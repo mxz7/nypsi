@@ -103,20 +103,20 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await setInventory(message.member, inventory);
 
-    let sellWorth = Math.floor(selected.worth * 0.5 * amount);
+    let sellWorth = Math.floor(selected.sell * amount);
 
     const multi = await getMulti(message.member);
 
     if (selected.role == "fish" || selected.role == "prey" || selected.role == "sellable") {
         sellWorth = Math.floor(sellWorth + sellWorth * multi);
     } else if (selected.id == "ethereum" || selected.id == "bitcoin") {
-        if (!selected.worth) {
+        if (!selected.sell) {
             return message.channel.send({
                 embeds: [new ErrorEmbed(`you cannot currently sell ${selected.name}`)],
             });
         }
-        sellWorth = Math.floor(selected.worth * 0.95 * amount);
-    } else if (!selected.worth) {
+        sellWorth = Math.floor(selected.sell * 0.95 * amount);
+    } else if (!selected.sell) {
         sellWorth = 1000 * amount;
     }
 

@@ -55,8 +55,9 @@ async function updateCryptoWorth() {
 
     const btcworth = Math.floor(res.bpi.USD.rate_float);
 
-    items["bitcoin"].worth = btcworth;
-    logger.info("bitcoin worth updated: $" + items["bitcoin"].worth.toLocaleString());
+    items["bitcoin"].buy = btcworth;
+    items["bitcoin"].sell = btcworth;
+    logger.info("bitcoin worth updated: $" + items["bitcoin"].buy.toLocaleString());
 
     res = await fetch("https://api.coinbase.com/v2/exchange-rates?currency=ETH").then((res) => res.json());
 
@@ -67,8 +68,9 @@ async function updateCryptoWorth() {
         return logger.error(res);
     }
 
-    items["ethereum"].worth = ethWorth;
-    logger.info("ethereum worth updated: $" + items["ethereum"].worth.toLocaleString());
+    items["ethereum"].buy = ethWorth;
+    items["ethereum"].sell = ethWorth;
+    logger.info("ethereum worth updated: $" + items["ethereum"].buy.toLocaleString());
 }
 
 export function getPadlockPrice(): number {
@@ -80,11 +82,13 @@ export function runEconomySetup() {
 
     loadItems();
 
-    items["padlock"].worth = padlockPrice;
+    items["padlock"].buy = padlockPrice;
+    items["padlock"].sell = padlockPrice / 3;
 
     setInterval(() => {
         padlockPrice = 25000 + randomOffset();
-        items["padlock"].worth = padlockPrice;
+        items["padlock"].buy = padlockPrice;
+        items["padlock"].sell = padlockPrice / 3;
     }, 3600000);
 }
 
