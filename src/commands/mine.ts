@@ -99,9 +99,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     for (const boosterId of boosters.keys()) {
         if (items[boosterId].role == "booster") {
             if (items[boosterId].boosterEffect.boosts.includes("mine")) {
+                let chance: number;
                 switch (items[boosterId].id) {
                     case "fortune":
-                        let chance = Math.floor(Math.random() * 5);
+                        chance = Math.floor(Math.random() * 5);
                         if (chance > 2) {
                             multi += items[boosterId].boosterEffect.effect;
                         }
