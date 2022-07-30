@@ -518,6 +518,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     delete inventory["streak_token"];
                 }
 
+                await setInventory(message.member, inventory);
+
                 embed.setDescription("applying token...");
                 laterDescription = `applying token...\n\nyour new daily streak is: \`${query.dailyStreak}\``;
                 break;
@@ -529,8 +531,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 inventory["stolen_credit_card"]--;
 
                 if (inventory["stolen_credit_card"] <= 0) {
-                    delete inventory["stolen_creidt_card"];
+                    delete inventory["stolen_credit_card"];
                 }
+
+                await setInventory(message.member, inventory);
 
                 embed.setDescription("using stolen credit card...");
                 laterDescription = `using stolen credit card...\n\nsuccessfully added $**${amount.toLocaleString()}** to your bank capacity`;
@@ -587,6 +591,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     delete inventory["cookie"];
                 }
 
+                await setInventory(message.member, inventory);
+
                 embed.setDescription("consuming cookie...");
                 laterDescription = "consuming cookie...\n\nyum 😋";
                 break;
@@ -596,6 +602,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 if (inventory["cake"] <= 0) {
                     delete inventory["cake"];
                 }
+
+                await setInventory(message.member, inventory);
 
                 embed.setDescription("consuming cake...");
                 laterDescription = "consuming cake...\n\nyum 😋";
