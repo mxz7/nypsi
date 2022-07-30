@@ -541,6 +541,93 @@ export async function topAmount(guild: Guild, amount: number): Promise<string[]>
     return usersFinal;
 }
 
+export async function topAmountItem(guild: Guild, amount: number, item: string): Promise<string[]> {
+    let members: Collection<string, GuildMember>;
+
+    if (guild.memberCount == guild.members.cache.size) {
+        members = guild.members.cache;
+    } else {
+        members = await guild.members.fetch();
+    }
+
+    if (!members) members = guild.members.cache;
+
+    members = members.filter((m) => {
+        return !m.user.bot;
+    });
+
+    const query = await prisma.economy.findMany({
+        where: {
+            money: { gt: 1000 },
+        },
+        select: {
+            userId: true,
+            inventory: true,
+        },
+        orderBy: {
+            money: "desc",
+        },
+    });
+
+    let userIDs = [];
+    const amounts = new Map<string, number>();
+
+    for (const user of query) {
+        const inventory = user.inventory as Inventory;
+        if (members.has(user.userId)) {
+            if (!inventory[item]) continue;
+            userIDs.push(user.userId);
+            amounts.set(user.userId, inventory[item]);
+        }
+    }
+
+    if (userIDs.length > 500) {
+        userIDs = await workerSort(userIDs, amounts);
+        userIDs.reverse();
+    } else {
+        inPlaceSort(userIDs).desc((i) => amounts.get(i));
+    }
+
+    const usersFinal = [];
+
+    let count = 0;
+
+    const getMemberID = (guild: Guild, id: string) => {
+        const target = guild.members.cache.find((member) => {
+            return member.user.id == id;
+        });
+
+        return target;
+    };
+
+    for (const user of userIDs) {
+        if (count >= amount) break;
+        if (usersFinal.join().length >= 1500) break;
+
+        if (amounts.get(user) != 0) {
+            let pos: number | string = count + 1;
+
+            if (pos == 1) {
+                pos = "🥇";
+            } else if (pos == 2) {
+                pos = "🥈";
+            } else if (pos == 3) {
+                pos = "🥉";
+            }
+
+            usersFinal[count] =
+                pos +
+                " **" +
+                getMemberID(guild, user).user.tag +
+                "** " +
+                amounts.get(user).toLocaleString() +
+                ` ${items[item].name}s`;
+            count++;
+        }
+    }
+    return usersFinal;
+}
+
 export async function bottomAmount(guild: Guild, amount: number): Promise<string[]> {
     let members: Collection<string, GuildMember>;
 
