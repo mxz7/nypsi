@@ -590,6 +590,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 embed.setDescription("consuming cookie...");
                 laterDescription = "consuming cookie...\n\nyum 😋";
                 break;
+            case "cake":
+                inventory["cake"]--;
+
+                if (inventory["cake"] <= 0) {
+                    delete inventory["cake"];
+                }
+
+                embed.setDescription("consuming cake...");
+                laterDescription = "consuming cake...\n\nyum 😋";
+                break;
 
             default:
                 return send({ embeds: [new ErrorEmbed("you cannot use this item")] });
