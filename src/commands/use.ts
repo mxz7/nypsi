@@ -580,6 +580,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 embed.setDescription(`restraining **${handcuffsTarget.user.tag}**...`);
                 laterDescription = `restraining **${handcuffsTarget.user.tag}**...\n\n**${handcuffsTarget.user.tag}** has been restrained for one minute`;
                 break;
+            case "cookie":
+                inventory["cookie"]--;
+
+                if (inventory["cookie"] <= 0) {
+                    delete inventory["cookie"];
+                }
+
+                embed.setDescription("consuming cookie...");
+                laterDescription = "consuming cookie...\n\nyum 😋";
+                break;
 
             default:
                 return send({ embeds: [new ErrorEmbed("you cannot use this item")] });
