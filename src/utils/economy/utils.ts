@@ -1105,6 +1105,9 @@ export async function getStats(member: GuildMember): Promise<StatsProfile> {
         where: {
             economyUserId: id,
         },
+        orderBy: {
+            win: "desc",
+        },
     });
 
     return new StatsProfile(query);
