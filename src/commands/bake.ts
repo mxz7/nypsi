@@ -1,6 +1,6 @@
 import { CommandInteraction, Message } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import { getInventory, setInventory } from "../utils/economy/utils";
+import { createUser, getInventory, setInventory, userExists } from "../utils/economy/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
@@ -16,6 +16,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         return message.channel.send({ embeds: [embed] });
     }
+
+    if (!(await userExists(message.member))) await createUser(message.member);
 
     const inventory = await getInventory(message.member);
 
