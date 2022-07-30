@@ -55,7 +55,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             items[item].role == "car" ||
             items[item].role == "sellable" ||
             items[item].role == "ore" ||
-            items[item].role == "booster"
+            items[item].role == "booster" ||
+            items[item].role == "tool"
         )
             continue;
         if (pageOfItems.length == 6) {
