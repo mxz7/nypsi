@@ -73,7 +73,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         const pages = new Map<number, string[]>();
 
-        if (Array.from(Object.keys(stats)).length > 6) {
+        if (Object.keys(stats).length > 6) {
             for (const item in stats) {
                 if (pages.size == 0) {
                     pages.set(1, [item]);
@@ -91,7 +91,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         for (const item in stats) {
-            if (embed.data.fields.length >= 6) break;
+            if (embed.data.fields?.length >= 6) break;
 
             embed.addField(item, `**${stats[item].toLocaleString()}** use${stats[item] > 1 ? "s" : ""}`, true);
         }
