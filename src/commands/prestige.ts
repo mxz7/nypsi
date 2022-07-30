@@ -166,7 +166,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 ).toLocaleString()}**, **${crateAmount}** vote crates\n` +
                 `your new multiplier: **${Math.floor(multi * 100)}**%\nyour maximum bet: $**${maxBet.toLocaleString()}**\n` +
                 `you have received **${amount}** basic crate${amount > 1 ? "s" : ""}${
-                    booster ? "and a **double xp** booster for 3 hours" : ""
+                    booster ? " and a **double xp** booster for 3 hours" : ""
                 }`
         );
 
