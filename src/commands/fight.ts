@@ -172,16 +172,22 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     let lastUpdate = Date.now();
 
+    let ended = false;
+
     collector.on("collect", async (i) => {
         await i.deferUpdate();
 
+        if (ended) return;
+
         if (i.customId == "a") {
+            if (ended) return;
             if (i.user.id == message.author.id) {
                 fight.homeHit();
             } else {
                 fight.awayHit();
             }
         } else {
+            if (ended) return;
             if (i.user.id == message.author.id) {
                 const res = fight.homeHeal();
 
@@ -192,6 +198,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     });
                 }
             } else {
+                if (ended) return;
                 const res = fight.awayHeal();
 
                 if (!res) {
@@ -203,6 +210,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         const health = fight.getHealth();
 
         if (health.home < 0 || health.away < 0) {
+            if (ended) return;
+            ended = true;
             const embed = await fight.end();
 
             await msg.edit({ embeds: [embed], components: [] });
@@ -212,6 +221,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         if (lastUpdate < Date.now() - 1500) {
             const embed = fight.renderEmbed();
+            if (ended) return;
 
             embed.disableFooter();
 
