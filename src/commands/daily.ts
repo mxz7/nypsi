@@ -62,10 +62,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const total = base + streakBonus * streak;
 
-    let xp = 0;
+    let xp = 1;
 
-    if (streak > 35) {
-        xp = Math.floor((streak - 35) / 15);
+    if (streak > 20) {
+        xp = Math.floor((streak - 20) / 15);
     }
 
     await updateBalance(message.member, (await getBalance(message.member)) + total);
