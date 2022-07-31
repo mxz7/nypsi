@@ -55,7 +55,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await setInventory(message.member, inventory);
 
-    let desc = `you baked **${amount}** cookies!! 🍪`;
+    let desc = `you baked **${amount}** cookie${amount > 1 ? "s" : ""}!! 🍪`;
 
     if (chance == 7) {
         desc += "\n\nyou also managed to bake a cake <:nypsi_cake:1002977512630001725> good job!!";
