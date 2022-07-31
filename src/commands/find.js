@@ -156,10 +156,10 @@ async function showGuild(message, guild) {
         )
         .addField(
             "member info",
-            `**members** ${guild.memberCount}
+            `**members** ${guild.members.length}
     **peak** ${await getPeaks(guild)}`,
             true
-        );
+        ); // if guild.members.length works add members field back
 
     if (invites && invites.length > 0) {
         embed.addField(`invite (${invites.length})`, invites[Math.floor(Math.random() & invites.length)]);
