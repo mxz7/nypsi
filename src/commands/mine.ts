@@ -188,7 +188,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         let amount = 1;
 
         if (veins.has(chosen)) {
-            amount = veins.get(chosen)[Math.floor(Math.random() * veins.get(chosen).length)] * (times - 1);
+            amount = veins.get(chosen)[Math.floor(Math.random() * veins.get(chosen).length)];
 
             if (multi > 0) {
                 amount += amount * multi;
