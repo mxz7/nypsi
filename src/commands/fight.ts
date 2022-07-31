@@ -67,10 +67,23 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         return send({ embeds: [embed] });
+    } else if (args[0].toLowerCase() == "stats" || args[0].toLowerCase() == "stat") {
+        const stats = (await getStats(message.member)).gamble["fight"];
+
+        if (!stats) {
+            return send({ embeds: [new ErrorEmbed("you have no fight stats")] });
+        }
+
+        const embed = new CustomEmbed(
+            message.member,
+            `you have won **${stats.wins.toLocaleString()}** fights and lost **${stats.lose.toLocaleString()}**`
+        ).setHeader("your fight stats", message.author.avatarURL());
+
+        return send({ embeds: [embed] });
     }
 
     if (waiting.has(message.author.id)) {
-        return message.channel.send({
+        return send({
             embeds: [new ErrorEmbed("please wait until your game has been accepted or denied")],
         });
     }
