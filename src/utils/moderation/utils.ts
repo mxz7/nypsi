@@ -98,7 +98,8 @@ export async function addModLog(
     moderator: string,
     command: string,
     caseID: number,
-    channelId?: string
+    channelId?: string,
+    similarity?: string
 ) {
     let punished: GuildMember | User | void = await guild.members.fetch(userID).catch(() => {});
 
@@ -124,6 +125,9 @@ export async function addModLog(
             embed.addField("moderator", `nypsi in <#${channelId}>`, true);
         } else {
             embed.addField("moderator", "nypsi", true);
+        }
+        if (similarity) {
+            embed.setFooter({ text: `${similarity}% match to filtered word` });
         }
     }
 
