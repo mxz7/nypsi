@@ -1,7 +1,7 @@
 import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
-import { getChatFilter, updateChatFilter, getPrefix } from "../utils/guilds/utils";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
+import { getChatFilter, getPrefix, updateChatFilter } from "../utils/guilds/utils";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 
 const cmd = new Command("chatfilter", "change the chat filter for your server", Categories.ADMIN)
     .setAliases(["filter"])
@@ -27,6 +27,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (filter.length == 0) {
             embed.setDescription("`❌` empty chat filter");
         }
+
+        return message.channel.send({ embeds: [embed] });
+    }
+
+    if (args[0].toLowerCase() == "help") {
+        const embed = new CustomEmbed(message.member).setHeader("chat filter help");
+
+        embed.setDescription(
+            `${prefix}**filter add/+ <word>** *add a word to the chat filter*\n${prefix}**filter del/- <word>** *remove a word from the chat filter*\n${prefix}**filter reset** *reset the chat filter*\n${prefix}**filter match <percentage>** *percentage match required to delete message*`
+        );
 
         return message.channel.send({ embeds: [embed] });
     }
