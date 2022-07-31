@@ -322,7 +322,7 @@ export async function increaseBaseBankStorage(member: GuildMember, amount: numbe
     });
 }
 
-export async function getXp(member: GuildMember): Promise<number> {
+export async function getXp(member: GuildMember | string): Promise<number> {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -363,11 +363,18 @@ export async function updateXp(member: GuildMember, amount: number) {
     await redis.del(`cache:economy:xp:${member.user.id}`);
 }
 
-export async function getMaxBankBalance(member: GuildMember): Promise<number> {
+export async function getMaxBankBalance(member: GuildMember | string): Promise<number> {
+    let id: string;
+    if (member instanceof GuildMember) {
+        id = member.user.id;
+    } else {
+        id = member;
+    }
+
     const base = await prisma.economy
         .findUnique({
             where: {
-                userId: member.user.id,
+                userId: id,
             },
             select: {
                 bankStorage: true,
@@ -375,7 +382,7 @@ export async function getMaxBankBalance(member: GuildMember): Promise<number> {
         })
         .then((q) => Number(q.bankStorage));
 
-    const xp = await getXp(member);
+    const xp = await getXp(id);
     const constant = 550;
     const starting = 15000;
     const bonus = xp * constant;
