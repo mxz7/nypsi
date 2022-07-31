@@ -625,7 +625,7 @@ export async function topAmountItem(guild: Guild, amount: number, item: string):
                 getMemberID(guild, user).user.tag +
                 "** " +
                 amounts.get(user).toLocaleString() +
-                ` ${items[item].name}s`;
+                ` ${items[item].name}${amounts.get(user) > 1 ? "s" : ""}`;
             count++;
         }
     }
