@@ -763,3 +763,52 @@ export async function deleteCountdown(guild: Guild | string, id: string | number
         },
     });
 }
+
+export async function getPercentMatch(guild: Guild | string) {
+    let guildID: string;
+
+    if (guild instanceof Guild) {
+        guildID = guild.id;
+    } else {
+        guildID = guild;
+    }
+
+    if (await redis.exists(`cache:guild:percentmatch:${guildID}`)) {
+        return parseInt(await redis.get(`cache:guild:percentmatch:${guildID}`));
+    }
+
+    const query = await prisma.guild.findUnique({
+        where: {
+            id: guildID,
+        },
+        select: {
+            percentMatch: true,
+        },
+    });
+
+    await redis.set(`cache:guild:percentmatch:${guildID}`, query.percentMatch);
+    await redis.expire(`cache:guild:percentmatch:${guildID}`, 3600);
+
+    return query.percentMatch;
+}
+
+export async function setPercentMatch(guild: Guild | string, num: number) {
+    let guildID: string;
+
+    if (guild instanceof Guild) {
+        guildID = guild.id;
+    } else {
+        guildID = guild;
+    }
+
+    await prisma.guild.update({
+        where: {
+            id: guildID,
+        },
+        data: {
+            percentMatch: num,
+        },
+    });
+
+    await redis.del(`cache:guild:percentmatch:${guildID}`);
+}
