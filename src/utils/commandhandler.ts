@@ -322,7 +322,7 @@ async function helpCmd(message: Message, args: string[]) {
             }
 
             if (selectedItem.sell) {
-                desc.push(`**sell** $${selectedItem.buy.toLocaleString()}`);
+                desc.push(`**sell** $${selectedItem.sell.toLocaleString()}`);
             }
 
             if (selectedItem.rarity) {
