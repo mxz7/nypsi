@@ -875,5 +875,16 @@
         "buy": 0,
         "sell": 50000,
         "role": "tool"
+    },
+    "blue_rocks": {
+        "id": "blue_rocks",
+        "name": "blue rocks",
+        "aliases": ["blue", "meth", "C10H15N"],
+        "emoji": "<:nypsi_bluerock:1003408529954177144>",
+        "description": "https://youtu.be/Dbt-OfbQTpw?t=28",
+        "rarity": 1,
+        "buy": 0,
+        "sell": 3000,
+        "role": "sellable"
     }
 }
