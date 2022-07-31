@@ -1,5 +1,5 @@
 import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
-import { getChatFilter, getPrefix, updateChatFilter } from "../utils/guilds/utils";
+import { getChatFilter, getPercentMatch, getPrefix, setPercentMatch, updateChatFilter } from "../utils/guilds/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 
@@ -39,6 +39,37 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         );
 
         return message.channel.send({ embeds: [embed] });
+    }
+
+    if (args[0].toLowerCase() == "match" || args[0].toLowerCase() == "percent") {
+        if (args.length == 1) {
+            const embed = new CustomEmbed(message.member).setHeader("chat filter percentage match");
+
+            const current = await getPercentMatch(message.guild);
+
+            embed.setDescription(
+                `current: \`${current}%\` match required\nuse ${prefix}**filter match <percent>** to change this.\n\n` +
+                    "the percentage match setting allows nypsi to calculate a percentage difference from words in a user's message and with words in the filter, if a word has a high enough match rate, that can be deleted. set this to 100 for exact matches only"
+            );
+
+            return message.channel.send({ embeds: [embed] });
+        }
+
+        if (!parseInt(args[1])) {
+            return message.channel.send({ embeds: [new ErrorEmbed("must be a number idiot")] });
+        }
+
+        const amount = parseInt(args[1]);
+
+        if (amount < 0 || amount > 100) {
+            return message.channel.send({ embeds: [new ErrorEmbed("ur pretty stupid arent u. **PERCENTAGE** MATCH")] });
+        }
+
+        await setPercentMatch(message.guild, amount);
+
+        return message.channel.send({
+            embeds: [new CustomEmbed(message.member, `✅ percentage match has been set to \`${amount}%\``)],
+        });
     }
 
     if (args[0].toLowerCase() == "add" || args[0].toLowerCase() == "+") {
