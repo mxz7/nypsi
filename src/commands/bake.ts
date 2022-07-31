@@ -33,7 +33,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
     }
 
-    await addCooldown(cmd.name, message.member, 900);
+    await addCooldown(cmd.name, message.member, 1200);
 
     const amount = Math.floor(Math.random() * 4) + 1;
 
