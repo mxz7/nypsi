@@ -140,10 +140,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
     }
 
-    if (selected.role != "item" && selected.role != "tool" && selected.role != "crate" && selected.role != "booster") {
-        return send({ embeds: [new ErrorEmbed("you cannot use this item")] });
-    }
-
     let cooldownLength = 10;
 
     if (selected.role == "crate") {
