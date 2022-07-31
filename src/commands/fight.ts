@@ -434,6 +434,9 @@ class FightCharacter {
         this.heals -= 1;
 
         this.health += 25;
+
+        if (this.health > 100) this.health = 100;
+
         this.lastHeal = Date.now();
         return true;
     }
