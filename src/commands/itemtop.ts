@@ -34,8 +34,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [embed] });
     }
 
-    await addCooldown(cmd.name, message.member, 15);
-
     const items = getItems();
     let item: Item;
     const prefix = await getPrefix(message.guild);
@@ -72,6 +70,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (!item) {
         return send({ embeds: [new ErrorEmbed("invalid item")] });
     }
+
+    await addCooldown(cmd.name, message.member, 15);
 
     const balTop = await topAmountItem(message.guild, 5, item.id);
 
