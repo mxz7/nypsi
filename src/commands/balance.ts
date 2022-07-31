@@ -1,21 +1,21 @@
 import { CommandInteraction, GuildMember, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
 import {
-    getBalance,
     createUser,
-    userExists,
-    updateBalance,
+    deleteUser,
+    getBalance,
     getBankBalance,
     getMaxBankBalance,
-    getXp,
+    getPrestige,
     getPrestigeRequirement,
     getPrestigeRequirementBal,
-    getPrestige,
-    deleteUser,
+    getXp,
+    updateBalance,
+    userExists,
 } from "../utils/economy/utils.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
-import { getPrefix } from "../utils/guilds/utils";
 import { getMember } from "../utils/functions/member.js";
+import { getPrefix } from "../utils/guilds/utils";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 
 const cmd = new Command("balance", "check your balance", Categories.MONEY).setAliases(["bal", "money", "wallet"]);
 
@@ -84,9 +84,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         .setFooter({ text: footer });
 
     if (target.user.id == message.author.id) {
-        embed.setHeader("your balance | season 3", message.author.avatarURL());
+        embed.setHeader("your balance | season 4", message.author.avatarURL());
     } else {
-        embed.setHeader(`${target.user.username}'s balance | season 3`, target.user.avatarURL());
+        embed.setHeader(`${target.user.username}'s balance | season 4`, target.user.avatarURL());
     }
 
     const send = async (data: MessageOptions) => {
