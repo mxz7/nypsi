@@ -116,7 +116,7 @@ model Guild {
   disabledCommands String[]
   snipeFilter      String[]
   chatFilter       String[]
-  percentMatch     Int      @default(80)
+  percentMatch     Int      @default(75)
   prefix           String   @default("$")
 
   GuildChristmas GuildChristmas?
