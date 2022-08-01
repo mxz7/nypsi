@@ -18,8 +18,8 @@ export default async function messageUpdate(message: Message, newMessage: Messag
                 message.author.id
             }\`\n\n**channel** ${message.channel.toString()} \`${message.channelId}\``
         );
-        embed.addField("old content", `\`${message.content}\``, true);
-        embed.addField("new content", `\`${newMessage.content}\``, true);
+        embed.addField("old content", `\`\`\`${message.content}\`\`\``, true);
+        embed.addField("new content", `\`\`\`${newMessage.content}\`\`\``, true);
 
         await addLog(message.guild, LogType.MESSAGE, embed);
     }
