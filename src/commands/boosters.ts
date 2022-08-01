@@ -4,7 +4,7 @@ import { getBoosters, getItems } from "../utils/economy/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed } from "../utils/models/EmbedBuilders";
 
-const cmd = new Command("boosters", "view your current active boosters", Categories.NSFW).setAliases(["booster"]);
+const cmd = new Command("boosters", "view your current active boosters", Categories.MONEY).setAliases(["booster"]);
 
 cmd.slashEnabled = true;
 
