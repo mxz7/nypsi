@@ -161,10 +161,10 @@ model GuildCountdown {
 }
 
 model Moderation {
-  caseCount   Int     @default(0)
-  muteRole    String?
-  modlogs     String?
-  logsChannel String?
+  caseCount Int     @default(0)
+  muteRole  String?
+  modlogs   String?
+  logs      String?
 
   guild          Guild            @relation(fields: [guildId], references: [id])
   guildId        String           @unique
