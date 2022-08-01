@@ -1,3 +1,4 @@
+import dayjs = require("dayjs");
 import { CommandInteraction, Message } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import {
@@ -63,6 +64,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (!(await userExists(target))) await createUser(target);
 
     if (!(await userExists(message.member))) await createUser(message.member);
+
+    if (message.author.createdTimestamp > dayjs().subtract(1, "hour").unix() * 1000) {
+        return message.channel.send({
+            embeds: [new ErrorEmbed("you cannot use this command yet. u might be an alt. or a bot 😳")],
+        });
+    }
 
     if ((await getPrestige(message.member)) < 1) {
         if ((await getXp(message.member)) < 100) {
