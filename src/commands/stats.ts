@@ -38,7 +38,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         ];
 
         for (const g of Object.keys(stats.gamble)) {
-            const percent = ((stats.gamble[g].wins / stats.gamble[g].lose + stats.gamble[g].wins) * 100).toFixed(1);
+            const percent = ((stats.gamble[g].wins / (stats.gamble[g].lose + stats.gamble[g].wins)) * 100).toFixed(1);
             gambleMsg.push(
                 `- **${g}** ${stats.gamble[g].wins.toLocaleString()} / ${(
                     stats.gamble[g].wins + stats.gamble[g].lose
