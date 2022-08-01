@@ -59,7 +59,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
 
     const lastVote = query.lastVote.getTime();
 
-    if (now - lastVote < 43200000) {
+    if (now - lastVote < 25200000) {
         return logger.error(`${user} already voted`);
     }
 
