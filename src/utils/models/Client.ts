@@ -21,7 +21,7 @@ import { runChristmas, runCountdowns, runSnipeClearIntervals, updateCounters } f
 import { updateCache } from "../imghandler";
 import { getWebhooks, logger, setClusterId } from "../logger";
 import { runLotteryInterval } from "../scheduled/clusterjobs/lottery";
-import { runModerationChecks } from "../scheduled/clusterjobs/moderationchecks";
+import { runLogs, runModerationChecks } from "../scheduled/clusterjobs/moderationchecks";
 import { runPremiumChecks } from "../scheduled/clusterjobs/premiumexpire";
 import { runPremiumCrateInterval } from "../scheduled/clusterjobs/weeklycrates";
 
@@ -113,5 +113,6 @@ export class NypsiClient extends Client {
         runPremiumCrateInterval(this);
         runPremiumChecks(this);
         runModerationChecks(this);
+        runLogs();
     }
 }
