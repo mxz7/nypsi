@@ -25,6 +25,8 @@ export default async function messageDeleteBulk(messages: Collection<Snowflake, 
             return true;
         });
 
+        desc.reverse();
+
         embed.setDescription(`\`\`\`${desc.join("\n")}\`\`\``);
 
         await addLog(channel.guild, LogType.MESSAGE, embed);
