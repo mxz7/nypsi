@@ -41,7 +41,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     let max = 15 + (prestigeBonus + premiumBonus + karmaBonus) * 4;
 
-    if (max > 100) max = 100;
+    if (max > 50) max = 50;
 
     const send = async (data: MessageOptions) => {
         if (!(message instanceof Message)) {
