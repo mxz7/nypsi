@@ -1153,6 +1153,8 @@ export async function toggleBan(id: string) {
 }
 
 export async function reset() {
+    await prisma.lotteryTicket.deleteMany();
+    await prisma.$executeRaw`ALTER SEQUENCE "LotteryTicket_id_seq" RESTART WITH 1;`;
     await prisma.booster.deleteMany();
     await prisma.economyStats.deleteMany();
     await prisma.economyGuildMember.deleteMany();
