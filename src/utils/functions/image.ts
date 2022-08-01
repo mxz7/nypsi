@@ -20,10 +20,13 @@ const imgur = new ImgurClient({
 let uploadDisabled = false;
 
 let uploadCount = 0;
-setInterval(() => {
-    uploadCount = 0;
-    logger.info("imgur upload count reset");
-}, 86400000);
+
+export function runUploadReset() {
+    setInterval(() => {
+        uploadCount = 0;
+        logger.info("imgur upload count reset");
+    }, 86400000);
+}
 
 const wholesomeWebhook = new WebhookClient({
     url: process.env.WHOLESOME_HOOK,
