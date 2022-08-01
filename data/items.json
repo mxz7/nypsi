@@ -47,8 +47,8 @@
         "description": "can be used to smelt 1 ore",
         "role": "fuel",
         "rarity": 1,
-        "buy": 0,
-        "sell": 2000
+        "buy": 3000,
+        "sell": 1500
     },
     "iron_ingot": {
         "id": "iron_ingot",
