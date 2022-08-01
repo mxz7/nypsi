@@ -7,3 +7,12 @@ export enum PunishmentType {
     UNBAN = "unban",
     FILTER_VIOLATION = "filter violation",
 }
+
+export enum LogType {
+    MEMBER = "member",
+    MESSAGE = "message",
+    CHANNEL = "channel",
+    ROLE = "role",
+    SERVER = "server",
+    EMOJI = "emoji",
+}

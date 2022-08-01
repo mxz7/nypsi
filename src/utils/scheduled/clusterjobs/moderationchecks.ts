@@ -5,6 +5,81 @@ import { logger } from "../../logger";
 import { NypsiClient } from "../../models/Client";
 import { requestUnban, requestUnmute } from "../../moderation/utils";
 
+export function runLogs() {
+    setInterval(async () => {
+        const query = await prisma.moderation.findMany({
+            where: {
+                logs: { not: null },
+            },
+            select: {
+                guildId: true,
+                logs: true,
+            },
+        });
+
+        let count = 0;
+
+        for (const guild of query) {
+            if ((await redis.llen(`nypsi:guild:logs:queue:${guild.guildId}`)) == 0) {
+                continue;
+            }
+            const hook = new WebhookClient({ url: guild.logs });
+
+            if (!hook) {
+                await prisma.moderation.update({
+                    where: {
+                        guildId: guild.guildId,
+                    },
+                    data: {
+                        logs: null,
+                    },
+                });
+                continue;
+            }
+
+            const embeds: APIEmbed[] = [];
+
+            if ((await redis.llen(`nypsi:guild:logs:queue:${guild.guildId}`)) > 10) {
+                for (let i = 0; i < 10; i++) {
+                    const current = await redis.rpop(`nypsi:guild:logs:queue:${guild.guildId}`);
+                    embeds.push(JSON.parse(current) as APIEmbed);
+                }
+            } else {
+                const current = await redis.lrange(`nypsi:guild:logs:queue:${guild.guildId}`, 0, 10);
+                await redis.del(`nypsi:guild:logs:queue:${guild.guildId}`);
+                for (const i of current) {
+                    embeds.push(JSON.parse(i) as APIEmbed);
+                }
+            }
+
+            embeds.reverse();
+
+            await hook
+                .send({ embeds: embeds })
+                .then(() => {
+                    count += embeds.length;
+                })
+                .catch(async (e) => {
+                    console.log(e);
+                    logger.error(`error sending logs to webhook (${guild.guildId})`);
+
+                    await prisma.moderation.update({
+                        where: {
+                            guildId: guild.guildId,
+                        },
+                        data: {
+                            logs: null,
+                        },
+                    });
+                });
+        }
+
+        if (count > 0) {
+            logger.info(`sent ${count} logs`);
+        }
+    }, 5000);
+}
+
 export function runModerationChecks(client: NypsiClient) {
     setInterval(async () => {
         const date = new Date();
@@ -68,9 +143,9 @@ export function runModerationChecks(client: NypsiClient) {
             const embeds: APIEmbed[] = [];
 
             if ((await redis.llen(`modlogs:${modlog.guildId}`)) > 10) {
-                const current = await redis.lpop(`modlogs:${modlog.guildId}`, 10);
-                for (const i of current) {
-                    embeds.push(JSON.parse(i) as APIEmbed);
+                for (let i = 0; i < 10; i++) {
+                    const current = await redis.rpop(`modlogs:${modlog.guildId}`);
+                    embeds.push(JSON.parse(current) as APIEmbed);
                 }
             } else {
                 const current = await redis.lrange(`modlogs:${modlog.guildId}`, 0, 10);
