@@ -1,6 +1,7 @@
 import * as Cluster from "discord-hybrid-sharding";
 import { Client, ClientOptions } from "discord.js";
 import channelCreate from "../../events/channelCreate";
+import channelDelete from "../../events/channelDelete";
 import guildCreate from "../../events/guildCreate";
 import guildDelete from "../../events/guildDelete";
 import guildMemberAdd from "../../events/guildMemberAdd";
@@ -89,6 +90,7 @@ export class NypsiClient extends Client {
             this.on("messageCreate", messageCreate.bind(null));
             this.on("messageDeleteBulk", messageDeleteBulk.bind(null));
             this.on("channelCreate", channelCreate.bind(null));
+            this.on("channelDelete", channelDelete.bind(null));
             this.on("roleDelete", roleDelete.bind(null));
             this.on("userUpdate", userUpdate.bind(null));
             this.on("interactionCreate", interactionCreate.bind(null));
