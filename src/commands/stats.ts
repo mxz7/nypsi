@@ -38,7 +38,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         ];
 
         for (const g of Object.keys(stats.gamble)) {
-            const percent = ((stats.gamble[g].wins / stats.gamble[g].lose) * 100).toFixed(1);
+            const percent = ((stats.gamble[g].wins / stats.gamble[g].lose + stats.gamble[g].wins) * 100).toFixed(1);
             gambleMsg.push(
                 `- **${g}** ${stats.gamble[g].wins.toLocaleString()} / ${(
                     stats.gamble[g].wins + stats.gamble[g].lose
@@ -60,7 +60,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             itemMsg.push(`- **${i}** ${stats.items[i].toLocaleString()}`);
         }
 
-        embed.addField("items", itemMsg.join("\n"), true);
+        embed.addField("item uses", itemMsg.join("\n"), true);
 
         embed.setFooter({ text: `you have performed ${commandUses.toLocaleString()} commands today` });
 
