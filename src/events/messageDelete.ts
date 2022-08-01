@@ -1,5 +1,8 @@
 import { Message } from "discord.js";
 import { createGuild, getChatFilter, getSnipeFilter, hasGuild, snipe } from "../utils/guilds/utils";
+import { CustomEmbed } from "../utils/models/EmbedBuilders";
+import { LogType } from "../utils/models/GuildStorage";
+import { addLog, isLogsEnabled } from "../utils/moderation/utils";
 
 export default async function messageDelete(message: Message) {
     if (!message) return;
@@ -8,6 +11,20 @@ export default async function messageDelete(message: Message) {
 
     if (message.content != "" && !message.member.user.bot && message.content.length > 1) {
         if (!(await hasGuild(message.guild))) await createGuild(message.guild);
+
+        if (await isLogsEnabled(message.guild)) {
+            const embed = new CustomEmbed().disableFooter().setTimestamp();
+
+            embed.setHeader("message deleted");
+            embed.setDescription(
+                `${message.member.toString()} \`${message.author.id}\`\n\n**channel** ${message.channel.toString()} \`${
+                    message.channelId
+                }\``
+            );
+            embed.addField("content", `\`${message.content}\``);
+
+            await addLog(message.guild, LogType.MESSAGE, embed);
+        }
 
         const filter = await getSnipeFilter(message.guild);
 
