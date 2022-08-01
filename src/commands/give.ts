@@ -1,22 +1,22 @@
 import { CommandInteraction, Message } from "discord.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import {
-    isEcoBanned,
-    userExists,
     createUser,
-    getItems,
     getInventory,
+    getItems,
     getMaxBitcoin,
     getMaxEthereum,
     getPrestige,
     getXp,
+    isEcoBanned,
     setInventory,
+    userExists,
 } from "../utils/economy/utils";
+import { getMember } from "../utils/functions/member";
 import { getPrefix } from "../utils/guilds/utils";
 import { payment } from "../utils/logger";
-import { getMember } from "../utils/functions/member";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("give", "give other users items from your inventory", Categories.MONEY);
 
@@ -63,6 +63,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (!(await userExists(target))) await createUser(target);
 
     if (!(await userExists(message.member))) await createUser(message.member);
+
+    if ((await getPrestige(message.member)) < 1) {
+        if ((await getXp(message.member)) < 100) {
+            return message.channel.send({
+                embeds: [new ErrorEmbed("you cannot use this command yet. u might be an alt. or a bot 😳")],
+            });
+        }
+    }
 
     const items = getItems();
     const inventory = await getInventory(message.member);
