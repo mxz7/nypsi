@@ -75,7 +75,7 @@ export function runLogs() {
         }
 
         if (count > 0) {
-            logger.info(`sent ${count} logs`);
+            logger.log({ level: "auto", message: `sent ${count} logs` });
         }
     }, 5000);
 }
