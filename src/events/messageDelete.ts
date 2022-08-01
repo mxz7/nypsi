@@ -21,7 +21,7 @@ export default async function messageDelete(message: Message) {
                     message.channelId
                 }\``
             );
-            embed.addField("content", `\`${message.content}\``);
+            embed.addField("content", `\`\`\`${message.content}\`\`\``);
 
             await addLog(message.guild, LogType.MESSAGE, embed);
         }
