@@ -16,6 +16,7 @@ import { getMember } from "../utils/functions/member";
 import { getPrefix } from "../utils/guilds/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
+import ms = require("ms");
 
 const cmd = new Command("fight", "challenge another member to a fight", Categories.FUN);
 
@@ -25,6 +26,7 @@ cmd.slashData.addUserOption((option) =>
 );
 
 const waiting = new Set<string>();
+const cookieRecent = new Set<string>();
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!(await userExists(message.member))) {
@@ -373,19 +375,22 @@ class Fight {
         }
 
         if (await userExists(winner.member.user.id)) {
-            const inventory = await getInventory(winner.member.user.id);
+            if (!cookieRecent.has(winner.member.user.id)) {
+                cookieRecent.add(winner.member.user.id);
+                const inventory = await getInventory(winner.member.user.id);
 
-            if (inventory["cookie"]) {
-                inventory["cookie"]++;
-            } else {
-                inventory["cookie"] = 1;
+                if (inventory["cookie"]) {
+                    inventory["cookie"]++;
+                } else {
+                    inventory["cookie"] = 1;
+                }
+
+                await setInventory(winner.member.user.id, inventory);
+
+                embed.setFooter({ text: "well done. enjoy this cookie 🍪" });
             }
 
-            await setInventory(winner.member.user.id, inventory);
-
             await addGamble(winner.member, "fight", true);
-
-            embed.setFooter({ text: "well done. enjoy this cookie 🍪" });
         }
 
         if (await userExists(loser.user.id)) {
@@ -462,3 +467,7 @@ async function wait(seconds: number) {
         }, seconds * 1000);
     });
 }
+
+setInterval(() => {
+    cookieRecent.clear();
+}, ms("30m"));
