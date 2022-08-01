@@ -1,21 +1,22 @@
 import { CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions, MessageOptions } from "discord.js";
-import { getMember } from "../utils/functions/member";
-import {
-    updateBalance,
-    getBalance,
-    userExists,
-    createUser,
-    getXp,
-    getPrestige,
-    isEcoBanned,
-} from "../utils/economy/utils.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
-import { getPrefix } from "../utils/guilds/utils";
-import { isPremium } from "../utils/premium/utils";
-import { formatNumber } from "../utils/economy/utils";
-import { payment } from "../utils/logger";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { formatNumber } from "../utils/economy/utils";
+import {
+    createUser,
+    getBalance,
+    getPrestige,
+    getXp,
+    isEcoBanned,
+    updateBalance,
+    userExists,
+} from "../utils/economy/utils.js";
+import { getMember } from "../utils/functions/member";
+import { getPrefix } from "../utils/guilds/utils";
+import { payment } from "../utils/logger";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
+import { isPremium } from "../utils/premium/utils";
+import dayjs = require("dayjs");
 
 const cmd = new Command("pay", "give other users money", Categories.MONEY);
 
@@ -86,6 +87,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (!(await userExists(target))) await createUser(target);
 
     if (!(await userExists(message.member))) await createUser(message.member);
+
+    if (message.author.createdTimestamp > dayjs().subtract(1, "hour").unix() * 1000) {
+        return message.channel.send({
+            embeds: [new ErrorEmbed("you cannot use this command yet. u might be an alt. or a bot 😳")],
+        });
+    }
 
     if (args[1].toLowerCase() == "all") {
         args[1] = (await getBalance(message.member)).toString();
