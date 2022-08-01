@@ -20,6 +20,9 @@ export function runLogs() {
         let count = 0;
 
         for (const guild of query) {
+            if ((await redis.llen(`nypsi:guild:logs:queue:${guild.guildId}`)) == 0) {
+                continue;
+            }
             const hook = new WebhookClient({ url: guild.logs });
 
             if (!hook) {
