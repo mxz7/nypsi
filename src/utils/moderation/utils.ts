@@ -3,9 +3,10 @@ import prisma from "../database/database";
 import redis from "../database/redis";
 import { NypsiClient } from "../models/Client";
 import { CustomEmbed } from "../models/EmbedBuilders";
-import { PunishmentType } from "../models/GuildStorage";
+import { LogType, PunishmentType } from "../models/GuildStorage";
 
 const modLogColors = new Map<PunishmentType, ColorResolvable>();
+const logColors = new Map<LogType, ColorResolvable>();
 
 modLogColors.set(PunishmentType.MUTE, "#ffffba");
 modLogColors.set(PunishmentType.BAN, "#ffb3ba");
@@ -14,6 +15,13 @@ modLogColors.set(PunishmentType.WARN, "#bae1ff");
 modLogColors.set(PunishmentType.KICK, "#ffdfba");
 modLogColors.set(PunishmentType.UNBAN, "#ffb3ba");
 modLogColors.set(PunishmentType.FILTER_VIOLATION, "#baffc9");
+
+logColors.set(LogType.SERVER, "#f7343a");
+logColors.set(LogType.ROLE, "#a046fa");
+logColors.set(LogType.CHANNEL, "#46fa7c");
+logColors.set(LogType.EMOJI, "#f1fa46");
+logColors.set(LogType.MEMBER, "#46befa");
+logColors.set(LogType.MESSAGE, "#fa8b46");
 
 export async function createProfile(guild: Guild) {
     await prisma.moderation.create({
@@ -138,6 +146,12 @@ export async function addModLog(
     }
 
     await redis.lpush(`modlogs:${guild.id}`, JSON.stringify(embed.toJSON()));
+}
+
+export async function addLog(guild: Guild, type: LogType, embed: CustomEmbed) {
+    embed.setColor(logColors.get(type));
+
+    await redis.lpush(`nypsi:guild:logs:queue:${guild.id}`, JSON.stringify(embed.toJSON()));
 }
 
 export async function isLogsEnabled(guild: Guild) {
