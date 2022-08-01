@@ -156,8 +156,7 @@ export async function addLog(guild: Guild, type: LogType, embed: CustomEmbed) {
 
 export async function isLogsEnabled(guild: Guild) {
     if (await redis.exists(`cache:guild:logs:${guild.id}`)) {
-        if ((await redis.get(`cache:guild:logs:${guild.id}`)) != "none") return true;
-        return false;
+        return (await redis.get(`cache:guild:logs:${guild.id}`)) === "t" ? true : false;
     }
 
     const query = await prisma.moderation.findUnique({
@@ -169,7 +168,14 @@ export async function isLogsEnabled(guild: Guild) {
         },
     });
 
-    if (!query || !query.logs) return false;
+    if (!query || !query.logs) {
+        await redis.set(`cache:guild:logs:${guild.id}`, "f");
+        await redis.expire(`cache:guild:logs:${guild.id}`, 3600);
+        return false;
+    } else {
+        await redis.set(`cache:guild:logs:${guild.id}`, "t");
+        await redis.expire(`cache:guild:logs:${guild.id}`, 3600);
+    }
 
     return true;
 }
