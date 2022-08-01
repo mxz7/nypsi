@@ -16,7 +16,11 @@ export default async function messageDelete(message: Message) {
             const embed = new CustomEmbed().disableFooter().setTimestamp();
 
             embed.setHeader("message deleted");
-            embed.setDescription(`${message.member.toString()} \`${message.author.id}\``);
+            embed.setDescription(
+                `${message.member.toString()} \`${message.author.id}\`\n\n**channel** ${message.channel.toString()} \`${
+                    message.channelId
+                }\``
+            );
             embed.addField("content", `\`${message.content}\``);
 
             await addLog(message.guild, LogType.MESSAGE, embed);
