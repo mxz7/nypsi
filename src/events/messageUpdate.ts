@@ -9,7 +9,7 @@ export default async function messageUpdate(message: Message, newMessage: Messag
 
     if (!message.member) return;
 
-    if (await isLogsEnabled(message.guild)) {
+    if ((await isLogsEnabled(message.guild)) && !message.author.bot) {
         const embed = new CustomEmbed().disableFooter().setTimestamp();
 
         embed.setHeader("message updated");
