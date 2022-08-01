@@ -9,6 +9,7 @@ import guildMemberUpdate from "../../events/guildMemberUpdate";
 import interactionCreate from "../../events/interactionCreate";
 import messageCreate from "../../events/message";
 import messageDelete from "../../events/messageDelete";
+import messageDeleteBulk from "../../events/messageDeleteBulk";
 import messageUpdate from "../../events/messageUpdate";
 import ready from "../../events/ready";
 import roleDelete from "../../events/roleDelete";
@@ -86,6 +87,7 @@ export class NypsiClient extends Client {
             this.on("messageDelete", messageDelete.bind(null));
             this.on("messageUpdate", messageUpdate.bind(null));
             this.on("messageCreate", messageCreate.bind(null));
+            this.on("messageDeleteBulk", messageDeleteBulk.bind(null));
             this.on("channelCreate", channelCreate.bind(null));
             this.on("roleDelete", roleDelete.bind(null));
             this.on("userUpdate", userUpdate.bind(null));
