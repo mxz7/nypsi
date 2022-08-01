@@ -2,6 +2,7 @@ import dayjs = require("dayjs");
 import { CommandInteraction, Message } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import {
+    createUser,
     getBalance,
     getDailyStreak,
     getLastDaily,
@@ -9,6 +10,7 @@ import {
     updateBalance,
     updateLastDaily,
     updateXp,
+    userExists,
 } from "../utils/economy/utils";
 import { MStoTime } from "../utils/functions/date";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
@@ -25,6 +27,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     await addCooldown(cmd.name, message.member, 90);
+
+    if (!(await userExists(message.member))) await createUser(message.member);
 
     const lastDaily = await getLastDaily(message.member);
 
