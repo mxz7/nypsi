@@ -72,7 +72,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         })
         .catch(async () => {
             embed.setDescription("request expired");
-            await m.edit({ embeds: [embed] });
+            await m.edit({ embeds: [embed], components: [] });
             fail = true;
         });
 
