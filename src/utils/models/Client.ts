@@ -19,6 +19,7 @@ import { doChatReactions } from "../chatreactions/utils";
 import { runCommandUseTimers } from "../commandhandler";
 import redis from "../database/redis";
 import { runEconomySetup } from "../economy/utils";
+import { runUploadReset } from "../functions/image";
 import { runChristmas, runCountdowns, runSnipeClearIntervals, updateCounters } from "../guilds/utils";
 import { updateCache } from "../imghandler";
 import { getWebhooks, logger, setClusterId } from "../logger";
@@ -110,6 +111,7 @@ export class NypsiClient extends Client {
         runSnipeClearIntervals();
         doChatReactions(this);
         runCommandUseTimers(this);
+        runUploadReset();
 
         if (this.cluster.id != 0) return;
 
