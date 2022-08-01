@@ -117,6 +117,7 @@ model Guild {
   snipeFilter      String[]
   chatFilter       String[]
   percentMatch     Int      @default(75)
+  logsChannel      String?
   prefix           String   @default("$")
 
   GuildChristmas GuildChristmas?
