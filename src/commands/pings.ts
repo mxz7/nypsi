@@ -17,7 +17,7 @@ import { getPrefix } from "../utils/guilds/utils";
 import { getKarma, getLastCommand } from "../utils/karma/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
-import { getTier, isPremium } from "../utils/premium/utils";
+import { isPremium } from "../utils/premium/utils";
 import { deleteUserMentions, fetchUserMentions } from "../utils/users/utils";
 import ms = require("ms");
 
@@ -78,9 +78,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let limit = 5;
 
     if (await isPremium(message.author.id)) {
-        const tier = await getTier(message.author.id);
-
-        limit += tier * 2;
+        limit = 69;
     }
 
     const mentions = await fetchUserMentions(message.guild, message.member, limit);
