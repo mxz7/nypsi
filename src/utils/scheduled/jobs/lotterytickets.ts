@@ -8,7 +8,9 @@ import redis from "../../database/redis";
 
     const tickets = await redis.hgetall("lotterytickets:queue");
 
-    if (Object.keys(tickets).length == 0) return;
+    if (Object.keys(tickets).length == 0) {
+        process.exit(0);
+    }
 
     const desc = [];
 
