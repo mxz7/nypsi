@@ -10,18 +10,20 @@ export default async function messageUpdate(message: Message, newMessage: Messag
     if (!message.member) return;
 
     if ((await isLogsEnabled(message.guild)) && !message.author.bot) {
-        const embed = new CustomEmbed().disableFooter().setTimestamp();
+        if (message.content != newMessage.content) {
+            const embed = new CustomEmbed().disableFooter().setTimestamp();
 
-        embed.setHeader("message updated");
-        embed.setDescription(
-            `[jump](${message.url})\n\n${message.member.toString()} \`${
-                message.author.id
-            }\`\n\n**channel** ${message.channel.toString()} \`${message.channelId}\``
-        );
-        embed.addField("old content", `\`\`\`${message.content}\`\`\``, true);
-        embed.addField("new content", `\`\`\`${newMessage.content}\`\`\``, true);
+            embed.setHeader("message updated");
+            embed.setDescription(
+                `[jump](${message.url})\n\n${message.member.toString()} \`${
+                    message.author.id
+                }\`\n\n**channel** ${message.channel.toString()} \`${message.channelId}\``
+            );
+            embed.addField("old content", `\`\`\`${message.content}\`\`\``, true);
+            embed.addField("new content", `\`\`\`${newMessage.content}\`\`\``, true);
 
-        await addLog(message.guild, LogType.MESSAGE, embed);
+            await addLog(message.guild, LogType.MESSAGE, embed);
+        }
     }
 
     if (!message.member.permissions.has(PermissionFlagsBits.Administrator)) {

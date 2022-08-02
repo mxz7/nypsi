@@ -13,7 +13,9 @@ export default async function guildMemberRemove(member: GuildMember) {
 
         embed.setHeader("member left");
         embed.setDescription(
-            `${member.toString()} \`${member.id}\`\n\n**tag** ${member.user.tag}\n**joined** ${daysAgo(member.joinedAt)}`
+            `${member.toString()} \`${member.id}\`\n\n**tag** ${member.user.tag}\n**joined** ${daysAgo(
+                member.joinedAt
+            )} days ago`
         );
 
         const history = await fetchUsernameHistory(member);
