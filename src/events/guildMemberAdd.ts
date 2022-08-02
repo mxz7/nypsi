@@ -18,7 +18,7 @@ export default async function guildMemberAdd(member: GuildMember) {
         embed.setDescription(
             `${member.toString()} \`${member.id}\`\n\n**tag** ${member.user.tag}\n**created** ${daysAgo(
                 member.user.createdAt
-            )}`
+            )} days ago`
         );
 
         const history = await fetchUsernameHistory(member);
