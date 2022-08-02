@@ -362,6 +362,8 @@ function calcTotalDealer(member: GuildMember) {
     let total = 0;
     let aces = 0;
 
+    let aceAs11 = false;
+
     for (let card of cards) {
         card = card.split("♠").join().split("♣").join().split("♥️").join().split("♦").join();
 
@@ -377,8 +379,15 @@ function calcTotalDealer(member: GuildMember) {
     for (let i = 0; i < aces; i++) {
         if (total < 11) {
             total += 11;
+            aceAs11 = true;
         } else {
             total += 1;
+        }
+    }
+
+    if (total > 21) {
+        if (aceAs11) {
+            total -= 10;
         }
     }
 
