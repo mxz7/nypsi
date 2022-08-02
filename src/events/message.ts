@@ -81,12 +81,14 @@ export default async function messageCreate(message: Message) {
                     const similarity = stringSimilarity.compareTwoStrings(word, contentWord);
 
                     if (similarity >= match / 100) {
+                        const contentModified = content.join(" ").replace(contentWord, `**${contentWord}**`);
+
                         addModLog(
                             message.guild,
                             PunishmentType.FILTER_VIOLATION,
                             message.author.id,
                             "nypsi",
-                            content.join(" "),
+                            contentModified,
                             -1,
                             message.channel.id,
                             (similarity * 100).toFixed(2)
