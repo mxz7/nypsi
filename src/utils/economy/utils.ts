@@ -902,6 +902,10 @@ export async function getDefaultBet(member: GuildMember): Promise<number> {
         id = member;
     }
 
+    if (await redis.exists(`cache:economy:defaultbet:${id}`)) {
+        return parseInt(await redis.get(`cache:economy:defaultbet:${id}`));
+    }
+
     const query = await prisma.economy.findUnique({
         where: {
             userId: id,
@@ -911,7 +915,10 @@ export async function getDefaultBet(member: GuildMember): Promise<number> {
         },
     });
 
-    return Number(query.defaultBet);
+    await redis.set(`cache:economy:defaultbet:${id}`, query.defaultBet);
+    await redis.expire(`cache:economy:defaultbet:${id}`, 3600);
+
+    return query.defaultBet;
 }
 
 export async function setDefaultBet(member: GuildMember, setting: number) {
@@ -923,6 +930,8 @@ export async function setDefaultBet(member: GuildMember, setting: number) {
             defaultBet: setting,
         },
     });
+
+    await redis.del(`cache:economy:defaultbet:${member.user.id}`);
 }
 
 export async function getPrestige(member: GuildMember | string): Promise<number> {

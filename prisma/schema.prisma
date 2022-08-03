@@ -29,7 +29,7 @@ model Economy {
   money       BigInt  @default(500)
   bank        BigInt  @default(9500)
   bankStorage BigInt  @default(5000)
-  defaultBet  BigInt  @default(0)
+  defaultBet  Int?
   xp          Int     @default(0)
   prestige    Int     @default(0)
   padlock     Boolean @default(false)

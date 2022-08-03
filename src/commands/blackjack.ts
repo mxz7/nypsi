@@ -21,6 +21,7 @@ import {
     createUser,
     formatBet,
     getBalance,
+    getDefaultBet,
     getGuildByUser,
     getMulti,
     getXp,
@@ -85,8 +86,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     const prefix = await getPrefix(message.guild);
+    const defaultBet = await getDefaultBet(message.member);
 
-    if (args.length == 0) {
+    if (args.length == 0 && !defaultBet) {
         const embed = new CustomEmbed(message.member)
             .setHeader("blackjack help")
             .addField("usage", `${prefix}blackjack <bet>\n${prefix}blackjack info`)
@@ -115,7 +117,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const maxBet = await calcMaxBet(message.member);
 
-    const bet = await formatBet(args[0], message.member);
+    const bet = defaultBet || (await formatBet(args[0], message.member));
 
     if (!bet) {
         return send({ embeds: [new ErrorEmbed("invalid bet")] });

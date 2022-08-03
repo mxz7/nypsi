@@ -1,20 +1,4 @@
 import {
-    getBalance,
-    createUser,
-    updateBalance,
-    userExists,
-    formatBet,
-    getXp,
-    updateXp,
-    calcMaxBet,
-    getMulti,
-    addGamble,
-    calcEarnedXp,
-    getGuildByUser,
-    addToGuildXP,
-    getDefaultBet,
-} from "../utils/economy/utils.js";
-import {
     CommandInteraction,
     InteractionReplyOptions,
     InteractionResponse,
@@ -22,12 +6,28 @@ import {
     MessageEditOptions,
     MessageOptions,
 } from "discord.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
+import {
+    addGamble,
+    addToGuildXP,
+    calcEarnedXp,
+    calcMaxBet,
+    createUser,
+    formatBet,
+    getBalance,
+    getDefaultBet,
+    getGuildByUser,
+    getMulti,
+    getXp,
+    updateBalance,
+    updateXp,
+    userExists,
+} from "../utils/economy/utils.js";
 import { getPrefix } from "../utils/guilds/utils";
 import { gamble } from "../utils/logger.js";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
 import { NypsiClient } from "../utils/models/Client.js";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 
 const values = [
     "b",
@@ -135,8 +135,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     const prefix = await getPrefix(message.guild);
+    const defaultBet = await getDefaultBet(message.member);
 
-    if (args.length != 2 && !(args.length == 1 && (await getDefaultBet(message.member)) > 0)) {
+    if (args.length != 2 && !defaultBet) {
         const embed = new CustomEmbed(message.member)
             .setHeader("roulette help")
             .addField("usage", `${prefix}roulette <colour (**r**ed/**g**reen/**b**lack)> <bet>\n${prefix}roulette odds`)
@@ -169,19 +170,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const maxBet = await calcMaxBet(message.member);
 
-    let bet: number;
+    const bet = defaultBet || (await formatBet(args[1], message.member));
 
-    if ((await getDefaultBet(message.member)) == 0 || args.length > 1) {
-
-        const writtenBet = await formatBet(args[1], message.member);
-
-        if (!writtenBet) {
-            return send({ embeds: [new ErrorEmbed("invalid bet")] });
-        }
-
-        bet = writtenBet;
-    } else {
-        bet = await getDefaultBet(message.member);
+    if (!bet) {
+        return send({ embeds: [new ErrorEmbed("invalid bet")] });
     }
 
     if (bet <= 0) {
