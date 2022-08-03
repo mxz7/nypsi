@@ -48,7 +48,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             const embed = new CustomEmbed(message.member).setHeader("default bet", message.author.avatarURL());
 
             embed.setDescription(
-                `your default bet is $**${defaultBet}**` + `\n\nuse ${prefix}**defaultBet <amount/reset>** to change this`
+                `your default bet is $**${defaultBet.toLocaleString()}**` +
+                    `\n\nuse ${prefix}**defaultBet <amount/reset>** to change this`
             );
 
             return send({ embeds: [embed] });
