@@ -894,6 +894,46 @@ export async function setPadlock(member: GuildMember, setting: boolean) {
     });
 }
 
+export async function getDefaultBet(member: GuildMember): Promise<number> {
+    let id: string;
+    if (member instanceof GuildMember) {
+        id = member.user.id;
+    } else {
+        id = member;
+    }
+
+    if (await redis.exists(`cache:economy:defaultbet:${id}`)) {
+        return parseInt(await redis.get(`cache:economy:defaultbet:${id}`));
+    }
+
+    const query = await prisma.economy.findUnique({
+        where: {
+            userId: id,
+        },
+        select: {
+            defaultBet: true,
+        },
+    });
+
+    await redis.set(`cache:economy:defaultbet:${id}`, query.defaultBet);
+    await redis.expire(`cache:economy:defaultbet:${id}`, 3600);
+
+    return query.defaultBet;
+}
+
+export async function setDefaultBet(member: GuildMember, setting: number) {
+    await prisma.economy.update({
+        where: {
+            userId: member.user.id,
+        },
+        data: {
+            defaultBet: setting,
+        },
+    });
+
+    await redis.del(`cache:economy:defaultbet:${member.user.id}`);
+}
+
 export async function getPrestige(member: GuildMember | string): Promise<number> {
     let id: string;
     if (member instanceof GuildMember) {
@@ -1186,6 +1226,7 @@ export async function reset() {
                 money: 500,
                 bank: 9500,
                 bankStorage: 5000,
+                defaultBet: 0,
                 xp: 0,
                 padlock: false,
                 inventory: {},
