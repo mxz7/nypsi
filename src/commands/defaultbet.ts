@@ -49,7 +49,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             embed.setDescription(
                 `your default bet is $**${defaultBet.toLocaleString()}**` +
-                    `\n\nuse ${prefix}**defaultBet <amount/reset>** to change this`
+                    `\n\nuse ${prefix}**defaultbet <amount/reset>** to change this`
             );
 
             return send({ embeds: [embed] });
