@@ -12,6 +12,7 @@ import {
     calcEarnedXp,
     getGuildByUser,
     addToGuildXP,
+    getDefaultBet,
 } from "../utils/economy/utils.js";
 import { CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions, MessageOptions } from "discord.js";
 import * as shuffle from "shuffle-array";
@@ -68,7 +69,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const prefix = await getPrefix(message.guild);
 
-    if (args.length == 0 || args.length == 1) {
+    if (args.length == 0 || (args.length == 1 && (await getDefaultBet(message.member) == 0))) {
         const embed = new CustomEmbed(message.member)
             .setHeader("rockpaperscissors help")
             .addField("usage", `${prefix}rps <**r**ock/**p**aper/**s**cissors> <bet>`)
@@ -99,10 +100,19 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const maxBet = await calcMaxBet(message.member);
 
-    const bet = await formatBet(args[1], message.member);
+    let bet: number;
 
-    if (!bet) {
-        return send({ embeds: [new ErrorEmbed("invalid bet")] });
+    if ((await getDefaultBet(message.member)) == 0 || args.length > 1) {
+
+        const writtenBet = await formatBet(args[1], message.member);
+
+        if (!writtenBet) {
+            return send({ embeds: [new ErrorEmbed("invalid bet")] });
+        }
+
+        bet = writtenBet;
+    } else {
+        bet = await getDefaultBet(message.member);
     }
 
     if (!bet) {
