@@ -12,7 +12,6 @@ import {
     calcEarnedXp,
     getGuildByUser,
     addToGuildXP,
-    getDefaultBet,
 } from "../utils/economy/utils.js";
 import {
     CommandInteraction,
@@ -136,7 +135,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const prefix = await getPrefix(message.guild);
 
-    if (args.length != 2 && !(args.length == 1 && (await getDefaultBet(message.member)) > 0)) {
+    if (args.length != 2) {
         const embed = new CustomEmbed(message.member)
             .setHeader("roulette help")
             .addField("usage", `${prefix}roulette <colour (**r**ed/**g**reen/**b**lack)> <bet>\n${prefix}roulette odds`)
@@ -169,19 +168,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const maxBet = await calcMaxBet(message.member);
 
-    let bet: number;
+    const bet = await formatBet(args[1], message.member);
 
-    if ((await getDefaultBet(message.member)) == 0 || args.length > 1) {
-
-        const writtenBet = await formatBet(args[1], message.member);
-
-        if (!writtenBet) {
-            return send({ embeds: [new ErrorEmbed("invalid bet")] });
-        }
-
-        bet = writtenBet;
-    } else {
-        bet = await getDefaultBet(message.member);
+    if (!bet) {
+        return send({ embeds: [new ErrorEmbed("invalid bet")] });
     }
 
     if (bet <= 0) {
