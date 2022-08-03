@@ -39,14 +39,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (!defaultBet) {
             const embed = new CustomEmbed(message.member).setHeader("default bet", message.author.avatarURL());
 
-            embed.setDescription(`${prefix}**defaultbet <amount/reset>** *set your default bet for games*`);
+            embed.setDescription(
+                `you do not currently have a default bet. use ${prefix}**defaultbet <amount/reset>** to set your default bet`
+            );
 
             return send({ embeds: [embed] });
         } else {
             const embed = new CustomEmbed(message.member).setHeader("default bet", message.author.avatarURL());
 
             embed.setDescription(
-                `your default bet is $**${defaultBet}**` + `\nuse ${prefix}**defaultBet <amount/reset>** to change this`
+                `your default bet is $**${defaultBet}**` + `\n\nuse ${prefix}**defaultBet <amount/reset>** to change this`
             );
 
             return send({ embeds: [embed] });
@@ -58,7 +60,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         const embed = new CustomEmbed(message.member);
 
-        embed.setDescription(":white_check_mark: your default bet has been reset!");
+        embed.setDescription(":white_check_mark: your default bet has been reset");
 
         return send({ embeds: [embed] });
     }
@@ -85,13 +87,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
     }
 
-    await addCooldown(cmd.name, message.member, 15);
+    await addCooldown(cmd.name, message.member, 5);
 
     await setDefaultBet(message.member, bet);
 
     const embed = new CustomEmbed(message.member);
 
-    embed.setDescription(`:white_check_mark: default bet has been set to $${bet.toLocaleString()}!`);
+    embed.setDescription(`:white_check_mark: your default bet has been set to $${bet.toLocaleString()}`);
 
     return send({ embeds: [embed] });
 }
