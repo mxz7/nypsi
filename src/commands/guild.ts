@@ -551,7 +551,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         const members = guild.members;
 
-        inPlaceSort(members).desc([(i) => i.contributedMoney, (i) => i.contributedXp]);
+        inPlaceSort(members).desc([(i) => i.contributedXp, (i) => i.contributedMoney]);
 
         const embed = new CustomEmbed(message.member).setHeader(`${guild.guildName} stats`, message.author.avatarURL());
 
@@ -566,7 +566,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             desc += `${position} **${
                 m.user.lastKnownTag
-            }** $${m.contributedMoney.toLocaleString()} **|** ${m.contributedXp.toLocaleString()}xp\n`;
+            }** ${m.contributedXp.toLocaleString()}xp **|** $${m.contributedMoney.toLocaleString()}\n`;
         }
 
         embed.setDescription(desc);
