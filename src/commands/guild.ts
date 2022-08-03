@@ -331,6 +331,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (fail) return;
 
         if (reaction == "yes") {
+            invited.delete(target.user.id);
             const targetGuild = await getGuildByUser(target.user.id);
             const refreshedGuild = await getGuildByName(guild.guildName);
 
