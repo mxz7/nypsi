@@ -1,15 +1,14 @@
-import { CommandInteraction, Message, MessageOptions, InteractionReplyOptions } from "discord.js";
-import { createUser, setDefaultBet, getDefaultBet, userExists, calcMaxBet, formatNumber } from "../utils/economy/utils";
+import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { calcMaxBet, createUser, formatNumber, getDefaultBet, setDefaultBet, userExists } from "../utils/economy/utils";
 import { getPrefix } from "../utils/guilds/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
-const cmd = new Command("defaultBet", "set your default bet", Categories.MONEY).setAliases(["preset"]);
+const cmd = new Command("defaultbet", "set your default bet", Categories.MONEY).setAliases(["preset"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!(await userExists(message.member))) await createUser(message.member);
-
 
     if (await onCooldown(cmd.name, message.member)) {
         const embed = await getResponse(cmd.name, message.member);
@@ -34,49 +33,46 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     };
 
     const prefix = await getPrefix(message.guild);
+    const defaultBet = await getDefaultBet(message.member);
 
     if (args.length == 0) {
-        if ((await getDefaultBet(message.member)) == 0) {
-            const embed = new CustomEmbed(message.member).setHeader("defaultbet", message.author.avatarURL());
+        if (!defaultBet) {
+            const embed = new CustomEmbed(message.member).setHeader("default bet", message.author.avatarURL());
 
-            embed.setDescription(`${prefix}**defaultBet <amount/reset>** *set your default bet for games*`);
+            embed.setDescription(`${prefix}**defaultbet <amount/reset>** *set your default bet for games*`);
 
             return send({ embeds: [embed] });
         } else {
-            const embed = new CustomEmbed(message.member).setHeader("defaultbet", message.author.avatarURL());
+            const embed = new CustomEmbed(message.member).setHeader("default bet", message.author.avatarURL());
 
-            embed.setDescription(`Your default bet is **$${(await getDefaultBet(message.member)).toLocaleString()}**` + 
-            `\nuse ${prefix}**defaultBet <amount/reset>** to change this`);
+            embed.setDescription(
+                `your default bet is $**${defaultBet}**` + `\nuse ${prefix}**defaultBet <amount/reset>** to change this`
+            );
 
             return send({ embeds: [embed] });
         }
     }
 
     if (args[0].toLocaleLowerCase() == "reset") {
-        setDefaultBet(message.member, 0);
+        setDefaultBet(message.member, null);
 
         const embed = new CustomEmbed(message.member);
 
-        embed.setDescription(":white_check_mark: default bet has been reset!");
+        embed.setDescription(":white_check_mark: your default bet has been reset!");
 
         return send({ embeds: [embed] });
     }
-
-
-
-
 
     const maxBet = await calcMaxBet(message.member);
 
     const bet = formatNumber(args[0]);
 
-
-    if (!bet) {
+    if (!bet || isNaN(bet)) {
         return send({ embeds: [new ErrorEmbed("invalid amount")] });
     }
 
     if (bet <= 0) {
-        return send({ embeds: [new ErrorEmbed("Your default bet must be greater than 0.")] });
+        return send({ embeds: [new ErrorEmbed("your default bet must be greater than 0")] });
     }
 
     if (bet > maxBet) {
@@ -89,10 +85,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
     }
 
-    
-    await addCooldown(cmd.name, message.member, 60);
+    await addCooldown(cmd.name, message.member, 15);
 
-    setDefaultBet(message.member, bet);
+    await setDefaultBet(message.member, bet);
 
     const embed = new CustomEmbed(message.member);
 
