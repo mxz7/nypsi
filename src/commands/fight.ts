@@ -11,7 +11,15 @@ import {
     MessageOptions,
 } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import { addGamble, createUser, getInventory, getStats, setInventory, userExists } from "../utils/economy/utils";
+import {
+    addGamble,
+    createUser,
+    getBoosters,
+    getInventory,
+    getStats,
+    setInventory,
+    userExists,
+} from "../utils/economy/utils";
 import { getMember } from "../utils/functions/member";
 import { getPrefix } from "../utils/guilds/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
@@ -148,6 +156,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await m.delete();
 
+    if (!(await userExists(message.member))) await createUser(message.member);
+    if (!(await userExists(target))) await createUser(target);
+
     const countdownEmbed = new CustomEmbed(message.member).setHeader(
         `${message.author.username} vs ${target.user.username}`
     );
@@ -175,7 +186,28 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         new ButtonBuilder().setCustomId("h").setLabel("heal").setStyle(ButtonStyle.Success)
     );
 
-    const fight = new Fight(message.member, target);
+    const homeBoosters = await getBoosters(message.member);
+    const awayBoosters = await getBoosters(target);
+
+    let homeStrength = false;
+
+    for (const booster of Array.from(homeBoosters.keys())) {
+        if (homeBoosters.get(booster)[0].boosterId == "steroids") {
+            homeStrength = true;
+            break;
+        }
+    }
+
+    let awayStrength = false;
+
+    for (const booster of Array.from(awayBoosters.keys())) {
+        if (awayBoosters.get(booster)[0].boosterId == "steroids") {
+            awayStrength = true;
+            break;
+        }
+    }
+
+    const fight = new Fight(message.member, target, homeStrength, awayStrength);
 
     const fightEmbed = fight.renderEmbed();
 
@@ -254,16 +286,18 @@ module.exports = cmd;
 
 class Fight {
     private person1: FightCharacter;
+    private person1Strength: boolean;
     private person2: FightCharacter;
+    private person2Strength: boolean;
     private log: string[];
     private logCount: number;
 
     private home: GuildMember;
     private away: GuildMember;
 
-    constructor(home: GuildMember, away: GuildMember) {
-        this.person1 = new FightCharacter();
-        this.person2 = new FightCharacter();
+    constructor(home: GuildMember, away: GuildMember, homeStrength: boolean, awayStrength: boolean) {
+        this.person1 = new FightCharacter(homeStrength);
+        this.person2 = new FightCharacter(awayStrength);
 
         this.home = home;
         this.away = away;
@@ -420,20 +454,24 @@ class FightCharacter {
 
     private lastHit: number;
     private lastHeal: number;
+    private strength: boolean;
 
-    constructor() {
+    constructor(strength: boolean) {
         this.health = 100;
         this.heals = 3;
         this.damageGiven = 0;
         this.damageReceived = 0;
         this.lastHit = Date.now();
         this.lastHeal = Date.now();
+        this.strength = strength;
     }
 
     public hit() {
         if (this.lastHit > Date.now() - 350) return null;
 
-        const damage = Math.floor(Math.random() * 10) + 3;
+        let damage = Math.floor(Math.random() * 10) + 3;
+
+        if (this.strength) damage += Math.floor(damage * 0.5);
 
         this.damageGiven += damage;
 
