@@ -886,5 +886,22 @@
         "buy": 0,
         "sell": 2000,
         "role": "sellable"
+    },
+    "steroids": {
+        "id": "steroids",
+        "name": "steroids",
+        "aliases": ["roids"],
+        "emoji": "💉",
+        "description": "https://tenor.com/view/ambeeee-gif-19218531",
+        "rarity": 1,
+        "buy": 100000,
+        "sell": 75000,
+        "role": "booster",
+        "stackable": false,
+        "boosterEffect": {
+            "boosts": ["fight"],
+            "effect": "improves fight strength",
+            "time": 3600
+        }
     }
 }
