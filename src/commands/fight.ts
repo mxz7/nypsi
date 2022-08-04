@@ -11,7 +11,15 @@ import {
     MessageOptions,
 } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import { addGamble, createUser, getInventory, getStats, setInventory, userExists } from "../utils/economy/utils";
+import {
+    addGamble,
+    createUser,
+    getBoosters,
+    getInventory,
+    getStats,
+    setInventory,
+    userExists,
+} from "../utils/economy/utils";
 import { getMember } from "../utils/functions/member";
 import { getPrefix } from "../utils/guilds/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
@@ -148,6 +156,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await m.delete();
 
+    if (!(await userExists(message.member))) await createUser(message.member);
+    if (!(await userExists(target))) await createUser(target);
+
     const countdownEmbed = new CustomEmbed(message.member).setHeader(
         `${message.author.username} vs ${target.user.username}`
     );
@@ -175,7 +186,28 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         new ButtonBuilder().setCustomId("h").setLabel("heal").setStyle(ButtonStyle.Success)
     );
 
-    const fight = new Fight(message.member, target);
+    const homeBoosters = await getBoosters(message.member);
+    const awayBoosters = await getBoosters(target);
+
+    let homeStrength = false;
+
+    for (const booster of Array.from(homeBoosters.keys())) {
+        if (homeBoosters.get(booster)[0].id == "steroids") {
+            homeStrength = true;
+            break;
+        }
+    }
+
+    let awayStrength = false;
+
+    for (const booster of Array.from(awayBoosters.keys())) {
+        if (awayBoosters.get(booster)[0].id == "steroids") {
+            awayStrength = true;
+            break;
+        }
+    }
+
+    const fight = new Fight(message.member, target, homeStrength, awayStrength);
 
     const fightEmbed = fight.renderEmbed();
 
@@ -254,16 +286,20 @@ module.exports = cmd;
 
 class Fight {
     private person1: FightCharacter;
+    private person1Strength: boolean;
     private person2: FightCharacter;
+    private person2Strength: boolean;
     private log: string[];
     private logCount: number;
 
     private home: GuildMember;
     private away: GuildMember;
 
-    constructor(home: GuildMember, away: GuildMember) {
+    constructor(home: GuildMember, away: GuildMember, homeStrength: boolean, awayStrength: boolean) {
         this.person1 = new FightCharacter();
+        this.person1Strength = homeStrength;
         this.person2 = new FightCharacter();
+        this.person2Strength = awayStrength;
 
         this.home = home;
         this.away = away;
@@ -273,9 +309,11 @@ class Fight {
     }
 
     public homeHit() {
-        const damage = this.person1.hit();
+        let damage = this.person1.hit();
 
         if (!damage) return;
+
+        if (this.person1Strength) damage += damage * 0.7;
 
         this.person2.takeHit(damage);
 
@@ -296,9 +334,11 @@ class Fight {
     }
 
     public awayHit() {
-        const damage = this.person2.hit();
+        let damage = this.person2.hit();
 
         if (!damage) return;
+
+        if (this.person2Strength) damage += damage * 0.7;
 
         this.person1.takeHit(damage);
 
