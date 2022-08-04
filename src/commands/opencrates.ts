@@ -101,6 +101,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     });
 
     if (fail || !(msg instanceof Message)) {
+        await stopOpeningCrates(message.member);
         const reply = new ErrorEmbed("failed to dm you, please check your privacy settings");
         if (message.interaction) {
             return send({ embeds: [reply], ephemeral: true });
