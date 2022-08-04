@@ -192,7 +192,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let homeStrength = false;
 
     for (const booster of Array.from(homeBoosters.keys())) {
-        if (homeBoosters.get(booster)[0].id == "steroids") {
+        if (homeBoosters.get(booster)[0].boosterId == "steroids") {
             homeStrength = true;
             break;
         }
@@ -201,7 +201,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let awayStrength = false;
 
     for (const booster of Array.from(awayBoosters.keys())) {
-        if (awayBoosters.get(booster)[0].id == "steroids") {
+        if (awayBoosters.get(booster)[0].boosterId == "steroids") {
             awayStrength = true;
             break;
         }
@@ -296,10 +296,8 @@ class Fight {
     private away: GuildMember;
 
     constructor(home: GuildMember, away: GuildMember, homeStrength: boolean, awayStrength: boolean) {
-        this.person1 = new FightCharacter();
-        this.person1Strength = homeStrength;
-        this.person2 = new FightCharacter();
-        this.person2Strength = awayStrength;
+        this.person1 = new FightCharacter(homeStrength);
+        this.person2 = new FightCharacter(awayStrength);
 
         this.home = home;
         this.away = away;
@@ -309,11 +307,9 @@ class Fight {
     }
 
     public homeHit() {
-        let damage = this.person1.hit();
+        const damage = this.person1.hit();
 
         if (!damage) return;
-
-        if (this.person1Strength) damage += damage * 0.7;
 
         this.person2.takeHit(damage);
 
@@ -334,11 +330,9 @@ class Fight {
     }
 
     public awayHit() {
-        let damage = this.person2.hit();
+        const damage = this.person2.hit();
 
         if (!damage) return;
-
-        if (this.person2Strength) damage += damage * 0.7;
 
         this.person1.takeHit(damage);
 
@@ -460,20 +454,24 @@ class FightCharacter {
 
     private lastHit: number;
     private lastHeal: number;
+    private strength: boolean;
 
-    constructor() {
+    constructor(strength: boolean) {
         this.health = 100;
         this.heals = 3;
         this.damageGiven = 0;
         this.damageReceived = 0;
         this.lastHit = Date.now();
         this.lastHeal = Date.now();
+        this.strength = strength;
     }
 
     public hit() {
         if (this.lastHit > Date.now() - 350) return null;
 
-        const damage = Math.floor(Math.random() * 10) + 3;
+        let damage = Math.floor(Math.random() * 10) + 3;
+
+        if (this.strength) damage += Math.floor(damage * 0.5);
 
         this.damageGiven += damage;
 
