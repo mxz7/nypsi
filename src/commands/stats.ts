@@ -57,6 +57,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         const itemMsg: string[] = [`**total** ${itemTotal.toLocaleString()}`];
 
         for (const i of Object.keys(stats.items)) {
+            if (itemMsg.length >= 8) break;
             itemMsg.push(`- **${i}** ${stats.items[i].toLocaleString()}`);
         }
 
