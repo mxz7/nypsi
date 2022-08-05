@@ -65,7 +65,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         
         let cmdMsg = commandUses.toLocaleString()
         
-        if (isNaN(cmdMsg)) cmdMsg = 'no'
+        if (cmdMsg == 'NaN')) cmdMsg = 'no'
 
         embed.setFooter({ text: `you have performed ${cmdMsg} commands today` });
 
