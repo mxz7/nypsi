@@ -63,7 +63,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         embed.addField("item uses", itemMsg.join("\n"), true);
         
-        let cmdMsg = commandUses.toLocaleString()
+        let cmdMsg = commandUses.toLocaleString();
         
         if (cmdMsg == "NaN") cmdMsg = "no";
 
