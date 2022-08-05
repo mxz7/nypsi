@@ -34,7 +34,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         const gambleTotalPercent = ((gambleWinTotal / gambleTotal) * 100).toFixed(1);
 
         const gambleMsg: string[] = [
-            `**total** ${gambleWinTotal.toLocaleString()} / ${gambleTotal.toLocaleString()} (${gambleTotalPercent}%)`,
+            `**total** ${gambleWinTotal.toLocaleString()} / ${gambleTotal.toLocaleString()} (${gambleTotalPercent != "NaN"  ? gambleTotalPercent : "0"}%)`,
         ];
 
         for (const g of Object.keys(stats.gamble)) {
@@ -63,7 +63,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         embed.addField("item uses", itemMsg.join("\n"), true);
 
-        embed.setFooter({ text: `you have performed ${commandUses ? commandUses.toLocaleString() : "0"} commands today` });
+        embed.setFooter({ text: `you have performed ${commandUses ? commandUses.toLocaleString() + " command" + (commandUses != 1 ? "s" : "") : "0 commands"} today` });
 
         return message.channel.send({ embeds: [embed] });
     };
