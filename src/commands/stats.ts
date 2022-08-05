@@ -62,12 +62,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         embed.addField("item uses", itemMsg.join("\n"), true);
-        
-        let cmdMsg = commandUses.toLocaleString();
-        
-        if (cmdMsg == "NaN") cmdMsg = "no";
 
-        embed.setFooter({ text: `you have performed ${cmdMsg} commands today` });
+        const uses = commandUses ? commandUses.toLocaleString() : “0”;
+        
+        embed.setFooter({ text: `you have performed ${uses} command ${Number(uses) != 1 : "s" : ""} today` });
 
         return message.channel.send({ embeds: [embed] });
     };
