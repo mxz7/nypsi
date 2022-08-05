@@ -62,8 +62,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         embed.addField("item uses", itemMsg.join("\n"), true);
+        
+        let cmdMsg = commandUses.toLocaleString()
+        
+        if (isNaN(cmdMsg)) cmdMsg = 'no'
 
-        embed.setFooter({ text: `you have performed ${commandUses.toLocaleString()} commands today` });
+        embed.setFooter({ text: `you have performed ${cmdMsg} commands today` });
 
         return message.channel.send({ embeds: [embed] });
     };
