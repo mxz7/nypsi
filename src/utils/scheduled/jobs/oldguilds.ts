@@ -1,5 +1,6 @@
 import { parentPort, workerData } from "worker_threads";
 import prisma from "../../database/database";
+import redis from "../../database/redis";
 
 (async () => {
     const guilds: string[] = workerData.guilds;
@@ -66,6 +67,10 @@ import prisma from "../../database/database";
                     id: guild.id,
                 },
             });
+
+            await redis.del(`cache:guild:exists:${guild.id}`);
+            await redis.del(`cache:guild:prefix:${guild.id}`);
+            await redis.del(`cache:guild:percentmatch:${guild.id}`);
 
             parentPort.postMessage(`deleted guild ${guild.id} from database`);
         }
