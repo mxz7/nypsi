@@ -859,15 +859,18 @@ export async function formatBet(bet: string | number, member: GuildMember): Prom
     return bet;
 }
 
-export function formatNumber(number: string): number | void {
-    number = number.toString().toLowerCase().replace("t", "000000000000");
-    number = number.replace("b", "000000000");
-    number = number.replace("m", "000000");
-    number = number.replace("k", "000");
+export function formatNumber(number: string | number): number | void {
+    if (number.toString().includes("b")) {
+        number = parseFloat(number.toString()) * 1000000000;
+    } else if (number.toString().includes("m")) {
+        number = parseFloat(number.toString()) * 1000000;
+    } else if (number.toString().includes("k")) {
+        number = parseFloat(number.toString()) * 1000;
+    }
 
-    if (isNaN(parseInt(number))) return null;
+    if (isNaN(parseFloat(number.toString()))) return null;
 
-    return Math.floor(parseInt(number));
+    return Math.floor(parseFloat(number.toString()));
 }
 
 export async function hasPadlock(member: GuildMember): Promise<boolean> {
