@@ -63,7 +63,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         embed.addField("item uses", itemMsg.join("\n"), true);
 
-        embed.setFooter({ text: `you have performed ${commandUses.toLocaleString()} commands today` });
+        embed.setFooter({ text: `you have performed ${commandUses ? commandUses.toLocaleString() : "0"} commands today` });
 
         return message.channel.send({ embeds: [embed] });
     };
