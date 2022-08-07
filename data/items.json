@@ -716,7 +716,7 @@
         "boosterEffect": {
             "boosts": ["cooldown"],
             "effect": 0.5,
-            "time": 1500
+            "time": 450
         }
     },
     "worm": {
@@ -745,7 +745,7 @@
         "sell": 100000,
         "role": "booster",
         "stackable": true,
-        "max": 5,
+        "max": 3,
         "boosterEffect": {
             "boosts": ["multi"],
             "effect": 3,
@@ -813,7 +813,7 @@
         "sell": 75000,
         "role": "booster",
         "stackable": true,
-        "max": 5,
+        "max": 3,
         "boosterEffect": {
             "boosts": ["xp"],
             "effect": 0.5,
@@ -851,7 +851,7 @@
         "boosterEffect": {
             "boosts": ["slots"],
             "effect": "improves slots win chance to 60%",
-            "time": 300
+            "time": 150
         }
     },
     "stolen_credit_card": {
