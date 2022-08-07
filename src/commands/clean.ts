@@ -1,13 +1,13 @@
-import { getPrefix } from "../utils/guilds/utils";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { Message, CommandInteraction, PermissionFlagsBits } from "discord.js";
+import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { getPrefix } from "../utils/guilds/utils";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 
 const cmd = new Command("clean", "clean up bot commands and responses", Categories.MODERATION).setPermissions([
     "MANAGE_MESSAGES",
 ]);
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) return;
 
     if (await onCooldown(cmd.name, message.member)) {
@@ -24,7 +24,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const prefix = await getPrefix(message.guild);
 
-    const collected = await message.channel.messages.fetch({ limit: 50 });
+    let amount = 50;
+
+    if (args[0] && parseInt(args[0]) && !isNaN(parseInt(args[0]))) {
+        amount = parseInt(args[0]);
+
+        if (amount < 2 || amount > 100) amount = 50;
+    }
+
+    const collected = await message.channel.messages.fetch({ limit: amount });
 
     const collecteda = collected.filter((msg) => msg.author.id == message.client.user.id || msg.content.startsWith(prefix));
 
