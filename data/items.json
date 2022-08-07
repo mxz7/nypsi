@@ -745,7 +745,7 @@
         "sell": 100000,
         "role": "booster",
         "stackable": true,
-        "max": 5,
+        "max": 3,
         "boosterEffect": {
             "boosts": ["multi"],
             "effect": 3,
@@ -813,7 +813,7 @@
         "sell": 75000,
         "role": "booster",
         "stackable": true,
-        "max": 5,
+        "max": 3,
         "boosterEffect": {
             "boosts": ["xp"],
             "effect": 0.5,
