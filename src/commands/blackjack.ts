@@ -512,53 +512,26 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
         setTimeout(() => {
             dealerPlay(message);
 
-            const res = calcWin(message);
-
-            switch (res) {
-                case "draw":
-                    return draw();
-                case "win":
+            if (calcTotal(message.member) == calcTotalDealer(message.member)) {
+                return draw();
+            } else if (calcTotalDealer(message.member) > 21) {
+                return win();
+            } else if (calcTotalDealer(message.member) == 21) {
+                return lose();
+            } else if (calcTotal(message.member) == 21) {
+                return win();
+            } else {
+                if (calcTotal(message.member) > calcTotalDealer(message.member)) {
                     return win();
-                case "lose":
+                } else {
                     return lose();
+                }
             }
         }, 1500);
         return;
     } else if (calcTotal(message.member) > 21) {
         lose();
         return;
-    } else if (games.get(message.author.id).cards.length >= 5) {
-        const newEmbed1 = new CustomEmbed(message.member, "**bet** $" + bet.toLocaleString())
-            .setHeader("blackjack", message.author.avatarURL())
-            .addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
-            .addField(message.author.username, getCards(message.member) + " **" + calcTotal(message.member) + "**");
-        edit({ embeds: [newEmbed1] });
-
-        games.set(message.member.user.id, {
-            bet: bet,
-            deck: games.get(message.member.user.id).deck,
-            cards: games.get(message.member.user.id).cards,
-            dealerCards: games.get(message.member.user.id).dealerCards,
-            id: games.get(message.member.user.id).id,
-            first: false,
-            dealerPlay: true,
-            voted: games.get(message.member.user.id).voted,
-        });
-
-        setTimeout(() => {
-            dealerPlay(message);
-
-            const res = calcWin(message);
-
-            switch (res) {
-                case "draw":
-                    return draw();
-                case "win":
-                    return win();
-                case "lose":
-                    return lose();
-            }
-        }, 1500);
     } else {
         games.set(message.member.user.id, {
             bet: bet,
@@ -607,15 +580,20 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
                 setTimeout(() => {
                     dealerPlay(message);
 
-                    const res = calcWin(message);
-
-                    switch (res) {
-                        case "draw":
-                            return draw();
-                        case "win":
+                    if (calcTotal(message.member) == calcTotalDealer(message.member)) {
+                        return draw();
+                    } else if (calcTotalDealer(message.member) > 21) {
+                        return win();
+                    } else if (calcTotalDealer(message.member) == 21) {
+                        return lose();
+                    } else if (calcTotal(message.member) == 21) {
+                        return win();
+                    } else {
+                        if (calcTotal(message.member) > calcTotalDealer(message.member)) {
                             return win();
-                        case "lose":
+                        } else {
                             return lose();
+                        }
                     }
                 }, 1500);
                 return;
@@ -643,15 +621,20 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
             setTimeout(() => {
                 dealerPlay(message);
 
-                const res = calcWin(message);
-
-                switch (res) {
-                    case "draw":
-                        return draw();
-                    case "win":
+                if (calcTotal(message.member) == calcTotalDealer(message.member)) {
+                    return draw();
+                } else if (calcTotalDealer(message.member) > 21) {
+                    return win();
+                } else if (calcTotalDealer(message.member) == 21) {
+                    return lose();
+                } else if (calcTotal(message.member) == 21) {
+                    return win();
+                } else {
+                    if (calcTotal(message.member) > calcTotalDealer(message.member)) {
                         return win();
-                    case "lose":
+                    } else {
                         return lose();
+                    }
                 }
             }, 1500);
         } else if (reaction == "3️⃣") {
@@ -688,15 +671,20 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
             setTimeout(() => {
                 dealerPlay(message);
 
-                const res = calcWin(message);
-
-                switch (res) {
-                    case "draw":
-                        return draw();
-                    case "win":
+                if (calcTotal(message.member) == calcTotalDealer(message.member)) {
+                    return draw();
+                } else if (calcTotalDealer(message.member) > 21) {
+                    return win();
+                } else if (calcTotalDealer(message.member) == 21) {
+                    return lose();
+                } else if (calcTotal(message.member) == 21) {
+                    return win();
+                } else {
+                    if (calcTotal(message.member) > calcTotalDealer(message.member)) {
                         return win();
-                    case "lose":
+                    } else {
                         return lose();
+                    }
                 }
             }, 1500);
         } else {
@@ -707,46 +695,8 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
 }
 
 function dealerPlay(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-    while (calcTotalDealer(message.member) < 17 && games.get(message.author.id).dealerCards.length < 5) {
+    while (calcTotalDealer(message.member) < 17) {
         newDealerCard(message.member);
     }
     return;
-}
-
-function calcWin(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-    if (
-        calcTotal(message.member) == calcTotalDealer(message.member) &&
-        !(games.get(message.author.id).cards.length >= 5 || games.get(message.author.id).dealerCards.length >= 5)
-    ) {
-        return "draw";
-    } else if (calcTotalDealer(message.member) > 21) {
-        return "win";
-    } else if (calcTotalDealer(message.member) == 21) {
-        return "lose";
-    } else if (calcTotal(message.member) == 21) {
-        return "win";
-    } else if (games.get(message.author.id).cards.length >= 5 || games.get(message.author.id).dealerCards.length >= 5) {
-        if (games.get(message.author.id).dealerCards.length >= 5 && !(games.get(message.author.id).cards.length >= 5)) {
-            return "lose";
-        } else if (
-            games.get(message.author.id).cards.length >= 5 &&
-            !(games.get(message.author.id).dealerCards.length >= 5)
-        ) {
-            return "win";
-        } else {
-            if (calcTotal(message.member) > calcTotalDealer(message.member)) {
-                return "win";
-            } else if (calcTotal(message.member) < calcTotalDealer(message.member)) {
-                return "lose";
-            } else {
-                return "draw";
-            }
-        }
-    } else {
-        if (calcTotal(message.member) > calcTotalDealer(message.member)) {
-            return "win";
-        } else {
-            return "lose";
-        }
-    }
 }
