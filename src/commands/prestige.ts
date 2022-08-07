@@ -149,9 +149,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         let booster = false;
 
-        if (!boosters.get("prestige_booster")) {
-            await addBooster(message.member, "prestige_booster");
+        if (boosters.has("xp_potion")) {
+            if (boosters.get("xp_potion").length < 3) {
+                booster = true;
+                await addBooster(message.member, "xp_potion");
+            }
+        } else {
             booster = true;
+            await addBooster(message.member, "xp_potion");
         }
 
         let crateAmount = Math.floor((await getPrestige(message.member)) / 2 + 1);
@@ -166,7 +171,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 ).toLocaleString()}**, **${crateAmount}** vote crates\n` +
                 `your new multiplier: **${Math.floor(multi * 100)}**%\nyour maximum bet: $**${maxBet.toLocaleString()}**\n` +
                 `you have received **${amount}** basic crate${amount > 1 ? "s" : ""}${
-                    booster ? " and a **double xp** booster for 3 hours" : ""
+                    booster ? " and an xp booster for 30 minutes" : ""
                 }`
         );
 
