@@ -4,13 +4,15 @@ export function formatDate(date: Date | number | dayjs.Dayjs): string {
     return dayjs(date).format("MMM D YYYY").toLowerCase();
 }
 
+export function formatLogDate(date: Date | number | dayjs.Dayjs): string {
+    return dayjs(date).format("YYYY-MM-DD HH:mm:ss");
+}
+
 export function daysAgo(date: Date | number): number {
     date = new Date(date);
     const ms = Math.floor(Date.now() - date.getTime());
 
-    const days = Math.floor(ms / (24 * 60 * 60 * 1000));
-
-    return days;
+    return Math.floor(ms / (24 * 60 * 60 * 1000));
 }
 
 export function daysUntilChristmas(): string {
@@ -32,9 +34,7 @@ export function daysUntil(date: Date | number): number {
     date = new Date(date);
     const ms = Math.floor(date.getTime() - Date.now());
 
-    const days = Math.floor(ms / (24 * 60 * 60 * 1000));
-
-    return days;
+    return Math.floor(ms / (24 * 60 * 60 * 1000));
 }
 
 export function MStoTime(ms: number, long = false) {
