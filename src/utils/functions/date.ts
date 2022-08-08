@@ -4,10 +4,6 @@ export function formatDate(date: Date | number | dayjs.Dayjs): string {
     return dayjs(date).format("MMM D YYYY").toLowerCase();
 }
 
-export function formatLogDate(date: Date | number | dayjs.Dayjs): string {
-    return dayjs(date).format("YYYY-MM-DD HH:mm:ss");
-}
-
 export function daysAgo(date: Date | number): number {
     date = new Date(date);
     const ms = Math.floor(Date.now() - date.getTime());

@@ -1,8 +1,8 @@
 import { Collection, Message, Snowflake, TextBasedChannel } from "discord.js";
-import { formatLogDate } from "../utils/functions/date";
 import { CustomEmbed } from "../utils/models/EmbedBuilders";
 import { LogType } from "../utils/models/GuildStorage";
 import { addLog, isLogsEnabled } from "../utils/moderation/utils";
+import dayjs = require("dayjs");
 
 export default async function messageDeleteBulk(messages: Collection<Snowflake, Message>, channel: TextBasedChannel) {
     if (channel.isDMBased()) return;
@@ -16,7 +16,11 @@ export default async function messageDeleteBulk(messages: Collection<Snowflake, 
 
         messages.each((message) => {
             if (message.content) {
-                desc.push(`[${formatLogDate(message.createdTimestamp)}] ${message.author.tag}: ${message.content}`);
+                desc.push(
+                    `[${dayjs(message.createdTimestamp).format("YYYY-MM-DD HH:mm:ss")}] ${message.author.tag}: ${
+                        message.content
+                    }`
+                );
             }
 
             if (desc.join("\n").length > 1500) {
