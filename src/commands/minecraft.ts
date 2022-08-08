@@ -50,7 +50,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const prefix = await getPrefix(message.guild);
 
     if (args.length == 0) {
-        return send({ embeds: [new ErrorEmbed(`${prefix}minecraft <name/server IP>`)] });
+        return send({ embeds: [new ErrorEmbed(`${prefix}minecraft <name>`)] });
     }
 
     await addCooldown(cmd.name, message.member, 10);
