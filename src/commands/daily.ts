@@ -32,8 +32,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const lastDaily = await getLastDaily(message.member);
 
-    if (lastDaily.getTime() > dayjs().subtract(1, "day").unix() * 1000) {
-        const diff = lastDaily.getTime() - dayjs().subtract(1, "day").unix() * 1000;
+    if (!dayjs(lastDaily.getTime()).isBefore(dayjs(), "day")) {
+        const diff = dayjs().add(1, "day").startOf("day").unix() * 1000 - dayjs().unix() * 1000;
         return message.channel.send({
             embeds: [new ErrorEmbed(`you can get your next daily bonus in **${MStoTime(diff)}**`)],
         });
