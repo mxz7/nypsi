@@ -1,9 +1,9 @@
 // @ts-expect-error doesnt like getting from json file
 import { workMessages } from "../../data/lists.json";
-import { getBalance, updateBalance, userExists, createUser } from "../utils/economy/utils.js";
+import { createUser, getBalance, updateBalance, userExists } from "../utils/economy/utils.js";
 import { CommandInteraction, Message } from "discord.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 
 const cmd = new Command("work", "work a random job and safely earn a random amount of money", Categories.MONEY);
@@ -41,9 +41,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if ((await getBalance(message.member)) >= 2000000) {
         const base = 25000;
         const bonus = Math.floor(Math.random() * 75000);
-        const total = base + bonus;
-
-        earned = total;
+        earned = base + bonus;
     }
 
     const work = workMessages[Math.floor(Math.random() * workMessages.length)];

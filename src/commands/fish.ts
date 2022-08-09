@@ -209,7 +209,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             if (owned + 1 > max) {
                 i--;
-                continue;
             } else {
                 if (inventory[chosen]) {
                     inventory[chosen] += 1;
@@ -224,7 +223,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             if (owned + 1 > max) {
                 i--;
-                continue;
             } else {
                 if (inventory[chosen]) {
                     inventory[chosen] += 1;

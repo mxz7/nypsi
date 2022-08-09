@@ -506,7 +506,5 @@ function getWord(): string {
 
     const body = await res.text();
 
-    const words = body.split("\n");
-
-    wordList = words;
+    wordList = body.split("\n");
 })();

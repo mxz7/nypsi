@@ -32,7 +32,7 @@ export async function createProfile(guild: Guild) {
 }
 
 export async function profileExists(guild: Guild) {
-    const query = await prisma.moderation.findUnique({
+    return await prisma.moderation.findUnique({
         where: {
             guildId: guild.id,
         },
@@ -40,12 +40,6 @@ export async function profileExists(guild: Guild) {
             guildId: true,
         },
     });
-
-    if (!query) {
-        return false;
-    } else {
-        return true;
-    }
 }
 
 export async function getCaseCount(guild: Guild) {
@@ -156,7 +150,7 @@ export async function addLog(guild: Guild, type: LogType, embed: CustomEmbed) {
 
 export async function isLogsEnabled(guild: Guild) {
     if (await redis.exists(`cache:guild:logs:${guild.id}`)) {
-        return (await redis.get(`cache:guild:logs:${guild.id}`)) === "t" ? true : false;
+        return (await redis.get(`cache:guild:logs:${guild.id}`)) === "t";
     }
 
     const query = await prisma.moderation.findUnique({
@@ -222,9 +216,7 @@ export async function isModLogsEnabled(guild: Guild) {
         },
     });
 
-    if (!query || !query.modlogs) return false;
-
-    return true;
+    return !(!query || !query.modlogs);
 }
 
 export async function setModLogs(guild: Guild, hook: string) {
@@ -295,7 +287,7 @@ export async function deleteServer(guild: Guild | string) {
 }
 
 export async function getCases(guild: Guild, userID: string) {
-    const query = await prisma.moderationCase.findMany({
+    return await prisma.moderationCase.findMany({
         where: {
             AND: [{ guildId: guild.id }, { user: userID }],
         },
@@ -303,12 +295,10 @@ export async function getCases(guild: Guild, userID: string) {
             time: "desc",
         },
     });
-
-    return query;
 }
 
 export async function getAllCases(guild: Guild) {
-    const query = await prisma.moderationCase.findMany({
+    return await prisma.moderationCase.findMany({
         where: {
             guildId: guild.id,
         },
@@ -322,8 +312,6 @@ export async function getAllCases(guild: Guild) {
             time: "desc",
         },
     });
-
-    return query;
 }
 
 export async function getCase(guild: Guild, caseID: number) {
@@ -381,11 +369,7 @@ export async function isMuted(guild: Guild, member: GuildMember) {
         },
     });
 
-    if (query) {
-        return true;
-    } else {
-        return false;
-    }
+    return !!query;
 }
 
 export async function isBanned(guild: Guild, member: GuildMember) {
@@ -398,11 +382,7 @@ export async function isBanned(guild: Guild, member: GuildMember) {
         },
     });
 
-    if (query) {
-        return true;
-    } else {
-        return false;
-    }
+    return !!query;
 }
 
 export async function setReason(guild: Guild, caseID: number, reason: string) {
@@ -569,11 +549,9 @@ export async function requestUnmute(guildId: string, member: string, client: Nyp
 }
 
 export async function getMutedUsers(guild: Guild) {
-    const query = await prisma.moderationMute.findMany({
+    return await prisma.moderationMute.findMany({
         where: {
             guildId: guild.id,
         },
     });
-
-    return query;
 }

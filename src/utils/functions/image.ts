@@ -214,34 +214,25 @@ export async function acceptWholesomeImage(id: number, accepter: GuildMember, cl
 }
 
 export async function denyWholesomeImage(id: number) {
-    const d = await prisma.wholesomeSuggestion.delete({
+    return await prisma.wholesomeSuggestion.delete({
         where: {
             id: id,
         },
     });
-
-    if (!d) {
-        return false;
-    }
-
-    return true;
 }
 
 export async function getWholesomeImage(id?: number): Promise<WholesomeImage> {
     if (id) {
-        const query = await prisma.wholesomeImage.findUnique({
+        return await prisma.wholesomeImage.findUnique({
             where: {
                 id: id,
             },
         });
-        return query;
     } else {
         if (wholesomeCache) {
             return wholesomeCache[Math.floor(Math.random() * wholesomeCache.length)];
         } else {
-            const query = await prisma.wholesomeImage.findMany();
-
-            wholesomeCache = query;
+            wholesomeCache = await prisma.wholesomeImage.findMany();
 
             return wholesomeCache[Math.floor(Math.random() * wholesomeCache.length)];
         }
@@ -261,17 +252,11 @@ export async function deleteFromWholesome(id: number) {
 
     clearWholesomeCache();
 
-    if (query) {
-        return true;
-    } else {
-        return false;
-    }
+    return !!query;
 }
 
 export async function getAllSuggestions(): Promise<WholesomeSuggestion[]> {
-    const query = await prisma.wholesomeSuggestion.findMany();
-
-    return query;
+    return await prisma.wholesomeSuggestion.findMany();
 }
 
 export async function uploadImageToImgur(url: string): Promise<string> {
@@ -287,7 +272,7 @@ export async function uploadImageToImgur(url: string): Promise<string> {
             image: url,
         })
         .catch((e) => {
-            logger.error("error occured uploading image to imgur");
+            logger.error("error occurred uploading image to imgur");
             logger.error(e);
             fail = true;
         });

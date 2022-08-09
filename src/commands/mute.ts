@@ -436,9 +436,7 @@ function getDuration(duration: string): number {
     } else if (duration.includes("s")) {
         if (!parseInt(duration.split("s")[0])) return undefined;
 
-        const num = parseInt(duration.split("s")[0]);
-
-        return num;
+        return parseInt(duration.split("s")[0]);
     }
 }
 

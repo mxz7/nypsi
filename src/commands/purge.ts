@@ -1,7 +1,7 @@
 import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions, PermissionFlagsBits } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 
 const cmd = new Command("purge", "bulk delete/purge messages", Categories.MODERATION)
     .setAliases(["del"])
@@ -188,7 +188,5 @@ module.exports = cmd;
 function timeSince(date: number) {
     const ms = Math.floor(new Date().getTime() - date);
 
-    const days = Math.floor(ms / (24 * 60 * 60 * 1000));
-
-    return days;
+    return Math.floor(ms / (24 * 60 * 60 * 1000));
 }

@@ -1,8 +1,8 @@
 import { CommandInteraction, Message, MessageReaction, PermissionFlagsBits, User } from "discord.js";
-import { profileExists, createProfile, newCase } from "../utils/moderation/utils";
+import { createProfile, newCase, profileExists } from "../utils/moderation/utils";
 import { getPrefix } from "../utils/guilds/utils";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 import { PunishmentType } from "../utils/models/GuildStorage";
 
 const cmd = new Command("kicksince", "kick members that joined after a certain time", Categories.ADMIN)
@@ -253,8 +253,6 @@ function getDuration(duration: string) {
     } else if (duration.includes("s")) {
         if (!parseInt(duration.split("s")[0])) return undefined;
 
-        const num = parseInt(duration.split("s")[0]);
-
-        return num;
+        return parseInt(duration.split("s")[0]);
     }
 }

@@ -10,7 +10,7 @@ export async function onCooldown(cmd: string, member: GuildMember): Promise<bool
 
     const res = await redis.exists(key);
 
-    return res == 1 ? true : false;
+    return res == 1;
 }
 
 export async function addCooldown(cmd: string, member: GuildMember, seconds?: number) {

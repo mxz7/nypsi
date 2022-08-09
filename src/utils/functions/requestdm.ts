@@ -68,10 +68,7 @@ export default async function requestDM(options: RequestDMOptions): Promise<bool
                     fail = true;
                 });
 
-                if (fail) {
-                    return false;
-                }
-                return true;
+                return !fail;
             },
             {
                 context: {
@@ -146,10 +143,7 @@ export default async function requestDM(options: RequestDMOptions): Promise<bool
                     fail = true;
                 });
 
-                if (fail) {
-                    return false;
-                }
-                return true;
+                return !fail;
             },
             {
                 context: {

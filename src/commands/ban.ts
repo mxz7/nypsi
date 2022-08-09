@@ -1,8 +1,8 @@
 import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions, PermissionFlagsBits, User } from "discord.js";
-import { newCase, profileExists, createProfile, newBan } from "../utils/moderation/utils";
-import { inCooldown, addCooldown, getPrefix } from "../utils/guilds/utils";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
+import { createProfile, newBan, newCase, profileExists } from "../utils/moderation/utils";
+import { addCooldown, getPrefix, inCooldown } from "../utils/guilds/utils";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 import { PunishmentType } from "../utils/models/GuildStorage";
 import { getExactMember } from "../utils/functions/member";
 
@@ -345,9 +345,7 @@ function getDuration(duration: string) {
     } else if (duration.includes("s")) {
         if (!parseInt(duration.split("s")[0])) return undefined;
 
-        const num = parseInt(duration.split("s")[0]);
-
-        return num;
+        return parseInt(duration.split("s")[0]);
     }
 }
 

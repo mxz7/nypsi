@@ -799,11 +799,7 @@ export async function runCommand(
 }
 
 export function commandExists(cmd: string) {
-    if (commands.has(cmd)) {
-        return true;
-    } else {
-        return false;
-    }
+    return commands.has(cmd);
 }
 
 function getCmdName(cmd: string): string {
@@ -827,9 +823,7 @@ export function getRandomCommand(): Command {
         }
     });
 
-    const choice = a[Math.floor(Math.random() * a.length)];
-
-    return choice;
+    return a[Math.floor(Math.random() * a.length)];
 }
 
 export function logCommand(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {

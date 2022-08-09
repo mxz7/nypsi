@@ -353,8 +353,7 @@ function equalCards(member: GuildMember) {
     const value1 = getValue(games.get(member.user.id).cards[0]);
     const value2 = getValue(games.get(member.user.id).cards[1]);
     const value3 = getValue(games.get(member.user.id).nextCard);
-    if (value3 == value1 || value3 == value2) return true;
-    return false;
+    return value3 == value1 || value3 == value2;
 }
 
 function nextCardInBetween(member: GuildMember) {
@@ -370,8 +369,7 @@ function nextCardInBetween(member: GuildMember) {
         high = value2;
         low = value1;
     }
-    if (low < value3 && value3 < high) return true;
-    return false;
+    return low < value3 && value3 < high;
 }
 
 function getCards(member: GuildMember) {

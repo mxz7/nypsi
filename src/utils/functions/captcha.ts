@@ -3,11 +3,7 @@ import { getZeroWidth } from "../chatreactions/utils";
 const locked: string[] = [];
 
 export function isLockedOut(string: string): boolean {
-    if (locked.indexOf(string) == -1) {
-        return false;
-    } else {
-        return true;
-    }
+    return locked.indexOf(string) != -1;
 }
 
 export function toggleLock(string: string) {

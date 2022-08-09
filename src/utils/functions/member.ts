@@ -91,12 +91,10 @@ export async function getExactMember(guild: Guild, memberName: string): Promise<
         members = await guild.members.fetch();
     }
 
-    const target = members.find(
+    return members.find(
         (member) =>
             member.user.username.toLowerCase() == memberName.toLowerCase() ||
             member.user.tag.toLowerCase() == memberName.toLowerCase() ||
             member.user.id == memberName
     );
-
-    return target;
 }

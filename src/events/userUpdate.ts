@@ -62,8 +62,7 @@ async function determineCluster(client: NypsiClient, userId: string) {
         }
     }
 
-    if (lowest == client.cluster.id) return true;
-    return false;
+    return lowest == client.cluster.id;
 }
 
 async function doQueue(client: NypsiClient) {

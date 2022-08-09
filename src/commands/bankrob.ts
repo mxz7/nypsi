@@ -43,13 +43,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         bankWorth.set("fleeca", Math.round((await getBalance(message.member)) * 0.05));
         bankWorth.set("mazebank", Math.round((await getBalance(message.member)) * 0.1));
     } else if ((await getBalance(message.member)) > 500000) {
-        bankWorth.set("barclays", Math.round((await getBalance(message.member)) * 1));
+        bankWorth.set("barclays", Math.round(await getBalance(message.member)));
         bankWorth.set("santander", Math.round((await getBalance(message.member)) * 0.8));
         bankWorth.set("bankofamerica", Math.round((await getBalance(message.member)) * 1.25));
         bankWorth.set("lloyds", Math.round((await getBalance(message.member)) * 0.75));
         bankWorth.set("hsbc", Math.round((await getBalance(message.member)) * 0.9));
         bankWorth.set("fleeca", Math.round((await getBalance(message.member)) * 0.5));
-        bankWorth.set("mazebank", Math.round((await getBalance(message.member)) * 1));
+        bankWorth.set("mazebank", Math.round(await getBalance(message.member)));
     } else {
         bankWorth.set("barclays", Math.round((await getBalance(message.member)) * 2));
         bankWorth.set("santander", Math.round((await getBalance(message.member)) * 1.7));

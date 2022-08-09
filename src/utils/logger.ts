@@ -145,9 +145,7 @@ export function getTimestamp(): string {
         seconds = "0" + seconds;
     }
 
-    const timestamp = hours + ":" + minutes + ":" + seconds;
-
-    return timestamp;
+    return hours + ":" + minutes + ":" + seconds;
 }
 
 export async function getWebhooks(client: Client) {

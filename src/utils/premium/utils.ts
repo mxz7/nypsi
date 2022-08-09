@@ -20,11 +20,7 @@ export async function isPremium(member: GuildMember | string): Promise<boolean> 
     if (await redis.exists(`cache:premium:level:${id}`)) {
         const level = parseInt(await redis.get(`cache:premium:level:${id}`));
 
-        if (level == 0) {
-            return false;
-        } else {
-            return true;
-        }
+        return level != 0;
     }
 
     const query = await prisma.premium.findUnique({

@@ -170,13 +170,11 @@ export async function updateSnipeFilter(guild: Guild, array: string[]) {
 }
 
 export async function getGuildCounter(guild: Guild) {
-    const query = await prisma.guildCounter.findUnique({
+    return await prisma.guildCounter.findUnique({
         where: {
             guildId: guild.id,
         },
     });
-
-    return query;
 }
 
 export async function createGuildCounter(guild: Guild) {
@@ -468,11 +466,7 @@ export function addCooldown(guild: Guild, seconds: number) {
 }
 
 export function inCooldown(guild: Guild): boolean {
-    if (fetchCooldown.has(guild.id)) {
-        return true;
-    } else {
-        return false;
-    }
+    return fetchCooldown.has(guild.id);
 }
 
 export async function getPrefix(guild: Guild): Promise<string> {
@@ -536,11 +530,7 @@ export async function hasChristmasCountdown(guild: Guild) {
         },
     });
 
-    if (query) {
-        return true;
-    } else {
-        return false;
-    }
+    return !!query;
 }
 
 export async function createNewChristmasCountdown(guild: Guild) {
@@ -552,13 +542,11 @@ export async function createNewChristmasCountdown(guild: Guild) {
 }
 
 export async function getChristmasCountdown(guild: Guild) {
-    const query = await prisma.guildChristmas.findUnique({
+    return await prisma.guildChristmas.findUnique({
         where: {
             guildId: guild.id,
         },
     });
-
-    return query;
 }
 
 export async function setChristmasCountdown(guild: Guild, xmas: any) {
@@ -698,13 +686,11 @@ export async function getCountdowns(guild: Guild | string) {
         guildID = guild;
     }
 
-    const query = await prisma.guildCountdown.findMany({
+    return await prisma.guildCountdown.findMany({
         where: {
             guildId: guildID,
         },
     });
-
-    return query;
 }
 
 export async function getCountdown(guild: Guild | string, id: string) {
@@ -716,13 +702,11 @@ export async function getCountdown(guild: Guild | string, id: string) {
         guildID = guild;
     }
 
-    const query = await prisma.guildCountdown.findFirst({
+    return await prisma.guildCountdown.findFirst({
         where: {
             AND: [{ guildId: guildID }, { id: id }],
         },
     });
-
-    return query;
 }
 
 export async function addCountdown(guild: Guild, date: Date | number, format: string, finalFormat: string, channel: string) {

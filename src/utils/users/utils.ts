@@ -39,7 +39,7 @@ export async function hasProfile(member: GuildMember | string) {
     }
 
     if (await redis.exists(`cache:user:exists:${id}`)) {
-        return (await redis.get(`cache:user:exists:${id}`)) === "true" ? true : false;
+        return (await redis.get(`cache:user:exists:${id}`)) === "true";
     }
 
     const query = await prisma.user.findUnique({
@@ -133,7 +133,7 @@ export async function isTracking(member: GuildMember | string): Promise<boolean>
     }
 
     if (await redis.exists(`cache:user:tracking:${id}`)) {
-        return (await redis.get(`cache:user:tracking:${id}`)) == "t" ? true : false;
+        return (await redis.get(`cache:user:tracking:${id}`)) == "t";
     }
 
     if (!hasProfile(id)) return undefined;
@@ -398,7 +398,7 @@ export async function fetchUserMentions(guild: Guild, member: GuildMember | stri
         id = member;
     }
 
-    const mentions = await prisma.mention.findMany({
+    return await prisma.mention.findMany({
         where: {
             AND: [{ guildId: guild.id }, { targetId: id }],
         },
@@ -407,8 +407,6 @@ export async function fetchUserMentions(guild: Guild, member: GuildMember | stri
         },
         take: amount,
     });
-
-    return mentions;
 }
 
 export async function deleteUserMentions(guild: Guild, member: GuildMember) {
@@ -420,13 +418,11 @@ export async function deleteUserMentions(guild: Guild, member: GuildMember) {
 }
 
 export async function getWordleStats(member: GuildMember) {
-    const query = await prisma.wordleStats.findUnique({
+    return await prisma.wordleStats.findUnique({
         where: {
             userId: member.user.id,
         },
     });
-
-    return query;
 }
 
 export async function addWordleGame(member: GuildMember, win: boolean, attempts?: number, seconds?: number) {

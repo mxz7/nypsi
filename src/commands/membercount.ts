@@ -165,11 +165,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return message.channel.send({ embeds: [new ErrorEmbed("value must either be true or false")] });
         }
 
-        if (args[1].toLowerCase() == "true") {
-            profile.filterBots = true;
-        } else {
-            profile.filterBots = false;
-        }
+        profile.filterBots = args[1].toLowerCase() == "true";
 
         await setGuildCounter(message.guild, profile);
 

@@ -113,8 +113,6 @@ export function doChatReactions(client: NypsiClient) {
                 const nextGame = new Date().getTime() + final * 1000;
 
                 lastGame.set(channel.id, nextGame);
-
-                continue;
             }
         }
 
@@ -145,11 +143,7 @@ export async function hasReactionProfile(guild: Guild) {
         },
     });
 
-    if (query) {
-        return true;
-    } else {
-        return false;
-    }
+    return !!query;
 }
 
 export async function getWords(guild: Guild) {
@@ -163,9 +157,7 @@ export async function getWords(guild: Guild) {
     });
 
     if (query.wordList.length == 0) {
-        const a = await getDefaultWords();
-
-        return a;
+        return await getDefaultWords();
     } else {
         return query.wordList;
     }
@@ -196,7 +188,7 @@ export async function getWordList(guild: Guild) {
 }
 
 export async function getReactionSettings(guild: Guild) {
-    const query = await prisma.chatReaction.findUnique({
+    return await prisma.chatReaction.findUnique({
         where: {
             guildId: guild.id,
         },
@@ -208,8 +200,6 @@ export async function getReactionSettings(guild: Guild) {
             timeout: true,
         },
     });
-
-    return query;
 }
 
 export async function updateReactionSettings(
@@ -401,11 +391,7 @@ export async function hasReactionStatsProfile(guild: Guild, member: GuildMember)
         },
     });
 
-    if (query) {
-        return true;
-    } else {
-        return false;
-    }
+    return !!query;
 }
 
 export async function createReactionStatsProfile(guild: Guild, member: GuildMember) {
@@ -514,9 +500,7 @@ export async function getServerLeaderboard(guild: Guild, amount: number): Promis
     }
 
     const getMember = (id: string) => {
-        const target = members.find((member) => member.user.id == id);
-
-        return target;
+        return members.find((member) => member.user.id == id);
     };
 
     inPlaceSort(usersWins).desc((i) => winsStats.get(i));
@@ -647,9 +631,7 @@ async function getDefaultWords(): Promise<string[]> {
     );
     const body = await res.text();
 
-    const words = body.split("\n");
-
-    return words;
+    return body.split("\n");
 }
 
 export function getZeroWidth() {

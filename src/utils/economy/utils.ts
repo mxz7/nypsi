@@ -103,11 +103,7 @@ export async function hasVoted(member: GuildMember | string) {
     if (await redis.exists(`cache:vote:${id}`)) {
         const res = await redis.get(`cache:vote:${id}`);
 
-        if (res === "true") {
-            return true;
-        } else {
-            return false;
-        }
+        return res === "true";
     }
 
     const now = new Date().getTime();
@@ -238,7 +234,7 @@ export async function userExists(member: GuildMember | string): Promise<boolean>
     if (!id) return;
 
     if (await redis.exists(`cache:economy:exists:${id}`)) {
-        return (await redis.get(`cache:economy:exists:${id}`)) === "true" ? true : false;
+        return (await redis.get(`cache:economy:exists:${id}`)) === "true";
     }
 
     const query = await prisma.economy.findUnique({
@@ -522,11 +518,9 @@ export async function topAmount(guild: Guild, amount: number): Promise<string[]>
     let count = 0;
 
     const getMemberID = (guild: Guild, id: string) => {
-        const target = guild.members.cache.find((member) => {
+        return guild.members.cache.find((member) => {
             return member.user.id == id;
         });
-
-        return target;
     };
 
     for (const user of userIDs) {
@@ -604,11 +598,9 @@ export async function topAmountItem(guild: Guild, amount: number, item: string):
     let count = 0;
 
     const getMemberID = (guild: Guild, id: string) => {
-        const target = guild.members.cache.find((member) => {
+        return guild.members.cache.find((member) => {
             return member.user.id == id;
         });
-
-        return target;
     };
 
     for (const user of userIDs) {
@@ -688,11 +680,9 @@ export async function bottomAmount(guild: Guild, amount: number): Promise<string
     let count = 0;
 
     const getMemberID = (guild: Guild, id: string) => {
-        const target = guild.members.cache.find((member) => {
+        return guild.members.cache.find((member) => {
             return member.user.id == id;
         });
-
-        return target;
     };
 
     for (const user of userIDs) {
@@ -768,11 +758,9 @@ export async function topAmountPrestige(guild: Guild, amount: number): Promise<s
     let count = 0;
 
     const getMemberID = (guild: Guild, id: string) => {
-        const target = guild.members.cache.find((member) => {
+        return guild.members.cache.find((member) => {
             return member.user.id == id;
         });
-
-        return target;
     };
 
     for (const user of userIDs) {
@@ -986,9 +974,7 @@ export async function getPrestigeRequirement(member: GuildMember): Promise<numbe
 
 export function getPrestigeRequirementBal(xp: number): number {
     const constant = 500;
-    const bonus = xp * constant;
-
-    return bonus;
+    return xp * constant;
 }
 
 export async function getDMsEnabled(member: GuildMember | string): Promise<boolean> {
@@ -1142,7 +1128,7 @@ export async function upgradeWorker(member: GuildMember | string, id: string) {
 
 export async function isEcoBanned(id: string) {
     if (await redis.exists(`cache:economy:banned:${id}`)) {
-        return (await redis.get(`cache:economy:banned:${id}`)) === "t" ? true : false;
+        return (await redis.get(`cache:economy:banned:${id}`)) === "t";
     } else {
         const query = await prisma.economy.findUnique({
             where: {
@@ -1491,7 +1477,7 @@ export async function getMaxBitcoin(member: GuildMember): Promise<number> {
 
     const prestigeBonus = 5 * (prestige > 15 ? 15 : prestige);
 
-    let xpBonus = 1 * Math.floor((await getXp(member)) / 100);
+    let xpBonus = Math.floor((await getXp(member)) / 100);
 
     if (xpBonus > 5) xpBonus = 5;
 
@@ -1564,13 +1550,11 @@ export async function getTickets(member: GuildMember | string): Promise<LotteryT
         id = member;
     }
 
-    const query = await prisma.lotteryTicket.findMany({
+    return await prisma.lotteryTicket.findMany({
         where: {
             userId: id,
         },
     });
-
-    return query;
 }
 
 export async function addTicket(member: GuildMember | string) {
@@ -1681,7 +1665,6 @@ export async function openCrate(member: GuildMember, item: Item): Promise<string
 
             if (owned + 1 > max) {
                 i--;
-                continue;
             } else {
                 if (inventory[chosen]) {
                     inventory[chosen] += 1;
@@ -1696,7 +1679,6 @@ export async function openCrate(member: GuildMember, item: Item): Promise<string
 
             if (owned + 1 > max) {
                 i--;
-                continue;
             } else {
                 if (inventory[chosen]) {
                     inventory[chosen] += 1;
@@ -1810,7 +1792,7 @@ export async function calcEarnedXp(member: GuildMember, bet: number): Promise<nu
 }
 
 export async function getGuildByName(name: string) {
-    const guild = await prisma.economyGuild
+    return await prisma.economyGuild
         .findMany({
             where: {
                 guildName: {
@@ -1832,8 +1814,6 @@ export async function getGuildByName(name: string) {
             },
         })
         .then((r) => r[0]);
-
-    return guild;
 }
 
 export async function getGuildByUser(member: GuildMember | string) {
@@ -2191,7 +2171,7 @@ export async function stopOpeningCrates(member: GuildMember) {
 }
 
 export async function isHandcuffed(id: string): Promise<boolean> {
-    return (await redis.exists(`economy:handcuffed:${id}`)) == 1 ? true : false;
+    return (await redis.exists(`economy:handcuffed:${id}`)) == 1;
 }
 
 export async function addHandcuffs(id: string) {

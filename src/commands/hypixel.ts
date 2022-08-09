@@ -190,7 +190,5 @@ function getLevel(exp: number) {
 function timeSince(date: number) {
     const ms = Math.floor(new Date().getTime() - date);
 
-    const days = Math.floor(ms / (24 * 60 * 60 * 1000));
-
-    return days;
+    return Math.floor(ms / (24 * 60 * 60 * 1000));
 }
