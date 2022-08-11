@@ -26,7 +26,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [embed] });
     }
 
-    await addCooldown(cmd.name, message.member, 90);
+    await addCooldown(cmd.name, message.member, 30);
 
     if (!(await userExists(message.member))) await createUser(message.member);
 
@@ -35,7 +35,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (!dayjs(lastDaily.getTime()).isBefore(dayjs(), "day")) {
         const diff = dayjs().add(1, "day").startOf("day").unix() * 1000 - dayjs().unix() * 1000;
         return message.channel.send({
-            embeds: [new ErrorEmbed(`you can get your next daily bonus in **${MStoTime(diff)}**`)],
+            embeds: [new ErrorEmbed(`your next daily bonus is available in **${MStoTime(diff)}**`).removeTitle()],
         });
     }
 
