@@ -33,15 +33,17 @@ manager.on("clusterCreate", (cluster) => {
     cluster.on("ready", () => {
         logger.info(`cluster ${cluster.id} ready`);
 
-        const interval = setInterval(async () => {
-            const heartbeat = await sendHeartbeat(cluster).catch(() => {});
+        setTimeout(() => {
+            const interval = setInterval(async () => {
+                const heartbeat = await sendHeartbeat(cluster).catch(() => {});
 
-            if (!heartbeat) {
-                logger.warn(`cluster ${cluster.id} missed heartbeat`);
-                addFailedHeatbeat(cluster);
-            }
-        }, 7000);
-        heartBeatIntervals.push(interval);
+                if (!heartbeat) {
+                    logger.warn(`cluster ${cluster.id} missed heartbeat`);
+                    addFailedHeatbeat(cluster);
+                }
+            }, 25000);
+            heartBeatIntervals.push(interval);
+        }, 120000);
     });
     cluster.on("death", () => {
         logger.info(`cluster ${cluster.id} died`);
