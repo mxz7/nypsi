@@ -6,6 +6,7 @@ import { addCooldown, inCooldown } from "../utils/guilds/utils";
 import { getKarma } from "../utils/karma/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
+import { fetchUsernameHistory } from "../utils/users/utils";
 import workerSort from "../utils/workers/sort";
 
 const cmd = new Command("user", "view info about a user in the server", Categories.INFO).setAliases(["whois", "who"]);
@@ -100,6 +101,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     rolesText = rolesText.reverse();
 
+    const usernameHistory = await fetchUsernameHistory(member, 5);
+
     const embed = new CustomEmbed(message.member, member.user.toString())
         .setThumbnail(member.user.displayAvatarURL({ size: 128 }))
         .setHeader(member.user.tag)
@@ -117,6 +120,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (member.roles.cache.size > 1) {
         embed.addField("roles [" + (member.roles.cache.size - 1) + "]", rolesText.join(" "));
+    }
+
+    if (usernameHistory.length > 1) {
+        const text: string[] = [];
+
+        for (const un of usernameHistory) {
+            if (text.length > 10) break;
+            text.push(`\`${un.value}\` | \`${formatDate(un.date)}\``);
+        }
+
+        embed.addField("username history", text.join("\n"), true);
     }
 
     message.channel.send({ embeds: [embed] });
