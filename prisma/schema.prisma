@@ -23,6 +23,7 @@ model User {
   WordleStats        WordleStats?
   EconomyGuildMember EconomyGuildMember?
   EconomyGuild       EconomyGuild?
+  Auction            Auction[]
 }
 
 model Economy {
@@ -107,6 +108,17 @@ model WordleStats {
 
   user   User   @relation(fields: [userId], references: [id])
   userId String @id
+}
+
+model Auction {
+  id         String @id @default(uuid())
+  ownerId    String
+  itemName   String
+  itemAmount Int    @default(1)
+  bin        BigInt
+  messageId  String
+
+  owner User @relation(fields: [ownerId], references: [id])
 }
 
 // guild specific tables
