@@ -117,7 +117,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             true
         )
 
-        .addField("\u200B", "\u200B")
+        .addField("\u200B", "\u200B", true)
         .setFooter({ text: `${(await getKarma(member)).toLocaleString()} karma` });
 
     if (member.roles.cache.size > 1) {
