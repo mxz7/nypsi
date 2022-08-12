@@ -215,7 +215,7 @@ export async function addNewUsername(member: GuildMember | string, username: str
     });
 }
 
-export async function fetchUsernameHistory(member: GuildMember | string) {
+export async function fetchUsernameHistory(member: GuildMember | string, limit = 69) {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -234,6 +234,7 @@ export async function fetchUsernameHistory(member: GuildMember | string) {
         orderBy: {
             date: "desc",
         },
+        take: limit,
     });
 
     inPlaceSort(query).desc((u) => u.date);
