@@ -9,11 +9,11 @@ import {
 } from "discord.js";
 import { runCommand } from "../utils/commandhandler";
 import prisma from "../utils/database/database";
-import { getBalance, updateBalance, userExists } from "../utils/economy/utils";
+import { getBalance, getInventory, setInventory, updateBalance, userExists } from "../utils/economy/utils";
 import { logger } from "../utils/logger";
-import { NypsiClient } from "../utils/models/Client";
 import { createNypsiInteraction, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
+import _ = require("lodash");
 
 export default async function interactionCreate(interaction: Interaction) {
     if (interaction.type == InteractionType.MessageComponent && interaction.customId == "b") {
@@ -25,6 +25,9 @@ export default async function interactionCreate(interaction: Interaction) {
                 bin: true,
                 messageId: true,
                 id: true,
+                ownerId: true,
+                itemAmount: true,
+                itemName: true,
             },
         });
 
@@ -46,37 +49,31 @@ export default async function interactionCreate(interaction: Interaction) {
                     },
                 })
                 .catch(() => {});
+
+            const inventory = await getInventory(interaction.user.id);
+
+            if (inventory[auction.itemName]) {
+                inventory[auction.itemName] += auction.itemAmount;
+            } else {
+                inventory[auction.itemName] = auction.itemAmount;
+            }
+
+            await setInventory(interaction.user.id, inventory);
             await updateBalance(interaction.user.id, balance - Number(auction.bin));
+            await updateBalance(auction.ownerId, (await getBalance(auction.ownerId)) + Number(auction.bin));
 
-            await (interaction.client as NypsiClient).cluster.broadcastEval(
-                async (client, { messageId, username }) => {
-                    const guild = await client.guilds.fetch("747056029795221513");
+            const embed: any = _.cloneDeep(interaction.message.embeds[0]);
 
-                    if (!guild) return;
+            const desc = embed.description.split("\n\n");
 
-                    const channel = await guild.channels.fetch("819640200699052052");
+            desc[0] = `**bought** by ${interaction.user.username} <t:${Math.floor(Date.now() / 1000)}:R>`;
 
-                    if (!channel) return;
+            embed.description = desc.join("\n\n");
 
-                    if (channel.isTextBased()) {
-                        const msg = await channel.messages.fetch(messageId);
-
-                        if (msg) {
-                            const embed = JSON.parse(JSON.stringify(msg.embeds[0]));
-                            const desc = embed.description.split("\n\n");
-
-                            desc[0] = `**bought** by ${username} <t:${Math.floor(Date.now() / 1000)}:R>`;
-
-                            embed.description = desc.join("\n\n");
-
-                            await msg.edit({ embeds: [embed], components: [] });
-                        }
-                    }
-                },
-                {
-                    context: { messageId: auction.messageId, username: interaction.user.username },
-                }
-            );
+            await interaction.message.edit({ embeds: [embed], components: [] });
+        } else {
+            await interaction.reply({ embeds: [new ErrorEmbed("invalid auction")], ephemeral: true });
+            await interaction.message.delete();
         }
     }
 
