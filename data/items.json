@@ -842,7 +842,7 @@
         "name": "lucky 7",
         "aliases": ["7"],
         "emoji": "<:nypsi_7:1001553113368506538>",
-        "description": "improved chances for slots",
+        "description": "improved chances for slots 65%",
         "rarity": 3,
         "buy": 0,
         "sell": 500000,
@@ -851,7 +851,7 @@
         "boosterEffect": {
             "boosts": ["slots"],
             "effect": "improves slots win chance to 60%",
-            "time": 150
+            "time": 180
         }
     },
     "stolen_credit_card": {
