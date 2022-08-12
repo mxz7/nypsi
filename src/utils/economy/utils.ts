@@ -2390,12 +2390,40 @@ export async function getAuctions(member: GuildMember | string) {
     return query;
 }
 
-export async function deleteAuction(id: string) {
-    await prisma.auction.delete({
-        where: {
-            id: id,
-        },
-    });
+export async function deleteAuction(id: string, client: NypsiClient) {
+    const auction = await prisma.auction
+        .delete({
+            where: {
+                id: id,
+            },
+            select: {
+                messageId: true,
+            },
+        })
+        .catch(() => {});
+
+    if (auction) {
+        await client.cluster.broadcastEval(
+            async (client, { id }) => {
+                const guild = await client.guilds.fetch("747056029795221513");
+
+                if (!guild) return;
+
+                const channel = await guild.channels.fetch("819640200699052052");
+
+                if (!channel) return;
+
+                if (channel.isTextBased()) {
+                    const msg = await channel.messages.fetch(id);
+
+                    if (msg) await msg.delete();
+                }
+            },
+            { context: { id: auction.messageId } }
+        );
+    }
+
+    return Boolean(auction);
 }
 
 export async function createAuction(member: GuildMember, itemId: string, itemAmount: number, bin: number) {
