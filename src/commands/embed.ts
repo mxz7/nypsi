@@ -54,7 +54,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (!(message instanceof Message)) return;
 
     if (message.author.id != "672793821850894347") embed.setFooter({ text: `sent by: ${message.author.tag}` });
-
+    if (message.author.id != "528539116925747210") embed.setFooter({ text: `sent by: ${message.author.tag}` });
+    
     message.channel
         .send({ embeds: [embed] })
         .then(() => {
