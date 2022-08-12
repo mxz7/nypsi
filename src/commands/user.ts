@@ -116,17 +116,19 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }`,
             true
         )
+
+        .addField("\u200B", "\u200B")
         .setFooter({ text: `${(await getKarma(member)).toLocaleString()} karma` });
 
     if (member.roles.cache.size > 1) {
-        embed.addField("roles [" + (member.roles.cache.size - 1) + "]", rolesText.join(" "));
+        embed.addField("roles [" + (member.roles.cache.size - 1) + "]", rolesText.join(" "), true);
     }
 
     if (usernameHistory.length > 1) {
         const text: string[] = [];
 
         for (const un of usernameHistory) {
-            if (text.length > 10) break;
+            if (text.length > 5) break;
             text.push(`\`${un.value}\` | \`${formatDate(un.date)}\``);
         }
 
