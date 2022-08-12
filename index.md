@@ -6,6 +6,22 @@
 
 ## FAQ
 
+### how do i clear my username history?
+
+run the following command to clear your username history
+
+```
+$un -clear
+```
+
+run the following command to clear your avatar history
+
+```
+$avh -clear
+```
+
+you can use `$toggletracking` to disable username/avatar tracking
+
 ### my server does not qualify for the pings command
 
 there are requirements set for pings/mentioned to be tracked, as there is massive performance issues when nypsi tracks every
