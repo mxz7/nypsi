@@ -91,15 +91,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const created = formatDate(member.user.createdAt);
     const roles = member.roles.cache;
 
-    let rolesText: any = [];
+    let rolesText: string[] = [];
 
     roles.forEach((role) => {
+        if (role.name == "@everyone") return;
         rolesText[role.position] = role.toString();
     });
 
-    rolesText = rolesText.reverse().join(" ");
-
-    rolesText = rolesText.split("@everyone").join("");
+    rolesText = rolesText.reverse();
 
     const embed = new CustomEmbed(message.member, member.user.toString())
         .setThumbnail(member.user.displayAvatarURL({ size: 128 }))
@@ -116,8 +115,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         )
         .setFooter({ text: `${(await getKarma(member)).toLocaleString()} karma` });
 
-    if (member.roles.cache.size > 0) {
-        embed.addField("roles [" + member.roles.cache.size + "]", rolesText);
+    if (member.roles.cache.size > 1) {
+        embed.addField("roles [" + (member.roles.cache.size - 1) + "]", rolesText.join(" "));
     }
 
     message.channel.send({ embeds: [embed] });
