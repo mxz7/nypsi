@@ -1,4 +1,12 @@
-import { Collection, Guild, GuildMember } from "discord.js";
+import {
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle,
+    Collection,
+    Guild,
+    GuildMember,
+    MessageActionRowComponentBuilder,
+} from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import * as fs from "fs";
 import fetch from "node-fetch";
@@ -2363,4 +2371,75 @@ export async function getDailyStreak(member: GuildMember | string) {
     });
 
     return query.dailyStreak;
+}
+
+export async function getAuctions(member: GuildMember | string) {
+    let id: string;
+    if (member instanceof GuildMember) {
+        id = member.user.id;
+    } else {
+        id = member;
+    }
+
+    const query = await prisma.auction.findMany({
+        where: {
+            ownerId: id,
+        },
+    });
+
+    return query;
+}
+
+export async function deleteAuction(id: string) {
+    await prisma.auction.delete({
+        where: {
+            id: id,
+        },
+    });
+}
+
+export async function createAuction(member: GuildMember, itemId: string, itemAmount: number, bin: number) {
+    const embed = new CustomEmbed(member).setHeader(`${member.user.username}'s auction`, member.user.avatarURL());
+
+    embed.setDescription(
+        `started <t:${Math.floor(Date.now() / 1000)}:R>\n\n` +
+            `**${itemAmount.toLocaleString()}x** ${items[itemId].emoji} ${
+                items[itemId].name
+            } for $**${bin.toLocaleString()}**`
+    );
+
+    const button = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder().setCustomId("b").setLabel("buy").setStyle(ButtonStyle.Success)
+    );
+
+    const messageId = await (member.client as NypsiClient).cluster.broadcastEval(
+        async (client, { embed, row }) => {
+            const guild = await client.guilds.fetch("747056029795221513");
+
+            if (!guild) return;
+
+            const channel = await guild.channels.fetch("819640200699052052");
+
+            if (!channel) return;
+
+            if (channel.isTextBased()) {
+                const msg = await channel.send({ embeds: [embed], components: [row] });
+
+                return msg.id;
+            }
+        },
+        { context: { embed: embed.toJSON(), row: button.toJSON() } }
+    );
+
+    messageId.filter((i) => Boolean(i));
+
+    await prisma.auction.create({
+        data: {
+            bin: bin,
+            itemName: itemId,
+            messageId: messageId[0],
+            itemAmount: itemAmount,
+            ownerId: member.user.id,
+        },
+    });
 }
