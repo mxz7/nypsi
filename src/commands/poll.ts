@@ -85,7 +85,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embed.setHeader(message.member.user.tag);
     }
 
-    embed.setFooter({ text: `sent by: ${message.author.tag}` });
+    embed.setFooter({ text: `nypsi.xyz` });
 
     if (!(message instanceof Message)) return;
 
