@@ -26,6 +26,7 @@ import { addUse, getCommand } from "./premium/utils";
 // @ts-expect-error typescript doesnt like opening package.json
 import { version } from "../../package.json";
 import redis from "./database/redis";
+import { a } from "./functions/anticheat";
 import { NypsiClient } from "./models/Client";
 import { Item } from "./models/Economy";
 import { createProfile, hasProfile, updateLastKnowntag } from "./users/utils";
@@ -316,8 +317,12 @@ async function helpCmd(message: Message, args: string[]) {
                 desc.push(`**aliases** \`${selectedItem.aliases.join("`, `")}\``);
             }
 
-            if (selectedItem.worth) {
-                desc.push(`**worth** $${selectedItem.worth.toLocaleString()}`);
+            if (selectedItem.buy) {
+                desc.push(`**buy** $${selectedItem.buy.toLocaleString()}`);
+            }
+
+            if (selectedItem.sell) {
+                desc.push(`**sell** $${selectedItem.sell.toLocaleString()}`);
             }
 
             if (selectedItem.rarity) {
@@ -687,23 +692,6 @@ export async function runCommand(
         }
     }
 
-    if (restarting || (await redis.get("nypsi:restarting")) == "t") {
-        if (message.author.id == "672793821850894347" && message instanceof Message) {
-            message.react("💀");
-        } else {
-            logCommand(message, args);
-            if (message instanceof Message) {
-                return message.channel.send({
-                    embeds: [new CustomEmbed(message.member, "nypsi is rebooting, try again in a few minutes")],
-                });
-            } else {
-                return message.editReply({
-                    embeds: [new CustomEmbed(message.member, "nypsi is rebooting, try again in a few minutes")],
-                });
-            }
-        }
-    }
-
     logCommand(message, args);
 
     let command: Command;
@@ -715,6 +703,22 @@ export async function runCommand(
     }
 
     if (command.category == "money") {
+        if (restarting || (await redis.get("nypsi:restarting")) == "t") {
+            if (message.author.id == "672793821850894347" && message instanceof Message) {
+                message.react("💀");
+            } else {
+                if (message instanceof Message) {
+                    return message.channel.send({
+                        embeds: [new CustomEmbed(message.member, "nypsi is rebooting, try again in a few minutes")],
+                    });
+                } else {
+                    return message.editReply({
+                        embeds: [new CustomEmbed(message.member, "nypsi is rebooting, try again in a few minutes")],
+                    });
+                }
+            }
+        }
+
         if (await isEcoBanned(message.author.id)) {
             return;
         } else if (await isHandcuffed(message.author.id)) {
@@ -762,6 +766,7 @@ export async function runCommand(
 
     command.run(message, args);
 
+    a(message.author.id, message.author.tag, message.content);
     updateCommandUses(message.member);
     await updateLastCommand(message.member);
     await redis.hincrby("nypsi:topcommands", command.name, 1);
@@ -885,7 +890,7 @@ export function runCommandUseTimers(client: NypsiClient) {
         for (const tag of noLifers.keys()) {
             const uses = noLifers.get(tag);
 
-            if (uses > 100) {
+            if (uses > 150) {
                 const res = await client.cluster.broadcastEval(
                     (c, { tag }) => {
                         const foundUser = c.users.cache.find((u) => `${u.username}#${u.discriminator}` == tag);
@@ -905,10 +910,10 @@ export function runCommandUseTimers(client: NypsiClient) {
                     }) performed **${uses}** commands in an hour`
                 );
 
-                if (uses > 150 && typeof id === "string") {
+                if (uses > 300 && typeof id === "string") {
                     const lastCommand = await getLastCommand(id);
 
-                    if (dayjs().subtract(5, "minutes").unix() > lastCommand.getTime()) continue; // dont lock if last command was more than 5 minutes ago
+                    if (dayjs().subtract(5, "minutes").unix() * 1000 > lastCommand.getTime()) continue; // dont lock if last command was more than 5 minutes ago
 
                     toggleLock(id);
                     logger.info(`${tag} (${id}) has been given a captcha`);

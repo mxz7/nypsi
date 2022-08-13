@@ -4,104 +4,115 @@
         "name": "small fish",
         "emoji": "🐟",
         "description": "commonly found while fishing",
-        "worth": 1000,
         "role": "fish",
-        "rarity": 0
+        "rarity": 0,
+        "buy": 0,
+        "sell": 1000
     },
     "medium_fish": {
         "id": "medium_fish",
         "name": "medium fish",
         "emoji": "🐠",
         "description": "commonly found while fishing with a normal fishing rod",
-        "worth": 5000,
         "role": "fish",
-        "rarity": 1
+        "rarity": 1,
+        "buy": 0,
+        "sell": 3000
     },
     "large_fish": {
         "id": "large_fish",
         "name": "large fish",
         "emoji": "🦈",
         "description": "rarely found while using an incredible fishing rod",
-        "worth": 50000,
         "role": "fish",
-        "rarity": 2
+        "rarity": 2,
+        "buy": 0,
+        "sell": 3500
     },
     "cobblestone": {
         "id": "cobblestone",
         "name": "cobblestone",
         "emoji": "<:nypsi_cobblestone:959445739673616484>",
         "description": "found when mining",
-        "worth": 400,
         "role": "sellable",
         "rarity": 0,
-        "aliases": ["cobble"]
+        "aliases": ["cobble"],
+        "buy": 0,
+        "sell": 200
     },
     "coal": {
         "id": "coal",
         "name": "coal",
         "emoji": "<:nypsi_coal:959442471388082176>",
         "description": "can be used to smelt 1 ore",
-        "worth": 5000,
         "role": "fuel",
-        "rarity": 1
+        "rarity": 1,
+        "buy": 3000,
+        "sell": 1500
     },
     "iron_ingot": {
         "id": "iron_ingot",
         "name": "iron",
         "emoji": "<:nypsi_iron:959442548064141362>",
         "description": "product of smelting iron ore",
-        "worth": 25000,
         "role": "sellable",
         "rarity": 69,
-        "aliases": ["iron"]
+        "aliases": ["iron"],
+        "buy": 0,
+        "sell": 10000
     },
     "gold_ingot": {
         "id": "gold_ingot",
         "name": "gold",
         "emoji": "<:nypsi_gold:959443010205126656>",
         "description": "product of smelting gold ore",
-        "worth": 45000,
         "role": "sellable",
         "rarity": 69,
-        "aliases": ["gold"]
+        "aliases": ["gold"],
+        "buy": 0,
+        "sell": 12500
     },
     "diamond": {
         "id": "diamond",
         "name": "diamond",
         "emoji": "<:nypsi_diamond:959443043377897502>",
         "description": "found when mining",
-        "worth": 100000,
         "role": "sellable",
-        "rarity": 3
+        "rarity": 3,
+        "buy": 0,
+        "sell": 40000
     },
     "furnace": {
         "id": "furnace",
         "name": "furnace",
         "emoji": "<:nypsi_furnace:959445132585869373>",
         "description": "used to smelt ore",
-        "worth": 50000,
         "role": "tool",
-        "rarity": 1
+        "rarity": 0,
+        "buy": 50000,
+        "sell": 15000
     },
     "iron_ore": {
         "id": "iron_ore",
         "name": "iron ore",
         "emoji": "<:nypsi_iron_ore:959444539435778078>",
         "description": "can be smelted into an iron ingot with a furnace and coal",
-        "worth": 500,
         "role": "ore",
         "rarity": 1,
-        "ingot": "iron_ingot"
+        "ingot": "iron_ingot",
+        "buy": 0,
+        "sell": 200
     },
     "gold_ore": {
         "id": "gold_ore",
         "name": "gold ore",
         "emoji": "<:nypsi_gold_ore:959444923139121223>",
         "description": "can be smelted into a gold ingot with a furnace and coal",
-        "worth": 500,
         "role": "ore",
         "rarity": 2,
-        "ingot": "gold_ingot"
+        "ingot": "gold_ingot",
+        "buy": 0,
+        "sell": 300
     },
     "wooden_pickaxe": {
         "id": "wooden_pickaxe",
@@ -109,7 +120,9 @@
         "emoji": "<:nypsi_wood_pickaxe:959441224731852850>",
         "description": "allows you to mine",
         "role": "tool",
-        "rarity": 0
+        "rarity": 0,
+        "buy": 0,
+        "sell": 5000
     },
     "iron_pickaxe": {
         "id": "iron_pickaxe",
@@ -117,7 +130,9 @@
         "emoji": "<:nypsi_iron_pickaxe:959441877956960326>",
         "description": "allows you to mine",
         "role": "tool",
-        "rarity": 1
+        "rarity": 1,
+        "buy": 0,
+        "sell": 5000
     },
     "diamond_pickaxe": {
         "id": "diamond_pickaxe",
@@ -125,7 +140,9 @@
         "emoji": "<:nypsi_diamond_pickaxe:959442215736844368>",
         "description": "allows you to mine",
         "role": "tool",
-        "rarity": 3
+        "rarity": 3,
+        "buy": 0,
+        "sell": 10000
     },
     "terrible_fishing_rod": {
         "id": "terrible_fishing_rod",
@@ -133,7 +150,9 @@
         "emoji": "🎣",
         "description": "allows you to fish",
         "role": "tool",
-        "rarity": 0
+        "rarity": 0,
+        "buy": 0,
+        "sell": 5000
     },
     "fishing_rod": {
         "id": "fishing_rod",
@@ -141,7 +160,9 @@
         "emoji": "🎣",
         "description": "allows you to fish with better luck",
         "role": "tool",
-        "rarity": 1
+        "rarity": 1,
+        "buy": 0,
+        "sell": 5000
     },
     "incredible_fishing_rod": {
         "id": "incredible_fishing_rod",
@@ -149,35 +170,40 @@
         "emoji": "🎣",
         "description": "allows you to fish with amazing luck",
         "role": "tool",
-        "rarity": 3
+        "rarity": 3,
+        "buy": 0,
+        "sell": 10000
     },
     "standard_watch": {
         "id": "standard_watch",
         "name": "standard watch",
         "emoji": "⌚",
         "description": "tell the time",
-        "worth": 1000,
         "role": "item",
         "rarity": 0,
-        "aliases": ["watch"]
+        "aliases": ["watch"],
+        "buy": 0,
+        "sell": 5000
     },
     "golden_watch": {
         "id": "golden_watch",
         "name": "golden watch",
         "emoji": "⌚",
         "description": "tell the time while flexing",
-        "worth": 50000,
         "role": "item",
-        "rarity": 1
+        "rarity": 1,
+        "buy": 0,
+        "sell": 75000
     },
     "diamond_watch": {
         "id": "diamond_watch",
         "name": "diamond watch",
         "emoji": "⌚",
         "description": "bling yourself out",
-        "worth": 500000,
         "role": "item",
-        "rarity": 3
+        "rarity": 3,
+        "buy": 0,
+        "sell": 250000
     },
     "bitcoin": {
         "id": "bitcoin",
@@ -203,7 +229,9 @@
         "emoji": "🔫",
         "description": "allows you to hunt",
         "role": "tool",
-        "rarity": 0
+        "rarity": 0,
+        "buy": 0,
+        "sell": 5000
     },
     "gun": {
         "id": "gun",
@@ -211,7 +239,9 @@
         "emoji": "🔫",
         "description": "allows you to hunt with better luck",
         "role": "tool",
-        "rarity": 1
+        "rarity": 1,
+        "buy": 0,
+        "sell": 5000
     },
     "incredible_gun": {
         "id": "incredible_gun",
@@ -219,79 +249,89 @@
         "emoji": "🔫",
         "description": "allows you to hunt with amazing luck",
         "role": "tool",
-        "rarity": 2
+        "rarity": 2,
+        "buy": 0,
+        "sell": 10000
     },
     "baby_rabbit": {
         "id": "baby_rabbit",
         "name": "baby rabbit",
         "emoji": "🐰",
         "description": "tiny small baby rabbit, ur cat could kill this",
-        "worth": 2500,
         "role": "prey",
-        "rarity": 0
+        "rarity": 0,
+        "buy": 0,
+        "sell": 2000
     },
     "normal_rabbit": {
         "id": "normal_rabbit",
         "name": "normal rabbit",
         "emoji": "🐰",
         "description": "jumps around in ur garden",
-        "worth": 8000,
         "role": "prey",
-        "rarity": 1
+        "rarity": 1,
+        "buy": 0,
+        "sell": 4500
     },
     "large_rabbit": {
         "id": "large_rabbit",
         "name": "large rabbit",
         "emoji": "🐰",
         "description": "massive fuck off rabbit like a bear",
-        "worth": 20000,
         "role": "prey",
-        "rarity": 2
+        "rarity": 2,
+        "buy": 0,
+        "sell": 15000
     },
     "deer": {
         "id": "deer",
         "name": "deer",
         "emoji": "🦌",
         "description": "not one of santa's.. anymore atleast",
-        "worth": 50000,
         "role": "prey",
-        "rarity": 3
+        "rarity": 3,
+        "buy": 0,
+        "sell": 30000
     },
     "rat": {
         "id": "rat",
         "name": "rat",
         "emoji": "🐀",
         "description": "https://youtu.be/1hhl9kFTuQ8?t=19",
-        "worth": 3000,
         "role": "prey",
-        "rarity": 0
+        "rarity": 0,
+        "buy": 0,
+        "sell": 3000
     },
     "mouse": {
         "id": "mouse",
         "name": "mouse",
         "emoji": "🐁",
         "description": "squeak squeak",
-        "worth": 4000,
         "role": "prey",
-        "rarity": 0
+        "rarity": 0,
+        "buy": 0,
+        "sell": 5000
     },
     "kangaroo": {
         "id": "kangaroo",
         "name": "kangaroo",
         "emoji": "🦘",
         "description": "australia",
-        "worth": 75000,
         "role": "prey",
-        "rarity": 3
+        "rarity": 3,
+        "buy": 0,
+        "sell": 50000
     },
     "wolf": {
         "id": "wolf",
         "name": "wolf",
         "emoji": "🐺",
         "description": "bark.",
-        "worth": 250000,
         "role": "prey",
-        "rarity": 3
+        "rarity": 3,
+        "buy": 0,
+        "sell": 150000
     },
     "vote_crate": {
         "id": "vote_crate",
@@ -324,9 +364,10 @@
         "name": "calendar",
         "emoji": "📅",
         "description": "find out the current date",
-        "worth": 500,
         "role": "item",
-        "rarity": 0
+        "rarity": 0,
+        "buy": 0,
+        "sell": 1000
     },
     "padlock": {
         "id": "padlock",
@@ -343,7 +384,8 @@
         "description": "destroy someone's padlock",
         "rarity": 1,
         "role": "item",
-        "worth": 150000
+        "buy": 150000,
+        "sell": 50000
     },
     "mask": {
         "id": "mask",
@@ -352,7 +394,8 @@
         "description": "bypass rob cooldown",
         "rarity": 2,
         "role": "item",
-        "worth": 300000
+        "buy": 300000,
+        "sell": 100000
     },
     "cookie": {
         "id": "cookie",
@@ -361,7 +404,18 @@
         "description": "yum yum",
         "rarity": 0,
         "role": "sellable",
-        "worth": 10000
+        "buy": 0,
+        "sell": 2500
+    },
+    "cake": {
+        "id": "cake",
+        "name": "cake",
+        "emoji": "<:nypsi_cake:1002977512630001725>",
+        "description": "yum yum 😋",
+        "rarity": 3,
+        "role": "sellable",
+        "buy": 0,
+        "sell": 50000
     },
     "potato": {
         "id": "potato",
@@ -370,7 +424,8 @@
         "description": "a potato.",
         "rarity": 0,
         "role": "sellable",
-        "worth": 5000
+        "buy": 0,
+        "sell": 5000
     },
     "tooth": {
         "id": "tooth",
@@ -465,7 +520,8 @@
         "role": "item",
         "boobies": "i got this idea while watching better call saul on netflix lol. if u havent seen it i would recommend that u go watch it. you're not seeing this file though so im talking to myself. its a prequel to breaking bad. im so weird.",
         "aliases": ["saulgoodman", "saul"],
-        "worth": 200000
+        "buy": 200000,
+        "sell": 75000
     },
     "minecraft_account": {
         "id": "minecraft_account",
@@ -491,8 +547,9 @@
         "description": "prevent someone from robbing people",
         "rarity": 1,
         "role": "item",
-        "worth": 150000,
-        "aliases": ["scanner", "policescanner"]
+        "aliases": ["scanner", "policescanner"],
+        "buy": 150000,
+        "sell": 25000
     },
     "lancer_evox": {
         "id": "lancer_evox",
@@ -503,7 +560,8 @@
         "role": "car",
         "speed": 3,
         "aliases": ["evox", "evo"],
-        "worth": 40000
+        "buy": 50000,
+        "sell": 15000
     },
     "honda_civic": {
         "id": "honda_civic",
@@ -514,7 +572,8 @@
         "role": "car",
         "speed": 4,
         "aliases": ["civic", "honda"],
-        "worth": 35000
+        "buy": 0,
+        "sell": 35000
     },
     "subaru_wrx": {
         "id": "subaru_wrx",
@@ -525,7 +584,8 @@
         "role": "car",
         "speed": 3,
         "aliases": ["subuwu"],
-        "worth": 30000
+        "buy": 0,
+        "sell": 30000
     },
     "flappy_bird": {
         "id": "flappy_bird",
@@ -534,7 +594,8 @@
         "description": "flap flap",
         "rarity": 2,
         "role": "prey",
-        "worth": 75000
+        "buy": 0,
+        "sell": 45000
     },
     "chastity_cage": {
         "id": "chastity_cage",
@@ -544,7 +605,9 @@
         "rarity": 1,
         "role": "item",
         "worth": 75000,
-        "aliases": ["chastity"]
+        "aliases": ["chastity"],
+        "buy": 75000,
+        "sell": 40000
     },
     "tesla_modelx": {
         "id": "tesla_modelx",
@@ -555,7 +618,8 @@
         "role": "car",
         "speed": 3,
         "aliases": ["tesla"],
-        "worth": 85000
+        "buy": 0,
+        "sell": 85000
     },
     "handcuffs": {
         "id": "handcuffs",
@@ -564,8 +628,9 @@
         "description": "simply handcuff someone",
         "rarity": 3,
         "role": "item",
-        "worth": 400000,
-        "aliases": ["handcuff"]
+        "aliases": ["handcuff"],
+        "buy": 400000,
+        "sell": 150000
     },
     "cycle": {
         "id": "cycle",
@@ -575,7 +640,8 @@
         "rarity": 100,
         "role": "car",
         "speed": 0,
-        "worth": 0
+        "buy": 0,
+        "sell": 0
     },
     "smart_car": {
         "id": "smart_car",
@@ -586,7 +652,8 @@
         "role": "car",
         "speed": 1,
         "aliases": ["smart"],
-        "worth": 15000
+        "buy": 0,
+        "sell": 15000
     },
     "lightning_mcqueen": {
         "id": "lightning_mcqueen",
@@ -597,7 +664,8 @@
         "role": "car",
         "speed": 4,
         "aliases": ["mcqueen", "lightning"],
-        "worth": 60000
+        "buy": 0,
+        "sell": 60000
     },
     "fiat": {
         "id": "fiat",
@@ -608,7 +676,8 @@
         "role": "car",
         "speed": 1,
         "aliases": ["inbetweeners"],
-        "worth": 15000
+        "buy": 0,
+        "sell": 15000
     },
     "ford_fiesta": {
         "id": "ford_fiesta",
@@ -619,7 +688,8 @@
         "role": "car",
         "speed": 2,
         "aliases": ["fiesta"],
-        "worth": 17500
+        "buy": 0,
+        "sell": 17500
     },
     "vauxhall_corsa": {
         "id": "vauxhall_corsa",
@@ -630,21 +700,23 @@
         "role": "car",
         "speed": 1,
         "aliases": ["chav", "corsa"],
-        "worth": 5000
+        "buy": 0,
+        "sell": 5000
     },
     "redbull": {
         "id": "redbull",
         "name": "red bull",
         "emoji": "<:nypsi_redbull:1001210452832964648>",
-        "description": "50% shorter cooldowns for 25 minutes",
+        "description": "50% shorter cooldowns for 7 minutes 30 seconds",
         "rarity": 2,
         "role": "booster",
-        "worth": 100000,
+        "buy": 0,
+        "sell": 100000,
         "stackable": false,
         "boosterEffect": {
             "boosts": ["cooldown"],
             "effect": 0.5,
-            "time": 1500
+            "time": 450
         }
     },
     "worm": {
@@ -654,7 +726,8 @@
         "description": "increased luck when fishing",
         "rarity": 0,
         "role": "booster",
-        "worth": 50000,
+        "buy": 45000,
+        "sell": 25000,
         "stackable": false,
         "boosterEffect": {
             "boosts": ["fish"],
@@ -668,10 +741,11 @@
         "emoji": "<:nypsi_potion:1001463080582131843>",
         "description": "increase your multipler by 3%",
         "rarity": 1,
-        "worth": 100000,
+        "buy": 0,
+        "sell": 100000,
         "role": "booster",
         "stackable": true,
-        "max": 5,
+        "max": 3,
         "boosterEffect": {
             "boosts": ["multi"],
             "effect": 3,
@@ -684,7 +758,8 @@
         "emoji": "<a:nypsi_book:1001459250163359786>",
         "description": "enchant your pickaxe with fortune",
         "rarity": 1,
-        "worth": 75000,
+        "buy": 0,
+        "sell": 75000,
         "role": "booster",
         "stackable": true,
         "max": 3,
@@ -700,7 +775,8 @@
         "emoji": "<a:nypsi_book:1001459250163359786>",
         "description": "when mining, fishing or hunting it will not reduce durability",
         "rarity": 1,
-        "worth": 75000,
+        "buy": 0,
+        "sell": 75000,
         "role": "booster",
         "stackable": true,
         "max": 3,
@@ -716,7 +792,8 @@
         "emoji": "<a:nypsi_book:1001459250163359786>",
         "description": "enchant your pickaxe with efficiency",
         "rarity": 1,
-        "worth": 75000,
+        "buy": 0,
+        "sell": 75000,
         "role": "booster",
         "stackable": true,
         "max": 4,
@@ -732,10 +809,11 @@
         "emoji": "<:nypsi_potion:1001463080582131843>",
         "description": "earn 50% more xp",
         "rarity": 1,
-        "worth": 75000,
+        "buy": 0,
+        "sell": 75000,
         "role": "booster",
         "stackable": true,
-        "max": 5,
+        "max": 3,
         "boosterEffect": {
             "boosts": ["xp"],
             "effect": 0.5,
@@ -748,7 +826,8 @@
         "emoji": "✨",
         "description": "double xp",
         "rarity": 69,
-        "worth": 0,
+        "buy": 0,
+        "sell": 0,
         "role": "booster",
         "stackable": true,
         "max": 5,
@@ -764,14 +843,65 @@
         "aliases": ["7"],
         "emoji": "<:nypsi_7:1001553113368506538>",
         "description": "improved chances for slots",
-        "rarity": 2,
-        "worth": 500000,
+        "rarity": 3,
+        "buy": 0,
+        "sell": 500000,
         "role": "booster",
         "stackable": false,
         "boosterEffect": {
             "boosts": ["slots"],
             "effect": "improves slots win chance to 60%",
-            "time": 450
+            "time": 180
+        }
+    },
+    "stolen_credit_card": {
+        "id": "stolen_credit_card",
+        "name": "stolen credit card",
+        "aliases": ["scc", "credit", "card", "cc"],
+        "emoji": "💳",
+        "description": "increase your bank limit by $1,000-$500,000",
+        "rarity": 1,
+        "buy": 0,
+        "sell": 75000,
+        "role": "tool"
+    },
+    "streak_token": {
+        "id": "streak_token",
+        "name": "streak token",
+        "aliases": ["streak"],
+        "emoji": "🎟️",
+        "description": "add one day to your daily streak",
+        "rarity": 0,
+        "buy": 0,
+        "sell": 50000,
+        "role": "tool"
+    },
+    "blue_rocks": {
+        "id": "blue_rocks",
+        "name": "blue rocks",
+        "aliases": ["blue", "meth", "C10H15N"],
+        "emoji": "<:nypsi_bluerock:1003408529954177144>",
+        "description": "https://youtu.be/Dbt-OfbQTpw?t=28",
+        "rarity": 0,
+        "buy": 0,
+        "sell": 2000,
+        "role": "sellable"
+    },
+    "steroids": {
+        "id": "steroids",
+        "name": "steroids",
+        "aliases": ["roids"],
+        "emoji": "💉",
+        "description": "https://tenor.com/view/ambeeee-gif-19218531",
+        "rarity": 1,
+        "buy": 100000,
+        "sell": 75000,
+        "role": "booster",
+        "stackable": false,
+        "boosterEffect": {
+            "boosts": ["fight"],
+            "effect": "improves fight strength",
+            "time": 3600
         }
     }
 }

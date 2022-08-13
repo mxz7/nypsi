@@ -75,6 +75,11 @@ export async function getResponse(cmd: string, member: GuildMember): Promise<Err
 
     const embed = new ErrorEmbed(`you are on cooldown for \`${remaining}\``).removeTitle();
 
+    if (remaining.includes("0.0") || remaining.includes("-")) {
+        await redis.del(key);
+        embed.setDescription("you are on cooldown for `0.1s`");
+    }
+
     const random = Math.floor(Math.random() * 50);
 
     if (random == 7 && !(await isPremium(member))) {

@@ -1,6 +1,7 @@
 import * as Cluster from "discord-hybrid-sharding";
 import { Client, ClientOptions } from "discord.js";
 import channelCreate from "../../events/channelCreate";
+import channelDelete from "../../events/channelDelete";
 import guildCreate from "../../events/guildCreate";
 import guildDelete from "../../events/guildDelete";
 import guildMemberAdd from "../../events/guildMemberAdd";
@@ -9,6 +10,7 @@ import guildMemberUpdate from "../../events/guildMemberUpdate";
 import interactionCreate from "../../events/interactionCreate";
 import messageCreate from "../../events/message";
 import messageDelete from "../../events/messageDelete";
+import messageDeleteBulk from "../../events/messageDeleteBulk";
 import messageUpdate from "../../events/messageUpdate";
 import ready from "../../events/ready";
 import roleDelete from "../../events/roleDelete";
@@ -17,11 +19,12 @@ import { doChatReactions } from "../chatreactions/utils";
 import { runCommandUseTimers } from "../commandhandler";
 import redis from "../database/redis";
 import { runEconomySetup } from "../economy/utils";
+import { runUploadReset } from "../functions/image";
 import { runChristmas, runCountdowns, runSnipeClearIntervals, updateCounters } from "../guilds/utils";
 import { updateCache } from "../imghandler";
 import { getWebhooks, logger, setClusterId } from "../logger";
 import { runLotteryInterval } from "../scheduled/clusterjobs/lottery";
-import { runModerationChecks } from "../scheduled/clusterjobs/moderationchecks";
+import { runLogs, runModerationChecks } from "../scheduled/clusterjobs/moderationchecks";
 import { runPremiumChecks } from "../scheduled/clusterjobs/premiumexpire";
 import { runPremiumCrateInterval } from "../scheduled/clusterjobs/weeklycrates";
 
@@ -86,7 +89,9 @@ export class NypsiClient extends Client {
             this.on("messageDelete", messageDelete.bind(null));
             this.on("messageUpdate", messageUpdate.bind(null));
             this.on("messageCreate", messageCreate.bind(null));
+            this.on("messageDeleteBulk", messageDeleteBulk.bind(null));
             this.on("channelCreate", channelCreate.bind(null));
+            this.on("channelDelete", channelDelete.bind(null));
             this.on("roleDelete", roleDelete.bind(null));
             this.on("userUpdate", userUpdate.bind(null));
             this.on("interactionCreate", interactionCreate.bind(null));
@@ -106,6 +111,7 @@ export class NypsiClient extends Client {
         runSnipeClearIntervals();
         doChatReactions(this);
         runCommandUseTimers(this);
+        runUploadReset();
 
         if (this.cluster.id != 0) return;
 
@@ -113,5 +119,6 @@ export class NypsiClient extends Client {
         runPremiumCrateInterval(this);
         runPremiumChecks(this);
         runModerationChecks(this);
+        runLogs();
     }
 }

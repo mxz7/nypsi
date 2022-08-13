@@ -8,9 +8,7 @@ export function daysAgo(date: Date | number): number {
     date = new Date(date);
     const ms = Math.floor(Date.now() - date.getTime());
 
-    const days = Math.floor(ms / (24 * 60 * 60 * 1000));
-
-    return days;
+    return Math.floor(ms / (24 * 60 * 60 * 1000));
 }
 
 export function daysUntilChristmas(): string {
@@ -32,9 +30,7 @@ export function daysUntil(date: Date | number): number {
     date = new Date(date);
     const ms = Math.floor(date.getTime() - Date.now());
 
-    const days = Math.floor(ms / (24 * 60 * 60 * 1000));
-
-    return days;
+    return Math.floor(ms / (24 * 60 * 60 * 1000));
 }
 
 export function MStoTime(ms: number, long = false) {
@@ -51,7 +47,7 @@ export function MStoTime(ms: number, long = false) {
     if (days > 0) {
         output = output + days;
         if (long) {
-            output += " days ";
+            output += ` day${days == 1 ? "" : "s"} `;
         } else {
             output += "d ";
         }
@@ -60,7 +56,7 @@ export function MStoTime(ms: number, long = false) {
     if (hours > 0) {
         output = output + hours;
         if (long) {
-            output += " hours ";
+            output += ` hour${hours == 1 ? "" : "s"} `;
         } else {
             output += "h ";
         }
@@ -69,7 +65,7 @@ export function MStoTime(ms: number, long = false) {
     if (minutes > 0) {
         output = output + minutes;
         if (long) {
-            output += " minutes ";
+            output += ` minute${minutes == 1 ? "" : "s"} `;
         } else {
             output += "m ";
         }
@@ -78,7 +74,7 @@ export function MStoTime(ms: number, long = false) {
     if (sec > 0) {
         output = output + sec;
         if (long) {
-            output += " seconds ";
+            output += ` second${sec == 1 ? "" : "s"} `;
         } else {
             output += "s ";
         }

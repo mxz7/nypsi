@@ -7,6 +7,7 @@ import {
     MessageOptions,
 } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import prisma from "../utils/database/database";
 import redis from "../utils/database/redis";
 import {
     addBooster,
@@ -18,6 +19,7 @@ import {
     getInventory,
     getItems,
     hasPadlock,
+    increaseBaseBankStorage,
     isHandcuffed,
     openCrate,
     setInventory,
@@ -138,16 +140,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
     }
 
-    if (selected.role != "item" && selected.role != "tool" && selected.role != "crate" && selected.role != "booster") {
-        return send({ embeds: [new ErrorEmbed("you cannot use this item")] });
-    }
-
-    let cooldownLength = 30;
+    let cooldownLength = 10;
 
     if (selected.role == "crate") {
         cooldownLength = 5;
     } else if (selected.role == "booster") {
-        cooldownLength = 10;
+        cooldownLength = 5;
     }
 
     await addCooldown(cmd.name, message.member, cooldownLength);
@@ -497,6 +495,47 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 laterDescription = `locking chastity cage...\n\n**${chastityTarget.user.tag}**'s chastity cage is now locked in place`;
                 break;
 
+            case "streak_token":
+                const query = await prisma.economy.update({
+                    where: {
+                        userId: message.author.id,
+                    },
+                    data: {
+                        dailyStreak: { increment: 1 },
+                    },
+                    select: {
+                        dailyStreak: true,
+                    },
+                });
+
+                inventory["streak_token"]--;
+
+                if (inventory["streak_token"] <= 0) {
+                    delete inventory["streak_token"];
+                }
+
+                await setInventory(message.member, inventory);
+
+                embed.setDescription("applying token...");
+                laterDescription = `applying token...\n\nyour new daily streak is: \`${query.dailyStreak}\``;
+                break;
+
+            case "stolen_credit_card":
+                const amount = Math.floor(Math.random() * 499000) + 1000;
+                await increaseBaseBankStorage(message.member, amount);
+
+                inventory["stolen_credit_card"]--;
+
+                if (inventory["stolen_credit_card"] <= 0) {
+                    delete inventory["stolen_credit_card"];
+                }
+
+                await setInventory(message.member, inventory);
+
+                embed.setDescription("using stolen credit card...");
+                laterDescription = `using stolen credit card...\n\nsuccessfully added $**${amount.toLocaleString()}** to your bank capacity`;
+                break;
+
             case "handcuffs":
                 if (args.length == 1) {
                     return send({
@@ -540,6 +579,30 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
                 embed.setDescription(`restraining **${handcuffsTarget.user.tag}**...`);
                 laterDescription = `restraining **${handcuffsTarget.user.tag}**...\n\n**${handcuffsTarget.user.tag}** has been restrained for one minute`;
+                break;
+            case "cookie":
+                inventory["cookie"]--;
+
+                if (inventory["cookie"] <= 0) {
+                    delete inventory["cookie"];
+                }
+
+                await setInventory(message.member, inventory);
+
+                embed.setDescription("consuming cookie...");
+                laterDescription = "consuming cookie...\n\nyum 😋";
+                break;
+            case "cake":
+                inventory["cake"]--;
+
+                if (inventory["cake"] <= 0) {
+                    delete inventory["cake"];
+                }
+
+                await setInventory(message.member, inventory);
+
+                embed.setDescription("consuming cake...");
+                laterDescription = "consuming cake...\n\nyum 😋";
                 break;
 
             default:

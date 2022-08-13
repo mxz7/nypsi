@@ -16,6 +16,7 @@ import {
     formatBet,
     getBalance,
     getBoosters,
+    getDefaultBet,
     getGuildByUser,
     getMulti,
     getXp,
@@ -158,8 +159,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     const prefix = await getPrefix(message.guild);
+    const defaultBet = await getDefaultBet(message.member);
 
-    if (args.length == 0) {
+    if (args.length == 0 && !defaultBet) {
         const embed = new CustomEmbed(message.member)
             .setHeader("slots help")
             .addField("usage", `${prefix}slots <bet>\n${prefix}slots info`)
@@ -185,15 +187,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [embed] });
     }
 
-    if (!args[0]) {
-        return send({
-            embeds: [new ErrorEmbed(`${prefix}slots <bet> | ${prefix}**slots info** shows the winning board`)],
-        });
-    }
-
     const maxBet = await calcMaxBet(message.member);
 
-    const bet = await formatBet(args[0], message.member);
+    const bet = (await formatBet(args[0], message.member).catch(() => {})) || defaultBet;
 
     if (!bet) {
         return send({ embeds: [new ErrorEmbed("invalid bet")] });

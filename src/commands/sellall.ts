@@ -50,8 +50,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     for (const item of Array.from(Object.keys(inventory))) {
         if (items[item].role == "fish" || items[item].role == "prey" || items[item].role == "sellable") {
+            if (items[item].id == "cookie" || items[item].id == "cake") continue;
             selected.set(item, inventory[item]);
-        } else if (items[item].id.includes("watch") || items[item].id == "calendar" || items[item].id == "potato") {
+        } else if (items[item].id.includes("watch") || items[item].id == "calendar") {
             selected.set(item, inventory[item]);
         }
     }
@@ -70,7 +71,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     for (const item of selected.keys()) {
         delete inventory[item];
 
-        let sellWorth = Math.floor(items[item].worth * 0.5 * selected.get(item));
+        let sellWorth = Math.floor(items[item].sell * selected.get(item));
 
         if (items[item].role == "fish" || items[item].role == "prey" || items[item].role == "sellable") {
             sellWorth = Math.floor(sellWorth + sellWorth * multi);

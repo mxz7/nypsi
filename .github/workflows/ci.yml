@@ -35,6 +35,9 @@ jobs:
             - name: setup node
               uses: actions/setup-node@v3
 
+            - name: run setup.sh
+              run: bash ${GITHUB_WORKSPACE}/setup.sh
+
             - name: install packages
               run: npm install
 
@@ -62,5 +65,5 @@ jobs:
                       cd ~/nypsi
                       git pull
                       git status
-                      npm ci
+                      npm i
                       npx tsc

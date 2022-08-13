@@ -126,60 +126,66 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let mode = "role";
     const failed = [];
 
-    let muteRole: Role = await message.guild.roles.fetch(await getMuteRole(message.guild));
+    const guildMuteRole = await getMuteRole(message.guild);
 
-    if (!muteRole) {
-        if ((await getMuteRole(message.guild)) == "timeout") mode = "timeout";
-    }
+    let muteRole: Role;
 
-    if (!muteRole && mode == "role") {
+    if (!guildMuteRole || guildMuteRole == "default") {
         muteRole = message.guild.roles.cache.find((r) => r.name.toLowerCase() == "muted");
-    }
 
-    if (!muteRole && mode == "role") {
-        let channelError = false;
-        try {
-            const newMuteRole = await message.guild.roles
-                .create({
-                    name: "muted",
-                })
-                .catch(() => {
-                    channelError = true;
-                });
-
-            if (newMuteRole instanceof Role) {
-                muteRole = newMuteRole;
-            }
-
-            message.guild.channels.cache.forEach(async (channel) => {
-                if (channel instanceof ThreadChannel) return;
-                await channel.permissionOverwrites
-                    .edit(muteRole, {
-                        SendMessages: false,
-                        Speak: false,
-                        AddReactions: false,
+        if (!muteRole) {
+            let channelError = false;
+            try {
+                const newMuteRole = await message.guild.roles
+                    .create({
+                        name: "muted",
                     })
                     .catch(() => {
                         channelError = true;
                     });
-            });
-        } catch (e) {
-            return send({
-                embeds: [
-                    new ErrorEmbed(
-                        "error creating mute role - make sure i have `manage roles` permission and `manage channels`"
-                    ),
-                ],
-            });
+
+                if (newMuteRole instanceof Role) {
+                    muteRole = newMuteRole;
+                }
+
+                message.guild.channels.cache.forEach(async (channel) => {
+                    if (channel instanceof ThreadChannel) return;
+                    await channel.permissionOverwrites
+                        .edit(muteRole, {
+                            SendMessages: false,
+                            Speak: false,
+                            AddReactions: false,
+                        })
+                        .catch(() => {
+                            channelError = true;
+                        });
+                });
+            } catch (e) {
+                return send({
+                    embeds: [
+                        new ErrorEmbed(
+                            "error creating mute role - make sure i have `manage roles` permission and `manage channels`"
+                        ),
+                    ],
+                });
+            }
+            if (channelError) {
+                return send({
+                    embeds: [
+                        new ErrorEmbed(
+                            "error creating mute role - make sure i have `manage roles` permission and `manage channels`"
+                        ),
+                    ],
+                });
+            }
         }
-        if (channelError) {
-            return send({
-                embeds: [
-                    new ErrorEmbed(
-                        "error creating mute role - make sure i have `manage roles` permission and `manage channels`"
-                    ),
-                ],
-            });
+    } else if (guildMuteRole == "timeout") {
+        mode = "timeout";
+    } else {
+        muteRole = await message.guild.roles.fetch(guildMuteRole);
+
+        if (!muteRole) {
+            return send({ embeds: [new ErrorEmbed(`failed to find muterole: ${guildMuteRole}`)] });
         }
     }
 
@@ -236,6 +242,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     .then(() => count++)
                     .catch(() => {
                         fail = true;
+                        console.log(muteRole);
+                        console.log(Array.from(message.guild.roles.cache.keys()));
+
                         return send({
                             embeds: [
                                 new ErrorEmbed(

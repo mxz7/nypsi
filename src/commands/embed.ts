@@ -1,7 +1,7 @@
 import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
 import { getPrefix } from "../utils/guilds/utils";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 
 const cmd = new Command("embed", "create an embed message", Categories.UTILITY).setPermissions(["MANAGE_MESSAGES"]);
 
@@ -52,6 +52,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (!(message instanceof Message)) return;
+
+    if (message.author.id != "672793821850894347") embed.setFooter({ text: `sent by: ${message.author.tag}` });
 
     message.channel
         .send({ embeds: [embed] })

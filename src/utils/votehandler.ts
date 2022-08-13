@@ -4,7 +4,6 @@ import * as express from "express";
 import prisma from "./database/database";
 import redis from "./database/redis";
 import {
-    addTicket,
     getBalance,
     getDMsEnabled,
     getInventory,
@@ -59,7 +58,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
 
     const lastVote = query.lastVote.getTime();
 
-    if (now - lastVote < 43200000) {
+    if (now - lastVote < 25200000) {
         return logger.error(`${user} already voted`);
     }
 
@@ -91,11 +90,9 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
     const premiumBonus = Math.floor((await isPremium(user)) ? await getTier(user) : 0);
     const karmaBonus = Math.floor((await getKarma(user)) / 100);
 
-    const max = 5 + prestigeBonus + premiumBonus + karmaBonus;
+    let max = 15 + (prestigeBonus + premiumBonus + karmaBonus) * 4;
 
-    if (tickets.length < max) {
-        await addTicket(user);
-    }
+    if (max > 50) max = 50;
 
     let crateAmount = Math.floor(prestige / 2 + 1);
 

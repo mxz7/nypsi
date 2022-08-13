@@ -29,8 +29,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let guildWorth = 0;
 
     for (const itemId in inventory) {
-        if (items[itemId].worth) {
-            inventoryWorth += items[itemId].worth * inventory[itemId];
+        if (items[itemId].sell) {
+            inventoryWorth += items[itemId].sell * inventory[itemId];
         }
     }
 

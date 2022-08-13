@@ -1,11 +1,12 @@
 import { Mention } from "@prisma/client";
 import { Collection, GuildMember, Message, PermissionsBitField, ThreadMember, ThreadMemberManager } from "discord.js";
 import { cpu } from "node-os-utils";
+import * as stringSimilarity from "string-similarity";
 import { runCommand } from "../utils/commandhandler";
 import prisma from "../utils/database/database";
 import { userExists } from "../utils/economy/utils";
 import { encrypt } from "../utils/functions/string";
-import { addCooldown, getChatFilter, getPrefix, hasGuild, inCooldown } from "../utils/guilds/utils";
+import { addCooldown, getChatFilter, getPercentMatch, getPrefix, hasGuild, inCooldown } from "../utils/guilds/utils";
 import { getKarma, getLastCommand } from "../utils/karma/utils";
 import { logger } from "../utils/logger";
 import { CustomEmbed } from "../utils/models/EmbedBuilders";
@@ -51,6 +52,7 @@ export default async function messageCreate(message: Message) {
 
     if ((await hasGuild(message.guild)) && !message.member.permissions.has(PermissionsBitField.Flags.ManageMessages)) {
         const filter = await getChatFilter(message.guild);
+        const match = await getPercentMatch(message.guild);
 
         let content: string | string[] = message.content.toLowerCase().normalize("NFD");
 
@@ -58,18 +60,42 @@ export default async function messageCreate(message: Message) {
 
         content = content.split(" ");
 
-        for (const word of filter) {
-            if (content.indexOf(word.toLowerCase()) != -1) {
-                addModLog(
-                    message.guild,
-                    PunishmentType.FILTER_VIOLATION,
-                    message.author.id,
-                    "nypsi",
-                    content.join(" "),
-                    -1,
-                    message.channel.id
-                );
-                return await message.delete().catch(() => {});
+        if (content.length >= 69) {
+            for (const word of filter) {
+                if (content.indexOf(word.toLowerCase()) != -1) {
+                    addModLog(
+                        message.guild,
+                        PunishmentType.FILTER_VIOLATION,
+                        message.author.id,
+                        "nypsi",
+                        content.join(" "),
+                        -1,
+                        message.channel.id
+                    );
+                    return await message.delete().catch(() => {});
+                }
+            }
+        } else {
+            for (const word of filter) {
+                for (const contentWord of content) {
+                    const similarity = stringSimilarity.compareTwoStrings(word, contentWord);
+
+                    if (similarity >= match / 100) {
+                        const contentModified = content.join(" ").replace(contentWord, `**${contentWord}**`);
+
+                        addModLog(
+                            message.guild,
+                            PunishmentType.FILTER_VIOLATION,
+                            message.author.id,
+                            "nypsi",
+                            contentModified,
+                            -1,
+                            message.channel.id,
+                            (similarity * 100).toFixed(2)
+                        );
+                        return await message.delete().catch(() => {});
+                    }
+                }
             }
         }
     }
@@ -87,7 +113,7 @@ export default async function messageCreate(message: Message) {
             message.guild.memberCount < 150000 &&
             ((await userExists(message.guild.ownerId)) ||
                 (await isPremium(message.guild.ownerId)) ||
-                (await getKarma(message.guild.ownerId)) >= 50 ||
+                (await getKarma(message.guild.ownerId)) >= 30 ||
                 (await getLastCommand(message.guild.ownerId)).getTime() >= Date.now() - ms("1 days"))
         ) {
             if (message.mentions.everyone) {

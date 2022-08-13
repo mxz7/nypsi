@@ -156,10 +156,10 @@ async function showGuild(message, guild) {
         )
         .addField(
             "member info",
-            `**members** ${guild.memberCount}
+            `**members** ${guild.members.length}
     **peak** ${await getPeaks(guild)}`,
             true
-        );
+        ); // if guild.members.length works add members field back
 
     if (invites && invites.length > 0) {
         embed.addField(`invite (${invites.length})`, invites[Math.floor(Math.random() & invites.length)]);
@@ -181,7 +181,7 @@ async function showUser(message, user) {
             `**tag** ${user.tag}
             **created** ${formatDate(user.createdAt)}${
                 (await getLastCommand(user.id))
-                    ? `\n**last command** ${daysAgo(await getLastCommand(user.id))} days ago`
+                    ? `\n**last command** <t:${(await (await getLastCommand(user.id)).getTime()) / 1000}:R> days ago`
                     : ""
             }`,
             true

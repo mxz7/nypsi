@@ -1,19 +1,4 @@
 import {
-    getBalance,
-    createUser,
-    updateBalance,
-    userExists,
-    formatBet,
-    getXp,
-    updateXp,
-    calcMaxBet,
-    getMulti,
-    addGamble,
-    calcEarnedXp,
-    getGuildByUser,
-    addToGuildXP,
-} from "../utils/economy/utils.js";
-import {
     CommandInteraction,
     InteractionReplyOptions,
     InteractionResponse,
@@ -21,12 +6,28 @@ import {
     MessageEditOptions,
     MessageOptions,
 } from "discord.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
+import {
+    addGamble,
+    addToGuildXP,
+    calcEarnedXp,
+    calcMaxBet,
+    createUser,
+    formatBet,
+    getBalance,
+    getDefaultBet,
+    getGuildByUser,
+    getMulti,
+    getXp,
+    updateBalance,
+    updateXp,
+    userExists,
+} from "../utils/economy/utils.js";
 import { getPrefix } from "../utils/guilds/utils";
 import { gamble } from "../utils/logger.js";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
 import { NypsiClient } from "../utils/models/Client.js";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 
 const values = [
     "b",
@@ -134,8 +135,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     const prefix = await getPrefix(message.guild);
+    const defaultBet = await getDefaultBet(message.member);
 
-    if (args.length != 2) {
+    if (args.length != 2 && !defaultBet) {
         const embed = new CustomEmbed(message.member)
             .setHeader("roulette help")
             .addField("usage", `${prefix}roulette <colour (**r**ed/**g**reen/**b**lack)> <bet>\n${prefix}roulette odds`)
@@ -168,7 +170,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const maxBet = await calcMaxBet(message.member);
 
-    const bet = await formatBet(args[1], message.member);
+    const bet = (await formatBet(args[1], message.member).catch(() => {})) || defaultBet;
 
     if (!bet) {
         return send({ embeds: [new ErrorEmbed("invalid bet")] });

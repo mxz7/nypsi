@@ -20,6 +20,7 @@ install nodejs on your WSL. [tutorial](https://www.digitalocean.com/community/tu
 -   run `sudo apt install redis-server` and install the package
 -   fill out the .env file with your own info
 -   run `sudo service redis-server start` to start the local redis server
+-   run `npx prisma migrate dev` to get the postgresql database ready
 -   if all went well, `node .` should start your version of nypsi (:
 
 ### postgresql

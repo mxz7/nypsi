@@ -1,8 +1,39 @@
 import { GuildMember } from "discord.js";
+import { daysAgo, formatDate } from "../utils/functions/date";
 import { NypsiClient } from "../utils/models/Client";
+import { CustomEmbed } from "../utils/models/EmbedBuilders";
+import { LogType } from "../utils/models/GuildStorage";
+import { addLog, isLogsEnabled } from "../utils/moderation/utils";
 import { setExpireDate, setTier } from "../utils/premium/utils";
+import { fetchUsernameHistory } from "../utils/users/utils";
 
 export default async function guildMemberRemove(member: GuildMember) {
+    if (await isLogsEnabled(member.guild)) {
+        const embed = new CustomEmbed().disableFooter().setTimestamp();
+
+        embed.setHeader("member left");
+        embed.setDescription(
+            `${member.toString()} \`${member.id}\`\n\n**tag** ${member.user.tag}\n**joined** ${daysAgo(
+                member.joinedAt
+            )} days ago`
+        );
+
+        const history = await fetchUsernameHistory(member);
+
+        if (history.length > 0) {
+            const text: string[] = [];
+
+            for (const un of history) {
+                if (text.length > 10) break;
+                text.push(`\`${un.value}\` | \`${formatDate(un.date)}\``);
+            }
+
+            embed.addField("username history", text.join("\n"));
+        }
+
+        await addLog(member.guild, LogType.MEMBER, embed);
+    }
+
     if (member.guild.id != "747056029795221513") return;
 
     if (member.roles.cache.has("747066190530347089")) {

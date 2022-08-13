@@ -70,17 +70,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
     }
 
-    await addCooldown(cmd.name, message.member, 1800);
+    await addCooldown(cmd.name, message.member, 300);
 
     const fishItems = [
-        "money:1000",
-        "money:5000",
-        "money:10000",
-        "money:20000",
-        "xp:5",
-        "xp:10",
-        "xp:15",
-        "xp:25",
+        "nothing",
+        "nothing",
+        "nothing",
+        "nothing",
         "nothing",
         "nothing",
         "nothing",
@@ -98,6 +94,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     ];
 
     for (const i of Array.from(Object.keys(items))) {
+        if (items[i].role == "prey") continue;
+        if (items[i].role == "tool") continue;
+        if (items[i].role == "car") continue;
+        if (items[i].role == "booster") continue;
+        if (items[i].id == "cobblestone") continue;
+        if (items[i].id == "iron_ore") continue;
+        if (items[i].id == "gold_ore") continue;
+        if (items[i].id == "coal") continue;
+        if (items[i].id == "iron_ingot") continue;
+        if (items[i].id == "gold_ingot") continue;
         fishItems.push(i);
     }
 
@@ -142,26 +148,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         for (const i of fishItems) {
             if (items[i]) {
-                if (items[i].role == "prey") continue;
-                if (items[i].role == "tool") continue;
-                if (items[i].role == "car") continue;
-                if (items[i].role == "booster") continue;
-                if (items[i].id == "cobblestone") continue;
-                if (items[i].id == "iron_ore") continue;
-                if (items[i].id == "gold_ore") continue;
-
                 if (items[i].rarity == 4) {
                     const chance = Math.floor(Math.random() * 15);
                     if (chance == 4 && fishingRod == "incredible_fishing_rod") {
                         if (items[i].role == "fish") {
-                            fishItemsModified.push(i);
-                            fishItemsModified.push(i);
-                            fishItemsModified.push(i);
-                            fishItemsModified.push(i);
-                            fishItemsModified.push(i);
-                            fishItemsModified.push(i);
-                            fishItemsModified.push(i);
-                            fishItemsModified.push(i);
+                            for (let x = 0; x < 20; x++) {
+                                fishItemsModified.push(i);
+                            }
                         }
                         fishItemsModified.push(i);
                     }
@@ -169,83 +162,34 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     const chance = Math.floor(Math.random() * 3);
                     if (chance == 2 && fishingRod != "terrible_fishing_rod") {
                         if (items[i].role == "fish") {
-                            fishItemsModified.push(i);
-                            fishItemsModified.push(i);
-                            fishItemsModified.push(i);
-                            fishItemsModified.push(i);
-                            fishItemsModified.push(i);
-                            fishItemsModified.push(i);
-                            fishItemsModified.push(i);
-                            fishItemsModified.push(i);
+                            for (let x = 0; x < 20; x++) {
+                                fishItemsModified.push(i);
+                            }
                         }
                         fishItemsModified.push(i);
                     }
                 } else if (items[i].rarity == 2 && fishingRod != "terrible_fishing_rod") {
                     if (items[i].role == "fish") {
-                        fishItemsModified.push(i);
-                        fishItemsModified.push(i);
-                        fishItemsModified.push(i);
-                        fishItemsModified.push(i);
-                        fishItemsModified.push(i);
-                        fishItemsModified.push(i);
-                        fishItemsModified.push(i);
-                        fishItemsModified.push(i);
-                        fishItemsModified.push(i);
-                        fishItemsModified.push(i);
-                        fishItemsModified.push(i);
-                        fishItemsModified.push(i);
+                        for (let x = 0; x < 30; x++) {
+                            fishItemsModified.push(i);
+                        }
                     }
                     fishItemsModified.push(i);
                 } else if (items[i].rarity == 1) {
                     if (items[i].role == "fish") {
-                        fishItemsModified.push(i);
-                        fishItemsModified.push(i);
-                        fishItemsModified.push(i);
-                        fishItemsModified.push(i);
-                        fishItemsModified.push(i);
-                        fishItemsModified.push(i);
-                        fishItemsModified.push(i);
-                        fishItemsModified.push(i);
-                        fishItemsModified.push(i);
-                        fishItemsModified.push(i);
-                        fishItemsModified.push(i);
-                        fishItemsModified.push(i);
-                        fishItemsModified.push(i);
-                        fishItemsModified.push(i);
-                        fishItemsModified.push(i);
-                        fishItemsModified.push(i);
-                        fishItemsModified.push(i);
+                        for (let x = 0; x < 20; x++) {
+                            fishItemsModified.push(i);
+                        }
+                    }
+                    for (let x = 0; x < 2; x++) {
                         fishItemsModified.push(i);
                     }
-                    fishItemsModified.push(i);
-                    fishItemsModified.push(i);
                 } else if (items[i].rarity == 0) {
                     if (items[i].role == "fish") {
-                        fishItemsModified.push(i);
-                        fishItemsModified.push(i);
-                        fishItemsModified.push(i);
-                        fishItemsModified.push(i);
-                        fishItemsModified.push(i);
-                        fishItemsModified.push(i);
-                        fishItemsModified.push(i);
-                        fishItemsModified.push(i);
-                        fishItemsModified.push(i);
-                        fishItemsModified.push(i);
-                        fishItemsModified.push(i);
-                        fishItemsModified.push(i);
-                        fishItemsModified.push(i);
-                        fishItemsModified.push(i);
-                        fishItemsModified.push(i);
-                        fishItemsModified.push(i);
-                        fishItemsModified.push(i);
-                        fishItemsModified.push(i);
-                        fishItemsModified.push(i);
-                        fishItemsModified.push(i);
-                    } else if (fishingRod == "incredible_fishing_rod") {
-                        fishItemsModified.push(i);
+                        for (let x = 0; x < 50; x++) {
+                            fishItemsModified.push(i);
+                        }
                     } else {
-                        fishItemsModified.push(i);
-                        fishItemsModified.push(i);
                         fishItemsModified.push(i);
                     }
                 }

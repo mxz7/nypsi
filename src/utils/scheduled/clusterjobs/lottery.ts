@@ -21,7 +21,7 @@ async function doLottery(client: Client) {
 
         embed.setTitle("lottery cancelled");
         embed.setDescription(
-            `the lottery has been cancelled as only **${tickets.length}** were bought ):\n\nthese tickets will remain and the lottery will happen next week`
+            `the lottery has been cancelled as only **${tickets.length}** tickets were bought ):\n\nthese tickets will remain and the lottery will happen next week`
         );
         embed.setColor("#111111");
         embed.disableFooter();
@@ -29,7 +29,7 @@ async function doLottery(client: Client) {
         return hook.send({ embeds: [embed] });
     }
 
-    const total = Math.floor(tickets.length * lotteryTicketPrice * 0.9);
+    const total = Math.floor(tickets.length * lotteryTicketPrice * 0.75);
 
     const shuffledTickets = shuffleArray(tickets);
 
@@ -60,7 +60,6 @@ async function doLottery(client: Client) {
     );
     embed.setFooter({ text: `a total of ${tickets.length.toLocaleString()} tickets were bought` });
     embed.setColor("#111111");
-    embed.disableFooter();
 
     await hook.send({ embeds: [embed] });
 

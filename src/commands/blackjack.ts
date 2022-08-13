@@ -21,6 +21,7 @@ import {
     createUser,
     formatBet,
     getBalance,
+    getDefaultBet,
     getGuildByUser,
     getMulti,
     getXp,
@@ -85,8 +86,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     const prefix = await getPrefix(message.guild);
+    const defaultBet = await getDefaultBet(message.member);
 
-    if (args.length == 0) {
+    if (args.length == 0 && !defaultBet) {
         const embed = new CustomEmbed(message.member)
             .setHeader("blackjack help")
             .addField("usage", `${prefix}blackjack <bet>\n${prefix}blackjack info`)
@@ -115,7 +117,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const maxBet = await calcMaxBet(message.member);
 
-    const bet = await formatBet(args[0], message.member);
+    const bet = (await formatBet(args[0], message.member).catch(() => {})) || defaultBet;
 
     if (!bet) {
         return send({ embeds: [new ErrorEmbed("invalid bet")] });
@@ -362,6 +364,8 @@ function calcTotalDealer(member: GuildMember) {
     let total = 0;
     let aces = 0;
 
+    let aceAs11 = false;
+
     for (let card of cards) {
         card = card.split("♠").join().split("♣").join().split("♥️").join().split("♦").join();
 
@@ -377,8 +381,15 @@ function calcTotalDealer(member: GuildMember) {
     for (let i = 0; i < aces; i++) {
         if (total < 11) {
             total += 11;
+            aceAs11 = true;
         } else {
             total += 1;
+        }
+    }
+
+    if (total > 21) {
+        if (aceAs11) {
+            total -= 10;
         }
     }
 

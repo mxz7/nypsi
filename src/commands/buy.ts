@@ -64,16 +64,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [new ErrorEmbed(`couldnt find \`${args[0]}\``)] });
     }
 
-    if (
-        !selected.worth ||
-        selected.role == "collectable" ||
-        selected.role == "prey" ||
-        selected.role == "fish" ||
-        selected.role == "car" ||
-        selected.role == "sellable" ||
-        selected.role == "ore" ||
-        selected.role == "booster"
-    ) {
+    if (!selected.buy) {
         return message.channel.send({ embeds: [new ErrorEmbed("you cannot buy this item")] });
     }
 
@@ -93,7 +84,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (amount > 50) amount = 50;
 
-    if ((await getBalance(message.member)) < selected.worth * amount) {
+    if ((await getBalance(message.member)) < selected.buy * amount) {
         return message.channel.send({ embeds: [new ErrorEmbed("you cannot afford this")] });
     }
 
@@ -115,7 +106,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    await updateBalance(message.member, (await getBalance(message.member)) - selected.worth * amount);
+    await updateBalance(message.member, (await getBalance(message.member)) - selected.buy * amount);
     inventory[selected.id] + amount;
 
     if (inventory[selected.id]) {
@@ -131,7 +122,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             new CustomEmbed(
                 message.member,
                 `you have bought **${amount.toLocaleString()}** ${selected.emoji} ${selected.name} for $${(
-                    selected.worth * amount
+                    selected.buy * amount
                 ).toLocaleString()}`
             ),
         ],

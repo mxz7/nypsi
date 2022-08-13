@@ -1,8 +1,8 @@
 import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
-import { getPrefix } from "../utils/guilds/utils";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { getPrefix } from "../utils/guilds/utils";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 
 const cmd = new Command("poll", "create a poll with a lot of customisation", Categories.UTILITY);
 
@@ -84,6 +84,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (!message.member.permissions.has(PermissionFlagsBits.Administrator)) {
         embed.setHeader(message.member.user.tag);
     }
+
+    embed.setFooter({ text: `sent by: ${message.author.tag}` });
 
     if (!(message instanceof Message)) return;
 

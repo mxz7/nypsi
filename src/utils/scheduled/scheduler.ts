@@ -51,18 +51,23 @@ const bree = new Bree({
         },
         {
             name: "lottery-tickets",
-            interval: "60m",
+            interval: "30m",
             path: path.join(__dirname, "jobs", "lotterytickets.js"),
         },
         {
             name: "clean-mentions",
-            interval: "6h",
+            interval: "at 11:59pm",
             path: path.join(__dirname, "jobs", "cleanmentions.js"),
         },
         {
             name: "top-commands",
             interval: "at 12:00am",
             path: path.join(__dirname, "jobs", "topcommands.js"),
+        },
+        {
+            name: "daily-streak",
+            interval: "30m",
+            path: path.join(__dirname, "jobs", "dailystreak.js"),
         },
     ],
 });

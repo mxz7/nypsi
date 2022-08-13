@@ -26,16 +26,24 @@ model User {
 }
 
 model Economy {
-  money     BigInt   @default(500)
-  bank      Int      @default(9500)
-  xp        Int      @default(0)
-  prestige  Int      @default(0)
-  padlock   Boolean  @default(false)
-  dms       Boolean  @default(true)
+  money       BigInt  @default(500)
+  bank        BigInt  @default(9500)
+  bankStorage BigInt  @default(5000)
+  defaultBet  Int?
+  xp          Int     @default(0)
+  prestige    Int     @default(0)
+  padlock     Boolean @default(false)
+  dms         Boolean @default(true)
+
+  lastDaily DateTime @default("1970-01-01T14:21:00+02:00")
   lastVote  DateTime
-  inventory Json     @default("{}")
-  workers   Json     @default("{}")
-  banned    Boolean  @default(false)
+
+  dailyStreak Int @default(0)
+
+  inventory Json @default("{}")
+  workers   Json @default("{}")
+
+  banned Boolean @default(false)
 
   user   User   @relation(fields: [userId], references: [id])
   userId String @id
@@ -68,7 +76,6 @@ model EconomyStats {
 model Premium {
   level      Int
   embedColor String   @default("default")
-  lastDaily  DateTime
   lastWeekly DateTime
   status     Int      @default(1)
   startDate  DateTime
@@ -110,6 +117,7 @@ model Guild {
   disabledCommands String[]
   snipeFilter      String[]
   chatFilter       String[]
+  percentMatch     Int      @default(75)
   prefix           String   @default("$")
 
   GuildChristmas GuildChristmas?
@@ -157,6 +165,7 @@ model Moderation {
   caseCount Int     @default(0)
   muteRole  String?
   modlogs   String?
+  logs      String?
 
   guild          Guild            @relation(fields: [guildId], references: [id])
   guildId        String           @unique

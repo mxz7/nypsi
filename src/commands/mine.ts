@@ -74,7 +74,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
     }
 
-    await addCooldown(cmd.name, message.member, 1800);
+    await addCooldown(cmd.name, message.member, 600);
 
     await addItemUse(message.member, pickaxe);
 
@@ -82,29 +82,36 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const boosters = await getBoosters(message.member);
 
-    let times = 2;
+    let times = 1;
     let multi = 0;
     let unbreakable = false;
 
     if (pickaxe == "iron_pickaxe") {
-        times = 3;
+        times = 2;
     } else if (pickaxe == "diamond_pickaxe") {
-        times = 4;
+        times = 3;
     }
 
-    for (let i = 0; i < 13; i++) {
+    for (let i = 0; i < 20; i++) {
         mineItems.push("nothing");
     }
 
     for (const boosterId of boosters.keys()) {
         if (items[boosterId].role == "booster") {
             if (items[boosterId].boosterEffect.boosts.includes("mine")) {
+                let chance: number;
                 switch (items[boosterId].id) {
                     case "fortune":
-                        multi += items[boosterId].boosterEffect.effect;
+                        chance = Math.floor(Math.random() * 5);
+                        if (chance > 2) {
+                            multi += items[boosterId].boosterEffect.effect;
+                        }
                         break;
                     case "efficiency":
-                        times += items[boosterId].boosterEffect.effect;
+                        chance = Math.floor(Math.random() * 5);
+                        if (chance > 2) {
+                            times += items[boosterId].boosterEffect.effect;
+                        }
                         break;
                     case "unbreaking":
                         unbreakable = true;
@@ -141,75 +148,34 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 if (items[i].rarity == 4) {
                     const chance = Math.floor(Math.random() * 15);
                     if (chance == 4 && pickaxe == "diamond_pickaxe") {
-                        mineItemsModified.push(i);
-                        mineItemsModified.push(i);
-                        mineItemsModified.push(i);
-                        mineItemsModified.push(i);
+                        for (let x = 0; x < 4; x++) {
+                            mineItemsModified.push(i);
+                        }
                     }
                 } else if (items[i].rarity == 3) {
                     const chance = Math.floor(Math.random() * 3);
                     if (chance == 2 && pickaxe != "wooden_pickaxe") {
-                        mineItemsModified.push(i);
-                        mineItemsModified.push(i);
-                        mineItemsModified.push(i);
-                        mineItemsModified.push(i);
+                        for (let x = 0; x < 4; x++) {
+                            mineItemsModified.push(i);
+                        }
                     }
                 } else if (items[i].rarity == 2 && pickaxe != "wooden_pickaxe") {
-                    mineItemsModified.push(i);
-                    mineItemsModified.push(i);
-                    mineItemsModified.push(i);
-                    mineItemsModified.push(i);
-                    mineItemsModified.push(i);
-                    mineItemsModified.push(i);
-                    mineItemsModified.push(i);
-                    mineItemsModified.push(i);
+                    for (let x = 0; x < 10; x++) {
+                        mineItemsModified.push(i);
+                    }
                 } else if (items[i].rarity == 1) {
-                    mineItemsModified.push(i);
-                    mineItemsModified.push(i);
-                    mineItemsModified.push(i);
-                    mineItemsModified.push(i);
-                    mineItemsModified.push(i);
-                    mineItemsModified.push(i);
-                    mineItemsModified.push(i);
-                    mineItemsModified.push(i);
-                    mineItemsModified.push(i);
-                    mineItemsModified.push(i);
-                    mineItemsModified.push(i);
-                    mineItemsModified.push(i);
-                    mineItemsModified.push(i);
-                    mineItemsModified.push(i);
-                    mineItemsModified.push(i);
+                    for (let x = 0; x < 15; x++) {
+                        mineItemsModified.push(i);
+                    }
                 } else if (items[i].rarity == 0) {
                     if (pickaxe == "diamond_pickaxe") {
-                        mineItemsModified.push(i);
-                        mineItemsModified.push(i);
-                        mineItemsModified.push(i);
-                        mineItemsModified.push(i);
-                        mineItemsModified.push(i);
-                        mineItemsModified.push(i);
-                        mineItemsModified.push(i);
-                        mineItemsModified.push(i);
+                        for (let x = 0; x < 7; x++) {
+                            mineItemsModified.push(i);
+                        }
                     } else {
-                        mineItemsModified.push(i);
-                        mineItemsModified.push(i);
-                        mineItemsModified.push(i);
-                        mineItemsModified.push(i);
-                        mineItemsModified.push(i);
-                        mineItemsModified.push(i);
-                        mineItemsModified.push(i);
-                        mineItemsModified.push(i);
-                        mineItemsModified.push(i);
-                        mineItemsModified.push(i);
-                        mineItemsModified.push(i);
-                        mineItemsModified.push(i);
-                        mineItemsModified.push(i);
-                        mineItemsModified.push(i);
-                        mineItemsModified.push(i);
-                        mineItemsModified.push(i);
-                        mineItemsModified.push(i);
-                        mineItemsModified.push(i);
-                        mineItemsModified.push(i);
-                        mineItemsModified.push(i);
+                        for (let x = 0; x < 20; x++) {
+                            mineItemsModified.push(i);
+                        }
                     }
                 }
             }
@@ -222,7 +188,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         let amount = 1;
 
         if (veins.has(chosen)) {
-            amount = veins.get(chosen)[Math.floor(Math.random() * veins.get(chosen).length)] * (times - 1);
+            amount = veins.get(chosen)[Math.floor(Math.random() * veins.get(chosen).length)];
 
             if (multi > 0) {
                 amount += amount * multi;
