@@ -3,6 +3,7 @@ import {
     Collection,
     CommandInteraction,
     CommandInteractionOption,
+    EmbedBuilder,
     GuildMember,
     Interaction,
     InteractionType,
@@ -15,7 +16,6 @@ import { logger } from "../utils/logger";
 import { NypsiClient } from "../utils/models/Client";
 import { createNypsiInteraction, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
-import _ = require("lodash");
 
 export default async function interactionCreate(interaction: Interaction) {
     if (interaction.type == InteractionType.MessageComponent && interaction.customId == "b") {
@@ -33,7 +33,7 @@ export default async function interactionCreate(interaction: Interaction) {
             },
         });
 
-        if (auction || !(await userExists(auction.ownerId))) {
+        if (auction && (await userExists(auction.ownerId))) {
             if (auction.ownerId == interaction.user.id) {
                 return await interaction.reply({
                     embeds: [new ErrorEmbed("you cannot buy your own auction")],
@@ -88,13 +88,14 @@ export default async function interactionCreate(interaction: Interaction) {
                 embed: embedDm,
             });
 
-            const embed: any = _.cloneDeep(interaction.message.embeds[0]);
+            const embed = new EmbedBuilder(interaction.message.embeds[0]);
 
-            const desc = embed.description.split("\n\n");
+            // @ts-expect-error stupid djs
+            const desc = embed.data.data.description.split("\n\n");
 
             desc[0] = `**bought** by ${interaction.user.username} <t:${Math.floor(Date.now() / 1000)}:R>`;
 
-            embed.description = desc.join("\n\n");
+            embed.setDescription(desc.join("\n\n"));
 
             await interaction.message.edit({ embeds: [embed], components: [] });
         } else {
