@@ -88,10 +88,9 @@ export default async function interactionCreate(interaction: Interaction) {
                 embed: embedDm,
             });
 
-            const embed = new EmbedBuilder(interaction.message.embeds[0]);
+            const embed = new EmbedBuilder(interaction.message.embeds[0].data);
 
-            // @ts-expect-error stupid djs
-            const desc = embed.data.data.description.split("\n\n");
+            const desc = embed.data.description.split("\n\n");
 
             desc[0] = `**bought** by ${interaction.user.username} <t:${Math.floor(Date.now() / 1000)}:R>`;
 
