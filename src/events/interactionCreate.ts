@@ -34,6 +34,13 @@ export default async function interactionCreate(interaction: Interaction) {
         });
 
         if (auction || !(await userExists(auction.ownerId))) {
+            if (auction.ownerId == interaction.user.id) {
+                return await interaction.reply({
+                    embeds: [new ErrorEmbed("you cannot buy your own auction")],
+                    ephemeral: true,
+                });
+            }
+
             if (!(await userExists(interaction.user.id))) {
                 return await interaction.reply({ embeds: [new ErrorEmbed("you cannot afford this")], ephemeral: true });
             }
