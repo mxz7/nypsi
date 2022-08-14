@@ -9,8 +9,10 @@ import {
 } from "discord.js";
 import { runCommand } from "../utils/commandhandler";
 import prisma from "../utils/database/database";
-import { getBalance, getInventory, setInventory, updateBalance, userExists } from "../utils/economy/utils";
+import { getBalance, getInventory, getItems, setInventory, updateBalance, userExists } from "../utils/economy/utils";
+import requestDM from "../utils/functions/requestdm";
 import { logger } from "../utils/logger";
+import { NypsiClient } from "../utils/models/Client";
 import { createNypsiInteraction, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 import _ = require("lodash");
@@ -31,7 +33,7 @@ export default async function interactionCreate(interaction: Interaction) {
             },
         });
 
-        if (auction) {
+        if (auction || !(await userExists(auction.ownerId))) {
             if (!(await userExists(interaction.user.id))) {
                 return await interaction.reply({ embeds: [new ErrorEmbed("you cannot afford this")], ephemeral: true });
             }
@@ -61,6 +63,23 @@ export default async function interactionCreate(interaction: Interaction) {
             await setInventory(interaction.user.id, inventory);
             await updateBalance(interaction.user.id, balance - Number(auction.bin));
             await updateBalance(auction.ownerId, (await getBalance(auction.ownerId)) + Number(auction.bin));
+
+            const items = getItems();
+
+            const embedDm = new CustomEmbed()
+                .setColor("#36393f")
+                .setDescription(
+                    `your auction for ${auction.itemAmount}x ${items[auction.itemName].emoji} ${
+                        items[auction.itemName].name
+                    } has been bought by ${interaction.user.username} for $**${auction.bin}**`
+                );
+
+            await requestDM({
+                client: interaction.client as NypsiClient,
+                memberId: auction.ownerId,
+                content: "your auction has been bought",
+                embed: embedDm,
+            });
 
             const embed: any = _.cloneDeep(interaction.message.embeds[0]);
 
