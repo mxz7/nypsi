@@ -271,6 +271,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         );
 
         displayAuction(0);
+    } else {
+        displayAuction(0);
     }
 
     let max = 2;
@@ -356,7 +358,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 );
             }
 
-            await msg.edit({ embeds: [embed] });
+            await msg.edit({ embeds: [embed], components: [row] });
             return pageManager();
         } else if (res == "del") {
             const res = await deleteAuction(auctions[currentPage].id, message.client as NypsiClient);
