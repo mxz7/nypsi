@@ -69,7 +69,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         } else {
             embed.setDescription("what item would you like to sell?");
 
-            await msg.edit({ embeds: [embed] });
+            await msg.edit({ embeds: [embed], components: [] });
 
             const filter = (m: Message) => message.author.id == m.author.id;
 
