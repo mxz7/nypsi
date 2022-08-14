@@ -10,7 +10,7 @@ import {
     SelectMenuOptionBuilder,
 } from "discord.js";
 import { getResponse, onCooldown } from "../utils/cooldownhandler";
-import { getAuctions, getInventory, getItems } from "../utils/economy/utils";
+import { createAuction, getAuctions, getInventory, getItems } from "../utils/economy/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { Item } from "../utils/models/Economy";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
@@ -24,7 +24,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [embed] });
     }
 
-    const createAuction = async (msg: Message) => {
+    const createAuctionProcess = async (msg: Message) => {
         const embed = new CustomEmbed(message.member).setHeader("create an auction", message.author.avatarURL());
 
         const inventory = await getInventory(message.member);
@@ -113,6 +113,101 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (!inventory[selected.id] || inventory[selected.id] == 0) {
             return message.channel.send({ embeds: [new ErrorEmbed(`you dont have a ${selected.name}`)] });
         }
+
+        embed.setDescription(`how many ${selected.emoji} ${selected.name} do you want to sell?`);
+
+        await msg.edit({ embeds: [embed], components: [] });
+
+        const filter = (m: Message) => m.author.id == message.author.id;
+
+        let fail = false;
+        let res = await msg.channel
+            .awaitMessages({ filter, time: 30000, max: 1 })
+            .then(async (m) => {
+                await m.first().delete();
+                return m.first().content;
+            })
+            .catch(async () => {
+                fail = true;
+                embed.setDescription("❌ expired");
+                msg.edit({ embeds: [embed] });
+            });
+
+        if (fail) return;
+        if (!res) return;
+
+        if (!parseInt(res)) {
+            fail = true;
+        }
+
+        if (isNaN(parseInt(res))) {
+            fail = true;
+        }
+
+        if (parseInt(res) < 1) {
+            fail = true;
+        }
+
+        if (fail) {
+            return message.channel.send({ embeds: [new ErrorEmbed("invalid amount")] });
+        }
+
+        if (!inventory[selected.id]) {
+            return message.channel.send({ embeds: [new ErrorEmbed(`you do not have this many ${selected.name}`)] });
+        }
+
+        if (inventory[selected.id] < parseInt(res)) {
+            return message.channel.send({ embeds: [new ErrorEmbed(`you do not have this many ${selected.name}`)] });
+        }
+
+        const amount = parseInt(res);
+
+        embed.setDescription(`how much do you want to sell ${amount}x ${selected.emoji} ${selected.name} for?`);
+
+        await msg.edit({ embeds: [embed], components: [] });
+
+        res = await msg.channel
+            .awaitMessages({ filter, time: 30000, max: 1 })
+            .then(async (m) => {
+                await m.first().delete();
+                return m.first().content;
+            })
+            .catch(async () => {
+                fail = true;
+                embed.setDescription("❌ expired");
+                msg.edit({ embeds: [embed] });
+            });
+
+        if (fail) return;
+        if (!res) return;
+
+        if (!parseInt(res)) {
+            fail = true;
+        }
+
+        if (isNaN(parseInt(res))) {
+            fail = true;
+        }
+
+        if (parseInt(res) < 1) {
+            fail = true;
+        }
+
+        if (fail) {
+            return message.channel.send({ embeds: [new ErrorEmbed("invalid amount")] });
+        }
+
+        const cost = parseInt(res);
+
+        const url = await createAuction(message.member, selected.id, amount, cost).catch(() => {});
+
+        if (url) {
+            embed.setDescription(`[your auction has been created](${url})`);
+        } else {
+            embed.setDescription("there was an error while creating your auction");
+        }
+
+        return await msg.edit({ embeds: [embed] });
     };
 
     if (args.length == 0) {
@@ -144,7 +239,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             if (fail) return;
 
             if (res == "y") {
-                return createAuction(msg);
+                return createAuctionProcess(msg);
             }
         }
     }
