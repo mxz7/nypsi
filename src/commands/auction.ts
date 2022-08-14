@@ -209,7 +209,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return message.channel.send({ embeds: [new ErrorEmbed("invalid amount")] });
         }
 
-        const cost = await formatBet(args[0], message.member).catch(() => {});
+        const cost = await formatBet(res, message.member).catch(() => {});
 
         if (!cost) {
             return message.channel.send({ embeds: [new ErrorEmbed("invalid amount")] });
