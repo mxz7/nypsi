@@ -50,7 +50,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             for (const item of Object.keys(inventory)) {
                 if (inventory[item] != 0) {
-                    console.log(items[item].id);
                     options.push(
                         new SelectMenuOptionBuilder()
                             .setValue(items[item].id)
