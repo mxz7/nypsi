@@ -10,7 +10,15 @@ import {
     SelectMenuOptionBuilder,
 } from "discord.js";
 import { getResponse, onCooldown } from "../utils/cooldownhandler";
-import { createAuction, deleteAuction, getAuctions, getInventory, getItems, setInventory } from "../utils/economy/utils";
+import {
+    createAuction,
+    deleteAuction,
+    formatBet,
+    getAuctions,
+    getInventory,
+    getItems,
+    setInventory,
+} from "../utils/economy/utils";
 import { NypsiClient } from "../utils/models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { Item } from "../utils/models/Economy";
@@ -202,7 +210,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return message.channel.send({ embeds: [new ErrorEmbed("invalid amount")] });
         }
 
-        const cost = parseInt(res);
+        const cost = await formatBet(args[0], message.member).catch(() => {});
+
+        if (!cost) {
+            return message.channel.send({ embeds: [new ErrorEmbed("invalid amount")] });
+        }
+
+        if (cost <= 0) {
+            return message.channel.send({
+                embeds: [new ErrorEmbed("invalid amount")],
+            });
+        }
 
         inventory = await getInventory(message.member);
 
