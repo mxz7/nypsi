@@ -181,7 +181,7 @@ async function showUser(message, user) {
             `**tag** ${user.tag}
             **created** ${formatDate(user.createdAt)}${
                 (await getLastCommand(user.id))
-                    ? `\n**last command** <t:${(await (await getLastCommand(user.id)).getTime()) / 1000}:R> days ago`
+                    ? `\n**last command** <t:${(await Math.floor(await getLastCommand(user.id)).getTime()) / 1000}:R>`
                     : ""
             }`,
             true
