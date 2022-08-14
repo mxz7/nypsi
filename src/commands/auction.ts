@@ -10,10 +10,11 @@ import {
     SelectMenuOptionBuilder,
 } from "discord.js";
 import { getResponse, onCooldown } from "../utils/cooldownhandler";
-import { createAuction, getAuctions, getInventory, getItems } from "../utils/economy/utils";
+import { createAuction, getAuctions, getInventory, getItems, setInventory } from "../utils/economy/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { Item } from "../utils/models/Economy";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
+import { getTier, isPremium } from "../utils/premium/utils";
 
 const cmd = new Command("auction", "create and manage your item auctions", Categories.MONEY).setAliases(["ah"]);
 
@@ -199,6 +200,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         const cost = parseInt(res);
 
+        if (!inventory[selected.id] || inventory[selected.id] < amount) {
+            return message.channel.send({ embeds: [new CustomEmbed(message.member, "sneaky bitch")] });
+        }
+
+        inventory[selected.id] -= amount;
+
+        if (inventory[selected.id] <= 0) {
+            delete inventory[selected.id];
+        }
+
+        await setInventory(message.member, inventory);
+
         const url = await createAuction(message.member, selected.id, amount, cost).catch(() => {});
 
         if (url) {
@@ -210,39 +223,57 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return await msg.edit({ embeds: [embed] });
     };
 
-    if (args.length == 0) {
-        const auctions = await getAuctions(message.member);
+    const auctions = await getAuctions(message.member);
 
-        if (auctions.length == 0) {
-            const embed = new CustomEmbed(message.member, "you don't have any auctions");
+    const embed = new CustomEmbed(message.member, "you don't have any auctions");
 
-            const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-                new ButtonBuilder().setLabel("create auction").setCustomId("y").setStyle(ButtonStyle.Success)
-            );
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>();
 
-            const msg = await message.channel.send({ embeds: [embed], components: [row] });
-
-            const filter = (i: Interaction) => i.user.id == message.author.id;
-
-            let fail = false;
-
-            const res = await msg
-                .awaitMessageComponent({ filter, time: 30000 })
-                .then(async (collected) => {
-                    await collected.deferUpdate();
-                    return collected.customId;
-                })
-                .catch(() => {
-                    fail = true;
-                });
-
-            if (fail) return;
-
-            if (res == "y") {
-                return createAuctionProcess(msg);
-            }
-        }
+    if (auctions.length == 0) {
+        embed.setDescription("you don't currently have any auctions");
+    } else if (auctions.length > 1) {
+        row.addComponents(
+            new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
+            new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
+            new ButtonBuilder().setCustomId("del").setLabel("delete").setStyle(ButtonStyle.Danger)
+        );
     }
+
+    let max = 2;
+
+    if (await isPremium(message.member)) {
+        max += await getTier(message.member);
+    }
+
+    if (auctions.length < max) {
+        row.addComponents(new ButtonBuilder().setLabel("create auction").setCustomId("y").setStyle(ButtonStyle.Success));
+    }
+
+    const msg = await message.channel.send({ embeds: [embed], components: [row] });
+
+    const filter = (i: Interaction) => i.user.id == message.author.id;
+
+    const pageManager = async () => {
+        let fail = false;
+
+        const res = await msg
+            .awaitMessageComponent({ filter, time: 30000 })
+            .then(async (collected) => {
+                await collected.deferUpdate();
+                return collected.customId;
+            })
+            .catch(() => {
+                fail = true;
+            });
+
+        if (fail) return;
+
+        if (res == "y") {
+            return createAuctionProcess(msg);
+        }
+    };
+
+    return pageManager();
 }
 
 cmd.setRun(run);
