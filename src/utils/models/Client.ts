@@ -23,6 +23,7 @@ import { runUploadReset } from "../functions/image";
 import { runChristmas, runCountdowns, runSnipeClearIntervals, updateCounters } from "../guilds/utils";
 import { updateCache } from "../imghandler";
 import { getWebhooks, logger, setClusterId } from "../logger";
+import { runAuctionChecks } from "../scheduled/clusterjobs/checkauctions";
 import { runLotteryInterval } from "../scheduled/clusterjobs/lottery";
 import { runLogs, runModerationChecks } from "../scheduled/clusterjobs/moderationchecks";
 import { runPremiumChecks } from "../scheduled/clusterjobs/premiumexpire";
@@ -119,6 +120,7 @@ export class NypsiClient extends Client {
         runPremiumCrateInterval(this);
         runPremiumChecks(this);
         runModerationChecks(this);
+        runAuctionChecks(this);
         runLogs();
     }
 }
