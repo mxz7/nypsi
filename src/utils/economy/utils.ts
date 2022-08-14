@@ -2476,3 +2476,68 @@ export async function createAuction(member: GuildMember, itemId: string, itemAmo
 
     return messageUrl;
 }
+
+export async function bumpAuction(id: string, client: NypsiClient) {
+    const query = await prisma.auction.findUnique({
+        where: {
+            id: id,
+        },
+        select: {
+            messageId: true,
+            owner: {
+                select: {
+                    lastKnownTag: true,
+                },
+            },
+            createdAt: true,
+            bin: true,
+            itemAmount: true,
+            itemName: true,
+        },
+    });
+
+    const embed = new CustomEmbed().setColor("#36393f").setHeader(`${query.owner.lastKnownTag.split("#")[0]}'s auction`);
+
+    embed.setDescription(
+        `started <t:${Math.floor(query.createdAt.getTime() / 1000)}:R>\n\n` +
+            `**${query.itemAmount.toLocaleString()}x** ${items[query.itemName].emoji} ${
+                items[query.itemName].name
+            } for $**${query.bin.toLocaleString()}**`
+    );
+
+    const button = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder().setCustomId("b").setLabel("buy").setStyle(ButtonStyle.Success)
+    );
+
+    const messageUrl = await client.cluster
+        .broadcastEval(
+            async (client, { row, messageId, embed }) => {
+                const guild = await client.guilds.fetch("747056029795221513");
+
+                if (!guild) return;
+
+                const channel = await guild.channels.fetch("819640200699052052");
+
+                if (!channel) return;
+
+                if (channel.isTextBased()) {
+                    const msg = await channel.messages.fetch(messageId);
+
+                    if (msg) {
+                        await msg.delete();
+                    }
+
+                    const m = await channel.send({ embeds: [embed], components: [row] });
+
+                    return m.url;
+                }
+            },
+            { context: { messageId: query.messageId, row: button.toJSON(), embed: embed.toJSON() } }
+        )
+        .then((res) => {
+            res.filter((i) => Boolean(i));
+            return res[0];
+        });
+
+    return messageUrl;
+}
