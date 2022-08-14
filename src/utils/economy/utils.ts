@@ -2440,34 +2440,39 @@ export async function createAuction(member: GuildMember, itemId: string, itemAmo
         new ButtonBuilder().setCustomId("b").setLabel("buy").setStyle(ButtonStyle.Success)
     );
 
-    const messageId = await (member.client as NypsiClient).cluster.broadcastEval(
-        async (client, { embed, row }) => {
-            const guild = await client.guilds.fetch("747056029795221513");
+    const { messageId, messageUrl } = await (member.client as NypsiClient).cluster
+        .broadcastEval(
+            async (client, { embed, row }) => {
+                const guild = await client.guilds.fetch("747056029795221513");
 
-            if (!guild) return;
+                if (!guild) return;
 
-            const channel = await guild.channels.fetch("819640200699052052");
+                const channel = await guild.channels.fetch("819640200699052052");
 
-            if (!channel) return;
+                if (!channel) return;
 
-            if (channel.isTextBased()) {
-                const msg = await channel.send({ embeds: [embed], components: [row] });
+                if (channel.isTextBased()) {
+                    const msg = await channel.send({ embeds: [embed], components: [row] });
 
-                return msg.id;
-            }
-        },
-        { context: { embed: embed.toJSON(), row: button.toJSON() } }
-    );
-
-    messageId.filter((i) => Boolean(i));
+                    return { messageId: msg.id, messageUrl: msg.url };
+                }
+            },
+            { context: { embed: embed.toJSON(), row: button.toJSON() } }
+        )
+        .then((res) => {
+            res.filter((i) => Boolean(i));
+            return res[0];
+        });
 
     await prisma.auction.create({
         data: {
             bin: bin,
             itemName: itemId,
-            messageId: messageId[0],
+            messageId: messageId,
             itemAmount: itemAmount,
             ownerId: member.user.id,
         },
     });
+
+    return messageUrl;
 }
