@@ -77,7 +77,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             const res = await msg.channel
                 .awaitMessages({ filter, time: 30000, max: 1 })
-                .then((m) => {
+                .then(async (m) => {
+                    await m.first().delete();
                     return m.first().content;
                 })
                 .catch(() => {
