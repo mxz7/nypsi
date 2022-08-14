@@ -41,6 +41,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         let inventory = await getInventory(message.member);
 
+        if (Object.keys(inventory).length == 0) {
+            embed.setDescription("you have nothing in your inventory");
+            return msg.edit({ embeds: [embed], components: [] });
+        }
+
         let selected: Item;
 
         if (Object.keys(inventory).length <= 25) {
