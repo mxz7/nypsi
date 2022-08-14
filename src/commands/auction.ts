@@ -272,6 +272,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         displayAuction(0);
     } else {
+        row.addComponents(new ButtonBuilder().setCustomId("del").setLabel("delete").setStyle(ButtonStyle.Danger));
         displayAuction(0);
     }
 
@@ -374,12 +375,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
                 await setInventory(message.member, inventory);
 
-                await interaction.reply({
+                await interaction.followUp({
                     embeds: [new CustomEmbed(message.member, "✅ your auction has been deleted")],
                     ephemeral: true,
                 });
             } else {
-                await interaction.reply({
+                await interaction.followUp({
                     embeds: [new CustomEmbed(message.member, "failed to delete that auction")],
                     ephemeral: true,
                 });
