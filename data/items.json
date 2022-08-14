@@ -208,7 +208,7 @@
     "bitcoin": {
         "id": "bitcoin",
         "name": "bitcoin",
-        "emoji": ":coin:",
+        "emoji": "🪙",
         "description": "a scary investment",
         "rarity": 2,
         "role": "item",
@@ -217,7 +217,7 @@
     "ethereum": {
         "id": "ethereum",
         "name": "ethereum",
-        "emoji": ":coin:",
+        "emoji": "🪙",
         "description": "less scary investment",
         "rarity": 0,
         "role": "item",
