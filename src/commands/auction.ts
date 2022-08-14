@@ -62,7 +62,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             const res = await msg.awaitMessageComponent({ filter, time: 30000 }).then(async (i) => {
                 await i.deferUpdate();
-                return i.customId;
+                if (!i.isSelectMenu()) return;
+                return i.values[0];
             });
 
             selected = items[res];
