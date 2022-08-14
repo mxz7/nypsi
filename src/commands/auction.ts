@@ -28,8 +28,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const createAuctionProcess = async (msg: Message) => {
         const embed = new CustomEmbed(message.member).setHeader("create an auction", message.author.avatarURL());
 
-        const inventory = await getInventory(message.member);
-        const items = getItems();
+        let inventory = await getInventory(message.member);
 
         let selected: Item;
 
@@ -199,6 +198,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         const cost = parseInt(res);
+
+        inventory = await getInventory(message.member);
 
         if (!inventory[selected.id] || inventory[selected.id] < amount) {
             return message.channel.send({ embeds: [new CustomEmbed(message.member, "sneaky bitch")] });
