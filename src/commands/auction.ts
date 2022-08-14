@@ -10,7 +10,8 @@ import {
     SelectMenuOptionBuilder,
 } from "discord.js";
 import { getResponse, onCooldown } from "../utils/cooldownhandler";
-import { createAuction, getAuctions, getInventory, getItems, setInventory } from "../utils/economy/utils";
+import { createAuction, deleteAuction, getAuctions, getInventory, getItems, setInventory } from "../utils/economy/utils";
+import { NypsiClient } from "../utils/models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { Item } from "../utils/models/Economy";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
@@ -24,6 +25,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         return message.channel.send({ embeds: [embed] });
     }
+
+    const items = getItems();
 
     const createAuctionProcess = async (msg: Message) => {
         const embed = new CustomEmbed(message.member).setHeader("create an auction", message.author.avatarURL());
@@ -226,9 +229,35 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const auctions = await getAuctions(message.member);
 
-    const embed = new CustomEmbed(message.member, "you don't have any auctions");
+    const embed = new CustomEmbed(message.member).setHeader("your auctions", message.author.avatarURL());
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>();
+
+    let currentPage = 0;
+    const maxPage = auctions.length - 1;
+
+    const displayAuction = (page: number) => {
+        embed.setFields(
+            {
+                name: "item",
+                value: `**${auctions[page].itemAmount}x** ${items[auctions[page].itemName].emoji} ${
+                    items[auctions[page].itemName].name
+                }`,
+                inline: true,
+            },
+            {
+                name: "cost",
+                value: `$**${auctions[page].bin}**`,
+                inline: true,
+            },
+            {
+                name: "created",
+                value: `<t:${Math.floor(auctions[page].createdAt.getTime() / 1000)}:R>`,
+                inline: true,
+            }
+        );
+        embed.setFooter({ text: `page ${page + 1}/${maxPage + 1}` });
+    };
 
     if (auctions.length == 0) {
         embed.setDescription("you don't currently have any auctions");
@@ -238,6 +267,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
             new ButtonBuilder().setCustomId("del").setLabel("delete").setStyle(ButtonStyle.Danger)
         );
+
+        displayAuction(0);
     }
 
     let max = 2;
@@ -254,23 +285,103 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const filter = (i: Interaction) => i.user.id == message.author.id;
 
-    const pageManager = async () => {
+    const pageManager: any = async () => {
         let fail = false;
 
-        const res = await msg
+        const response = await msg
             .awaitMessageComponent({ filter, time: 30000 })
             .then(async (collected) => {
                 await collected.deferUpdate();
-                return collected.customId;
+                return { res: collected.customId, interaction: collected };
             })
-            .catch(() => {
+            .catch(async () => {
                 fail = true;
+                await msg.edit({ embeds: [embed], components: [] });
             });
 
         if (fail) return;
+        if (!response) return;
+
+        const { res, interaction } = response;
 
         if (res == "y") {
             return createAuctionProcess(msg);
+        } else if (res == "⬅") {
+            if (currentPage == 0) {
+                return pageManager();
+            }
+
+            currentPage--;
+
+            displayAuction(currentPage);
+
+            if (currentPage == 0) {
+                row.setComponents(
+                    new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
+                    new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
+                    new ButtonBuilder().setCustomId("del").setLabel("delete").setStyle(ButtonStyle.Danger)
+                );
+            } else {
+                row.setComponents(
+                    new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary),
+                    new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
+                    new ButtonBuilder().setCustomId("del").setLabel("delete").setStyle(ButtonStyle.Danger)
+                );
+            }
+
+            await msg.edit({ embeds: [embed], components: [row] });
+            return pageManager();
+        } else if (res == "➡") {
+            if (currentPage == maxPage) {
+                return pageManager();
+            }
+
+            currentPage++;
+
+            displayAuction(currentPage);
+
+            if (currentPage == maxPage) {
+                row.setComponents(
+                    new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary),
+                    new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(true),
+                    new ButtonBuilder().setCustomId("del").setLabel("delete").setStyle(ButtonStyle.Danger)
+                );
+            } else {
+                row.setComponents(
+                    new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary),
+                    new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
+                    new ButtonBuilder().setCustomId("del").setLabel("delete").setStyle(ButtonStyle.Danger)
+                );
+            }
+
+            await msg.edit({ embeds: [embed] });
+            return pageManager();
+        } else if (res == "del") {
+            const res = await deleteAuction(auctions[currentPage].id, message.client as NypsiClient);
+
+            if (res) {
+                const inventory = await getInventory(message.member);
+
+                if (inventory[auctions[currentPage].itemName]) {
+                    inventory[auctions[currentPage].itemName] += auctions[currentPage].itemAmount;
+                } else {
+                    inventory[auctions[currentPage].itemName] = auctions[currentPage].itemAmount;
+                }
+
+                await setInventory(message.member, inventory);
+
+                await interaction.reply({
+                    embeds: [new CustomEmbed(message.member, "✅ your auction has been deleted")],
+                    ephemeral: true,
+                });
+            } else {
+                await interaction.reply({
+                    embeds: [new CustomEmbed(message.member, "failed to delete that auction")],
+                    ephemeral: true,
+                });
+            }
+
+            return pageManager();
         }
     };
 
