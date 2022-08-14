@@ -1666,12 +1666,28 @@ export async function openCrate(member: GuildMember, item: Item): Promise<string
                     crateItemsModified.push(i);
                 } else if (items[i].rarity == 1) {
                     for (let x = 0; x < 2; x++) {
+                        if (items[i].role == "collectable") {
+                            const chance = Math.floor(Math.random() * 3);
+
+                            if (chance == 2) {
+                                crateItemsModified.push(i);
+                            }
+                        } else {
+                            crateItemsModified.push(i);
+                        }
                         crateItemsModified.push(i);
                     }
                 } else if (items[i].rarity == 0) {
-                    for (let x = 0; x < 3; x++) {
+                    if (items[i].role == "collectable") {
+                        const chance = Math.floor(Math.random() * 3);
+
+                        if (chance == 2) {
+                            crateItemsModified.push(i);
+                        }
+                    } else {
                         crateItemsModified.push(i);
                     }
+                    crateItemsModified.push(i);
                 }
             } else {
                 for (let x = 0; x < 2; x++) {

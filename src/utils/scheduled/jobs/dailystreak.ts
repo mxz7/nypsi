@@ -7,12 +7,14 @@ import prisma from "../../database/database";
 
     const query = await prisma.economy.updateMany({
         where: {
-            AND: [{ lastDaily: { lte: limit } }, { dailyStreak: 1 }],
+            AND: [{ lastDaily: { lte: limit } }, { dailyStreak: { gt: 1 } }],
         },
         data: {
             dailyStreak: 0,
         },
     });
 
-    parentPort.postMessage(`${query.count} daily streaks reset`);
+    if (query.count > 0) parentPort.postMessage(`${query.count} daily streaks reset`);
+
+    process.exit(0);
 })();
