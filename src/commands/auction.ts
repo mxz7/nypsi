@@ -103,7 +103,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 .awaitMessages({ filter, time: 30000, max: 1 })
                 .then(async (m) => {
                     await m.first().delete();
-                    return m.first().content;
+                    return m.first().content.toLowerCase();
                 })
                 .catch(() => {
                     fail = true;
