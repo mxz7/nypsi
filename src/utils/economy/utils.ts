@@ -2432,7 +2432,7 @@ export async function deleteAuction(id: string, client: NypsiClient) {
                 if (channel.isTextBased()) {
                     const msg = await channel.messages.fetch(id).catch(() => {});
 
-                    if (msg) await msg.delete();
+                    if (msg) await msg.delete().catch(() => {});
                 }
             },
             { context: { id: auction.messageId } }
