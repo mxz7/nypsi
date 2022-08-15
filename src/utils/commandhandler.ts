@@ -929,9 +929,9 @@ export function runCommandUseTimers(client: NypsiClient) {
         for (const user of commandUses.keys()) {
             let modifier = 3;
 
-            if ((await getKarma(user)) > 200) modifier = 4;
-            if ((await getKarma(user)) > 400) modifier = 5;
-            if ((await getKarma(user)) > 500) modifier = 7;
+            if ((await getKarma(user)) > 200) modifier = 3;
+            if ((await getKarma(user)) > 400) modifier = 4;
+            if ((await getKarma(user)) > 500) modifier = 5;
 
             const amount = Math.floor(commandUses.get(user) / modifier);
 
