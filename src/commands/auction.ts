@@ -273,7 +273,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             },
             {
                 name: "cost",
-                value: `$**${auctions[page].bin}**`,
+                value: `$**${auctions[page].bin.toLocaleString()}**`,
                 inline: true,
             },
             {
