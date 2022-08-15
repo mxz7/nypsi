@@ -2430,7 +2430,7 @@ export async function deleteAuction(id: string, client: NypsiClient) {
                 if (!channel) return;
 
                 if (channel.isTextBased()) {
-                    const msg = await channel.messages.fetch(id);
+                    const msg = await channel.messages.fetch(id).catch(() => {});
 
                     if (msg) await msg.delete();
                 }
@@ -2456,9 +2456,26 @@ export async function createAuction(member: GuildMember, itemId: string, itemAmo
         new ButtonBuilder().setCustomId("b").setLabel("buy").setStyle(ButtonStyle.Success)
     );
 
+    const clusters = await (member.client as NypsiClient).cluster.broadcastEval(async (client) => {
+        const guild = await client.guilds.fetch("747056029795221513");
+
+        if (guild) return (client as NypsiClient).cluster.id;
+        return "not-found";
+    });
+
+    let cluster: number;
+
+    for (const i of clusters) {
+        if (i != "not-found") {
+            cluster = i;
+            break;
+        }
+    }
+
     const { messageId, messageUrl } = await (member.client as NypsiClient).cluster
         .broadcastEval(
-            async (client, { embed, row }) => {
+            async (client, { embed, row, cluster }) => {
+                if ((client as NypsiClient).cluster.id != cluster) return;
                 const guild = await client.guilds.fetch("747056029795221513");
 
                 if (!guild) return;
@@ -2473,7 +2490,7 @@ export async function createAuction(member: GuildMember, itemId: string, itemAmo
                     return { messageId: msg.id, messageUrl: msg.url };
                 }
             },
-            { context: { embed: embed.toJSON(), row: button.toJSON() } }
+            { context: { embed: embed.toJSON(), row: button.toJSON(), cluster: cluster } }
         )
         .then((res) => {
             res.filter((i) => Boolean(i));
@@ -2537,7 +2554,7 @@ export async function bumpAuction(id: string, client: NypsiClient) {
                 if (!channel) return;
 
                 if (channel.isTextBased()) {
-                    const msg = await channel.messages.fetch(messageId);
+                    const msg = await channel.messages.fetch(messageId).catch(() => {});
 
                     if (msg) {
                         await msg.delete();
