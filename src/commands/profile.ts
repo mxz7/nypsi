@@ -102,6 +102,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 Premium: true,
                 Username: true,
                 WordleStats: true,
+                Auction: true,
             },
         });
 
