@@ -1,4 +1,12 @@
-import { Collection, Guild, GuildMember } from "discord.js";
+import {
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle,
+    Collection,
+    Guild,
+    GuildMember,
+    MessageActionRowComponentBuilder,
+} from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import * as fs from "fs";
 import fetch from "node-fetch";
@@ -2379,4 +2387,173 @@ export async function getDailyStreak(member: GuildMember | string) {
     });
 
     return query.dailyStreak;
+}
+
+export async function getAuctions(member: GuildMember | string) {
+    let id: string;
+    if (member instanceof GuildMember) {
+        id = member.user.id;
+    } else {
+        id = member;
+    }
+
+    const query = await prisma.auction.findMany({
+        where: {
+            ownerId: id,
+        },
+    });
+
+    return query;
+}
+
+export async function deleteAuction(id: string, client: NypsiClient) {
+    const auction = await prisma.auction
+        .delete({
+            where: {
+                id: id,
+            },
+            select: {
+                messageId: true,
+            },
+        })
+        .catch(() => {});
+
+    if (auction) {
+        await client.cluster.broadcastEval(
+            async (client, { id }) => {
+                const guild = await client.guilds.fetch("747056029795221513");
+
+                if (!guild) return;
+
+                const channel = await guild.channels.fetch("1008467335973179482");
+
+                if (!channel) return;
+
+                if (channel.isTextBased()) {
+                    const msg = await channel.messages.fetch(id);
+
+                    if (msg) await msg.delete();
+                }
+            },
+            { context: { id: auction.messageId } }
+        );
+    }
+
+    return Boolean(auction);
+}
+
+export async function createAuction(member: GuildMember, itemId: string, itemAmount: number, bin: number) {
+    const embed = new CustomEmbed(member).setHeader(`${member.user.username}'s auction`, member.user.avatarURL());
+
+    embed.setDescription(
+        `started <t:${Math.floor(Date.now() / 1000)}:R>\n\n` +
+            `**${itemAmount.toLocaleString()}x** ${items[itemId].emoji} ${
+                items[itemId].name
+            } for $**${bin.toLocaleString()}**`
+    );
+
+    const button = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder().setCustomId("b").setLabel("buy").setStyle(ButtonStyle.Success)
+    );
+
+    const { messageId, messageUrl } = await (member.client as NypsiClient).cluster
+        .broadcastEval(
+            async (client, { embed, row }) => {
+                const guild = await client.guilds.fetch("747056029795221513");
+
+                if (!guild) return;
+
+                const channel = await guild.channels.fetch("1008467335973179482");
+
+                if (!channel) return;
+
+                if (channel.isTextBased()) {
+                    const msg = await channel.send({ embeds: [embed], components: [row] });
+
+                    return { messageId: msg.id, messageUrl: msg.url };
+                }
+            },
+            { context: { embed: embed.toJSON(), row: button.toJSON() } }
+        )
+        .then((res) => {
+            res.filter((i) => Boolean(i));
+            return res[0];
+        });
+
+    await prisma.auction.create({
+        data: {
+            bin: bin,
+            itemName: itemId,
+            messageId: messageId,
+            itemAmount: itemAmount,
+            ownerId: member.user.id,
+        },
+    });
+
+    return messageUrl;
+}
+
+export async function bumpAuction(id: string, client: NypsiClient) {
+    const query = await prisma.auction.findUnique({
+        where: {
+            id: id,
+        },
+        select: {
+            messageId: true,
+            owner: {
+                select: {
+                    lastKnownTag: true,
+                },
+            },
+            createdAt: true,
+            bin: true,
+            itemAmount: true,
+            itemName: true,
+        },
+    });
+
+    const embed = new CustomEmbed().setColor("#36393f").setHeader(`${query.owner.lastKnownTag.split("#")[0]}'s auction`);
+
+    embed.setDescription(
+        `started <t:${Math.floor(query.createdAt.getTime() / 1000)}:R>\n\n` +
+            `**${query.itemAmount.toLocaleString()}x** ${items[query.itemName].emoji} ${
+                items[query.itemName].name
+            } for $**${query.bin.toLocaleString()}**`
+    );
+
+    const button = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder().setCustomId("b").setLabel("buy").setStyle(ButtonStyle.Success)
+    );
+
+    const messageUrl = await client.cluster
+        .broadcastEval(
+            async (client, { row, messageId, embed }) => {
+                const guild = await client.guilds.fetch("747056029795221513");
+
+                if (!guild) return;
+
+                const channel = await guild.channels.fetch("1008467335973179482");
+
+                if (!channel) return;
+
+                if (channel.isTextBased()) {
+                    const msg = await channel.messages.fetch(messageId);
+
+                    if (msg) {
+                        await msg.delete();
+                    }
+
+                    const m = await channel.send({ embeds: [embed], components: [row] });
+
+                    return m.url;
+                }
+            },
+            { context: { messageId: query.messageId, row: button.toJSON(), embed: embed.toJSON() } }
+        )
+        .then((res) => {
+            res.filter((i) => Boolean(i));
+            return res[0];
+        });
+
+    return messageUrl;
 }
