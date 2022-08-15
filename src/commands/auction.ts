@@ -9,7 +9,7 @@ import {
     SelectMenuBuilder,
     SelectMenuOptionBuilder,
 } from "discord.js";
-import { getResponse, onCooldown } from "../utils/cooldownhandler";
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import {
     createAuction,
     deleteAuction,
@@ -35,6 +35,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         return message.channel.send({ embeds: [embed] });
     }
+
+    await addCooldown(cmd.name, message.member, 15);
 
     const items = getItems();
 
