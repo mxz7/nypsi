@@ -427,7 +427,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 });
             }
 
-            return pageManager();
+            await msg.edit({ components: [] });
         }
     };
 
