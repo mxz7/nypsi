@@ -237,6 +237,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             });
         }
 
+        if (cost > 100000000) {
+            return message.channel.send({ embeds: [new ErrorEmbed("this is too much")] });
+        }
+
         inventory = await getInventory(message.member);
 
         if (!inventory[selected.id] || inventory[selected.id] < amount) {
