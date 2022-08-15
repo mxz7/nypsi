@@ -76,11 +76,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             const filter = (i: Interaction) => i.user.id == message.author.id;
 
-            const res = await msg.awaitMessageComponent({ filter, time: 30000 }).then(async (i) => {
-                await i.deferUpdate();
-                if (!i.isSelectMenu()) return;
-                return i.values[0];
-            });
+            const res = await msg
+                .awaitMessageComponent({ filter, time: 30000 })
+                .then(async (i) => {
+                    await i.deferUpdate();
+                    if (!i.isSelectMenu()) return;
+                    return i.values[0];
+                })
+                .catch(() => {
+                    msg.edit({ components: [] });
+                });
+
+            if (!res) return;
 
             selected = items[res];
         } else {
