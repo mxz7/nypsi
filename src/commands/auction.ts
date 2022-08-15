@@ -29,7 +29,7 @@ const cmd = new Command("auction", "create and manage your item auctions", Categ
 
 cmd.slashEnabled = true;
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (await onCooldown(cmd.name, message.member)) {
         const embed = await getResponse(cmd.name, message.member);
 
@@ -135,7 +135,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         if (!selected) {
-            return message.channel.send({ embeds: [new ErrorEmbed(`couldnt find \`${args[0]}\``)] });
+            return message.channel.send({ embeds: [new ErrorEmbed("couldnt find that item")] });
         }
 
         if (!inventory[selected.id] || inventory[selected.id] == 0) {
