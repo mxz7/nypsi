@@ -403,7 +403,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             await msg.edit({ embeds: [embed], components: [row] });
             return pageManager();
         } else if (res == "del") {
-            const res = await deleteAuction(auctions[currentPage].id, message.client as NypsiClient);
+            const res = await deleteAuction(auctions[currentPage].id, message.client as NypsiClient).catch(() => {});
 
             if (res) {
                 const inventory = await getInventory(message.member);
