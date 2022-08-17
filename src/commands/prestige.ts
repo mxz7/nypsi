@@ -161,7 +161,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         let crateAmount = Math.floor((await getPrestige(message.member)) / 2 + 1);
 
-        if (crateAmount > 5) crateAmount = 5;
+        if (crateAmount > 5) crateAmount = 3;
 
         embed.setDescription(
             `you are now prestige **${await getPrestige(message.member)}**\n\n` +
