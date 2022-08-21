@@ -153,9 +153,8 @@ export function runModerationChecks(client: NypsiClient) {
                 for (const i of current) {
                     embeds.push(JSON.parse(i) as APIEmbed);
                 }
+                embeds.reverse();
             }
-
-            embeds.reverse();
 
             modLogCount += embeds.length;
 
