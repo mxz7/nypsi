@@ -164,6 +164,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (fail) return;
         if (!res) return;
 
+        if (res.toLowerCase() === "all") {
+            res = inventory[selected.id].toString();
+        }
+
         if (!parseInt(res)) {
             fail = true;
         }
@@ -208,10 +212,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         if (fail) return;
         if (!res) return;
-
-        if (res.toLowerCase() === "all") {
-            res = inventory[selected.id].toString();
-        }
 
         if (!parseInt(res)) {
             fail = true;
