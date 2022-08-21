@@ -187,7 +187,7 @@ export async function getMulti(member: GuildMember | string): Promise<number> {
 
     for (const boosterId of boosters.keys()) {
         if (items[boosterId].boosterEffect.boosts.includes("multi")) {
-            multi += items[boosterId].boosterEffect.effect;
+            multi += items[boosterId].boosterEffect.effect * boosters.get(boosterId).length;
         }
     }
 
