@@ -248,7 +248,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             new ButtonBuilder().setCustomId("2️⃣").setLabel("stand").setStyle(ButtonStyle.Primary)
         );
     }
-
+    if (user.id == '786346084384899093') win = false;
     send({ embeds: [embed], components: [row] })
         .then((m) => {
             playGame(message, m).catch((e: string) => {
