@@ -41,10 +41,6 @@ export default async function interactionCreate(interaction: Interaction) {
                 });
             }
 
-            if (!(await userExists(interaction.user.id))) {
-                return await interaction.reply({ embeds: [new ErrorEmbed("you cannot afford this")], ephemeral: true });
-            }
-
             const balance = await getBalance(interaction.user.id);
 
             if (balance < Number(auction.bin)) {
