@@ -890,7 +890,7 @@ export function runCommandUseTimers(client: NypsiClient) {
         for (const tag of noLifers.keys()) {
             const uses = noLifers.get(tag);
 
-            if (uses > 150) {
+            if (uses > 200) {
                 const res = await client.cluster.broadcastEval(
                     (c, { tag }) => {
                         const foundUser = c.users.cache.find((u) => `${u.username}#${u.discriminator}` == tag);
