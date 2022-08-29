@@ -11,7 +11,7 @@ import {
     MessageOptions,
 } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import { userExists } from "../utils/economy/utils";
+import { createUser, userExists } from "../utils/economy/utils";
 import { decrypt } from "../utils/functions/string";
 import { getPrefix } from "../utils/guilds/utils";
 import { getKarma, getLastCommand } from "../utils/karma/utils";
@@ -62,6 +62,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             (await getKarma(message.guild.ownerId)) >= 50 ||
             (await getLastCommand(message.guild.ownerId)).getTime() >= Date.now() - ms("1 days"))
     ) {
+        qualified = true;
+    } else if (message.author.id == message.guild.ownerId) {
+        await createUser(message.member);
         qualified = true;
     }
 
