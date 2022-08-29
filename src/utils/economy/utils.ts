@@ -2406,6 +2406,16 @@ export async function getAuctions(member: GuildMember | string) {
     return query;
 }
 
+export async function getAuctionByMessage(id: string) {
+    const auction = await prisma.auction.findUnique({
+        where: {
+            messageId: id,
+        },
+    });
+
+    return auction;
+}
+
 export async function deleteAuction(id: string, client: NypsiClient) {
     const auction = await prisma.auction
         .delete({
