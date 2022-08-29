@@ -14,11 +14,15 @@ import {
     createAuction,
     deleteAuction,
     formatBet,
+    getAuctionByMessage,
     getAuctions,
     getInventory,
     getItems,
     setInventory,
+    userExists,
 } from "../utils/economy/utils";
+import requestDM from "../utils/functions/requestdm";
+import { logger } from "../utils/logger";
 import { NypsiClient } from "../utils/models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { Item } from "../utils/models/Economy";
@@ -29,7 +33,7 @@ const cmd = new Command("auction", "create and manage your item auctions", Categ
 
 cmd.slashEnabled = true;
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (await onCooldown(cmd.name, message.member)) {
         const embed = await getResponse(cmd.name, message.member);
 
@@ -269,6 +273,62 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         return await msg.edit({ embeds: [embed] });
     };
+
+    if (args.length > 0 && args[0].toLowerCase() == "del") {
+        if (message.guild.id != "747056029795221513") return;
+
+        const roles = message.member.roles.cache;
+
+        let allow = false;
+
+        if (roles.has("747056620688900139")) allow = true;
+        if (roles.has("747059949770768475")) allow = true;
+        if (roles.has("845613231229370429")) allow = true;
+
+        if (!allow) return;
+
+        if (args.length == 1) {
+            return message.channel.send({ embeds: [new ErrorEmbed("use the message id dumbass")] });
+        }
+
+        const auction = await getAuctionByMessage(args[1]);
+
+        if (!auction) return message.channel.send({ embeds: [new ErrorEmbed("invalid auction bro")] });
+
+        await deleteAuction(auction.id, message.client as NypsiClient);
+
+        await (message as Message).react("✅");
+
+        if (!(await userExists(auction.ownerId))) return;
+
+        const inventory = await getInventory(auction.ownerId);
+
+        if (inventory[auction.itemName]) {
+            inventory[auction.itemName] += auction.itemAmount;
+        } else {
+            inventory[auction.itemName] = auction.itemAmount;
+        }
+
+        await setInventory(auction.ownerId, inventory);
+
+        const embed = new CustomEmbed().setColor("#36393f");
+
+        embed.setDescription(
+            `your auction for ${auction.itemAmount}x ${items[auction.itemName].emoji} ${
+                items[auction.itemName].name
+            } has been removed by a staff member. you have been given back your item${auction.itemAmount > 1 ? "s" : ""}`
+        );
+
+        await requestDM({
+            client: message.client as NypsiClient,
+            content: "your auction has been removed by a staff member",
+            memberId: auction.ownerId,
+            embed: embed,
+        });
+
+        logger.info(`auction ${auction.id} by ${auction.ownerId} deleted by ${message.author.tag}`);
+        return;
+    }
 
     const auctions = await getAuctions(message.member);
 
