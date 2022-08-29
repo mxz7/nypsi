@@ -28,7 +28,22 @@ export default async function guildMemberRemove(member: GuildMember) {
                 text.push(`\`${un.value}\` | \`${formatDate(un.date)}\``);
             }
 
-            embed.addField("username history", text.join("\n"));
+            embed.addField("username history", text.join("\n"), true);
+        }
+
+        const roles = member.roles.cache;
+
+        let rolesText: string[] = [];
+
+        roles.forEach((role) => {
+            if (role.name == "@everyone") return;
+            rolesText[role.position] = role.toString();
+        });
+
+        rolesText = rolesText.reverse();
+
+        if (roles.size > 1) {
+            embed.addField(`roles [${roles.size - 1}]`, rolesText.join(" "), true);
         }
 
         await addLog(member.guild, LogType.MEMBER, embed);
