@@ -245,7 +245,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             });
         }
 
-        if (cost > 100000000) {
+        if (cost > 15000000) {
             return message.channel.send({ embeds: [new ErrorEmbed("this is too much")] });
         }
 
