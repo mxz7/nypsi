@@ -84,10 +84,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             })
             .catch(() => {
                 fail = true;
-                return message.channel.send({ embeds: [new ErrorEmbed("error creating channel")] });
+                message.channel.send({ embeds: [new ErrorEmbed("error creating channel")] });
             });
 
         if (fail) return;
+        if (!channel) return;
 
         profile.enabled = true;
         profile.channel = channel.id;

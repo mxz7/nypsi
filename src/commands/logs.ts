@@ -101,12 +101,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             })
             .catch(() => {
                 fail = true;
-                return message.channel.send({
+                message.channel.send({
                     embeds: [new ErrorEmbed("i was unable to make a webhook in that channel, please check my permissions")],
                 });
             });
 
         if (fail) return;
+        if (!hook) return;
 
         await setLogsChannelHook(message.guild, hook.url);
 
