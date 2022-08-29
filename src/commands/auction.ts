@@ -326,7 +326,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             embed: embed,
         });
 
-        logger.info(`auction ${auction.id} by ${auction.ownerId} deleted by ${message.author.tag}`);
+        logger.info(`auction ${auction.id} by ${auction.ownerId} deleted by ${message.author.tag} (${message.author.id})`);
         return;
     }
 
