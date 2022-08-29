@@ -9,7 +9,7 @@ import { CustomEmbed } from "../../models/EmbedBuilders";
 
 export async function runAuctionChecks(client: NypsiClient) {
     setInterval(async () => {
-        const limit = dayjs().subtract(3, "days").toDate();
+        const limit = dayjs().subtract(2, "days").toDate();
 
         const query = await prisma.auction.findMany({
             where: {
