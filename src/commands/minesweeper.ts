@@ -493,7 +493,7 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
         .catch(() => {
             fail = true;
             games.delete(message.author.id);
-            return message.channel.send({ content: message.author.toString() + " minesweeper game expired" });
+            message.channel.send({ content: message.author.toString() + " minesweeper game expired" });
         });
 
     if (fail) return;
