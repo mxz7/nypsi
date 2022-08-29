@@ -140,7 +140,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 await m.edit({ embeds: [embed] }).catch(() => {
                     stop = true;
                     embed.setDescription("✅ operation cancelled");
-                    return message.channel.send({ embeds: [embed] });
+                    message.channel.send({ embeds: [embed] });
                 });
                 if (stop) return;
             }
@@ -169,7 +169,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 await m.edit({ embeds: [embed] }).catch(() => {
                     stop = true;
                     embed.setDescription("✅ operation cancelled");
-                    return message.channel.send({ embeds: [embed] });
+                    message.channel.send({ embeds: [embed] });
                 });
                 if (stop) return;
             }

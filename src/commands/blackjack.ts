@@ -254,7 +254,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             playGame(message, m).catch((e: string) => {
                 logger.error(`error occured playing blackjack - ${message.author.tag} (${message.author.id})`);
                 logger.error(e);
-                return message.channel.send({
+                message.channel.send({
                     embeds: [new ErrorEmbed("an error occured while running - join support server")],
                 });
             });
@@ -557,7 +557,7 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
             .catch(() => {
                 fail = true;
                 games.delete(message.author.id);
-                return message.channel.send({ content: message.author.toString() + " blackjack game expired" });
+                message.channel.send({ content: message.author.toString() + " blackjack game expired" });
             });
 
         if (fail) return;

@@ -666,7 +666,7 @@ export async function runCommand(
                 fail = true;
                 logger.info(`captcha (${message.author.id}) failed`);
                 failedCaptcha(message.member);
-                return message.channel.send({
+                message.channel.send({
                     content:
                         message.author.toString() + " captcha failed, please **type** the letter/number combination shown",
                 });
@@ -674,9 +674,8 @@ export async function runCommand(
 
         beingChecked.splice(beingChecked.indexOf(message.author.id), 1);
 
-        if (fail) {
-            return;
-        }
+        if (fail) return;
+        if (!response) return;
 
         if (response.content.toLowerCase() == captcha.answer) {
             logger.info(`captcha (${message.author.id}) passed`);
