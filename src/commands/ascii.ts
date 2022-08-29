@@ -1,10 +1,10 @@
-import * as ascii from "figlet";
 import { CommandInteraction, Message } from "discord.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
+import * as ascii from "figlet";
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { getDMsEnabled } from "../utils/economy/utils.js";
 import { getPrefix } from "../utils/guilds/utils";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 
 const cmd = new Command("ascii", "create ascii text", Categories.FUN);
 
@@ -120,12 +120,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         message.member
             .send({ content: asciiString })
             .then(() => {
-                return message.channel.send({
+                message.channel.send({
                     embeds: [new CustomEmbed(message.member, "✅ success **-** check your dms")],
                 });
             })
             .catch(() => {
-                return message.channel.send({ embeds: [new ErrorEmbed("unable to send you a dm")] });
+                message.channel.send({ embeds: [new ErrorEmbed("unable to send you a dm")] });
             });
     }, 500);
 }

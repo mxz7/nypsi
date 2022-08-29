@@ -74,7 +74,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         let res: any = await message.channel.awaitMessages({ filter, max: 1, time: 60000, errors: ["time"] }).catch(() => {
             fail = true;
-            return message.channel.send({ embeds: [new ErrorEmbed("you ran out of time - cancelled")] });
+            message.channel.send({ embeds: [new ErrorEmbed("you ran out of time - cancelled")] });
         });
 
         if (fail) return;
@@ -123,7 +123,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         res = await message.channel.awaitMessages({ filter, max: 1, time: 60000, errors: ["time"] }).catch(() => {
             fail = true;
-            return message.channel.send({ embeds: [new ErrorEmbed("you ran out of time - cancelled")] });
+            message.channel.send({ embeds: [new ErrorEmbed("you ran out of time - cancelled")] });
         });
 
         if (fail) return;
@@ -144,7 +144,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         res = await message.channel.awaitMessages({ filter, max: 1, time: 60000, errors: ["time"] }).catch(() => {
             fail = true;
-            return message.channel.send({ embeds: [new ErrorEmbed("you ran out of time - cancelled")] });
+            message.channel.send({ embeds: [new ErrorEmbed("you ran out of time - cancelled")] });
         });
 
         if (fail) return;
@@ -169,7 +169,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         res = await message.channel.awaitMessages({ filter, max: 1, time: 60000, errors: ["time"] }).catch(() => {
             fail = true;
-            return message.channel.send({ embeds: [new ErrorEmbed("you ran out of time - cancelled")] });
+            message.channel.send({ embeds: [new ErrorEmbed("you ran out of time - cancelled")] });
         });
 
         if (fail) return;

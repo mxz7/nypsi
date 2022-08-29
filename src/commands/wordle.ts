@@ -184,7 +184,7 @@ async function play(message: Message | (NypsiCommandInteraction & CommandInterac
             fail = true;
             cancel(message, m);
             games.delete(message.author.id);
-            return message.channel.send({ content: message.author.toString() + " wordle game expired" });
+            message.channel.send({ content: message.author.toString() + " wordle game expired" });
         });
 
     if (fail) return;

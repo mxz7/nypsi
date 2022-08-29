@@ -98,7 +98,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         let res: any = await message.channel.awaitMessages({ filter, max: 1, time: 30000, errors: ["time"] }).catch(() => {
             fail = true;
-            return message.channel.send({ embeds: [new ErrorEmbed("you took too long")] });
+            message.channel.send({ embeds: [new ErrorEmbed("you took too long")] });
         });
 
         if (fail) return;
