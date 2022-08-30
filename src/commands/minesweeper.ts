@@ -241,6 +241,7 @@ function getRows(grid: string[], end: boolean) {
                 current.addComponents(button);
                 break;
             case "b":
+                button.setStyle(ButtonStyle.Secondary);
                 if (end) button.setStyle(ButtonStyle.Danger).setDisabled(true);
                 current.addComponents(button);
                 break;
