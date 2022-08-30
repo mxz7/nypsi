@@ -238,21 +238,20 @@ function getRows(grid: string[], end: boolean) {
             case "a":
                 button.setStyle(ButtonStyle.Secondary);
                 if (end) button.setDisabled(true);
-                current.addComponents(button);
                 break;
             case "b":
                 button.setStyle(ButtonStyle.Secondary);
                 if (end) button.setStyle(ButtonStyle.Danger).setDisabled(true);
-                current.addComponents(button);
                 break;
             case "c":
                 button.setStyle(ButtonStyle.Success).setDisabled(true);
-                current.addComponents(button);
                 break;
             case "x":
-                button.setStyle(ButtonStyle.Success).setDisabled(true);
+                button.setStyle(ButtonStyle.Danger).setDisabled(true);
                 break;
         }
+
+        current.addComponents(button);
     }
 
     const button = new ButtonBuilder().setCustomId("finish").setLabel("finish").setStyle(ButtonStyle.Success);
@@ -424,6 +423,8 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
         await message.channel.send({ content: message.author.toString() + " invalid coordinate, example: `a3`" });
         return playGame(message, msg);
     }
+
+    console.log(response);
 
     if (response == "finish") {
         if (win < 1) {
