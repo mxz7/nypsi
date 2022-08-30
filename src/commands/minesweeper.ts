@@ -1,4 +1,15 @@
-import { CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions, MessageOptions } from "discord.js";
+import {
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle,
+    CommandInteraction,
+    Interaction,
+    InteractionReplyOptions,
+    Message,
+    MessageActionRowComponentBuilder,
+    MessageEditOptions,
+    MessageOptions,
+} from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
 import {
     addGamble,
@@ -87,14 +98,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             .addField(
                 "game rules",
                 "a 5x5 grid of white squares will be created\n" +
-                    "there will be numbers and letters on the top and side of the field which act as coordinates\n" +
-                    "once youve chosen your square, it will become blue if there was no mine, if there was, you will lose your bet"
-            )
-            .addField(
-                "help",
-                "`a1` - this would be the most top left square\n" +
-                    "`e5` - this would be the most bottom right square\n" +
-                    "`finish` - this is used to end the game and collect your reward"
+                    "once youve chosen your square, it will become green if there was no mine, if there was, you will lose your bet"
             );
 
         return send({ embeds: [embed] });
@@ -181,8 +185,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    const table = toTable(grid);
-
     const voteMulti = await getMulti(message.member);
 
     games.set(message.author.id, {
@@ -193,16 +195,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         voted: voteMulti,
     });
 
-    const embed = new CustomEmbed(message.member, "**bet** $" + bet.toLocaleString() + "\n**0**x ($0)")
-        .setHeader("minesweeper", message.author.avatarURL())
-        .addField("your grid", table)
-        .addField("help", "type `finish` to stop playing");
+    const embed = new CustomEmbed(message.member, "**bet** $" + bet.toLocaleString() + "\n**0**x ($0)").setHeader(
+        "minesweeper",
+        message.author.avatarURL()
+    );
 
-    const msg = await send({ embeds: [embed] });
+    const rows = getRows(grid, false);
+
+    const msg = await send({ embeds: [embed], components: rows });
 
     playGame(message, msg).catch((e: string) => {
         logger.error(`error occured playing minesweeper - ${message.author.tag} (${message.author.id})`);
-        logger.error(e);
+        console.error(e);
         return send({
             embeds: [new ErrorEmbed("an error occured while running - join support server")],
         });
@@ -213,130 +217,47 @@ cmd.setRun(run);
 
 module.exports = cmd;
 
-function getFront(grid: string[]) {
-    const gridFront = [];
+function getRows(grid: string[], end: boolean) {
+    const rows: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [];
 
     for (const item of grid) {
+        let current = rows[rows.length - 1];
+
+        if (!current || current.components.length >= 5) {
+            current = new ActionRowBuilder<MessageActionRowComponentBuilder>();
+            rows.push(current);
+        }
+
+        const coordinate = `${possibleLetters[current.components.length]}${rows.indexOf(current) + 1}`;
+
+        if (coordinate === "e5") break;
+
+        const button = new ButtonBuilder().setCustomId(coordinate).setLabel("\u200b");
+
         switch (item) {
             case "a":
-                gridFront.push(":white_large_square:");
-                break;
             case "b":
-                gridFront.push(":white_large_square:");
+                button.setStyle(ButtonStyle.Danger);
+                if (end) button.setDisabled(true);
+                current.addComponents(button);
                 break;
             case "c":
-                gridFront.push(":blue_square:");
+                button.setStyle(ButtonStyle.Success).setDisabled(true);
+                current.addComponents(button);
                 break;
             case "x":
-                gridFront.push(":red_square:");
+                button.setStyle(ButtonStyle.Success).setDisabled(true);
                 break;
         }
     }
 
-    return gridFront;
-}
+    const button = new ButtonBuilder().setCustomId("finish").setLabel("finish").setStyle(ButtonStyle.Success);
 
-function getExposedFront(grid: string[]) {
-    const gridFront = [];
+    if (end) button.setDisabled(true);
 
-    for (const item of grid) {
-        switch (item) {
-            case "a":
-                gridFront.push(":white_large_square:");
-                break;
-            case "b":
-                gridFront.push(":red_square:");
-                break;
-            case "c":
-                gridFront.push(":blue_square:");
-                break;
-            case "x":
-                gridFront.push(":red_square:");
-                break;
-        }
-    }
+    rows[4].addComponents(button);
 
-    return gridFront;
-}
-
-function toTable(grid: string[]) {
-    let table =
-        ":black_large_square::regional_indicator_a::regional_indicator_b::regional_indicator_c::regional_indicator_d::regional_indicator_e:\n:one:";
-    let count = 0;
-    let globalCount = 1;
-
-    grid = getFront(grid);
-
-    for (const item of grid) {
-        if (count == 5) {
-            count = 0;
-
-            let emoji;
-
-            switch (globalCount) {
-                case 1:
-                    emoji = ":two:";
-                    break;
-                case 2:
-                    emoji = ":three:";
-                    break;
-                case 3:
-                    emoji = ":four:";
-                    break;
-                case 4:
-                    emoji = ":five:";
-                    break;
-            }
-            globalCount++;
-
-            table = table + "\n" + emoji + item;
-        } else {
-            table = table + item;
-        }
-        count++;
-    }
-
-    return table;
-}
-
-function toExposedTable(grid: string[]) {
-    let table =
-        ":black_large_square::regional_indicator_a::regional_indicator_b::regional_indicator_c::regional_indicator_d::regional_indicator_e:\n:one:";
-    let count = 0;
-    let globalCount = 1;
-
-    grid = getExposedFront(grid);
-
-    for (const item of grid) {
-        if (count == 5) {
-            count = 0;
-
-            let emoji;
-
-            switch (globalCount) {
-                case 1:
-                    emoji = ":two:";
-                    break;
-                case 2:
-                    emoji = ":three:";
-                    break;
-                case 3:
-                    emoji = ":four:";
-                    break;
-                case 4:
-                    emoji = ":five:";
-                    break;
-            }
-            globalCount++;
-
-            table = table + "\n" + emoji + item;
-        } else {
-            table = table + item;
-        }
-        count++;
-    }
-
-    return table;
+    return rows;
 }
 
 function toLocation(coordinate: string) {
@@ -364,8 +285,6 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
     let win = games.get(message.author.id).win;
     const grid = games.get(message.author.id).grid;
 
-    let table: string;
-
     const embed = new CustomEmbed(message.member).setHeader("minesweeper", message.author.avatarURL());
 
     const edit = async (data: MessageEditOptions) => {
@@ -390,9 +309,8 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
                 Math.round(bet * win).toLocaleString() +
                 ")\n\n**you lose!!**"
         );
-        embed.addField("your grid", table);
         games.delete(message.author.id);
-        return await edit({ embeds: [embed] });
+        return await edit({ embeds: [embed], components: getRows(grid, true) });
     };
 
     const win1 = async () => {
@@ -449,10 +367,9 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
         gamble(message.author, "minesweeper", bet, true, winnings);
         await addGamble(message.member, "minesweeper", true);
 
-        embed.addField("your grid", table);
         await updateBalance(message.member, (await getBalance(message.member)) + winnings);
         games.delete(message.author.id);
-        return await edit({ embeds: [embed] });
+        return await edit({ embeds: [embed], components: getRows(grid, true) });
     };
 
     const draw = async () => {
@@ -470,10 +387,9 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
                 "\n\n**draw!!**\nyou win $" +
                 bet.toLocaleString()
         );
-        embed.addField("your grid", table);
         await updateBalance(message.member, (await getBalance(message.member)) + bet);
         games.delete(message.author.id);
-        return await edit({ embeds: [embed] });
+        return await edit({ embeds: [embed], components: getRows(grid, true) });
     };
 
     if (win == 15) {
@@ -481,14 +397,14 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
         return;
     }
 
-    const filter = (m: Message) => m.author.id == message.author.id;
+    const filter = (i: Interaction) => i.user.id == message.author.id;
     let fail = false;
 
-    const response = await message.channel
-        .awaitMessages({ filter, max: 1, time: 30000, errors: ["time"] })
+    const response = await msg
+        .awaitMessageComponent({ filter, time: 60000 })
         .then(async (collected) => {
-            await collected.first().delete();
-            return collected.first().content.toLowerCase();
+            await collected.deferUpdate();
+            return collected.customId;
         })
         .catch(() => {
             fail = true;
@@ -506,7 +422,6 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
     }
 
     if (response == "finish") {
-        table = toExposedTable(grid);
         if (win < 1) {
             lose();
             return;
@@ -551,7 +466,6 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
     switch (grid[location]) {
         case "b":
             grid[location] = "x";
-            table = toExposedTable(grid);
             lose();
             return;
         case "c":
@@ -573,15 +487,11 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
                 voted: games.get(message.author.id).voted,
             });
 
-            table = toTable(grid);
-
             embed.setDescription(
                 "**bet** $" + bet.toLocaleString() + "\n**" + win + "**x ($" + Math.round(bet * win).toLocaleString() + ")"
             );
-            embed.addField("your grid", table);
-            embed.addField("help", "type `finish` to stop playing");
 
-            edit({ embeds: [embed] });
+            edit({ embeds: [embed], components: getRows(grid, false) });
 
             return playGame(message, msg);
     }
