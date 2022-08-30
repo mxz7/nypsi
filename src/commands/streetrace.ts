@@ -383,7 +383,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         for (const u of race.users.keys()) {
             const user = race.users.get(u);
 
-            description += `\n\`${user.user.username}\` ${user.car.emoji}\\_\\_\\_\\_\\_\\_\\_\\_\\_ 🏁`;
+            description += `\n${user.car.emoji}\\_\\_\\_\\_\\_\\_\\_\\_\\_ 🏁 \`${user.user.username}\``;
         }
 
         const speedLimit = race.speedLimit;
@@ -484,7 +484,7 @@ async function startRace(id: string) {
     for (const u of race.users.keys()) {
         const user = race.users.get(u);
 
-        description += `\n\`${user.user.username}\` ${getRacePosition(user.car.emoji, user.position)} 🏁`;
+        description += `\n${getRacePosition(user.car.emoji, user.position)} 🏁 \`${user.user.username}\``;
     }
 
     embed.setDescription(description);
