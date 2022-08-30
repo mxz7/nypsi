@@ -236,9 +236,12 @@ function getRows(grid: string[], end: boolean) {
 
         switch (item) {
             case "a":
-            case "b":
                 button.setStyle(ButtonStyle.Secondary);
                 if (end) button.setDisabled(true);
+                current.addComponents(button);
+                break;
+            case "b":
+                if (end) button.setStyle(ButtonStyle.Danger).setDisabled(true);
                 current.addComponents(button);
                 break;
             case "c":
