@@ -739,7 +739,7 @@
         "id": "multi_potion",
         "name": "multiplier potion",
         "emoji": "<:nypsi_potion:1001463080582131843>",
-        "description": "increase your multipler by 3%",
+        "description": "increase your multiplier by 3%",
         "rarity": 1,
         "buy": 0,
         "sell": 100000,
