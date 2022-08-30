@@ -249,6 +249,20 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return message.channel.send({ embeds: [new ErrorEmbed("this is too much")] });
         }
 
+        const shopCost = (items[selected.id].buy || 0) * amount;
+
+        if (shopCost != 0 && cost > shopCost) {
+            return message.channel.send({
+                embeds: [
+                    new ErrorEmbed(
+                        `you can buy ${amount}x ${selected.emoji} ${
+                            selected.name
+                        } from nypsi's shop for $${shopCost.toLocaleString()}`
+                    ),
+                ],
+            });
+        }
+
         inventory = await getInventory(message.member);
 
         if (!inventory[selected.id] || inventory[selected.id] < amount) {
