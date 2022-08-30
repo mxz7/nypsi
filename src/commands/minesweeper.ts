@@ -424,8 +424,6 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
         return playGame(message, msg);
     }
 
-    console.log(response);
-
     if (response == "finish") {
         if (win < 1) {
             lose();
