@@ -127,7 +127,7 @@ const cmd = new Command("slots", "play slots", Categories.MONEY).setAliases(["be
 
 cmd.slashEnabled = true;
 
-cmd.slashData.addIntegerOption((option) =>
+cmd.slashData.addStringOption((option) =>
     option.setName("bet").setDescription("how much would you like to bet").setRequired(true)
 );
 
