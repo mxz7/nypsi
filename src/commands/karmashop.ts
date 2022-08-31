@@ -4,8 +4,10 @@ import {
     ButtonStyle,
     CommandInteraction,
     Interaction,
+    InteractionReplyOptions,
     Message,
     MessageActionRowComponentBuilder,
+    MessageOptions,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
@@ -14,15 +16,28 @@ import { closeKarmaShop, getKarma, isKarmaShopOpen, openKarmaShop, removeKarma }
 import { NypsiClient } from "../utils/models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
-import { KarmaShopItem } from "../utils/models/Karmashop";
 import { getTier, isPremium, setExpireDate } from "../utils/premium/utils";
 import dayjs = require("dayjs");
 
 const cmd = new Command("karmashop", "buy stuff with your karma", Categories.INFO).setAliases(["ks"]);
 
-declare function require(name: string): any;
+cmd.slashEnabled = true;
+cmd.slashData
+    .addSubcommand((view) => view.setName("view").setDescription("view the karma shop"))
+    .addSubcommand((buy) =>
+        buy
+            .setName("buy")
+            .setDescription("buy something from the karma shop")
+            .addStringOption((option) =>
+                option
+                    .setName("item-karmashop")
+                    .setDescription("item you want to buy from the karma shop")
+                    .setRequired(true)
+                    .setAutocomplete(true)
+            )
+    );
 
-const items: { [key: string]: KarmaShopItem } = require("../../data/karmashop.json");
+declare function require(name: string): any;
 
 const amount = new Map<string, number>();
 
@@ -36,10 +51,26 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
+    const send = async (data: MessageOptions) => {
+        if (!(message instanceof Message)) {
+            if (message.deferred) {
+                await message.editReply(data);
+            } else {
+                await message.reply(data as InteractionReplyOptions);
+            }
+            const replyMsg = await message.fetchReply();
+            if (replyMsg instanceof Message) {
+                return replyMsg;
+            }
+        } else {
+            return await message.channel.send(data);
+        }
+    };
+
     if (await onCooldown(cmd.name, message.member)) {
         const embed = await getResponse(cmd.name, message.member);
 
-        return message.channel.send({ embeds: [embed] });
+        return send({ embeds: [embed] });
     }
 
     if (!isKarmaShopOpen() && message.guild.id == "747056029795221513") {
@@ -49,11 +80,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             "the karma shop is currently **closed**\nkeep notifications enabled to see when the karma shop is opened!"
         );
 
-        return message.channel.send({ embeds: [embed] });
+        return send({ embeds: [embed] });
     }
 
     if (message.guild.id != "747056029795221513") {
-        return message.channel.send({
+        return send({
             content: "discord.gg/hJTDNST",
             embeds: [
                 new CustomEmbed(message.member, "the karma shop can **only be** accessed in the official nypsi server"),
@@ -130,9 +161,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         let msg: Message;
 
         if (pages.length == 1) {
-            return await message.channel.send({ embeds: [embed] });
+            return await send({ embeds: [embed] });
         } else {
-            msg = await message.channel.send({ embeds: [embed], components: [row] });
+            msg = await send({ embeds: [embed], components: [row] });
         }
 
         if (pages.length > 1) {
@@ -265,7 +296,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         const amountBought = amount.get(message.author.id);
 
         if (amountBought >= limit) {
-            return message.channel.send({
+            return send({
                 embeds: [
                     new CustomEmbed(
                         message.member,
@@ -292,15 +323,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         selected = items[selected];
 
         if (!selected) {
-            return message.channel.send({ embeds: [new ErrorEmbed(`couldnt find \`${args[1]}\``)] });
+            return send({ embeds: [new ErrorEmbed(`couldnt find \`${args[1]}\``)] });
         }
 
         if (selected.items_left <= 0) {
-            return message.channel.send({ embeds: [new ErrorEmbed("there is none of this item left in the shop")] });
+            return send({ embeds: [new ErrorEmbed("there is none of this item left in the shop")] });
         }
 
         if ((await getKarma(message.member)) < selected.cost) {
-            return message.channel.send({ embeds: [new ErrorEmbed("you cannot afford this")] });
+            return send({ embeds: [new ErrorEmbed("you cannot afford this")] });
         }
 
         await addCooldown(cmd.name, message.member, 10);
@@ -308,10 +339,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         switch (selected.id) {
             case "bronze":
                 if ((await isPremium(message.member)) && (await getTier(message.member)) >= 1) {
-                    return message.channel.send({ embeds: [new ErrorEmbed("you already have this membership or better")] });
+                    return send({ embeds: [new ErrorEmbed("you already have this membership or better")] });
                 } else {
                     if (message.guild.id != "747056029795221513") {
-                        return message.channel.send({
+                        return send({
                             embeds: [
                                 new ErrorEmbed(
                                     "you must be in the offical nypsi server to buy premium (discord.gg/hJTDNST)"
@@ -325,10 +356,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 break;
             case "silver":
                 if ((await isPremium(message.member)) && (await getTier(message.member)) >= 2) {
-                    return message.channel.send({ embeds: [new ErrorEmbed("you already have this membership or better")] });
+                    return send({ embeds: [new ErrorEmbed("you already have this membership or better")] });
                 } else {
                     if (message.guild.id != "747056029795221513") {
-                        return message.channel.send({
+                        return send({
                             embeds: [
                                 new ErrorEmbed(
                                     "you must be in the offical nypsi server to buy premium (discord.gg/hJTDNST)"
@@ -342,10 +373,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 break;
             case "gold":
                 if ((await isPremium(message.member)) && (await getTier(message.member)) >= 3) {
-                    return message.channel.send({ embeds: [new ErrorEmbed("you already have this membership or better")] });
+                    return send({ embeds: [new ErrorEmbed("you already have this membership or better")] });
                 } else {
                     if (message.guild.id != "747056029795221513") {
-                        return message.channel.send({
+                        return send({
                             embeds: [
                                 new ErrorEmbed(
                                     "you must be in the offical nypsi server to buy premium (discord.gg/hJTDNST)"
@@ -393,7 +424,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             items[selected.id].items_left -= 1;
         }
 
-        return message.channel.send({
+        return send({
             embeds: [
                 new CustomEmbed(
                     message.member,
