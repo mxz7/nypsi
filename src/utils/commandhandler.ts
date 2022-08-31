@@ -216,9 +216,7 @@ async function helpCmd(message: Message, args: string[]) {
             categoriesMsg += `» ${prefix}help **${category}**\n`;
         }
 
-        const news = getNews();
-
-        const lastSet = formatDate(news.date);
+        const news = await getNews();
 
         embed.setTitle("help menu");
         embed.setDescription(
@@ -230,7 +228,7 @@ async function helpCmd(message: Message, args: string[]) {
         embed.setThumbnail(message.client.user.displayAvatarURL({ size: 128 }));
 
         if (news.text != "") {
-            embed.addField("news", `${news.text} - *${lastSet}*`);
+            embed.addField("news", `${news.text} - *${formatDate(news.date)}*`);
         }
     } else {
         if (args[0].toLowerCase() == "mod") args[0] = "moderation";
