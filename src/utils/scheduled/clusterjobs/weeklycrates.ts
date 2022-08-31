@@ -44,7 +44,7 @@ async function doCrates(client: NypsiClient) {
                 memberId: member.userId,
                 content: "enjoy your weekly crate (:",
                 embed: embed,
-            }).catch(() => {});
+            }).catch();
         } else if (member.level == 3) {
             if (inventory["basic_crate"]) {
                 inventory["basic_crate"] += 2;
@@ -61,7 +61,7 @@ async function doCrates(client: NypsiClient) {
                 memberId: member.userId,
                 content: "enjoy your weekly crates (:",
                 embed: embed,
-            }).catch(() => {});
+            }).catch();
         } else if (member.level == 4) {
             if (inventory["basic_crate"]) {
                 inventory["basic_crate"] += 2;
@@ -84,7 +84,7 @@ async function doCrates(client: NypsiClient) {
                 memberId: member.userId,
                 content: "enjoy your weekly crates (:",
                 embed: embed,
-            }).catch(() => {});
+            }).catch();
         }
 
         await setInventory(member.userId, inventory);

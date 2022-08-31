@@ -1,7 +1,7 @@
 import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions, PermissionFlagsBits } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 
 const cmd = new Command("purge", "bulk delete/purge messages", Categories.MODERATION)
     .setAliases(["del"])
@@ -175,7 +175,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }
         }
         if (!(message instanceof Message)) {
-            message.editReply({ embeds: [new CustomEmbed(message.member, "operation complete (:")] }).catch(() => {});
+            message.editReply({ embeds: [new CustomEmbed(message.member, "operation complete (:")] }).catch();
         }
         return m.delete().catch();
     }

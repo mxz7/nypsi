@@ -47,7 +47,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const pages = new Map<number, string[]>();
 
     for (const m of muted) {
-        const user: GuildMember | void = await message.guild.members.fetch(m.userId).catch(() => {});
+        const user: GuildMember | void = await message.guild.members.fetch(m.userId).catch();
 
         const msg = `\`${user ? user.user.tag : m.userId}\` ${
             m.expire.getTime() >= 3130000000000
@@ -103,7 +103,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 return collected.customId;
             })
             .catch(async () => {
-                await msg.edit({ components: [] }).catch(() => {});
+                await msg.edit({ components: [] }).catch();
             });
 
         if (!reaction) return;
