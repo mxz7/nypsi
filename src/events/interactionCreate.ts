@@ -12,6 +12,7 @@ import { runCommand } from "../utils/commandhandler";
 import prisma from "../utils/database/database";
 import { getBalance, getInventory, getItems, setInventory, updateBalance, userExists } from "../utils/economy/utils";
 import requestDM from "../utils/functions/requestdm";
+import { getKarmaShopItems, isKarmaShopOpen } from "../utils/karma/utils";
 import { logger } from "../utils/logger";
 import { NypsiClient } from "../utils/models/Client";
 import { createNypsiInteraction, NypsiCommandInteraction } from "../utils/models/Command";
@@ -82,6 +83,28 @@ export default async function interactionCreate(interaction: Interaction) {
             );
 
             options.push("cycle");
+
+            if (options.length > 25) options = options.splice(0, 24);
+
+            if (options.length == 0) return;
+
+            const formatted = options.map((i) => ({
+                name: `${items[i].emoji.startsWith("<:") ? "" : `${items[i].emoji} `}${items[i].name}`,
+                value: i,
+            }));
+
+            return await interaction.respond(formatted);
+        } else if (focused.name == "item-karmashop") {
+            if (interaction.guild.id != "747056029795221513") return;
+            if (!isKarmaShopOpen()) return;
+
+            const items = getKarmaShopItems();
+
+            let options = Object.keys(items).filter(
+                (item) =>
+                    (item.startsWith(focused.value) || items[item].name.startsWith(focused.value)) &&
+                    items[item].items_left > 0
+            );
 
             if (options.length > 25) options = options.splice(0, 24);
 
