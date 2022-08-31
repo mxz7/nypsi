@@ -18,6 +18,28 @@ import { createNypsiInteraction, NypsiCommandInteraction } from "../utils/models
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
 export default async function interactionCreate(interaction: Interaction) {
+    if (interaction.type == InteractionType.ApplicationCommandAutocomplete) {
+        const focused = interaction.options.getFocused(true);
+
+        if (focused.name == "item") {
+            const inventory = await getInventory(interaction.user.id);
+
+            if (!inventory) return;
+
+            const options = Object.keys(inventory).filter((item) => item.startsWith(focused.value));
+
+            const items = getItems();
+
+            let formatted = options.map((i) => ({ name: `${items[i].emoji} ${items[i].name}`, value: i }));
+
+            if (formatted.length > 25) formatted = formatted.splice(0, 24);
+
+            if (formatted.length == 0) return;
+
+            await interaction.respond(formatted);
+        }
+    }
+
     if (interaction.type == InteractionType.MessageComponent && interaction.customId == "b") {
         const auction = await prisma.auction.findUnique({
             where: {
