@@ -1,21 +1,27 @@
-import { CommandInteraction, Message } from "discord.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 import {
-    getPrestige,
-    getWorkers,
-    getBalance,
+    APIApplicationCommandOptionChoice,
+    CommandInteraction,
+    InteractionReplyOptions,
+    Message,
+    MessageOptions,
+} from "discord.js";
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import {
     addWorker,
-    updateBalance,
-    userExists,
     createUser,
     emptyWorkersStored,
+    getBalance,
+    getPrestige,
+    getWorkers,
+    updateBalance,
     upgradeWorker,
+    userExists,
 } from "../utils/economy/utils";
 import { getAllWorkers, Worker } from "../utils/economy/workers";
 import { getPrefix } from "../utils/guilds/utils";
-import { isPremium, getTier } from "../utils/premium/utils";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
+import { getTier, isPremium } from "../utils/premium/utils";
 
 const cmd = new Command("workers", "view the available workers and manage your own", Categories.MONEY).setAliases([
     "worker",
@@ -25,15 +31,71 @@ const cmd = new Command("workers", "view the available workers and manage your o
     "slaves",
 ]);
 
+const workerChoices: APIApplicationCommandOptionChoice<string>[] = [
+    { name: "potato farmer", value: "0" },
+    { name: "fisherman", value: "1" },
+    { name: "miner", value: "2" },
+    { name: "lumberjack", value: "3" },
+    { name: "butcher", value: "4" },
+    { name: "tailor", value: "5" },
+    { name: "spacex", value: "6" },
+];
+
+cmd.slashEnabled = true;
+cmd.slashData
+    .addSubcommand((view) => view.setName("view").setDescription("view your workers"))
+    .addSubcommand((buy) =>
+        buy
+            .setName("buy")
+            .setDescription("buy a worker")
+            .addStringOption((option) =>
+                option
+                    .setName("worker")
+                    .setDescription("worker you want to buy")
+                    .setChoices(...workerChoices)
+                    .setRequired(true)
+            )
+    )
+    .addSubcommand((claim) => claim.setName("claim").setDescription("claim earned money from your workers"))
+    .addSubcommand((upgrade) =>
+        upgrade
+            .setName("upgrade")
+            .setDescription("upgrade a worker")
+            .addStringOption((option) =>
+                option
+                    .setName("worker")
+                    .setDescription("worker you want to upgrade")
+                    .setChoices(...workerChoices)
+                    .setRequired(true)
+            )
+    )
+    .addSubcommand((reclaim) => reclaim.setName("reclaim").setDescription("obtain workers from your premium subscription"));
+
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     const workers = getAllWorkers();
 
     if (!(await userExists(message.member))) await createUser(message.member);
 
+    const send = async (data: MessageOptions) => {
+        if (!(message instanceof Message)) {
+            if (message.deferred) {
+                await message.editReply(data);
+            } else {
+                await message.reply(data as InteractionReplyOptions);
+            }
+            const replyMsg = await message.fetchReply();
+            if (replyMsg instanceof Message) {
+                return replyMsg;
+            }
+        } else {
+            return await message.channel.send(data);
+        }
+    };
+
     if (await onCooldown(cmd.name, message.member)) {
         const embed = await getResponse(cmd.name, message.member);
 
-        return message.channel.send({ embeds: [embed] });
+        return send({ embeds: [embed] });
     }
 
     await addCooldown(cmd.name, message.member, 5);
@@ -59,7 +121,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             );
         }
 
-        return message.channel.send({ embeds: [embed] });
+        return send({ embeds: [embed] });
     };
 
     const listPersonalWorkers = async () => {
@@ -88,7 +150,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             );
         }
 
-        return message.channel.send({ embeds: [embed] });
+        return send({ embeds: [embed] });
     };
 
     if (args.length == 0) {
@@ -100,7 +162,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     } else {
         if (args[0].toLowerCase() == "buy") {
             if (args.length == 1) {
-                return message.channel.send({
+                return send({
                     embeds: [new ErrorEmbed(`${prefix}workers buy <worker name>`)],
                 });
             }
@@ -133,19 +195,19 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }
 
             if (!worker) {
-                return message.channel.send({
+                return send({
                     embeds: [new ErrorEmbed("invalid worker, please use the worker name")],
                 });
             }
 
             if (!(worker instanceof Worker)) {
-                return message.channel.send({
+                return send({
                     embeds: [new ErrorEmbed("invalid worker, please use the worker name")],
                 });
             }
 
             if (worker.prestige > (await getPrestige(message.member))) {
-                return message.channel.send({
+                return send({
                     embeds: [
                         new ErrorEmbed(
                             `you need to be prestige **${
@@ -157,7 +219,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }
 
             if ((await getBalance(message.member)) < worker.cost) {
-                return message.channel.send({ embeds: [new ErrorEmbed("you cannot afford this worker")] });
+                return send({ embeds: [new ErrorEmbed("you cannot afford this worker")] });
             }
 
             const personalWorkers = await getWorkers(message.member);
@@ -166,7 +228,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 const worker1 = personalWorkers[w];
 
                 if (worker1.id == worker.id) {
-                    return message.channel.send({ embeds: [new ErrorEmbed("you already have this worker")] });
+                    return send({ embeds: [new ErrorEmbed("you already have this worker")] });
                 }
             }
 
@@ -174,7 +236,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             await addWorker(message.member, worker.id);
 
-            return message.channel.send({
+            return send({
                 embeds: [new CustomEmbed(message.member, `✅ you have bought a **${worker.name}**`)],
             });
         } else if (args[0].toLowerCase() == "claim" || args[0].toLowerCase() == "sell") {
@@ -193,7 +255,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }
 
             if (amountEarned == 0) {
-                return message.channel.send({
+                return send({
                     embeds: [new ErrorEmbed("you have no money to claim from your workers")],
                 });
             }
@@ -206,10 +268,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 `+$**${amountEarned.toLocaleString()}**\n${earnedBreakdown}`
             ).setHeader("workers", message.author.avatarURL());
 
-            return message.channel.send({ embeds: [embed] });
+            return send({ embeds: [embed] });
         } else if (args[0].toLowerCase() == "upgrade") {
             if (args.length == 1) {
-                return message.channel.send({
+                return send({
                     embeds: [new ErrorEmbed(`${prefix}workers upgrade <name>`)],
                 });
             }
@@ -242,7 +304,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }
 
             if (!worker) {
-                return message.channel.send({
+                return send({
                     embeds: [new ErrorEmbed("invalid worker, please use the worker name")],
                 });
             }
@@ -250,7 +312,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             const memberWorkers = await getWorkers(message.member);
 
             if (!(worker instanceof Worker)) {
-                return message.channel.send({
+                return send({
                     embeds: [new ErrorEmbed("invalid worker, please use the worker name")],
                 });
             }
@@ -258,17 +320,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             worker = memberWorkers[worker.id];
 
             if (!worker) {
-                return message.channel.send({ embeds: [new ErrorEmbed("you don't have this worker")] });
+                return send({ embeds: [new ErrorEmbed("you don't have this worker")] });
             }
 
             worker = Worker.fromStorage(worker);
 
             if (worker.level >= 5) {
-                return message.channel.send({ embeds: [new ErrorEmbed("this worker is already max level")] });
+                return send({ embeds: [new ErrorEmbed("this worker is already max level")] });
             }
 
             if ((await getBalance(message.member)) < worker.getUpgradeCost()) {
-                return message.channel.send({
+                return send({
                     embeds: [
                         new ErrorEmbed(
                             `the upgrade cost for \`${worker.name}\` is $${worker
@@ -300,7 +362,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     } / ${worker.maxStorage.toLocaleString()}`
             );
 
-            return message.channel.send({ embeds: [embed] });
+            return send({ embeds: [embed] });
         } else if (args[0].toLowerCase() == "list") {
             return listAllWorkers();
         } else if (
@@ -309,7 +371,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             args[0].toLowerCase() == "premium"
         ) {
             if (!(await isPremium(message.author.id))) {
-                return message.channel.send({
+                return send({
                     embeds: [
                         new ErrorEmbed("you must have a premium membership for this").setFooter({
                             text: `${prefix}patreon`,
@@ -380,7 +442,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 msg = "you weren't able to claim any free workers";
             }
 
-            return message.channel.send({ embeds: [new CustomEmbed(message.member, msg)] });
+            return send({ embeds: [new CustomEmbed(message.member, msg)] });
+        } else if (args[0].toLowerCase() == "view") {
+            if (Object.keys(await getWorkers(message.member)).length == 0) {
+                return listAllWorkers();
+            } else {
+                return listPersonalWorkers();
+            }
         } else {
             const embed = new CustomEmbed(message.member).setHeader("workers", message.author.avatarURL());
 
@@ -391,7 +459,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     `${prefix}**workers upgrade** *upgrade a worker*`
             );
 
-            return message.channel.send({ embeds: [embed] });
+            return send({ embeds: [embed] });
         }
     }
 }
