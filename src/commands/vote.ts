@@ -1,4 +1,4 @@
-import { CommandInteraction, Message } from "discord.js";
+import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
 import { createUser, getMulti, getPrestige, hasVoted, userExists } from "../utils/economy/utils.js";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed } from "../utils/models/EmbedBuilders.js";
@@ -9,8 +9,26 @@ const cmd = new Command(
     Categories.MONEY
 );
 
+cmd.slashEnabled = true;
+
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (!(await userExists(message.member))) await createUser(message.member);
+
+    const send = async (data: MessageOptions) => {
+        if (!(message instanceof Message)) {
+            if (message.deferred) {
+                await message.editReply(data);
+            } else {
+                await message.reply(data as InteractionReplyOptions);
+            }
+            const replyMsg = await message.fetchReply();
+            if (replyMsg instanceof Message) {
+                return replyMsg;
+            }
+        } else {
+            return await message.channel.send(data);
+        }
+    };
 
     let prestige = await getPrestige(message.author.id);
 
@@ -43,7 +61,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embed.setFooter({ text: "you get increased rewards for prestiging" });
     }
 
-    message.channel.send({ embeds: [embed] });
+    send({ embeds: [embed] });
 }
 
 cmd.setRun(run);
