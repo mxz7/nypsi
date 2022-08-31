@@ -1,7 +1,7 @@
-import { isPremium, getTier } from "../utils/premium/utils";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { Collection, CommandInteraction, Message } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { getTier, isPremium } from "../utils/premium/utils";
 
 const cmd = new Command("delp", "bulk delete/purge your own messages", Categories.MODERATION).setAliases(["dp", "d"]);
 
@@ -57,7 +57,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (message.channel.isDMBased()) return;
 
-    await message.channel.bulkDelete(collected).catch(() => {});
+    await message.channel.bulkDelete(collected).catch();
 }
 
 cmd.setRun(run);

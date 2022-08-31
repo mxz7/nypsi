@@ -391,7 +391,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 embed.addField("reason", `\`${reason}\``, true);
             }
 
-            await mem.send({ content: `you have been muted in ${message.guild.name}`, embeds: [embed] }).catch(() => {});
+            await mem.send({ content: `you have been muted in ${message.guild.name}`, embeds: [embed] }).catch();
         } else {
             const embed = new CustomEmbed(mem)
                 .setTitle(`muted in ${message.guild.name}`)
@@ -403,7 +403,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 embed.addField("reason", `\`${reason}\``, true);
             }
 
-            await mem.send({ content: `you have been muted in ${message.guild.name}`, embeds: [embed] }).catch(() => {});
+            await mem.send({ content: `you have been muted in ${message.guild.name}`, embeds: [embed] }).catch();
         }
     }
 }
