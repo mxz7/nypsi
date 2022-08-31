@@ -1,5 +1,5 @@
 import dayjs = require("dayjs");
-import { CommandInteraction, Message } from "discord.js";
+import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import {
     createUser,
@@ -19,11 +19,29 @@ import { getTier, isPremium } from "../utils/premium/utils";
 
 const cmd = new Command("daily", "get your daily bonus", Categories.MONEY);
 
+cmd.slashEnabled = true;
+
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
+    const send = async (data: MessageOptions) => {
+        if (!(message instanceof Message)) {
+            if (message.deferred) {
+                await message.editReply(data);
+            } else {
+                await message.reply(data as InteractionReplyOptions);
+            }
+            const replyMsg = await message.fetchReply();
+            if (replyMsg instanceof Message) {
+                return replyMsg;
+            }
+        } else {
+            return await message.channel.send(data);
+        }
+    };
+
     if (await onCooldown(cmd.name, message.member)) {
         const embed = await getResponse(cmd.name, message.member);
 
-        return message.channel.send({ embeds: [embed] });
+        return send({ embeds: [embed] });
     }
 
     await addCooldown(cmd.name, message.member, 30);
@@ -34,7 +52,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (!dayjs(lastDaily.getTime()).isBefore(dayjs(), "day")) {
         const diff = dayjs().add(1, "day").startOf("day").unix() * 1000 - dayjs().unix() * 1000;
-        return message.channel.send({
+        return send({
             embeds: [new ErrorEmbed(`your next daily bonus is available in **${MStoTime(diff)}**`).removeTitle()],
         });
     }
@@ -84,7 +102,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embed.setFooter({ text: `+${xp}xp` });
     }
 
-    return message.channel.send({ embeds: [embed] });
+    return send({ embeds: [embed] });
 }
 
 cmd.setRun(run);

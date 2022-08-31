@@ -40,7 +40,9 @@ const games = new Map<string, { bet: number; win: number; deck: string[]; card: 
 const cmd = new Command("highlow", "higher or lower game", Categories.MONEY).setAliases(["hl"]);
 
 cmd.slashEnabled = true;
-cmd.slashData.addIntegerOption((option) => option.setName("bet").setDescription("amount to bet").setRequired(true));
+cmd.slashData.addStringOption((option) =>
+    option.setName("bet").setDescription("how much would you like to bet").setRequired(true)
+);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!(await userExists(message.member))) await createUser(message.member);
