@@ -626,13 +626,15 @@ export async function runCommand(
         }
     }
 
-    if (cooldown.has(message.author.id)) return;
+    if (message instanceof Message) {
+        if (cooldown.has(message.author.id)) return;
 
-    cooldown.add(message.author.id);
+        cooldown.add(message.author.id);
 
-    setTimeout(() => {
-        cooldown.delete(message.author.id);
-    }, 500);
+        setTimeout(() => {
+            cooldown.delete(message.author.id);
+        }, 500);
+    }
 
     // captcha check
 
