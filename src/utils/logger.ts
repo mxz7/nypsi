@@ -43,7 +43,7 @@ const format = winston.format.printf(({ level, message, timestamp }) => {
             break;
     }
 
-    return `[${chalk.blackBright(timestamp)}] [${
+    return `[${chalk.blackBright.italic(timestamp)}] [${
         typeof clusterId != "undefined" ? `${chalk.blackBright(clusterId)}` : ""
     }] ${prefix} ${color(message)}`;
 });
