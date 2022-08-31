@@ -84,7 +84,7 @@ cmd.slashData
                 { name: "🟢 green", value: "green" }
             )
     )
-    .addIntegerOption((option) => option.setName("bet").setDescription("how much would you like to bet").setRequired(true));
+    .addStringOption((option) => option.setName("bet").setDescription("how much would you like to bet").setRequired(true));
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     const send = async (data: MessageOptions) => {
