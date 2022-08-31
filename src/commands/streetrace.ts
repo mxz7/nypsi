@@ -33,22 +33,7 @@ cmd.slashData
             .setName("join")
             .setDescription("join an existing race in the channel (you will need a car, or you can use the bicycle)")
             .addStringOption((option) =>
-                option
-                    .setName("car")
-                    .setDescription("what car would you like to use")
-                    .setChoices(
-                        { name: "🚗 fiat", value: "fiat" },
-                        { name: "🚗 ford fiesta", value: "ford_fiesta" },
-                        { name: "🚗 mitsubishi lancer evo x", value: "lancer_evox" },
-                        { name: "🚗 lightning mcqueen", value: "lightning_mcqueen" },
-                        { name: "🏎️ nissan skyline gtr r34", value: "skyline_r34" },
-                        { name: "🚗 smart car", value: "smart_car" },
-                        { name: "🚗 subuwu", value: "subaru_wrx" },
-                        { name: "🚗 tesla model x", value: "tesla_modelx" },
-                        { name: "🏎️ toyota supra mk4", value: "toyota_supra" },
-                        { name: "🚗 corsa 2003", value: "vauxhall_corsa" },
-                        { name: "🚲 bicycle", value: "bike" }
-                    )
+                option.setName("car").setDescription("what car would you like to use").setAutocomplete(true)
             )
     );
 
@@ -93,7 +78,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (await onCooldown(cmd.name, message.member)) {
             const embed = await getResponse(cmd.name, message.member);
 
-            return message.channel.send({ embeds: [embed] });
+            return send({ embeds: [embed] });
         }
 
         if (args.length == 1) {
@@ -111,11 +96,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         const bet = await formatBet(args[1], message.member);
 
         if (!bet) {
-            return message.channel.send({ embeds: [new ErrorEmbed("invalid bet")] });
+            return send({ embeds: [new ErrorEmbed("invalid bet")] });
         }
 
         if (isNaN(bet)) {
-            return message.channel.send({ embeds: [new ErrorEmbed("invalid bet")] });
+            return send({ embeds: [new ErrorEmbed("invalid bet")] });
         }
 
         if (bet <= 0) {
@@ -150,12 +135,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         if (message.channel.isThread()) {
-            return message.channel.send({ embeds: [new ErrorEmbed("invalid channel")] });
+            return send({ embeds: [new ErrorEmbed("invalid channel")] });
         }
 
         if (message.channel.isDMBased()) return;
 
-        if (message.channel.isVoiceBased()) return message.channel.send({ embeds: [new ErrorEmbed("invalid channel")] });
+        if (message.channel.isVoiceBased()) return send({ embeds: [new ErrorEmbed("invalid channel")] });
 
         if (message.channel.type != ChannelType.GuildText) return;
 
@@ -174,7 +159,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             `no racers\n\nentry fee: $${bet.toLocaleString()}${speedLimit != 0 ? `\nspeed limit: ${speedLimit}` : ""}`
         );
 
-        const msg = await message.channel.send({ embeds: [embed] });
+        let msg = await send({ embeds: [embed] });
 
         const usersMap = new Map<string, RaceUserDetails>();
 
@@ -208,9 +193,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 races.delete(message.channel.id);
             } else {
                 if (races.get(message.channel.id).started) return;
+                msg = await message.channel.send({ embeds: [embed] });
                 startRace(message.channel.id);
                 const d = races.get(message.channel.id);
                 d.started = true;
+                d.message = msg;
                 races.set(message.channel.id, d);
                 setTimeout(() => {
                     if (races.has(message.channel.id) && races.get(message.channel.id).id == id) {
