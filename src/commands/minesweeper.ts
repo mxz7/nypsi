@@ -57,7 +57,9 @@ abcde.set("e", 4);
 const cmd = new Command("minesweeper", "play minesweeper", Categories.MONEY).setAliases(["sweeper", "ms"]);
 
 cmd.slashEnabled = true;
-cmd.slashData.addIntegerOption((option) => option.setName("bet").setDescription("amount to bet").setRequired(true));
+cmd.slashData.addStringOption((option) =>
+    option.setName("bet").setDescription("how much would you like to bet").setRequired(true)
+);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!(await userExists(message.member))) await createUser(message.member);

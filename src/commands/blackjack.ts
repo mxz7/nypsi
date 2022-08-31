@@ -52,7 +52,7 @@ const games = new Map<
 const cmd = new Command("blackjack", "play blackjack", Categories.MONEY).setAliases(["bj", "blowjob"]);
 
 cmd.slashEnabled = true;
-cmd.slashData.addIntegerOption((option) =>
+cmd.slashData.addStringOption((option) =>
     option.setName("bet").setDescription("how much would you like to bet").setRequired(true)
 );
 
