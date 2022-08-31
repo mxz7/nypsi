@@ -1,11 +1,16 @@
 import {
     ActionRowBuilder,
+    APIApplicationCommandOptionChoice,
     ButtonBuilder,
     ButtonStyle,
     CommandInteraction,
     Interaction,
+    InteractionReplyOptions,
+    InteractionResponse,
     Message,
     MessageActionRowComponentBuilder,
+    MessageEditOptions,
+    MessageOptions,
 } from "discord.js";
 import fetch from "node-fetch";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
@@ -17,11 +22,51 @@ import { getLastfmUsername } from "../utils/users/utils";
 
 const cmd = new Command("toptracks", "view your top tracks", Categories.MUSIC).setAliases(["tt"]);
 
+const lengthChoices: APIApplicationCommandOptionChoice<string>[] = [
+    { name: "1 week", value: "week" },
+    { name: "1 month", value: "month" },
+    { name: "1 year", value: "year" },
+    { name: "all time", value: "all" },
+];
+
+cmd.slashEnabled = true;
+cmd.slashData.addStringOption((option) =>
+    option
+        .setName("length")
+        .setDescription("length to fetch results from")
+        .setChoices(...lengthChoices)
+);
+
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+    const send = async (data: MessageOptions) => {
+        if (!(message instanceof Message)) {
+            if (message.deferred) {
+                await message.editReply(data);
+            } else {
+                await message.reply(data as InteractionReplyOptions);
+            }
+            const replyMsg = await message.fetchReply();
+            if (replyMsg instanceof Message) {
+                return replyMsg;
+            }
+        } else {
+            return await message.channel.send(data);
+        }
+    };
+
+    const edit = async (data: MessageEditOptions, msg: Message | InteractionResponse) => {
+        if (!(message instanceof Message)) {
+            return await message.editReply(data);
+        } else {
+            if (msg instanceof InteractionResponse) return;
+            return await msg.edit(data);
+        }
+    };
+
     if (await onCooldown(cmd.name, message.member)) {
         const embed = await getResponse(cmd.name, message.member);
 
-        return message.channel.send({ embeds: [embed] });
+        return send({ embeds: [embed] });
     }
 
     let length = "7day";
@@ -41,7 +86,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             length = "7day";
             lengthDisplay = "1 week";
         } else {
-            return message.channel.send({
+            return send({
                 embeds: [new ErrorEmbed("invalid length. use one of the following: `all` `year` `month` `week`")],
             });
         }
@@ -50,7 +95,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const username = await getLastfmUsername(message.member);
 
     if (!username) {
-        return message.channel.send({
+        return send({
             embeds: [new ErrorEmbed(`you have not set your last.fm username (${await getPrefix(message.guild)}**slfm**)`)],
         });
     }
@@ -63,14 +108,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (res.error) {
         logger.error(`lastfm error: ${res.error} - ${username}`);
-        return message.channel.send({ embeds: [new ErrorEmbed(`lastfm error: \`${res.error}\``)] });
+        return send({ embeds: [new ErrorEmbed(`lastfm error: \`${res.error}\``)] });
     }
 
     const total: number = parseInt(res.toptracks["@attr"].total);
     const tracks: Track[] = res.toptracks.track;
 
     if (!tracks || tracks.length == 0) {
-        return message.channel.send({ embeds: [new ErrorEmbed("no track data")] });
+        return send({ embeds: [new ErrorEmbed("no track data")] });
     }
 
     const pages = new Map<number, string[]>();
@@ -118,10 +163,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     );
 
     if (pages.size == 0) {
-        return message.channel.send({ embeds: [embed] });
+        return send({ embeds: [embed] });
     }
 
-    const msg = await message.channel.send({ embeds: [embed], components: [row] });
+    const msg = await send({ embeds: [embed], components: [row] });
 
     let currentPage = 1;
     const lastPage = pages.size;
@@ -136,7 +181,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 return collected.customId;
             })
             .catch(async () => {
-                await msg.edit({ components: [] });
+                await edit({ components: [] }, msg);
             });
 
         if (!reaction) return;
@@ -175,7 +220,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                             .setDisabled(false)
                     );
                 }
-                await msg.edit({ embeds: [embed], components: [row] });
+                await edit({ embeds: [embed], components: [row] }, msg);
                 return pageManager();
             }
         } else if (reaction == "➡") {
@@ -208,7 +253,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                             .setDisabled(false)
                     );
                 }
-                await msg.edit({ embeds: [embed], components: [row] });
+                await edit({ embeds: [embed], components: [row] }, msg);
                 return pageManager();
             }
         }

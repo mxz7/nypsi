@@ -1,5 +1,5 @@
 import dayjs = require("dayjs");
-import { CommandInteraction, Message } from "discord.js";
+import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import {
     createUser,
@@ -21,11 +21,35 @@ import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("give", "give other users items from your inventory", Categories.MONEY);
 
+cmd.slashEnabled = true;
+cmd.slashData
+    .addUserOption((option) => option.setName("user").setDescription("user you want to give items to").setRequired(true))
+    .addStringOption((option) =>
+        option.setName("item").setDescription("item you want to give").setRequired(true).setAutocomplete(true)
+    )
+    .addIntegerOption((option) => option.setName("amount").setDescription("amount of item you want to give").setMinValue(1));
+
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+    const send = async (data: MessageOptions) => {
+        if (!(message instanceof Message)) {
+            if (message.deferred) {
+                await message.editReply(data);
+            } else {
+                await message.reply(data as InteractionReplyOptions);
+            }
+            const replyMsg = await message.fetchReply();
+            if (replyMsg instanceof Message) {
+                return replyMsg;
+            }
+        } else {
+            return await message.channel.send(data);
+        }
+    };
+
     if (await onCooldown(cmd.name, message.member)) {
         const embed = await getResponse(cmd.name, message.member);
 
-        return message.channel.send({ embeds: [embed] });
+        return send({ embeds: [embed] });
     }
 
     const prefix = await getPrefix(message.guild);
@@ -36,7 +60,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embed.addField("usage", `${prefix}give <member> <item> (amount)`);
         embed.addField("help", "give members items from your inventory");
 
-        return message.channel.send({ embeds: [embed] });
+        return send({ embeds: [embed] });
     }
 
     let target = message.mentions.members.first();
@@ -46,19 +70,19 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (!target) {
-        return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] });
+        return send({ embeds: [new ErrorEmbed("invalid user")] });
     }
 
     if (message.member == target) {
-        return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] });
+        return send({ embeds: [new ErrorEmbed("invalid user")] });
     }
 
     if (target.user.bot) {
-        return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] });
+        return send({ embeds: [new ErrorEmbed("invalid user")] });
     }
 
     if (await isEcoBanned(target.user.id)) {
-        return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] });
+        return send({ embeds: [new ErrorEmbed("invalid user")] });
     }
 
     if (!(await userExists(target))) await createUser(target);
@@ -66,14 +90,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (!(await userExists(message.member))) await createUser(message.member);
 
     if (message.author.createdTimestamp > dayjs().subtract(1, "hour").unix() * 1000) {
-        return message.channel.send({
+        return send({
             embeds: [new ErrorEmbed("you cannot use this command yet. u might be an alt. or a bot 😳")],
         });
     }
 
     if ((await getPrestige(message.member)) < 1) {
         if ((await getXp(message.member)) < 100) {
-            return message.channel.send({
+            return send({
                 embeds: [new ErrorEmbed("you cannot use this command yet. u might be an alt. or a bot 😳")],
             });
         }
@@ -93,7 +117,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embed.addField("usage", `${prefix}give <member> <item> (amount)`);
         embed.addField("help", "give members items from your inventory");
 
-        return message.channel.send({ embeds: [embed] });
+        return send({ embeds: [embed] });
     }
 
     let selected;
@@ -115,11 +139,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     selected = items[selected];
 
     if (!selected) {
-        return message.channel.send({ embeds: [new ErrorEmbed(`couldnt find \`${args[1]}\``)] });
+        return send({ embeds: [new ErrorEmbed(`couldnt find \`${args[1]}\``)] });
     }
 
     if (!inventory[selected.id] || inventory[selected.id] == 0) {
-        return message.channel.send({ embeds: [new ErrorEmbed("you dont have any " + selected.name)] });
+        return send({ embeds: [new ErrorEmbed("you dont have any " + selected.name)] });
     }
 
     if (parseInt(args[2]) > 50) args[2] = "50";
@@ -130,16 +154,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         amount = 1;
     } else {
         if (amount <= 0) {
-            return message.channel.send({ embeds: [new ErrorEmbed("invalid amount")] });
+            return send({ embeds: [new ErrorEmbed("invalid amount")] });
         }
 
         if (amount > inventory[selected.id]) {
-            return message.channel.send({ embeds: [new ErrorEmbed(`you don't have enough ${selected.name}`)] });
+            return send({ embeds: [new ErrorEmbed(`you don't have enough ${selected.name}`)] });
         }
     }
 
     if (!amount) {
-        return message.channel.send({ embeds: [new ErrorEmbed("invalid amount")] });
+        return send({ embeds: [new ErrorEmbed("invalid amount")] });
     }
 
     if (selected.id == "bitcoin") {
@@ -147,7 +171,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         const max = await getMaxBitcoin(target);
 
         if (owned + amount > max) {
-            return message.channel.send({
+            return send({
                 embeds: [new ErrorEmbed("you cannot give this person that much bitcoin")],
             });
         }
@@ -156,7 +180,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         const max = await getMaxEthereum(target);
 
         if (owned + amount > max) {
-            return message.channel.send({
+            return send({
                 embeds: [new ErrorEmbed("you cannot give this person that much ethereum")],
             });
         }
@@ -180,7 +204,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         payLimit += prestigeBonus;
 
         if (amount > payLimit) {
-            return message.channel.send({ embeds: [new ErrorEmbed("you can't pay this user that much yet")] });
+            return send({ embeds: [new ErrorEmbed("you can't pay this user that much yet")] });
         }
     }
 
@@ -204,12 +228,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     payment(message.author, target.user, selected.sell * amount);
 
     if (selected.id == "ring") {
-        return message.channel.send({
+        return send({
             embeds: [new CustomEmbed(message.member, "you may now kiss the bride :heart:")],
         });
     }
 
-    return message.channel.send({
+    return send({
         embeds: [
             new CustomEmbed(
                 message.member,
