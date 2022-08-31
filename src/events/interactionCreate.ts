@@ -68,6 +68,31 @@ export default async function interactionCreate(interaction: Interaction) {
             }));
 
             return await interaction.respond(formatted);
+        } else if (focused.name == "car") {
+            const inventory = await getInventory(interaction.user.id);
+
+            const items = getItems();
+
+            let options = Object.keys(inventory).filter(
+                (item) =>
+                    (item.startsWith(focused.value) ||
+                        items[item].name.startsWith(focused.value) ||
+                        items[item].aliases?.includes(focused.value)) &&
+                    items[item].role == "car"
+            );
+
+            options.push("cycle");
+
+            if (options.length > 25) options = options.splice(0, 24);
+
+            if (options.length == 0) return;
+
+            const formatted = options.map((i) => ({
+                name: `${items[i].emoji.startsWith("<:") ? "" : `${items[i].emoji} `}${items[i].name}`,
+                value: i,
+            }));
+
+            return await interaction.respond(formatted);
         }
     }
 
