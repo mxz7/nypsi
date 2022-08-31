@@ -1,20 +1,20 @@
 import {
-    Message,
     ActionRowBuilder,
     ButtonBuilder,
-    CommandInteraction,
-    PermissionFlagsBits,
-    MessageActionRowComponentBuilder,
     ButtonStyle,
-    MessageOptions,
-    InteractionReplyOptions,
-    MessageEditOptions,
+    CommandInteraction,
     Interaction,
+    InteractionReplyOptions,
+    Message,
+    MessageActionRowComponentBuilder,
+    MessageEditOptions,
+    MessageOptions,
+    PermissionFlagsBits,
 } from "discord.js";
 import { getPrefix } from "../utils/guilds/utils";
-import { getCase, deleteCase, profileExists, createProfile } from "../utils/moderation/utils";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
+import { createProfile, deleteCase, getCase, profileExists } from "../utils/moderation/utils";
 
 const cmd = new Command("case", "get information about a given case", Categories.MODERATION)
     .setPermissions(["MANAGE_MESSAGES", "MANAGE_SERVER", "MODERATE_MEMBERS"])
@@ -74,7 +74,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
     }
 
-    const target = await message.guild.members.fetch(case0.user).catch(() => {});
+    const target = await message.guild.members.fetch(case0.user).catch();
 
     let reason = case0.command;
 
@@ -109,10 +109,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const edit = async (data: MessageEditOptions, msg: Message) => {
         if (!(message instanceof Message)) {
-            await message.editReply(data).catch(() => {});
+            await message.editReply(data).catch();
             return await message.fetchReply();
         } else {
-            return await msg.edit(data).catch(() => {});
+            return await msg.edit(data).catch();
         }
     };
 
