@@ -222,10 +222,14 @@ export default async function interactionCreate(interaction: Interaction) {
     const args = [""];
 
     let fail = false;
-    await interaction.deferReply().catch(() => {
-        logger.warn(`failed to defer slash command. ${interaction.commandName} by ${interaction.member.user.username}`);
-        fail = true;
-    });
+    setTimeout(async () => {
+        if (interaction.replied) return;
+        await interaction.deferReply().catch(() => {
+            logger.warn(`failed to defer slash command. ${interaction.commandName} by ${interaction.member.user.username}`);
+            fail = true;
+        });
+    }, 2000);
+
     if (fail) return;
 
     const parseArgument = async (arg: CommandInteractionOption) => {
