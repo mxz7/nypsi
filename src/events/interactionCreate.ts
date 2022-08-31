@@ -32,7 +32,7 @@ export default async function interactionCreate(interaction: Interaction) {
                 (item) =>
                     item.startsWith(focused.value) ||
                     items[item].name.startsWith(focused.value) ||
-                    items[item].aliases.includes(focused.value)
+                    items[item].aliases?.includes(focused.value)
             );
 
             if (options.length > 25) options = options.splice(0, 24);
@@ -49,7 +49,7 @@ export default async function interactionCreate(interaction: Interaction) {
                 (item) =>
                     (item.startsWith(focused.value) ||
                         items[item].name.startsWith(focused.value) ||
-                        items[item].aliases.includes(focused.value)) &&
+                        items[item].aliases?.includes(focused.value)) &&
                     items[item].buy
             );
 
