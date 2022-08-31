@@ -26,17 +26,33 @@ export default async function interactionCreate(interaction: Interaction) {
 
             if (!inventory) return;
 
-            let options = Object.keys(inventory).filter((item) => item.startsWith(focused.value));
+            const items = getItems();
+
+            let options = Object.keys(inventory).filter(
+                (item) => item.startsWith(focused.value) || items[item].name.startsWith(focused.value)
+            );
 
             if (options.length > 25) options = options.splice(0, 24);
 
             if (options.length == 0) return;
 
+            const formatted = options.map((i) => ({ name: items[i].name, value: i }));
+
+            return await interaction.respond(formatted);
+        } else if (focused.name == "item-buy") {
             const items = getItems();
+
+            let options = Object.keys(items).filter(
+                (item) => (item.startsWith(focused.value) || items[item].name.startsWith(focused.value)) && items[item].buy
+            );
+
+            if (options.length > 25) options = options.splice(0, 24);
+
+            if (options.length == 0) return;
 
             const formatted = options.map((i) => ({ name: items[i].name, value: i }));
 
-            await interaction.respond(formatted);
+            return await interaction.respond(formatted);
         }
     }
 
