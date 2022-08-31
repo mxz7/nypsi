@@ -85,7 +85,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [embed] });
     }
 
-    await addCooldown(cmd.name, message.member, 15);
+    await addCooldown(cmd.name, message.member, 10);
 
     const items = getItems();
 
@@ -391,7 +391,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             row.addComponents(new ButtonBuilder().setLabel("create auction").setCustomId("y").setStyle(ButtonStyle.Success));
         }
 
-        const msg = await message.channel.send({ embeds: [embed], components: [row] });
+        const msg = await send({ embeds: [embed], components: [row] });
 
         const filter = (i: Interaction) => i.user.id == message.author.id;
 
