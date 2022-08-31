@@ -98,7 +98,7 @@ export default async function interactionCreate(interaction: Interaction) {
                         id: auction.id,
                     },
                 })
-                .catch(() => {});
+                .catch();
 
             const inventory = await getInventory(interaction.user.id);
 

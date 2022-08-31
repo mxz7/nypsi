@@ -43,7 +43,7 @@ async function determineCluster(client: NypsiClient, userId: string) {
 
             if (client.cluster.id == currentId) return "current";
 
-            const user = await client.users.fetch(userId).catch(() => {});
+            const user = await client.users.fetch(userId).catch();
 
             if (!user) return;
 
