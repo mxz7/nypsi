@@ -384,10 +384,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         await race.message.edit({ embeds: [embed] });
 
         if (!(message instanceof Message)) {
-            await message.reply({
-                embeds: [new CustomEmbed(message.member, "you have joined the race")],
-                ephemeral: true,
-            });
+            await message
+                .editReply({
+                    embeds: [new CustomEmbed(message.member, "you have joined the race")],
+                })
+                .then((m) =>
+                    setTimeout(() => {
+                        m.delete();
+                    }, 3000)
+                );
         } else {
             await message.react("✅");
 
