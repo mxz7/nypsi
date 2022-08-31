@@ -18,6 +18,51 @@ import { createNypsiInteraction, NypsiCommandInteraction } from "../utils/models
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
 export default async function interactionCreate(interaction: Interaction) {
+    if (interaction.type == InteractionType.ApplicationCommandAutocomplete) {
+        const focused = interaction.options.getFocused(true);
+
+        if (focused.name == "item") {
+            const inventory = await getInventory(interaction.user.id);
+
+            if (!inventory) return;
+
+            const items = getItems();
+
+            let options = Object.keys(inventory).filter(
+                (item) =>
+                    item.startsWith(focused.value) ||
+                    items[item].name.startsWith(focused.value) ||
+                    items[item].aliases?.includes(focused.value)
+            );
+
+            if (options.length > 25) options = options.splice(0, 24);
+
+            if (options.length == 0) return;
+
+            const formatted = options.map((i) => ({ name: items[i].name, value: i }));
+
+            return await interaction.respond(formatted);
+        } else if (focused.name == "item-buy") {
+            const items = getItems();
+
+            let options = Object.keys(items).filter(
+                (item) =>
+                    (item.startsWith(focused.value) ||
+                        items[item].name.startsWith(focused.value) ||
+                        items[item].aliases?.includes(focused.value)) &&
+                    items[item].buy
+            );
+
+            if (options.length > 25) options = options.splice(0, 24);
+
+            if (options.length == 0) return;
+
+            const formatted = options.map((i) => ({ name: items[i].name, value: i }));
+
+            return await interaction.respond(formatted);
+        }
+    }
+
     if (interaction.type == InteractionType.MessageComponent && interaction.customId == "b") {
         const auction = await prisma.auction.findUnique({
             where: {

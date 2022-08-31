@@ -1,4 +1,4 @@
-import { CommandInteraction, Message } from "discord.js";
+import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import {
     createUser,
@@ -15,17 +15,40 @@ import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("sell", "sell items", Categories.MONEY);
 
+cmd.slashEnabled = true;
+cmd.slashData
+    .addStringOption((option) =>
+        option.setName("item").setRequired(true).setAutocomplete(true).setDescription("item you want to sell")
+    )
+    .addIntegerOption((option) => option.setMinValue(1).setName("amount").setDescription("amount you want to sell"));
+
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!(await userExists(message.member))) await createUser(message.member);
+
+    const send = async (data: MessageOptions) => {
+        if (!(message instanceof Message)) {
+            if (message.deferred) {
+                await message.editReply(data);
+            } else {
+                await message.reply(data as InteractionReplyOptions);
+            }
+            const replyMsg = await message.fetchReply();
+            if (replyMsg instanceof Message) {
+                return replyMsg;
+            }
+        } else {
+            return await message.channel.send(data);
+        }
+    };
 
     if (await onCooldown(cmd.name, message.member)) {
         const embed = await getResponse(cmd.name, message.member);
 
-        return message.channel.send({ embeds: [embed] });
+        return send({ embeds: [embed] });
     }
 
     if (args.length == 0) {
-        return message.channel.send({
+        return send({
             embeds: [
                 new CustomEmbed(
                     message.member,
@@ -59,7 +82,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     selected = items[selected];
 
     if (!selected) {
-        return message.channel.send({ embeds: [new ErrorEmbed(`couldnt find \`${args[0]}\``)] });
+        return send({ embeds: [new ErrorEmbed(`couldnt find \`${args[0]}\``)] });
     }
 
     let amount = 1;
@@ -68,29 +91,29 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (args[1].toLowerCase() == "all") {
             args[1] = inventory[selected.id].toString();
         } else if (isNaN(parseInt(args[1])) || parseInt(args[1]) <= 0) {
-            return message.channel.send({ embeds: [new ErrorEmbed("invalid amount")] });
+            return send({ embeds: [new ErrorEmbed("invalid amount")] });
         }
         amount = parseInt(args[1]);
     }
 
     if (!parseInt(amount.toString())) {
-        return message.channel.send({ embeds: [new ErrorEmbed("invalid amount")] });
+        return send({ embeds: [new ErrorEmbed("invalid amount")] });
     }
 
     if (amount < 1) {
-        return message.channel.send({ embeds: [new ErrorEmbed("invalid amount")] });
+        return send({ embeds: [new ErrorEmbed("invalid amount")] });
     }
 
     if (!amount) {
-        return message.channel.send({ embeds: [new ErrorEmbed("invalid amount")] });
+        return send({ embeds: [new ErrorEmbed("invalid amount")] });
     }
 
     if (!inventory[selected.id] || inventory[selected.id] == 0) {
-        return message.channel.send({ embeds: [new ErrorEmbed("you dont have any " + selected.name)] });
+        return send({ embeds: [new ErrorEmbed("you dont have any " + selected.name)] });
     }
 
     if (amount > inventory[selected.id]) {
-        return message.channel.send({ embeds: [new ErrorEmbed(`you don't have enough ${selected.name}`)] });
+        return send({ embeds: [new ErrorEmbed(`you don't have enough ${selected.name}`)] });
     }
 
     await addCooldown(cmd.name, message.member, 5);
@@ -111,7 +134,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         sellWorth = Math.floor(sellWorth + sellWorth * multi);
     } else if (selected.id == "ethereum" || selected.id == "bitcoin") {
         if (!selected.sell) {
-            return message.channel.send({
+            return send({
                 embeds: [new ErrorEmbed(`you cannot currently sell ${selected.name}`)],
             });
         }
@@ -134,7 +157,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }`
     );
 
-    return message.channel.send({ embeds: [embed] });
+    return send({ embeds: [embed] });
 }
 
 cmd.setRun(run);
