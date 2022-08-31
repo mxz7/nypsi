@@ -1,10 +1,10 @@
 import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions, PermissionFlagsBits } from "discord.js";
-import { profileExists, createProfile, newCase } from "../utils/moderation/utils";
-import { inCooldown, addCooldown, getPrefix } from "../utils/guilds/utils";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
-import { PunishmentType } from "../utils/models/GuildStorage";
 import { getExactMember } from "../utils/functions/member";
+import { addCooldown, getPrefix, inCooldown } from "../utils/guilds/utils";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
+import { PunishmentType } from "../utils/models/GuildStorage";
+import { createProfile, newCase, profileExists } from "../utils/moderation/utils";
 
 const cmd = new Command("kick", "kick one or more users", Categories.MODERATION)
     .setPermissions(["KICK_MEMBERS"])
@@ -169,7 +169,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (args.join(" ").includes("-s")) {
         if (message instanceof Message) {
             await message.delete();
-            await message.member.send({ embeds: [embed] }).catch(() => {});
+            await message.member.send({ embeds: [embed] }).catch();
         } else {
             await message.reply({ embeds: [embed], ephemeral: true });
         }
@@ -194,13 +194,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         const m = members.get(member);
 
         if (reason.split(": ")[1] == "no reason given") {
-            await m.send({ content: `you have been kicked from ${message.guild.name}` }).catch(() => {});
+            await m.send({ content: `you have been kicked from ${message.guild.name}` }).catch();
         } else {
             const embed = new CustomEmbed(m)
                 .setTitle(`kicked from ${message.guild.name}`)
                 .addField("reason", `\`${reason.split(": ")[1]}\``);
 
-            await m.send({ content: `you have been kicked from ${message.guild.name}`, embeds: [embed] }).catch(() => {});
+            await m.send({ content: `you have been kicked from ${message.guild.name}`, embeds: [embed] }).catch();
         }
     }
 }

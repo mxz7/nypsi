@@ -1,10 +1,10 @@
 import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions, PermissionFlagsBits, User } from "discord.js";
-import { newCase, profileExists, createProfile, newBan } from "../utils/moderation/utils";
-import { inCooldown, addCooldown, getPrefix } from "../utils/guilds/utils";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
-import { PunishmentType } from "../utils/models/GuildStorage";
 import { getExactMember } from "../utils/functions/member";
+import { addCooldown, getPrefix, inCooldown } from "../utils/guilds/utils";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
+import { PunishmentType } from "../utils/models/GuildStorage";
+import { createProfile, newBan, newCase, profileExists } from "../utils/moderation/utils";
 
 const cmd = new Command("ban", "ban one or more users from the server", Categories.MODERATION).setPermissions([
     "BAN_MEMBERS",
@@ -297,7 +297,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                             temporary ? `\n\nexpires in **${banLength}**}` : ""
                         }`,
                     })
-                    .catch(() => {});
+                    .catch();
             } else {
                 const embed = new CustomEmbed(m)
                     .setTitle(`banned from ${message.guild.name}`)
@@ -309,9 +309,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     embed.setTimestamp(unbanDate);
                 }
 
-                await m
-                    .send({ content: `you have been banned from ${message.guild.name}`, embeds: [embed] })
-                    .catch(() => {});
+                await m.send({ content: `you have been banned from ${message.guild.name}`, embeds: [embed] }).catch();
             }
         }
     }

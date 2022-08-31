@@ -198,7 +198,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             if (races.get(message.channel.id).users.size < 2) {
                 embed.setDescription("race cancelled ):");
                 embed.setFooter({ text: "race cancelled" });
-                msg.edit({ embeds: [embed] }).catch(() => {});
+                msg.edit({ embeds: [embed] }).catch();
 
                 for (const u of races.get(message.channel.id).users.keys()) {
                     const user = races.get(message.channel.id).users.get(u);
@@ -405,7 +405,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             await message.react("✅");
 
             setTimeout(async () => {
-                await message.delete().catch(() => {});
+                await message.delete().catch();
             }, 1500);
         }
 
@@ -490,7 +490,7 @@ async function startRace(id: string) {
     embed.setDescription(description);
     embed.setFooter({ text: "race has started" });
 
-    await race.message.edit({ embeds: [embed] }).catch(() => {});
+    await race.message.edit({ embeds: [embed] }).catch();
 
     races.set(id, race);
 
@@ -508,7 +508,7 @@ async function startRace(id: string) {
         embed.setFooter({ text: "race has ended" });
 
         return setTimeout(async () => {
-            await race.message.edit({ embeds: [embed] }).catch(() => {});
+            await race.message.edit({ embeds: [embed] }).catch();
             return races.delete(id);
         }, 500);
     }
