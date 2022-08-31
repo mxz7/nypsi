@@ -278,7 +278,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return message.channel.send({ embeds: [new ErrorEmbed("invalid amount")] });
         }
 
-        const cost = await formatBet(res, message.member).catch(() => {});
+        const cost = await formatBet(res, message.member).catch();
 
         if (!cost) {
             return message.channel.send({ embeds: [new ErrorEmbed("invalid amount")] });
@@ -322,7 +322,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         await setInventory(message.member, inventory);
 
-        const url = await createAuction(message.member, selected.id, amount, cost).catch(() => {});
+        const url = await createAuction(message.member, selected.id, amount, cost).catch();
 
         if (url) {
             embed.setDescription(`[your auction has been created](${url})`);
@@ -475,7 +475,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 await edit({ embeds: [embed], components: [row] }, msg);
                 return pageManager();
             } else if (res == "del") {
-                const res = await deleteAuction(auctions[currentPage].id, message.client as NypsiClient).catch(() => {});
+                const res = await deleteAuction(auctions[currentPage].id, message.client as NypsiClient).catch();
 
                 if (res) {
                     const inventory = await getInventory(message.member);
@@ -628,7 +628,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return send({ embeds: [new ErrorEmbed(`you dont have this many ${selected.name}`)] });
         }
 
-        const cost = await formatBet(args[3].toLowerCase(), message.member).catch(() => {});
+        const cost = await formatBet(args[3].toLowerCase(), message.member).catch();
 
         if (!cost) {
             return message.channel.send({ embeds: [new ErrorEmbed("invalid amount")] });
@@ -666,7 +666,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         await setInventory(message.member, inventory);
 
-        const url = await createAuction(message.member, selected.id, amount, cost).catch(() => {});
+        const url = await createAuction(message.member, selected.id, amount, cost).catch();
 
         let desc: string;
 

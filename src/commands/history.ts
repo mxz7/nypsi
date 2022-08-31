@@ -1,24 +1,24 @@
+import { ModerationCase } from "@prisma/client";
 import {
-    Message,
     ActionRowBuilder,
     ButtonBuilder,
-    CommandInteraction,
-    PermissionFlagsBits,
-    MessageActionRowComponentBuilder,
     ButtonStyle,
-    MessageOptions,
+    CommandInteraction,
     GuildMember,
     Interaction,
-    MessageEditOptions,
     InteractionReplyOptions,
+    Message,
+    MessageActionRowComponentBuilder,
+    MessageEditOptions,
+    MessageOptions,
+    PermissionFlagsBits,
 } from "discord.js";
-import { getCases, profileExists, createProfile } from "../utils/moderation/utils";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
-import { getPrefix } from "../utils/guilds/utils";
-import { getMember } from "../utils/functions/member";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import { ModerationCase } from "@prisma/client";
+import { getMember } from "../utils/functions/member";
+import { getPrefix } from "../utils/guilds/utils";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
+import { createProfile, getCases, profileExists } from "../utils/moderation/utils";
 
 const cmd = new Command("history", "view punishment history for a given user", Categories.MODERATION)
     .setAliases(["modlogs", "hist"])
@@ -189,7 +189,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     return collected.customId;
                 })
                 .catch(async () => {
-                    await edit({ components: [] }).catch(() => {});
+                    await edit({ components: [] }).catch();
                 });
 
             const newEmbed = new CustomEmbed(message.member);
