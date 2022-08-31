@@ -12,7 +12,14 @@ import {
 import { inPlaceSort } from "fast-sort";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { createUser, getInventory, getXp, setInventory, updateXp, userExists } from "../utils/economy/utils";
-import { closeKarmaShop, getKarma, isKarmaShopOpen, openKarmaShop, removeKarma } from "../utils/karma/utils";
+import {
+    closeKarmaShop,
+    getKarma,
+    getKarmaShopItems,
+    isKarmaShopOpen,
+    openKarmaShop,
+    removeKarma,
+} from "../utils/karma/utils";
 import { NypsiClient } from "../utils/models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
@@ -37,8 +44,6 @@ cmd.slashData
             )
     );
 
-declare function require(name: string): any;
-
 const amount = new Map<string, number>();
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
@@ -50,6 +55,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return closeKarmaShop();
         }
     }
+
+    const items = getKarmaShopItems();
 
     const send = async (data: MessageOptions) => {
         if (!(message instanceof Message)) {

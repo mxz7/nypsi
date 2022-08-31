@@ -1,7 +1,12 @@
 import { GuildMember } from "discord.js";
 import prisma from "../database/database";
 import redis from "../database/redis";
+import { KarmaShopItem } from "../models/Karmashop";
 import { createProfile } from "../users/utils";
+
+declare function require(name: string): any;
+
+const items: { [key: string]: KarmaShopItem } = require("../../../data/karmashop.json");
 
 let karmaShop = false;
 
@@ -137,4 +142,8 @@ export async function getLastCommand(member: GuildMember | string): Promise<Date
     }
 
     return query.lastCommand;
+}
+
+export function getKarmaShopItems() {
+    return items;
 }
