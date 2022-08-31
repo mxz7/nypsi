@@ -124,13 +124,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             const embed = new CustomEmbed(
                 message.member,
-                `a match has been made from **${key.guild.name}**\n\n` +
-                    `go ahead and send **${key.user.tag}** a *private* message 😉😏`
+                `a match has been made from **${
+                    key.guild.id == "747056029795221513" ? "[nypsi](https://discord.gg/hJTDNST)" : key.guild.name
+                }**\n\n` + `go ahead and send **${key.user.tag}** a *private* message 😉😏`
             ).setHeader("milf finder");
 
             if (key.description != "") {
                 embed.setDescription(
-                    `a match has been made from **${key.guild.name}**\n\n` +
+                    `a match has been made from **${
+                        key.guild.id == "747056029795221513" ? "[nypsi](https://discord.gg/hJTDNST)" : key.guild.name
+                    }**\n\n` +
                         `**${key.user.tag}** - ${key.description}\n\n` +
                         "go ahead and send them a *private* message 😉😏"
                 );
@@ -144,14 +147,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             const embed2 = new CustomEmbed(
                 undefined,
-                `a match has been made from **${message.guild.name}**\n\ngo ahead and send **${message.author.tag}** a *private* message 😉😏`
+                `a match has been made from **${
+                    message.guild.id == "747056029795221513" ? "[nypsi](https://discord.gg/hJTDNST)" : message.guild.name
+                }**\n\ngo ahead and send **${message.author.tag}** a *private* message 😉😏`
             )
                 .setHeader("milf finder")
                 .setColor("#5efb8f");
 
             if (description != "") {
                 embed2.setDescription(
-                    `a match has been made from **${message.guild.name}**\n\n` +
+                    `a match has been made from **${
+                        message.guild.id == "747056029795221513" ? "[nypsi](https://discord.gg/hJTDNST)" : message.guild.name
+                    }**\n\n` +
                         `**${message.author.tag}** - ${description}\n\n` +
                         "go ahead and send them a *private* message 😉😏"
                 );
@@ -159,7 +166,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             return await channel
                 .send({ content: key.user.toString() + " a match has been found", embeds: [embed2] })
-                .catch(() => {});
+                .catch();
         }
 
         addToLooking(description);
@@ -196,7 +203,7 @@ setInterval(() => {
                                 .setHeader("milf finder"),
                         ],
                     })
-                    .catch(() => {});
+                    .catch();
             }
 
             looking.delete(obj.user.id);

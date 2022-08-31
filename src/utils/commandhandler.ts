@@ -216,9 +216,7 @@ async function helpCmd(message: Message, args: string[]) {
             categoriesMsg += `» ${prefix}help **${category}**\n`;
         }
 
-        const news = getNews();
-
-        const lastSet = formatDate(news.date);
+        const news = await getNews();
 
         embed.setTitle("help menu");
         embed.setDescription(
@@ -230,7 +228,7 @@ async function helpCmd(message: Message, args: string[]) {
         embed.setThumbnail(message.client.user.displayAvatarURL({ size: 128 }));
 
         if (news.text != "") {
-            embed.addField("news", `${news.text} - *${lastSet}*`);
+            embed.addField("news", `${news.text} - *${formatDate(news.date)}*`);
         }
     } else {
         if (args[0].toLowerCase() == "mod") args[0] = "moderation";
@@ -409,7 +407,7 @@ async function helpCmd(message: Message, args: string[]) {
                 return collected.customId;
             })
             .catch(async () => {
-                await msg.edit({ components: [] }).catch(() => {});
+                await msg.edit({ components: [] }).catch();
             });
 
         if (!reaction) return;
@@ -504,7 +502,7 @@ export async function runCommand(
         if (message instanceof Message) {
             return message.member
                 .send("i don't have access to that channel. please contact server staff if this is an error")
-                .catch(() => {});
+                .catch();
         } else {
             return message
                 .editReply({
@@ -514,7 +512,7 @@ export async function runCommand(
                         ),
                     ],
                 })
-                .catch(() => {});
+                .catch();
         }
     }
 
@@ -523,7 +521,7 @@ export async function runCommand(
             .send(
                 "❌ i don't have permission to send messages in that channel - please contact server staff if this is an error"
             )
-            .catch(() => {});
+            .catch();
     }
 
     if (!message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.EmbedLinks)) {

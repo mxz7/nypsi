@@ -1,14 +1,14 @@
 import { CommandInteraction, Message } from "discord.js";
 import { formatDate } from "../utils/functions/date";
 import { getNews, setNews } from "../utils/functions/news";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("news", "set the news for the help command", Categories.INFO);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (args.length == 0 || message.member.user.id != "672793821850894347") {
-        const news = getNews();
+        const news = await getNews();
 
         if (news.text == "") {
             return message.channel.send({ embeds: [new ErrorEmbed("no news has been set")] });
@@ -23,7 +23,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (message.member.user.id != "672793821850894347") return;
         setNews(args.join(" "));
 
-        const news = getNews();
+        const news = await getNews();
 
         const lastSet = formatDate(news.date);
 

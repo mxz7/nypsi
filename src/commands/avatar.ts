@@ -42,9 +42,21 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] });
     }
 
-    const avatar = member.user.displayAvatarURL({ size: 256 });
+    let avatar = member.user.displayAvatarURL({ size: 256 });
+
+    if (avatar.endsWith("webp")) {
+        avatar = member.user.displayAvatarURL({ extension: "gif", size: 256 });
+    } else {
+        avatar = member.user.displayAvatarURL({ extension: "png", size: 256 });
+    }
 
     let serverAvatar = member.displayAvatarURL({ size: 256 });
+
+    if (serverAvatar.endsWith("webp")) {
+        serverAvatar = member.displayAvatarURL({ extension: "gif", size: 256 });
+    } else {
+        serverAvatar = member.displayAvatarURL({ extension: "png", size: 256 });
+    }
 
     if (avatar == serverAvatar) {
         serverAvatar = undefined;
