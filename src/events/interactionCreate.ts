@@ -26,15 +26,15 @@ export default async function interactionCreate(interaction: Interaction) {
 
             if (!inventory) return;
 
-            const options = Object.keys(inventory).filter((item) => item.startsWith(focused.value));
+            let options = Object.keys(inventory).filter((item) => item.startsWith(focused.value));
+
+            if (options.length > 25) options = options.splice(0, 24);
+
+            if (options.length == 0) return;
 
             const items = getItems();
 
-            let formatted = options.map((i) => ({ name: `${items[i].emoji} ${items[i].name}`, value: i }));
-
-            if (formatted.length > 25) formatted = formatted.splice(0, 24);
-
-            if (formatted.length == 0) return;
+            const formatted = options.map((i) => ({ name: items[i].name, value: i }));
 
             await interaction.respond(formatted);
         }
