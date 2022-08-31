@@ -12,7 +12,7 @@ import { runCommand } from "../utils/commandhandler";
 import prisma from "../utils/database/database";
 import { getBalance, getInventory, getItems, setInventory, updateBalance, userExists } from "../utils/economy/utils";
 import requestDM from "../utils/functions/requestdm";
-import { getKarmaShopItems, isKarmaShopOpen } from "../utils/karma/utils";
+import { getKarma, getKarmaShopItems, isKarmaShopOpen } from "../utils/karma/utils";
 import { logger } from "../utils/logger";
 import { NypsiClient } from "../utils/models/Client";
 import { createNypsiInteraction, NypsiCommandInteraction } from "../utils/models/Command";
@@ -99,11 +99,13 @@ export default async function interactionCreate(interaction: Interaction) {
             if (!isKarmaShopOpen()) return;
 
             const items = getKarmaShopItems();
+            const karma = await getKarma(interaction.user.id);
 
             let options = Object.keys(items).filter(
                 (item) =>
                     (item.startsWith(focused.value) || items[item].name.startsWith(focused.value)) &&
-                    items[item].items_left > 0
+                    items[item].items_left > 0 &&
+                    items[item].cost <= karma
             );
 
             if (options.length > 25) options = options.splice(0, 24);
