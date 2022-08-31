@@ -36,20 +36,7 @@ const cmd = new Command("use", "use an item or open crates", Categories.MONEY).s
 cmd.slashEnabled = true;
 cmd.slashData
     .addStringOption((option) =>
-        option
-            .setName("item")
-            .setDescription("the item you want to use")
-            .setRequired(true)
-            .setChoices(
-                { name: "📦 vote", value: "vote" },
-                { name: "📦 basic", value: "basic" },
-                { name: "🔒 padlock", value: "padlock" },
-                { name: "🧰 lock pick", value: "lock_pick" },
-                { name: "😷 mask", value: "mask" },
-                { name: "📻 radio", value: "radio" },
-                { name: "handcuffs", value: "handcuffs" },
-                { name: "chastity_cage", value: "chastity_cage" }
-            )
+        option.setName("item").setDescription("the item you want to use").setRequired(true).setAutocomplete(true)
     )
     .addUserOption((option) => option.setName("member").setDescription("member to use your item on, if applicable"));
 
