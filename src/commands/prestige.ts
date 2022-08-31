@@ -4,8 +4,12 @@ import {
     ButtonStyle,
     CommandInteraction,
     Interaction,
+    InteractionReplyOptions,
+    InteractionResponse,
     Message,
     MessageActionRowComponentBuilder,
+    MessageEditOptions,
+    MessageOptions,
 } from "discord.js";
 import { addCooldown, addExpiry, getResponse, onCooldown } from "../utils/cooldownhandler.js";
 import {
@@ -31,17 +35,44 @@ import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("prestige", "prestige to gain extra benefits", Categories.MONEY);
 
+cmd.slashEnabled = true;
+
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
+    const send = async (data: MessageOptions) => {
+        if (!(message instanceof Message)) {
+            if (message.deferred) {
+                await message.editReply(data);
+            } else {
+                await message.reply(data as InteractionReplyOptions);
+            }
+            const replyMsg = await message.fetchReply();
+            if (replyMsg instanceof Message) {
+                return replyMsg;
+            }
+        } else {
+            return await message.channel.send(data);
+        }
+    };
+
+    const edit = async (data: MessageEditOptions, msg: Message | InteractionResponse) => {
+        if (!(message instanceof Message)) {
+            return await message.editReply(data);
+        } else {
+            if (msg instanceof InteractionResponse) return;
+            return await msg.edit(data);
+        }
+    };
+
     if (await onCooldown(cmd.name, message.member)) {
         const embed = await getResponse(cmd.name, message.member);
 
-        return message.channel.send({ embeds: [embed] });
+        return send({ embeds: [embed] });
     }
 
     if (!(await userExists(message.member))) await createUser(message.member);
 
     // if (await getPrestige(message.member) >= 20) {
-    //     return message.channel.send({
+    //     return send({
     //         embeds: [
     //             new ErrorEmbed("gg, you're max prestige. you completed nypsi").setImage("https://i.imgur.com/vB3UGgi.png"),
     //         ],
@@ -54,11 +85,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         neededBal = getPrestigeRequirementBal(neededXp);
 
     if (currentXp < neededXp) {
-        return message.channel.send({ embeds: [new ErrorEmbed(`you need **${neededXp.toLocaleString()}**xp to prestige`)] });
+        return send({ embeds: [new ErrorEmbed(`you need **${neededXp.toLocaleString()}**xp to prestige`)] });
     }
 
     if (currentBal < neededBal) {
-        return message.channel.send({
+        return send({
             embeds: [
                 new CustomEmbed(
                     message.member,
@@ -80,7 +111,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         new ButtonBuilder().setCustomId("✅").setLabel("do it.").setStyle(ButtonStyle.Success)
     );
 
-    const msg = await message.channel.send({ embeds: [embed], components: [row] });
+    const msg = await send({ embeds: [embed], components: [row] });
 
     const filter = (i: Interaction) => i.user.id == message.author.id;
 
@@ -92,7 +123,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         })
         .catch(async () => {
             embed.setDescription("❌ expired");
-            await msg.edit({ embeds: [embed], components: [] });
+            await edit({ embeds: [embed], components: [] }, msg);
             addExpiry(cmd.name, message.member, 30);
         });
 
@@ -104,13 +135,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         neededBal = getPrestigeRequirementBal(neededXp);
 
         if (currentXp < neededXp) {
-            return message.channel.send({
+            return send({
                 embeds: [new ErrorEmbed(`you need **${neededXp.toLocaleString()}**xp to prestige`)],
             });
         }
 
         if (currentBal < neededBal) {
-            return message.channel.send({
+            return send({
                 embeds: [
                     new CustomEmbed(
                         message.member,
@@ -175,7 +206,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 }`
         );
 
-        await msg.edit({ embeds: [embed], components: [] });
+        await edit({ embeds: [embed], components: [] }, msg);
     }
 }
 
