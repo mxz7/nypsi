@@ -39,7 +39,12 @@ export default async function interactionCreate(interaction: Interaction) {
 
             if (options.length == 0) return;
 
-            const formatted = options.map((i) => ({ name: items[i].name, value: i }));
+            const formatted = options.map((i) => ({
+                name: `${items[i].emoji.startsWith("<:") ? "" : `${items[i].emoji} `}${items[i].name} [${inventory[
+                    i
+                ].toLocaleString()}]`,
+                value: i,
+            }));
 
             return await interaction.respond(formatted);
         } else if (focused.name == "item-buy") {
@@ -57,7 +62,10 @@ export default async function interactionCreate(interaction: Interaction) {
 
             if (options.length == 0) return;
 
-            const formatted = options.map((i) => ({ name: items[i].name, value: i }));
+            const formatted = options.map((i) => ({
+                name: `${items[i].emoji.startsWith("<:") ? "" : `${items[i].emoji} `}${items[i].name}`,
+                value: i,
+            }));
 
             return await interaction.respond(formatted);
         }
