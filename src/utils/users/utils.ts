@@ -80,7 +80,7 @@ export async function createProfile(member: User | string) {
                 lastCommand: new Date(0),
             },
         })
-        .catch(() => {});
+        .catch();
     await redis.del(`cache:user:exists:${id}`);
 }
 

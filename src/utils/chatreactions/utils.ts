@@ -60,7 +60,7 @@ export function doChatReactions(client: NypsiClient) {
                 if (channel.type == ChannelType.GuildVoice) return;
                 if (channel.type == ChannelType.GuildNews) return;
 
-                const messages = await channel.messages.fetch({ limit: 50 }).catch(() => {});
+                const messages = await channel.messages.fetch({ limit: 50 }).catch();
                 let stop = false;
 
                 if (!messages) continue;
@@ -386,7 +386,7 @@ export async function startReaction(guild: Guild, channel: TextChannel) {
             } else {
                 embed.setFooter({ text: `ended with ${winners.size} winners` });
             }
-            await msg.edit({ embeds: [embed] }).catch(() => {});
+            await msg.edit({ embeds: [embed] }).catch();
         }, 500);
     });
 }

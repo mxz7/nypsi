@@ -159,7 +159,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             return await channel
                 .send({ content: key.user.toString() + " a match has been found", embeds: [embed2] })
-                .catch(() => {});
+                .catch();
         }
 
         addToLooking(description);
@@ -196,7 +196,7 @@ setInterval(() => {
                                 .setHeader("milf finder"),
                         ],
                     })
-                    .catch(() => {});
+                    .catch();
             }
 
             looking.delete(obj.user.id);
