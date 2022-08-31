@@ -1449,24 +1449,36 @@ export async function getInventory(member: GuildMember | string): Promise<Invent
         id = member;
     }
 
-    const query = await prisma.economy.findUnique({
-        where: {
-            userId: id,
-        },
-        select: {
-            inventory: true,
-        },
-    });
+    if (await redis.exists(`cache:economy:inventory:${id}`)) {
+        return JSON.parse(await redis.get(`cache:economy:inventory:${id}`));
+    }
+
+    const query = await prisma.economy
+        .findUnique({
+            where: {
+                userId: id,
+            },
+            select: {
+                inventory: true,
+            },
+        })
+        .catch(() => {});
 
     if (!query) {
         if (!(await userExists(id))) await createUser(id);
+        await redis.set(`cache:economy:inventory:${id}`, "{}");
+        await redis.expire(`cache:economy:inventory:${id}`, 180);
         return {};
     }
 
     if (!query.inventory) {
+        await redis.set(`cache:economy:inventory:${id}`, "{}");
+        await redis.expire(`cache:economy:inventory:${id}`, 180);
         return {};
     }
 
+    await redis.set(`cache:economy:inventory:${id}`, JSON.stringify(query.inventory));
+    await redis.expire(`cache:economy:inventory:${id}`, 180);
     return query.inventory as Inventory;
 }
 
@@ -1486,6 +1498,8 @@ export async function setInventory(member: GuildMember | string, inventory: obje
             inventory: inventory,
         },
     });
+
+    await redis.del(`cache:economy:inventory:${id}`);
 }
 
 export function getItems(): { [key: string]: Item } {
