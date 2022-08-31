@@ -36,6 +36,22 @@ import { getTier, isPremium } from "../utils/premium/utils";
 const cmd = new Command("auction", "create and manage your item auctions", Categories.MONEY).setAliases(["ah"]);
 
 cmd.slashEnabled = true;
+cmd.slashData
+    .addSubcommand((manage) => manage.setName("manage").setDescription("manage your current auctions"))
+    .addSubcommand((create) =>
+        create
+            .setName("create")
+            .setDescription("create an auction")
+            .addStringOption((option) =>
+                option.setName("item").setDescription("item you would like to sell").setAutocomplete(true).setRequired(true)
+            )
+            .addStringOption((option) =>
+                option.setName("amount").setDescription("amount of items you would like to sell").setRequired(true)
+            )
+            .addStringOption((option) =>
+                option.setName("cost").setDescription("amount you would like this item to sell for").setRequired(true)
+            )
+    );
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     const send = async (data: MessageOptions) => {
@@ -317,7 +333,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return await edit({ embeds: [embed] }, msg);
     };
 
-    if (args.length == 0) {
+    if (args.length == 0 || args[0].toLowerCase() == "manage") {
         const auctions = await getAuctions(message.member);
 
         const embed = new CustomEmbed(message.member).setHeader("your auctions", message.author.avatarURL());
@@ -546,6 +562,121 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (args.length != 4) {
             return send({ embeds: [new ErrorEmbed("please use /auction create to create auctions in a command")] });
         }
+
+        let maxAuctions = 2;
+
+        if (await isPremium(message.member)) {
+            maxAuctions += await getTier(message.member);
+        }
+
+        const auctions = await getAuctions(message.member);
+
+        if (auctions.length >= maxAuctions) {
+            return send({
+                embeds: [new ErrorEmbed(`you have reached your maximum (\`${maxAuctions}\`) amount of auctions`)],
+            });
+        }
+
+        const items = getItems();
+
+        let chosen: string;
+
+        for (const itemName of Array.from(Object.keys(items))) {
+            const aliases = items[itemName].aliases ? items[itemName].aliases : [];
+            if (args[1].toLowerCase() == itemName) {
+                chosen = itemName;
+                break;
+            } else if (args[1].toLowerCase() == itemName.split("_").join("")) {
+                chosen = itemName;
+                break;
+            } else if (aliases.indexOf(args[1].toLowerCase()) != -1) {
+                chosen = itemName;
+                break;
+            } else if (args[1].toLowerCase() == items[itemName].name) {
+                chosen = itemName;
+                break;
+            }
+        }
+
+        const selected = items[chosen];
+
+        if (!selected) {
+            return send({ embeds: [new ErrorEmbed("couldnt find that item")] });
+        }
+
+        const inventory = await getInventory(message.member);
+
+        if (!inventory[selected.id] || inventory[selected.id] == 0) {
+            return send({ embeds: [new ErrorEmbed(`you dont have a ${selected.name}`)] });
+        }
+
+        if (args[2].toLowerCase() == "all") {
+            args[2] = inventory[selected.id].toString();
+        }
+
+        if (!parseInt(args[2]) || isNaN(parseInt(args[2]))) {
+            return send({ embeds: [new ErrorEmbed("invalid amount")] });
+        }
+
+        const amount = parseInt(args[2]);
+
+        if (amount < 1) {
+            return send({ embeds: [new ErrorEmbed("invalid amount")] });
+        }
+
+        if (inventory[selected.id] < amount) {
+            return send({ embeds: [new ErrorEmbed(`you dont have this many ${selected.name}`)] });
+        }
+
+        const cost = await formatBet(args[3].toLowerCase(), message.member).catch(() => {});
+
+        if (!cost) {
+            return message.channel.send({ embeds: [new ErrorEmbed("invalid amount")] });
+        }
+
+        if (cost <= 0) {
+            return send({
+                embeds: [new ErrorEmbed("invalid amount")],
+            });
+        }
+
+        if (cost > 15000000) {
+            return send({ embeds: [new ErrorEmbed("this is too much")] });
+        }
+
+        const shopCost = (items[selected.id].buy || 0) * amount;
+
+        if (shopCost != 0 && cost > shopCost) {
+            return send({
+                embeds: [
+                    new ErrorEmbed(
+                        `you can buy ${amount}x ${selected.emoji} ${
+                            selected.name
+                        } from nypsi's shop for $${shopCost.toLocaleString()}`
+                    ),
+                ],
+            });
+        }
+
+        inventory[selected.id] -= amount;
+
+        if (inventory[selected.id] <= 0) {
+            delete inventory[selected.id];
+        }
+
+        await setInventory(message.member, inventory);
+
+        const url = await createAuction(message.member, selected.id, amount, cost).catch(() => {});
+
+        let desc: string;
+
+        if (url) {
+            desc = `[your auction has been created](${url})`;
+        } else {
+            desc = "there was an error while creating your auction";
+        }
+
+        return await send({ embeds: [new CustomEmbed(message.member, desc)] });
     }
 }
 
