@@ -322,10 +322,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             if (await getDMsEnabled(target)) {
                 if (robberySuccess) {
                     await addRob(message.member, true);
-                    await target.send({ content: "you have been robbed!!", embeds: [embed3] }).catch();
+                    await target.send({ content: "you have been robbed!!", embeds: [embed3] }).catch(() => {});
                 } else {
                     await addRob(message.member, false);
-                    await target.send({ content: "you were nearly robbed!!", embeds: [embed3] }).catch();
+                    await target.send({ content: "you were nearly robbed!!", embeds: [embed3] }).catch(() => {});
                 }
             }
         }, 1500);

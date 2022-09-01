@@ -1,10 +1,10 @@
 import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions, PermissionFlagsBits, User } from "discord.js";
 import { getPrefix } from "../utils/guilds/utils";
-import { profileExists, createProfile, newCase, deleteBan } from "../utils/moderation/utils";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
 import { logger } from "../utils/logger";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 import { PunishmentType } from "../utils/models/GuildStorage";
+import { createProfile, deleteBan, newCase, profileExists } from "../utils/moderation/utils";
 
 const cmd = new Command("unban", "unban one or more users", Categories.MODERATION).setPermissions(["BAN_MEMBERS"]);
 
@@ -122,7 +122,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (args.join(" ").includes("-s")) {
         if (message instanceof Message) {
             await message.delete();
-            await message.member.send({ embeds: [embed] }).catch();
+            await message.member.send({ embeds: [embed] }).catch(() => {});
         } else {
             await message.reply({ embeds: [embed], ephemeral: true });
         }

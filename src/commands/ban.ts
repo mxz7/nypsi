@@ -256,7 +256,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (args.join(" ").includes("-s")) {
         if (message instanceof Message) {
             await message.delete();
-            await message.member.send({ embeds: [embed] }).catch();
+            await message.member.send({ embeds: [embed] }).catch(() => {});
         } else {
             await message.reply({ embeds: [embed], ephemeral: true });
         }
@@ -297,7 +297,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                             temporary ? `\n\nexpires in **${banLength}**}` : ""
                         }`,
                     })
-                    .catch();
+                    .catch(() => {});
             } else {
                 const embed = new CustomEmbed(m)
                     .setTitle(`banned from ${message.guild.name}`)
@@ -309,7 +309,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     embed.setTimestamp(unbanDate);
                 }
 
-                await m.send({ content: `you have been banned from ${message.guild.name}`, embeds: [embed] }).catch();
+                await m
+                    .send({ content: `you have been banned from ${message.guild.name}`, embeds: [embed] })
+                    .catch(() => {});
             }
         }
     }

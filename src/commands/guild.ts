@@ -134,10 +134,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const edit = async (data: MessageEditOptions, msg: Message) => {
         if (!(message instanceof Message)) {
-            await message.editReply(data).catch();
+            await message.editReply(data).catch(() => {});
             return await message.fetchReply();
         } else {
-            return await msg.edit(data).catch();
+            return await msg.edit(data).catch(() => {});
         }
     };
 
@@ -323,7 +323,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 return collected.customId;
             })
             .catch(async () => {
-                await edit({ components: [] }, msg).catch();
+                await edit({ components: [] }, msg).catch(() => {});
                 fail = true;
                 invited.delete(target.user.id);
             });

@@ -1,8 +1,8 @@
 import { CommandInteraction, Message } from "discord.js";
-import { getPrefix } from "../utils/guilds/utils";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { getPrefix } from "../utils/guilds/utils";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 
 const cmd = new Command("ezpoll", "simple poll builder", Categories.UTILITY);
 
@@ -64,7 +64,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (!(message instanceof Message)) return;
 
     message.channel.send({ embeds: [embed] }).then(async (m) => {
-        await message.delete().catch();
+        await message.delete().catch(() => {});
 
         if (args.length >= 2) {
             await m.react("1️⃣");

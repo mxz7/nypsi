@@ -52,7 +52,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (i.customId == customId) {
             await i.deferUpdate();
             if (reactions.includes(i.user.id) || i.deferred) {
-                return await i.followUp({ embeds: [new ErrorEmbed("you can only do this once")], ephemeral: true }).catch();
+                return await i
+                    .followUp({ embeds: [new ErrorEmbed("you can only do this once")], ephemeral: true })
+                    .catch(() => {});
             }
 
             reactions.push(i.user.id);

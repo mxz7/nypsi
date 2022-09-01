@@ -72,7 +72,7 @@ export default async function messageCreate(message: Message) {
                         -1,
                         message.channel.id
                     );
-                    return await message.delete().catch();
+                    return await message.delete().catch(() => {});
                 }
             }
         } else {
@@ -93,7 +93,7 @@ export default async function messageCreate(message: Message) {
                             message.channel.id,
                             (similarity * 100).toFixed(2)
                         );
-                        return await message.delete().catch();
+                        return await message.delete().catch(() => {});
                     }
                 }
             }
@@ -233,7 +233,7 @@ async function addMention() {
                 data: currentData,
                 skipDuplicates: true,
             })
-            .catch();
+            .catch(() => {});
         currentData = [];
         inserting = false;
     }
@@ -250,7 +250,7 @@ async function addMention() {
                     data: currentData,
                     skipDuplicates: true,
                 })
-                .catch();
+                .catch(() => {});
             currentData = [];
             inserting = false;
         }
@@ -375,7 +375,7 @@ async function addMention() {
                     data: currentData,
                     skipDuplicates: true,
                 })
-                .catch();
+                .catch(() => {});
             currentData = [];
             inserting = false;
         }

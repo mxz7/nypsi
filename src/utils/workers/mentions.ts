@@ -53,7 +53,7 @@ if (!isMainThread) {
                     data: currentData,
                     skipDuplicates: true,
                 })
-                .catch();
+                .catch(() => {});
             currentData = [];
             inserting = false;
         }
@@ -92,7 +92,7 @@ if (!isMainThread) {
                         data: currentData,
                         skipDuplicates: true,
                     })
-                    .catch();
+                    .catch(() => {});
                 currentData = [];
                 inserting = false;
             }
