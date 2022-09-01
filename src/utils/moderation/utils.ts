@@ -541,15 +541,18 @@ export async function requestUnmute(guildId: string, member: string, client: Nyp
             let role = muteRoleId;
 
             try {
-                if (muteRoleId == "" || muteRoleId == "default") {
-                    const roles = await guild.roles.fetch();
-                    role = roles.find((r) => r.name == "muted").id;
+                if (muteRoleId == "" || muteRoleId == "default" || !muteRoleId) {
+                    await guild.roles.fetch();
+                    role = guild.roles.cache.find((r) => r.name.toLowerCase() == "muted").id;
                 } else {
-                    role = (await guild.roles.fetch(muteRoleId)).id;
+                    role = (await guild.roles.fetch(muteRoleId).catch()).id;
                 }
             } catch {
                 return "role";
             }
+
+            // return guild.roles.cache.find((r) => r.name.toLowerCase() == "muted");
+            // return role;
 
             let fail = false;
             await member.roles.remove(role, "mute expired").catch(() => {
