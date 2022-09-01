@@ -765,7 +765,12 @@ export async function runCommand(
 
     const news = await getNews();
 
-    if ((await getPrestige(message.member)) >= 1 && !(await hasSeenNews(message.author.id)) && news.text != "") {
+    if (
+        news.text != "" &&
+        (await userExists(message.member)) &&
+        (await getPrestige(message.member)) >= 1 &&
+        !(await hasSeenNews(message.author.id))
+    ) {
         await redis.rpush("nypsi:news:seen", message.author.id);
 
         const pos = await hasSeenNews(message.author.id);
