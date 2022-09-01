@@ -122,9 +122,9 @@ export default async function interactionCreate(interaction: Interaction) {
     }
 
     if (interaction.type == InteractionType.MessageComponent && interaction.customId == "b") {
-        const auction = await prisma.auction.findUnique({
+        const auction = await prisma.auction.findFirst({
             where: {
-                messageId: interaction.message.id,
+                AND: [{ messageId: interaction.message.id }, { sold: false }],
             },
             select: {
                 bin: true,
@@ -151,9 +151,12 @@ export default async function interactionCreate(interaction: Interaction) {
             }
 
             await prisma.auction
-                .delete({
+                .update({
                     where: {
                         id: auction.id,
+                    },
+                    data: {
+                        sold: true,
                     },
                 })
                 .catch();
