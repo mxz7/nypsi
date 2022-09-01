@@ -333,6 +333,8 @@ export default async function interactionCreate(interaction: Interaction) {
                     return res.reply({ embeds: [new ErrorEmbed("your response had a filtered word")] });
             }
 
+            logger.debug(`survey response ${interaction.user.tag}: ${value}`);
+
             await prisma.surveyData
                 .create({
                     data: {
