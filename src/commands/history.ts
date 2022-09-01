@@ -189,7 +189,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     return collected.customId;
                 })
                 .catch(async () => {
-                    await edit({ components: [] }).catch();
+                    await edit({ components: [] }).catch(() => {});
                 });
 
             const newEmbed = new CustomEmbed(message.member);

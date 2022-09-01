@@ -109,10 +109,10 @@ export async function addModLog(
     channelId?: string,
     similarity?: string
 ) {
-    let punished: GuildMember | User | void = await guild.members.fetch(userID).catch();
+    let punished: GuildMember | User | void = await guild.members.fetch(userID).catch(() => {});
 
     if (!punished) {
-        punished = await guild.client.users.fetch(userID).catch();
+        punished = await guild.client.users.fetch(userID).catch(() => {});
     }
 
     const embed = new CustomEmbed().disableFooter();
@@ -506,7 +506,7 @@ export async function setMuteRole(guild: Guild, role: Role | string) {
 export async function requestUnban(guildId: string, member: string, client: NypsiClient) {
     const res = await client.cluster.broadcastEval(
         async (c, { guildId, memberId }) => {
-            const guild = await c.guilds.fetch(guildId).catch();
+            const guild = await c.guilds.fetch(guildId).catch(() => {});
 
             if (!guild) return "guild";
 
@@ -530,11 +530,11 @@ export async function requestUnmute(guildId: string, member: string, client: Nyp
 
     const res = await client.cluster.broadcastEval(
         async (c, { guildId, memberId, muteRoleId }) => {
-            const guild = await c.guilds.fetch(guildId).catch();
+            const guild = await c.guilds.fetch(guildId).catch(() => {});
 
             if (!guild) return "guild";
 
-            const member = await guild.members.fetch(memberId).catch();
+            const member = await guild.members.fetch(memberId).catch(() => {});
 
             if (!member) return "member";
 
@@ -545,7 +545,7 @@ export async function requestUnmute(guildId: string, member: string, client: Nyp
                     await guild.roles.fetch();
                     role = guild.roles.cache.find((r) => r.name.toLowerCase() == "muted").id;
                 } else {
-                    role = (await guild.roles.fetch(muteRoleId).catch()).id;
+                    role = (await guild.roles.fetch(muteRoleId).catch(() => {})).id;
                 }
             } catch {
                 return "role";

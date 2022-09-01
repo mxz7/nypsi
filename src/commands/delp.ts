@@ -57,7 +57,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (message.channel.isDMBased()) return;
 
-    await message.channel.bulkDelete(collected).catch();
+    await message.channel.bulkDelete(collected).catch(() => {});
 }
 
 cmd.setRun(run);

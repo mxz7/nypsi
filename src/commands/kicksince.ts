@@ -214,13 +214,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         const m = members.get(member);
 
         if (reason.split(": ")[1] == "no reason given") {
-            await m.send({ content: `you have been kicked from ${message.guild.name}` }).catch();
+            await m.send({ content: `you have been kicked from ${message.guild.name}` }).catch(() => {});
         } else {
             const embed = new CustomEmbed(m)
                 .setTitle(`kicked from ${message.guild.name}`)
                 .addField("reason", `\`${reason.split(": ")[1]}\``);
 
-            await m.send({ content: `you have been kicked from ${message.guild.name}`, embeds: [embed] }).catch();
+            await m.send({ content: `you have been kicked from ${message.guild.name}`, embeds: [embed] }).catch(() => {});
         }
     }
 }

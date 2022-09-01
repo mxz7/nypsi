@@ -18,7 +18,7 @@ export default async function requestDM(options: RequestDMOptions): Promise<bool
         const clusterHas = await options.client.cluster.broadcastEval(
             async (c, { userId }) => {
                 const client = c as NypsiClient;
-                const user = await client.users.fetch(userId).catch();
+                const user = await client.users.fetch(userId).catch(() => {});
 
                 if (user) {
                     return client.cluster.id;
@@ -58,7 +58,7 @@ export default async function requestDM(options: RequestDMOptions): Promise<bool
                 const client = c as NypsiClient;
                 if (client.cluster.id != needed) return false;
 
-                const user = await client.users.fetch(memberId).catch();
+                const user = await client.users.fetch(memberId).catch(() => {});
 
                 if (!user) return false;
 
@@ -96,7 +96,7 @@ export default async function requestDM(options: RequestDMOptions): Promise<bool
         const clusterHas = await options.client.broadcastEval(
             async (c, { userId }) => {
                 const client = c as NypsiClient;
-                const user = await client.users.fetch(userId).catch();
+                const user = await client.users.fetch(userId).catch(() => {});
 
                 if (user) {
                     return client.cluster.id;
@@ -136,7 +136,7 @@ export default async function requestDM(options: RequestDMOptions): Promise<bool
                 const client = c as NypsiClient;
                 if (client.cluster.id != needed) return false;
 
-                const user = await client.users.fetch(memberId).catch();
+                const user = await client.users.fetch(memberId).catch(() => {});
 
                 if (!user) return false;
 

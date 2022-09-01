@@ -117,7 +117,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const maxBet = await calcMaxBet(message.member);
 
-    const bet = (await formatBet(args[0], message.member).catch()) || defaultBet;
+    const bet = (await formatBet(args[0], message.member).catch(() => {})) || defaultBet;
 
     if (!bet) {
         return send({ embeds: [new ErrorEmbed("invalid bet")] });
@@ -259,7 +259,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 });
             });
         })
-        .catch();
+        .catch(() => {});
 }
 
 cmd.setRun(run);
