@@ -1,6 +1,6 @@
+import { EmbedBuilder } from "discord.js";
 import prisma from "../../database/database";
 import { NypsiClient } from "../../models/Client";
-import { CustomEmbed } from "../../models/EmbedBuilders";
 import ms = require("ms");
 
 export async function runSurveyChecks(client: NypsiClient) {
@@ -43,20 +43,64 @@ export async function runSurveyChecks(client: NypsiClient) {
 
             const desc = `${survey.surveyText}\n\n**results**\n${data}`;
 
-            const channel = await client.channels.fetch(survey.channelId);
+            const clusterHas = await client.cluster.broadcastEval(
+                async (c, { channelId }) => {
+                    const client = c as NypsiClient;
+                    const channel = await client.channels.fetch(channelId).catch();
 
-            if (!channel) continue;
-            if (!channel.isTextBased()) continue;
+                    if (channel) {
+                        return client.cluster.id;
+                    } else {
+                        return "not-found";
+                    }
+                },
+                {
+                    context: { channelId: survey.channelId },
+                }
+            );
 
-            const message = await channel.messages.fetch(survey.messageId);
+            let shard: number;
 
-            const embed = new CustomEmbed();
+            for (const i of clusterHas) {
+                if (i != "not-found") {
+                    shard = i;
+                    break;
+                }
+            }
 
-            embed.setColor(message.embeds[0].color);
-            embed.setHeader(message.embeds[0].author.name, message.embeds[0].author.iconURL);
-            embed.setDescription(desc);
+            await client.cluster.broadcastEval(
+                async (c, { channelId, desc, messageId, shard, embed }) => {
+                    if ((c as NypsiClient).cluster.id != shard) return;
 
-            await message.edit({ embeds: [embed], components: [] });
+                    const channel = await c.channels.fetch(channelId).catch(() => {});
+
+                    if (!channel) return;
+                    if (!channel.isTextBased()) return;
+
+                    const message = await channel.messages.fetch(messageId).catch(() => {});
+
+                    if (!message) return;
+
+                    embed.author = {
+                        name: message.embeds[0].author.name,
+                        icon_url: message.embeds[0].author.iconURL,
+                    };
+
+                    embed.color = message.embeds[0].color;
+                    embed.description = desc;
+
+                    return await message.edit({ embeds: [embed], components: [] });
+                },
+                {
+                    context: {
+                        desc: desc,
+                        messageId: survey.messageId,
+                        channelId: survey.channelId,
+                        shard: shard,
+                        embed: new EmbedBuilder().toJSON(),
+                    },
+                }
+            );
         }
-    }, ms("1 minutes")); // change to hour
+    }, ms("20 minutes"));
 }
