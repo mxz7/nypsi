@@ -118,6 +118,26 @@ export default async function interactionCreate(interaction: Interaction) {
             }));
 
             return await interaction.respond(formatted);
+        } else if (focused.name == "item-global") {
+            const items = getItems();
+
+            let options = Object.keys(items).filter(
+                (item) =>
+                    item.startsWith(focused.value) ||
+                    items[item].name.startsWith(focused.value) ||
+                    items[item].aliases?.includes(focused.value)
+            );
+
+            if (options.length > 25) options = options.splice(0, 24);
+
+            if (options.length == 0) return;
+
+            const formatted = options.map((i) => ({
+                name: `${items[i].emoji.startsWith("<:") ? "" : `${items[i].emoji} `}${items[i].name}`,
+                value: i,
+            }));
+
+            return await interaction.respond(formatted);
         }
     }
 
