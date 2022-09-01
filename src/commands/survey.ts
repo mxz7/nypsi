@@ -69,7 +69,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({
             embeds: [
                 new ErrorEmbed(
-                    `you have reached your maximum amount of surveys (\`${max}\`). you can become a patreon to create more`
+                    `you have reached your maximum amount of active surveys (\`${max}\`). you can become a patreon to create more`
                 ),
             ],
         });
