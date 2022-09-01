@@ -13,10 +13,10 @@ import {
 } from "discord.js";
 import * as fs from "fs";
 import { getBorderCharacters, table } from "table";
-import { getItems, getXp, isEcoBanned, isHandcuffed, updateXp, userExists } from "./economy/utils";
+import { getItems, getPrestige, getXp, isEcoBanned, isHandcuffed, updateXp, userExists } from "./economy/utils";
 import { createCaptcha, isLockedOut, toggleLock } from "./functions/captcha";
 import { formatDate, MStoTime } from "./functions/date";
-import { getNews } from "./functions/news";
+import { getNews, hasSeenNews } from "./functions/news";
 import { createGuild, getChatFilter, getDisabledCommands, getPrefix, hasGuild } from "./guilds/utils";
 import { addKarma, getKarma, getLastCommand, updateLastCommand } from "./karma/utils";
 import { getTimestamp, logger } from "./logger";
@@ -760,6 +760,26 @@ export async function runCommand(
             return message.channel.send({ embeds: [new ErrorEmbed("that command has been disabled")] });
         } else {
             return message.editReply({ embeds: [new ErrorEmbed("that command has been disabled")] });
+        }
+    }
+
+    const news = await getNews();
+
+    if ((await getPrestige(message.member)) >= 1 && !(await hasSeenNews(message.author.id)) && news.text != "") {
+        await redis.lpush("nypsi:news:seen", message.author.id);
+
+        const pos = await hasSeenNews(message.author.id);
+
+        const embed = new CustomEmbed(message.member, `${news.text}\n\n*${formatDate(news.date)}*`)
+            .setHeader("news", message.author.avatarURL())
+            .setFooter({ text: `you are #${pos} to see this` });
+
+        if (message instanceof Message) {
+            await message.reply({ embeds: [embed] });
+        } else {
+            setTimeout(() => {
+                message.followUp({ embeds: [embed] });
+            }, 2000);
         }
     }
 
