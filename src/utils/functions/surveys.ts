@@ -11,13 +11,14 @@ export async function getSurveys(member: GuildMember) {
     return query;
 }
 
-export async function createSurvey(ownerId: string, text: string, resultsAt: Date, messageId: string) {
+export async function createSurvey(ownerId: string, text: string, resultsAt: Date, messageId: string, channelId: string) {
     return await prisma.survey.create({
         data: {
             ownerId: ownerId,
             surveyText: text,
             resultsAt: resultsAt,
             messageId: messageId,
+            channelId: channelId,
         },
     });
 }

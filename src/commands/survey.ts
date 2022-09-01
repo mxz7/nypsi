@@ -93,7 +93,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const msg = await send({ embeds: [embed], components: [row] });
 
-    return await createSurvey(message.author.id, message.options.getString("string"), endsAt, msg.id);
+    return await createSurvey(message.author.id, message.options.getString("string"), endsAt, msg.id, message.channel.id);
 }
 
 cmd.setRun(run);

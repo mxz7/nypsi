@@ -130,6 +130,7 @@ model Survey {
   surveyText String
   resultsAt  DateTime
   messageId  String   @unique
+  channelId  String
 
   owner      User         @relation(fields: [ownerId], references: [id])
   SurveyData SurveyData[]
