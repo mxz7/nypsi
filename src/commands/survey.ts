@@ -80,7 +80,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         .add(message.options.getInteger("hours") || 12, "hours")
         .toDate();
 
-    desc += `\n\nanswers: \`0\`\nends <t:${Math.floor(endsAt.getTime() / 1000)}:R>`;
+    desc += `\n\n\`0\` answers\nends <t:${Math.floor(endsAt.getTime() / 1000)}:R>`;
 
     const embed = new CustomEmbed(message.member, desc).setHeader(
         `${message.author.username}'s survey`,

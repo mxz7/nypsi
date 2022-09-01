@@ -345,9 +345,9 @@ export default async function interactionCreate(interaction: Interaction) {
             embed.setColor(interaction.message.embeds[0].color);
             embed.setHeader(interaction.message.embeds[0].author.name, interaction.message.embeds[0].author.iconURL);
             embed.setDescription(
-                `${survey.surveyText}\n\nanswers: \`${(
+                `${survey.surveyText}\n\n\`${(
                     survey.SurveyData.length + 1
-                ).toLocaleString()}\`\nends <t:${Math.floor(survey.resultsAt.getTime() / 1000)}:R>`
+                ).toLocaleString()}\` answers\nends <t:${Math.floor(survey.resultsAt.getTime() / 1000)}:R>`
             );
 
             return await interaction.message.edit({ embeds: [embed] }).catch(() => {});
