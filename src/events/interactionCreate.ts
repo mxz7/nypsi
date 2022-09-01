@@ -280,11 +280,17 @@ export default async function interactionCreate(interaction: Interaction) {
 
             const modal = new ModalBuilder().setCustomId("survey-answer").setTitle("answer survey");
 
+            let label = survey.surveyText;
+
+            if (label.length > 25) {
+                label = label.substring(0, 24);
+            }
+
             modal.addComponents(
                 new ActionRowBuilder<TextInputBuilder>().addComponents(
                     new TextInputBuilder()
                         .setCustomId("answer")
-                        .setLabel(survey.surveyText)
+                        .setLabel(label)
                         .setStyle(TextInputStyle.Short)
                         .setRequired(true)
                         .setMaxLength(50)
