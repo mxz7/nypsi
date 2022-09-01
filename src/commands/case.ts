@@ -74,7 +74,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
     }
 
-    const target = await message.guild.members.fetch(case0.user).catch();
+    const target = await message.guild.members.fetch(case0.user).catch(() => {});
 
     let reason = case0.command;
 
@@ -109,10 +109,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const edit = async (data: MessageEditOptions, msg: Message) => {
         if (!(message instanceof Message)) {
-            await message.editReply(data).catch();
+            await message.editReply(data).catch(() => {});
             return await message.fetchReply();
         } else {
-            return await msg.edit(data).catch();
+            return await msg.edit(data).catch(() => {});
         }
     };
 

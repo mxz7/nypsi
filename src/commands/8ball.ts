@@ -1,8 +1,8 @@
 import { CommandInteraction, Message } from "discord.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import fetch from "node-fetch";
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
 const answers = [
     "as i see it, yes",
@@ -47,7 +47,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const res = (
         await fetch(`https://8ball.delegator.com/magic/JSON/${encodeURIComponent(question)}`)
             .then((res) => res.json())
-            .catch()
+            .catch(() => {})
     ).magic;
 
     let response: string;

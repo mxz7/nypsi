@@ -38,7 +38,7 @@ export default async function messageUpdate(message: Message, newMessage: Messag
         for (const word of filter) {
             if (content.indexOf(word.toLowerCase()) != -1) {
                 addModLog(message.guild, PunishmentType.FILTER_VIOLATION, message.author.id, "nypsi", content.join(" "), -1);
-                return await message.delete().catch();
+                return await message.delete().catch(() => {});
             }
         }
     }

@@ -8,8 +8,8 @@ import {
     PermissionsBitField,
 } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 
 const cmd = new Command(
     "lockdown",
@@ -119,7 +119,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         const embed = new CustomEmbed(message.member, "✅ " + channel.toString() + " has been locked");
 
         return send({ embeds: [embed] }).catch(() => {
-            return message.member.send({ embeds: [embed] }).catch();
+            return message.member.send({ embeds: [embed] }).catch(() => {});
         });
     } else {
         await channel.permissionOverwrites.edit(role, {

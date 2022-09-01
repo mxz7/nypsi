@@ -88,7 +88,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (!(message instanceof Message)) return;
 
     message.channel.send({ embeds: [embed] }).then(async (m) => {
-        await message.delete().catch();
+        await message.delete().catch(() => {});
 
         if (choices == 0) {
             await m.react("👍");

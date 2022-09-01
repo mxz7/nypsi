@@ -1,8 +1,8 @@
-import { getPadlockPrice, userExists, createUser, hasPadlock } from "../utils/economy/utils.js";
 import { CommandInteraction, Message } from "discord.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
+import { createUser, getPadlockPrice, hasPadlock, userExists } from "../utils/economy/utils.js";
 import { getPrefix } from "../utils/guilds/utils";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 
 const cmd = new Command("padlock", "buy a padlock to protect your wallet", Categories.MONEY);
 
@@ -22,13 +22,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (await hasPadlock(message.member)) {
             embed.setColor("#5efb8f");
             embed.setDescription("**protected** 🔒\nyou currently have a padlock");
-            return await message.channel.send({ embeds: [embed] }).catch();
+            return await message.channel.send({ embeds: [embed] }).catch(() => {});
         } else {
             embed.setDescription(
                 `**vulnerable** 🔓\nyou do not have a padlock\nyou can buy one for $**${padlockPrice.toLocaleString()}** with ${prefix}buy padlock`
             );
             embed.setColor("#e4334f");
-            return await message.channel.send({ embeds: [embed] }).catch();
+            return await message.channel.send({ embeds: [embed] }).catch(() => {});
         }
     }
 }

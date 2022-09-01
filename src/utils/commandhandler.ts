@@ -407,7 +407,7 @@ async function helpCmd(message: Message, args: string[]) {
                 return collected.customId;
             })
             .catch(async () => {
-                await msg.edit({ components: [] }).catch();
+                await msg.edit({ components: [] }).catch(() => {});
             });
 
         if (!reaction) return;
@@ -502,7 +502,7 @@ export async function runCommand(
         if (message instanceof Message) {
             return message.member
                 .send("i don't have access to that channel. please contact server staff if this is an error")
-                .catch();
+                .catch(() => {});
         } else {
             return message
                 .editReply({
@@ -512,7 +512,7 @@ export async function runCommand(
                         ),
                     ],
                 })
-                .catch();
+                .catch(() => {});
         }
     }
 
@@ -521,7 +521,7 @@ export async function runCommand(
             .send(
                 "❌ i don't have permission to send messages in that channel - please contact server staff if this is an error"
             )
-            .catch();
+            .catch(() => {});
     }
 
     if (!message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.EmbedLinks)) {

@@ -160,7 +160,7 @@ export class PremUser {
             memberId: this.id,
             client: client,
             content: `your **${this.getLevelString()}** membership has expired, join the support server if this is an error ($support)`,
-        }).catch();
+        }).catch(() => {});
 
         this.status = status.INACTIVE;
         this.level = 0;
@@ -191,11 +191,11 @@ export enum status {
 async function requestRemoveRole(id: string, roleID: string, client: NypsiClient) {
     const res = await client.cluster.broadcastEval(
         async (c, { guildId, memberId, roleId }) => {
-            const guild = await c.guilds.fetch(guildId).catch();
+            const guild = await c.guilds.fetch(guildId).catch(() => {});
 
             if (!guild) return;
 
-            const user = await guild.members.fetch(memberId).catch();
+            const user = await guild.members.fetch(memberId).catch(() => {});
 
             if (!user) return;
 
