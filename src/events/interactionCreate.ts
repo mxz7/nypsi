@@ -55,7 +55,7 @@ export default async function interactionCreate(interaction: Interaction) {
             if (options.length == 0) return;
 
             const formatted = options.map((i) => ({
-                name: `${items[i].emoji.startsWith("<:") || items[i].emoji.startsWith("<:a") ? "" : `${items[i].emoji} `}${
+                name: `${items[i].emoji.startsWith("<:") || items[i].emoji.startsWith("<a:") ? "" : `${items[i].emoji} `}${
                     items[i].name
                 } [${inventory[i].toLocaleString()}]`,
                 value: i,
@@ -78,7 +78,7 @@ export default async function interactionCreate(interaction: Interaction) {
             if (options.length == 0) return;
 
             const formatted = options.map((i) => ({
-                name: `${items[i].emoji.startsWith("<:") || items[i].emoji.startsWith("<:a") ? "" : `${items[i].emoji} `}${
+                name: `${items[i].emoji.startsWith("<:") || items[i].emoji.startsWith("<a:") ? "" : `${items[i].emoji} `}${
                     items[i].name
                 }`,
                 value: i,
@@ -105,7 +105,7 @@ export default async function interactionCreate(interaction: Interaction) {
             if (options.length == 0) return;
 
             const formatted = options.map((i) => ({
-                name: `${items[i].emoji.startsWith("<:") || items[i].emoji.startsWith("<:a") ? "" : `${items[i].emoji} `}${
+                name: `${items[i].emoji.startsWith("<:") || items[i].emoji.startsWith("<a:") ? "" : `${items[i].emoji} `}${
                     items[i].name
                 }`,
                 value: i,
@@ -131,7 +131,7 @@ export default async function interactionCreate(interaction: Interaction) {
             if (options.length == 0) return;
 
             const formatted = options.map((i) => ({
-                name: `${items[i].emoji.startsWith("<:") || items[i].emoji.startsWith("<:a") ? "" : `${items[i].emoji} `}${
+                name: `${items[i].emoji.startsWith("<:") || items[i].emoji.startsWith("<a:") ? "" : `${items[i].emoji} `}${
                     items[i].name
                 }`,
                 value: i,
@@ -153,7 +153,7 @@ export default async function interactionCreate(interaction: Interaction) {
             if (options.length == 0) return;
 
             const formatted = options.map((i) => ({
-                name: `${items[i].emoji.startsWith("<:") || items[i].emoji.startsWith("<:a") ? "" : `${items[i].emoji} `}${
+                name: `${items[i].emoji.startsWith("<:") || items[i].emoji.startsWith("<a:") ? "" : `${items[i].emoji} `}${
                     items[i].name
                 }`,
                 value: i,
