@@ -75,7 +75,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
     }
 
-    let desc = message.options.getString("string");
+    let desc = message.options.getString("text");
     const endsAt = dayjs()
         .add(message.options.getInteger("hours") || 12, "hours")
         .toDate();
@@ -93,7 +93,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const msg = await send({ embeds: [embed], components: [row] });
 
-    return await createSurvey(message.author.id, message.options.getString("string"), endsAt, msg.id, message.channel.id);
+    return await createSurvey(message.author.id, message.options.getString("text"), endsAt, msg.id, message.channel.id);
 }
 
 cmd.setRun(run);
