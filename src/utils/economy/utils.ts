@@ -1462,7 +1462,7 @@ export async function getInventory(member: GuildMember | string): Promise<Invent
                 inventory: true,
             },
         })
-        .catch();
+        .catch(() => {});
 
     if (!query) {
         if (!(await userExists(id))) await createUser(id);
@@ -2440,7 +2440,7 @@ export async function deleteAuction(id: string, client: NypsiClient) {
                 messageId: true,
             },
         })
-        .catch();
+        .catch(() => {});
 
     if (auction) {
         await client.cluster.broadcastEval(
@@ -2454,9 +2454,9 @@ export async function deleteAuction(id: string, client: NypsiClient) {
                 if (!channel) return;
 
                 if (channel.isTextBased()) {
-                    const msg = await channel.messages.fetch(id).catch();
+                    const msg = await channel.messages.fetch(id).catch(() => {});
 
-                    if (msg) await msg.delete().catch();
+                    if (msg) await msg.delete().catch(() => {});
                 }
             },
             { context: { id: auction.messageId } }
@@ -2578,7 +2578,7 @@ export async function bumpAuction(id: string, client: NypsiClient) {
                 if (!channel) return;
 
                 if (channel.isTextBased()) {
-                    const msg = await channel.messages.fetch(messageId).catch();
+                    const msg = await channel.messages.fetch(messageId).catch(() => {});
 
                     if (msg) {
                         await msg.delete();

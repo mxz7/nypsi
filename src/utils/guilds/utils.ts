@@ -237,7 +237,7 @@ export function updateCounters(client: NypsiClient) {
                 if (inCooldown(guild) || guild.memberCount == guild.members.cache.size) {
                     members = guild.members.cache;
                 } else {
-                    members = await guild.members.fetch().catch();
+                    members = await guild.members.fetch().catch(() => {});
                     addCooldown(guild, 3600);
                 }
 
