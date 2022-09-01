@@ -288,7 +288,10 @@ export default async function interactionCreate(interaction: Interaction) {
                 },
             });
 
-            await res.reply({ embeds: [new CustomEmbed(res.member as GuildMember, "✅ you answer has been taken")] });
+            await res.reply({
+                embeds: [new CustomEmbed(res.member as GuildMember, "✅ your answer has been taken")],
+                ephemeral: true,
+            });
 
             const embed = new CustomEmbed();
 
