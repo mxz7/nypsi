@@ -280,10 +280,14 @@ export default async function interactionCreate(interaction: Interaction) {
 
             if (!res) return;
 
+            let value = res.fields.getTextInputValue("answer").toLowerCase().normalize("NFD");
+
+            value = value.replace(/[^A-z0-9\s]/g, "");
+
             await prisma.surveyData.create({
                 data: {
                     userId: interaction.user.id,
-                    value: res.fields.getTextInputValue("answer"),
+                    value: value,
                     surveyId: survey.id,
                 },
             });
