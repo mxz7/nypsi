@@ -129,6 +129,7 @@ model Survey {
   ownerId    String
   surveyText String
   resultsAt  DateTime
+  messageId  String   @unique
 
   owner      User         @relation(fields: [ownerId], references: [id])
   SurveyData SurveyData[]
