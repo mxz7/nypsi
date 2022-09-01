@@ -9,7 +9,7 @@ import { CustomEmbed } from "../../models/EmbedBuilders";
 
 export async function runAuctionChecks(client: NypsiClient) {
     setInterval(async () => {
-        const limit = dayjs().subtract(2, "days").toDate();
+        let limit = dayjs().subtract(2, "days").toDate();
 
         const query = await prisma.auction.findMany({
             where: {
@@ -58,6 +58,18 @@ export async function runAuctionChecks(client: NypsiClient) {
 
         if (query.length > 0) {
             logger.info(`${query.length} auctions expired`);
+        }
+
+        limit = dayjs().subtract(90, "days").toDate();
+
+        const { count } = await prisma.auction.deleteMany({
+            where: {
+                AND: [{ sold: true }, { createdAt: { lte: limit } }],
+            },
+        });
+
+        if (count > 0) {
+            logger.info(`${count.toLocaleString()} sold auctions deleted`);
         }
     }, ms("3 hours"));
 }
