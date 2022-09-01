@@ -1,4 +1,5 @@
 import {
+    ActionRowBuilder,
     ApplicationCommandOptionType,
     Collection,
     CommandInteraction,
@@ -7,11 +8,15 @@ import {
     GuildMember,
     Interaction,
     InteractionType,
+    ModalBuilder,
+    TextInputBuilder,
+    TextInputStyle,
 } from "discord.js";
 import { runCommand } from "../utils/commandhandler";
 import prisma from "../utils/database/database";
 import { getBalance, getInventory, getItems, setInventory, updateBalance, userExists } from "../utils/economy/utils";
 import requestDM from "../utils/functions/requestdm";
+import { getSurveyByMessageId } from "../utils/functions/surveys";
 import { getKarma, getKarmaShopItems, isKarmaShopOpen } from "../utils/karma/utils";
 import { logger } from "../utils/logger";
 import { NypsiClient } from "../utils/models/Client";
@@ -141,91 +146,160 @@ export default async function interactionCreate(interaction: Interaction) {
         }
     }
 
-    if (interaction.type == InteractionType.MessageComponent && interaction.customId == "b") {
-        const auction = await prisma.auction.findFirst({
-            where: {
-                AND: [{ messageId: interaction.message.id }, { sold: false }],
-            },
-            select: {
-                bin: true,
-                messageId: true,
-                id: true,
-                ownerId: true,
-                itemAmount: true,
-                itemName: true,
-            },
-        });
+    if (interaction.type == InteractionType.MessageComponent) {
+        if (interaction.customId == "b") {
+            const auction = await prisma.auction.findFirst({
+                where: {
+                    AND: [{ messageId: interaction.message.id }, { sold: false }],
+                },
+                select: {
+                    bin: true,
+                    messageId: true,
+                    id: true,
+                    ownerId: true,
+                    itemAmount: true,
+                    itemName: true,
+                },
+            });
 
-        if (auction && (await userExists(auction.ownerId))) {
-            if (auction.ownerId == interaction.user.id) {
+            if (auction && (await userExists(auction.ownerId))) {
+                if (auction.ownerId == interaction.user.id) {
+                    return await interaction.reply({
+                        embeds: [new ErrorEmbed("you cannot buy your own auction")],
+                        ephemeral: true,
+                    });
+                }
+
+                const balance = await getBalance(interaction.user.id);
+
+                if (balance < Number(auction.bin)) {
+                    return await interaction.reply({ embeds: [new ErrorEmbed("you cannot afford this")], ephemeral: true });
+                }
+
+                await prisma.auction
+                    .update({
+                        where: {
+                            id: auction.id,
+                        },
+                        data: {
+                            sold: true,
+                        },
+                    })
+                    .catch();
+
+                const inventory = await getInventory(interaction.user.id);
+
+                if (inventory[auction.itemName]) {
+                    inventory[auction.itemName] += auction.itemAmount;
+                } else {
+                    inventory[auction.itemName] = auction.itemAmount;
+                }
+
+                await setInventory(interaction.user.id, inventory);
+                await updateBalance(interaction.user.id, balance - Number(auction.bin));
+                await updateBalance(auction.ownerId, (await getBalance(auction.ownerId)) + Number(auction.bin));
+
+                const items = getItems();
+
+                const embedDm = new CustomEmbed()
+                    .setColor("#36393f")
+                    .setDescription(
+                        `your auction for ${auction.itemAmount}x ${items[auction.itemName].emoji} ${
+                            items[auction.itemName].name
+                        } has been bought by ${interaction.user.username} for $**${auction.bin.toLocaleString()}**`
+                    );
+
+                await requestDM({
+                    client: interaction.client as NypsiClient,
+                    memberId: auction.ownerId,
+                    content: "your auction has been bought",
+                    embed: embedDm,
+                });
+
+                const embed = new EmbedBuilder(interaction.message.embeds[0].data);
+
+                const desc = embed.data.description.split("\n\n");
+
+                desc[0] = `**bought** by ${interaction.user.username} <t:${Math.floor(Date.now() / 1000)}:R>`;
+
+                embed.setDescription(desc.join("\n\n"));
+
+                await interaction.message.edit({ embeds: [embed], components: [] });
+
+                logger.info(
+                    `auction ${auction.id} by ${auction.ownerId} bought by ${interaction.user.tag} (${interaction.user.id})`
+                );
+            } else {
+                await interaction.reply({ embeds: [new ErrorEmbed("invalid auction")], ephemeral: true });
+                await interaction.message.delete();
+            }
+        } else if (interaction.customId == "a") {
+            const survey = await getSurveyByMessageId(interaction.message.id);
+
+            if (!survey) {
                 return await interaction.reply({
-                    embeds: [new ErrorEmbed("you cannot buy your own auction")],
+                    embeds: [new ErrorEmbed("this survey no longer exists")],
                     ephemeral: true,
                 });
             }
 
-            const balance = await getBalance(interaction.user.id);
-
-            if (balance < Number(auction.bin)) {
-                return await interaction.reply({ embeds: [new ErrorEmbed("you cannot afford this")], ephemeral: true });
-            }
-
-            await prisma.auction
-                .update({
-                    where: {
-                        id: auction.id,
+            const hasResponed = await prisma.surveyData.findUnique({
+                where: {
+                    userId_surveyId: {
+                        surveyId: survey.id,
+                        userId: interaction.user.id,
                     },
-                    data: {
-                        sold: true,
-                    },
-                })
-                .catch();
-
-            const inventory = await getInventory(interaction.user.id);
-
-            if (inventory[auction.itemName]) {
-                inventory[auction.itemName] += auction.itemAmount;
-            } else {
-                inventory[auction.itemName] = auction.itemAmount;
-            }
-
-            await setInventory(interaction.user.id, inventory);
-            await updateBalance(interaction.user.id, balance - Number(auction.bin));
-            await updateBalance(auction.ownerId, (await getBalance(auction.ownerId)) + Number(auction.bin));
-
-            const items = getItems();
-
-            const embedDm = new CustomEmbed()
-                .setColor("#36393f")
-                .setDescription(
-                    `your auction for ${auction.itemAmount}x ${items[auction.itemName].emoji} ${
-                        items[auction.itemName].name
-                    } has been bought by ${interaction.user.username} for $**${auction.bin.toLocaleString()}**`
-                );
-
-            await requestDM({
-                client: interaction.client as NypsiClient,
-                memberId: auction.ownerId,
-                content: "your auction has been bought",
-                embed: embedDm,
+                },
             });
 
-            const embed = new EmbedBuilder(interaction.message.embeds[0].data);
+            if (hasResponed) {
+                return await interaction.reply({
+                    embeds: [new ErrorEmbed("you have already answered to tyhis survey")],
+                    ephemeral: true,
+                });
+            }
 
-            const desc = embed.data.description.split("\n\n");
+            const modal = new ModalBuilder().setCustomId("survey-answer").setTitle("answer survey");
 
-            desc[0] = `**bought** by ${interaction.user.username} <t:${Math.floor(Date.now() / 1000)}:R>`;
-
-            embed.setDescription(desc.join("\n\n"));
-
-            await interaction.message.edit({ embeds: [embed], components: [] });
-
-            logger.info(
-                `auction ${auction.id} by ${auction.ownerId} bought by ${interaction.user.tag} (${interaction.user.id})`
+            modal.addComponents(
+                new ActionRowBuilder<TextInputBuilder>().addComponents(
+                    new TextInputBuilder()
+                        .setCustomId("answer")
+                        .setLabel(survey.surveyText)
+                        .setStyle(TextInputStyle.Short)
+                        .setRequired(true)
+                )
             );
-        } else {
-            await interaction.reply({ embeds: [new ErrorEmbed("invalid auction")], ephemeral: true });
-            await interaction.message.delete();
+
+            await interaction.showModal(modal);
+
+            const filter = (i: Interaction) => i.user.id == interaction.user.id;
+
+            const res = await interaction.awaitModalSubmit({ filter, time: 120000 }).catch(() => {});
+
+            if (!res) return;
+
+            await prisma.surveyData.create({
+                data: {
+                    userId: interaction.user.id,
+                    value: res.fields.getTextInputValue("answer"),
+                    surveyId: survey.id,
+                },
+            });
+
+            await res.reply({ embeds: [new CustomEmbed(res.member as GuildMember, "✅ you answer has been taken")] });
+
+            const embed = new CustomEmbed();
+
+            embed.setColor(interaction.message.embeds[0].color);
+            embed.setHeader(interaction.message.embeds[0].author.name, interaction.message.embeds[0].author.iconURL);
+            embed.setDescription(
+                `${survey.surveyText}\n\nanswers: \`${(
+                    survey.SurveyData.length + 1
+                ).toLocaleString()}\`\nends <t:${Math.floor(survey.resultsAt.getTime() / 1000)}:R>`
+            );
+
+            return await interaction.message.edit({ embeds: [embed] }).catch(() => {});
         }
     }
 
