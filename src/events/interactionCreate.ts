@@ -254,7 +254,7 @@ export default async function interactionCreate(interaction: Interaction) {
 
             if (hasResponed) {
                 return await interaction.reply({
-                    embeds: [new ErrorEmbed("you have already answered to tyhis survey")],
+                    embeds: [new ErrorEmbed("you have already answered to this survey")],
                     ephemeral: true,
                 });
             }
