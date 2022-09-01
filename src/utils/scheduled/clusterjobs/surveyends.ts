@@ -38,7 +38,7 @@ export async function runSurveyChecks(client: NypsiClient) {
             for (const a of grouped) {
                 if (data.length >= 1000) return;
 
-                data += `${a.value}: **${a._count.value.toLocaleString()}**`;
+                data += `${a.value}: **${a._count.value.toLocaleString()}**\n`;
             }
 
             const desc = `${survey.surveyText}\n\n**results**\n${data}`;
