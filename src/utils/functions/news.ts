@@ -26,7 +26,7 @@ export async function hasSeenNews(id: string) {
 
     const index = await redis.lpos("nypsi:news:seen", id);
 
-    if (index == -1) return null;
+    if (index == null) return null;
 
     return index + 1;
 }
