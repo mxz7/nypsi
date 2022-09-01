@@ -2413,7 +2413,7 @@ export async function getAuctions(member: GuildMember | string) {
 
     const query = await prisma.auction.findMany({
         where: {
-            ownerId: id,
+            AND: [{ ownerId: id }, { sold: false }],
         },
     });
 
