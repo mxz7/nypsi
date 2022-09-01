@@ -282,8 +282,8 @@ export default async function interactionCreate(interaction: Interaction) {
 
             let label = survey.surveyText;
 
-            if (label.length > 25) {
-                label = label.substring(0, 24);
+            if (label.length > 45) {
+                label = label.substring(0, 40) + "...";
             }
 
             modal.addComponents(
