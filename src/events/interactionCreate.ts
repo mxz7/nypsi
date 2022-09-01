@@ -17,6 +17,7 @@ import prisma from "../utils/database/database";
 import { getBalance, getInventory, getItems, setInventory, updateBalance, userExists } from "../utils/economy/utils";
 import requestDM from "../utils/functions/requestdm";
 import { getSurveyByMessageId } from "../utils/functions/surveys";
+import { getChatFilter } from "../utils/guilds/utils";
 import { getKarma, getKarmaShopItems, isKarmaShopOpen } from "../utils/karma/utils";
 import { logger } from "../utils/logger";
 import { NypsiClient } from "../utils/models/Client";
@@ -280,9 +281,33 @@ export default async function interactionCreate(interaction: Interaction) {
 
             if (!res) return;
 
+            const descFilter = [
+                "nigger",
+                "nigga",
+                "faggot",
+                "fag",
+                "nig",
+                "ugly",
+                "discordgg",
+                "discordcom",
+                "discordappcom",
+            ];
+
             let value = res.fields.getTextInputValue("answer").toLowerCase().normalize("NFD");
 
             value = value.replace(/[^A-z0-9\s]/g, "");
+
+            for (const word of descFilter) {
+                if (value.includes(word))
+                    return res.reply({ embeds: [new ErrorEmbed("your response had a filtered word")] });
+            }
+
+            const serverFilter = await getChatFilter(interaction.guild);
+
+            for (const word of serverFilter) {
+                if (value.includes(word))
+                    return res.reply({ embeds: [new ErrorEmbed("your response had a filtered word")] });
+            }
 
             await prisma.surveyData.create({
                 data: {
