@@ -196,7 +196,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (args.join(" ").includes("-s")) {
         if (message instanceof Message) {
             await message.delete();
-            await message.member.send({ embeds: [embed] }).catch();
+            await message.member.send({ embeds: [embed] }).catch(() => {});
         } else {
             await message.reply({ embeds: [embed], ephemeral: true });
         }

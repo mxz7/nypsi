@@ -88,7 +88,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (amount <= 100) {
-        await message.channel.bulkDelete(amount, true).catch();
+        await message.channel.bulkDelete(amount, true).catch(() => {});
     } else {
         amount = amount - 1;
 
@@ -107,7 +107,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         const m = await message.channel.send({ embeds: [embed] });
         for (let i = 0; i < amount1 / 100; i++) {
-            if (amount < 10) return await m.delete().catch();
+            if (amount < 10) return await m.delete().catch(() => {});
 
             if (amount <= 100) {
                 let messages = await message.channel.messages.fetch({ limit: amount, before: m.id });
@@ -116,8 +116,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     return timeSince(new Date(m.createdTimestamp).getTime()) < 14;
                 });
 
-                await message.channel.bulkDelete(messages).catch();
-                return await m.delete().catch();
+                await message.channel.bulkDelete(messages).catch(() => {});
+                return await m.delete().catch(() => {});
             }
 
             let messages = await message.channel.messages.fetch({ limit: 100, before: m.id });
@@ -175,9 +175,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }
         }
         if (!(message instanceof Message)) {
-            message.editReply({ embeds: [new CustomEmbed(message.member, "operation complete (:")] }).catch();
+            message.editReply({ embeds: [new CustomEmbed(message.member, "operation complete (:")] }).catch(() => {});
         }
-        return m.delete().catch();
+        return m.delete().catch(() => {});
     }
 }
 
