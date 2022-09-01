@@ -21,7 +21,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [embed] });
     } else {
         if (message.member.user.id != "672793821850894347") return;
-        setNews(args.join(" "));
+        await setNews(args.join(" "));
 
         const news = await getNews();
 
