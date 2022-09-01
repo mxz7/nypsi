@@ -256,10 +256,12 @@ export default async function interactionCreate(interaction: Interaction) {
             const survey = await getSurveyByMessageId(interaction.message.id);
 
             if (!survey) {
-                return await interaction.reply({
-                    embeds: [new ErrorEmbed("this survey no longer exists")],
-                    ephemeral: true,
-                });
+                return await interaction
+                    .reply({
+                        embeds: [new ErrorEmbed("this survey no longer exists")],
+                        ephemeral: true,
+                    })
+                    .catch(() => {});
             }
 
             const hasResponed = await prisma.surveyData.findUnique({
