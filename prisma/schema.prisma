@@ -24,6 +24,7 @@ model User {
   EconomyGuildMember EconomyGuildMember?
   EconomyGuild       EconomyGuild?
   Auction            Auction[]
+  Survey             Survey[]
 }
 
 model Economy {
@@ -121,6 +122,26 @@ model Auction {
   sold       Boolean  @default(false)
 
   owner User @relation(fields: [ownerId], references: [id])
+}
+
+model Survey {
+  id         String   @id @default(uuid())
+  ownerId    String
+  surveyText String
+  resultsAt  DateTime
+
+  owner      User         @relation(fields: [ownerId], references: [id])
+  SurveyData SurveyData[]
+}
+
+model SurveyData {
+  userId   String
+  surveyId String
+  value    String
+
+  survey Survey @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+
+  @@id([userId, surveyId])
 }
 
 // guild specific tables
