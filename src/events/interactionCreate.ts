@@ -333,13 +333,15 @@ export default async function interactionCreate(interaction: Interaction) {
                     return res.reply({ embeds: [new ErrorEmbed("your response had a filtered word")] });
             }
 
-            await prisma.surveyData.create({
-                data: {
-                    userId: interaction.user.id,
-                    value: value,
-                    surveyId: survey.id,
-                },
-            });
+            await prisma.surveyData
+                .create({
+                    data: {
+                        userId: interaction.user.id,
+                        value: value,
+                        surveyId: survey.id,
+                    },
+                })
+                .catch(() => {});
 
             await res.reply({
                 embeds: [new CustomEmbed(res.member as GuildMember, "✅ your answer has been taken")],
