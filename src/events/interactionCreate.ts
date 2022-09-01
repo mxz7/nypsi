@@ -14,7 +14,15 @@ import {
 } from "discord.js";
 import { runCommand } from "../utils/commandhandler";
 import prisma from "../utils/database/database";
-import { getBalance, getInventory, getItems, setInventory, updateBalance, userExists } from "../utils/economy/utils";
+import {
+    createUser,
+    getBalance,
+    getInventory,
+    getItems,
+    setInventory,
+    updateBalance,
+    userExists,
+} from "../utils/economy/utils";
 import requestDM from "../utils/functions/requestdm";
 import { getSurveyByMessageId } from "../utils/functions/surveys";
 import { getChatFilter } from "../utils/guilds/utils";
@@ -178,6 +186,8 @@ export default async function interactionCreate(interaction: Interaction) {
                         ephemeral: true,
                     });
                 }
+
+                if (!(await userExists(interaction.user.id))) await createUser(interaction.user.id);
 
                 const balance = await getBalance(interaction.user.id);
 
