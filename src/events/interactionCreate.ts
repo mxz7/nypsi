@@ -45,8 +45,8 @@ export default async function interactionCreate(interaction: Interaction) {
 
             let options = Object.keys(inventory).filter(
                 (item) =>
-                    item.startsWith(focused.value) ||
-                    items[item].name.startsWith(focused.value) ||
+                    item.includes(focused.value) ||
+                    items[item].name.includes(focused.value) ||
                     items[item].aliases?.includes(focused.value)
             );
 
@@ -67,8 +67,8 @@ export default async function interactionCreate(interaction: Interaction) {
 
             let options = Object.keys(items).filter(
                 (item) =>
-                    (item.startsWith(focused.value) ||
-                        items[item].name.startsWith(focused.value) ||
+                    (item.includes(focused.value) ||
+                        items[item].name.includes(focused.value) ||
                         items[item].aliases?.includes(focused.value)) &&
                     items[item].buy
             );
@@ -92,8 +92,8 @@ export default async function interactionCreate(interaction: Interaction) {
 
             let options = Object.keys(inventory).filter(
                 (item) =>
-                    (item.startsWith(focused.value) ||
-                        items[item].name.startsWith(focused.value) ||
+                    (item.includes(focused.value) ||
+                        items[item].name.includes(focused.value) ||
                         items[item].aliases?.includes(focused.value)) &&
                     items[item].role == "car"
             );
@@ -121,7 +121,7 @@ export default async function interactionCreate(interaction: Interaction) {
 
             let options = Object.keys(items).filter(
                 (item) =>
-                    (item.startsWith(focused.value) || items[item].name.startsWith(focused.value)) &&
+                    (item.includes(focused.value) || items[item].name.includes(focused.value)) &&
                     items[item].items_left > 0 &&
                     items[item].cost <= karma
             );
@@ -143,8 +143,8 @@ export default async function interactionCreate(interaction: Interaction) {
 
             let options = Object.keys(items).filter(
                 (item) =>
-                    item.startsWith(focused.value) ||
-                    items[item].name.startsWith(focused.value) ||
+                    item.includes(focused.value) ||
+                    items[item].name.includes(focused.value) ||
                     items[item].aliases?.includes(focused.value)
             );
 
