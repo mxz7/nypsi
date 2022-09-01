@@ -27,6 +27,7 @@ import { runAuctionChecks } from "../scheduled/clusterjobs/checkauctions";
 import { runLotteryInterval } from "../scheduled/clusterjobs/lottery";
 import { runLogs, runModerationChecks } from "../scheduled/clusterjobs/moderationchecks";
 import { runPremiumChecks } from "../scheduled/clusterjobs/premiumexpire";
+import { runSurveyChecks } from "../scheduled/clusterjobs/surveyends";
 import { runPremiumCrateInterval } from "../scheduled/clusterjobs/weeklycrates";
 
 export class NypsiClient extends Client {
@@ -121,6 +122,7 @@ export class NypsiClient extends Client {
         runPremiumChecks(this);
         runModerationChecks(this);
         runAuctionChecks(this);
+        runSurveyChecks(this);
         runLogs();
     }
 }
