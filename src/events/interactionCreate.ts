@@ -118,13 +118,33 @@ export default async function interactionCreate(interaction: Interaction) {
             }));
 
             return await interaction.respond(formatted);
+        } else if (focused.name == "item-global") {
+            const items = getItems();
+
+            let options = Object.keys(items).filter(
+                (item) =>
+                    item.startsWith(focused.value) ||
+                    items[item].name.startsWith(focused.value) ||
+                    items[item].aliases?.includes(focused.value)
+            );
+
+            if (options.length > 25) options = options.splice(0, 24);
+
+            if (options.length == 0) return;
+
+            const formatted = options.map((i) => ({
+                name: `${items[i].emoji.startsWith("<:") ? "" : `${items[i].emoji} `}${items[i].name}`,
+                value: i,
+            }));
+
+            return await interaction.respond(formatted);
         }
     }
 
     if (interaction.type == InteractionType.MessageComponent && interaction.customId == "b") {
-        const auction = await prisma.auction.findUnique({
+        const auction = await prisma.auction.findFirst({
             where: {
-                messageId: interaction.message.id,
+                AND: [{ messageId: interaction.message.id }, { sold: false }],
             },
             select: {
                 bin: true,
@@ -151,9 +171,12 @@ export default async function interactionCreate(interaction: Interaction) {
             }
 
             await prisma.auction
-                .delete({
+                .update({
                     where: {
                         id: auction.id,
+                    },
+                    data: {
+                        sold: true,
                     },
                 })
                 .catch();
