@@ -268,6 +268,7 @@ export default async function interactionCreate(interaction: Interaction) {
                         .setLabel(survey.surveyText)
                         .setStyle(TextInputStyle.Short)
                         .setRequired(true)
+                        .setMaxLength(50)
                 )
             );
 
