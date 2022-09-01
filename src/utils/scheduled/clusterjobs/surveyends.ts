@@ -46,7 +46,7 @@ export async function runSurveyChecks(client: NypsiClient) {
             const clusterHas = await client.cluster.broadcastEval(
                 async (c, { channelId }) => {
                     const client = c as NypsiClient;
-                    const channel = await client.channels.fetch(channelId).catch();
+                    const channel = await client.channels.fetch(channelId).catch(() => {});
 
                     if (channel) {
                         return client.cluster.id;
