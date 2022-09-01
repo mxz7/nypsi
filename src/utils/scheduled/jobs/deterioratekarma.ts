@@ -24,18 +24,18 @@ import redis from "../../database/redis";
     for (const user of users) {
         if (user.lastCommand.getTime() > threshold) continue;
 
-        let karmaToRemove = 5;
+        let karmaToRemove = 2;
 
         if (now - ms("1 day") > user.lastCommand.getTime()) {
-            karmaToRemove += 10;
+            karmaToRemove += 5;
         }
 
         if (now - ms("1 week") > user.lastCommand.getTime()) {
-            karmaToRemove += 35;
+            karmaToRemove += 10;
         }
 
         if (now - ms("30 days") > user.lastCommand.getTime()) {
-            karmaToRemove += 100;
+            karmaToRemove += 50;
         }
 
         if (now - ms("90 days") > user.lastCommand.getTime()) {
