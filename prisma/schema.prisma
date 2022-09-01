@@ -118,6 +118,7 @@ model Auction {
   bin        BigInt
   messageId  String   @unique
   createdAt  DateTime @default(now())
+  sold       Boolean  @default(false)
 
   owner User @relation(fields: [ownerId], references: [id])
 }
