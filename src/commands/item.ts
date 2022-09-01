@@ -131,7 +131,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const inventory = await getInventory(message.member);
 
     if (inventory[selected.id]) {
-        embed.setFooter({ text: `you have ${inventory[selected.id].toLocaleString()}` });
+        embed.setFooter({
+            text: `you have ${inventory[selected.id].toLocaleString()} ${selected.name}${
+                inventory[selected.id] > 1 ? (selected.name.endsWith("s") ? "" : "s") : ""
+            }`,
+        });
     }
 
     embed.setDescription(desc);
