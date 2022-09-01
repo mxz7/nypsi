@@ -290,7 +290,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             });
         }
 
-        if (cost > 15000000) {
+        if (cost > 15000000 && amount == 1) {
+            return message.channel.send({ embeds: [new ErrorEmbed("this is too much")] });
+        }
+
+        if (cost > 100000000) {
             return message.channel.send({ embeds: [new ErrorEmbed("this is too much")] });
         }
 
@@ -640,7 +644,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             });
         }
 
-        if (cost > 15000000) {
+        if (cost > 15000000 && amount == 1) {
+            return send({ embeds: [new ErrorEmbed("this is too much")] });
+        }
+
+        if (cost > 100000000) {
             return send({ embeds: [new ErrorEmbed("this is too much")] });
         }
 
