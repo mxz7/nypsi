@@ -592,7 +592,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 laterDescription = "consuming cake...\n\nyum 😋";
                 break;
             case "teddy":
-                embed.setDescription("you cuddle your teddy");
+                embed.setDescription("you cuddle your teddy bear");
                 embed.setImage("https://c.tenor.com/QGoHlSF2cSAAAAAM/hug-milk-and-mocha.gif");
                 break;
 
