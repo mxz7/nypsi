@@ -1,15 +1,30 @@
 import { Mention } from "@prisma/client";
-import { Collection, GuildMember, Message, PermissionsBitField, ThreadMember, ThreadMemberManager } from "discord.js";
+import {
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle,
+    Collection,
+    GuildMember,
+    Interaction,
+    Message,
+    MessageActionRowComponentBuilder,
+    PermissionsBitField,
+    ThreadMember,
+    ThreadMemberManager,
+} from "discord.js";
 import { cpu } from "node-os-utils";
 import * as stringSimilarity from "string-similarity";
 import { runCommand } from "../utils/commandhandler";
 import prisma from "../utils/database/database";
+import redis from "../utils/database/redis";
 import { userExists } from "../utils/economy/utils";
 import { encrypt } from "../utils/functions/string";
+import { createSupportRequest, getSupportRequest, sendToRequestChannel } from "../utils/functions/supportrequest";
 import { addCooldown, getChatFilter, getPercentMatch, getPrefix, hasGuild, inCooldown } from "../utils/guilds/utils";
 import { getKarma, getLastCommand } from "../utils/karma/utils";
 import { logger } from "../utils/logger";
-import { CustomEmbed } from "../utils/models/EmbedBuilders";
+import { NypsiClient } from "../utils/models/Client";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 import { PunishmentType } from "../utils/models/GuildStorage";
 import { addModLog } from "../utils/moderation/utils";
 import { isPremium } from "../utils/premium/utils";
@@ -21,10 +36,78 @@ let mentionInterval: NodeJS.Timer;
 
 export default async function messageCreate(message: Message) {
     if (message.author.bot) return;
-    if (!message.member) return;
 
     if (message.channel.isDMBased()) {
         logger.info("message in DM from " + message.author.tag + ": " + message.content);
+
+        if (await redis.exists(`cooldown:support:${message.author.id}`)) {
+            return message.reply({
+                embeds: [new ErrorEmbed("you have created a support request recently, try again later")],
+            });
+        }
+
+        const request = await getSupportRequest(message.author.id);
+
+        if (!request) {
+            const embed = new CustomEmbed()
+                .setHeader("support")
+                .setColor("#36393f")
+                .setDescription(
+                    "if you need support, click the button below or join the [**official nypsi server**](https://discord.gg/hJTDNST)"
+                );
+
+            const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+                new ButtonBuilder().setCustomId("s").setLabel("i need support").setStyle(ButtonStyle.Success)
+            );
+
+            const msg = await message.reply({ content: "discord.gg/hJTDNST", embeds: [embed], components: [row] });
+
+            const filter = (i: Interaction) => i.user.id == message.author.id;
+
+            const res = await msg.awaitMessageComponent({ filter, time: 30000 }).catch(() => {});
+
+            if (!res) {
+                return await msg.edit({ components: [] });
+            }
+
+            if (res.customId == "s") {
+                await res.deferUpdate();
+                const a = await getSupportRequest(message.author.id);
+
+                if (a) return;
+
+                const r = await createSupportRequest(
+                    message.author.id,
+                    message.client as NypsiClient,
+                    message.author.username
+                );
+
+                if (!r) {
+                    return res.followUp({ embeds: [new CustomEmbed().setDescription("failed to create support request")] });
+                } else {
+                    return res.followUp({
+                        embeds: [
+                            new CustomEmbed().setDescription(
+                                "✅ created support request, you can now talk directly to nypsi staff"
+                            ),
+                        ],
+                    });
+                }
+            }
+        } else {
+            const embed = new CustomEmbed()
+                .setHeader(message.author.tag, message.author.avatarURL())
+                .setColor("#36393f")
+                .setDescription(message.content);
+
+            const res = await sendToRequestChannel(message.author.id, embed, message.client as NypsiClient);
+
+            if (res) {
+                return await message.react("✅");
+            } else {
+                return await message.react("❌");
+            }
+        }
 
         const embed = new CustomEmbed()
             .setHeader("nypsi")
@@ -35,6 +118,8 @@ export default async function messageCreate(message: Message) {
             );
         return await message.channel.send({ embeds: [embed] });
     }
+
+    if (!message.member) return;
 
     message.content = message.content.replace(/ +(?= )/g, ""); // remove any additional spaces
 
