@@ -1,5 +1,5 @@
 import * as Cluster from "discord-hybrid-sharding";
-import { GatewayIntentBits, Options } from "discord.js";
+import { GatewayIntentBits, Options, Partials } from "discord.js";
 import { NypsiClient } from "./utils/models/Client";
 
 const client = new NypsiClient({
@@ -42,6 +42,7 @@ const client = new NypsiClient({
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.GuildMessageReactions,
     ],
+    partials: [Partials.Channel], // for direct messages
 });
 
 import { loadCommands } from "./utils/commandhandler";

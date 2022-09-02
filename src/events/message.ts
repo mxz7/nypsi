@@ -21,7 +21,6 @@ let mentionInterval: NodeJS.Timer;
 
 export default async function messageCreate(message: Message) {
     if (message.author.bot) return;
-    if (!message.member) return;
 
     if (message.channel.isDMBased()) {
         logger.info("message in DM from " + message.author.tag + ": " + message.content);
@@ -35,6 +34,8 @@ export default async function messageCreate(message: Message) {
             );
         return await message.channel.send({ embeds: [embed] });
     }
+
+    if (!message.member) return;
 
     message.content = message.content.replace(/ +(?= )/g, ""); // remove any additional spaces
 
