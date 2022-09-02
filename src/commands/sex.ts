@@ -21,7 +21,7 @@ const looking = new Map<string, MilfSearchData>();
 const descFilter = ["nigger", "nigga", "faggot", "fag", "nig", "ugly", "discordgg", "discordcom", "discordappcom"];
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-    const send = async (data: MessageOptions) => {
+    const send = async (data: MessageOptions | InteractionReplyOptions) => {
         if (!(message instanceof Message)) {
             if (message.deferred) {
                 await message.editReply(data);
@@ -33,14 +33,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 return replyMsg;
             }
         } else {
-            return await message.channel.send(data);
+            return await message.channel.send(data as MessageOptions);
         }
     };
 
     if (await onCooldown(cmd.name, message.member)) {
         const embed = await getResponse(cmd.name, message.member);
 
-        return send({ embeds: [embed] });
+        return send({ embeds: [embed], ephemeral: true });
     }
 
     if ((await redis.exists(`cd:sex-chastity:${message.author.id}`)) == 1) {

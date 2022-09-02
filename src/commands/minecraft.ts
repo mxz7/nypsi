@@ -1,21 +1,21 @@
 import {
-    CommandInteraction,
-    Message,
     ActionRowBuilder,
     ButtonBuilder,
-    MessageActionRowComponentBuilder,
     ButtonStyle,
-    MessageOptions,
-    InteractionReplyOptions,
+    CommandInteraction,
     Interaction,
+    InteractionReplyOptions,
+    Message,
+    MessageActionRowComponentBuilder,
     MessageEditOptions,
+    MessageOptions,
 } from "discord.js";
-import { getPrefix } from "../utils/guilds/utils";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
 import { getNameHistory } from "mc-names";
-import { cleanString } from "../utils/functions/string";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { cleanString } from "../utils/functions/string";
+import { getPrefix } from "../utils/guilds/utils";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 
 const cmd = new Command("minecraft", "view information about a minecraft account", Categories.MINECRAFT).setAliases(["mc"]);
 
@@ -25,7 +25,7 @@ cmd.slashData.addStringOption((option) =>
 );
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-    const send = async (data: MessageOptions) => {
+    const send = async (data: MessageOptions | InteractionReplyOptions) => {
         if (!(message instanceof Message)) {
             if (message.deferred) {
                 await message.editReply(data);
@@ -37,14 +37,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 return replyMsg;
             }
         } else {
-            return await message.channel.send(data);
+            return await message.channel.send(data as MessageOptions);
         }
     };
 
     if (await onCooldown(cmd.name, message.member)) {
         const embed = await getResponse(cmd.name, message.member);
 
-        return send({ embeds: [embed] });
+        return send({ embeds: [embed], ephemeral: true });
     }
 
     const prefix = await getPrefix(message.guild);

@@ -29,7 +29,7 @@ const cmd = new Command("pings", "view who mentioned you recently", Categories.U
 cmd.slashEnabled = true;
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-    const send = async (data: MessageOptions) => {
+    const send = async (data: MessageOptions | InteractionReplyOptions) => {
         if (!(message instanceof Message)) {
             if (message.deferred) {
                 await message.editReply(data);
@@ -41,14 +41,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 return replyMsg;
             }
         } else {
-            return await message.channel.send(data);
+            return await message.channel.send(data as MessageOptions);
         }
     };
 
     if (await onCooldown(cmd.name, message.member)) {
         const embed = await getResponse(cmd.name, message.member);
 
-        return send({ embeds: [embed] });
+        return send({ embeds: [embed], ephemeral: true });
     }
 
     await addCooldown(cmd.name, message.member, 20);

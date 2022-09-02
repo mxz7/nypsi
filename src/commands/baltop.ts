@@ -1,15 +1,15 @@
-import { topAmount } from "../utils/economy/utils.js";
 import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions, PermissionFlagsBits } from "discord.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
+import { topAmount } from "../utils/economy/utils.js";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 
 const cmd = new Command("baltop", "view top balances in the server", Categories.MONEY).setAliases(["top", "gangsters"]);
 
 cmd.slashEnabled = true;
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-    const send = async (data: MessageOptions) => {
+    const send = async (data: MessageOptions | InteractionReplyOptions) => {
         if (!(message instanceof Message)) {
             if (message.deferred) {
                 await message.editReply(data);
@@ -21,14 +21,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 return replyMsg;
             }
         } else {
-            return await message.channel.send(data);
+            return await message.channel.send(data as MessageOptions);
         }
     };
 
     if (await onCooldown(cmd.name, message.member)) {
         const embed = await getResponse(cmd.name, message.member);
 
-        return send({ embeds: [embed] });
+        return send({ embeds: [embed], ephemeral: true });
     }
 
     await addCooldown(cmd.name, message.member, 15);
