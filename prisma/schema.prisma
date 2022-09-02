@@ -347,5 +347,5 @@ model Mention {
 
 model SupportRequest {
   userId    String @id
-  channelId String
+  channelId String @unique
 }
