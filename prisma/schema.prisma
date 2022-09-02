@@ -344,3 +344,8 @@ model Mention {
 
   @@index([guildId], type: Hash)
 }
+
+model SupportRequest {
+  userId    String @id
+  channelId String @unique
+}
