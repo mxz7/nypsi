@@ -71,7 +71,7 @@ export default async function messageCreate(message: Message) {
             }
 
             if (res.customId == "s") {
-                await res.deferReply();
+                await res.deferUpdate();
                 const a = await getSupportRequest(message.author.id);
 
                 if (a) return;
