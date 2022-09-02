@@ -104,10 +104,15 @@ export default async function messageCreate(message: Message) {
                 }
             }
         } else {
-            const embed = new CustomEmbed()
-                .setHeader(message.author.tag, message.author.avatarURL())
-                .setColor("#36393f")
-                .setDescription(message.content);
+            const embed = new CustomEmbed().setHeader(message.author.tag, message.author.avatarURL()).setColor("#36393f");
+
+            if (message.content) {
+                embed.setDescription(message.content);
+            }
+
+            if (message.attachments.first()) {
+                embed.setImage(message.attachments.first().url);
+            }
 
             const res = await sendToRequestChannel(message.author.id, embed, message.client as NypsiClient);
 
