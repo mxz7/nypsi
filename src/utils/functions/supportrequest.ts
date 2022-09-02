@@ -3,6 +3,16 @@ import redis from "../database/redis";
 import { NypsiClient } from "../models/Client";
 import { CustomEmbed } from "../models/EmbedBuilders";
 
+export async function getSupportRequestByChannelId(id: string) {
+    const query = await prisma.supportRequest.findUnique({
+        where: {
+            channelId: id,
+        },
+    });
+
+    return query;
+}
+
 export async function getSupportRequest(id: string) {
     if (await redis.exists(`cache:support:${id}`)) {
         return await redis.get(`cache:support:${id}`);
