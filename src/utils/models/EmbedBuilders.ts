@@ -32,7 +32,7 @@ export class CustomEmbed extends EmbedBuilder {
             super.setDescription(text);
         }
 
-        const chance = Math.floor(Math.random() * 30);
+        const chance = Math.floor(Math.random() * 50);
 
         if (chance == 7 && !disableFooter)
             super.setFooter({
