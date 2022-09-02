@@ -32,6 +32,8 @@ import { mentionQueue, MentionQueueItem } from "../utils/users/utils";
 import doCollection from "../utils/workers/mentions";
 import ms = require("ms");
 
+const dmCooldown = new Set<string>();
+
 let mentionInterval: NodeJS.Timer;
 
 export default async function messageCreate(message: Message) {
@@ -49,6 +51,13 @@ export default async function messageCreate(message: Message) {
         const request = await getSupportRequest(message.author.id);
 
         if (!request) {
+            if (dmCooldown.has(message.author.id)) return;
+            dmCooldown.add(message.author.id);
+
+            setTimeout(() => {
+                dmCooldown.delete(message.author.id);
+            }, 30000);
+
             const embed = new CustomEmbed()
                 .setHeader("support")
                 .setColor("#36393f")
