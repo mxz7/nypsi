@@ -58,7 +58,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const items = getKarmaShopItems();
 
-    const send = async (data: MessageOptions) => {
+    const send = async (data: MessageOptions | InteractionReplyOptions) => {
         if (!(message instanceof Message)) {
             if (message.deferred) {
                 await message.editReply(data);
@@ -70,14 +70,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 return replyMsg;
             }
         } else {
-            return await message.channel.send(data);
+            return await message.channel.send(data as MessageOptions);
         }
     };
 
     if (await onCooldown(cmd.name, message.member)) {
         const embed = await getResponse(cmd.name, message.member);
 
-        return send({ embeds: [embed] });
+        return send({ embeds: [embed], ephemeral: true });
     }
 
     if (!isKarmaShopOpen() && message.guild.id == "747056029795221513") {
