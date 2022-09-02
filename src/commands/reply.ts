@@ -12,7 +12,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (!support) return;
 
-    const embed = new CustomEmbed().setDescription(args.join(" ")).setHeader(message.author.tag, message.author.avatarURL());
+    const embed = new CustomEmbed(message.member)
+        .setDescription(args.join(" "))
+        .setHeader(message.author.tag, message.author.avatarURL());
 
     await sendToRequestChannel(support.userId, embed, message.client as NypsiClient);
     await requestDM({
