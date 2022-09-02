@@ -591,6 +591,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 embed.setDescription("consuming cake...");
                 laterDescription = "consuming cake...\n\nyum 😋";
                 break;
+            case "teddy":
+                embed.setDescription("you cuddle your teddy");
+                embed.setImage("https://c.tenor.com/QGoHlSF2cSAAAAAM/hug-milk-and-mocha.gif");
+                break;
 
             default:
                 return send({ embeds: [new ErrorEmbed("you cannot use this item")] });
