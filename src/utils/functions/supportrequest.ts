@@ -74,6 +74,8 @@ export async function createSupportRequest(id: string, client: NypsiClient, user
 
             const thread = await channel.threads.create({ name: username });
 
+            await thread.send({ content: "<@&747059949770768475> <@&845613231229370429>" });
+
             return thread.id;
         },
         { context: { shard: shard, username: username } }
