@@ -16,17 +16,22 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return message.channel.send({ embeds: [new ErrorEmbed("dumbass")] });
     }
 
+    if (!(message instanceof Message)) return;
+
     const embed = new CustomEmbed(message.member)
         .setDescription(args.join(" "))
         .setHeader(message.author.tag, message.author.avatarURL());
 
-    await sendToRequestChannel(support.userId, embed, message.client as NypsiClient);
-    await requestDM({
-        client: message.client as NypsiClient,
-        content: "you have received a message from your support ticket",
-        embed: embed,
-        memberId: support.userId,
-    });
+    Promise.all([
+        sendToRequestChannel(support.userId, embed, message.client as NypsiClient),
+        requestDM({
+            client: message.client as NypsiClient,
+            content: "you have received a message from your support ticket",
+            embed: embed,
+            memberId: support.userId,
+        }),
+        message.delete(),
+    ]);
 }
 
 cmd.setRun(run);
