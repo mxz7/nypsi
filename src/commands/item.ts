@@ -74,7 +74,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const embed = new CustomEmbed(message.member).setTitle(`${selected.emoji} ${selected.name}`);
 
-    let desc = `\`${selected.id}\`\n\n*${selected.description}*\n\n`;
+    let desc = `\`${selected.id}\`\n\n*${selected.longDesc}*\n\n`;
 
     if (selected.buy) {
         desc += `**buy** $${selected.buy.toLocaleString()}\n`;
