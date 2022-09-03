@@ -147,3 +147,21 @@ export async function getLastCommand(member: GuildMember | string): Promise<Date
 export function getKarmaShopItems() {
     return items;
 }
+
+export async function addCommandUse(id: string, command: string) {
+    await prisma.commandUse.upsert({
+        where: {
+            userId_command: {
+                userId: id,
+                command: command,
+            },
+        },
+        update: {
+            uses: { increment: 1 },
+        },
+        create: {
+            command: command,
+            userId: id,
+        },
+    });
+}
