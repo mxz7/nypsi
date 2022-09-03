@@ -15,7 +15,7 @@ import redis from "../database/redis";
 import requestDM from "../functions/requestdm";
 import { logger } from "../logger";
 import { NypsiClient } from "../models/Client";
-import { Booster, GuildUpgradeRequirements, Item, LotteryTicket } from "../models/Economy";
+import { AchievementData, Booster, GuildUpgradeRequirements, Item, LotteryTicket } from "../models/Economy";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { StatsProfile } from "../models/StatsProfile";
 import { getTier, isPremium } from "../premium/utils";
@@ -26,6 +26,7 @@ import ms = require("ms");
 import _ = require("lodash");
 
 let items: { [key: string]: Item };
+let achievements: { [key: string]: AchievementData };
 
 const lotteryTicketPrice = 15000;
 /**
@@ -34,22 +35,19 @@ const lotteryTicketPrice = 15000;
  */
 export { lotteryTicketPrice };
 
-export function loadItems(): string {
-    let txt = "";
+export function loadItems() {
+    const itemsFile: any = fs.readFileSync("./data/items.json");
+    const achievementsFile: any = fs.readFileSync("./data/achievements.json");
 
-    const b: any = fs.readFileSync("./data/items.json");
-
-    items = JSON.parse(b);
+    items = JSON.parse(itemsFile);
+    achievements = JSON.parse(achievementsFile);
 
     logger.info(`${Array.from(Object.keys(items)).length.toLocaleString()} economy items loaded`);
-
-    txt += `${Array.from(Object.keys(items)).length.toLocaleString()} economy items loaded`;
+    logger.info(`${Object.keys(achievements).length.toLocaleString()} achievements loaded`);
 
     setTimeout(() => {
         updateCryptoWorth();
     }, 50);
-
-    return txt;
 }
 
 function randomOffset() {
@@ -1504,6 +1502,10 @@ export async function setInventory(member: GuildMember | string, inventory: obje
 
 export function getItems(): { [key: string]: Item } {
     return items;
+}
+
+export function getAchievements() {
+    return achievements;
 }
 
 export async function getMaxBitcoin(member: GuildMember): Promise<number> {
