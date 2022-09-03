@@ -25,6 +25,17 @@ model User {
   EconomyGuild       EconomyGuild?
   Auction            Auction[]
   Survey             Survey[]
+  CommandUse         CommandUse[]
+}
+
+model CommandUse {
+  userId  String
+  command String
+  uses    Int    @default(1)
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([userId, command])
 }
 
 model Economy {
