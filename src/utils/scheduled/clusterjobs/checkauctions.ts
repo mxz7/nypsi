@@ -13,7 +13,7 @@ export async function runAuctionChecks(client: NypsiClient) {
 
         const query = await prisma.auction.findMany({
             where: {
-                createdAt: { lte: limit },
+                AND: [{ createdAt: { lte: limit } }, { sold: false }],
             },
             select: {
                 ownerId: true,
