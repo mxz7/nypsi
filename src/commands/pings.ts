@@ -81,7 +81,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let limit = 5;
 
     if (await isPremium(message.author.id)) {
-        limit = 69;
+        limit = 150;
     }
 
     const mentions = await fetchUserMentions(message.guild, message.member, limit);
