@@ -1,17 +1,17 @@
 import {
-    CommandInteraction,
-    Message,
     ActionRowBuilder,
     ButtonBuilder,
-    MessageActionRowComponentBuilder,
     ButtonStyle,
+    CommandInteraction,
     Interaction,
+    Message,
+    MessageActionRowComponentBuilder,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed } from "../utils/models/EmbedBuilders";
-import { getItems, getInventory, userExists, createUser } from "../utils/economy/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { createUser, getInventory, getItems, userExists } from "../utils/economy/utils";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("cars", "view the current cars available", Categories.MONEY).setAliases(["car"]);
 
@@ -87,7 +87,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         embed.addField(
             item.id,
-            `${item.emoji} **${item.name}**\n${item.description}\n**speed** ${item.speed}${owned ? "\n*owned*" : ""}`,
+            `${item.emoji} **${item.name}**\n${item.longDesc}\n**speed** ${item.speed}${owned ? "\n*owned*" : ""}`,
             true
         );
     }
@@ -140,7 +140,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
                         newEmbed.addField(
                             item.id,
-                            `${item.emoji} **${item.name}**\n${item.description}\n**speed** ${item.speed}${
+                            `${item.emoji} **${item.name}**\n${item.longDesc}\n**speed** ${item.speed}${
                                 owned ? "\n*owned*" : ""
                             }`,
                             true
@@ -192,7 +192,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
                         newEmbed.addField(
                             item.id,
-                            `${item.emoji} **${item.name}**\n${item.description}\n**speed** ${item.speed}${
+                            `${item.emoji} **${item.name}**\n${item.longDesc}\n**speed** ${item.speed}${
                                 owned ? "\n*owned*" : ""
                             }`,
                             true
