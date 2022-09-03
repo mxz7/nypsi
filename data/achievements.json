@@ -1,0 +1,80 @@
+{
+    "collector_i": {
+        "id": "collector_i",
+        "name": "collector **I**",
+        "emoji": "🎒",
+        "target": 250,
+        "description": "have 250 items in your inventory"
+    },
+    "collector_ii": {
+        "id": "collector_ii",
+        "name": "collector **II**",
+        "emoji": "🎒",
+        "target": 1000,
+        "description": "have 1000 items in your inventory",
+        "requires": "collector_i"
+    },
+    "collector_iii": {
+        "id": "collector_iii",
+        "name": "collector **III**",
+        "emoji": "🎒",
+        "target": 10000,
+        "description": "have 10,000 items in your inventory",
+        "requires": "collector_ii"
+    },
+    "collector_iv": {
+        "id": "collector_iv",
+        "name": "collector **IV**",
+        "emoji": "🎒",
+        "target": 50000,
+        "description": "have 50,000 items in your inventory",
+        "requires": "collector_iii"
+    },
+    "collector_v": {
+        "id": "collector_v",
+        "name": "collector **V**",
+        "emoji": "🎒",
+        "target": 100000,
+        "description": "have 100,000 items in your inventory",
+        "requires": "collector_iv"
+    },
+    "gambler_i": {
+        "id": "gambler_i",
+        "name": "gamber **I**",
+        "emoji": "🎰",
+        "target": 5000,
+        "description": "gamble 5,000 times"
+    },
+    "gambler_ii": {
+        "id": "gambler_ii",
+        "name": "gambler **II**",
+        "emoji": "🎰",
+        "target": 15000,
+        "description": "gamble 15,000 times",
+        "requires": "gambler_i"
+    },
+    "gambler_iii": {
+        "id": "gambler_iii",
+        "name": "gambler **III**",
+        "emoji": "🎰",
+        "target": 50000,
+        "description": "gamble 50,000 times",
+        "requires": "gambler_ii"
+    },
+    "gambler_iv": {
+        "id": "gambler_iv",
+        "name": "gambler **IV**",
+        "emoji": "🎰",
+        "target": 100000,
+        "description": "gamble 250,000 times",
+        "requires": "gambler_ii"
+    },
+    "gambler_v": {
+        "id": "gambler_v",
+        "name": "gambler **v**",
+        "emoji": "🎰",
+        "target": 500000,
+        "description": "gamble 500,000 times",
+        "requires": "gambler_iv"
+    }
+}

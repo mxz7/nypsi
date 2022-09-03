@@ -16,6 +16,7 @@ temp/
 anticheat.ts
 
 !lists.json
+!achievements.json
 !items.json
 !karmashop.json
 !package.json
