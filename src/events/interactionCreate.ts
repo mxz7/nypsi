@@ -52,7 +52,7 @@ export default async function interactionCreate(interaction: Interaction) {
 
             if (options.length > 25) options = options.splice(0, 24);
 
-            if (options.length == 0) return;
+            if (options.length == 0) return interaction.respond([]);
 
             const formatted = options.map((i) => ({
                 name: `${items[i].emoji.startsWith("<:") || items[i].emoji.startsWith("<a:") ? "" : `${items[i].emoji} `}${
@@ -75,7 +75,7 @@ export default async function interactionCreate(interaction: Interaction) {
 
             if (options.length > 25) options = options.splice(0, 24);
 
-            if (options.length == 0) return;
+            if (options.length == 0) return interaction.respond([]);
 
             const formatted = options.map((i) => ({
                 name: `${items[i].emoji.startsWith("<:") || items[i].emoji.startsWith("<a:") ? "" : `${items[i].emoji} `}${
@@ -102,7 +102,7 @@ export default async function interactionCreate(interaction: Interaction) {
 
             if (options.length > 25) options = options.splice(0, 24);
 
-            if (options.length == 0) return;
+            if (options.length == 0) return interaction.respond([]);
 
             const formatted = options.map((i) => ({
                 name: `${items[i].emoji.startsWith("<:") || items[i].emoji.startsWith("<a:") ? "" : `${items[i].emoji} `}${
@@ -128,7 +128,7 @@ export default async function interactionCreate(interaction: Interaction) {
 
             if (options.length > 25) options = options.splice(0, 24);
 
-            if (options.length == 0) return;
+            if (options.length == 0) return interaction.respond([]);
 
             const formatted = options.map((i) => ({
                 name: `${items[i].emoji.startsWith("<:") || items[i].emoji.startsWith("<a:") ? "" : `${items[i].emoji} `}${
@@ -150,7 +150,7 @@ export default async function interactionCreate(interaction: Interaction) {
 
             if (options.length > 25) options = options.splice(0, 24);
 
-            if (options.length == 0) return;
+            if (options.length == 0) return interaction.respond([]);
 
             const formatted = options.map((i) => ({
                 name: `${items[i].emoji.startsWith("<:") || items[i].emoji.startsWith("<a:") ? "" : `${items[i].emoji} `}${
