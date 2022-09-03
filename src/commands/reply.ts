@@ -5,7 +5,7 @@ import { NypsiClient } from "../utils/models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
-const cmd = new Command("reply", "reply to a support ticket", Categories.ADMIN);
+const cmd = new Command("reply", "reply to a support ticket", Categories.NONE);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     const support = await getSupportRequestByChannelId(message.channel.id);
