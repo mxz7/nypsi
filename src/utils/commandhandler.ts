@@ -773,7 +773,9 @@ export async function runCommand(
             .setFooter({ text: `you are #${pos} to see this` });
 
         if (message instanceof Message) {
-            await message.reply({ embeds: [embed] });
+            setTimeout(() => {
+                message.reply({ embeds: [embed] });
+            }, 2000);
         } else {
             setTimeout(() => {
                 message.followUp({ embeds: [embed] });
