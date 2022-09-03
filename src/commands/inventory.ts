@@ -116,7 +116,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         const item = items[i];
         embed.addField(
             item.id,
-            `${item.emoji} **${item.name}** ~~--~~ ${inventory[item.id].toLocaleString()}\n${item.description}`,
+            `${item.emoji} **${item.name}** ~~--~~ *${inventory[item.id].toLocaleString()}*${
+                item.shortDesc ? `\n${item.shortDesc}` : "\n\u200b"
+            }`,
             true
         );
     }
@@ -174,8 +176,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                         const item = items[i];
                         newEmbed.addField(
                             item.id,
-                            `${item.emoji} **${item.name}** ~~--~~ ${inventory[item.id].toLocaleString()}\n${
-                                item.description
+                            `${item.emoji} **${item.name}** ~~--~~ *${inventory[item.id].toLocaleString()}*${
+                                item.shortDesc ? `\n${item.shortDesc}` : "\n\u200b"
                             }`,
                             true
                         );
@@ -222,8 +224,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                         const item = items[i];
                         newEmbed.addField(
                             item.id,
-                            `${item.emoji} **${item.name}** ~~--~~ ${inventory[item.id].toLocaleString()}\n${
-                                item.description
+                            `${item.emoji} **${item.name}** ~~--~~ *${inventory[item.id].toLocaleString()}*${
+                                item.shortDesc ? `\n${item.shortDesc}` : "\n\u200b"
                             }`,
                             true
                         );

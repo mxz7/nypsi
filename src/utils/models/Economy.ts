@@ -2,7 +2,8 @@ export interface Item {
     id: string;
     name: string;
     emoji: string;
-    description: string;
+    shortDesc?: string;
+    longDesc: string;
     buy?: number;
     sell?: number;
     role?: string;
