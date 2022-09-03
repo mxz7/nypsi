@@ -20,7 +20,7 @@ import { getNews, hasSeenNews } from "./functions/news";
 import { getChatFilter, getDisabledCommands, getPrefix } from "./guilds/utils";
 import { addCommandUse, addKarma, getKarma, getLastCommand, updateLastCommand } from "./karma/utils";
 import { getTimestamp, logger } from "./logger";
-import { Command, NypsiCommandInteraction } from "./models/Command";
+import { Categories, Command, NypsiCommandInteraction } from "./models/Command";
 import { CustomEmbed, ErrorEmbed } from "./models/EmbedBuilders";
 import { addUse, getCommand } from "./premium/utils";
 // @ts-expect-error typescript doesnt like opening package.json
@@ -765,6 +765,7 @@ export async function runCommand(
 
     if (
         news.text != "" &&
+        command.category == Categories.MONEY &&
         (await userExists(message.member)) &&
         ((await getPrestige(message.member)) || (await getXp(message.member)) > 50) >= 1 &&
         !(await hasSeenNews(message.author.id))
