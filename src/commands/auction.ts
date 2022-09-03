@@ -385,7 +385,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             displayAuction(0);
         }
 
-        let max = 2;
+        let max = 1;
 
         if (await isPremium(message.member)) {
             max += await getTier(message.member);
@@ -567,7 +567,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return send({ embeds: [new ErrorEmbed("please use /auction create to create auctions in a command")] });
         }
 
-        let maxAuctions = 2;
+        let maxAuctions = 1;
 
         if (await isPremium(message.member)) {
             maxAuctions += await getTier(message.member);
