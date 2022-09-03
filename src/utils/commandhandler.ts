@@ -768,7 +768,7 @@ export async function runCommand(
     if (
         news.text != "" &&
         (await userExists(message.member)) &&
-        ((await getPrestige(message.member)) || (await getXp(message.member)) > 100) >= 1 &&
+        ((await getPrestige(message.member)) || (await getXp(message.member)) > 50) >= 1 &&
         !(await hasSeenNews(message.author.id))
     ) {
         await redis.rpush("nypsi:news:seen", message.author.id);
@@ -786,6 +786,7 @@ export async function runCommand(
                 message.followUp({ embeds: [embed] });
             }, 2000);
         }
+        logger.debug(`news shown to ${message.author.tag}`);
     }
 
     command.run(message, args);
