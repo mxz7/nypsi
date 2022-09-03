@@ -72,7 +72,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         const item = items[i];
         embed.addField(
             item.id,
-            `${item.emoji} **${item.name}**\n${item.description}\n**cost** $${item.buy.toLocaleString()}`,
+            `${item.emoji} **${item.name}**\n${item.longDesc}\n**cost** $${item.buy.toLocaleString()}`,
             true
         );
     }
@@ -121,7 +121,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                         const item = items[i];
                         newEmbed.addField(
                             item.id,
-                            `${item.emoji} **${item.name}**\n${item.description}\n**cost** $${item.buy.toLocaleString()}`,
+                            `${item.emoji} **${item.name}**\n${item.longDesc}\n**cost** $${item.buy.toLocaleString()}`,
                             true
                         );
                     }
@@ -165,7 +165,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                         const item = items[i];
                         newEmbed.addField(
                             item.id,
-                            `${item.emoji} **${item.name}**\n${item.description}\n**cost** $${item.buy.toLocaleString()}`,
+                            `${item.emoji} **${item.name}**\n${item.longDesc}\n**cost** $${item.buy.toLocaleString()}`,
                             true
                         );
                     }
