@@ -20,6 +20,8 @@ const cmd = new Command("usage", "view your top used commands", Categories.INFO)
     "usedcommands",
 ]);
 
+cmd.slashEnabled = true;
+
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     const send = async (data: MessageOptions | InteractionReplyOptions) => {
         if (!(message instanceof Message)) {
