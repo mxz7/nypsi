@@ -1,4 +1,4 @@
-import { CommandInteraction, Message } from "discord.js";
+import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { createUser, getInventory, setInventory, userExists } from "../utils/economy/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
@@ -10,11 +10,29 @@ const cmd = new Command(
     Categories.FUN
 );
 
+cmd.slashEnabled = true;
+
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
+    const send = async (data: MessageOptions | InteractionReplyOptions) => {
+        if (!(message instanceof Message)) {
+            if (message.deferred) {
+                await message.editReply(data);
+            } else {
+                await message.reply(data as InteractionReplyOptions);
+            }
+            const replyMsg = await message.fetchReply();
+            if (replyMsg instanceof Message) {
+                return replyMsg;
+            }
+        } else {
+            return await message.channel.send(data as MessageOptions);
+        }
+    };
+
     if (await onCooldown(cmd.name, message.member)) {
         const embed = await getResponse(cmd.name, message.member);
 
-        return message.channel.send({ embeds: [embed] });
+        return send({ embeds: [embed] });
     }
 
     if (!(await userExists(message.member))) await createUser(message.member);
@@ -28,8 +46,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (!hasFurnace) {
-        return message.channel.send({
+        return send({
             embeds: [new ErrorEmbed("you need a furnace to bake. furnaces can be found in crates or bought from the shop")],
+            ephemeral: true,
         });
     }
 
@@ -61,7 +80,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         desc += "\n\nyou also managed to bake a cake <:nypsi_cake:1002977512630001725> good job!!";
     }
 
-    return message.channel.send({
+    return send({
         embeds: [
             new CustomEmbed(message.member, desc).setHeader(
                 `${message.author.username}'s bakery`,
