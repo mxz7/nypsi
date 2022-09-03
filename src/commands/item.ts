@@ -92,6 +92,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             bin: true,
             itemAmount: true,
         },
+        orderBy: {
+            createdAt: "desc",
+        },
         take: 100,
     });
 
