@@ -28,6 +28,51 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         memberId: support.userId,
     });
 
+    const clusterHas = await (message.client as NypsiClient).cluster.broadcastEval(
+        async (c, { channelId }) => {
+            const client = c as NypsiClient;
+            const channel = await client.channels.fetch(channelId).catch(() => {});
+
+            if (channel) {
+                return client.cluster.id;
+            } else {
+                return "not-found";
+            }
+        },
+        { context: { channelId: support.channelId } }
+    );
+
+    let shard: number;
+
+    for (const i of clusterHas) {
+        if (i != "not-found") {
+            shard = i;
+            break;
+        }
+    }
+
+    if (isNaN(shard)) {
+        return false;
+    }
+
+    await (message.client as NypsiClient).cluster.broadcastEval(
+        async (c, { shard, channelId }) => {
+            const client = c as NypsiClient;
+            if (client.cluster.id != shard) return false;
+
+            const channel = await client.channels.fetch(channelId);
+
+            if (!channel) return false;
+
+            if (!channel.isTextBased()) return;
+            if (!channel.isThread()) return;
+
+            await channel.setLocked(true).catch(() => {});
+            await channel.setArchived(true).catch(() => {});
+        },
+        { context: { shard: shard, channelId: support.channelId } }
+    );
+
     await prisma.supportRequest.delete({
         where: {
             userId: support.userId,
