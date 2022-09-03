@@ -35,6 +35,35 @@ export async function addAchievementProgress(userId: string, achievementId: stri
     }
 }
 
+export async function setAchievementProgress(userId: string, achievementId: string, progress: number) {
+    const query = await prisma.achievements.upsert({
+        create: {
+            userId: userId,
+            achievementId: achievementId,
+        },
+        update: {
+            progress: progress,
+        },
+        where: {
+            userId_achievementId: {
+                userId: userId,
+                achievementId: achievementId,
+            },
+        },
+        select: {
+            progress: true,
+        },
+    });
+
+    const achievements = getAchievements();
+
+    if (query.progress >= achievements[achievementId].target) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 export async function getAllAchievements(member: GuildMember) {
     return await prisma.achievements.findMany({
         where: {
