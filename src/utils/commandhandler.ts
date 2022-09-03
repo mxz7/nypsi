@@ -13,7 +13,7 @@ import {
 } from "discord.js";
 import * as fs from "fs";
 import { getBorderCharacters, table } from "table";
-import { getItems, getPrestige, getXp, isEcoBanned, isHandcuffed, updateXp, userExists } from "./economy/utils";
+import { getItems, getXp, isEcoBanned, isHandcuffed, updateXp, userExists } from "./economy/utils";
 import { createCaptcha, isLockedOut, toggleLock } from "./functions/captcha";
 import { formatDate, MStoTime } from "./functions/date";
 import { getNews, hasSeenNews } from "./functions/news";
@@ -763,13 +763,7 @@ export async function runCommand(
 
     const news = await getNews();
 
-    if (
-        news.text != "" &&
-        command.category == Categories.MONEY &&
-        (await userExists(message.member)) &&
-        ((await getPrestige(message.member)) || (await getXp(message.member)) > 50) >= 1 &&
-        !(await hasSeenNews(message.author.id))
-    ) {
+    if (news.text != "" && command.category == Categories.MONEY && !(await hasSeenNews(message.author.id))) {
         await redis.rpush("nypsi:news:seen", message.author.id);
 
         const pos = await hasSeenNews(message.author.id);
