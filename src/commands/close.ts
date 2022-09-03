@@ -8,7 +8,7 @@ import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Co
 import { CustomEmbed } from "../utils/models/EmbedBuilders";
 import ms = require("ms");
 
-const cmd = new Command("close", "close a support ticket", Categories.ADMIN);
+const cmd = new Command("close", "close a support ticket", Categories.NONE);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     const support = await getSupportRequestByChannelId(message.channel.id);
