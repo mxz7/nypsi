@@ -117,7 +117,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embed.addField(
             item.id,
             `${item.emoji} **${item.name}** ~~--~~ *${inventory[item.id].toLocaleString()}*${
-                item.shortDesc ? `\n${item.shortDesc}` : "\n\u200b"
+                item.shortDesc ? `\n${item.shortDesc}` : ""
             }`,
             true
         );
@@ -177,7 +177,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                         newEmbed.addField(
                             item.id,
                             `${item.emoji} **${item.name}** ~~--~~ *${inventory[item.id].toLocaleString()}*${
-                                item.shortDesc ? `\n${item.shortDesc}` : "\n\u200b"
+                                item.shortDesc ? `\n${item.shortDesc}` : ""
                             }`,
                             true
                         );
@@ -225,7 +225,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                         newEmbed.addField(
                             item.id,
                             `${item.emoji} **${item.name}** ~~--~~ *${inventory[item.id].toLocaleString()}*${
-                                item.shortDesc ? `\n${item.shortDesc}` : "\n\u200b"
+                                item.shortDesc ? `\n${item.shortDesc}` : ""
                             }`,
                             true
                         );
