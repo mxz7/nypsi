@@ -76,5 +76,161 @@
         "target": 500000,
         "description": "gamble 500,000 times",
         "requires": "gambler_iv"
+    },
+    "fisher_i": {
+        "id": "fisher_i",
+        "name": "fisher **I**",
+        "emoji": "🎣",
+        "target": 100,
+        "description": "fish 100 times"
+    },
+    "fisher_ii": {
+        "id": "fisher_ii",
+        "name": "fisher **II**",
+        "emoji": "🎣",
+        "target": 500,
+        "description": "fish 500 times",
+        "requires": "fisher_i"
+    },
+    "fisher_iii": {
+        "id": "fisher_iii",
+        "name": "fisher **III**",
+        "emoji": "🎣",
+        "target": 1000,
+        "description": "fish 1,000 times",
+        "requires": "fisher_ii"
+    },
+    "fisher_iv": {
+        "id": "fisher_iv",
+        "name": "fisher **IV**",
+        "emoji": "🎣",
+        "target": 10000,
+        "description": "fish 10,000 times",
+        "requires": "fisher_ii"
+    },
+    "fisher_v": {
+        "id": "fisher_v",
+        "name": "fisher **v**",
+        "emoji": "🎣",
+        "target": 25000,
+        "description": "fish 25,000 times",
+        "requires": "fisher_iv"
+    },
+    "hunter_i": {
+        "id": "hunter_i",
+        "name": "hunter **I**",
+        "emoji": ":gun:",
+        "target": 100,
+        "description": "hunt 100 times"
+    },
+    "hunter_ii": {
+        "id": "hunter_ii",
+        "name": "hunter **II**",
+        "emoji": ":gun:",
+        "target": 500,
+        "description": "hunt 500 times",
+        "requires": "hunter_i"
+    },
+    "hunter_iii": {
+        "id": "hunter_iii",
+        "name": "hunter **III**",
+        "emoji": ":gun:",
+        "target": 1000,
+        "description": "hunt 1,000 times",
+        "requires": "hunter_ii"
+    },
+    "hunter_iv": {
+        "id": "hunter_iv",
+        "name": "hunter **IV**",
+        "emoji": ":gun:",
+        "target": 10000,
+        "description": "hunt 10,000 times",
+        "requires": "hunter_ii"
+    },
+    "hunter_v": {
+        "id": "hunter_v",
+        "name": "hunter **v**",
+        "emoji": ":gun:",
+        "target": 25000,
+        "description": "hunt 25,000 times",
+        "requires": "hunter_iv"
+    },
+    "miner_i": {
+        "id": "miner_i",
+        "name": "miner **I**",
+        "emoji": "⛏️",
+        "target": 100,
+        "description": "mine 100 times"
+    },
+    "miner_ii": {
+        "id": "miner_ii",
+        "name": "miner **II**",
+        "emoji": "⛏️",
+        "target": 500,
+        "description": "mine 500 times",
+        "requires": "miner_i"
+    },
+    "miner_iii": {
+        "id": "miner_iii",
+        "name": "miner **III**",
+        "emoji": "⛏️",
+        "target": 1000,
+        "description": "mine 1,000 times",
+        "requires": "miner_ii"
+    },
+    "miner_iv": {
+        "id": "miner_iv",
+        "name": "miner **IV**",
+        "emoji": "⛏️",
+        "target": 10000,
+        "description": "mine 10,000 times",
+        "requires": "miner_ii"
+    },
+    "miner_v": {
+        "id": "miner_v",
+        "name": "miner **v**",
+        "emoji": "⛏️",
+        "target": 25000,
+        "description": "mine 25,000 times",
+        "requires": "miner_iv"
+    },
+    "baker_i": {
+        "id": "baker_i",
+        "name": "baker **I**",
+        "emoji": "🍪",
+        "target": 50,
+        "description": "bake 50 times"
+    },
+    "baker_ii": {
+        "id": "baker_ii",
+        "name": "baker **II**",
+        "emoji": "🍪",
+        "target": 500,
+        "description": "bake 500 times",
+        "requires": "baker_i"
+    },
+    "baker_iii": {
+        "id": "baker_iii",
+        "name": "baker **III**",
+        "emoji": "🍪",
+        "target": 2500,
+        "description": "bake 2,500 times",
+        "requires": "baker_ii"
+    },
+    "baker_iv": {
+        "id": "baker_iv",
+        "name": "baker **IV**",
+        "emoji": "🍪",
+        "target": 10000,
+        "description": "bake 10,000 times",
+        "requires": "baker_iii"
+    },
+    "baker_v": {
+        "id": "baker_v",
+        "name": "baker **V**",
+        "emoji": "🍪",
+        "target": 50000,
+        "description": "bake 50,000 times",
+        "requires": "baker_iv"
     }
 }
