@@ -1017,7 +1017,7 @@ export function startRestart() {
     restarting = true;
 }
 
-export async function uploadGuildCommands(guildID: string, clientID: string) {
+export async function uploadSlashCommandsToGuild(guildID: string, clientID: string) {
     logger.info("started refresh of [/] commands...");
     const rest = new REST({ version: "9" }).setToken(process.env.BOT_TOKEN);
 
@@ -1039,7 +1039,7 @@ export async function uploadGuildCommands(guildID: string, clientID: string) {
     }
 }
 
-export async function uploadGuildCommandsGlobal(clientID: string) {
+export async function uploadSlashCommands(clientID: string) {
     logger.info("started refresh of global [/] commands...");
     const rest = new REST({ version: "9" }).setToken(process.env.BOT_TOKEN);
 
@@ -1057,6 +1057,34 @@ export async function uploadGuildCommandsGlobal(clientID: string) {
         logger.info("finished refresh of global [/] commands");
     } catch (error) {
         logger.error("failed refresh of global [/] commands");
+        logger.error(error);
+    }
+}
+
+export async function deleteSlashCommandsFromGuild(guildID: string, clientID: string) {
+    logger.info("started deletion of [/] commands...");
+    const rest = new REST({ version: "9" }).setToken(process.env.BOT_TOKEN);
+
+    try {
+        await rest.put(Routes.applicationGuildCommands(clientID, guildID), { body: [] });
+
+        logger.info("finished deletion of [/] commands");
+    } catch (error) {
+        logger.error("failed deletion of [/] commands");
+        logger.error(error);
+    }
+}
+
+export async function deleteSlashCommands(clientID: string) {
+    logger.info("started refresh of global [/] commands...");
+    const rest = new REST({ version: "9" }).setToken(process.env.BOT_TOKEN);
+
+    try {
+        await rest.put(Routes.applicationCommands(clientID), { body: [] });
+
+        logger.info("finished deletion of global [/] commands");
+    } catch (error) {
+        logger.error("failed deletion of global [/] commands");
         logger.error(error);
     }
 }
