@@ -80,10 +80,10 @@ export async function getCompletedAchievements(member: GuildMember) {
     });
 }
 
-export async function getUncompletedAchievements(member: GuildMember) {
+export async function getUncompletedAchievements(id: string) {
     return await prisma.achievements.findMany({
         where: {
-            AND: [{ userId: member.user.id }, { progress: { gt: 0 } }],
+            AND: [{ userId: id }, { progress: { gt: 0 } }],
         },
     });
 }
