@@ -64,10 +64,10 @@ export async function setAchievementProgress(userId: string, achievementId: stri
     }
 }
 
-export async function getAllAchievements(member: GuildMember) {
+export async function getAllAchievements(id: string) {
     return await prisma.achievements.findMany({
         where: {
-            userId: member.user.id,
+            userId: id,
         },
     });
 }
