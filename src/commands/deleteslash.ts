@@ -1,20 +1,20 @@
 import { CommandInteraction, Message } from "discord.js";
-import { uploadSlashCommands, uploadSlashCommandsToGuild } from "../utils/commandhandler";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
+import { deleteSlashCommands, deleteSlashCommandsFromGuild } from "../utils/commandhandler";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 
-const cmd = new Command("reloadslash", "reload data for slash commands", Categories.NONE).setPermissions(["bot owner"]);
+const cmd = new Command("deleteslash", "delete slash commands", Categories.NONE).setPermissions(["bot owner"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (message.member.user.id != "672793821850894347") return;
 
     if (args.length == 0) {
-        await uploadSlashCommandsToGuild(message.guild.id, message.client.user.id);
+        await deleteSlashCommandsFromGuild(message.guild.id, message.client.user.id);
 
         if (!(message instanceof Message)) return;
 
         return await message.react("✅");
     } else if (args[0].toLowerCase() == "global") {
-        await uploadSlashCommands(message.client.user.id);
+        await deleteSlashCommands(message.client.user.id);
 
         if (!(message instanceof Message)) return;
 
