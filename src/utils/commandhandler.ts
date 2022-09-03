@@ -309,7 +309,7 @@ async function helpCmd(message: Message, args: string[]) {
         } else if (selectedItem) {
             embed.setTitle(`${selectedItem.emoji} ${selectedItem.name}`);
 
-            const desc: string[] = [`**id** \`${selectedItem.id}\``, `**description** ${selectedItem.description}`];
+            const desc: string[] = [`**id** \`${selectedItem.id}\``, `**description** ${selectedItem.longDesc}`];
 
             if (selectedItem.aliases) {
                 desc.push(`**aliases** \`${selectedItem.aliases.join("`, `")}\``);
