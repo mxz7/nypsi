@@ -29,9 +29,9 @@ export async function addAchievementProgress(userId: string, achievementId: stri
     const achievements = getAchievements();
 
     if (query.progress >= achievements[achievementId].target) {
-        return true;
+        await completeAchievement(userId, achievementId);
     } else {
-        return false;
+        await completeAchievement(userId, achievementId);
     }
 }
 
@@ -58,9 +58,9 @@ export async function setAchievementProgress(userId: string, achievementId: stri
     const achievements = getAchievements();
 
     if (query.progress >= achievements[achievementId].target) {
-        return true;
+        await completeAchievement(userId, achievementId);
     } else {
-        return false;
+        await completeAchievement(userId, achievementId);
     }
 }
 
@@ -88,7 +88,7 @@ export async function getUncompletedAchievements(id: string) {
     });
 }
 
-export async function completeAchievement(userId: string, achievementId: string) {
+async function completeAchievement(userId: string, achievementId: string) {
     await prisma.achievements.update({
         where: {
             userId_achievementId: {
