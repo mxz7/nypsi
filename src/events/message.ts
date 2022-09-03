@@ -9,6 +9,7 @@ import {
     Message,
     MessageActionRowComponentBuilder,
     PermissionsBitField,
+    TextChannel,
     ThreadMember,
     ThreadMemberManager,
 } from "discord.js";
@@ -133,6 +134,8 @@ export default async function messageCreate(message: Message) {
         return await message.channel.send({ embeds: [embed] });
     }
 
+    if (message.channel.isDMBased()) return;
+    if (message.channel.isVoiceBased()) return;
     if (!message.member) return;
 
     message.content = message.content.replace(/ +(?= )/g, ""); // remove any additional spaces
@@ -275,6 +278,15 @@ export default async function messageCreate(message: Message) {
                 if (message.mentions.members.first()) {
                     if (message.mentions.members.size == 1) {
                         if (message.mentions.members.first().user.id == message.author.id) return;
+
+                        if (
+                            !Array.from((message.channel as TextChannel).members.keys()).includes(
+                                message.mentions.members.first().id
+                            )
+                        ) {
+                            return; // return if user doesnt have access to channel
+                        }
+
                         let content = message.content;
 
                         if (content.length > 100) {
