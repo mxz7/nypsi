@@ -165,3 +165,16 @@ export async function addCommandUse(id: string, command: string) {
         },
     });
 }
+
+export async function getCommandUses(member: GuildMember) {
+    const query = await prisma.commandUse.findMany({
+        where: {
+            userId: member.user.id,
+        },
+        orderBy: {
+            uses: "desc",
+        },
+    });
+
+    return query;
+}
