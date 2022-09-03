@@ -1,3 +1,4 @@
+import { GuildMember } from "discord.js";
 import prisma from "../database/database";
 import { getAchievements } from "./utils";
 
@@ -31,4 +32,28 @@ export async function addAchievementProgress(userId: string, achievementId: stri
     } else {
         return false;
     }
+}
+
+export async function getAllAchievements(member: GuildMember) {
+    return await prisma.achievements.findMany({
+        where: {
+            userId: member.user.id,
+        },
+    });
+}
+
+export async function getCompletedAchievements(member: GuildMember) {
+    return await prisma.achievements.findMany({
+        where: {
+            AND: [{ userId: member.user.id }, { completed: true }],
+        },
+    });
+}
+
+export async function getUncompletedAchievements(member: GuildMember) {
+    return await prisma.achievements.findMany({
+        where: {
+            AND: [{ userId: member.user.id }, { progress: { gt: 0 } }],
+        },
+    });
 }
