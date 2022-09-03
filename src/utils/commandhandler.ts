@@ -17,8 +17,8 @@ import { getItems, getPrestige, getXp, isEcoBanned, isHandcuffed, updateXp, user
 import { createCaptcha, isLockedOut, toggleLock } from "./functions/captcha";
 import { formatDate, MStoTime } from "./functions/date";
 import { getNews, hasSeenNews } from "./functions/news";
-import { createGuild, getChatFilter, getDisabledCommands, getPrefix, hasGuild } from "./guilds/utils";
-import { addKarma, getKarma, getLastCommand, updateLastCommand } from "./karma/utils";
+import { getChatFilter, getDisabledCommands, getPrefix } from "./guilds/utils";
+import { addCommandUse, addKarma, getKarma, getLastCommand, updateLastCommand } from "./karma/utils";
 import { getTimestamp, logger } from "./logger";
 import { Command, NypsiCommandInteraction } from "./models/Command";
 import { CustomEmbed, ErrorEmbed } from "./models/EmbedBuilders";
@@ -493,8 +493,6 @@ export async function runCommand(
     message: Message | (NypsiCommandInteraction & CommandInteraction),
     args: string[]
 ) {
-    if (!(await hasGuild(message.guild))) await createGuild(message.guild);
-
     if (!message.channel.isTextBased()) return;
     if (message.channel.isDMBased()) return;
 
@@ -791,11 +789,14 @@ export async function runCommand(
 
     command.run(message, args);
 
-    a(message.author.id, message.author.tag, message.content);
-    updateCommandUses(message.member);
-    await updateLastCommand(message.member);
-    await redis.hincrby("nypsi:topcommands", command.name, 1);
-    await redis.hincrby("nypsi:topcommands:user", message.author.tag, 1);
+    Promise.all([
+        a(message.author.id, message.author.tag, message.content),
+        updateCommandUses(message.member),
+        updateLastCommand(message.member),
+        addCommandUse(message.author.id, command.name),
+        redis.hincrby("nypsi:topcommands", command.name, 1),
+        redis.hincrby("nypsi:topcommands:user", message.author.tag, 1),
+    ]);
 
     if (command.category == "money") {
         if (!message.member) return;
