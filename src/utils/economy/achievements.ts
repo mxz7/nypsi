@@ -1,5 +1,6 @@
 import { GuildMember } from "discord.js";
 import prisma from "../database/database";
+import redis from "../database/redis";
 import { getAchievements } from "./utils";
 
 /**
@@ -56,4 +57,21 @@ export async function getUncompletedAchievements(member: GuildMember) {
             AND: [{ userId: member.user.id }, { progress: { gt: 0 } }],
         },
     });
+}
+
+export async function completeAchievement(userId: string, achievementId: string) {
+    await prisma.achievements.update({
+        where: {
+            userId_achievementId: {
+                userId: userId,
+                achievementId: achievementId,
+            },
+        },
+        data: {
+            completed: true,
+            completedAt: new Date(),
+        },
+    });
+
+    await redis.set(`achievements:completed:${userId}`, achievementId);
 }
