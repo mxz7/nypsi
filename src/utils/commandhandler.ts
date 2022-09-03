@@ -13,7 +13,7 @@ import {
 } from "discord.js";
 import * as fs from "fs";
 import { getBorderCharacters, table } from "table";
-import { getItems, getXp, isEcoBanned, isHandcuffed, updateXp, userExists } from "./economy/utils";
+import { getAchievements, getItems, getXp, isEcoBanned, isHandcuffed, updateXp, userExists } from "./economy/utils";
 import { createCaptcha, isLockedOut, toggleLock } from "./functions/captcha";
 import { formatDate, MStoTime } from "./functions/date";
 import { getNews, hasSeenNews } from "./functions/news";
@@ -761,6 +761,8 @@ export async function runCommand(
         }
     }
 
+    command.run(message, args);
+
     const news = await getNews();
 
     if (news.text != "" && command.category == Categories.MONEY && !(await hasSeenNews(message.author.id))) {
@@ -784,8 +786,42 @@ export async function runCommand(
         logger.debug(`news shown to ${message.author.tag}`);
     }
 
-    command.run(message, args);
+    if (await redis.exists(`achievements:completed:${message.author.id}`)) {
+        const achievementId = await redis.get(`achievements:completed:${message.author.id}`);
+        await redis.del(`achievements:completed:${message.author.id}`);
 
+        const achievement = getAchievements()[achievementId];
+
+        const embed = new CustomEmbed(message.member).setHeader("achievement unlocked", message.author.avatarURL());
+
+        embed.setDescription(`you have completed ${achievement.emoji} ${achievement.name}`);
+
+        let earnedXp = 30;
+
+        if (achievementId.endsWith("v")) {
+            earnedXp = 5000;
+        } else if (achievementId.endsWith("iv")) {
+            earnedXp = 1000;
+        } else if (achievementId.endsWith("iii")) {
+            earnedXp = 500;
+        } else if (achievementId.endsWith("ii")) {
+            earnedXp = 100;
+        }
+
+        await updateXp(message.member, (await getXp(message.member)) + earnedXp);
+
+        embed.setDescription(`+${earnedXp.toLocaleString()}xp`);
+
+        if (message instanceof Message) {
+            setTimeout(() => {
+                message.reply({ embeds: [embed] });
+            }, 2000);
+        } else {
+            setTimeout(() => {
+                message.followUp({ embeds: [embed] });
+            }, 2000);
+        }
+    }
     Promise.all([
         a(message.author.id, message.author.tag, message.content),
         updateCommandUses(message.member),
