@@ -26,6 +26,7 @@ model User {
   Auction            Auction[]
   Survey             Survey[]
   CommandUse         CommandUse[]
+  Achievements       Achievements[]
 }
 
 model CommandUse {
@@ -36,6 +37,18 @@ model CommandUse {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, command])
+}
+
+model Achievements {
+  userId        String
+  achievementId String
+  completed     Boolean   @default(false)
+  completedAt   DateTime?
+  progress      Int       @default(0)
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@id([userId, achievementId])
 }
 
 model Economy {
