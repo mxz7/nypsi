@@ -336,7 +336,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                         } else {
                             carCooldown.set(message.author.id, current);
                         }
-                    }, 120000);
+                    }, 300000);
                 }
             }
         } else {
