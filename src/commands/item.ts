@@ -116,7 +116,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (selected.role) {
-        embed.addField("role", `\`${selected.role}\`${selected.role == "car" ? ` (${selected.speed})` : ""}`, true);
+        embed.addField("role", `\`${selected.role}${selected.role == "car" ? ` (${selected.speed})` : ""}\``, true);
     }
 
     const rarityMap = new Map<number, string>();
