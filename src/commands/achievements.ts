@@ -329,7 +329,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (args.length == 0) {
         return showCurrentProgress();
-    } else if (args[0].toLowerCase() == "view" || args[0].toLowerCase() == "progress") {
+    } else if (args[0].toLowerCase() == "progress") {
         return showCurrentProgress();
     } else if (args[0].toLocaleLowerCase() == "all") {
         return showAllAchievements();
