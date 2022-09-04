@@ -453,5 +453,40 @@
         "emoji": "🏎️",
         "target": 5000,
         "description": "win 5,000 street races"
+    },
+    "minesweeper_pro_i": {
+        "id": "minesweeper_pro_i",
+        "name": "minesweeper professional **I**",
+        "emoji": "🏎️",
+        "target": 5,
+        "description": "reach a 7x multiplier in minesweeper 5 times"
+    },
+    "minesweeper_pro_ii": {
+        "id": "minesweeper_pro_ii",
+        "name": "minesweeper professional **II**",
+        "emoji": "🏎️",
+        "target": 25,
+        "description": "reach a 7x multiplier in minesweeper 25 times"
+    },
+    "minesweeper_pro_iii": {
+        "id": "minesweeper_pro_iii",
+        "name": "minesweeper professional **III**",
+        "emoji": "🏎️",
+        "target": 100,
+        "description": "reach a 7x multiplier in minesweeper 100 times"
+    },
+    "minesweeper_pro_iv": {
+        "id": "minesweeper_pro_iv",
+        "name": "minesweeper professional **IV**",
+        "emoji": "🏎️",
+        "target": 500,
+        "description": "reach a 7x multiplier in minesweeper 500 times"
+    },
+    "minesweeper_pro_v": {
+        "id": "minesweeper_pro_v",
+        "name": "minesweeper professional **V**",
+        "emoji": "🏎️",
+        "target": 1000,
+        "description": "reach a 7x multiplier in minesweeper 1,000 times"
     }
 }
