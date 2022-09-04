@@ -171,7 +171,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             if (!reaction) return;
 
-            const newEmbed = new CustomEmbed(message.member).setHeader("most used commands", message.author.avatarURL());
+            const newEmbed = new CustomEmbed(message.member).setHeader("all achievements", message.author.avatarURL());
 
             if (reaction == "⬅") {
                 if (currentPage <= 1) {
