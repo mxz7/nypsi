@@ -105,7 +105,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [new ErrorEmbed("invalid amount")] });
     }
 
-    if (amount > 50) amount = 50;
+    if (amount > 250) amount = 250;
 
     if ((await getBalance(message.member)) < selected.buy * amount) {
         return send({ embeds: [new ErrorEmbed("you cannot afford this")] });
