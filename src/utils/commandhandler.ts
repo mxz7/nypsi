@@ -798,13 +798,13 @@ export async function runCommand(
 
         let earnedXp = 30;
 
-        if (achievementId.endsWith("v")) {
+        if (achievementId.endsWith("_v")) {
             earnedXp = 5000;
-        } else if (achievementId.endsWith("iv")) {
+        } else if (achievementId.endsWith("_iv")) {
             earnedXp = 1000;
-        } else if (achievementId.endsWith("iii")) {
+        } else if (achievementId.endsWith("_iii")) {
             earnedXp = 500;
-        } else if (achievementId.endsWith("ii")) {
+        } else if (achievementId.endsWith("_ii")) {
             earnedXp = 100;
         }
 
