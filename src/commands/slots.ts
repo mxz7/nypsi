@@ -7,6 +7,7 @@ import {
     MessageOptions,
 } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
+import { addProgress } from "../utils/economy/achievements.js";
 import {
     addGamble,
     addToGuildXP,
@@ -319,6 +320,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         win = true;
         winnings = Math.round(multiplier * bet);
+
+        if (one.split("-")[0] == "cherry") await addProgress(message.author.id, "slots_pro", 1);
     } else if (one.split("-")[0] == two.split("-")[0]) {
         win = true;
         winnings = Math.round(bet * 1.2);

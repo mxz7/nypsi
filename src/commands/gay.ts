@@ -1,5 +1,6 @@
 import { CommandInteraction, GuildMember, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { addProgress } from "../utils/economy/achievements";
 import { getMember } from "../utils/functions/member";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
@@ -88,7 +89,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         `${member.user.toString()}\n**${gayAmount}**% gay ${gayEmoji}\n${gayText}`
     ).setHeader("gay calculator", member.user.avatarURL());
 
-    return await send({ embeds: [embed] });
+    await send({ embeds: [embed] });
+
+    await addProgress(message.author.id, "unsure", 1);
 }
 
 cmd.setRun(run);

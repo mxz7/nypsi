@@ -16,6 +16,7 @@ import { runCommand } from "../utils/commandhandler";
 import prisma from "../utils/database/database";
 import {
     createUser,
+    getAchievements,
     getBalance,
     getInventory,
     getItems,
@@ -156,6 +157,27 @@ export default async function interactionCreate(interaction: Interaction) {
                 name: `${items[i].emoji.startsWith("<:") || items[i].emoji.startsWith("<a:") ? "" : `${items[i].emoji} `}${
                     items[i].name
                 }`,
+                value: i,
+            }));
+
+            return await interaction.respond(formatted);
+        } else if (focused.name == "achievement") {
+            const achievements = getAchievements();
+
+            let options = Object.keys(achievements).filter(
+                (i) => i.includes(focused.value) || achievements[i].name.includes(focused.value)
+            );
+
+            if (options.length > 25) options = options.splice(0, 24);
+
+            if (options.length == 0) return interaction.respond([]);
+
+            const formatted = options.map((i) => ({
+                name: `${
+                    achievements[i].emoji.startsWith("<:") || achievements[i].emoji.startsWith("<a:")
+                        ? ""
+                        : `${achievements[i].emoji} `
+                }${achievements[i].name.replaceAll("*", "")}`,
                 value: i,
             }));
 

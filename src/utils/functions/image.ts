@@ -3,6 +3,7 @@ import { GuildMember, WebhookClient } from "discord.js";
 import ImgurClient from "imgur";
 import fetch from "node-fetch";
 import prisma from "../database/database";
+import { addProgress } from "../economy/achievements";
 import { getDMsEnabled } from "../economy/utils";
 import { logger } from "../logger";
 import { NypsiClient } from "../models/Client";
@@ -201,6 +202,8 @@ export async function acceptWholesomeImage(id: number, accepter: GuildMember, cl
     });
 
     clearWholesomeCache();
+
+    await addProgress(query.submitterId, "wholesome", 1);
 
     if (await getDMsEnabled(query.submitterId)) {
         await requestDM({

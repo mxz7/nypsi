@@ -1,5 +1,6 @@
 import { CommandInteraction, GuildMember, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { addProgress } from "../utils/economy/achievements";
 import { createUser, getBalance, updateBalance, userExists } from "../utils/economy/utils";
 import { getMember } from "../utils/functions/member";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
@@ -113,7 +114,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embed.setFooter({ text: "+$1,069" });
     }
 
-    return await send({ embeds: [embed] });
+    await send({ embeds: [embed] });
+
+    await addProgress(message.author.id, "unsure", 1);
 }
 
 cmd.setRun(run);
