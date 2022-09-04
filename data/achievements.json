@@ -710,28 +710,28 @@
         "id": "nypsi_ii",
         "name": "nypsi **II**",
         "emoji": "<:xnypsi:819957267548864543>",
-        "target": 10000,
-        "description": "use 10,000 nypsi commands"
+        "target": 25000,
+        "description": "use 25,000 nypsi commands"
     },
     "nypsi_iii": {
         "id": "nypsi_iii",
         "name": "nypsi **III**",
         "emoji": "<:xnypsi:819957267548864543>",
-        "target": 50000,
-        "description": "use 50,000 nypsi commands"
+        "target": 100000,
+        "description": "use 100,000 nypsi commands"
     },
     "nypsi_iv": {
         "id": "nypsi_iv",
         "name": "nypsi **IV**",
         "emoji": "<:xnypsi:819957267548864543>",
-        "target": 100000,
-        "description": "use 100,000 nypsi commands"
+        "target": 250000,
+        "description": "use 250,000 nypsi commands"
     },
     "nypsi_v": {
         "id": "nypsi_v",
         "name": "nypsi **V**",
         "emoji": "<:xnypsi:819957267548864543>",
-        "target": 250000,
-        "description": "use 250,000 nypsi commands"
+        "target": 500000,
+        "description": "use 500,000 nypsi commands"
     }
 }
