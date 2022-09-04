@@ -466,5 +466,44 @@
         "target": 500,
         "description": "have 500 wholesome images accepted",
         "requires": "wholesome_iv"
+    },
+    "racer_i": {
+        "id": "racer_i",
+        "name": "racer **I**",
+        "emoji": "🏎️",
+        "target": 10,
+        "description": "win 10 street races"
+    },
+    "racer_ii": {
+        "id": "racer_ii",
+        "name": "racer **II**",
+        "emoji": "🏎️",
+        "target": 50,
+        "description": "win 50 street races",
+        "requires": "racer_i"
+    },
+    "racer_iii": {
+        "id": "racer_iii",
+        "name": "racer **III**",
+        "emoji": "🏎️",
+        "target": 100,
+        "description": "win 100 street races",
+        "requires": "racer_ii"
+    },
+    "racer_iv": {
+        "id": "racer_iv",
+        "name": "racer **IV**",
+        "emoji": "🏎️",
+        "target": 1000,
+        "description": "win 1,000 street races",
+        "requires": "racer_iii"
+    },
+    "racer_v": {
+        "id": "racer_v",
+        "name": "racer **V**",
+        "emoji": "🏎️",
+        "target": 5000,
+        "description": "win 5,000 street races",
+        "requires": "racer_iv"
     }
 }
