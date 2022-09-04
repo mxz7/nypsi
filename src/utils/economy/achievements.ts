@@ -30,8 +30,6 @@ export async function addAchievementProgress(userId: string, achievementId: stri
 
     if (query.progress >= achievements[achievementId].target) {
         await completeAchievement(userId, achievementId);
-    } else {
-        await completeAchievement(userId, achievementId);
     }
 }
 
@@ -58,8 +56,6 @@ export async function setAchievementProgress(userId: string, achievementId: stri
     const achievements = getAchievements();
 
     if (query.progress >= achievements[achievementId].target) {
-        await completeAchievement(userId, achievementId);
-    } else {
         await completeAchievement(userId, achievementId);
     }
 }
