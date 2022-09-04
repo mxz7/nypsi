@@ -43,5 +43,4 @@ export interface AchievementData {
     emoji: string;
     target: number;
     description: string;
-    requires?: string;
 }

@@ -11,32 +11,28 @@
         "name": "collector **II**",
         "emoji": "🎒",
         "target": 750,
-        "description": "have 750 items in your inventory",
-        "requires": "collector_i"
+        "description": "have 750 items in your inventory"
     },
     "collector_iii": {
         "id": "collector_iii",
         "name": "collector **III**",
         "emoji": "🎒",
         "target": 5000,
-        "description": "have 5,000 items in your inventory",
-        "requires": "collector_ii"
+        "description": "have 5,000 items in your inventory"
     },
     "collector_iv": {
         "id": "collector_iv",
         "name": "collector **IV**",
         "emoji": "🎒",
         "target": 10000,
-        "description": "have 10,000 items in your inventory",
-        "requires": "collector_iii"
+        "description": "have 10,000 items in your inventory"
     },
     "collector_v": {
         "id": "collector_v",
         "name": "collector **V**",
         "emoji": "🎒",
         "target": 50000,
-        "description": "have 50,000 items in your inventory",
-        "requires": "collector_iv"
+        "description": "have 50,000 items in your inventory"
     },
     "gambler_i": {
         "id": "gambler_i",
@@ -50,32 +46,28 @@
         "name": "gambler **II**",
         "emoji": "🎰",
         "target": 5000,
-        "description": "gamble 5,000 times",
-        "requires": "gambler_i"
+        "description": "gamble 5,000 times"
     },
     "gambler_iii": {
         "id": "gambler_iii",
         "name": "gambler **III**",
         "emoji": "🎰",
         "target": 15000,
-        "description": "gamble 15,000 times",
-        "requires": "gambler_ii"
+        "description": "gamble 15,000 times"
     },
     "gambler_iv": {
         "id": "gambler_iv",
         "name": "gambler **IV**",
         "emoji": "🎰",
         "target": 50000,
-        "description": "gamble 50,000 times",
-        "requires": "gambler_iii"
+        "description": "gamble 50,000 times"
     },
     "gambler_v": {
         "id": "gambler_v",
         "name": "gambler **V**",
         "emoji": "🎰",
         "target": 250000,
-        "description": "gamble 250,000 times",
-        "requires": "gambler_iv"
+        "description": "gamble 250,000 times"
     },
     "fisher_i": {
         "id": "fisher_i",
@@ -89,32 +81,28 @@
         "name": "fisher **II**",
         "emoji": "🎣",
         "target": 500,
-        "description": "find 500 fish",
-        "requires": "fisher_i"
+        "description": "find 500 fish"
     },
     "fisher_iii": {
         "id": "fisher_iii",
         "name": "fisher **III**",
         "emoji": "🎣",
         "target": 1000,
-        "description": "find 1,000 fish",
-        "requires": "fisher_ii"
+        "description": "find 1,000 fish"
     },
     "fisher_iv": {
         "id": "fisher_iv",
         "name": "fisher **IV**",
         "emoji": "🎣",
         "target": 10000,
-        "description": "find 10,000 fish",
-        "requires": "fisher_iii"
+        "description": "find 10,000 fish"
     },
     "fisher_v": {
         "id": "fisher_v",
         "name": "fisher **V**",
         "emoji": "🎣",
         "target": 25000,
-        "description": "find 25,000 fish",
-        "requires": "fisher_iv"
+        "description": "find 25,000 fish"
     },
     "hunter_i": {
         "id": "hunter_i",
@@ -128,32 +116,28 @@
         "name": "hunter **II**",
         "emoji": ":gun:",
         "target": 500,
-        "description": "hunt 500 animals",
-        "requires": "hunter_i"
+        "description": "hunt 500 animals"
     },
     "hunter_iii": {
         "id": "hunter_iii",
         "name": "hunter **III**",
         "emoji": ":gun:",
         "target": 1000,
-        "description": "hunt 1,000 animals",
-        "requires": "hunter_ii"
+        "description": "hunt 1,000 animals"
     },
     "hunter_iv": {
         "id": "hunter_iv",
         "name": "hunter **IV**",
         "emoji": ":gun:",
         "target": 10000,
-        "description": "hunt 10,000 animals",
-        "requires": "hunter_iii"
+        "description": "hunt 10,000 animals"
     },
     "hunter_v": {
         "id": "hunter_v",
         "name": "hunter **V**",
         "emoji": ":gun:",
         "target": 25000,
-        "description": "hunt 25,000 animals",
-        "requires": "hunter_iv"
+        "description": "hunt 25,000 animals"
     },
     "miner_i": {
         "id": "miner_i",
@@ -167,32 +151,28 @@
         "name": "miner **II**",
         "emoji": "⛏️",
         "target": 1000,
-        "description": "mine 1,000 items",
-        "requires": "miner_i"
+        "description": "mine 1,000 items"
     },
     "miner_iii": {
         "id": "miner_iii",
         "name": "miner **III**",
         "emoji": "⛏️",
         "target": 5000,
-        "description": "mine 5,000 items",
-        "requires": "miner_ii"
+        "description": "mine 5,000 items"
     },
     "miner_iv": {
         "id": "miner_iv",
         "name": "miner **IV**",
         "emoji": "⛏️",
         "target": 15000,
-        "description": "mine 15,000 items",
-        "requires": "miner_iii"
+        "description": "mine 15,000 items"
     },
     "miner_v": {
         "id": "miner_v",
         "name": "miner **V**",
         "emoji": "⛏️",
         "target": 50000,
-        "description": "mine 50,000 items",
-        "requires": "miner_iv"
+        "description": "mine 50,000 items"
     },
     "baker_i": {
         "id": "baker_i",
@@ -206,32 +186,28 @@
         "name": "baker **II**",
         "emoji": "🍪",
         "target": 500,
-        "description": "bake 500 cookies",
-        "requires": "baker_i"
+        "description": "bake 500 cookies"
     },
     "baker_iii": {
         "id": "baker_iii",
         "name": "baker **III**",
         "emoji": "🍪",
         "target": 2500,
-        "description": "bake 2,500 cookies",
-        "requires": "baker_ii"
+        "description": "bake 2,500 cookies"
     },
     "baker_iv": {
         "id": "baker_iv",
         "name": "baker **IV**",
         "emoji": "🍪",
         "target": 10000,
-        "description": "bake 10,000 cookies",
-        "requires": "baker_iii"
+        "description": "bake 10,000 cookies"
     },
     "baker_v": {
         "id": "baker_v",
         "name": "baker **V**",
         "emoji": "🍪",
         "target": 50000,
-        "description": "bake 50,000 cookies",
-        "requires": "baker_iv"
+        "description": "bake 50,000 cookies"
     },
     "wizard_i": {
         "id": "wizard_i",
@@ -245,32 +221,28 @@
         "name": "wizard **II**",
         "emoji": "🧙‍♂️",
         "target": 75,
-        "description": "buy 75 items from karma shop",
-        "requires": "wizard_i"
+        "description": "buy 75 items from karma shop"
     },
     "wizard_iii": {
         "id": "wizard_iii",
         "name": "wizard **III**",
         "emoji": "🧙‍♂️",
         "target": 150,
-        "description": "buy 150 items from karma shop",
-        "requires": "wizard_ii"
+        "description": "buy 150 items from karma shop"
     },
     "wizard_iv": {
         "id": "wizard_iv",
         "name": "wizard **IV**",
         "emoji": "🧙‍♂️",
         "target": 500,
-        "description": "buy 500 items from karma shop",
-        "requires": "wizard_iii"
+        "description": "buy 500 items from karma shop"
     },
     "wizard_v": {
         "id": "wizard_v",
         "name": "wizard **V**",
         "emoji": "🧙‍♂️",
         "target": 1000,
-        "description": "buy 1,000 items from karma shop",
-        "requires": "wizard_iv"
+        "description": "buy 1,000 items from karma shop"
     },
     "robber_i": {
         "id": "robber_i",
@@ -284,32 +256,28 @@
         "name": "robber **II**",
         "emoji": "🥷",
         "target": 250,
-        "description": "complete 250 successful robberies",
-        "requires": "robber_i"
+        "description": "complete 250 successful robberies"
     },
     "robber_iii": {
         "id": "robber_iii",
         "name": "robber **III**",
         "emoji": "🥷",
         "target": 1000,
-        "description": "complete 1,000 successful robberies",
-        "requires": "robber_ii"
+        "description": "complete 1,000 successful robberies"
     },
     "robber_iv": {
         "id": "robber_iv",
         "name": "robber **IV**",
         "emoji": "🥷",
         "target": 10000,
-        "description": "complete 10,000 successful robberies",
-        "requires": "robber_iii"
+        "description": "complete 10,000 successful robberies"
     },
     "robber_v": {
         "id": "robber_v",
         "name": "robber **V**",
         "emoji": "🥷",
         "target": 25000,
-        "description": "complete 25,000 successful robberies",
-        "requires": "robber_iv"
+        "description": "complete 25,000 successful robberies"
     },
     "whore_i": {
         "id": "whore_i",
@@ -323,32 +291,28 @@
         "name": "whore **II**",
         "emoji": "🍑",
         "target": 50,
-        "description": "find 50 milfs",
-        "requires": "whore_i"
+        "description": "find 50 milfs"
     },
     "whore_iii": {
         "id": "whore_iii",
         "name": "whore **III**",
         "emoji": "🍑",
         "target": 100,
-        "description": "find 100 milfs",
-        "requires": "whore_ii"
+        "description": "find 100 milfs"
     },
     "whore_iv": {
         "id": "whore_iv",
         "name": "whore **IV**",
         "emoji": "🍑",
         "target": 1000,
-        "description": "find 1,000 milfs",
-        "requires": "whore_iii"
+        "description": "find 1,000 milfs"
     },
     "whore_v": {
         "id": "whore_v",
         "name": "whore **V**",
         "emoji": "🍑",
         "target": 15000,
-        "description": "find 15,000 milfs",
-        "requires": "whore_iv"
+        "description": "find 15,000 milfs"
     },
     "streaker_i": {
         "id": "streaker_i",
@@ -362,32 +326,28 @@
         "name": "streaker **II**",
         "emoji": "📅",
         "target": 14,
-        "description": "get a daily streak for 14 days",
-        "requires": "streaker_i"
+        "description": "get a daily streak for 14 days"
     },
     "streaker_iii": {
         "id": "streaker_iii",
         "name": "streaker **III**",
         "emoji": "📅",
         "target": 30,
-        "description": "get a daily streak for 30 days",
-        "requires": "streaker_ii"
+        "description": "get a daily streak for 30 days"
     },
     "streaker_iv": {
         "id": "streaker_iv",
         "name": "streaker **IV**",
         "emoji": "📅",
         "target": 69,
-        "description": "get a daily streak for 69 days",
-        "requires": "streaker_iii"
+        "description": "get a daily streak for 69 days"
     },
     "streaker_v": {
         "id": "streaker_v",
         "name": "streaker **V**",
         "emoji": "📅",
         "target": 100,
-        "description": "get a daily streak for 100 days",
-        "requires": "streaker_iv"
+        "description": "get a daily streak for 100 days"
     },
     "unboxer_i": {
         "id": "unboxer_i",
@@ -401,32 +361,28 @@
         "name": "unboxer **II**",
         "emoji": "📦",
         "target": 100,
-        "description": "open 100 crates",
-        "requires": "unboxer_i"
+        "description": "open 100 crates"
     },
     "unboxer_iii": {
         "id": "unboxer_iii",
         "name": "unboxer **III**",
         "emoji": "📦",
         "target": 500,
-        "description": "open 500 crates",
-        "requires": "unboxer_ii"
+        "description": "open 500 crates"
     },
     "unboxer_iv": {
         "id": "unboxer_iv",
         "name": "unboxer **IV**",
         "emoji": "📦",
         "target": 1000,
-        "description": "open 1,000 crates",
-        "requires": "unboxer_iii"
+        "description": "open 1,000 crates"
     },
     "unboxer_v": {
         "id": "unboxer_v",
         "name": "unboxer **V**",
         "emoji": "📦",
         "target": 10000,
-        "description": "open 10,000 crates",
-        "requires": "unboxer_iv"
+        "description": "open 10,000 crates"
     },
     "wholesome_i": {
         "id": "wholesome_i",
@@ -440,32 +396,28 @@
         "name": "wholesome **II**",
         "emoji": "💖",
         "target": 10,
-        "description": "have 10 wholesome images accepted",
-        "requires": "wholesome_i"
+        "description": "have 10 wholesome images accepted"
     },
     "wholesome_iii": {
         "id": "wholesome_iii",
         "name": "wholesome **III**",
         "emoji": "💖",
         "target": 50,
-        "description": "have 50 wholesome images accepted",
-        "requires": "wholesome_ii"
+        "description": "have 50 wholesome images accepted"
     },
     "wholesome_iv": {
         "id": "wholesome_iv",
         "name": "wholesome **IV**",
         "emoji": "💖",
         "target": 250,
-        "description": "have 100 wholesome images accepted",
-        "requires": "wholesome_iii"
+        "description": "have 100 wholesome images accepted"
     },
     "wholesome_v": {
         "id": "wholesome_v",
         "name": "wholesome **V**",
         "emoji": "💖",
         "target": 500,
-        "description": "have 500 wholesome images accepted",
-        "requires": "wholesome_iv"
+        "description": "have 500 wholesome images accepted"
     },
     "racer_i": {
         "id": "racer_i",
@@ -479,31 +431,27 @@
         "name": "racer **II**",
         "emoji": "🏎️",
         "target": 50,
-        "description": "win 50 street races",
-        "requires": "racer_i"
+        "description": "win 50 street races"
     },
     "racer_iii": {
         "id": "racer_iii",
         "name": "racer **III**",
         "emoji": "🏎️",
         "target": 100,
-        "description": "win 100 street races",
-        "requires": "racer_ii"
+        "description": "win 100 street races"
     },
     "racer_iv": {
         "id": "racer_iv",
         "name": "racer **IV**",
         "emoji": "🏎️",
         "target": 1000,
-        "description": "win 1,000 street races",
-        "requires": "racer_iii"
+        "description": "win 1,000 street races"
     },
     "racer_v": {
         "id": "racer_v",
         "name": "racer **V**",
         "emoji": "🏎️",
         "target": 5000,
-        "description": "win 5,000 street races",
-        "requires": "racer_iv"
+        "description": "win 5,000 street races"
     }
 }
