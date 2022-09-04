@@ -527,70 +527,70 @@
     "roulette_pro_i": {
         "id": "roulette_pro_i",
         "name": "roulette professional **I**",
-        "emoji": "🃏",
+        "emoji": "🟢",
         "target": 5,
         "description": "win a bet on green 5 times"
     },
     "roulette_pro_ii": {
         "id": "roulette_pro_ii",
         "name": "roulette professional **II**",
-        "emoji": "🃏",
+        "emoji": "🟢",
         "target": 25,
         "description": "win a bet on green 25 times"
     },
     "roulette_pro_iii": {
         "id": "roulette_pro_iii",
         "name": "roulette professional **III**",
-        "emoji": "🃏",
+        "emoji": "🟢",
         "target": 100,
         "description": "win a bet on green 100 times"
     },
     "roulette_pro_iv": {
         "id": "roulette_pro_iv",
         "name": "roulette professional **IV**",
-        "emoji": "🃏",
+        "emoji": "🟢",
         "target": 500,
         "description": "win a bet on green 500 times"
     },
     "roulette_pro_v": {
         "id": "roulette_pro_v",
         "name": "roulette professional **V**",
-        "emoji": "🃏",
+        "emoji": "🟢",
         "target": 1000,
         "description": "win a bet on green 1,000 times"
     },
     "slots_pro_i": {
         "id": "slots_pro_i",
         "name": "slots professional **I**",
-        "emoji": "🃏",
+        "emoji": "🍒",
         "target": 5,
         "description": "win on cherries 5 times"
     },
     "slots_pro_ii": {
         "id": "slots_pro_ii",
         "name": "slots professional **II**",
-        "emoji": "🃏",
+        "emoji": "🍒",
         "target": 25,
         "description": "win on cherries 25 times"
     },
     "slots_pro_iii": {
         "id": "slots_pro_iii",
         "name": "slots professional **III**",
-        "emoji": "🃏",
+        "emoji": "🍒",
         "target": 100,
         "description": "win on cherries 100 times"
     },
     "slots_pro_iv": {
         "id": "slots_pro_iv",
         "name": "slots professional **IV**",
-        "emoji": "🃏",
+        "emoji": "🍒",
         "target": 500,
         "description": "win on cherries 500 times"
     },
     "slots_pro_v": {
         "id": "slots_pro_v",
         "name": "slots professional **V**",
-        "emoji": "🃏",
+        "emoji": "🍒",
         "target": 1000,
         "description": "win on cherries 1,000 times"
     }
