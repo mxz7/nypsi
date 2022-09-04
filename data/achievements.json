@@ -232,5 +232,44 @@
         "target": 50000,
         "description": "bake 50,000 cookies",
         "requires": "baker_iv"
+    },
+    "wizard_i": {
+        "id": "wizard_i",
+        "name": "wizard **I**",
+        "emoji": "🔮",
+        "target": 25,
+        "description": "buy 25 items from karma shop"
+    },
+    "wizard_ii": {
+        "id": "wizard_ii",
+        "name": "wizard **II**",
+        "emoji": "🔮",
+        "target": 75,
+        "description": "buy 75 items from karma shop",
+        "requires": "wizard_i"
+    },
+    "wizard_iii": {
+        "id": "wizard_iii",
+        "name": "wizard **III**",
+        "emoji": "🔮",
+        "target": 150,
+        "description": "buy 150 items from karma shop",
+        "requires": "wizard_ii"
+    },
+    "wizard_iv": {
+        "id": "wizard_iv",
+        "name": "wizard **IV**",
+        "emoji": "🔮",
+        "target": 500,
+        "description": "buy 500 items from karma shop",
+        "requires": "wizard_iii"
+    },
+    "wizard_v": {
+        "id": "wizard_v",
+        "name": "wizard **V**",
+        "emoji": "🔮",
+        "target": 1000,
+        "description": "buy 1,000 items from karma shop",
+        "requires": "wizard_iv"
     }
 }
