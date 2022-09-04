@@ -131,7 +131,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 if (achData.completed) {
                     str += "`completed`";
                 } else {
-                    str += `\`${achData.progress.toLocaleString()} / ${achievement.target} (${(
+                    str += `\`${achData.progress.toLocaleString()} / ${achievement.target.toLocaleString()} (${(
                         (achData.progress / achievement.target) *
                         100
                     ).toFixed(1)}%)\``;
