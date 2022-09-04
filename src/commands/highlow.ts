@@ -13,6 +13,7 @@ import {
 } from "discord.js";
 import * as shuffle from "shuffle-array";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
+import { addProgress } from "../utils/economy/achievements.js";
 import {
     addGamble,
     addToGuildXP,
@@ -365,6 +366,8 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
                 await addToGuildXP(guild.guildName, earnedXp, message.member, message.client as NypsiClient);
             }
         }
+
+        if (win >= 7) await addProgress(message.author.id, "highlow_pro", 1);
 
         gamble(message.author, "highlow", bet, true, winnings);
         await addGamble(message.member, "highlow", true);

@@ -15,17 +15,21 @@ import redis from "../database/redis";
 import requestDM from "../functions/requestdm";
 import { logger } from "../logger";
 import { NypsiClient } from "../models/Client";
-import { Booster, GuildUpgradeRequirements, Item, LotteryTicket } from "../models/Economy";
+import { AchievementData, Booster, GuildUpgradeRequirements, Item, LotteryTicket } from "../models/Economy";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { StatsProfile } from "../models/StatsProfile";
 import { getTier, isPremium } from "../premium/utils";
 import { createProfile, hasProfile } from "../users/utils";
 import workerSort from "../workers/sort";
+import { addProgress, getAllAchievements, setAchievementProgress } from "./achievements";
 import { Constructor, getAllWorkers, Worker, WorkerStorageData } from "./workers";
 import ms = require("ms");
 import _ = require("lodash");
 
+const inventoryAchievementCheckCooldown = new Set<string>();
+
 let items: { [key: string]: Item };
+let achievements: { [key: string]: AchievementData };
 
 const lotteryTicketPrice = 15000;
 /**
@@ -34,22 +38,19 @@ const lotteryTicketPrice = 15000;
  */
 export { lotteryTicketPrice };
 
-export function loadItems(): string {
-    let txt = "";
+export function loadItems() {
+    const itemsFile: any = fs.readFileSync("./data/items.json");
+    const achievementsFile: any = fs.readFileSync("./data/achievements.json");
 
-    const b: any = fs.readFileSync("./data/items.json");
-
-    items = JSON.parse(b);
+    items = JSON.parse(itemsFile);
+    achievements = JSON.parse(achievementsFile);
 
     logger.info(`${Array.from(Object.keys(items)).length.toLocaleString()} economy items loaded`);
-
-    txt += `${Array.from(Object.keys(items)).length.toLocaleString()} economy items loaded`;
+    logger.info(`${Object.keys(achievements).length.toLocaleString()} achievements loaded`);
 
     setTimeout(() => {
         updateCryptoWorth();
     }, 50);
-
-    return txt;
 }
 
 function randomOffset() {
@@ -1210,6 +1211,7 @@ export async function reset() {
     await prisma.economyStats.deleteMany();
     await prisma.economyGuildMember.deleteMany();
     await prisma.economyGuild.deleteMany();
+    await prisma.auction.deleteMany();
 
     await prisma.economy.deleteMany({
         where: {
@@ -1339,6 +1341,8 @@ export async function addGamble(member: GuildMember, game: string, win: boolean)
             });
         }
     }
+
+    await addProgress(id, "gambler", 1);
 }
 
 export async function addRob(member: GuildMember, win: boolean) {
@@ -1441,7 +1445,7 @@ export async function addItemUse(member: GuildMember, item: string) {
 
 type Inventory = { [key: string]: number };
 
-export async function getInventory(member: GuildMember | string): Promise<Inventory> {
+export async function getInventory(member: GuildMember | string, checkAchievement = false): Promise<Inventory> {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -1479,10 +1483,20 @@ export async function getInventory(member: GuildMember | string): Promise<Invent
 
     await redis.set(`cache:economy:inventory:${id}`, JSON.stringify(query.inventory));
     await redis.expire(`cache:economy:inventory:${id}`, 180);
+
+    if (checkAchievement && !inventoryAchievementCheckCooldown.has(id)) {
+        inventoryAchievementCheckCooldown.add(id);
+        setTimeout(() => {
+            inventoryAchievementCheckCooldown.delete(id);
+        }, 60000);
+
+        await checkCollectorAchievement(id, query.inventory as Inventory);
+    }
+
     return query.inventory as Inventory;
 }
 
-export async function setInventory(member: GuildMember | string, inventory: object) {
+export async function setInventory(member: GuildMember | string, inventory: Inventory) {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -1500,10 +1514,63 @@ export async function setInventory(member: GuildMember | string, inventory: obje
     });
 
     await redis.del(`cache:economy:inventory:${id}`);
+
+    if (!inventoryAchievementCheckCooldown.has(id)) {
+        inventoryAchievementCheckCooldown.add(id);
+        setTimeout(() => {
+            inventoryAchievementCheckCooldown.delete(id);
+        }, 60000);
+
+        await checkCollectorAchievement(id, inventory);
+    }
+}
+
+async function checkCollectorAchievement(id: string, inventory: Inventory) {
+    let itemCount = 0;
+
+    for (const itemId of Object.keys(inventory)) {
+        itemCount += inventory[itemId];
+    }
+
+    const achievements = await getAllAchievements(id);
+    let collectorCount = 0;
+
+    for (const achievement of achievements) {
+        if (achievement.achievementId.includes("collector")) collectorCount++;
+        // will always return if a valid achievement is found
+        if (achievement.achievementId.includes("collector") && !achievement.completed) {
+            if (achievement.progress != itemCount) {
+                await setAchievementProgress(id, achievement.achievementId, itemCount);
+            }
+            return;
+        }
+    }
+
+    switch (collectorCount) {
+        case 0:
+            await setAchievementProgress(id, "collector_i", itemCount);
+            break;
+        case 1:
+            await setAchievementProgress(id, "collector_ii", itemCount);
+            break;
+        case 2:
+            await setAchievementProgress(id, "collector_iii", itemCount);
+            break;
+        case 3:
+            await setAchievementProgress(id, "collector_iv", itemCount);
+            break;
+        case 4:
+            await setAchievementProgress(id, "collector_v", itemCount);
+            break;
+    }
 }
 
 export function getItems(): { [key: string]: Item } {
     return items;
+}
+
+export function getAchievements() {
+    return achievements;
 }
 
 export async function getMaxBitcoin(member: GuildMember): Promise<number> {
@@ -1650,6 +1717,8 @@ export async function openCrate(member: GuildMember, item: Item): Promise<string
     }
 
     await setInventory(member, inventory);
+    await addItemUse(member, item.id);
+    await addProgress(member.user.id, "unboxer", 1);
 
     let times = 2;
     const names = [];
@@ -1838,7 +1907,7 @@ export async function calcEarnedXp(member: GuildMember, bet: number): Promise<nu
 
     for (const boosterId of boosters.keys()) {
         if (items[boosterId].boosterEffect.boosts.includes("xp")) {
-            boosterEffect += items[boosterId].boosterEffect.effect;
+            boosterEffect += items[boosterId].boosterEffect.effect * boosters.get(boosterId).length;
         }
     }
 

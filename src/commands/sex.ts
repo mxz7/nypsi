@@ -1,6 +1,7 @@
 import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
 import redis from "../utils/database/redis.js";
+import { addProgress } from "../utils/economy/achievements.js";
 import { getDMsEnabled } from "../utils/economy/utils.js";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
@@ -163,6 +164,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                         "go ahead and send them a *private* message 😉😏"
                 );
             }
+
+            await addProgress(message.author.id, "whore", 1);
+            await addProgress(key.user.id, "whore", 1);
 
             return await channel
                 .send({ content: key.user.toString() + " a match has been found", embeds: [embed2] })

@@ -9,6 +9,7 @@ import {
     getPrestigeRequirement,
     getPrestigeRequirementBal,
     getXp,
+    hasPadlock,
     updateBalance,
     userExists,
 } from "../utils/economy/utils.js";
@@ -70,9 +71,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         footer += ` | prestige: ${await getPrestige(target)}`;
     }
 
+    let padlockStatus = false;
+
+    if (target.user.id == message.author.id && (await hasPadlock(message.member))) {
+        padlockStatus = true;
+    }
+
     const embed = new CustomEmbed(message.member)
         .setDescription(
-            "💰 $**" +
+            `${padlockStatus ? "🔒" : "💰"} $**` +
                 (await getBalance(target)).toLocaleString() +
                 "**\n" +
                 "💳 $**" +
