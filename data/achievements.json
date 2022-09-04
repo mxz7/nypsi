@@ -558,5 +558,40 @@
         "emoji": "🃏",
         "target": 1000,
         "description": "win a bet on green 1,000 times"
+    },
+    "slots_pro_i": {
+        "id": "slots_pro_i",
+        "name": "slots professional **I**",
+        "emoji": "🃏",
+        "target": 5,
+        "description": "win on cherries 5 times"
+    },
+    "slots_pro_ii": {
+        "id": "slots_pro_ii",
+        "name": "slots professional **II**",
+        "emoji": "🃏",
+        "target": 25,
+        "description": "win on cherries 25 times"
+    },
+    "slots_pro_iii": {
+        "id": "slots_pro_iii",
+        "name": "slots professional **III**",
+        "emoji": "🃏",
+        "target": 100,
+        "description": "win on cherries 100 times"
+    },
+    "slots_pro_iv": {
+        "id": "slots_pro_iv",
+        "name": "slots professional **IV**",
+        "emoji": "🃏",
+        "target": 500,
+        "description": "win on cherries 500 times"
+    },
+    "slots_pro_v": {
+        "id": "slots_pro_v",
+        "name": "slots professional **V**",
+        "emoji": "🃏",
+        "target": 1000,
+        "description": "win on cherries 1,000 times"
     }
 }
