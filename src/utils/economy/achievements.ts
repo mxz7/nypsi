@@ -1,6 +1,7 @@
-import { GuildMember } from "discord.js";
+import { EmbedBuilder, GuildMember, WebhookClient } from "discord.js";
 import prisma from "../database/database";
 import redis from "../database/redis";
+import { getLastKnownTag } from "../users/utils";
 import { getAchievements } from "./utils";
 
 /**
@@ -105,6 +106,20 @@ async function completeAchievement(userId: string, achievementId: string) {
     });
 
     await redis.set(`achievements:completed:${userId}`, achievementId);
+
+    const achievements = getAchievements();
+
+    const embed = new EmbedBuilder()
+        .setAuthor({ name: `${await getLastKnownTag(userId)} has unlocked an achievement` })
+        .setDescription(
+            `${achievements[achievementId].emoji} ${achievements[achievementId].name}\n\n*${achievements[achievementId].description}*`
+        )
+        .setTimestamp()
+        .setColor("#36393f");
+
+    const hook = new WebhookClient({ url: process.env.ACHIEVEMENTS_HOOK });
+
+    hook.send({ embeds: [embed] });
 }
 
 export async function getUserAchievement(userId: string, achievementId: string) {
