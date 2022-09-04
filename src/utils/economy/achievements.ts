@@ -6,14 +6,15 @@ import { getAchievements } from "./utils";
 /**
  * returns true if user has met requirements for achievement
  */
-export async function addAchievementProgress(userId: string, achievementId: string) {
+export async function addAchievementProgress(userId: string, achievementId: string, amount = 1) {
     const query = await prisma.achievements.upsert({
         create: {
             userId: userId,
             achievementId: achievementId,
+            progress: amount,
         },
         update: {
-            progress: { increment: 1 },
+            progress: { increment: amount },
         },
         where: {
             userId_achievementId: {
