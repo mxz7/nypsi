@@ -133,9 +133,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }
         }
 
+        const completion = `${((usersAchievements.length / Object.keys(allAchievements).length) * 100).toFixed(
+            1
+        )}% completion`;
+
         const embed = new CustomEmbed(message.member, pages.get(1).join("\n"))
             .setHeader("all achievements", message.author.avatarURL())
-            .setFooter({ text: `page 1/${pages.size}` });
+            .setFooter({ text: `page 1/${pages.size} | ${completion}` });
 
         let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
             new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
@@ -177,7 +181,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
                     newEmbed.setDescription(pages.get(currentPage).join("\n"));
 
-                    newEmbed.setFooter({ text: `page ${currentPage}/${pages.size}` });
+                    newEmbed.setFooter({ text: `page ${currentPage}/${pages.size} | ${completion}` });
 
                     if (currentPage == 1) {
                         row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -217,7 +221,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
                     newEmbed.setDescription(pages.get(currentPage).join("\n"));
 
-                    newEmbed.setFooter({ text: `page ${currentPage}/${pages.size}` });
+                    newEmbed.setFooter({ text: `page ${currentPage}/${pages.size} | ${completion}` });
 
                     if (currentPage == pages.size) {
                         row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -304,7 +308,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return showCurrentProgress();
     } else if (args[0].toLocaleLowerCase() == "all") {
         return showAllAchievements();
-    } else if (args[0].toLowerCase() == "show") {
+    } else if (args[0].toLowerCase() == "show" || args[0].toLowerCase() == "view") {
         return showSpecificAchievement();
     }
 }
