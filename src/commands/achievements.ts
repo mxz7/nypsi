@@ -23,6 +23,23 @@ const cmd = new Command("achievements", "view your achievement progress", Catego
     "achievement",
 ]);
 
+cmd.slashEnabled = true;
+cmd.slashData
+    .addSubcommand((progress) => progress.setName("progress").setDescription("view achievements in progress"))
+    .addSubcommand((all) => all.setName("all").setDescription("view all achievements"))
+    .addSubcommand((show) =>
+        show
+            .setName("view")
+            .setDescription("show information about a specific achievement")
+            .addStringOption((option) =>
+                option
+                    .setName("achievement")
+                    .setDescription("achievement you want to view")
+                    .setRequired(true)
+                    .setAutocomplete(true)
+            )
+    );
+
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     const send = async (data: MessageOptions | InteractionReplyOptions) => {
         if (!(message instanceof Message)) {
@@ -304,7 +321,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (args.length == 0) {
         return showCurrentProgress();
-    } else if (args[0].toLowerCase() == "view") {
+    } else if (args[0].toLowerCase() == "view" || args[0].toLowerCase() == "progress") {
         return showCurrentProgress();
     } else if (args[0].toLocaleLowerCase() == "all") {
         return showAllAchievements();
