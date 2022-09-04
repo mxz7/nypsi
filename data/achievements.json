@@ -11,7 +11,7 @@
         "name": "collector **II**",
         "emoji": "🎒",
         "target": 1000,
-        "description": "have 1000 items in your inventory",
+        "description": "have 1,000 items in your inventory",
         "requires": "collector_i"
     },
     "collector_iii": {
@@ -71,7 +71,7 @@
     },
     "gambler_v": {
         "id": "gambler_v",
-        "name": "gambler **v**",
+        "name": "gambler **V**",
         "emoji": "🎰",
         "target": 500000,
         "description": "gamble 500,000 times",
@@ -82,14 +82,14 @@
         "name": "fisher **I**",
         "emoji": "🎣",
         "target": 100,
-        "description": "fish 100 times"
+        "description": "fish 100 fish"
     },
     "fisher_ii": {
         "id": "fisher_ii",
         "name": "fisher **II**",
         "emoji": "🎣",
         "target": 500,
-        "description": "fish 500 times",
+        "description": "fish 500 fish",
         "requires": "fisher_i"
     },
     "fisher_iii": {
@@ -97,7 +97,7 @@
         "name": "fisher **III**",
         "emoji": "🎣",
         "target": 1000,
-        "description": "fish 1,000 times",
+        "description": "fish 1,000 fish",
         "requires": "fisher_ii"
     },
     "fisher_iv": {
@@ -105,15 +105,15 @@
         "name": "fisher **IV**",
         "emoji": "🎣",
         "target": 10000,
-        "description": "fish 10,000 times",
+        "description": "fish 10,000 fish",
         "requires": "fisher_ii"
     },
     "fisher_v": {
         "id": "fisher_v",
-        "name": "fisher **v**",
+        "name": "fisher **V**",
         "emoji": "🎣",
         "target": 25000,
-        "description": "fish 25,000 times",
+        "description": "fish 25,000 fish",
         "requires": "fisher_iv"
     },
     "hunter_i": {
@@ -121,14 +121,14 @@
         "name": "hunter **I**",
         "emoji": ":gun:",
         "target": 100,
-        "description": "hunt 100 times"
+        "description": "hunt 100 animals"
     },
     "hunter_ii": {
         "id": "hunter_ii",
         "name": "hunter **II**",
         "emoji": ":gun:",
         "target": 500,
-        "description": "hunt 500 times",
+        "description": "hunt 500 animals",
         "requires": "hunter_i"
     },
     "hunter_iii": {
@@ -136,7 +136,7 @@
         "name": "hunter **III**",
         "emoji": ":gun:",
         "target": 1000,
-        "description": "hunt 1,000 times",
+        "description": "hunt 1,000 animals",
         "requires": "hunter_ii"
     },
     "hunter_iv": {
@@ -144,15 +144,15 @@
         "name": "hunter **IV**",
         "emoji": ":gun:",
         "target": 10000,
-        "description": "hunt 10,000 times",
+        "description": "hunt 10,000 animals",
         "requires": "hunter_ii"
     },
     "hunter_v": {
         "id": "hunter_v",
-        "name": "hunter **v**",
+        "name": "hunter **V**",
         "emoji": ":gun:",
         "target": 25000,
-        "description": "hunt 25,000 times",
+        "description": "hunt 25,000 animals",
         "requires": "hunter_iv"
     },
     "miner_i": {
@@ -160,14 +160,14 @@
         "name": "miner **I**",
         "emoji": "⛏️",
         "target": 100,
-        "description": "mine 100 times"
+        "description": "mine 100 items"
     },
     "miner_ii": {
         "id": "miner_ii",
         "name": "miner **II**",
         "emoji": "⛏️",
         "target": 500,
-        "description": "mine 500 times",
+        "description": "mine 500 items",
         "requires": "miner_i"
     },
     "miner_iii": {
@@ -175,7 +175,7 @@
         "name": "miner **III**",
         "emoji": "⛏️",
         "target": 1000,
-        "description": "mine 1,000 times",
+        "description": "mine 1,000 items",
         "requires": "miner_ii"
     },
     "miner_iv": {
@@ -183,15 +183,15 @@
         "name": "miner **IV**",
         "emoji": "⛏️",
         "target": 10000,
-        "description": "mine 10,000 times",
+        "description": "mine 10,000 items",
         "requires": "miner_ii"
     },
     "miner_v": {
         "id": "miner_v",
-        "name": "miner **v**",
+        "name": "miner **V**",
         "emoji": "⛏️",
         "target": 25000,
-        "description": "mine 25,000 times",
+        "description": "mine 25,000 items",
         "requires": "miner_iv"
     },
     "baker_i": {
@@ -199,14 +199,14 @@
         "name": "baker **I**",
         "emoji": "🍪",
         "target": 50,
-        "description": "bake 50 times"
+        "description": "bake 50 cookies"
     },
     "baker_ii": {
         "id": "baker_ii",
         "name": "baker **II**",
         "emoji": "🍪",
         "target": 500,
-        "description": "bake 500 times",
+        "description": "bake 500 cookies",
         "requires": "baker_i"
     },
     "baker_iii": {
@@ -214,7 +214,7 @@
         "name": "baker **III**",
         "emoji": "🍪",
         "target": 2500,
-        "description": "bake 2,500 times",
+        "description": "bake 2,500 cookies",
         "requires": "baker_ii"
     },
     "baker_iv": {
@@ -222,7 +222,7 @@
         "name": "baker **IV**",
         "emoji": "🍪",
         "target": 10000,
-        "description": "bake 10,000 times",
+        "description": "bake 10,000 cookies",
         "requires": "baker_iii"
     },
     "baker_v": {
@@ -230,7 +230,7 @@
         "name": "baker **V**",
         "emoji": "🍪",
         "target": 50000,
-        "description": "bake 50,000 times",
+        "description": "bake 50,000 cookies",
         "requires": "baker_iv"
     }
 }
