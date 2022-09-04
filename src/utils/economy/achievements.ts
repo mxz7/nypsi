@@ -109,11 +109,18 @@ async function completeAchievement(userId: string, achievementId: string) {
 
     const achievements = getAchievements();
 
+    const completed = await prisma.achievements.count({
+        where: {
+            AND: [{ achievementId: achievementId }, { completed: true }],
+        },
+    });
+
     const embed = new EmbedBuilder()
         .setAuthor({ name: `${await getLastKnownTag(userId)} has unlocked an achievement` })
         .setDescription(
             `${achievements[achievementId].emoji} ${achievements[achievementId].name}\n\n*${achievements[achievementId].description}*`
         )
+        .setFooter({ text: `completed by ${completed.toLocaleString()} users` })
         .setTimestamp()
         .setColor("#36393f");
 
