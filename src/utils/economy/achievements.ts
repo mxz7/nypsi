@@ -38,6 +38,7 @@ export async function setAchievementProgress(userId: string, achievementId: stri
         create: {
             userId: userId,
             achievementId: achievementId,
+            progress: progress,
         },
         update: {
             progress: progress,
