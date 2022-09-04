@@ -349,5 +349,44 @@
         "target": 15000,
         "description": "find 15,000 milfs",
         "requires": "whore_iv"
+    },
+    "streaker_i": {
+        "id": "streaker_i",
+        "name": "streaker **I**",
+        "emoji": "📅",
+        "target": 7,
+        "description": "get a daily streak for 7 days"
+    },
+    "streaker_ii": {
+        "id": "streaker_ii",
+        "name": "streaker **II**",
+        "emoji": "📅",
+        "target": 14,
+        "description": "get a daily streak for 14 days",
+        "requires": "streaker_i"
+    },
+    "streaker_iii": {
+        "id": "streaker_iii",
+        "name": "streaker **III**",
+        "emoji": "📅",
+        "target": 30,
+        "description": "get a daily streak for 30 days",
+        "requires": "streaker_ii"
+    },
+    "streaker_iv": {
+        "id": "streaker_iv",
+        "name": "streaker **IV**",
+        "emoji": "📅",
+        "target": 69,
+        "description": "get a daily streak for 69 days",
+        "requires": "streaker_iii"
+    },
+    "streaker_v": {
+        "id": "streaker_v",
+        "name": "streaker **V**",
+        "emoji": "📅",
+        "target": 100,
+        "description": "get a daily streak for 100 days",
+        "requires": "streaker_iv"
     }
 }
