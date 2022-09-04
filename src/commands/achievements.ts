@@ -12,9 +12,10 @@ import {
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import { getAllAchievements, getUncompletedAchievements } from "../utils/economy/achievements";
+import { getAllAchievements, getUncompletedAchievements, getUserAchievement } from "../utils/economy/achievements";
 import { getAchievements } from "../utils/economy/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { AchievementData } from "../utils/models/Economy";
 import { CustomEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("achievements", "view your achievement progress", Categories.MONEY).setAliases([
@@ -254,12 +255,57 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return pageManager();
     };
 
+    const showSpecificAchievement = async () => {
+        args.shift();
+
+        let selected: AchievementData;
+
+        const allAchievementData = getAchievements();
+
+        const searchTag = args.join(" ");
+
+        for (const achievementId of Object.keys(allAchievementData)) {
+            const achievement = allAchievementData[achievementId];
+
+            if (searchTag.toLowerCase() == achievement.id) {
+                selected = achievement;
+                break;
+            } else if (achievement.name.replaceAll("*", "").toLowerCase().includes(searchTag)) {
+                selected = achievement;
+                break;
+            }
+        }
+
+        const achievement = await getUserAchievement(message.author.id, selected.id);
+
+        const embed = new CustomEmbed(message.member).setTitle(`${selected.emoji} ${selected.name}`);
+
+        let desc = `\`${selected.id}\`\n\n*${selected.description}*`;
+
+        if (achievement) {
+            if (achievement.completed) {
+                desc += `\n\ncompleted <t:${Math.floor(achievement.completedAt.getTime() / 1000)}:R>`;
+            } else {
+                desc += `\n\n${achievement.progress.toLocaleString()} / ${selected.target.toLocaleString()} (${(
+                    (achievement.progress / selected.target) *
+                    100
+                ).toFixed(1)}%)`;
+            }
+        }
+
+        embed.setDescription(desc);
+
+        return send({ embeds: [embed] });
+    };
+
     if (args.length == 0) {
         return showCurrentProgress();
     } else if (args[0].toLowerCase() == "view") {
         return showCurrentProgress();
     } else if (args[0].toLocaleLowerCase() == "all") {
         return showAllAchievements();
+    } else if (args[0].toLowerCase() == "show") {
+        return showSpecificAchievement();
     }
 }
 
