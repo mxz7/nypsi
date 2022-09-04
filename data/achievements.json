@@ -593,5 +593,40 @@
         "emoji": "🍒",
         "target": 1000,
         "description": "win on cherries 1,000 times"
+    },
+    "horny_i": {
+        "id": "horny_i",
+        "name": "horny **I**",
+        "emoji": "💦",
+        "target": 50,
+        "description": "view 50 nsfw images"
+    },
+    "horny_ii": {
+        "id": "horny_ii",
+        "name": "horny **II**",
+        "emoji": "💦",
+        "target": 250,
+        "description": "view 250 nsfw images"
+    },
+    "horny_iii": {
+        "id": "horny_iii",
+        "name": "horny **III**",
+        "emoji": "💦",
+        "target": 1000,
+        "description": "view 1,000 nsfw images"
+    },
+    "horny_iv": {
+        "id": "horny_iv",
+        "name": "horny **IV**",
+        "emoji": "💦",
+        "target": 5000,
+        "description": "view 5,000 nsfw images"
+    },
+    "horny_v": {
+        "id": "horny_v",
+        "name": "horny **V**",
+        "emoji": "💦",
+        "target": 15000,
+        "description": "view 15,000 nsfw images"
     }
 }
