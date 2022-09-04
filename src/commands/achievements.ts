@@ -332,7 +332,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
 
         if (completed > 0) {
-            desc += `this has been completed by **${completed.toLocaleString()}** users`;
+            desc += `**${completed.toLocaleString()}** people have completed this achievement`;
         }
 
         embed.setDescription(desc);
