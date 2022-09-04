@@ -1,5 +1,6 @@
 import { CommandInteraction, Message } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
+import { addProgress } from "../utils/economy/achievements.js";
 import {
     addItemUse,
     createUser,
@@ -138,6 +139,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         robbedAmount = Math.round((amount / 100) * shopWorth.get(shop));
 
         await updateBalance(message.member, (await getBalance(message.member)) + robbedAmount);
+        await addProgress(message.author.id, "robber", 1);
 
         embed2.addField("**success!!**", "**you stole** $" + robbedAmount.toLocaleString() + " from **" + shop + "**");
         embed2.setColor("#5efb8f");

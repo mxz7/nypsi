@@ -1,5 +1,6 @@
 import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { addProgress } from "../utils/economy/achievements";
 import { createUser, getInventory, setInventory, userExists } from "../utils/economy/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
@@ -32,7 +33,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (await onCooldown(cmd.name, message.member)) {
         const embed = await getResponse(cmd.name, message.member);
 
-        return send({ embeds: [embed] });
+        return send({ embeds: [embed], ephemeral: true });
     }
 
     if (!(await userExists(message.member))) await createUser(message.member);
@@ -80,7 +81,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         desc += "\n\nyou also managed to bake a cake <:nypsi_cake:1002977512630001725> good job!!";
     }
 
-    return send({
+    await send({
         embeds: [
             new CustomEmbed(message.member, desc).setHeader(
                 `${message.author.username}'s bakery`,
@@ -88,6 +89,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             ),
         ],
     });
+
+    await addProgress(message.author.id, "baker", amount);
 }
 
 cmd.setRun(run);

@@ -1,6 +1,7 @@
 import dayjs = require("dayjs");
 import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { setProgress } from "../utils/economy/achievements";
 import {
     createUser,
     getBalance,
@@ -102,7 +103,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embed.setFooter({ text: `+${xp}xp` });
     }
 
-    return send({ embeds: [embed] });
+    await send({ embeds: [embed] });
+
+    await setProgress(message.author.id, "streaker", streak + 1);
 }
 
 cmd.setRun(run);

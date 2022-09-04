@@ -1,5 +1,6 @@
 import { CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions, MessageOptions } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { addProgress } from "../utils/economy/achievements";
 import {
     addItemUse,
     createUser,
@@ -133,6 +134,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const foundItems = [];
 
+    let foundItemsAmount = 0;
+
     for (let i = 0; i < times; i++) {
         const mineItemsModified = [];
 
@@ -204,6 +207,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         foundItems.push(`${amount} ${items[chosen].emoji} ${items[chosen].name}`);
+        foundItemsAmount += amount;
     }
 
     await setInventory(message.member, inventory);
@@ -237,6 +241,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     setTimeout(() => {
         edit({ embeds: [embed] }, msg);
     }, 1500);
+
+    await addProgress(message.author.id, "miner", foundItemsAmount);
 }
 
 cmd.setRun(run);

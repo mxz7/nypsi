@@ -61,7 +61,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
-    const inventory = await getInventory(message.member);
+    const inventory = await getInventory(message.member, true);
     const items = getItems();
 
     const itemIDs = Array.from(Object.keys(inventory));
