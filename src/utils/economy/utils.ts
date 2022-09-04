@@ -1442,7 +1442,7 @@ export async function addItemUse(member: GuildMember, item: string) {
 
 type Inventory = { [key: string]: number };
 
-export async function getInventory(member: GuildMember | string): Promise<Inventory> {
+export async function getInventory(member: GuildMember | string, checkAchievement = false): Promise<Inventory> {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -1481,6 +1481,15 @@ export async function getInventory(member: GuildMember | string): Promise<Invent
     await redis.set(`cache:economy:inventory:${id}`, JSON.stringify(query.inventory));
     await redis.expire(`cache:economy:inventory:${id}`, 180);
 
+    if (checkAchievement && !inventoryAchievementCheckCooldown.has(id)) {
+        inventoryAchievementCheckCooldown.add(id);
+        setTimeout(() => {
+            inventoryAchievementCheckCooldown.delete(id);
+        }, 60000);
+
+        await checkCollectorAchievement(id, query.inventory as Inventory);
+    }
+
     return query.inventory as Inventory;
 }
 
@@ -1509,43 +1518,47 @@ export async function setInventory(member: GuildMember | string, inventory: Inve
             inventoryAchievementCheckCooldown.delete(id);
         }, 60000);
 
-        let itemCount = 0;
+        await checkCollectorAchievement(id, inventory);
+    }
+}
 
-        for (const itemId of Object.keys(inventory)) {
-            itemCount += inventory[itemId];
-        }
+async function checkCollectorAchievement(id: string, inventory: Inventory) {
+    let itemCount = 0;
 
-        const achievements = await getAllAchievements(id);
-        let collectorCount = 0;
+    for (const itemId of Object.keys(inventory)) {
+        itemCount += inventory[itemId];
+    }
 
-        for (const achievement of achievements) {
-            if (achievement.achievementId.includes("collector")) collectorCount++;
-            // will always return if a valid achievement is found
-            if (achievement.achievementId.includes("collector") && !achievement.completed) {
-                if (achievement.progress != itemCount) {
-                    await setAchievementProgress(id, achievement.achievementId, itemCount);
-                }
-                return;
+    const achievements = await getAllAchievements(id);
+    let collectorCount = 0;
+
+    for (const achievement of achievements) {
+        if (achievement.achievementId.includes("collector")) collectorCount++;
+        // will always return if a valid achievement is found
+        if (achievement.achievementId.includes("collector") && !achievement.completed) {
+            if (achievement.progress != itemCount) {
+                await setAchievementProgress(id, achievement.achievementId, itemCount);
             }
+            return;
         }
+    }
 
-        switch (collectorCount) {
-            case 0:
-                await setAchievementProgress(id, "collector_i", itemCount);
-                break;
-            case 1:
-                await setAchievementProgress(id, "collector_ii", itemCount);
-                break;
-            case 2:
-                await setAchievementProgress(id, "collector_iii", itemCount);
-                break;
-            case 3:
-                await setAchievementProgress(id, "collector_iv", itemCount);
-                break;
-            case 4:
-                await setAchievementProgress(id, "collector_v", itemCount);
-                break;
-        }
+    switch (collectorCount) {
+        case 0:
+            await setAchievementProgress(id, "collector_i", itemCount);
+            break;
+        case 1:
+            await setAchievementProgress(id, "collector_ii", itemCount);
+            break;
+        case 2:
+            await setAchievementProgress(id, "collector_iii", itemCount);
+            break;
+        case 3:
+            await setAchievementProgress(id, "collector_iv", itemCount);
+            break;
+        case 4:
+            await setAchievementProgress(id, "collector_v", itemCount);
+            break;
     }
 }
 
