@@ -12,7 +12,12 @@ import {
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import { getAllAchievements, getUncompletedAchievements, getUserAchievement } from "../utils/economy/achievements";
+import {
+    getAllAchievements,
+    getCompletedAchievements,
+    getUncompletedAchievements,
+    getUserAchievement,
+} from "../utils/economy/achievements";
 import { getAchievements } from "../utils/economy/utils";
 import { daysAgo } from "../utils/functions/date";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
@@ -151,7 +156,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }
         }
 
-        const completion = `${((usersAchievements.length / Object.keys(allAchievements).length) * 100).toFixed(
+        const completedAchievements = await getCompletedAchievements(message.member);
+
+        const completion = `${((completedAchievements.length / Object.keys(allAchievements).length) * 100).toFixed(
             1
         )}% completion`;
 
