@@ -7,13 +7,14 @@ import {
     Message,
     MessageActionRowComponentBuilder,
 } from "discord.js";
-import { onCooldown } from "../utils/cooldownhandler.js";
+import { addCooldown, onCooldown } from "../utils/cooldownhandler.js";
 import prisma from "../utils/database/database.js";
 import { getGuildByUser } from "../utils/economy/utils.js";
 import { logger } from "../utils/logger";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 import { hasProfile } from "../utils/users/utils.js";
+import ms = require("ms");
 
 const cmd = new Command("deletemydata", "delete your data from nypsi's database", Categories.INFO);
 
@@ -69,6 +70,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (typeof response != "string") return;
 
     if (response == "y") {
+        await addCooldown(cmd.name, message.member, Math.floor(ms("1 week") / 1000));
         embed.setDescription("deleting all of your data...");
 
         await m.edit({ embeds: [embed], components: [] });
