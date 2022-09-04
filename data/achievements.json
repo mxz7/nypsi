@@ -523,5 +523,40 @@
         "emoji": "🃏",
         "target": 1000,
         "description": "reach a 7x multiplier in highlow 1,000 times"
+    },
+    "roulette_pro_i": {
+        "id": "roulette_pro_i",
+        "name": "roulette professional **I**",
+        "emoji": "🃏",
+        "target": 5,
+        "description": "win a bet on green 5 times"
+    },
+    "roulette_pro_ii": {
+        "id": "roulette_pro_ii",
+        "name": "roulette professional **II**",
+        "emoji": "🃏",
+        "target": 25,
+        "description": "win a bet on green 25 times"
+    },
+    "roulette_pro_iii": {
+        "id": "roulette_pro_iii",
+        "name": "roulette professional **III**",
+        "emoji": "🃏",
+        "target": 100,
+        "description": "win a bet on green 100 times"
+    },
+    "roulette_pro_iv": {
+        "id": "roulette_pro_iv",
+        "name": "roulette professional **IV**",
+        "emoji": "🃏",
+        "target": 500,
+        "description": "win a bet on green 500 times"
+    },
+    "roulette_pro_v": {
+        "id": "roulette_pro_v",
+        "name": "roulette professional **V**",
+        "emoji": "🃏",
+        "target": 1000,
+        "description": "win a bet on green 1,000 times"
     }
 }

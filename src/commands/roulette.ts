@@ -7,6 +7,7 @@ import {
     MessageOptions,
 } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
+import { addProgress } from "../utils/economy/achievements.js";
 import {
     addGamble,
     addToGuildXP,
@@ -262,6 +263,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         } else {
             await updateBalance(message.member, (await getBalance(message.member)) + winnings);
         }
+
+        if (roll == "🟢") await addProgress(message.author.id, "roulette_pro", 1);
     } else {
         await updateBalance(message.member, (await getBalance(message.member)) - bet);
     }
