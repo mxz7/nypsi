@@ -122,11 +122,7 @@ export class PremUser {
     }
 
     renew() {
-        if (Math.abs(dayjs().diff(dayjs(this.expireDate), "days")) < 10) {
-            this.expireDate = dayjs().add(35, "days").toDate();
-        } else {
-            this.expireDate = dayjs(this.expireDate).add(35, "days").toDate();
-        }
+        this.expireDate = dayjs().add(35, "days").toDate();
     }
 
     async expire(client: NypsiClient): Promise<PremUser | string> {
