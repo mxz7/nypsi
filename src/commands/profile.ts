@@ -105,6 +105,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 Auction: true,
                 CommandUse: true,
                 Survey: true,
+                Achievements: true,
             },
         });
 
