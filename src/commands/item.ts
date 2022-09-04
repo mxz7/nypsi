@@ -67,7 +67,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     selected = items[selected];
 
     if (!selected) {
-        return send({ embeds: [new ErrorEmbed(`couldnt find \`${args[0]}\``)] });
+        return send({ embeds: [new ErrorEmbed(`couldnt find \`${args.join(" ")}\``)] });
     }
 
     await addCooldown(cmd.name, message.member, 7);
@@ -116,7 +116,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (selected.role) {
-        embed.addField("role", `\`${selected.role}\`${selected.role == "car" ? ` (${selected.speed})` : ""}`, true);
+        embed.addField("role", `\`${selected.role}${selected.role == "car" ? ` (${selected.speed})` : ""}\``, true);
     }
 
     const rarityMap = new Map<number, string>();

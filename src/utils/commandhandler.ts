@@ -13,7 +13,7 @@ import {
 } from "discord.js";
 import * as fs from "fs";
 import { getBorderCharacters, table } from "table";
-import { getItems, getXp, isEcoBanned, isHandcuffed, updateXp, userExists } from "./economy/utils";
+import { getAchievements, getItems, getXp, isEcoBanned, isHandcuffed, updateXp, userExists } from "./economy/utils";
 import { createCaptcha, isLockedOut, toggleLock } from "./functions/captcha";
 import { formatDate, MStoTime } from "./functions/date";
 import { getNews, hasSeenNews } from "./functions/news";
@@ -26,6 +26,7 @@ import { addUse, getCommand } from "./premium/utils";
 // @ts-expect-error typescript doesnt like opening package.json
 import { version } from "../../package.json";
 import redis from "./database/redis";
+import { addProgress } from "./economy/achievements";
 import { a } from "./functions/anticheat";
 import { NypsiClient } from "./models/Client";
 import { Item } from "./models/Economy";
@@ -761,38 +762,70 @@ export async function runCommand(
         }
     }
 
-    const news = await getNews();
-
-    if (news.text != "" && command.category == Categories.MONEY && !(await hasSeenNews(message.author.id))) {
-        await redis.rpush("nypsi:news:seen", message.author.id);
-
-        const pos = await hasSeenNews(message.author.id);
-
-        const embed = new CustomEmbed(message.member, `${news.text}\n\n*${formatDate(news.date)}*`)
-            .setHeader("news", message.author.avatarURL())
-            .setFooter({ text: `you are #${pos} to see this` });
-
-        if (message instanceof Message) {
-            setTimeout(() => {
-                message.reply({ embeds: [embed] });
-            }, 2000);
-        } else {
-            setTimeout(() => {
-                message.followUp({ embeds: [embed] });
-            }, 2000);
-        }
-        logger.debug(`news shown to ${message.author.tag}`);
-    }
-
     command.run(message, args);
 
-    Promise.all([
+    setTimeout(async () => {
+        const news = await getNews();
+
+        if (news.text != "" && command.category == Categories.MONEY && !(await hasSeenNews(message.author.id))) {
+            await redis.rpush("nypsi:news:seen", message.author.id);
+
+            const pos = await hasSeenNews(message.author.id);
+
+            const embed = new CustomEmbed(message.member, `${news.text}\n\n*${formatDate(news.date)}*`)
+                .setHeader("news", message.author.avatarURL())
+                .setFooter({ text: `you are #${pos} to see this` });
+
+            if (message instanceof Message) {
+                message.reply({ embeds: [embed] });
+            } else {
+                message.followUp({ embeds: [embed] });
+            }
+            logger.debug(`news shown to ${message.author.tag}`);
+        }
+
+        if (await redis.exists(`achievements:completed:${message.author.id}`)) {
+            const achievementId = await redis.get(`achievements:completed:${message.author.id}`);
+            await redis.del(`achievements:completed:${message.author.id}`);
+
+            const achievement = getAchievements()[achievementId];
+
+            const embed = new CustomEmbed(message.member).setHeader("achievement unlocked", message.author.avatarURL());
+
+            embed.setDescription(`you have completed ${achievement.emoji} ${achievement.name}`);
+
+            let earnedXp = 30;
+
+            if (achievementId.endsWith("_v")) {
+                earnedXp = 5000;
+            } else if (achievementId.endsWith("_iv")) {
+                earnedXp = 1000;
+            } else if (achievementId.endsWith("_iii")) {
+                earnedXp = 500;
+            } else if (achievementId.endsWith("_ii")) {
+                earnedXp = 100;
+            }
+
+            await updateXp(message.member, (await getXp(message.member)) + earnedXp);
+
+            embed.setFooter({ text: `+${earnedXp.toLocaleString()}xp` });
+
+            if (message instanceof Message) {
+                message.reply({ embeds: [embed] });
+            } else {
+                message.followUp({ embeds: [embed] });
+            }
+        }
+    }, 2000);
+
+    await Promise.all([
         a(message.author.id, message.author.tag, message.content),
         updateCommandUses(message.member),
         updateLastCommand(message.member),
         addCommandUse(message.author.id, command.name),
         redis.hincrby("nypsi:topcommands", command.name, 1),
         redis.hincrby("nypsi:topcommands:user", message.author.tag, 1),
+        addProgress(message.author.id, "nypsi", 1),
     ]);
 
     if (command.category == "money") {

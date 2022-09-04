@@ -36,3 +36,11 @@ export interface Booster {
     expire: number;
     id: string;
 }
+
+export interface AchievementData {
+    id: string;
+    name: string;
+    emoji: string;
+    target: number;
+    description: string;
+}

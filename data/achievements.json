@@ -1,0 +1,737 @@
+{
+    "collector_i": {
+        "id": "collector_i",
+        "name": "collector **I**",
+        "emoji": "🎒",
+        "target": 100,
+        "description": "have 100 items in your inventory"
+    },
+    "collector_ii": {
+        "id": "collector_ii",
+        "name": "collector **II**",
+        "emoji": "🎒",
+        "target": 750,
+        "description": "have 750 items in your inventory"
+    },
+    "collector_iii": {
+        "id": "collector_iii",
+        "name": "collector **III**",
+        "emoji": "🎒",
+        "target": 5000,
+        "description": "have 5,000 items in your inventory"
+    },
+    "collector_iv": {
+        "id": "collector_iv",
+        "name": "collector **IV**",
+        "emoji": "🎒",
+        "target": 10000,
+        "description": "have 10,000 items in your inventory"
+    },
+    "collector_v": {
+        "id": "collector_v",
+        "name": "collector **V**",
+        "emoji": "🎒",
+        "target": 50000,
+        "description": "have 50,000 items in your inventory"
+    },
+    "gambler_i": {
+        "id": "gambler_i",
+        "name": "gambler **I**",
+        "emoji": "🎰",
+        "target": 1000,
+        "description": "gamble 1,000 times"
+    },
+    "gambler_ii": {
+        "id": "gambler_ii",
+        "name": "gambler **II**",
+        "emoji": "🎰",
+        "target": 5000,
+        "description": "gamble 5,000 times"
+    },
+    "gambler_iii": {
+        "id": "gambler_iii",
+        "name": "gambler **III**",
+        "emoji": "🎰",
+        "target": 15000,
+        "description": "gamble 15,000 times"
+    },
+    "gambler_iv": {
+        "id": "gambler_iv",
+        "name": "gambler **IV**",
+        "emoji": "🎰",
+        "target": 50000,
+        "description": "gamble 50,000 times"
+    },
+    "gambler_v": {
+        "id": "gambler_v",
+        "name": "gambler **V**",
+        "emoji": "🎰",
+        "target": 100000,
+        "description": "gamble 100,000 times"
+    },
+    "fisher_i": {
+        "id": "fisher_i",
+        "name": "fisher **I**",
+        "emoji": "🎣",
+        "target": 100,
+        "description": "find 100 fish"
+    },
+    "fisher_ii": {
+        "id": "fisher_ii",
+        "name": "fisher **II**",
+        "emoji": "🎣",
+        "target": 500,
+        "description": "find 500 fish"
+    },
+    "fisher_iii": {
+        "id": "fisher_iii",
+        "name": "fisher **III**",
+        "emoji": "🎣",
+        "target": 1000,
+        "description": "find 1,000 fish"
+    },
+    "fisher_iv": {
+        "id": "fisher_iv",
+        "name": "fisher **IV**",
+        "emoji": "🎣",
+        "target": 10000,
+        "description": "find 10,000 fish"
+    },
+    "fisher_v": {
+        "id": "fisher_v",
+        "name": "fisher **V**",
+        "emoji": "🎣",
+        "target": 25000,
+        "description": "find 25,000 fish"
+    },
+    "hunter_i": {
+        "id": "hunter_i",
+        "name": "hunter **I**",
+        "emoji": ":gun:",
+        "target": 100,
+        "description": "hunt 100 animals"
+    },
+    "hunter_ii": {
+        "id": "hunter_ii",
+        "name": "hunter **II**",
+        "emoji": ":gun:",
+        "target": 500,
+        "description": "hunt 500 animals"
+    },
+    "hunter_iii": {
+        "id": "hunter_iii",
+        "name": "hunter **III**",
+        "emoji": ":gun:",
+        "target": 1000,
+        "description": "hunt 1,000 animals"
+    },
+    "hunter_iv": {
+        "id": "hunter_iv",
+        "name": "hunter **IV**",
+        "emoji": ":gun:",
+        "target": 10000,
+        "description": "hunt 10,000 animals"
+    },
+    "hunter_v": {
+        "id": "hunter_v",
+        "name": "hunter **V**",
+        "emoji": ":gun:",
+        "target": 25000,
+        "description": "hunt 25,000 animals"
+    },
+    "miner_i": {
+        "id": "miner_i",
+        "name": "miner **I**",
+        "emoji": "⛏️",
+        "target": 500,
+        "description": "mine 500 items"
+    },
+    "miner_ii": {
+        "id": "miner_ii",
+        "name": "miner **II**",
+        "emoji": "⛏️",
+        "target": 1000,
+        "description": "mine 1,000 items"
+    },
+    "miner_iii": {
+        "id": "miner_iii",
+        "name": "miner **III**",
+        "emoji": "⛏️",
+        "target": 5000,
+        "description": "mine 5,000 items"
+    },
+    "miner_iv": {
+        "id": "miner_iv",
+        "name": "miner **IV**",
+        "emoji": "⛏️",
+        "target": 15000,
+        "description": "mine 15,000 items"
+    },
+    "miner_v": {
+        "id": "miner_v",
+        "name": "miner **V**",
+        "emoji": "⛏️",
+        "target": 50000,
+        "description": "mine 50,000 items"
+    },
+    "baker_i": {
+        "id": "baker_i",
+        "name": "baker **I**",
+        "emoji": "🍪",
+        "target": 50,
+        "description": "bake 50 cookies"
+    },
+    "baker_ii": {
+        "id": "baker_ii",
+        "name": "baker **II**",
+        "emoji": "🍪",
+        "target": 500,
+        "description": "bake 500 cookies"
+    },
+    "baker_iii": {
+        "id": "baker_iii",
+        "name": "baker **III**",
+        "emoji": "🍪",
+        "target": 2500,
+        "description": "bake 2,500 cookies"
+    },
+    "baker_iv": {
+        "id": "baker_iv",
+        "name": "baker **IV**",
+        "emoji": "🍪",
+        "target": 10000,
+        "description": "bake 10,000 cookies"
+    },
+    "baker_v": {
+        "id": "baker_v",
+        "name": "baker **V**",
+        "emoji": "🍪",
+        "target": 50000,
+        "description": "bake 50,000 cookies"
+    },
+    "wizard_i": {
+        "id": "wizard_i",
+        "name": "wizard **I**",
+        "emoji": "🧙‍♂️",
+        "target": 25,
+        "description": "buy 25 items from karma shop"
+    },
+    "wizard_ii": {
+        "id": "wizard_ii",
+        "name": "wizard **II**",
+        "emoji": "🧙‍♂️",
+        "target": 75,
+        "description": "buy 75 items from karma shop"
+    },
+    "wizard_iii": {
+        "id": "wizard_iii",
+        "name": "wizard **III**",
+        "emoji": "🧙‍♂️",
+        "target": 150,
+        "description": "buy 150 items from karma shop"
+    },
+    "wizard_iv": {
+        "id": "wizard_iv",
+        "name": "wizard **IV**",
+        "emoji": "🧙‍♂️",
+        "target": 500,
+        "description": "buy 500 items from karma shop"
+    },
+    "wizard_v": {
+        "id": "wizard_v",
+        "name": "wizard **V**",
+        "emoji": "🧙‍♂️",
+        "target": 1000,
+        "description": "buy 1,000 items from karma shop"
+    },
+    "robber_i": {
+        "id": "robber_i",
+        "name": "robber **I**",
+        "emoji": "🥷",
+        "target": 50,
+        "description": "complete 50 successful robberies"
+    },
+    "robber_ii": {
+        "id": "robber_ii",
+        "name": "robber **II**",
+        "emoji": "🥷",
+        "target": 250,
+        "description": "complete 250 successful robberies"
+    },
+    "robber_iii": {
+        "id": "robber_iii",
+        "name": "robber **III**",
+        "emoji": "🥷",
+        "target": 1000,
+        "description": "complete 1,000 successful robberies"
+    },
+    "robber_iv": {
+        "id": "robber_iv",
+        "name": "robber **IV**",
+        "emoji": "🥷",
+        "target": 10000,
+        "description": "complete 10,000 successful robberies"
+    },
+    "robber_v": {
+        "id": "robber_v",
+        "name": "robber **V**",
+        "emoji": "🥷",
+        "target": 25000,
+        "description": "complete 25,000 successful robberies"
+    },
+    "whore_i": {
+        "id": "whore_i",
+        "name": "whore **I**",
+        "emoji": "🍑",
+        "target": 25,
+        "description": "find 25 milfs"
+    },
+    "whore_ii": {
+        "id": "whore_ii",
+        "name": "whore **II**",
+        "emoji": "🍑",
+        "target": 50,
+        "description": "find 50 milfs"
+    },
+    "whore_iii": {
+        "id": "whore_iii",
+        "name": "whore **III**",
+        "emoji": "🍑",
+        "target": 100,
+        "description": "find 100 milfs"
+    },
+    "whore_iv": {
+        "id": "whore_iv",
+        "name": "whore **IV**",
+        "emoji": "🍑",
+        "target": 1000,
+        "description": "find 1,000 milfs"
+    },
+    "whore_v": {
+        "id": "whore_v",
+        "name": "whore **V**",
+        "emoji": "🍑",
+        "target": 15000,
+        "description": "find 15,000 milfs"
+    },
+    "streaker_i": {
+        "id": "streaker_i",
+        "name": "streaker **I**",
+        "emoji": "📅",
+        "target": 7,
+        "description": "get a daily streak for 7 days"
+    },
+    "streaker_ii": {
+        "id": "streaker_ii",
+        "name": "streaker **II**",
+        "emoji": "📅",
+        "target": 14,
+        "description": "get a daily streak for 14 days"
+    },
+    "streaker_iii": {
+        "id": "streaker_iii",
+        "name": "streaker **III**",
+        "emoji": "📅",
+        "target": 30,
+        "description": "get a daily streak for 30 days"
+    },
+    "streaker_iv": {
+        "id": "streaker_iv",
+        "name": "streaker **IV**",
+        "emoji": "📅",
+        "target": 69,
+        "description": "get a daily streak for 69 days"
+    },
+    "streaker_v": {
+        "id": "streaker_v",
+        "name": "streaker **V**",
+        "emoji": "📅",
+        "target": 100,
+        "description": "get a daily streak for 100 days"
+    },
+    "unboxer_i": {
+        "id": "unboxer_i",
+        "name": "unboxer **I**",
+        "emoji": "📦",
+        "target": 25,
+        "description": "open 25 crates"
+    },
+    "unboxer_ii": {
+        "id": "unboxer_ii",
+        "name": "unboxer **II**",
+        "emoji": "📦",
+        "target": 100,
+        "description": "open 100 crates"
+    },
+    "unboxer_iii": {
+        "id": "unboxer_iii",
+        "name": "unboxer **III**",
+        "emoji": "📦",
+        "target": 500,
+        "description": "open 500 crates"
+    },
+    "unboxer_iv": {
+        "id": "unboxer_iv",
+        "name": "unboxer **IV**",
+        "emoji": "📦",
+        "target": 1000,
+        "description": "open 1,000 crates"
+    },
+    "unboxer_v": {
+        "id": "unboxer_v",
+        "name": "unboxer **V**",
+        "emoji": "📦",
+        "target": 10000,
+        "description": "open 10,000 crates"
+    },
+    "wholesome_i": {
+        "id": "wholesome_i",
+        "name": "wholesome **I**",
+        "emoji": "💖",
+        "target": 1,
+        "description": "have 1 wholesome image accepted"
+    },
+    "wholesome_ii": {
+        "id": "wholesome_ii",
+        "name": "wholesome **II**",
+        "emoji": "💖",
+        "target": 10,
+        "description": "have 10 wholesome images accepted"
+    },
+    "wholesome_iii": {
+        "id": "wholesome_iii",
+        "name": "wholesome **III**",
+        "emoji": "💖",
+        "target": 50,
+        "description": "have 50 wholesome images accepted"
+    },
+    "wholesome_iv": {
+        "id": "wholesome_iv",
+        "name": "wholesome **IV**",
+        "emoji": "💖",
+        "target": 250,
+        "description": "have 100 wholesome images accepted"
+    },
+    "wholesome_v": {
+        "id": "wholesome_v",
+        "name": "wholesome **V**",
+        "emoji": "💖",
+        "target": 500,
+        "description": "have 500 wholesome images accepted"
+    },
+    "racer_i": {
+        "id": "racer_i",
+        "name": "racer **I**",
+        "emoji": "🏎️",
+        "target": 10,
+        "description": "win 10 street races"
+    },
+    "racer_ii": {
+        "id": "racer_ii",
+        "name": "racer **II**",
+        "emoji": "🏎️",
+        "target": 50,
+        "description": "win 50 street races"
+    },
+    "racer_iii": {
+        "id": "racer_iii",
+        "name": "racer **III**",
+        "emoji": "🏎️",
+        "target": 100,
+        "description": "win 100 street races"
+    },
+    "racer_iv": {
+        "id": "racer_iv",
+        "name": "racer **IV**",
+        "emoji": "🏎️",
+        "target": 1000,
+        "description": "win 1,000 street races"
+    },
+    "racer_v": {
+        "id": "racer_v",
+        "name": "racer **V**",
+        "emoji": "🏎️",
+        "target": 5000,
+        "description": "win 5,000 street races"
+    },
+    "minesweeper_pro_i": {
+        "id": "minesweeper_pro_i",
+        "name": "minesweeper professional **I**",
+        "emoji": "💣",
+        "target": 5,
+        "description": "reach a 7x multiplier in minesweeper 5 times"
+    },
+    "minesweeper_pro_ii": {
+        "id": "minesweeper_pro_ii",
+        "name": "minesweeper professional **II**",
+        "emoji": "💣",
+        "target": 25,
+        "description": "reach a 7x multiplier in minesweeper 25 times"
+    },
+    "minesweeper_pro_iii": {
+        "id": "minesweeper_pro_iii",
+        "name": "minesweeper professional **III**",
+        "emoji": "💣",
+        "target": 100,
+        "description": "reach a 7x multiplier in minesweeper 100 times"
+    },
+    "minesweeper_pro_iv": {
+        "id": "minesweeper_pro_iv",
+        "name": "minesweeper professional **IV**",
+        "emoji": "💣",
+        "target": 500,
+        "description": "reach a 7x multiplier in minesweeper 500 times"
+    },
+    "minesweeper_pro_v": {
+        "id": "minesweeper_pro_v",
+        "name": "minesweeper professional **V**",
+        "emoji": "💣",
+        "target": 1000,
+        "description": "reach a 7x multiplier in minesweeper 1,000 times"
+    },
+    "highlow_pro_i": {
+        "id": "highlow_pro_i",
+        "name": "highlow professional **I**",
+        "emoji": "🃏",
+        "target": 5,
+        "description": "reach a 7x multiplier in highlow 5 times"
+    },
+    "highlow_pro_ii": {
+        "id": "highlow_pro_ii",
+        "name": "highlow professional **II**",
+        "emoji": "🃏",
+        "target": 25,
+        "description": "reach a 7x multiplier in highlow 25 times"
+    },
+    "highlow_pro_iii": {
+        "id": "highlow_pro_iii",
+        "name": "highlow professional **III**",
+        "emoji": "🃏",
+        "target": 100,
+        "description": "reach a 7x multiplier in highlow 100 times"
+    },
+    "highlow_pro_iv": {
+        "id": "highlow_pro_iv",
+        "name": "highlow professional **IV**",
+        "emoji": "🃏",
+        "target": 500,
+        "description": "reach a 7x multiplier in highlow 500 times"
+    },
+    "highlow_pro_v": {
+        "id": "highlow_pro_v",
+        "name": "highlow professional **V**",
+        "emoji": "🃏",
+        "target": 1000,
+        "description": "reach a 7x multiplier in highlow 1,000 times"
+    },
+    "roulette_pro_i": {
+        "id": "roulette_pro_i",
+        "name": "roulette professional **I**",
+        "emoji": "🟢",
+        "target": 5,
+        "description": "win a bet on green 5 times"
+    },
+    "roulette_pro_ii": {
+        "id": "roulette_pro_ii",
+        "name": "roulette professional **II**",
+        "emoji": "🟢",
+        "target": 25,
+        "description": "win a bet on green 25 times"
+    },
+    "roulette_pro_iii": {
+        "id": "roulette_pro_iii",
+        "name": "roulette professional **III**",
+        "emoji": "🟢",
+        "target": 100,
+        "description": "win a bet on green 100 times"
+    },
+    "roulette_pro_iv": {
+        "id": "roulette_pro_iv",
+        "name": "roulette professional **IV**",
+        "emoji": "🟢",
+        "target": 500,
+        "description": "win a bet on green 500 times"
+    },
+    "roulette_pro_v": {
+        "id": "roulette_pro_v",
+        "name": "roulette professional **V**",
+        "emoji": "🟢",
+        "target": 1000,
+        "description": "win a bet on green 1,000 times"
+    },
+    "slots_pro_i": {
+        "id": "slots_pro_i",
+        "name": "slots professional **I**",
+        "emoji": "🍒",
+        "target": 5,
+        "description": "win on cherries 5 times"
+    },
+    "slots_pro_ii": {
+        "id": "slots_pro_ii",
+        "name": "slots professional **II**",
+        "emoji": "🍒",
+        "target": 25,
+        "description": "win on cherries 25 times"
+    },
+    "slots_pro_iii": {
+        "id": "slots_pro_iii",
+        "name": "slots professional **III**",
+        "emoji": "🍒",
+        "target": 100,
+        "description": "win on cherries 100 times"
+    },
+    "slots_pro_iv": {
+        "id": "slots_pro_iv",
+        "name": "slots professional **IV**",
+        "emoji": "🍒",
+        "target": 500,
+        "description": "win on cherries 500 times"
+    },
+    "slots_pro_v": {
+        "id": "slots_pro_v",
+        "name": "slots professional **V**",
+        "emoji": "🍒",
+        "target": 1000,
+        "description": "win on cherries 1,000 times"
+    },
+    "horny_i": {
+        "id": "horny_i",
+        "name": "horny **I**",
+        "emoji": "💦",
+        "target": 50,
+        "description": "view 50 nsfw images"
+    },
+    "horny_ii": {
+        "id": "horny_ii",
+        "name": "horny **II**",
+        "emoji": "💦",
+        "target": 250,
+        "description": "view 250 nsfw images"
+    },
+    "horny_iii": {
+        "id": "horny_iii",
+        "name": "horny **III**",
+        "emoji": "💦",
+        "target": 1000,
+        "description": "view 1,000 nsfw images"
+    },
+    "horny_iv": {
+        "id": "horny_iv",
+        "name": "horny **IV**",
+        "emoji": "💦",
+        "target": 5000,
+        "description": "view 5,000 nsfw images"
+    },
+    "horny_v": {
+        "id": "horny_v",
+        "name": "horny **V**",
+        "emoji": "💦",
+        "target": 15000,
+        "description": "view 15,000 nsfw images"
+    },
+    "cute_i": {
+        "id": "cute_i",
+        "name": "cute **I**",
+        "emoji": "🐶",
+        "target": 50,
+        "description": "view 50 animal images"
+    },
+    "cute_ii": {
+        "id": "cute_ii",
+        "name": "cute **II**",
+        "emoji": "🐶",
+        "target": 250,
+        "description": "view 250 animal images"
+    },
+    "cute_iii": {
+        "id": "cute_iii",
+        "name": "cute **III**",
+        "emoji": "🐶",
+        "target": 1000,
+        "description": "view 1,000 animal images"
+    },
+    "cute_iv": {
+        "id": "cute_iv",
+        "name": "cute **IV**",
+        "emoji": "🐶",
+        "target": 5000,
+        "description": "view 5,000 animal images"
+    },
+    "cute_v": {
+        "id": "cute_v",
+        "name": "cute **V**",
+        "emoji": "🐶",
+        "target": 15000,
+        "description": "view 15,000 animal images"
+    },
+    "unsure_i": {
+        "id": "unsure_i",
+        "name": "unsure **I**",
+        "emoji": "📏",
+        "target": 50,
+        "description": "use 50 measurement commands"
+    },
+    "unsure_ii": {
+        "id": "unsure_ii",
+        "name": "unsure **II**",
+        "emoji": "📏",
+        "target": 250,
+        "description": "use 250 measurement commands"
+    },
+    "unsure_iii": {
+        "id": "unsure_iii",
+        "name": "unsure **III**",
+        "emoji": "📏",
+        "target": 1000,
+        "description": "use 1,000 measurement commands"
+    },
+    "unsure_iv": {
+        "id": "unsure_iv",
+        "name": "unsure **IV**",
+        "emoji": "📏",
+        "target": 5000,
+        "description": "use 5,000 measurement commands"
+    },
+    "unsure_v": {
+        "id": "unsure_v",
+        "name": "unsure **V**",
+        "emoji": "📏",
+        "target": 15000,
+        "description": "use 15,000 measurement commands"
+    },
+    "nypsi_i": {
+        "id": "nypsi_i",
+        "name": "nypsi **I**",
+        "emoji": "<:xnypsi:819957267548864543>",
+        "target": 5000,
+        "description": "use 5,000 nypsi commands"
+    },
+    "nypsi_ii": {
+        "id": "nypsi_ii",
+        "name": "nypsi **II**",
+        "emoji": "<:xnypsi:819957267548864543>",
+        "target": 25000,
+        "description": "use 25,000 nypsi commands"
+    },
+    "nypsi_iii": {
+        "id": "nypsi_iii",
+        "name": "nypsi **III**",
+        "emoji": "<:xnypsi:819957267548864543>",
+        "target": 100000,
+        "description": "use 100,000 nypsi commands"
+    },
+    "nypsi_iv": {
+        "id": "nypsi_iv",
+        "name": "nypsi **IV**",
+        "emoji": "<:xnypsi:819957267548864543>",
+        "target": 250000,
+        "description": "use 250,000 nypsi commands"
+    },
+    "nypsi_v": {
+        "id": "nypsi_v",
+        "name": "nypsi **V**",
+        "emoji": "<:xnypsi:819957267548864543>",
+        "target": 500000,
+        "description": "use 500,000 nypsi commands"
+    }
+}

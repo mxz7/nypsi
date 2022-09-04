@@ -11,6 +11,7 @@ import {
     MessageOptions,
 } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
+import { addProgress } from "../utils/economy/achievements.js";
 import {
     addGamble,
     addToGuildXP,
@@ -371,6 +372,8 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
 
         gamble(message.author, "minesweeper", bet, true, winnings);
         await addGamble(message.member, "minesweeper", true);
+
+        if (win >= 7) await addProgress(message.author.id, "minesweeper_pro", 1);
 
         await updateBalance(message.member, (await getBalance(message.member)) + winnings);
         games.delete(message.author.id);
