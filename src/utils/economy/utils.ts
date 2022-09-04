@@ -1211,6 +1211,7 @@ export async function reset() {
     await prisma.economyStats.deleteMany();
     await prisma.economyGuildMember.deleteMany();
     await prisma.economyGuild.deleteMany();
+    await prisma.auction.deleteMany();
 
     await prisma.economy.deleteMany({
         where: {
