@@ -11,7 +11,7 @@ import {
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import { doProgress } from "../utils/economy/achievements";
+import { addProgress } from "../utils/economy/achievements";
 import { createUser, getInventory, getXp, setInventory, updateXp, userExists } from "../utils/economy/utils";
 import {
     closeKarmaShop,
@@ -432,7 +432,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             items[selected.id].items_left -= 1;
         }
 
-        await doProgress(message.author.id, "wizard", 1);
+        await addProgress(message.author.id, "wizard", 1);
 
         return send({
             embeds: [

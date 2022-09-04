@@ -21,7 +21,7 @@ import { StatsProfile } from "../models/StatsProfile";
 import { getTier, isPremium } from "../premium/utils";
 import { createProfile, hasProfile } from "../users/utils";
 import workerSort from "../workers/sort";
-import { doProgress, getAllAchievements, setAchievementProgress } from "./achievements";
+import { addProgress, getAllAchievements, setAchievementProgress } from "./achievements";
 import { Constructor, getAllWorkers, Worker, WorkerStorageData } from "./workers";
 import ms = require("ms");
 import _ = require("lodash");
@@ -1341,7 +1341,7 @@ export async function addGamble(member: GuildMember, game: string, win: boolean)
         }
     }
 
-    await doProgress(id, "gambler", 1);
+    await addProgress(id, "gambler", 1);
 }
 
 export async function addRob(member: GuildMember, win: boolean) {

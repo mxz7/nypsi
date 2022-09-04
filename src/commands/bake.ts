@@ -1,6 +1,6 @@
 import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import { doProgress } from "../utils/economy/achievements";
+import { addProgress } from "../utils/economy/achievements";
 import { createUser, getInventory, setInventory, userExists } from "../utils/economy/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
@@ -90,7 +90,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         ],
     });
 
-    await doProgress(message.author.id, "baker", amount);
+    await addProgress(message.author.id, "baker", amount);
 }
 
 cmd.setRun(run);

@@ -118,7 +118,7 @@ export async function getUserAchievement(userId: string, achievementId: string) 
     });
 }
 
-export async function doProgress(userId: string, achievementStartName: string, amount: number) {
+export async function addProgress(userId: string, achievementStartName: string, amount: number) {
     const achievements = await getAllAchievements(userId);
     let count = 0;
 
