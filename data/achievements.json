@@ -40,7 +40,7 @@
     },
     "gambler_i": {
         "id": "gambler_i",
-        "name": "gamber **I**",
+        "name": "gambler **I**",
         "emoji": "🎰",
         "target": 1000,
         "description": "gamble 1,000 times"
