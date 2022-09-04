@@ -66,8 +66,8 @@
         "id": "gambler_v",
         "name": "gambler **V**",
         "emoji": "🎰",
-        "target": 250000,
-        "description": "gamble 250,000 times"
+        "target": 100000,
+        "description": "gamble 100,000 times"
     },
     "fisher_i": {
         "id": "fisher_i",
