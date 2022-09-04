@@ -177,7 +177,7 @@ export default async function interactionCreate(interaction: Interaction) {
                     achievements[i].emoji.startsWith("<:") || achievements[i].emoji.startsWith("<a:")
                         ? ""
                         : `${achievements[i].emoji} `
-                }${achievements[i].name}`,
+                }${achievements[i].name.replaceAll("*", "")}`,
                 value: i,
             }));
 
