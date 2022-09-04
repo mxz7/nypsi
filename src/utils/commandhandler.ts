@@ -763,65 +763,60 @@ export async function runCommand(
 
     command.run(message, args);
 
-    const news = await getNews();
+    setTimeout(async () => {
+        const news = await getNews();
 
-    if (news.text != "" && command.category == Categories.MONEY && !(await hasSeenNews(message.author.id))) {
-        await redis.rpush("nypsi:news:seen", message.author.id);
+        if (news.text != "" && command.category == Categories.MONEY && !(await hasSeenNews(message.author.id))) {
+            await redis.rpush("nypsi:news:seen", message.author.id);
 
-        const pos = await hasSeenNews(message.author.id);
+            const pos = await hasSeenNews(message.author.id);
 
-        const embed = new CustomEmbed(message.member, `${news.text}\n\n*${formatDate(news.date)}*`)
-            .setHeader("news", message.author.avatarURL())
-            .setFooter({ text: `you are #${pos} to see this` });
+            const embed = new CustomEmbed(message.member, `${news.text}\n\n*${formatDate(news.date)}*`)
+                .setHeader("news", message.author.avatarURL())
+                .setFooter({ text: `you are #${pos} to see this` });
 
-        if (message instanceof Message) {
-            setTimeout(() => {
+            if (message instanceof Message) {
                 message.reply({ embeds: [embed] });
-            }, 2000);
-        } else {
-            setTimeout(() => {
+            } else {
                 message.followUp({ embeds: [embed] });
-            }, 2000);
-        }
-        logger.debug(`news shown to ${message.author.tag}`);
-    }
-
-    if (await redis.exists(`achievements:completed:${message.author.id}`)) {
-        const achievementId = await redis.get(`achievements:completed:${message.author.id}`);
-        await redis.del(`achievements:completed:${message.author.id}`);
-
-        const achievement = getAchievements()[achievementId];
-
-        const embed = new CustomEmbed(message.member).setHeader("achievement unlocked", message.author.avatarURL());
-
-        embed.setDescription(`you have completed ${achievement.emoji} ${achievement.name}`);
-
-        let earnedXp = 30;
-
-        if (achievementId.endsWith("_v")) {
-            earnedXp = 5000;
-        } else if (achievementId.endsWith("_iv")) {
-            earnedXp = 1000;
-        } else if (achievementId.endsWith("_iii")) {
-            earnedXp = 500;
-        } else if (achievementId.endsWith("_ii")) {
-            earnedXp = 100;
+            }
+            logger.debug(`news shown to ${message.author.tag}`);
         }
 
-        await updateXp(message.member, (await getXp(message.member)) + earnedXp);
+        if (await redis.exists(`achievements:completed:${message.author.id}`)) {
+            const achievementId = await redis.get(`achievements:completed:${message.author.id}`);
+            await redis.del(`achievements:completed:${message.author.id}`);
 
-        embed.setFooter({ text: `+${earnedXp.toLocaleString()}xp` });
+            const achievement = getAchievements()[achievementId];
 
-        if (message instanceof Message) {
-            setTimeout(() => {
+            const embed = new CustomEmbed(message.member).setHeader("achievement unlocked", message.author.avatarURL());
+
+            embed.setDescription(`you have completed ${achievement.emoji} ${achievement.name}`);
+
+            let earnedXp = 30;
+
+            if (achievementId.endsWith("_v")) {
+                earnedXp = 5000;
+            } else if (achievementId.endsWith("_iv")) {
+                earnedXp = 1000;
+            } else if (achievementId.endsWith("_iii")) {
+                earnedXp = 500;
+            } else if (achievementId.endsWith("_ii")) {
+                earnedXp = 100;
+            }
+
+            await updateXp(message.member, (await getXp(message.member)) + earnedXp);
+
+            embed.setFooter({ text: `+${earnedXp.toLocaleString()}xp` });
+
+            if (message instanceof Message) {
                 message.reply({ embeds: [embed] });
-            }, 2000);
-        } else {
-            setTimeout(() => {
+            } else {
                 message.followUp({ embeds: [embed] });
-            }, 2000);
+            }
         }
-    }
+    }, 2000);
+
     Promise.all([
         a(message.author.id, message.author.tag, message.content),
         updateCommandUses(message.member),
