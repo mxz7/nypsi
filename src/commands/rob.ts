@@ -1,6 +1,7 @@
 import { CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions, MessageOptions } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import redis from "../utils/database/redis";
+import { doProgress } from "../utils/economy/achievements";
 import {
     addItemUse,
     addRob,
@@ -223,6 +224,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             embed2.addField("success!!", "you stole $**" + amountMoney.toLocaleString() + "**");
 
             const earnedXp = await calcEarnedXp(message.member, 6942069);
+            await doProgress(message.author.id, "robber", 1);
 
             if (earnedXp > 0) {
                 await updateXp(message.member, (await getXp(message.member)) + earnedXp);
