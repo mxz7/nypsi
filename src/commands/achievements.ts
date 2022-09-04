@@ -14,6 +14,7 @@ import { inPlaceSort } from "fast-sort";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { getAllAchievements, getUncompletedAchievements, getUserAchievement } from "../utils/economy/achievements";
 import { getAchievements } from "../utils/economy/utils";
+import { daysAgo } from "../utils/functions/date";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { AchievementData } from "../utils/models/Economy";
 import { CustomEmbed } from "../utils/models/EmbedBuilders";
@@ -129,7 +130,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 if (!achData) continue;
 
                 if (achData.completed) {
-                    str += "`completed`";
+                    str += `\`completed ${daysAgo(achData.completedAt).toLocaleString()} days ago\``;
                 } else {
                     str += `\`${achData.progress.toLocaleString()} / ${achievement.target.toLocaleString()} (${(
                         (achData.progress / achievement.target) *
