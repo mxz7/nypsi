@@ -90,6 +90,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         const desc: string[] = [];
 
+        inPlaceSort(achievements).desc((i) => (i.progress / allAchievementData[i.achievementId].target) * 100);
+
         for (const achievement of achievements) {
             if (achievement.completed) continue;
             desc.push(
