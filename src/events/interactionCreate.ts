@@ -37,6 +37,8 @@ export default async function interactionCreate(interaction: Interaction) {
     if (interaction.type == InteractionType.ApplicationCommandAutocomplete) {
         const focused = interaction.options.getFocused(true);
 
+        focused.value = focused.value.toLowerCase();
+
         if (focused.name == "item") {
             const inventory = await getInventory(interaction.user.id);
 
@@ -56,9 +58,11 @@ export default async function interactionCreate(interaction: Interaction) {
             if (options.length == 0) return interaction.respond([]);
 
             const formatted = options.map((i) => ({
-                name: `${items[i].emoji.startsWith("<:") || items[i].emoji.startsWith("<a:") ? "" : `${items[i].emoji} `}${
-                    items[i].name
-                } [${inventory[i].toLocaleString()}]`,
+                name: `${
+                    items[i].emoji.startsWith("<:") || items[i].emoji.startsWith("<a:") || items[i].emoji.startsWith(":")
+                        ? ""
+                        : `${items[i].emoji} `
+                }${items[i].name} [${inventory[i].toLocaleString()}]`,
                 value: i,
             }));
 
@@ -79,9 +83,11 @@ export default async function interactionCreate(interaction: Interaction) {
             if (options.length == 0) return interaction.respond([]);
 
             const formatted = options.map((i) => ({
-                name: `${items[i].emoji.startsWith("<:") || items[i].emoji.startsWith("<a:") ? "" : `${items[i].emoji} `}${
-                    items[i].name
-                }`,
+                name: `${
+                    items[i].emoji.startsWith("<:") || items[i].emoji.startsWith("<a:") || items[i].emoji.startsWith(":")
+                        ? ""
+                        : `${items[i].emoji} `
+                }${items[i].name}`,
                 value: i,
             }));
 
@@ -106,9 +112,11 @@ export default async function interactionCreate(interaction: Interaction) {
             if (options.length == 0) return interaction.respond([]);
 
             const formatted = options.map((i) => ({
-                name: `${items[i].emoji.startsWith("<:") || items[i].emoji.startsWith("<a:") ? "" : `${items[i].emoji} `}${
-                    items[i].name
-                }`,
+                name: `${
+                    items[i].emoji.startsWith("<:") || items[i].emoji.startsWith("<a:") || items[i].emoji.startsWith(":")
+                        ? ""
+                        : `${items[i].emoji} `
+                }${items[i].name}`,
                 value: i,
             }));
 
@@ -132,9 +140,11 @@ export default async function interactionCreate(interaction: Interaction) {
             if (options.length == 0) return interaction.respond([]);
 
             const formatted = options.map((i) => ({
-                name: `${items[i].emoji.startsWith("<:") || items[i].emoji.startsWith("<a:") ? "" : `${items[i].emoji} `}${
-                    items[i].name
-                }`,
+                name: `${
+                    items[i].emoji.startsWith("<:") || items[i].emoji.startsWith("<a:") || items[i].emoji.startsWith(":")
+                        ? ""
+                        : `${items[i].emoji} `
+                }${items[i].name}`,
                 value: i,
             }));
 
@@ -154,9 +164,11 @@ export default async function interactionCreate(interaction: Interaction) {
             if (options.length == 0) return interaction.respond([]);
 
             const formatted = options.map((i) => ({
-                name: `${items[i].emoji.startsWith("<:") || items[i].emoji.startsWith("<a:") ? "" : `${items[i].emoji} `}${
-                    items[i].name
-                }`,
+                name: `${
+                    items[i].emoji.startsWith("<:") || items[i].emoji.startsWith("<a:") || items[i].emoji.startsWith(":")
+                        ? ""
+                        : `${items[i].emoji} `
+                }${items[i].name}`,
                 value: i,
             }));
 
@@ -165,7 +177,9 @@ export default async function interactionCreate(interaction: Interaction) {
             const achievements = getAchievements();
 
             let options = Object.keys(achievements).filter(
-                (i) => i.includes(focused.value) || achievements[i].name.includes(focused.value)
+                (i) =>
+                    i.includes(focused.value) ||
+                    achievements[i].name.replaceAll("*", "").toLowerCase().includes(focused.value)
             );
 
             if (options.length > 25) options = options.splice(0, 24);
@@ -174,7 +188,9 @@ export default async function interactionCreate(interaction: Interaction) {
 
             const formatted = options.map((i) => ({
                 name: `${
-                    achievements[i].emoji.startsWith("<:") || achievements[i].emoji.startsWith("<a:")
+                    achievements[i].emoji.startsWith("<:") ||
+                    achievements[i].emoji.startsWith("<a:") ||
+                    achievements[i].emoji.startsWith(":")
                         ? ""
                         : `${achievements[i].emoji} `
                 }${achievements[i].name.replaceAll("*", "")}`,
