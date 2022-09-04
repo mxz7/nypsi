@@ -146,7 +146,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [new ErrorEmbed("you dont have any " + selected.name)] });
     }
 
-    if (parseInt(args[2]) > 50) args[2] = "50";
+    if (parseInt(args[2]) > 250) args[2] = "250";
 
     let amount = parseInt(args[2]);
 
