@@ -26,6 +26,7 @@ import { addUse, getCommand } from "./premium/utils";
 // @ts-expect-error typescript doesnt like opening package.json
 import { version } from "../../package.json";
 import redis from "./database/redis";
+import { addProgress } from "./economy/achievements";
 import { a } from "./functions/anticheat";
 import { NypsiClient } from "./models/Client";
 import { Item } from "./models/Economy";
@@ -817,13 +818,14 @@ export async function runCommand(
         }
     }, 2000);
 
-    Promise.all([
+    await Promise.all([
         a(message.author.id, message.author.tag, message.content),
         updateCommandUses(message.member),
         updateLastCommand(message.member),
         addCommandUse(message.author.id, command.name),
         redis.hincrby("nypsi:topcommands", command.name, 1),
         redis.hincrby("nypsi:topcommands:user", message.author.tag, 1),
+        addProgress(message.author.id, "nypsi", 1),
     ]);
 
     if (command.category == "money") {
