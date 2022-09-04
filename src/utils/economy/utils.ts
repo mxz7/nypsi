@@ -1906,7 +1906,7 @@ export async function calcEarnedXp(member: GuildMember, bet: number): Promise<nu
 
     for (const boosterId of boosters.keys()) {
         if (items[boosterId].boosterEffect.boosts.includes("xp")) {
-            boosterEffect += items[boosterId].boosterEffect.effect;
+            boosterEffect += items[boosterId].boosterEffect.effect * boosters.get(boosterId).length;
         }
     }
 
