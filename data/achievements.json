@@ -628,5 +628,40 @@
         "emoji": "💦",
         "target": 15000,
         "description": "view 15,000 nsfw images"
+    },
+    "cute_i": {
+        "id": "cute_i",
+        "name": "cute **I**",
+        "emoji": "🐶",
+        "target": 50,
+        "description": "view 50 animal images"
+    },
+    "cute_ii": {
+        "id": "cute_ii",
+        "name": "cute **II**",
+        "emoji": "🐶",
+        "target": 250,
+        "description": "view 250 animal images"
+    },
+    "cute_iii": {
+        "id": "cute_iii",
+        "name": "cute **III**",
+        "emoji": "🐶",
+        "target": 1000,
+        "description": "view 1,000 animal images"
+    },
+    "cute_iv": {
+        "id": "cute_iv",
+        "name": "cute **IV**",
+        "emoji": "🐶",
+        "target": 5000,
+        "description": "view 5,000 animal images"
+    },
+    "cute_v": {
+        "id": "cute_v",
+        "name": "cute **V**",
+        "emoji": "🐶",
+        "target": 15000,
+        "description": "view 15,000 animal images"
     }
 }
