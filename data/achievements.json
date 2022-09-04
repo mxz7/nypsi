@@ -159,39 +159,39 @@
         "id": "miner_i",
         "name": "miner **I**",
         "emoji": "⛏️",
-        "target": 100,
-        "description": "mine 100 items"
+        "target": 500,
+        "description": "mine 500 items"
     },
     "miner_ii": {
         "id": "miner_ii",
         "name": "miner **II**",
         "emoji": "⛏️",
-        "target": 500,
-        "description": "mine 500 items",
+        "target": 1000,
+        "description": "mine 1,000 items",
         "requires": "miner_i"
     },
     "miner_iii": {
         "id": "miner_iii",
         "name": "miner **III**",
         "emoji": "⛏️",
-        "target": 1000,
-        "description": "mine 1,000 items",
+        "target": 5000,
+        "description": "mine 5,000 items",
         "requires": "miner_ii"
     },
     "miner_iv": {
         "id": "miner_iv",
         "name": "miner **IV**",
         "emoji": "⛏️",
-        "target": 10000,
-        "description": "mine 10,000 items",
+        "target": 15000,
+        "description": "mine 15,000 items",
         "requires": "miner_iii"
     },
     "miner_v": {
         "id": "miner_v",
         "name": "miner **V**",
         "emoji": "⛏️",
-        "target": 25000,
-        "description": "mine 25,000 items",
+        "target": 50000,
+        "description": "mine 50,000 items",
         "requires": "miner_iv"
     },
     "baker_i": {
