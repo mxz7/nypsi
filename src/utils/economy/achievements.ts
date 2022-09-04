@@ -120,7 +120,7 @@ async function completeAchievement(userId: string, achievementId: string) {
         .setDescription(
             `${achievements[achievementId].emoji} ${achievements[achievementId].name}\n\n*${achievements[achievementId].description}*`
         )
-        .setFooter({ text: `completed by ${completed.toLocaleString()} people` })
+        .setFooter({ text: `completed by ${completed.toLocaleString()} ${completed == 1 ? "person" : "people"}` })
         .setTimestamp()
         .setColor("#36393f");
 
