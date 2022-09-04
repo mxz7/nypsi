@@ -12,6 +12,7 @@ import {
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import prisma from "../utils/database/database";
 import {
     getAllAchievements,
     getCompletedAchievements,
@@ -311,17 +312,27 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         const embed = new CustomEmbed(message.member).setTitle(`${selected.emoji} ${selected.name}`);
 
-        let desc = `\`${selected.id}\`\n\n*${selected.description}*`;
+        let desc = `\`${selected.id}\`\n\n*${selected.description}*\n\n`;
 
         if (achievement) {
             if (achievement.completed) {
-                desc += `\n\ncompleted <t:${Math.floor(achievement.completedAt.getTime() / 1000)}:R>`;
+                desc += `completed <t:${Math.floor(achievement.completedAt.getTime() / 1000)}:R>\n`;
             } else {
-                desc += `\n\n${achievement.progress.toLocaleString()} / ${selected.target.toLocaleString()} (${(
+                desc += `${achievement.progress.toLocaleString()} / ${selected.target.toLocaleString()} (${(
                     (achievement.progress / selected.target) *
                     100
-                ).toFixed(1)}%)`;
+                ).toFixed(1)}%)\n`;
             }
+        }
+
+        const completed = await prisma.achievements.count({
+            where: {
+                AND: [{ achievementId: selected.id }, { completed: true }],
+            },
+        });
+
+        if (completed > 0) {
+            desc += `this has been completed by **${completed.toLocaleString()}** users`;
         }
 
         embed.setDescription(desc);
