@@ -101,3 +101,14 @@ async function completeAchievement(userId: string, achievementId: string) {
 
     await redis.set(`achievements:completed:${userId}`, achievementId);
 }
+
+export async function getUserAchievement(userId: string, achievementId: string) {
+    return await prisma.achievements.findUnique({
+        where: {
+            userId_achievementId: {
+                userId: userId,
+                achievementId: achievementId,
+            },
+        },
+    });
+}
