@@ -389,44 +389,44 @@
         "description": "get a daily streak for 100 days",
         "requires": "streaker_iv"
     },
-    "crate_opener_i": {
-        "id": "crate_opener_i",
-        "name": "crate opener **I**",
+    "unboxer_i": {
+        "id": "unboxer_i",
+        "name": "unboxer **I**",
         "emoji": "📦",
         "target": 25,
         "description": "open 25 crates"
     },
-    "crate_opener_ii": {
-        "id": "crate_opener_ii",
-        "name": "crate opener **II**",
+    "unboxer_ii": {
+        "id": "unboxer_ii",
+        "name": "unboxer **II**",
         "emoji": "📦",
         "target": 100,
         "description": "open 100 crates",
-        "requires": "crate_opener_i"
+        "requires": "unboxer_i"
     },
-    "crate_opener_iii": {
-        "id": "crate_opener_iii",
-        "name": "crate opener **III**",
+    "unboxer_iii": {
+        "id": "unboxer_iii",
+        "name": "unboxer **III**",
         "emoji": "📦",
         "target": 500,
         "description": "open 500 crates",
-        "requires": "crate_opener_ii"
+        "requires": "unboxer_ii"
     },
-    "crate_opener_iv": {
-        "id": "crate_opener_iv",
-        "name": "crate opener **IV**",
+    "unboxer_iv": {
+        "id": "unboxer_iv",
+        "name": "unboxer **IV**",
         "emoji": "📦",
         "target": 1000,
         "description": "open 1,000 crates",
-        "requires": "crate_opener_iii"
+        "requires": "unboxer_iii"
     },
-    "crate_opener_v": {
-        "id": "crate_opener_v",
-        "name": "crate opener **V**",
+    "unboxer_v": {
+        "id": "unboxer_v",
+        "name": "unboxer **V**",
         "emoji": "📦",
         "target": 10000,
         "description": "open 10,000 crates",
-        "requires": "crate_opener_iv"
+        "requires": "unboxer_iv"
     },
     "wholesome_i": {
         "id": "wholesome_i",

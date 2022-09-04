@@ -1717,7 +1717,7 @@ export async function openCrate(member: GuildMember, item: Item): Promise<string
 
     await setInventory(member, inventory);
     await addItemUse(member, item.id);
-    await addProgress(member.user.id, "crate_opener", 1);
+    await addProgress(member.user.id, "unboxer", 1);
 
     let times = 2;
     const names = [];
