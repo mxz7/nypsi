@@ -810,7 +810,7 @@ export async function runCommand(
 
         await updateXp(message.member, (await getXp(message.member)) + earnedXp);
 
-        embed.setDescription(`+${earnedXp.toLocaleString()}xp`);
+        embed.setFooter({ text: `+${earnedXp.toLocaleString()}xp` });
 
         if (message instanceof Message) {
             setTimeout(() => {
