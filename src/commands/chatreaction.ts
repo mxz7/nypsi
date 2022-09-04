@@ -189,12 +189,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const showStats = async () => {
         await addCooldown(cmd.name, message.member, 10);
 
-        const embed = new CustomEmbed(message.member).setHeader(`${message.author.username}'s stats`);
+        const embed = new CustomEmbed(message.member).setHeader(
+            `${message.author.username}'s stats`,
+            message.author.avatarURL()
+        );
 
         const stats = await getReactionStats(message.guild, message.member);
 
-        embed.addField(
-            "your stats",
+        embed.setDescription(
             `first place **${stats.wins}**\nsecond place **${stats.secondPlace}**\nthird place **${stats.thirdPlace}**`
         );
 
