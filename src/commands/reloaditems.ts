@@ -1,16 +1,15 @@
 import { CommandInteraction, Message } from "discord.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed } from "../utils/models/EmbedBuilders";
 import { loadItems } from "../utils/economy/utils";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 
 const cmd = new Command("reloaditems", "reload items", Categories.NONE).setPermissions(["bot owner"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
     if (message.member.user.id != "672793821850894347") return;
 
-    const d = loadItems();
+    loadItems();
 
-    return message.channel.send({ embeds: [new CustomEmbed(message.member, d)] });
+    return (message as Message).react("");
 }
 
 cmd.setRun(run);
