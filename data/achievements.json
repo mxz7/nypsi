@@ -311,43 +311,43 @@
         "description": "complete 25,000 successful robberies",
         "requires": "robber_iv"
     },
-    "player_i": {
-        "id": "player_i",
-        "name": "player **I**",
+    "whore_i": {
+        "id": "whore_i",
+        "name": "whore **I**",
         "emoji": "🍑",
         "target": 25,
         "description": "find 25 milfs"
     },
-    "player_ii": {
-        "id": "player_ii",
-        "name": "player **II**",
+    "whore_ii": {
+        "id": "whore_ii",
+        "name": "whore **II**",
         "emoji": "🍑",
         "target": 50,
         "description": "find 50 milfs",
-        "requires": "player_i"
+        "requires": "whore_i"
     },
-    "player_iii": {
-        "id": "player_iii",
-        "name": "player **III**",
+    "whore_iii": {
+        "id": "whore_iii",
+        "name": "whore **III**",
         "emoji": "🍑",
         "target": 100,
         "description": "find 100 milfs",
-        "requires": "player_ii"
+        "requires": "whore_ii"
     },
-    "player_iv": {
-        "id": "player_iv",
-        "name": "player **IV**",
+    "whore_iv": {
+        "id": "whore_iv",
+        "name": "whore **IV**",
         "emoji": "🍑",
         "target": 1000,
         "description": "find 1,000 milfs",
-        "requires": "player_iii"
+        "requires": "whore_iii"
     },
-    "player_v": {
-        "id": "player_v",
-        "name": "player **V**",
+    "whore_v": {
+        "id": "whore_v",
+        "name": "whore **V**",
         "emoji": "🍑",
         "target": 15000,
         "description": "find 15,000 milfs",
-        "requires": "player_iv"
+        "requires": "whore_iv"
     }
 }
