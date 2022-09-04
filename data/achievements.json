@@ -663,5 +663,40 @@
         "emoji": "🐶",
         "target": 15000,
         "description": "view 15,000 animal images"
+    },
+    "unsure_i": {
+        "id": "unsure_i",
+        "name": "unsure **I**",
+        "emoji": "📏",
+        "target": 50,
+        "description": "use 50 measurement commands"
+    },
+    "unsure_ii": {
+        "id": "unsure_ii",
+        "name": "unsure **II**",
+        "emoji": "📏",
+        "target": 250,
+        "description": "use 250 measurement commands"
+    },
+    "unsure_iii": {
+        "id": "unsure_iii",
+        "name": "unsure **III**",
+        "emoji": "📏",
+        "target": 1000,
+        "description": "use 1,000 measurement commands"
+    },
+    "unsure_iv": {
+        "id": "unsure_iv",
+        "name": "unsure **IV**",
+        "emoji": "📏",
+        "target": 5000,
+        "description": "use 5,000 measurement commands"
+    },
+    "unsure_v": {
+        "id": "unsure_v",
+        "name": "unsure **V**",
+        "emoji": "📏",
+        "target": 15000,
+        "description": "use 15,000 measurement commands"
     }
 }

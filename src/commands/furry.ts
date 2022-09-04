@@ -1,5 +1,6 @@
 import { CommandInteraction, GuildMember, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
+import { addProgress } from "../utils/economy/achievements.js";
 import { createUser, getXp, updateXp, userExists } from "../utils/economy/utils.js";
 import { getMember } from "../utils/functions/member.js";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
@@ -117,7 +118,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embed.setFooter({ text: "+1xp" });
     }
 
-    return await send({ embeds: [embed] });
+    await send({ embeds: [embed] });
+
+    await addProgress(message.author.id, "unsure", 1);
 }
 
 cmd.setRun(run);
