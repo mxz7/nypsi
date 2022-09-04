@@ -164,3 +164,50 @@ export async function addProgress(userId: string, achievementStartName: string, 
             break;
     }
 }
+
+export async function setProgress(userId: string, achievementStartName: string, amount: number) {
+    const achievements = await getAllAchievements(userId);
+    let count = 0;
+
+    for (const achievement of achievements) {
+        if (achievement.achievementId.includes(achievementStartName)) count++;
+        // will always return if a valid achievement is found
+        if (achievement.achievementId.includes(achievementStartName) && !achievement.completed) {
+            const res = await setAchievementProgress(userId, achievement.achievementId, amount);
+
+            if (res && !achievement.achievementId.endsWith("_v")) {
+                let thing: string;
+                if (achievement.achievementId.endsWith("_i")) {
+                    thing = `${achievementStartName}_ii`;
+                } else if (achievement.achievementId.endsWith("_ii")) {
+                    thing = `${achievementStartName}_iii`;
+                } else if (achievement.achievementId.endsWith("_iii")) {
+                    thing = `${achievementStartName}_iv`;
+                } else if (achievement.achievementId.endsWith("iv")) {
+                    thing = `${achievementStartName}_v`;
+                }
+
+                if (thing) await setAchievementProgress(userId, thing, achievement.progress + amount);
+            }
+            return;
+        }
+    }
+
+    switch (count) {
+        case 0:
+            await setAchievementProgress(userId, `${achievementStartName}_i`, amount);
+            break;
+        case 1:
+            await setAchievementProgress(userId, `${achievementStartName}_ii`, amount);
+            break;
+        case 2:
+            await setAchievementProgress(userId, `${achievementStartName}_iii`, amount);
+            break;
+        case 3:
+            await setAchievementProgress(userId, `${achievementStartName}_iv`, amount);
+            break;
+        case 4:
+            await setAchievementProgress(userId, `${achievementStartName}_v`, amount);
+            break;
+    }
+}
