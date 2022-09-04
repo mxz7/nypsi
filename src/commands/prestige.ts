@@ -168,6 +168,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             amount = 3;
         }
 
+        amount += Math.floor((await getPrestige(message.member)) / 5);
+
         if (inventory["basic_crate"]) {
             inventory["basic_crate"] += amount;
         } else {
