@@ -80,7 +80,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
 
     if (prestige > 15) prestige = 15;
 
-    const amount = 15000 * (prestige + 1);
+    const amount = Math.floor(15000 * (prestige / 2 + 1));
     const inventory = await getInventory(user);
 
     await Promise.all([
@@ -118,8 +118,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
             .setDescription(
                 "you have received the following: \n\n" +
                     `+ $**${amount.toLocaleString()}**\n` +
-                    "+ **10** karma\n" +
-                    "+ **3**% multiplier\n" +
+                    "+ **5**% multiplier\n" +
                     `+ **${crateAmount}** vote crates` +
                     `${tickets.length < max ? "\n+ **1** lottery ticket" : ""}`
             )
