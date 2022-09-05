@@ -123,7 +123,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
             .setDescription(
                 "you have received the following: \n\n" +
                     `+ $**${amount.toLocaleString()}**\n` +
-                    "+ **5**% multiplier\n" +
+                    "+ **7**% multiplier\n" +
                     `+ **${crateAmount}** vote crates` +
                     `${tickets.length < max ? "\n+ **1** lottery ticket" : ""}`
             )
