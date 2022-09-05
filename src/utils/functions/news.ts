@@ -1,3 +1,4 @@
+import ms = require("ms");
 import redis from "../database/redis";
 
 type News = {
@@ -18,7 +19,8 @@ export async function getNews(): Promise<News> {
 export async function setNews(string: string) {
     await redis.del("nypsi:news:seen");
 
-    return await redis.set("nypsi:news", JSON.stringify({ text: string, date: Date.now() }));
+    await redis.set("nypsi:news", JSON.stringify({ text: string, date: Date.now() }));
+    await redis.expire("nypsi:news", 86400 * 3);
 }
 
 export async function hasSeenNews(id: string) {
