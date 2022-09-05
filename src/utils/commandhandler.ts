@@ -788,7 +788,7 @@ export async function runCommand(
             if (message instanceof Message) {
                 message.reply({ embeds: [embed] });
             } else {
-                message.followUp({ embeds: [embed] });
+                message.followUp({ embeds: [embed], ephemeral: true });
             }
             logger.debug(`news shown to ${message.author.tag}`);
         }
