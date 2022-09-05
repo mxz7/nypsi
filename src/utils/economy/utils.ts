@@ -213,16 +213,6 @@ export async function getMulti(member: GuildMember | string): Promise<number> {
     return parseFloat(multi.toFixed(2));
 }
 
-export async function getUserCount(): Promise<number> {
-    const query = await prisma.economy.findMany({
-        select: {
-            userId: true,
-        },
-    });
-
-    return query.length;
-}
-
 export async function getBalance(member: GuildMember | string) {
     let id: string;
     if (member instanceof GuildMember) {
