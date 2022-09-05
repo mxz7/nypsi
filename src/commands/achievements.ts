@@ -138,7 +138,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 if (!achData) continue;
 
                 if (achData.completed) {
-                    str += `\`completed ${daysAgo(achData.completedAt).toLocaleString()} days ago\``;
+                    str += `\`completed ${daysAgo(achData.completedAt).toLocaleString()} day${
+                        daysAgo(achData.completedAt) == 1 ? "" : "s"
+                    } ago\``;
                 } else {
                     str += `\`${achData.progress.toLocaleString()} / ${achievement.target.toLocaleString()} (${(
                         (achData.progress / achievement.target) *
