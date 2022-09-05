@@ -29,7 +29,9 @@ cmd.slashData
         item
             .setName("item")
             .setDescription("view top item holders in the server")
-            .addStringOption((option) => option.setName("item-global").setDescription("item to query").setRequired(true))
+            .addStringOption((option) =>
+                option.setName("item-global").setDescription("item to query").setRequired(true).setAutocomplete(true)
+            )
             .addIntegerOption((option) =>
                 option.setName("amount").setDescription("amount of members to show").setRequired(false)
             )
