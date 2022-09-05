@@ -3,6 +3,7 @@ import { Manager } from "discord-hybrid-sharding";
 import * as express from "express";
 import prisma from "./database/database";
 import redis from "./database/redis";
+import { addProgress } from "./economy/achievements";
 import {
     getBalance,
     getDMsEnabled,
@@ -81,8 +82,11 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
     const amount = 15000 * (prestige + 1);
     const inventory = await getInventory(user);
 
-    await updateBalance(user, (await getBalance(user)) + amount);
-    addKarma(user, 10);
+    await Promise.all([
+        updateBalance(user, (await getBalance(user)) + amount),
+        addKarma(user, 10),
+        addProgress(user, "voter", 1),
+    ]);
 
     const tickets = await getTickets(user);
 
