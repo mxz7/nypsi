@@ -169,6 +169,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }
         }
 
+        if (!item) {
+            return send({ embeds: [new ErrorEmbed(`couldn't find ${searchTag}`)] });
+        }
+
         let amount;
 
         amount = parseInt(args[2]);
