@@ -70,10 +70,7 @@ const dogLinks = [
     "https://www.reddit.com/r/goldenretrievers/top.json?limit=6969&t=month",
     "https://www.reddit.com/r/shiba/top.json?limit=6969&t=month",
 ];
-const duckLinks = [
-    "https://www.reddit.com/r/duck/top.json?limit=6969&t=month",
-    "https://www.reddit.com/r/BACKYARDDUCKS/top.json?limit=6969&t=month",
-];
+const duckLinks = ["https://www.reddit.com/r/duck/top.json?limit=6969&t=month"];
 const lizardLinks = [
     "https://www.reddit.com/r/Lizards/top.json?limit=6969&t=month",
     "https://www.reddit.com/r/BeardedDragons/top.json?limit=6969&t=month",
