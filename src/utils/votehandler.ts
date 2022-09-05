@@ -94,6 +94,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
                 expire: dayjs().add(1, "hour").toDate(),
             },
         }),
+        redis.del(`cache:vote:${user}`),
     ]);
 
     const tickets = await getTickets(user);
