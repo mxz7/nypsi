@@ -113,7 +113,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (target.user.id == message.author.id) {
         return send({
-            embeds: [new ErrorEmbed("imbecile").setImage("https://tenor.com/view/jim-carrey-hit-head-gif-10236285")],
+            embeds: [new ErrorEmbed("imbecile").setImage("https://c.tenor.com/ZaHfgKf59NAAAAAC/jim-carrey-hit.gif")],
         });
     }
 
