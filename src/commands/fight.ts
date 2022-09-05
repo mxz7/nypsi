@@ -111,6 +111,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [new ErrorEmbed("invalid user")] });
     }
 
+    if (target.user.id == message.author.id) {
+        return send({
+            embeds: [new ErrorEmbed("imbecile").setImage("https://tenor.com/view/jim-carrey-hit-head-gif-10236285")],
+        });
+    }
+
     await addCooldown(cmd.name, message.member, 60);
 
     waiting.add(message.author.id);
