@@ -64,7 +64,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embed.setColor("#e4334f");
         embed.addField(
             "rewards",
-            `× **3**% multiplier potion\n× +$**50k** max bet\n× $**${amount.toLocaleString()}** reward\n× **${crateAmount}** vote crate${
+            `× **5**% multiplier booster\n× +$**50k** max bet\n× $**${amount.toLocaleString()}** reward\n× **${crateAmount}** vote crate${
                 crateAmount > 1 ? "s" : ""
             }`
         );
