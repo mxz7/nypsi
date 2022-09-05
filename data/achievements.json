@@ -768,5 +768,40 @@
         "emoji": "<:nypsi_voter:1016326193869508638>",
         "target": 500,
         "description": "vote for nypsi 500 times"
+    },
+    "fighter_i": {
+        "id": "fighter_i",
+        "name": "mike tyson **I**",
+        "emoji": "🥊",
+        "target": 5,
+        "description": "win 10 fights"
+    },
+    "fighter_ii": {
+        "id": "fighter_ii",
+        "name": "mike tyson **II**",
+        "emoji": "🥊",
+        "target": 50,
+        "description": "win 50 fights"
+    },
+    "fighter_iii": {
+        "id": "fighter_iii",
+        "name": "mike tyson **III**",
+        "emoji": "🥊",
+        "target": 250,
+        "description": "win 250 fights"
+    },
+    "fighter_iv": {
+        "id": "fighter_iv",
+        "name": "mike tyson **IV**",
+        "emoji": "🥊",
+        "target": 500,
+        "description": "win 500 fights"
+    },
+    "fighter_v": {
+        "id": "fighter_v",
+        "name": "mike tyson **V**",
+        "emoji": "🥊",
+        "target": 1000,
+        "description": "win 1,000 fights"
     }
 }
