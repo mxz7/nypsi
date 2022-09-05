@@ -115,7 +115,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
         inventory["vote_crate"] = crateAmount;
     }
 
-    await setInventory(user, inventory);
+    await setInventory(user, inventory, false);
 
     if (await getDMsEnabled(user)) {
         const embed = new CustomEmbed()
