@@ -101,7 +101,7 @@ export function runEconomySetup() {
     }, 3600000);
 }
 
-export async function getLastVote(member: GuildMember) {
+export async function getLastVote(member: GuildMember | string) {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -130,34 +130,23 @@ export async function hasVoted(member: GuildMember | string) {
     }
 
     if (await redis.exists(`cache:vote:${id}`)) {
-        const res = await redis.get(`cache:vote:${id}`);
+        const res = parseInt(await redis.get(`cache:vote:${id}`));
 
-        if (res === "true") {
+        if (Date.now() - res < ms("12 hours")) {
             return true;
         } else {
             return false;
         }
     }
 
-    const now = new Date().getTime();
+    const lastVote = await getLastVote(id);
 
-    const query = await prisma.economy.findUnique({
-        where: {
-            userId: id,
-        },
-        select: {
-            lastVote: true,
-        },
-    });
-
-    const lastVote = query.lastVote.getTime();
-
-    if (now - lastVote < 43200000) {
-        redis.set(`cache:vote:${id}`, "true");
+    if (Date.now() - lastVote.getTime() < ms("12 hours")) {
+        redis.set(`cache:vote:${id}`, lastVote.getTime());
         redis.expire(`cache:vote:${id}`, ms("30 minutes") / 1000);
         return true;
     } else {
-        redis.set(`cache:vote:${id}`, "false");
+        redis.set(`cache:vote:${id}`, lastVote.getTime());
         redis.expire(`cache:vote:${id}`, ms("1 hour") / 1000);
         return false;
     }
