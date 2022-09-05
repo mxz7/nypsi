@@ -1,4 +1,3 @@
-import ms = require("ms");
 import redis from "../database/redis";
 
 type News = {
