@@ -189,8 +189,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     await wait(2);
 
     const fightRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder().setCustomId("a").setLabel("attack").setStyle(ButtonStyle.Danger),
-        new ButtonBuilder().setCustomId("h").setLabel("heal").setStyle(ButtonStyle.Success)
+        new ButtonBuilder().setCustomId("at").setLabel("attack").setStyle(ButtonStyle.Danger),
+        new ButtonBuilder().setCustomId("he").setLabel("heal").setStyle(ButtonStyle.Success)
     );
 
     const homeBoosters = await getBoosters(message.member);
@@ -234,7 +234,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         if (ended) return;
 
-        if (i.customId == "a") {
+        if (i.customId == "at") {
             if (ended) return;
             if (i.user.id == message.author.id) {
                 fight.homeHit();
