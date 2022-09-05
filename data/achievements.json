@@ -733,5 +733,40 @@
         "emoji": "<:xnypsi:819957267548864543>",
         "target": 500000,
         "description": "use 500,000 nypsi commands"
+    },
+    "voter_i": {
+        "id": "voter_i",
+        "name": "#ivoted **I**",
+        "emoji": "<:nypsi_voter:1016326193869508638>",
+        "target": 10,
+        "description": "vote for nypsi 10 times"
+    },
+    "voter_ii": {
+        "id": "voter_ii",
+        "name": "#ivoted **II**",
+        "emoji": "<:nypsi_voter:1016326193869508638>",
+        "target": 25,
+        "description": "vote for nypsi 25 times"
+    },
+    "voter_iii": {
+        "id": "voter_iii",
+        "name": "#ivoted **III**",
+        "emoji": "<:nypsi_voter:1016326193869508638>",
+        "target": 100,
+        "description": "vote for nypsi 100 times"
+    },
+    "voter_iv": {
+        "id": "voter_iv",
+        "name": "#ivoted **IV**",
+        "emoji": "<:nypsi_voter:1016326193869508638>",
+        "target": 250,
+        "description": "vote for nypsi 250 times"
+    },
+    "voter_v": {
+        "id": "voter_v",
+        "name": "#ivoted **V**",
+        "emoji": "<:nypsi_voter:1016326193869508638>",
+        "target": 500,
+        "description": "vote for nypsi 500 times"
     }
 }
