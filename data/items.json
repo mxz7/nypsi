@@ -208,7 +208,7 @@
     "bitcoin": {
         "id": "bitcoin",
         "name": "bitcoin",
-        "emoji": "🪙",
+        "emoji": "<:nypsi_btc:1016409538020261908>",
         "longDesc": "a scary investment (actually matches the worth of bitcoin in real life)",
         "rarity": 2,
         "role": "item",
@@ -217,7 +217,7 @@
     "ethereum": {
         "id": "ethereum",
         "name": "ethereum",
-        "emoji": "🪙",
+        "emoji": "<:nypsi_eth:1016409812067696691>",
         "longDesc": "less scary investment (actually matches the worth of ethereum in real life)",
         "rarity": 0,
         "role": "item",
