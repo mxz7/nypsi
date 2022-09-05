@@ -279,7 +279,7 @@ export default async function messageCreate(message: Message) {
                     if (message.mentions.members.size == 1) {
                         if (message.mentions.members.first().user.id == message.author.id) return;
 
-                        if ((message.channel as TextChannel).members) {
+                        if ((message.channel as TextChannel).members?.keys()) {
                             if (
                                 !Array.from((message.channel as TextChannel).members.keys()).includes(
                                     message.mentions.members.first().id
