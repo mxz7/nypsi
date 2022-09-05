@@ -23,7 +23,7 @@ import { getAchievements } from "../utils/economy/utils";
 import { daysAgo } from "../utils/functions/date";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { AchievementData } from "../utils/models/Economy";
-import { CustomEmbed } from "../utils/models/EmbedBuilders";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("achievements", "view your achievement progress", Categories.MONEY).setAliases([
     "ach",
@@ -308,6 +308,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 selected = achievement;
                 break;
             }
+        }
+
+        if (!selected) {
+            return send({ embeds: [new ErrorEmbed("couldnt find that achievement")] });
         }
 
         const achievement = await getUserAchievement(message.author.id, selected.id);
