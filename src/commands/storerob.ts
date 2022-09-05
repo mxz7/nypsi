@@ -121,10 +121,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         } else {
             await updateBalance(message.member, (await getBalance(message.member)) - amountLost);
 
-            embed2.addField(
-                "**you were caught**",
-                "**you lost** $" + amountLost.toLocaleString() + " (" + percentLost + "%)"
-            );
+            embed2.addField("**you were caught**", "**you lost** $" + amountLost.toLocaleString());
             embed2.setColor("#e4334f");
         }
     } else {
