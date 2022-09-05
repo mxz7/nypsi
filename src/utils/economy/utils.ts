@@ -101,6 +101,26 @@ export function runEconomySetup() {
     }, 3600000);
 }
 
+export async function getLastVote(member: GuildMember) {
+    let id: string;
+    if (member instanceof GuildMember) {
+        id = member.user.id;
+    } else {
+        id = member;
+    }
+
+    const query = await prisma.economy.findUnique({
+        where: {
+            userId: id,
+        },
+        select: {
+            lastVote: true,
+        },
+    });
+
+    return query.lastVote;
+}
+
 export async function hasVoted(member: GuildMember | string) {
     let id: string;
     if (member instanceof GuildMember) {
