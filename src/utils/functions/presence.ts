@@ -2,7 +2,7 @@ import redis from "../database/redis";
 import { daysUntilChristmas } from "./date";
 
 export function randomPresence(): string {
-    const possibilities = ["$help | nypsi.xyz", "$help | tekoh.net", "$help | nypsi.xyz", "xmas", "xmas"];
+    const possibilities = ["nypsi.xyz", "tekoh.net", "nypsi.xyz", "xmas", "xmas"];
 
     const chosen = possibilities[Math.floor(Math.random() * possibilities.length)];
 
