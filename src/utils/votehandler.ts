@@ -5,7 +5,6 @@ import prisma from "./database/database";
 import redis from "./database/redis";
 import { addProgress } from "./economy/achievements";
 import {
-    addBooster,
     getBalance,
     getDMsEnabled,
     getInventory,
@@ -21,6 +20,7 @@ import { logger } from "./logger";
 import { CustomEmbed } from "./models/EmbedBuilders";
 import { getTier, isPremium } from "./premium/utils";
 import ms = require("ms");
+import dayjs = require("dayjs");
 
 const app = express();
 const webhook = new topgg.Webhook("123");
@@ -87,7 +87,13 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
         updateBalance(user, (await getBalance(user)) + amount),
         addKarma(user, 10),
         addProgress(user, "voter", 1),
-        addBooster(user, "vote_booster"),
+        prisma.booster.create({
+            data: {
+                boosterId: "vote_booste",
+                userId: user,
+                expire: dayjs().add(1, "hour").toDate(),
+            },
+        }),
     ]);
 
     const tickets = await getTickets(user);
