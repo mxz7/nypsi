@@ -280,7 +280,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 break;
 
             case "lawyer":
-                embed.setDescription("lawyers will be used automatically when you rob someone");
+                embed.setDescription("lawyers will be used automatically when you perform a robbery");
                 break;
 
             case "lock_pick":
