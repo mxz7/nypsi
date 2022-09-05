@@ -803,5 +803,40 @@
         "emoji": "🥊",
         "target": 1000,
         "description": "win 1,000 fights"
+    },
+    "lucky_i": {
+        "id": "lucky_i",
+        "name": "lucky **I**",
+        "emoji": "🍀",
+        "target": 2,
+        "description": "win the lottery twice"
+    },
+    "lucky_ii": {
+        "id": "lucky_ii",
+        "name": "lucky **II**",
+        "emoji": "🍀",
+        "target": 15,
+        "description": "win the lottery 15 times"
+    },
+    "lucky_iii": {
+        "id": "lucky_iii",
+        "name": "lucky **III**",
+        "emoji": "🍀",
+        "target": 50,
+        "description": "win the lottery 50 times"
+    },
+    "lucky_iv": {
+        "id": "lucky_iv",
+        "name": "lucky **IV**",
+        "emoji": "🍀",
+        "target": 75,
+        "description": "win the lottery 75 times"
+    },
+    "lucky_v": {
+        "id": "lucky_v",
+        "name": "lucky **V**",
+        "emoji": "🍀",
+        "target": 150,
+        "description": "win the lottery 150 times"
     }
 }

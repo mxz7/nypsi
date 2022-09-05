@@ -1,5 +1,6 @@
 import { Client, User, WebhookClient } from "discord.js";
 import prisma from "../../database/database";
+import { addProgress } from "../../economy/achievements";
 import { getBalance, getDMsEnabled, lotteryTicketPrice, updateBalance } from "../../economy/utils";
 import { MStoTime } from "../../functions/date";
 import { logger } from "../../logger";
@@ -49,7 +50,7 @@ async function doLottery(client: Client) {
         message: `winner: ${user.tag} (${user.id}) with ticket #${chosen.id}`,
     });
 
-    await updateBalance(user.id, (await getBalance(user.id)) + total);
+    await Promise.all([updateBalance(user.id, (await getBalance(user.id)) + total), addProgress(user.id, "lucky", 1)]);
 
     const embed = new CustomEmbed();
 
