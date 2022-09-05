@@ -5,6 +5,7 @@ import prisma from "./database/database";
 import redis from "./database/redis";
 import { addProgress } from "./economy/achievements";
 import {
+    addBooster,
     getBalance,
     getDMsEnabled,
     getInventory,
@@ -86,6 +87,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
         updateBalance(user, (await getBalance(user)) + amount),
         addKarma(user, 10),
         addProgress(user, "voter", 1),
+        addBooster(user, "vote_booster"),
     ]);
 
     const tickets = await getTickets(user);

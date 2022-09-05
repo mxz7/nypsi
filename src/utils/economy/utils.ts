@@ -173,12 +173,6 @@ export async function getMulti(member: GuildMember | string): Promise<number> {
 
     let multi = 0;
 
-    const voted = await hasVoted(id);
-
-    if (voted) {
-        multi += 3;
-    }
-
     const prestige = await getPrestige(member);
 
     const prestigeBonus = (prestige > 10 ? 10 : prestige) * 2;
