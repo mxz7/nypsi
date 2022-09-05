@@ -1571,7 +1571,7 @@ export async function getInventory(member: GuildMember | string, checkAchievemen
     return query.inventory as Inventory;
 }
 
-export async function setInventory(member: GuildMember | string, inventory: Inventory) {
+export async function setInventory(member: GuildMember | string, inventory: Inventory, checkAchievement = true) {
     let id: string;
     if (member instanceof GuildMember) {
         id = member.user.id;
@@ -1590,7 +1590,7 @@ export async function setInventory(member: GuildMember | string, inventory: Inve
 
     await redis.del(`cache:economy:inventory:${id}`);
 
-    if (!inventoryAchievementCheckCooldown.has(id)) {
+    if (!inventoryAchievementCheckCooldown.has(id) && checkAchievement) {
         inventoryAchievementCheckCooldown.add(id);
         setTimeout(() => {
             inventoryAchievementCheckCooldown.delete(id);
