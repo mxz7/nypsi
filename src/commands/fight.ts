@@ -11,6 +11,7 @@ import {
     MessageOptions,
 } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { addProgress } from "../utils/economy/achievements";
 import {
     addGamble,
     createUser,
@@ -409,6 +410,7 @@ class Fight {
         }
 
         if (await userExists(winner.member.user.id)) {
+            await addProgress(winner.member.user.id, "fighter", 1);
             if (!cookieRecent.has(winner.member.user.id)) {
                 cookieRecent.add(winner.member.user.id);
                 const inventory = await getInventory(winner.member.user.id);
