@@ -1,5 +1,15 @@
-import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
-import { createUser, getMulti, getPrestige, hasVoted, userExists } from "../utils/economy/utils.js";
+import dayjs = require("dayjs");
+import {
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle,
+    CommandInteraction,
+    InteractionReplyOptions,
+    Message,
+    MessageActionRowComponentBuilder,
+    MessageOptions,
+} from "discord.js";
+import { createUser, getLastVote, getPrestige, hasVoted, userExists } from "../utils/economy/utils.js";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed } from "../utils/models/EmbedBuilders.js";
 
@@ -34,34 +44,40 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (prestige > 15) prestige = 15;
 
-    const amount = 15000 * (prestige + 1);
+    const amount = Math.floor(15000 * (prestige / 2 + 1));
     const voted = await hasVoted(message.member);
-    const multi = Math.floor((await getMulti(message.member)) * 100);
     let crateAmount = Math.floor(prestige / 2 + 1);
+    const lastVote = await getLastVote(message.member);
 
     if (crateAmount > 3) crateAmount = 3;
 
-    const embed = new CustomEmbed(message.member, "https://top.gg/bot/678711738845102087/vote")
-        .setURL("https://top.gg/bot/678711738845102087/vote")
-        .setFooter({ text: "you get increased rewards for prestiging" });
+    const embed = new CustomEmbed(message.member);
 
     if (voted) {
-        embed.setHeader("vote ✅", message.author.avatarURL());
+        const nextVote = dayjs(lastVote).add(10, "hours").unix();
+        embed.setHeader("thank you for voting", message.author.avatarURL());
         embed.setColor("#5efb8f");
-        embed.addField("active rewards", `✓ +**3**% multiplier, total: **${multi}**%\n✓ +$**50k** max bet`);
+        embed.setDescription(`you can vote again <t:${nextVote}:R>`);
+        send({ embeds: [embed] });
     } else {
-        embed.setHeader("vote ❌", message.author.avatarURL());
+        embed.setHeader("vote for nypsi", message.author.avatarURL());
         embed.setColor("#e4334f");
         embed.addField(
             "rewards",
-            `× +**3**% multiplier, current: **${multi}**%\n× +$**50k** max bet\n× $**${amount.toLocaleString()}** reward\n× **10** karma\n× **${crateAmount}** vote crate${
+            `× **5**% multiplier booster\n× +$**50k** max bet\n× $**${amount.toLocaleString()}** reward\n× **${crateAmount}** vote crate${
                 crateAmount > 1 ? "s" : ""
             }`
         );
-        embed.setFooter({ text: "you get increased rewards for prestiging" });
-    }
 
-    send({ embeds: [embed] });
+        const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+            new ButtonBuilder()
+                .setStyle(ButtonStyle.Link)
+                .setURL("https://top.gg/bot/678711738845102087/vote")
+                .setLabel("top.gg")
+        );
+
+        send({ embeds: [embed], components: [row] });
+    }
 }
 
 cmd.setRun(run);

@@ -887,5 +887,19 @@
             "effect": "improves fight strength",
             "time": 3600
         }
+    },
+    "vote_booster": {
+        "id": "vote_booster",
+        "name": "vote booster",
+        "emoji": "✨",
+        "longDesc": "increase your multiplier by 5% from voting",
+        "rarity": 69,
+        "role": "booster",
+        "stackable": false,
+        "boosterEffect": {
+            "boosts": ["multi"],
+            "effect": 5,
+            "time": 3600
+        }
     }
 }
