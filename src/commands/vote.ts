@@ -13,11 +13,7 @@ import { createUser, getLastVote, getPrestige, hasVoted, userExists } from "../u
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed } from "../utils/models/EmbedBuilders.js";
 
-const cmd = new Command(
-    "vote",
-    "vote every 12 hours to get an extra 5% bonus on gambling wins as well as a money reward",
-    Categories.MONEY
-);
+const cmd = new Command("vote", "vote every 12 hours to get rewards", Categories.MONEY);
 
 cmd.slashEnabled = true;
 
@@ -64,7 +60,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embed.setColor("#e4334f");
         embed.addField(
             "rewards",
-            `× **5**% multiplier booster\n× +$**50k** max bet\n× $**${amount.toLocaleString()}** reward\n× **${crateAmount}** vote crate${
+            `× **7**% multiplier booster\n× +$**50k** max bet\n× $**${amount.toLocaleString()}** reward\n× **${crateAmount}** vote crate${
                 crateAmount > 1 ? "s" : ""
             }`
         );

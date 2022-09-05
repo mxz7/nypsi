@@ -898,7 +898,7 @@
         "stackable": false,
         "boosterEffect": {
             "boosts": ["multi"],
-            "effect": 5,
+            "effect": 7,
             "time": 3600
         }
     }
