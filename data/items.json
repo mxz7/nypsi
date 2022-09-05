@@ -899,7 +899,7 @@
         "boosterEffect": {
             "boosts": ["multi"],
             "effect": 7,
-            "time": 3600
+            "time": 10800
         }
     }
 }
