@@ -27,14 +27,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const shopWorth = new Map<string, number>();
 
     if ((await getBalance(message.member)) > 100000000) {
-        shopWorth.set("primark", Math.round((await getBalance(message.member)) * 0.0005));
-        shopWorth.set("asda", Math.round((await getBalance(message.member)) * 0.005));
-        shopWorth.set("tesco", Math.round((await getBalance(message.member)) * 0.002));
-        shopWorth.set("morrisons", Math.round((await getBalance(message.member)) * 0.001));
-        shopWorth.set("walmart", Math.round((await getBalance(message.member)) * 0.005));
-        shopWorth.set("target", Math.round((await getBalance(message.member)) * 0.002));
-        shopWorth.set("7eleven", Math.round((await getBalance(message.member)) * 0.001));
-    } else if ((await getBalance(message.member)) > 10000000) {
         shopWorth.set("primark", Math.round((await getBalance(message.member)) * 0.005));
         shopWorth.set("asda", Math.round((await getBalance(message.member)) * 0.05));
         shopWorth.set("tesco", Math.round((await getBalance(message.member)) * 0.02));
@@ -119,11 +111,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             await setInventory(message.member, inventory);
 
-            await updateBalance(message.member, (await getBalance(message.member)) - Math.floor(amountLost * 0.25));
+            await updateBalance(message.member, (await getBalance(message.member)) - Math.floor(amountLost * 0.1));
 
             embed2.addField(
                 "**you were caught**",
-                `thanks to your lawyer, you only lost $**${Math.floor(amountLost * 0.25).toLocaleString()}**`
+                `thanks to your lawyer, you only lost $**${Math.floor(amountLost * 0.1).toLocaleString()}**`
             );
             embed2.setColor("#e4334f");
         } else {
