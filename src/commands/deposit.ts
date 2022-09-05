@@ -17,7 +17,7 @@ import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 const cmd = new Command("deposit", "deposit money into your bank", Categories.MONEY).setAliases(["dep"]);
 
 cmd.slashEnabled = true;
-cmd.slashData.addIntegerOption((option) => option.setName("amount").setDescription("amount to deposit").setRequired(true));
+cmd.slashData.addStringOption((option) => option.setName("amount").setDescription("amount to deposit").setRequired(true));
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!(await userExists(message.member))) await createUser(message.member);
