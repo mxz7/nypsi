@@ -13,7 +13,16 @@ import {
 } from "discord.js";
 import * as fs from "fs";
 import { getBorderCharacters, table } from "table";
-import { getAchievements, getItems, getXp, isEcoBanned, isHandcuffed, updateXp, userExists } from "./economy/utils";
+import {
+    createUser,
+    getAchievements,
+    getItems,
+    getXp,
+    isEcoBanned,
+    isHandcuffed,
+    updateXp,
+    userExists,
+} from "./economy/utils";
 import { createCaptcha, isLockedOut, toggleLock } from "./functions/captcha";
 import { formatDate, MStoTime } from "./functions/date";
 import { getNews, hasSeenNews } from "./functions/news";
@@ -785,6 +794,7 @@ export async function runCommand(
         }
 
         if (await redis.exists(`achievements:completed:${message.author.id}`)) {
+            if (!(await userExists(message.member))) await createUser(message.member);
             const achievementId = await redis.get(`achievements:completed:${message.author.id}`);
             await redis.del(`achievements:completed:${message.author.id}`);
 
