@@ -54,7 +54,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const embed = new CustomEmbed(message.member);
 
     if (voted) {
-        const nextVote = dayjs(lastVote).add(10, "hours").unix();
+        const nextVote = dayjs(lastVote).add(12, "hours").unix();
         embed.setHeader("thank you for voting", message.author.avatarURL());
         embed.setColor("#5efb8f");
         embed.setDescription(`you can vote again <t:${nextVote}:R>`);
