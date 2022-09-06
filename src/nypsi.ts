@@ -33,7 +33,7 @@ const client = new NypsiClient({
         status: "dnd",
         activities: [
             {
-                name: "nypsi.xyz",
+                name: "loading..",
             },
         ],
     },
@@ -64,14 +64,5 @@ client.loadEvents();
 
 setTimeout(() => {
     logger.info("logging in...");
-    client.login(process.env.BOT_TOKEN).then(() => {
-        client.user.setPresence({
-            status: "dnd",
-            activities: [
-                {
-                    name: "loading..",
-                },
-            ],
-        });
-    });
+    client.login(process.env.BOT_TOKEN);
 }, 500);
