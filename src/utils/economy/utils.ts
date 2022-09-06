@@ -1180,7 +1180,10 @@ export async function upgradeWorker(member: GuildMember | string, id: string) {
 
 export async function isEcoBanned(id: string) {
     if (await redis.exists(`cache:economy:banned:${id}`)) {
-        return (await redis.get(`cache:economy:banned:${id}`)) === "t" ? true : false;
+        const res = (await redis.get(`cache:economy:banned:${id}`)) === "t" ? true : false;
+
+        if (res) await redis.del(`cache:economy:banned:${id}`);
+        return res;
     } else {
         const query = await prisma.economy.findUnique({
             where: {
