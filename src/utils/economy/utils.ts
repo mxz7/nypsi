@@ -25,6 +25,7 @@ import { addProgress, getAllAchievements, setAchievementProgress } from "./achie
 import { Constructor, getAllWorkers, Worker, WorkerStorageData } from "./workers";
 import ms = require("ms");
 import _ = require("lodash");
+import dayjs = require("dayjs");
 
 const inventoryAchievementCheckCooldown = new Set<string>();
 
@@ -1190,13 +1191,13 @@ export async function isEcoBanned(id: string) {
             },
         });
 
-        if (!query) {
+        if (!query || !query.banned) {
             await redis.set(`cache:economy:banned:${id}`, "f");
             await redis.expire(`cache:economy:banned:${id}`, ms("1 hour") / 1000);
             return false;
         }
 
-        if (query.banned) {
+        if (dayjs().isBefore(query.banned)) {
             await redis.set(`cache:economy:banned:${id}`, "t");
             await redis.expire(`cache:economy:banned:${id}`, ms("1 hour") / 1000);
             return true;
