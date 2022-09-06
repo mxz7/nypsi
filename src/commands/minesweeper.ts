@@ -176,7 +176,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         "a",
     ];
 
-    const bombs = Math.floor(Math.random() * 3) + 4;
+    const bombs = Math.floor(Math.random() * 3) + 3;
 
     for (let i = 0; i < bombs; i++) {
         const num = Math.floor(Math.random() * 25);
