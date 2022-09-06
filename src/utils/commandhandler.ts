@@ -732,7 +732,9 @@ export async function runCommand(
 
             const embed = new CustomEmbed(
                 message.member,
-                `**you are banned from this command**\n\nyou'll be unbanned <t:${Math.floor(unbanTime.getTime() / 1000)}:R>`
+                `**you are banned from this command. dm me for help**\n\nyou'll be unbanned <t:${Math.floor(
+                    unbanTime.getTime() / 1000
+                )}:R>`
             );
 
             if (message instanceof Message) {
