@@ -109,10 +109,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         if (desc.length == 0) return showAllAchievements();
 
+        const completedAchievements = await getCompletedAchievements(message.member);
+
+        const completion = `${((completedAchievements.length / Object.keys(allAchievementData).length) * 100).toFixed(
+            1
+        )}% completion`;
+
         const embed = new CustomEmbed(message.member, desc.join("\n")).setHeader(
             "your achievement progress",
             message.author.avatarURL()
         );
+
+        embed.setFooter({ text: completion });
 
         return send({ embeds: [embed] });
     };
