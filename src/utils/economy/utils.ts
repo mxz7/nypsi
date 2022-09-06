@@ -1222,7 +1222,7 @@ export async function getEcoBanTime(id: string) {
     return query.banned;
 }
 
-export async function setEcoBan(id: string, date?: dayjs.Dayjs) {
+export async function setEcoBan(id: string, date?: Date) {
     if (!date) {
         await prisma.economy.update({
             where: {
@@ -1238,7 +1238,7 @@ export async function setEcoBan(id: string, date?: dayjs.Dayjs) {
                 userId: id,
             },
             data: {
-                banned: date.toDate(),
+                banned: date,
             },
         });
     }
