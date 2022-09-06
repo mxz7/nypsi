@@ -93,6 +93,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
             },
         }),
         redis.del(`cache:vote:${user}`),
+        redis.del(`cache:economy:boosters:${user}`),
     ]);
 
     const tickets = await getTickets(user);
