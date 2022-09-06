@@ -710,7 +710,7 @@ export async function runCommand(
         command = commands.get(cmd);
     }
 
-    if (command.category == "money") {
+    if (command.category == "money" || command.name == "wholesome") {
         if (restarting || (await redis.get("nypsi:restarting")) == "t") {
             if (message.author.id == "672793821850894347" && message instanceof Message) {
                 message.react("💀");
