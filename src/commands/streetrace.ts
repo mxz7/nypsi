@@ -194,6 +194,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 races.delete(message.channel.id);
             } else {
                 if (races.get(message.channel.id).started) return;
+                await msg.delete().catch(() => {});
                 msg = await message.channel.send({ embeds: [embed] });
                 startRace(message.channel.id);
                 const d = races.get(message.channel.id);
