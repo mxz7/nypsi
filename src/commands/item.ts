@@ -101,7 +101,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const costs: number[] = [];
 
     for (const auction of auctions) {
-        if (costs.length >= 1000) break;
+        if (costs.length >= 5000) break;
 
         if (auction.itemAmount > 1) {
             costs.push(Math.floor(Number(auction.bin) / auction.itemAmount));
