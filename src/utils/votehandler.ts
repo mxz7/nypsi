@@ -89,7 +89,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
             data: {
                 boosterId: "vote_booster",
                 userId: user,
-                expire: dayjs().add(3, "hour").toDate(),
+                expire: dayjs().add(2, "hour").toDate(),
             },
         }),
         redis.del(`cache:vote:${user}`),
