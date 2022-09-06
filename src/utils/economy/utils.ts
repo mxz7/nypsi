@@ -1209,14 +1209,27 @@ export async function isEcoBanned(id: string) {
     }
 }
 
-export async function toggleBan(id: string) {
-    if (await isEcoBanned(id)) {
+export async function getEcoBanTime(id: string) {
+    const query = await prisma.economy.findUnique({
+        where: {
+            userId: id,
+        },
+        select: {
+            banned: true,
+        },
+    });
+
+    return query.banned;
+}
+
+export async function setEcoBan(id: string, date?: dayjs.Dayjs) {
+    if (!date) {
         await prisma.economy.update({
             where: {
                 userId: id,
             },
             data: {
-                banned: false,
+                banned: new Date(0),
             },
         });
     } else {
@@ -1225,7 +1238,7 @@ export async function toggleBan(id: string) {
                 userId: id,
             },
             data: {
-                banned: true,
+                banned: date.toDate(),
             },
         });
     }
@@ -1244,7 +1257,7 @@ export async function reset() {
 
     await prisma.economy.deleteMany({
         where: {
-            banned: true,
+            banned: { gt: new Date() },
         },
     });
 
