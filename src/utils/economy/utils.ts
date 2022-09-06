@@ -573,7 +573,7 @@ export async function topAmount(guild: Guild, amount: number): Promise<string[]>
 
     const query = await prisma.economy.findMany({
         where: {
-            money: { gt: 1000 },
+            AND: [{ money: { gt: 0 } }, { userId: { in: Array.from(members.keys()) } }],
         },
         select: {
             userId: true,
@@ -582,24 +582,8 @@ export async function topAmount(guild: Guild, amount: number): Promise<string[]>
         orderBy: {
             money: "desc",
         },
+        take: amount,
     });
-
-    let userIDs = [];
-    const balances = new Map<string, number>();
-
-    for (const user of query) {
-        if (members.has(user.userId)) {
-            userIDs.push(user.userId);
-            balances.set(user.userId, Number(user.money));
-        }
-    }
-
-    if (userIDs.length > 500) {
-        userIDs = await workerSort(userIDs, balances);
-        userIDs.reverse();
-    } else {
-        inPlaceSort(userIDs).desc((i) => balances.get(i));
-    }
 
     const usersFinal = [];
 
@@ -613,11 +597,11 @@ export async function topAmount(guild: Guild, amount: number): Promise<string[]>
         return target;
     };
 
-    for (const user of userIDs) {
+    for (const user of query) {
         if (count >= amount) break;
         if (usersFinal.join().length >= 1500) break;
 
-        if (balances.get(user) != 0) {
+        if (Number(user.money) != 0) {
             let pos: number | string = count + 1;
 
             if (pos == 1) {
@@ -629,7 +613,7 @@ export async function topAmount(guild: Guild, amount: number): Promise<string[]>
             }
 
             usersFinal[count] =
-                pos + " **" + getMemberID(guild, user).user.tag + "** $" + balances.get(user).toLocaleString();
+                pos + " **" + getMemberID(guild, user.userId).user.tag + "** $" + Number(user.money).toLocaleString();
             count++;
         }
     }
@@ -653,28 +637,27 @@ export async function topAmountItem(guild: Guild, amount: number, item: string):
 
     const query = await prisma.economy.findMany({
         where: {
-            money: { gt: 1000 },
+            AND: [{ money: { gt: 0 } }, { userId: { in: Array.from(members.keys()) } }],
         },
         select: {
             userId: true,
             inventory: true,
         },
-        orderBy: {
-            money: "desc",
-        },
     });
 
-    let userIDs = [];
     const amounts = new Map<string, number>();
+    let userIDs = query
+        .filter((i) => {
+            const inventory = i.inventory as Inventory;
 
-    for (const user of query) {
-        const inventory = user.inventory as Inventory;
-        if (members.has(user.userId)) {
-            if (!inventory[item]) continue;
-            userIDs.push(user.userId);
-            amounts.set(user.userId, inventory[item]);
-        }
-    }
+            if (inventory[item]) {
+                amounts.set(i.userId, inventory[item]);
+                return true;
+            } else {
+                return false;
+            }
+        })
+        .map((i) => i.userId);
 
     if (userIDs.length > 500) {
         userIDs = await workerSort(userIDs, amounts);
@@ -740,7 +723,7 @@ export async function bottomAmount(guild: Guild, amount: number): Promise<string
 
     const query = await prisma.economy.findMany({
         where: {
-            money: { gt: 1000 },
+            AND: [{ money: { gt: 0 } }, { userId: { in: Array.from(members.keys()) } }],
         },
         select: {
             userId: true,
@@ -749,23 +732,8 @@ export async function bottomAmount(guild: Guild, amount: number): Promise<string
         orderBy: {
             money: "asc",
         },
+        take: amount,
     });
-
-    let userIDs = [];
-    const balances = new Map<string, number>();
-
-    for (const user of query) {
-        if (members.find((member) => member.user.id == user.userId)) {
-            userIDs.push(user.userId);
-            balances.set(user.userId, Number(user.money));
-        }
-    }
-
-    if (userIDs.length > 500) {
-        userIDs = await workerSort(userIDs, balances);
-    } else {
-        inPlaceSort(userIDs).asc((i) => balances.get(i));
-    }
 
     const usersFinal = [];
 
@@ -779,11 +747,11 @@ export async function bottomAmount(guild: Guild, amount: number): Promise<string
         return target;
     };
 
-    for (const user of userIDs) {
+    for (const user of query) {
         if (count >= amount) break;
         if (usersFinal.join().length >= 1500) break;
 
-        if (balances.get(user) != 0) {
+        if (Number(user.money) != 0) {
             let pos: number | string = count + 1;
 
             if (pos == 1) {
@@ -795,7 +763,7 @@ export async function bottomAmount(guild: Guild, amount: number): Promise<string
             }
 
             usersFinal[count] =
-                pos + " **" + getMemberID(guild, user).user.tag + "** $" + balances.get(user).toLocaleString();
+                pos + " **" + getMemberID(guild, user.userId).user.tag + "** $" + Number(user.money).toLocaleString();
             count++;
         }
     }
@@ -820,7 +788,7 @@ export async function topAmountPrestige(guild: Guild, amount: number): Promise<s
 
     const query = await prisma.economy.findMany({
         where: {
-            prestige: { gt: 0 },
+            AND: [{ prestige: { gt: 0 } }, { userId: { in: Array.from(members.keys()) } }],
         },
         select: {
             userId: true,
@@ -829,23 +797,8 @@ export async function topAmountPrestige(guild: Guild, amount: number): Promise<s
         orderBy: {
             prestige: "desc",
         },
+        take: amount,
     });
-
-    let userIDs = [];
-    const prestiges = new Map<string, number>();
-
-    for (const user of query) {
-        if (members.find((member) => member.user.id == user.userId)) {
-            userIDs.push(user.userId);
-            prestiges.set(user.userId, user.prestige);
-        }
-    }
-
-    if (userIDs.length > 500) {
-        userIDs = await workerSort(userIDs, prestiges);
-    } else {
-        inPlaceSort(userIDs).desc((i) => prestiges.get(i));
-    }
 
     const usersFinal = [];
 
@@ -859,11 +812,11 @@ export async function topAmountPrestige(guild: Guild, amount: number): Promise<s
         return target;
     };
 
-    for (const user of userIDs) {
+    for (const user of query) {
         if (count >= amount) break;
         if (usersFinal.join().length >= 1500) break;
 
-        if (prestiges.get(user) != 0) {
+        if (user.prestige != 0) {
             let pos: string | number = count + 1;
 
             if (pos == 1) {
@@ -875,13 +828,13 @@ export async function topAmountPrestige(guild: Guild, amount: number): Promise<s
             }
 
             const thing = ["th", "st", "nd", "rd"];
-            const v = prestiges.get(user) % 100;
+            const v = user.prestige % 100;
             usersFinal[count] =
                 pos +
                 " **" +
-                getMemberID(guild, user).user.tag +
+                getMemberID(guild, user.userId).user.tag +
                 "** " +
-                prestiges.get(user) +
+                user.prestige +
                 (thing[(v - 20) % 10] || thing[v] || thing[0]) +
                 " prestige";
             count++;
