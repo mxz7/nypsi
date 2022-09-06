@@ -16,6 +16,7 @@ import { getBorderCharacters, table } from "table";
 import {
     createUser,
     getAchievements,
+    getEcoBanTime,
     getItems,
     getXp,
     isEcoBanned,
@@ -727,7 +728,23 @@ export async function runCommand(
         }
 
         if (await isEcoBanned(message.author.id)) {
-            return;
+            const unbanTime = await getEcoBanTime(message.author.id);
+
+            const embed = new CustomEmbed(
+                message.member,
+                `**you are banned from this command**\n\nyou'll be unbanned <t:${Math.floor(unbanTime.getTime() / 1000)}:r>`
+            );
+
+            if (message instanceof Message) {
+                return message.channel.send({ embeds: [embed] }).then((m) => {
+                    setTimeout(() => {
+                        message.delete().catch(() => {});
+                        m.delete().catch(() => {});
+                    }, 5000);
+                });
+            } else {
+                return message.reply({ embeds: [embed], ephemeral: true });
+            }
         } else if (await isHandcuffed(message.author.id)) {
             const init = parseInt(await redis.get(`economy:handcuffed:${message.author.id}`));
             const curr = new Date().getTime();
