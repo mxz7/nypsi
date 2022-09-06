@@ -277,7 +277,7 @@ export async function updateBalance(member: GuildMember | string, amount: number
             userId: id,
         },
         data: {
-            money: amount,
+            money: Math.floor(amount),
         },
     });
     await redis.del(`cache:economy:balance:${id}`);
