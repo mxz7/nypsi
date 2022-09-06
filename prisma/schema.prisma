@@ -69,7 +69,7 @@ model Economy {
   inventory Json @default("{}")
   workers   Json @default("{}")
 
-  banned Boolean @default(false)
+  banned DateTime?
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String @id

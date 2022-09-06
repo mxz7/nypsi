@@ -25,6 +25,7 @@ import { addProgress, getAllAchievements, setAchievementProgress } from "./achie
 import { Constructor, getAllWorkers, Worker, WorkerStorageData } from "./workers";
 import ms = require("ms");
 import _ = require("lodash");
+import dayjs = require("dayjs");
 
 const inventoryAchievementCheckCooldown = new Set<string>();
 
@@ -1179,7 +1180,10 @@ export async function upgradeWorker(member: GuildMember | string, id: string) {
 
 export async function isEcoBanned(id: string) {
     if (await redis.exists(`cache:economy:banned:${id}`)) {
-        return (await redis.get(`cache:economy:banned:${id}`)) === "t" ? true : false;
+        const res = (await redis.get(`cache:economy:banned:${id}`)) === "t" ? true : false;
+
+        if (res) await redis.del(`cache:economy:banned:${id}`);
+        return res;
     } else {
         const query = await prisma.economy.findUnique({
             where: {
@@ -1190,13 +1194,13 @@ export async function isEcoBanned(id: string) {
             },
         });
 
-        if (!query) {
+        if (!query || !query.banned) {
             await redis.set(`cache:economy:banned:${id}`, "f");
             await redis.expire(`cache:economy:banned:${id}`, ms("1 hour") / 1000);
             return false;
         }
 
-        if (query.banned) {
+        if (dayjs().isBefore(query.banned)) {
             await redis.set(`cache:economy:banned:${id}`, "t");
             await redis.expire(`cache:economy:banned:${id}`, ms("1 hour") / 1000);
             return true;
@@ -1208,14 +1212,27 @@ export async function isEcoBanned(id: string) {
     }
 }
 
-export async function toggleBan(id: string) {
-    if (await isEcoBanned(id)) {
+export async function getEcoBanTime(id: string) {
+    const query = await prisma.economy.findUnique({
+        where: {
+            userId: id,
+        },
+        select: {
+            banned: true,
+        },
+    });
+
+    return query.banned;
+}
+
+export async function setEcoBan(id: string, date?: Date) {
+    if (!date) {
         await prisma.economy.update({
             where: {
                 userId: id,
             },
             data: {
-                banned: false,
+                banned: new Date(0),
             },
         });
     } else {
@@ -1224,7 +1241,7 @@ export async function toggleBan(id: string) {
                 userId: id,
             },
             data: {
-                banned: true,
+                banned: date,
             },
         });
     }
@@ -1243,7 +1260,7 @@ export async function reset() {
 
     await prisma.economy.deleteMany({
         where: {
-            banned: true,
+            banned: { gt: new Date() },
         },
     });
 

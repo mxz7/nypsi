@@ -16,6 +16,7 @@ import { getBorderCharacters, table } from "table";
 import {
     createUser,
     getAchievements,
+    getEcoBanTime,
     getItems,
     getXp,
     isEcoBanned,
@@ -709,7 +710,7 @@ export async function runCommand(
         command = commands.get(cmd);
     }
 
-    if (command.category == "money") {
+    if (command.category == "money" || command.name == "wholesome") {
         if (restarting || (await redis.get("nypsi:restarting")) == "t") {
             if (message.author.id == "672793821850894347" && message instanceof Message) {
                 message.react("💀");
@@ -727,7 +728,24 @@ export async function runCommand(
         }
 
         if (await isEcoBanned(message.author.id)) {
-            return;
+            const unbanTime = await getEcoBanTime(message.author.id);
+
+            const embed = new CustomEmbed(
+                message.member,
+                `**you are banned from this command. dm me for help**\n\nyou'll be unbanned <t:${Math.floor(
+                    unbanTime.getTime() / 1000
+                )}:R>`
+            );
+
+            if (message instanceof Message) {
+                return message.channel.send({ embeds: [embed] }).then((m) => {
+                    setTimeout(() => {
+                        Promise.all([m.delete().catch(() => {}), message.delete().catch(() => {})]);
+                    }, 5000);
+                });
+            } else {
+                return message.reply({ embeds: [embed], ephemeral: true });
+            }
         } else if (await isHandcuffed(message.author.id)) {
             const init = parseInt(await redis.get(`economy:handcuffed:${message.author.id}`));
             const curr = new Date().getTime();
