@@ -36,6 +36,13 @@ cmd.slashData.addUserOption((option) =>
 
 const waiting = new Set<string>();
 const cookieRecent = new Set<string>();
+const gifs = [
+    "https://c.tenor.com/p_cxPj2oRq0AAAAC/ksi-ksi-box.gif",
+    "https://c.tenor.com/SgWHHMfm7uUAAAAC/salt-saltpapi.gif",
+    "https://c.tenor.com/JmQOPxjJ6yYAAAAC/weji-deji.gif",
+    "https://c.tenor.com/EkWAL6XhODIAAAAC/deji-boxing-deji.gif",
+    "https://c.tenor.com/OHZwNy6nr5IAAAAC/conor-mcgregor-ufc.gif",
+];
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (!(await userExists(message.member))) {
@@ -280,6 +287,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             if (ended) return;
 
             embed.disableFooter();
+
+            embed.setImage(gifs[Math.floor(Math.random() * gifs.length)]);
 
             await msg.edit({ embeds: [embed] });
             return;
