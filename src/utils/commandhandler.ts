@@ -732,14 +732,13 @@ export async function runCommand(
 
             const embed = new CustomEmbed(
                 message.member,
-                `**you are banned from this command**\n\nyou'll be unbanned <t:${Math.floor(unbanTime.getTime() / 1000)}:r>`
+                `**you are banned from this command**\n\nyou'll be unbanned <t:${Math.floor(unbanTime.getTime() / 1000)}:R>`
             );
 
             if (message instanceof Message) {
                 return message.channel.send({ embeds: [embed] }).then((m) => {
                     setTimeout(() => {
-                        message.delete().catch(() => {});
-                        m.delete().catch(() => {});
+                        Promise.all([m.delete().catch(() => {}), message.delete().catch(() => {})]);
                     }, 5000);
                 });
             } else {
