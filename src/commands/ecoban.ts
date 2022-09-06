@@ -1,5 +1,5 @@
 import { CommandInteraction, Message } from "discord.js";
-import { setEcoBan } from "../utils/economy/utils";
+import { isEcoBanned, setEcoBan } from "../utils/economy/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 
 const cmd = new Command("ecoban", "ban an account from eco", Categories.NONE);
@@ -7,15 +7,21 @@ const cmd = new Command("ecoban", "ban an account from eco", Categories.NONE);
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     if (message.author.id != "672793821850894347") return;
 
-    if (args.length != 2) {
+    if (args.length == 0) {
         return message.channel.send({ content: "dumbass" });
     }
 
-    const time = new Date(Date.now() + getDuration(args[1].toLowerCase()) * 1000);
+    if (!args[1]) {
+        if (await isEcoBanned(args[0])) {
+            await setEcoBan(args[0]); // unbans user
+        }
+    } else {
+        const time = new Date(Date.now() + getDuration(args[1].toLowerCase()) * 1000);
 
-    await setEcoBan(args[0], time);
+        await setEcoBan(args[0], time);
+    }
 
-    if (!(message instanceof Message)) return;
+    if (!(message instanceof Message)) return; // never gonna happen
 
     message.react("✅");
 }
