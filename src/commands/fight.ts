@@ -276,6 +276,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             ended = true;
             const embed = await fight.end();
 
+            embed.setImage(gifs[Math.floor(Math.random() * gifs.length)]);
+
             await msg.edit({ embeds: [embed], components: [] });
             collector.stop();
             return;
@@ -287,8 +289,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             if (ended) return;
 
             embed.disableFooter();
-
-            embed.setImage(gifs[Math.floor(Math.random() * gifs.length)]);
 
             await msg.edit({ embeds: [embed] });
             return;
