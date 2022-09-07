@@ -3,6 +3,7 @@ import { inPlaceSort } from "fast-sort";
 import fetch from "node-fetch";
 import prisma from "../database/database";
 import redis from "../database/redis";
+import { addProgress } from "../economy/achievements";
 import { cleanString } from "../functions/string";
 import ms = require("ms");
 
@@ -444,12 +445,15 @@ export async function addWordleGame(member: GuildMember, win: boolean, attempts?
                 },
             });
         } else {
-            await prisma.wordleStats.create({
-                data: {
-                    userId: member.user.id,
-                    lose: 1,
-                },
-            });
+            await Promise.all([
+                prisma.wordleStats.create({
+                    data: {
+                        userId: member.user.id,
+                        lose: 1,
+                    },
+                }),
+                addProgress(member.user.id, "wordle", 1),
+            ]);
         }
     } else {
         if (profile) {
