@@ -68,7 +68,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         .setImage(image);
 
     message.channel.send({ embeds: [embed] });
-    
+
     await addProgress(message.author.id, "horny", 1);
 }
 
