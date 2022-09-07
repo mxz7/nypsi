@@ -26,6 +26,7 @@ import {
 } from "../utils/economy/utils";
 import requestDM from "../utils/functions/requestdm";
 import { getSurveyByMessageId } from "../utils/functions/surveys";
+import { getTax } from "../utils/functions/tax";
 import { getChatFilter } from "../utils/guilds/utils";
 import { getKarma, getKarmaShopItems, isKarmaShopOpen } from "../utils/karma/utils";
 import { logger } from "../utils/logger";
@@ -252,9 +253,16 @@ export default async function interactionCreate(interaction: Interaction) {
                     inventory[auction.itemName] = auction.itemAmount;
                 }
 
+                const tax = await getTax();
+
+                const taxedAmount = Math.floor(Number(auction.bin) - Number(auction.bin) * tax);
+
                 await setInventory(interaction.user.id, inventory);
                 await updateBalance(interaction.user.id, balance - Number(auction.bin));
-                await updateBalance(auction.ownerId, (await getBalance(auction.ownerId)) + Number(auction.bin));
+                await updateBalance(
+                    auction.ownerId,
+                    (await getBalance(auction.ownerId)) + (Number(auction.bin) - taxedAmount)
+                );
 
                 const items = getItems();
 
@@ -263,7 +271,9 @@ export default async function interactionCreate(interaction: Interaction) {
                     .setDescription(
                         `your auction for ${auction.itemAmount}x ${items[auction.itemName].emoji} ${
                             items[auction.itemName].name
-                        } has been bought by ${interaction.user.username} for $**${auction.bin.toLocaleString()}**`
+                        } has been bought by ${interaction.user.username} for $**${auction.bin.toLocaleString()}** (${
+                            (tax * 100).toFixed
+                        }% tax)`
                     );
 
                 await requestDM({
