@@ -11,6 +11,7 @@ import {
     userExists,
 } from "../utils/economy/utils.js";
 import { getMember } from "../utils/functions/member";
+import { getTax } from "../utils/functions/tax";
 import { getPrefix } from "../utils/guilds/utils";
 import { payment } from "../utils/logger";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
@@ -138,13 +139,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await addCooldown(cmd.name, message.member, 15);
 
-    let tax = 0;
-
-    if (amount >= 200000) {
-        tax = 0.1;
-    } else if (amount >= 100000) {
-        tax = 0.05;
-    }
+    let tax = await getTax();
 
     if (await isPremium(message.member)) {
         tax = 0;
