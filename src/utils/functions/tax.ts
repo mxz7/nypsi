@@ -3,17 +3,21 @@ import prisma from "../database/database";
 import redis from "../database/redis";
 
 export async function getTax() {
+    let tax: number;
+
     if (!(await redis.exists("nypsi:tax"))) {
-        return await updateTax();
+        tax = await updateTax();
     } else {
-        return parseFloat((parseFloat(await redis.get("nypsi:tax")) / 100).toFixed(1));
+        tax = parseFloat(await redis.get("nypsi:tax"));
     }
+
+    return parseFloat(tax.toFixed(3));
 }
 
 async function updateTax() {
-    const tax = parseFloat((Math.random() * 5 + 5).toFixed(1));
+    const tax = parseFloat((Math.random() * 5 + 5).toFixed(3)) / 100;
 
-    await redis.set("nypsi:tax", tax);
+    await redis.set("nypsi:tax", tax.toFixed(3));
     await redis.expire("nypsi:tax", ms("16 hours"));
 
     return tax;
