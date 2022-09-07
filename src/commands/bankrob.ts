@@ -168,7 +168,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             if (bank == "nypsi") {
                 await removeFromNypsiBankBalance(stolen);
             } else {
-                bankWorth.set(bank, bankWorth.get(bank) - stolen);
+                bankWorth.set(bank, Math.floor(bankWorth.get(bank) - stolen));
             }
 
             const embed = new CustomEmbed(message.member)
@@ -200,7 +200,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             if (bank == "nypsi") {
                 await addToNypsiBank(totalLossed);
             } else {
-                bankWorth.set(bank, bankWorth.get(bank) + totalLossed * 0.75);
+                bankWorth.set(bank, Math.floor(bankWorth.get(bank) + totalLossed * 0.75));
             }
 
             embed.setColor("#e4334f");
