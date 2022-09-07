@@ -5,7 +5,7 @@ export async function getTax() {
     if (!(await redis.exists("nypsi:tax"))) {
         return await updateTax();
     } else {
-        return parseFloat(await redis.get("nypsi:tax"));
+        return parseFloat((parseFloat(await redis.get("nypsi:tax")) / 100).toFixed(1));
     }
 }
 
