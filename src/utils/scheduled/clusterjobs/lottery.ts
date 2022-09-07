@@ -3,7 +3,7 @@ import prisma from "../../database/database";
 import { addProgress } from "../../economy/achievements";
 import { getBalance, getDMsEnabled, lotteryTicketPrice, updateBalance } from "../../economy/utils";
 import { MStoTime } from "../../functions/date";
-import { getTax } from "../../functions/tax";
+import { addToNypsiBank, getTax } from "../../functions/tax";
 import { logger } from "../../logger";
 import { LotteryTicket } from "../../models/Economy";
 import { CustomEmbed } from "../../models/EmbedBuilders";
@@ -31,7 +31,9 @@ async function doLottery(client: Client) {
         return hook.send({ embeds: [embed] });
     }
 
-    const total = Math.floor(tickets.length * lotteryTicketPrice * (await getTax()));
+    const taxedAmount = Math.floor(tickets.length * lotteryTicketPrice * (await getTax()));
+
+    const total = Math.floor(tickets.length * lotteryTicketPrice - taxedAmount);
 
     const shuffledTickets = shuffleArray(tickets);
 
@@ -51,7 +53,11 @@ async function doLottery(client: Client) {
         message: `winner: ${user.tag} (${user.id}) with ticket #${chosen.id}`,
     });
 
-    await Promise.all([updateBalance(user.id, (await getBalance(user.id)) + total), addProgress(user.id, "lucky", 1)]);
+    await Promise.all([
+        updateBalance(user.id, (await getBalance(user.id)) + total),
+        addProgress(user.id, "lucky", 1),
+        addToNypsiBank(taxedAmount),
+    ]);
 
     const embed = new CustomEmbed();
 

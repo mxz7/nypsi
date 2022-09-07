@@ -11,7 +11,7 @@ import {
     userExists,
 } from "../utils/economy/utils.js";
 import { getMember } from "../utils/functions/member";
-import { getTax } from "../utils/functions/tax";
+import { addToNypsiBank, getTax } from "../utils/functions/tax";
 import { getPrefix } from "../utils/guilds/utils";
 import { payment } from "../utils/logger";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
@@ -148,7 +148,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     await updateBalance(message.member, (await getBalance(message.member)) - amount);
 
     if (tax > 0) {
-        await updateBalance(target, (await getBalance(target)) + (amount - Math.round(amount * tax)));
+        const taxedAmount = Math.floor(amount * tax);
+        await addToNypsiBank(taxedAmount);
+        await updateBalance(target, (await getBalance(target)) + (amount - taxedAmount));
     } else {
         await updateBalance(target, (await getBalance(target)) + amount);
     }
