@@ -45,7 +45,7 @@ export async function getNypsiBankBalance() {
         },
     });
 
-    return query?.bank || 0;
+    return Number(query?.bank) || 0;
 }
 
 export async function removeFromNypsiBankBalance(amount: number) {
