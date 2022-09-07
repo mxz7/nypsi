@@ -3,6 +3,7 @@ import prisma from "../../database/database";
 import { addProgress } from "../../economy/achievements";
 import { getBalance, getDMsEnabled, lotteryTicketPrice, updateBalance } from "../../economy/utils";
 import { MStoTime } from "../../functions/date";
+import { getTax } from "../../functions/tax";
 import { logger } from "../../logger";
 import { LotteryTicket } from "../../models/Economy";
 import { CustomEmbed } from "../../models/EmbedBuilders";
@@ -30,7 +31,7 @@ async function doLottery(client: Client) {
         return hook.send({ embeds: [embed] });
     }
 
-    const total = Math.floor(tickets.length * lotteryTicketPrice * 0.9);
+    const total = Math.floor(tickets.length * lotteryTicketPrice * (await getTax()));
 
     const shuffledTickets = shuffleArray(tickets);
 
