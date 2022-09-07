@@ -445,15 +445,12 @@ export async function addWordleGame(member: GuildMember, win: boolean, attempts?
                 },
             });
         } else {
-            await Promise.all([
-                prisma.wordleStats.create({
-                    data: {
-                        userId: member.user.id,
-                        lose: 1,
-                    },
-                }),
-                addProgress(member.user.id, "wordle", 1),
-            ]);
+            await prisma.wordleStats.create({
+                data: {
+                    userId: member.user.id,
+                    lose: 1,
+                },
+            });
         }
     } else {
         if (profile) {
@@ -508,6 +505,7 @@ export async function addWordleGame(member: GuildMember, win: boolean, attempts?
                 },
                 data: data,
             });
+            await addProgress(member.user.id, "wordle", 1);
         } else {
             let data;
 
@@ -559,6 +557,7 @@ export async function addWordleGame(member: GuildMember, win: boolean, attempts?
             await prisma.wordleStats.create({
                 data: data,
             });
+            await addProgress(member.user.id, "wordle", 1);
         }
     }
 }
