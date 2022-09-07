@@ -14,6 +14,7 @@ import {
     userExists,
 } from "../utils/economy/utils.js";
 import { getMember } from "../utils/functions/member.js";
+import { getNypsiBankBalance, getTax, getTaxRefreshTime } from "../utils/functions/tax.js";
 import { getPrefix } from "../utils/guilds/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
@@ -63,7 +64,35 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     }
 
+    const send = async (data: MessageOptions | InteractionReplyOptions) => {
+        if (!(message instanceof Message)) {
+            if (message.deferred) {
+                await message.editReply(data);
+            } else {
+                await message.reply(data as InteractionReplyOptions);
+            }
+            const replyMsg = await message.fetchReply();
+            if (replyMsg instanceof Message) {
+                return replyMsg;
+            }
+        } else {
+            return await message.channel.send(data as MessageOptions);
+        }
+    };
+
     if (!(await userExists(target))) await createUser(target);
+
+    if (target.user.id == "678711738845102087") {
+        const embed = new CustomEmbed(message.member).setHeader("nypsi bank", target.user.avatarURL());
+
+        embed.setDescription(
+            `**current balance** $${(await getNypsiBankBalance()).toLocaleString()}\n**current tax rate** ${
+                (await getTax()) * 100
+            }%\n\ntax updates <t:${await getTaxRefreshTime()}:R>`
+        );
+
+        return send({ embeds: [embed] });
+    }
 
     let footer = `xp: ${(await getXp(target)).toLocaleString()}`;
 
@@ -95,22 +124,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     } else {
         embed.setHeader(`${target.user.username}'s balance | season 4`, target.user.avatarURL());
     }
-
-    const send = async (data: MessageOptions | InteractionReplyOptions) => {
-        if (!(message instanceof Message)) {
-            if (message.deferred) {
-                await message.editReply(data);
-            } else {
-                await message.reply(data as InteractionReplyOptions);
-            }
-            const replyMsg = await message.fetchReply();
-            if (replyMsg instanceof Message) {
-                return replyMsg;
-            }
-        } else {
-            return await message.channel.send(data as MessageOptions);
-        }
-    };
 
     if (message.member == target) {
         if (
