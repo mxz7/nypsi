@@ -1,4 +1,5 @@
 import ms = require("ms");
+import prisma from "../database/database";
 import redis from "../database/redis";
 
 export async function getTax() {
@@ -16,4 +17,44 @@ async function updateTax() {
     await redis.expire("nypsi:tax", ms("16 hours"));
 
     return tax;
+}
+
+export async function addToNypsiBank(amount: number) {
+    await prisma.economy.upsert({
+        where: {
+            userId: "678711738845102087",
+        },
+        update: {
+            bank: { increment: amount },
+        },
+        create: {
+            bank: amount,
+            lastVote: new Date(0),
+            userId: "678711738845102087",
+        },
+    });
+}
+
+export async function getNypsiBankBalance() {
+    const query = await prisma.economy.findUnique({
+        where: {
+            userId: "678711738845102087",
+        },
+        select: {
+            bank: true,
+        },
+    });
+
+    return query?.bank || 0;
+}
+
+export async function removeFromNypsiBankBalance(amount: number) {
+    await prisma.economy.update({
+        where: {
+            userId: "678711738845102087",
+        },
+        data: {
+            bank: { decrement: amount },
+        },
+    });
 }
