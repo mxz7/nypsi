@@ -120,7 +120,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (target.user.id == message.author.id) {
         return send({
-            embeds: [new ErrorEmbed("imbecile").setImage("https://c.tenor.com/ZaHfgKf59NAAAAAC/jim-carrey-hit.gif")],
+            embeds: [
+                new ErrorEmbed("imbecile").setImage(
+                    "https://media1.giphy.com/media/fjmH5BSfkHvVOkvRBs/giphy.gif?cid=790b7611184b72eeb610acf9c41e0f6a25c42f6e987583f6&rid=giphy.gif&ct=g"
+                ),
+            ],
         });
     }
 
