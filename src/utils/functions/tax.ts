@@ -14,11 +14,15 @@ export async function getTax() {
     return parseFloat(tax.toFixed(3));
 }
 
+export async function getTaxRefreshTime() {
+    return Math.floor(Date.now() / 1000 + (await redis.ttl("nypsi:tax")));
+}
+
 async function updateTax() {
     const tax = parseFloat((Math.random() * 5 + 5).toFixed(3)) / 100;
 
     await redis.set("nypsi:tax", tax.toFixed(3));
-    await redis.expire("nypsi:tax", ms("16 hours"));
+    await redis.expire("nypsi:tax", Math.floor(ms("16 hours") / 1000));
 
     return tax;
 }
