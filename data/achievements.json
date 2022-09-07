@@ -803,5 +803,40 @@
         "emoji": "🍀",
         "target": 150,
         "description": "win the lottery 150 times"
+    },
+    "wordle_i": {
+        "id": "wordle_i",
+        "name": "wordle professional **I**",
+        "emoji": "💬",
+        "target": 15,
+        "description": "win 15 wordles"
+    },
+    "wordle_ii": {
+        "id": "wordle_ii",
+        "name": "wordle professional **II**",
+        "emoji": "💬",
+        "target": 75,
+        "description": "win 75 wordles"
+    },
+    "wordle_iii": {
+        "id": "wordle_iii",
+        "name": "wordle professional **III**",
+        "emoji": "💬",
+        "target": 250,
+        "description": "win 250 wordles"
+    },
+    "wordle_iv": {
+        "id": "wordle_iv",
+        "name": "wordle professional **IV**",
+        "emoji": "💬",
+        "target": 1000,
+        "description": "win 1,000 wordles"
+    },
+    "wordle_v": {
+        "id": "wordle_v",
+        "name": "wordle professional **V**",
+        "emoji": "💬",
+        "target": 2500,
+        "description": "win 2,500 wordles"
     }
 }
