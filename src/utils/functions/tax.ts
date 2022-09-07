@@ -33,7 +33,7 @@ export async function addToNypsiBank(amount: number) {
             userId: "678711738845102087",
         },
         update: {
-            bank: { increment: amount },
+            bank: { increment: Math.floor(amount) },
         },
         create: {
             bank: amount,
@@ -62,7 +62,7 @@ export async function removeFromNypsiBankBalance(amount: number) {
             userId: "678711738845102087",
         },
         data: {
-            bank: { decrement: amount },
+            bank: { decrement: Math.floor(amount) },
         },
     });
 }
