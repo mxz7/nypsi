@@ -52,7 +52,7 @@
     },
     "iron_ingot": {
         "id": "iron_ingot",
-        "name": "iron",
+        "name": "iron ingot",
         "emoji": "<:nypsi_iron:959442548064141362>",
         "longDesc": "product of smelting iron ore",
         "role": "sellable",
@@ -63,7 +63,7 @@
     },
     "gold_ingot": {
         "id": "gold_ingot",
-        "name": "gold",
+        "name": "gold ingot",
         "emoji": "<:nypsi_gold:959443010205126656>",
         "longDesc": "product of smelting gold ore",
         "role": "sellable",
