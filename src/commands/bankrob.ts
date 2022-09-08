@@ -278,6 +278,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embed.setDescription(await displayBankInfo(bankNames[0], bankWorths));
     }
 
+    if (options.length == 0) {
+        return send({ embeds: [new CustomEmbed(message.member, "there are currently no banks to rob")] });
+    }
+
     const components: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [];
 
     components.push(
