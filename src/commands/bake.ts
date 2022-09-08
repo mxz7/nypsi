@@ -8,7 +8,7 @@ import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 const cmd = new Command(
     "bake",
     "use your furnace to bake cookies and cakes! (doesnt remove your furnace because cookies are cool)",
-    Categories.FUN
+    Categories.MONEY
 );
 
 cmd.slashEnabled = true;
