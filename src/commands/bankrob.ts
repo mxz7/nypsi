@@ -264,15 +264,22 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embed.setDescription(await displayBankInfo(bankNames[0], bankWorth));
     }
 
-    const dropdown = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new SelectMenuBuilder().setCustomId("bank").setOptions(options)
+    const components: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [];
+
+    components.push(
+        new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+            new SelectMenuBuilder().setCustomId("bank").setOptions(options)
+        )
     );
 
-    const button = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder().setCustomId("ro").setLabel("rob").setStyle(ButtonStyle.Danger)
-    );
+    if (!(await onCooldown(cmd.name, message.member)))
+        components.push(
+            new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+                new ButtonBuilder().setCustomId("ro").setLabel("rob").setStyle(ButtonStyle.Danger)
+            )
+        );
 
-    const msg = await send({ embeds: [embed], components: [dropdown, button] });
+    const msg = await send({ embeds: [embed], components });
 
     const filter = (i: Interaction) => i.user.id == message.author.id;
 
@@ -299,11 +306,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 if (option.data.value == res.values[0]) option.setDefault(true);
             }
 
-            const newDropdown = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+            components[0] = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                 new SelectMenuBuilder().setCustomId("bank").setOptions(options)
             );
 
-            await res.message.edit({ embeds: [embed], components: [newDropdown, button] });
+            await res.message.edit({ embeds: [embed], components });
             return pageManager();
         } else if (res.customId == "ro") {
             const selected = options.filter((o) => o.data.default)[0].data.value;
