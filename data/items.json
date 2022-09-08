@@ -82,6 +82,16 @@
         "buy": 0,
         "sell": 40000
     },
+    "emerald": {
+        "id": "emerald",
+        "name": "emerald",
+        "emoji": "<:nypsi_emerald:1017420625880551434>",
+        "longDesc": "found when mining",
+        "role": "sellable",
+        "rarity": 3,
+        "buy": 0,
+        "sell": 60000
+    },
     "furnace": {
         "id": "furnace",
         "name": "furnace",
