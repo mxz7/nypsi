@@ -12,7 +12,7 @@ import {
     SelectMenuOptionBuilder,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
+import { addCooldown, getRemaining, getResponse, onCooldown } from "../utils/cooldownhandler.js";
 import { addProgress } from "../utils/economy/achievements.js";
 import {
     createUser,
@@ -129,7 +129,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         return `**${bank}**\n*$${worth.toLocaleString()}*\n\n**max steal** $${steal.toLocaleString()}\n**max loss** $${loss.toLocaleString()}${
             lawyer ? " 🧑‍⚖️" : ""
-        }${(await onCooldown(cmd.name, message.member)) ? "\n\ncurrently on cooldown" : ""}`;
+        }${
+            (await onCooldown(cmd.name, message.member))
+                ? `\n\non cooldown for \`${await getRemaining(cmd.name, message.member)}\``
+                : ""
+        }`;
     };
 
     const robBank = async (bank: string, bankWorth: Map<string, number>) => {
