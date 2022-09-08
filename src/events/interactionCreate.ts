@@ -274,9 +274,9 @@ export default async function interactionCreate(interaction: Interaction) {
                     .setDescription(
                         `your auction for ${auction.itemAmount}x ${items[auction.itemName].emoji} ${
                             items[auction.itemName].name
-                        } has been bought by ${interaction.user.username} for $**${auction.bin.toLocaleString()}** (${
-                            (tax * 100).toFixed
-                        }% tax)`
+                        } has been bought by ${interaction.user.username} for $**${Math.floor(
+                            Number(auction.bin) - taxedAmount
+                        ).toLocaleString()}** (${tax * 100}% tax)`
                     );
 
                 await requestDM({
