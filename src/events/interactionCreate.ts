@@ -255,7 +255,7 @@ export default async function interactionCreate(interaction: Interaction) {
 
                 const tax = await getTax();
 
-                const taxedAmount = Math.floor(Number(auction.bin) - Number(auction.bin) * tax);
+                const taxedAmount = Math.floor(Number(auction.bin) * tax);
 
                 await Promise.all([
                     setInventory(interaction.user.id, inventory),
