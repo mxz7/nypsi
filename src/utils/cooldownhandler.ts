@@ -48,6 +48,34 @@ export async function addExpiry(cmd: string, member: GuildMember, seconds: numbe
     await redis.expire(key, expire);
 }
 
+export async function getRemaining(cmd: string, member: GuildMember) {
+    const key = `cd:${cmd}:${member.user.id}`;
+    const cd: CooldownData = JSON.parse(await redis.get(key));
+
+    if (!cd) {
+        return "0.1s";
+    }
+
+    const init = cd.date;
+    const length = cd.length;
+
+    const diff = (Date.now() - init) / 1000;
+    const time = length - diff;
+
+    const minutes = Math.floor(time / 60);
+    const seconds = (time - minutes * 60).toFixed(1);
+
+    let remaining: string;
+
+    if (minutes != 0) {
+        remaining = `${minutes}m${Math.floor(parseFloat(seconds))}s`;
+    } else {
+        remaining = `${seconds}s`;
+    }
+
+    return remaining;
+}
+
 export async function getResponse(cmd: string, member: GuildMember): Promise<ErrorEmbed> {
     const key = `cd:${cmd}:${member.user.id}`;
     const cd: CooldownData = JSON.parse(await redis.get(key));
