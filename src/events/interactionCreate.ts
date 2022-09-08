@@ -5,6 +5,7 @@ import {
     CommandInteraction,
     CommandInteractionOption,
     EmbedBuilder,
+    GuildBasedChannel,
     GuildMember,
     Interaction,
     InteractionType,
@@ -460,6 +461,17 @@ export default async function interactionCreate(interaction: Interaction) {
                     };
                 }
                 break;
+            case ApplicationCommandOptionType.Channel:
+                const channel = arg.channel;
+                args.push(`<#${channel.id}>`);
+
+                const collection = new Collection<string, GuildBasedChannel>();
+                collection.set(user.id, channel as GuildBasedChannel);
+                message.mentions = {
+                    channels: collection,
+                };
+
+                break;
             case ApplicationCommandOptionType.String:
                 for (const str of arg.value.toString().split(" ")) {
                     args.push(str);
@@ -467,10 +479,6 @@ export default async function interactionCreate(interaction: Interaction) {
                 break;
             case ApplicationCommandOptionType.Integer:
                 args.push(arg.value.toString());
-                break;
-            case ApplicationCommandOptionType.Channel:
-                // @ts-expect-error will always error bc typescript doesnt know type has been validated
-                args.push(arg.value);
                 break;
             case ApplicationCommandOptionType.SubcommandGroup:
                 args.push(arg.name);
