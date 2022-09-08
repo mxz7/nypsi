@@ -1,11 +1,11 @@
 import {
     Collection,
     CommandInteraction,
+    GuildBasedChannel,
     GuildMember,
     Message,
     Role,
     SlashCommandBuilder,
-    TextBasedChannel,
     User,
 } from "discord.js";
 
@@ -89,7 +89,7 @@ export interface NypsiCommandInteraction extends CommandInteraction {
     mentions?: {
         members?: Collection<string, GuildMember>;
         roles?: Collection<string, Role>;
-        channels?: Collection<string, TextBasedChannel>;
+        channels?: Collection<string, GuildBasedChannel>;
     };
     member: GuildMember;
     interaction?: boolean;
