@@ -514,7 +514,7 @@ export async function runCommand(
                 .catch(() => {});
         } else {
             return message
-                .editReply({
+                .reply({
                     embeds: [
                         new ErrorEmbed(
                             "i don't have access to this channel. please contact server staff if this is an error"
@@ -720,7 +720,7 @@ export async function runCommand(
                         embeds: [new CustomEmbed(message.member, "nypsi is rebooting, try again in a few minutes")],
                     });
                 } else {
-                    return message.editReply({
+                    return message.reply({
                         embeds: [new CustomEmbed(message.member, "nypsi is rebooting, try again in a few minutes")],
                     });
                 }
@@ -776,7 +776,7 @@ export async function runCommand(
             if (message instanceof Message) {
                 return message.channel.send({ embeds: [new ErrorEmbed("wait until you've finished opening crates")] });
             } else {
-                return message.editReply({ embeds: [new ErrorEmbed("wait until you've finished opening crates")] });
+                return message.reply({ embeds: [new ErrorEmbed("wait until you've finished opening crates")] });
             }
         }
     }
@@ -785,7 +785,7 @@ export async function runCommand(
         if (message instanceof Message) {
             return message.channel.send({ embeds: [new ErrorEmbed("that command has been disabled")] });
         } else {
-            return message.editReply({ embeds: [new ErrorEmbed("that command has been disabled")] });
+            return message.reply({ embeds: [new ErrorEmbed("that command has been disabled")] });
         }
     }
 
