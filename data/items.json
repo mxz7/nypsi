@@ -775,7 +775,7 @@
         "name": "unbreaking",
         "emoji": "<a:nypsi_book:1001459250163359786>",
         "longDesc": "when mining, fishing or hunting it will not reduce durability",
-        "rarity": 1,
+        "rarity": 2,
         "buy": 0,
         "sell": 75000,
         "role": "booster",
