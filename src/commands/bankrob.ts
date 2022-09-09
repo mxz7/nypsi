@@ -275,7 +275,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embed.setDescription(await displayBankInfo("nypsi", bankWorths));
     } else {
         options[0].setDefault(true);
-        embed.setDescription(await displayBankInfo(bankNames[0], bankWorths));
+        embed.setDescription(await displayBankInfo(options[0].data.value, bankWorths));
     }
 
     if (options.length == 0) {
