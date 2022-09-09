@@ -86,9 +86,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         const embed = new CustomEmbed(message.member).setHeader("nypsi bank", target.user.avatarURL());
 
         embed.setDescription(
-            `**current balance** $${(await getNypsiBankBalance()).toLocaleString()}\n**current tax rate** ${
+            `**current balance** $${(await getNypsiBankBalance()).toLocaleString()}\n**current tax rate** ${(
                 (await getTax()) * 100
-            }%\n\ntax updates <t:${await getTaxRefreshTime()}:R>`
+            ).toFixed(1)}%\n\ntax updates <t:${await getTaxRefreshTime()}:R>`
         );
 
         return send({ embeds: [embed] });

@@ -164,7 +164,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (tax > 0) {
         embed.setDescription(
-            message.member.user.toString() + " -> " + target.user.toString() + "\n**" + tax * 100 + "**% tax"
+            message.member.user.toString() + " -> " + target.user.toString() + "\n**" + (tax * 100).toFixed(1) + "**% tax"
         );
         embed.addField(
             target.user.tag,
@@ -206,7 +206,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     "**)"
             );
             embed.setDescription(
-                message.member.user.toString() + " -> " + target.user.toString() + "\n**" + tax * 100 + "**% tax"
+                message.member.user.toString() +
+                    " -> " +
+                    target.user.toString() +
+                    "\n**" +
+                    (tax * 100).toFixed(1) +
+                    "**% tax"
             );
         } else {
             embed.addField(
