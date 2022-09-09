@@ -180,7 +180,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         const embed = new CustomEmbed(message.member).setHeader("bank robbery", message.author.avatarURL());
 
-        if (chance > 65) {
+        if (chance > 70) {
             const minStolen = Math.floor(steal * 0.5);
 
             const stolen = Math.floor(Math.random() * (steal - minStolen)) + minStolen;
