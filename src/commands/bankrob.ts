@@ -186,8 +186,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             const stolen = Math.floor(Math.random() * (steal - minStolen)) + minStolen;
 
             await Promise.all([
-                await updateBalance(message.member, (await getBalance(message.member)) + stolen),
-                await addProgress(message.author.id, "robber", 1),
+                updateBalance(message.member, (await getBalance(message.member)) + stolen),
+                addProgress(message.author.id, "robber", 1),
             ]);
 
             if (bank == "nypsi") {
