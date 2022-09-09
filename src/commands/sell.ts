@@ -10,6 +10,7 @@ import {
     updateBalance,
     userExists,
 } from "../utils/economy/utils";
+import { getTax } from "../utils/functions/tax";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
@@ -132,16 +133,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (selected.role == "fish" || selected.role == "prey" || selected.role == "sellable") {
         sellWorth = Math.floor(sellWorth + sellWorth * multi);
-    } else if (selected.id == "ethereum" || selected.id == "bitcoin") {
-        if (!selected.sell) {
-            return send({
-                embeds: [new ErrorEmbed(`you cannot currently sell ${selected.name}`)],
-            });
-        }
-        sellWorth = Math.floor(selected.sell * 0.95 * amount);
     } else if (!selected.sell) {
         sellWorth = 1000 * amount;
     }
+
+    const taxedAmount = Math.floor(sellWorth * (await getTax()));
+
+    sellWorth = sellWorth - taxedAmount;
 
     await updateBalance(message.member, (await getBalance(message.member)) + sellWorth);
 
@@ -151,11 +149,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         `you sold **${amount}** ${selected.emoji} ${selected.name} for $${sellWorth.toLocaleString()} ${
             multi > 0 && (selected.role == "fish" || selected.role == "prey" || selected.role == "sellable")
                 ? `(+**${Math.floor(multi * 100).toString()}**% bonus)`
-                : selected.id == "bitcoin" || selected.id == "ethereum"
-                ? "(-**5**% fee)"
                 : ""
         }`
     );
+    embed.setFooter({ text: `${((await getTax()) * 100).toFixed(1)}% tax` });
 
     return send({ embeds: [embed] });
 }
