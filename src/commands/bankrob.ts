@@ -31,12 +31,12 @@ import ms = require("ms");
 const cmd = new Command("bankrob", "attempt to rob a bank for a high reward", Categories.MONEY);
 
 const defaults = new Map<string, number>([
-    ["bank of america", 10_000_000],
-    ["maze bank", 5_000_000],
-    ["barclays", 2_500_000],
-    ["lloyds", 1_250_000],
-    ["monzo", 1_000_000],
-    ["fleeca", 750_000],
+    ["bank of america", 75_000_000],
+    ["maze bank", 50_000_000],
+    ["barclays", 15_000_000],
+    ["lloyds", 5_000_000],
+    ["monzo", 2_500_000],
+    ["fleeca", 1_000_000],
 ]);
 
 const requirements = new Map<string, number>([
@@ -222,11 +222,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             await updateBalance(message.member, (await getBalance(message.member)) - totalLossed);
 
-            if (bank == "nypsi") {
-                await addToNypsiBank(totalLossed);
-            } else {
-                bankWorth.set(bank, Math.floor(bankWorth.get(bank) + totalLossed * 0.75));
-            }
+            await addToNypsiBank(totalLossed);
 
             embed.setColor("#e4334f");
 
