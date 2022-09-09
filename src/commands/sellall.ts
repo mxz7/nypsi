@@ -10,6 +10,7 @@ import {
     updateBalance,
     userExists,
 } from "../utils/economy/utils";
+import { addToNypsiBank, getTax } from "../utils/functions/tax";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
@@ -66,7 +67,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const multi = await getMulti(message.member);
 
     let total = 0;
+    let taxedAmount = 0;
     let earned = "";
+
+    const tax = await getTax();
 
     for (const item of selected.keys()) {
         delete inventory[item];
@@ -77,17 +81,23 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             sellWorth = Math.floor(sellWorth + sellWorth * multi);
         }
 
+        taxedAmount += Math.floor(sellWorth * tax);
+        sellWorth = sellWorth - Math.floor(sellWorth * tax);
         total += sellWorth;
+
         earned += `\n${items[item].emoji} ${items[item].name} +$${sellWorth.toLocaleString()} (${selected.get(item)})`;
     }
 
     await setInventory(message.member, inventory);
+
+    await addToNypsiBank(taxedAmount);
 
     await updateBalance(message.member, (await getBalance(message.member)) + total);
 
     const embed = new CustomEmbed(message.member);
 
     embed.setDescription(`+$**${total.toLocaleString()}**\n${earned}`);
+    embed.setFooter({ text: `${((await getTax()) * 100).toFixed(1)}% tax` });
 
     return send({ embeds: [embed] });
 }
