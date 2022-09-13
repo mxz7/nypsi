@@ -464,17 +464,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         const embed = new CustomEmbed(message.member);
 
-        const gambleOverall = gambleTotal._sum.win + gambleTotal._sum.lose;
-        const gambleWinPercent = ((gambleTotal._sum.win / gambleOverall) * 100).toFixed(2);
+        const gambleOverall = Number(gambleTotal._sum.win) + Number(gambleTotal._sum.lose);
+        const gambleWinPercent = ((Number(gambleTotal._sum.win) / gambleOverall) * 100).toFixed(2);
 
         const gambleMsg = [
             `**total** ${gambleTotal._sum.win.toLocaleString()} / ${gambleOverall.toLocaleString()} (${gambleWinPercent}%)`,
         ];
 
         for (const gamble of byTypeGamble) {
-            const total = gamble._sum.win + gamble._sum.lose;
+            const total = Number(gamble._sum.win) + Number(gamble._sum.lose);
 
-            const percent = ((gamble._sum.win / total) * 100).toFixed(2);
+            const percent = ((Number(gamble._sum.win) / total) * 100).toFixed(2);
 
             gambleMsg.push(
                 ` - **${gamble.type}** ${gamble._sum.win.toLocaleString()} / ${total.toLocaleString()} (${percent}%)`
@@ -488,7 +488,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         for (const item of byItem) {
             if (itemMsg.length >= gambleMsg.length) break;
 
-            const percent = ((item._sum.win / itemTotal._sum.win) * 100).toFixed(2);
+            const percent = ((Number(item._sum.win) / Number(itemTotal._sum.win)) * 100).toFixed(2);
 
             itemMsg.push(` - **${item.type}** ${item._sum.win.toLocaleString()} (${percent}%)`);
         }
@@ -496,7 +496,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embed.addField("item stats", itemMsg.join("\n"), true);
 
         const robTotal = robStats._sum.win + robStats._sum.lose;
-        const robPercent = ((robStats._sum.win / robTotal) * 100).toFixed(2);
+        const robPercent = ((Number(robStats._sum.win) / Number(robTotal)) * 100).toFixed(2);
 
         embed.setFooter({
             text: `rob: ${robStats._sum.win.toLocaleString()} / ${robTotal.toLocaleString()} (${robPercent}%)`,
