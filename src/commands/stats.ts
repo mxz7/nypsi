@@ -364,7 +364,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         const embed = new CustomEmbed(message.member).setHeader("bank robbery stats", message.author.avatarURL());
 
         embed.setDescription(
-            `**total won** $${query.win.toLocaleString()}\n**total lost** $${query.lose.toLocaleString()}\n\n**total** $${(
+            `**won** $${query.win.toLocaleString()}\n**lost** $${query.lose.toLocaleString()}\n\n**total** $${(
                 query.win - query.lose
             ).toLocaleString()}`
         );
