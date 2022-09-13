@@ -19,7 +19,7 @@ import { getStats } from "../utils/economy/utils";
 import { MStoTime } from "../utils/functions/date";
 import { getCommandUses } from "../utils/karma/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed } from "../utils/models/EmbedBuilders";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 // @ts-expect-error typescript doesnt like opening package.json
 import { version } from "../../package.json";
 import { workerCount } from "../events/message";
@@ -90,6 +90,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         ];
 
         for (const g of Object.keys(stats.gamble)) {
+            if (g == "bankrob") continue;
             const percent = ((stats.gamble[g].wins / (stats.gamble[g].lose + stats.gamble[g].wins)) * 100).toFixed(1);
             gambleMsg.push(
                 `- **${g}** ${stats.gamble[g].wins.toLocaleString()} / ${(
@@ -341,6 +342,35 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [embed] });
     };
 
+    const bankrobStats = async () => {
+        const query = await prisma.economyStats.findUnique({
+            where: {
+                type_economyUserId: {
+                    economyUserId: message.author.id,
+                    type: "bankrob",
+                },
+            },
+            select: {
+                lose: true,
+                win: true,
+            },
+        });
+
+        if (!query) {
+            return send({ embeds: [new ErrorEmbed("no data")] });
+        }
+
+        const embed = new CustomEmbed(message.member).setHeader("bank robbery stats", message.author.avatarURL());
+
+        embed.setDescription(
+            `**total won** $${query.win.toLocaleString()}\n**total lost** $${query.lose.toLocaleString()}\n\n**total** $${(
+                query.win - query.lose
+            ).toLocaleString()}`
+        );
+
+        return send({ embeds: [embed] });
+    };
+
     if (args.length == 0) {
         return normalStats();
     } else if (args[0].toLowerCase() == "global" && message.author.id == "672793821850894347") {
@@ -434,17 +464,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         const embed = new CustomEmbed(message.member);
 
-        const gambleOverall = gambleTotal._sum.win + gambleTotal._sum.lose;
-        const gambleWinPercent = ((gambleTotal._sum.win / gambleOverall) * 100).toFixed(2);
+        const gambleOverall = Number(gambleTotal._sum.win) + Number(gambleTotal._sum.lose);
+        const gambleWinPercent = ((Number(gambleTotal._sum.win) / gambleOverall) * 100).toFixed(2);
 
         const gambleMsg = [
             `**total** ${gambleTotal._sum.win.toLocaleString()} / ${gambleOverall.toLocaleString()} (${gambleWinPercent}%)`,
         ];
 
         for (const gamble of byTypeGamble) {
-            const total = gamble._sum.win + gamble._sum.lose;
+            const total = Number(gamble._sum.win) + Number(gamble._sum.lose);
 
-            const percent = ((gamble._sum.win / total) * 100).toFixed(2);
+            const percent = ((Number(gamble._sum.win) / total) * 100).toFixed(2);
 
             gambleMsg.push(
                 ` - **${gamble.type}** ${gamble._sum.win.toLocaleString()} / ${total.toLocaleString()} (${percent}%)`
@@ -458,7 +488,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         for (const item of byItem) {
             if (itemMsg.length >= gambleMsg.length) break;
 
-            const percent = ((item._sum.win / itemTotal._sum.win) * 100).toFixed(2);
+            const percent = ((Number(item._sum.win) / Number(itemTotal._sum.win)) * 100).toFixed(2);
 
             itemMsg.push(` - **${item.type}** ${item._sum.win.toLocaleString()} (${percent}%)`);
         }
@@ -466,7 +496,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embed.addField("item stats", itemMsg.join("\n"), true);
 
         const robTotal = robStats._sum.win + robStats._sum.lose;
-        const robPercent = ((robStats._sum.win / robTotal) * 100).toFixed(2);
+        const robPercent = ((Number(robStats._sum.win) / Number(robTotal)) * 100).toFixed(2);
 
         embed.setFooter({
             text: `rob: ${robStats._sum.win.toLocaleString()} / ${robTotal.toLocaleString()} (${robPercent}%)`,
@@ -484,6 +514,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return commandStats();
     } else if (args[0].toLowerCase().includes("bot") || args[0].toLowerCase().includes("nypsi")) {
         return botStats();
+    } else if (args[0].toLowerCase() == "bankrob") {
+        return bankrobStats();
     } else {
         return normalStats();
     }

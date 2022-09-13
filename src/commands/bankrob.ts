@@ -13,6 +13,7 @@ import {
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { addCooldown, getRemaining, getResponse, onCooldown } from "../utils/cooldownhandler.js";
+import prisma from "../utils/database/database.js";
 import { addProgress } from "../utils/economy/achievements.js";
 import {
     createUser,
@@ -196,6 +197,24 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 bankWorth.set(bank, Math.floor(bankWorth.get(bank) - stolen));
             }
 
+            await prisma.economyStats.upsert({
+                create: {
+                    economyUserId: message.author.id,
+                    gamble: true,
+                    type: "bankrob",
+                    win: stolen,
+                },
+                where: {
+                    type_economyUserId: {
+                        economyUserId: message.author.id,
+                        type: "bankrob",
+                    },
+                },
+                update: {
+                    win: { increment: stolen },
+                },
+            });
+
             const embed = new CustomEmbed(message.member)
                 .setColor("#5efb8f")
                 .setDescription(`**success!**\n\n**you stole** $${stolen.toLocaleString()} from **${bank}**`);
@@ -225,6 +244,24 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             await addToNypsiBank(totalLossed);
 
             embed.setColor("#e4334f");
+
+            await prisma.economyStats.upsert({
+                create: {
+                    economyUserId: message.author.id,
+                    gamble: true,
+                    type: "bankrob",
+                    lose: totalLossed,
+                },
+                where: {
+                    type_economyUserId: {
+                        economyUserId: message.author.id,
+                        type: "bankrob",
+                    },
+                },
+                update: {
+                    lose: { increment: totalLossed },
+                },
+            });
 
             if (lawyer) {
                 embed.setDescription(

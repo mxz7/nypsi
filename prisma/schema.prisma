@@ -89,8 +89,8 @@ model Booster {
 
 model EconomyStats {
   type   String
-  win    Int     @default(0)
-  lose   Int     @default(0)
+  win    BigInt  @default(0)
+  lose   BigInt  @default(0)
   gamble Boolean
 
   economy       Economy @relation(fields: [economyUserId], references: [userId], onDelete: Cascade)
