@@ -19,7 +19,7 @@ import { getStats } from "../utils/economy/utils";
 import { MStoTime } from "../utils/functions/date";
 import { getCommandUses } from "../utils/karma/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed } from "../utils/models/EmbedBuilders";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 // @ts-expect-error typescript doesnt like opening package.json
 import { version } from "../../package.json";
 import { workerCount } from "../events/message";
@@ -90,6 +90,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         ];
 
         for (const g of Object.keys(stats.gamble)) {
+            if (g == "bankrob") continue;
             const percent = ((stats.gamble[g].wins / (stats.gamble[g].lose + stats.gamble[g].wins)) * 100).toFixed(1);
             gambleMsg.push(
                 `- **${g}** ${stats.gamble[g].wins.toLocaleString()} / ${(
@@ -341,6 +342,35 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [embed] });
     };
 
+    const bankrobStats = async () => {
+        const query = await prisma.economyStats.findUnique({
+            where: {
+                type_economyUserId: {
+                    economyUserId: message.author.id,
+                    type: "bankrob",
+                },
+            },
+            select: {
+                lose: true,
+                win: true,
+            },
+        });
+
+        if (!query) {
+            return send({ embeds: [new ErrorEmbed("no data")] });
+        }
+
+        const embed = new CustomEmbed(message.member).setHeader("bank robbery stats", message.author.avatarURL());
+
+        embed.setDescription(
+            `**total won** $${query.win.toLocaleString()}\n**total lost** $${query.lose.toLocaleString()}\n\n**total** $${(
+                query.win - query.lose
+            ).toLocaleString()}`
+        );
+
+        return send({ embeds: [embed] });
+    };
+
     if (args.length == 0) {
         return normalStats();
     } else if (args[0].toLowerCase() == "global" && message.author.id == "672793821850894347") {
@@ -484,6 +514,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return commandStats();
     } else if (args[0].toLowerCase().includes("bot") || args[0].toLowerCase().includes("nypsi")) {
         return botStats();
+    } else if (args[0].toLowerCase() == "bankrob") {
+        return bankrobStats();
     } else {
         return normalStats();
     }
