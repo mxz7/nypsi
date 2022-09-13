@@ -1,7 +1,6 @@
 import { ColorResolvable, Guild, GuildMember, Role, User, WebhookClient } from "discord.js";
 import prisma from "../database/database";
 import redis from "../database/redis";
-import { logger } from "../logger";
 import { NypsiClient } from "../models/Client";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { LogType, PunishmentType } from "../models/GuildStorage";
@@ -505,7 +504,7 @@ export async function setMuteRole(guild: Guild, role: Role | string) {
 }
 
 export async function requestUnban(guildId: string, member: string, client: NypsiClient) {
-    const res = await client.cluster.broadcastEval(
+    await client.cluster.broadcastEval(
         async (c, { guildId, memberId }) => {
             const guild = await c.guilds.fetch(guildId).catch(() => {});
 
@@ -521,11 +520,7 @@ export async function requestUnban(guildId: string, member: string, client: Nyps
         { context: { guildId: guildId, memberId: member } }
     );
 
-    if (res.includes(true)) {
-        await deleteBan(guildId, member);
-    } else {
-        logger.warn(`failed to unban ${res.join(", ")}`);
-    }
+    await deleteBan(guildId, member);
 }
 
 export async function requestUnmute(guildId: string, member: string, client: NypsiClient) {
