@@ -79,6 +79,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         let gambleWinTotal = 0;
 
         for (const g of Object.keys(stats.gamble)) {
+            if (g == "bankrob") continue;
             gambleTotal += stats.gamble[g].wins + stats.gamble[g].lose;
             gambleWinTotal += stats.gamble[g].wins;
         }
