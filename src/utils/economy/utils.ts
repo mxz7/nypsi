@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import {
     ActionRowBuilder,
     ButtonBuilder,
@@ -1336,56 +1337,43 @@ export async function addGamble(member: GuildMember, game: string, win: boolean)
         id = member;
     }
 
-    const query = await prisma.economyStats.findFirst({
-        where: {
-            AND: [{ economyUserId: id }, { type: game }],
-        },
-        select: {
-            economyUserId: true,
-        },
-    });
+    let updateData: Prisma.Without<Prisma.EconomyStatsUpdateInput, Prisma.EconomyStatsUncheckedUpdateInput> &
+        Prisma.EconomyStatsUncheckedUpdateInput;
+    let createData: Prisma.Without<Prisma.EconomyStatsCreateInput, Prisma.EconomyStatsUncheckedCreateInput> &
+        Prisma.EconomyStatsUncheckedCreateInput;
 
-    if (query) {
-        if (win) {
-            await prisma.economyStats.updateMany({
-                where: {
-                    AND: [{ economyUserId: id }, { type: game }],
-                },
-                data: {
-                    win: { increment: 1 },
-                },
-            });
-        } else {
-            await prisma.economyStats.updateMany({
-                where: {
-                    AND: [{ economyUserId: id }, { type: game }],
-                },
-                data: {
-                    lose: { increment: 1 },
-                },
-            });
-        }
+    if (win) {
+        updateData = {
+            win: { increment: 1 },
+        };
+        createData = {
+            economyUserId: id,
+            gamble: true,
+            type: game,
+            win: 1,
+        };
     } else {
-        if (win) {
-            await prisma.economyStats.create({
-                data: {
-                    economyUserId: id,
-                    type: game,
-                    win: 1,
-                    gamble: true,
-                },
-            });
-        } else {
-            await prisma.economyStats.create({
-                data: {
-                    economyUserId: id,
-                    type: game,
-                    lose: 1,
-                    gamble: true,
-                },
-            });
-        }
+        updateData = {
+            lose: { increment: 1 },
+        };
+        createData = {
+            economyUserId: id,
+            gamble: true,
+            type: game,
+            lose: 1,
+        };
     }
+
+    await prisma.economyStats.upsert({
+        where: {
+            type_economyUserId: {
+                type: game,
+                economyUserId: id,
+            },
+        },
+        update: updateData,
+        create: createData,
+    });
 
     await addProgress(id, "gambler", 1);
 }
