@@ -257,6 +257,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         const queue = await getAllSuggestions();
 
+        if (!queue) return send({ embeds: [new CustomEmbed(message.member, "no items in queue")] });
+
         const pages = new Map<number, WholesomeSuggestion[]>();
 
         if (queue.length > 6) {
