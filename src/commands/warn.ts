@@ -99,6 +99,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const error: User[] = [];
 
     for (const member of members.keys()) {
+        if (members.get(member).user.id == message.client.user.id) {
+            await send({ content: "wow... 😢" });
+            continue;
+        }
+
         const targetHighestRole = members.get(member).roles.highest;
         const memberHighestRole = message.member.roles.highest;
 
@@ -116,10 +121,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     error.push(members.get(member).user);
                 });
             count++;
-        }
-
-        if (members.get(member).user.id == message.client.user.id) {
-            await send({ content: "wow... 😢" });
         }
     }
 
