@@ -53,7 +53,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             embeds: [
                 new CustomEmbed(
                     message.member,
-                    "sell items from your inventory\n\ncoins have a set fee of **5**% per coin, while standard items have a **50**% fee"
+                    "sell items from your inventory\n\nyou will have to pay tax on your sold items"
                 ),
             ],
         });
