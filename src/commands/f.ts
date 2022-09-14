@@ -51,7 +51,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     collector.on("collect", async (i): Promise<any> => {
         if (i.customId == customId) {
             await i.deferUpdate();
-            if (reactions.includes(i.user.id) || i.deferred) {
+            if (reactions.includes(i.user.id)) {
                 return await i
                     .followUp({ embeds: [new ErrorEmbed("you can only do this once")], ephemeral: true })
                     .catch(() => {});
