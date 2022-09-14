@@ -416,7 +416,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         if (selected.id == "bronze" || selected.id == "silver" || selected.id == "gold") {
             setTimeout(async () => {
-                await setExpireDate(message.member, dayjs().add(15, "days").toDate(), message.client as NypsiClient);
+                await setExpireDate(message.member, dayjs().add(7, "days").toDate(), message.client as NypsiClient);
             }, 1000);
         }
 
