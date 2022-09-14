@@ -22,7 +22,7 @@ async function updateTax() {
     const tax = parseFloat((Math.random() * 5 + 5).toFixed(3)) / 100;
 
     await redis.set("nypsi:tax", tax.toFixed(3));
-    await redis.expire("nypsi:tax", Math.floor(ms("12 hours") / 1000));
+    await redis.expire("nypsi:tax", Math.floor(ms("6 hours") / 1000));
 
     return tax;
 }
