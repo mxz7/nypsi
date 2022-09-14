@@ -142,7 +142,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             await send({ embeds: [embed] });
 
-            const channel = key.guild.channels.cache.find((ch) => ch.id == key.channel);
+            const channel = await key.guild.channels.fetch(key.channel);
 
             if (!channel.isTextBased()) return;
 
