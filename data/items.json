@@ -413,19 +413,33 @@
         "emoji": "🍪",
         "longDesc": "yum yum",
         "rarity": 0,
-        "role": "sellable",
+        "role": "booster",
         "buy": 0,
-        "sell": 2500
+        "sell": 2500,
+        "stackable": true,
+        "max": 7,
+        "boosterEffect": {
+            "boosts": ["multi"],
+            "effect": 1,
+            "time": 30
+        }
     },
     "cake": {
         "id": "cake",
         "name": "cake",
         "emoji": "<:nypsi_cake:1002977512630001725>",
         "longDesc": "yum yum 😋",
-        "rarity": 3,
-        "role": "sellable",
+        "rarity": 2,
+        "role": "booster",
         "buy": 0,
-        "sell": 50000
+        "sell": 50000,
+        "stackable": true,
+        "max": 3,
+        "boosterEffect": {
+            "boosts": ["xp"],
+            "effect": 0.2,
+            "time": 300
+        }
     },
     "potato": {
         "id": "potato",
