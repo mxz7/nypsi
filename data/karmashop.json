@@ -2,25 +2,25 @@
     "bronze": {
         "name": "bronze membership",
         "emoji": "<:xbronze:820243846461128736>",
-        "description": "access to nypsi's bronze tier for 15 days",
+        "description": "access to nypsi's bronze tier for 7 days",
         "id": "bronze",
         "cost": 200,
         "unlimited": false,
-        "items_left": 3
+        "items_left": 1
     },
     "silver": {
         "name": "silver membership",
         "emoji": "<:xsilver:820243846507003924>",
-        "description": "access to nypsi's silver tier for 15 days",
+        "description": "access to nypsi's silver tier for 7 days",
         "id": "silver",
         "cost": 350,
         "unlimited": false,
-        "items_left": 2
+        "items_left": 1
     },
     "gold": {
         "name": "gold membership",
         "emoji": "<:xgold:820243845950341122>",
-        "description": "access to nypsi's gold tier for 15 days",
+        "description": "access to nypsi's gold tier for 7 days",
         "id": "gold",
         "cost": 500,
         "unlimited": false,
@@ -31,7 +31,7 @@
         "emoji": "🌟",
         "description": "100 xp will be added to your economy profile",
         "id": "100xp",
-        "cost": 30,
+        "cost": 20,
         "unlimited": false,
         "items_left": 30
     },
@@ -40,7 +40,7 @@
         "emoji": "🌟",
         "description": "1000 xp will be added to your economy profile",
         "id": "1000xp",
-        "cost": 250,
+        "cost": 150,
         "unlimited": false,
         "items_left": 15
     },
