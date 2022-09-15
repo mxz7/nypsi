@@ -67,7 +67,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         embed.setHeader("wordle help");
         embed.setDescription(
-            `you have 6 attempts to guess the word\n\ngreen letters indicate that the letter is in the correct spot\nyellow letters indicate that the letter is in the word, but in the wrong spot\ngrey letters arent in the word at all\n\n**${prefix}wordle play**`
+            `you have 6 attempts to guess the word\n\ngreen letters indicate that the letter is in the correct spot\nyellow letters indicate that the letter is in the word, but in the wrong spot\ngrey letters arent in the word at all\n\n[wordlist](https://github.com/tekoh/nypsi/blob/main/data/wordle.txt)\n**${prefix}wordle play**`
         );
         embed.setFooter({ text: "type 'stop' to cancel the game when you're playing" });
 
