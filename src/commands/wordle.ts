@@ -497,7 +497,5 @@ module.exports = cmd;
 async function getWord() {
     if (!wordList) wordList = await fs.readFile("./data/wordle.txt").then((res) => res.toString().split("\n"));
 
-    console.log(wordList);
-
     return wordList[Math.floor(Math.random() * wordList.length)];
 }
