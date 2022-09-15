@@ -9,6 +9,8 @@ import { logger } from "../../logger";
 import { LotteryTicket } from "../../models/Economy";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 import shuffleArray = require("shuffle-array");
+import dayjs = require("dayjs");
+import ms = require("ms");
 
 async function doLottery(client: Client) {
     await redis.del("lotterytickets:queue");
@@ -101,18 +103,15 @@ async function doLottery(client: Client) {
 }
 
 export function runLotteryInterval(client: Client) {
-    const now = new Date();
-    const saturday = new Date();
-    saturday.setDate(now.getDate() + ((6 - 1 - now.getDay() + 7) % 7) + 1);
-    saturday.setHours(0, 0, 0, 0);
+    const next = dayjs().add(1, "day").startOf("day").toDate();
 
-    const needed = saturday.getTime() - now.getTime();
+    const needed = next.getTime() - Date.now();
 
     setTimeout(() => {
         doLottery(client);
         setInterval(() => {
             doLottery(client);
-        }, 86400 * 1000 * 7);
+        }, ms("1 day"));
     }, needed);
 
     logger.log({
