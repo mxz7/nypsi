@@ -372,7 +372,7 @@ function guessWord(word: string, id: string): Response {
     const board = game.board;
     const notInWord = game.notInWord;
 
-    const copy = (" " + game.word).slice(1).split("");
+    const counts = new Map<string, number>();
 
     for (let i = 0; i < 5; i++) {
         const letter = word[i];
@@ -381,22 +381,35 @@ function guessWord(word: string, id: string): Response {
         let emoji: string;
 
         if (letter == actualLetter) {
-            copy[i] = "";
             emoji = emojis.get(`green-${letter}`);
+            counts.set(letter, (counts.get(letter) || 0) + 1);
+        }
+
+        board[game.guesses.length][i] = emoji;
+    }
+
+    for (let i = 0; i < 5; i++) {
+        const letter = word[i];
+        const actualLetter = game.word[i];
+        const letterCount = (game.word.match(new RegExp(letter, "g")) || []).length;
+
+        let emoji: string;
+
+        if (letter == actualLetter) {
+            // do nothing
         } else if (game.word.includes(letter)) {
-            const index = copy.indexOf(letter);
-            if (index == -1) {
+            if ((counts.get(letter) || 0) >= letterCount) {
                 emoji = emojis.get(`grey-${letter}`);
             } else {
                 emoji = emojis.get(`yellow-${letter}`);
-                copy[index] = "";
+                counts.set(letter, (counts.get(letter) || 0) + 1);
             }
         } else {
             if (!notInWord.includes(letter)) notInWord.push(letter);
             emoji = emojis.get(`grey-${letter}`);
         }
 
-        board[game.guesses.length][i] = emoji;
+        if (emoji) board[game.guesses.length][i] = emoji;
     }
 
     if (word == game.word) {
