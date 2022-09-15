@@ -1,5 +1,5 @@
 import { CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions, MessageOptions } from "discord.js";
-import fetch from "node-fetch";
+import * as fs from "fs/promises";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { MStoTime } from "../utils/functions/date";
 import { getPrefix } from "../utils/guilds/utils";
@@ -124,7 +124,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     await addCooldown(cmd.name, message.member, 75);
 
     const board = createBoard();
-    const word = getWord();
+    const word = await getWord();
 
     const embed = new CustomEmbed(message.member);
 
@@ -494,19 +494,10 @@ cmd.setRun(run);
 
 module.exports = cmd;
 
-function getWord(): string {
+async function getWord() {
+    if (!wordList) wordList = await fs.readFile("./data/wordle.txt").then((res) => res.toString().split("\n"));
+
+    console.log(wordList);
+
     return wordList[Math.floor(Math.random() * wordList.length)];
 }
-
-// prettier-ignore
-(async () => {
-    const res = await fetch(
-        "https://gist.githubusercontent.com/cfreshman/a7b776506c73284511034e63af1017ee/raw/845966807347a7b857d53294525263408be967ce/wordle-nyt-answers-alphabetical.txt"
-    );
-
-    const body = await res.text();
-
-    const words = body.split("\n");
-
-    wordList = words;
-})();
