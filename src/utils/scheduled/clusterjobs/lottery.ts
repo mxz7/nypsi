@@ -1,5 +1,6 @@
 import { Client, User, WebhookClient } from "discord.js";
 import prisma from "../../database/database";
+import redis from "../../database/redis";
 import { addProgress } from "../../economy/achievements";
 import { getBalance, getDMsEnabled, lotteryTicketPrice, updateBalance } from "../../economy/utils";
 import { MStoTime } from "../../functions/date";
@@ -10,6 +11,7 @@ import { CustomEmbed } from "../../models/EmbedBuilders";
 import shuffleArray = require("shuffle-array");
 
 async function doLottery(client: Client) {
+    await redis.del("lotterytickets:queue");
     logger.info("performing lottery..");
 
     const hook = new WebhookClient({ url: process.env.LOTTERY_HOOK });
