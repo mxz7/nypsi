@@ -1626,7 +1626,6 @@ sally
 salon
 salsa
 salty
-salve
 salvo
 sandy
 saner
@@ -1764,6 +1763,7 @@ slang
 slant
 slash
 slate
+slave
 sleek
 sleep
 sleet
