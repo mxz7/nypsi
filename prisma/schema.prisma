@@ -74,8 +74,16 @@ model Economy {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String @id
 
-  Boosters     Booster[]
-  EconomyStats EconomyStats[]
+  Boosters      Booster[]
+  EconomyStats  EconomyStats[]
+  LotteryTicket LotteryTicket[]
+}
+
+model LotteryTicket {
+  id     Int    @id @default(autoincrement())
+  userId String
+
+  economy Economy @relation(fields: [userId], references: [userId], onDelete: Cascade)
 }
 
 model Booster {
@@ -107,8 +115,18 @@ model Premium {
   startDate  DateTime
   expireDate DateTime
 
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String @id
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId         String          @id
+  PremiumCommand PremiumCommand?
+}
+
+model PremiumCommand {
+  owner   String @id
+  trigger String @unique
+  content String
+  uses    Int    @default(0)
+
+  premium Premium @relation(fields: [owner], references: [userId], onDelete: Cascade)
 }
 
 model Username {
@@ -345,18 +363,6 @@ model WholesomeSuggestion {
 }
 
 // tables with no relation for easiness
-
-model LotteryTicket {
-  id     Int    @id @default(autoincrement())
-  userId String
-}
-
-model PremiumCommand {
-  owner   String @id
-  trigger String @unique
-  content String
-  uses    Int    @default(0)
-}
 
 model Mention {
   guildId  String
