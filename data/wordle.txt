@@ -80,8 +80,6 @@ aping
 apnea
 apple
 apply
-apr ave *
-apr bre *
 apron
 aptly
 arbor
@@ -130,9 +128,6 @@ badly
 bagel
 baggy
 baker
-baler
-balmy
-banal
 banjo
 barge
 baron
@@ -141,44 +136,30 @@ basic
 basil
 basin
 basis
-baste
 batch
 bathe
 baton
-batty
-bawdy
-bayou
 beach
 beady
 beard
 beast
-beech
 beefy
-befit
 began
-begat
-beget
 begin
 begun
 being
 belch
-belie
 belle
 belly
 below
 bench
-beret
 berry
 berth
-beset
-betel
 bevel
 bezel
 bible
 bicep
-biddy
 bigot
-bilge
 billy
 binge
 bingo
@@ -186,6 +167,7 @@ biome
 birch
 birth
 bison
+bitch
 bitty
 black
 blade
@@ -213,7 +195,6 @@ blond
 blood
 bloom
 blown
-bluer
 bluff
 blunt
 blurb
@@ -222,7 +203,7 @@ blush
 board
 boast
 bobby
-boney
+boner
 bongo
 bonus
 booby
@@ -230,14 +211,10 @@ boost
 booth
 booty
 booze
-boozy
-borax
 borne
 bosom
 bossy
 botch
-bough
-boule
 bound
 bowel
 boxer
@@ -251,25 +228,18 @@ brass
 brave
 bravo
 brawl
-brawn
 bread
 break
 breed
-briar
 bribe
 brick
 bride
 brief
-brine
 bring
 brink
-briny
 brisk
 broad
-broil
 broke
-brood
-brook
 broom
 broth
 brown
@@ -279,7 +249,6 @@ brute
 buddy
 budge
 buggy
-bugle
 build
 built
 bulge
@@ -287,21 +256,16 @@ bulky
 bully
 bunch
 bunny
-burly
 burnt
 burst
-bused
 bushy
 butch
 butte
-buxom
 buyer
-bylaw
 cabal
 cabby
 cabin
 cable
-cacao
 cache
 cacti
 caddy
@@ -457,7 +421,6 @@ crick
 cried
 crier
 crime
-crimp
 crisp
 croak
 crock
@@ -465,7 +428,6 @@ crone
 crony
 crook
 cross
-croup
 crowd
 crown
 crude
@@ -499,7 +461,6 @@ debar
 debit
 debug
 debut
-dec epost
 decal
 decay
 decor
@@ -683,8 +644,6 @@ fault
 fauna
 favor
 feast
-feb ora *
-feb pal *
 fecal
 feign
 fella
@@ -1038,7 +997,6 @@ joust
 judge
 juice
 juicy
-jul nch *
 jumbo
 jumpy
 junta
@@ -1174,8 +1132,6 @@ manic
 manly
 manor
 maple
-mar nch *
-march
 marry
 marsh
 mason
@@ -2001,6 +1957,7 @@ teary
 tease
 teddy
 teeth
+tekoh
 tempo
 tenet
 tenor
