@@ -1,3 +1,4 @@
+import dayjs = require("dayjs");
 import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import {
@@ -64,7 +65,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         embed.setHeader("lottery", message.author.avatarURL());
         embed.setDescription(
-            "nypsi lottery is a weekly draw which happens in the [official nypsi server](https://discord.gg/hJTDNST) every saturday at 12am (utc)\n\n" +
+            `nypsi lottery is a daily draw which happens in the [official nypsi server](https://discord.gg/hJTDNST)\nnext draw <t:${dayjs()
+                .add(1, "day")
+                .startOf("day")
+                .unix()}:R>\n\n` +
                 `you can buy lottery tickets for $**${lotteryTicketPrice.toLocaleString()}** with ${await getPrefix(
                     message.guild
                 )}**lotto buy**\nyou can have a maximum of **${max}** tickets`
