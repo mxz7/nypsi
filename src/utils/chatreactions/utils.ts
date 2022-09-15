@@ -1,6 +1,6 @@
 import { ChannelType, Collection, Guild, GuildMember, Message, TextChannel } from "discord.js";
 import { inPlaceSort } from "fast-sort";
-import fetch from "node-fetch";
+import * as fs from "fs/promises";
 import prisma from "../database/database";
 import { addCooldown, inCooldown } from "../guilds/utils";
 import { logger } from "../logger";
@@ -642,12 +642,7 @@ export async function deleteStats(guild: Guild) {
 }
 
 async function getDefaultWords(): Promise<string[]> {
-    const res = await fetch(
-        "https://gist.githubusercontent.com/tekoh/f8b8d6db6259cad221a679f5015d9f82/raw/e0d80c53eecd33ea4eed4a5f253da1145fa7951c/chat-reactions.txt"
-    );
-    const body = await res.text();
-
-    const words = body.split("\n");
+    const words = await fs.readFile("./data/cr_words.txt").then((res) => res.toString().split("\n"));
 
     return words;
 }
