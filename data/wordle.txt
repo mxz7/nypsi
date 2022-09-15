@@ -307,7 +307,6 @@ cacti
 caddy
 cadet
 cagey
-cairn
 camel
 cameo
 canal
@@ -315,7 +314,6 @@ candy
 canny
 canoe
 canon
-caper
 caput
 carat
 cargo
@@ -403,12 +401,10 @@ close
 cloth
 cloud
 clout
-clove
 clown
 cluck
 clued
 clump
-clung
 coach
 coast
 cobra
@@ -421,10 +417,7 @@ comic
 comma
 conch
 condo
-conic
-copse
 coral
-corer
 corny
 couch
 cough
@@ -452,7 +445,6 @@ craze
 crazy
 creak
 cream
-credo
 creed
 creek
 creep
@@ -484,8 +476,6 @@ crush
 crust
 crypt
 cubic
-cumin
-curio
 curly
 curry
 curse
@@ -494,7 +484,6 @@ curvy
 cutie
 cyber
 cycle
-cynic
 daddy
 daily
 dairy
@@ -1236,6 +1225,7 @@ mogul
 moist
 molar
 moldy
+mommy
 money
 month
 moody
