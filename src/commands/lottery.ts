@@ -1,21 +1,14 @@
 import dayjs = require("dayjs");
 import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import {
-  addTicket,
-  createUser,
-  getBalance,
-  getPrestige,
-  getTickets,
-  lotteryTicketPrice,
-  updateBalance,
-  userExists,
-} from "../utils/economy/utils";
+import { getBalance, updateBalance } from "../utils/functions/economy/balance";
+import { getPrestige } from "../utils/functions/economy/prestige";
+import { addTicket, createUser, getTickets, lotteryTicketPrice, userExists } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
-import { getKarma } from "../utils/karma/utils";
+import { getKarma } from "../utils/functions/karma/karma";
+import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
-import { getTier, isPremium } from "../utils/functions/premium/premium";
 
 const cmd = new Command("lottery", "enter the weekly lottery draw", Categories.MONEY).setAliases(["lotto"]);
 

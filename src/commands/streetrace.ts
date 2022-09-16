@@ -1,16 +1,9 @@
 import { ChannelType, CommandInteraction, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import { addProgress } from "../utils/economy/achievements";
-import {
-  calcMaxBet,
-  createUser,
-  formatBet,
-  getBalance,
-  getInventory,
-  getItems,
-  updateBalance,
-  userExists,
-} from "../utils/economy/utils";
+import { addProgress } from "../utils/functions/economy/achievements";
+import { calcMaxBet, getBalance, updateBalance } from "../utils/functions/economy/balance";
+import { getInventory } from "../utils/functions/economy/inventory";
+import { createUser, formatBet, getItems, userExists } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { Item } from "../utils/models/Economy";

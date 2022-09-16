@@ -1,8 +1,8 @@
 import { Client, Guild } from "discord.js";
 import { createGuild, hasGuild, runCheck } from "../utils/functions/guilds/utils";
-import { addKarma } from "../utils/karma/utils";
+import { addKarma } from "../utils/functions/karma/karma";
+import { createProfile, hasProfile } from "../utils/functions/users/utils";
 import { logger } from "../utils/logger";
-import { createProfile, hasProfile } from "../utils/users/utils";
 
 export default async function guildCreate(client: Client, guild: Guild) {
   logger.log({

@@ -1,8 +1,9 @@
 import { Message } from "discord.js";
-import { createGuild, getChatFilter, getSnipeFilter, hasGuild, snipe } from "../utils/functions/guilds/utils";
+import { getChatFilter, getSnipeFilter } from "../utils/functions/guilds/filters";
+import { createGuild, hasGuild, snipe } from "../utils/functions/guilds/utils";
+import { addLog, isLogsEnabled } from "../utils/functions/moderation/logs";
 import { CustomEmbed } from "../utils/models/EmbedBuilders";
 import { LogType } from "../utils/models/GuildStorage";
-import { addLog, isLogsEnabled } from "../utils/moderation/utils";
 
 export default async function messageDelete(message: Message) {
   if (!message) return;

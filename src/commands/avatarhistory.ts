@@ -11,9 +11,15 @@ import {
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { formatDate } from "../utils/functions/date";
 import { uploadImageToImgur } from "../utils/functions/image";
+import {
+  addNewAvatar,
+  clearAvatarHistory,
+  deleteAvatar,
+  fetchAvatarHistory,
+  isTracking,
+} from "../utils/functions/users/history";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
-import { addNewAvatar, clearAvatarHistory, deleteAvatar, fetchAvatarHistory, isTracking } from "../utils/users/utils";
 
 const cmd = new Command("avatarhistory", "view a user's avatar history", Categories.INFO).setAliases([
   "avh",

@@ -9,7 +9,7 @@ import {
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import { getItems } from "../utils/economy/utils";
+import { getItems } from "../utils/functions/economy/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed } from "../utils/models/EmbedBuilders";
 

@@ -1,28 +1,15 @@
 import { CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions, MessageOptions } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import redis from "../utils/database/redis";
-import { addProgress } from "../utils/economy/achievements";
-import {
-  addItemUse,
-  addRob,
-  addToGuildXP,
-  calcEarnedXp,
-  createUser,
-  getBalance,
-  getDMsEnabled,
-  getGuildByUser,
-  getInventory,
-  getXp,
-  hasPadlock,
-  isEcoBanned,
-  setInventory,
-  setPadlock,
-  updateBalance,
-  updateXp,
-  userExists,
-} from "../utils/economy/utils.js";
-import { getMember } from "../utils/functions/member";
+import { addProgress } from "../utils/functions/economy/achievements";
+import { getBalance, hasPadlock, setPadlock, updateBalance } from "../utils/functions/economy/balance";
+import { addToGuildXP, getGuildByUser } from "../utils/functions/economy/guilds";
+import { getInventory, setInventory } from "../utils/functions/economy/inventory";
+import { addItemUse, addRob } from "../utils/functions/economy/stats";
+import { createUser, getDMsEnabled, isEcoBanned, userExists } from "../utils/functions/economy/utils";
+import { calcEarnedXp, getXp, updateXp } from "../utils/functions/economy/xp";
 import { getPrefix } from "../utils/functions/guilds/utils";
+import { getMember } from "../utils/functions/member";
 import { NypsiClient } from "../utils/models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";

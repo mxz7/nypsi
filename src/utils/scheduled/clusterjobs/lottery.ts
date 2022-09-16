@@ -1,9 +1,10 @@
 import { Client, User, WebhookClient } from "discord.js";
 import prisma from "../../database/database";
 import redis from "../../database/redis";
-import { addProgress } from "../../economy/achievements";
-import { getBalance, getDMsEnabled, lotteryTicketPrice, updateBalance } from "../../economy/utils";
 import { MStoTime } from "../../functions/date";
+import { addProgress } from "../../functions/economy/achievements";
+import { getBalance, updateBalance } from "../../functions/economy/balance";
+import { getDMsEnabled, lotteryTicketPrice } from "../../functions/economy/utils";
 import { addToNypsiBank, getTax } from "../../functions/tax";
 import { logger } from "../../logger";
 import { LotteryTicket } from "../../models/Economy";

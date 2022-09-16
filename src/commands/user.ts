@@ -3,11 +3,11 @@ import { inPlaceSort } from "fast-sort";
 import { formatDate } from "../utils/functions/date";
 import { getMember } from "../utils/functions/member";
 import { addCooldown, inCooldown } from "../utils/functions/guilds/utils";
-import { getKarma } from "../utils/karma/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
-import { fetchUsernameHistory } from "../utils/users/utils";
 import workerSort from "../utils/workers/sort";
+import { fetchUsernameHistory } from "../utils/functions/users/history";
+import { getKarma } from "../utils/functions/karma/karma";
 
 const cmd = new Command("user", "view info about a user in the server", Categories.INFO).setAliases(["whois", "who"]);
 

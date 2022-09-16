@@ -14,11 +14,12 @@ import {
   PermissionFlagsBits,
 } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import { getMember } from "../utils/functions/member";
 import { getPrefix } from "../utils/functions/guilds/utils";
+import { getMember } from "../utils/functions/member";
+import { getCases } from "../utils/functions/moderation/cases";
+import { createProfile, profileExists } from "../utils/functions/moderation/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
-import { createProfile, getCases, profileExists } from "../utils/moderation/utils";
 
 const cmd = new Command("history", "view punishment history for a given user", Categories.MODERATION)
   .setAliases(["modlogs", "hist"])

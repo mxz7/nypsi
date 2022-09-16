@@ -1,8 +1,8 @@
 import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import { addProgress } from "../utils/economy/achievements";
-import { getMember } from "../utils/functions/member";
+import { addProgress } from "../utils/functions/economy/achievements";
 import { getPrefix } from "../utils/functions/guilds/utils";
+import { getMember } from "../utils/functions/member";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 

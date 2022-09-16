@@ -1,7 +1,7 @@
 import _ = require("lodash");
 import { parentPort } from "worker_threads";
 import prisma from "../../database/database";
-import { Worker, WorkerStorageData } from "../../economy/workers";
+import { Worker, WorkerStorageData } from "../../models/Workers";
 
 (async () => {
   const query = await prisma.economy.findMany({

@@ -6,22 +6,15 @@ import {
   MessageOptions,
 } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import {
-  addWorker,
-  createUser,
-  emptyWorkersStored,
-  getBalance,
-  getPrestige,
-  getWorkers,
-  updateBalance,
-  upgradeWorker,
-  userExists,
-} from "../utils/economy/utils";
-import { getAllWorkers, Worker } from "../utils/economy/workers";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
+import { getAllWorkers, Worker } from "../utils/models/Workers";
+import { createUser, userExists } from "../utils/functions/economy/utils";
+import { addWorker, emptyWorkersStored, getWorkers, upgradeWorker } from "../utils/functions/economy/workers";
+import { getPrestige } from "../utils/functions/economy/prestige";
+import { getBalance, updateBalance } from "../utils/functions/economy/balance";
 
 const cmd = new Command("workers", "view the available workers and manage your own", Categories.MONEY).setAliases([
   "worker",

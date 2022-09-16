@@ -1,8 +1,8 @@
 import { CommandInteraction, Message } from "discord.js";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { getDMsEnabled, setDMsEnabled, userExists, createUser } from "../utils/economy/utils.js";
 import { CustomEmbed } from "../utils/models/EmbedBuilders";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { createUser, getDMsEnabled, setDMsEnabled, userExists } from "../utils/functions/economy/utils";
 
 const cmd = new Command("dms", "enable/disable dms with the bot", Categories.INFO).setAliases([
   "optout",

@@ -3,11 +3,11 @@ import * as fs from "fs/promises";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { MStoTime } from "../utils/functions/date";
 import { getPrefix } from "../utils/functions/guilds/utils";
-import { addKarma } from "../utils/karma/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
-import { addWordleGame, getWordleStats } from "../utils/users/utils";
 import ms = require("ms");
+import { addWordleGame, getWordleStats } from "../utils/functions/users/wordle";
+import { addKarma } from "../utils/functions/karma/karma";
 
 const cmd = new Command("wordle", "play wordle on discord", Categories.FUN).setAliases(["w"]);
 

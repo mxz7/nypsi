@@ -3,21 +3,15 @@ import { Manager } from "discord-hybrid-sharding";
 import * as express from "express";
 import prisma from "./database/database";
 import redis from "./database/redis";
-import {
-  getBalance,
-  getDMsEnabled,
-  getInventory,
-  getPrestige,
-  getTickets,
-  setInventory,
-  updateBalance,
-  userExists,
-} from "./economy/utils";
+import { getBalance, updateBalance } from "./functions/economy/balance";
+import { getInventory, setInventory } from "./functions/economy/inventory";
+import { getPrestige } from "./functions/economy/prestige";
+import { addTicket, getDMsEnabled, getTickets, userExists } from "./functions/economy/utils";
+import { addKarma, getKarma } from "./functions/karma/karma";
+import { getTier, isPremium } from "./functions/premium/premium";
 import requestDM from "./functions/requestdm";
-import { addKarma, getKarma } from "./karma/utils";
 import { logger } from "./logger";
 import { CustomEmbed } from "./models/EmbedBuilders";
-import { getTier, isPremium } from "./functions/premium/premium";
 import ms = require("ms");
 import dayjs = require("dayjs");
 
@@ -106,6 +100,10 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
 
   if (max > 50) max = 50;
 
+  if (tickets.length <= max - 2) {
+    await Promise.all([addTicket(user), addTicket(user)]);
+  }
+
   let crateAmount = Math.floor(prestige / 2 + 1);
 
   if (crateAmount > 3) crateAmount = 3;
@@ -126,7 +124,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
           `+ $**${amount.toLocaleString()}**\n` +
           "+ **7**% multiplier\n" +
           `+ **${crateAmount}** vote crates` +
-          `${tickets.length < max ? "\n+ **1** lottery ticket" : ""}`
+          `${tickets.length <= max - 2 ? "\n+ **2** lottery tickets" : ""}`
       )
       .disableFooter();
 

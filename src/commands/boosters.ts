@@ -1,6 +1,7 @@
 import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
 import { getResponse, onCooldown } from "../utils/cooldownhandler";
-import { getBoosters, getItems } from "../utils/economy/utils";
+import { getBoosters } from "../utils/functions/economy/boosters";
+import { getItems } from "../utils/functions/economy/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed } from "../utils/models/EmbedBuilders";
 

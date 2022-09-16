@@ -1,3 +1,9 @@
+import { GuildMember } from "discord.js";
+import prisma from "../../database/database";
+import redis from "../../database/redis";
+import { cleanString } from "../string";
+import ms = require("ms");
+
 export async function getLastfmUsername(member: GuildMember | string) {
   let id: string;
   if (member instanceof GuildMember) {

@@ -1,7 +1,7 @@
 import { CommandInteraction, Message } from "discord.js";
 import * as ascii from "figlet";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import { getDMsEnabled } from "../utils/economy/utils.js";
+import { getDMsEnabled } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";

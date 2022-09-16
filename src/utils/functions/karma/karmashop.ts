@@ -2,7 +2,7 @@ import { KarmaShopItem } from "../../models/Karmashop";
 
 declare function require(name: string): any;
 
-const items: { [key: string]: KarmaShopItem } = require("../../../data/karmashop.json");
+const items: { [key: string]: KarmaShopItem } = require("../../../../data/karmashop.json");
 
 let karmaShop = false;
 

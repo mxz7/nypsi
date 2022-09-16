@@ -1,23 +1,19 @@
 import { CommandInteraction, GuildMember, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
-import {
-  createUser,
-  deleteUser,
-  getBalance,
-  getBankBalance,
-  getMaxBankBalance,
-  getPrestige,
-  getPrestigeRequirement,
-  getPrestigeRequirementBal,
-  getXp,
-  hasPadlock,
-  updateBalance,
-  userExists,
-} from "../utils/economy/utils.js";
 import { getMember } from "../utils/functions/member.js";
 import { getNypsiBankBalance, getTax, getTaxRefreshTime } from "../utils/functions/tax.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
+import { createUser, deleteUser, userExists } from "../utils/functions/economy/utils.js";
+import {
+  getBalance,
+  getBankBalance,
+  getMaxBankBalance,
+  hasPadlock,
+  updateBalance,
+} from "../utils/functions/economy/balance.js";
+import { getXp } from "../utils/functions/economy/xp.js";
+import { getPrestige, getPrestigeRequirement, getPrestigeRequirementBal } from "../utils/functions/economy/prestige.js";
 
 const cmd = new Command("balance", "check your balance", Categories.MONEY).setAliases(["bal", "money", "wallet"]);
 

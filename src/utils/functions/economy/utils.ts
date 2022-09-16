@@ -5,11 +5,11 @@ import prisma from "../../database/database";
 import redis from "../../database/redis";
 import { logger } from "../../logger";
 import { AchievementData, Item } from "../../models/Economy";
-import { createProfile, hasProfile } from "../../users/utils";
 import { calcMaxBet, getBalance } from "./balance";
 import { getGuildByUser } from "./guilds";
 import ms = require("ms");
 import dayjs = require("dayjs");
+import { createProfile, hasProfile } from "../users/utils";
 
 let items: { [key: string]: Item };
 let achievements: { [key: string]: AchievementData };

@@ -1,6 +1,8 @@
 import { CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions, MessageOptions } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import { addItemUse, createUser, getInventory, getItems, setInventory, userExists } from "../utils/economy/utils";
+import { getInventory, setInventory } from "../utils/functions/economy/inventory";
+import { addItemUse } from "../utils/functions/economy/stats";
+import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 

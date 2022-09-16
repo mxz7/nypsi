@@ -19,25 +19,20 @@ import * as stringSimilarity from "string-similarity";
 import { runCommand } from "../utils/commandhandler";
 import prisma from "../utils/database/database";
 import redis from "../utils/database/redis";
-import { userExists } from "../utils/economy/utils";
+import { userExists } from "../utils/functions/economy/utils";
+import { getChatFilter } from "../utils/functions/guilds/filters";
+import { addCooldown, getPercentMatch, getPrefix, hasGuild, inCooldown } from "../utils/functions/guilds/utils";
+import { getKarma } from "../utils/functions/karma/karma";
+import { addModLog } from "../utils/functions/moderation/logs";
+import { isPremium } from "../utils/functions/premium/premium";
 import { encrypt } from "../utils/functions/string";
 import { createSupportRequest, getSupportRequest, sendToRequestChannel } from "../utils/functions/supportrequest";
-import {
-  addCooldown,
-  getChatFilter,
-  getPercentMatch,
-  getPrefix,
-  hasGuild,
-  inCooldown,
-} from "../utils/functions/guilds/utils";
-import { getKarma, getLastCommand } from "../utils/karma/utils";
+import { getLastCommand } from "../utils/functions/users/commands";
+import { mentionQueue, MentionQueueItem } from "../utils/functions/users/mentions";
 import { logger } from "../utils/logger";
 import { NypsiClient } from "../utils/models/Client";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 import { PunishmentType } from "../utils/models/GuildStorage";
-import { addModLog } from "../utils/moderation/utils";
-import { isPremium } from "../utils/functions/premium/premium";
-import { mentionQueue, MentionQueueItem } from "../utils/users/utils";
 import doCollection from "../utils/workers/mentions";
 import ms = require("ms");
 

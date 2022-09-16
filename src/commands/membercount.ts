@@ -1,8 +1,9 @@
 import { ChannelType, CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
-import { getPeaks, getPrefix, getGuildCounter, setGuildCounter, createGuildCounter } from "../utils/functions/guilds/utils";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
+import { createGuildCounter, setGuildCounter } from "../utils/functions/guilds/counters";
+import { getGuildCounter, getPeaks, getPrefix } from "../utils/functions/guilds/utils";
 import { logger } from "../utils/logger";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 
 const cmd = new Command("membercount", "create an updating member count channel for your server", Categories.ADMIN)
   .setAliases(["counter"])

@@ -13,31 +13,27 @@ import {
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { daysAgo, formatDate } from "../utils/functions/date";
+import { getBalance, updateBalance } from "../utils/functions/economy/balance";
 import {
   addMember,
   addToGuildBank,
   createGuild,
-  createUser,
   deleteGuild,
-  formatNumber,
-  getBalance,
   getGuildByName,
   getGuildByUser,
   getMaxMembersForGuild,
-  getPrestige,
   getRequiredForGuildUpgrade,
-  isEcoBanned,
   removeMember,
   RemoveMemberMode,
   setGuildMOTD,
   topGuilds,
-  updateBalance,
-  userExists,
-} from "../utils/economy/utils";
-import { daysAgo, formatDate } from "../utils/functions/date";
+} from "../utils/functions/economy/guilds";
+import { getPrestige } from "../utils/functions/economy/prestige";
+import { createUser, formatNumber, isEcoBanned, userExists } from "../utils/functions/economy/utils";
+import { getPrefix } from "../utils/functions/guilds/utils";
 import requestDM from "../utils/functions/requestdm";
 import { cleanString } from "../utils/functions/string";
-import { getPrefix } from "../utils/functions/guilds/utils";
 import { NypsiClient } from "../utils/models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";

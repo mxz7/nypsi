@@ -1,6 +1,6 @@
 import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
-import { getCase, setReason } from "../utils/moderation/utils";
+import { getCase, setReason } from "../utils/functions/moderation/cases";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
 

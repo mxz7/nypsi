@@ -2,8 +2,8 @@ import { Collection, EmbedBuilder, Guild, GuildMember, WebhookClient } from "dis
 import { inPlaceSort } from "fast-sort";
 import prisma from "../../database/database";
 import redis from "../../database/redis";
-import { getLastKnownTag } from "../../users/utils";
 import workerSort from "../../workers/sort";
+import { getLastKnownTag } from "../users/tag";
 import { getAchievements } from "./utils";
 
 /**

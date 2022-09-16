@@ -1,22 +1,16 @@
 import { CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions, MessageOptions } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import { formatNumber } from "../utils/economy/utils";
-import {
-  createUser,
-  getBalance,
-  getPrestige,
-  getXp,
-  isEcoBanned,
-  updateBalance,
-  userExists,
-} from "../utils/economy/utils.js";
-import { getMember } from "../utils/functions/member";
-import { addToNypsiBank, getTax } from "../utils/functions/tax";
+import { getBalance, updateBalance } from "../utils/functions/economy/balance";
+import { getPrestige } from "../utils/functions/economy/prestige";
+import { createUser, formatNumber, isEcoBanned, userExists } from "../utils/functions/economy/utils";
+import { getXp } from "../utils/functions/economy/xp";
 import { getPrefix } from "../utils/functions/guilds/utils";
+import { getMember } from "../utils/functions/member";
+import { isPremium } from "../utils/functions/premium/premium";
+import { addToNypsiBank, getTax } from "../utils/functions/tax";
 import { payment } from "../utils/logger";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
-import { isPremium } from "../utils/functions/premium/premium";
 import dayjs = require("dayjs");
 
 const cmd = new Command("pay", "give other users money", Categories.MONEY);

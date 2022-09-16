@@ -1,20 +1,12 @@
 import dayjs = require("dayjs");
 import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import {
-  createUser,
-  getInventory,
-  getItems,
-  getMaxBitcoin,
-  getMaxEthereum,
-  getPrestige,
-  getXp,
-  isEcoBanned,
-  setInventory,
-  userExists,
-} from "../utils/economy/utils";
-import { getMember } from "../utils/functions/member";
+import { getInventory, getMaxBitcoin, getMaxEthereum, setInventory } from "../utils/functions/economy/inventory";
+import { getPrestige } from "../utils/functions/economy/prestige";
+import { createUser, getItems, isEcoBanned, userExists } from "../utils/functions/economy/utils";
+import { getXp } from "../utils/functions/economy/xp";
 import { getPrefix } from "../utils/functions/guilds/utils";
+import { getMember } from "../utils/functions/member";
 import { payment } from "../utils/logger";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";

@@ -10,9 +10,10 @@ import {
   PermissionFlagsBits,
 } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { getMutedUsers } from "../utils/functions/moderation/mute";
+import { createProfile, profileExists } from "../utils/functions/moderation/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed } from "../utils/models/EmbedBuilders";
-import { createProfile, getMutedUsers, profileExists } from "../utils/moderation/utils";
 
 const cmd = new Command("muted", "view the currently muted members in the server", Categories.MODERATION).setPermissions([
   "MANAGE_MESSAGES",

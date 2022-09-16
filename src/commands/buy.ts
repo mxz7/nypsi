@@ -1,16 +1,8 @@
 import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import {
-  createUser,
-  getBalance,
-  getInventory,
-  getItems,
-  getMaxBitcoin,
-  getMaxEthereum,
-  setInventory,
-  updateBalance,
-  userExists,
-} from "../utils/economy/utils";
+import { getBalance, updateBalance } from "../utils/functions/economy/balance";
+import { getInventory, getMaxBitcoin, getMaxEthereum, setInventory } from "../utils/functions/economy/inventory";
+import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";

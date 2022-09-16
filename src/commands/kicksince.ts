@@ -1,9 +1,10 @@
 import { CommandInteraction, Message, MessageReaction, PermissionFlagsBits, User } from "discord.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
+import { newCase } from "../utils/functions/moderation/cases";
+import { createProfile, profileExists } from "../utils/functions/moderation/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 import { PunishmentType } from "../utils/models/GuildStorage";
-import { createProfile, newCase, profileExists } from "../utils/moderation/utils";
 
 const cmd = new Command("kicksince", "kick members that joined after a certain time", Categories.ADMIN)
   .setPermissions(["ADMINISTRATOR"])

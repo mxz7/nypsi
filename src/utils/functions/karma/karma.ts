@@ -1,7 +1,7 @@
 import { GuildMember } from "discord.js";
 import prisma from "../../database/database";
 import redis from "../../database/redis";
-import { createProfile } from "../../users/utils";
+import { createProfile } from "../users/utils";
 
 export async function getKarma(member: GuildMember | string): Promise<number> {
   let id: string;

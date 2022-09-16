@@ -7,12 +7,14 @@ import {
   PermissionFlagsBits,
   Role,
 } from "discord.js";
-import { getExactMember } from "../utils/functions/member";
 import { addCooldown, getPrefix, inCooldown } from "../utils/functions/guilds/utils";
+import { getExactMember } from "../utils/functions/member";
+import { newCase } from "../utils/functions/moderation/cases";
+import { deleteMute, getMuteRole, isMuted } from "../utils/functions/moderation/mute";
+import { createProfile, profileExists } from "../utils/functions/moderation/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 import { PunishmentType } from "../utils/models/GuildStorage";
-import { createProfile, deleteMute, getMuteRole, isMuted, newCase, profileExists } from "../utils/moderation/utils";
 
 const cmd = new Command("unmute", "unmute one or more users", Categories.MODERATION).setPermissions([
   "MANAGE_MESSAGES",

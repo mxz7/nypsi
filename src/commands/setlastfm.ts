@@ -1,10 +1,10 @@
 import { CommandInteraction, Message } from "discord.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed } from "../utils/models/EmbedBuilders";
-import { getPrefix } from "../utils/functions/guilds/utils";
-import { setLastfmUsername, getLastfmUsername } from "../utils/users/utils";
-import { cleanString } from "../utils/functions/string";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { getPrefix } from "../utils/functions/guilds/utils";
+import { cleanString } from "../utils/functions/string";
+import { getLastfmUsername, setLastfmUsername } from "../utils/functions/users/lastfm";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("setlastfm", "set your last.fm username", Categories.MUSIC).setAliases(["slfm"]);
 
