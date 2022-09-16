@@ -1,6 +1,7 @@
 import { CommandInteraction, Message } from "discord.js";
-import { createUser, getPadlockPrice, hasPadlock, userExists } from "../utils/economy/utils.js";
-import { getPrefix } from "../utils/guilds/utils";
+import { hasPadlock } from "../utils/functions/economy/balance";
+import { createUser, getPadlockPrice, userExists } from "../utils/functions/economy/utils";
+import { getPrefix } from "../utils/functions/guilds/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 

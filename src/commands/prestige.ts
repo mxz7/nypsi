@@ -12,24 +12,17 @@ import {
   MessageOptions,
 } from "discord.js";
 import { addCooldown, addExpiry, getResponse, onCooldown } from "../utils/cooldownhandler.js";
+import { calcMaxBet, getBankBalance, getMulti, updateBankBalance } from "../utils/functions/economy/balance.js";
+import { addBooster, getBoosters } from "../utils/functions/economy/boosters.js";
+import { getInventory, setInventory } from "../utils/functions/economy/inventory.js";
 import {
-  addBooster,
-  calcMaxBet,
-  createUser,
-  getBankBalance,
-  getBoosters,
-  getInventory,
-  getMulti,
   getPrestige,
   getPrestigeRequirement,
   getPrestigeRequirementBal,
-  getXp,
-  setInventory,
   setPrestige,
-  updateBankBalance,
-  updateXp,
-  userExists,
-} from "../utils/economy/utils.js";
+} from "../utils/functions/economy/prestige.js";
+import { createUser, userExists } from "../utils/functions/economy/utils.js";
+import { getXp, updateXp } from "../utils/functions/economy/xp.js";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 

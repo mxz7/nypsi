@@ -1,6 +1,10 @@
 import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions, PermissionFlagsBits } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
-import { getItems, topAmount, topAmountItem, topAmountPrestige, topCompletion } from "../utils/economy/utils.js";
+import { topCompletion } from "../utils/functions/economy/achievements.js";
+import { topAmount } from "../utils/functions/economy/balance.js";
+import { topAmountItem } from "../utils/functions/economy/inventory.js";
+import { topAmountPrestige } from "../utils/functions/economy/prestige.js";
+import { getItems } from "../utils/functions/economy/utils.js";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { Item } from "../utils/models/Economy.js";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";

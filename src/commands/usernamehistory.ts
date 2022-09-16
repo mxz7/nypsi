@@ -11,9 +11,10 @@ import {
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { formatDate } from "../utils/functions/date";
 import { getMember } from "../utils/functions/member";
+import { clearUsernameHistory, fetchUsernameHistory, isTracking } from "../utils/functions/users/history";
+import { hasProfile } from "../utils/functions/users/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
-import { clearUsernameHistory, fetchUsernameHistory, hasProfile, isTracking } from "../utils/users/utils";
 
 const cmd = new Command("usernamehistory", "view a user's username history", Categories.INFO).setAliases([
   "un",

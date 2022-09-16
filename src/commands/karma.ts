@@ -1,9 +1,9 @@
 import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
 import { getMember } from "../utils/functions/member";
-import { getPrefix } from "../utils/guilds/utils";
-import { getKarma, removeKarma } from "../utils/karma/utils";
+import { getPrefix } from "../utils/functions/guilds/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
+import { getKarma, removeKarma } from "../utils/functions/karma/karma";
 
 const cmd = new Command("karma", "check how much karma you have", Categories.INFO).setDocs(
   "https://docs.nypsi.xyz/economy/karma"

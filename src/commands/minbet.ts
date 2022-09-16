@@ -1,7 +1,9 @@
 import { CommandInteraction, Message } from "discord.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
+import { getRequiredBetForXp } from "../utils/functions/economy/balance";
+import { getGuildByUser } from "../utils/functions/economy/guilds";
+import { calcMinimumEarnedXp } from "../utils/functions/economy/xp";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed } from "../utils/models/EmbedBuilders";
-import { calcMinimumEarnedXp, getRequiredBetForXp, getGuildByUser } from "../utils/economy/utils";
 
 const cmd = new Command("minbet", "the minimum amount you need to bet to earn xp", Categories.MONEY);
 

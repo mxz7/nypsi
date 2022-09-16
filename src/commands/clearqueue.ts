@@ -1,6 +1,6 @@
 import { CommandInteraction, Message } from "discord.js";
+import { mentionQueue } from "../utils/functions/users/mentions";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
-import { mentionQueue } from "../utils/users/utils";
 
 const cmd = new Command("clearqueue", "clear the mentions queue", Categories.NONE).setPermissions(["bot owner"]);
 

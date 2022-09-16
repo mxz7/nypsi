@@ -15,17 +15,17 @@ import * as os from "os";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import prisma from "../utils/database/database";
 import redis from "../utils/database/redis";
-import { getStats } from "../utils/economy/utils";
 import { MStoTime } from "../utils/functions/date";
-import { getCommandUses } from "../utils/karma/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 // @ts-expect-error typescript doesnt like opening package.json
 import { version } from "../../package.json";
 import { workerCount } from "../events/message";
 import { aliasesSize, commandsSize } from "../utils/commandhandler";
+import { getStats } from "../utils/functions/economy/stats";
+import { getCommandUses } from "../utils/functions/users/commands";
+import { mentionQueue } from "../utils/functions/users/mentions";
 import { NypsiClient } from "../utils/models/Client";
-import { mentionQueue } from "../utils/users/utils";
 
 const cmd = new Command("stats", "view your nypsi stats", Categories.MONEY);
 

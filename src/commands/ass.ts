@@ -4,7 +4,7 @@ import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
 import { redditImage } from "../utils/functions/image";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { images } from "../utils/imghandler";
-import { addProgress } from "../utils/economy/achievements";
+import { addProgress } from "../utils/functions/economy/achievements";
 
 const cmd = new Command("ass", "get a random ass image", Categories.NSFW).setAliases(["peach"]);
 

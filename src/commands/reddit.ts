@@ -2,7 +2,7 @@ import { CommandInteraction, Message } from "discord.js";
 import fetch from "node-fetch";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
-import { getPrefix } from "../utils/guilds/utils";
+import { getPrefix } from "../utils/functions/guilds/utils";
 import { redditImage } from "../utils/functions/image";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { RedditJSON } from "../utils/models/Reddit";

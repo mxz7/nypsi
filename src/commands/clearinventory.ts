@@ -1,15 +1,16 @@
 import {
-  CommandInteraction,
-  Message,
   ActionRowBuilder,
   ButtonBuilder,
-  MessageActionRowComponentBuilder,
   ButtonStyle,
+  CommandInteraction,
   Interaction,
+  Message,
+  MessageActionRowComponentBuilder,
 } from "discord.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
-import { userExists, createUser, getInventory, setInventory } from "../utils/economy/utils";
+import { getInventory, setInventory } from "../utils/functions/economy/inventory";
+import { createUser, userExists } from "../utils/functions/economy/utils";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("clearinventory", "clear your inventory. this cannot be undone", Categories.MONEY).setAliases([
   "clearinv",

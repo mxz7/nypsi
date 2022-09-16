@@ -1,6 +1,6 @@
 import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
-import { getPrefix } from "../utils/guilds/utils";
-import { isPremium } from "../utils/premium/utils";
+import { getPrefix } from "../utils/functions/guilds/utils";
+import { isPremium } from "../utils/functions/premium/premium";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
 import { inPlaceSort } from "fast-sort";

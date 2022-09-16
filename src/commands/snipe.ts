@@ -1,5 +1,5 @@
 import { Channel, CommandInteraction, GuildMember, Message } from "discord.js";
-import { snipe } from "../utils/guilds/utils";
+import { snipe } from "../utils/functions/guilds/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 

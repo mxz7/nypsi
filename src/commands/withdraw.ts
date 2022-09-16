@@ -1,16 +1,14 @@
 import { CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions, MessageOptions } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
 import {
-  createUser,
-  formatNumber,
   getBalance,
   getBankBalance,
   getMaxBankBalance,
   updateBalance,
   updateBankBalance,
-  userExists,
-} from "../utils/economy/utils.js";
-import { getPrefix } from "../utils/guilds/utils";
+} from "../utils/functions/economy/balance.js";
+import { createUser, formatNumber, userExists } from "../utils/functions/economy/utils.js";
+import { getPrefix } from "../utils/functions/guilds/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 
