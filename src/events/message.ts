@@ -290,7 +290,7 @@ export default async function messageCreate(message: Message) {
                                 }
                             }
                         } catch {
-                            console.log((message.channel as TextChannel).members);
+                            console.log((message.channel as ThreadChannel).members.cache);
                             return;
                         }
 
