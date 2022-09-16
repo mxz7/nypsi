@@ -1,6 +1,6 @@
 import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import prisma from "../utils/database/database";
+import { getAuctionAverage } from "../utils/functions/economy/auctions";
 import { getInventory } from "../utils/functions/economy/inventory";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
@@ -85,34 +85,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     desc += `**sell** $${selected.sell.toLocaleString()}\n`;
   }
 
-  const auctions = await prisma.auction.findMany({
-    where: {
-      AND: [{ sold: true }, { itemName: selected.id }],
-    },
-    select: {
-      bin: true,
-      itemAmount: true,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-    take: 100,
-  });
-
-  const costs: number[] = [];
-
-  for (const auction of auctions) {
-    if (costs.length >= 5000) break;
-
-    if (auction.itemAmount > 1) {
-      costs.push(Math.floor(Number(auction.bin) / auction.itemAmount));
-    } else {
-      costs.push(Number(auction.bin));
-    }
-  }
-
-  const sum = costs.reduce((a, b) => a + b, 0);
-  const avg = sum / costs.length || 0;
+  const avg = await getAuctionAverage(selected.id);
 
   if (avg) {
     desc += `**average auction sale** $${Math.floor(avg).toLocaleString()}\n`;
