@@ -1,7 +1,8 @@
 import { CommandInteraction, GuildMember, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
-import { addProgress } from "../utils/economy/achievements.js";
-import { createUser, getXp, updateXp, userExists } from "../utils/economy/utils.js";
+import { addProgress } from "../utils/functions/economy/achievements.js";
+import { createUser, userExists } from "../utils/functions/economy/utils.js";
+import { getXp, updateXp } from "../utils/functions/economy/xp.js";
 import { getMember } from "../utils/functions/member.js";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";

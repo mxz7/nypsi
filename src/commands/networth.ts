@@ -1,9 +1,13 @@
 import { CommandInteraction, Message } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import { getBalance, getBankBalance, getGuildByUser, getInventory, getItems, getWorkers } from "../utils/economy/utils";
-import { getAllWorkers, Worker } from "../utils/economy/workers";
+import { getBalance, getBankBalance } from "../utils/functions/economy/balance";
+import { getGuildByUser } from "../utils/functions/economy/guilds";
+import { getInventory } from "../utils/functions/economy/inventory";
+import { getItems } from "../utils/functions/economy/utils";
+import { getWorkers } from "../utils/functions/economy/workers";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed } from "../utils/models/EmbedBuilders";
+import { getAllWorkers, Worker } from "../utils/models/Workers";
 
 const cmd = new Command("networth", "view your net worth", Categories.MONEY).setAliases(["net"]);
 

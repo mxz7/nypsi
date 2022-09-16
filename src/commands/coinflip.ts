@@ -1,29 +1,22 @@
 import {
-  getBalance,
-  createUser,
-  updateBalance,
-  userExists,
-  formatBet,
-  calcMaxBet,
-  isEcoBanned,
-  addGamble,
-} from "../utils/economy/utils.js";
-import {
-  CommandInteraction,
-  Message,
   ActionRowBuilder,
   ButtonBuilder,
-  MessageActionRowComponentBuilder,
   ButtonStyle,
+  CommandInteraction,
   GuildMember,
   Interaction,
+  Message,
+  MessageActionRowComponentBuilder,
 } from "discord.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
-import { getPrefix } from "../utils/guilds/utils";
-import { gamble } from "../utils/logger.js";
-import { getMember } from "../utils/functions/member.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
+import { calcMaxBet, getBalance, updateBalance } from "../utils/functions/economy/balance";
+import { addGamble } from "../utils/functions/economy/stats";
+import { createUser, formatBet, isEcoBanned, userExists } from "../utils/functions/economy/utils";
+import { getPrefix } from "../utils/functions/guilds/utils";
+import { getMember } from "../utils/functions/member.js";
+import { gamble } from "../utils/logger.js";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 
 const waiting = new Set<string>();
 

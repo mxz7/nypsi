@@ -11,18 +11,13 @@ import {
   MessageOptions,
 } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import { addProgress } from "../utils/economy/achievements";
-import {
-  addGamble,
-  createUser,
-  getBoosters,
-  getInventory,
-  getStats,
-  setInventory,
-  userExists,
-} from "../utils/economy/utils";
+import { addProgress } from "../utils/functions/economy/achievements";
+import { getBoosters } from "../utils/functions/economy/boosters";
+import { getInventory, setInventory } from "../utils/functions/economy/inventory";
+import { addGamble, getStats } from "../utils/functions/economy/stats";
+import { createUser, userExists } from "../utils/functions/economy/utils";
+import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
-import { getPrefix } from "../utils/guilds/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 import ms = require("ms");

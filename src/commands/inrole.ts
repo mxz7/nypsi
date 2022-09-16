@@ -11,7 +11,7 @@ import {
   Role,
 } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import { addCooldown as addGuildCooldown, getPrefix, inCooldown } from "../utils/guilds/utils";
+import { addCooldown as addGuildCooldown, getPrefix, inCooldown } from "../utils/functions/guilds/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 

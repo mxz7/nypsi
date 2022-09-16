@@ -1,10 +1,11 @@
 import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions, PermissionFlagsBits, User } from "discord.js";
 import { getExactMember } from "../utils/functions/member";
-import { addCooldown, getPrefix, inCooldown } from "../utils/guilds/utils";
+import { addCooldown, getPrefix, inCooldown } from "../utils/functions/guilds/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 import { PunishmentType } from "../utils/models/GuildStorage";
-import { createProfile, newCase, profileExists } from "../utils/moderation/utils";
+import { createProfile, profileExists } from "../utils/functions/moderation/utils";
+import { newCase } from "../utils/functions/moderation/cases";
 
 const cmd = new Command("warn", "warn one or more users", Categories.MODERATION).setPermissions(["MANAGE_MESSAGES"]);
 

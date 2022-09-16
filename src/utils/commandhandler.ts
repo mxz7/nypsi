@@ -13,34 +13,37 @@ import {
 } from "discord.js";
 import * as fs from "fs";
 import { getBorderCharacters, table } from "table";
+import { createCaptcha, isLockedOut, toggleLock } from "./functions/captcha";
+import { formatDate, MStoTime } from "./functions/date";
+import { getNews, hasSeenNews } from "./functions/news";
+import { getTimestamp, logger } from "./logger";
+import { Categories, Command, NypsiCommandInteraction } from "./models/Command";
+import { CustomEmbed, ErrorEmbed } from "./models/EmbedBuilders";
+// @ts-expect-error typescript doesnt like opening package.json
+import { version } from "../../package.json";
+import redis from "./database/redis";
+import { a } from "./functions/anticheat";
+import { addProgress } from "./functions/economy/achievements";
 import {
   createUser,
   getAchievements,
   getEcoBanTime,
   getItems,
-  getXp,
   isEcoBanned,
   isHandcuffed,
-  updateXp,
   userExists,
-} from "./economy/utils";
-import { createCaptcha, isLockedOut, toggleLock } from "./functions/captcha";
-import { formatDate, MStoTime } from "./functions/date";
-import { getNews, hasSeenNews } from "./functions/news";
-import { getChatFilter, getDisabledCommands, getPrefix } from "./guilds/utils";
-import { addCommandUse, addKarma, getKarma, getLastCommand, updateLastCommand } from "./karma/utils";
-import { getTimestamp, logger } from "./logger";
-import { Categories, Command, NypsiCommandInteraction } from "./models/Command";
-import { CustomEmbed, ErrorEmbed } from "./models/EmbedBuilders";
-import { addUse, getCommand } from "./premium/utils";
-// @ts-expect-error typescript doesnt like opening package.json
-import { version } from "../../package.json";
-import redis from "./database/redis";
-import { addProgress } from "./economy/achievements";
-import { a } from "./functions/anticheat";
+} from "./functions/economy/utils";
+import { getXp, updateXp } from "./functions/economy/xp";
+import { getDisabledCommands } from "./functions/guilds/disabledcommands";
+import { getChatFilter } from "./functions/guilds/filters";
+import { getPrefix } from "./functions/guilds/utils";
+import { addKarma, getKarma } from "./functions/karma/karma";
+import { addUse, getCommand } from "./functions/premium/command";
+import { addCommandUse, getLastCommand, updateLastCommand } from "./functions/users/commands";
+import { updateLastKnowntag } from "./functions/users/tag";
+import { createProfile, hasProfile } from "./functions/users/utils";
 import { NypsiClient } from "./models/Client";
 import { Item } from "./models/Economy";
-import { createProfile, hasProfile, updateLastKnowntag } from "./users/utils";
 import dayjs = require("dayjs");
 
 const commands = new Map<string, Command>();

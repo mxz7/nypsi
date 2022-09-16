@@ -1,8 +1,10 @@
 import { Client, Guild } from "discord.js";
-import { setPrefix, updateDisabledCommands } from "../utils/guilds/utils";
-import { removeKarma } from "../utils/karma/utils";
+import { updateDisabledCommands } from "../utils/functions/guilds/disabledcommands";
+import { setPrefix } from "../utils/functions/guilds/utils";
+import { removeKarma } from "../utils/functions/karma/karma";
+import { setMuteRole } from "../utils/functions/moderation/mute";
+import { profileExists } from "../utils/functions/moderation/utils";
 import { logger } from "../utils/logger";
-import { profileExists, setMuteRole } from "../utils/moderation/utils";
 
 export default async function guildDelete(client: Client, guild: Guild) {
   if (!guild.name) {

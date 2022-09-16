@@ -1,13 +1,12 @@
 import { GuildMember } from "discord.js";
-import prisma from "../database/database";
-import redis from "../database/redis";
-import { formatDate } from "../functions/date";
-import requestDM from "../functions/requestdm";
-import { logger } from "../logger";
-import { NypsiClient } from "../models/Client";
-import { PremUser } from "../models/PremStorage";
-
-const colorCache = new Map<string, `#${string}` | "default">();
+import prisma from "../../database/database";
+import redis from "../../database/redis";
+import { logger } from "../../logger";
+import { NypsiClient } from "../../models/Client";
+import { PremUser } from "../../models/PremStorage";
+import { formatDate } from "../date";
+import requestDM from "../requestdm";
+import { colorCache } from "./color";
 
 export async function isPremium(member: GuildMember | string): Promise<boolean> {
   let id: string;
@@ -167,65 +166,6 @@ export async function setTier(member: GuildMember | string, level: number, clien
   await redis.del(`cache:premium:level:${id}`);
 }
 
-export async function setEmbedColor(member: GuildMember | string, color: string) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
-
-  await prisma.premium.update({
-    where: {
-      userId: id,
-    },
-    data: {
-      embedColor: color,
-    },
-  });
-
-  if (colorCache.has(id)) {
-    colorCache.delete(id);
-  }
-}
-
-export async function getEmbedColor(member: string): Promise<`#${string}` | "default"> {
-  if (colorCache.has(member)) {
-    return colorCache.get(member);
-  }
-
-  const query = await prisma.premium.findUnique({
-    where: {
-      userId: member,
-    },
-    select: {
-      embedColor: true,
-    },
-  });
-
-  colorCache.set(member, query.embedColor as `#${string}` | "default");
-
-  return query.embedColor as `#${string}` | "default";
-}
-
-export async function setLastWeekly(member: GuildMember | string, date: Date) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
-
-  await prisma.premium.update({
-    where: {
-      userId: id,
-    },
-    data: {
-      lastWeekly: date,
-    },
-  });
-}
-
 export async function setStatus(member: GuildMember | string, status: number) {
   let id: string;
   if (member instanceof GuildMember) {
@@ -301,94 +241,6 @@ export async function expireUser(member: string, client: NypsiClient) {
   if (colorCache.has(member)) {
     colorCache.delete(member);
   }
-}
-
-export async function getLastWeekly(member: string) {
-  const query = await prisma.premium.findUnique({
-    where: {
-      userId: member,
-    },
-    select: {
-      lastWeekly: true,
-    },
-  });
-
-  return query.lastWeekly;
-}
-
-type PremiumCommand = {
-  owner: string;
-  trigger: string;
-  content: string;
-  uses: number;
-};
-
-export async function getCommand(name: string): Promise<PremiumCommand> {
-  const query = await prisma.premiumCommand.findUnique({
-    where: {
-      trigger: name,
-    },
-  });
-
-  if (query) {
-    if (!(await isPremium(query.owner))) {
-      return undefined;
-    }
-    return query;
-  } else {
-    return undefined;
-  }
-}
-
-export async function getUserCommand(id: string) {
-  return await prisma.premiumCommand.findUnique({
-    where: {
-      owner: id,
-    },
-  });
-}
-
-export async function setCommand(id: string, trigger: string, content: string) {
-  const query = await prisma.premiumCommand.findUnique({
-    where: {
-      owner: id,
-    },
-    select: {
-      owner: true,
-    },
-  });
-
-  if (query) {
-    await prisma.premiumCommand.update({
-      where: {
-        owner: id,
-      },
-      data: {
-        trigger: trigger,
-        content: content,
-        uses: 0,
-      },
-    });
-  } else {
-    await prisma.premiumCommand.create({
-      data: {
-        trigger: trigger,
-        content: content,
-        owner: id,
-      },
-    });
-  }
-}
-
-export async function addUse(id: string) {
-  await prisma.premiumCommand.update({
-    where: {
-      owner: id,
-    },
-    data: {
-      uses: { increment: 1 },
-    },
-  });
 }
 
 export async function setExpireDate(member: GuildMember | string, date: Date, client: NypsiClient) {

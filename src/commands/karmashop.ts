@@ -11,20 +11,16 @@ import {
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import { addProgress } from "../utils/economy/achievements";
-import { createUser, getInventory, getXp, setInventory, updateXp, userExists } from "../utils/economy/utils";
-import {
-  closeKarmaShop,
-  getKarma,
-  getKarmaShopItems,
-  isKarmaShopOpen,
-  openKarmaShop,
-  removeKarma,
-} from "../utils/karma/utils";
+import { addProgress } from "../utils/functions/economy/achievements";
+import { getInventory, setInventory } from "../utils/functions/economy/inventory";
+import { createUser, userExists } from "../utils/functions/economy/utils";
+import { getXp, updateXp } from "../utils/functions/economy/xp";
+import { getKarma, removeKarma } from "../utils/functions/karma/karma";
+import { closeKarmaShop, getKarmaShopItems, isKarmaShopOpen, openKarmaShop } from "../utils/functions/karma/karmashop";
+import { getTier, isPremium, setExpireDate } from "../utils/functions/premium/premium";
 import { NypsiClient } from "../utils/models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
-import { getTier, isPremium, setExpireDate } from "../utils/premium/utils";
 import dayjs = require("dayjs");
 
 const cmd = new Command("karmashop", "buy stuff with your karma", Categories.INFO).setAliases(["ks"]);

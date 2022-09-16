@@ -1,27 +1,21 @@
 import {
-  CommandInteraction,
-  Message,
   ActionRowBuilder,
   ButtonBuilder,
-  MessageActionRowComponentBuilder,
   ButtonStyle,
+  CommandInteraction,
   Interaction,
+  Message,
+  MessageActionRowComponentBuilder,
 } from "discord.js";
-import {
-  getXp,
-  getPrestige,
-  userExists,
-  createUser,
-  getMulti,
-  getInventory,
-  getBalance,
-  deleteUser,
-  getItems,
-} from "../utils/economy/utils.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed } from "../utils/models/EmbedBuilders";
-import { addKarma } from "../utils/karma/utils.js";
 import { addCooldown, addExpiry, getResponse, onCooldown } from "../utils/cooldownhandler.js";
+import { getBalance, getMulti } from "../utils/functions/economy/balance";
+import { getInventory } from "../utils/functions/economy/inventory";
+import { getPrestige } from "../utils/functions/economy/prestige";
+import { createUser, deleteUser, getItems, userExists } from "../utils/functions/economy/utils";
+import { getXp } from "../utils/functions/economy/xp";
+import { addKarma } from "../utils/functions/karma/karma";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("reset", "reset your economy profile to gain karma", Categories.MONEY);
 
@@ -59,10 +53,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
   }
 
-  earnedKarma += (await getPrestige(message.member)) * 30;
-  earnedKarma += (await getXp(message.member)) / 100;
+  earnedKarma += (await getPrestige(message.member)) * 50;
+  earnedKarma += (await getXp(message.member)) / 50;
   earnedKarma += (await getBalance(message.member)) / 100000 / 2;
-  earnedKarma += inventoryWorth / 100000 / 2;
+  earnedKarma += inventoryWorth / 10000 / 2;
 
   earnedKarma = Math.floor(earnedKarma * 2.2);
 
@@ -118,10 +112,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       }
     }
 
-    earnedKarma += (await getPrestige(message.member)) * 30;
-    earnedKarma += (await getXp(message.member)) / 100;
+    earnedKarma += (await getPrestige(message.member)) * 50;
+    earnedKarma += (await getXp(message.member)) / 50;
     earnedKarma += (await getBalance(message.member)) / 100000 / 2;
-    earnedKarma += inventoryWorth / 100000 / 2;
+    earnedKarma += inventoryWorth / 10000 / 2;
 
     earnedKarma = Math.floor(earnedKarma * 2.2);
 

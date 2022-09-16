@@ -1,8 +1,8 @@
 import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
 import redis from "../utils/database/redis.js";
-import { addProgress } from "../utils/economy/achievements.js";
-import { getDMsEnabled } from "../utils/economy/utils.js";
+import { addProgress } from "../utils/functions/economy/achievements.js";
+import { getDMsEnabled } from "../utils/functions/economy/utils.js";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 import { MilfSearchData } from "../utils/models/Sex.js";
