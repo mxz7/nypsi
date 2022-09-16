@@ -421,7 +421,7 @@
         "boosterEffect": {
             "boosts": ["multi"],
             "effect": 1,
-            "time": 30
+            "time": 55
         }
     },
     "cake": {
@@ -437,8 +437,8 @@
         "max": 3,
         "boosterEffect": {
             "boosts": ["xp"],
-            "effect": 0.2,
-            "time": 300
+            "effect": 0.5,
+            "time": 600
         }
     },
     "potato": {
@@ -741,7 +741,7 @@
         "boosterEffect": {
             "boosts": ["cooldown"],
             "effect": 0.5,
-            "time": 450
+            "time": 600
         }
     },
     "worm": {
@@ -909,7 +909,7 @@
         "boosterEffect": {
             "boosts": ["fight"],
             "effect": "improves fight strength",
-            "time": 3600
+            "time": 2700
         }
     },
     "vote_booster": {
