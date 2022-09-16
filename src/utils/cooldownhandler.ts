@@ -2,7 +2,7 @@ import { GuildMember } from "discord.js";
 import redis from "./database/redis";
 import { getBoosters } from "./functions/economy/boosters";
 import { getItems } from "./functions/economy/utils";
-import { getPrefix } from "./guilds/utils";
+import { getPrefix } from "./functions/guilds/utils";
 import { ErrorEmbed } from "./models/EmbedBuilders";
 import { getTier, isPremium } from "./premium/utils";
 

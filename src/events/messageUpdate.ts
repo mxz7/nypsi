@@ -1,5 +1,5 @@
 import { Message, PermissionFlagsBits } from "discord.js";
-import { createGuild, eSnipe, getChatFilter, getSnipeFilter, hasGuild } from "../utils/guilds/utils";
+import { createGuild, eSnipe, getChatFilter, getSnipeFilter, hasGuild } from "../utils/functions/guilds/utils";
 import { CustomEmbed } from "../utils/models/EmbedBuilders";
 import { LogType, PunishmentType } from "../utils/models/GuildStorage";
 import { addLog, addModLog, isLogsEnabled } from "../utils/moderation/utils";

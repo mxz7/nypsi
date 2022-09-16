@@ -1,7 +1,7 @@
 import { CommandInteraction, Message, PermissionFlagsBits, Role, ThreadChannel } from "discord.js";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
-import { getPrefix } from "../utils/guilds/utils";
+import { getPrefix } from "../utils/functions/guilds/utils";
 import { setMuteRole, getMuteRole, createProfile, profileExists } from "../utils/moderation/utils";
 
 const cmd = new Command("muterole", "set the muterole for the server", Categories.ADMIN)

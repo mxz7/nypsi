@@ -11,7 +11,7 @@ import * as fs from "fs/promises";
 import { addCooldown, onCooldown } from "../utils/cooldownhandler.js";
 import prisma from "../utils/database/database";
 import { getDMsEnabled } from "../utils/economy/utils";
-import { getPrefix } from "../utils/guilds/utils";
+import { getPrefix } from "../utils/functions/guilds/utils";
 import { logger } from "../utils/logger";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";

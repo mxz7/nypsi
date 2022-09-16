@@ -1,5 +1,5 @@
 import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
-import { getPrefix, getDisabledCommands, updateDisabledCommands } from "../utils/guilds/utils";
+import { getPrefix, getDisabledCommands, updateDisabledCommands } from "../utils/functions/guilds/utils";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
 import { commandExists } from "../utils/commandhandler";

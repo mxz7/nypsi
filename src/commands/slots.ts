@@ -25,7 +25,7 @@ import {
   updateXp,
   userExists,
 } from "../utils/economy/utils.js";
-import { getPrefix } from "../utils/guilds/utils";
+import { getPrefix } from "../utils/functions/guilds/utils";
 import { gamble } from "../utils/logger.js";
 import { NypsiClient } from "../utils/models/Client.js";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";

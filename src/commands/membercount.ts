@@ -1,5 +1,5 @@
 import { ChannelType, CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
-import { getPeaks, getPrefix, getGuildCounter, setGuildCounter, createGuildCounter } from "../utils/guilds/utils";
+import { getPeaks, getPrefix, getGuildCounter, setGuildCounter, createGuildCounter } from "../utils/functions/guilds/utils";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
 import { logger } from "../utils/logger";

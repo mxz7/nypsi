@@ -1,7 +1,7 @@
 import { Collection, Guild, GuildMember } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import prisma from "../../database/database";
-import { addCooldown, inCooldown } from "../../guilds/utils";
+import { addCooldown, inCooldown } from "../guilds/utils";
 
 export async function getReactionStats(guild: Guild, member: GuildMember) {
   const query = await prisma.chatReactionStats.findFirst({

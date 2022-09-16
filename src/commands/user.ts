@@ -2,7 +2,7 @@ import { CommandInteraction, Message } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { formatDate } from "../utils/functions/date";
 import { getMember } from "../utils/functions/member";
-import { addCooldown, inCooldown } from "../utils/guilds/utils";
+import { addCooldown, inCooldown } from "../utils/functions/guilds/utils";
 import { getKarma } from "../utils/karma/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";

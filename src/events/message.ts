@@ -22,7 +22,14 @@ import redis from "../utils/database/redis";
 import { userExists } from "../utils/economy/utils";
 import { encrypt } from "../utils/functions/string";
 import { createSupportRequest, getSupportRequest, sendToRequestChannel } from "../utils/functions/supportrequest";
-import { addCooldown, getChatFilter, getPercentMatch, getPrefix, hasGuild, inCooldown } from "../utils/guilds/utils";
+import {
+  addCooldown,
+  getChatFilter,
+  getPercentMatch,
+  getPrefix,
+  hasGuild,
+  inCooldown,
+} from "../utils/functions/guilds/utils";
 import { getKarma, getLastCommand } from "../utils/karma/utils";
 import { logger } from "../utils/logger";
 import { NypsiClient } from "../utils/models/Client";

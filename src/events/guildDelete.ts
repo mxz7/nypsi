@@ -1,5 +1,5 @@
 import { Client, Guild } from "discord.js";
-import { setPrefix, updateDisabledCommands } from "../utils/guilds/utils";
+import { setPrefix, updateDisabledCommands } from "../utils/functions/guilds/utils";
 import { removeKarma } from "../utils/karma/utils";
 import { logger } from "../utils/logger";
 import { profileExists, setMuteRole } from "../utils/moderation/utils";

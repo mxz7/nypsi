@@ -1,5 +1,5 @@
 import { Message } from "discord.js";
-import { createGuild, getChatFilter, getSnipeFilter, hasGuild, snipe } from "../utils/guilds/utils";
+import { createGuild, getChatFilter, getSnipeFilter, hasGuild, snipe } from "../utils/functions/guilds/utils";
 import { CustomEmbed } from "../utils/models/EmbedBuilders";
 import { LogType } from "../utils/models/GuildStorage";
 import { addLog, isLogsEnabled } from "../utils/moderation/utils";

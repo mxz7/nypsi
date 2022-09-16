@@ -1,5 +1,11 @@
 import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
-import { getChatFilter, getPercentMatch, getPrefix, setPercentMatch, updateChatFilter } from "../utils/guilds/utils";
+import {
+  getChatFilter,
+  getPercentMatch,
+  getPrefix,
+  setPercentMatch,
+  updateChatFilter,
+} from "../utils/functions/guilds/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 

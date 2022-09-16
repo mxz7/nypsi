@@ -1,6 +1,6 @@
 import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
 import { daysUntil, formatDate } from "../utils/functions/date";
-import { addCountdown, deleteCountdown, getCountdowns, getPrefix } from "../utils/guilds/utils";
+import { addCountdown, deleteCountdown, getCountdowns, getPrefix } from "../utils/functions/guilds/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 import { getTier, isPremium } from "../utils/premium/utils";

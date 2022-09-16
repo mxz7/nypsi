@@ -14,7 +14,7 @@ const {
   topAmountGlobal,
   isEcoBanned,
 } = require("../utils/economy/utils");
-const { getPeaks } = require("../utils/guilds/utils");
+const { getPeaks } = require("../utils/functions/guilds/utils");
 const { getKarma, getLastCommand } = require("../utils/karma/utils");
 const { isPremium, getPremiumProfile } = require("../utils/premium/utils");
 const { formatDate, daysAgo } = require("../utils/functions/date");

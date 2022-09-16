@@ -20,7 +20,7 @@ import { runCommandUseTimers } from "../commandhandler";
 import redis from "../database/redis";
 import { runEconomySetup } from "../economy/utils";
 import { runUploadReset } from "../functions/image";
-import { runChristmas, runCountdowns, runSnipeClearIntervals, updateCounters } from "../guilds/utils";
+import { runChristmas, runCountdowns, runSnipeClearIntervals, updateCounters } from "../functions/guilds/utils";
 import { updateCache } from "../imghandler";
 import { getWebhooks, logger, setClusterId } from "../logger";
 import { runAuctionChecks } from "../scheduled/clusterjobs/checkauctions";

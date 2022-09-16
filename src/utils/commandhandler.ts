@@ -27,7 +27,7 @@ import {
 import { createCaptcha, isLockedOut, toggleLock } from "./functions/captcha";
 import { formatDate, MStoTime } from "./functions/date";
 import { getNews, hasSeenNews } from "./functions/news";
-import { getChatFilter, getDisabledCommands, getPrefix } from "./guilds/utils";
+import { getChatFilter, getDisabledCommands, getPrefix } from "./functions/guilds/utils";
 import { addCommandUse, addKarma, getKarma, getLastCommand, updateLastCommand } from "./karma/utils";
 import { getTimestamp, logger } from "./logger";
 import { Categories, Command, NypsiCommandInteraction } from "./models/Command";

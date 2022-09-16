@@ -12,7 +12,7 @@ import {
 } from "../utils/economy/utils.js";
 import { getMember } from "../utils/functions/member";
 import { addToNypsiBank, getTax } from "../utils/functions/tax";
-import { getPrefix } from "../utils/guilds/utils";
+import { getPrefix } from "../utils/functions/guilds/utils";
 import { payment } from "../utils/logger";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";

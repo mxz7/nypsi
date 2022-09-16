@@ -28,7 +28,7 @@ import {
 import requestDM from "../utils/functions/requestdm";
 import { getSurveyByMessageId } from "../utils/functions/surveys";
 import { addToNypsiBank, getTax } from "../utils/functions/tax";
-import { getChatFilter } from "../utils/guilds/utils";
+import { getChatFilter } from "../utils/functions/guilds/utils";
 import { getKarma, getKarmaShopItems, isKarmaShopOpen } from "../utils/karma/utils";
 import { logger } from "../utils/logger";
 import { NypsiClient } from "../utils/models/Client";

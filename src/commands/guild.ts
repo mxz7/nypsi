@@ -37,7 +37,7 @@ import {
 import { daysAgo, formatDate } from "../utils/functions/date";
 import requestDM from "../utils/functions/requestdm";
 import { cleanString } from "../utils/functions/string";
-import { getPrefix } from "../utils/guilds/utils";
+import { getPrefix } from "../utils/functions/guilds/utils";
 import { NypsiClient } from "../utils/models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";

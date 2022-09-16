@@ -1,7 +1,7 @@
 import { CommandInteraction, Message } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
 import { createUser, getBalance, getMulti, updateBalance, userExists } from "../utils/economy/utils.js";
-import { getPrefix } from "../utils/guilds/utils";
+import { getPrefix } from "../utils/functions/guilds/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed } from "../utils/models/EmbedBuilders";
 import { getLastWeekly, getTier, isPremium, setLastWeekly } from "../utils/premium/utils";

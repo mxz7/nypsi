@@ -1,5 +1,5 @@
 import { Client, Guild } from "discord.js";
-import { createGuild, hasGuild, runCheck } from "../utils/guilds/utils";
+import { createGuild, hasGuild, runCheck } from "../utils/functions/guilds/utils";
 import { addKarma } from "../utils/karma/utils";
 import { logger } from "../utils/logger";
 import { createProfile, hasProfile } from "../utils/users/utils";

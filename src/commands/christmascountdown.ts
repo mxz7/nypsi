@@ -7,7 +7,7 @@ import {
   checkChristmasCountdown,
   hasChristmasCountdown,
   createNewChristmasCountdown,
-} from "../utils/guilds/utils";
+} from "../utils/functions/guilds/utils";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
 

@@ -13,7 +13,7 @@ import {
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { createUser, userExists } from "../utils/economy/utils";
 import { decrypt } from "../utils/functions/string";
-import { getPrefix } from "../utils/guilds/utils";
+import { getPrefix } from "../utils/functions/guilds/utils";
 import { getKarma, getLastCommand } from "../utils/karma/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";

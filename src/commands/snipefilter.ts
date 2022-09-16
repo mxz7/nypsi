@@ -1,5 +1,5 @@
 import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
-import { getSnipeFilter, getPrefix, updateSnipeFilter } from "../utils/guilds/utils";
+import { getSnipeFilter, getPrefix, updateSnipeFilter } from "../utils/functions/guilds/utils";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
 

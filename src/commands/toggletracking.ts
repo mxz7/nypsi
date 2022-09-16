@@ -1,7 +1,7 @@
 import { CommandInteraction, Message } from "discord.js";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed } from "../utils/models/EmbedBuilders";
-import { getPrefix } from "../utils/guilds/utils";
+import { getPrefix } from "../utils/functions/guilds/utils";
 import { isTracking, disableTracking, enableTracking } from "../utils/users/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 

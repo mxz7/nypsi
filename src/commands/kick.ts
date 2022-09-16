@@ -1,6 +1,6 @@
 import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions, PermissionFlagsBits } from "discord.js";
 import { getExactMember } from "../utils/functions/member";
-import { addCooldown, getPrefix, inCooldown } from "../utils/guilds/utils";
+import { addCooldown, getPrefix, inCooldown } from "../utils/functions/guilds/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 import { PunishmentType } from "../utils/models/GuildStorage";
