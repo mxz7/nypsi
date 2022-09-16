@@ -13,24 +13,24 @@ const cmd = new Command("wordle", "play wordle on discord", Categories.FUN).setA
 
 cmd.slashEnabled = true;
 cmd.slashData
-    .addSubcommand((option) => option.setName("play").setDescription("play a game of wordle"))
-    .addSubcommand((option) => option.setName("stats").setDescription("view your stats for wordle"))
-    .addSubcommand((option) => option.setName("help").setDescription("view the help menu for wordle"));
+  .addSubcommand((option) => option.setName("play").setDescription("play a game of wordle"))
+  .addSubcommand((option) => option.setName("stats").setDescription("view your stats for wordle"))
+  .addSubcommand((option) => option.setName("help").setDescription("view the help menu for wordle"));
 
 interface Game {
-    word: string;
-    notInWord: string[];
-    message: Message;
-    guesses: string[];
-    board: string[][];
-    embed: CustomEmbed;
-    start: number;
+  word: string;
+  notInWord: string[];
+  message: Message;
+  guesses: string[];
+  board: string[][];
+  embed: CustomEmbed;
+  start: number;
 }
 
 enum Response {
-    WIN,
-    CONTINUE,
-    LOSE,
+  WIN,
+  CONTINUE,
+  LOSE,
 }
 
 const emojis = new Map<string, string>();
@@ -40,386 +40,381 @@ const karmaCooldown = new Set<string>();
 let wordList: string[];
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-    const send = async (data: MessageOptions | InteractionReplyOptions) => {
-        if (!(message instanceof Message)) {
-            if (message.deferred) {
-                await message.editReply(data);
-            } else {
-                await message.reply(data as InteractionReplyOptions);
-            }
-            const replyMsg = await message.fetchReply();
-            if (replyMsg instanceof Message) {
-                return replyMsg;
-            }
-        } else {
-            return await message.channel.send(data as MessageOptions);
-        }
-    };
-
-    if (games.has(message.author.id)) {
-        return send({ embeds: [new ErrorEmbed("you are already playing wordle")] });
+  const send = async (data: MessageOptions | InteractionReplyOptions) => {
+    if (!(message instanceof Message)) {
+      if (message.deferred) {
+        await message.editReply(data);
+      } else {
+        await message.reply(data as InteractionReplyOptions);
+      }
+      const replyMsg = await message.fetchReply();
+      if (replyMsg instanceof Message) {
+        return replyMsg;
+      }
+    } else {
+      return await message.channel.send(data as MessageOptions);
     }
+  };
 
-    const prefix = await getPrefix(message.guild);
+  if (games.has(message.author.id)) {
+    return send({ embeds: [new ErrorEmbed("you are already playing wordle")] });
+  }
 
-    if (args.length == 0) {
-        const embed = new CustomEmbed(message.member);
+  const prefix = await getPrefix(message.guild);
 
-        embed.setHeader("wordle help");
-        embed.setDescription(
-            `you have 6 attempts to guess the word\n\ngreen letters indicate that the letter is in the correct spot\nyellow letters indicate that the letter is in the word, but in the wrong spot\ngrey letters arent in the word at all\n\n[wordlist](https://github.com/tekoh/nypsi/blob/main/data/wordle.txt)\n**${prefix}wordle play**`
-        );
-        embed.setFooter({ text: "type 'stop' to cancel the game when you're playing" });
-
-        return await send({ embeds: [embed] });
-    }
-
-    if (args[0].toLowerCase() == "stats") {
-        const stats = await getWordleStats(message.member);
-
-        if (!stats) {
-            return send({ embeds: [new ErrorEmbed("you have no wordle stats")] });
-        }
-
-        const embed = new CustomEmbed(message.member).setHeader(
-            `${message.author.username}'s wordle stats`,
-            message.author.avatarURL()
-        );
-
-        let desc = "";
-
-        if (stats.win1) desc += `:green_square: **${stats.win1.toLocaleString()}**\n`;
-        if (stats.win2) desc += `<:solid_grey:987046773157691452>:green_square: **${stats.win2.toLocaleString()}**\n`;
-        if (stats.win3)
-            desc += `<:solid_grey:987046773157691452><:solid_grey:987046773157691452>:green_square: **${stats.win3.toLocaleString()}**\n`;
-        if (stats.win4)
-            desc += `<:solid_grey:987046773157691452><:solid_grey:987046773157691452><:solid_grey:987046773157691452>:green_square: **${stats.win4.toLocaleString()}**\n`;
-        if (stats.win5)
-            desc += `<:solid_grey:987046773157691452><:solid_grey:987046773157691452><:solid_grey:987046773157691452><:solid_grey:987046773157691452>:green_square: **${stats.win5.toLocaleString()}**\n`;
-        if (stats.win6)
-            desc += `<:solid_grey:987046773157691452><:solid_grey:987046773157691452><:solid_grey:987046773157691452><:solid_grey:987046773157691452><:solid_grey:987046773157691452>:green_square: **${stats.win6.toLocaleString()}**\n`;
-        if (stats.lose) desc += `:red_square: **${stats.lose.toLocaleString()}**\n`;
-
-        embed.setDescription(desc);
-
-        if (stats.history.length > 2) {
-            const average = stats.history.reduce((a, b) => Number(a) + Number(b)) / stats.history.length;
-
-            embed.setFooter({ text: `average length of winning game: ${MStoTime(average)}` });
-        }
-
-        return send({ embeds: [embed] });
-    }
-
-    if (args[0].toLowerCase() != "start" && args[0].toLowerCase() != "play" && args[0].toLowerCase() != "p") {
-        return send({ embeds: [new ErrorEmbed(`${prefix}wordle play`)] });
-    }
-
-    if (await onCooldown(cmd.name, message.member)) {
-        const embed = await getResponse(cmd.name, message.member);
-
-        return message.channel.send({ embeds: [embed] });
-    }
-
-    await addCooldown(cmd.name, message.member, 75);
-
-    const board = createBoard();
-    const word = await getWord();
-
+  if (args.length == 0) {
     const embed = new CustomEmbed(message.member);
 
-    embed.setHeader(`${message.author.username}'s wordle`, message.author.avatarURL());
-    embed.setDescription(renderBoard(board));
-    embed.setFooter({ text: "type your guess in chat" });
+    embed.setHeader("wordle help");
+    embed.setDescription(
+      `you have 6 attempts to guess the word\n\ngreen letters indicate that the letter is in the correct spot\nyellow letters indicate that the letter is in the word, but in the wrong spot\ngrey letters arent in the word at all\n\n[wordlist](https://github.com/tekoh/nypsi/blob/main/data/wordle.txt)\n**${prefix}wordle play**`
+    );
+    embed.setFooter({ text: "type 'stop' to cancel the game when you're playing" });
 
-    let fail = false;
-    const msg = await send({ embeds: [embed] }).catch(() => {
-        fail = true;
-    });
+    return await send({ embeds: [embed] });
+  }
 
-    if (fail) return;
+  if (args[0].toLowerCase() == "stats") {
+    const stats = await getWordleStats(message.member);
 
-    games.set(message.author.id, {
-        message: msg as Message,
-        word: word,
-        notInWord: [],
-        guesses: [],
-        board: board,
-        embed: embed,
-        start: Date.now(),
-    });
+    if (!stats) {
+      return send({ embeds: [new ErrorEmbed("you have no wordle stats")] });
+    }
 
-    return play(message);
+    const embed = new CustomEmbed(message.member).setHeader(
+      `${message.author.username}'s wordle stats`,
+      message.author.avatarURL()
+    );
+
+    let desc = "";
+
+    if (stats.win1) desc += `:green_square: **${stats.win1.toLocaleString()}**\n`;
+    if (stats.win2) desc += `<:solid_grey:987046773157691452>:green_square: **${stats.win2.toLocaleString()}**\n`;
+    if (stats.win3)
+      desc += `<:solid_grey:987046773157691452><:solid_grey:987046773157691452>:green_square: **${stats.win3.toLocaleString()}**\n`;
+    if (stats.win4)
+      desc += `<:solid_grey:987046773157691452><:solid_grey:987046773157691452><:solid_grey:987046773157691452>:green_square: **${stats.win4.toLocaleString()}**\n`;
+    if (stats.win5)
+      desc += `<:solid_grey:987046773157691452><:solid_grey:987046773157691452><:solid_grey:987046773157691452><:solid_grey:987046773157691452>:green_square: **${stats.win5.toLocaleString()}**\n`;
+    if (stats.win6)
+      desc += `<:solid_grey:987046773157691452><:solid_grey:987046773157691452><:solid_grey:987046773157691452><:solid_grey:987046773157691452><:solid_grey:987046773157691452>:green_square: **${stats.win6.toLocaleString()}**\n`;
+    if (stats.lose) desc += `:red_square: **${stats.lose.toLocaleString()}**\n`;
+
+    embed.setDescription(desc);
+
+    if (stats.history.length > 2) {
+      const average = stats.history.reduce((a, b) => Number(a) + Number(b)) / stats.history.length;
+
+      embed.setFooter({ text: `average length of winning game: ${MStoTime(average)}` });
+    }
+
+    return send({ embeds: [embed] });
+  }
+
+  if (args[0].toLowerCase() != "start" && args[0].toLowerCase() != "play" && args[0].toLowerCase() != "p") {
+    return send({ embeds: [new ErrorEmbed(`${prefix}wordle play`)] });
+  }
+
+  if (await onCooldown(cmd.name, message.member)) {
+    const embed = await getResponse(cmd.name, message.member);
+
+    return message.channel.send({ embeds: [embed] });
+  }
+
+  await addCooldown(cmd.name, message.member, 75);
+
+  const board = createBoard();
+  const word = await getWord();
+
+  const embed = new CustomEmbed(message.member);
+
+  embed.setHeader(`${message.author.username}'s wordle`, message.author.avatarURL());
+  embed.setDescription(renderBoard(board));
+  embed.setFooter({ text: "type your guess in chat" });
+
+  let fail = false;
+  const msg = await send({ embeds: [embed] }).catch(() => {
+    fail = true;
+  });
+
+  if (fail) return;
+
+  games.set(message.author.id, {
+    message: msg as Message,
+    word: word,
+    notInWord: [],
+    guesses: [],
+    board: board,
+    embed: embed,
+    start: Date.now(),
+  });
+
+  return play(message);
 }
 
 async function play(message: Message | (NypsiCommandInteraction & CommandInteraction)): Promise<void> {
-    const m = games.get(message.author.id).message;
-    const edit = async (data: MessageEditOptions) => {
-        if (!(message instanceof Message)) {
-            await message.editReply(data).catch(() => {
-                games.delete(message.author.id);
-                return;
-            });
-            return await message.fetchReply();
-        } else {
-            return await m.edit(data).catch(() => {
-                games.delete(message.author.id);
-                return;
-            });
-        }
-    };
-
-    const embed = games.get(message.author.id).embed;
-
-    const filter = (m: Message) => m.author.id == message.author.id && !m.content.includes(" ");
-    let fail = false;
-
-    const response: any = await message.channel
-        .awaitMessages({ filter, max: 1, time: 180_000, errors: ["time"] })
-        .then(async (collected) => {
-            await collected.first().delete();
-            return collected.first().content.toLowerCase();
-        })
-        .catch(() => {
-            fail = true;
-            cancel(message, m);
-            games.delete(message.author.id);
-            message.channel.send({ content: message.author.toString() + " wordle game expired" });
-        });
-
-    if (fail) return;
-
-    if (!(typeof response == "string")) return;
-
-    if (
-        response == "stop" ||
-        response == "cancel" ||
-        response == "" ||
-        response.startsWith(await getPrefix(message.guild))
-    ) {
-        return cancel(message, m);
-    }
-
-    if (response.length != 5) {
-        const m = await message.channel.send({
-            embeds: [new CustomEmbed(message.member, "guesses must be 5 letter words")],
-        });
-
-        setTimeout(() => {
-            m.delete();
-        }, 2000);
-        return play(message);
-    } else if (!wordList.includes(response)) {
-        const msg = await message.channel.send({
-            embeds: [new CustomEmbed(message.member, `\`${response}\` is not in the word list`)],
-        });
-
-        setTimeout(() => {
-            msg.delete();
-        }, 2000);
-        return play(message);
-    } else if (games.get(message.author.id).guesses.includes(response)) {
-        const msg = await message.channel.send({
-            embeds: [new CustomEmbed(message.member, `you have already guessed \`${response}\``)],
-        });
-
-        setTimeout(() => {
-            msg.delete();
-        }, 2000);
-        return play(message);
+  const m = games.get(message.author.id).message;
+  const edit = async (data: MessageEditOptions) => {
+    if (!(message instanceof Message)) {
+      await message.editReply(data).catch(() => {
+        games.delete(message.author.id);
+        return;
+      });
+      return await message.fetchReply();
     } else {
-        const res = guessWord(response, message.author.id);
-
-        embed.setDescription(renderBoard(games.get(message.author.id).board));
-        embed.setFooter({ text: "'stop' to end the game" });
-
-        if (games.get(message.author.id).notInWord.length > 0) {
-            if (embed.data?.fields) {
-                embed.data.fields[0] = {
-                    name: "letters not in wordle",
-                    value: `~~${games.get(message.author.id).notInWord.join("~~ ~~")}~~`,
-                    inline: false,
-                };
-            } else {
-                embed.addField("letters not in wordle", `~~${games.get(message.author.id).notInWord.join("~~ ~~")}~~`);
-            }
-        }
-
-        let fail = false;
-        await edit({ embeds: [embed] }).catch(() => {
-            fail = true;
-        });
-        if (fail) {
-            games.delete(message.author.id);
-            return;
-        }
-
-        if (res == Response.CONTINUE) {
-            return play(message);
-        } else if (res == Response.LOSE) {
-            return lose(message, m);
-        } else {
-            return win(message, m);
-        }
+      return await m.edit(data).catch(() => {
+        games.delete(message.author.id);
+        return;
+      });
     }
+  };
+
+  const embed = games.get(message.author.id).embed;
+
+  const filter = (m: Message) => m.author.id == message.author.id && !m.content.includes(" ");
+  let fail = false;
+
+  const response: any = await message.channel
+    .awaitMessages({ filter, max: 1, time: 180_000, errors: ["time"] })
+    .then(async (collected) => {
+      await collected.first().delete();
+      return collected.first().content.toLowerCase();
+    })
+    .catch(() => {
+      fail = true;
+      cancel(message, m);
+      games.delete(message.author.id);
+      message.channel.send({ content: message.author.toString() + " wordle game expired" });
+    });
+
+  if (fail) return;
+
+  if (!(typeof response == "string")) return;
+
+  if (response == "stop" || response == "cancel" || response == "" || response.startsWith(await getPrefix(message.guild))) {
+    return cancel(message, m);
+  }
+
+  if (response.length != 5) {
+    const m = await message.channel.send({
+      embeds: [new CustomEmbed(message.member, "guesses must be 5 letter words")],
+    });
+
+    setTimeout(() => {
+      m.delete();
+    }, 2000);
+    return play(message);
+  } else if (!wordList.includes(response)) {
+    const msg = await message.channel.send({
+      embeds: [new CustomEmbed(message.member, `\`${response}\` is not in the word list`)],
+    });
+
+    setTimeout(() => {
+      msg.delete();
+    }, 2000);
+    return play(message);
+  } else if (games.get(message.author.id).guesses.includes(response)) {
+    const msg = await message.channel.send({
+      embeds: [new CustomEmbed(message.member, `you have already guessed \`${response}\``)],
+    });
+
+    setTimeout(() => {
+      msg.delete();
+    }, 2000);
+    return play(message);
+  } else {
+    const res = guessWord(response, message.author.id);
+
+    embed.setDescription(renderBoard(games.get(message.author.id).board));
+    embed.setFooter({ text: "'stop' to end the game" });
+
+    if (games.get(message.author.id).notInWord.length > 0) {
+      if (embed.data?.fields) {
+        embed.data.fields[0] = {
+          name: "letters not in wordle",
+          value: `~~${games.get(message.author.id).notInWord.join("~~ ~~")}~~`,
+          inline: false,
+        };
+      } else {
+        embed.addField("letters not in wordle", `~~${games.get(message.author.id).notInWord.join("~~ ~~")}~~`);
+      }
+    }
+
+    let fail = false;
+    await edit({ embeds: [embed] }).catch(() => {
+      fail = true;
+    });
+    if (fail) {
+      games.delete(message.author.id);
+      return;
+    }
+
+    if (res == Response.CONTINUE) {
+      return play(message);
+    } else if (res == Response.LOSE) {
+      return lose(message, m);
+    } else {
+      return win(message, m);
+    }
+  }
 }
 
 async function cancel(message: Message | (NypsiCommandInteraction & CommandInteraction), m: any) {
-    const edit = async (data: MessageOptions) => {
-        if (!(message instanceof Message)) {
-            await message.editReply(data);
-            return await message.fetchReply();
-        } else {
-            return await m.edit(data);
-        }
-    };
+  const edit = async (data: MessageOptions) => {
+    if (!(message instanceof Message)) {
+      await message.editReply(data);
+      return await message.fetchReply();
+    } else {
+      return await m.edit(data);
+    }
+  };
 
-    const embed = games.get(message.author.id).embed;
-    embed.setDescription(
-        `${renderBoard(games.get(message.author.id).board)}\n\n` +
-            `game cancelled. the word was **${games.get(message.author.id).word}**`
-    );
-    embed.setColor("#e4334f");
-    embed.setFooter(null);
+  const embed = games.get(message.author.id).embed;
+  embed.setDescription(
+    `${renderBoard(games.get(message.author.id).board)}\n\n` +
+      `game cancelled. the word was **${games.get(message.author.id).word}**`
+  );
+  embed.setColor("#e4334f");
+  embed.setFooter(null);
 
-    edit({ embeds: [embed] });
-    games.delete(message.author.id);
+  edit({ embeds: [embed] });
+  games.delete(message.author.id);
 
-    if (!message.member) return;
-    addWordleGame(message.member, false);
+  if (!message.member) return;
+  addWordleGame(message.member, false);
 }
 
 async function win(message: Message | (NypsiCommandInteraction & CommandInteraction), m: any) {
-    const edit = async (data: MessageOptions) => {
-        if (!(message instanceof Message)) {
-            await message.editReply(data);
-            return await message.fetchReply();
-        } else {
-            return await m.edit(data);
-        }
-    };
-
-    addWordleGame(
-        message.member,
-        true,
-        games.get(message.author.id).guesses.length,
-        Date.now() - games.get(message.author.id).start
-    );
-
-    const embed = games.get(message.author.id).embed;
-    embed.setDescription(`${renderBoard(games.get(message.author.id).board)}\n\n` + "you won!! congratulations");
-    embed.setColor("#5efb8f");
-    embed.setFooter({ text: `completed in ${MStoTime(Date.now() - games.get(message.author.id).start)}` });
-
-    edit({ embeds: [embed] });
-    games.delete(message.author.id);
-
-    if (!karmaCooldown.has(message.author.id)) {
-        karmaCooldown.add(message.author.id);
-
-        setTimeout(() => {
-            karmaCooldown.delete(message.author.id);
-        }, ms("15m"));
-
-        await addKarma(message.author.id, 5);
+  const edit = async (data: MessageOptions) => {
+    if (!(message instanceof Message)) {
+      await message.editReply(data);
+      return await message.fetchReply();
+    } else {
+      return await m.edit(data);
     }
+  };
+
+  addWordleGame(
+    message.member,
+    true,
+    games.get(message.author.id).guesses.length,
+    Date.now() - games.get(message.author.id).start
+  );
+
+  const embed = games.get(message.author.id).embed;
+  embed.setDescription(`${renderBoard(games.get(message.author.id).board)}\n\n` + "you won!! congratulations");
+  embed.setColor("#5efb8f");
+  embed.setFooter({ text: `completed in ${MStoTime(Date.now() - games.get(message.author.id).start)}` });
+
+  edit({ embeds: [embed] });
+  games.delete(message.author.id);
+
+  if (!karmaCooldown.has(message.author.id)) {
+    karmaCooldown.add(message.author.id);
+
+    setTimeout(() => {
+      karmaCooldown.delete(message.author.id);
+    }, ms("15m"));
+
+    await addKarma(message.author.id, 5);
+  }
 }
 
 async function lose(message: Message | (NypsiCommandInteraction & CommandInteraction), m: any) {
-    const edit = async (data: MessageOptions) => {
-        if (!(message instanceof Message)) {
-            await message.editReply(data);
-            return await message.fetchReply();
-        } else {
-            return await m.edit(data);
-        }
-    };
+  const edit = async (data: MessageOptions) => {
+    if (!(message instanceof Message)) {
+      await message.editReply(data);
+      return await message.fetchReply();
+    } else {
+      return await m.edit(data);
+    }
+  };
 
-    const embed = games.get(message.author.id).embed;
-    embed.setDescription(
-        `${renderBoard(games.get(message.author.id).board)}\n\n` +
-            `you lost ): the word was **${games.get(message.author.id).word}**`
-    );
-    embed.setColor("#e4334f");
-    embed.setFooter(null);
+  const embed = games.get(message.author.id).embed;
+  embed.setDescription(
+    `${renderBoard(games.get(message.author.id).board)}\n\n` +
+      `you lost ): the word was **${games.get(message.author.id).word}**`
+  );
+  embed.setColor("#e4334f");
+  embed.setFooter(null);
 
-    edit({ embeds: [embed] });
-    games.delete(message.author.id);
+  edit({ embeds: [embed] });
+  games.delete(message.author.id);
 
-    if (!message.member) return;
-    addWordleGame(message.member, false);
+  if (!message.member) return;
+  addWordleGame(message.member, false);
 }
 
 function createBoard(): string[][] {
-    const board = [];
+  const board = [];
 
-    for (let c = 0; c < 6; c++) {
-        board[c] = [];
-        for (let r = 0; r < 5; r++) {
-            board[c][r] = "<:spacer:971524938139852870>";
-        }
+  for (let c = 0; c < 6; c++) {
+    board[c] = [];
+    for (let r = 0; r < 5; r++) {
+      board[c][r] = "<:spacer:971524938139852870>";
     }
+  }
 
-    return board;
+  return board;
 }
 
 function renderBoard(board: string[][]): string {
-    return board.join("\n").replaceAll(",", "");
+  return board.join("\n").replaceAll(",", "");
 }
 
 function guessWord(word: string, id: string): Response {
-    const game = games.get(id);
-    const board = game.board;
-    const notInWord = game.notInWord;
+  const game = games.get(id);
+  const board = game.board;
+  const notInWord = game.notInWord;
 
-    const counts = new Map<string, number>();
+  const counts = new Map<string, number>();
 
-    for (let i = 0; i < 5; i++) {
-        const letter = word[i];
-        const actualLetter = game.word[i];
+  for (let i = 0; i < 5; i++) {
+    const letter = word[i];
+    const actualLetter = game.word[i];
 
-        let emoji: string;
+    let emoji: string;
 
-        if (letter == actualLetter) {
-            emoji = emojis.get(`green-${letter}`);
-            counts.set(letter, (counts.get(letter) || 0) + 1);
-        }
-
-        board[game.guesses.length][i] = emoji;
+    if (letter == actualLetter) {
+      emoji = emojis.get(`green-${letter}`);
+      counts.set(letter, (counts.get(letter) || 0) + 1);
     }
 
-    for (let i = 0; i < 5; i++) {
-        const letter = word[i];
-        const actualLetter = game.word[i];
-        const letterCount = (game.word.match(new RegExp(letter, "g")) || []).length;
+    board[game.guesses.length][i] = emoji;
+  }
 
-        let emoji: string;
+  for (let i = 0; i < 5; i++) {
+    const letter = word[i];
+    const actualLetter = game.word[i];
+    const letterCount = (game.word.match(new RegExp(letter, "g")) || []).length;
 
-        if (letter == actualLetter) {
-            // do nothing
-        } else if (game.word.includes(letter)) {
-            if ((counts.get(letter) || 0) >= letterCount) {
-                emoji = emojis.get(`grey-${letter}`);
-            } else {
-                emoji = emojis.get(`yellow-${letter}`);
-                counts.set(letter, (counts.get(letter) || 0) + 1);
-            }
-        } else {
-            if (!notInWord.includes(letter)) notInWord.push(letter);
-            emoji = emojis.get(`grey-${letter}`);
-        }
+    let emoji: string;
 
-        if (emoji) board[game.guesses.length][i] = emoji;
-    }
-
-    if (word == game.word) {
-        return Response.WIN;
-    } else if (game.guesses.length == 5) {
-        return Response.LOSE;
+    if (letter == actualLetter) {
+      // do nothing
+    } else if (game.word.includes(letter)) {
+      if ((counts.get(letter) || 0) >= letterCount) {
+        emoji = emojis.get(`grey-${letter}`);
+      } else {
+        emoji = emojis.get(`yellow-${letter}`);
+        counts.set(letter, (counts.get(letter) || 0) + 1);
+      }
     } else {
-        game.guesses.push(word);
-        return Response.CONTINUE;
+      if (!notInWord.includes(letter)) notInWord.push(letter);
+      emoji = emojis.get(`grey-${letter}`);
     }
+
+    if (emoji) board[game.guesses.length][i] = emoji;
+  }
+
+  if (word == game.word) {
+    return Response.WIN;
+  } else if (game.guesses.length == 5) {
+    return Response.LOSE;
+  } else {
+    game.guesses.push(word);
+    return Response.CONTINUE;
+  }
 }
 
 emojis.set("green-a", "<:1f1e6:971480503314178139>");
@@ -508,7 +503,7 @@ cmd.setRun(run);
 module.exports = cmd;
 
 async function getWord() {
-    if (!wordList) wordList = await fs.readFile("./data/wordle.txt").then((res) => res.toString().split("\n"));
+  if (!wordList) wordList = await fs.readFile("./data/wordle.txt").then((res) => res.toString().split("\n"));
 
-    return wordList[Math.floor(Math.random() * wordList.length)];
+  return wordList[Math.floor(Math.random() * wordList.length)];
 }

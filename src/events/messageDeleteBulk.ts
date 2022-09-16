@@ -5,35 +5,33 @@ import { addLog, isLogsEnabled } from "../utils/moderation/utils";
 import dayjs = require("dayjs");
 
 export default async function messageDeleteBulk(messages: Collection<Snowflake, Message>, channel: TextBasedChannel) {
-    if (channel.isDMBased()) return;
+  if (channel.isDMBased()) return;
 
-    if (await isLogsEnabled(channel.guild)) {
-        const embed = new CustomEmbed().disableFooter().setTimestamp();
+  if (await isLogsEnabled(channel.guild)) {
+    const embed = new CustomEmbed().disableFooter().setTimestamp();
 
-        embed.setHeader(`${messages.size} messages deleted in #${channel.name} [bulk delete]`);
+    embed.setHeader(`${messages.size} messages deleted in #${channel.name} [bulk delete]`);
 
-        const desc: string[] = [];
+    const desc: string[] = [];
 
-        messages.each((message) => {
-            if (message.content) {
-                desc.push(
-                    `[${dayjs(message.createdTimestamp).format("YYYY-MM-DD HH:mm:ss")}] ${message.author.tag}: ${
-                        message.content
-                    }`
-                );
-            }
+    messages.each((message) => {
+      if (message.content) {
+        desc.push(
+          `[${dayjs(message.createdTimestamp).format("YYYY-MM-DD HH:mm:ss")}] ${message.author.tag}: ${message.content}`
+        );
+      }
 
-            if (desc.join("\n").length > 1500) {
-                desc.push("...");
-                return false;
-            }
-            return true;
-        });
+      if (desc.join("\n").length > 1500) {
+        desc.push("...");
+        return false;
+      }
+      return true;
+    });
 
-        desc.reverse();
+    desc.reverse();
 
-        embed.setDescription(`\`\`\`${desc.join("\n")}\`\`\``);
+    embed.setDescription(`\`\`\`${desc.join("\n")}\`\`\``);
 
-        await addLog(channel.guild, LogType.MESSAGE, embed);
-    }
+    await addLog(channel.guild, LogType.MESSAGE, embed);
+  }
 }

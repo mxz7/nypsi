@@ -1,14 +1,14 @@
 import { CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions, MessageOptions } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
 import {
-    createUser,
-    formatNumber,
-    getBalance,
-    getBankBalance,
-    getMaxBankBalance,
-    updateBalance,
-    updateBankBalance,
-    userExists,
+  createUser,
+  formatNumber,
+  getBalance,
+  getBankBalance,
+  getMaxBankBalance,
+  updateBalance,
+  updateBankBalance,
+  userExists,
 } from "../utils/economy/utils.js";
 import { getPrefix } from "../utils/guilds/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
@@ -20,110 +20,110 @@ cmd.slashEnabled = true;
 cmd.slashData.addStringOption((option) => option.setName("amount").setDescription("amount to withdraw").setRequired(true));
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-    if (!(await userExists(message.member))) await createUser(message.member);
+  if (!(await userExists(message.member))) await createUser(message.member);
 
-    const send = async (data: MessageOptions | InteractionReplyOptions) => {
-        if (!(message instanceof Message)) {
-            if (message.deferred) {
-                await message.editReply(data);
-            } else {
-                await message.reply(data as InteractionReplyOptions);
-            }
-            const replyMsg = await message.fetchReply();
-            if (replyMsg instanceof Message) {
-                return replyMsg;
-            }
-        } else {
-            return await message.channel.send(data as MessageOptions);
-        }
-    };
-
-    if (await onCooldown(cmd.name, message.member)) {
-        const embed = await getResponse(cmd.name, message.member);
-
-        return send({ embeds: [embed], ephemeral: true });
+  const send = async (data: MessageOptions | InteractionReplyOptions) => {
+    if (!(message instanceof Message)) {
+      if (message.deferred) {
+        await message.editReply(data);
+      } else {
+        await message.reply(data as InteractionReplyOptions);
+      }
+      const replyMsg = await message.fetchReply();
+      if (replyMsg instanceof Message) {
+        return replyMsg;
+      }
+    } else {
+      return await message.channel.send(data as MessageOptions);
     }
+  };
 
-    const prefix = await getPrefix(message.guild);
+  if (await onCooldown(cmd.name, message.member)) {
+    const embed = await getResponse(cmd.name, message.member);
 
-    if (args.length == 0) {
-        const embed = new CustomEmbed(message.member)
-            .setHeader("withdraw help")
-            .addField("usage", `${prefix}withdraw <amount>`)
-            .addField("help", "you can withdraw money from your bank aslong as you have that amount available in your bank");
-        return send({ embeds: [embed] });
-    }
+    return send({ embeds: [embed], ephemeral: true });
+  }
 
-    if ((await getBankBalance(message.member)) == 0) {
-        return send({ embeds: [new ErrorEmbed("you dont have any money in your bank account")] });
-    }
+  const prefix = await getPrefix(message.guild);
 
-    if (args[0].toLowerCase() == "all") {
-        args[0] = (await getBankBalance(message.member)).toString();
-    }
-
-    if (args[0] == "half") {
-        args[0] = ((await getBankBalance(message.member)) / 2).toString();
-    }
-
-    const amount = formatNumber(args[0]);
-
-    if (amount > (await getBankBalance(message.member))) {
-        return send({
-            embeds: [new ErrorEmbed("you dont have enough money in your bank account")],
-        });
-    }
-
-    if (!amount) {
-        return send({ embeds: [new ErrorEmbed("invalid payment")] });
-    }
-
-    if (amount <= 0) {
-        return send({ embeds: [new ErrorEmbed("invalid payment")] });
-    }
-
-    await addCooldown(cmd.name, message.member, 30);
-
+  if (args.length == 0) {
     const embed = new CustomEmbed(message.member)
-        .setHeader("bank withdrawal", message.author.avatarURL())
-        .addField(
-            "bank balance",
-            "$**" +
-                (await getBankBalance(message.member)).toLocaleString() +
-                "** / $**" +
-                (await getMaxBankBalance(message.member)).toLocaleString() +
-                "**"
-        )
-        .addField("transaction amount", "-$**" + amount.toLocaleString() + "**");
+      .setHeader("withdraw help")
+      .addField("usage", `${prefix}withdraw <amount>`)
+      .addField("help", "you can withdraw money from your bank aslong as you have that amount available in your bank");
+    return send({ embeds: [embed] });
+  }
 
-    const m = await send({ embeds: [embed] });
+  if ((await getBankBalance(message.member)) == 0) {
+    return send({ embeds: [new ErrorEmbed("you dont have any money in your bank account")] });
+  }
 
-    await updateBankBalance(message.member, (await getBankBalance(message.member)) - amount);
-    await updateBalance(message.member, (await getBalance(message.member)) + amount);
+  if (args[0].toLowerCase() == "all") {
+    args[0] = (await getBankBalance(message.member)).toString();
+  }
 
-    const embed1 = new CustomEmbed(message.member)
-        .setHeader("bank withdrawal", message.author.avatarURL())
-        .addField(
-            "bank balance",
-            "$**" +
-                (await getBankBalance(message.member)).toLocaleString() +
-                "** / $**" +
-                (await getMaxBankBalance(message.member)).toLocaleString() +
-                "**"
-        );
+  if (args[0] == "half") {
+    args[0] = ((await getBankBalance(message.member)) / 2).toString();
+  }
 
-    embed1.addField("transaction amount", "-$**" + amount.toLocaleString() + "**");
+  const amount = formatNumber(args[0]);
 
-    const edit = async (data: MessageEditOptions, msg: Message) => {
-        if (!(message instanceof Message)) {
-            await message.editReply(data);
-            return await message.fetchReply();
-        } else {
-            return await msg.edit(data);
-        }
-    };
+  if (amount > (await getBankBalance(message.member))) {
+    return send({
+      embeds: [new ErrorEmbed("you dont have enough money in your bank account")],
+    });
+  }
 
-    setTimeout(() => edit({ embeds: [embed1] }, m), 1500);
+  if (!amount) {
+    return send({ embeds: [new ErrorEmbed("invalid payment")] });
+  }
+
+  if (amount <= 0) {
+    return send({ embeds: [new ErrorEmbed("invalid payment")] });
+  }
+
+  await addCooldown(cmd.name, message.member, 30);
+
+  const embed = new CustomEmbed(message.member)
+    .setHeader("bank withdrawal", message.author.avatarURL())
+    .addField(
+      "bank balance",
+      "$**" +
+        (await getBankBalance(message.member)).toLocaleString() +
+        "** / $**" +
+        (await getMaxBankBalance(message.member)).toLocaleString() +
+        "**"
+    )
+    .addField("transaction amount", "-$**" + amount.toLocaleString() + "**");
+
+  const m = await send({ embeds: [embed] });
+
+  await updateBankBalance(message.member, (await getBankBalance(message.member)) - amount);
+  await updateBalance(message.member, (await getBalance(message.member)) + amount);
+
+  const embed1 = new CustomEmbed(message.member)
+    .setHeader("bank withdrawal", message.author.avatarURL())
+    .addField(
+      "bank balance",
+      "$**" +
+        (await getBankBalance(message.member)).toLocaleString() +
+        "** / $**" +
+        (await getMaxBankBalance(message.member)).toLocaleString() +
+        "**"
+    );
+
+  embed1.addField("transaction amount", "-$**" + amount.toLocaleString() + "**");
+
+  const edit = async (data: MessageEditOptions, msg: Message) => {
+    if (!(message instanceof Message)) {
+      await message.editReply(data);
+      return await message.fetchReply();
+    } else {
+      return await msg.edit(data);
+    }
+  };
+
+  setTimeout(() => edit({ embeds: [embed1] }, m), 1500);
 }
 
 cmd.setRun(run);

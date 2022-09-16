@@ -9,143 +9,143 @@ const cmd = new Command("item", "view information about an item", Categories.MON
 
 cmd.slashEnabled = true;
 cmd.slashData.addStringOption((option) =>
-    option.setName("item-global").setDescription("item you want to view info for").setAutocomplete(true).setRequired(true)
+  option.setName("item-global").setDescription("item you want to view info for").setAutocomplete(true).setRequired(true)
 );
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-    const send = async (data: MessageOptions | InteractionReplyOptions) => {
-        if (!(message instanceof Message)) {
-            if (message.deferred) {
-                await message.editReply(data);
-            } else {
-                await message.reply(data as InteractionReplyOptions);
-            }
-            const replyMsg = await message.fetchReply();
-            if (replyMsg instanceof Message) {
-                return replyMsg;
-            }
-        } else {
-            return await message.channel.send(data as MessageOptions);
-        }
-    };
-
-    if (!(await userExists(message.member))) await createUser(message.member);
-
-    if (await onCooldown(cmd.name, message.member)) {
-        const embed = await getResponse(cmd.name, message.member);
-
-        return send({ embeds: [embed], ephemeral: true });
+  const send = async (data: MessageOptions | InteractionReplyOptions) => {
+    if (!(message instanceof Message)) {
+      if (message.deferred) {
+        await message.editReply(data);
+      } else {
+        await message.reply(data as InteractionReplyOptions);
+      }
+      const replyMsg = await message.fetchReply();
+      if (replyMsg instanceof Message) {
+        return replyMsg;
+      }
+    } else {
+      return await message.channel.send(data as MessageOptions);
     }
+  };
 
-    if (args.length == 0) {
-        return send({ embeds: [new ErrorEmbed("/item <item>")] });
+  if (!(await userExists(message.member))) await createUser(message.member);
+
+  if (await onCooldown(cmd.name, message.member)) {
+    const embed = await getResponse(cmd.name, message.member);
+
+    return send({ embeds: [embed], ephemeral: true });
+  }
+
+  if (args.length == 0) {
+    return send({ embeds: [new ErrorEmbed("/item <item>")] });
+  }
+
+  const items = getItems();
+
+  const searchTag = args.join(" ").toLowerCase();
+
+  let selected;
+
+  for (const itemName of Array.from(Object.keys(items))) {
+    const aliases = items[itemName].aliases ? items[itemName].aliases : [];
+    if (searchTag == itemName) {
+      selected = itemName;
+      break;
+    } else if (searchTag == itemName.split("_").join("")) {
+      selected = itemName;
+      break;
+    } else if (aliases.indexOf(searchTag) != -1) {
+      selected = itemName;
+      break;
+    } else if (searchTag == items[itemName].name) {
+      selected = itemName;
+      break;
     }
+  }
 
-    const items = getItems();
+  selected = items[selected];
 
-    const searchTag = args.join(" ").toLowerCase();
+  if (!selected) {
+    return send({ embeds: [new ErrorEmbed(`couldnt find \`${args.join(" ")}\``)] });
+  }
 
-    let selected;
+  await addCooldown(cmd.name, message.member, 7);
 
-    for (const itemName of Array.from(Object.keys(items))) {
-        const aliases = items[itemName].aliases ? items[itemName].aliases : [];
-        if (searchTag == itemName) {
-            selected = itemName;
-            break;
-        } else if (searchTag == itemName.split("_").join("")) {
-            selected = itemName;
-            break;
-        } else if (aliases.indexOf(searchTag) != -1) {
-            selected = itemName;
-            break;
-        } else if (searchTag == items[itemName].name) {
-            selected = itemName;
-            break;
-        }
+  const embed = new CustomEmbed(message.member).setTitle(`${selected.emoji} ${selected.name}`);
+
+  let desc = `\`${selected.id}\`\n\n*${selected.longDesc}*\n\n`;
+
+  if (selected.buy) {
+    desc += `**buy** $${selected.buy.toLocaleString()}\n`;
+  }
+
+  if (selected.sell) {
+    desc += `**sell** $${selected.sell.toLocaleString()}\n`;
+  }
+
+  const auctions = await prisma.auction.findMany({
+    where: {
+      AND: [{ sold: true }, { itemName: selected.id }],
+    },
+    select: {
+      bin: true,
+      itemAmount: true,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+    take: 100,
+  });
+
+  const costs: number[] = [];
+
+  for (const auction of auctions) {
+    if (costs.length >= 5000) break;
+
+    if (auction.itemAmount > 1) {
+      costs.push(Math.floor(Number(auction.bin) / auction.itemAmount));
+    } else {
+      costs.push(Number(auction.bin));
     }
+  }
 
-    selected = items[selected];
+  const sum = costs.reduce((a, b) => a + b, 0);
+  const avg = sum / costs.length || 0;
 
-    if (!selected) {
-        return send({ embeds: [new ErrorEmbed(`couldnt find \`${args.join(" ")}\``)] });
-    }
+  if (avg) {
+    desc += `**average auction sale** $${Math.floor(avg).toLocaleString()}\n`;
+  }
 
-    await addCooldown(cmd.name, message.member, 7);
+  if (selected.role) {
+    embed.addField("role", `\`${selected.role}${selected.role == "car" ? ` (${selected.speed})` : ""}\``, true);
+  }
 
-    const embed = new CustomEmbed(message.member).setTitle(`${selected.emoji} ${selected.name}`);
+  const rarityMap = new Map<number, string>();
 
-    let desc = `\`${selected.id}\`\n\n*${selected.longDesc}*\n\n`;
+  rarityMap.set(0, "common");
+  rarityMap.set(1, "uncommon");
+  rarityMap.set(2, "rare");
+  rarityMap.set(3, "very rare");
+  rarityMap.set(4, "exotic");
 
-    if (selected.buy) {
-        desc += `**buy** $${selected.buy.toLocaleString()}\n`;
-    }
+  if (selected.rarity) {
+    embed.addField("rarity", `\`${rarityMap.get(selected.rarity)}\``, true);
+  }
 
-    if (selected.sell) {
-        desc += `**sell** $${selected.sell.toLocaleString()}\n`;
-    }
+  const inventory = await getInventory(message.member);
 
-    const auctions = await prisma.auction.findMany({
-        where: {
-            AND: [{ sold: true }, { itemName: selected.id }],
-        },
-        select: {
-            bin: true,
-            itemAmount: true,
-        },
-        orderBy: {
-            createdAt: "desc",
-        },
-        take: 100,
+  if (inventory[selected.id]) {
+    embed.setFooter({
+      text: `you have ${inventory[selected.id].toLocaleString()} ${selected.name}${
+        inventory[selected.id] > 1 ? (selected.name.endsWith("s") ? "" : "s") : ""
+      }`,
     });
+  }
 
-    const costs: number[] = [];
+  embed.setDescription(desc);
 
-    for (const auction of auctions) {
-        if (costs.length >= 5000) break;
-
-        if (auction.itemAmount > 1) {
-            costs.push(Math.floor(Number(auction.bin) / auction.itemAmount));
-        } else {
-            costs.push(Number(auction.bin));
-        }
-    }
-
-    const sum = costs.reduce((a, b) => a + b, 0);
-    const avg = sum / costs.length || 0;
-
-    if (avg) {
-        desc += `**average auction sale** $${Math.floor(avg).toLocaleString()}\n`;
-    }
-
-    if (selected.role) {
-        embed.addField("role", `\`${selected.role}${selected.role == "car" ? ` (${selected.speed})` : ""}\``, true);
-    }
-
-    const rarityMap = new Map<number, string>();
-
-    rarityMap.set(0, "common");
-    rarityMap.set(1, "uncommon");
-    rarityMap.set(2, "rare");
-    rarityMap.set(3, "very rare");
-    rarityMap.set(4, "exotic");
-
-    if (selected.rarity) {
-        embed.addField("rarity", `\`${rarityMap.get(selected.rarity)}\``, true);
-    }
-
-    const inventory = await getInventory(message.member);
-
-    if (inventory[selected.id]) {
-        embed.setFooter({
-            text: `you have ${inventory[selected.id].toLocaleString()} ${selected.name}${
-                inventory[selected.id] > 1 ? (selected.name.endsWith("s") ? "" : "s") : ""
-            }`,
-        });
-    }
-
-    embed.setDescription(desc);
-
-    return await send({ embeds: [embed] });
+  return await send({ embeds: [embed] });
 }
 
 cmd.setRun(run);
