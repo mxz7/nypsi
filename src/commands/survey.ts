@@ -12,7 +12,7 @@ import {
 import { createSurvey, getSurveys } from "../utils/functions/surveys";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
-import { getTier, isPremium } from "../utils/premium/utils";
+import { getTier, isPremium } from "../utils/functions/premium/premium";
 
 const cmd = new Command("survey", "create a survey for users to respond to", Categories.INFO);
 

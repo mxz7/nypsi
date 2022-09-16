@@ -1,6 +1,6 @@
 import { CommandInteraction, Message } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import { addProgress } from "../utils/economy/achievements";
+import { addProgress } from "../utils/functions/economy/achievements";
 import { redditImage } from "../utils/functions/image";
 import { images } from "../utils/imghandler";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";

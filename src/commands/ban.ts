@@ -1,10 +1,12 @@
 import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions, PermissionFlagsBits, User } from "discord.js";
+import { addCooldown, getPrefix, inCooldown } from "../utils/functions/guilds/utils";
 import { getExactMember } from "../utils/functions/member";
-import { addCooldown, getPrefix, inCooldown } from "../utils/guilds/utils";
+import { newBan } from "../utils/functions/moderation/ban";
+import { newCase } from "../utils/functions/moderation/cases";
+import { createProfile, profileExists } from "../utils/functions/moderation/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 import { PunishmentType } from "../utils/models/GuildStorage";
-import { createProfile, newBan, newCase, profileExists } from "../utils/moderation/utils";
 
 const cmd = new Command("ban", "ban one or more users from the server", Categories.MODERATION).setPermissions([
   "BAN_MEMBERS",

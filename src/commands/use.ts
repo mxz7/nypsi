@@ -9,25 +9,20 @@ import {
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import prisma from "../utils/database/database";
 import redis from "../utils/database/redis";
+import { hasPadlock, increaseBaseBankStorage, setPadlock } from "../utils/functions/economy/balance";
+import { addBooster, getBoosters } from "../utils/functions/economy/boosters";
+import { getInventory, openCrate, setInventory } from "../utils/functions/economy/inventory";
+import { addItemUse } from "../utils/functions/economy/stats";
 import {
-  addBooster,
   addHandcuffs,
-  addItemUse,
   createUser,
-  getBoosters,
   getDMsEnabled,
-  getInventory,
   getItems,
-  hasPadlock,
-  increaseBaseBankStorage,
   isHandcuffed,
-  openCrate,
-  setInventory,
-  setPadlock,
   userExists,
-} from "../utils/economy/utils";
+} from "../utils/functions/economy/utils";
+import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
-import { getPrefix } from "../utils/guilds/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 

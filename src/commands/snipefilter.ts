@@ -1,7 +1,8 @@
 import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
-import { getSnipeFilter, getPrefix, updateSnipeFilter } from "../utils/guilds/utils";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
+import { getSnipeFilter, updateSnipeFilter } from "../utils/functions/guilds/filters";
+import { getPrefix } from "../utils/functions/guilds/utils";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 
 const cmd = new Command("snipefilter", "change the snipe filter for your server", Categories.ADMIN)
   .setAliases(["sf"])

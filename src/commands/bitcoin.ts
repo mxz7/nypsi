@@ -1,7 +1,8 @@
 import { CommandInteraction, Message } from "discord.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
+import { getInventory } from "../utils/functions/economy/inventory";
+import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed } from "../utils/models/EmbedBuilders";
-import { getItems, getInventory, userExists, createUser } from "../utils/economy/utils";
 
 const cmd = new Command("bitcoin", "view the current bitcoin value (reflects real life USD)", Categories.MONEY).setAliases([
   "btc",

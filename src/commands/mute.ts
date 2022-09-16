@@ -7,12 +7,14 @@ import {
   Role,
   ThreadChannel,
 } from "discord.js";
+import { addCooldown, getPrefix, inCooldown } from "../utils/functions/guilds/utils";
 import { getExactMember } from "../utils/functions/member";
-import { addCooldown, getPrefix, inCooldown } from "../utils/guilds/utils";
+import { newCase } from "../utils/functions/moderation/cases";
+import { deleteMute, getMuteRole, isMuted, newMute } from "../utils/functions/moderation/mute";
+import { createProfile, profileExists } from "../utils/functions/moderation/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 import { PunishmentType } from "../utils/models/GuildStorage";
-import { createProfile, deleteMute, getMuteRole, isMuted, newCase, newMute, profileExists } from "../utils/moderation/utils";
 import ms = require("ms");
 import dayjs = require("dayjs");
 

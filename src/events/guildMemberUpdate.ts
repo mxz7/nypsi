@@ -1,9 +1,9 @@
 import { GuildMember } from "discord.js";
 import Constants from "../utils/Constants";
-import { addKarma } from "../utils/karma/utils";
+import { addKarma } from "../utils/functions/karma/karma";
+import { addMember, getTier, isPremium, renewUser, setExpireDate, setTier } from "../utils/functions/premium/premium";
+import { createProfile, hasProfile } from "../utils/functions/users/utils";
 import { NypsiClient } from "../utils/models/Client";
-import { addMember, getTier, isPremium, renewUser, setExpireDate, setTier } from "../utils/premium/utils";
-import { createProfile, hasProfile } from "../utils/users/utils";
 
 export default async function guildMemberUpdate(oldMember: GuildMember, newMember: GuildMember) {
   if (newMember.guild.id == "747056029795221513") {

@@ -1,6 +1,6 @@
 import { CommandInteraction, Message } from "discord.js";
 import { formatDate } from "../utils/functions/date";
-import { getPeaks, inCooldown, addCooldown, runCheck } from "../utils/guilds/utils";
+import { getPeaks, inCooldown, addCooldown, runCheck } from "../utils/functions/guilds/utils";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed } from "../utils/models/EmbedBuilders.js";
 

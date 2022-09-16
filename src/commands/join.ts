@@ -2,7 +2,7 @@ import { Collection, CommandInteraction, GuildMember, InteractionReplyOptions, M
 import { inPlaceSort } from "fast-sort";
 import { daysAgo, formatDate } from "../utils/functions/date";
 import { getMember } from "../utils/functions/member";
-import { addCooldown, inCooldown } from "../utils/guilds/utils";
+import { addCooldown, inCooldown } from "../utils/functions/guilds/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 import workerSort from "../utils/workers/sort";

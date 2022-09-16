@@ -9,7 +9,9 @@ import {
   MessageActionRowComponentBuilder,
   MessageOptions,
 } from "discord.js";
-import { createUser, getLastVote, getPrestige, hasVoted, userExists } from "../utils/economy/utils.js";
+import { getPrestige } from "../utils/functions/economy/prestige";
+import { createUser, userExists } from "../utils/functions/economy/utils";
+import { getLastVote, hasVoted } from "../utils/functions/economy/vote";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed } from "../utils/models/EmbedBuilders.js";
 

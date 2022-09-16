@@ -1,5 +1,5 @@
 import { CommandInteraction, Message } from "discord.js";
-import { loadItems } from "../utils/economy/utils";
+import { loadItems } from "../utils/functions/economy/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 
 const cmd = new Command("reloaditems", "reload items", Categories.NONE).setPermissions(["bot owner"]);
