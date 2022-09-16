@@ -2570,12 +2570,14 @@ export async function deleteAuction(id: string, client: NypsiClient) {
 
 export async function createAuction(member: GuildMember, itemId: string, itemAmount: number, bin: number) {
     const embed = new CustomEmbed(member).setHeader(`${member.user.username}'s auction`, member.user.avatarURL());
-
+    const price = itemAmount/bin;
+    
     embed.setDescription(
         `started <t:${Math.floor(Date.now() / 1000)}:R>\n\n` +
             `**${itemAmount.toLocaleString()}x** ${items[itemId].emoji} ${
                 items[itemId].name
-            } for $**${bin.toLocaleString()}**`
+            } for $**${bin.toLocaleString()}**\n\n`+ 
+        `$**${price.toLocaleString}** per ${items[itemId].emoji} ${items[itemId].name}`
     );
 
     const button = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
