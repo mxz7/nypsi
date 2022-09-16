@@ -10,6 +10,7 @@ import {
     MessageActionRowComponentBuilder,
     PermissionsBitField,
     TextChannel,
+    ThreadChannel,
     ThreadMember,
     ThreadMemberManager,
 } from "discord.js";
