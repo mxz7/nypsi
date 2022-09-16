@@ -13,14 +13,14 @@ import {
 import { inPlaceSort } from "fast-sort";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import prisma from "../utils/database/database";
+import { daysAgo } from "../utils/functions/date";
 import {
   getAllAchievements,
   getCompletedAchievements,
   getUncompletedAchievements,
   getUserAchievement,
-} from "../utils/economy/achievements";
-import { getAchievements } from "../utils/economy/utils";
-import { daysAgo } from "../utils/functions/date";
+} from "../utils/functions/economy/achievements";
+import { getAchievements } from "../utils/functions/economy/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { AchievementData } from "../utils/models/Economy";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";

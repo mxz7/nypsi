@@ -14,7 +14,7 @@ import {
   uploadImageToImgur,
 } from "../utils/functions/image";
 import { getMember } from "../utils/functions/member";
-import { getPrefix } from "../utils/guilds/utils";
+import { getPrefix } from "../utils/functions/guilds/utils";
 import { NypsiClient } from "../utils/models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";

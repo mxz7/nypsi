@@ -3,12 +3,12 @@ import { GuildMember, WebhookClient } from "discord.js";
 import ImgurClient from "imgur";
 import fetch from "node-fetch";
 import prisma from "../database/database";
-import { addProgress } from "../economy/achievements";
-import { getDMsEnabled } from "../economy/utils";
 import { logger } from "../logger";
 import { NypsiClient } from "../models/Client";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { RedditJSONPost } from "../models/Reddit";
+import { addProgress } from "./economy/achievements";
+import { getDMsEnabled } from "./economy/utils";
 import requestDM from "./requestdm";
 
 const imgur = new ImgurClient({

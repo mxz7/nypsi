@@ -1,10 +1,11 @@
 // @ts-expect-error doesnt like getting from json file
 import { workMessages } from "../../data/lists.json";
-import { getBalance, updateBalance, userExists, createUser } from "../utils/economy/utils.js";
 import { CommandInteraction, Message } from "discord.js";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { createUser, userExists } from "../utils/functions/economy/utils";
+import { getBalance, updateBalance } from "../utils/functions/economy/balance";
 
 const cmd = new Command("work", "work a random job and safely earn a random amount of money", Categories.MONEY);
 

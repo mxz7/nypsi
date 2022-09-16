@@ -1,6 +1,7 @@
 import prisma from "../../database/database";
-import { getInventory, setInventory, userExists } from "../../economy/utils";
 import { MStoTime } from "../../functions/date";
+import { getInventory, setInventory } from "../../functions/economy/inventory";
+import { userExists } from "../../functions/economy/utils";
 import requestDM from "../../functions/requestdm";
 import { logger } from "../../logger";
 import { NypsiClient } from "../../models/Client";

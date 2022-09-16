@@ -1,7 +1,9 @@
 import dayjs = require("dayjs");
 import ms = require("ms");
 import prisma from "../../database/database";
-import { deleteAuction, getInventory, getItems, setInventory, userExists } from "../../economy/utils";
+import { deleteAuction } from "../../functions/economy/auctions";
+import { getInventory, setInventory } from "../../functions/economy/inventory";
+import { getItems, userExists } from "../../functions/economy/utils";
 import requestDM from "../../functions/requestdm";
 import { logger } from "../../logger";
 import { NypsiClient } from "../../models/Client";

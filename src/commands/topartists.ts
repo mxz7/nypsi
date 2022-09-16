@@ -14,11 +14,11 @@ import {
 } from "discord.js";
 import fetch from "node-fetch";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import { getPrefix } from "../utils/guilds/utils";
+import { getPrefix } from "../utils/functions/guilds/utils";
+import { getLastfmUsername } from "../utils/functions/users/lastfm";
 import { logger } from "../utils/logger";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
-import { getLastfmUsername } from "../utils/users/utils";
 
 const cmd = new Command("topartists", "view your top artists", Categories.MUSIC).setAliases(["ta"]);
 

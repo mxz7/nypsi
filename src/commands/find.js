@@ -14,9 +14,9 @@ const {
   topAmountGlobal,
   isEcoBanned,
 } = require("../utils/economy/utils");
-const { getPeaks } = require("../utils/guilds/utils");
+const { getPeaks } = require("../utils/functions/guilds/utils");
 const { getKarma, getLastCommand } = require("../utils/karma/utils");
-const { isPremium, getPremiumProfile } = require("../utils/premium/utils");
+const { isPremium, getPremiumProfile } = require("../utils/functions/premium/premium");
 const { formatDate, daysAgo } = require("../utils/functions/date");
 const { NypsiClient } = require("../utils/models/Client");
 const { fetchUsernameHistory } = require("../utils/users/utils");

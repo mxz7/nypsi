@@ -1,5 +1,6 @@
 import { CommandInteraction, Message } from "discord.js";
-import { calcMaxBet, userExists, createUser } from "../utils/economy/utils.js";
+import { calcMaxBet } from "../utils/functions/economy/balance";
+import { createUser, userExists } from "../utils/functions/economy/utils";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed } from "../utils/models/EmbedBuilders";
 

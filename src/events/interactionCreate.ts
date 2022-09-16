@@ -15,21 +15,15 @@ import {
 } from "discord.js";
 import { runCommand } from "../utils/commandhandler";
 import prisma from "../utils/database/database";
-import {
-  createUser,
-  getAchievements,
-  getBalance,
-  getInventory,
-  getItems,
-  setInventory,
-  updateBalance,
-  userExists,
-} from "../utils/economy/utils";
+import { getBalance, updateBalance } from "../utils/functions/economy/balance";
+import { getInventory, setInventory } from "../utils/functions/economy/inventory";
+import { createUser, getAchievements, getItems, userExists } from "../utils/functions/economy/utils";
+import { getChatFilter } from "../utils/functions/guilds/filters";
+import { getKarma } from "../utils/functions/karma/karma";
+import { getKarmaShopItems, isKarmaShopOpen } from "../utils/functions/karma/karmashop";
 import requestDM from "../utils/functions/requestdm";
 import { getSurveyByMessageId } from "../utils/functions/surveys";
 import { addToNypsiBank, getTax } from "../utils/functions/tax";
-import { getChatFilter } from "../utils/guilds/utils";
-import { getKarma, getKarmaShopItems, isKarmaShopOpen } from "../utils/karma/utils";
 import { logger } from "../utils/logger";
 import { NypsiClient } from "../utils/models/Client";
 import { createNypsiInteraction, NypsiCommandInteraction } from "../utils/models/Command";

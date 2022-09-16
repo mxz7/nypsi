@@ -1,7 +1,7 @@
 import { GuildChannel } from "discord.js";
+import { addLog, isLogsEnabled } from "../utils/functions/moderation/logs";
 import { CustomEmbed } from "../utils/models/EmbedBuilders";
 import { LogType } from "../utils/models/GuildStorage";
-import { addLog, isLogsEnabled } from "../utils/moderation/utils";
 
 export default async function channelDelete(channel: GuildChannel) {
   if (!channel.guild) return;

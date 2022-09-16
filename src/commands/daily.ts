@@ -1,22 +1,14 @@
 import dayjs = require("dayjs");
 import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import { setProgress } from "../utils/economy/achievements";
-import {
-  createUser,
-  getBalance,
-  getDailyStreak,
-  getLastDaily,
-  getXp,
-  updateBalance,
-  updateLastDaily,
-  updateXp,
-  userExists,
-} from "../utils/economy/utils";
 import { MStoTime } from "../utils/functions/date";
+import { setProgress } from "../utils/functions/economy/achievements";
+import { getBalance, updateBalance } from "../utils/functions/economy/balance";
+import { createUser, getDailyStreak, getLastDaily, updateLastDaily, userExists } from "../utils/functions/economy/utils";
+import { getXp, updateXp } from "../utils/functions/economy/xp";
+import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
-import { getTier, isPremium } from "../utils/premium/utils";
 
 const cmd = new Command("daily", "get your daily bonus", Categories.MONEY);
 

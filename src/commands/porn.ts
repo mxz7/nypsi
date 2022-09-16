@@ -1,10 +1,10 @@
 import { CommandInteraction, Message } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import { addProgress } from "../utils/economy/achievements";
+import { addProgress } from "../utils/functions/economy/achievements";
 import { redditImage } from "../utils/functions/image";
 import { images } from "../utils/imghandler";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 
 const cmd = new Command("porn", "get a random porn image", Categories.NSFW);
 
