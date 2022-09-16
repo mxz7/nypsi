@@ -1,9 +1,14 @@
 import { Cluster } from "discord-hybrid-sharding";
+import redis from "../database/redis";
 import { logger } from "../logger";
 
 const failedHeartbeats = new Map<number, number>();
 
 export async function sendHeartbeat(cluster: Cluster) {
+  if ((await redis.get("nypsi:restarting")) == "t") {
+    return true;
+  }
+
   return new Promise((resolve, reject) => {
     setImmediate(async () => {
       const res: any = await cluster.request({ alive: true });
