@@ -7,8 +7,8 @@ import { RedditJSON, RedditJSONPost } from "../utils/models/Reddit";
 import ms = require("ms");
 
 const cmd = new Command("dadjoke", "get a hilarious dad joke straight from r/dadjokes", Categories.FUN).setAliases([
-    "dadjokes",
-    "dj",
+  "dadjokes",
+  "dj",
 ]);
 
 cmd.slashEnabled = true;
@@ -18,52 +18,52 @@ const url = "https://www.reddit.com/r/dadjokes/top.json?limit=69&t=week";
 let cached: RedditJSONPost[] = [];
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-    const send = async (data: MessageOptions | InteractionReplyOptions) => {
-        if (!(message instanceof Message)) {
-            if (message.deferred) {
-                await message.editReply(data);
-            } else {
-                await message.reply(data as InteractionReplyOptions);
-            }
-            const replyMsg = await message.fetchReply();
-            if (replyMsg instanceof Message) {
-                return replyMsg;
-            }
-        } else {
-            return await message.channel.send(data as MessageOptions);
-        }
-    };
-
-    if (await onCooldown(cmd.name, message.member)) {
-        const embed = await getResponse(cmd.name, message.member);
-
-        return send({ embeds: [embed], ephemeral: true });
+  const send = async (data: MessageOptions | InteractionReplyOptions) => {
+    if (!(message instanceof Message)) {
+      if (message.deferred) {
+        await message.editReply(data);
+      } else {
+        await message.reply(data as InteractionReplyOptions);
+      }
+      const replyMsg = await message.fetchReply();
+      if (replyMsg instanceof Message) {
+        return replyMsg;
+      }
+    } else {
+      return await message.channel.send(data as MessageOptions);
     }
+  };
 
-    await addCooldown(cmd.name, message.member, 10);
+  if (await onCooldown(cmd.name, message.member)) {
+    const embed = await getResponse(cmd.name, message.member);
 
-    const embed = new CustomEmbed(message.member);
+    return send({ embeds: [embed], ephemeral: true });
+  }
 
-    if (cached.length == 0) {
-        const res: RedditJSON = await fetch(url).then((res) => res.json());
+  await addCooldown(cmd.name, message.member, 10);
 
-        cached = res.data.children;
+  const embed = new CustomEmbed(message.member);
 
-        setTimeout(() => {
-            cached = [];
-        }, ms("1 hour"));
-    }
+  if (cached.length == 0) {
+    const res: RedditJSON = await fetch(url).then((res) => res.json());
 
-    const chosen = cached[Math.floor(Math.random() * cached.length)].data;
+    cached = res.data.children;
 
-    embed.setHeader(`u/${chosen.author}`);
-    embed.setTitle(chosen.title);
-    embed.setURL(chosen.url);
-    embed.setDescription(chosen.selftext);
+    setTimeout(() => {
+      cached = [];
+    }, ms("1 hour"));
+  }
 
-    return send({ embeds: [embed] }).catch(() => {
-        send({ embeds: [new ErrorEmbed("unable to find dad joke. please try again")] });
-    });
+  const chosen = cached[Math.floor(Math.random() * cached.length)].data;
+
+  embed.setHeader(`u/${chosen.author}`);
+  embed.setTitle(chosen.title);
+  embed.setURL(chosen.url);
+  embed.setDescription(chosen.selftext);
+
+  return send({ embeds: [embed] }).catch(() => {
+    send({ embeds: [new ErrorEmbed("unable to find dad joke. please try again")] });
+  });
 }
 
 cmd.setRun(run);

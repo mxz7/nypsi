@@ -9,56 +9,56 @@ import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 const cmd = new Command("snek", "get a random picture of a snake/snek", Categories.ANIMALS).setAliases(["snake"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-    if (await onCooldown(cmd.name, message.member)) {
-        const embed = await getResponse(cmd.name, message.member);
+  if (await onCooldown(cmd.name, message.member)) {
+    const embed = await getResponse(cmd.name, message.member);
 
-        return message.channel.send({ embeds: [embed] });
-    }
+    return message.channel.send({ embeds: [embed] });
+  }
 
-    const snekCache = images.get("snek");
+  const snekCache = images.get("snek");
 
-    if (!snekCache) {
-        return message.channel.send({ embeds: [new ErrorEmbed("please wait a couple more seconds..")] });
-    }
+  if (!snekCache) {
+    return message.channel.send({ embeds: [new ErrorEmbed("please wait a couple more seconds..")] });
+  }
 
-    if (snekCache.size < 1) {
-        return message.channel.send({ embeds: [new ErrorEmbed("please wait a couple more seconds..")] });
-    }
+  if (snekCache.size < 1) {
+    return message.channel.send({ embeds: [new ErrorEmbed("please wait a couple more seconds..")] });
+  }
 
-    await addCooldown(cmd.name, message.member, 7);
+  await addCooldown(cmd.name, message.member, 7);
 
-    const snekLinks = Array.from(snekCache.keys());
+  const snekLinks = Array.from(snekCache.keys());
 
-    const subredditChoice = snekLinks[Math.floor(Math.random() * snekLinks.length)];
+  const subredditChoice = snekLinks[Math.floor(Math.random() * snekLinks.length)];
 
-    const allowed = snekCache.get(subredditChoice);
+  const allowed = snekCache.get(subredditChoice);
 
-    const chosen = allowed[Math.floor(Math.random() * allowed.length)];
+  const chosen = allowed[Math.floor(Math.random() * allowed.length)];
 
-    const a = await redditImage(chosen, allowed);
+  const a = await redditImage(chosen, allowed);
 
-    if (a == "lol") {
-        return message.channel.send({ embeds: [new ErrorEmbed("unable to find snek image")] });
-    }
+  if (a == "lol") {
+    return message.channel.send({ embeds: [new ErrorEmbed("unable to find snek image")] });
+  }
 
-    const image = a.split("|")[0];
-    const title = a.split("|")[1];
-    let url = a.split("|")[2];
-    const author = a.split("|")[3];
+  const image = a.split("|")[0];
+  const title = a.split("|")[1];
+  let url = a.split("|")[2];
+  const author = a.split("|")[3];
 
-    url = "https://reddit.com" + url;
+  url = "https://reddit.com" + url;
 
-    const subreddit = subredditChoice.split("/")[4];
+  const subreddit = subredditChoice.split("/")[4];
 
-    const embed = new CustomEmbed(message.member)
-        .setTitle(title)
-        .setHeader("u/" + author + " | r/" + subreddit)
-        .setURL(url)
-        .setImage(image);
+  const embed = new CustomEmbed(message.member)
+    .setTitle(title)
+    .setHeader("u/" + author + " | r/" + subreddit)
+    .setURL(url)
+    .setImage(image);
 
-    message.channel.send({ embeds: [embed] });
+  message.channel.send({ embeds: [embed] });
 
-    await addProgress(message.author.id, "cute", 1);
+  await addProgress(message.author.id, "cute", 1);
 }
 
 cmd.setRun(run);

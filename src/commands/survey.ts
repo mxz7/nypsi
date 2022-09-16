@@ -1,13 +1,13 @@
 import dayjs = require("dayjs");
 import {
-    ActionRowBuilder,
-    ButtonBuilder,
-    ButtonStyle,
-    CommandInteraction,
-    InteractionReplyOptions,
-    Message,
-    MessageActionRowComponentBuilder,
-    MessageOptions,
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  CommandInteraction,
+  InteractionReplyOptions,
+  Message,
+  MessageActionRowComponentBuilder,
+  MessageOptions,
 } from "discord.js";
 import { createSurvey, getSurveys } from "../utils/functions/surveys";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
@@ -18,82 +18,82 @@ const cmd = new Command("survey", "create a survey for users to respond to", Cat
 
 cmd.slashEnabled = true;
 cmd.slashData.addSubcommand((create) =>
-    create
-        .setName("create")
-        .setDescription("create a survey")
-        .addStringOption((option) =>
-            option
-                .setName("text")
-                .setDescription("the text/question asked to members")
-                .setRequired(true)
-                .setMinLength(1)
-                .setMaxLength(500)
-        )
-        .addIntegerOption((option) =>
-            option.setName("hours").setDescription("amount of hours until survey ends").setMinValue(1).setMaxValue(72)
-        )
+  create
+    .setName("create")
+    .setDescription("create a survey")
+    .addStringOption((option) =>
+      option
+        .setName("text")
+        .setDescription("the text/question asked to members")
+        .setRequired(true)
+        .setMinLength(1)
+        .setMaxLength(500)
+    )
+    .addIntegerOption((option) =>
+      option.setName("hours").setDescription("amount of hours until survey ends").setMinValue(1).setMaxValue(72)
+    )
 );
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-    const send = async (data: MessageOptions | InteractionReplyOptions) => {
-        if (!(message instanceof Message)) {
-            if (message.deferred) {
-                await message.editReply(data);
-            } else {
-                await message.reply(data as InteractionReplyOptions);
-            }
-            const replyMsg = await message.fetchReply();
-            if (replyMsg instanceof Message) {
-                return replyMsg;
-            }
-        } else {
-            return await message.channel.send(data as MessageOptions);
-        }
-    };
-
-    if (message instanceof Message) {
-        return send({ embeds: [new CustomEmbed(message.member, "use /survey")] });
+  const send = async (data: MessageOptions | InteractionReplyOptions) => {
+    if (!(message instanceof Message)) {
+      if (message.deferred) {
+        await message.editReply(data);
+      } else {
+        await message.reply(data as InteractionReplyOptions);
+      }
+      const replyMsg = await message.fetchReply();
+      if (replyMsg instanceof Message) {
+        return replyMsg;
+      }
+    } else {
+      return await message.channel.send(data as MessageOptions);
     }
+  };
 
-    if (!message.isChatInputCommand()) return;
+  if (message instanceof Message) {
+    return send({ embeds: [new CustomEmbed(message.member, "use /survey")] });
+  }
 
-    const surveys = await getSurveys(message.member);
+  if (!message.isChatInputCommand()) return;
 
-    let max = 1;
+  const surveys = await getSurveys(message.member);
 
-    if (await isPremium(message.member)) {
-        max += await getTier(message.member);
-    }
+  let max = 1;
 
-    if (surveys.length >= max) {
-        return send({
-            embeds: [
-                new ErrorEmbed(
-                    `you have reached your maximum amount of active surveys (\`${max}\`). you can become a patreon to create more`
-                ),
-            ],
-        });
-    }
+  if (await isPremium(message.member)) {
+    max += await getTier(message.member);
+  }
 
-    let desc = message.options.getString("text");
-    const endsAt = dayjs()
-        .add(message.options.getInteger("hours") || 12, "hours")
-        .toDate();
+  if (surveys.length >= max) {
+    return send({
+      embeds: [
+        new ErrorEmbed(
+          `you have reached your maximum amount of active surveys (\`${max}\`). you can become a patreon to create more`
+        ),
+      ],
+    });
+  }
 
-    desc += `\n\n\`0\` answers\nends <t:${Math.floor(endsAt.getTime() / 1000)}:R>`;
+  let desc = message.options.getString("text");
+  const endsAt = dayjs()
+    .add(message.options.getInteger("hours") || 12, "hours")
+    .toDate();
 
-    const embed = new CustomEmbed(message.member, desc).setHeader(
-        `${message.author.username}'s survey`,
-        message.author.avatarURL()
-    );
+  desc += `\n\n\`0\` answers\nends <t:${Math.floor(endsAt.getTime() / 1000)}:R>`;
 
-    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder().setCustomId("a").setLabel("answer").setStyle(ButtonStyle.Success)
-    );
+  const embed = new CustomEmbed(message.member, desc).setHeader(
+    `${message.author.username}'s survey`,
+    message.author.avatarURL()
+  );
 
-    const msg = await send({ embeds: [embed], components: [row] });
+  const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+    new ButtonBuilder().setCustomId("a").setLabel("answer").setStyle(ButtonStyle.Success)
+  );
 
-    return await createSurvey(message.author.id, message.options.getString("text"), endsAt, msg.id, message.channel.id);
+  const msg = await send({ embeds: [embed], components: [row] });
+
+  return await createSurvey(message.author.id, message.options.getString("text"), endsAt, msg.id, message.channel.id);
 }
 
 cmd.setRun(run);

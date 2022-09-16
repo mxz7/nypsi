@@ -4,157 +4,157 @@ import { NypsiClient } from "../models/Client";
 import { CustomEmbed } from "../models/EmbedBuilders";
 
 export async function getSupportRequestByChannelId(id: string) {
-    const query = await prisma.supportRequest.findUnique({
-        where: {
-            channelId: id,
-        },
-    });
+  const query = await prisma.supportRequest.findUnique({
+    where: {
+      channelId: id,
+    },
+  });
 
-    return query;
+  return query;
 }
 
 export async function getSupportRequest(id: string) {
-    if (await redis.exists(`cache:support:${id}`)) {
-        return await redis.get(`cache:support:${id}`);
-    }
+  if (await redis.exists(`cache:support:${id}`)) {
+    return await redis.get(`cache:support:${id}`);
+  }
 
-    const query = await prisma.supportRequest.findUnique({
-        where: {
-            userId: id,
-        },
-    });
+  const query = await prisma.supportRequest.findUnique({
+    where: {
+      userId: id,
+    },
+  });
 
-    if (query) {
-        await redis.set(`cache:support:${id}`, query.channelId);
-        await redis.expire(`cache:support:${id}`, 900);
-        return query.channelId;
-    } else {
-        return null;
-    }
+  if (query) {
+    await redis.set(`cache:support:${id}`, query.channelId);
+    await redis.expire(`cache:support:${id}`, 900);
+    return query.channelId;
+  } else {
+    return null;
+  }
 }
 
 export async function createSupportRequest(id: string, client: NypsiClient, username: string) {
-    const clusterHas = await client.cluster.broadcastEval(async (c) => {
-        const client = c as NypsiClient;
-        const channel = await client.channels.fetch("1015299117934723173").catch(() => {});
+  const clusterHas = await client.cluster.broadcastEval(async (c) => {
+    const client = c as NypsiClient;
+    const channel = await client.channels.fetch("1015299117934723173").catch(() => {});
 
-        if (channel) {
-            return client.cluster.id;
-        } else {
-            return "not-found";
-        }
-    });
-
-    let shard: number;
-
-    for (const i of clusterHas) {
-        if (i != "not-found") {
-            shard = i;
-            break;
-        }
+    if (channel) {
+      return client.cluster.id;
+    } else {
+      return "not-found";
     }
+  });
 
-    if (isNaN(shard)) {
-        return false;
+  let shard: number;
+
+  for (const i of clusterHas) {
+    if (i != "not-found") {
+      shard = i;
+      break;
     }
+  }
 
-    const res = await client.cluster.broadcastEval(
-        async (c, { shard, username }) => {
-            const client = c as NypsiClient;
-            if (client.cluster.id != shard) return false;
+  if (isNaN(shard)) {
+    return false;
+  }
 
-            const channel = await client.channels.fetch("1015299117934723173");
+  const res = await client.cluster.broadcastEval(
+    async (c, { shard, username }) => {
+      const client = c as NypsiClient;
+      if (client.cluster.id != shard) return false;
 
-            if (!channel) return false;
+      const channel = await client.channels.fetch("1015299117934723173");
 
-            if (!channel.isTextBased()) return;
-            if (channel.isVoiceBased()) return;
-            if (channel.isThread()) return;
-            if (channel.isDMBased()) return;
+      if (!channel) return false;
 
-            const thread = await channel.threads.create({ name: username });
+      if (!channel.isTextBased()) return;
+      if (channel.isVoiceBased()) return;
+      if (channel.isThread()) return;
+      if (channel.isDMBased()) return;
 
-            await thread.send({ content: "<@&747059949770768475> <@&845613231229370429>" });
+      const thread = await channel.threads.create({ name: username });
 
-            return thread.id;
-        },
-        { context: { shard: shard, username: username } }
-    );
+      await thread.send({ content: "<@&747059949770768475> <@&845613231229370429>" });
 
-    let channelId: string;
+      return thread.id;
+    },
+    { context: { shard: shard, username: username } }
+  );
 
-    for (const item of res) {
-        if (typeof item == "string") channelId = item;
-    }
+  let channelId: string;
 
-    if (!channelId) return false;
+  for (const item of res) {
+    if (typeof item == "string") channelId = item;
+  }
 
-    await prisma.supportRequest.create({
-        data: {
-            channelId: channelId,
-            userId: id,
-        },
-    });
+  if (!channelId) return false;
 
-    const embed = new CustomEmbed().setColor("#36393f").setDescription(`support request for ${username} (${id})`);
+  await prisma.supportRequest.create({
+    data: {
+      channelId: channelId,
+      userId: id,
+    },
+  });
 
-    await sendToRequestChannel(id, embed, client);
+  const embed = new CustomEmbed().setColor("#36393f").setDescription(`support request for ${username} (${id})`);
 
-    return true;
+  await sendToRequestChannel(id, embed, client);
+
+  return true;
 }
 
 export async function sendToRequestChannel(id: string, embed: CustomEmbed, client: NypsiClient) {
-    const channelId = await getSupportRequest(id);
+  const channelId = await getSupportRequest(id);
 
-    if (!channelId) return false;
+  if (!channelId) return false;
 
-    const clusterHas = await client.cluster.broadcastEval(
-        async (c, { channelId }) => {
-            const client = c as NypsiClient;
-            const channel = await client.channels.fetch(channelId).catch(() => {});
+  const clusterHas = await client.cluster.broadcastEval(
+    async (c, { channelId }) => {
+      const client = c as NypsiClient;
+      const channel = await client.channels.fetch(channelId).catch(() => {});
 
-            if (channel) {
-                return client.cluster.id;
-            } else {
-                return "not-found";
-            }
-        },
-        { context: { channelId: channelId } }
-    );
+      if (channel) {
+        return client.cluster.id;
+      } else {
+        return "not-found";
+      }
+    },
+    { context: { channelId: channelId } }
+  );
 
-    let shard: number;
+  let shard: number;
 
-    for (const i of clusterHas) {
-        if (i != "not-found") {
-            shard = i;
-            break;
-        }
+  for (const i of clusterHas) {
+    if (i != "not-found") {
+      shard = i;
+      break;
     }
+  }
 
-    if (isNaN(shard)) {
-        return false;
-    }
+  if (isNaN(shard)) {
+    return false;
+  }
 
-    const res = await client.cluster.broadcastEval(
-        async (c, { shard, embed, channelId }) => {
-            const client = c as NypsiClient;
-            if (client.cluster.id != shard) return false;
+  const res = await client.cluster.broadcastEval(
+    async (c, { shard, embed, channelId }) => {
+      const client = c as NypsiClient;
+      if (client.cluster.id != shard) return false;
 
-            const channel = await client.channels.fetch(channelId);
+      const channel = await client.channels.fetch(channelId);
 
-            if (!channel) return false;
+      if (!channel) return false;
 
-            if (!channel.isTextBased()) return;
+      if (!channel.isTextBased()) return;
 
-            const msg = await channel.send({ embeds: [embed] }).catch(() => {});
+      const msg = await channel.send({ embeds: [embed] }).catch(() => {});
 
-            if (!msg) return false;
-            return true;
-        },
-        { context: { shard: shard, embed: embed.toJSON(), channelId: channelId } }
-    );
+      if (!msg) return false;
+      return true;
+    },
+    { context: { shard: shard, embed: embed.toJSON(), channelId: channelId } }
+  );
 
-    if (!res.includes(true)) return false;
+  if (!res.includes(true)) return false;
 
-    return true;
+  return true;
 }

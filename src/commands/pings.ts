@@ -1,14 +1,14 @@
 import {
-    ActionRowBuilder,
-    ButtonBuilder,
-    ButtonStyle,
-    CommandInteraction,
-    Interaction,
-    InteractionReplyOptions,
-    Message,
-    MessageActionRowComponentBuilder,
-    MessageEditOptions,
-    MessageOptions,
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  CommandInteraction,
+  Interaction,
+  InteractionReplyOptions,
+  Message,
+  MessageActionRowComponentBuilder,
+  MessageEditOptions,
+  MessageOptions,
 } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { createUser, userExists } from "../utils/economy/utils";
@@ -22,263 +22,227 @@ import { deleteUserMentions, fetchUserMentions } from "../utils/users/utils";
 import ms = require("ms");
 
 const cmd = new Command("pings", "view who mentioned you recently", Categories.UTILITY).setAliases([
-    "mentions",
-    "whothefuckpingedme",
+  "mentions",
+  "whothefuckpingedme",
 ]);
 
 cmd.slashEnabled = true;
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-    const send = async (data: MessageOptions | InteractionReplyOptions) => {
-        if (!(message instanceof Message)) {
-            if (message.deferred) {
-                await message.editReply(data);
-            } else {
-                await message.reply(data as InteractionReplyOptions);
-            }
-            const replyMsg = await message.fetchReply();
-            if (replyMsg instanceof Message) {
-                return replyMsg;
-            }
-        } else {
-            return await message.channel.send(data as MessageOptions);
-        }
-    };
-
-    if (await onCooldown(cmd.name, message.member)) {
-        const embed = await getResponse(cmd.name, message.member);
-
-        return send({ embeds: [embed], ephemeral: true });
+  const send = async (data: MessageOptions | InteractionReplyOptions) => {
+    if (!(message instanceof Message)) {
+      if (message.deferred) {
+        await message.editReply(data);
+      } else {
+        await message.reply(data as InteractionReplyOptions);
+      }
+      const replyMsg = await message.fetchReply();
+      if (replyMsg instanceof Message) {
+        return replyMsg;
+      }
+    } else {
+      return await message.channel.send(data as MessageOptions);
     }
+  };
 
-    await addCooldown(cmd.name, message.member, 20);
+  if (await onCooldown(cmd.name, message.member)) {
+    const embed = await getResponse(cmd.name, message.member);
 
-    let qualified = false;
+    return send({ embeds: [embed], ephemeral: true });
+  }
 
-    if (
-        message.guild.memberCount < 150000 &&
-        ((await userExists(message.guild.ownerId)) ||
-            (await isPremium(message.guild.ownerId)) ||
-            (await getKarma(message.guild.ownerId)) >= 50 ||
-            (await getLastCommand(message.guild.ownerId)).getTime() >= Date.now() - ms("1 days"))
-    ) {
-        qualified = true;
-    } else if (message.author.id == message.guild.ownerId) {
-        await createUser(message.member);
-        qualified = true;
-    }
+  await addCooldown(cmd.name, message.member, 20);
 
-    const prefix = await getPrefix(message.guild);
+  let qualified = false;
 
-    if (!qualified) {
-        const embed = new ErrorEmbed(
-            `this server does not qualify to track mentions (${prefix}pings)\nhttps://docs.nypsi.xyz/#my-server-does-not-qualify-for-the-pings-command\njoin the support server for help (${prefix}support)`
-        );
+  if (
+    message.guild.memberCount < 150000 &&
+    ((await userExists(message.guild.ownerId)) ||
+      (await isPremium(message.guild.ownerId)) ||
+      (await getKarma(message.guild.ownerId)) >= 50 ||
+      (await getLastCommand(message.guild.ownerId)).getTime() >= Date.now() - ms("1 days"))
+  ) {
+    qualified = true;
+  } else if (message.author.id == message.guild.ownerId) {
+    await createUser(message.member);
+    qualified = true;
+  }
 
-        return send({ embeds: [embed] });
-    }
+  const prefix = await getPrefix(message.guild);
 
-    let limit = 5;
-
-    if (await isPremium(message.author.id)) {
-        limit = 150;
-    }
-
-    const mentions = await fetchUserMentions(message.guild, message.member, limit);
-
-    if (!mentions || mentions.length == 0) {
-        return send({ embeds: [new CustomEmbed(message.member, "no recent mentions")] });
-    }
-
-    const pages = new Map<number, string[]>();
-
-    for (const i of mentions) {
-        if (pages.size == 0) {
-            const page1 = [];
-            page1.push(
-                `<t:${Math.floor(i.date.getTime() / 1000)}:R>|6|9|**${i.userTag}**: ${decrypt(i.content)}\n[jump](${i.url})`
-            );
-            pages.set(1, page1);
-        } else {
-            const lastPage = pages.size;
-
-            if (pages.get(lastPage).length >= 3) {
-                const newPage = [];
-                newPage.push(
-                    `<t:${Math.floor(i.date.getTime() / 1000)}:R>|6|9|**${i.userTag}**: ${decrypt(i.content)}\n[jump](${
-                        i.url
-                    })`
-                );
-                pages.set(lastPage + 1, newPage);
-            } else {
-                pages
-                    .get(lastPage)
-                    .push(
-                        `<t:${Math.floor(i.date.getTime() / 1000)}:R>|6|9|**${i.userTag}**: ${decrypt(i.content)}\n[jump](${
-                            i.url
-                        })`
-                    );
-            }
-        }
-    }
-
-    const embed = new CustomEmbed(message.member).setHeader("recent mentions", message.author.avatarURL());
-
-    for (const i of pages.get(1)) {
-        const fieldName = i.split("|6|9|")[0];
-        const fieldValue = i.split("|6|9|").splice(-1, 1).join("");
-        embed.addField(fieldName, fieldValue);
-    }
-
-    if (pages.size >= 2) {
-        embed.setFooter({ text: `page 1/${pages.size}` });
-    }
-
-    let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
-        new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
-        new ButtonBuilder().setCustomId("❌").setLabel("clear mentions").setStyle(ButtonStyle.Danger)
+  if (!qualified) {
+    const embed = new ErrorEmbed(
+      `this server does not qualify to track mentions (${prefix}pings)\nhttps://docs.nypsi.xyz/#my-server-does-not-qualify-for-the-pings-command\njoin the support server for help (${prefix}support)`
     );
 
-    let msg: Message;
+    return send({ embeds: [embed] });
+  }
 
-    if (pages.size == 1) {
-        return await send({ embeds: [embed] });
+  let limit = 5;
+
+  if (await isPremium(message.author.id)) {
+    limit = 150;
+  }
+
+  const mentions = await fetchUserMentions(message.guild, message.member, limit);
+
+  if (!mentions || mentions.length == 0) {
+    return send({ embeds: [new CustomEmbed(message.member, "no recent mentions")] });
+  }
+
+  const pages = new Map<number, string[]>();
+
+  for (const i of mentions) {
+    if (pages.size == 0) {
+      const page1 = [];
+      page1.push(
+        `<t:${Math.floor(i.date.getTime() / 1000)}:R>|6|9|**${i.userTag}**: ${decrypt(i.content)}\n[jump](${i.url})`
+      );
+      pages.set(1, page1);
     } else {
-        msg = await send({ embeds: [embed], components: [row] });
+      const lastPage = pages.size;
+
+      if (pages.get(lastPage).length >= 3) {
+        const newPage = [];
+        newPage.push(
+          `<t:${Math.floor(i.date.getTime() / 1000)}:R>|6|9|**${i.userTag}**: ${decrypt(i.content)}\n[jump](${i.url})`
+        );
+        pages.set(lastPage + 1, newPage);
+      } else {
+        pages
+          .get(lastPage)
+          .push(
+            `<t:${Math.floor(i.date.getTime() / 1000)}:R>|6|9|**${i.userTag}**: ${decrypt(i.content)}\n[jump](${i.url})`
+          );
+      }
     }
+  }
 
-    if (pages.size >= 2) {
-        let currentPage = 1;
-        const lastPage = pages.size;
+  const embed = new CustomEmbed(message.member).setHeader("recent mentions", message.author.avatarURL());
 
-        const edit = async (data: MessageEditOptions) => {
-            if (!(message instanceof Message)) {
-                await message.editReply(data);
-                return await message.fetchReply();
-            } else {
-                return await msg.edit(data);
-            }
-        };
+  for (const i of pages.get(1)) {
+    const fieldName = i.split("|6|9|")[0];
+    const fieldValue = i.split("|6|9|").splice(-1, 1).join("");
+    embed.addField(fieldName, fieldValue);
+  }
 
-        const filter = (i: Interaction) => i.user.id == message.author.id;
+  if (pages.size >= 2) {
+    embed.setFooter({ text: `page 1/${pages.size}` });
+  }
 
-        const pageManager = async (): Promise<void> => {
-            const reaction = await msg
-                .awaitMessageComponent({ filter, time: 30000 })
-                .then(async (collected) => {
-                    await collected.deferUpdate();
-                    return collected.customId;
-                })
-                .catch(async () => {
-                    await edit({ components: [] }).catch(() => {});
-                });
+  let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+    new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
+    new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
+    new ButtonBuilder().setCustomId("❌").setLabel("clear mentions").setStyle(ButtonStyle.Danger)
+  );
 
-            if (!reaction) return;
+  let msg: Message;
 
-            const newEmbed = new CustomEmbed(message.member).setHeader("recent mentions", message.author.avatarURL());
+  if (pages.size == 1) {
+    return await send({ embeds: [embed] });
+  } else {
+    msg = await send({ embeds: [embed], components: [row] });
+  }
 
-            if (reaction == "⬅") {
-                if (currentPage <= 1) {
-                    return pageManager();
-                } else {
-                    currentPage--;
+  if (pages.size >= 2) {
+    let currentPage = 1;
+    const lastPage = pages.size;
 
-                    for (const i of pages.get(currentPage)) {
-                        const fieldName = i.split("|6|9|")[0];
-                        const fieldValue = i.split("|6|9|").splice(-1, 1).join("");
-                        newEmbed.addField(fieldName, fieldValue);
-                    }
+    const edit = async (data: MessageEditOptions) => {
+      if (!(message instanceof Message)) {
+        await message.editReply(data);
+        return await message.fetchReply();
+      } else {
+        return await msg.edit(data);
+      }
+    };
 
-                    newEmbed.setFooter({ text: "page " + currentPage + "/" + lastPage });
-                    if (currentPage == 1) {
-                        row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-                            new ButtonBuilder()
-                                .setCustomId("⬅")
-                                .setLabel("back")
-                                .setStyle(ButtonStyle.Primary)
-                                .setDisabled(true),
-                            new ButtonBuilder()
-                                .setCustomId("➡")
-                                .setLabel("next")
-                                .setStyle(ButtonStyle.Primary)
-                                .setDisabled(false),
-                            new ButtonBuilder().setCustomId("❌").setLabel("clear mentions").setStyle(ButtonStyle.Danger)
-                        );
-                    } else {
-                        row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-                            new ButtonBuilder()
-                                .setCustomId("⬅")
-                                .setLabel("back")
-                                .setStyle(ButtonStyle.Primary)
-                                .setDisabled(false),
-                            new ButtonBuilder()
-                                .setCustomId("➡")
-                                .setLabel("next")
-                                .setStyle(ButtonStyle.Primary)
-                                .setDisabled(false),
-                            new ButtonBuilder().setCustomId("❌").setLabel("clear mentions").setStyle(ButtonStyle.Danger)
-                        );
-                    }
-                    await edit({ embeds: [newEmbed], components: [row] });
-                    return pageManager();
-                }
-            } else if (reaction == "➡") {
-                if (currentPage >= lastPage) {
-                    return pageManager();
-                } else {
-                    currentPage++;
+    const filter = (i: Interaction) => i.user.id == message.author.id;
 
-                    for (const i of pages.get(currentPage)) {
-                        const fieldName = i.split("|6|9|")[0];
-                        const fieldValue = i.split("|6|9|").splice(-1, 1).join("");
-                        newEmbed.addField(fieldName, fieldValue);
-                    }
-                    newEmbed.setFooter({ text: "page " + currentPage + "/" + lastPage });
-                    if (currentPage == lastPage) {
-                        row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-                            new ButtonBuilder()
-                                .setCustomId("⬅")
-                                .setLabel("back")
-                                .setStyle(ButtonStyle.Primary)
-                                .setDisabled(false),
-                            new ButtonBuilder()
-                                .setCustomId("➡")
-                                .setLabel("next")
-                                .setStyle(ButtonStyle.Primary)
-                                .setDisabled(true),
-                            new ButtonBuilder().setCustomId("❌").setLabel("clear mentions").setStyle(ButtonStyle.Danger)
-                        );
-                    } else {
-                        row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-                            new ButtonBuilder()
-                                .setCustomId("⬅")
-                                .setLabel("back")
-                                .setStyle(ButtonStyle.Primary)
-                                .setDisabled(false),
-                            new ButtonBuilder()
-                                .setCustomId("➡")
-                                .setLabel("next")
-                                .setStyle(ButtonStyle.Primary)
-                                .setDisabled(false),
-                            new ButtonBuilder().setCustomId("❌").setLabel("clear mentions").setStyle(ButtonStyle.Danger)
-                        );
-                    }
-                    await edit({ embeds: [newEmbed], components: [row] });
-                    return pageManager();
-                }
-            } else if (reaction == "❌") {
-                deleteUserMentions(message.guild, message.member);
+    const pageManager = async (): Promise<void> => {
+      const reaction = await msg
+        .awaitMessageComponent({ filter, time: 30000 })
+        .then(async (collected) => {
+          await collected.deferUpdate();
+          return collected.customId;
+        })
+        .catch(async () => {
+          await edit({ components: [] }).catch(() => {});
+        });
 
-                newEmbed.setDescription("✅ mentions cleared");
+      if (!reaction) return;
 
-                edit({ embeds: [newEmbed], components: [] });
-                return;
-            }
-        };
+      const newEmbed = new CustomEmbed(message.member).setHeader("recent mentions", message.author.avatarURL());
 
-        return pageManager();
-    }
+      if (reaction == "⬅") {
+        if (currentPage <= 1) {
+          return pageManager();
+        } else {
+          currentPage--;
+
+          for (const i of pages.get(currentPage)) {
+            const fieldName = i.split("|6|9|")[0];
+            const fieldValue = i.split("|6|9|").splice(-1, 1).join("");
+            newEmbed.addField(fieldName, fieldValue);
+          }
+
+          newEmbed.setFooter({ text: "page " + currentPage + "/" + lastPage });
+          if (currentPage == 1) {
+            row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+              new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
+              new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(false),
+              new ButtonBuilder().setCustomId("❌").setLabel("clear mentions").setStyle(ButtonStyle.Danger)
+            );
+          } else {
+            row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+              new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(false),
+              new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(false),
+              new ButtonBuilder().setCustomId("❌").setLabel("clear mentions").setStyle(ButtonStyle.Danger)
+            );
+          }
+          await edit({ embeds: [newEmbed], components: [row] });
+          return pageManager();
+        }
+      } else if (reaction == "➡") {
+        if (currentPage >= lastPage) {
+          return pageManager();
+        } else {
+          currentPage++;
+
+          for (const i of pages.get(currentPage)) {
+            const fieldName = i.split("|6|9|")[0];
+            const fieldValue = i.split("|6|9|").splice(-1, 1).join("");
+            newEmbed.addField(fieldName, fieldValue);
+          }
+          newEmbed.setFooter({ text: "page " + currentPage + "/" + lastPage });
+          if (currentPage == lastPage) {
+            row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+              new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(false),
+              new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(true),
+              new ButtonBuilder().setCustomId("❌").setLabel("clear mentions").setStyle(ButtonStyle.Danger)
+            );
+          } else {
+            row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+              new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(false),
+              new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(false),
+              new ButtonBuilder().setCustomId("❌").setLabel("clear mentions").setStyle(ButtonStyle.Danger)
+            );
+          }
+          await edit({ embeds: [newEmbed], components: [row] });
+          return pageManager();
+        }
+      } else if (reaction == "❌") {
+        deleteUserMentions(message.guild, message.member);
+
+        newEmbed.setDescription("✅ mentions cleared");
+
+        edit({ embeds: [newEmbed], components: [] });
+        return;
+      }
+    };
+
+    return pageManager();
+  }
 }
 
 cmd.setRun(run);

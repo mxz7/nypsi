@@ -4,30 +4,30 @@ import { CustomEmbed } from "../utils/models/EmbedBuilders";
 import { getItems, getInventory, userExists, createUser } from "../utils/economy/utils";
 
 const cmd = new Command("ethereum", "view the current ethereum value (reflects real life USD)", Categories.MONEY).setAliases(
-    ["eth"]
+  ["eth"]
 );
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-    if (!(await userExists(message.member))) await createUser(message.member);
-    const ethereum = getItems()["ethereum"];
-    const inventory = await getInventory(message.member);
+  if (!(await userExists(message.member))) await createUser(message.member);
+  const ethereum = getItems()["ethereum"];
+  const inventory = await getInventory(message.member);
 
-    let ethereumAmount = 0;
+  let ethereumAmount = 0;
 
-    if (inventory["ethereum"]) {
-        ethereumAmount = inventory["ethereum"];
-    }
+  if (inventory["ethereum"]) {
+    ethereumAmount = inventory["ethereum"];
+  }
 
-    const embed = new CustomEmbed(
-        message.member,
-        `**worth** $${ethereum.sell.toLocaleString()}\n**owned** ${ethereumAmount.toLocaleString()} ($${(
-            ethereumAmount * ethereum.sell
-        ).toLocaleString()})`
-    )
-        .setFooter({ text: "not real ethereum, although it reflects current worth in USD" })
-        .setHeader("your ethereum", message.author.avatarURL());
+  const embed = new CustomEmbed(
+    message.member,
+    `**worth** $${ethereum.sell.toLocaleString()}\n**owned** ${ethereumAmount.toLocaleString()} ($${(
+      ethereumAmount * ethereum.sell
+    ).toLocaleString()})`
+  )
+    .setFooter({ text: "not real ethereum, although it reflects current worth in USD" })
+    .setHeader("your ethereum", message.author.avatarURL());
 
-    return message.channel.send({ embeds: [embed] });
+  return message.channel.send({ embeds: [embed] });
 }
 
 cmd.setRun(run);
