@@ -1,4 +1,5 @@
 import { GuildMember } from "discord.js";
+import Constants from "../utils/Constants";
 import { addKarma } from "../utils/karma/utils";
 import { NypsiClient } from "../utils/models/Client";
 import { addMember, getTier, isPremium, renewUser, setExpireDate, setTier } from "../utils/premium/utils";
@@ -14,19 +15,19 @@ export default async function guildMemberUpdate(oldMember: GuildMember, newMembe
             // 819870846536646666 gold role
             // 819870959325413387 platinum role
 
-            if (newMember.roles.cache.find((r) => r.id == "819870959325413387")) {
+            if (newMember.roles.cache.find((r) => r.id == Constants.PLATINUM_ROLE_ID)) {
                 // platinum
                 tier = 4;
-            } else if (newMember.roles.cache.find((r) => r.id == "819870846536646666")) {
+            } else if (newMember.roles.cache.find((r) => r.id == Constants.GOLD_ROLE_ID)) {
                 // gold
                 tier = 3;
-            } else if (newMember.roles.cache.find((r) => r.id == "747066190530347089")) {
+            } else if (newMember.roles.cache.find((r) => r.id == Constants.BOOST_ROLE_ID)) {
                 // boost
                 tier = 2;
-            } else if (newMember.roles.cache.find((r) => r.id == "819870727834566696")) {
+            } else if (newMember.roles.cache.find((r) => r.id == Constants.SILVER_ROLE_ID)) {
                 // silver
                 tier = 2;
-            } else if (newMember.roles.cache.find((r) => r.id == "819870590718181391")) {
+            } else if (newMember.roles.cache.find((r) => r.id == Constants.BRONZE_ROLE_ID)) {
                 // bronze
                 tier = 1;
             }
@@ -49,12 +50,12 @@ export default async function guildMemberUpdate(oldMember: GuildMember, newMembe
             // 819870846536646666 gold role
             // 819870959325413387 platinum role
             if (
-                oldMember.roles.cache.find((r) => r.id == "747066190530347089") &&
-                !newMember.roles.cache.find((r) => r.id == "747066190530347089")
+                oldMember.roles.cache.find((r) => r.id == Constants.BOOST_ROLE_ID) &&
+                !newMember.roles.cache.find((r) => r.id == Constants.BOOST_ROLE_ID)
             ) {
-                if (newMember.roles.cache.find((r) => r.id == "819870959325413387")) return;
-                if (newMember.roles.cache.find((r) => r.id == "819870846536646666")) return;
-                if (newMember.roles.cache.find((r) => r.id == "819870727834566696"))
+                if (newMember.roles.cache.find((r) => r.id == Constants.PLATINUM_ROLE_ID)) return;
+                if (newMember.roles.cache.find((r) => r.id == Constants.GOLD_ROLE_ID)) return;
+                if (newMember.roles.cache.find((r) => r.id == Constants.SILVER_ROLE_ID))
                     setExpireDate(newMember.id, new Date(0), newMember.client as NypsiClient);
             }
         }
