@@ -1,4 +1,5 @@
 import { CommandInteraction, Message } from "discord.js";
+import Constants from "../utils/Constants";
 import { daysAgo, daysUntil, formatDate } from "../utils/functions/date";
 import { getPrefix } from "../utils/guilds/utils";
 import { NypsiClient } from "../utils/models/Client";
@@ -7,6 +8,7 @@ import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 import {
     addMember,
     getPremiumProfile,
+    getTier,
     getUserCommand,
     isPremium,
     renewUser,
@@ -24,6 +26,31 @@ const cmd = new Command("premium", "view your premium status", Categories.INFO)
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     const defaultMessage = async () => {
         if (await isPremium(message.member)) {
+            if (message.guild.id == Constants.NYPSI_SERVER_ID) {
+                let requiredRole: string;
+
+                switch (await getTier(message.author.id)) {
+                    case 1:
+                        requiredRole = Constants.BRONZE_ROLE_ID;
+                        break;
+                    case 2:
+                        requiredRole = Constants.SILVER_ROLE_ID;
+                        break;
+                    case 3:
+                        requiredRole = Constants.GOLD_ROLE_ID;
+                        break;
+                    case 4:
+                        requiredRole = Constants.PLATINUM_ROLE_ID;
+                        break;
+                }
+
+                const member = await message.guild.members.fetch(message.author.id);
+
+                if (!Array.from(member.roles.cache.keys()).includes(requiredRole)) {
+                    await member.roles.add(requiredRole);
+                }
+            }
+
             const embed = new CustomEmbed(message.member);
 
             embed.setHeader("premium status", message.author.avatarURL());
