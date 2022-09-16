@@ -1,12 +1,12 @@
-import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
+import { ColorResolvable, CommandInteraction, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
 import Constants from "../utils/Constants";
 import { daysAgo, daysUntil, formatDate } from "../utils/functions/date";
-import { getPrefix } from "../utils/guilds/utils";
 import { NypsiClient } from "../utils/models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 import {
     addMember,
+    getEmbedColor,
     getPremiumProfile,
     getTier,
     getUserCommand,
@@ -24,6 +24,19 @@ const cmd = new Command("premium", "view your premium status", Categories.INFO)
     .setDocs("https://docs.nypsi.xyz/premium");
 
 cmd.slashEnabled = true;
+cmd.slashData
+    .addSubcommand((view) => view.setName("view").setDescription("view your premium status"))
+    .addSubcommand((color) =>
+        color
+            .setName("color")
+            .setDescription("set your custom color")
+            .addStringOption((option) =>
+                option
+                    .setName("color")
+                    .setDescription("color you want to be used on all messages (hex format)")
+                    .setRequired(true)
+            )
+    );
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
     const send = async (data: MessageOptions | InteractionReplyOptions) => {
@@ -83,7 +96,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             let description = `**tier** ${profile.getLevelString()}\n**started** ${timeStarted} (${timeAgo} days ago)\n**expires** ${expires} (${timeUntil} days left)`;
 
-            description += `\n\n**color** ${embedColor} - ${await getPrefix(message.guild)}setcolor`;
+            description += `\n\n**color** ${embedColor} - /premium color`;
 
             if (profile.level > 2) {
                 const cmd = await getUserCommand(message.author.id);
@@ -115,7 +128,66 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
     };
 
-    if (args.length == 0) {
+    const setColor = async () => {
+        if (!(await isPremium(message.author.id))) {
+            return send({
+                embeds: [
+                    new ErrorEmbed("you must be a BRONZE tier patreon for this command\n\nhttps://www.patreon.com/nypsi"),
+                ],
+            });
+        }
+
+        if ((await getTier(message.author.id)) < 1) {
+            return send({
+                embeds: [
+                    new ErrorEmbed(
+                        "you must be atleast BRONZE tier for this command, you are BRONZE\n\nhttps://www.patreon.com/nypsi"
+                    ),
+                ],
+            });
+        }
+
+        if (args.length == 1) {
+            return send({ embeds: [new ErrorEmbed("/premium setcolor <#color>")] });
+        }
+
+        let color = args[1].split("#").join("");
+
+        if (color.toLowerCase() == "reset") color = "default";
+
+        if (color.length > 6 && color != "default") {
+            color = color.substr(0, 6);
+        }
+
+        if (!color.startsWith("#")) color = `#${color}`;
+
+        const embed = new CustomEmbed();
+
+        try {
+            if (color != "default") {
+                embed.setColor(color as ColorResolvable);
+            }
+        } catch {
+            return message.channel.send({
+                embeds: [
+                    new ErrorEmbed("invalid color, please use a hex color ([color.tekoh.net](https://color.tekoh.net))"),
+                ],
+            });
+        }
+
+        await setEmbedColor(message.author.id, color);
+
+        return send({
+            embeds: [
+                new CustomEmbed(
+                    message.member,
+                    `your color has been updated to **${await getEmbedColor(message.author.id)}**`
+                ),
+            ],
+        });
+    };
+
+    if (args.length == 0 || args[0].toLowerCase() == "view") {
         return defaultMessage();
     } else if (args[0].toLowerCase() == "check" || args[0].toLowerCase() == "status") {
         if (message.author.id != "672793821850894347") {
@@ -252,6 +324,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         setExpireDate(args[1], new Date(0), message.client as NypsiClient);
 
         return send({ embeds: [new CustomEmbed(message.member, "✅ membership will expire soon")] });
+    } else if (args[0].toLowerCase() == "color") {
+        return setColor();
     }
 }
 
