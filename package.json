@@ -29,7 +29,7 @@
     "chalk": "^4.1.2",
     "crypto-js": "^4.1.1",
     "dayjs": "^1.11.5",
-    "discord-api-types": "^0.37.9",
+    "discord-api-types": "^0.37.10",
     "discord-hybrid-sharding": "^1.7.4",
     "discord.js": "^14.3.0",
     "dotenv": "^16.0.2",
