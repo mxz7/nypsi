@@ -2,13 +2,13 @@ import { CommandInteraction, InteractionReplyOptions, Message, MessageEditOption
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { addProgress } from "../utils/economy/achievements";
 import {
-    addItemUse,
-    createUser,
-    getBoosters,
-    getInventory,
-    getItems,
-    setInventory,
-    userExists,
+  addItemUse,
+  createUser,
+  getBoosters,
+  getInventory,
+  getItems,
+  setInventory,
+  userExists,
 } from "../utils/economy/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
@@ -18,191 +18,189 @@ const cmd = new Command("hunt", "go to a field and hunt", Categories.MONEY);
 cmd.slashEnabled = true;
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-    if (!(await userExists(message.member))) await createUser(message.member);
+  if (!(await userExists(message.member))) await createUser(message.member);
 
-    const send = async (data: MessageOptions | InteractionReplyOptions) => {
-        if (!(message instanceof Message)) {
-            if (message.deferred) {
-                await message.editReply(data);
-            } else {
-                await message.reply(data as InteractionReplyOptions);
-            }
-            const replyMsg = await message.fetchReply();
-            if (replyMsg instanceof Message) {
-                return replyMsg;
-            }
-        } else {
-            return await message.channel.send(data as MessageOptions);
-        }
-    };
+  const send = async (data: MessageOptions | InteractionReplyOptions) => {
+    if (!(message instanceof Message)) {
+      if (message.deferred) {
+        await message.editReply(data);
+      } else {
+        await message.reply(data as InteractionReplyOptions);
+      }
+      const replyMsg = await message.fetchReply();
+      if (replyMsg instanceof Message) {
+        return replyMsg;
+      }
+    } else {
+      return await message.channel.send(data as MessageOptions);
+    }
+  };
 
-    if (await onCooldown(cmd.name, message.member)) {
-        const embed = await getResponse(cmd.name, message.member);
+  if (await onCooldown(cmd.name, message.member)) {
+    const embed = await getResponse(cmd.name, message.member);
 
-        return send({ embeds: [embed], ephemeral: true });
+    return send({ embeds: [embed], ephemeral: true });
+  }
+
+  const inventory = await getInventory(message.member);
+  const items = getItems();
+
+  let gun;
+
+  if (inventory["incredible_gun"] && inventory["incredible_gun"] > 0) {
+    gun = "incredible_gun";
+  } else if (inventory["gun"] && inventory["gun"] > 0) {
+    gun = "gun";
+  } else if (inventory["terrible_gun"] && inventory["terrible_gun"] > 0) {
+    gun = "terrible_gun";
+  }
+
+  if (!gun) {
+    return send({
+      embeds: [
+        new ErrorEmbed("you need a gun to hunt\n[how do i get a gun?](https://docs.nypsi.xyz/economy/fishinghunting)"),
+      ],
+    });
+  }
+
+  await addCooldown(cmd.name, message.member, 300);
+
+  await addItemUse(message.member, gun);
+
+  const huntItems = Array.from(Object.keys(items));
+
+  let times = 1;
+
+  if (gun == "gun") {
+    times = 2;
+  } else if (gun == "incredible_gun") {
+    times = 3;
+  }
+
+  const boosters = await getBoosters(message.member);
+  let unbreaking = false;
+
+  for (const boosterId of boosters.keys()) {
+    if (items[boosterId].boosterEffect.boosts.includes("hunt")) {
+      if (items[boosterId].id == "unbreaking") {
+        unbreaking = true;
+      } else {
+        times++;
+      }
+    }
+  }
+
+  if (!unbreaking) {
+    inventory[gun]--;
+
+    if (inventory[gun] <= 0) {
+      delete inventory[gun];
     }
 
-    const inventory = await getInventory(message.member);
-    const items = getItems();
-
-    let gun;
-
-    if (inventory["incredible_gun"] && inventory["incredible_gun"] > 0) {
-        gun = "incredible_gun";
-    } else if (inventory["gun"] && inventory["gun"] > 0) {
-        gun = "gun";
-    } else if (inventory["terrible_gun"] && inventory["terrible_gun"] > 0) {
-        gun = "terrible_gun";
-    }
-
-    if (!gun) {
-        return send({
-            embeds: [
-                new ErrorEmbed(
-                    "you need a gun to hunt\n[how do i get a gun?](https://docs.nypsi.xyz/economy/fishinghunting)"
-                ),
-            ],
-        });
-    }
-
-    await addCooldown(cmd.name, message.member, 300);
-
-    await addItemUse(message.member, gun);
-
-    const huntItems = Array.from(Object.keys(items));
-
-    let times = 1;
-
-    if (gun == "gun") {
-        times = 2;
-    } else if (gun == "incredible_gun") {
-        times = 3;
-    }
-
-    const boosters = await getBoosters(message.member);
-    let unbreaking = false;
-
-    for (const boosterId of boosters.keys()) {
-        if (items[boosterId].boosterEffect.boosts.includes("hunt")) {
-            if (items[boosterId].id == "unbreaking") {
-                unbreaking = true;
-            } else {
-                times++;
-            }
-        }
-    }
-
-    if (!unbreaking) {
-        inventory[gun]--;
-
-        if (inventory[gun] <= 0) {
-            delete inventory[gun];
-        }
-
-        await setInventory(message.member, inventory);
-    }
-
-    for (let i = 0; i < 15; i++) {
-        huntItems.push("nothing");
-    }
-
-    const foundItems = [];
-    let foundItemsAmount = 0;
-
-    for (let i = 0; i < times; i++) {
-        const huntItemsModified = [];
-
-        for (const i of huntItems) {
-            if (items[i]) {
-                if (items[i].role != "prey") continue;
-                if (items[i].rarity == 4) {
-                    const chance = Math.floor(Math.random() * 15);
-                    if (chance == 4 && gun == "incredible_gun") {
-                        for (let x = 0; x < 4; x++) {
-                            huntItemsModified.push(i);
-                        }
-                    }
-                } else if (items[i].rarity == 3) {
-                    const chance = Math.floor(Math.random() * 3);
-                    if (chance == 2 && gun != "terrible_gun") {
-                        for (let x = 0; x < 4; x++) {
-                            huntItemsModified.push(i);
-                        }
-                    }
-                } else if (items[i].rarity == 2 && gun != "terrible_gun") {
-                    for (let x = 0; x < 7; x++) {
-                        huntItemsModified.push(i);
-                    }
-                } else if (items[i].rarity == 1) {
-                    for (let x = 0; x < 15; x++) {
-                        huntItemsModified.push(i);
-                    }
-                } else if (items[i].rarity == 0) {
-                    if (gun == "incredible_gun") {
-                        for (let x = 0; x < 7; x++) {
-                            huntItemsModified.push(i);
-                        }
-                    } else {
-                        for (let x = 0; x < 25; x++) {
-                            huntItemsModified.push(i);
-                        }
-                    }
-                }
-            }
-        }
-
-        const chosen = huntItemsModified[Math.floor(Math.random() * huntItemsModified.length)];
-
-        if (chosen == "nothing") continue;
-
-        let amount = 1;
-
-        if (gun == "terrible_gun") {
-            amount = Math.floor(Math.random() * 2) + 1;
-        } else if (gun == "gun") {
-            amount = Math.floor(Math.random() * 4) + 1;
-        } else if (gun == "incredible_gun") {
-            amount = Math.floor(Math.random() * 4) + 2;
-        }
-
-        if (inventory[chosen]) {
-            inventory[chosen] += amount;
-        } else {
-            inventory[chosen] = amount;
-        }
-
-        foundItems.push(`${amount} ${items[chosen].emoji} ${items[chosen].name}`);
-        foundItemsAmount += amount;
-    }
     await setInventory(message.member, inventory);
+  }
 
-    const embed = new CustomEmbed(
-        message.member,
-        `you go to the ${["field", "forest"][Math.floor(Math.random() * 2)]} and prepare your **${items[gun].name}**`
-    );
+  for (let i = 0; i < 15; i++) {
+    huntItems.push("nothing");
+  }
 
-    const msg = await send({ embeds: [embed] });
+  const foundItems = [];
+  let foundItemsAmount = 0;
 
-    embed.setDescription(
-        `you go to the ${["field", "forest"][Math.floor(Math.random() * 2)]} and prepare your **${
-            items[gun].name
-        }**\n\nyou killed${foundItems.length > 0 ? `: \n - ${foundItems.join("\n - ")}` : " **nothing**"}`
-    );
+  for (let i = 0; i < times; i++) {
+    const huntItemsModified = [];
 
-    const edit = async (data: MessageEditOptions, msg: Message) => {
-        if (!(message instanceof Message)) {
-            await message.editReply(data);
-            return await message.fetchReply();
-        } else {
-            return await msg.edit(data);
+    for (const i of huntItems) {
+      if (items[i]) {
+        if (items[i].role != "prey") continue;
+        if (items[i].rarity == 4) {
+          const chance = Math.floor(Math.random() * 15);
+          if (chance == 4 && gun == "incredible_gun") {
+            for (let x = 0; x < 4; x++) {
+              huntItemsModified.push(i);
+            }
+          }
+        } else if (items[i].rarity == 3) {
+          const chance = Math.floor(Math.random() * 3);
+          if (chance == 2 && gun != "terrible_gun") {
+            for (let x = 0; x < 4; x++) {
+              huntItemsModified.push(i);
+            }
+          }
+        } else if (items[i].rarity == 2 && gun != "terrible_gun") {
+          for (let x = 0; x < 7; x++) {
+            huntItemsModified.push(i);
+          }
+        } else if (items[i].rarity == 1) {
+          for (let x = 0; x < 15; x++) {
+            huntItemsModified.push(i);
+          }
+        } else if (items[i].rarity == 0) {
+          if (gun == "incredible_gun") {
+            for (let x = 0; x < 7; x++) {
+              huntItemsModified.push(i);
+            }
+          } else {
+            for (let x = 0; x < 25; x++) {
+              huntItemsModified.push(i);
+            }
+          }
         }
-    };
+      }
+    }
 
-    setTimeout(() => {
-        edit({ embeds: [embed] }, msg);
-    }, 1500);
+    const chosen = huntItemsModified[Math.floor(Math.random() * huntItemsModified.length)];
 
-    await addProgress(message.author.id, "hunter", foundItemsAmount);
+    if (chosen == "nothing") continue;
+
+    let amount = 1;
+
+    if (gun == "terrible_gun") {
+      amount = Math.floor(Math.random() * 2) + 1;
+    } else if (gun == "gun") {
+      amount = Math.floor(Math.random() * 4) + 1;
+    } else if (gun == "incredible_gun") {
+      amount = Math.floor(Math.random() * 4) + 2;
+    }
+
+    if (inventory[chosen]) {
+      inventory[chosen] += amount;
+    } else {
+      inventory[chosen] = amount;
+    }
+
+    foundItems.push(`${amount} ${items[chosen].emoji} ${items[chosen].name}`);
+    foundItemsAmount += amount;
+  }
+  await setInventory(message.member, inventory);
+
+  const embed = new CustomEmbed(
+    message.member,
+    `you go to the ${["field", "forest"][Math.floor(Math.random() * 2)]} and prepare your **${items[gun].name}**`
+  );
+
+  const msg = await send({ embeds: [embed] });
+
+  embed.setDescription(
+    `you go to the ${["field", "forest"][Math.floor(Math.random() * 2)]} and prepare your **${
+      items[gun].name
+    }**\n\nyou killed${foundItems.length > 0 ? `: \n - ${foundItems.join("\n - ")}` : " **nothing**"}`
+  );
+
+  const edit = async (data: MessageEditOptions, msg: Message) => {
+    if (!(message instanceof Message)) {
+      await message.editReply(data);
+      return await message.fetchReply();
+    } else {
+      return await msg.edit(data);
+    }
+  };
+
+  setTimeout(() => {
+    edit({ embeds: [embed] }, msg);
+  }, 1500);
+
+  await addProgress(message.author.id, "hunter", foundItemsAmount);
 }
 
 cmd.setRun(run);

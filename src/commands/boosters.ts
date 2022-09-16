@@ -9,67 +9,67 @@ const cmd = new Command("boosters", "view your current active boosters", Categor
 cmd.slashEnabled = true;
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-    const send = async (data: MessageOptions | InteractionReplyOptions) => {
-        if (!(message instanceof Message)) {
-            if (message.deferred) {
-                await message.editReply(data);
-            } else {
-                await message.reply(data as InteractionReplyOptions);
-            }
-            const replyMsg = await message.fetchReply();
-            if (replyMsg instanceof Message) {
-                return replyMsg;
-            }
-        } else {
-            return await message.channel.send(data as MessageOptions);
-        }
-    };
-
-    if (await onCooldown(cmd.name, message.member)) {
-        const embed = await getResponse(cmd.name, message.member);
-
-        return send({ embeds: [embed], ephemeral: true });
+  const send = async (data: MessageOptions | InteractionReplyOptions) => {
+    if (!(message instanceof Message)) {
+      if (message.deferred) {
+        await message.editReply(data);
+      } else {
+        await message.reply(data as InteractionReplyOptions);
+      }
+      const replyMsg = await message.fetchReply();
+      if (replyMsg instanceof Message) {
+        return replyMsg;
+      }
+    } else {
+      return await message.channel.send(data as MessageOptions);
     }
+  };
 
-    const embed = new CustomEmbed(message.member);
+  if (await onCooldown(cmd.name, message.member)) {
+    const embed = await getResponse(cmd.name, message.member);
 
-    embed.setHeader("your boosters", message.author.avatarURL());
+    return send({ embeds: [embed], ephemeral: true });
+  }
 
-    const desc: string[] = [];
+  const embed = new CustomEmbed(message.member);
 
-    const items = getItems();
-    const boosters = await getBoosters(message.member);
+  embed.setHeader("your boosters", message.author.avatarURL());
 
-    if (boosters.size == 0) {
-        embed.setDescription("you have no active boosters");
-        return send({ embeds: [embed] });
-    }
+  const desc: string[] = [];
 
-    for (const boosterId of boosters.keys()) {
-        if (boosters.get(boosterId).length == 1) {
-            desc.push(
-                `**${items[boosterId].name}** ${items[boosterId].emoji} - expires <t:${Math.round(
-                    boosters.get(boosterId)[0].expire / 1000
-                )}:R>`
-            );
-        } else {
-            let lowest = boosters.get(boosterId)[0].expire;
+  const items = getItems();
+  const boosters = await getBoosters(message.member);
 
-            for (const booster of boosters.get(boosterId)) {
-                if (booster.expire < lowest) lowest = booster.expire;
-            }
-
-            desc.push(
-                `**${items[boosterId].name}** ${items[boosterId].emoji} \`x${
-                    boosters.get(boosterId).length
-                }\` - next expires <t:${Math.round(boosters.get(boosterId)[0].expire / 1000)}:R>`
-            );
-        }
-    }
-
-    embed.setDescription(desc.join("\n"));
-
+  if (boosters.size == 0) {
+    embed.setDescription("you have no active boosters");
     return send({ embeds: [embed] });
+  }
+
+  for (const boosterId of boosters.keys()) {
+    if (boosters.get(boosterId).length == 1) {
+      desc.push(
+        `**${items[boosterId].name}** ${items[boosterId].emoji} - expires <t:${Math.round(
+          boosters.get(boosterId)[0].expire / 1000
+        )}:R>`
+      );
+    } else {
+      let lowest = boosters.get(boosterId)[0].expire;
+
+      for (const booster of boosters.get(boosterId)) {
+        if (booster.expire < lowest) lowest = booster.expire;
+      }
+
+      desc.push(
+        `**${items[boosterId].name}** ${items[boosterId].emoji} \`x${
+          boosters.get(boosterId).length
+        }\` - next expires <t:${Math.round(boosters.get(boosterId)[0].expire / 1000)}:R>`
+      );
+    }
+  }
+
+  embed.setDescription(desc.join("\n"));
+
+  return send({ embeds: [embed] });
 }
 
 cmd.setRun(run);

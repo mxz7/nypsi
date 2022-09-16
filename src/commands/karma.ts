@@ -6,67 +6,67 @@ import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Co
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 
 const cmd = new Command("karma", "check how much karma you have", Categories.INFO).setDocs(
-    "https://docs.nypsi.xyz/economy/karma"
+  "https://docs.nypsi.xyz/economy/karma"
 );
 
 cmd.slashEnabled = true;
 cmd.slashData.addUserOption((option) => option.setName("user").setDescription("user to get karma of"));
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-    let target = message.member;
+  let target = message.member;
 
-    const send = async (data: MessageOptions | InteractionReplyOptions) => {
-        if (!(message instanceof Message)) {
-            if (message.deferred) {
-                await message.editReply(data);
-            } else {
-                await message.reply(data as InteractionReplyOptions);
-            }
-            const replyMsg = await message.fetchReply();
-            if (replyMsg instanceof Message) {
-                return replyMsg;
-            }
-        } else {
-            return await message.channel.send(data as MessageOptions);
-        }
-    };
-
-    if (args.length >= 1) {
-        if (message.author.id == "672793821850894347" && args[0] == "remove") {
-            if (!args[1] || !args[2]) {
-                return send({
-                    embeds: [new CustomEmbed(message.member, "$karma remove <userid> <amount>")],
-                });
-            }
-
-            await removeKarma(args[1], parseInt(args[2]));
-        }
-        target = message.mentions.members.first();
-
-        if (!target) {
-            target = await getMember(message.guild, args.join(" "));
-        }
-
-        if (!target) {
-            return send({ embeds: [new ErrorEmbed("invalid user")] });
-        }
-    }
-
-    const karma = await getKarma(target);
-
-    const embed = new CustomEmbed(message.member);
-
-    if (target.user.id == message.author.id) {
-        embed.setHeader("your karma", message.author.avatarURL());
-        embed.setDescription(`you have **${karma.toLocaleString()}** karma 🔮`);
+  const send = async (data: MessageOptions | InteractionReplyOptions) => {
+    if (!(message instanceof Message)) {
+      if (message.deferred) {
+        await message.editReply(data);
+      } else {
+        await message.reply(data as InteractionReplyOptions);
+      }
+      const replyMsg = await message.fetchReply();
+      if (replyMsg instanceof Message) {
+        return replyMsg;
+      }
     } else {
-        embed.setHeader(`${target.user.username}'s karma`, target.user.avatarURL());
-        embed.setDescription(`${target.user.username} has **${karma.toLocaleString()}** karma 🔮`);
+      return await message.channel.send(data as MessageOptions);
+    }
+  };
+
+  if (args.length >= 1) {
+    if (message.author.id == "672793821850894347" && args[0] == "remove") {
+      if (!args[1] || !args[2]) {
+        return send({
+          embeds: [new CustomEmbed(message.member, "$karma remove <userid> <amount>")],
+        });
+      }
+
+      await removeKarma(args[1], parseInt(args[2]));
+    }
+    target = message.mentions.members.first();
+
+    if (!target) {
+      target = await getMember(message.guild, args.join(" "));
     }
 
-    embed.setFooter({ text: `whats karma? do ${await getPrefix(message.guild)}karmahelp` });
+    if (!target) {
+      return send({ embeds: [new ErrorEmbed("invalid user")] });
+    }
+  }
 
-    return send({ embeds: [embed] });
+  const karma = await getKarma(target);
+
+  const embed = new CustomEmbed(message.member);
+
+  if (target.user.id == message.author.id) {
+    embed.setHeader("your karma", message.author.avatarURL());
+    embed.setDescription(`you have **${karma.toLocaleString()}** karma 🔮`);
+  } else {
+    embed.setHeader(`${target.user.username}'s karma`, target.user.avatarURL());
+    embed.setDescription(`${target.user.username} has **${karma.toLocaleString()}** karma 🔮`);
+  }
+
+  embed.setFooter({ text: `whats karma? do ${await getPrefix(message.guild)}karmahelp` });
+
+  return send({ embeds: [embed] });
 }
 
 cmd.setRun(run);

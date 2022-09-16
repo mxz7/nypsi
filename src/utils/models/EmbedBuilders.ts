@@ -6,222 +6,222 @@ import { getEmbedColor } from "../premium/utils";
 const embedColorCache = new Map<string, string>();
 
 export class CustomEmbed extends EmbedBuilder {
-    constructor(member?: GuildMember, text?: string, disableFooter = false) {
-        super();
+  constructor(member?: GuildMember, text?: string, disableFooter = false) {
+    super();
 
-        if (member) {
-            const color = embedColorCache.get(member.user.id) as ColorResolvable | "default" | "none";
+    if (member) {
+      const color = embedColorCache.get(member.user.id) as ColorResolvable | "default" | "none";
 
-            if (color && color != "none") {
-                if (color == "default") {
-                    super.setColor(getColor(member));
-                } else {
-                    super.setColor(color);
-                }
-            } else {
-                checkPremium(member.user.id);
-                super.setColor(getColor(member));
-            }
-        }
-
-        if (text) {
-            if (text.length > 2000) {
-                text = text.substring(0, 2000);
-            }
-
-            super.setDescription(text);
-        }
-
-        const chance = Math.floor(Math.random() * 50);
-
-        if (chance == 7 && !disableFooter)
-            super.setFooter({
-                text: "nypsi.xyz",
-            });
-
-        return this;
-    }
-
-    disableFooter() {
-        try {
-            delete this.data.footer;
-        } catch {
-            /* keep eslint happy */
-        }
-
-        return this;
-    }
-
-    setDescription(text: string) {
-        if (text.length > 2000) {
-            text = text.substr(0, 2000);
-        }
-        super.setDescription(text);
-
-        return this;
-    }
-
-    addField(title: string, text: string, inline = false) {
-        if (text.length > 1000) {
-            text = text.substr(0, 1000);
-        }
-
-        if (super.data?.fields) {
-            super.data.fields.push({ name: title, value: text, inline: inline });
+      if (color && color != "none") {
+        if (color == "default") {
+          super.setColor(getColor(member));
         } else {
-            super.addFields([{ name: title, value: text, inline: inline }]);
+          super.setColor(color);
         }
-
-        return this;
+      } else {
+        checkPremium(member.user.id);
+        super.setColor(getColor(member));
+      }
     }
 
-    setTitle(text: string) {
-        super.setTitle(text);
+    if (text) {
+      if (text.length > 2000) {
+        text = text.substring(0, 2000);
+      }
 
-        return this;
+      super.setDescription(text);
     }
 
-    setImage(url: string) {
-        super.setImage(url);
+    const chance = Math.floor(Math.random() * 50);
 
-        return this;
+    if (chance == 7 && !disableFooter)
+      super.setFooter({
+        text: "nypsi.xyz",
+      });
+
+    return this;
+  }
+
+  disableFooter() {
+    try {
+      delete this.data.footer;
+    } catch {
+      /* keep eslint happy */
     }
 
-    setThumbnail(url: string) {
-        super.setThumbnail(url);
+    return this;
+  }
 
-        return this;
+  setDescription(text: string) {
+    if (text.length > 2000) {
+      text = text.substr(0, 2000);
+    }
+    super.setDescription(text);
+
+    return this;
+  }
+
+  addField(title: string, text: string, inline = false) {
+    if (text.length > 1000) {
+      text = text.substr(0, 1000);
     }
 
-    setURL(url: string) {
-        super.setURL(url);
-
-        return this;
+    if (super.data?.fields) {
+      super.data.fields.push({ name: title, value: text, inline: inline });
+    } else {
+      super.addFields([{ name: title, value: text, inline: inline }]);
     }
 
-    setHeader(text: string, image?: string) {
-        super.setAuthor({ name: text, iconURL: image });
+    return this;
+  }
 
-        return this;
+  setTitle(text: string) {
+    super.setTitle(text);
+
+    return this;
+  }
+
+  setImage(url: string) {
+    super.setImage(url);
+
+    return this;
+  }
+
+  setThumbnail(url: string) {
+    super.setThumbnail(url);
+
+    return this;
+  }
+
+  setURL(url: string) {
+    super.setURL(url);
+
+    return this;
+  }
+
+  setHeader(text: string, image?: string) {
+    super.setAuthor({ name: text, iconURL: image });
+
+    return this;
+  }
+
+  setColor(color: `#${string}` | ColorResolvable) {
+    super.setColor(color);
+
+    return this;
+  }
+
+  setTimestamp(date?: Date | number) {
+    if (date) {
+      super.setTimestamp(date);
+    } else {
+      super.setTimestamp();
     }
 
-    setColor(color: `#${string}` | ColorResolvable) {
-        super.setColor(color);
-
-        return this;
-    }
-
-    setTimestamp(date?: Date | number) {
-        if (date) {
-            super.setTimestamp(date);
-        } else {
-            super.setTimestamp();
-        }
-
-        return this;
-    }
+    return this;
+  }
 }
 
 export class ErrorEmbed extends EmbedBuilder {
-    constructor(text: string) {
-        super();
-        super.setColor("#e31937");
-        super.setTitle("`❌`");
-        super.setDescription(text);
+  constructor(text: string) {
+    super();
+    super.setColor("#e31937");
+    super.setTitle("`❌`");
+    super.setDescription(text);
 
-        return this;
+    return this;
+  }
+
+  removeTitle() {
+    delete this.data.title;
+
+    return this;
+  }
+
+  setDescription(text: string) {
+    if (text.length > 2000) {
+      text = text.substring(0, 2000);
+    }
+    super.setDescription(text);
+
+    return this;
+  }
+
+  addField(title: string, text: string, inline = false) {
+    if (text.length > 1000) {
+      text = text.substr(0, 1000);
     }
 
-    removeTitle() {
-        delete this.data.title;
-
-        return this;
+    if (super.data?.fields) {
+      super.data.fields.push({ name: title, value: text, inline: inline });
+    } else {
+      super.addFields([{ name: title, value: text, inline: inline }]);
     }
 
-    setDescription(text: string) {
-        if (text.length > 2000) {
-            text = text.substring(0, 2000);
-        }
-        super.setDescription(text);
+    return this;
+  }
 
-        return this;
+  setTitle(text: string) {
+    super.setTitle(text);
+
+    return this;
+  }
+
+  setImage(url: string) {
+    super.setImage(url);
+
+    return this;
+  }
+
+  setThumbnail(url: string) {
+    super.setThumbnail(url);
+
+    return this;
+  }
+
+  setURL(url: string) {
+    super.setURL(url);
+
+    return this;
+  }
+
+  setHeader(text: string): ErrorEmbed {
+    super.setAuthor({ name: text });
+
+    return this;
+  }
+
+  setColor(color: `#${string}` | ColorResolvable) {
+    super.setColor(color);
+
+    return this;
+  }
+
+  setTimestamp(date: Date | number) {
+    if (date) {
+      super.setTimestamp(date);
+    } else {
+      super.setTimestamp();
     }
 
-    addField(title: string, text: string, inline = false) {
-        if (text.length > 1000) {
-            text = text.substr(0, 1000);
-        }
-
-        if (super.data?.fields) {
-            super.data.fields.push({ name: title, value: text, inline: inline });
-        } else {
-            super.addFields([{ name: title, value: text, inline: inline }]);
-        }
-
-        return this;
-    }
-
-    setTitle(text: string) {
-        super.setTitle(text);
-
-        return this;
-    }
-
-    setImage(url: string) {
-        super.setImage(url);
-
-        return this;
-    }
-
-    setThumbnail(url: string) {
-        super.setThumbnail(url);
-
-        return this;
-    }
-
-    setURL(url: string) {
-        super.setURL(url);
-
-        return this;
-    }
-
-    setHeader(text: string): ErrorEmbed {
-        super.setAuthor({ name: text });
-
-        return this;
-    }
-
-    setColor(color: `#${string}` | ColorResolvable) {
-        super.setColor(color);
-
-        return this;
-    }
-
-    setTimestamp(date: Date | number) {
-        if (date) {
-            super.setTimestamp(date);
-        } else {
-            super.setTimestamp();
-        }
-
-        return this;
-    }
+    return this;
+  }
 }
 
 async function checkPremium(id: string) {
-    const x = parseInt(await redis.get(`cache:premium:level:${id}`));
+  const x = parseInt(await redis.get(`cache:premium:level:${id}`));
 
-    if (x > 0) {
-        const embedColor = await getEmbedColor(id);
+  if (x > 0) {
+    const embedColor = await getEmbedColor(id);
 
-        embedColorCache.set(id, embedColor);
-        setTimeout(() => {
-            embedColorCache.delete(id);
-        }, 900 * 1000);
-    } else {
-        embedColorCache.set(id, "none");
-        setTimeout(() => {
-            embedColorCache.delete(id);
-        }, 900 * 1000);
-    }
+    embedColorCache.set(id, embedColor);
+    setTimeout(() => {
+      embedColorCache.delete(id);
+    }, 900 * 1000);
+  } else {
+    embedColorCache.set(id, "none");
+    setTimeout(() => {
+      embedColorCache.delete(id);
+    }, 900 * 1000);
+  }
 }

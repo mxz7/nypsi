@@ -4,7 +4,7 @@ import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Co
 const cmd = new Command("support", "join the nypsi support server", Categories.INFO).setAliases(["discord"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-    return message.channel.send({ content: "discord.gg/hJTDNST" });
+  return message.channel.send({ content: "discord.gg/hJTDNST" });
 }
 
 cmd.setRun(run);

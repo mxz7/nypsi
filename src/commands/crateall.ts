@@ -6,88 +6,88 @@ import { inCooldown, addCooldown } from "../utils/guilds/utils";
 import { logger } from "../utils/logger";
 
 const cmd = new Command("crateall", "give every user in the current guild a crate", Categories.NONE).setPermissions([
-    "bot owner",
+  "bot owner",
 ]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-    if (message.member.user.id != "672793821850894347") return;
+  if (message.member.user.id != "672793821850894347") return;
 
-    if (args.length == 0) {
-        return message.channel.send({ embeds: [new ErrorEmbed("u know how this works")] });
+  if (args.length == 0) {
+    return message.channel.send({ embeds: [new ErrorEmbed("u know how this works")] });
+  }
+
+  const items = getItems();
+
+  const searchTag = args[0].toLowerCase();
+
+  let selected;
+
+  for (const itemName of Array.from(Object.keys(items))) {
+    const aliases = items[itemName].aliases ? items[itemName].aliases : [];
+    if (searchTag == itemName) {
+      selected = itemName;
+      break;
+    } else if (searchTag == itemName.split("_").join("")) {
+      selected = itemName;
+      break;
+    } else if (aliases.indexOf(searchTag) != -1) {
+      selected = itemName;
+      break;
     }
+  }
 
-    const items = getItems();
+  selected = items[selected];
 
-    const searchTag = args[0].toLowerCase();
+  if (!selected) {
+    return message.channel.send({ embeds: [new ErrorEmbed(`couldnt find \`${args[0]}\``)] });
+  }
 
-    let selected;
+  if (selected.role != "crate") {
+    return message.channel.send({ embeds: [new ErrorEmbed(`${selected.name} is not a crate`)] });
+  }
 
-    for (const itemName of Array.from(Object.keys(items))) {
-        const aliases = items[itemName].aliases ? items[itemName].aliases : [];
-        if (searchTag == itemName) {
-            selected = itemName;
-            break;
-        } else if (searchTag == itemName.split("_").join("")) {
-            selected = itemName;
-            break;
-        } else if (aliases.indexOf(searchTag) != -1) {
-            selected = itemName;
-            break;
-        }
-    }
+  let members;
 
-    selected = items[selected];
+  if (
+    inCooldown(message.guild) ||
+    message.guild.memberCount == message.guild.members.cache.size ||
+    message.guild.memberCount <= 50
+  ) {
+    members = message.guild.members.cache;
+  } else {
+    members = await message.guild.members.fetch();
+    addCooldown(message.guild, 3600);
+  }
 
-    if (!selected) {
-        return message.channel.send({ embeds: [new ErrorEmbed(`couldnt find \`${args[0]}\``)] });
-    }
+  let amount = 1;
 
-    if (selected.role != "crate") {
-        return message.channel.send({ embeds: [new ErrorEmbed(`${selected.name} is not a crate`)] });
-    }
+  if (args[1]) {
+    amount = parseInt(args[1]);
+  }
 
-    let members;
+  let count = 0;
 
-    if (
-        inCooldown(message.guild) ||
-        message.guild.memberCount == message.guild.members.cache.size ||
-        message.guild.memberCount <= 50
-    ) {
-        members = message.guild.members.cache;
+  for (const m of members.keys()) {
+    const member = members.get(m);
+
+    if (!(await userExists(m))) continue;
+
+    const inventory = await getInventory(member);
+
+    if (inventory[selected.id]) {
+      inventory[selected.id] += amount;
     } else {
-        members = await message.guild.members.fetch();
-        addCooldown(message.guild, 3600);
+      inventory[selected.id] = amount;
     }
 
-    let amount = 1;
+    await setInventory(member, inventory);
+    logger.info(`${amount} ${selected.id} given to ${member.user.tag} (${member.user.id})`);
+    count += amount;
+  }
 
-    if (args[1]) {
-        amount = parseInt(args[1]);
-    }
-
-    let count = 0;
-
-    for (const m of members.keys()) {
-        const member = members.get(m);
-
-        if (!(await userExists(m))) continue;
-
-        const inventory = await getInventory(member);
-
-        if (inventory[selected.id]) {
-            inventory[selected.id] += amount;
-        } else {
-            inventory[selected.id] = amount;
-        }
-
-        await setInventory(member, inventory);
-        logger.info(`${amount} ${selected.id} given to ${member.user.tag} (${member.user.id})`);
-        count += amount;
-    }
-
-    return message.channel.send({
-        embeds: [new CustomEmbed(message.member, `**${count}** ${selected.name}${count != 1 ? "s" : ""} given`)],
-    });
+  return message.channel.send({
+    embeds: [new CustomEmbed(message.member, `**${count}** ${selected.name}${count != 1 ? "s" : ""} given`)],
+  });
 }
 
 cmd.setRun(run);

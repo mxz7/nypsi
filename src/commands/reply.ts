@@ -8,30 +8,30 @@ import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 const cmd = new Command("reply", "reply to a support ticket", Categories.NONE);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-    const support = await getSupportRequestByChannelId(message.channel.id);
+  const support = await getSupportRequestByChannelId(message.channel.id);
 
-    if (!support) return;
+  if (!support) return;
 
-    if (args.length == 0) {
-        return message.channel.send({ embeds: [new ErrorEmbed("dumbass")] });
-    }
+  if (args.length == 0) {
+    return message.channel.send({ embeds: [new ErrorEmbed("dumbass")] });
+  }
 
-    if (!(message instanceof Message)) return;
+  if (!(message instanceof Message)) return;
 
-    const embed = new CustomEmbed(message.member)
-        .setDescription(args.join(" "))
-        .setHeader(message.author.tag, message.author.avatarURL());
+  const embed = new CustomEmbed(message.member)
+    .setDescription(args.join(" "))
+    .setHeader(message.author.tag, message.author.avatarURL());
 
-    Promise.all([
-        sendToRequestChannel(support.userId, embed, message.client as NypsiClient),
-        requestDM({
-            client: message.client as NypsiClient,
-            content: "you have received a message from your support ticket",
-            embed: embed,
-            memberId: support.userId,
-        }),
-        message.delete(),
-    ]);
+  Promise.all([
+    sendToRequestChannel(support.userId, embed, message.client as NypsiClient),
+    requestDM({
+      client: message.client as NypsiClient,
+      content: "you have received a message from your support ticket",
+      embed: embed,
+      memberId: support.userId,
+    }),
+    message.delete(),
+  ]);
 }
 
 cmd.setRun(run);

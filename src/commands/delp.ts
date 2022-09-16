@@ -6,58 +6,58 @@ import { getTier, isPremium } from "../utils/premium/utils";
 const cmd = new Command("delp", "bulk delete/purge your own messages", Categories.MODERATION).setAliases(["dp", "d"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-    if (await onCooldown(cmd.name, message.member)) {
-        const embed = await getResponse(cmd.name, message.member);
+  if (await onCooldown(cmd.name, message.member)) {
+    const embed = await getResponse(cmd.name, message.member);
 
-        return message.channel.send({ embeds: [embed] });
-    }
+    return message.channel.send({ embeds: [embed] });
+  }
 
-    let amount = 25;
+  let amount = 25;
 
-    if (await isPremium(message.author.id)) {
-        if ((await getTier(message.author.id)) == 4) {
-            amount = 100;
-        } else {
-            amount = 50;
-        }
-    }
-
-    await addCooldown(cmd.name, message.member, 20);
-
-    let collected: Collection<string, Message>;
-
-    if (amount == 25) {
-        collected = await message.channel.messages.fetch({ limit: 25 });
+  if (await isPremium(message.author.id)) {
+    if ((await getTier(message.author.id)) == 4) {
+      amount = 100;
     } else {
-        collected = await message.channel.messages.fetch({ limit: 100 });
+      amount = 50;
     }
+  }
 
-    collected = collected.filter((msg) => {
-        if (!msg.author) return;
-        return msg.author.id == message.author.id;
-    });
+  await addCooldown(cmd.name, message.member, 20);
 
-    if (collected.size == 0) {
-        return;
+  let collected: Collection<string, Message>;
+
+  if (amount == 25) {
+    collected = await message.channel.messages.fetch({ limit: 25 });
+  } else {
+    collected = await message.channel.messages.fetch({ limit: 100 });
+  }
+
+  collected = collected.filter((msg) => {
+    if (!msg.author) return;
+    return msg.author.id == message.author.id;
+  });
+
+  if (collected.size == 0) {
+    return;
+  }
+
+  if (collected.size > amount) {
+    const collectedValues = Array.from(collected.values());
+
+    collectedValues.splice(amount + 1, collectedValues.length);
+
+    collected = new Collection();
+
+    for (const msg of collectedValues) {
+      collected.set(msg.id, msg);
     }
+  }
 
-    if (collected.size > amount) {
-        const collectedValues = Array.from(collected.values());
+  if (!message.channel.isTextBased()) return;
 
-        collectedValues.splice(amount + 1, collectedValues.length);
+  if (message.channel.isDMBased()) return;
 
-        collected = new Collection();
-
-        for (const msg of collectedValues) {
-            collected.set(msg.id, msg);
-        }
-    }
-
-    if (!message.channel.isTextBased()) return;
-
-    if (message.channel.isDMBased()) return;
-
-    await message.channel.bulkDelete(collected).catch(() => {});
+  await message.channel.bulkDelete(collected).catch(() => {});
 }
 
 cmd.setRun(run);
