@@ -201,3 +201,36 @@ export async function bumpAuction(id: string, client: NypsiClient) {
 
   return messageUrl;
 }
+
+export async function getAuctionAverage(item: string) {
+  const auctions = await prisma.auction.findMany({
+    where: {
+      AND: [{ sold: true }, { itemName: item }],
+    },
+    select: {
+      bin: true,
+      itemAmount: true,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+    take: 100,
+  });
+
+  const costs: number[] = [];
+
+  for (const auction of auctions) {
+    if (costs.length >= 5000) break;
+
+    if (auction.itemAmount > 1) {
+      costs.push(Math.floor(Number(auction.bin) / auction.itemAmount));
+    } else {
+      costs.push(Number(auction.bin));
+    }
+  }
+
+  const sum = costs.reduce((a, b) => a + b, 0);
+  const avg = sum / costs.length || 0;
+
+  return avg;
+}
