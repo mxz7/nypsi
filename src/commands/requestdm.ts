@@ -5,35 +5,35 @@ import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Co
 import { ErrorEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command(
-    "requestdm",
-    "attempt to send a DM to a given user (this is my way of having fun leave me alone)",
-    Categories.NONE
+  "requestdm",
+  "attempt to send a DM to a given user (this is my way of having fun leave me alone)",
+  Categories.NONE
 );
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-    if (message.author.id != "672793821850894347") return;
+  if (message.author.id != "672793821850894347") return;
 
-    if (args.length < 2) {
-        return message.channel.send({ embeds: [new ErrorEmbed("$requestdm <id> <content>")] });
-    }
+  if (args.length < 2) {
+    return message.channel.send({ embeds: [new ErrorEmbed("$requestdm <id> <content>")] });
+  }
 
-    const user = args[0];
+  const user = args[0];
 
-    args.shift();
+  args.shift();
 
-    const a = await requestDM({
-        client: message.client as NypsiClient,
-        memberId: user,
-        content: args.join(" "),
-    });
+  const a = await requestDM({
+    client: message.client as NypsiClient,
+    memberId: user,
+    content: args.join(" "),
+  });
 
-    if (!(message instanceof Message)) return;
+  if (!(message instanceof Message)) return;
 
-    if (a) {
-        message.react("✅");
-    } else {
-        message.react("❌");
-    }
+  if (a) {
+    message.react("✅");
+  } else {
+    message.react("❌");
+  }
 }
 
 cmd.setRun(run);

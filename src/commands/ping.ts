@@ -5,66 +5,66 @@ import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Co
 import { CustomEmbed } from "../utils/models/EmbedBuilders.js";
 
 const cmd = new Command(
-    "ping",
-    "measured by timing how long it takes for a message to be sent - rate limiting can affect this",
-    Categories.INFO
+  "ping",
+  "measured by timing how long it takes for a message to be sent - rate limiting can affect this",
+  Categories.INFO
 ).setAliases(["latency"]);
 
 let pingingDb = false;
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-    /**
-     * not perfect latency testing i know but it works!!
-     */
-    let now = Date.now();
-    await redis.set("ping:test", "ping ping ping");
-    await redis.del("ping:test");
-    let after = Date.now();
+  /**
+   * not perfect latency testing i know but it works!!
+   */
+  let now = Date.now();
+  await redis.set("ping:test", "ping ping ping");
+  await redis.del("ping:test");
+  let after = Date.now();
 
-    const redisLatency = after - now;
+  const redisLatency = after - now;
 
-    let dbLatency: number;
+  let dbLatency: number;
 
-    if (!pingingDb) {
-        pingingDb = true;
-        now = Date.now();
-        await prisma.user.create({
-            data: {
-                id: "test_user",
-                lastKnownTag: "",
-                lastCommand: new Date(),
-            },
-        });
-        await prisma.user.delete({
-            where: {
-                id: "test_user",
-            },
-        });
-        after = Date.now();
-        pingingDb = false;
-
-        dbLatency = after - now;
-    }
-
+  if (!pingingDb) {
+    pingingDb = true;
     now = Date.now();
-    const msg = await message.channel.send({ content: "pong" });
+    await prisma.user.create({
+      data: {
+        id: "test_user",
+        lastKnownTag: "",
+        lastCommand: new Date(),
+      },
+    });
+    await prisma.user.delete({
+      where: {
+        id: "test_user",
+      },
+    });
     after = Date.now();
+    pingingDb = false;
 
-    const msgLatency = after - now;
+    dbLatency = after - now;
+  }
 
-    const discordLatency = Math.round(message.client.ws.ping);
+  now = Date.now();
+  const msg = await message.channel.send({ content: "pong" });
+  after = Date.now();
 
-    const embed = new CustomEmbed(message.member);
+  const msgLatency = after - now;
 
-    let desc = `discord api \`${discordLatency}ms\`\n` + `bot message \`${msgLatency}ms\`\n` + `redis \`${redisLatency}ms\``;
+  const discordLatency = Math.round(message.client.ws.ping);
 
-    if (dbLatency) {
-        desc += `\ndatabase \`${dbLatency}ms\``;
-    }
+  const embed = new CustomEmbed(message.member);
 
-    embed.setDescription(desc);
+  let desc = `discord api \`${discordLatency}ms\`\n` + `bot message \`${msgLatency}ms\`\n` + `redis \`${redisLatency}ms\``;
 
-    return await msg.edit({ embeds: [embed] });
+  if (dbLatency) {
+    desc += `\ndatabase \`${dbLatency}ms\``;
+  }
+
+  embed.setDescription(desc);
+
+  return await msg.edit({ embeds: [embed] });
 }
 
 cmd.setRun(run);

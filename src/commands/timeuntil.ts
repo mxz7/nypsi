@@ -9,54 +9,54 @@ import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 const cmd = new Command("timeuntil", "calculate time until a date", Categories.INFO).setAliases(["tu", "until"]);
 
 async function run(message: Message | (CommandInteraction & NypsiCommandInteraction), args: string[]) {
-    if (await onCooldown(cmd.name, message.member)) {
-        const embed = await getResponse(cmd.name, message.member);
+  if (await onCooldown(cmd.name, message.member)) {
+    const embed = await getResponse(cmd.name, message.member);
 
-        return message.channel.send({ embeds: [embed] });
-    }
+    return message.channel.send({ embeds: [embed] });
+  }
 
-    if (args.length == 0) {
-        return message.channel.send({
-            embeds: [new ErrorEmbed(`${await getPrefix(message.guild)}until <date> (label...)`)],
-        });
-    }
+  if (args.length == 0) {
+    return message.channel.send({
+      embeds: [new ErrorEmbed(`${await getPrefix(message.guild)}until <date> (label...)`)],
+    });
+  }
 
-    let target = dayjs(args[0]);
+  let target = dayjs(args[0]);
 
-    if (isNaN(target.unix())) {
-        const day = args[0].split("/")[0];
-        const month = args[0].split("/")[1];
-        const year = args[0].split("/")[2];
+  if (isNaN(target.unix())) {
+    const day = args[0].split("/")[0];
+    const month = args[0].split("/")[1];
+    const year = args[0].split("/")[2];
 
-        target = dayjs(`${month}/${day}/${year}`);
-    }
+    target = dayjs(`${month}/${day}/${year}`);
+  }
 
-    if (isNaN(target.unix())) {
-        return message.channel.send({ embeds: [new ErrorEmbed("invalid date")] });
-    }
+  if (isNaN(target.unix())) {
+    return message.channel.send({ embeds: [new ErrorEmbed("invalid date")] });
+  }
 
-    if (target.isBefore(dayjs())) {
-        return message.channel.send({ embeds: [new ErrorEmbed("date must be in the future")] });
-    }
+  if (target.isBefore(dayjs())) {
+    return message.channel.send({ embeds: [new ErrorEmbed("date must be in the future")] });
+  }
 
-    await addCooldown(cmd.name, message.member, 10);
+  await addCooldown(cmd.name, message.member, 10);
 
-    args.shift();
+  args.shift();
 
-    const diff = target.toDate().getTime() - Date.now();
-    const length = MStoTime(diff, true);
+  const diff = target.toDate().getTime() - Date.now();
+  const length = MStoTime(diff, true);
 
-    let label: string;
+  let label: string;
 
-    if (args[0]) {
-        label = args.join(" ");
-    }
+  if (args[0]) {
+    label = args.join(" ");
+  }
 
-    if (label) {
-        return message.channel.send({ embeds: [new CustomEmbed(message.member, `**${length}** until ${label}`)] });
-    } else {
-        return message.channel.send({ embeds: [new CustomEmbed(message.member, `${length}`)] });
-    }
+  if (label) {
+    return message.channel.send({ embeds: [new CustomEmbed(message.member, `**${length}** until ${label}`)] });
+  } else {
+    return message.channel.send({ embeds: [new CustomEmbed(message.member, `${length}`)] });
+  }
 }
 
 cmd.setRun(run);

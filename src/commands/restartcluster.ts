@@ -11,46 +11,46 @@ const cmd = new Command("restartcluster", "restartcluster", Categories.NONE).set
 let confirm = false;
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-    if (message.member.user.id != "672793821850894347") return;
+  if (message.member.user.id != "672793821850894347") return;
 
-    if (confirm == false) {
-        confirm = true;
-        setTimeout(() => {
-            confirm = false;
-        }, 120000);
-        return message.channel.send({
-            embeds: [new CustomEmbed(message.member, "run command again to confirm")],
-        });
-    } else {
-        startRestart();
+  if (confirm == false) {
+    confirm = true;
+    setTimeout(() => {
+      confirm = false;
+    }, 120000);
+    return message.channel.send({
+      embeds: [new CustomEmbed(message.member, "run command again to confirm")],
+    });
+  } else {
+    startRestart();
 
-        await setCustomPresence("rebooting..");
+    await setCustomPresence("rebooting..");
 
-        message.client.user.setPresence({
-            activities: [
-                {
-                    name: "rebooting..",
-                },
-            ],
-        });
+    message.client.user.setPresence({
+      activities: [
+        {
+          name: "rebooting..",
+        },
+      ],
+    });
 
-        logger.info("cluster shutting down soon...");
+    logger.info("cluster shutting down soon...");
 
-        setTimeout(() => {
-            logger.info("cluster shutting down in 10 seconds...");
+    setTimeout(() => {
+      logger.info("cluster shutting down in 10 seconds...");
 
-            setTimeout(() => {
-                logger.info("cluster shutting down...");
-                const client = message.client as NypsiClient;
+      setTimeout(() => {
+        logger.info("cluster shutting down...");
+        const client = message.client as NypsiClient;
 
-                client.cluster.evalOnManager(`this.clusters.get(${client.cluster.id}).respawn()`);
-            }, 10000);
-        }, 20000);
+        client.cluster.evalOnManager(`this.clusters.get(${client.cluster.id}).respawn()`);
+      }, 10000);
+    }, 20000);
 
-        return message.channel.send({
-            embeds: [new CustomEmbed(message.member, "✅ current cluster will shut down soon")],
-        });
-    }
+    return message.channel.send({
+      embeds: [new CustomEmbed(message.member, "✅ current cluster will shut down soon")],
+    });
+  }
 }
 
 cmd.setRun(run);

@@ -31,98 +31,98 @@ import { runSurveyChecks } from "../scheduled/clusterjobs/surveyends";
 import { runPremiumCrateInterval } from "../scheduled/clusterjobs/weeklycrates";
 
 export class NypsiClient extends Client {
-    public cluster: Cluster.Client;
+  public cluster: Cluster.Client;
 
-    constructor(options: ClientOptions) {
-        super(options);
+  constructor(options: ClientOptions) {
+    super(options);
 
-        this.cluster = new Cluster.Client(this);
+    this.cluster = new Cluster.Client(this);
 
-        setClusterId(this.cluster.id);
+    setClusterId(this.cluster.id);
 
-        runEconomySetup();
+    runEconomySetup();
 
-        redis.del("nypsi:presence");
+    redis.del("nypsi:presence");
 
-        if (this.cluster.maintenance) {
-            logger.info(`started on maintenance mode with ${this.cluster.maintenance}`);
-        }
-
-        return this;
+    if (this.cluster.maintenance) {
+      logger.info(`started on maintenance mode with ${this.cluster.maintenance}`);
     }
 
-    public loadEvents() {
-        this.on("shardReady", (shardID) => {
-            logger.info(`shard#${shardID} ready`);
-        });
-        this.on("shardDisconnect", (s, shardID) => {
-            logger.info(`shard#${shardID} disconnected`);
-        });
-        this.on("shardError", (error1, shardID) => {
-            logger.error(`shard#${shardID} error: ${error1}`);
-        });
-        this.on("shardReconnecting", (shardID) => {
-            logger.info(`shard#${shardID} connecting`);
-        });
-        this.on("shardResume", (shardId) => {
-            logger.info(`shard#${shardId} resume`);
-        });
+    return this;
+  }
 
-        this.once("ready", ready.bind(null, this));
+  public loadEvents() {
+    this.on("shardReady", (shardID) => {
+      logger.info(`shard#${shardID} ready`);
+    });
+    this.on("shardDisconnect", (s, shardID) => {
+      logger.info(`shard#${shardID} disconnected`);
+    });
+    this.on("shardError", (error1, shardID) => {
+      logger.error(`shard#${shardID} error: ${error1}`);
+    });
+    this.on("shardReconnecting", (shardID) => {
+      logger.info(`shard#${shardID} connecting`);
+    });
+    this.on("shardResume", (shardId) => {
+      logger.info(`shard#${shardId} resume`);
+    });
 
-        this.cluster.on("message", (message) => {
-            if (message._sRequest) {
-                if (message.alive) message.reply({ alive: true });
-            }
-        });
+    this.once("ready", ready.bind(null, this));
 
-        this.cluster.on("ready", async () => {
-            await redis.del("nypsi:restarting");
-            this.on("guildCreate", guildCreate.bind(null, this));
-            this.on("guildDelete", guildDelete.bind(null, this));
-            this.rest.on("rateLimited", (rate) => {
-                const a = rate.route.split("/");
-                const reason = a[a.length - 1];
-                logger.warn("rate limit: " + reason);
-            });
-            this.on("guildMemberUpdate", guildMemberUpdate.bind(null));
-            this.on("guildMemberAdd", guildMemberAdd.bind(null));
-            this.on("guildMemberRemove", guildMemberRemove.bind(null));
-            this.on("messageDelete", messageDelete.bind(null));
-            this.on("messageUpdate", messageUpdate.bind(null));
-            this.on("messageCreate", messageCreate.bind(null));
-            this.on("messageDeleteBulk", messageDeleteBulk.bind(null));
-            this.on("channelCreate", channelCreate.bind(null));
-            this.on("channelDelete", channelDelete.bind(null));
-            this.on("roleDelete", roleDelete.bind(null));
-            this.on("userUpdate", userUpdate.bind(null));
-            this.on("interactionCreate", interactionCreate.bind(null));
+    this.cluster.on("message", (message) => {
+      if (message._sRequest) {
+        if (message.alive) message.reply({ alive: true });
+      }
+    });
 
-            setTimeout(() => {
-                this.runIntervals();
-            }, 60000);
-        });
-    }
+    this.cluster.on("ready", async () => {
+      await redis.del("nypsi:restarting");
+      this.on("guildCreate", guildCreate.bind(null, this));
+      this.on("guildDelete", guildDelete.bind(null, this));
+      this.rest.on("rateLimited", (rate) => {
+        const a = rate.route.split("/");
+        const reason = a[a.length - 1];
+        logger.warn("rate limit: " + reason);
+      });
+      this.on("guildMemberUpdate", guildMemberUpdate.bind(null));
+      this.on("guildMemberAdd", guildMemberAdd.bind(null));
+      this.on("guildMemberRemove", guildMemberRemove.bind(null));
+      this.on("messageDelete", messageDelete.bind(null));
+      this.on("messageUpdate", messageUpdate.bind(null));
+      this.on("messageCreate", messageCreate.bind(null));
+      this.on("messageDeleteBulk", messageDeleteBulk.bind(null));
+      this.on("channelCreate", channelCreate.bind(null));
+      this.on("channelDelete", channelDelete.bind(null));
+      this.on("roleDelete", roleDelete.bind(null));
+      this.on("userUpdate", userUpdate.bind(null));
+      this.on("interactionCreate", interactionCreate.bind(null));
 
-    private runIntervals() {
-        updateCache();
-        getWebhooks(this);
-        updateCounters(this);
-        runCountdowns(this);
-        runChristmas(this);
-        runSnipeClearIntervals();
-        doChatReactions(this);
-        runCommandUseTimers(this);
-        runUploadReset();
+      setTimeout(() => {
+        this.runIntervals();
+      }, 60000);
+    });
+  }
 
-        if (this.cluster.id != 0) return;
+  private runIntervals() {
+    updateCache();
+    getWebhooks(this);
+    updateCounters(this);
+    runCountdowns(this);
+    runChristmas(this);
+    runSnipeClearIntervals();
+    doChatReactions(this);
+    runCommandUseTimers(this);
+    runUploadReset();
 
-        runLotteryInterval(this);
-        runPremiumCrateInterval(this);
-        runPremiumChecks(this);
-        runModerationChecks(this);
-        runAuctionChecks(this);
-        runSurveyChecks(this);
-        runLogs();
-    }
+    if (this.cluster.id != 0) return;
+
+    runLotteryInterval(this);
+    runPremiumCrateInterval(this);
+    runPremiumChecks(this);
+    runModerationChecks(this);
+    runAuctionChecks(this);
+    runSurveyChecks(this);
+    runLogs();
+  }
 }

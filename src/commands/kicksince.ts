@@ -6,223 +6,217 @@ import { PunishmentType } from "../utils/models/GuildStorage";
 import { createProfile, newCase, profileExists } from "../utils/moderation/utils";
 
 const cmd = new Command("kicksince", "kick members that joined after a certain time", Categories.ADMIN)
-    .setPermissions(["ADMINISTRATOR"])
-    .setAliases(["fuckoffsince"]);
+  .setPermissions(["ADMINISTRATOR"])
+  .setAliases(["fuckoffsince"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-    if (!message.member.permissions.has(PermissionFlagsBits.Administrator)) {
-        if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
-            return message.channel.send({ embeds: [new ErrorEmbed("you need the `administrator` permission")] });
-        }
-        return;
+  if (!message.member.permissions.has(PermissionFlagsBits.Administrator)) {
+    if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
+      return message.channel.send({ embeds: [new ErrorEmbed("you need the `administrator` permission")] });
     }
+    return;
+  }
 
-    if (!message.guild.members.me.permissions.has(PermissionFlagsBits.KickMembers)) {
-        return message.channel.send({
-            embeds: [new ErrorEmbed("i need the `kick members` permission for this command to work")],
-        });
-    }
+  if (!message.guild.members.me.permissions.has(PermissionFlagsBits.KickMembers)) {
+    return message.channel.send({
+      embeds: [new ErrorEmbed("i need the `kick members` permission for this command to work")],
+    });
+  }
 
-    if (!(await profileExists(message.guild))) await createProfile(message.guild);
+  if (!(await profileExists(message.guild))) await createProfile(message.guild);
 
-    const prefix = await getPrefix(message.guild);
+  const prefix = await getPrefix(message.guild);
 
-    if (args.length == 0 && message.mentions.members.first() == null) {
-        const embed = new CustomEmbed(message.member)
-            .setHeader("kicksince help")
-            .addField("usage", `${prefix}kicksince <length> (reason)`)
-            .addField(
-                "help",
-                "**<>** required | **()** optional | **[]** parameter\n" +
-                    "**<length>** the amount of time to traceback to before kicking\n" +
-                    "**(reason)** reason for the kick, will be given to all kicked members\n"
-            )
-            .addField("examples", `${prefix}kicksince 1h bots`)
-            .addField(
-                "time format examples",
-                "**1d** *1 day*\n**10h** *10 hours*\n**15m** *15 minutes*\n**30s** *30 seconds*"
-            );
+  if (args.length == 0 && message.mentions.members.first() == null) {
+    const embed = new CustomEmbed(message.member)
+      .setHeader("kicksince help")
+      .addField("usage", `${prefix}kicksince <length> (reason)`)
+      .addField(
+        "help",
+        "**<>** required | **()** optional | **[]** parameter\n" +
+          "**<length>** the amount of time to traceback to before kicking\n" +
+          "**(reason)** reason for the kick, will be given to all kicked members\n"
+      )
+      .addField("examples", `${prefix}kicksince 1h bots`)
+      .addField("time format examples", "**1d** *1 day*\n**10h** *10 hours*\n**15m** *15 minutes*\n**30s** *30 seconds*");
 
-        return message.channel.send({ embeds: [embed] });
-    }
+    return message.channel.send({ embeds: [embed] });
+  }
 
-    const time = new Date().getTime() - getDuration(args[0].toLowerCase()) * 1000;
+  const time = new Date().getTime() - getDuration(args[0].toLowerCase()) * 1000;
 
-    if (!time) {
-        return message.channel.send({ embeds: [new ErrorEmbed("invalid time length")] });
-    } else if (time < Date.now() - 604800000 && message.author.id != message.guild.ownerId) {
-        return message.channel.send({ embeds: [new ErrorEmbed("lol dont even try")] });
-    } else if (time < Date.now() - 604800000 * 2) {
-        return message.channel.send({ embeds: [new ErrorEmbed("lol dont even try")] });
-    }
+  if (!time) {
+    return message.channel.send({ embeds: [new ErrorEmbed("invalid time length")] });
+  } else if (time < Date.now() - 604800000 && message.author.id != message.guild.ownerId) {
+    return message.channel.send({ embeds: [new ErrorEmbed("lol dont even try")] });
+  } else if (time < Date.now() - 604800000 * 2) {
+    return message.channel.send({ embeds: [new ErrorEmbed("lol dont even try")] });
+  }
 
-    let members = await message.guild.members.fetch();
+  let members = await message.guild.members.fetch();
 
-    members = await members.filter((m) => m.joinedTimestamp >= time);
+  members = await members.filter((m) => m.joinedTimestamp >= time);
 
-    if (members.size >= 50) {
-        const confirm = await message.channel.send({
-            embeds: [
-                new CustomEmbed(
-                    message.member,
-                    `this will kick **${members.size.toLocaleString()}** members, are you sure?`
-                ),
-            ],
-        });
+  if (members.size >= 50) {
+    const confirm = await message.channel.send({
+      embeds: [
+        new CustomEmbed(message.member, `this will kick **${members.size.toLocaleString()}** members, are you sure?`),
+      ],
+    });
 
-        await confirm.react("✅");
+    await confirm.react("✅");
 
-        const filter = (reaction: MessageReaction, user: User) => {
-            return ["✅"].includes(reaction.emoji.name) && user.id == message.member.user.id;
-        };
+    const filter = (reaction: MessageReaction, user: User) => {
+      return ["✅"].includes(reaction.emoji.name) && user.id == message.member.user.id;
+    };
 
-        const reaction = await confirm
-            .awaitReactions({ filter, max: 1, time: 15000, errors: ["time"] })
-            .then((collected) => {
-                return collected.first().emoji.name;
-            })
-            .catch(async () => {
-                await confirm.reactions.removeAll();
-            });
+    const reaction = await confirm
+      .awaitReactions({ filter, max: 1, time: 15000, errors: ["time"] })
+      .then((collected) => {
+        return collected.first().emoji.name;
+      })
+      .catch(async () => {
+        await confirm.reactions.removeAll();
+      });
 
-        if (reaction == "✅") {
-            await confirm.delete();
-        } else {
-            return;
-        }
-    }
-
-    let status;
-    let statusDesc = `\`0/${members.size}\` members kicked..`;
-    let reason = message.member.user.tag + ": ";
-
-    if (members.size >= 15) {
-        status = new CustomEmbed(
-            message.member,
-            statusDesc + "\n\n - if you'd like to cancel this operation, delete this message"
-        );
-    }
-
-    let msg;
-
-    if (status) {
-        msg = await message.channel.send({ embeds: [status] });
-    }
-
-    if (args.length > 1) {
-        args.shift();
-
-        reason += args.join(" ");
+    if (reaction == "✅") {
+      await confirm.delete();
     } else {
-        reason += "no reason given";
+      return;
     }
+  }
 
-    let count = 0;
-    const failed = [];
-    let interval = 0;
+  let status;
+  let statusDesc = `\`0/${members.size}\` members kicked..`;
+  let reason = message.member.user.tag + ": ";
 
-    for (const member of members.keys()) {
-        interval++;
+  if (members.size >= 15) {
+    status = new CustomEmbed(
+      message.member,
+      statusDesc + "\n\n - if you'd like to cancel this operation, delete this message"
+    );
+  }
 
-        const targetHighestRole = members.get(member).roles.highest;
-        const memberHighestRole = message.member.roles.highest;
+  let msg;
 
-        if (targetHighestRole.position >= memberHighestRole.position && message.guild.ownerId != message.member.user.id) {
-            failed.push(members.get(member).user);
-        } else {
-            if (members.get(member).user.id == message.client.user.id) {
-                continue;
-            }
+  if (status) {
+    msg = await message.channel.send({ embeds: [status] });
+  }
 
-            await members
-                .get(member)
-                .kick(reason)
-                .then(() => {
-                    count++;
-                })
-                .catch(() => {
-                    failed.push(members.get(member).user);
-                });
+  if (args.length > 1) {
+    args.shift();
 
-            if (interval >= 10 && status) {
-                statusDesc = `\`${count}/${members.size}\` members kicked..${
-                    failed.length != 0 ? `\n - **${failed.length}** failed` : ""
-                }`;
-                status.setDescription(statusDesc + "\n\n - if you'd like to cancel this operation, delete this message");
-                let fail = false;
-                await msg.edit({ embeds: [status] }).catch(() => {
-                    fail = true;
-                });
-                if (fail) {
-                    return message.channel.send({
-                        embeds: [new CustomEmbed(message.member, "✅ operation cancelled")],
-                    });
-                }
-                interval = 0;
-            }
+    reason += args.join(" ");
+  } else {
+    reason += "no reason given";
+  }
+
+  let count = 0;
+  const failed = [];
+  let interval = 0;
+
+  for (const member of members.keys()) {
+    interval++;
+
+    const targetHighestRole = members.get(member).roles.highest;
+    const memberHighestRole = message.member.roles.highest;
+
+    if (targetHighestRole.position >= memberHighestRole.position && message.guild.ownerId != message.member.user.id) {
+      failed.push(members.get(member).user);
+    } else {
+      if (members.get(member).user.id == message.client.user.id) {
+        continue;
+      }
+
+      await members
+        .get(member)
+        .kick(reason)
+        .then(() => {
+          count++;
+        })
+        .catch(() => {
+          failed.push(members.get(member).user);
+        });
+
+      if (interval >= 10 && status) {
+        statusDesc = `\`${count}/${members.size}\` members kicked..${
+          failed.length != 0 ? `\n - **${failed.length}** failed` : ""
+        }`;
+        status.setDescription(statusDesc + "\n\n - if you'd like to cancel this operation, delete this message");
+        let fail = false;
+        await msg.edit({ embeds: [status] }).catch(() => {
+          fail = true;
+        });
+        if (fail) {
+          return message.channel.send({
+            embeds: [new CustomEmbed(message.member, "✅ operation cancelled")],
+          });
         }
+        interval = 0;
+      }
+    }
+  }
+
+  if (count == 0) {
+    return message.channel.send({ embeds: [new ErrorEmbed("i was unable to kick any users")] });
+  }
+
+  const embed = new CustomEmbed(message.member);
+
+  if (reason.split(": ")[1] == "no reason given") {
+    embed.setDescription(`✅ **${count}** members kicked`);
+  } else {
+    embed.setDescription(`✅ **${count}** members kicked for: ${reason.split(": ")[1]}`);
+  }
+
+  if (failed.length != 0) {
+    const failedTags = [];
+    for (const fail1 of failed) {
+      failedTags.push(fail1.tag);
     }
 
-    if (count == 0) {
-        return message.channel.send({ embeds: [new ErrorEmbed("i was unable to kick any users")] });
-    }
+    embed.addField("error", "unable to kick: " + failedTags.join(", "));
+  }
 
-    const embed = new CustomEmbed(message.member);
+  if (count == 1) {
+    if (reason.split(": ")[1] == "no reason given") {
+      embed.setDescription("✅ `" + members.first().user.tag + "` has been kicked");
+    } else {
+      embed.setDescription("✅ `" + members.first().user.tag + "` has been kicked for: " + reason.split(": ")[1]);
+    }
+  }
+
+  if (status) {
+    msg.delete();
+  }
+
+  await message.channel.send({ embeds: [embed] });
+
+  const members1 = Array.from(members.keys());
+
+  if (failed.length != 0) {
+    for (const fail of failed) {
+      if (members1.includes(fail.id)) {
+        members1.splice(members1.indexOf(fail.id), 1);
+      }
+    }
+  }
+
+  await newCase(message.guild, PunishmentType.KICK, members1, message.author.tag, reason.split(": ")[1]);
+
+  for (const member of members1) {
+    const m = members.get(member);
 
     if (reason.split(": ")[1] == "no reason given") {
-        embed.setDescription(`✅ **${count}** members kicked`);
+      await m.send({ content: `you have been kicked from ${message.guild.name}` }).catch(() => {});
     } else {
-        embed.setDescription(`✅ **${count}** members kicked for: ${reason.split(": ")[1]}`);
+      const embed = new CustomEmbed(m)
+        .setTitle(`kicked from ${message.guild.name}`)
+        .addField("reason", `\`${reason.split(": ")[1]}\``);
+
+      await m.send({ content: `you have been kicked from ${message.guild.name}`, embeds: [embed] }).catch(() => {});
     }
-
-    if (failed.length != 0) {
-        const failedTags = [];
-        for (const fail1 of failed) {
-            failedTags.push(fail1.tag);
-        }
-
-        embed.addField("error", "unable to kick: " + failedTags.join(", "));
-    }
-
-    if (count == 1) {
-        if (reason.split(": ")[1] == "no reason given") {
-            embed.setDescription("✅ `" + members.first().user.tag + "` has been kicked");
-        } else {
-            embed.setDescription("✅ `" + members.first().user.tag + "` has been kicked for: " + reason.split(": ")[1]);
-        }
-    }
-
-    if (status) {
-        msg.delete();
-    }
-
-    await message.channel.send({ embeds: [embed] });
-
-    const members1 = Array.from(members.keys());
-
-    if (failed.length != 0) {
-        for (const fail of failed) {
-            if (members1.includes(fail.id)) {
-                members1.splice(members1.indexOf(fail.id), 1);
-            }
-        }
-    }
-
-    await newCase(message.guild, PunishmentType.KICK, members1, message.author.tag, reason.split(": ")[1]);
-
-    for (const member of members1) {
-        const m = members.get(member);
-
-        if (reason.split(": ")[1] == "no reason given") {
-            await m.send({ content: `you have been kicked from ${message.guild.name}` }).catch(() => {});
-        } else {
-            const embed = new CustomEmbed(m)
-                .setTitle(`kicked from ${message.guild.name}`)
-                .addField("reason", `\`${reason.split(": ")[1]}\``);
-
-            await m.send({ content: `you have been kicked from ${message.guild.name}`, embeds: [embed] }).catch(() => {});
-        }
-    }
+  }
 }
 
 cmd.setRun(run);
@@ -230,31 +224,31 @@ cmd.setRun(run);
 module.exports = cmd;
 
 function getDuration(duration: string) {
-    duration.toLowerCase();
+  duration.toLowerCase();
 
-    if (duration.includes("d")) {
-        if (!parseInt(duration.split("d")[0])) return undefined;
+  if (duration.includes("d")) {
+    if (!parseInt(duration.split("d")[0])) return undefined;
 
-        const num = parseInt(duration.split("d")[0]);
+    const num = parseInt(duration.split("d")[0]);
 
-        return num * 86400;
-    } else if (duration.includes("h")) {
-        if (!parseInt(duration.split("h")[0])) return undefined;
+    return num * 86400;
+  } else if (duration.includes("h")) {
+    if (!parseInt(duration.split("h")[0])) return undefined;
 
-        const num = parseInt(duration.split("h")[0]);
+    const num = parseInt(duration.split("h")[0]);
 
-        return num * 3600;
-    } else if (duration.includes("m")) {
-        if (!parseInt(duration.split("m")[0])) return undefined;
+    return num * 3600;
+  } else if (duration.includes("m")) {
+    if (!parseInt(duration.split("m")[0])) return undefined;
 
-        const num = parseInt(duration.split("m")[0]);
+    const num = parseInt(duration.split("m")[0]);
 
-        return num * 60;
-    } else if (duration.includes("s")) {
-        if (!parseInt(duration.split("s")[0])) return undefined;
+    return num * 60;
+  } else if (duration.includes("s")) {
+    if (!parseInt(duration.split("s")[0])) return undefined;
 
-        const num = parseInt(duration.split("s")[0]);
+    const num = parseInt(duration.split("s")[0]);
 
-        return num;
-    }
+    return num;
+  }
 }

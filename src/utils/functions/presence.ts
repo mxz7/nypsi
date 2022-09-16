@@ -2,25 +2,25 @@ import redis from "../database/redis";
 import { daysUntilChristmas } from "./date";
 
 export function randomPresence(): string {
-    const possibilities = ["nypsi.xyz", "tekoh.net", "nypsi.xyz", "xmas", "xmas"];
+  const possibilities = ["nypsi.xyz", "tekoh.net", "nypsi.xyz", "xmas", "xmas"];
 
-    const chosen = possibilities[Math.floor(Math.random() * possibilities.length)];
+  const chosen = possibilities[Math.floor(Math.random() * possibilities.length)];
 
-    let game = "";
+  let game = "";
 
-    if (chosen === "xmas") {
-        game = `${daysUntilChristmas()} days until christmas`;
-    } else {
-        game = chosen;
-    }
+  if (chosen === "xmas") {
+    game = `${daysUntilChristmas()} days until christmas`;
+  } else {
+    game = chosen;
+  }
 
-    return game;
+  return game;
 }
 
 export async function getCustomPresence() {
-    return await redis.get("nypsi:presence");
+  return await redis.get("nypsi:presence");
 }
 
 export async function setCustomPresence(text?: string) {
-    await redis.set("nypsi:presence", text);
+  await redis.set("nypsi:presence", text);
 }
