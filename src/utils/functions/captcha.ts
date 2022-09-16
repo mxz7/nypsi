@@ -1,4 +1,4 @@
-import { getZeroWidth } from "../chatreactions/utils";
+import { getZeroWidth } from "./chatreactions/utils";
 
 const locked: string[] = [];
 

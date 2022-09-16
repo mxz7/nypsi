@@ -1,6 +1,7 @@
 import { GuildMember } from "discord.js";
 import redis from "./database/redis";
-import { getBoosters, getItems } from "./economy/utils";
+import { getBoosters } from "./functions/economy/boosters";
+import { getItems } from "./functions/economy/utils";
 import { getPrefix } from "./guilds/utils";
 import { ErrorEmbed } from "./models/EmbedBuilders";
 import { getTier, isPremium } from "./premium/utils";

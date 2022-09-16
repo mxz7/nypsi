@@ -15,7 +15,7 @@ import messageUpdate from "../../events/messageUpdate";
 import ready from "../../events/ready";
 import roleDelete from "../../events/roleDelete";
 import userUpdate from "../../events/userUpdate";
-import { doChatReactions } from "../chatreactions/utils";
+import { doChatReactions } from "../functions/chatreactions/utils";
 import { runCommandUseTimers } from "../commandhandler";
 import redis from "../database/redis";
 import { runEconomySetup } from "../economy/utils";

@@ -25,3 +25,7 @@ export function decrypt(ciphertext: string): string {
 
   return bytes.toString(CryptoJS.enc.Utf8);
 }
+
+export function getZeroWidth() {
+  return "​";
+}

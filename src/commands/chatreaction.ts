@@ -29,7 +29,7 @@ import {
   startReaction,
   updateReactionSettings,
   updateWords,
-} from "../utils/chatreactions/utils";
+} from "../utils/functions/chatreactions/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { getPrefix } from "../utils/guilds/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
