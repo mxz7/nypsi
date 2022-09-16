@@ -95,11 +95,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     include: {
                         Boosters: true,
                         EconomyStats: true,
+                        LotteryTicket: true,
                     },
                 },
                 EconomyGuild: true,
                 EconomyGuildMember: true,
-                Premium: true,
+                Premium: {
+                    include: {
+                        PremiumCommand: true,
+                    },
+                },
                 Username: true,
                 WordleStats: true,
                 Auction: true,
