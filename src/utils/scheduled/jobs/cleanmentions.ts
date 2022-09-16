@@ -3,17 +3,17 @@ import { parentPort } from "worker_threads";
 import prisma from "../../database/database";
 
 (async () => {
-    const limit = dayjs().subtract(2, "weeks").toDate();
+  const limit = dayjs().subtract(2, "weeks").toDate();
 
-    const c = await prisma.mention.deleteMany({
-        where: {
-            date: { lte: limit },
-        },
-    });
+  const c = await prisma.mention.deleteMany({
+    where: {
+      date: { lte: limit },
+    },
+  });
 
-    if (c.count > 0) {
-        parentPort.postMessage(`${c.count} mentions deleted`);
-    }
+  if (c.count > 0) {
+    parentPort.postMessage(`${c.count} mentions deleted`);
+  }
 
-    process.exit(0);
+  process.exit(0);
 })();

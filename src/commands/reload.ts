@@ -7,28 +7,28 @@ import { loadCommands, reloadCommand } from "../utils/commandhandler";
 const cmd = new Command("reload", "reload commands", Categories.NONE).setPermissions(["bot owner"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-    if (message.member.user.id != "672793821850894347") return;
+  if (message.member.user.id != "672793821850894347") return;
 
-    if (args.length == 0) {
-        loadCommands();
-        if (message instanceof Message) {
-            message.react("✅");
-        }
-        logger.info("commands reloaded");
-    } else {
-        let msg;
-
-        try {
-            msg = reloadCommand(args).split("✔");
-            msg = "```\n" + msg + "```";
-        } catch (e) {
-            return message.channel.send({ embeds: [new ErrorEmbed(`\`\`\`${e}\`\`\``)] });
-        }
-
-        const embed = new CustomEmbed(message.member, msg).setHeader("reload");
-
-        message.channel.send({ embeds: [embed] });
+  if (args.length == 0) {
+    loadCommands();
+    if (message instanceof Message) {
+      message.react("✅");
     }
+    logger.info("commands reloaded");
+  } else {
+    let msg;
+
+    try {
+      msg = reloadCommand(args).split("✔");
+      msg = "```\n" + msg + "```";
+    } catch (e) {
+      return message.channel.send({ embeds: [new ErrorEmbed(`\`\`\`${e}\`\`\``)] });
+    }
+
+    const embed = new CustomEmbed(message.member, msg).setHeader("reload");
+
+    message.channel.send({ embeds: [embed] });
+  }
 }
 
 cmd.setRun(run);

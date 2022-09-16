@@ -12,16 +12,16 @@ install nodejs on your WSL. [tutorial](https://www.digitalocean.com/community/tu
 
 ### instructions
 
--   run `git clone https://github.com/tekoh/nypsi`
--   run `cd nypsi`
--   run the ./setup.sh file
--   run `npm install` this will install all packages needed for nypsi
--   run `npx tsc` this will compile the typescript into javascript
--   run `sudo apt install redis-server` and install the package
--   fill out the .env file with your own info
--   run `sudo service redis-server start` to start the local redis server
--   run `npx prisma migrate dev` to get the postgresql database ready
--   if all went well, `node .` should start your version of nypsi (:
+- run `git clone https://github.com/tekoh/nypsi`
+- run `cd nypsi`
+- run the ./setup.sh file
+- run `npm install` this will install all packages needed for nypsi
+- run `npx tsc` this will compile the typescript into javascript
+- run `sudo apt install redis-server` and install the package
+- fill out the .env file with your own info
+- run `sudo service redis-server start` to start the local redis server
+- run `npx prisma migrate dev` to get the postgresql database ready
+- if all went well, `node .` should start your version of nypsi (:
 
 ### postgresql
 

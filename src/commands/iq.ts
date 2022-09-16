@@ -14,113 +14,113 @@ cmd.slashEnabled = true;
 cmd.slashData.addUserOption((option) => option.setName("user").setDescription("how large is your iq"));
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-    const send = async (data: MessageOptions | InteractionReplyOptions) => {
-        if (!(message instanceof Message)) {
-            if (message.deferred) {
-                await message.editReply(data);
-            } else {
-                await message.reply(data as InteractionReplyOptions);
-            }
-            const replyMsg = await message.fetchReply();
-            if (replyMsg instanceof Message) {
-                return replyMsg;
-            }
-        } else {
-            return await message.channel.send(data as MessageOptions);
-        }
-    };
-
-    if (await onCooldown(cmd.name, message.member)) {
-        const embed = await getResponse(cmd.name, message.member);
-
-        return send({ embeds: [embed], ephemeral: true });
-    }
-
-    let member: GuildMember;
-
-    if (args.length == 0) {
-        member = message.member;
+  const send = async (data: MessageOptions | InteractionReplyOptions) => {
+    if (!(message instanceof Message)) {
+      if (message.deferred) {
+        await message.editReply(data);
+      } else {
+        await message.reply(data as InteractionReplyOptions);
+      }
+      const replyMsg = await message.fetchReply();
+      if (replyMsg instanceof Message) {
+        return replyMsg;
+      }
     } else {
-        if (!message.mentions.members.first()) {
-            member = await getMember(message.guild, args[0]);
-        } else {
-            member = message.mentions.members.first();
-        }
-
-        if (!member) {
-            return send({ embeds: [new ErrorEmbed("invalid user")] });
-        }
+      return await message.channel.send(data as MessageOptions);
     }
+  };
 
-    await addCooldown(cmd.name, message.member, 7);
+  if (await onCooldown(cmd.name, message.member)) {
+    const embed = await getResponse(cmd.name, message.member);
 
-    let iq;
-    let iqMsg;
+    return send({ embeds: [embed], ephemeral: true });
+  }
 
-    if (cache.has(member.user.id)) {
-        iq = cache.get(member.user.id);
+  let member: GuildMember;
+
+  if (args.length == 0) {
+    member = message.member;
+  } else {
+    if (!message.mentions.members.first()) {
+      member = await getMember(message.guild, args[0]);
     } else {
-        let chanceAmount = 25;
-
-        if (await isPremium(member.user.id)) {
-            if ((await getTier(member.user.id)) >= 3) {
-                chanceAmount = 10;
-            }
-        }
-
-        const chance = Math.floor(Math.random() * chanceAmount);
-
-        if (chance == 7) {
-            const chance2 = Math.floor(Math.random() * 10);
-
-            if (chance2 > 5) {
-                iq = Math.floor(Math.random() * 20);
-            } else {
-                iq = (Math.floor(Math.random() * 8) + 2) * 100;
-            }
-        } else if (chance == 6) {
-            iq = 69;
-        } else if (chance == 5) {
-            iq = 420;
-        } else {
-            iq = Math.floor(Math.random() * 40) + 80;
-        }
-
-        cache.set(member.user.id, iq);
-
-        setTimeout(() => {
-            cache.delete(member.user.id);
-        }, 60 * 1000);
+      member = message.mentions.members.first();
     }
 
-    if (iq == 69) {
-        iqMsg = "😉😏🍆🍑";
-    } else if (iq < 80) {
-        iqMsg = "you're a rock :rock:";
-    } else if (iq < 90) {
-        iqMsg = "u probably push doors that say pull";
-    } else if (iq < 98) {
-        iqMsg = "dumbass.. 🤣";
-    } else if (iq < 103) {
-        iqMsg = "average 🙄";
-    } else if (iq < 120) {
-        iqMsg = "big brain";
-    } else if (iq < 400) {
-        iqMsg = "nerd 🤓";
-    } else if (iq == 420) {
-        iqMsg = "🚬🍁🍂";
+    if (!member) {
+      return send({ embeds: [new ErrorEmbed("invalid user")] });
+    }
+  }
+
+  await addCooldown(cmd.name, message.member, 7);
+
+  let iq;
+  let iqMsg;
+
+  if (cache.has(member.user.id)) {
+    iq = cache.get(member.user.id);
+  } else {
+    let chanceAmount = 25;
+
+    if (await isPremium(member.user.id)) {
+      if ((await getTier(member.user.id)) >= 3) {
+        chanceAmount = 10;
+      }
+    }
+
+    const chance = Math.floor(Math.random() * chanceAmount);
+
+    if (chance == 7) {
+      const chance2 = Math.floor(Math.random() * 10);
+
+      if (chance2 > 5) {
+        iq = Math.floor(Math.random() * 20);
+      } else {
+        iq = (Math.floor(Math.random() * 8) + 2) * 100;
+      }
+    } else if (chance == 6) {
+      iq = 69;
+    } else if (chance == 5) {
+      iq = 420;
     } else {
-        iqMsg = "uh. woah.";
+      iq = Math.floor(Math.random() * 40) + 80;
     }
 
-    const embed = new CustomEmbed(message.member, `${member.user.toString()}\n\n**${iq}** IQ 🧠\n${iqMsg}`).setHeader(
-        "iq calculator",
-        member.user.avatarURL()
-    );
+    cache.set(member.user.id, iq);
 
-    send({ embeds: [embed] });
+    setTimeout(() => {
+      cache.delete(member.user.id);
+    }, 60 * 1000);
+  }
 
-    await addProgress(message.author.id, "unsure", 1);
+  if (iq == 69) {
+    iqMsg = "😉😏🍆🍑";
+  } else if (iq < 80) {
+    iqMsg = "you're a rock :rock:";
+  } else if (iq < 90) {
+    iqMsg = "u probably push doors that say pull";
+  } else if (iq < 98) {
+    iqMsg = "dumbass.. 🤣";
+  } else if (iq < 103) {
+    iqMsg = "average 🙄";
+  } else if (iq < 120) {
+    iqMsg = "big brain";
+  } else if (iq < 400) {
+    iqMsg = "nerd 🤓";
+  } else if (iq == 420) {
+    iqMsg = "🚬🍁🍂";
+  } else {
+    iqMsg = "uh. woah.";
+  }
+
+  const embed = new CustomEmbed(message.member, `${member.user.toString()}\n\n**${iq}** IQ 🧠\n${iqMsg}`).setHeader(
+    "iq calculator",
+    member.user.avatarURL()
+  );
+
+  send({ embeds: [embed] });
+
+  await addProgress(message.author.id, "unsure", 1);
 }
 
 cmd.setRun(run);

@@ -37,75 +37,75 @@ better showcase of features can be found on the bot's website: [`nypsi.xyz`](htt
 
 #### 💬 mentions
 
--   nypsi tracks mentions across qualifying servers, preventing your users from being irritated by ghost pings, as well as putting all of their recent mentions into a simple, easy access command
+- nypsi tracks mentions across qualifying servers, preventing your users from being irritated by ghost pings, as well as putting all of their recent mentions into a simple, easy access command
 
 #### 📖 wordle
 
--   you can play wordle on discord, with nypsi. no limit to how much you play per day
+- you can play wordle on discord, with nypsi. no limit to how much you play per day
 
 ##### 💸 gambling / economy
 
--   nypsi has a seasonal economy system, meaning that the economy resets every few months. this also means that the top 5 richest users on the bot at the end of every season receive real life rewards, such as paypal money or equivalent
+- nypsi has a seasonal economy system, meaning that the economy resets every few months. this also means that the top 5 richest users on the bot at the end of every season receive real life rewards, such as paypal money or equivalent
 
 ##### 🛠 moderation
 
--   every `ban, kick, mute, warn, unban and unmute` that is ran through nypsi is logged and saved and can be accessed with the `$history` and `$case` commands. with all of these commands you are also able to punish multiple people in the same command. use `$help mod` to view all of the moderation commands available. you are also able to moderate the `$snipe / $esnipe` command by including a filter with `$sf`
+- every `ban, kick, mute, warn, unban and unmute` that is ran through nypsi is logged and saved and can be accessed with the `$history` and `$case` commands. with all of these commands you are also able to punish multiple people in the same command. use `$help mod` to view all of the moderation commands available. you are also able to moderate the `$snipe / $esnipe` command by including a filter with `$sf`
 
 ##### ⛏ minecraft
 
--   `[disclaimer]` - this bot is not affiliated with minecraft/mojang in any way there are two minecraft related commands being `$mc` and `$skin`, both allow you to view information about a minecraft account, including past names and their current skin
+- `[disclaimer]` - this bot is not affiliated with minecraft/mojang in any way there are two minecraft related commands being `$mc` and `$skin`, both allow you to view information about a minecraft account, including past names and their current skin
 
 ##### 📊 server stats
 
--   nypsi tracks every server's member peaks, this information can be viewed with `$server`
--   nypsi is also able to create a member counter for your server, similar to other bots but allows you to customise it for free - `$counter`
+- nypsi tracks every server's member peaks, this information can be viewed with `$server`
+- nypsi is also able to create a member counter for your server, similar to other bots but allows you to customise it for free - `$counter`
 
 ##### 🎅 christmas countdown
 
--   24/7 running christmas countdown, updates daily
--   sends a message to a specified channel once everyday with a customisable message
+- 24/7 running christmas countdown, updates daily
+- sends a message to a specified channel once everyday with a customisable message
 
 ##### 🎮 fun commands
 
--   there are a lot of fun commands available for use, including `$reddit` which allows you to grab a random image from any subreddit, as well as `$ddos` which will generate a _fake_ ip address
--   very simple method of creating small/large polls with the `$poll` command
+- there are a lot of fun commands available for use, including `$reddit` which allows you to grab a random image from any subreddit, as well as `$ddos` which will generate a _fake_ ip address
+- very simple method of creating small/large polls with the `$poll` command
 
 ##### 🏆 guilds
 
--   nypsi has a guild feature similar to hypixel's where you can create a guild, invite friends and grow it together.
--   guild upgrades will allow guild members to receive global perks on nypsi (such as xp, multipliers, etc)
--   grow your guild and level up to become the top and receive awesome perks
+- nypsi has a guild feature similar to hypixel's where you can create a guild, invite friends and grow it together.
+- guild upgrades will allow guild members to receive global perks on nypsi (such as xp, multipliers, etc)
+- grow your guild and level up to become the top and receive awesome perks
 
 ### 🖼 screenshots
 
--   `$wordle`
+- `$wordle`
 
 ![wordle game](images/wordle.png)
 
--   `$mc`
+- `$mc`
 
 ![mc command](images/minecraft.png)
 
--   `$streetrace`
+- `$streetrace`
 
 ![steetrace game](images/streetrace.png)
 
--   `$blackjack`
+- `$blackjack`
 
 ![blackjack game](images/blackjack.png)
 
--   `$skin`
+- `$skin`
 
 ![skin command](images/skin.png)
 
--   `$join`
+- `$join`
 
 ![join command](images/join.png)
 
--   `$history`
+- `$history`
 
 ![history command](images/history.png)
 
--   `$case`
+- `$case`
 
 ![case command](images/case.png)
