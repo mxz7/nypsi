@@ -16,7 +16,7 @@ import {
 import { MStoTime } from "../utils/functions/date";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
-import { getTier, isPremium } from "../utils/premium/utils";
+import { getTier, isPremium } from "../utils/functions/premium/premium";
 
 const cmd = new Command("daily", "get your daily bonus", Categories.MONEY);
 

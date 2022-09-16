@@ -4,7 +4,7 @@ import { NypsiClient } from "../utils/models/Client";
 import { CustomEmbed } from "../utils/models/EmbedBuilders";
 import { LogType } from "../utils/models/GuildStorage";
 import { addLog, isLogsEnabled } from "../utils/moderation/utils";
-import { setExpireDate, setTier } from "../utils/premium/utils";
+import { setExpireDate, setTier } from "../utils/functions/premium/premium";
 import { fetchUsernameHistory } from "../utils/users/utils";
 
 export default async function guildMemberRemove(member: GuildMember) {

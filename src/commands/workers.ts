@@ -21,7 +21,7 @@ import { getAllWorkers, Worker } from "../utils/economy/workers";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
-import { getTier, isPremium } from "../utils/premium/utils";
+import { getTier, isPremium } from "../utils/functions/premium/premium";
 
 const cmd = new Command("workers", "view the available workers and manage your own", Categories.MONEY).setAliases([
   "worker",

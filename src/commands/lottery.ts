@@ -15,7 +15,7 @@ import { getPrefix } from "../utils/functions/guilds/utils";
 import { getKarma } from "../utils/karma/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
-import { getTier, isPremium } from "../utils/premium/utils";
+import { getTier, isPremium } from "../utils/functions/premium/premium";
 
 const cmd = new Command("lottery", "enter the weekly lottery draw", Categories.MONEY).setAliases(["lotto"]);
 

@@ -2,7 +2,7 @@ import { CommandInteraction, Message } from "discord.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
-import { getEmbedColor, getTier, isPremium, setEmbedColor } from "../utils/premium/utils";
+import { getEmbedColor, getTier, isPremium, setEmbedColor } from "../utils/functions/premium/premium";
 
 const cmd = new Command("setcolor", "set the color of the bot's messages (premium only)", Categories.UTILITY).setAliases([
   "setcolour",

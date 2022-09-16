@@ -4,7 +4,7 @@ import { getBoosters } from "./functions/economy/boosters";
 import { getItems } from "./functions/economy/utils";
 import { getPrefix } from "./functions/guilds/utils";
 import { ErrorEmbed } from "./models/EmbedBuilders";
-import { getTier, isPremium } from "./premium/utils";
+import { getTier, isPremium } from "./functions/premium/premium";
 
 export async function onCooldown(cmd: string, member: GuildMember): Promise<boolean> {
   const key = `cd:${cmd}:${member.user.id}`;

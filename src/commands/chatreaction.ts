@@ -34,7 +34,7 @@ import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
-import { isPremium } from "../utils/premium/utils";
+import { isPremium } from "../utils/functions/premium/premium";
 
 const cmd = new Command("chatreaction", "see who can type the fastest", Categories.FUN)
   .setAliases(["cr", "reaction"])

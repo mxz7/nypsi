@@ -17,7 +17,7 @@ import requestDM from "./functions/requestdm";
 import { addKarma, getKarma } from "./karma/utils";
 import { logger } from "./logger";
 import { CustomEmbed } from "./models/EmbedBuilders";
-import { getTier, isPremium } from "./premium/utils";
+import { getTier, isPremium } from "./functions/premium/premium";
 import ms = require("ms");
 import dayjs = require("dayjs");
 

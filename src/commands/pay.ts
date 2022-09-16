@@ -16,7 +16,7 @@ import { getPrefix } from "../utils/functions/guilds/utils";
 import { payment } from "../utils/logger";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
-import { isPremium } from "../utils/premium/utils";
+import { isPremium } from "../utils/functions/premium/premium";
 import dayjs = require("dayjs");
 
 const cmd = new Command("pay", "give other users money", Categories.MONEY);

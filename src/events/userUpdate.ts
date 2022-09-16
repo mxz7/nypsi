@@ -2,7 +2,7 @@ import { User } from "discord.js";
 import { getPrestige, userExists } from "../utils/economy/utils";
 import { uploadImageToImgur } from "../utils/functions/image";
 import { NypsiClient } from "../utils/models/Client";
-import { isPremium } from "../utils/premium/utils";
+import { isPremium } from "../utils/functions/premium/premium";
 import { addNewAvatar, addNewUsername, hasProfile, isTracking, updateLastKnowntag } from "../utils/users/utils";
 
 const queue: User[] = [];

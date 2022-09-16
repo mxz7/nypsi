@@ -32,7 +32,7 @@ import { addCommandUse, addKarma, getKarma, getLastCommand, updateLastCommand } 
 import { getTimestamp, logger } from "./logger";
 import { Categories, Command, NypsiCommandInteraction } from "./models/Command";
 import { CustomEmbed, ErrorEmbed } from "./models/EmbedBuilders";
-import { addUse, getCommand } from "./premium/utils";
+import { addUse, getCommand } from "./functions/premium/premium";
 // @ts-expect-error typescript doesnt like opening package.json
 import { version } from "../../package.json";
 import redis from "./database/redis";

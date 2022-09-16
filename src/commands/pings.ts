@@ -17,7 +17,7 @@ import { getPrefix } from "../utils/functions/guilds/utils";
 import { getKarma, getLastCommand } from "../utils/karma/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
-import { isPremium } from "../utils/premium/utils";
+import { isPremium } from "../utils/functions/premium/premium";
 import { deleteUserMentions, fetchUserMentions } from "../utils/users/utils";
 import ms = require("ms");
 

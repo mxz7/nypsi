@@ -36,7 +36,7 @@ import { NypsiClient } from "../utils/models/Client";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 import { PunishmentType } from "../utils/models/GuildStorage";
 import { addModLog } from "../utils/moderation/utils";
-import { isPremium } from "../utils/premium/utils";
+import { isPremium } from "../utils/functions/premium/premium";
 import { mentionQueue, MentionQueueItem } from "../utils/users/utils";
 import doCollection from "../utils/workers/mentions";
 import ms = require("ms");

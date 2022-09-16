@@ -24,7 +24,7 @@ import {
 import { NypsiClient } from "../utils/models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
-import { getTier, isPremium, setExpireDate } from "../utils/premium/utils";
+import { getTier, isPremium, setExpireDate } from "../utils/functions/premium/premium";
 import dayjs = require("dayjs");
 
 const cmd = new Command("karmashop", "buy stuff with your karma", Categories.INFO).setAliases(["ks"]);

@@ -4,7 +4,7 @@ import { createUser, getBalance, getMulti, updateBalance, userExists } from "../
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed } from "../utils/models/EmbedBuilders";
-import { getLastWeekly, getTier, isPremium, setLastWeekly } from "../utils/premium/utils";
+import { getLastWeekly, getTier, isPremium, setLastWeekly } from "../utils/functions/premium/premium";
 
 const cmd = new Command("weekly", "get your weekly bonus (premium only)", Categories.MONEY);
 

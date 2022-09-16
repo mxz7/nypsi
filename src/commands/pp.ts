@@ -4,7 +4,7 @@ import { addProgress } from "../utils/economy/achievements";
 import { getMember } from "../utils/functions/member";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
-import { getTier, isPremium } from "../utils/premium/utils";
+import { getTier, isPremium } from "../utils/functions/premium/premium";
 
 const cache = new Map<string, number>();
 

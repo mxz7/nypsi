@@ -2,7 +2,7 @@ import { userExists, updateBalance, getBalance, createUser } from "../utils/econ
 import { CommandInteraction, Message } from "discord.js";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
-import { isPremium, getTier } from "../utils/premium/utils";
+import { isPremium, getTier } from "../utils/functions/premium/premium";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
 
 const cmd = new Command("freemoney", "get $1k every 5 minutes", Categories.MONEY).setAliases(["poor", "imbroke"]);

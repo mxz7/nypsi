@@ -2,7 +2,7 @@ import { GuildMember } from "discord.js";
 import Constants from "../utils/Constants";
 import { addKarma } from "../utils/karma/utils";
 import { NypsiClient } from "../utils/models/Client";
-import { addMember, getTier, isPremium, renewUser, setExpireDate, setTier } from "../utils/premium/utils";
+import { addMember, getTier, isPremium, renewUser, setExpireDate, setTier } from "../utils/functions/premium/premium";
 import { createProfile, hasProfile } from "../utils/users/utils";
 
 export default async function guildMemberUpdate(oldMember: GuildMember, newMember: GuildMember) {

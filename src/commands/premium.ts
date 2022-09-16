@@ -16,7 +16,7 @@ import {
   setExpireDate,
   setStatus,
   setTier,
-} from "../utils/premium/utils";
+} from "../utils/functions/premium/premium";
 import dayjs = require("dayjs");
 
 const cmd = new Command("premium", "view your premium status", Categories.INFO)
