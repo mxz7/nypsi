@@ -1,4 +1,4 @@
-import { CommandInteraction, Message } from "discord.js";
+import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
 import Constants from "../utils/Constants";
 import { daysAgo, daysUntil, formatDate } from "../utils/functions/date";
 import { getPrefix } from "../utils/guilds/utils";
@@ -23,7 +23,25 @@ const cmd = new Command("premium", "view your premium status", Categories.INFO)
     .setAliases(["patreon", "donate", "prem"])
     .setDocs("https://docs.nypsi.xyz/premium");
 
+cmd.slashEnabled = true;
+
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+    const send = async (data: MessageOptions | InteractionReplyOptions) => {
+        if (!(message instanceof Message)) {
+            if (message.deferred) {
+                await message.editReply(data);
+            } else {
+                await message.reply(data as InteractionReplyOptions);
+            }
+            const replyMsg = await message.fetchReply();
+            if (replyMsg instanceof Message) {
+                return replyMsg;
+            }
+        } else {
+            return await message.channel.send(data as MessageOptions);
+        }
+    };
+
     const defaultMessage = async () => {
         if (await isPremium(message.member)) {
             if (message.guild.id == Constants.NYPSI_SERVER_ID) {
@@ -80,7 +98,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             embed.setDescription(description);
             embed.setFooter({ text: "thank you so much for supporting!" });
 
-            return message.channel.send({ embeds: [embed] });
+            return send({ embeds: [embed] });
         } else {
             const embed = new CustomEmbed(
                 message.member,
@@ -93,7 +111,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                     "if you'd like to pay another way (crypto, paypal) join the [support server](https://discord.gg/hJTDNST)"
             );
 
-            return message.channel.send({ embeds: [embed] });
+            return send({ embeds: [embed] });
         }
     };
 
@@ -105,12 +123,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         if (args.length == 1) {
-            return message.channel.send({ embeds: [new ErrorEmbed("invalid syntax bro")] });
+            return send({ embeds: [new ErrorEmbed("invalid syntax bro")] });
         }
 
         const user = await message.client.users.fetch(args[1]);
 
-        if (!user) return message.channel.send({ embeds: [new ErrorEmbed("user doesnt exist")] });
+        if (!user) return send({ embeds: [new ErrorEmbed("user doesnt exist")] });
 
         if (await isPremium(user.id)) {
             const embed = new CustomEmbed(message.member);
@@ -133,11 +151,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
             embed.setDescription(description);
 
-            return message.channel.send({ embeds: [embed] });
+            return send({ embeds: [embed] });
         } else {
             const embed = new CustomEmbed(message.member, "no premium membership");
 
-            return message.channel.send({ embeds: [embed] });
+            return send({ embeds: [embed] });
         }
     } else if (args[0].toLowerCase() == "update") {
         if (message.author.id != "672793821850894347") {
@@ -145,11 +163,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         if (args.length < 4) {
-            return message.channel.send({ embeds: [new ErrorEmbed("invalid syntax bro")] });
+            return send({ embeds: [new ErrorEmbed("invalid syntax bro")] });
         }
 
         if (!(await isPremium(args[2]))) {
-            return message.channel.send({
+            return send({
                 embeds: [
                     new ErrorEmbed(
                         "this user does not have a profile, use $premium add dumbass check it before u update it"
@@ -164,17 +182,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         switch (args[1].toLowerCase()) {
             case "level":
                 await setTier(args[2], parseInt(args[3]), message.client as NypsiClient);
-                return message.channel.send({
+                return send({
                     embeds: [new CustomEmbed(message.member, `✅ tier changed to ${args[3]}`)],
                 });
             case "embed":
                 await setEmbedColor(args[2], args[3]);
-                return message.channel.send({
+                return send({
                     embeds: [new CustomEmbed(message.member, `✅ embed color changed to ${args[3]}`)],
                 });
             case "status":
                 await setStatus(args[2], parseInt(args[3]));
-                return message.channel.send({
+                return send({
                     embeds: [new CustomEmbed(message.member, `✅ status changed to ${args[3]}`)],
                 });
             case "adddays":
@@ -183,7 +201,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 date = date.add(parseInt(args[3]), "days");
 
                 await setExpireDate(args[2], date.toDate(), message.client as NypsiClient);
-                return message.channel.send({
+                return send({
                     embeds: [new CustomEmbed(message.member, `✅ expire date changed to ${date.toDate()}`)],
                 });
             case "remdays":
@@ -192,7 +210,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 date = date.subtract(parseInt(args[3]), "days");
 
                 await setExpireDate(args[2], date.toDate(), message.client as NypsiClient);
-                return message.channel.send({
+                return send({
                     embeds: [new CustomEmbed(message.member, `✅ expire date changed to ${date.toDate()}`)],
                 });
         }
@@ -202,12 +220,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         if (args.length < 3) {
-            return message.channel.send({ embeds: [new ErrorEmbed("invalid syntax bro")] });
+            return send({ embeds: [new ErrorEmbed("invalid syntax bro")] });
         }
 
         await addMember(args[1], parseInt(args[2]), message.client as NypsiClient);
 
-        return message.channel.send({
+        return send({
             embeds: [new CustomEmbed(message.member, "✅ created profile at tier " + args[2])],
         });
     } else if (args[0].toLowerCase() == "renew") {
@@ -216,24 +234,24 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         if (args.length != 2) {
-            return message.channel.send({ embeds: [new ErrorEmbed("invalid syntax bro")] });
+            return send({ embeds: [new ErrorEmbed("invalid syntax bro")] });
         }
 
         await renewUser(args[1], message.client as NypsiClient);
 
-        return message.channel.send({ embeds: [new CustomEmbed(message.member, "✅ membership renewed")] });
+        return send({ embeds: [new CustomEmbed(message.member, "✅ membership renewed")] });
     } else if (args[0].toLowerCase() == "expire") {
         if (message.author.id != "672793821850894347") {
             return defaultMessage();
         }
 
         if (args.length != 2) {
-            return message.channel.send({ embeds: [new ErrorEmbed("invalid syntax bro")] });
+            return send({ embeds: [new ErrorEmbed("invalid syntax bro")] });
         }
 
         setExpireDate(args[1], new Date(0), message.client as NypsiClient);
 
-        return message.channel.send({ embeds: [new CustomEmbed(message.member, "✅ membership will expire soon")] });
+        return send({ embeds: [new CustomEmbed(message.member, "✅ membership will expire soon")] });
     }
 }
 
