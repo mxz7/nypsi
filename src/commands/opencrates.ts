@@ -103,12 +103,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return send({ embeds: [reply] });
     }
   } else {
-    const reply = new CustomEmbed(message.member, "✅ check your dms");
-    if (message.interaction) {
-      await send({ embeds: [reply], ephemeral: true });
-    } else {
-      await send({ embeds: [reply] });
-    }
+    const reply = new CustomEmbed(message.member, `✅ [check your dms}(${msg.url})`);
+    await send({ embeds: [reply] });
   }
 
   const interval = setInterval(async () => {
