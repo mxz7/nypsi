@@ -3,11 +3,11 @@ import * as fs from "fs/promises";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { MStoTime } from "../utils/functions/date";
 import { getPrefix } from "../utils/functions/guilds/utils";
+import { addKarma } from "../utils/functions/karma/karma";
+import { addWordleGame, getWordleStats } from "../utils/functions/users/wordle";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 import ms = require("ms");
-import { addWordleGame, getWordleStats } from "../utils/functions/users/wordle";
-import { addKarma } from "../utils/functions/karma/karma";
 
 const cmd = new Command("wordle", "play wordle on discord", Categories.FUN).setAliases(["w"]);
 
@@ -118,7 +118,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (await onCooldown(cmd.name, message.member)) {
     const embed = await getResponse(cmd.name, message.member);
 
-    return message.channel.send({ embeds: [embed] });
+    return send({ embeds: [embed], ephemeral: true });
   }
 
   await addCooldown(cmd.name, message.member, 75);
