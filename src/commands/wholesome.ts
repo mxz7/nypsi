@@ -2,6 +2,7 @@ import { WholesomeSuggestion } from "@prisma/client";
 import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions, MessageReaction, User } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { formatDate } from "../utils/functions/date";
+import { getPrefix } from "../utils/functions/guilds/utils";
 import {
   acceptWholesomeImage,
   clearWholesomeCache,
@@ -14,7 +15,6 @@ import {
   uploadImageToImgur,
 } from "../utils/functions/image";
 import { getMember } from "../utils/functions/member";
-import { getPrefix } from "../utils/functions/guilds/utils";
 import { NypsiClient } from "../utils/models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
@@ -121,7 +121,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         setTimeout(() => {
           uploadCooldown.delete(message.author.id);
-        }, 60 * 1000);
+        }, 25 * 1000);
         url = upload;
       }
     }
