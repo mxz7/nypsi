@@ -478,6 +478,20 @@ export async function runCommand(
   if (!message.channel.isTextBased()) return;
   if (message.channel.isDMBased()) return;
 
+  if (message instanceof Message) {
+    if (cooldown.has(message.author.id)) return;
+
+    cooldown.add(message.author.id);
+
+    setTimeout(() => {
+      try {
+        cooldown.delete(message.author.id);
+      } catch {
+        cooldown.clear();
+      }
+    }, 500);
+  }
+
   if (!message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.ViewChannel)) {
     if (message instanceof Message) {
       return message.member
@@ -553,14 +567,6 @@ export async function runCommand(
 
       const content = customCommand.content;
 
-      if (cooldown.has(message.author.id)) return;
-
-      cooldown.add(message.author.id);
-
-      setTimeout(() => {
-        cooldown.delete(message.author.id);
-      }, 1500);
-
       if ((await getDisabledCommands(message.guild)).indexOf("customcommand") != -1) {
         return message.channel.send({
           embeds: [new ErrorEmbed("custom commands have been disabled in this server")],
@@ -596,16 +602,6 @@ export async function runCommand(
     } else {
       alias = true;
     }
-  }
-
-  if (message instanceof Message) {
-    if (cooldown.has(message.author.id)) return;
-
-    cooldown.add(message.author.id);
-
-    setTimeout(() => {
-      cooldown.delete(message.author.id);
-    }, 500);
   }
 
   // captcha check
