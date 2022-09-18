@@ -7,7 +7,7 @@
     "role": "fish",
     "rarity": 0,
     "buy": 0,
-    "sell": 1000
+    "sell": 2500
   },
   "medium_fish": {
     "id": "medium_fish",
@@ -17,7 +17,7 @@
     "role": "fish",
     "rarity": 1,
     "buy": 0,
-    "sell": 3000
+    "sell": 7500
   },
   "large_fish": {
     "id": "large_fish",
@@ -27,7 +27,7 @@
     "role": "fish",
     "rarity": 2,
     "buy": 0,
-    "sell": 3500
+    "sell": 10000
   },
   "cobblestone": {
     "id": "cobblestone",
@@ -59,7 +59,7 @@
     "rarity": 69,
     "aliases": ["iron"],
     "buy": 0,
-    "sell": 10000
+    "sell": 15000
   },
   "gold_ingot": {
     "id": "gold_ingot",
@@ -70,7 +70,7 @@
     "rarity": 69,
     "aliases": ["gold"],
     "buy": 0,
-    "sell": 12500
+    "sell": 20000
   },
   "diamond": {
     "id": "diamond",
@@ -80,7 +80,7 @@
     "role": "sellable",
     "rarity": 3,
     "buy": 0,
-    "sell": 40000
+    "sell": 50000
   },
   "emerald": {
     "id": "emerald",
@@ -90,7 +90,7 @@
     "role": "sellable",
     "rarity": 3,
     "buy": 0,
-    "sell": 60000
+    "sell": 75000
   },
   "furnace": {
     "id": "furnace",
@@ -271,7 +271,7 @@
     "role": "prey",
     "rarity": 0,
     "buy": 0,
-    "sell": 2000
+    "sell": 5000
   },
   "normal_rabbit": {
     "id": "normal_rabbit",
@@ -281,7 +281,7 @@
     "role": "prey",
     "rarity": 1,
     "buy": 0,
-    "sell": 4500
+    "sell": 7500
   },
   "large_rabbit": {
     "id": "large_rabbit",
@@ -301,7 +301,7 @@
     "role": "prey",
     "rarity": 3,
     "buy": 0,
-    "sell": 30000
+    "sell": 50000
   },
   "rat": {
     "id": "rat",
@@ -331,7 +331,7 @@
     "role": "prey",
     "rarity": 3,
     "buy": 0,
-    "sell": 50000
+    "sell": 60000
   },
   "wolf": {
     "id": "wolf",
@@ -620,7 +620,7 @@
     "rarity": 2,
     "role": "prey",
     "buy": 0,
-    "sell": 45000
+    "sell": 75000
   },
   "chastity_cage": {
     "id": "chastity_cage",
