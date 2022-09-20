@@ -397,6 +397,8 @@ export default async function interactionCreate(interaction: Interaction) {
 
   if (interaction.type != InteractionType.ApplicationCommand) return;
 
+  if (interaction.createdTimestamp < Date.now() - 2500) return;
+
   if (!interaction.guild) {
     const embed = new CustomEmbed()
       .setHeader("nypsi")
