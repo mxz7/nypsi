@@ -18,7 +18,7 @@ cmd.slashData
     buy
       .setName("buy")
       .setDescription("buy lottery tickets")
-      .addIntegerOption((option) => option.setName("amount").setDescription("amount of lottery tickets to buy"))
+      .addStringOption((option) => option.setName("amount").setDescription("amount of lottery tickets to buy"))
   )
   .addSubcommand((tickets) => tickets.setName("tickets").setDescription("view your current tickets"));
 
