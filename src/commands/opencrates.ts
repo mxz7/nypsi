@@ -103,7 +103,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return send({ embeds: [reply] });
     }
   } else {
-    const reply = new CustomEmbed(message.member, `✅ [check your dms}(${msg.url})`);
+    const reply = new CustomEmbed(message.member, `✅ [check your dms](${msg.url})`);
     await send({ embeds: [reply] });
   }
 
