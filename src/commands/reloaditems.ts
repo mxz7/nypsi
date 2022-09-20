@@ -9,7 +9,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   loadItems();
 
-  return (message as Message).react("");
+  return (message as Message).react("✅");
 }
 
 cmd.setRun(run);
