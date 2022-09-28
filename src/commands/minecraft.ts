@@ -1,11 +1,11 @@
-import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
+import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed } from "../utils/models/EmbedBuilders.js";
 
 const cmd = new Command("minecraft", "view information about a minecraft account", Categories.MINECRAFT).setAliases(["mc"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-  const send = async (data: MessageOptions | InteractionReplyOptions) => {
+  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       if (message.deferred) {
         await message.editReply(data);
@@ -17,7 +17,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return replyMsg;
       }
     } else {
-      return await message.channel.send(data as MessageOptions);
+      return await message.channel.send(data as BaseMessageOptions);
     }
   };
 

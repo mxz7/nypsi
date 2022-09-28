@@ -1,4 +1,4 @@
-import { CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions, MessageOptions } from "discord.js";
+import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions } from "discord.js";
 import * as fs from "fs/promises";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { MStoTime } from "../utils/functions/date";
@@ -40,7 +40,7 @@ const karmaCooldown = new Set<string>();
 let wordList: string[];
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-  const send = async (data: MessageOptions | InteractionReplyOptions) => {
+  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       if (message.deferred) {
         await message.editReply(data);
@@ -52,7 +52,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return replyMsg;
       }
     } else {
-      return await message.channel.send(data as MessageOptions);
+      return await message.channel.send(data as BaseMessageOptions);
     }
   };
 
@@ -260,7 +260,7 @@ async function play(message: Message | (NypsiCommandInteraction & CommandInterac
 }
 
 async function cancel(message: Message | (NypsiCommandInteraction & CommandInteraction), m: any) {
-  const edit = async (data: MessageOptions) => {
+  const edit = async (data: BaseMessageOptions) => {
     if (!(message instanceof Message)) {
       await message.editReply(data);
       return await message.fetchReply();
@@ -285,7 +285,7 @@ async function cancel(message: Message | (NypsiCommandInteraction & CommandInter
 }
 
 async function win(message: Message | (NypsiCommandInteraction & CommandInteraction), m: any) {
-  const edit = async (data: MessageOptions) => {
+  const edit = async (data: BaseMessageOptions) => {
     if (!(message instanceof Message)) {
       await message.editReply(data);
       return await message.fetchReply();
@@ -321,7 +321,7 @@ async function win(message: Message | (NypsiCommandInteraction & CommandInteract
 }
 
 async function lose(message: Message | (NypsiCommandInteraction & CommandInteraction), m: any) {
-  const edit = async (data: MessageOptions) => {
+  const edit = async (data: BaseMessageOptions) => {
     if (!(message instanceof Message)) {
       await message.editReply(data);
       return await message.fetchReply();
