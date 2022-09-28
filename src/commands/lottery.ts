@@ -123,9 +123,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await updateBalance(message.member, (await getBalance(message.member)) - lotteryTicketPrice * amount);
 
+    const ticketPromises = [];
+
     for (let i = 0; i < amount; i++) {
-      await addTicket(message.member);
+      ticketPromises.push(addTicket(message.member));
     }
+
+    await Promise.all(ticketPromises);
 
     const embed = new CustomEmbed(
       message.member,
