@@ -69,6 +69,11 @@ const bree = new Bree({
       interval: "at 11:59pm",
       path: path.join(__dirname, "jobs", "dailystreak.js"),
     },
+    {
+      name: "reset-suggestions",
+      interval: "at 12:00am",
+      path: path.join(__dirname, "jobs", "resetsuggestions.js"),
+    },
   ],
 });
 
