@@ -245,18 +245,7 @@ export async function openCrate(member: GuildMember, item: Item): Promise<string
   const inventory = await getInventory(member);
   const items = getItems();
 
-  const crateItems = [
-    "money:10000",
-    "money:15000",
-    "money:20000",
-    "money:50000",
-    "money:100000",
-    "xp:5",
-    "xp:10",
-    "xp:15",
-    "xp:25",
-    "xp:50",
-  ];
+  const crateItems = ["money:50000", "money:100000", "xp:25", "xp:50"];
 
   for (const i of Array.from(Object.keys(items))) {
     if (
