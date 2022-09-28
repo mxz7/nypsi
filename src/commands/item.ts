@@ -103,7 +103,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   rarityMap.set(3, "very rare");
   rarityMap.set(4, "exotic");
 
-  if (selected.rarity) {
+  if (rarityMap.get(selected.rarity)) {
     embed.addField("rarity", `\`${rarityMap.get(selected.rarity)}\``, true);
   }
 
