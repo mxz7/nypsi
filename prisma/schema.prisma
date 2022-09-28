@@ -198,6 +198,7 @@ model Guild {
   chatFilter       String[]
   percentMatch     Int      @default(75)
   prefix           String   @default("$")
+  createdAt        DateTime @default(now())
 
   GuildChristmas GuildChristmas?
   GuildCounter   GuildCounter?
