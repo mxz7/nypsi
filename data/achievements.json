@@ -396,28 +396,28 @@
     "name": "wholesome **II**",
     "emoji": "💖",
     "target": 5,
-    "description": "have 10 wholesome images accepted"
+    "description": "have 5 wholesome images accepted"
   },
   "wholesome_iii": {
     "id": "wholesome_iii",
     "name": "wholesome **III**",
     "emoji": "💖",
     "target": 15,
-    "description": "have 50 wholesome images accepted"
+    "description": "have 15 wholesome images accepted"
   },
   "wholesome_iv": {
     "id": "wholesome_iv",
     "name": "wholesome **IV**",
     "emoji": "💖",
     "target": 25,
-    "description": "have 100 wholesome images accepted"
+    "description": "have 25 wholesome images accepted"
   },
   "wholesome_v": {
     "id": "wholesome_v",
     "name": "wholesome **V**",
     "emoji": "💖",
     "target": 50,
-    "description": "have 500 wholesome images accepted"
+    "description": "have 50 wholesome images accepted"
   },
   "racer_i": {
     "id": "racer_i",
