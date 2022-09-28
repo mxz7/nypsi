@@ -1,11 +1,18 @@
-import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions, PermissionFlagsBits, User } from "discord.js";
-import { getExactMember } from "../utils/functions/member";
+import {
+  BaseMessageOptions,
+  CommandInteraction,
+  InteractionReplyOptions,
+  Message,
+  PermissionFlagsBits,
+  User,
+} from "discord.js";
 import { addCooldown, getPrefix, inCooldown } from "../utils/functions/guilds/utils";
+import { getExactMember } from "../utils/functions/member";
+import { newCase } from "../utils/functions/moderation/cases";
+import { createProfile, profileExists } from "../utils/functions/moderation/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 import { PunishmentType } from "../utils/models/GuildStorage";
-import { createProfile, profileExists } from "../utils/functions/moderation/utils";
-import { newCase } from "../utils/functions/moderation/cases";
 
 const cmd = new Command("warn", "warn one or more users", Categories.MODERATION).setPermissions(["MANAGE_MESSAGES"]);
 
@@ -21,7 +28,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const prefix = await getPrefix(message.guild);
 
-  const send = async (data: MessageOptions | InteractionReplyOptions) => {
+  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       if (message.deferred) {
         await message.editReply(data);
@@ -33,7 +40,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return replyMsg;
       }
     } else {
-      return await message.channel.send(data as MessageOptions);
+      return await message.channel.send(data as BaseMessageOptions);
     }
   };
 

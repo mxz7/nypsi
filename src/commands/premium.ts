@@ -1,4 +1,4 @@
-import { ColorResolvable, CommandInteraction, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
+import { BaseMessageOptions, ColorResolvable, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
 import Constants from "../utils/Constants";
 import { daysAgo, daysUntil, formatDate } from "../utils/functions/date";
 import { getEmbedColor, setEmbedColor } from "../utils/functions/premium/color";
@@ -35,7 +35,7 @@ cmd.slashData
   );
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-  const send = async (data: MessageOptions | InteractionReplyOptions) => {
+  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       if (message.deferred) {
         await message.editReply(data);
@@ -47,7 +47,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return replyMsg;
       }
     } else {
-      return await message.channel.send(data as MessageOptions);
+      return await message.channel.send(data as BaseMessageOptions);
     }
   };
 

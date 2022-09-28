@@ -1,20 +1,20 @@
 import {
   APIApplicationCommandOptionChoice,
+  BaseMessageOptions,
   CommandInteraction,
   InteractionReplyOptions,
   Message,
-  MessageOptions,
 } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import { getPrefix } from "../utils/functions/guilds/utils";
-import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
-import { getTier, isPremium } from "../utils/functions/premium/premium";
-import { getAllWorkers, Worker } from "../utils/models/Workers";
+import { getBalance, updateBalance } from "../utils/functions/economy/balance";
+import { getPrestige } from "../utils/functions/economy/prestige";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { addWorker, emptyWorkersStored, getWorkers, upgradeWorker } from "../utils/functions/economy/workers";
-import { getPrestige } from "../utils/functions/economy/prestige";
-import { getBalance, updateBalance } from "../utils/functions/economy/balance";
+import { getPrefix } from "../utils/functions/guilds/utils";
+import { getTier, isPremium } from "../utils/functions/premium/premium";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
+import { getAllWorkers, Worker } from "../utils/models/Workers";
 
 const cmd = new Command("workers", "view the available workers and manage your own", Categories.MONEY).setAliases([
   "worker",
@@ -69,7 +69,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (!(await userExists(message.member))) await createUser(message.member);
 
-  const send = async (data: MessageOptions | InteractionReplyOptions) => {
+  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       if (message.deferred) {
         await message.editReply(data);
@@ -81,7 +81,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return replyMsg;
       }
     } else {
-      return await message.channel.send(data as MessageOptions);
+      return await message.channel.send(data as BaseMessageOptions);
     }
   };
 

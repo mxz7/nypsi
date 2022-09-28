@@ -1,8 +1,15 @@
-import { Collection, CommandInteraction, GuildMember, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
+import {
+  BaseMessageOptions,
+  Collection,
+  CommandInteraction,
+  GuildMember,
+  InteractionReplyOptions,
+  Message,
+} from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { daysAgo, formatDate } from "../utils/functions/date";
-import { getMember } from "../utils/functions/member";
 import { addCooldown, inCooldown } from "../utils/functions/guilds/utils";
+import { getMember } from "../utils/functions/member";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 import workerSort from "../utils/workers/sort";
@@ -29,7 +36,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
   }
 
-  const send = async (data: MessageOptions | InteractionReplyOptions) => {
+  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       if (message.deferred) {
         await message.editReply(data);
@@ -41,7 +48,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return replyMsg;
       }
     } else {
-      return await message.channel.send(data as MessageOptions);
+      return await message.channel.send(data as BaseMessageOptions);
     }
   };
 
