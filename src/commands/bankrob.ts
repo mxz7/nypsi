@@ -14,15 +14,15 @@ import {
 import { inPlaceSort } from "fast-sort";
 import { addCooldown, getRemaining, getResponse, onCooldown } from "../utils/cooldownhandler.js";
 import prisma from "../utils/database/database.js";
+import { addProgress } from "../utils/functions/economy/achievements.js";
+import { getBalance, updateBalance } from "../utils/functions/economy/balance.js";
+import { getInventory, setInventory } from "../utils/functions/economy/inventory.js";
+import { getPrestige } from "../utils/functions/economy/prestige.js";
+import { createUser, userExists } from "../utils/functions/economy/utils.js";
 import { addToNypsiBank, getNypsiBankBalance, removeFromNypsiBankBalance } from "../utils/functions/tax.js";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 import ms = require("ms");
-import { createUser, userExists } from "../utils/functions/economy/utils.js";
-import { getBalance, updateBalance } from "../utils/functions/economy/balance.js";
-import { getInventory, setInventory } from "../utils/functions/economy/inventory.js";
-import { addProgress } from "../utils/functions/economy/achievements.js";
-import { getPrestige } from "../utils/functions/economy/prestige.js";
 
 const cmd = new Command("bankrob", "attempt to rob a bank for a high reward", Categories.MONEY);
 
@@ -36,11 +36,11 @@ const defaults = new Map<string, number>([
 ]);
 
 const requirements = new Map<string, number>([
-  ["bank of america", 5],
-  ["maze bank", 4],
-  ["barclays", 3],
-  ["lloyds", 2],
-  ["monzo", 1],
+  ["bank of america", 4],
+  ["maze bank", 3],
+  ["barclays", 2],
+  ["lloyds", 1],
+  ["monzo", 0],
   ["fleeca", 0],
 ]);
 
