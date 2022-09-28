@@ -1,9 +1,9 @@
-import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
-import { getMember } from "../utils/functions/member";
+import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
+import { getKarma, removeKarma } from "../utils/functions/karma/karma";
+import { getMember } from "../utils/functions/member";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
-import { getKarma, removeKarma } from "../utils/functions/karma/karma";
 
 const cmd = new Command("karma", "check how much karma you have", Categories.INFO).setDocs(
   "https://docs.nypsi.xyz/economy/karma"
@@ -15,7 +15,7 @@ cmd.slashData.addUserOption((option) => option.setName("user").setDescription("u
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   let target = message.member;
 
-  const send = async (data: MessageOptions | InteractionReplyOptions) => {
+  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       if (message.deferred) {
         await message.editReply(data);
@@ -27,7 +27,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return replyMsg;
       }
     } else {
-      return await message.channel.send(data as MessageOptions);
+      return await message.channel.send(data as BaseMessageOptions);
     }
   };
 

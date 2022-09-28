@@ -1,5 +1,5 @@
 import dayjs = require("dayjs");
-import { CommandInteraction, InteractionReplyOptions, Message, MessageOptions } from "discord.js";
+import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { getInventory, getMaxBitcoin, getMaxEthereum, setInventory } from "../utils/functions/economy/inventory";
 import { getPrestige } from "../utils/functions/economy/prestige";
@@ -22,7 +22,7 @@ cmd.slashData
   .addIntegerOption((option) => option.setName("amount").setDescription("amount of item you want to give").setMinValue(1));
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-  const send = async (data: MessageOptions | InteractionReplyOptions) => {
+  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       if (message.deferred) {
         await message.editReply(data);
@@ -34,7 +34,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return replyMsg;
       }
     } else {
-      return await message.channel.send(data as MessageOptions);
+      return await message.channel.send(data as BaseMessageOptions);
     }
   };
 
