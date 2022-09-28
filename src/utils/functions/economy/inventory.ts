@@ -32,7 +32,7 @@ export async function topAmountItem(guild: Guild, amount: number, item: string):
 
   const query = await prisma.economy.findMany({
     where: {
-      AND: [{ money: { gt: 0 } }, { userId: { in: Array.from(members.keys()) } }],
+      userId: { in: Array.from(members.keys()) },
     },
     select: {
       userId: true,
