@@ -82,7 +82,13 @@ cmd.slashData
       .setDescription("set the motd for the guild")
       .addStringOption((option) => option.setName("text").setDescription("text for the motd").setRequired(true))
   )
-  .addSubcommand((top) => top.setName("top").setDescription("view the top guilds"));
+  .addSubcommand((top) => top.setName("top").setDescription("view the top guilds"))
+  .addSubcommand((view) =>
+    view
+      .setName("view")
+      .setDescription("view a guild")
+      .addStringOption((option) => option.setName("guild-name").setDescription("guild to show").setRequired(false))
+  );
 
 const filter = [
   "nig",
@@ -659,6 +665,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({ embeds: [embed] });
   }
 
+  if (args[0].toLowerCase() == "view") {
+    args.shift();
+  }
+
   const name = args.join(" ");
 
   if (name.length > 25) {
@@ -670,6 +680,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const targetGuild = await getGuildByName(name);
 
   if (!targetGuild) {
+    if (guild) {
+      return showGuild(guild);
+    }
     return send({ embeds: [new ErrorEmbed("invalid guild")] });
   }
 
