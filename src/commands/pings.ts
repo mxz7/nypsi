@@ -1,5 +1,6 @@
 import {
   ActionRowBuilder,
+  BaseMessageOptions,
   ButtonBuilder,
   ButtonStyle,
   CommandInteraction,
@@ -8,19 +9,18 @@ import {
   Message,
   MessageActionRowComponentBuilder,
   MessageEditOptions,
-  MessageOptions,
 } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import { decrypt } from "../utils/functions/string";
-import { getPrefix } from "../utils/functions/guilds/utils";
-import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
-import { isPremium } from "../utils/functions/premium/premium";
-import ms = require("ms");
 import { createUser, userExists } from "../utils/functions/economy/utils";
+import { getPrefix } from "../utils/functions/guilds/utils";
 import { getKarma } from "../utils/functions/karma/karma";
+import { isPremium } from "../utils/functions/premium/premium";
+import { decrypt } from "../utils/functions/string";
 import { getLastCommand } from "../utils/functions/users/commands";
 import { deleteUserMentions, fetchUserMentions } from "../utils/functions/users/mentions";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
+import ms = require("ms");
 
 const cmd = new Command("pings", "view who mentioned you recently", Categories.UTILITY).setAliases([
   "mentions",
@@ -30,7 +30,7 @@ const cmd = new Command("pings", "view who mentioned you recently", Categories.U
 cmd.slashEnabled = true;
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-  const send = async (data: MessageOptions | InteractionReplyOptions) => {
+  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       if (message.deferred) {
         await message.editReply(data);
@@ -42,7 +42,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return replyMsg;
       }
     } else {
-      return await message.channel.send(data as MessageOptions);
+      return await message.channel.send(data as BaseMessageOptions);
     }
   };
 

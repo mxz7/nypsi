@@ -1,8 +1,8 @@
 import {
+  BaseMessageOptions,
   CommandInteraction,
   InteractionReplyOptions,
   Message,
-  MessageOptions,
   PermissionFlagsBits,
   Role,
   ThreadChannel,
@@ -37,7 +37,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (!(await profileExists(message.guild))) await createProfile(message.guild);
 
-  const send = async (data: MessageOptions | InteractionReplyOptions) => {
+  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       if (message.deferred) {
         await message.editReply(data);
@@ -49,7 +49,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return replyMsg;
       }
     } else {
-      return await message.channel.send(data as MessageOptions);
+      return await message.channel.send(data as BaseMessageOptions);
     }
   };
 
