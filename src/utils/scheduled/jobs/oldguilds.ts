@@ -1,3 +1,4 @@
+import dayjs = require("dayjs");
 import { parentPort, workerData } from "worker_threads";
 import prisma from "../../database/database";
 import redis from "../../database/redis";
@@ -7,7 +8,12 @@ import redis from "../../database/redis";
 
   if (guilds.length < 5000) return parentPort.postMessage("less than 5k guilds. not running.");
 
+  const date = dayjs().subtract(1, "day").toDate();
+
   const query = await prisma.guild.findMany({
+    where: {
+      AND: [{ id: { notIn: guilds } }, { createdAt: { lt: date } }],
+    },
     select: {
       id: true,
     },
