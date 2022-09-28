@@ -1,13 +1,13 @@
 import dayjs = require("dayjs");
 import {
   ActionRowBuilder,
+  BaseMessageOptions,
   ButtonBuilder,
   ButtonStyle,
   CommandInteraction,
   InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
-  MessageOptions,
 } from "discord.js";
 import { getPrestige } from "../utils/functions/economy/prestige";
 import { createUser, userExists } from "../utils/functions/economy/utils";
@@ -22,7 +22,7 @@ cmd.slashEnabled = true;
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
   if (!(await userExists(message.member))) await createUser(message.member);
 
-  const send = async (data: MessageOptions | InteractionReplyOptions) => {
+  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       if (message.deferred) {
         await message.editReply(data);
@@ -34,7 +34,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return replyMsg;
       }
     } else {
-      return await message.channel.send(data as MessageOptions);
+      return await message.channel.send(data as BaseMessageOptions);
     }
   };
 

@@ -1,9 +1,9 @@
 import {
+  BaseMessageOptions,
   Channel,
   CommandInteraction,
   InteractionReplyOptions,
   Message,
-  MessageOptions,
   PermissionFlagsBits,
   PermissionsBitField,
 } from "discord.js";
@@ -23,7 +23,7 @@ cmd.slashEnabled = true;
 cmd.slashData.addChannelOption((option) => option.setName("channel").setDescription("channel to lock").setRequired(false));
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-  const send = async (data: MessageOptions | InteractionReplyOptions) => {
+  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       if (message.deferred) {
         await message.editReply(data);
@@ -35,7 +35,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return replyMsg;
       }
     } else {
-      return await message.channel.send(data as MessageOptions);
+      return await message.channel.send(data as BaseMessageOptions);
     }
   };
 

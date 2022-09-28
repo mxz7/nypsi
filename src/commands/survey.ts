@@ -1,18 +1,18 @@
 import dayjs = require("dayjs");
 import {
   ActionRowBuilder,
+  BaseMessageOptions,
   ButtonBuilder,
   ButtonStyle,
   CommandInteraction,
   InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
-  MessageOptions,
 } from "discord.js";
+import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { createSurvey, getSurveys } from "../utils/functions/surveys";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
-import { getTier, isPremium } from "../utils/functions/premium/premium";
 
 const cmd = new Command("survey", "create a survey for users to respond to", Categories.INFO);
 
@@ -35,7 +35,7 @@ cmd.slashData.addSubcommand((create) =>
 );
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-  const send = async (data: MessageOptions | InteractionReplyOptions) => {
+  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       if (message.deferred) {
         await message.editReply(data);
@@ -47,7 +47,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return replyMsg;
       }
     } else {
-      return await message.channel.send(data as MessageOptions);
+      return await message.channel.send(data as BaseMessageOptions);
     }
   };
 

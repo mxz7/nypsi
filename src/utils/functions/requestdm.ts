@@ -1,5 +1,5 @@
 import { Manager } from "discord-hybrid-sharding";
-import { MessageOptions, MessagePayload } from "discord.js";
+import { BaseMessageOptions, MessagePayload } from "discord.js";
 import { logger } from "../logger";
 import { NypsiClient } from "../models/Client";
 import { CustomEmbed } from "../models/EmbedBuilders";
@@ -45,7 +45,7 @@ export default async function requestDM(options: RequestDMOptions): Promise<bool
       return false;
     }
 
-    const payload: MessageOptions = {
+    const payload: BaseMessageOptions = {
       content: options.content,
     };
 
@@ -123,7 +123,7 @@ export default async function requestDM(options: RequestDMOptions): Promise<bool
       return false;
     }
 
-    const payload: MessageOptions = {
+    const payload: BaseMessageOptions = {
       content: options.content,
     };
 
