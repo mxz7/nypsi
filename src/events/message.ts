@@ -10,6 +10,7 @@ import {
   MessageActionRowComponentBuilder,
   PermissionsBitField,
   TextChannel,
+  ThreadChannel,
   ThreadMember,
   ThreadMemberManager,
 } from "discord.js";
@@ -284,7 +285,8 @@ export default async function messageCreate(message: Message) {
                 }
               }
             } catch {
-              console.log(message.channel.type);
+              // always a public thread channel
+              console.log((message.channel as ThreadChannel).members);
               return;
             }
 
