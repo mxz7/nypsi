@@ -27,7 +27,7 @@ export function listenForVotes(manager: Manager) {
     })
   );
 
-  app.listen(5000);
+  app.listen(process.env.EXPRESS_PORT || 5000);
 
   logger.info("listening for votes..");
 }
