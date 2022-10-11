@@ -57,7 +57,7 @@ export async function updateBalance(member: GuildMember | string, amount: number
   await redis.del(`cache:economy:balance:${id}`);
 }
 
-export async function getBankBalance(member: GuildMember): Promise<number> {
+export async function getBankBalance(member: GuildMember | string): Promise<number> {
   let id: string;
   if (member instanceof GuildMember) {
     id = member.user.id;
