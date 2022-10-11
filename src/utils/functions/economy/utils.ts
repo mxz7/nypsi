@@ -80,7 +80,7 @@ export function runEconomySetup() {
   setInterval(() => {
     padlockPrice = 25000 + randomOffset();
     items["padlock"].buy = padlockPrice;
-    items["padlock"].sell = padlockPrice / 3;
+    items["padlock"].sell = Math.floor(padlockPrice / 3);
   }, 3600000);
 }
 
