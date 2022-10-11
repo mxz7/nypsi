@@ -1,32 +1,33 @@
-const { Message, Guild, User } = require("discord.js");
-const { Command, Categories, NypsiCommandInteraction } = require("../utils/models/Command");
-const { CustomEmbed } = require("../utils/models/EmbedBuilders.js");
-const {
-  topAmount,
-  userExists,
+import { CommandInteraction, Message, User } from "discord.js";
+import { formatDate } from "../utils/functions/date";
+import {
   getBalance,
   getBankBalance,
   getMaxBankBalance,
-  getXp,
-  hasVoted,
-  getPrestige,
   getMulti,
   topAmountGlobal,
-  isEcoBanned,
-} = require("../utils/economy/utils");
-const { getPeaks } = require("../utils/functions/guilds/utils");
-const { getKarma, getLastCommand } = require("../utils/karma/utils");
-const { isPremium, getPremiumProfile } = require("../utils/functions/premium/premium");
-const { formatDate, daysAgo } = require("../utils/functions/date");
-const { NypsiClient } = require("../utils/models/Client");
-const { fetchUsernameHistory } = require("../utils/users/utils");
+} from "../utils/functions/economy/balance";
+import { getPrestige } from "../utils/functions/economy/prestige";
+import { isEcoBanned, userExists } from "../utils/functions/economy/utils";
+import { hasVoted } from "../utils/functions/economy/vote";
+import { getXp } from "../utils/functions/economy/xp";
+import { getPeaks } from "../utils/functions/guilds/utils";
+import { getKarma } from "../utils/functions/karma/karma";
+import { getPremiumProfile, isPremium } from "../utils/functions/premium/premium";
+import { getLastCommand } from "../utils/functions/users/commands";
+import { fetchUsernameHistory } from "../utils/functions/users/history";
+import { NypsiClient } from "../utils/models/Client";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("find", "find info", Categories.NONE).setPermissions(["bot owner"]);
 
-async function run(message, args) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (message.member.user.id != "672793821850894347") return;
 
-  const client = message.client;
+  if (!(message instanceof Message)) return;
+
+  const client = message.client as NypsiClient;
 
   if (args.length == 0) {
     const embed = new CustomEmbed(message.member);
@@ -39,9 +40,11 @@ async function run(message, args) {
   } else if (args[0].toLowerCase() == "gid") {
     if (args.length == 1) return message.react("❌");
 
-    let guild = await client.cluster.broadcastEval(
+    let guild: any = await client.cluster.broadcastEval(
       async (c, { guildId }) => {
         const g = await c.guilds.fetch(guildId);
+
+        if (!g) return null;
 
         return g;
       },
@@ -49,6 +52,7 @@ async function run(message, args) {
     );
 
     for (const res of guild) {
+      if (!res) continue;
       if (res.id) {
         guild = res;
         break;
@@ -63,7 +67,7 @@ async function run(message, args) {
 
     args.shift();
 
-    let guild = await client.cluster.broadcastEval(
+    let guild: any = await client.cluster.broadcastEval(
       (c, { guildId }) => {
         const g = c.guilds.cache.find((g) => g.name.includes(guildId));
 
@@ -85,7 +89,7 @@ async function run(message, args) {
   } else if (args[0].toLowerCase() == "id") {
     if (args.length == 1) return message.react("❌");
 
-    let user = await client.cluster.broadcastEval(
+    let user: any = await client.cluster.broadcastEval(
       async (c, { userId }) => {
         const g = await c.users.fetch(userId);
 
@@ -109,7 +113,7 @@ async function run(message, args) {
 
     args.shift();
 
-    let user = await client.cluster.broadcastEval(
+    let user: any = await client.cluster.broadcastEval(
       async (c, { userId }) => {
         const g = await c.users.cache.find((u) => {
           return `${u.username}#${u.discriminator}`.includes(userId);
@@ -132,7 +136,7 @@ async function run(message, args) {
 
     return showUser(message, user);
   } else if (args[0].toLowerCase() == "top") {
-    const balTop = await topAmountGlobal(10, message.client, false);
+    const balTop = await topAmountGlobal(10, client, false);
 
     const embed = new CustomEmbed(message.member, balTop.join("\n")).setTitle("top " + balTop.length);
 
@@ -140,7 +144,7 @@ async function run(message, args) {
   }
 }
 
-async function showGuild(message, guild) {
+async function showGuild(message: Message, guild: any) {
   const owner = guild.ownerId;
 
   const invites = guild.invites.cache;
@@ -168,7 +172,7 @@ async function showGuild(message, guild) {
   return message.channel.send({ embeds: [embed] });
 }
 
-async function showUser(message, user) {
+async function showUser(message: Message, user: User) {
   const embed = new CustomEmbed(message.member)
     .setTitle(user.tag)
     .setDescription(
