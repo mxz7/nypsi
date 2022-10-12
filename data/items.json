@@ -925,5 +925,21 @@
       "effect": 7,
       "time": 7200
     }
+  },
+  "coffee": {
+    "id": "coffee",
+    "name": "coffee",
+    "aliases": ["caffeine"],
+    "emoji": "☕️",
+    "longDesc": "feed your workers with coffee and produce 50% more items per hour",
+    "rarity": 2,
+    "sell": 100000,
+    "role": "booster",
+    "stackable": false,
+    "boosterEffect": {
+      "boosts": ["per_interval"],
+      "effect": "workers produce 50% more items per hour",
+      "time": 21600
+    }
   }
 }
