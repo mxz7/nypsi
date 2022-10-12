@@ -286,7 +286,7 @@ export default async function messageCreate(message: Message) {
               }
             } catch {
               // always a public thread channel
-              console.log((message.channel as ThreadChannel).members);
+              console.log((message.channel as ThreadChannel).members.cache);
               return;
             }
 
