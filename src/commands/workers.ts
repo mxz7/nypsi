@@ -17,7 +17,14 @@ import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { getBalance } from "../utils/functions/economy/balance";
 import { getPrestige } from "../utils/functions/economy/prestige";
 import { createUser, userExists } from "../utils/functions/economy/utils";
-import { addWorker, calcWorkerValues, getBaseWorkers, getWorkers } from "../utils/functions/economy/workers";
+import {
+  addWorker,
+  addWorkerUpgrade,
+  calcWorkerValues,
+  getBaseUpgrades,
+  getBaseWorkers,
+  getWorkers,
+} from "../utils/functions/economy/workers";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 import { Worker } from "../utils/models/Workers";
@@ -108,6 +115,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     return false;
+  };
+
+  const calcUpgradeCost = (upgradeId: string, owned: number) => {
+    const baseUpgrades = getBaseUpgrades();
+
+    const cost = baseUpgrades[upgradeId].base_cost + baseUpgrades[upgradeId].base_cost * owned * 0.5;
+
+    return cost;
   };
 
   const showWorkers = async (defaultWorker = "potato_farmer", msg?: Message) => {
@@ -233,6 +248,94 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
           return showWorkers(selected, msg);
         }
+      } else if (res.customId == "upg") {
+        const selected = options.filter((o) => o.data.default)[0].data.value;
+        return upgradeWorker(baseWorkers[selected], res.message);
+      }
+    };
+
+    return pageManager();
+  };
+
+  const upgradeWorker = async (worker: Worker, msg: Message) => {
+    const embed = new CustomEmbed(message.member);
+
+    embed.setHeader(`${worker.name} upgrades`, message.author.avatarURL());
+
+    let desc = "";
+
+    const userWorker = userWorkers.find((w) => w.workerId == worker.id);
+    const baseUpgrades = getBaseUpgrades();
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder().setCustomId("ba").setLabel("back").setStyle(ButtonStyle.Danger)
+    );
+
+    for (const upgradeId of Object.keys(baseUpgrades)) {
+      if (baseUpgrades[upgradeId].base_cost) {
+        const owned = userWorker.upgrades.find((u) => u.upgradeId == upgradeId)?.amount || 0;
+
+        desc += `**${baseUpgrades[upgradeId].name}** ${owned}/${baseUpgrades[upgradeId].stack_limit}`;
+
+        const button = new ButtonBuilder().setCustomId(`up-${upgradeId}`).setLabel(`⬆️ ${baseUpgrades[upgradeId].name}`);
+
+        if (owned < baseUpgrades[upgradeId].stack_limit) {
+          desc += ` - $${calcUpgradeCost(upgradeId, owned).toLocaleString()}`;
+          button.setStyle(ButtonStyle.Success);
+        } else {
+          button.setStyle(ButtonStyle.Secondary);
+          button.setDisabled(true);
+        }
+        desc += "\n";
+
+        row.addComponents(button);
+      } else if (userWorker.upgrades.find((u) => u.upgradeId == upgradeId)) {
+        desc += `**${baseUpgrades[upgradeId].name}** ${userWorker.upgrades.find((u) => u.upgradeId == upgradeId).amount}/${
+          baseUpgrades[upgradeId].stack_limit
+        }\n`;
+      }
+    }
+
+    embed.setDescription(desc);
+
+    msg = await msg.edit({ embeds: [embed], components: [row] });
+
+    const filter = (i: Interaction) => i.user.id == message.author.id;
+
+    const pageManager: any = async () => {
+      const res = await msg
+        .awaitMessageComponent({ filter, time: 30_000 })
+        .then(async (i) => {
+          await i.deferUpdate();
+          return i;
+        })
+        .catch(() => {});
+
+      if (!res) {
+        msg.edit({ components: [] });
+        return;
+      }
+
+      if (res.customId == "ba") {
+        return showWorkers(worker.id, msg);
+      } else if (res.customId.startsWith("up-")) {
+        const upgradeId = res.customId.split("-")[1];
+
+        if (
+          userWorkers.find((w) => w.workerId == worker.id).upgrades.find((u) => u.upgradeId == upgradeId).amount >=
+          baseUpgrades[upgradeId].stack_limit
+        ) {
+          await res.followUp({ embeds: [new ErrorEmbed("you have maxed out this upgrade")], ephemeral: true });
+
+          userWorkers = await getWorkers(message.member);
+
+          return upgradeWorker(worker, res.message);
+        }
+
+        await addWorkerUpgrade(message.member, worker.id, upgradeId);
+
+        userWorkers = await getWorkers(message.member);
+
+        return upgradeWorker(worker, res.message);
       }
     };
 
