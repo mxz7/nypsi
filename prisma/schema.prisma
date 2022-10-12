@@ -67,7 +67,6 @@ model Economy {
   dailyStreak Int @default(0)
 
   inventory Json @default("{}")
-  workers   Json @default("{}")
 
   banned DateTime?
 
@@ -77,6 +76,33 @@ model Economy {
   Boosters      Booster[]
   EconomyStats  EconomyStats[]
   LotteryTicket LotteryTicket[]
+  EconomyWorker EconomyWorker[]
+}
+
+model EconomyWorker {
+  userId   String
+  workerId String
+
+  stored Int @default(0)
+
+  upgrades EconomyWorkerUpgrades[]
+
+  economy       Economy @relation(fields: [economyUserId], references: [userId])
+  economyUserId String
+
+  @@id([userId, workerId])
+}
+
+model EconomyWorkerUpgrades {
+  userId   String
+  workerId String
+
+  upgradeId String
+  amount    Int    @default(1)
+
+  worker EconomyWorker @relation(fields: [userId, workerId], references: [userId, workerId])
+
+  @@id([userId, workerId, upgradeId])
 }
 
 model LotteryTicket {
