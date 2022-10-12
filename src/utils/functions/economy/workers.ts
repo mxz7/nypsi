@@ -124,3 +124,24 @@ export async function calcWorkerValues(
     maxStorage: baseWorkers[worker.workerId].base.max_storage + maxStoredBonus,
   };
 }
+
+export async function addWorkerUpgrade(member: GuildMember, workerId: string, upgradeId: string) {
+  await prisma.economyWorkerUpgrades.upsert({
+    where: {
+      userId_workerId_upgradeId: {
+        upgradeId: upgradeId,
+        userId: member.user.id,
+        workerId: workerId,
+      },
+    },
+    update: {
+      amount: { increment: 1 },
+    },
+    create: {
+      upgradeId: upgradeId,
+      userId: member.user.id,
+      workerId: workerId,
+      amount: 1,
+    },
+  });
+}
