@@ -162,7 +162,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embed.setColor(color as ColorResolvable);
       }
     } catch {
-      return message.channel.send({
+      return send({
         embeds: [new ErrorEmbed("invalid color, please use a hex color ([color.tekoh.net](https://color.tekoh.net))")],
       });
     }
