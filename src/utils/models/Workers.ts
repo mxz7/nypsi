@@ -1,5 +1,6 @@
 export interface Worker {
   name: string;
+  id: string
   item_emoji: string;
   prestige_requirement: number;
   cost: number;
