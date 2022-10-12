@@ -297,6 +297,7 @@ export async function reset() {
   await prisma.economyGuildMember.deleteMany();
   await prisma.economyGuild.deleteMany();
   await prisma.auction.deleteMany();
+  await prisma.economyWorker.deleteMany();
 
   await prisma.economy.deleteMany({
     where: {
@@ -328,7 +329,6 @@ export async function reset() {
         xp: 0,
         padlock: false,
         inventory: {},
-        workers: {},
       },
     });
 
