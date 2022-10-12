@@ -29,11 +29,6 @@ const bree = new Bree({
       path: path.join(__dirname, "jobs", "topglobal.js"),
     },
     {
-      name: "workers",
-      interval: "60m",
-      path: path.join(__dirname, "jobs", "workers.js"),
-    },
-    {
       name: "delete-guilds",
       interval: "at 3:01am",
       path: path.join(__dirname, "jobs", "oldguilds.js"),
