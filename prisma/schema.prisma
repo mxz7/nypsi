@@ -87,8 +87,7 @@ model EconomyWorker {
 
   upgrades EconomyWorkerUpgrades[]
 
-  economy       Economy @relation(fields: [economyUserId], references: [userId])
-  economyUserId String
+  economy Economy @relation(fields: [userId], references: [userId])
 
   @@id([userId, workerId])
 }
