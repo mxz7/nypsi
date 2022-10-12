@@ -110,10 +110,7 @@ export async function calcWorkerValues(
 
     switch (items[boosterId].boosterEffect.boosts[0]) {
       case "per_interval":
-        perIntervalBonus +=
-          items[boosterId].boosterEffect.effect *
-          boosters.get(boosterId).length *
-          baseWorkers[worker.workerId].base.per_interval;
+        perIntervalBonus += items[boosterId].boosterEffect.effect * boosters.get(boosterId).length * perIntervalBonus;
         break;
     }
   }
