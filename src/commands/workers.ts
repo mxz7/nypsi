@@ -12,6 +12,7 @@ import {
   MessageActionRowComponentBuilder,
   SelectMenuBuilder,
   SelectMenuOptionBuilder,
+  TextBasedChannel,
 } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { getBalance } from "../utils/functions/economy/balance";
@@ -38,30 +39,18 @@ const cmd = new Command("workers", "view the available workers and manage your o
 ]);
 
 const workerChoices: APIApplicationCommandOptionChoice<string>[] = [
-  { name: "potato farmer", value: "0" },
-  { name: "fisherman", value: "1" },
-  { name: "miner", value: "2" },
-  { name: "lumberjack", value: "3" },
-  { name: "butcher", value: "4" },
-  { name: "tailor", value: "5" },
-  { name: "spacex", value: "6" },
+  { name: "potato farmer", value: "potato_farmer" },
+  { name: "fisherman", value: "fisherman" },
+  { name: "miner", value: "miner" },
+  { name: "lumberjack", value: "lumberjack" },
+  { name: "butcher", value: "butcher" },
+  { name: "tailor", value: "tailor" },
+  { name: "spacex", value: "spacex" },
 ];
 
 cmd.slashEnabled = true;
 cmd.slashData
-  .addSubcommand((view) => view.setName("view").setDescription("view your workers"))
-  .addSubcommand((buy) =>
-    buy
-      .setName("buy")
-      .setDescription("buy a worker")
-      .addStringOption((option) =>
-        option
-          .setName("worker")
-          .setDescription("worker you want to buy")
-          .setChoices(...workerChoices)
-          .setRequired(true)
-      )
-  )
+  .addSubcommand((view) => view.setName("view").setDescription("view all workers"))
   .addSubcommand((claim) => claim.setName("claim").setDescription("claim earned money from your workers"))
   .addSubcommand((upgrade) =>
     upgrade
@@ -74,8 +63,7 @@ cmd.slashData
           .setChoices(...workerChoices)
           .setRequired(true)
       )
-  )
-  .addSubcommand((reclaim) => reclaim.setName("reclaim").setDescription("obtain workers from your premium subscription"));
+  );
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   const baseWorkers = getBaseWorkers();
@@ -257,7 +245,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return pageManager();
   };
 
-  const upgradeWorker = async (worker: Worker, msg: Message) => {
+  const upgradeWorker = async (worker: Worker, msg?: Message, channel?: TextBasedChannel) => {
     const embed = new CustomEmbed(message.member);
 
     embed.setHeader(`${worker.name} upgrades`, message.author.avatarURL());
@@ -297,7 +285,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     embed.setDescription(desc);
 
-    msg = await msg.edit({ embeds: [embed], components: [row] });
+    if (!msg) {
+      msg = await channel.send({ embeds: [embed], components: [row] });
+    } else {
+      msg = await msg.edit({ embeds: [embed], components: [row] });
+    }
 
     const filter = (i: Interaction) => i.user.id == message.author.id;
 
@@ -344,6 +336,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (args.length == 0 || args[0].toLowerCase() == "view") {
     return showWorkers();
+  } else if (args[0].toLowerCase() == "upgrade") {
+    if (args.length == 1) {
+      return showWorkers();
+    }
+
+    const worker = baseWorkers[args[1].toLowerCase()];
+
+    if (!worker) {
+      return showWorkers();
+    }
+
+    return upgradeWorker(worker, null, message.channel);
   }
 }
 
