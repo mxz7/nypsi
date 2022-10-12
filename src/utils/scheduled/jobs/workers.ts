@@ -1,47 +1,85 @@
-import _ = require("lodash");
-import { parentPort } from "worker_threads";
 import prisma from "../../database/database";
-import { Worker, WorkerStorageData } from "../../models/Workers";
+import { getBoosters } from "../../functions/economy/boosters";
+import { getItems } from "../../functions/economy/utils";
+import { getBaseUpgrades, getBaseWorkers } from "../../functions/economy/workers";
+import { Booster } from "../../models/Economy";
 
 (async () => {
-  const query = await prisma.economy.findMany({
-    select: {
-      userId: true,
-      workers: true,
+  const query = await prisma.economyWorker.findMany({
+    include: {
+      upgrades: true,
     },
   });
 
-  for (const user of query) {
-    try {
-      const workers: { [key: string]: WorkerStorageData } = user.workers as any;
+  const boosters = new Map<string, Map<string, Booster[]>>();
+  const baseWorkers = getBaseWorkers();
+  const baseUpgrades = getBaseUpgrades();
+  const items = getItems();
 
-      if (_.isEmpty(workers)) continue;
+  const promises = [];
 
-      for (const w of Object.keys(workers)) {
-        const worker = workers[w];
+  for (const worker of query) {
+    if (!boosters.has(worker.userId)) {
+      boosters.set(worker.userId, await getBoosters(worker.userId));
+    }
 
-        const workerData = Worker.fromStorage(worker);
+    const usersBoosters = boosters.get(worker.userId);
 
-        if (worker.stored < workerData.maxStorage) {
-          if (worker.stored + workerData.perInterval > workerData.maxStorage) {
-            worker.stored = workerData.maxStorage;
-          } else {
-            worker.stored += workerData.perInterval;
-          }
-        }
+    let perIntervalBonus = 0;
+    let maxStoredBonus = 0;
+
+    for (const upgrade of worker.upgrades) {
+      switch (baseUpgrades[upgrade.upgradeId].upgrades) {
+        case 1:
+          perIntervalBonus +=
+            baseUpgrades[upgrade.upgradeId].effect * upgrade.amount * baseWorkers[worker.workerId].base.per_interval;
+          break;
+        case 2:
+          maxStoredBonus +=
+            baseUpgrades[upgrade.upgradeId].effect * upgrade.amount * baseWorkers[worker.workerId].base.max_storage;
+          break;
       }
+    }
 
-      await prisma.economy.update({
+    for (const boosterId of usersBoosters.keys()) {
+      if (items[boosterId].role != "booster") return;
+
+      switch (items[boosterId].boosterEffect.boosts[0]) {
+        case "per_interval":
+          perIntervalBonus +=
+            items[boosterId].boosterEffect.effect *
+            usersBoosters.get(boosterId).length *
+            baseWorkers[worker.workerId].base.per_interval;
+          break;
+      }
+    }
+
+    const maxStorage = baseWorkers[worker.workerId].base.max_storage + maxStoredBonus;
+
+    if (worker.stored >= maxStorage) continue;
+
+    let incrementAmount = baseWorkers[worker.workerId].base.per_interval + perIntervalBonus;
+
+    if (worker.stored + incrementAmount > maxStorage) incrementAmount = maxStorage - worker.stored;
+
+    promises.push(
+      prisma.economyWorker.update({
         where: {
-          userId: user.userId,
+          userId_workerId: {
+            userId: worker.userId,
+            workerId: worker.workerId,
+          },
         },
         data: {
-          workers: workers as any,
+          stored: {
+            increment: incrementAmount,
+          },
         },
-      });
-    } catch (e) {
-      parentPort.postMessage(`error: ${e}`);
-    }
+      })
+    );
   }
+
+  await Promise.all(promises);
+
   process.exit(0);
 })();
