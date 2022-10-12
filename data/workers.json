@@ -7,6 +7,15 @@
       "effect": 0.25,
       "stack_limit": 25,
       "base_cost": 30000
+    },
+    "bait": {
+      "id": "bait",
+      "name": "bait",
+      "upgrades": 1,
+      "effect": 0.1,
+      "stack_limit": 20,
+      "base_cost": 50000,
+      "for": ["fisherman"]
     }
   },
   "workers": {

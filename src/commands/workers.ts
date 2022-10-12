@@ -259,6 +259,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     );
 
     for (const upgradeId of Object.keys(baseUpgrades)) {
+      if (baseUpgrades[upgradeId].for && !baseUpgrades[upgradeId].for.includes(worker.id)) continue;
+
       if (baseUpgrades[upgradeId].base_cost) {
         const owned = userWorker.upgrades.find((u) => u.upgradeId == upgradeId)?.amount || 0;
 
@@ -313,7 +315,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         const upgradeId = res.customId.split("-")[1];
 
         if (
-          userWorkers.find((w) => w.workerId == worker.id).upgrades.find((u) => u.upgradeId == upgradeId).amount >=
+          userWorkers.find((w) => w.workerId == worker.id).upgrades.find((u) => u.upgradeId == upgradeId)?.amount >=
           baseUpgrades[upgradeId].stack_limit
         ) {
           await res.followUp({ embeds: [new ErrorEmbed("you have maxed out this upgrade")], ephemeral: true });
