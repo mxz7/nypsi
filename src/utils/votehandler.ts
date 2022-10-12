@@ -104,9 +104,9 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
     await Promise.all([addTicket(user), addTicket(user), addTicket(user)]);
   }
 
-  let crateAmount = Math.floor(prestige / 2 + 1);
+  let crateAmount = Math.floor(prestige / 1.5 + 1);
 
-  if (crateAmount > 3) crateAmount = 3;
+  if (crateAmount > 5) crateAmount = 5;
 
   if (inventory["vote_crate"]) {
     inventory["vote_crate"] += crateAmount;
