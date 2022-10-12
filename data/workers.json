@@ -1,4 +1,14 @@
 {
+  "upgrades": {
+    "deep_pockets": {
+      "id": "deep_pockets",
+      "name": "deep pockets",
+      "upgrades": 2,
+      "effect": 0.25,
+      "stack_limit": 25,
+      "base_cost": 30000
+    }
+  },
   "workers": {
     "potato_farmer": {
       "id": "potato_farmer",
