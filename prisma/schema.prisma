@@ -87,7 +87,7 @@ model EconomyWorker {
 
   upgrades EconomyWorkerUpgrades[]
 
-  economy Economy @relation(fields: [userId], references: [userId])
+  economy Economy @relation(fields: [userId], references: [userId], onDelete: Cascade)
 
   @@id([userId, workerId])
 }
@@ -99,7 +99,7 @@ model EconomyWorkerUpgrades {
   upgradeId String
   amount    Int    @default(1)
 
-  worker EconomyWorker @relation(fields: [userId, workerId], references: [userId, workerId])
+  worker EconomyWorker @relation(fields: [userId, workerId], references: [userId, workerId], onDelete: Cascade)
 
   @@id([userId, workerId, upgradeId])
 }
