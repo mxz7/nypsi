@@ -15,6 +15,7 @@ temp/
 
 anticheat.ts
 
+!workers.json
 !lists.json
 !achievements.json
 !items.json
