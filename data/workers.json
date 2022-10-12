@@ -9,7 +9,7 @@
       "base": {
         "per_item": 4,
         "max_storage": 600,
-        "per_interval": 17
+        "per_interval": 204
       }
     },
     "fisherman": {
@@ -21,7 +21,7 @@
       "base": {
         "per_item": 15,
         "max_storage": 350,
-        "per_interval": 10
+        "per_interval": 120
       }
     },
     "miner": {
@@ -33,7 +33,7 @@
       "base": {
         "per_item": 22,
         "max_storage": 400,
-        "per_interval": 14
+        "per_interval": 168
       }
     },
     "lumberjack": {
@@ -45,7 +45,7 @@
       "base": {
         "per_item": 35,
         "max_storage": 350,
-        "per_interval": 10
+        "per_interval": 120
       }
     },
     "butcher": {
@@ -57,7 +57,7 @@
       "base": {
         "per_item": 17,
         "max_storage": 600,
-        "per_interval": 25
+        "per_interval": 300
       }
     },
     "tailor": {
@@ -69,7 +69,7 @@
       "base": {
         "per_item": 20,
         "max_storage": 750,
-        "per_interval": 30
+        "per_interval": 360
       }
     },
     "spacex": {
@@ -81,7 +81,7 @@
       "base": {
         "per_item": 75,
         "max_storage": 215,
-        "per_interval": 7
+        "per_interval": 84
       }
     }
   }

@@ -30,8 +30,7 @@ const bree = new Bree({
     },
     {
       name: "workers",
-      timeout: "5m",
-      interval: "5m",
+      interval: "60m",
       path: path.join(__dirname, "jobs", "workers.js"),
     },
     {
