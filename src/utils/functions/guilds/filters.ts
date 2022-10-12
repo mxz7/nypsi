@@ -1,5 +1,9 @@
-import { Guild } from "discord.js";
+import { Guild, Message } from "discord.js";
 import prisma from "../../database/database";
+import { PunishmentType } from "../../models/GuildStorage";
+import { addModLog } from "../moderation/logs";
+import { getPercentMatch } from "./utils";
+import * as stringSimilarity from "string-similarity";
 
 const chatFilterCache = new Map<string, string[]>();
 const snipeFilterCache = new Map<string, string[]>();
@@ -75,4 +79,57 @@ export async function updateChatFilter(guild: Guild, array: string[]) {
   });
 
   if (chatFilterCache.has(guild.id)) chatFilterCache.delete(guild.id);
+}
+
+export async function checkMessageContent(message: Message) {
+  const filter = await getChatFilter(message.guild);
+  const match = await getPercentMatch(message.guild);
+
+  let content: string | string[] = message.content.toLowerCase().normalize("NFD");
+
+  content = content.replace(/[^A-z0-9\s]/g, "");
+
+  content = content.split(" ");
+
+  if (content.length >= 69) {
+    for (const word of filter) {
+      if (content.indexOf(word.toLowerCase()) != -1) {
+        addModLog(
+          message.guild,
+          PunishmentType.FILTER_VIOLATION,
+          message.author.id,
+          "nypsi",
+          content.join(" "),
+          -1,
+          message.channel.id
+        );
+        await message.delete().catch(() => {});
+        return false;
+      }
+    }
+  } else {
+    for (const word of filter) {
+      for (const contentWord of content) {
+        const similarity = stringSimilarity.compareTwoStrings(word, contentWord);
+
+        if (similarity >= match / 100) {
+          const contentModified = content.join(" ").replace(contentWord, `**${contentWord}**`);
+
+          addModLog(
+            message.guild,
+            PunishmentType.FILTER_VIOLATION,
+            message.author.id,
+            "nypsi",
+            contentModified,
+            -1,
+            message.channel.id,
+            (similarity * 100).toFixed(2)
+          );
+          await message.delete().catch(() => {});
+          return false;
+        }
+      }
+    }
+  }
+  return true;
 }
