@@ -1,9 +1,9 @@
 import { Message, PermissionFlagsBits } from "discord.js";
-import { getChatFilter, getSnipeFilter } from "../utils/functions/guilds/filters";
+import { checkMessageContent, getChatFilter, getSnipeFilter } from "../utils/functions/guilds/filters";
 import { createGuild, eSnipe, hasGuild } from "../utils/functions/guilds/utils";
-import { addLog, addModLog, isLogsEnabled } from "../utils/functions/moderation/logs";
+import { addLog, isLogsEnabled } from "../utils/functions/moderation/logs";
 import { CustomEmbed } from "../utils/models/EmbedBuilders";
-import { LogType, PunishmentType } from "../utils/models/GuildStorage";
+import { LogType } from "../utils/models/GuildStorage";
 
 export default async function messageUpdate(message: Message, newMessage: Message) {
   if (!message) return;
@@ -28,20 +28,9 @@ export default async function messageUpdate(message: Message, newMessage: Messag
   }
 
   if (!message.member.permissions.has(PermissionFlagsBits.Administrator)) {
-    const filter = await getChatFilter(message.guild);
+    const res = await checkMessageContent(message);
 
-    let content: string | string[] = newMessage.content.toLowerCase().normalize("NFD");
-
-    content = content.replace(/[^A-z0-9\s]/g, "");
-
-    content = content.split(" ");
-
-    for (const word of filter) {
-      if (content.indexOf(word.toLowerCase()) != -1) {
-        addModLog(message.guild, PunishmentType.FILTER_VIOLATION, message.author.id, "nypsi", content.join(" "), -1);
-        return await message.delete().catch(() => {});
-      }
-    }
+    if (!res) return;
   }
 
   if (message.content != "" && !message.member.user.bot && message.content.length > 1) {
