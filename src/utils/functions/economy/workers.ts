@@ -1,8 +1,21 @@
 import { GuildMember } from "discord.js";
 import prisma from "../../database/database";
-import { Constructor, getAllWorkers, Worker, WorkerStorageData } from "../../models/Workers";
+import { Worker, WorkerUpgrades } from "../../models/Workers";
 
-export async function getWorkers(member: GuildMember | string): Promise<{ [key: string]: WorkerStorageData }> {
+declare function require(name: string): any;
+
+const baseWorkers: { [key: string]: Worker } = require("../../../../data/workers.json").workers;
+const baseUpgrades: { [key: string]: WorkerUpgrades } = require("../../../../data/workers.json").upgrades;
+
+export function getBaseWorkers() {
+  return baseWorkers;
+}
+
+export function getBaseUpgrades() {
+  return baseUpgrades;
+}
+
+export async function getWorkers(member: GuildMember | string) {
   let id: string;
   if (member instanceof GuildMember) {
     id = member.user.id;
@@ -10,19 +23,19 @@ export async function getWorkers(member: GuildMember | string): Promise<{ [key: 
     id = member;
   }
 
-  const query = await prisma.economy.findUnique({
+  const query = await prisma.economyWorker.findMany({
     where: {
       userId: id,
     },
-    select: {
-      workers: true,
+    include: {
+      upgrades: true,
     },
   });
 
-  return query.workers as any;
+  return query;
 }
 
-export async function addWorker(member: GuildMember, id: number) {
+export async function addWorker(member: GuildMember, id: string) {
   let memberID: string;
   if (member instanceof GuildMember) {
     memberID = member.user.id;
@@ -30,24 +43,10 @@ export async function addWorker(member: GuildMember, id: number) {
     memberID = member;
   }
 
-  const workers = getAllWorkers();
-
-  let worker: Constructor<Worker> | Worker = workers.get(id);
-
-  if (!worker) return;
-
-  worker = new worker();
-
-  const memberWorkers = await getWorkers(member);
-
-  memberWorkers[id] = worker.toStorage();
-
-  await prisma.economy.update({
-    where: {
-      userId: memberID,
-    },
+  await prisma.economyWorker.create({
     data: {
-      workers: memberWorkers as any,
+      userId: memberID,
+      workerId: id,
     },
   });
 }
@@ -60,44 +59,12 @@ export async function emptyWorkersStored(member: GuildMember | string) {
     memberID = member;
   }
 
-  const workers = await getWorkers(memberID);
-
-  for (const w of Object.keys(workers)) {
-    workers[w].stored = 0;
-  }
-
-  await prisma.economy.update({
+  await prisma.economyWorker.updateMany({
     where: {
       userId: memberID,
     },
     data: {
-      workers: workers as any,
-    },
-  });
-}
-
-export async function upgradeWorker(member: GuildMember | string, id: string) {
-  let memberID: string;
-  if (member instanceof GuildMember) {
-    memberID = member.user.id;
-  } else {
-    memberID = member;
-  }
-
-  const workers = await getWorkers(memberID);
-
-  const worker = Worker.fromStorage(workers[id]);
-
-  worker.upgrade();
-
-  workers[id] = worker.toStorage();
-
-  await prisma.economy.update({
-    where: {
-      userId: memberID,
-    },
-    data: {
-      workers: workers as any,
+      stored: 0,
     },
   });
 }
