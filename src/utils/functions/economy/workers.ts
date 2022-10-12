@@ -1,6 +1,7 @@
 import { EconomyWorker, EconomyWorkerUpgrades } from "@prisma/client";
 import { GuildMember } from "discord.js";
 import prisma from "../../database/database";
+import { logger } from "../../logger";
 import { Worker, WorkerUpgrades } from "../../models/Workers";
 import { getBoosters } from "./boosters";
 import { getItems } from "./utils";
@@ -46,12 +47,16 @@ export async function addWorker(member: GuildMember, id: string) {
     memberID = member;
   }
 
-  await prisma.economyWorker.create({
-    data: {
-      userId: memberID,
-      workerId: id,
-    },
-  });
+  if (!baseWorkers[id]) return logger.warn(`unknown worker: ${id}`);
+
+  await prisma.economyWorker
+    .create({
+      data: {
+        userId: memberID,
+        workerId: id,
+      },
+    })
+    .catch(() => {});
 }
 
 export async function emptyWorkersStored(member: GuildMember | string) {
