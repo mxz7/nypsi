@@ -768,7 +768,7 @@ export async function runCommand(
       } else {
         message.followUp({ embeds: [embed], ephemeral: true });
       }
-      logger.debug(`news shown to ${message.author.tag}`);
+      logger.info(`news shown to ${message.author.tag}`);
     }
 
     if (await redis.exists(`achievements:completed:${message.author.id}`)) {
