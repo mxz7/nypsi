@@ -939,7 +939,7 @@
     "max": 3,
     "boosterEffect": {
       "boosts": ["per_interval"],
-      "effect": "workers produce 50% more items per hour",
+      "effect": 0.5,
       "time": 21600
     }
   },
