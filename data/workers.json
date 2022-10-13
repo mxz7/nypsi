@@ -52,6 +52,15 @@
       "base_cost": 50000,
       "for": "mcdonalds"
     },
+    "warehouse_workers": {
+      "id": "warehouse_workers",
+      "name": "warehouse workers",
+      "upgrades": 1,
+      "effect": 0.1,
+      "stack_limit": 20,
+      "base_cost": 50000,
+      "for": "amazon"
+    },
     "nasa_computers": {
       "id": "nasa_computers",
       "name": "nasa computers",
@@ -156,6 +165,18 @@
         "per_item": 15,
         "max_storage": 400,
         "per_interval": 250
+      }
+    },
+    "amazon": {
+      "id": "amazon",
+      "name": "amazon",
+      "item_emoji": "📦",
+      "prestige_requirement": 10,
+      "cost": 5000000,
+      "base": {
+        "per_item": 10,
+        "max_storage": 5000,
+        "per_interval": 450
       }
     }
   }
