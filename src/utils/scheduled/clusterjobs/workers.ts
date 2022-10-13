@@ -35,5 +35,5 @@ async function doWorkerThing() {
 }
 
 export function runWorkerInterval() {
-  setInterval(doWorkerThing, ms("1 minute"));
+  setInterval(doWorkerThing, ms("1 hour"));
 }
