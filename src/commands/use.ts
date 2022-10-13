@@ -21,7 +21,7 @@ import {
   isHandcuffed,
   userExists,
 } from "../utils/functions/economy/utils";
-import { addWorkerUpgrade, getBaseUpgrades, getWorkers } from "../utils/functions/economy/workers";
+import { addWorkerUpgrade, getBaseUpgrades, getBaseWorkers, getWorkers } from "../utils/functions/economy/workers";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
@@ -251,7 +251,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       embeds: [
         new CustomEmbed(
           message.member,
-          `you have activated **${upgrade.name}**\n\n${userUpgrade ? userUpgrade.amount + 1 : 1}/${upgrade.stack_limit}`
+          `you have activated **${upgrade.name}** on your **${getBaseWorkers()[upgrade.for].name}**\n\n${
+            userUpgrade ? userUpgrade.amount + 1 : 1
+          }/${upgrade.stack_limit}`
         ),
       ],
     });
