@@ -13,7 +13,7 @@
       "name": "premium quality",
       "upgrades": 0,
       "effect": 0.25,
-      "stack_limit": 40,
+      "stack_limit": 50,
       "base_cost": 55000
     },
     "immigrant_farmers": {
