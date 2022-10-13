@@ -254,7 +254,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           `you have activated **${upgrade.name}** on your **${getBaseWorkers()[upgrade.for].name}**\n\n${
             userUpgrade ? userUpgrade.amount + 1 : 1
           }/${upgrade.stack_limit}`
-        ),
+        ).setHeader("use", message.author.avatarURL()),
       ],
     });
   }
