@@ -110,15 +110,18 @@ export async function calcWorkerValues(
 
     switch (items[boosterId].boosterEffect.boosts[0]) {
       case "per_interval":
-        perIntervalBonus += items[boosterId].boosterEffect.effect * boosters.get(boosterId).length * perIntervalBonus;
+        perIntervalBonus +=
+          items[boosterId].boosterEffect.effect *
+          boosters.get(boosterId).length *
+          (perIntervalBonus + baseWorkers[worker.workerId].base.per_interval);
         break;
     }
   }
 
   return {
-    perInterval: baseWorkers[worker.workerId].base.per_interval + perIntervalBonus,
-    perItem: baseWorkers[worker.workerId].base.per_item + perItemBonus,
-    maxStorage: baseWorkers[worker.workerId].base.max_storage + maxStoredBonus,
+    perInterval: Math.floor(baseWorkers[worker.workerId].base.per_interval + perIntervalBonus),
+    perItem: Math.floor(baseWorkers[worker.workerId].base.per_item + perItemBonus),
+    maxStorage: Math.floor(baseWorkers[worker.workerId].base.max_storage + maxStoredBonus),
   };
 }
 
