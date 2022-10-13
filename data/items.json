@@ -941,5 +941,16 @@
       "effect": "workers produce 50% more items per hour",
       "time": 21600
     }
+  },
+  "stolen_nasa_computer": {
+    "id": "stolen_nasa_computer",
+    "name": "stolen nasa computer",
+    "aliases": ["nasa", "computer"],
+    "emoji": "🖥",
+    "longDesc": "applies the nasa computer upgrade to the spacex worker",
+    "rarity": 2,
+    "sell": 100000,
+    "role": "worker-upgrade",
+    "worker_upgrade_id": "nasa_computers"
   }
 }
