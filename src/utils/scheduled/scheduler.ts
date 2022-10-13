@@ -74,11 +74,11 @@ const bree = new Bree({
 export default async function startJobs() {
   await bree.start();
 
-  bree.config.jobs[3].worker.workerData.guilds = await getGuilds();
+  bree.config.jobs[2].worker.workerData.guilds = await getGuilds();
 
   // await bree.run();
 
   setInterval(async () => {
-    bree.config.jobs[3].worker.workerData.guilds = await getGuilds();
+    bree.config.jobs[2].worker.workerData.guilds = await getGuilds();
   }, ms("1 day"));
 }
