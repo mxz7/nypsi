@@ -43,6 +43,15 @@
       "base_cost": 50000,
       "for": "tailor"
     },
+    "ipad_kids": {
+      "id": "ipad_kids",
+      "name": "ipad kids",
+      "upgrades": 1,
+      "effect": 0.1,
+      "stack_limit": 20,
+      "base_cost": 50000,
+      "for": "mcdonalds"
+    },
     "nasa_computers": {
       "id": "nasa_computers",
       "name": "nasa computers",
@@ -135,6 +144,18 @@
         "per_item": 50,
         "max_storage": 215,
         "per_interval": 84
+      }
+    },
+    "mcdonalds": {
+      "id": "mcdonalds",
+      "name": "mcdonalds",
+      "item_emoji": "🍟",
+      "prestige_requirement": 5,
+      "cost": 1000000,
+      "base": {
+        "per_item": 15,
+        "max_storage": 400,
+        "per_interval": 250
       }
     }
   }
