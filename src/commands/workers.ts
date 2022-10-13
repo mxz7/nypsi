@@ -413,6 +413,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     );
 
     return send({ embeds: [embed] });
+  } else {
+    return showWorkers();
   }
 }
 
