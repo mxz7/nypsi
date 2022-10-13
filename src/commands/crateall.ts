@@ -67,24 +67,31 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   }
 
   let count = 0;
+  const promises = [];
 
   for (const m of members.keys()) {
-    const member = members.get(m);
+    promises.push(
+      (async () => {
+        const member = members.get(m);
 
-    if (!(await userExists(m))) continue;
+        if (!(await userExists(m))) return;
 
-    const inventory = await getInventory(member);
+        const inventory = await getInventory(member);
 
-    if (inventory[selected.id]) {
-      inventory[selected.id] += amount;
-    } else {
-      inventory[selected.id] = amount;
-    }
+        if (inventory[selected.id]) {
+          inventory[selected.id] += amount;
+        } else {
+          inventory[selected.id] = amount;
+        }
 
-    await setInventory(member, inventory);
-    logger.info(`${amount} ${selected.id} given to ${member.user.tag} (${member.user.id})`);
-    count += amount;
+        await setInventory(member, inventory);
+        logger.info(`${amount} ${selected.id} given to ${member.user.tag} (${member.user.id})`);
+        count += amount;
+      })()
+    );
   }
+
+  await Promise.all(promises);
 
   return message.channel.send({
     embeds: [new CustomEmbed(message.member, `**${count}** ${selected.name}${count != 1 ? "s" : ""} given`)],

@@ -925,5 +925,54 @@
       "effect": 7,
       "time": 7200
     }
+  },
+  "coffee": {
+    "id": "coffee",
+    "name": "coffee",
+    "aliases": ["caffeine"],
+    "emoji": "☕️",
+    "longDesc": "feed your workers with coffee and produce 50% more items per hour",
+    "rarity": 2,
+    "sell": 100000,
+    "role": "booster",
+    "stackable": true,
+    "max": 3,
+    "boosterEffect": {
+      "boosts": ["per_interval"],
+      "effect": 0.5,
+      "time": 21600
+    }
+  },
+  "stolen_nasa_computer": {
+    "id": "stolen_nasa_computer",
+    "name": "stolen nasa computer",
+    "aliases": ["nasa", "computer"],
+    "emoji": "🖥",
+    "longDesc": "applies the nasa computer upgrade to the spacex worker",
+    "rarity": 2,
+    "sell": 100000,
+    "role": "worker-upgrade",
+    "worker_upgrade_id": "nasa_computers"
+  },
+  "warehouse_permit": {
+    "id": "warehouse_permit",
+    "name": "warehouse permit",
+    "aliases": ["warehouse", "permit"],
+    "emoji": "📄",
+    "longDesc": "applies the warehouse expansion upgrade to the amazon worker",
+    "rarity": 2,
+    "sell": 100000,
+    "role": "worker-upgrade",
+    "worker_upgrade_id": "warehouse_expansion"
+  },
+  "orphan": {
+    "id": "orphan",
+    "name": "orphan",
+    "emoji": "🧒🏼",
+    "longDesc": "applies the underage workers upgrade to the amazon worker",
+    "rarity": 2,
+    "sell": 100000,
+    "role": "worker-upgrade",
+    "worker_upgrade_id": "underage_workers"
   }
 }

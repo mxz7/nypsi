@@ -21,6 +21,7 @@ import {
   isHandcuffed,
   userExists,
 } from "../utils/functions/economy/utils";
+import { addWorkerUpgrade, getBaseUpgrades, getBaseWorkers, getWorkers } from "../utils/functions/economy/workers";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
@@ -214,6 +215,48 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return edit({ embeds: [embed] }, msg);
     }, 1000);
     return;
+  } else if (selected.role == "worker-upgrade") {
+    const baseUpgrades = getBaseUpgrades();
+
+    const upgrade = baseUpgrades[selected.worker_upgrade_id];
+    const userWorkers = await getWorkers(message.member);
+    const userUpgrade = userWorkers.find((w) => upgrade.for == w.workerId)?.upgrades.find((u) => u.upgradeId == upgrade.id);
+
+    if (!userWorkers.find((w) => upgrade.for.includes(w.workerId))) {
+      return send({
+        embeds: [new ErrorEmbed(`this upgrade requires you to have **${upgrade.for}**`)],
+      });
+    }
+
+    let allowed = false;
+
+    if (!userUpgrade) allowed = true;
+
+    if (userUpgrade && userUpgrade.amount < upgrade.stack_limit) allowed = true;
+
+    if (!allowed) {
+      return send({ embeds: [new ErrorEmbed("you have reached the limit for this upgrade")] });
+    }
+
+    inventory[selected.id]--;
+
+    if (inventory[selected.id] <= 0) {
+      delete inventory[selected.id];
+    }
+
+    await setInventory(message.member, inventory);
+    await addWorkerUpgrade(message.member, upgrade.for, upgrade.id);
+
+    return send({
+      embeds: [
+        new CustomEmbed(
+          message.member,
+          `you have activated **${upgrade.name}** on your **${getBaseWorkers()[upgrade.for].name}**\n\n${
+            userUpgrade ? userUpgrade.amount + 1 : 1
+          }/${upgrade.stack_limit}`
+        ),
+      ],
+    });
   }
 
   const embed = new CustomEmbed(message.member).setHeader("use", message.author.avatarURL());

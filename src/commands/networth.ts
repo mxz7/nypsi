@@ -4,10 +4,8 @@ import { getBalance, getBankBalance } from "../utils/functions/economy/balance";
 import { getGuildByUser } from "../utils/functions/economy/guilds";
 import { getInventory } from "../utils/functions/economy/inventory";
 import { getItems } from "../utils/functions/economy/utils";
-import { getWorkers } from "../utils/functions/economy/workers";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed } from "../utils/models/EmbedBuilders";
-import { getAllWorkers, Worker } from "../utils/models/Workers";
 
 const cmd = new Command("networth", "view your net worth", Categories.MONEY).setAliases(["net"]);
 
@@ -21,15 +19,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   await addCooldown(cmd.name, message.member, 30);
 
   const items = getItems();
-  const allWorkers = getAllWorkers();
 
   const inventory = await getInventory(message.member);
-  const workers = await getWorkers(message.member);
   const guild = await getGuildByUser(message.member);
 
   const money = (await getBalance(message.member)) + (await getBankBalance(message.member));
   let inventoryWorth = 0;
-  let workersWorth = 0;
   let guildWorth = 0;
 
   for (const itemId in inventory) {
@@ -38,24 +33,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
   }
 
-  for (const workerId in workers) {
-    if (workers[workerId].level > 1) {
-      const constructor = allWorkers.get(parseInt(workerId));
-      const worker = new constructor();
-
-      workersWorth += worker.cost + worker.cost * workers[workerId].level;
-    }
-
-    const worker = Worker.fromStorage(workers[workerId]);
-
-    workersWorth += worker.stored * worker.perItem;
-  }
-
   if (guild) {
     guildWorth = guild.balance;
   }
 
-  const total = Math.floor(guildWorth + workersWorth + inventoryWorth + money);
+  const total = Math.floor(guildWorth + inventoryWorth + money);
 
   if (total == 0) {
     return message.channel.send({ embeds: [new CustomEmbed(message.member, "damn bro ur broke. $0 net worth lol!")] });
@@ -69,10 +51,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (inventoryWorth > 0) {
     description += ` -- 🎒 $**${Math.floor(inventoryWorth).toLocaleString()}**\n`;
-  }
-
-  if (workersWorth > 0) {
-    description += ` -- 👷‍♂️ $**${Math.floor(workersWorth).toLocaleString()}**\n`;
   }
 
   if (guildWorth > 0) {
