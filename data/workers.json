@@ -16,6 +16,15 @@
       "stack_limit": 40,
       "base_cost": 55000
     },
+    "immigrant_farmers": {
+      "id": "immigrant_farmers",
+      "name": "immigrant farmers",
+      "upgrades": 1,
+      "effect": 0.1,
+      "stack_limit": 20,
+      "base_cost": 50000,
+      "for": ["potato_farmer"]
+    },
     "bait": {
       "id": "bait",
       "name": "bait",
@@ -24,6 +33,15 @@
       "stack_limit": 20,
       "base_cost": 50000,
       "for": ["fisherman"]
+    },
+    "sweatshop_workers": {
+      "id": "sweatshop_workers",
+      "name": "sweatshop workers",
+      "upgrades": 1,
+      "effect": 0.1,
+      "stack_limit": 20,
+      "base_cost": 50000,
+      "for": ["tailor"]
     }
   },
   "workers": {
@@ -46,7 +64,7 @@
       "prestige_requirement": 2,
       "cost": 250000,
       "base": {
-        "per_item": 15,
+        "per_item": 10,
         "max_storage": 350,
         "per_interval": 120
       }
@@ -58,7 +76,7 @@
       "prestige_requirement": 2,
       "cost": 400000,
       "base": {
-        "per_item": 22,
+        "per_item": 17,
         "max_storage": 400,
         "per_interval": 168
       }
@@ -70,7 +88,7 @@
       "prestige_requirement": 3,
       "cost": 500000,
       "base": {
-        "per_item": 35,
+        "per_item": 25,
         "max_storage": 350,
         "per_interval": 120
       }
@@ -82,7 +100,7 @@
       "prestige_requirement": 4,
       "cost": 600000,
       "base": {
-        "per_item": 17,
+        "per_item": 13,
         "max_storage": 600,
         "per_interval": 300
       }
@@ -94,7 +112,7 @@
       "prestige_requirement": 5,
       "cost": 700000,
       "base": {
-        "per_item": 20,
+        "per_item": 15,
         "max_storage": 750,
         "per_interval": 360
       }
@@ -106,7 +124,7 @@
       "prestige_requirement": 7,
       "cost": 1500000,
       "base": {
-        "per_item": 75,
+        "per_item": 50,
         "max_storage": 215,
         "per_interval": 84
       }
