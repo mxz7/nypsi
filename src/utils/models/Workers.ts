@@ -18,7 +18,7 @@ export interface WorkerUpgrades {
   effect: number; // decimal
   stack_limit: number;
   base_cost?: number;
-  for?: string[];
+  for?: string;
 }
 
 enum PossibleUpgrade {
