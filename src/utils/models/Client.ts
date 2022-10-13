@@ -32,6 +32,7 @@ import { runLogs, runModerationChecks } from "../scheduled/clusterjobs/moderatio
 import { runPremiumChecks } from "../scheduled/clusterjobs/premiumexpire";
 import { runSurveyChecks } from "../scheduled/clusterjobs/surveyends";
 import { runPremiumCrateInterval } from "../scheduled/clusterjobs/weeklycrates";
+import { runWorkerInterval } from "../scheduled/clusterjobs/workers";
 
 export class NypsiClient extends Client {
   public cluster: Cluster.Client;
@@ -127,5 +128,6 @@ export class NypsiClient extends Client {
     runAuctionChecks(this);
     runSurveyChecks(this);
     runLogs();
+    runWorkerInterval();
   }
 }
