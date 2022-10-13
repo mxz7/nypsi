@@ -24,6 +24,9 @@ const baseUpgrades: { [key: string]: WorkerUpgrades } = require("../../../../dat
   }
 
   baseWorkers = newObj;
+
+  logger.info(`${Object.keys(baseWorkers).length} workers loaded`);
+  logger.info(`${Object.keys(baseUpgrades).length} worker upgrades loaded`);
 })();
 
 export function getBaseWorkers() {
