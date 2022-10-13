@@ -935,7 +935,8 @@
     "rarity": 2,
     "sell": 100000,
     "role": "booster",
-    "stackable": false,
+    "stackable": true,
+    "max": 3,
     "boosterEffect": {
       "boosts": ["per_interval"],
       "effect": "workers produce 50% more items per hour",
