@@ -30,6 +30,7 @@ import {
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 import { Worker } from "../utils/models/Workers";
+import _ = require("lodash");
 
 const cmd = new Command("workers", "view the available workers and manage your own", Categories.MONEY).setAliases([
   "worker",
@@ -106,12 +107,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return false;
   };
 
-  const calcUpgradeCost = (upgradeId: string, owned: number) => {
+  const calcUpgradeCost = (workerId: string, upgradeId: string, owned: number) => {
     const baseUpgrades = getBaseUpgrades();
 
-    const cost = baseUpgrades[upgradeId].base_cost + baseUpgrades[upgradeId].base_cost * owned;
+    let baseCost = _.clone(baseUpgrades[upgradeId]).base_cost;
 
-    return cost;
+    baseCost = baseCost * (baseWorkers[workerId].prestige_requirement - 0.5);
+
+    const cost = baseCost + baseCost * owned;
+
+    return Math.floor(cost);
   };
 
   const showWorkers = async (defaultWorker = "potato_farmer", msg?: Message) => {
@@ -277,7 +282,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         const button = new ButtonBuilder().setCustomId(`up-${upgradeId}`).setLabel(`⬆️ ${baseUpgrades[upgradeId].name}`);
 
         if (owned < baseUpgrades[upgradeId].stack_limit) {
-          desc += ` - $${calcUpgradeCost(upgradeId, owned).toLocaleString()}`;
+          desc += ` - $${calcUpgradeCost(userWorker.workerId, upgradeId, owned).toLocaleString()}`;
           button.setStyle(ButtonStyle.Success);
         } else {
           button.setStyle(ButtonStyle.Secondary);
@@ -334,6 +339,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         const cost = calcUpgradeCost(
+          worker.id,
           upgradeId,
           userWorkers.find((w) => w.workerId == worker.id).upgrades.find((u) => u.upgradeId == upgradeId)?.amount || 0
         );
