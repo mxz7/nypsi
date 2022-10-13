@@ -68,6 +68,22 @@
       "effect": 0.75,
       "stack_limit": 15,
       "for": "spacex"
+    },
+    "warehouse_expansion": {
+      "id": "warehouse_expansion",
+      "name": "warehouse expansion",
+      "upgrades": 2,
+      "effect": 0.75,
+      "stack_limit": 10,
+      "for": "amazon"
+    },
+    "underage_workers": {
+      "id": "underage_workers",
+      "name": "underage workers",
+      "upgrades": 0,
+      "effect": 0.5,
+      "stack_limit": 10,
+      "for": "amazon"
     }
   },
   "workers": {
