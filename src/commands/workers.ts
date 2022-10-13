@@ -12,7 +12,6 @@ import {
   MessageActionRowComponentBuilder,
   SelectMenuBuilder,
   SelectMenuOptionBuilder,
-  TextBasedChannel,
 } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
@@ -262,7 +261,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return pageManager();
   };
 
-  const upgradeWorker = async (worker: Worker, msg?: Message, channel?: TextBasedChannel) => {
+  const upgradeWorker = async (worker: Worker, msg?: Message) => {
     const embed = new CustomEmbed(message.member);
 
     embed.setHeader(`${worker.name} upgrades`, message.author.avatarURL());
@@ -305,7 +304,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     embed.setDescription(desc);
 
     if (!msg) {
-      msg = await channel.send({ embeds: [embed], components: [row] });
+      msg = await send({ embeds: [embed], components: [row] });
     } else {
       msg = await msg.edit({ embeds: [embed], components: [row] });
     }
@@ -383,7 +382,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return showWorkers();
     }
 
-    return upgradeWorker(worker, null, message.channel);
+    return upgradeWorker(worker);
   } else if (args[0].toLowerCase() == "claim" || args[0].toLowerCase() == "sell") {
     let amountEarned = 0;
     let earnedBreakdown = "";
