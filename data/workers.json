@@ -92,7 +92,7 @@
       "name": "potato farmer",
       "item_emoji": "🥔",
       "prestige_requirement": 1,
-      "cost": 100000,
+      "cost": 50000,
       "base": {
         "per_item": 4,
         "max_storage": 600,
@@ -104,7 +104,7 @@
       "name": "fisherman",
       "item_emoji": "🐟",
       "prestige_requirement": 2,
-      "cost": 250000,
+      "cost": 75000,
       "base": {
         "per_item": 10,
         "max_storage": 350,
@@ -116,7 +116,7 @@
       "name": "miner",
       "item_emoji": "⛏",
       "prestige_requirement": 2,
-      "cost": 400000,
+      "cost": 100000,
       "base": {
         "per_item": 17,
         "max_storage": 400,
@@ -128,7 +128,7 @@
       "name": "lumberjack",
       "item_emoji": "🪓",
       "prestige_requirement": 3,
-      "cost": 500000,
+      "cost": 250000,
       "base": {
         "per_item": 25,
         "max_storage": 350,
@@ -139,8 +139,8 @@
       "id": "butcher",
       "name": "butcher",
       "item_emoji": "🥓",
-      "prestige_requirement": 4,
-      "cost": 600000,
+      "prestige_requirement": 2,
+      "cost": 500000,
       "base": {
         "per_item": 13,
         "max_storage": 600,
@@ -151,7 +151,7 @@
       "id": "tailor",
       "name": "tailor",
       "item_emoji": "👕",
-      "prestige_requirement": 5,
+      "prestige_requirement": 3,
       "cost": 700000,
       "base": {
         "per_item": 15,
@@ -163,8 +163,8 @@
       "id": "spacex",
       "name": "spacex",
       "item_emoji": "🚀",
-      "prestige_requirement": 7,
-      "cost": 1500000,
+      "prestige_requirement": 4,
+      "cost": 1000000,
       "base": {
         "per_item": 50,
         "max_storage": 215,
@@ -187,8 +187,8 @@
       "id": "amazon",
       "name": "amazon",
       "item_emoji": "📦",
-      "prestige_requirement": 10,
-      "cost": 5000000,
+      "prestige_requirement": 5,
+      "cost": 2000000,
       "base": {
         "per_item": 10,
         "max_storage": 5000,
