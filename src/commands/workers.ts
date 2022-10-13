@@ -109,7 +109,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const calcUpgradeCost = (upgradeId: string, owned: number) => {
     const baseUpgrades = getBaseUpgrades();
 
-    const cost = baseUpgrades[upgradeId].base_cost + baseUpgrades[upgradeId].base_cost * owned * 0.5;
+    const cost = baseUpgrades[upgradeId].base_cost + baseUpgrades[upgradeId].base_cost * owned;
 
     return cost;
   };
@@ -332,7 +332,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         const cost = calcUpgradeCost(
           upgradeId,
-          userWorkers.find((w) => w.workerId == worker.id).upgrades.find((u) => u.upgradeId == upgradeId).amount || 0
+          userWorkers.find((w) => w.workerId == worker.id).upgrades.find((u) => u.upgradeId == upgradeId)?.amount || 0
         );
 
         const balance = await getBalance(message.member);
