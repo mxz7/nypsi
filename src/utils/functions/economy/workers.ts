@@ -1,5 +1,6 @@
 import { EconomyWorker, EconomyWorkerUpgrades } from "@prisma/client";
 import { GuildMember } from "discord.js";
+import { inPlaceSort } from "fast-sort";
 import prisma from "../../database/database";
 import { logger } from "../../logger";
 import { Worker, WorkerUpgrades } from "../../models/Workers";
@@ -8,8 +9,22 @@ import { getItems } from "./utils";
 
 declare function require(name: string): any;
 
-const baseWorkers: { [key: string]: Worker } = require("../../../../data/workers.json").workers;
+let baseWorkers: { [key: string]: Worker } = require("../../../../data/workers.json").workers;
 const baseUpgrades: { [key: string]: WorkerUpgrades } = require("../../../../data/workers.json").upgrades;
+
+(() => {
+  const workerIds = Object.keys(baseWorkers);
+
+  inPlaceSort(workerIds).desc((w) => baseWorkers[w].prestige_requirement);
+
+  const newObj: { [key: string]: Worker } = {};
+
+  for (const workerId of workerIds) {
+    newObj[workerId] = baseWorkers[workerId];
+  }
+
+  baseWorkers = newObj;
+})();
 
 export function getBaseWorkers() {
   return baseWorkers;
