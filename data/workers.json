@@ -9,8 +9,8 @@
       "base_cost": 30000
     },
     "premium_quality": {
-      "id": "bait",
-      "name": "bait",
+      "id": "premium_quality",
+      "name": "premium quality",
       "upgrades": 0,
       "effect": 0.25,
       "stack_limit": 40,
