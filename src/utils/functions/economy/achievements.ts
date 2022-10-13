@@ -117,6 +117,8 @@ async function completeAchievement(userId: string, achievementId: string) {
     },
   });
 
+  if (!process.env.ACHIEVEMENTS_HOOK) return;
+
   const embed = new EmbedBuilder()
     .setAuthor({ name: `${await getLastKnownTag(userId)} has unlocked an achievement` })
     .setDescription(
