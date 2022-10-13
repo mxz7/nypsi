@@ -1,0 +1,199 @@
+{
+  "upgrades": {
+    "deep_pockets": {
+      "id": "deep_pockets",
+      "name": "deep pockets",
+      "upgrades": 2,
+      "effect": 0.25,
+      "stack_limit": 25,
+      "base_cost": 20000
+    },
+    "premium_quality": {
+      "id": "premium_quality",
+      "name": "premium quality",
+      "upgrades": 0,
+      "effect": 0.25,
+      "stack_limit": 50,
+      "base_cost": 40000
+    },
+    "immigrant_farmers": {
+      "id": "immigrant_farmers",
+      "name": "immigrant farmers",
+      "upgrades": 1,
+      "effect": 0.1,
+      "stack_limit": 20,
+      "base_cost": 50000,
+      "for": "potato_farmer"
+    },
+    "bait": {
+      "id": "bait",
+      "name": "bait",
+      "upgrades": 1,
+      "effect": 0.1,
+      "stack_limit": 20,
+      "base_cost": 50000,
+      "for": "fisherman"
+    },
+    "sweatshop_workers": {
+      "id": "sweatshop_workers",
+      "name": "sweatshop workers",
+      "upgrades": 1,
+      "effect": 0.1,
+      "stack_limit": 20,
+      "base_cost": 50000,
+      "for": "tailor"
+    },
+    "ipad_kids": {
+      "id": "ipad_kids",
+      "name": "ipad kids",
+      "upgrades": 1,
+      "effect": 0.1,
+      "stack_limit": 20,
+      "base_cost": 50000,
+      "for": "mcdonalds"
+    },
+    "warehouse_workers": {
+      "id": "warehouse_workers",
+      "name": "warehouse workers",
+      "upgrades": 1,
+      "effect": 0.1,
+      "stack_limit": 20,
+      "base_cost": 50000,
+      "for": "amazon"
+    },
+    "nasa_computers": {
+      "id": "nasa_computers",
+      "name": "nasa computers",
+      "upgrades": 1,
+      "effect": 0.75,
+      "stack_limit": 15,
+      "for": "spacex"
+    },
+    "warehouse_expansion": {
+      "id": "warehouse_expansion",
+      "name": "warehouse expansion",
+      "upgrades": 2,
+      "effect": 0.75,
+      "stack_limit": 10,
+      "for": "amazon"
+    },
+    "underage_workers": {
+      "id": "underage_workers",
+      "name": "underage workers",
+      "upgrades": 0,
+      "effect": 0.5,
+      "stack_limit": 10,
+      "for": "amazon"
+    }
+  },
+  "workers": {
+    "potato_farmer": {
+      "id": "potato_farmer",
+      "name": "potato farmer",
+      "item_emoji": "🥔",
+      "prestige_requirement": 1,
+      "cost": 100000,
+      "base": {
+        "per_item": 4,
+        "max_storage": 600,
+        "per_interval": 204
+      }
+    },
+    "fisherman": {
+      "id": "fisherman",
+      "name": "fisherman",
+      "item_emoji": "🐟",
+      "prestige_requirement": 2,
+      "cost": 250000,
+      "base": {
+        "per_item": 10,
+        "max_storage": 350,
+        "per_interval": 120
+      }
+    },
+    "miner": {
+      "id": "miner",
+      "name": "miner",
+      "item_emoji": "⛏",
+      "prestige_requirement": 2,
+      "cost": 400000,
+      "base": {
+        "per_item": 17,
+        "max_storage": 400,
+        "per_interval": 168
+      }
+    },
+    "lumberjack": {
+      "id": "lumberjack",
+      "name": "lumberjack",
+      "item_emoji": "🪓",
+      "prestige_requirement": 3,
+      "cost": 500000,
+      "base": {
+        "per_item": 25,
+        "max_storage": 350,
+        "per_interval": 120
+      }
+    },
+    "butcher": {
+      "id": "butcher",
+      "name": "butcher",
+      "item_emoji": "🥓",
+      "prestige_requirement": 4,
+      "cost": 600000,
+      "base": {
+        "per_item": 13,
+        "max_storage": 600,
+        "per_interval": 300
+      }
+    },
+    "tailor": {
+      "id": "tailor",
+      "name": "tailor",
+      "item_emoji": "👕",
+      "prestige_requirement": 5,
+      "cost": 700000,
+      "base": {
+        "per_item": 15,
+        "max_storage": 750,
+        "per_interval": 360
+      }
+    },
+    "spacex": {
+      "id": "spacex",
+      "name": "spacex",
+      "item_emoji": "🚀",
+      "prestige_requirement": 7,
+      "cost": 1500000,
+      "base": {
+        "per_item": 50,
+        "max_storage": 215,
+        "per_interval": 84
+      }
+    },
+    "mcdonalds": {
+      "id": "mcdonalds",
+      "name": "mcdonalds",
+      "item_emoji": "🍟",
+      "prestige_requirement": 2,
+      "cost": 1000000,
+      "base": {
+        "per_item": 15,
+        "max_storage": 400,
+        "per_interval": 250
+      }
+    },
+    "amazon": {
+      "id": "amazon",
+      "name": "amazon",
+      "item_emoji": "📦",
+      "prestige_requirement": 10,
+      "cost": 5000000,
+      "base": {
+        "per_item": 10,
+        "max_storage": 5000,
+        "per_interval": 450
+      }
+    }
+  }
+}
