@@ -150,7 +150,7 @@
       "id": "mcdonalds",
       "name": "mcdonalds",
       "item_emoji": "🍟",
-      "prestige_requirement": 5,
+      "prestige_requirement": 2,
       "cost": 1000000,
       "base": {
         "per_item": 15,
