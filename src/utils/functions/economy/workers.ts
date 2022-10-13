@@ -15,7 +15,7 @@ const baseUpgrades: { [key: string]: WorkerUpgrades } = require("../../../../dat
 (() => {
   const workerIds = Object.keys(baseWorkers);
 
-  inPlaceSort(workerIds).desc((w) => baseWorkers[w].prestige_requirement);
+  inPlaceSort(workerIds).asc((w) => baseWorkers[w].prestige_requirement);
 
   const newObj: { [key: string]: Worker } = {};
 
