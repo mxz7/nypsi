@@ -330,6 +330,22 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           return upgradeWorker(worker, res.message);
         }
 
+        const cost = calcUpgradeCost(
+          upgradeId,
+          userWorkers.find((w) => w.workerId == worker.id).upgrades.find((u) => u.upgradeId == upgradeId).amount || 0
+        );
+
+        const balance = await getBalance(message.member);
+
+        if (balance < cost) {
+          await res.followUp({ embeds: [new ErrorEmbed("you cannot afford this upgrade")], ephemeral: true });
+
+          userWorkers = await getWorkers(message.member);
+
+          return upgradeWorker(worker, res.message);
+        }
+
+        await updateBalance(message.member, balance - cost);
         await addWorkerUpgrade(message.member, worker.id, upgradeId);
 
         userWorkers = await getWorkers(message.member);
