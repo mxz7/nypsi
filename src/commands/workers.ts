@@ -15,13 +15,14 @@ import {
   TextBasedChannel,
 } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import { getBalance } from "../utils/functions/economy/balance";
+import { getBalance, updateBalance } from "../utils/functions/economy/balance";
 import { getPrestige } from "../utils/functions/economy/prestige";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import {
   addWorker,
   addWorkerUpgrade,
   calcWorkerValues,
+  emptyWorkersStored,
   getBaseUpgrades,
   getBaseWorkers,
   getWorkers,
@@ -350,6 +351,36 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     return upgradeWorker(worker, null, message.channel);
+  } else if (args[0].toLowerCase() == "claim" || args[0].toLowerCase() == "sell") {
+    let amountEarned = 0;
+    let earnedBreakdown = "";
+
+    for (const worker of userWorkers) {
+      const baseWorker = baseWorkers[worker.workerId];
+
+      const { perItem } = await calcWorkerValues(worker);
+
+      amountEarned += Math.floor(perItem * worker.stored);
+      earnedBreakdown += `\n${baseWorker.name} +$${Math.floor(
+        perItem * worker.stored
+      ).toLocaleString()} (${worker.stored.toLocaleString()} ${baseWorker.item_emoji})`;
+    }
+
+    if (amountEarned == 0) {
+      return send({
+        embeds: [new ErrorEmbed("you have no money to claim from your workers")],
+      });
+    }
+
+    await emptyWorkersStored(message.member);
+    await updateBalance(message.member, (await getBalance(message.member)) + amountEarned);
+
+    const embed = new CustomEmbed(message.member, `+$**${amountEarned.toLocaleString()}**\n${earnedBreakdown}`).setHeader(
+      "workers",
+      message.author.avatarURL()
+    );
+
+    return send({ embeds: [embed] });
   }
 }
 
