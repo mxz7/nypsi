@@ -112,7 +112,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     let baseCost = _.clone(baseUpgrades[upgradeId]).base_cost;
 
-    baseCost = baseCost * (baseWorkers[workerId].prestige_requirement - 0.5);
+    baseCost =
+      baseCost *
+      (baseWorkers[workerId].prestige_requirement >= 4
+        ? baseWorkers[workerId].prestige_requirement / 2
+        : baseWorkers[workerId].prestige_requirement - 0.5);
 
     const cost = baseCost + baseCost * owned;
 
