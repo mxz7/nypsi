@@ -6,7 +6,7 @@
       "upgrades": 2,
       "effect": 0.25,
       "stack_limit": 25,
-      "base_cost": 30000
+      "base_cost": 20000
     },
     "premium_quality": {
       "id": "premium_quality",
@@ -14,7 +14,7 @@
       "upgrades": 0,
       "effect": 0.25,
       "stack_limit": 50,
-      "base_cost": 55000
+      "base_cost": 40000
     },
     "immigrant_farmers": {
       "id": "immigrant_farmers",
