@@ -65,14 +65,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (args.length == 0 || !args[0]) {
     const embed = new CustomEmbed(message.member)
       .setHeader("ban help")
-      .addField("usage", `${prefix}ban <@user(s)> (reason) [-s] [-k]`)
+      .addField("usage", `${prefix}ban <@user(s)> (reason) [-s]`)
       .addField(
         "help",
         "**<>** required | **()** optional | **[]** parameter\n" +
           "**<@users>** you can ban one or more members in one command (must tag them)\n" +
           "**(reason)** reason for the ban, will be given to all banned members\n" +
-          "**[-s]** if used, command message will be deleted and the output will be sent to moderator as a DM if possible\n" +
-          "**[-k]** if used, messages from banned members wont be deleted"
+          "**[-s]** if used, command message will be deleted and the output will be sent to moderator as a DM if possible"
       )
       .addField(
         "examples",
@@ -113,7 +112,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const members = message.mentions.members;
   let reason = message.member.user.tag + ": ";
-  let days = 1;
   let unbanDate: Date;
   let temporary = false;
   let duration;
@@ -140,10 +138,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     reason = reason + "no reason given";
   }
 
-  if (reason.includes("-k")) {
-    days = 0;
-  }
-
   let count = 0;
   const failed = [];
   let fail = false;
@@ -151,7 +145,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (idOnly) {
     await message.guild.members
       .ban(id, {
-        deleteMessageDays: days,
         reason: reason,
       })
       .then((banned) => {
@@ -191,7 +184,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       await message.guild.members
         .ban(member, {
-          deleteMessageDays: days,
           reason: reason,
         })
         .then(() => {
