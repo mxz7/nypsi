@@ -173,7 +173,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     for (const worker of Object.keys(baseWorkers)) {
       options.push(
         new SelectMenuOptionBuilder()
-          .setLabel(`${baseWorkers[worker].name}${baseWorkers[worker].prestige_requirement > prestige ? " [locked]" : ""}`)
+          .setLabel(
+            `${baseWorkers[worker].name}${
+              baseWorkers[worker].prestige_requirement > prestige ? " [locked]" : isOwned(worker) ? " [owned]" : ""
+            }`
+          )
           .setValue(baseWorkers[worker].id)
           .setDefault(baseWorkers[worker].id == defaultWorker ? true : false)
       );
