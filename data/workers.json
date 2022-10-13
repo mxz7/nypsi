@@ -20,7 +20,7 @@
       "id": "immigrant_farmers",
       "name": "immigrant farmers",
       "upgrades": 1,
-      "effect": 0.1,
+      "effect": 0.2,
       "stack_limit": 20,
       "base_cost": 30000,
       "for": "potato_farmer"
@@ -29,7 +29,7 @@
       "id": "bait",
       "name": "bait",
       "upgrades": 1,
-      "effect": 0.1,
+      "effect": 0.2,
       "stack_limit": 20,
       "base_cost": 30000,
       "for": "fisherman"
@@ -38,7 +38,7 @@
       "id": "sweatshop_workers",
       "name": "sweatshop workers",
       "upgrades": 1,
-      "effect": 0.1,
+      "effect": 0.2,
       "stack_limit": 20,
       "base_cost": 30000,
       "for": "tailor"
@@ -47,7 +47,7 @@
       "id": "ipad_kids",
       "name": "ipad kids",
       "upgrades": 1,
-      "effect": 0.1,
+      "effect": 0.2,
       "stack_limit": 20,
       "base_cost": 30000,
       "for": "mcdonalds"
@@ -56,7 +56,7 @@
       "id": "warehouse_workers",
       "name": "warehouse workers",
       "upgrades": 1,
-      "effect": 0.1,
+      "effect": 0.2,
       "stack_limit": 20,
       "base_cost": 30000,
       "for": "amazon"
