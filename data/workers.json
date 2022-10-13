@@ -12,7 +12,7 @@
       "id": "premium_quality",
       "name": "premium quality",
       "upgrades": 0,
-      "effect": 0.25,
+      "effect": 0.5,
       "stack_limit": 50,
       "base_cost": 40000
     },
@@ -81,7 +81,7 @@
       "id": "underage_workers",
       "name": "underage workers",
       "upgrades": 0,
-      "effect": 0.5,
+      "effect": 0.75,
       "stack_limit": 10,
       "for": "amazon"
     }
