@@ -6,7 +6,7 @@
       "upgrades": 2,
       "effect": 0.25,
       "stack_limit": 25,
-      "base_cost": 20000
+      "base_cost": 10000
     },
     "premium_quality": {
       "id": "premium_quality",
@@ -14,7 +14,7 @@
       "upgrades": 0,
       "effect": 0.5,
       "stack_limit": 50,
-      "base_cost": 40000
+      "base_cost": 15000
     },
     "immigrant_farmers": {
       "id": "immigrant_farmers",
@@ -22,7 +22,7 @@
       "upgrades": 1,
       "effect": 0.1,
       "stack_limit": 20,
-      "base_cost": 50000,
+      "base_cost": 30000,
       "for": "potato_farmer"
     },
     "bait": {
@@ -31,7 +31,7 @@
       "upgrades": 1,
       "effect": 0.1,
       "stack_limit": 20,
-      "base_cost": 50000,
+      "base_cost": 30000,
       "for": "fisherman"
     },
     "sweatshop_workers": {
@@ -40,7 +40,7 @@
       "upgrades": 1,
       "effect": 0.1,
       "stack_limit": 20,
-      "base_cost": 50000,
+      "base_cost": 30000,
       "for": "tailor"
     },
     "ipad_kids": {
@@ -49,7 +49,7 @@
       "upgrades": 1,
       "effect": 0.1,
       "stack_limit": 20,
-      "base_cost": 50000,
+      "base_cost": 30000,
       "for": "mcdonalds"
     },
     "warehouse_workers": {
@@ -58,7 +58,7 @@
       "upgrades": 1,
       "effect": 0.1,
       "stack_limit": 20,
-      "base_cost": 50000,
+      "base_cost": 30000,
       "for": "amazon"
     },
     "nasa_computers": {
