@@ -19,6 +19,7 @@ export interface Item {
     effect: number;
     time: number;
   };
+  worker_upgrade_id: string;
 }
 
 export interface LotteryTicket {
