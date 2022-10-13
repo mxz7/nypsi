@@ -224,7 +224,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (!userWorkers.find((w) => upgrade.for.includes(w.workerId))) {
       return send({
-        embeds: [new ErrorEmbed(`this upgrade requires you to have the **${upgrade.for}**`)],
+        embeds: [new ErrorEmbed(`this upgrade requires you to have **${upgrade.for}**`)],
       });
     }
 
