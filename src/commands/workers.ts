@@ -118,7 +118,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const displayWorker = async (worker: Worker) => {
       const embed = new CustomEmbed(message.member);
 
-      embed.setTitle(`${worker.name}${prestige < worker.prestige_requirement ? " [locked]" : ""}`);
+      embed.setHeader(
+        `${worker.name}${prestige < worker.prestige_requirement ? " [locked]" : ""}`,
+        message.author.avatarURL()
+      );
 
       const row = new ActionRowBuilder<MessageActionRowComponentBuilder>();
 
