@@ -13,8 +13,16 @@ import { hasPadlock, increaseBaseBankStorage, setPadlock } from "../utils/functi
 import { addBooster, getBoosters } from "../utils/functions/economy/boosters";
 import { getInventory, openCrate, setInventory } from "../utils/functions/economy/inventory";
 import { addItemUse } from "../utils/functions/economy/stats";
-import { addHandcuffs, createUser, getItems, isHandcuffed, userExists } from "../utils/functions/economy/utils";
-import { addWorkerUpgrade, getBaseUpgrades, getBaseWorkers, getWorkers } from "../utils/functions/economy/workers";
+import {
+  addHandcuffs,
+  createUser,
+  getBaseUpgrades,
+  getBaseWorkers,
+  getItems,
+  isHandcuffed,
+  userExists,
+} from "../utils/functions/economy/utils";
+import { addWorkerUpgrade, getWorkers } from "../utils/functions/economy/workers";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
 import { getDmSettings } from "../utils/functions/users/notifications";
