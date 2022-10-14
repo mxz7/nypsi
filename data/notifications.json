@@ -2,12 +2,12 @@
   "rob": {
     "id": "rob",
     "name": "robbery notifications",
-    "description": "get dm notifications when someone attempts to rob you"
+    "description": "get a dm when someone attempts to rob you"
   },
   "lottery": {
     "id": "lottery",
     "name": "lottery notifications",
-    "description": "get dm notifications when you win the lottery"
+    "description": "get a dm when you win the lottery"
   },
   "premium": {
     "id": "premium",
@@ -17,36 +17,36 @@
   "auction": {
     "id": "auction",
     "name": "auction notifications",
-    "description": "get dm notifications when someone buys your auctions"
+    "description": "get a dm when someone buys your auctions"
   },
   "vote": {
     "id": "vote",
     "name": "vote notificatons",
-    "description": "get a dm when you vote showing your rewards for voting"
+    "description": "get a dm when you vote to show your rewards for voting"
   },
   "vote_reminder": {
     "id": "vote_reminder",
     "name": "vote reminders",
-    "description": "get a dm notification when you are able to vote again"
+    "description": "receive a reminder in your dms when you are able to vote again"
   },
   "worker": {
     "id": "worker",
     "name": "worker notifications",
-    "description": "get a dm notification when one of your workers has reached full capacity"
+    "description": "get a dm when one of your workers has reached full capacity"
   },
   "booster": {
     "id": "booster",
     "name": "booster notifications",
-    "description": "get a dm notification when one or more of your boosters have expired"
+    "description": "get a dm when one or more of your boosters have expired"
   },
   "payment": {
     "id": "payment",
     "name": "payment notifications",
-    "description": "get a dm notification when someone sends you money or gives you an item"
+    "description": "get a dm when someone sends you money or gives you an item"
   },
   "other": {
     "id": "other",
     "name": "miscellaneous",
-    "description": "get a dm notification for miscellaneous things, such as guild level upgrades"
+    "description": "get a dm for miscellaneous things, such as guild level upgrades"
   }
 }
