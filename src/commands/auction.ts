@@ -756,9 +756,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       current = await addToAuctionWatch(message.member, selected.id);
     }
 
-    const embed = new CustomEmbed(message.member, desc)
-      .setHeader("auction watch", message.author.avatarURL())
-      .addField("currently watching", current.map((i) => `${items[i].emoji} ${items[i].name}`).join("\n"));
+    const embed = new CustomEmbed(message.member, desc).setHeader("auction watch", message.author.avatarURL());
+
+    if (current.length > 0) {
+      embed.addField("currently watching", current.map((i) => `${items[i].emoji} ${items[i].name}`).join("\n"));
+    }
 
     return send({ embeds: [embed] });
   }
