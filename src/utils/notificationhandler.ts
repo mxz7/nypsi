@@ -13,6 +13,7 @@ export async function doDmQueueInterval(manager: Manager) {
       content: item.content,
       memberId: item.memberId,
       embed: item.embed,
+      components: item.components,
     });
   }, 10000);
 }
