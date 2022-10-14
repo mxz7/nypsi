@@ -58,7 +58,11 @@ cmd.slashData
       .setName("watch")
       .setDescription("receive notifications when an auction is created for chosen items")
       .addStringOption((option) =>
-        option.setName("item-global").setDescription("item you want to toggle on/off").setRequired(false)
+        option
+          .setName("item-global")
+          .setDescription("item you want to toggle on/off")
+          .setRequired(false)
+          .setAutocomplete(true)
       )
   );
 
