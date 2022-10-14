@@ -43,5 +43,10 @@
     "id": "payment",
     "name": "payment notifications",
     "description": "get a dm notification when someone sends you money or gives you an item"
+  },
+  "other": {
+    "id": "other",
+    "name": "miscellaneous",
+    "description": "get a dm notification for miscellaneous things, such as guild level upgrades"
   }
 }

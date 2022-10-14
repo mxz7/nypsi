@@ -42,6 +42,7 @@ model DMSettings {
   worker        Boolean @default(true)
   booster       Boolean @default(true)
   payment       Boolean @default(true)
+  other         Boolean @default(true)
 
   user User @relation(fields: [userId], references: [id])
 }
