@@ -27,6 +27,24 @@ model User {
   Survey             Survey[]
   CommandUse         CommandUse[]
   Achievements       Achievements[]
+  DMSettings         DMSettings?
+}
+
+model DMSettings {
+  userId String @id
+
+  rob           Boolean @default(true)
+  lottery       Boolean @default(true)
+  premium       Boolean @default(true)
+  auction       Boolean @default(true)
+  vote          Boolean @default(true)
+  vote_reminder Boolean @default(false)
+  worker        Boolean @default(true)
+  booster       Boolean @default(true)
+  payment       Boolean @default(true)
+  other         Boolean @default(true)
+
+  user User @relation(fields: [userId], references: [id])
 }
 
 model CommandUse {
@@ -59,7 +77,6 @@ model Economy {
   xp          Int     @default(0)
   prestige    Int     @default(0)
   padlock     Boolean @default(false)
-  dms         Boolean @default(true)
 
   lastDaily DateTime @default("1970-01-01T14:21:00+02:00")
   lastVote  DateTime
@@ -70,6 +87,8 @@ model Economy {
   workers   Json @default("{}")
 
   banned DateTime?
+
+  auction_watch String[]
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String @id
@@ -225,6 +244,7 @@ model Guild {
   percentMatch     Int      @default(75)
   prefix           String   @default("$")
   createdAt        DateTime @default(now())
+  slash_only       Boolean  @default(false)
 
   GuildChristmas GuildChristmas?
   GuildCounter   GuildCounter?

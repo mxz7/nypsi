@@ -2,6 +2,8 @@ import { GuildMember } from "discord.js";
 import prisma from "../../database/database";
 import redis from "../../database/redis";
 import { Booster } from "../../models/Economy";
+import { CustomEmbed } from "../../models/EmbedBuilders";
+import { getDmSettings } from "../users/notifications";
 import { getItems } from "./utils";
 import _ = require("lodash");
 
@@ -12,6 +14,8 @@ export async function getBoosters(member: GuildMember | string): Promise<Map<str
   } else {
     id = member;
   }
+
+  const expired = new Map<string, number>();
 
   const cache = await redis.get(`cache:economy:boosters:${id}`);
 
@@ -31,12 +35,53 @@ export async function getBoosters(member: GuildMember | string): Promise<Map<str
             },
           });
 
+          if (expired.has(booster.boosterId)) {
+            expired.set(booster.boosterId, expired.get(booster.boosterId) + 1);
+          } else {
+            expired.set(booster.boosterId, 1);
+          }
+
           await redis.del(`cache:economy:boosters:${id}`);
 
           boosters.splice(boosters.indexOf(booster), 1);
           map.set(key, boosters);
         }
       }
+    }
+
+    if (expired.size != 0 && (await getDmSettings(id)).booster) {
+      const embed = new CustomEmbed().setColor("#36393f");
+
+      let desc = "";
+      let text = "";
+      let total = 0;
+      const items = getItems();
+
+      for (const expiredBoosterId of Array.from(expired.keys())) {
+        total += expired.get(expiredBoosterId);
+
+        desc += `\`${expired.get(expiredBoosterId)}x\` ${items[expiredBoosterId].emoji} ${items[expiredBoosterId].name}`;
+      }
+
+      embed.setHeader(`expired booster${total > 1 ? "s" : ""}:`);
+      embed.setDescription(desc);
+
+      if (total == 1) {
+        text = `your ${items[Array.from(expired.keys())[0]].emoji} ${
+          items[Array.from(expired.keys())[0]].name
+        } booster has expired`;
+      } else {
+        text = `${total} of your boosters have expired`;
+      }
+
+      await redis.lpush(
+        "nypsi:dm:queue",
+        JSON.stringify({
+          memberId: id,
+          embed: embed,
+          content: text,
+        })
+      );
     }
 
     return map;
@@ -63,6 +108,12 @@ export async function getBoosters(member: GuildMember | string): Promise<Map<str
         },
       });
 
+      if (expired.has(booster.boosterId)) {
+        expired.set(booster.boosterId, expired.get(booster.boosterId) + 1);
+      } else {
+        expired.set(booster.boosterId, 1);
+      }
+
       continue;
     }
 
@@ -85,6 +136,41 @@ export async function getBoosters(member: GuildMember | string): Promise<Map<str
         },
       ]);
     }
+  }
+
+  if (expired.size != 0 && (await getDmSettings(id)).booster) {
+    const embed = new CustomEmbed().setColor("#36393f");
+
+    let desc = "";
+    let text = "";
+    let total = 0;
+    const items = getItems();
+
+    for (const expiredBoosterId of Array.from(expired.keys())) {
+      total += expired.get(expiredBoosterId);
+
+      desc += `\`${expired.get(expiredBoosterId)}x\` ${items[expiredBoosterId].emoji} ${items[expiredBoosterId].name}`;
+    }
+
+    embed.setHeader(`expired booster${total > 1 ? "s" : ""}:`);
+    embed.setDescription(desc);
+
+    if (total == 1) {
+      text = `your ${items[Array.from(expired.keys())[0]].emoji} ${
+        items[Array.from(expired.keys())[0]].name
+      } booster has expired`;
+    } else {
+      text = `${total} of your boosters have expired`;
+    }
+
+    await redis.lpush(
+      "nypsi:dm:queue",
+      JSON.stringify({
+        memberId: id,
+        embed: embed,
+        content: text,
+      })
+    );
   }
 
   await redis.set(`cache:economy:boosters:${id}`, JSON.stringify(Object.fromEntries(map)));

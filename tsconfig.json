@@ -1,12 +1,12 @@
 {
-    "compilerOptions": {
-        "rootDir": "./src",
-        "outDir": "./dist",
-        "target": "ESNext",
-        "module": "commonjs",
-        "allowJs": true,
-        "strictFunctionTypes": true,
-        "skipLibCheck": true,
-        "noImplicitAny": true
-    },
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "target": "ESNext",
+    "module": "commonjs",
+    "allowJs": true,
+    "strictFunctionTypes": true,
+    "skipLibCheck": true,
+    "noImplicitAny": true
+  }
 }

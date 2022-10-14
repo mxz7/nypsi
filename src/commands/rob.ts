@@ -6,10 +6,11 @@ import { getBalance, hasPadlock, setPadlock, updateBalance } from "../utils/func
 import { addToGuildXP, getGuildByUser } from "../utils/functions/economy/guilds";
 import { getInventory, setInventory } from "../utils/functions/economy/inventory";
 import { addItemUse, addRob } from "../utils/functions/economy/stats";
-import { createUser, getDMsEnabled, isEcoBanned, userExists } from "../utils/functions/economy/utils";
+import { createUser, isEcoBanned, userExists } from "../utils/functions/economy/utils";
 import { calcEarnedXp, getXp, updateXp } from "../utils/functions/economy/xp";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
+import { getDmSettings } from "../utils/functions/users/notifications";
 import { NypsiClient } from "../utils/models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
@@ -306,7 +307,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     setTimeout(async () => {
       await edit({ embeds: [embed2] }, m);
 
-      if (await getDMsEnabled(target)) {
+      if ((await getDmSettings(target)).rob) {
         if (robberySuccess) {
           await addRob(message.member, true);
           await target.send({ content: "you have been robbed!!", embeds: [embed3] }).catch(() => {});

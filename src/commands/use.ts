@@ -18,7 +18,6 @@ import {
   createUser,
   getBaseUpgrades,
   getBaseWorkers,
-  getDMsEnabled,
   getItems,
   isHandcuffed,
   userExists,
@@ -26,6 +25,7 @@ import {
 import { addWorkerUpgrade, getWorkers } from "../utils/functions/economy/workers";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
+import { getDmSettings } from "../utils/functions/users/notifications";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
@@ -389,7 +389,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             "your money is no longer protected by a padlock"
         );
 
-        if (await getDMsEnabled(lockPickTarget)) {
+        if ((await getDmSettings(lockPickTarget)).rob) {
           await lockPickTarget.send({ embeds: [targetEmbed] });
         }
         embed.setDescription(`picking **${lockPickTarget.user.tag}**'s padlock...`);

@@ -4,8 +4,9 @@ import redis from "../../database/redis";
 import { MStoTime } from "../../functions/date";
 import { addProgress } from "../../functions/economy/achievements";
 import { getBalance, updateBalance } from "../../functions/economy/balance";
-import { getDMsEnabled, lotteryTicketPrice } from "../../functions/economy/utils";
+import { lotteryTicketPrice } from "../../functions/economy/utils";
 import { addToNypsiBank, getTax } from "../../functions/tax";
+import { getDmSettings } from "../../functions/users/notifications";
 import { logger } from "../../logger";
 import { LotteryTicket } from "../../models/Economy";
 import { CustomEmbed } from "../../models/EmbedBuilders";
@@ -76,7 +77,7 @@ async function doLottery(client: Client) {
 
   await hook.send({ embeds: [embed] });
 
-  if (await getDMsEnabled(user.id)) {
+  if ((await getDmSettings(user.id)).lottery) {
     embed.setTitle("you have won the lottery!");
     embed.setDescription(`you have won a total of $**${total.toLocaleString()}**\n\nyour winning ticket was #${chosen.id}`);
     embed.setColor("#111111");

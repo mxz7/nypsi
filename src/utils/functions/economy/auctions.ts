@@ -1,8 +1,11 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, GuildMember, MessageActionRowComponentBuilder } from "discord.js";
 import prisma from "../../database/database";
+import redis from "../../database/redis";
 import { NypsiClient } from "../../models/Client";
 import { CustomEmbed } from "../../models/EmbedBuilders";
+import { getDmSettings } from "../users/notifications";
 import { getItems } from "./utils";
+import ms = require("ms");
 
 export async function getAuctions(member: GuildMember | string) {
   let id: string;
@@ -132,6 +135,8 @@ export async function createAuction(member: GuildMember, itemId: string, itemAmo
     },
   });
 
+  checkWatchers(itemId, messageUrl, member.user.id);
+
   return messageUrl;
 }
 
@@ -233,4 +238,85 @@ export async function getAuctionAverage(item: string) {
   const avg = sum / costs.length || 0;
 
   return avg;
+}
+
+export async function addToAuctionWatch(member: GuildMember, itemName: string) {
+  return await prisma.economy
+    .update({
+      where: {
+        userId: member.user.id,
+      },
+      data: {
+        auction_watch: { push: itemName },
+      },
+      select: {
+        auction_watch: true,
+      },
+    })
+    .then((q) => q.auction_watch);
+}
+
+export async function setAuctionWatch(member: GuildMember, items: string[]) {
+  return await prisma.economy
+    .update({
+      where: {
+        userId: member.user.id,
+      },
+      data: {
+        auction_watch: items,
+      },
+      select: {
+        auction_watch: true,
+      },
+    })
+    .then((q) => q.auction_watch);
+}
+
+export async function getAuctionWatch(member: GuildMember) {
+  return await prisma.economy
+    .findUnique({
+      where: {
+        userId: member.user.id,
+      },
+      select: {
+        auction_watch: true,
+      },
+    })
+    .then((q) => q.auction_watch);
+}
+
+async function checkWatchers(itemName: string, messageUrl: string, creatorId: string) {
+  const users = await prisma.economy
+    .findMany({
+      where: {
+        AND: [{ auction_watch: { has: itemName } }, { userId: { not: creatorId } }],
+      },
+      select: {
+        userId: true,
+      },
+    })
+    .then((q) => q.map((q) => q.userId));
+
+  const payload = {
+    memberId: "boob",
+    embed: new CustomEmbed()
+      .setColor("#36393f")
+      .setDescription(`an auction has started for ${getItems()[itemName].emoji} **${getItems()[itemName].name}**`)
+      .toJSON(),
+    components: new ActionRowBuilder<MessageActionRowComponentBuilder>()
+      .addComponents(new ButtonBuilder().setStyle(ButtonStyle.Link).setURL(messageUrl).setLabel("jump"))
+      .toJSON(),
+  };
+
+  for (const userId of users) {
+    if (!(await getDmSettings(userId)).auction) continue;
+
+    if (await redis.exists(`nypsi:auctionwatch:cooldown:${userId}`)) continue;
+
+    payload.memberId = userId;
+
+    await redis.lpush("nypsi:dm:queue", JSON.stringify(payload));
+    await redis.set(`nypsi:auctionwatch:cooldown:${userId}`, "true");
+    await redis.expire(`nypsi:auctionwatch:cooldown:${userId}`, ms("30 minutes") / 1000);
+  }
 }
