@@ -37,3 +37,16 @@ export async function getDmSettings(member: GuildMember | string) {
 
   return query;
 }
+
+export async function updateDmSettings(member: GuildMember, data: DMSettings) {
+  const query = await prisma.dMSettings.update({
+    where: {
+      userId: member.user.id,
+    },
+    data,
+  });
+
+  await redis.del(`cache:dmsettings:${member.user.id}`);
+
+  return query;
+}
