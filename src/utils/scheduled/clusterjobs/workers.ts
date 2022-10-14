@@ -1,6 +1,7 @@
 import prisma from "../../database/database";
 import redis from "../../database/redis";
-import { calcWorkerValues, getBaseWorkers, getWorkers } from "../../functions/economy/workers";
+import { getBaseWorkers } from "../../functions/economy/utils";
+import { calcWorkerValues, getWorkers } from "../../functions/economy/workers";
 import { getDmSettings } from "../../functions/users/notifications";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 import ms = require("ms");
