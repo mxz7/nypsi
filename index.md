@@ -42,6 +42,14 @@ if you need further help, feel free to join the [support server](https://discord
 the karmashop (`$karmashop`) opens around once every month. everyone will be notified in the official nypsi server
 (`$support`) when it is opened. make sure to join to stay updated (:
 
+### how do i get vote reminders
+
+use the below command to open your notification settings. there will be a 'vote reminders' option for you to enable
+
+```
+/settings me notifications
+```
+
 ### how do i disable certain commands
 
 in order to disable a command, run the command below.
