@@ -24,6 +24,7 @@ import { getKarmaShopItems, isKarmaShopOpen } from "../utils/functions/karma/kar
 import requestDM from "../utils/functions/requestdm";
 import { getSurveyByMessageId } from "../utils/functions/surveys";
 import { addToNypsiBank, getTax } from "../utils/functions/tax";
+import { getDmSettings } from "../utils/functions/users/notifications";
 import { logger } from "../utils/logger";
 import { NypsiClient } from "../utils/models/Client";
 import { createNypsiInteraction, NypsiCommandInteraction } from "../utils/models/Command";
@@ -259,22 +260,24 @@ export default async function interactionCreate(interaction: Interaction) {
 
         const items = getItems();
 
-        const embedDm = new CustomEmbed()
-          .setColor("#36393f")
-          .setDescription(
-            `your auction for ${auction.itemAmount}x ${items[auction.itemName].emoji} ${
-              items[auction.itemName].name
-            } has been bought by ${interaction.user.username} for $**${Math.floor(
-              Number(auction.bin) - taxedAmount
-            ).toLocaleString()}** (${(tax * 100).toFixed(1)}% tax)`
-          );
+        if ((await getDmSettings(auction.ownerId)).auction) {
+          const embedDm = new CustomEmbed()
+            .setColor("#36393f")
+            .setDescription(
+              `your auction for ${auction.itemAmount}x ${items[auction.itemName].emoji} ${
+                items[auction.itemName].name
+              } has been bought by ${interaction.user.username} for $**${Math.floor(
+                Number(auction.bin) - taxedAmount
+              ).toLocaleString()}** (${(tax * 100).toFixed(1)}% tax)`
+            );
 
-        await requestDM({
-          client: interaction.client as NypsiClient,
-          memberId: auction.ownerId,
-          content: "your auction has been bought",
-          embed: embedDm,
-        });
+          await requestDM({
+            client: interaction.client as NypsiClient,
+            memberId: auction.ownerId,
+            content: "your auction has been bought",
+            embed: embedDm,
+          });
+        }
 
         const embed = new EmbedBuilder(interaction.message.embeds[0].data);
 

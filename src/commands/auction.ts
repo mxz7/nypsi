@@ -19,6 +19,7 @@ import { getInventory, setInventory } from "../utils/functions/economy/inventory
 import { formatBet, getItems, userExists } from "../utils/functions/economy/utils";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import requestDM from "../utils/functions/requestdm";
+import { getDmSettings } from "../utils/functions/users/notifications";
 import { logger } from "../utils/logger";
 import { NypsiClient } from "../utils/models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
@@ -524,20 +525,22 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await setInventory(auction.ownerId, inventory);
 
-    const embed = new CustomEmbed().setColor("#36393f");
+    if ((await getDmSettings(auction.ownerId)).auction) {
+      const embed = new CustomEmbed().setColor("#36393f");
 
-    embed.setDescription(
-      `your auction for ${auction.itemAmount}x ${items[auction.itemName].emoji} ${
-        items[auction.itemName].name
-      } has been removed by a staff member. you have been given back your item${auction.itemAmount > 1 ? "s" : ""}`
-    );
+      embed.setDescription(
+        `your auction for ${auction.itemAmount}x ${items[auction.itemName].emoji} ${
+          items[auction.itemName].name
+        } has been removed by a staff member. you have been given back your item${auction.itemAmount > 1 ? "s" : ""}`
+      );
 
-    await requestDM({
-      client: message.client as NypsiClient,
-      content: "your auction has been removed by a staff member",
-      memberId: auction.ownerId,
-      embed: embed,
-    });
+      await requestDM({
+        client: message.client as NypsiClient,
+        content: "your auction has been removed by a staff member",
+        memberId: auction.ownerId,
+        embed: embed,
+      });
+    }
 
     logger.info(`auction ${auction.id} by ${auction.ownerId} deleted by ${message.author.tag} (${message.author.id})`);
     return;

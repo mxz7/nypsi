@@ -3,6 +3,7 @@ import { MStoTime } from "../../functions/date";
 import { getInventory, setInventory } from "../../functions/economy/inventory";
 import { userExists } from "../../functions/economy/utils";
 import requestDM from "../../functions/requestdm";
+import { getDmSettings } from "../../functions/users/notifications";
 import { logger } from "../../logger";
 import { NypsiClient } from "../../models/Client";
 import { CustomEmbed } from "../../models/EmbedBuilders";
@@ -40,12 +41,14 @@ async function doCrates(client: NypsiClient) {
 
       embed.setDescription("you have received 1 **basic crate** 🙂");
 
-      await requestDM({
-        client: client,
-        memberId: member.userId,
-        content: "enjoy your weekly crate (:",
-        embed: embed,
-      }).catch(() => {});
+      if ((await getDmSettings(member.userId)).premium) {
+        await requestDM({
+          client: client,
+          memberId: member.userId,
+          content: "enjoy your weekly crate (:",
+          embed: embed,
+        }).catch(() => {});
+      }
     } else if (member.level == 3) {
       if (inventory["basic_crate"]) {
         inventory["basic_crate"] += 2;
@@ -57,12 +60,14 @@ async function doCrates(client: NypsiClient) {
 
       embed.setDescription("you have received 2 **basic crates** 🙂");
 
-      await requestDM({
-        client: client,
-        memberId: member.userId,
-        content: "enjoy your weekly crates (:",
-        embed: embed,
-      }).catch(() => {});
+      if ((await getDmSettings(member.userId)).premium) {
+        await requestDM({
+          client: client,
+          memberId: member.userId,
+          content: "enjoy your weekly crates (:",
+          embed: embed,
+        }).catch(() => {});
+      }
     } else if (member.level == 4) {
       if (inventory["basic_crate"]) {
         inventory["basic_crate"] += 2;
@@ -80,12 +85,14 @@ async function doCrates(client: NypsiClient) {
 
       embed.setDescription("you have received 2 **basic crates** and 1 **69420 crate** 🙂");
 
-      await requestDM({
-        client: client,
-        memberId: member.userId,
-        content: "enjoy your weekly crates (:",
-        embed: embed,
-      }).catch(() => {});
+      if ((await getDmSettings(member.userId)).premium) {
+        await requestDM({
+          client: client,
+          memberId: member.userId,
+          content: "enjoy your weekly crates (:",
+          embed: embed,
+        }).catch(() => {});
+      }
     }
 
     await setInventory(member.userId, inventory);

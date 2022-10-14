@@ -1,11 +1,7 @@
-*.json
 *.yml
 
 # *.md
 
 !lists.json
-!items.json
-!karmashop.json
-!achievements.json
-!workers.json
+
 dist/

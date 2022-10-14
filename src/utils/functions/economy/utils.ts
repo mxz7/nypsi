@@ -216,39 +216,6 @@ export function formatNumber(number: string | number): number | void {
   return Math.floor(parseFloat(number.toString()));
 }
 
-export async function getDMsEnabled(member: GuildMember | string): Promise<boolean> {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
-
-  if (!(await userExists(id))) await createUser(id);
-
-  const query = await prisma.economy.findUnique({
-    where: {
-      userId: id,
-    },
-    select: {
-      dms: true,
-    },
-  });
-
-  return query.dms;
-}
-
-export async function setDMsEnabled(member: GuildMember, value: boolean) {
-  await prisma.economy.update({
-    where: {
-      userId: member.user.id,
-    },
-    data: {
-      dms: value,
-    },
-  });
-}
-
 export async function isEcoBanned(id: string) {
   if (await redis.exists(`cache:economy:banned:${id}`)) {
     const res = (await redis.get(`cache:economy:banned:${id}`)) === "t" ? true : false;
@@ -339,7 +306,7 @@ export async function reset() {
   const deleted = await prisma.economy
     .deleteMany({
       where: {
-        AND: [{ prestige: 0 }, { lastVote: { lt: new Date(Date.now() - ms("12 hours")) } }, { dms: true }],
+        AND: [{ prestige: 0 }, { lastVote: { lt: new Date(Date.now() - ms("12 hours")) } }],
       },
     })
     .then((r) => r.count);

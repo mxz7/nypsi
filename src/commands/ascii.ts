@@ -1,7 +1,6 @@
 import { CommandInteraction, Message } from "discord.js";
 import * as ascii from "figlet";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import { getDMsEnabled } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
@@ -10,12 +9,6 @@ const cmd = new Command("ascii", "create ascii text", Categories.FUN);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   const prefix = await getPrefix(message.guild);
-
-  if (!(await getDMsEnabled(message.member))) {
-    return message.channel.send({
-      embeds: [new ErrorEmbed(`you have opted out of bot dms, use ${prefix}dms to enable this command`)],
-    });
-  }
 
   if (await onCooldown(cmd.name, message.member)) {
     const embed = await getResponse(cmd.name, message.member);
