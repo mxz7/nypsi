@@ -64,9 +64,8 @@ async function doWorkerThing() {
       data.content = "all of your workers are full";
       data.embed = new CustomEmbed().setDescription("all of your workers are full").setColor("#36393f");
     } else if (full.length == 1) {
-      data.content = `your ${getBaseWorkers()[full[0]].name} worker is full`;
       data.embed = new CustomEmbed()
-        .setDescription(`your ${getBaseWorkers()[full[0]].name} worker is full`)
+        .setDescription(`your ${getBaseWorkers()[full[0]].item_emoji} ${getBaseWorkers()[full[0]].name} is full`)
         .setColor("#36393f");
     } else {
       data.content = `${full.length} of your workers are full`;
