@@ -61,17 +61,20 @@ async function doWorkerThing() {
 
     if (full.length == workers.length) {
       data.content = "all of your workers are full";
-      data.embed = new CustomEmbed().setDescription("all of your workers are full");
+      data.embed = new CustomEmbed().setDescription("all of your workers are full").setColor("#36393f");
     } else if (full.length == 1) {
       data.content = `your ${getBaseWorkers()[full[0]].name} worker is full`;
-      data.embed = new CustomEmbed().setDescription(`your ${getBaseWorkers()[full[0]].name} worker is full`);
+      data.embed = new CustomEmbed()
+        .setDescription(`your ${getBaseWorkers()[full[0]].name} worker is full`)
+        .setColor("#36393f");
     } else {
       data.content = `${full.length} of your workers are full`;
       data.embed = new CustomEmbed()
         .setDescription(
           full.map((workerId) => `${getBaseWorkers()[workerId].item_emoji} ${getBaseWorkers()[workerId].name}`).join("\n")
         )
-        .setHeader("full workers:");
+        .setHeader("full workers:")
+        .setColor("#36393f");
     }
 
     await redis.lpush("nypsi:dm:queue", JSON.stringify(data));

@@ -29,7 +29,10 @@ import dayjs = require("dayjs");
 
   const data = {
     memberId: "boob",
-    embed: new CustomEmbed().setDescription("it has been more than 12 hours since you last voted").toJSON(),
+    embed: new CustomEmbed()
+      .setDescription("it has been more than 12 hours since you last voted")
+      .setColor("#36393f")
+      .toJSON(),
     components: new ActionRowBuilder<MessageActionRowComponentBuilder>()
       .addComponents(
         new ButtonBuilder()
