@@ -93,7 +93,7 @@ export default async function requestDM(options: RequestDMOptions): Promise<bool
       });
       return true;
     } else {
-      logger.error("failed to send DM");
+      logger.warn("failed to send DM");
       return false;
     }
   } else {
@@ -175,7 +175,7 @@ export default async function requestDM(options: RequestDMOptions): Promise<bool
       });
       return true;
     } else {
-      logger.error("failed to send DM");
+      logger.warn("failed to send DM");
       return false;
     }
   }
