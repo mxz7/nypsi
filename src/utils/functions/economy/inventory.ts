@@ -6,7 +6,6 @@ import { Item } from "../../models/Economy";
 import workerSort from "../../workers/sort";
 import { addProgress, getAllAchievements, setAchievementProgress } from "./achievements";
 import { getBalance, updateBalance } from "./balance";
-import { getPrestige } from "./prestige";
 import { addItemUse } from "./stats";
 import { createUser, getItems, userExists } from "./utils";
 import { getXp, updateXp } from "./xp";
@@ -223,24 +222,6 @@ async function checkCollectorAchievement(id: string, inventory: Inventory) {
   }
 }
 
-export async function getMaxBitcoin(member: GuildMember): Promise<number> {
-  const base = 10;
-
-  const prestige = await getPrestige(member);
-
-  const prestigeBonus = 5 * (prestige > 15 ? 15 : prestige);
-
-  let xpBonus = 1 * Math.floor((await getXp(member)) / 100);
-
-  if (xpBonus > 5) xpBonus = 5;
-
-  return base + prestigeBonus + xpBonus;
-}
-
-export async function getMaxEthereum(member: GuildMember): Promise<number> {
-  return (await getMaxBitcoin(member)) * 10;
-}
-
 export async function openCrate(member: GuildMember, item: Item): Promise<string[]> {
   const inventory = await getInventory(member);
   const items = getItems();
@@ -331,37 +312,7 @@ export async function openCrate(member: GuildMember, item: Item): Promise<string
 
     const chosen = crateItemsModified[Math.floor(Math.random() * crateItemsModified.length)];
 
-    if (chosen == "bitcoin") {
-      const owned = inventory["bitcoin"] || 0;
-      const max = await getMaxBitcoin(member);
-
-      if (owned + 1 > max) {
-        i--;
-        continue;
-      } else {
-        if (inventory[chosen]) {
-          inventory[chosen] += 1;
-        } else {
-          inventory[chosen] = 1;
-        }
-        names.push(`${items[chosen].emoji} ${items[chosen].name}`);
-      }
-    } else if (chosen == "ethereum") {
-      const owned = inventory["ethereum"] || 0;
-      const max = await getMaxEthereum(member);
-
-      if (owned + 1 > max) {
-        i--;
-        continue;
-      } else {
-        if (inventory[chosen]) {
-          inventory[chosen] += 1;
-        } else {
-          inventory[chosen] = 1;
-        }
-        names.push(`${items[chosen].emoji} ${items[chosen].name}`);
-      }
-    } else if (chosen.includes("money:") || chosen.includes("xp:")) {
+    if (chosen.includes("money:") || chosen.includes("xp:")) {
       if (chosen.includes("money:")) {
         const amount = parseInt(chosen.substr(6));
 

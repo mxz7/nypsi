@@ -3,7 +3,7 @@ import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
 import { getBoosters } from "../utils/functions/economy/boosters";
-import { getInventory, getMaxBitcoin, getMaxEthereum, setInventory } from "../utils/functions/economy/inventory";
+import { getInventory, setInventory } from "../utils/functions/economy/inventory";
 import { addItemUse } from "../utils/functions/economy/stats";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import { getXp, updateXp } from "../utils/functions/economy/xp";
@@ -197,37 +197,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (chosen == "nothing") continue;
 
-    if (chosen == "bitcoin") {
-      const owned = inventory["bitcoin"] || 0;
-      const max = await getMaxBitcoin(message.member);
-
-      if (owned + 1 > max) {
-        i--;
-        continue;
-      } else {
-        if (inventory[chosen]) {
-          inventory[chosen] += 1;
-        } else {
-          inventory[chosen] = 1;
-        }
-        foundItems.push(`${items[chosen].emoji} ${items[chosen].name}`);
-      }
-    } else if (chosen == "ethereum") {
-      const owned = inventory["ethereum"] || 0;
-      const max = await getMaxEthereum(message.member);
-
-      if (owned + 1 > max) {
-        i--;
-        continue;
-      } else {
-        if (inventory[chosen]) {
-          inventory[chosen] += 1;
-        } else {
-          inventory[chosen] = 1;
-        }
-        foundItems.push(`${items[chosen].emoji} ${items[chosen].name}`);
-      }
-    } else if (chosen.includes("money:") || chosen.includes("xp:")) {
+    if (chosen.includes("money:") || chosen.includes("xp:")) {
       if (chosen.includes("money:")) {
         const amount = parseInt(chosen.substr(6));
 
