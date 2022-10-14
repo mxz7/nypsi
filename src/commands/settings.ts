@@ -13,6 +13,7 @@ import {
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { calcMaxBet, getDefaultBet, getRequiredBetForXp, setDefaultBet } from "../utils/functions/economy/balance";
 import { createUser, formatNumber, userExists } from "../utils/functions/economy/utils";
+import { setSlashOnly } from "../utils/functions/guilds/slash";
 import { getDmSettings, getNotificationsData, updateDmSettings } from "../utils/functions/users/notifications";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
@@ -20,20 +21,34 @@ import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 const cmd = new Command("settings", "manage nypsi settings for your server and you", Categories.UTILITY);
 
 cmd.slashEnabled = true;
-cmd.slashData.addSubcommandGroup((me) =>
-  me
-    .addSubcommand((notifications) =>
-      notifications.setName("notifications").setDescription("manage your notifications settings")
-    )
-    .addSubcommand((defaultbet) =>
-      defaultbet
-        .setName("defaultbet")
-        .setDescription("set or reset your default bet")
-        .addStringOption((option) =>
-          option.setName("bet").setDescription("use reset to disable your default bet").setRequired(false)
-        )
-    )
-);
+cmd.slashData
+  .addSubcommandGroup((me) =>
+    me
+      .setName("me")
+      .setDescription("modify your own settings")
+      .addSubcommand((notifications) =>
+        notifications.setName("notifications").setDescription("manage your notifications settings")
+      )
+      .addSubcommand((defaultbet) =>
+        defaultbet
+          .setName("defaultbet")
+          .setDescription("set or reset your default bet")
+          .addStringOption((option) =>
+            option.setName("bet").setDescription("use reset to disable your default bet").setRequired(false)
+          )
+      )
+  )
+  .addSubcommandGroup((server) =>
+    server
+      .setName("server")
+      .setDescription("modify settings for the server")
+      .addSubcommand((slashonly) =>
+        slashonly
+          .setName("slash-only")
+          .setDescription("set the server to only use slash commands")
+          .addBooleanOption((option) => option.setName("value").setDescription("yes/no").setRequired(true))
+      )
+  );
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
@@ -246,6 +261,27 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({ embeds: [embed] });
   };
 
+  const slashOnly = async () => {
+    if (message instanceof Message) {
+      return await send({ embeds: [new ErrorEmbed("please use /settings server slash-only")] });
+    }
+
+    if (!message.isChatInputCommand()) return;
+
+    await setSlashOnly(message.guild, message.options.getBoolean("value"));
+
+    return await send({
+      embeds: [
+        new CustomEmbed(
+          message.member,
+          `✅ this server will now use ${
+            message.options.getBoolean("value") ? "slash commands only" : "slash commands and message commands"
+          }`
+        ),
+      ],
+    });
+  };
+
   if (args.length == 0) {
     return send({ embeds: [new CustomEmbed(message.member, "/settings me\n/settings server")] });
   } else if (args[0].toLowerCase() == "me") {
@@ -253,6 +289,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return showDmSettings();
     } else if (args[1].toLowerCase() == "defaultbet") {
       return defaultBet();
+    }
+  } else if (args[0].toLowerCase() == "server") {
+    if (args[1].toLowerCase() == "slash-only") {
+      return slashOnly();
     }
   }
 }
