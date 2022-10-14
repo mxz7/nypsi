@@ -1,11 +1,15 @@
 import {
   ActionRowBuilder,
+  BaseMessageOptions,
   ButtonBuilder,
   ButtonStyle,
   CommandInteraction,
   Interaction,
+  InteractionReplyOptions,
+  InteractionResponse,
   Message,
   MessageActionRowComponentBuilder,
+  MessageEditOptions,
 } from "discord.js";
 import * as fs from "fs/promises";
 import { addCooldown, onCooldown } from "../utils/cooldownhandler.js";
@@ -14,11 +18,13 @@ import { logger } from "../utils/logger";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
-const cmd = new Command("profile", "view your raw data stored in nypsi's database", Categories.INFO).setAliases([
+const cmd = new Command("requestdata", "view your raw data stored in nypsi's database", Categories.INFO).setAliases([
   "data",
   "viewdata",
   "showmemydatazuckerberg",
 ]);
+
+cmd.slashEnabled = true;
 
 const cooldown = new Set<string>();
 
@@ -28,13 +34,38 @@ BigInt.prototype.toJSON = function () {
 };
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
+  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
+    if (!(message instanceof Message)) {
+      if (message.deferred) {
+        await message.editReply(data);
+      } else {
+        await message.reply(data as InteractionReplyOptions);
+      }
+      const replyMsg = await message.fetchReply();
+      if (replyMsg instanceof Message) {
+        return replyMsg;
+      }
+    } else {
+      return await message.channel.send(data as BaseMessageOptions);
+    }
+  };
+
+  const edit = async (data: MessageEditOptions, msg: Message | InteractionResponse) => {
+    if (!(message instanceof Message)) {
+      return await message.editReply(data);
+    } else {
+      if (msg instanceof InteractionResponse) return;
+      return await msg.edit(data);
+    }
+  };
+
   if (cooldown.has(message.author.id)) {
-    return message.channel.send({ embeds: [new ErrorEmbed("please wait before doing that again")] });
+    return send({ embeds: [new ErrorEmbed("please wait before doing that again")], ephemeral: true });
   }
   if (await onCooldown(cmd.name, message.member)) {
     const embed = new ErrorEmbed("you have already received your data recently.");
 
-    return message.channel.send({ embeds: [embed] });
+    return send({ embeds: [embed], ephemeral: true });
   }
 
   const embed = new CustomEmbed(message.member).setHeader("data request", message.author.avatarURL());
@@ -51,7 +82,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     cooldown.delete(message.author.id);
   }, 60000);
 
-  const m = await message.channel.send({ embeds: [embed], components: [row] });
+  const m = await send({ embeds: [embed], components: [row] });
 
   const filter = (i: Interaction) => i.user.id == message.author.id;
   let fail = false;
@@ -240,7 +271,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       await addCooldown(cmd.name, message.member, 604800);
       embed.setDescription("check your direct messages");
     }
-    await m.edit({ embeds: [embed] });
+    await edit({ embeds: [embed] }, m);
     await fs.unlink(file);
   }
 }
