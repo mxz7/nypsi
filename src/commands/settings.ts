@@ -30,7 +30,7 @@ cmd.slashData.addSubcommandGroup((me) =>
         .setName("defaultbet")
         .setDescription("set or reset your default bet")
         .addStringOption((option) =>
-          option.setName("bet").setDescription("use reset to disable your default bet").setRequired(true)
+          option.setName("bet").setDescription("use reset to disable your default bet").setRequired(false)
         )
     )
 );
