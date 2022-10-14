@@ -14,7 +14,15 @@ import {
   SelectMenuOptionBuilder,
 } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import { createAuction, deleteAuction, getAuctionByMessage, getAuctions } from "../utils/functions/economy/auctions";
+import {
+  addToAuctionWatch,
+  createAuction,
+  deleteAuction,
+  getAuctionByMessage,
+  getAuctions,
+  getAuctionWatch,
+  setAuctionWatch,
+} from "../utils/functions/economy/auctions";
 import { getInventory, setInventory } from "../utils/functions/economy/inventory";
 import { formatBet, getItems, userExists } from "../utils/functions/economy/utils";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
@@ -665,6 +673,69 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     return await send({ embeds: [new CustomEmbed(message.member, desc)] });
+  } else if (args[0].toLowerCase() == "watch") {
+    if (args.length == 1) {
+      return send({ embeds: [new ErrorEmbed("/auction watch <item>")] });
+    }
+
+    const items = getItems();
+
+    const searchTag = args[1].toLowerCase();
+
+    let selected;
+
+    for (const itemName of Array.from(Object.keys(items))) {
+      const aliases = items[itemName].aliases ? items[itemName].aliases : [];
+      if (searchTag == itemName) {
+        selected = itemName;
+        break;
+      } else if (searchTag == itemName.split("_").join("")) {
+        selected = itemName;
+        break;
+      } else if (aliases.indexOf(searchTag) != -1) {
+        selected = itemName;
+        break;
+      } else if (searchTag == items[itemName].name) {
+        selected = itemName;
+        break;
+      }
+    }
+
+    selected = items[selected];
+
+    if (!selected) {
+      return send({ embeds: [new ErrorEmbed(`couldnt find \`${args[1]}\``)] });
+    }
+
+    let max = 1;
+
+    if (await isPremium(message.member)) max += await getTier(message.member);
+
+    let current = await getAuctionWatch(message.member);
+
+    if (current.length >= max) {
+      return send({ embeds: [new ErrorEmbed(`you have reached the limit of auction watches (**${max}**)`)] });
+    }
+
+    let desc = "";
+
+    if (current.includes(selected.id)) {
+      desc = `✅ removed ${selected.emoji} ${selected.name}`;
+
+      current.splice(current.indexOf(selected.id), 1);
+
+      current = await setAuctionWatch(message.member, current);
+    } else {
+      desc = `✅ added ${selected.emoji} ${selected.name}`;
+
+      current = await addToAuctionWatch(message.member, selected.id);
+    }
+
+    const embed = new CustomEmbed(message.member, desc)
+      .setHeader("auction watch", message.author.avatarURL())
+      .addField("currently watching", current.join("\n"));
+
+    return send({ embeds: [embed] });
   }
 }
 
