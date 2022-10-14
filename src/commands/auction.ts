@@ -52,6 +52,14 @@ cmd.slashData
       .addStringOption((option) =>
         option.setName("cost").setDescription("amount you would like this item to sell for").setRequired(true)
       )
+  )
+  .addSubcommand((watch) =>
+    watch
+      .setName("watch")
+      .setDescription("receive notifications when an auction is created for chosen items")
+      .addStringOption((option) =>
+        option.setName("item-global").setDescription("item you want to toggle on/off").setRequired(false)
+      )
   );
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
@@ -674,11 +682,24 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     return await send({ embeds: [new CustomEmbed(message.member, desc)] });
   } else if (args[0].toLowerCase() == "watch") {
-    if (args.length == 1) {
-      return send({ embeds: [new ErrorEmbed("/auction watch <item>")] });
-    }
+    let current = await getAuctionWatch(message.member);
 
     const items = getItems();
+
+    if (args.length == 1) {
+      if (current.length == 0) {
+        return send({ embeds: [new CustomEmbed(message.member, "you are not currently watching for any auctions")] });
+      }
+
+      return send({
+        embeds: [
+          new CustomEmbed(
+            message.member,
+            `you are currently watching: \n\n${current.map((i) => `${items[i].emoji} ${items[i].name}`).join("\n")}`
+          ).setHeader("auction watch", message.author.avatarURL()),
+        ],
+      });
+    }
 
     const searchTag = args[1].toLowerCase();
 
@@ -711,10 +732,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (await isPremium(message.member)) max += await getTier(message.member);
 
-    let current = await getAuctionWatch(message.member);
-
     if (current.length >= max) {
-      return send({ embeds: [new ErrorEmbed(`you have reached the limit of auction watches (**${max}**)`)] });
+      let desc = `you have reached the limit of auction watches (**${max}**)`;
+
+      if (max == 1) {
+        desc += "\n\nyou can upgrade this with premium membership (`/premium`)";
+      }
+
+      return send({ embeds: [new ErrorEmbed(desc)] });
     }
 
     let desc = "";
@@ -733,7 +758,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const embed = new CustomEmbed(message.member, desc)
       .setHeader("auction watch", message.author.avatarURL())
-      .addField("currently watching", current.join("\n"));
+      .addField("currently watching", current.map((i) => `${items[i].emoji} ${items[i].name}`).join("\n"));
 
     return send({ embeds: [embed] });
   }
