@@ -11,7 +11,7 @@ import {
   SelectMenuOptionBuilder,
 } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import { calcMaxBet, getDefaultBet, setDefaultBet } from "../utils/functions/economy/balance";
+import { calcMaxBet, getDefaultBet, getRequiredBetForXp, setDefaultBet } from "../utils/functions/economy/balance";
 import { createUser, formatNumber, userExists } from "../utils/functions/economy/utils";
 import { getDmSettings, getNotificationsData, updateDmSettings } from "../utils/functions/users/notifications";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
@@ -181,11 +181,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const defaultBet = await getDefaultBet(message.member);
 
     if (args.length == 2) {
+      const requiredBet = await getRequiredBetForXp(message.member);
+
       if (!defaultBet) {
         const embed = new CustomEmbed(message.member).setHeader("default bet", message.author.avatarURL());
 
         embed.setDescription(
-          "you do not currently have a default bet. use `/settings me defaultbet <amount/reset>` to set your default bet"
+          "you do not currently have a default bet. use `/settings me defaultbet <amount/reset>` to set your default bet\n\n" +
+            `you must bet at least $**${requiredBet.toLocaleString()}** to earn xp`
         );
 
         return send({ embeds: [embed] });
@@ -194,7 +197,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         embed.setDescription(
           `your default bet is $**${defaultBet.toLocaleString()}**` +
-            "\n\nuse `/settings me defaultbet <amount/reset>` to change this"
+            "\n\nuse `/settings me defaultbet <amount/reset>` to change this\n" +
+            `you must bet at least $**${requiredBet.toLocaleString()}** to earn xp`
         );
 
         return send({ embeds: [embed] });
