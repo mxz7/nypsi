@@ -59,14 +59,19 @@ async function doWorkerThing() {
       if (worker.stored >= maxStorage) full.push(worker.workerId);
     }
 
-    if (full.length == 1) {
-      data.text = `your ${getBaseWorkers()[full[0]].name} worker is full`;
+    if (full.length == workers.length) {
+      data.content = "all of your workers are full";
+      data.embed = new CustomEmbed().setDescription("all of your workers are full");
+    } else if (full.length == 1) {
+      data.content = `your ${getBaseWorkers()[full[0]].name} worker is full`;
       data.embed = new CustomEmbed().setDescription(`your ${getBaseWorkers()[full[0]].name} worker is full`);
     } else {
-      data.text = `${full.length} of your workers are full`;
-      data.embed = new CustomEmbed().setDescription(
-        full.map((workerId) => `${getBaseWorkers()[workerId].item_emoji} ${getBaseWorkers()[workerId].name}`).join("\n")
-      );
+      data.content = `${full.length} of your workers are full`;
+      data.embed = new CustomEmbed()
+        .setDescription(
+          full.map((workerId) => `${getBaseWorkers()[workerId].item_emoji} ${getBaseWorkers()[workerId].name}`).join("\n")
+        )
+        .setHeader("full workers:");
     }
 
     await redis.lpush("nypsi:dm:queue", JSON.stringify(data));
