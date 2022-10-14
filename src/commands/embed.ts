@@ -1,4 +1,5 @@
 import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
+import Constants from "../utils/Constants";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
@@ -50,7 +51,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (!(message instanceof Message)) return;
 
-  if (message.author.id != "672793821850894347") embed.setFooter({ text: `sent by: ${message.author.tag}` });
+  if (message.author.id != Constants.TEKOH_ID) embed.setFooter({ text: `sent by: ${message.author.tag}` });
 
   message.channel
     .send({ embeds: [embed] })

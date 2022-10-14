@@ -22,6 +22,7 @@ import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 import { version } from "../../package.json";
 import { workerCount } from "../events/message";
 import { aliasesSize, commandsSize } from "../utils/commandhandler";
+import Constants from "../utils/Constants";
 import { getStats } from "../utils/functions/economy/stats";
 import { getCommandUses } from "../utils/functions/users/commands";
 import { mentionQueue } from "../utils/functions/users/mentions";
@@ -342,7 +343,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (args.length == 0) {
     return normalStats();
-  } else if (args[0].toLowerCase() == "global" && message.author.id == "672793821850894347") {
+  } else if (args[0].toLowerCase() == "global" && message.author.id == Constants.TEKOH_ID) {
     const gambleTotal = await prisma.economyStats.aggregate({
       where: {
         AND: [

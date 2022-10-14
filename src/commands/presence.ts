@@ -1,4 +1,5 @@
 import { CommandInteraction, Message } from "discord.js";
+import Constants from "../utils/Constants";
 import { setCustomPresence } from "../utils/functions/presence";
 import { NypsiClient } from "../utils/models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
@@ -6,7 +7,7 @@ import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Co
 const cmd = new Command("presence", "set custom a presence for nypsi", Categories.NONE);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-  if (message.author.id != "672793821850894347") return;
+  if (message.author.id != Constants.TEKOH_ID) return;
 
   if (args.length == 0) {
     await setCustomPresence("");

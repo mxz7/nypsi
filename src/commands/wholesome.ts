@@ -1,5 +1,6 @@
 import { WholesomeSuggestion } from "@prisma/client";
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message, MessageReaction, User } from "discord.js";
+import Constants from "../utils/Constants";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { formatDate } from "../utils/functions/date";
 import { getPrefix } from "../utils/functions/guilds/utils";
@@ -152,7 +153,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     embed.setHeader(`image #${wholesome.id}`);
 
-    if (message.author.id == "672793821850894347") {
+    if (message.author.id == Constants.TEKOH_ID) {
       embed.setDescription(
         `**suggested by** ${wholesome.submitter} (${wholesome.submitterId})\n**accepted by** \`${wholesome.accepterId}\`\n**url** ${wholesome.image}`
       );
@@ -215,7 +216,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     return message.react("✅");
   } else if (args[0].toLowerCase() == "delete") {
-    if (message.author.id != "672793821850894347") return;
+    if (message.author.id != Constants.TEKOH_ID) return;
 
     if (args.length == 1) {
       return send({ embeds: [new ErrorEmbed("dumbass")] });
@@ -229,7 +230,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     return message.react("✅");
   } else if (args[0].toLowerCase() == "reload") {
-    if (message.author.id != "672793821850894347") return;
+    if (message.author.id != Constants.TEKOH_ID) return;
 
     clearWholesomeCache();
 

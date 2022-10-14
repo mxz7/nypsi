@@ -179,7 +179,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (args.length == 0 || args[0].toLowerCase() == "view") {
     return defaultMessage();
   } else if (args[0].toLowerCase() == "check" || args[0].toLowerCase() == "status") {
-    if (message.author.id != "672793821850894347") {
+    if (message.author.id != Constants.TEKOH_ID) {
       return defaultMessage();
     }
 
@@ -219,7 +219,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return send({ embeds: [embed] });
     }
   } else if (args[0].toLowerCase() == "update") {
-    if (message.author.id != "672793821850894347") {
+    if (message.author.id != Constants.TEKOH_ID) {
       return defaultMessage();
     }
 
@@ -272,7 +272,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
     }
   } else if (args[0].toLowerCase() == "add") {
-    if (message.author.id != "672793821850894347") {
+    if (message.author.id != Constants.TEKOH_ID) {
       return defaultMessage();
     }
 
@@ -286,7 +286,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       embeds: [new CustomEmbed(message.member, "✅ created profile at tier " + args[2])],
     });
   } else if (args[0].toLowerCase() == "renew") {
-    if (message.author.id != "672793821850894347") {
+    if (message.author.id != Constants.TEKOH_ID) {
       return defaultMessage();
     }
 
@@ -298,7 +298,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     return send({ embeds: [new CustomEmbed(message.member, "✅ membership renewed")] });
   } else if (args[0].toLowerCase() == "expire") {
-    if (message.author.id != "672793821850894347") {
+    if (message.author.id != Constants.TEKOH_ID) {
       return defaultMessage();
     }
 
