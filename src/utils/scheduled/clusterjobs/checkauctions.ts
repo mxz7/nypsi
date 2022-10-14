@@ -5,6 +5,7 @@ import { deleteAuction } from "../../functions/economy/auctions";
 import { getInventory, setInventory } from "../../functions/economy/inventory";
 import { getItems, userExists } from "../../functions/economy/utils";
 import requestDM from "../../functions/requestdm";
+import { getDmSettings } from "../../functions/users/notifications";
 import { logger } from "../../logger";
 import { NypsiClient } from "../../models/Client";
 import { CustomEmbed } from "../../models/EmbedBuilders";
@@ -50,12 +51,14 @@ export async function runAuctionChecks(client: NypsiClient) {
         } has expired. you have been given back your item${auction.itemAmount > 1 ? "s" : ""}`
       );
 
-      await requestDM({
-        client: client,
-        content: "your auction has expired",
-        memberId: auction.ownerId,
-        embed: embed,
-      });
+      if ((await getDmSettings(auction.ownerId)).auction) {
+        await requestDM({
+          client: client,
+          content: "your auction has expired",
+          memberId: auction.ownerId,
+          embed: embed,
+        });
+      }
     }
 
     if (query.length > 0) {
