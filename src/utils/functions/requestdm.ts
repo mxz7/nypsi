@@ -1,5 +1,5 @@
 import { Manager } from "discord-hybrid-sharding";
-import { BaseMessageOptions, MessagePayload } from "discord.js";
+import { APIEmbed, BaseMessageOptions, MessagePayload } from "discord.js";
 import { logger } from "../logger";
 import { NypsiClient } from "../models/Client";
 import { CustomEmbed } from "../models/EmbedBuilders";
@@ -50,7 +50,11 @@ export default async function requestDM(options: RequestDMOptions): Promise<bool
     };
 
     if (options.embed) {
-      payload.embeds = [options.embed.toJSON()];
+      try {
+        payload.embeds = [options.embed.toJSON()];
+      } catch {
+        payload.embeds = [options.embed as APIEmbed];
+      }
     }
 
     const res = await options.client.cluster.broadcastEval(
@@ -128,7 +132,11 @@ export default async function requestDM(options: RequestDMOptions): Promise<bool
     };
 
     if (options.embed) {
-      payload.embeds = [options.embed.toJSON()];
+      try {
+        payload.embeds = [options.embed.toJSON()];
+      } catch {
+        payload.embeds = [options.embed as APIEmbed];
+      }
     }
 
     const res = await options.client.broadcastEval(
