@@ -376,7 +376,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         await setInventory(message.member, inventory);
 
-        const targetEmbed = new CustomEmbed().setFooter({ text: "use $optout to optout of bot dms" });
+        const targetEmbed = new CustomEmbed();
 
         targetEmbed.setColor("#e4334f");
         targetEmbed.setTitle("your padlock has been picked");

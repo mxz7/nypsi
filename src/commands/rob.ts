@@ -140,7 +140,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     message.author.avatarURL()
   );
 
-  const embed3 = new CustomEmbed().setFooter({ text: "use $optout to optout of bot dms" });
+  const embed3 = new CustomEmbed();
 
   let robberySuccess = false;
 
