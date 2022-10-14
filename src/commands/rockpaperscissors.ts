@@ -27,7 +27,7 @@ cmd.slashData
         { name: "✂ scissors", value: "scissors" }
       )
   )
-  .addStringOption((option) => option.setName("bet").setDescription("how much would you like to bet").setRequired(true));
+  .addStringOption((option) => option.setName("bet").setDescription("how much would you like to bet").setRequired(false));
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
