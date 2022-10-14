@@ -85,8 +85,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (maxLoss > bankBalance * 0.6) {
       maxLoss = bankBalance * 0.7;
       maxSteal = bankBalance * 0.5;
-    } else if (maxSteal < 100_000) {
-      maxSteal = 100_000;
+    } else if (maxSteal < 500_000) {
+      maxSteal = 500_000;
       maxLoss = balance * 0.95;
     }
 
