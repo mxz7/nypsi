@@ -135,7 +135,7 @@ export async function createAuction(member: GuildMember, itemId: string, itemAmo
     },
   });
 
-  checkWatchers(itemId, messageUrl);
+  checkWatchers(itemId, messageUrl, member.user.id);
 
   return messageUrl;
 }
@@ -285,11 +285,11 @@ export async function getAuctionWatch(member: GuildMember) {
     .then((q) => q.auction_watch);
 }
 
-async function checkWatchers(itemName: string, messageUrl: string) {
+async function checkWatchers(itemName: string, messageUrl: string, creatorId: string) {
   const users = await prisma.economy
     .findMany({
       where: {
-        auction_watch: { has: itemName },
+        AND: [{ auction_watch: { has: itemName } }, { userId: { not: creatorId } }],
       },
       select: {
         userId: true,
