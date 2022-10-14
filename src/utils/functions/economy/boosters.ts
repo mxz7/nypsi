@@ -66,7 +66,7 @@ export async function getBoosters(member: GuildMember | string): Promise<Map<str
       embed.setHeader(`expired booster${total > 1 ? "s" : ""}:`);
       embed.setDescription(desc);
 
-      if (total > 1) {
+      if (total == 1) {
         text = `your ${items[Array.from(expired.keys())[0]].emoji} ${
           items[Array.from(expired.keys())[0]].name
         } booster has expired`;
