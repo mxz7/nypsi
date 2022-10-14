@@ -1,41 +1,9 @@
 import { EconomyWorker, EconomyWorkerUpgrades } from "@prisma/client";
 import { GuildMember } from "discord.js";
-import { inPlaceSort } from "fast-sort";
 import prisma from "../../database/database";
 import { logger } from "../../logger";
-import { Worker, WorkerUpgrades } from "../../models/Workers";
 import { getBoosters } from "./boosters";
-import { getItems } from "./utils";
-
-declare function require(name: string): any;
-
-let baseWorkers: { [key: string]: Worker } = require("../../../../data/workers.json").workers;
-const baseUpgrades: { [key: string]: WorkerUpgrades } = require("../../../../data/workers.json").upgrades;
-
-(() => {
-  const workerIds = Object.keys(baseWorkers);
-
-  inPlaceSort(workerIds).asc((w) => baseWorkers[w].prestige_requirement);
-
-  const newObj: { [key: string]: Worker } = {};
-
-  for (const workerId of workerIds) {
-    newObj[workerId] = baseWorkers[workerId];
-  }
-
-  baseWorkers = newObj;
-
-  logger.info(`${Object.keys(baseWorkers).length} workers loaded`);
-  logger.info(`${Object.keys(baseUpgrades).length} worker upgrades loaded`);
-})();
-
-export function getBaseWorkers() {
-  return baseWorkers;
-}
-
-export function getBaseUpgrades() {
-  return baseUpgrades;
-}
+import { getBaseUpgrades, getBaseWorkers, getItems } from "./utils";
 
 export async function getWorkers(member: GuildMember | string) {
   let id: string;
@@ -64,6 +32,8 @@ export async function addWorker(member: GuildMember, id: string) {
   } else {
     memberID = member;
   }
+
+  const baseWorkers = getBaseWorkers();
 
   if (!baseWorkers[id]) return logger.warn(`unknown worker: ${id}`);
 
@@ -100,6 +70,9 @@ export async function calcWorkerValues(
     upgrades: EconomyWorkerUpgrades[];
   }
 ) {
+  const baseUpgrades = getBaseUpgrades();
+  const baseWorkers = getBaseWorkers();
+
   const boosters = await getBoosters(worker.userId);
   const items = getItems();
 
