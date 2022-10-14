@@ -10,8 +10,6 @@ import {
 import * as fs from "fs/promises";
 import { addCooldown, onCooldown } from "../utils/cooldownhandler.js";
 import prisma from "../utils/database/database";
-import { getDMsEnabled } from "../utils/functions/economy/utils.js";
-import { getPrefix } from "../utils/functions/guilds/utils";
 import { logger } from "../utils/logger";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
@@ -37,12 +35,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const embed = new ErrorEmbed("you have already received your data recently.");
 
     return message.channel.send({ embeds: [embed] });
-  }
-
-  if (!(await getDMsEnabled(message.member))) {
-    return await message.channel.send({
-      embeds: [new ErrorEmbed(`you must have your dms enabled - (${await getPrefix(message.guild)})dms`)],
-    });
   }
 
   const embed = new CustomEmbed(message.member).setHeader("data request", message.author.avatarURL());

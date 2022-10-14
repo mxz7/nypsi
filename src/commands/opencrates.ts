@@ -1,8 +1,7 @@
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { getInventory, openCrate } from "../utils/functions/economy/inventory";
-import { getDMsEnabled, getItems, startOpeningCrates, stopOpeningCrates } from "../utils/functions/economy/utils";
-import { getPrefix } from "../utils/functions/guilds/utils";
+import { getItems, startOpeningCrates, stopOpeningCrates } from "../utils/functions/economy/utils";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
@@ -32,12 +31,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const embed = await getResponse(cmd.name, message.member);
 
     return send({ embeds: [embed], ephemeral: true });
-  }
-
-  if (!(await getDMsEnabled(message.member))) {
-    return send({
-      embeds: [new ErrorEmbed(`you must have dms enabled. ${await getPrefix(message.guild)}dms`)],
-    });
   }
 
   const inventory = await getInventory(message.member);
