@@ -1,11 +1,12 @@
 import { CommandInteraction, Message } from "discord.js";
 import { uploadSlashCommands, uploadSlashCommandsToGuild } from "../utils/commandhandler";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
+import Constants from "../utils/Constants";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 
 const cmd = new Command("reloadslash", "reload data for slash commands", Categories.NONE).setPermissions(["bot owner"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-  if (message.member.user.id != "672793821850894347") return;
+  if (message.member.user.id != Constants.TEKOH_ID) return;
 
   if (args.length == 0) {
     await uploadSlashCommandsToGuild(message.guild.id, message.client.user.id);

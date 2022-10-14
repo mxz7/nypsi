@@ -1,13 +1,14 @@
 import { CommandInteraction, Message } from "discord.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
-import { logger } from "../utils/logger";
 import { loadCommands, reloadCommand } from "../utils/commandhandler";
+import Constants from "../utils/Constants";
+import { logger } from "../utils/logger";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 
 const cmd = new Command("reload", "reload commands", Categories.NONE).setPermissions(["bot owner"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-  if (message.member.user.id != "672793821850894347") return;
+  if (message.member.user.id != Constants.TEKOH_ID) return;
 
   if (args.length == 0) {
     loadCommands();

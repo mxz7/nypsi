@@ -1,4 +1,5 @@
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
+import Constants from "../utils/Constants";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getKarma, removeKarma } from "../utils/functions/karma/karma";
 import { getMember } from "../utils/functions/member";
@@ -32,7 +33,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   };
 
   if (args.length >= 1) {
-    if (message.author.id == "672793821850894347" && args[0] == "remove") {
+    if (message.author.id == Constants.TEKOH_ID && args[0] == "remove") {
       if (!args[1] || !args[2]) {
         return send({
           embeds: [new CustomEmbed(message.member, "$karma remove <userid> <amount>")],

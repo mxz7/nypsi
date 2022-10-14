@@ -1,4 +1,5 @@
 import { CommandInteraction, Message } from "discord.js";
+import Constants from "../utils/Constants";
 import { formatDate } from "../utils/functions/date";
 import { getNews, setNews } from "../utils/functions/news";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
@@ -7,7 +8,7 @@ import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 const cmd = new Command("news", "set the news for the help command", Categories.INFO);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-  if (args.length == 0 || message.member.user.id != "672793821850894347") {
+  if (args.length == 0 || message.member.user.id != Constants.TEKOH_ID) {
     const news = await getNews();
 
     if (news.text == "") {
@@ -20,7 +21,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     return message.channel.send({ embeds: [embed] });
   } else {
-    if (message.member.user.id != "672793821850894347") return;
+    if (message.member.user.id != Constants.TEKOH_ID) return;
     await setNews(args.join(" "));
 
     const news = await getNews();
