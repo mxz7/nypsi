@@ -12,6 +12,7 @@ import {
   MessageEditOptions,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
+import Constants from "../utils/Constants";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { daysAgo, formatDate } from "../utils/functions/date";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
@@ -370,7 +371,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   }
 
   if (args[0].toLowerCase() == "forcekick") {
-    if (message.author.id != "672793821850894347") return;
+    if (message.author.id != Constants.TEKOH_ID) return;
 
     if (args.length == 1) {
       return send({ embeds: [new ErrorEmbed(`${prefix}guild kick <tag>`)] });

@@ -1,5 +1,6 @@
 import { CommandInteraction, Message } from "discord.js";
 import { startRestart } from "../utils/commandhandler";
+import Constants from "../utils/Constants";
 import redis from "../utils/database/redis";
 import { setCustomPresence } from "../utils/functions/presence";
 import { logger } from "../utils/logger";
@@ -12,7 +13,7 @@ const cmd = new Command("restart", "restart", Categories.NONE).setPermissions(["
 let confirm = false;
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-  if (message.member.user.id != "672793821850894347") return;
+  if (message.member.user.id != Constants.TEKOH_ID) return;
 
   if (confirm == false) {
     confirm = true;

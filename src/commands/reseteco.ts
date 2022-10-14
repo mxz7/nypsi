@@ -1,13 +1,14 @@
 import { CommandInteraction, Message } from "discord.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
+import Constants from "../utils/Constants";
 import { createCaptcha } from "../utils/functions/captcha";
 import { reset } from "../utils/functions/economy/utils";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("reseteco", "reset economy except prestige and karma", Categories.NONE);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-  if (message.author.id != "672793821850894347") return;
+  if (message.author.id != Constants.TEKOH_ID) return;
 
   const captcha = createCaptcha();
 

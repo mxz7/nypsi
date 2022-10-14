@@ -1,4 +1,5 @@
 import { CommandInteraction, Message, User } from "discord.js";
+import Constants from "../utils/Constants";
 import { formatDate } from "../utils/functions/date";
 import {
   getBalance,
@@ -23,7 +24,7 @@ import { CustomEmbed } from "../utils/models/EmbedBuilders";
 const cmd = new Command("find", "find info", Categories.NONE).setPermissions(["bot owner"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-  if (message.member.user.id != "672793821850894347") return;
+  if (message.member.user.id != Constants.TEKOH_ID) return;
 
   if (!(message instanceof Message)) return;
 

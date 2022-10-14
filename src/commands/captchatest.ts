@@ -1,11 +1,12 @@
 import { CommandInteraction, Message } from "discord.js";
+import Constants from "../utils/Constants";
 import { toggleLock } from "../utils/functions/captcha";
 import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 
 const cmd = new Command("captchatest", "test an account", Categories.NONE);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-  if (message.author.id != "672793821850894347") return;
+  if (message.author.id != Constants.TEKOH_ID) return;
 
   if (args.length == 0 || args[0].length != 18) {
     return message.channel.send({ content: "dumbass" });
