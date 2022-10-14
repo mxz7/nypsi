@@ -1,10 +1,12 @@
 import { GuildMember } from "discord.js";
+import { inPlaceSort } from "fast-sort";
 import * as fs from "fs";
 import fetch from "node-fetch";
 import prisma from "../../database/database";
 import redis from "../../database/redis";
 import { logger } from "../../logger";
 import { AchievementData, Item } from "../../models/Economy";
+import { Worker, WorkerUpgrades } from "../../models/Workers";
 import { createProfile, hasProfile } from "../users/utils";
 import { calcMaxBet, getBalance } from "./balance";
 import { getGuildByUser } from "./guilds";
@@ -13,6 +15,8 @@ import dayjs = require("dayjs");
 
 let items: { [key: string]: Item };
 let achievements: { [key: string]: AchievementData };
+let baseWorkers: { [key: string]: Worker };
+let baseUpgrades: { [key: string]: WorkerUpgrades };
 
 const lotteryTicketPrice = 15000;
 /**
@@ -25,8 +29,27 @@ export function loadItems() {
   const itemsFile: any = fs.readFileSync("./data/items.json");
   const achievementsFile: any = fs.readFileSync("./data/achievements.json");
 
+  const workersFile: any = fs.readFileSync("./data/workers.json");
+
   items = JSON.parse(itemsFile);
   achievements = JSON.parse(achievementsFile);
+  baseWorkers = JSON.parse(workersFile).workers;
+  baseUpgrades = JSON.parse(workersFile).upgrades;
+
+  const workerIds = Object.keys(baseWorkers);
+
+  inPlaceSort(workerIds).asc((w) => baseWorkers[w].prestige_requirement);
+
+  const newObj: { [key: string]: Worker } = {};
+
+  for (const workerId of workerIds) {
+    newObj[workerId] = baseWorkers[workerId];
+  }
+
+  baseWorkers = newObj;
+
+  logger.info(`${Object.keys(baseWorkers).length} workers loaded`);
+  logger.info(`${Object.keys(baseUpgrades).length} worker upgrades loaded`);
 
   logger.info(`${Array.from(Object.keys(items)).length.toLocaleString()} economy items loaded`);
   logger.info(`${Object.keys(achievements).length.toLocaleString()} achievements loaded`);
@@ -63,6 +86,14 @@ async function updateCryptoWorth() {
   items["ethereum"].buy = ethWorth;
   items["ethereum"].sell = ethWorth;
   logger.info("ethereum worth updated: $" + items["ethereum"].buy.toLocaleString());
+}
+
+export function getBaseWorkers() {
+  return baseWorkers;
+}
+
+export function getBaseUpgrades() {
+  return baseUpgrades;
 }
 
 export function getPadlockPrice(): number {
