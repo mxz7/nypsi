@@ -1,5 +1,5 @@
 import { Manager } from "discord-hybrid-sharding";
-import { APIEmbed, BaseMessageOptions, MessagePayload } from "discord.js";
+import { APIEmbed, BaseMessageOptions, MessageActionRowComponentBuilder, MessagePayload } from "discord.js";
 import { logger } from "../logger";
 import { NypsiClient } from "../models/Client";
 import { CustomEmbed } from "../models/EmbedBuilders";
@@ -9,6 +9,7 @@ interface RequestDMOptions {
   content: string;
   embed?: CustomEmbed;
   client: NypsiClient | Manager;
+  components?: MessageActionRowComponentBuilder;
 }
 
 export default async function requestDM(options: RequestDMOptions): Promise<boolean> {
@@ -54,6 +55,16 @@ export default async function requestDM(options: RequestDMOptions): Promise<bool
         payload.embeds = [options.embed.toJSON()];
       } catch {
         payload.embeds = [options.embed as APIEmbed];
+      }
+    }
+
+    if (options.components) {
+      try {
+        // @ts-expect-error hate ts
+        payload.components = [options.components.toJSON()];
+      } catch {
+        // @ts-expect-error hate ts
+        payload.components = [options.components];
       }
     }
 
@@ -136,6 +147,16 @@ export default async function requestDM(options: RequestDMOptions): Promise<bool
         payload.embeds = [options.embed.toJSON()];
       } catch {
         payload.embeds = [options.embed as APIEmbed];
+      }
+    }
+
+    if (options.components) {
+      try {
+        // @ts-expect-error hate ts
+        payload.components = [options.components.toJSON()];
+      } catch {
+        // @ts-expect-error hate ts
+        payload.components = [options.components];
       }
     }
 
