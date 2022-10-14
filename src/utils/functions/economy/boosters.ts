@@ -138,6 +138,41 @@ export async function getBoosters(member: GuildMember | string): Promise<Map<str
     }
   }
 
+  if (expired.size != 0 && (await getDmSettings(id)).booster) {
+    const embed = new CustomEmbed().setColor("#36393f");
+
+    let desc = "";
+    let text = "";
+    let total = 0;
+    const items = getItems();
+
+    for (const expiredBoosterId of Array.from(expired.keys())) {
+      total += expired.get(expiredBoosterId);
+
+      desc += `\`${expired.get(expiredBoosterId)}x\` ${items[expiredBoosterId].emoji} ${items[expiredBoosterId].name}`;
+    }
+
+    embed.setHeader(`expired booster${total > 1 ? "s" : ""}:`);
+    embed.setDescription(desc);
+
+    if (total == 1) {
+      text = `your ${items[Array.from(expired.keys())[0]].emoji} ${
+        items[Array.from(expired.keys())[0]].name
+      } booster has expired`;
+    } else {
+      text = `${total} of your boosters have expired`;
+    }
+
+    await redis.lpush(
+      "nypsi:dm:queue",
+      JSON.stringify({
+        memberId: id,
+        embed: embed,
+        content: text,
+      })
+    );
+  }
+
   await redis.set(`cache:economy:boosters:${id}`, JSON.stringify(Object.fromEntries(map)));
   await redis.expire(`cache:economy:boosters:${id}`, 300);
 
