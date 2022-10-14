@@ -13,6 +13,7 @@ import {
   SelectMenuBuilder,
   SelectMenuOptionBuilder,
 } from "discord.js";
+import { inPlaceSort } from "fast-sort";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
 import { getPrestige } from "../utils/functions/economy/prestige";
@@ -386,6 +387,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   } else if (args[0].toLowerCase() == "claim" || args[0].toLowerCase() == "sell") {
     let amountEarned = 0;
     let earnedBreakdown = "";
+
+    inPlaceSort(userWorkers).desc((w) => baseWorkers[w.workerId].prestige_requirement);
 
     for (const worker of userWorkers) {
       const baseWorker = baseWorkers[worker.workerId];
