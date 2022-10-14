@@ -45,6 +45,7 @@ import { createProfile, hasProfile } from "./functions/users/utils";
 import { NypsiClient } from "./models/Client";
 import { Item } from "./models/Economy";
 import dayjs = require("dayjs");
+import Constants from "./Constants";
 
 const commands = new Map<string, Command>();
 const aliases = new Map<string, string>();
@@ -672,7 +673,7 @@ export async function runCommand(
 
   if (command.category == "money" || command.name == "wholesome") {
     if (restarting || (await redis.get("nypsi:restarting")) == "t") {
-      if (message.author.id == "672793821850894347" && message instanceof Message) {
+      if (message.author.id == Constants.TEKOH_ID && message instanceof Message) {
         message.react("💀");
       } else {
         if (message instanceof Message) {

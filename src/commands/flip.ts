@@ -1,5 +1,6 @@
 import { CommandInteraction, Message } from "discord.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
+import Constants from "../utils/Constants";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("flip", "flip a coin", Categories.UTILITY);
@@ -49,7 +50,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
     const amount = parseInt(args[0]);
 
-    if ((amount > 1069 || amount < 2) && message.author.id != "672793821850894347") {
+    if ((amount > 1069 || amount < 2) && message.author.id != Constants.TEKOH_ID) {
       return message.channel.send({
         embeds: [new ErrorEmbed("invalid range: must be between 2 and 1,069")],
       });

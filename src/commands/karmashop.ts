@@ -22,6 +22,7 @@ import { NypsiClient } from "../utils/models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 import dayjs = require("dayjs");
+import Constants from "../utils/Constants";
 
 const cmd = new Command("karmashop", "buy stuff with your karma", Categories.INFO).setAliases(["ks"]);
 
@@ -45,7 +46,7 @@ const amount = new Map<string, number>();
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (!(await userExists(message.member))) await createUser(message.member);
-  if (message.author.id == "672793821850894347") {
+  if (message.author.id == Constants.TEKOH_ID) {
     if (args[0] && args[0].toLowerCase() == "open") {
       return openKarmaShop();
     } else if (args[0] && args[0].toLowerCase() == "close") {
