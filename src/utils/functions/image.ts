@@ -8,7 +8,6 @@ import { NypsiClient } from "../models/Client";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { RedditJSONPost } from "../models/Reddit";
 import { addProgress } from "./economy/achievements";
-import { getDMsEnabled } from "./economy/utils";
 import requestDM from "./requestdm";
 
 const imgur = new ImgurClient({
@@ -205,13 +204,11 @@ export async function acceptWholesomeImage(id: number, accepter: GuildMember, cl
 
   await addProgress(query.submitterId, "wholesome", 1);
 
-  if (await getDMsEnabled(query.submitterId)) {
-    await requestDM({
-      memberId: query.submitterId,
-      client: client,
-      content: `your wholesome image (${query.image}) has been accepted`,
-    });
-  }
+  await requestDM({
+    memberId: query.submitterId,
+    client: client,
+    content: `your wholesome image (${query.image}) has been accepted`,
+  });
 
   return true;
 }

@@ -5,7 +5,6 @@ dist/
 out/
 temp/
 
-*.json
 *.env
 *.db
 *.db-shm
@@ -14,18 +13,3 @@ temp/
 *.sql
 
 anticheat.ts
-
-!workers.json
-!lists.json
-!achievements.json
-!items.json
-!karmashop.json
-!package.json
-!package-lock.json
-!slotsmulti.json
-!.eslintrc.json
-!.prettierrc.json
-!.prettierignore
-!tsconfig.json
-!.commitlintrc.json
-!migration_lock.toml

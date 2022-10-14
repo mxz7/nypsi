@@ -14,11 +14,20 @@ import {
   SelectMenuOptionBuilder,
 } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import { createAuction, deleteAuction, getAuctionByMessage, getAuctions } from "../utils/functions/economy/auctions";
+import {
+  addToAuctionWatch,
+  createAuction,
+  deleteAuction,
+  getAuctionByMessage,
+  getAuctions,
+  getAuctionWatch,
+  setAuctionWatch,
+} from "../utils/functions/economy/auctions";
 import { getInventory, setInventory } from "../utils/functions/economy/inventory";
 import { formatBet, getItems, userExists } from "../utils/functions/economy/utils";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import requestDM from "../utils/functions/requestdm";
+import { getDmSettings } from "../utils/functions/users/notifications";
 import { logger } from "../utils/logger";
 import { NypsiClient } from "../utils/models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
@@ -42,6 +51,14 @@ cmd.slashData
       )
       .addStringOption((option) =>
         option.setName("cost").setDescription("amount you would like this item to sell for").setRequired(true)
+      )
+  )
+  .addSubcommand((watch) =>
+    watch
+      .setName("watch")
+      .setDescription("receive notifications when an auction is created for chosen items")
+      .addStringOption((option) =>
+        option.setName("item-global").setDescription("item you want to toggle on/off").setRequired(false)
       )
   );
 
@@ -524,20 +541,22 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await setInventory(auction.ownerId, inventory);
 
-    const embed = new CustomEmbed().setColor("#36393f");
+    if ((await getDmSettings(auction.ownerId)).auction) {
+      const embed = new CustomEmbed().setColor("#36393f");
 
-    embed.setDescription(
-      `your auction for ${auction.itemAmount}x ${items[auction.itemName].emoji} ${
-        items[auction.itemName].name
-      } has been removed by a staff member. you have been given back your item${auction.itemAmount > 1 ? "s" : ""}`
-    );
+      embed.setDescription(
+        `your auction for ${auction.itemAmount}x ${items[auction.itemName].emoji} ${
+          items[auction.itemName].name
+        } has been removed by a staff member. you have been given back your item${auction.itemAmount > 1 ? "s" : ""}`
+      );
 
-    await requestDM({
-      client: message.client as NypsiClient,
-      content: "your auction has been removed by a staff member",
-      memberId: auction.ownerId,
-      embed: embed,
-    });
+      await requestDM({
+        client: message.client as NypsiClient,
+        content: "your auction has been removed by a staff member",
+        memberId: auction.ownerId,
+        embed: embed,
+      });
+    }
 
     logger.info(`auction ${auction.id} by ${auction.ownerId} deleted by ${message.author.tag} (${message.author.id})`);
     return;
@@ -662,6 +681,86 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     return await send({ embeds: [new CustomEmbed(message.member, desc)] });
+  } else if (args[0].toLowerCase() == "watch") {
+    let current = await getAuctionWatch(message.member);
+
+    const items = getItems();
+
+    if (args.length == 1) {
+      if (current.length == 0) {
+        return send({ embeds: [new CustomEmbed(message.member, "you are not currently watching for any auctions")] });
+      }
+
+      return send({
+        embeds: [
+          new CustomEmbed(
+            message.member,
+            `you are currently watching: \n\n${current.map((i) => `${items[i].emoji} ${items[i].name}`).join("\n")}`
+          ).setHeader("auction watch", message.author.avatarURL()),
+        ],
+      });
+    }
+
+    const searchTag = args[1].toLowerCase();
+
+    let selected;
+
+    for (const itemName of Array.from(Object.keys(items))) {
+      const aliases = items[itemName].aliases ? items[itemName].aliases : [];
+      if (searchTag == itemName) {
+        selected = itemName;
+        break;
+      } else if (searchTag == itemName.split("_").join("")) {
+        selected = itemName;
+        break;
+      } else if (aliases.indexOf(searchTag) != -1) {
+        selected = itemName;
+        break;
+      } else if (searchTag == items[itemName].name) {
+        selected = itemName;
+        break;
+      }
+    }
+
+    selected = items[selected];
+
+    if (!selected) {
+      return send({ embeds: [new ErrorEmbed(`couldnt find \`${args[1]}\``)] });
+    }
+
+    let max = 1;
+
+    if (await isPremium(message.member)) max += await getTier(message.member);
+
+    if (current.length >= max) {
+      let desc = `you have reached the limit of auction watches (**${max}**)`;
+
+      if (max == 1) {
+        desc += "\n\nyou can upgrade this with premium membership (`/premium`)";
+      }
+
+      return send({ embeds: [new ErrorEmbed(desc)] });
+    }
+
+    let desc = "";
+
+    if (current.includes(selected.id)) {
+      desc = `✅ removed ${selected.emoji} ${selected.name}`;
+
+      current.splice(current.indexOf(selected.id), 1);
+
+      current = await setAuctionWatch(message.member, current);
+    } else {
+      desc = `✅ added ${selected.emoji} ${selected.name}`;
+
+      current = await addToAuctionWatch(message.member, selected.id);
+    }
+
+    const embed = new CustomEmbed(message.member, desc)
+      .setHeader("auction watch", message.author.avatarURL())
+      .addField("currently watching", current.map((i) => `${items[i].emoji} ${items[i].name}`).join("\n"));
+
+    return send({ embeds: [embed] });
   }
 }
 

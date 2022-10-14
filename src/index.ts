@@ -4,6 +4,7 @@ import { clearInterval } from "timers";
 import { addFailedHeatbeat, sendHeartbeat } from "./utils/functions/heartbeat";
 import { updateStats } from "./utils/functions/topgg";
 import { logger, setClusterId } from "./utils/logger";
+import { doDmQueueInterval } from "./utils/notificationhandler";
 import startJobs from "./utils/scheduled/scheduler";
 import { listenForVotes } from "./utils/votehandler";
 import ms = require("ms");
@@ -97,9 +98,10 @@ listenForVotes(manager);
 
 setTimeout(async () => {
   await startJobs();
+  await doDmQueueInterval(manager);
   logger.info("jobs triggered");
-}, 300000);
-// }, 15000);
+  // }, 300000);
+}, 15000);
 
 setTimeout(async () => {
   const userId = await manager.fetchClientValues("user.id");
