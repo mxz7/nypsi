@@ -1,7 +1,7 @@
 import dayjs = require("dayjs");
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import { getInventory, getMaxBitcoin, getMaxEthereum, setInventory } from "../utils/functions/economy/inventory";
+import { getInventory, setInventory } from "../utils/functions/economy/inventory";
 import { getPrestige } from "../utils/functions/economy/prestige";
 import { createUser, getItems, isEcoBanned, userExists } from "../utils/functions/economy/utils";
 import { getXp } from "../utils/functions/economy/xp";
@@ -156,26 +156,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (!amount) {
     return send({ embeds: [new ErrorEmbed("invalid amount")] });
-  }
-
-  if (selected.id == "bitcoin") {
-    const owned = targetInventory["bitcoin"] || 0;
-    const max = await getMaxBitcoin(target);
-
-    if (owned + amount > max) {
-      return send({
-        embeds: [new ErrorEmbed("you cannot give this person that much bitcoin")],
-      });
-    }
-  } else if (selected.id == "ethereum") {
-    const owned = targetInventory["ethereum"] || 0;
-    const max = await getMaxEthereum(target);
-
-    if (owned + amount > max) {
-      return send({
-        embeds: [new ErrorEmbed("you cannot give this person that much ethereum")],
-      });
-    }
   }
 
   const targetPrestige = await getPrestige(target);
