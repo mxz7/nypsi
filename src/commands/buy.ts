@@ -1,7 +1,7 @@
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
-import { getInventory, getMaxBitcoin, getMaxEthereum, setInventory } from "../utils/functions/economy/inventory";
+import { getInventory, setInventory } from "../utils/functions/economy/inventory";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
@@ -104,22 +104,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   }
 
   await addCooldown(cmd.name, message.member, 7);
-
-  if (selected.id == "bitcoin") {
-    const owned = inventory["bitcoin"] || 0;
-    const max = await getMaxBitcoin(message.member);
-
-    if (owned + amount > max) {
-      return send({ embeds: [new ErrorEmbed("you cannot buy this much bitcoin yet")] });
-    }
-  } else if (selected.id == "ethereum") {
-    const owned = inventory["ethereum"] || 0;
-    const max = await getMaxEthereum(message.member);
-
-    if (owned + amount > max) {
-      return send({ embeds: [new ErrorEmbed("you cannot buy this much ethereum yet")] });
-    }
-  }
 
   await updateBalance(message.member, (await getBalance(message.member)) - selected.buy * amount);
   inventory[selected.id] + amount;
