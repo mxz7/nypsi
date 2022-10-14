@@ -41,7 +41,7 @@ const cmd = new Command("yablon", "play yablon", Categories.MONEY).setAliases(["
 
 cmd.slashEnabled = true;
 cmd.slashData.addStringOption((option) =>
-  option.setName("bet").setDescription("how much would you like to bet").setRequired(true)
+  option.setName("bet").setDescription("how much would you like to bet").setRequired(false)
 );
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {

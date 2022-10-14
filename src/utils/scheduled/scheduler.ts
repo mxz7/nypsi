@@ -68,6 +68,11 @@ const bree = new Bree({
       interval: "at 12:00am",
       path: path.join(__dirname, "jobs", "resetsuggestions.js"),
     },
+    {
+      name: "vote-reminders",
+      interval: "30m",
+      path: path.join(__dirname, "jobs", "votereminders.js"),
+    },
   ],
 });
 

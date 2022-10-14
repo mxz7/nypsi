@@ -16,10 +16,12 @@ import {
 } from "discord.js";
 import { cpu } from "node-os-utils";
 import { runCommand } from "../utils/commandhandler";
+import Constants from "../utils/Constants";
 import prisma from "../utils/database/database";
 import redis from "../utils/database/redis";
 import { userExists } from "../utils/functions/economy/utils";
 import { checkMessageContent } from "../utils/functions/guilds/filters";
+import { isSlashOnly } from "../utils/functions/guilds/slash";
 import { addCooldown, getPrefix, hasGuild, inCooldown } from "../utils/functions/guilds/utils";
 import { getKarma } from "../utils/functions/karma/karma";
 import { isPremium } from "../utils/functions/premium/premium";
@@ -152,7 +154,7 @@ export default async function messageCreate(message: Message) {
     if (!res) return;
   }
 
-  if (message.content.startsWith(prefix)) {
+  if (message.content.startsWith(prefix) && !(await isSlashOnly(message.guild)) && message.author.id != Constants.TEKOH_ID) {
     const args = message.content.substring(prefix.length).split(" ");
 
     const cmd = args[0].toLowerCase();

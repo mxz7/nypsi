@@ -1,5 +1,6 @@
 import dayjs = require("dayjs");
 import requestDM from "../functions/requestdm";
+import { getDmSettings } from "../functions/users/notifications";
 import { logger } from "../logger";
 import { NypsiClient } from "./Client";
 
@@ -152,11 +153,13 @@ export class PremUser {
       return "boost";
     }
 
-    await requestDM({
-      memberId: this.id,
-      client: client,
-      content: `your **${this.getLevelString()}** membership has expired, join the support server if this is an error ($support)`,
-    }).catch(() => {});
+    if ((await getDmSettings(this.id)).premium) {
+      await requestDM({
+        memberId: this.id,
+        client: client,
+        content: `your **${this.getLevelString()}** membership has expired, join the support server if this is an error ($support)`,
+      }).catch(() => {});
+    }
 
     this.status = status.INACTIVE;
     this.level = 0;
