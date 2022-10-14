@@ -17,14 +17,12 @@ import { inPlaceSort } from "fast-sort";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
 import { getPrestige } from "../utils/functions/economy/prestige";
-import { createUser, userExists } from "../utils/functions/economy/utils";
+import { createUser, getBaseUpgrades, getBaseWorkers, userExists } from "../utils/functions/economy/utils";
 import {
   addWorker,
   addWorkerUpgrade,
   calcWorkerValues,
   emptyWorkersStored,
-  getBaseUpgrades,
-  getBaseWorkers,
   getWorkers,
 } from "../utils/functions/economy/workers";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";

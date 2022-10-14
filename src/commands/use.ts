@@ -16,12 +16,14 @@ import { addItemUse } from "../utils/functions/economy/stats";
 import {
   addHandcuffs,
   createUser,
+  getBaseUpgrades,
+  getBaseWorkers,
   getDMsEnabled,
   getItems,
   isHandcuffed,
   userExists,
 } from "../utils/functions/economy/utils";
-import { addWorkerUpgrade, getBaseUpgrades, getBaseWorkers, getWorkers } from "../utils/functions/economy/workers";
+import { addWorkerUpgrade, getWorkers } from "../utils/functions/economy/workers";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
