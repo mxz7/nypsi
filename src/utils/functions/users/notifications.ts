@@ -4,6 +4,16 @@ import prisma from "../../database/database";
 import redis from "../../database/redis";
 import ms = require("ms");
 
+declare function require(name: string): any;
+
+interface NotificationData {
+  id: string;
+  name: string;
+  description: string;
+}
+
+const notificationsData: { [key: string]: NotificationData } = require("../../../../data/notifications.json");
+
 export async function getDmSettings(member: GuildMember | string) {
   let id: string;
   if (member instanceof GuildMember) {
@@ -49,4 +59,8 @@ export async function updateDmSettings(member: GuildMember, data: DMSettings) {
   await redis.del(`cache:dmsettings:${member.user.id}`);
 
   return query;
+}
+
+export function getNotificationsData() {
+  return notificationsData;
 }
