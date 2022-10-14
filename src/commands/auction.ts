@@ -728,20 +728,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return send({ embeds: [new ErrorEmbed(`couldnt find \`${args[1]}\``)] });
     }
 
-    let max = 1;
-
-    if (await isPremium(message.member)) max += await getTier(message.member);
-
-    if (current.length >= max) {
-      let desc = `you have reached the limit of auction watches (**${max}**)`;
-
-      if (max == 1) {
-        desc += "\n\nyou can upgrade this with premium membership (`/premium`)";
-      }
-
-      return send({ embeds: [new ErrorEmbed(desc)] });
-    }
-
     let desc = "";
 
     if (current.includes(selected.id)) {
@@ -751,6 +737,20 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       current = await setAuctionWatch(message.member, current);
     } else {
+      let max = 1;
+
+      if (await isPremium(message.member)) max += await getTier(message.member);
+
+      if (current.length >= max) {
+        let desc = `you have reached the limit of auction watches (**${max}**)`;
+
+        if (max == 1) {
+          desc += "\n\nyou can upgrade this with premium membership (`/premium`)";
+        }
+
+        return send({ embeds: [new ErrorEmbed(desc)] });
+      }
+
       desc = `✅ added ${selected.emoji} ${selected.name}`;
 
       current = await addToAuctionWatch(message.member, selected.id);
