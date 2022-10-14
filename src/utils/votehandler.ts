@@ -6,10 +6,11 @@ import redis from "./database/redis";
 import { getBalance, updateBalance } from "./functions/economy/balance";
 import { getInventory, setInventory } from "./functions/economy/inventory";
 import { getPrestige } from "./functions/economy/prestige";
-import { addTicket, getDMsEnabled, getTickets, userExists } from "./functions/economy/utils";
+import { addTicket, getTickets, userExists } from "./functions/economy/utils";
 import { addKarma, getKarma } from "./functions/karma/karma";
 import { getTier, isPremium } from "./functions/premium/premium";
 import requestDM from "./functions/requestdm";
+import { getDmSettings } from "./functions/users/notifications";
 import { logger } from "./logger";
 import { CustomEmbed } from "./models/EmbedBuilders";
 import ms = require("ms");
@@ -116,7 +117,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
 
   await setInventory(user, inventory, false);
 
-  if (await getDMsEnabled(user)) {
+  if ((await getDmSettings(user)).vote) {
     const embed = new CustomEmbed()
       .setColor("#5efb8f")
       .setDescription(
@@ -134,6 +135,8 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
       content: "thank you for voting!",
       embed: embed,
     });
+
+    await redis.srem("nypsi:vote_reminder:received", user);
 
     if (res) {
       logger.log({

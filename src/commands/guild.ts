@@ -35,6 +35,7 @@ import { createUser, formatNumber, isEcoBanned, userExists } from "../utils/func
 import { getPrefix } from "../utils/functions/guilds/utils";
 import requestDM from "../utils/functions/requestdm";
 import { cleanString } from "../utils/functions/string";
+import { getDmSettings } from "../utils/functions/users/notifications";
 import { NypsiClient } from "../utils/models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
@@ -468,20 +469,22 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           (await getBalance(guildMember.userId)) + Math.floor(contributedMoney * 0.25)
         );
 
-        const embed = new CustomEmbed().setColor("#5efb8f");
+        if ((await getDmSettings(guildMember.userId)).other) {
+          const embed = new CustomEmbed().setColor("#5efb8f");
 
-        embed.setDescription(
-          `since you contributed money to this guild, you have been repaid $**${Math.floor(
-            contributedMoney * 0.25
-          ).toLocaleString()}**`
-        );
+          embed.setDescription(
+            `since you contributed money to this guild, you have been repaid $**${Math.floor(
+              contributedMoney * 0.25
+            ).toLocaleString()}**`
+          );
 
-        await requestDM({
-          memberId: guildMember.userId,
-          content: `${guild.guildName} has been deleted`,
-          client: message.client as NypsiClient,
-          embed: embed,
-        });
+          await requestDM({
+            memberId: guildMember.userId,
+            content: `${guild.guildName} has been deleted`,
+            client: message.client as NypsiClient,
+            embed: embed,
+          });
+        }
       }
     }
 

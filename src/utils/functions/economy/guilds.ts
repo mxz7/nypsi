@@ -7,8 +7,8 @@ import { NypsiClient } from "../../models/Client";
 import { GuildUpgradeRequirements } from "../../models/Economy";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 import requestDM from "../requestdm";
+import { getDmSettings } from "../users/notifications";
 import { getInventory, setInventory } from "./inventory";
-import { getDMsEnabled } from "./utils";
 import ms = require("ms");
 
 export async function getGuildByName(name: string) {
@@ -327,7 +327,7 @@ async function checkUpgrade(guild: EconomyGuild | string, client: NypsiClient): 
 
       await setInventory(member.userId, inventory);
 
-      if (await getDMsEnabled(member.userId)) {
+      if ((await getDmSettings(member.userId)).other) {
         await requestDM({
           memberId: member.userId,
           client: client,

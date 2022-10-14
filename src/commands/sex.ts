@@ -2,7 +2,6 @@ import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Messag
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
 import redis from "../utils/database/redis.js";
 import { addProgress } from "../utils/functions/economy/achievements.js";
-import { getDMsEnabled } from "../utils/functions/economy/utils.js";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 import { MilfSearchData } from "../utils/models/Sex.js";
@@ -196,17 +195,15 @@ setInterval(() => {
 
   looking.forEach(async (obj) => {
     if (now - obj.date >= expire) {
-      if (await getDMsEnabled(obj.user.id)) {
-        await obj.user
-          .send({
-            embeds: [
-              new CustomEmbed(undefined, "unfortunately we couldn't find you a milf 😢")
-                .setColor("#e4334f")
-                .setHeader("milf finder"),
-            ],
-          })
-          .catch(() => {});
-      }
+      await obj.user
+        .send({
+          embeds: [
+            new CustomEmbed(undefined, "unfortunately we couldn't find you a milf 😢")
+              .setColor("#e4334f")
+              .setHeader("milf finder"),
+          ],
+        })
+        .catch(() => {});
 
       looking.delete(obj.user.id);
     }
