@@ -108,6 +108,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         CommandUse: true,
         Survey: true,
         Achievements: true,
+        DMSettings: true,
       },
     });
 
