@@ -136,6 +136,8 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
       embed: embed,
     });
 
+    await redis.srem("nypsi:vote_reminder:received", user);
+
     if (res) {
       logger.log({
         level: "success",
