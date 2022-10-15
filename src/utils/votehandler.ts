@@ -122,6 +122,14 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
       )
       .disableFooter();
 
+    if (!(await getDmSettings(user)).vote_reminder) {
+      const chance = Math.floor(Math.random() * 10);
+
+      if (chance == 7) {
+        embed.setFooter({ text: "you can enable vote reminders with /settings me notifications" });
+      }
+    }
+
     const res = await requestDM({
       memberId: user,
       client: manager,
