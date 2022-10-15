@@ -93,7 +93,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const averageAuction = await getAuctionAverage(item);
 
     if (averageAuction) {
-      worth += averageAuction * inventory.find((i) => i.item == item).amount;
+      worth += Math.floor(averageAuction * inventory.find((i) => i.item == item).amount);
     } else if (items[item].sell) {
       worth += items[item].sell * inventory.find((i) => i.item == item).amount;
     }
