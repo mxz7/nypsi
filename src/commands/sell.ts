@@ -1,10 +1,11 @@
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { getBalance, getMulti, updateBalance } from "../utils/functions/economy/balance";
-import { getInventory, setInventory } from "../utils/functions/economy/inventory";
+import { getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import { getTax } from "../utils/functions/tax";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { Item } from "../utils/models/Economy";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("sell", "sell items", Categories.MONEY);
@@ -54,23 +55,21 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const searchTag = args[0].toLowerCase();
 
-  let selected;
+  let selected: Item;
 
   for (const itemName of Array.from(Object.keys(items))) {
     const aliases = items[itemName].aliases ? items[itemName].aliases : [];
     if (searchTag == itemName) {
-      selected = itemName;
+      selected = items[itemName];
       break;
     } else if (searchTag == itemName.split("_").join("")) {
-      selected = itemName;
+      selected = items[itemName];
       break;
     } else if (aliases.indexOf(searchTag) != -1) {
-      selected = itemName;
+      selected = items[itemName];
       break;
     }
   }
-
-  selected = items[selected];
 
   if (!selected) {
     return send({ embeds: [new ErrorEmbed(`couldnt find \`${args[0]}\``)] });
@@ -80,7 +79,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (args.length != 1) {
     if (args[1].toLowerCase() == "all") {
-      args[1] = inventory[selected.id].toString();
+      args[1] = inventory.find((i) => i.item == selected.id).amount.toString();
     } else if (isNaN(parseInt(args[1])) || parseInt(args[1]) <= 0) {
       return send({ embeds: [new ErrorEmbed("invalid amount")] });
     }
@@ -99,23 +98,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({ embeds: [new ErrorEmbed("invalid amount")] });
   }
 
-  if (!inventory[selected.id] || inventory[selected.id] == 0) {
+  if (!inventory.find((i) => i.item == selected.id) || inventory.find((i) => i.item == selected.id).amount == 0) {
     return send({ embeds: [new ErrorEmbed("you dont have any " + selected.name)] });
   }
 
-  if (amount > inventory[selected.id]) {
+  if (amount > inventory.find((i) => i.item == selected.id).amount) {
     return send({ embeds: [new ErrorEmbed(`you don't have enough ${selected.name}`)] });
   }
 
   await addCooldown(cmd.name, message.member, 5);
 
-  inventory[selected.id] -= amount;
-
-  if (inventory[selected.id] == 0) {
-    delete inventory[selected.id];
-  }
-
-  await setInventory(message.member, inventory);
+  await setInventoryItem(message.member, selected.id, inventory.find((i) => i.item == selected.id).amount - amount, false);
 
   let sellWorth = Math.floor(selected.sell * amount);
 

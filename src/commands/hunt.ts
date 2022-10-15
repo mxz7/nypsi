@@ -2,7 +2,7 @@ import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Messag
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { getBoosters } from "../utils/functions/economy/boosters";
-import { getInventory, setInventory } from "../utils/functions/economy/inventory";
+import { addInventoryItem, getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
 import { addItemUse } from "../utils/functions/economy/stats";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
@@ -40,13 +40,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const inventory = await getInventory(message.member);
   const items = getItems();
 
-  let gun;
+  let gun: string;
 
-  if (inventory["incredible_gun"] && inventory["incredible_gun"] > 0) {
+  if (inventory.find((i) => i.item == "incredible_gun") && inventory.find((i) => i.item == "incredible_gun").amount > 0) {
     gun = "incredible_gun";
-  } else if (inventory["gun"] && inventory["gun"] > 0) {
+  } else if (inventory.find((i) => i.item == "gun") && inventory.find((i) => i.item == "gun").amount > 0) {
     gun = "gun";
-  } else if (inventory["terrible_gun"] && inventory["terrible_gun"] > 0) {
+  } else if (inventory.find((i) => i.item == "terrible_gun") && inventory.find((i) => i.item == "terrible_gun").amount > 0) {
     gun = "terrible_gun";
   }
 
@@ -86,13 +86,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   }
 
   if (!unbreaking) {
-    inventory[gun]--;
-
-    if (inventory[gun] <= 0) {
-      delete inventory[gun];
-    }
-
-    await setInventory(message.member, inventory);
+    await setInventoryItem(message.member, gun, inventory.find((i) => i.item == gun).amount - 1, false);
   }
 
   for (let i = 0; i < 15; i++) {
@@ -158,16 +152,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       amount = Math.floor(Math.random() * 4) + 2;
     }
 
-    if (inventory[chosen]) {
-      inventory[chosen] += amount;
-    } else {
-      inventory[chosen] = amount;
-    }
+    await addInventoryItem(message.member, chosen, amount);
 
     foundItems.push(`${amount} ${items[chosen].emoji} ${items[chosen].name}`);
     foundItemsAmount += amount;
   }
-  await setInventory(message.member, inventory);
 
   const embed = new CustomEmbed(
     message.member,

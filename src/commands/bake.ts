@@ -1,7 +1,7 @@
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { addProgress } from "../utils/functions/economy/achievements";
-import { getInventory, setInventory } from "../utils/functions/economy/inventory";
+import { addInventoryItem, getInventory } from "../utils/functions/economy/inventory";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
@@ -43,7 +43,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   let hasFurnace = false;
 
-  if (inventory["furnace"] && inventory["furnace"] > 0) {
+  if (inventory.find((i) => i.item == "furnace") && inventory.find((i) => i.item == "furnace").amount > 0) {
     hasFurnace = true;
   }
 
@@ -58,23 +58,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const amount = Math.floor(Math.random() * 4) + 1;
 
-  if (inventory["cookie"]) {
-    inventory["cookie"] += amount;
-  } else {
-    inventory["cookie"] = amount;
-  }
+  await addInventoryItem(message.member, "cookie", amount, false);
 
   const chance = Math.floor(Math.random() * 15);
 
   if (chance == 7) {
-    if (inventory["cake"]) {
-      inventory["cake"] += 1;
-    } else {
-      inventory["cake"] = 1;
-    }
+    await addInventoryItem(message.member, "cake", 1);
   }
-
-  await setInventory(message.member, inventory);
 
   let desc = `you baked **${amount}** cookie${amount > 1 ? "s" : ""}!! 🍪`;
 

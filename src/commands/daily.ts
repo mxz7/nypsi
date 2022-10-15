@@ -4,7 +4,7 @@ import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { MStoTime } from "../utils/functions/date";
 import { setProgress } from "../utils/functions/economy/achievements";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
-import { getInventory, setInventory } from "../utils/functions/economy/inventory";
+import { addInventoryItem } from "../utils/functions/economy/inventory";
 import { createUser, getDailyStreak, getLastDaily, updateLastDaily, userExists } from "../utils/functions/economy/utils";
 import { getXp, updateXp } from "../utils/functions/economy/xp";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
@@ -90,27 +90,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     crate += Math.floor(streak / 30);
 
-    const inventory = await getInventory(message.member);
-
-    if (inventory["basic_crate"]) {
-      inventory["basic_crate"] += crate;
-    } else {
-      inventory["basic_crate"] = crate;
-    }
-
-    await setInventory(message.member, inventory);
+    await addInventoryItem(message.member, "basic_crate", crate);
   }
 
   if (streak == 69) {
-    const inventory = await getInventory(message.member);
-
-    if (inventory["69420"]) {
-      inventory["69420"] += crate;
-    } else {
-      inventory["69420"] = crate;
-    }
-
-    await setInventory(message.member, inventory);
+    await addInventoryItem(message.member, "69420_crate", 3);
   }
 
   await updateBalance(message.member, (await getBalance(message.member)) + total);
@@ -120,7 +104,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   embed.setHeader("daily", message.author.avatarURL());
   embed.setDescription(
     `+$**${total.toLocaleString()}**${
-      crate ? `\n+ **${crate}** basic crate${crate > 1 ? "s" : ""}` : streak == 69 ? "\n+ **1** 69420 crate" : ""
+      crate ? `\n+ **${crate}** basic crate${crate > 1 ? "s" : ""}` : streak == 69 ? "\n+ **3** 69420 crates" : ""
     }\ndaily streak: \`${streak}\``
   );
 

@@ -1,9 +1,10 @@
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { getAuctionAverage } from "../utils/functions/economy/auctions";
-import { getInventory } from "../utils/functions/economy/inventory";
+import { getInventory, getTotalAmountOfItem } from "../utils/functions/economy/inventory";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { Item } from "../utils/models/Economy";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("item", "view information about an item", Categories.MONEY);
@@ -46,26 +47,24 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const searchTag = args.join(" ").toLowerCase();
 
-  let selected;
+  let selected: Item;
 
   for (const itemName of Array.from(Object.keys(items))) {
     const aliases = items[itemName].aliases ? items[itemName].aliases : [];
     if (searchTag == itemName) {
-      selected = itemName;
+      selected = items[itemName];
       break;
     } else if (searchTag == itemName.split("_").join("")) {
-      selected = itemName;
+      selected = items[itemName];
       break;
     } else if (aliases.indexOf(searchTag) != -1) {
-      selected = itemName;
+      selected = items[itemName];
       break;
     } else if (searchTag == items[itemName].name) {
-      selected = itemName;
+      selected = items[itemName];
       break;
     }
   }
-
-  selected = items[selected];
 
   if (!selected) {
     return send({ embeds: [new ErrorEmbed(`couldnt find \`${args.join(" ")}\``)] });
@@ -86,9 +85,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   }
 
   const avg = await getAuctionAverage(selected.id);
+  const total = await getTotalAmountOfItem(selected.id);
+  const inventory = await getInventory(message.member);
 
   if (avg) {
     desc += `**average auction sale** $${Math.floor(avg).toLocaleString()}\n`;
+  }
+
+  if (total) {
+    const percentOwned = (inventory.find((i) => i.item == selected.id).amount / total) * 100;
+
+    desc += `**in world** ${total.toLocaleString()}${percentOwned > 1 ? ` (${percentOwned.toFixed(1)}%)` : ""}`;
   }
 
   if (selected.role) {
@@ -107,12 +114,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     embed.addField("rarity", `\`${rarityMap.get(selected.rarity)}\``, true);
   }
 
-  const inventory = await getInventory(message.member);
-
-  if (inventory[selected.id]) {
+  if (inventory.find((i) => i.item == selected.id)) {
     embed.setFooter({
-      text: `you have ${inventory[selected.id].toLocaleString()} ${selected.name}${
-        inventory[selected.id] > 1 ? (selected.name.endsWith("s") ? "" : "s") : ""
+      text: `you have ${inventory.find((i) => i.item == selected.id).amount.toLocaleString()} ${selected.name}${
+        inventory.find((i) => i.item == selected.id).amount > 1 ? (selected.name.endsWith("s") ? "" : "s") : ""
       }`,
     });
   }

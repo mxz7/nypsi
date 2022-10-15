@@ -1,7 +1,8 @@
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
+import { inPlaceSort } from "fast-sort";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { getBalance, getMulti, updateBalance } from "../utils/functions/economy/balance";
-import { getInventory, setInventory } from "../utils/functions/economy/inventory";
+import { getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import { addToNypsiBank, getTax } from "../utils/functions/tax";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
@@ -42,12 +43,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const selected = new Map<string, number>();
 
-  for (const item of Array.from(Object.keys(inventory))) {
-    if (items[item].role == "fish" || items[item].role == "prey" || items[item].role == "sellable") {
-      if (items[item].id == "cookie" || items[item].id == "cake") continue;
-      selected.set(item, inventory[item]);
-    } else if (items[item].id.includes("watch") || items[item].id == "calendar") {
-      selected.set(item, inventory[item]);
+  for (const item of inventory) {
+    if (items[item.item].role == "fish" || items[item.item].role == "prey" || items[item.item].role == "sellable") {
+      if (items[item.item].id == "cookie" || items[item.item].id == "cake") continue;
+      selected.set(item.item, inventory.find((i) => i.item == item.item).amount);
+    } else if (items[item.item].id.includes("watch") || items[item.item].id == "calendar") {
+      selected.set(item.item, inventory.find((i) => i.item == item.item).amount);
     }
   }
 
@@ -61,12 +62,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   let total = 0;
   let taxedAmount = 0;
-  let earned = "";
 
   const tax = await getTax();
 
+  const promises = [];
+  const desc: string[] = [];
+  const amounts = new Map<string, number>();
+
   for (const item of selected.keys()) {
-    delete inventory[item];
+    promises.push(setInventoryItem(message.member, item, 0, false));
 
     let sellWorth = Math.floor(items[item].sell * selected.get(item));
 
@@ -78,18 +82,23 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     sellWorth = sellWorth - Math.floor(sellWorth * tax);
     total += sellWorth;
 
-    earned += `\n${items[item].emoji} ${items[item].name} +$${sellWorth.toLocaleString()} (${selected.get(item)})`;
+    desc.push(`${items[item].emoji} ${items[item].name} +$${sellWorth.toLocaleString()} (${selected.get(item)})`);
+    amounts.set(
+      `${items[item].emoji} ${items[item].name} +$${sellWorth.toLocaleString()} (${selected.get(item)})`,
+      sellWorth
+    );
   }
 
-  await setInventory(message.member, inventory);
+  promises.push(addToNypsiBank(taxedAmount));
+  promises.push(updateBalance(message.member, (await getBalance(message.member)) + total));
 
-  await addToNypsiBank(taxedAmount);
+  await Promise.all(promises);
 
-  await updateBalance(message.member, (await getBalance(message.member)) + total);
+  inPlaceSort(desc).desc((i) => amounts.get(i));
 
   const embed = new CustomEmbed(message.member);
 
-  embed.setDescription(`+$**${total.toLocaleString()}**\n${earned}`);
+  embed.setDescription(`+$**${total.toLocaleString()}**\n${desc.join("\n")}`);
   embed.setFooter({ text: `${((await getTax()) * 100).toFixed(1)}% tax` });
 
   return send({ embeds: [embed] });
