@@ -366,8 +366,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       if (!newEmbed) return await res.message.edit({ components: [] });
 
-      await res.followUp({ embeds: [newEmbed] });
-      await res.message.edit({ components: [] });
+      await res.message.edit({ embeds: [newEmbed], components: [] });
       return;
     }
   };
