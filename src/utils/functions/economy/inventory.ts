@@ -2,6 +2,7 @@ import { Collection, Guild, GuildMember } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import prisma from "../../database/database";
 import redis from "../../database/redis";
+import { logger } from "../../logger";
 import { Item } from "../../models/Economy";
 import workerSort from "../../workers/sort";
 import { addProgress, getAllAchievements, setAchievementProgress } from "./achievements";
@@ -157,6 +158,11 @@ export async function addInventoryItem(
     id = member;
   }
 
+  if (!getItems()[itemId]) {
+    console.trace();
+    return logger.error(`invalid item: ${itemId}`);
+  }
+
   await prisma.inventory.upsert({
     where: {
       userId_item: {
@@ -199,15 +205,22 @@ export async function setInventoryItem(
     id = member;
   }
 
+  if (!getItems()[itemId]) {
+    console.trace();
+    return logger.error(`invalid item: ${itemId}`);
+  }
+
   if (amount <= 0) {
-    await prisma.inventory.delete({
-      where: {
-        userId_item: {
-          userId: id,
-          item: itemId,
+    await prisma.inventory
+      .delete({
+        where: {
+          userId_item: {
+            userId: id,
+            item: itemId,
+          },
         },
-      },
-    });
+      })
+      .catch(() => {});
   } else {
     await prisma.inventory.upsert({
       where: {
