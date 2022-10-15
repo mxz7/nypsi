@@ -303,11 +303,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       });
     }
 
-    if (cost > 15000000 && amount == 1 && selected.rarity != 4) {
+    if (cost > 50000000 && amount == 1 && selected.rarity != 4) {
       return message.channel.send({ embeds: [new ErrorEmbed("this is too much")] });
     }
 
-    if (cost > 100000000 && selected.rarity != 4) {
+    if (cost > 200000000 && selected.rarity != 4) {
       return message.channel.send({ embeds: [new ErrorEmbed("this is too much")] });
     }
 
