@@ -3,6 +3,7 @@ import redis from "../../database/redis";
 import { getBaseWorkers } from "../../functions/economy/utils";
 import { calcWorkerValues, getWorkers } from "../../functions/economy/workers";
 import { getDmSettings } from "../../functions/users/notifications";
+import { logger } from "../../logger";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 import ms = require("ms");
 
@@ -45,6 +46,8 @@ async function doWorkerThing() {
     });
   }
 
+  let amount = 0;
+
   for (const userId of Array.from(dms.keys())) {
     const data: any = {
       memberId: userId,
@@ -78,7 +81,10 @@ async function doWorkerThing() {
     }
 
     await redis.lpush("nypsi:dm:queue", JSON.stringify(data));
+    amount++;
   }
+
+  if (amount > 0) logger.info(`${amount} worker notifications queued`);
 }
 
 export function runWorkerInterval() {
