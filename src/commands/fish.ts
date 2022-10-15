@@ -167,8 +167,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             for (let x = 0; x < 35; x++) {
               fishItemsModified.push(i);
             }
+          } else if (items[i].role == "worker-upgrad") {
+            const chance = Math.floor(Math.random() * 10);
+
+            if (chance == 7) {
+              fishItemsModified.push(i);
+            }
+          } else {
+            fishItemsModified.push(i);
           }
-          fishItemsModified.push(i);
         } else if (items[i].rarity == 1) {
           if (items[i].role == "fish") {
             for (let x = 0; x < 40; x++) {
