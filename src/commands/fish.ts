@@ -146,7 +146,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           const chance = Math.floor(Math.random() * 15);
           if (chance == 4 && fishingRod == "incredible_fishing_rod") {
             if (items[i].role == "fish") {
-              for (let x = 0; x < 30; x++) {
+              for (let x = 0; x < 60; x++) {
                 fishItemsModified.push(i);
               }
             }
@@ -156,7 +156,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           const chance = Math.floor(Math.random() * 3);
           if (chance == 2 && fishingRod != "terrible_fishing_rod") {
             if (items[i].role == "fish") {
-              for (let x = 0; x < 30; x++) {
+              for (let x = 0; x < 60; x++) {
                 fishItemsModified.push(i);
               }
             }
@@ -164,7 +164,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           }
         } else if (items[i].rarity == 2 && fishingRod != "terrible_fishing_rod") {
           if (items[i].role == "fish") {
-            for (let x = 0; x < 35; x++) {
+            for (let x = 0; x < 70; x++) {
               fishItemsModified.push(i);
             }
           } else if (items[i].role == "worker-upgrade") {
@@ -178,7 +178,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           }
         } else if (items[i].rarity == 1) {
           if (items[i].role == "fish") {
-            for (let x = 0; x < 40; x++) {
+            for (let x = 0; x < 80; x++) {
               fishItemsModified.push(i);
             }
           } else if (items[i].role == "worker-upgrade") {
@@ -196,7 +196,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           }
         } else if (items[i].rarity == 0) {
           if (items[i].role == "fish") {
-            for (let x = 0; x < 75; x++) {
+            for (let x = 0; x < 150; x++) {
               fishItemsModified.push(i);
             }
           } else {
