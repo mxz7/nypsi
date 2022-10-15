@@ -960,7 +960,7 @@
     "aliases": ["warehouse", "permit"],
     "emoji": "📄",
     "longDesc": "applies the warehouse expansion upgrade to the amazon worker",
-    "rarity": 2,
+    "rarity": 1,
     "sell": 100000,
     "role": "worker-upgrade",
     "worker_upgrade_id": "warehouse_expansion"
