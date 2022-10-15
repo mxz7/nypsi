@@ -54,7 +54,7 @@ import dayjs = require("dayjs");
     amount++;
   }
 
-  if (amount > 0) parentPort.postMessage(`${amount} vote reminders sent`);
+  if (amount > 0) parentPort.postMessage(`${amount} vote reminders queued`);
 
   process.exit(0);
 })();
