@@ -167,7 +167,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             for (let x = 0; x < 35; x++) {
               fishItemsModified.push(i);
             }
-          } else if (items[i].role == "worker-upgrad") {
+          } else if (items[i].role == "worker-upgrade") {
             const chance = Math.floor(Math.random() * 10);
 
             if (chance == 7) {
@@ -181,9 +181,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             for (let x = 0; x < 40; x++) {
               fishItemsModified.push(i);
             }
-          }
-          for (let x = 0; x < 2; x++) {
-            fishItemsModified.push(i);
+          } else if (items[i].role == "worker-upgrade") {
+            const chance = Math.floor(Math.random() * 10);
+
+            if (chance == 7) {
+              for (let x = 0; x < 2; x++) {
+                fishItemsModified.push(i);
+              }
+            }
+          } else {
+            for (let x = 0; x < 2; x++) {
+              fishItemsModified.push(i);
+            }
           }
         } else if (items[i].rarity == 0) {
           if (items[i].role == "fish") {
