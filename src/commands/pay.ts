@@ -19,9 +19,7 @@ const cmd = new Command("pay", "give other users money", Categories.MONEY);
 cmd.slashEnabled = true;
 cmd.slashData
   .addUserOption((option) => option.setName("user").setDescription("who would you like to send money to").setRequired(true))
-  .addIntegerOption((option) =>
-    option.setName("amount").setDescription("how much would you like to send").setRequired(true)
-  );
+  .addStringOption((option) => option.setName("amount").setDescription("how much would you like to send").setRequired(true));
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
