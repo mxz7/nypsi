@@ -133,14 +133,16 @@ export async function getInventory(member: GuildMember | string, checkAchievemen
   await redis.set(`cache:economy:inventory:${id}`, JSON.stringify(query));
   await redis.expire(`cache:economy:inventory:${id}`, 180);
 
-  if (checkAchievement && !inventoryAchievementCheckCooldown.has(id)) {
-    inventoryAchievementCheckCooldown.add(id);
-    setTimeout(() => {
-      inventoryAchievementCheckCooldown.delete(id);
-    }, 60000);
+  setTimeout(async () => {
+    if (checkAchievement && !inventoryAchievementCheckCooldown.has(id)) {
+      inventoryAchievementCheckCooldown.add(id);
+      setTimeout(() => {
+        inventoryAchievementCheckCooldown.delete(id);
+      }, 60000);
 
-    await checkCollectorAchievement(id, query);
-  }
+      await checkCollectorAchievement(id, query);
+    }
+  }, 1000);
 
   return query;
 }
