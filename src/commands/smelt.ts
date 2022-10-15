@@ -1,6 +1,6 @@
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import { getInventory, setInventory } from "../utils/functions/economy/inventory";
+import { addInventoryItem, getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
 import { addItemUse } from "../utils/functions/economy/stats";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
@@ -44,7 +44,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   let coal = 0;
   const ores = [];
 
-  if (inventory["furnace"] && inventory["furnace"] > 0) {
+  if (inventory.find((i) => i.item == "furnace") && inventory.find((i) => i.item == "furnace").amount > 0) {
     hasFurnace = true;
   }
 
@@ -54,15 +54,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     });
   }
 
-  if (inventory["iron_ore"] && inventory["iron_ore"] > 0) {
-    for (let i = 0; i < inventory["iron_ore"]; i++) {
+  if (inventory.find((i) => i.item == "iron_ore") && inventory.find((i) => i.item == "iron_ore").amount > 0) {
+    for (let i = 0; i < inventory.find((i) => i.item == "iron_ore").amount; i++) {
       ores.push("iron_ore");
       if (ores.length >= 64) break;
     }
   }
 
-  if (inventory["gold_ore"] && inventory["gold_ore"] > 0 && ores.length < 64) {
-    for (let i = 0; i < inventory["gold_ore"]; i++) {
+  if (inventory.find((i) => i.item == "gold_ore") && inventory.find((i) => i.item == "gold_ore").amount > 0) {
+    for (let i = 0; i < inventory.find((i) => i.item == "gold_ore").amount; i++) {
       ores.push("gold_ore");
       if (ores.length >= 64) break;
     }
@@ -74,8 +74,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     });
   }
 
-  if (inventory["coal"] && inventory["coal"] > 0) {
-    coal = inventory["coal"];
+  if (inventory.find((i) => i.item == "coal") && inventory.find((i) => i.item == "coal").amount > 0) {
+    coal = inventory.find((i) => i.item == "coal").amount;
 
     if (coal > ores.length) coal = ores.length;
   }
@@ -102,29 +102,26 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   let res = "";
 
-  for (const ore of Array.from(smelted.keys())) {
-    inventory[ore] -= smelted.get(ore);
+  const promises = [];
 
-    if (inventory[ore] <= 0) delete inventory[ore];
+  for (const ore of Array.from(smelted.keys())) {
+    promises.push(
+      setInventoryItem(message.member, ore, inventory.find((i) => i.item == ore).amount - smelted.get(ore), false)
+    );
 
     const ingot = items[ore].ingot;
 
     res += `\n${smelted.get(ore)} ${items[ingot].emoji} ${items[ingot].name}`;
 
-    if (inventory[ingot]) {
-      inventory[ingot] += smelted.get(ore);
-    } else {
-      inventory[ingot] = smelted.get(ore);
-    }
+    promises.push(addInventoryItem(message.member, ingot, smelted.get(ore), false));
   }
 
-  inventory["coal"] -= coal;
-  inventory["furnace"] -= 1;
+  promises.push(setInventoryItem(message.member, "coal", inventory.find((i) => i.item == "coal").amount - coal, false));
+  promises.push(
+    setInventoryItem(message.member, "furnace", inventory.find((i) => i.item == "furnace").amount - coal, false)
+  );
 
-  if (inventory["coal"] <= 0) delete inventory["coal"];
-  if (inventory["furnace"] <= 0) delete inventory["furnace"];
-
-  await setInventory(message.member, inventory);
+  await Promise.all(promises);
 
   const embed = new CustomEmbed(message.member);
   embed.setHeader("furnace", message.author.avatarURL());
