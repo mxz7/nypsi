@@ -12,7 +12,10 @@ import { getXp, updateXp } from "./xp";
 
 const inventoryAchievementCheckCooldown = new Set<string>();
 
-type Inventory = { [key: string]: number };
+type Inventory = {
+  item: string;
+  amount: number;
+}[];
 
 export async function topAmountItem(guild: Guild, amount: number, item: string): Promise<string[]> {
   let members: Collection<string, GuildMember>;
