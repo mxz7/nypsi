@@ -9,7 +9,6 @@ import { getBalance, updateBalance } from "./balance";
 import { addItemUse } from "./stats";
 import { createUser, getItems, userExists } from "./utils";
 import { getXp, updateXp } from "./xp";
-import e = require("express");
 
 const inventoryAchievementCheckCooldown = new Set<string>();
 
@@ -33,29 +32,22 @@ export async function topAmountItem(guild: Guild, amount: number, item: string):
     return !m.user.bot;
   });
 
-  const query = await prisma.economy.findMany({
+  const query = await prisma.inventory.findMany({
     where: {
-      userId: { in: Array.from(members.keys()) },
+      AND: [{ userId: { in: Array.from(members.keys()) } }, { item: item }],
     },
     select: {
       userId: true,
-      inventory: true,
+      amount: true,
     },
   });
 
   const amounts = new Map<string, number>();
-  let userIDs = query
-    .filter((i) => {
-      const inventory = i.inventory as Inventory;
+  let userIDs = query.map((i) => {
+    amounts.set(i.userId, i.amount);
 
-      if (inventory[item]) {
-        amounts.set(i.userId, inventory[item]);
-        return true;
-      } else {
-        return false;
-      }
-    })
-    .map((i) => i.userId);
+    return i.userId;
+  });
 
   if (userIDs.length > 500) {
     userIDs = await workerSort(userIDs, amounts);
@@ -305,13 +297,8 @@ export async function openCrate(member: GuildMember, item: Item): Promise<string
     crateItems.push(i);
   }
 
-  inventory[item.id] -= 1;
+  await setInventoryItem(member, item.id, inventory.find((i) => i.item == item.id).amount - 1);
 
-  if (inventory[item.id] == 0) {
-    delete inventory[item.id];
-  }
-
-  await setInventory(member, inventory);
   await addItemUse(member, item.id);
   await addProgress(member.user.id, "unboxer", 1);
 
@@ -400,16 +387,11 @@ export async function openCrate(member: GuildMember, item: Item): Promise<string
         amount = 10;
       }
 
-      if (inventory[chosen]) {
-        inventory[chosen] += amount;
-      } else {
-        inventory[chosen] = amount;
-      }
+      await addInventoryItem(member, chosen, amount);
+
       names.push(`${items[chosen].emoji} ${items[chosen].name}`);
     }
   }
-
-  await setInventory(member, inventory);
 
   return names;
 }
