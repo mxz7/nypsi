@@ -40,7 +40,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   for (const item of itemIDs) {
     if (items[item].sell) {
-      const amount = inventory[item];
+      const amount = inventory.find((i) => i.item == item).amount;
 
       if (items[item].role == "fish" || items[item].role == "prey") {
         const worth1 = Math.floor(items[item].sell * amount);
@@ -99,7 +99,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     for (const item of itemIDs) {
       if (items[item].sell) {
-        const amount = inventory[item];
+        const amount = inventory.find((i) => i.item == item).amount;
 
         if (items[item].role == "fish" || items[item].role == "prey") {
           const worth1 = Math.floor(items[item].sell * amount);
