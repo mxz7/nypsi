@@ -12,6 +12,7 @@ import {
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { getAuctionAverage } from "../utils/functions/economy/auctions";
 import { getInventory } from "../utils/functions/economy/inventory";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
@@ -89,10 +90,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       pageOfItems.push(item);
     }
 
-    if (items[item].sell) {
-      const amount = inventory.find((i) => i.item == item).amount;
+    const averageAuction = await getAuctionAverage(item);
 
-      worth += Math.floor(items[item].sell * amount);
+    if (averageAuction) {
+      worth += averageAuction * inventory.find((i) => i.item == item).amount;
+    } else if (items[item].sell) {
+      worth += items[item].sell * inventory.find((i) => i.item == item).amount;
     }
   }
 
