@@ -386,7 +386,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let amountEarned = 0;
     let earnedBreakdown = "";
 
-    inPlaceSort(userWorkers).desc((w) => baseWorkers[w.workerId].prestige_requirement);
+    inPlaceSort(userWorkers).desc((w) => baseWorkers[w.workerId].base.per_item * userWorker.stored);
 
     for (const worker of userWorkers) {
       const baseWorker = baseWorkers[worker.workerId];
