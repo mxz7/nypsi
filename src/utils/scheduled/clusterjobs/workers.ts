@@ -6,6 +6,7 @@ import { getDmSettings } from "../../functions/users/notifications";
 import { logger } from "../../logger";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 import ms = require("ms");
+import dayjs = require("dayjs");
 
 async function doWorkerThing() {
   const query = await prisma.economyWorker.findMany({
@@ -88,5 +89,12 @@ async function doWorkerThing() {
 }
 
 export function runWorkerInterval() {
-  setInterval(doWorkerThing, ms("1 hour"));
+  const nextHour = dayjs().add(1, "hour").set("minutes", 0).set("seconds", 0);
+  const msNeeded = nextHour.diff(dayjs(), "milliseconds");
+
+  setTimeout(() => {
+    doWorkerThing();
+
+    setInterval(doWorkerThing, ms("1 hour"));
+  }, msNeeded);
 }
