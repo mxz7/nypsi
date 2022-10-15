@@ -954,6 +954,17 @@
     "role": "worker-upgrade",
     "worker_upgrade_id": "nasa_computers"
   },
+  "launchpad": {
+    "id": "launchpad",
+    "name": "launchpad",
+    "aliases": ["launch"],
+    "emoji": "🚀",
+    "longDesc": "applies the launchpad upgrade to the spacex worker",
+    "rarity": 2,
+    "sell": 75000,
+    "role": "worker-upgrade",
+    "worker_upgrade_id": "launchpad"
+  },
   "warehouse_permit": {
     "id": "warehouse_permit",
     "name": "warehouse permit",
