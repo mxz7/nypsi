@@ -51,7 +51,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     });
   }
 
-  const streak = await getDailyStreak(message.member);
+  const streak = (await getDailyStreak(message.member)) + 1;
 
   const base = 20000;
 
@@ -101,15 +101,27 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     await setInventory(message.member, inventory);
   }
 
+  if (streak == 69) {
+    const inventory = await getInventory(message.member);
+
+    if (inventory["69420"]) {
+      inventory["69420"] += crate;
+    } else {
+      inventory["69420"] = crate;
+    }
+
+    await setInventory(message.member, inventory);
+  }
+
   await updateBalance(message.member, (await getBalance(message.member)) + total);
   await updateLastDaily(message.member);
 
   const embed = new CustomEmbed(message.member);
   embed.setHeader("daily", message.author.avatarURL());
   embed.setDescription(
-    `+$**${total.toLocaleString()}**${crate ? `\n+ **${crate}** basic crate${crate > 1 ? "s" : ""}` : ""}\ndaily streak: \`${
-      streak + 1
-    }\``
+    `+$**${total.toLocaleString()}**${
+      crate ? `\n+ **${crate}** basic crate${crate > 1 ? "s" : ""}` : streak == 69 ? "\n+ **1** 69420 crate" : ""
+    }\ndaily streak: \`${streak}\``
   );
 
   if (xp > 0) {
