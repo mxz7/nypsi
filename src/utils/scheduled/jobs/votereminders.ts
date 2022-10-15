@@ -1,5 +1,6 @@
 import { ActionRowBuilder, ButtonBuilder, MessageActionRowComponentBuilder } from "@discordjs/builders";
 import { ButtonStyle } from "discord.js";
+import { parentPort } from "worker_threads";
 import prisma from "../../database/database";
 import redis from "../../database/redis";
 import { CustomEmbed } from "../../models/EmbedBuilders";
@@ -43,10 +44,17 @@ import dayjs = require("dayjs");
       .toJSON(),
   };
 
+  let amount = 0;
+
   for (const user of toSendReminder) {
     if (await redis.sismember("nypsi:vote_reminder:received", user)) return;
     data.memberId = user;
     await redis.lpush("nypsi:dm:queue", JSON.stringify(data));
     await redis.sadd("nypsi:vote_reminder:received", user);
+    amount++;
   }
+
+  if (amount > 0) parentPort.postMessage(`${amount} vote reminders sent`);
+
+  process.exit(0);
 })();
