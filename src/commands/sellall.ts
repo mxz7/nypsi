@@ -82,9 +82,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     sellWorth = sellWorth - Math.floor(sellWorth * tax);
     total += sellWorth;
 
-    desc.push(`\n${items[item].emoji} ${items[item].name} +$${sellWorth.toLocaleString()} (${selected.get(item)})`);
+    desc.push(`${items[item].emoji} ${items[item].name} +$${sellWorth.toLocaleString()} (${selected.get(item)})`);
     amounts.set(
-      `\n${items[item].emoji} ${items[item].name} +$${sellWorth.toLocaleString()} (${selected.get(item)})`,
+      `${items[item].emoji} ${items[item].name} +$${sellWorth.toLocaleString()} (${selected.get(item)})`,
       sellWorth
     );
   }
