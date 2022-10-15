@@ -241,7 +241,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (args.length == 1) {
       for (const item of Array.from(Object.keys(inventory))) {
         if (items[item].role == "car") {
-          if (inventory[item] && inventory[item] > 0) {
+          if (inventory.find((i) => i.item == item) && inventory.find((i) => i.item == item).amount > 0) {
             if (car) {
               if (car.speed < items[item].speed) {
                 if (carCooldown.has(message.author.id)) {
@@ -286,7 +286,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         car = items[carName];
       }
 
-      if ((!inventory[car.id] || inventory[car.id] == 0) && car.id != "cycle") {
+      if (
+        (!inventory.find((i) => i.item == car.id) || inventory.find((i) => i.item == car.id).amount == 0) &&
+        car.id != "cycle"
+      ) {
         return send({ embeds: [new ErrorEmbed(`you don't have a ${car.name}`)] });
       }
     }
