@@ -127,7 +127,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const showWorkers = async (defaultWorker = "potato_farmer", msg?: Message) => {
     const displayWorker = async (worker: Worker) => {
-      const embed = new CustomEmbed(message.member);
+      const embed = new CustomEmbed(message.member).disableFooter();
 
       embed.setHeader(
         `${worker.name}${prestige < worker.prestige_requirement ? " [locked]" : ""}`,
@@ -265,7 +265,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   };
 
   const upgradeWorker = async (worker: Worker, msg?: Message) => {
-    const embed = new CustomEmbed(message.member);
+    const embed = new CustomEmbed(message.member).disableFooter();
 
     embed.setHeader(`${worker.name} upgrades`, message.author.avatarURL());
 
@@ -416,10 +416,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     await emptyWorkersStored(message.member);
     await updateBalance(message.member, (await getBalance(message.member)) + amountEarned);
 
-    const embed = new CustomEmbed(message.member, `+$**${amountEarned.toLocaleString()}**\n${earnedBreakdown}`).setHeader(
-      "workers",
-      message.author.avatarURL()
-    );
+    const embed = new CustomEmbed(message.member, `+$**${amountEarned.toLocaleString()}**\n${earnedBreakdown}`)
+      .setHeader("workers", message.author.avatarURL())
+      .disableFooter();
 
     return send({ embeds: [embed] });
   } else {
