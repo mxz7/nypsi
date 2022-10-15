@@ -46,7 +46,11 @@ const workerChoices: APIApplicationCommandOptionChoice<string>[] = [
   { name: "butcher", value: "butcher" },
   { name: "tailor", value: "tailor" },
   { name: "spacex", value: "spacex" },
+  { name: "amazon", value: "amazon" },
+  { name: "mcdonalds", value: "mcdonalds" },
 ];
+
+inPlaceSort(workerChoices).asc((wch) => getBaseWorkers()[wch.value].prestige_requirement);
 
 cmd.slashEnabled = true;
 cmd.slashData
