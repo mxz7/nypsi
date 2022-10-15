@@ -4,7 +4,7 @@ import * as express from "express";
 import prisma from "./database/database";
 import redis from "./database/redis";
 import { getBalance, updateBalance } from "./functions/economy/balance";
-import { getInventory, setInventory } from "./functions/economy/inventory";
+import { addInventoryItem } from "./functions/economy/inventory";
 import { getPrestige } from "./functions/economy/prestige";
 import { addTicket, getTickets, userExists } from "./functions/economy/utils";
 import { addKarma, getKarma } from "./functions/karma/karma";
@@ -75,7 +75,6 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
   if (prestige > 15) prestige = 15;
 
   const amount = Math.floor(15000 * (prestige / 2 + 1));
-  const inventory = await getInventory(user);
 
   await Promise.all([
     updateBalance(user, (await getBalance(user)) + amount),
@@ -109,13 +108,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
 
   if (crateAmount > 5) crateAmount = 5;
 
-  if (inventory["vote_crate"]) {
-    inventory["vote_crate"] += crateAmount;
-  } else {
-    inventory["vote_crate"] = crateAmount;
-  }
-
-  await setInventory(user, inventory, false);
+  await addInventoryItem(user, "vote_crate", crateAmount, false);
 
   if ((await getDmSettings(user)).vote) {
     const embed = new CustomEmbed()

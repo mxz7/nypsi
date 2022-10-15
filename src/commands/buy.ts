@@ -1,7 +1,7 @@
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
-import { getInventory, setInventory } from "../utils/functions/economy/inventory";
+import { addInventoryItem } from "../utils/functions/economy/inventory";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
@@ -53,7 +53,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   }
 
   const items = getItems();
-  const inventory = await getInventory(message.member);
 
   const searchTag = args[0].toLowerCase();
 
@@ -106,15 +105,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   await addCooldown(cmd.name, message.member, 7);
 
   await updateBalance(message.member, (await getBalance(message.member)) - selected.buy * amount);
-  inventory[selected.id] + amount;
 
-  if (inventory[selected.id]) {
-    inventory[selected.id] += amount;
-  } else {
-    inventory[selected.id] = amount;
-  }
-
-  await setInventory(message.member, inventory);
+  await addInventoryItem(message.member, selected.id, amount);
 
   return send({
     embeds: [

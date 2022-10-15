@@ -15,8 +15,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   let ethereumAmount = 0;
 
-  if (inventory["ethereum"]) {
-    ethereumAmount = inventory["ethereum"];
+  if (inventory.find((i) => i.item == "ethereum")) {
+    ethereumAmount = inventory.find((i) => i.item == "ethereum").amount;
   }
 
   const embed = new CustomEmbed(

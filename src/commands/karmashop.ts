@@ -10,9 +10,10 @@ import {
   MessageActionRowComponentBuilder,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
+import Constants from "../utils/Constants";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { addProgress } from "../utils/functions/economy/achievements";
-import { getInventory, setInventory } from "../utils/functions/economy/inventory";
+import { addInventoryItem } from "../utils/functions/economy/inventory";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { getXp, updateXp } from "../utils/functions/economy/xp";
 import { getKarma, removeKarma } from "../utils/functions/karma/karma";
@@ -22,7 +23,6 @@ import { NypsiClient } from "../utils/models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 import dayjs = require("dayjs");
-import Constants from "../utils/Constants";
 
 const cmd = new Command("karmashop", "buy stuff with your karma", Categories.INFO).setAliases(["ks"]);
 
@@ -351,15 +351,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         await updateXp(message.member, (await getXp(message.member)) + 1000);
         break;
       case "basic_crate":
-        const inventory = await getInventory(message.member); // eslint-disable-line
-
-        if (inventory["basic_crate"]) {
-          inventory["basic_crate"]++;
-        } else {
-          inventory["basic_crate"] = 1;
-        }
-
-        await setInventory(message.member, inventory);
+        await addInventoryItem(message.member, "basic_crate", 1);
     }
 
     if (selected.id == "bronze" || selected.id == "silver" || selected.id == "gold") {

@@ -11,7 +11,7 @@ import prisma from "../utils/database/database";
 import redis from "../utils/database/redis";
 import { hasPadlock, increaseBaseBankStorage, setPadlock } from "../utils/functions/economy/balance";
 import { addBooster, getBoosters } from "../utils/functions/economy/boosters";
-import { getInventory, openCrate, setInventory } from "../utils/functions/economy/inventory";
+import { getInventory, openCrate, setInventoryItem } from "../utils/functions/economy/inventory";
 import { addItemUse } from "../utils/functions/economy/stats";
 import {
   addHandcuffs,
@@ -27,6 +27,7 @@ import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
 import { getDmSettings } from "../utils/functions/users/notifications";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { Item } from "../utils/models/Economy";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("use", "use an item or open crates", Categories.MONEY).setAliases(["open", "activate"]);
@@ -90,32 +91,30 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const searchTag = args[0].toLowerCase();
 
-  let selected;
+  let selected: Item;
 
   for (const itemName of Array.from(Object.keys(items))) {
     const aliases = items[itemName].aliases ? items[itemName].aliases : [];
     if (searchTag == itemName) {
-      selected = itemName;
+      selected = items[itemName];
       break;
     } else if (searchTag == itemName.split("_").join("")) {
-      selected = itemName;
+      selected = items[itemName];
       break;
     } else if (aliases.indexOf(searchTag) != -1) {
-      selected = itemName;
+      selected = items[itemName];
       break;
     } else if (searchTag == items[itemName].name) {
-      selected = itemName;
+      selected = items[itemName];
       break;
     }
   }
 
-  selected = items[selected];
-
-  if (!selected) {
+  if (!selected || typeof selected == "string") {
     return send({ embeds: [new ErrorEmbed(`couldnt find \`${args[0]}\``)] });
   }
 
-  if (!inventory[selected.id] || inventory[selected.id] == 0) {
+  if (!inventory.find((i) => i.item == selected.id) || inventory.find((i) => i.item == selected.id).amount == 0) {
     return send({ embeds: [new ErrorEmbed(`you dont have a ${selected.name}`)] });
   }
 
@@ -168,15 +167,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       }
     }
 
-    inventory[selected.id]--;
-
-    if (inventory[selected.id] <= 0) {
-      delete inventory[selected.id];
-    }
-
-    await setInventory(message.member, inventory);
-    await addItemUse(message.member, selected.id);
-    await addBooster(message.member, selected.id);
+    await Promise.all([
+      setInventoryItem(message.member, selected.id, inventory.find((i) => i.item == selected.id).amount - 1, false),
+      addItemUse(message.member, selected.id),
+      addBooster(message.member, selected.id),
+    ]);
 
     boosters = await getBoosters(message.member);
 
@@ -240,14 +235,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return send({ embeds: [new ErrorEmbed("you have reached the limit for this upgrade")] });
     }
 
-    inventory[selected.id]--;
-
-    if (inventory[selected.id] <= 0) {
-      delete inventory[selected.id];
-    }
-
-    await setInventory(message.member, inventory);
-    await addWorkerUpgrade(message.member, upgrade.for, upgrade.id);
+    await Promise.all([
+      setInventoryItem(message.member, selected.id, inventory.find((i) => i.item == selected.id).amount - 1, false),
+      addWorkerUpgrade(message.member, upgrade.for, upgrade.id),
+    ]);
 
     return send({
       embeds: [
@@ -305,16 +296,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           });
         }
 
-        await setPadlock(message.member, true);
-        inventory["padlock"]--;
-
-        if (inventory["padlock"] <= 0) {
-          delete inventory["padlock"];
-        }
-
-        await setInventory(message.member, inventory);
-
-        await addItemUse(message.member, selected.id);
+        await Promise.all([
+          setInventoryItem(message.member, selected.id, inventory.find((i) => i.item == selected.id).amount - 1, false),
+          addItemUse(message.member, selected.id),
+          setPadlock(message.member, true),
+        ]);
 
         embed.setDescription("✅ your padlock has been applied");
         break;
@@ -364,17 +350,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           });
         }
 
-        await setPadlock(lockPickTarget, false);
-
-        inventory["lock_pick"]--;
-
-        if (inventory["lock_pick"] <= 0) {
-          delete inventory["lock_pick"];
-        }
-
-        await addItemUse(message.member, selected.id);
-
-        await setInventory(message.member, inventory);
+        await Promise.all([
+          setInventoryItem(message.member, selected.id, inventory.find((i) => i.item == selected.id).amount - 1, false),
+          addItemUse(message.member, selected.id),
+          setPadlock(lockPickTarget, false),
+        ]);
 
         const targetEmbed = new CustomEmbed();
 
@@ -417,15 +397,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           embed.setDescription("you're wearing your **mask** and can now rob a store again");
         }
 
-        inventory["mask"]--;
+        await Promise.all([
+          setInventoryItem(message.member, selected.id, inventory.find((i) => i.item == selected.id).amount - 1, false),
+          addItemUse(message.member, selected.id),
+        ]);
 
-        if (inventory["mask"] <= 0) {
-          delete inventory["mask"];
-        }
-
-        await addItemUse(message.member, selected.id);
-
-        await setInventory(message.member, inventory);
         break;
 
       case "radio":
@@ -462,13 +438,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         await redis.set(`cd:rob-radio:${radioTarget.user.id}`, Date.now());
         await redis.expire(`cd:rob-radio:${radioTarget.user.id}`, 900);
 
-        inventory["radio"]--;
-
-        if (inventory["radio"] <= 0) {
-          delete inventory["radio"];
-        }
-
-        await setInventory(message.member, inventory);
+        await Promise.all([
+          setInventoryItem(message.member, selected.id, inventory.find((i) => i.item == selected.id).amount - 1, false),
+          addItemUse(message.member, selected.id),
+        ]);
 
         embed.setDescription("putting report out on police scanner...");
         laterDescription = `putting report out on police scanner...\n\nthe police are now looking for **${radioTarget.user.tag}**`;
@@ -505,18 +478,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           });
         }
 
-        await addItemUse(message.member, selected.id);
-
         await redis.set(`cd:sex-chastity:${chastityTarget.user.id}`, Date.now());
         await redis.expire(`cd:sex-chastity:${chastityTarget.user.id}`, 10800);
 
-        inventory["chastity_cage"]--;
-
-        if (inventory["chastity_cage"] <= 0) {
-          delete inventory["chastity_cage"];
-        }
-
-        await setInventory(message.member, inventory);
+        await Promise.all([
+          setInventoryItem(message.member, selected.id, inventory.find((i) => i.item == selected.id).amount - 1, false),
+          addItemUse(message.member, selected.id),
+        ]);
 
         embed.setDescription("locking chastity cage...");
         laterDescription = `locking chastity cage...\n\n**${chastityTarget.user.tag}**'s chastity cage is now locked in place`;
@@ -535,13 +503,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           },
         });
 
-        inventory["streak_token"]--;
-
-        if (inventory["streak_token"] <= 0) {
-          delete inventory["streak_token"];
-        }
-
-        await setInventory(message.member, inventory);
+        await Promise.all([
+          setInventoryItem(message.member, selected.id, inventory.find((i) => i.item == selected.id).amount - 1, false),
+          addItemUse(message.member, selected.id),
+        ]);
 
         embed.setDescription("applying token...");
         laterDescription = `applying token...\n\nyour new daily streak is: \`${query.dailyStreak}\``;
@@ -549,15 +514,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       case "stolen_credit_card":
         const amount = Math.floor(Math.random() * 499000) + 1000;
-        await increaseBaseBankStorage(message.member, amount);
 
-        inventory["stolen_credit_card"]--;
-
-        if (inventory["stolen_credit_card"] <= 0) {
-          delete inventory["stolen_credit_card"];
-        }
-
-        await setInventory(message.member, inventory);
+        await Promise.all([
+          setInventoryItem(message.member, selected.id, inventory.find((i) => i.item == selected.id).amount - 1, false),
+          addItemUse(message.member, selected.id),
+          increaseBaseBankStorage(message.member, amount),
+        ]);
 
         embed.setDescription("using stolen credit card...");
         laterDescription = `using stolen credit card...\n\nsuccessfully added $**${amount.toLocaleString()}** to your bank capacity`;
@@ -592,44 +554,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           });
         }
 
-        await addItemUse(message.member, selected.id);
-
-        await addHandcuffs(handcuffsTarget.id);
-
-        inventory["handcuffs"]--;
-
-        if (inventory["handcuffs"] <= 0) {
-          delete inventory["handcuffs"];
-        }
-
-        await setInventory(message.member, inventory);
+        await Promise.all([
+          setInventoryItem(message.member, selected.id, inventory.find((i) => i.item == selected.id).amount - 1, false),
+          addItemUse(message.member, selected.id),
+          addHandcuffs(handcuffsTarget.id),
+        ]);
 
         embed.setDescription(`restraining **${handcuffsTarget.user.tag}**...`);
         laterDescription = `restraining **${handcuffsTarget.user.tag}**...\n\n**${handcuffsTarget.user.tag}** has been restrained for one minute`;
-        break;
-      case "cookie":
-        inventory["cookie"]--;
-
-        if (inventory["cookie"] <= 0) {
-          delete inventory["cookie"];
-        }
-
-        await setInventory(message.member, inventory);
-
-        embed.setDescription("consuming cookie...");
-        laterDescription = "consuming cookie...\n\nyum 😋";
-        break;
-      case "cake":
-        inventory["cake"]--;
-
-        if (inventory["cake"] <= 0) {
-          delete inventory["cake"];
-        }
-
-        await setInventory(message.member, inventory);
-
-        embed.setDescription("consuming cake...");
-        laterDescription = "consuming cake...\n\nyum 😋";
         break;
       case "teddy":
         embed.setDescription("you cuddle your teddy bear");

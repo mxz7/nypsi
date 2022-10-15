@@ -1,6 +1,6 @@
 import prisma from "../../database/database";
 import { MStoTime } from "../../functions/date";
-import { getInventory, setInventory } from "../../functions/economy/inventory";
+import { addInventoryItem } from "../../functions/economy/inventory";
 import { userExists } from "../../functions/economy/utils";
 import requestDM from "../../functions/requestdm";
 import { getDmSettings } from "../../functions/users/notifications";
@@ -28,14 +28,9 @@ async function doCrates(client: NypsiClient) {
 
   for (const member of query) {
     if (!(await userExists(member.userId))) continue;
-    const inventory = await getInventory(member.userId);
 
     if (member.level == 2) {
-      if (inventory["basic_crate"]) {
-        inventory["basic_crate"] += 1;
-      } else {
-        inventory["basic_crate"] = 1;
-      }
+      await addInventoryItem(member.userId, "basic_crate", 1, false);
 
       const embed = new CustomEmbed().setHeader("thank you for supporting nypsi!").setColor("#5efb8f");
 
@@ -50,11 +45,7 @@ async function doCrates(client: NypsiClient) {
         }).catch(() => {});
       }
     } else if (member.level == 3) {
-      if (inventory["basic_crate"]) {
-        inventory["basic_crate"] += 2;
-      } else {
-        inventory["basic_crate"] = 2;
-      }
+      await addInventoryItem(member.userId, "basic_crate", 2, false);
 
       const embed = new CustomEmbed().setHeader("thank you for supporting nypsi!").setColor("#5efb8f");
 
@@ -69,17 +60,10 @@ async function doCrates(client: NypsiClient) {
         }).catch(() => {});
       }
     } else if (member.level == 4) {
-      if (inventory["basic_crate"]) {
-        inventory["basic_crate"] += 2;
-      } else {
-        inventory["basic_crate"] = 2;
-      }
-
-      if (inventory["69420_crate"]) {
-        inventory["69420_crate"] += 1;
-      } else {
-        inventory["69420_crate"] = 1;
-      }
+      await Promise.all([
+        addInventoryItem(member.userId, "basic_crate", 2, false),
+        addInventoryItem(member.userId, "69420_crate", 1, false),
+      ]);
 
       const embed = new CustomEmbed().setHeader("thank you for supporting nypsi!").setColor("#5efb8f");
 
@@ -94,8 +78,6 @@ async function doCrates(client: NypsiClient) {
         }).catch(() => {});
       }
     }
-
-    await setInventory(member.userId, inventory);
   }
 }
 
