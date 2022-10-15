@@ -44,7 +44,12 @@ export async function getBoosters(member: GuildMember | string): Promise<Map<str
           await redis.del(`cache:economy:boosters:${id}`);
 
           boosters.splice(boosters.indexOf(booster), 1);
-          map.set(key, boosters);
+
+          if (boosters.length == 0) {
+            map.delete(key);
+          } else {
+            map.set(key, boosters);
+          }
         }
       }
     }
