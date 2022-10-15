@@ -93,7 +93,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   }
 
   if (total) {
-    const percentOwned = (inventory.find((i) => i.item == selected.id).amount / total) * 100;
+    const percentOwned = (inventory.find((i) => i.item == selected.id)?.amount / total) * 100;
 
     desc += `**in world** ${total.toLocaleString()}${percentOwned > 1 ? ` (${percentOwned.toFixed(1)}%)` : ""}`;
   }
