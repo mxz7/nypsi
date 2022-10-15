@@ -269,7 +269,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     embed.setHeader(`${worker.name} upgrades`, message.author.avatarURL());
 
-    let desc = "";
+    let desc = `💰 $${(await getBalance(message.member)).toLocaleString()}\n\n`;
 
     const userWorker = userWorkers.find((w) => w.workerId == worker.id);
     const baseUpgrades = getBaseUpgrades();
@@ -388,13 +388,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return upgradeWorker(worker);
   } else if (args[0].toLowerCase() == "claim" || args[0].toLowerCase() == "sell") {
     let amountEarned = 0;
-    let earnedBreakdown = "";
-
-    inPlaceSort(userWorkers).desc(async (w) => {
-      const { perItem } = await calcWorkerValues(w);
-
-      return perItem * w.stored;
-    });
+    const earnedBreakdown: string[] = [];
+    const amounts = new Map<string, number>();
 
     for (const worker of userWorkers) {
       const baseWorker = baseWorkers[worker.workerId];
@@ -402,10 +397,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       const { perItem } = await calcWorkerValues(worker);
 
       amountEarned += Math.floor(perItem * worker.stored);
-      earnedBreakdown += `\n${baseWorker.name} +$${Math.floor(
-        perItem * worker.stored
-      ).toLocaleString()} (${worker.stored.toLocaleString()} ${baseWorker.item_emoji})`;
+      earnedBreakdown.push(
+        `\n${baseWorker.name} +$${Math.floor(perItem * worker.stored).toLocaleString()} (${worker.stored.toLocaleString()} ${
+          baseWorker.item_emoji
+        })`
+      );
     }
+
+    inPlaceSort(earnedBreakdown).desc((x) => amounts.get(x));
 
     if (amountEarned == 0) {
       return send({
@@ -416,7 +415,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     await emptyWorkersStored(message.member);
     await updateBalance(message.member, (await getBalance(message.member)) + amountEarned);
 
-    const embed = new CustomEmbed(message.member, `+$**${amountEarned.toLocaleString()}**\n${earnedBreakdown}`)
+    const embed = new CustomEmbed(message.member, `+$**${amountEarned.toLocaleString()}**\n${earnedBreakdown.join("\n")}`)
       .setHeader("workers", message.author.avatarURL())
       .disableFooter();
 
