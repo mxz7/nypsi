@@ -7,6 +7,7 @@ import { createUser, getItems, isEcoBanned, userExists } from "../utils/function
 import { getXp } from "../utils/functions/economy/xp";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
+import { getDmSettings } from "../utils/functions/users/notifications";
 import { payment } from "../utils/logger";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
@@ -196,6 +197,22 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   await setInventory(message.member, inventory);
   await setInventory(target, targetInventory);
+
+  if ((await getDmSettings(target)).payment) {
+    const embed = new CustomEmbed(
+      target,
+      `**${message.author.tag}** has given you ${amount.toLocaleString()} ${selected.emoji} ${selected.name}`
+    )
+      .setHeader(`you have received ${amount == 1 ? "an item" : `${amount.toLocaleString()} items`}`)
+      .setFooter({ text: "/settings me notifications" });
+
+    await target
+      .send({
+        embeds: [embed],
+        content: `you have received ${amount == 1 ? "an item" : `${amount.toLocaleString()} items`}`,
+      })
+      .catch(() => {});
+  }
 
   payment(message.author, target.user, selected.sell * amount);
 
