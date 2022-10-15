@@ -29,7 +29,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   for (const itemId in inventory) {
     if (items[itemId].sell) {
-      inventoryWorth += items[itemId].sell * inventory[itemId];
+      inventoryWorth += items[itemId].sell * inventory.find((i) => i.item == itemId).amount;
     }
   }
 
