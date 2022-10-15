@@ -46,6 +46,7 @@ const bree = new Bree({
     },
     {
       name: "lottery-tickets",
+      timeout: dayjs().add(1, "hour").set("minutes", 30).set("seconds", 0).diff(dayjs(), "milliseconds"),
       interval: "30m",
       path: path.join(__dirname, "jobs", "lotterytickets.js"),
     },
