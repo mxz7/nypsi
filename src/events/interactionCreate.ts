@@ -287,6 +287,10 @@ export default async function interactionCreate(interaction: Interaction) {
 
         embed.setDescription(desc.join("\n\n"));
 
+        if (embed.data.footer?.text) {
+          embed.setFooter({ text: embed.data.footer.text });
+        }
+
         await interaction.message.edit({ embeds: [embed], components: [] });
 
         logger.info(

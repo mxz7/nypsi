@@ -80,6 +80,10 @@ export async function createAuction(member: GuildMember, itemId: string, itemAmo
       `**${itemAmount.toLocaleString()}x** ${items[itemId].emoji} ${items[itemId].name} for $**${bin.toLocaleString()}**`
   );
 
+  if (itemAmount > 1 && bin > 69_420) {
+    embed.setFooter({ text: `$${Math.floor(bin / itemAmount).toLocaleString()} per ${items[itemId].name}` });
+  }
+
   const button = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder().setCustomId("b").setLabel("buy").setStyle(ButtonStyle.Success)
   );
