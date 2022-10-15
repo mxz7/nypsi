@@ -84,7 +84,6 @@ model Economy {
   dailyStreak Int @default(0)
 
   inventory Json @default("{}")
-  workers   Json @default("{}")
 
   banned DateTime?
 
