@@ -9,6 +9,7 @@ import { getBalance, updateBalance } from "./balance";
 import { addItemUse } from "./stats";
 import { createUser, getItems, userExists } from "./utils";
 import { getXp, updateXp } from "./xp";
+import e = require("express");
 
 const inventoryAchievementCheckCooldown = new Set<string>();
 
@@ -117,31 +118,26 @@ export async function getInventory(member: GuildMember | string, checkAchievemen
     return JSON.parse(await redis.get(`cache:economy:inventory:${id}`));
   }
 
-  const query = await prisma.economy
-    .findUnique({
+  const query = await prisma.inventory
+    .findMany({
       where: {
         userId: id,
       },
       select: {
-        inventory: true,
+        item: true,
+        amount: true,
       },
     })
     .catch(() => {});
 
-  if (!query) {
+  if (!query || query.length == 0) {
     if (!(await userExists(id))) await createUser(id);
-    await redis.set(`cache:economy:inventory:${id}`, "{}");
+    await redis.set(`cache:economy:inventory:${id}`, "[]");
     await redis.expire(`cache:economy:inventory:${id}`, 180);
-    return {};
+    return [];
   }
 
-  if (!query.inventory) {
-    await redis.set(`cache:economy:inventory:${id}`, "{}");
-    await redis.expire(`cache:economy:inventory:${id}`, 180);
-    return {};
-  }
-
-  await redis.set(`cache:economy:inventory:${id}`, JSON.stringify(query.inventory));
+  await redis.set(`cache:economy:inventory:${id}`, JSON.stringify(query));
   await redis.expire(`cache:economy:inventory:${id}`, 180);
 
   if (checkAchievement && !inventoryAchievementCheckCooldown.has(id)) {
@@ -150,13 +146,18 @@ export async function getInventory(member: GuildMember | string, checkAchievemen
       inventoryAchievementCheckCooldown.delete(id);
     }, 60000);
 
-    await checkCollectorAchievement(id, query.inventory as Inventory);
+    await checkCollectorAchievement(id, query);
   }
 
-  return query.inventory as Inventory;
+  return query;
 }
 
-export async function setInventory(member: GuildMember | string, inventory: Inventory, checkAchievement = true) {
+export async function addInventoryItem(
+  member: GuildMember | string,
+  itemId: string,
+  amount: number,
+  checkAchievement = true
+) {
   let id: string;
   if (member instanceof GuildMember) {
     id = member.user.id;
@@ -164,12 +165,20 @@ export async function setInventory(member: GuildMember | string, inventory: Inve
     id = member;
   }
 
-  await prisma.economy.update({
+  await prisma.inventory.upsert({
     where: {
-      userId: id,
+      userId_item: {
+        userId: id,
+        item: itemId,
+      },
     },
-    data: {
-      inventory: inventory,
+    update: {
+      amount: { increment: amount },
+    },
+    create: {
+      userId: id,
+      item: itemId,
+      amount: amount,
     },
   });
 
@@ -181,15 +190,68 @@ export async function setInventory(member: GuildMember | string, inventory: Inve
       inventoryAchievementCheckCooldown.delete(id);
     }, 60000);
 
-    await checkCollectorAchievement(id, inventory);
+    checkCollectorAchievement(id, await getInventory(id, false));
+  }
+}
+
+export async function setInventoryItem(
+  member: GuildMember | string,
+  itemId: string,
+  amount: number,
+  checkAchievement = true
+) {
+  let id: string;
+  if (member instanceof GuildMember) {
+    id = member.user.id;
+  } else {
+    id = member;
+  }
+
+  if (amount <= 0) {
+    await prisma.inventory.delete({
+      where: {
+        userId_item: {
+          userId: id,
+          item: itemId,
+        },
+      },
+    });
+  } else {
+    await prisma.inventory.upsert({
+      where: {
+        userId_item: {
+          userId: id,
+          item: itemId,
+        },
+      },
+      update: {
+        amount: amount,
+      },
+      create: {
+        userId: id,
+        item: itemId,
+        amount: amount,
+      },
+    });
+  }
+
+  await redis.del(`cache:economy:inventory:${id}`);
+
+  if (!inventoryAchievementCheckCooldown.has(id) && checkAchievement) {
+    inventoryAchievementCheckCooldown.add(id);
+    setTimeout(() => {
+      inventoryAchievementCheckCooldown.delete(id);
+    }, 60000);
+
+    checkCollectorAchievement(id, await getInventory(id, false));
   }
 }
 
 async function checkCollectorAchievement(id: string, inventory: Inventory) {
   let itemCount = 0;
 
-  for (const itemId of Object.keys(inventory)) {
-    itemCount += inventory[itemId];
+  for (const item of inventory) {
+    itemCount += item.amount;
   }
 
   const achievements = await getAllAchievements(id);
