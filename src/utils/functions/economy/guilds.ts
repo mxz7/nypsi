@@ -8,7 +8,7 @@ import { GuildUpgradeRequirements } from "../../models/Economy";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 import requestDM from "../requestdm";
 import { getDmSettings } from "../users/notifications";
-import { getInventory, setInventory } from "./inventory";
+import { addInventoryItem } from "./inventory";
 import ms = require("ms");
 
 export async function getGuildByName(name: string) {
@@ -317,15 +317,7 @@ async function checkUpgrade(guild: EconomyGuild | string, client: NypsiClient): 
     embed.disableFooter();
 
     for (const member of guild.members) {
-      const inventory = await getInventory(member.userId);
-
-      if (inventory["basic_crate"]) {
-        inventory["basic_crate"] += guild.level;
-      } else {
-        inventory["basic_crate"] = guild.level;
-      }
-
-      await setInventory(member.userId, inventory);
+      await addInventoryItem(member.userId, "basic_crate", guild.level, false);
 
       if ((await getDmSettings(member.userId)).other) {
         await requestDM({
