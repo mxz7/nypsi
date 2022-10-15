@@ -107,7 +107,7 @@ model Inventory {
 
   economy Economy @relation(fields: [userId], references: [userId], onDelete: Cascade)
 
-  @@id([userId, item])
+  @@unique([userId, item])
   @@index([userId, item])
 }
 
