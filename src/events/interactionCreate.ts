@@ -224,6 +224,36 @@ export default async function interactionCreate(interaction: Interaction) {
           });
         }
 
+        if (auction.bin >= 10_000_000) {
+          const modal = new ModalBuilder().setCustomId("auction-confirm").setTitle("confirmation");
+
+          modal.addComponents(
+            new ActionRowBuilder<TextInputBuilder>().addComponents(
+              new TextInputBuilder()
+                .setCustomId("confirmation")
+                .setLabel("type 'yes' to confirm")
+                .setPlaceholder(`this will cost $${auction.bin.toLocaleString()}`)
+                .setStyle(TextInputStyle.Short)
+                .setRequired(true)
+                .setMaxLength(3)
+            )
+          );
+
+          await interaction.showModal(modal);
+
+          const filter = (i: Interaction) => i.user.id == interaction.user.id;
+
+          const res = await interaction.awaitModalSubmit({ filter, time: 120000 }).catch(() => {});
+
+          if (!res) return;
+
+          if (!res.isModalSubmit()) return;
+
+          if (res.fields.fields.first().value != "yes") return;
+
+          interaction = res;
+        }
+
         if (!(await userExists(interaction.user.id))) await createUser(interaction.user.id);
 
         const balance = await getBalance(interaction.user.id);
@@ -419,8 +449,10 @@ export default async function interactionCreate(interaction: Interaction) {
 
   let fail = false;
   setTimeout(async () => {
+    if (!interaction.isCommand()) return;
     if (interaction.replied) return;
     await interaction.deferReply().catch(() => {
+      if (!interaction.isCommand()) return;
       logger.warn(`failed to defer slash command. ${interaction.commandName} by ${interaction.member.user.username}`);
       fail = true;
     });
