@@ -90,7 +90,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (items[item].sell) {
-      const amount = inventory[item];
+      const amount = inventory.find((i) => i.item == item).amount;
 
       worth += Math.floor(items[item].sell * amount);
     }
@@ -114,7 +114,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const item = items[i];
     embed.addField(
       item.id,
-      `${item.emoji} **${item.name}** ~~--~~ *${inventory[item.id].toLocaleString()}*${
+      `${item.emoji} **${item.name}** ~~--~~ *${inventory.find((i) => i.item == item.id).amount.toLocaleString()}*${
         item.shortDesc ? `\n${item.shortDesc}` : ""
       }`,
       true
@@ -174,7 +174,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             const item = items[i];
             newEmbed.addField(
               item.id,
-              `${item.emoji} **${item.name}** ~~--~~ *${inventory[item.id].toLocaleString()}*${
+              `${item.emoji} **${item.name}** ~~--~~ *${inventory.find((i) => i.item == item.id).amount.toLocaleString()}*${
                 item.shortDesc ? `\n${item.shortDesc}` : ""
               }`,
               true
@@ -206,7 +206,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             const item = items[i];
             newEmbed.addField(
               item.id,
-              `${item.emoji} **${item.name}** ~~--~~ *${inventory[item.id].toLocaleString()}*${
+              `${item.emoji} **${item.name}** ~~--~~ *${inventory.find((i) => i.item == item.id).amount.toLocaleString()}*${
                 item.shortDesc ? `\n${item.shortDesc}` : ""
               }`,
               true
