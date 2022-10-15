@@ -1,4 +1,5 @@
 import Bree = require("bree");
+import dayjs = require("dayjs");
 import ms = require("ms");
 import path = require("path");
 import { getGuilds } from "../..";
@@ -70,6 +71,7 @@ const bree = new Bree({
     },
     {
       name: "vote-reminders",
+      timeout: dayjs().add(1, "hour").set("minutes", 30).set("seconds", 0).diff(dayjs(), "milliseconds"),
       interval: "30m",
       path: path.join(__dirname, "jobs", "votereminders.js"),
     },
