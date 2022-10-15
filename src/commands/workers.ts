@@ -421,7 +421,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     await emptyWorkersStored(message.member);
     await updateBalance(message.member, (await getBalance(message.member)) + amountEarned);
 
-    const embed = new CustomEmbed(message.member, `+$**${amountEarned.toLocaleString()}**\n${earnedBreakdown.join("\n")}`)
+    const embed = new CustomEmbed(message.member, `+$**${amountEarned.toLocaleString()}**\n\n${earnedBreakdown.join("\n")}`)
       .setHeader("workers", message.author.avatarURL())
       .disableFooter();
 
