@@ -100,14 +100,14 @@ model Economy {
 }
 
 model Inventory {
-  userId String @id
+  userId String
 
   item   String
   amount Int    @default(1)
 
   economy Economy @relation(fields: [userId], references: [userId], onDelete: Cascade)
 
-  @@unique([userId, item])
+  @@id([userId, item])
   @@index([userId, item])
 }
 
