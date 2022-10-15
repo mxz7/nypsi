@@ -14,16 +14,26 @@ async function main() {
   const users = await prisma.economy.findMany({
     select: {
       userId: true,
-      workers: true,
+      inventory: true,
     },
   });
 
   for (const user of users) {
-    for (const workerId of Object.keys(user.workers)) {
-      await prisma.economyWorker.create({
-        data: {
+    for (const item of Object.keys(user.inventory as { [key: string]: number })) {
+      await prisma.inventory.upsert({
+        where: {
+          userId_item: {
+            userId: user.userId,
+            item: item,
+          },
+        },
+        update: {
+          amount: (user.inventory as { [key: string]: number })[item],
+        },
+        create: {
           userId: user.userId,
-          workerId: conversions.get(workerId),
+          item: item,
+          amount: (user.inventory as { [key: string]: number })[item],
         },
       });
     }
