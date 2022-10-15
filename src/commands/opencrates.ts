@@ -49,12 +49,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
   }
 
-  for (const item of Array.from(Object.keys(inventory))) {
-    if (items[item].role == "crate") {
+  for (const item of inventory) {
+    if (items[item.item].role == "crate") {
       let amount = 0;
-      while (amount < inventory.find((i) => (i.item = item)).amount) {
+      while (amount < inventory.find((i) => i.item == item.item).amount) {
         amount++;
-        crates.push(item);
+        crates.push(item.item);
         if (crates.length >= max) {
           hitMax = true;
           break;

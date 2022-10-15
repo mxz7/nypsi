@@ -107,22 +107,25 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     let inventory = await getInventory(message.member);
 
-    if (Object.keys(inventory).length == 0) {
+    if (inventory.length == 0) {
       embed.setDescription("you have nothing in your inventory");
       return edit({ embeds: [embed], components: [] }, msg);
     }
 
     let selected: Item;
 
-    if (Object.keys(inventory).length <= 25) {
+    if (inventory.length <= 25) {
       embed.setDescription("select the **item you want to sell** from the dropdown list below");
 
       const options: SelectMenuOptionBuilder[] = [];
 
-      for (const item of Object.keys(inventory)) {
-        if (inventory.find((i) => i.item == item).amount != 0) {
+      for (const item of inventory) {
+        if (item.amount != 0) {
           options.push(
-            new SelectMenuOptionBuilder().setValue(items[item].id).setEmoji(items[item].emoji).setLabel(items[item].name)
+            new SelectMenuOptionBuilder()
+              .setValue(items[item.item].id)
+              .setEmoji(items[item.item].emoji)
+              .setLabel(items[item.item].name)
           );
         }
       }

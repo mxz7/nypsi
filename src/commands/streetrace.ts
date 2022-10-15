@@ -239,23 +239,23 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let cycle = false;
 
     if (args.length == 1) {
-      for (const item of Array.from(Object.keys(inventory))) {
-        if (items[item].role == "car") {
-          if (inventory.find((i) => i.item == item) && inventory.find((i) => i.item == item).amount > 0) {
+      for (const item of inventory) {
+        if (items[item.item].role == "car") {
+          if (inventory.find((i) => i.item == item.item) && inventory.find((i) => i.item == item.item).amount > 0) {
             if (car) {
-              if (car.speed < items[item].speed) {
+              if (car.speed < items[item.item].speed) {
                 if (carCooldown.has(message.author.id)) {
                   const current = carCooldown.get(message.author.id);
-                  if (current.includes(items[item].id)) continue;
+                  if (current.includes(items[item.item].id)) continue;
                 }
-                car = items[item];
+                car = items[item.item];
               }
             } else {
               if (carCooldown.has(message.author.id)) {
                 const current = carCooldown.get(message.author.id);
-                if (current.includes(items[item].id)) continue;
+                if (current.includes(items[item.item].id)) continue;
               }
-              car = items[item];
+              car = items[item.item];
             }
           }
         }

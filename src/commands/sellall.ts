@@ -43,12 +43,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const selected = new Map<string, number>();
 
-  for (const item of Array.from(Object.keys(inventory))) {
-    if (items[item].role == "fish" || items[item].role == "prey" || items[item].role == "sellable") {
-      if (items[item].id == "cookie" || items[item].id == "cake") continue;
-      selected.set(item, inventory.find((i) => i.item == item).amount);
-    } else if (items[item].id.includes("watch") || items[item].id == "calendar") {
-      selected.set(item, inventory.find((i) => i.item == item).amount);
+  for (const item of inventory) {
+    if (items[item.item].role == "fish" || items[item.item].role == "prey" || items[item.item].role == "sellable") {
+      if (items[item.item].id == "cookie" || items[item.item].id == "cake") continue;
+      selected.set(item.item, inventory.find((i) => i.item == item.item).amount);
+    } else if (items[item.item].id.includes("watch") || items[item.item].id == "calendar") {
+      selected.set(item.item, inventory.find((i) => i.item == item.item).amount);
     }
   }
 
