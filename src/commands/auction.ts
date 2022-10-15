@@ -23,7 +23,7 @@ import {
   getAuctionWatch,
   setAuctionWatch,
 } from "../utils/functions/economy/auctions";
-import { getInventory, setInventory } from "../utils/functions/economy/inventory";
+import { addInventoryItem, getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
 import { formatBet, getItems, userExists } from "../utils/functions/economy/utils";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import requestDM from "../utils/functions/requestdm";
@@ -107,22 +107,25 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     let inventory = await getInventory(message.member);
 
-    if (Object.keys(inventory).length == 0) {
+    if (inventory.length == 0) {
       embed.setDescription("you have nothing in your inventory");
       return edit({ embeds: [embed], components: [] }, msg);
     }
 
     let selected: Item;
 
-    if (Object.keys(inventory).length <= 25) {
+    if (inventory.length <= 25) {
       embed.setDescription("select the **item you want to sell** from the dropdown list below");
 
       const options: SelectMenuOptionBuilder[] = [];
 
-      for (const item of Object.keys(inventory)) {
-        if (inventory[item] != 0) {
+      for (const item of inventory) {
+        if (item.amount != 0) {
           options.push(
-            new SelectMenuOptionBuilder().setValue(items[item].id).setEmoji(items[item].emoji).setLabel(items[item].name)
+            new SelectMenuOptionBuilder()
+              .setValue(items[item.item].id)
+              .setEmoji(items[item.item].emoji)
+              .setLabel(items[item.item].name)
           );
         }
       }
@@ -197,7 +200,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return message.channel.send({ embeds: [new ErrorEmbed("couldnt find that item")] });
     }
 
-    if (!inventory[selected.id] || inventory[selected.id] == 0) {
+    if (!inventory.find((i) => i.item == selected.id) || inventory.find((i) => i.item == selected.id).amount == 0) {
       return message.channel.send({ embeds: [new ErrorEmbed(`you dont have a ${selected.name}`)] });
     }
 
@@ -224,7 +227,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (!res) return;
 
     if (res.toLowerCase() === "all") {
-      res = inventory[selected.id].toString();
+      res = inventory.find((i) => i.item == selected.id).amount.toString();
     }
 
     if (!parseInt(res)) {
@@ -243,11 +246,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return message.channel.send({ embeds: [new ErrorEmbed("invalid amount")] });
     }
 
-    if (!inventory[selected.id]) {
+    if (!inventory.find((i) => i.item == selected.id)) {
       return message.channel.send({ embeds: [new ErrorEmbed(`you do not have this many ${selected.name}`)] });
     }
 
-    if (inventory[selected.id] < parseInt(res)) {
+    if (inventory.find((i) => i.item == selected.id).amount < parseInt(res)) {
       return message.channel.send({ embeds: [new ErrorEmbed(`you do not have this many ${selected.name}`)] });
     }
 
@@ -300,11 +303,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       });
     }
 
-    if (cost > 15000000 && amount == 1 && selected.rarity != 4) {
+    if (cost > 50000000 && amount == 1 && selected.rarity != 4) {
       return message.channel.send({ embeds: [new ErrorEmbed("this is too much")] });
     }
 
-    if (cost > 100000000 && selected.rarity != 4) {
+    if (cost > 200000000 && selected.rarity != 4) {
       return message.channel.send({ embeds: [new ErrorEmbed("this is too much")] });
     }
 
@@ -322,17 +325,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     inventory = await getInventory(message.member);
 
-    if (!inventory[selected.id] || inventory[selected.id] < amount) {
+    if (!inventory.find((i) => i.item == selected.id) || inventory.find((i) => i.item == selected.id).amount < amount) {
       return message.channel.send({ embeds: [new CustomEmbed(message.member, "sneaky bitch")] });
     }
 
-    inventory[selected.id] -= amount;
-
-    if (inventory[selected.id] <= 0) {
-      delete inventory[selected.id];
-    }
-
-    await setInventory(message.member, inventory);
+    await setInventoryItem(message.member, selected.id, inventory.find((i) => i.item == selected.id).amount - amount, false);
 
     const url = await createAuction(message.member, selected.id, amount, cost).catch(() => {});
 
@@ -482,15 +479,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         const res = await deleteAuction(auctions[currentPage].id, message.client as NypsiClient).catch(() => {});
 
         if (res) {
-          const inventory = await getInventory(message.member);
-
-          if (inventory[auctions[currentPage].itemName]) {
-            inventory[auctions[currentPage].itemName] += auctions[currentPage].itemAmount;
-          } else {
-            inventory[auctions[currentPage].itemName] = auctions[currentPage].itemAmount;
-          }
-
-          await setInventory(message.member, inventory);
+          await addInventoryItem(
+            auctions[currentPage].ownerId,
+            auctions[currentPage].itemName,
+            auctions[currentPage].itemAmount
+          );
 
           await interaction.followUp({
             embeds: [new CustomEmbed(message.member, "✅ your auction has been deleted")],
@@ -535,15 +528,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (!(await userExists(auction.ownerId))) return;
 
-    const inventory = await getInventory(auction.ownerId);
-
-    if (inventory[auction.itemName]) {
-      inventory[auction.itemName] += auction.itemAmount;
-    } else {
-      inventory[auction.itemName] = auction.itemAmount;
-    }
-
-    await setInventory(auction.ownerId, inventory);
+    await addInventoryItem(auction.ownerId, auction.itemName, auction.itemAmount);
 
     if ((await getDmSettings(auction.ownerId)).auction) {
       const embed = new CustomEmbed().setColor("#36393f");
@@ -612,12 +597,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const inventory = await getInventory(message.member);
 
-    if (!inventory[selected.id] || inventory[selected.id] == 0) {
+    if (!inventory.find((i) => i.item == selected.id) || inventory.find((i) => i.item == selected.id).amount == 0) {
       return send({ embeds: [new ErrorEmbed(`you dont have a ${selected.name}`)] });
     }
 
     if (args[2].toLowerCase() == "all") {
-      args[2] = inventory[selected.id].toString();
+      args[2] = inventory.find((i) => i.item == selected.id).amount.toString();
     }
 
     if (!parseInt(args[2]) || isNaN(parseInt(args[2]))) {
@@ -630,7 +615,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return send({ embeds: [new ErrorEmbed("invalid amount")] });
     }
 
-    if (inventory[selected.id] < amount) {
+    if (inventory.find((i) => i.item == selected.id).amount < amount) {
       return send({ embeds: [new ErrorEmbed(`you dont have this many ${selected.name}`)] });
     }
 
@@ -666,13 +651,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       });
     }
 
-    inventory[selected.id] -= amount;
-
-    if (inventory[selected.id] <= 0) {
-      delete inventory[selected.id];
-    }
-
-    await setInventory(message.member, inventory);
+    await setInventoryItem(message.member, selected.id, inventory.find((i) => i.item == selected.id).amount - amount, false);
 
     const url = await createAuction(message.member, selected.id, amount, cost).catch(() => {});
 

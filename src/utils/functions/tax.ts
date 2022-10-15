@@ -28,19 +28,21 @@ async function updateTax() {
 }
 
 export async function addToNypsiBank(amount: number) {
-  await prisma.economy.upsert({
-    where: {
-      userId: "678711738845102087",
-    },
-    update: {
-      bank: { increment: Math.floor(amount) },
-    },
-    create: {
-      bank: amount,
-      lastVote: new Date(0),
-      userId: "678711738845102087",
-    },
-  });
+  await prisma.economy
+    .upsert({
+      where: {
+        userId: "678711738845102087",
+      },
+      update: {
+        bank: { increment: Math.floor(amount) },
+      },
+      create: {
+        bank: amount,
+        lastVote: new Date(0),
+        userId: "678711738845102087",
+      },
+    })
+    .catch(() => {});
 }
 
 export async function getNypsiBankBalance() {

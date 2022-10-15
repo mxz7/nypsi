@@ -13,7 +13,7 @@ import {
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { getBoosters } from "../utils/functions/economy/boosters";
-import { getInventory, setInventory } from "../utils/functions/economy/inventory";
+import { addInventoryItem } from "../utils/functions/economy/inventory";
 import { addGamble, getStats } from "../utils/functions/economy/stats";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
@@ -419,15 +419,8 @@ class Fight {
       await addProgress(winner.member.user.id, "fighter", 1);
       if (!cookieRecent.has(winner.member.user.id)) {
         cookieRecent.add(winner.member.user.id);
-        const inventory = await getInventory(winner.member.user.id);
 
-        if (inventory["cookie"]) {
-          inventory["cookie"]++;
-        } else {
-          inventory["cookie"] = 1;
-        }
-
-        await setInventory(winner.member.user.id, inventory);
+        await addInventoryItem(winner.member, "cookie", 1);
 
         embed.setFooter({ text: "well done. enjoy this cookie 🍪" });
       }

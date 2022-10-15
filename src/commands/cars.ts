@@ -56,7 +56,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (items[item].role != "car") continue;
     totalCars++;
 
-    if (inventory[items[item].id] && inventory[items[item].id] > 0) totalOwned++;
+    if (inventory.find((i) => i.item == item) && inventory.find((i) => i.item == item).amount > 0) totalOwned++;
 
     if (pageOfItems.length == 6) {
       pages.push(pageOfItems);
@@ -84,7 +84,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let owned = false;
     const item = items[i];
 
-    if (inventory[item.id] && inventory[item.id] > 0) owned = true;
+    if (inventory.find((i) => i.item == item.id) && inventory.find((i) => i.item == item.id).amount > 0) owned = true;
 
     embed.addField(
       item.id,
@@ -137,7 +137,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             let owned = false;
             const item = items[i];
 
-            if (inventory[item.id] && inventory[item.id] > 0) owned = true;
+            if (inventory.find((i) => i.item == item.id) && inventory.find((i) => i.item == item.id).amount > 0)
+              owned = true;
 
             newEmbed.addField(
               item.id,
@@ -171,7 +172,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             let owned = false;
             const item = items[i];
 
-            if (inventory[item.id] && inventory[item.id] > 0) owned = true;
+            if (inventory.find((i) => i.item == item.id) && inventory.find((i) => i.item == item.id).amount > 0)
+              owned = true;
 
             newEmbed.addField(
               item.id,

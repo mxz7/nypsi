@@ -2,7 +2,7 @@ import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Messag
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { getBoosters } from "../utils/functions/economy/boosters";
-import { getInventory, setInventory } from "../utils/functions/economy/inventory";
+import { addInventoryItem, getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
 import { addItemUse } from "../utils/functions/economy/stats";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
@@ -50,13 +50,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const inventory = await getInventory(message.member);
   const items = getItems();
 
-  let pickaxe;
+  let pickaxe: string;
 
-  if (inventory["diamond_pickaxe"] && inventory["diamond_pickaxe"] > 0) {
+  if (inventory.find((i) => i.item == "diamond_pickaxe") && inventory.find((i) => i.item == "diamond_pickaxe").amount > 0) {
     pickaxe = "diamond_pickaxe";
-  } else if (inventory["iron_pickaxe"] && inventory["iron_pickaxe"] > 0) {
+  } else if (inventory.find((i) => i.item == "iron_pickaxe") && inventory.find((i) => i.item == "iron_pickaxe").amount > 0) {
     pickaxe = "iron_pickaxe";
-  } else if (inventory["wooden_pickaxe"] && inventory["wooden_pickaxe"] > 0) {
+  } else if (
+    inventory.find((i) => i.item == "wooden_pickaxe") &&
+    inventory.find((i) => i.item == "wooden_pickaxe").amount > 0
+  ) {
     pickaxe = "wooden_pickaxe";
   }
 
@@ -116,13 +119,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   }
 
   if (!unbreakable) {
-    inventory[pickaxe]--;
-
-    if (inventory[pickaxe] <= 0) {
-      delete inventory[pickaxe];
-    }
-
-    await setInventory(message.member, inventory);
+    await setInventoryItem(message.member, pickaxe, inventory.find((i) => i.item == pickaxe).amount - 1, false);
   }
 
   const foundItems = [];
@@ -188,17 +185,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       }
     }
 
-    if (inventory[chosen]) {
-      inventory[chosen] += amount;
-    } else {
-      inventory[chosen] = amount;
-    }
+    await addInventoryItem(message.member, chosen, amount);
 
     foundItems.push(`${amount} ${items[chosen].emoji} ${items[chosen].name}`);
     foundItemsAmount += amount;
   }
-
-  await setInventory(message.member, inventory);
 
   const embed = new CustomEmbed(
     message.member,

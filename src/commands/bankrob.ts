@@ -16,7 +16,7 @@ import { addCooldown, getRemaining, getResponse, onCooldown } from "../utils/coo
 import prisma from "../utils/database/database.js";
 import { addProgress } from "../utils/functions/economy/achievements.js";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance.js";
-import { getInventory, setInventory } from "../utils/functions/economy/inventory.js";
+import { getInventory, setInventoryItem } from "../utils/functions/economy/inventory.js";
 import { getPrestige } from "../utils/functions/economy/prestige.js";
 import { createUser, userExists } from "../utils/functions/economy/utils.js";
 import { addToNypsiBank, getNypsiBankBalance, removeFromNypsiBankBalance } from "../utils/functions/tax.js";
@@ -92,7 +92,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     let lawyer = false;
 
-    if (inventory["lawyer"] && inventory["lawyer"] > 0) {
+    if (inventory.find((i) => i.item == "lawyer") && inventory.find((i) => i.item == "lawyer").amount > 0) {
       lawyer = true;
       maxLoss = maxLoss * 0.35;
     }
@@ -222,16 +222,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       const inventory = await getInventory(message.member);
       let lawyer = false;
 
-      if (inventory["lawyer"] && inventory["lawyer"] > 0) {
+      if (inventory.find((i) => i.item == "lawyer") && inventory.find((i) => i.item == "lawyer").amount > 0) {
         lawyer = true;
 
-        inventory["lawyer"]--;
-
-        if (inventory["lawyer"] <= 0) {
-          delete inventory["lawyer"];
-        }
-
-        await setInventory(message.member, inventory);
+        await setInventoryItem(message.member, "lawyer", inventory.find((i) => i.item == "lawyer").amount - 1, false);
       }
 
       const minLoss = Math.floor(loss * 0.4);

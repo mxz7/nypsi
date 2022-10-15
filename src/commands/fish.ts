@@ -3,7 +3,7 @@ import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
 import { getBoosters } from "../utils/functions/economy/boosters";
-import { getInventory, setInventory } from "../utils/functions/economy/inventory";
+import { addInventoryItem, getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
 import { addItemUse } from "../utils/functions/economy/stats";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import { getXp, updateXp } from "../utils/functions/economy/xp";
@@ -42,13 +42,19 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const inventory = await getInventory(message.member);
   const items = getItems();
 
-  let fishingRod;
+  let fishingRod: string;
 
-  if (inventory["incredible_fishing_rod"] && inventory["incredible_fishing_rod"] > 0) {
+  if (
+    inventory.find((i) => i.item == "incredible_fishing_rod") &&
+    inventory.find((i) => i.item == "incredible_fishing_rod").amount > 0
+  ) {
     fishingRod = "incredible_fishing_rod";
-  } else if (inventory["fishing_rod"] && inventory["fishing_rod"] > 0) {
+  } else if (inventory.find((i) => i.item == "fishing_rod") && inventory.find((i) => i.item == "fishing_rod").amount > 0) {
     fishingRod = "fishing_rod";
-  } else if (inventory["terrible_fishing_rod"] && inventory["terrible_fishing_rod"] > 0) {
+  } else if (
+    inventory.find((i) => i.item == "terrible_fishing_rod") &&
+    inventory.find((i) => i.item == "terrible_fishing_rod").amount > 0
+  ) {
     fishingRod = "terrible_fishing_rod";
   }
 
@@ -124,13 +130,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   }
 
   if (!unbreaking) {
-    inventory[fishingRod]--;
-
-    if (inventory[fishingRod] <= 0) {
-      delete inventory[fishingRod];
-    }
-
-    await setInventory(message.member, inventory);
+    await setInventoryItem(message.member, fishingRod, inventory.find((i) => i.item == fishingRod).amount - 1, false);
   }
 
   const foundItems = [];
@@ -220,17 +220,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         amount = 10;
       }
 
-      if (inventory[chosen]) {
-        inventory[chosen] += amount;
-      } else {
-        inventory[chosen] = amount;
-      }
+      await addInventoryItem(message.member, chosen, amount);
 
       foundItems.push(`${items[chosen].emoji} ${items[chosen].name}`);
       if (items[chosen].role == "fish") foundItemsAmount += amount;
     }
   }
-  await setInventory(message.member, inventory);
 
   const embed = new CustomEmbed(message.member, `you go to the pond and cast your **${items[fishingRod].name}**`);
 

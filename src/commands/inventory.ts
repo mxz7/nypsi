@@ -12,6 +12,7 @@ import {
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { getAuctionAverage } from "../utils/functions/economy/auctions";
 import { getInventory } from "../utils/functions/economy/inventory";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
@@ -65,7 +66,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const inventory = await getInventory(message.member, true);
   const items = getItems();
 
-  const itemIDs = Array.from(Object.keys(inventory));
+  const itemIDs = inventory.map((i) => i.item);
 
   if (itemIDs.length == 0) {
     return send({
@@ -89,10 +90,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       pageOfItems.push(item);
     }
 
-    if (items[item].sell) {
-      const amount = inventory[item];
+    const averageAuction = await getAuctionAverage(item);
 
-      worth += Math.floor(items[item].sell * amount);
+    if (averageAuction) {
+      worth += averageAuction * inventory.find((i) => i.item == item).amount;
+    } else if (items[item].sell) {
+      worth += items[item].sell * inventory.find((i) => i.item == item).amount;
     }
   }
 
@@ -114,7 +117,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const item = items[i];
     embed.addField(
       item.id,
-      `${item.emoji} **${item.name}** ~~--~~ *${inventory[item.id].toLocaleString()}*${
+      `${item.emoji} **${item.name}** ~~--~~ *${inventory.find((i) => i.item == item.id).amount.toLocaleString()}*${
         item.shortDesc ? `\n${item.shortDesc}` : ""
       }`,
       true
@@ -174,7 +177,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             const item = items[i];
             newEmbed.addField(
               item.id,
-              `${item.emoji} **${item.name}** ~~--~~ *${inventory[item.id].toLocaleString()}*${
+              `${item.emoji} **${item.name}** ~~--~~ *${inventory.find((i) => i.item == item.id).amount.toLocaleString()}*${
                 item.shortDesc ? `\n${item.shortDesc}` : ""
               }`,
               true
@@ -206,7 +209,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             const item = items[i];
             newEmbed.addField(
               item.id,
-              `${item.emoji} **${item.name}** ~~--~~ *${inventory[item.id].toLocaleString()}*${
+              `${item.emoji} **${item.name}** ~~--~~ *${inventory.find((i) => i.item == item.id).amount.toLocaleString()}*${
                 item.shortDesc ? `\n${item.shortDesc}` : ""
               }`,
               true

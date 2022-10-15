@@ -1,5 +1,6 @@
 import { CommandInteraction, Message } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { getAuctionAverage } from "../utils/functions/economy/auctions";
 import { getBalance, getBankBalance } from "../utils/functions/economy/balance";
 import { getGuildByUser } from "../utils/functions/economy/guilds";
 import { getInventory } from "../utils/functions/economy/inventory";
@@ -27,9 +28,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   let inventoryWorth = 0;
   let guildWorth = 0;
 
-  for (const itemId in inventory) {
-    if (items[itemId].sell) {
-      inventoryWorth += items[itemId].sell * inventory[itemId];
+  for (const item of inventory) {
+    const averageAuction = await getAuctionAverage(item.item);
+
+    if (averageAuction) {
+      inventoryWorth += averageAuction * inventory.find((i) => i.item == item.item).amount;
+    } else if (items[item.item].sell) {
+      inventoryWorth += items[item.item].sell * inventory.find((i) => i.item == item.item).amount;
     }
   }
 

@@ -14,7 +14,7 @@ import {
 import { addCooldown, addExpiry, getResponse, onCooldown } from "../utils/cooldownhandler.js";
 import { calcMaxBet, getBankBalance, getMulti, updateBankBalance } from "../utils/functions/economy/balance.js";
 import { addBooster, getBoosters } from "../utils/functions/economy/boosters.js";
-import { getInventory, setInventory } from "../utils/functions/economy/inventory.js";
+import { addInventoryItem } from "../utils/functions/economy/inventory.js";
 import {
   getPrestige,
   getPrestigeRequirement,
@@ -151,8 +151,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const multi = await getMulti(message.member);
     const maxBet = await calcMaxBet(message.member);
 
-    const inventory = await getInventory(message.member);
-
     let amount = 1;
 
     if ((await getPrestige(message.member)) > 5) {
@@ -163,13 +161,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     amount += Math.floor((await getPrestige(message.member)) / 5);
 
-    if (inventory["basic_crate"]) {
-      inventory["basic_crate"] += amount;
-    } else {
-      inventory["basic_crate"] = amount;
-    }
-
-    await setInventory(message.member, inventory);
+    await addInventoryItem(message.member, "basic_crate", amount);
 
     const boosters = await getBoosters(message.member);
 
