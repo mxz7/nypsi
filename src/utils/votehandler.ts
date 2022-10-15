@@ -101,8 +101,8 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
 
   if (max > 50) max = 50;
 
-  if (tickets.length <= max - 3) {
-    await Promise.all([addTicket(user), addTicket(user), addTicket(user)]);
+  if (tickets.length <= max - 5) {
+    await Promise.all([addTicket(user), addTicket(user), addTicket(user), addTicket(user), addTicket(user)]);
   }
 
   let crateAmount = Math.floor(prestige / 1.5 + 1);
@@ -125,7 +125,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
           `+ $**${amount.toLocaleString()}**\n` +
           "+ **7**% multiplier\n" +
           `+ **${crateAmount}** vote crates` +
-          `${tickets.length <= max - 3 ? "\n+ **3** lottery tickets" : ""}`
+          `${tickets.length <= max - 5 ? "\n+ **5** lottery tickets" : ""}`
       )
       .disableFooter();
 
