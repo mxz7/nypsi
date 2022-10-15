@@ -72,9 +72,7 @@ export async function getBoosters(member: GuildMember | string): Promise<Map<str
       embed.setDescription(desc);
 
       if (total == 1) {
-        text = `your ${items[Array.from(expired.keys())[0]].emoji} ${
-          items[Array.from(expired.keys())[0]].name
-        } booster has expired`;
+        text = `your ${items[Array.from(expired.keys())[0]].name} booster has expired`;
       } else {
         text = `${total} of your boosters have expired`;
       }
@@ -161,9 +159,7 @@ export async function getBoosters(member: GuildMember | string): Promise<Map<str
     embed.setDescription(desc);
 
     if (total == 1) {
-      text = `your ${items[Array.from(expired.keys())[0]].emoji} ${
-        items[Array.from(expired.keys())[0]].name
-      } booster has expired`;
+      text = `your ${items[Array.from(expired.keys())[0]].name} booster has expired`;
     } else {
       text = `${total} of your boosters have expired`;
     }
