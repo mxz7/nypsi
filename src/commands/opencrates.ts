@@ -100,7 +100,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     await send({ embeds: [reply] });
   }
 
-  const interval = setInterval(async () => {
+  const doCrate = async () => {
     let finished = false;
     const crate = crates.shift();
 
@@ -115,15 +115,27 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     embed.setDescription(desc);
 
-    msg.edit({ embeds: [embed] });
+    await msg.edit({ embeds: [embed] });
 
     if (finished) {
-      clearInterval(interval);
       stopOpeningCrates(message.member);
+    } else {
+      await wait(1500);
+
+      doCrate();
     }
-  }, 1500);
+  };
+  doCrate();
 }
 
 cmd.setRun(run);
 
 module.exports = cmd;
+
+async function wait(ms: number) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(0);
+    }, ms);
+  });
+}
