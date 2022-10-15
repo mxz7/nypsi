@@ -52,7 +52,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   for (const item of Array.from(Object.keys(inventory))) {
     if (items[item].role == "crate") {
       let amount = 0;
-      while (amount < inventory[item]) {
+      while (amount < inventory.find((i) => (i.item = item)).amount) {
         amount++;
         crates.push(item);
         if (crates.length >= max) {
