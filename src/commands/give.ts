@@ -1,7 +1,7 @@
 import dayjs = require("dayjs");
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import { getInventory, setInventory } from "../utils/functions/economy/inventory";
+import { addInventoryItem, getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
 import { getPrestige } from "../utils/functions/economy/prestige";
 import { createUser, getItems, isEcoBanned, userExists } from "../utils/functions/economy/utils";
 import { getXp } from "../utils/functions/economy/xp";
@@ -10,6 +10,7 @@ import { getMember } from "../utils/functions/member";
 import { getDmSettings } from "../utils/functions/users/notifications";
 import { payment } from "../utils/logger";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { Item } from "../utils/models/Economy";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("give", "give other users items from your inventory", Categories.MONEY);
@@ -98,7 +99,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const items = getItems();
   const inventory = await getInventory(message.member);
-  const targetInventory = await getInventory(target);
 
   let searchTag;
 
@@ -113,29 +113,27 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({ embeds: [embed] });
   }
 
-  let selected;
+  let selected: Item;
 
   for (const itemName of Array.from(Object.keys(items))) {
     const aliases = items[itemName].aliases ? items[itemName].aliases : [];
     if (searchTag == itemName) {
-      selected = itemName;
+      selected = items[itemName];
       break;
     } else if (searchTag == itemName.split("_").join("")) {
-      selected = itemName;
+      selected = items[itemName];
       break;
     } else if (aliases.indexOf(searchTag) != -1) {
-      selected = itemName;
+      selected = items[itemName];
       break;
     }
   }
-
-  selected = items[selected];
 
   if (!selected) {
     return send({ embeds: [new ErrorEmbed(`couldnt find \`${args[1]}\``)] });
   }
 
-  if (!inventory[selected.id] || inventory[selected.id] == 0) {
+  if (!inventory.find((i) => i.item == selected.id) || inventory.find((i) => i.item == selected.id).amount == 0) {
     return send({ embeds: [new ErrorEmbed("you dont have any " + selected.name)] });
   }
 
@@ -150,7 +148,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return send({ embeds: [new ErrorEmbed("invalid amount")] });
     }
 
-    if (amount > inventory[selected.id]) {
+    if (amount > inventory.find((i) => i.item == selected.id).amount) {
       return send({ embeds: [new ErrorEmbed(`you don't have enough ${selected.name}`)] });
     }
   }
@@ -183,20 +181,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   await addCooldown(cmd.name, message.member, 15);
 
-  inventory[selected.id] -= amount;
-
-  if (inventory[selected.id] <= 0) {
-    delete inventory[selected.id];
-  }
-
-  if (targetInventory[selected.id]) {
-    targetInventory[selected.id] += amount;
-  } else {
-    targetInventory[selected.id] = amount;
-  }
-
-  await setInventory(message.member, inventory);
-  await setInventory(target, targetInventory);
+  await Promise.all([
+    addInventoryItem(target, selected.id, amount),
+    setInventoryItem(message.member, selected.id, inventory.find((i) => i.item == selected.id).amount - amount, false),
+  ]);
 
   if ((await getDmSettings(target)).payment) {
     const embed = new CustomEmbed(

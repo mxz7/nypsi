@@ -96,6 +96,19 @@ model Economy {
   EconomyStats  EconomyStats[]
   LotteryTicket LotteryTicket[]
   EconomyWorker EconomyWorker[]
+  Inventory     Inventory[]
+}
+
+model Inventory {
+  userId String
+
+  item   String
+  amount Int    @default(1)
+
+  economy Economy @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@unique([userId, item])
+  @@index([userId, item])
 }
 
 model EconomyWorker {

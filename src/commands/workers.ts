@@ -398,9 +398,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       amountEarned += Math.floor(perItem * worker.stored);
       earnedBreakdown.push(
-        `\n${baseWorker.name} +$${Math.floor(perItem * worker.stored).toLocaleString()} (${worker.stored.toLocaleString()} ${
+        `${baseWorker.name} +$${Math.floor(perItem * worker.stored).toLocaleString()} (${worker.stored.toLocaleString()} ${
           baseWorker.item_emoji
         })`
+      );
+      amounts.set(
+        `${baseWorker.name} +$${Math.floor(perItem * worker.stored).toLocaleString()} (${worker.stored.toLocaleString()} ${
+          baseWorker.item_emoji
+        })`,
+        perItem * worker.stored
       );
     }
 

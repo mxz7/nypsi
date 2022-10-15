@@ -2,7 +2,7 @@ import dayjs = require("dayjs");
 import ms = require("ms");
 import prisma from "../../database/database";
 import { deleteAuction } from "../../functions/economy/auctions";
-import { getInventory, setInventory } from "../../functions/economy/inventory";
+import { addInventoryItem } from "../../functions/economy/inventory";
 import { getItems, userExists } from "../../functions/economy/utils";
 import requestDM from "../../functions/requestdm";
 import { getDmSettings } from "../../functions/users/notifications";
@@ -33,15 +33,7 @@ export async function runAuctionChecks(client: NypsiClient) {
 
       if (!(await userExists(auction.ownerId))) continue;
 
-      const inventory = await getInventory(auction.ownerId);
-
-      if (inventory[auction.itemName]) {
-        inventory[auction.itemName] += auction.itemAmount;
-      } else {
-        inventory[auction.itemName] = auction.itemAmount;
-      }
-
-      await setInventory(auction.ownerId, inventory);
+      await addInventoryItem(auction.ownerId, auction.itemName, auction.itemAmount, false);
 
       const embed = new CustomEmbed().setColor("#36393f");
 

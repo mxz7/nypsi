@@ -16,7 +16,7 @@ import {
 import { runCommand } from "../utils/commandhandler";
 import prisma from "../utils/database/database";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
-import { getInventory, setInventory } from "../utils/functions/economy/inventory";
+import { addInventoryItem, getInventory } from "../utils/functions/economy/inventory";
 import { createUser, getAchievements, getItems, userExists } from "../utils/functions/economy/utils";
 import { getChatFilter } from "../utils/functions/guilds/filters";
 import { getKarma } from "../utils/functions/karma/karma";
@@ -43,12 +43,14 @@ export default async function interactionCreate(interaction: Interaction) {
 
       const items = getItems();
 
-      let options = Object.keys(inventory).filter(
-        (item) =>
-          item.includes(focused.value) ||
-          items[item].name.includes(focused.value) ||
-          items[item].aliases?.includes(focused.value)
-      );
+      let options = inventory
+        .map((i) => i.item)
+        .filter(
+          (item) =>
+            item.includes(focused.value) ||
+            items[item].name.includes(focused.value) ||
+            items[item].aliases?.includes(focused.value)
+        );
 
       if (options.length > 25) options = options.splice(0, 24);
 
@@ -59,7 +61,7 @@ export default async function interactionCreate(interaction: Interaction) {
           items[i].emoji.startsWith("<:") || items[i].emoji.startsWith("<a:") || items[i].emoji.startsWith(":")
             ? ""
             : `${items[i].emoji} `
-        }${items[i].name} [${inventory[i].toLocaleString()}]`,
+        }${items[i].name} [${inventory.find((x) => x.item == i).amount.toLocaleString()}]`,
         value: i,
       }));
 
@@ -94,13 +96,15 @@ export default async function interactionCreate(interaction: Interaction) {
 
       const items = getItems();
 
-      let options = Object.keys(inventory).filter(
-        (item) =>
-          (item.includes(focused.value) ||
-            items[item].name.includes(focused.value) ||
-            items[item].aliases?.includes(focused.value)) &&
-          items[item].role == "car"
-      );
+      let options = inventory
+        .map((i) => i.item)
+        .filter(
+          (item) =>
+            (item.includes(focused.value) ||
+              items[item].name.includes(focused.value) ||
+              items[item].aliases?.includes(focused.value)) &&
+            items[item].role == "car"
+        );
 
       options.push("cycle");
 
@@ -239,20 +243,12 @@ export default async function interactionCreate(interaction: Interaction) {
           })
           .catch(() => {});
 
-        const inventory = await getInventory(interaction.user.id);
-
-        if (inventory[auction.itemName]) {
-          inventory[auction.itemName] += auction.itemAmount;
-        } else {
-          inventory[auction.itemName] = auction.itemAmount;
-        }
-
         const tax = await getTax();
 
         const taxedAmount = Math.floor(Number(auction.bin) * tax);
 
         await Promise.all([
-          setInventory(interaction.user.id, inventory),
+          addInventoryItem(interaction.user.id, auction.itemName, auction.itemAmount),
           updateBalance(interaction.user.id, balance - Number(auction.bin)),
           updateBalance(auction.ownerId, (await getBalance(auction.ownerId)) + (Number(auction.bin) - taxedAmount)),
           addToNypsiBank(taxedAmount),

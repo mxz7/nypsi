@@ -78,7 +78,8 @@ async function doWorkerThing() {
           full.map((workerId) => `${getBaseWorkers()[workerId].item_emoji} ${getBaseWorkers()[workerId].name}`).join("\n")
         )
         .setHeader("full workers:")
-        .setColor("#36393f");
+        .setColor("#36393f")
+        .setFooter({ text: "/settings me notifications" });
     }
 
     await redis.lpush("nypsi:dm:queue", JSON.stringify(data));
