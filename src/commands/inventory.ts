@@ -12,7 +12,6 @@ import {
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import { getAuctionAverage } from "../utils/functions/economy/auctions";
 import { getInventory } from "../utils/functions/economy/inventory";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
@@ -80,7 +79,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const pages: string[][] = [];
   let pageOfItems: string[] = [];
-  let worth = 0;
 
   for (const item of itemIDs) {
     if (pageOfItems.length == 6) {
@@ -89,14 +87,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     } else {
       pageOfItems.push(item);
     }
-
-    const averageAuction = await getAuctionAverage(item);
-
-    if (averageAuction) {
-      worth += Math.floor(averageAuction * inventory.find((i) => i.item == item).amount);
-    } else if (items[item].sell) {
-      worth += items[item].sell * inventory.find((i) => i.item == item).amount;
-    }
   }
 
   if (pageOfItems.length != 0) {
@@ -104,7 +94,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   }
 
   const embed = new CustomEmbed(message.member).setFooter({
-    text: `page ${page + 1}/${pages.length} | worth: $${worth.toLocaleString()}`,
+    text: `page ${page + 1}/${pages.length}`,
   });
 
   embed.setHeader("your inventory", message.author.avatarURL());
@@ -184,7 +174,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             );
           }
           newEmbed.setFooter({
-            text: `page ${currentPage + 1}/${pages.length} | worth: $${worth.toLocaleString()}`,
+            text: `page ${currentPage + 1}/${pages.length}`,
           });
           if (currentPage == 0) {
             row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -216,7 +206,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             );
           }
           newEmbed.setFooter({
-            text: `page ${currentPage + 1}/${pages.length} | worth: $${worth.toLocaleString()}`,
+            text: `page ${currentPage + 1}/${pages.length}`,
           });
           if (currentPage + 1 == lastPage) {
             row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
