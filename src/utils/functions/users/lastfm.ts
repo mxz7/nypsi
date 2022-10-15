@@ -1,4 +1,5 @@
 import { GuildMember } from "discord.js";
+import fetch from "node-fetch";
 import prisma from "../../database/database";
 import redis from "../../database/redis";
 import { cleanString } from "../string";
