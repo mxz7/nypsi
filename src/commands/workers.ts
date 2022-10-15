@@ -269,7 +269,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     embed.setHeader(`${worker.name} upgrades`, message.author.avatarURL());
 
-    let desc = "";
+    let desc = `💰 $${(await getBalance(message.member)).toLocaleString()}\n\n`;
 
     const userWorker = userWorkers.find((w) => w.workerId == worker.id);
     const baseUpgrades = getBaseUpgrades();
