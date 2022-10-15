@@ -1,6 +1,6 @@
 import { CommandInteraction, Message } from "discord.js";
 import Constants from "../utils/Constants";
-import { getInventory, setInventory } from "../utils/functions/economy/inventory";
+import { addInventoryItem } from "../utils/functions/economy/inventory";
 import { getItems, userExists } from "../utils/functions/economy/utils";
 import { addCooldown, inCooldown } from "../utils/functions/guilds/utils";
 import { logger } from "../utils/logger";
@@ -77,15 +77,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         if (!(await userExists(m))) return;
 
-        const inventory = await getInventory(member);
+        await addInventoryItem(message.member, selected.id, amount, false);
 
-        if (inventory[selected.id]) {
-          inventory[selected.id] += amount;
-        } else {
-          inventory[selected.id] = amount;
-        }
-
-        await setInventory(member, inventory);
         logger.info(`${amount} ${selected.id} given to ${member.user.tag} (${member.user.id})`);
         count += amount;
       })()
