@@ -98,7 +98,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const embed = new CustomEmbed(message.member);
 
-  embed.setDescription(`+$**${total.toLocaleString()}**\n${desc.join("\n")}`);
+  embed.setDescription(`+$**${total.toLocaleString()}**\n\n${desc.join("\n")}`);
   embed.setFooter({ text: `${((await getTax()) * 100).toFixed(1)}% tax` });
 
   return send({ embeds: [embed] });
