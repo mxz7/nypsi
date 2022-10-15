@@ -8,6 +8,7 @@ import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
 import { isPremium } from "../utils/functions/premium/premium";
 import { addToNypsiBank, getTax } from "../utils/functions/tax";
+import { getDmSettings } from "../utils/functions/users/notifications";
 import { payment } from "../utils/logger";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
@@ -137,12 +138,27 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   await updateBalance(message.member, (await getBalance(message.member)) - amount);
 
+  let taxedAmount = 0;
+
   if (tax > 0) {
-    const taxedAmount = Math.floor(amount * tax);
+    taxedAmount = Math.floor(amount * tax);
     await addToNypsiBank(taxedAmount);
     await updateBalance(target, (await getBalance(target)) + (amount - taxedAmount));
   } else {
     await updateBalance(target, (await getBalance(target)) + amount);
+  }
+
+  if ((await getDmSettings(target)).payment) {
+    const embed = new CustomEmbed(
+      target,
+      `**${message.author.tag}** has sent you $**${Math.floor(amount - taxedAmount).toLocaleString()}**`
+    )
+      .setHeader("you have received a payment")
+      .setFooter({ text: "/settings me notifications" });
+
+    await target
+      .send({ embeds: [embed], content: `you have received $${Math.floor(amount - taxedAmount).toLocaleString()}` })
+      .catch(() => {});
   }
 
   const embed = new CustomEmbed(message.member)
