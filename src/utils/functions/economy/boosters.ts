@@ -77,14 +77,18 @@ export async function getBoosters(member: GuildMember | string): Promise<Map<str
         text = `${total} of your boosters have expired`;
       }
 
-      await redis.lpush(
-        "nypsi:dm:queue",
-        JSON.stringify({
-          memberId: id,
-          embed: embed,
-          content: text,
-        })
-      );
+      if (member instanceof GuildMember) {
+        await member.send({ embeds: [embed], content: text });
+      } else {
+        await redis.lpush(
+          "nypsi:dm:queue",
+          JSON.stringify({
+            memberId: id,
+            embed: embed,
+            content: text,
+          })
+        );
+      }
     }
 
     return map;
@@ -164,14 +168,18 @@ export async function getBoosters(member: GuildMember | string): Promise<Map<str
       text = `${total} of your boosters have expired`;
     }
 
-    await redis.lpush(
-      "nypsi:dm:queue",
-      JSON.stringify({
-        memberId: id,
-        embed: embed,
-        content: text,
-      })
-    );
+    if (member instanceof GuildMember) {
+      await member.send({ embeds: [embed], content: text });
+    } else {
+      await redis.lpush(
+        "nypsi:dm:queue",
+        JSON.stringify({
+          memberId: id,
+          embed: embed,
+          content: text,
+        })
+      );
+    }
   }
 
   await redis.set(`cache:economy:boosters:${id}`, JSON.stringify(Object.fromEntries(map)));
