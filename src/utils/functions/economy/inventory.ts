@@ -182,14 +182,16 @@ export async function addInventoryItem(
 
   await redis.del(`cache:economy:inventory:${id}`);
 
-  if (!inventoryAchievementCheckCooldown.has(id) && checkAchievement) {
-    inventoryAchievementCheckCooldown.add(id);
-    setTimeout(() => {
-      inventoryAchievementCheckCooldown.delete(id);
-    }, 60000);
+  setTimeout(async () => {
+    if (!inventoryAchievementCheckCooldown.has(id) && checkAchievement) {
+      inventoryAchievementCheckCooldown.add(id);
+      setTimeout(() => {
+        inventoryAchievementCheckCooldown.delete(id);
+      }, 60000);
 
-    checkCollectorAchievement(id, await getInventory(id, false));
-  }
+      checkCollectorAchievement(id, await getInventory(id, false));
+    }
+  }, 500);
 }
 
 export async function setInventoryItem(
