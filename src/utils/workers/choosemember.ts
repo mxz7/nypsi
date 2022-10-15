@@ -66,4 +66,6 @@ if (!isMainThread) {
   } else {
     parentPort.postMessage(target.user.id);
   }
+
+  process.exit(0);
 }
