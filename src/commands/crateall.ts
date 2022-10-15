@@ -77,7 +77,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         if (!(await userExists(m))) return;
 
-        await addInventoryItem(message.member, selected.id, amount, false);
+        await addInventoryItem(member, selected.id, amount, false);
 
         logger.info(`${amount} ${selected.id} given to ${member.user.tag} (${member.user.id})`);
         count += amount;
