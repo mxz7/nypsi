@@ -408,3 +408,16 @@ export async function openCrate(member: GuildMember, item: Item): Promise<string
 
   return names;
 }
+
+export async function getTotalAmountOfItem(itemId: string) {
+  const query = await prisma.inventory.aggregate({
+    where: {
+      item: itemId,
+    },
+    _sum: {
+      amount: true,
+    },
+  });
+
+  return query._sum.amount;
+}
