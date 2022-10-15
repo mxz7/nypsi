@@ -86,13 +86,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const avg = await getAuctionAverage(selected.id);
   const total = await getTotalAmountOfItem(selected.id);
+  const inventory = await getInventory(message.member);
 
   if (avg) {
     desc += `**average auction sale** $${Math.floor(avg).toLocaleString()}\n`;
   }
 
   if (total) {
-    desc += `**in world** ${total.toLocaleString()}`;
+    const percentOwned = (inventory.find((i) => i.item == selected.id).amount / total) * 100;
+
+    desc += `**in world** ${total.toLocaleString()}${percentOwned > 1 ? ` (${percentOwned.toFixed(1)}%)` : ""}`;
   }
 
   if (selected.role) {
@@ -110,8 +113,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (rarityMap.get(selected.rarity)) {
     embed.addField("rarity", `\`${rarityMap.get(selected.rarity)}\``, true);
   }
-
-  const inventory = await getInventory(message.member);
 
   if (inventory.find((i) => i.item == selected.id)) {
     embed.setFooter({
