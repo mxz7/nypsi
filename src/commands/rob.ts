@@ -4,7 +4,7 @@ import redis from "../utils/database/redis";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { getBalance, hasPadlock, setPadlock, updateBalance } from "../utils/functions/economy/balance";
 import { addToGuildXP, getGuildByUser } from "../utils/functions/economy/guilds";
-import { getInventory, setInventory } from "../utils/functions/economy/inventory";
+import { getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
 import { addItemUse, addRob } from "../utils/functions/economy/stats";
 import { createUser, isEcoBanned, userExists } from "../utils/functions/economy/utils";
 import { calcEarnedXp, getXp, updateXp } from "../utils/functions/economy/xp";
@@ -249,15 +249,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       const inventory = await getInventory(message.member);
 
-      if (inventory["lawyer"] && inventory["lawyer"] > 0) {
-        await addItemUse(message.member, "lawyer");
-        inventory["lawyer"]--;
-
-        if (inventory["lawyer"] == 0) {
-          delete inventory["lawyer"];
-        }
-
-        await setInventory(message.member, inventory);
+      if (inventory.find((i) => i.item == "lawyer") && inventory.find((i) => i.item == "lawyer").amount > 0) {
+        await Promise.all([
+          setInventoryItem(message.member, "lawyer", inventory.find((i) => i.item == "lawyer").amount - 1, false),
+          addItemUse(message.member, "lawyer"),
+        ]);
 
         embed2.addField(
           "fail!!",
