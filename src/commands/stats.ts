@@ -312,6 +312,51 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({ embeds: [embed] });
   };
 
+  const dbStats = async () => {
+    const res = await Promise.all([
+      prisma.user.count(),
+      prisma.achievements.count(),
+      prisma.economy.count(),
+      prisma.inventory.count(),
+      prisma.economyWorker.count(),
+      prisma.economyWorkerUpgrades.count(),
+      prisma.booster.count(),
+      prisma.economyStats.count(),
+      prisma.premium.count(),
+      prisma.premiumCommand.count(),
+      prisma.username.count(),
+      prisma.wordleStats.count(),
+      prisma.auction.count(),
+      prisma.moderationBan.count(),
+      prisma.moderationMute.count(),
+      prisma.moderationCase.count(),
+      prisma.mention.count(),
+    ]);
+
+    const embed = new CustomEmbed(
+      message.member,
+      `**user** ${res[0].toLocaleString()}\n` +
+        `**achievements** ${res[1].toLocaleString()}\n` +
+        `**economy** ${res[2].toLocaleString()}\n` +
+        `**inventory** ${res[3].toLocaleString()}\n` +
+        `**worker** ${res[4].toLocaleString()}\n` +
+        `**worker upgrades** ${res[5].toLocaleString()}\n` +
+        `**boosters** ${res[6].toLocaleString()}\n` +
+        `**stats** ${res[7].toLocaleString()}\n` +
+        `**premium** ${res[8].toLocaleString()}\n` +
+        `**premium command** ${res[9].toLocaleString()}\n` +
+        `**username** ${res[10].toLocaleString()}\n` +
+        `**wordle stats** ${res[11].toLocaleString()}\n` +
+        `**auctions** ${res[12].toLocaleString()}\n` +
+        `**bans** ${res[13].toLocaleString()}\n` +
+        `**mutes** ${res[14].toLocaleString()}\n` +
+        `**cases** ${res[15].toLocaleString()}\n` +
+        `**mentions** ${res[16].toLocaleString()}`
+    );
+
+    return send({ embeds: [embed] });
+  };
+
   const bankrobStats = async () => {
     const query = await prisma.economyStats.findUnique({
       where: {
@@ -484,6 +529,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return botStats();
   } else if (args[0].toLowerCase() == "bankrob") {
     return bankrobStats();
+  } else if (args[0].toLowerCase() == "db" && message.author.id == Constants.TEKOH_ID) {
+    return dbStats();
   } else {
     return normalStats();
   }
