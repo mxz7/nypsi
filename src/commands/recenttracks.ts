@@ -1,11 +1,10 @@
 import { CommandInteraction, Message } from "discord.js";
 import fetch from "node-fetch";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
-import { getMember } from "../utils/functions/member";
-import { getPrefix } from "../utils/functions/guilds/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { getMember } from "../utils/functions/member";
 import { getLastfmUsername } from "../utils/functions/users/lastfm";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command(
   "recenttracks",
@@ -41,7 +40,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (!username) {
     if (message.author.id == member.user.id) {
       return message.channel.send({
-        embeds: [new ErrorEmbed(`you have not set your last.fm username (${await getPrefix(message.guild)}**slfm**)`)],
+        embeds: [new ErrorEmbed("you have not set your last.fm username (**/settings me lastfm**)")],
       });
     } else {
       return message.channel.send({ embeds: [new ErrorEmbed("this user has not set their last.fm username")] });
