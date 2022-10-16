@@ -238,10 +238,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const memUsage = Math.round(totalMem - freeMem);
     const cpuUsage = await cpu.usage();
 
-    const usersDb = await prisma.user.count();
-    const economyDb = await prisma.economy.count();
-    const premDb = await prisma.premium.count();
-
     const client = message.client as NypsiClient;
 
     const clusterCount = client.cluster.count;
@@ -284,11 +280,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         true
       )
       .addField(
-        "database",
-        `**users** ${usersDb.toLocaleString()}\n**economy** ${economyDb.toLocaleString()}\n**premium** ${premDb.toLocaleString()}`,
-        true
-      )
-      .addField(
         "mention queue",
         "**total** " +
           mentionQueue.length.toLocaleString() +
@@ -302,7 +293,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       )
       .addField(
         "system",
-        `**memory** ${memUsage.toLocaleString()}mb/${totalMem.toLocaleString()}mb\n**cpu** ${cpuUsage}%\n**uptime** ${systemUptime}`,
+        `**memory** ${memUsage.toLocaleString()}mb/${totalMem.toLocaleString()}mb\n` +
+          `**cpu** ${cpuUsage}%\n` +
+          `**uptime** ${systemUptime}\n` +
+          `**load avg** ${os
+            .loadavg()
+            .map((i) => i.toFixed(2))
+            .join(" ")}`,
         true
       )
       .addField("cluster", `**uptime** ${uptime}`, true);
