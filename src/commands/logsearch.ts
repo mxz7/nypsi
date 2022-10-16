@@ -12,14 +12,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const res = await searchLogs(args.join(" "));
 
-  if (!res) {
+  if (!res[0]) {
     if (!(message instanceof Message)) return;
     return message.react("❌");
   }
 
   return message.channel.send({
-    content: `results for \`${args.join(" ")}\``,
-    files: [{ name: "search_results.txt", attachment: Buffer.from(res) }],
+    content: `${res[1].toLocaleString()} results for \`${args.join(" ")}\``,
+    files: [{ name: "search_results.txt", attachment: Buffer.from(res[0]) }],
   });
 }
 
