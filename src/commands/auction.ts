@@ -28,7 +28,6 @@ import { formatBet, getItems, userExists } from "../utils/functions/economy/util
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import requestDM from "../utils/functions/requestdm";
 import { getDmSettings } from "../utils/functions/users/notifications";
-import { logger } from "../utils/logger";
 import { NypsiClient } from "../utils/models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { Item } from "../utils/models/Economy";
@@ -547,7 +546,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       });
     }
 
-    logger.info(`auction ${auction.id} by ${auction.ownerId} deleted by ${message.author.tag} (${message.author.id})`);
     return;
   } else if (args[0].toLowerCase() == "create") {
     if (args.length != 4) {

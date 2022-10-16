@@ -318,10 +318,6 @@ export default async function interactionCreate(interaction: Interaction) {
         }
 
         await interaction.message.edit({ embeds: [embed], components: [] });
-
-        logger.info(
-          `auction ${auction.id} by ${auction.ownerId} bought by ${interaction.user.tag} (${interaction.user.id})`
-        );
       } else {
         await interaction.reply({ embeds: [new ErrorEmbed("invalid auction")], ephemeral: true });
         await interaction.message.delete();
