@@ -36,6 +36,8 @@ export function listenForVotes(manager: Manager) {
 async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
   const { user } = vote;
 
+  await redis.srem("nypsi:vote_reminder:received", user);
+
   if (!(await userExists(user))) {
     logger.warn(`${user} doesnt exist`);
     return;
@@ -136,8 +138,6 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
       content: "thank you for voting!",
       embed: embed,
     });
-
-    await redis.srem("nypsi:vote_reminder:received", user);
 
     if (res) {
       logger.log({
