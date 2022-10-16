@@ -70,7 +70,7 @@ async function doLottery(client: Client) {
   embed.setTitle("lottery winner");
   embed.setDescription(
     `**${user.username}** has won the lottery with ticket #${chosen.id}!!\n\n` +
-      `they have won a total of $**${total.toLocaleString()}**`
+      `they have won $**${total.toLocaleString()}**`
   );
   embed.setFooter({ text: `a total of ${tickets.length.toLocaleString()} tickets were bought` });
   embed.setColor("#111111");
