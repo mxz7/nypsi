@@ -270,6 +270,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   };
 
   const slashOnly = async () => {
+    if (message.author.id != message.guild.ownerId) {
+      return send({ embeds: [new ErrorEmbed("you must be the server owner to do this")] });
+    }
+
     if (message instanceof Message) {
       return await send({ embeds: [new ErrorEmbed("please use /settings server slash-only")] });
     }
