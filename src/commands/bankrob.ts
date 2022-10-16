@@ -32,7 +32,7 @@ const defaults = new Map<string, number>([
   ["barclays", 15_000_000],
   ["lloyds", 5_000_000],
   ["monzo", 2_500_000],
-  ["fleeca", 1_000_000],
+  ["fleeca", 1_750_000],
 ]);
 
 const requirements = new Map<string, number>([
