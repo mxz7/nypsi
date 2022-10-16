@@ -19,7 +19,7 @@ if (!isMainThread) {
     const searchTerm: string = workerData[0];
     const resultsFile = `./temp/search_results_${Date.now()}.txt`;
 
-    const logFiles = await fs.readdir("./out/logs").then((x) => x.filter((file) => file.endsWith(".log")));
+    const logFiles = await fs.readdir("./out/logs").then((x) => x.filter((file) => file.includes(".log")));
     let resultsFound = 0;
 
     for (const fileName of logFiles) {
