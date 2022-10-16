@@ -76,6 +76,11 @@ const bree = new Bree({
       interval: "30m",
       path: path.join(__dirname, "jobs", "votereminders.js"),
     },
+    {
+      name: "clean-logs",
+      interval: "on the first day of the month",
+      path: path.join(__dirname, "jobs", "cleanlogs.js"),
+    },
   ],
 });
 
