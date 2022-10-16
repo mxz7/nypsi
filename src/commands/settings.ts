@@ -14,6 +14,8 @@ import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { calcMaxBet, getDefaultBet, getRequiredBetForXp, setDefaultBet } from "../utils/functions/economy/balance";
 import { createUser, formatNumber, userExists } from "../utils/functions/economy/utils";
 import { setSlashOnly } from "../utils/functions/guilds/slash";
+import { cleanString } from "../utils/functions/string";
+import { getLastfmUsername, setLastfmUsername } from "../utils/functions/users/lastfm";
 import { getDmSettings, getNotificationsData, updateDmSettings } from "../utils/functions/users/notifications";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
@@ -34,9 +36,15 @@ cmd.slashData
           .setName("defaultbet")
           .setDescription("set or reset your default bet")
           .addStringOption((option) =>
-            option.setName("bet").setDescription("use reset to disable your default bet").setRequired(false)
+            option.setName("bet").setDescription("type reset to disable your default bet").setRequired(false)
           )
       )
+  )
+  .addSubcommand((lastfm) =>
+    lastfm
+      .setName("lastfm")
+      .setDescription("set your last.fm username")
+      .addStringOption((option) => option.setName("username").setDescription("your username on last.fm").setRequired(false))
   )
   .addSubcommandGroup((server) =>
     server
@@ -282,6 +290,34 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     });
   };
 
+  const setLastFm = async () => {
+    if (args.length == 2) {
+      const embed = new CustomEmbed(message.member);
+
+      const username = await getLastfmUsername(message.member);
+
+      if (username) {
+        embed.setDescription(`your last.fm username is set to \`${username}\``);
+      } else {
+        embed.setDescription("your username has not been set, /settings me lastfm");
+      }
+
+      return message.channel.send({ embeds: [embed] });
+    }
+
+    const res = await setLastfmUsername(message.member, args[2]);
+
+    const embed = new CustomEmbed(message.member);
+
+    if (res) {
+      embed.setDescription(`your last.fm username has been set to \`${cleanString(args[2])}\``);
+    } else {
+      embed.setDescription(`\`${cleanString(args[2])}\` is not a valid last.fm username`);
+    }
+
+    return send({ embeds: [embed] });
+  };
+
   if (args.length == 0) {
     return send({ embeds: [new CustomEmbed(message.member, "/settings me\n/settings server")] });
   } else if (args[0].toLowerCase() == "me") {
@@ -289,6 +325,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return showDmSettings();
     } else if (args[1].toLowerCase() == "defaultbet") {
       return defaultBet();
+    } else if (args[1].toLowerCase() == "lastfm") {
+      return setLastFm();
     }
   } else if (args[0].toLowerCase() == "server") {
     if (args[1].toLowerCase() == "slash-only") {
