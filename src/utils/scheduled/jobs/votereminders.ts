@@ -9,24 +9,21 @@ import dayjs = require("dayjs");
 (async () => {
   const userIds = await prisma.dMSettings.findMany({
     where: {
-      vote_reminder: true,
+      AND: [
+        { vote_reminder: true },
+        {
+          user: {
+            Economy: {
+              lastVote: { lte: dayjs().subtract(12, "hours").toDate() },
+            },
+          },
+        },
+      ],
     },
     select: {
       userId: true,
     },
   });
-
-  const toSendReminder = await prisma.economy
-    .findMany({
-      where: {
-        AND: [
-          { userId: { in: userIds.map((u) => u.userId) } },
-          { lastVote: { lte: dayjs().subtract(12, "hours").toDate() } },
-        ],
-      },
-      select: { userId: true },
-    })
-    .then((q) => q.map((i) => i.userId));
 
   const data = {
     memberId: "boob",
@@ -46,11 +43,11 @@ import dayjs = require("dayjs");
 
   let amount = 0;
 
-  for (const user of toSendReminder) {
-    if (await redis.sismember("nypsi:vote_reminder:received", user)) return;
-    data.memberId = user;
+  for (const user of userIds) {
+    if (await redis.sismember("nypsi:vote_reminder:received", user.userId)) continue;
+    data.memberId = user.userId;
     await redis.lpush("nypsi:dm:queue", JSON.stringify(data));
-    await redis.sadd("nypsi:vote_reminder:received", user);
+    await redis.sadd("nypsi:vote_reminder:received", user.userId);
     amount++;
   }
 
