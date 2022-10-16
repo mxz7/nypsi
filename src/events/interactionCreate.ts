@@ -464,15 +464,17 @@ export default async function interactionCreate(interaction: Interaction) {
     switch (arg.type) {
       case ApplicationCommandOptionType.User:
         const user = arg.user;
-        args.push(`<@${user.id}>`);
-        const guildMember = await interaction.guild.members.fetch(user.id);
+        const guildMember = await interaction.guild.members.fetch(user.id).catch(() => {});
 
         if (guildMember) {
+          args.push(`<@${user.id}>`);
           const collection: Collection<string, GuildMember> = new Collection();
           collection.set(user.id, guildMember);
           message.mentions = {
             members: collection,
           };
+        } else {
+          args.push(user.id);
         }
         break;
       case ApplicationCommandOptionType.Channel:
