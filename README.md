@@ -37,7 +37,7 @@ better showcase of features can be found on the bot's website: [`nypsi.xyz`](htt
 
 #### 💬 mentions
 
-- nypsi tracks mentions across qualifying servers, preventing your users from being irritated by ghost pings, as well as putting all of their recent mentions into a simple, easy access command
+- nypsi tracks mentions / pings across qualifying servers, preventing your users from being irritated by ghost pings, as well as putting all of their recent mentions into a simple, easy access command
 
 #### 📖 wordle
 
@@ -50,10 +50,6 @@ better showcase of features can be found on the bot's website: [`nypsi.xyz`](htt
 ##### 🛠 moderation
 
 - every `ban, kick, mute, warn, unban and unmute` that is ran through nypsi is logged and saved and can be accessed with the `$history` and `$case` commands. with all of these commands you are also able to punish multiple people in the same command. use `$help mod` to view all of the moderation commands available. you are also able to moderate the `$snipe / $esnipe` command by including a filter with `$sf`
-
-##### ⛏ minecraft
-
-- `[disclaimer]` - this bot is not affiliated with minecraft/mojang in any way there are two minecraft related commands being `$mc` and `$skin`, both allow you to view information about a minecraft account, including past names and their current skin
 
 ##### 📊 server stats
 
@@ -81,10 +77,6 @@ better showcase of features can be found on the bot's website: [`nypsi.xyz`](htt
 - `$wordle`
 
 ![wordle game](images/wordle.png)
-
-- `$mc`
-
-![mc command](images/minecraft.png)
 
 - `$streetrace`
 
