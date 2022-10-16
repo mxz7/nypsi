@@ -117,9 +117,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   }
 
   promises.push(setInventoryItem(message.member, "coal", inventory.find((i) => i.item == "coal").amount - coal, false));
-  promises.push(
-    setInventoryItem(message.member, "furnace", inventory.find((i) => i.item == "furnace").amount - coal, false)
-  );
+  promises.push(setInventoryItem(message.member, "furnace", inventory.find((i) => i.item == "furnace").amount - 1, false));
 
   await Promise.all(promises);
 
