@@ -3,6 +3,7 @@ import { Categories, Command, NypsiCommandInteraction } from "../models/Command"
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { getDisabledCommands, updateDisabledCommands } from "../utils/functions/guilds/disabledcommands";
 import { getPrefix } from "../utils/functions/guilds/utils";
+import { cleanString } from "../utils/functions/string";
 import { commandExists } from "../utils/handlers/commandhandler";
 
 const cmd = new Command("disablecommand", "disable certain commands in your server", Categories.ADMIN)
@@ -38,11 +39,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}disablecmd add/+ <command name>`)] });
     }
 
-    const word = args[1]
-      .toString()
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[^A-z0-9\s]/g, "");
+    const word = cleanString(args[1].toString().toLowerCase().normalize("NFD"));
 
     if (filter.indexOf(word) > -1) {
       const embed = new CustomEmbed(message.member, "❌ `" + prefix + word + "` is already disabled").setFooter({
@@ -86,11 +83,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}disablecmd del/- <command>`)] });
     }
 
-    const word = args[1]
-      .toString()
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[^A-z0-9\s]/g, "");
+    const word = cleanString(args[1].toString().toLowerCase().normalize("NFD"));
 
     if (filter.indexOf(word) > -1) {
       filter.splice(filter.indexOf(word), 1);
