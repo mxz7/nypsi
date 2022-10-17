@@ -16,6 +16,7 @@ model User {
   lastCommand    DateTime
   tracking       Boolean  @default(true)
   lastfmUsername String?
+  email          String?
 
   Economy            Economy?
   Premium            Premium?
