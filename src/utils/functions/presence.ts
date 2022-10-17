@@ -1,4 +1,4 @@
-import redis from "../database/redis";
+import redis from "../../init/redis";
 import { daysUntilChristmas } from "./date";
 
 export function randomPresence(): string {

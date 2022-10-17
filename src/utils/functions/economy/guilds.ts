@@ -1,11 +1,11 @@
 import { GuildMember } from "discord.js";
 import { inPlaceSort } from "fast-sort";
-import prisma from "../../database/database";
-import redis from "../../database/redis";
+import prisma from "../../../init/database";
+import redis from "../../../init/redis";
+import { NypsiClient } from "../../../models/Client";
+import { CustomEmbed } from "../../../models/EmbedBuilders";
+import { GuildUpgradeRequirements } from "../../../types/Economy";
 import { logger } from "../../logger";
-import { NypsiClient } from "../../models/Client";
-import { GuildUpgradeRequirements } from "../../models/Economy";
-import { CustomEmbed } from "../../models/EmbedBuilders";
 import requestDM from "../requestdm";
 import { getDmSettings } from "../users/notifications";
 import { addInventoryItem } from "./inventory";

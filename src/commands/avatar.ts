@@ -11,9 +11,9 @@ import {
   MessageActionRowComponentBuilder,
   MessageEditOptions,
 } from "discord.js";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { getMember } from "../utils/functions/member";
-import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 
 const avatar = new Command("avatar", "get a person's avatar", Categories.INFO);
 

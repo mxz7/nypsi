@@ -1,7 +1,7 @@
 import { Channel, CommandInteraction, GuildMember, Message } from "discord.js";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { snipe } from "../utils/functions/guilds/utils";
-import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 
 const cmd = new Command("snipe", "snipe the most recently deleted message", Categories.FUN).setAliases(["s"]);
 

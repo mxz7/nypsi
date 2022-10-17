@@ -1,7 +1,7 @@
 import { DMSettings } from "@prisma/client";
 import { GuildMember } from "discord.js";
-import prisma from "../../database/database";
-import redis from "../../database/redis";
+import redis from "../../../init/redis";
+import prisma from "../../../init/database";
 import ms = require("ms");
 
 declare function require(name: string): any;

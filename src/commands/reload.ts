@@ -1,9 +1,9 @@
 import { CommandInteraction, Message } from "discord.js";
-import { loadCommands, reloadCommand } from "../utils/commandhandler";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
+import { loadCommands, reloadCommand } from "../utils/handlers/commandhandler";
 import { logger } from "../utils/logger";
-import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 
 const cmd = new Command("reload", "reload commands", Categories.NONE).setPermissions(["bot owner"]);
 

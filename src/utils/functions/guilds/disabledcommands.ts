@@ -1,5 +1,5 @@
 import { Guild } from "discord.js";
-import prisma from "../../database/database";
+import prisma from "../../../init/database";
 
 const disableCache = new Map<string, string[]>();
 

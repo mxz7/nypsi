@@ -1,12 +1,12 @@
 import { User } from "discord.js";
-import { uploadImageToImgur } from "../utils/functions/image";
-import { NypsiClient } from "../utils/models/Client";
-import { isPremium } from "../utils/functions/premium/premium";
-import { hasProfile } from "../utils/functions/users/utils";
-import { updateLastKnowntag } from "../utils/functions/users/tag";
-import { addNewAvatar, addNewUsername, isTracking } from "../utils/functions/users/history";
-import { userExists } from "../utils/functions/economy/utils";
+import { NypsiClient } from "../models/Client";
 import { getPrestige } from "../utils/functions/economy/prestige";
+import { userExists } from "../utils/functions/economy/utils";
+import { uploadImageToImgur } from "../utils/functions/image";
+import { isPremium } from "../utils/functions/premium/premium";
+import { addNewAvatar, addNewUsername, isTracking } from "../utils/functions/users/history";
+import { updateLastKnowntag } from "../utils/functions/users/tag";
+import { hasProfile } from "../utils/functions/users/utils";
 
 const queue: User[] = [];
 let interval: NodeJS.Timer;

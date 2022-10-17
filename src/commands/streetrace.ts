@@ -1,14 +1,14 @@
 import { BaseMessageOptions, ChannelType, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import { Item } from "../types/Economy";
+import { RaceDetails, RaceUserDetails } from "../types/StreetRace";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { calcMaxBet, getBalance, updateBalance } from "../utils/functions/economy/balance";
 import { getInventory } from "../utils/functions/economy/inventory";
 import { createUser, formatBet, getItems, userExists } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
-import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
-import { Item } from "../utils/models/Economy";
-import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
-import { RaceDetails, RaceUserDetails } from "../utils/models/StreetRace";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("streetrace", "create or join a street race", Categories.MONEY).setAliases(["sr"]);
 

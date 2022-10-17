@@ -1,9 +1,9 @@
 import { CommandInteraction, Message } from "discord.js";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { createCaptcha } from "../utils/functions/captcha";
 import { reset } from "../utils/functions/economy/utils";
-import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("reseteco", "reset economy except prestige and karma", Categories.NONE);
 

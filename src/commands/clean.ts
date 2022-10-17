@@ -1,7 +1,7 @@
 import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { getPrefix } from "../utils/functions/guilds/utils";
-import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("clean", "clean up bot commands and responses", Categories.MODERATION).setPermissions([
   "MANAGE_MESSAGES",

@@ -1,10 +1,10 @@
 import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { daysUntil, formatDate } from "../utils/functions/date";
-import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
-import { getTier, isPremium } from "../utils/functions/premium/premium";
-import { getPrefix } from "../utils/functions/guilds/utils";
 import { addCountdown, deleteCountdown, getCountdowns } from "../utils/functions/guilds/countdowns";
+import { getPrefix } from "../utils/functions/guilds/utils";
+import { getTier, isPremium } from "../utils/functions/premium/premium";
 
 const cmd = new Command("countdown", "create and manage your server countdowns", Categories.ADMIN)
   .setAliases(["countdowns"])

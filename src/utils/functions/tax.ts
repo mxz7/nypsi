@@ -1,6 +1,6 @@
 import ms = require("ms");
-import prisma from "../database/database";
-import redis from "../database/redis";
+import redis from "../../init/redis";
+import prisma from "../../init/database";
 
 export async function getTax() {
   let tax: number;

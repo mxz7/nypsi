@@ -1,11 +1,11 @@
 import { CommandInteraction, Message } from "discord.js";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { addInventoryItem } from "../utils/functions/economy/inventory";
 import { getItems, userExists } from "../utils/functions/economy/utils";
 import { addCooldown, inCooldown } from "../utils/functions/guilds/utils";
 import { logger } from "../utils/logger";
-import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("crateall", "give every user in the current guild a crate", Categories.NONE).setPermissions([
   "bot owner",

@@ -1,9 +1,9 @@
 import { Message, PermissionFlagsBits } from "discord.js";
+import { CustomEmbed } from "../models/EmbedBuilders";
+import { LogType } from "../types/Moderation";
 import { checkMessageContent, getChatFilter, getSnipeFilter } from "../utils/functions/guilds/filters";
 import { createGuild, eSnipe, hasGuild } from "../utils/functions/guilds/utils";
 import { addLog, isLogsEnabled } from "../utils/functions/moderation/logs";
-import { CustomEmbed } from "../utils/models/EmbedBuilders";
-import { LogType } from "../utils/models/GuildStorage";
 
 export default async function messageUpdate(message: Message, newMessage: Message) {
   if (!message) return;

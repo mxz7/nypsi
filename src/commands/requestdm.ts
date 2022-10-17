@@ -1,9 +1,9 @@
 import { CommandInteraction, Message } from "discord.js";
+import { NypsiClient } from "../models/Client";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import requestDM from "../utils/functions/requestdm";
-import { NypsiClient } from "../utils/models/Client";
-import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command(
   "requestdm",

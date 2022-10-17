@@ -11,7 +11,8 @@ import {
   MessageActionRowComponentBuilder,
   MessageEditOptions,
 } from "discord.js";
-import { addCooldown, addExpiry, getResponse, onCooldown } from "../utils/cooldownhandler.js";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { calcMaxBet, getBankBalance, getMulti, updateBankBalance } from "../utils/functions/economy/balance.js";
 import { addBooster, getBoosters } from "../utils/functions/economy/boosters.js";
 import { addInventoryItem } from "../utils/functions/economy/inventory.js";
@@ -23,8 +24,7 @@ import {
 } from "../utils/functions/economy/prestige.js";
 import { createUser, userExists } from "../utils/functions/economy/utils.js";
 import { getXp, updateXp } from "../utils/functions/economy/xp.js";
-import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
+import { addCooldown, addExpiry, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 
 const cmd = new Command("prestige", "prestige to gain extra benefits", Categories.MONEY);
 

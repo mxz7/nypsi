@@ -1,7 +1,7 @@
 import { CommandInteraction, Message } from "discord.js";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import Constants from "../utils/Constants";
 import { toggleLock } from "../utils/functions/captcha";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
 
 const cmd = new Command("captchatest", "test an account", Categories.NONE);
 

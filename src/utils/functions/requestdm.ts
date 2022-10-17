@@ -1,8 +1,8 @@
 import { Manager } from "discord-hybrid-sharding";
 import { APIEmbed, BaseMessageOptions, MessageActionRowComponentBuilder, MessagePayload } from "discord.js";
+import { NypsiClient } from "../../models/Client";
+import { CustomEmbed } from "../../models/EmbedBuilders";
 import { logger } from "../logger";
-import { NypsiClient } from "../models/Client";
-import { CustomEmbed } from "../models/EmbedBuilders";
 
 interface RequestDMOptions {
   memberId: string;

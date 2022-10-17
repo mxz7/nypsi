@@ -9,10 +9,10 @@ import {
   Message,
   MessageActionRowComponentBuilder,
 } from "discord.js";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { createSurvey, getSurveys } from "../utils/functions/surveys";
-import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("survey", "create a survey for users to respond to", Categories.INFO);
 

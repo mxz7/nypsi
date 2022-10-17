@@ -1,8 +1,8 @@
 import { CommandInteraction, Message } from "discord.js";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { CustomEmbed } from "../models/EmbedBuilders";
 import { calcMaxBet } from "../utils/functions/economy/balance";
 import { createUser, userExists } from "../utils/functions/economy/utils";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("maxbet", "calculate your maximum bet", Categories.MONEY);
 
