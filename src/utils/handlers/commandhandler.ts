@@ -610,17 +610,27 @@ export async function runCommand(
   if (isLockedOut(message.author.id)) {
     if (beingChecked.indexOf(message.author.id) != -1) return;
 
-    const captcha = createCaptcha();
+    const { captcha, text } = await createCaptcha();
 
     const embed = new CustomEmbed(message.member).setTitle("you have been locked");
 
     embed.setDescription(
-      `please note that using macros / auto typers is not allowed with nypsi\n\ntype: \`${captcha.display}\` to be unlocked`
+      "please note that using macros / auto typers is not allowed with nypsi\n\nplease type the following:"
     );
+
+    embed.setImage("attachment://captcha.png");
 
     beingChecked.push(message.author.id);
 
-    await message.channel.send({ embeds: [embed] });
+    await message.channel.send({
+      embeds: [embed],
+      files: [
+        {
+          attachment: captcha,
+          name: "captcha.png",
+        },
+      ],
+    });
 
     logger.info(`sent captcha (${message.author.id}) - awaiting reply`);
 
@@ -647,7 +657,7 @@ export async function runCommand(
     if (fail) return;
     if (!response) return;
 
-    if (response.content.toLowerCase() == captcha.answer) {
+    if (response.content.toLowerCase() == text) {
       logger.info(`captcha (${message.author.id}) passed`);
       passedCaptcha(message.member);
       toggleLock(message.author.id);

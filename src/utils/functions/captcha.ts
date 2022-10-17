@@ -1,6 +1,11 @@
-import { getZeroWidth } from "./string";
+import { CaptchaGenerator } from "captcha-canvas";
+import * as crypto from "node:crypto";
 
 const locked: string[] = [];
+
+const colors = ["deeppink", "green", "red", "blue"];
+
+const generator = new CaptchaGenerator().setDecoy({ opacity: 0.5, total: 5 });
 
 export function isLockedOut(string: string): boolean {
   if (locked.indexOf(string) == -1) {
@@ -18,30 +23,11 @@ export function toggleLock(string: string) {
   }
 }
 
-export function createCaptcha(): Captcha {
-  return new Captcha(Math.random().toString(36).substr(2, 7));
-}
+export async function createCaptcha() {
+  let text = crypto.randomBytes(32).toString("hex");
 
-class Captcha {
-  public answer: string;
-  public display: string;
-  constructor(d: string) {
-    this.answer = d;
+  text = text.substring(0, Math.floor(Math.random() * 3) + 6);
 
-    const zeroWidthCount = d.length / 2;
-
-    const zeroWidthChar = getZeroWidth();
-
-    let displayWord = d;
-
-    for (let i = 0; i < zeroWidthCount; i++) {
-      const pos = Math.floor(Math.random() * d.length + 1);
-
-      displayWord = displayWord.substring(0, pos) + zeroWidthChar + displayWord.substring(pos);
-    }
-
-    this.display = displayWord;
-
-    return this;
-  }
+  generator.setCaptcha({ colors, text });
+  return { captcha: await generator.generate(), text };
 }
