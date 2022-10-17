@@ -4,6 +4,7 @@ import * as express from "express";
 import prisma from "../../init/database";
 import redis from "../../init/redis";
 import { CustomEmbed } from "../../models/EmbedBuilders";
+import { KofiResponse } from "../../types/Kofi";
 import { getBalance, updateBalance } from "../functions/economy/balance";
 import { addInventoryItem } from "../functions/economy/inventory";
 import { getPrestige } from "../functions/economy/prestige";
@@ -27,6 +28,15 @@ export function listen(manager: Manager) {
       doVote(vote, manager);
     })
   );
+
+  app.post("/kofi", async (res: KofiResponse) => {
+    console.log(res);
+
+    if (res.verification_token != process.env.KOFI_VERIFICATION) {
+      logger.warn("received faulty kofi data");
+      return logger.warn(res);
+    }
+  });
 
   app.listen(process.env.EXPRESS_PORT || 5000);
 
