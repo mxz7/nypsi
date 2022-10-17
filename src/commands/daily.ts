@@ -115,7 +115,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   await send({ embeds: [embed] });
 
-  await setProgress(message.author.id, "streaker", streak + 1);
+  await setProgress(message.author.id, "streaker", streak);
 }
 
 cmd.setRun(run);
