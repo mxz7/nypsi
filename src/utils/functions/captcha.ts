@@ -22,10 +22,11 @@ export function isLockedOut(string: string): boolean {
   }
 }
 
-export function toggleLock(string: string) {
+export async function toggleLock(string: string) {
   if (isLockedOut(string)) {
     locked.splice(locked.indexOf(string), 1);
   } else {
+    if (await isVerified(string)) return;
     locked.push(string);
   }
 }
