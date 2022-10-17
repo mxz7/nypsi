@@ -1,7 +1,7 @@
-import redis from "../../init/redis";
 import { ColorResolvable, EmbedBuilder, GuildMember } from "discord.js";
-import { getColor } from "../functions/color";
-import { getEmbedColor } from "../functions/premium/color";
+import redis from "../init/redis";
+import { getColor } from "../utils/functions/color";
+import { getEmbedColor } from "../utils/functions/premium/color";
 
 const embedColorCache = new Map<string, string>();
 

@@ -1,6 +1,6 @@
 import { Message, TextChannel, User } from "discord.js";
+import { CustomEmbed } from "../models/EmbedBuilders";
 import { Item } from "./Economy";
-import { CustomEmbed } from "./EmbedBuilders";
 
 export interface RaceDetails {
   channel: TextChannel;
