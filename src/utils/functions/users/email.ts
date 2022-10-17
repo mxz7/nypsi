@@ -13,7 +13,7 @@ export async function getEmail(id: string) {
   return query.email;
 }
 
-export async function setEmal(id: string, email: string) {
+export async function setEmail(id: string, email: string) {
   return await prisma.user.update({
     where: {
       id,
