@@ -3,6 +3,7 @@ import prisma from "../../../../init/database";
 import { NypsiCommandInteraction } from "../../../../models/Command";
 import { CustomEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
+import sleep from "../../sleep";
 import { getInventory, setInventoryItem } from "../inventory";
 
 module.exports = new ItemUse("streak_token", async (message: Message | (NypsiCommandInteraction & CommandInteraction)) => {
@@ -48,6 +49,8 @@ module.exports = new ItemUse("streak_token", async (message: Message | (NypsiCom
   await setInventoryItem(message.member, "streak_token", inventory.find((i) => i.item == "streak_token").amount - 1, false);
 
   const msg = await send({ embeds: [new CustomEmbed(message.member, "applying token...")] });
+
+  await sleep(2000);
 
   return edit(
     {

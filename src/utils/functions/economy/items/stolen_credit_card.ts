@@ -2,6 +2,7 @@ import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Messag
 import { NypsiCommandInteraction } from "../../../../models/Command";
 import { CustomEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
+import sleep from "../../sleep";
 import { increaseBaseBankStorage } from "../balance";
 import { getInventory, setInventoryItem } from "../inventory";
 
@@ -48,6 +49,8 @@ module.exports = new ItemUse(
     ]);
 
     const msg = await send({ embeds: [new CustomEmbed(message.member, "using stolen credit card...")] });
+
+    await sleep(2000);
 
     return edit(
       {
