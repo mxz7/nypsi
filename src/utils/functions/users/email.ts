@@ -1,7 +1,12 @@
 import prisma from "../../../init/database";
 import { NypsiClient } from "../../../models/Client";
+import { CustomEmbed } from "../../../models/EmbedBuilders";
+import { NotificationPayload } from "../../../types/Notification";
+import Constants from "../../Constants";
 import { addInventoryItem } from "../economy/inventory";
+import { getItems } from "../economy/utils";
 import { addMember, getPremiumProfile, isPremium, renewUser, setTier } from "../premium/premium";
+import { addNotificationToQueue, getDmSettings } from "./notifications";
 
 export async function getEmail(id: string) {
   const query = await prisma.user.findUnique({
@@ -57,6 +62,20 @@ export async function checkPurchases(id: string, client: NypsiClient) {
       }
     } else {
       await addInventoryItem(id, item.item, 1, false);
+
+      if ((await getDmSettings(id)).premium) {
+        const payload: NotificationPayload = {
+          memberId: id,
+          payload: {
+            content: "thank you for your purchase",
+            embed: new CustomEmbed()
+              .setDescription(`you have received 1 ${getItems()[item.item].emoji} ${getItems()[item.item].name}`)
+              .setColor(Constants.TRANSPARENT_EMBED_COLOR),
+          },
+        };
+
+        await addNotificationToQueue(payload);
+      }
     }
   }
 
