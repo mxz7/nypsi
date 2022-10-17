@@ -1,7 +1,6 @@
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions } from "discord.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
 import { getPrestige } from "../utils/functions/economy/prestige";
 import { createUser, formatNumber, isEcoBanned, userExists } from "../utils/functions/economy/utils";
@@ -11,6 +10,7 @@ import { getMember } from "../utils/functions/member";
 import { isPremium } from "../utils/functions/premium/premium";
 import { addToNypsiBank, getTax } from "../utils/functions/tax";
 import { getDmSettings } from "../utils/functions/users/notifications";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { payment } from "../utils/logger";
 import dayjs = require("dayjs");
 

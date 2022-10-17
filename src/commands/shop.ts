@@ -10,8 +10,8 @@ import {
 import { inPlaceSort } from "fast-sort";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { getItems } from "../utils/functions/economy/utils";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("shop", "view current items that are available to buy/sell", Categories.MONEY).setAliases(["store"]);
 

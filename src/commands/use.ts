@@ -11,7 +11,6 @@ import redis from "../init/redis";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { Item } from "../types/Economy";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { hasPadlock, increaseBaseBankStorage, setPadlock } from "../utils/functions/economy/balance";
 import { addBooster, getBoosters } from "../utils/functions/economy/boosters";
 import { getInventory, openCrate, setInventoryItem } from "../utils/functions/economy/inventory";
@@ -29,6 +28,7 @@ import { addWorkerUpgrade, getWorkers } from "../utils/functions/economy/workers
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
 import { getDmSettings } from "../utils/functions/users/notifications";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("use", "use an item or open crates", Categories.MONEY).setAliases(["open", "activate"]);
 

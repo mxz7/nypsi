@@ -19,7 +19,6 @@ import prisma from "../init/database";
 import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import { runCommand } from "../utils/commandhandler";
 import { userExists } from "../utils/functions/economy/utils";
 import { checkMessageContent } from "../utils/functions/guilds/filters";
 import { isSlashOnly } from "../utils/functions/guilds/slash";
@@ -31,6 +30,7 @@ import { createSupportRequest, getSupportRequest, sendToRequestChannel } from ".
 import { getLastCommand } from "../utils/functions/users/commands";
 import { mentionQueue, MentionQueueItem } from "../utils/functions/users/mentions";
 import doCollection from "../utils/functions/workers/mentions";
+import { runCommand } from "../utils/handlers/commandhandler";
 import { logger } from "../utils/logger";
 import ms = require("ms");
 

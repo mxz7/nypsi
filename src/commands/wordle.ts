@@ -2,11 +2,11 @@ import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Messag
 import * as fs from "fs/promises";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { MStoTime } from "../utils/functions/date";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { addKarma } from "../utils/functions/karma/karma";
 import { addWordleGame, getWordleStats } from "../utils/functions/users/wordle";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import ms = require("ms");
 
 const cmd = new Command("wordle", "play wordle on discord", Categories.FUN).setAliases(["w"]);

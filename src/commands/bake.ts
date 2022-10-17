@@ -1,10 +1,10 @@
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { addInventoryItem, getInventory } from "../utils/functions/economy/inventory";
 import { createUser, userExists } from "../utils/functions/economy/utils";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command(
   "bake",

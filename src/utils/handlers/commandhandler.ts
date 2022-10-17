@@ -13,6 +13,8 @@ import {
 } from "discord.js";
 import * as fs from "fs";
 import { getBorderCharacters, table } from "table";
+import redis from "../../init/redis";
+import { NypsiClient } from "../../models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../models/EmbedBuilders";
 import { createCaptcha, isLockedOut, toggleLock } from "../functions/captcha";
@@ -20,8 +22,6 @@ import { formatDate, MStoTime } from "../functions/date";
 import { getNews, hasSeenNews } from "../functions/news";
 import { getTimestamp, logger } from "../logger";
 // @ts-expect-error typescript doesnt like opening package.json
-import redis from "../../init/redis";
-import { NypsiClient } from "../../models/Client";
 import { version } from "../../package.json";
 import { Item } from "../../types/Economy";
 import Constants from "../Constants";

@@ -3,8 +3,8 @@ import redis from "../init/redis.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { MilfSearchData } from "../types/Sex.js";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
 import { addProgress } from "../utils/functions/economy/achievements.js";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 
 const cmd = new Command("sex", "find horny milfs in ur area 😏", Categories.FUN).setAliases([
   "findhornymilfsinmyarea",

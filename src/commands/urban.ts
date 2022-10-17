@@ -3,8 +3,8 @@ import { inPlaceSort } from "fast-sort";
 import * as urban from "urban-dictionary";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { getPrefix } from "../utils/functions/guilds/utils";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("urban", "get a definition from urban dictionary", Categories.INFO).setAliases(["define"]);
 

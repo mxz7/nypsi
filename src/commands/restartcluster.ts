@@ -2,9 +2,9 @@ import { CommandInteraction, Message } from "discord.js";
 import { NypsiClient } from "../models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders.js";
-import { startRestart } from "../utils/commandhandler";
 import Constants from "../utils/Constants";
 import { setCustomPresence } from "../utils/functions/presence";
+import { startRestart } from "../utils/handlers/commandhandler";
 import { logger } from "../utils/logger";
 
 const cmd = new Command("restartcluster", "restartcluster", Categories.NONE).setPermissions(["bot owner"]);

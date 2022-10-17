@@ -4,9 +4,9 @@ import { clearInterval } from "timers";
 import startJobs from "./scheduled/scheduler";
 import { addFailedHeatbeat, sendHeartbeat } from "./utils/functions/heartbeat";
 import { updateStats } from "./utils/functions/topgg";
+import { listenForDms } from "./utils/handlers/notificationhandler";
+import { listenForVotes } from "./utils/handlers/votehandler";
 import { logger, setClusterId } from "./utils/logger";
-import { listenForDms } from "./utils/notificationhandler";
-import { listenForVotes } from "./utils/votehandler";
 import ms = require("ms");
 
 setClusterId("main");

@@ -1,10 +1,10 @@
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions } from "discord.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { addInventoryItem, getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
 import { addItemUse } from "../utils/functions/economy/stats";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("smelt", "smelt your ores into ingots with coal", Categories.MONEY).setDocs(
   "https://docs.nypsi.xyz/economy/minecraft"

@@ -15,9 +15,9 @@ import {
 import fetch from "node-fetch";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getLastfmUsername } from "../utils/functions/users/lastfm";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger } from "../utils/logger";
 
 const cmd = new Command("topartists", "view your top artists", Categories.MUSIC).setAliases(["ta"]);

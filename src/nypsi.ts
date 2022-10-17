@@ -56,7 +56,7 @@ const client = new NypsiClient({
   partials: [Partials.Channel], // for direct messages
 });
 
-import { loadCommands } from "./utils/commandhandler";
+import { loadCommands } from "./utils/handlers/commandhandler";
 import { logger } from "./utils/logger";
 
 loadCommands();

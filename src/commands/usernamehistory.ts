@@ -10,11 +10,11 @@ import {
 } from "discord.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { formatDate } from "../utils/functions/date";
 import { getMember } from "../utils/functions/member";
 import { clearUsernameHistory, fetchUsernameHistory, isTracking } from "../utils/functions/users/history";
 import { hasProfile } from "../utils/functions/users/utils";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("usernamehistory", "view a user's username history", Categories.INFO).setAliases([
   "un",

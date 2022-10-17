@@ -23,7 +23,6 @@ import { runPremiumChecks } from "../scheduled/clusterjobs/premiumexpire";
 import { runSurveyChecks } from "../scheduled/clusterjobs/surveyends";
 import { runPremiumCrateInterval } from "../scheduled/clusterjobs/weeklycrates";
 import { runWorkerInterval } from "../scheduled/clusterjobs/workers";
-import { runCommandUseTimers } from "../utils/commandhandler";
 import { doChatReactions } from "../utils/functions/chatreactions/utils";
 import { runEconomySetup } from "../utils/functions/economy/utils";
 import { runChristmas } from "../utils/functions/guilds/christmas";
@@ -31,7 +30,8 @@ import { runCountdowns } from "../utils/functions/guilds/countdowns";
 import { updateCounters } from "../utils/functions/guilds/counters";
 import { runSnipeClearIntervals } from "../utils/functions/guilds/utils";
 import { runUploadReset } from "../utils/functions/image";
-import { updateCache } from "../utils/imghandler";
+import { runCommandUseTimers } from "../utils/handlers/commandhandler";
+import { updateCache } from "../utils/handlers/imghandler";
 import { getWebhooks, logger, setClusterId } from "../utils/logger";
 
 export class NypsiClient extends Client {

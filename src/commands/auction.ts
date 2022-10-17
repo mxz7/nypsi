@@ -17,7 +17,6 @@ import { NypsiClient } from "../models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { Item } from "../types/Economy";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import {
   addToAuctionWatch,
   createAuction,
@@ -32,6 +31,7 @@ import { formatBet, getItems, userExists } from "../utils/functions/economy/util
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import requestDM from "../utils/functions/requestdm";
 import { getDmSettings } from "../utils/functions/users/notifications";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("auction", "create and manage your item auctions", Categories.MONEY).setAliases(["ah"]);
 

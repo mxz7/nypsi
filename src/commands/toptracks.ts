@@ -15,8 +15,8 @@ import {
 import fetch from "node-fetch";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { getLastfmUsername } from "../utils/functions/users/lastfm";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger } from "../utils/logger";
 
 const cmd = new Command("toptracks", "view your top tracks", Categories.MUSIC).setAliases(["tt"]);

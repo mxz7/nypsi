@@ -3,7 +3,6 @@ import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Messag
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { Item } from "../types/Economy";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { addInventoryItem, getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
 import { getPrestige } from "../utils/functions/economy/prestige";
 import { createUser, getItems, isEcoBanned, userExists } from "../utils/functions/economy/utils";
@@ -11,6 +10,7 @@ import { getXp } from "../utils/functions/economy/xp";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
 import { getDmSettings } from "../utils/functions/users/notifications";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { payment } from "../utils/logger";
 
 const cmd = new Command("give", "give other users items from your inventory", Categories.MONEY);

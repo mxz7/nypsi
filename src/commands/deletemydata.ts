@@ -10,9 +10,9 @@ import {
 import prisma from "../init/database.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import { addCooldown, onCooldown } from "../utils/cooldownhandler.js";
 import { getGuildByUser } from "../utils/functions/economy/guilds.js";
 import { hasProfile } from "../utils/functions/users/utils.js";
+import { addCooldown, onCooldown } from "../utils/handlers/cooldownhandler.js";
 import { logger } from "../utils/logger";
 import ms = require("ms");
 

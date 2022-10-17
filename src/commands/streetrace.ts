@@ -3,12 +3,12 @@ import { Categories, Command, NypsiCommandInteraction } from "../models/Command"
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { Item } from "../types/Economy";
 import { RaceDetails, RaceUserDetails } from "../types/StreetRace";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { calcMaxBet, getBalance, updateBalance } from "../utils/functions/economy/balance";
 import { getInventory } from "../utils/functions/economy/inventory";
 import { createUser, formatBet, getItems, userExists } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("streetrace", "create or join a street race", Categories.MONEY).setAliases(["sr"]);
 

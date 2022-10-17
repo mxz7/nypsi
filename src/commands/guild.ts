@@ -16,7 +16,6 @@ import { NypsiClient } from "../models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { daysAgo, formatDate } from "../utils/functions/date";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
 import {
@@ -39,6 +38,7 @@ import { getPrefix } from "../utils/functions/guilds/utils";
 import requestDM from "../utils/functions/requestdm";
 import { cleanString } from "../utils/functions/string";
 import { getDmSettings } from "../utils/functions/users/notifications";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("guild", "create and manage your guild/clan", Categories.MONEY)
   .setAliases(["g", "clan"])

@@ -1,10 +1,10 @@
 import { CommandInteraction, Message } from "discord.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import { commandExists } from "../utils/commandhandler";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getCommand, getUserCommand, setCommand } from "../utils/functions/premium/command";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
+import { commandExists } from "../utils/handlers/commandhandler";
 
 const cmd = new Command("customcommand", "create a custom command", Categories.FUN).setAliases(["mycommand", "mycmd"]);
 

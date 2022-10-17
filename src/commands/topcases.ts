@@ -1,11 +1,11 @@
 import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
 import { getAllCases } from "../utils/functions/moderation/cases";
 import { profileExists } from "../utils/functions/moderation/utils";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("topcases", "see who has the top moderation cases", Categories.MODERATION).setPermissions([
   "MANAGE_MESSAGES",

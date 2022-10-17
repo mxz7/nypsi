@@ -1,8 +1,8 @@
 import { CommandInteraction, GuildMember, Message } from "discord.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { getMember } from "../utils/functions/member";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("ddos", "ddos other users (fake)", Categories.FUN).setAliases(["hitoff"]);
 

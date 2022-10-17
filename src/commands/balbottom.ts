@@ -1,8 +1,8 @@
 import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders.js";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
 import { bottomAmount } from "../utils/functions/economy/balance";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 
 const cmd = new Command("balbottom", "view bottom balances in the server", Categories.MONEY).setAliases([
   "bottom",

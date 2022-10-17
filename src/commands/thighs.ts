@@ -1,10 +1,10 @@
 import { CommandInteraction, Message } from "discord.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { redditImage } from "../utils/functions/image";
-import { images } from "../utils/imghandler";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import { images } from "../utils/handlers/imghandler";
 
 const cmd = new Command("thighs", "get a random thighs image", Categories.NSFW);
 

@@ -12,7 +12,6 @@ import {
 } from "discord.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getKarma } from "../utils/functions/karma/karma";
@@ -20,6 +19,7 @@ import { isPremium } from "../utils/functions/premium/premium";
 import { decrypt } from "../utils/functions/string";
 import { getLastCommand } from "../utils/functions/users/commands";
 import { deleteUserMentions, fetchUserMentions } from "../utils/functions/users/mentions";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import ms = require("ms");
 
 const cmd = new Command("pings", "view who mentioned you recently", Categories.UTILITY).setAliases([

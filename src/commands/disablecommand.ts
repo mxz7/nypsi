@@ -1,9 +1,9 @@
 import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
-import { commandExists } from "../utils/commandhandler";
 import { getDisabledCommands, updateDisabledCommands } from "../utils/functions/guilds/disabledcommands";
 import { getPrefix } from "../utils/functions/guilds/utils";
+import { commandExists } from "../utils/handlers/commandhandler";
 
 const cmd = new Command("disablecommand", "disable certain commands in your server", Categories.ADMIN)
   .setAliases(["disablecmd", "disable"])

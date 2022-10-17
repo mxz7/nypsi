@@ -10,7 +10,6 @@ import {
 } from "discord.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { formatDate } from "../utils/functions/date";
 import { uploadImageToImgur } from "../utils/functions/image";
 import {
@@ -20,6 +19,7 @@ import {
   fetchAvatarHistory,
   isTracking,
 } from "../utils/functions/users/history";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("avatarhistory", "view a user's avatar history", Categories.INFO).setAliases([
   "avh",

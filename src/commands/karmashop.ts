@@ -14,7 +14,6 @@ import { NypsiClient } from "../models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { addInventoryItem } from "../utils/functions/economy/inventory";
 import { createUser, userExists } from "../utils/functions/economy/utils";
@@ -22,6 +21,7 @@ import { getXp, updateXp } from "../utils/functions/economy/xp";
 import { getKarma, removeKarma } from "../utils/functions/karma/karma";
 import { closeKarmaShop, getKarmaShopItems, isKarmaShopOpen, openKarmaShop } from "../utils/functions/karma/karmashop";
 import { getTier, isPremium, setExpireDate } from "../utils/functions/premium/premium";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import dayjs = require("dayjs");
 
 const cmd = new Command("karmashop", "buy stuff with your karma", Categories.INFO).setAliases(["ks"]);
