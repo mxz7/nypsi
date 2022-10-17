@@ -6,10 +6,12 @@ import {
   Message,
   MessageEditOptions,
 } from "discord.js";
+import { readdir } from "fs/promises";
 import prisma from "../init/database";
 import redis from "../init/redis";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import { ItemUse } from "../models/ItemUse";
 import { Item } from "../types/Economy";
 import { hasPadlock, increaseBaseBankStorage, setPadlock } from "../utils/functions/economy/balance";
 import { addBooster, getBoosters } from "../utils/functions/economy/boosters";
@@ -29,6 +31,9 @@ import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
 import { getDmSettings } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import { logger } from "../utils/logger";
+
+const itemFunctions = new Map<string, ItemUse>();
 
 const cmd = new Command("use", "use an item or open crates", Categories.MONEY).setAliases(["open", "activate"]);
 
@@ -586,3 +591,21 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 cmd.setRun(run);
 
 module.exports = cmd;
+
+(async () => {
+  const files = await readdir("./dist/utils/functions/economy/items").then((res) =>
+    res.filter((file) => file.endsWith(".js"))
+  );
+
+  for (const file of files) {
+    const x = await import(`../utils/functions/economy/items/${file}`);
+
+    if (!(x instanceof ItemUse)) {
+      logger.error(`failed to load ${file}`);
+    } else {
+      itemFunctions.set(x.itemId, x);
+    }
+  }
+
+  logger.info(`${itemFunctions.size.toLocaleString()} item functions loaded`);
+})();
