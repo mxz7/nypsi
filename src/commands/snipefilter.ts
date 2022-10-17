@@ -3,6 +3,7 @@ import { Categories, Command, NypsiCommandInteraction } from "../models/Command"
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { getSnipeFilter, updateSnipeFilter } from "../utils/functions/guilds/filters";
 import { getPrefix } from "../utils/functions/guilds/utils";
+import { cleanString } from "../utils/functions/string";
 
 const cmd = new Command("snipefilter", "change the snipe filter for your server", Categories.ADMIN)
   .setAliases(["sf"])
@@ -39,11 +40,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       });
     }
 
-    const word = args[1]
-      .toString()
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[^A-z0-9\s]/g, "");
+    const word = cleanString(args[1].toString().toLowerCase().normalize("NFD"));
 
     if (word == "" || word == " ") {
       return message.channel.send({ embeds: [new ErrorEmbed("word must contain letters or numbers")] });
@@ -81,11 +78,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}sf del/- <word>`)] });
     }
 
-    const word = args[1]
-      .toString()
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[^A-z0-9\s]/g, "");
+    const word = cleanString(args[1].toString().toLowerCase().normalize("NFD"));
 
     if (filter.indexOf(word) > -1) {
       filter.splice(filter.indexOf(word), 1);

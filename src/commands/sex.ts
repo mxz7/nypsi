@@ -4,6 +4,7 @@ import { Categories, Command, NypsiCommandInteraction } from "../models/Command"
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { MilfSearchData } from "../types/Sex.js";
 import { addProgress } from "../utils/functions/economy/achievements.js";
+import { cleanString } from "../utils/functions/string.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 
 const cmd = new Command("sex", "find horny milfs in ur area 😏", Categories.FUN).setAliases([
@@ -83,7 +84,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (args.length > 0) {
     description = args.join(" ");
-    const descriptionCheck = description.replace(/[^A-z0-9\s]/g, "");
+    const descriptionCheck = cleanString(description);
 
     for (const word of descFilter) {
       if (descriptionCheck.includes(word)) {

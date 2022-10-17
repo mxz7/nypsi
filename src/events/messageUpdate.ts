@@ -4,6 +4,7 @@ import { LogType } from "../types/Moderation";
 import { checkMessageContent, getChatFilter, getSnipeFilter } from "../utils/functions/guilds/filters";
 import { createGuild, eSnipe, hasGuild } from "../utils/functions/guilds/utils";
 import { addLog, isLogsEnabled } from "../utils/functions/moderation/logs";
+import { cleanString } from "../utils/functions/string";
 
 export default async function messageUpdate(message: Message, newMessage: Message) {
   if (!message) return;
@@ -38,9 +39,7 @@ export default async function messageUpdate(message: Message, newMessage: Messag
 
     const filter = await getSnipeFilter(message.guild);
 
-    let content = message.content.toLowerCase().normalize("NFD");
-
-    content = content.replace(/[^A-z0-9\s]/g, "");
+    const content = cleanString(message.content.toLowerCase().normalize("NFD"));
 
     for (const word of filter) {
       if (content.includes(word.toLowerCase())) return;
