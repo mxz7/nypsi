@@ -12,10 +12,6 @@ cd ..
 cd ..
 
 cd out
-mkdir data
-cd data
-mkdir backup
-cd ..
 mkdir logs
 cd ..
 cp -i .env.example .env
