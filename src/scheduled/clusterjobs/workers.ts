@@ -1,9 +1,9 @@
 import prisma from "../../init/database";
-import redis from "../../init/redis";
 import { CustomEmbed } from "../../models/EmbedBuilders";
+import { NotificationPayload } from "../../types/Notification";
 import { getBaseWorkers } from "../../utils/functions/economy/utils";
 import { calcWorkerValues, getWorkers } from "../../utils/functions/economy/workers";
-import { getDmSettings } from "../../utils/functions/users/notifications";
+import { addNotificationToQueue, getDmSettings } from "../../utils/functions/users/notifications";
 import { logger } from "../../utils/logger";
 import ms = require("ms");
 import dayjs = require("dayjs");
@@ -50,8 +50,9 @@ async function doWorkerThing() {
   let amount = 0;
 
   for (const userId of Array.from(dms.keys())) {
-    const data: any = {
+    const data: NotificationPayload = {
       memberId: userId,
+      payload: null,
     };
 
     const workers = await getWorkers(userId);
@@ -65,15 +66,15 @@ async function doWorkerThing() {
     }
 
     if (full.length == workers.length) {
-      data.content = "all of your workers are full";
-      data.embed = new CustomEmbed().setDescription("all of your workers are full").setColor("#36393f");
+      data.payload.content = "all of your workers are full";
+      data.payload.embed = new CustomEmbed().setDescription("all of your workers are full").setColor("#36393f");
     } else if (full.length == 1) {
-      data.embed = new CustomEmbed()
+      data.payload.embed = new CustomEmbed()
         .setDescription(`your ${getBaseWorkers()[full[0]].item_emoji} ${getBaseWorkers()[full[0]].name} is full`)
         .setColor("#36393f");
     } else {
-      data.content = `${full.length} of your workers are full`;
-      data.embed = new CustomEmbed()
+      data.payload.content = `${full.length} of your workers are full`;
+      data.payload.embed = new CustomEmbed()
         .setDescription(
           full.map((workerId) => `${getBaseWorkers()[workerId].item_emoji} ${getBaseWorkers()[workerId].name}`).join("\n")
         )
@@ -82,7 +83,7 @@ async function doWorkerThing() {
         .setFooter({ text: "/settings me notifications" });
     }
 
-    await redis.lpush("nypsi:dm:queue", JSON.stringify(data));
+    await addNotificationToQueue(data);
     amount++;
   }
 

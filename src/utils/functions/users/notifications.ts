@@ -1,7 +1,8 @@
 import { DMSettings } from "@prisma/client";
 import { GuildMember } from "discord.js";
-import redis from "../../../init/redis";
 import prisma from "../../../init/database";
+import redis from "../../../init/redis";
+import { NotificationPayload } from "../../../types/Notification";
 import ms = require("ms");
 
 declare function require(name: string): any;
@@ -63,4 +64,8 @@ export async function updateDmSettings(member: GuildMember, data: DMSettings) {
 
 export function getNotificationsData() {
   return notificationsData;
+}
+
+export async function addNotificationToQueue(payload: NotificationPayload) {
+  await redis.lpush("nypsi:dm:queue", JSON.stringify(payload));
 }

@@ -34,10 +34,10 @@ async function doDmQueueInterval(manager: Manager): Promise<void> {
 
   await requestDM({
     client: manager,
-    content: item.content,
+    content: item.payload.content,
     memberId: item.memberId,
-    embed: item.embed,
-    components: item.components,
+    embed: item.payload.embed,
+    components: item.payload.components,
   });
 
   return doDmQueueInterval(manager);

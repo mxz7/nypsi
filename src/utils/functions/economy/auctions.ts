@@ -3,7 +3,7 @@ import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
-import { getDmSettings } from "../users/notifications";
+import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { getItems } from "./utils";
 import ms = require("ms");
 
@@ -302,14 +302,15 @@ async function checkWatchers(itemName: string, messageUrl: string, creatorId: st
     .then((q) => q.map((q) => q.userId));
 
   const payload = {
+    payload: {
+      embed: new CustomEmbed()
+        .setColor("#36393f")
+        .setDescription(`an auction has started for ${getItems()[itemName].emoji} **${getItems()[itemName].name}**`),
+      components: new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder().setStyle(ButtonStyle.Link).setURL(messageUrl).setLabel("jump")
+      ),
+    },
     memberId: "boob",
-    embed: new CustomEmbed()
-      .setColor("#36393f")
-      .setDescription(`an auction has started for ${getItems()[itemName].emoji} **${getItems()[itemName].name}**`)
-      .toJSON(),
-    components: new ActionRowBuilder<MessageActionRowComponentBuilder>()
-      .addComponents(new ButtonBuilder().setStyle(ButtonStyle.Link).setURL(messageUrl).setLabel("jump"))
-      .toJSON(),
   };
 
   for (const userId of users) {
@@ -319,8 +320,9 @@ async function checkWatchers(itemName: string, messageUrl: string, creatorId: st
 
     payload.memberId = userId;
 
-    await redis.lpush("nypsi:dm:queue", JSON.stringify(payload));
+    await addNotificationToQueue(payload);
+
     await redis.set(`nypsi:auctionwatch:cooldown:${userId}`, "true");
-    await redis.expire(`nypsi:auctionwatch:cooldown:${userId}`, ms("30 minutes") / 1000);
+    await redis.expire(`nypsi:auctionwatch:cooldown:${userId}`, ms("5 minutes") / 1000);
   }
 }
