@@ -3,6 +3,7 @@ import * as stringSimilarity from "string-similarity";
 import prisma from "../../../init/database";
 import { PunishmentType } from "../../../types/Moderation";
 import { addModLog } from "../moderation/logs";
+import { cleanString } from "../string";
 import { getPercentMatch } from "./utils";
 
 const chatFilterCache = new Map<string, string[]>();
@@ -85,9 +86,7 @@ export async function checkMessageContent(message: Message) {
   const filter = await getChatFilter(message.guild);
   const match = await getPercentMatch(message.guild);
 
-  let content: string | string[] = message.content.toLowerCase().normalize("NFD");
-
-  content = content.replace(/[^A-z0-9\s]/g, "");
+  let content: string | string[] = cleanString(message.content.toLowerCase().normalize("NFD"));
 
   content = content.split(" ");
 

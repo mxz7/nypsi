@@ -42,6 +42,7 @@ import { getChatFilter } from "../functions/guilds/filters";
 import { getPrefix } from "../functions/guilds/utils";
 import { addKarma, getKarma } from "../functions/karma/karma";
 import { addUse, getCommand } from "../functions/premium/command";
+import { cleanString } from "../functions/string";
 import { addCommandUse, getLastCommand, updateLastCommand } from "../functions/users/commands";
 import { updateLastKnowntag } from "../functions/users/tag";
 import { createProfile, hasProfile } from "../functions/users/utils";
@@ -574,9 +575,7 @@ export async function runCommand(
 
       const filter = await getChatFilter(message.guild);
 
-      let contentToCheck: string | string[] = content.toLowerCase().normalize("NFD");
-
-      contentToCheck = contentToCheck.replace(/[^A-z0-9\s]/g, "");
+      let contentToCheck: string | string[] = cleanString(content.toLowerCase().normalize("NFD"));
 
       contentToCheck = contentToCheck.split(" ");
 
