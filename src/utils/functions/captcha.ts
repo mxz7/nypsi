@@ -1,6 +1,18 @@
-import { getZeroWidth } from "./string";
+import { CaptchaGenerator } from "captcha-canvas";
+import { GuildMember, WebhookClient } from "discord.js";
+import * as crypto from "node:crypto";
+import redis from "../../init/redis";
+import { getTimestamp } from "../logger";
+import ms = require("ms");
 
 const locked: string[] = [];
+
+const colors = ["deeppink", "green", "red", "blue"];
+
+const generator = new CaptchaGenerator().setDecoy({ opacity: 0.5, total: 5 });
+
+const captchaFails = new Map<string, number>();
+const captchaPasses = new Map<string, number>();
 
 export function isLockedOut(string: string): boolean {
   if (locked.indexOf(string) == -1) {
@@ -10,38 +22,63 @@ export function isLockedOut(string: string): boolean {
   }
 }
 
-export function toggleLock(string: string) {
+export async function toggleLock(string: string) {
   if (isLockedOut(string)) {
     locked.splice(locked.indexOf(string), 1);
   } else {
+    if (await isVerified(string)) return;
     locked.push(string);
   }
 }
 
-export function createCaptcha(): Captcha {
-  return new Captcha(Math.random().toString(36).substr(2, 7));
+export async function createCaptcha() {
+  let text = crypto.randomBytes(32).toString("hex");
+
+  text = text.substring(0, Math.floor(Math.random() * 3) + 6);
+
+  generator.setCaptcha({ colors, text });
+  return { captcha: await generator.generate(), text };
 }
 
-class Captcha {
-  public answer: string;
-  public display: string;
-  constructor(d: string) {
-    this.answer = d;
+export async function isVerified(id: string) {
+  return await redis.exists(`nypsi:captcha_verified:${id}`);
+}
 
-    const zeroWidthCount = d.length / 2;
+export async function passedCaptcha(member: GuildMember) {
+  const hook = new WebhookClient({
+    url: process.env.ANTICHEAT_HOOK,
+  });
 
-    const zeroWidthChar = getZeroWidth();
-
-    let displayWord = d;
-
-    for (let i = 0; i < zeroWidthCount; i++) {
-      const pos = Math.floor(Math.random() * d.length + 1);
-
-      displayWord = displayWord.substring(0, pos) + zeroWidthChar + displayWord.substring(pos);
-    }
-
-    this.display = displayWord;
-
-    return this;
+  if (captchaPasses.has(member.user.id)) {
+    captchaPasses.set(member.user.id, captchaPasses.get(member.user.id) + 1);
+  } else {
+    captchaPasses.set(member.user.id, 1);
   }
+
+  await hook.send(
+    `[${getTimestamp()}] **${member.user.tag}** (${member.user.id}) has passed a captcha (${captchaPasses.get(
+      member.user.id
+    )})`
+  );
+
+  await redis.set(`nypsi:captcha_verified:${member.user.id}`, member.user.id);
+  await redis.expire(`nypsi:captcha_verified:${member.user.id}`, ms("1 hour") / 1000);
+}
+
+export async function failedCaptcha(member: GuildMember) {
+  const hook = new WebhookClient({
+    url: process.env.ANTICHEAT_HOOK,
+  });
+
+  if (captchaFails.has(member.user.id)) {
+    captchaFails.set(member.user.id, captchaFails.get(member.user.id) + 1);
+  } else {
+    captchaFails.set(member.user.id, 1);
+  }
+
+  await hook.send(
+    `[${getTimestamp()}] **${member.user.tag}** (${member.user.id}) has failed a captcha (${captchaFails.get(
+      member.user.id
+    )})`
+  );
 }
