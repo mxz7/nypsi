@@ -17,7 +17,7 @@ import redis from "../../init/redis";
 import { NypsiClient } from "../../models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../models/EmbedBuilders";
-import { createCaptcha, isLockedOut, toggleLock } from "../functions/captcha";
+import { createCaptcha, failedCaptcha, isLockedOut, passedCaptcha, toggleLock } from "../functions/captcha";
 import { formatDate, MStoTime } from "../functions/date";
 import { getNews, hasSeenNews } from "../functions/news";
 import { getTimestamp, logger } from "../logger";
@@ -51,8 +51,6 @@ const commands = new Map<string, Command>();
 const aliases = new Map<string, string>();
 const noLifers = new Map<string, number>();
 const commandUses = new Map<string, number>();
-const captchaFails = new Map<string, number>();
-const captchaPasses = new Map<string, number>();
 
 const karmaCooldown = new Set<string>();
 const xpCooldown = new Set<string>();
@@ -610,17 +608,27 @@ export async function runCommand(
   if (isLockedOut(message.author.id)) {
     if (beingChecked.indexOf(message.author.id) != -1) return;
 
-    const captcha = createCaptcha();
+    const { captcha, text } = await createCaptcha();
 
     const embed = new CustomEmbed(message.member).setTitle("you have been locked");
 
     embed.setDescription(
-      `please note that using macros / auto typers is not allowed with nypsi\n\ntype: \`${captcha.display}\` to be unlocked`
+      "please note that using macros / auto typers is not allowed with nypsi\n\nplease type the following:"
     );
+
+    embed.setImage("attachment://captcha.png");
 
     beingChecked.push(message.author.id);
 
-    await message.channel.send({ embeds: [embed] });
+    await message.channel.send({
+      embeds: [embed],
+      files: [
+        {
+          attachment: captcha,
+          name: "captcha.png",
+        },
+      ],
+    });
 
     logger.info(`sent captcha (${message.author.id}) - awaiting reply`);
 
@@ -647,7 +655,7 @@ export async function runCommand(
     if (fail) return;
     if (!response) return;
 
-    if (response.content.toLowerCase() == captcha.answer) {
+    if (response.content.toLowerCase() == text) {
       logger.info(`captcha (${message.author.id}) passed`);
       passedCaptcha(message.member);
       toggleLock(message.author.id);
@@ -996,42 +1004,6 @@ export function runCommandUseTimers(client: NypsiClient) {
     await postCommandUsers();
     setTimeout(updateKarma, 60000);
   }, 3600000);
-}
-
-async function failedCaptcha(member: GuildMember) {
-  const hook = new WebhookClient({
-    url: process.env.ANTICHEAT_HOOK,
-  });
-
-  if (captchaFails.has(member.user.id)) {
-    captchaFails.set(member.user.id, captchaFails.get(member.user.id) + 1);
-  } else {
-    captchaFails.set(member.user.id, 1);
-  }
-
-  await hook.send(
-    `[${getTimestamp()}] **${member.user.tag}** (${member.user.id}) has failed a captcha (${captchaFails.get(
-      member.user.id
-    )})`
-  );
-}
-
-async function passedCaptcha(member: GuildMember) {
-  const hook = new WebhookClient({
-    url: process.env.ANTICHEAT_HOOK,
-  });
-
-  if (captchaPasses.has(member.user.id)) {
-    captchaPasses.set(member.user.id, captchaPasses.get(member.user.id) + 1);
-  } else {
-    captchaPasses.set(member.user.id, 1);
-  }
-
-  await hook.send(
-    `[${getTimestamp()}] **${member.user.tag}** (${member.user.id}) has passed a captcha (${captchaPasses.get(
-      member.user.id
-    )})`
-  );
 }
 
 export function startRestart() {
