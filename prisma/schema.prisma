@@ -39,8 +39,8 @@ model DMSettings {
   auction       Boolean @default(true)
   vote          Boolean @default(true)
   vote_reminder Boolean @default(false)
-  worker        Boolean @default(true)
-  booster       Boolean @default(true)
+  worker        Boolean @default(false)
+  booster       Boolean @default(false)
   payment       Boolean @default(true)
   other         Boolean @default(true)
 
