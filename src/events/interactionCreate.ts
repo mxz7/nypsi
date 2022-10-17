@@ -202,7 +202,7 @@ export default async function interactionCreate(interaction: Interaction) {
 
   if (interaction.type == InteractionType.MessageComponent) {
     if (interaction.customId == "b") {
-      const auction = await prisma.auction.findFirst({
+      let auction = await prisma.auction.findFirst({
         where: {
           AND: [{ messageId: interaction.message.id }, { sold: false }],
         },
@@ -249,9 +249,31 @@ export default async function interactionCreate(interaction: Interaction) {
 
           if (!res.isModalSubmit()) return;
 
-          if (res.fields.fields.first().value != "yes") return;
+          if (res.fields.fields.first().value.toLowerCase() != "yes") {
+            return res.reply({ embeds: [new CustomEmbed().setDescription("✅ cancelled purchase")] });
+          }
 
           interaction = res;
+        }
+
+        auction = await prisma.auction.findFirst({
+          where: {
+            AND: [{ messageId: interaction.message.id }, { sold: false }],
+          },
+          select: {
+            bin: true,
+            messageId: true,
+            id: true,
+            ownerId: true,
+            itemAmount: true,
+            itemName: true,
+          },
+        });
+
+        if (!auction) {
+          await interaction.reply({ embeds: [new ErrorEmbed("invalid auction")], ephemeral: true });
+          await interaction.message.delete();
+          return;
         }
 
         if (!(await userExists(interaction.user.id))) await createUser(interaction.user.id);
