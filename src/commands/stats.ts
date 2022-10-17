@@ -12,9 +12,9 @@ import {
 } from "discord.js";
 import { cpu } from "node-os-utils";
 import * as os from "os";
+import prisma from "../init/database";
+import redis from "../init/redis";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import prisma from "../utils/database/database";
-import redis from "../utils/database/redis";
 import { MStoTime } from "../utils/functions/date";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";

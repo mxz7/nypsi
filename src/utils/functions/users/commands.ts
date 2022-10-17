@@ -1,6 +1,6 @@
 import { GuildMember } from "discord.js";
-import prisma from "../../database/database";
-import redis from "../../database/redis";
+import prisma from "../../../init/database";
+import redis from "../../../init/redis";
 
 export async function updateLastCommand(member: GuildMember | string) {
   let id: string;

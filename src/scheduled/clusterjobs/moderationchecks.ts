@@ -1,6 +1,6 @@
 import { APIEmbed, WebhookClient } from "discord.js";
 import prisma from "../../init/database";
-import redis from "../../utils/database/redis";
+import redis from "../../init/redis";
 import { requestUnban } from "../../utils/functions/moderation/ban";
 import { requestUnmute } from "../../utils/functions/moderation/mute";
 import { logger } from "../../utils/logger";

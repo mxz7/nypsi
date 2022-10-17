@@ -1,5 +1,5 @@
 import prisma from "../../init/database";
-import redis from "../../utils/database/redis";
+import redis from "../../init/redis";
 import { getBaseWorkers } from "../../utils/functions/economy/utils";
 import { calcWorkerValues, getWorkers } from "../../utils/functions/economy/workers";
 import { getDmSettings } from "../../utils/functions/users/notifications";

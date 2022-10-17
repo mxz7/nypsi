@@ -1,5 +1,5 @@
 import { Guild } from "discord.js";
-import prisma from "../../database/database";
+import prisma from "../../../init/database";
 import { PunishmentType } from "../../models/GuildStorage";
 import { addModLog, isModLogsEnabled } from "./logs";
 

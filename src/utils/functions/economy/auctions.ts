@@ -1,6 +1,6 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, GuildMember, MessageActionRowComponentBuilder } from "discord.js";
-import prisma from "../../database/database";
-import redis from "../../database/redis";
+import prisma from "../../../init/database";
+import redis from "../../../init/redis";
 import { NypsiClient } from "../../models/Client";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 import { getDmSettings } from "../users/notifications";

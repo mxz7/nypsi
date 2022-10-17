@@ -6,9 +6,9 @@ import {
   Message,
   MessageEditOptions,
 } from "discord.js";
+import prisma from "../init/database";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import prisma from "../utils/database/database";
-import redis from "../utils/database/redis";
+import redis from "../init/redis";
 import { hasPadlock, increaseBaseBankStorage, setPadlock } from "../utils/functions/economy/balance";
 import { addBooster, getBoosters } from "../utils/functions/economy/boosters";
 import { getInventory, openCrate, setInventoryItem } from "../utils/functions/economy/inventory";

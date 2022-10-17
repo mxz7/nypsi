@@ -2,7 +2,7 @@ import { WholesomeImage, WholesomeSuggestion } from "@prisma/client";
 import { GuildMember, WebhookClient } from "discord.js";
 import ImgurClient from "imgur";
 import fetch from "node-fetch";
-import prisma from "../database/database";
+import prisma from "../../init/database";
 import { logger } from "../logger";
 import { NypsiClient } from "../models/Client";
 import { CustomEmbed } from "../models/EmbedBuilders";

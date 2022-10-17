@@ -1,4 +1,4 @@
-import prisma from "../../database/database";
+import prisma from "../../../init/database";
 import { isPremium } from "./premium";
 
 type PremiumCommand = {

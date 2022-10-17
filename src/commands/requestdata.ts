@@ -12,8 +12,8 @@ import {
   MessageEditOptions,
 } from "discord.js";
 import * as fs from "fs/promises";
+import prisma from "../init/database";
 import { addCooldown, onCooldown } from "../utils/cooldownhandler.js";
-import prisma from "../utils/database/database";
 import { logger } from "../utils/logger";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";

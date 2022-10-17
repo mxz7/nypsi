@@ -1,6 +1,6 @@
 import { GuildMember } from "discord.js";
-import prisma from "../../database/database";
-import redis from "../../database/redis";
+import prisma from "../../../init/database";
+import redis from "../../../init/redis";
 import { getRequiredBetForXp } from "./balance";
 import { getBoosters } from "./boosters";
 import { getGuildByUser } from "./guilds";

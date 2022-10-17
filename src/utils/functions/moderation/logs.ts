@@ -1,6 +1,6 @@
 import { ColorResolvable, Guild, GuildMember, User, WebhookClient } from "discord.js";
-import prisma from "../../database/database";
-import redis from "../../database/redis";
+import prisma from "../../../init/database";
+import redis from "../../../init/redis";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 import { LogType, PunishmentType } from "../../models/GuildStorage";
 

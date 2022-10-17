@@ -1,7 +1,7 @@
 import dayjs = require("dayjs");
 import { parentPort, workerData } from "worker_threads";
 import prisma from "../../init/database";
-import redis from "../../utils/database/redis";
+import redis from "../../init/redis";
 
 (async () => {
   const guilds: string[] = workerData.guilds;

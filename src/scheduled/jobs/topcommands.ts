@@ -1,7 +1,7 @@
 import { EmbedBuilder, WebhookClient } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { parentPort } from "worker_threads";
-import redis from "../../utils/database/redis";
+import redis from "../../init/redis";
 
 (async () => {
   const topCommands = await redis.hgetall("nypsi:topcommands");

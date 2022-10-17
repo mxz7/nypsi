@@ -1,9 +1,9 @@
 import { Mention } from "@prisma/client";
 import { isMainThread, parentPort, Worker, workerData } from "worker_threads";
-import prisma from "../database/database";
+import prisma from "../../init/database";
 import { encrypt } from "../functions/string";
-import ms = require("ms");
 import { MentionQueueItem } from "../functions/users/mentions";
+import ms = require("ms");
 
 export default function doCollection(array: MentionQueueItem): Promise<any> {
   return new Promise((resolve, reject) => {

@@ -1,6 +1,6 @@
 import { Client, User, WebhookClient } from "discord.js";
 import prisma from "../../init/database";
-import redis from "../../utils/database/redis";
+import redis from "../../init/redis";
 import { MStoTime } from "../../utils/functions/date";
 import { addProgress } from "../../utils/functions/economy/achievements";
 import { getBalance, updateBalance } from "../../utils/functions/economy/balance";

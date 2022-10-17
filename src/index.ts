@@ -1,11 +1,11 @@
 import * as Cluster from "discord-hybrid-sharding";
 import "dotenv/config";
 import { clearInterval } from "timers";
+import startJobs from "./scheduled/scheduler";
 import { addFailedHeatbeat, sendHeartbeat } from "./utils/functions/heartbeat";
 import { updateStats } from "./utils/functions/topgg";
 import { logger, setClusterId } from "./utils/logger";
 import { listenForDms } from "./utils/notificationhandler";
-import startJobs from "./utils/scheduled/scheduler";
 import { listenForVotes } from "./utils/votehandler";
 import ms = require("ms");
 

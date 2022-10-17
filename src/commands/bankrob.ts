@@ -12,8 +12,8 @@ import {
   SelectMenuOptionBuilder,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
+import prisma from "../init/database.js";
 import { addCooldown, getRemaining, getResponse, onCooldown } from "../utils/cooldownhandler.js";
-import prisma from "../utils/database/database.js";
 import { addProgress } from "../utils/functions/economy/achievements.js";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance.js";
 import { getInventory, setInventoryItem } from "../utils/functions/economy/inventory.js";

@@ -11,8 +11,8 @@ import {
   MessageEditOptions,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
+import prisma from "../init/database";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import prisma from "../utils/database/database";
 import { daysAgo } from "../utils/functions/date";
 import {
   getAllAchievements,

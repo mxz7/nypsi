@@ -1,7 +1,7 @@
 import { CommandInteraction, Message } from "discord.js";
+import redis from "../init/redis";
 import { startRestart } from "../utils/commandhandler";
 import Constants from "../utils/Constants";
-import redis from "../utils/database/redis";
 import { setCustomPresence } from "../utils/functions/presence";
 import { logger } from "../utils/logger";
 import { NypsiClient } from "../utils/models/Client";

@@ -1,6 +1,6 @@
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
+import redis from "../init/redis.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
-import redis from "../utils/database/redis.js";
 import { addProgress } from "../utils/functions/economy/achievements.js";
 import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";

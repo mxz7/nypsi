@@ -15,9 +15,9 @@ import {
   ThreadMemberManager,
 } from "discord.js";
 import { cpu } from "node-os-utils";
+import prisma from "../init/database";
 import { runCommand } from "../utils/commandhandler";
-import prisma from "../utils/database/database";
-import redis from "../utils/database/redis";
+import redis from "../init/redis";
 import { userExists } from "../utils/functions/economy/utils";
 import { checkMessageContent } from "../utils/functions/guilds/filters";
 import { isSlashOnly } from "../utils/functions/guilds/slash";

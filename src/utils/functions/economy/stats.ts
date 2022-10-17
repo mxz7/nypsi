@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { GuildMember } from "discord.js";
-import prisma from "../../database/database";
+import prisma from "../../../init/database";
 import { StatsProfile } from "../../models/StatsProfile";
 import { addProgress } from "./achievements";
 

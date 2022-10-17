@@ -1,5 +1,5 @@
 import { Guild, GuildMember } from "discord.js";
-import prisma from "../../database/database";
+import prisma from "../../../init/database";
 import { NypsiClient } from "../../models/Client";
 
 export async function newBan(guild: Guild, userIDs: string[] | string, date: Date) {

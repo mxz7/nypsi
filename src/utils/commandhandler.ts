@@ -21,7 +21,8 @@ import { Categories, Command, NypsiCommandInteraction } from "./models/Command";
 import { CustomEmbed, ErrorEmbed } from "./models/EmbedBuilders";
 // @ts-expect-error typescript doesnt like opening package.json
 import { version } from "../../package.json";
-import redis from "./database/redis";
+import redis from "../init/redis";
+import Constants from "./Constants";
 import { a } from "./functions/anticheat";
 import { addProgress } from "./functions/economy/achievements";
 import {
@@ -45,7 +46,6 @@ import { createProfile, hasProfile } from "./functions/users/utils";
 import { NypsiClient } from "./models/Client";
 import { Item } from "./models/Economy";
 import dayjs = require("dayjs");
-import Constants from "./Constants";
 
 const commands = new Map<string, Command>();
 const aliases = new Map<string, string>();

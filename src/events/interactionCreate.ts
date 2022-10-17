@@ -13,8 +13,8 @@ import {
   TextInputBuilder,
   TextInputStyle,
 } from "discord.js";
+import prisma from "../init/database";
 import { runCommand } from "../utils/commandhandler";
-import prisma from "../utils/database/database";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
 import { addInventoryItem, getInventory } from "../utils/functions/economy/inventory";
 import { createUser, getAchievements, getItems, userExists } from "../utils/functions/economy/utils";

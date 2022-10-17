@@ -1,8 +1,8 @@
 import * as topgg from "@top-gg/sdk";
 import { Manager } from "discord-hybrid-sharding";
 import * as express from "express";
-import prisma from "./database/database";
-import redis from "./database/redis";
+import prisma from "../init/database";
+import redis from "../init/redis";
 import { getBalance, updateBalance } from "./functions/economy/balance";
 import { addInventoryItem } from "./functions/economy/inventory";
 import { getPrestige } from "./functions/economy/prestige";

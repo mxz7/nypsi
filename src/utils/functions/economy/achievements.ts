@@ -1,7 +1,7 @@
 import { Collection, EmbedBuilder, Guild, GuildMember, WebhookClient } from "discord.js";
 import { inPlaceSort } from "fast-sort";
-import prisma from "../../database/database";
-import redis from "../../database/redis";
+import prisma from "../../../init/database";
+import redis from "../../../init/redis";
 import workerSort from "../../workers/sort";
 import { getLastKnownTag } from "../users/tag";
 import { getAchievements } from "./utils";

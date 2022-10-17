@@ -1,7 +1,7 @@
 import { GuildMember } from "discord.js";
 import fetch from "node-fetch";
-import prisma from "../../database/database";
-import redis from "../../database/redis";
+import prisma from "../../../init/database";
+import redis from "../../../init/redis";
 import { cleanString } from "../string";
 import ms = require("ms");
 

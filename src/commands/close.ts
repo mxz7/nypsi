@@ -1,6 +1,6 @@
 import { CommandInteraction, Message } from "discord.js";
-import prisma from "../utils/database/database";
-import redis from "../utils/database/redis";
+import prisma from "../init/database";
+import redis from "../init/redis";
 import requestDM from "../utils/functions/requestdm";
 import { getSupportRequestByChannelId, sendToRequestChannel } from "../utils/functions/supportrequest";
 import { NypsiClient } from "../utils/models/Client";

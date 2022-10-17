@@ -7,8 +7,8 @@ import {
   Message,
   MessageActionRowComponentBuilder,
 } from "discord.js";
+import prisma from "../init/database.js";
 import { addCooldown, onCooldown } from "../utils/cooldownhandler.js";
-import prisma from "../utils/database/database.js";
 import { getGuildByUser } from "../utils/functions/economy/guilds.js";
 import { hasProfile } from "../utils/functions/users/utils.js";
 import { logger } from "../utils/logger";

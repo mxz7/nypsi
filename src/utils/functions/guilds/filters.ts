@@ -1,9 +1,9 @@
 import { Guild, Message } from "discord.js";
-import prisma from "../../database/database";
+import * as stringSimilarity from "string-similarity";
+import prisma from "../../../init/database";
 import { PunishmentType } from "../../models/GuildStorage";
 import { addModLog } from "../moderation/logs";
 import { getPercentMatch } from "./utils";
-import * as stringSimilarity from "string-similarity";
 
 const chatFilterCache = new Map<string, string[]>();
 const snipeFilterCache = new Map<string, string[]>();

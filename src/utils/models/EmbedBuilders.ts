@@ -1,5 +1,5 @@
+import redis from "../../init/redis";
 import { ColorResolvable, EmbedBuilder, GuildMember } from "discord.js";
-import redis from "../database/redis";
 import { getColor } from "../functions/color";
 import { getEmbedColor } from "../functions/premium/color";
 

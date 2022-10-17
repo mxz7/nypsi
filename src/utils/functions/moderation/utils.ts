@@ -1,5 +1,5 @@
 import { Guild } from "discord.js";
-import prisma from "../../database/database";
+import prisma from "../../../init/database";
 
 export async function createProfile(guild: Guild) {
   await prisma.moderation.create({

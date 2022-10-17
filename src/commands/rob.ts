@@ -1,6 +1,6 @@
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions } from "discord.js";
+import redis from "../init/redis";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import redis from "../utils/database/redis";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { getBalance, hasPadlock, setPadlock, updateBalance } from "../utils/functions/economy/balance";
 import { addToGuildXP, getGuildByUser } from "../utils/functions/economy/guilds";

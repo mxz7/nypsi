@@ -1,5 +1,5 @@
 import { Guild } from "discord.js";
-import prisma from "../../database/database";
+import prisma from "../../../init/database";
 import { logger } from "../../logger";
 import { NypsiClient } from "../../models/Client";
 import { CustomEmbed } from "../../models/EmbedBuilders";

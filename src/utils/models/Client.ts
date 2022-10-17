@@ -1,3 +1,4 @@
+import redis from "../../init/redis";
 import * as Cluster from "discord-hybrid-sharding";
 import { Client, ClientOptions } from "discord.js";
 import channelCreate from "../../events/channelCreate";
@@ -15,8 +16,14 @@ import messageUpdate from "../../events/messageUpdate";
 import ready from "../../events/ready";
 import roleDelete from "../../events/roleDelete";
 import userUpdate from "../../events/userUpdate";
+import { runAuctionChecks } from "../../scheduled/clusterjobs/checkauctions";
+import { runLotteryInterval } from "../../scheduled/clusterjobs/lottery";
+import { runLogs, runModerationChecks } from "../../scheduled/clusterjobs/moderationchecks";
+import { runPremiumChecks } from "../../scheduled/clusterjobs/premiumexpire";
+import { runSurveyChecks } from "../../scheduled/clusterjobs/surveyends";
+import { runPremiumCrateInterval } from "../../scheduled/clusterjobs/weeklycrates";
+import { runWorkerInterval } from "../../scheduled/clusterjobs/workers";
 import { runCommandUseTimers } from "../commandhandler";
-import redis from "../database/redis";
 import { doChatReactions } from "../functions/chatreactions/utils";
 import { runEconomySetup } from "../functions/economy/utils";
 import { runChristmas } from "../functions/guilds/christmas";
@@ -26,13 +33,6 @@ import { runSnipeClearIntervals } from "../functions/guilds/utils";
 import { runUploadReset } from "../functions/image";
 import { updateCache } from "../imghandler";
 import { getWebhooks, logger, setClusterId } from "../logger";
-import { runAuctionChecks } from "../scheduled/clusterjobs/checkauctions";
-import { runLotteryInterval } from "../scheduled/clusterjobs/lottery";
-import { runLogs, runModerationChecks } from "../scheduled/clusterjobs/moderationchecks";
-import { runPremiumChecks } from "../scheduled/clusterjobs/premiumexpire";
-import { runSurveyChecks } from "../scheduled/clusterjobs/surveyends";
-import { runPremiumCrateInterval } from "../scheduled/clusterjobs/weeklycrates";
-import { runWorkerInterval } from "../scheduled/clusterjobs/workers";
 
 export class NypsiClient extends Client {
   public cluster: Cluster.Client;

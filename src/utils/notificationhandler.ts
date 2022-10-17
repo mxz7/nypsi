@@ -1,5 +1,5 @@
 import { Manager } from "discord-hybrid-sharding";
-import redis from "./database/redis";
+import redis from "../init/redis";
 import requestDM from "./functions/requestdm";
 import { logger } from "./logger";
 

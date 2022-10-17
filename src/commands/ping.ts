@@ -1,7 +1,7 @@
 import { CommandInteraction, Message } from "discord.js";
-import prisma from "../utils/database/database";
-import redis from "../utils/database/redis";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
+import prisma from "../init/database";
+import redis from "../init/redis";
+import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 import { CustomEmbed } from "../utils/models/EmbedBuilders.js";
 
 const cmd = new Command(
