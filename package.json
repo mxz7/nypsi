@@ -9,7 +9,8 @@
     "configure-husky": "npx husky install && npx husky add .husky/pre-commit \"npx --no-install lint-staged\"",
     "prepare": "husky install",
     "clean": "rm -rf dist node_modules",
-    "compile": "tsc && tsc -w"
+    "build": "tsc --build",
+    "watch": "tsc --build --watch"
   },
   "lint-staged": {
     "**/*.{ts,md,json}": [
