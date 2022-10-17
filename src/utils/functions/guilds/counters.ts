@@ -1,7 +1,7 @@
 import { Collection, Guild, GuildMember } from "discord.js";
 import prisma from "../../../init/database";
+import { NypsiClient } from "../../../models/Client";
 import { logger } from "../../logger";
-import { NypsiClient } from "../../models/Client";
 import { addCooldown, getPeaks, inCooldown } from "./utils";
 
 export async function createGuildCounter(guild: Guild) {

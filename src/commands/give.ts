@@ -1,5 +1,8 @@
 import dayjs = require("dayjs");
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import { Item } from "../types/Economy";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { addInventoryItem, getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
 import { getPrestige } from "../utils/functions/economy/prestige";
@@ -9,9 +12,6 @@ import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
 import { getDmSettings } from "../utils/functions/users/notifications";
 import { payment } from "../utils/logger";
-import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
-import { Item } from "../utils/models/Economy";
-import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("give", "give other users items from your inventory", Categories.MONEY);
 

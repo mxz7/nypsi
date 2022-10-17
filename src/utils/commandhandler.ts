@@ -13,15 +13,17 @@ import {
 } from "discord.js";
 import * as fs from "fs";
 import { getBorderCharacters, table } from "table";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { createCaptcha, isLockedOut, toggleLock } from "./functions/captcha";
 import { formatDate, MStoTime } from "./functions/date";
 import { getNews, hasSeenNews } from "./functions/news";
 import { getTimestamp, logger } from "./logger";
-import { Categories, Command, NypsiCommandInteraction } from "./models/Command";
-import { CustomEmbed, ErrorEmbed } from "./models/EmbedBuilders";
 // @ts-expect-error typescript doesnt like opening package.json
 import { version } from "../../package.json";
 import redis from "../init/redis";
+import { NypsiClient } from "../models/Client";
+import { Item } from "../types/Economy";
 import Constants from "./Constants";
 import { a } from "./functions/anticheat";
 import { addProgress } from "./functions/economy/achievements";
@@ -43,8 +45,6 @@ import { addUse, getCommand } from "./functions/premium/command";
 import { addCommandUse, getLastCommand, updateLastCommand } from "./functions/users/commands";
 import { updateLastKnowntag } from "./functions/users/tag";
 import { createProfile, hasProfile } from "./functions/users/utils";
-import { NypsiClient } from "./models/Client";
-import { Item } from "./models/Economy";
 import dayjs = require("dayjs");
 
 const commands = new Map<string, Command>();

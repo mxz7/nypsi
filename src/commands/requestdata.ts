@@ -13,10 +13,10 @@ import {
 } from "discord.js";
 import * as fs from "fs/promises";
 import prisma from "../init/database";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addCooldown, onCooldown } from "../utils/cooldownhandler.js";
 import { logger } from "../utils/logger";
-import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("requestdata", "view your raw data stored in nypsi's database", Categories.INFO).setAliases([
   "data",

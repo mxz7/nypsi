@@ -1,11 +1,11 @@
 import { CommandInteraction, Message } from "discord.js";
 import fetch from "node-fetch";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
+import { RedditJSON } from "../types/Reddit";
+import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { redditImage } from "../utils/functions/image";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import { RedditJSON } from "../utils/models/Reddit";
 
 const blacklisted = ["body", "shit"];
 

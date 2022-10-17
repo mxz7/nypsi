@@ -7,11 +7,11 @@ import {
   Message,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { daysAgo, formatDate } from "../utils/functions/date";
 import { addCooldown, inCooldown } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
-import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 import workerSort from "../utils/workers/sort";
 
 const cmd = new Command("join", "view your join position in the server", Categories.INFO).setAliases(["joined"]);

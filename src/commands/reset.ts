@@ -7,6 +7,8 @@ import {
   Message,
   MessageActionRowComponentBuilder,
 } from "discord.js";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { CustomEmbed } from "../models/EmbedBuilders";
 import { addCooldown, addExpiry, getResponse, onCooldown } from "../utils/cooldownhandler.js";
 import { getBalance, getMulti } from "../utils/functions/economy/balance";
 import { getInventory } from "../utils/functions/economy/inventory";
@@ -14,8 +16,6 @@ import { getPrestige } from "../utils/functions/economy/prestige";
 import { createUser, deleteUser, getItems, userExists } from "../utils/functions/economy/utils";
 import { getXp } from "../utils/functions/economy/xp";
 import { addKarma } from "../utils/functions/karma/karma";
-import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("reset", "reset your economy profile to gain karma", Categories.MONEY);
 

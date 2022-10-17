@@ -1,5 +1,8 @@
 import { WholesomeSuggestion } from "@prisma/client";
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message, MessageReaction, User } from "discord.js";
+import { NypsiClient } from "../models/Client";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { formatDate } from "../utils/functions/date";
@@ -16,9 +19,6 @@ import {
   uploadImageToImgur,
 } from "../utils/functions/image";
 import { getMember } from "../utils/functions/member";
-import { NypsiClient } from "../utils/models/Client";
-import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
 const uploadCooldown = new Map<string, number>();
 

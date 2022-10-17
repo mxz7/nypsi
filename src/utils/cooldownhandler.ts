@@ -1,10 +1,10 @@
 import { GuildMember } from "discord.js";
 import redis from "../init/redis";
+import { ErrorEmbed } from "../models/EmbedBuilders";
 import { getBoosters } from "./functions/economy/boosters";
 import { getItems } from "./functions/economy/utils";
 import { getPrefix } from "./functions/guilds/utils";
 import { getTier, isPremium } from "./functions/premium/premium";
-import { ErrorEmbed } from "./models/EmbedBuilders";
 
 export async function onCooldown(cmd: string, member: GuildMember): Promise<boolean> {
   const key = `cd:${cmd}:${member.user.id}`;

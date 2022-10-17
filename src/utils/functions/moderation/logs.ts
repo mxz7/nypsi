@@ -1,8 +1,8 @@
 import { ColorResolvable, Guild, GuildMember, User, WebhookClient } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
-import { CustomEmbed } from "../../models/EmbedBuilders";
-import { LogType, PunishmentType } from "../../models/GuildStorage";
+import { CustomEmbed } from "../../../models/EmbedBuilders";
+import { LogType, PunishmentType } from "../../../types/Moderation";
 
 const logColors = new Map<LogType, ColorResolvable>();
 const modLogColors = new Map<PunishmentType, ColorResolvable>();

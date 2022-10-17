@@ -13,6 +13,10 @@ import {
   SelectMenuBuilder,
   SelectMenuOptionBuilder,
 } from "discord.js";
+import { NypsiClient } from "../models/Client";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import { Item } from "../types/Economy";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import {
   addToAuctionWatch,
@@ -28,10 +32,6 @@ import { formatBet, getItems, userExists } from "../utils/functions/economy/util
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import requestDM from "../utils/functions/requestdm";
 import { getDmSettings } from "../utils/functions/users/notifications";
-import { NypsiClient } from "../utils/models/Client";
-import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
-import { Item } from "../utils/models/Economy";
-import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("auction", "create and manage your item auctions", Categories.MONEY).setAliases(["ah"]);
 

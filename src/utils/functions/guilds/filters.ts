@@ -1,7 +1,7 @@
 import { Guild, Message } from "discord.js";
 import * as stringSimilarity from "string-similarity";
 import prisma from "../../../init/database";
-import { PunishmentType } from "../../models/GuildStorage";
+import { PunishmentType } from "../../../types/Moderation";
 import { addModLog } from "../moderation/logs";
 import { getPercentMatch } from "./utils";
 

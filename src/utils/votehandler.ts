@@ -3,6 +3,7 @@ import { Manager } from "discord-hybrid-sharding";
 import * as express from "express";
 import prisma from "../init/database";
 import redis from "../init/redis";
+import { CustomEmbed } from "../models/EmbedBuilders";
 import { getBalance, updateBalance } from "./functions/economy/balance";
 import { addInventoryItem } from "./functions/economy/inventory";
 import { getPrestige } from "./functions/economy/prestige";
@@ -12,7 +13,6 @@ import { getTier, isPremium } from "./functions/premium/premium";
 import requestDM from "./functions/requestdm";
 import { getDmSettings } from "./functions/users/notifications";
 import { logger } from "./logger";
-import { CustomEmbed } from "./models/EmbedBuilders";
 import ms = require("ms");
 import dayjs = require("dayjs");
 

@@ -1,7 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { GuildMember } from "discord.js";
 import prisma from "../../../init/database";
-import { StatsProfile } from "../../models/StatsProfile";
+import { StatsProfile } from "../../../models/StatsProfile";
 import { addProgress } from "./achievements";
 
 export async function getStats(member: GuildMember): Promise<StatsProfile> {

@@ -1,6 +1,6 @@
 import { EmbedBuilder } from "discord.js";
 import prisma from "../../init/database";
-import { NypsiClient } from "../../utils/models/Client";
+import { NypsiClient } from "../../models/Client";
 import ms = require("ms");
 
 export async function runSurveyChecks(client: NypsiClient) {

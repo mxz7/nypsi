@@ -1,8 +1,8 @@
 import { CommandInteraction, Message } from "discord.js";
 import prisma from "../init/database";
 import redis from "../init/redis";
-import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed } from "../utils/models/EmbedBuilders.js";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { CustomEmbed } from "../models/EmbedBuilders.js";
 
 const cmd = new Command(
   "ping",

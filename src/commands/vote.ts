@@ -9,11 +9,11 @@ import {
   Message,
   MessageActionRowComponentBuilder,
 } from "discord.js";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { CustomEmbed } from "../models/EmbedBuilders.js";
 import { getPrestige } from "../utils/functions/economy/prestige";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { getLastVote, hasVoted } from "../utils/functions/economy/vote";
-import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed } from "../utils/models/EmbedBuilders.js";
 
 const cmd = new Command("vote", "vote every 12 hours to get rewards", Categories.MONEY);
 

@@ -13,11 +13,11 @@ import {
   MessageEditOptions,
 } from "discord.js";
 import fetch from "node-fetch";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { getLastfmUsername } from "../utils/functions/users/lastfm";
 import { logger } from "../utils/logger";
-import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("toptracks", "view your top tracks", Categories.MUSIC).setAliases(["tt"]);
 

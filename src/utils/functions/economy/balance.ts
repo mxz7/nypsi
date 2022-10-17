@@ -2,7 +2,7 @@ import { Collection, Guild, GuildMember } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
-import { NypsiClient } from "../../models/Client";
+import { NypsiClient } from "../../../models/Client";
 import { getTier, isPremium } from "../premium/premium";
 import { getBoosters } from "./boosters";
 import { getGuildByUser } from "./guilds";

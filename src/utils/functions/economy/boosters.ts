@@ -1,8 +1,8 @@
 import { GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
-import { Booster } from "../../models/Economy";
-import { CustomEmbed } from "../../models/EmbedBuilders";
+import { CustomEmbed } from "../../../models/EmbedBuilders";
+import { Booster } from "../../../types/Economy";
 import { getDmSettings } from "../users/notifications";
 import { getItems } from "./utils";
 import _ = require("lodash");

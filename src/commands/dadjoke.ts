@@ -1,9 +1,9 @@
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
 import fetch from "node-fetch";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import { RedditJSON, RedditJSONPost } from "../types/Reddit";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
-import { RedditJSON, RedditJSONPost } from "../utils/models/Reddit";
 import ms = require("ms");
 
 const cmd = new Command("dadjoke", "get a hilarious dad joke straight from r/dadjokes", Categories.FUN).setAliases([

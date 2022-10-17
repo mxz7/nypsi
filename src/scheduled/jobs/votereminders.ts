@@ -3,7 +3,7 @@ import { ButtonStyle } from "discord.js";
 import { parentPort } from "worker_threads";
 import prisma from "../../init/database";
 import redis from "../../init/redis";
-import { CustomEmbed } from "../../utils/models/EmbedBuilders";
+import { CustomEmbed } from "../../models/EmbedBuilders";
 import dayjs = require("dayjs");
 
 (async () => {

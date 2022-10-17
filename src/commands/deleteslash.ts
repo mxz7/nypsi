@@ -1,7 +1,7 @@
 import { CommandInteraction, Message } from "discord.js";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { deleteSlashCommands, deleteSlashCommandsFromGuild } from "../utils/commandhandler";
 import Constants from "../utils/Constants";
-import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 
 const cmd = new Command("deleteslash", "delete slash commands", Categories.NONE).setPermissions(["bot owner"]);
 

@@ -1,11 +1,11 @@
 import { CommandInteraction, Message } from "discord.js";
 import fetch from "node-fetch";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import { cleanString } from "../utils/functions/string";
 import { getPrefix } from "../utils/functions/guilds/utils";
+import { cleanString } from "../utils/functions/string";
 import { logger } from "../utils/logger";
-import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 
 const cache = new Map<string, { hypixel: string; mojang: string }>();
 

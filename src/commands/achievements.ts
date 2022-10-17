@@ -12,6 +12,9 @@ import {
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import prisma from "../init/database";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import { AchievementData } from "../types/Economy";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { daysAgo } from "../utils/functions/date";
 import {
@@ -21,9 +24,6 @@ import {
   getUserAchievement,
 } from "../utils/functions/economy/achievements";
 import { getAchievements } from "../utils/functions/economy/utils";
-import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
-import { AchievementData } from "../utils/models/Economy";
-import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("achievements", "view your achievement progress", Categories.MONEY).setAliases([
   "ach",

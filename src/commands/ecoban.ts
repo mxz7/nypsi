@@ -1,7 +1,7 @@
 import { CommandInteraction, Message } from "discord.js";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import Constants from "../utils/Constants";
 import { isEcoBanned, setEcoBan } from "../utils/functions/economy/utils";
-import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 
 const cmd = new Command("ecoban", "ban an account from eco", Categories.NONE);
 

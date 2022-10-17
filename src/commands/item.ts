@@ -1,11 +1,11 @@
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import { Item } from "../types/Economy";
 import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { getAuctionAverage } from "../utils/functions/economy/auctions";
 import { getInventory, getTotalAmountOfItem } from "../utils/functions/economy/inventory";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
-import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
-import { Item } from "../utils/models/Economy";
-import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("item", "view information about an item", Categories.MONEY);
 

@@ -1,4 +1,7 @@
 import { CommandInteraction, Message, User } from "discord.js";
+import { NypsiClient } from "../models/Client";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { CustomEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { formatDate } from "../utils/functions/date";
 import {
@@ -17,9 +20,6 @@ import { getKarma } from "../utils/functions/karma/karma";
 import { getPremiumProfile, isPremium } from "../utils/functions/premium/premium";
 import { getLastCommand } from "../utils/functions/users/commands";
 import { fetchUsernameHistory } from "../utils/functions/users/history";
-import { NypsiClient } from "../utils/models/Client";
-import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("find", "find info", Categories.NONE).setPermissions(["bot owner"]);
 

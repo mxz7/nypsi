@@ -1,6 +1,8 @@
 import { Client, User, WebhookClient } from "discord.js";
 import prisma from "../../init/database";
 import redis from "../../init/redis";
+import { CustomEmbed } from "../../models/EmbedBuilders";
+import { LotteryTicket } from "../../types/Economy";
 import { MStoTime } from "../../utils/functions/date";
 import { addProgress } from "../../utils/functions/economy/achievements";
 import { getBalance, updateBalance } from "../../utils/functions/economy/balance";
@@ -8,8 +10,6 @@ import { lotteryTicketPrice } from "../../utils/functions/economy/utils";
 import { addToNypsiBank, getTax } from "../../utils/functions/tax";
 import { getDmSettings } from "../../utils/functions/users/notifications";
 import { logger } from "../../utils/logger";
-import { LotteryTicket } from "../../utils/models/Economy";
-import { CustomEmbed } from "../../utils/models/EmbedBuilders";
 import shuffleArray = require("shuffle-array");
 import dayjs = require("dayjs");
 import ms = require("ms");
