@@ -4,7 +4,7 @@
 
 karma is earned passively while using commmands with nypsi.
 
-to check how much karma you have, use the `$karma` command.
+to check how much karma you have, use the `/karma` command.
 
 ## what is karma used for
 
@@ -14,7 +14,7 @@ karma is used in the karma shop that is opened periodically to purchase rewards 
 
 <img src="https://raw.githubusercontent.com/tekoh/nypsi/docs/assets/karmashop_1.png" height="200px" width="auto" style="border-radius:4px">
 
-while the karma shop is opened, it can be viewed using the `$karmashop` command.
+while the karma shop is opened, it can be viewed using the `/karmashop view` command.
 
 to purchase an item, use the command below.
 

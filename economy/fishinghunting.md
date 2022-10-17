@@ -2,8 +2,9 @@
 
 ## how do i get a fishing rod / gun?
 
-you can obtain a fishing rod or gun through crates. the easiest way to get crates is by voting daily with `$vote`. you can
-earn more vote crates each day by working hard and reaching high levels of prestige
+you can obtain a fishing rod or gun through crates. the easiest way to get crates is by voting daily with `/vote`. you can
+earn more vote crates each day by working hard and reaching high levels of prestige. p.s don't forget to turn vote reminders
+on!! (`/settings me notifications`)
 
 ## different levels of item
 

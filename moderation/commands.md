@@ -3,7 +3,8 @@
 ## multi-user
 
 every punishment command (`$warn`, `$mute`, `$kick`, etc.) allows you to affect multiple users with one command use. to be
-able to affect multiple users, each user must be mentioned, otherwise it will not work.
+able to affect multiple users, each user must be mentioned, otherwise it will not work. note: this does not work when using
+slash commands.
 
 the example below shows how you would mute 3 members for the same length and reason
 

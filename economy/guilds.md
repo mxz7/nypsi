@@ -23,8 +23,8 @@ requirements for the next upgrade
 at first, a guild can only hold 3 members. this will increase when the guild upgrades, allowing for more members. although
 note, with more members, the requirements to upgrade the guild are higher.
 
-to leave your guild, use the `$guild leave` command. if you are the owner however, you will need to delete your guild, using
-`$guild delete`
+to leave your guild, use the `/guild leave` command. if you are the owner however, you will need to delete your guild, using
+`/guild delete`
 
 ## how can i get my money back after depositing?
 

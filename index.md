@@ -32,15 +32,15 @@ the requirements are as follows:
 -   your server **must** have less than 150k members
 -   your server owner must have an economy profile
 
-the quick fix for this is to simply check the server owner's balance using the `$bal` command, if this doesn't work, try
-paying the owner with `$pay @owner 1`
+the quick fix for this is to simply check the server owner's balance using the `/balance` command, if this doesn't work, try
+paying the owner with `/pay`
 
 if you need further help, feel free to join the [support server](https://discord.gg/hJTDNST)
 
 ### when will karmashop be open
 
-the karmashop (`$karmashop`) opens around once every month. everyone will be notified in the official nypsi server
-(`$support`) when it is opened. make sure to join to stay updated (:
+the karmashop (`/karmashop view`) opens 1-3 times every month. everyone will be notified in the
+[official nypsi server](http://discord.nypsi.xyz) when it is opened. make sure to join to stay updated (:
 
 ### how do i get vote reminders
 
@@ -62,6 +62,13 @@ to undo, type the following command:
 
 ```
 $disablecmd - <cmd>
+```
+
+you can also enable slash command only mode, which allows you to customise which commands are allowed within your discord
+server settings
+
+```
+/settings server slash-only
 ```
 
 ### whats with the lowercase?

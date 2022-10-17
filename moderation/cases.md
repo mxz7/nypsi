@@ -9,7 +9,7 @@ this decision was made so that if a staff member were to leave, there is still c
 being shown.
 
 ```
-$case <case ID>
+/case <case ID>
 ```
 
 the command above allows you to view information about a case
@@ -39,13 +39,13 @@ a confirmation message will then be shown to prevent any accidental resets. plea
 ## deleting a single case
 
 deleting a single case entirely is not possible, however, it is marked as being deleted, and is shown as deleted in a user's
-punishment history. to do this, use the `$case` command to view the case, then press the delete button to mark the case as
+punishment history. to do this, use the `/case` command to view the case, then press the delete button to mark the case as
 deleted. please not that this is irreversible.
 
 ## punishment history
 
 ```
-$history <user>
+/history <user>
 ```
 
 this command shows the target user's punishment history
