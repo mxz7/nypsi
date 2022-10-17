@@ -65,7 +65,7 @@ export async function getBoosters(member: GuildMember | string): Promise<Map<str
       for (const expiredBoosterId of Array.from(expired.keys())) {
         total += expired.get(expiredBoosterId);
 
-        desc += `\`${expired.get(expiredBoosterId)}x\` ${items[expiredBoosterId].emoji} ${items[expiredBoosterId].name}`;
+        desc += `\`${expired.get(expiredBoosterId)}x\` ${items[expiredBoosterId].emoji} ${items[expiredBoosterId].name}\n`;
       }
 
       embed.setHeader(`expired booster${total > 1 ? "s" : ""}:`);
@@ -155,7 +155,7 @@ export async function getBoosters(member: GuildMember | string): Promise<Map<str
     for (const expiredBoosterId of Array.from(expired.keys())) {
       total += expired.get(expiredBoosterId);
 
-      desc += `\`${expired.get(expiredBoosterId)}x\` ${items[expiredBoosterId].emoji} ${items[expiredBoosterId].name}`;
+      desc += `\`${expired.get(expiredBoosterId)}x\` ${items[expiredBoosterId].emoji} ${items[expiredBoosterId].name}\n`;
     }
 
     embed.setHeader(`expired booster${total > 1 ? "s" : ""}:`);
