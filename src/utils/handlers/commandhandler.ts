@@ -22,7 +22,7 @@ import { formatDate, MStoTime } from "../functions/date";
 import { getNews, hasSeenNews } from "../functions/news";
 import { getTimestamp, logger } from "../logger";
 // @ts-expect-error typescript doesnt like opening package.json
-import { version } from "../../package.json";
+import { version } from "../../../package.json";
 import { Item } from "../../types/Economy";
 import Constants from "../Constants";
 import { a } from "../functions/anticheat";
@@ -73,7 +73,7 @@ export function loadCommands() {
 
   if (commands.size > 0) {
     for (const command of commands.keys()) {
-      delete require.cache[require.resolve(`../commands/${command}.js`)];
+      delete require.cache[require.resolve(`../../commands/${command}.js`)];
     }
     commands.clear();
     aliases.clear();
@@ -83,7 +83,7 @@ export function loadCommands() {
     let command;
 
     try {
-      command = require(`../commands/${file}`);
+      command = require(`../../commands/${file}`);
 
       let enabled = true;
 
@@ -129,7 +129,7 @@ export function reloadCommand(commandsArray: string[]) {
     try {
       commands.delete(cmd);
       try {
-        delete require.cache[require.resolve(`../commands/${cmd}`)];
+        delete require.cache[require.resolve(`../../commands/${cmd}`)];
       } catch (e) {
         logger.error("error deleting from cache");
         return;
@@ -137,7 +137,7 @@ export function reloadCommand(commandsArray: string[]) {
 
       let commandData: Command | number = 0;
 
-      commandData = require(`../commands/${cmd}`);
+      commandData = require(`../../commands/${cmd}`);
 
       let enabled = true;
 
