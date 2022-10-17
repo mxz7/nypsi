@@ -17,6 +17,7 @@ import { NypsiClient } from "../models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { Item } from "../types/Economy";
+import Constants from "../utils/Constants";
 import {
   addToAuctionWatch,
   createAuction,
@@ -302,12 +303,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       });
     }
 
-    if (cost > 50000000 && amount == 1 && selected.rarity != 4) {
-      return message.channel.send({ embeds: [new ErrorEmbed("this is too much")] });
-    }
-
-    if (cost > 200000000 && selected.rarity != 4) {
-      return message.channel.send({ embeds: [new ErrorEmbed("this is too much")] });
+    if (cost > Constants.MAX_AUCTION_PER_ITEM * amount) {
+      return message.channel.send({
+        embeds: [new ErrorEmbed(`the maximum cost per item is $${Constants.MAX_AUCTION_PER_ITEM.toLocaleString()}`)],
+      });
     }
 
     const shopCost = (items[selected.id].buy || 0) * amount;
@@ -629,12 +628,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       });
     }
 
-    if (cost > 15000000 && amount == 1 && selected.rarity != 4) {
-      return send({ embeds: [new ErrorEmbed("this is too much")] });
-    }
-
-    if (cost > 100000000 && selected.rarity != 4) {
-      return send({ embeds: [new ErrorEmbed("this is too much")] });
+    if (cost > Constants.MAX_AUCTION_PER_ITEM * amount) {
+      return message.channel.send({
+        embeds: [new ErrorEmbed(`the maximum cost per item is $${Constants.MAX_AUCTION_PER_ITEM.toLocaleString()}`)],
+      });
     }
 
     const shopCost = (items[selected.id].buy || 0) * amount;
