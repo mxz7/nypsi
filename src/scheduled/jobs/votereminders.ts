@@ -1,9 +1,9 @@
 import { ActionRowBuilder, ButtonBuilder, MessageActionRowComponentBuilder } from "@discordjs/builders";
 import { ButtonStyle } from "discord.js";
 import { parentPort } from "worker_threads";
-import prisma from "../../database/database";
-import redis from "../../database/redis";
-import { CustomEmbed } from "../../models/EmbedBuilders";
+import prisma from "../../init/database";
+import redis from "../../utils/database/redis";
+import { CustomEmbed } from "../../utils/models/EmbedBuilders";
 import dayjs = require("dayjs");
 
 (async () => {

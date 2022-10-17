@@ -1,14 +1,14 @@
 import dayjs = require("dayjs");
 import ms = require("ms");
-import prisma from "../../database/database";
-import { deleteAuction } from "../../functions/economy/auctions";
-import { addInventoryItem } from "../../functions/economy/inventory";
-import { getItems, userExists } from "../../functions/economy/utils";
-import requestDM from "../../functions/requestdm";
-import { getDmSettings } from "../../functions/users/notifications";
-import { logger } from "../../logger";
-import { NypsiClient } from "../../models/Client";
-import { CustomEmbed } from "../../models/EmbedBuilders";
+import prisma from "../../init/database";
+import { deleteAuction } from "../../utils/functions/economy/auctions";
+import { addInventoryItem } from "../../utils/functions/economy/inventory";
+import { getItems, userExists } from "../../utils/functions/economy/utils";
+import requestDM from "../../utils/functions/requestdm";
+import { getDmSettings } from "../../utils/functions/users/notifications";
+import { logger } from "../../utils/logger";
+import { NypsiClient } from "../../utils/models/Client";
+import { CustomEmbed } from "../../utils/models/EmbedBuilders";
 
 export async function runAuctionChecks(client: NypsiClient) {
   setInterval(async () => {

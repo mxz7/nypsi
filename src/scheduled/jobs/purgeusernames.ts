@@ -1,6 +1,6 @@
 import dayjs = require("dayjs");
 import { parentPort } from "worker_threads";
-import prisma from "../../database/database";
+import prisma from "../../init/database";
 
 (async () => {
   const old = dayjs().subtract(180, "days").toDate();

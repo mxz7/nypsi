@@ -1,6 +1,6 @@
-import prisma from "../../database/database";
-import { NypsiClient } from "../../models/Client";
-import { expireUser } from "../../functions/premium/premium";
+import prisma from "../../init/database";
+import { expireUser } from "../../utils/functions/premium/premium";
+import { NypsiClient } from "../../utils/models/Client";
 
 export async function runPremiumChecks(client: NypsiClient) {
   setInterval(async () => {

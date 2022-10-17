@@ -1,7 +1,7 @@
 import ms = require("ms");
 import { parentPort } from "worker_threads";
-import prisma from "../../database/database";
-import redis from "../../database/redis";
+import prisma from "../../init/database";
+import redis from "../../utils/database/redis";
 
 (async () => {
   const now = Date.now();

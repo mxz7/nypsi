@@ -1,7 +1,7 @@
 import { EmbedBuilder, WebhookClient } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { parentPort } from "worker_threads";
-import prisma from "../../database/database";
+import prisma from "../../init/database";
 
 (async () => {
   const baltop = await topAmountGlobal(10, true);

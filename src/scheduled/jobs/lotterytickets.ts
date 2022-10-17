@@ -1,5 +1,5 @@
 import { EmbedBuilder, WebhookClient } from "discord.js";
-import redis from "../../database/redis";
+import redis from "../../utils/database/redis";
 
 (async () => {
   const hook = new WebhookClient({

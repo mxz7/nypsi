@@ -2,8 +2,8 @@ import Bree = require("bree");
 import dayjs = require("dayjs");
 import ms = require("ms");
 import path = require("path");
-import { getGuilds } from "../..";
-import { logger } from "../logger";
+import { getGuilds } from "..";
+import { logger } from "../utils/logger";
 
 const bree = new Bree({
   root: path.resolve("./jobs"),

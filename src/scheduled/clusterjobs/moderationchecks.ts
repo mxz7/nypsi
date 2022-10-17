@@ -1,10 +1,10 @@
 import { APIEmbed, WebhookClient } from "discord.js";
-import prisma from "../../database/database";
-import redis from "../../database/redis";
-import { requestUnban } from "../../functions/moderation/ban";
-import { requestUnmute } from "../../functions/moderation/mute";
-import { logger } from "../../logger";
-import { NypsiClient } from "../../models/Client";
+import prisma from "../../init/database";
+import redis from "../../utils/database/redis";
+import { requestUnban } from "../../utils/functions/moderation/ban";
+import { requestUnmute } from "../../utils/functions/moderation/mute";
+import { logger } from "../../utils/logger";
+import { NypsiClient } from "../../utils/models/Client";
 
 export function runLogs() {
   setInterval(async () => {
