@@ -4,6 +4,8 @@ import { parentPort } from "worker_threads";
 import prisma from "../../init/database";
 import redis from "../../init/redis";
 import { CustomEmbed } from "../../models/EmbedBuilders";
+import { NotificationPayload } from "../../types/Notification";
+import { addNotificationToQueue } from "../../utils/functions/users/notifications";
 import dayjs = require("dayjs");
 
 (async () => {
@@ -25,20 +27,18 @@ import dayjs = require("dayjs");
     },
   });
 
-  const data = {
+  const data: NotificationPayload = {
     memberId: "boob",
-    embed: new CustomEmbed()
-      .setDescription("it has been more than 12 hours since you last voted")
-      .setColor("#36393f")
-      .toJSON(),
-    components: new ActionRowBuilder<MessageActionRowComponentBuilder>()
-      .addComponents(
+    payload: {
+      embed: new CustomEmbed().setDescription("it has been more than 12 hours since you last voted").setColor("#36393f"),
+
+      components: new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()
           .setStyle(ButtonStyle.Link)
           .setURL("https://top.gg/bot/678711738845102087/vote")
           .setLabel("top.gg")
-      )
-      .toJSON(),
+      ),
+    },
   };
 
   let amount = 0;
@@ -46,7 +46,9 @@ import dayjs = require("dayjs");
   for (const user of userIds) {
     if (await redis.sismember("nypsi:vote_reminder:received", user.userId)) continue;
     data.memberId = user.userId;
-    await redis.lpush("nypsi:dm:queue", JSON.stringify(data));
+
+    await addNotificationToQueue(data);
+
     await redis.sadd("nypsi:vote_reminder:received", user.userId);
     amount++;
   }

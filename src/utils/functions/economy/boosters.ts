@@ -3,7 +3,7 @@ import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { Booster } from "../../../types/Economy";
-import { getDmSettings } from "../users/notifications";
+import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { getItems } from "./utils";
 import _ = require("lodash");
 
@@ -80,14 +80,13 @@ export async function getBoosters(member: GuildMember | string): Promise<Map<str
       if (member instanceof GuildMember) {
         await member.send({ embeds: [embed], content: text });
       } else {
-        await redis.lpush(
-          "nypsi:dm:queue",
-          JSON.stringify({
-            memberId: id,
-            embed: embed,
+        await addNotificationToQueue({
+          memberId: id,
+          payload: {
             content: text,
-          })
-        );
+            embed: embed,
+          },
+        });
       }
     }
 
@@ -171,14 +170,13 @@ export async function getBoosters(member: GuildMember | string): Promise<Map<str
     if (member instanceof GuildMember) {
       await member.send({ embeds: [embed], content: text });
     } else {
-      await redis.lpush(
-        "nypsi:dm:queue",
-        JSON.stringify({
-          memberId: id,
+      await addNotificationToQueue({
+        memberId: id,
+        payload: {
           embed: embed,
           content: text,
-        })
-      );
+        },
+      });
     }
   }
 
