@@ -1,5 +1,5 @@
 import { CommandInteraction, Message } from "discord.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 
 const cmd = new Command("support", "join the nypsi support server", Categories.INFO).setAliases(["discord"]);
 

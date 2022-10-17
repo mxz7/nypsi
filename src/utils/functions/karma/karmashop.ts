@@ -1,4 +1,4 @@
-import { KarmaShopItem } from "../../models/Karmashop";
+import { KarmaShopItem } from "../../../types/Karmashop";
 
 declare function require(name: string): any;
 

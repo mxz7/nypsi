@@ -1,10 +1,10 @@
 import { CommandInteraction, Message } from "discord.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
-import { redditImage } from "../utils/functions/image";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import { images } from "../utils/imghandler";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { addProgress } from "../utils/functions/economy/achievements";
+import { redditImage } from "../utils/functions/image";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import { images } from "../utils/handlers/imghandler";
 
 const cmd = new Command("ass", "get a random ass image", Categories.NSFW).setAliases(["peach"]);
 

@@ -10,15 +10,15 @@ import {
   MessageActionRowComponentBuilder,
   SelectMenuOptionBuilder,
 } from "discord.js";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { calcMaxBet, getDefaultBet, getRequiredBetForXp, setDefaultBet } from "../utils/functions/economy/balance";
 import { createUser, formatNumber, userExists } from "../utils/functions/economy/utils";
 import { setSlashOnly } from "../utils/functions/guilds/slash";
 import { cleanString } from "../utils/functions/string";
 import { getLastfmUsername, setLastfmUsername } from "../utils/functions/users/lastfm";
 import { getDmSettings, getNotificationsData, updateDmSettings } from "../utils/functions/users/notifications";
-import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("settings", "manage nypsi settings for your server and you", Categories.UTILITY);
 

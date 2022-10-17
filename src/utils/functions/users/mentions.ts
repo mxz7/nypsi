@@ -1,5 +1,5 @@
 import { Collection, Guild, GuildMember, Message, ThreadMember } from "discord.js";
-import prisma from "../../database/database";
+import prisma from "../../../init/database";
 
 export interface MentionQueueItem {
   type: string;

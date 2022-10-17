@@ -1,5 +1,5 @@
 import { GuildMember } from "discord.js";
-import prisma from "../database/database";
+import prisma from "../../init/database";
 
 export async function getSurveys(member: GuildMember) {
   const query = await prisma.survey.findMany({

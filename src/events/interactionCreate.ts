@@ -13,8 +13,10 @@ import {
   TextInputBuilder,
   TextInputStyle,
 } from "discord.js";
-import { runCommand } from "../utils/commandhandler";
-import prisma from "../utils/database/database";
+import prisma from "../init/database";
+import { NypsiClient } from "../models/Client";
+import { createNypsiInteraction, NypsiCommandInteraction } from "../models/Command";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
 import { addInventoryItem, getInventory } from "../utils/functions/economy/inventory";
 import { createUser, getAchievements, getItems, userExists } from "../utils/functions/economy/utils";
@@ -25,10 +27,8 @@ import requestDM from "../utils/functions/requestdm";
 import { getSurveyByMessageId } from "../utils/functions/surveys";
 import { addToNypsiBank, getTax } from "../utils/functions/tax";
 import { getDmSettings } from "../utils/functions/users/notifications";
+import { runCommand } from "../utils/handlers/commandhandler";
 import { logger } from "../utils/logger";
-import { NypsiClient } from "../utils/models/Client";
-import { createNypsiInteraction, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
 export default async function interactionCreate(interaction: Interaction) {
   if (interaction.type == InteractionType.ApplicationCommandAutocomplete) {

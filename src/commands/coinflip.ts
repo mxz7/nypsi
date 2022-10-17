@@ -8,15 +8,15 @@ import {
   Message,
   MessageActionRowComponentBuilder,
 } from "discord.js";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler.js";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { calcMaxBet, getBalance, updateBalance } from "../utils/functions/economy/balance";
 import { addGamble } from "../utils/functions/economy/stats";
 import { createUser, formatBet, isEcoBanned, userExists } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member.js";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 import { gamble } from "../utils/logger.js";
-import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
 
 const waiting = new Set<string>();
 

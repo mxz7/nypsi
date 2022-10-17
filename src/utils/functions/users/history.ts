@@ -1,9 +1,9 @@
 import { GuildMember } from "discord.js";
 import { inPlaceSort } from "fast-sort";
-import ms = require("ms");
-import prisma from "../../database/database";
-import redis from "../../database/redis";
+import prisma from "../../../init/database";
+import redis from "../../../init/redis";
 import { hasProfile } from "./utils";
+import ms = require("ms");
 
 export async function isTracking(member: GuildMember | string): Promise<boolean> {
   let id: string;

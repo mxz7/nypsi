@@ -1,6 +1,6 @@
 import { EconomyWorker, EconomyWorkerUpgrades } from "@prisma/client";
 import { GuildMember } from "discord.js";
-import prisma from "../../database/database";
+import prisma from "../../../init/database";
 import { logger } from "../../logger";
 import { getBoosters } from "./boosters";
 import { getBaseUpgrades, getBaseWorkers, getItems } from "./utils";

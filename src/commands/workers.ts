@@ -14,7 +14,9 @@ import {
   SelectMenuOptionBuilder,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import { Worker } from "../types/Workers";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
 import { getPrestige } from "../utils/functions/economy/prestige";
 import { createUser, getBaseUpgrades, getBaseWorkers, userExists } from "../utils/functions/economy/utils";
@@ -25,9 +27,7 @@ import {
   emptyWorkersStored,
   getWorkers,
 } from "../utils/functions/economy/workers";
-import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
-import { Worker } from "../utils/models/Workers";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import _ = require("lodash");
 
 const cmd = new Command("workers", "view the available workers and manage your own", Categories.MONEY).setAliases([

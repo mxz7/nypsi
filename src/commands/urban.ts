@@ -1,10 +1,10 @@
-import * as urban from "urban-dictionary";
 import { CommandInteraction, Message } from "discord.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
-import { getPrefix } from "../utils/functions/guilds/utils";
 import { inPlaceSort } from "fast-sort";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import * as urban from "urban-dictionary";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
+import { getPrefix } from "../utils/functions/guilds/utils";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("urban", "get a definition from urban dictionary", Categories.INFO).setAliases(["define"]);
 

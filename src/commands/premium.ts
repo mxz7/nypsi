@@ -1,4 +1,7 @@
 import { BaseMessageOptions, ColorResolvable, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
+import { NypsiClient } from "../models/Client";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { daysAgo, daysUntil, formatDate } from "../utils/functions/date";
 import { getEmbedColor, setEmbedColor } from "../utils/functions/premium/color";
@@ -13,9 +16,6 @@ import {
   setStatus,
   setTier,
 } from "../utils/functions/premium/premium";
-import { NypsiClient } from "../utils/models/Client";
-import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 import dayjs = require("dayjs");
 
 const cmd = new Command("premium", "view your premium status", Categories.INFO)

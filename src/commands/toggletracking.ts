@@ -1,9 +1,9 @@
 import { CommandInteraction, Message } from "discord.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed } from "../utils/models/EmbedBuilders";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { CustomEmbed } from "../models/EmbedBuilders";
 import { getPrefix } from "../utils/functions/guilds/utils";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
 import { disableTracking, enableTracking, isTracking } from "../utils/functions/users/history";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("toggletracking", "toggle tracking your username and avatar changes", Categories.INFO);
 

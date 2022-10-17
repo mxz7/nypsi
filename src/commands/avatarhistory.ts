@@ -8,7 +8,8 @@ import {
   Message,
   MessageActionRowComponentBuilder,
 } from "discord.js";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { formatDate } from "../utils/functions/date";
 import { uploadImageToImgur } from "../utils/functions/image";
 import {
@@ -18,8 +19,7 @@ import {
   fetchAvatarHistory,
   isTracking,
 } from "../utils/functions/users/history";
-import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("avatarhistory", "view a user's avatar history", Categories.INFO).setAliases([
   "avh",

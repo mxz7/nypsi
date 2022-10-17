@@ -1,9 +1,9 @@
 import { Channel, CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getLogsChannelHook, setLogsChannelHook } from "../utils/functions/moderation/logs";
 import { createProfile, profileExists } from "../utils/functions/moderation/utils";
-import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("logs", "set/update the logs channel", Categories.MODERATION).setPermissions(["MANAGE_SERVER"]);
 

@@ -1,7 +1,7 @@
 import { Collection, CommandInteraction, Message } from "discord.js";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("delp", "bulk delete/purge your own messages", Categories.MODERATION).setAliases(["dp", "d"]);
 

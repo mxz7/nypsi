@@ -1,8 +1,8 @@
 import { Guild } from "discord.js";
-import prisma from "../../database/database";
+import prisma from "../../../init/database";
+import { NypsiClient } from "../../../models/Client";
+import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { logger } from "../../logger";
-import { NypsiClient } from "../../models/Client";
-import { CustomEmbed } from "../../models/EmbedBuilders";
 import { daysUntilChristmas, MStoTime } from "../date";
 
 export function runChristmas(client: NypsiClient) {

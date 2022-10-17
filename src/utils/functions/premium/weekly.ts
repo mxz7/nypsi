@@ -1,5 +1,5 @@
 import { GuildMember } from "discord.js";
-import prisma from "../../database/database";
+import prisma from "../../../init/database";
 
 export async function setLastWeekly(member: GuildMember | string, date: Date) {
   let id: string;
