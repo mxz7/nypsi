@@ -3,6 +3,7 @@ import { Categories, Command, NypsiCommandInteraction } from "../models/Command"
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { getChatFilter, updateChatFilter } from "../utils/functions/guilds/filters";
 import { getPercentMatch, getPrefix, setPercentMatch } from "../utils/functions/guilds/utils";
+import { cleanString } from "../utils/functions/string";
 
 const cmd = new Command("chatfilter", "change the chat filter for your server", Categories.ADMIN)
   .setAliases(["filter"])
@@ -80,11 +81,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       });
     }
 
-    const word = args[1]
-      .toString()
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[^A-z0-9\s]/g, "");
+    const word = cleanString(args[1].toString().toLowerCase().normalize("NFD"));
 
     if (word == "" || word == " ") {
       return message.channel.send({ embeds: [new ErrorEmbed("word must contain letters or numbers")] });
@@ -122,11 +119,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}filter del/- <word>`)] });
     }
 
-    const word = args[1]
-      .toString()
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[^A-z0-9\s]/g, "");
+    const word = cleanString(args[1].toString().toLowerCase().normalize("NFD"));
 
     if (filter.indexOf(word) > -1) {
       filter.splice(filter.indexOf(word), 1);

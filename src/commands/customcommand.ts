@@ -4,6 +4,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getCommand, getUserCommand, setCommand } from "../utils/functions/premium/command";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
+import { cleanString } from "../utils/functions/string";
 import { commandExists } from "../utils/handlers/commandhandler";
 
 const cmd = new Command("customcommand", "create a custom command", Categories.FUN).setAliases(["mycommand", "mycmd"]);
@@ -79,9 +80,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       });
     }
 
-    let contentToTest = message.content.toLowerCase().normalize("NFD");
-
-    contentToTest = contentToTest.replace(/[^A-z0-9\s]/g, "");
+    const contentToTest = cleanString(message.content.toLowerCase().normalize("NFD"));
 
     for (const word of filterxd) {
       if (contentToTest.includes(word)) {
@@ -112,9 +111,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       });
     }
 
-    let resToTest = res.normalize("NFD");
-
-    resToTest = resToTest.replace(/[^A-z0-9\s]/g, "");
+    const resToTest = cleanString(res.normalize("NFD"));
 
     for (const word of filterxd) {
       if (resToTest.includes(word)) {

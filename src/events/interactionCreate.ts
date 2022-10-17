@@ -24,6 +24,7 @@ import { getChatFilter } from "../utils/functions/guilds/filters";
 import { getKarma } from "../utils/functions/karma/karma";
 import { getKarmaShopItems, isKarmaShopOpen } from "../utils/functions/karma/karmashop";
 import requestDM from "../utils/functions/requestdm";
+import { cleanString } from "../utils/functions/string";
 import { getSurveyByMessageId } from "../utils/functions/surveys";
 import { addToNypsiBank, getTax } from "../utils/functions/tax";
 import { getDmSettings } from "../utils/functions/users/notifications";
@@ -401,9 +402,7 @@ export default async function interactionCreate(interaction: Interaction) {
 
       const descFilter = ["nigger", "nigga", "faggot", "fag", "nig", "ugly", "discordgg", "discordcom", "discordappcom"];
 
-      let value = res.fields.getTextInputValue("answer").toLowerCase().normalize("NFD");
-
-      value = value.replace(/[^A-z0-9\s]/g, "");
+      const value = cleanString(res.fields.getTextInputValue("answer").toLowerCase().normalize("NFD"));
 
       for (const word of descFilter) {
         if (value.includes(word)) return res.reply({ embeds: [new ErrorEmbed("your response had a filtered word")] });
