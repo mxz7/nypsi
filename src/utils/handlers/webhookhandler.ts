@@ -19,7 +19,7 @@ import dayjs = require("dayjs");
 const app = express();
 const webhook = new topgg.Webhook("123");
 
-export function listenForVotes(manager: Manager) {
+export function listen(manager: Manager) {
   app.post(
     "/dblwebhook",
     webhook.listener((vote) => {

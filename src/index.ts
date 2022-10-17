@@ -5,7 +5,8 @@ import startJobs from "./scheduled/scheduler";
 import { addFailedHeatbeat, sendHeartbeat } from "./utils/functions/heartbeat";
 import { updateStats } from "./utils/functions/topgg";
 import { listenForDms } from "./utils/handlers/notificationhandler";
-import { listenForVotes } from "./utils/handlers/votehandler";
+
+import { listen } from "./utils/handlers/webhookhandler";
 import { logger, setClusterId } from "./utils/logger";
 import ms = require("ms");
 
@@ -94,7 +95,7 @@ export async function getGuilds(): Promise<string[]> {
   return newGuildIds;
 }
 
-listenForVotes(manager);
+listen(manager);
 
 setTimeout(async () => {
   await startJobs();
