@@ -1,6 +1,6 @@
 import { GuildMember, User } from "discord.js";
-import prisma from "../../database/database";
-import redis from "../../database/redis";
+import redis from "../../../init/redis";
+import prisma from "../../../init/database";
 import ms = require("ms");
 
 export async function hasProfile(member: GuildMember | string) {

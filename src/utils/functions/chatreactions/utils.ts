@@ -1,8 +1,8 @@
 import { ChannelType, Guild, GuildMember, Message, TextChannel } from "discord.js";
-import prisma from "../../database/database";
+import prisma from "../../../init/database";
+import { NypsiClient } from "../../../models/Client";
+import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { logger } from "../../logger";
-import { NypsiClient } from "../../models/Client";
-import { CustomEmbed } from "../../models/EmbedBuilders";
 import { getZeroWidth } from "../string";
 import { getBlacklisted } from "./blacklisted";
 import { add2ndPlace, add3rdPlace, addWin, createReactionStatsProfile, hasReactionStatsProfile } from "./stats";

@@ -1,5 +1,5 @@
 import { Guild } from "discord.js";
-import prisma from "../../database/database";
+import prisma from "../../../init/database";
 
 export async function getBlacklisted(guild: Guild) {
   const query = await prisma.chatReaction.findUnique({

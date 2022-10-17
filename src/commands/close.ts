@@ -1,11 +1,11 @@
 import { CommandInteraction, Message } from "discord.js";
-import prisma from "../utils/database/database";
-import redis from "../utils/database/redis";
+import prisma from "../init/database";
+import redis from "../init/redis";
+import { NypsiClient } from "../models/Client";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { CustomEmbed } from "../models/EmbedBuilders";
 import requestDM from "../utils/functions/requestdm";
 import { getSupportRequestByChannelId, sendToRequestChannel } from "../utils/functions/supportrequest";
-import { NypsiClient } from "../utils/models/Client";
-import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed } from "../utils/models/EmbedBuilders";
 import ms = require("ms");
 
 const cmd = new Command("close", "close a support ticket", Categories.NONE);

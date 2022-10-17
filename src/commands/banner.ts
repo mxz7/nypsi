@@ -1,7 +1,7 @@
 import { CommandInteraction, GuildMember, Message } from "discord.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { getMember } from "../utils/functions/member";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders.js";
 
 const cmd = new Command("banner", "get a person's banner", Categories.INFO);
 

@@ -1,5 +1,5 @@
 import { GuildMember } from "discord.js";
-import prisma from "../../database/database";
+import prisma from "../../../init/database";
 
 const colorCache = new Map<string, `#${string}` | "default">();
 

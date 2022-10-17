@@ -1,7 +1,7 @@
 import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getPrefix, setPrefix } from "../utils/functions/guilds/utils";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("prefix", "change the bot's prefix", Categories.ADMIN).setPermissions(["MANAGE_GUILD"]);
 

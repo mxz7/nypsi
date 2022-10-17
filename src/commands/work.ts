@@ -1,11 +1,11 @@
+import { CommandInteraction, Message } from "discord.js";
 // @ts-expect-error doesnt like getting from json file
 import { workMessages } from "../../data/lists.json";
-import { CommandInteraction, Message } from "discord.js";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { ErrorEmbed, CustomEmbed } from "../utils/models/EmbedBuilders";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import { createUser, userExists } from "../utils/functions/economy/utils";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
+import { createUser, userExists } from "../utils/functions/economy/utils";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("work", "work a random job and safely earn a random amount of money", Categories.MONEY);
 

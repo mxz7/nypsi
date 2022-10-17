@@ -1,5 +1,5 @@
 import { Collection, Guild, GuildMember } from "discord.js";
-import chooseMember from "../workers/choosemember";
+import chooseMember from "./workers/choosemember";
 
 export async function getMember(guild: Guild, memberName: string): Promise<GuildMember> {
   if (!guild) return null;

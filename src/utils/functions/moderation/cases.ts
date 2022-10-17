@@ -1,6 +1,6 @@
 import { Guild } from "discord.js";
-import prisma from "../../database/database";
-import { PunishmentType } from "../../models/GuildStorage";
+import prisma from "../../../init/database";
+import { PunishmentType } from "../../../types/Moderation";
 import { addModLog, isModLogsEnabled } from "./logs";
 
 export async function getCaseCount(guild: Guild) {

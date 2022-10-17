@@ -1,11 +1,11 @@
 import { GuildMember } from "discord.js";
+import { NypsiClient } from "../models/Client";
+import { CustomEmbed } from "../models/EmbedBuilders";
+import { LogType } from "../types/Moderation";
 import { daysAgo, formatDate } from "../utils/functions/date";
 import { addLog, isLogsEnabled } from "../utils/functions/moderation/logs";
 import { setExpireDate, setTier } from "../utils/functions/premium/premium";
 import { fetchUsernameHistory } from "../utils/functions/users/history";
-import { NypsiClient } from "../utils/models/Client";
-import { CustomEmbed } from "../utils/models/EmbedBuilders";
-import { LogType } from "../utils/models/GuildStorage";
 
 export default async function guildMemberRemove(member: GuildMember) {
   if (await isLogsEnabled(member.guild)) {

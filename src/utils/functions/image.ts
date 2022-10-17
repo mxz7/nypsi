@@ -2,11 +2,11 @@ import { WholesomeImage, WholesomeSuggestion } from "@prisma/client";
 import { GuildMember, WebhookClient } from "discord.js";
 import ImgurClient from "imgur";
 import fetch from "node-fetch";
-import prisma from "../database/database";
+import prisma from "../../init/database";
+import { NypsiClient } from "../../models/Client";
+import { CustomEmbed } from "../../models/EmbedBuilders";
+import { RedditJSONPost } from "../../types/Reddit";
 import { logger } from "../logger";
-import { NypsiClient } from "../models/Client";
-import { CustomEmbed } from "../models/EmbedBuilders";
-import { RedditJSONPost } from "../models/Reddit";
 import { addProgress } from "./economy/achievements";
 import requestDM from "./requestdm";
 

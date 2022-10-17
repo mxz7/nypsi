@@ -1,6 +1,6 @@
 import * as Cluster from "discord-hybrid-sharding";
 import { GatewayIntentBits, Options, Partials } from "discord.js";
-import { NypsiClient } from "./utils/models/Client";
+import { NypsiClient } from "./models/Client";
 
 const client = new NypsiClient({
   allowedMentions: {
@@ -56,7 +56,7 @@ const client = new NypsiClient({
   partials: [Partials.Channel], // for direct messages
 });
 
-import { loadCommands } from "./utils/commandhandler";
+import { loadCommands } from "./utils/handlers/commandhandler";
 import { logger } from "./utils/logger";
 
 loadCommands();
