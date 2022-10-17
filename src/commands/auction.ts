@@ -529,7 +529,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     await addInventoryItem(auction.ownerId, auction.itemName, auction.itemAmount);
 
     if ((await getDmSettings(auction.ownerId)).auction) {
-      const embed = new CustomEmbed().setColor("#36393f");
+      const embed = new CustomEmbed().setColor(Constants.TRANSPARENT_EMBED_COLOR);
 
       embed.setDescription(
         `your auction for ${auction.itemAmount}x ${items[auction.itemName].emoji} ${

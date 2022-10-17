@@ -7,6 +7,7 @@ import { CustomEmbed } from "../../models/EmbedBuilders";
 import { NotificationPayload } from "../../types/Notification";
 import { addNotificationToQueue } from "../../utils/functions/users/notifications";
 import dayjs = require("dayjs");
+import Constants from "../../utils/Constants";
 
 (async () => {
   const userIds = await prisma.dMSettings.findMany({
@@ -30,7 +31,9 @@ import dayjs = require("dayjs");
   const data: NotificationPayload = {
     memberId: "boob",
     payload: {
-      embed: new CustomEmbed().setDescription("it has been more than 12 hours since you last voted").setColor("#36393f"),
+      embed: new CustomEmbed()
+        .setDescription("it has been more than 12 hours since you last voted")
+        .setColor(Constants.TRANSPARENT_EMBED_COLOR),
 
       components: new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()

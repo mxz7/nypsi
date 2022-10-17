@@ -6,6 +6,7 @@ import { Booster } from "../../../types/Economy";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { getItems } from "./utils";
 import _ = require("lodash");
+import Constants from "../../Constants";
 
 export async function getBoosters(member: GuildMember | string): Promise<Map<string, Booster[]>> {
   let id: string;
@@ -55,7 +56,7 @@ export async function getBoosters(member: GuildMember | string): Promise<Map<str
     }
 
     if (expired.size != 0 && (await getDmSettings(id)).booster) {
-      const embed = new CustomEmbed().setColor("#36393f");
+      const embed = new CustomEmbed().setColor(Constants.TRANSPARENT_EMBED_COLOR);
 
       let desc = "";
       let text = "";
@@ -145,7 +146,7 @@ export async function getBoosters(member: GuildMember | string): Promise<Map<str
   }
 
   if (expired.size != 0 && (await getDmSettings(id)).booster) {
-    const embed = new CustomEmbed().setColor("#36393f");
+    const embed = new CustomEmbed().setColor(Constants.TRANSPARENT_EMBED_COLOR);
 
     let desc = "";
     let text = "";

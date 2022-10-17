@@ -2,6 +2,7 @@ import prisma from "../../init/database";
 import redis from "../../init/redis";
 import { NypsiClient } from "../../models/Client";
 import { CustomEmbed } from "../../models/EmbedBuilders";
+import Constants from "../Constants";
 
 export async function getSupportRequestByChannelId(id: string) {
   const query = await prisma.supportRequest.findUnique({
@@ -96,7 +97,9 @@ export async function createSupportRequest(id: string, client: NypsiClient, user
     },
   });
 
-  const embed = new CustomEmbed().setColor("#36393f").setDescription(`support request for ${username} (${id})`);
+  const embed = new CustomEmbed()
+    .setColor(Constants.TRANSPARENT_EMBED_COLOR)
+    .setDescription(`support request for ${username} (${id})`);
 
   await sendToRequestChannel(id, embed, client);
 

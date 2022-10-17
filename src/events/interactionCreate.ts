@@ -17,6 +17,7 @@ import prisma from "../init/database";
 import { NypsiClient } from "../models/Client";
 import { createNypsiInteraction, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import Constants from "../utils/Constants";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
 import { addInventoryItem, getInventory } from "../utils/functions/economy/inventory";
 import { createUser, getAchievements, getItems, userExists } from "../utils/functions/economy/utils";
@@ -311,7 +312,7 @@ export default async function interactionCreate(interaction: Interaction) {
 
         if ((await getDmSettings(auction.ownerId)).auction) {
           const embedDm = new CustomEmbed()
-            .setColor("#36393f")
+            .setColor(Constants.TRANSPARENT_EMBED_COLOR)
             .setDescription(
               `your auction for ${auction.itemAmount}x ${items[auction.itemName].emoji} ${
                 items[auction.itemName].name
@@ -452,7 +453,7 @@ export default async function interactionCreate(interaction: Interaction) {
   if (!interaction.guild) {
     const embed = new CustomEmbed()
       .setHeader("nypsi")
-      .setColor("#36393f")
+      .setColor(Constants.TRANSPARENT_EMBED_COLOR)
       .setDescription(
         "unfortunately you can't do commands in direct messages ):\n\n" +
           "if you need support or help for nypsi, please join the official nypsi server: https://discord.gg/hJTDNST"
