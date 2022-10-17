@@ -7,7 +7,7 @@ import { addCooldown, inCooldown } from "../utils/functions/guilds/utils";
 import { getKarma } from "../utils/functions/karma/karma";
 import { getMember } from "../utils/functions/member";
 import { fetchUsernameHistory } from "../utils/functions/users/history";
-import workerSort from "../utils/workers/sort";
+import workerSort from "../utils/functions/workers/sort";
 
 const cmd = new Command("user", "view info about a user in the server", Categories.INFO).setAliases(["whois", "who"]);
 

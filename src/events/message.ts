@@ -30,8 +30,8 @@ import { encrypt } from "../utils/functions/string";
 import { createSupportRequest, getSupportRequest, sendToRequestChannel } from "../utils/functions/supportrequest";
 import { getLastCommand } from "../utils/functions/users/commands";
 import { mentionQueue, MentionQueueItem } from "../utils/functions/users/mentions";
+import doCollection from "../utils/functions/workers/mentions";
 import { logger } from "../utils/logger";
-import doCollection from "../utils/workers/mentions";
 import ms = require("ms");
 
 const dmCooldown = new Set<string>();
