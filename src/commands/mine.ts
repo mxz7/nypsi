@@ -140,16 +140,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
               mineItemsModified.push(i);
             }
           }
-        } else if (items[i].rarity == 3) {
-          const chance = Math.floor(Math.random() * 3);
-          if (chance == 2 && pickaxe != "wooden_pickaxe") {
-            for (let x = 0; x < 7; x++) {
-              mineItemsModified.push(i);
-            }
-          } else if (pickaxe == "diamond_pickaxe") {
-            for (let x = 0; x < 3; x++) {
-              mineItemsModified.push(i);
-            }
+        } else if (items[i].rarity == 3 && pickaxe != "wooden_pickaxe") {
+          for (let x = 0; x < 5; x++) {
+            mineItemsModified.push(i);
           }
         } else if (items[i].rarity == 2 && pickaxe != "wooden_pickaxe") {
           for (let x = 0; x < 10; x++) {
