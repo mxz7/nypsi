@@ -1,7 +1,7 @@
 import { Manager } from "discord-hybrid-sharding";
-import redis from "../init/redis";
-import requestDM from "./functions/requestdm";
-import { logger } from "./logger";
+import redis from "../../init/redis";
+import requestDM from "../functions/requestdm";
+import { logger } from "../logger";
 
 let active = false;
 let interval: NodeJS.Timer;
