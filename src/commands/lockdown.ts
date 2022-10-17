@@ -7,9 +7,9 @@ import {
   PermissionFlagsBits,
   PermissionsBitField,
 } from "discord.js";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command(
   "lockdown",

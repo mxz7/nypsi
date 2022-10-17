@@ -83,8 +83,6 @@ model Economy {
 
   dailyStreak Int @default(0)
 
-  inventory Json @default("{}")
-
   banned DateTime?
 
   auction_watch String[]

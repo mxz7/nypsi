@@ -1,12 +1,12 @@
 import { GuildMember } from "discord.js";
+import { CustomEmbed } from "../models/EmbedBuilders";
+import { LogType } from "../types/Moderation";
 import { daysAgo, formatDate } from "../utils/functions/date";
 import { createGuild, hasGuild, runCheck } from "../utils/functions/guilds/utils";
 import { addLog, isLogsEnabled } from "../utils/functions/moderation/logs";
 import { deleteMute, getMuteRole, isMuted } from "../utils/functions/moderation/mute";
 import { profileExists } from "../utils/functions/moderation/utils";
 import { fetchUsernameHistory } from "../utils/functions/users/history";
-import { CustomEmbed } from "../utils/models/EmbedBuilders";
-import { LogType } from "../utils/models/GuildStorage";
 
 const queue = new Set<string>();
 

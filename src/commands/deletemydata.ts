@@ -7,13 +7,13 @@ import {
   Message,
   MessageActionRowComponentBuilder,
 } from "discord.js";
-import { addCooldown, onCooldown } from "../utils/cooldownhandler.js";
-import prisma from "../utils/database/database.js";
+import prisma from "../init/database.js";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getGuildByUser } from "../utils/functions/economy/guilds.js";
 import { hasProfile } from "../utils/functions/users/utils.js";
+import { addCooldown, onCooldown } from "../utils/handlers/cooldownhandler.js";
 import { logger } from "../utils/logger";
-import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 import ms = require("ms");
 
 const cmd = new Command("deletemydata", "delete your data from nypsi's database", Categories.INFO);

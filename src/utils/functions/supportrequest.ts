@@ -1,7 +1,7 @@
-import prisma from "../database/database";
-import redis from "../database/redis";
-import { NypsiClient } from "../models/Client";
-import { CustomEmbed } from "../models/EmbedBuilders";
+import prisma from "../../init/database";
+import redis from "../../init/redis";
+import { NypsiClient } from "../../models/Client";
+import { CustomEmbed } from "../../models/EmbedBuilders";
 
 export async function getSupportRequestByChannelId(id: string) {
   const query = await prisma.supportRequest.findUnique({

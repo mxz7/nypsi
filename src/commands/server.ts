@@ -1,8 +1,8 @@
 import { CommandInteraction, Message } from "discord.js";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { CustomEmbed } from "../models/EmbedBuilders.js";
 import { formatDate } from "../utils/functions/date";
-import { getPeaks, inCooldown, addCooldown, runCheck } from "../utils/functions/guilds/utils";
-import { Command, Categories, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed } from "../utils/models/EmbedBuilders.js";
+import { addCooldown, getPeaks, inCooldown, runCheck } from "../utils/functions/guilds/utils";
 
 const cmd = new Command("server", "view information about the server", Categories.INFO).setAliases([
   "serverinfo",

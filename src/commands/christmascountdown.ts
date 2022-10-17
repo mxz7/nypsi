@@ -1,4 +1,6 @@
 import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { daysUntilChristmas } from "../utils/functions/date";
 import {
   checkChristmasCountdown,
@@ -8,8 +10,6 @@ import {
   setChristmasCountdown,
 } from "../utils/functions/guilds/christmas";
 import { getPrefix } from "../utils/functions/guilds/utils";
-import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
 
 const cmd = new Command("christmascountdown", "create a christmas countdown", Categories.ADMIN)
   .setAliases(["christmas", "xmas"])

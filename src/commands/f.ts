@@ -6,9 +6,9 @@ import {
   Message,
   MessageActionRowComponentBuilder,
 } from "discord.js";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("f", "pay your respects", Categories.FUN);
 

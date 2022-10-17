@@ -1,9 +1,9 @@
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
-import { getResponse, onCooldown } from "../utils/cooldownhandler";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { CustomEmbed } from "../models/EmbedBuilders";
 import { getBoosters } from "../utils/functions/economy/boosters";
 import { getItems } from "../utils/functions/economy/utils";
-import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed } from "../utils/models/EmbedBuilders";
+import { getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("boosters", "view your current active boosters", Categories.MONEY).setAliases(["booster"]);
 

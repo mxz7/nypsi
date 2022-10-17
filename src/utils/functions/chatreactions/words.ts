@@ -1,6 +1,6 @@
 import { Guild } from "discord.js";
 import * as fs from "fs/promises";
-import prisma from "../../database/database";
+import prisma from "../../../init/database";
 
 export async function getWords(guild: Guild) {
   const query = await prisma.chatReaction.findUnique({

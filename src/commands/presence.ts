@@ -1,8 +1,8 @@
 import { CommandInteraction, Message } from "discord.js";
+import { NypsiClient } from "../models/Client";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import Constants from "../utils/Constants";
 import { setCustomPresence } from "../utils/functions/presence";
-import { NypsiClient } from "../utils/models/Client";
-import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
 
 const cmd = new Command("presence", "set custom a presence for nypsi", Categories.NONE);
 

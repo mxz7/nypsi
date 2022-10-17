@@ -1,5 +1,5 @@
 import { GuildMember } from "discord.js";
-import prisma from "../../database/database";
+import prisma from "../../../init/database";
 import ms = require("ms");
 
 const lastKnownTagCooldown = new Set<string>();

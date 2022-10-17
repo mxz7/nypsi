@@ -1,10 +1,10 @@
 import { CommandInteraction, Message } from "discord.js";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { redditImage } from "../utils/functions/image";
-import { images } from "../utils/imghandler";
-import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders.js";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import { images } from "../utils/handlers/imghandler";
 
 const cmd = new Command("duck", "get a random picture of a duck", Categories.ANIMALS).setAliases(["notdick"]);
 

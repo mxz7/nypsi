@@ -1,8 +1,8 @@
 import { Guild } from "discord.js";
-import prisma from "../../database/database";
-import redis from "../../database/redis";
+import prisma from "../../../init/database";
+import redis from "../../../init/redis";
+import { SnipedMessage } from "../../../types/Snipe";
 import { logger } from "../../logger";
-import { SnipedMessage } from "../../models/Snipe";
 
 const snipe: Map<string, SnipedMessage> = new Map();
 const eSnipe: Map<string, SnipedMessage> = new Map();

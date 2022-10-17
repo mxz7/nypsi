@@ -1,12 +1,12 @@
 import { CommandInteraction, Message } from "discord.js";
-import { startRestart } from "../utils/commandhandler";
+import redis from "../init/redis";
+import { NypsiClient } from "../models/Client";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { CustomEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
-import redis from "../utils/database/redis";
 import { setCustomPresence } from "../utils/functions/presence";
+import { startRestart } from "../utils/handlers/commandhandler";
 import { logger } from "../utils/logger";
-import { NypsiClient } from "../utils/models/Client";
-import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed } from "../utils/models/EmbedBuilders.js";
 
 const cmd = new Command("restart", "restart", Categories.NONE).setPermissions(["bot owner"]);
 

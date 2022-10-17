@@ -12,21 +12,21 @@ import {
 } from "discord.js";
 import { cpu } from "node-os-utils";
 import * as os from "os";
-import { addCooldown, getResponse, onCooldown } from "../utils/cooldownhandler";
-import prisma from "../utils/database/database";
-import redis from "../utils/database/redis";
+import prisma from "../init/database";
+import redis from "../init/redis";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { MStoTime } from "../utils/functions/date";
-import { Categories, Command, NypsiCommandInteraction } from "../utils/models/Command";
-import { CustomEmbed, ErrorEmbed } from "../utils/models/EmbedBuilders";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 // @ts-expect-error typescript doesnt like opening package.json
 import { version } from "../../package.json";
 import { workerCount } from "../events/message";
-import { aliasesSize, commandsSize } from "../utils/commandhandler";
+import { NypsiClient } from "../models/Client";
 import Constants from "../utils/Constants";
 import { getStats } from "../utils/functions/economy/stats";
 import { getCommandUses } from "../utils/functions/users/commands";
 import { mentionQueue } from "../utils/functions/users/mentions";
-import { NypsiClient } from "../utils/models/Client";
+import { aliasesSize, commandsSize } from "../utils/handlers/commandhandler";
 
 const cmd = new Command("stats", "view your nypsi stats", Categories.MONEY);
 
