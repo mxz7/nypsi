@@ -50,7 +50,7 @@ export function listen(manager: Manager) {
 
   app.listen(process.env.EXPRESS_PORT || 5000);
 
-  logger.info("listening for votes..");
+  logger.info(`listening on port ${process.env.EXPRESS_PORT || 5000}`);
 }
 
 async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
