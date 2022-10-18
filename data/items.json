@@ -46,7 +46,7 @@
     "emoji": "<:nypsi_coal:959442471388082176>",
     "longDesc": "can be used to smelt 1 ore in a furnace",
     "role": "fuel",
-    "rarity": 1,
+    "rarity": 0,
     "buy": 3000,
     "sell": 1500
   },
