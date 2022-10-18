@@ -35,9 +35,6 @@ export function listen(manager: Manager) {
   );
 
   app.post("/kofi", async (req, response) => {
-    console.log(req.body);
-    console.log(JSON.parse(req.body.data));
-
     const data = JSON.parse(req.body.data) as KofiResponse;
 
     console.log(data);
