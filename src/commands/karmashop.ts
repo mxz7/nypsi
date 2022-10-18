@@ -107,7 +107,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const itemIDs = Array.from(Object.keys(items));
 
   if (args.length == 0 || args.length == 1) {
-    inPlaceSort(itemIDs).asc((i) => items[i].cost);
+    inPlaceSort(itemIDs).desc((i) => items[i].items_left);
 
     const pages: string[][] = [];
 

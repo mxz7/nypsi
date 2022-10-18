@@ -411,7 +411,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       });
 
       if (fail) {
-        return res.message.edit({ embeds: [new ErrorEmbed("that email has already been set")] });
+        return res.message.edit({ embeds: [new ErrorEmbed("that email has already been set")], components: [] });
       }
 
       checkPurchases(message.author.id, message.client as NypsiClient);
