@@ -23,6 +23,7 @@ const app = express();
 const webhook = new topgg.Webhook("123");
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 export function listen(manager: Manager) {
   app.post(
