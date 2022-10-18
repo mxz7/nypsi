@@ -8,14 +8,19 @@ import {
   InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
+  ModalBuilder,
   SelectMenuOptionBuilder,
+  TextInputBuilder,
+  TextInputStyle,
 } from "discord.js";
+import { NypsiClient } from "../models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { calcMaxBet, getDefaultBet, getRequiredBetForXp, setDefaultBet } from "../utils/functions/economy/balance";
 import { createUser, formatNumber, userExists } from "../utils/functions/economy/utils";
 import { setSlashOnly } from "../utils/functions/guilds/slash";
 import { cleanString } from "../utils/functions/string";
+import { checkPurchases, getEmail, setEmail } from "../utils/functions/users/email";
 import { getLastfmUsername, setLastfmUsername } from "../utils/functions/users/lastfm";
 import { getDmSettings, getNotificationsData, updateDmSettings } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -39,6 +44,7 @@ cmd.slashData
             option.setName("bet").setDescription("type reset to disable your default bet").setRequired(false)
           )
       )
+      .addSubcommand((email) => email.setName("email").setDescription("get/set your email for purchases"))
   )
   .addSubcommand((lastfm) =>
     lastfm
@@ -322,6 +328,98 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({ embeds: [embed] });
   };
 
+  const doEmail = async () => {
+    const email = await getEmail(message.author.id);
+
+    const embed = new CustomEmbed(message.member);
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder().setCustomId("setemail").setLabel("set email").setStyle(ButtonStyle.Success)
+    );
+
+    if (email) {
+      embed.setDescription(
+        "your email has been set. if you would like to view it, use the button below. this will be sent in your dms."
+      );
+      row.addComponents(new ButtonBuilder().setCustomId("viewemail").setLabel("view email").setStyle(ButtonStyle.Danger));
+    } else {
+      embed.setDescription(
+        "your email as not been set. use the button to set it below via form. this will not be shared with anyone.\n\nnypsi uses your email address for purchases only. if you do not intend to make any purchases, do not set your email address."
+      );
+    }
+
+    const msg = await send({ embeds: [embed], components: [row] });
+
+    const filter = (i: Interaction) => i.user.id == message.author.id;
+
+    const res = await msg.awaitMessageComponent({ filter, time: 15_000 }).catch(() => {});
+
+    if (!res || !res.isButton()) {
+      return msg.edit({ components: [] });
+    }
+
+    if (res.customId == "viewemail") {
+      await res.deferUpdate();
+
+      let fail = false;
+
+      await message.author.send({ embeds: [new CustomEmbed(message.member, `your email: \`${email}\``)] }).catch(() => {
+        fail = true;
+      });
+
+      if (fail) {
+        return msg.edit({
+          embeds: [new CustomEmbed(message.member, "please turn on your direct messages")],
+          components: [],
+        });
+      }
+
+      return msg.edit({ embeds: [new CustomEmbed(message.member, "sent in dms")], components: [] });
+    } else if (res.customId == "setemail") {
+      const modal = new ModalBuilder()
+        .setCustomId("email")
+        .setTitle("email")
+        .addComponents(
+          new ActionRowBuilder<TextInputBuilder>().addComponents(
+            new TextInputBuilder()
+              .setCustomId("emailtext")
+              .setLabel("enter your email below")
+              .setPlaceholder("nypsi@example.com")
+              .setStyle(TextInputStyle.Short)
+              .setRequired(true)
+              .setMaxLength(50)
+          )
+        );
+
+      await res.showModal(modal);
+
+      const modalSubmit = await res.awaitModalSubmit({ filter, time: 90_000 }).catch(() => {});
+
+      if (!modalSubmit) return;
+
+      if (!modalSubmit.isModalSubmit()) return;
+
+      const value = modalSubmit.fields.fields.first().value;
+
+      if (!value) return;
+
+      let fail = false;
+
+      await modalSubmit.deferUpdate();
+
+      await setEmail(message.author.id, value.toLowerCase()).catch(() => {
+        fail = true;
+      });
+
+      if (fail) {
+        return res.message.edit({ embeds: [new ErrorEmbed("that email has already been set")] });
+      }
+
+      checkPurchases(message.author.id, message.client as NypsiClient);
+
+      return res.message.edit({ embeds: [new CustomEmbed(message.member, "✅ your email has been set")], components: [] });
+    }
+  };
+
   if (args.length == 0) {
     return send({ embeds: [new CustomEmbed(message.member, "/settings me\n/settings server")] });
   } else if (args[0].toLowerCase() == "me") {
@@ -331,6 +429,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return defaultBet();
     } else if (args[1].toLowerCase() == "lastfm") {
       return setLastFm();
+    } else if (args[1].toLowerCase() == "email") {
+      return doEmail();
     }
   } else if (args[0].toLowerCase() == "server") {
     if (args[1].toLowerCase() == "slash-only") {

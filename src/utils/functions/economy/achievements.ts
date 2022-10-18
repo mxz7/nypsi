@@ -2,6 +2,7 @@ import { Collection, EmbedBuilder, Guild, GuildMember, WebhookClient } from "dis
 import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
+import Constants from "../../Constants";
 import { getLastKnownTag } from "../users/tag";
 import workerSort from "../workers/sort";
 import { getAchievements } from "./utils";
@@ -126,7 +127,7 @@ async function completeAchievement(userId: string, achievementId: string) {
     )
     .setFooter({ text: `completed by ${completed.toLocaleString()} ${completed == 1 ? "person" : "people"}` })
     .setTimestamp()
-    .setColor("#36393f");
+    .setColor(Constants.TRANSPARENT_EMBED_COLOR);
 
   const hook = new WebhookClient({ url: process.env.ACHIEVEMENTS_HOOK });
 

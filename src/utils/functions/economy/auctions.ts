@@ -6,6 +6,7 @@ import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { getItems } from "./utils";
 import ms = require("ms");
+import Constants from "../../Constants";
 
 export async function getAuctions(member: GuildMember | string) {
   let id: string;
@@ -163,7 +164,9 @@ export async function bumpAuction(id: string, client: NypsiClient) {
     },
   });
 
-  const embed = new CustomEmbed().setColor("#36393f").setHeader(`${query.owner.lastKnownTag.split("#")[0]}'s auction`);
+  const embed = new CustomEmbed()
+    .setColor(Constants.TRANSPARENT_EMBED_COLOR)
+    .setHeader(`${query.owner.lastKnownTag.split("#")[0]}'s auction`);
 
   const items = getItems();
 
@@ -304,7 +307,7 @@ async function checkWatchers(itemName: string, messageUrl: string, creatorId: st
   const payload = {
     payload: {
       embed: new CustomEmbed()
-        .setColor("#36393f")
+        .setColor(Constants.TRANSPARENT_EMBED_COLOR)
         .setDescription(`an auction has started for ${getItems()[itemName].emoji} **${getItems()[itemName].name}**`),
       components: new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder().setStyle(ButtonStyle.Link).setURL(messageUrl).setLabel("jump")

@@ -33,6 +33,7 @@ import doCollection from "../utils/functions/workers/mentions";
 import { runCommand } from "../utils/handlers/commandhandler";
 import { logger } from "../utils/logger";
 import ms = require("ms");
+import Constants from "../utils/Constants";
 
 const dmCooldown = new Set<string>();
 
@@ -62,7 +63,7 @@ export default async function messageCreate(message: Message) {
 
       const embed = new CustomEmbed()
         .setHeader("support")
-        .setColor("#36393f")
+        .setColor(Constants.TRANSPARENT_EMBED_COLOR)
         .setDescription(
           "if you need support, click the button below or join the [**official nypsi server**](https://discord.gg/hJTDNST)"
         );
@@ -100,7 +101,9 @@ export default async function messageCreate(message: Message) {
         }
       }
     } else {
-      const embed = new CustomEmbed().setHeader(message.author.tag, message.author.avatarURL()).setColor("#36393f");
+      const embed = new CustomEmbed()
+        .setHeader(message.author.tag, message.author.avatarURL())
+        .setColor(Constants.TRANSPARENT_EMBED_COLOR);
 
       if (message.content) {
         embed.setDescription(message.content);
@@ -121,7 +124,7 @@ export default async function messageCreate(message: Message) {
 
     const embed = new CustomEmbed()
       .setHeader("nypsi")
-      .setColor("#36393f")
+      .setColor(Constants.TRANSPARENT_EMBED_COLOR)
       .setDescription(
         "unfortunately you can't do commands in direct messages ):\n\n" +
           "if you need support or help for nypsi, please join the official nypsi server: https://discord.gg/hJTDNST"
