@@ -7,6 +7,7 @@ import { addNotificationToQueue, getDmSettings } from "../../utils/functions/use
 import { logger } from "../../utils/logger";
 import ms = require("ms");
 import dayjs = require("dayjs");
+import Constants from "../../utils/Constants";
 
 async function doWorkerThing() {
   const query = await prisma.economyWorker.findMany({
@@ -67,11 +68,13 @@ async function doWorkerThing() {
 
     if (full.length == workers.length) {
       data.payload.content = "all of your workers are full";
-      data.payload.embed = new CustomEmbed().setDescription("all of your workers are full").setColor("#36393f");
+      data.payload.embed = new CustomEmbed()
+        .setDescription("all of your workers are full")
+        .setColor(Constants.TRANSPARENT_EMBED_COLOR);
     } else if (full.length == 1) {
       data.payload.embed = new CustomEmbed()
         .setDescription(`your ${getBaseWorkers()[full[0]].item_emoji} ${getBaseWorkers()[full[0]].name} is full`)
-        .setColor("#36393f");
+        .setColor(Constants.TRANSPARENT_EMBED_COLOR);
     } else {
       data.payload.content = `${full.length} of your workers are full`;
       data.payload.embed = new CustomEmbed()
@@ -79,7 +82,7 @@ async function doWorkerThing() {
           full.map((workerId) => `${getBaseWorkers()[workerId].item_emoji} ${getBaseWorkers()[workerId].name}`).join("\n")
         )
         .setHeader("full workers:")
-        .setColor("#36393f")
+        .setColor(Constants.TRANSPARENT_EMBED_COLOR)
         .setFooter({ text: "/settings me notifications" });
     }
 

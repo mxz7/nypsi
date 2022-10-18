@@ -3,6 +3,7 @@ import ms = require("ms");
 import prisma from "../../init/database";
 import { NypsiClient } from "../../models/Client";
 import { CustomEmbed } from "../../models/EmbedBuilders";
+import Constants from "../../utils/Constants";
 import { deleteAuction } from "../../utils/functions/economy/auctions";
 import { addInventoryItem } from "../../utils/functions/economy/inventory";
 import { getItems, userExists } from "../../utils/functions/economy/utils";
@@ -35,7 +36,7 @@ export async function runAuctionChecks(client: NypsiClient) {
 
       await addInventoryItem(auction.ownerId, auction.itemName, auction.itemAmount, false);
 
-      const embed = new CustomEmbed().setColor("#36393f");
+      const embed = new CustomEmbed().setColor(Constants.TRANSPARENT_EMBED_COLOR);
 
       embed.setDescription(
         `your auction for ${auction.itemAmount}x ${items[auction.itemName].emoji} ${

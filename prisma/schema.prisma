@@ -16,6 +16,7 @@ model User {
   lastCommand    DateTime
   tracking       Boolean  @default(true)
   lastfmUsername String?
+  email          String?  @unique
 
   Economy            Economy?
   Premium            Premium?
@@ -435,4 +436,11 @@ model Mention {
 model SupportRequest {
   userId    String @id
   channelId String @unique
+}
+
+model KofiPurchases {
+  id String @id @default(uuid())
+
+  email String
+  item  String
 }
