@@ -5,20 +5,24 @@ import prisma from "../../init/database";
 import redis from "../../init/redis";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 import { KofiResponse } from "../../types/Kofi";
+import { NotificationPayload } from "../../types/Notification";
+import Constants from "../Constants";
 import { getBalance, updateBalance } from "../functions/economy/balance";
 import { addInventoryItem } from "../functions/economy/inventory";
 import { getPrestige } from "../functions/economy/prestige";
 import { addTicket, getTickets, userExists } from "../functions/economy/utils";
 import { addKarma, getKarma } from "../functions/karma/karma";
-import { getTier, isPremium } from "../functions/premium/premium";
+import { addMember, getPremiumProfile, getTier, isPremium, renewUser, setTier } from "../functions/premium/premium";
 import requestDM from "../functions/requestdm";
-import { getDmSettings } from "../functions/users/notifications";
+import { addNotificationToQueue, getDmSettings } from "../functions/users/notifications";
 import { logger } from "../logger";
 import ms = require("ms");
 import dayjs = require("dayjs");
 
 const app = express();
 const webhook = new topgg.Webhook("123");
+
+app.use(express.json());
 
 export function listen(manager: Manager) {
   app.post(
@@ -29,13 +33,17 @@ export function listen(manager: Manager) {
     })
   );
 
-  app.post("/kofi", async (res: KofiResponse) => {
-    console.log(res);
+  app.post("/kofi", async (req, response) => {
+    const data = req.body as KofiResponse;
 
-    if (res.verification_token != process.env.KOFI_VERIFICATION) {
+    response.send(req.body);
+
+    if (data.verification_token != process.env.KOFI_VERIFICATION) {
       logger.warn("received faulty kofi data");
-      return logger.warn(res);
+      return logger.warn(data);
     }
+
+    return handleKofiData(data);
   });
 
   app.listen(process.env.EXPRESS_PORT || 5000);
@@ -157,5 +165,60 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
     } else {
       logger.warn(`failed to send vote confirmation to ${user}`);
     }
+  }
+}
+
+async function handleKofiData(data: KofiResponse) {
+  const user = await prisma.user.findUnique({
+    where: {
+      email: data.email,
+    },
+  });
+
+  const item = Constants.KOFI_PRODUCTS.get(data.shop_items[0]?.direct_link_code || data.tier_name.toLowerCase());
+
+  if (!item) {
+    logger.error("invalid item");
+    return logger.error(data);
+  }
+
+  const premiums = ["platinum", "gold", "silver", "bronze"].reverse();
+
+  if (user) {
+    if (premiums.includes(item)) {
+      if (await isPremium(user.id)) {
+        if ((await getPremiumProfile(user.id)).getLevelString().toLowerCase() != item) {
+          await setTier(user.id, premiums.indexOf(item) + 1);
+          await renewUser(user.id);
+        } else {
+          await renewUser(user.id);
+        }
+      } else {
+        await addMember(user.id, premiums.indexOf(item) + 1);
+      }
+    } else {
+      await addInventoryItem(user.id, item, 1, false);
+
+      if ((await getDmSettings(user.id)).premium) {
+        const payload: NotificationPayload = {
+          memberId: user.id,
+          payload: {
+            content: "thank you for your purchase",
+            embed: new CustomEmbed()
+              .setDescription(`you have received 1 ${item}`)
+              .setColor(Constants.TRANSPARENT_EMBED_COLOR),
+          },
+        };
+
+        await addNotificationToQueue(payload);
+      }
+    }
+  } else {
+    await prisma.kofiPurchases.create({
+      data: {
+        email: data.email,
+        item: item,
+      },
+    });
   }
 }
