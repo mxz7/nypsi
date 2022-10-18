@@ -3,6 +3,7 @@ import { NypsiClient } from "../../../models/Client";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { NotificationPayload } from "../../../types/Notification";
 import Constants from "../../Constants";
+import { logger } from "../../logger";
 import { addInventoryItem } from "../economy/inventory";
 import { getItems } from "../economy/utils";
 import { addMember, getPremiumProfile, isPremium, renewUser, setTier } from "../premium/premium";
@@ -49,6 +50,8 @@ export async function checkPurchases(id: string, client: NypsiClient) {
   const premiums = ["platinum", "gold", "silver", "bronze"].reverse();
 
   for (const item of query) {
+    logger.info(item);
+
     if (premiums.includes(item.item)) {
       if (await isPremium(id)) {
         if ((await getPremiumProfile(id)).getLevelString().toLowerCase() != item.item) {
