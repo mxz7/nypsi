@@ -343,7 +343,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       row.addComponents(new ButtonBuilder().setCustomId("viewemail").setLabel("view email").setStyle(ButtonStyle.Danger));
     } else {
       embed.setDescription(
-        "your email as not been set. use the email to set it below via form. this will not be shared with anyone.\n\nnypsi uses your email address for purchases only. if you do not intend to make any purchases, do not set your email address."
+        "your email as not been set. use the button to set it below via form. this will not be shared with anyone.\n\nnypsi uses your email address for purchases only. if you do not intend to make any purchases, do not set your email address."
       );
     }
 
