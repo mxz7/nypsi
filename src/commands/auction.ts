@@ -1,3 +1,4 @@
+import dayjs = require("dayjs");
 import {
   ActionRowBuilder,
   BaseMessageOptions,
@@ -28,7 +29,9 @@ import {
   setAuctionWatch,
 } from "../utils/functions/economy/auctions";
 import { addInventoryItem, getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
+import { getPrestige } from "../utils/functions/economy/prestige";
 import { formatBet, getItems, userExists } from "../utils/functions/economy/utils";
+import { getXp } from "../utils/functions/economy/xp";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import requestDM from "../utils/functions/requestdm";
 import { getDmSettings } from "../utils/functions/users/notifications";
@@ -99,6 +102,20 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   }
 
   await addCooldown(cmd.name, message.member, 10);
+
+  if (message.author.createdTimestamp > dayjs().subtract(1, "day").unix() * 1000) {
+    return send({
+      embeds: [new ErrorEmbed("you cannot use this command yet. u might be an alt. or a bot 😳")],
+    });
+  }
+
+  if ((await getPrestige(message.member)) < 1) {
+    if ((await getXp(message.member)) < 100) {
+      return send({
+        embeds: [new ErrorEmbed("you need at least 100xp before you can create an auction")],
+      });
+    }
+  }
 
   const items = getItems();
 
