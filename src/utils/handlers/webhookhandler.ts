@@ -175,7 +175,7 @@ async function handleKofiData(data: KofiResponse) {
     },
   });
 
-  logger.info(`received kofi purchase. email: ${data.email}. item ${data.tier_name || JSON.stringify(data.shop_items)}`);
+  logger.info(`received kofi purchase for email: ${data.email} item ${data.tier_name || JSON.stringify(data.shop_items)}`);
 
   if (data.type.toLowerCase() == "shop order") {
     for (const shopItem of data.shop_items) {
@@ -230,15 +230,25 @@ async function handleKofiData(data: KofiResponse) {
       return logger.error(data);
     }
 
-    if (await isPremium(user.id)) {
-      if ((await getPremiumProfile(user.id)).getLevelString().toLowerCase() != item) {
-        await setTier(user.id, premiums.indexOf(item) + 1);
-        await renewUser(user.id);
+    if (user) {
+      if (await isPremium(user.id)) {
+        if ((await getPremiumProfile(user.id)).getLevelString().toLowerCase() != item) {
+          await setTier(user.id, premiums.indexOf(item) + 1);
+          await renewUser(user.id);
+        } else {
+          await renewUser(user.id);
+        }
       } else {
-        await renewUser(user.id);
+        await addMember(user.id, premiums.indexOf(item) + 1);
       }
     } else {
-      await addMember(user.id, premiums.indexOf(item) + 1);
+      await prisma.kofiPurchases.create({
+        data: {
+          email: data.email,
+          item: item,
+        },
+      });
+      logger.info(`created purchase for ${data.email} ${item}`);
     }
   }
 }
