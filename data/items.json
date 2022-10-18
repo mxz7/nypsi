@@ -995,5 +995,22 @@
     "sell": 100000,
     "role": "worker-upgrade",
     "worker_upgrade_id": "underage_workers"
+  },
+  "grandma": {
+    "id": "grandma",
+    "name": "grandma",
+    "aliases": ["gran", "nan", "uncle"],
+    "emoji": "👵🏻",
+    "longDesc": "grandma will help you bake more cookies",
+    "rarity": 1,
+    "sell": 100000,
+    "role": "booster",
+    "stackable": true,
+    "max": 5,
+    "boosterEffect": {
+      "boosts": ["cookie"],
+      "effect": 1,
+      "time": 7200
+    }
   }
 }
