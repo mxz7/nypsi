@@ -78,7 +78,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const failed: string[] = [];
 
   for (const arg of args) {
-    if (arg.length == 18) {
+    if (arg.length == 18 || args.length == 19) {
       await message.guild.members
         .unban(arg, message.member.user.tag)
         .then(async (user) => {

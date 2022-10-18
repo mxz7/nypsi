@@ -78,7 +78,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   } else {
     const members = message.guild.members.cache;
 
-    if (args[0].length == 18) {
+    if (args[0].length == 18 || args[0].length == 19) {
       member = members.find((m) => m.user.id == args[0]);
 
       if (!member) {

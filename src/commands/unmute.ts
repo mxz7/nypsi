@@ -64,7 +64,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({ embeds: [new ErrorEmbed(`${prefix}unmute <@user(s)>`)] });
   }
 
-  if (args[0].length == 18 && message.mentions.members.first() == null) {
+  if ((await message.guild.members.fetch(args[0]).catch(() => {})) && message.mentions.members.first() == null) {
     let members;
 
     if (inCooldown(message.guild)) {
