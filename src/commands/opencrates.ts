@@ -54,7 +54,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       let amount = 0;
       while (amount < inventory.find((i) => i.item == item.item).amount) {
         if (item.item == "nypsi_crate") {
-          if (crates.length != 0 && max != 5) continue;
+          if (crates.length != 0 && max != 5) break;
 
           max = 5;
         }
