@@ -9,7 +9,7 @@ const locked: string[] = [];
 
 const colors = ["deeppink", "green", "red", "blue"];
 
-const generator = new CaptchaGenerator().setDecoy({ opacity: 0.5, total: 5 });
+const generator = new CaptchaGenerator().setDecoy({ opacity: 0.6, total: 15 });
 
 const captchaFails = new Map<string, number>();
 const captchaPasses = new Map<string, number>();
