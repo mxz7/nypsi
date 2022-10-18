@@ -183,7 +183,7 @@ async function handleKofiData(data: KofiResponse) {
 
   logger.info(`received kofi purchase for email: ${data.email} item ${data.tier_name || JSON.stringify(data.shop_items)}`);
 
-  if (data.type.toLowerCase() == "shop order") {
+  if (data.shop_items && data.shop_items.length > 0) {
     for (const shopItem of data.shop_items) {
       const item = Constants.KOFI_PRODUCTS.get(shopItem.direct_link_code);
 
@@ -221,11 +221,13 @@ async function handleKofiData(data: KofiResponse) {
         logger.info(`created purchase for ${data.email} ${item}`);
       }
     }
-  } else if (data.type.toLowerCase() == "subscription") {
+  }
+
+  if (data.tier_name) {
     const item = Constants.KOFI_PRODUCTS.get(data.tier_name.toLowerCase());
 
     if (!item) {
-      logger.error("invalid item");
+      logger.error(`invalid tier: ${data.tier_name}`);
       return logger.error(data);
     }
 
