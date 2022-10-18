@@ -19,6 +19,7 @@ import prisma from "../init/database";
 import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import Constants from "../utils/Constants";
 import { userExists } from "../utils/functions/economy/utils";
 import { checkMessageContent } from "../utils/functions/guilds/filters";
 import { isSlashOnly } from "../utils/functions/guilds/slash";
@@ -33,7 +34,6 @@ import doCollection from "../utils/functions/workers/mentions";
 import { runCommand } from "../utils/handlers/commandhandler";
 import { logger } from "../utils/logger";
 import ms = require("ms");
-import Constants from "../utils/Constants";
 
 const dmCooldown = new Set<string>();
 
@@ -242,8 +242,8 @@ export default async function messageCreate(message: Message) {
                 }
               }
             } catch {
-              // always a public thread channel
-              console.log(await (message.channel as ThreadChannel).members.fetch());
+              const members = await (message.channel as ThreadChannel).members.fetch();
+              if (!Array.from(members.keys()).includes(message.mentions.members.first().id)) return;
               return;
             }
 
