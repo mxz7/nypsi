@@ -36,7 +36,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (message.mentions.roles.first()) {
     role = message.mentions.roles.first();
-  } else if (args[0].length == 18 && parseInt(args[0])) {
+  } else if (!(await message.guild.roles.fetch(args[0]).catch(() => {})) && parseInt(args[0])) {
     role = roles.find((r) => r.id == args[0]);
   } else {
     role = roles.find((r) => r.name.toLowerCase().includes(args.join(" ").toLowerCase()));

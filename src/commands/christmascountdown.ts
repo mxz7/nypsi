@@ -68,7 +68,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         name: "christmas",
       });
     } else {
-      if (args[1].length != 18) {
+      if (!(await message.guild.channels.fetch(channel))) {
         if (message.mentions.channels.first()) {
           channel = message.mentions.channels.first();
         } else {
@@ -188,7 +188,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     let channel;
 
-    if (args[1].length != 18) {
+    if (!(await message.guild.channels.fetch(channel).catch(() => {}))) {
       if (message.mentions.channels.first()) {
         channel = message.mentions.channels.first();
       } else {

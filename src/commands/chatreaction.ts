@@ -293,7 +293,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         let user: string | GuildMember = args[2];
 
-        if (user.length != 18) {
+        if (!(await message.guild.members.fetch(user))) {
           if (!message.mentions.members.first()) {
             return send({
               embeds: [
@@ -335,7 +335,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         let user = args[2];
 
-        if (user.length != 18) {
+        if (!(await message.guild.members.fetch(user))) {
           if (!message.mentions.members.first()) {
             return send({
               embeds: [
@@ -479,7 +479,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       if (args[1].toLowerCase() == "channel" || args[1].toLowerCase() == "channels") {
         let channel: string | Channel = args[2];
 
-        if (channel.length != 18) {
+        if (!(await message.guild.channels.fetch(channel).catch(() => {}))) {
           if (!message.mentions.channels.first()) {
             return send({
               embeds: [

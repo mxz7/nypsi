@@ -65,7 +65,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   } else {
     let channel: string | Channel = args[0];
 
-    if (channel.length != 18) {
+    if (!(await message.guild.channels.fetch(args[0]).catch(() => {}))) {
       if (!message.mentions.channels.first()) {
         return message.channel.send({
           embeds: [

@@ -129,10 +129,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (message.mentions.members.first()) {
       member = message.mentions.members.first();
     } else {
-      const members = message.guild.members.cache;
-
-      if (args[0].length == 18) {
-        member = members.find((m) => m.user.id == args[0]);
+      if (await message.guild.members.fetch(args[0]).catch(() => {})) {
+        member = await message.guild.members.fetch(args[0]);
 
         if (!member) {
           return message.channel.send({

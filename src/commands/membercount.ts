@@ -192,7 +192,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     let channel;
 
-    if (args[1].length != 18) {
+    if (!(await message.guild.channels.fetch(args[1]).catch(() => {}))) {
       if (message.mentions.channels.first()) {
         channel = message.mentions.channels.first();
       } else {
