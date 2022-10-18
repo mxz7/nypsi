@@ -336,12 +336,19 @@ export async function openCrate(member: GuildMember, item: Item): Promise<string
 
     for (const i of crateItems) {
       if (items[i]) {
+        if (item.id == "nypsi_crate" && items[i].role == "collectable") {
+          const chance = Math.floor(Math.random() * 3);
+
+          if (chance != 2) continue;
+        }
         if (items[i].rarity == 4) {
           const chance = Math.floor(Math.random() * 15);
           if (chance == 4) {
             crateItemsModified.push(i);
           } else if (chance > 7 && item.id == "nypsi_crate") {
-            crateItemsModified.push(i);
+            for (let x = 0; x < 3; x++) {
+              crateItemsModified.push(i);
+            }
           }
         } else if (items[i].rarity == 3) {
           const chance = Math.floor(Math.random() * 3);
@@ -361,7 +368,7 @@ export async function openCrate(member: GuildMember, item: Item): Promise<string
           crateItemsModified.push(i);
         } else if (items[i].rarity == 1) {
           for (let x = 0; x < 2; x++) {
-            if (items[i].role == "collectable") {
+            if (items[i].role == "collectable" && item.id != "nypsi_crate") {
               const chance = Math.floor(Math.random() * 3);
 
               if (chance == 2) {
@@ -385,6 +392,12 @@ export async function openCrate(member: GuildMember, item: Item): Promise<string
           crateItemsModified.push(i);
         }
       } else {
+        if (item.id == "nypsi_crate") {
+          for (let x = 0; x < 7; x++) {
+            crateItemsModified.push("money:10000000");
+            crateItemsModified.push("xp:500");
+          }
+        }
         for (let x = 0; x < 2; x++) {
           crateItemsModified.push(i);
           crateItemsModified.push(i);
