@@ -404,6 +404,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       let fail = false;
 
+      await modalSubmit.deferUpdate();
+
       await setEmail(message.author.id, value.toLowerCase()).catch(() => {
         fail = true;
       });
@@ -414,7 +416,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       checkPurchases(message.author.id, message.client as NypsiClient);
 
-      return res.message.edit({ embeds: [new CustomEmbed(message.member, "✅ your email has been set")] });
+      return res.message.edit({ embeds: [new CustomEmbed(message.member, "✅ your email has been set")], components: [] });
     }
   };
 
