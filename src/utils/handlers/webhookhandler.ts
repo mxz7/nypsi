@@ -41,7 +41,7 @@ export function listen(manager: Manager) {
       return logger.error(data);
     }
 
-    response.send(req.body);
+    response.status(200).send();
 
     return handleKofiData(data);
   });
