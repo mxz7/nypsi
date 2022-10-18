@@ -29,7 +29,7 @@ export default async function messageUpdate(message: Message, newMessage: Messag
   }
 
   if (!message.member.permissions.has(PermissionFlagsBits.Administrator)) {
-    const res = await checkMessageContent(message);
+    const res = await checkMessageContent(newMessage);
 
     if (!res) return;
   }
