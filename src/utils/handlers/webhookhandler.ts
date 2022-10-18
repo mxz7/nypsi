@@ -34,13 +34,13 @@ export function listen(manager: Manager) {
   );
 
   app.post("/kofi", async (req, response) => {
-    const data = req.body as KofiResponse;
+    const data = req.body.data as KofiResponse;
 
     response.send(req.body);
 
     if (data.verification_token != process.env.KOFI_VERIFICATION) {
-      logger.warn("received faulty kofi data");
-      return logger.warn(data);
+      logger.error("received faulty kofi data");
+      return logger.error(data);
     }
 
     return handleKofiData(data);
@@ -175,50 +175,70 @@ async function handleKofiData(data: KofiResponse) {
     },
   });
 
-  const item = Constants.KOFI_PRODUCTS.get(data.shop_items[0]?.direct_link_code || data.tier_name.toLowerCase());
+  logger.info(`received kofi purchase. email: ${data.email}. item ${data.tier_name || JSON.stringify(data.shop_items)}`);
 
-  if (!item) {
-    logger.error("invalid item");
-    return logger.error(data);
-  }
+  if (data.type.toLowerCase() == "shop order") {
+    for (const shopItem of data.shop_items) {
+      const item = Constants.KOFI_PRODUCTS.get(shopItem.direct_link_code);
 
-  const premiums = ["platinum", "gold", "silver", "bronze"].reverse();
+      if (!item) {
+        logger.error(`invalid item: ${shopItem.direct_link_code}`);
+        return logger.error(data);
+      }
 
-  if (user) {
-    if (premiums.includes(item)) {
-      if (await isPremium(user.id)) {
-        if ((await getPremiumProfile(user.id)).getLevelString().toLowerCase() != item) {
-          await setTier(user.id, premiums.indexOf(item) + 1);
-          await renewUser(user.id);
-        } else {
-          await renewUser(user.id);
+      if (user) {
+        await addInventoryItem(user.id, item, 1, false);
+
+        logger.info(`${item} given to ${user.id} (${user.email})`);
+
+        if ((await getDmSettings(user.id)).premium) {
+          const payload: NotificationPayload = {
+            memberId: user.id,
+            payload: {
+              content: "thank you for your purchase",
+              embed: new CustomEmbed()
+                .setDescription(`you have received 1 ${item}`)
+                .setColor(Constants.TRANSPARENT_EMBED_COLOR),
+            },
+          };
+
+          await addNotificationToQueue(payload);
         }
       } else {
-        await addMember(user.id, premiums.indexOf(item) + 1);
-      }
-    } else {
-      await addInventoryItem(user.id, item, 1, false);
-
-      if ((await getDmSettings(user.id)).premium) {
-        const payload: NotificationPayload = {
-          memberId: user.id,
-          payload: {
-            content: "thank you for your purchase",
-            embed: new CustomEmbed()
-              .setDescription(`you have received 1 ${item}`)
-              .setColor(Constants.TRANSPARENT_EMBED_COLOR),
+        await prisma.kofiPurchases.create({
+          data: {
+            email: data.email,
+            item: item,
           },
-        };
+        });
 
-        await addNotificationToQueue(payload);
+        logger.info(`created purchase for ${data.email} ${item}`);
       }
     }
-  } else {
-    await prisma.kofiPurchases.create({
-      data: {
-        email: data.email,
-        item: item,
-      },
-    });
+  } else if (data.type.toLowerCase() == "subscription") {
+    const item = Constants.KOFI_PRODUCTS.get(data.tier_name.toLowerCase());
+
+    if (!item) {
+      logger.error("invalid item");
+      return logger.error(data);
+    }
+
+    const premiums = ["platinum", "gold", "silver", "bronze"].reverse();
+
+    if (!premiums.includes(item)) {
+      logger.error("invalid premium");
+      return logger.error(data);
+    }
+
+    if (await isPremium(user.id)) {
+      if ((await getPremiumProfile(user.id)).getLevelString().toLowerCase() != item) {
+        await setTier(user.id, premiums.indexOf(item) + 1);
+        await renewUser(user.id);
+      } else {
+        await renewUser(user.id);
+      }
+    } else {
+      await addMember(user.id, premiums.indexOf(item) + 1);
+    }
   }
 }
