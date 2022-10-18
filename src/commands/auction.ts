@@ -547,7 +547,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     return;
   } else if (args[0].toLowerCase() == "create") {
-    if (args.length != 4) {
+    if (message instanceof Message) {
       return send({ embeds: [new ErrorEmbed("please use /auction create to create auctions in a command")] });
     }
 
