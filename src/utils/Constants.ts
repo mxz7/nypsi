@@ -7,6 +7,8 @@ products.set("gold", "gold");
 products.set("silver", "silver");
 products.set("bronze", "bronze");
 products.set("dfcfa66092", "basic_crate");
+products.set("595ba15808", "69420_crate");
+products.set("5569964b90", "nypsi_crate");
 
 export default {
   BRONZE_ROLE_ID: "819870590718181391",

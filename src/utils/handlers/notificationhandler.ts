@@ -5,6 +5,7 @@ import { logger } from "../logger";
 
 let active = false;
 let interval: NodeJS.Timer;
+const promises: Promise<boolean>[] = [];
 
 export function listenForDms(manager: Manager) {
   interval = setInterval(async () => {
@@ -24,6 +25,10 @@ export function listenForDms(manager: Manager) {
 
 async function doDmQueueInterval(manager: Manager): Promise<void> {
   if ((await redis.llen("nypsi:dm:queue")) == 0) {
+    await Promise.all(promises);
+
+    promises.length = 0;
+
     active = false;
     logger.debug("dm queue finished");
     listenForDms(manager);
@@ -32,13 +37,15 @@ async function doDmQueueInterval(manager: Manager): Promise<void> {
 
   const item = JSON.parse(await redis.rpop("nypsi:dm:queue"));
 
-  await requestDM({
-    client: manager,
-    content: item.payload.content,
-    memberId: item.memberId,
-    embed: item.payload.embed,
-    components: item.payload.components,
-  });
+  promises.push(
+    requestDM({
+      client: manager,
+      content: item.payload.content,
+      memberId: item.memberId,
+      embed: item.payload.embed,
+      components: item.payload.components,
+    })
+  );
 
   return doDmQueueInterval(manager);
 }
