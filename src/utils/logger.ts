@@ -17,6 +17,8 @@ const format = winston.format.printf(({ level, message, timestamp }) => {
   let color = chalk.reset;
   let prefix = `${chalk.green("[info]")}`;
 
+  if (typeof message == "object") message = JSON.stringify(message, null, 2);
+
   switch (level) {
     case "guild":
       color = chalk.magenta;

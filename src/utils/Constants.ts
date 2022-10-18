@@ -1,3 +1,13 @@
+import { ColorResolvable } from "discord.js";
+
+const products = new Map<string, string>();
+
+products.set("platinum", "platinum");
+products.set("gold", "gold");
+products.set("silver", "silver");
+products.set("bronze", "bronze");
+products.set("dfcfa66092", "basic_crate");
+
 export default {
   BRONZE_ROLE_ID: "819870590718181391",
   SILVER_ROLE_ID: "819870727834566696",
@@ -7,4 +17,6 @@ export default {
   NYPSI_SERVER_ID: "747056029795221513",
   TEKOH_ID: "672793821850894347",
   MAX_AUCTION_PER_ITEM: 25_000_000,
+  TRANSPARENT_EMBED_COLOR: "#36393f" as ColorResolvable,
+  KOFI_PRODUCTS: products,
 };
