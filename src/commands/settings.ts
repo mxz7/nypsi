@@ -401,7 +401,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       if (!value) return;
 
-      await setEmail(message.author.id, value);
+      let fail = false;
+
+      await setEmail(message.author.id, value.toLowerCase()).catch(() => {
+        fail = true;
+      });
+
+      if (fail) {
+        return res.message.edit({ embeds: [new ErrorEmbed("that email has already been set")] });
+      }
 
       return res.message.edit({ embeds: [new CustomEmbed(message.member, "✅ your email has been set")] });
     }
