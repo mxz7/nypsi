@@ -6,7 +6,7 @@ import { PremUser } from "../../../models/PremStorage";
 import { logger } from "../../logger";
 import { formatDate } from "../date";
 import requestDM from "../requestdm";
-import { getDmSettings } from "../users/notifications";
+import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { colorCache } from "./color";
 
 export async function isPremium(member: GuildMember | string): Promise<boolean> {
@@ -84,7 +84,7 @@ export async function getTier(member: GuildMember | string): Promise<number> {
   return query.level;
 }
 
-export async function addMember(member: GuildMember | string, level: number, client: NypsiClient) {
+export async function addMember(member: GuildMember | string, level: number, client?: NypsiClient) {
   let id: string;
   if (member instanceof GuildMember) {
     id = member.user.id;
@@ -112,13 +112,24 @@ export async function addMember(member: GuildMember | string, level: number, cli
   logger.info(`premium level ${level} given to ${id}`);
 
   if ((await getDmSettings(id)).premium) {
-    await requestDM({
-      memberId: id,
-      client: client,
-      content: `you have been given **${profile.getLevelString()}** membership, this will expire on **${formatDate(
-        profile.expireDate
-      )}**\n\nplease join the support server if you have any problems, or questions. discord.gg/hJTDNST`,
-    });
+    if (client) {
+      await requestDM({
+        memberId: id,
+        client: client,
+        content: `you have been given **${profile.getLevelString()}** membership, this will expire on **${formatDate(
+          profile.expireDate
+        )}**\n\nplease join the support server if you have any problems, or questions. discord.gg/hJTDNST`,
+      });
+    } else {
+      await addNotificationToQueue({
+        memberId: id,
+        payload: {
+          content: `you have been given **${profile.getLevelString()}** membership, this will expire on **${formatDate(
+            profile.expireDate
+          )}**\n\nplease join the support server if you have any problems, or questions. discord.gg/hJTDNST`,
+        },
+      });
+    }
   }
 
   await redis.del(`cache:premium:level:${id}`);
@@ -141,7 +152,7 @@ export async function getPremiumProfile(member: GuildMember | string): Promise<P
   return createPremUser(query);
 }
 
-export async function setTier(member: GuildMember | string, level: number, client: NypsiClient) {
+export async function setTier(member: GuildMember | string, level: number, client?: NypsiClient) {
   let id: string;
   if (member instanceof GuildMember) {
     id = member.user.id;
@@ -161,11 +172,20 @@ export async function setTier(member: GuildMember | string, level: number, clien
   logger.info(`premium level updated to ${level} for ${id}`);
 
   if ((await getDmSettings(id)).premium) {
-    await requestDM({
-      memberId: id,
-      client: client,
-      content: `your membership has been updated to **${PremUser.getLevelString(level)}**`,
-    });
+    if (client) {
+      await requestDM({
+        memberId: id,
+        client: client,
+        content: `your membership has been updated to **${PremUser.getLevelString(level)}**`,
+      });
+    } else {
+      await addNotificationToQueue({
+        memberId: id,
+        payload: {
+          content: `your membership has been updated to **${PremUser.getLevelString(level)}**`,
+        },
+      });
+    }
   }
 
   await redis.del(`cache:premium:level:${id}`);
@@ -189,7 +209,7 @@ export async function setStatus(member: GuildMember | string, status: number) {
   });
 }
 
-export async function renewUser(member: string, client: NypsiClient) {
+export async function renewUser(member: string, client?: NypsiClient) {
   const profile = await getPremiumProfile(member);
 
   profile.renew();
@@ -204,11 +224,20 @@ export async function renewUser(member: string, client: NypsiClient) {
   });
 
   if ((await getDmSettings(member)).premium) {
-    await requestDM({
-      memberId: member,
-      client: client,
-      content: `your membership has been renewed until **${formatDate(profile.expireDate)}**`,
-    });
+    if (client) {
+      await requestDM({
+        memberId: member,
+        client: client,
+        content: `your membership has been renewed until **${formatDate(profile.expireDate)}**`,
+      });
+    } else {
+      await addNotificationToQueue({
+        memberId: member,
+        payload: {
+          content: `your membership has been renewed until **${formatDate(profile.expireDate)}**`,
+        },
+      });
+    }
   }
 
   await redis.del(`cache:premium:level:${member}`);
