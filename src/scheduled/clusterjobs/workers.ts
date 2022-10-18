@@ -53,7 +53,10 @@ async function doWorkerThing() {
   for (const userId of Array.from(dms.keys())) {
     const data: NotificationPayload = {
       memberId: userId,
-      payload: null,
+      payload: {
+        content: null,
+        embed: null,
+      },
     };
 
     const workers = await getWorkers(userId);
