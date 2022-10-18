@@ -35,8 +35,10 @@ export function listen(manager: Manager) {
   );
 
   app.post("/kofi", async (req, response) => {
-    const data = req.body as KofiResponse;
+    const data = JSON.parse(req.body).data as KofiResponse;
 
+    console.log(req.body);
+    console.log(JSON.parse(req.body));
     console.log(data);
 
     if (data.verification_token != process.env.KOFI_VERIFICATION) {
