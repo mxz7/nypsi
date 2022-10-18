@@ -65,7 +65,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (message.mentions.roles.first()) {
       role = message.mentions.roles.first();
-    } else if (args[1].length == 18 && parseInt(args[1])) {
+    } else if (await message.guild.roles.fetch(args[1]).catch(() => {})) {
       role = roles.find((r) => r.id == args[1]);
     } else {
       args.shift();
