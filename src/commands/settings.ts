@@ -13,13 +13,14 @@ import {
   TextInputBuilder,
   TextInputStyle,
 } from "discord.js";
+import { NypsiClient } from "../models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { calcMaxBet, getDefaultBet, getRequiredBetForXp, setDefaultBet } from "../utils/functions/economy/balance";
 import { createUser, formatNumber, userExists } from "../utils/functions/economy/utils";
 import { setSlashOnly } from "../utils/functions/guilds/slash";
 import { cleanString } from "../utils/functions/string";
-import { getEmail, setEmail } from "../utils/functions/users/email";
+import { checkPurchases, getEmail, setEmail } from "../utils/functions/users/email";
 import { getLastfmUsername, setLastfmUsername } from "../utils/functions/users/lastfm";
 import { getDmSettings, getNotificationsData, updateDmSettings } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -410,6 +411,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       if (fail) {
         return res.message.edit({ embeds: [new ErrorEmbed("that email has already been set")] });
       }
+
+      checkPurchases(message.author.id, message.client as NypsiClient);
 
       return res.message.edit({ embeds: [new CustomEmbed(message.member, "✅ your email has been set")] });
     }
