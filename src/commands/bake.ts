@@ -2,8 +2,9 @@ import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Messag
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addProgress } from "../utils/functions/economy/achievements";
+import { getBoosters } from "../utils/functions/economy/boosters";
 import { addInventoryItem, getInventory } from "../utils/functions/economy/inventory";
-import { createUser, userExists } from "../utils/functions/economy/utils";
+import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command(
@@ -56,7 +57,19 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   await addCooldown(cmd.name, message.member, 1200);
 
-  const amount = Math.floor(Math.random() * 4) + 1;
+  let amount = Math.floor(Math.random() * 4) + 1;
+
+  const boosters = await getBoosters(message.member);
+
+  for (const booster of boosters.keys()) {
+    if (getItems()[booster].boosterEffect.boosts.includes("cookie")) {
+      for (let i = 0; i < boosters.get(booster).length; i++) {
+        amount += amount * getItems()[booster].boosterEffect.effect;
+      }
+    }
+  }
+
+  amount = Math.floor(amount);
 
   await addInventoryItem(message.member, "cookie", amount, false);
 
