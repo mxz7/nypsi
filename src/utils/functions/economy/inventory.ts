@@ -160,6 +160,8 @@ export async function addInventoryItem(
     id = member;
   }
 
+  if (!(await userExists(id))) await createUser(id);
+
   if (!getItems()[itemId]) {
     console.trace();
     return logger.error(`invalid item: ${itemId}`);
