@@ -393,8 +393,8 @@ export async function openCrate(member: GuildMember, item: Item): Promise<string
         }
       } else {
         if (item.id == "nypsi_crate") {
-          for (let x = 0; x < 7; x++) {
-            crateItemsModified.push("money:10000000");
+          for (let x = 0; x < 4; x++) {
+            crateItemsModified.push("money:5000000");
             crateItemsModified.push("xp:500");
           }
         }
