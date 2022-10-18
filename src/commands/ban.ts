@@ -9,7 +9,7 @@ import {
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { PunishmentType } from "../types/Moderation";
-import { addCooldown, getPrefix, inCooldown } from "../utils/functions/guilds/utils";
+import { getPrefix } from "../utils/functions/guilds/utils";
 import { getExactMember } from "../utils/functions/member";
 import { newBan } from "../utils/functions/moderation/ban";
 import { newCase } from "../utils/functions/moderation/cases";
@@ -81,17 +81,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({ embeds: [embed] });
   }
 
-  if (args[0].length == 18 && message.mentions.members.first() == null) {
-    let members;
-
-    if (inCooldown(message.guild)) {
-      members = message.guild.members.cache;
-    } else {
-      members = await message.guild.members.fetch();
-      addCooldown(message.guild, 3600);
-    }
-
-    const member = members.find((m) => m.id == args[0]);
+  if ((await message.guild.members.fetch(args[0]).catch(() => {})) && message.mentions.members.first() == null) {
+    const member = await message.guild.members.fetch(args[0]).catch(() => {});
 
     if (!member) {
       idOnly = true;
