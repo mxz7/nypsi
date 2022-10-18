@@ -377,7 +377,15 @@ export async function openCrate(member: GuildMember, item: Item): Promise<string
                 crateItemsModified.push(i);
               }
             } else {
-              crateItemsModified.push(i);
+              if (item.id == "nypsi_crate") {
+                const chance = Math.floor(Math.random() * 10);
+
+                if (chance < 7) {
+                  crateItemsModified.push(i);
+                }
+              } else {
+                crateItemsModified.push(i);
+              }
             }
             crateItemsModified.push(i);
           }
@@ -395,9 +403,9 @@ export async function openCrate(member: GuildMember, item: Item): Promise<string
         }
       } else {
         if (item.id == "nypsi_crate") {
-          for (let x = 0; x < 4; x++) {
-            crateItemsModified.push("money:5000000");
-            crateItemsModified.push("xp:500");
+          for (let x = 0; x < 6; x++) {
+            crateItemsModified.push("money:10000000");
+            crateItemsModified.push("xp:750");
           }
         }
         for (let x = 0; x < 2; x++) {
