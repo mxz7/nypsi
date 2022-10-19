@@ -213,9 +213,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         },
       });
 
-      const embed = new CustomEmbed(message.member)
-        .setColor("#5efb8f")
-        .setDescription(`**success!**\n\n**you stole** $${stolen.toLocaleString()} from **${bank}**`);
+      embed.setDescription(`**success!**\n\n**you stole** $${stolen.toLocaleString()} from **${bank}**`);
 
       return embed;
     } else {
