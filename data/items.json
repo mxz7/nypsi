@@ -100,7 +100,7 @@
     "role": "sellable",
     "rarity": 3,
     "buy": 0,
-    "sell": 100000
+    "sell": 50000
   },
   "furnace": {
     "id": "furnace",
