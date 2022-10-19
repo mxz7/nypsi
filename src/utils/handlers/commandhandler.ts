@@ -607,6 +607,8 @@ export async function runCommand(
   if (isLockedOut(message.author.id)) {
     if (beingChecked.indexOf(message.author.id) != -1) return;
 
+    logCommand(message, args);
+
     const { captcha, text } = await createCaptcha();
 
     const embed = new CustomEmbed(message.member).setTitle("you have been locked");
@@ -660,6 +662,7 @@ export async function runCommand(
       toggleLock(message.author.id);
       return response.react("✅");
     } else {
+      logger.info(`${message.guild} - ${message.author.tag}: ${message.content}`);
       logger.info(`captcha (${message.author.id}) failed`);
       failedCaptcha(message.member);
       return message.channel.send({
