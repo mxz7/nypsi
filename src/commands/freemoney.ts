@@ -1,6 +1,6 @@
 import { CommandInteraction, Message } from "discord.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
-import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
+import { CustomEmbed } from "../models/EmbedBuilders.js";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
@@ -16,10 +16,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   }
 
   if (!(await userExists(message.member))) await createUser(message.member);
-
-  if ((await getBalance(message.member)) > 500000) {
-    return message.channel.send({ embeds: [new ErrorEmbed("you're too rich for this command bro")] });
-  }
 
   await addCooldown(cmd.name, message.member, 300);
 
