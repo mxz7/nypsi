@@ -102,16 +102,36 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       embed.setDescription(notificationsData[settingId].description);
 
-      const buttons = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      const userSelection = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder().setCustomId("enable-setting").setLabel("enable").setStyle(ButtonStyle.Success),
         new ButtonBuilder().setCustomId("disable-setting").setLabel("disable").setStyle(ButtonStyle.Danger)
       );
 
-      // @ts-expect-error annoying grr
-      if (settings[settingId]) {
-        buttons.components[0].setDisabled(true);
+      if (notificationsData[settingId].types) {
+        const boobies: SelectMenuOptionBuilder[] = [];
+
+        for (const type of notificationsData[settingId].types) {
+          const option = new SelectMenuOptionBuilder()
+            .setLabel(type.name)
+            .setDescription(type.description)
+            .setValue(type.value);
+
+          //@ts-expect-error silly ts
+          if (settings[settingId] == type.value) {
+            option.setDefault(true);
+          }
+
+          boobies.push(option);
+        }
+
+        userSelection.setComponents(new SelectMenuBuilder().setCustomId("typesetting").setOptions(boobies));
       } else {
-        buttons.components[1].setDisabled(true);
+        // @ts-expect-error annoying grr
+        if (settings[settingId]) {
+          userSelection.components[0].setDisabled(true);
+        } else {
+          userSelection.components[1].setDisabled(true);
+        }
       }
 
       if (!msg) {
@@ -121,7 +141,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
               new SelectMenuBuilder().setCustomId("setting").setOptions(options)
             ),
-            buttons,
+            userSelection,
           ],
         });
       } else {
@@ -131,7 +151,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
               new SelectMenuBuilder().setCustomId("setting").setOptions(options)
             ),
-            buttons,
+            userSelection,
           ],
         });
       }
@@ -169,7 +189,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return;
       }
 
-      if (res.isSelectMenu()) {
+      if (res.isSelectMenu() && res.customId == "setting") {
         for (const option of options) {
           option.setDefault(false);
 
@@ -177,6 +197,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         msg = await showSetting(settings, res.values[0], options, res.message);
+        return pageManager();
+      } else if (res.isSelectMenu() && res.customId == "typesetting") {
+        const selected = options.find((o) => o.data.default).data.value;
+        const value = notificationsData[settingId].types.find((x) => x.value == res.values[0]);
+
+        // @ts-expect-error silly ts
+        settings[selected] = value.value;
+
+        settings = await updateDmSettings(message.member, settings);
+        msg = await showSetting(settings, selected, options, res.message);
+
         return pageManager();
       } else if (res.customId.startsWith("enable")) {
         const selected = options.find((o) => o.data.default).data.value;
