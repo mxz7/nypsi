@@ -32,7 +32,16 @@
   "worker": {
     "id": "worker",
     "name": "worker notifications",
-    "description": "get a dm when one of your workers has reached full capacity"
+    "description": "get a dm when one of your workers has reached full capacity",
+    "types": [
+      { "name": "disabled", "description": "no worker notifications", "value": "Disabled" },
+      {
+        "name": "only when full",
+        "description": "only receive a notification when all of your workers are full",
+        "value": "OnlyWhenFull"
+      },
+      { "name": "all", "description": "receive a notification when any amount of workers are full", "value": "All" }
+    ]
   },
   "booster": {
     "id": "booster",

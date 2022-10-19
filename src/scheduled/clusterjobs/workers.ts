@@ -38,7 +38,7 @@ async function doWorkerThing() {
     if (worker.stored + incrementAmount > maxStorage) {
       incrementAmount = maxStorage - worker.stored;
 
-      if ((await getDmSettings(worker.userId)).worker) {
+      if ((await getDmSettings(worker.userId)).worker != "Disabled") {
         dms.add(worker.userId);
       }
     }
@@ -115,15 +115,15 @@ async function doWorkerThing() {
     }
 
     if (full.length == workers.length) {
-      data.payload.content = "all of your workers are full";
+      data.payload.content = null;
       data.payload.embed = new CustomEmbed()
         .setDescription("all of your workers are full")
         .setColor(Constants.TRANSPARENT_EMBED_COLOR);
-    } else if (full.length == 1) {
+    } else if (full.length == 1 && (await getDmSettings(userId)).worker == "All") {
       data.payload.embed = new CustomEmbed()
         .setDescription(`your ${getBaseWorkers()[full[0]].item_emoji} ${getBaseWorkers()[full[0]].name} is full`)
         .setColor(Constants.TRANSPARENT_EMBED_COLOR);
-    } else {
+    } else if ((await getDmSettings(userId)).worker == "All") {
       data.payload.content = `${full.length} of your workers are full`;
       data.payload.embed = new CustomEmbed()
         .setDescription(
