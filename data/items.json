@@ -952,7 +952,7 @@
     "aliases": ["caffeine"],
     "emoji": "☕️",
     "longDesc": "feed your workers with coffee and produce 50% more items per hour",
-    "rarity": 1,
+    "rarity": 2,
     "sell": 100000,
     "role": "booster",
     "stackable": true,
