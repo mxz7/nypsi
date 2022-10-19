@@ -1022,5 +1022,21 @@
       "effect": 1,
       "time": 7200
     }
+  },
+  "highroller": {
+    "id": "highroller",
+    "name": "highroller",
+    "aliases": ["high", "roller"],
+    "emoji": "💸",
+    "longDesc": "double your max bet for 30 minutes",
+    "rarity": 3,
+    "sell": 100000,
+    "role": "booster",
+    "stackable": false,
+    "boosterEffect": {
+      "boosts": ["maxbet"],
+      "effect": 1,
+      "time": 1800
+    }
   }
 }
