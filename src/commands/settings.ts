@@ -200,7 +200,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return pageManager();
       } else if (res.isSelectMenu() && res.customId == "typesetting") {
         const selected = options.find((o) => o.data.default).data.value;
-        const value = notificationsData[settingId].types.find((x) => x.value == res.values[0]);
+        const value = notificationsData[selected].types.find((x) => x.value == res.values[0]);
 
         // @ts-expect-error silly ts
         settings[selected] = value.value;
