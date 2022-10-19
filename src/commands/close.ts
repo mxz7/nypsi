@@ -81,8 +81,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   await redis.del(`cache:support:${support.userId}`);
 
-  await redis.set(`cooldown:support:${message.author.id}`, "t");
-  await redis.expire(`cooldown:support:${message.author.id}`, Math.floor(ms("24 hours") / 1000));
+  await redis.set(`cooldown:support:${support.userId}`, "t");
+  await redis.expire(`cooldown:support:${support.userId}`, Math.floor(ms("24 hours") / 1000));
 }
 
 cmd.setRun(run);
