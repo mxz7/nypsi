@@ -38,7 +38,7 @@
     "rarity": 0,
     "aliases": ["cobble"],
     "buy": 0,
-    "sell": 200
+    "sell": 1000
   },
   "coal": {
     "id": "coal",
@@ -48,7 +48,7 @@
     "role": "fuel",
     "rarity": 0,
     "buy": 3000,
-    "sell": 1500
+    "sell": 2000
   },
   "iron_ingot": {
     "id": "iron_ingot",
