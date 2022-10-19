@@ -137,22 +137,22 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (items[i].rarity == 4) {
           const chance = Math.floor(Math.random() * 15);
           if (chance == 4 && pickaxe == "diamond_pickaxe") {
-            for (let x = 0; x < 4; x++) {
+            for (let x = 0; x < 10; x++) {
               mineItemsModified.push(i);
             }
           }
         } else if (items[i].rarity == 3 && pickaxe != "wooden_pickaxe") {
-          for (let x = 0; x < 5; x++) {
+          for (let x = 0; x < 10; x++) {
             mineItemsModified.push(i);
 
             if (pickaxe == "diamond_pickaxe") mineItemsModified.push(i);
           }
         } else if (items[i].rarity == 2 && pickaxe != "wooden_pickaxe") {
-          for (let x = 0; x < 10; x++) {
+          for (let x = 0; x < 15; x++) {
             mineItemsModified.push(i);
           }
-        } else if (items[i].rarity == 1) {
-          for (let x = 0; x < 15; x++) {
+        } else if (items[i].rarity == 1 && pickaxe != "wooden_pickaxe") {
+          for (let x = 0; x < 20; x++) {
             mineItemsModified.push(i);
           }
         } else if (items[i].rarity == 0) {
