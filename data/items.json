@@ -38,7 +38,7 @@
     "rarity": 0,
     "aliases": ["cobble"],
     "buy": 0,
-    "sell": 200
+    "sell": 1000
   },
   "coal": {
     "id": "coal",
@@ -48,7 +48,7 @@
     "role": "fuel",
     "rarity": 0,
     "buy": 3000,
-    "sell": 1500
+    "sell": 2000
   },
   "iron_ingot": {
     "id": "iron_ingot",
@@ -1037,6 +1037,22 @@
       "boosts": ["maxbet"],
       "effect": 1,
       "time": 1800
+    }
+  },
+  "steve": {
+    "id": "steve",
+    "name": "steve",
+    "aliases": ["stevieee", "stephen", "stephen", "maxsdad", "ste_ste_ste"],
+    "emoji": "👷🏻‍♂️",
+    "longDesc": "steve will automatically claim money from your workers for you\neveryone loves steve",
+    "rarity": 3,
+    "sell": 1000000,
+    "role": "booster",
+    "stackable": false,
+    "boosterEffect": {
+      "boosts": ["worker_claim"],
+      "effect": 1,
+      "time": 57600
     }
   }
 }
