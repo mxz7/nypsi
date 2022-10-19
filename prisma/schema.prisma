@@ -40,7 +40,7 @@ model DMSettings {
   auction       Boolean         @default(true)
   vote          Boolean         @default(true)
   vote_reminder Boolean         @default(false)
-  worker        WorkerDmSetting @default(Disabled)
+  worker        WorkerDmSetting @default(OnlyWhenFull)
   booster       Boolean         @default(false)
   payment       Boolean         @default(true)
   other         Boolean         @default(true)
