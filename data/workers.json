@@ -73,7 +73,7 @@
       "id": "launchpad",
       "name": "launchpad",
       "upgrades": 2,
-      "effect": 0.75,
+      "effect": 1.2,
       "stack_limit": 10,
       "for": "spacex"
     },
