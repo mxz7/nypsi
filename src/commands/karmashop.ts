@@ -13,6 +13,7 @@ import { inPlaceSort } from "fast-sort";
 import { NypsiClient } from "../models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
+import { KarmaShopItem } from "../types/Karmashop";
 import Constants from "../utils/Constants";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { addInventoryItem } from "../utils/functions/economy/inventory";
@@ -109,23 +110,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (args.length == 0 || args.length == 1) {
     inPlaceSort(itemIDs).desc((i) => items[i].items_left);
 
-    const pages: string[][] = [];
+    const pages = new Map<number, KarmaShopItem[]>();
 
-    let pageOfItems: string[] = [];
     for (const item of itemIDs) {
-      if (pageOfItems.length == 6) {
-        pages.push(pageOfItems);
-        pageOfItems = [item];
+      if (pages.size == 0) {
+        pages.set(1, [items[item]]);
+      } else if (pages.get(pages.size).length >= 6) {
+        pages.set(pages.size + 1, [items[item]]);
       } else {
-        pageOfItems.push(item);
+        pages.get(pages.size).push(items[item]);
       }
     }
-
-    if (pageOfItems.length != 0) {
-      pages.push(pageOfItems);
-    }
-
-    const page = 0;
 
     const embed = new CustomEmbed(message.member);
 
@@ -142,16 +137,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     embed.setHeader("karma shop", message.author.avatarURL());
     embed.setFooter({
-      text: `you have ${(await getKarma(message.member)).toLocaleString()} karma ${displayItemsLeft()}`,
+      text: `page 1/${pages.size} | you have ${(
+        await getKarma(message.member)
+      ).toLocaleString()} karma ${displayItemsLeft()}`,
     });
 
-    for (const i of pages[page]) {
-      const item = items[i];
+    for (const item of pages.get(1)) {
       embed.addField(
         item.id,
-        `${item.emoji} **${item.name}**\n${item.description}\n**cost** ${item.cost.toLocaleString()} karma\n*${
-          item.items_left
-        }* available`,
+        `${item.emoji} **${item.name}**\n**cost** ${item.cost.toLocaleString()} karma\n*${item.items_left}* available`,
         true
       );
     }
@@ -163,16 +157,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     let msg: Message;
 
-    if (pages.length == 1) {
+    if (pages.size == 1) {
       return await send({ embeds: [embed] });
     } else {
       msg = await send({ embeds: [embed], components: [row] });
     }
 
-    if (pages.length > 1) {
-      let currentPage = page;
+    if (pages.size > 1) {
+      let currentPage = 1;
 
-      const lastPage = pages.length;
+      const lastPage = pages.size;
 
       const filter = (i: Interaction) => i.user.id == message.author.id;
 
@@ -192,26 +186,25 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (!reaction) return;
 
         if (reaction == "⬅") {
-          if (currentPage <= 0) {
+          if (currentPage <= 1) {
             return pageManager();
           } else {
             currentPage--;
-            for (const i of pages[currentPage]) {
-              const item = items[i];
-              embed.addField(
+            for (const item of pages.get(currentPage)) {
+              newEmbed.addField(
                 item.id,
-                `${item.emoji} **${item.name}**\n${item.description}\n**cost** ${item.cost.toLocaleString()} karma\n*${
+                `${item.emoji} **${item.name}**\n**cost** ${item.cost.toLocaleString()} karma\n*${
                   item.items_left
                 }* available`,
                 true
               );
             }
             newEmbed.setFooter({
-              text: `page ${currentPage + 1}/${pages.length} | you have ${(
+              text: `page ${currentPage}/${pages.size} | you have ${(
                 await getKarma(message.member)
               ).toLocaleString()} karma ${displayItemsLeft()}`,
             });
-            if (currentPage == 0) {
+            if (currentPage == 1) {
               row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                 new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
                 new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(false)
@@ -226,26 +219,25 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return pageManager();
           }
         } else if (reaction == "➡") {
-          if (currentPage + 1 >= lastPage) {
+          if (currentPage + 1 > lastPage) {
             return pageManager();
           } else {
             currentPage++;
-            for (const i of pages[currentPage]) {
-              const item = items[i];
-              embed.addField(
+            for (const item of pages.get(currentPage)) {
+              newEmbed.addField(
                 item.id,
-                `${item.emoji} **${item.name}**\n${item.description}\n**cost** ${item.cost.toLocaleString()} karma\n*${
+                `${item.emoji} **${item.name}**\n**cost** ${item.cost.toLocaleString()} karma\n*${
                   item.items_left
                 }* available`,
                 true
               );
             }
             newEmbed.setFooter({
-              text: `page ${currentPage + 1}/${pages.length} | you have ${(
+              text: `page ${currentPage}/${pages.size} | you have ${(
                 await getKarma(message.member)
               ).toLocaleString()} karma ${displayItemsLeft()}`,
             });
-            if (currentPage + 1 == lastPage) {
+            if (currentPage == lastPage) {
               row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
                 new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(false),
                 new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(true)
