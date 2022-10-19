@@ -47,7 +47,7 @@ async function doWorkerThing() {
       let earned = 0;
 
       if (worker.stored != 0) {
-        earned += worker.stored * perItem;
+        earned += Math.floor(worker.stored * perItem);
 
         await prisma.economyWorker.update({
           where: {
@@ -62,7 +62,7 @@ async function doWorkerThing() {
         });
       }
 
-      earned += incrementAmount * perItem;
+      earned += Math.floor(incrementAmount * perItem);
 
       await updateBalance(worker.userId, (await getBalance(worker.userId)) + earned);
 
