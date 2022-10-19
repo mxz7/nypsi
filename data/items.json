@@ -92,6 +92,16 @@
     "buy": 0,
     "sell": 75000
   },
+  "amethyst": {
+    "id": "amethyst",
+    "name": "amethyst",
+    "emoji": "<:nypsi_amethyst:1032257888699297872>",
+    "longDesc": "found when mining",
+    "role": "sellable",
+    "rarity": 3,
+    "buy": 0,
+    "sell": 100000
+  },
   "furnace": {
     "id": "furnace",
     "name": "furnace",
