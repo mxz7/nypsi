@@ -70,7 +70,7 @@ async function doWorkerThing() {
     }
 
     if (full.length == workers.length) {
-      data.payload.content = "all of your workers are full";
+      data.payload.content = null;
       data.payload.embed = new CustomEmbed()
         .setDescription("all of your workers are full")
         .setColor(Constants.TRANSPARENT_EMBED_COLOR);
