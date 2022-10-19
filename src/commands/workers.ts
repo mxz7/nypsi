@@ -18,8 +18,9 @@ import { Categories, Command, NypsiCommandInteraction } from "../models/Command"
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { Worker } from "../types/Workers";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
+import { getBoosters } from "../utils/functions/economy/boosters";
 import { getPrestige } from "../utils/functions/economy/prestige";
-import { createUser, getBaseUpgrades, getBaseWorkers, userExists } from "../utils/functions/economy/utils";
+import { createUser, getBaseUpgrades, getBaseWorkers, getItems, userExists } from "../utils/functions/economy/utils";
 import {
   addWorker,
   addWorkerUpgrade,
@@ -149,12 +150,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           `**rate** ${perInterval.toLocaleString()} ${worker.item_emoji} / hour`;
 
         if (userWorker.stored < maxStorage) {
-          let hours = Math.ceil((maxStorage - userWorker.stored) / perInterval);
+          const boosters = await getBoosters(message.member);
 
-          const diff = dayjs().add(hours, "hours").unix() - dayjs().unix();
-          hours = diff / 3600;
+          if (Array.from(boosters.keys()).includes("steve")) {
+            desc += `\n\n${getItems()["steve"].emoji} steve is hard at work`;
+          } else {
+            let hours = Math.ceil((maxStorage - userWorker.stored) / perInterval);
 
-          desc += `\n\n\`${hours.toLocaleString()} hour${hours > 1 ? "s" : ""}\` until full`;
+            const diff = dayjs().add(hours, "hours").unix() - dayjs().unix();
+            hours = diff / 3600;
+
+            desc += `\n\n\`${hours.toLocaleString()} hour${hours > 1 ? "s" : ""}\` until full`;
+          }
         }
 
         embed.setDescription(desc);
