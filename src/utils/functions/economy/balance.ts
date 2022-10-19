@@ -469,6 +469,16 @@ export async function calcMaxBet(member: GuildMember): Promise<number> {
 
   if (calculated > 1_000_000) calculated = 1_000_000;
 
+  const boosters = await getBoosters(member);
+
+  for (const boosterId of boosters.keys()) {
+    if (getItems()[boosterId].boosterEffect.boosts.includes("maxbet")) {
+      for (let i = 0; i < boosters.get(boosterId).length; i++) {
+        calculated += calculated * getItems()[boosterId].boosterEffect.effect;
+      }
+    }
+  }
+
   return calculated;
 }
 
