@@ -42,7 +42,7 @@ jobs:
               run: npm install
 
             - name: build
-              run: npm run build
+              run: npx tsc
             
             - name: linting
               run: npx eslint ./src/
@@ -66,4 +66,4 @@ jobs:
                       git pull
                       git status
                       npm i
-                      npm run build
+                      npx tsc
