@@ -465,7 +465,11 @@ export async function calcMaxBet(member: GuildMember): Promise<number> {
 
   const prestige = await getPrestige(member);
 
-  return total + bonus * (prestige > 15 ? 15 : prestige);
+  let calculated = total + bonus * prestige;
+
+  if (calculated > 1_000_000) calculated = 1_000_000;
+
+  return calculated;
 }
 
 export async function getRequiredBetForXp(member: GuildMember): Promise<number> {
