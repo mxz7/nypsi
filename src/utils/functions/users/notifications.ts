@@ -11,6 +11,7 @@ interface NotificationData {
   id: string;
   name: string;
   description: string;
+  types?: { name: string; description: string; value: string }[];
 }
 
 const notificationsData: { [key: string]: NotificationData } = require("../../../../data/notifications.json");
