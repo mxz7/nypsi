@@ -1,6 +1,6 @@
 import ms = require("ms");
-import redis from "../../init/redis";
 import prisma from "../../init/database";
+import redis from "../../init/redis";
 
 export async function getTax() {
   let tax: number;
@@ -19,7 +19,7 @@ export async function getTaxRefreshTime() {
 }
 
 async function updateTax() {
-  const tax = parseFloat((Math.random() * 5 + 2.4).toFixed(3)) / 100;
+  const tax = parseFloat((Math.random() * 7 + 2.2).toFixed(3)) / 100;
 
   await redis.set("nypsi:tax", tax.toFixed(3));
   await redis.expire("nypsi:tax", Math.floor(ms("6 hours") / 1000));
