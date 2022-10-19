@@ -3,10 +3,10 @@ import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { Booster } from "../../../types/Economy";
+import Constants from "../../Constants";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { getItems } from "./utils";
 import _ = require("lodash");
-import Constants from "../../Constants";
 
 export async function getBoosters(member: GuildMember | string): Promise<Map<string, Booster[]>> {
   let id: string;
@@ -66,7 +66,16 @@ export async function getBoosters(member: GuildMember | string): Promise<Map<str
       for (const expiredBoosterId of Array.from(expired.keys())) {
         total += expired.get(expiredBoosterId);
 
-        desc += `\`${expired.get(expiredBoosterId)}x\` ${items[expiredBoosterId].emoji} ${items[expiredBoosterId].name}\n`;
+        if (expiredBoosterId == "steve") {
+          const earned = parseInt((await redis.get(`nypsi:steveearned:${id}`)) || "0");
+          await redis.del(`nypsi:steveearned:${id}`);
+
+          desc += `\`${expired.get(expiredBoosterId)}x\` ${items[expiredBoosterId].emoji} ${
+            items[expiredBoosterId].name
+          } (earned $${earned.toLocaleString()})\n`;
+        } else {
+          desc += `\`${expired.get(expiredBoosterId)}x\` ${items[expiredBoosterId].emoji} ${items[expiredBoosterId].name}\n`;
+        }
       }
 
       embed.setHeader(`expired booster${total > 1 ? "s" : ""}:`);
@@ -156,7 +165,16 @@ export async function getBoosters(member: GuildMember | string): Promise<Map<str
     for (const expiredBoosterId of Array.from(expired.keys())) {
       total += expired.get(expiredBoosterId);
 
-      desc += `\`${expired.get(expiredBoosterId)}x\` ${items[expiredBoosterId].emoji} ${items[expiredBoosterId].name}\n`;
+      if (expiredBoosterId == "steve") {
+        const earned = parseInt((await redis.get(`nypsi:steveearned:${id}`)) || "0");
+        await redis.del(`nypsi:steveearned:${id}`);
+
+        desc += `\`${expired.get(expiredBoosterId)}x\` ${items[expiredBoosterId].emoji} ${
+          items[expiredBoosterId].name
+        } (earned $${earned.toLocaleString()})\n`;
+      } else {
+        desc += `\`${expired.get(expiredBoosterId)}x\` ${items[expiredBoosterId].emoji} ${items[expiredBoosterId].name}\n`;
+      }
     }
 
     embed.setHeader(`expired booster${total > 1 ? "s" : ""}:`);

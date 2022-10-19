@@ -1,7 +1,10 @@
 import prisma from "../../init/database";
+import redis from "../../init/redis";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 import { NotificationPayload } from "../../types/Notification";
 import Constants from "../../utils/Constants";
+import { getBalance, updateBalance } from "../../utils/functions/economy/balance";
+import { getBoosters } from "../../utils/functions/economy/boosters";
 import { getBaseWorkers } from "../../utils/functions/economy/utils";
 import { calcWorkerValues, getWorkers } from "../../utils/functions/economy/workers";
 import { addNotificationToQueue, getDmSettings } from "../../utils/functions/users/notifications";
@@ -17,11 +20,18 @@ async function doWorkerThing() {
   });
 
   const dms = new Set<string>();
+  const hasSteve = new Set<string>();
 
   for (const worker of query) {
-    const { maxStorage, perInterval } = await calcWorkerValues(worker);
+    const { maxStorage, perInterval, perItem } = await calcWorkerValues(worker);
 
-    if (worker.stored >= maxStorage) continue;
+    if (!hasSteve.has(worker.userId)) {
+      const boosters = await getBoosters(worker.userId);
+
+      if (Array.from(boosters.keys()).includes("steve")) hasSteve.add(worker.userId);
+    }
+
+    if (worker.stored >= maxStorage && !hasSteve.has(worker.userId)) continue;
 
     let incrementAmount = perInterval;
 
@@ -33,19 +43,54 @@ async function doWorkerThing() {
       }
     }
 
-    await prisma.economyWorker.update({
-      where: {
-        userId_workerId: {
-          userId: worker.userId,
-          workerId: worker.workerId,
+    if (hasSteve.has(worker.userId)) {
+      let earned = 0;
+
+      if (worker.stored != 0) {
+        earned += Math.floor(worker.stored * perItem);
+
+        await prisma.economyWorker.update({
+          where: {
+            userId_workerId: {
+              userId: worker.userId,
+              workerId: worker.workerId,
+            },
+          },
+          data: {
+            stored: 0,
+          },
+        });
+      }
+
+      earned += Math.floor(incrementAmount * perItem);
+
+      await updateBalance(worker.userId, (await getBalance(worker.userId)) + earned);
+
+      if (await redis.exists(`nypsi:steveearned:${worker.userId}`)) {
+        await redis.set(
+          `nypsi:steveearned:${worker.userId}`,
+          parseInt(await redis.get(`nypsi:steveearned:${worker.userId}`)) + earned
+        );
+        await redis.expire(`nypsi:steveearned:${worker.userId}`, ms("24 hours") / 1000);
+      } else {
+        await redis.set(`nypsi:steveearned:${worker.userId}`, earned);
+        await redis.expire(`nypsi:steveearned:${worker.userId}`, ms("24 hours") / 1000);
+      }
+    } else {
+      await prisma.economyWorker.update({
+        where: {
+          userId_workerId: {
+            userId: worker.userId,
+            workerId: worker.workerId,
+          },
         },
-      },
-      data: {
-        stored: {
-          increment: incrementAmount,
+        data: {
+          stored: {
+            increment: incrementAmount,
+          },
         },
-      },
-    });
+      });
+    }
   }
 
   let amount = 0;
