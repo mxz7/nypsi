@@ -1,13 +1,13 @@
 import prisma from "../../init/database";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 import { NotificationPayload } from "../../types/Notification";
+import Constants from "../../utils/Constants";
 import { getBaseWorkers } from "../../utils/functions/economy/utils";
 import { calcWorkerValues, getWorkers } from "../../utils/functions/economy/workers";
 import { addNotificationToQueue, getDmSettings } from "../../utils/functions/users/notifications";
 import { logger } from "../../utils/logger";
 import ms = require("ms");
 import dayjs = require("dayjs");
-import Constants from "../../utils/Constants";
 
 async function doWorkerThing() {
   const query = await prisma.economyWorker.findMany({
@@ -28,7 +28,7 @@ async function doWorkerThing() {
     if (worker.stored + incrementAmount > maxStorage) {
       incrementAmount = maxStorage - worker.stored;
 
-      if ((await getDmSettings(worker.userId)).worker) {
+      if ((await getDmSettings(worker.userId)).worker != "Disabled") {
         dms.add(worker.userId);
       }
     }
@@ -74,11 +74,11 @@ async function doWorkerThing() {
       data.payload.embed = new CustomEmbed()
         .setDescription("all of your workers are full")
         .setColor(Constants.TRANSPARENT_EMBED_COLOR);
-    } else if (full.length == 1) {
+    } else if (full.length == 1 && (await getDmSettings(userId)).worker == "All") {
       data.payload.embed = new CustomEmbed()
         .setDescription(`your ${getBaseWorkers()[full[0]].item_emoji} ${getBaseWorkers()[full[0]].name} is full`)
         .setColor(Constants.TRANSPARENT_EMBED_COLOR);
-    } else {
+    } else if ((await getDmSettings(userId)).worker == "All") {
       data.payload.content = `${full.length} of your workers are full`;
       data.payload.embed = new CustomEmbed()
         .setDescription(
