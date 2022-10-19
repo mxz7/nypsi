@@ -56,7 +56,9 @@ export async function getBoosters(member: GuildMember | string): Promise<Map<str
     }
 
     if (expired.size != 0 && (await getDmSettings(id)).booster) {
-      const embed = new CustomEmbed().setColor(Constants.TRANSPARENT_EMBED_COLOR);
+      const embed = new CustomEmbed()
+        .setColor(Constants.TRANSPARENT_EMBED_COLOR)
+        .setFooter({ text: "/settings me notifications" });
 
       let desc = "";
       let text = "";
@@ -155,7 +157,9 @@ export async function getBoosters(member: GuildMember | string): Promise<Map<str
   }
 
   if (expired.size != 0 && (await getDmSettings(id)).booster) {
-    const embed = new CustomEmbed().setColor(Constants.TRANSPARENT_EMBED_COLOR);
+    const embed = new CustomEmbed()
+      .setColor(Constants.TRANSPARENT_EMBED_COLOR)
+      .setFooter({ text: "/settings me notifications" });
 
     let desc = "";
     let text = "";
