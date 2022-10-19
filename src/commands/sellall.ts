@@ -5,6 +5,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getBalance, getMulti, updateBalance } from "../utils/functions/economy/balance";
 import { getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
+import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { addToNypsiBank, getTax } from "../utils/functions/tax";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
@@ -64,6 +65,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   let taxedAmount = 0;
 
   const tax = await getTax();
+  let taxEnabled = true;
+
+  if ((await isPremium(message.member)) && (await getTier(message.member)) == 4) taxEnabled = false;
 
   const promises = [];
   const desc: string[] = [];
@@ -78,8 +82,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       sellWorth = Math.floor(sellWorth + sellWorth * multi);
     }
 
-    taxedAmount += Math.floor(sellWorth * tax);
-    sellWorth = sellWorth - Math.floor(sellWorth * tax);
+    if (taxEnabled) {
+      taxedAmount += Math.floor(sellWorth * tax);
+      sellWorth = sellWorth - Math.floor(sellWorth * tax);
+    }
+
     total += sellWorth;
 
     desc.push(`${items[item].emoji} ${items[item].name} +$${sellWorth.toLocaleString()} (${selected.get(item)})`);
@@ -99,7 +106,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const embed = new CustomEmbed(message.member);
 
   embed.setDescription(`+$**${total.toLocaleString()}**\n\n${desc.join("\n")}`);
-  embed.setFooter({ text: `${((await getTax()) * 100).toFixed(1)}% tax` });
+  if (taxEnabled) embed.setFooter({ text: `${((await getTax()) * 100).toFixed(1)}% tax` });
 
   return send({ embeds: [embed] });
 }
