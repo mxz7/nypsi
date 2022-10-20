@@ -34,6 +34,10 @@ module.exports = new ItemUse(
       }
     };
 
+    if (message.guild.id == "747056029795221513") {
+      return send({ embeds: [new ErrorEmbed("this has been disabled in the support server")] });
+    }
+
     if (args.length == 1) {
       return send({
         embeds: [new ErrorEmbed("/use handcuffs <member>")],
