@@ -225,6 +225,21 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         await updateXp(message.member, (await getXp(message.member)) + amount);
         foundItems.push(amount + "xp");
       }
+    } else if (items[chosen]?.role == "fish") {
+      let amount = 1;
+
+      if (fishingRod == "terrible_fishing_rod" && items[chosen].rarity == 0) {
+        amount = Math.floor(Math.random() * 2) + 1;
+      } else if (fishingRod == "fishing_rod" && items[chosen].rarity < 2) {
+        amount = Math.floor(Math.random() * 4) + 1;
+      } else if (fishingRod == "incredible_fishing_rod") {
+        amount = Math.floor(Math.random() * 4) + 2;
+      }
+
+      await addInventoryItem(message.member, chosen, amount);
+
+      foundItems.push(`${amount} ${items[chosen].emoji} ${items[chosen].name}`);
+      foundItemsAmount += amount;
     } else {
       let amount = 1;
 

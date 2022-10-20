@@ -37,7 +37,7 @@
     "role": "fish",
     "rarity": 1,
     "buy": 0,
-    "sell": 35000
+    "sell": 30000
   },
   "large_fish": {
     "id": "large_fish",
