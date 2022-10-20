@@ -1,7 +1,8 @@
 import { GuildMember, User } from "discord.js";
-import redis from "../../../init/redis";
 import prisma from "../../../init/database";
+import redis from "../../../init/redis";
 import ms = require("ms");
+import Constants from "../../Constants";
 
 export async function hasProfile(member: GuildMember | string) {
   let id: string;
@@ -11,8 +12,8 @@ export async function hasProfile(member: GuildMember | string) {
     id = member;
   }
 
-  if (await redis.exists(`cache:user:exists:${id}`)) {
-    return (await redis.get(`cache:user:exists:${id}`)) === "true" ? true : false;
+  if (await redis.exists(`${Constants.redis.cache.user.EXISTS}:${id}`)) {
+    return (await redis.get(`${Constants.redis.cache.user.EXISTS}:${id}`)) === "true" ? true : false;
   }
 
   const query = await prisma.user.findUnique({
@@ -25,12 +26,12 @@ export async function hasProfile(member: GuildMember | string) {
   });
 
   if (query) {
-    await redis.set(`cache:user:exists:${id}`, "true");
-    await redis.expire(`cache:user:exists:${id}`, ms("1 hour") / 1000);
+    await redis.set(`${Constants.redis.cache.user.EXISTS}:${id}`, "true");
+    await redis.expire(`${Constants.redis.cache.user.EXISTS}:${id}`, ms("1 hour") / 1000);
     return true;
   } else {
-    await redis.set(`cache:user:exists:${id}`, "false");
-    await redis.expire(`cache:user:exists:${id}`, ms("1 hour") / 1000);
+    await redis.set(`${Constants.redis.cache.user.EXISTS}:${id}`, "false");
+    await redis.expire(`${Constants.redis.cache.user.EXISTS}:${id}`, ms("1 hour") / 1000);
     return false;
   }
 }
@@ -54,5 +55,5 @@ export async function createProfile(member: User | string) {
       },
     })
     .catch(() => {});
-  await redis.del(`cache:user:exists:${id}`);
+  await redis.del(`${Constants.redis.cache.user.EXISTS}:${id}`);
 }

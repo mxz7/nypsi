@@ -3,6 +3,7 @@ import redis from "../init/redis.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { MilfSearchData } from "../types/Sex.js";
+import Constants from "../utils/Constants.js";
 import { addProgress } from "../utils/functions/economy/achievements.js";
 import { cleanString } from "../utils/functions/string.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
@@ -44,8 +45,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({ embeds: [embed], ephemeral: true });
   }
 
-  if ((await redis.exists(`cd:sex-chastity:${message.author.id}`)) == 1) {
-    const init = parseInt(await redis.get(`cd:sex-chastity:${message.author.id}`));
+  if ((await redis.exists(`${Constants.redis.cooldown.SEX_CHASTITY}:${message.author.id}`)) == 1) {
+    const init = parseInt(await redis.get(`${Constants.redis.cooldown.SEX_CHASTITY}:${message.author.id}`));
     const curr = new Date();
     const diff = Math.round((curr.getTime() - init) / 1000);
     const time = 10800 - diff;

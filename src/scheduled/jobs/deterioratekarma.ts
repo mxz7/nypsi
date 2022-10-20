@@ -2,6 +2,7 @@ import ms = require("ms");
 import { parentPort } from "worker_threads";
 import prisma from "../../init/database";
 import redis from "../../init/redis";
+import Constants from "../../utils/Constants";
 
 (async () => {
   const now = Date.now();
@@ -57,7 +58,7 @@ import redis from "../../init/redis";
       },
     });
 
-    await redis.del(`cache:user:karma:${user.id}`);
+    await redis.del(`${Constants.redis.cache.user.KARMA}:${user.id}`);
   }
 
   parentPort.postMessage(`${total} total karma deteriorated`);

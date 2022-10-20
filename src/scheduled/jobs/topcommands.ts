@@ -2,12 +2,13 @@ import { EmbedBuilder, WebhookClient } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { parentPort } from "worker_threads";
 import redis from "../../init/redis";
+import Constants from "../../utils/Constants";
 
 (async () => {
-  const topCommands = await redis.hgetall("nypsi:topcommands");
-  const topUsers = await redis.hgetall("nypsi:topcommands:user");
-  await redis.del("nypsi:topcommands");
-  await redis.del("nypsi:topcommands:user");
+  const topCommands = await redis.hgetall(Constants.redis.nypsi.TOP_COMMANDS);
+  const topUsers = await redis.hgetall(Constants.redis.nypsi.TOP_COMMANDS_USER);
+  await redis.del(Constants.redis.nypsi.TOP_COMMANDS);
+  await redis.del(Constants.redis.nypsi.TOP_COMMANDS_USER);
 
   const commands: string[] = [];
 
