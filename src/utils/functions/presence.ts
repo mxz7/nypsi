@@ -18,9 +18,9 @@ export function randomPresence(): string {
 }
 
 export async function getCustomPresence() {
-  return await redis.get("nypsi:presence");
+  return await redis.get("${Constants.redis.nypsi.PRESENCE}");
 }
 
 export async function setCustomPresence(text?: string) {
-  await redis.set("nypsi:presence", text);
+  await redis.set("${Constants.redis.nypsi.PRESENCE}", text);
 }

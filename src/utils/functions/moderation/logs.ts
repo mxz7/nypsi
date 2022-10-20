@@ -74,7 +74,7 @@ export async function addModLog(
 export async function addLog(guild: Guild, type: LogType, embed: CustomEmbed) {
   embed.setColor(logColors.get(type));
 
-  await redis.lpush(`nypsi:guild:logs:queue:${guild.id}`, JSON.stringify(embed.toJSON()));
+  await redis.lpush(`${Constants.redis.nypsi.GUILD_LOG_QUEUE}:${guild.id}`, JSON.stringify(embed.toJSON()));
 }
 
 export async function isLogsEnabled(guild: Guild) {
@@ -107,7 +107,7 @@ export async function setLogsChannelHook(guild: Guild, hook: string) {
   await redis.del(`${Constants.redis.cache.guild.LOGS}:${guild.id}`);
 
   if (!hook) {
-    await redis.del(`nypsi:guild:logs:queue:${guild.id}`);
+    await redis.del(`${Constants.redis.nypsi.GUILD_LOG_QUEUE}:${guild.id}`);
   }
 
   await prisma.moderation.update({

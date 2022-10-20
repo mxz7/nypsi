@@ -325,13 +325,13 @@ async function checkWatchers(itemName: string, messageUrl: string, creatorId: st
   for (const userId of users) {
     if (!(await getDmSettings(userId)).auction) continue;
 
-    if (await redis.exists(`nypsi:auctionwatch:cooldown:${userId}`)) continue;
+    if (await redis.exists(`${Constants.redis.cooldown.AUCTION_WATCH}:${userId}`)) continue;
 
     payload.memberId = userId;
 
     await addNotificationToQueue(payload);
 
-    await redis.set(`nypsi:auctionwatch:cooldown:${userId}`, "true");
-    await redis.expire(`nypsi:auctionwatch:cooldown:${userId}`, ms("5 minutes") / 1000);
+    await redis.set(`${Constants.redis.cooldown.AUCTION_WATCH}:${userId}`, "true");
+    await redis.expire(`${Constants.redis.cooldown.AUCTION_WATCH}:${userId}`, ms("5 minutes") / 1000);
   }
 }

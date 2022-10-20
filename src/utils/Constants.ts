@@ -13,9 +13,10 @@ products.set("5569964b90", "nypsi_crate");
 export default {
   redis: {
     cooldown: {
-      SUPPORT: "cooldown:support",
+      SUPPORT: "cd:support",
       ROB_RADIO: "cd:rob-radio",
       SEX_CHASTITY: "cd:sex-chastity",
+      AUCTION_WATCH: "cd:auctionwatch",
     },
     cache: {
       SUPPORT: "cache:support",
@@ -57,6 +58,15 @@ export default {
       RESTART: "nypsi:restarting",
       TOP_COMMANDS_USER: "nypsi:topcommands:user",
       STEVE_EARNED: "nypsi:steveearned",
+      PRESENCE: "nypsi:presence",
+      NEWS_SEEN: "nypsi:news:seen",
+      NEWS: "nypsi:news",
+      CAPTCHA_VERIFIED: "nypsi:captcha_verified",
+      GUILD_LOG_QUEUE: "nypsi:guild:logs:queue",
+      TOP_COMMANDS: "nypsi:topcommands",
+      VOTE_REMINDER_RECEIVED: "nypsi:vote_reminder:received",
+      TAX: "nypsi:tax",
+      DM_QUEUE: "nypsi:dmqueue",
     },
   },
   BRONZE_ROLE_ID: "819870590718181391",

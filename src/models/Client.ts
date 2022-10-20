@@ -46,7 +46,7 @@ export class NypsiClient extends Client {
 
     runEconomySetup();
 
-    redis.del("nypsi:presence");
+    redis.del("${Constants.redis.nypsi.PRESENCE}");
 
     if (this.cluster.maintenance) {
       logger.info(`started on maintenance mode with ${this.cluster.maintenance}`);

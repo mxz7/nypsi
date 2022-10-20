@@ -41,7 +41,7 @@ export async function createCaptcha() {
 }
 
 export async function isVerified(id: string) {
-  return await redis.exists(`nypsi:captcha_verified:${id}`);
+  return await redis.exists(`${Constants.redis.nypsi.CAPTCHA_VERIFIED}:${id}`);
 }
 
 export async function passedCaptcha(member: GuildMember) {
@@ -61,8 +61,8 @@ export async function passedCaptcha(member: GuildMember) {
     )})`
   );
 
-  await redis.set(`nypsi:captcha_verified:${member.user.id}`, member.user.id);
-  await redis.expire(`nypsi:captcha_verified:${member.user.id}`, ms("1 hour") / 1000);
+  await redis.set(`${Constants.redis.nypsi.CAPTCHA_VERIFIED}:${member.user.id}`, member.user.id);
+  await redis.expire(`${Constants.redis.nypsi.CAPTCHA_VERIFIED}:${member.user.id}`, ms("1 hour") / 1000);
 }
 
 export async function failedCaptcha(member: GuildMember) {

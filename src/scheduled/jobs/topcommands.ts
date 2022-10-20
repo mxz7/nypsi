@@ -4,9 +4,9 @@ import { parentPort } from "worker_threads";
 import redis from "../../init/redis";
 
 (async () => {
-  const topCommands = await redis.hgetall("nypsi:topcommands");
+  const topCommands = await redis.hgetall("${Constants.redis.nypsi.TOP_COMMANDS}");
   const topUsers = await redis.hgetall("${Constants.redis.nypsi.TOP_COMMANDS_USER}");
-  await redis.del("nypsi:topcommands");
+  await redis.del("${Constants.redis.nypsi.TOP_COMMANDS}");
   await redis.del("${Constants.redis.nypsi.TOP_COMMANDS_USER}");
 
   const commands: string[] = [];
