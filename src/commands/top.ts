@@ -208,6 +208,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (amount < 5) amount = 5;
 
     return topComplete(amount);
+  } else if (args[0].toLowerCase() == "net" || args[0].toLowerCase() == "networth") {
+    let amount;
+
+    amount = parseInt(args[1]);
+
+    if (!amount) amount = 5;
+
+    if (amount > 10 && !message.member.permissions.has(PermissionFlagsBits.Administrator)) amount = 10;
+
+    if (amount < 5) amount = 5;
+
+    return topNet(amount);
   }
 }
 
