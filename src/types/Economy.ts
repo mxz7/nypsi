@@ -20,6 +20,7 @@ export interface Item {
     time: number;
   };
   worker_upgrade_id: string;
+  plural?: string;
 }
 
 export interface LotteryTicket {
