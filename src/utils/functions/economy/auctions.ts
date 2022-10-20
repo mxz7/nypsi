@@ -3,10 +3,10 @@ import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
+import Constants from "../../Constants";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { getItems } from "./utils";
 import ms = require("ms");
-import Constants from "../../Constants";
 
 export async function getAuctions(member: GuildMember | string) {
   let id: string;
@@ -215,6 +215,8 @@ export async function bumpAuction(id: string, client: NypsiClient) {
 }
 
 export async function getAuctionAverage(item: string) {
+  if (await redis.exists(`cache:auctionavg:${item}`)) return parseInt(await redis.get(`cache:auctionavg:${item}`));
+
   const auctions = await prisma.auction.findMany({
     where: {
       AND: [{ sold: true }, { itemName: item }],
@@ -242,7 +244,10 @@ export async function getAuctionAverage(item: string) {
   }
 
   const sum = costs.reduce((a, b) => a + b, 0);
-  const avg = sum / costs.length || 0;
+  const avg = Math.floor(sum / costs.length) || 0;
+
+  await redis.set(`cache:auctionavg:${item}`, avg);
+  await redis.expire(`cache:auctionavg:${item}`, ms("1 hour") / 1000);
 
   return avg;
 }
