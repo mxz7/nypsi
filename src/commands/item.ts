@@ -1,10 +1,9 @@
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import { Item } from "../types/Economy";
 import { getAuctionAverage } from "../utils/functions/economy/auctions";
-import { getInventory, getTotalAmountOfItem } from "../utils/functions/economy/inventory";
-import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
+import { getInventory, getTotalAmountOfItem, selectItem } from "../utils/functions/economy/inventory";
+import { createUser, userExists } from "../utils/functions/economy/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("item", "view information about an item", Categories.MONEY);
@@ -43,28 +42,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({ embeds: [new ErrorEmbed("/item <item>")] });
   }
 
-  const items = getItems();
-
-  const searchTag = args.join(" ").toLowerCase();
-
-  let selected: Item;
-
-  for (const itemName of Array.from(Object.keys(items))) {
-    const aliases = items[itemName].aliases ? items[itemName].aliases : [];
-    if (searchTag == itemName) {
-      selected = items[itemName];
-      break;
-    } else if (searchTag == itemName.split("_").join("")) {
-      selected = items[itemName];
-      break;
-    } else if (aliases.indexOf(searchTag) != -1) {
-      selected = items[itemName];
-      break;
-    } else if (searchTag == items[itemName].name) {
-      selected = items[itemName];
-      break;
-    }
-  }
+  const selected = selectItem(args.join(" ").toLowerCase());
 
   if (!selected) {
     return send({ embeds: [new ErrorEmbed(`couldnt find \`${args.join(" ")}\``)] });
