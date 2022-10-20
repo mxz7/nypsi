@@ -461,3 +461,29 @@ export async function getTotalAmountOfItem(itemId: string) {
 
   return query._sum.amount;
 }
+
+export function selectItem(search: string) {
+  let selected: Item;
+  const items = getItems();
+
+  for (const itemName of Array.from(Object.keys(items))) {
+    const aliases = items[itemName].aliases ? items[itemName].aliases : [];
+    if (search == itemName) {
+      selected = items[itemName];
+      break;
+    } else if (search == itemName.split("_").join("")) {
+      selected = items[itemName];
+      break;
+    } else if (aliases.indexOf(search) != -1) {
+      selected = items[itemName];
+      break;
+    } else if (search == items[itemName].name) {
+      selected = items[itemName];
+      break;
+    } else if (search == items[itemName].plural) {
+      selected = items[itemName];
+    }
+  }
+
+  return selected;
+}
