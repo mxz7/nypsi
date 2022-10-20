@@ -4,12 +4,15 @@ import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
 import { getTier, isPremium } from "../premium/premium";
+import { getAuctionAverage } from "./auctions";
 import { getBoosters } from "./boosters";
 import { getGuildByUser } from "./guilds";
 import { getPrestige } from "./prestige";
 import { getItems } from "./utils";
 import { hasVoted } from "./vote";
+import { calcWorkerValues } from "./workers";
 import { getXp } from "./xp";
+import ms = require("ms");
 
 export async function getBalance(member: GuildMember | string) {
   let id: string;
@@ -492,4 +495,77 @@ export async function getRequiredBetForXp(member: GuildMember): Promise<number> 
   requiredBet += prestige * 1000;
 
   return requiredBet;
+}
+
+export async function calcNetWorth(member: GuildMember | string) {
+  let id: string;
+  if (member instanceof GuildMember) {
+    id = member.user.id;
+  } else {
+    id = member;
+  }
+
+  if (await redis.exists(`cache:networth:${id}`)) {
+    return parseInt(await redis.get(`cache:networth:${id}`));
+  }
+
+  const query = await prisma.economy.findUnique({
+    where: {
+      userId: id,
+    },
+    select: {
+      money: true,
+      bank: true,
+      Inventory: true,
+      EconomyWorker: {
+        include: {
+          upgrades: true,
+        },
+      },
+      user: {
+        select: {
+          EconomyGuild: {
+            select: {
+              balance: true,
+              members: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  let worth = 0;
+
+  if (!query) {
+    await redis.set(`cache:networth:${id}`, worth);
+    await redis.expire(`cache:networth:${id}`, ms("30 minutes") / 1000);
+
+    return worth;
+  }
+
+  worth += Number(query.money);
+  worth += Number(query.bank);
+  worth += Number(query.user.EconomyGuild?.balance / query.user.EconomyGuild?.members.length) || 0;
+
+  for (const item of query.Inventory) {
+    const auctionAvg = await getAuctionAverage(item.item);
+
+    if (auctionAvg) {
+      worth += auctionAvg * item.amount;
+    } else if (getItems()[item.item].sell) {
+      worth += getItems()[item.item].sell * item.amount;
+    }
+  }
+
+  for (const worker of query.EconomyWorker) {
+    const { perItem } = await calcWorkerValues(worker);
+
+    worth += worker.stored * perItem;
+  }
+
+  await redis.set(`cache:networth:${id}`, worth);
+  await redis.expire(`cache:networth:${id}`, ms("30 minutes") / 1000);
+
+  return worth;
 }
