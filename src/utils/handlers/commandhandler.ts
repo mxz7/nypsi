@@ -512,6 +512,14 @@ export async function runCommand(
       .catch(() => {});
   }
 
+  if (!message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.UseApplicationCommands)) {
+    return message.member
+      .send(
+        "❌ i don't have permission to perform commands in that channel - please contact server staff if this is an error"
+      )
+      .catch(() => {});
+  }
+
   if (!message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.EmbedLinks)) {
     return message.channel.send({
       content:
