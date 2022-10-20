@@ -16,17 +16,25 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   /**
    * not perfect latency testing i know but it works!!
    */
+  const redisLatency: number[] = [];
+
   let now = Date.now();
-  await redis.set("ping:test", "ping ping ping");
-  await redis.del("ping:test");
+  await redis.set("ping:test", "pong");
   let after = Date.now();
 
-  const redisLatency = after - now;
+  redisLatency[0] = after - now;
 
-  let dbLatency: number;
+  now = Date.now();
+  await redis.del("ping:test");
+  after = Date.now();
+
+  redisLatency[1] = after - now;
+
+  const dbLatency: number[] = [];
 
   if (!pingingDb) {
     pingingDb = true;
+
     now = Date.now();
     await prisma.user.create({
       data: {
@@ -35,15 +43,21 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         lastCommand: new Date(),
       },
     });
+    after = Date.now();
+
+    dbLatency[0] = after - now;
+
+    now = Date.now();
     await prisma.user.delete({
       where: {
         id: "test_user",
       },
     });
     after = Date.now();
+
     pingingDb = false;
 
-    dbLatency = after - now;
+    dbLatency[1] = after - now;
   }
 
   now = Date.now();
@@ -56,10 +70,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const embed = new CustomEmbed(message.member);
 
-  let desc = `discord api \`${discordLatency}ms\`\n` + `bot message \`${msgLatency}ms\`\n` + `redis \`${redisLatency}ms\``;
+  let desc =
+    `discord api \`${discordLatency}ms\`\n` +
+    `bot message \`${msgLatency}ms\`\n` +
+    `redis \`${redisLatency.join("ms` | `")}ms\``;
 
   if (dbLatency) {
-    desc += `\ndatabase \`${dbLatency}ms\``;
+    desc += `\ndatabase \`${dbLatency.join("ms` | `")}ms\``;
   }
 
   embed.setDescription(desc);
