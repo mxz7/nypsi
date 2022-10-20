@@ -5,9 +5,9 @@ import prisma from "../../init/database";
 import redis from "../../init/redis";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 import { NotificationPayload } from "../../types/Notification";
+import Constants from "../../utils/Constants";
 import { addNotificationToQueue } from "../../utils/functions/users/notifications";
 import dayjs = require("dayjs");
-import Constants from "../../utils/Constants";
 
 (async () => {
   const userIds = await prisma.dMSettings.findMany({
@@ -47,12 +47,12 @@ import Constants from "../../utils/Constants";
   let amount = 0;
 
   for (const user of userIds) {
-    if (await redis.sismember("nypsi:vote_reminder:received", user.userId)) continue;
+    if (await redis.sismember(Constants.redis.nypsi.VOTE_REMINDER_RECEIVED, user.userId)) continue;
     data.memberId = user.userId;
 
     await addNotificationToQueue(data);
 
-    await redis.sadd("nypsi:vote_reminder:received", user.userId);
+    await redis.sadd(Constants.redis.nypsi.VOTE_REMINDER_RECEIVED, user.userId);
     amount++;
   }
 

@@ -15,8 +15,8 @@ export async function getSupportRequestByChannelId(id: string) {
 }
 
 export async function getSupportRequest(id: string) {
-  if (await redis.exists(`cache:support:${id}`)) {
-    return await redis.get(`cache:support:${id}`);
+  if (await redis.exists(`${Constants.redis.cache.SUPPORT}:${id}`)) {
+    return await redis.get(`${Constants.redis.cache.SUPPORT}:${id}`);
   }
 
   const query = await prisma.supportRequest.findUnique({
@@ -26,8 +26,8 @@ export async function getSupportRequest(id: string) {
   });
 
   if (query) {
-    await redis.set(`cache:support:${id}`, query.channelId);
-    await redis.expire(`cache:support:${id}`, 900);
+    await redis.set(`${Constants.redis.cache.SUPPORT}:${id}`, query.channelId);
+    await redis.expire(`${Constants.redis.cache.SUPPORT}:${id}`, 900);
     return query.channelId;
   } else {
     return null;

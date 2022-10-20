@@ -10,6 +10,7 @@ import redis from "../../../../init/redis";
 import { NypsiCommandInteraction } from "../../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
+import Constants from "../../../Constants";
 import { getMember } from "../../member";
 import sleep from "../../sleep";
 import { getInventory, setInventoryItem } from "../inventory";
@@ -66,14 +67,14 @@ module.exports = new ItemUse(
       });
     }
 
-    if ((await redis.exists(`cd:sex-chastity:${chastityTarget.user.id}`)) == 1) {
+    if ((await redis.exists(`${Constants.redis.cooldown.SEX_CHASTITY}:${chastityTarget.user.id}`)) == 1) {
       return send({
         embeds: [new ErrorEmbed(`**${chastityTarget.user.tag}** is already equipped with a chastity cage`)],
       });
     }
 
-    await redis.set(`cd:sex-chastity:${chastityTarget.user.id}`, Date.now());
-    await redis.expire(`cd:sex-chastity:${chastityTarget.user.id}`, 10800);
+    await redis.set(`${Constants.redis.cooldown.SEX_CHASTITY}:${chastityTarget.user.id}`, Date.now());
+    await redis.expire(`${Constants.redis.cooldown.SEX_CHASTITY}:${chastityTarget.user.id}`, 10800);
 
     const inventory = await getInventory(message.member, false);
 

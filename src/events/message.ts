@@ -45,7 +45,7 @@ export default async function messageCreate(message: Message) {
   if (message.channel.isDMBased()) {
     logger.info("message in DM from " + message.author.tag + ": " + message.content);
 
-    if (await redis.exists(`cooldown:support:${message.author.id}`)) {
+    if (await redis.exists(`${Constants.redis.cooldown.SUPPORT}:${message.author.id}`)) {
       return message.reply({
         embeds: [new ErrorEmbed("you have created a support request recently, try again later")],
       });

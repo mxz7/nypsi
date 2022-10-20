@@ -18,7 +18,7 @@ export async function getBoosters(member: GuildMember | string): Promise<Map<str
 
   const expired = new Map<string, number>();
 
-  const cache = await redis.get(`cache:economy:boosters:${id}`);
+  const cache = await redis.get(`${Constants.redis.cache.economy.BOOSTERS}:${id}`);
 
   if (cache) {
     if (_.isEmpty(JSON.parse(cache))) return new Map();
@@ -42,7 +42,7 @@ export async function getBoosters(member: GuildMember | string): Promise<Map<str
             expired.set(booster.boosterId, 1);
           }
 
-          await redis.del(`cache:economy:boosters:${id}`);
+          await redis.del(`${Constants.redis.cache.economy.BOOSTERS}:${id}`);
 
           boosters.splice(boosters.indexOf(booster), 1);
 
@@ -69,8 +69,8 @@ export async function getBoosters(member: GuildMember | string): Promise<Map<str
         total += expired.get(expiredBoosterId);
 
         if (expiredBoosterId == "steve") {
-          const earned = parseInt((await redis.get(`nypsi:steveearned:${id}`)) || "0");
-          await redis.del(`nypsi:steveearned:${id}`);
+          const earned = parseInt((await redis.get(`${Constants.redis.nypsi.STEVE_EARNED}:${id}`)) || "0");
+          await redis.del(`${Constants.redis.nypsi.STEVE_EARNED}:${id}`);
 
           desc += `\`${expired.get(expiredBoosterId)}x\` ${items[expiredBoosterId].emoji} ${
             items[expiredBoosterId].name
@@ -170,8 +170,8 @@ export async function getBoosters(member: GuildMember | string): Promise<Map<str
       total += expired.get(expiredBoosterId);
 
       if (expiredBoosterId == "steve") {
-        const earned = parseInt((await redis.get(`nypsi:steveearned:${id}`)) || "0");
-        await redis.del(`nypsi:steveearned:${id}`);
+        const earned = parseInt((await redis.get(`${Constants.redis.nypsi.STEVE_EARNED}:${id}`)) || "0");
+        await redis.del(`${Constants.redis.nypsi.STEVE_EARNED}:${id}`);
 
         desc += `\`${expired.get(expiredBoosterId)}x\` ${items[expiredBoosterId].emoji} ${
           items[expiredBoosterId].name
@@ -203,8 +203,8 @@ export async function getBoosters(member: GuildMember | string): Promise<Map<str
     }
   }
 
-  await redis.set(`cache:economy:boosters:${id}`, JSON.stringify(Object.fromEntries(map)));
-  await redis.expire(`cache:economy:boosters:${id}`, 300);
+  await redis.set(`${Constants.redis.cache.economy.BOOSTERS}:${id}`, JSON.stringify(Object.fromEntries(map)));
+  await redis.expire(`${Constants.redis.cache.economy.BOOSTERS}:${id}`, 300);
 
   return map;
 }
@@ -227,5 +227,5 @@ export async function addBooster(member: GuildMember | string, boosterId: string
     },
   });
 
-  await redis.del(`cache:economy:boosters:${id}`);
+  await redis.del(`${Constants.redis.cache.economy.BOOSTERS}:${id}`);
 }

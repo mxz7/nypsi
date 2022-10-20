@@ -4,6 +4,7 @@ import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders";
+import Constants from "../utils/Constants";
 import requestDM from "../utils/functions/requestdm";
 import { getSupportRequestByChannelId, sendToRequestChannel } from "../utils/functions/supportrequest";
 import ms = require("ms");
@@ -79,10 +80,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     },
   });
 
-  await redis.del(`cache:support:${support.userId}`);
+  await redis.del(`${Constants.redis.cache.SUPPORT}:${support.userId}`);
 
-  await redis.set(`cooldown:support:${support.userId}`, "t");
-  await redis.expire(`cooldown:support:${support.userId}`, Math.floor(ms("24 hours") / 1000));
+  await redis.set(`${Constants.redis.cooldown.SUPPORT}:${support.userId}`, "t");
+  await redis.expire(`${Constants.redis.cooldown.SUPPORT}:${support.userId}`, Math.floor(ms("24 hours") / 1000));
 }
 
 cmd.setRun(run);

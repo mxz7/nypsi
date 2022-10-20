@@ -3,6 +3,7 @@ import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
 import { PremUser } from "../../../models/PremStorage";
+import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { formatDate } from "../date";
 import requestDM from "../requestdm";
@@ -17,8 +18,8 @@ export async function isPremium(member: GuildMember | string): Promise<boolean> 
     id = member;
   }
 
-  if (await redis.exists(`cache:premium:level:${id}`)) {
-    const level = parseInt(await redis.get(`cache:premium:level:${id}`));
+  if (await redis.exists(`${Constants.redis.cache.premium.LEVEL}:${id}`)) {
+    const level = parseInt(await redis.get(`${Constants.redis.cache.premium.LEVEL}:${id}`));
 
     if (level == 0) {
       return false;
@@ -44,17 +45,17 @@ export async function isPremium(member: GuildMember | string): Promise<boolean> 
           userId: id,
         },
       });
-      await redis.set(`cache:premium:level:${id}`, 0);
-      await redis.expire(`cache:premium:level:${id}`, 300);
+      await redis.set(`${Constants.redis.cache.premium.LEVEL}:${id}`, 0);
+      await redis.expire(`${Constants.redis.cache.premium.LEVEL}:${id}`, 300);
       return false;
     }
 
-    await redis.set(`cache:premium:level:${id}`, query.level);
-    await redis.expire(`cache:premium:level:${id}`, 300);
+    await redis.set(`${Constants.redis.cache.premium.LEVEL}:${id}`, query.level);
+    await redis.expire(`${Constants.redis.cache.premium.LEVEL}:${id}`, 300);
     return true;
   } else {
-    await redis.set(`cache:premium:level:${id}`, 0);
-    await redis.expire(`cache:premium:level:${id}`, 300);
+    await redis.set(`${Constants.redis.cache.premium.LEVEL}:${id}`, 0);
+    await redis.expire(`${Constants.redis.cache.premium.LEVEL}:${id}`, 300);
     return false;
   }
 }
@@ -67,7 +68,8 @@ export async function getTier(member: GuildMember | string): Promise<number> {
     id = member;
   }
 
-  if (await redis.exists(`cache:premium:level:${id}`)) return parseInt(await redis.get(`cache:premium:level:${id}`));
+  if (await redis.exists(`${Constants.redis.cache.premium.LEVEL}:${id}`))
+    return parseInt(await redis.get(`${Constants.redis.cache.premium.LEVEL}:${id}`));
 
   const query = await prisma.premium.findUnique({
     where: {
@@ -78,8 +80,8 @@ export async function getTier(member: GuildMember | string): Promise<number> {
     },
   });
 
-  await redis.set(`cache:premium:level:${id}`, query.level || 0);
-  await redis.expire(`cache:premium:level:${id}`, 300);
+  await redis.set(`${Constants.redis.cache.premium.LEVEL}:${id}`, query.level || 0);
+  await redis.expire(`${Constants.redis.cache.premium.LEVEL}:${id}`, 300);
 
   return query.level;
 }
@@ -132,7 +134,7 @@ export async function addMember(member: GuildMember | string, level: number, cli
     }
   }
 
-  await redis.del(`cache:premium:level:${id}`);
+  await redis.del(`${Constants.redis.cache.premium.LEVEL}:${id}`);
 }
 
 export async function getPremiumProfile(member: GuildMember | string): Promise<PremUser> {
@@ -188,7 +190,7 @@ export async function setTier(member: GuildMember | string, level: number, clien
     }
   }
 
-  await redis.del(`cache:premium:level:${id}`);
+  await redis.del(`${Constants.redis.cache.premium.LEVEL}:${id}`);
 }
 
 export async function setStatus(member: GuildMember | string, status: number) {
@@ -240,7 +242,7 @@ export async function renewUser(member: string, client?: NypsiClient) {
     }
   }
 
-  await redis.del(`cache:premium:level:${member}`);
+  await redis.del(`${Constants.redis.cache.premium.LEVEL}:${member}`);
 
   if (colorCache.has(member)) {
     colorCache.delete(member);
@@ -272,7 +274,7 @@ export async function expireUser(member: string, client: NypsiClient) {
       // doesnt need to find one
     });
 
-  await redis.del(`cache:premium:level:${member}`);
+  await redis.del(`${Constants.redis.cache.premium.LEVEL}:${member}`);
 
   if (colorCache.has(member)) {
     colorCache.delete(member);
