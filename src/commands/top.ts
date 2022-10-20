@@ -91,7 +91,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return send({ embeds: [new ErrorEmbed("there are no users to show")] });
     }
 
-    const embed = new CustomEmbed(message.member).setHeader("top " + balTop.length).setDescription(balTop.join("\n"));
+    const embed = new CustomEmbed(message.member)
+      .setHeader("top " + balTop.length + " networth")
+      .setDescription(balTop.join("\n"));
 
     return send({ embeds: [embed] });
   };
