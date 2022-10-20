@@ -512,6 +512,7 @@
   "teddy": {
     "id": "teddy",
     "name": "teddy bear",
+    "plural": "teddy bears",
     "emoji": "🧸",
     "shortDesc": "[i love you](https://64.media.tumblr.com/3020949b864ff6fdeecdd80fe5b5859c/tumblr_mg5tw61IIQ1r5rz5so1_500.gif)",
     "longDesc": "[i love you](https://64.media.tumblr.com/3020949b864ff6fdeecdd80fe5b5859c/tumblr_mg5tw61IIQ1r5rz5so1_500.gif)",
@@ -593,6 +594,7 @@
   "minecraft_account": {
     "id": "minecraft_account",
     "name": "minecraft account",
+    "plural": "minecraft accounts",
     "emoji": "<:nypsi_minecraft:839560490324721735>",
     "longDesc": "[mining away... i dont know what to mine ill mine this anyway](https://www.youtube.com/watch?v=dgha9S39Y6M)",
     "rarity": 2,
@@ -602,6 +604,7 @@
   "ring": {
     "id": "ring",
     "name": "ring",
+    "plural": "rings",
     "emoji": "💍",
     "longDesc": "maybe get married?",
     "rarity": 4,
@@ -610,6 +613,7 @@
   "radio": {
     "id": "radio",
     "name": "police scanner",
+    "plural": "police scanners",
     "emoji": "📻",
     "longDesc": "prevent someone from robbing people",
     "rarity": 1,
@@ -657,6 +661,7 @@
   "flappy_bird": {
     "id": "flappy_bird",
     "name": "flappy bird",
+    "plural": "flappy birds",
     "emoji": "<:nypsi_flappy_bird:839531060194967582>",
     "longDesc": "flap flap",
     "rarity": 2,
@@ -667,6 +672,7 @@
   "chastity_cage": {
     "id": "chastity_cage",
     "name": "chastity cage",
+    "plural": "chastity cages",
     "emoji": "<:nypsi_chastity_cage:839532763338113036>",
     "longDesc": "stop someone finding milfs",
     "rarity": 1,
@@ -714,6 +720,7 @@
   "smart_car": {
     "id": "smart_car",
     "name": "smart car",
+    "plural": "smart cars",
     "emoji": "<:nypsi_smart_car:839967953306386442>",
     "longDesc": "you should be embarrassed of yourself",
     "rarity": 1,
@@ -774,6 +781,7 @@
   "redbull": {
     "id": "redbull",
     "name": "red bull",
+    "plural": "red bulls",
     "emoji": "<:nypsi_redbull:1001210452832964648>",
     "longDesc": "50% shorter cooldowns for 7 minutes 30 seconds",
     "rarity": 2,
@@ -807,6 +815,7 @@
   "multi_potion": {
     "id": "multi_potion",
     "name": "multiplier potion",
+    "plural": "multiplier potions",
     "aliases": ["multi"],
     "emoji": "<:nypsi_potion:1001463080582131843>",
     "longDesc": "increase your multiplier by 3%",
@@ -876,6 +885,7 @@
   "xp_potion": {
     "id": "xp_potion",
     "name": "xp potion",
+    "plural": "xp potions",
     "emoji": "<:nypsi_potion:1001463080582131843>",
     "longDesc": "earn 50% more xp",
     "rarity": 1,
@@ -910,6 +920,7 @@
   "stolen_credit_card": {
     "id": "stolen_credit_card",
     "name": "stolen credit card",
+    "plural": "stolen credit cards",
     "aliases": ["scc", "credit", "card", "cc"],
     "emoji": "💳",
     "longDesc": "increase your bank limit by $1,000-$500,000",
@@ -992,6 +1003,7 @@
   "stolen_nasa_computer": {
     "id": "stolen_nasa_computer",
     "name": "stolen nasa computer",
+    "plural": "stolen nasa computers",
     "aliases": ["nasa", "computer"],
     "emoji": "🖥",
     "longDesc": "applies the nasa computer upgrade to the spacex worker",
@@ -1003,6 +1015,7 @@
   "launchpad": {
     "id": "launchpad",
     "name": "launchpad",
+    "plural": "launchpads",
     "aliases": ["launch"],
     "emoji": "🚀",
     "longDesc": "applies the launchpad upgrade to the spacex worker",
@@ -1014,6 +1027,7 @@
   "warehouse_permit": {
     "id": "warehouse_permit",
     "name": "warehouse permit",
+    "plural": "warehouse permits",
     "aliases": ["warehouse", "permit"],
     "emoji": "📄",
     "longDesc": "applies the warehouse expansion upgrade to the amazon worker",
@@ -1025,6 +1039,7 @@
   "orphan": {
     "id": "orphan",
     "name": "orphan",
+    "plural": "orphans",
     "emoji": "🧒🏼",
     "longDesc": "applies the underage workers upgrade to the amazon worker",
     "rarity": 2,
@@ -1035,6 +1050,7 @@
   "grandma": {
     "id": "grandma",
     "name": "grandma",
+    "plural": "grandmas",
     "aliases": ["gran", "nan", "uncle"],
     "emoji": "👵🏻",
     "longDesc": "grandma will help you bake more cookies",
@@ -1052,6 +1068,7 @@
   "highroller": {
     "id": "highroller",
     "name": "highroller",
+    "plural": "highrollers",
     "aliases": ["high", "roller"],
     "emoji": "💸",
     "longDesc": "burn your money away even faster by doubling your max bet for 30 minutes",
@@ -1068,6 +1085,7 @@
   "steve": {
     "id": "steve",
     "name": "steve",
+    "plural": "steves",
     "aliases": ["stevieee", "stephen", "stephen", "maxsdad", "ste_ste_ste"],
     "emoji": "👷🏻‍♂️",
     "longDesc": "steve will automatically claim money from your workers for you\neveryone loves steve",
