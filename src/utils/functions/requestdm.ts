@@ -13,7 +13,7 @@ interface RequestDMOptions {
 }
 
 export default async function requestDM(options: RequestDMOptions): Promise<boolean> {
-  logger.info(`DM requested with ${options.memberId}`);
+  logger.info(`DM requested: ${options.memberId}`);
 
   if (options.client instanceof NypsiClient) {
     const clusterHas = await options.client.cluster.broadcastEval(
@@ -42,7 +42,7 @@ export default async function requestDM(options: RequestDMOptions): Promise<bool
     }
 
     if (isNaN(shard)) {
-      logger.warn("user not found");
+      logger.warn(`user not found: ${options.memberId}`);
       return false;
     }
 
@@ -100,11 +100,11 @@ export default async function requestDM(options: RequestDMOptions): Promise<bool
     if (res.includes(true)) {
       logger.log({
         level: "success",
-        message: "DM sent",
+        message: `DM sent: ${options.memberId}`,
       });
       return true;
     } else {
-      logger.warn("failed to send DM");
+      logger.warn(`failed to send DM: ${options.memberId}`);
       return false;
     }
   } else {
@@ -134,7 +134,7 @@ export default async function requestDM(options: RequestDMOptions): Promise<bool
     }
 
     if (isNaN(shard)) {
-      logger.warn("user not found");
+      logger.warn(`user not found: ${options.memberId}`);
       return false;
     }
 
@@ -192,11 +192,11 @@ export default async function requestDM(options: RequestDMOptions): Promise<bool
     if (res.includes(true)) {
       logger.log({
         level: "success",
-        message: "DM sent",
+        message: `DM sent: ${options.memberId}`,
       });
       return true;
     } else {
-      logger.warn("failed to send DM");
+      logger.warn(`failed to send DM: ${options.memberId}`);
       return false;
     }
   }
