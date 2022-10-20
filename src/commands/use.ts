@@ -54,7 +54,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (await onCooldown(cmd.name, message.member)) {
     const embed = await getResponse(cmd.name, message.member);
 
-    return message.channel.send({ embeds: [embed] });
+    return send({ embeds: [embed], ephemeral: true });
   }
 
   const prefix = await getPrefix(message.guild);
