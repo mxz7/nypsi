@@ -7,7 +7,7 @@
     "role": "fish",
     "rarity": 0,
     "buy": 0,
-    "sell": 2500
+    "sell": 7500
   },
   "medium_fish": {
     "id": "medium_fish",
@@ -17,7 +17,27 @@
     "role": "fish",
     "rarity": 1,
     "buy": 0,
-    "sell": 7500
+    "sell": 15000
+  },
+  "salmon": {
+    "id": "salmon",
+    "name": "salmon",
+    "emoji": "<:nypsi_salmon:1032766920476336148>",
+    "Longdesc": "commonly found while fishing with a normal fishing rod",
+    "role": "fish",
+    "rarity": 1,
+    "buy": 0,
+    "sell": 25000
+  },
+  "pufferfish": {
+    "id": "pufferfish",
+    "name": "pufferfish",
+    "emoji": "<:nypsi_pufferfish:1032767867625668708>",
+    "Longdesc": "commonly found while fishing with a normal fishing rod",
+    "role": "fish",
+    "rarity": 1,
+    "buy": 0,
+    "sell": 35000
   },
   "large_fish": {
     "id": "large_fish",
@@ -27,7 +47,17 @@
     "role": "fish",
     "rarity": 2,
     "buy": 0,
-    "sell": 10000
+    "sell": 50000
+  },
+  "nemo": {
+    "id": "nemo",
+    "name": "nemo",
+    "emoji": "<:nypsi_nemo:1032768399928987668>",
+    "longDesc": "rarely found while using an incredible fishing rod",
+    "role": "fish",
+    "rarity": 2,
+    "buy": 0,
+    "sell": 75000
   },
   "cobblestone": {
     "id": "cobblestone",
