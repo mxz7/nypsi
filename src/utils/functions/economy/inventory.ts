@@ -42,6 +42,10 @@ export async function topAmountItem(guild: Guild, amount: number, item: string):
       userId: true,
       amount: true,
     },
+    orderBy: {
+      amount: "desc",
+    },
+    take: amount,
   });
 
   const amounts = new Map<string, number>();
