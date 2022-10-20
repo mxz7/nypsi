@@ -47,7 +47,7 @@
     "role": "fish",
     "rarity": 2,
     "buy": 0,
-    "sell": 50000
+    "sell": 35000
   },
   "nemo": {
     "id": "nemo",
@@ -57,7 +57,7 @@
     "role": "fish",
     "rarity": 2,
     "buy": 0,
-    "sell": 75000
+    "sell": 50000
   },
   "cobblestone": {
     "id": "cobblestone",
