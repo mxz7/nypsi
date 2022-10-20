@@ -5,6 +5,7 @@ import { CustomEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { formatDate } from "../utils/functions/date";
 import {
+  calcNetWorth,
   getBalance,
   getBankBalance,
   getMaxBankBalance,
@@ -201,6 +202,7 @@ async function showUser(message: Message, user: User) {
             💳 $**${(await getBankBalance(user.id)).toLocaleString()}** / $**${(
         await getMaxBankBalance(user.id)
       ).toLocaleString()}**
+      🌍 $**${(await calcNetWorth(user.id)).toLocaleString()}**
             **xp** ${(await getXp(user.id)).toLocaleString()}
             **voted** ${voted}
             **prestige** ${await getPrestige(user.id)}
