@@ -2,10 +2,9 @@ import dayjs = require("dayjs");
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import { Item } from "../types/Economy";
-import { addInventoryItem, getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
+import { addInventoryItem, getInventory, selectItem, setInventoryItem } from "../utils/functions/economy/inventory";
 import { getPrestige } from "../utils/functions/economy/prestige";
-import { createUser, getItems, isEcoBanned, userExists } from "../utils/functions/economy/utils";
+import { createUser, isEcoBanned, userExists } from "../utils/functions/economy/utils";
 import { getXp } from "../utils/functions/economy/xp";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
@@ -97,7 +96,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
   }
 
-  const items = getItems();
   const inventory = await getInventory(message.member);
 
   let searchTag;
@@ -113,21 +111,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({ embeds: [embed] });
   }
 
-  let selected: Item;
-
-  for (const itemName of Array.from(Object.keys(items))) {
-    const aliases = items[itemName].aliases ? items[itemName].aliases : [];
-    if (searchTag == itemName) {
-      selected = items[itemName];
-      break;
-    } else if (searchTag == itemName.split("_").join("")) {
-      selected = items[itemName];
-      break;
-    } else if (aliases.indexOf(searchTag) != -1) {
-      selected = items[itemName];
-      break;
-    }
-  }
+  const selected = selectItem(searchTag);
 
   if (!selected) {
     return send({ embeds: [new ErrorEmbed(`couldnt find \`${args[1]}\``)] });
