@@ -47,12 +47,12 @@ import dayjs = require("dayjs");
   let amount = 0;
 
   for (const user of userIds) {
-    if (await redis.sismember("${Constants.redis.nypsi.VOTE_REMINDER_RECEIVED}", user.userId)) continue;
+    if (await redis.sismember(Constants.redis.nypsi.VOTE_REMINDER_RECEIVED, user.userId)) continue;
     data.memberId = user.userId;
 
     await addNotificationToQueue(data);
 
-    await redis.sadd("${Constants.redis.nypsi.VOTE_REMINDER_RECEIVED}", user.userId);
+    await redis.sadd(Constants.redis.nypsi.VOTE_REMINDER_RECEIVED, user.userId);
     amount++;
   }
 

@@ -1,4 +1,5 @@
 import redis from "../../init/redis";
+import Constants from "../Constants";
 import { daysUntilChristmas } from "./date";
 
 export function randomPresence(): string {
@@ -18,9 +19,9 @@ export function randomPresence(): string {
 }
 
 export async function getCustomPresence() {
-  return await redis.get("${Constants.redis.nypsi.PRESENCE}");
+  return await redis.get(Constants.redis.nypsi.PRESENCE);
 }
 
 export async function setCustomPresence(text?: string) {
-  await redis.set("${Constants.redis.nypsi.PRESENCE}", text);
+  await redis.set(Constants.redis.nypsi.PRESENCE, text);
 }

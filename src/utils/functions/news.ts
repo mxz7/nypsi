@@ -1,4 +1,5 @@
 import redis from "../../init/redis";
+import Constants from "../Constants";
 
 type News = {
   text: string;
@@ -6,7 +7,7 @@ type News = {
 };
 
 export async function getNews(): Promise<News> {
-  const news = await redis.get("${Constants.redis.nypsi.NEWS}");
+  const news = await redis.get(Constants.redis.nypsi.NEWS);
 
   if (!news) {
     return { text: "", date: 0 };
@@ -16,16 +17,16 @@ export async function getNews(): Promise<News> {
 }
 
 export async function setNews(string: string) {
-  await redis.del("${Constants.redis.nypsi.NEWS_SEEN}");
+  await redis.del(Constants.redis.nypsi.NEWS_SEEN);
 
-  await redis.set("${Constants.redis.nypsi.NEWS}", JSON.stringify({ text: string, date: Date.now() }));
-  await redis.expire("${Constants.redis.nypsi.NEWS}", 86400 * 3);
+  await redis.set(Constants.redis.nypsi.NEWS, JSON.stringify({ text: string, date: Date.now() }));
+  await redis.expire(Constants.redis.nypsi.NEWS, 86400 * 3);
 }
 
 export async function hasSeenNews(id: string) {
-  if (!(await redis.exists("${Constants.redis.nypsi.NEWS_SEEN}"))) return null;
+  if (!(await redis.exists(Constants.redis.nypsi.NEWS_SEEN))) return null;
 
-  const index = await redis.lpos("${Constants.redis.nypsi.NEWS_SEEN}", id);
+  const index = await redis.lpos(Constants.redis.nypsi.NEWS_SEEN, id);
 
   if (index == null) return null;
 

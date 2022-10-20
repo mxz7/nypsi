@@ -1,5 +1,6 @@
 import { Manager } from "discord-hybrid-sharding";
 import redis from "../../init/redis";
+import Constants from "../Constants";
 import requestDM from "../functions/requestdm";
 import { logger } from "../logger";
 
@@ -14,7 +15,7 @@ export function listenForDms(manager: Manager) {
       return;
     }
 
-    if ((await redis.llen("${Constants.redis.nypsi.DM_QUEUE}")) != 0) {
+    if ((await redis.llen(Constants.redis.nypsi.DM_QUEUE)) != 0) {
       active = true;
 
       logger.debug("executing dm queue...");
@@ -24,7 +25,7 @@ export function listenForDms(manager: Manager) {
 }
 
 async function doDmQueueInterval(manager: Manager): Promise<void> {
-  if ((await redis.llen("${Constants.redis.nypsi.DM_QUEUE}")) == 0) {
+  if ((await redis.llen(Constants.redis.nypsi.DM_QUEUE)) == 0) {
     await Promise.all(promises);
 
     promises.length = 0;
@@ -35,7 +36,7 @@ async function doDmQueueInterval(manager: Manager): Promise<void> {
     return;
   }
 
-  const item = JSON.parse(await redis.rpop("${Constants.redis.nypsi.DM_QUEUE}"));
+  const item = JSON.parse(await redis.rpop(Constants.redis.nypsi.DM_QUEUE));
 
   promises.push(
     requestDM({

@@ -37,6 +37,7 @@ export default {
         PERCENT_MATCH: "cache:guild:percentmatch",
         LOGS: "cache:guild:logs",
         SLASH_ONLY: "cache:guild:slashonly",
+        MODLOGS: "cache:guild:modlogs",
       },
       economy: {
         BALANCE: "cache:economy:balance",

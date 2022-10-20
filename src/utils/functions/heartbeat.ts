@@ -1,11 +1,12 @@
 import { Cluster } from "discord-hybrid-sharding";
 import redis from "../../init/redis";
+import Constants from "../Constants";
 import { logger } from "../logger";
 
 const failedHeartbeats = new Map<number, number>();
 
 export async function sendHeartbeat(cluster: Cluster) {
-  if ((await redis.get("${Constants.redis.nypsi.RESTART}")) == "t") {
+  if ((await redis.get(Constants.redis.nypsi.RESTART)) == "t") {
     return true;
   }
 

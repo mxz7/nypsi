@@ -3,6 +3,7 @@ import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { LogType, PunishmentType } from "../../../types/Moderation";
+import Constants from "../../Constants";
 
 const logColors = new Map<LogType, ColorResolvable>();
 const modLogColors = new Map<PunishmentType, ColorResolvable>();
@@ -68,7 +69,7 @@ export async function addModLog(
     embed.addField("reason", command);
   }
 
-  await redis.lpush(`modlogs:${guild.id}`, JSON.stringify(embed.toJSON()));
+  await redis.lpush(`${Constants.redis.cache.guild.MODLOGS}${guild.id}`, JSON.stringify(embed.toJSON()));
 }
 
 export async function addLog(guild: Guild, type: LogType, embed: CustomEmbed) {

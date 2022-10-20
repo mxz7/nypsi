@@ -23,6 +23,7 @@ import { runPremiumChecks } from "../scheduled/clusterjobs/premiumexpire";
 import { runSurveyChecks } from "../scheduled/clusterjobs/surveyends";
 import { runPremiumCrateInterval } from "../scheduled/clusterjobs/weeklycrates";
 import { runWorkerInterval } from "../scheduled/clusterjobs/workers";
+import Constants from "../utils/Constants";
 import { doChatReactions } from "../utils/functions/chatreactions/utils";
 import { runEconomySetup } from "../utils/functions/economy/utils";
 import { runChristmas } from "../utils/functions/guilds/christmas";
@@ -46,7 +47,7 @@ export class NypsiClient extends Client {
 
     runEconomySetup();
 
-    redis.del("${Constants.redis.nypsi.PRESENCE}");
+    redis.del(Constants.redis.nypsi.PRESENCE);
 
     if (this.cluster.maintenance) {
       logger.info(`started on maintenance mode with ${this.cluster.maintenance}`);
@@ -81,7 +82,7 @@ export class NypsiClient extends Client {
     });
 
     this.cluster.on("ready", async () => {
-      await redis.del("${Constants.redis.nypsi.RESTART}");
+      await redis.del(Constants.redis.nypsi.RESTART);
       this.on("guildCreate", guildCreate.bind(null, this));
       this.on("guildDelete", guildDelete.bind(null, this));
       this.rest.on("rateLimited", (rate) => {

@@ -4,6 +4,7 @@ import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { NotificationPayload } from "../../../types/Notification";
 import ms = require("ms");
+import Constants from "../../Constants";
 
 declare function require(name: string): any;
 
@@ -68,5 +69,5 @@ export function getNotificationsData() {
 }
 
 export async function addNotificationToQueue(payload: NotificationPayload) {
-  await redis.lpush("${Constants.redis.nypsi.DM_QUEUE}", JSON.stringify(payload));
+  await redis.lpush(Constants.redis.nypsi.DM_QUEUE, JSON.stringify(payload));
 }
