@@ -166,11 +166,19 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       }
     }
 
-    embed.setDescription(`activating **${selected.name}** booster...`);
+    let desc = `activating **${selected.name}** booster...`;
+    let desc2 = `you have activated **${selected.name}**`;
+
+    if (["cake", "cookie"].includes(selected.id)) {
+      desc = `eating **${selected.name}**...`;
+      desc2 = `you have ate a **${selected.name}** 😋`;
+    }
+
+    embed.setDescription(desc);
 
     const msg = await send({ embeds: [embed] });
 
-    embed.setDescription(`you have activated **${selected.name}**`);
+    embed.setDescription(desc2);
     embed.addField("current boosters", currentBoosters.join("\n"));
 
     setTimeout(() => {
