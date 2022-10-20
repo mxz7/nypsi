@@ -14,7 +14,12 @@ import { logger } from "../utils/logger";
 
 const itemFunctions = new Map<string, ItemUse>();
 
-const cmd = new Command("use", "use an item or open crates", Categories.MONEY).setAliases(["open", "activate"]);
+const cmd = new Command("use", "use an item or open crates", Categories.MONEY).setAliases([
+  "open",
+  "activate",
+  "eat",
+  "cuddle",
+]);
 
 cmd.slashEnabled = true;
 cmd.slashData
