@@ -13,8 +13,8 @@ export async function isTracking(member: GuildMember | string): Promise<boolean>
     id = member;
   }
 
-  if (await redis.exists(`cache:user:tracking:${id}`)) {
-    return (await redis.get(`cache:user:tracking:${id}`)) == "t" ? true : false;
+  if (await redis.exists(`${Constants.redis.cache.user.TRACKING}:${id}`)) {
+    return (await redis.get(`${Constants.redis.cache.user.TRACKING}:${id}`)) == "t" ? true : false;
   }
 
   if (!hasProfile(id)) return undefined;
@@ -29,12 +29,12 @@ export async function isTracking(member: GuildMember | string): Promise<boolean>
   });
 
   if (query.tracking) {
-    await redis.set(`cache:user:tracking:${id}`, "t");
-    await redis.expire(`cache:user:tracking:${id}`, ms("1 hour") / 1000);
+    await redis.set(`${Constants.redis.cache.user.TRACKING}:${id}`, "t");
+    await redis.expire(`${Constants.redis.cache.user.TRACKING}:${id}`, ms("1 hour") / 1000);
     return true;
   } else {
-    await redis.set(`cache:user:tracking:${id}`, "f");
-    await redis.expire(`cache:user:tracking:${id}`, ms("1 hour") / 1000);
+    await redis.set(`${Constants.redis.cache.user.TRACKING}:${id}`, "f");
+    await redis.expire(`${Constants.redis.cache.user.TRACKING}:${id}`, ms("1 hour") / 1000);
     return false;
   }
 }
@@ -56,7 +56,7 @@ export async function disableTracking(member: GuildMember | string) {
     },
   });
 
-  await redis.del(`cache:user:tracking:${id}`);
+  await redis.del(`${Constants.redis.cache.user.TRACKING}:${id}`);
 }
 
 export async function enableTracking(member: GuildMember | string) {
@@ -76,7 +76,7 @@ export async function enableTracking(member: GuildMember | string) {
     },
   });
 
-  await redis.del(`cache:user:tracking:${id}`);
+  await redis.del(`${Constants.redis.cache.user.TRACKING}:${id}`);
 }
 
 export async function addNewUsername(member: GuildMember | string, username: string) {

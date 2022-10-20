@@ -72,7 +72,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const normalStats = async () => {
     const stats = await getStats(message.member);
-    const commandUses = parseInt(await redis.hget("nypsi:topcommands:user", message.author.tag));
+    const commandUses = parseInt(await redis.hget("${Constants.redis.nypsi.TOP_COMMANDS_USER}", message.author.tag));
 
     const embed = new CustomEmbed(message.member).setHeader("stats", message.author.avatarURL());
 

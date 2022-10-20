@@ -43,7 +43,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     logger.info("nypsi restarting soon...");
 
     setTimeout(async () => {
-      await redis.set("nypsi:restarting", "t");
+      await redis.set("${Constants.redis.nypsi.RESTART}", "t");
       logger.info("starting graceful restart..");
 
       client.cluster.send("restart");

@@ -690,7 +690,7 @@ export async function runCommand(
   }
 
   if (command.category == "money" || ["wholesome", "settings", "wordle"].includes(command.name)) {
-    if (restarting || (await redis.get("nypsi:restarting")) == "t") {
+    if (restarting || (await redis.get("${Constants.redis.nypsi.RESTART}")) == "t") {
       if (message.author.id == Constants.TEKOH_ID && message instanceof Message) {
         message.react("💀");
       } else {
@@ -831,7 +831,7 @@ export async function runCommand(
     updateLastCommand(message.member),
     addCommandUse(message.author.id, command.name),
     redis.hincrby("nypsi:topcommands", command.name, 1),
-    redis.hincrby("nypsi:topcommands:user", message.author.tag, 1),
+    redis.hincrby("${Constants.redis.nypsi.TOP_COMMANDS_USER}", message.author.tag, 1),
     addProgress(message.author.id, "nypsi", 1),
   ]);
 

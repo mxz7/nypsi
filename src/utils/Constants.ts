@@ -11,6 +11,54 @@ products.set("595ba15808", "69420_crate");
 products.set("5569964b90", "nypsi_crate");
 
 export default {
+  redis: {
+    cooldown: {
+      SUPPORT: "cooldown:support",
+      ROB_RADIO: "cd:rob-radio",
+      SEX_CHASTITY: "cd:sex-chastity",
+    },
+    cache: {
+      SUPPORT: "cache:support",
+      premium: {
+        LEVEL: "cache:premium:level",
+      },
+      user: {
+        LASTFM: "cache:user:lastfm",
+        KARMA: "cache:user:karma",
+        TRACKING: "cache:user:tracking",
+        EXISTS: "cache:user:exists",
+        LAST_COMMAND: "cache:user:lastcmd",
+        DM_SETTINGS: "cache:user:dmsettings",
+      },
+      guild: {
+        EXISTS: "cache:guild:exists",
+        PREFIX: "cache:guild:prefix",
+        PERCENT_MATCH: "cache:guild:percentmatch",
+        LOGS: "cache:guild:logs",
+        SLASH_ONLY: "cache:guild:slashonly",
+      },
+      economy: {
+        BALANCE: "cache:economy:balance",
+        DEFAULT_BET: "cache:economy:defaultbet",
+        GUILD_USER: "cache:economy:guild:user",
+        GUILD_REQUIREMENTS: "cache:economy:guild:requirements",
+        BOOSTERS: "cache:economy:boosters",
+        INVENTORY: "cache:economy:inventory",
+        EXISTS: "cache:economy:exists",
+        PRESTIGE: "cache:economy:prestige",
+        BANNED: "cache:economy:banned",
+        XP: "cache:economy:xp",
+        NETWORTH: "cache:economy:networth",
+        VOTE: "cache:economy:vote",
+        AUCTION_AVG: "cache:economy:auctionavg",
+      },
+    },
+    nypsi: {
+      RESTART: "nypsi:restarting",
+      TOP_COMMANDS_USER: "nypsi:topcommands:user",
+      STEVE_EARNED: "nypsi:steveearned",
+    },
+  },
   BRONZE_ROLE_ID: "819870590718181391",
   SILVER_ROLE_ID: "819870727834566696",
   GOLD_ROLE_ID: "819870846536646666",

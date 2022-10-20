@@ -209,7 +209,7 @@ export class ErrorEmbed extends EmbedBuilder {
 }
 
 async function checkPremium(id: string) {
-  const x = parseInt(await redis.get(`cache:premium:level:${id}`));
+  const x = parseInt(await redis.get(`${Constants.redis.cache.premium.LEVEL}:${id}`));
 
   if (x > 0) {
     const embedColor = await getEmbedColor(id);

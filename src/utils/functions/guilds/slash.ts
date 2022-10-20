@@ -4,8 +4,8 @@ import redis from "../../../init/redis";
 import ms = require("ms");
 
 export async function isSlashOnly(guild: Guild) {
-  if (await redis.exists(`cache:slashonly:${guild.id}`)) {
-    return (await redis.get(`cache:slashonly:${guild.id}`)) === "t" ? true : false;
+  if (await redis.exists(`${Constants.redis.cache.guild.SLASH_ONLY}:${guild.id}`)) {
+    return (await redis.get(`${Constants.redis.cache.guild.SLASH_ONLY}:${guild.id}`)) === "t" ? true : false;
   }
 
   const res = await prisma.guild
@@ -20,11 +20,11 @@ export async function isSlashOnly(guild: Guild) {
     .then((q) => q.slash_only);
 
   if (res) {
-    await redis.set(`cache:slashonly:${guild.id}`, "t");
-    await redis.expire(`cache:slashonly:${guild.id}`, ms("3 hours") / 1000);
+    await redis.set(`${Constants.redis.cache.guild.SLASH_ONLY}:${guild.id}`, "t");
+    await redis.expire(`${Constants.redis.cache.guild.SLASH_ONLY}:${guild.id}`, ms("3 hours") / 1000);
   } else {
-    await redis.set(`cache:slashonly:${guild.id}`, "f");
-    await redis.expire(`cache:slashonly:${guild.id}`, ms("3 hours") / 1000);
+    await redis.set(`${Constants.redis.cache.guild.SLASH_ONLY}:${guild.id}`, "f");
+    await redis.expire(`${Constants.redis.cache.guild.SLASH_ONLY}:${guild.id}`, ms("3 hours") / 1000);
   }
 
   return res;
@@ -40,5 +40,5 @@ export async function setSlashOnly(guild: Guild, bool: boolean) {
     },
   });
 
-  await redis.del(`cache:slashonly:${guild.id}`);
+  await redis.del(`${Constants.redis.cache.guild.SLASH_ONLY}:${guild.id}`);
 }

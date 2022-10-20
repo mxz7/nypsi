@@ -15,8 +15,8 @@ export async function getXp(member: GuildMember | string): Promise<number> {
     id = member;
   }
 
-  if (await redis.exists(`cache:economy:xp:${id}`)) {
-    return parseInt(await redis.get(`cache:economy:xp:${id}`));
+  if (await redis.exists(`${Constants.redis.cache.economy.XP}:${id}`)) {
+    return parseInt(await redis.get(`${Constants.redis.cache.economy.XP}:${id}`));
   }
 
   const query = await prisma.economy.findUnique({
@@ -28,8 +28,8 @@ export async function getXp(member: GuildMember | string): Promise<number> {
     },
   });
 
-  await redis.set(`cache:economy:xp:${id}`, query.xp);
-  await redis.expire(`cache:economy:xp:${id}`, 30);
+  await redis.set(`${Constants.redis.cache.economy.XP}:${id}`, query.xp);
+  await redis.expire(`${Constants.redis.cache.economy.XP}:${id}`, 30);
 
   return query.xp;
 }
@@ -45,7 +45,7 @@ export async function updateXp(member: GuildMember, amount: number) {
       xp: amount,
     },
   });
-  await redis.del(`cache:economy:xp:${member.user.id}`);
+  await redis.del(`${Constants.redis.cache.economy.XP}:${member.user.id}`);
 }
 
 export async function calcMinimumEarnedXp(member: GuildMember): Promise<number> {

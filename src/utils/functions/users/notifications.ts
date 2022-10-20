@@ -24,8 +24,8 @@ export async function getDmSettings(member: GuildMember | string) {
     id = member;
   }
 
-  if (await redis.exists(`cache:dmsettings:${id}`)) {
-    return (await JSON.parse(await redis.get(`cache:dmsettings:${id}`))) as DMSettings;
+  if (await redis.exists(`${Constants.redis.cache.user.DM_SETTINGS}:${id}`)) {
+    return (await JSON.parse(await redis.get(`${Constants.redis.cache.user.DM_SETTINGS}:${id}`))) as DMSettings;
   }
 
   let query = await prisma.dMSettings
@@ -44,8 +44,8 @@ export async function getDmSettings(member: GuildMember | string) {
     });
   }
 
-  await redis.set(`cache:dmsettings:${id}`, JSON.stringify(query));
-  await redis.expire(`cache:dmsettings:${id}`, ms("1 hour") / 1000);
+  await redis.set(`${Constants.redis.cache.user.DM_SETTINGS}:${id}`, JSON.stringify(query));
+  await redis.expire(`${Constants.redis.cache.user.DM_SETTINGS}:${id}`, ms("1 hour") / 1000);
 
   return query;
 }
@@ -58,7 +58,7 @@ export async function updateDmSettings(member: GuildMember, data: DMSettings) {
     data,
   });
 
-  await redis.del(`cache:dmsettings:${member.user.id}`);
+  await redis.del(`${Constants.redis.cache.user.DM_SETTINGS}:${member.user.id}`);
 
   return query;
 }

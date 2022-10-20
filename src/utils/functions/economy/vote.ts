@@ -31,8 +31,8 @@ export async function hasVoted(member: GuildMember | string) {
     id = member;
   }
 
-  if (await redis.exists(`cache:vote:${id}`)) {
-    const res = parseInt(await redis.get(`cache:vote:${id}`));
+  if (await redis.exists(`${Constants.redis.cache.economy.VOTE}:${id}`)) {
+    const res = parseInt(await redis.get(`${Constants.redis.cache.economy.VOTE}:${id}`));
 
     if (Date.now() - res < ms("12 hours")) {
       return true;
@@ -44,12 +44,12 @@ export async function hasVoted(member: GuildMember | string) {
   const lastVote = await getLastVote(id);
 
   if (Date.now() - lastVote.getTime() < ms("12 hours")) {
-    redis.set(`cache:vote:${id}`, lastVote.getTime());
-    redis.expire(`cache:vote:${id}`, ms("30 minutes") / 1000);
+    redis.set(`${Constants.redis.cache.economy.VOTE}:${id}`, lastVote.getTime());
+    redis.expire(`${Constants.redis.cache.economy.VOTE}:${id}`, ms("30 minutes") / 1000);
     return true;
   } else {
-    redis.set(`cache:vote:${id}`, lastVote.getTime());
-    redis.expire(`cache:vote:${id}`, ms("1 hour") / 1000);
+    redis.set(`${Constants.redis.cache.economy.VOTE}:${id}`, lastVote.getTime());
+    redis.expire(`${Constants.redis.cache.economy.VOTE}:${id}`, ms("1 hour") / 1000);
     return false;
   }
 }

@@ -60,8 +60,8 @@ module.exports = new ItemUse(
     }
 
     if (message.member == lockPickTarget) {
-      if ((await redis.exists(`cd:sex-chastity:${message.author.id}`)) == 1) {
-        await redis.del(`cd:sex-chastity:${message.author.id}`);
+      if ((await redis.exists(`${Constants.redis.cooldown.SEX_CHASTITY}:${message.author.id}`)) == 1) {
+        await redis.del(`${Constants.redis.cooldown.SEX_CHASTITY}:${message.author.id}`);
 
         const msg = await send({ embeds: [new CustomEmbed(message.member, "picking chastity cage...")] });
 

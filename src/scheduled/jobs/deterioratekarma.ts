@@ -57,7 +57,7 @@ import redis from "../../init/redis";
       },
     });
 
-    await redis.del(`cache:user:karma:${user.id}`);
+    await redis.del(`${Constants.redis.cache.user.KARM}:${user.id}`);
   }
 
   parentPort.postMessage(`${total} total karma deteriorated`);

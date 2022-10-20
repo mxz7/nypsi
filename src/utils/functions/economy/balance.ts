@@ -23,8 +23,8 @@ export async function getBalance(member: GuildMember | string) {
     id = member;
   }
 
-  if (await redis.exists(`cache:economy:balance:${id}`)) {
-    return parseInt(await redis.get(`cache:economy:balance:${id}`));
+  if (await redis.exists(`${Constants.redis.cache.economy.BALANCE}:${id}`)) {
+    return parseInt(await redis.get(`${Constants.redis.cache.economy.BALANCE}:${id}`));
   }
 
   const query = await prisma.economy.findUnique({
@@ -36,8 +36,8 @@ export async function getBalance(member: GuildMember | string) {
     },
   });
 
-  await redis.set(`cache:economy:balance:${id}`, Number(query.money));
-  await redis.expire(`cache:economy:balance:${id}`, 30);
+  await redis.set(`${Constants.redis.cache.economy.BALANCE}:${id}`, Number(query.money));
+  await redis.expire(`${Constants.redis.cache.economy.BALANCE}:${id}`, 30);
 
   return Number(query.money);
 }
@@ -58,7 +58,7 @@ export async function updateBalance(member: GuildMember | string, amount: number
       money: Math.floor(amount),
     },
   });
-  await redis.del(`cache:economy:balance:${id}`);
+  await redis.del(`${Constants.redis.cache.economy.BALANCE}:${id}`);
 }
 
 export async function getBankBalance(member: GuildMember | string): Promise<number> {
@@ -424,8 +424,8 @@ export async function getDefaultBet(member: GuildMember): Promise<number> {
     id = member;
   }
 
-  if (await redis.exists(`cache:economy:defaultbet:${id}`)) {
-    return parseInt(await redis.get(`cache:economy:defaultbet:${id}`));
+  if (await redis.exists(`${Constants.redis.cache.economy.DEFAULT_BET}:${id}`)) {
+    return parseInt(await redis.get(`${Constants.redis.cache.economy.DEFAULT_BET}:${id}`));
   }
 
   const query = await prisma.economy.findUnique({
@@ -437,8 +437,8 @@ export async function getDefaultBet(member: GuildMember): Promise<number> {
     },
   });
 
-  await redis.set(`cache:economy:defaultbet:${id}`, query.defaultBet);
-  await redis.expire(`cache:economy:defaultbet:${id}`, 3600);
+  await redis.set(`${Constants.redis.cache.economy.DEFAULT_BET}:${id}`, query.defaultBet);
+  await redis.expire(`${Constants.redis.cache.economy.DEFAULT_BET}:${id}`, 3600);
 
   return query.defaultBet;
 }
@@ -453,7 +453,7 @@ export async function setDefaultBet(member: GuildMember, setting: number) {
     },
   });
 
-  await redis.del(`cache:economy:defaultbet:${member.user.id}`);
+  await redis.del(`${Constants.redis.cache.economy.DEFAULT_BET}:${member.user.id}`);
 }
 
 export async function calcMaxBet(member: GuildMember): Promise<number> {
@@ -506,8 +506,8 @@ export async function calcNetWorth(member: GuildMember | string) {
     id = member;
   }
 
-  if (await redis.exists(`cache:networth:${id}`)) {
-    return parseInt(await redis.get(`cache:networth:${id}`));
+  if (await redis.exists(`${Constants.redis.cache.economy.NETWORTH}:${id}`)) {
+    return parseInt(await redis.get(`${Constants.redis.cache.economy.NETWORTH}:${id}`));
   }
 
   const query = await prisma.economy.findUnique({
@@ -539,8 +539,8 @@ export async function calcNetWorth(member: GuildMember | string) {
   let worth = 0;
 
   if (!query) {
-    await redis.set(`cache:networth:${id}`, worth);
-    await redis.expire(`cache:networth:${id}`, ms("30 minutes") / 1000);
+    await redis.set(`${Constants.redis.cache.economy.NETWORTH}:${id}`, worth);
+    await redis.expire(`${Constants.redis.cache.economy.NETWORTH}:${id}`, ms("30 minutes") / 1000);
 
     return worth;
   }
@@ -565,8 +565,8 @@ export async function calcNetWorth(member: GuildMember | string) {
     worth += worker.stored * perItem;
   }
 
-  await redis.set(`cache:networth:${id}`, Math.floor(worth));
-  await redis.expire(`cache:networth:${id}`, ms("30 minutes") / 1000);
+  await redis.set(`${Constants.redis.cache.economy.NETWORTH}:${id}`, Math.floor(worth));
+  await redis.expire(`${Constants.redis.cache.economy.NETWORTH}:${id}`, ms("30 minutes") / 1000);
 
   return Math.floor(worth);
 }

@@ -215,7 +215,8 @@ export async function bumpAuction(id: string, client: NypsiClient) {
 }
 
 export async function getAuctionAverage(item: string) {
-  if (await redis.exists(`cache:auctionavg:${item}`)) return parseInt(await redis.get(`cache:auctionavg:${item}`));
+  if (await redis.exists(`${Constants.redis.cache.economy.AUCTION_AVG}:${item}`))
+    return parseInt(await redis.get(`${Constants.redis.cache.economy.AUCTION_AVG}:${item}`));
 
   const auctions = await prisma.auction.findMany({
     where: {
@@ -246,8 +247,8 @@ export async function getAuctionAverage(item: string) {
   const sum = costs.reduce((a, b) => a + b, 0);
   const avg = Math.floor(sum / costs.length) || 0;
 
-  await redis.set(`cache:auctionavg:${item}`, avg);
-  await redis.expire(`cache:auctionavg:${item}`, ms("1 hour") / 1000);
+  await redis.set(`${Constants.redis.cache.economy.AUCTION_AVG}:${item}`, avg);
+  await redis.expire(`${Constants.redis.cache.economy.AUCTION_AVG}:${item}`, ms("1 hour") / 1000);
 
   return avg;
 }

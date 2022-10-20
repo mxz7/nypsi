@@ -13,8 +13,8 @@ export async function getLastfmUsername(member: GuildMember | string) {
     id = member;
   }
 
-  if (await redis.exists(`cache:user:lastfm:${id}`)) {
-    return await redis.get(`cache:user:lastfm:${id}`);
+  if (await redis.exists(`${Constants.redis.cache.user.LASTFM}:${id}`)) {
+    return await redis.get(`${Constants.redis.cache.user.LASTFM}:${id}`);
   } else {
     const query = await prisma.user.findUnique({
       where: {
@@ -26,8 +26,8 @@ export async function getLastfmUsername(member: GuildMember | string) {
     });
 
     if (query && query.lastfmUsername) {
-      await redis.set(`cache:user:lastfm:${id}`, query.lastfmUsername);
-      await redis.expire(`cache:user:lastfm:${id}`, ms("1 hour") / 1000);
+      await redis.set(`${Constants.redis.cache.user.LASTFM}:${id}`, query.lastfmUsername);
+      await redis.expire(`${Constants.redis.cache.user.LASTFM}:${id}`, ms("1 hour") / 1000);
       return query.lastfmUsername;
     } else {
       return undefined;
@@ -51,7 +51,7 @@ export async function setLastfmUsername(member: GuildMember, username: string) {
 
   if (res.error && res.error == 6) return false;
 
-  await redis.del(`cache:user:lastfm:${id}`);
+  await redis.del(`${Constants.redis.cache.user.LASTFM}:${id}`);
 
   await prisma.user.update({
     where: {

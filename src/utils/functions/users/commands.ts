@@ -12,7 +12,7 @@ export async function updateLastCommand(member: GuildMember | string) {
 
   const date = new Date();
 
-  await redis.set(`cache:user:lastcmd:${id}`, date.getTime());
+  await redis.set(`${Constants.redis.cache.user.LAST_COMMAND}:${id}`, date.getTime());
 
   await prisma.user.update({
     where: {
@@ -32,7 +32,8 @@ export async function getLastCommand(member: GuildMember | string): Promise<Date
     id = member;
   }
 
-  if (await redis.exists(`cache:user:lastcmd:${id}`)) return new Date(parseInt(await redis.get(`cache:user:lastcmd:${id}`)));
+  if (await redis.exists(`${Constants.redis.cache.user.LAST_COMMAND}:${id}`))
+    return new Date(parseInt(await redis.get(`${Constants.redis.cache.user.LAST_COMMAND}:${id}`)));
 
   const query = await prisma.user.findUnique({
     where: {

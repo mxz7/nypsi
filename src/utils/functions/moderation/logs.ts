@@ -78,8 +78,8 @@ export async function addLog(guild: Guild, type: LogType, embed: CustomEmbed) {
 }
 
 export async function isLogsEnabled(guild: Guild) {
-  if (await redis.exists(`cache:guild:logs:${guild.id}`)) {
-    return (await redis.get(`cache:guild:logs:${guild.id}`)) === "t" ? true : false;
+  if (await redis.exists(`${Constants.redis.cache.guild.LOGS}:${guild.id}`)) {
+    return (await redis.get(`${Constants.redis.cache.guild.LOGS}:${guild.id}`)) === "t" ? true : false;
   }
 
   const query = await prisma.moderation.findUnique({
@@ -92,19 +92,19 @@ export async function isLogsEnabled(guild: Guild) {
   });
 
   if (!query || !query.logs) {
-    await redis.set(`cache:guild:logs:${guild.id}`, "f");
-    await redis.expire(`cache:guild:logs:${guild.id}`, 3600);
+    await redis.set(`${Constants.redis.cache.guild.LOGS}:${guild.id}`, "f");
+    await redis.expire(`${Constants.redis.cache.guild.LOGS}:${guild.id}`, 3600);
     return false;
   } else {
-    await redis.set(`cache:guild:logs:${guild.id}`, "t");
-    await redis.expire(`cache:guild:logs:${guild.id}`, 3600);
+    await redis.set(`${Constants.redis.cache.guild.LOGS}:${guild.id}`, "t");
+    await redis.expire(`${Constants.redis.cache.guild.LOGS}:${guild.id}`, 3600);
   }
 
   return true;
 }
 
 export async function setLogsChannelHook(guild: Guild, hook: string) {
-  await redis.del(`cache:guild:logs:${guild.id}`);
+  await redis.del(`${Constants.redis.cache.guild.LOGS}:${guild.id}`);
 
   if (!hook) {
     await redis.del(`nypsi:guild:logs:queue:${guild.id}`);

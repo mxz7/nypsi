@@ -5,9 +5,9 @@ import redis from "../../init/redis";
 
 (async () => {
   const topCommands = await redis.hgetall("nypsi:topcommands");
-  const topUsers = await redis.hgetall("nypsi:topcommands:user");
+  const topUsers = await redis.hgetall("${Constants.redis.nypsi.TOP_COMMANDS_USER}");
   await redis.del("nypsi:topcommands");
-  await redis.del("nypsi:topcommands:user");
+  await redis.del("${Constants.redis.nypsi.TOP_COMMANDS_USER}");
 
   const commands: string[] = [];
 

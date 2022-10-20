@@ -81,7 +81,7 @@ export class NypsiClient extends Client {
     });
 
     this.cluster.on("ready", async () => {
-      await redis.del("nypsi:restarting");
+      await redis.del("${Constants.redis.nypsi.RESTART}");
       this.on("guildCreate", guildCreate.bind(null, this));
       this.on("guildDelete", guildDelete.bind(null, this));
       this.rest.on("rateLimited", (rate) => {
