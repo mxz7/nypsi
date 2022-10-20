@@ -53,6 +53,7 @@
   "iron_ingot": {
     "id": "iron_ingot",
     "name": "iron ingot",
+    "plural": "iron ingots",
     "emoji": "<:nypsi_iron:959442548064141362>",
     "longDesc": "product of smelting iron ore",
     "role": "sellable",
@@ -64,6 +65,7 @@
   "gold_ingot": {
     "id": "gold_ingot",
     "name": "gold ingot",
+    "plural": "gold ingots",
     "emoji": "<:nypsi_gold:959443010205126656>",
     "longDesc": "product of smelting gold ore",
     "role": "sellable",
@@ -75,6 +77,7 @@
   "diamond": {
     "id": "diamond",
     "name": "diamond",
+    "plural": "diamonds",
     "emoji": "<:nypsi_diamond:959443043377897502>",
     "longDesc": "found when mining",
     "role": "sellable",
@@ -85,6 +88,7 @@
   "emerald": {
     "id": "emerald",
     "name": "emerald",
+    "plural": "emeralds",
     "emoji": "<:nypsi_emerald:1017420625880551434>",
     "longDesc": "found when mining",
     "role": "sellable",
@@ -95,6 +99,7 @@
   "amethyst": {
     "id": "amethyst",
     "name": "amethyst",
+    "plural": "amethysts",
     "emoji": "<:nypsi_amethyst:1032257888699297872>",
     "longDesc": "found when mining",
     "role": "sellable",
@@ -105,6 +110,7 @@
   "furnace": {
     "id": "furnace",
     "name": "furnace",
+    "plural": "furnaces",
     "emoji": "<:nypsi_furnace:959445132585869373>",
     "longDesc": "used to smelt ore",
     "role": "tool",
@@ -316,6 +322,7 @@
   "rat": {
     "id": "rat",
     "name": "rat",
+    "plural": "rats",
     "emoji": "🐀",
     "longDesc": "https://youtu.be/1hhl9kFTuQ8?t=19",
     "role": "prey",
@@ -326,6 +333,7 @@
   "mouse": {
     "id": "mouse",
     "name": "mouse",
+    "plural": "mice",
     "emoji": "🐁",
     "longDesc": "squeak squeak",
     "role": "prey",
@@ -336,6 +344,7 @@
   "kangaroo": {
     "id": "kangaroo",
     "name": "kangaroo",
+    "plural": "kangaroos",
     "emoji": "🦘",
     "longDesc": "australia",
     "role": "prey",
@@ -346,6 +355,7 @@
   "wolf": {
     "id": "wolf",
     "name": "wolf",
+    "plural": "wolves",
     "emoji": "🐺",
     "longDesc": "bark.",
     "role": "prey",
@@ -356,6 +366,7 @@
   "vote_crate": {
     "id": "vote_crate",
     "name": "vote crate",
+    "plural": "vote crates",
     "emoji": "📦",
     "role": "crate",
     "longDesc": "open to receive one random item",
@@ -364,6 +375,7 @@
   "basic_crate": {
     "id": "basic_crate",
     "name": "basic crate",
+    "plural": "basic crates",
     "emoji": "📦",
     "role": "crate",
     "longDesc": "open to receive two random items",
@@ -373,6 +385,7 @@
   "69420_crate": {
     "id": "69420_crate",
     "name": "69420 crate",
+    "plural": "69420 crates",
     "emoji": "🎁",
     "role": "crate",
     "longDesc": "open to receive two random items and $69,420",
@@ -382,6 +395,7 @@
   "nypsi_crate": {
     "id": "nypsi_crate",
     "name": "nypsi crate",
+    "plural": "nypsi crates",
     "emoji": "<:xnypsi:819957267548864543>",
     "role": "crate",
     "longDesc": "open to receive 5 rare items",
@@ -392,6 +406,7 @@
   "calendar": {
     "id": "calendar",
     "name": "calendar",
+    "plural": "calendars",
     "emoji": "📅",
     "longDesc": "find out the current date",
     "role": "item",
@@ -402,6 +417,7 @@
   "padlock": {
     "id": "padlock",
     "name": "padlock",
+    "plural": "padlocks",
     "emoji": "🔒",
     "longDesc": "protect your balance",
     "role": "item",
@@ -410,6 +426,7 @@
   "lock_pick": {
     "id": "lock_pick",
     "name": "lock pick",
+    "plural": "lock picks",
     "emoji": "🧰",
     "longDesc": "destroy someone's padlock",
     "rarity": 1,
@@ -420,6 +437,7 @@
   "mask": {
     "id": "mask",
     "name": "mask",
+    "plural": "masks",
     "emoji": "😷",
     "longDesc": "bypass rob cooldown",
     "rarity": 2,
@@ -430,6 +448,7 @@
   "cookie": {
     "id": "cookie",
     "name": "cookie",
+    "plural": "cookies",
     "emoji": "🍪",
     "longDesc": "yum yum",
     "rarity": 69,
@@ -447,6 +466,7 @@
   "cake": {
     "id": "cake",
     "name": "cake",
+    "plural": "cakes",
     "emoji": "<:nypsi_cake:1002977512630001725>",
     "longDesc": "yum yum 😋",
     "rarity": 69,
@@ -474,6 +494,7 @@
   "tooth": {
     "id": "tooth",
     "name": "tooth",
+    "plural": "teeth",
     "emoji": "🦷",
     "longDesc": "its a molar i think",
     "rarity": 1,
@@ -559,6 +580,7 @@
   "lawyer": {
     "id": "lawyer",
     "name": "lawyer",
+    "plural": "lawyers",
     "emoji": "👨‍⚖️",
     "longDesc": "[if you're caught by the police on a robbery, you wont lose money](https://i.giphy.com/media/40dEau6bZRO3S/giphy.webp)",
     "rarity": 1,
@@ -768,6 +790,7 @@
   "worm": {
     "id": "worm",
     "name": "worm",
+    "plural": "worms",
     "emoji": "🪱",
     "longDesc": "increased luck when fishing",
     "rarity": 0,
@@ -898,6 +921,7 @@
   "streak_token": {
     "id": "streak_token",
     "name": "streak token",
+    "plural": "streak tokens",
     "aliases": ["streak"],
     "emoji": "🎟️",
     "longDesc": "add one day to your daily streak",
