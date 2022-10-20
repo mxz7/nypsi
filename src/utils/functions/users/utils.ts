@@ -2,6 +2,7 @@ import { GuildMember, User } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import ms = require("ms");
+import Constants from "../../Constants";
 
 export async function hasProfile(member: GuildMember | string) {
   let id: string;

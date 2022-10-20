@@ -2,6 +2,7 @@ import { Guild } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import ms = require("ms");
+import Constants from "../../Constants";
 
 export async function isSlashOnly(guild: Guild) {
   if (await redis.exists(`${Constants.redis.cache.guild.SLASH_ONLY}:${guild.id}`)) {

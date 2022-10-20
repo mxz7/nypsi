@@ -14,6 +14,7 @@ import { hasVoted } from "./vote";
 import { calcWorkerValues } from "./workers";
 import { getXp } from "./xp";
 import ms = require("ms");
+import Constants from "../../Constants";
 
 export async function getBalance(member: GuildMember | string) {
   let id: string;

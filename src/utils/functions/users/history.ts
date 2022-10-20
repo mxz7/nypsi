@@ -4,6 +4,7 @@ import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { hasProfile } from "./utils";
 import ms = require("ms");
+import Constants from "../../Constants";
 
 export async function isTracking(member: GuildMember | string): Promise<boolean> {
   let id: string;

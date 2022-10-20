@@ -10,6 +10,7 @@ import redis from "../../../../init/redis";
 import { NypsiCommandInteraction } from "../../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
+import Constants from "../../../Constants";
 import { getMember } from "../../member";
 import sleep from "../../sleep";
 import { getInventory, setInventoryItem } from "../inventory";

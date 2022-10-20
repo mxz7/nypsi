@@ -4,6 +4,7 @@ import * as crypto from "node:crypto";
 import redis from "../../init/redis";
 import { getTimestamp } from "../logger";
 import ms = require("ms");
+import Constants from "../Constants";
 
 const locked: string[] = [];
 

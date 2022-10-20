@@ -10,6 +10,7 @@ import requestDM from "../requestdm";
 import { getDmSettings } from "../users/notifications";
 import { addInventoryItem } from "./inventory";
 import ms = require("ms");
+import Constants from "../../Constants";
 
 export async function getGuildByName(name: string) {
   const guild = await prisma.economyGuild

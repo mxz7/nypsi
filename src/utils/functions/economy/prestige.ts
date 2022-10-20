@@ -2,6 +2,7 @@ import { Collection, Guild, GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import ms = require("ms");
+import Constants from "../../Constants";
 
 export async function topAmountPrestige(guild: Guild, amount: number): Promise<string[]> {
   let members: Collection<string, GuildMember>;

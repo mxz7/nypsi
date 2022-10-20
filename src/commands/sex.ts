@@ -3,6 +3,7 @@ import redis from "../init/redis.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { MilfSearchData } from "../types/Sex.js";
+import Constants from "../utils/Constants.js";
 import { addProgress } from "../utils/functions/economy/achievements.js";
 import { cleanString } from "../utils/functions/string.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";

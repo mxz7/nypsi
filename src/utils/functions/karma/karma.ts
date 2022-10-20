@@ -1,6 +1,7 @@
 import { GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
+import Constants from "../../Constants";
 import { createProfile } from "../users/utils";
 
 export async function getKarma(member: GuildMember | string): Promise<number> {
@@ -11,8 +12,8 @@ export async function getKarma(member: GuildMember | string): Promise<number> {
     id = member;
   }
 
-  if (await redis.exists(`${Constants.redis.cache.user.KARM}:${id}`))
-    return parseInt(await redis.get(`${Constants.redis.cache.user.KARM}:${id}`));
+  if (await redis.exists(`${Constants.redis.cache.user.KARMA}:${id}`))
+    return parseInt(await redis.get(`${Constants.redis.cache.user.KARMA}:${id}`));
 
   const query = await prisma.user.findUnique({
     where: {
@@ -31,8 +32,8 @@ export async function getKarma(member: GuildMember | string): Promise<number> {
     }
     return 1;
   } else {
-    await redis.set(`${Constants.redis.cache.user.KARM}:${id}`, query.karma);
-    await redis.expire(`${Constants.redis.cache.user.KARM}:${id}`, 300);
+    await redis.set(`${Constants.redis.cache.user.KARMA}:${id}`, query.karma);
+    await redis.expire(`${Constants.redis.cache.user.KARMA}:${id}`, 300);
     return query.karma;
   }
 }
@@ -54,7 +55,7 @@ export async function addKarma(member: GuildMember | string, amount: number) {
     },
   });
 
-  await redis.del(`${Constants.redis.cache.user.KARM}:${id}`);
+  await redis.del(`${Constants.redis.cache.user.KARMA}:${id}`);
 }
 
 export async function removeKarma(member: GuildMember | string, amount: number) {
@@ -74,5 +75,5 @@ export async function removeKarma(member: GuildMember | string, amount: number) 
     },
   });
 
-  await redis.del(`${Constants.redis.cache.user.KARM}:${id}`);
+  await redis.del(`${Constants.redis.cache.user.KARMA}:${id}`);
 }

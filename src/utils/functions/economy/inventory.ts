@@ -3,6 +3,7 @@ import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { Item } from "../../../types/Economy";
+import Constants from "../../Constants";
 import { logger } from "../../logger";
 import workerSort from "../workers/sort";
 import { addProgress, getAllAchievements, setAchievementProgress } from "./achievements";
