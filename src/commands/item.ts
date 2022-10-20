@@ -94,8 +94,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (inventory.find((i) => i.item == selected.id)) {
     embed.setFooter({
-      text: `you have ${inventory.find((i) => i.item == selected.id).amount.toLocaleString()} ${selected.name}${
-        inventory.find((i) => i.item == selected.id).amount > 1 ? (selected.name.endsWith("s") ? "" : "s") : ""
+      text: `you have ${inventory.find((i) => i.item == selected.id).amount.toLocaleString()} ${
+        inventory.find((i) => i.item == selected.id).amount > 1 ? selected.plural || selected.name : selected.name
       }`,
     });
   }
