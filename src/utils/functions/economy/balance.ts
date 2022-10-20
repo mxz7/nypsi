@@ -4,6 +4,7 @@ import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
 import { getTier, isPremium } from "../premium/premium";
+import workerSort from "../workers/sort";
 import { getAuctionAverage } from "./auctions";
 import { getBoosters } from "./boosters";
 import { getGuildByUser } from "./guilds";
@@ -568,4 +569,78 @@ export async function calcNetWorth(member: GuildMember | string) {
   await redis.expire(`cache:networth:${id}`, ms("30 minutes") / 1000);
 
   return Math.floor(worth);
+}
+
+export async function topNetWorth(guild: Guild, amount: number): Promise<string[]> {
+  let members: Collection<string, GuildMember>;
+
+  if (guild.memberCount == guild.members.cache.size) {
+    members = guild.members.cache;
+  } else {
+    members = await guild.members.fetch();
+  }
+
+  if (!members) members = guild.members.cache;
+
+  members = members.filter((m) => {
+    return !m.user.bot;
+  });
+
+  const query = await prisma.economy.findMany({
+    where: {
+      AND: [{ userId: { in: Array.from(members.keys()) } }, { money: { gt: 0 } }],
+    },
+    select: {
+      userId: true,
+    },
+  });
+
+  const amounts = new Map<string, number>();
+  let userIds: string[] = [];
+
+  for (const user of query) {
+    amounts.set(user.userId, await calcNetWorth(user.userId));
+
+    userIds.push(user.userId);
+  }
+
+  if (userIds.length > 500) {
+    userIds = await workerSort(userIds, amounts);
+    userIds.reverse();
+  } else {
+    inPlaceSort(userIds).desc((i) => amounts.get(i));
+  }
+
+  const usersFinal = [];
+
+  let count = 0;
+
+  const getMemberID = (guild: Guild, id: string) => {
+    const target = guild.members.cache.find((member) => {
+      return member.user.id == id;
+    });
+
+    return target;
+  };
+
+  for (const user of userIds) {
+    if (count >= amount) break;
+    if (usersFinal.join().length >= 1500) break;
+
+    if (amounts.get(user) != 0) {
+      let pos: number | string = count + 1;
+
+      if (pos == 1) {
+        pos = "🥇";
+      } else if (pos == 2) {
+        pos = "🥈";
+      } else if (pos == 3) {
+        pos = "🥉";
+      }
+
+      usersFinal[count] = pos + " **" + getMemberID(guild, user).user.tag + "** $" + amounts.get(user).toLocaleString();
+      count++;
+    }
+  }
+  return usersFinal;
 }

@@ -3,7 +3,7 @@ import { Categories, Command, NypsiCommandInteraction } from "../models/Command"
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { Item } from "../types/Economy.js";
 import { topCompletion } from "../utils/functions/economy/achievements.js";
-import { topAmount } from "../utils/functions/economy/balance.js";
+import { topAmount, topNetWorth } from "../utils/functions/economy/balance.js";
 import { topAmountItem } from "../utils/functions/economy/inventory.js";
 import { topAmountPrestige } from "../utils/functions/economy/prestige.js";
 import { getItems } from "../utils/functions/economy/utils.js";
@@ -39,6 +39,12 @@ cmd.slashData
       .setName("completion")
       .setDescription("view top completion in the server")
       .addIntegerOption((option) => option.setName("amount").setDescription("amount of members to show").setRequired(false))
+  )
+  .addSubcommand((networth) =>
+    networth
+      .setName("networth")
+      .setDescription("view top networths in the server")
+      .addIntegerOption((option) => option.setName("amount").setDescription("amount of members to show").setRequired(false))
   );
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
@@ -68,6 +74,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const topBalance = async (amount: number) => {
     const balTop = await topAmount(message.guild, amount);
+
+    if (balTop.length == 0) {
+      return send({ embeds: [new ErrorEmbed("there are no users to show")] });
+    }
+
+    const embed = new CustomEmbed(message.member).setHeader("top " + balTop.length).setDescription(balTop.join("\n"));
+
+    return send({ embeds: [embed] });
+  };
+
+  const topNet = async (amount: number) => {
+    const balTop = await topNetWorth(message.guild, amount);
 
     if (balTop.length == 0) {
       return send({ embeds: [new ErrorEmbed("there are no users to show")] });
