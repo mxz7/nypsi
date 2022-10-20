@@ -565,7 +565,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const items = getItems();
 
-    const selected = selectItem(args[0].toLowerCase());
+    const selected = selectItem(args[1].toLowerCase());
 
     if (!selected) {
       return send({ embeds: [new ErrorEmbed("couldnt find that item")] });
