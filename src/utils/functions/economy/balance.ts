@@ -564,8 +564,8 @@ export async function calcNetWorth(member: GuildMember | string) {
     worth += worker.stored * perItem;
   }
 
-  await redis.set(`cache:networth:${id}`, worth);
+  await redis.set(`cache:networth:${id}`, Math.floor(worth));
   await redis.expire(`cache:networth:${id}`, ms("30 minutes") / 1000);
 
-  return worth;
+  return Math.floor(worth);
 }
