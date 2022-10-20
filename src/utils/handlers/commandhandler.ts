@@ -681,7 +681,7 @@ export async function runCommand(
     command = commands.get(cmd);
   }
 
-  if (command.category == "money" || ["wholesome", "settings"].includes(command.name)) {
+  if (command.category == "money" || ["wholesome", "settings", "wordle"].includes(command.name)) {
     if (restarting || (await redis.get("nypsi:restarting")) == "t") {
       if (message.author.id == Constants.TEKOH_ID && message instanceof Message) {
         message.react("💀");
