@@ -194,9 +194,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
               fishItemsModified.push(i);
             }
           }
-        } else if (items[i].rarity == 0) {
+        } else if (items[i].rarity == 0 && fishingRod != "incredible_fishing_rod") {
           if (items[i].role == "fish") {
-            for (let x = 0; x < 250; x++) {
+            for (let x = 0; x < 200; x++) {
               fishItemsModified.push(i);
             }
           } else {
