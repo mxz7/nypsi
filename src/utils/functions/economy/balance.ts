@@ -3,18 +3,19 @@ import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
+import Constants from "../../Constants";
 import { getTier, isPremium } from "../premium/premium";
 import workerSort from "../workers/sort";
 import { getAuctionAverage } from "./auctions";
 import { getBoosters } from "./boosters";
 import { getGuildByUser } from "./guilds";
 import { getPrestige } from "./prestige";
-import { getItems } from "./utils";
+import { getBaseUpgrades, getBaseWorkers, getItems } from "./utils";
 import { hasVoted } from "./vote";
 import { calcWorkerValues } from "./workers";
 import { getXp } from "./xp";
 import ms = require("ms");
-import Constants from "../../Constants";
+import _ = require("lodash");
 
 export async function getBalance(member: GuildMember | string) {
   let id: string;
@@ -561,6 +562,27 @@ export async function calcNetWorth(member: GuildMember | string) {
   }
 
   for (const worker of query.EconomyWorker) {
+    const baseUpgrades = getBaseUpgrades();
+    const baseWorkers = getBaseWorkers();
+
+    for (const upgrade of worker.upgrades) {
+      if (!baseUpgrades[upgrade.upgradeId].base_cost) continue;
+
+      let baseCost = _.clone(baseUpgrades[upgrade.upgradeId]).base_cost;
+
+      baseCost =
+        baseCost *
+        (baseWorkers[upgrade.workerId].prestige_requirement >= 4
+          ? baseWorkers[upgrade.workerId].prestige_requirement / 2
+          : baseWorkers[upgrade.workerId].prestige_requirement - 0.5);
+
+      // zack's formula ((price+amount×price)×amount)/2
+
+      const cost = ((baseCost + upgrade.amount * baseCost) * upgrade.amount) / 2;
+
+      worth += cost;
+    }
+
     const { perItem } = await calcWorkerValues(worker);
 
     worth += worker.stored * perItem;
