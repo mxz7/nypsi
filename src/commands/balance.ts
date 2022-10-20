@@ -16,6 +16,7 @@ import { getXp } from "../utils/functions/economy/xp.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member.js";
 import { getNypsiBankBalance, getTax, getTaxRefreshTime } from "../utils/functions/tax.js";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("balance", "check your balance", Categories.MONEY).setAliases(["bal", "money", "wallet"]);
 
@@ -77,6 +78,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return await message.channel.send(data as BaseMessageOptions);
     }
   };
+
+  if (await onCooldown(cmd.name, message.member)) {
+    const embed = await getResponse(cmd.name, message.member);
+
+    return send({ embeds: [embed], ephemeral: true });
+  }
+
+  await addCooldown(cmd.name, message.member, 5);
 
   if (!(await userExists(target))) await createUser(target);
 
