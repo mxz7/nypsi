@@ -3,6 +3,7 @@ import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
+import Constants from "../utils/Constants";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { getBalance, hasPadlock, setPadlock, updateBalance } from "../utils/functions/economy/balance";
 import { addToGuildXP, getGuildByUser } from "../utils/functions/economy/guilds";
@@ -45,8 +46,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({ embeds: [embed], ephemeral: true });
   }
 
-  if ((await redis.exists(`cd:rob-radio:${message.author.id}`)) == 1) {
-    const init = parseInt(await redis.get(`cd:rob-radio:${message.author.id}`));
+  if ((await redis.exists(`${Constants.redis.cooldown.ROB_RADIO}:${message.author.id}`)) == 1) {
+    const init = parseInt(await redis.get(`${Constants.redis.cooldown.ROB_RADIO}:${message.author.id}`));
     const curr = new Date();
     const diff = Math.round((curr.getTime() - init) / 1000);
     const time = 900 - diff;

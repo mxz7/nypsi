@@ -10,6 +10,7 @@ import requestDM from "../requestdm";
 import { getDmSettings } from "../users/notifications";
 import { addInventoryItem } from "./inventory";
 import ms = require("ms");
+import Constants from "../../Constants";
 
 export async function getGuildByName(name: string) {
   const guild = await prisma.economyGuild
@@ -48,8 +49,8 @@ export async function getGuildByUser(member: GuildMember | string) {
 
   let guildName: string;
 
-  if (await redis.exists(`cache:economy:guild:user:${id}`)) {
-    guildName = await redis.get(`cache:economy:guild:user:${id}`);
+  if (await redis.exists(`${Constants.redis.cache.economy.GUILD_USER}:${id}`)) {
+    guildName = await redis.get(`${Constants.redis.cache.economy.GUILD_USER}:${id}`);
 
     if (guildName == "noguild") return undefined;
   } else {
@@ -76,12 +77,12 @@ export async function getGuildByUser(member: GuildMember | string) {
     });
 
     if (!query || !query.guild) {
-      await redis.set(`cache:economy:guild:user:${id}`, "noguild");
-      await redis.expire(`cache:economy:guild:user:${id}`, ms("1 hour") / 1000);
+      await redis.set(`${Constants.redis.cache.economy.GUILD_USER}:${id}`, "noguild");
+      await redis.expire(`${Constants.redis.cache.economy.GUILD_USER}:${id}`, ms("1 hour") / 1000);
       return undefined;
     } else {
-      await redis.set(`cache:economy:guild:user:${id}`, query.guild.guildName);
-      await redis.expire(`cache:economy:guild:user:${id}`, ms("1 hour") / 1000);
+      await redis.set(`${Constants.redis.cache.economy.GUILD_USER}:${id}`, query.guild.guildName);
+      await redis.expire(`${Constants.redis.cache.economy.GUILD_USER}:${id}`, ms("1 hour") / 1000);
     }
 
     return query.guild;
@@ -106,7 +107,7 @@ export async function createGuild(name: string, owner: GuildMember) {
     },
   });
 
-  await redis.del(`cache:economy:guild:user:${owner.user.id}`);
+  await redis.del(`${Constants.redis.cache.economy.GUILD_USER}:${owner.user.id}`);
 }
 
 export async function deleteGuild(name: string) {
@@ -172,8 +173,8 @@ export async function getMaxMembersForGuild(name: string) {
 }
 
 export async function getRequiredForGuildUpgrade(name: string): Promise<GuildUpgradeRequirements> {
-  if (await redis.exists(`cache:economy:guild:requirements:${name}`)) {
-    return JSON.parse(await redis.get(`cache:economy:guild:requirements:${name}`));
+  if (await redis.exists(`${Constants.redis.cache.economy.GUILD_REQUIREMENTS}:${name}`)) {
+    return JSON.parse(await redis.get(`${Constants.redis.cache.economy.GUILD_REQUIREMENTS}:${name}`));
   }
 
   const guild = await getGuildByName(name);
@@ -185,13 +186,13 @@ export async function getRequiredForGuildUpgrade(name: string): Promise<GuildUpg
   const bonusXP = 75 * guild.members.length;
 
   await redis.set(
-    `cache:economy:guild:requirements:${name}`,
+    `${Constants.redis.cache.economy.GUILD_REQUIREMENTS}:${name}`,
     JSON.stringify({
       money: baseMoney + bonusMoney,
       xp: baseXP + bonusXP,
     })
   );
-  await redis.expire(`cache:economy:guild:requirements:${name}`, ms("1 hour") / 1000);
+  await redis.expire(`${Constants.redis.cache.economy.GUILD_REQUIREMENTS}:${name}`, ms("1 hour") / 1000);
 
   return {
     money: baseMoney + bonusMoney,
@@ -214,7 +215,7 @@ export async function addMember(name: string, member: GuildMember) {
     },
   });
 
-  await redis.del(`cache:economy:guild:user:${member.user.id}`);
+  await redis.del(`${Constants.redis.cache.economy.GUILD_USER}:${member.user.id}`);
 
   return true;
 }
@@ -231,7 +232,7 @@ export async function removeMember(member: string, mode: RemoveMemberMode) {
         userId: member,
       },
     });
-    await redis.del(`cache:economy:guild:user:${member}`);
+    await redis.del(`${Constants.redis.cache.economy.GUILD_USER}:${member}`);
     return true;
   } else {
     const user = await prisma.user.findFirst({
@@ -254,7 +255,7 @@ export async function removeMember(member: string, mode: RemoveMemberMode) {
     });
 
     if (x) {
-      await redis.del(`cache:economy:guild:user:${x.userId}`);
+      await redis.del(`${Constants.redis.cache.economy.GUILD_USER}:${x.userId}`);
 
       return true;
     }
@@ -303,7 +304,7 @@ async function checkUpgrade(guild: EconomyGuild | string, client: NypsiClient): 
 
     logger.info(`${guild.guildName} has upgraded to level ${guild.level + 1}`);
 
-    await redis.del(`cache:economy:guild:requirements:${guild.guildName}`);
+    await redis.del(`${Constants.redis.cache.economy.GUILD_REQUIREMENTS}:${guild.guildName}`);
 
     const embed = new CustomEmbed().setColor("#5efb8f");
 

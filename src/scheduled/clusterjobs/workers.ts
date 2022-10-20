@@ -66,15 +66,15 @@ async function doWorkerThing() {
 
       await updateBalance(worker.userId, (await getBalance(worker.userId)) + earned);
 
-      if (await redis.exists(`nypsi:steveearned:${worker.userId}`)) {
+      if (await redis.exists(`${Constants.redis.nypsi.STEVE_EARNED}:${worker.userId}`)) {
         await redis.set(
-          `nypsi:steveearned:${worker.userId}`,
-          parseInt(await redis.get(`nypsi:steveearned:${worker.userId}`)) + earned
+          `${Constants.redis.nypsi.STEVE_EARNED}:${worker.userId}`,
+          parseInt(await redis.get(`${Constants.redis.nypsi.STEVE_EARNED}:${worker.userId}`)) + earned
         );
-        await redis.expire(`nypsi:steveearned:${worker.userId}`, ms("24 hours") / 1000);
+        await redis.expire(`${Constants.redis.nypsi.STEVE_EARNED}:${worker.userId}`, ms("24 hours") / 1000);
       } else {
-        await redis.set(`nypsi:steveearned:${worker.userId}`, earned);
-        await redis.expire(`nypsi:steveearned:${worker.userId}`, ms("24 hours") / 1000);
+        await redis.set(`${Constants.redis.nypsi.STEVE_EARNED}:${worker.userId}`, earned);
+        await redis.expire(`${Constants.redis.nypsi.STEVE_EARNED}:${worker.userId}`, ms("24 hours") / 1000);
       }
     } else {
       await prisma.economyWorker.update({

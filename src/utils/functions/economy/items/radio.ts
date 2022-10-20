@@ -10,6 +10,7 @@ import redis from "../../../../init/redis";
 import { NypsiCommandInteraction } from "../../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
+import Constants from "../../../Constants";
 import { getMember } from "../../member";
 import sleep from "../../sleep";
 import { getInventory, setInventoryItem } from "../inventory";
@@ -64,14 +65,14 @@ module.exports = new ItemUse(
       return send({ embeds: [new ErrorEmbed("invalid user")] });
     }
 
-    if ((await redis.exists(`cd:rob-radio:${radioTarget.user.id}`)) == 1) {
+    if ((await redis.exists(`${Constants.redis.cooldown.ROB_RADIO}:${radioTarget.user.id}`)) == 1) {
       return send({
         embeds: [new ErrorEmbed(`the police are already looking for **${radioTarget.user.tag}**`)],
       });
     }
 
-    await redis.set(`cd:rob-radio:${radioTarget.user.id}`, Date.now());
-    await redis.expire(`cd:rob-radio:${radioTarget.user.id}`, 900);
+    await redis.set(`${Constants.redis.cooldown.ROB_RADIO}:${radioTarget.user.id}`, Date.now());
+    await redis.expire(`${Constants.redis.cooldown.ROB_RADIO}:${radioTarget.user.id}`, 900);
 
     const inventory = await getInventory(message.member, false);
 

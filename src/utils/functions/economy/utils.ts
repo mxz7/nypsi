@@ -6,6 +6,7 @@ import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { AchievementData, Item } from "../../../types/Economy";
 import { Worker, WorkerUpgrades } from "../../../types/Workers";
+import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { createProfile, hasProfile } from "../users/utils";
 import { calcMaxBet, getBalance } from "./balance";
@@ -125,8 +126,8 @@ export async function userExists(member: GuildMember | string): Promise<boolean>
 
   if (!id) return;
 
-  if (await redis.exists(`cache:economy:exists:${id}`)) {
-    return (await redis.get(`cache:economy:exists:${id}`)) === "true" ? true : false;
+  if (await redis.exists(`${Constants.redis.cache.economy.EXISTS}:${id}`)) {
+    return (await redis.get(`${Constants.redis.cache.economy.EXISTS}:${id}`)) === "true" ? true : false;
   }
 
   const query = await prisma.economy.findUnique({
@@ -139,12 +140,12 @@ export async function userExists(member: GuildMember | string): Promise<boolean>
   });
 
   if (query) {
-    await redis.set(`cache:economy:exists:${id}`, "true");
-    await redis.expire(`cache:economy:exists:${id}`, ms("1 hour") / 1000);
+    await redis.set(`${Constants.redis.cache.economy.EXISTS}:${id}`, "true");
+    await redis.expire(`${Constants.redis.cache.economy.EXISTS}:${id}`, ms("1 hour") / 1000);
     return true;
   } else {
-    await redis.set(`cache:economy:exists:${id}`, "false");
-    await redis.expire(`cache:economy:exists:${id}`, ms("1 hour") / 1000);
+    await redis.set(`${Constants.redis.cache.economy.EXISTS}:${id}`, "false");
+    await redis.expire(`${Constants.redis.cache.economy.EXISTS}:${id}`, ms("1 hour") / 1000);
     return false;
   }
 }
@@ -172,7 +173,7 @@ export async function createUser(member: GuildMember | string) {
       lastDaily: new Date(0),
     },
   });
-  await redis.del(`cache:economy:exists:${id}`);
+  await redis.del(`${Constants.redis.cache.economy.EXISTS}:${id}`);
 }
 
 export async function formatBet(bet: string | number, member: GuildMember): Promise<number | void> {
@@ -217,10 +218,10 @@ export function formatNumber(number: string | number): number | void {
 }
 
 export async function isEcoBanned(id: string) {
-  if (await redis.exists(`cache:economy:banned:${id}`)) {
-    const res = (await redis.get(`cache:economy:banned:${id}`)) === "t" ? true : false;
+  if (await redis.exists(`${Constants.redis.cache.economy.BANNED}:${id}`)) {
+    const res = (await redis.get(`${Constants.redis.cache.economy.BANNED}:${id}`)) === "t" ? true : false;
 
-    if (res) await redis.del(`cache:economy:banned:${id}`);
+    if (res) await redis.del(`${Constants.redis.cache.economy.BANNED}:${id}`);
     return res;
   } else {
     const query = await prisma.economy.findUnique({
@@ -233,18 +234,18 @@ export async function isEcoBanned(id: string) {
     });
 
     if (!query || !query.banned) {
-      await redis.set(`cache:economy:banned:${id}`, "f");
-      await redis.expire(`cache:economy:banned:${id}`, ms("1 hour") / 1000);
+      await redis.set(`${Constants.redis.cache.economy.BANNED}:${id}`, "f");
+      await redis.expire(`${Constants.redis.cache.economy.BANNED}:${id}`, ms("1 hour") / 1000);
       return false;
     }
 
     if (dayjs().isBefore(query.banned)) {
-      await redis.set(`cache:economy:banned:${id}`, "t");
-      await redis.expire(`cache:economy:banned:${id}`, ms("1 hour") / 1000);
+      await redis.set(`${Constants.redis.cache.economy.BANNED}:${id}`, "t");
+      await redis.expire(`${Constants.redis.cache.economy.BANNED}:${id}`, ms("1 hour") / 1000);
       return true;
     } else {
-      await redis.set(`cache:economy:banned:${id}`, "f");
-      await redis.expire(`cache:economy:banned:${id}`, ms("1 hour") / 1000);
+      await redis.set(`${Constants.redis.cache.economy.BANNED}:${id}`, "f");
+      await redis.expire(`${Constants.redis.cache.economy.BANNED}:${id}`, ms("1 hour") / 1000);
       return false;
     }
   }
@@ -284,7 +285,7 @@ export async function setEcoBan(id: string, date?: Date) {
     });
   }
 
-  await redis.del(`cache:economy:banned:${id}`);
+  await redis.del(`${Constants.redis.cache.economy.BANNED}:${id}`);
 }
 
 export async function reset() {
@@ -332,15 +333,16 @@ export async function reset() {
 
     updated++;
 
-    await redis.del(`cache:economy:exists:${user.userId}`);
-    await redis.del(`cache:economy:banned:${user.userId}`);
-    await redis.del(`cache:economy:prestige:${user.userId}`);
-    await redis.del(`cache:economy:exists:${user.userId}`);
-    await redis.del(`cache:economy:xp:${user.userId}`);
-    await redis.del(`cache:economy:balance:${user.userId}`);
-    await redis.del(`cache:economy:boosters:${user.userId}`);
+    await redis.del(`${Constants.redis.cache.economy.EXISTS}:${user.userId}`);
+    await redis.del(`${Constants.redis.cache.economy.BANNED}:${user.userId}`);
+    await redis.del(`${Constants.redis.cache.economy.PRESTIGE}:${user.userId}`);
+    await redis.del(`${Constants.redis.cache.economy.EXISTS}:${user.userId}`);
+    await redis.del(`${Constants.redis.cache.economy.XP}:${user.userId}`);
+    await redis.del(`${Constants.redis.cache.economy.BALANCE}:${user.userId}`);
+    await redis.del(`${Constants.redis.cache.economy.BOOSTERS}:${user.userId}`);
     await redis.del(`economy:handcuffed:${user.userId}`);
-    await redis.del(`cache:economy:guild:user:${user.userId}`);
+    await redis.del(`${Constants.redis.cache.economy.GUILD_USER}:${user.userId}`);
+    await redis.del(`${Constants.redis.cache.economy.NETWORTH}:${user.userId}`);
   }
 
   return updated + deleted;
@@ -404,14 +406,14 @@ export async function deleteUser(member: GuildMember | string) {
     },
   });
 
-  await redis.del(`cache:economy:exists:${id}`);
-  await redis.del(`cache:economy:banned:${id}`);
-  await redis.del(`cache:economy:prestige:${id}`);
-  await redis.del(`cache:economy:exists:${id}`);
-  await redis.del(`cache:economy:xp:${id}`);
-  await redis.del(`cache:economy:balance:${id}`);
-  await redis.del(`cache:economy:boosters:${id}`);
-  await redis.del(`cache:economy:guild:user:${id}`);
+  await redis.del(`${Constants.redis.cache.economy.EXISTS}:${id}`);
+  await redis.del(`${Constants.redis.cache.economy.BANNED}:${id}`);
+  await redis.del(`${Constants.redis.cache.economy.PRESTIGE}:${id}`);
+  await redis.del(`${Constants.redis.cache.economy.EXISTS}:${id}`);
+  await redis.del(`${Constants.redis.cache.economy.XP}:${id}`);
+  await redis.del(`${Constants.redis.cache.economy.BALANCE}:${id}`);
+  await redis.del(`${Constants.redis.cache.economy.BOOSTERS}:${id}`);
+  await redis.del(`${Constants.redis.cache.economy.GUILD_USER}:${id}`);
 }
 
 export async function getTickets(member: GuildMember | string) {
