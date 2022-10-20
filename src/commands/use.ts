@@ -3,9 +3,8 @@ import { readdir } from "fs/promises";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { ItemUse } from "../models/ItemUse";
-import { Item } from "../types/Economy";
 import { addBooster, getBoosters } from "../utils/functions/economy/boosters";
-import { getInventory, openCrate, setInventoryItem } from "../utils/functions/economy/inventory";
+import { getInventory, openCrate, selectItem, setInventoryItem } from "../utils/functions/economy/inventory";
 import { addItemUse } from "../utils/functions/economy/stats";
 import { createUser, getBaseUpgrades, getBaseWorkers, getItems, userExists } from "../utils/functions/economy/utils";
 import { addWorkerUpgrade, getWorkers } from "../utils/functions/economy/workers";
@@ -74,26 +73,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const items = getItems();
   const inventory = await getInventory(message.member);
 
-  const searchTag = args[0].toLowerCase();
-
-  let selected: Item;
-
-  for (const itemName of Array.from(Object.keys(items))) {
-    const aliases = items[itemName].aliases ? items[itemName].aliases : [];
-    if (searchTag == itemName) {
-      selected = items[itemName];
-      break;
-    } else if (searchTag == itemName.split("_").join("")) {
-      selected = items[itemName];
-      break;
-    } else if (aliases.indexOf(searchTag) != -1) {
-      selected = items[itemName];
-      break;
-    } else if (searchTag == items[itemName].name) {
-      selected = items[itemName];
-      break;
-    }
-  }
+  const selected = selectItem(args[0].toLowerCase());
 
   if (!selected || typeof selected == "string") {
     return send({ embeds: [new ErrorEmbed(`couldnt find \`${args[0]}\``)] });
