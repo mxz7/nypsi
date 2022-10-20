@@ -1,28 +1,29 @@
 import ms = require("ms");
 import prisma from "../../init/database";
 import redis from "../../init/redis";
+import Constants from "../Constants";
 
 export async function getTax() {
   let tax: number;
 
-  if (!(await redis.exists("nypsi:tax"))) {
+  if (!(await redis.exists(Constants.redis.nypsi.TAX))) {
     tax = await updateTax();
   } else {
-    tax = parseFloat(await redis.get("nypsi:tax"));
+    tax = parseFloat(await redis.get(Constants.redis.nypsi.TAX));
   }
 
   return parseFloat(tax.toFixed(3));
 }
 
 export async function getTaxRefreshTime() {
-  return Math.floor(Date.now() / 1000 + (await redis.ttl("nypsi:tax")));
+  return Math.floor(Date.now() / 1000 + (await redis.ttl(Constants.redis.nypsi.TAX)));
 }
 
 async function updateTax() {
   const tax = parseFloat((Math.random() * 7 + 2.2).toFixed(3)) / 100;
 
-  await redis.set("nypsi:tax", tax.toFixed(3));
-  await redis.expire("nypsi:tax", Math.floor(ms("6 hours") / 1000));
+  await redis.set(Constants.redis.nypsi.TAX, tax.toFixed(3));
+  await redis.expire(Constants.redis.nypsi.TAX, Math.floor(ms("6 hours") / 1000));
 
   return tax;
 }

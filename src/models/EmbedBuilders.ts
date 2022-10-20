@@ -1,5 +1,6 @@
 import { ColorResolvable, EmbedBuilder, GuildMember } from "discord.js";
 import redis from "../init/redis";
+import Constants from "../utils/Constants";
 import { getColor } from "../utils/functions/color";
 import { getEmbedColor } from "../utils/functions/premium/color";
 
@@ -209,7 +210,7 @@ export class ErrorEmbed extends EmbedBuilder {
 }
 
 async function checkPremium(id: string) {
-  const x = parseInt(await redis.get(`cache:premium:level:${id}`));
+  const x = parseInt(await redis.get(`${Constants.redis.cache.premium.LEVEL}:${id}`));
 
   if (x > 0) {
     const embedColor = await getEmbedColor(id);

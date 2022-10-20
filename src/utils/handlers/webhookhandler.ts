@@ -57,7 +57,7 @@ export function listen(manager: Manager) {
 async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
   const { user } = vote;
 
-  await redis.srem("nypsi:vote_reminder:received", user);
+  await redis.srem(Constants.redis.nypsi.VOTE_REMINDER_RECEIVED, user);
 
   if (!(await userExists(user))) {
     logger.warn(`${user} doesnt exist`);
@@ -90,8 +90,8 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
     },
   });
 
-  redis.set(`cache:vote:${user}`, "true");
-  redis.expire(`cache:vote:${user}`, ms("1 hour") / 1000);
+  redis.set(`${Constants.redis.cache.economy.VOTE}:${user}`, "true");
+  redis.expire(`${Constants.redis.cache.economy.VOTE}:${user}`, ms("1 hour") / 1000);
 
   let prestige = await getPrestige(user);
 
@@ -109,8 +109,8 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
         expire: dayjs().add(2, "hour").toDate(),
       },
     }),
-    redis.del(`cache:vote:${user}`),
-    redis.del(`cache:economy:boosters:${user}`),
+    redis.del(`${Constants.redis.cache.economy.VOTE}:${user}`),
+    redis.del(`${Constants.redis.cache.economy.BOOSTERS}:${user}`),
   ]);
 
   const tickets = await getTickets(user);

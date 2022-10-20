@@ -2,6 +2,7 @@ import dayjs = require("dayjs");
 import { parentPort, workerData } from "worker_threads";
 import prisma from "../../init/database";
 import redis from "../../init/redis";
+import Constants from "../../utils/Constants";
 
 (async () => {
   const guilds: string[] = workerData.guilds;
@@ -74,9 +75,9 @@ import redis from "../../init/redis";
         },
       });
 
-      await redis.del(`cache:guild:exists:${guild.id}`);
-      await redis.del(`cache:guild:prefix:${guild.id}`);
-      await redis.del(`cache:guild:percentmatch:${guild.id}`);
+      await redis.del(`${Constants.redis.cache.guild.EXISTS}:${guild.id}`);
+      await redis.del(`${Constants.redis.cache.guild.PREFIX}:${guild.id}`);
+      await redis.del(`${Constants.redis.cache.guild.PERCENT_MATCH}:${guild.id}`);
 
       parentPort.postMessage(`deleted guild ${guild.id} from database`);
     }

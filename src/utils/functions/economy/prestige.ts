@@ -2,6 +2,7 @@ import { Collection, Guild, GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import ms = require("ms");
+import Constants from "../../Constants";
 
 export async function topAmountPrestige(guild: Guild, amount: number): Promise<string[]> {
   let members: Collection<string, GuildMember>;
@@ -83,8 +84,8 @@ export async function getPrestige(member: GuildMember | string): Promise<number>
     id = member;
   }
 
-  if (await redis.exists(`cache:economy:prestige:${id}`)) {
-    return parseInt(await redis.get(`cache:economy:prestige:${id}`));
+  if (await redis.exists(`${Constants.redis.cache.economy.PRESTIGE}:${id}`)) {
+    return parseInt(await redis.get(`${Constants.redis.cache.economy.PRESTIGE}:${id}`));
   }
 
   const query = await prisma.economy.findUnique({
@@ -96,8 +97,8 @@ export async function getPrestige(member: GuildMember | string): Promise<number>
     },
   });
 
-  await redis.set(`cache:economy:prestige:${id}`, query.prestige);
-  await redis.expire(`cache:economy:prestige:${id}`, ms("1 hour") / 1000);
+  await redis.set(`${Constants.redis.cache.economy.PRESTIGE}:${id}`, query.prestige);
+  await redis.expire(`${Constants.redis.cache.economy.PRESTIGE}:${id}`, ms("1 hour") / 1000);
 
   return query.prestige;
 }
@@ -112,7 +113,7 @@ export async function setPrestige(member: GuildMember, amount: number) {
     },
   });
 
-  await redis.del(`cache:economy:prestige:${member.user.id}`);
+  await redis.del(`${Constants.redis.cache.economy.PRESTIGE}:${member.user.id}`);
 }
 
 export async function getPrestigeRequirement(member: GuildMember): Promise<number> {

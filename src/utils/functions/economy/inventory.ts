@@ -3,6 +3,7 @@ import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { Item } from "../../../types/Economy";
+import Constants from "../../Constants";
 import { logger } from "../../logger";
 import workerSort from "../workers/sort";
 import { addProgress, getAllAchievements, setAchievementProgress } from "./achievements";
@@ -107,8 +108,8 @@ export async function getInventory(member: GuildMember | string, checkAchievemen
     id = member;
   }
 
-  if (await redis.exists(`cache:economy:inventory:${id}`)) {
-    return JSON.parse(await redis.get(`cache:economy:inventory:${id}`));
+  if (await redis.exists(`${Constants.redis.cache.economy.INVENTORY}:${id}`)) {
+    return JSON.parse(await redis.get(`${Constants.redis.cache.economy.INVENTORY}:${id}`));
   }
 
   const query = await prisma.inventory
@@ -125,13 +126,13 @@ export async function getInventory(member: GuildMember | string, checkAchievemen
 
   if (!query || query.length == 0) {
     if (!(await userExists(id))) await createUser(id);
-    await redis.set(`cache:economy:inventory:${id}`, "[]");
-    await redis.expire(`cache:economy:inventory:${id}`, 180);
+    await redis.set(`${Constants.redis.cache.economy.INVENTORY}:${id}`, "[]");
+    await redis.expire(`${Constants.redis.cache.economy.INVENTORY}:${id}`, 180);
     return [];
   }
 
-  await redis.set(`cache:economy:inventory:${id}`, JSON.stringify(query));
-  await redis.expire(`cache:economy:inventory:${id}`, 180);
+  await redis.set(`${Constants.redis.cache.economy.INVENTORY}:${id}`, JSON.stringify(query));
+  await redis.expire(`${Constants.redis.cache.economy.INVENTORY}:${id}`, 180);
 
   setTimeout(async () => {
     if (checkAchievement && !inventoryAchievementCheckCooldown.has(id)) {
@@ -184,7 +185,7 @@ export async function addInventoryItem(
     },
   });
 
-  await redis.del(`cache:economy:inventory:${id}`);
+  await redis.del(`${Constants.redis.cache.economy.INVENTORY}:${id}`);
 
   setTimeout(async () => {
     if (!inventoryAchievementCheckCooldown.has(id) && checkAchievement) {
@@ -246,7 +247,7 @@ export async function setInventoryItem(
     });
   }
 
-  await redis.del(`cache:economy:inventory:${id}`);
+  await redis.del(`${Constants.redis.cache.economy.INVENTORY}:${id}`);
 
   if (!inventoryAchievementCheckCooldown.has(id) && checkAchievement) {
     inventoryAchievementCheckCooldown.add(id);

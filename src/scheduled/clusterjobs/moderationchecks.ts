@@ -2,6 +2,7 @@ import { APIEmbed, WebhookClient } from "discord.js";
 import prisma from "../../init/database";
 import redis from "../../init/redis";
 import { NypsiClient } from "../../models/Client";
+import Constants from "../../utils/Constants";
 import { requestUnban } from "../../utils/functions/moderation/ban";
 import { requestUnmute } from "../../utils/functions/moderation/mute";
 import { logger } from "../../utils/logger";
@@ -21,7 +22,7 @@ export function runLogs() {
     let count = 0;
 
     for (const guild of query) {
-      if ((await redis.llen(`nypsi:guild:logs:queue:${guild.guildId}`)) == 0) {
+      if ((await redis.llen(`${Constants.redis.nypsi.GUILD_LOG_QUEUE}:${guild.guildId}`)) == 0) {
         continue;
       }
       const hook = new WebhookClient({ url: guild.logs });
@@ -40,14 +41,14 @@ export function runLogs() {
 
       const embeds: APIEmbed[] = [];
 
-      if ((await redis.llen(`nypsi:guild:logs:queue:${guild.guildId}`)) > 10) {
+      if ((await redis.llen(`${Constants.redis.nypsi.GUILD_LOG_QUEUE}:${guild.guildId}`)) > 10) {
         for (let i = 0; i < 10; i++) {
-          const current = await redis.rpop(`nypsi:guild:logs:queue:${guild.guildId}`);
+          const current = await redis.rpop(`${Constants.redis.nypsi.GUILD_LOG_QUEUE}:${guild.guildId}`);
           embeds.push(JSON.parse(current) as APIEmbed);
         }
       } else {
-        const current = await redis.lrange(`nypsi:guild:logs:queue:${guild.guildId}`, 0, 10);
-        await redis.del(`nypsi:guild:logs:queue:${guild.guildId}`);
+        const current = await redis.lrange(`${Constants.redis.nypsi.GUILD_LOG_QUEUE}:${guild.guildId}`, 0, 10);
+        await redis.del(`${Constants.redis.nypsi.GUILD_LOG_QUEUE}:${guild.guildId}`);
         for (const i of current) {
           embeds.push(JSON.parse(i) as APIEmbed);
         }
@@ -134,7 +135,10 @@ export function runModerationChecks(client: NypsiClient) {
     let modLogCount = 0;
 
     for (const modlog of query3) {
-      if (!(await redis.exists(`modlogs:${modlog.guildId}`)) || (await redis.llen(`modlogs:${modlog.guildId}`)) == 0)
+      if (
+        !(await redis.exists(`${Constants.redis.cache.guild.MODLOGS}:${modlog.guildId}`)) ||
+        (await redis.llen(`${Constants.redis.cache.guild.MODLOGS}:${modlog.guildId}`)) == 0
+      )
         continue;
 
       const webhook = new WebhookClient({
@@ -143,14 +147,14 @@ export function runModerationChecks(client: NypsiClient) {
 
       const embeds: APIEmbed[] = [];
 
-      if ((await redis.llen(`modlogs:${modlog.guildId}`)) > 10) {
+      if ((await redis.llen(`${Constants.redis.cache.guild.MODLOGS}:${modlog.guildId}`)) > 10) {
         for (let i = 0; i < 10; i++) {
-          const current = await redis.rpop(`modlogs:${modlog.guildId}`);
+          const current = await redis.rpop(`${Constants.redis.cache.guild.MODLOGS}:${modlog.guildId}`);
           embeds.push(JSON.parse(current) as APIEmbed);
         }
       } else {
-        const current = await redis.lrange(`modlogs:${modlog.guildId}`, 0, 10);
-        await redis.del(`modlogs:${modlog.guildId}`);
+        const current = await redis.lrange(`${Constants.redis.cache.guild.MODLOGS}:${modlog.guildId}`, 0, 10);
+        await redis.del(`${Constants.redis.cache.guild.MODLOGS}:${modlog.guildId}`);
         for (const i of current) {
           embeds.push(JSON.parse(i) as APIEmbed);
         }

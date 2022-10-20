@@ -3,6 +3,7 @@ import redis from "../../../../init/redis";
 import { NypsiCommandInteraction } from "../../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
+import Constants from "../../../Constants";
 import { getMember } from "../../member";
 import sleep from "../../sleep";
 import { getDmSettings } from "../../users/notifications";
@@ -60,8 +61,8 @@ module.exports = new ItemUse(
     }
 
     if (message.member == lockPickTarget) {
-      if ((await redis.exists(`cd:sex-chastity:${message.author.id}`)) == 1) {
-        await redis.del(`cd:sex-chastity:${message.author.id}`);
+      if ((await redis.exists(`${Constants.redis.cooldown.SEX_CHASTITY}:${message.author.id}`)) == 1) {
+        await redis.del(`${Constants.redis.cooldown.SEX_CHASTITY}:${message.author.id}`);
 
         const msg = await send({ embeds: [new CustomEmbed(message.member, "picking chastity cage...")] });
 

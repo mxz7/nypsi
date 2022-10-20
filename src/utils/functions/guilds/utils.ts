@@ -2,6 +2,7 @@ import { Guild } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { SnipedMessage } from "../../../types/Snipe";
+import Constants from "../../Constants";
 import { logger } from "../../logger";
 
 const snipe: Map<string, SnipedMessage> = new Map();
@@ -83,7 +84,7 @@ export async function runCheck(guild: Guild) {
 }
 
 export async function hasGuild(guild: Guild): Promise<boolean> {
-  if (await redis.exists(`cache:guild:exists:${guild.id}`)) return true;
+  if (await redis.exists(`${Constants.redis.cache.guild.EXISTS}:${guild.id}`)) return true;
   const query = await prisma.guild.findUnique({
     where: {
       id: guild.id,
@@ -94,8 +95,8 @@ export async function hasGuild(guild: Guild): Promise<boolean> {
   });
 
   if (query) {
-    await redis.set(`cache:guild:exists:${guild.id}`, "1");
-    await redis.expire(`cache:guild:exists:${guild.id}`, 43200);
+    await redis.set(`${Constants.redis.cache.guild.EXISTS}:${guild.id}`, "1");
+    await redis.expire(`${Constants.redis.cache.guild.EXISTS}:${guild.id}`, 43200);
     return true;
   } else {
     return false;
@@ -122,8 +123,8 @@ export async function createGuild(guild: Guild) {
     },
   });
 
-  await redis.set(`cache:guild:exists:${guild.id}`, 1);
-  await redis.expire(`cache:guild:exists:${guild.id}`, 43200);
+  await redis.set(`${Constants.redis.cache.guild.EXISTS}:${guild.id}`, 1);
+  await redis.expire(`${Constants.redis.cache.guild.EXISTS}:${guild.id}`, 43200);
 }
 
 export async function getGuildCounter(guild: Guild) {
@@ -154,8 +155,8 @@ export function inCooldown(guild: Guild): boolean {
 
 export async function getPrefix(guild: Guild): Promise<string> {
   try {
-    if (await redis.exists(`cache:guild:prefix:${guild.id}`)) {
-      return redis.get(`cache:guild:prefix:${guild.id}`);
+    if (await redis.exists(`${Constants.redis.cache.guild.PREFIX}:${guild.id}`)) {
+      return redis.get(`${Constants.redis.cache.guild.PREFIX}:${guild.id}`);
     }
 
     const query = await prisma.guild.findUnique({
@@ -179,8 +180,8 @@ export async function getPrefix(guild: Guild): Promise<string> {
       });
     }
 
-    await redis.set(`cache:guild:prefix:${guild.id}`, query.prefix);
-    await redis.expire(`cache:guild:prefix:${guild.id}`, 3600);
+    await redis.set(`${Constants.redis.cache.guild.PREFIX}:${guild.id}`, query.prefix);
+    await redis.expire(`${Constants.redis.cache.guild.PREFIX}:${guild.id}`, 3600);
 
     return query.prefix;
   } catch (e) {
@@ -200,7 +201,7 @@ export async function setPrefix(guild: Guild, prefix: string) {
     },
   });
 
-  await redis.del(`cache:guild:prefix:${guild.id}`);
+  await redis.del(`${Constants.redis.cache.guild.PREFIX}:${guild.id}`);
 }
 
 export async function getPercentMatch(guild: Guild | string) {
@@ -212,8 +213,8 @@ export async function getPercentMatch(guild: Guild | string) {
     guildID = guild;
   }
 
-  if (await redis.exists(`cache:guild:percentmatch:${guildID}`)) {
-    return parseInt(await redis.get(`cache:guild:percentmatch:${guildID}`));
+  if (await redis.exists(`${Constants.redis.cache.guild.PERCENT_MATCH}:${guildID}`)) {
+    return parseInt(await redis.get(`${Constants.redis.cache.guild.PERCENT_MATCH}:${guildID}`));
   }
 
   const query = await prisma.guild.findUnique({
@@ -225,8 +226,8 @@ export async function getPercentMatch(guild: Guild | string) {
     },
   });
 
-  await redis.set(`cache:guild:percentmatch:${guildID}`, query.percentMatch);
-  await redis.expire(`cache:guild:percentmatch:${guildID}`, 3600);
+  await redis.set(`${Constants.redis.cache.guild.PERCENT_MATCH}:${guildID}`, query.percentMatch);
+  await redis.expire(`${Constants.redis.cache.guild.PERCENT_MATCH}:${guildID}`, 3600);
 
   return query.percentMatch;
 }
@@ -249,5 +250,5 @@ export async function setPercentMatch(guild: Guild | string, num: number) {
     },
   });
 
-  await redis.del(`cache:guild:percentmatch:${guildID}`);
+  await redis.del(`${Constants.redis.cache.guild.PERCENT_MATCH}:${guildID}`);
 }
