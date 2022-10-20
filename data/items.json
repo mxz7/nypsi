@@ -532,7 +532,7 @@
     "longDesc": "rarest pokemon card",
     "rarity": 3,
     "role": "collectable",
-    "aliases": ["pokemon"]
+    "aliases": ["pokemon", "pikachu", "illustrator"]
   },
   "skyline_r34": {
     "id": "skyline_r34",
@@ -553,7 +553,7 @@
     "rarity": 3,
     "role": "car",
     "speed": 5,
-    "aliases": ["supra"],
+    "aliases": ["supra", "toyota"],
     "worth": 170000
   },
   "lawyer": {
@@ -604,7 +604,7 @@
     "rarity": 2,
     "role": "car",
     "speed": 3,
-    "aliases": ["evox", "evo"],
+    "aliases": ["evox", "evo", "lancer"],
     "buy": 50000,
     "sell": 15000
   },
@@ -685,6 +685,7 @@
     "rarity": 100,
     "role": "car",
     "speed": 0,
+    "aliases": ["bike", "bicycle"],
     "buy": 0,
     "sell": 0
   },
@@ -783,6 +784,7 @@
   "multi_potion": {
     "id": "multi_potion",
     "name": "multiplier potion",
+    "aliases": ["multi"],
     "emoji": "<:nypsi_potion:1001463080582131843>",
     "longDesc": "increase your multiplier by 3%",
     "rarity": 1,
