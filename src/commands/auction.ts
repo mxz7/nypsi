@@ -28,7 +28,7 @@ import {
   getAuctionWatch,
   setAuctionWatch,
 } from "../utils/functions/economy/auctions";
-import { addInventoryItem, getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
+import { addInventoryItem, getInventory, selectItem, setInventoryItem } from "../utils/functions/economy/inventory";
 import { getPrestige } from "../utils/functions/economy/prestige";
 import { formatBet, getItems, userExists } from "../utils/functions/economy/utils";
 import { getXp } from "../utils/functions/economy/xp";
@@ -191,26 +191,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       if (fail) return;
       if (!res) return;
 
-      let chosen;
-
-      for (const itemName of Array.from(Object.keys(items))) {
-        const aliases = items[itemName].aliases ? items[itemName].aliases : [];
-        if (res == itemName) {
-          chosen = itemName;
-          break;
-        } else if (res == itemName.split("_").join("")) {
-          chosen = itemName;
-          break;
-        } else if (aliases.indexOf(res) != -1) {
-          chosen = itemName;
-          break;
-        } else if (res == items[itemName].name) {
-          chosen = itemName;
-          break;
-        }
-      }
-
-      selected = items[chosen];
+      selected = selectItem(res);
     }
 
     if (!selected) {
@@ -584,26 +565,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const items = getItems();
 
-    let chosen: string;
-
-    for (const itemName of Array.from(Object.keys(items))) {
-      const aliases = items[itemName].aliases ? items[itemName].aliases : [];
-      if (args[1].toLowerCase() == itemName) {
-        chosen = itemName;
-        break;
-      } else if (args[1].toLowerCase() == itemName.split("_").join("")) {
-        chosen = itemName;
-        break;
-      } else if (aliases.indexOf(args[1].toLowerCase()) != -1) {
-        chosen = itemName;
-        break;
-      } else if (args[1].toLowerCase() == items[itemName].name) {
-        chosen = itemName;
-        break;
-      }
-    }
-
-    const selected = items[chosen];
+    const selected = selectItem(args[0].toLowerCase());
 
     if (!selected) {
       return send({ embeds: [new ErrorEmbed("couldnt find that item")] });

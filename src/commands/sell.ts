@@ -1,10 +1,9 @@
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import { Item } from "../types/Economy";
 import { getBalance, getMulti, updateBalance } from "../utils/functions/economy/balance";
-import { getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
-import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
+import { getInventory, selectItem, setInventoryItem } from "../utils/functions/economy/inventory";
+import { createUser, userExists } from "../utils/functions/economy/utils";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { getTax } from "../utils/functions/tax";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -51,26 +50,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     });
   }
 
-  const items = getItems();
   const inventory = await getInventory(message.member);
 
-  const searchTag = args[0].toLowerCase();
-
-  let selected: Item;
-
-  for (const itemName of Array.from(Object.keys(items))) {
-    const aliases = items[itemName].aliases ? items[itemName].aliases : [];
-    if (searchTag == itemName) {
-      selected = items[itemName];
-      break;
-    } else if (searchTag == itemName.split("_").join("")) {
-      selected = items[itemName];
-      break;
-    } else if (aliases.indexOf(searchTag) != -1) {
-      selected = items[itemName];
-      break;
-    }
-  }
+  const selected = selectItem(args[0].toLowerCase());
 
   if (!selected) {
     return send({ embeds: [new ErrorEmbed(`couldnt find \`${args[0]}\``)] });
