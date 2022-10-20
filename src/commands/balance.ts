@@ -3,6 +3,7 @@ import { Categories, Command, NypsiCommandInteraction } from "../models/Command"
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants.js";
 import {
+  calcNetWorth,
   getBalance,
   getBankBalance,
   getMaxBankBalance,
@@ -103,16 +104,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     padlockStatus = true;
   }
 
+  const net = await calcNetWorth(target);
+
   const embed = new CustomEmbed(message.member)
     .setDescription(
-      `${padlockStatus ? "🔒" : "💰"} $**` +
-        (await getBalance(target)).toLocaleString() +
-        "**\n" +
-        "💳 $**" +
-        (await getBankBalance(target)).toLocaleString() +
-        "** / $**" +
-        (await getMaxBankBalance(target)).toLocaleString() +
-        "**"
+      `${padlockStatus ? "🔒" : "💰"} $**${(await getBalance(target)).toLocaleString()}**\n` +
+        `💳 $**${(await getBankBalance(target)).toLocaleString()}** / $**${(
+          await getMaxBankBalance(target)
+        ).toLocaleString()}**${net > 100_000 ? `\n\n🌍 $**${net.toLocaleString()}**` : ""}`
     )
     .setFooter({ text: footer });
 
