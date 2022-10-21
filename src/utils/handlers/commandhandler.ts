@@ -342,6 +342,7 @@ async function helpCmd(message: Message, args: string[]) {
         rarityMap.set(2, "rare");
         rarityMap.set(3, "very rare");
         rarityMap.set(4, "exotic");
+        rarityMap.set(5, "impossible");
 
         let rarity = rarityMap.get(selectedItem.rarity);
 
