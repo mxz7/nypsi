@@ -545,7 +545,7 @@ export async function calcNetWorth(member: GuildMember | string) {
 
   if (!query) {
     await redis.set(`${Constants.redis.cache.economy.NETWORTH}:${id}`, worth);
-    await redis.expire(`${Constants.redis.cache.economy.NETWORTH}:${id}`, ms("30 minutes") / 1000);
+    await redis.expire(`${Constants.redis.cache.economy.NETWORTH}:${id}`, ms("1 hour") / 1000);
 
     return worth;
   }
