@@ -5,6 +5,7 @@ import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
 import Constants from "../../Constants";
 import { getTier, isPremium } from "../premium/premium";
+import { getDmSettings } from "../users/notifications";
 import workerSort from "../workers/sort";
 import { getAuctionAverage } from "./auctions";
 import { getBoosters } from "./boosters";
@@ -142,6 +143,8 @@ export async function getMulti(member: GuildMember | string): Promise<number> {
 
   const boosters = await getBoosters(id);
   const items = getItems();
+
+  if ((await getDmSettings(id)).vote_reminder) multi += 2;
 
   for (const boosterId of boosters.keys()) {
     if (items[boosterId].boosterEffect.boosts.includes("multi")) {

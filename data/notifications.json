@@ -27,7 +27,7 @@
   "vote_reminder": {
     "id": "vote_reminder",
     "name": "vote reminders",
-    "description": "receive a reminder in your dms when you are able to vote again"
+    "description": "receive a reminder in your dms when you are able to vote again\n\n+**2**% multiplier"
   },
   "worker": {
     "id": "worker",
