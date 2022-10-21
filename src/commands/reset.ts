@@ -9,10 +9,9 @@ import {
 } from "discord.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders";
-import { getBalance, getMulti } from "../utils/functions/economy/balance";
-import { getInventory } from "../utils/functions/economy/inventory";
+import { calcNetWorth } from "../utils/functions/economy/balance";
 import { getPrestige } from "../utils/functions/economy/prestige";
-import { createUser, deleteUser, getItems, userExists } from "../utils/functions/economy/utils";
+import { createUser, deleteUser, userExists } from "../utils/functions/economy/utils";
 import { getXp } from "../utils/functions/economy/xp";
 import { addKarma } from "../utils/functions/karma/karma";
 import { addCooldown, addExpiry, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
@@ -30,33 +29,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   let earnedKarma = 0;
 
-  let inventoryWorth = 0;
-  const multi = await getMulti(message.member);
-
-  let inventory = await getInventory(message.member);
-  const items = getItems();
-
-  let itemIDs = inventory.map((i) => i.item);
-
-  for (const item of itemIDs) {
-    if (items[item].sell) {
-      const amount = inventory.find((i) => i.item == item).amount;
-
-      if (items[item].role == "fish" || items[item].role == "prey") {
-        const worth1 = Math.floor(items[item].sell * amount);
-        inventoryWorth += Math.floor(worth1 + worth1 * multi);
-      } else {
-        inventoryWorth += Math.floor(items[item].sell * 0.95 * amount);
-      }
-    } else {
-      inventoryWorth += 1000;
-    }
-  }
-
-  earnedKarma += (await getPrestige(message.member)) * 50;
+  earnedKarma += (await calcNetWorth(message.member)) / 1000;
+  earnedKarma += (await getPrestige(message.member)) * 100;
   earnedKarma += (await getXp(message.member)) / 50;
-  earnedKarma += (await getBalance(message.member)) / 100000 / 2;
-  earnedKarma += inventoryWorth / 10000 / 2;
 
   earnedKarma = Math.floor(earnedKarma * 2.2);
 
@@ -91,31 +66,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (reaction == "✅") {
     await addExpiry(cmd.name, message.member, 1800);
     earnedKarma = 0;
-    inventoryWorth = 0;
 
-    inventory = await getInventory(message.member);
-
-    itemIDs = inventory.map((i) => i.item);
-
-    for (const item of itemIDs) {
-      if (items[item].sell) {
-        const amount = inventory.find((i) => i.item == item).amount;
-
-        if (items[item].role == "fish" || items[item].role == "prey") {
-          const worth1 = Math.floor(items[item].sell * amount);
-          inventoryWorth += Math.floor(worth1 + worth1 * multi);
-        } else {
-          inventoryWorth += Math.floor(items[item].sell * 0.95 * amount);
-        }
-      } else {
-        inventoryWorth += 1000;
-      }
-    }
-
-    earnedKarma += (await getPrestige(message.member)) * 50;
+    earnedKarma += (await calcNetWorth(message.member)) / 1000;
+    earnedKarma += (await getPrestige(message.member)) * 100;
     earnedKarma += (await getXp(message.member)) / 50;
-    earnedKarma += (await getBalance(message.member)) / 100000 / 2;
-    earnedKarma += inventoryWorth / 10000 / 2;
 
     earnedKarma = Math.floor(earnedKarma * 2.2);
 
