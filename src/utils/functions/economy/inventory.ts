@@ -1,11 +1,9 @@
-import { Collection, Guild, GuildMember } from "discord.js";
-import { inPlaceSort } from "fast-sort";
+import { GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { Item } from "../../../types/Economy";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
-import workerSort from "../workers/sort";
 import { addProgress, getAllAchievements, setAchievementProgress } from "./achievements";
 import { getBalance, updateBalance } from "./balance";
 import { addItemUse } from "./stats";
@@ -18,91 +16,6 @@ type Inventory = {
   item: string;
   amount: number;
 }[];
-
-export async function topAmountItem(guild: Guild, amount: number, item: string): Promise<string[]> {
-  let members: Collection<string, GuildMember>;
-
-  if (guild.memberCount == guild.members.cache.size) {
-    members = guild.members.cache;
-  } else {
-    members = await guild.members.fetch();
-  }
-
-  if (!members) members = guild.members.cache;
-
-  members = members.filter((m) => {
-    return !m.user.bot;
-  });
-
-  const query = await prisma.inventory.findMany({
-    where: {
-      AND: [{ userId: { in: Array.from(members.keys()) } }, { item: item }],
-    },
-    select: {
-      userId: true,
-      amount: true,
-    },
-    orderBy: {
-      amount: "desc",
-    },
-    take: amount,
-  });
-
-  const amounts = new Map<string, number>();
-  let userIDs = query.map((i) => {
-    amounts.set(i.userId, i.amount);
-
-    return i.userId;
-  });
-
-  if (userIDs.length > 500) {
-    userIDs = await workerSort(userIDs, amounts);
-    userIDs.reverse();
-  } else {
-    inPlaceSort(userIDs).desc((i) => amounts.get(i));
-  }
-
-  const usersFinal = [];
-
-  let count = 0;
-
-  const getMemberID = (guild: Guild, id: string) => {
-    const target = guild.members.cache.find((member) => {
-      return member.user.id == id;
-    });
-
-    return target;
-  };
-
-  for (const user of userIDs) {
-    if (count >= amount) break;
-    if (usersFinal.join().length >= 1500) break;
-
-    if (amounts.get(user) != 0) {
-      let pos: number | string = count + 1;
-
-      if (pos == 1) {
-        pos = "🥇";
-      } else if (pos == 2) {
-        pos = "🥈";
-      } else if (pos == 3) {
-        pos = "🥉";
-      }
-
-      const items = getItems();
-
-      usersFinal[count] =
-        pos +
-        " **" +
-        getMemberID(guild, user).user.tag +
-        "** " +
-        amounts.get(user).toLocaleString() +
-        ` ${amounts.get(user) > 1 ? items[item].plural || items[item].name : items[item].name}`;
-      count++;
-    }
-  }
-  return usersFinal;
-}
 
 export async function getInventory(member: GuildMember | string, checkAchievement = false): Promise<Inventory> {
   let id: string;
