@@ -237,7 +237,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         await addToNypsiBank(totalLossed * 0.9);
       } else {
         await addToNypsiBank(totalLossed * 0.7);
-        bankWorth.set(bank, bankWorth.get(bank) + totalLossed * 0.2);
+        bankWorth.set(bank, bankWorth.get(bank) + Math.floor(totalLossed * 0.2));
       }
 
       embed.setColor(Constants.EMBED_FAIL_COLOR);
