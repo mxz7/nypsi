@@ -48,7 +48,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   let crateAmount = Math.floor(prestige / 2 + 1);
   const lastVote = await getLastVote(message.member);
 
-  if (crateAmount > 5) crateAmount = 5;
+  if (crateAmount > 4) crateAmount = 4;
 
   const embed = new CustomEmbed(message.member);
 
