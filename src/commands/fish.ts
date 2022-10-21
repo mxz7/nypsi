@@ -229,11 +229,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       let amount = 1;
 
       if (fishingRod == "terrible_fishing_rod" && items[chosen].rarity == 0) {
-        amount = Math.floor(Math.random() * 2) + 1;
+        amount = Math.floor(Math.random() * 1) + 1;
       } else if (fishingRod == "fishing_rod" && items[chosen].rarity < 2) {
-        amount = Math.floor(Math.random() * 4) + 1;
+        amount = Math.floor(Math.random() * 3) + 1;
       } else if (fishingRod == "incredible_fishing_rod") {
-        amount = Math.floor(Math.random() * 4) + 2;
+        amount = Math.floor(Math.random() * 3) + 1;
       }
 
       await addInventoryItem(message.member, chosen, amount);
