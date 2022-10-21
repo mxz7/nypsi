@@ -2,10 +2,13 @@ import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Messag
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { Item } from "../types/Economy.js";
-import { topCompletion } from "../utils/functions/economy/achievements.js";
-import { topAmount, topNetWorth } from "../utils/functions/economy/balance.js";
-import { topAmountItem } from "../utils/functions/economy/inventory.js";
-import { topAmountPrestige } from "../utils/functions/economy/prestige.js";
+import {
+  topBalance as topMoney,
+  topCompletion,
+  topItem as topInventoryItem,
+  topNetWorth,
+  topPrestige as topPrestigeGuild,
+} from "../utils/functions/economy/top";
 import { getItems } from "../utils/functions/economy/utils.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 
@@ -73,7 +76,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   await addCooldown(cmd.name, message.member, 15);
 
   const topBalance = async (amount: number) => {
-    const balTop = await topAmount(message.guild, amount);
+    const balTop = await topMoney(message.guild, amount);
 
     if (balTop.length == 0) {
       return send({ embeds: [new ErrorEmbed("there are no users to show")] });
@@ -99,7 +102,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   };
 
   const topPrestige = async (amount: number) => {
-    const prestigeTop = await topAmountPrestige(message.guild, amount);
+    const prestigeTop = await topPrestigeGuild(message.guild, amount);
 
     const embed = new CustomEmbed(message.member)
       .setHeader("top " + prestigeTop.length)
@@ -109,7 +112,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   };
 
   const topItem = async (item: Item, amount: number) => {
-    const top = await topAmountItem(message.guild, amount, item.id);
+    const top = await topInventoryItem(message.guild, amount, item.id);
 
     if (top.length == 0) {
       return send({ embeds: [new ErrorEmbed(`there are no users to show for ${item.name}`)] });

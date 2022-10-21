@@ -4,15 +4,9 @@ import { Categories, Command, NypsiCommandInteraction } from "../models/Command"
 import { CustomEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { formatDate } from "../utils/functions/date";
-import {
-  calcNetWorth,
-  getBalance,
-  getBankBalance,
-  getMaxBankBalance,
-  getMulti,
-  topAmountGlobal,
-} from "../utils/functions/economy/balance";
+import { calcNetWorth, getBalance, getBankBalance, getMaxBankBalance, getMulti } from "../utils/functions/economy/balance";
 import { getPrestige } from "../utils/functions/economy/prestige";
+import { topBalanceGlobal } from "../utils/functions/economy/top";
 import { isEcoBanned, userExists } from "../utils/functions/economy/utils";
 import { hasVoted } from "../utils/functions/economy/vote";
 import { getXp } from "../utils/functions/economy/xp";
@@ -138,7 +132,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     return showUser(message, user);
   } else if (args[0].toLowerCase() == "top") {
-    const balTop = await topAmountGlobal(10, client, false);
+    const balTop = await topBalanceGlobal(10, false);
 
     const embed = new CustomEmbed(message.member, balTop.join("\n")).setTitle("top " + balTop.length);
 
