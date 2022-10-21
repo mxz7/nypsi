@@ -1,4 +1,11 @@
-import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message, PermissionFlagsBits } from "discord.js";
+import {
+  APIApplicationCommandOptionChoice,
+  BaseMessageOptions,
+  CommandInteraction,
+  InteractionReplyOptions,
+  Message,
+  PermissionFlagsBits,
+} from "discord.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { Item } from "../types/Economy.js";
@@ -7,12 +14,18 @@ import {
   topCompletion,
   topItem as topInventoryItem,
   topNetWorth,
+  topNetWorthGlobal,
   topPrestige as topPrestigeGuild,
 } from "../utils/functions/economy/top";
 import { getItems } from "../utils/functions/economy/utils.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 
 const cmd = new Command("top", "view top etc. in the server", Categories.MONEY).setAliases(["baltop", "gangsters"]);
+
+const scopeChoices: APIApplicationCommandOptionChoice<string>[] = [
+  { name: "global", value: "global" },
+  { name: "server", value: "server" },
+];
 
 cmd.slashEnabled = true;
 cmd.slashData
@@ -48,6 +61,13 @@ cmd.slashData
       .setName("networth")
       .setDescription("view top networths in the server")
       .addIntegerOption((option) => option.setName("amount").setDescription("amount of members to show").setRequired(false))
+      .addStringOption((option) =>
+        option
+          .setName("scope")
+          .setDescription("show global/server")
+          .setChoices(...scopeChoices)
+          .setRequired(false)
+      )
   );
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
@@ -87,18 +107,35 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({ embeds: [embed] });
   };
 
-  const topNet = async (amount: number) => {
-    const balTop = await topNetWorth(message.guild, amount);
+  const topNet = async (amount: number, global: boolean) => {
+    if (global) {
+      const { list, userPos } = await topNetWorthGlobal(amount, message.author.id);
 
-    if (balTop.length == 0) {
-      return send({ embeds: [new ErrorEmbed("there are no users to show")] });
+      if (list.length == 0) {
+        return send({ embeds: [new ErrorEmbed("there are no users to show")] });
+      }
+
+      const embed = new CustomEmbed(message.member, list.join("\n")).setHeader(
+        `top ${amount} networth [global]`,
+        message.author.avatarURL()
+      );
+
+      if (userPos > amount) embed.setFooter({ text: `you are #${userPos.toLocaleString()}` });
+
+      return send({ embeds: [embed] });
+    } else {
+      const balTop = await topNetWorth(message.guild, amount);
+
+      if (balTop.length == 0) {
+        return send({ embeds: [new ErrorEmbed("there are no users to show")] });
+      }
+
+      const embed = new CustomEmbed(message.member)
+        .setHeader("top " + balTop.length + " networth")
+        .setDescription(balTop.join("\n"));
+
+      return send({ embeds: [embed] });
     }
-
-    const embed = new CustomEmbed(message.member)
-      .setHeader("top " + balTop.length + " networth")
-      .setDescription(balTop.join("\n"));
-
-    return send({ embeds: [embed] });
   };
 
   const topPrestige = async (amount: number) => {
@@ -224,7 +261,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (amount < 5) amount = 5;
 
-    return topNet(amount);
+    let global = false;
+
+    if (!(message instanceof Message) && message.isChatInputCommand() && message.options.getString("scope") == "global")
+      global = true;
+
+    return topNet(amount, global);
   }
 }
 
