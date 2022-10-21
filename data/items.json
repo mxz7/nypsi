@@ -55,7 +55,7 @@
     "emoji": "<:nypsi_nemo:1032768399928987668>",
     "longDesc": "just keep swimming.. just keep swimming..",
     "role": "fish",
-    "rarity": 2,
+    "rarity": 3,
     "buy": 0,
     "sell": 50000
   },
@@ -345,7 +345,7 @@
     "emoji": "🦌",
     "longDesc": "not one of santa's.. anymore atleast",
     "role": "prey",
-    "rarity": 3,
+    "rarity": 2,
     "buy": 0,
     "sell": 50000
   },
@@ -694,7 +694,7 @@
     "plural": "flappy birds",
     "emoji": "<:nypsi_flappy_bird:839531060194967582>",
     "longDesc": "flap flap",
-    "rarity": 2,
+    "rarity": 3,
     "role": "prey",
     "buy": 0,
     "sell": 75000
