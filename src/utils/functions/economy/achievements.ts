@@ -1,10 +1,8 @@
-import { Collection, EmbedBuilder, Guild, GuildMember, WebhookClient } from "discord.js";
-import { inPlaceSort } from "fast-sort";
+import { EmbedBuilder, GuildMember, WebhookClient } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import Constants from "../../Constants";
 import { getLastKnownTag } from "../users/tag";
-import workerSort from "../workers/sort";
 import { getAchievements } from "./utils";
 
 /**
@@ -237,86 +235,4 @@ export async function setProgress(userId: string, achievementStartName: string, 
       await setAchievementProgress(userId, `${achievementStartName}_v`, amount);
       break;
   }
-}
-
-export async function topCompletion(guild: Guild, amount = 10): Promise<string[]> {
-  let members: Collection<string, GuildMember>;
-
-  if (guild.memberCount == guild.members.cache.size) {
-    members = guild.members.cache;
-  } else {
-    members = await guild.members.fetch();
-  }
-
-  if (!members) members = guild.members.cache;
-
-  members = members.filter((m) => {
-    return !m.user.bot;
-  });
-
-  const query = await prisma.achievements.findMany({
-    where: {
-      AND: [{ completed: true }, { userId: { in: Array.from(members.keys()) } }],
-    },
-    select: {
-      userId: true,
-    },
-  });
-
-  if (query.length == 0) {
-    return [];
-  }
-
-  const allAchievements = Object.keys(getAchievements()).length;
-  let userIds = query.map((i) => i.userId);
-  const completionRate = new Map<string, number>();
-
-  userIds = [...new Set(userIds)];
-
-  for (const userId of userIds) {
-    const achievementsForUser = query.filter((i) => i.userId == userId);
-
-    completionRate.set(userId, (achievementsForUser.length / allAchievements) * 100);
-  }
-
-  if (userIds.length > 500) {
-    userIds = await workerSort(userIds, completionRate);
-    userIds.reverse();
-  } else {
-    inPlaceSort(userIds).desc((i) => completionRate.get(i));
-  }
-
-  const usersFinal = [];
-
-  let count = 0;
-
-  const getMemberID = (guild: Guild, id: string) => {
-    const target = guild.members.cache.find((member) => {
-      return member.user.id == id;
-    });
-
-    return target;
-  };
-
-  for (const user of userIds) {
-    if (count >= amount) break;
-    if (usersFinal.join().length >= 1500) break;
-
-    if (completionRate.get(user) != 0) {
-      let pos: number | string = count + 1;
-
-      if (pos == 1) {
-        pos = "🥇";
-      } else if (pos == 2) {
-        pos = "🥈";
-      } else if (pos == 3) {
-        pos = "🥉";
-      }
-
-      usersFinal[count] =
-        pos + " **" + getMemberID(guild, user).user.tag + "** " + completionRate.get(user).toFixed(1) + "%";
-      count++;
-    }
-  }
-  return usersFinal;
 }

@@ -1,12 +1,9 @@
 import { Collection, Guild, GuildMember } from "discord.js";
-import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
-import { NypsiClient } from "../../../models/Client";
 import Constants from "../../Constants";
 import { getTier, isPremium } from "../premium/premium";
 import { getDmSettings } from "../users/notifications";
-import workerSort from "../workers/sort";
 import { getAuctionAverage } from "./auctions";
 import { getBoosters } from "./boosters";
 import { getGuildByUser } from "./guilds";
@@ -185,151 +182,6 @@ export async function getMaxBankBalance(member: GuildMember | string): Promise<n
   const max = bonus + starting;
 
   return max + base;
-}
-
-export async function topAmountGlobal(amount: number, client?: NypsiClient, anon = true): Promise<string[]> {
-  const query = await prisma.economy.findMany({
-    where: {
-      money: { gt: 1000 },
-    },
-    select: {
-      userId: true,
-      money: true,
-      user: {
-        select: {
-          lastKnownTag: true,
-        },
-      },
-    },
-    orderBy: {
-      money: "desc",
-    },
-  });
-
-  const userIDs: string[] = [];
-  const balances = new Map<string, number>();
-
-  for (const user of query) {
-    userIDs.push(user.userId);
-    balances.set(user.userId, Number(user.money));
-  }
-
-  inPlaceSort(userIDs).desc((i) => balances.get(i));
-
-  const usersFinal = [];
-
-  let count = 0;
-
-  for (const user of userIDs) {
-    if (count >= amount) break;
-    if (usersFinal.join().length >= 1500) break;
-
-    if (balances.get(user) != 0) {
-      let pos: number | string = count + 1;
-
-      if (pos == 1) {
-        pos = "🥇";
-      } else if (pos == 2) {
-        pos = "🥈";
-      } else if (pos == 3) {
-        pos = "🥉";
-      }
-
-      let username: string;
-
-      if (client) {
-        const res = await client.cluster.broadcastEval(
-          async (c, { userId }) => {
-            const user = await c.users.fetch(userId);
-
-            if (user) {
-              return user.tag;
-            }
-          },
-          { context: { userId: user } }
-        );
-
-        for (const i of res) {
-          if (i.includes("#")) {
-            username = i;
-            break;
-          }
-        }
-      }
-
-      if (anon) {
-        username = username.split("#")[0];
-      }
-
-      usersFinal[count] = pos + " **" + username + "** $" + balances.get(user).toLocaleString();
-      count++;
-    }
-  }
-  return usersFinal;
-}
-
-export async function topAmount(guild: Guild, amount: number): Promise<string[]> {
-  let members: Collection<string, GuildMember>;
-
-  if (guild.memberCount == guild.members.cache.size) {
-    members = guild.members.cache;
-  } else {
-    members = await guild.members.fetch();
-  }
-
-  if (!members) members = guild.members.cache;
-
-  members = members.filter((m) => {
-    return !m.user.bot;
-  });
-
-  const query = await prisma.economy.findMany({
-    where: {
-      AND: [{ money: { gt: 0 } }, { userId: { in: Array.from(members.keys()) } }],
-    },
-    select: {
-      userId: true,
-      money: true,
-    },
-    orderBy: {
-      money: "desc",
-    },
-    take: amount,
-  });
-
-  const usersFinal = [];
-
-  let count = 0;
-
-  const getMemberID = (guild: Guild, id: string) => {
-    const target = guild.members.cache.find((member) => {
-      return member.user.id == id;
-    });
-
-    return target;
-  };
-
-  for (const user of query) {
-    if (count >= amount) break;
-    if (usersFinal.join().length >= 1500) break;
-
-    if (Number(user.money) != 0) {
-      let pos: number | string = count + 1;
-
-      if (pos == 1) {
-        pos = "🥇";
-      } else if (pos == 2) {
-        pos = "🥈";
-      } else if (pos == 3) {
-        pos = "🥉";
-      }
-
-      usersFinal[count] =
-        pos + " **" + getMemberID(guild, user.userId).user.tag + "** $" + Number(user.money).toLocaleString();
-      count++;
-    }
-  }
-  return usersFinal;
 }
 
 export async function bottomAmount(guild: Guild, amount: number): Promise<string[]> {
@@ -594,79 +446,14 @@ export async function calcNetWorth(member: GuildMember | string) {
   await redis.set(`${Constants.redis.cache.economy.NETWORTH}:${id}`, Math.floor(worth));
   await redis.expire(`${Constants.redis.cache.economy.NETWORTH}:${id}`, ms("30 minutes") / 1000);
 
-  return Math.floor(worth);
-}
-
-export async function topNetWorth(guild: Guild, amount: number): Promise<string[]> {
-  let members: Collection<string, GuildMember>;
-
-  if (guild.memberCount == guild.members.cache.size) {
-    members = guild.members.cache;
-  } else {
-    members = await guild.members.fetch();
-  }
-
-  if (!members) members = guild.members.cache;
-
-  members = members.filter((m) => {
-    return !m.user.bot;
-  });
-
-  const query = await prisma.economy.findMany({
+  await prisma.economy.update({
     where: {
-      AND: [{ userId: { in: Array.from(members.keys()) } }, { money: { gt: 0 } }],
+      userId: id,
     },
-    select: {
-      userId: true,
+    data: {
+      net_worth: Math.floor(worth),
     },
   });
 
-  const amounts = new Map<string, number>();
-  let userIds: string[] = [];
-
-  for (const user of query) {
-    amounts.set(user.userId, await calcNetWorth(user.userId));
-
-    userIds.push(user.userId);
-  }
-
-  if (userIds.length > 500) {
-    userIds = await workerSort(userIds, amounts);
-    userIds.reverse();
-  } else {
-    inPlaceSort(userIds).desc((i) => amounts.get(i));
-  }
-
-  const usersFinal = [];
-
-  let count = 0;
-
-  const getMemberID = (guild: Guild, id: string) => {
-    const target = guild.members.cache.find((member) => {
-      return member.user.id == id;
-    });
-
-    return target;
-  };
-
-  for (const user of userIds) {
-    if (count >= amount) break;
-    if (usersFinal.join().length >= 1500) break;
-
-    if (amounts.get(user) != 0) {
-      let pos: number | string = count + 1;
-
-      if (pos == 1) {
-        pos = "🥇";
-      } else if (pos == 2) {
-        pos = "🥈";
-      } else if (pos == 3) {
-        pos = "🥉";
-      }
-
-      usersFinal[count] = pos + " **" + getMemberID(guild, user).user.tag + "** $" + amounts.get(user).toLocaleString();
-      count++;
-    }
-  }
-  return usersFinal;
+  return Math.floor(worth);
 }
