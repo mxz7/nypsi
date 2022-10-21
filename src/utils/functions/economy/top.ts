@@ -154,8 +154,9 @@ export async function topNetWorthGlobal(amount: number, userId: string) {
       pos = "🥉";
     }
 
-    out[out.length + 1] =
-      pos + " **" + user.user.lastKnownTag.split("#")[0] + "** $" + Number(user.net_worth).toLocaleString();
+    out.push(
+      pos + " **" + (user.user.lastKnownTag?.split("#")[0] || user.userId) + "** $" + Number(user.net_worth).toLocaleString()
+    );
   }
 
   return { list: out, userPos: query.map((i) => i.userId).indexOf(userId) + 1 };
