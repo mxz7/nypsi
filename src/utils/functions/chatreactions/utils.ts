@@ -8,6 +8,7 @@ import { getBlacklisted } from "./blacklisted";
 import { add2ndPlace, add3rdPlace, addWin, createReactionStatsProfile, hasReactionStatsProfile } from "./stats";
 import { getWords } from "./words";
 import ms = require("ms");
+import Constants from "../../Constants";
 
 const currentChannels = new Set<string>();
 const lastGame = new Map<string, number>();
@@ -214,7 +215,7 @@ export async function startReaction(guild: Guild, channel: TextChannel) {
     displayWord = displayWord.substr(0, pos) + zeroWidthChar + displayWord.substr(pos);
   }
 
-  const embed = new CustomEmbed().setColor("#5efb8f");
+  const embed = new CustomEmbed().setColor(Constants.EMBED_SUCCESS_COLOR);
 
   embed.setHeader("chat reaction");
   embed.setDescription(`type: \`${displayWord}\``);

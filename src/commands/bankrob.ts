@@ -23,6 +23,7 @@ import { createUser, userExists } from "../utils/functions/economy/utils.js";
 import { addToNypsiBank, getNypsiBankBalance, removeFromNypsiBankBalance } from "../utils/functions/tax.js";
 import { addCooldown, getRemaining, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 import ms = require("ms");
+import Constants from "../utils/Constants.js";
 
 const cmd = new Command("bankrob", "attempt to rob a bank for a high reward", Categories.MONEY);
 
@@ -233,7 +234,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       await addToNypsiBank(totalLossed);
 
-      embed.setColor("#e4334f");
+      embed.setColor(Constants.EMBED_FAIL_COLOR);
 
       await prisma.economyStats.upsert({
         create: {

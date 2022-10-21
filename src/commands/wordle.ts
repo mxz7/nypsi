@@ -8,6 +8,7 @@ import { addKarma } from "../utils/functions/karma/karma";
 import { addWordleGame, getWordleStats } from "../utils/functions/users/wordle";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import ms = require("ms");
+import Constants from "../utils/Constants";
 
 const cmd = new Command("wordle", "play wordle on discord", Categories.FUN).setAliases(["w"]);
 
@@ -274,7 +275,7 @@ async function cancel(message: Message | (NypsiCommandInteraction & CommandInter
     `${renderBoard(games.get(message.author.id).board)}\n\n` +
       `game cancelled. the word was **${games.get(message.author.id).word}**`
   );
-  embed.setColor("#e4334f");
+  embed.setColor(Constants.EMBED_FAIL_COLOR);
   embed.setFooter(null);
 
   edit({ embeds: [embed] });
@@ -303,7 +304,7 @@ async function win(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const embed = games.get(message.author.id).embed;
   embed.setDescription(`${renderBoard(games.get(message.author.id).board)}\n\n` + "you won!! congratulations");
-  embed.setColor("#5efb8f");
+  embed.setColor(Constants.EMBED_SUCCESS_COLOR);
   embed.setFooter({ text: `completed in ${MStoTime(Date.now() - games.get(message.author.id).start)}` });
 
   edit({ embeds: [embed] });
@@ -335,7 +336,7 @@ async function lose(message: Message | (NypsiCommandInteraction & CommandInterac
     `${renderBoard(games.get(message.author.id).board)}\n\n` +
       `you lost ): the word was **${games.get(message.author.id).word}**`
   );
-  embed.setColor("#e4334f");
+  embed.setColor(Constants.EMBED_FAIL_COLOR);
   embed.setFooter(null);
 
   edit({ embeds: [embed] });

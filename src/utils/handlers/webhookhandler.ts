@@ -140,7 +140,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
 
   if ((await getDmSettings(user)).vote) {
     const embed = new CustomEmbed()
-      .setColor("#5efb8f")
+      .setColor(Constants.EMBED_SUCCESS_COLOR)
       .setDescription(
         "you have received the following: \n\n" +
           `+ $**${amount.toLocaleString()}**\n` +
