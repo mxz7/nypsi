@@ -15,6 +15,7 @@ import { inPlaceSort } from "fast-sort";
 import prisma from "../init/database.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
+import Constants from "../utils/Constants.js";
 import { addProgress } from "../utils/functions/economy/achievements.js";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance.js";
 import { getInventory, setInventoryItem } from "../utils/functions/economy/inventory.js";
@@ -23,7 +24,6 @@ import { createUser, userExists } from "../utils/functions/economy/utils.js";
 import { addToNypsiBank, getNypsiBankBalance, removeFromNypsiBankBalance } from "../utils/functions/tax.js";
 import { addCooldown, getRemaining, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 import ms = require("ms");
-import Constants from "../utils/Constants.js";
 
 const cmd = new Command("bankrob", "attempt to rob a bank for a high reward", Categories.MONEY);
 
@@ -215,6 +215,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       });
 
       embed.setDescription(`**success!**\n\n**you stole** $${stolen.toLocaleString()} from **${bank}**`);
+      embed.setColor(Constants.EMBED_SUCCESS_COLOR);
 
       return embed;
     } else {
