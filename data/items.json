@@ -1126,7 +1126,7 @@
     "boosterEffect": {
       "boosts": ["worker_claim"],
       "effect": 1,
-      "time": 57600
+      "time": 86400
     }
   },
   "palm_tree": {
