@@ -11,6 +11,7 @@ import {
 } from "discord.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders.js";
+import Constants from "../utils/Constants";
 import { getPrestige } from "../utils/functions/economy/prestige";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { getLastVote, hasVoted } from "../utils/functions/economy/vote";
@@ -54,12 +55,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (voted) {
     const nextVote = dayjs(lastVote).add(12, "hours").unix();
     embed.setHeader("thank you for voting", message.author.avatarURL());
-    embed.setColor("#5efb8f");
+    embed.setColor(Constants.EMBED_SUCCESS_COLOR);
     embed.setDescription(`you can vote again <t:${nextVote}:R>`);
     send({ embeds: [embed] });
   } else {
     embed.setHeader("vote for nypsi", message.author.avatarURL());
-    embed.setColor("#e4334f");
+    embed.setColor(Constants.EMBED_FAIL_COLOR);
     embed.addField(
       "rewards",
       `× **7**% multiplier booster\n× +$**50k** max bet\n× $**${amount.toLocaleString()}** reward\n× **${crateAmount}** vote crate${

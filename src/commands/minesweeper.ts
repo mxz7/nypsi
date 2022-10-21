@@ -13,6 +13,7 @@ import {
 import { NypsiClient } from "../models/Client.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command.js";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
+import Constants from "../utils/Constants.js";
 import { addProgress } from "../utils/functions/economy/achievements.js";
 import { calcMaxBet, getBalance, getDefaultBet, getMulti, updateBalance } from "../utils/functions/economy/balance.js";
 import { addToGuildXP, getGuildByUser } from "../utils/functions/economy/guilds.js";
@@ -292,7 +293,7 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
   const lose = async () => {
     gamble(message.author, "minesweeper", bet, false, 0);
     await addGamble(message.member, "minesweeper", false);
-    embed.setColor("#e4334f");
+    embed.setColor(Constants.EMBED_FAIL_COLOR);
     embed.setDescription(
       "**bet** $" +
         bet.toLocaleString() +
@@ -309,7 +310,7 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
   const win1 = async () => {
     let winnings = Math.round(bet * win);
 
-    embed.setColor("#5efb8f");
+    embed.setColor(Constants.EMBED_SUCCESS_COLOR);
     if (games.get(message.author.id).voted > 0) {
       winnings = winnings + Math.round(winnings * games.get(message.member.user.id).voted);
 

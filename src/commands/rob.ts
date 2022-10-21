@@ -152,7 +152,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     await updateBalance(target, (await getBalance(target)) + amountMoney);
     await updateBalance(message.member, (await getBalance(message.member)) - amountMoney);
 
-    embed2.setColor("#e4334f");
+    embed2.setColor(Constants.EMBED_FAIL_COLOR);
     embed2.addField(
       "**fail!!**",
       "**" +
@@ -163,7 +163,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     );
 
     embed3.setTitle("you were nearly robbed");
-    embed3.setColor("#5efb8f");
+    embed3.setColor(Constants.EMBED_SUCCESS_COLOR);
     embed3.setDescription(
       "**" +
         message.member.user.tag +
@@ -180,11 +180,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const amount = Math.floor(Math.random() * 35) + 5;
     const amountMoney = Math.round((await getBalance(target)) * (amount / 100));
 
-    embed2.setColor("#e4334f");
+    embed2.setColor(Constants.EMBED_FAIL_COLOR);
     embed2.addField("fail!!", "**" + target.user.tag + "** had a padlock, which has now been broken");
 
     embed3.setTitle("you were nearly robbed");
-    embed3.setColor("#5efb8f");
+    embed3.setColor(Constants.EMBED_SUCCESS_COLOR);
     embed3.setDescription(
       "**" +
         message.member.user.tag +
@@ -207,7 +207,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       await updateBalance(target, (await getBalance(target)) - amountMoney);
       await updateBalance(message.member, (await getBalance(message.member)) + amountMoney);
 
-      embed2.setColor("#5efb8f");
+      embed2.setColor(Constants.EMBED_SUCCESS_COLOR);
       embed2.addField("success!!", "you stole $**" + amountMoney.toLocaleString() + "**");
 
       const earnedXp = await calcEarnedXp(message.member, 6942069);
@@ -225,7 +225,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       }
 
       embed3.setTitle("you have been robbed");
-      embed3.setColor("#e4334f");
+      embed3.setColor(Constants.EMBED_FAIL_COLOR);
       embed3.setDescription(
         "**" +
           message.member.user.tag +
@@ -284,10 +284,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         );
       }
 
-      embed2.setColor("#e4334f");
+      embed2.setColor(Constants.EMBED_FAIL_COLOR);
 
       embed3.setTitle("you were nearly robbed");
-      embed3.setColor("#5efb8f");
+      embed3.setColor(Constants.EMBED_SUCCESS_COLOR);
     }
   }
 

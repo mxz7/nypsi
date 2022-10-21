@@ -98,7 +98,7 @@ module.exports = new ItemUse(
 
     const targetEmbed = new CustomEmbed();
 
-    targetEmbed.setColor("#e4334f");
+    targetEmbed.setColor(Constants.EMBED_FAIL_COLOR);
     targetEmbed.setTitle("your padlock has been picked");
     targetEmbed.setDescription(
       "**" +
