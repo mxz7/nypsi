@@ -3,6 +3,7 @@ import { APIEmbed, BaseMessageOptions, MessageActionRowComponentBuilder, Message
 import { NypsiClient } from "../../models/Client";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 import { logger } from "../logger";
+import { getDmSettings, updateDmSettings } from "./users/notifications";
 
 interface RequestDMOptions {
   memberId: string;
@@ -105,6 +106,7 @@ export default async function requestDM(options: RequestDMOptions): Promise<bool
       return true;
     } else {
       logger.warn(`failed to send DM: ${options.memberId}`);
+      await checkVoteReminder(options.memberId);
       return false;
     }
   } else {
@@ -197,7 +199,17 @@ export default async function requestDM(options: RequestDMOptions): Promise<bool
       return true;
     } else {
       logger.warn(`failed to send DM: ${options.memberId}`);
+      await checkVoteReminder(options.memberId);
       return false;
     }
+  }
+}
+
+async function checkVoteReminder(userId: string) {
+  const dmSettings = await getDmSettings(userId);
+
+  if (dmSettings.vote_reminder) {
+    dmSettings.vote_reminder = false;
+    await updateDmSettings(userId, dmSettings);
   }
 }
