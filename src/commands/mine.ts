@@ -132,12 +132,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     for (const i of mineItems) {
       if (items[i]) {
-        if (items[i].id != "cobblestone" && items[i].id != "coal" && items[i].id != "diamond" && items[i].role != "ore")
+        if (!["cobblestone", "coal", "diamond", "amethyst", "emerald"].includes(items[i].id) || items[i].role != "ore")
           continue;
         if (items[i].rarity == 4) {
           const chance = Math.floor(Math.random() * 15);
           if (chance == 4 && pickaxe == "diamond_pickaxe") {
-            for (let x = 0; x < 10; x++) {
+            for (let x = 0; x < 5; x++) {
               mineItemsModified.push(i);
             }
           }
