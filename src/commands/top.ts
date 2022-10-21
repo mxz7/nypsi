@@ -1,15 +1,31 @@
-import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message, PermissionFlagsBits } from "discord.js";
+import {
+  APIApplicationCommandOptionChoice,
+  BaseMessageOptions,
+  CommandInteraction,
+  InteractionReplyOptions,
+  Message,
+  PermissionFlagsBits,
+} from "discord.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { Item } from "../types/Economy.js";
-import { topCompletion } from "../utils/functions/economy/achievements.js";
-import { topAmount, topNetWorth } from "../utils/functions/economy/balance.js";
-import { topAmountItem } from "../utils/functions/economy/inventory.js";
-import { topAmountPrestige } from "../utils/functions/economy/prestige.js";
+import {
+  topBalance as topMoney,
+  topCompletion,
+  topItem as topInventoryItem,
+  topNetWorth,
+  topNetWorthGlobal,
+  topPrestige as topPrestigeGuild,
+} from "../utils/functions/economy/top";
 import { getItems } from "../utils/functions/economy/utils.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 
 const cmd = new Command("top", "view top etc. in the server", Categories.MONEY).setAliases(["baltop", "gangsters"]);
+
+const scopeChoices: APIApplicationCommandOptionChoice<string>[] = [
+  { name: "global", value: "global" },
+  { name: "server", value: "server" },
+];
 
 cmd.slashEnabled = true;
 cmd.slashData
@@ -45,6 +61,13 @@ cmd.slashData
       .setName("networth")
       .setDescription("view top networths in the server")
       .addIntegerOption((option) => option.setName("amount").setDescription("amount of members to show").setRequired(false))
+      .addStringOption((option) =>
+        option
+          .setName("scope")
+          .setDescription("show global/server")
+          .setChoices(...scopeChoices)
+          .setRequired(false)
+      )
   );
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
@@ -73,7 +96,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   await addCooldown(cmd.name, message.member, 15);
 
   const topBalance = async (amount: number) => {
-    const balTop = await topAmount(message.guild, amount);
+    const balTop = await topMoney(message.guild, amount);
 
     if (balTop.length == 0) {
       return send({ embeds: [new ErrorEmbed("there are no users to show")] });
@@ -84,22 +107,39 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({ embeds: [embed] });
   };
 
-  const topNet = async (amount: number) => {
-    const balTop = await topNetWorth(message.guild, amount);
+  const topNet = async (amount: number, global: boolean) => {
+    if (global) {
+      const { list, userPos } = await topNetWorthGlobal(amount, message.author.id);
 
-    if (balTop.length == 0) {
-      return send({ embeds: [new ErrorEmbed("there are no users to show")] });
+      if (list.length == 0) {
+        return send({ embeds: [new ErrorEmbed("there are no users to show")] });
+      }
+
+      const embed = new CustomEmbed(message.member, list.join("\n")).setHeader(
+        `top ${amount} networth [global]`,
+        message.author.avatarURL()
+      );
+
+      if (userPos > amount) embed.setFooter({ text: `you are #${userPos.toLocaleString()}` });
+
+      return send({ embeds: [embed] });
+    } else {
+      const balTop = await topNetWorth(message.guild, amount);
+
+      if (balTop.length == 0) {
+        return send({ embeds: [new ErrorEmbed("there are no users to show")] });
+      }
+
+      const embed = new CustomEmbed(message.member)
+        .setHeader("top " + balTop.length + " networth")
+        .setDescription(balTop.join("\n"));
+
+      return send({ embeds: [embed] });
     }
-
-    const embed = new CustomEmbed(message.member)
-      .setHeader("top " + balTop.length + " networth")
-      .setDescription(balTop.join("\n"));
-
-    return send({ embeds: [embed] });
   };
 
   const topPrestige = async (amount: number) => {
-    const prestigeTop = await topAmountPrestige(message.guild, amount);
+    const prestigeTop = await topPrestigeGuild(message.guild, amount);
 
     const embed = new CustomEmbed(message.member)
       .setHeader("top " + prestigeTop.length)
@@ -109,7 +149,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   };
 
   const topItem = async (item: Item, amount: number) => {
-    const top = await topAmountItem(message.guild, amount, item.id);
+    const top = await topInventoryItem(message.guild, amount, item.id);
 
     if (top.length == 0) {
       return send({ embeds: [new ErrorEmbed(`there are no users to show for ${item.name}`)] });
@@ -221,7 +261,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (amount < 5) amount = 5;
 
-    return topNet(amount);
+    let global = false;
+
+    if (!(message instanceof Message) && message.isChatInputCommand() && message.options.getString("scope") == "global")
+      global = true;
+
+    return topNet(amount, global);
   }
 }
 
