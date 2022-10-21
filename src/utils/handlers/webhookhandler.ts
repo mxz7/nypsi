@@ -129,7 +129,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
 
   let crateAmount = Math.floor(prestige / 1.5 + 1);
 
-  if (crateAmount > 5) crateAmount = 5;
+  if (crateAmount > 4) crateAmount = 4;
 
   await addInventoryItem(user, "vote_crate", crateAmount, false);
 
@@ -144,7 +144,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
       .setDescription(
         "you have received the following: \n\n" +
           `+ $**${amount.toLocaleString()}**\n` +
-          "+ **7**% multiplier\n" +
+          "+ **5**% multiplier\n" +
           `+ **${crateAmount}** vote crates` +
           `${tickets.length <= max - 5 ? "\n+ **5** lottery tickets" : ""}`
       )
