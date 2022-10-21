@@ -66,7 +66,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({ embeds: [new ErrorEmbed("invalid user")] });
   }
 
-  if (target.user.bot) {
+  if (target.user.bot && target.user.id != message.client.user.id) {
     return send({ embeds: [new ErrorEmbed("invalid user")] });
   }
 
@@ -102,6 +102,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (amount <= 0) {
     return send({ embeds: [new ErrorEmbed("invalid payment")] });
+  }
+
+  if (target.user.id == message.client.user.id) {
+    await updateBalance(message.member, (await getBalance(message.member)) - amount);
+    await addToNypsiBank(amount);
+
+    return send({
+      embeds: [new CustomEmbed(message.member, `thank you for your donation of ${amount.toLocaleString()} 🙂`)],
+    });
   }
 
   const targetPrestige = await getPrestige(target);
