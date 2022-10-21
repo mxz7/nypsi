@@ -233,7 +233,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       await updateBalance(message.member, (await getBalance(message.member)) - totalLossed);
 
-      await addToNypsiBank(totalLossed);
+      if (bank == "nypsi") {
+        await addToNypsiBank(totalLossed * 0.9);
+      } else {
+        await addToNypsiBank(totalLossed * 0.7);
+        bankWorth.set(bank, bankWorth.get(bank) + totalLossed * 0.2);
+      }
 
       embed.setColor(Constants.EMBED_FAIL_COLOR);
 
