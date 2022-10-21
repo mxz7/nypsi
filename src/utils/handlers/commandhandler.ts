@@ -27,6 +27,7 @@ import { Item } from "../../types/Economy";
 import Constants from "../Constants";
 import { a } from "../functions/anticheat";
 import { addProgress } from "../functions/economy/achievements";
+import { addInventoryItem } from "../functions/economy/inventory";
 import {
   createUser,
   getAchievements,
@@ -799,22 +800,30 @@ export async function runCommand(
 
       const embed = new CustomEmbed(message.member).setHeader("achievement unlocked", message.author.avatarURL());
 
-      embed.setDescription(`you have completed ${achievement.emoji} ${achievement.name}`);
-
       let earnedXp = 30;
+      let crates = 0;
 
       if (achievementId.endsWith("_v")) {
         earnedXp = 5000;
+        crates = 3;
       } else if (achievementId.endsWith("_iv")) {
         earnedXp = 1000;
+        crates = 2;
       } else if (achievementId.endsWith("_iii")) {
         earnedXp = 500;
+        crates = 1;
       } else if (achievementId.endsWith("_ii")) {
         earnedXp = 100;
       }
 
       await updateXp(message.member, (await getXp(message.member)) + earnedXp);
+      if (crates > 0) await addInventoryItem(message.member, "basic_crate", crates, false);
 
+      embed.setDescription(
+        `you have completed ${achievement.emoji} ${achievement.name}${
+          crates > 0 ? `\n\n+**${crates}** basic crate${crates > 1 ? "s" : ""}` : ""
+        }`
+      );
       embed.setFooter({ text: `+${earnedXp.toLocaleString()}xp` });
 
       if (message instanceof Message) {
