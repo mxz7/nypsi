@@ -152,7 +152,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }**\n\ngo ahead and send **${message.author.tag}** a *private* message 😉😏`
       )
         .setHeader("milf finder")
-        .setColor("#5efb8f");
+        .setColor(Constants.EMBED_SUCCESS_COLOR);
 
       if (description != "") {
         embed2.setDescription(
@@ -201,7 +201,7 @@ setInterval(() => {
         .send({
           embeds: [
             new CustomEmbed(undefined, "unfortunately we couldn't find you a milf 😢")
-              .setColor("#e4334f")
+              .setColor(Constants.EMBED_FAIL_COLOR)
               .setHeader("milf finder"),
           ],
         })

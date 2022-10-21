@@ -3,6 +3,7 @@ import * as shuffle from "shuffle-array";
 import { NypsiClient } from "../models/Client.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
+import Constants from "../utils/Constants.js";
 import { calcMaxBet, getBalance, getDefaultBet, getMulti, updateBalance } from "../utils/functions/economy/balance.js";
 import { addToGuildXP, getGuildByUser } from "../utils/functions/economy/guilds.js";
 import { addGamble } from "../utils/functions/economy/stats.js";
@@ -229,10 +230,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
       }
 
-      embed.setColor("#5efb8f");
+      embed.setColor(Constants.EMBED_SUCCESS_COLOR);
     } else {
       embed.addField("**loser!!**", "**you lost** $" + bet.toLocaleString());
-      embed.setColor("#e4334f");
+      embed.setColor(Constants.EMBED_FAIL_COLOR);
     }
 
     setTimeout(() => {

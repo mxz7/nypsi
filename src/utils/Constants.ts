@@ -80,4 +80,6 @@ export default {
   MAX_AUCTION_PER_ITEM: 25_000_000,
   TRANSPARENT_EMBED_COLOR: "#36393f" as ColorResolvable,
   KOFI_PRODUCTS: products,
+  EMBED_SUCCESS_COLOR: "#5efb8f" as ColorResolvable,
+  EMBED_FAIL_COLOR: "#e4334f" as ColorResolvable,
 };
