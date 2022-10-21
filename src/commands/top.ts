@@ -257,14 +257,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (!amount) amount = 5;
 
+    let global = false;
+
+    if (!(message instanceof Message) && message.isChatInputCommand() && message.options.getString("scope") == "global") {
+      if (!parseInt(args[1])) amount = 10;
+      global = true;
+    }
+
     if (amount > 10 && !message.member.permissions.has(PermissionFlagsBits.Administrator)) amount = 10;
 
     if (amount < 5) amount = 5;
-
-    let global = false;
-
-    if (!(message instanceof Message) && message.isChatInputCommand() && message.options.getString("scope") == "global")
-      global = true;
 
     return topNet(amount, global);
   }
