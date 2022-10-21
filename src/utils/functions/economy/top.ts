@@ -188,11 +188,21 @@ export async function topNetWorth(guild: Guild, amount: number): Promise<string[
   const amounts = new Map<string, number>();
   let userIds: string[] = [];
 
-  for (const user of query) {
-    amounts.set(user.userId, await calcNetWorth(user.userId));
+  const promises = [];
 
-    userIds.push(user.userId);
+  for (const user of query) {
+    promises.push(
+      (async () => {
+        const net = await calcNetWorth(user.userId);
+
+        amounts.set(user.userId, net);
+        userIds.push(user.userId);
+        return;
+      })()
+    );
   }
+
+  await Promise.all(promises);
 
   if (userIds.length > 500) {
     userIds = await workerSort(userIds, amounts);
