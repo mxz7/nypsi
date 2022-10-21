@@ -1128,5 +1128,16 @@
       "effect": 1,
       "time": 57600
     }
+  },
+  "palm_tree": {
+    "id": "palm_tree",
+    "name": "palm tree necklace",
+    "emoji": "<:nypsi_necklace:1032965107896029185>",
+    "longDesc": "it's the bot owner's actual necklace!!",
+    "rarity": 5,
+    "role": "collectable",
+    "speed": 6,
+    "aliases": ["palm", "tree", "necklace"],
+    "worth": 230000
   }
 }

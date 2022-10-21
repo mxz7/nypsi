@@ -348,7 +348,12 @@ export async function openCrate(member: GuildMember, item: Item): Promise<string
 
           if (chance != 2) continue;
         }
-        if (items[i].rarity == 4) {
+
+        if (items[i].rarity == 5) {
+          const chance = Math.floor(Math.random() * 50);
+
+          if (chance == 7) crateItemsModified.push(i);
+        } else if (items[i].rarity == 4) {
           const chance = Math.floor(Math.random() * 15);
           if (chance == 4) {
             crateItemsModified.push(i);
