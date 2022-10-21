@@ -5,12 +5,12 @@ import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { GuildUpgradeRequirements } from "../../../types/Economy";
+import Constants from "../../Constants";
 import { logger } from "../../logger";
 import requestDM from "../requestdm";
 import { getDmSettings } from "../users/notifications";
 import { addInventoryItem } from "./inventory";
 import ms = require("ms");
-import Constants from "../../Constants";
 
 export async function getGuildByName(name: string) {
   const guild = await prisma.economyGuild
@@ -306,7 +306,7 @@ async function checkUpgrade(guild: EconomyGuild | string, client: NypsiClient): 
 
     await redis.del(`${Constants.redis.cache.economy.GUILD_REQUIREMENTS}:${guild.guildName}`);
 
-    const embed = new CustomEmbed().setColor("#5efb8f");
+    const embed = new CustomEmbed().setColor(Constants.EMBED_SUCCESS_COLOR);
 
     embed.setHeader(guild.guildName);
     embed.setDescription(

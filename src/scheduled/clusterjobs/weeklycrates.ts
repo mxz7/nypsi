@@ -1,6 +1,7 @@
 import prisma from "../../init/database";
 import { NypsiClient } from "../../models/Client";
 import { CustomEmbed } from "../../models/EmbedBuilders";
+import Constants from "../../utils/Constants";
 import { MStoTime } from "../../utils/functions/date";
 import { addInventoryItem } from "../../utils/functions/economy/inventory";
 import { userExists } from "../../utils/functions/economy/utils";
@@ -32,7 +33,7 @@ async function doCrates(client: NypsiClient) {
     if (member.level == 2) {
       await addInventoryItem(member.userId, "basic_crate", 1, false);
 
-      const embed = new CustomEmbed().setHeader("thank you for supporting nypsi!").setColor("#5efb8f");
+      const embed = new CustomEmbed().setHeader("thank you for supporting nypsi!").setColor(Constants.EMBED_SUCCESS_COLOR);
 
       embed.setDescription("you have received 1 **basic crate** 🙂");
 
@@ -47,7 +48,7 @@ async function doCrates(client: NypsiClient) {
     } else if (member.level == 3) {
       await addInventoryItem(member.userId, "basic_crate", 2, false);
 
-      const embed = new CustomEmbed().setHeader("thank you for supporting nypsi!").setColor("#5efb8f");
+      const embed = new CustomEmbed().setHeader("thank you for supporting nypsi!").setColor(Constants.EMBED_SUCCESS_COLOR);
 
       embed.setDescription("you have received 2 **basic crates** 🙂");
 
@@ -65,7 +66,7 @@ async function doCrates(client: NypsiClient) {
         addInventoryItem(member.userId, "69420_crate", 1, false),
       ]);
 
-      const embed = new CustomEmbed().setHeader("thank you for supporting nypsi!").setColor("#5efb8f");
+      const embed = new CustomEmbed().setHeader("thank you for supporting nypsi!").setColor(Constants.EMBED_SUCCESS_COLOR);
 
       embed.setDescription("you have received 2 **basic crates** and 1 **69420 crate** 🙂");
 

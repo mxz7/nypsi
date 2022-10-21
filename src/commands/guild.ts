@@ -470,7 +470,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         );
 
         if ((await getDmSettings(guildMember.userId)).other) {
-          const embed = new CustomEmbed().setColor("#5efb8f");
+          const embed = new CustomEmbed().setColor(Constants.EMBED_SUCCESS_COLOR);
 
           embed.setDescription(
             `since you contributed money to this guild, you have been repaid $**${Math.floor(

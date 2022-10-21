@@ -1,6 +1,7 @@
 import { CommandInteraction, GuildMember, Message } from "discord.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
+import Constants from "../utils/Constants";
 import { getMember } from "../utils/functions/member";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
@@ -71,7 +72,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
                 "\n\n" +
                 "**status** *offline*"
             );
-            embed.setColor("#5efb8f");
+            embed.setColor(Constants.EMBED_SUCCESS_COLOR);
 
             setTimeout(() => {
               m.edit({ embeds: [embed] });

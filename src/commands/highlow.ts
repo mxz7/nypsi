@@ -15,6 +15,7 @@ import * as shuffle from "shuffle-array";
 import { NypsiClient } from "../models/Client.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command.js";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
+import Constants from "../utils/Constants.js";
 import { addProgress } from "../utils/functions/economy/achievements.js";
 import { calcMaxBet, getBalance, getDefaultBet, getMulti, updateBalance } from "../utils/functions/economy/balance.js";
 import { addToGuildXP, getGuildByUser } from "../utils/functions/economy/guilds.js";
@@ -287,7 +288,7 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
   const lose = async () => {
     gamble(message.author, "highlow", bet, false, 0);
     await addGamble(message.member, "highlow", false);
-    newEmbed.setColor("#e4334f");
+    newEmbed.setColor(Constants.EMBED_FAIL_COLOR);
     newEmbed.setDescription(
       "**bet** $" +
         bet.toLocaleString() +
@@ -306,7 +307,7 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
   const win1 = async () => {
     let winnings = Math.round(bet * win);
 
-    newEmbed.setColor("#5efb8f");
+    newEmbed.setColor(Constants.EMBED_SUCCESS_COLOR);
     if (games.get(message.member.user.id).voted > 0) {
       winnings = winnings + Math.round(winnings * games.get(message.member.user.id).voted);
 
