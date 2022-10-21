@@ -3,8 +3,8 @@ import { GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { NotificationPayload } from "../../../types/Notification";
-import ms = require("ms");
 import Constants from "../../Constants";
+import ms = require("ms");
 
 declare function require(name: string): any;
 
@@ -51,15 +51,22 @@ export async function getDmSettings(member: GuildMember | string) {
   return query;
 }
 
-export async function updateDmSettings(member: GuildMember, data: DMSettings) {
+export async function updateDmSettings(member: GuildMember | string, data: DMSettings) {
+  let id: string;
+  if (member instanceof GuildMember) {
+    id = member.user.id;
+  } else {
+    id = member;
+  }
+
   const query = await prisma.dMSettings.update({
     where: {
-      userId: member.user.id,
+      userId: id,
     },
     data,
   });
 
-  await redis.del(`${Constants.redis.cache.user.DM_SETTINGS}:${member.user.id}`);
+  await redis.del(`${Constants.redis.cache.user.DM_SETTINGS}:${id}`);
 
   return query;
 }
