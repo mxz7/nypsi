@@ -315,11 +315,11 @@ async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
 
     desc.push(` +**${cratesEarned}** basic crates`);
 
-    if (guild.level <= 5) {
+    if (guild.level < 5) {
       desc.push(" +**1**% multiplier");
     }
 
-    if (guild.level <= 10) {
+    if (guild.level < 10) {
       desc.push(" +**1** max xp gain");
     }
 
