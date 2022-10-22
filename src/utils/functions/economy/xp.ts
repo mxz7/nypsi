@@ -50,10 +50,10 @@ export async function updateXp(member: GuildMember, amount: number) {
 }
 
 export async function calcMinimumEarnedXp(member: GuildMember): Promise<number> {
-  let earned = 1;
-  earned += (await getPrestige(member)) / 1.5;
+  let earned = 2;
+  earned += (await getPrestige(member)) / 1.79; // i dont like 8
 
-  let max = 6;
+  let max = 10;
 
   const guild = await getGuildByUser(member);
 
@@ -79,7 +79,7 @@ export async function calcEarnedXp(member: GuildMember, bet: number): Promise<nu
 
   earned += random;
 
-  let max = 6;
+  let max = 10;
 
   const guild = await getGuildByUser(member);
 
