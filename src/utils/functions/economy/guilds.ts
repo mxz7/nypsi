@@ -2,13 +2,12 @@ import { GuildMember } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
-import { NypsiClient } from "../../../models/Client";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { GuildUpgradeRequirements } from "../../../types/Economy";
+import { NotificationPayload } from "../../../types/Notification";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
-import requestDM from "../requestdm";
-import { getDmSettings } from "../users/notifications";
+import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { addInventoryItem } from "./inventory";
 import ms = require("ms");
 
@@ -124,7 +123,7 @@ export async function deleteGuild(name: string) {
   });
 }
 
-export async function addToGuildBank(name: string, amount: number, member: GuildMember, client: NypsiClient) {
+export async function addToGuildBank(name: string, amount: number, member: GuildMember) {
   await prisma.economyGuild.update({
     where: {
       guildName: name,
@@ -142,10 +141,10 @@ export async function addToGuildBank(name: string, amount: number, member: Guild
     },
   });
 
-  return checkUpgrade(name, client);
+  return checkUpgrade(name);
 }
 
-export async function addToGuildXP(name: string, amount: number, member: GuildMember, client: NypsiClient) {
+export async function addToGuildXP(name: string, amount: number, member: GuildMember) {
   await prisma.economyGuild.update({
     where: {
       guildName: name,
@@ -163,7 +162,7 @@ export async function addToGuildXP(name: string, amount: number, member: GuildMe
     },
   });
 
-  return checkUpgrade(name, client);
+  return checkUpgrade(name);
 }
 
 export async function getMaxMembersForGuild(name: string) {
@@ -282,7 +281,7 @@ interface EconomyGuildMember {
   contributedXp: number;
 }
 
-async function checkUpgrade(guild: EconomyGuild | string, client: NypsiClient): Promise<boolean> {
+async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
   if (typeof guild == "string") {
     guild = await getGuildByName(guild);
   }
@@ -308,25 +307,40 @@ async function checkUpgrade(guild: EconomyGuild | string, client: NypsiClient): 
 
     const embed = new CustomEmbed().setColor(Constants.EMBED_SUCCESS_COLOR);
 
+    const desc = [`**${guild.guildName}** has upgraded to level **${guild.level + 1}**\n\nyou have received:`];
+
+    let cratesEarned = guild.level;
+
+    if (cratesEarned > 5) cratesEarned = 5;
+
+    desc.push(` +**${cratesEarned}** basic crates`);
+
+    if (guild.level <= 5) {
+      desc.push(" +**1**% multiplier");
+    }
+
+    if (guild.level <= 10) {
+      desc.push(" +**1** max xp gain");
+    }
+
     embed.setHeader(guild.guildName);
-    embed.setDescription(
-      `**${guild.guildName}** has upgraded to level **${guild.level + 1}**\n\nyou have received:` +
-        `\n +**${guild.level}** basic crates` +
-        "\n +**1**% multiplier" +
-        "\n +**1** max xp gain"
-    );
+    embed.setDescription(desc.join("\n"));
     embed.disableFooter();
 
+    const payload: NotificationPayload = {
+      memberId: "boob",
+      payload: {
+        content: `${guild.guildName} has levelled up!`,
+        embed: embed,
+      },
+    };
+
     for (const member of guild.members) {
-      await addInventoryItem(member.userId, "basic_crate", guild.level, false);
+      await addInventoryItem(member.userId, "basic_crate", cratesEarned, false);
 
       if ((await getDmSettings(member.userId)).other) {
-        await requestDM({
-          memberId: member.userId,
-          client: client,
-          content: `${guild.guildName} has been upgraded!`,
-          embed: embed,
-        });
+        payload.memberId = member.userId;
+        addNotificationToQueue(payload);
       }
     }
 
