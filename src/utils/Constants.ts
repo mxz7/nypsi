@@ -17,6 +17,7 @@ export default {
       ROB_RADIO: "cd:rob-radio",
       SEX_CHASTITY: "cd:sex-chastity",
       AUCTION_WATCH: "cd:auctionwatch",
+      GUILD_CREATE: "cd:guildcreate",
     },
     cache: {
       SUPPORT: "cache:support",

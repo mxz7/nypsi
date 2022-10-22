@@ -12,6 +12,7 @@ import {
   MessageEditOptions,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
+import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
@@ -39,6 +40,7 @@ import requestDM from "../utils/functions/requestdm";
 import { cleanString } from "../utils/functions/string";
 import { getDmSettings } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import ms = require("ms");
 
 const cmd = new Command("guild", "create and manage your guild/clan", Categories.MONEY)
   .setAliases(["g", "clan"])
@@ -201,6 +203,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   }
 
   if (args[0].toLowerCase() == "create") {
+    if (await redis.exists(`${Constants.redis.cooldown.GUILD_CREATE}:${message.author.id}`)) {
+      return send({ embeds: [new ErrorEmbed("you have already created a guild recently")] });
+    }
+
     if ((await getPrestige(message.member)) < 1) {
       return send({ embeds: [new ErrorEmbed("you must be atleast prestige 1 to create a guild")] });
     }
@@ -242,6 +248,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     await updateBalance(message.member, (await getBalance(message.member)) - 500000);
 
     await createGuild(name, message.member);
+
+    await redis.set(`${Constants.redis.cooldown.GUILD_CREATE}:${message.author.id}`, "t");
+    await redis.expire(`${Constants.redis.cooldown.GUILD_CREATE}:${message.author.id}`, ms("2 days") / 1000);
 
     return send({ embeds: [new CustomEmbed(message.member, `you are now the owner of **${name}**`)] });
   }
