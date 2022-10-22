@@ -25,10 +25,10 @@ import Constants from "../../utils/Constants";
   for (const user of users) {
     if (user.lastCommand.getTime() > threshold) continue;
 
-    let karmaToRemove = 2;
+    let karmaToRemove = 1;
 
-    if (now - ms("1 day") > user.lastCommand.getTime()) {
-      karmaToRemove += 5;
+    if (now - ms("2 days") > user.lastCommand.getTime()) {
+      karmaToRemove += 7;
     }
 
     if (now - ms("1 week") > user.lastCommand.getTime()) {
