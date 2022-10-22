@@ -565,7 +565,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       embed.setDescription(`$**${guild.balance.toLocaleString()}**\n  +$**${amount.toLocaleString()}**`);
 
-      await reaction.message.edit({ embeds: [embed] });
+      await reaction.message.edit({ embeds: [embed], components: [] });
 
       embed.setDescription(`$**${(guild.balance + amount).toLocaleString()}**`);
 
