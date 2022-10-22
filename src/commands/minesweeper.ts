@@ -10,7 +10,6 @@ import {
   MessageActionRowComponentBuilder,
   MessageEditOptions,
 } from "discord.js";
-import { NypsiClient } from "../models/Client.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command.js";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants.js";
@@ -354,7 +353,7 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
       const guild = await getGuildByUser(message.member);
 
       if (guild) {
-        await addToGuildXP(guild.guildName, earnedXp, message.member, message.client as NypsiClient);
+        await addToGuildXP(guild.guildName, earnedXp, message.member);
       }
     }
 
