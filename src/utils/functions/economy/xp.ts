@@ -79,16 +79,6 @@ export async function calcEarnedXp(member: GuildMember, bet: number): Promise<nu
 
   earned += random;
 
-  let max = 10;
-
-  const guild = await getGuildByUser(member);
-
-  if (guild) {
-    max += guild.level - 1;
-  }
-
-  if (earned > max) earned = max;
-
   const boosters = await getBoosters(member);
 
   let boosterEffect = 0;
