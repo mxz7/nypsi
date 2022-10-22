@@ -466,7 +466,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       if (contributedMoney > 100) {
         await updateBalance(
           guildMember.userId,
-          (await getBalance(guildMember.userId)) + Math.floor(contributedMoney * 0.25)
+          (await getBalance(guildMember.userId)) + Math.floor(Number(contributedMoney) * 0.25)
         );
 
         if ((await getDmSettings(guildMember.userId)).other) {
@@ -474,7 +474,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
           embed.setDescription(
             `since you contributed money to this guild, you have been repaid $**${Math.floor(
-              contributedMoney * 0.25
+              Number(contributedMoney) * 0.25
             ).toLocaleString()}**`
           );
 
@@ -567,7 +567,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       await reaction.message.edit({ embeds: [embed], components: [] });
 
-      embed.setDescription(`$**${(guild.balance + amount).toLocaleString()}**`);
+      embed.setDescription(`$**${(Number(guild.balance) + amount).toLocaleString()}**`);
 
       return setTimeout(() => {
         reaction.message.edit({ embeds: [embed] });

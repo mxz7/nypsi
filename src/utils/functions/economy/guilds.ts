@@ -265,7 +265,7 @@ export async function removeMember(member: string, mode: RemoveMemberMode) {
 interface EconomyGuild {
   guildName: string;
   createdAt: Date;
-  balance: number;
+  balance: bigint;
   xp: number;
   level: number;
   motd: string;
@@ -277,7 +277,7 @@ interface EconomyGuildMember {
   userId: string;
   guildName: string;
   joinedAt: Date;
-  contributedMoney: number;
+  contributedMoney: bigint;
   contributedXp: number;
 }
 
@@ -289,7 +289,7 @@ async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
   if (guild.level >= Constants.MAX_GUILD_LEVEL) return;
   const requirements = await getRequiredForGuildUpgrade(guild.guildName);
 
-  if (guild.balance >= requirements.money && guild.xp >= requirements.xp) {
+  if (Number(guild.balance) >= requirements.money && guild.xp >= requirements.xp) {
     await prisma.economyGuild.update({
       where: {
         guildName: guild.guildName,

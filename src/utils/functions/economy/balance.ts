@@ -404,7 +404,7 @@ export async function calcNetWorth(member: GuildMember | string) {
 
   worth += Number(query.money);
   worth += Number(query.bank);
-  worth += Number(query.user.EconomyGuild?.balance / query.user.EconomyGuild?.members.length) || 0;
+  worth += Number(Number(query.user.EconomyGuild?.balance) / query.user.EconomyGuild?.members.length) || 0;
 
   for (const item of query.Inventory) {
     const auctionAvg = await getAuctionAverage(item.item);
