@@ -6,7 +6,6 @@ import {
   Message,
   MessageEditOptions,
 } from "discord.js";
-import { NypsiClient } from "../models/Client.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants.js";
@@ -292,7 +291,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         const guild = await getGuildByUser(message.member);
 
         if (guild) {
-          await addToGuildXP(guild.guildName, earnedXp, message.member, message.client as NypsiClient);
+          await addToGuildXP(guild.guildName, earnedXp, message.member);
         }
       }
 
