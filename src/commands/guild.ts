@@ -522,21 +522,57 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return send({ embeds: [new ErrorEmbed("invalid payment")] });
     }
 
-    await updateBalance(message.member, (await getBalance(message.member)) - amount);
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder().setCustomId("✅").setLabel("do it.").setStyle(ButtonStyle.Success)
+    );
 
-    await addToGuildBank(guild.guildName, amount, message.member, message.client as NypsiClient);
+    const msg = await send({
+      embeds: [
+        new CustomEmbed(
+          message.member,
+          `are you sure you want to deposit $**${amount.toLocaleString()}** into **${
+            guild.guildName
+          }** bank?\n\nyou **cannot** get this back`
+        ),
+      ],
+      components: [row],
+    });
 
-    const embed = new CustomEmbed(message.member).setHeader("guild deposit", message.author.avatarURL());
+    const reaction = await msg
+      .awaitMessageComponent({ filter: (i: Interaction) => i.user.id == message.author.id, time: 15000 })
+      .then(async (collected) => {
+        await collected.deferUpdate();
+        return collected;
+      })
+      .catch(async () => {
+        await msg.delete();
+      });
 
-    embed.setDescription(`$**${guild.balance.toLocaleString()}**\n  +$**${amount.toLocaleString()}**`);
+    if (!reaction) return;
 
-    const msg = await send({ embeds: [embed] });
+    if (!reaction.isButton()) return;
 
-    embed.setDescription(`$**${(guild.balance + amount).toLocaleString()}**`);
+    if (reaction.customId == "✅") {
+      if (amount > (await getBalance(message.member))) {
+        return reaction.message.edit({ embeds: [new ErrorEmbed("you cannot afford this payment")] });
+      }
 
-    return setTimeout(() => {
-      edit({ embeds: [embed] }, msg);
-    }, 1500);
+      await updateBalance(message.member, (await getBalance(message.member)) - amount);
+
+      await addToGuildBank(guild.guildName, amount, message.member);
+
+      const embed = new CustomEmbed(message.member).setHeader("guild deposit", message.author.avatarURL());
+
+      embed.setDescription(`$**${guild.balance.toLocaleString()}**\n  +$**${amount.toLocaleString()}**`);
+
+      await reaction.message.edit({ embeds: [embed] });
+
+      embed.setDescription(`$**${(guild.balance + amount).toLocaleString()}**`);
+
+      return setTimeout(() => {
+        reaction.message.edit({ embeds: [embed] });
+      }, 1500);
+    }
   }
 
   if (args[0].toLowerCase() == "stats") {
