@@ -344,6 +344,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         break;
       case "basic_crate":
         await addInventoryItem(message.member, "basic_crate", 1);
+        break;
+      case "nypsi_crate":
+        await addInventoryItem(message.member, "nypsi_crate", 1);
+        break;
     }
 
     if (selected.id == "bronze" || selected.id == "silver" || selected.id == "gold") {
