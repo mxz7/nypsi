@@ -168,7 +168,13 @@ export async function addToGuildXP(name: string, amount: number, member: GuildMe
 export async function getMaxMembersForGuild(name: string) {
   const guild = await getGuildByName(name);
 
-  return guild.level * 3;
+  let level = guild.level;
+
+  if (level > 10) level = 10;
+
+  const amount = 3 + Math.floor(level / 2) * 3;
+
+  return amount < 3 ? 3 : amount;
 }
 
 export async function getRequiredForGuildUpgrade(name: string): Promise<GuildUpgradeRequirements> {
