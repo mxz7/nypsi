@@ -5,6 +5,7 @@ import { getBalance, updateBalance } from "../utils/functions/economy/balance";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
+import ms = require("ms");
 
 const cmd = new Command("freemoney", "get $1k every 5 minutes", Categories.MONEY).setAliases(["poor", "imbroke"]);
 
@@ -17,7 +18,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (!(await userExists(message.member))) await createUser(message.member);
 
-  await addCooldown(cmd.name, message.member, 300);
+  await addCooldown(cmd.name, message.member, ms("30 minutes") / 1000);
 
   let amount = 1000;
 
