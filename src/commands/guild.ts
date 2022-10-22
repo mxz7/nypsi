@@ -172,7 +172,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           `**owner** ${guild.owner.lastKnownTag}`,
         true
       );
-      if (guild.level != 5) {
+      if (guild.level < Constants.MAX_GUILD_LEVEL) {
         embed.addField("bank", `**money** $${guild.balance.toLocaleString()}\n**xp** ${guild.xp.toLocaleString()}`, true);
       }
 
@@ -258,7 +258,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (guild.members.length >= (await getMaxMembersForGuild(guild.guildName))) {
       let msg = "your guild already has the max amount of members";
 
-      if (guild.level != 5) {
+      if (guild.level < Constants.MAX_GUILD_LEVEL) {
         msg += `. use ${prefix}guild upgrade to increase this`;
       }
 
@@ -576,7 +576,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return send({ embeds: [new ErrorEmbed("you're not in a guild")] });
     }
 
-    if (guild.level == 5) {
+    if (guild.level >= Constants.MAX_GUILD_LEVEL) {
       return send({ embeds: [new CustomEmbed(message.member, `**${guild.guildName}** is at max level`)] });
     }
 

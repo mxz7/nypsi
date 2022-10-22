@@ -287,7 +287,7 @@ async function checkUpgrade(guild: EconomyGuild | string, client: NypsiClient): 
     guild = await getGuildByName(guild);
   }
 
-  if (guild.level == 5) return;
+  if (guild.level >= Constants.MAX_GUILD_LEVEL) return;
   const requirements = await getRequiredForGuildUpgrade(guild.guildName);
 
   if (guild.balance >= requirements.money && guild.xp >= requirements.xp) {
