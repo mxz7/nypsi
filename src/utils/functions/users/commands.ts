@@ -2,6 +2,7 @@ import { GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import Constants from "../../Constants";
+import ms = require("ms");
 
 export async function updateLastCommand(member: GuildMember | string) {
   let id: string;
@@ -14,6 +15,7 @@ export async function updateLastCommand(member: GuildMember | string) {
   const date = new Date();
 
   await redis.set(`${Constants.redis.cache.user.LAST_COMMAND}:${id}`, date.getTime());
+  await redis.expire(`${Constants.redis.cache.user.LAST_COMMAND}:${id}`, ms("30 minutes") / 1000);
 
   await prisma.user.update({
     where: {
@@ -48,6 +50,9 @@ export async function getLastCommand(member: GuildMember | string): Promise<Date
   if (!query || !query.lastCommand) {
     return new Date(0);
   }
+
+  await redis.set(`${Constants.redis.cache.user.LAST_COMMAND}:${id}`, query.lastCommand.getTime());
+  await redis.expire(`${Constants.redis.cache.user.LAST_COMMAND}:${id}`, ms("30 minutes") / 1000);
 
   return query.lastCommand;
 }
