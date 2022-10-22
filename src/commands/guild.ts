@@ -12,6 +12,7 @@ import {
   MessageEditOptions,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
+import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
@@ -39,6 +40,7 @@ import requestDM from "../utils/functions/requestdm";
 import { cleanString } from "../utils/functions/string";
 import { getDmSettings } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import ms = require("ms");
 
 const cmd = new Command("guild", "create and manage your guild/clan", Categories.MONEY)
   .setAliases(["g", "clan"])
@@ -172,7 +174,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           `**owner** ${guild.owner.lastKnownTag}`,
         true
       );
-      if (guild.level != 5) {
+      if (guild.level < Constants.MAX_GUILD_LEVEL) {
         embed.addField("bank", `**money** $${guild.balance.toLocaleString()}\n**xp** ${guild.xp.toLocaleString()}`, true);
       }
 
@@ -201,6 +203,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   }
 
   if (args[0].toLowerCase() == "create") {
+    if (await redis.exists(`${Constants.redis.cooldown.GUILD_CREATE}:${message.author.id}`)) {
+      return send({ embeds: [new ErrorEmbed("you have already created a guild recently")] });
+    }
+
     if ((await getPrestige(message.member)) < 1) {
       return send({ embeds: [new ErrorEmbed("you must be atleast prestige 1 to create a guild")] });
     }
@@ -243,6 +249,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await createGuild(name, message.member);
 
+    await redis.set(`${Constants.redis.cooldown.GUILD_CREATE}:${message.author.id}`, "t");
+    await redis.expire(`${Constants.redis.cooldown.GUILD_CREATE}:${message.author.id}`, ms("2 days") / 1000);
+
     return send({ embeds: [new CustomEmbed(message.member, `you are now the owner of **${name}**`)] });
   }
 
@@ -258,7 +267,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (guild.members.length >= (await getMaxMembersForGuild(guild.guildName))) {
       let msg = "your guild already has the max amount of members";
 
-      if (guild.level != 5) {
+      if (guild.level < Constants.MAX_GUILD_LEVEL) {
         msg += `. use ${prefix}guild upgrade to increase this`;
       }
 
@@ -466,7 +475,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       if (contributedMoney > 100) {
         await updateBalance(
           guildMember.userId,
-          (await getBalance(guildMember.userId)) + Math.floor(contributedMoney * 0.25)
+          (await getBalance(guildMember.userId)) + Math.floor(Number(contributedMoney) * 0.25)
         );
 
         if ((await getDmSettings(guildMember.userId)).other) {
@@ -474,7 +483,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
           embed.setDescription(
             `since you contributed money to this guild, you have been repaid $**${Math.floor(
-              contributedMoney * 0.25
+              Number(contributedMoney) * 0.25
             ).toLocaleString()}**`
           );
 
@@ -522,21 +531,57 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return send({ embeds: [new ErrorEmbed("invalid payment")] });
     }
 
-    await updateBalance(message.member, (await getBalance(message.member)) - amount);
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder().setCustomId("✅").setLabel("do it.").setStyle(ButtonStyle.Success)
+    );
 
-    await addToGuildBank(guild.guildName, amount, message.member, message.client as NypsiClient);
+    const msg = await send({
+      embeds: [
+        new CustomEmbed(
+          message.member,
+          `are you sure you want to deposit $**${amount.toLocaleString()}** into **${
+            guild.guildName
+          }** bank?\n\nyou **cannot** get this back`
+        ),
+      ],
+      components: [row],
+    });
 
-    const embed = new CustomEmbed(message.member).setHeader("guild deposit", message.author.avatarURL());
+    const reaction = await msg
+      .awaitMessageComponent({ filter: (i: Interaction) => i.user.id == message.author.id, time: 15000 })
+      .then(async (collected) => {
+        await collected.deferUpdate();
+        return collected;
+      })
+      .catch(async () => {
+        await msg.delete();
+      });
 
-    embed.setDescription(`$**${guild.balance.toLocaleString()}**\n  +$**${amount.toLocaleString()}**`);
+    if (!reaction) return;
 
-    const msg = await send({ embeds: [embed] });
+    if (!reaction.isButton()) return;
 
-    embed.setDescription(`$**${(guild.balance + amount).toLocaleString()}**`);
+    if (reaction.customId == "✅") {
+      if (amount > (await getBalance(message.member))) {
+        return reaction.message.edit({ embeds: [new ErrorEmbed("you cannot afford this payment")] });
+      }
 
-    return setTimeout(() => {
-      edit({ embeds: [embed] }, msg);
-    }, 1500);
+      await updateBalance(message.member, (await getBalance(message.member)) - amount);
+
+      await addToGuildBank(guild.guildName, amount, message.member);
+
+      const embed = new CustomEmbed(message.member).setHeader("guild deposit", message.author.avatarURL());
+
+      embed.setDescription(`$**${guild.balance.toLocaleString()}**\n  +$**${amount.toLocaleString()}**`);
+
+      await reaction.message.edit({ embeds: [embed], components: [] });
+
+      embed.setDescription(`$**${(Number(guild.balance) + amount).toLocaleString()}**`);
+
+      return setTimeout(() => {
+        reaction.message.edit({ embeds: [embed] });
+      }, 1500);
+    }
   }
 
   if (args[0].toLowerCase() == "stats") {
@@ -576,7 +621,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return send({ embeds: [new ErrorEmbed("you're not in a guild")] });
     }
 
-    if (guild.level == 5) {
+    if (guild.level >= Constants.MAX_GUILD_LEVEL) {
       return send({ embeds: [new CustomEmbed(message.member, `**${guild.guildName}** is at max level`)] });
     }
 

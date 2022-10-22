@@ -17,6 +17,7 @@ export default {
       ROB_RADIO: "cd:rob-radio",
       SEX_CHASTITY: "cd:sex-chastity",
       AUCTION_WATCH: "cd:auctionwatch",
+      GUILD_CREATE: "cd:guildcreate",
     },
     cache: {
       SUPPORT: "cache:support",
@@ -82,4 +83,5 @@ export default {
   KOFI_PRODUCTS: products,
   EMBED_SUCCESS_COLOR: "#5efb8f" as ColorResolvable,
   EMBED_FAIL_COLOR: "#e4334f" as ColorResolvable,
+  MAX_GUILD_LEVEL: 69,
 };
