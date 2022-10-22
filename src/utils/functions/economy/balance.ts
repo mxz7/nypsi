@@ -135,7 +135,7 @@ export async function getMulti(member: GuildMember | string): Promise<number> {
   const guild = await getGuildByUser(id);
 
   if (guild) {
-    multi += guild.level - 1;
+    multi += guild.level > 5 ? 5 : guild.level - 1;
   }
 
   const boosters = await getBoosters(id);

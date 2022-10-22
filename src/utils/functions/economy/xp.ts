@@ -58,7 +58,7 @@ export async function calcMinimumEarnedXp(member: GuildMember): Promise<number> 
   const guild = await getGuildByUser(member);
 
   if (guild) {
-    max += guild.level - 1;
+    max += guild.level > 10 ? 10 : guild.level - 1;
   }
 
   if (earned > max) earned = max;
