@@ -384,7 +384,7 @@ model ChatReactionStats {
 model EconomyGuild {
   guildName String   @id
   createdAt DateTime
-  balance   Int      @default(0)
+  balance   BigInt   @default(0)
   xp        Int      @default(0)
   level     Int      @default(1)
   motd      String   @default("welcome to the guild fool (/guild motd)")
@@ -399,7 +399,7 @@ model EconomyGuildMember {
   userId           String   @unique
   guildName        String
   joinedAt         DateTime
-  contributedMoney Int      @default(0)
+  contributedMoney BigInt   @default(0)
   contributedXp    Int      @default(0)
 
   user  User         @relation(fields: [userId], references: [id], onDelete: Cascade)
