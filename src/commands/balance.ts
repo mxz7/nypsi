@@ -1,4 +1,5 @@
 import { BaseMessageOptions, CommandInteraction, GuildMember, InteractionReplyOptions, Message } from "discord.js";
+import prisma from "../init/database";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants.js";
@@ -37,6 +38,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (args[1] == "reset") {
       await deleteUser(target);
+      if (!(message instanceof Message)) return;
+      return message.react("✅");
+    } else if (args[1] == "clearinv") {
+      await prisma.inventory.deleteMany({
+        where: {
+          userId: typeof target == "string" ? target : target.user.id,
+        },
+      });
+
       if (!(message instanceof Message)) return;
       return message.react("✅");
     }
