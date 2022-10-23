@@ -174,7 +174,7 @@ export async function getMaxMembersForGuild(name: string) {
 
   const amount = 3 + Math.floor(level / 2) * 3;
 
-  return amount < 3 ? 3 : amount;
+  return (amount < 3 ? 3 : amount) > 10 ? 10 : amount < 3 ? 3 : amount;
 }
 
 export async function getRequiredForGuildUpgrade(name: string): Promise<GuildUpgradeRequirements> {
