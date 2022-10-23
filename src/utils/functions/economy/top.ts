@@ -72,7 +72,7 @@ export async function topBalance(guild: Guild, amount: number): Promise<string[]
 export async function topBalanceGlobal(amount: number, anon = true): Promise<string[]> {
   const query = await prisma.economy.findMany({
     where: {
-      money: { gt: 1000 },
+      money: { gt: 10_000 },
     },
     select: {
       userId: true,
@@ -179,7 +179,7 @@ export async function topNetWorth(guild: Guild, amount: number): Promise<string[
 
   const query = await prisma.economy.findMany({
     where: {
-      AND: [{ userId: { in: Array.from(members.keys()) } }, { money: { gt: 0 } }],
+      userId: { in: Array.from(members.keys()) },
     },
     select: {
       userId: true,
