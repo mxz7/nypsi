@@ -318,6 +318,61 @@ export async function topPrestige(guild: Guild, amount: number): Promise<string[
   return usersFinal;
 }
 
+export async function topPrestigeGlobal(memberId: string, amount: number) {
+  const query = await prisma.economy.findMany({
+    where: {
+      prestige: { gt: 0 },
+    },
+    select: {
+      userId: true,
+      prestige: true,
+      user: {
+        select: {
+          lastKnownTag: true,
+        },
+      },
+    },
+    orderBy: {
+      prestige: "desc",
+    },
+  });
+
+  const usersFinal = [];
+
+  let count = 0;
+
+  for (const user of query) {
+    if (count >= amount) break;
+    if (usersFinal.join().length >= 1500) break;
+
+    if (user.prestige != 0) {
+      let pos: string | number = count + 1;
+
+      if (pos == 1) {
+        pos = "🥇";
+      } else if (pos == 2) {
+        pos = "🥈";
+      } else if (pos == 3) {
+        pos = "🥉";
+      }
+
+      const thing = ["th", "st", "nd", "rd"];
+      const v = user.prestige % 100;
+      usersFinal[count] =
+        pos +
+        " **" +
+        user.user.lastKnownTag.split("#")[0] +
+        "** " +
+        user.prestige +
+        (thing[(v - 20) % 10] || thing[v] || thing[0]) +
+        " prestige";
+      count++;
+    }
+  }
+
+  return { out: usersFinal, pos: query.map((i) => i.userId).indexOf(memberId) + 1 };
+}
+
 export async function topItem(guild: Guild, amount: number, item: string): Promise<string[]> {
   let members: Collection<string, GuildMember>;
 
