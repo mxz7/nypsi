@@ -396,3 +396,17 @@ export async function topGuilds(limit = 5) {
 
   return out;
 }
+
+export async function setOwner(guild: string, newOwner: string) {
+  await prisma.economyGuild.updateMany({
+    where: {
+      guildName: {
+        mode: "insensitive",
+        equals: guild,
+      },
+    },
+    data: {
+      ownerId: newOwner,
+    },
+  });
+}
