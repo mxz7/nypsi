@@ -7,6 +7,7 @@ export interface Item {
   buy?: number;
   sell?: number;
   role?: string;
+  booster_desc?: string;
   aliases?: string[];
   speed?: number;
   rarity?: number;

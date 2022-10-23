@@ -54,6 +54,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   let desc = `\`${selected.id}\`\n\n*${selected.longDesc}*\n\n`;
 
+  if (selected.booster_desc) {
+    desc += `*${selected.booster_desc}*\n\n`;
+  }
+
   if (selected.buy) {
     desc += `**buy** $${selected.buy.toLocaleString()}\n`;
   }
