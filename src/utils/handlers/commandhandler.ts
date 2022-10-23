@@ -963,7 +963,7 @@ export function runCommandUseTimers(client: NypsiClient) {
     for (const tag of noLifers.keys()) {
       const uses = noLifers.get(tag);
 
-      if (uses > 200) {
+      if (uses > 500) {
         const res = await client.cluster.broadcastEval(
           (c, { tag }) => {
             const foundUser = c.users.cache.find((u) => `${u.username}#${u.discriminator}` == tag);
@@ -983,10 +983,10 @@ export function runCommandUseTimers(client: NypsiClient) {
           }) performed **${uses}** commands in an hour`
         );
 
-        if (uses > 400 && typeof id === "string") {
+        if (uses > 600 && typeof id === "string") {
           const lastCommand = await getLastCommand(id);
 
-          if (dayjs().subtract(5, "minutes").unix() * 1000 > lastCommand.getTime()) continue; // dont lock if last command was more than 5 minutes ago
+          if (dayjs().subtract(1, "minutes").unix() * 1000 > lastCommand.getTime()) continue; // dont lock if last command was more than 5 minutes ago
 
           toggleLock(id);
           logger.info(`${tag} (${id}) has been given a captcha`);
