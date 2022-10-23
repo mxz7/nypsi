@@ -23,6 +23,8 @@ export async function getEmail(id: string) {
 }
 
 export async function setEmail(id: string, email: string) {
+  logger.info(`${email} assigned to ${id}`);
+
   return await prisma.user.update({
     where: {
       id,
