@@ -69,8 +69,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
   }
 
-  console.log(max);
-
   const amount = Math.floor(Math.random() * max) + 1;
 
   await addInventoryItem(message.member, "cookie", amount, false);
