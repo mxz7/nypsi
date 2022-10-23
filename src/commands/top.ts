@@ -16,6 +16,7 @@ import {
   topNetWorth,
   topNetWorthGlobal,
   topPrestige as topPrestigeGuild,
+  topPrestigeGlobal,
 } from "../utils/functions/economy/top";
 import { getItems } from "../utils/functions/economy/utils.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
@@ -40,6 +41,13 @@ cmd.slashData
       .setName("prestige")
       .setDescription("view top prestiges in the server")
       .addIntegerOption((option) => option.setName("amount").setDescription("amount of members to show").setRequired(false))
+      .addStringOption((option) =>
+        option
+          .setName("scope")
+          .setDescription("show global/server")
+          .setChoices(...scopeChoices)
+          .setRequired(false)
+      )
   )
   .addSubcommand((item) =>
     item
@@ -138,14 +146,31 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
   };
 
-  const topPrestige = async (amount: number) => {
-    const prestigeTop = await topPrestigeGuild(message.guild, amount);
+  const topPrestige = async (amount: number, global: boolean) => {
+    if (global) {
+      const { out, pos } = await topPrestigeGlobal(message.author.id, amount);
 
-    const embed = new CustomEmbed(message.member)
-      .setHeader("top " + prestigeTop.length)
-      .setDescription(prestigeTop.join("\n"));
+      if (out.length == 0) {
+        return send({ embeds: [new ErrorEmbed("there are no users to show")] });
+      }
 
-    return send({ embeds: [embed] });
+      const embed = new CustomEmbed(message.member, out.join("\n")).setHeader(
+        `top ${amount} [global]`,
+        message.author.avatarURL()
+      );
+
+      if (pos > amount) embed.setFooter({ text: `you are #${pos.toLocaleString()}` });
+
+      return send({ embeds: [embed] });
+    } else {
+      const prestigeTop = await topPrestigeGuild(message.guild, amount);
+
+      const embed = new CustomEmbed(message.member)
+        .setHeader("top " + prestigeTop.length)
+        .setDescription(prestigeTop.join("\n"));
+
+      return send({ embeds: [embed] });
+    }
   };
 
   const topItem = async (item: Item, amount: number) => {
@@ -195,11 +220,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (!amount) amount = 5;
 
+    let global = false;
+
+    if (!(message instanceof Message) && message.isChatInputCommand() && message.options.getString("scope") == "global") {
+      if (!parseInt(args[1])) amount = 10;
+      global = true;
+    }
+
     if (amount > 10 && !message.member.permissions.has(PermissionFlagsBits.Administrator)) amount = 10;
 
     if (amount < 5) amount = 5;
 
-    return topPrestige(amount);
+    return topPrestige(amount, global);
   } else if (args[0].toLowerCase() == "item") {
     const items = getItems();
     const searchTag = args[1].toLowerCase();
