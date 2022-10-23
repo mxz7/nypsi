@@ -1,9 +1,11 @@
 import { Collection, Guild, GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
+import { CustomEmbed } from "../../../models/EmbedBuilders";
+import { NotificationPayload } from "../../../types/Notification";
 import Constants from "../../Constants";
 import { getTier, isPremium } from "../premium/premium";
-import { getDmSettings } from "../users/notifications";
+import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { getAuctionAverage } from "./auctions";
 import { getBoosters } from "./boosters";
 import { getGuildByUser } from "./guilds";
@@ -375,6 +377,7 @@ export async function calcNetWorth(member: GuildMember | string) {
       money: true,
       bank: true,
       Inventory: true,
+      net_worth: true,
       EconomyWorker: {
         include: {
           upgrades: true,
@@ -453,6 +456,31 @@ export async function calcNetWorth(member: GuildMember | string) {
     data: {
       net_worth: Math.floor(worth),
     },
+  });
+
+  setImmediate(async () => {
+    if (query.net_worth) {
+      const payload: NotificationPayload = {
+        memberId: id,
+        payload: {
+          content: "",
+          embed: new CustomEmbed(
+            null,
+            `**old** $${Number(query.net_worth).toLocaleString()}\n**new** $${Math.floor(worth).toLocaleString()}`
+          ).setColor(Constants.TRANSPARENT_EMBED_COLOR),
+        },
+      };
+
+      if (Number(query.net_worth) < Math.floor(worth) - 1_000_000) {
+        payload.payload.content = `your net worth has increased by $${Math.floor(worth) - Number(query.net_worth)}`;
+      } else if (Number(query.net_worth) > Math.floor(worth) + 1_000_000) {
+        payload.payload.content = `your net worth has decreased by $${Number(query.net_worth) - Math.floor(worth)}`;
+      } else {
+        return;
+      }
+
+      await addNotificationToQueue(payload);
+    }
   });
 
   return Math.floor(worth);
