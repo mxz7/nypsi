@@ -58,14 +58,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   await addCooldown(cmd.name, message.member, 1200);
 
   let max = 4;
+  let maxCake = 1;
 
   const boosters = await getBoosters(message.member);
 
   for (const booster of boosters.keys()) {
     if (getItems()[booster].boosterEffect.boosts.includes("cookie")) {
-      for (let i = 0; i < boosters.get(booster).length; i++) {
-        max += max * getItems()[booster].boosterEffect.effect;
-      }
+      max += max * getItems()[booster].boosterEffect.effect * boosters.get(booster).length;
+      maxCake += boosters.get(booster).length;
     }
   }
 
@@ -76,7 +76,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const chance = Math.floor(Math.random() * 15);
 
   if (chance == 7) {
-    await addInventoryItem(message.member, "cake", 1);
+    let foundCakes = 1;
+
+    if (maxCake > 1) {
+      foundCakes = Math.floor(Math.random() * maxCake) + 1;
+    }
+
+    await addInventoryItem(message.member, "cake", foundCakes);
   }
 
   let desc = `you baked **${amount}** cookie${amount > 1 ? "s" : ""}!! 🍪`;
