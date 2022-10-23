@@ -466,7 +466,7 @@ export async function calcNetWorth(member: GuildMember | string) {
           content: "",
           embed: new CustomEmbed(
             null,
-            `**old** $${Number(query.net_worth).toLocaleString()}\n**new** $${Math.floor(worth).toLocaleString()}`
+            `$${Number(query.net_worth).toLocaleString()} ➔ $${Math.floor(worth).toLocaleString()}`
           ).setColor(Constants.TRANSPARENT_EMBED_COLOR),
         },
       };
