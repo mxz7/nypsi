@@ -49,7 +49,6 @@ const cmd = new Command("guild", "create and manage your guild/clan", Categories
 cmd.slashEnabled = true;
 
 cmd.slashData
-  .addSubcommand((help) => help.setName("help").setDescription("view the help menu for guild commands"))
   .addSubcommand((create) =>
     create
       .setName("create")
