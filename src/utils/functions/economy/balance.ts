@@ -459,7 +459,7 @@ export async function calcNetWorth(member: GuildMember | string) {
   });
 
   setImmediate(async () => {
-    if (query.net_worth) {
+    if (query.net_worth && (await getDmSettings(id)).net_worth) {
       const payload: NotificationPayload = {
         memberId: id,
         payload: {
