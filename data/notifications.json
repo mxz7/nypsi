@@ -53,6 +53,11 @@
     "name": "payment notifications",
     "description": "get a dm when someone sends you money or gives you an item"
   },
+  "net_worth": {
+    "id": "net_worth",
+    "name": "net worth updates",
+    "description": "get a dm when your net worth changes by 1 million or more"
+  },
   "other": {
     "id": "other",
     "name": "miscellaneous",
