@@ -31,6 +31,7 @@ import {
   removeMember,
   RemoveMemberMode,
   setGuildMOTD,
+  setOwner,
   topGuilds,
 } from "../utils/functions/economy/guilds";
 import { getPrestige } from "../utils/functions/economy/prestige";
@@ -387,6 +388,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     return await removeMember(args[1], RemoveMemberMode.ID);
+  }
+
+  if (args[0].toLowerCase() == "setowner") {
+    if (message.author.id != Constants.TEKOH_ID) return;
+
+    if (args.length != 3) {
+      return send({ embeds: [new ErrorEmbed(`${prefix}guild setowner <guild> <newid>`)] });
+    }
+
+    return await setOwner(args[1], args[2]);
   }
 
   if (args[0].toLowerCase() == "kick") {
