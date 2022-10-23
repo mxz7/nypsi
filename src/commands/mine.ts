@@ -11,7 +11,7 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 const veins = new Map<string, number[]>();
 
 veins.set("cobblestone", [5, 7, 15, 25]);
-veins.set("coal", [2, 4, 5, 8]);
+veins.set("coal", [2, 4, 5, 8, 16]);
 veins.set("iron_ore", [1, 3, 7]);
 veins.set("gold_ore", [1, 2, 4]);
 veins.set("diamond", [1, 2]);
