@@ -4,7 +4,7 @@ import { Categories, Command, NypsiCommandInteraction } from "../models/Command"
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { MStoTime } from "../utils/functions/date";
 import { setProgress } from "../utils/functions/economy/achievements";
-import { getBalance, updateBalance } from "../utils/functions/economy/balance";
+import { getBalance, getMulti, updateBalance } from "../utils/functions/economy/balance";
 import { addInventoryItem } from "../utils/functions/economy/inventory";
 import { createUser, getDailyStreak, getLastDaily, updateLastDaily, userExists } from "../utils/functions/economy/utils";
 import { getXp, updateXp } from "../utils/functions/economy/xp";
@@ -76,7 +76,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
   }
 
-  const total = base + streakBonus * streak;
+  let total = base + streakBonus * streak;
+
+  total += Math.floor(total * (await getMulti(message.member)));
 
   let xp = 1;
   let crate = 0;
