@@ -471,11 +471,11 @@ export async function calcNetWorth(member: GuildMember | string) {
         },
       };
 
-      if (Number(query.net_worth) < Math.floor(worth) - 1_000_000) {
+      if (Number(query.net_worth) < Math.floor(worth) - 50_000_000) {
         payload.payload.content = `your net worth has increased by $${(
           Math.floor(worth) - Number(query.net_worth)
         ).toLocaleString()}`;
-      } else if (Number(query.net_worth) > Math.floor(worth) + 1_000_000) {
+      } else if (Number(query.net_worth) > Math.floor(worth) + 50_000_000) {
         payload.payload.content = `your net worth has decreased by $${(
           Number(query.net_worth) - Math.floor(worth)
         ).toLocaleString()}`;
