@@ -57,19 +57,19 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   await addCooldown(cmd.name, message.member, 1200);
 
-  let amount = Math.floor(Math.random() * 4) + 1;
+  let max = 4;
 
   const boosters = await getBoosters(message.member);
 
   for (const booster of boosters.keys()) {
     if (getItems()[booster].boosterEffect.boosts.includes("cookie")) {
       for (let i = 0; i < boosters.get(booster).length; i++) {
-        amount += amount * getItems()[booster].boosterEffect.effect;
+        max += max * getItems()[booster].boosterEffect.effect;
       }
     }
   }
 
-  amount = Math.floor(amount);
+  const amount = Math.floor(Math.random() * max) + 1;
 
   await addInventoryItem(message.member, "cookie", amount, false);
 
