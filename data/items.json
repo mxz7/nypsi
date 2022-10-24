@@ -282,6 +282,7 @@
   "terrible_gun": {
     "id": "terrible_gun",
     "name": "terrible gun",
+    "plural": "terrible guns",
     "emoji": "🔫",
     "longDesc": "allows you to hunt",
     "role": "tool",
@@ -292,6 +293,7 @@
   "gun": {
     "id": "gun",
     "name": "gun",
+    "plural": "guns",
     "emoji": "🔫",
     "longDesc": "allows you to hunt with better luck",
     "role": "tool",
@@ -302,6 +304,7 @@
   "incredible_gun": {
     "id": "incredible_gun",
     "name": "incredible gun",
+    "plural": "incredible guns",
     "emoji": "🔫",
     "longDesc": "allows you to hunt with amazing luck",
     "role": "tool",
@@ -312,6 +315,7 @@
   "baby_rabbit": {
     "id": "baby_rabbit",
     "name": "baby rabbit",
+    "plural": "baby rabbits",
     "emoji": "🐰",
     "longDesc": "tiny small baby rabbit, ur cat could kill this",
     "role": "prey",
@@ -322,6 +326,7 @@
   "normal_rabbit": {
     "id": "normal_rabbit",
     "name": "normal rabbit",
+    "plural": "normal rabbits",
     "emoji": "🐰",
     "longDesc": "jumps around in ur garden",
     "role": "prey",
@@ -332,6 +337,7 @@
   "large_rabbit": {
     "id": "large_rabbit",
     "name": "large rabbit",
+    "plural": "large rabbits",
     "emoji": "🐰",
     "longDesc": "massive fuck off rabbit like a bear",
     "role": "prey",
