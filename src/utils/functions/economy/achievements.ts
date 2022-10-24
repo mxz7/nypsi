@@ -161,7 +161,7 @@ async function completeAchievement(userId: string, achievementId: string) {
 
     await addNotificationToQueue(payload);
   } else {
-    await redis.set(`achievements:completed:${userId}`, JSON.stringify(userEmbed));
+    await redis.set(`achievements:completed:${userId}`, JSON.stringify(userEmbed.toJSON()));
   }
 
   if (!process.env.ACHIEVEMENTS_HOOK) return;
