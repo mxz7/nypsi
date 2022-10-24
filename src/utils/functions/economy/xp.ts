@@ -35,18 +35,25 @@ export async function getXp(member: GuildMember | string): Promise<number> {
   return query.xp;
 }
 
-export async function updateXp(member: GuildMember, amount: number) {
+export async function updateXp(member: GuildMember | string, amount: number) {
   if (amount >= 69420) return;
+
+  let id: string;
+  if (member instanceof GuildMember) {
+    id = member.user.id;
+  } else {
+    id = member;
+  }
 
   await prisma.economy.update({
     where: {
-      userId: member.user.id,
+      userId: id,
     },
     data: {
       xp: amount,
     },
   });
-  await redis.del(`${Constants.redis.cache.economy.XP}:${member.user.id}`);
+  await redis.del(`${Constants.redis.cache.economy.XP}:${id}`);
 }
 
 export async function calcMinimumEarnedXp(member: GuildMember): Promise<number> {
