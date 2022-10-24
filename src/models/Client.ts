@@ -19,6 +19,7 @@ import redis from "../init/redis";
 import { runAuctionChecks } from "../scheduled/clusterjobs/checkauctions";
 import { runLotteryInterval } from "../scheduled/clusterjobs/lottery";
 import { runLogs, runModerationChecks } from "../scheduled/clusterjobs/moderationchecks";
+import { runNetWorthInterval } from "../scheduled/clusterjobs/networth-update";
 import { runPremiumChecks } from "../scheduled/clusterjobs/premiumexpire";
 import { runSurveyChecks } from "../scheduled/clusterjobs/surveyends";
 import { runPremiumCrateInterval } from "../scheduled/clusterjobs/weeklycrates";
@@ -130,5 +131,6 @@ export class NypsiClient extends Client {
     runSurveyChecks(this);
     runLogs();
     runWorkerInterval();
+    runNetWorthInterval();
   }
 }
