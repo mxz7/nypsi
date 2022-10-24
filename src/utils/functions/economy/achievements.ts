@@ -115,7 +115,8 @@ async function completeAchievement(userId: string, achievementId: string) {
 
   const userEmbed = new CustomEmbed()
     .setColor(Constants.TRANSPARENT_EMBED_COLOR)
-    .setTitle(`you have completed ${achievements[achievementId].emoji} ${achievements[achievementId].name}`);
+    .setHeader("achievement unlocked")
+    .setDescription(`you have completed ${achievements[achievementId].emoji} ${achievements[achievementId].name}`);
 
   let earnedXp = 30;
   let earnedCrates = 0;
@@ -134,9 +135,9 @@ async function completeAchievement(userId: string, achievementId: string) {
   }
 
   userEmbed.setDescription(
-    `you have received:\n + ${earnedXp.toLocaleString()}xp${
+    (userEmbed.data.description += `\n\nyou have received:\n + ${earnedXp.toLocaleString()}xp${
       earnedCrates > 0 ? `\n + ${earnedCrates} 🎁 69420 crate${earnedCrates > 1 ? "s" : ""}` : ""
-    }`
+    }`)
   );
 
   await updateXp(userId, (await getXp(userId)) + earnedXp);
