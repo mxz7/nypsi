@@ -1,9 +1,14 @@
 import { EmbedBuilder, GuildMember, WebhookClient } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
+import { CustomEmbed } from "../../../models/EmbedBuilders";
+import { NotificationPayload } from "../../../types/Notification";
 import Constants from "../../Constants";
+import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { getLastKnownTag } from "../users/tag";
-import { getAchievements } from "./utils";
+import { addInventoryItem } from "./inventory";
+import { getAchievements, getItems } from "./utils";
+import { getXp, updateXp } from "./xp";
 
 /**
  * returns true if user has met requirements for achievement
@@ -106,17 +111,66 @@ async function completeAchievement(userId: string, achievementId: string) {
     },
   });
 
-  await redis.set(`achievements:completed:${userId}`, achievementId);
-
   const achievements = getAchievements();
+
+  const userEmbed = new CustomEmbed()
+    .setColor(Constants.TRANSPARENT_EMBED_COLOR)
+    .setTitle(`you have completed ${achievements[achievementId].emoji} ${achievements[achievementId].name}`);
+
+  let earnedXp = 30;
+  let earnedCrates = 0;
+
+  if (achievementId.endsWith("_v")) {
+    earnedXp = 5000;
+    earnedCrates = 3;
+  } else if (achievementId.endsWith("_iv")) {
+    earnedXp = 1000;
+    earnedCrates = 2;
+  } else if (achievementId.endsWith("_iii")) {
+    earnedXp = 500;
+    earnedCrates = 1;
+  } else if (achievementId.endsWith("_ii")) {
+    earnedXp = 100;
+  }
+
+  userEmbed.setDescription(
+    `you have received:\n + ${earnedXp.toLocaleString()}xp${
+      earnedCrates > 0 ? `\n + ${earnedCrates} 🎁 69420 crate${earnedCrates > 1 ? "s" : ""}` : ""
+    }`
+  );
+
+  await updateXp(userId, (await getXp(userId)) + earnedXp);
+  if (earnedCrates > 0) await addInventoryItem(userId, "69420_crate", earnedCrates);
+
+  if (achievements[achievementId].prize) {
+    await addInventoryItem(userId, achievements[achievementId].prize, 1, false);
+    userEmbed.setDescription(
+      (userEmbed.data.description += `\n + 1 ${getItems()[achievements[achievementId].prize].emoji} ${
+        getItems()[achievements[achievementId].prize].name
+      }`)
+    );
+  }
+
+  if ((await getDmSettings(userId)).other) {
+    const payload: NotificationPayload = {
+      memberId: userId,
+      payload: {
+        embed: userEmbed,
+      },
+    };
+
+    await addNotificationToQueue(payload);
+  } else {
+    await redis.set(`achievements:completed:${userId}`, JSON.stringify(userEmbed));
+  }
+
+  if (!process.env.ACHIEVEMENTS_HOOK) return;
 
   const completed = await prisma.achievements.count({
     where: {
       AND: [{ achievementId: achievementId }, { completed: true }],
     },
   });
-
-  if (!process.env.ACHIEVEMENTS_HOOK) return;
 
   const embed = new EmbedBuilder()
     .setAuthor({ name: `${await getLastKnownTag(userId)} has unlocked an achievement` })
