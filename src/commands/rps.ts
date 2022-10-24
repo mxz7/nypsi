@@ -12,7 +12,7 @@ import { getPrefix } from "../utils/functions/guilds/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 import { gamble } from "../utils/logger.js";
 
-const cmd = new Command("rockpaperscissors", "play rock paper scissors", Categories.MONEY).setAliases(["rps"]);
+const cmd = new Command("rps", "play rock paper scissors", Categories.MONEY).setAliases(["rockpaperscissors"]);
 
 cmd.slashEnabled = true;
 cmd.slashData
