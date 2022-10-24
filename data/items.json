@@ -1141,5 +1141,21 @@
     "speed": 6,
     "aliases": ["palm", "tree", "necklace"],
     "worth": 230000
+  },
+  "double_xp": {
+    "id": "double_xp",
+    "name": "double xp",
+    "emoji": "✨",
+    "longDesc": "earn double xp for 12 hours",
+    "rarity": 4,
+    "buy": 0,
+    "sell": 1000000,
+    "role": "booster",
+    "stackable": false,
+    "boosterEffect": {
+      "boosts": ["xp"],
+      "effect": 1,
+      "time": 43200
+    }
   }
 }
