@@ -83,7 +83,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const embed = new CustomEmbed(message.member);
 
     embed.setDescription(
-      "the karma shop is currently **closed**\nkeep notifications enabled to see when the karma shop is opened!"
+      "the karma shop is currently **closed**\nkeep server notifications enabled to see when the karma shop is opened!"
     );
 
     return send({ embeds: [embed] });
