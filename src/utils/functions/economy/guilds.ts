@@ -315,8 +315,9 @@ async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
 
     const desc = [`**${guild.guildName}** has upgraded to level **${guild.level + 1}**\n\nyou have received:`];
 
-    let cratesEarned = guild.level;
+    let cratesEarned = Math.floor(guild.level / 1.75);
 
+    if (cratesEarned < 1) cratesEarned = 1;
     if (cratesEarned > 5) cratesEarned = 5;
 
     desc.push(` +**${cratesEarned}** basic crates`);
