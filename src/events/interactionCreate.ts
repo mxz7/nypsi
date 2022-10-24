@@ -206,7 +206,7 @@ export default async function interactionCreate(interaction: Interaction) {
     if (interaction.customId == "b") {
       let auction = await prisma.auction.findFirst({
         where: {
-          AND: [{ messageId: interaction.message.id }, { sold: false }],
+          AND: [{ messageId: interaction.message.id }],
         },
         select: {
           bin: true,
@@ -215,10 +215,11 @@ export default async function interactionCreate(interaction: Interaction) {
           ownerId: true,
           itemAmount: true,
           itemName: true,
+          sold: true,
         },
       });
 
-      if (auction && (await userExists(auction.ownerId))) {
+      if (auction && !auction.sold && (await userExists(auction.ownerId))) {
         if (auction.ownerId == interaction.user.id) {
           return await interaction.reply({
             embeds: [new ErrorEmbed("you cannot buy your own auction")],
@@ -260,7 +261,7 @@ export default async function interactionCreate(interaction: Interaction) {
 
         auction = await prisma.auction.findFirst({
           where: {
-            AND: [{ messageId: interaction.message.id }, { sold: false }],
+            AND: [{ messageId: interaction.message.id }],
           },
           select: {
             bin: true,
@@ -269,6 +270,7 @@ export default async function interactionCreate(interaction: Interaction) {
             ownerId: true,
             itemAmount: true,
             itemName: true,
+            sold: true,
           },
         });
 
@@ -276,6 +278,10 @@ export default async function interactionCreate(interaction: Interaction) {
           await interaction.reply({ embeds: [new ErrorEmbed("invalid auction")], ephemeral: true });
           await interaction.message.delete();
           return;
+        }
+
+        if (auction.sold) {
+          return await interaction.reply({ embeds: [new ErrorEmbed("too slow ):").removeTitle()], ephemeral: true });
         }
 
         if (!(await userExists(interaction.user.id))) await createUser(interaction.user.id);
@@ -342,6 +348,8 @@ export default async function interactionCreate(interaction: Interaction) {
         }
 
         await interaction.message.edit({ embeds: [embed], components: [] });
+      } else if (auction.sold) {
+        return await interaction.reply({ embeds: [new ErrorEmbed("too slow ):").removeTitle()], ephemeral: true });
       } else {
         await interaction.reply({ embeds: [new ErrorEmbed("invalid auction")], ephemeral: true });
         await interaction.message.delete();
