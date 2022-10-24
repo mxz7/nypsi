@@ -718,21 +718,24 @@
     "name": "nypsi **III**",
     "emoji": "<:xnypsi:819957267548864543>",
     "target": 100000,
-    "description": "use 100,000 nypsi commands"
+    "description": "use 100,000 nypsi commands",
+    "prize": "nypsi_crate"
   },
   "nypsi_iv": {
     "id": "nypsi_iv",
     "name": "nypsi **IV**",
     "emoji": "<:xnypsi:819957267548864543>",
     "target": 250000,
-    "description": "use 250,000 nypsi commands"
+    "description": "use 250,000 nypsi commands",
+    "prize": "nypsi_crate"
   },
   "nypsi_v": {
     "id": "nypsi_v",
     "name": "nypsi **V**",
     "emoji": "<:xnypsi:819957267548864543>",
     "target": 500000,
-    "description": "use 500,000 nypsi commands"
+    "description": "use 500,000 nypsi commands",
+    "prize": "nypsi_crate"
   },
   "fighter_i": {
     "id": "fighter_i",
