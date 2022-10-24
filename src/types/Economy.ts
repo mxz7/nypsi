@@ -46,4 +46,5 @@ export interface AchievementData {
   emoji: string;
   target: number;
   description: string;
+  prize?: string;
 }
