@@ -454,6 +454,7 @@ export async function addTicket(member: GuildMember | string) {
 
 export async function startOpeningCrates(member: GuildMember) {
   await redis.set(`economy:crates:block:${member.user.id}`, "y");
+  await redis.expire(`economy:crates:block:${member.user.id}`, 180);
 }
 
 export async function stopOpeningCrates(member: GuildMember) {
