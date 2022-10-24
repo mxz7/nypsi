@@ -9,9 +9,12 @@ let interval: NodeJS.Timer;
 const promises: Promise<boolean>[] = [];
 
 export function listenForDms(manager: Manager) {
+  if (interval) return;
+
   interval = setInterval(async () => {
     if (active) {
       clearInterval(interval);
+      interval = null;
       return;
     }
 
