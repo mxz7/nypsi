@@ -125,7 +125,8 @@
     "sell": 20000,
     "in_crates": false,
     "craft": {
-      "ingrediants": ["gold_nugget:9"]
+      "ingrediants": ["gold_nugget:9"],
+      "time": 10
     }
   },
   "diamond": {
@@ -270,7 +271,7 @@
     "buy": 0,
     "sell": 750000,
     "craft": {
-      "time": 300,
+      "time": 600,
       "ingrediants": ["netherite_scrap:4", "gold_ingot:4"]
     },
     "in_crates": false
