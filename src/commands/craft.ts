@@ -389,7 +389,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       embeds: [
         new CustomEmbed(
           message.member,
-          `your ${amount.toLocaleString()} ${
+          `\`${amount.toLocaleString()}x\` ${selected.emoji} ${
             amount > 1 ? selected.plural || selected.name : selected.name
           } will be crafted <t:${Math.floor(craft.finished.getTime() / 1000)}:R>`
         ),
