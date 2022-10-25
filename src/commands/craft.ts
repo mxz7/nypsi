@@ -165,7 +165,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (crafting.current.length > 0) {
-      components[1] = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      components[components.length] = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder().setCustomId("prog").setLabel("currently crafting").setStyle(ButtonStyle.Success)
       );
     }
@@ -280,7 +280,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const inventory = await getInventory(message.member, false);
 
     for (const ingrediantId of selected.craft.ingrediants) {
-      const ownedAmount = inventory.find((i) => i.item == ingrediantId)?.amount || 0;
+      const ownedAmount = inventory.find((i) => i.item == ingrediantId.split(":")[0])?.amount || 0;
 
       owned.set(ingrediantId, ownedAmount);
     }
@@ -288,9 +288,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let craftable = 1e10;
 
     for (const [key, value] of owned.entries()) {
-      const needed = parseInt(selected.craft.ingrediants.find((i) => i.split(":")[0] == key)?.split(":")[1]) || -1;
+      const needed = parseInt(key.split(":")[1]);
 
-      if (needed == -1) craftable = 0;
+      // if (needed == -1) craftable = 0;
 
       const recipeAvailableToCraft = Math.floor(value / needed);
 
