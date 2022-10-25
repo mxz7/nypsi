@@ -15,6 +15,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getCraftingItems, newCraftItem } from "../utils/functions/economy/crafting";
 import { getInventory, selectItem, setInventoryItem } from "../utils/functions/economy/inventory";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
+import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("craft", "craft items", Categories.MONEY);
@@ -299,6 +300,24 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (args.length == 0) {
     return mainPage();
   } else {
+    const crafting = await getCraftingItems(message.member, false);
+
+    let max = 2;
+
+    if (await isPremium(message.member)) {
+      max += await getTier(message.member);
+    }
+
+    if (crafting.current.length >= max) {
+      return send({
+        embeds: [
+          new ErrorEmbed(
+            `you have reached your crafting slots limit (${max})${max == 2 ? " /premium to get more slots" : ""}`
+          ),
+        ],
+      });
+    }
+
     const selected = selectItem(args[0].toLowerCase());
 
     if (!selected) {
