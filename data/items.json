@@ -235,7 +235,7 @@
     "id": "ancient_debris",
     "name": "ancient debris",
     "aliases": ["debris", "ancient"],
-    "emoji": "<:nypsi_gold_ore:959444923139121223>",
+    "emoji": "<:nypsi_ancient_debris:1032256372068335647>",
     "longDesc": "can be smelted into a netherite scrap with a furnace and coal",
     "role": "ore",
     "rarity": 2,
