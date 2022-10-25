@@ -1,0 +1,233 @@
+import {
+  ActionRowBuilder,
+  BaseMessageOptions,
+  ButtonBuilder,
+  ButtonStyle,
+  CommandInteraction,
+  Interaction,
+  InteractionReplyOptions,
+  Message,
+  MessageActionRowComponentBuilder,
+  MessageEditOptions,
+} from "discord.js";
+import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { CustomEmbed } from "../models/EmbedBuilders";
+import { getCraftingItems } from "../utils/functions/economy/crafting";
+import { getInventory } from "../utils/functions/economy/inventory";
+import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+
+const cmd = new Command("craft", "craft items", Categories.MONEY);
+
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+  if (!(await userExists(message.member))) await createUser(message.member);
+
+  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
+    if (!(message instanceof Message)) {
+      if (message.deferred) {
+        await message.editReply(data);
+      } else {
+        await message.reply(data as InteractionReplyOptions);
+      }
+      const replyMsg = await message.fetchReply();
+      if (replyMsg instanceof Message) {
+        return replyMsg;
+      }
+    } else {
+      return await message.channel.send(data as BaseMessageOptions);
+    }
+  };
+
+  if (await onCooldown(cmd.name, message.member)) {
+    const embed = await getResponse(cmd.name, message.member);
+
+    return send({ embeds: [embed] });
+  }
+
+  await addCooldown(cmd.name, message.member, 10);
+
+  const items = getItems();
+  const craftableItemIds = Object.keys(items).filter((i) => items[i].craft);
+
+  const mainPage = async () => {
+    const embed = new CustomEmbed(message.member);
+    const inventory = await getInventory(message.member);
+    const crafting = await getCraftingItems(message.member);
+
+    if (crafting.completed.length > 0) {
+      const desc: string[] = [];
+
+      for (const completed of crafting.completed) {
+        desc.push(`\`${completed.amount}x\` ${items[completed.itemId].emoji} ${items[completed.itemId].name}`);
+      }
+
+      embed.addField("completed", desc.join("\n"));
+    }
+
+    const availableToCraft: string[] = [];
+
+    for (const itemId of craftableItemIds) {
+      const ingrediants = items[itemId].craft.ingrediants.map((i) => i.split(":")[0]);
+
+      let item = `${items[itemId].emoji} **${items[itemId].name}**`;
+
+      const owned = new Map<string, number>();
+      let isZero = 0;
+
+      for (const ingrediantId of ingrediants) {
+        const ownedAmount = inventory.find((i) => i.item == ingrediantId)?.amount || 0;
+
+        owned.set(ingrediantId, ownedAmount);
+
+        if (ownedAmount == 0) isZero++;
+      }
+
+      if (isZero == ingrediants.length) continue;
+
+      let craftable = 1e10;
+
+      for (const [key, value] of owned.entries()) {
+        const needed = parseInt(items[itemId].craft.ingrediants.find((i) => i.split(":")[0] == key).split(":")[1]);
+
+        item += `\n - ${value.toLocaleString()} / ${needed}`;
+
+        const recipeAvailableToCraft = value / needed;
+
+        if (recipeAvailableToCraft < craftable) craftable = recipeAvailableToCraft;
+      }
+
+      if (craftable != 0) {
+        item += `\n${craftable.toLocaleString()} craftable`;
+      }
+
+      availableToCraft.push(item);
+    }
+
+    const pages = new Map<number, string[]>();
+
+    if (availableToCraft.length == 0) {
+      availableToCraft.push("you can not currently craft anything. collect more items to discover craftable items");
+    }
+
+    const doPages = (): void => {
+      pages.set(pages.size + 1, availableToCraft.splice(0, 5));
+
+      if (availableToCraft.length > 5) {
+        return doPages();
+      } else if (availableToCraft.length > 0) {
+        pages.set(pages.size + 1, availableToCraft);
+      }
+    };
+    doPages();
+
+    embed.setDescription(pages.get(1).join("\n\n"));
+
+    const components = [new ActionRowBuilder<MessageActionRowComponentBuilder>()];
+
+    if (pages.size > 1) {
+      components[0].addComponents(
+        new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
+        new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
+      );
+
+      embed.setFooter({ text: `1/${pages.size}` });
+    }
+
+    if (crafting.current.length > 0) {
+      components[1] = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder().setCustomId("prog").setLabel("progress").setStyle(ButtonStyle.Success)
+      );
+    }
+
+    let msg: Message;
+
+    if (components[0].components.length > 0 || components[1]) {
+      msg = await send({ embeds: [embed], components });
+    } else {
+      return send({ embeds: [embed] });
+    }
+
+    const filter = (i: Interaction) => i.user.id == message.author.id;
+
+    let currentPage = 1;
+
+    const pageManager = async (): Promise<void> => {
+      const reaction = await msg
+        .awaitMessageComponent({ filter, time: 30000 })
+        .then(async (collected) => {
+          await collected.deferUpdate();
+          return collected;
+        })
+        .catch(async () => {
+          const edit = async (data: MessageEditOptions) => {
+            if (!(message instanceof Message)) {
+              await message.editReply(data);
+              return await message.fetchReply();
+            } else {
+              return await msg.edit(data);
+            }
+          };
+          await edit({ components: [] }).catch(() => {});
+        });
+
+      if (!reaction) return;
+      if (!reaction.isButton()) return;
+
+      if (reaction.customId == "⬅") {
+        if (currentPage <= 1) {
+          return pageManager();
+        } else {
+          currentPage--;
+
+          embed.setDescription(pages.get(currentPage).join("\n\n"));
+          embed.setFooter({ text: "page " + currentPage + "/" + pages.size });
+
+          if (currentPage == 1) {
+            components[0].setComponents(
+              new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
+              new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(false)
+            );
+          } else {
+            components[0].setComponents(
+              new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(false),
+              new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(false)
+            );
+          }
+          await reaction.message.edit({ embeds: [embed], components });
+          return pageManager();
+        }
+      } else if (reaction.customId == "➡") {
+        if (currentPage >= pages.size) {
+          return pageManager();
+        } else {
+          currentPage++;
+
+          embed.setDescription(pages.get(currentPage).join("\n\n"));
+          embed.setFooter({ text: "page " + currentPage + "/" + pages.size });
+          if (currentPage == pages.size) {
+            components[0].setComponents(
+              new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(false),
+              new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(true)
+            );
+          } else {
+            components[0].setComponents(
+              new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(false),
+              new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(false)
+            );
+          }
+          await reaction.message.edit({ embeds: [embed], components });
+          return pageManager();
+        }
+      }
+    };
+    return pageManager();
+  };
+
+  if (args.length == 0) {
+    return mainPage();
+  }
+}
+
+cmd.setRun(run);
+
+module.exports = cmd;
