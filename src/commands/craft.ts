@@ -171,10 +171,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       availableToCraft.push("you can not currently craft anything. collect more items to discover craftable items");
     }
 
-    const doPages = (): void => {
-      pages.set(pages.size + 1, availableToCraft.splice(0, 5));
+    const PER_PAGE = 4;
 
-      if (availableToCraft.length > 5) {
+    const doPages = (): void => {
+      pages.set(pages.size + 1, availableToCraft.splice(0, PER_PAGE));
+
+      if (availableToCraft.length > PER_PAGE) {
         return doPages();
       } else if (availableToCraft.length > 0) {
         pages.set(pages.size + 1, availableToCraft);
