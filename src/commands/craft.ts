@@ -288,7 +288,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let craftable = 1e10;
 
     for (const [key, value] of owned.entries()) {
-      const needed = parseInt(selected.craft.ingrediants.find((i) => i.split(":")[0] == key).split(":")[1]);
+      const needed = parseInt(selected.craft.ingrediants.find((i) => i.split(":")[0] == key)?.split(":")[1]) || -1;
+
+      if (needed == -1) craftable = 0;
 
       const recipeAvailableToCraft = Math.floor(value / needed);
 
