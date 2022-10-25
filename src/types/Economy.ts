@@ -26,6 +26,7 @@ export interface Item {
     ingrediants: string[]; // format: item_id:amount
     time: string; // seconds
   };
+  in_crates: boolean;
 }
 
 export interface LotteryTicket {
