@@ -159,7 +159,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (chosenArea == "nether") {
           if (!["netherrack", "ancient_debris", "quartz", "gold_nugget"].includes(items[i].id)) continue;
         } else {
-          if (!["cobblestone", "coal", "diamond", "amethyst", "emerald"].includes(items[i].id) && items[i].role != "ore")
+          if (!["cobblestone", "coal", "diamond", "amethyst", "emerald", "iron_ore", "gold_ore"].includes(items[i].id))
             continue;
         }
 
