@@ -42,7 +42,7 @@ async function doDmQueueInterval(manager: Manager): Promise<void> {
   const item = JSON.parse(await redis.rpop(Constants.redis.nypsi.DM_QUEUE));
 
   if (!item) {
-    console.log(await redis.llen(Constants.redis.nypsi.DM_QUEUE));
+    logger.info(await redis.llen(Constants.redis.nypsi.DM_QUEUE));
   }
 
   promises.push(
