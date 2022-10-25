@@ -41,5 +41,5 @@ async function checkCraftItems() {
 }
 
 export function runCraftItemsJob() {
-  setInterval(checkCraftItems, 60000);
+  setInterval(checkCraftItems, 300_000);
 }
