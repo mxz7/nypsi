@@ -242,7 +242,7 @@
     "emoji": "<:nypsi_ancient_debris:1032256372068335647>",
     "longDesc": "can be smelted into a netherite scrap with a furnace and coal",
     "role": "ore",
-    "rarity": 2,
+    "rarity": 3,
     "ingot": "netherite_scrap",
     "buy": 0,
     "sell": 75000,
