@@ -1360,6 +1360,7 @@
       "ingrediants": ["obsidian:14"],
       "time": 1800
     },
-    "in_crates": false
+    "in_crates": false,
+    "aliases": ["portal"]
   }
 }
