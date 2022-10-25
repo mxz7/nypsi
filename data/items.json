@@ -126,7 +126,7 @@
     "in_crates": false,
     "craft": {
       "ingrediants": ["gold_nugget:9"],
-      "time": 10
+      "time": 60
     }
   },
   "diamond": {
