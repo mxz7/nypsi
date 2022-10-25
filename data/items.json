@@ -196,7 +196,7 @@
     "emoji": "<:nypsi_diamond_pickaxe:959442215736844368>",
     "longDesc": "allows you to mine",
     "role": "tool",
-    "rarity": 3,
+    "rarity": 2,
     "buy": 0,
     "sell": 10000
   },
@@ -226,7 +226,7 @@
     "emoji": "🎣",
     "longDesc": "allows you to fish with amazing luck",
     "role": "tool",
-    "rarity": 3,
+    "rarity": 2,
     "buy": 0,
     "sell": 10000
   },
