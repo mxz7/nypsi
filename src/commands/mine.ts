@@ -147,6 +147,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   chosenArea = choseArea();
 
+  if (chosenArea == "nether") await addItemUse(message.member, "nether_portal");
+
   const foundItems = [];
 
   let foundItemsAmount = 0;

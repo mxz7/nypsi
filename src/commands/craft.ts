@@ -14,6 +14,7 @@ import { Categories, Command, NypsiCommandInteraction } from "../models/Command"
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getCraftingItems, newCraftItem } from "../utils/functions/economy/crafting";
 import { getInventory, selectItem, setInventoryItem } from "../utils/functions/economy/inventory";
+import { addItemUse } from "../utils/functions/economy/stats";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -371,17 +372,27 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return send({ embeds: [new ErrorEmbed(`you can only craft ${craftable.toLocaleString()} ${selected.name}`)] });
     }
 
+    const promises: Promise<any>[] = [];
+
     for (const ingrediant of selected.craft.ingrediants) {
       const item = ingrediant.split(":")[0];
       const ingrediantAmount = parseInt(ingrediant.split(":")[1]);
 
-      await setInventoryItem(
-        message.member,
-        item,
-        inventory.find((i) => i.item == item).amount - amount * ingrediantAmount,
-        false
+      promises.push(
+        setInventoryItem(
+          message.member,
+          item,
+          inventory.find((i) => i.item == item).amount - amount * ingrediantAmount,
+          false
+        )
       );
+
+      for (let i = 0; i < amount; i++) {
+        promises.push(addItemUse(message.member, item));
+      }
     }
+
+    await Promise.all(promises);
 
     const craft = await newCraftItem(message.member, selected.id, amount);
 
