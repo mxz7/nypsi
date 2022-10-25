@@ -168,8 +168,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         if (items[i].rarity == 4) {
-          const chance = Math.floor(Math.random() * 5);
-          if (chance == 4 && pickaxe == "diamond_pickaxe") {
+          const chance = Math.floor(Math.random() * 3);
+          if (chance == 1 && pickaxe == "diamond_pickaxe") {
             for (let x = 0; x < 5; x++) {
               mineItemsModified.push(i);
             }
