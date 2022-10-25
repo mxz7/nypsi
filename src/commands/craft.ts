@@ -14,7 +14,7 @@ import { Categories, Command, NypsiCommandInteraction } from "../models/Command"
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getCraftingItems, newCraftItem } from "../utils/functions/economy/crafting";
 import { getInventory, selectItem, setInventoryItem } from "../utils/functions/economy/inventory";
-import { createUser, formatBet, getItems, userExists } from "../utils/functions/economy/utils";
+import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("craft", "craft items", Categories.MONEY);
@@ -335,7 +335,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let amount = 1;
 
     if (args[1]) {
-      amount = (await formatBet(args[1], message.member)) || 1;
+      if (args[1].toLowerCase() == "all") {
+        amount = craftable;
+      } else {
+        amount = parseInt(args[1]);
+      }
+    }
+
+    if (!amount || amount < 1) {
+      return send({ embeds: [new ErrorEmbed("invalid amount")] });
     }
 
     if (amount > craftable) {
