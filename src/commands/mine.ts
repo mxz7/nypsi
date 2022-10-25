@@ -221,17 +221,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     foundItemsAmount += amount;
   }
 
-  const embed = new CustomEmbed(
-    message.member,
-    `you go to the ${[Math.floor(Math.random() * 4)]} and swing your **${items[pickaxe].name}**`
-  );
+  const embed = new CustomEmbed(message.member, `you go to the ${chosenArea} and swing your **${items[pickaxe].name}**`);
 
   const msg = await send({ embeds: [embed] });
 
   embed.setDescription(
-    `you go to the ${
-      ["cave", "strip mine", "1x1 hole you dug", "staircase to bedrock"][Math.floor(Math.random() * 4)]
-    } and swing your **${items[pickaxe].name}**\n\nyou found${
+    `you go to the ${chosenArea} and swing your **${items[pickaxe].name}**\n\nyou found${
       foundItems.length > 0 ? `: \n - ${foundItems.join("\n - ")}` : " **nothing**"
     }`
   );
