@@ -4,7 +4,7 @@ import prisma from "../../../init/database";
 import { addInventoryItem } from "./inventory";
 import { getItems } from "./utils";
 
-export async function getCraftingItems(member: GuildMember | string) {
+export async function getCraftingItems(member: GuildMember | string, deleteOld = true) {
   let id: string;
   if (member instanceof GuildMember) {
     id = member.user.id;
@@ -26,18 +26,20 @@ export async function getCraftingItems(member: GuildMember | string) {
 
   const completed: { itemId: string; amount: number; finished: Date }[] = [];
 
-  for (const item of query) {
-    if (item.finished.getTime() < Date.now()) {
-      completed.push(item);
-      query.splice(query.indexOf(item), 1);
+  if (deleteOld) {
+    for (const item of query) {
+      if (item.finished.getTime() < Date.now()) {
+        completed.push(item);
+        query.splice(query.indexOf(item), 1);
 
-      await prisma.crafting.delete({
-        where: {
-          id: item.id,
-        },
-      });
+        await prisma.crafting.delete({
+          where: {
+            id: item.id,
+          },
+        });
 
-      await addInventoryItem(id, item.itemId, item.amount);
+        await addInventoryItem(id, item.itemId, item.amount);
+      }
     }
   }
 
