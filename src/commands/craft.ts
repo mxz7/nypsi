@@ -49,7 +49,33 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const items = getItems();
   const craftableItemIds = Object.keys(items).filter((i) => items[i].craft);
 
-  const mainPage = async () => {
+  const craftingPage = async (msg: Message) => {
+    const { current: crafting } = await getCraftingItems(message.member);
+
+    const embed = new CustomEmbed(message.member).setHeader("currently crafting", message.author.avatarURL());
+
+    const desc: string[] = [];
+
+    for (const craftingItem of crafting) {
+      desc.push(
+        `\`${craftingItem.amount.toLocaleString()}x\` ${items[craftingItem.itemId].emoji} ${
+          items[craftingItem.itemId].name
+        } finished <t:${Math.floor(craftingItem.finished.getTime() / 1000)}:R>`
+      );
+    }
+
+    embed.setDescription(desc.join("\n"));
+
+    const components = [
+      new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder().setCustomId("bck").setLabel("back").setStyle(ButtonStyle.Primary)
+      ),
+    ];
+
+    return msg.edit({ embeds: [embed], components });
+  };
+
+  const mainPage = async (msg?: Message) => {
     const embed = new CustomEmbed(message.member).setHeader("craft", message.author.avatarURL());
     const inventory = await getInventory(message.member);
     const crafting = await getCraftingItems(message.member);
@@ -135,16 +161,22 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (crafting.current.length > 0) {
       components[1] = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder().setCustomId("prog").setLabel("progress").setStyle(ButtonStyle.Success)
+        new ButtonBuilder().setCustomId("prog").setLabel("currently crafting").setStyle(ButtonStyle.Success)
       );
     }
 
-    let msg: Message;
-
-    if (components[0].components.length > 0 || components[1]) {
-      msg = await send({ embeds: [embed], components });
+    if (msg) {
+      if (components[0].components.length > 0 || components[1]) {
+        msg = await msg.edit({ embeds: [embed], components });
+      } else {
+        return msg.edit({ embeds: [embed] });
+      }
     } else {
-      return send({ embeds: [embed] });
+      if (components[0].components.length > 0 || components[1]) {
+        msg = await send({ embeds: [embed], components });
+      } else {
+        return send({ embeds: [embed] });
+      }
     }
 
     const filter = (i: Interaction) => i.user.id == message.author.id;
@@ -218,6 +250,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           await reaction.message.edit({ embeds: [embed], components });
           return pageManager();
         }
+      } else if (reaction.customId == "prog") {
+        craftingPage(msg);
+        return;
       }
     };
     return pageManager();
