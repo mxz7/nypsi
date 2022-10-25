@@ -1,6 +1,5 @@
 import prisma from "../../init/database";
 import { CustomEmbed } from "../../models/EmbedBuilders";
-import { NotificationPayload } from "../../types/Notification";
 import Constants from "../../utils/Constants";
 import { addInventoryItem } from "../../utils/functions/economy/inventory";
 import { getItems } from "../../utils/functions/economy/utils";
@@ -23,7 +22,7 @@ async function checkCraftItems() {
     await addInventoryItem(item.userId, item.itemId, item.amount, false);
 
     if ((await getDmSettings(item.userId)).other) {
-      const payload: NotificationPayload = {
+      await addNotificationToQueue({
         memberId: item.userId,
         payload: {
           content: `you have finished crafting ${item.amount} ${getItems()[item.itemId].emoji} ${
@@ -33,9 +32,7 @@ async function checkCraftItems() {
             .setDescription(`\`${item.amount}x\` ${getItems()[item.itemId].emoji} ${getItems()[item.itemId].name}`)
             .setColor(Constants.TRANSPARENT_EMBED_COLOR),
         },
-      };
-
-      await addNotificationToQueue(payload);
+      });
     }
   }
 }
