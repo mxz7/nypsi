@@ -50,7 +50,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const craftableItemIds = Object.keys(items).filter((i) => items[i].craft);
 
   const mainPage = async () => {
-    const embed = new CustomEmbed(message.member);
+    const embed = new CustomEmbed(message.member).setHeader("craft", message.author.avatarURL());
     const inventory = await getInventory(message.member);
     const crafting = await getCraftingItems(message.member);
 
@@ -89,9 +89,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       for (const [key, value] of owned.entries()) {
         const needed = parseInt(items[itemId].craft.ingrediants.find((i) => i.split(":")[0] == key).split(":")[1]);
 
-        item += `\n - ${value.toLocaleString()} / ${needed}`;
+        item += `\n - ${items[key].emoji} ${items[key].name} \`${value.toLocaleString()} / ${needed}\``;
 
-        const recipeAvailableToCraft = value / needed;
+        const recipeAvailableToCraft = Math.floor(value / needed);
 
         if (recipeAvailableToCraft < craftable) craftable = recipeAvailableToCraft;
       }
