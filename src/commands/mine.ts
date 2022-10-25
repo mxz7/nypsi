@@ -159,12 +159,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (chosenArea == "nether") {
           if (!["netherrack", "ancient_debris", "quartz", "gold_nugget"].includes(items[i].id)) continue;
         } else {
-          if (!["cobblestone", "coal", "diamond", "amethyst", "emerald", "iron_ore", "gold_ore"].includes(items[i].id))
+          if (
+            !["cobblestone", "coal", "diamond", "amethyst", "emerald", "iron_ore", "gold_ore", "obsidian"].includes(
+              items[i].id
+            )
+          )
             continue;
         }
 
         if (items[i].rarity == 4) {
-          const chance = Math.floor(Math.random() * 15);
+          const chance = Math.floor(Math.random() * 5);
           if (chance == 4 && pickaxe == "diamond_pickaxe") {
             for (let x = 0; x < 5; x++) {
               mineItemsModified.push(i);
