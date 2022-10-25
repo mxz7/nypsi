@@ -11,10 +11,10 @@ import {
   MessageEditOptions,
 } from "discord.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
-import { CustomEmbed } from "../models/EmbedBuilders";
-import { getCraftingItems } from "../utils/functions/economy/crafting";
-import { getInventory } from "../utils/functions/economy/inventory";
-import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import { getCraftingItems, newCraftItem } from "../utils/functions/economy/crafting";
+import { getInventory, selectItem, setInventoryItem } from "../utils/functions/economy/inventory";
+import { createUser, formatBet, getItems, userExists } from "../utils/functions/economy/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("craft", "craft items", Categories.MONEY);
@@ -260,6 +260,74 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (args.length == 0) {
     return mainPage();
+  } else {
+    const selected = selectItem(args[0].toLowerCase());
+
+    if (!selected) {
+      return send({ embeds: [new ErrorEmbed(`couldnt find \`${args[0].toLowerCase()}\``)] });
+    }
+
+    if (!selected.craft) {
+      return send({ embeds: [new ErrorEmbed("you cannot craft that item")] });
+    }
+
+    const owned = new Map<string, number>();
+    const inventory = await getInventory(message.member, false);
+
+    for (const ingrediantId of selected.craft.ingrediants) {
+      const ownedAmount = inventory.find((i) => i.item == ingrediantId)?.amount || 0;
+
+      owned.set(ingrediantId, ownedAmount);
+    }
+
+    let craftable = 1e10;
+
+    for (const [key, value] of owned.entries()) {
+      const needed = parseInt(selected.craft.ingrediants.find((i) => i.split(":")[0] == key).split(":")[1]);
+
+      const recipeAvailableToCraft = Math.floor(value / needed);
+
+      if (recipeAvailableToCraft < craftable) craftable = recipeAvailableToCraft;
+    }
+
+    if (craftable == 0) {
+      return send({ embeds: [new ErrorEmbed("you cant craft any of this item")] });
+    }
+
+    let amount = 1;
+
+    if (args[1]) {
+      amount = (await formatBet(args[1], message.member)) || 1;
+    }
+
+    if (amount > craftable) {
+      return send({ embeds: [new ErrorEmbed(`you can only craft ${craftable.toLocaleString()} ${selected.name}`)] });
+    }
+
+    for (const ingrediant of selected.craft.ingrediants) {
+      const item = ingrediant.split(":")[0];
+      const ingrediantAmount = parseInt(ingrediant.split(":")[1]);
+
+      await setInventoryItem(
+        message.member,
+        item,
+        inventory.find((i) => i.item == item).amount - amount * ingrediantAmount,
+        false
+      );
+    }
+
+    const craft = await newCraftItem(message.member, selected.id, amount);
+
+    return send({
+      embeds: [
+        new CustomEmbed(
+          message.member,
+          `your ${amount.toLocaleString()} ${
+            amount > 1 ? selected.plural || selected.name : selected.name
+          } will be crafted <t:${Math.floor(craft.finished.getTime() / 1000)}:R>`
+        ),
+      ],
+    });
   }
 }
 
