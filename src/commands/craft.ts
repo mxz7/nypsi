@@ -19,6 +19,11 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 
 const cmd = new Command("craft", "craft items", Categories.MONEY);
 
+cmd.slashEnabled = true;
+cmd.slashData
+  .addStringOption((option) => option.setName("craft-item").setAutocomplete(true).setDescription("item to craft"))
+  .addStringOption((option) => option.setName("amount").setDescription("amount of item you want to craft"));
+
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (!(await userExists(message.member))) await createUser(message.member);
 
