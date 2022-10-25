@@ -167,6 +167,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             continue;
         }
 
+        if (items[i].id == "ancient_debris" && pickaxe != "diamond_pickaxe") continue;
+
         if (items[i].rarity == 4) {
           const chance = Math.floor(Math.random() * 3);
           if (chance == 1 && pickaxe == "diamond_pickaxe") {
@@ -181,7 +183,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             if (pickaxe == "diamond_pickaxe") mineItemsModified.push(i);
           }
         } else if (items[i].rarity == 2 && pickaxe != "wooden_pickaxe") {
-          if (items[i].id == "ancient_debris" && pickaxe != "diamond_pickaxe") continue;
           for (let x = 0; x < 15; x++) {
             mineItemsModified.push(i);
           }
