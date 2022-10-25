@@ -70,6 +70,16 @@
     "buy": 0,
     "sell": 1000
   },
+  "netherrack": {
+    "id": "netherrack",
+    "name": "netherrack",
+    "emoji": "<:nypsi_netherrack:1034510405101432963>",
+    "longDesc": "found when mining in the nether",
+    "role": "sellable",
+    "rarity": 0,
+    "buy": 0,
+    "sell": 15000
+  },
   "coal": {
     "id": "coal",
     "name": "coal",
@@ -115,6 +125,16 @@
     "buy": 0,
     "sell": 50000
   },
+  "obsidian": {
+    "id": "obsidian",
+    "name": "obsidian",
+    "emoji": "<:nypsi_obsidian:1034510054008823849>",
+    "longDesc": "found when mining and used to craft a nether portal",
+    "role": "resource",
+    "rarity": 4,
+    "buy": 0,
+    "sell": 75000
+  },
   "emerald": {
     "id": "emerald",
     "name": "emerald",
@@ -159,6 +179,27 @@
     "buy": 0,
     "sell": 200
   },
+  "gold_nugget": {
+    "id": "gold_nugget",
+    "name": "gold nugget",
+    "aliases": ["nugget"],
+    "emoji": "<:nypsi_goldn:1034512597153742898>",
+    "longDesc": "can be crafted into a gold ingot or sold as is",
+    "role": "sellable",
+    "rarity": 1,
+    "buy": 0,
+    "sell": 2000
+  },
+  "quartz": {
+    "id": "quartz",
+    "name": "quartz",
+    "emoji": "<:nypsi_quartz:1034514057455222875>",
+    "longDesc": "found when mining in the nether",
+    "role": "sellable",
+    "rarity": 1,
+    "buy": 0,
+    "sell": 5000
+  },
   "gold_ore": {
     "id": "gold_ore",
     "name": "gold ore",
@@ -169,6 +210,44 @@
     "ingot": "gold_ingot",
     "buy": 0,
     "sell": 300
+  },
+  "ancient_debris": {
+    "id": "ancient_debris",
+    "name": "ancient debris",
+    "aliases": ["debris", "ancient"],
+    "emoji": "<:nypsi_gold_ore:959444923139121223>",
+    "longDesc": "can be smelted into a netherite scrap with a furnace and coal",
+    "role": "ore",
+    "rarity": 2,
+    "ingot": "netherite_scrap",
+    "buy": 0,
+    "sell": 75000
+  },
+  "netherite_scrap": {
+    "id": "netherite_scrap",
+    "name": "netherite scrap",
+    "aliases": ["scrap"],
+    "emoji": "<:nypsi_gold_ore:959444923139121223>",
+    "longDesc": "can be crafted into a netherite ingot",
+    "role": "resource",
+    "rarity": 3,
+    "buy": 0,
+    "sell": 100000
+  },
+  "netherite_ingot": {
+    "id": "netherite_ingot",
+    "name": "netherite ingot",
+    "aliases": ["netherite"],
+    "emoji": "<:nypsi_gold_ore:959444923139121223>",
+    "longDesc": "can be crafted into a netherite ingot",
+    "role": "sellable",
+    "rarity": 69,
+    "buy": 0,
+    "sell": 750000,
+    "craft": {
+      "time": 300,
+      "ingrediants": ["netherite_scrap:4", "gold_ingot:4"]
+    }
   },
   "wooden_pickaxe": {
     "id": "wooden_pickaxe",
@@ -1162,6 +1241,20 @@
       "boosts": ["xp"],
       "effect": 1,
       "time": 43200
+    }
+  },
+  "nether_portal": {
+    "id": "nether_portal",
+    "name": "nether_portal",
+    "emoji": "<:nypsi_portal:1034509723749322843>",
+    "longDesc": "used to enter the nether when mining",
+    "role": "item",
+    "rarity": 69,
+    "buy": 0,
+    "sell": 1000000,
+    "craft": {
+      "ingrediants": ["obsidian:14"],
+      "time": 1800
     }
   }
 }
