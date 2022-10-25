@@ -77,7 +77,38 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       ),
     ];
 
-    return msg.edit({ embeds: [embed], components });
+    msg = await msg.edit({ embeds: [embed], components });
+
+    const filter = (i: Interaction) => i.user.id == message.author.id;
+
+    const pageManager = async (): Promise<void> => {
+      const reaction = await msg
+        .awaitMessageComponent({ filter, time: 30000 })
+        .then(async (collected) => {
+          await collected.deferUpdate();
+          return collected;
+        })
+        .catch(async () => {
+          const edit = async (data: MessageEditOptions) => {
+            if (!(message instanceof Message)) {
+              await message.editReply(data);
+              return await message.fetchReply();
+            } else {
+              return await msg.edit(data);
+            }
+          };
+          await edit({ components: [] }).catch(() => {});
+        });
+
+      if (!reaction) return;
+      if (!reaction.isButton()) return;
+
+      if (reaction.customId == "bck") {
+        mainPage(msg);
+        return;
+      }
+    };
+    return pageManager();
   };
 
   const mainPage = async (msg?: Message) => {
@@ -165,7 +196,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (crafting.current.length > 0) {
-      components[components.length] = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      components[pages.size > 1 ? 1 : 0] = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder().setCustomId("prog").setLabel("currently crafting").setStyle(ButtonStyle.Success)
       );
     }
