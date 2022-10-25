@@ -313,7 +313,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return send({
         embeds: [
           new ErrorEmbed(
-            `you have reached your crafting slots limit (${max})${max == 2 ? " /premium to get more slots" : ""}`
+            `you have reached your crafting slots limit (${max})${
+              max == 2 ? "\n\nyou can upgrade this with premium membership (`/premium`)" : ""
+            }`
           ),
         ],
       });
