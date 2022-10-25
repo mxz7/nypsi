@@ -1,6 +1,7 @@
 import prisma from "../../init/database";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 import { NotificationPayload } from "../../types/Notification";
+import Constants from "../../utils/Constants";
 import { addInventoryItem } from "../../utils/functions/economy/inventory";
 import { getItems } from "../../utils/functions/economy/utils";
 import { addNotificationToQueue, getDmSettings } from "../../utils/functions/users/notifications";
@@ -28,9 +29,9 @@ async function checkCraftItems() {
           content: `you have finished crafting ${item.amount} ${getItems()[item.itemId].emoji} ${
             getItems()[item.itemId].name
           }`,
-          embed: new CustomEmbed().setDescription(
-            `\`${item.amount}x\` ${getItems()[item.itemId].emoji} ${getItems()[item.itemId].name}`
-          ),
+          embed: new CustomEmbed()
+            .setDescription(`\`${item.amount}x\` ${getItems()[item.itemId].emoji} ${getItems()[item.itemId].name}`)
+            .setColor(Constants.TRANSPARENT_EMBED_COLOR),
         },
       };
 
