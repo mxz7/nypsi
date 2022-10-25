@@ -24,7 +24,7 @@ export interface Item {
   plural?: string;
   craft?: {
     ingrediants: string[]; // format: item_id:amount
-    time: string; // seconds
+    time: number; // seconds
   };
   in_crates: boolean;
 }
