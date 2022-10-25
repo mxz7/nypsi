@@ -205,13 +205,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       if (components[0].components.length > 0 || components[1]) {
         msg = await msg.edit({ embeds: [embed], components });
       } else {
-        return msg.edit({ embeds: [embed] });
+        return msg.edit({ embeds: [embed], components: [] });
       }
     } else {
       if (components[0].components.length > 0 || components[1]) {
         msg = await send({ embeds: [embed], components });
       } else {
-        return send({ embeds: [embed] });
+        return send({ embeds: [embed], components: [] });
       }
     }
 
