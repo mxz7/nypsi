@@ -191,12 +191,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             mineItemsModified.push(i);
           }
         } else if (items[i].rarity == 0) {
-          if (pickaxe == "diamond_pickaxe") {
+          if (pickaxe == "diamond_pickaxe" && chosenArea != "nether") {
             for (let x = 0; x < 7; x++) {
               mineItemsModified.push(i);
             }
           } else {
-            for (let x = 0; x < 20; x++) {
+            for (let x = 0; x < 50; x++) {
               mineItemsModified.push(i);
             }
           }
