@@ -16,6 +16,11 @@ veins.set("iron_ore", [1, 3, 7]);
 veins.set("gold_ore", [1, 2, 4]);
 veins.set("diamond", [1, 2]);
 veins.set("amethyst", [1, 2, 3]);
+veins.set("netherrack", [5, 7, 15, 25]);
+veins.set("gold_nugget", [2, 8, 12, 18, 28]);
+veins.set("quartz", [1, 4, 6, 12]);
+
+const areas = ["cave", "strip mine", "1x1 hole you dug", "staircase to bedrock", "nether", "nether", "nether"];
 
 const cmd = new Command("mine", "go to a cave and mine", Categories.MONEY).setDocs(
   "https://docs.nypsi.xyz/economy/minecraft"
@@ -123,6 +128,25 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     await setInventoryItem(message.member, pickaxe, inventory.find((i) => i.item == pickaxe).amount - 1, false);
   }
 
+  let chosenArea: string;
+
+  const choseArea = (): string => {
+    chosenArea = areas[Math.floor(Math.random() * areas.length)];
+
+    if (chosenArea == "nether") {
+      if (
+        !inventory.find((i) => i.item == "nether_portal") ||
+        inventory.find((i) => i.item == "nether_portal").amount == 0
+      ) {
+        return choseArea();
+      }
+    }
+
+    return chosenArea;
+  };
+
+  chosenArea = choseArea();
+
   const foundItems = [];
 
   let foundItemsAmount = 0;
@@ -132,8 +156,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     for (const i of mineItems) {
       if (items[i]) {
-        if (!["cobblestone", "coal", "diamond", "amethyst", "emerald"].includes(items[i].id) && items[i].role != "ore")
-          continue;
+        if (chosenArea == "nether") {
+          if (!["netherrack", "ancient_debris", "quartz", "gold_nugget"].includes(items[i].id)) continue;
+        } else {
+          if (!["cobblestone", "coal", "diamond", "amethyst", "emerald"].includes(items[i].id) && items[i].role != "ore")
+            continue;
+        }
+
         if (items[i].rarity == 4) {
           const chance = Math.floor(Math.random() * 15);
           if (chance == 4 && pickaxe == "diamond_pickaxe") {
@@ -148,6 +177,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             if (pickaxe == "diamond_pickaxe") mineItemsModified.push(i);
           }
         } else if (items[i].rarity == 2 && pickaxe != "wooden_pickaxe") {
+          if (items[i].id == "ancient_debris" && pickaxe != "diamond_pickaxe") continue;
           for (let x = 0; x < 15; x++) {
             mineItemsModified.push(i);
           }
@@ -193,9 +223,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const embed = new CustomEmbed(
     message.member,
-    `you go to the ${
-      ["cave", "strip mine", "1x1 hole you dug", "staircase to bedrock"][Math.floor(Math.random() * 4)]
-    } and swing your **${items[pickaxe].name}**`
+    `you go to the ${[Math.floor(Math.random() * 4)]} and swing your **${items[pickaxe].name}**`
   );
 
   const msg = await send({ embeds: [embed] });
