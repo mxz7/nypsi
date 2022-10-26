@@ -1,0 +1,32 @@
+dependencies:
+  - any: ["package.json", "package-lock.json"]
+
+build:
+  - any: ["tsconfig.json"]
+
+ci:
+  - any: ["github/**"]
+
+economy:
+  - any: ["src/utils/functions/economy/**"]
+
+chatreaction:
+  - any: ["src/utils/functions/chatreactions/**"]
+
+guild:
+  - any: ["src/utils/functions/guilds/**"]
+
+karma:
+  - any: ["src/utils/functions/karma/**"]
+
+moderation:
+  - any: ["src/utils/functions/moderation/**"]
+
+premium:
+  - any: ["src/utils/functions/premium/**"]
+
+users:
+  - any: ["src/utils/functions/users/**"]
+
+scheduled:
+  - any: ["src/utils/scheduled/**"]
