@@ -30,3 +30,6 @@ users:
 
 scheduled:
   - any: ["src/scheduled/**"]
+
+commands: 
+  - any: ["src/commands/**"]
