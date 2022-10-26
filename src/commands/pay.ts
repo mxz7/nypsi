@@ -109,7 +109,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     await addToNypsiBank(amount);
 
     return send({
-      embeds: [new CustomEmbed(message.member, `thank you for your donation of ${amount.toLocaleString()} 🙂`)],
+      embeds: [new CustomEmbed(message.member, `thank you for your donation of $${amount.toLocaleString()} 🙂`)],
     });
   }
 

@@ -24,7 +24,7 @@ export function listenForDms(manager: Manager) {
       logger.debug("executing dm queue...");
       doDmQueueInterval(manager);
     }
-  }, 10_000);
+  }, 5_000);
 }
 
 async function doDmQueueInterval(manager: Manager): Promise<void> {
