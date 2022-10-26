@@ -149,24 +149,26 @@ export function getTimestamp(): string {
   return timestamp;
 }
 
-export async function getWebhooks(client: Client) {
-  if (client.user.id != "678711738845102087") return;
+export async function getWebhooks(client?: Client) {
+  if (client && client.user.id != "678711738845102087") return;
 
-  webhook.set(
-    "pay",
-    new WebhookClient({
-      url: process.env.PAYMENTS_HOOK,
-    })
-  );
+  if (client) {
+    webhook.set(
+      "pay",
+      new WebhookClient({
+        url: process.env.PAYMENTS_HOOK,
+      })
+    );
 
-  webhook.set(
-    "gamble",
-    new WebhookClient({
-      url: process.env.GAMBLE_HOOK,
-    })
-  );
+    webhook.set(
+      "gamble",
+      new WebhookClient({
+        url: process.env.GAMBLE_HOOK,
+      })
+    );
 
-  runLogs();
+    runLogs();
+  }
 
   logger.add(
     new DiscordTransport({
