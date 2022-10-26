@@ -33,3 +33,6 @@ scheduled:
 
 commands: 
   - any: ["src/commands/**"]
+
+schema: 
+  - any: ["prisma/schema.prisma"]
