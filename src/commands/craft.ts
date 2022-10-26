@@ -345,8 +345,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     for (const [key, value] of owned.entries()) {
       const needed = parseInt(key.split(":")[1]);
 
-      // if (needed == -1) craftable = 0;
-
       const recipeAvailableToCraft = Math.floor(value / needed);
 
       if (recipeAvailableToCraft < craftable) craftable = recipeAvailableToCraft;
