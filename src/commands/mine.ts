@@ -169,7 +169,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             continue;
         }
 
-        if (items[i].id == "ancient_debris" && pickaxe != "diamond_pickaxe") continue;
+        if (items[i].id == "ancient_debris") {
+          if (pickaxe != "diamond_pickaxe") continue;
+
+          const chance = Math.floor(Math.random() * 6);
+
+          if (chance != 3) continue;
+        }
 
         if (items[i].rarity == 4) {
           const chance = Math.floor(Math.random() * 3);
