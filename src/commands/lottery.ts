@@ -2,12 +2,10 @@ import dayjs = require("dayjs");
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import Constants from "../utils/Constants";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
-import { getPrestige } from "../utils/functions/economy/prestige";
 import { addTicket, createUser, getTickets, lotteryTicketPrice, userExists } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
-import { getKarma } from "../utils/functions/karma/karma";
-import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("lottery", "enter the weekly lottery draw", Categories.MONEY).setAliases(["lotto"]);
@@ -26,16 +24,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (!(await userExists(message.member))) await createUser(message.member);
 
   const tickets = await getTickets(message.member);
-
-  const prestigeBonus = Math.floor(
-    ((await getPrestige(message.member)) > 10 ? 10 : await getPrestige(message.member)) / 2.5
-  );
-  const premiumBonus = Math.floor((await isPremium(message.member)) ? await getTier(message.member) : 0);
-  const karmaBonus = Math.floor((await getKarma(message.member)) / 75);
-
-  let max = 15 + (prestigeBonus + premiumBonus + karmaBonus) * 4;
-
-  if (max > 50) max = 50;
 
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -64,7 +52,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         .unix()}:R>\n\n` +
         `you can buy lottery tickets for $**${lotteryTicketPrice.toLocaleString()}** with ${await getPrefix(
           message.guild
-        )}**lotto buy**\nyou can have a maximum of **${max}** tickets`
+        )}**lotto buy**\nyou can have a maximum of **${Constants.LOTTERY_TICKETS_MAX}** tickets`
     );
 
     if (tickets.length > 0) {
@@ -96,7 +84,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     } else if (parseInt(args[1])) {
       amount = parseInt(args[1]);
     } else if (args[1].toLowerCase() == "all" || args[1].toLowerCase() == "max") {
-      amount = max;
+      amount = Constants.LOTTERY_TICKETS_MAX;
     } else {
       return send({ embeds: [new ErrorEmbed("invalid amount")] });
     }
@@ -105,12 +93,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return send({ embeds: [new ErrorEmbed("invalid amount")] });
     }
 
-    if (tickets.length + amount > max) {
-      amount = max - tickets.length;
+    if (tickets.length + amount > Constants.LOTTERY_TICKETS_MAX) {
+      amount = Constants.LOTTERY_TICKETS_MAX - tickets.length;
     }
 
-    if (tickets.length >= max) {
-      return send({ embeds: [new ErrorEmbed(`you can only have ${max} tickets at a time`)] });
+    if (tickets.length >= Constants.LOTTERY_TICKETS_MAX) {
+      return send({ embeds: [new ErrorEmbed(`you can only have ${Constants.LOTTERY_TICKETS_MAX} tickets at a time`)] });
     }
 
     if ((await getBalance(message.member)) < lotteryTicketPrice * amount) {
