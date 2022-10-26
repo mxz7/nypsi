@@ -45,10 +45,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const amount = Math.floor(15000 * (prestige / 2 + 1));
   const voted = await hasVoted(message.member);
-  let crateAmount = Math.floor(prestige / 2 + 1);
   const lastVote = await getLastVote(message.member);
 
-  if (crateAmount > 4) crateAmount = 4;
+  let crateAmount = Math.floor(prestige / 1.2 + 1);
+
+  if (crateAmount > 6) crateAmount = 6;
 
   const embed = new CustomEmbed(message.member);
 
