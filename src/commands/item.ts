@@ -52,18 +52,33 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const embed = new CustomEmbed(message.member).setTitle(`${selected.emoji} ${selected.name}`);
 
-  let desc = `\`${selected.id}\`\n\n*${selected.longDesc}*\n\n`;
+  const desc: string[] = [];
+
+  desc.push(`\`${selected.id}\``);
+  desc.push(`\n> ${selected.longDesc}\n`);
 
   if (selected.booster_desc) {
-    desc += `*${selected.booster_desc}*\n\n`;
+    desc.push(`*${selected.booster_desc}*`);
+  }
+
+  if (!selected.in_crates) {
+    desc.push("*cannot be found in crates*");
   }
 
   if (selected.buy) {
-    desc += `**buy** $${selected.buy.toLocaleString()}\n`;
+    if (desc[desc.length - 1].endsWith("\n")) {
+      desc.push(`**buy** $${selected.buy.toLocaleString()}`);
+    } else {
+      desc.push(`\n**buy** $${selected.buy.toLocaleString()}`);
+    }
   }
 
   if (selected.sell) {
-    desc += `**sell** $${selected.sell.toLocaleString()}\n`;
+    if (selected.buy) {
+      desc.push(`**sell** $${selected.sell.toLocaleString()}`);
+    } else {
+      desc.push(`\n**sell** $${selected.sell.toLocaleString()}`);
+    }
   }
 
   const avg = await getAuctionAverage(selected.id);
@@ -71,13 +86,21 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const inventory = await getInventory(message.member);
 
   if (avg) {
-    desc += `**average auction sale** $${Math.floor(avg).toLocaleString()}\n`;
+    if (selected.sell || selected.buy) {
+      desc.push(`**average auction sale** $${Math.floor(avg).toLocaleString()}`);
+    } else {
+      desc.push(`\n**average auction sale** $${Math.floor(avg).toLocaleString()}`);
+    }
   }
 
   if (total) {
     const percentOwned = (inventory.find((i) => i.item == selected.id)?.amount / total) * 100;
 
-    desc += `**in world** ${total.toLocaleString()}${percentOwned > 1 ? ` (${percentOwned.toFixed(1)}%)` : ""}`;
+    if (avg || selected.sell || selected.buy) {
+      desc.push(`**in world** ${total.toLocaleString()}${percentOwned > 1 ? ` (${percentOwned.toFixed(1)}%)` : ""}`);
+    } else {
+      desc.push(`\n**in world** ${total.toLocaleString()}${percentOwned > 1 ? ` (${percentOwned.toFixed(1)}%)` : ""}`);
+    }
   }
 
   if (selected.role) {
@@ -105,7 +128,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     });
   }
 
-  embed.setDescription(desc);
+  embed.setDescription(desc.join("\n"));
 
   return await send({ embeds: [embed] });
 }
