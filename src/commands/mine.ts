@@ -195,7 +195,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             }
           }
         } else if (items[i].rarity == 3) {
-          if (pickaxe == "wooden_pickaxe" && items[i].id != "mineshaft_chest") return;
+          if (pickaxe == "wooden_pickaxe" && items[i].id != "mineshaft_chest") continue;
 
           for (let x = 0; x < 10; x++) {
             mineItemsModified.push(i);
