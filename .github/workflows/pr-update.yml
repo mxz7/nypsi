@@ -11,6 +11,11 @@ jobs:
   autoupdate:
     name: pr-update
     runs-on: ubuntu-20.04
+
+    permissions:
+      contents: read
+      pull-requests: write
+
     steps:
       - uses: docker://chinthakagodawita/autoupdate-action:v1
         env:
