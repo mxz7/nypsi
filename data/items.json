@@ -527,6 +527,17 @@
     "sell": 150000,
     "in_crates": false
   },
+  "mineshaft_chest": {
+    "id": "mineshaft_chest",
+    "name": "mineshaft chest",
+    "plural": "mineshaft chests",
+    "emoji": "<:nypsi_chest:1034843159647236190>",
+    "role": "crate",
+    "longDesc": "open to receive one random item",
+    "aliases": ["mineshaft", "chest"],
+    "rarity": 3,
+    "in_crates": false
+  },
   "vote_crate": {
     "id": "vote_crate",
     "name": "vote crate",
