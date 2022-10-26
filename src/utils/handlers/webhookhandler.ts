@@ -11,8 +11,8 @@ import { getBalance, updateBalance } from "../functions/economy/balance";
 import { addInventoryItem } from "../functions/economy/inventory";
 import { getPrestige } from "../functions/economy/prestige";
 import { addTicket, getTickets, userExists } from "../functions/economy/utils";
-import { addKarma, getKarma } from "../functions/karma/karma";
-import { addMember, getPremiumProfile, getTier, isPremium, renewUser, setTier } from "../functions/premium/premium";
+import { addKarma } from "../functions/karma/karma";
+import { addMember, getPremiumProfile, isPremium, renewUser, setTier } from "../functions/premium/premium";
 import requestDM from "../functions/requestdm";
 import { addNotificationToQueue, getDmSettings } from "../functions/users/notifications";
 import { logger } from "../logger";
@@ -115,15 +115,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
 
   const tickets = await getTickets(user);
 
-  const prestigeBonus = Math.floor(((await getPrestige(user)) > 20 ? 20 : await getPrestige(user)) / 2.5);
-  const premiumBonus = Math.floor((await isPremium(user)) ? await getTier(user) : 0);
-  const karmaBonus = Math.floor((await getKarma(user)) / 100);
-
-  let max = 15 + (prestigeBonus + premiumBonus + karmaBonus) * 4;
-
-  if (max > 50) max = 50;
-
-  if (tickets.length <= max - 5) {
+  if (tickets.length <= Constants.LOTTERY_TICKETS_MAX - 5) {
     await Promise.all([addTicket(user), addTicket(user), addTicket(user), addTicket(user), addTicket(user)]);
   }
 
@@ -146,7 +138,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
           `+ $**${amount.toLocaleString()}**\n` +
           "+ **5**% multiplier\n" +
           `+ **${crateAmount}** vote crates` +
-          `${tickets.length <= max - 5 ? "\n+ **5** lottery tickets" : ""}`
+          `${tickets.length <= Constants.LOTTERY_TICKETS_MAX - 5 ? "\n+ **5** lottery tickets" : ""}`
       )
       .disableFooter();
 
