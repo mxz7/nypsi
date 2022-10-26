@@ -235,7 +235,7 @@ export async function openCrate(member: GuildMember, item: Item): Promise<string
   let times = 2;
   const names = [];
 
-  if (item.id.includes("vote")) {
+  if (item.id.includes("vote") || item.id.includes("chest")) {
     times = 1;
   } else if (item.id.includes("69420")) {
     await updateBalance(member, (await getBalance(member)) + 69420);
