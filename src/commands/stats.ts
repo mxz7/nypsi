@@ -72,7 +72,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const normalStats = async () => {
     const stats = await getStats(message.member);
-    const commandUses = parseInt(await redis.hget(Constants.redis.nypsi.TOP_COMMANDS_USER, message.author.tag));
 
     const embed = new CustomEmbed(message.member).setHeader("stats", message.author.avatarURL());
 
@@ -112,19 +111,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const itemMsg: string[] = [`**total** ${itemTotal.toLocaleString()}`];
 
     for (const i of Object.keys(stats.items)) {
-      if (itemMsg.length >= 11) break;
+      if (itemMsg.length >= gambleMsg.length) break;
       itemMsg.push(`- **${i}** ${stats.items[i].toLocaleString()}`);
     }
 
     embed.addField("item uses", itemMsg.join("\n"), true);
-
-    embed.setFooter({ text: `you have performed ${commandUses ? commandUses.toLocaleString() : "0"} commands today` });
 
     return send({ embeds: [embed] });
   };
 
   const commandStats = async () => {
     const uses = await getCommandUses(message.member);
+    const total = uses.map((x) => x.uses).reduce((a, b) => a + b);
 
     const pages = new Map<number, string[]>();
 
@@ -140,9 +138,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       }
     }
 
+    const commandUses = parseInt(await redis.hget(Constants.redis.nypsi.TOP_COMMANDS_USER, message.author.tag));
+
     const embed = new CustomEmbed(message.member, pages.get(1).join("\n"))
       .setHeader("most used commands", message.author.avatarURL())
-      .setFooter({ text: `page 1/${pages.size}` });
+      .setFooter({ text: `total: ${total.toLocaleString()} | today: ${commandUses.toLocaleString()} | 1/${pages.size}` });
 
     let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
@@ -184,7 +184,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
           newEmbed.setDescription(pages.get(currentPage).join("\n"));
 
-          newEmbed.setFooter({ text: `page ${currentPage}/${pages.size}` });
+          newEmbed.setFooter({
+            text: `total: ${total.toLocaleString()} | today: ${commandUses.toLocaleString()} | 1/${pages.size}`,
+          });
 
           if (currentPage == 1) {
             row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -208,7 +210,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
           newEmbed.setDescription(pages.get(currentPage).join("\n"));
 
-          newEmbed.setFooter({ text: `page ${currentPage}/${pages.size}` });
+          newEmbed.setFooter({
+            text: `total: ${total.toLocaleString()} | today: ${commandUses.toLocaleString()} | 1/${pages.size}`,
+          });
 
           if (currentPage == pages.size) {
             row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
