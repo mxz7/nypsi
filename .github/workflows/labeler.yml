@@ -1,4 +1,4 @@
-name: "pr labeler"
+name: "pr-labeler"
 on:
 - pull_request_target
 
