@@ -74,9 +74,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   await addInventoryItem(message.member, "cookie", amount, false);
 
   const chance = Math.floor(Math.random() * 15);
+  let foundCakes = 0;
 
   if (chance == 7) {
-    let foundCakes = 1;
+    foundCakes = 1;
 
     if (maxCake > 1) {
       foundCakes = Math.floor(Math.random() * maxCake) + 1;
@@ -88,7 +89,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   let desc = `you baked **${amount}** cookie${amount > 1 ? "s" : ""}!! 🍪`;
 
   if (chance == 7) {
-    desc += "\n\nyou also managed to bake a cake <:nypsi_cake:1002977512630001725> good job!!";
+    desc += `\n\nyou also managed to bake ${foundCakes > 1 ? foundCakes : "a"} cake${
+      foundCakes > 1 ? "s" : ""
+    } <:nypsi_cake:1002977512630001725> good job!!`;
   }
 
   await send({
