@@ -54,23 +54,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     });
   }
 
-  if (inventory.find((i) => i.item == "iron_ore") && inventory.find((i) => i.item == "iron_ore").amount > 0) {
-    for (let i = 0; i < inventory.find((i) => i.item == "iron_ore").amount; i++) {
-      ores.push("iron_ore");
-      if (ores.length >= 64) break;
-    }
-  }
+  for (const i of inventory) {
+    if (items[i.item].role != "ore") continue;
 
-  if (inventory.find((i) => i.item == "gold_ore") && inventory.find((i) => i.item == "gold_ore").amount > 0) {
-    for (let i = 0; i < inventory.find((i) => i.item == "gold_ore").amount; i++) {
-      ores.push("gold_ore");
+    for (let x = 0; x < i.amount; x++) {
       if (ores.length >= 64) break;
+      ores.push(i.item);
     }
   }
 
   if (ores.length == 0) {
     return send({
-      embeds: [new ErrorEmbed("you need ore to smelt. ore can be found in crates and through mining")],
+      embeds: [new ErrorEmbed("you need ore to smelt. ores can be found through mining")],
     });
   }
 

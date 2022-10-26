@@ -104,6 +104,17 @@ model Economy {
   LotteryTicket LotteryTicket[]
   EconomyWorker EconomyWorker[]
   Inventory     Inventory[]
+  Crafting      Crafting[]
+}
+
+model Crafting {
+  id       String   @id @default(uuid())
+  userId   String
+  itemId   String
+  amount   Int
+  finished DateTime
+
+  economy Economy @relation(fields: [userId], references: [userId], onDelete: Cascade)
 }
 
 model Inventory {

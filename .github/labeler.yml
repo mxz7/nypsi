@@ -5,7 +5,7 @@ build:
   - any: ["tsconfig.json"]
 
 ci:
-  - any: ["github/**"]
+  - any: [".github/**"]
 
 economy:
   - any: ["src/utils/functions/economy/**"]
@@ -29,4 +29,7 @@ users:
   - any: ["src/utils/functions/users/**"]
 
 scheduled:
-  - any: ["src/utils/scheduled/**"]
+  - any: ["src/scheduled/**"]
+
+commands: 
+  - any: ["src/commands/**"]

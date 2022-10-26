@@ -223,14 +223,7 @@ export async function openCrate(member: GuildMember, item: Item): Promise<string
   const crateItems = ["money:50000", "money:100000", "xp:25", "xp:50"];
 
   for (const i of Array.from(Object.keys(items))) {
-    if (
-      items[i].role == "fish" ||
-      items[i].role == "prey" ||
-      items[i].id == "gold_ore" ||
-      items[i].id == "iron_ore" ||
-      items[i].id == "cobblestone"
-    )
-      continue;
+    if (!items[i].in_crates) continue;
     crateItems.push(i);
   }
 

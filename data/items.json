@@ -7,7 +7,8 @@
     "role": "fish",
     "rarity": 0,
     "buy": 0,
-    "sell": 7500
+    "sell": 7500,
+    "in_crates": false
   },
   "medium_fish": {
     "id": "medium_fish",
@@ -17,7 +18,8 @@
     "role": "fish",
     "rarity": 1,
     "buy": 0,
-    "sell": 15000
+    "sell": 15000,
+    "in_crates": false
   },
   "salmon": {
     "id": "salmon",
@@ -27,7 +29,8 @@
     "role": "fish",
     "rarity": 1,
     "buy": 0,
-    "sell": 25000
+    "sell": 25000,
+    "in_crates": false
   },
   "pufferfish": {
     "id": "pufferfish",
@@ -37,7 +40,8 @@
     "role": "fish",
     "rarity": 1,
     "buy": 0,
-    "sell": 30000
+    "sell": 30000,
+    "in_crates": false
   },
   "large_fish": {
     "id": "large_fish",
@@ -47,7 +51,8 @@
     "role": "fish",
     "rarity": 2,
     "buy": 0,
-    "sell": 35000
+    "sell": 35000,
+    "in_crates": false
   },
   "nemo": {
     "id": "nemo",
@@ -57,7 +62,8 @@
     "role": "fish",
     "rarity": 3,
     "buy": 0,
-    "sell": 50000
+    "sell": 50000,
+    "in_crates": false
   },
   "cobblestone": {
     "id": "cobblestone",
@@ -68,7 +74,19 @@
     "rarity": 0,
     "aliases": ["cobble"],
     "buy": 0,
-    "sell": 1000
+    "sell": 1000,
+    "in_crates": false
+  },
+  "netherrack": {
+    "id": "netherrack",
+    "name": "netherrack",
+    "emoji": "<:nypsi_netherrack:1034510405101432963>",
+    "longDesc": "found when mining in the nether",
+    "role": "sellable",
+    "rarity": 0,
+    "buy": 0,
+    "sell": 15000,
+    "in_crates": false
   },
   "coal": {
     "id": "coal",
@@ -78,7 +96,8 @@
     "role": "fuel",
     "rarity": 0,
     "buy": 3000,
-    "sell": 2000
+    "sell": 2000,
+    "in_crates": false
   },
   "iron_ingot": {
     "id": "iron_ingot",
@@ -90,7 +109,8 @@
     "rarity": 69,
     "aliases": ["iron"],
     "buy": 0,
-    "sell": 15000
+    "sell": 15000,
+    "in_crates": false
   },
   "gold_ingot": {
     "id": "gold_ingot",
@@ -102,7 +122,12 @@
     "rarity": 69,
     "aliases": ["gold"],
     "buy": 0,
-    "sell": 20000
+    "sell": 20000,
+    "in_crates": false,
+    "craft": {
+      "ingrediants": ["gold_nugget:9"],
+      "time": 60
+    }
   },
   "diamond": {
     "id": "diamond",
@@ -113,7 +138,19 @@
     "role": "sellable",
     "rarity": 3,
     "buy": 0,
-    "sell": 50000
+    "sell": 50000,
+    "in_crates": false
+  },
+  "obsidian": {
+    "id": "obsidian",
+    "name": "obsidian",
+    "emoji": "<:nypsi_obsidian:1034510054008823849>",
+    "longDesc": "found when mining and used to craft a nether portal",
+    "role": "resource",
+    "rarity": 4,
+    "buy": 0,
+    "sell": 75000,
+    "in_crates": false
   },
   "emerald": {
     "id": "emerald",
@@ -124,7 +161,8 @@
     "role": "sellable",
     "rarity": 3,
     "buy": 0,
-    "sell": 75000
+    "sell": 75000,
+    "in_crates": false
   },
   "amethyst": {
     "id": "amethyst",
@@ -135,7 +173,8 @@
     "role": "sellable",
     "rarity": 3,
     "buy": 0,
-    "sell": 50000
+    "sell": 50000,
+    "in_crates": false
   },
   "furnace": {
     "id": "furnace",
@@ -146,7 +185,8 @@
     "role": "tool",
     "rarity": 0,
     "buy": 50000,
-    "sell": 15000
+    "sell": 15000,
+    "in_crates": false
   },
   "iron_ore": {
     "id": "iron_ore",
@@ -157,7 +197,31 @@
     "rarity": 1,
     "ingot": "iron_ingot",
     "buy": 0,
-    "sell": 200
+    "sell": 200,
+    "in_crates": false
+  },
+  "gold_nugget": {
+    "id": "gold_nugget",
+    "name": "gold nugget",
+    "aliases": ["nugget"],
+    "emoji": "<:nypsi_goldn:1034512597153742898>",
+    "longDesc": "can be crafted into a gold ingot or sold as is",
+    "role": "sellable",
+    "rarity": 1,
+    "buy": 0,
+    "sell": 2000,
+    "in_crates": false
+  },
+  "quartz": {
+    "id": "quartz",
+    "name": "quartz",
+    "emoji": "<:nypsi_quartz:1034514057455222875>",
+    "longDesc": "found when mining in the nether",
+    "role": "sellable",
+    "rarity": 1,
+    "buy": 0,
+    "sell": 5000,
+    "in_crates": false
   },
   "gold_ore": {
     "id": "gold_ore",
@@ -168,7 +232,49 @@
     "rarity": 2,
     "ingot": "gold_ingot",
     "buy": 0,
-    "sell": 300
+    "sell": 300,
+    "in_crates": false
+  },
+  "ancient_debris": {
+    "id": "ancient_debris",
+    "name": "ancient debris",
+    "aliases": ["debris", "ancient"],
+    "emoji": "<:nypsi_ancient_debris:1032256372068335647>",
+    "longDesc": "can be smelted into a netherite scrap with a furnace and coal",
+    "role": "ore",
+    "rarity": 3,
+    "ingot": "netherite_scrap",
+    "buy": 0,
+    "sell": 75000,
+    "in_crates": false
+  },
+  "netherite_scrap": {
+    "id": "netherite_scrap",
+    "name": "netherite scrap",
+    "aliases": ["scrap"],
+    "emoji": "<:nypsi_nscrap:1034591769662341170>",
+    "longDesc": "can be crafted into a netherite ingot",
+    "role": "resource",
+    "rarity": 3,
+    "buy": 0,
+    "sell": 100000,
+    "in_crates": false
+  },
+  "netherite_ingot": {
+    "id": "netherite_ingot",
+    "name": "netherite ingot",
+    "aliases": ["netherite"],
+    "emoji": "<:nypsi_ningot:1034591922473418792>",
+    "longDesc": "can be crafted into a netherite ingot",
+    "role": "sellable",
+    "rarity": 69,
+    "buy": 0,
+    "sell": 750000,
+    "craft": {
+      "time": 600,
+      "ingrediants": ["netherite_scrap:4", "gold_ingot:4"]
+    },
+    "in_crates": false
   },
   "wooden_pickaxe": {
     "id": "wooden_pickaxe",
@@ -178,7 +284,8 @@
     "role": "tool",
     "rarity": 0,
     "buy": 0,
-    "sell": 5000
+    "sell": 5000,
+    "in_crates": true
   },
   "iron_pickaxe": {
     "id": "iron_pickaxe",
@@ -188,7 +295,8 @@
     "role": "tool",
     "rarity": 1,
     "buy": 0,
-    "sell": 5000
+    "sell": 5000,
+    "in_crates": true
   },
   "diamond_pickaxe": {
     "id": "diamond_pickaxe",
@@ -196,9 +304,10 @@
     "emoji": "<:nypsi_diamond_pickaxe:959442215736844368>",
     "longDesc": "allows you to mine",
     "role": "tool",
-    "rarity": 3,
+    "rarity": 2,
     "buy": 0,
-    "sell": 10000
+    "sell": 10000,
+    "in_crates": true
   },
   "terrible_fishing_rod": {
     "id": "terrible_fishing_rod",
@@ -208,7 +317,8 @@
     "role": "tool",
     "rarity": 0,
     "buy": 0,
-    "sell": 5000
+    "sell": 5000,
+    "in_crates": true
   },
   "fishing_rod": {
     "id": "fishing_rod",
@@ -218,7 +328,8 @@
     "role": "tool",
     "rarity": 1,
     "buy": 0,
-    "sell": 5000
+    "sell": 5000,
+    "in_crates": true
   },
   "incredible_fishing_rod": {
     "id": "incredible_fishing_rod",
@@ -226,9 +337,10 @@
     "emoji": "🎣",
     "longDesc": "allows you to fish with amazing luck",
     "role": "tool",
-    "rarity": 3,
+    "rarity": 2,
     "buy": 0,
-    "sell": 10000
+    "sell": 10000,
+    "in_crates": true
   },
   "standard_watch": {
     "id": "standard_watch",
@@ -239,7 +351,8 @@
     "rarity": 0,
     "aliases": ["watch"],
     "buy": 0,
-    "sell": 5000
+    "sell": 5000,
+    "in_crates": true
   },
   "golden_watch": {
     "id": "golden_watch",
@@ -249,7 +362,8 @@
     "role": "item",
     "rarity": 1,
     "buy": 0,
-    "sell": 75000
+    "sell": 75000,
+    "in_crates": true
   },
   "diamond_watch": {
     "id": "diamond_watch",
@@ -259,7 +373,8 @@
     "role": "item",
     "rarity": 3,
     "buy": 0,
-    "sell": 250000
+    "sell": 250000,
+    "in_crates": true
   },
   "bitcoin": {
     "id": "bitcoin",
@@ -268,7 +383,8 @@
     "longDesc": "a scary investment (actually matches the worth of bitcoin in real life)",
     "rarity": 2,
     "role": "item",
-    "aliases": ["btc"]
+    "aliases": ["btc"],
+    "in_crates": true
   },
   "ethereum": {
     "id": "ethereum",
@@ -277,7 +393,8 @@
     "longDesc": "less scary investment (actually matches the worth of ethereum in real life)",
     "rarity": 0,
     "role": "item",
-    "aliases": ["eth"]
+    "aliases": ["eth"],
+    "in_crates": true
   },
   "terrible_gun": {
     "id": "terrible_gun",
@@ -288,7 +405,8 @@
     "role": "tool",
     "rarity": 0,
     "buy": 0,
-    "sell": 5000
+    "sell": 5000,
+    "in_crates": true
   },
   "gun": {
     "id": "gun",
@@ -299,7 +417,8 @@
     "role": "tool",
     "rarity": 1,
     "buy": 0,
-    "sell": 5000
+    "sell": 5000,
+    "in_crates": true
   },
   "incredible_gun": {
     "id": "incredible_gun",
@@ -310,7 +429,8 @@
     "role": "tool",
     "rarity": 2,
     "buy": 0,
-    "sell": 10000
+    "sell": 10000,
+    "in_crates": true
   },
   "baby_rabbit": {
     "id": "baby_rabbit",
@@ -321,7 +441,8 @@
     "role": "prey",
     "rarity": 0,
     "buy": 0,
-    "sell": 5000
+    "sell": 5000,
+    "in_crates": false
   },
   "normal_rabbit": {
     "id": "normal_rabbit",
@@ -332,7 +453,8 @@
     "role": "prey",
     "rarity": 1,
     "buy": 0,
-    "sell": 7500
+    "sell": 7500,
+    "in_crates": false
   },
   "large_rabbit": {
     "id": "large_rabbit",
@@ -343,7 +465,8 @@
     "role": "prey",
     "rarity": 2,
     "buy": 0,
-    "sell": 15000
+    "sell": 15000,
+    "in_crates": false
   },
   "deer": {
     "id": "deer",
@@ -353,7 +476,8 @@
     "role": "prey",
     "rarity": 2,
     "buy": 0,
-    "sell": 50000
+    "sell": 50000,
+    "in_crates": false
   },
   "rat": {
     "id": "rat",
@@ -364,7 +488,8 @@
     "role": "prey",
     "rarity": 0,
     "buy": 0,
-    "sell": 3000
+    "sell": 3000,
+    "in_crates": false
   },
   "mouse": {
     "id": "mouse",
@@ -375,7 +500,8 @@
     "role": "prey",
     "rarity": 0,
     "buy": 0,
-    "sell": 5000
+    "sell": 5000,
+    "in_crates": false
   },
   "kangaroo": {
     "id": "kangaroo",
@@ -386,7 +512,8 @@
     "role": "prey",
     "rarity": 3,
     "buy": 0,
-    "sell": 60000
+    "sell": 60000,
+    "in_crates": false
   },
   "wolf": {
     "id": "wolf",
@@ -397,7 +524,8 @@
     "role": "prey",
     "rarity": 3,
     "buy": 0,
-    "sell": 150000
+    "sell": 150000,
+    "in_crates": false
   },
   "vote_crate": {
     "id": "vote_crate",
@@ -406,7 +534,8 @@
     "emoji": "📦",
     "role": "crate",
     "longDesc": "open to receive one random item",
-    "aliases": ["vote", "crate"]
+    "aliases": ["vote", "crate"],
+    "in_crates": false
   },
   "basic_crate": {
     "id": "basic_crate",
@@ -416,7 +545,8 @@
     "role": "crate",
     "longDesc": "open to receive two random items",
     "rarity": 1,
-    "aliases": ["basic"]
+    "aliases": ["basic"],
+    "in_crates": true
   },
   "69420_crate": {
     "id": "69420_crate",
@@ -426,7 +556,8 @@
     "role": "crate",
     "longDesc": "open to receive two random items and $69,420",
     "rarity": 1,
-    "aliases": ["69420"]
+    "aliases": ["69420"],
+    "in_crates": true
   },
   "nypsi_crate": {
     "id": "nypsi_crate",
@@ -437,7 +568,8 @@
     "longDesc": "open to receive 5 rare items",
     "sell": 5000000,
     "rarity": 4,
-    "aliases": ["nypsi"]
+    "aliases": ["nypsi"],
+    "in_crates": true
   },
   "calendar": {
     "id": "calendar",
@@ -448,7 +580,8 @@
     "role": "item",
     "rarity": 0,
     "buy": 0,
-    "sell": 1000
+    "sell": 1000,
+    "in_crates": true
   },
   "padlock": {
     "id": "padlock",
@@ -457,7 +590,8 @@
     "emoji": "🔒",
     "longDesc": "protect your balance",
     "role": "item",
-    "rarity": 0
+    "rarity": 0,
+    "in_crates": true
   },
   "lock_pick": {
     "id": "lock_pick",
@@ -468,7 +602,8 @@
     "rarity": 1,
     "role": "item",
     "buy": 150000,
-    "sell": 50000
+    "sell": 50000,
+    "in_crates": true
   },
   "mask": {
     "id": "mask",
@@ -479,7 +614,8 @@
     "rarity": 2,
     "role": "item",
     "buy": 300000,
-    "sell": 100000
+    "sell": 100000,
+    "in_crates": true
   },
   "cookie": {
     "id": "cookie",
@@ -498,7 +634,8 @@
       "boosts": ["multi"],
       "effect": 1,
       "time": 30
-    }
+    },
+    "in_crates": true
   },
   "cake": {
     "id": "cake",
@@ -517,7 +654,8 @@
       "boosts": ["xp"],
       "effect": 0.1,
       "time": 300
-    }
+    },
+    "in_crates": true
   },
   "potato": {
     "id": "potato",
@@ -527,7 +665,8 @@
     "rarity": 0,
     "role": "sellable",
     "buy": 0,
-    "sell": 5000
+    "sell": 5000,
+    "in_crates": true
   },
   "tooth": {
     "id": "tooth",
@@ -536,7 +675,8 @@
     "emoji": "🦷",
     "longDesc": "its a molar i think",
     "rarity": 1,
-    "role": "collectable"
+    "role": "collectable",
+    "in_crates": true
   },
   "clover": {
     "id": "clover",
@@ -545,7 +685,8 @@
     "longDesc": "ur pretty lucky",
     "rarity": 3,
     "role": "collectable",
-    "aliases": ["leaf"]
+    "aliases": ["leaf"],
+    "in_crates": true
   },
   "teddy": {
     "id": "teddy",
@@ -556,7 +697,8 @@
     "longDesc": "[i love you](https://64.media.tumblr.com/3020949b864ff6fdeecdd80fe5b5859c/tumblr_mg5tw61IIQ1r5rz5so1_500.gif)",
     "rarity": 2,
     "role": "collectable",
-    "aliases": ["teddybear"]
+    "aliases": ["teddybear"],
+    "in_crates": true
   },
   "floppy_disk": {
     "id": "floppy_disk",
@@ -565,7 +707,8 @@
     "longDesc": "we're getting old now",
     "rarity": 2,
     "role": "collectable",
-    "aliases": ["save", "icon"]
+    "aliases": ["save", "icon"],
+    "in_crates": true
   },
   "test_tube": {
     "id": "test_tube",
@@ -574,7 +717,8 @@
     "longDesc": "no comment",
     "rarity": 1,
     "role": "collectable",
-    "aliases": ["child", "children"]
+    "aliases": ["child", "children"],
+    "in_crates": true
   },
   "match_attax": {
     "id": "match_attax",
@@ -583,7 +727,8 @@
     "longDesc": "rarest match attax card",
     "rarity": 4,
     "role": "collectable",
-    "aliases": ["pele"]
+    "aliases": ["pele"],
+    "in_crates": true
   },
   "pokemon_card": {
     "id": "pokemon_card",
@@ -592,7 +737,8 @@
     "longDesc": "rarest pokemon card",
     "rarity": 3,
     "role": "collectable",
-    "aliases": ["pokemon", "pikachu", "illustrator"]
+    "aliases": ["pokemon", "pikachu", "illustrator"],
+    "in_crates": true
   },
   "skyline_r34": {
     "id": "skyline_r34",
@@ -603,7 +749,8 @@
     "role": "car",
     "speed": 6,
     "aliases": ["r34", "gtr"],
-    "worth": 230000
+    "worth": 230000,
+    "in_crates": true
   },
   "toyota_supra": {
     "id": "toyota_supra",
@@ -614,7 +761,8 @@
     "role": "car",
     "speed": 5,
     "aliases": ["supra", "toyota"],
-    "worth": 170000
+    "worth": 170000,
+    "in_crates": true
   },
   "lawyer": {
     "id": "lawyer",
@@ -627,7 +775,8 @@
     "boobies": "i got this idea while watching better call saul on netflix lol. if u havent seen it i would recommend that u go watch it. you're not seeing this file though so im talking to myself. its a prequel to breaking bad. im so weird.",
     "aliases": ["saulgoodman", "saul"],
     "buy": 200000,
-    "sell": 75000
+    "sell": 75000,
+    "in_crates": true
   },
   "minecraft_account": {
     "id": "minecraft_account",
@@ -637,7 +786,8 @@
     "longDesc": "[mining away... i dont know what to mine ill mine this anyway](https://www.youtube.com/watch?v=dgha9S39Y6M)",
     "rarity": 2,
     "role": "collectable",
-    "aliases": ["mc", "minecraft"]
+    "aliases": ["mc", "minecraft"],
+    "in_crates": true
   },
   "ring": {
     "id": "ring",
@@ -646,7 +796,8 @@
     "emoji": "💍",
     "longDesc": "maybe get married?",
     "rarity": 4,
-    "role": "collectable"
+    "role": "collectable",
+    "in_crates": true
   },
   "radio": {
     "id": "radio",
@@ -658,7 +809,8 @@
     "role": "item",
     "aliases": ["scanner", "policescanner"],
     "buy": 150000,
-    "sell": 25000
+    "sell": 25000,
+    "in_crates": true
   },
   "lancer_evox": {
     "id": "lancer_evox",
@@ -670,7 +822,8 @@
     "speed": 3,
     "aliases": ["evox", "evo", "lancer"],
     "buy": 50000,
-    "sell": 15000
+    "sell": 15000,
+    "in_crates": true
   },
   "honda_civic": {
     "id": "honda_civic",
@@ -682,7 +835,8 @@
     "speed": 4,
     "aliases": ["civic", "honda"],
     "buy": 0,
-    "sell": 35000
+    "sell": 35000,
+    "in_crates": true
   },
   "subaru_wrx": {
     "id": "subaru_wrx",
@@ -694,7 +848,8 @@
     "speed": 3,
     "aliases": ["subuwu"],
     "buy": 0,
-    "sell": 30000
+    "sell": 30000,
+    "in_crates": true
   },
   "flappy_bird": {
     "id": "flappy_bird",
@@ -705,7 +860,8 @@
     "rarity": 3,
     "role": "prey",
     "buy": 0,
-    "sell": 75000
+    "sell": 75000,
+    "in_crates": true
   },
   "chastity_cage": {
     "id": "chastity_cage",
@@ -718,7 +874,8 @@
     "worth": 75000,
     "aliases": ["chastity"],
     "buy": 75000,
-    "sell": 40000
+    "sell": 40000,
+    "in_crates": true
   },
   "tesla_modelx": {
     "id": "tesla_modelx",
@@ -730,7 +887,8 @@
     "speed": 3,
     "aliases": ["tesla"],
     "buy": 0,
-    "sell": 85000
+    "sell": 85000,
+    "in_crates": true
   },
   "handcuffs": {
     "id": "handcuffs",
@@ -741,7 +899,8 @@
     "role": "item",
     "aliases": ["handcuff"],
     "buy": 400000,
-    "sell": 150000
+    "sell": 150000,
+    "in_crates": true
   },
   "cycle": {
     "id": "cycle",
@@ -766,7 +925,8 @@
     "speed": 1,
     "aliases": ["smart"],
     "buy": 0,
-    "sell": 15000
+    "sell": 15000,
+    "in_crates": true
   },
   "lightning_mcqueen": {
     "id": "lightning_mcqueen",
@@ -778,7 +938,8 @@
     "speed": 4,
     "aliases": ["mcqueen", "lightning"],
     "buy": 0,
-    "sell": 60000
+    "sell": 60000,
+    "in_crates": true
   },
   "fiat": {
     "id": "fiat",
@@ -790,7 +951,8 @@
     "speed": 1,
     "aliases": ["inbetweeners"],
     "buy": 0,
-    "sell": 15000
+    "sell": 15000,
+    "in_crates": true
   },
   "ford_fiesta": {
     "id": "ford_fiesta",
@@ -802,7 +964,8 @@
     "speed": 2,
     "aliases": ["fiesta"],
     "buy": 0,
-    "sell": 17500
+    "sell": 17500,
+    "in_crates": true
   },
   "vauxhall_corsa": {
     "id": "vauxhall_corsa",
@@ -814,7 +977,8 @@
     "speed": 1,
     "aliases": ["chav", "corsa"],
     "buy": 0,
-    "sell": 5000
+    "sell": 5000,
+    "in_crates": true
   },
   "redbull": {
     "id": "redbull",
@@ -831,7 +995,8 @@
       "boosts": ["cooldown"],
       "effect": 0.5,
       "time": 900
-    }
+    },
+    "in_crates": true
   },
   "worm": {
     "id": "worm",
@@ -848,7 +1013,8 @@
       "boosts": ["fish"],
       "effect": 1,
       "time": 3600
-    }
+    },
+    "in_crates": true
   },
   "multi_potion": {
     "id": "multi_potion",
@@ -867,7 +1033,8 @@
       "boosts": ["multi"],
       "effect": 3,
       "time": 1800
-    }
+    },
+    "in_crates": true
   },
   "fortune": {
     "id": "fortune",
@@ -884,7 +1051,8 @@
       "boosts": ["mine"],
       "effect": 0.5,
       "time": 3600
-    }
+    },
+    "in_crates": true
   },
   "unbreaking": {
     "id": "unbreaking",
@@ -901,7 +1069,8 @@
       "boosts": ["mine", "fish", "hunt"],
       "effect": 0.5,
       "time": 3600
-    }
+    },
+    "in_crates": true
   },
   "efficiency": {
     "id": "efficiency",
@@ -918,7 +1087,8 @@
       "boosts": ["mine"],
       "effect": 1,
       "time": 3600
-    }
+    },
+    "in_crates": true
   },
   "xp_potion": {
     "id": "xp_potion",
@@ -936,7 +1106,8 @@
       "boosts": ["xp"],
       "effect": 0.5,
       "time": 1800
-    }
+    },
+    "in_crates": true
   },
   "lucky_7": {
     "id": "lucky_7",
@@ -953,7 +1124,8 @@
       "boosts": ["slots"],
       "effect": "improves slots win chance to 60%",
       "time": 180
-    }
+    },
+    "in_crates": true
   },
   "stolen_credit_card": {
     "id": "stolen_credit_card",
@@ -965,7 +1137,8 @@
     "rarity": 1,
     "buy": 0,
     "sell": 75000,
-    "role": "tool"
+    "role": "tool",
+    "in_crates": true
   },
   "streak_token": {
     "id": "streak_token",
@@ -977,7 +1150,8 @@
     "rarity": 0,
     "buy": 0,
     "sell": 50000,
-    "role": "tool"
+    "role": "tool",
+    "in_crates": true
   },
   "blue_rocks": {
     "id": "blue_rocks",
@@ -988,7 +1162,8 @@
     "rarity": 0,
     "buy": 0,
     "sell": 25000,
-    "role": "sellable"
+    "role": "sellable",
+    "in_crates": true
   },
   "steroids": {
     "id": "steroids",
@@ -1005,7 +1180,8 @@
       "boosts": ["fight"],
       "effect": "improves fight strength",
       "time": 3600
-    }
+    },
+    "in_crates": true
   },
   "vote_booster": {
     "id": "vote_booster",
@@ -1019,7 +1195,8 @@
       "boosts": ["multi"],
       "effect": 5,
       "time": 7200
-    }
+    },
+    "in_crates": false
   },
   "coffee": {
     "id": "coffee",
@@ -1036,7 +1213,8 @@
       "boosts": ["per_interval"],
       "effect": 0.5,
       "time": 21600
-    }
+    },
+    "in_crates": true
   },
   "stolen_nasa_computer": {
     "id": "stolen_nasa_computer",
@@ -1048,7 +1226,8 @@
     "rarity": 2,
     "sell": 100000,
     "role": "worker-upgrade",
-    "worker_upgrade_id": "nasa_computers"
+    "worker_upgrade_id": "nasa_computers",
+    "in_crates": true
   },
   "launchpad": {
     "id": "launchpad",
@@ -1060,7 +1239,8 @@
     "rarity": 2,
     "sell": 75000,
     "role": "worker-upgrade",
-    "worker_upgrade_id": "launchpad"
+    "worker_upgrade_id": "launchpad",
+    "in_crates": true
   },
   "warehouse_permit": {
     "id": "warehouse_permit",
@@ -1072,7 +1252,8 @@
     "rarity": 1,
     "sell": 100000,
     "role": "worker-upgrade",
-    "worker_upgrade_id": "warehouse_expansion"
+    "worker_upgrade_id": "warehouse_expansion",
+    "in_crates": true
   },
   "orphan": {
     "id": "orphan",
@@ -1083,7 +1264,8 @@
     "rarity": 2,
     "sell": 100000,
     "role": "worker-upgrade",
-    "worker_upgrade_id": "underage_workers"
+    "worker_upgrade_id": "underage_workers",
+    "in_crates": true
   },
   "grandma": {
     "id": "grandma",
@@ -1101,7 +1283,8 @@
       "boosts": ["cookie"],
       "effect": 2,
       "time": 7200
-    }
+    },
+    "in_crates": true
   },
   "highroller": {
     "id": "highroller",
@@ -1118,7 +1301,8 @@
       "boosts": ["maxbet"],
       "effect": 1,
       "time": 1800
-    }
+    },
+    "in_crates": true
   },
   "steve": {
     "id": "steve",
@@ -1135,7 +1319,8 @@
       "boosts": ["worker_claim"],
       "effect": 1,
       "time": 86400
-    }
+    },
+    "in_crates": true
   },
   "palm_tree": {
     "id": "palm_tree",
@@ -1146,7 +1331,8 @@
     "role": "collectable",
     "speed": 6,
     "aliases": ["palm", "tree", "necklace"],
-    "worth": 230000
+    "worth": 230000,
+    "in_crates": true
   },
   "double_xp": {
     "id": "double_xp",
@@ -1162,6 +1348,23 @@
       "boosts": ["xp"],
       "effect": 1,
       "time": 43200
-    }
+    },
+    "in_crates": true
+  },
+  "nether_portal": {
+    "id": "nether_portal",
+    "name": "nether portal",
+    "emoji": "<:nypsi_portal:1034509723749322843>",
+    "longDesc": "used to enter the nether when mining",
+    "role": "item",
+    "rarity": 69,
+    "buy": 0,
+    "sell": 1000000,
+    "craft": {
+      "ingrediants": ["obsidian:14"],
+      "time": 1800
+    },
+    "in_crates": false,
+    "aliases": ["portal"]
   }
 }
