@@ -198,7 +198,7 @@ export default async function requestDM(options: RequestDMOptions): Promise<bool
       return true;
     } else {
       logger.warn(`failed to send DM: ${options.memberId}`);
-      await checkVoteReminder(options.memberId);
+      // await checkVoteReminder(options.memberId);
       logger.info(options);
       return false;
     }
