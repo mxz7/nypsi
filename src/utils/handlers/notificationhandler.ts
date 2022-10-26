@@ -5,18 +5,11 @@ import requestDM from "../functions/requestdm";
 import { logger } from "../logger";
 
 let active = false;
-let interval: NodeJS.Timer;
 const promises: Promise<boolean>[] = [];
 
 export function listenForDms(manager: Manager) {
-  if (interval) return;
-
-  interval = setInterval(async () => {
-    if (active) {
-      clearInterval(interval);
-      interval = null;
-      return;
-    }
+  setInterval(async () => {
+    if (active) return;
 
     if ((await redis.llen(Constants.redis.nypsi.DM_QUEUE)) != 0) {
       active = true;
@@ -28,6 +21,7 @@ export function listenForDms(manager: Manager) {
 }
 
 async function doDmQueueInterval(manager: Manager): Promise<void> {
+  if (!active) return;
   if ((await redis.llen(Constants.redis.nypsi.DM_QUEUE)) == 0) {
     await Promise.all(promises);
 
@@ -35,7 +29,6 @@ async function doDmQueueInterval(manager: Manager): Promise<void> {
 
     active = false;
     logger.debug("dm queue finished");
-    listenForDms(manager);
     return;
   }
 
