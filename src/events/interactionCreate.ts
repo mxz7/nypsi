@@ -278,7 +278,7 @@ export default async function interactionCreate(interaction: Interaction) {
           if (!res.isModalSubmit()) return;
 
           if (res.fields.fields.first().value.toLowerCase() != "yes") {
-            return res.reply({ embeds: [new CustomEmbed().setDescription("✅ cancelled purchase")] });
+            return res.reply({ embeds: [new CustomEmbed().setDescription("✅ cancelled purchase")], ephemeral: true });
           }
 
           interaction = res;
