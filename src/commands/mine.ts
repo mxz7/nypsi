@@ -20,7 +20,7 @@ veins.set("netherrack", [5, 7, 15, 25]);
 veins.set("gold_nugget", [2, 8, 12, 18, 28]);
 veins.set("quartz", [1, 4, 6, 12]);
 
-const areas = ["cave", "strip mine", "1x1 hole you dug", "staircase to bedrock", "nether", "nether", "nether"];
+const areas = ["cave", "mineshaft", "strip mine", "1x1 hole you dug", "staircase to bedrock", "nether", "nether", "nether"];
 
 const cmd = new Command("mine", "go to a cave and mine", Categories.MONEY).setDocs(
   "https://docs.nypsi.xyz/economy/minecraft"
@@ -162,11 +162,21 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           if (!["netherrack", "ancient_debris", "quartz", "gold_nugget"].includes(items[i].id)) continue;
         } else {
           if (
-            !["cobblestone", "coal", "diamond", "amethyst", "emerald", "iron_ore", "gold_ore", "obsidian"].includes(
-              items[i].id
-            )
+            ![
+              "cobblestone",
+              "coal",
+              "diamond",
+              "amethyst",
+              "emerald",
+              "iron_ore",
+              "gold_ore",
+              "obsidian",
+              "mineshaft_chest",
+            ].includes(items[i].id)
           )
             continue;
+
+          if (items[i].id == "mineshaft_chest" && chosenArea != "mineshaft") continue;
         }
 
         if (items[i].id == "ancient_debris") {
@@ -184,7 +194,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
               mineItemsModified.push(i);
             }
           }
-        } else if (items[i].rarity == 3 && pickaxe != "wooden_pickaxe") {
+        } else if (items[i].rarity == 3) {
+          if (pickaxe == "wooden_pickaxe" && items[i].id != "mineshaft_chest") return;
+
           for (let x = 0; x < 10; x++) {
             mineItemsModified.push(i);
 
