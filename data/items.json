@@ -381,7 +381,7 @@
     "name": "bitcoin",
     "emoji": "<:nypsi_btc:1016409538020261908>",
     "longDesc": "a scary investment (actually matches the worth of bitcoin in real life)",
-    "rarity": 2,
+    "rarity": 0,
     "role": "item",
     "aliases": ["btc"],
     "in_crates": true
@@ -634,7 +634,7 @@
     "plural": "cookies",
     "emoji": "🍪",
     "longDesc": "yum yum",
-    "rarity": 69,
+    "rarity": 0,
     "role": "booster",
     "booster_desc": "eat a cookie to get +**1**% multi for 30 seconds (stacks up to 7)",
     "buy": 0,
@@ -654,7 +654,7 @@
     "plural": "cakes",
     "emoji": "<:nypsi_cake:1002977512630001725>",
     "longDesc": "yum yum 😋",
-    "rarity": 69,
+    "rarity": 0,
     "role": "booster",
     "booster_desc": "eat a cake to get +**10**% xp (stacks up to 3)",
     "buy": 0,
@@ -918,12 +918,13 @@
     "name": "bicycle",
     "emoji": "<:nypsi_bikeman:969327640001531904>",
     "longDesc": "wow",
-    "rarity": 100,
+    "rarity": 69,
     "role": "car",
     "speed": 0,
     "aliases": ["bike", "bicycle"],
     "buy": 0,
-    "sell": 0
+    "sell": 0,
+    "in_crates": false
   },
   "smart_car": {
     "id": "smart_car",
