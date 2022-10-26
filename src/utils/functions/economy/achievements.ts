@@ -4,6 +4,7 @@ import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { NotificationPayload } from "../../../types/Notification";
 import Constants from "../../Constants";
+import { logger } from "../../logger";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { getLastKnownTag } from "../users/tag";
 import { addInventoryItem } from "./inventory";
@@ -110,6 +111,8 @@ async function completeAchievement(userId: string, achievementId: string) {
       completedAt: new Date(),
     },
   });
+
+  logger.info(`${achievementId} completed by ${userId}`);
 
   const achievements = getAchievements();
 
