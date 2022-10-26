@@ -265,7 +265,7 @@
     "name": "netherite ingot",
     "aliases": ["netherite"],
     "emoji": "<:nypsi_ningot:1034591922473418792>",
-    "longDesc": "can be crafted into a netherite ingot",
+    "longDesc": "crafted from netherite scraps and gold ingots",
     "role": "sellable",
     "rarity": 69,
     "buy": 0,
