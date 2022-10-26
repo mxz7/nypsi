@@ -84,4 +84,5 @@ export default {
   EMBED_SUCCESS_COLOR: "#5efb8f" as ColorResolvable,
   EMBED_FAIL_COLOR: "#e4334f" as ColorResolvable,
   MAX_GUILD_LEVEL: 69,
+  LOTTERY_TICKETS_MAX: 50,
 };
