@@ -338,7 +338,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return await edit({ embeds: [embed] }, msg);
   };
 
-  if (args.length == 0 || args[0].toLowerCase() == "manage") {
+  const manageAuctions = async (msg?: Message) => {
     const auctions = await getAuctions(message.member);
 
     const embed = new CustomEmbed(message.member).setHeader("your auctions", message.author.avatarURL());
@@ -396,7 +396,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       row.addComponents(new ButtonBuilder().setLabel("create auction").setCustomId("y").setStyle(ButtonStyle.Success));
     }
 
-    const msg = await send({ embeds: [embed], components: [row] });
+    if (msg) {
+      msg = await msg.edit({ embeds: [embed], components: [row] });
+    } else {
+      msg = await send({ embeds: [embed], components: [row] });
+    }
 
     const filter = (i: Interaction) => i.user.id == message.author.id;
 
@@ -492,11 +496,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           });
         }
 
-        await edit({ components: [] }, msg);
+        return manageAuctions(msg);
       }
     };
 
     return pageManager();
+  };
+
+  if (args.length == 0 || args[0].toLowerCase() == "manage") {
+    return manageAuctions();
   } else if (args[0].toLowerCase() == "del") {
     if (message.guild.id != "747056029795221513") return;
 
