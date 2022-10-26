@@ -135,7 +135,7 @@ async function completeAchievement(userId: string, achievementId: string) {
   }
 
   userEmbed.setDescription(
-    (userEmbed.data.description += `\n\nyou have received:\n + ${earnedXp.toLocaleString()}xp${
+    (userEmbed.data.description += `\n\nrewards:\n + ${earnedXp.toLocaleString()}xp${
       earnedCrates > 0 ? `\n + ${earnedCrates} 🎁 69420 crate${earnedCrates > 1 ? "s" : ""}` : ""
     }`)
   );
