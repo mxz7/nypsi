@@ -3,7 +3,7 @@ import { Categories, Command, NypsiCommandInteraction } from "../models/Command"
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { getBoosters } from "../utils/functions/economy/boosters";
-import { addInventoryItem, getInventory } from "../utils/functions/economy/inventory";
+import { addInventoryItem, getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
@@ -43,14 +43,26 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const inventory = await getInventory(message.member);
 
   let hasFurnace = false;
+  let hasCoal = false;
 
   if (inventory.find((i) => i.item == "furnace") && inventory.find((i) => i.item == "furnace").amount > 0) {
     hasFurnace = true;
   }
 
+  if (inventory.find((i) => i.item == "coal") && inventory.find((i) => i.item == "coal").amount > 0) {
+    hasCoal = true;
+  }
+
   if (!hasFurnace) {
     return send({
       embeds: [new ErrorEmbed("you need a furnace to bake. furnaces can be found in crates or bought from the shop")],
+      ephemeral: true,
+    });
+  }
+
+  if (!hasCoal) {
+    return send({
+      embeds: [new ErrorEmbed("you need coal to bake. coal can be found when mining or bought from the shop")],
       ephemeral: true,
     });
   }
@@ -71,6 +83,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const amount = Math.floor(Math.random() * max) + 1;
 
+  await setInventoryItem(message.member, "coal", inventory.find((i) => i.item == "coal").amount - 1, false);
   await addInventoryItem(message.member, "cookie", amount, false);
 
   const chance = Math.floor(Math.random() * 15);
