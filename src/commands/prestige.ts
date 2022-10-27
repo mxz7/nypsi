@@ -179,13 +179,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     let crateAmount = Math.floor((await getPrestige(message.member)) / 2 + 1);
 
-    if (crateAmount > 3) crateAmount = 3;
+    if (crateAmount > 6) crateAmount = 6;
+
+    let prestige = await getPrestige(message.author.id);
+
+    if (prestige > 15) prestige = 15;
 
     embed.setDescription(
       `you are now prestige **${await getPrestige(message.member)}**\n\n` +
-        `new vote rewards: $**${(
-          15000 *
-          ((await getPrestige(message.member)) + 1)
+        `new vote rewards: $**${Math.floor(
+          15000 * (prestige / 2 + 1)
         ).toLocaleString()}**, **${crateAmount}** vote crates\n` +
         `your new multiplier: **${Math.floor(multi * 100)}**%\nyour maximum bet: $**${maxBet.toLocaleString()}**\n` +
         `you have received **${amount}** basic crate${amount > 1 ? "s" : ""}${
