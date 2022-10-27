@@ -4,30 +4,28 @@ import Constants from "../Constants";
 import requestDM from "../functions/requestdm";
 import { logger } from "../logger";
 
-let active = false;
+let lastRun = 0;
 const promises: Promise<boolean>[] = [];
 
 export function listenForDms(manager: Manager) {
   setInterval(async () => {
-    if (active) return;
+    if (lastRun > Date.now() - 30000) return;
 
     if ((await redis.llen(Constants.redis.nypsi.DM_QUEUE)) != 0) {
-      active = true;
-
       logger.debug("executing dm queue...");
-      doDmQueueInterval(manager);
+      doDmQueueInterval(manager).catch(() => {
+        lastRun = 0;
+      });
     }
   }, 5_000);
 }
 
 async function doDmQueueInterval(manager: Manager): Promise<void> {
-  if (!active) return;
   if ((await redis.llen(Constants.redis.nypsi.DM_QUEUE)) == 0) {
     await Promise.all(promises);
 
     promises.length = 0;
 
-    active = false;
     logger.debug("dm queue finished");
     return;
   }
@@ -47,6 +45,8 @@ async function doDmQueueInterval(manager: Manager): Promise<void> {
       components: item.payload.components,
     })
   );
+
+  lastRun = Date.now();
 
   return doDmQueueInterval(manager);
 }
