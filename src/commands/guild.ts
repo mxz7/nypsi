@@ -738,6 +738,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const targetGuild = await getGuildByName(name);
 
+  console.log(targetGuild);
+
   if (!targetGuild) {
     if (guild) {
       return showGuild(guild);
