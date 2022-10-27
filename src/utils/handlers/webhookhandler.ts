@@ -37,7 +37,8 @@ export function listen(manager: Manager) {
   app.post("/kofi", async (req, response) => {
     const data = JSON.parse(req.body.data) as KofiResponse;
 
-    console.log(data);
+    logger.info("received kofi data");
+    logger.info(data);
 
     if (data.verification_token != process.env.KOFI_VERIFICATION) {
       logger.error("received faulty kofi data");
