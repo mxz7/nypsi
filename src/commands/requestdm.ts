@@ -1,9 +1,8 @@
 import { CommandInteraction, Message } from "discord.js";
-import { NypsiClient } from "../models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
-import requestDM from "../utils/functions/requestdm";
+import { addNotificationToQueue } from "../utils/functions/users/notifications";
 
 const cmd = new Command(
   "requestdm",
@@ -22,19 +21,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   args.shift();
 
-  const a = await requestDM({
-    client: message.client as NypsiClient,
+  await addNotificationToQueue({
     memberId: user,
-    content: args.join(" "),
+    payload: {
+      content: args.join(" "),
+    },
   });
 
   if (!(message instanceof Message)) return;
 
-  if (a) {
-    message.react("✅");
-  } else {
-    message.react("❌");
-  }
+  message.react("✅");
 }
 
 cmd.setRun(run);
