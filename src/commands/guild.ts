@@ -195,7 +195,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({ embeds: [embed] });
   };
 
-  const guild = await getGuildByUser(message.member);
+  let guild = await getGuildByUser(message.member);
   const prefix = await getPrefix(message.guild);
 
   if (args.length == 0) {
@@ -512,6 +512,48 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({ embeds: [new CustomEmbed(message.member, `✅ **${guild.guildName}** has been deleted`)] });
   }
 
+  if (args[0].toLowerCase() == "forcedelete") {
+    if (message.author.id != Constants.TEKOH_ID) return;
+
+    args.shift();
+
+    guild = await getGuildByName(args.join(" "));
+
+    if (!guild) return;
+
+    for (const guildMember of guild.members) {
+      const contributedMoney = guildMember.contributedMoney;
+
+      if (contributedMoney > 100) {
+        await updateBalance(
+          guildMember.userId,
+          (await getBalance(guildMember.userId)) + Math.floor(Number(contributedMoney) * 0.25)
+        );
+
+        if ((await getDmSettings(guildMember.userId)).other) {
+          const embed = new CustomEmbed().setColor(Constants.EMBED_SUCCESS_COLOR);
+
+          embed.setDescription(
+            `since you contributed money to this guild, you have been repaid $**${Math.floor(
+              Number(contributedMoney) * 0.25
+            ).toLocaleString()}**`
+          );
+
+          await requestDM({
+            memberId: guildMember.userId,
+            content: `${guild.guildName} has been deleted`,
+            client: message.client as NypsiClient,
+            embed: embed,
+          });
+        }
+      }
+    }
+
+    await deleteGuild(guild.guildName);
+
+    return send({ embeds: [new CustomEmbed(message.member, `✅ **${guild.guildName}** has been deleted`)] });
+  }
+
   if (args[0].toLowerCase() == "deposit" || args[0].toLowerCase() == "dep") {
     if (!guild) {
       return send({ embeds: [new ErrorEmbed("you're not in a guild")] });
@@ -737,8 +779,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   await addCooldown(cmd.name, message.member, 7);
 
   const targetGuild = await getGuildByName(name);
-
-  console.log(targetGuild);
 
   if (!targetGuild) {
     if (guild) {
