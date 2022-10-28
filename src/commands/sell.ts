@@ -118,7 +118,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const embed = new CustomEmbed(message.member);
 
   embed.setDescription(
-    `you sold **${amount}** ${selected.emoji} ${selected.name} for $${sellWorth.toLocaleString()} ${
+    `you sold **${amount.toLocaleString()}** ${selected.emoji} ${selected.name} for $${sellWorth.toLocaleString()} ${
       multi > 0 && (selected.role == "fish" || selected.role == "prey" || selected.role == "sellable")
         ? `(+**${Math.floor(multi * 100).toString()}**% bonus)`
         : ""
