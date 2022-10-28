@@ -3,7 +3,7 @@ import { parentPort } from "worker_threads";
 import prisma from "../../init/database";
 
 (async () => {
-  const limit = dayjs().subtract(1, "day").toDate();
+  const limit = dayjs().subtract(1, "day").subtract(12, "hours").toDate();
 
   const query = await prisma.economy.updateMany({
     where: {
