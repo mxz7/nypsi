@@ -1,14 +1,14 @@
-import { ChannelType, Guild, GuildMember, Message, TextChannel } from "discord.js";
+import { ChannelType, Guild, Message, TextChannel } from "discord.js";
 import prisma from "../../../init/database";
 import { NypsiClient } from "../../../models/Client";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
+import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { getZeroWidth } from "../string";
 import { getBlacklisted } from "./blacklisted";
 import { add2ndPlace, add3rdPlace, addWin, createReactionStatsProfile, hasReactionStatsProfile } from "./stats";
 import { getWords } from "./words";
 import ms = require("ms");
-import Constants from "../../Constants";
 
 const currentChannels = new Set<string>();
 const lastGame = new Map<string, number>();
@@ -220,14 +220,12 @@ export async function startReaction(guild: Guild, channel: TextChannel) {
   embed.setHeader("chat reaction");
   embed.setDescription(`type: \`${displayWord}\``);
 
-  const msg = await channel.send({ embeds: [embed] });
+  let msg = await channel.send({ embeds: [embed] });
 
   const start = new Date().getTime();
 
-  const winners = new Map<number, { mention: string; time: string; member: GuildMember }>();
   const winnersIDs: string[] = [];
 
-  let waiting = false;
   const blacklisted = await getBlacklisted(guild);
 
   const filter = async (m: Message) =>
@@ -244,89 +242,87 @@ export async function startReaction(guild: Guild, channel: TextChannel) {
     time: timeout * 1000,
   });
 
+  const winnersList: { user: string; time: string }[] = [];
+  const winnersText: string[] = [];
+  const medals = new Map<number, string>();
+
+  medals.set(1, "🥇");
+  medals.set(2, "🥈");
+  medals.set(3, "🥉");
+
+  let ended = false;
+
+  const interval = setInterval(async () => {
+    if (winnersList.length == winnersText.length) return;
+
+    setTimeout(() => {
+      if (ended) return;
+      ended = true;
+
+      collector.emit("end");
+      clearInterval(interval);
+    }, 10000);
+
+    winnersText.length = 0;
+
+    for (const winner of winnersList) {
+      const pos = medals.get(winnersList.indexOf(winner) + 1);
+
+      winnersText.push(`${pos} ${winner.user} in \`${winner.time}\``);
+    }
+
+    if (embed.data.fields?.length == 0) {
+      embed.addField("winners", winnersText.join("\n"));
+    } else {
+      embed.setFields([{ name: "winners", value: winnersText.join("\n") }]);
+    }
+
+    msg = await msg.edit({ embeds: [embed] });
+
+    if (winnersList.length == 3) {
+      clearInterval(interval);
+    }
+  }, 750);
+
   collector.on("collect", async (message): Promise<void> => {
     let time: number | string = new Date().getTime();
 
     time = ((time - start) / 1000).toFixed(2);
 
+    winnersList.push({ user: message.author.toString(), time: time });
+
+    winnersIDs.push(message.author.id);
+
     if (!(await hasReactionStatsProfile(guild, message.member))) await createReactionStatsProfile(guild, message.member);
 
-    if (winners.size == 0) {
-      embed.addField("winners", `🥇 ${message.author.toString()} in \`${time}s\``);
-
-      await addWin(guild, message.member);
-
-      setTimeout(() => {
-        if (winners.size != 3) {
-          return collector.stop();
-        }
-      }, 10000);
-    } else {
-      if (winners.size == 1) {
-        waiting = true;
-
-        setTimeout(async () => {
-          waiting = false;
-
-          if (winners.size == 1) {
-            return;
-          } else {
-            const field = embed.data.fields.find((f) => f.name == "winners");
-
-            field.value += `\n🥈 ${winners.get(2).mention} in \`${winners.get(2).time}s\``;
-
-            await add2ndPlace(guild, winners.get(2).member);
-
-            if (winners.get(3)) {
-              field.value += `\n🥉 ${winners.get(3).mention} in \`${winners.get(3).time}s\``;
-              await add3rdPlace(guild, winners.get(3).member);
-            }
-
-            return await msg.edit({ embeds: [embed] }).catch(() => {
-              currentChannels.delete(channel.id);
-              collector.stop();
-              return;
-            });
-          }
-        }, 250);
-      } else {
-        if (!waiting) {
-          const field = embed.data.fields.find((f) => f.name == "winners");
-
-          field.value += `\n🥉 ${message.author.toString()} in \`${time}s\``;
-
-          await add3rdPlace(guild, message.member);
-        }
-      }
+    switch (winnersList.length) {
+      case 1:
+        await addWin(guild, message.member);
+        break;
+      case 2:
+        await add2ndPlace(guild, message.member);
+        break;
+      case 3:
+        await add3rdPlace(guild, message.member);
+        break;
     }
 
-    winners.set(winners.size + 1, {
-      mention: message.author.toString(),
-      time: time,
-      member: message.member,
-    });
-    winnersIDs.push(message.author.id);
-    if (!waiting) {
-      await msg.edit({ embeds: [embed] }).catch(() => {
-        currentChannels.delete(channel.id);
-        collector.stop();
-        return;
-      });
-      return;
-    }
+    return;
   });
 
   collector.on("end", () => {
     currentChannels.delete(channel.id);
+    ended = true;
     setTimeout(async () => {
-      if (winners.size == 0) {
+      clearInterval(interval);
+      if (winnersList.length == 0) {
         embed.setDescription(embed.data.description + "\n\nnobody won ):");
-      } else if (winners.size == 1) {
+      } else if (winnersList.length == 1) {
         embed.setFooter({ text: "ended with 1 winner" });
       } else {
-        embed.setFooter({ text: `ended with ${winners.size} winners` });
+        embed.setFooter({ text: `ended with ${winnersList.length} winners` });
       }
       await msg.edit({ embeds: [embed] }).catch(() => {});
-    }, 500);
+    }, 1000);
   });
 }
