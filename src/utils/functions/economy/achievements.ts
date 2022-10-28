@@ -8,7 +8,7 @@ import { logger } from "../../logger";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { getLastKnownTag } from "../users/tag";
 import { addInventoryItem } from "./inventory";
-import { getAchievements, getItems } from "./utils";
+import { createUser, getAchievements, getItems, userExists } from "./utils";
 import { getXp, updateXp } from "./xp";
 
 /**
@@ -113,6 +113,8 @@ async function completeAchievement(userId: string, achievementId: string) {
   });
 
   logger.info(`${achievementId} completed by ${userId}`);
+
+  if (!(await userExists(userId))) await createUser(userId);
 
   const achievements = getAchievements();
 
