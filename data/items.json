@@ -1373,7 +1373,7 @@
     "buy": 0,
     "sell": 1000000,
     "craft": {
-      "ingrediants": ["obsidian:14"],
+      "ingrediants": ["obsidian:10"],
       "time": 1800
     },
     "in_crates": false,
