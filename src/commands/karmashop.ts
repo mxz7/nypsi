@@ -17,6 +17,7 @@ import { KarmaShopItem } from "../types/Karmashop";
 import Constants from "../utils/Constants";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { addInventoryItem } from "../utils/functions/economy/inventory";
+import { getPrestige } from "../utils/functions/economy/prestige";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { getXp, updateXp } from "../utils/functions/economy/xp";
 import { getKarma, removeKarma } from "../utils/functions/karma/karma";
@@ -256,6 +257,20 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return pageManager();
     }
   } else if (args[0].toLowerCase() == "buy") {
+    if (message.author.createdTimestamp > dayjs().subtract(1, "day").unix() * 1000) {
+      return send({
+        embeds: [new ErrorEmbed("you cannot use this command yet. u might be an alt. or a bot 😳")],
+      });
+    }
+
+    if ((await getPrestige(message.member)) < 1) {
+      if ((await getXp(message.member)) < 100) {
+        return send({
+          embeds: [new ErrorEmbed("you cannot use this command yet. u might be an alt. or a bot 😳")],
+        });
+      }
+    }
+
     const amountBought = amount.get(message.author.id);
 
     if (amountBought >= limit) {
