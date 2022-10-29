@@ -77,7 +77,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     });
   }
 
-  await addCooldown(cmd.name, message.member, 600);
+  await addCooldown(cmd.name, message.member, 300);
 
   await addItemUse(message.member, pickaxe);
 
