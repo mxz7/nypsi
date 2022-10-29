@@ -257,7 +257,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return pageManager();
     }
   } else if (args[0].toLowerCase() == "buy") {
-    if (message.author.createdTimestamp > dayjs().subtract(1, "day").unix() * 1000) {
+    if (message.author.createdTimestamp > dayjs().subtract(30, "day").unix() * 1000) {
       return send({
         embeds: [new ErrorEmbed("you cannot use this command yet. u might be an alt. or a bot 😳")],
       });
