@@ -1061,7 +1061,7 @@
     "max": 3,
     "boosterEffect": {
       "boosts": ["mine"],
-      "effect": 0.75,
+      "effect": 1,
       "time": 3600
     },
     "in_crates": true
