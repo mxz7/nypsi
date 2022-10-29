@@ -23,9 +23,9 @@ import Constants from "../../utils/Constants";
   let total = 0;
 
   for (const user of users) {
-    if (user.lastCommand.getTime() > threshold) continue;
-
     let karmaToRemove = 1;
+
+    if (user.lastCommand.getTime() > threshold) karmaToRemove = 0;
 
     if (now - ms("2 days") > user.lastCommand.getTime()) {
       karmaToRemove += 7;
@@ -41,6 +41,14 @@ import Constants from "../../utils/Constants";
 
     if (now - ms("90 days") > user.lastCommand.getTime()) {
       karmaToRemove += 69420;
+    }
+
+    if (user.karma > 1000) {
+      karmaToRemove += user.karma * 0.1;
+    }
+
+    if (user.karma > 10_000) {
+      karmaToRemove += user.karma * 0.2;
     }
 
     if (karmaToRemove > user.karma) {
