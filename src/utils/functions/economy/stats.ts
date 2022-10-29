@@ -141,32 +141,21 @@ export async function addItemUse(member: GuildMember, item: string) {
     id = member;
   }
 
-  const query = await prisma.economyStats.findFirst({
+  await prisma.economyStats.upsert({
     where: {
-      AND: [{ economyUserId: id, type: item }],
-    },
-    select: {
-      economyUserId: true,
-    },
-  });
-
-  if (query) {
-    await prisma.economyStats.updateMany({
-      where: {
-        AND: [{ economyUserId: id }, { type: item }],
-      },
-      data: {
-        win: { increment: 1 },
-      },
-    });
-  } else {
-    await prisma.economyStats.create({
-      data: {
+      type_economyUserId: {
         economyUserId: id,
         type: item,
-        win: 1,
-        gamble: false,
       },
-    });
-  }
+    },
+    update: {
+      win: { increment: 1 },
+    },
+    create: {
+      economyUserId: id,
+      type: item,
+      gamble: false,
+      win: 1,
+    },
+  });
 }
