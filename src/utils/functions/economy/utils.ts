@@ -370,6 +370,10 @@ export async function deleteUser(member: GuildMember | string) {
     id = member;
   }
 
+  await redis.del(`${Constants.redis.cache.economy.NETWORTH}:${id}`);
+  await redis.del(`${Constants.redis.cache.economy.INVENTORY}:${id}`);
+  await redis.del(`${Constants.redis.cache.economy.PRESTIGE}:${id}`);
+
   const guild = await getGuildByUser(member);
 
   if (guild) {
