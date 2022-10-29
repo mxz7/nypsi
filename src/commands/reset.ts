@@ -67,7 +67,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     await addExpiry(cmd.name, message.member, 1800);
     earnedKarma = 0;
 
-    earnedKarma += (await calcNetWorth(message.member)) / 1000;
+    earnedKarma += (await calcNetWorth(message.member)) / 100000;
     earnedKarma += (await getPrestige(message.member)) * 100;
     earnedKarma += (await getXp(message.member)) / 50;
 
