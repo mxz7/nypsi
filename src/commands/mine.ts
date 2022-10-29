@@ -106,13 +106,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         switch (items[boosterId].id) {
           case "fortune":
             chance = Math.floor(Math.random() * 5);
-            if (chance > 2) {
+            if (chance > 1) {
               multi += items[boosterId].boosterEffect.effect;
             }
             break;
           case "efficiency":
             chance = Math.floor(Math.random() * 5);
-            if (chance > 2) {
+            if (chance > 1) {
               times += items[boosterId].boosterEffect.effect;
             }
             break;
