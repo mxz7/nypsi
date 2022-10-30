@@ -37,9 +37,9 @@ export async function getAuctionByMessage(id: string) {
 
 export async function deleteAuction(id: string, client: NypsiClient) {
   const auction = await prisma.auction
-    .delete({
+    .findFirst({
       where: {
-        id: id,
+        AND: [{ id: id }, { sold: false }],
       },
       select: {
         messageId: true,
@@ -48,6 +48,15 @@ export async function deleteAuction(id: string, client: NypsiClient) {
     .catch(() => {});
 
   if (auction) {
+    await prisma.auction.delete({
+      where: {
+        messageId: auction.messageId,
+      },
+      select: {
+        id: true,
+      },
+    });
+
     await client.cluster.broadcastEval(
       async (client, { id }) => {
         const guild = await client.guilds.fetch("747056029795221513");
