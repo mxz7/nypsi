@@ -184,7 +184,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
           const chance = Math.floor(Math.random() * 5);
 
-          if (chance != 3) continue;
+          if (chance >= 2) continue;
         }
 
         if (items[i].rarity == 4) {
