@@ -387,9 +387,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         )
       );
 
-      for (let i = 0; i < amount; i++) {
-        promises.push(addItemUse(message.member, item).catch(() => {}));
-      }
+      promises.push(addItemUse(message.member, item, amount).catch(() => {}));
     }
 
     await Promise.all(promises);
