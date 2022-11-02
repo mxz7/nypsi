@@ -1,8 +1,10 @@
+import { variants } from "@catppuccin/palette";
 import {
   ActionRowBuilder,
   BaseMessageOptions,
   ButtonBuilder,
   ButtonStyle,
+  ColorResolvable,
   CommandInteraction,
   Interaction,
   InteractionReplyOptions,
@@ -370,7 +372,7 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
   const draw = async () => {
     gamble(message.author, "minesweeper", bet, true, bet);
     await addGamble(message.member, "minesweeper", true);
-    embed.setColor("#e5ff00");
+    embed.setColor(variants.macchiato.yellow.hex as ColorResolvable);
     embed.setDescription(
       "**bet** $" +
         bet.toLocaleString() +

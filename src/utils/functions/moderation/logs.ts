@@ -1,3 +1,4 @@
+import { variants } from "@catppuccin/palette";
 import { ColorResolvable, Guild, GuildMember, User, WebhookClient } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
@@ -8,20 +9,20 @@ import Constants from "../../Constants";
 const logColors = new Map<LogType, ColorResolvable>();
 const modLogColors = new Map<PunishmentType, ColorResolvable>();
 
-logColors.set(LogType.SERVER, "#f7343a");
-logColors.set(LogType.ROLE, "#a046fa");
-logColors.set(LogType.CHANNEL, "#46fa7c");
-logColors.set(LogType.EMOJI, "#f1fa46");
-logColors.set(LogType.MEMBER, "#46befa");
-logColors.set(LogType.MESSAGE, "#fa8b46");
+logColors.set(LogType.SERVER, variants.mocha.red.hex as ColorResolvable);
+logColors.set(LogType.ROLE, variants.mocha.pink.hex as ColorResolvable);
+logColors.set(LogType.CHANNEL, variants.mocha.green.hex as ColorResolvable);
+logColors.set(LogType.EMOJI, variants.mocha.peach.hex as ColorResolvable);
+logColors.set(LogType.MEMBER, variants.mocha.sky.hex as ColorResolvable);
+logColors.set(LogType.MESSAGE, variants.mocha.flamingo.hex as ColorResolvable);
 
-modLogColors.set(PunishmentType.MUTE, "#ffffba");
-modLogColors.set(PunishmentType.BAN, "#ffb3ba");
-modLogColors.set(PunishmentType.UNMUTE, "#ffffba");
-modLogColors.set(PunishmentType.WARN, "#bae1ff");
-modLogColors.set(PunishmentType.KICK, "#ffdfba");
-modLogColors.set(PunishmentType.UNBAN, "#ffb3ba");
-modLogColors.set(PunishmentType.FILTER_VIOLATION, "#baffc9");
+modLogColors.set(PunishmentType.MUTE, variants.macchiato.yellow.hex as ColorResolvable);
+modLogColors.set(PunishmentType.UNMUTE, variants.macchiato.yellow.hex as ColorResolvable);
+modLogColors.set(PunishmentType.BAN, variants.macchiato.red.hex as ColorResolvable);
+modLogColors.set(PunishmentType.UNBAN, variants.macchiato.red.hex as ColorResolvable);
+modLogColors.set(PunishmentType.WARN, variants.macchiato.flamingo.hex as ColorResolvable);
+modLogColors.set(PunishmentType.KICK, variants.macchiato.sky.hex as ColorResolvable);
+modLogColors.set(PunishmentType.FILTER_VIOLATION, variants.macchiato.sapphire.hex as ColorResolvable);
 
 export async function addModLog(
   guild: Guild,
