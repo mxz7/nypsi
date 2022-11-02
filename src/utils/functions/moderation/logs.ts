@@ -69,7 +69,7 @@ export async function addModLog(
     embed.addField("reason", command);
   }
 
-  await redis.lpush(`${Constants.redis.cache.guild.MODLOGS}${guild.id}`, JSON.stringify(embed.toJSON()));
+  await redis.lpush(`${Constants.redis.cache.guild.MODLOGS}:${guild.id}`, JSON.stringify(embed.toJSON()));
 }
 
 export async function addLog(guild: Guild, type: LogType, embed: CustomEmbed) {
