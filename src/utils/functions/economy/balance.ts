@@ -412,7 +412,7 @@ export async function calcNetWorth(member: GuildMember | string) {
   for (const item of query.Inventory) {
     const auctionAvg = await getAuctionAverage(item.item);
 
-    if (auctionAvg) {
+    if (auctionAvg && !["ethereum", "bitcoin"].includes(getItems()[item.item].id)) {
       worth += auctionAvg * item.amount;
     } else if (getItems()[item.item].sell) {
       worth += getItems()[item.item].sell * item.amount;
