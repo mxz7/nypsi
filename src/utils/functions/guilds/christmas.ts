@@ -1,4 +1,5 @@
-import { Guild } from "discord.js";
+import { variants } from "@catppuccin/palette";
+import { ColorResolvable, Guild } from "discord.js";
 import prisma from "../../../init/database";
 import { NypsiClient } from "../../../models/Client";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
@@ -60,7 +61,13 @@ export function runChristmas(client: NypsiClient) {
 
       await channel
         .send({
-          embeds: [new CustomEmbed().setDescription(format).setColor("#ff0000").setTitle(":santa_tone1:").disableFooter()],
+          embeds: [
+            new CustomEmbed()
+              .setDescription(format)
+              .setColor(variants.macchiato.red.hex as ColorResolvable)
+              .setTitle(":santa_tone1:")
+              .disableFooter(),
+          ],
         })
         .then(() => {
           logger.log({
@@ -164,7 +171,13 @@ export async function checkChristmasCountdown(guild: Guild) {
 
   return await channel
     .send({
-      embeds: [new CustomEmbed().setDescription(format).setColor("#ff0000").setTitle(":santa_tone1:").disableFooter()],
+      embeds: [
+        new CustomEmbed()
+          .setDescription(format)
+          .setColor(variants.macchiato.red.hex as ColorResolvable)
+          .setTitle(":santa_tone1:")
+          .disableFooter(),
+      ],
     })
     .then(() => {
       logger.log({
