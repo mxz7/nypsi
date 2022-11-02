@@ -15,8 +15,8 @@ const cmd = new Command("sex", "find horny milfs in ur area 😏", Categories.FU
   "letsfuck",
 ]);
 
-cmd.slashEnabled = true;
-cmd.slashData.addStringOption((option) => option.setName("message").setDescription("a good pickup line always works (;"));
+// cmd.slashEnabled = true;
+// cmd.slashData.addStringOption((option) => option.setName("message").setDescription("a good pickup line always works (;"));
 
 const looking = new Map<string, MilfSearchData>();
 
