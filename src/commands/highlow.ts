@@ -368,7 +368,7 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
   const draw = async () => {
     gamble(message.author, "highlow", bet, true, bet);
     await addGamble(message.member, "highlow", true);
-    newEmbed.setColor("#E5FF00");
+    newEmbed.setColor(variants.macchiato.yellow.hex as ColorResolvable);
     newEmbed.setDescription(
       "**bet** $" +
         bet.toLocaleString() +

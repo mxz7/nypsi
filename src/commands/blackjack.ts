@@ -1,8 +1,10 @@
+import { variants } from "@catppuccin/palette";
 import {
   ActionRowBuilder,
   BaseMessageOptions,
   ButtonBuilder,
   ButtonStyle,
+  ColorResolvable,
   CommandInteraction,
   GuildMember,
   Interaction,
@@ -480,7 +482,7 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
   const draw = async () => {
     gamble(message.author, "blackjack", bet, true, bet);
     await addGamble(message.member, "blackjack", true);
-    newEmbed.setColor("#E5FF00");
+    newEmbed.setColor(variants.macchiato.yellow.hex as ColorResolvable);
     newEmbed.setDescription("**bet** $" + bet.toLocaleString() + "\n\n**draw!!**\nyou win $" + bet.toLocaleString());
     newEmbed.addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**");
     newEmbed.addField(message.author.username, getCards(message.member) + " **" + calcTotal(message.member) + "**");
