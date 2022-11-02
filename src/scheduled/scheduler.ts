@@ -6,7 +6,7 @@ import { getGuilds } from "..";
 import { logger } from "../utils/logger";
 
 const bree = new Bree({
-  root: path.resolve("./jobs"),
+  root: path.join(__dirname, "jobs"),
   logger: logger,
 
   workerMessageHandler: (message) => {
@@ -20,19 +20,16 @@ const bree = new Bree({
 
   jobs: [
     {
-      name: "purge-usernames",
+      name: "purgeusernames",
       interval: "at 3:00am",
-      path: path.join(__dirname, "jobs", "purgeusernames.js"),
     },
     {
-      name: "top-global",
+      name: "topglobal",
       interval: "at 12:00am",
-      path: path.join(__dirname, "jobs", "topglobal.js"),
     },
     {
-      name: "delete-guilds",
-      interval: "at 3:01am",
-      path: path.join(__dirname, "jobs", "oldguilds.js"),
+      name: "oldguilds",
+      interval: "at 3:02am",
       worker: {
         workerData: {
           guilds: [],
@@ -40,46 +37,38 @@ const bree = new Bree({
       },
     },
     {
-      name: "deteriorate-karma",
-      interval: "at 3:02am",
-      path: path.join(__dirname, "jobs", "deterioratekarma.js"),
+      name: "deterioratekarma",
+      interval: "at 3:00am",
     },
     {
-      name: "lottery-tickets",
+      name: "lotterytickets",
       timeout: dayjs().add(1, "hour").set("minutes", 25).set("seconds", 0).diff(dayjs(), "milliseconds"),
       interval: "30m",
-      path: path.join(__dirname, "jobs", "lotterytickets.js"),
     },
     {
-      name: "clean-mentions",
-      interval: "at 11:59pm",
-      path: path.join(__dirname, "jobs", "cleanmentions.js"),
-    },
-    {
-      name: "top-commands",
+      name: "cleanmentions",
       interval: "at 12:00am",
-      path: path.join(__dirname, "jobs", "topcommands.js"),
     },
     {
-      name: "daily-streak",
-      interval: "at 11:59pm",
-      path: path.join(__dirname, "jobs", "dailystreak.js"),
-    },
-    {
-      name: "reset-suggestions",
+      name: "topcommands",
       interval: "at 12:00am",
-      path: path.join(__dirname, "jobs", "resetsuggestions.js"),
     },
     {
-      name: "vote-reminders",
+      name: "dailystreak",
+      interval: "at 12:00am",
+    },
+    {
+      name: "resetsuggestions",
+      interval: "at 12:00am",
+    },
+    {
+      name: "votereminders",
       timeout: dayjs().add(1, "hour").set("minutes", 25).set("seconds", 0).diff(dayjs(), "milliseconds"),
       interval: "30m",
-      path: path.join(__dirname, "jobs", "votereminders.js"),
     },
     {
-      name: "clean-logs",
+      name: "cleanlogs",
       interval: "on the first day of the month",
-      path: path.join(__dirname, "jobs", "cleanlogs.js"),
     },
   ],
 });
