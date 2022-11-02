@@ -252,6 +252,16 @@ export async function startReaction(guild: Guild, channel: TextChannel) {
 
   let ended = false;
 
+  const updateWinnersText = () => {
+    winnersText.length = 0;
+
+    for (const winner of winnersList) {
+      const pos = medals.get(winnersList.indexOf(winner) + 1);
+
+      winnersText.push(`${pos} ${winner.user} in \`${winner.time}\``);
+    }
+  };
+
   const interval = setInterval(async () => {
     if (winnersList.length == winnersText.length) return;
 
@@ -263,13 +273,7 @@ export async function startReaction(guild: Guild, channel: TextChannel) {
       clearInterval(interval);
     }, 10000);
 
-    winnersText.length = 0;
-
-    for (const winner of winnersList) {
-      const pos = medals.get(winnersList.indexOf(winner) + 1);
-
-      winnersText.push(`${pos} ${winner.user} in \`${winner.time}\``);
-    }
+    updateWinnersText();
 
     if (embed.data.fields?.length == 0) {
       embed.addField("winners", winnersText.join("\n"));
@@ -317,11 +321,21 @@ export async function startReaction(guild: Guild, channel: TextChannel) {
       clearInterval(interval);
       if (winnersList.length == 0) {
         embed.setDescription(embed.data.description + "\n\nnobody won ):");
-      } else if (winnersList.length == 1) {
-        embed.setFooter({ text: "ended with 1 winner" });
       } else {
-        embed.setFooter({ text: `ended with ${winnersList.length} winners` });
+        if (winnersList.length == 1) {
+          embed.setFooter({ text: "ended with 1 winner" });
+        } else {
+          embed.setFooter({ text: `ended with ${winnersList.length} winners` });
+        }
+        updateWinnersText();
+
+        if (embed.data.fields?.length == 0) {
+          embed.addField("winners", winnersText.join("\n"));
+        } else {
+          embed.setFields([{ name: "winners", value: winnersText.join("\n") }]);
+        }
       }
+
       await msg.edit({ embeds: [embed] }).catch(() => {});
     }, 1000);
   });
