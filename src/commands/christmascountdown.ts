@@ -74,6 +74,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         } else {
           return message.channel.send({ embeds: [new ErrorEmbed("invalid channel")] });
         }
+      } else if (message.mentions.channels.first()) {
+        channel = message.mentions.channels.first();
       } else {
         const c = message.guild.channels.cache.find((c) => c.id == args[1]);
 
