@@ -22,4 +22,6 @@ scheduled: src/scheduled/**
 
 commands: src/commands/**
 
+events: src/events/**
+
 schema: prisma/**
