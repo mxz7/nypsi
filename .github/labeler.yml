@@ -2,35 +2,24 @@ dependencies: package.json
 
 build: tsconfig.json
 
-ci:
-  - any: [".github/**"]
+ci: .github/**
 
-economy:
-  - any: ["src/utils/functions/economy/**"]
+economy: src/utils/functions/economy/**
 
-chatreaction:
-  - any: ["src/utils/functions/chatreactions/**"]
+chatreaction: src/utils/functions/chatreactions/**
 
-guild:
-  - any: ["src/utils/functions/guilds/**"]
+guild: src/utils/functions/guilds/**
 
-karma:
-  - any: ["src/utils/functions/karma/**"]
+karma: src/utils/functions/karma/**
 
-moderation:
-  - any: ["src/utils/functions/moderation/**"]
+moderation: src/utils/functions/moderation/**
 
-premium:
-  - any: ["src/utils/functions/premium/**"]
+premium: src/utils/functions/premium/**
 
-users:
-  - any: ["src/utils/functions/users/**"]
+users: src/utils/functions/users/**
 
-scheduled:
-  - any: ["src/scheduled/**"]
+scheduled: src/scheduled/**
 
-commands: 
-  - any: ["src/commands/**"]
+commands: src/commands/**
 
-schema: 
-  - any: ["prisma/**"]
+schema: prisma/**
