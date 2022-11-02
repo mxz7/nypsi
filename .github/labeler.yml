@@ -1,6 +1,6 @@
-dependencies: package.json
+dependencies: /package.json
 
-build: tsconfig.json
+build: /tsconfig.json
 
 ci: .github/**
 
