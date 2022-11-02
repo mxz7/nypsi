@@ -1,8 +1,6 @@
-dependencies:
-  - any: ["*package.json", "*package-lock.json"]
+dependencies: package.json
 
-build:
-  - any: ["*tsconfig.json"]
+build: tsconfig.json
 
 ci:
   - any: [".github/**"]
