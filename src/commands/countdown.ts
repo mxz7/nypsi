@@ -1,6 +1,7 @@
 import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import Constants from "../utils/Constants";
 import { daysUntil, formatDate } from "../utils/functions/date";
 import { addCountdown, deleteCountdown, getCountdowns } from "../utils/functions/guilds/countdowns";
 import { getPrefix } from "../utils/functions/guilds/utils";
@@ -186,7 +187,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const embedd = new CustomEmbed();
 
     embedd.setDescription(format.split("%days%").join(daysUntil(date) + 1));
-    embedd.setColor("#37393f");
+    embedd.setColor(Constants.TRANSPARENT_EMBED_COLOR);
 
     await channel.send({ embeds: [embedd] }).catch(() => {
       fail = true;
