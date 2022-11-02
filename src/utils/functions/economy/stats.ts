@@ -133,7 +133,7 @@ export async function addRob(member: GuildMember, win: boolean) {
   }
 }
 
-export async function addItemUse(member: GuildMember, item: string) {
+export async function addItemUse(member: GuildMember, item: string, amount = 1) {
   let id: string;
   if (member instanceof GuildMember) {
     id = member.user.id;
@@ -149,13 +149,13 @@ export async function addItemUse(member: GuildMember, item: string) {
       },
     },
     update: {
-      win: { increment: 1 },
+      win: { increment: amount },
     },
     create: {
       economyUserId: id,
       type: item,
       gamble: false,
-      win: 1,
+      win: amount,
     },
   });
 }
