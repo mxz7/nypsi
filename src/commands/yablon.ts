@@ -1,8 +1,10 @@
+import { variants } from "@catppuccin/palette";
 import {
   ActionRowBuilder,
   BaseMessageOptions,
   ButtonBuilder,
   ButtonStyle,
+  ColorResolvable,
   CommandInteraction,
   GuildMember,
   Interaction,

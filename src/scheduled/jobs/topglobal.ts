@@ -1,5 +1,5 @@
 import { variants } from "@catppuccin/palette";
-import { EmbedBuilder, WebhookClient } from "discord.js";
+import { ColorResolvable, EmbedBuilder, WebhookClient } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { parentPort } from "worker_threads";
 import prisma from "../../init/database";
