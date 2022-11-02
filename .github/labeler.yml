@@ -1,8 +1,8 @@
 dependencies:
-  - any: ["./package.json", "./package-lock.json"]
+  - any: ["*package.json", "*package-lock.json"]
 
 build:
-  - any: ["./tsconfig.json"]
+  - any: ["*tsconfig.json"]
 
 ci:
   - any: [".github/**"]
@@ -35,4 +35,4 @@ commands:
   - any: ["src/commands/**"]
 
 schema: 
-  - any: ["prisma/schema.prisma"]
+  - any: ["prisma/**"]
