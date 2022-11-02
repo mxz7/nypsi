@@ -1,3 +1,4 @@
+import { variants } from "@catppuccin/palette";
 import { EmbedBuilder, WebhookClient } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { parentPort } from "worker_threads";
@@ -10,7 +11,7 @@ import prisma from "../../init/database";
 
   embed.setTitle("top 10 richest users");
   embed.setDescription(baltop.join("\n"));
-  embed.setColor("#111111");
+  embed.setColor(variants.latte.base.alpha.hex as ColorResolvable);
 
   const hook = new WebhookClient({ url: process.env.TOPGLOBAL_HOOK });
 

@@ -2,6 +2,7 @@ import { Guild } from "discord.js";
 import prisma from "../../../init/database";
 import { NypsiClient } from "../../../models/Client";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
+import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { daysUntil, MStoTime } from "../date";
 
@@ -44,7 +45,7 @@ export function runCountdowns(client: NypsiClient) {
         const embed = new CustomEmbed();
 
         embed.setDescription(message);
-        embed.setColor("#111111");
+        embed.setColor(Constants.TRANSPARENT_EMBED_COLOR);
         embed.disableFooter();
 
         const channel = guild.channels.cache.find((ch) => ch.id == countdown.channel);
