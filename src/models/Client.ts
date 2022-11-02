@@ -5,6 +5,7 @@ import channelDelete from "../events/channelDelete";
 import channelUpdate from "../events/channelUpdate";
 import emojiCreate from "../events/emojiCreate";
 import emojiDelete from "../events/emojiDelete";
+import emojiUpdate from "../events/emojiUpdate";
 import guildCreate from "../events/guildCreate";
 import guildDelete from "../events/guildDelete";
 import guildMemberAdd from "../events/guildMemberAdd";
@@ -110,6 +111,7 @@ export class NypsiClient extends Client {
       this.on("channelUpdate", channelUpdate.bind(null));
       this.on("emojiCreate", emojiCreate.bind(null));
       this.on("emojiDelete", emojiDelete.bind(null));
+      this.on("emojiUpdate", emojiUpdate.bind(null));
 
       setTimeout(() => {
         this.runIntervals();
