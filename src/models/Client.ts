@@ -3,6 +3,7 @@ import { Client, ClientOptions } from "discord.js";
 import channelCreate from "../events/channelCreate";
 import channelDelete from "../events/channelDelete";
 import channelUpdate from "../events/channelUpdate";
+import emojiCreate from "../events/emojiCreate";
 import guildCreate from "../events/guildCreate";
 import guildDelete from "../events/guildDelete";
 import guildMemberAdd from "../events/guildMemberAdd";
@@ -106,6 +107,7 @@ export class NypsiClient extends Client {
       this.on("userUpdate", userUpdate.bind(null));
       this.on("interactionCreate", interactionCreate.bind(null));
       this.on("channelUpdate", channelUpdate.bind(null));
+      this.on("emojiCreate", emojiCreate.bind(null));
 
       setTimeout(() => {
         this.runIntervals();
