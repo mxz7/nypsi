@@ -1,7 +1,10 @@
-import { GuildMember } from "discord.js";
+import { GuildMember, Role } from "discord.js";
 import { NypsiClient } from "../models/Client";
+import { CustomEmbed } from "../models/EmbedBuilders";
+import { LogType } from "../types/Moderation";
 import Constants from "../utils/Constants";
 import { addKarma } from "../utils/functions/karma/karma";
+import { addLog, isLogsEnabled } from "../utils/functions/moderation/logs";
 import { addMember, getTier, isPremium, renewUser, setExpireDate, setTier } from "../utils/functions/premium/premium";
 import { createProfile, hasProfile } from "../utils/functions/users/utils";
 
@@ -59,5 +62,28 @@ export default async function guildMemberUpdate(oldMember: GuildMember, newMembe
           setExpireDate(newMember.id, new Date(0), newMember.client as NypsiClient);
       }
     }
+  }
+
+  if (oldMember.roles.cache.size != newMember.roles.cache.size && (await isLogsEnabled(newMember.guild))) {
+    let roles: Role[];
+
+    const oldIds = Array.from(oldMember.roles.cache.keys());
+    const newIds = Array.from(newMember.roles.cache.keys());
+
+    if (oldIds.length > newIds.length) {
+      roles = oldIds.filter((a) => !newIds.includes(a)).map((id) => oldMember.roles.cache.get(id));
+    } else {
+      roles = newIds.filter((a) => !oldIds.includes(a)).map((id) => newMember.roles.cache.get(id));
+    }
+
+    if (roles.length == 0) return;
+
+    const embed = new CustomEmbed().disableFooter().setTimestamp();
+
+    embed.setHeader(oldIds.length > newIds.length ? "role removed" : "role added");
+    embed.setDescription(`${newMember.user.toString()} \`${newMember.user.id}\``);
+    embed.addField(`role${roles.length > 1 ? "s" : ""}`, roles.map((r) => r.toString()).join("\n"));
+
+    await addLog(newMember.guild, LogType.MEMBER, embed);
   }
 }
