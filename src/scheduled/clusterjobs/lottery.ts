@@ -1,5 +1,4 @@
-import { variants } from "@catppuccin/palette";
-import { Client, ColorResolvable, User, WebhookClient } from "discord.js";
+import { Client, User, WebhookClient } from "discord.js";
 import prisma from "../../init/database";
 import redis from "../../init/redis";
 import { CustomEmbed } from "../../models/EmbedBuilders";
@@ -32,7 +31,7 @@ async function doLottery(client: Client) {
     embed.setDescription(
       `the lottery has been cancelled as only **${tickets.length}** tickets were bought ):\n\nthese tickets will remain and the lottery will happen next week`
     );
-    embed.setColor(variants.latte.base.alpha.hex as ColorResolvable);
+    embed.setColor("#111111");
     embed.disableFooter();
 
     return hook.send({ embeds: [embed] });
@@ -74,14 +73,14 @@ async function doLottery(client: Client) {
       `they have won $**${total.toLocaleString()}**`
   );
   embed.setFooter({ text: `a total of ${tickets.length.toLocaleString()} tickets were bought` });
-  embed.setColor(variants.latte.base.alpha.hex as ColorResolvable);
+  embed.setColor("#111111");
 
   await hook.send({ embeds: [embed] });
 
   if ((await getDmSettings(user.id)).lottery) {
     embed.setTitle("you have won the lottery!");
     embed.setDescription(`you have won a total of $**${total.toLocaleString()}**\n\nyour winning ticket was #${chosen.id}`);
-    embed.setColor(variants.latte.base.alpha.hex as ColorResolvable);
+    embed.setColor("#111111");
 
     await user
       .send({ embeds: [embed] })
