@@ -5,7 +5,7 @@ import workerSort from "../workers/sort";
 import { calcNetWorth } from "./balance";
 import { getAchievements, getItems } from "./utils";
 
-export async function topBalance(guild: Guild, amount: number): Promise<string[]> {
+export async function topBalance(guild: Guild, userId?: string) {
   let members: Collection<string, GuildMember>;
 
   if (guild.memberCount == guild.members.cache.size) {
@@ -31,10 +31,10 @@ export async function topBalance(guild: Guild, amount: number): Promise<string[]
     orderBy: {
       money: "desc",
     },
-    take: amount,
+    take: 100,
   });
 
-  const usersFinal = [];
+  const out = [];
 
   let count = 0;
 
@@ -47,9 +47,6 @@ export async function topBalance(guild: Guild, amount: number): Promise<string[]
   };
 
   for (const user of query) {
-    if (count >= amount) break;
-    if (usersFinal.join().length >= 1500) break;
-
     if (Number(user.money) != 0) {
       let pos: number | string = count + 1;
 
@@ -61,12 +58,34 @@ export async function topBalance(guild: Guild, amount: number): Promise<string[]
         pos = "🥉";
       }
 
-      usersFinal[count] =
-        pos + " **" + getMemberID(guild, user.userId).user.tag + "** $" + Number(user.money).toLocaleString();
+      out[count] = pos + " **" + getMemberID(guild, user.userId).user.tag + "** $" + Number(user.money).toLocaleString();
       count++;
     }
   }
-  return usersFinal;
+
+  const pages = new Map<number, string[]>();
+
+  for (const line of out) {
+    if (pages.size == 0) {
+      pages.set(1, [line]);
+    } else {
+      if (pages.get(pages.size).length >= 10) {
+        pages.set(pages.size + 1, [line]);
+      } else {
+        const arr = pages.get(pages.size);
+        arr.push(line);
+        pages.set(pages.size, arr);
+      }
+    }
+  }
+
+  let pos = 0;
+
+  if (userId) {
+    pos = query.map((i) => i.userId).indexOf(userId) + 1;
+  }
+
+  return { pages, pos };
 }
 
 export async function topBalanceGlobal(amount: number, anon = true): Promise<string[]> {
@@ -119,7 +138,7 @@ export async function topBalanceGlobal(amount: number, anon = true): Promise<str
   return usersFinal;
 }
 
-export async function topNetWorthGlobal(amount: number, userId: string) {
+export async function topNetWorthGlobal(userId: string) {
   const query = await prisma.economy.findMany({
     where: {
       net_worth: { gt: 0 },
@@ -141,9 +160,6 @@ export async function topNetWorthGlobal(amount: number, userId: string) {
   const out: string[] = [];
 
   for (const user of query) {
-    if (out.length >= amount) break;
-    if (out.join("\n").length > 1500) break;
-
     let pos: number | string = out.length + 1;
 
     if (pos == 1) {
@@ -159,10 +175,32 @@ export async function topNetWorthGlobal(amount: number, userId: string) {
     );
   }
 
-  return { list: out, userPos: query.map((i) => i.userId).indexOf(userId) + 1 };
+  const pages = new Map<number, string[]>();
+
+  for (const line of out) {
+    if (pages.size == 0) {
+      pages.set(1, [line]);
+    } else {
+      if (pages.get(pages.size).length >= 10) {
+        pages.set(pages.size + 1, [line]);
+      } else {
+        const arr = pages.get(pages.size);
+        arr.push(line);
+        pages.set(pages.size, arr);
+      }
+    }
+  }
+
+  let pos = 0;
+
+  if (userId) {
+    pos = query.map((i) => i.userId).indexOf(userId) + 1;
+  }
+
+  return { pages, pos };
 }
 
-export async function topNetWorth(guild: Guild, amount: number): Promise<string[]> {
+export async function topNetWorth(guild: Guild, userId?: string) {
   let members: Collection<string, GuildMember>;
 
   if (guild.memberCount == guild.members.cache.size) {
@@ -212,7 +250,7 @@ export async function topNetWorth(guild: Guild, amount: number): Promise<string[
     inPlaceSort(userIds).desc((i) => amounts.get(i));
   }
 
-  const usersFinal = [];
+  const out = [];
 
   let count = 0;
 
@@ -225,8 +263,7 @@ export async function topNetWorth(guild: Guild, amount: number): Promise<string[
   };
 
   for (const user of userIds) {
-    if (count >= amount) break;
-    if (usersFinal.join().length >= 1500) break;
+    if (out.length >= 100) break;
 
     if (amounts.get(user) != 0) {
       let pos: number | string = count + 1;
@@ -239,14 +276,37 @@ export async function topNetWorth(guild: Guild, amount: number): Promise<string[
         pos = "🥉";
       }
 
-      usersFinal[count] = pos + " **" + getMemberID(guild, user).user.tag + "** $" + amounts.get(user).toLocaleString();
+      out[count] = pos + " **" + getMemberID(guild, user).user.tag + "** $" + amounts.get(user).toLocaleString();
       count++;
     }
   }
-  return usersFinal;
+
+  const pages = new Map<number, string[]>();
+
+  for (const line of out) {
+    if (pages.size == 0) {
+      pages.set(1, [line]);
+    } else {
+      if (pages.get(pages.size).length >= 10) {
+        pages.set(pages.size + 1, [line]);
+      } else {
+        const arr = pages.get(pages.size);
+        arr.push(line);
+        pages.set(pages.size, arr);
+      }
+    }
+  }
+
+  let pos = 0;
+
+  if (userId) {
+    pos = userIds.indexOf(userId) + 1;
+  }
+
+  return { pages, pos };
 }
 
-export async function topPrestige(guild: Guild, amount: number): Promise<string[]> {
+export async function topPrestige(guild: Guild, userId?: string) {
   let members: Collection<string, GuildMember>;
 
   if (guild.memberCount == guild.members.cache.size) {
@@ -272,10 +332,10 @@ export async function topPrestige(guild: Guild, amount: number): Promise<string[
     orderBy: {
       prestige: "desc",
     },
-    take: amount,
+    take: 100,
   });
 
-  const usersFinal = [];
+  const out = [];
 
   let count = 0;
 
@@ -288,9 +348,6 @@ export async function topPrestige(guild: Guild, amount: number): Promise<string[
   };
 
   for (const user of query) {
-    if (count >= amount) break;
-    if (usersFinal.join().length >= 1500) break;
-
     if (user.prestige != 0) {
       let pos: string | number = count + 1;
 
@@ -304,7 +361,7 @@ export async function topPrestige(guild: Guild, amount: number): Promise<string[
 
       const thing = ["th", "st", "nd", "rd"];
       const v = user.prestige % 100;
-      usersFinal[count] =
+      out[count] =
         pos +
         " **" +
         getMemberID(guild, user.userId).user.tag +
@@ -315,10 +372,33 @@ export async function topPrestige(guild: Guild, amount: number): Promise<string[
       count++;
     }
   }
-  return usersFinal;
+
+  const pages = new Map<number, string[]>();
+
+  for (const line of out) {
+    if (pages.size == 0) {
+      pages.set(1, [line]);
+    } else {
+      if (pages.get(pages.size).length >= 10) {
+        pages.set(pages.size + 1, [line]);
+      } else {
+        const arr = pages.get(pages.size);
+        arr.push(line);
+        pages.set(pages.size, arr);
+      }
+    }
+  }
+
+  let pos = 0;
+
+  if (userId) {
+    pos = query.map((i) => i.userId).indexOf(userId) + 1;
+  }
+
+  return { pages, pos };
 }
 
-export async function topPrestigeGlobal(memberId: string, amount: number) {
+export async function topPrestigeGlobal(userId: string) {
   const query = await prisma.economy.findMany({
     where: {
       prestige: { gt: 0 },
@@ -337,14 +417,11 @@ export async function topPrestigeGlobal(memberId: string, amount: number) {
     },
   });
 
-  const usersFinal = [];
+  const out = [];
 
   let count = 0;
 
   for (const user of query) {
-    if (count >= amount) break;
-    if (usersFinal.join().length >= 1500) break;
-
     if (user.prestige != 0) {
       let pos: string | number = count + 1;
 
@@ -358,7 +435,7 @@ export async function topPrestigeGlobal(memberId: string, amount: number) {
 
       const thing = ["th", "st", "nd", "rd"];
       const v = user.prestige % 100;
-      usersFinal[count] =
+      out[count] =
         pos +
         " **" +
         user.user.lastKnownTag.split("#")[0] +
@@ -370,10 +447,32 @@ export async function topPrestigeGlobal(memberId: string, amount: number) {
     }
   }
 
-  return { out: usersFinal, pos: query.map((i) => i.userId).indexOf(memberId) + 1 };
+  const pages = new Map<number, string[]>();
+
+  for (const line of out) {
+    if (pages.size == 0) {
+      pages.set(1, [line]);
+    } else {
+      if (pages.get(pages.size).length >= 10) {
+        pages.set(pages.size + 1, [line]);
+      } else {
+        const arr = pages.get(pages.size);
+        arr.push(line);
+        pages.set(pages.size, arr);
+      }
+    }
+  }
+
+  let pos = 0;
+
+  if (userId) {
+    pos = query.map((i) => i.userId).indexOf(userId) + 1;
+  }
+
+  return { pages, pos };
 }
 
-export async function topItem(guild: Guild, amount: number, item: string): Promise<string[]> {
+export async function topItem(guild: Guild, item: string, userId: string) {
   let members: Collection<string, GuildMember>;
 
   if (guild.memberCount == guild.members.cache.size) {
@@ -399,10 +498,10 @@ export async function topItem(guild: Guild, amount: number, item: string): Promi
     orderBy: {
       amount: "desc",
     },
-    take: amount,
+    take: 100,
   });
 
-  const usersFinal = [];
+  const out = [];
 
   let count = 0;
 
@@ -415,9 +514,6 @@ export async function topItem(guild: Guild, amount: number, item: string): Promi
   };
 
   for (const user of query) {
-    if (count >= amount) break;
-    if (usersFinal.join().length >= 1500) break;
-
     let pos: number | string = count + 1;
 
     if (pos == 1) {
@@ -430,7 +526,7 @@ export async function topItem(guild: Guild, amount: number, item: string): Promi
 
     const items = getItems();
 
-    usersFinal[count] =
+    out[count] =
       pos +
       " **" +
       getMemberID(guild, user.userId).user.tag +
@@ -439,10 +535,33 @@ export async function topItem(guild: Guild, amount: number, item: string): Promi
       ` ${user.amount > 1 ? items[item].plural || items[item].name : items[item].name}`;
     count++;
   }
-  return usersFinal;
+
+  const pages = new Map<number, string[]>();
+
+  for (const line of out) {
+    if (pages.size == 0) {
+      pages.set(1, [line]);
+    } else {
+      if (pages.get(pages.size).length >= 10) {
+        pages.set(pages.size + 1, [line]);
+      } else {
+        const arr = pages.get(pages.size);
+        arr.push(line);
+        pages.set(pages.size, arr);
+      }
+    }
+  }
+
+  let pos = 0;
+
+  if (userId) {
+    pos = query.map((i) => i.userId).indexOf(userId) + 1;
+  }
+
+  return { pages, pos };
 }
 
-export async function topCompletion(guild: Guild, amount = 10): Promise<string[]> {
+export async function topCompletion(guild: Guild, userId: string) {
   let members: Collection<string, GuildMember>;
 
   if (guild.memberCount == guild.members.cache.size) {
@@ -467,7 +586,7 @@ export async function topCompletion(guild: Guild, amount = 10): Promise<string[]
   });
 
   if (query.length == 0) {
-    return [];
+    return { pages: new Map<number, string[]>(), pos: 0 };
   }
 
   const allAchievements = Object.keys(getAchievements()).length;
@@ -489,7 +608,7 @@ export async function topCompletion(guild: Guild, amount = 10): Promise<string[]
     inPlaceSort(userIds).desc((i) => completionRate.get(i));
   }
 
-  const usersFinal = [];
+  const out = [];
 
   let count = 0;
 
@@ -502,9 +621,6 @@ export async function topCompletion(guild: Guild, amount = 10): Promise<string[]
   };
 
   for (const user of userIds) {
-    if (count >= amount) break;
-    if (usersFinal.join().length >= 1500) break;
-
     if (completionRate.get(user) != 0) {
       let pos: number | string = count + 1;
 
@@ -516,10 +632,32 @@ export async function topCompletion(guild: Guild, amount = 10): Promise<string[]
         pos = "🥉";
       }
 
-      usersFinal[count] =
-        pos + " **" + getMemberID(guild, user).user.tag + "** " + completionRate.get(user).toFixed(1) + "%";
+      out[count] = pos + " **" + getMemberID(guild, user).user.tag + "** " + completionRate.get(user).toFixed(1) + "%";
       count++;
     }
   }
-  return usersFinal;
+
+  const pages = new Map<number, string[]>();
+
+  for (const line of out) {
+    if (pages.size == 0) {
+      pages.set(1, [line]);
+    } else {
+      if (pages.get(pages.size).length >= 10) {
+        pages.set(pages.size + 1, [line]);
+      } else {
+        const arr = pages.get(pages.size);
+        arr.push(line);
+        pages.set(pages.size, arr);
+      }
+    }
+  }
+
+  let pos = 0;
+
+  if (userId) {
+    pos = userIds.indexOf(userId) + 1;
+  }
+
+  return { pages, pos };
 }
