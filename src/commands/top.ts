@@ -1,21 +1,25 @@
 import {
+  ActionRowBuilder,
   APIApplicationCommandOptionChoice,
   BaseMessageOptions,
+  ButtonBuilder,
+  ButtonStyle,
   CommandInteraction,
+  Interaction,
   InteractionReplyOptions,
   Message,
-  PermissionFlagsBits,
+  MessageActionRowComponentBuilder,
 } from "discord.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { Item } from "../types/Economy.js";
 import {
-  topBalance as topMoney,
+  topBalance,
   topCompletion,
-  topItem as topInventoryItem,
+  topItem,
   topNetWorth,
   topNetWorthGlobal,
-  topPrestige as topPrestigeGuild,
+  topPrestige,
   topPrestigeGlobal,
 } from "../utils/functions/economy/top";
 import { getItems } from "../utils/functions/economy/utils.js";
@@ -103,135 +107,118 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   await addCooldown(cmd.name, message.member, 15);
 
-  const topBalance = async (amount: number) => {
-    const balTop = await topMoney(message.guild, amount);
+  const show = async (pages: Map<number, string[]>, pos: number, title: string) => {
+    const embed = new CustomEmbed(message.member).setHeader(title, message.author.avatarURL());
 
-    if (balTop.length == 0) {
-      return send({ embeds: [new ErrorEmbed("there are no users to show")] });
-    }
-
-    const embed = new CustomEmbed(message.member).setHeader("top " + balTop.length).setDescription(balTop.join("\n"));
-
-    return send({ embeds: [embed] });
-  };
-
-  const topNet = async (amount: number, global: boolean) => {
-    if (global) {
-      const { list, userPos } = await topNetWorthGlobal(amount, message.author.id);
-
-      if (list.length == 0) {
-        return send({ embeds: [new ErrorEmbed("there are no users to show")] });
-      }
-
-      const embed = new CustomEmbed(message.member, list.join("\n")).setHeader(
-        `top ${amount} networth [global]`,
-        message.author.avatarURL()
-      );
-
-      if (userPos > amount) embed.setFooter({ text: `you are #${userPos.toLocaleString()}` });
-
-      return send({ embeds: [embed] });
+    if (pages.size == 0) {
+      embed.setDescription("no data to show");
     } else {
-      const balTop = await topNetWorth(message.guild, amount);
+      embed.setDescription(pages.get(1).join("\n"));
+    }
 
-      if (balTop.length == 0) {
-        return send({ embeds: [new ErrorEmbed("there are no users to show")] });
+    if (pos != 0) {
+      embed.setFooter({ text: `you are #${pos}` });
+    }
+
+    let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
+      new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
+    );
+
+    if (pages.size == 1) {
+      return send({ embeds: [embed] });
+    }
+
+    const msg = await send({ embeds: [embed], components: [row] });
+
+    const filter = (i: Interaction) => i.user.id == message.author.id;
+    let currentPage = 1;
+
+    const pageManager = async (): Promise<void> => {
+      const reaction = await msg
+        .awaitMessageComponent({ filter, time: 30000 })
+        .then(async (collected) => {
+          await collected.deferUpdate();
+          return collected.customId;
+        })
+        .catch(async () => {
+          await msg.edit({ components: [] }).catch(() => {});
+        });
+
+      if (!reaction) return;
+
+      if (reaction == "⬅") {
+        if (currentPage <= 1) {
+          return pageManager();
+        } else {
+          currentPage--;
+
+          embed.setDescription(pages.get(currentPage).join("\n"));
+
+          if (currentPage == 1) {
+            row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+              new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
+              new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(false)
+            );
+          } else {
+            row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+              new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(false),
+              new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(false)
+            );
+          }
+          await msg.edit({ embeds: [embed], components: [row] });
+          return pageManager();
+        }
+      } else if (reaction == "➡") {
+        if (currentPage >= pages.size) {
+          return pageManager();
+        } else {
+          currentPage++;
+
+          embed.setDescription(pages.get(currentPage).join("\n"));
+
+          if (currentPage == pages.size) {
+            row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+              new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(false),
+              new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(true)
+            );
+          } else {
+            row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+              new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(false),
+              new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(false)
+            );
+          }
+          await msg.edit({ embeds: [embed], components: [row] });
+          return pageManager();
+        }
       }
+    };
 
-      const embed = new CustomEmbed(message.member)
-        .setHeader("top " + balTop.length + " networth")
-        .setDescription(balTop.join("\n"));
-
-      return send({ embeds: [embed] });
-    }
-  };
-
-  const topPrestige = async (amount: number, global: boolean) => {
-    if (global) {
-      const { out, pos } = await topPrestigeGlobal(message.author.id, amount);
-
-      if (out.length == 0) {
-        return send({ embeds: [new ErrorEmbed("there are no users to show")] });
-      }
-
-      const embed = new CustomEmbed(message.member, out.join("\n")).setHeader(
-        `top ${amount} [global]`,
-        message.author.avatarURL()
-      );
-
-      if (pos > amount) embed.setFooter({ text: `you are #${pos.toLocaleString()}` });
-
-      return send({ embeds: [embed] });
-    } else {
-      const prestigeTop = await topPrestigeGuild(message.guild, amount);
-
-      const embed = new CustomEmbed(message.member)
-        .setHeader("top " + prestigeTop.length)
-        .setDescription(prestigeTop.join("\n"));
-
-      return send({ embeds: [embed] });
-    }
-  };
-
-  const topItem = async (item: Item, amount: number) => {
-    const top = await topInventoryItem(message.guild, amount, item.id);
-
-    if (top.length == 0) {
-      return send({ embeds: [new ErrorEmbed(`there are no users to show for ${item.name}`)] });
-    }
-
-    const embed = new CustomEmbed(message.member)
-      .setHeader(`top ${top.length} ${item.name} holders`)
-      .setDescription(top.join("\n"));
-
-    return send({ embeds: [embed] });
-  };
-
-  const topComplete = async (amount: number) => {
-    const top = await topCompletion(message.guild, amount);
-
-    if (top.length == 0) {
-      return send({ embeds: [new ErrorEmbed("there are no users to show")] });
-    }
-
-    const embed = new CustomEmbed(message.member).setHeader(`top ${top.length} completion`).setDescription(top.join("\n"));
-
-    return send({ embeds: [embed] });
+    return pageManager();
   };
 
   if (args.length == 0) {
-    return topBalance(5);
+    const data = await topBalance(message.guild, message.author.id);
+
+    return show(data.pages, data.pos, `top balance for ${message.guild.name}`);
   } else if (args[0].toLowerCase() == "balance") {
-    let amount;
+    const data = await topBalance(message.guild, message.author.id);
 
-    amount = parseInt(args[1]);
-
-    if (!amount) amount = 5;
-
-    if (amount > 10 && !message.member.permissions.has(PermissionFlagsBits.Administrator)) amount = 10;
-
-    if (amount < 5) amount = 5;
-
-    return topBalance(amount);
+    return show(data.pages, data.pos, `top balance for ${message.guild.name}`);
   } else if (args[0].toLowerCase() == "prestige") {
-    let amount;
-
-    amount = parseInt(args[1]);
-
-    if (!amount) amount = 5;
-
     let global = false;
 
-    if (!(message instanceof Message) && message.isChatInputCommand() && message.options.getString("scope") == "global") {
-      if (!parseInt(args[1])) amount = 10;
-      global = true;
+    if (args[1]?.toLowerCase() == "global") global = true;
+
+    let data: { pages: Map<number, string[]>; pos: number };
+
+    if (global) {
+      data = await topPrestigeGlobal(message.author.id);
+    } else {
+      data = await topPrestige(message.guild, message.author.id);
     }
 
-    if (amount > 10 && !message.member.permissions.has(PermissionFlagsBits.Administrator)) amount = 10;
-
-    if (amount < 5) amount = 5;
-
-    return topPrestige(amount, global);
+    return show(data.pages, data.pos, `top prestige ${global ? "[global]" : `for ${message.guild.name}`}`);
   } else if (args[0].toLowerCase() == "item") {
     const items = getItems();
     const searchTag = args[1].toLowerCase();
@@ -259,48 +246,27 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return send({ embeds: [new ErrorEmbed(`couldn't find ${searchTag}`)] });
     }
 
-    let amount;
+    const data = await topItem(message.guild, item.id, message.author.id);
 
-    amount = parseInt(args[2]);
-
-    if (!amount) amount = 5;
-
-    if (amount > 10 && !message.member.permissions.has(PermissionFlagsBits.Administrator)) amount = 10;
-
-    if (amount < 5) amount = 5;
-
-    return topItem(item, amount);
+    return show(data.pages, data.pos, `top ${item.name} in ${message.guild.name}`);
   } else if (args[0].toLowerCase() == "completion") {
-    let amount;
+    const data = await topCompletion(message.guild, message.author.id);
 
-    amount = parseInt(args[1]);
-
-    if (!amount) amount = 5;
-
-    if (amount > 10 && !message.member.permissions.has(PermissionFlagsBits.Administrator)) amount = 10;
-
-    if (amount < 5) amount = 5;
-
-    return topComplete(amount);
+    return show(data.pages, data.pos, `top completion in ${message.guild.name}`);
   } else if (args[0].toLowerCase() == "net" || args[0].toLowerCase() == "networth") {
-    let amount;
-
-    amount = parseInt(args[1]);
-
-    if (!amount) amount = 5;
-
     let global = false;
 
-    if (!(message instanceof Message) && message.isChatInputCommand() && message.options.getString("scope") == "global") {
-      if (!parseInt(args[1])) amount = 10;
-      global = true;
+    if (args[1]?.toLowerCase() == "global") global = true;
+
+    let data: { pages: Map<number, string[]>; pos: number };
+
+    if (global) {
+      data = await topNetWorthGlobal(message.author.id);
+    } else {
+      data = await topNetWorth(message.guild, message.author.id);
     }
 
-    if (amount > 10 && !message.member.permissions.has(PermissionFlagsBits.Administrator)) amount = 10;
-
-    if (amount < 5) amount = 5;
-
-    return topNet(amount, global);
+    return show(data.pages, data.pos, `top net worth ${global ? "[global]" : `for ${message.guild.name}`}`);
   }
 }
 
