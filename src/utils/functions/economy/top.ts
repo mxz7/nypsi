@@ -85,7 +85,7 @@ export async function topBalance(guild: Guild, userId?: string) {
     pos = query.map((i) => i.userId).indexOf(userId) + 1;
   }
 
-  return { list: out, userPos: pos };
+  return { pages, pos };
 }
 
 export async function topBalanceGlobal(amount: number, anon = true): Promise<string[]> {
@@ -181,7 +181,7 @@ export async function topNetWorthGlobal(amount: number, userId: string) {
   return { list: out, userPos: query.map((i) => i.userId).indexOf(userId) + 1 };
 }
 
-export async function topNetWorth(guild: Guild, amount: number): Promise<string[]> {
+export async function topNetWorth(guild: Guild, userId?: string) {
   let members: Collection<string, GuildMember>;
 
   if (guild.memberCount == guild.members.cache.size) {
@@ -231,7 +231,7 @@ export async function topNetWorth(guild: Guild, amount: number): Promise<string[
     inPlaceSort(userIds).desc((i) => amounts.get(i));
   }
 
-  const usersFinal = [];
+  const out = [];
 
   let count = 0;
 
@@ -244,8 +244,7 @@ export async function topNetWorth(guild: Guild, amount: number): Promise<string[
   };
 
   for (const user of userIds) {
-    if (count >= amount) break;
-    if (usersFinal.join().length >= 1500) break;
+    if (out.length >= 100) break;
 
     if (amounts.get(user) != 0) {
       let pos: number | string = count + 1;
@@ -258,11 +257,34 @@ export async function topNetWorth(guild: Guild, amount: number): Promise<string[
         pos = "🥉";
       }
 
-      usersFinal[count] = pos + " **" + getMemberID(guild, user).user.tag + "** $" + amounts.get(user).toLocaleString();
+      out[count] = pos + " **" + getMemberID(guild, user).user.tag + "** $" + amounts.get(user).toLocaleString();
       count++;
     }
   }
-  return usersFinal;
+
+  const pages = new Map<number, string[]>();
+
+  for (const line of out) {
+    if (pages.size == 0) {
+      pages.set(1, [line]);
+    } else {
+      if (pages.get(pages.size).length >= 10) {
+        pages.set(pages.size + 1, [line]);
+      } else {
+        const arr = pages.get(pages.size);
+        arr.push(line);
+        pages.set(pages.size, arr);
+      }
+    }
+  }
+
+  let pos = 0;
+
+  if (userId) {
+    pos = userIds.indexOf(userId) + 1;
+  }
+
+  return { pages, pos };
 }
 
 export async function topPrestige(guild: Guild, amount: number): Promise<string[]> {
