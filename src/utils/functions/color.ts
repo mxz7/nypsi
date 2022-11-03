@@ -13,7 +13,7 @@ const colors: string[] = [
 ];
 
 export function getColor(member: GuildMember) {
-  if (member.displayHexColor == "#ffffff") {
+  if (member.displayHexColor == "#ffffff" || member.displayHexColor == "#000000") {
     return colors[Math.floor(Math.random() * colors.length)] as ColorResolvable;
   } else {
     return member.displayHexColor;
