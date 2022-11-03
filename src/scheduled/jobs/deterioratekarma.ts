@@ -55,14 +55,14 @@ import Constants from "../../utils/Constants";
       karmaToRemove = user.karma - 1;
     }
 
-    total += karmaToRemove;
+    total += Math.floor(karmaToRemove);
 
     await prisma.user.update({
       where: {
         id: user.id,
       },
       data: {
-        karma: { decrement: karmaToRemove },
+        karma: { decrement: Math.floor(karmaToRemove) },
       },
     });
 
