@@ -287,7 +287,7 @@ export async function topNetWorth(guild: Guild, userId?: string) {
   return { pages, pos };
 }
 
-export async function topPrestige(guild: Guild, amount: number): Promise<string[]> {
+export async function topPrestige(guild: Guild, userId?: string) {
   let members: Collection<string, GuildMember>;
 
   if (guild.memberCount == guild.members.cache.size) {
@@ -313,10 +313,10 @@ export async function topPrestige(guild: Guild, amount: number): Promise<string[
     orderBy: {
       prestige: "desc",
     },
-    take: amount,
+    take: 100,
   });
 
-  const usersFinal = [];
+  const out = [];
 
   let count = 0;
 
@@ -329,9 +329,6 @@ export async function topPrestige(guild: Guild, amount: number): Promise<string[
   };
 
   for (const user of query) {
-    if (count >= amount) break;
-    if (usersFinal.join().length >= 1500) break;
-
     if (user.prestige != 0) {
       let pos: string | number = count + 1;
 
@@ -345,7 +342,7 @@ export async function topPrestige(guild: Guild, amount: number): Promise<string[
 
       const thing = ["th", "st", "nd", "rd"];
       const v = user.prestige % 100;
-      usersFinal[count] =
+      out[count] =
         pos +
         " **" +
         getMemberID(guild, user.userId).user.tag +
@@ -356,7 +353,30 @@ export async function topPrestige(guild: Guild, amount: number): Promise<string[
       count++;
     }
   }
-  return usersFinal;
+
+  const pages = new Map<number, string[]>();
+
+  for (const line of out) {
+    if (pages.size == 0) {
+      pages.set(1, [line]);
+    } else {
+      if (pages.get(pages.size).length >= 10) {
+        pages.set(pages.size + 1, [line]);
+      } else {
+        const arr = pages.get(pages.size);
+        arr.push(line);
+        pages.set(pages.size, arr);
+      }
+    }
+  }
+
+  let pos = 0;
+
+  if (userId) {
+    pos = query.map((i) => i.userId).indexOf(userId) + 1;
+  }
+
+  return { pages, pos };
 }
 
 export async function topPrestigeGlobal(memberId: string, amount: number) {
