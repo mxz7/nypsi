@@ -34,17 +34,12 @@ const scopeChoices: APIApplicationCommandOptionChoice<string>[] = [
 
 cmd.slashEnabled = true;
 cmd.slashData
-  .addSubcommand((balance) =>
-    balance
-      .setName("balance")
-      .setDescription("view top balances in the server")
-      .addIntegerOption((option) => option.setName("amount").setDescription("amount of members to show").setRequired(false))
-  )
+  .addSubcommand((balance) => balance.setName("balance").setDescription("view top balances in the server"))
   .addSubcommand((prestige) =>
     prestige
       .setName("prestige")
       .setDescription("view top prestiges in the server")
-      .addIntegerOption((option) => option.setName("amount").setDescription("amount of members to show").setRequired(false))
+
       .addStringOption((option) =>
         option
           .setName("scope")
@@ -60,19 +55,13 @@ cmd.slashData
       .addStringOption((option) =>
         option.setName("item-global").setDescription("item to query").setRequired(true).setAutocomplete(true)
       )
-      .addIntegerOption((option) => option.setName("amount").setDescription("amount of members to show").setRequired(false))
   )
-  .addSubcommand((completion) =>
-    completion
-      .setName("completion")
-      .setDescription("view top completion in the server")
-      .addIntegerOption((option) => option.setName("amount").setDescription("amount of members to show").setRequired(false))
-  )
+  .addSubcommand((completion) => completion.setName("completion").setDescription("view top completion in the server"))
   .addSubcommand((networth) =>
     networth
       .setName("networth")
       .setDescription("view top networths in the server")
-      .addIntegerOption((option) => option.setName("amount").setDescription("amount of members to show").setRequired(false))
+
       .addStringOption((option) =>
         option
           .setName("scope")
