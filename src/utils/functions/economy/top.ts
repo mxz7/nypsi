@@ -428,7 +428,29 @@ export async function topPrestigeGlobal(userId: string) {
     }
   }
 
-  return { out: out, pos: query.map((i) => i.userId).indexOf(userId) + 1 };
+  const pages = new Map<number, string[]>();
+
+  for (const line of out) {
+    if (pages.size == 0) {
+      pages.set(1, [line]);
+    } else {
+      if (pages.get(pages.size).length >= 10) {
+        pages.set(pages.size + 1, [line]);
+      } else {
+        const arr = pages.get(pages.size);
+        arr.push(line);
+        pages.set(pages.size, arr);
+      }
+    }
+  }
+
+  let pos = 0;
+
+  if (userId) {
+    pos = query.map((i) => i.userId).indexOf(userId) + 1;
+  }
+
+  return { pages, pos };
 }
 
 export async function topItem(guild: Guild, item: string, userId: string) {
