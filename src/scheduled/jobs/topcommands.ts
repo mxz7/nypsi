@@ -1,4 +1,5 @@
-import { EmbedBuilder, WebhookClient } from "discord.js";
+import { variants } from "@catppuccin/palette";
+import { ColorResolvable, EmbedBuilder, WebhookClient } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { parentPort } from "worker_threads";
 import redis from "../../init/redis";
@@ -49,7 +50,7 @@ import Constants from "../../utils/Constants";
 
   embed.setTitle("top 10 commands");
   embed.setDescription(msg.join("\n"));
-  embed.setColor("#111111");
+  embed.setColor(variants.latte.base.hex as ColorResolvable);
   embed.setFooter({ text: `${users[0]} has no life (${parseInt(topUsers[users[0]]).toLocaleString()} commands)` });
 
   const hook = new WebhookClient({ url: process.env.TOPCOMMANDS_HOOK });
