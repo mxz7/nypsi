@@ -379,7 +379,7 @@ export async function topPrestige(guild: Guild, userId?: string) {
   return { pages, pos };
 }
 
-export async function topPrestigeGlobal(memberId: string, amount: number) {
+export async function topPrestigeGlobal(userId: string) {
   const query = await prisma.economy.findMany({
     where: {
       prestige: { gt: 0 },
@@ -398,14 +398,11 @@ export async function topPrestigeGlobal(memberId: string, amount: number) {
     },
   });
 
-  const usersFinal = [];
+  const out = [];
 
   let count = 0;
 
   for (const user of query) {
-    if (count >= amount) break;
-    if (usersFinal.join().length >= 1500) break;
-
     if (user.prestige != 0) {
       let pos: string | number = count + 1;
 
@@ -419,7 +416,7 @@ export async function topPrestigeGlobal(memberId: string, amount: number) {
 
       const thing = ["th", "st", "nd", "rd"];
       const v = user.prestige % 100;
-      usersFinal[count] =
+      out[count] =
         pos +
         " **" +
         user.user.lastKnownTag.split("#")[0] +
@@ -431,7 +428,7 @@ export async function topPrestigeGlobal(memberId: string, amount: number) {
     }
   }
 
-  return { out: usersFinal, pos: query.map((i) => i.userId).indexOf(memberId) + 1 };
+  return { out: out, pos: query.map((i) => i.userId).indexOf(userId) + 1 };
 }
 
 export async function topItem(guild: Guild, amount: number, item: string): Promise<string[]> {
