@@ -1,6 +1,5 @@
-import { variants } from "@catppuccin/palette";
 import { WholesomeImage, WholesomeSuggestion } from "@prisma/client";
-import { ColorResolvable, GuildMember, WebhookClient } from "discord.js";
+import { GuildMember, WebhookClient } from "discord.js";
 import ImgurClient from "imgur";
 import fetch from "node-fetch";
 import prisma from "../../init/database";
@@ -161,7 +160,7 @@ export async function suggestWholesomeImage(submitter: GuildMember, image: strin
   });
 
   const embed = new CustomEmbed()
-    .setColor(variants.latte.base.alpha.hex as ColorResolvable)
+    .setColor("#111111")
     .setTitle("wholesome suggestion #" + id)
     .disableFooter();
 

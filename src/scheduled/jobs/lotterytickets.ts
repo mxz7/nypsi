@@ -1,5 +1,4 @@
-import { variants } from "@catppuccin/palette";
-import { ColorResolvable, EmbedBuilder, WebhookClient } from "discord.js";
+import { EmbedBuilder, WebhookClient } from "discord.js";
 import redis from "../../init/redis";
 
 (async () => {
@@ -27,7 +26,7 @@ import redis from "../../init/redis";
 
   const embed = new EmbedBuilder();
 
-  embed.setColor(variants.latte.base.alpha.hex as ColorResolvable);
+  embed.setColor("#111111");
   embed.setDescription(desc.join("\n"));
   embed.setTimestamp();
 
