@@ -138,7 +138,7 @@ export async function topBalanceGlobal(amount: number, anon = true): Promise<str
   return usersFinal;
 }
 
-export async function topNetWorthGlobal(amount: number, userId: string) {
+export async function topNetWorthGlobal(userId: string) {
   const query = await prisma.economy.findMany({
     where: {
       net_worth: { gt: 0 },
@@ -160,9 +160,6 @@ export async function topNetWorthGlobal(amount: number, userId: string) {
   const out: string[] = [];
 
   for (const user of query) {
-    if (out.length >= amount) break;
-    if (out.join("\n").length > 1500) break;
-
     let pos: number | string = out.length + 1;
 
     if (pos == 1) {
@@ -178,7 +175,29 @@ export async function topNetWorthGlobal(amount: number, userId: string) {
     );
   }
 
-  return { list: out, userPos: query.map((i) => i.userId).indexOf(userId) + 1 };
+  const pages = new Map<number, string[]>();
+
+  for (const line of out) {
+    if (pages.size == 0) {
+      pages.set(1, [line]);
+    } else {
+      if (pages.get(pages.size).length >= 10) {
+        pages.set(pages.size + 1, [line]);
+      } else {
+        const arr = pages.get(pages.size);
+        arr.push(line);
+        pages.set(pages.size, arr);
+      }
+    }
+  }
+
+  let pos = 0;
+
+  if (userId) {
+    pos = query.map((i) => i.userId).indexOf(userId) + 1;
+  }
+
+  return { pages, pos };
 }
 
 export async function topNetWorth(guild: Guild, userId?: string) {
