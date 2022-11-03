@@ -5,7 +5,7 @@ import workerSort from "../workers/sort";
 import { calcNetWorth } from "./balance";
 import { getAchievements, getItems } from "./utils";
 
-export async function topBalance(guild: Guild, amount: number): Promise<string[]> {
+export async function topBalance(guild: Guild, userId?: string) {
   let members: Collection<string, GuildMember>;
 
   if (guild.memberCount == guild.members.cache.size) {
@@ -31,10 +31,10 @@ export async function topBalance(guild: Guild, amount: number): Promise<string[]
     orderBy: {
       money: "desc",
     },
-    take: amount,
+    take: 100,
   });
 
-  const usersFinal = [];
+  const out = [];
 
   let count = 0;
 
@@ -47,9 +47,6 @@ export async function topBalance(guild: Guild, amount: number): Promise<string[]
   };
 
   for (const user of query) {
-    if (count >= amount) break;
-    if (usersFinal.join().length >= 1500) break;
-
     if (Number(user.money) != 0) {
       let pos: number | string = count + 1;
 
@@ -61,12 +58,34 @@ export async function topBalance(guild: Guild, amount: number): Promise<string[]
         pos = "🥉";
       }
 
-      usersFinal[count] =
-        pos + " **" + getMemberID(guild, user.userId).user.tag + "** $" + Number(user.money).toLocaleString();
+      out[count] = pos + " **" + getMemberID(guild, user.userId).user.tag + "** $" + Number(user.money).toLocaleString();
       count++;
     }
   }
-  return usersFinal;
+
+  const pages = new Map<number, string[]>();
+
+  for (const line of out) {
+    if (pages.size == 0) {
+      pages.set(1, [line]);
+    } else {
+      if (pages.get(pages.size).length >= 10) {
+        pages.set(pages.size + 1, [line]);
+      } else {
+        const arr = pages.get(pages.size);
+        arr.push(line);
+        pages.set(pages.size, arr);
+      }
+    }
+  }
+
+  let pos = 0;
+
+  if (userId) {
+    pos = query.map((i) => i.userId).indexOf(userId) + 1;
+  }
+
+  return { list: out, userPos: pos };
 }
 
 export async function topBalanceGlobal(amount: number, anon = true): Promise<string[]> {
