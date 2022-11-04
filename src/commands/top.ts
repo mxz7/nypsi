@@ -97,7 +97,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   await addCooldown(cmd.name, message.member, 15);
 
   const show = async (pages: Map<number, string[]>, pos: number, title: string) => {
-    const embed = new CustomEmbed(message.member).setHeader(title, message.author.avatarURL());
+    const embed = new CustomEmbed(message.member).setHeader(
+      title,
+      title.includes("global") ? message.guild.iconURL() : message.client.user.avatarURL()
+    );
 
     if (pages.size == 0) {
       embed.setDescription("no data to show");
