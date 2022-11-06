@@ -244,6 +244,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return send({
         embeds: [new ErrorEmbed("there is already a chat reaction in this channel")],
       });
+    } else {
+      if (!(message instanceof Message)) {
+        return send({ embeds: [new CustomEmbed(message.member, "✅ chat reaction started")], ephemeral: true });
+      }
     }
   } else if (args[0].toLowerCase() == "stats") {
     if (args.length == 2 && args[1].toLowerCase() == "reset") {
