@@ -10,7 +10,9 @@ module.exports = new ItemUse("diamond_watch", async (message: Message | (NypsiCo
       if (message.deferred) {
         await message.editReply(data);
       } else {
-        await message.reply(data as InteractionReplyOptions);
+        await message.reply(data as InteractionReplyOptions).catch(() => {
+          return message.editReply(data);
+        });
       }
       const replyMsg = await message.fetchReply();
       if (replyMsg instanceof Message) {
