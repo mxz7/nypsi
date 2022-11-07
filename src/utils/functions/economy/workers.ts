@@ -148,6 +148,7 @@ export async function claimFromWorkers(userId: string): Promise<string> {
   const amounts = new Map<string, number>();
 
   for (const worker of userWorkers) {
+    if (worker.stored == 0) continue;
     const baseWorker = baseWorkers[worker.workerId];
 
     const { perItem } = await calcWorkerValues(worker);
