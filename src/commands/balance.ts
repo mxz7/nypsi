@@ -78,7 +78,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       if (message.deferred) {
         await message.editReply(data);
       } else {
-        await message.reply(data as InteractionReplyOptions);
+        await message.reply(data as InteractionReplyOptions).catch(() => {
+          return message.editReply(data);
+        });
       }
       const replyMsg = await message.fetchReply();
       if (replyMsg instanceof Message) {

@@ -12,7 +12,9 @@ module.exports = new ItemUse("streak_token", async (message: Message | (NypsiCom
       if (message.deferred) {
         await message.editReply(data);
       } else {
-        await message.reply(data as InteractionReplyOptions);
+        await message.reply(data as InteractionReplyOptions).catch(() => {
+          return message.editReply(data);
+        });
       }
       const replyMsg = await message.fetchReply();
       if (replyMsg instanceof Message) {
