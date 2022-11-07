@@ -1,3 +1,4 @@
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder } from "discord.js";
 import prisma from "../../init/database";
 import redis from "../../init/redis";
 import { CustomEmbed } from "../../models/EmbedBuilders";
@@ -101,6 +102,9 @@ async function doWorkerThing() {
       payload: {
         content: null,
         embed: null,
+        components: new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+          new ButtonBuilder().setCustomId("w-claim").setLabel("claim").setStyle(ButtonStyle.Success)
+        ),
       },
     };
 

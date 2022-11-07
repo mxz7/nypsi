@@ -25,7 +25,7 @@ import {
   addWorker,
   addWorkerUpgrade,
   calcWorkerValues,
-  emptyWorkersStored,
+  claimFromWorkers,
   getWorkers,
 } from "../utils/functions/economy/workers";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -396,43 +396,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     return upgradeWorker(worker);
   } else if (args[0].toLowerCase() == "claim" || args[0].toLowerCase() == "sell") {
-    let amountEarned = 0;
-    const earnedBreakdown: string[] = [];
-    const amounts = new Map<string, number>();
+    const desc = await claimFromWorkers(message.author.id);
 
-    for (const worker of userWorkers) {
-      const baseWorker = baseWorkers[worker.workerId];
-
-      const { perItem } = await calcWorkerValues(worker);
-
-      amountEarned += Math.floor(perItem * worker.stored);
-      earnedBreakdown.push(
-        `${baseWorker.name} +$${Math.floor(perItem * worker.stored).toLocaleString()} (${worker.stored.toLocaleString()} ${
-          baseWorker.item_emoji
-        })`
-      );
-      amounts.set(
-        `${baseWorker.name} +$${Math.floor(perItem * worker.stored).toLocaleString()} (${worker.stored.toLocaleString()} ${
-          baseWorker.item_emoji
-        })`,
-        perItem * worker.stored
-      );
-    }
-
-    inPlaceSort(earnedBreakdown).desc((x) => amounts.get(x));
-
-    if (amountEarned == 0) {
-      return send({
-        embeds: [new ErrorEmbed("you have no money to claim from your workers")],
-      });
-    }
-
-    await emptyWorkersStored(message.member);
-    await updateBalance(message.member, (await getBalance(message.member)) + amountEarned);
-
-    const embed = new CustomEmbed(message.member, `+$**${amountEarned.toLocaleString()}**\n\n${earnedBreakdown.join("\n")}`)
-      .setHeader("workers", message.author.avatarURL())
-      .disableFooter();
+    const embed = new CustomEmbed(message.member, desc).setHeader("workers", message.author.avatarURL()).disableFooter();
 
     return send({ embeds: [embed] });
   } else {
