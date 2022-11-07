@@ -1,7 +1,9 @@
 import { EconomyWorker, EconomyWorkerUpgrades } from "@prisma/client";
 import { GuildMember } from "discord.js";
+import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
 import { logger } from "../../logger";
+import { getBalance, updateBalance } from "./balance";
 import { getBoosters } from "./boosters";
 import { getBaseUpgrades, getBaseWorkers, getItems } from "./utils";
 
@@ -135,4 +137,43 @@ export async function addWorkerUpgrade(member: GuildMember, workerId: string, up
       amount: 1,
     },
   });
+}
+
+export async function claimFromWorkers(userId: string): Promise<string> {
+  const baseWorkers = getBaseWorkers();
+  const userWorkers = await getWorkers(userId);
+
+  let amountEarned = 0;
+  const earnedBreakdown: string[] = [];
+  const amounts = new Map<string, number>();
+
+  for (const worker of userWorkers) {
+    const baseWorker = baseWorkers[worker.workerId];
+
+    const { perItem } = await calcWorkerValues(worker);
+
+    amountEarned += Math.floor(perItem * worker.stored);
+    earnedBreakdown.push(
+      `${baseWorker.name} +$${Math.floor(perItem * worker.stored).toLocaleString()} (${worker.stored.toLocaleString()} ${
+        baseWorker.item_emoji
+      })`
+    );
+    amounts.set(
+      `${baseWorker.name} +$${Math.floor(perItem * worker.stored).toLocaleString()} (${worker.stored.toLocaleString()} ${
+        baseWorker.item_emoji
+      })`,
+      perItem * worker.stored
+    );
+  }
+
+  inPlaceSort(earnedBreakdown).desc((x) => amounts.get(x));
+
+  if (amountEarned == 0) {
+    return "you have no money to claim from your workers";
+  }
+
+  await emptyWorkersStored(userId);
+  await updateBalance(userId, (await getBalance(userId)) + amountEarned);
+
+  return `+$**${amountEarned.toLocaleString()}**\n\n${earnedBreakdown.join("\n")}`;
 }
