@@ -2,13 +2,13 @@ import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Messag
 import * as fs from "fs/promises";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import Constants from "../utils/Constants";
 import { MStoTime } from "../utils/functions/date";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { addKarma } from "../utils/functions/karma/karma";
 import { addWordleGame, getWordleStats } from "../utils/functions/users/wordle";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import ms = require("ms");
-import Constants from "../utils/Constants";
 
 const cmd = new Command("wordle", "play wordle on discord", Categories.FUN).setAliases(["w"]);
 
@@ -46,7 +46,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       if (message.deferred) {
         await message.editReply(data);
       } else {
-        await message.reply(data as InteractionReplyOptions);
+        await message.reply(data as InteractionReplyOptions).catch(() => {
+          return message.editReply(data);
+        });
       }
       const replyMsg = await message.fetchReply();
       if (replyMsg instanceof Message) {
