@@ -65,11 +65,11 @@ export default async function messageCreate(message: Message) {
         .setHeader("support")
         .setColor(Constants.TRANSPARENT_EMBED_COLOR)
         .setDescription(
-          "if you need support, click the button below to talk to a human or join the [**official nypsi server**](https://discord.gg/hJTDNST)"
+          "if you need support, join the [**official nypsi server**](https://discord.gg/hJTDNST) or click the button below to talk to a staff member. only click the button if you actually need support"
         );
 
       const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder().setCustomId("s").setLabel("talk to a human").setStyle(ButtonStyle.Success)
+        new ButtonBuilder().setCustomId("s").setLabel("talk to a staff member").setStyle(ButtonStyle.Success)
       );
 
       const msg = await message.reply({ content: "discord.gg/hJTDNST", embeds: [embed], components: [row] });
