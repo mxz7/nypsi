@@ -156,6 +156,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
               SendMessages: false,
               Speak: false,
               AddReactions: false,
+              SendMessagesInThreads: false,
             })
             .catch(() => {
               channelError = true;
