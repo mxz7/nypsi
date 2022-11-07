@@ -21,6 +21,7 @@ import Constants from "../utils/Constants";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
 import { addInventoryItem, getInventory } from "../utils/functions/economy/inventory";
 import { createUser, getAchievements, getItems, userExists } from "../utils/functions/economy/utils";
+import { claimFromWorkers } from "../utils/functions/economy/workers";
 import { getChatFilter } from "../utils/functions/guilds/filters";
 import { getKarma } from "../utils/functions/karma/karma";
 import { getKarmaShopItems, isKarmaShopOpen } from "../utils/functions/karma/karmashop";
@@ -476,6 +477,16 @@ export default async function interactionCreate(interaction: Interaction) {
       );
 
       return await interaction.message.edit({ embeds: [embed] }).catch(() => {});
+    } else if (interaction.customId == "w-claim") {
+      const desc = await claimFromWorkers(interaction.user.id);
+
+      const embed = new CustomEmbed()
+        .setDescription(desc)
+        .setColor(Constants.EMBED_SUCCESS_COLOR)
+        .setHeader("workers", interaction.user.avatarURL())
+        .disableFooter();
+
+      return interaction.reply({ embeds: [embed] });
     }
   }
 
