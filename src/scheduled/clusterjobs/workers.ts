@@ -138,6 +138,8 @@ async function doWorkerThing() {
         .setFooter({ text: "/settings me notifications" });
     }
 
+    if (!data.payload.embed) continue;
+
     await addNotificationToQueue(data);
     amount++;
   }
