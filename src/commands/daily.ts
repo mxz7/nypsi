@@ -2,7 +2,6 @@ import dayjs = require("dayjs");
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import { MStoTime } from "../utils/functions/date";
 import { setProgress } from "../utils/functions/economy/achievements";
 import { getBalance, getMulti, updateBalance } from "../utils/functions/economy/balance";
 import { addInventoryItem } from "../utils/functions/economy/inventory";
@@ -47,9 +46,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const lastDaily = await getLastDaily(message.member);
 
   if (!dayjs(lastDaily.getTime()).isBefore(dayjs(), "day")) {
-    const diff = dayjs().add(1, "day").startOf("day").unix() * 1000 - dayjs().unix() * 1000;
+    const diff = dayjs().add(1, "day").startOf("day").unix() * 1000 - dayjs().unix();
     return send({
-      embeds: [new ErrorEmbed(`your next daily bonus is available in **${MStoTime(diff)}**`).removeTitle()],
+      embeds: [new ErrorEmbed(`your next daily bonus is available <t:${diff}:R>`).removeTitle()],
     });
   }
 
