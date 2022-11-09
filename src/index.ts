@@ -11,6 +11,7 @@ import ms = require("ms");
 
 setClusterId("main");
 getWebhooks();
+process.title = "nypsi main";
 
 let heartBeatIntervals: NodeJS.Timer[] = [];
 
