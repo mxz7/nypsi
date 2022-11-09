@@ -15,6 +15,7 @@ export default function searchLogs(searchTerm: string): Promise<[Buffer, number]
 }
 
 if (!isMainThread) {
+  process.title = "nypsi: logsearch worker";
   (async () => {
     const searchTerm: string = workerData[0];
     const resultsFile = `./temp/search_results_${Date.now()}.txt`;

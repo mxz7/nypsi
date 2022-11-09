@@ -19,6 +19,7 @@ export default function doCollection(array: MentionQueueItem): Promise<any> {
 }
 
 if (!isMainThread) {
+  process.title = "nypsi: mentions worker";
   setTimeout(() => {
     parentPort.postMessage(1);
   }, ms("1 hour"));
