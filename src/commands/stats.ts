@@ -18,8 +18,6 @@ import { Categories, Command, NypsiCommandInteraction } from "../models/Command"
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { MStoTime } from "../utils/functions/date";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-// @ts-expect-error typescript doesnt like opening package.json
-import { version } from "../../package.json";
 import { workerCount } from "../events/message";
 import { NypsiClient } from "../models/Client";
 import Constants from "../utils/Constants";
@@ -27,6 +25,7 @@ import { getStats } from "../utils/functions/economy/stats";
 import { getCommandUses } from "../utils/functions/users/commands";
 import { mentionQueue } from "../utils/functions/users/mentions";
 import { aliasesSize, commandsSize } from "../utils/handlers/commandhandler";
+import { getVersion } from "../utils/functions/version";
 
 const cmd = new Command("stats", "view your nypsi stats", Categories.MONEY);
 
@@ -310,7 +309,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       )
       .addField("cluster", `**uptime** ${uptime}`, true);
 
-    embed.setFooter({ text: `v${version} | shard: ${currentShard}` });
+    embed.setFooter({ text: `v${getVersion()} | shard: ${currentShard}` });
 
     return send({ embeds: [embed] });
   };
