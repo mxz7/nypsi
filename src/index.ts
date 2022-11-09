@@ -4,6 +4,7 @@ import { clearInterval } from "timers";
 import startJobs from "./scheduled/scheduler";
 import { addFailedHeatbeat, sendHeartbeat } from "./utils/functions/heartbeat";
 import { updateStats } from "./utils/functions/topgg";
+import { getVersion } from "./utils/functions/version";
 import { listenForDms } from "./utils/handlers/notificationhandler";
 import { listen } from "./utils/handlers/webhookhandler";
 import { getWebhooks, logger, setClusterId } from "./utils/logger";
@@ -11,7 +12,7 @@ import ms = require("ms");
 
 setClusterId("main");
 getWebhooks();
-process.title = "nypsi main";
+process.title = `nypsi v${getVersion()} main`;
 
 let heartBeatIntervals: NodeJS.Timer[] = [];
 
