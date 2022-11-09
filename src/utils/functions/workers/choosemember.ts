@@ -15,6 +15,7 @@ export default function chooseMember(members: Collection<string, GuildMember>, t
 }
 
 if (!isMainThread) {
+  process.title = "nypsi: choosemember worker";
   let target: GuildMember;
   const possible = new Map<number, GuildMember>();
   const members: Collection<string, GuildMember> = workerData[0];
