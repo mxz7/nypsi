@@ -50,6 +50,7 @@ export class NypsiClient extends Client {
     this.cluster = new Cluster.Client(this);
 
     setClusterId(this.cluster.id);
+    process.title = `nypsi cluster ${this.cluster.id}`;
 
     runEconomySetup();
 
