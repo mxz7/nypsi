@@ -4,13 +4,17 @@ import * as fs from "fs";
 import fetch from "node-fetch";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
+import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { AchievementData, Item } from "../../../types/Economy";
 import { Worker, WorkerUpgrades } from "../../../types/Workers";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
+import { getTier, isPremium } from "../premium/premium";
 import { createProfile, hasProfile } from "../users/utils";
-import { calcMaxBet, getBalance } from "./balance";
+import { calcMaxBet, getBalance, getMulti, updateBalance } from "./balance";
 import { getGuildByUser } from "./guilds";
+import { addInventoryItem } from "./inventory";
+import { getXp, updateXp } from "./xp";
 import ms = require("ms");
 import dayjs = require("dayjs");
 
@@ -531,4 +535,72 @@ export async function getDailyStreak(member: GuildMember | string) {
   });
 
   return query.dailyStreak;
+}
+
+export async function doDaily(member: GuildMember) {
+  const streak = (await getDailyStreak(member)) + 1;
+
+  const base = 20000;
+
+  let streakBonus = 5000;
+
+  if (await isPremium(member)) {
+    const tier = await getTier(member);
+
+    switch (tier) {
+      case 1:
+        streakBonus = 5500;
+        break;
+      case 2:
+        streakBonus = 6000;
+        break;
+      case 3:
+        streakBonus = 6500;
+        break;
+      case 4:
+        streakBonus = 7500;
+        break;
+    }
+  }
+
+  let total = base + streakBonus * streak;
+
+  total += Math.floor(total * (await getMulti(member)));
+
+  let xp = 1;
+  let crate = 0;
+
+  if (streak > 5) {
+    xp = Math.floor((streak - 5) / 10);
+  }
+
+  if (streak > 0 && streak % 7 == 0) {
+    crate++;
+
+    crate += Math.floor(streak / 30);
+
+    await addInventoryItem(member, "basic_crate", crate);
+  }
+
+  if (streak == 69) {
+    await addInventoryItem(member, "69420_crate", 3);
+  }
+
+  await updateBalance(member, (await getBalance(member)) + total);
+  await updateLastDaily(member);
+
+  const embed = new CustomEmbed(member);
+  embed.setHeader("daily", member.user.avatarURL());
+  embed.setDescription(
+    `+$**${total.toLocaleString()}**${
+      crate ? `\n+ **${crate}** basic crate${crate > 1 ? "s" : ""}` : streak == 69 ? "\n+ **3** 69420 crates" : ""
+    }\ndaily streak: \`${streak}\``
+  );
+
+  if (xp > 0) {
+    await updateXp(member, (await getXp(member)) + xp);
+    embed.setFooter({ text: `+${xp}xp` });
+  }
+
+  return embed;
 }
