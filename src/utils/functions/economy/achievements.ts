@@ -123,20 +123,20 @@ async function completeAchievement(userId: string, achievementId: string) {
     .setHeader("achievement unlocked")
     .setDescription(`you have completed ${achievements[achievementId].emoji} ${achievements[achievementId].name}`);
 
-  let earnedXp = 30;
+  let earnedXp = 100;
   let earnedCrates = 0;
 
   if (achievementId.endsWith("_v")) {
     earnedXp = 5000;
     earnedCrates = 3;
   } else if (achievementId.endsWith("_iv")) {
-    earnedXp = 1000;
+    earnedXp = 1500;
     earnedCrates = 2;
   } else if (achievementId.endsWith("_iii")) {
-    earnedXp = 500;
+    earnedXp = 750;
     earnedCrates = 1;
   } else if (achievementId.endsWith("_ii")) {
-    earnedXp = 100;
+    earnedXp = 250;
   }
 
   userEmbed.setDescription(
