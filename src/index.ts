@@ -12,7 +12,7 @@ import ms = require("ms");
 
 setClusterId("main");
 getWebhooks();
-process.title = `nypsi v${getVersion()} main`;
+process.title = `nypsi v${getVersion()}: main`;
 
 let heartBeatIntervals: NodeJS.Timer[] = [];
 
