@@ -1,14 +1,8 @@
 import dayjs = require("dayjs");
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
-import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import { MStoTime } from "../utils/functions/date";
-import { setProgress } from "../utils/functions/economy/achievements";
-import { getBalance, getMulti, updateBalance } from "../utils/functions/economy/balance";
-import { addInventoryItem } from "../utils/functions/economy/inventory";
-import { createUser, getDailyStreak, getLastDaily, updateLastDaily, userExists } from "../utils/functions/economy/utils";
-import { getXp, updateXp } from "../utils/functions/economy/xp";
-import { getTier, isPremium } from "../utils/functions/premium/premium";
+import { ErrorEmbed } from "../models/EmbedBuilders";
+import { createUser, doDaily, getLastDaily, userExists } from "../utils/functions/economy/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("daily", "get your daily bonus", Categories.MONEY);
@@ -47,79 +41,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const lastDaily = await getLastDaily(message.member);
 
   if (!dayjs(lastDaily.getTime()).isBefore(dayjs(), "day")) {
-    const diff = dayjs().add(1, "day").startOf("day").unix() * 1000 - dayjs().unix() * 1000;
+    const diff = dayjs().add(1, "day").startOf("day").unix() * 1000 - dayjs().unix();
     return send({
-      embeds: [new ErrorEmbed(`your next daily bonus is available in **${MStoTime(diff)}**`).removeTitle()],
+      embeds: [new ErrorEmbed(`your next daily bonus is available <t:${diff}:R>`).removeTitle()],
     });
   }
 
-  const streak = (await getDailyStreak(message.member)) + 1;
+  const embed = await doDaily(message.member);
 
-  const base = 20000;
-
-  let streakBonus = 5000;
-
-  if (await isPremium(message.member)) {
-    const tier = await getTier(message.member);
-
-    switch (tier) {
-      case 1:
-        streakBonus = 5500;
-        break;
-      case 2:
-        streakBonus = 6000;
-        break;
-      case 3:
-        streakBonus = 6500;
-        break;
-      case 4:
-        streakBonus = 7500;
-        break;
-    }
-  }
-
-  let total = base + streakBonus * streak;
-
-  total += Math.floor(total * (await getMulti(message.member)));
-
-  let xp = 1;
-  let crate = 0;
-
-  if (streak > 5) {
-    xp = Math.floor((streak - 5) / 10);
-  }
-
-  if (streak > 0 && streak % 7 == 0) {
-    crate++;
-
-    crate += Math.floor(streak / 30);
-
-    await addInventoryItem(message.member, "basic_crate", crate);
-  }
-
-  if (streak == 69) {
-    await addInventoryItem(message.member, "69420_crate", 3);
-  }
-
-  await updateBalance(message.member, (await getBalance(message.member)) + total);
-  await updateLastDaily(message.member);
-
-  const embed = new CustomEmbed(message.member);
-  embed.setHeader("daily", message.author.avatarURL());
-  embed.setDescription(
-    `+$**${total.toLocaleString()}**${
-      crate ? `\n+ **${crate}** basic crate${crate > 1 ? "s" : ""}` : streak == 69 ? "\n+ **3** 69420 crates" : ""
-    }\ndaily streak: \`${streak}\``
-  );
-
-  if (xp > 0) {
-    await updateXp(message.member, (await getXp(message.member)) + xp);
-    embed.setFooter({ text: `+${xp}xp` });
-  }
-
-  await send({ embeds: [embed] });
-
-  await setProgress(message.author.id, "streaker", streak);
+  return send({ embeds: [embed] });
 }
 
 cmd.setRun(run);

@@ -1161,7 +1161,7 @@
     "longDesc": "add one day to your daily streak",
     "rarity": 0,
     "buy": 0,
-    "sell": 50000,
+    "sell": 100000,
     "role": "tool",
     "in_crates": true
   },
