@@ -17,6 +17,7 @@ import { addInventoryItem } from "./inventory";
 import { getXp, updateXp } from "./xp";
 import ms = require("ms");
 import dayjs = require("dayjs");
+import { setProgress } from "./achievements";
 
 let items: { [key: string]: Item };
 let achievements: { [key: string]: AchievementData };
@@ -601,6 +602,8 @@ export async function doDaily(member: GuildMember) {
     await updateXp(member, (await getXp(member)) + xp);
     embed.setFooter({ text: `+${xp}xp` });
   }
+
+  await setProgress(member.id, "streaker", streak);
 
   return embed;
 }
