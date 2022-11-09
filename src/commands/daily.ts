@@ -41,9 +41,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const lastDaily = await getLastDaily(message.member);
 
   if (!dayjs(lastDaily.getTime()).isBefore(dayjs(), "day")) {
-    const diff = dayjs().add(1, "day").startOf("day").unix() * 1000 - dayjs().unix();
+    const next = dayjs().add(1, "day").startOf("day").unix();
     return send({
-      embeds: [new ErrorEmbed(`your next daily bonus is available <t:${diff}:R>`).removeTitle()],
+      embeds: [new ErrorEmbed(`your next daily bonus is available <t:${next}:R>`).removeTitle()],
     });
   }
 
