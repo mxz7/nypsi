@@ -47,7 +47,7 @@ const bree = new Bree({
     },
     {
       name: "cleanmentions",
-      interval: "at 12:00am",
+      interval: "at 11:50pm",
     },
     {
       name: "topcommands",
@@ -55,11 +55,11 @@ const bree = new Bree({
     },
     {
       name: "dailystreak",
-      interval: "at 12:00am",
+      interval: "at 11:55pm",
     },
     {
       name: "resetsuggestions",
-      interval: "at 12:00am",
+      interval: "at 11:55pm",
     },
     {
       name: "votereminders",
