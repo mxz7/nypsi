@@ -3,41 +3,52 @@ import redis from "../../init/redis";
 import Constants from "../../utils/Constants";
 import { MStoTime } from "../../utils/functions/date";
 import { calcNetWorth } from "../../utils/functions/economy/balance";
+import sleep from "../../utils/functions/sleep";
 import { logger } from "../../utils/logger";
 
 import dayjs = require("dayjs");
 import ms = require("ms");
+import pAll = require("p-all");
 
 async function updateNetWorth() {
+  logger.info("net worths updating...");
+  const start = Date.now();
   const query = await prisma.economy.findMany({
     select: {
       userId: true,
     },
   });
 
-  const promises: Promise<any>[] = [];
+  const actions: (() => Promise<number>)[] = [];
 
   for (const user of query) {
+    await sleep(50);
     if (await redis.exists(`${Constants.redis.cache.economy.NETWORTH}:${user.userId}`)) continue;
 
-    if (promises.length == 0) {
-      promises.push(calcNetWorth(user.userId));
+    if (actions.length == 0) {
+      await calcNetWorth(user.userId);
 
-      await Promise.all(promises);
+      actions.push(() => {
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            resolve(1);
+          }, 500);
+        });
+      });
     } else {
-      promises.push(calcNetWorth(user.userId));
+      actions.push(() => calcNetWorth(user.userId));
     }
   }
 
-  promises.splice(0, 1);
+  actions.splice(0, 1);
 
-  await Promise.all(promises);
+  await pAll(actions, { concurrency: 5 });
 
-  logger.info(`net updated for ${promises.length} members`);
+  logger.info(`net updated for ${actions.length} members in ${MStoTime(Date.now() - start)}`);
 }
 
 export function runNetWorthInterval() {
-  const next = dayjs().add(1, "day").startOf("day").toDate();
+  const next = dayjs().add(1, "day").startOf("day").subtract(30, "minutes").toDate();
 
   const needed = next.getTime() - Date.now();
 
