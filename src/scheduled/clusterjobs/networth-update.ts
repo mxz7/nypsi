@@ -44,7 +44,7 @@ async function updateNetWorth() {
 
   await pAll(actions, { concurrency: 5 });
 
-  logger.info(`net updated for ${actions.length} members in ${MStoTime(Date.now() - start)}`);
+  logger.info(`net worth updated for ${actions.length} members in ${MStoTime(Date.now() - start)}`);
 }
 
 export function runNetWorthInterval() {
