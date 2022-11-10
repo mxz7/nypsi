@@ -39,6 +39,8 @@ export default async function channelCreate(channel: GuildChannel) {
       Speak: false,
       AddReactions: false,
       SendMessagesInThreads: false,
+      CreatePublicThreads: false,
+      CreatePrivateThreads: false,
     })
     .catch(() => {});
 }
