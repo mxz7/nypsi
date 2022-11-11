@@ -41,7 +41,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const embed = new CustomEmbed(
       message.member,
       `tag: ${user.username}#${user.discriminator}\nid: ${user.id}\ncreated: <t:${Math.floor(
-        user.createdAt.getTime() / 1000
+        user.createdTimestamp / 1000
       )}:R>`
     ).setHeader("discord");
 
