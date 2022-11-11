@@ -69,7 +69,7 @@ export default async function messageCreate(message: Message) {
         );
 
       const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder().setCustomId("s").setLabel("talk to a staff member").setStyle(ButtonStyle.Success)
+        new ButtonBuilder().setCustomId("s").setLabel("talk to a staff member").setStyle(ButtonStyle.Danger)
       );
 
       const msg = await message.reply({ content: "discord.gg/hJTDNST", embeds: [embed], components: [row] });
