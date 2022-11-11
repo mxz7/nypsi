@@ -20,7 +20,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
 import { addInventoryItem, getInventory } from "../utils/functions/economy/inventory";
-import { createUser, getAchievements, getItems, userExists } from "../utils/functions/economy/utils";
+import { createUser, getAchievements, getItems, isEcoBanned, userExists } from "../utils/functions/economy/utils";
 import { claimFromWorkers } from "../utils/functions/economy/workers";
 import { getChatFilter } from "../utils/functions/guilds/filters";
 import { getKarma } from "../utils/functions/karma/karma";
@@ -230,6 +230,7 @@ export default async function interactionCreate(interaction: Interaction) {
 
   if (interaction.type == InteractionType.MessageComponent) {
     if (interaction.customId == "b") {
+      if (await isEcoBanned(interaction.user.id)) return;
       let auction = await prisma.auction.findFirst({
         where: {
           AND: [{ messageId: interaction.message.id }],
