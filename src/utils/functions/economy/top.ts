@@ -1,3 +1,4 @@
+import dayjs = require("dayjs");
 import { Collection, Guild, GuildMember } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
@@ -27,6 +28,7 @@ export async function topBalance(guild: Guild, userId?: string) {
     select: {
       userId: true,
       money: true,
+      banned: true,
     },
     orderBy: {
       money: "desc",
@@ -47,6 +49,7 @@ export async function topBalance(guild: Guild, userId?: string) {
   };
 
   for (const user of query) {
+    if (user.banned && dayjs().isBefore(user.banned)) continue;
     if (Number(user.money) != 0) {
       let pos: number | string = count + 1;
 
@@ -96,6 +99,7 @@ export async function topBalanceGlobal(amount: number, anon = true): Promise<str
     select: {
       userId: true,
       money: true,
+      banned: true,
       user: {
         select: {
           lastKnownTag: true,
@@ -115,6 +119,8 @@ export async function topBalanceGlobal(amount: number, anon = true): Promise<str
   for (const user of query) {
     if (count >= amount) break;
     if (usersFinal.join().length >= 1500) break;
+
+    if (user.banned && dayjs().isBefore(user.banned)) continue;
 
     let pos: number | string = count + 1;
 
@@ -146,6 +152,7 @@ export async function topNetWorthGlobal(userId: string) {
     select: {
       userId: true,
       net_worth: true,
+      banned: true,
       user: {
         select: {
           lastKnownTag: true,
@@ -160,6 +167,8 @@ export async function topNetWorthGlobal(userId: string) {
   const out: string[] = [];
 
   for (const user of query) {
+    if (user.banned && dayjs().isBefore(user.banned)) continue;
+
     let pos: number | string = out.length + 1;
 
     if (pos == 1) {
@@ -221,6 +230,7 @@ export async function topNetWorth(guild: Guild, userId?: string) {
     },
     select: {
       userId: true,
+      banned: true,
     },
   });
 
@@ -230,6 +240,8 @@ export async function topNetWorth(guild: Guild, userId?: string) {
   const promises = [];
 
   for (const user of query) {
+    if (user.banned && dayjs().isBefore(user.banned)) continue;
+
     promises.push(
       (async () => {
         const net = await calcNetWorth(user.userId);
@@ -328,6 +340,7 @@ export async function topPrestige(guild: Guild, userId?: string) {
     select: {
       userId: true,
       prestige: true,
+      banned: true,
     },
     orderBy: {
       prestige: "desc",
@@ -349,6 +362,8 @@ export async function topPrestige(guild: Guild, userId?: string) {
 
   for (const user of query) {
     if (user.prestige != 0) {
+      if (user.banned && dayjs().isBefore(user.banned)) continue;
+
       let pos: string | number = count + 1;
 
       if (pos == 1) {
@@ -406,6 +421,7 @@ export async function topPrestigeGlobal(userId: string) {
     select: {
       userId: true,
       prestige: true,
+      banned: true,
       user: {
         select: {
           lastKnownTag: true,
@@ -423,6 +439,8 @@ export async function topPrestigeGlobal(userId: string) {
 
   for (const user of query) {
     if (user.prestige != 0) {
+      if (user.banned && dayjs().isBefore(user.banned)) continue;
+
       let pos: string | number = count + 1;
 
       if (pos == 1) {
@@ -494,6 +512,11 @@ export async function topItem(guild: Guild, item: string, userId: string) {
     select: {
       userId: true,
       amount: true,
+      economy: {
+        select: {
+          banned: true,
+        },
+      },
     },
     orderBy: {
       amount: "desc",
@@ -514,6 +537,8 @@ export async function topItem(guild: Guild, item: string, userId: string) {
   };
 
   for (const user of query) {
+    if (user.economy.banned && dayjs().isBefore(user.economy.banned)) continue;
+
     let pos: number | string = count + 1;
 
     if (pos == 1) {
@@ -582,6 +607,15 @@ export async function topCompletion(guild: Guild, userId: string) {
     },
     select: {
       userId: true,
+      user: {
+        select: {
+          Economy: {
+            select: {
+              banned: true,
+            },
+          },
+        },
+      },
     },
   });
 
@@ -596,6 +630,13 @@ export async function topCompletion(guild: Guild, userId: string) {
   userIds = [...new Set(userIds)];
 
   for (const userId of userIds) {
+    if (
+      query.find((u) => u.userId).user.Economy.banned &&
+      dayjs().isBefore(query.find((u) => u.userId).user.Economy.banned)
+    ) {
+      userIds.splice(userIds.indexOf(userId), 1);
+    }
+
     const achievementsForUser = query.filter((i) => i.userId == userId);
 
     completionRate.set(userId, (achievementsForUser.length / allAchievements) * 100);
