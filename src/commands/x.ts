@@ -6,6 +6,8 @@ import { Categories, Command, NypsiCommandInteraction } from "../models/Command"
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { formatDate } from "../utils/functions/date";
+import { getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
+import { getItems } from "../utils/functions/economy/utils";
 import { fetchUsernameHistory } from "../utils/functions/users/history";
 import { logger } from "../utils/logger";
 
@@ -227,6 +229,20 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return message.channel.send({ embeds: [new CustomEmbed(message.member, desc)] });
   };
 
+  const removeItem = async (userId: string, itemId: string, amount = 1) => {
+    const inventory = await getInventory(userId, false);
+
+    if (inventory.length == 0) {
+      return message.channel.send({ embeds: [new ErrorEmbed("user's inventory is empty")] });
+    }
+
+    if (!getItems()[itemId]) return message.channel.send({ embeds: [new ErrorEmbed("invalid item")] });
+
+    await setInventoryItem(userId, itemId, inventory.find((i) => i.item == itemId).amount - amount, false);
+
+    return message.react("💦");
+  };
+
   if (args.length == 0) {
     const embed = new CustomEmbed(
       message.member,
@@ -248,6 +264,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     return findId(args[1]);
+  } else if (args[0].toLowerCase() == "removeitem") {
+    if (args.length < 3) {
+      return message.channel.send({ embeds: [new ErrorEmbed("$x removeitem <userid> <item> <amount>")] });
+    }
+
+    return removeItem(args[1], args[2], args[3] ? parseInt(args[3]) : null);
   }
 }
 
