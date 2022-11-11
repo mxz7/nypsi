@@ -479,6 +479,7 @@ export default async function interactionCreate(interaction: Interaction) {
 
       return await interaction.message.edit({ embeds: [embed] }).catch(() => {});
     } else if (interaction.customId == "w-claim") {
+      if (await isEcoBanned(interaction.user.id)) return;
       const desc = await claimFromWorkers(interaction.user.id);
 
       const embed = new CustomEmbed()
