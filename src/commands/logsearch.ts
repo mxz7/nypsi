@@ -6,7 +6,7 @@ import searchLogs from "../utils/functions/workers/logsearch";
 const cmd = new Command("logsearch", "search through logs", Categories.NONE).setPermissions(["bot owner"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-  if (message.member.user.id != Constants.TEKOH_ID) return;
+  if (!Constants.ADMIN_IDS.includes(message.author.id)) return;
 
   if (args.length == 0) return;
 
