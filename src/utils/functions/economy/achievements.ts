@@ -8,13 +8,14 @@ import { logger } from "../../logger";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { getLastKnownTag } from "../users/tag";
 import { addInventoryItem } from "./inventory";
-import { createUser, getAchievements, getItems, userExists } from "./utils";
+import { createUser, getAchievements, getItems, isEcoBanned, userExists } from "./utils";
 import { getXp, updateXp } from "./xp";
 
 /**
  * returns true if user has met requirements for achievement
  */
 export async function addAchievementProgress(userId: string, achievementId: string, amount = 1) {
+  if (await isEcoBanned(userId)) return;
   const query = await prisma.achievements.upsert({
     create: {
       userId: userId,
@@ -45,6 +46,7 @@ export async function addAchievementProgress(userId: string, achievementId: stri
 }
 
 export async function setAchievementProgress(userId: string, achievementId: string, progress: number) {
+  if (await isEcoBanned(userId)) return;
   const query = await prisma.achievements.upsert({
     create: {
       userId: userId,
@@ -204,6 +206,7 @@ export async function getUserAchievement(userId: string, achievementId: string) 
 }
 
 export async function addProgress(userId: string, achievementStartName: string, amount: number) {
+  if (await isEcoBanned(userId)) return;
   const achievements = await getAllAchievements(userId);
   let count = 0;
 
@@ -251,6 +254,7 @@ export async function addProgress(userId: string, achievementStartName: string, 
 }
 
 export async function setProgress(userId: string, achievementStartName: string, amount: number) {
+  if (await isEcoBanned(userId)) return;
   const achievements = await getAllAchievements(userId);
   let count = 0;
 
