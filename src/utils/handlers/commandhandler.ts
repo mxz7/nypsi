@@ -971,7 +971,7 @@ export function runCommandUseTimers(client: NypsiClient) {
 
       const amount = Math.floor(commandUses.get(user) / modifier);
 
-      if (amount > 0) {
+      if (amount > 0 && !(await isEcoBanned(user))) {
         await addKarma(user, amount);
       }
     }
