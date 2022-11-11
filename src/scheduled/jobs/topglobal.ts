@@ -3,6 +3,7 @@ import { ColorResolvable, EmbedBuilder, WebhookClient } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { parentPort } from "worker_threads";
 import prisma from "../../init/database";
+import dayjs = require("dayjs");
 
 (async () => {
   const baltop = await topAmountGlobal(10, true);
@@ -35,6 +36,7 @@ async function topAmountGlobal(amount: number, anon = true): Promise<string[]> {
     select: {
       userId: true,
       money: true,
+      banned: true,
       user: {
         select: {
           lastKnownTag: true,
@@ -65,6 +67,7 @@ async function topAmountGlobal(amount: number, anon = true): Promise<string[]> {
   for (const user of userIDs) {
     if (count >= amount) break;
     if (usersFinal.join().length >= 1500) break;
+    if (query.find((u) => u.userId == user).banned && dayjs().isBefore(query.find((u) => u.userId == user).banned)) continue;
 
     if (balances.get(user) != 0) {
       let pos: number | string = count + 1;
