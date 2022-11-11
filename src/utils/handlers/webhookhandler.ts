@@ -10,7 +10,7 @@ import Constants from "../Constants";
 import { getBalance, updateBalance } from "../functions/economy/balance";
 import { addInventoryItem } from "../functions/economy/inventory";
 import { getPrestige } from "../functions/economy/prestige";
-import { addTicket, getTickets, userExists } from "../functions/economy/utils";
+import { addTicket, getTickets, isEcoBanned, userExists } from "../functions/economy/utils";
 import { addKarma } from "../functions/karma/karma";
 import { addMember, getPremiumProfile, isPremium, renewUser, setTier } from "../functions/premium/premium";
 import requestDM from "../functions/requestdm";
@@ -100,19 +100,21 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
 
   const amount = Math.floor(15000 * (prestige / 2 + 1));
 
-  await Promise.all([
-    updateBalance(user, (await getBalance(user)) + amount),
-    addKarma(user, 10),
-    prisma.booster.create({
-      data: {
-        boosterId: "vote_booster",
-        userId: user,
-        expire: dayjs().add(2, "hour").toDate(),
-      },
-    }),
-    redis.del(`${Constants.redis.cache.economy.VOTE}:${user}`),
-    redis.del(`${Constants.redis.cache.economy.BOOSTERS}:${user}`),
-  ]);
+  if (!(await isEcoBanned(user))) {
+    await Promise.all([
+      updateBalance(user, (await getBalance(user)) + amount),
+      addKarma(user, 10),
+      prisma.booster.create({
+        data: {
+          boosterId: "vote_booster",
+          userId: user,
+          expire: dayjs().add(2, "hour").toDate(),
+        },
+      }),
+      redis.del(`${Constants.redis.cache.economy.VOTE}:${user}`),
+      redis.del(`${Constants.redis.cache.economy.BOOSTERS}:${user}`),
+    ]);
+  }
 
   const tickets = await getTickets(user);
 
