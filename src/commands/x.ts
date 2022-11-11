@@ -179,7 +179,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
           return g;
         },
-        { context: { userId: args.join(" ") } }
+        { context: { userId: tag } }
       );
 
       for (const res of user) {
@@ -201,7 +201,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const knownTag = await prisma.user.findFirst({
       where: {
-        lastKnownTag: { in: tag },
+        lastKnownTag: { contains: tag },
       },
       select: {
         id: true,
@@ -212,7 +212,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const usernameHistories = await prisma.username.findMany({
       where: {
-        AND: [{ type: "username" }, { value: { in: tag } }],
+        AND: [{ type: "username" }, { value: { contains: tag } }],
       },
       select: {
         value: true,
