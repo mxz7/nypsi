@@ -169,6 +169,64 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return message.channel.send({ embeds: [embed], files: [{ attachment: buffer, name: `data_for_${user.id}.txt` }] });
   };
 
+  const findId = async (tag: string) => {
+    const findFromCache = async () => {
+      let user: any = await (message.client as NypsiClient).cluster.broadcastEval(
+        async (c, { userId }) => {
+          const g = await c.users.cache.find((u) => {
+            return `${u.username}#${u.discriminator}`.includes(userId);
+          });
+
+          return g;
+        },
+        { context: { userId: args.join(" ") } }
+      );
+
+      for (const res of user) {
+        if (!res) continue;
+        if (res.username) {
+          user = res;
+          break;
+        }
+      }
+
+      if (!user || user instanceof Array) return null;
+
+      return user.id as string;
+    };
+
+    const current = await findFromCache();
+
+    let desc = `current: ${current || "not found"}`;
+
+    const knownTag = await prisma.user.findFirst({
+      where: {
+        lastKnownTag: { in: tag },
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    desc += `\nlkt: ${knownTag?.id || "not found"}`;
+
+    const usernameHistories = await prisma.username.findMany({
+      where: {
+        AND: [{ type: "username" }, { value: { in: tag } }],
+      },
+      select: {
+        value: true,
+        userId: true,
+      },
+    });
+
+    if (usernameHistories.length > 0) {
+      desc += `\nhistories: \n${usernameHistories.join("\n").substring(0, 1000)}`;
+    }
+
+    return message.channel.send({ embeds: [new CustomEmbed(message.member, desc)] });
+  };
+
   if (args.length == 0) {
     const embed = new CustomEmbed(
       message.member,
@@ -184,6 +242,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     return showUser(args[1]);
+  } else if (args[0].toLowerCase() == "findid") {
+    if (args.length == 1) {
+      return message.channel.send({ embeds: [new ErrorEmbed("$x findid (tag)")] });
+    }
+
+    return findId(args[1]);
   }
 }
 
