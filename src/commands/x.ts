@@ -226,7 +226,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     });
 
     if (usernameHistories.length > 0) {
-      desc += `\nhistories: \n${usernameHistories.join("\n").substring(0, 1000)}`;
+      desc += `\nhistories: \n${usernameHistories
+        .map((i) => `\`${i.userId}\` - \`${i.value}\``)
+        .join("\n")
+        .substring(0, 1000)}`;
     }
 
     return message.channel.send({ embeds: [new CustomEmbed(message.member, desc)] });
