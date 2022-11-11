@@ -269,7 +269,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return message.channel.send({ embeds: [new ErrorEmbed("$x removeitem <userid> <item> <amount>")] });
     }
 
-    return removeItem(args[1], args[2], args[3] ? parseInt(args[3]) : null);
+    return removeItem(args[1], args[2], args[3] ? parseInt(args[3]) : undefined);
   }
 }
 
