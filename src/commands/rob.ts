@@ -88,10 +88,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (!(await userExists(message.member))) await createUser(message.member);
 
-  if (message.guild.id == "747056029795221513") {
-    return send({ embeds: [new ErrorEmbed("this has been disabled in the support server")] });
-  }
-
   let target = message.mentions.members.first();
 
   if (!target) {
