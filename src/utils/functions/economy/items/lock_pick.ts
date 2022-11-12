@@ -4,6 +4,7 @@ import { NypsiCommandInteraction } from "../../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
 import Constants from "../../../Constants";
+import { getDisabledCommands } from "../../guilds/disabledcommands";
 import { getMember } from "../../member";
 import sleep from "../../sleep";
 import { getDmSettings } from "../../users/notifications";
@@ -38,8 +39,8 @@ module.exports = new ItemUse(
       }
     };
 
-    if (message.guild.id == "747056029795221513") {
-      return send({ embeds: [new ErrorEmbed("this has been disabled in the support server")] });
+    if ((await getDisabledCommands(message.guild)).includes("rob")) {
+      return send({ embeds: [new ErrorEmbed("that command has been disabled")] });
     }
 
     if (args.length == 1) {
