@@ -12,22 +12,22 @@ import {
 } from "discord.js";
 import { cpu } from "node-os-utils";
 import * as os from "os";
+import { workerCount } from "../events/message";
 import prisma from "../init/database";
 import redis from "../init/redis";
+import { NypsiClient } from "../models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import { MStoTime } from "../utils/functions/date";
-import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import { workerCount } from "../events/message";
-import { NypsiClient } from "../models/Client";
 import Constants from "../utils/Constants";
+import { MStoTime } from "../utils/functions/date";
 import { getStats } from "../utils/functions/economy/stats";
 import { getCommandUses } from "../utils/functions/users/commands";
 import { mentionQueue } from "../utils/functions/users/mentions";
-import { aliasesSize, commandsSize } from "../utils/handlers/commandhandler";
 import { getVersion } from "../utils/functions/version";
+import { aliasesSize, commandsSize } from "../utils/handlers/commandhandler";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command("stats", "view your nypsi stats", Categories.MONEY);
+const cmd = new Command("stats", "view your nypsi stats", Categories.INFO);
 
 cmd.slashEnabled = true;
 cmd.slashData
