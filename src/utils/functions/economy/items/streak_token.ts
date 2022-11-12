@@ -25,12 +25,7 @@ module.exports = new ItemUse("streak_token", async (message: Message | (NypsiCom
 
   const inventory = await getInventory(message.member);
 
-  await setInventoryItem(
-    message.member,
-    "stolen_credit_card",
-    inventory.find((i) => i.item == "stolen_credit_card").amount - 1,
-    false
-  );
+  await setInventoryItem(message.member, "streak_token", inventory.find((i) => i.item == "streak_token").amount - 1, false);
 
   const embed = await doDaily(message.member);
 
