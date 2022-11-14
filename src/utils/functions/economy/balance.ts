@@ -410,12 +410,14 @@ export async function calcNetWorth(member: GuildMember | string) {
   worth += Number(Number(query.user.EconomyGuild?.balance) / query.user.EconomyGuild?.members.length) || 0;
 
   for (const item of query.Inventory) {
-    const auctionAvg = await getAuctionAverage(item.item);
-
-    if (auctionAvg && !["ethereum", "bitcoin"].includes(getItems()[item.item].id)) {
-      worth += auctionAvg * item.amount;
-    } else if (getItems()[item.item].sell) {
+    if (getItems()[item.item].sell) {
       worth += getItems()[item.item].sell * item.amount;
+    } else {
+      const auctionAvg = await getAuctionAverage(item.item);
+
+      if (auctionAvg) {
+        worth += auctionAvg * item.amount;
+      }
     }
   }
 
