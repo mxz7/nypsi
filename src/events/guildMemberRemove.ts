@@ -1,4 +1,5 @@
 import { GuildMember } from "discord.js";
+import prisma from "../init/database";
 import { NypsiClient } from "../models/Client";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { LogType } from "../types/Moderation";
@@ -46,6 +47,23 @@ export default async function guildMemberRemove(member: GuildMember) {
 
     await addLog(member.guild, LogType.MEMBER, embed);
   }
+
+  await prisma.rolePersist.upsert({
+    where: {
+      guildId_userId: {
+        guildId: member.guild.id,
+        userId: member.id,
+      },
+    },
+    create: {
+      userId: member.id,
+      guildId: member.guild.id,
+      roles: Array.from(member.roles.cache.values()).map((r) => r.id),
+    },
+    update: {
+      roles: Array.from(member.roles.cache.values()).map((r) => r.id),
+    },
+  });
 
   if (member.guild.id != "747056029795221513") return;
 
