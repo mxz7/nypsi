@@ -344,21 +344,23 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const roles = await getAutoJoinRoles(message.guild);
 
     if (args[1].toLowerCase() == "list") {
-      const rolesDisplay = roles.map(async (r) => {
+      const rolesDisplay: string[] = [];
+
+      for (const r of roles) {
         const role = await message.guild.roles.fetch(r).catch(() => {});
 
         if (!role) {
           roles.splice(roles.indexOf(r), 1);
           await setAutoJoinRoles(message.guild, roles);
-          return r;
+          break;
         }
 
-        return role.toString();
-      });
+        rolesDisplay.push(role.toString());
+      }
 
       const embed = new CustomEmbed(
         message.member,
-        `${roles.length > 0 ? rolesDisplay : "no roles will automatically be added to new members"}`
+        `${roles.length > 0 ? rolesDisplay.join("\n") : "no roles will automatically be added to new members"}`
       );
 
       return send({ embeds: [embed] });
