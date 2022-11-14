@@ -381,6 +381,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return send({ embeds: [embed] });
     }
 
+    if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
+      return send({ embeds: [new ErrorEmbed("you need the `manage server` permission")] });
+    }
+
     let chosenRole: Role;
 
     if (message.mentions.roles.first()) {
@@ -449,6 +453,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       );
 
       return send({ embeds: [embed] });
+    }
+
+    if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
+      return send({ embeds: [new ErrorEmbed("you need the `manage server` permission")] });
     }
 
     let chosenRole: Role;
