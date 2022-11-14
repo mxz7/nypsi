@@ -4,6 +4,7 @@ import { NypsiClient } from "../models/Client";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { LogType } from "../types/Moderation";
 import { daysAgo, formatDate } from "../utils/functions/date";
+import { getPersistantRoles } from "../utils/functions/guilds/roles";
 import { addLog, isLogsEnabled } from "../utils/functions/moderation/logs";
 import { setExpireDate, setTier } from "../utils/functions/premium/premium";
 import { fetchUsernameHistory } from "../utils/functions/users/history";
@@ -48,7 +49,7 @@ export default async function guildMemberRemove(member: GuildMember) {
     await addLog(member.guild, LogType.MEMBER, embed);
   }
 
-  if (member.roles.cache.size > 0) {
+  if (member.roles.cache.size > 0 && (await getPersistantRoles(member.guild)).length > 0) {
     await prisma.rolePersist.upsert({
       where: {
         guildId_userId: {
