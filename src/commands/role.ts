@@ -8,7 +8,7 @@ import {
 } from "discord.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import { getAutoJoinRoles, setAutoJoinRoles } from "../utils/functions/guilds/roles";
+import { getAutoJoinRoles, getPersistantRoles, setAutoJoinRoles, setPersistantRoles } from "../utils/functions/guilds/roles";
 import { getMember, getRole } from "../utils/functions/member";
 
 const cmd = new Command("role", "role utilities", Categories.UTILITY);
@@ -72,6 +72,24 @@ cmd.slashData
           .setDescription("remove a role from the autojoin list")
           .addRoleOption((option) => option.setName("role").setDescription("role to remove from the list").setRequired(true))
       )
+  )
+  .addSubcommandGroup((persist) =>
+    persist
+      .setName("persist")
+      .setDescription("persist settings")
+      .addSubcommand((list) => list.setName("list").setDescription("show all persistant roles"))
+      .addSubcommand((add) =>
+        add
+          .setName("add")
+          .setDescription("add a role to the persistance list")
+          .addRoleOption((option) => option.setName("role").setDescription("role to add to list").setRequired(true))
+      )
+      .addSubcommand((remove) =>
+        remove
+          .setName("remove")
+          .setDescription("remove a role from the persistance list")
+          .addRoleOption((option) => option.setName("role").setDescription("role to remove from the list").setRequired(true))
+      )
   );
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
@@ -130,7 +148,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             "/role remove <member|all> (member - if in member mode) (role) - remove roles from members\n" +
             "/role autojoin add <role> - set a role to be automatically added when a user joins\n" +
             "/role autojoin remove <role> - remove a role from the autojoin list\n" +
-            "/role autojoin list - show all current autojoin roles"
+            "/role autojoin list - show all current autojoin roles\n" +
+            "/role persist add <role> - add a role to be added back to a user after they leave, if they had it. (data deleted after 30 days)\n" +
+            "/role persist remove <role> - remove a role from the persistance list\n" +
+            "/role persist list - show all current persistant roles"
         ),
       ],
     });
@@ -156,12 +177,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (!role) {
       return send({ embeds: [new ErrorEmbed("invalid role")] });
     }
-
-    // members.filter((m) => m.roles.highest.position < message.guild.members.me.roles.highest.position);
-
-    // if (members.length == 0) {
-    //   return send
-    // }
 
     if (members.length > 50) {
       const msg = await send({
@@ -385,6 +400,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const embed = new CustomEmbed(message.member);
 
     if (args[1].toLowerCase() == "add") {
+      if (roles.includes(chosenRole.id)) {
+        return send({ embeds: [new ErrorEmbed("this role is already in the autojoin role list")] });
+      }
       roles.push(chosenRole.id);
       embed.setDescription(`✅ added ${chosenRole.toString()} to the autojoin role list`);
     } else {
@@ -397,6 +415,72 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     await setAutoJoinRoles(message.guild, roles);
+
+    return send({ embeds: [embed] });
+  } else if (args[0].toLowerCase() == "persist") {
+    if (args.length == 1) {
+      return send({ embeds: [new ErrorEmbed("use slash commands")] });
+    }
+
+    const roles = await getPersistantRoles(message.guild);
+
+    if (args[1].toLowerCase() == "list") {
+      const rolesDisplay: string[] = [];
+
+      for (const r of roles) {
+        const role = await message.guild.roles.fetch(r).catch(() => {});
+
+        if (!role) {
+          roles.splice(roles.indexOf(r), 1);
+          await setPersistantRoles(message.guild, roles);
+          break;
+        }
+
+        rolesDisplay.push(role.toString());
+      }
+
+      const embed = new CustomEmbed(
+        message.member,
+        `${
+          roles.length > 0
+            ? rolesDisplay.join("\n")
+            : "no roles will be added back to joining members (use /role autojoin if you want roles added to every new member)"
+        }`
+      );
+
+      return send({ embeds: [embed] });
+    }
+
+    let chosenRole: Role;
+
+    if (message.mentions.roles.first()) {
+      chosenRole = message.mentions.roles.first();
+    } else {
+      chosenRole = await getRole(message.guild, args[2]);
+    }
+
+    if (!chosenRole) {
+      return send({ embeds: [new ErrorEmbed("invalid role")] });
+    }
+
+    const embed = new CustomEmbed(message.member);
+
+    if (args[1].toLowerCase() == "add") {
+      if (roles.includes(chosenRole.id)) {
+        return send({ embeds: [new ErrorEmbed("this role is already in the persistant role list")] });
+      }
+      roles.push(chosenRole.id);
+      embed.setDescription(`✅ added ${chosenRole.toString()} to the persistant role list`);
+    } else {
+      if (!roles.includes(chosenRole.id)) {
+        return send({ embeds: [new ErrorEmbed("that role is not in the persistant role list")] });
+      }
+
+      roles.splice(roles.indexOf(chosenRole.id), 1);
+      embed.setDescription(`✅ removed ${chosenRole.toString()} from the persistant role list`);
+    }
+
+    await setPersistantRoles(message.guild, roles);
 
     return send({ embeds: [embed] });
   }
