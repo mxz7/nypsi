@@ -94,9 +94,7 @@ export class NypsiClient extends Client {
       this.on("guildCreate", guildCreate.bind(null, this));
       this.on("guildDelete", guildDelete.bind(null, this));
       this.rest.on("rateLimited", (rate) => {
-        const a = rate.route.split("/");
-        const reason = a[a.length - 1];
-        logger.warn("rate limit: " + reason);
+        logger.warn("rate limit: " + rate.url);
       });
       this.on("guildMemberUpdate", guildMemberUpdate.bind(null));
       this.on("guildMemberAdd", guildMemberAdd.bind(null));

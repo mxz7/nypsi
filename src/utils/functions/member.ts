@@ -1,4 +1,4 @@
-import { Collection, Guild, GuildMember } from "discord.js";
+import { Collection, Guild, GuildMember, Role } from "discord.js";
 import chooseMember from "./workers/choosemember";
 
 export async function getMember(guild: Guild, memberName: string): Promise<GuildMember> {
@@ -97,6 +97,49 @@ export async function getExactMember(guild: Guild, memberName: string): Promise<
       member.user.tag.toLowerCase() == memberName.toLowerCase() ||
       member.user.id == memberName
   );
+
+  return target;
+}
+
+export async function getRole(guild: Guild, roleName: string): Promise<Role> {
+  if (!guild) return null;
+
+  const roles = await guild.roles.fetch();
+
+  let target: Role;
+  const possible = new Map<number, Role>();
+
+  for (const m of roles.keys()) {
+    const role = roles.get(m);
+
+    if (role.id == roleName) {
+      target = role;
+      break;
+    } else if (role.name.toLowerCase() == roleName.toLowerCase()) {
+      target = role;
+      break;
+    } else if (role.name.toLowerCase().includes(roleName.toLowerCase())) {
+      possible.set(3, role);
+    }
+  }
+
+  if (!target) {
+    if (possible.get(1)) {
+      target = possible.get(1);
+    } else if (possible.get(2)) {
+      target = possible.get(2);
+    } else if (possible.get(3)) {
+      target = possible.get(3);
+    } else if (possible.get(4)) {
+      target = possible.get(4);
+    } else if (possible.get(5)) {
+      target = possible.get(5);
+    } else if (possible.get(6)) {
+      target = possible.get(6);
+    } else {
+      target = null;
+    }
+  }
 
   return target;
 }
