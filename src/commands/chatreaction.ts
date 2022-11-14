@@ -34,6 +34,7 @@ import {
 import { getWordList, updateWords } from "../utils/functions/chatreactions/words";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { isPremium } from "../utils/functions/premium/premium";
+import sleep from "../utils/functions/sleep";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("chatreaction", "see who can type the fastest", Categories.FUN)
@@ -236,10 +237,96 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) return showStats();
     return helpCmd();
   } else if (args[0].toLowerCase() == "start") {
-    if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) return;
     if (!(message.channel instanceof TextChannel)) {
       return send({ embeds: [new ErrorEmbed("this is an invalid channel")] });
     }
+
+    if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
+      const blacklisted = await getBlacklisted(message.guild);
+
+      if (blacklisted.includes(message.author.id)) return;
+
+      const embed = new CustomEmbed(
+        message.member,
+        "click the button below to vote start a chat reaction\n\n1/5",
+        true
+      ).setHeader(`${message.author.username}'s chat reaction`, message.author.avatarURL());
+
+      const components = [
+        new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+          new ButtonBuilder().setLabel("vote start").setCustomId("vs").setStyle(ButtonStyle.Success)
+        ),
+      ];
+
+      const msg = await send({ embeds: [embed], components });
+
+      const voted = [message.author.id];
+
+      const filter = (i: Interaction) => !blacklisted.includes(i.user.id);
+
+      const collector = msg.createMessageComponentCollector({ filter, time: 45_000, max: 4 });
+
+      const i = setInterval(async () => {
+        embed.setDescription(`click the button below to vote start a chat reaction\n\n${voted.length}/5`);
+
+        if (embed.data.description == msg.embeds[0].description) return;
+
+        if (voted.length == 5) {
+          clearInterval(i);
+          await msg.edit({ embeds: [embed], components: [] });
+
+          const countdownMsg = await message.channel.send({
+            embeds: [new CustomEmbed(message.member, "chat reaction starting in 3 seconds...")],
+          });
+
+          await sleep(1500);
+
+          await countdownMsg.edit({ embeds: [new CustomEmbed(message.member, "chat reaction starting in 2 seconds...")] });
+
+          await sleep(1500);
+
+          await countdownMsg.edit({ embeds: [new CustomEmbed(message.member, "chat reaction starting in 1 second...")] });
+
+          await sleep(1500);
+
+          await countdownMsg.delete().catch(() => {});
+          const a = await startReaction(message.guild, message.channel as TextChannel);
+
+          if (a == "xoxo69") {
+            return send({
+              embeds: [new ErrorEmbed("there is already a chat reaction in this channel")],
+            });
+          }
+        } else {
+          await msg.edit({ embeds: [embed] });
+        }
+      }, 750);
+
+      collector.on("collect", async (interaction) => {
+        if (voted.includes(interaction.user.id)) {
+          await interaction.reply({
+            embeds: [new ErrorEmbed("you have already voted start")],
+            ephemeral: true,
+          });
+          return;
+        }
+        await interaction.deferUpdate();
+        voted.push(interaction.user.id);
+      });
+
+      collector.on("end", () => {
+        clearInterval(i);
+
+        if (voted.length != 5) {
+          embed.setDescription(`chat reaction not started\n\nonly received ${voted.length}/5 votes ):`);
+          msg.edit({ embeds: [embed], components: [] });
+          return;
+        }
+      });
+
+      return;
+    }
+
     const a = await startReaction(message.guild, message.channel);
 
     if (a == "xoxo69") {
