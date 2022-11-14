@@ -48,22 +48,24 @@ export default async function guildMemberRemove(member: GuildMember) {
     await addLog(member.guild, LogType.MEMBER, embed);
   }
 
-  await prisma.rolePersist.upsert({
-    where: {
-      guildId_userId: {
-        guildId: member.guild.id,
-        userId: member.id,
+  if (member.roles.cache.size > 0) {
+    await prisma.rolePersist.upsert({
+      where: {
+        guildId_userId: {
+          guildId: member.guild.id,
+          userId: member.id,
+        },
       },
-    },
-    create: {
-      userId: member.id,
-      guildId: member.guild.id,
-      roles: Array.from(member.roles.cache.values()).map((r) => r.id),
-    },
-    update: {
-      roles: Array.from(member.roles.cache.values()).map((r) => r.id),
-    },
-  });
+      create: {
+        userId: member.id,
+        guildId: member.guild.id,
+        roles: Array.from(member.roles.cache.values()).map((r) => r.id),
+      },
+      update: {
+        roles: Array.from(member.roles.cache.values()).map((r) => r.id),
+      },
+    });
+  }
 
   if (member.guild.id != "747056029795221513") return;
 
