@@ -2,6 +2,7 @@ import { Guild } from "discord.js";
 import prisma from "../../../init/database";
 
 const autoRoleCache = new Map<string, string[]>();
+const persistantRoleCache = new Map<string, string[]>();
 
 export async function getAutoJoinRoles(guild: Guild) {
   if (autoRoleCache.has(guild.id)) return autoRoleCache.get(guild.id);
@@ -31,4 +32,43 @@ export async function setAutoJoinRoles(guild: Guild, roles: string[]) {
   });
 
   autoRoleCache.delete(guild.id);
+}
+
+export async function getPersistantRoles(guild: Guild) {
+  if (persistantRoleCache.has(guild.id)) return persistantRoleCache.get(guild.id);
+
+  const query = await prisma.guild.findUnique({ where: { id: guild.id }, select: { persist_role: true } });
+
+  persistantRoleCache.set(guild.id, query.persist_role);
+
+  return query.persist_role;
+}
+
+export async function setPersistantRoles(guild: Guild, roles: string[]) {
+  await prisma.guild.update({
+    where: {
+      id: guild.id,
+    },
+    data: {
+      persist_role: roles,
+    },
+  });
+
+  persistantRoleCache.delete(guild.id);
+}
+
+export async function getPersistantRolesForUser(guild: Guild, userId: string) {
+  return await prisma.rolePersist
+    .findUnique({
+      where: {
+        guildId_userId: {
+          guildId: guild.id,
+          userId: userId,
+        },
+      },
+      select: {
+        roles: true,
+      },
+    })
+    .then((r) => r.roles);
 }
