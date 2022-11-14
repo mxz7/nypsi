@@ -8,6 +8,7 @@ import {
 } from "discord.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import { getAutoJoinRoles, setAutoJoinRoles } from "../utils/functions/guilds/roles";
 import { getMember, getRole } from "../utils/functions/member";
 
 const cmd = new Command("role", "role utilities", Categories.UTILITY);
@@ -107,7 +108,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       embeds: [
         new CustomEmbed(
           message.member,
-          "/role add <member|all> (member - if in member mode) (role) - add roles to members\n/role remove <member|all> (member - if in member mode) (role) - remove roles from members"
+          "/role add <member|all> (member - if in member mode) (role) - add roles to members\n" +
+            "/role remove <member|all> (member - if in member mode) (role) - remove roles from members\n" +
+            "/role autojoin add <role> - set a role to be automatically added when a user joins\n" +
+            "/role autojoin remove <role> - remove a role from the autojoin list\n" +
+            "/role autojoin list - show all current autojoin roles"
         ),
       ],
     });
@@ -313,6 +318,67 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({
       embeds: [new CustomEmbed(message.member, `removed ${role.toString()} from ${members[0].toLocaleString()} members`)],
     });
+  } else if (args[0].toLowerCase() == "autojoin") {
+    if (args.length == 1) {
+      return send({ embeds: [new ErrorEmbed("use slash commands")] });
+    }
+
+    const roles = await getAutoJoinRoles(message.guild);
+
+    if (args[1].toLowerCase() == "list") {
+      const rolesDisplay = roles.map(async (r) => {
+        const role = await message.guild.roles.fetch(r).catch(() => {});
+
+        if (!role) {
+          roles.splice(roles.indexOf(r), 1);
+          await setAutoJoinRoles(message.guild, roles);
+          return r;
+        }
+
+        return role.toString();
+      });
+
+      const embed = new CustomEmbed(
+        message.member,
+        `${roles.length > 0 ? rolesDisplay : "no roles will automatically be added to new members"}`
+      );
+
+      return send({ embeds: [embed] });
+    }
+
+    let chosenRole: Role;
+
+    if (message.mentions.roles.first()) {
+      chosenRole = message.mentions.roles.first();
+    } else {
+      chosenRole = await getRole(message.guild, args[2]);
+    }
+
+    if (!chosenRole) {
+      return send({ embeds: [new ErrorEmbed("invalid role")] });
+    }
+
+    if (args[1].toLowerCase() == "add" && roles.length >= 5) {
+      return send({ embeds: [new ErrorEmbed("there is a maximum of 5 autojoin roles")] });
+    }
+
+    const embed = new CustomEmbed(message.member);
+
+    if (args[1].toLowerCase() == "add") {
+      roles.push(chosenRole.id);
+      embed.setDescription(`✅ added ${chosenRole.toString()} to the autojoin role list`);
+    } else {
+      if (!roles.includes(chosenRole.id)) {
+        return send({ embeds: [new ErrorEmbed("that role is not in the autojoin role list")] });
+      }
+
+      roles.splice(roles.indexOf(chosenRole.id), 1);
+      embed.setDescription(`✅ removed ${chosenRole.toString()} from the autojoin role list`);
+    }
+
+    await setAutoJoinRoles(message.guild, roles);
+
+    return send({ embeds: [embed] });
   }
 }
 
