@@ -73,7 +73,7 @@ export async function getPersistantRolesForUser(guild: Guild, userId: string) {
     .then((r) => r.roles)
     .catch(() => []);
 
-  if (query) {
+  if (query.length > 0) {
     await prisma.rolePersist.delete({
       where: {
         guildId_userId: {
