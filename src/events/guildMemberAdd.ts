@@ -7,6 +7,7 @@ import {
   getPersistantRoles,
   getPersistantRolesForUser,
   setAutoJoinRoles,
+  setPersistantRoles,
 } from "../utils/functions/guilds/roles";
 import { createGuild, hasGuild, runCheck } from "../utils/functions/guilds/utils";
 import { addLog, isLogsEnabled } from "../utils/functions/moderation/logs";
@@ -62,7 +63,10 @@ export default async function guildMemberAdd(member: GuildMember) {
   if (userRoles.length > 0 && persistantRoles.length > 0) {
     for (const roleId of userRoles) {
       if (persistantRoles.includes(roleId)) {
-        await member.roles.add(persistantRoles);
+        await member.roles.add(persistantRoles).catch(async () => {
+          persistantRoles.splice(persistantRoles.indexOf(roleId));
+          await setPersistantRoles(member.guild, persistantRoles);
+        });
       }
     }
   }
