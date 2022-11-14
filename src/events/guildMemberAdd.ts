@@ -2,7 +2,12 @@ import { GuildMember } from "discord.js";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { LogType } from "../types/Moderation";
 import { daysAgo, formatDate } from "../utils/functions/date";
-import { getAutoJoinRoles, setAutoJoinRoles } from "../utils/functions/guilds/roles";
+import {
+  getAutoJoinRoles,
+  getPersistantRoles,
+  getPersistantRolesForUser,
+  setAutoJoinRoles,
+} from "../utils/functions/guilds/roles";
 import { createGuild, hasGuild, runCheck } from "../utils/functions/guilds/utils";
 import { addLog, isLogsEnabled } from "../utils/functions/moderation/logs";
 import { deleteMute, getMuteRole, isMuted } from "../utils/functions/moderation/mute";
@@ -48,6 +53,17 @@ export default async function guildMemberAdd(member: GuildMember) {
         autoRoles.splice(autoRoles.indexOf(roleId), 1);
         await setAutoJoinRoles(member.guild, autoRoles);
       });
+    }
+  }
+
+  const persistantRoles = await getPersistantRoles(member.guild);
+  const userRoles = await getPersistantRolesForUser(member.guild, member.id);
+
+  if (userRoles.length > 0 && persistantRoles.length > 0) {
+    for (const roleId of userRoles) {
+      if (persistantRoles.includes(roleId)) {
+        await member.roles.add(persistantRoles);
+      }
     }
   }
 
