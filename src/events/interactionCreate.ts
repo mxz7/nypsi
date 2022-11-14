@@ -10,6 +10,7 @@ import {
   Interaction,
   InteractionType,
   ModalBuilder,
+  Role,
   TextInputBuilder,
   TextInputStyle,
 } from "discord.js";
@@ -546,9 +547,20 @@ export default async function interactionCreate(interaction: Interaction) {
         args.push(`<#${channel.id}>`);
 
         const collection = new Collection<string, GuildBasedChannel>();
-        collection.set(user.id, channel as GuildBasedChannel);
+        collection.set(channel.id, channel as GuildBasedChannel);
         message.mentions = {
           channels: collection,
+        };
+
+        break;
+      case ApplicationCommandOptionType.Role:
+        const role = arg.role;
+        args.push(`<@${role.id}>`);
+
+        const roleCollection = new Collection<string, Role>();
+        roleCollection.set(role.id, role as Role);
+        message.mentions = {
+          roles: roleCollection,
         };
 
         break;
