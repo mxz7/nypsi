@@ -275,6 +275,7 @@ model Guild {
   prefix           String   @default("$")
   createdAt        DateTime @default(now())
   slash_only       Boolean  @default(false)
+  auto_role        String[]
 
   GuildChristmas GuildChristmas?
   GuildCounter   GuildCounter?

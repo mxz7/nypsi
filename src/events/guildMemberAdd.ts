@@ -2,6 +2,7 @@ import { GuildMember } from "discord.js";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { LogType } from "../types/Moderation";
 import { daysAgo, formatDate } from "../utils/functions/date";
+import { getAutoJoinRoles, setAutoJoinRoles } from "../utils/functions/guilds/roles";
 import { createGuild, hasGuild, runCheck } from "../utils/functions/guilds/utils";
 import { addLog, isLogsEnabled } from "../utils/functions/moderation/logs";
 import { deleteMute, getMuteRole, isMuted } from "../utils/functions/moderation/mute";
@@ -37,6 +38,17 @@ export default async function guildMemberAdd(member: GuildMember) {
     }
 
     await addLog(member.guild, LogType.MEMBER, embed);
+  }
+
+  const autoRoles = await getAutoJoinRoles(member.guild);
+
+  if (autoRoles.length > 0) {
+    for (const roleId of autoRoles) {
+      await member.roles.add(roleId).catch(async () => {
+        autoRoles.splice(autoRoles.indexOf(roleId), 1);
+        await setAutoJoinRoles(member.guild, autoRoles);
+      });
+    }
   }
 
   if (!queue.has(member.guild.id)) {
