@@ -2,6 +2,7 @@ import { Collection, Guild, GuildMember } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
 import { addCooldown, inCooldown } from "../guilds/utils";
+import { getBlacklisted } from "./blacklisted";
 
 export async function getReactionStats(guild: Guild, member: GuildMember) {
   const query = await prisma.chatReactionStats.findFirst({
@@ -119,8 +120,12 @@ export async function getServerLeaderboard(guild: Guild, amount: number): Promis
     },
   });
 
+  const blacklisted = await getBlacklisted(guild);
+
   for (const user of query) {
     let overall = false;
+
+    if (blacklisted.includes(user.userId)) continue;
 
     if (members.find((member) => member.user.id == user.userId) && user.wins != 0) {
       usersWins.push(user.userId);
