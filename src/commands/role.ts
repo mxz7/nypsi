@@ -54,6 +54,24 @@ cmd.slashData
           )
           .addRoleOption((option) => option.setName("role").setDescription("role to add").setRequired(true))
       )
+  )
+  .addSubcommandGroup((autojoin) =>
+    autojoin
+      .setName("autojoin")
+      .setDescription("autojoin settings")
+      .addSubcommand((list) => list.setName("list").setDescription("show all autojoin roles"))
+      .addSubcommand((add) =>
+        add
+          .setName("add")
+          .setDescription("add a role to the autojoin list")
+          .addRoleOption((option) => option.setName("role").setDescription("role to add to list").setRequired(true))
+      )
+      .addSubcommand((remove) =>
+        remove
+          .setName("remove")
+          .setDescription("remove a role from the autojoin list")
+          .addRoleOption((option) => option.setName("role").setDescription("role to remove from the list").setRequired(true))
+      )
   );
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
