@@ -1,5 +1,4 @@
 import { CommandInteraction, Message } from "discord.js";
-import fetch from "node-fetch";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -44,19 +43,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const question = args.join(" ");
 
-  const res = (
-    await fetch(`https://8ball.delegator.com/magic/JSON/${encodeURIComponent(question)}`)
-      .then((res) => res.json())
-      .catch(() => {})
-  ).magic;
-
-  let response: string;
-
-  if (!res || !res.answer) {
-    response = answers[Math.floor(Math.random() * answers.length)];
-  } else {
-    response = res.answer.toLowerCase();
-  }
+  const response = answers[Math.floor(Math.random() * answers.length)];
 
   const embed = new CustomEmbed(message.member, `**${question}** - ${message.member.user.toString()}\n\n🎱 ${response}`);
 
