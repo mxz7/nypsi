@@ -410,7 +410,7 @@ export async function calcNetWorth(member: GuildMember | string) {
   worth += Number(Number(query.user.EconomyGuild?.balance) / query.user.EconomyGuild?.members.length) || 0;
 
   for (const item of query.Inventory) {
-    if (getItems()[item.item].sell) {
+    if (getItems()[item.item].buy && getItems()[item.item].sell) {
       worth += getItems()[item.item].sell * item.amount;
     } else {
       const auctionAvg = await getAuctionAverage(item.item);
