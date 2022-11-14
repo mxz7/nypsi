@@ -13,6 +13,7 @@ import { createGuild, hasGuild, runCheck } from "../utils/functions/guilds/utils
 import { addLog, isLogsEnabled } from "../utils/functions/moderation/logs";
 import { deleteMute, getMuteRole, isMuted } from "../utils/functions/moderation/mute";
 import { profileExists } from "../utils/functions/moderation/utils";
+import sleep from "../utils/functions/sleep";
 import { fetchUsernameHistory } from "../utils/functions/users/history";
 
 const queue = new Set<string>();
@@ -54,6 +55,7 @@ export default async function guildMemberAdd(member: GuildMember) {
         autoRoles.splice(autoRoles.indexOf(roleId), 1);
         await setAutoJoinRoles(member.guild, autoRoles);
       });
+      await sleep(500);
     }
   }
 
@@ -67,6 +69,7 @@ export default async function guildMemberAdd(member: GuildMember) {
           persistantRoles.splice(persistantRoles.indexOf(roleId));
           await setPersistantRoles(member.guild, persistantRoles);
         });
+        await sleep(500);
       }
     }
   }
