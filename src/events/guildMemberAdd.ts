@@ -15,6 +15,7 @@ import { deleteMute, getMuteRole, isMuted } from "../utils/functions/moderation/
 import { profileExists } from "../utils/functions/moderation/utils";
 import sleep from "../utils/functions/sleep";
 import { fetchUsernameHistory } from "../utils/functions/users/history";
+import { logger } from "../utils/logger";
 
 const queue = new Set<string>();
 
@@ -57,6 +58,8 @@ export default async function guildMemberAdd(member: GuildMember) {
       });
       await sleep(500);
     }
+
+    logger.info(`autojoin roles given to ${member.id} in ${member.guild.id}`);
   }
 
   const persistantRoles = await getPersistantRoles(member.guild);
@@ -72,6 +75,7 @@ export default async function guildMemberAdd(member: GuildMember) {
         await sleep(500);
       }
     }
+    logger.info(`persistant roles given to ${member.id} in ${member.guild.id}`);
   }
 
   if (!queue.has(member.guild.id)) {
