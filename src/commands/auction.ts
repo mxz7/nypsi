@@ -545,6 +545,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         } has been removed by a staff member. you have been given back your item${auction.itemAmount > 1 ? "s" : ""}`
       );
 
+      if (args.length > 2) {
+        args.splice(0, 2);
+        embed.addField("reason", args.join(" "));
+      }
+
       await requestDM({
         client: message.client as NypsiClient,
         content: "your auction has been removed by a staff member",
