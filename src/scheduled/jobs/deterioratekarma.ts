@@ -23,7 +23,7 @@ import Constants from "../../utils/Constants";
   let total = 0;
 
   for (const user of users) {
-    let karmaToRemove = 1;
+    let karmaToRemove = 2;
 
     if (user.lastCommand.getTime() > threshold) karmaToRemove = 0;
 
