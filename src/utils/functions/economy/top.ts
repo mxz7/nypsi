@@ -5,6 +5,7 @@ import prisma from "../../../init/database";
 import workerSort from "../workers/sort";
 import { calcNetWorth } from "./balance";
 import { getAchievements, getItems } from "./utils";
+import pAll = require("p-all");
 
 export async function topBalance(guild: Guild, userId?: string) {
   let members: Collection<string, GuildMember>;
@@ -48,9 +49,11 @@ export async function topBalance(guild: Guild, userId?: string) {
     return target;
   };
 
+  const userIds = query.map((i) => i.userId);
+
   for (const user of query) {
     if (user.banned && dayjs().isBefore(user.banned)) {
-      query.splice(query.indexOf(user), 1);
+      userIds.splice(userIds.indexOf(user.userId), 1);
       continue;
     }
     if (Number(user.money) != 0) {
@@ -88,7 +91,7 @@ export async function topBalance(guild: Guild, userId?: string) {
   let pos = 0;
 
   if (userId) {
-    pos = query.map((i) => i.userId).indexOf(userId) + 1;
+    pos = userIds.indexOf(userId) + 1;
   }
 
   return { pages, pos };
@@ -124,7 +127,6 @@ export async function topBalanceGlobal(amount: number, anon = true): Promise<str
     if (usersFinal.join().length >= 1500) break;
 
     if (user.banned && dayjs().isBefore(user.banned)) {
-      query.splice(query.indexOf(user), 1);
       continue;
     }
 
@@ -147,6 +149,7 @@ export async function topBalanceGlobal(amount: number, anon = true): Promise<str
     usersFinal[count] = pos + " **" + username + "** $" + Number(user.money).toLocaleString();
     count++;
   }
+
   return usersFinal;
 }
 
@@ -172,9 +175,11 @@ export async function topNetWorthGlobal(userId: string) {
 
   const out: string[] = [];
 
+  const userIds = query.map((i) => i.userId);
+
   for (const user of query) {
     if (user.banned && dayjs().isBefore(user.banned)) {
-      query.splice(query.indexOf(user), 1);
+      userIds.splice(userIds.indexOf(user.userId), 1);
       continue;
     }
 
@@ -212,7 +217,7 @@ export async function topNetWorthGlobal(userId: string) {
   let pos = 0;
 
   if (userId) {
-    pos = query.map((i) => i.userId).indexOf(userId) + 1;
+    pos = userIds.indexOf(userId) + 1;
   }
 
   return { pages, pos };
@@ -250,22 +255,19 @@ export async function topNetWorth(guild: Guild, userId?: string) {
 
   for (const user of query) {
     if (user.banned && dayjs().isBefore(user.banned)) {
-      query.splice(query.indexOf(user), 1);
       continue;
     }
 
-    promises.push(
-      (async () => {
-        const net = await calcNetWorth(user.userId);
+    promises.push(async () => {
+      const net = await calcNetWorth(user.userId);
 
-        amounts.set(user.userId, net);
-        userIds.push(user.userId);
-        return;
-      })()
-    );
+      amounts.set(user.userId, net);
+      userIds.push(user.userId);
+      return;
+    });
   }
 
-  await Promise.all(promises);
+  await pAll(promises, { concurrency: 10 });
 
   if (userIds.length > 500) {
     userIds = await workerSort(userIds, amounts);
@@ -372,35 +374,35 @@ export async function topPrestige(guild: Guild, userId?: string) {
     return target;
   };
 
+  const userIds = query.map((i) => i.userId);
+
   for (const user of query) {
-    if (user.prestige != 0) {
-      if (user.banned && dayjs().isBefore(user.banned)) {
-        query.splice(query.indexOf(user), 1);
-        continue;
-      }
-
-      let pos: string | number = count + 1;
-
-      if (pos == 1) {
-        pos = "🥇";
-      } else if (pos == 2) {
-        pos = "🥈";
-      } else if (pos == 3) {
-        pos = "🥉";
-      }
-
-      const thing = ["th", "st", "nd", "rd"];
-      const v = user.prestige % 100;
-      out[count] =
-        pos +
-        " **" +
-        getMemberID(guild, user.userId).user.tag +
-        "** " +
-        user.prestige +
-        (thing[(v - 20) % 10] || thing[v] || thing[0]) +
-        " prestige";
-      count++;
+    if (user.banned && dayjs().isBefore(user.banned)) {
+      userIds.splice(userIds.indexOf(user.userId), 1);
+      continue;
     }
+
+    let pos: string | number = count + 1;
+
+    if (pos == 1) {
+      pos = "🥇";
+    } else if (pos == 2) {
+      pos = "🥈";
+    } else if (pos == 3) {
+      pos = "🥉";
+    }
+
+    const thing = ["th", "st", "nd", "rd"];
+    const v = user.prestige % 100;
+    out[count] =
+      pos +
+      " **" +
+      getMemberID(guild, user.userId).user.tag +
+      "** " +
+      user.prestige +
+      (thing[(v - 20) % 10] || thing[v] || thing[0]) +
+      " prestige";
+    count++;
   }
 
   const pages = new Map<number, string[]>();
@@ -422,7 +424,7 @@ export async function topPrestige(guild: Guild, userId?: string) {
   let pos = 0;
 
   if (userId) {
-    pos = query.map((i) => i.userId).indexOf(userId) + 1;
+    pos = userIds.indexOf(userId) + 1;
   }
 
   return { pages, pos };
@@ -452,35 +454,35 @@ export async function topPrestigeGlobal(userId: string) {
 
   let count = 0;
 
+  const userIds = query.map((i) => i.userId);
+
   for (const user of query) {
-    if (user.prestige != 0) {
-      if (user.banned && dayjs().isBefore(user.banned)) {
-        query.splice(query.indexOf(user), 1);
-        continue;
-      }
-
-      let pos: string | number = count + 1;
-
-      if (pos == 1) {
-        pos = "🥇";
-      } else if (pos == 2) {
-        pos = "🥈";
-      } else if (pos == 3) {
-        pos = "🥉";
-      }
-
-      const thing = ["th", "st", "nd", "rd"];
-      const v = user.prestige % 100;
-      out[count] =
-        pos +
-        " **" +
-        user.user.lastKnownTag.split("#")[0] +
-        "** " +
-        user.prestige +
-        (thing[(v - 20) % 10] || thing[v] || thing[0]) +
-        " prestige";
-      count++;
+    if (user.banned && dayjs().isBefore(user.banned)) {
+      userIds.splice(userIds.indexOf(user.userId), 1);
+      continue;
     }
+
+    let pos: string | number = count + 1;
+
+    if (pos == 1) {
+      pos = "🥇";
+    } else if (pos == 2) {
+      pos = "🥈";
+    } else if (pos == 3) {
+      pos = "🥉";
+    }
+
+    const thing = ["th", "st", "nd", "rd"];
+    const v = user.prestige % 100;
+    out[count] =
+      pos +
+      " **" +
+      user.user.lastKnownTag.split("#")[0] +
+      "** " +
+      user.prestige +
+      (thing[(v - 20) % 10] || thing[v] || thing[0]) +
+      " prestige";
+    count++;
   }
 
   const pages = new Map<number, string[]>();
@@ -502,7 +504,7 @@ export async function topPrestigeGlobal(userId: string) {
   let pos = 0;
 
   if (userId) {
-    pos = query.map((i) => i.userId).indexOf(userId) + 1;
+    pos = userIds.indexOf(userId) + 1;
   }
 
   return { pages, pos };
@@ -554,9 +556,11 @@ export async function topItem(guild: Guild, item: string, userId: string) {
     return target;
   };
 
+  const userIds = query.map((i) => i.userId);
+
   for (const user of query) {
     if (user.economy.banned && dayjs().isBefore(user.economy.banned)) {
-      query.splice(query.indexOf(user), 1);
+      userIds.splice(userIds.indexOf(user.userId), 1);
       continue;
     }
 
@@ -601,7 +605,7 @@ export async function topItem(guild: Guild, item: string, userId: string) {
   let pos = 0;
 
   if (userId) {
-    pos = query.map((i) => i.userId).indexOf(userId) + 1;
+    pos = userIds.indexOf(userId) + 1;
   }
 
   return { pages, pos };
