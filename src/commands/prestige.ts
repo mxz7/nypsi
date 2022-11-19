@@ -80,7 +80,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     neededBal = getPrestigeRequirementBal(neededXp);
 
   if (currentXp < neededXp) {
-    return send({ embeds: [new ErrorEmbed(`you need **${neededXp.toLocaleString()}**xp to prestige`)] });
+    const remainingXp = neededXp - currentXp;
+
+  return send({
+      embeds: [
+        new CustomEmbed(
+          message.member,
+          `you have $**${currentXp.toLocaleString()}/${neededXp.toLocaleString()}**xp to prestige`
+        ).setHeader("prestige", message.author.avatarURL()).setFooter(`you need ${remainingXp.toLocaleString()} more xp`),
+      ],
+    });
   }
 
   if (currentBal < neededBal) {
