@@ -87,7 +87,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         new CustomEmbed(
           message.member,
           `you have $**${currentXp.toLocaleString()}/${neededXp.toLocaleString()}**xp to prestige`
-        ).setHeader("prestige", message.author.avatarURL()).setFooter(`you need ${remainingXp.toLocaleString()} more xp`),
+        ).setHeader("prestige", message.author.avatarURL()).setFooter({ text: `you need ${remainingXp.toLocaleString()} more xp` }),
       ],
     });
   }
