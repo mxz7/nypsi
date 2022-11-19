@@ -79,25 +79,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   let currentBal = await getBankBalance(message.member),
     neededBal = getPrestigeRequirementBal(neededXp);
 
-  if (currentXp < neededXp) {
-    const remainingXp = neededXp - currentXp;
+  if (currentXp < neededXp || currentBal < neededBal) {
 
   return send({
       embeds: [
         new CustomEmbed(
           message.member,
-          `you have $**${currentXp.toLocaleString()}/${neededXp.toLocaleString()}**xp to prestige`
-        ).setHeader("prestige", message.author.avatarURL()).setFooter({ text: `you need ${remainingXp.toLocaleString()} more xp` }),
-      ],
-    });
-  }
-
-  if (currentBal < neededBal) {
-    return send({
-      embeds: [
-        new CustomEmbed(
-          message.member,
-          `you need $**${neededBal.toLocaleString()}** in your **bank** to be able to prestige`
+          `**${currentXp.toLocaleString()}**/**${neededXp.toLocaleString()}** xp\n$**${currentBal.toLocaleString()}**/$**${neededBal.toLocaleString()}`
         ).setHeader("prestige", message.author.avatarURL()),
       ],
     });
