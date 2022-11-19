@@ -67,8 +67,8 @@ const bree = new Bree({
     },
     {
       name: "votereminders",
-      timeout: dayjs().add(1, "hour").set("minutes", 25).set("seconds", 0).diff(dayjs(), "milliseconds"),
-      interval: "30m",
+      timeout: dayjs().add(1, "hour").set("minutes", 15).set("seconds", 0).diff(dayjs(), "milliseconds"),
+      interval: "15m",
     },
     {
       name: "cleanlogs",
