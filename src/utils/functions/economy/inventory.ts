@@ -249,7 +249,10 @@ export async function openCrate(member: GuildMember, item: Item): Promise<string
 
     for (const i of crateItems) {
       if (items[i]) {
-        if (item.id == "nypsi_crate" && ["collectable", "sellable", "item", "car"].includes(items[i].role)) {
+        if (
+          item.id == "nypsi_crate" &&
+          (["collectable", "sellable", "item", "car"].includes(items[i].role) || items[i].buy)
+        ) {
           const chance = Math.floor(Math.random() * 7);
 
           if (chance != 2) continue;
