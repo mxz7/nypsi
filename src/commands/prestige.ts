@@ -84,8 +84,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       embeds: [
         new CustomEmbed(
           message.member,
-          `**${currentXp.toLocaleString()}**/**${neededXp.toLocaleString()}** xp\n$**${currentBal.toLocaleString()}**/$**${neededBal.toLocaleString()}`
-        ).setHeader("prestige", message.author.avatarURL()),
+          `**xp** ${currentXp.toLocaleString()}/${neededXp.toLocaleString()}\n**bank** $${currentBal.toLocaleString()}**/${neededBal.toLocaleString()}`
+        ).setHeader("prestige requirements", message.author.avatarURL()),
       ],
     });
   }
@@ -130,8 +130,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embeds: [
           new CustomEmbed(
             message.member,
-            `**${currentXp.toLocaleString()}**/**${neededXp.toLocaleString()}** xp\n$**${currentBal.toLocaleString()}**/$**${neededBal.toLocaleString()}`
-          ).setHeader("prestige", message.author.avatarURL()),
+            `**xp** ${currentXp.toLocaleString()}/${neededXp.toLocaleString()}\n**bank** $${currentBal.toLocaleString()}**/${neededBal.toLocaleString()}`
+          ).setHeader("prestige requirements", message.author.avatarURL()),
         ],
       });
     }
