@@ -12,7 +12,7 @@ import {
   MessageEditOptions,
 } from "discord.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
-import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import { CustomEmbed } from "../models/EmbedBuilders";
 import { calcMaxBet, getBankBalance, getMulti, updateBankBalance } from "../utils/functions/economy/balance.js";
 import { addBooster, getBoosters } from "../utils/functions/economy/boosters.js";
 import { addInventoryItem } from "../utils/functions/economy/inventory.js";
@@ -79,17 +79,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   let currentBal = await getBankBalance(message.member),
     neededBal = getPrestigeRequirementBal(neededXp);
 
-  if (currentXp < neededXp) {
-    return send({ embeds: [new ErrorEmbed(`you need **${neededXp.toLocaleString()}**xp to prestige`)] });
-  }
-
-  if (currentBal < neededBal) {
+  if (currentXp < neededXp || currentBal < neededBal) {
     return send({
       embeds: [
         new CustomEmbed(
           message.member,
-          `you need $**${neededBal.toLocaleString()}** in your **bank** to be able to prestige`
-        ).setHeader("prestige", message.author.avatarURL()),
+          `**xp** ${currentXp.toLocaleString()}/${neededXp.toLocaleString()}\n**bank** $${currentBal.toLocaleString()}**/${neededBal.toLocaleString()}`
+        ).setHeader("prestige requirements", message.author.avatarURL()),
       ],
     });
   }
@@ -129,19 +125,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     currentBal = await getBankBalance(message.member);
     neededBal = getPrestigeRequirementBal(neededXp);
 
-    if (currentXp < neededXp) {
-      return send({
-        embeds: [new ErrorEmbed(`you need **${neededXp.toLocaleString()}**xp to prestige`)],
-      });
-    }
-
-    if (currentBal < neededBal) {
+    if (currentXp < neededXp || currentBal < neededBal) {
       return send({
         embeds: [
           new CustomEmbed(
             message.member,
-            `you need $**${neededBal.toLocaleString()}** in your **bank** to be able to prestige`
-          ).setHeader("prestige", message.author.avatarURL()),
+            `**xp** ${currentXp.toLocaleString()}/${neededXp.toLocaleString()}\n**bank** $${currentBal.toLocaleString()}**/${neededBal.toLocaleString()}`
+          ).setHeader("prestige requirements", message.author.avatarURL()),
         ],
       });
     }
