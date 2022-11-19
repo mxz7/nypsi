@@ -12,7 +12,7 @@ import {
   MessageEditOptions,
 } from "discord.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
-import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import { CustomEmbed } from "../models/EmbedBuilders";
 import { calcMaxBet, getBankBalance, getMulti, updateBankBalance } from "../utils/functions/economy/balance.js";
 import { addBooster, getBoosters } from "../utils/functions/economy/boosters.js";
 import { addInventoryItem } from "../utils/functions/economy/inventory.js";
@@ -80,16 +80,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     neededBal = getPrestigeRequirementBal(neededXp);
 
   if (currentXp < neededXp || currentBal < neededBal) {
-
     return send({
-        embeds: [
-          new CustomEmbed(
-            message.member,
-            `**${currentXp.toLocaleString()}**/**${neededXp.toLocaleString()}** xp\n$**${currentBal.toLocaleString()}**/$**${neededBal.toLocaleString()}`
-          ).setHeader("prestige", message.author.avatarURL()),
-        ],
-      });
-    }
+      embeds: [
+        new CustomEmbed(
+          message.member,
+          `**${currentXp.toLocaleString()}**/**${neededXp.toLocaleString()}** xp\n$**${currentBal.toLocaleString()}**/$**${neededBal.toLocaleString()}`
+        ).setHeader("prestige", message.author.avatarURL()),
+      ],
+    });
+  }
 
   const embed = new CustomEmbed(
     message.member,
@@ -127,16 +126,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     neededBal = getPrestigeRequirementBal(neededXp);
 
     if (currentXp < neededXp || currentBal < neededBal) {
-
       return send({
-          embeds: [
-            new CustomEmbed(
-              message.member,
-              `**${currentXp.toLocaleString()}**/**${neededXp.toLocaleString()}** xp\n$**${currentBal.toLocaleString()}**/$**${neededBal.toLocaleString()}`
-            ).setHeader("prestige", message.author.avatarURL()),
-          ],
-        });
-      }
+        embeds: [
+          new CustomEmbed(
+            message.member,
+            `**${currentXp.toLocaleString()}**/**${neededXp.toLocaleString()}** xp\n$**${currentBal.toLocaleString()}**/$**${neededBal.toLocaleString()}`
+          ).setHeader("prestige", message.author.avatarURL()),
+        ],
+      });
+    }
 
     await updateBankBalance(message.member, currentBal - neededBal);
     await updateXp(message.member, currentXp - neededXp);
