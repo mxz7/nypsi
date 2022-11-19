@@ -81,15 +81,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (currentXp < neededXp || currentBal < neededBal) {
 
-  return send({
-      embeds: [
-        new CustomEmbed(
-          message.member,
-          `**${currentXp.toLocaleString()}**/**${neededXp.toLocaleString()}** xp\n$**${currentBal.toLocaleString()}**/$**${neededBal.toLocaleString()}`
-        ).setHeader("prestige", message.author.avatarURL()),
-      ],
-    });
-  }
+    return send({
+        embeds: [
+          new CustomEmbed(
+            message.member,
+            `**${currentXp.toLocaleString()}**/**${neededXp.toLocaleString()}** xp\n$**${currentBal.toLocaleString()}**/$**${neededBal.toLocaleString()}`
+          ).setHeader("prestige", message.author.avatarURL()),
+        ],
+      });
+    }
 
   const embed = new CustomEmbed(
     message.member,
@@ -126,22 +126,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     currentBal = await getBankBalance(message.member);
     neededBal = getPrestigeRequirementBal(neededXp);
 
-    if (currentXp < neededXp) {
-      return send({
-        embeds: [new ErrorEmbed(`you need **${neededXp.toLocaleString()}**xp to prestige`)],
-      });
-    }
+    if (currentXp < neededXp || currentBal < neededBal) {
 
-    if (currentBal < neededBal) {
       return send({
-        embeds: [
-          new CustomEmbed(
-            message.member,
-            `you need $**${neededBal.toLocaleString()}** in your **bank** to be able to prestige`
-          ).setHeader("prestige", message.author.avatarURL()),
-        ],
-      });
-    }
+          embeds: [
+            new CustomEmbed(
+              message.member,
+              `**${currentXp.toLocaleString()}**/**${neededXp.toLocaleString()}** xp\n$**${currentBal.toLocaleString()}**/$**${neededBal.toLocaleString()}`
+            ).setHeader("prestige", message.author.avatarURL()),
+          ],
+        });
+      }
 
     await updateBankBalance(message.member, currentBal - neededBal);
     await updateXp(message.member, currentXp - neededXp);
