@@ -85,7 +85,7 @@
     "role": "sellable",
     "rarity": 0,
     "buy": 0,
-    "sell": 15000,
+    "sell": 6000,
     "in_crates": false
   },
   "coal": {
