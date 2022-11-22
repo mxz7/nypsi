@@ -203,14 +203,10 @@ export async function checkAutoMute(message: Message) {
       await deleteMute(message.guild, message.member);
     }
 
-    await newCase(
-      message.guild,
-      PunishmentType.MUTE,
-      message.author.id,
-      message.guild.members.me.user.tag,
-      "filter violation"
-    );
-    await newMute(message.guild, [message.author.id], new Date(Date.now() + length * 1000));
+    await Promise.all([
+      newCase(message.guild, PunishmentType.MUTE, message.author.id, message.guild.members.me.user.tag, "filter violation"),
+      newMute(message.guild, [message.author.id], new Date(Date.now() + length * 1000)),
+    ]);
 
     logger.log({ message: `${message.guild.id} ${message.author.id} automuted ${length}s`, level: "auto" });
 
