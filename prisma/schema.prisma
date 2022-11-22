@@ -336,6 +336,7 @@ model Moderation {
   muteRole  String?
   modlogs   String?
   logs      String?
+  automute  Int[]
 
   guild          Guild            @relation(fields: [guildId], references: [id], onDelete: Cascade)
   guildId        String           @unique
