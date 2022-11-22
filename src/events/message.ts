@@ -21,7 +21,7 @@ import { NypsiClient } from "../models/Client";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { userExists } from "../utils/functions/economy/utils";
-import { checkMessageContent } from "../utils/functions/guilds/filters";
+import { checkAutoMute, checkMessageContent } from "../utils/functions/guilds/filters";
 import { isSlashOnly } from "../utils/functions/guilds/slash";
 import { addCooldown, getPrefix, hasGuild, inCooldown } from "../utils/functions/guilds/utils";
 import { getKarma } from "../utils/functions/karma/karma";
@@ -153,7 +153,10 @@ export default async function messageCreate(message: Message) {
   if ((await hasGuild(message.guild)) && !message.member.permissions.has(PermissionsBitField.Flags.ManageMessages)) {
     const res = await checkMessageContent(message);
 
-    if (!res) return;
+    if (!res) {
+      await checkAutoMute(message);
+      return;
+    }
   }
 
   if (message.content.startsWith(prefix) && !(await isSlashOnly(message.guild))) {
