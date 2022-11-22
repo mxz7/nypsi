@@ -227,7 +227,9 @@ export async function checkAutoMute(message: Message) {
 
   if (muteLevels[vl]) {
     await muteUser(muteLevels[vl]);
-  } else if (muteLevels[muteLevels.length - 1]) {
-    await muteUser(muteLevels[muteLevels.length - 1]);
+  } else if (vl > 0) {
+    let modified = vl;
+    while (modified > 0 && !muteLevels[modified]) modified--;
+    await muteUser(muteLevels[modified]);
   }
 }
