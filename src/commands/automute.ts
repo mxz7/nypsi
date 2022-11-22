@@ -22,7 +22,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (args.length == 0) {
     const embed = new CustomEmbed(
       message.member,
-      levels.map((secs, index) => `${index + 1} \`${MStoTime(secs * 1000, true)}\``).join("\n")
+      levels.map((secs, index) => `${index + 1} \`${MStoTime(secs * 1000, true).trim() || "no mute"}\``).join("\n")
     )
       .setHeader("current auto mute lengths")
       .setFooter({ text: `${prefix}automute <vl> <length | none>` });
