@@ -35,7 +35,7 @@
     "crypto-js": "^4.1.1",
     "dayjs": "^1.11.6",
     "discord-api-types": "^0.37.14",
-    "discord-hybrid-sharding": "^1.7.4",
+    "discord-hybrid-sharding": "^1.7.5",
     "discord.js": "^14.6.0",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
