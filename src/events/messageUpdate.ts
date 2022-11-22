@@ -4,6 +4,7 @@ import { LogType } from "../types/Moderation";
 import { checkAutoMute, checkMessageContent, getChatFilter, getSnipeFilter } from "../utils/functions/guilds/filters";
 import { createGuild, eSnipe, hasGuild } from "../utils/functions/guilds/utils";
 import { addLog, isLogsEnabled } from "../utils/functions/moderation/logs";
+import { addMuteViolation } from "../utils/functions/moderation/mute";
 import { cleanString } from "../utils/functions/string";
 
 export default async function messageUpdate(message: Message, newMessage: Message) {
@@ -32,11 +33,10 @@ export default async function messageUpdate(message: Message, newMessage: Messag
     const res = await checkMessageContent(newMessage);
 
     if (!res) {
+      addMuteViolation(message.guild, message.member);
       await checkAutoMute(message);
       return;
     }
-
-    if (!res) return;
   }
 
   if (message.content != "" && !message.member.user.bot && message.content.length > 1) {

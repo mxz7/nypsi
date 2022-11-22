@@ -25,6 +25,7 @@ import { checkAutoMute, checkMessageContent } from "../utils/functions/guilds/fi
 import { isSlashOnly } from "../utils/functions/guilds/slash";
 import { addCooldown, getPrefix, hasGuild, inCooldown } from "../utils/functions/guilds/utils";
 import { getKarma } from "../utils/functions/karma/karma";
+import { addMuteViolation } from "../utils/functions/moderation/mute";
 import { isPremium } from "../utils/functions/premium/premium";
 import { encrypt } from "../utils/functions/string";
 import { createSupportRequest, getSupportRequest, sendToRequestChannel } from "../utils/functions/supportrequest";
@@ -154,6 +155,7 @@ export default async function messageCreate(message: Message) {
     const res = await checkMessageContent(message);
 
     if (!res) {
+      addMuteViolation(message.guild, message.member);
       await checkAutoMute(message);
       return;
     }
