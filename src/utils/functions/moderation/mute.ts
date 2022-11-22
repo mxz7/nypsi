@@ -1,10 +1,26 @@
 import { Guild, GuildMember, Role } from "discord.js";
 import prisma from "../../../init/database";
 import { NypsiClient } from "../../../models/Client";
+import sleep from "../sleep";
 import { createProfile, profileExists } from "./utils";
+import ms = require("ms");
 
 const muteRoleCache = new Map<string, string>();
 const autoMuteLevelCache = new Map<string, number[]>();
+
+const violations = new Map<string, Map<string, { vl: number; startedAt: number }>>();
+
+export function startAutoMuteViolationInterval() {
+  setInterval(async () => {
+    for (const guildId of violations.keys()) {
+      for (const [userId, userVl] of violations.get(guildId).entries()) {
+        if (userVl.startedAt < Date.now() - ms("1 hour")) violations.get(guildId).delete(userId);
+        await sleep(5);
+      }
+      await sleep(50);
+    }
+  }, ms("20 minutes"));
+}
 
 export async function newMute(guild: Guild, userIDs: string[], date: Date) {
   if (!(userIDs instanceof Array)) {
