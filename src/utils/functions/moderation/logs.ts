@@ -147,7 +147,7 @@ export async function isModLogsEnabled(guild: Guild) {
     },
   });
 
-  if (!query || !query.modlogs) return false;
+  if (!query || !query.modlogs || query.modlogs == "") return false;
 
   return true;
 }
