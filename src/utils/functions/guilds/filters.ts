@@ -212,7 +212,7 @@ export async function checkAutoMute(message: Message) {
         PunishmentType.MUTE,
         message.author.id,
         message.guild.members.me.user.tag,
-        `filter violation [${MStoTime(length * 1000, true)}]`
+        `filter violation [${MStoTime(length * 1000, true).trim()}]`
       ),
       newMute(message.guild, [message.author.id], new Date(Date.now() + length * 1000)),
     ]);
@@ -223,7 +223,7 @@ export async function checkAutoMute(message: Message) {
 
     if (mode == "timeout") {
       await message.member
-        .timeout(length, `filter violation auto mute - ${MStoTime(length * 1000, true)}`)
+        .timeout(length, `filter violation auto mute - ${MStoTime(length * 1000, true).trim()}`)
         .then(() => {
           successful = true;
         })
@@ -232,7 +232,7 @@ export async function checkAutoMute(message: Message) {
         });
     } else {
       await message.member.roles
-        .add(muteRole, `filter violation auto mute - ${MStoTime(length * 1000, true)}`)
+        .add(muteRole, `filter violation auto mute - ${MStoTime(length * 1000, true).trim()}`)
         .then(() => {
           successful = true;
         })
@@ -244,7 +244,7 @@ export async function checkAutoMute(message: Message) {
     if (successful) {
       const embed = new CustomEmbed()
         .setTitle(`muted in ${message.guild.name}`)
-        .addField("length", `\`${MStoTime(length * 1000, true)}\``, true)
+        .addField("length", `\`${MStoTime(length * 1000, true).trim()}\``, true)
         .setFooter({ text: "unmuted at:" })
         .setTimestamp(new Date(Date.now() + length * 1000))
         .setColor(Constants.TRANSPARENT_EMBED_COLOR)
