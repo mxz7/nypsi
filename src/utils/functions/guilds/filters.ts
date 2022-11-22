@@ -139,8 +139,6 @@ export async function checkMessageContent(message: Message) {
 export async function checkAutoMute(message: Message) {
   const vl = getMuteViolations(message.guild, message.member);
 
-  console.log(vl);
-
   const muteLevels = await getAutoMuteLevels(message.guild);
 
   const muteUser = async (length: number) => {
@@ -214,7 +212,7 @@ export async function checkAutoMute(message: Message) {
     );
     await newMute(message.guild, [message.author.id], new Date(Date.now() + length * 1000));
 
-    logger.info(`${message.guild.id} ${message.author.id} automuted ${length}s`);
+    logger.log({ message: `${message.guild.id} ${message.author.id} automuted ${length}s`, level: "auto" });
 
     if (mode == "timeout") {
       return await message.member.timeout(length, "filter violation auto mute").catch(() => {
