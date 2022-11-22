@@ -237,7 +237,7 @@ export function getMuteViolations(guild: Guild, member: GuildMember) {
 
 export function addMuteViolation(guild: Guild, member: GuildMember) {
   if (!violations.has(guild.id)) {
-    violations.set(guild.id, new Map([[member.user.id, { vl: 1, startedAt: Date.now() }]]));
+    violations.set(guild.id, new Map([[member.user.id, { vl: 0, startedAt: Date.now() }]]));
   } else {
     if (violations.get(guild.id).has(member.user.id)) {
       violations.get(member.user.id).get(member.user.id).vl++;
