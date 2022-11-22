@@ -214,6 +214,8 @@ export async function checkAutoMute(message: Message) {
     );
     await newMute(message.guild, [message.author.id], new Date(Date.now() + length * 1000));
 
+    logger.info(`${message.guild.id} ${message.author.id} automuted ${length}s`);
+
     if (mode == "timeout") {
       return await message.member.timeout(length, "filter violation auto mute").catch(() => {
         logger.warn(`error timing out user ${message.guild.id} ${message.author.id}`);
