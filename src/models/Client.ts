@@ -37,6 +37,7 @@ import { runCountdowns } from "../utils/functions/guilds/countdowns";
 import { updateCounters } from "../utils/functions/guilds/counters";
 import { runSnipeClearIntervals } from "../utils/functions/guilds/utils";
 import { runUploadReset } from "../utils/functions/image";
+import { startAutoMuteViolationInterval } from "../utils/functions/moderation/mute";
 import { getVersion } from "../utils/functions/version";
 import { runCommandUseTimers } from "../utils/handlers/commandhandler";
 import { updateCache } from "../utils/handlers/imghandler";
@@ -129,6 +130,7 @@ export class NypsiClient extends Client {
     doChatReactions(this);
     runCommandUseTimers(this);
     runUploadReset();
+    startAutoMuteViolationInterval();
 
     if (this.cluster.id != 0) return;
 

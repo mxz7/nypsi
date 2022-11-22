@@ -1,6 +1,26 @@
 import { Guild, GuildMember, Role } from "discord.js";
 import prisma from "../../../init/database";
 import { NypsiClient } from "../../../models/Client";
+import sleep from "../sleep";
+import { createProfile, profileExists } from "./utils";
+import ms = require("ms");
+
+const muteRoleCache = new Map<string, string>();
+const autoMuteLevelCache = new Map<string, number[]>();
+
+const violations = new Map<string, Map<string, { vl: number; startedAt: number }>>();
+
+export function startAutoMuteViolationInterval() {
+  setInterval(async () => {
+    for (const guildId of violations.keys()) {
+      for (const [userId, userVl] of violations.get(guildId).entries()) {
+        if (userVl.startedAt < Date.now() - ms("1 hour")) violations.get(guildId).delete(userId);
+        await sleep(5);
+      }
+      await sleep(50);
+    }
+  }, ms("1 hour"));
+}
 
 export async function newMute(guild: Guild, userIDs: string[], date: Date) {
   if (!(userIDs instanceof Array)) {
@@ -42,6 +62,8 @@ export async function getMuteRole(guild: Guild | string) {
     guildId = guild;
   }
 
+  if (muteRoleCache.has(guildId)) return muteRoleCache.get(guildId);
+
   const query = await prisma.moderation.findUnique({
     where: {
       guildId: guildId,
@@ -52,8 +74,10 @@ export async function getMuteRole(guild: Guild | string) {
   });
 
   if (query.muteRole == "") {
+    muteRoleCache.set(guildId, undefined);
     return undefined;
   } else {
+    muteRoleCache.set(guildId, query.muteRole);
     return query.muteRole;
   }
 }
@@ -66,6 +90,8 @@ export async function setMuteRole(guild: Guild, role: Role | string) {
   } else {
     id = role;
   }
+
+  if (muteRoleCache.has(id)) muteRoleCache.delete(id);
 
   await prisma.moderation.update({
     where: {
@@ -153,4 +179,78 @@ export async function deleteMute(guild: Guild | string, member: GuildMember | st
       AND: [{ userId: id }, { guildId: guildId }],
     },
   });
+}
+
+export async function getAutoMuteLevels(guild: Guild) {
+  let guildId: string;
+  if (guild instanceof Guild) {
+    guildId = guild.id;
+  } else {
+    guildId = guild;
+  }
+
+  if (autoMuteLevelCache.has(guildId)) {
+    return autoMuteLevelCache.get(guildId);
+  }
+
+  if (!(await profileExists(guild))) await createProfile(guild);
+
+  const query = await prisma.moderation.findUnique({
+    where: {
+      guildId,
+    },
+    select: {
+      automute: true,
+    },
+  });
+
+  autoMuteLevelCache.set(guildId, query.automute);
+
+  return query.automute;
+}
+
+export async function setAutoMuteLevels(guild: Guild, levels: number[]) {
+  let guildId: string;
+  if (guild instanceof Guild) {
+    guildId = guild.id;
+  } else {
+    guildId = guild;
+  }
+
+  if (autoMuteLevelCache.has(guildId)) {
+    autoMuteLevelCache.delete(guildId);
+  }
+
+  await prisma.moderation.update({
+    where: {
+      guildId,
+    },
+    data: {
+      automute: levels,
+    },
+  });
+}
+
+export function getMuteViolations(guild: Guild, member: GuildMember) {
+  if (violations.get(guild.id)?.get(member.user.id)?.startedAt < Date.now() - ms("1 hour")) {
+    violations.get(guild.id).delete(member.user.id);
+    return 0;
+  }
+  return violations.get(guild.id)?.get(member.user.id).vl || 0;
+}
+
+export function addMuteViolation(guild: Guild, member: GuildMember) {
+  if (!violations.has(guild.id)) {
+    violations.set(guild.id, new Map([[member.user.id, { vl: 0, startedAt: Date.now() }]]));
+  } else {
+    if (violations.get(guild.id).has(member.user.id)) {
+      if (violations.get(guild.id).get(member.user.id)?.startedAt < Date.now() - ms("1 hour")) {
+        violations.get(guild.id).set(member.user.id, { vl: 0, startedAt: Date.now() });
+      } else {
+        violations.get(guild.id).get(member.user.id).vl++;
+      }
+    } else {
+      violations.get(guild.id).set(member.user.id, { vl: 0, startedAt: Date.now() });
+    }
+  }
 }
