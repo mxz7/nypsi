@@ -234,3 +234,15 @@ export async function setAutoMuteLevels(guild: Guild, levels: number[]) {
 export function getMuteViolations(guild: Guild, member: GuildMember) {
   return violations.get(guild.id)?.get(member.user.id).vl || 0;
 }
+
+export function addMuteViolation(guild: Guild, member: GuildMember) {
+  if (!violations.has(guild.id)) {
+    violations.set(guild.id, new Map([[member.user.id, { vl: 1, startedAt: Date.now() }]]));
+  } else {
+    if (violations.get(guild.id).has(member.user.id)) {
+      violations.get(member.user.id).get(member.user.id).vl++;
+    } else {
+      violations.get(member.user.id).set(member.user.id, { vl: 0, startedAt: Date.now() });
+    }
+  }
+}
