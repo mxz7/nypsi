@@ -19,7 +19,7 @@ export function startAutoMuteViolationInterval() {
       }
       await sleep(50);
     }
-  }, ms("20 minutes"));
+  }, ms("1 hour"));
 }
 
 export async function newMute(guild: Guild, userIDs: string[], date: Date) {
@@ -232,6 +232,10 @@ export async function setAutoMuteLevels(guild: Guild, levels: number[]) {
 }
 
 export function getMuteViolations(guild: Guild, member: GuildMember) {
+  if (violations.get(guild.id)?.get(member.user.id)?.startedAt < Date.now() - ms("1 hour")) {
+    violations.get(guild.id).delete(member.user.id);
+    return 0;
+  }
   return violations.get(guild.id)?.get(member.user.id).vl || 0;
 }
 
@@ -240,9 +244,13 @@ export function addMuteViolation(guild: Guild, member: GuildMember) {
     violations.set(guild.id, new Map([[member.user.id, { vl: 0, startedAt: Date.now() }]]));
   } else {
     if (violations.get(guild.id).has(member.user.id)) {
-      violations.get(member.user.id).get(member.user.id).vl++;
+      if (violations.get(guild.id).get(member.user.id)?.startedAt < Date.now() - ms("1 hour")) {
+        violations.get(guild.id).set(member.user.id, { vl: 0, startedAt: Date.now() });
+      } else {
+        violations.get(guild.id).get(member.user.id).vl++;
+      }
     } else {
-      violations.get(member.user.id).set(member.user.id, { vl: 0, startedAt: Date.now() });
+      violations.get(guild.id).set(member.user.id, { vl: 0, startedAt: Date.now() });
     }
   }
 }
