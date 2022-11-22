@@ -1,5 +1,3 @@
-dependencies: package.json
-
 build: tsconfig.json
 
 ci: .github/**
