@@ -212,7 +212,7 @@ export async function checkAutoMute(message: Message) {
         PunishmentType.MUTE,
         message.author.id,
         message.guild.members.me.user.tag,
-        `filter violation [${MStoTime(length * 1000, true).trim()}]`
+        `[${MStoTime(length * 1000, true).trim()}] filter violation`
       ),
       newMute(message.guild, [message.author.id], new Date(Date.now() + length * 1000)),
     ]);
