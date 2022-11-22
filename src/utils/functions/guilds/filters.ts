@@ -1,8 +1,11 @@
 import { Guild, Message, Role, ThreadChannel } from "discord.js";
 import * as stringSimilarity from "string-similarity";
 import prisma from "../../../init/database";
+import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { PunishmentType } from "../../../types/Moderation";
+import Constants from "../../Constants";
 import { logger } from "../../logger";
+import { MStoTime } from "../date";
 import { newCase } from "../moderation/cases";
 import { addModLog } from "../moderation/logs";
 import { deleteMute, getAutoMuteLevels, getMuteRole, getMuteViolations, isMuted, newMute } from "../moderation/mute";
@@ -204,18 +207,52 @@ export async function checkAutoMute(message: Message) {
     }
 
     await Promise.all([
-      newCase(message.guild, PunishmentType.MUTE, message.author.id, message.guild.members.me.user.tag, "filter violation"),
+      newCase(
+        message.guild,
+        PunishmentType.MUTE,
+        message.author.id,
+        message.guild.members.me.user.tag,
+        `filter violation [${MStoTime(length * 1000, true)}]`
+      ),
       newMute(message.guild, [message.author.id], new Date(Date.now() + length * 1000)),
     ]);
 
     logger.log({ message: `${message.guild.id} ${message.author.id} automuted ${length}s`, level: "auto" });
 
+    let successful = false;
+
     if (mode == "timeout") {
-      return await message.member.timeout(length, "filter violation auto mute").catch(() => {
-        logger.warn(`error timing out user ${message.guild.id} ${message.author.id}`);
-      });
+      await message.member
+        .timeout(length, `filter violation auto mute - ${MStoTime(length * 1000, true)}`)
+        .then(() => {
+          successful = true;
+        })
+        .catch(() => {
+          logger.warn(`error timing out user ${message.guild.id} ${message.author.id}`);
+        });
     } else {
-      return await message.member.roles.add(muteRole, "filter violation auto mute");
+      await message.member.roles
+        .add(muteRole, `filter violation auto mute - ${MStoTime(length * 1000, true)}`)
+        .then(() => {
+          successful = true;
+        })
+        .catch(() => {
+          logger.warn(`error adding mute role to user ${message.guild.id} ${message.author.id}`);
+        });
+    }
+
+    if (successful) {
+      const embed = new CustomEmbed()
+        .setTitle(`muted in ${message.guild.name}`)
+        .addField("length", `\`${MStoTime(length * 1000, true)}\``, true)
+        .setFooter({ text: "unmuted at:" })
+        .setTimestamp(new Date(Date.now() + length * 1000))
+        .setColor(Constants.TRANSPARENT_EMBED_COLOR)
+        .addField("reason", "filter violation", true);
+
+      return await message.member
+        .send({ content: `you have been muted in ${message.guild.name}`, embeds: [embed] })
+        .catch(() => {});
     }
   };
 
