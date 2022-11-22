@@ -50,14 +50,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   collector.on("collect", async (i): Promise<any> => {
     if (i.customId == customId) {
-      await i.deferUpdate();
       if (reactions.includes(i.user.id)) {
-        return await i.followUp({ embeds: [new ErrorEmbed("you can only do this once")], ephemeral: true }).catch(() => {});
+        return await i.reply({ embeds: [new ErrorEmbed("you can only do this once")], ephemeral: true }).catch(() => {});
       }
 
       reactions.push(i.user.id);
 
-      return await message.channel.send({
+      return await i.reply({
         embeds: [new CustomEmbed(message.member, `${i.user.toString()} has paid respects to **${args.join(" ")}**`)],
       });
     }
