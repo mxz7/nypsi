@@ -230,3 +230,7 @@ export async function setAutoMuteLevels(guild: Guild, levels: number[]) {
     },
   });
 }
+
+export function getMuteViolations(guild: Guild, member: GuildMember) {
+  return violations.get(guild.id)?.get(member.user.id).vl;
+}
