@@ -1,8 +1,10 @@
 import { Guild, GuildMember, Role } from "discord.js";
 import prisma from "../../../init/database";
 import { NypsiClient } from "../../../models/Client";
+import { createProfile, profileExists } from "./utils";
 
 const muteRoleCache = new Map<string, string>();
+const autoMuteLevelCache = new Map<string, number[]>();
 
 export async function newMute(guild: Guild, userIDs: string[], date: Date) {
   if (!(userIDs instanceof Array)) {
@@ -159,6 +161,56 @@ export async function deleteMute(guild: Guild | string, member: GuildMember | st
   await prisma.moderationMute.deleteMany({
     where: {
       AND: [{ userId: id }, { guildId: guildId }],
+    },
+  });
+}
+
+export async function getAutoMuteLevels(guild: Guild) {
+  let guildId: string;
+  if (guild instanceof Guild) {
+    guildId = guild.id;
+  } else {
+    guildId = guild;
+  }
+
+  if (autoMuteLevelCache.has(guildId)) {
+    return autoMuteLevelCache.get(guildId);
+  }
+
+  if (!(await profileExists(guild))) await createProfile(guild);
+
+  const query = await prisma.moderation.findUnique({
+    where: {
+      guildId,
+    },
+    select: {
+      automute: true,
+    },
+  });
+
+  autoMuteLevelCache.set(guildId, query.automute);
+
+  return query.automute;
+}
+
+export async function setAutoMuteLevels(guild: Guild, levels: number[]) {
+  let guildId: string;
+  if (guild instanceof Guild) {
+    guildId = guild.id;
+  } else {
+    guildId = guild;
+  }
+
+  if (autoMuteLevelCache.has(guildId)) {
+    autoMuteLevelCache.delete(guildId);
+  }
+
+  await prisma.moderation.update({
+    where: {
+      guildId,
+    },
+    data: {
+      automute: levels,
     },
   });
 }
