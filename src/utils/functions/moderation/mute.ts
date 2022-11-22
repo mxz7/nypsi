@@ -2,6 +2,8 @@ import { Guild, GuildMember, Role } from "discord.js";
 import prisma from "../../../init/database";
 import { NypsiClient } from "../../../models/Client";
 
+const muteRoleCache = new Map<string, string>();
+
 export async function newMute(guild: Guild, userIDs: string[], date: Date) {
   if (!(userIDs instanceof Array)) {
     userIDs = [userIDs];
@@ -42,6 +44,8 @@ export async function getMuteRole(guild: Guild | string) {
     guildId = guild;
   }
 
+  if (muteRoleCache.has(guildId)) return muteRoleCache.get(guildId);
+
   const query = await prisma.moderation.findUnique({
     where: {
       guildId: guildId,
@@ -52,8 +56,10 @@ export async function getMuteRole(guild: Guild | string) {
   });
 
   if (query.muteRole == "") {
+    muteRoleCache.set(guildId, undefined);
     return undefined;
   } else {
+    muteRoleCache.set(guildId, query.muteRole);
     return query.muteRole;
   }
 }
@@ -66,6 +72,8 @@ export async function setMuteRole(guild: Guild, role: Role | string) {
   } else {
     id = role;
   }
+
+  if (muteRoleCache.has(id)) muteRoleCache.delete(id);
 
   await prisma.moderation.update({
     where: {
