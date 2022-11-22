@@ -184,33 +184,40 @@ async function handleKofiData(data: KofiResponse) {
         return logger.error(data);
       }
 
-      if (user) {
-        await addInventoryItem(user.id, item, 1, false);
+      if (!shopItem.quantity) {
+        logger.error(`invalid quantity: ${JSON.stringify(shopItem)}`);
+        return;
+      }
 
-        logger.info(`${item} given to ${user.id} (${user.email})`);
+      for (let i = 0; i < shopItem.quantity; i++) {
+        if (user) {
+          await addInventoryItem(user.id, item, 1, false);
 
-        if ((await getDmSettings(user.id)).premium) {
-          const payload: NotificationPayload = {
-            memberId: user.id,
-            payload: {
-              content: "thank you for your purchase",
-              embed: new CustomEmbed()
-                .setDescription(`you have received 1 ${item}`)
-                .setColor(Constants.TRANSPARENT_EMBED_COLOR),
+          logger.info(`${item} given to ${user.id} (${user.email})`);
+
+          if ((await getDmSettings(user.id)).premium) {
+            const payload: NotificationPayload = {
+              memberId: user.id,
+              payload: {
+                content: "thank you for your purchase",
+                embed: new CustomEmbed()
+                  .setDescription(`you have received 1 ${item}`)
+                  .setColor(Constants.TRANSPARENT_EMBED_COLOR),
+              },
+            };
+
+            await addNotificationToQueue(payload);
+          }
+        } else {
+          await prisma.kofiPurchases.create({
+            data: {
+              email: data.email,
+              item: item,
             },
-          };
+          });
 
-          await addNotificationToQueue(payload);
+          logger.info(`created purchase for ${data.email} ${item}`);
         }
-      } else {
-        await prisma.kofiPurchases.create({
-          data: {
-            email: data.email,
-            item: item,
-          },
-        });
-
-        logger.info(`created purchase for ${data.email} ${item}`);
       }
     }
   }
