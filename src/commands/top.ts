@@ -104,7 +104,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const show = async (pages: Map<number, string[]>, pos: number, title: string) => {
     const embed = new CustomEmbed(message.member).setHeader(
       title,
-      title.includes("global") ? message.guild.iconURL() : message.client.user.avatarURL()
+      title.includes("global") || title.includes("guild") ? message.guild.iconURL() : message.client.user.avatarURL()
     );
 
     if (pages.size == 0) {
