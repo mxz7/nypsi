@@ -728,3 +728,50 @@ export async function topCompletion(guild: Guild, userId: string) {
 
   return { pages, pos };
 }
+
+export async function topGuilds(guildName?: string) {
+  const query = await prisma.economyGuild.findMany({
+    select: {
+      guildName: true,
+      level: true,
+    },
+    orderBy: [{ level: "desc" }, { xp: "desc" }, { balance: "desc" }],
+    take: 100,
+  });
+
+  const out: string[] = [];
+
+  for (const guild of query) {
+    let position: number | string = query.indexOf(guild) + 1;
+
+    if (position == 1) position = "🥇";
+    if (position == 2) position = "🥈";
+    if (position == 3) position = "🥉";
+
+    out.push(`${position} **${guild.guildName}** level ${guild.level}`);
+  }
+
+  const pages = new Map<number, string[]>();
+
+  for (const line of out) {
+    if (pages.size == 0) {
+      pages.set(1, [line]);
+    } else {
+      if (pages.get(pages.size).length >= 10) {
+        pages.set(pages.size + 1, [line]);
+      } else {
+        const arr = pages.get(pages.size);
+        arr.push(line);
+        pages.set(pages.size, arr);
+      }
+    }
+  }
+
+  let pos = 0;
+
+  if (guildName) {
+    pos = query.map((g) => g.guildName).indexOf(guildName) + 1;
+  }
+
+  return { pages, pos };
+}
