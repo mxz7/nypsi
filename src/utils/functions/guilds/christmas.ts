@@ -41,9 +41,10 @@ export function runChristmas(client: NypsiClient) {
       const channel = guild.channels.cache.find((c) => c.id == profile.channel);
 
       if (!channel) {
-        profile.enabled = false;
-        profile.channel = "none";
-        await setChristmasCountdown(guild, profile);
+        logger.warn(`${guild.id}: couldn't find christmas channel`);
+        // profile.enabled = false;
+        // profile.channel = "none";
+        // await setChristmasCountdown(guild, profile);
         continue;
       }
 
@@ -57,7 +58,7 @@ export function runChristmas(client: NypsiClient) {
         format = "MERRY CHRISTMAS EVERYONE I HOPE YOU HAVE A FANTASTIC DAY WOO";
       }
 
-      if (!channel.isTextBased()) return;
+      if (!channel.isTextBased()) continue;
 
       await channel
         .send({
@@ -76,10 +77,10 @@ export function runChristmas(client: NypsiClient) {
           });
         })
         .catch(async () => {
-          logger.error(`error sending christmas countdown in ${guild.name}`);
-          profile.enabled = false;
-          profile.channel = "none";
-          await setChristmasCountdown(guild, profile);
+          logger.warn(`failed sending christmas countdown in ${guild.name} | ${guild.id}`);
+          // profile.enabled = false;
+          // profile.channel = "none";
+          // await setChristmasCountdown(guild, profile);
         });
     }
   };
