@@ -32,7 +32,6 @@ import {
   RemoveMemberMode,
   setGuildMOTD,
   setOwner,
-  topGuilds,
 } from "../utils/functions/economy/guilds";
 import { getPrestige } from "../utils/functions/economy/prestige";
 import { createUser, formatNumber, isEcoBanned, userExists } from "../utils/functions/economy/utils";
@@ -86,7 +85,6 @@ cmd.slashData
       .setDescription("set the motd for the guild")
       .addStringOption((option) => option.setName("text").setDescription("text for the motd").setRequired(true))
   )
-  .addSubcommand((top) => top.setName("top").setDescription("view the top guilds"))
   .addSubcommand((view) =>
     view
       .setName("view")
@@ -726,24 +724,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     await setGuildMOTD(guild.guildName, motd);
 
     return send({ embeds: [new CustomEmbed(message.member, "✅ motd has been updated")] });
-  }
-
-  if (args[0].toLowerCase() == "top") {
-    await addCooldown(cmd.name, message.member, 15);
-
-    let limit = 5;
-
-    if (!isNaN(parseInt(args[1]))) {
-      limit = parseInt(args[1]);
-    }
-
-    const top = await topGuilds(limit);
-
-    const embed = new CustomEmbed(message.member).setHeader(`top ${args[1] ?? 5} guilds`, message.author.avatarURL());
-
-    embed.setDescription(top.join("\n"));
-
-    return send({ embeds: [embed] });
   }
 
   if (args[0].toLowerCase() == "help") {
