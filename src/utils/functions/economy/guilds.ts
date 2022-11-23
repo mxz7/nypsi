@@ -1,5 +1,4 @@
 import { GuildMember } from "discord.js";
-import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
@@ -365,37 +364,6 @@ export async function setGuildMOTD(name: string, motd: string) {
       motd: motd,
     },
   });
-}
-
-export async function topGuilds(limit = 5) {
-  const guilds = await prisma.economyGuild.findMany({
-    where: {
-      balance: { gt: 1000 },
-    },
-    select: {
-      guildName: true,
-      balance: true,
-      xp: true,
-      level: true,
-    },
-  });
-
-  inPlaceSort(guilds).desc([(i) => i.level, (i) => i.balance, (i) => i.xp]);
-
-  const out: string[] = [];
-
-  for (const guild of guilds) {
-    if (out.length >= limit) break;
-    let position: number | string = guilds.indexOf(guild) + 1;
-
-    if (position == 1) position = "🥇";
-    if (position == 2) position = "🥈";
-    if (position == 3) position = "🥉";
-
-    out.push(`${position} **${guild.guildName}**[${guild.level}] $${guild.balance.toLocaleString()}`);
-  }
-
-  return out;
 }
 
 export async function setOwner(guild: string, newOwner: string) {
