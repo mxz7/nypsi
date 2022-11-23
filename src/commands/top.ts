@@ -13,9 +13,11 @@ import {
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { Item } from "../types/Economy.js";
+import { getGuildByUser } from "../utils/functions/economy/guilds";
 import {
   topBalance,
   topCompletion,
+  topGuilds,
   topItem,
   topNetWorth,
   topNetWorthGlobal,
@@ -56,6 +58,7 @@ cmd.slashData
         option.setName("item-global").setDescription("item to query").setRequired(true).setAutocomplete(true)
       )
   )
+  .addSubcommand((guild) => guild.setName("guilds").setDescription("view top nypsi guilds"))
   .addSubcommand((completion) => completion.setName("completion").setDescription("view top completion in the server"))
   .addSubcommand((networth) =>
     networth
@@ -261,6 +264,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     return show(data.pages, data.pos, `top net worth ${global ? "[global]" : `for ${message.guild.name}`}`);
+  } else if (args[0].toLowerCase().includes("guild")) {
+    const userGuild = await getGuildByUser(message.member);
+
+    const data = await topGuilds(userGuild?.guildName);
+
+    return show(data.pages, data.pos, "top guilds");
   }
 }
 
