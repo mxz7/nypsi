@@ -18,7 +18,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (args.length == 0) {
     const embed = new CustomEmbed(message.member)
       .setHeader("poll help")
-      .addField("usage", `${prefix}poll (choices) <title> | (text)`)
+      .addField("usage", `${prefix}poll (number of choices) <text>`)
       .addField(
         "help",
         "**<>** required | **()** optional\n" +
@@ -26,7 +26,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           "if a number isnt found for choices then 👍👎 emojis will be used\n" +
           "largest number of choices is 10, and 1 is minimum"
       )
-      .addField("examples", `${prefix}poll question?\n` + `${prefix}poll 2 title | this is a description`);
+      .addField("examples", `${prefix}poll question?\n` + `${prefix}poll 2 this or that`);
 
     return message.channel.send({ embeds: [embed] });
   }
@@ -56,30 +56,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     args.shift();
   }
 
-  let mode = "";
-
   if (args.length == 0) {
     return message.channel.send({ embeds: [new ErrorEmbed("missing text")] });
   }
 
-  if (!message.content.includes("|")) {
-    mode = "title_only";
-  } else if (args.join(" ").split("|").length == 2) {
-    mode = "title_desc";
-  }
+  const embed = new CustomEmbed(message.member);
 
-  const title = args.join(" ").split("|")[0];
-  let description;
-
-  if (mode.includes("desc")) {
-    description = args.join(" ").split("|")[1];
-  }
-
-  const embed = new CustomEmbed(message.member).setTitle(title);
-
-  if (mode.includes("desc")) {
-    embed.setDescription(description);
-  }
+  embed.setDescription(args.join(" "));
 
   if (!message.member.permissions.has(PermissionFlagsBits.Administrator)) {
     embed.setHeader(message.member.user.tag);
