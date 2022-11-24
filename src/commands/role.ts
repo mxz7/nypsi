@@ -17,7 +17,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getAutoJoinRoles, getPersistantRoles, setAutoJoinRoles, setPersistantRoles } from "../utils/functions/guilds/roles";
 import { addCooldown, inCooldown } from "../utils/functions/guilds/utils";
 import { getMember, getRole } from "../utils/functions/member";
-import { arrayToPage } from "../utils/functions/page";
+import PageManager from "../utils/functions/page";
 
 const cmd = new Command("role", "role utilities", Categories.UTILITY);
 
@@ -551,7 +551,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return send({ embeds: [new CustomEmbed(message.member, `${role.toString()} has no members`)] });
     }
 
-    const pages = arrayToPage(filteredMembers);
+    const pages = PageManager.createPages(filteredMembers);
 
     const embed = new CustomEmbed(message.member, pages.get(1).join("\n"))
       .setHeader(`${role.name} [${filteredMembers.length}]`)

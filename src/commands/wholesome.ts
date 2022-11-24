@@ -17,7 +17,7 @@ import {
   uploadImageToImgur,
 } from "../utils/functions/image";
 import { getMember } from "../utils/functions/member";
-import { arrayToPage } from "../utils/functions/page";
+import PageManager from "../utils/functions/page";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const uploadCooldown = new Map<string, number>();
@@ -255,7 +255,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (!queue) return send({ embeds: [new CustomEmbed(message.member, "no items in queue")] });
 
-    const pages = arrayToPage(queue, 6);
+    const pages = PageManager.createPages(queue, 6);
 
     for (const image of queue) {
       if (embed.data.fields.length >= 6) break;

@@ -21,7 +21,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { MStoTime } from "../utils/functions/date";
 import { getStats } from "../utils/functions/economy/stats";
-import { arrayToPage } from "../utils/functions/page";
+import PageManager from "../utils/functions/page";
 import { getCommandUses } from "../utils/functions/users/commands";
 import { mentionQueue } from "../utils/functions/users/mentions";
 import { getVersion } from "../utils/functions/version";
@@ -126,7 +126,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const uses = await getCommandUses(message.member);
     const total = uses.map((x) => x.uses).reduce((a, b) => a + b);
 
-    const pages = arrayToPage(uses.map((i) => `\`$${i.command}\` ${i.uses.toLocaleString()}`));
+    const pages = PageManager.createPages(uses.map((i) => `\`$${i.command}\` ${i.uses.toLocaleString()}`));
 
     const commandUses = parseInt(await redis.hget(Constants.redis.nypsi.TOP_COMMANDS_USER, message.author.tag));
 

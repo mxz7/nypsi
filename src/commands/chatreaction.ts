@@ -33,7 +33,7 @@ import {
 } from "../utils/functions/chatreactions/utils";
 import { getWordList, updateWords } from "../utils/functions/chatreactions/words";
 import { getPrefix } from "../utils/functions/guilds/utils";
-import { arrayToPage } from "../utils/functions/page";
+import PageManager from "../utils/functions/page";
 import { isPremium } from "../utils/functions/premium/premium";
 import sleep from "../utils/functions/sleep";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -833,7 +833,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embed.setDescription("using [default word list](https://github.com/tekoh/nypsi/blob/main/data/cr_words.txt)");
         embed.setHeader("chat reactions");
       } else {
-        const pages = arrayToPage(words);
+        const pages = PageManager.createPages(words);
 
         embed.setHeader(`word list [${words.length}]`);
         embed.setDescription(`${pages.get(1).join("\n")}`);

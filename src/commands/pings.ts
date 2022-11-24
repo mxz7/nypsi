@@ -15,7 +15,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getKarma } from "../utils/functions/karma/karma";
-import { arrayToPage } from "../utils/functions/page";
+import PageManager from "../utils/functions/page";
 import { isPremium } from "../utils/functions/premium/premium";
 import { decrypt } from "../utils/functions/string";
 import { getLastCommand } from "../utils/functions/users/commands";
@@ -94,7 +94,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({ embeds: [new CustomEmbed(message.member, "no recent mentions")] });
   }
 
-  const pages = arrayToPage(
+  const pages = PageManager.createPages(
     mentions.map(
       (i) => `<t:${Math.floor(i.date.getTime() / 1000)}:R>|6|9|**${i.userTag}**: ${decrypt(i.content)}\n[jump](${i.url})`
     ),

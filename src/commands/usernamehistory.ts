@@ -12,7 +12,7 @@ import { Categories, Command, NypsiCommandInteraction } from "../models/Command"
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { formatDate } from "../utils/functions/date";
 import { getMember } from "../utils/functions/member";
-import { arrayToPage } from "../utils/functions/page";
+import PageManager from "../utils/functions/page";
 import { clearUsernameHistory, fetchUsernameHistory, isTracking } from "../utils/functions/users/history";
 import { hasProfile } from "../utils/functions/users/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -74,7 +74,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     history.push({ value: "[tracking disabled]", date: new Date() });
   }
 
-  const pages = arrayToPage(history, 7);
+  const pages = PageManager.createPages(history, 7);
 
   const embed = new CustomEmbed(message.member)
     .setTitle(member.user.tag)

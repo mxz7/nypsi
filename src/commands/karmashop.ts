@@ -21,7 +21,7 @@ import { createUser, userExists } from "../utils/functions/economy/utils";
 import { getXp, updateXp } from "../utils/functions/economy/xp";
 import { getKarma, removeKarma } from "../utils/functions/karma/karma";
 import { closeKarmaShop, getKarmaShopItems, isKarmaShopOpen, openKarmaShop } from "../utils/functions/karma/karmashop";
-import { arrayToPage } from "../utils/functions/page";
+import PageManager from "../utils/functions/page";
 import { getTier, isPremium, setExpireDate } from "../utils/functions/premium/premium";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import dayjs = require("dayjs");
@@ -113,7 +113,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (args.length == 0 || args.length == 1) {
     inPlaceSort(itemIDs).desc((i) => items[i].items_left);
 
-    const pages = arrayToPage(
+    const pages = PageManager.createPages(
       itemIDs.map((i) => items[i]),
       6
     );
