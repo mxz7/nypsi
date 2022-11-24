@@ -284,6 +284,8 @@ export default async function interactionCreate(interaction: Interaction) {
             return res.reply({ embeds: [new CustomEmbed().setDescription("✅ cancelled purchase")], ephemeral: true });
           }
 
+          await res.deferUpdate();
+
           interaction = res;
         }
 
