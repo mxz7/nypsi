@@ -5,7 +5,6 @@ import {
   ButtonStyle,
   CommandInteraction,
   GuildMember,
-  Interaction,
   InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
@@ -17,7 +16,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getAutoJoinRoles, getPersistantRoles, setAutoJoinRoles, setPersistantRoles } from "../utils/functions/guilds/roles";
 import { addCooldown, inCooldown } from "../utils/functions/guilds/utils";
 import { getMember, getRole } from "../utils/functions/member";
-import { arrayToPage } from "../utils/functions/page";
+import PageManager from "../utils/functions/page";
 
 const cmd = new Command("role", "role utilities", Categories.UTILITY);
 
@@ -551,7 +550,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return send({ embeds: [new CustomEmbed(message.member, `${role.toString()} has no members`)] });
     }
 
-    const pages = arrayToPage(filteredMembers);
+    const pages = PageManager.createPages(filteredMembers);
 
     const embed = new CustomEmbed(message.member, pages.get(1).join("\n"))
       .setHeader(`${role.name} [${filteredMembers.length}]`)
@@ -559,7 +558,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     let msg: Message;
 
-    let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
       new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
     );
@@ -570,69 +569,19 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return await message.channel.send({ embeds: [embed] });
     }
 
-    let currentPage = 1;
-    const lastPage = pages.size;
+    const manager = new PageManager({
+      embed,
+      row,
+      message: msg,
+      userId: message.author.id,
+      pages,
+      onPageUpdate(manager) {
+        manager.embed.setFooter({ text: `page ${manager.currentPage}/${manager.lastPage}` });
+        return manager.embed;
+      },
+    });
 
-    const filter = (i: Interaction) => i.user.id == message.author.id;
-
-    const pageManager = async (): Promise<any> => {
-      const reaction = await msg
-        .awaitMessageComponent({ filter, time: 30000 })
-        .then(async (collected) => {
-          await collected.deferUpdate();
-          return collected.customId;
-        })
-        .catch(async () => {
-          await msg.edit({ components: [] });
-        });
-
-      if (!reaction) return;
-
-      if (reaction == "⬅") {
-        if (currentPage <= 1) {
-          return pageManager();
-        } else {
-          currentPage--;
-          embed.setDescription(pages.get(currentPage).join("\n"));
-          embed.setFooter({ text: `page ${currentPage}/${lastPage}` });
-          if (currentPage == 1) {
-            row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-              new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
-              new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(false)
-            );
-          } else {
-            row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-              new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(false),
-              new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(false)
-            );
-          }
-          await msg.edit({ embeds: [embed], components: [row] });
-          return pageManager();
-        }
-      } else if (reaction == "➡") {
-        if (currentPage == lastPage) {
-          return pageManager();
-        } else {
-          currentPage++;
-          embed.setDescription(pages.get(currentPage).join("\n"));
-          embed.setFooter({ text: `page ${currentPage}/${lastPage}` });
-          if (currentPage == lastPage) {
-            row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-              new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(false),
-              new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(true)
-            );
-          } else {
-            row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-              new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(false),
-              new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(false)
-            );
-          }
-          await msg.edit({ embeds: [embed], components: [row] });
-          return pageManager();
-        }
-      }
-    };
-    return pageManager();
+    return manager.listen();
   }
 }
 

@@ -44,10 +44,17 @@ export async function fetchUserMentions(guild: Guild, member: GuildMember | stri
   return mentions;
 }
 
-export async function deleteUserMentions(guild: Guild, member: GuildMember) {
+export async function deleteUserMentions(guild: Guild, member: GuildMember | string) {
+  let id: string;
+  if (member instanceof GuildMember) {
+    id = member.user.id;
+  } else {
+    id = member;
+  }
+
   await prisma.mention.deleteMany({
     where: {
-      AND: [{ guildId: guild.id }, { targetId: member.user.id }],
+      AND: [{ guildId: guild.id }, { targetId: id }],
     },
   });
 }
