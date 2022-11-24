@@ -132,7 +132,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       row: row,
       userId: message.author.id,
       pages: pages,
-      updateEmbed: (page: string[], embed) => {
+      updateEmbed(page: string[], embed) {
         embed.data.fields.length = 0;
 
         for (const line of page) {
@@ -142,6 +142,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         return embed;
+      },
+      onPageUpdate(manager) {
+        manager.embed.setFooter({ text: `page ${manager.currentPage}/${manager.lastPage}` });
+        return manager.embed;
       },
       handleResponses: new Map().set("❌", async (data: { manager: PageManager }) => {
         await deleteUserMentions(data.manager.message.guild, manager.userId);
