@@ -9,6 +9,29 @@ import { addMember, getTier, isPremium, renewUser, setExpireDate, setTier } from
 import { createProfile, hasProfile } from "../utils/functions/users/utils";
 
 export default async function guildMemberUpdate(oldMember: GuildMember, newMember: GuildMember) {
+  if (oldMember.roles.cache.size != newMember.roles.cache.size && (await isLogsEnabled(newMember.guild))) {
+    let roles: Role[];
+
+    const oldIds = Array.from(oldMember.roles.cache.keys());
+    const newIds = Array.from(newMember.roles.cache.keys());
+
+    if (oldIds.length > newIds.length) {
+      roles = oldIds.filter((a) => !newIds.includes(a)).map((id) => oldMember.roles.cache.get(id));
+    } else {
+      roles = newIds.filter((a) => !oldIds.includes(a)).map((id) => newMember.roles.cache.get(id));
+    }
+
+    if (roles.length == 0) return;
+
+    const embed = new CustomEmbed().disableFooter().setTimestamp();
+
+    embed.setHeader(oldIds.length > newIds.length ? "role removed" : "role added");
+    embed.setDescription(`${newMember.user.toString()} \`${newMember.user.id}\``);
+    embed.addField(`role${roles.length > 1 ? "s" : ""}`, roles.map((r) => r.toString()).join("\n"));
+
+    await addLog(newMember.guild, LogType.MEMBER, embed);
+  }
+
   if (newMember.guild.id == "747056029795221513") {
     if (oldMember.roles.cache.size < newMember.roles.cache.size) {
       let tier = 0;
@@ -62,28 +85,5 @@ export default async function guildMemberUpdate(oldMember: GuildMember, newMembe
           setExpireDate(newMember.id, new Date(0), newMember.client as NypsiClient);
       }
     }
-  }
-
-  if (oldMember.roles.cache.size != newMember.roles.cache.size && (await isLogsEnabled(newMember.guild))) {
-    let roles: Role[];
-
-    const oldIds = Array.from(oldMember.roles.cache.keys());
-    const newIds = Array.from(newMember.roles.cache.keys());
-
-    if (oldIds.length > newIds.length) {
-      roles = oldIds.filter((a) => !newIds.includes(a)).map((id) => oldMember.roles.cache.get(id));
-    } else {
-      roles = newIds.filter((a) => !oldIds.includes(a)).map((id) => newMember.roles.cache.get(id));
-    }
-
-    if (roles.length == 0) return;
-
-    const embed = new CustomEmbed().disableFooter().setTimestamp();
-
-    embed.setHeader(oldIds.length > newIds.length ? "role removed" : "role added");
-    embed.setDescription(`${newMember.user.toString()} \`${newMember.user.id}\``);
-    embed.addField(`role${roles.length > 1 ? "s" : ""}`, roles.map((r) => r.toString()).join("\n"));
-
-    await addLog(newMember.guild, LogType.MEMBER, embed);
   }
 }
