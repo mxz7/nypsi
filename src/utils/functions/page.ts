@@ -1,4 +1,11 @@
-import { ActionRowBuilder, ComponentType, Interaction, Message, MessageActionRowComponentBuilder } from "discord.js";
+import {
+  ActionRowBuilder,
+  ButtonInteraction,
+  ComponentType,
+  Interaction,
+  Message,
+  MessageActionRowComponentBuilder,
+} from "discord.js";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 
 interface PageManagerOptions {
@@ -8,9 +15,9 @@ interface PageManagerOptions {
   pages?: Map<number, unknown[]>;
   pageLength?: number;
   embed: CustomEmbed;
-  updateEmbed?: (page: unknown[], embed: CustomEmbed) => CustomEmbed;
+  updateEmbed?: (page: any[], embed: CustomEmbed) => CustomEmbed;
   userId: string;
-  handleResponses?: Map<string, (data?: PageManager) => Promise<void>>;
+  handleResponses?: Map<string, (data?: { manager: PageManager; interaction: ButtonInteraction }) => Promise<void>>;
 }
 
 export default class PageManager {
@@ -42,7 +49,7 @@ export default class PageManager {
 
   private updatePageFunc: (page: unknown[], embed: CustomEmbed) => CustomEmbed;
   private filter: (i: Interaction) => boolean;
-  private handleResponses: Map<string, (data?: PageManager) => Promise<void>>;
+  private handleResponses: Map<string, (data?: { manager: PageManager; interaction: ButtonInteraction }) => Promise<void>>;
 
   constructor(opts: PageManagerOptions) {
     this.pages = opts.arr ? PageManager.createPages(opts.arr, opts.pageLength) : opts.pages;
@@ -67,54 +74,60 @@ export default class PageManager {
     }
   }
 
-  private async back(manager: PageManager): Promise<void> {
-    if (manager.currentPage == 1) {
-      return manager.listen();
+  private async back(data: { manager: PageManager }): Promise<void> {
+    if (data.manager.currentPage == 1) {
+      return data.manager.listen();
     }
 
-    manager.currentPage--;
+    data.manager.currentPage--;
 
-    if (manager.updatePageFunc) {
-      manager.embed = manager.updatePageFunc(manager.pages.get(manager.currentPage), manager.embed);
+    if (data.manager.updatePageFunc) {
+      data.manager.embed = data.manager.updatePageFunc(data.manager.pages.get(data.manager.currentPage), data.manager.embed);
     } else {
-      manager.embed = PageManager.defaultUpdateEmbed(manager.pages.get(manager.currentPage), manager.embed);
+      data.manager.embed = PageManager.defaultUpdateEmbed(
+        data.manager.pages.get(data.manager.currentPage),
+        data.manager.embed
+      );
     }
 
-    if (manager.currentPage == 1) {
-      manager.row.components[0].setDisabled(true);
+    if (data.manager.currentPage == 1) {
+      data.manager.row.components[0].setDisabled(true);
     } else {
-      manager.row.components[0].setDisabled(false);
+      data.manager.row.components[0].setDisabled(false);
     }
 
-    manager.row.components[1].setDisabled(false);
+    data.manager.row.components[1].setDisabled(false);
 
-    await manager.message.edit({ embeds: [manager.embed], components: [manager.row] });
-    return manager.listen();
+    await data.manager.message.edit({ embeds: [data.manager.embed], components: [data.manager.row] });
+    return data.manager.listen();
   }
 
-  private async next(manager: PageManager): Promise<void> {
-    if (manager.currentPage == manager.lastPage) {
-      return manager.listen();
+  private async next(data: { manager: PageManager }): Promise<void> {
+    if (data.manager.currentPage == data.manager.lastPage) {
+      return data.manager.listen();
     }
 
-    manager.currentPage++;
+    data.manager.currentPage++;
 
-    if (manager.updatePageFunc) {
-      manager.embed = manager.updatePageFunc(manager.pages.get(manager.currentPage), manager.embed);
+    if (data.manager.updatePageFunc) {
+      data.manager.embed = data.manager.updatePageFunc(data.manager.pages.get(data.manager.currentPage), data.manager.embed);
     } else {
-      manager.embed = PageManager.defaultUpdateEmbed(manager.pages.get(manager.currentPage), manager.embed);
+      data.manager.embed = PageManager.defaultUpdateEmbed(
+        data.manager.pages.get(data.manager.currentPage),
+        data.manager.embed
+      );
     }
 
-    if (manager.currentPage == manager.lastPage) {
-      manager.row.components[1].setDisabled(true);
+    if (data.manager.currentPage == data.manager.lastPage) {
+      data.manager.row.components[1].setDisabled(true);
     } else {
-      manager.row.components[1].setDisabled(false);
+      data.manager.row.components[1].setDisabled(false);
     }
 
-    manager.row.components[0].setDisabled(false);
+    data.manager.row.components[0].setDisabled(false);
 
-    await manager.message.edit({ embeds: [manager.embed], components: [manager.row] });
-    return manager.listen();
+    await data.manager.message.edit({ embeds: [data.manager.embed], components: [data.manager.row] });
+    return data.manager.listen();
   }
 
   public async listen(): Promise<void> {
@@ -130,7 +143,7 @@ export default class PageManager {
     await res.deferUpdate();
 
     if (this.handleResponses.has(res.customId)) {
-      return this.handleResponses.get(res.customId)(this);
+      return this.handleResponses.get(res.customId)({ manager: this, interaction: res });
     }
   }
 
