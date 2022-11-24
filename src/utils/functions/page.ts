@@ -18,6 +18,7 @@ interface PageManagerOptions {
   updateEmbed?: (page: any[], embed: CustomEmbed) => CustomEmbed;
   userId: string;
   handleResponses?: Map<string, (data?: { manager: PageManager; interaction: ButtonInteraction }) => Promise<void>>;
+  onPageUpdate?: (manager: PageManager) => CustomEmbed;
 }
 
 export default class PageManager {
@@ -50,6 +51,7 @@ export default class PageManager {
   private updatePageFunc: (page: unknown[], embed: CustomEmbed) => CustomEmbed;
   private filter: (i: Interaction) => boolean;
   private handleResponses: Map<string, (data?: { manager: PageManager; interaction: ButtonInteraction }) => Promise<void>>;
+  private onPageUpdate: (manager: PageManager) => CustomEmbed;
 
   constructor(opts: PageManagerOptions) {
     this.pages = opts.arr ? PageManager.createPages(opts.arr, opts.pageLength) : opts.pages;
@@ -59,6 +61,7 @@ export default class PageManager {
     this.updatePageFunc = opts.updateEmbed;
     this.userId = opts.userId;
     this.embed = opts.embed;
+    this.onPageUpdate = opts.onPageUpdate;
 
     this.filter = (i: Interaction) => i.user.id == this.userId;
 
@@ -90,6 +93,10 @@ export default class PageManager {
       );
     }
 
+    if (data.manager.onPageUpdate) {
+      data.manager.embed = data.manager.onPageUpdate(data.manager);
+    }
+
     if (data.manager.currentPage == 1) {
       data.manager.row.components[0].setDisabled(true);
     } else {
@@ -116,6 +123,10 @@ export default class PageManager {
         data.manager.pages.get(data.manager.currentPage),
         data.manager.embed
       );
+    }
+
+    if (data.manager.onPageUpdate) {
+      data.manager.embed = data.manager.onPageUpdate(data.manager);
     }
 
     if (data.manager.currentPage == data.manager.lastPage) {
