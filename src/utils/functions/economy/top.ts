@@ -2,6 +2,7 @@ import dayjs = require("dayjs");
 import { Collection, Guild, GuildMember } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
+import PageManager from "../page";
 import workerSort from "../workers/sort";
 import { calcNetWorth } from "./balance";
 import { getAchievements, getItems } from "./utils";
@@ -72,21 +73,7 @@ export async function topBalance(guild: Guild, userId?: string) {
     }
   }
 
-  const pages = new Map<number, string[]>();
-
-  for (const line of out) {
-    if (pages.size == 0) {
-      pages.set(1, [line]);
-    } else {
-      if (pages.get(pages.size).length >= 10) {
-        pages.set(pages.size + 1, [line]);
-      } else {
-        const arr = pages.get(pages.size);
-        arr.push(line);
-        pages.set(pages.size, arr);
-      }
-    }
-  }
+  const pages = PageManager.createPages(out);
 
   let pos = 0;
 
@@ -198,21 +185,7 @@ export async function topNetWorthGlobal(userId: string) {
     );
   }
 
-  const pages = new Map<number, string[]>();
-
-  for (const line of out) {
-    if (pages.size == 0) {
-      pages.set(1, [line]);
-    } else {
-      if (pages.get(pages.size).length >= 10) {
-        pages.set(pages.size + 1, [line]);
-      } else {
-        const arr = pages.get(pages.size);
-        arr.push(line);
-        pages.set(pages.size, arr);
-      }
-    }
-  }
+  const pages = PageManager.createPages(out);
 
   let pos = 0;
 
@@ -307,21 +280,7 @@ export async function topNetWorth(guild: Guild, userId?: string) {
     }
   }
 
-  const pages = new Map<number, string[]>();
-
-  for (const line of out) {
-    if (pages.size == 0) {
-      pages.set(1, [line]);
-    } else {
-      if (pages.get(pages.size).length >= 10) {
-        pages.set(pages.size + 1, [line]);
-      } else {
-        const arr = pages.get(pages.size);
-        arr.push(line);
-        pages.set(pages.size, arr);
-      }
-    }
-  }
+  const pages = PageManager.createPages(out);
 
   let pos = 0;
 
@@ -405,21 +364,7 @@ export async function topPrestige(guild: Guild, userId?: string) {
     count++;
   }
 
-  const pages = new Map<number, string[]>();
-
-  for (const line of out) {
-    if (pages.size == 0) {
-      pages.set(1, [line]);
-    } else {
-      if (pages.get(pages.size).length >= 10) {
-        pages.set(pages.size + 1, [line]);
-      } else {
-        const arr = pages.get(pages.size);
-        arr.push(line);
-        pages.set(pages.size, arr);
-      }
-    }
-  }
+  const pages = PageManager.createPages(out);
 
   let pos = 0;
 
@@ -485,21 +430,7 @@ export async function topPrestigeGlobal(userId: string) {
     count++;
   }
 
-  const pages = new Map<number, string[]>();
-
-  for (const line of out) {
-    if (pages.size == 0) {
-      pages.set(1, [line]);
-    } else {
-      if (pages.get(pages.size).length >= 10) {
-        pages.set(pages.size + 1, [line]);
-      } else {
-        const arr = pages.get(pages.size);
-        arr.push(line);
-        pages.set(pages.size, arr);
-      }
-    }
-  }
+  const pages = PageManager.createPages(out);
 
   let pos = 0;
 
@@ -586,21 +517,7 @@ export async function topItem(guild: Guild, item: string, userId: string) {
     count++;
   }
 
-  const pages = new Map<number, string[]>();
-
-  for (const line of out) {
-    if (pages.size == 0) {
-      pages.set(1, [line]);
-    } else {
-      if (pages.get(pages.size).length >= 10) {
-        pages.set(pages.size + 1, [line]);
-      } else {
-        const arr = pages.get(pages.size);
-        arr.push(line);
-        pages.set(pages.size, arr);
-      }
-    }
-  }
+  const pages = PageManager.createPages(out);
 
   let pos = 0;
 
@@ -704,21 +621,7 @@ export async function topCompletion(guild: Guild, userId: string) {
     }
   }
 
-  const pages = new Map<number, string[]>();
-
-  for (const line of out) {
-    if (pages.size == 0) {
-      pages.set(1, [line]);
-    } else {
-      if (pages.get(pages.size).length >= 10) {
-        pages.set(pages.size + 1, [line]);
-      } else {
-        const arr = pages.get(pages.size);
-        arr.push(line);
-        pages.set(pages.size, arr);
-      }
-    }
-  }
+  const pages = PageManager.createPages(out);
 
   let pos = 0;
 
@@ -751,21 +654,7 @@ export async function topGuilds(guildName?: string) {
     out.push(`${position} **${guild.guildName}** level ${guild.level}`);
   }
 
-  const pages = new Map<number, string[]>();
-
-  for (const line of out) {
-    if (pages.size == 0) {
-      pages.set(1, [line]);
-    } else {
-      if (pages.get(pages.size).length >= 10) {
-        pages.set(pages.size + 1, [line]);
-      } else {
-        const arr = pages.get(pages.size);
-        arr.push(line);
-        pages.set(pages.size, arr);
-      }
-    }
-  }
+  const pages = PageManager.createPages(out);
 
   let pos = 0;
 
