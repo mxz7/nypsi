@@ -67,50 +67,54 @@ export default class PageManager {
     }
   }
 
-  private async back(): Promise<void> {
-    if (this.currentPage == 1) {
-      return this.listen();
+  private async back(manager: PageManager): Promise<void> {
+    if (manager.currentPage == 1) {
+      return manager.listen();
     }
 
-    this.currentPage--;
+    manager.currentPage--;
 
-    if (this.updatePageFunc) {
-      this.embed = this.updatePageFunc(this.pages.get(this.currentPage), this.embed);
+    if (manager.updatePageFunc) {
+      manager.embed = manager.updatePageFunc(manager.pages.get(manager.currentPage), manager.embed);
     } else {
-      this.embed = PageManager.defaultUpdateEmbed(this.pages.get(this.currentPage), this.embed);
+      manager.embed = PageManager.defaultUpdateEmbed(manager.pages.get(manager.currentPage), manager.embed);
     }
 
-    if (this.currentPage == 1) {
-      this.row.components[0].setDisabled(true);
+    if (manager.currentPage == 1) {
+      manager.row.components[0].setDisabled(true);
     } else {
-      this.row.components[0].setDisabled(false);
+      manager.row.components[0].setDisabled(false);
     }
 
-    await this.message.edit({ embeds: [this.embed], components: [this.row] });
-    return this.listen();
+    manager.row.components[1].setDisabled(false);
+
+    await manager.message.edit({ embeds: [manager.embed], components: [manager.row] });
+    return manager.listen();
   }
 
-  private async next(): Promise<void> {
-    if (this.currentPage == this.lastPage) {
-      return this.listen();
+  private async next(manager: PageManager): Promise<void> {
+    if (manager.currentPage == manager.lastPage) {
+      return manager.listen();
     }
 
-    this.currentPage++;
+    manager.currentPage++;
 
-    if (this.updatePageFunc) {
-      this.embed = this.updatePageFunc(this.pages.get(this.currentPage), this.embed);
+    if (manager.updatePageFunc) {
+      manager.embed = manager.updatePageFunc(manager.pages.get(manager.currentPage), manager.embed);
     } else {
-      this.embed = PageManager.defaultUpdateEmbed(this.pages.get(this.currentPage), this.embed);
+      manager.embed = PageManager.defaultUpdateEmbed(manager.pages.get(manager.currentPage), manager.embed);
     }
 
-    if (this.currentPage == this.lastPage) {
-      this.row.components[1].setDisabled(true);
+    if (manager.currentPage == manager.lastPage) {
+      manager.row.components[1].setDisabled(true);
     } else {
-      this.row.components[1].setDisabled(false);
+      manager.row.components[1].setDisabled(false);
     }
 
-    await this.message.edit({ embeds: [this.embed], components: [this.row] });
-    return this.listen();
+    manager.row.components[0].setDisabled(false);
+
+    await manager.message.edit({ embeds: [manager.embed], components: [manager.row] });
+    return manager.listen();
   }
 
   public async listen(): Promise<void> {
