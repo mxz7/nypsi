@@ -4,11 +4,9 @@ import {
   ButtonBuilder,
   ButtonStyle,
   CommandInteraction,
-  Interaction,
   InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
-  MessageEditOptions,
 } from "discord.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
@@ -113,7 +111,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     embed.setFooter({ text: `page 1/${pages.size}` });
   }
 
-  let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+  const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
     new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
     new ButtonBuilder().setCustomId("❌").setLabel("clear mentions").setStyle(ButtonStyle.Danger)
@@ -128,103 +126,36 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   }
 
   if (pages.size >= 2) {
-    let currentPage = 1;
-    const lastPage = pages.size;
+    const manager = new PageManager({
+      embed: embed,
+      message: msg,
+      row: row,
+      userId: message.author.id,
+      pages: pages,
+      updateEmbed: (page: string[], embed) => {
+        embed.data.fields.length = 0;
 
-    const edit = async (data: MessageEditOptions) => {
-      if (!(message instanceof Message)) {
-        await message.editReply(data);
-        return await message.fetchReply();
-      } else {
-        return await msg.edit(data);
-      }
-    };
-
-    const filter = (i: Interaction) => i.user.id == message.author.id;
-
-    const pageManager = async (): Promise<void> => {
-      const reaction = await msg
-        .awaitMessageComponent({ filter, time: 30000 })
-        .then(async (collected) => {
-          await collected.deferUpdate();
-          return collected.customId;
-        })
-        .catch(async () => {
-          await edit({ components: [] }).catch(() => {});
-        });
-
-      if (!reaction) return;
-
-      const newEmbed = new CustomEmbed(message.member).setHeader("recent mentions", message.author.avatarURL());
-
-      if (reaction == "⬅") {
-        if (currentPage <= 1) {
-          return pageManager();
-        } else {
-          currentPage--;
-
-          for (const i of pages.get(currentPage)) {
-            const fieldName = i.split("|6|9|")[0];
-            const fieldValue = i.split("|6|9|").splice(-1, 1).join("");
-            newEmbed.addField(fieldName, fieldValue);
-          }
-
-          newEmbed.setFooter({ text: "page " + currentPage + "/" + lastPage });
-          if (currentPage == 1) {
-            row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-              new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
-              new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(false),
-              new ButtonBuilder().setCustomId("❌").setLabel("clear mentions").setStyle(ButtonStyle.Danger)
-            );
-          } else {
-            row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-              new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(false),
-              new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(false),
-              new ButtonBuilder().setCustomId("❌").setLabel("clear mentions").setStyle(ButtonStyle.Danger)
-            );
-          }
-          await edit({ embeds: [newEmbed], components: [row] });
-          return pageManager();
+        for (const line of page) {
+          const fieldName = line.split("|6|9|")[0];
+          const fieldValue = line.split("|6|9|").splice(-1, 1).join("");
+          embed.addField(fieldName, fieldValue);
         }
-      } else if (reaction == "➡") {
-        if (currentPage >= lastPage) {
-          return pageManager();
-        } else {
-          currentPage++;
 
-          for (const i of pages.get(currentPage)) {
-            const fieldName = i.split("|6|9|")[0];
-            const fieldValue = i.split("|6|9|").splice(-1, 1).join("");
-            newEmbed.addField(fieldName, fieldValue);
-          }
-          newEmbed.setFooter({ text: "page " + currentPage + "/" + lastPage });
-          if (currentPage == lastPage) {
-            row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-              new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(false),
-              new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(true),
-              new ButtonBuilder().setCustomId("❌").setLabel("clear mentions").setStyle(ButtonStyle.Danger)
-            );
-          } else {
-            row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-              new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(false),
-              new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(false),
-              new ButtonBuilder().setCustomId("❌").setLabel("clear mentions").setStyle(ButtonStyle.Danger)
-            );
-          }
-          await edit({ embeds: [newEmbed], components: [row] });
-          return pageManager();
-        }
-      } else if (reaction == "❌") {
-        deleteUserMentions(message.guild, message.member);
+        return embed;
+      },
+      handleResponses: new Map().set("❌", async (data: { manager: PageManager }) => {
+        await deleteUserMentions(data.manager.message.guild, manager.userId);
 
-        newEmbed.setDescription("✅ mentions cleared");
+        embed.data.fields.length == 0;
 
-        edit({ embeds: [newEmbed], components: [] });
+        embed.setDescription("✅ mentions cleared");
+
+        await manager.message.edit({ embeds: [embed], components: [] });
         return;
-      }
-    };
+      }),
+    });
 
-    return pageManager();
+    return manager.listen();
   }
 }
 
