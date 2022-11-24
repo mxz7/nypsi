@@ -5,7 +5,6 @@ import {
   ButtonBuilder,
   ButtonStyle,
   CommandInteraction,
-  Interaction,
   InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
@@ -25,6 +24,7 @@ import {
   topPrestigeGlobal,
 } from "../utils/functions/economy/top";
 import { getItems } from "../utils/functions/economy/utils.js";
+import PageManager from "../utils/functions/page";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 
 const cmd = new Command("top", "view top etc. in the server", Categories.MONEY).setAliases(["baltop", "gangsters"]);
@@ -117,7 +117,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       embed.setFooter({ text: `you are #${pos}` });
     }
 
-    let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
       new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
     );
@@ -128,70 +128,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const msg = await send({ embeds: [embed], components: [row] });
 
-    const filter = (i: Interaction) => i.user.id == message.author.id;
-    let currentPage = 1;
+    const manager = new PageManager({
+      embed: embed,
+      message: msg,
+      row: row,
+      userId: message.author.id,
+      pages: pages,
+    });
 
-    const pageManager = async (): Promise<void> => {
-      const reaction = await msg
-        .awaitMessageComponent({ filter, time: 30000 })
-        .then(async (collected) => {
-          await collected.deferUpdate();
-          return collected.customId;
-        })
-        .catch(async () => {
-          await msg.edit({ components: [] }).catch(() => {});
-        });
-
-      if (!reaction) return;
-
-      if (reaction == "⬅") {
-        if (currentPage <= 1) {
-          return pageManager();
-        } else {
-          currentPage--;
-
-          embed.setDescription(pages.get(currentPage).join("\n"));
-
-          if (currentPage == 1) {
-            row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-              new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
-              new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(false)
-            );
-          } else {
-            row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-              new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(false),
-              new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(false)
-            );
-          }
-          await msg.edit({ embeds: [embed], components: [row] });
-          return pageManager();
-        }
-      } else if (reaction == "➡") {
-        if (currentPage >= pages.size) {
-          return pageManager();
-        } else {
-          currentPage++;
-
-          embed.setDescription(pages.get(currentPage).join("\n"));
-
-          if (currentPage == pages.size) {
-            row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-              new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(false),
-              new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(true)
-            );
-          } else {
-            row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-              new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(false),
-              new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(false)
-            );
-          }
-          await msg.edit({ embeds: [embed], components: [row] });
-          return pageManager();
-        }
-      }
-    };
-
-    return pageManager();
+    return manager.listen();
   };
 
   if (args.length == 0) {
