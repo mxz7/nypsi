@@ -13,7 +13,6 @@ import { inPlaceSort } from "fast-sort";
 import { NypsiClient } from "../models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
-import { KarmaShopItem } from "../types/Karmashop";
 import Constants from "../utils/Constants";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { addInventoryItem } from "../utils/functions/economy/inventory";
@@ -22,6 +21,7 @@ import { createUser, userExists } from "../utils/functions/economy/utils";
 import { getXp, updateXp } from "../utils/functions/economy/xp";
 import { getKarma, removeKarma } from "../utils/functions/karma/karma";
 import { closeKarmaShop, getKarmaShopItems, isKarmaShopOpen, openKarmaShop } from "../utils/functions/karma/karmashop";
+import { arrayToPage } from "../utils/functions/page";
 import { getTier, isPremium, setExpireDate } from "../utils/functions/premium/premium";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import dayjs = require("dayjs");
@@ -113,17 +113,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (args.length == 0 || args.length == 1) {
     inPlaceSort(itemIDs).desc((i) => items[i].items_left);
 
-    const pages = new Map<number, KarmaShopItem[]>();
-
-    for (const item of itemIDs) {
-      if (pages.size == 0) {
-        pages.set(1, [items[item]]);
-      } else if (pages.get(pages.size).length >= 6) {
-        pages.set(pages.size + 1, [items[item]]);
-      } else {
-        pages.get(pages.size).push(items[item]);
-      }
-    }
+    const pages = arrayToPage(
+      itemIDs.map((i) => items[i]),
+      6
+    );
 
     const embed = new CustomEmbed(message.member);
 

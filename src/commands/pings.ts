@@ -15,6 +15,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getKarma } from "../utils/functions/karma/karma";
+import { arrayToPage } from "../utils/functions/page";
 import { isPremium } from "../utils/functions/premium/premium";
 import { decrypt } from "../utils/functions/string";
 import { getLastCommand } from "../utils/functions/users/commands";
@@ -93,33 +94,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({ embeds: [new CustomEmbed(message.member, "no recent mentions")] });
   }
 
-  const pages = new Map<number, string[]>();
-
-  for (const i of mentions) {
-    if (pages.size == 0) {
-      const page1 = [];
-      page1.push(
-        `<t:${Math.floor(i.date.getTime() / 1000)}:R>|6|9|**${i.userTag}**: ${decrypt(i.content)}\n[jump](${i.url})`
-      );
-      pages.set(1, page1);
-    } else {
-      const lastPage = pages.size;
-
-      if (pages.get(lastPage).length >= 3) {
-        const newPage = [];
-        newPage.push(
-          `<t:${Math.floor(i.date.getTime() / 1000)}:R>|6|9|**${i.userTag}**: ${decrypt(i.content)}\n[jump](${i.url})`
-        );
-        pages.set(lastPage + 1, newPage);
-      } else {
-        pages
-          .get(lastPage)
-          .push(
-            `<t:${Math.floor(i.date.getTime() / 1000)}:R>|6|9|**${i.userTag}**: ${decrypt(i.content)}\n[jump](${i.url})`
-          );
-      }
-    }
-  }
+  const pages = arrayToPage(
+    mentions.map(
+      (i) => `<t:${Math.floor(i.date.getTime() / 1000)}:R>|6|9|**${i.userTag}**: ${decrypt(i.content)}\n[jump](${i.url})`
+    ),
+    3
+  );
 
   const embed = new CustomEmbed(message.member).setHeader("recent mentions", message.author.avatarURL());
 

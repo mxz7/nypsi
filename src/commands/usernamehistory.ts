@@ -12,6 +12,7 @@ import { Categories, Command, NypsiCommandInteraction } from "../models/Command"
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { formatDate } from "../utils/functions/date";
 import { getMember } from "../utils/functions/member";
+import { arrayToPage } from "../utils/functions/page";
 import { clearUsernameHistory, fetchUsernameHistory, isTracking } from "../utils/functions/users/history";
 import { hasProfile } from "../utils/functions/users/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -69,25 +70,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     });
   }
 
-  const pages = new Map<number, { value: string; date: Date }[]>();
-
-  for (const item of history) {
-    if (pages.size == 0) {
-      if (!isUserTracking) {
-        pages.set(1, [{ value: "[tracking disabled]", date: new Date() }, item]);
-      } else {
-        pages.set(1, [item]);
-      }
-    } else {
-      if (pages.get(pages.size).length >= 7) {
-        pages.set(pages.size + 1, [item]);
-      } else {
-        const current = pages.get(pages.size);
-        current.push(item);
-        pages.set(pages.size, current);
-      }
-    }
+  if (!isUserTracking) {
+    history.push({ value: "[tracking disabled]", date: new Date() });
   }
+
+  const pages = arrayToPage(history, 7);
 
   const embed = new CustomEmbed(message.member)
     .setTitle(member.user.tag)

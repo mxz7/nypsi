@@ -1,4 +1,3 @@
-import { WholesomeSuggestion } from "@prisma/client";
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message, MessageReaction, User } from "discord.js";
 import { NypsiClient } from "../models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
@@ -18,6 +17,7 @@ import {
   uploadImageToImgur,
 } from "../utils/functions/image";
 import { getMember } from "../utils/functions/member";
+import { arrayToPage } from "../utils/functions/page";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const uploadCooldown = new Map<string, number>();
@@ -255,23 +255,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (!queue) return send({ embeds: [new CustomEmbed(message.member, "no items in queue")] });
 
-    const pages = new Map<number, WholesomeSuggestion[]>();
-
-    if (queue.length > 6) {
-      for (const image of queue) {
-        if (pages.size == 0) {
-          pages.set(1, [image]);
-        } else {
-          if (pages.get(pages.size).length >= 6) {
-            pages.set(pages.size + 1, [image]);
-          } else {
-            const current = pages.get(pages.size);
-            current.push(image);
-            pages.set(pages.size, current);
-          }
-        }
-      }
-    }
+    const pages = arrayToPage(queue, 6);
 
     for (const image of queue) {
       if (embed.data.fields.length >= 6) break;
