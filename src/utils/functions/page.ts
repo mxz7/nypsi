@@ -4,7 +4,8 @@ import { CustomEmbed } from "../../models/EmbedBuilders";
 interface PageManagerOptions {
   message: Message;
   row: ActionRowBuilder<MessageActionRowComponentBuilder>;
-  arr: unknown[];
+  arr?: unknown[];
+  pages?: Map<number, unknown[]>;
   pageLength?: number;
   embed: CustomEmbed;
   updateEmbed?: (page: unknown[], embed: CustomEmbed) => CustomEmbed;
@@ -44,7 +45,7 @@ export default class PageManager {
   private handleResponses: Map<string, (data?: PageManager) => Promise<void>>;
 
   constructor(opts: PageManagerOptions) {
-    this.pages = PageManager.createPages(opts.arr, opts.pageLength);
+    this.pages = opts.arr ? PageManager.createPages(opts.arr, opts.pageLength) : opts.pages;
     this.lastPage = this.pages.size;
     this.message = opts.message;
     this.row = opts.row;
