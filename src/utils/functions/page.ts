@@ -10,7 +10,7 @@ interface PageManagerOptions {
   embed: CustomEmbed;
   updateEmbed?: (page: unknown[], embed: CustomEmbed) => CustomEmbed;
   userId: string;
-  handleResponses: Map<string, (data?: PageManager) => Promise<void>>;
+  handleResponses?: Map<string, (data?: PageManager) => Promise<void>>;
 }
 
 export default class PageManager {
