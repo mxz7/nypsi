@@ -66,12 +66,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (!(await userExists(message.member))) await createUser(message.member);
 
-  // if (await getPrestige(message.member) >= 20) {
-  //     return send({
-  //         embeds: [
-  //             new ErrorEmbed("gg, you're max prestige. you completed nypsi").setImage("https://i.imgur.com/vB3UGgi.png"),
-  //         ],
-  //     })
+  // if ((await getPrestige(message.member)) >= 20) {
+  //   return send({
+  //     embeds: [new ErrorEmbed("gg, you're max prestige. you completed nypsi").setImage("https://i.imgur.com/vB3UGgi.png")],
+  //   });
   // }
 
   let currentXp = await getXp(message.member),
@@ -84,7 +82,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       embeds: [
         new CustomEmbed(
           message.member,
-          `**xp** ${currentXp.toLocaleString()}/${neededXp.toLocaleString()}\n**bank** $${currentBal.toLocaleString()}/$${neededBal.toLocaleString()}`
+          `**xp** ${currentXp.toLocaleString()}/${neededXp.toLocaleString()}\n` +
+            `**bank** $${currentBal.toLocaleString()}/$${neededBal.toLocaleString()}`
         ).setHeader("prestige requirements", message.author.avatarURL()),
       ],
     });
@@ -130,7 +129,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embeds: [
           new CustomEmbed(
             message.member,
-            `**xp** ${currentXp.toLocaleString()}/${neededXp.toLocaleString()}\n**bank** $${currentBal.toLocaleString()}/$${neededBal.toLocaleString()}`
+            `**xp** ${currentXp.toLocaleString()}/${neededXp.toLocaleString()}\n` +
+              `**bank** $${currentBal.toLocaleString()}/$${neededBal.toLocaleString()}`
           ).setHeader("prestige requirements", message.author.avatarURL()),
         ],
       });
@@ -182,7 +182,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         `new vote rewards: $**${Math.floor(
           15000 * (prestige / 2 + 1)
         ).toLocaleString()}**, **${crateAmount}** vote crates\n` +
-        `your new multiplier: **${Math.floor(multi * 100)}**%\nyour maximum bet: $**${maxBet.toLocaleString()}**\n` +
+        `your new multiplier: **${Math.floor(multi * 100)}**%\n` +
+        `your maximum bet: $**${maxBet.toLocaleString()}**\n` +
         `you have received **${amount}** basic crate${amount > 1 ? "s" : ""}${
           booster ? " and an xp booster for 30 minutes" : ""
         }`
