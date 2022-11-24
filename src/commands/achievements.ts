@@ -4,11 +4,9 @@ import {
   ButtonBuilder,
   ButtonStyle,
   CommandInteraction,
-  Interaction,
   InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
-  MessageEditOptions,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import prisma from "../init/database";
@@ -23,6 +21,7 @@ import {
   getUserAchievement,
 } from "../utils/functions/economy/achievements";
 import { getAchievements } from "../utils/functions/economy/utils";
+import PageManager from "../utils/functions/page";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("achievements", "view your achievement progress", Categories.MONEY).setAliases([
@@ -59,15 +58,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       }
     } else {
       return await message.channel.send(data as BaseMessageOptions);
-    }
-  };
-
-  const edit = async (data: MessageEditOptions, msg: Message) => {
-    if (!(message instanceof Message)) {
-      await message.editReply(data);
-      return await message.fetchReply();
-    } else {
-      return await msg.edit(data);
     }
   };
 
@@ -177,7 +167,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       .setHeader("all achievements", message.author.avatarURL())
       .setFooter({ text: `page 1/${pages.size} | ${completion}` });
 
-    let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
       new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
     );
@@ -190,77 +180,19 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       msg = await send({ embeds: [embed], components: [row] });
     }
 
-    const filter = (i: Interaction) => i.user.id == message.author.id;
+    const manager = new PageManager({
+      pages,
+      message: msg,
+      embed,
+      row,
+      userId: message.author.id,
+      onPageUpdate(manager) {
+        manager.embed.setFooter({ text: `page ${manager.currentPage}/${manager.lastPage}` });
+        return manager.embed;
+      },
+    });
 
-    let currentPage = 1;
-
-    const pageManager = async (): Promise<void> => {
-      const reaction = await msg
-        .awaitMessageComponent({ filter, time: 30000 })
-        .then(async (collected) => {
-          await collected.deferUpdate();
-          return collected.customId;
-        })
-        .catch(async () => {
-          await edit({ components: [] }, msg).catch(() => {});
-        });
-
-      if (!reaction) return;
-
-      const newEmbed = new CustomEmbed(message.member).setHeader("all achievements", message.author.avatarURL());
-
-      if (reaction == "⬅") {
-        if (currentPage <= 1) {
-          return pageManager();
-        } else {
-          currentPage--;
-
-          newEmbed.setDescription(pages.get(currentPage).join("\n"));
-
-          newEmbed.setFooter({ text: `page ${currentPage}/${pages.size} | ${completion}` });
-
-          if (currentPage == 1) {
-            row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-              new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
-              new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(false)
-            );
-          } else {
-            row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-              new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(false),
-              new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(false)
-            );
-          }
-          await edit({ embeds: [newEmbed], components: [row] }, msg);
-          return pageManager();
-        }
-      } else if (reaction == "➡") {
-        if (currentPage >= pages.size) {
-          return pageManager();
-        } else {
-          currentPage++;
-
-          newEmbed.setDescription(pages.get(currentPage).join("\n"));
-
-          newEmbed.setFooter({ text: `page ${currentPage}/${pages.size} | ${completion}` });
-
-          if (currentPage == pages.size) {
-            row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-              new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(false),
-              new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(true)
-            );
-          } else {
-            row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-              new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(false),
-              new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(false)
-            );
-          }
-          await edit({ embeds: [newEmbed], components: [row] }, msg);
-          return pageManager();
-        }
-      }
-    };
-
-    return pageManager();
+    return manager.listen();
   };
 
   const showSpecificAchievement = async () => {
