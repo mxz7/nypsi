@@ -23,6 +23,12 @@ const cmd = new Command("role", "role utilities", Categories.UTILITY);
 
 cmd.slashEnabled = true;
 cmd.slashData
+  .addSubcommand((members) =>
+    members
+      .setName("members")
+      .setDescription("view members in a role")
+      .addRoleOption((option) => option.setName("role").setDescription("role to show members for").setRequired(true))
+  )
   .addSubcommandGroup((add) =>
     add
       .setName("add")
@@ -155,7 +161,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             "/role autojoin list - show all current autojoin roles\n" +
             "/role persist add <role> - add a role to be added back to a user after they leave, if they had it. (data deleted after 30 days)\n" +
             "/role persist remove <role> - remove a role from the persistance list\n" +
-            "/role persist list - show all current persistant roles"
+            "/role persist list - show all current persistant roles\n" +
+            "/role members <role> - show members in a role"
         ),
       ],
     });
