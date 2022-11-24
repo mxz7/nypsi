@@ -1,15 +1,23 @@
 import {
+  ActionRowBuilder,
   BaseMessageOptions,
+  ButtonBuilder,
+  ButtonStyle,
   CommandInteraction,
+  GuildMember,
+  Interaction,
   InteractionReplyOptions,
   Message,
+  MessageActionRowComponentBuilder,
   PermissionFlagsBits,
   Role,
 } from "discord.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getAutoJoinRoles, getPersistantRoles, setAutoJoinRoles, setPersistantRoles } from "../utils/functions/guilds/roles";
+import { addCooldown, inCooldown } from "../utils/functions/guilds/utils";
 import { getMember, getRole } from "../utils/functions/member";
+import { arrayToPage } from "../utils/functions/page";
 
 const cmd = new Command("role", "role utilities", Categories.UTILITY);
 
@@ -93,10 +101,6 @@ cmd.slashData
   );
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-  if (!message.member.permissions.has(PermissionFlagsBits.ManageRoles)) {
-    return;
-  }
-
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       if (message.deferred) {
@@ -158,6 +162,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   }
 
   if (args[0].toLowerCase() == "add") {
+    if (!message.member.permissions.has(PermissionFlagsBits.ManageRoles)) {
+      return;
+    }
+
     const members = await getMembers();
 
     if (!members || members.length == 0) {
@@ -252,6 +260,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       embeds: [new CustomEmbed(message.member, `added ${role.toString()} to ${members.length.toLocaleString()} members`)],
     });
   } else if (args[0].toLowerCase() == "remove") {
+    if (!message.member.permissions.has(PermissionFlagsBits.ManageRoles)) {
+      return;
+    }
+
     let members = await getMembers();
 
     if (!members || members.length == 0) {
@@ -352,6 +364,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       embeds: [new CustomEmbed(message.member, `removed ${role.toString()} from ${members[0].toLocaleString()} members`)],
     });
   } else if (args[0].toLowerCase() == "autojoin") {
+    if (!message.member.permissions.has(PermissionFlagsBits.ManageRoles)) {
+      return;
+    }
+
     if (args.length == 1) {
       return send({ embeds: [new ErrorEmbed("use slash commands")] });
     }
@@ -422,6 +438,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     return send({ embeds: [embed] });
   } else if (args[0].toLowerCase() == "persist") {
+    if (!message.member.permissions.has(PermissionFlagsBits.ManageRoles)) {
+      return;
+    }
+
     if (args.length == 1) {
       return send({ embeds: [new ErrorEmbed("use slash commands")] });
     }
@@ -491,6 +511,121 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     await setPersistantRoles(message.guild, roles);
 
     return send({ embeds: [embed] });
+  } else if (args[0].toLowerCase() == "members") {
+    if (args.length == 1) {
+      return send({ embeds: [new ErrorEmbed("/role members <role>")] });
+    }
+
+    args.shift();
+
+    const role = await getRole(message.guild, args.join(" "));
+
+    if (!role) {
+      return send({ embeds: [new ErrorEmbed(`couldnt find a role with the name\`${args.join(" ")}\``)] });
+    }
+
+    let members: GuildMember[];
+
+    if (
+      inCooldown(message.guild) ||
+      message.guild.memberCount == message.guild.members.cache.size ||
+      message.guild.memberCount <= 250
+    ) {
+      members = Array.from(message.guild.members.cache.values());
+    } else {
+      members = Array.from((await message.guild.members.fetch()).values());
+
+      addCooldown(message.guild, 3600);
+    }
+
+    const filteredMembers = members.filter((m) => m.roles.cache.has(role.id)).map((m) => `\`${m.user.tag}\``);
+
+    if (filteredMembers.length == 0) {
+      return send({ embeds: [new CustomEmbed(message.member, `${role.toString()} has no members`)] });
+    }
+
+    const pages = arrayToPage(filteredMembers);
+
+    const embed = new CustomEmbed(message.member, pages.get(1).join("\n"))
+      .setHeader(`${role.name} [${filteredMembers.length}]`)
+      .setFooter({ text: `page 1/${pages.size}` });
+
+    let msg: Message;
+
+    let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
+      new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
+    );
+
+    if (pages.size > 1) {
+      msg = await message.channel.send({ embeds: [embed], components: [row] });
+    } else {
+      return await message.channel.send({ embeds: [embed] });
+    }
+
+    let currentPage = 1;
+    const lastPage = pages.size;
+
+    const filter = (i: Interaction) => i.user.id == message.author.id;
+
+    const pageManager = async (): Promise<any> => {
+      const reaction = await msg
+        .awaitMessageComponent({ filter, time: 30000 })
+        .then(async (collected) => {
+          await collected.deferUpdate();
+          return collected.customId;
+        })
+        .catch(async () => {
+          await msg.edit({ components: [] });
+        });
+
+      if (!reaction) return;
+
+      if (reaction == "⬅") {
+        if (currentPage <= 1) {
+          return pageManager();
+        } else {
+          currentPage--;
+          embed.setDescription(pages.get(currentPage).join("\n"));
+          embed.setFooter({ text: `page ${currentPage}/${lastPage}` });
+          if (currentPage == 1) {
+            row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+              new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
+              new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(false)
+            );
+          } else {
+            row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+              new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(false),
+              new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(false)
+            );
+          }
+          await msg.edit({ embeds: [embed], components: [row] });
+          return pageManager();
+        }
+      } else if (reaction == "➡") {
+        if (currentPage == lastPage) {
+          return pageManager();
+        } else {
+          currentPage++;
+          embed.setDescription(pages.get(currentPage).join("\n"));
+          embed.setFooter({ text: `page ${currentPage}/${lastPage}` });
+          if (currentPage == lastPage) {
+            row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+              new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(false),
+              new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(true)
+            );
+          } else {
+            row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+              new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(false),
+              new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(false)
+            );
+          }
+          await msg.edit({ embeds: [embed], components: [row] });
+          return pageManager();
+        }
+      }
+    };
+    return pageManager();
   }
 }
 
