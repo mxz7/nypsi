@@ -111,6 +111,8 @@ setTimeout(async () => {
 
 setTimeout(async () => {
   const userId = (await manager.fetchClientValues("user.id"))[0];
+
+  logger.info("posting analytics every 5 minutes..");
   setInterval(async () => {
     if ((await redis.get(Constants.redis.nypsi.RESTART)) == "t") return;
 
