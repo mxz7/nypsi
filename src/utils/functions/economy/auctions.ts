@@ -238,13 +238,13 @@ export async function getAuctionAverage(item: string) {
     orderBy: {
       createdAt: "desc",
     },
-    take: 1000,
+    take: 150,
   });
 
   const costs: number[] = [];
 
   for (const auction of auctions) {
-    if (costs.length >= 6969) break;
+    if (costs.length >= 5000) break;
 
     if (auction.itemAmount > 1) {
       costs.push(Math.floor(Number(auction.bin) / auction.itemAmount));
