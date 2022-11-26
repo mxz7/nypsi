@@ -89,7 +89,7 @@ export async function postAnalytics(userId: string, serverCount: number) {
   }
 
   if (res.error) {
-    logger.warn(`failed to post analytics. retrying in 5 minutes: ${res.error} ${res.message}`);
+    logger.warn(`failed to post analytics. retrying in 1 minute: ${res.error} ${res.message}`);
 
     return new Promise((resolve) => {
       setTimeout(async () => {
@@ -116,7 +116,7 @@ export async function postAnalytics(userId: string, serverCount: number) {
           logger.error(`failed to post analytics: ${res.error} ${res.message}`);
           return resolve(false);
         }
-      }, ms("5 minutes"));
+      }, 60000);
 
       return resolve(true);
     });
