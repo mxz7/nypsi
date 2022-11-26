@@ -56,7 +56,8 @@ cmd.slashData
       .addIntegerOption((option) =>
         option.setName("amount").setDescription("amount of messages to delete").setRequired(true)
       )
-  );
+  )
+  .addSubcommand((clean) => clean.setName("clean").setDescription("clean up bot commands and responses"));
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
@@ -331,7 +332,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         "/**purge messages <amount>** *delete messages from current channel*\n" +
         "/**purge member <@member> <amount>** *delete messages by a specific member*\n" +
         "/**purge bot <amount>** *delete messages by bots*\n" +
-        "/**purge includes <text> <amount>** *delete messages containing certain text*"
+        "/**purge includes <text> <amount>** *delete messages containing certain text*\n" +
+        "/**purge clean** *clean up bot commands and responses*"
     );
 
     return send({ embeds: [embed] });
@@ -425,6 +427,32 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     await addCooldown(cmd.name, message.member, 10);
 
     return deleteIncludesMessages(text, amount);
+  } else if (args[0].toLowerCase() == "clean") {
+    await addCooldown(cmd.name, message.member, 15);
+
+    const prefix = await getPrefix(message.guild);
+
+    let amount = 50;
+
+    if (args[0] && parseInt(args[0]) && !isNaN(parseInt(args[0]))) {
+      amount = parseInt(args[0]);
+
+      if (amount < 2 || amount > 100) amount = 50;
+    }
+
+    if (!message.channel.isTextBased()) return;
+
+    if (message.channel.isDMBased()) return;
+
+    const collected = await message.channel.messages.fetch({ limit: amount });
+
+    const collecteda = collected.filter((msg) => msg.author.id == message.client.user.id || msg.content.startsWith(prefix));
+
+    await message.channel.bulkDelete(collecteda);
+
+    if (message instanceof Message) return;
+
+    return send({ embeds: [new CustomEmbed(message.member, `✅ ${collecteda.size} messages cleaned up`)], ephemeral: true });
   } else {
     return helpMenu();
   }
