@@ -37,7 +37,7 @@ import { addKarma, getKarma } from "../functions/karma/karma";
 import { addUse, getCommand } from "../functions/premium/command";
 import { cleanString } from "../functions/string";
 import { addCommandUse, getLastCommand, updateLastCommand } from "../functions/users/commands";
-import { updateLastKnowntag } from "../functions/users/tag";
+import { getLastKnownTag, updateLastKnowntag } from "../functions/users/tag";
 import { createProfile, hasProfile } from "../functions/users/utils";
 import dayjs = require("dayjs");
 
@@ -591,12 +591,17 @@ export async function runCommand(
 
       message.content += ` [custom cmd - ${customCommand.owner}]`;
 
-      addUse(customCommand.owner);
+      const ownerTag = await getLastKnownTag(customCommand.owner);
+      await addUse(customCommand.owner);
       logCommand(message, ["", "", ""]);
 
       const embed = new CustomEmbed(message.member, content).setFooter({
         text: `${customCommand.uses.toLocaleString()} use${customCommand.uses == 1 ? "" : "s"}`,
       });
+
+      if (ownerTag) {
+        embed.setHeader(`${ownerTag.split("#")[0]}'s command`);
+      }
 
       return message.channel.send({ embeds: [embed] });
     } else {
