@@ -44,7 +44,7 @@ import Constants from "../../utils/Constants";
     }
 
     if (user.karma > 1000) {
-      karmaToRemove += user.karma * 0.1;
+      karmaToRemove += user.karma * 0.05;
     }
 
     if (user.karma > 10_000) {
