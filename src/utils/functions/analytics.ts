@@ -22,6 +22,11 @@ export async function postAnalytics(userId: string, serverCount: number) {
     commandCount += parseInt(count);
   }
 
+  if (commandCount == 0 || popularCommands.length == 0 || activeUsers.length == 0) {
+    logger.info("skipping analytics post due to inactivity");
+    return;
+  }
+
   await redis.del(Constants.redis.nypsi.TOP_COMMANDS_ANALYTICS);
   await redis.del(Constants.redis.nypsi.ACTIVE_USERS_ANALYTICS);
 
