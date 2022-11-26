@@ -47,7 +47,7 @@ export default async function guildMemberUpdate(oldMember: GuildMember, newMembe
       Array.from(oldMember.roles.cache.keys()).includes(Constants.BOOST_ROLE_ID)
     ) {
       if ((await isPremium(newMember)) && (await getTier(newMember)) == 2) {
-        await expireUser(newMember, newMember.client as NypsiClient);
+        await expireUser(newMember.user.id, newMember.client as NypsiClient);
       }
     }
   }
