@@ -78,7 +78,7 @@ export async function postAnalytics(userId: string, serverCount: number) {
         }).then((res) => res.json());
 
         if (res2.error) {
-          logger.error(`failed to post analytics: ${res.error} ${res.message}`);
+          logger.error(`failed to post analytics: ${res.message}`);
           return resolve(false);
         }
       }, res.wait);
@@ -88,7 +88,7 @@ export async function postAnalytics(userId: string, serverCount: number) {
   }
 
   if (res.error) {
-    logger.warn(`failed to post analytics. retrying in 1 minute: ${res.error} ${res.message}`);
+    logger.warn(`failed to post analytics. retrying in 1 minute: ${res.message}`);
 
     return new Promise((resolve) => {
       setTimeout(async () => {
@@ -112,7 +112,7 @@ export async function postAnalytics(userId: string, serverCount: number) {
         }).then((res) => res.json());
 
         if (res.error) {
-          logger.error(`failed to post analytics: ${res.error} ${res.message}`);
+          logger.error(`failed to post analytics: ${res.message}`);
           return resolve(false);
         }
       }, 60000);
