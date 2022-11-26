@@ -22,7 +22,7 @@ import { getXp, updateXp } from "../utils/functions/economy/xp";
 import { getKarma, removeKarma } from "../utils/functions/karma/karma";
 import { closeKarmaShop, getKarmaShopItems, isKarmaShopOpen, openKarmaShop } from "../utils/functions/karma/karmashop";
 import PageManager from "../utils/functions/page";
-import { getTier, isPremium, setExpireDate } from "../utils/functions/premium/premium";
+import { addMember, getTier, isPremium, setExpireDate } from "../utils/functions/premium/premium";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import dayjs = require("dayjs");
 
@@ -316,7 +316,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
               embeds: [new ErrorEmbed("you must be in the offical nypsi server to buy premium (discord.gg/hJTDNST)")],
             });
           } else {
-            await message.member.roles.add("819870590718181391");
+            await addMember(message.member, 1, message.client as NypsiClient);
           }
         }
         break;
@@ -329,7 +329,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
               embeds: [new ErrorEmbed("you must be in the offical nypsi server to buy premium (discord.gg/hJTDNST)")],
             });
           } else {
-            await message.member.roles.add("819870727834566696");
+            await addMember(message.member, 2, message.client as NypsiClient);
           }
         }
         break;
@@ -342,7 +342,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
               embeds: [new ErrorEmbed("you must be in the offical nypsi server to buy premium (discord.gg/hJTDNST)")],
             });
           } else {
-            await message.member.roles.add("819870846536646666");
+            await addMember(message.member, 3, message.client as NypsiClient);
           }
         }
         break;
