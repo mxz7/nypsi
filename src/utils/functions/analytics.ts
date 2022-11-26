@@ -54,6 +54,40 @@ export async function postAnalytics(userId: string, serverCount: number) {
     }),
   }).then((res) => res.json());
 
+  if (res.wait) {
+    logger.warn(`hit analytics rate limit: ${res}`);
+
+    return new Promise((resolve) => {
+      setTimeout(async () => {
+        const res2 = await fetch(`${BASE_URL}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id: userId,
+            key: KEY,
+            servers: serverCount,
+            users: userCount,
+            active: activeUsers,
+            commands: commandCount,
+            popular: popularCommands.slice(0, 4),
+            memactive: memUsage,
+            memload: memUsagePerc,
+            cpuload: cpuUsage,
+          }),
+        }).then((res) => res.json());
+
+        if (res2.error) {
+          logger.error(`failed to post analytics: ${res.error} ${res.message}`);
+          return resolve(false);
+        }
+      }, res.wait);
+
+      return resolve(true);
+    });
+  }
+
   if (res.error) {
     logger.warn(`failed to post analytics. retrying in 5 minutes: ${res.error} ${res.message}`);
 
