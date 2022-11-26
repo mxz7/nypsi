@@ -12,19 +12,19 @@ const KEY = process.env.STATCORD_KEY;
 const BASE_URL = "https://api.statcord.com/v3/stats";
 
 export async function postAnalytics(userId: string, serverCount: number) {
-  const activeUsers: string[] = await redis.smembers(Constants.redis.nypsi.ACTIVE_USERS_HOURLY);
+  const activeUsers: string[] = await redis.smembers(Constants.redis.nypsi.ACTIVE_USERS_ANALYTICS);
   const popularCommands: { name: string; count: number }[] = [];
   let commandCount = 0;
 
-  const popularCommandsData = await redis.hgetall(Constants.redis.nypsi.TOP_COMMANDS_HOURLY);
+  const popularCommandsData = await redis.hgetall(Constants.redis.nypsi.TOP_COMMANDS_ANALYTICS);
 
   for (const [cmd, count] of Object.entries(popularCommandsData)) {
     popularCommands.push({ name: cmd, count: parseInt(count) });
     commandCount += parseInt(count);
   }
 
-  await redis.del(Constants.redis.nypsi.TOP_COMMANDS_HOURLY);
-  await redis.del(Constants.redis.nypsi.ACTIVE_USERS_HOURLY);
+  await redis.del(Constants.redis.nypsi.TOP_COMMANDS_ANALYTICS);
+  await redis.del(Constants.redis.nypsi.ACTIVE_USERS_ANALYTICS);
 
   inPlaceSort(popularCommands).desc((i) => i.count);
 

@@ -804,8 +804,8 @@ export async function runCommand(
     addCommandUse(message.author.id, command.name),
     redis.hincrby(Constants.redis.nypsi.TOP_COMMANDS, command.name, 1),
     redis.hincrby(Constants.redis.nypsi.TOP_COMMANDS_USER, message.author.tag, 1),
-    redis.sadd(Constants.redis.nypsi.ACTIVE_USERS_HOURLY, message.author.id),
-    redis.hincrby(Constants.redis.nypsi.TOP_COMMANDS_HOURLY, command.name, 1),
+    redis.sadd(Constants.redis.nypsi.ACTIVE_USERS_ANALYTICS, message.author.id),
+    redis.hincrby(Constants.redis.nypsi.TOP_COMMANDS_ANALYTICS, command.name, 1),
     addProgress(message.author.id, "nypsi", 1),
   ]);
 
