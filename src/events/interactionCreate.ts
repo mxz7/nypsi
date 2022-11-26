@@ -322,16 +322,24 @@ export default async function interactionCreate(interaction: Interaction) {
           return await interaction.reply({ embeds: [new ErrorEmbed("you cannot afford this")], ephemeral: true });
         }
 
-        await prisma.auction
-          .update({
+        if (Number(auction.bin) < 10_000) {
+          await prisma.auction.delete({
             where: {
               id: auction.id,
             },
-            data: {
-              sold: true,
-            },
-          })
-          .catch(() => {});
+          });
+        } else {
+          await prisma.auction
+            .update({
+              where: {
+                id: auction.id,
+              },
+              data: {
+                sold: true,
+              },
+            })
+            .catch(() => {});
+        }
 
         const tax = await getTax();
 
