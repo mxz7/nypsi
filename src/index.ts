@@ -106,10 +106,7 @@ setTimeout(async () => {
   await startJobs();
   listenForDms(manager);
   logger.info("jobs triggered");
-}, 300000);
-// }, 15000);
 
-setTimeout(async () => {
   const userId = (await manager.fetchClientValues("user.id"))[0];
 
   logger.info("posting analytics every 5 minutes..");
@@ -118,7 +115,8 @@ setTimeout(async () => {
 
     await postAnalytics(userId, (await getGuilds()).length);
   }, ms("5 minutes"));
-}, ms("10 minutes"));
+}, 300000);
+// }, 15000);
 
 setTimeout(async () => {
   const userId = await manager.fetchClientValues("user.id");
