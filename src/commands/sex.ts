@@ -47,6 +47,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({ embeds: [embed], ephemeral: true });
   }
 
+  for (const item of descFilter) {
+    if (message.guild.name.toLowerCase().split(" ").join("").includes(item)) {
+      return send({ embeds: [new ErrorEmbed("this server is not able to use this command")] });
+    }
+  }
+
   if ((await redis.exists(`${Constants.redis.cooldown.SEX_CHASTITY}:${message.author.id}`)) == 1) {
     const init = parseInt(await redis.get(`${Constants.redis.cooldown.SEX_CHASTITY}:${message.author.id}`));
     const curr = new Date();
