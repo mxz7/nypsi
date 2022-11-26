@@ -2,6 +2,7 @@ import * as Cluster from "discord-hybrid-sharding";
 import "dotenv/config";
 import { clearInterval } from "timers";
 import startJobs from "./scheduled/scheduler";
+import { postHourlyStats } from "./utils/functions/analytics";
 import { addFailedHeatbeat, sendHeartbeat } from "./utils/functions/heartbeat";
 import { updateStats } from "./utils/functions/topgg";
 import { getVersion } from "./utils/functions/version";
@@ -9,6 +10,7 @@ import { listenForDms } from "./utils/handlers/notificationhandler";
 import { listen } from "./utils/handlers/webhookhandler";
 import { getWebhooks, logger, setClusterId } from "./utils/logger";
 import ms = require("ms");
+import dayjs = require("dayjs");
 
 setClusterId("main");
 getWebhooks();
@@ -105,6 +107,18 @@ setTimeout(async () => {
   logger.info("jobs triggered");
 }, 300000);
 // }, 15000);
+
+setTimeout(async () => {
+  const userId = await manager.fetchClientValues("user.id");
+
+  postHourlyStats(userId[0], (await getGuilds()).length);
+
+  setInterval(async () => {
+    const userId = await manager.fetchClientValues("user.id");
+
+    postHourlyStats(userId[0], (await getGuilds()).length);
+  }, ms("1 hour"));
+}, dayjs().add(1, "hour").set("minutes", 0).set("seconds", 0).unix() * 1000 - Date.now());
 
 setTimeout(async () => {
   const userId = await manager.fetchClientValues("user.id");
