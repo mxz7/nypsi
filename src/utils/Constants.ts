@@ -68,6 +68,8 @@ export default {
       TAX: "nypsi:tax",
       TOP_COMMANDS_USER: "nypsi:topcommands:user",
       TOP_COMMANDS: "nypsi:topcommands",
+      TOP_COMMANDS_ANALYTICS: "nypsi:topcommands:anal",
+      ACTIVE_USERS_ANALYTICS: "nypsi:active:user:anal",
       VOTE_REMINDER_RECEIVED: "nypsi:vote_reminder:received",
     },
   },
