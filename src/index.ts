@@ -1,7 +1,10 @@
 import * as Cluster from "discord-hybrid-sharding";
 import "dotenv/config";
 import { clearInterval } from "timers";
+import redis from "./init/redis";
 import startJobs from "./scheduled/scheduler";
+import Constants from "./utils/Constants";
+import { postAnalytics } from "./utils/functions/analytics";
 import { addFailedHeatbeat, sendHeartbeat } from "./utils/functions/heartbeat";
 import { updateStats } from "./utils/functions/topgg";
 import { getVersion } from "./utils/functions/version";
@@ -103,6 +106,15 @@ setTimeout(async () => {
   await startJobs();
   listenForDms(manager);
   logger.info("jobs triggered");
+
+  const userId = (await manager.fetchClientValues("user.id"))[0];
+
+  logger.info("posting analytics every 5 minutes..");
+  setInterval(async () => {
+    if ((await redis.get(Constants.redis.nypsi.RESTART)) == "t") return;
+
+    await postAnalytics(userId, (await getGuilds()).length);
+  }, ms("5 minutes"));
 }, 300000);
 // }, 15000);
 
