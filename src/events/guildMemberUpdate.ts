@@ -1,7 +1,10 @@
 import { GuildMember, Role } from "discord.js";
+import { NypsiClient } from "../models/Client";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { LogType } from "../types/Moderation";
+import Constants from "../utils/Constants";
 import { addLog, isLogsEnabled } from "../utils/functions/moderation/logs";
+import { addMember, expireUser, getTier, isPremium, setTier } from "../utils/functions/premium/premium";
 
 export default async function guildMemberUpdate(oldMember: GuildMember, newMember: GuildMember) {
   if (oldMember.roles.cache.size != newMember.roles.cache.size && (await isLogsEnabled(newMember.guild))) {
@@ -25,5 +28,27 @@ export default async function guildMemberUpdate(oldMember: GuildMember, newMembe
     embed.addField(`role${roles.length > 1 ? "s" : ""}`, roles.map((r) => r.toString()).join("\n"));
 
     await addLog(newMember.guild, LogType.MEMBER, embed);
+  }
+
+  if (oldMember.guild.id == Constants.NYPSI_SERVER_ID) {
+    if (
+      Array.from(newMember.roles.cache.keys()).includes(Constants.BOOST_ROLE_ID) &&
+      !Array.from(oldMember.roles.cache.keys()).includes(Constants.BOOST_ROLE_ID)
+    ) {
+      if (await isPremium(newMember)) {
+        if ((await getTier(newMember)) < 2) {
+          await setTier(newMember, 2);
+        }
+      } else {
+        await addMember(newMember, 2, newMember.client as NypsiClient);
+      }
+    } else if (
+      !Array.from(newMember.roles.cache.keys()).includes(Constants.BOOST_ROLE_ID) &&
+      Array.from(oldMember.roles.cache.keys()).includes(Constants.BOOST_ROLE_ID)
+    ) {
+      if ((await isPremium(newMember)) && (await getTier(newMember)) == 2) {
+        await expireUser(newMember, newMember.client as NypsiClient);
+      }
+    }
   }
 }
