@@ -6,7 +6,6 @@ import prisma from "../../init/database";
 import redis from "../../init/redis";
 import Constants from "../Constants";
 import { logger } from "../logger";
-import ms = require("ms");
 
 const KEY = process.env.STATCORD_KEY;
 const BASE_URL = "https://api.statcord.com/v3/stats";
