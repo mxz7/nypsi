@@ -137,9 +137,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     .setFooter({ text: footer });
 
   if (target.user.id == message.author.id) {
-    embed.setHeader("your balance | season 4", message.author.avatarURL());
+    embed.setHeader("your balance | season 5", message.author.avatarURL());
   } else {
-    embed.setHeader(`${target.user.username}'s balance | season 4`, target.user.avatarURL());
+    embed.setHeader(`${target.user.username}'s balance | season 5`, target.user.avatarURL());
   }
 
   if (message.member == target) {
