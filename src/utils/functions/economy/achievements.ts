@@ -276,7 +276,7 @@ export async function setProgress(userId: string, achievementStartName: string, 
           thing = `${achievementStartName}_v`;
         }
 
-        if (thing) await setAchievementProgress(userId, thing, achievement.progress + amount);
+        if (thing) await setAchievementProgress(userId, thing, amount);
       }
       return;
     }

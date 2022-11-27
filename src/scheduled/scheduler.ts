@@ -21,14 +21,14 @@ const bree = new Bree({
   jobs: [
     {
       name: "purgeusernames",
-      interval: "at 3:00am",
+      interval: "at 12:30am",
     },
     {
       name: "topglobal",
       interval: "at 12:00am",
     },
     {
-      name: "oldguilds",
+      name: "purgeguilds",
       interval: "at 3:02am",
       worker: {
         workerData: {
@@ -38,7 +38,7 @@ const bree = new Bree({
     },
     {
       name: "deterioratekarma",
-      interval: "at 3:00am",
+      interval: "at 11:51pm",
     },
     {
       name: "lotterytickets",
@@ -46,7 +46,7 @@ const bree = new Bree({
       interval: "30m",
     },
     {
-      name: "cleanmentions",
+      name: "purgementions",
       interval: "at 11:50pm",
     },
     {
@@ -62,7 +62,7 @@ const bree = new Bree({
       interval: "at 11:55pm",
     },
     {
-      name: "deleteoldrolepersist",
+      name: "purgerolepersist",
       interval: "at 11:55pm",
     },
     {
@@ -71,8 +71,12 @@ const bree = new Bree({
       interval: "15m",
     },
     {
-      name: "cleanlogs",
+      name: "purgelogs",
       interval: "on the first day of the month",
+    },
+    {
+      name: "purgeusers",
+      interval: "at 1:00am",
     },
   ],
 });
