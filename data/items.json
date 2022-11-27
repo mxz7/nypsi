@@ -1174,7 +1174,13 @@
     "rarity": 0,
     "buy": 0,
     "sell": 25000,
-    "role": "sellable",
+    "role": "booster",
+    "stackable": false,
+    "boosterEffect": {
+      "boosts": ["fight"],
+      "effect": "improves fight strength",
+      "time": 1800
+    },
     "in_crates": true
   },
   "steroids": {
