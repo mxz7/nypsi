@@ -587,11 +587,11 @@
     "name": "calendar",
     "plural": "calendars",
     "emoji": "📅",
-    "longDesc": "find out the current date",
+    "longDesc": "protects your daily streak in the event you forget to do /daily",
     "role": "item",
-    "rarity": 0,
+    "rarity": 2,
     "buy": 0,
-    "sell": 1000,
+    "sell": 100000,
     "in_crates": true
   },
   "padlock": {
