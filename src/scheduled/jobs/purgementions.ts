@@ -12,7 +12,7 @@ import prisma from "../../init/database";
   });
 
   if (c.count > 0) {
-    parentPort.postMessage(`${c.count} mentions deleted`);
+    parentPort.postMessage(`${c.count} mentions purged`);
   }
 
   process.exit(0);
