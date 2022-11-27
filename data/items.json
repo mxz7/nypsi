@@ -668,17 +668,6 @@
     },
     "in_crates": true
   },
-  "potato": {
-    "id": "potato",
-    "name": "potato",
-    "emoji": "🥔",
-    "longDesc": "a potato.",
-    "rarity": 0,
-    "role": "sellable",
-    "buy": 0,
-    "sell": 5000,
-    "in_crates": true
-  },
   "tooth": {
     "id": "tooth",
     "name": "tooth",
