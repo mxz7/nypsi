@@ -21,7 +21,7 @@ const bree = new Bree({
   jobs: [
     {
       name: "purgeusernames",
-      interval: "at 3:00am",
+      interval: "at 12:30am",
     },
     {
       name: "topglobal",
@@ -38,7 +38,7 @@ const bree = new Bree({
     },
     {
       name: "deterioratekarma",
-      interval: "at 3:00am",
+      interval: "at 11:51pm",
     },
     {
       name: "purgetickets",
@@ -73,6 +73,10 @@ const bree = new Bree({
     {
       name: "purgelogs",
       interval: "on the first day of the month",
+    },
+    {
+      name: "purgeusers",
+      interval: "at 1:00am",
     },
   ],
 });
