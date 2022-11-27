@@ -356,6 +356,7 @@ export async function reset() {
     await redis.del(`economy:handcuffed:${user.userId}`);
     await redis.del(`${Constants.redis.cache.economy.GUILD_USER}:${user.userId}`);
     await redis.del(`${Constants.redis.cache.economy.NETWORTH}:${user.userId}`);
+    await redis.del(`${Constants.redis.nypsi.STEVE_EARNED}:${user.userId}`);
   }
 
   return updated + deleted;
