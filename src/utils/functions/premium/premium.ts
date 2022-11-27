@@ -2,7 +2,7 @@ import { GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
-import { PremUser } from "../../../models/PremStorage";
+import { PremUser, requestRemoveRole } from "../../../models/PremStorage";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { formatDate } from "../date";
@@ -92,6 +92,33 @@ export async function addMember(member: GuildMember | string, level: number, cli
     id = member.user.id;
   } else {
     id = member;
+  }
+
+  if (await isPremium(member)) {
+    if (client) {
+      const tier = await getTier(member);
+
+      let role: string;
+
+      switch (tier) {
+        case 1:
+          role = Constants.BRONZE_ROLE_ID;
+          break;
+        case 2:
+          role = Constants.SILVER_ROLE_ID;
+          break;
+        case 3:
+          role = Constants.GOLD_ROLE_ID;
+          break;
+        case 4:
+          role = Constants.PLATINUM_ROLE_ID;
+          break;
+      }
+
+      await requestRemoveRole(id, role, client);
+    }
+
+    return await setTier(member, level, client);
   }
 
   const start = new Date();
