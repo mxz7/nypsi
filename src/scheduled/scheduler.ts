@@ -62,7 +62,7 @@ const bree = new Bree({
       interval: "at 11:55pm",
     },
     {
-      name: "deleteoldrolepersist",
+      name: "purgerolepersist",
       interval: "at 11:55pm",
     },
     {
