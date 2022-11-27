@@ -282,9 +282,6 @@ export async function setProgress(userId: string, achievementStartName: string, 
     }
   }
 
-  console.log(count);
-  console.log(amount);
-
   switch (count) {
     case 0:
       await setAchievementProgress(userId, `${achievementStartName}_i`, amount);
