@@ -11,7 +11,7 @@ const cmd = new Command(
 );
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-  if (message.author.id != Constants.TEKOH_ID) return;
+  if (!Constants.ADMIN_IDS.includes(message.author.id)) return;
 
   if (args.length < 2) {
     return message.channel.send({ embeds: [new ErrorEmbed("$requestdm <id> <content>")] });
