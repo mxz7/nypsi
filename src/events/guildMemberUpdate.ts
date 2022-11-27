@@ -38,13 +38,17 @@ export default async function guildMemberUpdate(oldMember: GuildMember, newMembe
       if (await isPremium(newMember)) {
         if ((await getTier(newMember)) < 2) {
           await setTier(newMember, 2);
+          if (Array.from(newMember.roles.cache.keys()).includes(Constants.BRONZE_ROLE_ID)) {
+            await newMember.roles.remove(Constants.BRONZE_ROLE_ID);
+          }
         }
       } else {
         await addMember(newMember, 2, newMember.client as NypsiClient);
       }
     } else if (
       !Array.from(newMember.roles.cache.keys()).includes(Constants.BOOST_ROLE_ID) &&
-      Array.from(oldMember.roles.cache.keys()).includes(Constants.BOOST_ROLE_ID)
+      Array.from(oldMember.roles.cache.keys()).includes(Constants.BOOST_ROLE_ID) &&
+      !Array.from(newMember.roles.cache.keys()).includes(Constants.SILVER_ROLE_ID)
     ) {
       if ((await isPremium(newMember)) && (await getTier(newMember)) == 2) {
         await expireUser(newMember.user.id, newMember.client as NypsiClient);
