@@ -40,14 +40,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       });
     });
 
-    logger.info("nypsi restarting soon...");
+    await redis.set(Constants.redis.nypsi.RESTART, "t");
+    logger.info("starting graceful restart..");
 
-    setTimeout(async () => {
-      await redis.set(Constants.redis.nypsi.RESTART, "t");
-      logger.info("starting graceful restart..");
-
-      client.cluster.send("restart");
-    }, 10000);
+    client.cluster.send("restart");
 
     return message.channel.send({
       embeds: [new CustomEmbed(message.member, "✅ all clusters will be restarted soon")],
