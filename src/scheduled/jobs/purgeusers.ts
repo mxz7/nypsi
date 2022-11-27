@@ -5,7 +5,7 @@ import prisma from "../../init/database";
 (async () => {
   const users = await prisma.user.findMany({
     where: {
-      AND: [{ lastCommand: { lt: dayjs().subtract(1, "month").toDate() } }, { karma: { lt: 10 } }],
+      AND: [{ lastCommand: { lt: dayjs().subtract(6, "month").toDate() } }, { karma: { lt: 10 } }],
     },
     select: {
       Achievements: true,
