@@ -11,7 +11,7 @@ async () => {
     },
   });
 
-  parentPort.postMessage(`deleted ${query.count.toLocaleString()} old role persist data`);
+  parentPort.postMessage(`${query.count.toLocaleString()} role persist data purged`);
 
   process.exit(0);
 };
