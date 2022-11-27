@@ -12,7 +12,7 @@ import prisma from "../../init/database";
   });
 
   if (d.count > 0) {
-    parentPort.postMessage(`${d.count.toLocaleString()} old usernames deleted from database`);
+    parentPort.postMessage(`${d.count.toLocaleString()} usernames purged`);
   }
 
   process.exit(0);
