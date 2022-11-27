@@ -760,7 +760,6 @@
     "role": "car",
     "speed": 6,
     "aliases": ["r34", "gtr"],
-    "worth": 230000,
     "in_crates": true
   },
   "toyota_supra": {
@@ -772,7 +771,6 @@
     "role": "car",
     "speed": 5,
     "aliases": ["supra", "toyota"],
-    "worth": 170000,
     "in_crates": true
   },
   "lawyer": {
@@ -882,7 +880,6 @@
     "longDesc": "stop someone finding milfs",
     "rarity": 0,
     "role": "item",
-    "worth": 75000,
     "aliases": ["chastity"],
     "buy": 75000,
     "sell": 40000,
@@ -1349,7 +1346,6 @@
     "role": "collectable",
     "speed": 6,
     "aliases": ["palm", "tree", "necklace"],
-    "worth": 230000,
     "in_crates": true
   },
   "double_xp": {
