@@ -705,6 +705,32 @@ export async function runCommand(
       }
     }
 
+    if (await redis.get("nypsi:maintenance")) {
+      if (message.author.id == Constants.TEKOH_ID && message instanceof Message) {
+        message.react("💀");
+      }
+
+      if (message instanceof Message) {
+        return message.channel.send({
+          embeds: [
+            new CustomEmbed(
+              message.member,
+              "fun & moderation commands are still available to you. maintenance mode only prevents certain commands"
+            ).setTitle("⚠️ nypsi is under maintenance"),
+          ],
+        });
+      } else {
+        return message.reply({
+          embeds: [
+            new CustomEmbed(
+              message.member,
+              "fun & moderation commands are still available to you. maintenance mode only prevents certain commands"
+            ).setTitle("⚠️ nypsi is under maintenance"),
+          ],
+        });
+      }
+    }
+
     if (await isEcoBanned(message.author.id)) {
       const unbanTime = await getEcoBanTime(message.author.id);
 
