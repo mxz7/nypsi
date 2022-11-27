@@ -294,7 +294,7 @@ model RolePersist {
   createdAt DateTime @default(now())
   roles     String[]
 
-  guild Guild @relation(fields: [guildId], references: [id])
+  guild Guild @relation(fields: [guildId], references: [id], onDelete: Cascade)
 
   @@id([guildId, userId])
 }
