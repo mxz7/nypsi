@@ -40,11 +40,11 @@ import prisma from "../../init/database";
       continue;
 
     count++;
-    await prisma.user.delete({
-      where: {
-        id: user.id,
-      },
-    });
+    // await prisma.user.delete({ IM NOT CONFIDENT YET
+    //   where: {
+    //     id: user.id,
+    //   },
+    // });
   }
 
   parentPort.postMessage(`${count.toLocaleString()} users purged from database`);
