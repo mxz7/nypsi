@@ -28,7 +28,7 @@ const bree = new Bree({
       interval: "at 12:00am",
     },
     {
-      name: "oldguilds",
+      name: "purgeguilds",
       interval: "at 3:02am",
       worker: {
         workerData: {
