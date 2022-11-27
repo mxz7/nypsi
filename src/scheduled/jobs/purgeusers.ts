@@ -31,7 +31,7 @@ import prisma from "../../init/database";
       (user.CommandUse.length == 0 ? false : user.CommandUse.map((c) => c.uses).reduce((a, b) => a + b) > 100) ||
       user.Economy ||
       user.Premium ||
-      user.Username.length == 0 ||
+      user.Username.length > 0 ||
       user.WordleStats ||
       user.email ||
       user.lastfmUsername ||
