@@ -841,5 +841,40 @@
     "emoji": "💬",
     "target": 2500,
     "description": "win 2,500 wordles"
+  },
+  "crafter_i": {
+    "id": "crafter_i",
+    "name": "crafter **I**",
+    "emoji": "<:Craft:615426524862087191>",
+    "target": 100,
+    "description": "craft 100 items"
+  },
+  "crafter_ii": {
+    "id": "crafter_ii",
+    "name": "crafter **II**",
+    "emoji": "<:Craft:615426524862087191>",
+    "target": 1000,
+    "description": "craft 1,000 items"
+  },
+  "crafter_iii": {
+    "id": "crafter_iii",
+    "name": "crafter **III**",
+    "emoji": "<:Craft:615426524862087191>",
+    "target": 2500,
+    "description": "craft 2,500 items"
+  },
+  "crafter_iv": {
+    "id": "crafter_iv",
+    "name": "crafter **IV**",
+    "emoji": "<:Craft:615426524862087191>",
+    "target": 5000,
+    "description": "craft 5,000 items"
+  },
+  "crafter_v": {
+    "id": "crafter_v",
+    "name": "crafter **V**",
+    "emoji": "<:Craft:615426524862087191>",
+    "target": 10000,
+    "description": "craft 10,000 items"
   }
 }
