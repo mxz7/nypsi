@@ -154,6 +154,10 @@ async function prepareGame(
     }
   };
 
+  if (games.has(message.author.id)) {
+    return send({ embeds: [new ErrorEmbed("you are already playing mines")] });
+  }
+
   const maxBet = await calcMaxBet(message.member);
   const defaultBet = await getDefaultBet(message.member);
 
