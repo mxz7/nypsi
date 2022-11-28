@@ -484,7 +484,7 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
     .awaitMessageComponent({ filter, time: 60000 })
     .then(async (collected) => {
       await collected.deferUpdate();
-      return collected.customId;
+      return collected;
     })
     .catch(() => {
       fail = true;
@@ -494,14 +494,14 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
 
   if (fail) return;
 
-  if (typeof response != "string") return;
+  if (!response) return;
 
-  if (response.length != 2 && response != "finish") {
+  if (response.customId.length != 2 && response.customId != "finish") {
     await message.channel.send({ content: message.author.toString() + " invalid coordinate, example: `a3`" });
     return playGame(message, msg);
   }
 
-  if (response == "finish") {
+  if (response.customId == "finish") {
     if (win < 1) {
       lose();
       return;
@@ -513,8 +513,8 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
       return;
     }
   } else {
-    const letter = response.split("")[0];
-    const number = response.split("")[1];
+    const letter = response.customId.split("")[0];
+    const number = response.customId.split("")[1];
 
     let check = false;
     let check1 = false;
@@ -541,7 +541,7 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
     }
   }
 
-  const location = toLocation(response);
+  const location = toLocation(response.customId);
 
   switch (grid[location]) {
     case "b":
@@ -558,6 +558,10 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
       } else {
         grid[location] = "gc";
         win += 3;
+        await response.followUp({
+          embeds: [new CustomEmbed(message.member, `you found a **gem** ${GEM_EMOJI}\n+**3**x`)],
+          ephemeral: true,
+        });
       }
 
       games.set(message.author.id, {
