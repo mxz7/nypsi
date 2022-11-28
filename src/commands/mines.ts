@@ -213,7 +213,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   }
 
   for (let i = 0; i < bombCount; i++) {
-    const num = Math.floor(Math.random() * 25);
+    const num = Math.floor(Math.random() * 24);
 
     if (grid[num] != "b") {
       grid[num] = "b";
