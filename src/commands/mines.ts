@@ -559,7 +559,7 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
         grid[location] = "gc";
         win += 3;
         await response.followUp({
-          embeds: [new CustomEmbed(message.member, `you found a **gem** ${GEM_EMOJI}\n+**3**x`)],
+          embeds: [new CustomEmbed(message.member, `${GEM_EMOJI} you found a **gem**!!\n+**3**x`)],
           ephemeral: true,
         });
       }
