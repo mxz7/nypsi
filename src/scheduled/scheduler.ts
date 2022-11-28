@@ -76,7 +76,7 @@ const bree = new Bree({
     },
     {
       name: "purgeusers",
-      interval: "at 1:00am",
+      cron: "0 1 * * 1",
     },
   ],
 });
