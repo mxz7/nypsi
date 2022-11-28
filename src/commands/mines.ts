@@ -346,7 +346,7 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
       "**bet** $" +
         bet.toLocaleString() +
         "\n**" +
-        win +
+        win.toFixed(2) +
         "**x ($" +
         Math.round(bet * win).toLocaleString() +
         ")\n\n**you lose!!**"
@@ -367,7 +367,7 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
           bet.toLocaleString() +
           "\n" +
           "**" +
-          win +
+          win.toFixed(2) +
           "**x ($" +
           Math.round(bet * win).toLocaleString() +
           ")" +
@@ -384,7 +384,7 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
           bet.toLocaleString() +
           "\n" +
           "**" +
-          win +
+          win.toFixed(2) +
           "**x ($" +
           Math.round(bet * win).toLocaleString() +
           ")" +
@@ -424,7 +424,7 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
       "**bet** $" +
         bet.toLocaleString() +
         "\n**" +
-        win +
+        win.toFixed(2) +
         "**x ($" +
         Math.round(bet * win).toLocaleString() +
         ")" +
@@ -529,7 +529,13 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
       });
 
       embed.setDescription(
-        "**bet** $" + bet.toLocaleString() + "\n**" + win + "**x ($" + Math.round(bet * win).toLocaleString() + ")"
+        "**bet** $" +
+          bet.toLocaleString() +
+          "\n**" +
+          win.toFixed(2) +
+          "**x ($" +
+          Math.round(bet * win).toLocaleString() +
+          ")"
       );
 
       edit({ embeds: [embed], components: getRows(grid, false) });
