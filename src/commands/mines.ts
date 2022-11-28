@@ -158,7 +158,11 @@ async function prepareGame(
   };
 
   if (games.has(message.author.id)) {
-    return send({ embeds: [new ErrorEmbed("you are already playing mines")] });
+    if (msg) {
+      return msg.edit({ embeds: [new ErrorEmbed("you are already playing mines")] });
+    } else {
+      return send({ embeds: [new ErrorEmbed("you are already playing mines")] });
+    }
   }
 
   const maxBet = await calcMaxBet(message.member);
@@ -167,23 +171,43 @@ async function prepareGame(
   const bet = (await formatBet(args[0], message.member).catch(() => {})) || defaultBet;
 
   if (!bet) {
-    return send({ embeds: [new ErrorEmbed("invalid bet")] });
+    if (msg) {
+      return msg.edit({ embeds: [new ErrorEmbed("invalid bet")] });
+    } else {
+      return send({ embeds: [new ErrorEmbed("invalid bet")] });
+    }
   }
 
   if (bet <= 0) {
-    return send({ embeds: [new ErrorEmbed("/mines <bet> (mines)")] });
+    if (msg) {
+      return msg.edit({ embeds: [new ErrorEmbed("/mines <bet> (mines)")] });
+    } else {
+      return send({ embeds: [new ErrorEmbed("/mines <bet> (mines)")] });
+    }
   }
 
   if (bet > (await getBalance(message.member))) {
-    return send({ embeds: [new ErrorEmbed("you cannot afford this bet")] });
+    if (msg) {
+      return msg.edit({ embeds: [new ErrorEmbed("you cannot afford this bet")] });
+    } else {
+      return send({ embeds: [new ErrorEmbed("you cannot afford this bet")] });
+    }
   }
 
   if (bet > maxBet) {
-    return send({
-      embeds: [
-        new ErrorEmbed(`your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`),
-      ],
-    });
+    if (msg) {
+      return msg.edit({
+        embeds: [
+          new ErrorEmbed(`your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`),
+        ],
+      });
+    } else {
+      return send({
+        embeds: [
+          new ErrorEmbed(`your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`),
+        ],
+      });
+    }
   }
 
   let chosenMinesCount = parseInt(args[1]);
@@ -191,11 +215,19 @@ async function prepareGame(
   if (!chosenMinesCount) {
     chosenMinesCount = 0;
   } else if (!mineIncrements.has(chosenMinesCount)) {
-    return send({
-      embeds: [
-        new ErrorEmbed(`you cannot use this amount of mines\nallowed: ${Array.from(mineIncrements.keys()).join(", ")}`),
-      ],
-    });
+    if (msg) {
+      return msg.edit({
+        embeds: [
+          new ErrorEmbed(`you cannot use this amount of mines\nallowed: ${Array.from(mineIncrements.keys()).join(", ")}`),
+        ],
+      });
+    } else {
+      return send({
+        embeds: [
+          new ErrorEmbed(`you cannot use this amount of mines\nallowed: ${Array.from(mineIncrements.keys()).join(", ")}`),
+        ],
+      });
+    }
   }
 
   await addCooldown(cmd.name, message.member, 25);
