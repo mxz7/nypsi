@@ -43,7 +43,7 @@ import dayjs = require("dayjs");
 
 const commands = new Map<string, Command>();
 const aliases = new Map<string, string>();
-const noLifers = new Map<string, number>();
+const hourlyCommandCount = new Map<string, number>();
 const commandUses = new Map<string, number>();
 
 const karmaCooldown = new Set<string>();
@@ -857,10 +857,10 @@ export function logCommand(message: Message | (NypsiCommandInteraction & Command
 }
 
 function updateCommandUses(member: GuildMember) {
-  if (noLifers.has(member.user.tag)) {
-    noLifers.set(member.user.tag, noLifers.get(member.user.tag) + 1);
+  if (hourlyCommandCount.has(member.user.tag)) {
+    hourlyCommandCount.set(member.user.tag, hourlyCommandCount.get(member.user.tag) + 1);
   } else {
-    noLifers.set(member.user.tag, 1);
+    hourlyCommandCount.set(member.user.tag, 1);
   }
 
   if (karmaCooldown.has(member.user.id)) return;
@@ -888,8 +888,8 @@ export function runCommandUseTimers(client: NypsiClient) {
       url: process.env.ANTICHEAT_HOOK,
     });
 
-    for (const tag of noLifers.keys()) {
-      const uses = noLifers.get(tag);
+    for (const tag of hourlyCommandCount.keys()) {
+      const uses = hourlyCommandCount.get(tag);
 
       if (uses > 500) {
         const res = await client.cluster.broadcastEval(
@@ -922,7 +922,7 @@ export function runCommandUseTimers(client: NypsiClient) {
         }
       }
     }
-    noLifers.clear();
+    hourlyCommandCount.clear();
     return;
   };
 
