@@ -35,7 +35,8 @@ import prisma from "../../init/database";
       user.WordleStats ||
       user.email ||
       user.lastfmUsername ||
-      !user.tracking
+      !user.tracking ||
+      (await prisma.mention.findMany({ where: { targetId: user.id }, take: 1 })).length > 0
     )
       continue;
 
