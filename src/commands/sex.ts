@@ -13,6 +13,7 @@ const cmd = new Command("sex", "find horny milfs in ur area 😏", Categories.FU
   "milffinder",
   "findamilf",
   "letsfuck",
+  "milf",
 ]);
 
 // cmd.slashEnabled = true;
