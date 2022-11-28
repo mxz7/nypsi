@@ -856,6 +856,14 @@ export function logCommand(message: Message | (NypsiCommandInteraction & Command
   });
 }
 
+export function addHourlyCommand(member: GuildMember) {
+  if (hourlyCommandCount.has(member.user.tag)) {
+    hourlyCommandCount.set(member.user.tag, hourlyCommandCount.get(member.user.tag) + 1);
+  } else {
+    hourlyCommandCount.set(member.user.tag, 1);
+  }
+}
+
 function updateCommandUses(member: GuildMember) {
   if (hourlyCommandCount.has(member.user.tag)) {
     hourlyCommandCount.set(member.user.tag, hourlyCommandCount.get(member.user.tag) + 1);
