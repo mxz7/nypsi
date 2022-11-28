@@ -17,6 +17,8 @@ import * as shuffle from "shuffle-array";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command.js";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants.js";
+import { a } from "../utils/functions/anticheat.js";
+import { isLockedOut, verifyUser } from "../utils/functions/captcha.js";
 import { addProgress } from "../utils/functions/economy/achievements.js";
 import { calcMaxBet, getBalance, getDefaultBet, getMulti, updateBalance } from "../utils/functions/economy/balance.js";
 import { addToGuildXP, getGuildByUser } from "../utils/functions/economy/guilds.js";
@@ -24,6 +26,7 @@ import { addGamble } from "../utils/functions/economy/stats.js";
 import { createUser, formatBet, userExists } from "../utils/functions/economy/utils.js";
 import { calcEarnedXp, getXp, updateXp } from "../utils/functions/economy/xp.js";
 import { isPremium } from "../utils/functions/premium/premium.js";
+import { addHourlyCommand } from "../utils/handlers/commandhandler.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 import { gamble, logger } from "../utils/logger.js";
 
@@ -345,6 +348,13 @@ async function playGame(
         level: "cmd",
         message: `${message.guild.id} - ${message.author.tag}: replaying highlow`,
       });
+
+      addHourlyCommand(message.member);
+
+      await a(message.author.id, message.author.tag, message.content);
+
+      if (isLockedOut(message.author.id)) return verifyUser(message);
+
       return prepareGame(message, args, m);
     }
   };
