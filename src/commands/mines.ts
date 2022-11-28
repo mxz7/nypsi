@@ -38,6 +38,7 @@ const games = new Map<
   }
 >();
 
+const GEM_EMOJI = "<:nypsi_gem:1046854542047850556>";
 const abcde = new Map<string, number>();
 const possibleLetters = ["a", "b", "c", "d", "e"];
 const possibleNumbers = ["1", "2", "3", "4", "5"];
@@ -223,14 +224,40 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
   }
 
-  const voteMulti = await getMulti(message.member);
+  const spawnGem = Math.floor(Math.random() * 10);
+
+  if (spawnGem < 2) {
+    let passes = 0;
+    let achieved = false;
+
+    while (passes < 5) {
+      for (let i = 0; i < grid.length; i++) {
+        if (grid[i] != "b" && i != 24) {
+          const chance = Math.floor(Math.random() * 10);
+          if (chance < 3) {
+            grid[i] = "g";
+            passes = 69;
+            achieved = true;
+            break;
+          }
+        }
+      }
+      passes++;
+    }
+
+    if (!achieved) {
+      grid[grid.findIndex((i) => i == "a")] = "g";
+    }
+  }
+
+  const multi = await getMulti(message.member);
 
   games.set(message.author.id, {
     bet: bet,
     win: 0,
     grid: grid,
     id: id,
-    voted: voteMulti,
+    voted: multi,
     increment: incrementAmount,
   });
 
@@ -284,6 +311,14 @@ function getRows(grid: string[], end: boolean) {
         break;
       case "c":
         button.setStyle(ButtonStyle.Success).setDisabled(true);
+        break;
+      case "g":
+        button.setStyle(ButtonStyle.Secondary);
+        if (end) button.setEmoji(GEM_EMOJI).setDisabled(true);
+        break;
+      case "gc":
+        button.setStyle(ButtonStyle.Success).setDisabled(true);
+        button.setEmoji(GEM_EMOJI);
         break;
       case "x":
         button.setStyle(ButtonStyle.Danger).setDisabled(true);
@@ -515,10 +550,15 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
       return;
     case "c":
       return playGame(message, msg);
+    case "g":
     case "a":
-      grid[location] = "c";
-
-      win += increment;
+      if (grid[location] == "a") {
+        grid[location] = "c";
+        win += increment;
+      } else {
+        grid[location] = "gc";
+        win += 3;
+      }
 
       games.set(message.author.id, {
         bet: bet,
