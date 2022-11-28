@@ -145,23 +145,43 @@ async function prepareGame(
   const bet = (await formatBet(args[0], message.member).catch(() => {})) || defaultBet;
 
   if (!bet) {
-    return send({ embeds: [new ErrorEmbed("invalid bet")] });
+    if (msg) {
+      return msg.edit({ embeds: [new ErrorEmbed("invalid bet")] });
+    } else {
+      return send({ embeds: [new ErrorEmbed("invalid bet")] });
+    }
   }
 
   if (bet <= 0) {
-    return send({ embeds: [new ErrorEmbed("/blackjack bet")] });
+    if (msg) {
+      return msg.edit({ embeds: [new ErrorEmbed("/blackjack <bet>")] });
+    } else {
+      return send({ embeds: [new ErrorEmbed("/blackjack <bet>")] });
+    }
   }
 
   if (bet > (await getBalance(message.member))) {
-    return send({ embeds: [new ErrorEmbed("you cannot afford this bet")] });
+    if (msg) {
+      return msg.edit({ embeds: [new ErrorEmbed("you cannot afford this bet")] });
+    } else {
+      return send({ embeds: [new ErrorEmbed("you cannot afford this bet")] });
+    }
   }
 
   if (bet > maxBet) {
-    return send({
-      embeds: [
-        new ErrorEmbed(`your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`),
-      ],
-    });
+    if (msg) {
+      return msg.edit({
+        embeds: [
+          new ErrorEmbed(`your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`),
+        ],
+      });
+    } else {
+      return send({
+        embeds: [
+          new ErrorEmbed(`your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`),
+        ],
+      });
+    }
   }
 
   await addCooldown(cmd.name, message.member, 25);
