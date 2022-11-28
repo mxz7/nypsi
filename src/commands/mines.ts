@@ -443,6 +443,10 @@ async function playGame(
 
     if (res && res.customId == "rp") {
       await res.deferUpdate();
+      logger.log({
+        level: "cmd",
+        message: `${message.guild} - ${message.author.tag}: replaying mines`,
+      });
       return prepareGame(message, args, msg);
     }
   };
