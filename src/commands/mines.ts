@@ -207,7 +207,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   let incrementAmount = 0.5;
 
   if (chosenMinesCount == 0) {
-    bombCount = Math.floor(Math.random() * 3) + 3;
+    bombCount = Math.floor(Math.random() * 4) + 3;
   } else {
     bombCount = chosenMinesCount;
     incrementAmount = mineIncrements.get(bombCount);
