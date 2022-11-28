@@ -46,7 +46,7 @@ abcde.set("c", 2);
 abcde.set("d", 3);
 abcde.set("e", 4);
 
-const cmd = new Command("minesweeper", "play minesweeper", Categories.MONEY).setAliases(["sweeper", "ms"]);
+const cmd = new Command("mines", "play mines", Categories.MONEY).setAliases(["minesweeper", "ms"]);
 
 cmd.slashEnabled = true;
 cmd.slashData.addStringOption((option) =>
@@ -75,7 +75,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   };
 
   if (games.has(message.author.id)) {
-    return send({ embeds: [new ErrorEmbed("you are already playing minesweeper")] });
+    return send({ embeds: [new ErrorEmbed("you are already playing mines")] });
   }
 
   if (await onCooldown(cmd.name, message.member)) {
@@ -89,7 +89,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (args.length == 0 && !defaultBet) {
     const embed = new CustomEmbed(message.member)
-      .setHeader("minesweeper help")
+      .setHeader("mines help")
       .addField("usage", `${prefix}ms <bet>`)
       .addField(
         "game rules",
@@ -190,7 +190,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   });
 
   const embed = new CustomEmbed(message.member, "**bet** $" + bet.toLocaleString() + "\n**0**x ($0)").setHeader(
-    "minesweeper",
+    "mines",
     message.author.avatarURL()
   );
 
@@ -199,7 +199,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const msg = await send({ embeds: [embed], components: rows });
 
   playGame(message, msg).catch((e: string) => {
-    logger.error(`error occured playing minesweeper - ${message.author.tag} (${message.author.id})`);
+    logger.error(`error occured playing mines - ${message.author.tag} (${message.author.id})`);
     console.error(e);
     return send({
       embeds: [new ErrorEmbed("an error occured while running - join support server")],
@@ -282,7 +282,7 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
   let win = games.get(message.author.id).win;
   const grid = games.get(message.author.id).grid;
 
-  const embed = new CustomEmbed(message.member).setHeader("minesweeper", message.author.avatarURL());
+  const embed = new CustomEmbed(message.member).setHeader("mines", message.author.avatarURL());
 
   const edit = async (data: MessageEditOptions) => {
     if (!(message instanceof Message)) {
@@ -294,8 +294,8 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
   };
 
   const lose = async () => {
-    gamble(message.author, "minesweeper", bet, false, 0);
-    await addGamble(message.member, "minesweeper", false);
+    gamble(message.author, "mines", bet, false, 0);
+    await addGamble(message.member, "mines", false);
     embed.setColor(Constants.EMBED_FAIL_COLOR);
     embed.setDescription(
       "**bet** $" +
@@ -361,10 +361,10 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
       }
     }
 
-    gamble(message.author, "minesweeper", bet, true, winnings);
-    await addGamble(message.member, "minesweeper", true);
+    gamble(message.author, "mines", bet, true, winnings);
+    await addGamble(message.member, "mines", true);
 
-    if (win >= 7) await addProgress(message.author.id, "minesweeper_pro", 1);
+    if (win >= 7) await addProgress(message.author.id, "mines_pro", 1);
 
     await updateBalance(message.member, (await getBalance(message.member)) + winnings);
     games.delete(message.author.id);
@@ -372,8 +372,8 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
   };
 
   const draw = async () => {
-    gamble(message.author, "minesweeper", bet, true, bet);
-    await addGamble(message.member, "minesweeper", true);
+    gamble(message.author, "mines", bet, true, bet);
+    await addGamble(message.member, "mines", true);
     embed.setColor(variants.macchiato.yellow.hex as ColorResolvable);
     embed.setDescription(
       "**bet** $" +
@@ -408,7 +408,7 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
     .catch(() => {
       fail = true;
       games.delete(message.author.id);
-      message.channel.send({ content: message.author.toString() + " minesweeper game expired" });
+      message.channel.send({ content: message.author.toString() + " mines game expired" });
     });
 
   if (fail) return;
