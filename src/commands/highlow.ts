@@ -23,7 +23,7 @@ import { addToGuildXP, getGuildByUser } from "../utils/functions/economy/guilds.
 import { addGamble } from "../utils/functions/economy/stats.js";
 import { createUser, formatBet, userExists } from "../utils/functions/economy/utils.js";
 import { calcEarnedXp, getXp, updateXp } from "../utils/functions/economy/xp.js";
-import { getPrefix } from "../utils/functions/guilds/utils";
+import { isPremium } from "../utils/functions/premium/premium.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 import { gamble, logger } from "../utils/logger.js";
 
@@ -63,13 +63,42 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({ embeds: [embed], ephemeral: true });
   }
 
-  const prefix = await getPrefix(message.guild);
+  return prepareGame(message, args);
+}
+
+cmd.setRun(run);
+
+module.exports = cmd;
+
+async function prepareGame(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[],
+  msg?: Message
+) {
+  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
+    if (!(message instanceof Message)) {
+      if (message.deferred) {
+        await message.editReply(data);
+      } else {
+        await message.reply(data as InteractionReplyOptions).catch(() => {
+          return message.editReply(data);
+        });
+      }
+      const replyMsg = await message.fetchReply();
+      if (replyMsg instanceof Message) {
+        return replyMsg;
+      }
+    } else {
+      return await message.channel.send(data as BaseMessageOptions);
+    }
+  };
+
   const defaultBet = await getDefaultBet(message.member);
 
   if (args.length == 0 && !defaultBet) {
     const embed = new CustomEmbed(message.member)
       .setHeader("highlow help")
-      .addField("usage", `${prefix}highlow <bet>\n${prefix}highlow info`)
+      .addField("usage", "/highlow <bet>")
       .addField(
         "game rules",
         "you'll receive your first card and you have to predict whether the next card you pick up will be higher or lower in value than the card that you have, you can cash out after predicting correctly once."
@@ -107,7 +136,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   }
 
   if (bet <= 0) {
-    return send({ embeds: [new ErrorEmbed(`${prefix}highlow <bet>`)] });
+    return send({ embeds: [new ErrorEmbed("/highlow <bet>")] });
   }
 
   if (bet > (await getBalance(message.member))) {
@@ -219,20 +248,20 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     .setHeader("highlow", message.author.avatarURL())
     .addField("card", "| " + games.get(message.member.user.id).card + " |");
 
-  send({ embeds: [embed], components: [row] }).then((m) => {
-    playGame(message, m).catch((e: string) => {
-      logger.error(`error occured playing highlow - ${message.author.tag} (${message.author.id})`);
-      logger.error(e);
-      return send({
-        embeds: [new ErrorEmbed("an error occured while running - join support server")],
-      });
+  if (msg) {
+    await msg.edit({ embeds: [embed], components: [row] });
+  } else {
+    msg = await send({ embeds: [embed], components: [row] });
+  }
+
+  playGame(message, msg, args).catch((e: string) => {
+    logger.error(`error occured playing highlow - ${message.author.tag} (${message.author.id})`);
+    logger.error(e);
+    return send({
+      embeds: [new ErrorEmbed("an error occured while running - join support server")],
     });
   });
 }
-
-cmd.setRun(run);
-
-module.exports = cmd;
 
 function newCard(member: GuildMember) {
   const deck = games.get(member.user.id).deck;
@@ -270,7 +299,11 @@ function getValue(member: GuildMember) {
   }
 }
 
-async function playGame(message: Message | (NypsiCommandInteraction & CommandInteraction), m: Message): Promise<void> {
+async function playGame(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  m: Message,
+  args: string[]
+): Promise<void> {
   if (!games.has(message.author.id)) return;
 
   const bet = games.get(message.member.user.id).bet;
@@ -285,6 +318,30 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
       return await message.fetchReply();
     } else {
       return await m.edit(data);
+    }
+  };
+
+  const replay = async (embed: CustomEmbed) => {
+    if (!(await isPremium(message.member)) || (await getBalance(message.member)) < bet) {
+      return m.edit({ embeds: [embed], components: [] });
+    }
+
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder().setLabel("play again").setStyle(ButtonStyle.Secondary).setCustomId("rp")
+    );
+
+    await m.edit({ embeds: [embed], components: [row] });
+
+    const res = await m
+      .awaitMessageComponent({ filter: (i: Interaction) => i.user.id == message.author.id, time: 30000 })
+      .catch(() => {
+        m.edit({ components: [] });
+        return;
+      });
+
+    if (res && res.customId == "rp") {
+      await res.deferUpdate();
+      return prepareGame(message, args, m);
     }
   };
 
@@ -304,7 +361,7 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
     );
     newEmbed.addField("card", "| " + card + " |");
     games.delete(message.author.id);
-    return await edit({ embeds: [newEmbed], components: [] });
+    return replay(newEmbed);
   };
 
   const win1 = async () => {
@@ -366,7 +423,7 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
     newEmbed.addField("card", "| " + card + " |");
     await updateBalance(message.member, (await getBalance(message.member)) + winnings);
     games.delete(message.author.id);
-    return edit({ embeds: [newEmbed], components: [] });
+    return replay(newEmbed);
   };
 
   const draw = async () => {
@@ -387,7 +444,7 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
     newEmbed.addField("card", "| " + card + " |");
     await updateBalance(message.member, (await getBalance(message.member)) + bet);
     games.delete(message.author.id);
-    return await edit({ embeds: [newEmbed], components: [] });
+    return replay(newEmbed);
   };
 
   if (win == 15) {
@@ -456,7 +513,7 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
       );
       newEmbed.addField("card", "| " + card + " |");
       await edit({ embeds: [newEmbed], components: [row] });
-      return playGame(message, m);
+      return playGame(message, m, args);
     } else if (newCard1 == oldCard) {
       newEmbed.setDescription(
         "**bet** $" + bet.toLocaleString() + "\n**" + win + "**x ($" + Math.round(bet * win).toLocaleString() + ")"
@@ -464,7 +521,7 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
       newEmbed.addField("card", "| " + card + " |");
 
       await edit({ embeds: [newEmbed] });
-      return playGame(message, m);
+      return playGame(message, m, args);
     } else {
       lose();
       return;
@@ -510,21 +567,21 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
       );
       newEmbed.addField("card", "| " + card + " |");
       await edit({ embeds: [newEmbed], components: [row] });
-      return playGame(message, m);
+      return playGame(message, m, args);
     } else if (newCard1 == oldCard) {
       newEmbed.setDescription(
         "**bet** $" + bet.toLocaleString() + "\n**" + win + "**x ($" + Math.round(bet * win).toLocaleString() + ")"
       );
       newEmbed.addField("card", "| " + card + " |");
       await edit({ embeds: [newEmbed] });
-      return playGame(message, m);
+      return playGame(message, m, args);
     } else {
       lose();
       return;
     }
   } else if (reaction == "💰") {
     if (win < 1) {
-      return playGame(message, m);
+      return playGame(message, m, args);
     } else if (win == 1) {
       draw();
       return;
