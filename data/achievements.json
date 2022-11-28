@@ -456,38 +456,38 @@
   },
   "minesweeper_pro_i": {
     "id": "minesweeper_pro_i",
-    "name": "minesweeper professional **I**",
+    "name": "mines professional **I**",
     "emoji": "💣",
     "target": 5,
-    "description": "reach a 7x multiplier in minesweeper 5 times"
+    "description": "reach a 7x multiplier in mines 5 times"
   },
   "minesweeper_pro_ii": {
     "id": "minesweeper_pro_ii",
-    "name": "minesweeper professional **II**",
+    "name": "mines professional **II**",
     "emoji": "💣",
     "target": 25,
-    "description": "reach a 7x multiplier in minesweeper 25 times"
+    "description": "reach a 7x multiplier in mines 25 times"
   },
   "minesweeper_pro_iii": {
     "id": "minesweeper_pro_iii",
-    "name": "minesweeper professional **III**",
+    "name": "mines professional **III**",
     "emoji": "💣",
     "target": 100,
-    "description": "reach a 7x multiplier in minesweeper 100 times"
+    "description": "reach a 7x multiplier in mines 100 times"
   },
   "minesweeper_pro_iv": {
     "id": "minesweeper_pro_iv",
-    "name": "minesweeper professional **IV**",
+    "name": "mines professional **IV**",
     "emoji": "💣",
     "target": 500,
-    "description": "reach a 7x multiplier in minesweeper 500 times"
+    "description": "reach a 7x multiplier in mines 500 times"
   },
   "minesweeper_pro_v": {
     "id": "minesweeper_pro_v",
-    "name": "minesweeper professional **V**",
+    "name": "mines professional **V**",
     "emoji": "💣",
     "target": 1000,
-    "description": "reach a 7x multiplier in minesweeper 1,000 times"
+    "description": "reach a 7x multiplier in mines 1,000 times"
   },
   "highlow_pro_i": {
     "id": "highlow_pro_i",
@@ -841,5 +841,40 @@
     "emoji": "💬",
     "target": 2500,
     "description": "win 2,500 wordles"
+  },
+  "crafter_i": {
+    "id": "crafter_i",
+    "name": "crafter **I**",
+    "emoji": "<:Craft:615426524862087191>",
+    "target": 100,
+    "description": "craft 100 items"
+  },
+  "crafter_ii": {
+    "id": "crafter_ii",
+    "name": "crafter **II**",
+    "emoji": "<:Craft:615426524862087191>",
+    "target": 1000,
+    "description": "craft 1,000 items"
+  },
+  "crafter_iii": {
+    "id": "crafter_iii",
+    "name": "crafter **III**",
+    "emoji": "<:Craft:615426524862087191>",
+    "target": 2500,
+    "description": "craft 2,500 items"
+  },
+  "crafter_iv": {
+    "id": "crafter_iv",
+    "name": "crafter **IV**",
+    "emoji": "<:Craft:615426524862087191>",
+    "target": 5000,
+    "description": "craft 5,000 items"
+  },
+  "crafter_v": {
+    "id": "crafter_v",
+    "name": "crafter **V**",
+    "emoji": "<:Craft:615426524862087191>",
+    "target": 10000,
+    "description": "craft 10,000 items"
   }
 }

@@ -1,3 +1,4 @@
+import dayjs = require("dayjs");
 import prisma from "../../init/database";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 import Constants from "../../utils/Constants";
@@ -38,5 +39,9 @@ async function checkCraftItems() {
 }
 
 export function runCraftItemsJob() {
-  setInterval(checkCraftItems, 300_000);
+  const onHour = dayjs().add(1, "hour").set("minutes", 0).set("seconds", 0);
+
+  const needed = onHour.toDate().getTime() - Date.now();
+
+  setInterval(checkCraftItems, needed);
 }

@@ -14,6 +14,7 @@ import {
   SelectMenuBuilder,
   SelectMenuOptionBuilder,
 } from "discord.js";
+import prisma from "../init/database";
 import { NypsiClient } from "../models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
@@ -23,7 +24,6 @@ import {
   addToAuctionWatch,
   createAuction,
   deleteAuction,
-  getAuctionByMessage,
   getAuctions,
   getAuctionWatch,
   setAuctionWatch,
@@ -524,39 +524,51 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return message.channel.send({ embeds: [new ErrorEmbed("use the message id dumbass")] });
     }
 
-    const auction = await getAuctionByMessage(args[1]);
+    const auction = await prisma.auction.findUnique({
+      where: {
+        messageId: args[1],
+      },
+    });
 
     if (!auction) return message.channel.send({ embeds: [new ErrorEmbed("invalid auction bro")] });
 
-    await deleteAuction(auction.id, message.client as NypsiClient);
+    if (auction.sold) {
+      await prisma.auction.delete({
+        where: {
+          messageId: auction.messageId,
+        },
+      });
+    } else {
+      await deleteAuction(auction.id, message.client as NypsiClient);
+
+      if (!(await userExists(auction.ownerId))) return;
+
+      await addInventoryItem(auction.ownerId, auction.itemName, auction.itemAmount);
+
+      if ((await getDmSettings(auction.ownerId)).auction) {
+        const embed = new CustomEmbed().setColor(Constants.TRANSPARENT_EMBED_COLOR);
+
+        embed.setDescription(
+          `your auction for ${auction.itemAmount}x ${items[auction.itemName].emoji} ${
+            items[auction.itemName].name
+          } has been removed by a staff member. you have been given back your item${auction.itemAmount > 1 ? "s" : ""}`
+        );
+
+        if (args.length > 2) {
+          args.splice(0, 2);
+          embed.addField("reason", args.join(" "));
+        }
+
+        await requestDM({
+          client: message.client as NypsiClient,
+          content: "your auction has been removed by a staff member",
+          memberId: auction.ownerId,
+          embed: embed,
+        });
+      }
+    }
 
     await (message as Message).react("✅");
-
-    if (!(await userExists(auction.ownerId))) return;
-
-    await addInventoryItem(auction.ownerId, auction.itemName, auction.itemAmount);
-
-    if ((await getDmSettings(auction.ownerId)).auction) {
-      const embed = new CustomEmbed().setColor(Constants.TRANSPARENT_EMBED_COLOR);
-
-      embed.setDescription(
-        `your auction for ${auction.itemAmount}x ${items[auction.itemName].emoji} ${
-          items[auction.itemName].name
-        } has been removed by a staff member. you have been given back your item${auction.itemAmount > 1 ? "s" : ""}`
-      );
-
-      if (args.length > 2) {
-        args.splice(0, 2);
-        embed.addField("reason", args.join(" "));
-      }
-
-      await requestDM({
-        client: message.client as NypsiClient,
-        content: "your auction has been removed by a staff member",
-        memberId: auction.ownerId,
-        embed: embed,
-      });
-    }
 
     return;
   } else if (args[0].toLowerCase() == "create") {

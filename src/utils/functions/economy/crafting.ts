@@ -1,6 +1,7 @@
 import dayjs = require("dayjs");
 import { GuildMember } from "discord.js";
 import prisma from "../../../init/database";
+import { addProgress } from "./achievements";
 import { addInventoryItem } from "./inventory";
 import { getItems } from "./utils";
 
@@ -41,6 +42,10 @@ export async function getCraftingItems(member: GuildMember | string, deleteOld =
         await addInventoryItem(id, item.itemId, item.amount);
       }
     }
+  }
+
+  if (completed.length > 0) {
+    await addProgress(id, "crafter", completed.length);
   }
 
   return { current: query, completed };
