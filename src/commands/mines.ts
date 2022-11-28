@@ -168,7 +168,11 @@ async function prepareGame(
   const maxBet = await calcMaxBet(message.member);
   const defaultBet = await getDefaultBet(message.member);
 
-  const bet = (await formatBet(args[0], message.member).catch(() => {})) || defaultBet;
+  let bet = (await formatBet(args[0], message.member).catch(() => {})) || defaultBet;
+
+  if (!(message instanceof Message) && message.isChatInputCommand()) {
+    bet = (await formatBet(message.options.getString("bet"), message.member)) || defaultBet;
+  }
 
   if (!bet) {
     if (msg) {
@@ -211,6 +215,10 @@ async function prepareGame(
   }
 
   let chosenMinesCount = parseInt(args[1]);
+
+  if (!(message instanceof Message) && message.isChatInputCommand()) {
+    chosenMinesCount = message.options.getInteger("mine-count");
+  }
 
   if (!chosenMinesCount) {
     chosenMinesCount = 0;
