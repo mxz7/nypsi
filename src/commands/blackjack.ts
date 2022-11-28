@@ -473,7 +473,7 @@ async function playGame(
       await res.deferUpdate();
       logger.log({
         level: "cmd",
-        message: `${message.guild} - ${message.author.tag}: replaying blackjack`,
+        message: `${message.guild.id} - ${message.author.tag}: replaying blackjack`,
       });
       return prepareGame(message, args, m);
     }
