@@ -267,17 +267,13 @@ async function prepareGame(
     let passes = 0;
     let achieved = false;
 
-    while (passes < 5) {
-      for (let i = 0; i < grid.length; i++) {
-        if (grid[i] != "b" && i != 24) {
-          const chance = Math.floor(Math.random() * 10);
-          if (chance < 3) {
-            grid[i] = "g";
-            passes = 69;
-            achieved = true;
-            break;
-          }
-        }
+    while (passes < 25 && !achieved) {
+      const index = Math.floor(Math.random() * grid.length - 1);
+
+      if (grid[index] != "b") {
+        grid[index] = "g";
+        achieved = true;
+        break;
       }
       passes++;
     }
