@@ -471,6 +471,10 @@ async function playGame(
 
     if (res && res.customId == "rp") {
       await res.deferUpdate();
+      logger.log({
+        level: "cmd",
+        message: `${message.guild} - ${message.author.tag}: replaying blackjack`,
+      });
       return prepareGame(message, args, m);
     }
   };
