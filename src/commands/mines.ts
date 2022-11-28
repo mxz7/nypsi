@@ -42,7 +42,7 @@ const abcde = new Map<string, number>();
 const possibleLetters = ["a", "b", "c", "d", "e"];
 const possibleNumbers = ["1", "2", "3", "4", "5"];
 const mineIncrements = new Map<number, number>([
-  [2, 0.15],
+  [2, 0.2],
   [3, 0.25],
   [4, 0.3],
   [5, 0.4],
