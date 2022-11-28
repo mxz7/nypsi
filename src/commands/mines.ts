@@ -522,7 +522,7 @@ async function playGame(
     gamble(message.author, "mines", bet, true, winnings);
     await addGamble(message.member, "mines", true);
 
-    if (win >= 7) await addProgress(message.author.id, "mines_pro", 1);
+    if (win >= 7) await addProgress(message.author.id, "minesweeper_pro", 1);
 
     await updateBalance(message.member, (await getBalance(message.member)) + winnings);
     games.delete(message.author.id);
@@ -659,6 +659,11 @@ async function playGame(
           Math.round(bet * win).toLocaleString() +
           ")"
       );
+
+      if (win >= 15) {
+        win1();
+        return;
+      }
 
       edit({ embeds: [embed], components: getRows(grid, false) });
 
