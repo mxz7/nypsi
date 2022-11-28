@@ -17,12 +17,15 @@ import * as shuffle from "shuffle-array";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants.js";
+import { a } from "../utils/functions/anticheat";
+import { isLockedOut, verifyUser } from "../utils/functions/captcha";
 import { calcMaxBet, getBalance, getDefaultBet, getMulti, updateBalance } from "../utils/functions/economy/balance.js";
 import { addToGuildXP, getGuildByUser } from "../utils/functions/economy/guilds.js";
 import { addGamble } from "../utils/functions/economy/stats.js";
 import { createUser, formatBet, userExists } from "../utils/functions/economy/utils.js";
 import { calcEarnedXp, getXp, updateXp } from "../utils/functions/economy/xp.js";
-import { getPrefix } from "../utils/functions/guilds/utils";
+import { isPremium } from "../utils/functions/premium/premium";
+import { addHourlyCommand } from "../utils/handlers/commandhandler";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 import { gamble, logger } from "../utils/logger.js";
 
@@ -68,23 +71,52 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
   };
 
-  if (games.has(message.member.user.id)) {
-    return send({ embeds: [new ErrorEmbed("you are already playing blackjack")] });
-  }
-
   if (await onCooldown(cmd.name, message.member)) {
     const embed = await getResponse(cmd.name, message.member);
 
     return send({ embeds: [embed], ephemeral: true });
   }
 
-  const prefix = await getPrefix(message.guild);
+  return prepareGame(message, args);
+}
+
+cmd.setRun(run);
+
+module.exports = cmd;
+
+async function prepareGame(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[],
+  msg?: Message
+) {
+  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
+    if (!(message instanceof Message)) {
+      if (message.deferred) {
+        await message.editReply(data);
+      } else {
+        await message.reply(data as InteractionReplyOptions).catch(() => {
+          return message.editReply(data);
+        });
+      }
+      const replyMsg = await message.fetchReply();
+      if (replyMsg instanceof Message) {
+        return replyMsg;
+      }
+    } else {
+      return await message.channel.send(data as BaseMessageOptions);
+    }
+  };
+
+  if (games.has(message.member.user.id)) {
+    return send({ embeds: [new ErrorEmbed("you are already playing blackjack")] });
+  }
+
   const defaultBet = await getDefaultBet(message.member);
 
   if (args.length == 0 && !defaultBet) {
     const embed = new CustomEmbed(message.member)
       .setHeader("blackjack help")
-      .addField("usage", `${prefix}blackjack <bet>\n${prefix}blackjack info`)
+      .addField("usage", "/blackjack <bet>")
       .addField(
         "game rules",
         "in blackjack, the aim is to get **21**, or as close as to **21** as you can get without going over\n" +
@@ -113,23 +145,43 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const bet = (await formatBet(args[0], message.member).catch(() => {})) || defaultBet;
 
   if (!bet) {
-    return send({ embeds: [new ErrorEmbed("invalid bet")] });
+    if (msg) {
+      return msg.edit({ embeds: [new ErrorEmbed("invalid bet")] });
+    } else {
+      return send({ embeds: [new ErrorEmbed("invalid bet")] });
+    }
   }
 
   if (bet <= 0) {
-    return send({ embeds: [new ErrorEmbed(`${prefix}blackjack <bet>`)] });
+    if (msg) {
+      return msg.edit({ embeds: [new ErrorEmbed("/blackjack <bet>")] });
+    } else {
+      return send({ embeds: [new ErrorEmbed("/blackjack <bet>")] });
+    }
   }
 
   if (bet > (await getBalance(message.member))) {
-    return send({ embeds: [new ErrorEmbed("you cannot afford this bet")] });
+    if (msg) {
+      return msg.edit({ embeds: [new ErrorEmbed("you cannot afford this bet")] });
+    } else {
+      return send({ embeds: [new ErrorEmbed("you cannot afford this bet")] });
+    }
   }
 
   if (bet > maxBet) {
-    return send({
-      embeds: [
-        new ErrorEmbed(`your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`),
-      ],
-    });
+    if (msg) {
+      return msg.edit({
+        embeds: [
+          new ErrorEmbed(`your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`),
+        ],
+      });
+    } else {
+      return send({
+        embeds: [
+          new ErrorEmbed(`your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`),
+        ],
+      });
+    }
   }
 
   await addCooldown(cmd.name, message.member, 25);
@@ -240,22 +292,20 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     );
   }
 
-  send({ embeds: [embed], components: [row] })
-    .then((m) => {
-      playGame(message, m).catch((e: string) => {
-        logger.error(`error occured playing blackjack - ${message.author.tag} (${message.author.id})`);
-        logger.error(e);
-        message.channel.send({
-          embeds: [new ErrorEmbed("an error occured while running - join support server")],
-        });
-      });
-    })
-    .catch(() => {});
+  if (msg) {
+    await msg.edit({ embeds: [embed], components: [row] });
+  } else {
+    msg = await send({ embeds: [embed], components: [row] });
+  }
+
+  playGame(message, msg, args).catch((e: string) => {
+    logger.error(`error occured playing blackjack - ${message.author.tag} (${message.author.id})`);
+    logger.error(e);
+    message.channel.send({
+      embeds: [new ErrorEmbed("an error occured while running - join support server")],
+    });
+  });
 }
-
-cmd.setRun(run);
-
-module.exports = cmd;
 
 function newCard(member: GuildMember) {
   const bet = games.get(member.user.id).bet;
@@ -399,7 +449,11 @@ function getDealerCards(member: GuildMember) {
   return "| " + cards.join(" | ") + " |";
 }
 
-async function playGame(message: Message | (NypsiCommandInteraction & CommandInteraction), m: Message): Promise<void> {
+async function playGame(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  m: Message,
+  args: string[]
+): Promise<void> {
   if (!games.has(message.author.id)) return;
 
   const edit = async (data: MessageEditOptions) => {
@@ -420,6 +474,41 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
     message.author.avatarURL()
   );
 
+  const replay = async (embed: CustomEmbed) => {
+    if (!(await isPremium(message.member)) || (await getBalance(message.member)) < bet) {
+      return m.edit({ embeds: [embed], components: [] });
+    }
+
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder().setLabel("play again").setStyle(ButtonStyle.Secondary).setCustomId("rp")
+    );
+
+    await m.edit({ embeds: [embed], components: [row] });
+
+    const res = await m
+      .awaitMessageComponent({ filter: (i: Interaction) => i.user.id == message.author.id, time: 30000 })
+      .catch(() => {
+        m.edit({ components: [] });
+        return;
+      });
+
+    if (res && res.customId == "rp") {
+      await res.deferUpdate();
+      logger.log({
+        level: "cmd",
+        message: `${message.guild.id} - ${message.author.tag}: replaying blackjack`,
+      });
+
+      addHourlyCommand(message.member);
+
+      await a(message.author.id, message.author.tag, message.content);
+
+      if (isLockedOut(message.author.id)) return verifyUser(message);
+
+      return prepareGame(message, args, m);
+    }
+  };
+
   const lose = async () => {
     gamble(message.author, "blackjack", bet, false, 0);
     await addGamble(message.member, "blackjack", false);
@@ -428,7 +517,7 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
     newEmbed.addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**");
     newEmbed.addField(message.author.username, getCards(message.member) + " **" + calcTotal(message.member) + "**");
     games.delete(message.author.id);
-    return await edit({ embeds: [newEmbed], components: [] });
+    return replay(newEmbed);
   };
 
   const win = async () => {
@@ -478,7 +567,7 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
     newEmbed.addField(message.author.username, getCards(message.member) + " **" + calcTotal(message.member) + "**");
     await updateBalance(message.member, (await getBalance(message.member)) + winnings);
     games.delete(message.author.id);
-    return await edit({ embeds: [newEmbed], components: [] });
+    return replay(newEmbed);
   };
 
   const draw = async () => {
@@ -490,7 +579,7 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
     newEmbed.addField(message.author.username, getCards(message.member) + " **" + calcTotal(message.member) + "**");
     await updateBalance(message.member, (await getBalance(message.member)) + bet);
     games.delete(message.author.id);
-    return await edit({ embeds: [newEmbed], components: [] });
+    return replay(newEmbed);
   };
 
   if (calcTotalDealer(message.member) > 21) {
@@ -590,7 +679,7 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
         return;
       }
 
-      return playGame(message, m);
+      return playGame(message, m, args);
     } else if (reaction == "2️⃣") {
       const newEmbed1 = new CustomEmbed(message.member, "**bet** $" + bet.toLocaleString())
         .setHeader("blackjack", message.author.avatarURL())

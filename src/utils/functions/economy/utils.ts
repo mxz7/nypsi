@@ -11,13 +11,13 @@ import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { getTier, isPremium } from "../premium/premium";
 import { createProfile, hasProfile } from "../users/utils";
+import { setProgress } from "./achievements";
 import { calcMaxBet, getBalance, getMulti, updateBalance } from "./balance";
 import { getGuildByUser } from "./guilds";
 import { addInventoryItem } from "./inventory";
 import { getXp, updateXp } from "./xp";
 import ms = require("ms");
 import dayjs = require("dayjs");
-import { setProgress } from "./achievements";
 
 let items: { [key: string]: Item };
 let achievements: { [key: string]: AchievementData };
@@ -301,8 +301,10 @@ export async function reset() {
   await prisma.economyGuildMember.deleteMany();
   await prisma.economyGuild.deleteMany();
   await prisma.auction.deleteMany();
+  await prisma.economyWorkerUpgrades.deleteMany();
   await prisma.economyWorker.deleteMany();
   await prisma.inventory.deleteMany();
+  await prisma.crafting.deleteMany();
 
   await prisma.economy.deleteMany({
     where: {
@@ -313,7 +315,13 @@ export async function reset() {
   const deleted = await prisma.economy
     .deleteMany({
       where: {
-        AND: [{ prestige: 0 }, { lastVote: { lt: new Date(Date.now() - ms("12 hours")) } }, { dailyStreak: { lt: 2 } }],
+        AND: [
+          { prestige: 0 },
+          { lastVote: { lt: new Date(Date.now() - ms("12 hours")) } },
+          { dailyStreak: { lt: 2 } },
+          { auction_watch: { isEmpty: true } },
+          {},
+        ],
       },
     })
     .then((r) => r.count);
@@ -348,6 +356,7 @@ export async function reset() {
     await redis.del(`economy:handcuffed:${user.userId}`);
     await redis.del(`${Constants.redis.cache.economy.GUILD_USER}:${user.userId}`);
     await redis.del(`${Constants.redis.cache.economy.NETWORTH}:${user.userId}`);
+    await redis.del(`${Constants.redis.nypsi.STEVE_EARNED}:${user.userId}`);
   }
 
   return updated + deleted;

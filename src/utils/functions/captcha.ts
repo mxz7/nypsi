@@ -1,12 +1,15 @@
 import { CaptchaGenerator } from "captcha-canvas";
-import { GuildMember, WebhookClient } from "discord.js";
+import { CommandInteraction, GuildMember, Message, WebhookClient } from "discord.js";
 import * as crypto from "node:crypto";
 import redis from "../../init/redis";
-import { getTimestamp } from "../logger";
-import ms = require("ms");
+import { NypsiCommandInteraction } from "../../models/Command";
+import { CustomEmbed } from "../../models/EmbedBuilders";
 import Constants from "../Constants";
+import { getTimestamp, logger } from "../logger";
+import ms = require("ms");
 
 const locked: string[] = [];
+const beingVerified = new Set<string>();
 
 const colors = ["deeppink", "green", "red", "blue"];
 
@@ -82,4 +85,70 @@ export async function failedCaptcha(member: GuildMember) {
       member.user.id
     )})`
   );
+}
+
+export async function verifyUser(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
+  if (beingVerified.has(message.author.id)) return;
+
+  const { captcha, text } = await createCaptcha();
+
+  const embed = new CustomEmbed(message.member).setTitle("you have been locked");
+
+  embed.setDescription(
+    "please note that using macros / auto typers is not allowed with nypsi\n\nplease type the following:"
+  );
+
+  embed.setImage("attachment://captcha.png");
+
+  beingVerified.add(message.author.id);
+
+  await message.channel.send({
+    content: message.author.toString(),
+    embeds: [embed],
+    files: [
+      {
+        attachment: captcha,
+        name: "captcha.png",
+      },
+    ],
+  });
+
+  logger.info(`sent captcha (${message.author.id}) - awaiting reply`);
+
+  const filter = (m: Message) => m.author.id == message.author.id;
+
+  let fail = false;
+
+  const response = await message.channel
+    .awaitMessages({ filter, max: 1, time: 30000, errors: ["time"] })
+    .then(async (collected) => {
+      return collected.first();
+    })
+    .catch(() => {
+      fail = true;
+      logger.info(`captcha (${message.author.id}) failed`);
+      failedCaptcha(message.member);
+      message.channel.send({
+        content: message.author.toString() + " captcha failed, please **type** the letter/number combination shown",
+      });
+    });
+
+  beingVerified.delete(message.author.id);
+
+  if (fail) return;
+  if (!response) return;
+
+  if (response.content.toLowerCase() == text) {
+    logger.info(`captcha (${message.author.id}) passed`);
+    passedCaptcha(message.member);
+    toggleLock(message.author.id);
+    return response.react("✅");
+  } else {
+    logger.info(`${message.guild} - ${message.author.tag}: ${message.content}`);
+    logger.info(`captcha (${message.author.id}) failed`);
+    failedCaptcha(message.member);
+    return message.channel.send({
+      content: message.author.toString() + " captcha failed, please **type** the letter/number combination shown",
+    });
+  }
 }
