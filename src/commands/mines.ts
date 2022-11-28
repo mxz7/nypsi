@@ -1,6 +1,7 @@
 import { variants } from "@catppuccin/palette";
 import {
   ActionRowBuilder,
+  APIApplicationCommandOptionChoice,
   BaseMessageOptions,
   ButtonBuilder,
   ButtonStyle,
@@ -33,12 +34,24 @@ const games = new Map<
     grid: string[];
     id: number;
     voted: number;
+    increment: number;
   }
 >();
 
 const abcde = new Map<string, number>();
 const possibleLetters = ["a", "b", "c", "d", "e"];
 const possibleNumbers = ["1", "2", "3", "4", "5"];
+const mineIncrements = new Map<number, number>([
+  [2, 0.15],
+  [3, 0.25],
+  [4, 0.3],
+  [5, 0.4],
+  [6, 0.5],
+  [7, 0.55],
+  [10, 0.75],
+  [15, 1],
+  [20, 2],
+]);
 
 abcde.set("a", 0);
 abcde.set("b", 1);
@@ -49,9 +62,18 @@ abcde.set("e", 4);
 const cmd = new Command("mines", "play mines", Categories.MONEY).setAliases(["minesweeper", "ms"]);
 
 cmd.slashEnabled = true;
-cmd.slashData.addStringOption((option) =>
-  option.setName("bet").setDescription("how much would you like to bet").setRequired(false)
-);
+cmd.slashData
+  .addStringOption((option) => option.setName("bet").setDescription("how much would you like to bet").setRequired(false))
+  .addIntegerOption((option) =>
+    option
+      .setName("mine-count")
+      .setDescription("how many mines do you want in your game")
+      .setChoices(
+        ...(Array.from(mineIncrements.keys()).map((n) => {
+          return { name: n.toString(), value: n };
+        }) as APIApplicationCommandOptionChoice<number>[])
+      )
+  );
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (!(await userExists(message.member))) await createUser(message.member);
@@ -90,11 +112,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (args.length == 0 && !defaultBet) {
     const embed = new CustomEmbed(message.member)
       .setHeader("mines help")
-      .addField("usage", `${prefix}ms <bet>`)
+      .addField("usage", `${prefix}mines <bet> (mines)`)
       .addField(
         "game rules",
         "a 5x5 grid of white squares will be created\n" +
-          "once youve chosen your square, it will become green if there was no mine, if there was, you will lose your bet"
+          "once youve chosen your square, it will become green if there was no mine, if there was, you will lose your bet\n" +
+          "if you don't choose an amount of mines, you will be given 3-6 mines, giving you 0.5x per square"
       );
 
     return send({ embeds: [embed] });
@@ -120,6 +143,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({
       embeds: [
         new ErrorEmbed(`your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`),
+      ],
+    });
+  }
+
+  let chosenMinesCount = parseInt(args[1]);
+
+  if (!chosenMinesCount) {
+    chosenMinesCount = 0;
+  } else if (!mineIncrements.has(chosenMinesCount)) {
+    return send({
+      embeds: [
+        new ErrorEmbed(`you cannot use this amount of mines\nallowed: ${Array.from(mineIncrements.keys()).join(", ")}`),
       ],
     });
   }
@@ -167,9 +202,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     "a",
   ];
 
-  const bombs = Math.floor(Math.random() * 3) + 3;
+  let bombCount: number;
+  let incrementAmount = 0.5;
 
-  for (let i = 0; i < bombs; i++) {
+  if (chosenMinesCount == 0) {
+    bombCount = Math.floor(Math.random() * 3) + 3;
+  } else {
+    bombCount = chosenMinesCount;
+    incrementAmount = mineIncrements.get(bombCount);
+  }
+
+  for (let i = 0; i < bombCount; i++) {
     const num = Math.floor(Math.random() * 25);
 
     if (grid[num] != "b") {
@@ -187,6 +230,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     grid: grid,
     id: id,
     voted: voteMulti,
+    increment: incrementAmount,
   });
 
   const embed = new CustomEmbed(message.member, "**bet** $" + bet.toLocaleString() + "\n**0**x ($0)").setHeader(
@@ -281,6 +325,7 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
   const bet = games.get(message.author.id).bet;
   let win = games.get(message.author.id).win;
   const grid = games.get(message.author.id).grid;
+  const increment = games.get(message.author.id).increment;
 
   const embed = new CustomEmbed(message.member).setHeader("mines", message.author.avatarURL());
 
@@ -472,11 +517,7 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
     case "a":
       grid[location] = "c";
 
-      if (win < 3) {
-        win += 0.5;
-      } else {
-        win += 1;
-      }
+      win += increment;
 
       games.set(message.author.id, {
         bet: bet,
@@ -484,6 +525,7 @@ async function playGame(message: Message | (NypsiCommandInteraction & CommandInt
         grid: grid,
         id: games.get(message.author.id).id,
         voted: games.get(message.author.id).voted,
+        increment,
       });
 
       embed.setDescription(
