@@ -343,7 +343,7 @@ async function playGame(
       await res.deferUpdate();
       logger.log({
         level: "cmd",
-        message: `${message.guild} - ${message.author.tag}: replaying highlow`,
+        message: `${message.guild.id} - ${message.author.tag}: replaying highlow`,
       });
       return prepareGame(message, args, m);
     }
