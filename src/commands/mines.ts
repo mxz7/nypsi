@@ -445,7 +445,7 @@ async function playGame(
       await res.deferUpdate();
       logger.log({
         level: "cmd",
-        message: `${message.guild} - ${message.author.tag}: replaying mines`,
+        message: `${message.guild.id} - ${message.author.tag}: replaying mines`,
       });
       return prepareGame(message, args, msg);
     }
