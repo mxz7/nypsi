@@ -38,7 +38,7 @@ const games = new Map<
   }
 >();
 
-const GEM_EMOJI = "<:nypsi_gem:1046854542047850556>";
+const GEM_EMOJI = "<:nypsi_gem_green:1046866209326514206>";
 const abcde = new Map<string, number>();
 const possibleLetters = ["a", "b", "c", "d", "e"];
 const possibleNumbers = ["1", "2", "3", "4", "5"];
