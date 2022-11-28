@@ -91,7 +91,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         WordleStats: true,
         Auction: true,
         CommandUse: true,
-        Survey: true,
         Achievements: true,
         DMSettings: true,
       },

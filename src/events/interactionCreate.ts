@@ -22,13 +22,9 @@ import Constants from "../utils/Constants";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
 import { addInventoryItem, getInventory } from "../utils/functions/economy/inventory";
 import { createUser, getAchievements, getItems, isEcoBanned, userExists } from "../utils/functions/economy/utils";
-import { claimFromWorkers } from "../utils/functions/economy/workers";
-import { getChatFilter } from "../utils/functions/guilds/filters";
 import { getKarma } from "../utils/functions/karma/karma";
 import { getKarmaShopItems, isKarmaShopOpen } from "../utils/functions/karma/karmashop";
 import requestDM from "../utils/functions/requestdm";
-import { cleanString } from "../utils/functions/string";
-import { getSurveyByMessageId } from "../utils/functions/surveys";
 import { addToNypsiBank, getTax } from "../utils/functions/tax";
 import { getDmSettings } from "../utils/functions/users/notifications";
 import { runCommand } from "../utils/handlers/commandhandler";
@@ -384,114 +380,6 @@ export default async function interactionCreate(interaction: Interaction) {
         await interaction.reply({ embeds: [new ErrorEmbed("invalid auction")], ephemeral: true });
         await interaction.message.delete();
       }
-    } else if (interaction.customId == "a") {
-      const survey = await getSurveyByMessageId(interaction.message.id);
-
-      if (!survey) {
-        return await interaction
-          .reply({
-            embeds: [new ErrorEmbed("this survey no longer exists")],
-            ephemeral: true,
-          })
-          .catch(() => {});
-      }
-
-      const hasResponed = await prisma.surveyData.findUnique({
-        where: {
-          userId_surveyId: {
-            surveyId: survey.id,
-            userId: interaction.user.id,
-          },
-        },
-      });
-
-      if (hasResponed) {
-        return await interaction.reply({
-          embeds: [new ErrorEmbed("you have already answered to this survey")],
-          ephemeral: true,
-        });
-      }
-
-      const modal = new ModalBuilder().setCustomId("survey-answer").setTitle("answer survey");
-
-      let label = survey.surveyText;
-
-      if (label.length > 45) {
-        label = label.substring(0, 40) + "...";
-      }
-
-      modal.addComponents(
-        new ActionRowBuilder<TextInputBuilder>().addComponents(
-          new TextInputBuilder()
-            .setCustomId("answer")
-            .setLabel(label)
-            .setStyle(TextInputStyle.Short)
-            .setRequired(true)
-            .setMaxLength(50)
-        )
-      );
-
-      await interaction.showModal(modal);
-
-      const filter = (i: Interaction) => i.user.id == interaction.user.id;
-
-      const res = await interaction.awaitModalSubmit({ filter, time: 120000 }).catch(() => {});
-
-      if (!res) return;
-
-      const descFilter = ["nigger", "nigga", "faggot", "fag", "nig", "ugly", "discordgg", "discordcom", "discordappcom"];
-
-      const value = cleanString(res.fields.getTextInputValue("answer").toLowerCase().normalize("NFD"));
-
-      for (const word of descFilter) {
-        if (value.includes(word)) return res.reply({ embeds: [new ErrorEmbed("your response had a filtered word")] });
-      }
-
-      const serverFilter = await getChatFilter(interaction.guild);
-
-      for (const word of serverFilter) {
-        if (value.includes(word)) return res.reply({ embeds: [new ErrorEmbed("your response had a filtered word")] });
-      }
-
-      logger.debug(`survey response ${interaction.user.tag}: ${value}`);
-
-      await prisma.surveyData
-        .create({
-          data: {
-            userId: interaction.user.id,
-            value: value,
-            surveyId: survey.id,
-          },
-        })
-        .catch(() => {});
-
-      await res.reply({
-        embeds: [new CustomEmbed(res.member as GuildMember, "✅ your answer has been taken")],
-        ephemeral: true,
-      });
-
-      const embed = new CustomEmbed();
-
-      embed.setColor(interaction.message.embeds[0].color);
-      embed.setHeader(interaction.message.embeds[0].author.name, interaction.message.embeds[0].author.iconURL);
-      embed.setDescription(
-        `${survey.surveyText}\n\n\`${(survey.SurveyData.length + 1).toLocaleString()}\` answers\nends <t:${Math.floor(
-          survey.resultsAt.getTime() / 1000
-        )}:R>`
-      );
-
-      return await interaction.message.edit({ embeds: [embed] }).catch(() => {});
-    } else if (interaction.customId == "w-claim") {
-      if (await isEcoBanned(interaction.user.id)) return;
-      const desc = await claimFromWorkers(interaction.user.id);
-
-      const embed = new CustomEmbed()
-        .setDescription(desc)
-        .setColor(Constants.EMBED_SUCCESS_COLOR)
-        .setHeader("workers", interaction.user.avatarURL())
-        .disableFooter();
-
-      return interaction.reply({ embeds: [embed] });
     }
   }
 
