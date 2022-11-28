@@ -18,7 +18,7 @@ import redis from "../../init/redis";
 import { NypsiClient } from "../../models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../models/EmbedBuilders";
-import { createCaptcha, failedCaptcha, isLockedOut, passedCaptcha, toggleLock } from "../functions/captcha";
+import { isLockedOut, toggleLock, verifyUser } from "../functions/captcha";
 import { formatDate, MStoTime } from "../functions/date";
 import { getNews, hasSeenNews } from "../functions/news";
 import { getTimestamp, logger } from "../logger";
@@ -49,8 +49,6 @@ const commandUses = new Map<string, number>();
 const karmaCooldown = new Set<string>();
 const xpCooldown = new Set<string>();
 const cooldown = new Set<string>();
-
-const beingChecked: string[] = [];
 
 let commandsSize = 0;
 let aliasesSize = 0;
@@ -609,76 +607,11 @@ export async function runCommand(
     }
   }
 
-  // captcha check
+  logCommand(message, args);
 
   if (isLockedOut(message.author.id)) {
-    if (beingChecked.indexOf(message.author.id) != -1) return;
-
-    logCommand(message, args);
-
-    const { captcha, text } = await createCaptcha();
-
-    const embed = new CustomEmbed(message.member).setTitle("you have been locked");
-
-    embed.setDescription(
-      "please note that using macros / auto typers is not allowed with nypsi\n\nplease type the following:"
-    );
-
-    embed.setImage("attachment://captcha.png");
-
-    beingChecked.push(message.author.id);
-
-    await message.channel.send({
-      embeds: [embed],
-      files: [
-        {
-          attachment: captcha,
-          name: "captcha.png",
-        },
-      ],
-    });
-
-    logger.info(`sent captcha (${message.author.id}) - awaiting reply`);
-
-    const filter = (m: Message) => m.author.id == message.author.id;
-
-    let fail = false;
-
-    const response = await message.channel
-      .awaitMessages({ filter, max: 1, time: 30000, errors: ["time"] })
-      .then(async (collected) => {
-        return collected.first();
-      })
-      .catch(() => {
-        fail = true;
-        logger.info(`captcha (${message.author.id}) failed`);
-        failedCaptcha(message.member);
-        message.channel.send({
-          content: message.author.toString() + " captcha failed, please **type** the letter/number combination shown",
-        });
-      });
-
-    beingChecked.splice(beingChecked.indexOf(message.author.id), 1);
-
-    if (fail) return;
-    if (!response) return;
-
-    if (response.content.toLowerCase() == text) {
-      logger.info(`captcha (${message.author.id}) passed`);
-      passedCaptcha(message.member);
-      toggleLock(message.author.id);
-      return response.react("✅");
-    } else {
-      logger.info(`${message.guild} - ${message.author.tag}: ${message.content}`);
-      logger.info(`captcha (${message.author.id}) failed`);
-      failedCaptcha(message.member);
-      return message.channel.send({
-        content: message.author.toString() + " captcha failed, please **type** the letter/number combination shown",
-      });
-    }
+    return verifyUser(message);
   }
-
-  logCommand(message, args);
 
   let command: Command;
 
