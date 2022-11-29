@@ -1,4 +1,5 @@
 import { variants } from "@catppuccin/palette";
+import { randomInt } from "crypto";
 import {
   ActionRowBuilder,
   APIApplicationCommandOptionChoice,
@@ -293,7 +294,7 @@ async function prepareGame(
   }
 
   for (let i = 0; i < bombCount; i++) {
-    const num = Math.floor(Math.random() * 24);
+    const num = randomInt(24);
 
     if (grid[num] != "b") {
       grid[num] = "b";
@@ -302,14 +303,14 @@ async function prepareGame(
     }
   }
 
-  const spawnGem = Math.floor(Math.random() * 10);
+  const spawnGem = randomInt(10);
 
   if (spawnGem < 3) {
     let passes = 0;
     let achieved = false;
 
     while (passes < 25 && !achieved) {
-      const index = Math.floor(Math.random() * grid.length - 1);
+      const index = randomInt(grid.length - 1);
 
       if (grid[index] != "b") {
         grid[index] = "g";
