@@ -5,6 +5,7 @@ import Constants from "../../Constants";
 import { getRequiredBetForXp } from "./balance";
 import { getBoosters } from "./boosters";
 import { getGuildByUser } from "./guilds";
+import { getInventory } from "./inventory";
 import { getPrestige } from "./prestige";
 import { getItems } from "./utils";
 
@@ -63,12 +64,26 @@ export async function calcMinimumEarnedXp(member: GuildMember): Promise<number> 
   let max = 10;
 
   const guild = await getGuildByUser(member);
+  const inventory = await getInventory(member);
 
   if (guild) {
     max += guild.level > 10 ? 10 : guild.level - 1;
   }
 
+  if (inventory.find((i) => i.item == "white_gem").amount > 0) {
+    const chance = Math.floor(Math.random() * 10);
+
+    if (chance < 2) {
+      max -= 2;
+    } else {
+      max += 7;
+    }
+  } else if (inventory.find((i) => i.item == "pink_gem").amount > 0) {
+    max += 1;
+  }
+
   if (earned > max) earned = max;
+  if (earned < 0) earned = 0;
 
   return Math.floor(earned);
 }
