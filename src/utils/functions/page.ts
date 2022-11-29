@@ -47,8 +47,8 @@ export default class PageManager<T> {
   public lastPage: number;
   public userId: string;
   public embed: CustomEmbed;
+  public updatePageFunc: (page: T[], embed: CustomEmbed) => CustomEmbed;
 
-  private updatePageFunc: (page: T[], embed: CustomEmbed) => CustomEmbed;
   private filter: (i: Interaction) => boolean;
   private handleResponses: Map<
     string,
