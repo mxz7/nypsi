@@ -70,7 +70,9 @@ export default class PageManager<T> {
 
     this.handleResponses = new Map();
 
+    // @ts-expect-error stupid
     this.handleResponses.set("⬅", this.back);
+    // @ts-expect-error stupid
     this.handleResponses.set("➡", this.next);
 
     if (opts.handleResponses) {
@@ -80,7 +82,8 @@ export default class PageManager<T> {
     }
   }
 
-  private async back(data: { manager: PageManager<T> }): Promise<void> {
+  private async back(data: { manager: PageManager<T>; interacton: ButtonInteraction }): Promise<void> {
+    await data.interacton.deferUpdate();
     if (data.manager.currentPage == 1) {
       return data.manager.listen();
     }
@@ -112,7 +115,8 @@ export default class PageManager<T> {
     return data.manager.listen();
   }
 
-  private async next(data: { manager: PageManager<T> }): Promise<void> {
+  private async next(data: { manager: PageManager<T>; interacton: ButtonInteraction }): Promise<void> {
+    await data.interacton.deferUpdate();
     if (data.manager.currentPage == data.manager.lastPage) {
       return data.manager.listen();
     }
@@ -153,8 +157,6 @@ export default class PageManager<T> {
       await this.message.edit({ components: [] });
       return;
     }
-
-    await res.deferUpdate();
 
     if (this.handleResponses.has(res.customId)) {
       return this.handleResponses.get(res.customId)({ manager: this, interaction: res });
