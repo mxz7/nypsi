@@ -230,7 +230,7 @@ async function handleKofiData(data: KofiResponse) {
             await addNotificationToQueue(payload);
           }
 
-          const gemChance = Math.floor(Math.random() * 150);
+          const gemChance = Math.floor(Math.random() * 77);
 
           if (gemChance == 7) {
             await addInventoryItem(user.id, "pink_gem", 1);
@@ -246,7 +246,7 @@ async function handleKofiData(data: KofiResponse) {
                 },
               });
             }
-          } else if (gemChance == 107) {
+          } else if (gemChance == 17) {
             await addInventoryItem(user.id, "blue_gem", 1);
             await addProgress(user.id, "gem_hunter", 1);
 
@@ -274,7 +274,7 @@ async function handleKofiData(data: KofiResponse) {
                 },
               });
             }
-          } else if (gemChance == 17) {
+          } else if (gemChance == 27) {
             await addInventoryItem(user.id, "green_gem", 1);
             await addProgress(user.id, "gem_hunter", 1);
 
@@ -284,6 +284,22 @@ async function handleKofiData(data: KofiResponse) {
                 payload: {
                   embed: new CustomEmbed()
                     .setDescription(`${getItems()["green_gem"].emoji} you've found a gem! i wonder what powers it holds...`)
+                    .setTitle("you've found a gem"),
+                },
+              });
+            }
+          } else if (gemChance == 57) {
+            const gemChance2 = Math.floor(Math.random() * 15);
+
+            if (gemChance2 == 7 && (await getDmSettings(user.id)).other) {
+              await addInventoryItem(user.id, "white_gem", 1);
+              await addProgress(user.id, "gem_hunter", 1);
+
+              await addNotificationToQueue({
+                memberId: user.id,
+                payload: {
+                  embed: new CustomEmbed()
+                    .setDescription(`${getItems()["white_gem"].emoji} you've found a gem! i wonder what powers it holds...`)
                     .setTitle("you've found a gem"),
                 },
               });
