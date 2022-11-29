@@ -1,5 +1,4 @@
-import { ActionRowBuilder, ButtonBuilder, MessageActionRowComponentBuilder } from "@discordjs/builders";
-import { ButtonStyle } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder } from "discord.js";
 import { parentPort } from "worker_threads";
 import prisma from "../../init/database";
 import redis from "../../init/redis";
