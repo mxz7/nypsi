@@ -8,20 +8,20 @@ import {
 } from "discord.js";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 
-interface PageManagerOptions {
+interface PageManagerOptions<T> {
   message: Message;
   row: ActionRowBuilder<MessageActionRowComponentBuilder>;
-  arr?: unknown[];
-  pages?: Map<number, unknown[]>;
+  arr?: T[];
+  pages?: Map<number, T[]>;
   pageLength?: number;
   embed: CustomEmbed;
   updateEmbed?: (page: any[], embed: CustomEmbed) => CustomEmbed;
   userId: string;
-  handleResponses?: Map<string, (data?: { manager: PageManager; interaction: ButtonInteraction }) => Promise<void>>;
-  onPageUpdate?: (manager: PageManager) => CustomEmbed;
+  handleResponses?: Map<string, (manager: PageManager<T>, interaction: ButtonInteraction) => Promise<void>>;
+  onPageUpdate?: (manager: PageManager<T>) => CustomEmbed;
 }
 
-export default class PageManager {
+export default class PageManager<T> {
   static createPages<T>(arr: T[], pageLength = 10): Map<number, T[]> {
     const map = new Map<number, T[]>();
 
@@ -40,20 +40,20 @@ export default class PageManager {
     return map;
   }
 
-  public pages: Map<number, unknown[]>;
+  public pages: Map<number, T[]>;
   public message: Message;
   public row: ActionRowBuilder<MessageActionRowComponentBuilder>;
   public currentPage = 1;
   public lastPage: number;
   public userId: string;
   public embed: CustomEmbed;
+  public updatePageFunc: (page: T[], embed: CustomEmbed) => CustomEmbed;
 
-  private updatePageFunc: (page: unknown[], embed: CustomEmbed) => CustomEmbed;
   private filter: (i: Interaction) => boolean;
-  private handleResponses: Map<string, (data?: { manager: PageManager; interaction: ButtonInteraction }) => Promise<void>>;
-  private onPageUpdate: (manager: PageManager) => CustomEmbed;
+  private handleResponses: Map<string, (manager: PageManager<T>, interaction: ButtonInteraction) => Promise<void>>;
+  private onPageUpdate: (manager: PageManager<T>) => CustomEmbed;
 
-  constructor(opts: PageManagerOptions) {
+  constructor(opts: PageManagerOptions<T>) {
     this.pages = opts.arr ? PageManager.createPages(opts.arr, opts.pageLength) : opts.pages;
     this.lastPage = this.pages.size;
     this.message = opts.message;
@@ -77,68 +77,64 @@ export default class PageManager {
     }
   }
 
-  private async back(data: { manager: PageManager }): Promise<void> {
-    if (data.manager.currentPage == 1) {
-      return data.manager.listen();
+  private async back(manager: PageManager<T>, interaction: ButtonInteraction): Promise<void> {
+    await interaction.deferUpdate();
+    if (manager.currentPage == 1) {
+      return manager.listen();
     }
 
-    data.manager.currentPage--;
+    manager.currentPage--;
 
-    if (data.manager.updatePageFunc) {
-      data.manager.embed = data.manager.updatePageFunc(data.manager.pages.get(data.manager.currentPage), data.manager.embed);
+    if (manager.updatePageFunc) {
+      manager.embed = manager.updatePageFunc(manager.pages.get(manager.currentPage), manager.embed);
     } else {
-      data.manager.embed = PageManager.defaultUpdateEmbed(
-        data.manager.pages.get(data.manager.currentPage),
-        data.manager.embed
-      );
+      manager.embed = PageManager.defaultUpdateEmbed(manager.pages.get(manager.currentPage), manager.embed);
     }
 
-    if (data.manager.onPageUpdate) {
-      data.manager.embed = data.manager.onPageUpdate(data.manager);
+    if (manager.onPageUpdate) {
+      manager.embed = manager.onPageUpdate(manager);
     }
 
-    if (data.manager.currentPage == 1) {
-      data.manager.row.components[0].setDisabled(true);
+    if (manager.currentPage == 1) {
+      manager.row.components[0].setDisabled(true);
     } else {
-      data.manager.row.components[0].setDisabled(false);
+      manager.row.components[0].setDisabled(false);
     }
 
-    data.manager.row.components[1].setDisabled(false);
+    manager.row.components[1].setDisabled(false);
 
-    await data.manager.message.edit({ embeds: [data.manager.embed], components: [data.manager.row] });
-    return data.manager.listen();
+    await manager.message.edit({ embeds: [manager.embed], components: [manager.row] });
+    return manager.listen();
   }
 
-  private async next(data: { manager: PageManager }): Promise<void> {
-    if (data.manager.currentPage == data.manager.lastPage) {
-      return data.manager.listen();
+  private async next(manager: PageManager<T>, interaction: ButtonInteraction): Promise<void> {
+    await interaction.deferUpdate();
+    if (manager.currentPage == manager.lastPage) {
+      return manager.listen();
     }
 
-    data.manager.currentPage++;
+    manager.currentPage++;
 
-    if (data.manager.updatePageFunc) {
-      data.manager.embed = data.manager.updatePageFunc(data.manager.pages.get(data.manager.currentPage), data.manager.embed);
+    if (manager.updatePageFunc) {
+      manager.embed = manager.updatePageFunc(manager.pages.get(manager.currentPage), manager.embed);
     } else {
-      data.manager.embed = PageManager.defaultUpdateEmbed(
-        data.manager.pages.get(data.manager.currentPage),
-        data.manager.embed
-      );
+      manager.embed = PageManager.defaultUpdateEmbed(manager.pages.get(manager.currentPage), manager.embed);
     }
 
-    if (data.manager.onPageUpdate) {
-      data.manager.embed = data.manager.onPageUpdate(data.manager);
+    if (manager.onPageUpdate) {
+      manager.embed = manager.onPageUpdate(manager);
     }
 
-    if (data.manager.currentPage == data.manager.lastPage) {
-      data.manager.row.components[1].setDisabled(true);
+    if (manager.currentPage == manager.lastPage) {
+      manager.row.components[1].setDisabled(true);
     } else {
-      data.manager.row.components[1].setDisabled(false);
+      manager.row.components[1].setDisabled(false);
     }
 
-    data.manager.row.components[0].setDisabled(false);
+    manager.row.components[0].setDisabled(false);
 
-    await data.manager.message.edit({ embeds: [data.manager.embed], components: [data.manager.row] });
-    return data.manager.listen();
+    await manager.message.edit({ embeds: [manager.embed], components: [manager.row] });
+    return manager.listen();
   }
 
   public async listen(): Promise<void> {
@@ -151,14 +147,12 @@ export default class PageManager {
       return;
     }
 
-    await res.deferUpdate();
-
     if (this.handleResponses.has(res.customId)) {
-      return this.handleResponses.get(res.customId)({ manager: this, interaction: res });
+      return this.handleResponses.get(res.customId)(this, res);
     }
   }
 
-  private static defaultUpdateEmbed(page: unknown[], embed: CustomEmbed): CustomEmbed {
+  private static defaultUpdateEmbed(page: any[], embed: CustomEmbed): CustomEmbed {
     embed.setDescription(page.join("\n"));
 
     return embed;
