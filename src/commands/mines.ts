@@ -678,10 +678,9 @@ async function playGame(
     case "a":
       if (grid[location] == "a") {
         grid[location] = "c";
-        win += increment;
       } else {
         grid[location] = "gc";
-        win += increment + 3;
+        win += 4;
 
         const caught = Math.floor(Math.random() * 50);
 
@@ -709,6 +708,8 @@ async function playGame(
           });
         }
       }
+
+      win += increment;
 
       games.set(message.author.id, {
         bet: bet,
