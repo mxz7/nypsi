@@ -650,13 +650,12 @@ async function playGame(
         return;
       }
 
-      const newEmbed1 = new CustomEmbed(message.member, "**bet** $" + bet.toLocaleString())
-        .setHeader("blackjack", message.author.avatarURL())
-        .addField("dealer", `| ${games.get(message.member.user.id).dealerCards[0]} |`)
-        .addField(message.author.username, getCards(message.member) + " **" + calcTotal(message.member) + "**");
-      await edit({ embeds: [newEmbed1] });
-
       if (calcTotal(message.member) == 21) {
+        const newEmbed1 = new CustomEmbed(message.member, "**bet** $" + bet.toLocaleString())
+          .setHeader("blackjack", message.author.avatarURL())
+          .addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
+          .addField(message.author.username, getCards(message.member) + " **" + calcTotal(message.member) + "**");
+        await edit({ embeds: [newEmbed1], components: [] });
         setTimeout(() => {
           dealerPlay(message);
 
@@ -677,6 +676,12 @@ async function playGame(
           }
         }, 1500);
         return;
+      } else {
+        const newEmbed1 = new CustomEmbed(message.member, "**bet** $" + bet.toLocaleString())
+          .setHeader("blackjack", message.author.avatarURL())
+          .addField("dealer", `| ${games.get(message.member.user.id).dealerCards[0]} |`)
+          .addField(message.author.username, getCards(message.member) + " **" + calcTotal(message.member) + "**");
+        await edit({ embeds: [newEmbed1] });
       }
 
       return playGame(message, m, args);
@@ -685,7 +690,7 @@ async function playGame(
         .setHeader("blackjack", message.author.avatarURL())
         .addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
         .addField(message.author.username, getCards(message.member) + " **" + calcTotal(message.member) + "**");
-      edit({ embeds: [newEmbed1] });
+      edit({ embeds: [newEmbed1], components: [] });
 
       games.set(message.member.user.id, {
         bet: bet,
@@ -739,7 +744,7 @@ async function playGame(
         .setHeader("blackjack", message.author.avatarURL())
         .addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
         .addField(message.author.username, getCards(message.member) + " **" + calcTotal(message.member) + "**");
-      edit({ embeds: [newEmbed1] });
+      await edit({ embeds: [newEmbed1], components: [] });
 
       if (calcTotal(message.member) > 21) {
         setTimeout(() => {
