@@ -304,7 +304,7 @@ async function prepareGame(
 
   const spawnGem = Math.floor(Math.random() * 10);
 
-  if (spawnGem < 2) {
+  if (spawnGem < 3) {
     let passes = 0;
     let achieved = false;
 
