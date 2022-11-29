@@ -15,19 +15,19 @@ import {
 } from "discord.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
-import Constants from "../utils/Constants.js";
+import Constants from "../utils/Constants";
 import { a } from "../utils/functions/anticheat";
 import { isLockedOut, verifyUser } from "../utils/functions/captcha";
 import { calcMaxBet, getBalance, getDefaultBet, getMulti, updateBalance } from "../utils/functions/economy/balance.js";
-import { addToGuildXP, getGuildByUser } from "../utils/functions/economy/guilds.js";
-import { addGamble } from "../utils/functions/economy/stats.js";
+import { addToGuildXP, getGuildByUser } from "../utils/functions/economy/guilds";
+import { addGamble } from "../utils/functions/economy/stats";
 import { createUser, formatBet, userExists } from "../utils/functions/economy/utils.js";
-import { calcEarnedXp, getXp, updateXp } from "../utils/functions/economy/xp.js";
+import { calcEarnedXp, getXp, updateXp } from "../utils/functions/economy/xp";
 import { isPremium } from "../utils/functions/premium/premium";
 import { shuffle } from "../utils/functions/random";
 import { addHourlyCommand } from "../utils/handlers/commandhandler";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
-import { gamble, logger } from "../utils/logger.js";
+import { gamble, logger } from "../utils/logger";
 
 const games = new Map<
   string,
@@ -274,7 +274,14 @@ async function prepareGame(
 
   const embed = new CustomEmbed(message.member, "**bet** $" + bet.toLocaleString())
     .setHeader("blackjack", message.author.avatarURL())
-    .addField("dealer", `| ${games.get(message.member.user.id).dealerCards[0]} |`)
+    .addField(
+      "dealer",
+      `${
+        calcTotal(message.member) == 21
+          ? `${getDealerCards(message.member)} **${calcTotalDealer(message.member)}**`
+          : `| s${games.get(message.member.user.id).dealerCards[0]} |`
+      }`
+    )
     .addField(message.author.username, getCards(message.member) + " **" + calcTotal(message.member) + "**");
 
   let row;
@@ -291,6 +298,8 @@ async function prepareGame(
       new ButtonBuilder().setCustomId("2️⃣").setLabel("stand").setStyle(ButtonStyle.Primary)
     );
   }
+
+  if (calcTotal(message.member) == 21) row.components.forEach((c) => c.setDisabled(true));
 
   if (msg) {
     await msg.edit({ embeds: [embed], components: [row] });
@@ -650,12 +659,19 @@ async function playGame(
         return;
       }
 
+      const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder().setCustomId("1️⃣").setLabel("hit").setStyle(ButtonStyle.Primary),
+        new ButtonBuilder().setCustomId("2️⃣").setLabel("stand").setStyle(ButtonStyle.Primary)
+      );
+
       if (calcTotal(message.member) == 21) {
         const newEmbed1 = new CustomEmbed(message.member, "**bet** $" + bet.toLocaleString())
           .setHeader("blackjack", message.author.avatarURL())
           .addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
           .addField(message.author.username, getCards(message.member) + " **" + calcTotal(message.member) + "**");
-        await edit({ embeds: [newEmbed1], components: [] });
+
+        row.components.forEach((c) => c.setDisabled(true));
+        await edit({ embeds: [newEmbed1], components: [row] });
         setTimeout(() => {
           dealerPlay(message);
 
@@ -681,16 +697,22 @@ async function playGame(
           .setHeader("blackjack", message.author.avatarURL())
           .addField("dealer", `| ${games.get(message.member.user.id).dealerCards[0]} |`)
           .addField(message.author.username, getCards(message.member) + " **" + calcTotal(message.member) + "**");
-        await edit({ embeds: [newEmbed1] });
+        await edit({ embeds: [newEmbed1], components: [row] });
       }
 
       return playGame(message, m, args);
     } else if (reaction == "2️⃣") {
+      const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder().setCustomId("1️⃣").setLabel("hit").setStyle(ButtonStyle.Primary).setDisabled(true),
+        new ButtonBuilder().setCustomId("2️⃣").setLabel("stand").setStyle(ButtonStyle.Primary).setDisabled(true)
+      );
+
       const newEmbed1 = new CustomEmbed(message.member, "**bet** $" + bet.toLocaleString())
         .setHeader("blackjack", message.author.avatarURL())
         .addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
         .addField(message.author.username, getCards(message.member) + " **" + calcTotal(message.member) + "**");
-      edit({ embeds: [newEmbed1], components: [] });
+
+      await edit({ embeds: [newEmbed1], components: [row] });
 
       games.set(message.member.user.id, {
         bet: bet,
