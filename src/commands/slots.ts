@@ -220,7 +220,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     } else if (!two) {
       two = shuffled[randomInt(shuffled.length)];
     } else if (!three) {
-      two = shuffled[randomInt(shuffled.length)];
+      three = shuffled[randomInt(shuffled.length)];
     }
   }
 
