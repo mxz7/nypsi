@@ -1,3 +1,4 @@
+import { randomInt } from "crypto";
 import {
   BaseMessageOptions,
   CommandInteraction,
@@ -17,6 +18,7 @@ import { addGamble } from "../utils/functions/economy/stats.js";
 import { createUser, formatBet, userExists } from "../utils/functions/economy/utils.js";
 import { calcEarnedXp, getXp, updateXp } from "../utils/functions/economy/xp.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
+import { shuffle } from "../utils/functions/random";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 import { gamble } from "../utils/logger.js";
 
@@ -53,7 +55,9 @@ const multipliers = {
   melon: 1.5,
 };
 
-const reel1 = [
+const reels = new Map<number, string[]>();
+
+reels.set(1, [
   "melon-1",
   "melon-1",
   "melon-1",
@@ -70,8 +74,9 @@ const reel1 = [
   "lemon-1",
   "lemon-1",
   "cherry-1",
-];
-const reel2 = [
+]);
+
+reels.set(1, [
   "melon-2",
   "melon-2",
   "melon-2",
@@ -91,8 +96,8 @@ const reel2 = [
   "lemon-2",
   "cherry-2",
   "cherry-2",
-];
-const reel3 = [
+]);
+reels.set(3, [
   "melon-3",
   "melon-3",
   "melon-3",
@@ -111,7 +116,7 @@ const reel3 = [
   "lemon-3",
   "cherry-3",
   "cherry-3",
-];
+]);
 
 const cmd = new Command("slots", "play slots", Categories.MONEY).setAliases(["bet", "slot"]);
 
@@ -204,9 +209,20 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   await addCooldown(cmd.name, message.member, 10);
 
-  let one = reel1[Math.floor(Math.random() * reel1.length)];
-  const two = reel2[Math.floor(Math.random() * reel2.length)];
-  let three = reel3[Math.floor(Math.random() * reel3.length)];
+  let one: string;
+  let two: string;
+  let three: string;
+
+  for (const arr of reels.values()) {
+    const shuffled = shuffle(arr);
+    if (!one) {
+      one = shuffled[randomInt(shuffled.length)];
+    } else if (!two) {
+      two = shuffled[randomInt(shuffled.length)];
+    } else if (!three) {
+      two = shuffled[randomInt(shuffled.length)];
+    }
+  }
 
   const boosters = await getBoosters(message.member);
 
