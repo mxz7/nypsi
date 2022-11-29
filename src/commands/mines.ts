@@ -14,6 +14,7 @@ import {
   MessageActionRowComponentBuilder,
   MessageEditOptions,
 } from "discord.js";
+import redis from "../init/redis.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command.js";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants.js";
@@ -488,12 +489,12 @@ async function playGame(
         level: "cmd",
         message: `${message.guild.id} - ${message.author.tag}: replaying mines`,
       });
+      if (isLockedOut(message.author.id)) return verifyUser(message);
 
       addHourlyCommand(message.member);
 
+      await redis.hincrby(Constants.redis.nypsi.TOP_COMMANDS_ANALYTICS, "mines", 1);
       await a(message.author.id, message.author.tag, message.content);
-
-      if (isLockedOut(message.author.id)) return verifyUser(message);
 
       return prepareGame(message, args, msg);
     }
