@@ -21,6 +21,7 @@ import { isLockedOut, verifyUser } from "../utils/functions/captcha.js";
 import { addProgress } from "../utils/functions/economy/achievements.js";
 import { calcMaxBet, getBalance, getDefaultBet, getMulti, updateBalance } from "../utils/functions/economy/balance.js";
 import { addToGuildXP, getGuildByUser } from "../utils/functions/economy/guilds.js";
+import { addInventoryItem } from "../utils/functions/economy/inventory.js";
 import { addGamble } from "../utils/functions/economy/stats.js";
 import { createUser, formatBet, userExists } from "../utils/functions/economy/utils.js";
 import { calcEarnedXp, getXp, updateXp } from "../utils/functions/economy/xp.js";
@@ -681,10 +682,31 @@ async function playGame(
       } else {
         grid[location] = "gc";
         win += 3;
-        await response.followUp({
-          embeds: [new CustomEmbed(message.member, `${GEM_EMOJI} you found a **gem**!!\n+**3**x`)],
-          ephemeral: true,
-        });
+
+        const caught = Math.floor(Math.random() * 50);
+
+        if (caught == 7) {
+          await addInventoryItem(message.member, "green_gem", 1);
+          await response.followUp({
+            embeds: [
+              new CustomEmbed(
+                message.member,
+                `${GEM_EMOJI} you found a **gem**!!\nit has been added to your inventory, i wonder what powers it has`
+              ),
+            ],
+            ephemeral: true,
+          });
+        } else {
+          await response.followUp({
+            embeds: [
+              new CustomEmbed(
+                message.member,
+                `${GEM_EMOJI} you found a **gem**!!\n+unfortunately you dropped it and it shattered. maybe next time`
+              ),
+            ],
+            ephemeral: true,
+          });
+        }
       }
 
       games.set(message.author.id, {
