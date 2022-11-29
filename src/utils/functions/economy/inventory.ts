@@ -20,7 +20,10 @@ type Inventory = {
   amount: number;
 }[];
 
-export async function getInventory(member: GuildMember | string, checkAchievement = false): Promise<Inventory> {
+export async function getInventory(
+  member: GuildMember | string,
+  checkAchievement = false
+): Promise<{ item: string; amount: number }[]> {
   let id: string;
   if (member instanceof GuildMember) {
     id = member.user.id;
