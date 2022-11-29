@@ -150,7 +150,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     pages,
     onPageUpdate(manager) {
       manager.embed.setFooter({
-        text: `page ${manager.currentPage}/${manager.lastPage}${currentFilter ? `| filter: ${currentFilter}` : ""}`,
+        text: `page ${manager.currentPage}/${manager.lastPage}${currentFilter ? ` | filter: ${currentFilter}` : ""}`,
       });
       return manager.embed;
     },
@@ -208,7 +208,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       manager.updatePageFunc(manager.pages.get(1), manager.embed);
       manager.currentPage = 1;
       manager.lastPage = manager.pages.size;
-      manager.embed.setFooter({ text: `page 1/${manager.lastPage}${currentFilter ? `| filter: ${currentFilter}` : ""}` });
+      manager.embed.setFooter({ text: `page 1/${manager.lastPage}${currentFilter ? ` | filter: ${currentFilter}` : ""}` });
 
       await manager.message.edit({
         embeds: [manager.embed],
