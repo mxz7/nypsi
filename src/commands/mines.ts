@@ -681,7 +681,7 @@ async function playGame(
         win += increment;
       } else {
         grid[location] = "gc";
-        win += 3;
+        win += increment + 3;
 
         const caught = Math.floor(Math.random() * 50);
 
