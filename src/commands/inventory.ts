@@ -25,7 +25,9 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 const cmd = new Command("inventory", "view items in your inventory", Categories.MONEY).setAliases(["inv"]);
 
 cmd.slashEnabled = true;
-cmd.slashData.addIntegerOption((option) => option.setName("page").setDescription("page number"));
+cmd.slashData.addStringOption((option) =>
+  option.setName("filter").setDescription("filter through your inventory with a search term")
+);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (!(await userExists(message.member))) await createUser(message.member);
