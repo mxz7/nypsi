@@ -1,11 +1,13 @@
 import { randomInt } from "crypto";
 
 export function shuffle<T>(array: T[]): T[] {
-  for (let i = array.length - 1; i > 0; i--) {
+  const arr = [...array];
+
+  for (let i = arr.length - 1; i > 0; i--) {
     const j = randomInt(i + 1);
-    const temp = array[i];
-    array[i] = array[j];
-    array[j] = temp;
+    const temp = arr[i];
+    arr[i] = arr[j];
+    arr[j] = temp;
   }
-  return array;
+  return arr;
 }
