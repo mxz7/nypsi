@@ -701,7 +701,7 @@ async function playGame(
             embeds: [
               new CustomEmbed(
                 message.member,
-                `${GEM_EMOJI} you found a **gem**!!\n+unfortunately you dropped it and it shattered. maybe next time`
+                `${GEM_EMOJI} you found a **gem**!!\nunfortunately you dropped it and it shattered. maybe next time`
               ),
             ],
             ephemeral: true,
