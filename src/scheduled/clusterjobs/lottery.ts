@@ -1,5 +1,6 @@
 import { variants } from "@catppuccin/palette";
 import { Client, ColorResolvable, User, WebhookClient } from "discord.js";
+import { randomInt } from "node:crypto";
 import prisma from "../../init/database";
 import redis from "../../init/redis";
 import { CustomEmbed } from "../../models/EmbedBuilders";
@@ -9,10 +10,10 @@ import { addProgress } from "../../utils/functions/economy/achievements";
 import { getBalance, updateBalance } from "../../utils/functions/economy/balance";
 import { addInventoryItem } from "../../utils/functions/economy/inventory";
 import { getItems, lotteryTicketPrice } from "../../utils/functions/economy/utils";
+import { shuffle } from "../../utils/functions/random";
 import { addToNypsiBank, getTax } from "../../utils/functions/tax";
 import { addNotificationToQueue, getDmSettings } from "../../utils/functions/users/notifications";
 import { logger } from "../../utils/logger";
-import shuffleArray = require("shuffle-array");
 import dayjs = require("dayjs");
 import ms = require("ms");
 
@@ -43,13 +44,13 @@ async function doLottery(client: Client) {
 
   const total = Math.floor(tickets.length * lotteryTicketPrice - taxedAmount);
 
-  const shuffledTickets = shuffleArray(tickets);
+  const shuffledTickets = shuffle(tickets);
 
   let chosen: LotteryTicket;
   let user: User;
 
   while (!user) {
-    chosen = shuffledTickets[Math.floor(Math.random() * shuffledTickets.length)];
+    chosen = shuffledTickets[randomInt(shuffledTickets.length)];
 
     logger.info(`winner: ${chosen.userId} with ticket #${chosen.id}`);
 
