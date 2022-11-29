@@ -2,6 +2,7 @@ import dayjs = require("dayjs");
 import prisma from "../../init/database";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 import Constants from "../../utils/Constants";
+import { addProgress } from "../../utils/functions/economy/achievements";
 import { addInventoryItem } from "../../utils/functions/economy/inventory";
 import { getItems } from "../../utils/functions/economy/utils";
 import { addNotificationToQueue, getDmSettings } from "../../utils/functions/users/notifications";
@@ -21,6 +22,8 @@ async function checkCraftItems() {
     });
 
     await addInventoryItem(item.userId, item.itemId, item.amount, false);
+
+    await addProgress(item.userId, "crafter", item.amount);
 
     if ((await getDmSettings(item.userId)).other) {
       await addNotificationToQueue({
