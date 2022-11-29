@@ -22,6 +22,7 @@ import Constants from "../utils/Constants";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
 import { addInventoryItem, getInventory } from "../utils/functions/economy/inventory";
 import { createUser, getAchievements, getItems, isEcoBanned, userExists } from "../utils/functions/economy/utils";
+import { claimFromWorkers } from "../utils/functions/economy/workers";
 import { getKarma } from "../utils/functions/karma/karma";
 import { getKarmaShopItems, isKarmaShopOpen } from "../utils/functions/karma/karmashop";
 import requestDM from "../utils/functions/requestdm";
@@ -388,6 +389,17 @@ export default async function interactionCreate(interaction: Interaction) {
         await interaction.reply({ embeds: [new ErrorEmbed("invalid auction")], ephemeral: true });
         await interaction.message.delete();
       }
+    } else if (interaction.customId == "w-claim") {
+      if (await isEcoBanned(interaction.user.id)) return;
+      const desc = await claimFromWorkers(interaction.user.id);
+
+      const embed = new CustomEmbed()
+        .setDescription(desc)
+        .setColor(Constants.EMBED_SUCCESS_COLOR)
+        .setHeader("workers", interaction.user.avatarURL())
+        .disableFooter();
+
+      return interaction.reply({ embeds: [embed] });
     }
   }
 

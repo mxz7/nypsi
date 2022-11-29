@@ -480,7 +480,7 @@ async function playGame(
     }
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder().setLabel("play again").setStyle(ButtonStyle.Secondary).setCustomId("rp")
+      new ButtonBuilder().setLabel("play again").setStyle(ButtonStyle.Success).setCustomId("rp")
     );
 
     await m.edit({ embeds: [embed], components: [row] });

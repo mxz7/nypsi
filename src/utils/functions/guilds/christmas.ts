@@ -38,7 +38,7 @@ export function runChristmas(client: NypsiClient) {
 
       if (!profile || !profile.channel) continue;
 
-      const channel = guild.channels.cache.find((c) => c.id == profile.channel);
+      const channel = await guild.channels.fetch(profile.channel);
 
       if (!channel) {
         logger.warn(`${guild.id}: couldn't find christmas channel`);

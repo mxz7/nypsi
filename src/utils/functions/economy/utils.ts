@@ -31,7 +31,7 @@ const lotteryTicketPrice = 15000;
  */
 export { lotteryTicketPrice };
 
-export function loadItems() {
+export function loadItems(crypto = true) {
   const itemsFile: any = fs.readFileSync("./data/items.json");
   const achievementsFile: any = fs.readFileSync("./data/achievements.json");
 
@@ -60,9 +60,11 @@ export function loadItems() {
   logger.info(`${Array.from(Object.keys(items)).length.toLocaleString()} economy items loaded`);
   logger.info(`${Object.keys(achievements).length.toLocaleString()} achievements loaded`);
 
-  setTimeout(() => {
-    updateCryptoWorth();
-  }, 50);
+  if (crypto) {
+    setTimeout(() => {
+      updateCryptoWorth();
+    }, 50);
+  }
 }
 
 function randomOffset() {

@@ -876,5 +876,40 @@
     "emoji": "<:Craft:615426524862087191>",
     "target": 10000,
     "description": "craft 10,000 items"
+  },
+  "gem_hunter_i": {
+    "id": "gem_hunter_i",
+    "name": "gem hunter **I**",
+    "emoji": "<:nypsi_gem_white:1046933670436552725>",
+    "target": 2,
+    "description": "find 2 gems"
+  },
+  "gem_hunter_ii": {
+    "id": "gem_hunter_ii",
+    "name": "gem hunter **II**",
+    "emoji": "<:nypsi_gem_white:1046933670436552725>",
+    "target": 10,
+    "description": "find 10 gems"
+  },
+  "gem_hunter_iii": {
+    "id": "gem_hunter_iii",
+    "name": "gem hunter **III**",
+    "emoji": "<:nypsi_gem_white:1046933670436552725>",
+    "target": 25,
+    "description": "find 25 gems"
+  },
+  "gem_hunter_iv": {
+    "id": "gem_hunter_iv",
+    "name": "gem hunter **IV**",
+    "emoji": "<:nypsi_gem_white:1046933670436552725>",
+    "target": 50,
+    "description": "find 50 gems"
+  },
+  "gem_hunter_v": {
+    "id": "gem_hunter_v",
+    "name": "gem hunter **V**",
+    "emoji": "<:nypsi_gem_white:1046933670436552725>",
+    "target": 100,
+    "description": "find 100 gems"
   }
 }
