@@ -147,7 +147,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         manager.embed.setFooter({ text: `page ${manager.currentPage}/${manager.lastPage}` });
         return manager.embed;
       },
-      handleResponses: new Map().set("❌", async (data: { manager: PageManager }) => {
+      handleResponses: new Map().set("❌", async (data: { manager: PageManager<string> }) => {
         await deleteUserMentions(data.manager.message.guild, manager.userId);
 
         embed.data.fields.length == 0;
