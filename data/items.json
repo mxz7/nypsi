@@ -1424,7 +1424,7 @@
     "name": "white gem",
     "emoji": "<:nypsi_gem_white:1046933670436552725>",
     "longDesc": "a mysterious white, shiny gem. the most ancient and most powerful of them all. ancient tablets claim that the holder of this gem has the power to create worlds. be careful.",
-    "role": "collectable",
+    "role": "item",
     "rarity": 69,
     "in_crates": false,
     "craft": {
