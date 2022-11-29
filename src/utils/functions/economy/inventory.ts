@@ -1,9 +1,12 @@
 import { GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
+import { Categories } from "../../../models/Command";
+import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { Item } from "../../../types/Economy";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
+import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { addProgress, getAllAchievements, setAchievementProgress } from "./achievements";
 import { getBalance, updateBalance } from "./balance";
 import { addItemUse } from "./stats";
@@ -405,4 +408,46 @@ export function selectItem(search: string) {
   }
 
   return selected;
+}
+
+export async function commandGemCheck(member: GuildMember, commandCategory: Categories) {
+  if (!(await userExists(member))) return;
+
+  if (commandCategory == Categories.MODERATION) {
+    const chance = Math.floor(Math.random() * 400);
+
+    if (chance == 7) {
+      await addInventoryItem(member, "pink_gem", 1);
+
+      if ((await getDmSettings(member)).other) {
+        await addNotificationToQueue({
+          memberId: member.user.id,
+          payload: {
+            embed: new CustomEmbed(
+              member,
+              `${getItems()["pink_gem"].emoji} you've found a gem! i wonder what powers it holds...`
+            ).setTitle("you've found a gem"),
+          },
+        });
+      }
+    }
+  } else if (commandCategory == Categories.ANIMALS || commandCategory == Categories.NSFW) {
+    const chance = Math.floor(Math.random() * 500);
+
+    if (chance == 77) {
+      await addInventoryItem(member, "purple_gem", 1);
+
+      if ((await getDmSettings(member)).other) {
+        await addNotificationToQueue({
+          memberId: member.user.id,
+          payload: {
+            embed: new CustomEmbed(
+              member,
+              `${getItems()["purple_gem"].emoji} you've found a gem! i wonder what powers it holds...`
+            ).setTitle("you've found a gem"),
+          },
+        });
+      }
+    }
+  }
 }
