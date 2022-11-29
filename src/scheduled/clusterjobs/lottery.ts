@@ -100,6 +100,7 @@ async function doLottery(client: Client) {
 
     if (gemChance == 17) {
       await addInventoryItem(user.id, "purple_gem", 1);
+      await addProgress(user.id, "gem_hunter", 1);
 
       if ((await getDmSettings(user.id)).other) {
         await addNotificationToQueue({
