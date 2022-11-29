@@ -1,4 +1,5 @@
 import { BaseMessageOptions, ChannelType, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
+import { randomInt } from "node:crypto";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { Item } from "../types/Economy";
@@ -409,7 +410,7 @@ cmd.setRun(run);
 module.exports = cmd;
 
 function getNewPosition(current: number, speed: number) {
-  const randomness = Math.floor(Math.random() * 12) - 4;
+  const randomness = randomInt(-4, 8);
 
   const movement = speed + randomness;
 
