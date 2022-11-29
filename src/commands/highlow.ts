@@ -13,6 +13,7 @@ import {
   MessageActionRowComponentBuilder,
   MessageEditOptions,
 } from "discord.js";
+import redis from "../init/redis.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command.js";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants.js";
@@ -372,12 +373,13 @@ async function playGame(
         level: "cmd",
         message: `${message.guild.id} - ${message.author.tag}: replaying highlow`,
       });
+      if (isLockedOut(message.author.id)) return verifyUser(message);
 
       addHourlyCommand(message.member);
 
       await a(message.author.id, message.author.tag, message.content);
 
-      if (isLockedOut(message.author.id)) return verifyUser(message);
+      await redis.hincrby(Constants.redis.nypsi.TOP_COMMANDS_ANALYTICS, "blackjack", 1);
 
       return prepareGame(message, args, m);
     }
