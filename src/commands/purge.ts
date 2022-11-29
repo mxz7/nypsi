@@ -218,7 +218,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (message instanceof Message) {
       await message.delete();
     } else {
-      await send({ embeds: [new CustomEmbed(message.member, "deleting messages...")] });
+      await send({ embeds: [new CustomEmbed(message.member, "deleting messages...")], ephemeral: true });
     }
 
     let collected = await message.channel.messages.fetch({ limit: 100 });
