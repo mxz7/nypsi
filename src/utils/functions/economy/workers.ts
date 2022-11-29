@@ -5,6 +5,7 @@ import prisma from "../../../init/database";
 import { logger } from "../../logger";
 import { getBalance, updateBalance } from "./balance";
 import { getBoosters } from "./boosters";
+import { getInventory } from "./inventory";
 import { getBaseUpgrades, getBaseWorkers, getItems } from "./utils";
 
 export async function getWorkers(member: GuildMember | string) {
@@ -75,6 +76,7 @@ export async function calcWorkerValues(
   const baseUpgrades = getBaseUpgrades();
   const baseWorkers = getBaseWorkers();
 
+  const inventory = await getInventory(worker.userId);
   const boosters = await getBoosters(worker.userId);
   const items = getItems();
 
@@ -109,6 +111,24 @@ export async function calcWorkerValues(
           (perIntervalBonus + baseWorkers[worker.workerId].base.per_interval);
         break;
     }
+  }
+
+  if (inventory.find((i) => i.item == "purple_gem")) {
+    perItemBonus += perItemBonus * 0.07;
+  }
+
+  if (inventory.find((i) => i.item == "green_gem")) {
+    maxStoredBonus += maxStoredBonus * 0.07;
+  }
+
+  if (inventory.find((i) => i.item == "blue_gem")) {
+    perIntervalBonus += perIntervalBonus * 0.07;
+  }
+
+  if (inventory.find((i) => i.item == "white_gem")) {
+    maxStoredBonus += maxStoredBonus * 0.07;
+    perIntervalBonus += perIntervalBonus * 0.07;
+    perItemBonus += perItemBonus * 0.07;
   }
 
   return {
