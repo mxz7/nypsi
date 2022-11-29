@@ -1,5 +1,6 @@
 import { variants } from "@catppuccin/palette";
 import { Client, ColorResolvable, User, WebhookClient } from "discord.js";
+import { randomInt } from "node:crypto";
 import prisma from "../../init/database";
 import redis from "../../init/redis";
 import { CustomEmbed } from "../../models/EmbedBuilders";
@@ -49,7 +50,7 @@ async function doLottery(client: Client) {
   let user: User;
 
   while (!user) {
-    chosen = shuffledTickets[Math.floor(Math.random() * shuffledTickets.length)];
+    chosen = shuffledTickets[randomInt(shuffledTickets.length)];
 
     logger.info(`winner: ${chosen.userId} with ticket #${chosen.id}`);
 
