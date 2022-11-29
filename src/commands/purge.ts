@@ -450,9 +450,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await message.channel.bulkDelete(collecteda);
 
-    if (message instanceof Message) return;
-
-    return send({ embeds: [new CustomEmbed(message.member, `✅ ${collecteda.size} messages cleaned up`)], ephemeral: true });
+    return send({ embeds: [new CustomEmbed(message.member, `✅ ${collecteda.size} messages cleaned up`)] }).then((m) => {
+      setTimeout(() => {
+        m.delete().catch(() => {});
+      }, 1500);
+    });
   } else {
     return helpMenu();
   }
