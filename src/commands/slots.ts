@@ -76,7 +76,7 @@ reels.set(1, [
   "cherry-1",
 ]);
 
-reels.set(1, [
+reels.set(2, [
   "melon-2",
   "melon-2",
   "melon-2",
@@ -215,6 +215,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   for (const arr of reels.values()) {
     const shuffled = shuffle(arr);
+
     if (!one) {
       one = shuffled[randomInt(shuffled.length)];
     } else if (!two) {
