@@ -169,10 +169,10 @@ async function prepareGame(
   const maxBet = await calcMaxBet(message.member);
   const defaultBet = await getDefaultBet(message.member);
 
-  let bet = (await formatBet(args[0], message.member).catch(() => {})) || defaultBet;
+  let bet = (await formatBet(args[0] || "", message.member).catch(() => {})) || defaultBet;
 
   if (!(message instanceof Message) && message.isChatInputCommand()) {
-    bet = (await formatBet(message.options.getString("bet"), message.member)) || defaultBet;
+    bet = (await formatBet(message.options.getString("bet") || "", message.member)) || defaultBet;
   }
 
   if (!bet) {
@@ -304,7 +304,7 @@ async function prepareGame(
 
   const spawnGem = Math.floor(Math.random() * 10);
 
-  if (spawnGem < 2) {
+  if (spawnGem < 3) {
     let passes = 0;
     let achieved = false;
 
@@ -681,12 +681,13 @@ async function playGame(
         win += increment;
       } else {
         grid[location] = "gc";
-        win += 3;
+        win += increment + 3;
 
         const caught = Math.floor(Math.random() * 50);
 
         if (caught == 7) {
           await addInventoryItem(message.member, "green_gem", 1);
+          await addProgress(message.author.id, "gem_hunter", 1);
           await response.followUp({
             embeds: [
               new CustomEmbed(
@@ -701,7 +702,7 @@ async function playGame(
             embeds: [
               new CustomEmbed(
                 message.member,
-                `${GEM_EMOJI} you found a **gem**!!\n+unfortunately you dropped it and it shattered. maybe next time`
+                `${GEM_EMOJI} you found a **gem**!!\nunfortunately you dropped it and it shattered. maybe next time`
               ),
             ],
             ephemeral: true,
