@@ -143,11 +143,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     )
     .setFooter({ text: footer });
 
-  if (target.user.id == message.author.id) {
-    embed.setHeader("your balance | season 5", message.author.avatarURL());
-  } else {
-    embed.setHeader(`${target.user.username}'s balance | season 5`, target.user.avatarURL());
-  }
+  embed.setHeader(`${target.user.username} | season 5`, target.user.avatarURL());
 
   if (message.member == target) {
     if (
