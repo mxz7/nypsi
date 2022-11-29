@@ -8,20 +8,20 @@ import {
 } from "discord.js";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 
-interface PageManagerOptions {
+interface PageManagerOptions<T> {
   message: Message;
   row: ActionRowBuilder<MessageActionRowComponentBuilder>;
-  arr?: unknown[];
-  pages?: Map<number, unknown[]>;
+  arr?: T[];
+  pages?: Map<number, T[]>;
   pageLength?: number;
   embed: CustomEmbed;
   updateEmbed?: (page: any[], embed: CustomEmbed) => CustomEmbed;
   userId: string;
-  handleResponses?: Map<string, (data?: { manager: PageManager; interaction: ButtonInteraction }) => Promise<void>>;
-  onPageUpdate?: (manager: PageManager) => CustomEmbed;
+  handleResponses?: Map<string, (data?: { manager: PageManager<T>; interaction: ButtonInteraction }) => Promise<void>>;
+  onPageUpdate?: (manager: PageManager<T>) => CustomEmbed;
 }
 
-export default class PageManager {
+export default class PageManager<T> {
   static createPages<T>(arr: T[], pageLength = 10): Map<number, T[]> {
     const map = new Map<number, T[]>();
 
@@ -40,7 +40,7 @@ export default class PageManager {
     return map;
   }
 
-  public pages: Map<number, unknown[]>;
+  public pages: Map<number, T[]>;
   public message: Message;
   public row: ActionRowBuilder<MessageActionRowComponentBuilder>;
   public currentPage = 1;
@@ -48,12 +48,15 @@ export default class PageManager {
   public userId: string;
   public embed: CustomEmbed;
 
-  private updatePageFunc: (page: unknown[], embed: CustomEmbed) => CustomEmbed;
+  private updatePageFunc: (page: T[], embed: CustomEmbed) => CustomEmbed;
   private filter: (i: Interaction) => boolean;
-  private handleResponses: Map<string, (data?: { manager: PageManager; interaction: ButtonInteraction }) => Promise<void>>;
-  private onPageUpdate: (manager: PageManager) => CustomEmbed;
+  private handleResponses: Map<
+    string,
+    (data?: { manager: PageManager<T>; interaction: ButtonInteraction }) => Promise<void>
+  >;
+  private onPageUpdate: (manager: PageManager<T>) => CustomEmbed;
 
-  constructor(opts: PageManagerOptions) {
+  constructor(opts: PageManagerOptions<T>) {
     this.pages = opts.arr ? PageManager.createPages(opts.arr, opts.pageLength) : opts.pages;
     this.lastPage = this.pages.size;
     this.message = opts.message;
@@ -77,7 +80,7 @@ export default class PageManager {
     }
   }
 
-  private async back(data: { manager: PageManager }): Promise<void> {
+  private async back(data: { manager: PageManager<T> }): Promise<void> {
     if (data.manager.currentPage == 1) {
       return data.manager.listen();
     }
@@ -109,7 +112,7 @@ export default class PageManager {
     return data.manager.listen();
   }
 
-  private async next(data: { manager: PageManager }): Promise<void> {
+  private async next(data: { manager: PageManager<T> }): Promise<void> {
     if (data.manager.currentPage == data.manager.lastPage) {
       return data.manager.listen();
     }
@@ -158,7 +161,7 @@ export default class PageManager {
     }
   }
 
-  private static defaultUpdateEmbed(page: unknown[], embed: CustomEmbed): CustomEmbed {
+  private static defaultUpdateEmbed(page: any[], embed: CustomEmbed): CustomEmbed {
     embed.setDescription(page.join("\n"));
 
     return embed;
