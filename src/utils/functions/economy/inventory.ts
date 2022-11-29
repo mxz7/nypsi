@@ -418,6 +418,7 @@ export async function commandGemCheck(member: GuildMember, commandCategory: Cate
 
     if (chance == 7) {
       await addInventoryItem(member, "pink_gem", 1);
+      await addProgress(member.user.id, "gem_hunter", 1);
 
       if ((await getDmSettings(member)).other) {
         await addNotificationToQueue({
@@ -436,6 +437,7 @@ export async function commandGemCheck(member: GuildMember, commandCategory: Cate
 
     if (chance == 77) {
       await addInventoryItem(member, "purple_gem", 1);
+      await addProgress(member.user.id, "gem_hunter", 1);
 
       if ((await getDmSettings(member)).other) {
         await addNotificationToQueue({

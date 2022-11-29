@@ -687,6 +687,7 @@ async function playGame(
 
         if (caught == 7) {
           await addInventoryItem(message.member, "green_gem", 1);
+          await addProgress(message.author.id, "gem_hunter", 1);
           await response.followUp({
             embeds: [
               new CustomEmbed(
