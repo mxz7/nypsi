@@ -9,6 +9,7 @@ import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { getAuctionAverage } from "./auctions";
 import { getBoosters } from "./boosters";
 import { getGuildByUser } from "./guilds";
+import { getInventory } from "./inventory";
 import { getPrestige } from "./prestige";
 import { getBaseUpgrades, getBaseWorkers, getItems } from "./utils";
 import { hasVoted } from "./vote";
@@ -149,6 +150,13 @@ export async function getMulti(member: GuildMember | string): Promise<number> {
     if (items[boosterId].boosterEffect.boosts.includes("multi")) {
       multi += items[boosterId].boosterEffect.effect * boosters.get(boosterId).length;
     }
+  }
+
+  const inventory = await getInventory(id, false);
+  if (inventory.find((i) => i.item == "white_gem")) {
+    multi += 17;
+  } else if (inventory.find((i) => i.item == "pink_gem")) {
+    multi += 7;
   }
 
   multi = Math.floor(multi);

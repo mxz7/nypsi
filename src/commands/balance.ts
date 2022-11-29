@@ -11,8 +11,9 @@ import {
   hasPadlock,
   updateBalance,
 } from "../utils/functions/economy/balance.js";
+import { getInventory } from "../utils/functions/economy/inventory";
 import { getPrestige, getPrestigeRequirement, getPrestigeRequirementBal } from "../utils/functions/economy/prestige.js";
-import { createUser, deleteUser, userExists } from "../utils/functions/economy/utils.js";
+import { createUser, deleteUser, getItems, userExists } from "../utils/functions/economy/utils.js";
 import { getXp } from "../utils/functions/economy/xp.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member.js";
@@ -125,11 +126,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     padlockStatus = true;
   }
 
+  const inventory = await getInventory(target);
   const net = await calcNetWorth(target);
+  let hasGem = false;
+
+  if (inventory.some((i) => i.item == "white_gem")) hasGem = true;
 
   const embed = new CustomEmbed(message.member)
     .setDescription(
-      `${padlockStatus ? "🔒" : "💰"} $**${(await getBalance(target)).toLocaleString()}**\n` +
+      `${padlockStatus ? "🔒" : "💰"} $**${(await getBalance(target)).toLocaleString()}** ${
+        hasGem ? getItems()["white_gem"].emoji : ""
+      }\n` +
         `💳 $**${(await getBankBalance(target)).toLocaleString()}** / $**${(
           await getMaxBankBalance(target)
         ).toLocaleString()}**${net > 1_000_000 ? `\n\n🌍 $**${net.toLocaleString()}**` : ""}`
