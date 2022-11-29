@@ -10,7 +10,7 @@ import Constants from "../Constants";
 import { getBalance, updateBalance } from "../functions/economy/balance";
 import { addInventoryItem } from "../functions/economy/inventory";
 import { getPrestige } from "../functions/economy/prestige";
-import { addTicket, getTickets, isEcoBanned, userExists } from "../functions/economy/utils";
+import { addTicket, getItems, getTickets, isEcoBanned, userExists } from "../functions/economy/utils";
 import { addKarma } from "../functions/karma/karma";
 import { addMember, getPremiumProfile, isPremium, renewUser, setTier } from "../functions/premium/premium";
 import requestDM from "../functions/requestdm";
@@ -128,6 +128,23 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
 
   await addInventoryItem(user, "vote_crate", crateAmount, false);
 
+  const gemChance = Math.floor(Math.random() * 250);
+
+  if (gemChance == 107) {
+    await addInventoryItem(user, "blue_gem", 1);
+
+    if ((await getDmSettings(user)).other) {
+      await addNotificationToQueue({
+        memberId: user,
+        payload: {
+          embed: new CustomEmbed()
+            .setDescription(`${getItems()["blue_gem"].emoji} you've found a gem! i wonder what powers it holds...`)
+            .setTitle("you've found a gem"),
+        },
+      });
+    }
+  }
+
   logger.log({
     level: "success",
     message: `vote processed for ${user}`,
@@ -207,6 +224,62 @@ async function handleKofiData(data: KofiResponse) {
             };
 
             await addNotificationToQueue(payload);
+          }
+
+          const gemChance = Math.floor(Math.random() * 150);
+
+          if (gemChance == 7) {
+            await addInventoryItem(user.id, "pink_gem", 1);
+
+            if ((await getDmSettings(user.id)).other) {
+              await addNotificationToQueue({
+                memberId: user.id,
+                payload: {
+                  embed: new CustomEmbed()
+                    .setDescription(`${getItems()["pink_gem"].emoji} you've found a gem! i wonder what powers it holds...`)
+                    .setTitle("you've found a gem"),
+                },
+              });
+            }
+          } else if (gemChance == 107) {
+            await addInventoryItem(user.id, "blue_gem", 1);
+
+            if ((await getDmSettings(user.id)).other) {
+              await addNotificationToQueue({
+                memberId: user.id,
+                payload: {
+                  embed: new CustomEmbed()
+                    .setDescription(`${getItems()["blue_gem"].emoji} you've found a gem! i wonder what powers it holds...`)
+                    .setTitle("you've found a gem"),
+                },
+              });
+            }
+          } else if (gemChance == 77) {
+            await addInventoryItem(user.id, "purple_gem", 1);
+
+            if ((await getDmSettings(user.id)).other) {
+              await addNotificationToQueue({
+                memberId: user.id,
+                payload: {
+                  embed: new CustomEmbed()
+                    .setDescription(`${getItems()["purple_gem"].emoji} you've found a gem! i wonder what powers it holds...`)
+                    .setTitle("you've found a gem"),
+                },
+              });
+            }
+          } else if (gemChance == 17) {
+            await addInventoryItem(user.id, "green_gem", 1);
+
+            if ((await getDmSettings(user.id)).other) {
+              await addNotificationToQueue({
+                memberId: user.id,
+                payload: {
+                  embed: new CustomEmbed()
+                    .setDescription(`${getItems()["green_gem"].emoji} you've found a gem! i wonder what powers it holds...`)
+                    .setTitle("you've found a gem"),
+                },
+              });
+            }
           }
         } else {
           await prisma.kofiPurchases.create({
