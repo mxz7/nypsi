@@ -1,5 +1,4 @@
 import { REST } from "@discordjs/rest";
-import { PermissionFlagsBits, Routes } from "discord-api-types/v9";
 import {
   ActionRowBuilder,
   APIEmbed,
@@ -10,6 +9,8 @@ import {
   Interaction,
   Message,
   MessageActionRowComponentBuilder,
+  PermissionFlagsBits,
+  Routes,
   WebhookClient,
 } from "discord.js";
 import * as fs from "fs";
