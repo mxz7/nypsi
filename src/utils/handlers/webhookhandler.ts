@@ -7,17 +7,20 @@ import { CustomEmbed } from "../../models/EmbedBuilders";
 import { KofiResponse } from "../../types/Kofi";
 import { NotificationPayload } from "../../types/Notification";
 import Constants from "../Constants";
+import { addProgress } from "../functions/economy/achievements";
 import { getBalance, updateBalance } from "../functions/economy/balance";
+import { addBooster } from "../functions/economy/boosters";
 import { addInventoryItem } from "../functions/economy/inventory";
 import { getPrestige } from "../functions/economy/prestige";
-import { addTicket, getItems, getTickets, isEcoBanned, userExists } from "../functions/economy/utils";
+import { addTicket, getItems, getTickets, isEcoBanned, loadItems, userExists } from "../functions/economy/utils";
 import { addKarma } from "../functions/karma/karma";
 import { addMember, getPremiumProfile, isPremium, renewUser, setTier } from "../functions/premium/premium";
 import requestDM from "../functions/requestdm";
 import { addNotificationToQueue, getDmSettings } from "../functions/users/notifications";
 import { logger } from "../logger";
 import ms = require("ms");
-import dayjs = require("dayjs");
+
+loadItems(false);
 
 const app = express();
 const webhook = new topgg.Webhook("123");
@@ -101,19 +104,19 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
   const amount = Math.floor(15000 * (prestige / 2 + 1));
 
   if (!(await isEcoBanned(user))) {
-    await Promise.all([
-      updateBalance(user, (await getBalance(user)) + amount),
-      addKarma(user, 10),
-      prisma.booster.create({
-        data: {
-          boosterId: "vote_booster",
-          userId: user,
-          expire: dayjs().add(2, "hour").toDate(),
-        },
-      }),
-      redis.del(`${Constants.redis.cache.economy.VOTE}:${user}`),
-      redis.del(`${Constants.redis.cache.economy.BOOSTERS}:${user}`),
-    ]);
+    try {
+      await Promise.all([
+        updateBalance(user, (await getBalance(user)) + amount),
+        addKarma(user, 10),
+        addBooster(user, "vote_booster"),
+        redis.del(`${Constants.redis.cache.economy.VOTE}:${user}`),
+        redis.del(`${Constants.redis.cache.economy.BOOSTERS}:${user}`),
+      ]).catch((e) => {
+        logger.error(e);
+      });
+    } catch (e) {
+      logger.error(e);
+    }
   }
 
   const tickets = await getTickets(user);
@@ -132,6 +135,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
 
   if (gemChance == 107) {
     await addInventoryItem(user, "blue_gem", 1);
+    await addProgress(user, "gem_hunter", 1);
 
     if ((await getDmSettings(user)).other) {
       await addNotificationToQueue({
@@ -230,6 +234,7 @@ async function handleKofiData(data: KofiResponse) {
 
           if (gemChance == 7) {
             await addInventoryItem(user.id, "pink_gem", 1);
+            await addProgress(user.id, "gem_hunter", 1);
 
             if ((await getDmSettings(user.id)).other) {
               await addNotificationToQueue({
@@ -243,6 +248,7 @@ async function handleKofiData(data: KofiResponse) {
             }
           } else if (gemChance == 107) {
             await addInventoryItem(user.id, "blue_gem", 1);
+            await addProgress(user.id, "gem_hunter", 1);
 
             if ((await getDmSettings(user.id)).other) {
               await addNotificationToQueue({
@@ -256,6 +262,7 @@ async function handleKofiData(data: KofiResponse) {
             }
           } else if (gemChance == 77) {
             await addInventoryItem(user.id, "purple_gem", 1);
+            await addProgress(user.id, "gem_hunter", 1);
 
             if ((await getDmSettings(user.id)).other) {
               await addNotificationToQueue({
@@ -269,6 +276,7 @@ async function handleKofiData(data: KofiResponse) {
             }
           } else if (gemChance == 17) {
             await addInventoryItem(user.id, "green_gem", 1);
+            await addProgress(user.id, "gem_hunter", 1);
 
             if ((await getDmSettings(user.id)).other) {
               await addNotificationToQueue({

@@ -2,6 +2,7 @@ import dayjs = require("dayjs");
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import { addProgress } from "../utils/functions/economy/achievements";
 import { addInventoryItem } from "../utils/functions/economy/inventory";
 import { createUser, doDaily, getItems, getLastDaily, userExists } from "../utils/functions/economy/utils";
 import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications";
@@ -53,6 +54,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (gemChance == 407) {
     await addInventoryItem(message.member, "blue_gem", 1);
+    await addProgress(message.author.id, "gem_hunter", 1);
 
     if ((await getDmSettings(message.member)).other) {
       await addNotificationToQueue({
