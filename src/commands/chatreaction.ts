@@ -265,7 +265,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       const filter = (i: Interaction) => !blacklisted.includes(i.user.id);
 
-      const collector = msg.createMessageComponentCollector({ filter, time: 45_000, max: 4 });
+      const collector = msg.createMessageComponentCollector({ filter, time: 45_000, max: 5 });
 
       const i = setInterval(async () => {
         embed.setDescription(`click the button below to vote start a chat reaction\n\n${voted.length}/5`);
