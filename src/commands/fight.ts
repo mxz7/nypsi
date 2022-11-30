@@ -15,7 +15,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { getBoosters } from "../utils/functions/economy/boosters";
 import { addInventoryItem } from "../utils/functions/economy/inventory";
-import { addGamble, getStats } from "../utils/functions/economy/stats";
+import { createGame, getStats } from "../utils/functions/economy/stats";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
@@ -426,12 +426,16 @@ class Fight {
 
         embed.setFooter({ text: "well done. enjoy this cookie 🍪" });
       }
-
-      await addGamble(winner.member, "fight", true);
     }
 
-    if (await userExists(loser.user.id)) {
-      await addGamble(loser, "fight", false);
+    if (await userExists(this.home.user.id)) {
+      await createGame({
+        userId: this.home.user.id,
+        bet: 0,
+        game: "fight",
+        win: this.home.user.id == winner.member.user.id,
+        outcome: `\`\`\`${this.log.join("\n")}\`\`\``,
+      });
     }
 
     embed.setHeader(`${this.home.user.username} vs ${this.away.user.username}`);
