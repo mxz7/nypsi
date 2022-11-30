@@ -173,8 +173,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         );
       }
 
-      await addProgress(message.author.id, "whore", 1);
-      await addProgress(key.user.id, "whore", 1);
+      addProgress(message.author.id, "whore", 1);
+      addProgress(key.user.id, "whore", 1);
 
       return await channel
         .send({ content: key.user.toString() + " a match has been found", embeds: [embed2] })

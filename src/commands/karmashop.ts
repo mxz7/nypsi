@@ -378,7 +378,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       items[selected.id].items_left -= 1;
     }
 
-    await addProgress(message.author.id, "wizard", 1);
+    addProgress(message.author.id, "wizard", 1);
 
     return send({
       embeds: [

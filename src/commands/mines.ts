@@ -592,7 +592,7 @@ async function playGame(
       embed.setFooter({ text: `id: ${id}` });
     }
 
-    if (win >= 7) await addProgress(message.author.id, "minesweeper_pro", 1);
+    if (win >= 7) addProgress(message.author.id, "minesweeper_pro", 1);
 
     await updateBalance(message.member, (await getBalance(message.member)) + winnings);
     games.delete(message.author.id);
@@ -716,7 +716,7 @@ async function playGame(
 
         if (caught == 7) {
           await addInventoryItem(message.member, "green_gem", 1);
-          await addProgress(message.author.id, "gem_hunter", 1);
+          addProgress(message.author.id, "gem_hunter", 1);
           await response.followUp({
             embeds: [
               new CustomEmbed(

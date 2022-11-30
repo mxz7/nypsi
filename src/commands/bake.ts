@@ -119,7 +119,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     ],
   });
 
-  await addProgress(message.author.id, "baker", amount);
+  addProgress(message.author.id, "baker", amount);
 }
 
 cmd.setRun(run);

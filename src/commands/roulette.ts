@@ -250,7 +250,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       await updateBalance(message.member, (await getBalance(message.member)) + winnings);
     }
 
-    if (roll == "🟢") await addProgress(message.author.id, "roulette_pro", 1);
+    if (roll == "🟢") addProgress(message.author.id, "roulette_pro", 1);
   } else {
     await updateBalance(message.member, (await getBalance(message.member)) - bet);
   }

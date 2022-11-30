@@ -203,7 +203,7 @@ export async function acceptWholesomeImage(id: number, accepter: GuildMember, cl
 
   clearWholesomeCache();
 
-  await addProgress(query.submitterId, "wholesome", 1);
+  addProgress(query.submitterId, "wholesome", 1);
 
   await requestDM({
     memberId: query.submitterId,

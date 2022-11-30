@@ -324,7 +324,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     win = true;
     winnings = Math.round(multiplier * bet);
 
-    if (one.split("-")[0] == "cherry") await addProgress(message.author.id, "slots_pro", 1);
+    if (one.split("-")[0] == "cherry") addProgress(message.author.id, "slots_pro", 1);
   } else if (one.split("-")[0] == two.split("-")[0]) {
     win = true;
     winnings = Math.round(bet * 1.2);

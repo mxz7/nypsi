@@ -420,7 +420,7 @@ class Fight {
     }
 
     if (await userExists(winner.member.user.id)) {
-      await addProgress(winner.member.user.id, "fighter", 1);
+      addProgress(winner.member.user.id, "fighter", 1);
       if (!cookieRecent.has(winner.member.user.id)) {
         cookieRecent.add(winner.member.user.id);
 
