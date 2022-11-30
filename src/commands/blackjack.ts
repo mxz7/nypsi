@@ -280,7 +280,7 @@ async function prepareGame(
       `${
         calcTotal(message.member) == 21
           ? `${getDealerCards(message.member)} **${calcTotalDealer(message.member)}**`
-          : `| s${games.get(message.member.user.id).dealerCards[0]} |`
+          : `| ${games.get(message.member.user.id).dealerCards[0]} |`
       }`
     )
     .addField(message.author.username, getCards(message.member) + " **" + calcTotal(message.member) + "**");
