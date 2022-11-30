@@ -63,7 +63,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     `**game** \`${game.game}\`\n` +
     `**date** <t:${Math.floor(game.date.getTime() / 1000)}>\n` +
     `**bet** $${game.bet.toLocaleString()}\n` +
-    `**won** \`${game.win}\`\n`;
+    `**won** \`${Boolean(game.win)}\`\n`;
 
   if (game.outcome.startsWith("mines:")) {
     components = JSON.parse(

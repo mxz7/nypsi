@@ -83,9 +83,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let desc = "";
 
     for (const stat of gambleStats) {
-      desc += `\`${stat.game}\` ${stat._count.win.toLocaleString()}/${stat._count._all.toLocaleString()} profit: $${(
-        stat._count.earned - stat._count.bet
-      ).toLocaleString()}`;
+      desc += `\`${stat.game}\` ${stat._sum.win.toLocaleString()}/${stat._count._all.toLocaleString()} profit: $${(
+        Number(stat._sum.earned) - Number(stat._sum.bet)
+      ).toLocaleString()} xp: ${Number(stat._sum.xpEarned).toLocaleString()}\n`;
     }
 
     const embed = new CustomEmbed(message.member, desc).setHeader("gamble stats", message.author.avatarURL());

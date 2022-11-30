@@ -18,10 +18,13 @@ export async function getGambleStats(member: GuildMember) {
     },
     by: ["game"],
     _count: {
-      win: true,
       _all: true,
-      earned: true,
+    },
+    _sum: {
+      win: true,
       bet: true,
+      earned: true,
+      xpEarned: true,
     },
   });
 
@@ -78,7 +81,7 @@ export async function createGame(opts: {
         id,
         userId: opts.userId,
         game: opts.game,
-        win: opts.win,
+        win: opts.win ? 1 : 0,
         bet: opts.bet,
         earned: opts.earned,
         xpEarned: opts.xp,

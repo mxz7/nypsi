@@ -78,7 +78,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const stats = (await getGambleStats(message.member)).find((s) => s.game == "fight");
 
     if (stats) {
-      embed.setFooter({ text: `you are ${stats._count.win}-${stats._count._all - stats._count.win}` });
+      embed.setFooter({ text: `you are ${stats._sum.win}-${stats._count._all - stats._sum.win}` });
     }
 
     return send({ embeds: [embed] });
@@ -91,8 +91,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const embed = new CustomEmbed(
       message.member,
-      `you have won **${stats._count.win.toLocaleString()}** fights and lost **${(
-        stats._count._all - stats._count.win
+      `you have won **${stats._sum.win.toLocaleString()}** fights and lost **${(
+        stats._count._all - stats._sum.win
       ).toLocaleString()}**`
     ).setHeader("your fight stats", message.author.avatarURL());
 

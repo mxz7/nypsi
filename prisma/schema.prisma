@@ -174,7 +174,7 @@ model Game {
   id       String   @id
   userId   String
   game     String
-  win      Boolean
+  win      Int
   bet      BigInt
   earned   BigInt?
   xpEarned Int?
