@@ -13,7 +13,7 @@ import {
   MessageActionRowComponentBuilder,
   MessageEditOptions,
 } from "discord.js";
-import * as shuffle from "shuffle-array";
+import redis from "../init/redis.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command.js";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants.js";
@@ -26,6 +26,7 @@ import { createGame } from "../utils/functions/economy/stats.js";
 import { createUser, formatBet, userExists } from "../utils/functions/economy/utils.js";
 import { calcEarnedXp, getXp, updateXp } from "../utils/functions/economy/xp.js";
 import { isPremium } from "../utils/functions/premium/premium.js";
+import { shuffle } from "../utils/functions/random.js";
 import { addHourlyCommand } from "../utils/handlers/commandhandler.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 import { gamble, logger } from "../utils/logger.js";
@@ -377,12 +378,13 @@ async function playGame(
         level: "cmd",
         message: `${message.guild.id} - ${message.author.tag}: replaying highlow`,
       });
+      if (isLockedOut(message.author.id)) return verifyUser(message);
 
       addHourlyCommand(message.member);
 
       await a(message.author.id, message.author.tag, message.content);
 
-      if (isLockedOut(message.author.id)) return verifyUser(message);
+      await redis.hincrby(Constants.redis.nypsi.TOP_COMMANDS_ANALYTICS, "blackjack", 1);
 
       return prepareGame(message, args, m);
     }

@@ -1,4 +1,5 @@
 import { variants } from "@catppuccin/palette";
+import { randomInt } from "crypto";
 import {
   ActionRowBuilder,
   APIApplicationCommandOptionChoice,
@@ -13,6 +14,7 @@ import {
   MessageActionRowComponentBuilder,
   MessageEditOptions,
 } from "discord.js";
+import redis from "../init/redis.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command.js";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants.js";
@@ -293,7 +295,7 @@ async function prepareGame(
   }
 
   for (let i = 0; i < bombCount; i++) {
-    const num = Math.floor(Math.random() * 24);
+    const num = randomInt(24);
 
     if (grid[num] != "b") {
       grid[num] = "b";
@@ -302,14 +304,14 @@ async function prepareGame(
     }
   }
 
-  const spawnGem = Math.floor(Math.random() * 10);
+  const spawnGem = randomInt(10);
 
   if (spawnGem < 3) {
     let passes = 0;
     let achieved = false;
 
     while (passes < 25 && !achieved) {
-      const index = Math.floor(Math.random() * grid.length - 1);
+      const index = randomInt(grid.length - 1);
 
       if (grid[index] != "b") {
         grid[index] = "g";
@@ -487,12 +489,12 @@ async function playGame(
         level: "cmd",
         message: `${message.guild.id} - ${message.author.tag}: replaying mines`,
       });
+      if (isLockedOut(message.author.id)) return verifyUser(message);
 
       addHourlyCommand(message.member);
 
+      await redis.hincrby(Constants.redis.nypsi.TOP_COMMANDS_ANALYTICS, "mines", 1);
       await a(message.author.id, message.author.tag, message.content);
-
-      if (isLockedOut(message.author.id)) return verifyUser(message);
 
       return prepareGame(message, args, msg);
     }
@@ -706,10 +708,9 @@ async function playGame(
     case "a":
       if (grid[location] == "a") {
         grid[location] = "c";
-        win += increment;
       } else {
         grid[location] = "gc";
-        win += increment + 3;
+        win += 4;
 
         const caught = Math.floor(Math.random() * 50);
 
@@ -737,6 +738,8 @@ async function playGame(
           });
         }
       }
+
+      win += increment;
 
       games.set(message.author.id, {
         bet: bet,

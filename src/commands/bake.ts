@@ -1,3 +1,4 @@
+import { randomInt } from "crypto";
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
@@ -83,7 +84,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
   }
 
-  const amount = Math.floor(Math.random() * max) + 1;
+  let min = Math.floor(max / 25);
+  if (min < 1) min = 1;
+
+  const amount = randomInt(min, max);
 
   await setInventoryItem(message.member, "coal", inventory.find((i) => i.item == "coal").amount - 1, false);
   await addInventoryItem(message.member, "cookie", amount, false);
