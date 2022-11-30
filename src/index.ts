@@ -32,6 +32,9 @@ const manager = new Cluster.Manager(`${__dirname}/nypsi.js`, {
 
   // totalShards: 6,
   shardsPerClusters: 3, // force clusters
+  spawnOptions: {
+    delay: 7500,
+  },
 });
 
 manager.extend(new Cluster.ReClusterManager());
@@ -50,7 +53,7 @@ manager.on("clusterCreate", (cluster) => {
         }
       }, 25000);
       heartBeatIntervals.push(interval);
-    }, 120000);
+    }, 10000);
   });
   cluster.on("death", () => {
     logger.info(`cluster ${cluster.id} died`);
