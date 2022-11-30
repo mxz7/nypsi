@@ -1,12 +1,10 @@
-import { Prisma } from "@prisma/client";
 import { GuildMember } from "discord.js";
+import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
-import { StatsProfile } from "../../../models/StatsProfile";
 import Constants from "../../Constants";
-import { addProgress } from "./achievements";
 
-export async function getStats(member: GuildMember): Promise<StatsProfile> {
+export async function getGambleStats(member: GuildMember) {
   let id: string;
   if (member instanceof GuildMember) {
     id = member.user.id;
@@ -14,16 +12,38 @@ export async function getStats(member: GuildMember): Promise<StatsProfile> {
     id = member;
   }
 
-  const query = await prisma.economyStats.findMany({
+  const query = await prisma.game.groupBy({
     where: {
-      economyUserId: id,
+      userId: id,
     },
-    orderBy: {
-      win: "desc",
+    by: ["game"],
+    _count: {
+      win: true,
+      _all: true,
+      earned: true,
+      bet: true,
     },
   });
 
-  return new StatsProfile(query);
+  inPlaceSort(query).desc((i) => i._count._all);
+
+  return query;
+}
+
+export async function getItemStats(member: GuildMember) {
+  const query = await prisma.itemUse.findMany({
+    where: {
+      userId: member.user.id,
+    },
+    select: {
+      amount: true,
+      itemId: true,
+    },
+  });
+
+  inPlaceSort(query).desc((i) => i.amount);
+
+  return query;
 }
 
 async function createGameId() {
@@ -75,8 +95,6 @@ export async function createGame(opts: {
   if (fail) return createGame(opts);
   if (!res) return createGame(opts);
 
-  addGamble(opts.userId, opts.game, opts.win);
-
   return res.id;
 }
 
@@ -88,108 +106,6 @@ export async function fetchGame(id: string) {
   });
 }
 
-async function addGamble(member: string, game: string, win: boolean) {
-  let updateData: Prisma.Without<Prisma.EconomyStatsUpdateInput, Prisma.EconomyStatsUncheckedUpdateInput> &
-    Prisma.EconomyStatsUncheckedUpdateInput;
-  let createData: Prisma.Without<Prisma.EconomyStatsCreateInput, Prisma.EconomyStatsUncheckedCreateInput> &
-    Prisma.EconomyStatsUncheckedCreateInput;
-
-  if (win) {
-    updateData = {
-      win: { increment: 1 },
-    };
-    createData = {
-      economyUserId: member,
-      gamble: true,
-      type: game,
-      win: 1,
-    };
-  } else {
-    updateData = {
-      lose: { increment: 1 },
-    };
-    createData = {
-      economyUserId: member,
-      gamble: true,
-      type: game,
-      lose: 1,
-    };
-  }
-
-  await prisma.economyStats.upsert({
-    where: {
-      type_economyUserId: {
-        type: game,
-        economyUserId: member,
-      },
-    },
-    update: updateData,
-    create: createData,
-  });
-
-  await addProgress(member, "gambler", 1);
-}
-
-export async function addRob(member: GuildMember, win: boolean) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
-
-  const query = await prisma.economyStats.findFirst({
-    where: {
-      AND: [{ economyUserId: id }, { type: "rob" }],
-    },
-    select: {
-      economyUserId: true,
-    },
-  });
-
-  if (query) {
-    if (win) {
-      await prisma.economyStats.updateMany({
-        where: {
-          AND: [{ economyUserId: id }, { type: "rob" }],
-        },
-        data: {
-          win: { increment: 1 },
-        },
-      });
-    } else {
-      await prisma.economyStats.updateMany({
-        where: {
-          AND: [{ economyUserId: id }, { type: "rob" }],
-        },
-        data: {
-          lose: { increment: 1 },
-        },
-      });
-    }
-  } else {
-    if (win) {
-      await prisma.economyStats.create({
-        data: {
-          economyUserId: id,
-          type: "rob",
-          win: 1,
-          gamble: true,
-        },
-      });
-    } else {
-      await prisma.economyStats.create({
-        data: {
-          economyUserId: id,
-          type: "rob",
-          lose: 1,
-          gamble: true,
-        },
-      });
-    }
-  }
-}
-
 export async function addItemUse(member: GuildMember, item: string, amount = 1) {
   let id: string;
   if (member instanceof GuildMember) {
@@ -198,21 +114,20 @@ export async function addItemUse(member: GuildMember, item: string, amount = 1) 
     id = member;
   }
 
-  await prisma.economyStats.upsert({
+  await prisma.itemUse.upsert({
     where: {
-      type_economyUserId: {
-        economyUserId: id,
-        type: item,
+      userId_itemId: {
+        itemId: item,
+        userId: id,
       },
     },
     update: {
-      win: { increment: amount },
+      amount: { increment: amount },
     },
     create: {
-      economyUserId: id,
-      type: item,
-      gamble: false,
-      win: amount,
+      userId: id,
+      itemId: item,
+      amount: amount,
     },
   });
 }

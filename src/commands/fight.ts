@@ -15,7 +15,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { getBoosters } from "../utils/functions/economy/boosters";
 import { addInventoryItem } from "../utils/functions/economy/inventory";
-import { createGame, getStats } from "../utils/functions/economy/stats";
+import { createGame, getGambleStats } from "../utils/functions/economy/stats";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
@@ -75,15 +75,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     embed.setDescription(`${prefix}**fight <member>** *challenge another member to a fight*`);
 
-    const stats = (await getStats(message.member)).gamble["fight"];
+    const stats = (await getGambleStats(message.member)).find((s) => s.game == "fight");
 
     if (stats) {
-      embed.setFooter({ text: `you are ${stats.wins}-${stats.lose}` });
+      embed.setFooter({ text: `you are ${stats._count.win}-${stats._count._all - stats._count.win}` });
     }
 
     return send({ embeds: [embed] });
   } else if (args[0].toLowerCase() == "stats" || args[0].toLowerCase() == "stat") {
-    const stats = (await getStats(message.member)).gamble["fight"];
+    const stats = (await getGambleStats(message.member)).find((s) => s.game == "fight");
 
     if (!stats) {
       return send({ embeds: [new ErrorEmbed("you have no fight stats")] });
@@ -91,7 +91,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const embed = new CustomEmbed(
       message.member,
-      `you have won **${stats.wins.toLocaleString()}** fights and lost **${stats.lose.toLocaleString()}**`
+      `you have won **${stats._count.win.toLocaleString()}** fights and lost **${(
+        stats._count._all - stats._count.win
+      ).toLocaleString()}**`
     ).setHeader("your fight stats", message.author.avatarURL());
 
     return send({ embeds: [embed] });

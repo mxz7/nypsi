@@ -70,7 +70,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           include: {
             Inventory: true,
             Boosters: true,
-            EconomyStats: true,
+            Game: true,
+            ItemUse: true,
             Crafting: true,
             LotteryTicket: true,
             EconomyWorker: {
