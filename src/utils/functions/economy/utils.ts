@@ -299,7 +299,8 @@ export async function reset() {
   await prisma.lotteryTicket.deleteMany();
   await prisma.$executeRaw`ALTER SEQUENCE "LotteryTicket_id_seq" RESTART WITH 1;`;
   await prisma.booster.deleteMany();
-  await prisma.economyStats.deleteMany();
+  await prisma.game.deleteMany();
+  await prisma.itemUse.deleteMany();
   await prisma.economyGuildMember.deleteMany();
   await prisma.economyGuild.deleteMany();
   await prisma.auction.deleteMany();
@@ -414,11 +415,6 @@ export async function deleteUser(member: GuildMember | string) {
 
   await prisma.booster.deleteMany({
     where: { userId: id },
-  });
-  await prisma.economyStats.deleteMany({
-    where: {
-      economyUserId: id,
-    },
   });
   await prisma.economy.delete({
     where: {
