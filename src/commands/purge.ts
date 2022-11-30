@@ -105,11 +105,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       let msg: Message;
 
       if (!(message instanceof Message)) {
-        await send({ embeds: [new CustomEmbed(message.member, "deleting messages...")], ephemeral: true });
+        msg = await send({ embeds: [new CustomEmbed(message.member, "deleting messages...")], ephemeral: true });
       }
       await message.channel.bulkDelete(amount, true).catch(() => {});
       if (msg) {
-        return edit({ embeds: [new CustomEmbed(message.member, "✅ messages deleted")] }, msg);
+        await msg.edit({ embeds: [new CustomEmbed(message.member, "✅ messages deleted")] });
+      }
+
+      if (message instanceof Message) {
+        setTimeout(() => {
+          msg.delete().catch(() => {});
+        }, 1500);
       }
     } else {
       amount = amount - 1;
@@ -257,7 +263,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (message instanceof Message) {
       await message.delete();
     } else {
-      await send({ embeds: [new CustomEmbed(message.member, "deleting messages...")] });
+      await send({ embeds: [new CustomEmbed(message.member, "deleting messages...")], ephemeral: true });
     }
 
     let collected = await message.channel.messages.fetch({ limit: 100 });
@@ -293,7 +299,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (message instanceof Message) {
       await message.delete();
     } else {
-      await send({ embeds: [new CustomEmbed(message.member, "deleting messages...")] });
+      await send({ embeds: [new CustomEmbed(message.member, "deleting messages...")], ephemeral: true });
     }
 
     let collected = await message.channel.messages.fetch({ limit: 100 });
@@ -450,7 +456,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await message.channel.bulkDelete(collecteda);
 
-    return send({ embeds: [new CustomEmbed(message.member, `✅ ${collecteda.size} messages cleaned up`)] }).then((m) => {
+    return send({
+      embeds: [new CustomEmbed(message.member, `✅ ${collecteda.size} messages cleaned up`)],
+      ephemeral: true,
+    }).then((m) => {
       setTimeout(() => {
         m.delete().catch(() => {});
       }, 1500);
