@@ -3,6 +3,7 @@ import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import Constants from "../../Constants";
+import { addProgress } from "./achievements";
 
 export async function getGambleStats(member: GuildMember) {
   let id: string;
@@ -97,6 +98,8 @@ export async function createGame(opts: {
 
   if (fail) return createGame(opts);
   if (!res) return createGame(opts);
+
+  addProgress(opts.userId, "gambler", 1);
 
   return res.id;
 }
