@@ -58,7 +58,7 @@ export async function updateXp(member: GuildMember | string, amount: number) {
 }
 
 export async function calcMinimumEarnedXp(member: GuildMember): Promise<number> {
-  let earned = 2;
+  let earned = 1;
   earned += (await getPrestige(member)) / 1.79; // i dont like 8
 
   let max = 10;
@@ -97,7 +97,7 @@ export async function calcEarnedXp(member: GuildMember, bet: number): Promise<nu
 
   let earned = await calcMinimumEarnedXp(member);
 
-  const random = Math.floor(Math.random() * 3);
+  const random = Math.floor(Math.random() * 4);
 
   earned += random;
 
