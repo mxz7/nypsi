@@ -51,7 +51,7 @@ export async function postAnalytics(userId: string, serverCount: number) {
       users: userCount,
       active: activeUsers,
       commands: commandCount,
-      popular: popularCommands.slice(0, 4),
+      popular: popularCommands,
       memactive: memUsage,
       memload: memUsagePerc,
       cpuload: cpuUsage,
