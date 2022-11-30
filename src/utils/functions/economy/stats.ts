@@ -1,7 +1,9 @@
 import { Prisma } from "@prisma/client";
 import { GuildMember } from "discord.js";
 import prisma from "../../../init/database";
+import redis from "../../../init/redis";
 import { StatsProfile } from "../../../models/StatsProfile";
+import Constants from "../../Constants";
 import { addProgress } from "./achievements";
 
 export async function getStats(member: GuildMember): Promise<StatsProfile> {
@@ -24,14 +26,61 @@ export async function getStats(member: GuildMember): Promise<StatsProfile> {
   return new StatsProfile(query);
 }
 
-export async function addGamble(member: GuildMember, game: string, win: boolean) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
+async function createGameId() {
+  let gameCount: number;
+
+  if (await redis.exists(Constants.redis.cache.economy.GAME_COUNT)) {
+    gameCount = parseInt(await redis.get(Constants.redis.cache.economy.GAME_COUNT));
+    await redis.set(Constants.redis.cache.economy.GAME_COUNT, gameCount + 1);
   } else {
-    id = member;
+    gameCount = await prisma.game.count();
+    await redis.set(Constants.redis.cache.economy.GAME_COUNT, gameCount + 1);
   }
 
+  return (gameCount + 1).toString(36);
+}
+
+export async function createGame(opts: {
+  userId: string;
+  game: string;
+  win: boolean;
+  bet: number;
+  earned?: number;
+  xp?: number;
+  outcome: string;
+}): Promise<string> {
+  const id = await createGameId();
+  let fail = false;
+
+  const res = await prisma.game
+    .create({
+      data: {
+        id,
+        userId: opts.userId,
+        game: opts.game,
+        win: opts.win,
+        bet: opts.bet,
+        earned: opts.earned,
+        xpEarned: opts.xp,
+        outcome: opts.outcome,
+      },
+      select: {
+        id: true,
+      },
+    })
+    .catch(() => {
+      fail = true;
+    });
+
+  if (fail) return createGame(opts);
+  if (!res) return createGame(opts);
+
+  addGamble(opts.userId, opts.game, opts.win);
+
+  return res.id;
+}
+
+async function addGamble(member: string, game: string, win: boolean) {
   let updateData: Prisma.Without<Prisma.EconomyStatsUpdateInput, Prisma.EconomyStatsUncheckedUpdateInput> &
     Prisma.EconomyStatsUncheckedUpdateInput;
   let createData: Prisma.Without<Prisma.EconomyStatsCreateInput, Prisma.EconomyStatsUncheckedCreateInput> &
@@ -42,7 +91,7 @@ export async function addGamble(member: GuildMember, game: string, win: boolean)
       win: { increment: 1 },
     };
     createData = {
-      economyUserId: id,
+      economyUserId: member,
       gamble: true,
       type: game,
       win: 1,
@@ -52,7 +101,7 @@ export async function addGamble(member: GuildMember, game: string, win: boolean)
       lose: { increment: 1 },
     };
     createData = {
-      economyUserId: id,
+      economyUserId: member,
       gamble: true,
       type: game,
       lose: 1,
@@ -63,14 +112,14 @@ export async function addGamble(member: GuildMember, game: string, win: boolean)
     where: {
       type_economyUserId: {
         type: game,
-        economyUserId: id,
+        economyUserId: member,
       },
     },
     update: updateData,
     create: createData,
   });
 
-  await addProgress(id, "gambler", 1);
+  await addProgress(member, "gambler", 1);
 }
 
 export async function addRob(member: GuildMember, win: boolean) {
