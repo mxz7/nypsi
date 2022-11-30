@@ -11,7 +11,7 @@ import {
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { calcMaxBet, getBalance, updateBalance } from "../utils/functions/economy/balance";
-import { addGamble } from "../utils/functions/economy/stats";
+import { createGame } from "../utils/functions/economy/stats";
 import { createUser, formatBet, isEcoBanned, userExists } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member.js";
@@ -218,8 +218,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     gamble(winner.user, "coinflip", bet, true, bet * 2);
     gamble(loser.user, "coinflip", bet, false);
-    await addGamble(winner, "coinflip", true);
-    await addGamble(loser, "coinflip", false);
+
+    const id = await createGame({
+      userId: message.author.id,
+      bet: bet,
+      game: "coinflip",
+      outcome: `**winner** ${winner.user.tag}\n**loser** ${loser.user.tag}`,
+      win: winner.user.id == message.author.id,
+      earned: winner.user.id == message.author.id ? bet * 2 : null,
+    });
 
     await updateBalance(winner, (await getBalance(winner)) + bet * 2);
 
@@ -238,6 +245,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       embed.setDescription(`**winner** ${winner.user.tag}\n\n${thingy}\n\n**bet** $${bet.toLocaleString()}`);
       embed.setColor(winner.displayHexColor);
+      embed.setFooter({ text: `id: ${id}` });
 
       return setTimeout(() => {
         return msg.edit({ embeds: [embed] });
