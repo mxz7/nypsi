@@ -53,7 +53,7 @@ manager.on("clusterCreate", (cluster) => {
         }
       }, 25000);
       heartBeatIntervals.push(interval);
-    }, 120000);
+    }, 10000);
   });
   cluster.on("death", () => {
     logger.info(`cluster ${cluster.id} died`);
