@@ -22,7 +22,7 @@ import { addProgress } from "../utils/functions/economy/achievements.js";
 import { calcMaxBet, getBalance, getDefaultBet, getMulti, updateBalance } from "../utils/functions/economy/balance.js";
 import { addToGuildXP, getGuildByUser } from "../utils/functions/economy/guilds.js";
 import { addInventoryItem } from "../utils/functions/economy/inventory.js";
-import { addGamble } from "../utils/functions/economy/stats.js";
+import { createGame } from "../utils/functions/economy/stats.js";
 import { createUser, formatBet, userExists } from "../utils/functions/economy/utils.js";
 import { calcEarnedXp, getXp, updateXp } from "../utils/functions/economy/xp.js";
 import { isPremium } from "../utils/functions/premium/premium.js";
@@ -500,7 +500,14 @@ async function playGame(
 
   const lose = async () => {
     gamble(message.author, "mines", bet, false, 0);
-    await addGamble(message.member, "mines", false);
+    const id = await createGame({
+      userId: message.author.id,
+      bet: bet,
+      game: "mines",
+      win: false,
+      outcome: `mines:${JSON.stringify(getRows(grid, true))}`,
+    });
+    embed.setFooter({ text: `id: ${id}` });
     embed.setColor(Constants.EMBED_FAIL_COLOR);
     embed.setDescription(
       "**bet** $" +
@@ -567,7 +574,21 @@ async function playGame(
     }
 
     gamble(message.author, "mines", bet, true, winnings);
-    await addGamble(message.member, "mines", true);
+    const id = await createGame({
+      userId: message.author.id,
+      bet: bet,
+      game: "mines",
+      win: true,
+      outcome: `mines:${JSON.stringify(getRows(grid, true))}`,
+      earned: winnings,
+      xp: earnedXp,
+    });
+
+    if (embed.data.footer) {
+      embed.setFooter({ text: `+${earnedXp}xp | id: ${id}` });
+    } else {
+      embed.setFooter({ text: `id: ${id}` });
+    }
 
     if (win >= 7) await addProgress(message.author.id, "minesweeper_pro", 1);
 
@@ -578,7 +599,14 @@ async function playGame(
 
   const draw = async () => {
     gamble(message.author, "mines", bet, true, bet);
-    await addGamble(message.member, "mines", true);
+    const id = await createGame({
+      userId: message.author.id,
+      bet: bet,
+      game: "mines",
+      win: false,
+      outcome: `mines:${JSON.stringify(getRows(grid, true))}`,
+    });
+    embed.setFooter({ text: `id: ${id}` });
     embed.setColor(variants.macchiato.yellow.hex as ColorResolvable);
     embed.setDescription(
       "**bet** $" +
