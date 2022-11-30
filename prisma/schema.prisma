@@ -104,6 +104,7 @@ model Economy {
   EconomyWorker EconomyWorker[]
   Inventory     Inventory[]
   Crafting      Crafting[]
+  Game          Game[]
 }
 
 model Crafting {
@@ -179,6 +180,19 @@ model EconomyStats {
   economyUserId String
 
   @@id([type, economyUserId])
+}
+
+model Game {
+  id       String  @id
+  userId   String
+  game     String
+  win      Boolean
+  bet      BigInt
+  earned   BigInt
+  xpEarned Int
+  outcome  String
+
+  economy Economy @relation(fields: [userId], references: [userId])
 }
 
 model Premium {
