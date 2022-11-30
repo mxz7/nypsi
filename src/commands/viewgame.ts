@@ -61,6 +61,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   let desc =
     `**user** \`${tag || "[redacted]"}\`\n` +
     `**game** \`${game.game}\`\n` +
+    `**date** <t:${Math.floor(game.date.getTime() / 1000)}>\n` +
     `**bet** $${game.bet.toLocaleString()}\n` +
     `**won** \`${game.win}\`\n`;
 
