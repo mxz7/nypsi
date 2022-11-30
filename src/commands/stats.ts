@@ -20,7 +20,8 @@ import { Categories, Command, NypsiCommandInteraction } from "../models/Command"
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { MStoTime } from "../utils/functions/date";
-import { getStats } from "../utils/functions/economy/stats";
+import { getGambleStats, getItemStats } from "../utils/functions/economy/stats";
+import { getItems } from "../utils/functions/economy/utils";
 import PageManager from "../utils/functions/page";
 import { getCommandUses } from "../utils/functions/users/commands";
 import { mentionQueue } from "../utils/functions/users/mentions";
@@ -72,54 +73,66 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   await addCooldown(cmd.name, message.member, 25);
 
-  const normalStats = async () => {
-    const stats = await getStats(message.member);
+  const gambleStats = async () => {
+    const gambleStats = await getGambleStats(message.member);
 
-    const embed = new CustomEmbed(message.member).setHeader("stats", message.author.avatarURL());
-
-    let gambleTotal = 0;
-    let gambleWinTotal = 0;
-
-    for (const g of Object.keys(stats.gamble)) {
-      if (g == "bankrob") continue;
-      gambleTotal += stats.gamble[g].wins + stats.gamble[g].lose;
-      gambleWinTotal += stats.gamble[g].wins;
+    if (gambleStats.length == 0) {
+      return send({ embeds: [new ErrorEmbed("you have no gamble stats")] });
     }
 
-    const gambleTotalPercent = ((gambleWinTotal / gambleTotal) * 100).toFixed(1);
+    let desc = "";
 
-    const gambleMsg: string[] = [
-      `**total** ${gambleWinTotal.toLocaleString()} / ${gambleTotal.toLocaleString()} (${gambleTotalPercent}%)`,
-    ];
-
-    for (const g of Object.keys(stats.gamble)) {
-      if (g == "bankrob") continue;
-      const percent = ((stats.gamble[g].wins / (stats.gamble[g].lose + stats.gamble[g].wins)) * 100).toFixed(1);
-      gambleMsg.push(
-        `- **${g}** ${stats.gamble[g].wins.toLocaleString()} / ${(
-          stats.gamble[g].wins + stats.gamble[g].lose
-        ).toLocaleString()} (${percent}%)`
-      );
+    for (const stat of gambleStats) {
+      desc += `\`${stat.game}\` ${stat._sum.win.toLocaleString()}/${stat._count._all.toLocaleString()} profit: $${(
+        Number(stat._sum.earned) - Number(stat._sum.bet)
+      ).toLocaleString()} xp: ${Number(stat._sum.xpEarned).toLocaleString()}\n`;
     }
 
-    embed.addField("gamble", gambleMsg.join("\n"), true);
-
-    let itemTotal = 0;
-
-    for (const i of Object.keys(stats.items)) {
-      itemTotal += stats.items[i];
-    }
-
-    const itemMsg: string[] = [`**total** ${itemTotal.toLocaleString()}`];
-
-    for (const i of Object.keys(stats.items)) {
-      if (itemMsg.length >= gambleMsg.length) break;
-      itemMsg.push(`- **${i}** ${stats.items[i].toLocaleString()}`);
-    }
-
-    embed.addField("item uses", itemMsg.join("\n"), true);
+    const embed = new CustomEmbed(message.member, desc).setHeader("gamble stats", message.author.avatarURL());
 
     return send({ embeds: [embed] });
+  };
+
+  const itemStats = async () => {
+    const itemStats = await getItemStats(message.member);
+
+    if (itemStats.length == 0) {
+      return send({ embeds: [new ErrorEmbed("you have no item stats")] });
+    }
+
+    const pages = PageManager.createPages(
+      itemStats.map((i) => `\`${getItems()[i.itemId]?.name}\` ${i.amount.toLocaleString()} uses`)
+    );
+
+    const embed = new CustomEmbed(message.member, pages.get(1).join("\n")).setHeader(
+      "item stats",
+      message.author.avatarURL()
+    );
+
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
+      new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
+    );
+
+    if (pages.size == 1) {
+      return send({ embeds: [embed] });
+    }
+
+    const msg = await send({ embeds: [embed], components: [row] });
+
+    const manager = new PageManager({
+      userId: message.author.id,
+      embed: embed,
+      message: msg,
+      row: row,
+      pages,
+      onPageUpdate(manager) {
+        manager.embed.setFooter({ text: `page ${manager.currentPage}/${manager.lastPage}` });
+        return manager.embed;
+      },
+    });
+
+    return manager.listen();
   };
 
   const commandStats = async () => {
@@ -312,7 +325,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       prisma.economyWorker.count(),
       prisma.economyWorkerUpgrades.count(),
       prisma.booster.count(),
-      prisma.economyStats.count(),
+      prisma.game.count(),
       prisma.premium.count(),
       prisma.premiumCommand.count(),
       prisma.username.count(),
@@ -348,182 +361,67 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({ embeds: [embed] });
   };
 
-  const bankrobStats = async () => {
-    const query = await prisma.economyStats.findUnique({
-      where: {
-        type_economyUserId: {
-          economyUserId: message.author.id,
-          type: "bankrob",
-        },
-      },
-      select: {
-        lose: true,
-        win: true,
-      },
-    });
-
-    if (!query) {
-      return send({ embeds: [new ErrorEmbed("no data")] });
-    }
-
-    const embed = new CustomEmbed(message.member).setHeader("bank robbery stats", message.author.avatarURL());
-
-    embed.setDescription(
-      `**won** $${query.win.toLocaleString()}\n**lost** $${query.lose.toLocaleString()}\n\n**total** $${(
-        query.win - query.lose
-      ).toLocaleString()}`
-    );
-
-    return send({ embeds: [embed] });
-  };
-
   if (args.length == 0) {
-    return normalStats();
+    return gambleStats();
   } else if (args[0].toLowerCase() == "global" && message.author.id == Constants.TEKOH_ID) {
-    const gambleTotal = await prisma.economyStats.aggregate({
-      where: {
-        AND: [
-          {
-            gamble: true,
-          },
-          {
-            NOT: { type: "rob" },
-          },
-        ],
-      },
-      _sum: {
+    const byTypeGamble = await prisma.game.groupBy({
+      by: ["game"],
+      _count: {
         win: true,
-        lose: true,
-      },
-    });
-
-    const byTypeGamble = await prisma.economyStats.groupBy({
-      where: {
-        AND: [
-          {
-            gamble: true,
-          },
-          {
-            NOT: { type: "rob" },
-          },
-        ],
-      },
-      by: ["type"],
-      _sum: {
-        win: true,
-        lose: true,
+        _all: true,
       },
       orderBy: {
-        _sum: {
+        _count: {
           win: "desc",
         },
       },
     });
 
-    const itemTotal = await prisma.economyStats.aggregate({
-      where: {
-        AND: [
-          {
-            gamble: false,
-          },
-          {
-            NOT: { type: "rob" },
-          },
-        ],
-      },
+    const byItem = await prisma.itemUse.groupBy({
+      by: ["itemId"],
       _sum: {
-        win: true,
-      },
-    });
-
-    const byItem = await prisma.economyStats.groupBy({
-      where: {
-        AND: [
-          {
-            gamble: false,
-          },
-          {
-            NOT: { type: "rob" },
-          },
-        ],
-      },
-      by: ["type"],
-      _sum: {
-        win: true,
-      },
-      orderBy: {
-        _sum: {
-          win: "desc",
-        },
-      },
-    });
-
-    const robStats = await prisma.economyStats.aggregate({
-      where: {
-        type: "rob",
-      },
-      _sum: {
-        win: true,
-        lose: true,
+        amount: true,
       },
     });
 
     const embed = new CustomEmbed(message.member);
 
-    const gambleOverall = Number(gambleTotal._sum.win) + Number(gambleTotal._sum.lose);
-    const gambleWinPercent = ((Number(gambleTotal._sum.win) / gambleOverall) * 100).toFixed(2);
-
-    const gambleMsg = [
-      `**total** ${gambleTotal._sum.win.toLocaleString()} / ${gambleOverall.toLocaleString()} (${gambleWinPercent}%)`,
-    ];
+    const gambleMsg: string[] = [];
 
     for (const gamble of byTypeGamble) {
-      const total = Number(gamble._sum.win) + Number(gamble._sum.lose);
+      const percent = ((Number(gamble._count.win) / gamble._count._all) * 100).toFixed(2);
 
-      const percent = ((Number(gamble._sum.win) / total) * 100).toFixed(2);
-
-      gambleMsg.push(` - **${gamble.type}** ${gamble._sum.win.toLocaleString()} / ${total.toLocaleString()} (${percent}%)`);
+      gambleMsg.push(
+        ` - **${gamble.game}** ${gamble._count.win.toLocaleString()} / ${gamble._count._all.toLocaleString()} (${percent}%)`
+      );
     }
 
     embed.addField("gamble wins", gambleMsg.join("\n"), true);
 
-    const itemMsg = [`**total** ${itemTotal._sum.win.toLocaleString()}`];
+    const itemMsg: string[] = [];
 
     for (const item of byItem) {
       if (itemMsg.length >= gambleMsg.length) break;
 
-      const percent = ((Number(item._sum.win) / Number(itemTotal._sum.win)) * 100).toFixed(2);
-
-      itemMsg.push(` - **${item.type}** ${item._sum.win.toLocaleString()} (${percent}%)`);
+      itemMsg.push(` - **${item.itemId}** ${item._sum.amount.toLocaleString()}`);
     }
 
     embed.addField("item stats", itemMsg.join("\n"), true);
 
-    const robTotal = robStats._sum.win + robStats._sum.lose;
-    const robPercent = ((Number(robStats._sum.win) / Number(robTotal)) * 100).toFixed(2);
-
-    embed.setFooter({
-      text: `rob: ${robStats._sum.win.toLocaleString()} / ${robTotal.toLocaleString()} (${robPercent}%)`,
-    });
-
     embed.setHeader("global stats", message.author.avatarURL());
     return send({ embeds: [embed] });
-  } else if (
-    args[0].toLowerCase() == "economy" ||
-    args[0].toLowerCase() == "gamble" ||
-    args[0].toLowerCase().includes("item")
-  ) {
-    return normalStats();
+  } else if (args[0].toLowerCase() == "economy" || args[0].toLowerCase() == "gamble") {
+    return gambleStats();
   } else if (args[0].toLowerCase().includes("command") || args[0].toLowerCase().includes("cmd")) {
     return commandStats();
   } else if (args[0].toLowerCase().includes("bot") || args[0].toLowerCase().includes("nypsi")) {
     return botStats();
-  } else if (args[0].toLowerCase() == "bankrob") {
-    return bankrobStats();
   } else if (args[0].toLowerCase() == "db" && message.author.id == Constants.TEKOH_ID) {
     return dbStats();
+  } else if (args[0].toLowerCase().includes("item")) {
+    return itemStats();
   } else {
-    return normalStats();
+    return gambleStats();
   }
 }
 

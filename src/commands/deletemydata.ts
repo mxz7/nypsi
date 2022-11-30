@@ -83,12 +83,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       },
     });
 
-    await prisma.economyStats.deleteMany({
-      where: {
-        economyUserId: message.author.id,
-      },
-    });
-
     const guild = await getGuildByUser(message.member);
 
     if (guild) {

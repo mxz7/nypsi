@@ -99,11 +99,12 @@ model Economy {
   userId String @id
 
   Boosters      Booster[]
-  EconomyStats  EconomyStats[]
   LotteryTicket LotteryTicket[]
   EconomyWorker EconomyWorker[]
   Inventory     Inventory[]
   Crafting      Crafting[]
+  Game          Game[]
+  ItemUse       ItemUse[]
 }
 
 model Crafting {
@@ -169,16 +170,28 @@ model Booster {
   Economy Economy @relation(fields: [userId], references: [userId], onDelete: Cascade)
 }
 
-model EconomyStats {
-  type   String
-  win    BigInt  @default(0)
-  lose   BigInt  @default(0)
-  gamble Boolean
+model Game {
+  id       String   @id
+  userId   String
+  game     String
+  win      Int
+  bet      BigInt
+  earned   BigInt?
+  xpEarned Int?
+  outcome  String
+  date     DateTime @default(now())
 
-  economy       Economy @relation(fields: [economyUserId], references: [userId], onDelete: Cascade)
-  economyUserId String
+  economy Economy @relation(fields: [userId], references: [userId], onDelete: Cascade)
+}
 
-  @@id([type, economyUserId])
+model ItemUse {
+  userId String
+  itemId String
+  amount Int
+
+  economy Economy @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@id([userId, itemId])
 }
 
 model Premium {

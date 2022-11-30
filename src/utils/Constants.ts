@@ -54,6 +54,7 @@ export default {
         PRESTIGE: "cache:economy:prestige",
         VOTE: "cache:economy:vote",
         XP: "cache:economy:xp",
+        GAME_COUNT: "cache:economy:gamecount",
       },
     },
     nypsi: {
