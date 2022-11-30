@@ -467,7 +467,7 @@ async function playGame(
       }
     }
 
-    if (win >= 7) await addProgress(message.author.id, "highlow_pro", 1);
+    if (win >= 7) addProgress(message.author.id, "highlow_pro", 1);
 
     const id = await createGame({
       userId: message.author.id,

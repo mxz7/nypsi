@@ -238,7 +238,7 @@ export async function openCrate(member: GuildMember, item: Item): Promise<string
   await setInventoryItem(member, item.id, inventory.find((i) => i.item == item.id).amount - 1);
 
   await addItemUse(member, item.id);
-  await addProgress(member.user.id, "unboxer", 1);
+  addProgress(member.user.id, "unboxer", 1);
 
   let times = 2;
   const names = [];
@@ -423,7 +423,7 @@ export async function commandGemCheck(member: GuildMember, commandCategory: Cate
 
     if (chance == 7) {
       await addInventoryItem(member, "pink_gem", 1);
-      await addProgress(member.user.id, "gem_hunter", 1);
+      addProgress(member.user.id, "gem_hunter", 1);
 
       if ((await getDmSettings(member)).other) {
         await addNotificationToQueue({
@@ -442,7 +442,7 @@ export async function commandGemCheck(member: GuildMember, commandCategory: Cate
 
     if (chance == 77) {
       await addInventoryItem(member, "purple_gem", 1);
-      await addProgress(member.user.id, "gem_hunter", 1);
+      addProgress(member.user.id, "gem_hunter", 1);
 
       if ((await getDmSettings(member)).other) {
         await addNotificationToQueue({

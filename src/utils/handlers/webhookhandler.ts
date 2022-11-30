@@ -135,7 +135,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
 
   if (gemChance == 107) {
     await addInventoryItem(user, "blue_gem", 1);
-    await addProgress(user, "gem_hunter", 1);
+    addProgress(user, "gem_hunter", 1);
 
     if ((await getDmSettings(user)).other) {
       await addNotificationToQueue({
@@ -234,7 +234,7 @@ async function handleKofiData(data: KofiResponse) {
 
           if (gemChance == 7) {
             await addInventoryItem(user.id, "pink_gem", 1);
-            await addProgress(user.id, "gem_hunter", 1);
+            addProgress(user.id, "gem_hunter", 1);
 
             if ((await getDmSettings(user.id)).other) {
               await addNotificationToQueue({
@@ -248,7 +248,7 @@ async function handleKofiData(data: KofiResponse) {
             }
           } else if (gemChance == 17) {
             await addInventoryItem(user.id, "blue_gem", 1);
-            await addProgress(user.id, "gem_hunter", 1);
+            addProgress(user.id, "gem_hunter", 1);
 
             if ((await getDmSettings(user.id)).other) {
               await addNotificationToQueue({
@@ -262,7 +262,7 @@ async function handleKofiData(data: KofiResponse) {
             }
           } else if (gemChance == 77) {
             await addInventoryItem(user.id, "purple_gem", 1);
-            await addProgress(user.id, "gem_hunter", 1);
+            addProgress(user.id, "gem_hunter", 1);
 
             if ((await getDmSettings(user.id)).other) {
               await addNotificationToQueue({
@@ -276,7 +276,7 @@ async function handleKofiData(data: KofiResponse) {
             }
           } else if (gemChance == 27) {
             await addInventoryItem(user.id, "green_gem", 1);
-            await addProgress(user.id, "gem_hunter", 1);
+            addProgress(user.id, "gem_hunter", 1);
 
             if ((await getDmSettings(user.id)).other) {
               await addNotificationToQueue({
@@ -293,7 +293,7 @@ async function handleKofiData(data: KofiResponse) {
 
             if (gemChance2 == 7 && (await getDmSettings(user.id)).other) {
               await addInventoryItem(user.id, "white_gem", 1);
-              await addProgress(user.id, "gem_hunter", 1);
+              addProgress(user.id, "gem_hunter", 1);
 
               await addNotificationToQueue({
                 memberId: user.id,
