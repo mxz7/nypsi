@@ -391,7 +391,6 @@ async function playGame(
   };
 
   const lose = async () => {
-    gamble(message.author, "highlow", bet, false, 0);
     const id = await createGame({
       userId: message.author.id,
       bet: bet,
@@ -399,6 +398,7 @@ async function playGame(
       win: false,
       outcome: `**old card** ${games.get(message.author.id).oldCard}\n**new card** ${games.get(message.author.id).card}`,
     });
+    gamble(message.author, "highlow", bet, false, id, 0);
     newEmbed.setFooter({ text: `id: ${id}` });
     newEmbed.setColor(Constants.EMBED_FAIL_COLOR);
     newEmbed.setDescription(
@@ -469,7 +469,6 @@ async function playGame(
 
     if (win >= 7) await addProgress(message.author.id, "highlow_pro", 1);
 
-    gamble(message.author, "highlow", bet, true, winnings);
     const id = await createGame({
       userId: message.author.id,
       bet: bet,
@@ -479,6 +478,7 @@ async function playGame(
       earned: winnings,
       xp: earnedXp,
     });
+    gamble(message.author, "highlow", bet, true, id, winnings);
 
     if (newEmbed.data.footer) {
       newEmbed.setFooter({ text: `+${earnedXp}xp | id: ${id}` });
@@ -493,7 +493,6 @@ async function playGame(
   };
 
   const draw = async () => {
-    gamble(message.author, "highlow", bet, true, bet);
     const id = await createGame({
       userId: message.author.id,
       bet: bet,
@@ -501,6 +500,7 @@ async function playGame(
       win: false,
       outcome: `**old card** ${games.get(message.author.id).oldCard}\n**new card** ${games.get(message.author.id).card}`,
     });
+    gamble(message.author, "highlow", bet, true, id, bet);
     newEmbed.setFooter({ text: `id: ${id}` });
     newEmbed.setColor(variants.macchiato.yellow.hex as ColorResolvable);
     newEmbed.setDescription(

@@ -20,8 +20,8 @@ import Constants from "../utils/Constants";
 import { a } from "../utils/functions/anticheat";
 import { isLockedOut, verifyUser } from "../utils/functions/captcha";
 import { calcMaxBet, getBalance, getDefaultBet, getMulti, updateBalance } from "../utils/functions/economy/balance.js";
-import { createGame } from "../utils/functions/economy/stats";
 import { addToGuildXP, getGuildByUser } from "../utils/functions/economy/guilds";
+import { createGame } from "../utils/functions/economy/stats";
 import { createUser, formatBet, userExists } from "../utils/functions/economy/utils.js";
 import { calcEarnedXp, getXp, updateXp } from "../utils/functions/economy/xp";
 import { isPremium } from "../utils/functions/premium/premium";
@@ -521,7 +521,6 @@ async function playGame(
   };
 
   const lose = async () => {
-    gamble(message.author, "blackjack", bet, false, 0);
     const id = await createGame({
       userId: message.author.id,
       bet: bet,
@@ -531,6 +530,7 @@ async function playGame(
         message.member
       )})\nmember cards: ${getCards(message.member)} (${calcTotal(message.member)})`,
     });
+    gamble(message.author, "blackjack", bet, false, id, 0);
     newEmbed.setColor(Constants.EMBED_FAIL_COLOR);
     newEmbed.setDescription("**bet** $" + bet.toLocaleString() + "\n\n**you lose!!**");
     newEmbed.addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**");
@@ -580,7 +580,6 @@ async function playGame(
       }
     }
 
-    gamble(message.author, "blackjack", bet, true, winnings);
     const id = await createGame({
       userId: message.author.id,
       bet: bet,
@@ -593,6 +592,7 @@ async function playGame(
       xp: earnedXp,
     });
 
+    gamble(message.author, "blackjack", bet, true, id, winnings);
     if (newEmbed.data.footer) {
       newEmbed.setFooter({ text: `+${earnedXp}xp | id: ${id}` });
     } else {
@@ -607,7 +607,6 @@ async function playGame(
   };
 
   const draw = async () => {
-    gamble(message.author, "blackjack", bet, true, bet);
     const id = await createGame({
       userId: message.author.id,
       bet: bet,
@@ -617,6 +616,7 @@ async function playGame(
         message.member
       )})\nmember cards: ${getCards(message.member)} (${calcTotal(message.member)})`,
     });
+    gamble(message.author, "blackjack", bet, true, id, bet);
     newEmbed.setFooter({ text: `id: ${id}` });
     newEmbed.setColor(variants.macchiato.yellow.hex as ColorResolvable);
     newEmbed.setDescription("**bet** $" + bet.toLocaleString() + "\n\n**draw!!**\nyou win $" + bet.toLocaleString());

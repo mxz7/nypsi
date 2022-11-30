@@ -208,6 +208,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         bet.toLocaleString()
     );
 
+    let id: string;
+
     if (win) {
       if (multi > 0) {
         embed.addField(
@@ -231,7 +233,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
       }
 
-      const id = await createGame({
+      id = await createGame({
         userId: message.author.id,
         bet: bet,
         game: "rps",
@@ -251,7 +253,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     } else {
       embed.addField("**loser!!**", "**you lost** $" + bet.toLocaleString());
       embed.setColor(Constants.EMBED_FAIL_COLOR);
-      const id = await createGame({
+      id = await createGame({
         userId: message.author.id,
         bet: bet,
         game: "rps",
@@ -261,12 +263,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       embed.setFooter({ text: `id: ${id}` });
     }
 
+    gamble(message.author, "rock paper scissors", bet, win, id, winnings);
     setTimeout(() => {
       edit({ embeds: [embed] }, m);
     }, 1500);
   });
-
-  gamble(message.author, "rock paper scissors", bet, win, winnings);
 }
 
 cmd.setRun(run);

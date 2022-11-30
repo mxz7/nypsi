@@ -216,9 +216,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       loser = message.member;
     }
 
-    gamble(winner.user, "coinflip", bet, true, bet * 2);
-    gamble(loser.user, "coinflip", bet, false);
-
     const id = await createGame({
       userId: message.author.id,
       bet: bet,
@@ -227,6 +224,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       win: winner.user.id == message.author.id,
       earned: winner.user.id == message.author.id ? bet * 2 : null,
     });
+
+    gamble(winner.user, "coinflip", bet, true, id, bet * 2);
+    gamble(loser.user, "coinflip", bet, false, id);
 
     await updateBalance(winner, (await getBalance(winner)) + bet * 2);
 

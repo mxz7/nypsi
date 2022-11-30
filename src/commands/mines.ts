@@ -501,7 +501,6 @@ async function playGame(
   };
 
   const lose = async () => {
-    gamble(message.author, "mines", bet, false, 0);
     const id = await createGame({
       userId: message.author.id,
       bet: bet,
@@ -509,6 +508,7 @@ async function playGame(
       win: false,
       outcome: `mines:${JSON.stringify(getRows(grid, true))}`,
     });
+    gamble(message.author, "mines", bet, false, id, 0);
     embed.setFooter({ text: `id: ${id}` });
     embed.setColor(Constants.EMBED_FAIL_COLOR);
     embed.setDescription(
@@ -575,7 +575,6 @@ async function playGame(
       }
     }
 
-    gamble(message.author, "mines", bet, true, winnings);
     const id = await createGame({
       userId: message.author.id,
       bet: bet,
@@ -585,6 +584,7 @@ async function playGame(
       earned: winnings,
       xp: earnedXp,
     });
+    gamble(message.author, "mines", bet, true, id, winnings);
 
     if (embed.data.footer) {
       embed.setFooter({ text: `+${earnedXp}xp | id: ${id}` });
@@ -600,7 +600,6 @@ async function playGame(
   };
 
   const draw = async () => {
-    gamble(message.author, "mines", bet, true, bet);
     const id = await createGame({
       userId: message.author.id,
       bet: bet,
@@ -608,6 +607,7 @@ async function playGame(
       win: false,
       outcome: `mines:${JSON.stringify(getRows(grid, true))}`,
     });
+    gamble(message.author, "mines", bet, true, id, bet);
     embed.setFooter({ text: `id: ${id}` });
     embed.setColor(variants.macchiato.yellow.hex as ColorResolvable);
     embed.setDescription(

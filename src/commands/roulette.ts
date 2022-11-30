@@ -274,6 +274,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   send({ embeds: [embed] }).then(async (m) => {
     embed.setDescription("**landed on** " + roll + "\n\n**choice** " + colorBet + "\n**your bet** $" + bet.toLocaleString());
 
+    let id: string;
+
     if (win) {
       if (multi > 0) {
         embed.addField(
@@ -297,7 +299,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
       }
 
-      const id = await createGame({
+      id = await createGame({
         userId: message.author.id,
         bet: bet,
         game: "roulette",
@@ -318,7 +320,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       embed.addField("**loser!!**", "**you lost** $" + bet.toLocaleString());
       embed.setColor(Constants.EMBED_FAIL_COLOR);
 
-      const id = await createGame({
+      id = await createGame({
         userId: message.author.id,
         bet: bet,
         game: "roulette",
@@ -328,11 +330,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       embed.setFooter({ text: `id: ${id}` });
     }
 
+    gamble(message.author, "roulette", bet, win, id, winnings);
+
     setTimeout(() => {
       edit({ embeds: [embed] }, m);
     }, 2000);
   });
-  gamble(message.author, "roulette", bet, win, winnings);
 }
 
 cmd.setRun(run);
