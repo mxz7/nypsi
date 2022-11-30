@@ -114,7 +114,7 @@ export async function postAnalytics(userId: string, serverCount: number) {
             memload: memUsagePerc,
             cpuload: cpuUsage,
           }),
-        }).then((res) => res.json());
+        }).then((res) => res.json().catch((e) => logger.error(e)));
 
         if (res.error) {
           logger.error(`failed to post analytics: ${res.message}`);
