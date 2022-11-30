@@ -29,6 +29,7 @@ import { Item } from "../../types/Economy";
 import Constants from "../Constants";
 import { a } from "../functions/anticheat";
 import { addProgress } from "../functions/economy/achievements";
+import { commandGemCheck } from "../functions/economy/inventory";
 import { createUser, getEcoBanTime, getItems, isEcoBanned, isHandcuffed, userExists } from "../functions/economy/utils";
 import { getXp, updateXp } from "../functions/economy/xp";
 import { getDisabledCommands } from "../functions/guilds/disabledcommands";
@@ -774,6 +775,7 @@ export async function runCommand(
     redis.sadd(Constants.redis.nypsi.ACTIVE_USERS_ANALYTICS, message.author.id),
     redis.hincrby(Constants.redis.nypsi.TOP_COMMANDS_ANALYTICS, command.name, 1),
     addProgress(message.author.id, "nypsi", 1),
+    commandGemCheck(message.member, command.category),
   ]);
 
   if (command.category == "money") {
