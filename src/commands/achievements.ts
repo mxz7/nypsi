@@ -73,6 +73,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const allAchievementData = getAchievements();
     const achievements = await getUncompletedAchievements(message.author.id);
 
+    console.log(achievements);
+
     if (!achievements || achievements.length == 0) {
       return showAllAchievements();
     }
