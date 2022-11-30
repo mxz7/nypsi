@@ -22,7 +22,7 @@ import { isLockedOut, verifyUser } from "../utils/functions/captcha.js";
 import { addProgress } from "../utils/functions/economy/achievements.js";
 import { calcMaxBet, getBalance, getDefaultBet, getMulti, updateBalance } from "../utils/functions/economy/balance.js";
 import { addToGuildXP, getGuildByUser } from "../utils/functions/economy/guilds.js";
-import { addGamble } from "../utils/functions/economy/stats.js";
+import { createGame } from "../utils/functions/economy/stats.js";
 import { createUser, formatBet, userExists } from "../utils/functions/economy/utils.js";
 import { calcEarnedXp, getXp, updateXp } from "../utils/functions/economy/xp.js";
 import { isPremium } from "../utils/functions/premium/premium.js";
@@ -30,7 +30,10 @@ import { addHourlyCommand } from "../utils/handlers/commandhandler.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 import { gamble, logger } from "../utils/logger.js";
 
-const games = new Map<string, { bet: number; win: number; deck: string[]; card: string; id: number; voted: number }>();
+const games = new Map<
+  string,
+  { bet: number; win: number; deck: string[]; card: string; id: number; voted: number; oldCard?: string }
+>();
 
 const cmd = new Command("highlow", "higher or lower game", Categories.MONEY).setAliases(["hl"]);
 
@@ -291,6 +294,7 @@ async function prepareGame(
 }
 
 function newCard(member: GuildMember) {
+  const oldCard = games.get(member.user.id).card;
   const deck = games.get(member.user.id).deck;
 
   const choice = deck[0];
@@ -304,6 +308,7 @@ function newCard(member: GuildMember) {
     card: choice,
     id: games.get(member.user.id).id,
     voted: games.get(member.user.id).voted,
+    oldCard,
   });
 }
 
@@ -385,7 +390,14 @@ async function playGame(
 
   const lose = async () => {
     gamble(message.author, "highlow", bet, false, 0);
-    await addGamble(message.member, "highlow", false);
+    const id = await createGame({
+      userId: message.author.id,
+      bet: bet,
+      game: "highlow",
+      win: false,
+      outcome: `**old card** ${games.get(message.author.id).oldCard}\n**new card** ${games.get(message.author.id).card}`,
+    });
+    newEmbed.setFooter({ text: `id: ${id}` });
     newEmbed.setColor(Constants.EMBED_FAIL_COLOR);
     newEmbed.setDescription(
       "**bet** $" +
@@ -456,7 +468,21 @@ async function playGame(
     if (win >= 7) await addProgress(message.author.id, "highlow_pro", 1);
 
     gamble(message.author, "highlow", bet, true, winnings);
-    await addGamble(message.member, "highlow", true);
+    const id = await createGame({
+      userId: message.author.id,
+      bet: bet,
+      game: "highlow",
+      win: true,
+      outcome: `**old card** ${games.get(message.author.id).oldCard}\n**new card** ${games.get(message.author.id).card}`,
+      earned: winnings,
+      xp: earnedXp,
+    });
+
+    if (newEmbed.data.footer) {
+      newEmbed.setFooter({ text: `+${earnedXp}xp | id: ${id}` });
+    } else {
+      newEmbed.setFooter({ text: `id: ${id}` });
+    }
 
     newEmbed.addField("card", "| " + card + " |");
     await updateBalance(message.member, (await getBalance(message.member)) + winnings);
@@ -466,7 +492,14 @@ async function playGame(
 
   const draw = async () => {
     gamble(message.author, "highlow", bet, true, bet);
-    await addGamble(message.member, "highlow", true);
+    const id = await createGame({
+      userId: message.author.id,
+      bet: bet,
+      game: "highlow",
+      win: false,
+      outcome: `**old card** ${games.get(message.author.id).oldCard}\n**new card** ${games.get(message.author.id).card}`,
+    });
+    newEmbed.setFooter({ text: `id: ${id}` });
     newEmbed.setColor(variants.macchiato.yellow.hex as ColorResolvable);
     newEmbed.setDescription(
       "**bet** $" +
