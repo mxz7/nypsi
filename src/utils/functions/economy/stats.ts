@@ -80,6 +80,14 @@ export async function createGame(opts: {
   return res.id;
 }
 
+export async function fetchGame(id: string) {
+  return await prisma.game.findUnique({
+    where: {
+      id,
+    },
+  });
+}
+
 async function addGamble(member: string, game: string, win: boolean) {
   let updateData: Prisma.Without<Prisma.EconomyStatsUpdateInput, Prisma.EconomyStatsUncheckedUpdateInput> &
     Prisma.EconomyStatsUncheckedUpdateInput;
