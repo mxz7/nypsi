@@ -50,9 +50,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const game = await fetchGame(args[0].toLowerCase());
 
-  if (!game) return send({ embeds: [new ErrorEmbed(`couldn't find a game with id \`${game}\``)] });
+  if (!game) return send({ embeds: [new ErrorEmbed(`couldn't find a game with id \`${args[0]}\``)] });
 
-  const embed = new CustomEmbed(message.member).setHeader(game.id, message.author.id);
+  const embed = new CustomEmbed(message.member).setHeader(game.id, message.author.avatarURL());
 
   const tag = (await getLastKnownTag(game.userId))?.split("#")[0];
 
@@ -60,20 +60,22 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   let desc =
     `**user** \`${tag || "[redacted]"}\`\n` +
-    `**game** ${game.game}\n` +
-    `**bet** ${game.bet.toLocaleString()}\n` +
-    `**won** ${game.win}\n`;
+    `**game** \`${game.game}\`\n` +
+    `**bet** $${game.bet.toLocaleString()}\n` +
+    `**won** \`${game.win}\`\n`;
 
   if (game.outcome.startsWith("mines:")) {
     components = JSON.parse(
       game.outcome.slice(6, game.outcome.length)
     ) as ActionRowBuilder<MessageActionRowComponentBuilder>[];
+
+    components[components.length - 1].components.length = 4;
   } else {
     desc += `**outcome** ${game.outcome}`;
   }
 
   if (game.win) {
-    embed.addField("rewards", `**money** $${game.earned.toLocaleString()}\n**xp** ${game.xpEarned}xp`);
+    embed.addField("rewards", `$${game.earned.toLocaleString()}\n${game.xpEarned}xp`);
   }
 
   embed.setDescription(desc);
