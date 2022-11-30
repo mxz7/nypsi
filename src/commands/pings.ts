@@ -2,6 +2,7 @@ import {
   ActionRowBuilder,
   BaseMessageOptions,
   ButtonBuilder,
+  ButtonInteraction,
   ButtonStyle,
   CommandInteraction,
   InteractionReplyOptions,
@@ -147,8 +148,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         manager.embed.setFooter({ text: `page ${manager.currentPage}/${manager.lastPage}` });
         return manager.embed;
       },
-      handleResponses: new Map().set("❌", async (data: { manager: PageManager }) => {
-        await deleteUserMentions(data.manager.message.guild, manager.userId);
+      handleResponses: new Map().set("❌", async (manager: PageManager<string>, interaction: ButtonInteraction) => {
+        await interaction.deferUpdate();
+        await deleteUserMentions(manager.message.guild, manager.userId);
 
         embed.data.fields.length == 0;
 

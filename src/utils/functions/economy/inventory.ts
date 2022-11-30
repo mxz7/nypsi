@@ -20,7 +20,10 @@ type Inventory = {
   amount: number;
 }[];
 
-export async function getInventory(member: GuildMember | string, checkAchievement = false): Promise<Inventory> {
+export async function getInventory(
+  member: GuildMember | string,
+  checkAchievement = false
+): Promise<{ item: string; amount: number }[]> {
   let id: string;
   if (member instanceof GuildMember) {
     id = member.user.id;
@@ -104,6 +107,8 @@ export async function addInventoryItem(
       amount: amount,
     },
   });
+
+  if (itemId.endsWith("gem")) logger.info(`${id} received: ${itemId}`);
 
   await redis.del(`${Constants.redis.cache.economy.INVENTORY}:${id}`);
 

@@ -1,5 +1,4 @@
 import { REST } from "@discordjs/rest";
-import { PermissionFlagsBits, Routes } from "discord-api-types/v9";
 import {
   ActionRowBuilder,
   APIEmbed,
@@ -10,6 +9,8 @@ import {
   Interaction,
   Message,
   MessageActionRowComponentBuilder,
+  PermissionFlagsBits,
+  Routes,
   WebhookClient,
 } from "discord.js";
 import * as fs from "fs";
@@ -598,7 +599,9 @@ export async function runCommand(
       });
 
       if (ownerTag) {
-        embed.setHeader(`${ownerTag.split("#")[0]}'s command`);
+        embed.setFooter({
+          text: `by ${ownerTag} | ${customCommand.uses.toLocaleString()} use${customCommand.uses == 1 ? "" : "s"}`,
+        });
       }
 
       return message.channel.send({ embeds: [embed] });

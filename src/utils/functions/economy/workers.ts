@@ -113,29 +113,55 @@ export async function calcWorkerValues(
     }
   }
 
-  if (inventory.find((i) => i.item == "purple_gem")) {
-    perItemBonus += perItemBonus * 0.07;
+  if (inventory.find((i) => i.item == "purple_gem").amount > 0) {
+    const chance = Math.floor(Math.random() * 10);
+
+    if (chance < 5) {
+      perItemBonus -= perItemBonus * 0.27;
+    } else {
+      perItemBonus += perItemBonus * 0.17;
+    }
   }
 
-  if (inventory.find((i) => i.item == "green_gem")) {
-    maxStoredBonus += maxStoredBonus * 0.07;
+  if (inventory.find((i) => i.item == "green_gem").amount > 0) {
+    maxStoredBonus += maxStoredBonus * 0.17;
   }
 
-  if (inventory.find((i) => i.item == "blue_gem")) {
-    perIntervalBonus += perIntervalBonus * 0.07;
+  if (inventory.find((i) => i.item == "blue_gem").amount > 0) {
+    const chance = Math.floor(Math.random() * 10);
+
+    if (chance < 5) {
+      perIntervalBonus -= perIntervalBonus * 0.27;
+    } else {
+      perIntervalBonus += perIntervalBonus * 0.17;
+    }
   }
 
-  if (inventory.find((i) => i.item == "white_gem")) {
-    maxStoredBonus += maxStoredBonus * 0.07;
-    perIntervalBonus += perIntervalBonus * 0.07;
-    perItemBonus += perItemBonus * 0.07;
+  if (inventory.find((i) => i.item == "white_gem").amount > 0) {
+    const chance = Math.floor(Math.random() * 10);
+
+    if (chance < 4) {
+      perIntervalBonus -= perIntervalBonus * 0.97;
+      perItemBonus -= perItemBonus * 0.97;
+    } else {
+      perIntervalBonus += perIntervalBonus * 0.7;
+      perItemBonus += perItemBonus * 0.7;
+    }
+
+    maxStoredBonus += maxStoredBonus * 0.7;
   }
 
-  return {
+  const res = {
     perInterval: Math.floor(baseWorkers[worker.workerId].base.per_interval + perIntervalBonus),
     perItem: Math.floor(baseWorkers[worker.workerId].base.per_item + perItemBonus),
     maxStorage: Math.floor(baseWorkers[worker.workerId].base.max_storage + maxStoredBonus),
   };
+
+  if (res.perInterval < 0) res.perInterval = 0;
+  if (res.perItem < 0) res.perItem = 0;
+  if (res.maxStorage < 0) res.maxStorage = 0;
+
+  return res;
 }
 
 export async function addWorkerUpgrade(member: GuildMember, workerId: string, upgradeId: string) {

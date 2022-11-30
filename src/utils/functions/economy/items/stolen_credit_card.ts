@@ -1,4 +1,5 @@
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions } from "discord.js";
+import { randomInt } from "node:crypto";
 import { NypsiCommandInteraction } from "../../../../models/Command";
 import { CustomEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
@@ -34,7 +35,7 @@ module.exports = new ItemUse(
       }
     };
 
-    const amount = Math.floor(Math.random() * 499000) + 1000;
+    const amount = randomInt(1000, 500_000);
 
     const inventory = await getInventory(message.member, false);
 
