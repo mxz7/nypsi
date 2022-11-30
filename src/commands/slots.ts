@@ -13,7 +13,7 @@ import { addProgress } from "../utils/functions/economy/achievements.js";
 import { calcMaxBet, getBalance, getDefaultBet, getMulti, updateBalance } from "../utils/functions/economy/balance.js";
 import { getBoosters } from "../utils/functions/economy/boosters.js";
 import { addToGuildXP, getGuildByUser } from "../utils/functions/economy/guilds.js";
-import { addGamble } from "../utils/functions/economy/stats.js";
+import { createGame } from "../utils/functions/economy/stats";
 import { createUser, formatBet, userExists } from "../utils/functions/economy/utils.js";
 import { calcEarnedXp, getXp, updateXp } from "../utils/functions/economy/xp.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
@@ -387,10 +387,45 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
       }
 
+      const id = await createGame({
+        userId: message.author.id,
+        bet: bet,
+        game: "slots",
+        outcome:
+          staticEmojis.get(one.split("-")[0]) +
+          " **|** " +
+          staticEmojis.get(two.split("-")[0]) +
+          " **|** " +
+          staticEmojis.get(three.split("-")[0]),
+        win: true,
+        earned: winnings,
+        xp: earnedXp,
+      });
+
+      if (embed.data.footer) {
+        embed.setFooter({ text: `+${earnedXp}xp | id: ${id}` });
+      } else {
+        embed.setFooter({ text: `id: ${id}` });
+      }
+
       embed.setColor(Constants.EMBED_SUCCESS_COLOR);
     } else {
       embed.addField("**loser!!**", "**you lost** $" + bet.toLocaleString());
       embed.setColor(Constants.EMBED_FAIL_COLOR);
+
+      const id = await createGame({
+        userId: message.author.id,
+        bet: bet,
+        game: "slots",
+        outcome:
+          staticEmojis.get(one.split("-")[0]) +
+          " **|** " +
+          staticEmojis.get(two.split("-")[0]) +
+          " **|** " +
+          staticEmojis.get(three.split("-")[0]),
+        win: false,
+      });
+      embed.setFooter({ text: `id: ${id}` });
     }
 
     setTimeout(() => {
@@ -399,7 +434,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   });
 
   gamble(message.author, "slots", bet, win, winnings);
-  await addGamble(message.member, "slots", win);
 }
 
 cmd.setRun(run);
