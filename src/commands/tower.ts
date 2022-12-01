@@ -140,6 +140,17 @@ async function prepareGame(
     }
   };
 
+  if (args.length == 0) {
+    return send({
+      embeds: [
+        new CustomEmbed(message.member)
+          .addField("usage", "/tower <bet> (difficulty)")
+          .addField("game", "click the eggs to climb to the top of the dragons tower")
+          .setHeader("dragon tower help", message.author.avatarURL()),
+      ],
+    });
+  }
+
   if (games.has(message.author.id)) return send({ embeds: [new ErrorEmbed("you are already playing dragon tower")] });
 
   if (await redis.sismember(Constants.redis.nypsi.USERS_PLAYING, message.author.id)) {
