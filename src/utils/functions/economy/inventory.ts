@@ -415,13 +415,13 @@ export function selectItem(search: string) {
   return selected;
 }
 
-export async function commandGemCheck(member: GuildMember, commandCategory: Categories) {
+export async function commandGemCheck(member: GuildMember, commandCategory: string) {
   if (!(await userExists(member))) return;
 
   if (commandCategory == Categories.MODERATION) {
-    const chance = Math.floor(Math.random() * 400);
+    const chance = Math.floor(Math.random() * 350);
 
-    if (chance == 7) {
+    if (chance == 77) {
       await addInventoryItem(member, "pink_gem", 1);
       addProgress(member.user.id, "gem_hunter", 1);
 

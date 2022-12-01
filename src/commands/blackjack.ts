@@ -112,6 +112,13 @@ async function prepareGame(
     return send({ embeds: [new ErrorEmbed("you are already playing blackjack")] });
   }
 
+  if (await redis.sismember(Constants.redis.nypsi.USERS_PLAYING, message.author.id)) {
+    if (msg) {
+      return msg.edit({ embeds: [new ErrorEmbed("you are already playing something")], components: [] });
+    }
+    return send({ embeds: [new ErrorEmbed("you are already playing something")] });
+  }
+
   const defaultBet = await getDefaultBet(message.member);
 
   if (args.length == 0 && !defaultBet) {
@@ -186,7 +193,7 @@ async function prepareGame(
   }
 
   await addCooldown(cmd.name, message.member, 25);
-
+  await redis.sadd(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
   await updateBalance(message.member, (await getBalance(message.member)) - bet);
 
   const id = Math.random();
@@ -263,6 +270,7 @@ async function prepareGame(
     if (games.has(message.author.id)) {
       if (games.get(message.author.id).id == id) {
         games.delete(message.author.id);
+        await redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
         await updateBalance(message.member, (await getBalance(message.member)) + bet);
       }
     }
@@ -310,6 +318,7 @@ async function prepareGame(
 
   playGame(message, msg, args).catch((e: string) => {
     logger.error(`error occured playing blackjack - ${message.author.tag} (${message.author.id})`);
+    redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
     logger.error(e);
     message.channel.send({
       embeds: [new ErrorEmbed("an error occured while running - join support server")],
@@ -485,6 +494,7 @@ async function playGame(
   );
 
   const replay = async (embed: CustomEmbed) => {
+    await redis.del(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
     if (!(await isPremium(message.member)) || (await getBalance(message.member)) < bet) {
       return m.edit({ embeds: [embed], components: [] });
     }
@@ -683,6 +693,7 @@ async function playGame(
         fail = true;
         games.delete(message.author.id);
         message.channel.send({ content: message.author.toString() + " blackjack game expired" });
+        redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
       });
 
     if (fail) return;
@@ -831,6 +842,7 @@ async function playGame(
         }
       }, 1500);
     } else {
+      await redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
       games.delete(message.author.id);
       return;
     }
