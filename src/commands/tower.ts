@@ -21,7 +21,9 @@ interface Game {
 /**
  * nothing = a
  * egg = b
+ * gem = g
  * found egg = c
+ * found gem = gc
  * bad click = x (end game)
  * last row is always finish / play again
  * only show 1 untouched row
@@ -196,12 +198,22 @@ async function prepareGame(
 
 function createBoard(diff: string) {
   const board: string[][] = [];
+  let spawnedGem = false;
 
   const createRow = () => {
     const populate = (eggs: number, row: string[]) => {
       while (row.filter((i) => i == "b").length < eggs) {
-        const pos = randomInt(0, row.length);
-        row[pos] = "b";
+        const gemSpawnChance = Math.floor(Math.random() * 10);
+
+        if (gemSpawnChance == 3 && diff == "hard" && !spawnedGem) {
+          const pos = randomInt(0, row.length);
+          row[pos] = "g";
+          spawnedGem = true;
+        } else {
+          const pos = randomInt(0, row.length);
+          if (row[pos] == "g") continue;
+          row[pos] = "b";
+        }
       }
       return row;
     };
