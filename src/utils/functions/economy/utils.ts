@@ -322,7 +322,6 @@ export async function reset() {
           { lastVote: { lt: new Date(Date.now() - ms("12 hours")) } },
           { dailyStreak: { lt: 2 } },
           { auction_watch: { isEmpty: true } },
-          {},
         ],
       },
     })
