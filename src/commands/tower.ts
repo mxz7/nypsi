@@ -493,8 +493,6 @@ async function playGame(
     gamble(message.author, "tower", game.bet, true, winnings);
     await addGamble(message.member, "tower", true);
 
-    if (game.win >= 7) await addProgress(message.author.id, "tower_pro", 1);
-
     await updateBalance(message.member, (await getBalance(message.member)) + winnings);
     games.delete(message.author.id);
     return replay(game.embed);
@@ -603,14 +601,14 @@ async function playGame(
 
       const modifiers = new Map<number, number>([
         [0, 0.6],
-        [1, 0.6],
-        [2, 0.6],
-        [3, 0.45],
+        [1, 0.55],
+        [2, 0.5],
+        [3, 0.4],
         [4, 0.4],
         [5, 0.3],
         [6, 0.2],
         [7, 0.1],
-        [8, 0.05],
+        [8, 0.1],
       ]);
 
       game.win += game.increment * (y + 1) * modifiers.get(y);
@@ -635,6 +633,7 @@ async function playGame(
       );
 
       if (y >= 8) {
+        await addProgress("tower_pro");
         game.win += game.increment * 2;
         win1();
         return;
