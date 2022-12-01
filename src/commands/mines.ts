@@ -390,11 +390,15 @@ function getRows(grid: string[], end: boolean) {
         break;
       case "g":
         button.setStyle(ButtonStyle.Secondary);
-        if (end) button.setEmoji(GEM_EMOJI).setDisabled(true);
+        if (end) {
+          button.setEmoji(GEM_EMOJI).setDisabled(true);
+          delete button.data.label;
+        }
         break;
       case "gc":
         button.setStyle(ButtonStyle.Success).setDisabled(true);
         button.setEmoji(GEM_EMOJI);
+        delete button.data.label;
         break;
       case "x":
         button.setStyle(ButtonStyle.Danger).setDisabled(true);
