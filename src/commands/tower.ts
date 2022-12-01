@@ -261,7 +261,7 @@ function createBoard(diff: string) {
   const createRow = () => {
     const populate = (eggs: number, row: string[]) => {
       while (row.filter((i) => ["b", "g"].includes(i)).length < eggs) {
-        const gemSpawnChance = Math.floor(Math.random() * 50);
+        const gemSpawnChance = Math.floor(Math.random() * 45);
 
         if (gemSpawnChance == 7 && !spawnedGem) {
           const pos = randomInt(0, row.length);
