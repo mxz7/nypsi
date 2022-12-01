@@ -246,7 +246,7 @@ async function prepareGame(
   }
 
   playGame(message, msg, args).catch((e: string) => {
-    logger.error(`error occured playing mines - ${message.author.tag} (${message.author.id})`);
+    logger.error(`error occured playing tower - ${message.author.tag} (${message.author.id})`);
     logger.error(e);
     return send({
       embeds: [new ErrorEmbed("an error occured while running - join support server")],
@@ -363,7 +363,7 @@ function createRows(board: string[][], end = false) {
   }
 
   rows[rows.length] = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder().setCustomId("f").setLabel("finish").setStyle(ButtonStyle.Success)
+    new ButtonBuilder().setCustomId("f").setLabel("finish").setStyle(ButtonStyle.Success).setDisabled(end)
   );
 
   return rows;
@@ -423,8 +423,8 @@ async function playGame(
   };
 
   const lose = async () => {
-    gamble(message.author, "mines", game.bet, false, 0);
-    await addGamble(message.member, "mines", false);
+    gamble(message.author, "tower", game.bet, false, 0);
+    await addGamble(message.member, "tower", false);
     game.embed.setColor(Constants.EMBED_FAIL_COLOR);
     game.embed.setDescription(
       "**bet** $" +
