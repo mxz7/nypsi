@@ -57,8 +57,8 @@ const mineIncrements = new Map<number, number>([
   [7, 0.6],
   [10, 1],
   [15, 1.5],
-  [20, 5],
-  [23, 15],
+  [20, 4],
+  [23, 13],
 ]);
 
 abcde.set("a", 0);
