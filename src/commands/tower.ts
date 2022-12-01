@@ -29,7 +29,7 @@ interface Game {
  *
  */
 
-const difficulty = new Map<string, number>([
+const difficultyIncrements = new Map<string, number>([
   ["easy", 0.5],
   ["medium", 1],
   ["hard", 2],
@@ -44,7 +44,7 @@ cmd.slashData
       .setName("difficulty")
       .setDescription("how hard would you like your game to be")
       .setChoices(
-        ...Array.from(difficulty.keys()).map((i) => {
+        ...Array.from(difficultyIncrements.keys()).map((i) => {
           return { name: i, value: i };
         })
       )
@@ -166,14 +166,14 @@ async function prepareGame(
 
   if (!chosenDifficulty) {
     chosenDifficulty = "medium";
-  } else if (!difficulty.has(chosenDifficulty)) {
+  } else if (!difficultyIncrements.has(chosenDifficulty)) {
     if (msg) {
       return msg.edit({
-        embeds: [new ErrorEmbed(`invalid difficulty\nallowed: ${Array.from(difficulty.keys()).join(", ")}`)],
+        embeds: [new ErrorEmbed(`invalid difficulty\nallowed: ${Array.from(difficultyIncrements.keys()).join(", ")}`)],
       });
     } else {
       return send({
-        embeds: [new ErrorEmbed(`invalid difficulty\nallowed: ${Array.from(difficulty.keys()).join(", ")}`)],
+        embeds: [new ErrorEmbed(`invalid difficulty\nallowed: ${Array.from(difficultyIncrements.keys()).join(", ")}`)],
       });
     }
   }
