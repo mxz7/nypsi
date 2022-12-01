@@ -168,6 +168,13 @@ async function prepareGame(
     }
   }
 
+  if (await redis.sismember(Constants.redis.nypsi.USERS_PLAYING, message.author.id)) {
+    if (msg) {
+      return msg.edit({ embeds: [new ErrorEmbed("you are already playing something")], components: [] });
+    }
+    return send({ embeds: [new ErrorEmbed("you are already playing something")] });
+  }
+
   const maxBet = await calcMaxBet(message.member);
   const defaultBet = await getDefaultBet(message.member);
 
@@ -247,10 +254,13 @@ async function prepareGame(
     if (games.has(message.author.id)) {
       if (games.get(message.author.id).id == id) {
         games.delete(message.author.id);
+        await redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
         await updateBalance(message.member, (await getBalance(message.member)) + bet);
       }
     }
   }, 180000);
+
+  await redis.sadd(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
 
   await updateBalance(message.member, (await getBalance(message.member)) - bet);
 
@@ -353,6 +363,7 @@ async function prepareGame(
   playGame(message, msg, args).catch((e: string) => {
     logger.error(`error occured playing mines - ${message.author.tag} (${message.author.id})`);
     console.error(e);
+    redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
     return send({
       embeds: [new ErrorEmbed("an error occured while running - join support server")],
     });
@@ -459,6 +470,7 @@ async function playGame(
   };
 
   const replay = async (embed: CustomEmbed) => {
+    await redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
     if (!(await isPremium(message.member)) || (await getBalance(message.member)) < bet) {
       return msg.edit({ embeds: [embed], components: getRows(grid, true) });
     }
@@ -619,6 +631,7 @@ async function playGame(
     .catch(() => {
       fail = true;
       games.delete(message.author.id);
+      redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
       message.channel.send({ content: message.author.toString() + " mines game expired" });
     });
 
