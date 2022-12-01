@@ -1,30 +1,49 @@
+import { variants } from "@catppuccin/palette";
 import { randomInt } from "crypto";
 import {
   ActionRowBuilder,
   BaseMessageOptions,
   ButtonBuilder,
   ButtonStyle,
+  ColorResolvable,
   CommandInteraction,
+  Interaction,
   InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
 } from "discord.js";
+import redis from "../init/redis";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
-import { ErrorEmbed } from "../models/EmbedBuilders";
-import { calcMaxBet, getBalance, getDefaultBet, updateBalance } from "../utils/functions/economy/balance";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import Constants from "../utils/Constants";
+import { a } from "../utils/functions/anticheat";
+import { isLockedOut, verifyUser } from "../utils/functions/captcha";
+import { addProgress } from "../utils/functions/economy/achievements";
+import { calcMaxBet, getBalance, getDefaultBet, getMulti, updateBalance } from "../utils/functions/economy/balance";
+import { addToGuildXP, getGuildByUser } from "../utils/functions/economy/guilds";
+import { addInventoryItem } from "../utils/functions/economy/inventory";
+import { addGamble } from "../utils/functions/economy/stats";
 import { createUser, formatBet, userExists } from "../utils/functions/economy/utils";
+import { calcEarnedXp, getXp, updateXp } from "../utils/functions/economy/xp";
+import { isPremium } from "../utils/functions/premium/premium";
+import { addHourlyCommand } from "../utils/handlers/commandhandler";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import { gamble, logger } from "../utils/logger";
 
-const cmd = new Command("tower", "play dragon tower", Categories.MONEY).setAliases(["dragon", "dragontower", "dt"]);
+const cmd = new Command("tower", "play dragon tower", Categories.MONEY).setAliases([
+  "dragon",
+  "dragontower",
+  "dt",
+  "dragonstower",
+]);
 
 interface Game {
   userId: string;
-  message: Message;
-  gameMessage: Message;
   bet: number;
   win: number;
-  difficiculty: string;
   board: string[][];
+  increment: number;
+  embed: CustomEmbed;
 }
 
 /**
@@ -201,10 +220,38 @@ async function prepareGame(
     }
   }, 180000);
 
+  await updateBalance(message.member, (await getBalance(message.member)) - bet);
+
   const board = createBoard(chosenDifficulty);
+
   const components = createRows(board, false);
 
-  return send({ content: "boobs", components });
+  const embed = new CustomEmbed(message.member, `**bet** $${bet.toLocaleString()}\n**0**x ($0)`)
+    .setHeader("dragon tower", message.author.avatarURL())
+    .setFooter({ text: `difficulty: ${chosenDifficulty}` });
+
+  games.set(message.author.id, {
+    bet,
+    board,
+    increment: difficultyIncrements.get(chosenDifficulty),
+    userId: message.author.id,
+    win: 0,
+    embed,
+  });
+
+  if (msg) {
+    await msg.edit({ embeds: [embed], components });
+  } else {
+    msg = await send({ embeds: [embed], components });
+  }
+
+  playGame(message, msg, args).catch((e: string) => {
+    logger.error(`error occured playing mines - ${message.author.tag} (${message.author.id})`);
+    logger.error(e);
+    return send({
+      embeds: [new ErrorEmbed("an error occured while running - join support server")],
+    });
+  });
 }
 
 function createBoard(diff: string) {
@@ -251,18 +298,18 @@ function createBoard(diff: string) {
   return board;
 }
 
-function createRows(board: string[][], end = false) {
-  const getActiveRow = () => {
-    let index = 0;
-    for (const row of board) {
-      if (row.includes("c") || row.includes("gc")) index++;
-    }
-    return index;
-  };
+function getActiveRow(board: string[][]) {
+  let index = 0;
+  for (const row of board) {
+    if (row.includes("c") || row.includes("gc")) index++;
+  }
+  return index;
+}
 
+function createRows(board: string[][], end = false) {
   const rows: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [];
 
-  for (let i = getActiveRow(); i >= 0; i--) {
+  for (let i = getActiveRow(board); i >= 0; i--) {
     if (rows.length >= 4) break;
 
     const rowData = board[i];
@@ -271,31 +318,39 @@ function createRows(board: string[][], end = false) {
     for (const item of rowData) {
       const button = new ButtonBuilder();
 
-      button.setCustomId(`${i}-${row.components.length}`);
+      button.setCustomId(`${i}${row.components.length}`);
       button.setLabel("\u200B");
       button.setStyle(ButtonStyle.Secondary);
 
       switch (item) {
         case "a":
-          if (end || i != getActiveRow()) button.setDisabled(true);
+          if (end || i != getActiveRow(board)) button.setDisabled(true);
           break;
         case "b":
-          if (end || i != getActiveRow()) button.setDisabled(true);
-          if (end) button.setEmoji(":egg:");
+          if (end || i != getActiveRow(board)) button.setDisabled(true);
+          if (end) {
+            button.setEmoji("🥚");
+            delete button.data.label;
+          }
           break;
         case "g":
-          if (end || i != getActiveRow()) button.setDisabled(true);
-          if (end) button.setEmoji(GEM_EMOJI);
+          if (end || i != getActiveRow(board)) button.setDisabled(true);
+          if (end) {
+            button.setEmoji(GEM_EMOJI);
+            delete button.data.label;
+          }
           break;
         case "c":
           button.setStyle(ButtonStyle.Success);
           button.setDisabled(true);
-          button.setEmoji(":egg:");
+          button.setEmoji("🥚");
+          delete button.data.label;
           break;
         case "gc":
           button.setStyle(ButtonStyle.Success);
           button.setDisabled(true);
           button.setEmoji(GEM_EMOJI);
+          delete button.data.label;
           break;
         case "x":
           button.setStyle(ButtonStyle.Danger);
@@ -312,4 +367,250 @@ function createRows(board: string[][], end = false) {
   );
 
   return rows;
+}
+
+async function playGame(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  msg: Message,
+  args: string[]
+): Promise<void> {
+  const game = games.get(message.author.id);
+
+  const replay = async (embed: CustomEmbed) => {
+    if (!(await isPremium(message.member)) || (await getBalance(message.member)) < game.bet) {
+      return msg.edit({ embeds: [embed], components: createRows(game.board, true) });
+    }
+
+    const components = createRows(game.board, true);
+
+    (components[components.length - 1].components[0] as ButtonBuilder)
+      .setCustomId("rp")
+      .setLabel("play again")
+      .setDisabled(false);
+
+    await msg.edit({ embeds: [embed], components });
+
+    const res = await msg
+      .awaitMessageComponent({ filter: (i: Interaction) => i.user.id == message.author.id, time: 30000 })
+      .catch(() => {
+        (
+          components[components.length - 1].components[
+            components[components.length - 1].components.length - 1
+          ] as ButtonBuilder
+        )
+          .setCustomId("rp")
+          .setLabel("play again")
+          .setDisabled(true);
+        msg.edit({ components });
+        return;
+      });
+
+    if (res && res.customId == "rp") {
+      await res.deferUpdate();
+      logger.log({
+        level: "cmd",
+        message: `${message.guild.id} - ${message.author.tag}: replaying tower`,
+      });
+      if (isLockedOut(message.author.id)) return verifyUser(message);
+
+      addHourlyCommand(message.member);
+
+      await redis.hincrby(Constants.redis.nypsi.TOP_COMMANDS_ANALYTICS, "tower", 1);
+      await a(message.author.id, message.author.tag, message.content);
+
+      return prepareGame(message, args, msg);
+    }
+  };
+
+  const lose = async () => {
+    gamble(message.author, "mines", game.bet, false, 0);
+    await addGamble(message.member, "mines", false);
+    game.embed.setColor(Constants.EMBED_FAIL_COLOR);
+    game.embed.setDescription(
+      "**bet** $" +
+        game.bet.toLocaleString() +
+        "\n**" +
+        game.win.toFixed(2) +
+        "**x ($" +
+        Math.round(game.bet * game.win).toLocaleString() +
+        ")\n\n**you lose!!**"
+    );
+
+    replay(game.embed);
+    return games.delete(message.author.id);
+  };
+
+  const win1 = async () => {
+    let winnings = Math.round(game.bet * game.win);
+    const multi = await getMulti(game.userId);
+
+    if (multi > 0) {
+      winnings += Math.round(winnings * multi);
+    }
+
+    game.embed.setDescription(
+      `**bet** $${game.bet.toLocaleString()}\nz` +
+        `**${game.win.toFixed(2)}**x ($${Math.round(game.bet * game.win).toLocaleString()})\n\n**winner!!**\n` +
+        `**you win** $${winnings.toLocaleString()}${multi > 0 ? `\n**${Math.floor(multi * 100)}**% bonus` : ""}`
+    );
+    game.embed.setColor(Constants.EMBED_SUCCESS_COLOR);
+
+    const earnedXp = await calcEarnedXp(message.member, game.bet);
+
+    if (earnedXp > 0) {
+      await updateXp(message.member, (await getXp(message.member)) + earnedXp);
+      game.embed.setFooter({ text: `+${earnedXp}xp` });
+
+      const guild = await getGuildByUser(message.member);
+
+      if (guild) {
+        await addToGuildXP(guild.guildName, earnedXp, message.member);
+      }
+    }
+
+    gamble(message.author, "tower", game.bet, true, winnings);
+    await addGamble(message.member, "tower", true);
+
+    if (game.win >= 7) await addProgress(message.author.id, "tower_pro", 1);
+
+    await updateBalance(message.member, (await getBalance(message.member)) + winnings);
+    games.delete(message.author.id);
+    return replay(game.embed);
+  };
+
+  const draw = async () => {
+    gamble(message.author, "tower", game.bet, true, game.bet);
+    await addGamble(message.member, "tower", true);
+    game.embed.setColor(variants.macchiato.yellow.hex as ColorResolvable);
+    game.embed.setDescription(
+      "**bet** $" +
+        game.bet.toLocaleString() +
+        "\n**" +
+        game.win.toFixed(2) +
+        "**x ($" +
+        Math.round(game.bet * game.win).toLocaleString() +
+        ")" +
+        "\n\n**draw!!**\nyou win $" +
+        game.bet.toLocaleString()
+    );
+    await updateBalance(message.member, (await getBalance(message.member)) + game.bet);
+    games.delete(message.author.id);
+    return replay(game.embed);
+  };
+
+  if (game.win >= 15) {
+    win1();
+    return;
+  }
+
+  const filter = (i: Interaction) => i.user.id == message.author.id;
+  let fail = false;
+
+  const response = await msg
+    .awaitMessageComponent({ filter, time: 60000 })
+    .then(async (collected) => {
+      await collected.deferUpdate();
+      return collected;
+    })
+    .catch(() => {
+      fail = true;
+      games.delete(message.author.id);
+      message.channel.send({ content: message.author.toString() + " tower game expired" });
+    });
+
+  if (fail) return;
+
+  if (!response) return;
+
+  if (response.customId.length != 2 && response.customId != "finish") {
+    await message.channel.send({ content: message.author.toString() + " invalid coordinate, example: `a3`" });
+    return playGame(message, msg, args);
+  }
+
+  if (response.customId == "finish") {
+    if (game.win < 1) {
+      lose();
+      return;
+    } else if (game.win == 1) {
+      draw();
+      return;
+    } else {
+      win1();
+      return;
+    }
+  }
+  const [y, x] = response.customId.split("").map((i) => parseInt(i));
+
+  const row = game.board[y];
+
+  switch (row[x]) {
+    case "a":
+      row[x] = "x";
+      lose();
+      return;
+    case "g":
+    case "b":
+      if (row[x] == "b") {
+        row[x] = "c";
+      } else {
+        row[x] = "gc";
+        game.win += 4;
+
+        const caught = Math.floor(Math.random() * 50);
+
+        if (caught == 7) {
+          addInventoryItem(message.member, "green_gem", 1);
+          addProgress(message.author.id, "gem_hunter", 1);
+          response.followUp({
+            embeds: [
+              new CustomEmbed(
+                message.member,
+                `${GEM_EMOJI} you found a **gem**!!\nit has been added to your inventory, i wonder what powers it has`
+              ),
+            ],
+            ephemeral: true,
+          });
+        } else {
+          response.followUp({
+            embeds: [
+              new CustomEmbed(
+                message.member,
+                `${GEM_EMOJI} you found a **gem**!!\nunfortunately you dropped it and it shattered. maybe next time`
+              ),
+            ],
+            ephemeral: true,
+          });
+        }
+      }
+
+      game.win += game.increment;
+
+      // games.set(message.author.id, {
+      //   bet: bet,
+      //   win: win,
+      //   grid: grid,
+      //   id: games.get(message.author.id).id,
+      //   voted: games.get(message.author.id).voted,
+      //   increment,
+      // });
+
+      game.embed.setDescription(
+        "**bet** $" +
+          game.bet.toLocaleString() +
+          "\n**" +
+          game.win.toFixed(2) +
+          "**x ($" +
+          Math.round(game.bet * game.win).toLocaleString() +
+          ")"
+      );
+
+      if (game.win >= 15) {
+        win1();
+        return;
+      }
+
+      msg.edit({ embeds: [game.embed], components: createRows(game.board, false) });
+
+      return playGame(message, msg, args);
+  }
 }
