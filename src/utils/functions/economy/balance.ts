@@ -144,7 +144,8 @@ export async function getMulti(member: GuildMember | string): Promise<number> {
   const boosters = await getBoosters(id);
   const items = getItems();
 
-  if ((await getDmSettings(id)).vote_reminder) multi += 2;
+  if ((await getDmSettings(id)).vote_reminder && !(await redis.sismember(Constants.redis.nypsi.VOTE_REMINDER_RECEIVED, id)))
+    multi += 2;
 
   for (const boosterId of boosters.keys()) {
     if (items[boosterId].boosterEffect.boosts.includes("multi")) {
