@@ -22,13 +22,14 @@ import { addProgress } from "../utils/functions/economy/achievements";
 import { calcMaxBet, getBalance, getDefaultBet, getMulti, updateBalance } from "../utils/functions/economy/balance";
 import { addToGuildXP, getGuildByUser } from "../utils/functions/economy/guilds";
 import { addInventoryItem } from "../utils/functions/economy/inventory";
-import { addGamble } from "../utils/functions/economy/stats";
+import { createGame } from "../utils/functions/economy/stats";
 import { createUser, formatBet, userExists } from "../utils/functions/economy/utils";
 import { calcEarnedXp, getXp, updateXp } from "../utils/functions/economy/xp";
 import { isPremium } from "../utils/functions/premium/premium";
 import { addHourlyCommand } from "../utils/handlers/commandhandler";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { gamble, logger } from "../utils/logger";
+import _ = require("lodash");
 
 const cmd = new Command("tower", "play dragon tower", Categories.MONEY).setAliases([
   "dragon",
@@ -445,8 +446,22 @@ async function playGame(
   };
 
   const lose = async () => {
-    gamble(message.author, "tower", game.bet, false, 0);
-    await addGamble(message.member, "tower", false);
+    const board = _.cloneDeep(game.board);
+
+    const id = await createGame({
+      userId: message.author.id,
+      bet: game.bet,
+      game: "tower",
+      win: false,
+      outcome:
+        "A = blank | B = egg | C = clicked egg | g = gem | gc = found gem | x = bad click\n" +
+        board
+          .map((row) => row.join("").toUpperCase())
+          .reverse()
+          .join("\n"),
+    });
+    gamble(message.author, "tower", game.bet, false, id, 0);
+    game.embed.setFooter({ text: `id: ${id}` });
     game.embed.setColor(Constants.EMBED_FAIL_COLOR);
     game.embed.setDescription(
       "**bet** $" +
@@ -490,8 +505,29 @@ async function playGame(
       }
     }
 
-    gamble(message.author, "tower", game.bet, true, winnings);
-    await addGamble(message.member, "tower", true);
+    const board = _.cloneDeep(game.board);
+
+    const id = await createGame({
+      userId: message.author.id,
+      bet: game.bet,
+      game: "tower",
+      win: true,
+      outcome:
+        "A = blank | B = egg | C = clicked egg | g = gem | gc = found gem | x = bad click\n" +
+        board
+          .map((row) => row.join("").toUpperCase())
+          .reverse()
+          .join("\n"),
+      earned: winnings,
+      xp: earnedXp,
+    });
+    gamble(message.author, "tower", game.bet, true, id, winnings);
+
+    if (game.embed.data.footer) {
+      game.embed.setFooter({ text: `+${earnedXp}xp | id: ${id}` });
+    } else {
+      game.embed.setFooter({ text: `id: ${id}` });
+    }
 
     await updateBalance(message.member, (await getBalance(message.member)) + winnings);
     games.delete(message.author.id);
@@ -499,8 +535,21 @@ async function playGame(
   };
 
   const draw = async () => {
-    gamble(message.author, "tower", game.bet, true, game.bet);
-    await addGamble(message.member, "tower", true);
+    const board = _.cloneDeep(game.board);
+
+    const id = await createGame({
+      userId: message.author.id,
+      bet: game.bet,
+      game: "tower",
+      win: false,
+      outcome:
+        "A = blank | B = egg | C = clicked egg | g = gem | gc = found gem | x = bad click\n" +
+        board
+          .map((row) => row.join("").toUpperCase())
+          .reverse()
+          .join("\n"),
+    });
+    gamble(message.author, "tower", game.bet, true, id, game.bet);
     game.embed.setColor(variants.macchiato.yellow.hex as ColorResolvable);
     game.embed.setDescription(
       "**bet** $" +
