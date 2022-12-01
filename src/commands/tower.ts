@@ -633,7 +633,7 @@ async function playGame(
       );
 
       if (y >= 8) {
-        await addProgress("tower_pro");
+        await addProgress(message.author.id, "tower_pro", 1);
         game.win += game.increment * 2;
         win1();
         return;
