@@ -260,10 +260,10 @@ function createBoard(diff: string) {
 
   const createRow = () => {
     const populate = (eggs: number, row: string[]) => {
-      while (row.filter((i) => i == "b").length < eggs) {
-        const gemSpawnChance = Math.floor(Math.random() * 15);
+      while (row.filter((i) => ["b", "g"].includes(i)).length < eggs) {
+        const gemSpawnChance = Math.floor(Math.random() * 50);
 
-        if (gemSpawnChance == 3 && !spawnedGem) {
+        if (gemSpawnChance == 7 && !spawnedGem) {
           const pos = randomInt(0, row.length);
           row[pos] = "g";
           spawnedGem = true;
@@ -449,7 +449,7 @@ async function playGame(
     }
 
     game.embed.setDescription(
-      `**bet** $${game.bet.toLocaleString()}\nz` +
+      `**bet** $${game.bet.toLocaleString()}\n` +
         `**${game.win.toFixed(2)}**x ($${Math.round(game.bet * game.win).toLocaleString()})\n\n**winner!!**\n` +
         `**you win** $${winnings.toLocaleString()}${multi > 0 ? `\n**${Math.floor(multi * 100)}**% bonus` : ""}`
     );
