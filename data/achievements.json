@@ -911,5 +911,40 @@
     "emoji": "<:nypsi_gem_white:1046933670436552725>",
     "target": 100,
     "description": "find 100 gems"
+  },
+  "tower_pro_i": {
+    "id": "tower_pro_i",
+    "name": "tower professional **I**",
+    "emoji": "🐲",
+    "target": 5,
+    "description": "reach a 7x multiplier in dragon's tower 5 times"
+  },
+  "tower_pro_ii": {
+    "id": "tower_pro_ii",
+    "name": "tower professional **II**",
+    "emoji": "🐲",
+    "target": 25,
+    "description": "reach a 7x multiplier in dragon's tower 25 times"
+  },
+  "tower_pro_iii": {
+    "id": "tower_pro_iii",
+    "name": "tower professional **III**",
+    "emoji": "🐲",
+    "target": 100,
+    "description": "reach a 7x multiplier in dragon's tower 100 times"
+  },
+  "tower_pro_iv": {
+    "id": "tower_pro_iv",
+    "name": "tower professional **IV**",
+    "emoji": "🐲",
+    "target": 500,
+    "description": "reach a 7x multiplier in dragon's tower 500 times"
+  },
+  "tower_pro_v": {
+    "id": "tower_pro_v",
+    "name": "tower professional **V**",
+    "emoji": "🐲",
+    "target": 1000,
+    "description": "reach a 7x multiplier in dragon's tower 1,000 times"
   }
 }
