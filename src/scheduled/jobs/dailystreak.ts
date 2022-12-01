@@ -25,7 +25,7 @@ import { addNotificationToQueue } from "../../utils/functions/users/notification
       },
       Inventory: {
         where: {
-          item: "calendar",
+          OR: [{ item: "calendar" }, { item: { contains: "gem" } }],
         },
       },
     },
