@@ -57,8 +57,8 @@ const mineIncrements = new Map<number, number>([
   [7, 0.6],
   [10, 1],
   [15, 1.5],
-  [20, 4],
-  [23, 13],
+  [20, 3.5],
+  [23, 12.5],
 ]);
 
 abcde.set("a", 0);
@@ -699,7 +699,7 @@ async function playGame(
         grid[location] = "c";
       } else {
         grid[location] = "gc";
-        win += 4;
+        win += 3;
 
         const caught = Math.floor(Math.random() * 50);
 
