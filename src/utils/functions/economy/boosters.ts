@@ -8,54 +8,47 @@ import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { getItems } from "./utils";
 import _ = require("lodash");
 
-export async function getBoosters(member: GuildMember | string): Promise<Map<string, Booster[]>> {
-  let id: string;
+async function checkBoosters(member: string | GuildMember, boosters: Map<string, Booster[]>) {
+  let userId: string;
   if (member instanceof GuildMember) {
-    id = member.user.id;
+    userId = member.user.id;
   } else {
-    id = member;
+    userId = member;
   }
 
   const expired = new Map<string, number>();
 
-  const cache = await redis.get(`${Constants.redis.cache.economy.BOOSTERS}:${id}`);
+  for (const key of boosters.keys()) {
+    const boosters2 = boosters.get(key);
 
-  if (cache) {
-    if (_.isEmpty(JSON.parse(cache))) return new Map();
+    for (const booster of boosters2) {
+      if (booster.expire <= Date.now()) {
+        await prisma.booster.delete({
+          where: {
+            id: booster.id,
+          },
+        });
 
-    const map = new Map<string, Booster[]>(Object.entries(JSON.parse(cache)));
+        if (expired.has(booster.boosterId)) {
+          expired.set(booster.boosterId, expired.get(booster.boosterId) + 1);
+        } else {
+          expired.set(booster.boosterId, 1);
+        }
 
-    for (const key of map.keys()) {
-      const boosters = map.get(key);
+        boosters2.splice(boosters2.indexOf(booster), 1);
 
-      for (const booster of boosters) {
-        if (booster.expire <= Date.now()) {
-          await prisma.booster.delete({
-            where: {
-              id: booster.id,
-            },
-          });
-
-          if (expired.has(booster.boosterId)) {
-            expired.set(booster.boosterId, expired.get(booster.boosterId) + 1);
-          } else {
-            expired.set(booster.boosterId, 1);
-          }
-
-          await redis.del(`${Constants.redis.cache.economy.BOOSTERS}:${id}`);
-
-          boosters.splice(boosters.indexOf(booster), 1);
-
-          if (boosters.length == 0) {
-            map.delete(key);
-          } else {
-            map.set(key, boosters);
-          }
+        if (boosters2.length == 0) {
+          boosters.delete(key);
+        } else {
+          boosters.set(key, boosters2);
         }
       }
     }
+  }
 
-    if (expired.size != 0 && (await getDmSettings(id)).booster) {
+  if (expired.size != 0) {
+    await redis.del(`${Constants.redis.cache.economy.BOOSTERS}:${userId}`);
+    if ((await getDmSettings(userId)).booster) {
       const embed = new CustomEmbed()
         .setColor(Constants.TRANSPARENT_EMBED_COLOR)
         .setFooter({ text: "/settings me notifications" });
@@ -69,8 +62,8 @@ export async function getBoosters(member: GuildMember | string): Promise<Map<str
         total += expired.get(expiredBoosterId);
 
         if (expiredBoosterId == "steve") {
-          const earned = parseInt((await redis.get(`${Constants.redis.nypsi.STEVE_EARNED}:${id}`)) || "0");
-          await redis.del(`${Constants.redis.nypsi.STEVE_EARNED}:${id}`);
+          const earned = parseInt((await redis.get(`${Constants.redis.nypsi.STEVE_EARNED}:${userId}`)) || "0");
+          await redis.del(`${Constants.redis.nypsi.STEVE_EARNED}:${userId}`);
 
           desc += `\`${expired.get(expiredBoosterId)}x\` ${items[expiredBoosterId].emoji} ${
             items[expiredBoosterId].name
@@ -95,7 +88,7 @@ export async function getBoosters(member: GuildMember | string): Promise<Map<str
         await member.send({ embeds: [embed], content: text });
       } else {
         await addNotificationToQueue({
-          memberId: id,
+          memberId: userId,
           payload: {
             content: text,
             embed: embed,
@@ -103,8 +96,27 @@ export async function getBoosters(member: GuildMember | string): Promise<Map<str
         });
       }
     }
+  }
 
-    return map;
+  return boosters;
+}
+
+export async function getBoosters(member: GuildMember | string): Promise<Map<string, Booster[]>> {
+  let id: string;
+  if (member instanceof GuildMember) {
+    id = member.user.id;
+  } else {
+    id = member;
+  }
+
+  const cache = await redis.get(`${Constants.redis.cache.economy.BOOSTERS}:${id}`);
+
+  if (cache) {
+    if (_.isEmpty(JSON.parse(cache))) return new Map();
+
+    const map = new Map<string, Booster[]>(Object.entries(JSON.parse(cache)));
+
+    return await checkBoosters(member, map);
   }
 
   const query = await prisma.booster.findMany({
@@ -118,94 +130,27 @@ export async function getBoosters(member: GuildMember | string): Promise<Map<str
     },
   });
 
-  const map = new Map<string, Booster[]>();
+  let map = new Map<string, Booster[]>();
 
-  for (const booster of query) {
-    if (booster.expire.getTime() <= Date.now()) {
-      await prisma.booster.delete({
-        where: {
-          id: booster.id,
-        },
+  query.forEach((i) => {
+    if (map.has(i.boosterId)) {
+      map.get(i.boosterId).push({
+        boosterId: i.boosterId,
+        expire: i.expire.getTime(),
+        id: i.id,
       });
-
-      if (expired.has(booster.boosterId)) {
-        expired.set(booster.boosterId, expired.get(booster.boosterId) + 1);
-      } else {
-        expired.set(booster.boosterId, 1);
-      }
-
-      continue;
-    }
-
-    if (map.has(booster.boosterId)) {
-      const c = map.get(booster.boosterId);
-
-      c.push({
-        boosterId: booster.boosterId,
-        expire: booster.expire.getTime(),
-        id: booster.id,
-      });
-
-      map.set(booster.boosterId, c);
     } else {
-      map.set(booster.boosterId, [
+      map.set(i.boosterId, [
         {
-          boosterId: booster.boosterId,
-          expire: booster.expire.getTime(),
-          id: booster.id,
+          boosterId: i.boosterId,
+          expire: i.expire.getTime(),
+          id: i.id,
         },
       ]);
     }
-  }
+  });
 
-  if (expired.size != 0 && (await getDmSettings(id)).booster) {
-    const embed = new CustomEmbed()
-      .setColor(Constants.TRANSPARENT_EMBED_COLOR)
-      .setFooter({ text: "/settings me notifications" });
-
-    let desc = "";
-    let text = "";
-    let total = 0;
-    const items = getItems();
-
-    for (const expiredBoosterId of Array.from(expired.keys())) {
-      total += expired.get(expiredBoosterId);
-
-      if (expiredBoosterId == "steve") {
-        const earned = parseInt((await redis.get(`${Constants.redis.nypsi.STEVE_EARNED}:${id}`)) || "0");
-        await redis.del(`${Constants.redis.nypsi.STEVE_EARNED}:${id}`);
-
-        desc += `\`${expired.get(expiredBoosterId)}x\` ${items[expiredBoosterId].emoji} ${
-          items[expiredBoosterId].name
-        } (earned $${earned.toLocaleString()})\n`;
-      } else {
-        desc += `\`${expired.get(expiredBoosterId)}x\` ${items[expiredBoosterId].emoji} ${items[expiredBoosterId].name}\n`;
-      }
-    }
-
-    embed.setHeader(`expired booster${total > 1 ? "s" : ""}:`);
-    embed.setDescription(desc);
-
-    if (total == 1) {
-      text = `your ${items[Array.from(expired.keys())[0]].name} ${
-        items[Array.from(expired.keys())[0]].name.endsWith("booster") ? "" : "booster "
-      }has expired`;
-    } else {
-      text = `${total} of your boosters have expired`;
-    }
-
-    if (member instanceof GuildMember) {
-      await member.send({ embeds: [embed], content: text });
-    } else {
-      await addNotificationToQueue({
-        memberId: id,
-        payload: {
-          embed: embed,
-          content: text,
-        },
-      });
-    }
-  }
+  map = await checkBoosters(member, map);
 
   await redis.set(`${Constants.redis.cache.economy.BOOSTERS}:${id}`, JSON.stringify(Object.fromEntries(map)));
   await redis.expire(`${Constants.redis.cache.economy.BOOSTERS}:${id}`, 300);

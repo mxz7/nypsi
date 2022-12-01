@@ -57,8 +57,8 @@ const mineIncrements = new Map<number, number>([
   [7, 0.6],
   [10, 1],
   [15, 1.5],
-  [20, 5],
-  [23, 15],
+  [20, 4],
+  [23, 13],
 ]);
 
 abcde.set("a", 0);
@@ -168,6 +168,13 @@ async function prepareGame(
     }
   }
 
+  if (await redis.sismember(Constants.redis.nypsi.USERS_PLAYING, message.author.id)) {
+    if (msg) {
+      return msg.edit({ embeds: [new ErrorEmbed("you are already playing something")], components: [] });
+    }
+    return send({ embeds: [new ErrorEmbed("you are already playing something")] });
+  }
+
   const maxBet = await calcMaxBet(message.member);
   const defaultBet = await getDefaultBet(message.member);
 
@@ -247,10 +254,13 @@ async function prepareGame(
     if (games.has(message.author.id)) {
       if (games.get(message.author.id).id == id) {
         games.delete(message.author.id);
+        await redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
         await updateBalance(message.member, (await getBalance(message.member)) + bet);
       }
     }
   }, 180000);
+
+  await redis.sadd(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
 
   await updateBalance(message.member, (await getBalance(message.member)) - bet);
 
@@ -353,6 +363,7 @@ async function prepareGame(
   playGame(message, msg, args).catch((e: string) => {
     logger.error(`error occured playing mines - ${message.author.tag} (${message.author.id})`);
     console.error(e);
+    redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
     return send({
       embeds: [new ErrorEmbed("an error occured while running - join support server")],
     });
@@ -390,11 +401,15 @@ function getRows(grid: string[], end: boolean) {
         break;
       case "g":
         button.setStyle(ButtonStyle.Secondary);
-        if (end) button.setEmoji(GEM_EMOJI).setDisabled(true);
+        if (end) {
+          button.setEmoji(GEM_EMOJI).setDisabled(true);
+          delete button.data.label;
+        }
         break;
       case "gc":
         button.setStyle(ButtonStyle.Success).setDisabled(true);
         button.setEmoji(GEM_EMOJI);
+        delete button.data.label;
         break;
       case "x":
         button.setStyle(ButtonStyle.Danger).setDisabled(true);
@@ -455,6 +470,7 @@ async function playGame(
   };
 
   const replay = async (embed: CustomEmbed) => {
+    await redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
     if (!(await isPremium(message.member)) || (await getBalance(message.member)) < bet) {
       return msg.edit({ embeds: [embed], components: getRows(grid, true) });
     }
@@ -643,6 +659,7 @@ async function playGame(
     .catch(() => {
       fail = true;
       games.delete(message.author.id);
+      redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
       message.channel.send({ content: message.author.toString() + " mines game expired" });
     });
 
@@ -715,9 +732,9 @@ async function playGame(
         const caught = Math.floor(Math.random() * 50);
 
         if (caught == 7) {
-          await addInventoryItem(message.member, "green_gem", 1);
+          addInventoryItem(message.member, "green_gem", 1);
           addProgress(message.author.id, "gem_hunter", 1);
-          await response.followUp({
+          response.followUp({
             embeds: [
               new CustomEmbed(
                 message.member,
@@ -727,7 +744,7 @@ async function playGame(
             ephemeral: true,
           });
         } else {
-          await response.followUp({
+          response.followUp({
             embeds: [
               new CustomEmbed(
                 message.member,

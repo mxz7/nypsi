@@ -72,6 +72,7 @@ export default {
       TOP_COMMANDS_ANALYTICS: "nypsi:topcommands:anal",
       ACTIVE_USERS_ANALYTICS: "nypsi:active:user:anal",
       VOTE_REMINDER_RECEIVED: "nypsi:vote_reminder:received",
+      USERS_PLAYING: "nypsi:users:playing",
     },
   },
   BOOST_ROLE_ID: "747066190530347089",

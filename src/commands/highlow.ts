@@ -186,8 +186,15 @@ async function prepareGame(
     }
   }
 
-  await addCooldown(cmd.name, message.member, 25);
+  if (await redis.sismember(Constants.redis.nypsi.USERS_PLAYING, message.author.id)) {
+    if (msg) {
+      return msg.edit({ embeds: [new ErrorEmbed("you are already playing something")], components: [] });
+    }
+    return send({ embeds: [new ErrorEmbed("you are already playing something")] });
+  }
 
+  await addCooldown(cmd.name, message.member, 25);
+  await redis.sadd(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
   await updateBalance(message.member, (await getBalance(message.member)) - bet);
 
   const id = Math.random();
@@ -262,6 +269,7 @@ async function prepareGame(
     if (games.has(message.author.id)) {
       if (games.get(message.author.id).id == id) {
         games.delete(message.author.id);
+        await redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
         await updateBalance(message.member, (await getBalance(message.member)) + bet);
       }
     }
@@ -288,6 +296,7 @@ async function prepareGame(
   playGame(message, msg, args).catch((e: string) => {
     logger.error(`error occured playing highlow - ${message.author.tag} (${message.author.id})`);
     logger.error(e);
+    redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
     return send({
       embeds: [new ErrorEmbed("an error occured while running - join support server")],
     });
@@ -355,6 +364,7 @@ async function playGame(
   };
 
   const replay = async (embed: CustomEmbed) => {
+    await redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
     if (!(await isPremium(message.member)) || (await getBalance(message.member)) < bet) {
       return m.edit({ embeds: [embed], components: [] });
     }
@@ -538,6 +548,7 @@ async function playGame(
     .catch(() => {
       fail = true;
       games.delete(message.author.id);
+      redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
       message.channel.send({ content: message.author.toString() + " highlow game expired" });
     });
 
@@ -664,6 +675,7 @@ async function playGame(
     }
   } else {
     games.delete(message.author.id);
+    redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
     m.reactions.removeAll();
     return;
   }

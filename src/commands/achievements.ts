@@ -97,20 +97,45 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (desc.length == 0) return showAllAchievements();
 
+    const pages = PageManager.createPages(desc);
+
     const completedAchievements = await getCompletedAchievements(message.member);
 
     const completion = `${((completedAchievements.length / Object.keys(allAchievementData).length) * 100).toFixed(
       1
     )}% completion`;
 
-    const embed = new CustomEmbed(message.member, desc.join("\n")).setHeader(
+    const embed = new CustomEmbed(message.member, pages.get(1).join("\n")).setHeader(
       "your achievement progress",
       message.author.avatarURL()
     );
 
     embed.setFooter({ text: completion });
 
-    return send({ embeds: [embed] });
+    if (pages.size == 1) return send({ embeds: [embed] });
+
+    embed.setFooter({ text: `page 1/${pages.size} | ${completion}` });
+
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
+      new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
+    );
+
+    const msg = await send({ embeds: [embed], components: [row] });
+
+    const manager = new PageManager({
+      userId: message.author.id,
+      embed,
+      message: msg,
+      row,
+      pages,
+      onPageUpdate(manager) {
+        manager.embed.setFooter({ text: `page ${manager.currentPage}/${manager.lastPage} | ${completion}` });
+        return manager.embed;
+      },
+    });
+
+    return manager.listen();
   };
 
   const showAllAchievements = async () => {
