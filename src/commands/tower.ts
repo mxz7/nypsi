@@ -1,5 +1,14 @@
 import { randomInt } from "crypto";
-import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
+import {
+  ActionRowBuilder,
+  BaseMessageOptions,
+  ButtonBuilder,
+  ButtonStyle,
+  CommandInteraction,
+  InteractionReplyOptions,
+  Message,
+  MessageActionRowComponentBuilder,
+} from "discord.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { ErrorEmbed } from "../models/EmbedBuilders";
 import { calcMaxBet, getBalance, getDefaultBet, updateBalance } from "../utils/functions/economy/balance";
@@ -37,6 +46,7 @@ const difficultyIncrements = new Map<string, number>([
   ["hard", 2],
 ]);
 const games = new Map<string, Game>();
+const GEM_EMOJI = "<:nypsi_gem_green:1046866209326514206>";
 
 cmd.slashEnabled = true;
 cmd.slashData
@@ -192,8 +202,9 @@ async function prepareGame(
   }, 180000);
 
   const board = createBoard(chosenDifficulty);
+  const components = createRows(board, false);
 
-  console.log(board);
+  return send({ content: "boobs", components });
 }
 
 function createBoard(diff: string) {
@@ -238,4 +249,67 @@ function createBoard(diff: string) {
   }
 
   return board;
+}
+
+function createRows(board: string[][], end = false) {
+  const getActiveRow = () => {
+    let index = 0;
+    for (const row of board) {
+      if (row.includes("c") || row.includes("gc")) index++;
+    }
+    return index;
+  };
+
+  const rows: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [];
+
+  for (let i = getActiveRow(); i >= 0; i--) {
+    if (rows.length >= 4) break;
+
+    const rowData = board[i];
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>();
+
+    for (const item of rowData) {
+      const button = new ButtonBuilder();
+
+      button.setCustomId(`${i}-${row.components.length}`);
+      button.setLabel("\u200B");
+      button.setStyle(ButtonStyle.Secondary);
+
+      switch (item) {
+        case "a":
+          if (end || i != getActiveRow()) button.setDisabled(true);
+          break;
+        case "b":
+          if (end || i != getActiveRow()) button.setDisabled(true);
+          if (end) button.setEmoji(":egg:");
+          break;
+        case "g":
+          if (end || i != getActiveRow()) button.setDisabled(true);
+          if (end) button.setEmoji(GEM_EMOJI);
+          break;
+        case "c":
+          button.setStyle(ButtonStyle.Success);
+          button.setDisabled(true);
+          button.setEmoji(":egg:");
+          break;
+        case "gc":
+          button.setStyle(ButtonStyle.Success);
+          button.setDisabled(true);
+          button.setEmoji(GEM_EMOJI);
+          break;
+        case "x":
+          button.setStyle(ButtonStyle.Danger);
+          button.setDisabled(true);
+          break;
+      }
+      row.addComponents(button);
+    }
+    rows.push(row);
+  }
+
+  rows[rows.length] = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+    new ButtonBuilder().setCustomId("f").setLabel("finish").setStyle(ButtonStyle.Success)
+  );
+
+  return rows;
 }
