@@ -303,7 +303,7 @@ function getActiveRow(board: string[][]) {
   for (const row of board) {
     if (row.includes("c") || row.includes("gc")) index++;
   }
-  return index;
+  return index > 8 ? 8 : index;
 }
 
 function createRows(board: string[][], end = false) {
