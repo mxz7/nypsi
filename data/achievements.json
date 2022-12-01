@@ -911,5 +911,40 @@
     "emoji": "<:nypsi_gem_white:1046933670436552725>",
     "target": 100,
     "description": "find 100 gems"
+  },
+  "tower_pro_i": {
+    "id": "tower_pro_i",
+    "name": "tower professional **I**",
+    "emoji": "🐲",
+    "target": 2,
+    "description": "complete the dragons tower twice"
+  },
+  "tower_pro_ii": {
+    "id": "tower_pro_ii",
+    "name": "tower professional **II**",
+    "emoji": "🐲",
+    "target": 5,
+    "description": "complete the dragons tower 5 times"
+  },
+  "tower_pro_iii": {
+    "id": "tower_pro_iii",
+    "name": "tower professional **III**",
+    "emoji": "🐲",
+    "target": 25,
+    "description": "complete the dragons tower 25 times"
+  },
+  "tower_pro_iv": {
+    "id": "tower_pro_iv",
+    "name": "tower professional **IV**",
+    "emoji": "🐲",
+    "target": 100,
+    "description": "complete the dragons tower 100 times"
+  },
+  "tower_pro_v": {
+    "id": "tower_pro_v",
+    "name": "tower professional **V**",
+    "emoji": "🐲",
+    "target": 500,
+    "description": "complete the dragons tower 500 times"
   }
 }
