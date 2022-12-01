@@ -19,7 +19,7 @@ import {
 import dayjs = require("dayjs");
 
 const cmd = new Command("premium", "view your premium status", Categories.INFO)
-  .setAliases(["patreon", "donate", "prem"])
+  .setAliases(["patreon", "donate", "prem", "kofi"])
   .setDocs("https://docs.nypsi.xyz/premium");
 
 cmd.slashEnabled = true;
