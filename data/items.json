@@ -1145,7 +1145,7 @@
     "aliases": ["streak"],
     "emoji": "🎟️",
     "longDesc": "add one day to your daily streak",
-    "rarity": 1,
+    "rarity": 0,
     "buy": 0,
     "sell": 100000,
     "role": "tool",
