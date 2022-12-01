@@ -61,8 +61,8 @@ interface Game {
 
 const difficultyIncrements = new Map<string, number>([
   ["easy", 0.5],
-  ["medium", 1],
-  ["hard", 2.75],
+  ["medium", 0.9],
+  ["hard", 2.1],
 ]);
 const games = new Map<string, Game>();
 const GEM_EMOJI = "<:nypsi_gem_green:1046866209326514206>";
@@ -107,6 +107,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     return send({ embeds: [embed], ephemeral: true });
   }
+
+  if (games.has(message.author.id)) return send({ embeds: [new ErrorEmbed("you are already playing dragon tower")] });
 
   return prepareGame(message, args);
 }
@@ -498,11 +500,6 @@ async function playGame(
     return replay(game.embed);
   };
 
-  if (game.win >= 15) {
-    win1();
-    return;
-  }
-
   const filter = (i: Interaction) => i.user.id == message.author.id;
   let fail = false;
 
@@ -554,7 +551,7 @@ async function playGame(
         row[x] = "c";
       } else {
         row[x] = "gc";
-        game.win += 4;
+        game.win += 3;
 
         const caught = Math.floor(Math.random() * 50);
 
@@ -583,7 +580,19 @@ async function playGame(
         }
       }
 
-      game.win += game.increment;
+      const modifiers = new Map<number, number>([
+        [0, 0.6],
+        [1, 0.6],
+        [2, 0.6],
+        [3, 0.45],
+        [4, 0.4],
+        [5, 0.3],
+        [6, 0.2],
+        [7, 0.1],
+        [8, 0.05],
+      ]);
+
+      game.win += game.increment * (y + 1) * modifiers.get(y);
 
       // games.set(message.author.id, {
       //   bet: bet,
@@ -604,8 +613,8 @@ async function playGame(
           ")"
       );
 
-      if (game.win >= 15 || y >= 8) {
-        if (y >= 8) game.win += 3;
+      if (y >= 8) {
+        game.win += game.increment * 2;
         win1();
         return;
       }
