@@ -605,6 +605,7 @@ async function playGame(
       );
 
       if (game.win >= 15 || y >= 8) {
+        if (y >= 8) game.win += 3;
         win1();
         return;
       }
