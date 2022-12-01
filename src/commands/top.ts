@@ -122,7 +122,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
     );
 
-    if (pages.size == 1) {
+    if (pages.size <= 1) {
       return send({ embeds: [embed] });
     }
 
@@ -163,7 +163,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return show(data.pages, data.pos, `top prestige ${global ? "[global]" : `for ${message.guild.name}`}`);
   } else if (args[0].toLowerCase() == "item") {
     const items = getItems();
-    const searchTag = args[1].toLowerCase();
+    args.shift();
+    const searchTag = args.join(" ").toLowerCase();
 
     let item: Item;
 
