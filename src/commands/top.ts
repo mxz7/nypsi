@@ -122,7 +122,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
     );
 
-    if (pages.size == 1) {
+    if (pages.size <= 1) {
       return send({ embeds: [embed] });
     }
 
