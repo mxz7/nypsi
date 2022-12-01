@@ -62,7 +62,7 @@ interface Game {
 const difficultyIncrements = new Map<string, number>([
   ["easy", 0.5],
   ["medium", 1],
-  ["hard", 2],
+  ["hard", 2.75],
 ]);
 const games = new Map<string, Game>();
 const GEM_EMOJI = "<:nypsi_gem_green:1046866209326514206>";
@@ -261,9 +261,9 @@ function createBoard(diff: string) {
   const createRow = () => {
     const populate = (eggs: number, row: string[]) => {
       while (row.filter((i) => i == "b").length < eggs) {
-        const gemSpawnChance = Math.floor(Math.random() * 10);
+        const gemSpawnChance = Math.floor(Math.random() * 15);
 
-        if (gemSpawnChance == 3 && diff == "hard" && !spawnedGem) {
+        if (gemSpawnChance == 3 && !spawnedGem) {
           const pos = randomInt(0, row.length);
           row[pos] = "g";
           spawnedGem = true;
@@ -279,10 +279,10 @@ function createBoard(diff: string) {
 
     switch (diff) {
       case "easy":
-        row = populate(3, new Array(4).fill("a"));
+        row = populate(2, new Array(3).fill("a"));
         break;
       case "medium":
-        row = populate(2, new Array(3).fill("a"));
+        row = populate(2, new Array(4).fill("a"));
         break;
       case "hard":
         row = populate(1, new Array(4).fill("a"));
@@ -363,7 +363,7 @@ function createRows(board: string[][], end = false) {
   }
 
   rows[rows.length] = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder().setCustomId("f").setLabel("finish").setStyle(ButtonStyle.Success).setDisabled(end)
+    new ButtonBuilder().setCustomId("finish").setLabel("finish").setStyle(ButtonStyle.Success).setDisabled(end)
   );
 
   return rows;
