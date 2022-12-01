@@ -687,9 +687,9 @@ async function playGame(
         const caught = Math.floor(Math.random() * 50);
 
         if (caught == 7) {
-          await addInventoryItem(message.member, "green_gem", 1);
-          await addProgress(message.author.id, "gem_hunter", 1);
-          await response.followUp({
+          addInventoryItem(message.member, "green_gem", 1);
+          addProgress(message.author.id, "gem_hunter", 1);
+          response.followUp({
             embeds: [
               new CustomEmbed(
                 message.member,
@@ -699,7 +699,7 @@ async function playGame(
             ephemeral: true,
           });
         } else {
-          await response.followUp({
+          response.followUp({
             embeds: [
               new CustomEmbed(
                 message.member,
