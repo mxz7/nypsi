@@ -394,7 +394,30 @@ async function playGame(
 
       await a(message.author.id, message.author.tag, message.content);
 
-      await redis.hincrby(Constants.redis.nypsi.TOP_COMMANDS_ANALYTICS, "blackjack", 1);
+      await redis.hincrby(Constants.redis.nypsi.TOP_COMMANDS_ANALYTICS, "highlow", 1);
+
+      if ((await redis.get(Constants.redis.nypsi.RESTART)) == "t") {
+        if (message.author.id == Constants.TEKOH_ID && message instanceof Message) {
+          message.react("💀");
+        } else {
+          return m.edit({ embeds: [new CustomEmbed(message.member, "nypsi is rebooting, try again in a few minutes")] });
+        }
+      }
+
+      if (await redis.get("nypsi:maintenance")) {
+        if (message.author.id == Constants.TEKOH_ID && message instanceof Message) {
+          message.react("💀");
+        } else {
+          return m.edit({
+            embeds: [
+              new CustomEmbed(
+                message.member,
+                "fun & moderation commands are still available to you. maintenance mode only prevents certain commands to prevent loss of progress"
+              ).setTitle("⚠️ nypsi is under maintenance"),
+            ],
+          });
+        }
+      }
 
       return prepareGame(message, args, m);
     }
