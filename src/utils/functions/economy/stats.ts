@@ -1,8 +1,6 @@
 import { GuildMember } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
-import redis from "../../../init/redis";
-import Constants from "../../Constants";
 import { addProgress } from "./achievements";
 
 export async function getGambleStats(member: GuildMember) {
@@ -50,20 +48,6 @@ export async function getItemStats(member: GuildMember) {
   return query;
 }
 
-async function createGameId() {
-  let gameCount: number;
-
-  if (await redis.exists(Constants.redis.cache.economy.GAME_COUNT)) {
-    gameCount = parseInt(await redis.get(Constants.redis.cache.economy.GAME_COUNT));
-    await redis.set(Constants.redis.cache.economy.GAME_COUNT, gameCount + 1);
-  } else {
-    gameCount = await prisma.game.count();
-    await redis.set(Constants.redis.cache.economy.GAME_COUNT, gameCount + 1);
-  }
-
-  return (gameCount + 1).toString(36);
-}
-
 export async function createGame(opts: {
   userId: string;
   game: string;
@@ -73,13 +57,10 @@ export async function createGame(opts: {
   xp?: number;
   outcome: string;
 }): Promise<string> {
-  const id = await createGameId();
   let fail = false;
-
   const res = await prisma.game
     .create({
       data: {
-        id,
         userId: opts.userId,
         game: opts.game,
         win: opts.win ? 1 : 0,
@@ -101,13 +82,13 @@ export async function createGame(opts: {
 
   addProgress(opts.userId, "gambler", 1);
 
-  return res.id;
+  return res.id.toString(36);
 }
 
 export async function fetchGame(id: string) {
   return await prisma.game.findUnique({
     where: {
-      id,
+      id: parseInt(id, 36),
     },
   });
 }

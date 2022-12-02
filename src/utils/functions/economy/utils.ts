@@ -300,6 +300,7 @@ export async function reset() {
   await prisma.$executeRaw`ALTER SEQUENCE "LotteryTicket_id_seq" RESTART WITH 1;`;
   await prisma.booster.deleteMany();
   await prisma.game.deleteMany();
+  await prisma.$executeRaw`TRUNCATE TABLE "Game" RESTART IDENTITY;`;
   await prisma.itemUse.deleteMany();
   await prisma.economyGuildMember.deleteMany();
   await prisma.economyGuild.deleteMany();
