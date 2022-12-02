@@ -64,6 +64,17 @@ const difficultyIncrements = new Map<string, number>([
   ["medium", 0.9],
   ["hard", 2.1],
 ]);
+const incrementOffsets = new Map<number, number>([
+  [0, 0.5],
+  [1, 0.5],
+  [2, 0.47],
+  [3, 0.4],
+  [4, 0.4],
+  [5, 0.3],
+  [6, 0.2],
+  [7, 0.1],
+  [8, 0.1],
+]);
 const games = new Map<string, Game>();
 const GEM_EMOJI = "<:nypsi_gem_green:1046866209326514206>";
 
@@ -622,19 +633,7 @@ async function playGame(
         }
       }
 
-      const modifiers = new Map<number, number>([
-        [0, 0.6],
-        [1, 0.55],
-        [2, 0.5],
-        [3, 0.4],
-        [4, 0.4],
-        [5, 0.3],
-        [6, 0.2],
-        [7, 0.1],
-        [8, 0.1],
-      ]);
-
-      game.win += game.increment * (y + 1) * modifiers.get(y);
+      game.win += game.increment * (y + 1) * incrementOffsets.get(y);
 
       // games.set(message.author.id, {
       //   bet: bet,
