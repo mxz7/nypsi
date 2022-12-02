@@ -170,9 +170,9 @@ async function prepareGame(
 
   if (await redis.sismember(Constants.redis.nypsi.USERS_PLAYING, message.author.id)) {
     if (msg) {
-      return msg.edit({ embeds: [new ErrorEmbed("you are already playing something")], components: [] });
+      return msg.edit({ embeds: [new ErrorEmbed("you have an active game")], components: [] });
     }
-    return send({ embeds: [new ErrorEmbed("you are already playing something")] });
+    return send({ embeds: [new ErrorEmbed("you have an active game")] });
   }
 
   const maxBet = await calcMaxBet(message.member);
