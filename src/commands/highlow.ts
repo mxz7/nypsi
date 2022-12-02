@@ -25,7 +25,7 @@ import { addToGuildXP, getGuildByUser } from "../utils/functions/economy/guilds.
 import { createGame } from "../utils/functions/economy/stats.js";
 import { createUser, formatBet, userExists } from "../utils/functions/economy/utils.js";
 import { calcEarnedXp, getXp, updateXp } from "../utils/functions/economy/xp.js";
-import { isPremium } from "../utils/functions/premium/premium.js";
+import { getTier, isPremium } from "../utils/functions/premium/premium.js";
 import { shuffle } from "../utils/functions/random.js";
 import { addHourlyCommand } from "../utils/handlers/commandhandler.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
@@ -365,7 +365,11 @@ async function playGame(
 
   const replay = async (embed: CustomEmbed) => {
     await redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
-    if (!(await isPremium(message.member)) || (await getBalance(message.member)) < bet) {
+    if (
+      !(await isPremium(message.member)) ||
+      !((await getTier(message.member)) >= 2) ||
+      (await getBalance(message.member)) < bet
+    ) {
       return m.edit({ embeds: [embed], components: [] });
     }
 

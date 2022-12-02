@@ -4,6 +4,7 @@ import {
   ActionRowBuilder,
   BaseMessageOptions,
   ButtonBuilder,
+  ButtonInteraction,
   ButtonStyle,
   ColorResolvable,
   CommandInteraction,
@@ -25,7 +26,7 @@ import { addInventoryItem } from "../utils/functions/economy/inventory";
 import { createGame } from "../utils/functions/economy/stats";
 import { createUser, formatBet, userExists } from "../utils/functions/economy/utils";
 import { calcEarnedXp, getXp, updateXp } from "../utils/functions/economy/xp";
-import { isPremium } from "../utils/functions/premium/premium";
+import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { addHourlyCommand } from "../utils/handlers/commandhandler";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { gamble, logger } from "../utils/logger";
@@ -61,9 +62,20 @@ interface Game {
  */
 
 const difficultyIncrements = new Map<string, number>([
-  ["easy", 0.5],
-  ["medium", 0.9],
-  ["hard", 2.1],
+  ["easy", 0.7],
+  ["medium", 0.97],
+  ["hard", 3.4],
+]);
+const incrementOffsets = new Map<number, number>([
+  [0, 0.6],
+  [1, 0.55],
+  [2, 0.5],
+  [3, 0.4],
+  [4, 0.4],
+  [5, 0.3],
+  [6, 0.2],
+  [7, 0.1],
+  [8, 0.1],
 ]);
 const games = new Map<string, Game>();
 const GEM_EMOJI = "<:nypsi_gem_green:1046866209326514206>";
@@ -141,7 +153,9 @@ async function prepareGame(
     }
   };
 
-  if (args.length == 0) {
+  const defaultBet = await getDefaultBet(message.member);
+
+  if (args.length == 0 && !defaultBet) {
     return send({
       embeds: [
         new CustomEmbed(message.member)
@@ -161,7 +175,6 @@ async function prepareGame(
     return send({ embeds: [new ErrorEmbed("you are already playing something")] });
   }
   const maxBet = await calcMaxBet(message.member);
-  const defaultBet = await getDefaultBet(message.member);
 
   let bet = (await formatBet(args[0] || "", message.member).catch(() => {})) || defaultBet;
 
@@ -231,15 +244,6 @@ async function prepareGame(
 
   await addCooldown(cmd.name, message.member, 25);
 
-  setTimeout(async () => {
-    if (games.has(message.author.id)) {
-      if (games.get(message.author.id).userId == message.author.id) {
-        games.delete(message.author.id);
-        await redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
-        await updateBalance(message.member, (await getBalance(message.member)) + bet);
-      }
-    }
-  }, 180000);
   await redis.sadd(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
   await updateBalance(message.member, (await getBalance(message.member)) - bet);
 
@@ -269,6 +273,7 @@ async function prepareGame(
   playGame(message, msg, args).catch((e: string) => {
     logger.error(`error occured playing tower - ${message.author.tag} (${message.author.id})`);
     logger.error(e);
+    console.trace();
     redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
     return send({
       embeds: [new ErrorEmbed("an error occured while running - join support server")],
@@ -385,7 +390,8 @@ function createRows(board: string[][], end = false) {
   }
 
   rows[rows.length] = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder().setCustomId("finish").setLabel("finish").setStyle(ButtonStyle.Success).setDisabled(end)
+    new ButtonBuilder().setCustomId("finish").setLabel("finish").setStyle(ButtonStyle.Success),
+    new ButtonBuilder().setCustomId("random").setLabel("random").setStyle(ButtonStyle.Primary).setDisabled(end)
   );
 
   return rows;
@@ -397,14 +403,19 @@ async function playGame(
   args: string[]
 ): Promise<void> {
   const game = games.get(message.author.id);
+  const board = game.board;
 
   const replay = async (embed: CustomEmbed) => {
     await redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
-    if (!(await isPremium(message.member)) || (await getBalance(message.member)) < game.bet) {
-      return msg.edit({ embeds: [embed], components: createRows(game.board, true) });
+    if (
+      !(await isPremium(message.member)) ||
+      !((await getTier(message.member)) >= 2) ||
+      (await getBalance(message.member)) < game.bet
+    ) {
+      return msg.edit({ embeds: [embed], components: createRows(board, true) });
     }
 
-    const components = createRows(game.board, true);
+    const components = createRows(board, true);
 
     (components[components.length - 1].components[0] as ButtonBuilder)
       .setCustomId("rp")
@@ -416,11 +427,7 @@ async function playGame(
     const res = await msg
       .awaitMessageComponent({ filter: (i: Interaction) => i.user.id == message.author.id, time: 30000 })
       .catch(() => {
-        (
-          components[components.length - 1].components[
-            components[components.length - 1].components.length - 1
-          ] as ButtonBuilder
-        )
+        (components[components.length - 1].components[0] as ButtonBuilder)
           .setCustomId("rp")
           .setLabel("play again")
           .setDisabled(true);
@@ -590,6 +597,83 @@ async function playGame(
     return replay(game.embed);
   };
 
+  const clickSquare = async (response: ButtonInteraction, x: number, y: number) => {
+    const row = board[y];
+
+    switch (row[x]) {
+      case "a":
+        row[x] = "x";
+        lose();
+        return;
+      case "g":
+      case "b":
+        if (row[x] == "b") {
+          row[x] = "c";
+        } else {
+          row[x] = "gc";
+          game.win += 3;
+
+          const caught = Math.floor(Math.random() * 50);
+
+          if (caught == 7) {
+            addInventoryItem(message.member, "green_gem", 1);
+            addProgress(message.author.id, "gem_hunter", 1);
+            response.followUp({
+              embeds: [
+                new CustomEmbed(
+                  message.member,
+                  `${GEM_EMOJI} you found a **gem**!!\nit has been added to your inventory, i wonder what powers it has`
+                ),
+              ],
+              ephemeral: true,
+            });
+          } else {
+            response.followUp({
+              embeds: [
+                new CustomEmbed(
+                  message.member,
+                  `${GEM_EMOJI} you found a **gem**!!\nunfortunately you dropped it and it shattered. maybe next time`
+                ),
+              ],
+              ephemeral: true,
+            });
+          }
+        }
+
+        game.win += game.increment * (y + 1) * incrementOffsets.get(y);
+
+        // games.set(message.author.id, {
+        //   bet: bet,
+        //   win: win,
+        //   grid: grid,
+        //   id: games.get(message.author.id).id,
+        //   voted: games.get(message.author.id).voted,
+        //   increment,
+        // });
+
+        game.embed.setDescription(
+          "**bet** $" +
+            game.bet.toLocaleString() +
+            "\n**" +
+            game.win.toFixed(2) +
+            "**x ($" +
+            Math.round(game.bet * game.win).toLocaleString() +
+            ")"
+        );
+
+        if (y >= 8) {
+          await addProgress(message.author.id, "tower_pro", 1);
+          game.win += game.increment * 2;
+          win1();
+          return;
+        }
+
+        msg.edit({ embeds: [game.embed], components: createRows(board, false) });
+
+        return playGame(message, msg, args);
+    }
+  };
+
   const filter = (i: Interaction) => i.user.id == message.author.id;
   let fail = false;
 
@@ -610,9 +694,16 @@ async function playGame(
 
   if (!response) return;
 
-  if (response.customId.length != 2 && response.customId != "finish") {
-    await message.channel.send({ content: message.author.toString() + " invalid coordinate, example: `a3`" });
-    return playGame(message, msg, args);
+  if (!response.isButton()) return;
+
+  if (response.customId == "random") {
+    const y = getActiveRow(board);
+
+    const rows = createRows(board, false);
+
+    const x = randomInt(rows.length);
+
+    return clickSquare(response, x, y);
   }
 
   if (response.customId == "finish") {
@@ -629,90 +720,5 @@ async function playGame(
   }
   const [y, x] = response.customId.split("").map((i) => parseInt(i));
 
-  const row = game.board[y];
-
-  switch (row[x]) {
-    case "a":
-      row[x] = "x";
-      lose();
-      return;
-    case "g":
-    case "b":
-      if (row[x] == "b") {
-        row[x] = "c";
-      } else {
-        row[x] = "gc";
-        game.win += 3;
-
-        const caught = Math.floor(Math.random() * 50);
-
-        if (caught == 7) {
-          addInventoryItem(message.member, "green_gem", 1);
-          addProgress(message.author.id, "gem_hunter", 1);
-          response.followUp({
-            embeds: [
-              new CustomEmbed(
-                message.member,
-                `${GEM_EMOJI} you found a **gem**!!\nit has been added to your inventory, i wonder what powers it has`
-              ),
-            ],
-            ephemeral: true,
-          });
-        } else {
-          response.followUp({
-            embeds: [
-              new CustomEmbed(
-                message.member,
-                `${GEM_EMOJI} you found a **gem**!!\nunfortunately you dropped it and it shattered. maybe next time`
-              ),
-            ],
-            ephemeral: true,
-          });
-        }
-      }
-
-      const modifiers = new Map<number, number>([
-        [0, 0.6],
-        [1, 0.55],
-        [2, 0.5],
-        [3, 0.4],
-        [4, 0.4],
-        [5, 0.3],
-        [6, 0.2],
-        [7, 0.1],
-        [8, 0.1],
-      ]);
-
-      game.win += game.increment * (y + 1) * modifiers.get(y);
-
-      // games.set(message.author.id, {
-      //   bet: bet,
-      //   win: win,
-      //   grid: grid,
-      //   id: games.get(message.author.id).id,
-      //   voted: games.get(message.author.id).voted,
-      //   increment,
-      // });
-
-      game.embed.setDescription(
-        "**bet** $" +
-          game.bet.toLocaleString() +
-          "\n**" +
-          game.win.toFixed(2) +
-          "**x ($" +
-          Math.round(game.bet * game.win).toLocaleString() +
-          ")"
-      );
-
-      if (y >= 8) {
-        await addProgress(message.author.id, "tower_pro", 1);
-        game.win += game.increment * 2;
-        win1();
-        return;
-      }
-
-      msg.edit({ embeds: [game.embed], components: createRows(game.board, false) });
-
-      return playGame(message, msg, args);
-  }
+  return clickSquare(response, x, y);
 }
