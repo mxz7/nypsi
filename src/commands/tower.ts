@@ -65,9 +65,9 @@ const difficultyIncrements = new Map<string, number>([
   ["hard", 2.1],
 ]);
 const incrementOffsets = new Map<number, number>([
-  [0, 0.5],
-  [1, 0.5],
-  [2, 0.47],
+  [0, 0.6],
+  [1, 0.55],
+  [2, 0.5],
   [3, 0.4],
   [4, 0.4],
   [5, 0.3],
