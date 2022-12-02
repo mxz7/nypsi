@@ -170,9 +170,9 @@ async function prepareGame(
 
   if (await redis.sismember(Constants.redis.nypsi.USERS_PLAYING, message.author.id)) {
     if (msg) {
-      return msg.edit({ embeds: [new ErrorEmbed("you are already playing something")], components: [] });
+      return msg.edit({ embeds: [new ErrorEmbed("you have an active game")], components: [] });
     }
-    return send({ embeds: [new ErrorEmbed("you are already playing something")] });
+    return send({ embeds: [new ErrorEmbed("you have an active game")] });
   }
   const maxBet = await calcMaxBet(message.member);
 
@@ -390,7 +390,7 @@ function createRows(board: string[][], end = false) {
   }
 
   rows[rows.length] = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder().setCustomId("finish").setLabel("finish").setStyle(ButtonStyle.Success),
+    new ButtonBuilder().setCustomId("finish").setLabel("finish").setStyle(ButtonStyle.Success).setDisabled(end),
     new ButtonBuilder().setCustomId("random").setLabel("random").setStyle(ButtonStyle.Primary).setDisabled(end)
   );
 
@@ -701,7 +701,7 @@ async function playGame(
 
     const rows = createRows(board, false);
 
-    const x = randomInt(rows[y].components.length);
+    const x = randomInt(rows[0].components.length);
 
     return clickSquare(response, x, y);
   }
