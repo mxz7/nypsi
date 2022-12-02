@@ -168,6 +168,27 @@ async function completeAchievement(userId: string, achievementId: string) {
     };
 
     await addNotificationToQueue(payload);
+
+    const gemChance = Math.floor(Math.random() * 75);
+
+    if (gemChance == 7) {
+      const gems = ["green_gem", "blue_gem", "purple_gem", "pink_gem"];
+
+      const gem = gems[Math.floor(Math.random() * gems.length)];
+
+      await addInventoryItem(userId, gem, 1);
+      await addProgress(userId, "gem_hunter", 1);
+
+      await addNotificationToQueue({
+        memberId: userId,
+        payload: {
+          embed: new CustomEmbed(
+            null,
+            `${getItems()[gem].emoji} you've found a gem! i wonder what powers it holds...`
+          ).setTitle("you've found a gem"),
+        },
+      });
+    }
   } else {
     await redis.set(`achievements:completed:${userId}`, JSON.stringify(userEmbed.toJSON()));
   }
