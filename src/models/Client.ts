@@ -124,7 +124,6 @@ export class NypsiClient extends Client {
     getWebhooks(this);
     updateCounters(this);
     runCountdowns(this);
-    runChristmas(this);
     runSnipeClearIntervals();
     doChatReactions(this);
     runCommandUseTimers(this);
@@ -138,6 +137,7 @@ export class NypsiClient extends Client {
     runPremiumChecks(this);
     runModerationChecks(this);
     runAuctionChecks(this);
+    runChristmas(this);
     runLogs();
     runWorkerInterval();
     runNetWorthInterval();
