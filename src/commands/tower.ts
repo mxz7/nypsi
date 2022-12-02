@@ -151,7 +151,9 @@ async function prepareGame(
     }
   };
 
-  if (args.length == 0) {
+  const defaultBet = await getDefaultBet(message.member);
+
+  if (args.length == 0 && !defaultBet) {
     return send({
       embeds: [
         new CustomEmbed(message.member)
@@ -171,7 +173,6 @@ async function prepareGame(
     return send({ embeds: [new ErrorEmbed("you are already playing something")] });
   }
   const maxBet = await calcMaxBet(message.member);
-  const defaultBet = await getDefaultBet(message.member);
 
   let bet = (await formatBet(args[0] || "", message.member).catch(() => {})) || defaultBet;
 
