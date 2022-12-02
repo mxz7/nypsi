@@ -280,6 +280,7 @@ async function prepareGame(
   playGame(message, msg, args).catch((e: string) => {
     logger.error(`error occured playing tower - ${message.author.tag} (${message.author.id})`);
     logger.error(e);
+    console.trace();
     redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
     return send({
       embeds: [new ErrorEmbed("an error occured while running - join support server")],
@@ -408,6 +409,7 @@ async function playGame(
   args: string[]
 ): Promise<void> {
   const game = games.get(message.author.id);
+  const board = game.board;
 
   const replay = async (embed: CustomEmbed) => {
     await redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
@@ -416,10 +418,10 @@ async function playGame(
       !((await getTier(message.member)) >= 2) ||
       (await getBalance(message.member)) < game.bet
     ) {
-      return msg.edit({ embeds: [embed], components: createRows(game.board, true) });
+      return msg.edit({ embeds: [embed], components: createRows(board, true) });
     }
 
-    const components = createRows(game.board, true);
+    const components = createRows(board, true);
 
     (components[components.length - 1].components[0] as ButtonBuilder)
       .setCustomId("rp")
@@ -596,7 +598,7 @@ async function playGame(
   }
   const [y, x] = response.customId.split("").map((i) => parseInt(i));
 
-  const row = game.board[y];
+  const row = board[y];
 
   switch (row[x]) {
     case "a":
@@ -666,7 +668,7 @@ async function playGame(
         return;
       }
 
-      msg.edit({ embeds: [game.embed], components: createRows(game.board, false) });
+      msg.edit({ embeds: [game.embed], components: createRows(board, false) });
 
       return playGame(message, msg, args);
   }
