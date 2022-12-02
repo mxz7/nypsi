@@ -25,6 +25,7 @@ import { createUser, getAchievements, getItems, isEcoBanned, userExists } from "
 import { claimFromWorkers } from "../utils/functions/economy/workers";
 import { getKarma } from "../utils/functions/karma/karma";
 import { getKarmaShopItems, isKarmaShopOpen } from "../utils/functions/karma/karmashop";
+import { getTier, isPremium } from "../utils/functions/premium/premium";
 import requestDM from "../utils/functions/requestdm";
 import { addToNypsiBank, getTax } from "../utils/functions/tax";
 import { getDmSettings } from "../utils/functions/users/notifications";
@@ -340,13 +341,17 @@ export default async function interactionCreate(interaction: Interaction) {
 
         const tax = await getTax();
 
-        const taxedAmount = Math.floor(Number(auction.bin) * tax);
+        let taxedAmount = 0;
+
+        if (!(await isPremium(interaction.user.id)) && (await getTier(interaction.user.id)) != 4) {
+          taxedAmount = Math.floor(Number(auction.bin) * tax);
+          addToNypsiBank(taxedAmount);
+        }
 
         await Promise.all([
           addInventoryItem(interaction.user.id, auction.itemName, auction.itemAmount),
           updateBalance(interaction.user.id, balance - Number(auction.bin)),
           updateBalance(auction.ownerId, (await getBalance(auction.ownerId)) + (Number(auction.bin) - taxedAmount)),
-          addToNypsiBank(taxedAmount),
         ]);
 
         const items = getItems();

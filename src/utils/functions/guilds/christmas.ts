@@ -18,37 +18,49 @@ export function runChristmas(client: NypsiClient) {
   const needed = new Date(Date.parse(d) + 10800000);
 
   const runChristmasThing = async () => {
-    for (const guildId of client.guilds.cache.keys()) {
-      const guild = await client.guilds.fetch(guildId);
+    const query = await prisma.guildChristmas.findMany({
+      where: {
+        enabled: true,
+      },
+      select: {
+        channel: true,
+        format: true,
+        guildId: true,
+      },
+    });
 
-      if (!guild) continue;
+    for (const guild of query) {
+      const clusterHas = await client.cluster.broadcastEval(
+        async (c, { channelId }) => {
+          const client = c as NypsiClient;
+          const channel = await client.channels.fetch(channelId).catch(() => {});
 
-      const profile = await prisma.guildChristmas.findFirst({
-        where: {
-          AND: [
-            {
-              guildId: guildId,
-            },
-            {
-              enabled: true,
-            },
-          ],
+          if (channel) {
+            return client.cluster.id;
+          } else {
+            return "not-found";
+          }
         },
-      });
+        {
+          context: { channelId: guild.channel },
+        }
+      );
 
-      if (!profile || !profile.channel) continue;
+      let shard: number;
 
-      const channel = await guild.channels.fetch(profile.channel);
+      for (const i of clusterHas) {
+        if (i != "not-found") {
+          shard = i;
+          break;
+        }
+      }
 
-      if (!channel) {
-        logger.warn(`${guild.id}: couldn't find christmas channel`);
-        // profile.enabled = false;
-        // profile.channel = "none";
-        // await setChristmasCountdown(guild, profile);
+      if (isNaN(shard)) {
+        logger.warn(`christmas channel not found: ${guild.guildId} ${guild.channel}`);
         continue;
       }
 
-      let format = profile.format;
+      let format = guild.format;
 
       const days = daysUntilChristmas();
 
@@ -58,30 +70,50 @@ export function runChristmas(client: NypsiClient) {
         format = "MERRY CHRISTMAS EVERYONE I HOPE YOU HAVE A FANTASTIC DAY WOO";
       }
 
-      if (!channel.isTextBased()) continue;
+      const embed = new CustomEmbed()
+        .setDescription(format)
+        .setColor(variants.macchiato.red.hex as ColorResolvable)
+        .setTitle(":santa_tone1:")
+        .disableFooter();
 
-      await channel
-        .send({
-          embeds: [
-            new CustomEmbed()
-              .setDescription(format)
-              .setColor(variants.macchiato.red.hex as ColorResolvable)
-              .setTitle(":santa_tone1:")
-              .disableFooter(),
-          ],
-        })
-        .then(() => {
-          logger.log({
-            level: "auto",
-            message: `sent christmas countdown in ${guild.name} ~ ${format}`,
+      const res = await client.cluster.broadcastEval(
+        async (c, { needed, embed, channelId }) => {
+          const client = c as NypsiClient;
+          if (client.cluster.id != needed) return false;
+
+          const channel = await client.channels.fetch(channelId).catch(() => {});
+
+          if (!channel) return false;
+          if (!channel.isTextBased()) return false;
+
+          let fail = false;
+
+          await channel.send({ embeds: [embed] }).catch(() => {
+            fail = true;
           });
-        })
-        .catch(async () => {
-          logger.warn(`failed sending christmas countdown in ${guild.name} | ${guild.id}`);
-          // profile.enabled = false;
-          // profile.channel = "none";
-          // await setChristmasCountdown(guild, profile);
+
+          if (fail) {
+            return false;
+          }
+          return true;
+        },
+        {
+          context: {
+            needed: shard,
+            channelId: guild.channel,
+            embed: embed.toJSON(),
+          },
+        }
+      );
+
+      if (res.includes(true)) {
+        logger.log({
+          level: "auto",
+          message: `sent christmas countdown in ${guild.guildId} - ${format}`,
         });
+      } else {
+        logger.warn(`failed to send christmas countdown: ${guild.guildId} ${guild.channel}`);
+      }
     }
   };
 
