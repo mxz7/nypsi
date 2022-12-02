@@ -118,7 +118,7 @@ export async function getMulti(member: GuildMember | string): Promise<number> {
 
   const prestige = await getPrestige(member);
 
-  const prestigeBonus = (prestige > 10 ? 10 : prestige) * 2;
+  const prestigeBonus = (prestige > 10 ? 10 : prestige) * 1.79;
 
   multi += prestigeBonus;
 
