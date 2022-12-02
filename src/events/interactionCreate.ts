@@ -343,7 +343,7 @@ export default async function interactionCreate(interaction: Interaction) {
 
         let taxedAmount = 0;
 
-        if (!(await isPremium(interaction.user.id)) && (await getTier(interaction.user.id)) != 4) {
+        if (!(await isPremium(auction.ownerId)) && (await getTier(auction.ownerId)) != 4) {
           taxedAmount = Math.floor(Number(auction.bin) * tax);
           addToNypsiBank(taxedAmount);
         }
@@ -364,7 +364,7 @@ export default async function interactionCreate(interaction: Interaction) {
                 items[auction.itemName].name
               } has been bought by ${interaction.user.username} for $**${Math.floor(
                 Number(auction.bin) - taxedAmount
-              ).toLocaleString()}** (${(tax * 100).toFixed(1)}% tax)`
+              ).toLocaleString()}**${taxedAmount != 0 ? `(${(tax * 100).toFixed(1)}% tax)` : ""} `
             );
 
           await requestDM({

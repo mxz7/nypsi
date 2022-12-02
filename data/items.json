@@ -269,7 +269,7 @@
     "role": "sellable",
     "rarity": 69,
     "buy": 0,
-    "sell": 1250000,
+    "sell": 1500000,
     "craft": {
       "time": 600,
       "ingrediants": ["netherite_scrap:4", "gold_ingot:4"]
