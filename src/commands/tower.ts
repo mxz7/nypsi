@@ -251,6 +251,8 @@ async function prepareGame(
 
   const components = createRows(board, false);
 
+  components[components.length - 1].components[0].setDisabled(true);
+
   const embed = new CustomEmbed(message.member, `**bet** $${bet.toLocaleString()}\n**0**x ($0)`)
     .setHeader("dragon tower", message.author.avatarURL())
     .setFooter({ text: `difficulty: ${chosenDifficulty}` });
@@ -623,7 +625,13 @@ async function playGame(
           return;
         }
 
-        msg.edit({ embeds: [game.embed], components: createRows(board, false) });
+        const components = createRows(board, false);
+
+        if (game.win < 1) {
+          components[components.length - 1].components[0].setDisabled(true);
+        }
+
+        msg.edit({ embeds: [game.embed], components });
 
         return playGame(message, msg, args);
     }
