@@ -129,8 +129,8 @@ async function prepareGame(
         "game rules",
         "in blackjack, the aim is to get **21**, or as close as to **21** as you can get without going over\n" +
           "the dealer will always stand on or above **17**\n" +
-          "**2**x multiplier for winning, on a draw you receive your bet back\n" +
-          "if your first 2 cards add up to 21, you get a **2.5**x win"
+          "3:2 payout for winning, on a draw you receive your bet back\n" +
+          "if your first 2 cards add up to 21, you get a 2:1 payout"
       );
 
     return send({ embeds: [embed] });
@@ -569,10 +569,10 @@ async function playGame(
   };
 
   const win = async () => {
-    let winnings = bet * 2;
+    let winnings = bet * 1.5;
 
     if (games.get(message.author.id).cards.length == 2 && calcTotal(message.member) == 21) {
-      winnings = Math.floor(bet * 2.5);
+      winnings = Math.floor(bet * 2);
     }
 
     newEmbed.setColor(Constants.EMBED_SUCCESS_COLOR);
