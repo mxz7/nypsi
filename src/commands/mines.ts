@@ -57,8 +57,8 @@ const mineIncrements = new Map<number, number>([
   [7, 0.6],
   [10, 1],
   [15, 1.5],
-  [20, 4],
-  [23, 13],
+  [20, 3.5],
+  [23, 12.5],
 ]);
 
 abcde.set("a", 0);
@@ -512,6 +512,29 @@ async function playGame(
       await redis.hincrby(Constants.redis.nypsi.TOP_COMMANDS_ANALYTICS, "mines", 1);
       await a(message.author.id, message.author.tag, message.content);
 
+      if ((await redis.get(Constants.redis.nypsi.RESTART)) == "t") {
+        if (message.author.id == Constants.TEKOH_ID && message instanceof Message) {
+          message.react("💀");
+        } else {
+          return msg.edit({ embeds: [new CustomEmbed(message.member, "nypsi is rebooting, try again in a few minutes")] });
+        }
+      }
+
+      if (await redis.get("nypsi:maintenance")) {
+        if (message.author.id == Constants.TEKOH_ID && message instanceof Message) {
+          message.react("💀");
+        } else {
+          return msg.edit({
+            embeds: [
+              new CustomEmbed(
+                message.member,
+                "fun & moderation commands are still available to you. maintenance mode only prevents certain commands to prevent loss of progress"
+              ).setTitle("⚠️ nypsi is under maintenance"),
+            ],
+          });
+        }
+      }
+
       return prepareGame(message, args, msg);
     }
   };
@@ -727,7 +750,7 @@ async function playGame(
         grid[location] = "c";
       } else {
         grid[location] = "gc";
-        win += 4;
+        win += 3;
 
         const caught = Math.floor(Math.random() * 50);
 
