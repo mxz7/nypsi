@@ -652,7 +652,7 @@ async function playGame(
 
     const rows = createRows(board, false);
 
-    const x = randomInt(rows[y].components.length);
+    const x = randomInt(rows[0].components.length);
 
     return clickSquare(response, x, y);
   }
