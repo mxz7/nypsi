@@ -139,7 +139,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       }\n` +
         `💳 $**${(await getBankBalance(target)).toLocaleString()}** / $**${(
           await getMaxBankBalance(target)
-        ).toLocaleString()}**${net > 1_000_000 ? `\n\n🌍 $**${net.toLocaleString()}**` : ""}`
+        ).toLocaleString()}**${net > 15_000_000 ? `\n\n🌍 $**${net.toLocaleString()}**` : ""}`
     )
     .setFooter({ text: footer });
 
