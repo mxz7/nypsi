@@ -389,7 +389,7 @@ function createRows(board: string[][], end = false) {
   }
 
   rows[rows.length] = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder().setCustomId("finish").setLabel("finish").setStyle(ButtonStyle.Success),
+    new ButtonBuilder().setCustomId("finish").setLabel("finish").setStyle(ButtonStyle.Success).setDisabled(end),
     new ButtonBuilder().setCustomId("random").setLabel("random").setStyle(ButtonStyle.Primary).setDisabled(end)
   );
 
