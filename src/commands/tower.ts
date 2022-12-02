@@ -242,15 +242,6 @@ async function prepareGame(
 
   await addCooldown(cmd.name, message.member, 25);
 
-  setTimeout(async () => {
-    if (games.has(message.author.id)) {
-      if (games.get(message.author.id).userId == message.author.id) {
-        games.delete(message.author.id);
-        await redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
-        await updateBalance(message.member, (await getBalance(message.member)) + bet);
-      }
-    }
-  }, 180000);
   await redis.sadd(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
   await updateBalance(message.member, (await getBalance(message.member)) - bet);
 
