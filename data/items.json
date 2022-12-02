@@ -1420,7 +1420,7 @@
     "in_crates": false,
     "craft": {
       "time": 259200,
-      "ingrediants": ["blue_gem:1", "green_gem:1", "pink_gem:1", "purple_gem:1"]
+      "ingrediants": ["blue_gem:2", "green_gem:2", "pink_gem:1", "purple_gem:1"]
     },
     "aliases": ["white"]
   }
