@@ -52,7 +52,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (!game) return send({ embeds: [new ErrorEmbed(`couldn't find a game with id \`${args[0]}\``)] });
 
-  const embed = new CustomEmbed(message.member).setHeader(game.id, message.author.avatarURL());
+  const embed = new CustomEmbed(message.member).setHeader(game.id.toString(36), message.author.avatarURL());
 
   const tag = (await getLastKnownTag(game.userId))?.split("#")[0];
 
@@ -61,7 +61,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   let desc =
     `**user** \`${tag || "[redacted]"}\`\n` +
     `**game** \`${game.game}\`\n` +
-    `**date** <t:${Math.floor(game.date.getTime() / 1000)}>\n` +
+    `**time** <t:${Math.floor(game.date.getTime() / 1000)}>\n` +
     `**bet** $${game.bet.toLocaleString()}\n` +
     `**won** \`${Boolean(game.win)}\`\n`;
 

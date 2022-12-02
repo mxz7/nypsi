@@ -171,7 +171,7 @@ model Booster {
 }
 
 model Game {
-  id       String   @id
+  id       Int      @id @default(autoincrement())
   userId   String
   game     String
   win      Int
