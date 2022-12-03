@@ -6,6 +6,7 @@ import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { Item } from "../../../types/Economy";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
+import { percentChance } from "../random";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { addProgress, getAllAchievements, setAchievementProgress } from "./achievements";
 import { getBalance, updateBalance } from "./balance";
@@ -418,15 +419,13 @@ export function selectItem(search: string) {
 export async function commandGemCheck(member: GuildMember, commandCategory: string) {
   if (!(await userExists(member))) return;
 
-  const chance = Math.floor(Math.random() * 5000);
-
-  if (chance == 777) {
+  if (percentChance(0.01)) {
     const gems = ["green_gem", "blue_gem", "purple_gem", "pink_gem"];
 
     const gem = gems[Math.floor(Math.random() * gems.length)];
 
     await addInventoryItem(member, gem, 1);
-    await addProgress(member.user.id, "gem_hunter", 1);
+    addProgress(member.user.id, "gem_hunter", 1);
 
     if ((await getDmSettings(member)).other) {
       await addNotificationToQueue({
@@ -442,9 +441,7 @@ export async function commandGemCheck(member: GuildMember, commandCategory: stri
   }
 
   if (commandCategory == Categories.MODERATION) {
-    const chance = Math.floor(Math.random() * 500);
-
-    if (chance == 77) {
+    if (percentChance(0.2)) {
       await addInventoryItem(member, "pink_gem", 1);
       addProgress(member.user.id, "gem_hunter", 1);
 
@@ -461,9 +458,7 @@ export async function commandGemCheck(member: GuildMember, commandCategory: stri
       }
     }
   } else if (commandCategory == Categories.ANIMALS || commandCategory == Categories.NSFW) {
-    const chance = Math.floor(Math.random() * 600);
-
-    if (chance == 77) {
+    if (percentChance(0.1)) {
       await addInventoryItem(member, "purple_gem", 1);
       addProgress(member.user.id, "gem_hunter", 1);
 

@@ -5,6 +5,7 @@ import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { NotificationPayload } from "../../../types/Notification";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
+import { percentChance } from "../random";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { getLastKnownTag } from "../users/tag";
 import { addInventoryItem } from "./inventory";
@@ -169,9 +170,7 @@ async function completeAchievement(userId: string, achievementId: string) {
 
     await addNotificationToQueue(payload);
 
-    const gemChance = Math.floor(Math.random() * 75);
-
-    if (gemChance == 7) {
+    if (percentChance(0.7)) {
       const gems = ["green_gem", "blue_gem", "purple_gem", "pink_gem"];
 
       const gem = gems[Math.floor(Math.random() * gems.length)];

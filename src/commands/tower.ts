@@ -27,6 +27,7 @@ import { createGame } from "../utils/functions/economy/stats";
 import { createUser, formatBet, userExists } from "../utils/functions/economy/utils";
 import { calcEarnedXp, getXp, updateXp } from "../utils/functions/economy/xp";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
+import { percentChance } from "../utils/functions/random";
 import { addHourlyCommand } from "../utils/handlers/commandhandler";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { gamble, logger } from "../utils/logger";
@@ -291,9 +292,7 @@ function createBoard(diff: string) {
   const createRow = () => {
     const populate = (eggs: number, row: string[]) => {
       while (row.filter((i) => ["b", "g"].includes(i)).length < eggs) {
-        const gemSpawnChance = Math.floor(Math.random() * 45);
-
-        if (gemSpawnChance == 7 && !spawnedGem) {
+        if (percentChance(1.5) && !spawnedGem) {
           const pos = randomInt(0, row.length);
           row[pos] = "g";
           spawnedGem = true;

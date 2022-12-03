@@ -5,6 +5,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { addInventoryItem } from "../utils/functions/economy/inventory";
 import { createUser, doDaily, getItems, getLastDaily, userExists } from "../utils/functions/economy/utils";
+import { percentChance } from "../utils/functions/random";
 import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
@@ -50,9 +51,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     });
   }
 
-  const gemChance = Math.floor(Math.random() * 550);
-
-  if (gemChance == 307) {
+  if (percentChance(0.3)) {
     await addInventoryItem(message.member, "blue_gem", 1);
     addProgress(message.author.id, "gem_hunter", 1);
 

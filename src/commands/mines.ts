@@ -28,6 +28,7 @@ import { createGame } from "../utils/functions/economy/stats.js";
 import { createUser, formatBet, userExists } from "../utils/functions/economy/utils.js";
 import { calcEarnedXp, getXp, updateXp } from "../utils/functions/economy/xp.js";
 import { getTier, isPremium } from "../utils/functions/premium/premium.js";
+import { percentChance } from "../utils/functions/random.js";
 import { addHourlyCommand } from "../utils/handlers/commandhandler.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 import { gamble, logger } from "../utils/logger.js";
@@ -314,9 +315,7 @@ async function prepareGame(
     }
   }
 
-  const spawnGem = randomInt(10);
-
-  if (spawnGem < 3) {
+  if (percentChance(20)) {
     let passes = 0;
     let achieved = false;
 

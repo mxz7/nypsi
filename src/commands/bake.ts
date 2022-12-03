@@ -6,6 +6,7 @@ import { addProgress } from "../utils/functions/economy/achievements";
 import { getBoosters } from "../utils/functions/economy/boosters";
 import { addInventoryItem, getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
+import { percentChance } from "../utils/functions/random";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command(
@@ -92,10 +93,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   await setInventoryItem(message.member, "coal", inventory.find((i) => i.item == "coal").amount - 1, false);
   await addInventoryItem(message.member, "cookie", amount, false);
 
-  const chance = Math.floor(Math.random() * 15);
+  const chance = percentChance(7);
   let foundCakes = 0;
 
-  if (chance == 7) {
+  if (chance) {
     foundCakes = 1;
 
     if (maxCake > 1) {
@@ -107,7 +108,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   let desc = `you baked **${amount}** cookie${amount > 1 ? "s" : ""}!! 🍪`;
 
-  if (chance == 7) {
+  if (chance) {
     desc += `\n\nyou also managed to bake ${foundCakes > 1 ? foundCakes : "a"} cake${
       foundCakes > 1 ? "s" : ""
     } <:nypsi_cake:1002977512630001725> good job!!`;
