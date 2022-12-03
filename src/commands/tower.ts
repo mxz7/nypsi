@@ -39,6 +39,7 @@ const cmd = new Command("tower", "play dragon tower", Categories.MONEY).setAlias
 ]);
 
 interface Game {
+  gameId: number;
   userId: string;
   bet: number;
   win: number;
@@ -257,7 +258,10 @@ async function prepareGame(
     .setHeader("dragon tower", message.author.avatarURL())
     .setFooter({ text: `difficulty: ${chosenDifficulty}` });
 
+  const gameId = Math.random();
+
   games.set(message.author.id, {
+    gameId,
     bet,
     board,
     increment: difficultyIncrements.get(chosenDifficulty),
@@ -265,6 +269,16 @@ async function prepareGame(
     win: 0,
     embed,
   });
+
+  setTimeout(async () => {
+    if (games.has(message.author.id)) {
+      if (games.get(message.author.id).gameId == gameId) {
+        games.delete(message.author.id);
+        await redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+        await updateBalance(message.member, (await getBalance(message.member)) + bet);
+      }
+    }
+  }, 180000);
 
   if (msg) {
     await msg.edit({ embeds: [embed], components });
