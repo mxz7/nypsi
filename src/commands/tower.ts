@@ -62,19 +62,20 @@ interface Game {
  */
 
 const difficultyIncrements = new Map<string, number>([
-  ["easy", 0.7],
-  ["medium", 0.97],
-  ["hard", 3.4],
+  ["easy", 0.34],
+  ["medium", 0.7],
+  ["hard", 0.97],
+  ["expert", 2.9],
 ]);
 const incrementOffsets = new Map<number, number>([
   [0, 0.6],
-  [1, 0.55],
-  [2, 0.5],
+  [1, 0.53],
+  [2, 0.47],
   [3, 0.4],
   [4, 0.4],
   [5, 0.3],
-  [6, 0.2],
-  [7, 0.1],
+  [6, 0.23],
+  [7, 0.12],
   [8, 0.1],
 ]);
 const games = new Map<string, Game>();
@@ -251,6 +252,8 @@ async function prepareGame(
 
   const components = createRows(board, false);
 
+  components[components.length - 1].components[0].setDisabled(true);
+
   const embed = new CustomEmbed(message.member, `**bet** $${bet.toLocaleString()}\n**0**x ($0)`)
     .setHeader("dragon tower", message.author.avatarURL())
     .setFooter({ text: `difficulty: ${chosenDifficulty}` });
@@ -306,12 +309,15 @@ function createBoard(diff: string) {
 
     switch (diff) {
       case "easy":
-        row = populate(2, new Array(3).fill("a"));
+        row = populate(3, new Array(4).fill("a"));
         break;
       case "medium":
-        row = populate(2, new Array(4).fill("a"));
+        row = populate(2, new Array(3).fill("a"));
         break;
       case "hard":
+        row = populate(1, new Array(2).fill("a"));
+        break;
+      case "expert":
         row = populate(1, new Array(4).fill("a"));
         break;
     }
@@ -668,7 +674,13 @@ async function playGame(
           return;
         }
 
-        msg.edit({ embeds: [game.embed], components: createRows(board, false) });
+        const components = createRows(board, false);
+
+        if (game.win < 1) {
+          components[components.length - 1].components[0].setDisabled(true);
+        }
+
+        msg.edit({ embeds: [game.embed], components });
 
         return playGame(message, msg, args);
     }
