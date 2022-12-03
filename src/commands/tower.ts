@@ -576,6 +576,7 @@ async function playGame(
     for (const item of row) {
       if (["c", "gc"].includes(item)) {
         await response.followUp({ embeds: [new ErrorEmbed("invalid square")], ephemeral: true });
+        return playGame(message, msg, args);
       }
     }
 
