@@ -192,7 +192,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       .catch(() => {});
   }
 
-  payment(message.author, target.user, selected.sell * amount);
+  payment(message.author, target.user, `${selected.id} x ${amount}`);
 
   if (selected.id == "ring") {
     return send({
