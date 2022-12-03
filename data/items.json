@@ -1375,7 +1375,7 @@
     "name": "green gem",
     "emoji": "<:nypsi_gem_green:1046866209326514206>",
     "longDesc": "a mysterious green, shiny gem. only found during a specific activity. it is widely known that the green gem is harmless... mostly. the most noble of all gems",
-    "role": "collectable",
+    "role": "item",
     "rarity": 69,
     "in_crates": false,
     "aliases": ["green"]
@@ -1385,7 +1385,7 @@
     "name": "purple gem",
     "emoji": "<:nypsi_gem_purple:1046932495184187452>",
     "longDesc": "a mysterious purple, shiny gem. only found during a specific activity. some say gems are magical, made by witches. and are dangerous...",
-    "role": "collectable",
+    "role": "item",
     "rarity": 69,
     "in_crates": false,
     "aliases": ["purple"]
@@ -1395,7 +1395,7 @@
     "name": "pink gem",
     "emoji": "<:nypsi_gem_pink:1046932847069499472>",
     "longDesc": "a mysterious pink, shiny gem. only found during a specific activity. some say gems were planted by aliens in the early stages of earth's creation",
-    "role": "collectable",
+    "role": "item",
     "rarity": 69,
     "in_crates": false,
     "aliases": ["pink"]
@@ -1405,7 +1405,7 @@
     "name": "blue gem",
     "emoji": "<:nypsi_gem_blue:1046933487770423406>",
     "longDesc": "a mysterious blue, shiny gem. only found during a specific activity. some say gems are ancient relics of a long past civilization",
-    "role": "collectable",
+    "role": "item",
     "rarity": 69,
     "in_crates": false,
     "aliases": ["blue"]
