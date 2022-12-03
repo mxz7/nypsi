@@ -505,7 +505,8 @@ async function playGame(
       game: "tower",
       win: false,
       outcome:
-        "A = blank | B = egg | C = clicked egg | g = gem | gc = found gem | x = bad click\n" +
+        `difficulty: ${game.difficulty}\n` +
+        "A = blank | B = egg | C = clicked egg | G = gem | GC = found gem | X = bad click\n" +
         board
           .map((row) => row.join("").toUpperCase())
           .reverse()
@@ -564,7 +565,8 @@ async function playGame(
       game: "tower",
       win: true,
       outcome:
-        "A = blank | B = egg | C = clicked egg | g = gem | gc = found gem | x = bad click\n" +
+        `difficulty: ${game.difficulty}\n` +
+        "A = blank | B = egg | C = clicked egg | G = gem | GC = found gem | X = bad click\n" +
         board
           .map((row) => row.join("").toUpperCase())
           .reverse()
@@ -594,7 +596,8 @@ async function playGame(
       game: "tower",
       win: false,
       outcome:
-        "A = blank | B = egg | C = clicked egg | g = gem | gc = found gem | x = bad click\n" +
+        `difficulty: ${game.difficulty}\n` +
+        "A = blank | B = egg | C = clicked egg | G = gem | GC = found gem | X = bad click\n" +
         board
           .map((row) => row.join("").toUpperCase())
           .reverse()
