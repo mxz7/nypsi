@@ -1,8 +1,18 @@
-import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
+import {
+  ActionRowBuilder,
+  BaseMessageOptions,
+  ButtonBuilder,
+  ButtonStyle,
+  CommandInteraction,
+  InteractionReplyOptions,
+  Message,
+  MessageActionRowComponentBuilder,
+} from "discord.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { getBoosters } from "../utils/functions/economy/boosters";
 import { getItems } from "../utils/functions/economy/utils";
+import PageManager from "../utils/functions/page";
 import { getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("boosters", "view your current active boosters", Categories.MONEY).setAliases(["booster"]);
@@ -70,9 +80,32 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
   }
 
-  embed.setDescription(desc.join("\n"));
+  const pages = PageManager.createPages(desc, 10);
 
-  return send({ embeds: [embed] });
+  embed.setDescription(pages.get(1).join("\n"));
+
+  if (pages.size <= 1) return send({ embeds: [embed] });
+
+  const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+    new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
+    new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
+  );
+
+  const msg = await send({ embeds: [embed], components: [row] });
+
+  const manager = new PageManager({
+    embed,
+    message: msg,
+    row,
+    userId: message.author.id,
+    pages,
+    onPageUpdate(manager) {
+      manager.embed.setFooter({ text: `page ${manager.currentPage}/${manager.lastPage}` });
+      return manager.embed;
+    },
+  });
+
+  return manager.listen();
 }
 
 cmd.setRun(run);

@@ -1,4 +1,14 @@
-import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions } from "discord.js";
+import {
+  ActionRowBuilder,
+  BaseMessageOptions,
+  ButtonBuilder,
+  ButtonStyle,
+  CommandInteraction,
+  InteractionReplyOptions,
+  Message,
+  MessageActionRowComponentBuilder,
+  MessageEditOptions,
+} from "discord.js";
 import { readdir } from "fs/promises";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
@@ -9,6 +19,7 @@ import { addItemUse } from "../utils/functions/economy/stats";
 import { createUser, getBaseUpgrades, getBaseWorkers, getItems, userExists } from "../utils/functions/economy/utils";
 import { addWorkerUpgrade, getWorkers } from "../utils/functions/economy/workers";
 import { getPrefix } from "../utils/functions/guilds/utils";
+import PageManager from "../utils/functions/page";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger } from "../utils/logger";
 
@@ -185,11 +196,39 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const msg = await send({ embeds: [embed] });
 
-    embed.setDescription(desc2);
-    embed.addField("current boosters", currentBoosters.join("\n"));
+    const pages = PageManager.createPages(currentBoosters, 10);
 
-    setTimeout(() => {
-      return edit({ embeds: [embed] }, msg);
+    embed.setDescription(desc2);
+    embed.addField("current boosters", pages.get(1).join("\n"));
+
+    setTimeout(async () => {
+      if (pages.size <= 1) return msg.edit({ embeds: [embed] });
+
+      const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
+        new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
+      );
+
+      await msg.edit({ embeds: [embed], components: [row] });
+
+      const manager = new PageManager({
+        embed,
+        message: msg,
+        row,
+        userId: message.author.id,
+        pages,
+        updateEmbed(page: string[], embed: CustomEmbed) {
+          embed.data.fields.length = 0;
+          embed.addField("current boosters", page.join("\n"));
+          return embed;
+        },
+        onPageUpdate(manager) {
+          manager.embed.setFooter({ text: `page ${manager.currentPage}/${manager.lastPage}` });
+          return manager.embed;
+        },
+      });
+
+      return manager.listen();
     }, 1000);
     return;
   } else if (selected.role == "worker-upgrade") {
