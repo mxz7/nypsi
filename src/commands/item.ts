@@ -1,7 +1,7 @@
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import { getAuctionAverage } from "../utils/functions/economy/auctions";
+import { countItemOnAuction, getAuctionAverage } from "../utils/functions/economy/auctions";
 import { getInventory, getTotalAmountOfItem, selectItem } from "../utils/functions/economy/inventory";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -86,6 +86,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const avg = await getAuctionAverage(selected.id);
   const total = await getTotalAmountOfItem(selected.id);
   const inventory = await getInventory(message.member);
+  const inAuction = await countItemOnAuction(selected.id);
 
   if (avg) {
     if (selected.sell || selected.buy) {
@@ -102,6 +103,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       desc.push(`**in world** ${total.toLocaleString()}${percentOwned > 1 ? ` (${percentOwned.toFixed(1)}%)` : ""}`);
     } else {
       desc.push(`\n**in world** ${total.toLocaleString()}${percentOwned > 1 ? ` (${percentOwned.toFixed(1)}%)` : ""}`);
+    }
+  }
+
+  if (inAuction) {
+    if (total || avg || selected.sell || selected.buy) {
+      desc.push(`**in auction** ${inAuction.toLocaleString()}`);
+    } else {
+      desc.push(`\n**in auction** ${inAuction.toLocaleString()}`);
     }
   }
 
