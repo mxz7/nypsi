@@ -618,9 +618,7 @@ async function playGame(
           row[x] = "gc";
           game.win += 3;
 
-          const caught = Math.floor(Math.random() * 50);
-
-          if (caught == 7) {
+          if (percentChance(1.1)) {
             addInventoryItem(message.member, "green_gem", 1);
             addProgress(message.author.id, "gem_hunter", 1);
             response.followUp({
@@ -628,16 +626,6 @@ async function playGame(
                 new CustomEmbed(
                   message.member,
                   `${GEM_EMOJI} you found a **gem**!!\nit has been added to your inventory, i wonder what powers it has`
-                ),
-              ],
-              ephemeral: true,
-            });
-          } else {
-            response.followUp({
-              embeds: [
-                new CustomEmbed(
-                  message.member,
-                  `${GEM_EMOJI} you found a **gem**!!\nunfortunately you dropped it and it shattered. maybe next time`
                 ),
               ],
               ephemeral: true,
