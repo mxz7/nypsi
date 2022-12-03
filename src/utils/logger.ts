@@ -96,13 +96,13 @@ const logger = winston.createLogger({
 
 export { logger };
 
-export function payment(from: User, to: User, amount: number) {
+export function payment(from: User, to: User, value: string) {
   if (!nextLogMsg.get("pay")) {
-    nextLogMsg.set("pay", `**${from.tag}** (${from.id}) -> **${to.tag}** (${to.id}) - $**${amount.toLocaleString()}**\n`);
+    nextLogMsg.set("pay", `**${from.tag}** (${from.id}) -> **${to.tag}** (${to.id}) - $**${value}**\n`);
   } else {
     nextLogMsg.set(
       "pay",
-      nextLogMsg.get("pay") + `**${from.tag}** (${from.id}) -> **${to.tag}** (${to.id}) - $**${amount.toLocaleString()}**\n`
+      nextLogMsg.get("pay") + `**${from.tag}** (${from.id}) -> **${to.tag}** (${to.id}) - $**${value}**\n`
     );
   }
 }
