@@ -418,7 +418,7 @@ export function selectItem(search: string) {
 export async function commandGemCheck(member: GuildMember, commandCategory: string) {
   if (!(await userExists(member))) return;
 
-  const chance = Math.floor(Math.random() * 1500);
+  const chance = Math.floor(Math.random() * 100000);
 
   if (chance == 777) {
     const gems = ["green_gem", "blue_gem", "purple_gem", "pink_gem"];
@@ -442,7 +442,7 @@ export async function commandGemCheck(member: GuildMember, commandCategory: stri
   }
 
   if (commandCategory == Categories.MODERATION) {
-    const chance = Math.floor(Math.random() * 350);
+    const chance = Math.floor(Math.random() * 1000);
 
     if (chance == 77) {
       await addInventoryItem(member, "pink_gem", 1);
@@ -461,7 +461,7 @@ export async function commandGemCheck(member: GuildMember, commandCategory: stri
       }
     }
   } else if (commandCategory == Categories.ANIMALS || commandCategory == Categories.NSFW) {
-    const chance = Math.floor(Math.random() * 500);
+    const chance = Math.floor(Math.random() * 1000);
 
     if (chance == 77) {
       await addInventoryItem(member, "purple_gem", 1);
