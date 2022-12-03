@@ -131,7 +131,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
 
   await addInventoryItem(user, "vote_crate", crateAmount, false);
 
-  const gemChance = Math.floor(Math.random() * 250);
+  const gemChance = Math.floor(Math.random() * 500);
 
   if (gemChance == 107) {
     await addInventoryItem(user, "blue_gem", 1);
