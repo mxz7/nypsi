@@ -50,9 +50,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     });
   }
 
-  const gemChance = Math.floor(Math.random() * 500);
+  const gemChance = Math.floor(Math.random() * 550);
 
-  if (gemChance == 407) {
+  if (gemChance == 307) {
     await addInventoryItem(message.member, "blue_gem", 1);
     addProgress(message.author.id, "gem_hunter", 1);
 
