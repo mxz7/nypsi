@@ -10,7 +10,7 @@ import { addProgress } from "../../utils/functions/economy/achievements";
 import { getBalance, updateBalance } from "../../utils/functions/economy/balance";
 import { addInventoryItem } from "../../utils/functions/economy/inventory";
 import { getItems, lotteryTicketPrice } from "../../utils/functions/economy/utils";
-import { shuffle } from "../../utils/functions/random";
+import { percentChance, shuffle } from "../../utils/functions/random";
 import { addToNypsiBank, getTax } from "../../utils/functions/tax";
 import { addNotificationToQueue, getDmSettings } from "../../utils/functions/users/notifications";
 import { logger } from "../../utils/logger";
@@ -97,9 +97,7 @@ async function doLottery(client: Client) {
         logger.warn("failed to send notification to winner");
       });
 
-    const gemChance = Math.floor(Math.random() * 150);
-
-    if (gemChance == 17) {
+    if (percentChance(0.9)) {
       await addInventoryItem(user.id, "purple_gem", 1);
       addProgress(user.id, "gem_hunter", 1);
 

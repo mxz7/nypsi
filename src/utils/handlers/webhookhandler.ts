@@ -15,6 +15,7 @@ import { getPrestige } from "../functions/economy/prestige";
 import { addTicket, getItems, getTickets, isEcoBanned, loadItems, userExists } from "../functions/economy/utils";
 import { addKarma } from "../functions/karma/karma";
 import { addMember, getPremiumProfile, isPremium, renewUser, setTier } from "../functions/premium/premium";
+import { percentChance } from "../functions/random";
 import requestDM from "../functions/requestdm";
 import { addNotificationToQueue, getDmSettings } from "../functions/users/notifications";
 import { logger } from "../logger";
@@ -131,9 +132,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
 
   await addInventoryItem(user, "vote_crate", crateAmount, false);
 
-  const gemChance = Math.floor(Math.random() * 500);
-
-  if (gemChance == 107) {
+  if (percentChance(0.2)) {
     await addInventoryItem(user, "blue_gem", 1);
     addProgress(user, "gem_hunter", 1);
 
