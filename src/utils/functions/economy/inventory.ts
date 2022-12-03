@@ -420,7 +420,6 @@ export async function commandGemCheck(member: GuildMember, commandCategory: stri
   if (!(await userExists(member))) return;
 
   if (percentChance(0.0001)) {
-
     const gems = ["green_gem", "blue_gem", "purple_gem", "pink_gem"];
 
     const gem = gems[Math.floor(Math.random() * gems.length)];
