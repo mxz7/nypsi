@@ -288,7 +288,7 @@ async function handleKofiData(data: KofiResponse) {
               });
             }
           } else if (gemChance == 57) {
-            const gemChance2 = Math.floor(Math.random() * 15);
+            const gemChance2 = Math.floor(Math.random() * 50);
 
             if (gemChance2 == 7 && (await getDmSettings(user.id)).other) {
               await addInventoryItem(user.id, "white_gem", 1);
