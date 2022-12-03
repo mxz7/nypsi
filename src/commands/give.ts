@@ -143,6 +143,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({ embeds: [new ErrorEmbed("invalid amount")] });
   }
 
+  if (selected.account_locked) {
+    return send({ embeds: [new ErrorEmbed("this item is locked to your account")] });
+  }
+
   const targetPrestige = await getPrestige(target);
 
   if (targetPrestige < 2) {

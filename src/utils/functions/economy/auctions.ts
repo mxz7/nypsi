@@ -85,6 +85,8 @@ export async function createAuction(member: GuildMember, itemId: string, itemAmo
 
   const items = getItems();
 
+  if (items[itemId].account_locked) return false;
+
   embed.setDescription(
     `started <t:${Math.floor(Date.now() / 1000)}:R>\n\n` +
       `**${itemAmount.toLocaleString()}x** ${items[itemId].emoji} ${items[itemId].name} for $**${bin.toLocaleString()}**`
@@ -343,4 +345,17 @@ async function checkWatchers(itemName: string, messageUrl: string, creatorId: st
     await redis.set(`${Constants.redis.cooldown.AUCTION_WATCH}:${userId}`, "true");
     await redis.expire(`${Constants.redis.cooldown.AUCTION_WATCH}:${userId}`, ms("5 minutes") / 1000);
   }
+}
+
+export async function countItemOnAuction(itemId: string) {
+  const amount = await prisma.auction.aggregate({
+    where: {
+      AND: [{ sold: false }, { itemName: itemId }],
+    },
+    _count: {
+      itemAmount: true,
+    },
+  });
+
+  return amount?._count?.itemAmount || 0;
 }

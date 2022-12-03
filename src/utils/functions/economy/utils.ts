@@ -181,6 +181,7 @@ export async function createUser(member: GuildMember | string) {
     },
   });
   await redis.del(`${Constants.redis.cache.economy.EXISTS}:${id}`);
+  await addInventoryItem(id, "beginner_booster", 1, false);
 }
 
 export async function formatBet(bet: string | number, member: GuildMember): Promise<number | void> {
