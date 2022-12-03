@@ -1432,5 +1432,21 @@
       "ingrediants": ["blue_gem:1", "green_gem:1", "pink_gem:1", "purple_gem:1"]
     },
     "aliases": ["white"]
+  },
+  "beginner_booster": {
+    "id": "beginner_booster",
+    "name": "new player booster",
+    "emoji": "✨",
+    "longDesc": "24 hour 17% multi and double xp booster for new players",
+    "rarity": 69,
+    "role": "booster",
+    "stackable": false,
+    "boosterEffect": {
+      "boosts": ["multi", "xp"],
+      "effect": 17,
+      "time": 86400
+    },
+    "in_crates": false,
+    "account_locked": true
   }
 }

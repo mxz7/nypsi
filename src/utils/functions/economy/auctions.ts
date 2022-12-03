@@ -85,6 +85,8 @@ export async function createAuction(member: GuildMember, itemId: string, itemAmo
 
   const items = getItems();
 
+  if (items[itemId].account_locked) return false;
+
   embed.setDescription(
     `started <t:${Math.floor(Date.now() / 1000)}:R>\n\n` +
       `**${itemAmount.toLocaleString()}x** ${items[itemId].emoji} ${items[itemId].name} for $**${bin.toLocaleString()}**`
