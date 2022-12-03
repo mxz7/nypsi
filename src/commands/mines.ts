@@ -354,6 +354,8 @@ async function prepareGame(
 
   const rows = getRows(grid, false);
 
+  rows[4].components[4].setDisabled(true);
+
   if (msg) {
     await msg.edit({ embeds: [embed], components: rows });
   } else {
@@ -809,7 +811,13 @@ async function playGame(
         return;
       }
 
-      edit({ embeds: [embed], components: getRows(grid, false) });
+      const components = getRows(grid, false);
+
+      if (win < 1) {
+        components[4].components[4].setDisabled(true);
+      }
+
+      edit({ embeds: [embed], components });
 
       return playGame(message, msg, args);
   }

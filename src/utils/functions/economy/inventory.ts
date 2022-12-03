@@ -418,6 +418,29 @@ export function selectItem(search: string) {
 export async function commandGemCheck(member: GuildMember, commandCategory: string) {
   if (!(await userExists(member))) return;
 
+  const chance = Math.floor(Math.random() * 1500);
+
+  if (chance == 777) {
+    const gems = ["green_gem", "blue_gem", "purple_gem", "pink_gem"];
+
+    const gem = gems[Math.floor(Math.random() * gems.length)];
+
+    await addInventoryItem(member, gem, 1);
+    await addProgress(member.user.id, "gem_hunter", 1);
+
+    if ((await getDmSettings(member)).other) {
+      await addNotificationToQueue({
+        memberId: member.user.id,
+        payload: {
+          embed: new CustomEmbed(
+            member,
+            `${getItems()[gem].emoji} you've found a gem! i wonder what powers it holds...`
+          ).setTitle("you've found a gem"),
+        },
+      });
+    }
+  }
+
   if (commandCategory == Categories.MODERATION) {
     const chance = Math.floor(Math.random() * 350);
 
