@@ -41,12 +41,14 @@ const cmd = new Command("tower", "play dragon tower", Categories.MONEY).setAlias
 ]);
 
 interface Game {
+  gameId: number;
   userId: string;
   bet: number;
   win: number;
   board: string[][];
   increment: number;
   embed: CustomEmbed;
+  difficulty: string;
 }
 
 /**
@@ -259,14 +261,28 @@ async function prepareGame(
     .setHeader("dragon tower", message.author.avatarURL())
     .setFooter({ text: `difficulty: ${chosenDifficulty}` });
 
+  const gameId = Math.random();
+
   games.set(message.author.id, {
+    gameId,
     bet,
     board,
     increment: difficultyIncrements.get(chosenDifficulty),
     userId: message.author.id,
     win: 0,
     embed,
+    difficulty: chosenDifficulty,
   });
+
+  setTimeout(async () => {
+    if (games.has(message.author.id)) {
+      if (games.get(message.author.id).gameId == gameId) {
+        games.delete(message.author.id);
+        await redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+        await updateBalance(message.member, (await getBalance(message.member)) + bet);
+      }
+    }
+  }, 180000);
 
   if (msg) {
     await msg.edit({ embeds: [embed], components });
@@ -605,6 +621,13 @@ async function playGame(
   const clickSquare = async (response: ButtonInteraction, x: number, y: number) => {
     const row = board[y];
 
+    for (const item of row) {
+      if (["c", "gc"].includes(item)) {
+        await response.followUp({ embeds: [new ErrorEmbed("invalid square")], ephemeral: true });
+        return playGame(message, msg, args);
+      }
+    }
+
     switch (row[x]) {
       case "a":
         row[x] = "x";
@@ -655,7 +678,7 @@ async function playGame(
         );
 
         if (y >= 8) {
-          await addProgress(message.author.id, "tower_pro", 1);
+          if (game.difficulty != "easy") addProgress(message.author.id, "tower_pro", 1);
           game.win += game.increment * 2;
           win1();
           return;
