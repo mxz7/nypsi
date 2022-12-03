@@ -27,6 +27,7 @@ export interface Item {
     time: number; // seconds
   };
   in_crates: boolean;
+  account_locked?: boolean;
 }
 
 export interface LotteryTicket {
