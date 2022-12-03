@@ -66,7 +66,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     embed.setColor(Constants.EMBED_FAIL_COLOR);
     embed.addField(
       "rewards",
-      `× **7**% multiplier booster\n× +$**50k** max bet\n× $**${amount.toLocaleString()}** reward\n× **${crateAmount}** vote crate${
+      `× **5**% multiplier booster\n× +$**50k** max bet\n× $**${amount.toLocaleString()}** reward\n× **${crateAmount}** vote crate${
         crateAmount > 1 ? "s" : ""
       }`
     );
