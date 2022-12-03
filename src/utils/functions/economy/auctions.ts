@@ -346,3 +346,16 @@ async function checkWatchers(itemName: string, messageUrl: string, creatorId: st
     await redis.expire(`${Constants.redis.cooldown.AUCTION_WATCH}:${userId}`, ms("5 minutes") / 1000);
   }
 }
+
+export async function countItemOnAuction(itemId: string) {
+  const amount = await prisma.auction.aggregate({
+    where: {
+      AND: [{ sold: false }, { itemName: itemId }],
+    },
+    _count: {
+      itemAmount: true,
+    },
+  });
+
+  return amount?._count?.itemAmount || 0;
+}
