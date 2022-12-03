@@ -917,34 +917,34 @@
     "name": "tower professional **I**",
     "emoji": "🐲",
     "target": 2,
-    "description": "complete the dragons tower twice"
+    "description": "complete the dragons tower twice on medium or higher"
   },
   "tower_pro_ii": {
     "id": "tower_pro_ii",
     "name": "tower professional **II**",
     "emoji": "🐲",
     "target": 5,
-    "description": "complete the dragons tower 5 times"
+    "description": "complete the dragons tower 5 times on medium or higher"
   },
   "tower_pro_iii": {
     "id": "tower_pro_iii",
     "name": "tower professional **III**",
     "emoji": "🐲",
     "target": 25,
-    "description": "complete the dragons tower 25 times"
+    "description": "complete the dragons tower 25 times on medium or higher"
   },
   "tower_pro_iv": {
     "id": "tower_pro_iv",
     "name": "tower professional **IV**",
     "emoji": "🐲",
     "target": 100,
-    "description": "complete the dragons tower 100 times"
+    "description": "complete the dragons tower 100 times on medium or higher"
   },
   "tower_pro_v": {
     "id": "tower_pro_v",
     "name": "tower professional **V**",
     "emoji": "🐲",
     "target": 500,
-    "description": "complete the dragons tower 500 times"
+    "description": "complete the dragons tower 500 times on medium or higher"
   }
 }

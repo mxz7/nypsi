@@ -282,6 +282,12 @@ export default async function interactionCreate(interaction: Interaction) {
             return res.reply({ embeds: [new CustomEmbed().setDescription("✅ cancelled purchase")], ephemeral: true });
           }
 
+          const balance = await getBalance(interaction.user.id);
+
+          if (balance < Number(auction.bin)) {
+            return await interaction.reply({ embeds: [new ErrorEmbed("you cannot afford this")], ephemeral: true });
+          }
+
           await res.deferUpdate();
 
           interaction = res;

@@ -17,12 +17,13 @@ import Constants from "../utils/Constants";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { addInventoryItem } from "../utils/functions/economy/inventory";
 import { getPrestige } from "../utils/functions/economy/prestige";
-import { createUser, userExists } from "../utils/functions/economy/utils";
+import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import { getXp, updateXp } from "../utils/functions/economy/xp";
 import { getKarma, removeKarma } from "../utils/functions/karma/karma";
 import { closeKarmaShop, getKarmaShopItems, isKarmaShopOpen, openKarmaShop } from "../utils/functions/karma/karmashop";
 import PageManager from "../utils/functions/page";
 import { addMember, getTier, isPremium, setExpireDate } from "../utils/functions/premium/premium";
+import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import dayjs = require("dayjs");
 
@@ -379,6 +380,22 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     addProgress(message.author.id, "wizard", 1);
+
+    const gemSpawn = Math.floor(Math.random() * 377);
+
+    if (gemSpawn == 307 && (await getDmSettings(message.member)).other) {
+      await addInventoryItem(message.member, "purple_gem", 1);
+      addProgress(message.author.id, "gem_hunter", 1);
+      await addNotificationToQueue({
+        memberId: message.author.id,
+        payload: {
+          embed: new CustomEmbed(
+            message.member,
+            `${getItems()["purple_gem"].emoji} you've found a gem! i wonder what powers it holds...`
+          ).setTitle("you've found a gem"),
+        },
+      });
+    }
 
     return send({
       embeds: [
