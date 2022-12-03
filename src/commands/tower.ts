@@ -46,6 +46,7 @@ interface Game {
   board: string[][];
   increment: number;
   embed: CustomEmbed;
+  difficulty: string;
 }
 
 /**
@@ -268,6 +269,7 @@ async function prepareGame(
     userId: message.author.id,
     win: 0,
     embed,
+    difficulty: chosenDifficulty,
   });
 
   setTimeout(async () => {
@@ -633,7 +635,7 @@ async function playGame(
         );
 
         if (y >= 8) {
-          await addProgress(message.author.id, "tower_pro", 1);
+          if (game.difficulty != "easy") addProgress(message.author.id, "tower_pro", 1);
           game.win += game.increment * 2;
           win1();
           return;
