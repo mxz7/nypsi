@@ -188,5 +188,5 @@ function runLogs() {
         nextLogMsg.set(k, "");
       }
     });
-  }, 2500);
+  }, 5000);
 }
