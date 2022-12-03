@@ -53,31 +53,59 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
   };
 
+  const checkRoles = async () => {
+    let requiredRole: string;
+
+    switch (await getTier(message.author.id)) {
+      case 1:
+        requiredRole = Constants.BRONZE_ROLE_ID;
+        break;
+      case 2:
+        requiredRole = Constants.SILVER_ROLE_ID;
+        break;
+      case 3:
+        requiredRole = Constants.GOLD_ROLE_ID;
+        break;
+      case 4:
+        requiredRole = Constants.PLATINUM_ROLE_ID;
+        break;
+    }
+
+    const member = await message.guild.members.fetch(message.author.id);
+
+    for (const role of member.roles.cache.values()) {
+      let requiredLevel: number;
+      switch (role.id) {
+        case Constants.BRONZE_ROLE_ID:
+          requiredLevel = 1;
+          break;
+        case Constants.SILVER_ROLE_ID:
+          requiredLevel = 2;
+          break;
+        case Constants.GOLD_ROLE_ID:
+          requiredLevel = 3;
+          break;
+        case Constants.PLATINUM_ROLE_ID:
+          requiredLevel = 4;
+          break;
+      }
+
+      if (requiredLevel && (await getTier(message.member)) != requiredLevel) {
+        await member.roles.remove(role);
+      }
+    }
+
+    if ((await getTier(message.member)) == 2 && member.roles.cache.has(Constants.BOOST_ROLE_ID)) return;
+
+    if (!Array.from(member.roles.cache.keys()).includes(requiredRole)) {
+      await member.roles.add(requiredRole);
+    }
+  };
+
   const defaultMessage = async () => {
     if (await isPremium(message.member)) {
       if (message.guild.id == Constants.NYPSI_SERVER_ID) {
-        let requiredRole: string;
-
-        switch (await getTier(message.author.id)) {
-          case 1:
-            requiredRole = Constants.BRONZE_ROLE_ID;
-            break;
-          case 2:
-            requiredRole = Constants.SILVER_ROLE_ID;
-            break;
-          case 3:
-            requiredRole = Constants.GOLD_ROLE_ID;
-            break;
-          case 4:
-            requiredRole = Constants.PLATINUM_ROLE_ID;
-            break;
-        }
-
-        const member = await message.guild.members.fetch(message.author.id);
-
-        if (!Array.from(member.roles.cache.keys()).includes(requiredRole)) {
-          await member.roles.add(requiredRole);
-        }
+        checkRoles();
       }
 
       const embed = new CustomEmbed(message.member);
