@@ -573,6 +573,12 @@ async function playGame(
   const clickSquare = async (response: ButtonInteraction, x: number, y: number) => {
     const row = board[y];
 
+    for (const item of row) {
+      if (["c", "gc"].includes(item)) {
+        await response.followUp({ embeds: [new ErrorEmbed("invalid square")], ephemeral: true });
+      }
+    }
+
     switch (row[x]) {
       case "a":
         row[x] = "x";
