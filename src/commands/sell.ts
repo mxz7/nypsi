@@ -47,7 +47,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (args.length == 0) {
     return send({
       embeds: [
-        new CustomEmbed(message.member, "sell items from your inventory\n\nyou will have to pay tax on your sold items"),
+        new CustomEmbed(
+          message.member,
+          "sell items from your inventory\n\nyou will have to pay tax on your sold items, selling crypto has a 5% fee"
+        ),
       ],
     });
   }
@@ -104,6 +107,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   } else if (!selected.sell) {
     sellWorth = 1000 * amount;
   }
+
+  if (["bitcoin", "ethereum"].includes(selected.id)) sellWorth = Math.floor(sellWorth - sellWorth * 0.05);
 
   let tax = true;
 

@@ -84,6 +84,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       sellWorth = Math.floor(sellWorth + sellWorth * multi);
     }
 
+    if (["bitcoin", "ethereum"].includes(item)) sellWorth = Math.floor(sellWorth - sellWorth * 0.05);
+
     if (taxEnabled) {
       taxedAmount += Math.floor(sellWorth * tax);
       sellWorth = sellWorth - Math.floor(sellWorth * tax);
