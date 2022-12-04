@@ -17,7 +17,7 @@ async function doTopBalance() {
   for (const user of query) {
     await prisma.graphTopBalance.create({
       data: {
-        balance: user.money,
+        value: user.money,
         date,
         userId: user.userId,
       },
@@ -43,7 +43,7 @@ async function doTopNetworth() {
     await prisma.graphTopNetworth.create({
       data: {
         userId: user.userId,
-        netWorth: user.net_worth,
+        value: user.net_worth,
         date,
       },
     });
@@ -71,7 +71,7 @@ async function doCookies() {
     await prisma.graphCookies.create({
       data: {
         userId: user.userId,
-        count: user.amount,
+        value: user.amount,
         date,
       },
     });
