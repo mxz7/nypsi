@@ -37,6 +37,13 @@ cmd.slashData
   .addStringOption((option) =>
     option.setName("item").setDescription("the item you want to use").setRequired(true).setAutocomplete(true)
   )
+  .addIntegerOption((option) =>
+    option
+      .setName("amount")
+      .setDescription("amount of item you want to use (only applicable to boosters)")
+      .setMinValue(0)
+      .setMaxValue(7)
+  )
   .addUserOption((option) => option.setName("member").setDescription("member to use your item on, if applicable"));
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
@@ -135,26 +142,39 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (selected.role == "booster") {
     let boosters = await getBoosters(message.member);
+    let amount = parseInt(args[1]) || 1;
 
-    if (selected.stackable) {
-      if (boosters.has(selected.id)) {
-        if (boosters.get(selected.id).length >= selected.max) {
+    if (boosters.has(selected.id)) {
+      if (selected.stackable) {
+        if (selected.max === boosters.get(selected.id).length) {
           return send({
             embeds: [new ErrorEmbed(`**${selected.name}** can only be stacked ${selected.max} times`)],
           });
         }
-      }
-    } else {
-      if (boosters.has(selected.id)) {
+        if (amount > selected.max - boosters.get(selected.id).length) {
+          amount = selected.max - boosters.get(selected.id).length;
+        }
+      } else {
         return send({ embeds: [new ErrorEmbed(`**${selected.name}** cannot be stacked`)] });
       }
     }
 
-    await Promise.all([
-      setInventoryItem(message.member, selected.id, inventory.find((i) => i.item == selected.id).amount - 1, false),
-      addItemUse(message.member, selected.id),
-      addBooster(message.member, selected.id),
-    ]);
+    if (amount > selected.max) amount = selected.max;
+
+    if (amount === 0)
+      return send({
+        embeds: [new ErrorEmbed(`**${selected.name}** can only be stacked ${selected.max} times`)],
+      });
+
+    if (inventory.find((i) => i.item == selected.id)?.amount < amount)
+      return send({ embeds: [new ErrorEmbed(`you don't have ${amount}x ${selected.name}`)] });
+
+    for (let i = 0; i < amount; i++) {
+      await addBooster(message.member, selected.id);
+    }
+
+    await addItemUse(message.member, selected.id, amount);
+    await setInventoryItem(message.member, selected.id, inventory.find((i) => i.item == selected.id).amount - amount, false);
 
     boosters = await getBoosters(message.member);
 
@@ -184,12 +204,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       }
     }
 
-    let desc = `activating **${selected.name}** booster...`;
-    let desc2 = `you have activated **${selected.name}**`;
+    let desc = `activating ${amount > 1 ? `${amount}x ` : ""}**${selected.name}** booster...`;
+    let desc2 = `you have activated ${amount > 1 ? `${amount}x ` : ""}**${selected.name}**`;
 
     if (["cake", "cookie"].includes(selected.id)) {
-      desc = `eating **${selected.name}**...`;
-      desc2 = `you have ate a **${selected.name}** 😋`;
+      desc = `eating ${amount > 1 ? `${amount} ` : ""}**${
+        amount > 1 ? selected.plural || selected.name : selected.name
+      }**...`;
+      desc2 = `you have ate ${amount > 1 ? `${amount} ` : "a "}**${
+        amount > 1 ? selected.plural || selected.name : selected.name
+      }** 😋`;
     }
 
     embed.setDescription(desc);
