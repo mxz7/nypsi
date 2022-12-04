@@ -468,3 +468,15 @@ model KofiPurchases {
   email String
   item  String
 }
+
+// data for creating graphs
+
+model GraphMetrics {
+  id Int @id @default(autoincrement())
+
+  category String
+
+  userId String
+  value  BigInt
+  date   DateTime
+}
