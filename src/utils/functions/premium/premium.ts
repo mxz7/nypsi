@@ -80,10 +80,10 @@ export async function getTier(member: GuildMember | string): Promise<number> {
     },
   });
 
-  await redis.set(`${Constants.redis.cache.premium.LEVEL}:${id}`, query.level || 0);
+  await redis.set(`${Constants.redis.cache.premium.LEVEL}:${id}`, query?.level || 0);
   await redis.expire(`${Constants.redis.cache.premium.LEVEL}:${id}`, 300);
 
-  return query.level;
+  return query?.level || 0;
 }
 
 export async function addMember(member: GuildMember | string, level: number, client?: NypsiClient) {
