@@ -1428,13 +1428,13 @@
     "id": "beginner_booster",
     "name": "new player booster",
     "emoji": "✨",
-    "longDesc": "24 hour 17% multi and double xp booster for new players",
+    "longDesc": "24 hour 10% multi and double xp booster for new players",
     "rarity": 69,
     "role": "booster",
     "stackable": false,
     "boosterEffect": {
       "boosts": ["multi", "xp"],
-      "effect": 17,
+      "effect": 10,
       "time": 86400
     },
     "in_crates": false,
