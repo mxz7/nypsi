@@ -1,6 +1,7 @@
 import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { getPrefix } from "../utils/functions/guilds/utils";
+import { isPremium } from "../utils/functions/premium/premium";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("clean", "clean up bot commands and responses", Categories.MODERATION).setPermissions([
@@ -8,7 +9,10 @@ const cmd = new Command("clean", "clean up bot commands and responses", Categori
 ]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-  if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) return;
+  if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
+    if (message.channel.id != "747056029795221516") return;
+    if (!(await isPremium(message.member))) return;
+  }
 
   if (await onCooldown(cmd.name, message.member)) {
     const embed = await getResponse(cmd.name, message.member);
