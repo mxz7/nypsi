@@ -18,16 +18,16 @@ export default function graphToCsv(): Promise<void> {
 if (!isMainThread) {
   process.title = "nypsi: graph to csv";
 
-  const toCsv = async (fileName: string, data: { userId: string; balance: bigint; date: Date; id: number }[]) => {
+  const toCsv = async (fileName: string, data: { userId: string; value: bigint | number; date: Date; id: number }[]) => {
     const dates: number[] = [];
     const map = new Map<string, { value: number; date: number }[]>();
 
     for (const user of data) {
       if (!dates.includes(user.date.getTime())) dates.push(user.date.getTime());
       if (map.has(user.userId)) {
-        map.get(user.userId).push({ value: Number(user.balance), date: user.date.getTime() });
+        map.get(user.userId).push({ value: Number(user.value), date: user.date.getTime() });
       } else {
-        map.set(user.userId, [{ value: Number(user.balance), date: user.date.getTime() }]);
+        map.set(user.userId, [{ value: Number(user.value), date: user.date.getTime() }]);
       }
     }
 
@@ -78,13 +78,32 @@ if (!isMainThread) {
   };
 
   (async () => {
-    const topBalance = await prisma.graphTopBalance.findMany({
-      orderBy: {
-        date: "asc",
-      },
-    });
+    await toCsv(
+      "topbalance.csv",
+      await prisma.graphTopBalance.findMany({
+        orderBy: {
+          date: "asc",
+        },
+      })
+    );
 
-    await toCsv("topbalance.csv", topBalance);
+    await toCsv(
+      "topnetworth.csv",
+      await prisma.graphTopNetworth.findMany({
+        orderBy: {
+          date: "asc",
+        },
+      })
+    );
+
+    await toCsv(
+      "topcookies.csv",
+      await prisma.graphCookies.findMany({
+        orderBy: {
+          date: "asc",
+        },
+      })
+    );
 
     parentPort.postMessage(true);
     process.exit(0);
