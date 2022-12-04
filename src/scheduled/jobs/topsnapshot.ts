@@ -15,11 +15,12 @@ async function doTopBalance() {
   const date = new Date();
 
   for (const user of query) {
-    await prisma.graphTopBalance.create({
+    await prisma.graphMetrics.create({
       data: {
         value: user.money,
         date,
         userId: user.userId,
+        category: "balance",
       },
     });
   }
@@ -40,11 +41,12 @@ async function doTopNetworth() {
   const date = new Date();
 
   for (const user of query) {
-    await prisma.graphTopNetworth.create({
+    await prisma.graphMetrics.create({
       data: {
         userId: user.userId,
         value: user.net_worth,
         date,
+        category: "networth",
       },
     });
   }
@@ -68,11 +70,12 @@ async function doCookies() {
   const date = new Date();
 
   for (const user of query) {
-    await prisma.graphCookies.create({
+    await prisma.graphMetrics.create({
       data: {
         userId: user.userId,
         value: user.amount,
         date,
+        category: "cookies",
       },
     });
   }

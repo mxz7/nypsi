@@ -80,7 +80,10 @@ if (!isMainThread) {
   (async () => {
     await toCsv(
       "topbalance.csv",
-      await prisma.graphTopBalance.findMany({
+      await prisma.graphMetrics.findMany({
+        where: {
+          category: "balance",
+        },
         orderBy: {
           date: "asc",
         },
@@ -89,7 +92,10 @@ if (!isMainThread) {
 
     await toCsv(
       "topnetworth.csv",
-      await prisma.graphTopNetworth.findMany({
+      await prisma.graphMetrics.findMany({
+        where: {
+          category: "networth",
+        },
         orderBy: {
           date: "asc",
         },
@@ -98,7 +104,10 @@ if (!isMainThread) {
 
     await toCsv(
       "topcookies.csv",
-      await prisma.graphCookies.findMany({
+      await prisma.graphMetrics.findMany({
+        where: {
+          category: "cookies",
+        },
         orderBy: {
           date: "asc",
         },

@@ -471,26 +471,12 @@ model KofiPurchases {
 
 // data for creating graphs
 
-model GraphTopBalance {
+model GraphMetrics {
   id Int @id @default(autoincrement())
+
+  category String
 
   userId String
   value  BigInt
-  date   DateTime
-}
-
-model GraphTopNetworth {
-  id Int @id @default(autoincrement())
-
-  userId String
-  value  BigInt
-  date   DateTime
-}
-
-model GraphCookies {
-  id Int @id @default(autoincrement())
-
-  userId String
-  value  Int
   date   DateTime
 }
