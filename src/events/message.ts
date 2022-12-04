@@ -434,7 +434,14 @@ async function addMention() {
         url: data.link,
         date: new Date(data.date),
         targetId: target,
-        userTag: data.user,
+        userTag: data.user
+          .toLowerCase()
+          .replaceAll(";", "")
+          .replaceAll("'", "")
+          .replaceAll("delete from", "")
+          .replaceAll("insert into", "")
+          .replaceAll("update ", "")
+          .replaceAll("drop ", ""),
       });
     }
   }
