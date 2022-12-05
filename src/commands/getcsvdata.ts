@@ -6,7 +6,7 @@ import graphToCsv from "../utils/functions/workers/graphtocsv";
 const cmd = new Command("getcsvdata", "get csv data", Categories.NONE).setPermissions(["bot owner"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-  if (message.member.user.id != Constants.TEKOH_ID) return;
+  if (!Constants.ADMIN_IDS.includes(message.author.id)) return;
 
   const msg = await message.channel.send({ content: "processing..." });
 
