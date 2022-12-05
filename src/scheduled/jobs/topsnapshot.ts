@@ -81,8 +81,51 @@ async function doCookies() {
   }
 }
 
+async function doMembers() {
+  const query = await prisma.premium.findMany({
+    select: {
+      userId: true,
+      user: {
+        select: {
+          Economy: {
+            select: {
+              money: true,
+              net_worth: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  const date = new Date();
+
+  for (const user of query) {
+    if (user.user.Economy.money) {
+      await prisma.graphMetrics.create({
+        data: {
+          category: "user-money",
+          date,
+          userId: user.userId,
+          value: user.user.Economy.money,
+        },
+      });
+    }
+    if (user.user.Economy.net_worth) {
+      await prisma.graphMetrics.create({
+        data: {
+          category: "user-net",
+          date,
+          userId: user.userId,
+          value: user.user.Economy.net_worth,
+        },
+      });
+    }
+  }
+}
+
 (async () => {
-  await Promise.all([doTopBalance(), doTopNetworth(), doCookies()]);
+  await Promise.all([doTopBalance(), doTopNetworth(), doCookies(), doMembers()]);
 
   process.exit(0);
 })();
