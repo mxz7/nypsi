@@ -92,7 +92,7 @@ jobs:
         with:
           src: ./deploy/*
           host: ${{ secrets.HOST }}
-          remote: ./boobies/
+          remote: ./nypsi/
           port: 22
           user: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_KEY }}
@@ -105,7 +105,7 @@ jobs:
           port: 22
           password: ${{ secrets.PASS }}
           script: |
-            cd ~/boobies
+            cd ~/nypsi
             npm i --omit=dev
 
       - name: update deployment status
