@@ -468,3 +468,29 @@ model KofiPurchases {
   email String
   item  String
 }
+
+// data for creating graphs
+
+model GraphTopBalance {
+  id Int @id @default(autoincrement())
+
+  userId  String
+  balance BigInt
+  date    DateTime
+}
+
+model GraphTopNetworth {
+  id Int @id @default(autoincrement())
+
+  userId   String
+  netWorth BigInt
+  date     DateTime
+}
+
+model GraphCookies {
+  id Int @id @default(autoincrement())
+
+  userId String
+  count  Int
+  date   DateTime
+}

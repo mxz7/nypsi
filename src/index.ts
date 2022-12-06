@@ -118,8 +118,8 @@ setTimeout(async () => {
 
     await postAnalytics(userId, (await getGuilds()).length);
   }, ms("5 minutes"));
-}, 300000);
-// }, 15000);
+  // }, 300000);
+}, 15000);
 
 setTimeout(async () => {
   const userId = await manager.fetchClientValues("user.id");
