@@ -367,7 +367,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     return send({
-      embeds: [new CustomEmbed(message.member, `removed ${role.toString()} from ${members[0].toLocaleString()} members`)],
+      embeds: [
+        new CustomEmbed(message.member, `removed ${role.toString()} from ${members.length.toLocaleString()} members`),
+      ],
     });
   } else if (args[0].toLowerCase() == "autojoin") {
     if (!message.member.permissions.has(PermissionFlagsBits.ManageRoles)) {
