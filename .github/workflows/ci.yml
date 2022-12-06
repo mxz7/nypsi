@@ -62,19 +62,44 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           env: prod
 
-      - name: connect to server & pull changes
-        uses: appleboy/ssh-action@master
+      - name: checkout repository
+      - uses: actions/checkout@v3
+
+      - name: setup node
+        uses: actions/setup-node@v3
+
+      - name: run setup.sh
+        run: bash ${GITHUB_WORKSPACE}/setup.sh
+
+      - name: install packages
+        run: npm install
+
+      - name: build
+        run: npx tsc
+
+      - name: deploy
+        uses: nogsantos/scp-deploy@master
         with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
+          src: ./*
+          host: ${{ secrets.SSH_HOST }}
+          remote: ./boobies/
           port: 22
-          password: ${{ secrets.PASS }}
-          script: |
-            cd ~/nypsi
-            git pull
-            git status
-            npm i
-            npx tsc
+          user: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+
+      # - name: connect to server & pull changes
+      #   uses: appleboy/ssh-action@master
+      #   with:
+      #     host: ${{ secrets.HOST }}
+      #     username: ${{ secrets.USERNAME }}
+      #     port: 22
+      #     password: ${{ secrets.PASS }}
+      #     script: |
+      #       cd ~/nypsi
+      #       git pull
+      #       git status
+      #       npm i
+      #       npx tsc
 
       - name: update deployment status
         uses: bobheadxi/deployments@v1
