@@ -77,10 +77,19 @@ jobs:
       - name: build
         run: npx tsc
 
+      - name: prepare files for deploy
+        run: mkdir deploy
+        run: mv dist/ deploy/
+        run: mv package.json deploy/
+        run: mv package-lock.json deploy/
+        run: mv data/ deploy/
+        run: mv prisma/ deploy/
+        run: mv tsconfig.json deploy/
+
       - name: deploy
         uses: nogsantos/scp-deploy@master
         with:
-          src: ./*
+          src: ./deploy/*
           host: ${{ secrets.HOST }}
           remote: ./boobies/
           port: 22
