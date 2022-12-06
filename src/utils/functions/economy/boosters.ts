@@ -20,6 +20,7 @@ async function checkBoosters(member: string | GuildMember, boosters: Map<string,
 
   for (const key of boosters.keys()) {
     const boosters2 = boosters.get(key);
+    const newBoosters: Booster[] = [];
 
     for (const booster of boosters2) {
       if (booster.expire <= Date.now()) {
@@ -42,7 +43,15 @@ async function checkBoosters(member: string | GuildMember, boosters: Map<string,
         } else {
           boosters.set(key, boosters2);
         }
+      } else {
+        newBoosters.push(booster);
       }
+    }
+
+    if (newBoosters.length > 0) {
+      boosters.set(key, newBoosters);
+    } else {
+      boosters.delete(key);
     }
   }
 
