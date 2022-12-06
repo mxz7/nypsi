@@ -423,7 +423,7 @@ export async function topPrestigeGlobal(userId: string) {
     out[count] =
       pos +
       " **" +
-      user.user.lastKnownTag.split("#")[0] +
+      (user.user.lastKnownTag.split("#")[0] || user.userId) +
       "** " +
       user.prestige +
       (thing[(v - 20) % 10] || thing[v] || thing[0]) +
