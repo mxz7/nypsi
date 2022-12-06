@@ -97,19 +97,16 @@ jobs:
           user: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_KEY }}
 
-      # - name: connect to server & pull changes
-      #   uses: appleboy/ssh-action@master
-      #   with:
-      #     host: ${{ secrets.HOST }}
-      #     username: ${{ secrets.USERNAME }}
-      #     port: 22
-      #     password: ${{ secrets.PASS }}
-      #     script: |
-      #       cd ~/nypsi
-      #       git pull
-      #       git status
-      #       npm i
-      #       npx tsc
+      - name: connect to server & update packages
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          port: 22
+          password: ${{ secrets.PASS }}
+          script: |
+            cd ~/boobies
+            npm i --omit=dev
 
       - name: update deployment status
         uses: bobheadxi/deployments@v1
