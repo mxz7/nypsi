@@ -56,7 +56,7 @@ jobs:
     steps:
       - name: start deployment
         uses: bobheadxi/deployments@v1
-        id: deployment
+        id: prod
         with:
           step: start
           token: ${{ secrets.GITHUB_TOKEN }}
