@@ -78,13 +78,14 @@ jobs:
         run: npx tsc
 
       - name: prepare files for deploy
-        run: mkdir deploy
-        run: mv dist/ deploy/
-        run: mv package.json deploy/
-        run: mv package-lock.json deploy/
-        run: mv data/ deploy/
-        run: mv prisma/ deploy/
-        run: mv tsconfig.json deploy/
+        run: |
+          mkdir deploy
+          mv dist/ deploy/
+          mv package.json deploy/
+          mv package-lock.json deploy/
+          mv data/ deploy/
+          mv prisma/ deploy/
+          mv tsconfig.json deploy/
 
       - name: deploy
         uses: nogsantos/scp-deploy@master
