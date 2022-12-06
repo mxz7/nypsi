@@ -81,10 +81,10 @@ jobs:
         uses: nogsantos/scp-deploy@master
         with:
           src: ./*
-          host: ${{ secrets.SSH_HOST }}
+          host: ${{ secrets.HOST }}
           remote: ./boobies/
           port: 22
-          user: ${{ secrets.SSH_USER }}
+          user: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_KEY }}
 
       # - name: connect to server & pull changes
