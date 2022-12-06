@@ -678,6 +678,16 @@
     "role": "collectable",
     "in_crates": true
   },
+  "bitch": {
+    "id": "bitch",
+    "name": "bitch",
+    "plural": "bitches",
+    "emoji": "👧🏼",
+    "longDesc": "i coded some bitches",
+    "rarity": 2,
+    "role": "collectable",
+    "in_crates": true
+  },
   "clover": {
     "id": "clover",
     "name": "clover leaf",
