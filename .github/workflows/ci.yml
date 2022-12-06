@@ -56,11 +56,11 @@ jobs:
     steps:
       - name: start deployment
         uses: bobheadxi/deployments@v1
-        id: prod
+        id: deployment
         with:
           step: start
           token: ${{ secrets.GITHUB_TOKEN }}
-          env: release
+          env: prod
 
       - name: connect to server & pull changes
         uses: appleboy/ssh-action@master
