@@ -63,7 +63,7 @@ jobs:
           env: prod
 
       - name: checkout repository
-      - uses: actions/checkout@v3
+        uses: actions/checkout@v3
 
       - name: setup node
         uses: actions/setup-node@v3
