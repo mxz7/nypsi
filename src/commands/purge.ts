@@ -112,7 +112,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         await msg.edit({ embeds: [new CustomEmbed(message.member, "✅ messages deleted")] });
       }
 
-      if (message instanceof Message) {
+      if (!(message instanceof Message)) {
         setTimeout(() => {
           msg.delete().catch(() => {});
         }, 1500);
