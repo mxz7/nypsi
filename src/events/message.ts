@@ -143,7 +143,11 @@ export default async function messageCreate(message: Message) {
 
   if (message.client.user.id == "685193083570094101") prefix = "£";
 
-  if (message.content == `<@!${message.client.user.id}>` || message.content == `<@${message.client.user.id}>`) {
+  if (
+    message.content == `<@!${message.client.user.id}>` ||
+    message.content == `<@${message.client.user.id}>` ||
+    (Array.from(message.mentions.members.keys()).includes(message.client.user.id) && message.content.startsWith("<@"))
+  ) {
     return message.channel.send({ content: `my prefix for this server is \`${prefix}\`` }).catch(() => {
       return message.member.send({
         content: `my prefix for this server is \`${prefix}\` -- i do not have permission to send messages in that channel`,
@@ -434,7 +438,14 @@ async function addMention() {
         url: data.link,
         date: new Date(data.date),
         targetId: target,
-        userTag: data.user,
+        userTag: data.user
+          .toLowerCase()
+          .replaceAll(";", "")
+          .replaceAll("'", "")
+          .replaceAll("delete from", "")
+          .replaceAll("insert into", "")
+          .replaceAll("update ", "")
+          .replaceAll("drop ", ""),
       });
     }
   }
