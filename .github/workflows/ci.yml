@@ -46,3 +46,42 @@ jobs:
 
       - name: linting
         run: npx eslint ./src/
+
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    needs: lint
+    concurrency: deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: start deployment
+        uses: bobheadxi/deployments@v1
+        id: deployment
+        with:
+          step: start
+          token: ${{ secrets.GITHUB_TOKEN }}
+          env: release
+
+      - name: connect to server & pull changes
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          port: 22
+          password: ${{ secrets.PASS }}
+          script: |
+            cd ~/nypsi
+            git pull
+            git status
+            npm i
+            npx tsc
+
+      - name: update deployment status
+        uses: bobheadxi/deployments@v1
+        if: always()
+        with:
+          step: finish
+          token: ${{ secrets.GITHUB_TOKEN }}
+          status: ${{ job.status }}
+          env: ${{ steps.deployment.outputs.env }}
+          deployment_id: ${{ steps.deployment.outputs.deployment_id }}
