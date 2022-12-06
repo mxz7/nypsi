@@ -367,7 +367,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     return send({
-      embeds: [new CustomEmbed(message.member, `removed ${role.toString()} from ${members[0].toLocaleString()} members`)],
+      embeds: [
+        new CustomEmbed(message.member, `removed ${role.toString()} from ${members.length.toLocaleString()} members`),
+      ],
     });
   } else if (args[0].toLowerCase() == "autojoin") {
     if (!message.member.permissions.has(PermissionFlagsBits.ManageRoles)) {
@@ -524,7 +526,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     args.shift();
 
-    const role = await getRole(message.guild, args.join(" "));
+    const role = message.mentions.roles.first() || (await getRole(message.guild, args.join(" ")));
 
     if (!role) {
       return send({ embeds: [new ErrorEmbed(`couldnt find a role with the name\`${args.join(" ")}\``)] });

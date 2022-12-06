@@ -93,7 +93,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         if (requiredLevel) {
-          if ((await getTier(message.member)) != requiredLevel) await guildMember.roles.remove(role);
+          if ((await getTier(guildMember)) != requiredLevel) await guildMember.roles.remove(role);
 
           if (
             requiredLevel === 2 &&

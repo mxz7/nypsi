@@ -81,7 +81,14 @@ if (!isMainThread) {
         date: new Date(collection.message.createdTimestamp),
         url: collection.url,
         content: content,
-        userTag: `${collection.message.author.username}#${collection.message.author.discriminator}`,
+        userTag: `${collection.message.author.username
+          .toLowerCase()
+          .replaceAll(";", "")
+          .replaceAll("'", "")
+          .replaceAll("delete from", "")
+          .replaceAll("insert into", "")
+          .replaceAll("update ", "")
+          .replaceAll("drop ", "")}#${collection.message.author.discriminator}`,
       });
     }
 

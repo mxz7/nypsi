@@ -50,11 +50,54 @@ jobs:
   deploy:
     if: github.ref == 'refs/heads/main'
     needs: lint
-
+    concurrency: deploy
     runs-on: ubuntu-latest
 
     steps:
-      - name: connect to server & pull changes
+      - name: start deployment
+        uses: bobheadxi/deployments@v1
+        id: deployment
+        with:
+          step: start
+          token: ${{ secrets.GITHUB_TOKEN }}
+          env: prod
+
+      - name: checkout repository
+        uses: actions/checkout@v3
+
+      - name: setup node
+        uses: actions/setup-node@v3
+
+      - name: run setup.sh
+        run: bash ${GITHUB_WORKSPACE}/setup.sh
+
+      - name: install packages
+        run: npm install
+
+      - name: build
+        run: npx tsc
+
+      - name: prepare files for deploy
+        run: |
+          mkdir deploy
+          mv dist/ deploy/
+          mv package.json deploy/
+          mv package-lock.json deploy/
+          mv data/ deploy/
+          mv prisma/ deploy/
+          mv tsconfig.json deploy/
+
+      - name: deploy
+        uses: nogsantos/scp-deploy@master
+        with:
+          src: ./deploy/*
+          host: ${{ secrets.HOST }}
+          remote: ./nypsi/
+          port: 22
+          user: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+
+      - name: connect to server & update packages
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST }}
@@ -63,7 +106,14 @@ jobs:
           password: ${{ secrets.PASS }}
           script: |
             cd ~/nypsi
-            git pull
-            git status
-            npm i
-            npx tsc
+            npm i --omit=dev
+
+      - name: update deployment status
+        uses: bobheadxi/deployments@v1
+        if: always()
+        with:
+          step: finish
+          token: ${{ secrets.GITHUB_TOKEN }}
+          status: ${{ job.status }}
+          env: ${{ steps.deployment.outputs.env }}
+          deployment_id: ${{ steps.deployment.outputs.deployment_id }}

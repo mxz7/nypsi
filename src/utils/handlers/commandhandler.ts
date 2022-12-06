@@ -486,69 +486,86 @@ export async function runCommand(
     }, 500);
   }
 
-  if (!message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.ViewChannel)) {
-    if (message instanceof Message) {
-      return message.member
-        .send("i don't have access to that channel. please contact server staff if this is an error")
-        .catch(() => {});
-    } else {
-      return message
-        .reply({
-          embeds: [new ErrorEmbed("i don't have access to this channel. please contact server staff if this is an error")],
-        })
-        .catch(() => {});
-    }
-  }
-
-  if (!message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.SendMessages)) {
-    return message.member
-      .send("❌ i don't have permission to send messages in that channel - please contact server staff if this is an error")
-      .catch(() => {});
-  }
-
-  if (!message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.UseApplicationCommands)) {
-    return message.member
-      .send(
-        "❌ i don't have permission to perform commands in that channel - please contact server staff if this is an error"
-      )
-      .catch(() => {});
-  }
-
-  if (!message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.EmbedLinks)) {
-    return message.channel.send({
-      content:
-        "❌ i don't have the `embed links` permission\n\nto fix this go to: server settings -> roles -> find my role and enable `embed links`\n" +
-        "if this error still shows, check channel specific permissions",
-    });
-  }
-
-  if (!message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.ManageMessages)) {
-    return message.channel.send(
-      "❌ i don't have the `manage messages` permission, this is a required permission for nypsi to work\n\n" +
-        "to fix this go to: server settings -> roles -> find my role and enable `manage messages`\n" +
-        "if this error still shows, check channel specific permissions"
-    );
-  }
-
-  if (!message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.AddReactions)) {
-    return message.channel.send({
-      content:
-        "❌ i don't have the `add reactions` permission, this is a required permission for nypsi to work\n\n" +
-        "to fix this go to: server settings -> roles -> find my role and enable `add reactions`\n" +
-        "if this error still shows, check channel specific permissions",
-    });
-  }
-  if (!message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.UseExternalEmojis)) {
-    return message.channel.send({
-      content:
-        "❌ i don't have the `use external emojis` permission, this is a required permission for nypsi to work\n\n" +
-        "to fix this go to: server settings -> roles -> find my role and enable `use external emojis`\n" +
-        "if this error still shows, check channel specific permissions",
-    });
-  }
-
   if (cmd == "help" && message instanceof Message) {
     return helpCmd(message, args);
+  }
+
+  let alias = false;
+  let command: Command;
+
+  if (!commands.has(cmd) && aliases.has(cmd)) {
+    alias = true;
+  }
+
+  if (alias) {
+    command = commands.get(aliases.get(cmd));
+  } else {
+    command = commands.get(cmd);
+  }
+
+  if (["h", "w"].includes(cmd) && typeof command !== "undefined") {
+    if (!message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.ViewChannel)) {
+      if (message instanceof Message) {
+        return message.member
+          .send("i don't have access to that channel. please contact server staff if this is an error")
+          .catch(() => {});
+      } else {
+        return message
+          .reply({
+            embeds: [new ErrorEmbed("i don't have access to this channel. please contact server staff if this is an error")],
+          })
+          .catch(() => {});
+      }
+    }
+
+    if (!message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.SendMessages)) {
+      return message.member
+        .send(
+          "❌ i don't have permission to send messages in that channel - please contact server staff if this is an error"
+        )
+        .catch(() => {});
+    }
+
+    if (!message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.UseApplicationCommands)) {
+      return message.member
+        .send(
+          "❌ i don't have permission to perform commands in that channel - please contact server staff if this is an error"
+        )
+        .catch(() => {});
+    }
+
+    if (!message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.EmbedLinks)) {
+      return message.channel.send({
+        content:
+          "❌ i don't have the `embed links` permission\n\nto fix this go to: server settings -> roles -> find my role and enable `embed links`\n" +
+          "if this error still shows, check channel specific permissions",
+      });
+    }
+
+    if (!message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.ManageMessages)) {
+      return message.channel.send(
+        "❌ i don't have the `manage messages` permission, this is a required permission for nypsi to work\n\n" +
+          "to fix this go to: server settings -> roles -> find my role and enable `manage messages`\n" +
+          "if this error still shows, check channel specific permissions"
+      );
+    }
+
+    if (!message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.AddReactions)) {
+      return message.channel.send({
+        content:
+          "❌ i don't have the `add reactions` permission, this is a required permission for nypsi to work\n\n" +
+          "to fix this go to: server settings -> roles -> find my role and enable `add reactions`\n" +
+          "if this error still shows, check channel specific permissions",
+      });
+    }
+    if (!message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.UseExternalEmojis)) {
+      return message.channel.send({
+        content:
+          "❌ i don't have the `use external emojis` permission, this is a required permission for nypsi to work\n\n" +
+          "to fix this go to: server settings -> roles -> find my role and enable `use external emojis`\n" +
+          "if this error still shows, check channel specific permissions",
+      });
+    }
   }
 
   if (!(await hasProfile(message.member))) {
@@ -557,7 +574,6 @@ export async function runCommand(
     updateLastKnowntag(message.author.id, message.author.tag);
   }
 
-  let alias = false;
   if (!commandExists(cmd) && message instanceof Message) {
     if (!aliases.has(cmd)) {
       if (isLockedOut(message.author.id)) return;
@@ -606,8 +622,6 @@ export async function runCommand(
       }
 
       return message.channel.send({ embeds: [embed] });
-    } else {
-      alias = true;
     }
   }
 
@@ -615,14 +629,6 @@ export async function runCommand(
 
   if (isLockedOut(message.author.id)) {
     return verifyUser(message);
-  }
-
-  let command: Command;
-
-  if (alias) {
-    command = commands.get(aliases.get(cmd));
-  } else {
-    command = commands.get(cmd);
   }
 
   if (command.category == "money" || ["wholesome", "settings", "wordle"].includes(command.name)) {
