@@ -6,7 +6,6 @@ on:
       - "*"
 jobs:
   deploy:
-    if: github.ref == 'refs/heads/main'
     concurrency: deploy
 
     runs-on: ubuntu-latest
