@@ -393,6 +393,7 @@ export async function topPrestigeGlobal(userId: string) {
     orderBy: {
       prestige: "desc",
     },
+    take: 100,
   });
 
   const out = [];
