@@ -55,17 +55,23 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const checkRoles = async () => {
     for (const guildMember of message.guild.members.cache.values()) {
-      let requiredRole: string;
+      const roleIds = Array.from(guildMember.roles.cache.keys());
+      if (!(await isPremium(guildMember)) || guildMember.user.id == Constants.TEKOH_ID) {
+        // i dont want plat role lol
+        if (roleIds.includes(Constants.PLATINUM_ROLE_ID)) guildMember.roles.remove(Constants.PLATINUM_ROLE_ID);
+        if (roleIds.includes(Constants.GOLD_ROLE_ID)) guildMember.roles.remove(Constants.GOLD_ROLE_ID);
+        if (roleIds.includes(Constants.SILVER_ROLE_ID)) guildMember.roles.remove(Constants.SILVER_ROLE_ID);
+        if (roleIds.includes(Constants.BRONZE_ROLE_ID)) guildMember.roles.remove(Constants.BRONZE_ROLE_ID);
+        continue;
+      }
 
-      switch (await getTier(guildMember.user.id)) {
-        case 0:
-          requiredRole = "none";
-          break;
+      let requiredRole = "none";
+      switch (await getTier(guildMember)) {
         case 1:
           requiredRole = Constants.BRONZE_ROLE_ID;
           break;
         case 2:
-          requiredRole = Constants.SILVER_ROLE_ID;
+          if (!roleIds.includes(Constants.BOOST_ROLE_ID)) requiredRole = Constants.SILVER_ROLE_ID;
           break;
         case 3:
           requiredRole = Constants.GOLD_ROLE_ID;
@@ -75,40 +81,28 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           break;
       }
 
+      if (!roleIds.includes(requiredRole)) guildMember.roles.add(requiredRole);
+
       for (const role of guildMember.roles.cache.values()) {
-        let requiredLevel: number;
+        let requiredLevel = 0;
         switch (role.id) {
-          case Constants.BRONZE_ROLE_ID:
-            requiredLevel = 1;
-            break;
-          case Constants.SILVER_ROLE_ID:
-            requiredLevel = 2;
+          case Constants.PLATINUM_ROLE_ID:
+            requiredLevel = 4;
             break;
           case Constants.GOLD_ROLE_ID:
             requiredLevel = 3;
             break;
-          case Constants.PLATINUM_ROLE_ID:
-            requiredLevel = 4;
+          case Constants.SILVER_ROLE_ID:
+            if (roleIds.includes(Constants.BOOST_ROLE_ID)) guildMember.roles.remove(Constants.SILVER_ROLE_ID);
+            requiredLevel = 2;
+            break;
+          case Constants.BRONZE_ROLE_ID:
+            requiredLevel = 1;
             break;
         }
-
-        if (requiredLevel) {
-          if ((await getTier(guildMember)) != requiredLevel) await guildMember.roles.remove(role);
-
-          if (
-            requiredLevel === 2 &&
-            guildMember.roles.cache.has(Constants.BOOST_ROLE_ID) &&
-            guildMember.roles.cache.has(Constants.SILVER_ROLE_ID)
-          ) {
-            await guildMember.roles.remove(Constants.SILVER_ROLE_ID);
-          }
+        if (requiredLevel !== 0) {
+          if ((await getTier(guildMember)) != requiredLevel) guildMember.roles.remove(role.id);
         }
-      }
-
-      if ((await getTier(message.member)) == 2 && guildMember.roles.cache.has(Constants.BOOST_ROLE_ID)) return;
-
-      if (requiredRole != "none" && !Array.from(guildMember.roles.cache.keys()).includes(requiredRole)) {
-        await guildMember.roles.add(requiredRole);
       }
     }
   };
