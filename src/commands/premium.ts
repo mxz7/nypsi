@@ -81,7 +81,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           break;
       }
 
-      if (!roleIds.includes(requiredRole)) guildMember.roles.add(requiredRole);
+      if (requiredRole != "none" && !roleIds.includes(requiredRole)) guildMember.roles.add(requiredRole);
 
       for (const role of guildMember.roles.cache.values()) {
         let requiredLevel = 0;
