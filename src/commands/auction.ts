@@ -112,9 +112,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   }
 
   if ((await getPrestige(message.member)) < 1) {
-    if ((await getXp(message.member)) < 100) {
+    if ((await getXp(message.member)) < 30) {
       return send({
-        embeds: [new ErrorEmbed("you need at least 100xp before you can create an auction")],
+        embeds: [new ErrorEmbed("you need at least 30xp before you can create an auction")],
       });
     }
   }
