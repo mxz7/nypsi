@@ -91,7 +91,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   }
 
   if ((await getPrestige(message.member)) < 1) {
-    if ((await getXp(message.member)) < 100) {
+    if ((await getXp(message.member)) < 30) {
       return send({
         embeds: [new ErrorEmbed("you cannot use this command yet. u might be an alt. or a bot 😳")],
       });
