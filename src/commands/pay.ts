@@ -235,7 +235,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }, 1500);
   });
 
-  payment(message.author, target.user, amount.toLocaleString());
+  payment(message.author, target.user, `$${amount.toLocaleString()}`);
 }
 
 cmd.setRun(run);
