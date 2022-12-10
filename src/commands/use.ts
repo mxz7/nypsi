@@ -146,7 +146,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (boosters.has(selected.id)) {
       if (selected.stackable) {
-        if (selected.max === boosters.get(selected.id).length) {
+        if (selected.max <= boosters.get(selected.id).length) {
           return send({
             embeds: [new ErrorEmbed(`**${selected.name}** can only be stacked ${selected.max} times`)],
           });
@@ -161,7 +161,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (amount > selected.max) amount = selected.max;
 
-    if (amount === 0)
+    if (amount <= 0)
       return send({
         embeds: [new ErrorEmbed(`**${selected.name}** can only be stacked ${selected.max} times`)],
       });
