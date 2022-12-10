@@ -1,6 +1,7 @@
 import dayjs = require("dayjs");
 import {
   ActionRowBuilder,
+  APIMessageComponentEmoji,
   BaseMessageOptions,
   ButtonBuilder,
   ButtonStyle,
@@ -12,7 +13,7 @@ import {
   MessageActionRowComponentBuilder,
   MessageEditOptions,
   SelectMenuBuilder,
-  SelectMenuOptionBuilder,
+  StringSelectMenuOptionBuilder,
 } from "discord.js";
 import prisma from "../init/database";
 import { NypsiClient } from "../models/Client";
@@ -136,14 +137,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (inventory.length <= 25) {
       embed.setDescription("select the **item you want to sell** from the dropdown list below");
 
-      const options: SelectMenuOptionBuilder[] = [];
+      const options: StringSelectMenuOptionBuilder[] = [];
 
       for (const item of inventory) {
         if (item.amount != 0) {
           options.push(
-            new SelectMenuOptionBuilder()
+            new StringSelectMenuOptionBuilder()
               .setValue(items[item.item].id)
-              .setEmoji(items[item.item].emoji)
+              .setEmoji(items[item.item].emoji as APIMessageComponentEmoji)
               .setLabel(items[item.item].name)
           );
         }
