@@ -144,6 +144,8 @@ export async function checkAutoMute(message: Message) {
 
   const muteLevels = await getAutoMuteLevels(message.guild);
 
+  if (muteLevels.length == 0) return;
+
   const muteUser = async (length: number) => {
     const guildMuteRole = await getMuteRole(message.guild);
 
