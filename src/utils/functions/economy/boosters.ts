@@ -35,14 +35,6 @@ async function checkBoosters(member: string | GuildMember, boosters: Map<string,
         } else {
           expired.set(booster.boosterId, 1);
         }
-
-        boosters2.splice(boosters2.indexOf(booster), 1);
-
-        if (boosters2.length == 0) {
-          boosters.delete(key);
-        } else {
-          boosters.set(key, boosters2);
-        }
       } else {
         newBoosters.push(booster);
       }
