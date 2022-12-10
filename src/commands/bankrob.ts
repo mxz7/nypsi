@@ -9,7 +9,7 @@ import {
   Message,
   MessageActionRowComponentBuilder,
   SelectMenuBuilder,
-  SelectMenuOptionBuilder,
+  StringSelectMenuOptionBuilder,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
@@ -257,7 +257,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const embed = new CustomEmbed(message.member).setHeader("bank robbery", message.author.avatarURL());
 
-  const options: SelectMenuOptionBuilder[] = [];
+  const options: StringSelectMenuOptionBuilder[] = [];
 
   const bankNames = Array.from(bankWorths.keys());
 
@@ -270,7 +270,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (bankWorths.get(bankName) < defaults.get(bankName) * 0.1) continue;
 
     options.push(
-      new SelectMenuOptionBuilder()
+      new StringSelectMenuOptionBuilder()
         .setLabel(bankName)
         .setValue(bankName)
         .setDescription(`$${bankWorths.get(bankName).toLocaleString()}`)
@@ -283,7 +283,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if ((await getNypsiBankBalance()) > 500_000 && prestige >= 2) {
     options.push(
-      new SelectMenuOptionBuilder()
+      new StringSelectMenuOptionBuilder()
         .setLabel("nypsi bank")
         .setValue("nypsi")
         .setDefault(true)

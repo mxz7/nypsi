@@ -9,7 +9,7 @@ import {
   Message,
   MessageActionRowComponentBuilder,
   ModalBuilder,
-  SelectMenuOptionBuilder,
+  StringSelectMenuOptionBuilder,
   TextInputBuilder,
   TextInputStyle,
 } from "discord.js";
@@ -97,7 +97,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const showSetting = async (
       settings: DMSettings,
       settingId: string,
-      options: SelectMenuOptionBuilder[],
+      options: StringSelectMenuOptionBuilder[],
       msg?: Message
     ) => {
       const embed = new CustomEmbed(message.member).setHeader(notificationsData[settingId].name);
@@ -126,10 +126,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         userSelection.setComponents(boobies);
       } else if (notificationsData[settingId].types) {
-        const boobies: SelectMenuOptionBuilder[] = [];
+        const boobies: StringSelectMenuOptionBuilder[] = [];
 
         for (const type of notificationsData[settingId].types) {
-          const option = new SelectMenuOptionBuilder()
+          const option = new StringSelectMenuOptionBuilder()
             .setLabel(type.name)
             .setDescription(type.description)
             .setValue(type.value);
@@ -177,10 +177,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     let settings = await getDmSettings(message.member);
 
-    const options: SelectMenuOptionBuilder[] = [];
+    const options: StringSelectMenuOptionBuilder[] = [];
 
     for (const settingId of Object.keys(notificationsData)) {
-      options.push(new SelectMenuOptionBuilder().setValue(settingId).setLabel(notificationsData[settingId].name));
+      options.push(new StringSelectMenuOptionBuilder().setValue(settingId).setLabel(notificationsData[settingId].name));
     }
 
     if (settingId) {
