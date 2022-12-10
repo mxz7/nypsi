@@ -8,7 +8,6 @@ import Constants from "../Constants";
 import { getTimestamp, logger } from "../logger";
 import ms = require("ms");
 
-const locked: string[] = [];
 const beingVerified = new Set<string>();
 
 const colors = ["deeppink", "green", "red", "blue"];
@@ -18,20 +17,16 @@ const generator = new CaptchaGenerator().setDecoy({ opacity: 0.6, total: 15 });
 const captchaFails = new Map<string, number>();
 const captchaPasses = new Map<string, number>();
 
-export function isLockedOut(string: string): boolean {
-  if (locked.indexOf(string) == -1) {
-    return false;
-  } else {
-    return true;
-  }
+export async function isLockedOut(userId: string) {
+  return Boolean(await redis.sismember(Constants.redis.nypsi.LOCKED_OUT, userId));
 }
 
-export async function toggleLock(string: string) {
-  if (isLockedOut(string)) {
-    locked.splice(locked.indexOf(string), 1);
+export async function toggleLock(userId: string) {
+  if (await isLockedOut(userId)) {
+    await redis.srem(Constants.redis.nypsi.LOCKED_OUT, userId);
   } else {
-    if (await isVerified(string)) return;
-    locked.push(string);
+    if (await isVerified(userId)) return;
+    await redis.sadd(Constants.redis.nypsi.LOCKED_OUT, userId);
   }
 }
 
@@ -44,7 +39,7 @@ export async function createCaptcha() {
   return { captcha: await generator.generate(), text };
 }
 
-export async function isVerified(id: string) {
+async function isVerified(id: string) {
   return await redis.exists(`${Constants.redis.nypsi.CAPTCHA_VERIFIED}:${id}`);
 }
 
@@ -66,7 +61,7 @@ export async function passedCaptcha(member: GuildMember) {
   );
 
   await redis.set(`${Constants.redis.nypsi.CAPTCHA_VERIFIED}:${member.user.id}`, member.user.id);
-  await redis.expire(`${Constants.redis.nypsi.CAPTCHA_VERIFIED}:${member.user.id}`, ms("1 hour") / 1000);
+  await redis.expire(`${Constants.redis.nypsi.CAPTCHA_VERIFIED}:${member.user.id}`, ms("30 minutes") / 1000);
 }
 
 export async function failedCaptcha(member: GuildMember) {

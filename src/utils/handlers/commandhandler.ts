@@ -576,7 +576,7 @@ export async function runCommand(
 
   if (!commandExists(cmd) && message instanceof Message) {
     if (!aliases.has(cmd)) {
-      if (isLockedOut(message.author.id)) return;
+      if (await isLockedOut(message.author.id)) return;
       const customCommand = await getCommand(cmd);
 
       if (!customCommand) {
@@ -627,7 +627,7 @@ export async function runCommand(
 
   logCommand(message, args);
 
-  if (isLockedOut(message.author.id)) {
+  if (await isLockedOut(message.author.id)) {
     return verifyUser(message);
   }
 
