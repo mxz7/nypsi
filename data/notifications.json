@@ -56,7 +56,7 @@
   "net_worth": {
     "id": "net_worth",
     "name": "net worth updates",
-    "description": "get a dm when your net worth changes by 10 million or more"
+    "description": "get a dm when your net worth changes by the amount set. currently: ${VALUE}"
   },
   "other": {
     "id": "other",

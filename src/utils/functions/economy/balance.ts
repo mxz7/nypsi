@@ -485,7 +485,7 @@ export async function calcNetWorth(member: GuildMember | string) {
   });
 
   setImmediate(async () => {
-    if (query.net_worth && (await getDmSettings(id)).net_worth) {
+    if (query.net_worth && (await getDmSettings(id)).net_worth > 0) {
       const payload: NotificationPayload = {
         memberId: id,
         payload: {
@@ -497,11 +497,11 @@ export async function calcNetWorth(member: GuildMember | string) {
         },
       };
 
-      if (Number(query.net_worth) < Math.floor(worth) - 10_000_000) {
+      if (Number(query.net_worth) < Math.floor(worth) - (await getDmSettings(id)).net_worth) {
         payload.payload.content = `your net worth has increased by $${(
           Math.floor(worth) - Number(query.net_worth)
         ).toLocaleString()}`;
-      } else if (Number(query.net_worth) > Math.floor(worth) + 10_000_000) {
+      } else if (Number(query.net_worth) > Math.floor(worth) + (await getDmSettings(id)).net_worth) {
         payload.payload.content = `your net worth has decreased by $${(
           Number(query.net_worth) - Math.floor(worth)
         ).toLocaleString()}`;

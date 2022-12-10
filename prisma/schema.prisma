@@ -43,7 +43,7 @@ model DMSettings {
   booster       Boolean         @default(false)
   payment       Boolean         @default(true)
   other         Boolean         @default(true)
-  net_worth     Boolean         @default(false)
+  net_worth     Int             @default(0)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
