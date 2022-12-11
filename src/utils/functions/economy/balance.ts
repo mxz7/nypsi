@@ -9,7 +9,7 @@ import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { getAuctionAverage } from "./auctions";
 import { getBoosters } from "./boosters";
 import { getGuildByUser } from "./guilds";
-import { getInventory } from "./inventory";
+import { gemBreak, getInventory } from "./inventory";
 import { getPrestige } from "./prestige";
 import { getBaseUpgrades, getBaseWorkers, getItems } from "./utils";
 import { hasVoted } from "./vote";
@@ -160,7 +160,8 @@ export async function getMulti(member: GuildMember | string): Promise<number> {
     if (chance < 2) {
       multi -= 7;
     } else {
-      const choices = [7, 17, 3, 4, 5, 7, 2, 17, 17, 15, 16, 17, 13];
+      gemBreak(id, 0.007, "white_gem");
+      const choices = [7, 3, 4, 5, 7, 2, 17, 17, 17, 7, 4];
       multi += choices[Math.floor(Math.random() * choices.length)];
     }
   } else if (inventory.find((i) => i.item == "pink_gem")) {
@@ -169,6 +170,7 @@ export async function getMulti(member: GuildMember | string): Promise<number> {
     if (chance < 2) {
       multi -= 3;
     } else {
+      gemBreak(id, 0.07, "pink_gem");
       const choices = [7, 7, 7, 7, 7, 5, 4, 3, 2, 1, 3, 1, 1, 1];
       multi += choices[Math.floor(Math.random() * choices.length)];
     }

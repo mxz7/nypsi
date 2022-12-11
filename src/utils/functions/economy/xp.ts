@@ -5,7 +5,7 @@ import Constants from "../../Constants";
 import { getRequiredBetForXp } from "./balance";
 import { getBoosters } from "./boosters";
 import { getGuildByUser } from "./guilds";
-import { getInventory } from "./inventory";
+import { gemBreak, getInventory } from "./inventory";
 import { getPrestige } from "./prestige";
 import { getItems } from "./utils";
 
@@ -76,9 +76,11 @@ export async function calcMinimumEarnedXp(member: GuildMember): Promise<number> 
     if (chance < 2) {
       max -= 2;
     } else {
+      gemBreak(member.user.id, 0.007, "white_gem");
       max += 7;
     }
   } else if (inventory.find((i) => i.item == "pink_gem")?.amount > 0) {
+    gemBreak(member.user.id, 0.07, "pink_gem");
     max += 1;
   }
 

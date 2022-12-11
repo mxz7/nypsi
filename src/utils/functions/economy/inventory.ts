@@ -481,3 +481,27 @@ export async function commandGemCheck(member: GuildMember, commandCategory: stri
     }
   }
 }
+
+export async function gemBreak(userId: string, chance: number, gem: string) {
+  if (!percentChance(chance)) return;
+
+  const inventory = await getInventory(userId, false);
+
+  if (!(inventory.find((i) => i.item === gem)?.amount > 0)) return;
+
+  await setInventoryItem(userId, gem, inventory.find((i) => i.item === gem).amount - 1, false);
+
+  if ((await getDmSettings(userId)).other) {
+    await addNotificationToQueue({
+      memberId: userId,
+      payload: {
+        embed: new CustomEmbed()
+          .setColor(Constants.TRANSPARENT_EMBED_COLOR)
+          .setTitle(`your ${getItems()[gem].name} has shattered`)
+          .setDescription(
+            `${getItems()[gem].emoji} your gem exerted too much power and destroyed itself. shattering into pieces`
+          ),
+      },
+    });
+  }
+}
