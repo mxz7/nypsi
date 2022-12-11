@@ -169,7 +169,7 @@ export async function getMulti(member: GuildMember | string): Promise<number> {
     if (chance < 2) {
       multi -= 3;
     } else {
-      const choices = [7, 7, 7, 7, 7, 5, 4, 3, 2, 1, 3, 1, 1, 1];
+      const choices = [7, 7, 7, 5, 4, 3, 2, 1, 3, 1, 1, 1];
       multi += choices[Math.floor(Math.random() * choices.length)];
     }
   }
