@@ -154,7 +154,7 @@ export async function getMulti(member: GuildMember | string): Promise<number> {
   }
 
   const inventory = await getInventory(id, false);
-  if (inventory.find((i) => i.item == "white_gem")) {
+  if (inventory.find((i) => i.item == "white_gem")?.amount > 0) {
     const chance = Math.floor(Math.random() * 10);
 
     if (chance < 2) {
@@ -163,7 +163,7 @@ export async function getMulti(member: GuildMember | string): Promise<number> {
       const choices = [7, 17, 3, 4, 5, 7, 2, 17, 17, 15, 16, 17, 13];
       multi += choices[Math.floor(Math.random() * choices.length)];
     }
-  } else if (inventory.find((i) => i.item == "pink_gem")) {
+  } else if (inventory.find((i) => i.item == "pink_gem")?.amount > 0) {
     const chance = Math.floor(Math.random() * 10);
 
     if (chance < 2) {
