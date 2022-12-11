@@ -1,3 +1,4 @@
+import dayjs = require("dayjs");
 import { GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
@@ -489,6 +490,49 @@ export async function gemBreak(userId: string, chance: number, gem: string) {
 
   if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0) return;
   if (!(inventory.find((i) => i.item === gem)?.amount > 0)) return;
+
+  let uniqueGemCount = 0;
+
+  inventory.forEach((i) => {
+    if (i.item.includes("gem")) uniqueGemCount++;
+  });
+
+  if (uniqueGemCount === 5 && percentChance(5) && (await getDmSettings(userId)).other) {
+    await Promise.all([
+      setInventoryItem(userId, "pink_gem", inventory.find((i) => i.item === "pink_gem").amount - 1, false),
+      setInventoryItem(userId, "purple_gem", inventory.find((i) => i.item === "purple_gem").amount - 1, false),
+      setInventoryItem(userId, "blue_gem", inventory.find((i) => i.item === "blue_gem").amount - 1, false),
+      setInventoryItem(userId, "green_gem", inventory.find((i) => i.item === "green_gem").amount - 1, false),
+      setInventoryItem(userId, "white_gem", inventory.find((i) => i.item === "white_gem").amount - 1, false),
+      prisma.crafting.create({
+        data: {
+          amount: 1,
+          finished: dayjs().add(7, "days").toDate(),
+          itemId: "crystal_heart",
+          userId,
+        },
+      }),
+    ]);
+
+    await addNotificationToQueue({
+      memberId: userId,
+      payload: {
+        embed: new CustomEmbed()
+          .setColor(Constants.TRANSPARENT_EMBED_COLOR)
+          .setTitle("a very exciting moment")
+          .setFooter("use /craft to view the progress")
+          .setDescription(
+            `${
+              getItems()["crystal_heart"].emoji
+            } a truly historic event is taking place\nyour gems are fusing together, into one crystal\n\n` +
+              `${getItems()["white_gem"].emoji} ${getItems()["pink_gem"].emoji} ${getItems()["purple_gem"].emoji} ${
+                getItems()["blue_gem"].emoji
+              } ${getItems()["green_gem"].emoji}`
+          ),
+      },
+    });
+    return;
+  }
 
   await setInventoryItem(userId, gem, inventory.find((i) => i.item === gem).amount - 1, false);
 
