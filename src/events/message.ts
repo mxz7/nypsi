@@ -29,6 +29,7 @@ import { addMuteViolation } from "../utils/functions/moderation/mute";
 import { isPremium } from "../utils/functions/premium/premium";
 import { encrypt } from "../utils/functions/string";
 import { createSupportRequest, getSupportRequest, sendToRequestChannel } from "../utils/functions/supportrequest";
+import { isUserBlacklisted } from "../utils/functions/users/blacklist";
 import { getLastCommand } from "../utils/functions/users/commands";
 import { mentionQueue, MentionQueueItem } from "../utils/functions/users/mentions";
 import doCollection from "../utils/functions/workers/mentions";
@@ -45,6 +46,9 @@ export default async function messageCreate(message: Message) {
 
   if (message.channel.isDMBased()) {
     logger.info("message in DM from " + message.author.tag + ": " + message.content);
+
+    if (await isUserBlacklisted(message.author.id))
+      return message.reply({ content: "you are blacklisted from nypsi. this punishment will not be removed." });
 
     if (await redis.exists(`${Constants.redis.cooldown.SUPPORT}:${message.author.id}`)) {
       return message.reply({

@@ -17,6 +17,7 @@ model User {
   tracking       Boolean  @default(true)
   lastfmUsername String?
   email          String?  @unique
+  blacklisted    Boolean  @default(false)
 
   Economy            Economy?
   Premium            Premium?

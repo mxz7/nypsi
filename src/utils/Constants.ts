@@ -31,6 +31,7 @@ export default {
         LAST_COMMAND: "cache:user:lastcmd",
         LASTFM: "cache:user:lastfm",
         TRACKING: "cache:user:tracking",
+        BLACKLIST: "cache:user:blacklist",
       },
       guild: {
         EXISTS: "cache:guild:exists",
