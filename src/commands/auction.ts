@@ -22,6 +22,7 @@ import { Item } from "../types/Economy";
 import Constants from "../utils/Constants";
 import {
   addToAuctionWatch,
+  bumpAuction,
   createAuction,
   deleteAuction,
   getAuctions,
@@ -373,30 +374,59 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       embed.setFooter({ text: `page ${page + 1}/${maxPage + 1}` });
     };
 
+    const updateButtons = async (page: number) => {
+      if (auctions.length > 0) {
+        row.setComponents(
+          new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary),
+          new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
+          new ButtonBuilder().setCustomId("del").setLabel("delete").setStyle(ButtonStyle.Danger)
+        );
+
+        if (auctions.length == 1) {
+          row.components[0].setDisabled(true);
+          row.components[1].setDisabled(true);
+        } else {
+          if (page === 0) {
+            row.components[0].setDisabled(true);
+          } else if (page === auctions.length - 1) {
+            row.components[1].setDisabled(true);
+          }
+        }
+
+        if (
+          dayjs(auctions[page].createdAt).isAfter(dayjs().subtract((await isPremium(message.author.id)) ? 1 : 12, "hour"))
+        ) {
+          row.addComponents(
+            new ButtonBuilder().setCustomId("bump").setLabel("bump").setStyle(ButtonStyle.Secondary).setDisabled(true)
+          );
+        } else {
+          row.addComponents(
+            new ButtonBuilder().setCustomId("bump").setLabel("bump").setStyle(ButtonStyle.Secondary).setDisabled(false)
+          );
+        }
+      }
+
+      let max = 1;
+
+      if (await isPremium(message.member)) {
+        max += await getTier(message.member);
+      }
+
+      if (auctions.length < max) {
+        row.addComponents(new ButtonBuilder().setLabel("create auction").setCustomId("y").setStyle(ButtonStyle.Success));
+      }
+    };
+
     if (auctions.length == 0) {
       embed.setDescription("you don't currently have any auctions");
     } else if (auctions.length > 1) {
-      row.addComponents(
-        new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
-        new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
-        new ButtonBuilder().setCustomId("del").setLabel("delete").setStyle(ButtonStyle.Danger)
-      );
-
       displayAuction(0);
     } else {
       row.addComponents(new ButtonBuilder().setCustomId("del").setLabel("delete").setStyle(ButtonStyle.Danger));
       displayAuction(0);
     }
 
-    let max = 1;
-
-    if (await isPremium(message.member)) {
-      max += await getTier(message.member);
-    }
-
-    if (auctions.length < max) {
-      row.addComponents(new ButtonBuilder().setLabel("create auction").setCustomId("y").setStyle(ButtonStyle.Success));
-    }
+    await updateButtons(0);
 
     if (msg) {
       msg = await msg.edit({ embeds: [embed], components: [row] });
@@ -436,19 +466,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         displayAuction(currentPage);
 
-        if (currentPage == 0) {
-          row.setComponents(
-            new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
-            new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
-            new ButtonBuilder().setCustomId("del").setLabel("delete").setStyle(ButtonStyle.Danger)
-          );
-        } else {
-          row.setComponents(
-            new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary),
-            new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
-            new ButtonBuilder().setCustomId("del").setLabel("delete").setStyle(ButtonStyle.Danger)
-          );
-        }
+        await updateButtons(currentPage);
 
         await edit({ embeds: [embed], components: [row] }, msg);
         return pageManager();
@@ -460,20 +478,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         currentPage++;
 
         displayAuction(currentPage);
-
-        if (currentPage == maxPage) {
-          row.setComponents(
-            new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary),
-            new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(true),
-            new ButtonBuilder().setCustomId("del").setLabel("delete").setStyle(ButtonStyle.Danger)
-          );
-        } else {
-          row.setComponents(
-            new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary),
-            new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
-            new ButtonBuilder().setCustomId("del").setLabel("delete").setStyle(ButtonStyle.Danger)
-          );
-        }
+        await updateButtons(currentPage);
 
         await edit({ embeds: [embed], components: [row] }, msg);
         return pageManager();
@@ -499,6 +504,24 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         return manageAuctions(msg);
+      } else if (res === "bump") {
+        const bumpRes = await bumpAuction(auctions[currentPage].id, message.client as NypsiClient);
+
+        if (!bumpRes) {
+          await interaction.followUp({ embeds: [new ErrorEmbed("this auction has already been bumped recently")] });
+          displayAuction(currentPage);
+          await updateButtons(currentPage);
+          await msg.edit({ embeds: [embed], components: [row] });
+          return pageManager();
+        } else {
+          await interaction.followUp({
+            embeds: [new CustomEmbed(message.member, `[your auction has been bumped](${bumpRes})`)],
+          });
+          displayAuction(currentPage);
+          await updateButtons(currentPage);
+          await msg.edit({ embeds: [embed], components: [row] });
+          return pageManager();
+        }
       }
     };
 
