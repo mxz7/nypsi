@@ -4,9 +4,11 @@ import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
+import { isPremium } from "../premium/premium";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { getItems } from "./utils";
 import ms = require("ms");
+import dayjs = require("dayjs");
 
 export async function getAuctions(member: GuildMember | string) {
   let id: string;
@@ -163,6 +165,7 @@ export async function bumpAuction(id: string, client: NypsiClient) {
     },
     select: {
       messageId: true,
+      ownerId: true,
       owner: {
         select: {
           lastKnownTag: true,
@@ -174,6 +177,8 @@ export async function bumpAuction(id: string, client: NypsiClient) {
       itemName: true,
     },
   });
+
+  if (dayjs(query.createdAt).isAfter(dayjs().subtract((await isPremium(query.ownerId)) ? 1 : 12, "hour"))) return null;
 
   const embed = new CustomEmbed()
     .setColor(Constants.TRANSPARENT_EMBED_COLOR)
@@ -192,7 +197,7 @@ export async function bumpAuction(id: string, client: NypsiClient) {
     new ButtonBuilder().setCustomId("b").setLabel("buy").setStyle(ButtonStyle.Success)
   );
 
-  const messageUrl = await client.cluster
+  const [messageUrl, messageId] = await client.cluster
     .broadcastEval(
       async (client, { row, messageId, embed }) => {
         const guild = await client.guilds.fetch("747056029795221513");
@@ -212,7 +217,7 @@ export async function bumpAuction(id: string, client: NypsiClient) {
 
           const m = await channel.send({ embeds: [embed], components: [row] });
 
-          return m.url;
+          return [m.url, m.id];
         }
       },
       { context: { messageId: query.messageId, row: button.toJSON(), embed: embed.toJSON() } }
@@ -221,6 +226,16 @@ export async function bumpAuction(id: string, client: NypsiClient) {
       res.filter((i) => Boolean(i));
       return res[0];
     });
+
+  await prisma.auction.update({
+    where: {
+      id,
+    },
+    data: {
+      messageId,
+      createdAt: new Date(),
+    },
+  });
 
   return messageUrl;
 }
