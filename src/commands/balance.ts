@@ -141,7 +141,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       `${padlockStatus ? "🔒" : "💰"} $**${(await getBalance(target)).toLocaleString()}**\n` +
         `💳 $**${(await getBankBalance(target)).toLocaleString()}** / $**${(
           await getMaxBankBalance(target)
-
         ).toLocaleString()}**${net > 15_000_000 ? `\n${gemLine}\n🌍 $**${net.toLocaleString()}**` : ""}`
     )
     .setFooter({ text: footer });
