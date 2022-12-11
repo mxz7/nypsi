@@ -51,7 +51,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   let crateAmount = Math.floor(prestige / 1.2 + 1);
 
-  if (crateAmount > 6) crateAmount = 6;
+  if (crateAmount > 5) crateAmount = 5;
 
   const embed = new CustomEmbed(message.member);
 
