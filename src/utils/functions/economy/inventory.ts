@@ -520,7 +520,7 @@ export async function gemBreak(userId: string, chance: number, gem: string) {
         embed: new CustomEmbed()
           .setColor(Constants.TRANSPARENT_EMBED_COLOR)
           .setTitle("a very exciting moment")
-          .setFooter("use /craft to view the progress")
+          .setFooter({ text: "use /craft to view the progress" })
           .setDescription(
             `${
               getItems()["crystal_heart"].emoji
