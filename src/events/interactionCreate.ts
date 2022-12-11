@@ -31,7 +31,7 @@ import { addToNypsiBank, getTax } from "../utils/functions/tax";
 import { isUserBlacklisted } from "../utils/functions/users/blacklist";
 import { getDmSettings } from "../utils/functions/users/notifications";
 import { runCommand } from "../utils/handlers/commandhandler";
-import { logger } from "../utils/logger";
+import { logger, payment } from "../utils/logger";
 
 export default async function interactionCreate(interaction: Interaction) {
   if (await isUserBlacklisted(interaction.user.id)) return;
@@ -362,6 +362,12 @@ export default async function interactionCreate(interaction: Interaction) {
           updateBalance(interaction.user.id, balance - Number(auction.bin)),
           updateBalance(auction.ownerId, (await getBalance(auction.ownerId)) + (Number(auction.bin) - taxedAmount)),
         ]);
+
+        payment(
+          await interaction.client.users.fetch(auction.ownerId),
+          interaction.user,
+          `${auction.itemName} x ${auction.itemAmount} (auction)`
+        );
 
         const items = getItems();
 
