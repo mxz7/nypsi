@@ -134,7 +134,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
 
   let crateAmount = Math.floor(prestige / 1.2 + 1);
 
-  if (crateAmount > 6) crateAmount = 6;
+  if (crateAmount > 5) crateAmount = 5;
 
   await addInventoryItem(user, "vote_crate", crateAmount, false);
 
