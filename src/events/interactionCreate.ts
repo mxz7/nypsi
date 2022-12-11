@@ -28,11 +28,14 @@ import { getKarmaShopItems, isKarmaShopOpen } from "../utils/functions/karma/kar
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import requestDM from "../utils/functions/requestdm";
 import { addToNypsiBank, getTax } from "../utils/functions/tax";
+import { isUserBlacklisted } from "../utils/functions/users/blacklist";
 import { getDmSettings } from "../utils/functions/users/notifications";
 import { runCommand } from "../utils/handlers/commandhandler";
 import { logger } from "../utils/logger";
 
 export default async function interactionCreate(interaction: Interaction) {
+  if (await isUserBlacklisted(interaction.user.id)) return;
+
   if (interaction.type == InteractionType.ApplicationCommandAutocomplete) {
     const focused = interaction.options.getFocused(true);
 

@@ -17,6 +17,7 @@ import { addKarma } from "../functions/karma/karma";
 import { addMember, getPremiumProfile, isPremium, renewUser, setTier } from "../functions/premium/premium";
 import { percentChance } from "../functions/random";
 import requestDM from "../functions/requestdm";
+import { isUserBlacklisted } from "../functions/users/blacklist";
 import { addNotificationToQueue, getDmSettings } from "../functions/users/notifications";
 import { logger } from "../logger";
 import ms = require("ms");
@@ -66,6 +67,11 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
 
   if (!(await userExists(user))) {
     logger.warn(`${user} doesnt exist`);
+    return;
+  }
+
+  if (await isUserBlacklisted(user)) {
+    logger.info(`${user} blacklisted`);
     return;
   }
 
@@ -187,9 +193,9 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
 }
 
 async function handleKofiData(data: KofiResponse) {
-  const user = await prisma.user.findUnique({
+  const user = await prisma.user.findFirst({
     where: {
-      email: data.email,
+      AND: [{ email: data.email }, { blacklisted: false }],
     },
   });
 
