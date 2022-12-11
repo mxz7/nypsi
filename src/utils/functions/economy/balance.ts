@@ -158,10 +158,10 @@ export async function getMulti(member: GuildMember | string): Promise<number> {
     const chance = Math.floor(Math.random() * 10);
 
     if (chance < 2) {
-      multi -= 7;
+      multi -= Math.floor(Math.random() * 6) + 1;
     } else {
       const choices = [7, 17, 3, 4, 5, 7, 2, 17, 17, 15, 16, 17, 13];
-      multi += choices[Math.floor(Math.random() * choices.length)];
+      multi += Math.floor(Math.random() * choices[Math.floor(Math.random() * choices.length)]) + 1;
     }
   } else if (inventory.find((i) => i.item == "pink_gem")?.amount > 0) {
     const chance = Math.floor(Math.random() * 10);
