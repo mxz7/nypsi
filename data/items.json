@@ -1433,6 +1433,16 @@
     },
     "aliases": ["white"]
   },
+  "crystal_heart": {
+    "id": "crystal_heart",
+    "name": "crystal heart",
+    "emoji": "<:nypsi_crystal_heart:1051624572694319124>",
+    "longDesc": "it's widely understood throughout history, that nobody truly understands the origin of any gem, including the crystal heart. ancient hieroglyphs depict the crystal heart forming when all gems in existence fuse together. quite a sight to behold.",
+    "role": "item",
+    "rarity": 69,
+    "in_crates": false,
+    "aliases": ["heart", "crystal"]
+  },
   "beginner_booster": {
     "id": "beginner_booster",
     "name": "new player booster",
