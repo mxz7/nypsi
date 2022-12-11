@@ -644,7 +644,7 @@ async function playGame(
           row[x] = "gc";
           game.win += 3;
 
-          if (percentChance(1.1)) {
+          if (percentChance(0.5)) {
             addInventoryItem(message.member, "green_gem", 1);
             addProgress(message.author.id, "gem_hunter", 1);
             response.followUp({
