@@ -128,18 +128,21 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const inventory = await getInventory(target);
   const net = await calcNetWorth(target);
-  let hasGem = false;
+  let gemLine = "";
 
-  if (inventory.some((i) => i.item == "white_gem")) hasGem = true;
+  if (inventory.find((i) => i.item == "white_gem")?.amount > 0) gemLine += `${getItems()["white_gem"].emoji}`;
+  if (inventory.find((i) => i.item == "pink_gem")?.amount > 0) gemLine += `${getItems()["pink_gem"].emoji}`;
+  if (inventory.find((i) => i.item == "purple_gem")?.amount > 0) gemLine += `${getItems()["purple_gem"].emoji}`;
+  if (inventory.find((i) => i.item == "blue_gem")?.amount > 0) gemLine += `${getItems()["blue_gem"].emoji}`;
+  if (inventory.find((i) => i.item == "green_gem")?.amount > 0) gemLine += `${getItems()["green_gem"].emoji}`;
 
   const embed = new CustomEmbed(message.member)
     .setDescription(
-      `${padlockStatus ? "🔒" : "💰"} $**${(await getBalance(target)).toLocaleString()}** ${
-        hasGem ? getItems()["white_gem"].emoji : ""
-      }\n` +
+      `${padlockStatus ? "🔒" : "💰"} $**${(await getBalance(target)).toLocaleString()}**\n` +
         `💳 $**${(await getBankBalance(target)).toLocaleString()}** / $**${(
           await getMaxBankBalance(target)
-        ).toLocaleString()}**${net > 15_000_000 ? `\n\n🌍 $**${net.toLocaleString()}**` : ""}`
+
+        ).toLocaleString()}**${net > 15_000_000 ? `\n${gemLine}\n🌍 $**${net.toLocaleString()}**` : ""}`
     )
     .setFooter({ text: footer });
 
