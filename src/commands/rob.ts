@@ -88,7 +88,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (!(await userExists(message.member))) await createUser(message.member);
 
-  let target = message.mentions.members.first();
+  let target = message.mentions?.members?.first();
 
   if (!target) {
     target = await getMember(message.guild, args[0]);
