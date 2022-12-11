@@ -14,6 +14,10 @@ import { createUser, getItems, userExists } from "./utils";
 import { getXp, updateXp } from "./xp";
 
 const inventoryAchievementCheckCooldown = new Set<string>();
+const gemChanceCooldown = new Set<string>();
+setInterval(() => {
+  gemChanceCooldown.clear();
+}, 60000);
 
 type Inventory = {
   item: string;
@@ -417,6 +421,8 @@ export function selectItem(search: string) {
 
 export async function commandGemCheck(member: GuildMember, commandCategory: string) {
   if (!(await userExists(member))) return;
+  if (gemChanceCooldown.has(member.user.id)) return;
+  gemChanceCooldown.add(member.user.id);
 
   const chance = Math.floor(Math.random() * 100000);
 
