@@ -522,7 +522,7 @@ async function playGame(
         level: "cmd",
         message: `${message.guild.id} - ${message.author.tag}: replaying blackjack`,
       });
-      if (isLockedOut(message.author.id)) return verifyUser(message);
+      if (await isLockedOut(message.author.id)) return verifyUser(message);
 
       addHourlyCommand(message.member);
 

@@ -107,7 +107,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   );
 
   const embed = new CustomEmbed(message.member).setFooter({
-    text: `page 1/${pages.size}`,
+    text: `page 1/${pages.size}${currentFilter ? ` filter: ${currentFilter}` : ""}`,
   });
 
   embed.setHeader("your inventory", message.author.avatarURL());
