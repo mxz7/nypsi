@@ -122,7 +122,7 @@ model Inventory {
   userId String
 
   item   String
-  amount Int    @default(1)
+  amount BigInt @default(1)
 
   economy Economy @relation(fields: [userId], references: [userId], onDelete: Cascade)
 

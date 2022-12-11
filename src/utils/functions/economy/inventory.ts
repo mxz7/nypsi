@@ -46,6 +46,11 @@ export async function getInventory(
         amount: true,
       },
     })
+    .then((q) =>
+      q.map((i) => {
+        return { item: i.item, amount: Number(i.amount) };
+      })
+    )
     .catch(() => {});
 
   if (!query || query.length == 0) {
@@ -387,7 +392,7 @@ export async function getTotalAmountOfItem(itemId: string) {
     },
   });
 
-  return query._sum.amount;
+  return Number(query._sum.amount);
 }
 
 export function selectItem(search: string) {
