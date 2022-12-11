@@ -74,6 +74,7 @@ export default {
       ACTIVE_USERS_ANALYTICS: "nypsi:active:user:anal",
       VOTE_REMINDER_RECEIVED: "nypsi:vote_reminder:received",
       USERS_PLAYING: "nypsi:users:playing",
+      LOCKED_OUT: "nypsi:requirescaptcha",
     },
   },
   BOOST_ROLE_ID: "747066190530347089",
