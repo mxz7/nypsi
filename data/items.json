@@ -577,7 +577,7 @@
     "emoji": "<:xnypsi:819957267548864543>",
     "role": "crate",
     "longDesc": "open to receive 5 rare items",
-    "sell": 5000000,
+    "sell": 3000000,
     "rarity": 4,
     "aliases": ["nypsi"],
     "in_crates": true
