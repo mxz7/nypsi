@@ -435,12 +435,12 @@ export async function calcNetWorth(member: GuildMember | string) {
 
   for (const item of query.Inventory) {
     if (getItems()[item.item].buy && getItems()[item.item].sell) {
-      worth += getItems()[item.item].sell * item.amount;
+      worth += getItems()[item.item].sell * Number(item.amount);
     } else {
       const auctionAvg = await getAuctionAverage(item.item);
 
       if (auctionAvg) {
-        worth += auctionAvg * item.amount;
+        worth += auctionAvg * Number(item.amount);
       }
     }
   }

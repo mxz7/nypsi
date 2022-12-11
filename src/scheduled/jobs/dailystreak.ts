@@ -39,7 +39,7 @@ import { addNotificationToQueue } from "../../utils/functions/users/notification
     if (user.Inventory.find((i) => i.item == "calendar")?.amount > 0) {
       if (user.user.DMSettings.other) calendarSaved.push(user.userId);
 
-      if (user.Inventory.find((i) => i.item == "calendar").amount == 1) {
+      if (Number(user.Inventory.find((i) => i.item == "calendar").amount) == 1) {
         await prisma.inventory.delete({
           where: {
             userId_item: {
