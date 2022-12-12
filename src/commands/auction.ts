@@ -508,7 +508,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         const bumpRes = await bumpAuction(auctions[currentPage].id, message.client as NypsiClient);
 
         if (!bumpRes) {
-          await interaction.followUp({ embeds: [new ErrorEmbed("this auction has already been bumped recently")] });
+          await interaction.followUp({
+            embeds: [new ErrorEmbed("this auction has already been bumped recently")],
+            ephemeral: true,
+          });
           displayAuction(currentPage);
           await updateButtons(currentPage);
           await msg.edit({ embeds: [embed], components: [row] });
@@ -516,6 +519,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         } else {
           await interaction.followUp({
             embeds: [new CustomEmbed(message.member, `[your auction has been bumped](${bumpRes})`)],
+            ephemeral: true,
           });
           displayAuction(currentPage);
           await updateButtons(currentPage);
