@@ -18,6 +18,7 @@ import {
   topCompletion,
   topGuilds,
   topItem,
+  topItemGlobal,
   topNetWorth,
   topNetWorthGlobal,
   topPrestige,
@@ -41,7 +42,6 @@ cmd.slashData
     prestige
       .setName("prestige")
       .setDescription("view top prestiges in the server")
-
       .addStringOption((option) =>
         option
           .setName("scope")
@@ -56,6 +56,13 @@ cmd.slashData
       .setDescription("view top item holders in the server")
       .addStringOption((option) =>
         option.setName("item-global").setDescription("item to query").setRequired(true).setAutocomplete(true)
+      )
+      .addStringOption((option) =>
+        option
+          .setName("scope")
+          .setDescription("show global/server")
+          .setChoices(...scopeChoices)
+          .setRequired(false)
       )
   )
   .addSubcommand((guild) => guild.setName("guilds").setDescription("view top nypsi guilds"))
@@ -189,9 +196,19 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return send({ embeds: [new ErrorEmbed(`couldn't find ${searchTag}`)] });
     }
 
-    const data = await topItem(message.guild, item.id, message.author.id);
+    let global = false;
 
-    return show(data.pages, data.pos, `top ${item.name} in ${message.guild.name}`);
+    if (args[1]?.toLowerCase() == "global") global = true;
+
+    let data: { pages: Map<number, string[]>; pos: number };
+
+    if (global) {
+      data = await topItemGlobal(item.id, message.author.id);
+    } else {
+      data = await topItem(message.guild, item.id, message.author.id);
+    }
+
+    return show(data.pages, data.pos, `top ${item.name} in ${global ? "[global]" : `for ${message.guild.name}`}`);
   } else if (args[0].toLowerCase() == "completion") {
     const data = await topCompletion(message.guild, message.author.id);
 
