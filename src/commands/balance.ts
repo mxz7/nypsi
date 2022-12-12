@@ -130,11 +130,25 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const net = await calcNetWorth(target);
   let gemLine = "";
 
-  if (inventory.find((i) => i.item == "white_gem")?.amount > 0) gemLine += `${getItems()["white_gem"].emoji}`;
-  if (inventory.find((i) => i.item == "pink_gem")?.amount > 0) gemLine += `${getItems()["pink_gem"].emoji}`;
-  if (inventory.find((i) => i.item == "purple_gem")?.amount > 0) gemLine += `${getItems()["purple_gem"].emoji}`;
-  if (inventory.find((i) => i.item == "blue_gem")?.amount > 0) gemLine += `${getItems()["blue_gem"].emoji}`;
-  if (inventory.find((i) => i.item == "green_gem")?.amount > 0) gemLine += `${getItems()["green_gem"].emoji}`;
+  const gems: string[] = [];
+  inventory.forEach((i) => {
+    switch (i.item) {
+      case "crystal_heart":
+      case "white_gem":
+      case "pink_gem":
+      case "purple_gem":
+      case "blue_gem":
+      case "green_gem":
+        gems.push(i.item);
+        break;
+    }
+  });
+  if (gems.includes("crystal_heart")) gemLine += `${getItems()["crystal_heart"].emoji}`;
+  if (gems.includes("white_gem")) gemLine += `${getItems()["white_gem"].emoji}`;
+  if (gems.includes("pink_gem")) gemLine += `${getItems()["pink_gem"].emoji}`;
+  if (gems.includes("purple_gem")) gemLine += `${getItems()["purple_gem"].emoji}`;
+  if (gems.includes("blue_gem")) gemLine += `${getItems()["blue_gem"].emoji}`;
+  if (gems.includes("green_gem")) gemLine += `${getItems()["green_gem"].emoji}`;
 
   const embed = new CustomEmbed(message.member)
     .setDescription(

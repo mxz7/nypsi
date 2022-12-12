@@ -5,9 +5,7 @@ import { getPrefix } from "../utils/functions/guilds/utils";
 import { getModLogsHook, setModLogs } from "../utils/functions/moderation/logs";
 import { createProfile, profileExists } from "../utils/functions/moderation/utils";
 
-const cmd = new Command("modlogs", "set/update the modlogs channel", Categories.MODERATION).setPermissions([
-  "MANAGE_SERVER",
-]);
+const cmd = new Command("modlogs", "set/update the modlogs channel", Categories.ADMIN).setPermissions(["MANAGE_SERVER"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
