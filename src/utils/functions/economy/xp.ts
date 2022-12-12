@@ -70,6 +70,7 @@ export async function calcMinimumEarnedXp(member: GuildMember): Promise<number> 
     max += guild.level > 10 ? 10 : guild.level - 1;
   }
 
+  if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0) max += Math.floor(Math.random() * 5);
   if (inventory.find((i) => i.item == "white_gem")?.amount > 0) {
     const chance = Math.floor(Math.random() * 10);
 

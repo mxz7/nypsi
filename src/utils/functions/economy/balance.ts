@@ -118,7 +118,7 @@ export async function getMulti(member: GuildMember | string): Promise<number> {
 
   const prestige = await getPrestige(member);
 
-  const prestigeBonus = (prestige > 10 ? 10 : prestige) * 1.79;
+  const prestigeBonus = (prestige > 10 ? 10 : prestige) * 1.7;
 
   multi += prestigeBonus;
 
@@ -154,14 +154,15 @@ export async function getMulti(member: GuildMember | string): Promise<number> {
   }
 
   const inventory = await getInventory(id, false);
+  if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0) multi += Math.floor(Math.random() * 7);
   if (inventory.find((i) => i.item == "white_gem")?.amount > 0) {
     const chance = Math.floor(Math.random() * 10);
 
     if (chance < 2) {
       multi -= Math.floor(Math.random() * 6) + 1;
     } else {
-      gemBreak(id, 0.007, "white_gem");
-      const choices = [7, 3, 4, 5, 7, 2, 17, 17, 17, 7, 4];
+      gemBreak(id, 0.01, "white_gem");
+      const choices = [7, 3, 4, 5, 7, 2, 17, 7, 4, 5, 3, 3, 3, 3, 4];
       multi += Math.floor(Math.random() * choices[Math.floor(Math.random() * choices.length)]) + 1;
     }
   } else if (inventory.find((i) => i.item == "pink_gem")?.amount > 0) {
@@ -171,7 +172,7 @@ export async function getMulti(member: GuildMember | string): Promise<number> {
       multi -= 3;
     } else {
       gemBreak(id, 0.07, "pink_gem");
-      const choices = [7, 7, 7, 5, 4, 3, 2, 1, 3, 1, 1, 1];
+      const choices = [7, 5, 4, 3, 2, 1, 3, 1, 1, 1, 3, 3];
       multi += choices[Math.floor(Math.random() * choices.length)];
     }
   }
