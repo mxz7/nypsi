@@ -28,11 +28,11 @@ import ms = require("ms");
 const cmd = new Command("bankrob", "attempt to rob a bank for a high reward", Categories.MONEY);
 
 const defaults = new Map<string, number>([
-  ["bank of america", 30_000_000],
-  ["maze bank", 10_000_000],
-  ["barclays", 5_000_000],
-  ["lloyds", 2_500_000],
-  ["monzo", 1_500_000],
+  ["bank of america", 5_000_000],
+  ["maze bank", 2_500_000],
+  ["barclays", 1_000_000],
+  ["lloyds", 750_000],
+  ["monzo", 500_000],
 ]);
 
 const requirements = new Map<string, number>([
