@@ -79,7 +79,7 @@ async function updateCryptoWorth() {
   const btcworth = Math.floor(res.bpi.USD.rate_float);
 
   items["bitcoin"].buy = btcworth;
-  items["bitcoin"].sell = btcworth;
+  items["bitcoin"].sell = Math.floor(btcworth * 0.95);
   logger.info("bitcoin worth updated: $" + items["bitcoin"].buy.toLocaleString());
 
   res = await fetch("https://api.coinbase.com/v2/exchange-rates?currency=ETH").then((res) => res.json());
@@ -92,7 +92,7 @@ async function updateCryptoWorth() {
   }
 
   items["ethereum"].buy = ethWorth;
-  items["ethereum"].sell = ethWorth;
+  items["ethereum"].sell = Math.floor(ethWorth * 0.95);
   logger.info("ethereum worth updated: $" + items["ethereum"].buy.toLocaleString());
 }
 
