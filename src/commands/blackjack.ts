@@ -150,7 +150,7 @@ async function prepareGame(
 
   const maxBet = await calcMaxBet(message.member);
 
-  const bet = (await formatBet(args[0], message.member).catch(() => { })) || defaultBet;
+  const bet = (await formatBet(args[0], message.member).catch(() => {})) || defaultBet;
 
   if (!bet) {
     if (msg) {
