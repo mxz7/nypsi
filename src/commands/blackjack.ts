@@ -128,9 +128,9 @@ async function prepareGame(
       .addField(
         "game rules",
         "in blackjack, the aim is to get **21**, or as close as to **21** as you can get without going over\n" +
-          "the dealer will always stand on or above **17**\n" +
-          "**2**x multiplier for winning, on a draw you receive your bet back\n" +
-          "if your first 2 cards add up to 21, you get a **2.5**x win"
+        "the dealer will always stand on or above **17**\n" +
+        "**2**x multiplier for winning, on a draw you receive your bet back\n" +
+        "if your first 2 cards add up to 21, you get a **2.5**x win"
       );
 
     return send({ embeds: [embed] });
@@ -140,9 +140,9 @@ async function prepareGame(
     const embed = new CustomEmbed(
       message.member,
       "blackjack works exactly how it would in real life\n" +
-        "when you create a game, a full 52 deck is shuffled in a random order\n" +
-        "for every new card you take, it is taken from the first in the deck (array) and then removed from the deck\n" +
-        "view the code for this [here](https://github.com/tekoh/nypsi/blob/main/src/commands/blackjack.ts)"
+      "when you create a game, a full 52 deck is shuffled in a random order\n" +
+      "for every new card you take, it is taken from the first in the deck (array) and then removed from the deck\n" +
+      "view the code for this [here](https://github.com/tekoh/nypsi/blob/main/src/commands/blackjack.ts)"
     ).setHeader("blackjack help");
 
     return send({ embeds: [embed] });
@@ -150,7 +150,7 @@ async function prepareGame(
 
   const maxBet = await calcMaxBet(message.member);
 
-  const bet = (await formatBet(args[0], message.member).catch(() => {})) || defaultBet;
+  const bet = (await formatBet(args[0], message.member).catch(() => { })) || defaultBet;
 
   if (!bet) {
     if (msg) {
@@ -281,14 +281,13 @@ async function prepareGame(
   newDealerCard(message.member);
   newCard(message.member);
 
-  const embed = new CustomEmbed(message.member, "**bet** $" + bet.toLocaleString())
+  const embed = new CustomEmbed(message.member, "💰 $" + await getBalance(message.member).toLocaleString() + "\n\n**bet** $" + bet.toLocaleString())
     .setHeader("blackjack", message.author.avatarURL())
     .addField(
       "dealer",
-      `${
-        calcTotal(message.member) == 21
-          ? `${getDealerCards(message.member)} **${calcTotalDealer(message.member)}**`
-          : `| ${games.get(message.member.user.id).dealerCards[0]} |`
+      `${calcTotal(message.member) == 21
+        ? `${getDealerCards(message.member)} **${calcTotalDealer(message.member)}**`
+        : `| ${games.get(message.member.user.id).dealerCards[0]} |`
       }`
     )
     .addField(message.author.username, getCards(message.member) + " **" + calcTotal(message.member) + "**");
@@ -488,7 +487,7 @@ async function playGame(
   const first = games.get(message.member.user.id).first;
   const dealerPlaya = games.get(message.member.user.id).dealerPlay;
 
-  const newEmbed = new CustomEmbed(message.member, "**bet** $" + bet.toLocaleString()).setHeader(
+  const newEmbed = new CustomEmbed(message.member, "💰 $" + await getBalance(message.member).toLocaleString() + "\n\n**bet** $" + bet.toLocaleString()).setHeader(
     "blackjack",
     message.author.avatarURL()
   );
@@ -561,7 +560,7 @@ async function playGame(
     gamble(message.author, "blackjack", bet, false, 0);
     await addGamble(message.member, "blackjack", false);
     newEmbed.setColor(Constants.EMBED_FAIL_COLOR);
-    newEmbed.setDescription("**bet** $" + bet.toLocaleString() + "\n\n**you lose!!**");
+    newEmbed.setDescription("💰 $" + await getBalance(message.member).toLocaleString() + "\n\n**bet** $" + bet.toLocaleString() + "\n\n**you lose!!**");
     newEmbed.addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**");
     newEmbed.addField(message.author.username, getCards(message.member) + " **" + calcTotal(message.member) + "**");
     games.delete(message.author.id);
@@ -580,18 +579,20 @@ async function playGame(
       winnings = winnings + Math.round(winnings * games.get(message.member.user.id).voted);
 
       newEmbed.setDescription(
-        "**bet** $" +
-          bet.toLocaleString() +
-          "\n\n**winner!!**\n**you win** $" +
-          winnings.toLocaleString() +
-          "\n" +
-          "+**" +
-          Math.floor(games.get(message.member.user.id).voted * 100).toString() +
-          "**% bonus"
+        "💰 $" +
+        await getBalance(message.member).toLocaleString() +
+        "\n\n**bet** $" +
+        bet.toLocaleString() +
+        "\n\n**winner!!**\n**you win** $" +
+        winnings.toLocaleString() +
+        "\n" +
+        "+**" +
+        Math.floor(games.get(message.member.user.id).voted * 100).toString() +
+        "**% bonus"
       );
     } else {
       newEmbed.setDescription(
-        "**bet** $" + bet.toLocaleString() + "\n\n**winner!!**\n**you win** $" + winnings.toLocaleString()
+        "💰 $" + await getBalance(message.member).toLocaleString() + "\n\n**bet** $" + bet.toLocaleString() + "\n\n**winner!!**\n**you win** $" + winnings.toLocaleString()
       );
     }
 
@@ -622,7 +623,7 @@ async function playGame(
     gamble(message.author, "blackjack", bet, true, bet);
     await addGamble(message.member, "blackjack", true);
     newEmbed.setColor(variants.macchiato.yellow.hex as ColorResolvable);
-    newEmbed.setDescription("**bet** $" + bet.toLocaleString() + "\n\n**draw!!**\nyou win $" + bet.toLocaleString());
+    newEmbed.setDescription("💰 $" + await getBalance(message.member).toLocaleString() + "\n\n**bet** $" + bet.toLocaleString() + "\n\n**draw!!**\nyou win $" + bet.toLocaleString());
     newEmbed.addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**");
     newEmbed.addField(message.author.username, getCards(message.member) + " **" + calcTotal(message.member) + "**");
     await updateBalance(message.member, (await getBalance(message.member)) + bet);
@@ -705,7 +706,7 @@ async function playGame(
       );
 
       if (calcTotal(message.member) == 21) {
-        const newEmbed1 = new CustomEmbed(message.member, "**bet** $" + bet.toLocaleString())
+        const newEmbed1 = new CustomEmbed(message.member, "💰 $" + await getBalance(message.member).toLocaleString() + "\n\n**bet** $" + bet.toLocaleString())
           .setHeader("blackjack", message.author.avatarURL())
           .addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
           .addField(message.author.username, getCards(message.member) + " **" + calcTotal(message.member) + "**");
@@ -733,7 +734,7 @@ async function playGame(
         }, 1500);
         return;
       } else {
-        const newEmbed1 = new CustomEmbed(message.member, "**bet** $" + bet.toLocaleString())
+        const newEmbed1 = new CustomEmbed(message.member, "💰 $" + await getBalance(message.member).toLocaleString() + "\n\n**bet** $" + bet.toLocaleString())
           .setHeader("blackjack", message.author.avatarURL())
           .addField("dealer", `| ${games.get(message.member.user.id).dealerCards[0]} |`)
           .addField(message.author.username, getCards(message.member) + " **" + calcTotal(message.member) + "**");
@@ -747,7 +748,7 @@ async function playGame(
         new ButtonBuilder().setCustomId("2️⃣").setLabel("stand").setStyle(ButtonStyle.Primary).setDisabled(true)
       );
 
-      const newEmbed1 = new CustomEmbed(message.member, "**bet** $" + bet.toLocaleString())
+      const newEmbed1 = new CustomEmbed(message.member, "💰 $" + await getBalance(message.member).toLocaleString() + "\n\n**bet** $" + bet.toLocaleString())
         .setHeader("blackjack", message.author.avatarURL())
         .addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
         .addField(message.author.username, getCards(message.member) + " **" + calcTotal(message.member) + "**");
@@ -802,7 +803,7 @@ async function playGame(
 
       newCard(message.member);
 
-      const newEmbed1 = new CustomEmbed(message.member, "**bet** $" + bet.toLocaleString())
+      const newEmbed1 = new CustomEmbed(message.member, "💰 $" + await getBalance(message.member).toLocaleString() + "\n\n**bet** $" + bet.toLocaleString())
         .setHeader("blackjack", message.author.avatarURL())
         .addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
         .addField(message.author.username, getCards(message.member) + " **" + calcTotal(message.member) + "**");
