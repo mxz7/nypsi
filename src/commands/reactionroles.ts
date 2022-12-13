@@ -364,7 +364,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return send({ embeds: [new ErrorEmbed(`couldn't find the role '${args[1]}', use the role id or mention the role`)] });
 
     if (reactionRole.roles.find((r) => r.roleId === role.id))
-      return send({ embeds: [new ErrorEmbed("this role is arleady on this reaction role")] });
+      return send({ embeds: [new ErrorEmbed("this role is already on this reaction role")] });
 
     args.shift();
     args.shift();
