@@ -91,6 +91,8 @@ cmd.slashData
   )
   .addSubcommandGroup((whitelist) =>
     whitelist
+      .setName("whitelist")
+      .setDescription("whitelist settings")
       .addSubcommand((add) =>
         add
           .setName("add")
@@ -98,9 +100,7 @@ cmd.slashData
           .addStringOption((option) =>
             option.setName("reaction-role").setDescription("reaction role to effect").setRequired(true).setAutocomplete(true)
           )
-          .addRoleOption((option) =>
-            option.setDescription("role").setDescription("role to add to the whitelist").setRequired(true)
-          )
+          .addRoleOption((option) => option.setName("role").setDescription("role to add to the whitelist").setRequired(true))
       )
       .addSubcommand((remove) =>
         remove
