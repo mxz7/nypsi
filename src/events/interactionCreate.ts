@@ -225,6 +225,23 @@ export default async function interactionCreate(interaction: Interaction) {
       }));
 
       return await interaction.respond(formatted);
+    } else if (focused.name === "reaction-role") {
+      const reactionRoles = await getReactionRolesByGuild(interaction.guild);
+
+      const filtered = reactionRoles.filter(
+        (rr) =>
+          rr.messageId.includes(focused.value) || rr.description.includes(focused.value) || rr.title.includes(focused.value)
+      );
+
+      return interaction.respond(
+        filtered.map((rr) => {
+          let title = rr.title;
+
+          if (title.length > 20) title = title.substring(0, 20) + "...";
+
+          return { name: title ? `${title} (${rr.messageId})` : rr.messageId, value: rr.messageId };
+        })
+      );
     }
   }
 
