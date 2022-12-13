@@ -274,7 +274,7 @@ model ReactionRole {
   blacklisted String[]
   mode        ReactionRoleMode
 
-  guild             Guild               @relation(fields: [guildId], references: [id])
+  guild             Guild               @relation(fields: [guildId], references: [id], onDelete: Cascade)
   ReactionRoleRoles ReactionRoleRoles[]
 }
 
@@ -289,7 +289,7 @@ model ReactionRoleRoles {
   label     String
   createdAt DateTime @default(now())
 
-  reactionRole ReactionRole @relation(fields: [messageId], references: [messageId])
+  reactionRole ReactionRole @relation(fields: [messageId], references: [messageId], onDelete: Cascade)
 
   @@id([messageId, roleId])
 }
