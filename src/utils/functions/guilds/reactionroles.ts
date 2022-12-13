@@ -157,7 +157,7 @@ export async function sendReactionRole(
   await redis.del(`${Constants.redis.cache.guild.REACTION_ROLES}:${reactionRole.guildId}`);
 }
 
-export async function setMode(guildId: string, messageId: string, mode: ReactionRoleMode) {
+export async function setReactionRoleMode(guildId: string, messageId: string, mode: ReactionRoleMode) {
   await prisma.reactionRole.update({
     where: {
       messageId,
@@ -170,7 +170,7 @@ export async function setMode(guildId: string, messageId: string, mode: Reaction
   await redis.del(`${Constants.redis.cache.guild.REACTION_ROLES}:${guildId}`);
 }
 
-export async function setTitle(guildId: string, messageId: string, title: string) {
+export async function setReactionRoleTitle(guildId: string, messageId: string, title: string) {
   await prisma.reactionRole.update({
     where: {
       messageId,
@@ -183,7 +183,7 @@ export async function setTitle(guildId: string, messageId: string, title: string
   await redis.del(`${Constants.redis.cache.guild.REACTION_ROLES}:${guildId}`);
 }
 
-export async function setDescription(guildId: string, messageId: string, description: string) {
+export async function setReactionRoleDescription(guildId: string, messageId: string, description: string) {
   await prisma.reactionRole.update({
     where: {
       messageId,
