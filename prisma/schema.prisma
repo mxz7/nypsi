@@ -272,7 +272,7 @@ model ReactionRole {
   messageId   String           @unique
   title       String?
   description String
-  blacklisted String[]
+  whitelist   String[]
   mode        ReactionRoleMode
 
   guild Guild               @relation(fields: [guildId], references: [id], onDelete: Cascade)
