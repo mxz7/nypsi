@@ -358,10 +358,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     let role = message.mentions?.roles?.first();
 
-    if (!role) role = await getRole(message.guild, args[1]);
+    if (!role) role = await getRole(message.guild, args[2]);
 
     if (!role)
-      return send({ embeds: [new ErrorEmbed(`couldn't find the role '${args[1]}', use the role id or mention the role`)] });
+      return send({ embeds: [new ErrorEmbed(`couldn't find the role '${args[2]}', use the role id or mention the role`)] });
 
     if (reactionRole.roles.find((r) => r.roleId === role.id))
       return send({ embeds: [new ErrorEmbed("this role is already on this reaction role")] });
@@ -424,10 +424,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (!reactionRole) return send({ embeds: [new ErrorEmbed(`'${args[1]}' is not a reaction role message`)] });
 
-    if (!reactionRole.roles.find((r) => r.roleId === args[2]))
-      return send({ embeds: [new ErrorEmbed(`role not found in reaction roles: '${args[2]}'. you must use the role id`)] });
+    let role = message.mentions?.roles?.first();
 
-    await deleteRoleFromReactionRole(message.guild.id, args[1], args[2]);
+    if (!role) role = await getRole(message.guild, args[2]);
+
+    if (!role)
+      return send({ embeds: [new ErrorEmbed(`couldn't find the role '${args[2]}', use the role id or mention the role`)] });
+
+    await deleteRoleFromReactionRole(message.guild.id, args[1], role.id);
 
     reactionRoles = await getReactionRolesByGuild(message.guild);
     reactionRole = reactionRoles.find((r) => r.messageId === args[1]);
