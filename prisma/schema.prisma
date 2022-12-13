@@ -286,6 +286,7 @@ enum ReactionRoleMode {
 model ReactionRoleRoles {
   messageId String
   roleId    String
+  createdAt DateTime @default(now())
 
   reactionRole ReactionRole @relation(fields: [messageId], references: [messageId])
 
