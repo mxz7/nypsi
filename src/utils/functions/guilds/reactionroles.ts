@@ -73,3 +73,26 @@ export async function addRoleToReactionRole(options: {
 
   await redis.del(`${Constants.redis.cache.guild.REACTION_ROLES}:${options.guildId}`);
 }
+
+export async function deleteRoleFromReactionRole(guildId: string, messageId: string, roleId: string) {
+  await prisma.reactionRoleRoles.delete({
+    where: {
+      messageId_roleId: {
+        messageId,
+        roleId,
+      },
+    },
+  });
+
+  await redis.del(`${Constants.redis.cache.guild.REACTION_ROLES}:${guildId}`);
+}
+
+export async function deleteReactionRole(guildId: string, messageId: string) {
+  await prisma.reactionRole.delete({
+    where: {
+      messageId,
+    },
+  });
+
+  await redis.del(`${Constants.redis.cache.guild.REACTION_ROLES}:${guildId}`);
+}
