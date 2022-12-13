@@ -1,5 +1,5 @@
 import { ReactionRole, ReactionRoleMode, ReactionRoleRoles } from "@prisma/client";
-import { Guild, GuildTextBasedChannel } from "discord.js";
+import { Guild, GuildTextBasedChannel, Role } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
@@ -49,6 +49,25 @@ export async function createReactionRole(options: {
       mode: options.mode,
       guildId: options.guildId,
       title: options.title,
+    },
+  });
+
+  await redis.del(`${Constants.redis.cache.guild.REACTION_ROLES}:${options.guildId}`);
+}
+
+export async function addRoleToReactionRole(options: {
+  messageId: string;
+  guildId: string;
+  role: {
+    role: Role;
+    label: string;
+  };
+}) {
+  await prisma.reactionRoleRoles.create({
+    data: {
+      roleId: options.role.role.id,
+      messageId: options.messageId,
+      label: options.role.label,
     },
   });
 
