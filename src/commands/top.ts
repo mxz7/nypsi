@@ -197,7 +197,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     let global = false;
 
-    if (args[1]?.toLowerCase() == "global") global = true;
+    if (args[2]?.toLowerCase() == "global") global = true;
 
     let data: { pages: Map<number, string[]>; pos: number };
 
@@ -207,7 +207,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       data = await topItem(message.guild, item.id, message.author.id);
     }
 
-    return show(data.pages, data.pos, `top ${item.name} in ${global ? "[global]" : `for ${message.guild.name}`}`);
+    return show(data.pages, data.pos, `top ${item.name} ${global ? "[global]" : `for ${message.guild.name}`}`);
   } else if (args[0].toLowerCase() == "completion") {
     const data = await topCompletion(message.guild, message.author.id);
 
