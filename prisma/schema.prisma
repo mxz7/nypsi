@@ -261,8 +261,34 @@ model Guild {
 
   ChatReaction ChatReaction?
 
-  Moderation  Moderation?
-  RolePersist RolePersist[]
+  Moderation   Moderation?
+  RolePersist  RolePersist[]
+  ReactionRole ReactionRole[]
+}
+
+model ReactionRole {
+  guildId     String
+  messageId   String           @unique
+  title       String?
+  blacklisted String[]
+  mode        ReactionRoleMode
+
+  guild             Guild               @relation(fields: [guildId], references: [id])
+  ReactionRoleRoles ReactionRoleRoles[]
+}
+
+enum ReactionRoleMode {
+  MANY
+  UNIQUE
+}
+
+model ReactionRoleRoles {
+  messageId String
+  roleId    String
+
+  reactionRole ReactionRole @relation(fields: [messageId], references: [messageId])
+
+  @@id([messageId, roleId])
 }
 
 model RolePersist {
