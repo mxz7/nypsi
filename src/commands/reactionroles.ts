@@ -28,6 +28,101 @@ const cmd = new Command("reactionroles", "create & manage the server's reaction 
   .setPermissions(["MANAGE_SERVER"])
   .setAliases(["rr"]);
 
+cmd.slashEnabled = true;
+cmd.slashData
+  .addSubcommand((list) => list.setName("list").setDescription("list all reaction roles"))
+  .addSubcommand((create) => create.setName("create").setDescription("create a reaction role"))
+  .addSubcommand((addrole) =>
+    addrole
+      .setName("addrole")
+      .setDescription("add a role to a reaction role")
+      .addStringOption((option) =>
+        option.setName("reaction-role").setDescription("reaction role to effect").setRequired(true).setAutocomplete(true)
+      )
+      .addRoleOption((option) => option.setName("role").setDescription("role to add").setRequired(true))
+      .addStringOption((option) =>
+        option.setName("label").setDescription("either an emoji or some text").setRequired(true).setMaxLength(80)
+      )
+  )
+  .addSubcommand((update) =>
+    update
+      .setName("update")
+      .setDescription("update a reaction role setting")
+      .addStringOption((option) =>
+        option.setName("reaction-role").setDescription("reaction role to effect").setRequired(true).setAutocomplete(true)
+      )
+      .addStringOption((option) =>
+        option
+          .setName("setting")
+          .setDescription("the setting you want to change")
+          .setChoices(
+            { name: "mode", value: "mode" },
+            { name: "title", value: "title" },
+            { name: "description", value: "description" }
+          )
+          .setRequired(true)
+      )
+      .addStringOption((option) => option.setName("value").setDescription("new value").setRequired(true))
+  )
+  .addSubcommand((send) =>
+    send
+      .setName("send")
+      .setDescription("resend a reaction role")
+      .addStringOption((option) =>
+        option.setName("reaction-role").setDescription("reaction role to effect").setRequired(true).setAutocomplete(true)
+      )
+  )
+  .addSubcommand((del) =>
+    del
+      .setName("delete")
+      .setDescription("delete a reaction role")
+      .addStringOption((option) =>
+        option.setName("reaction-role").setDescription("reaction role to effect").setRequired(true).setAutocomplete(true)
+      )
+  )
+  .addSubcommand((removerole) =>
+    removerole
+      .setName("removerole")
+      .setDescription("remove a role from a reaction role")
+      .addStringOption((option) =>
+        option.setName("reaction-role").setDescription("reaction role to effect").setRequired(true).setAutocomplete(true)
+      )
+      .addRoleOption((option) => option.setName("role").setDescription("role to remove").setRequired(true))
+  )
+  .addSubcommandGroup((whitelist) =>
+    whitelist
+      .addSubcommand((add) =>
+        add
+          .setName("add")
+          .setDescription("add a role to the whitelist")
+          .addStringOption((option) =>
+            option.setName("reaction-role").setDescription("reaction role to effect").setRequired(true).setAutocomplete(true)
+          )
+          .addRoleOption((option) =>
+            option.setDescription("role").setDescription("role to add to the whitelist").setRequired(true)
+          )
+      )
+      .addSubcommand((remove) =>
+        remove
+          .setName("remove")
+          .setDescription("remove a role from the whitelist")
+          .addStringOption((option) =>
+            option.setName("reaction-role").setDescription("reaction role to effect").setRequired(true).setAutocomplete(true)
+          )
+          .addRoleOption((option) =>
+            option.setName("role").setDescription("role to remove from the whitelist").setRequired(true)
+          )
+      )
+      .addSubcommand((list) =>
+        list
+          .setName("list")
+          .setDescription("list all whitelisted roles")
+          .addStringOption((option) =>
+            option.setName("reaction-role").setDescription("reaction role to effect").setRequired(true).setAutocomplete(true)
+          )
+      )
+  );
+
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -104,7 +199,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     let title = await message.channel
       .awaitMessages({ filter, max: 1, time: 90_000 })
-      .then((m) => m.first().content)
+      .then((m) => {
+        m.first().delete();
+        return m.first().content;
+      })
       .catch(() => {
         fail = true;
       });
@@ -126,7 +224,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const description = await message.channel
       .awaitMessages({ filter, max: 1, time: 90_000 })
-      .then((m) => m.first().content)
+      .then((m) => {
+        m.first().delete();
+        return m.first().content;
+      })
       .catch(() => {
         fail = true;
       });
@@ -148,7 +249,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const channel = await message.channel
       .awaitMessages({ filter, max: 1, time: 90_000 })
-      .then((m) => m.first().mentions?.channels?.first())
+      .then((m) => {
+        m.first().delete();
+        return m.first().mentions.channels.first();
+      })
       .catch(() => {
         fail = true;
       });
@@ -270,7 +374,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       guildId: message.guild.id,
       role: {
         role,
-        label: args.join(" "),
+        label: args.join(" ").substring(0, 80),
       },
     });
 
@@ -376,6 +480,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (args[1].toLowerCase() === "add") {
       if (args.length < 4) return send({ embeds: [new ErrorEmbed("/reactionroles whitelist")] });
+
+      if (reactionRole.whitelist.length >= 25) return send({ embeds: [new ErrorEmbed("really? 25 whitelsited roles?")] });
 
       let role = message.mentions?.roles?.first();
 
