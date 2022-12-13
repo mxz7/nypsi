@@ -454,6 +454,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     } else if (args[2].toLowerCase() === "title") {
       args.shift();
       args.shift();
+      args.shift();
 
       if (args.join(" ").length > 100) return send({ embeds: [new ErrorEmbed("too long")] });
 
@@ -461,6 +462,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       return send({ embeds: [new CustomEmbed(message.member, "✅ updated title. you will have to resend the mesage")] });
     } else if (args[2].toLowerCase() === "description") {
+      args.shift();
       args.shift();
       args.shift();
 
