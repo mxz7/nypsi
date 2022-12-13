@@ -461,7 +461,7 @@ export default async function interactionCreate(interaction: Interaction) {
 
             for (const roleId of reactionRole.whitelist) {
               const role = await interaction.guild.roles
-                .fetch(reactionRole.whitelist[0])
+                .fetch(roleId)
                 .then((r) => r.toString())
                 .catch(() => {});
 
