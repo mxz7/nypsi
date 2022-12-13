@@ -802,11 +802,17 @@ async function playGame(
 
       newCard(message.member);
 
+      const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder().setCustomId("1️⃣").setLabel("hit").setStyle(ButtonStyle.Primary).setDisabled(true),
+        new ButtonBuilder().setCustomId("2️⃣").setLabel("stand").setStyle(ButtonStyle.Primary).setDisabled(true),
+        new ButtonBuilder().setCustomId("3️⃣").setLabel("double down").setStyle(ButtonStyle.Secondary).setDisabled(true)
+      );
+
       const newEmbed1 = new CustomEmbed(message.member, "**bet** $" + bet.toLocaleString())
         .setHeader("blackjack", message.author.avatarURL())
         .addField("dealer", getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**")
         .addField(message.author.username, getCards(message.member) + " **" + calcTotal(message.member) + "**");
-      await edit({ embeds: [newEmbed1], components: [] });
+      await edit({ embeds: [newEmbed1], components: [row] });
 
       if (calcTotal(message.member) > 21) {
         setTimeout(() => {
