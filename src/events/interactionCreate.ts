@@ -421,13 +421,47 @@ export default async function interactionCreate(interaction: Interaction) {
       const reactionRole = reactionRoles.find((r) => r.messageId === interactionMessageId);
       if (!reactionRole) return;
 
+      const member = await interaction.guild.members.fetch(interaction.user.id);
+
+      if (reactionRole.whitelist.length !== 0) {
+        let allowed = false;
+        for (const roleId of reactionRole.whitelist) {
+          if (member.roles.cache.has(roleId)) allowed = true;
+        }
+
+        if (!allowed) {
+          if (reactionRole.whitelist.length === 1) {
+            const role = await interaction.guild.roles
+              .fetch(reactionRole.whitelist[0])
+              .then((r) => r.toString())
+              .catch(() => {});
+            return interaction.reply({
+              embeds: [new ErrorEmbed(`you require ${role || reactionRole.whitelist[0]} to use this`)],
+              ephemeral: true,
+            });
+          } else {
+            const roles: string[] = [];
+
+            for (const roleId of reactionRole.whitelist) {
+              const role = await interaction.guild.roles
+                .fetch(reactionRole.whitelist[0])
+                .then((r) => r.toString())
+                .catch(() => {});
+
+              roles.push(role || roleId);
+            }
+
+            return interaction.reply({ embeds: [new ErrorEmbed(`to use this, you need one of:\n\n${roles.join("\n")}`)] });
+          }
+        }
+      }
+
       const roleId = reactionRole.roles.find((r) => r.roleId === customId).roleId;
       if (!roleId) return;
 
       await interaction.deferReply({ ephemeral: true });
 
       const responseDesc: string[] = [];
-      const member = await interaction.guild.members.fetch(interaction.user.id);
 
       if (reactionRole.mode === "UNIQUE") {
         for (const role of member.roles.cache.values()) {
