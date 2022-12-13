@@ -196,7 +196,7 @@ export async function setReactionRoleDescription(guildId: string, messageId: str
   await redis.del(`${Constants.redis.cache.guild.REACTION_ROLES}:${guildId}`);
 }
 
-export async function setWhitelist(guildId: string, messageId: string, whitelist: string[]) {
+export async function setReactionRoleWhitelist(guildId: string, messageId: string, whitelist: string[]) {
   await prisma.reactionRole.update({
     where: {
       messageId,
