@@ -480,23 +480,27 @@ export default async function interactionCreate(interaction: Interaction) {
 
       const responseDesc: string[] = [];
 
-      if (reactionRole.mode === "UNIQUE") {
-        for (const role of member.roles.cache.values()) {
-          if (reactionRole.roles.find((r) => r.roleId === role.id)) {
-            responseDesc.push(`- ${role.toString()}`);
-            await member.roles.remove(role);
+      if (member.roles.cache.has(roleId)) {
+        responseDesc.push(`- ${member.roles.cache.find((r) => r.id === roleId).toString()}`);
+        await member.roles.remove(roleId);
+      } else {
+        if (reactionRole.mode === "UNIQUE") {
+          for (const role of member.roles.cache.values()) {
+            if (reactionRole.roles.find((r) => r.roleId === role.id)) {
+              responseDesc.push(`- ${role.toString()}`);
+              await member.roles.remove(role);
+            }
           }
         }
+
+        const role = await interaction.guild.roles.fetch(roleId);
+
+        if (!role) return interaction.editReply({ embeds: [new ErrorEmbed("role is not valid")] });
+
+        await member.roles.add(role);
+        responseDesc.push(`+ ${role.toString()}`);
+        logger.info(`(reaction roles) added ${role.id} to ${member.user.id}`);
       }
-
-      const role = await interaction.guild.roles.fetch(roleId);
-
-      if (!role) return interaction.editReply({ embeds: [new ErrorEmbed("role is not valid")] });
-
-      await member.roles.add(role);
-      responseDesc.push(`+ ${role.toString()}`);
-
-      logger.info(`(reaction roles) added ${role.id} to ${member.user.id}`);
 
       return interaction.editReply({ embeds: [new CustomEmbed(member, responseDesc.join("\n"))] });
     }
