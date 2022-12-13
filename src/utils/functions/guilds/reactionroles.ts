@@ -18,7 +18,11 @@ export async function getReactionRolesByGuild(guild: Guild) {
       guildId: guild.id,
     },
     include: {
-      ReactionRoleRoles: true,
+      roles: {
+        orderBy: {
+          createdAt: "desc",
+        },
+      },
     },
   });
 
