@@ -529,6 +529,76 @@ export async function topItem(guild: Guild, item: string, userId: string) {
   return { pages, pos };
 }
 
+export async function topItemGlobal(item: string, userId: string) {
+  const query = await prisma.inventory.findMany({
+    where: {
+      item,
+    },
+    select: {
+      userId: true,
+      amount: true,
+      economy: {
+        select: {
+          user: {
+            select: {
+              lastKnownTag: true,
+            },
+          },
+          banned: true,
+        },
+      },
+    },
+    orderBy: {
+      amount: "desc",
+    },
+    take: 100,
+  });
+
+  const out = [];
+
+  let count = 0;
+
+  const userIds = query.map((i) => i.userId);
+
+  for (const user of query) {
+    if (user.economy.banned && dayjs().isBefore(user.economy.banned)) {
+      userIds.splice(userIds.indexOf(user.userId), 1);
+      continue;
+    }
+
+    let pos: number | string = count + 1;
+
+    if (pos == 1) {
+      pos = "🥇";
+    } else if (pos == 2) {
+      pos = "🥈";
+    } else if (pos == 3) {
+      pos = "🥉";
+    }
+
+    const items = getItems();
+
+    out[count] =
+      pos +
+      " **" +
+      user.economy.user.lastKnownTag.split("#")[0] +
+      "** " +
+      user.amount.toLocaleString() +
+      ` ${user.amount > 1 ? items[item].plural || items[item].name : items[item].name}`;
+    count++;
+  }
+
+  const pages = PageManager.createPages(out);
+
+  let pos = 0;
+
+  if (userId) {
+    pos = userIds.indexOf(userId) + 1;
+  }
+
+  return { pages, pos };
+}
+
 export async function topCompletion(guild: Guild, userId: string) {
   let members: Collection<string, GuildMember>;
 
