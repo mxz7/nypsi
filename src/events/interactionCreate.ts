@@ -468,7 +468,10 @@ export default async function interactionCreate(interaction: Interaction) {
               roles.push(role || roleId);
             }
 
-            return interaction.reply({ embeds: [new ErrorEmbed(`to use this, you need one of:\n\n${roles.join("\n")}`)] });
+            return interaction.reply({
+              embeds: [new ErrorEmbed(`to use this, you need one of:\n\n${roles.join("\n")}`)],
+              ephemeral: true,
+            });
           }
         }
       }
