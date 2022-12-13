@@ -23,6 +23,7 @@ import { getBalance, updateBalance } from "../utils/functions/economy/balance";
 import { addInventoryItem, getInventory } from "../utils/functions/economy/inventory";
 import { createUser, getAchievements, getItems, isEcoBanned, userExists } from "../utils/functions/economy/utils";
 import { claimFromWorkers } from "../utils/functions/economy/workers";
+import { getReactionRolesByGuild } from "../utils/functions/guilds/reactionroles";
 import { getKarma } from "../utils/functions/karma/karma";
 import { getKarmaShopItems, isKarmaShopOpen } from "../utils/functions/karma/karmashop";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
@@ -224,6 +225,23 @@ export default async function interactionCreate(interaction: Interaction) {
       }));
 
       return await interaction.respond(formatted);
+    } else if (focused.name === "reaction-role") {
+      const reactionRoles = await getReactionRolesByGuild(interaction.guild);
+
+      const filtered = reactionRoles.filter(
+        (rr) =>
+          rr.messageId.includes(focused.value) || rr.description.includes(focused.value) || rr.title.includes(focused.value)
+      );
+
+      return interaction.respond(
+        filtered.map((rr) => {
+          let title = rr.title;
+
+          if (title.length > 20) title = title.substring(0, 20) + "...";
+
+          return { name: title ? `${title} (${rr.messageId})` : rr.messageId, value: rr.messageId };
+        })
+      );
     }
   }
 
@@ -409,6 +427,85 @@ export default async function interactionCreate(interaction: Interaction) {
         .disableFooter();
 
       return interaction.reply({ embeds: [embed] });
+    } else {
+      const reactionRoles = await getReactionRolesByGuild(interaction.guild);
+
+      if (reactionRoles.length === 0) return;
+
+      const interactionMessageId = interaction.message.id;
+      const customId = interaction.customId;
+
+      const reactionRole = reactionRoles.find((r) => r.messageId === interactionMessageId);
+      if (!reactionRole) return;
+
+      const member = await interaction.guild.members.fetch(interaction.user.id);
+
+      if (reactionRole.whitelist.length !== 0) {
+        let allowed = false;
+        for (const roleId of reactionRole.whitelist) {
+          if (member.roles.cache.has(roleId)) allowed = true;
+        }
+
+        if (!allowed) {
+          if (reactionRole.whitelist.length === 1) {
+            const role = await interaction.guild.roles
+              .fetch(reactionRole.whitelist[0])
+              .then((r) => r.toString())
+              .catch(() => {});
+            return interaction.reply({
+              embeds: [new ErrorEmbed(`you require ${role || reactionRole.whitelist[0]} to use this`)],
+              ephemeral: true,
+            });
+          } else {
+            const roles: string[] = [];
+
+            for (const roleId of reactionRole.whitelist) {
+              const role = await interaction.guild.roles
+                .fetch(roleId)
+                .then((r) => r.toString())
+                .catch(() => {});
+
+              roles.push(role || roleId);
+            }
+
+            return interaction.reply({
+              embeds: [new ErrorEmbed(`to use this, you need one of:\n\n${roles.join("\n")}`)],
+              ephemeral: true,
+            });
+          }
+        }
+      }
+
+      const roleId = reactionRole.roles.find((r) => r.roleId === customId).roleId;
+      if (!roleId) return;
+
+      await interaction.deferReply({ ephemeral: true });
+
+      const responseDesc: string[] = [];
+
+      if (member.roles.cache.has(roleId)) {
+        responseDesc.push(`- ${member.roles.cache.find((r) => r.id === roleId).toString()}`);
+        await member.roles.remove(roleId);
+      } else {
+        if (reactionRole.mode === "UNIQUE") {
+          for (const role of member.roles.cache.values()) {
+            if (reactionRole.roles.find((r) => r.roleId === role.id)) {
+              responseDesc.push(`- ${role.toString()}`);
+              await member.roles.remove(role);
+            }
+          }
+        }
+
+        const role = await interaction.guild.roles.fetch(roleId);
+
+        if (!role) return interaction.editReply({ embeds: [new ErrorEmbed("role is not valid")] });
+
+        await member.roles.add(role);
+        responseDesc.push(`+ ${role.toString()}`);
+        logger.info(`(reaction roles) added ${role.id} to ${member.user.id}`);
+      }
+
+      return interaction.editReply({ embeds: [new CustomEmbed(member, responseDesc.join("\n"))] });
     }
   }
 
