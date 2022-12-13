@@ -438,7 +438,12 @@ export default async function interactionCreate(interaction: Interaction) {
         }
       }
 
-      await member.roles.add(roleId);
+      const role = await interaction.guild.roles.fetch(roleId);
+
+      if (!role) return interaction.editReply({ embeds: [new ErrorEmbed("role is not valid")] });
+
+      await member.roles.add(role);
+      responseDesc.push(`+ ${role.toString()}`);
 
       return interaction.editReply({ embeds: [new CustomEmbed(member, responseDesc.join("\n"))] });
     }
