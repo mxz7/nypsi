@@ -39,6 +39,7 @@ export default {
         PERCENT_MATCH: "cache:guild:percentmatch",
         PREFIX: "cache:guild:prefix",
         SLASH_ONLY: "cache:guild:slashonly",
+        REACTION_ROLES: "cache:guild:reactionroles",
       },
       economy: {
         AUCTION_AVG: "cache:economy:auctionavg",
@@ -90,4 +91,5 @@ export default {
   TEKOH_ID: "672793821850894347",
   TRANSPARENT_EMBED_COLOR: "#36393f" as ColorResolvable,
   ADMIN_IDS: ["672793821850894347", "449774710469689355"],
+  EMOJI_REGEX: /(<:[A-z]+:[0-9]+>)/,
 };
