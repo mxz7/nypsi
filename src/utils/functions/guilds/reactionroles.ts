@@ -5,7 +5,7 @@ import redis from "../../../init/redis";
 import Constants from "../../Constants";
 import ms = require("ms");
 
-export async function getReactionRoles(guild: Guild) {
+export async function getReactionRolesByGuild(guild: Guild) {
   if (await redis.exists(`${Constants.redis.cache.guild.REACTION_ROLES}:${guild.id}`)) {
     return JSON.parse(await redis.get(`${Constants.redis.cache.guild.REACTION_ROLES}:${guild.id}`)) as (ReactionRole & {
       ReactionRoleRoles: ReactionRoleRoles[];
