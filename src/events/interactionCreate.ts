@@ -445,6 +445,8 @@ export default async function interactionCreate(interaction: Interaction) {
       await member.roles.add(role);
       responseDesc.push(`+ ${role.toString()}`);
 
+      logger.info(`(reaction roles) added ${role.id} to ${member.user.id}`);
+
       return interaction.editReply({ embeds: [new CustomEmbed(member, responseDesc.join("\n"))] });
     }
   }
