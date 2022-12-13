@@ -53,6 +53,7 @@ export async function createReactionRole(options: {
       mode: options.mode,
       guildId: options.guildId,
       title: options.title,
+      description: options.messageDescription,
     },
   });
 
