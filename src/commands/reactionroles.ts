@@ -442,13 +442,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (!reactionRole) return send({ embeds: [new ErrorEmbed(`'${args[1]}' is not a reaction role message`)] });
 
     if (args[2].toLowerCase() === "mode") {
-      if (!["many", "unique"].includes(args[2].toLowerCase()))
+      if (!["many", "unique"].includes(args[3].toLowerCase()))
         return send({ embeds: [new ErrorEmbed("possible values: many, unique")] });
 
-      if (reactionRole.mode.toLowerCase() === args[2].toLowerCase())
+      if (reactionRole.mode.toLowerCase() === args[3].toLowerCase())
         return send({ embeds: [new ErrorEmbed("already that value lol")] });
 
-      await setReactionRoleMode(message.guild.id, args[1], args[2].toUpperCase() as ReactionRoleMode);
+      await setReactionRoleMode(message.guild.id, args[1], args[3].toUpperCase() as ReactionRoleMode);
 
       return send({ embeds: [new CustomEmbed(message.member, "✅ updated mode")] });
     } else if (args[2].toLowerCase() === "title") {
