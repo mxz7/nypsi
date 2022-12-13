@@ -171,7 +171,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   } else if (args[0].toLowerCase() == "item") {
     const items = getItems();
     args.shift();
-    const searchTag = args.join(" ").toLowerCase();
+    const searchTag = args[1].toLowerCase();
 
     let item: Item;
 
