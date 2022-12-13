@@ -274,8 +274,8 @@ model ReactionRole {
   blacklisted String[]
   mode        ReactionRoleMode
 
-  guild             Guild               @relation(fields: [guildId], references: [id], onDelete: Cascade)
-  ReactionRoleRoles ReactionRoleRoles[]
+  guild Guild               @relation(fields: [guildId], references: [id], onDelete: Cascade)
+  roles ReactionRoleRoles[]
 }
 
 enum ReactionRoleMode {
