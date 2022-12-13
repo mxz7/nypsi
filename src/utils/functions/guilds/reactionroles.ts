@@ -122,6 +122,11 @@ export async function sendReactionRole(
   const components: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [];
 
   for (const role of reactionRole.roles) {
+    if (!(await channel.guild.roles.fetch(role.roleId))) {
+      await deleteRoleFromReactionRole(channel.guild.id, reactionRole.messageId, role.roleId);
+      continue;
+    }
+
     const button = new ButtonBuilder().setCustomId(role.roleId).setStyle(ButtonStyle.Secondary);
 
     if (role.label.match(Constants.EMOJI_REGEX)) {
