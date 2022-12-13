@@ -566,9 +566,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     );
 
     if (pages.size > 1) {
-      msg = await message.channel.send({ embeds: [embed], components: [row] });
+      msg = await send({ embeds: [embed], components: [row] });
     } else {
-      return await message.channel.send({ embeds: [embed] });
+      return await send({ embeds: [embed] });
     }
 
     const manager = new PageManager({
