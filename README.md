@@ -45,6 +45,11 @@ gimme ur moneis ):< - haha joking but seriously check out the patreon it would h
 
 better showcase of features can be found on the bot's website: [`nypsi.xyz`](https://nypsi.xyz)
 
+#### 🕵️ reaction roles
+
+- incredibly easy & fast to set up and get going reaction roles, different modes to allow for unique roles or having many at a time.
+- set a whitelist to have exclusive self roles
+
 #### 💬 mentions
 
 - nypsi tracks mentions / pings across qualifying servers, preventing your users from being irritated by ghost pings, as well as putting all of their recent mentions into a simple, easy access command
@@ -83,6 +88,10 @@ better showcase of features can be found on the bot's website: [`nypsi.xyz`](htt
 - grow your guild and level up to become the top and receive awesome perks
 
 ### 🖼 screenshots
+
+- `$rr`
+
+![reaction roles](images/reactionroles.jpg)
 
 - `$wordle`
 
