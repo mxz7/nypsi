@@ -23,6 +23,7 @@ import { getBalance, updateBalance } from "../utils/functions/economy/balance";
 import { addInventoryItem, getInventory } from "../utils/functions/economy/inventory";
 import { createUser, getAchievements, getItems, isEcoBanned, userExists } from "../utils/functions/economy/utils";
 import { claimFromWorkers } from "../utils/functions/economy/workers";
+import { getReactionRolesByGuild } from "../utils/functions/guilds/reactionroles";
 import { getKarma } from "../utils/functions/karma/karma";
 import { getKarmaShopItems, isKarmaShopOpen } from "../utils/functions/karma/karmashop";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
@@ -409,6 +410,37 @@ export default async function interactionCreate(interaction: Interaction) {
         .disableFooter();
 
       return interaction.reply({ embeds: [embed] });
+    } else {
+      const reactionRoles = await getReactionRolesByGuild(interaction.guild);
+
+      if (reactionRoles.length === 0) return;
+
+      const interactionMessageId = interaction.message.id;
+      const customId = interaction.customId;
+
+      const reactionRole = reactionRoles.find((r) => r.messageId === interactionMessageId);
+      if (!reactionRole) return;
+
+      const roleId = reactionRole.roles.find((r) => r.roleId === customId).roleId;
+      if (!roleId) return;
+
+      await interaction.deferReply({ ephemeral: true });
+
+      const responseDesc: string[] = [];
+      const member = await interaction.guild.members.fetch(interaction.user.id);
+
+      if (reactionRole.mode === "UNIQUE") {
+        for (const role of member.roles.cache.values()) {
+          if (reactionRole.roles.find((r) => r.roleId === role.id)) {
+            responseDesc.push(`- ${role.toString()}`);
+            await member.roles.remove(role);
+          }
+        }
+      }
+
+      await member.roles.add(roleId);
+
+      return interaction.editReply({ embeds: [new CustomEmbed(member, responseDesc.join("\n"))] });
     }
   }
 
