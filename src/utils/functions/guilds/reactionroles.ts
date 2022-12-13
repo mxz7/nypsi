@@ -28,7 +28,7 @@ export async function getReactionRolesByGuild(guild: Guild) {
     include: {
       roles: {
         orderBy: {
-          createdAt: "desc",
+          createdAt: "asc",
         },
       },
     },
