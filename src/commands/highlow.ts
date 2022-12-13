@@ -590,7 +590,7 @@ async function playGame(
     if (newCard1 > oldCard) {
       if (win == 0) {
         win += 1;
-      } else if (win > 2.5) {
+      } else if (win > 5) {
         win += 1;
       } else {
         win += 0.5;
