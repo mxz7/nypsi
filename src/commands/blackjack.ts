@@ -488,7 +488,8 @@ async function playGame(
   const first = games.get(message.member.user.id).first;
   const dealerPlaya = games.get(message.member.user.id).dealerPlay;
 
-  const newEmbed = new CustomEmbed(message.member, "**bet** $" + bet.toLocaleString()).setHeader(
+  const newEmbed = new CustomEmbed(message.member, "💰 $" +
+  await getBalance(message.member).toLocaleString() + "\n\n**bet** $" + bet.toLocaleString()).setHeader(
     "blackjack",
     message.author.avatarURL()
   );
