@@ -271,6 +271,7 @@ model ReactionRole {
   channelId   String
   messageId   String           @unique
   title       String?
+  description String
   blacklisted String[]
   mode        ReactionRoleMode
 
