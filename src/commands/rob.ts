@@ -232,7 +232,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       embed2.setColor(Constants.EMBED_SUCCESS_COLOR);
       embed2.addField("success!!", "you stole $**" + amountMoney.toLocaleString() + "**");
 
-      const earnedXp = await calcEarnedXp(message.member, 6942069);
+      const earnedXp = await calcEarnedXp(message.member, 6942069, 1);
       addProgress(message.author.id, "robber", 1);
 
       if (earnedXp > 0) {

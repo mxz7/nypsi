@@ -544,7 +544,7 @@ async function playGame(
     );
     game.embed.setColor(Constants.EMBED_SUCCESS_COLOR);
 
-    const earnedXp = await calcEarnedXp(message.member, game.bet);
+    const earnedXp = await calcEarnedXp(message.member, game.bet, game.win);
 
     if (earnedXp > 0) {
       await updateXp(message.member, (await getXp(message.member)) + earnedXp);

@@ -316,10 +316,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   let win = false;
   let winnings = 0;
+  let multiplier = 0;
 
   if (one.split("-")[0] == two.split("-")[0] && two.split("-")[0] == three.split("-")[0]) {
     // @ts-expect-error uhh its weird
-    const multiplier = multipliers[one.split("-")[0]];
+    multiplier = multipliers[one.split("-")[0]];
 
     win = true;
     winnings = Math.round(multiplier * bet);
@@ -328,6 +329,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   } else if (one.split("-")[0] == two.split("-")[0]) {
     win = true;
     winnings = Math.round(bet * 1.2);
+    multiplier = 1.2;
   }
 
   let multi = 0;
@@ -393,7 +395,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embed.addField("**winner!!**", "**you win** $" + winnings.toLocaleString());
       }
 
-      const earnedXp = await calcEarnedXp(message.member, bet);
+      const earnedXp = await calcEarnedXp(message.member, bet, multiplier);
 
       if (earnedXp > 0) {
         await updateXp(message.member, (await getXp(message.member)) + earnedXp);
