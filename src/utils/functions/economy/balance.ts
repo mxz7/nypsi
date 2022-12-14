@@ -8,7 +8,7 @@ import { getTier, isPremium } from "../premium/premium";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { getAuctionAverage } from "./auctions";
 import { getBoosters } from "./boosters";
-import { getGuildByUser } from "./guilds";
+import { getGuildLevelByUser } from "./guilds";
 import { gemBreak, getInventory } from "./inventory";
 import { getPrestige } from "./prestige";
 import { getBaseUpgrades, getBaseWorkers, getItems } from "./utils";
@@ -135,10 +135,10 @@ export async function getMulti(member: GuildMember | string): Promise<number> {
     }
   }
 
-  const guild = await getGuildByUser(id);
+  const guildLevel = await getGuildLevelByUser(id);
 
-  if (guild) {
-    multi += guild.level > 5 ? 5 : guild.level - 1;
+  if (guildLevel) {
+    multi += guildLevel > 5 ? 5 : guildLevel - 1;
   }
 
   const boosters = await getBoosters(id);

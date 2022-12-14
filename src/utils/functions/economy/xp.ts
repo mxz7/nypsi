@@ -63,11 +63,15 @@ export async function calcMinimumEarnedXp(member: GuildMember): Promise<number> 
 
   let max = 10;
 
-  const guild = await getGuildByUser(member);
+  let minRandom = 1;
+  let maxRandom = 4;
+
+  const prestige = await getPrestigeRequirement(member);
+  const guildLevel = await getGuildLevelByUser(member);
   const inventory = await getInventory(member);
 
-  if (guild) {
-    max += guild.level > 10 ? 10 : guild.level - 1;
+  if (guildLevel) {
+    maxRandom += guildLevel > 10 ? 10 : guildLevel - 1;
   }
 
   if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0) max += Math.floor(Math.random() * 5);
