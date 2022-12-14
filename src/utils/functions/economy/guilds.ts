@@ -354,6 +354,7 @@ async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
     logger.info(`${guild.guildName} has upgraded to level ${guild.level + 1}`);
 
     await redis.del(`${Constants.redis.cache.economy.GUILD_REQUIREMENTS}:${guild.guildName}`);
+    await redis.del(`${Constants.redis.cache.economy.GUILD_LEVEL}:${guild.guildName.toLowerCase()}`);
 
     const embed = new CustomEmbed().setColor(Constants.EMBED_SUCCESS_COLOR);
 
