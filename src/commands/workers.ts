@@ -148,7 +148,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           `**inventory** ${userWorker.stored.toLocaleString()} ${worker.item_emoji} / ${maxStorage.toLocaleString()} ${
             worker.item_emoji
           }\n` +
-          `**item worth** $${perItem.toLocaleString()} / ${worker.item_emoji}\n` +
+          `**worth** $${perItem.toLocaleString()} / ${worker.item_emoji}\n` +
           `**rate** ${perInterval.toLocaleString()} ${worker.item_emoji} / hour`;
 
         if (userWorker.stored < maxStorage) {
@@ -173,7 +173,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embed.setDescription(
           `**cost** $${worker.cost.toLocaleString()}\n` +
             `**required prestige** ${worker.prestige_requirement}\n\n` +
-            `**item worth** $${worker.base.per_item.toLocaleString()} / ${worker.item_emoji}\n` +
+            `**worth** $${worker.base.per_item.toLocaleString()} / ${worker.item_emoji}\n` +
             `**rate** ${worker.base.per_interval.toLocaleString()} ${worker.item_emoji} / hour`
         );
 
