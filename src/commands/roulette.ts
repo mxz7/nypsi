@@ -208,13 +208,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   let win = false;
   let winnings = 0;
+  let multiplier = 0;
 
   if (colorBet == roll) {
     win = true;
     if (roll == "g") {
       winnings = Math.round(bet * 17);
+      multiplier = 17;
     } else {
       winnings = Math.round(bet * 1.5);
+      multiplier = 1.5;
     }
   }
 
@@ -286,7 +289,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embed.addField("**winner!!**", "**you win** $" + winnings.toLocaleString());
       }
 
-      const earnedXp = await calcEarnedXp(message.member, bet);
+      const earnedXp = await calcEarnedXp(message.member, bet, multiplier);
 
       if (earnedXp > 0) {
         await updateXp(message.member, (await getXp(message.member)) + earnedXp);
