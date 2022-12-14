@@ -188,7 +188,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           newEmbed.setDescription(pages.get(currentPage).join("\n"));
 
           newEmbed.setFooter({
-            text: `total: ${total.toLocaleString()} | today: ${commandUses.toLocaleString()} | 1/${pages.size}`,
+            text: `total: ${total.toLocaleString()} | today: ${commandUses.toLocaleString()} | ${currentPage}/${pages.size}`,
           });
 
           if (currentPage == 1) {
@@ -214,7 +214,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           newEmbed.setDescription(pages.get(currentPage).join("\n"));
 
           newEmbed.setFooter({
-            text: `total: ${total.toLocaleString()} | today: ${commandUses.toLocaleString()} | 1/${pages.size}`,
+            text: `total: ${total.toLocaleString()} | today: ${commandUses.toLocaleString()} | ${currentPage}/${pages.size}`,
           });
 
           if (currentPage == pages.size) {
