@@ -2,6 +2,7 @@ import dayjs = require("dayjs");
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import Constants from "../utils/Constants";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { addInventoryItem } from "../utils/functions/economy/inventory";
 import { createUser, doDaily, getItems, getLastDaily, userExists } from "../utils/functions/economy/utils";
@@ -62,7 +63,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           embed: new CustomEmbed(
             message.member,
             `${getItems()["blue_gem"].emoji} you've found a gem! i wonder what powers it holds...`
-          ).setTitle("you've found a gem"),
+          )
+            .setTitle("you've found a gem")
+            .setColor(Constants.TRANSPARENT_EMBED_COLOR),
         },
       });
     }

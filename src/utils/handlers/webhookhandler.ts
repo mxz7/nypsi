@@ -148,7 +148,8 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
         payload: {
           embed: new CustomEmbed()
             .setDescription(`${getItems()["blue_gem"].emoji} you've found a gem! i wonder what powers it holds...`)
-            .setTitle("you've found a gem"),
+            .setTitle("you've found a gem")
+            .setColor(Constants.TRANSPARENT_EMBED_COLOR),
         },
       });
     }
@@ -247,7 +248,8 @@ async function handleKofiData(data: KofiResponse) {
                 payload: {
                   embed: new CustomEmbed()
                     .setDescription(`${getItems()["pink_gem"].emoji} you've found a gem! i wonder what powers it holds...`)
-                    .setTitle("you've found a gem"),
+                    .setTitle("you've found a gem")
+                    .setColor(Constants.TRANSPARENT_EMBED_COLOR),
                 },
               });
             }
@@ -261,7 +263,8 @@ async function handleKofiData(data: KofiResponse) {
                 payload: {
                   embed: new CustomEmbed()
                     .setDescription(`${getItems()["blue_gem"].emoji} you've found a gem! i wonder what powers it holds...`)
-                    .setTitle("you've found a gem"),
+                    .setTitle("you've found a gem")
+                    .setColor(Constants.TRANSPARENT_EMBED_COLOR),
                 },
               });
             }
@@ -289,7 +292,8 @@ async function handleKofiData(data: KofiResponse) {
                 payload: {
                   embed: new CustomEmbed()
                     .setDescription(`${getItems()["green_gem"].emoji} you've found a gem! i wonder what powers it holds...`)
-                    .setTitle("you've found a gem"),
+                    .setTitle("you've found a gem")
+                    .setColor(Constants.TRANSPARENT_EMBED_COLOR),
                 },
               });
             }
@@ -305,7 +309,8 @@ async function handleKofiData(data: KofiResponse) {
                 payload: {
                   embed: new CustomEmbed()
                     .setDescription(`${getItems()["white_gem"].emoji} you've found a gem! i wonder what powers it holds...`)
-                    .setTitle("you've found a gem"),
+                    .setTitle("you've found a gem")
+                    .setColor(Constants.TRANSPARENT_EMBED_COLOR),
                 },
               });
             }
