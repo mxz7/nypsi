@@ -84,7 +84,7 @@ export async function calcEarnedXp(member: GuildMember, bet: number, multiplier:
   min += bet / 75_000;
   max += multiplier;
 
-  if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0) min += Math.floor(Math.random() * 4);
+  if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0) min += Math.floor(Math.random() * 5);
   if (inventory.find((i) => i.item == "white_gem")?.amount > 0) {
     const chance = Math.floor(Math.random() * 10);
 
@@ -92,7 +92,7 @@ export async function calcEarnedXp(member: GuildMember, bet: number, multiplier:
       max -= Math.floor(Math.random() * 7) + 1;
     } else {
       gemBreak(member.user.id, 0.007, "white_gem");
-      max += Math.floor(Math.random() * 7) + 1;
+      max += Math.floor(Math.random() * 13) + 1;
     }
   } else if (inventory.find((i) => i.item == "pink_gem")?.amount > 0) {
     gemBreak(member.user.id, 0.07, "pink_gem");
