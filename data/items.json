@@ -342,40 +342,6 @@
     "sell": 10000,
     "in_crates": true
   },
-  "standard_watch": {
-    "id": "standard_watch",
-    "name": "standard watch",
-    "emoji": "⌚",
-    "longDesc": "tell the time",
-    "role": "item",
-    "rarity": 0,
-    "aliases": ["watch"],
-    "buy": 0,
-    "sell": 5000,
-    "in_crates": true
-  },
-  "golden_watch": {
-    "id": "golden_watch",
-    "name": "golden watch",
-    "emoji": "⌚",
-    "longDesc": "tell the time while flexing",
-    "role": "item",
-    "rarity": 1,
-    "buy": 0,
-    "sell": 75000,
-    "in_crates": true
-  },
-  "diamond_watch": {
-    "id": "diamond_watch",
-    "name": "diamond watch",
-    "emoji": "⌚",
-    "longDesc": "bling yourself out",
-    "role": "item",
-    "rarity": 1,
-    "buy": 0,
-    "sell": 250000,
-    "in_crates": true
-  },
   "bitcoin": {
     "id": "bitcoin",
     "name": "bitcoin",
