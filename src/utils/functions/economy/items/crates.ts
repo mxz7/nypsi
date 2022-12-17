@@ -16,6 +16,7 @@ import PageManager from "../../page";
 import { getTier, isPremium } from "../../premium/premium";
 import sleep from "../../sleep";
 import { getInventory, openCrate, selectItem } from "../inventory";
+import { getItems } from "../utils";
 
 module.exports = new ItemUse(
   "crates",
@@ -61,10 +62,9 @@ module.exports = new ItemUse(
     let max = 5;
 
     if (await isPremium(message.member)) {
+      max = 20;
       if ((await getTier(message.member)) >= 3) {
         max = 50;
-      } else {
-        max = 20;
       }
     }
 
@@ -110,11 +110,14 @@ module.exports = new ItemUse(
       foundItems.delete("xp");
     }
 
-    for (const [item, amount] of inPlaceSort(Array.from(foundItems.entries())).desc((i) => i[1])) {
-      desc.push(`- \`${amount}x\` ${item}`);
+    for (const [item, amount] of inPlaceSort(Array.from(foundItems.entries())).desc([
+      (i) => getItems()[i[0]].rarity,
+      (i) => i[1],
+    ])) {
+      desc.push(`- \`${amount}x\` ${getItems()[item].emoji} ${getItems()[item].name}`);
     }
 
-    const pages = PageManager.createPages(desc, 7);
+    const pages = PageManager.createPages(desc, 15);
 
     embed.setDescription(pages.get(1).join("\n"));
 
