@@ -50,8 +50,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (items[item.item].role == "fish" || items[item.item].role == "prey" || items[item.item].role == "sellable") {
       if (items[item.item].id == "cookie" || items[item.item].id == "cake") continue;
       selected.set(item.item, inventory.find((i) => i.item == item.item).amount);
-    } else if (items[item.item].id.includes("watch")) {
-      selected.set(item.item, inventory.find((i) => i.item == item.item).amount);
     }
   }
 
