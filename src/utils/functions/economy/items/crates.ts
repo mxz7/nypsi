@@ -118,7 +118,7 @@ module.exports = new ItemUse(
 
     embed.setDescription(pages.get(1).join("\n"));
 
-    await sleep(1500);
+    await sleep(2500);
 
     if (pages.size === 1) {
       return msg.edit({ embeds: [embed] });
