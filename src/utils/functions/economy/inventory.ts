@@ -373,7 +373,12 @@ export async function openCrate(member: GuildMember, item: Item) {
 
       await addInventoryItem(member, chosen, amount);
 
-      found.set(`${items[chosen].emoji} ${items[chosen].name}`, found.has("money") ? found.get("money") + amount : amount);
+      found.set(
+        `${items[chosen].emoji} ${items[chosen].name}`,
+        found.has(`${items[chosen].emoji} ${items[chosen].name}`)
+          ? found.get(`${items[chosen].emoji} ${items[chosen].name}`) + amount
+          : amount
+      );
     }
   }
 
