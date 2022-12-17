@@ -235,7 +235,7 @@ async function checkCollectorAchievement(id: string, inventory: Inventory) {
   }
 }
 
-export async function openCrate(member: GuildMember, item: Item): Promise<string[]> {
+export async function openCrate(member: GuildMember, item: Item) {
   const inventory = await getInventory(member);
   const items = getItems();
 
@@ -252,13 +252,13 @@ export async function openCrate(member: GuildMember, item: Item): Promise<string
   addProgress(member.user.id, "unboxer", 1);
 
   let times = 2;
-  const names = [];
+  const found = new Map<string, number>();
 
   if (item.id.includes("vote") || item.id.includes("chest")) {
     times = 1;
   } else if (item.id.includes("69420")) {
     await updateBalance(member, (await getBalance(member)) + 69420);
-    names.push("$69,420");
+    found.set("money", 69420);
   } else if (item.id == "nypsi_crate") {
     times = 5;
   }
@@ -360,12 +360,12 @@ export async function openCrate(member: GuildMember, item: Item): Promise<string
         const amount = parseInt(chosen.substr(6));
 
         await updateBalance(member, (await getBalance(member)) + amount);
-        names.push("$" + amount.toLocaleString());
+        found.set("money", found.has("money") ? found.get("money") + amount : amount);
       } else if (chosen.includes("xp:")) {
         const amount = parseInt(chosen.substr(3));
 
         await updateXp(member, (await getXp(member)) + amount);
-        names.push(amount + "xp");
+        found.set("xp", found.has("xp") ? found.get("xp") + amount : amount);
       }
     } else {
       let amount = 1;
@@ -380,11 +380,11 @@ export async function openCrate(member: GuildMember, item: Item): Promise<string
 
       await addInventoryItem(member, chosen, amount);
 
-      names.push(`${items[chosen].emoji} ${items[chosen].name}`);
+      found.set(chosen, found.has(chosen) ? found.get(chosen) + amount : amount);
     }
   }
 
-  return names;
+  return found;
 }
 
 export async function getTotalAmountOfItem(itemId: string) {

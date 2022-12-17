@@ -7,14 +7,13 @@ import {
   InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
-  MessageEditOptions,
 } from "discord.js";
 import { readdir } from "fs/promises";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { ItemUse } from "../models/ItemUse";
 import { addBooster, getBoosters } from "../utils/functions/economy/boosters";
-import { getInventory, openCrate, selectItem, setInventoryItem } from "../utils/functions/economy/inventory";
+import { getInventory, selectItem, setInventoryItem } from "../utils/functions/economy/inventory";
 import { addItemUse } from "../utils/functions/economy/stats";
 import { createUser, getBaseUpgrades, getBaseWorkers, getItems, userExists } from "../utils/functions/economy/utils";
 import { addWorkerUpgrade, getWorkers } from "../utils/functions/economy/workers";
@@ -64,15 +63,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       }
     } else {
       return await message.channel.send(data as BaseMessageOptions);
-    }
-  };
-
-  const edit = async (data: MessageEditOptions, msg: Message) => {
-    if (!(message instanceof Message)) {
-      await message.editReply(data);
-      return await message.fetchReply();
-    } else {
-      return await msg.edit(data);
     }
   };
 
@@ -295,17 +285,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     });
   }
 
-  const embed = new CustomEmbed(message.member).setHeader("use", message.author.avatarURL());
-
-  let laterDescription: string;
-
   if (selected.role == "crate") {
-    await addItemUse(message.member, selected.id);
-    const itemsFound = await openCrate(message.member, selected);
-
-    embed.setDescription(`opening ${selected.emoji} ${selected.name}...`);
-
-    laterDescription = `opening ${selected.emoji} ${selected.name}...\n\nyou found: \n - ${itemsFound.join("\n - ")}`;
+    return itemFunctions.get("crates").run(message, args);
   } else {
     if (itemFunctions.has(selected.id)) {
       await addItemUse(message.member, selected.id);
@@ -314,15 +295,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return send({ embeds: [new CustomEmbed(message.member, "unfortunately you can't use this item.")] });
     }
   }
-
-  const msg = await send({ embeds: [embed] });
-
-  if (!laterDescription) return;
-
-  setTimeout(() => {
-    embed.setDescription(laterDescription);
-    edit({ embeds: [embed] }, msg);
-  }, 2000);
 }
 
 cmd.setRun(run);
