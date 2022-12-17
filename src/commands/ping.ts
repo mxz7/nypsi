@@ -71,7 +71,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const embed = new CustomEmbed(message.member);
 
   let desc =
-    `discord api \`${discordLatency}ms\`\n` +
+    `websocket \`${discordLatency}ms\`\n` +
     `bot message \`${msgLatency}ms\`\n` +
     `redis \`${redisLatency.join("ms` | `")}ms\``;
 

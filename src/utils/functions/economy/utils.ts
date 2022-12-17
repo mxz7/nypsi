@@ -469,15 +469,6 @@ export async function addTicket(member: GuildMember | string) {
   await redis.hincrby("lotterytickets:queue", member.user.username, 1);
 }
 
-export async function startOpeningCrates(member: GuildMember) {
-  await redis.set(`economy:crates:block:${member.user.id}`, "y");
-  await redis.expire(`economy:crates:block:${member.user.id}`, 180);
-}
-
-export async function stopOpeningCrates(member: GuildMember) {
-  await redis.del(`economy:crates:block:${member.user.id}`);
-}
-
 export async function isHandcuffed(id: string): Promise<boolean> {
   return (await redis.exists(`economy:handcuffed:${id}`)) == 1 ? true : false;
 }

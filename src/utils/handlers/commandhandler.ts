@@ -722,12 +722,6 @@ export async function runCommand(
           embeds: [new ErrorEmbed(`you have been handcuffed, they will be removed in **${remaining}**`)],
         });
       }
-    } else if (await redis.exists(`economy:crates:block:${message.author.id}`)) {
-      if (message instanceof Message) {
-        return message.channel.send({ embeds: [new ErrorEmbed("wait until you've finished opening crates")] });
-      } else {
-        return message.reply({ embeds: [new ErrorEmbed("wait until you've finished opening crates")] });
-      }
     }
   }
 
