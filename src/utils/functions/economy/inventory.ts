@@ -443,10 +443,9 @@ export async function commandGemCheck(member: GuildMember, commandCategory: stri
       await addNotificationToQueue({
         memberId: member.user.id,
         payload: {
-          embed: new CustomEmbed(
-            member,
-            `${getItems()[gem].emoji} you've found a gem! i wonder what powers it holds...`
-          ).setTitle("you've found a gem"),
+          embed: new CustomEmbed(member, `${getItems()[gem].emoji} you've found a gem! i wonder what powers it holds...`)
+            .setTitle("you've found a gem")
+            .setColor(Constants.TRANSPARENT_EMBED_COLOR),
         },
       });
     }
@@ -464,7 +463,9 @@ export async function commandGemCheck(member: GuildMember, commandCategory: stri
             embed: new CustomEmbed(
               member,
               `${getItems()["pink_gem"].emoji} you've found a gem! i wonder what powers it holds...`
-            ).setTitle("you've found a gem"),
+            )
+              .setTitle("you've found a gem")
+              .setColor(Constants.TRANSPARENT_EMBED_COLOR),
           },
         });
       }
@@ -481,7 +482,9 @@ export async function commandGemCheck(member: GuildMember, commandCategory: stri
             embed: new CustomEmbed(
               member,
               `${getItems()["purple_gem"].emoji} you've found a gem! i wonder what powers it holds...`
-            ).setTitle("you've found a gem"),
+            )
+              .setTitle("you've found a gem")
+              .setColor(Constants.TRANSPARENT_EMBED_COLOR),
           },
         });
       }
