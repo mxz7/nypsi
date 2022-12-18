@@ -152,7 +152,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         await interaction.deferUpdate();
         await deleteUserMentions(manager.message.guild, manager.userId);
 
-        embed.data.fields.length == 0;
+        embed.data.fields.length = 0;
 
         embed.setDescription("✅ mentions cleared");
 
