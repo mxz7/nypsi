@@ -95,4 +95,5 @@ export default {
   TRANSPARENT_EMBED_COLOR: "#36393f" as ColorResolvable,
   ADMIN_IDS: ["672793821850894347", "449774710469689355"],
   EMOJI_REGEX: /(<:[A-z]+:[0-9]+>)/,
+  COLOUR_REGEX: /^#([A-Fa-f0-9]{6})$/,
 };
