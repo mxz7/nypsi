@@ -286,6 +286,7 @@ model ReactionRole {
   messageId   String           @unique
   title       String?
   description String
+  color       String?
   whitelist   String[]
   mode        ReactionRoleMode
 
