@@ -18,6 +18,95 @@ export function runCountdowns(client: NypsiClient) {
   const needed = new Date(Date.parse(d) + 10800000);
 
   const doCountdowns = async () => {
+    const query = await prisma.guildCountdown.findMany();
+
+    for (const countdown of query) {
+      const clusterHas = await client.cluster.broadcastEval(
+        async (c, { channelId }) => {
+          const client = c as NypsiClient;
+          const channel = await client.channels.fetch(channelId).catch(() => {});
+
+          if (channel) {
+            return client.cluster.id;
+          } else {
+            return "not-found";
+          }
+        },
+        {
+          context: { channelId: countdown.channel },
+        }
+      );
+
+      let shard: number;
+
+      for (const i of clusterHas) {
+        if (i != "not-found") {
+          shard = i;
+          break;
+        }
+      }
+
+      if (isNaN(shard)) {
+        logger.warn(`countdown channel not found: ${countdown.guildId} ${countdown.channel}`);
+        continue;
+      }
+
+      const days = daysUntil(new Date(countdown.date)) + 1;
+
+      let message;
+
+      if (days == 0) {
+        message = countdown.finalFormat;
+      } else {
+        message = countdown.format.split("%days%").join(days.toLocaleString());
+      }
+
+      const embed = new CustomEmbed();
+
+      embed.setDescription(message);
+      embed.setColor(Constants.TRANSPARENT_EMBED_COLOR);
+      embed.disableFooter();
+
+      const res = await client.cluster.broadcastEval(
+        async (c, { needed, embed, channelId }) => {
+          const client = c as NypsiClient;
+          if (client.cluster.id != needed) return false;
+
+          const channel = await client.channels.fetch(channelId).catch(() => {});
+
+          if (!channel) return false;
+          if (!channel.isTextBased()) return false;
+
+          let fail = false;
+
+          await channel.send({ embeds: [embed] }).catch(() => {
+            fail = true;
+          });
+
+          if (fail) {
+            return false;
+          }
+          return true;
+        },
+        {
+          context: {
+            needed: shard,
+            channelId: countdown.channel,
+            embed: embed.toJSON(),
+          },
+        }
+      );
+
+      if (res.includes(true)) {
+        logger.log({
+          level: "auto",
+          message: `sent custom countdown (${countdown.id}) in ${countdown.guildId}`,
+        });
+      } else {
+        logger.warn(`failed to send custom countdown (${countdown.id}) in ${countdown.guildId}`);
+      }
+    }
+
     for (const guildId of client.guilds.cache.keys()) {
       const guild = await client.guilds.fetch(guildId);
 
