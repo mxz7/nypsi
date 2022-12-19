@@ -70,6 +70,9 @@ module.exports = new ItemUse(
 
     if (amount > max) amount = max;
 
+    if (amount > (inventory.find((i) => i.item === selected.id)?.amount || 0))
+      return send({ embeds: [new ErrorEmbed(`you don't have ${amount} ${selected.name}`)] });
+
     const embed = new CustomEmbed(
       message.member,
       `opening **${amount}** ${amount > 1 ? (selected.plural ? selected.plural : selected.name) : selected.name}`
