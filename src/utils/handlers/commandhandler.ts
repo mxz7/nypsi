@@ -625,14 +625,11 @@ export async function runCommand(
     }
   }
 
-  console.log("z");
   logCommand(message, args);
 
   if (await isLockedOut(message.author.id)) {
     return verifyUser(message);
   }
-
-  console.log("y");
 
   if (command.category == "money" || ["wholesome", "settings", "wordle"].includes(command.name)) {
     if (restarting || (await redis.get(Constants.redis.nypsi.RESTART)) == "t") {
@@ -725,8 +722,6 @@ export async function runCommand(
     }
   }
 
-  console.log("h");
-
   if ((await getDisabledCommands(message.guild)).includes(command.name)) {
     if (message instanceof Message) {
       return message.channel.send({ embeds: [new ErrorEmbed("that command has been disabled")] });
@@ -735,9 +730,7 @@ export async function runCommand(
     }
   }
 
-  console.log("a");
   command.run(message, args);
-  console.log("b");
 
   setTimeout(async () => {
     const news = await getNews();
