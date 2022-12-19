@@ -86,6 +86,7 @@ jobs:
           mv data/ deploy/
           mv prisma/ deploy/
           mv tsconfig.json deploy/
+          rm deploy/dist/utils/functions/anticheat.js
 
       - name: deploy
         uses: nogsantos/scp-deploy@master
