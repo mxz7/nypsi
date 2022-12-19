@@ -62,6 +62,25 @@ import { logger } from "./utils/logger";
 loadCommands();
 client.loadEvents();
 
+process.on("SIGINT", () => {
+  console.log("received sigint");
+  process.exit();
+});
+
+//emitted when an uncaught JavaScript exception bubbles
+process.on("uncaughtException", (err) => {
+  console.log(err);
+});
+
+//emitted whenever a Promise is rejected and no error handler is attached to it
+process.on("unhandledRejection", (reason, p) => {
+  console.log(reason);
+});
+
+process.on("exit", (code) => {
+  console.log(`exit: ${code}`);
+});
+
 setTimeout(() => {
   logger.info("logging in...");
   client.login(process.env.BOT_TOKEN);
