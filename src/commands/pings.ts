@@ -62,8 +62,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     message.guild.memberCount < 150000 &&
     ((await userExists(message.guild.ownerId)) ||
       (await isPremium(message.guild.ownerId)) ||
-      (await getKarma(message.guild.ownerId)) >= 50 ||
-      (await getLastCommand(message.guild.ownerId)).getTime() >= Date.now() - ms("1 days"))
+      (await getKarma(message.guild.ownerId)) >= 10 ||
+      (await getLastCommand(message.guild.ownerId)).getTime() >= Date.now() - ms("30 days"))
   ) {
     qualified = true;
   } else if (message.author.id == message.guild.ownerId) {
