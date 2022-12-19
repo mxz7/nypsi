@@ -59,7 +59,7 @@ module.exports = new ItemUse(
       amount = parseInt(args[1]);
     }
 
-    let max = 5;
+    let max = 10;
 
     if (await isPremium(message.member)) {
       max = 20;
