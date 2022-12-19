@@ -1,6 +1,6 @@
 {
   "name": "nypsi",
-  "version": "5.10.0",
+  "version": "5.10.2",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
@@ -62,13 +62,13 @@
     "@types/crypto-js": "^4.1.1",
     "@types/figlet": "^1.5.5",
     "@types/ms": "^0.7.31",
-    "@types/node": "^18.11.15",
+    "@types/node": "^18.11.17",
     "@types/node-os-utils": "^1.2.0",
     "@types/string-similarity": "^4.0.0",
     "@types/urban-dictionary": "^3.0.0",
     "@typescript-eslint/eslint-plugin": "^5.46.1",
     "@typescript-eslint/parser": "^5.46.1",
-    "eslint": "^8.29.0",
+    "eslint": "^8.30.0",
     "lint-staged": "^13.1.0",
     "prettier": "2.8.1",
     "prisma": "^4.7.1",
