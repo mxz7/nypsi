@@ -8,14 +8,23 @@ export async function getDisabledCommands(guild: Guild): Promise<string[]> {
     return disableCache.get(guild.id);
   }
 
-  const query = await prisma.guild.findUnique({
-    where: {
-      id: guild.id,
-    },
-    select: {
-      disabledCommands: true,
-    },
-  });
+  console.log("1");
+  const query = await prisma.guild
+    .findUnique({
+      where: {
+        id: guild.id,
+      },
+      select: {
+        disabledCommands: true,
+      },
+    })
+    .catch((e) => {
+      console.log(e);
+    });
+
+  console.log("2");
+
+  if (!query) return;
 
   disableCache.set(guild.id, query.disabledCommands);
 
