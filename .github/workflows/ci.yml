@@ -106,7 +106,7 @@ jobs:
           password: ${{ secrets.PASS }}
           script: |
             cd ~/nypsi
-            bash
+            nvm use lts
             npm i --omit=dev
 
       - name: update deployment status
