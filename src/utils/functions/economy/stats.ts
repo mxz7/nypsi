@@ -133,7 +133,7 @@ export async function addRob(member: GuildMember, win: boolean) {
   }
 }
 
-export async function addItemUse(member: GuildMember, item: string, amount = 1) {
+export async function addItemUse(member: GuildMember | string, item: string, amount = 1) {
   let id: string;
   if (member instanceof GuildMember) {
     id = member.user.id;
