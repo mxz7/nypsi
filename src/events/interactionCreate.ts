@@ -438,6 +438,8 @@ export default async function interactionCreate(interaction: Interaction) {
         .disableFooter();
 
       return interaction.reply({ embeds: [embed] });
+    } else if (interaction.customId === "bake") {
+      return runCommand("bake", interaction as unknown as NypsiCommandInteraction, []);
     } else {
       const reactionRoles = await getReactionRolesByGuild(interaction.guild);
 

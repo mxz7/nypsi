@@ -94,7 +94,7 @@ async function doBake(message: Message | (NypsiCommandInteraction & CommandInter
     new ButtonBuilder().setCustomId("bake").setLabel("bake").setStyle(ButtonStyle.Success)
   );
 
-  if (msg) {
+  if (msg && msg.embeds[0].author.name.startsWith(member.user.username)) {
     return msg.edit({ embeds: [response] });
   } else {
     return send({ embeds: [response], components: [row] });
