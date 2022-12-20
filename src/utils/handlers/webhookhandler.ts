@@ -1,5 +1,7 @@
+import { ActionRowBuilder, ButtonBuilder, MessageActionRowComponentBuilder } from "@discordjs/builders";
 import * as topgg from "@top-gg/sdk";
 import { Manager } from "discord-hybrid-sharding";
+import { ButtonStyle } from "discord.js";
 import * as express from "express";
 import prisma from "../../init/database";
 import redis from "../../init/redis";
@@ -180,11 +182,16 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
       }
     }
 
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder().setLabel("open crates").setCustomId("vote-crates").setStyle(ButtonStyle.Success)
+    );
+
     const res = await requestDM({
       memberId: user,
       client: manager,
       content: "thank you for voting!",
       embed: embed,
+      components: row,
     });
 
     if (!res) {
