@@ -37,6 +37,7 @@ import requestDM from "../utils/functions/requestdm";
 import { addToNypsiBank, getTax } from "../utils/functions/tax";
 import { getDmSettings } from "../utils/functions/users/notifications";
 import { runCommand } from "../utils/handlers/commandhandler";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger, payment } from "../utils/logger";
 
 export default async function interactionCreate(interaction: Interaction) {
@@ -423,6 +424,14 @@ export default async function interactionCreate(interaction: Interaction) {
         await interaction.message.delete();
       }
     } else if (interaction.customId === "vote-crates") {
+      if (await onCooldown("use", interaction.user.id)) {
+        const embed = await getResponse("use", interaction.user.id);
+
+        return interaction.reply({ embeds: [embed] });
+      }
+
+      await addCooldown("use", interaction.user.id, 7);
+
       const inventory = await getInventory(interaction.user.id, false);
 
       let crateAmount = Math.floor((await getPrestige(interaction.user.id)) / 1.2 + 1);
