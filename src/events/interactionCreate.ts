@@ -442,8 +442,9 @@ export default async function interactionCreate(interaction: Interaction) {
       const int = interaction as unknown as NypsiCommandInteraction;
 
       int.author = interaction.user;
+      int.content = "bake";
 
-      return runCommand("bake", interaction as unknown as NypsiCommandInteraction, ["bake"]);
+      return runCommand("bake", interaction as unknown as NypsiCommandInteraction, []);
     } else {
       const reactionRoles = await getReactionRolesByGuild(interaction.guild);
 
