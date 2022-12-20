@@ -367,10 +367,10 @@ export async function countItemOnAuction(itemId: string) {
     where: {
       AND: [{ sold: false }, { itemName: itemId }],
     },
-    _count: {
+    _sum: {
       itemAmount: true,
     },
   });
 
-  return amount?._count?.itemAmount || 0;
+  return amount?._sum?.itemAmount || 0;
 }
