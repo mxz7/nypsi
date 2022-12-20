@@ -57,7 +57,7 @@ export interface AchievementData {
 
 export interface BakeryUpgradeData {
   id: string;
-  upgrades: "hourly" | "bake";
+  upgrades: "hourly" | "bake" | "maxafk";
   name: string;
   emoji: string;
   value: number;
