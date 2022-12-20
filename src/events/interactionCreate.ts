@@ -439,7 +439,11 @@ export default async function interactionCreate(interaction: Interaction) {
 
       return interaction.reply({ embeds: [embed] });
     } else if (interaction.customId === "bake") {
-      return runCommand("bake", interaction as unknown as NypsiCommandInteraction, []);
+      const int = interaction as unknown as NypsiCommandInteraction;
+
+      int.author = interaction.user;
+
+      return runCommand("bake", interaction as unknown as NypsiCommandInteraction, ["bake"]);
     } else {
       const reactionRoles = await getReactionRolesByGuild(interaction.guild);
 
