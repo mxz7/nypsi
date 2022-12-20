@@ -114,6 +114,7 @@ export async function runBakery(member: GuildMember) {
   let diffHours = diffMs / 3.6e6;
 
   if (diffHours > maxAfkHours) diffHours = maxAfkHours;
+  if (diffHours < 0) diffHours = 0;
 
   const earned = new Map<string, number>();
 
