@@ -3,19 +3,32 @@ import redis from "../../init/redis";
 import { ErrorEmbed } from "../../models/EmbedBuilders";
 import { getBoosters } from "../functions/economy/boosters";
 import { getItems } from "../functions/economy/utils";
-import { getPrefix } from "../functions/guilds/utils";
 import { getTier, isPremium } from "../functions/premium/premium";
 
-export async function onCooldown(cmd: string, member: GuildMember): Promise<boolean> {
-  const key = `cd:${cmd}:${member.user.id}`;
+export async function onCooldown(cmd: string, member: GuildMember | string): Promise<boolean> {
+  let id: string;
+  if (member instanceof GuildMember) {
+    id = member.user.id;
+  } else {
+    id = member;
+  }
+
+  const key = `cd:${cmd}:${id}`;
 
   const res = await redis.exists(key);
 
   return res == 1 ? true : false;
 }
 
-export async function addCooldown(cmd: string, member: GuildMember, seconds?: number) {
-  const key = `cd:${cmd}:${member.user.id}`;
+export async function addCooldown(cmd: string, member: GuildMember | string, seconds?: number) {
+  let id: string;
+  if (member instanceof GuildMember) {
+    id = member.user.id;
+  } else {
+    id = member;
+  }
+
+  const key = `cd:${cmd}:${id}`;
 
   let expireDisabled = false;
 
@@ -77,8 +90,15 @@ export async function getRemaining(cmd: string, member: GuildMember) {
   return remaining;
 }
 
-export async function getResponse(cmd: string, member: GuildMember): Promise<ErrorEmbed> {
-  const key = `cd:${cmd}:${member.user.id}`;
+export async function getResponse(cmd: string, member: GuildMember | string): Promise<ErrorEmbed> {
+  let id: string;
+  if (member instanceof GuildMember) {
+    id = member.user.id;
+  } else {
+    id = member;
+  }
+
+  const key = `cd:${cmd}:${id}`;
   const cd: CooldownData = JSON.parse(await redis.get(key));
 
   if (!cd) {
@@ -112,13 +132,13 @@ export async function getResponse(cmd: string, member: GuildMember): Promise<Err
   const random = Math.floor(Math.random() * 50);
 
   if (random == 7 && !(await isPremium(member))) {
-    embed.setFooter({ text: `premium members get 50% shorter cooldowns (${await getPrefix(member.guild)}donate)` });
+    embed.setFooter({ text: "premium members get 50% shorter cooldowns (/premium)" });
   }
 
   return embed;
 }
 
-async function calculateCooldownLength(seconds: number, member: GuildMember): Promise<number> {
+async function calculateCooldownLength(seconds: number, member: GuildMember | string): Promise<number> {
   if (await isPremium(member)) {
     if ((await getTier(member)) == 4) {
       seconds = seconds * 0.25;
