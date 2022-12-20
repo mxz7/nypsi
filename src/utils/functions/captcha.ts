@@ -78,7 +78,7 @@ export async function failedCaptcha(member: GuildMember) {
   await hook.send(
     `[${getTimestamp()}] **${member.user.tag}** (${member.user.id}) has failed a captcha (${captchaFails.get(
       member.user.id
-    )})${captchaFails.get(member.user.id) % 15 === 0 ? " <@747059949770768475> <@672793821850894347>" : ""}`
+    )})${captchaFails.get(member.user.id) % 15 === 0 ? " <@&747059949770768475> <@672793821850894347>" : ""}`
   );
 }
 
