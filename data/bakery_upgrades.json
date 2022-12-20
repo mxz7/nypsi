@@ -1,0 +1,9 @@
+{
+  "grandma": {
+    "id": "grandma",
+    "name": "grandma",
+    "emoji": "👵🏻",
+    "upgrades": "hourly",
+    "value": 0.5
+  }
+}
