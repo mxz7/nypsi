@@ -12,10 +12,18 @@ import { readdir } from "fs/promises";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { ItemUse } from "../models/ItemUse";
+import { addBakeryUpgrade, getBakeryUpgrades } from "../utils/functions/economy/bakery";
 import { addBooster, getBoosters } from "../utils/functions/economy/boosters";
 import { getInventory, selectItem, setInventoryItem } from "../utils/functions/economy/inventory";
 import { addItemUse } from "../utils/functions/economy/stats";
-import { createUser, getBaseUpgrades, getBaseWorkers, getItems, userExists } from "../utils/functions/economy/utils";
+import {
+  createUser,
+  getBakeryUpgradesData,
+  getBaseUpgrades,
+  getBaseWorkers,
+  getItems,
+  userExists,
+} from "../utils/functions/economy/utils";
 import { addWorkerUpgrade, getWorkers } from "../utils/functions/economy/workers";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import PageManager from "../utils/functions/page";
@@ -283,10 +291,34 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         ).setHeader("use", message.author.avatarURL()),
       ],
     });
-  }
-
-  if (selected.role == "crate") {
+  } else if (selected.role == "crate") {
     return itemFunctions.get("crates").run(message, args);
+  } else if (selected.role === "bakery-upgrade") {
+    await Promise.all([
+      setInventoryItem(message.member, selected.id, inventory.find((i) => i.item == selected.id).amount - 1, false),
+      addBakeryUpgrade(message.member, selected.id),
+    ]);
+
+    const upgrades = await getBakeryUpgrades(message.member);
+
+    const embed = new CustomEmbed(
+      message.member,
+      `you have activated the ${items[selected.id].emoji} ${items[selected.id].name} upgrade on your bakery`
+    ).setHeader("use", message.author.avatarURL());
+
+    embed.addField(
+      "upgrades",
+      upgrades
+        .map(
+          (u) =>
+            `\`${u.amount.toLocaleString()}x\` ${getBakeryUpgradesData()[u.upgradeId].emoji} ${
+              getBakeryUpgradesData()[u.upgradeId].name
+            }`
+        )
+        .join("\n")
+    );
+
+    return send({ embeds: [embed] });
   } else {
     if (itemFunctions.has(selected.id)) {
       await addItemUse(message.member, selected.id);
