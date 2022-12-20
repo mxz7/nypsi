@@ -442,7 +442,7 @@ export default async function interactionCreate(interaction: Interaction) {
       const int = interaction as unknown as NypsiCommandInteraction;
 
       int.author = interaction.user;
-      int.content = "bake";
+      int.commandName = "bake";
 
       setTimeout(() => {
         if (interaction.isRepliable()) {
