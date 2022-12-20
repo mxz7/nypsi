@@ -1,3 +1,4 @@
+import { exec } from "child_process";
 import { GuildMember } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import * as fs from "fs";
@@ -388,9 +389,7 @@ export async function deleteUser(member: GuildMember | string) {
     id = member;
   }
 
-  await redis.del(`${Constants.redis.cache.economy.NETWORTH}:${id}`);
-  await redis.del(`${Constants.redis.cache.economy.INVENTORY}:${id}`);
-  await redis.del(`${Constants.redis.cache.economy.PRESTIGE}:${id}`);
+  exec(`redis-cli KEYS "*:${id}:*" | xargs redis-cli DEL`);
 
   const guild = await getGuildByUser(member);
 
@@ -422,15 +421,6 @@ export async function deleteUser(member: GuildMember | string) {
       userId: id,
     },
   });
-
-  await redis.del(`${Constants.redis.cache.economy.EXISTS}:${id}`);
-  await redis.del(`${Constants.redis.cache.economy.BANNED}:${id}`);
-  await redis.del(`${Constants.redis.cache.economy.PRESTIGE}:${id}`);
-  await redis.del(`${Constants.redis.cache.economy.EXISTS}:${id}`);
-  await redis.del(`${Constants.redis.cache.economy.XP}:${id}`);
-  await redis.del(`${Constants.redis.cache.economy.BALANCE}:${id}`);
-  await redis.del(`${Constants.redis.cache.economy.BOOSTERS}:${id}`);
-  await redis.del(`${Constants.redis.cache.economy.GUILD_USER}:${id}`);
 }
 
 export async function getTickets(member: GuildMember | string) {
