@@ -105,31 +105,34 @@ export async function runBakery(member: GuildMember) {
   const upgrades = await getBakeryUpgrades(member);
   const maxAfkHours = await getMaxAfkHours(member);
 
-  await prisma.economy.update({
-    where: {
-      userId: member.user.id,
-    },
-    data: {
-      lastBake: new Date(),
-    },
-  });
-
   let passive = 0;
   let click = 1;
 
   const diffMs = Date.now() - lastBaked.getTime();
 
-  let diffHours = diffMs * 3.6e6;
+  let diffHours = diffMs / 3.6e6;
 
   if (diffHours > maxAfkHours) diffHours = maxAfkHours;
 
   for (const upgrade of upgrades) {
     if (getBakeryUpgradesData()[upgrade.upgradeId].upgrades === "hourly") {
       const amount = Math.round(upgrade.amount * getBakeryUpgradesData()[upgrade.upgradeId].value * diffHours);
+
       passive += amount;
     } else {
       click += upgrade.amount * getBakeryUpgradesData()[upgrade.upgradeId].value;
     }
+  }
+
+  if (passive > 0) {
+    await prisma.economy.update({
+      where: {
+        userId: member.user.id,
+      },
+      data: {
+        lastBake: new Date(),
+      },
+    });
   }
 
   await addInventoryItem(member, "cookie", click + passive);
