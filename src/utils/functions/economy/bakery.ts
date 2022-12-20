@@ -177,7 +177,7 @@ export async function runBakery(member: GuildMember) {
   );
 
   if (breakdownDesc.length > 0) {
-    embed.addField("breakdown", breakdownDesc.join("\n"));
+    embed.addField("stats", breakdownDesc.join("\n"));
   }
 
   addProgress(member.user.id, "baker", Math.round(chosenAmount + passive));
