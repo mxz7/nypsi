@@ -1,4 +1,5 @@
 import { BakeryUpgrade } from "@prisma/client";
+import { randomInt } from "crypto";
 import { GuildMember } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
@@ -107,7 +108,11 @@ export async function runBakery(member: GuildMember) {
   const maxAfkHours = await getMaxAfkHours(member);
 
   let passive = 0;
-  let click = 1;
+  const click = [1, 3];
+
+  if (await isPremium(member)) {
+    click[1] += await getTier(member);
+  }
 
   const diffMs = Date.now() - lastBaked.getTime();
 
@@ -128,7 +133,8 @@ export async function runBakery(member: GuildMember) {
         earned.set(upgrade.upgradeId, amount);
       }
     } else {
-      click += upgrade.amount * getBakeryUpgradesData()[upgrade.upgradeId].value;
+      click[0] += upgrade.amount * getBakeryUpgradesData()[upgrade.upgradeId].value;
+      click[1] += upgrade.amount * getBakeryUpgradesData()[upgrade.upgradeId].value;
     }
   }
 
@@ -143,7 +149,9 @@ export async function runBakery(member: GuildMember) {
     });
   }
 
-  await addInventoryItem(member, "cookie", click + passive);
+  const chosenAmount = randomInt(click[0], click[1] + 1);
+
+  await addInventoryItem(member, "cookie", chosenAmount + passive);
 
   const embed = new CustomEmbed(member).setHeader(`${member.user.username}'s bakery`, member.user.avatarURL());
 
@@ -159,13 +167,15 @@ export async function runBakery(member: GuildMember) {
     );
   }
 
-  embed.setDescription(`you baked **${(click + passive).toLocaleString()}** cookie${click + passive > 1 ? "s" : ""}!! 🍪`);
+  embed.setDescription(
+    `you baked **${(chosenAmount + passive).toLocaleString()}** cookie${chosenAmount + passive > 1 ? "s" : ""}!! 🍪`
+  );
 
   if (breakdownDesc.length > 0) {
     embed.addField("breakdown", breakdownDesc.join("\n"));
   }
 
-  addProgress(member.user.id, "baker", Math.round(click + passive));
+  addProgress(member.user.id, "baker", Math.round(chosenAmount + passive));
 
   return embed;
 }
