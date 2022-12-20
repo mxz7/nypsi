@@ -9,6 +9,7 @@ import { getTier, isPremium } from "../premium/premium";
 import { addProgress } from "./achievements";
 import { addInventoryItem } from "./inventory";
 import { getBakeryUpgradesData } from "./utils";
+import ms = require("ms");
 
 export async function getLastBake(member: GuildMember | string) {
   let id: string;
@@ -75,6 +76,9 @@ export async function getBakeryUpgrades(member: GuildMember | string) {
       userId: id,
     },
   });
+
+  await redis.set(`${Constants.redis.cache.economy.BAKERY_UPGRADES}:${id}`, JSON.stringify(query));
+  await redis.expire(`${Constants.redis.cache.economy.BAKERY_UPGRADES}:${id}`, Math.floor(ms("1 hour") / 1000));
 
   return query;
 }
