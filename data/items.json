@@ -1111,6 +1111,7 @@
     "rarity": 1,
     "buy": 0,
     "sell": 75000,
+    "aliases": ["xp"],
     "role": "booster",
     "stackable": true,
     "max": 3,
