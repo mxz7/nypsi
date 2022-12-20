@@ -44,13 +44,7 @@ cmd.slashData
   .addStringOption((option) =>
     option.setName("item").setDescription("the item you want to use").setRequired(true).setAutocomplete(true)
   )
-  .addIntegerOption((option) =>
-    option
-      .setName("amount")
-      .setDescription("amount of item you want to use (only applicable to boosters)")
-      .setMinValue(0)
-      .setMaxValue(7)
-  )
+  .addStringOption((option) => option.setName("amount").setDescription("amount of item you want to use"))
   .addUserOption((option) => option.setName("member").setDescription("member to use your item on, if applicable"));
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {

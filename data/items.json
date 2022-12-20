@@ -696,26 +696,6 @@
     "aliases": ["child", "children"],
     "in_crates": true
   },
-  "match_attax": {
-    "id": "match_attax",
-    "name": "2010 match attax pelé 100 club",
-    "emoji": "🃏",
-    "longDesc": "rarest match attax card",
-    "rarity": 4,
-    "role": "collectable",
-    "aliases": ["pele"],
-    "in_crates": true
-  },
-  "pokemon_card": {
-    "id": "pokemon_card",
-    "name": "pikachu illustrator",
-    "emoji": "🃏",
-    "longDesc": "rarest pokemon card",
-    "rarity": 3,
-    "role": "collectable",
-    "aliases": ["pokemon", "pikachu", "illustrator"],
-    "in_crates": true
-  },
   "skyline_r34": {
     "id": "skyline_r34",
     "name": "nissan skyline gtr r34",
@@ -1073,6 +1053,7 @@
     "rarity": 1,
     "buy": 0,
     "sell": 75000,
+    "aliases": ["xp"],
     "role": "booster",
     "stackable": true,
     "max": 3,
