@@ -152,7 +152,7 @@ export async function runBakery(member: GuildMember) {
   }
 
   embed.setDescription(
-    `you baked **${(click + passive).toLocaleString()} cookie${click + passive > 1 ? "s" : ""}!${
+    `you baked **${(click + passive).toLocaleString()}** cookie${click + passive > 1 ? "s" : ""}!${
       breakdownDesc.length > 0 ? `\n\n${breakdownDesc.join("\n")}` : ""
     }`
   );
