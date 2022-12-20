@@ -324,7 +324,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             "**/reactionroles addrole <message id> <role> <label|emoji>** *add a role to a reaction role*\n" +
             "**/reactionroles send <message id>** *resend the reaction roles message*\n" +
             "**/reactionroles update <message id> <setting> <newvalue>** *update a setting for reaction roles*\n" +
-            "**/reactionroles delete <message id>** *delete a reaction role**\n" +
+            "**/reactionroles delete <message id>** *delete a reaction role*\n" +
             "**/reactionroles removerole <message id> <role>** *remove a role from a reaction role*\n" +
             "**/reactionroles whilist add <message id> <role id>** *only allow members of this role to access*\n" +
             "**/reactionroles whitelist remove <message id> <role id>** *unwhitelist a role*\n" +
