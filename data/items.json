@@ -1256,14 +1256,7 @@
     "longDesc": "grandma will help you bake more cookies (stacks to 5)",
     "rarity": 1,
     "sell": 100000,
-    "role": "booster",
-    "stackable": true,
-    "max": 5,
-    "boosterEffect": {
-      "boosts": ["cookie"],
-      "effect": 2,
-      "time": 7200
-    },
+    "role": "bakery-upgrade",
     "in_crates": true
   },
   "highroller": {
