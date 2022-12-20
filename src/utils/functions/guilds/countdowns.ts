@@ -106,60 +106,6 @@ export function runCountdowns(client: NypsiClient) {
         logger.warn(`failed to send custom countdown (${countdown.id}) in ${countdown.guildId}`);
       }
     }
-
-    for (const guildId of client.guilds.cache.keys()) {
-      const guild = await client.guilds.fetch(guildId);
-
-      if (!guild) continue;
-
-      const query = await prisma.guildCountdown.findMany({
-        where: {
-          guildId: guildId,
-        },
-      });
-
-      if (!query) continue;
-
-      for (const countdown of query) {
-        const days = daysUntil(new Date(countdown.date)) + 1;
-
-        let message;
-
-        if (days == 0) {
-          message = countdown.finalFormat;
-        } else {
-          message = countdown.format.split("%days%").join(days.toLocaleString());
-        }
-
-        const embed = new CustomEmbed();
-
-        embed.setDescription(message);
-        embed.setColor(Constants.TRANSPARENT_EMBED_COLOR);
-        embed.disableFooter();
-
-        const channel = guild.channels.cache.find((ch) => ch.id == countdown.channel);
-
-        if (!channel) continue;
-
-        if (!channel.isTextBased()) continue;
-
-        await channel
-          .send({ embeds: [embed] })
-          .then(() => {
-            logger.log({
-              level: "auto",
-              message: `sent custom countdown (${countdown.id}) in ${guild.name} (${guildId})`,
-            });
-          })
-          .catch(() => {
-            logger.error(`error sending custom countdown (${countdown.id}) ${guild.name} (${guildId})`);
-          });
-
-        if (days <= 0) {
-          await deleteCountdown(guildId, countdown.id);
-        }
-      }
-    }
   };
 
   setTimeout(async () => {
