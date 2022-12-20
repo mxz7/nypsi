@@ -93,7 +93,7 @@ export async function fetchGame(id: string) {
   });
 }
 
-export async function addItemUse(member: GuildMember, item: string, amount = 1) {
+export async function addItemUse(member: GuildMember | string, item: string, amount = 1) {
   let id: string;
   if (member instanceof GuildMember) {
     id = member.user.id;

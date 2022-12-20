@@ -1,6 +1,8 @@
 import {
   ActionRowBuilder,
   ApplicationCommandOptionType,
+  ButtonBuilder,
+  ButtonStyle,
   Collection,
   CommandInteraction,
   CommandInteractionOption,
@@ -9,29 +11,34 @@ import {
   GuildMember,
   Interaction,
   InteractionType,
+  MessageActionRowComponentBuilder,
   ModalBuilder,
   Role,
   TextInputBuilder,
   TextInputStyle,
 } from "discord.js";
+import { inPlaceSort } from "fast-sort";
 import prisma from "../init/database";
 import { NypsiClient } from "../models/Client";
 import { createNypsiInteraction, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
-import { addInventoryItem, getInventory } from "../utils/functions/economy/inventory";
+import { addInventoryItem, getInventory, openCrate } from "../utils/functions/economy/inventory";
+import { getPrestige } from "../utils/functions/economy/prestige";
 import { createUser, getAchievements, getItems, isEcoBanned, userExists } from "../utils/functions/economy/utils";
 import { claimFromWorkers } from "../utils/functions/economy/workers";
 import { getReactionRolesByGuild } from "../utils/functions/guilds/reactionroles";
 import { getKarma } from "../utils/functions/karma/karma";
 import { getKarmaShopItems, isKarmaShopOpen } from "../utils/functions/karma/karmashop";
+import PageManager from "../utils/functions/page";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import requestDM from "../utils/functions/requestdm";
 import { addToNypsiBank, getTax } from "../utils/functions/tax";
 import { isUserBlacklisted } from "../utils/functions/users/blacklist";
 import { getDmSettings } from "../utils/functions/users/notifications";
 import { runCommand } from "../utils/handlers/commandhandler";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger, payment } from "../utils/logger";
 
 export default async function interactionCreate(interaction: Interaction) {
@@ -426,6 +433,94 @@ export default async function interactionCreate(interaction: Interaction) {
       } else {
         await interaction.reply({ embeds: [new ErrorEmbed("invalid auction")], ephemeral: true });
         await interaction.message.delete();
+      }
+    } else if (interaction.customId === "vote-crates") {
+      if (await onCooldown("use", interaction.user.id)) {
+        const embed = await getResponse("use", interaction.user.id);
+
+        return interaction.reply({ embeds: [embed] });
+      }
+
+      await addCooldown("use", interaction.user.id, 7);
+
+      const inventory = await getInventory(interaction.user.id, false);
+
+      let crateAmount = Math.floor((await getPrestige(interaction.user.id)) / 1.2 + 1);
+
+      if (crateAmount > 6) crateAmount = 6;
+
+      if (
+        !inventory.find((i) => i.item === "vote_crate") ||
+        inventory.find((i) => i.item === "vote_crate")?.amount < crateAmount
+      ) {
+        return interaction.reply({ embeds: [new ErrorEmbed(`you do not have ${crateAmount} vote crates`)] });
+      }
+
+      await interaction.deferReply();
+
+      const embed = new CustomEmbed().setHeader(
+        `${interaction.user.username}'s ${crateAmount} vote crate${crateAmount > 1 ? "s" : ""}`,
+        interaction.user.avatarURL()
+      );
+
+      const foundItems = new Map<string, number>();
+
+      for (let i = 0; i < crateAmount; i++) {
+        const found = await openCrate(interaction.user.id, getItems()["vote_crate"]);
+
+        for (const [key, value] of found.entries()) {
+          if (foundItems.has(key)) {
+            foundItems.set(key, foundItems.get(key) + value);
+          } else {
+            foundItems.set(key, value);
+          }
+        }
+      }
+
+      const desc: string[] = [];
+
+      desc.push("you found: ");
+
+      if (foundItems.has("money")) {
+        desc.push(`- $${foundItems.get("money").toLocaleString()}`);
+        foundItems.delete("money");
+      }
+
+      if (foundItems.has("xp")) {
+        embed.setFooter({ text: `+${foundItems.get("xp").toLocaleString()}xp` });
+        foundItems.delete("xp");
+      }
+
+      for (const [item, amount] of inPlaceSort(Array.from(foundItems.entries())).desc([
+        (i) => getItems()[i[0]].rarity,
+        (i) => i[1],
+      ])) {
+        desc.push(`- \`${amount}x\` ${getItems()[item].emoji} ${getItems()[item].name}`);
+      }
+
+      const pages = PageManager.createPages(desc, 15);
+
+      embed.setDescription(pages.get(1).join("\n"));
+
+      if (pages.size === 1) {
+        return interaction.editReply({ embeds: [embed] });
+      } else {
+        const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+          new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
+          new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
+        );
+
+        const msg = await interaction.editReply({ embeds: [embed], components: [row] });
+
+        const manager = new PageManager({
+          embed,
+          message: msg,
+          row,
+          userId: interaction.user.id,
+          pages,
+        });
+
+        return manager.listen();
       }
     } else if (interaction.customId == "w-claim") {
       if (await isEcoBanned(interaction.user.id)) return;
