@@ -8,7 +8,7 @@ import { CustomEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
 import { getTier, isPremium } from "../premium/premium";
 import { addProgress } from "./achievements";
-import { addInventoryItem } from "./inventory";
+import { addInventoryItem, getInventory } from "./inventory";
 import { getBakeryUpgradesData } from "./utils";
 import ms = require("ms");
 
@@ -106,6 +106,7 @@ export async function runBakery(member: GuildMember) {
   const lastBaked = await getLastBake(member);
   const upgrades = await getBakeryUpgrades(member);
   const maxAfkHours = await getMaxAfkHours(member);
+  const inventory = await getInventory(member);
 
   let passive = 0;
   const click = [1, 3];
@@ -113,6 +114,10 @@ export async function runBakery(member: GuildMember) {
   if (await isPremium(member)) {
     click[1] += await getTier(member);
   }
+
+  if (inventory.find((i) => i.item === "blue_gem")?.amount > 0) click[1] += Math.floor(Math.random() * 3);
+  if (inventory.find((i) => i.item === "white_gem")?.amount > 0) click[1] += Math.floor(Math.random() * 3);
+  if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0) click[1] += Math.floor(Math.random() * 5);
 
   const diffMs = Date.now() - lastBaked.getTime();
 
