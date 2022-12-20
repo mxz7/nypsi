@@ -444,6 +444,12 @@ export default async function interactionCreate(interaction: Interaction) {
       int.author = interaction.user;
       int.content = "bake";
 
+      setTimeout(() => {
+        if (interaction.isRepliable()) {
+          interaction.deferReply().catch(() => {});
+        }
+      }, 2500);
+
       return runCommand("bake", interaction as unknown as NypsiCommandInteraction, []);
     } else {
       const reactionRoles = await getReactionRolesByGuild(interaction.guild);

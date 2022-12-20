@@ -28,7 +28,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   doBake(message);
 }
 
-async function doBake(message: Message | (NypsiCommandInteraction & CommandInteraction) | ButtonInteraction, msg?: Message) {
+async function doBake(message: Message | (NypsiCommandInteraction & CommandInteraction) | ButtonInteraction) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       if (message.deferred) {
@@ -95,11 +95,7 @@ async function doBake(message: Message | (NypsiCommandInteraction & CommandInter
     new ButtonBuilder().setCustomId("bake").setLabel("bake").setStyle(ButtonStyle.Success)
   );
 
-  if (msg && msg.embeds[0].author.name.startsWith(member.user.username)) {
-    return msg.edit({ embeds: [response] });
-  } else {
-    return send({ embeds: [response], components: [row] });
-  }
+  return send({ embeds: [response], components: [row] });
 }
 
 cmd.setRun(run);
