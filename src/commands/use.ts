@@ -106,9 +106,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   let cooldownLength = 10;
 
-  if (selected.role == "crate") {
-    cooldownLength = 5;
-  } else if (selected.role == "booster") {
+  if (selected.role == "booster") {
     cooldownLength = 5;
   }
 
@@ -156,7 +154,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embeds: [new ErrorEmbed(`**${selected.name}** can only be stacked ${selected.max} times`)],
       });
 
-    if (inventory.find((i) => i.item == selected.id)?.amount < amount)
+    if (!inventory.find((i) => i.item === selected.id) || inventory.find((i) => i.item == selected.id)?.amount < amount)
       return send({ embeds: [new ErrorEmbed(`you don't have ${amount}x ${selected.name}`)] });
 
     for (let i = 0; i < amount; i++) {
