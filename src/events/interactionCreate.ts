@@ -447,7 +447,7 @@ export default async function interactionCreate(interaction: Interaction) {
 
       let crateAmount = Math.floor((await getPrestige(interaction.user.id)) / 1.2 + 1);
 
-      if (crateAmount > 6) crateAmount = 6;
+      if (crateAmount > 5) crateAmount = 5;
 
       if (
         !inventory.find((i) => i.item === "vote_crate") ||
