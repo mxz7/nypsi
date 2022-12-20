@@ -6,6 +6,7 @@ import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
 import { getTier, isPremium } from "../premium/premium";
+import { addProgress } from "./achievements";
 import { addInventoryItem } from "./inventory";
 import { getBakeryUpgradesData } from "./utils";
 
@@ -155,6 +156,8 @@ export async function runBakery(member: GuildMember) {
       breakdownDesc.length > 0 ? `\n\n${breakdownDesc.join("\n")}` : ""
     }`
   );
+
+  addProgress(member.user.id, "baker", Math.round(click + passive));
 
   return embed;
 }
