@@ -1,3 +1,4 @@
+import { exec } from "child_process";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -168,6 +169,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         id: message.author.id,
       },
     });
+
+    exec(`redis-cli KEYS "*:${message.author.id}:*" | xargs redis-cli DEL`);
 
     logger.info(`data deleted for ${message.author.id}`);
 

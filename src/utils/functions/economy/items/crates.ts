@@ -59,7 +59,7 @@ module.exports = new ItemUse(
       amount = parseInt(args[1]);
     }
 
-    let max = 5;
+    let max = 10;
 
     if (await isPremium(message.member)) {
       max = 20;
@@ -69,6 +69,9 @@ module.exports = new ItemUse(
     }
 
     if (amount > max) amount = max;
+
+    if (amount > (inventory.find((i) => i.item === selected.id)?.amount || 0))
+      return send({ embeds: [new ErrorEmbed(`you don't have ${amount} ${selected.name}`)] });
 
     const embed = new CustomEmbed(
       message.member,
