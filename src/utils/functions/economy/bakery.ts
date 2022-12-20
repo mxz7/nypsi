@@ -1,5 +1,6 @@
 import { BakeryUpgrade } from "@prisma/client";
 import { GuildMember } from "discord.js";
+import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
@@ -114,11 +115,17 @@ export async function runBakery(member: GuildMember) {
 
   if (diffHours > maxAfkHours) diffHours = maxAfkHours;
 
+  const earned = new Map<string, number>();
+
   for (const upgrade of upgrades) {
     if (getBakeryUpgradesData()[upgrade.upgradeId].upgrades === "hourly") {
       const amount = Math.round(upgrade.amount * getBakeryUpgradesData()[upgrade.upgradeId].value * diffHours);
 
       passive += amount;
+
+      if (amount > 0) {
+        earned.set(upgrade.upgradeId, amount);
+      }
     } else {
       click += upgrade.amount * getBakeryUpgradesData()[upgrade.upgradeId].value;
     }
@@ -139,7 +146,23 @@ export async function runBakery(member: GuildMember) {
 
   const embed = new CustomEmbed(member).setHeader(`${member.user.username}'s bakery`, member.user.avatarURL());
 
-  embed.setDescription(`you baked **${(click + passive).toLocaleString()}** cookie${click + passive > 1 ? "s" : ""}!! 🍪`);
+  const earnedIds = Array.from(earned.keys());
+  inPlaceSort(earnedIds).desc((i) => earned.get(i));
+  const breakdownDesc: string[] = [];
+
+  for (const upgradeId of earnedIds) {
+    breakdownDesc.push(
+      `${getBakeryUpgradesData()[upgradeId].emoji} ${getBakeryUpgradesData()[upgradeId].name}: ${earned.get(
+        earnedIds.toLocaleString()
+      )}`
+    );
+  }
+
+  embed.setDescription(
+    `you baked **${(click + passive).toLocaleString()}** cookie${click + passive > 1 ? "s" : ""}!! 🍪${
+      breakdownDesc.length > 0 ? `\n\n${breakdownDesc.join("\n")}` : ""
+    }`
+  );
 
   addProgress(member.user.id, "baker", Math.round(click + passive));
 
