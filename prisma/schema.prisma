@@ -107,6 +107,17 @@ model Economy {
   Crafting      Crafting[]
   Game          Game[]
   ItemUse       ItemUse[]
+  BakeryUpgrade BakeryUpgrade[]
+}
+
+model BakeryUpgrade {
+  userId    String
+  upgradeId String
+  amount    Int
+
+  economy Economy @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@id([userId, upgradeId])
 }
 
 model Crafting {
