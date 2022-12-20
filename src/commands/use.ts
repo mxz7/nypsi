@@ -106,9 +106,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   let cooldownLength = 10;
 
-  if (selected.role == "crate") {
-    cooldownLength = 5;
-  } else if (selected.role == "booster") {
+  if (selected.role == "booster") {
     cooldownLength = 5;
   }
 
