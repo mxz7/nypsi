@@ -152,17 +152,17 @@ export async function runBakery(member: GuildMember) {
 
   for (const upgradeId of earnedIds) {
     breakdownDesc.push(
-      `${getBakeryUpgradesData()[upgradeId].emoji} ${getBakeryUpgradesData()[upgradeId].name}: ${earned.get(
-        earnedIds.toLocaleString()
-      )}`
+      `${getBakeryUpgradesData()[upgradeId].emoji} ${getBakeryUpgradesData()[upgradeId].name} baked ${earned
+        .get(upgradeId)
+        .toLocaleString()} cookie${earned.get(upgradeId) > 1 ? "s" : ""}`
     );
   }
 
-  embed.setDescription(
-    `you baked **${(click + passive).toLocaleString()}** cookie${click + passive > 1 ? "s" : ""}!! 🍪${
-      breakdownDesc.length > 0 ? `\n\n${breakdownDesc.join("\n")}` : ""
-    }`
-  );
+  embed.setDescription(`you baked **${(click + passive).toLocaleString()}** cookie${click + passive > 1 ? "s" : ""}!! 🍪`);
+
+  if (breakdownDesc.length > 0) {
+    embed.addField("breakdown", breakdownDesc.join("\n"));
+  }
 
   addProgress(member.user.id, "baker", Math.round(click + passive));
 
