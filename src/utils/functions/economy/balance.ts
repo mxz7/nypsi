@@ -161,7 +161,7 @@ export async function getMulti(member: GuildMember | string): Promise<number> {
     if (chance < 2) {
       multi -= Math.floor(Math.random() * 6) + 1;
     } else {
-      gemBreak(id, 0.01, "white_gem");
+      gemBreak(id, 0.007, "white_gem");
       const choices = [7, 3, 4, 5, 7, 2, 17, 7, 4, 5, 3, 3, 3, 3, 4];
       multi += Math.floor(Math.random() * choices[Math.floor(Math.random() * choices.length)]) + 1;
     }
@@ -171,7 +171,7 @@ export async function getMulti(member: GuildMember | string): Promise<number> {
     if (chance < 2) {
       multi -= 3;
     } else {
-      gemBreak(id, 0.07, "pink_gem");
+      gemBreak(id, 0.01, "pink_gem");
       const choices = [7, 5, 4, 3, 2, 1, 3, 1, 1, 1, 3, 3];
       multi += choices[Math.floor(Math.random() * choices.length)];
     }
