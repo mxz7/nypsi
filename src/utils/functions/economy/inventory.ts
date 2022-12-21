@@ -505,7 +505,7 @@ export async function gemBreak(userId: string, chance: number, gem: string) {
   const inventory = await getInventory(userId, false);
 
   if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0) return;
-  if (!(inventory.find((i) => i.item === gem)?.amount > 0)) return;
+  if (!inventory.find((i) => i.item === gem)) return;
 
   let uniqueGemCount = 0;
 
