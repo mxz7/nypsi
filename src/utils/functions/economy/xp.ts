@@ -100,7 +100,7 @@ export async function calcEarnedXp(member: GuildMember, bet: number, multiplier:
       max += Math.floor(Math.random() * 13) + 1;
     }
   } else if (inventory.find((i) => i.item == "pink_gem")?.amount > 0) {
-    gemBreak(member.user.id, 0.01, "pink_gem");
+    gemBreak(member.user.id, 0.07, "pink_gem");
     min += 3;
   }
 
