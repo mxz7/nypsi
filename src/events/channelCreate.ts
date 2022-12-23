@@ -13,9 +13,9 @@ export default async function channelCreate(channel: GuildChannel) {
 
     embed.setHeader("channel created");
     embed.setDescription(
-      `${channel.toString()} \`${channel.id}\`\n\n**name** ${channel.name}\n**category** ${channel.parent.name}\n**type** ${
-        channel.type
-      }`
+      `${channel.toString()} \`${channel.id}\`\n\n**name** ${channel.name}\n${
+        channel.parent ? `**category** ${channel.parent.name}\n` : ""
+      }**type** ${channel.type}`
     );
 
     await addLog(channel.guild, LogType.CHANNEL, embed);
