@@ -316,8 +316,8 @@ model GuildChristmas {
 }
 
 model GuildCounter {
-  format    String          @default("members: %value%")
-  tracks    CounterTracking @default(HUMANS)
+  format    String       @default("members: %value%")
+  tracks    TrackingType @default(HUMANS)
   channel   String
   totalItem String?
 
@@ -325,7 +325,7 @@ model GuildCounter {
   guildId String @id @unique
 }
 
-enum CounterTracking {
+enum TrackingType {
   MEMBERS
   HUMANS
   BOOSTS
