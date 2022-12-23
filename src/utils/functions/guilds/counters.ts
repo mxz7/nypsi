@@ -296,15 +296,21 @@ export async function createGuildCounter(guild: Guild, mode: TrackingType, item?
 
   if (fail || !channel) return false;
 
-  const res = await prisma.guildCounter.create({
-    data: {
-      channel: channel.id,
-      format,
-      guildId: guild.id,
-      tracks: mode,
-      totalItem: item,
-    },
-  });
+  const res = await prisma.guildCounter
+    .create({
+      data: {
+        channel: channel.id,
+        format,
+        guildId: guild.id,
+        tracks: mode,
+        totalItem: item,
+      },
+    })
+    .catch(() => {
+      fail = true;
+    });
+
+  if (fail || !res) return false;
 
   await updateChannel(res, channel.client as NypsiClient);
 
