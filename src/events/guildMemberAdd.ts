@@ -66,6 +66,8 @@ export default async function guildMemberAdd(member: GuildMember) {
   const userRoles = await getPersistantRolesForUser(member.guild, member.id);
 
   if (userRoles.length > 0 && persistantRoles.length > 0) {
+    logger.info(userRoles);
+    logger.info(persistantRoles);
     for (const roleId of userRoles) {
       if (persistantRoles.includes(roleId)) {
         await member.roles.add(persistantRoles).catch(async () => {
