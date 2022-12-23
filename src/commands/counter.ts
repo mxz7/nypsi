@@ -4,6 +4,7 @@ import { Categories, Command, NypsiCommandInteraction } from "../models/Command"
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { getItems } from "../utils/functions/economy/utils";
 import { createGuildCounter, deleteGuildCounter, getGuildCounters } from "../utils/functions/guilds/counters";
+import { getTier, isPremium } from "../utils/functions/premium/premium";
 
 const cmd = new Command("counter", "create updating count channels for your server", Categories.ADMIN)
   .setAliases(["counters"])
@@ -39,7 +40,7 @@ cmd.slashData
       .addStringOption((option) =>
         option.setName("format").setDescription("format of the channel name. use %value% for the number").setMaxLength(50)
       )
-      .addStringOption((option) => option.setName("item-global").setDescription("item to show"))
+      .addStringOption((option) => option.setName("item-global").setDescription("item to show").setAutocomplete(true))
   );
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
@@ -98,7 +99,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     });
   } else if (args[0].toLowerCase() === "list") {
     const counters = await getGuildCounters(message.guild);
-    const embed = new CustomEmbed(message.member);
+    const embed = new CustomEmbed(message.member).setHeader(`counters in ${message.guild.name}`, message.guild.iconURL());
 
     if (counters.length === 0) {
       embed.setDescription("this server has no counters");
@@ -120,9 +121,27 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   } else if (args[0].toLowerCase() === "create") {
     const mode = message.options.getString("mode") as TrackingType;
     const format = message.options.getString("format");
-    const item = message.options.getString("item");
+    const item = message.options.getString("item-global");
 
-    if (mode == TrackingType.TOTAL_ITEM && !(!item && !getItems()[item])) {
+    const counters = await getGuildCounters(message.guild);
+
+    let max = 3;
+
+    if (await isPremium(message.member)) max += await getTier(message.member);
+
+    if (counters.length >= max) {
+      return send({
+        embeds: [
+          new ErrorEmbed(
+            `you have reached the limit of counters (\`${max}\`)${
+              (await getTier(message.member)) < 4 ? "\nupgrade your tier (/premium) to get more" : ""
+            }`
+          ),
+        ],
+      });
+    }
+
+    if (mode == TrackingType.TOTAL_ITEM && (!item || !getItems()[item])) {
       return send({
         embeds: [
           new ErrorEmbed("since you have chosen the mode as total item, you must choose a valid item to show the total of"),
@@ -134,9 +153,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (!res)
       return send({
-        embeds: [
-          new ErrorEmbed("failed to create counter\n\nnote: you cannot have two of the same counters in the same server"),
-        ],
+        embeds: [new ErrorEmbed("failed to create counter")],
       });
 
     return send({ embeds: [new CustomEmbed(message.member, "✅ successfully created counter.")] });
