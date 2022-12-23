@@ -192,6 +192,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return send({ embeds: [new ErrorEmbed("invalid role")] });
     }
 
+    let highest = 0;
+
+    message.member.roles.cache.forEach((r) => {
+      if (highest < r.position) highest = r.position;
+    });
+
+    if (highest < role.position)
+      return send({ embeds: [new ErrorEmbed(`you do not have permission to modify ${role.toString()}`)] });
+
     if (members.length > 50) {
       const msg = await send({
         embeds: [
@@ -289,6 +298,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (!role) {
       return send({ embeds: [new ErrorEmbed("invalid role")] });
     }
+
+    let highest = 0;
+
+    message.member.roles.cache.forEach((r) => {
+      if (highest < r.position) highest = r.position;
+    });
+
+    if (highest < role.position)
+      return send({ embeds: [new ErrorEmbed(`you do not have permission to modify ${role.toString()}`)] });
 
     members = members.filter((m) => Array.from(m.roles.cache.keys()).includes(role.id));
 
