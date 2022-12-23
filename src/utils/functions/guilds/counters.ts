@@ -259,7 +259,7 @@ export async function updateChannel(data: GuildCounter, client: NypsiClient) {
   for (const r of res) {
     if (r) {
       if (r === "failed") {
-        logger.warn(`failed to upload counter ${data}`);
+        logger.warn(`failed to update counter ${JSON.stringify(data)}`);
       } else if (r === "updated") {
         logger.info({
           message: `updated counter for ${data.guildId} type: ${data.tracks}`,
