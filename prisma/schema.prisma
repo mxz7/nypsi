@@ -331,6 +331,7 @@ enum CounterTracking {
   BOOSTS
   RICHEST_MEMBER
   TOTAL_ITEM
+  TOTAL_BALANCE
 }
 
 model GuildCountdown {
