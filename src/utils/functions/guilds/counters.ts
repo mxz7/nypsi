@@ -35,10 +35,7 @@ export async function updateChannel(data: GuildCounter, client: NypsiClient) {
     logger.warn(`counter channel not found: ${JSON.stringify(data)}`);
     await prisma.guildCounter.delete({
       where: {
-        tracks_guildId: {
-          guildId: data.guildId,
-          tracks: data.tracks,
-        },
+        channel: data.channel,
       },
     });
     return;

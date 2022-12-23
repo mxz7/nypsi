@@ -323,8 +323,6 @@ model GuildCounter {
 
   guild   Guild  @relation(fields: [guildId], references: [id], onDelete: Cascade)
   guildId String
-
-  @@id([tracks, guildId])
 }
 
 enum TrackingType {
