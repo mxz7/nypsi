@@ -318,7 +318,7 @@ model GuildChristmas {
 model GuildCounter {
   format    String       @default("members: %value%")
   tracks    TrackingType @default(HUMANS)
-  channel   String
+  channel   String       @unique
   totalItem String?
 
   guild   Guild  @relation(fields: [guildId], references: [id], onDelete: Cascade)
