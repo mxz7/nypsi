@@ -88,7 +88,8 @@ model Economy {
   padlock     Boolean @default(false)
 
   lastDaily DateTime @default("1970-01-01T14:21:00+02:00")
-  lastVote  DateTime
+  lastVote  DateTime @default("1970-01-01T14:21:00+02:00")
+  lastBake  DateTime @default("1970-01-01T14:21:00+02:00")
 
   dailyStreak Int @default(0)
 
@@ -106,6 +107,17 @@ model Economy {
   Crafting      Crafting[]
   Game          Game[]
   ItemUse       ItemUse[]
+  BakeryUpgrade BakeryUpgrade[]
+}
+
+model BakeryUpgrade {
+  userId    String
+  upgradeId String
+  amount    Int
+
+  economy Economy @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@id([userId, upgradeId])
 }
 
 model Crafting {
