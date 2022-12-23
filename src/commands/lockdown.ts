@@ -19,9 +19,6 @@ const cmd = new Command(
   .setAliases(["lock", "shutup"])
   .setPermissions(["MANAGE_MESSAGES", "MANAGE_CHANNELS"]);
 
-cmd.slashEnabled = true;
-cmd.slashData.addChannelOption((option) => option.setName("channel").setDescription("channel to lock").setRequired(false));
-
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
