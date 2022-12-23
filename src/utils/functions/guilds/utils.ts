@@ -127,16 +127,6 @@ export async function createGuild(guild: Guild) {
   await redis.expire(`${Constants.redis.cache.guild.EXISTS}:${guild.id}`, 43200);
 }
 
-export async function getGuildCounter(guild: Guild) {
-  const query = await prisma.guildCounter.findUnique({
-    where: {
-      guildId: guild.id,
-    },
-  });
-
-  return query;
-}
-
 export function addCooldown(guild: Guild, seconds: number) {
   fetchCooldown.add(guild.id);
 

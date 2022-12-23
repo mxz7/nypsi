@@ -256,7 +256,7 @@ model Guild {
   persist_role     String[]
 
   GuildChristmas GuildChristmas?
-  GuildCounter   GuildCounter?
+  counters       GuildCounter[]
   GuildCountdown GuildCountdown[]
 
   ChatReaction ChatReaction?
@@ -316,13 +316,22 @@ model GuildChristmas {
 }
 
 model GuildCounter {
-  enabled    Boolean @default(false)
-  format     String  @default("members: %count% (%peak%)")
-  filterBots Boolean @default(false)
-  channel    String  @default("")
+  format    String       @default("members: %value%")
+  tracks    TrackingType @default(HUMANS)
+  channel   String       @unique
+  totalItem String?
 
   guild   Guild  @relation(fields: [guildId], references: [id], onDelete: Cascade)
-  guildId String @id @unique
+  guildId String
+}
+
+enum TrackingType {
+  MEMBERS
+  HUMANS
+  BOOSTS
+  RICHEST_MEMBER
+  TOTAL_ITEM
+  TOTAL_BALANCE
 }
 
 model GuildCountdown {
