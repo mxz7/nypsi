@@ -604,7 +604,7 @@
     "role": "booster",
     "booster_desc": "eat a cookie to get +**1**% multi for 30 seconds (stacks up to 7)",
     "buy": 0,
-    "sell": 2500,
+    "sell": 500,
     "stackable": true,
     "max": 7,
     "boosterEffect": {
@@ -1234,17 +1234,10 @@
     "plural": "grandmas",
     "aliases": ["gran", "nan", "uncle"],
     "emoji": "👵🏻",
-    "longDesc": "grandma will help you bake more cookies (stacks to 5)",
-    "rarity": 1,
+    "longDesc": "bakes 0.5 cookies per hour",
+    "rarity": 2,
     "sell": 100000,
-    "role": "booster",
-    "stackable": true,
-    "max": 5,
-    "boosterEffect": {
-      "boosts": ["cookie"],
-      "effect": 2,
-      "time": 7200
-    },
+    "role": "bakery-upgrade",
     "in_crates": true
   },
   "highroller": {
@@ -1406,5 +1399,17 @@
     },
     "in_crates": false,
     "account_locked": true
+  },
+  "cursor": {
+    "id": "cursor",
+    "name": "cursor",
+    "plural": "cursors",
+    "aliases": ["pointer"],
+    "emoji": "<:nypsi_cursor:1054771565557981244>",
+    "longDesc": "gives you an extra cookie every time you bake",
+    "rarity": 2,
+    "sell": 100000,
+    "role": "bakery-upgrade",
+    "in_crates": true
   }
 }

@@ -54,3 +54,11 @@ export interface AchievementData {
   description: string;
   prize?: string;
 }
+
+export interface BakeryUpgradeData {
+  id: string;
+  upgrades: "hourly" | "bake" | "maxafk";
+  name: string;
+  emoji: string;
+  value: number;
+}
