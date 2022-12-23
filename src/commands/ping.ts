@@ -48,6 +48,19 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     dbLatency[0] = after - now;
 
     now = Date.now();
+    await prisma.user.update({
+      where: {
+        id: "test_user",
+      },
+      data: {
+        karma: 69,
+      },
+    });
+    after = Date.now();
+
+    dbLatency[1] = after - now;
+
+    now = Date.now();
     await prisma.user.delete({
       where: {
         id: "test_user",
@@ -57,7 +70,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     pingingDb = false;
 
-    dbLatency[1] = after - now;
+    dbLatency[2] = after - now;
   }
 
   now = Date.now();
