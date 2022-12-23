@@ -324,3 +324,16 @@ export async function getGuildCounters(guild: Guild) {
     },
   });
 }
+
+export async function deleteGuildCounter(channelId: string) {
+  const res = await prisma.guildCounter
+    .delete({
+      where: {
+        channel: channelId,
+      },
+    })
+    .catch(() => {});
+
+  if (res) return true;
+  return false;
+}
