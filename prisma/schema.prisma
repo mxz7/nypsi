@@ -479,8 +479,6 @@ model Mention {
   userTag  String
   url      String   @id
   content  String
-
-  @@index([guildId], type: Hash)
 }
 
 model SupportRequest {
