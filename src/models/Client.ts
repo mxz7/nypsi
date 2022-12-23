@@ -21,6 +21,7 @@ import roleDelete from "../events/roleDelete";
 import userUpdate from "../events/userUpdate";
 import redis from "../init/redis";
 import { runAuctionChecks } from "../scheduled/clusterjobs/checkauctions";
+import { updateCounters } from "../scheduled/clusterjobs/counters";
 import { runCraftItemsJob } from "../scheduled/clusterjobs/crafted";
 import { runLotteryInterval } from "../scheduled/clusterjobs/lottery";
 import { runLogs, runModerationChecks } from "../scheduled/clusterjobs/moderationchecks";
@@ -33,7 +34,6 @@ import { doChatReactions } from "../utils/functions/chatreactions/utils";
 import { runEconomySetup } from "../utils/functions/economy/utils";
 import { runChristmas } from "../utils/functions/guilds/christmas";
 import { runCountdowns } from "../utils/functions/guilds/countdowns";
-import { updateCounters } from "../utils/functions/guilds/counters";
 import { runSnipeClearIntervals } from "../utils/functions/guilds/utils";
 import { runUploadReset } from "../utils/functions/image";
 import { startAutoMuteViolationInterval } from "../utils/functions/moderation/mute";
@@ -122,7 +122,6 @@ export class NypsiClient extends Client {
   private runIntervals() {
     updateCache();
     getWebhooks(this);
-    updateCounters(this);
     runSnipeClearIntervals();
     doChatReactions(this);
     runCommandUseTimers(this);
@@ -138,6 +137,7 @@ export class NypsiClient extends Client {
     runAuctionChecks(this);
     runCountdowns(this);
     runChristmas(this);
+    updateCounters(this);
     runLogs();
     runWorkerInterval();
     runNetWorthInterval();

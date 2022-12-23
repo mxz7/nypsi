@@ -1,114 +1,336 @@
-import { Collection, Guild, GuildMember } from "discord.js";
+import { GuildCounter, TrackingType } from "@prisma/client";
+import { ChannelType, Guild, PermissionFlagsBits } from "discord.js";
 import prisma from "../../../init/database";
 import { NypsiClient } from "../../../models/Client";
 import { logger } from "../../logger";
-import { addCooldown, getPeaks, inCooldown } from "./utils";
+import { getItems } from "../economy/utils";
 
-export async function createGuildCounter(guild: Guild) {
-  await prisma.guildCounter.create({
-    data: {
-      guildId: guild.id,
+export async function updateChannel(data: GuildCounter, client: NypsiClient) {
+  const clusterHas = await client.cluster.broadcastEval(
+    async (c, { channelId }) => {
+      const client = c as NypsiClient;
+      const channel = await client.channels.fetch(channelId).catch(() => {});
+
+      if (channel) {
+        return client.cluster.id;
+      } else {
+        return "not-found";
+      }
     },
-  });
+    {
+      context: { channelId: data.channel },
+    }
+  );
+
+  let shard: number;
+
+  for (const i of clusterHas) {
+    if (i != "not-found") {
+      shard = i;
+      break;
+    }
+  }
+
+  if (isNaN(shard)) {
+    logger.warn(`counter channel not found: ${JSON.stringify(data)}`);
+    await prisma.guildCounter.delete({
+      where: {
+        channel: data.channel,
+      },
+    });
+    return;
+  }
+
+  let value: string;
+
+  if (data.tracks === TrackingType.HUMANS) {
+    value = await client.cluster
+      .broadcastEval(
+        async (c, { channelId, shard }) => {
+          const client = c as NypsiClient;
+
+          if (client.cluster.id != shard) return;
+
+          const channel = await client.channels.fetch(channelId);
+
+          if (channel.isDMBased()) return;
+
+          if (channel.guild.memberCount != channel.guild.members.cache.size) {
+            return await channel.guild.members.fetch().then((m) => m.size.toLocaleString());
+          }
+          return channel.guild.memberCount.toLocaleString();
+        },
+        { context: { channelId: data.channel, shard } }
+      )
+      .then((res) => {
+        for (const r of res) {
+          if (r) return r;
+        }
+      });
+  } else if (data.tracks === TrackingType.MEMBERS) {
+    value = await client.cluster
+      .broadcastEval(
+        async (c, { channelId, shard }) => {
+          const client = c as NypsiClient;
+
+          if (client.cluster.id != shard) return;
+
+          const channel = await client.channels.fetch(channelId);
+
+          if (channel.isDMBased()) return;
+
+          return channel.guild.memberCount.toLocaleString();
+        },
+        { context: { channelId: data.channel, shard } }
+      )
+      .then((res) => {
+        for (const r of res) {
+          if (r) return r;
+        }
+      });
+  } else if (data.tracks === TrackingType.BOOSTS) {
+    value = await client.cluster
+      .broadcastEval(
+        async (c, { channelId, shard }) => {
+          const client = c as NypsiClient;
+
+          if (client.cluster.id != shard) return;
+
+          const channel = await client.channels.fetch(channelId);
+
+          if (channel.isDMBased()) return;
+
+          return channel.guild.premiumSubscriptionCount.toLocaleString();
+        },
+        { context: { channelId: data.channel, shard } }
+      )
+      .then((res) => {
+        for (const r of res) {
+          if (r) return r;
+        }
+      });
+  } else if (data.tracks === TrackingType.RICHEST_MEMBER) {
+    const members = await client.cluster
+      .broadcastEval(
+        async (c, { channelId, shard }) => {
+          const client = c as NypsiClient;
+
+          if (client.cluster.id != shard) return;
+
+          const channel = await client.channels.fetch(channelId);
+
+          if (channel.isDMBased()) return;
+
+          if (channel.guild.memberCount !== channel.guild.members.cache.size) {
+            return Array.from(await channel.guild.members.fetch().then((members) => members.keys()));
+          }
+          return Array.from(channel.guild.members.cache.keys());
+        },
+        { context: { channelId: data.channel, shard } }
+      )
+      .then((res) => {
+        for (const r of res) {
+          if (r) return r;
+        }
+      });
+
+    const topMember = await prisma.economy.findFirst({
+      where: {
+        userId: { in: members },
+      },
+      select: {
+        user: {
+          select: {
+            lastKnownTag: true,
+          },
+        },
+      },
+      orderBy: { money: "desc" },
+    });
+
+    value = topMember?.user?.lastKnownTag.split("#")[0] || "null";
+  } else if (data.tracks === TrackingType.TOTAL_BALANCE) {
+    const members = await client.cluster
+      .broadcastEval(
+        async (c, { channelId, shard }) => {
+          const client = c as NypsiClient;
+
+          if (client.cluster.id != shard) return;
+
+          const channel = await client.channels.fetch(channelId);
+
+          if (channel.isDMBased()) return;
+
+          if (channel.guild.memberCount !== channel.guild.members.cache.size) {
+            return Array.from(await channel.guild.members.fetch().then((members) => members.keys()));
+          }
+          return Array.from(channel.guild.members.cache.keys());
+        },
+        { context: { channelId: data.channel, shard } }
+      )
+      .then((res) => {
+        for (const r of res) {
+          if (r) return r;
+        }
+      });
+
+    const total = await prisma.economy.aggregate({
+      where: {
+        userId: { in: members },
+      },
+      _sum: {
+        money: true,
+      },
+    });
+
+    value = total._sum.money.toLocaleString();
+  } else if (data.tracks === TrackingType.TOTAL_ITEM) {
+    if (!data.totalItem || !getItems()[data.totalItem]) {
+      logger.warn(`invalid item: ${JSON.stringify(data)}`);
+      return;
+    }
+    const members = await client.cluster
+      .broadcastEval(
+        async (c, { channelId, shard }) => {
+          const client = c as NypsiClient;
+
+          if (client.cluster.id != shard) return;
+
+          const channel = await client.channels.fetch(channelId);
+
+          if (channel.isDMBased()) return;
+
+          if (channel.guild.memberCount !== channel.guild.members.cache.size) {
+            return Array.from(await channel.guild.members.fetch().then((members) => members.keys()));
+          }
+          return Array.from(channel.guild.members.cache.keys());
+        },
+        { context: { channelId: data.channel, shard } }
+      )
+      .then((res) => {
+        for (const r of res) {
+          if (r) return r;
+        }
+      });
+
+    const query = await prisma.inventory.aggregate({
+      where: {
+        AND: [{ userId: { in: members } }, { item: data.totalItem }],
+      },
+      _sum: {
+        amount: true,
+      },
+    });
+
+    value = query?._sum.amount.toLocaleString() || "0";
+  }
+
+  const format = data.format.replace("%value%", value);
+
+  if (format.length > 164) {
+    logger.warn(`channel name too long: ${JSON.stringify(data)}`);
+    return;
+  }
+
+  const res = await client.cluster.broadcastEval(
+    async (c, { shard, channelId, format }) => {
+      const client = c as NypsiClient;
+
+      if (client.cluster.id != shard) return;
+
+      const channel = await client.channels.fetch(channelId);
+
+      if (channel.isDMBased()) return;
+
+      if (channel.name == format) return "no-update";
+
+      let fail = false;
+
+      await channel.setName(format).catch(() => {
+        fail = true;
+      });
+
+      if (fail) return "failed";
+      return "updated";
+    },
+    { context: { shard, channelId: data.channel, format } }
+  );
+
+  for (const r of res) {
+    if (r) {
+      if (r === "failed") {
+        logger.warn(`failed to upload counter ${data}`);
+      } else if (r === "updated") {
+        logger.info({
+          message: `updated counter for ${data.guildId} type: ${data.tracks}`,
+          level: "success",
+        });
+      }
+    }
+  }
 }
 
-export async function setGuildCounter(guild: Guild, profile: any) {
-  await prisma.guildCounter.update({
+export async function createGuildCounter(guild: Guild, mode: TrackingType, item?: string, format?: string) {
+  let fail = false;
+
+  const everyone = guild.roles.cache.find((r) => r.name == "@everyone");
+
+  const channel = await guild.channels
+    .create({
+      name: "creating...",
+      type: ChannelType.GuildVoice,
+      permissionOverwrites: [
+        {
+          id: everyone.id,
+          deny: [PermissionFlagsBits.Connect, PermissionFlagsBits.SendMessages],
+        },
+      ],
+      reason: `creating counter with type: ${TrackingType}`,
+    })
+    .catch(() => {
+      fail = true;
+    });
+
+  if (fail || !channel) return false;
+
+  const res = await prisma.guildCounter
+    .create({
+      data: {
+        channel: channel.id,
+        format,
+        guildId: guild.id,
+        tracks: mode,
+        totalItem: item,
+      },
+    })
+    .catch(() => {
+      fail = true;
+    });
+
+  if (fail || !res) return false;
+
+  await updateChannel(res, channel.client as NypsiClient);
+
+  return true;
+}
+
+export async function getGuildCounters(guild: Guild) {
+  return await prisma.guildCounter.findMany({
     where: {
       guildId: guild.id,
     },
-    data: {
-      enabled: profile.enabled,
-      format: profile.format,
-      filterBots: profile.filterBots,
-      channel: profile.channel,
-    },
   });
 }
 
-export function updateCounters(client: NypsiClient) {
-  setInterval(async () => {
-    for (const guildId of client.guilds.cache.keys()) {
-      const guild = await client.guilds.fetch(guildId);
+export async function deleteGuildCounter(channelId: string) {
+  const res = await prisma.guildCounter
+    .delete({
+      where: {
+        channel: channelId,
+      },
+    })
+    .catch(() => {});
 
-      if (!guild) continue;
-
-      const profile = await prisma.guildCounter
-        .findMany({
-          where: {
-            AND: [
-              {
-                guildId: guildId,
-              },
-              {
-                enabled: true,
-              },
-            ],
-          },
-        })
-        .then((res) => res[0]);
-
-      if (!profile) continue;
-
-      let memberCount: number;
-
-      if (profile.filterBots && guild.memberCount >= 500) {
-        profile.filterBots = false;
-        await setGuildCounter(guild, profile);
-        memberCount = guild.memberCount;
-      } else if (profile.filterBots) {
-        let members: Collection<string, GuildMember> | void;
-
-        if (inCooldown(guild) || guild.memberCount == guild.members.cache.size) {
-          members = guild.members.cache;
-        } else {
-          members = await guild.members.fetch().catch(() => {});
-          addCooldown(guild, 3600);
-        }
-
-        if (!members) return;
-
-        if (members.size == guild.memberCount) {
-          members = members.filter((m) => !m.user.bot);
-
-          memberCount = members.size;
-        } else {
-          memberCount = guild.memberCount;
-        }
-      } else {
-        memberCount = guild.memberCount;
-      }
-
-      if (!memberCount) memberCount = guild.memberCount;
-
-      const channel = guild.channels.cache.find((c) => c.id == profile.channel);
-
-      if (!channel) {
-        continue;
-      }
-
-      let format = profile.format;
-      format = format.split("%count%").join(memberCount.toLocaleString());
-      format = format.split("%peak%").join((await getPeaks(guild)).toLocaleString());
-
-      if (channel.name != format) {
-        const old = channel.name;
-
-        await channel
-          .edit({ name: format })
-          .then(() => {
-            logger.log({
-              level: "auto",
-              message: "counter updated for '" + guild.name + "' ~ '" + old + "' -> '" + format + "'",
-            });
-          })
-          .catch(async () => {
-            logger.warn("error updating counter in " + guild.name);
-            profile.enabled = false;
-            profile.channel = "none";
-            await setGuildCounter(guild, profile);
-          });
-      }
-    }
-  }, 600000);
+  if (res) return true;
+  return false;
 }
