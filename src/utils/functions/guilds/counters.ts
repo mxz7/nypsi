@@ -151,7 +151,7 @@ export async function updateChannel(data: GuildCounter, client: NypsiClient) {
       orderBy: { money: "desc" },
     });
 
-    value = topMember?.user?.lastKnownTag || "null";
+    value = topMember?.user?.lastKnownTag.split("#")[0] || "null";
   } else if (data.tracks === TrackingType.TOTAL_BALANCE) {
     const members = await client.cluster
       .broadcastEval(
