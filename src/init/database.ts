@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { parentPort } from "worker_threads";
 import { logger } from "../utils/logger";
 
 const prisma = new PrismaClient();
@@ -10,7 +11,7 @@ prisma.$use(async (params, next) => {
 
   const timeTaken = Date.now() - before;
 
-  if (timeTaken > 50) {
+  if (timeTaken > 50 && !parentPort) {
     logger.warn(`query ${params.model}.${params.action} took ${timeTaken}ms`);
   }
 
