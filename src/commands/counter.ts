@@ -3,36 +3,44 @@ import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Messag
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { getItems } from "../utils/functions/economy/utils";
-import { createGuildCounter, getGuildCounters } from "../utils/functions/guilds/counters";
+import { createGuildCounter, deleteGuildCounter, getGuildCounters } from "../utils/functions/guilds/counters";
 
 const cmd = new Command("counter", "create updating count channels for your server", Categories.ADMIN)
   .setAliases(["counters"])
   .setPermissions(["MANAGE_SERVER"]);
 
 cmd.slashEnabled = true;
-cmd.slashData.addSubcommand((create) =>
-  create
-    .setName("create")
-    .setDescription("create a counter")
-    .addStringOption((option) =>
-      option
-        .setName("mode")
-        .setDescription("what would you like to track?")
-        .setChoices(
-          { name: "member count", value: "MEMBERS" },
-          { name: "human count", value: "HUMANS" },
-          { name: "boosts", value: "BOOSTS" },
-          { name: "richest member in server", value: "RICHEST_MEMBER" },
-          { name: "total item of server", value: "TOTAL_ITEM" },
-          { name: "total balance of server", value: "TOTAL_BALANCE" }
-        )
-        .setRequired(true)
-    )
-    .addStringOption((option) =>
-      option.setName("format").setDescription("format of the channel name. use %value% for the number").setMaxLength(50)
-    )
-    .addStringOption((option) => option.setName("item-global").setDescription("item to show"))
-);
+cmd.slashData
+  .addSubcommand((del) =>
+    del
+      .setName("delete")
+      .setDescription("delete a guild counter")
+      .addChannelOption((option) => option.setName("channel").setDescription("channel to delete").setRequired(true))
+  )
+  .addSubcommand((list) => list.setName("list").setDescription("list all active counters"))
+  .addSubcommand((create) =>
+    create
+      .setName("create")
+      .setDescription("create a counter")
+      .addStringOption((option) =>
+        option
+          .setName("mode")
+          .setDescription("what would you like to track?")
+          .setChoices(
+            { name: "member count", value: "MEMBERS" },
+            { name: "human count", value: "HUMANS" },
+            { name: "boosts", value: "BOOSTS" },
+            { name: "richest member in server", value: "RICHEST_MEMBER" },
+            { name: "total item of server", value: "TOTAL_ITEM" },
+            { name: "total balance of server", value: "TOTAL_BALANCE" }
+          )
+          .setRequired(true)
+      )
+      .addStringOption((option) =>
+        option.setName("format").setDescription("format of the channel name. use %value% for the number").setMaxLength(50)
+      )
+      .addStringOption((option) => option.setName("item-global").setDescription("item to show"))
+  );
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
@@ -132,6 +140,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       });
 
     return send({ embeds: [new CustomEmbed(message.member, "✅ successfully created counter.")] });
+  } else if (args[0].toLowerCase() === "delete") {
+    const channel = message.options.getChannel("channel");
+
+    const res = await deleteGuildCounter(channel.id);
+
+    if (!res) return send({ embeds: [new ErrorEmbed("that channel does not have a counter tied to it")] });
+    return send({
+      embeds: [new CustomEmbed(message.member, "✅ counter removed, you will have to manually delete the channel")],
+    });
   }
 }
 
