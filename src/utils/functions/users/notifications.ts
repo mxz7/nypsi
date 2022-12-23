@@ -75,6 +75,6 @@ export function getNotificationsData() {
   return notificationsData;
 }
 
-export async function addNotificationToQueue(payload: NotificationPayload) {
-  await redis.lpush(Constants.redis.nypsi.DM_QUEUE, JSON.stringify(payload));
+export async function addNotificationToQueue(...payload: NotificationPayload[]) {
+  await redis.lpush(Constants.redis.nypsi.DM_QUEUE, ...payload.map((p) => JSON.stringify(p)));
 }
