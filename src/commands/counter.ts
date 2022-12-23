@@ -38,7 +38,11 @@ cmd.slashData
           .setRequired(true)
       )
       .addStringOption((option) =>
-        option.setName("format").setDescription("format of the channel name. use %value% for the number").setMaxLength(50)
+        option
+          .setName("format")
+          .setDescription("format of the channel name. use %value% for the number")
+          .setMaxLength(50)
+          .setRequired(true)
       )
       .addStringOption((option) => option.setName("item-global").setDescription("item to show").setAutocomplete(true))
   );
