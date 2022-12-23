@@ -310,3 +310,11 @@ export async function createGuildCounter(guild: Guild, mode: TrackingType, item?
 
   return true;
 }
+
+export async function getGuildCounters(guild: Guild) {
+  return await prisma.guildCounter.findMany({
+    where: {
+      guildId: guild.id,
+    },
+  });
+}
