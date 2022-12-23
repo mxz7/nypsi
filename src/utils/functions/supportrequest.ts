@@ -5,7 +5,7 @@ import { CustomEmbed } from "../../models/EmbedBuilders";
 import Constants from "../Constants";
 
 export async function getSupportRequestByChannelId(id: string) {
-  const query = await prisma.supportRequest.findUnique({
+  const query = await prisma.supportRequest.findFirst({
     where: {
       channelId: id,
     },
