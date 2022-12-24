@@ -197,9 +197,26 @@ export async function bumpAuction(id: string, client: NypsiClient) {
     new ButtonBuilder().setCustomId("b").setLabel("buy").setStyle(ButtonStyle.Success)
   );
 
+  const clusters = await client.cluster.broadcastEval(async (client) => {
+    const guild = await client.guilds.fetch("747056029795221513");
+
+    if (guild) return (client as NypsiClient).cluster.id;
+    return "not-found";
+  });
+
+  let cluster: number;
+
+  for (const i of clusters) {
+    if (i != "not-found") {
+      cluster = i;
+      break;
+    }
+  }
+
   const [messageUrl, messageId] = await client.cluster
     .broadcastEval(
-      async (client, { row, messageId, embed }) => {
+      async (client, { row, messageId, embed, cluster }) => {
+        if ((client as NypsiClient).cluster.id != cluster) return null;
         const guild = await client.guilds.fetch("747056029795221513");
 
         if (!guild) return;
@@ -220,11 +237,10 @@ export async function bumpAuction(id: string, client: NypsiClient) {
           return [m.url, m.id];
         }
       },
-      { context: { messageId: query.messageId, row: button.toJSON(), embed: embed.toJSON() } }
+      { context: { messageId: query.messageId, row: button.toJSON(), embed: embed.toJSON(), cluster } }
     )
     .then((res) => {
-      res.filter((i) => Boolean(i));
-      return res[0];
+      return res.filter((i) => Boolean(i))[0];
     });
 
   await prisma.auction.update({
