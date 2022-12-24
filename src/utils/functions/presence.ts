@@ -10,7 +10,13 @@ export function randomPresence(): string {
   let game = "";
 
   if (chosen === "xmas") {
-    game = `${daysUntilChristmas()} days until christmas`;
+    const days = daysUntilChristmas();
+
+    if (days == "ITS CHRISTMAS") {
+      game = "MERRY CHRISTMAS";
+    } else {
+      game = `${days} day${parseInt(days) > 1 ? "s" : ""} until christmas`;
+    }
   } else {
     game = chosen;
   }
