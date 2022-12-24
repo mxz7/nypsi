@@ -209,7 +209,7 @@ async function completeAchievement(userId: string, achievementId: string) {
   });
 
   const embed = new EmbedBuilder()
-    .setAuthor({ name: `${await getLastKnownTag(userId)} has unlocked an achievement` })
+    .setAuthor({ name: `${(await getLastKnownTag(userId)).split("#")[0]} has unlocked an achievement` })
     .setDescription(
       `${achievements[achievementId].emoji} ${achievements[achievementId].name}\n\n*${achievements[achievementId].description}*`
     )
