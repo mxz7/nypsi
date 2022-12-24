@@ -76,7 +76,14 @@ export async function setAchievementProgress(userId: string, achievementId: stri
   return false;
 }
 
-export async function getAllAchievements(id: string) {
+export async function getAllAchievements(id: string, filter?: string) {
+  if (filter) {
+    return await prisma.achievements.findMany({
+      where: {
+        AND: [{ userId: id }, { achievementId: { contains: filter } }],
+      },
+    });
+  }
   return await prisma.achievements.findMany({
     where: {
       userId: id,
@@ -228,7 +235,7 @@ export async function getUserAchievement(userId: string, achievementId: string) 
 
 export async function addProgress(userId: string, achievementStartName: string, amount: number) {
   if (await isEcoBanned(userId)) return;
-  const achievements = await getAllAchievements(userId);
+  const achievements = await getAllAchievements(userId, achievementStartName);
   let count = 0;
 
   for (const achievement of achievements) {
@@ -276,7 +283,7 @@ export async function addProgress(userId: string, achievementStartName: string, 
 
 export async function setProgress(userId: string, achievementStartName: string, amount: number) {
   if (await isEcoBanned(userId)) return;
-  const achievements = await getAllAchievements(userId);
+  const achievements = await getAllAchievements(userId, achievementStartName);
   let count = 0;
 
   for (const achievement of achievements) {
