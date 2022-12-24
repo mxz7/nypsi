@@ -62,7 +62,7 @@ model CommandUse {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, command])
+  @@id([userId, command])
 }
 
 model Achievements {
@@ -138,8 +138,7 @@ model Inventory {
 
   economy Economy @relation(fields: [userId], references: [userId], onDelete: Cascade)
 
-  @@unique([userId, item])
-  @@index([userId, item])
+  @@id([userId, item])
 }
 
 model EconomyWorker {
@@ -295,7 +294,7 @@ model Guild {
 model ReactionRole {
   guildId     String
   channelId   String
-  messageId   String           @unique
+  messageId   String           @id
   title       String?
   description String
   color       String?
@@ -339,13 +338,13 @@ model GuildChristmas {
   channel String  @default("")
 
   guild   Guild  @relation(fields: [guildId], references: [id], onDelete: Cascade)
-  guildId String @id @unique
+  guildId String @id
 }
 
 model GuildCounter {
   format    String       @default("members: %value%")
   tracks    TrackingType @default(HUMANS)
-  channel   String       @unique
+  channel   String       @id
   totalItem String?
 
   guild   Guild  @relation(fields: [guildId], references: [id], onDelete: Cascade)
@@ -382,7 +381,7 @@ model Moderation {
   automute  Int[]   @default([0, 60, 120, 300])
 
   guild          Guild            @relation(fields: [guildId], references: [id], onDelete: Cascade)
-  guildId        String           @unique
+  guildId        String           @id
   ModerationBan  ModerationBan[]
   ModerationMute ModerationMute[]
   ModerationCase ModerationCase[]
@@ -433,7 +432,7 @@ model ChatReaction {
   blacklisted    String[]
 
   guild             Guild               @relation(fields: [guildId], references: [id], onDelete: Cascade)
-  guildId           String              @unique
+  guildId           String              @id
   ChatReactionStats ChatReactionStats[]
 }
 
@@ -506,13 +505,11 @@ model Mention {
   userTag  String
   url      String   @id
   content  String
-
-  @@index([guildId], type: Hash)
 }
 
 model SupportRequest {
   userId    String @id
-  channelId String @unique
+  channelId String
 }
 
 model KofiPurchases {

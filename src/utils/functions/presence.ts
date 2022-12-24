@@ -3,14 +3,20 @@ import Constants from "../Constants";
 import { daysUntilChristmas } from "./date";
 
 export function randomPresence(): string {
-  const possibilities = ["nypsi.xyz", "tekoh.net", "nypsi.xyz", "xmas", "xmas"];
+  const possibilities = ["nypsi.xyz", "tekoh.net", "nypsi.xyz", "xmas", "nypsi.xyz"];
 
   const chosen = possibilities[Math.floor(Math.random() * possibilities.length)];
 
   let game = "";
 
   if (chosen === "xmas") {
-    game = `${daysUntilChristmas()} days until christmas`;
+    const days = daysUntilChristmas();
+
+    if (days == "ITS CHRISTMAS") {
+      game = "MERRY CHRISTMAS";
+    } else {
+      game = `${days} day${parseInt(days) > 1 ? "s" : ""} until christmas`;
+    }
   } else {
     game = chosen;
   }
