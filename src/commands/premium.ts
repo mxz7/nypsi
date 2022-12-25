@@ -177,7 +177,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (args.length == 1) {
-      return send({ embeds: [new ErrorEmbed("/premium setcolor <#color>")] });
+      return send({ embeds: [new ErrorEmbed("/premium color <#color>")] });
     }
 
     let color = args[1].split("#").join("");
