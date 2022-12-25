@@ -188,7 +188,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       color = color.substr(0, 6);
     }
 
-    if (!color.startsWith("#")) color = `#${color}`;
+    if (!color.startsWith("#") && color != "default") color = `#${color}`;
 
     if (!color.match(Constants.COLOUR_REGEX))
       return send({ embeds: [new ErrorEmbed("invalid hex color code. example: #abcdef")] });
