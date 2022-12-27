@@ -502,7 +502,18 @@
     "longDesc": "open to receive one random item",
     "aliases": ["mineshaft", "chest"],
     "rarity": 3,
-    "in_crates": false
+    "in_crates": false,
+    "items": [
+      "id:wooden_pickaxe",
+      "id:iron_pickaxe",
+      "id:diamond_pickaxe",
+      "role:ore",
+      "id:quartz",
+      "id:ancient_debris",
+      "id:emerald",
+      "id:diamond",
+      "id:gold_nugget"
+    ]
   },
   "vote_crate": {
     "id": "vote_crate",
