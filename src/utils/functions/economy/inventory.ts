@@ -277,16 +277,12 @@ export async function openCrate(member: GuildMember | string, item: Item) {
   addItemUse(id, item.id);
   addProgress(id, "unboxer", 1);
 
-  let times = 2;
+  const times = item.crate_runs || 1;
   const found = new Map<string, number>();
 
-  if (item.id.includes("vote") || item.id.includes("chest")) {
-    times = 1;
-  } else if (item.id.includes("69420")) {
+  if (item.id.includes("69420")) {
     await updateBalance(member, (await getBalance(member)) + 69420);
     found.set("money", 69420);
-  } else if (item.id == "nypsi_crate") {
-    times = 5;
   }
 
   for (let i = 0; i < times; i++) {
