@@ -16,6 +16,8 @@ import { getGuildByUser } from "../utils/functions/economy/guilds";
 import {
   topBalance,
   topCompletion,
+  topDailyStreak,
+  topDailyStreakGlobal,
   topGuilds,
   topItem,
   topItemGlobal,
@@ -42,6 +44,18 @@ cmd.slashData
     prestige
       .setName("prestige")
       .setDescription("view top prestiges in the server")
+      .addStringOption((option) =>
+        option
+          .setName("scope")
+          .setDescription("show global/server")
+          .setChoices(...scopeChoices)
+          .setRequired(false)
+      )
+  )
+  .addSubcommand((prestige) =>
+    prestige
+      .setName("dailystreak")
+      .setDescription("view top daily streaks in the server")
       .addStringOption((option) =>
         option
           .setName("scope")
@@ -232,6 +246,20 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const data = await topGuilds(userGuild?.guildName);
 
     return show(data.pages, data.pos, "top guilds");
+  } else if (args[0].toLowerCase().includes("streak")) {
+    let global = false;
+
+    if (args[1]?.toLowerCase() == "global") global = true;
+
+    let data: { pages: Map<number, string[]>; pos: number };
+
+    if (global) {
+      data = await topDailyStreakGlobal(message.author.id);
+    } else {
+      data = await topDailyStreak(message.guild, message.author.id);
+    }
+
+    return show(data.pages, data.pos, `top daily streak ${global ? "[global]" : `for ${message.guild.name}`}`);
   }
 }
 
