@@ -61,7 +61,7 @@ model CommandUse {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@id([userId, command])
+  @@unique([userId, command])
 }
 
 model Achievements {
@@ -124,7 +124,8 @@ model Inventory {
 
   economy Economy @relation(fields: [userId], references: [userId], onDelete: Cascade)
 
-  @@id([userId, item])
+  @@unique([userId, item])
+  @@index([userId, item])
 }
 
 model EconomyWorker {
@@ -268,7 +269,7 @@ model Guild {
 model ReactionRole {
   guildId     String
   channelId   String
-  messageId   String           @id
+  messageId   String           @unique
   title       String?
   description String
   whitelist   String[]
@@ -311,13 +312,13 @@ model GuildChristmas {
   channel String  @default("")
 
   guild   Guild  @relation(fields: [guildId], references: [id], onDelete: Cascade)
-  guildId String @id
+  guildId String @id @unique
 }
 
 model GuildCounter {
   format    String       @default("members: %value%")
   tracks    TrackingType @default(HUMANS)
-  channel   String       @id
+  channel   String       @unique
   totalItem String?
 
   guild   Guild  @relation(fields: [guildId], references: [id], onDelete: Cascade)
@@ -354,7 +355,7 @@ model Moderation {
   automute  Int[]   @default([0, 60, 120, 300])
 
   guild          Guild            @relation(fields: [guildId], references: [id], onDelete: Cascade)
-  guildId        String           @id
+  guildId        String           @unique
   ModerationBan  ModerationBan[]
   ModerationMute ModerationMute[]
   ModerationCase ModerationCase[]
@@ -405,7 +406,7 @@ model ChatReaction {
   blacklisted    String[]
 
   guild             Guild               @relation(fields: [guildId], references: [id], onDelete: Cascade)
-  guildId           String              @id
+  guildId           String              @unique
   ChatReactionStats ChatReactionStats[]
 }
 
@@ -482,7 +483,7 @@ model Mention {
 
 model SupportRequest {
   userId    String @id
-  channelId String
+  channelId String @unique
 }
 
 model KofiPurchases {
