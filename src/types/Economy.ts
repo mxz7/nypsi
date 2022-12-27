@@ -28,6 +28,7 @@ export interface Item {
   };
   in_crates: boolean;
   account_locked?: boolean;
+  items?: string[]; // used for crates with specific items format: <id|role>:(value)
 }
 
 export interface LotteryTicket {
