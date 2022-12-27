@@ -246,11 +246,30 @@ export async function openCrate(member: GuildMember | string, item: Item) {
   const inventory = await getInventory(member);
   const items = getItems();
 
-  const crateItems = ["money:50000", "money:100000", "xp:25", "xp:50"];
+  const crateItems: string[] = [];
 
-  for (const i of Array.from(Object.keys(items))) {
-    if (!items[i].in_crates) continue;
-    crateItems.push(i);
+  if (item.items) {
+    for (const itemFilter of item.items) {
+      let filteredItems: string[];
+      if (itemFilter.startsWith("id:")) {
+        filteredItems = Object.keys(items).filter((i) => i === itemFilter.substring(3));
+      } else if (itemFilter.startsWith("role:")) {
+        filteredItems = Object.keys(items).filter((i) => items[i].role === itemFilter.substring(5));
+      } else {
+        crateItems.push(itemFilter);
+        continue;
+      }
+      for (const i of filteredItems) {
+        crateItems.push(i);
+      }
+    }
+  } else {
+    crateItems.push(...["money:50000", "money:100000", "xp:25", "xp:50"]);
+
+    for (const i of Object.keys(items)) {
+      if (!items[i].in_crates) continue;
+      crateItems.push(i);
+    }
   }
 
   await setInventoryItem(member, item.id, inventory.find((i) => i.item == item.id).amount - 1);
