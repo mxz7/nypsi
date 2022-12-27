@@ -68,6 +68,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       include: {
         Economy: {
           include: {
+            EconomyGuild: true,
+            EconomyGuildMember: true,
+            Auction: true,
+            BakeryUpgrade: true,
             Inventory: true,
             Boosters: true,
             Game: true,
@@ -81,8 +85,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             },
           },
         },
-        EconomyGuild: true,
-        EconomyGuildMember: true,
         Premium: {
           include: {
             PremiumCommand: true,
@@ -90,7 +92,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         },
         Username: true,
         WordleStats: true,
-        Auction: true,
         CommandUse: true,
         Achievements: true,
         DMSettings: true,

@@ -410,14 +410,10 @@ export async function calcNetWorth(member: GuildMember | string) {
           upgrades: true,
         },
       },
-      user: {
+      EconomyGuild: {
         select: {
-          EconomyGuild: {
-            select: {
-              balance: true,
-              members: true,
-            },
-          },
+          balance: true,
+          members: true,
         },
       },
     },
@@ -434,7 +430,7 @@ export async function calcNetWorth(member: GuildMember | string) {
 
   worth += Number(query.money);
   worth += Number(query.bank);
-  worth += Number(Number(query.user.EconomyGuild?.balance) / query.user.EconomyGuild?.members.length) || 0;
+  worth += Number(Number(query.EconomyGuild?.balance) / query.EconomyGuild?.members.length) || 0;
 
   for (const item of query.Inventory) {
     if (getItems()[item.item].buy && getItems()[item.item].sell) {
