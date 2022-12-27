@@ -9,7 +9,6 @@ import prisma from "../../init/database";
     },
     select: {
       Achievements: true,
-      Auction: true,
       CommandUse: true,
       Economy: true,
       email: true,
@@ -27,7 +26,6 @@ import prisma from "../../init/database";
   for (const user of users) {
     if (
       user.Achievements.some((a) => a.completed) ||
-      user.Auction.length > 0 ||
       (user.CommandUse.length == 0 ? false : user.CommandUse.map((c) => c.uses).reduce((a, b) => a + b) > 100) ||
       user.Economy ||
       user.Premium ||

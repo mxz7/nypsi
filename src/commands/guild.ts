@@ -1,4 +1,4 @@
-import { EconomyGuild, EconomyGuildMember, User } from "@prisma/client";
+import { EconomyGuild, EconomyGuildMember } from "@prisma/client";
 import {
   ActionRowBuilder,
   BaseMessageOptions,
@@ -148,10 +148,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const showGuild = async (
     guild: EconomyGuild & {
-      owner: User;
-      members: (EconomyGuildMember & {
+      owner: {
         user: {
           lastKnownTag: string;
+        };
+      };
+      members: (EconomyGuildMember & {
+        economy: {
+          user: {
+            lastKnownTag: string;
+          };
         };
       })[];
     }
@@ -171,7 +177,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         "info",
         `**level** ${guild.level}\n` +
           `**created on** ${formatDate(guild.createdAt)}\n` +
-          `**owner** ${guild.owner.lastKnownTag}`,
+          `**owner** ${guild.owner.user.lastKnownTag}`,
         true
       );
       if (guild.level < Constants.MAX_GUILD_LEVEL) {
@@ -182,7 +188,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       const maxMembers = await getMaxMembersForGuild(guild.guildName);
 
       for (const m of guild.members) {
-        membersText += `\`${m.user.lastKnownTag}\` `;
+        membersText += `\`${m.economy.user.lastKnownTag}\` `;
 
         if (m.userId == message.author.id) {
           embed.setFooter({ text: `you joined ${daysAgo(m.joinedAt).toLocaleString()} days ago` });
@@ -439,7 +445,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           found = true;
           mode = RemoveMemberMode.ID;
           break;
-        } else if (m.user.lastKnownTag == args[1]) {
+        } else if (m.economy.user.lastKnownTag == args[1]) {
           found = true;
           mode = RemoveMemberMode.TAG;
           break;
@@ -659,7 +665,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       if (position == 3) position = "🥉";
 
       desc += `${position} **${
-        m.user.lastKnownTag
+        m.economy.user.lastKnownTag
       }** ${m.contributedXp.toLocaleString()}xp **|** $${m.contributedMoney.toLocaleString()}\n`;
     }
 

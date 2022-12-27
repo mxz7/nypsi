@@ -20,12 +20,24 @@ export async function getGuildByName(name: string) {
         },
       },
       include: {
-        owner: true,
-        members: {
-          include: {
+        owner: {
+          select: {
             user: {
               select: {
                 lastKnownTag: true,
+              },
+            },
+          },
+        },
+        members: {
+          include: {
+            economy: {
+              select: {
+                user: {
+                  select: {
+                    lastKnownTag: true,
+                  },
+                },
               },
             },
           },
@@ -101,12 +113,24 @@ export async function getGuildByUser(member: GuildMember | string) {
       where: {
         userId: id,
       },
-      select: {
+      include: {
         guild: {
           include: {
-            owner: true,
             members: {
               include: {
+                economy: {
+                  select: {
+                    user: {
+                      select: {
+                        lastKnownTag: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            owner: {
+              select: {
                 user: {
                   select: {
                     lastKnownTag: true,

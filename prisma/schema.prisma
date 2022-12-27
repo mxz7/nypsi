@@ -19,16 +19,13 @@ model User {
   email          String?  @unique
   blacklisted    Boolean  @default(false)
 
-  Economy            Economy?
-  Premium            Premium?
-  Username           Username[]
-  WordleStats        WordleStats?
-  EconomyGuildMember EconomyGuildMember?
-  EconomyGuild       EconomyGuild?
-  Auction            Auction[]
-  CommandUse         CommandUse[]
-  Achievements       Achievements[]
-  DMSettings         DMSettings?
+  Economy      Economy?
+  Premium      Premium?
+  Username     Username[]
+  WordleStats  WordleStats?
+  CommandUse   CommandUse[]
+  Achievements Achievements[]
+  DMSettings   DMSettings?
 }
 
 model DMSettings {
@@ -100,14 +97,17 @@ model Economy {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String @id
 
-  Boosters      Booster[]
-  LotteryTicket LotteryTicket[]
-  EconomyWorker EconomyWorker[]
-  Inventory     Inventory[]
-  Crafting      Crafting[]
-  Game          Game[]
-  ItemUse       ItemUse[]
-  BakeryUpgrade BakeryUpgrade[]
+  Boosters           Booster[]
+  LotteryTicket      LotteryTicket[]
+  EconomyWorker      EconomyWorker[]
+  Inventory          Inventory[]
+  Crafting           Crafting[]
+  Game               Game[]
+  ItemUse            ItemUse[]
+  BakeryUpgrade      BakeryUpgrade[]
+  Auction            Auction[]
+  EconomyGuild       EconomyGuild?
+  EconomyGuildMember EconomyGuildMember?
 }
 
 model BakeryUpgrade {
@@ -262,7 +262,7 @@ model Auction {
   createdAt  DateTime @default(now())
   sold       Boolean  @default(false)
 
-  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  owner Economy @relation(fields: [ownerId], references: [userId], onDelete: Cascade)
 }
 
 // guild specific tables
@@ -458,8 +458,8 @@ model EconomyGuild {
   level     Int      @default(1)
   motd      String   @default("welcome to the guild fool (/guild motd)")
 
-  owner   User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  ownerId String @unique
+  owner   Economy @relation(fields: [ownerId], references: [userId], onDelete: Cascade)
+  ownerId String  @unique
 
   members EconomyGuildMember[]
 }
@@ -471,8 +471,8 @@ model EconomyGuildMember {
   contributedMoney BigInt   @default(0)
   contributedXp    Int      @default(0)
 
-  user  User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  guild EconomyGuild @relation(fields: [guildName], references: [guildName], onDelete: Cascade)
+  economy Economy      @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  guild   EconomyGuild @relation(fields: [guildName], references: [guildName], onDelete: Cascade)
 
   @@id([userId, guildName])
 }
