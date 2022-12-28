@@ -108,7 +108,7 @@ jobs:
           script: |
             cd ~/nypsi
             nvm use lts
-            npm i --omit=dev
+            pnpm install -P
             npx prisma generate
 
       - name: update deployment status
