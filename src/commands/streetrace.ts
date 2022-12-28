@@ -110,8 +110,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return send({ embeds: [new ErrorEmbed("entry fee cannot be less than $1k")] });
     }
 
-    if (bet > 500000) {
-      return send({ embeds: [new ErrorEmbed("entry fee cannot be over $500k")] });
+    if (bet > 5000000) {
+      return send({ embeds: [new ErrorEmbed("entry fee cannot be over $5m")] });
     }
 
     let speedLimit = 0;
@@ -225,12 +225,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return send({ embeds: [new ErrorEmbed("you cant afford the entry fee")] });
     }
 
-    const maxBet = await calcMaxBet(message.member);
+    const maxBet = (await calcMaxBet(message.member)) * 5;
 
     if (race.bet > maxBet) {
       return send({
         embeds: [
-          new ErrorEmbed(`your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`),
+          new ErrorEmbed(
+            `your max bet for races is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
+          ),
         ],
       });
     }
