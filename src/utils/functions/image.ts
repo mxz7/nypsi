@@ -324,6 +324,8 @@ export async function uploadImageToImgur(url: string): Promise<string> {
       return null;
     }
 
+    logger.info(`uploaded (${res})`);
+
     return res;
   }
 
@@ -331,7 +333,7 @@ export async function uploadImageToImgur(url: string): Promise<string> {
   return boobies.data.link;
 }
 
-export async function fallbackUpload(url: string) {
+export async function fallbackUpload(url: string): Promise<string> {
   const res = await fetch(`https://api.imgbb.com/1/upload?key=${process.env.IMGBB_TOKEN}&image=${url}`).then((res) =>
     res.json()
   );
