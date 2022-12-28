@@ -1427,5 +1427,18 @@
     "sell": 100000,
     "role": "bakery-upgrade",
     "in_crates": true
+  },
+  "workers_crate": {
+    "id": "workers_crate",
+    "name": "workers crate",
+    "plural": "worker crates",
+    "emoji": "<:worker_crate:1057639345441476668>",
+    "role": "crate",
+    "longDesc": "open to receive two random worker upgrades",
+    "aliases": ["workerscrate", "wcrate"],
+    "rarity": 3,
+    "in_crates": true,
+    "crate_runs": 2,
+    "items": ["role:worker-upgrade"]
   }
 }
