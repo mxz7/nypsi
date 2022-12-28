@@ -203,6 +203,8 @@ export async function acceptWholesomeImage(id: number, accepter: GuildMember, cl
 
   clearWholesomeCache();
 
+  logger.info(`${query.image} by ${query.submitterId} accepted by ${accepter.user.id}`);
+
   await addProgress(query.submitterId, "wholesome", 1);
 
   await requestDM({
@@ -214,7 +216,7 @@ export async function acceptWholesomeImage(id: number, accepter: GuildMember, cl
   return true;
 }
 
-export async function denyWholesomeImage(id: number) {
+export async function denyWholesomeImage(id: number, staff: GuildMember) {
   const d = await prisma.wholesomeSuggestion.delete({
     where: {
       id: id,
@@ -224,6 +226,8 @@ export async function denyWholesomeImage(id: number) {
   if (!d) {
     return false;
   }
+
+  logger.info(`${d.image} by ${d.submitterId} denied by ${staff.user.id}`);
 
   return true;
 }

@@ -1,4 +1,18 @@
-import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message, MessageReaction, User } from "discord.js";
+import { WholesomeSuggestion } from "@prisma/client";
+import {
+  ActionRowBuilder,
+  BaseMessageOptions,
+  ButtonBuilder,
+  ButtonStyle,
+  CommandInteraction,
+  Interaction,
+  InteractionReplyOptions,
+  Message,
+  MessageActionRowComponentBuilder,
+  MessageReaction,
+  User,
+} from "discord.js";
+import prisma from "../init/database";
 import { NypsiClient } from "../models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
@@ -208,7 +222,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return send({ embeds: [new ErrorEmbed("you must include the suggestion id")] });
     }
 
-    const res = await denyWholesomeImage(parseInt(args[1]));
+    const res = await denyWholesomeImage(parseInt(args[1]), message.member);
 
     if (!res) {
       return send({
@@ -339,6 +353,89 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     };
 
     return pageManager();
+  } else if (args[0].toLowerCase() === "review") {
+    if (message.guild.id != "747056029795221513") return;
+
+    const roles = message.member.roles.cache;
+
+    let allow = false;
+
+    if (roles.has("747056620688900139")) allow = true;
+    if (roles.has("747059949770768475")) allow = true;
+    if (roles.has("845613231229370429")) allow = true;
+    if (roles.has("1023950187661635605")) allow = true;
+
+    if (!allow) return;
+
+    const doReview = async (msg: Message): Promise<any> => {
+      const count = await prisma.wholesomeSuggestion.count();
+      let suggestion = await prisma.wholesomeSuggestion.findFirst({
+        skip: Math.floor(Math.random() * count),
+      });
+
+      if (!suggestion)
+        return msg.edit({
+          embeds: [new CustomEmbed(message.member, "you're done 🙂 no more suggestions left")],
+          components: [],
+        });
+
+      await msg.edit({
+        embeds: [
+          new CustomEmbed(
+            message.member,
+            `suggested by ${suggestion.submitter} (${suggestion.submitterId}) on <t:${Math.floor(
+              suggestion.uploadDate.getTime() / 1000
+            )}>\n${suggestion.image}`
+          ).setImage(suggestion.image),
+        ],
+      });
+
+      const filter = (interaction: Interaction) => interaction.user.id === message.author.id;
+      let fail = false;
+
+      const res = await msg.awaitMessageComponent({ filter, time: 30000 }).catch(() => {
+        fail = true;
+      });
+
+      if (fail || !res) return msg.edit({ components: [] });
+
+      suggestion = await prisma.wholesomeSuggestion
+        .findUnique({
+          where: {
+            id: suggestion.id,
+          },
+        })
+        .catch(() => {
+          return {} as WholesomeSuggestion;
+        });
+
+      if (!suggestion) {
+        await res.reply({
+          embeds: [new CustomEmbed(message.member, "this suggestion no longer exists, perhaps someone beat you to it")],
+          ephemeral: true,
+        });
+        return doReview(msg);
+      }
+
+      if (res.customId === "accept") {
+        await res.deferUpdate();
+        await acceptWholesomeImage(suggestion.id, message.member, message.client as NypsiClient);
+        return doReview(msg);
+      } else {
+        await res.deferUpdate();
+        await denyWholesomeImage(suggestion.id, message.member);
+        return doReview(msg);
+      }
+    };
+
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder().setCustomId("accept").setLabel("accept").setStyle(ButtonStyle.Success),
+      new ButtonBuilder().setCustomId("deny").setLabel("deny").setStyle(ButtonStyle.Danger)
+    );
+
+    const msg = await message.channel.send({ embeds: [new CustomEmbed(message.member, "loading...")], components: [row] });
+
+    return doReview(msg);
   } else {
     let member;
 
