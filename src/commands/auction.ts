@@ -12,7 +12,7 @@ import {
   Message,
   MessageActionRowComponentBuilder,
   MessageEditOptions,
-  SelectMenuBuilder,
+  StringSelectMenuBuilder,
   StringSelectMenuOptionBuilder,
 } from "discord.js";
 import prisma from "../init/database";
@@ -152,7 +152,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       }
 
       const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new SelectMenuBuilder().setCustomId("item").setPlaceholder("item you want to sell").setOptions(options)
+        new StringSelectMenuBuilder().setCustomId("item").setPlaceholder("item you want to sell").setOptions(options)
       );
 
       await edit({ embeds: [embed], components: [row] }, msg);

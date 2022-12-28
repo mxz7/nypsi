@@ -8,7 +8,7 @@ import {
   InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
-  SelectMenuBuilder,
+  StringSelectMenuBuilder,
   StringSelectMenuOptionBuilder,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
@@ -303,7 +303,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   components.push(
     new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new SelectMenuBuilder().setCustomId("bank").setOptions(options)
+      new StringSelectMenuBuilder().setCustomId("bank").setOptions(options)
     )
   );
 
@@ -342,7 +342,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       }
 
       components[0] = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new SelectMenuBuilder().setCustomId("bank").setOptions(options)
+        new StringSelectMenuBuilder().setCustomId("bank").setOptions(options)
       );
 
       await res.message.edit({ embeds: [embed], components });
