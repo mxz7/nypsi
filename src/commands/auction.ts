@@ -356,8 +356,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       embed.setFields(
         {
           name: "item",
-          value: `**${auctions[page].itemAmount}x** ${items[auctions[page].itemName].emoji} ${
-            items[auctions[page].itemName].name
+          value: `**${auctions[page].itemAmount}x** ${items[auctions[page].itemId].emoji} ${
+            items[auctions[page].itemId].name
           }`,
           inline: true,
         },
@@ -489,7 +489,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (res) {
           await addInventoryItem(
             auctions[currentPage].ownerId,
-            auctions[currentPage].itemName,
+            auctions[currentPage].itemId,
             auctions[currentPage].itemAmount
           );
 
@@ -571,14 +571,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       if (!(await userExists(auction.ownerId))) return;
 
-      await addInventoryItem(auction.ownerId, auction.itemName, auction.itemAmount);
+      await addInventoryItem(auction.ownerId, auction.itemId, auction.itemAmount);
 
       if ((await getDmSettings(auction.ownerId)).auction) {
         const embed = new CustomEmbed().setColor(Constants.TRANSPARENT_EMBED_COLOR);
 
         embed.setDescription(
-          `your auction for ${auction.itemAmount}x ${items[auction.itemName].emoji} ${
-            items[auction.itemName].name
+          `your auction for ${auction.itemAmount}x ${items[auction.itemId].emoji} ${
+            items[auction.itemId].name
           } has been removed by a staff member. you have been given back your item${auction.itemAmount > 1 ? "s" : ""}`
         );
 

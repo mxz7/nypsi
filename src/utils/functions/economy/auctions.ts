@@ -146,7 +146,7 @@ export async function createAuction(member: GuildMember, itemId: string, itemAmo
   await prisma.auction.create({
     data: {
       bin: bin,
-      itemName: itemId,
+      itemId,
       messageId: messageId,
       itemAmount: itemAmount,
       ownerId: member.user.id,
@@ -178,7 +178,7 @@ export async function bumpAuction(id: string, client: NypsiClient) {
       createdAt: true,
       bin: true,
       itemAmount: true,
-      itemName: true,
+      itemId: true,
     },
   });
 
@@ -192,14 +192,14 @@ export async function bumpAuction(id: string, client: NypsiClient) {
 
   embed.setDescription(
     `started <t:${Math.floor(query.createdAt.getTime() / 1000)}:R>\n\n` +
-      `**${query.itemAmount.toLocaleString()}x** ${items[query.itemName].emoji} ${
-        items[query.itemName].name
+      `**${query.itemAmount.toLocaleString()}x** ${items[query.itemId].emoji} ${
+        items[query.itemId].name
       } for $**${query.bin.toLocaleString()}**`
   );
 
   if (query.itemAmount > 1 && query.bin > 69_420) {
     embed.setFooter({
-      text: `$${Math.floor(Number(query.bin) / query.itemAmount).toLocaleString()} per ${items[query.itemName].name}`,
+      text: `$${Math.floor(Number(query.bin) / query.itemAmount).toLocaleString()} per ${items[query.itemId].name}`,
     });
   }
 
@@ -272,7 +272,7 @@ export async function getAuctionAverage(item: string) {
 
   const auctions = await prisma.auction.findMany({
     where: {
-      AND: [{ sold: true }, { itemName: item }],
+      AND: [{ sold: true }, { itemId: item }],
     },
     select: {
       bin: true,
@@ -391,7 +391,7 @@ async function checkWatchers(itemName: string, messageUrl: string, creatorId: st
 export async function countItemOnAuction(itemId: string) {
   const amount = await prisma.auction.aggregate({
     where: {
-      AND: [{ sold: false }, { itemName: itemId }],
+      AND: [{ sold: false }, { itemId: itemId }],
     },
     _sum: {
       itemAmount: true,
