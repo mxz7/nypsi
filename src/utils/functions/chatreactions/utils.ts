@@ -256,6 +256,7 @@ export async function startReaction(guild: Guild, channel: TextChannel) {
     winnersText.length = 0;
 
     for (const winner of winnersList) {
+      if (winnersText.length >= 3) break;
       const pos = medals.get(winnersList.indexOf(winner) + 1);
 
       winnersText.push(`${pos} ${winner.user} in \`${winner.time}\``);
