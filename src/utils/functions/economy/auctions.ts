@@ -197,6 +197,12 @@ export async function bumpAuction(id: string, client: NypsiClient) {
       } for $**${query.bin.toLocaleString()}**`
   );
 
+  if (query.itemAmount > 1 && query.bin > 69_420) {
+    embed.setFooter({
+      text: `$${Math.floor(Number(query.bin) / query.itemAmount).toLocaleString()} per ${items[query.itemName].name}`,
+    });
+  }
+
   const button = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder().setCustomId("b").setLabel("buy").setStyle(ButtonStyle.Success)
   );

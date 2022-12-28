@@ -505,7 +505,10 @@ export async function runCommand(
   }
 
   if (["h", "w"].includes(cmd) && typeof command !== "undefined") {
-    if (!message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.ViewChannel)) {
+    if (
+      !message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.ViewChannel) ||
+      !message.guild.members.me.permissions.has(PermissionFlagsBits.ViewChannel)
+    ) {
       if (message instanceof Message) {
         return message.member
           .send("i don't have access to that channel. please contact server staff if this is an error")
@@ -519,7 +522,10 @@ export async function runCommand(
       }
     }
 
-    if (!message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.SendMessages)) {
+    if (
+      !message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.SendMessages) ||
+      !message.guild.members.me.permissions.has(PermissionFlagsBits.SendMessages)
+    ) {
       return message.member
         .send(
           "❌ i don't have permission to send messages in that channel - please contact server staff if this is an error"
@@ -527,7 +533,10 @@ export async function runCommand(
         .catch(() => {});
     }
 
-    if (!message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.UseApplicationCommands)) {
+    if (
+      !message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.UseApplicationCommands) ||
+      !message.guild.members.me.permissions.has(PermissionFlagsBits.UseApplicationCommands)
+    ) {
       return message.member
         .send(
           "❌ i don't have permission to perform commands in that channel - please contact server staff if this is an error"
@@ -535,7 +544,10 @@ export async function runCommand(
         .catch(() => {});
     }
 
-    if (!message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.EmbedLinks)) {
+    if (
+      !message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.EmbedLinks) ||
+      !message.guild.members.me.permissions.has(PermissionFlagsBits.EmbedLinks)
+    ) {
       return message.channel.send({
         content:
           "❌ i don't have the `embed links` permission\n\nto fix this go to: server settings -> roles -> find my role and enable `embed links`\n" +
@@ -543,7 +555,10 @@ export async function runCommand(
       });
     }
 
-    if (!message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.ManageMessages)) {
+    if (
+      !message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.ManageMessages) ||
+      !message.guild.members.me.permissions.has(PermissionFlagsBits.ManageMessages)
+    ) {
       return message.channel.send(
         "❌ i don't have the `manage messages` permission, this is a required permission for nypsi to work\n\n" +
           "to fix this go to: server settings -> roles -> find my role and enable `manage messages`\n" +
@@ -551,14 +566,6 @@ export async function runCommand(
       );
     }
 
-    if (!message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.AddReactions)) {
-      return message.channel.send({
-        content:
-          "❌ i don't have the `add reactions` permission, this is a required permission for nypsi to work\n\n" +
-          "to fix this go to: server settings -> roles -> find my role and enable `add reactions`\n" +
-          "if this error still shows, check channel specific permissions",
-      });
-    }
     if (!message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.UseExternalEmojis)) {
       return message.channel.send({
         content:

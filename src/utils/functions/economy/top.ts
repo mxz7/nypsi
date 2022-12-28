@@ -735,3 +735,135 @@ export async function topGuilds(guildName?: string) {
 
   return { pages, pos };
 }
+
+export async function topDailyStreak(guild: Guild, userId?: string) {
+  let members: Collection<string, GuildMember>;
+
+  if (guild.memberCount == guild.members.cache.size) {
+    members = guild.members.cache;
+  } else {
+    members = await guild.members.fetch();
+  }
+
+  if (!members) members = guild.members.cache;
+
+  members = members.filter((m) => {
+    return !m.user.bot;
+  });
+
+  const query = await prisma.economy.findMany({
+    where: {
+      AND: [{ dailyStreak: { gt: 0 } }, { userId: { in: Array.from(members.keys()) } }],
+    },
+    select: {
+      userId: true,
+      dailyStreak: true,
+      banned: true,
+    },
+    orderBy: {
+      dailyStreak: "desc",
+    },
+    take: 100,
+  });
+
+  const out = [];
+
+  let count = 0;
+
+  const getMemberID = (guild: Guild, id: string) => {
+    const target = guild.members.cache.find((member) => {
+      return member.user.id == id;
+    });
+
+    return target;
+  };
+
+  const userIds = query.map((i) => i.userId);
+
+  for (const user of query) {
+    if (user.banned && dayjs().isBefore(user.banned)) {
+      userIds.splice(userIds.indexOf(user.userId), 1);
+      continue;
+    }
+
+    let pos: string | number = count + 1;
+
+    if (pos == 1) {
+      pos = "🥇";
+    } else if (pos == 2) {
+      pos = "🥈";
+    } else if (pos == 3) {
+      pos = "🥉";
+    }
+
+    out[count] = pos + " **" + getMemberID(guild, user.userId).user.tag + "** " + user.dailyStreak;
+    count++;
+  }
+
+  const pages = PageManager.createPages(out);
+
+  let pos = 0;
+
+  if (userId) {
+    pos = userIds.indexOf(userId) + 1;
+  }
+
+  return { pages, pos };
+}
+
+export async function topDailyStreakGlobal(userId: string) {
+  const query = await prisma.economy.findMany({
+    where: {
+      dailyStreak: { gt: 0 },
+    },
+    select: {
+      userId: true,
+      dailyStreak: true,
+      banned: true,
+      user: {
+        select: {
+          lastKnownTag: true,
+        },
+      },
+    },
+    orderBy: {
+      dailyStreak: "desc",
+    },
+    take: 100,
+  });
+
+  const out = [];
+
+  let count = 0;
+
+  const userIds = query.map((i) => i.userId);
+
+  for (const user of query) {
+    if (user.banned && dayjs().isBefore(user.banned)) {
+      userIds.splice(userIds.indexOf(user.userId), 1);
+      continue;
+    }
+
+    let pos: string | number = count + 1;
+
+    if (pos == 1) {
+      pos = "🥇";
+    } else if (pos == 2) {
+      pos = "🥈";
+    } else if (pos == 3) {
+      pos = "🥉";
+    }
+    out[count] = pos + " **" + (user.user.lastKnownTag.split("#")[0] || user.userId) + "** " + user.dailyStreak;
+    count++;
+  }
+
+  const pages = PageManager.createPages(out);
+
+  let pos = 0;
+
+  if (userId) {
+    pos = userIds.indexOf(userId) + 1;
+  }
+
+  return { pages, pos };
+}
