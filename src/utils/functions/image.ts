@@ -204,6 +204,7 @@ export async function acceptWholesomeImage(id: number, accepter: GuildMember, cl
   clearWholesomeCache();
 
   addProgress(query.submitterId, "wholesome", 1);
+  logger.info(`${query.image} by ${query.submitterId} accepted by ${accepter.user.id}`);
 
   await requestDM({
     memberId: query.submitterId,
@@ -214,7 +215,7 @@ export async function acceptWholesomeImage(id: number, accepter: GuildMember, cl
   return true;
 }
 
-export async function denyWholesomeImage(id: number) {
+export async function denyWholesomeImage(id: number, staff: GuildMember) {
   const d = await prisma.wholesomeSuggestion.delete({
     where: {
       id: id,
@@ -224,6 +225,8 @@ export async function denyWholesomeImage(id: number) {
   if (!d) {
     return false;
   }
+
+  logger.info(`${d.image} by ${d.submitterId} denied by ${staff.user.id}`);
 
   return true;
 }
@@ -303,7 +306,14 @@ export async function uploadImageToImgur(url: string): Promise<string> {
     fallback = true;
   }
 
-  if (fallback || !boobies) {
+  if (fallback || !boobies || typeof boobies?.data?.link != "string") {
+    uploadDisabled = true;
+
+    setTimeout(() => {
+      uploadDisabled = false;
+    }, 1800000);
+
+    fallback = true;
     logger.info("using fallback uploader..");
 
     const res = await fallbackUpload(url);
@@ -313,6 +323,8 @@ export async function uploadImageToImgur(url: string): Promise<string> {
       return null;
     }
 
+    logger.info(`uploaded (${res})`);
+
     return res;
   }
 
@@ -320,14 +332,10 @@ export async function uploadImageToImgur(url: string): Promise<string> {
   return boobies.data.link;
 }
 
-async function fallbackUpload(url: string) {
+export async function fallbackUpload(url: string): Promise<string> {
   const res = await fetch(`https://api.imgbb.com/1/upload?key=${process.env.IMGBB_TOKEN}&image=${url}`).then((res) =>
     res.json()
   );
 
-  if (!res.success) {
-    return false;
-  }
-
-  return res.display_url;
+  return res.data.url;
 }
