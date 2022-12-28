@@ -2,26 +2,27 @@
 
 pls note that if you come to me for help even with these instructions, i wont help you
 
-you will also need a [postgresql server running](#postgresql)
+## requirements
 
-### for windows
+- [postgresql database](#postgresql)
+- redis
+- node 18+
 
-install and enable WSL on your system. [tutorial](https://pureinfotech.com/install-wsl-windows-11/) - i recommend you go for ubuntu
+### windows
 
-install nodejs on your WSL. [tutorial](https://www.digitalocean.com/community/tutorials/how-to-install-node-js-on-ubuntu-20-04)
+i strongly recommend against using windows for running nypsi. however, if your computer is relatively modern, you should be able to set up a WSL instance on your system.
 
 ### instructions
 
-- run `git clone https://github.com/tekoh/nypsi`
-- run `cd nypsi`
-- run the ./setup.sh file
-- run `npm install` this will install all packages needed for nypsi
-- run `npx tsc` this will compile the typescript into javascript
-- run `sudo apt install redis-server` and install the package
-- fill out the .env file with your own info
-- run `sudo service redis-server start` to start the local redis server
-- run `npx prisma migrate dev` to get the postgresql database ready
-- if all went well, `node .` should start your version of nypsi (:
+- `git clone https://github.com/tekoh/nypsi`
+- `cd nypsi`
+- configure .env.example with your tokens/keys etc. (most of these will cause issues if not given)
+- `./setup.sh`
+- `npm install -g pnpm`
+- `pnpm install`
+- `npx tsc`
+- `npx prisma migrate deploy`
+- `node .`
 
 ### postgresql
 
