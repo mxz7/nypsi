@@ -86,7 +86,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       const init = uploadCooldown.get(message.member.id);
       const curr = new Date();
       const diff = Math.round((curr.getTime() - init) / 1000);
-      const time = 60 - diff;
+      const time = 25 - diff;
 
       const minutes = Math.floor(time / 60);
       const seconds = time - minutes * 60;
