@@ -9,6 +9,9 @@ products.set("bronze", "bronze");
 products.set("dfcfa66092", "basic_crate");
 products.set("595ba15808", "69420_crate");
 products.set("5569964b90", "nypsi_crate");
+products.set("1e62c44770", "workers_crate");
+products.set("4b1d3a70b2", "boosters_crate");
+products.set("4ec1ebe6b4", "gem_crate");
 
 export default {
   redis: {
