@@ -10,7 +10,7 @@ import {
   InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
-  SelectMenuBuilder,
+  StringSelectMenuBuilder,
   StringSelectMenuOptionBuilder,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
@@ -207,7 +207,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     let workersList = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new SelectMenuBuilder().setCustomId("worker").setOptions(options)
+      new StringSelectMenuBuilder().setCustomId("worker").setOptions(options)
     );
 
     const { buttonRow, embed } = await displayWorker(baseWorkers[defaultWorker]);
@@ -244,7 +244,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         workersList = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-          new SelectMenuBuilder().setCustomId("worker").setOptions(options)
+          new StringSelectMenuBuilder().setCustomId("worker").setOptions(options)
         );
 
         await res.message.edit({ embeds: [embed], components: [workersList, buttonRow] });
