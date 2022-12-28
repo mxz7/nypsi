@@ -52,14 +52,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (!game) return send({ embeds: [new ErrorEmbed(`couldn't find a game with id \`${args[0]}\``)] });
 
-  const embed = new CustomEmbed(message.member).setHeader(game.id.toString(36), message.author.avatarURL());
+  const username = (await getLastKnownTag(game.userId))?.split("#")[0];
 
-  const tag = (await getLastKnownTag(game.userId))?.split("#")[0];
+  const embed = new CustomEmbed(message.member).setHeader(
+    username ? `${username}'s ${game.game} game` : `id: ${game.id.toString(36)}`,
+    message.author.avatarURL()
+  );
 
   let components: ActionRowBuilder<MessageActionRowComponentBuilder>[];
 
-  let desc =
-    `**user** \`${tag || "[redacted]"}\`\n` +
+  const desc =
+    `**id** \`${game.id.toString(36)}\`\n` +
+    `**user** \`${username || "[redacted]"}\`\n` +
     `**game** \`${game.game}\`\n` +
     `**time** <t:${Math.floor(game.date.getTime() / 1000)}>\n` +
     `**bet** $${game.bet.toLocaleString()}\n` +
@@ -72,11 +76,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     components[components.length - 1].components.length = 4;
   } else {
-    desc += `**outcome** ${game.outcome}`;
+    embed.addField("outcome", game.outcome, true);
   }
 
   if (game.win) {
-    embed.addField("rewards", `$${game.earned.toLocaleString()}\n${game.xpEarned}xp`);
+    embed.addField("rewards", `$${game.earned.toLocaleString()}\n${game.xpEarned}xp`, true);
   }
 
   embed.setDescription(desc);
