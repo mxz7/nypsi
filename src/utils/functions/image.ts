@@ -308,6 +308,13 @@ export async function uploadImageToImgur(url: string): Promise<string> {
   }
 
   if (fallback || !boobies || typeof boobies?.data?.link != "string") {
+    uploadDisabled = true;
+
+    setTimeout(() => {
+      uploadDisabled = false;
+    }, 1800000);
+
+    fallback = true;
     logger.info("using fallback uploader..");
 
     const res = await fallbackUpload(url);
