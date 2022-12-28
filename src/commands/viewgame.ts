@@ -52,7 +52,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (!game) return send({ embeds: [new ErrorEmbed(`couldn't find a game with id \`${args[0]}\``)] });
 
-  const username = (await getLastKnownTag(game.userId))?.split("#")[0];
+  const username = (await getLastKnownTag(game.userId).catch(() => null))?.split("#")[0];
 
   const embed = new CustomEmbed(message.member).setHeader(
     username ? `${username}'s ${game.game} game` : `id: ${game.id.toString(36)}`,
