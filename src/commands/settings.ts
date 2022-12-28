@@ -1,7 +1,8 @@
-import { ActionRowBuilder, ButtonBuilder, SelectMenuBuilder } from "@discordjs/builders";
 import { DMSettings } from "@prisma/client";
 import {
+  ActionRowBuilder,
   BaseMessageOptions,
+  ButtonBuilder,
   ButtonStyle,
   CommandInteraction,
   Interaction,
@@ -9,6 +10,7 @@ import {
   Message,
   MessageActionRowComponentBuilder,
   ModalBuilder,
+  SelectMenuBuilder,
   SelectMenuOptionBuilder,
   TextInputBuilder,
   TextInputStyle,
