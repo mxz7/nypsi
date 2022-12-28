@@ -268,7 +268,7 @@ export default async function interactionCreate(interaction: Interaction) {
           id: true,
           ownerId: true,
           itemAmount: true,
-          itemName: true,
+          itemId: true,
           sold: true,
         },
       });
@@ -331,7 +331,7 @@ export default async function interactionCreate(interaction: Interaction) {
             id: true,
             ownerId: true,
             itemAmount: true,
-            itemName: true,
+            itemId: true,
             sold: true,
           },
         });
@@ -383,7 +383,7 @@ export default async function interactionCreate(interaction: Interaction) {
         }
 
         await Promise.all([
-          addInventoryItem(interaction.user.id, auction.itemName, auction.itemAmount),
+          addInventoryItem(interaction.user.id, auction.itemId, auction.itemAmount),
           updateBalance(interaction.user.id, balance - Number(auction.bin)),
           updateBalance(auction.ownerId, (await getBalance(auction.ownerId)) + (Number(auction.bin) - taxedAmount)),
         ]);
@@ -391,7 +391,7 @@ export default async function interactionCreate(interaction: Interaction) {
         payment(
           await interaction.client.users.fetch(auction.ownerId),
           interaction.user,
-          `${auction.itemName} x ${auction.itemAmount} (auction)`
+          `${auction.itemId} x ${auction.itemAmount} (auction)`
         );
 
         const items = getItems();
@@ -400,8 +400,8 @@ export default async function interactionCreate(interaction: Interaction) {
           const embedDm = new CustomEmbed()
             .setColor(Constants.TRANSPARENT_EMBED_COLOR)
             .setDescription(
-              `your auction for ${auction.itemAmount}x ${items[auction.itemName].emoji} ${
-                items[auction.itemName].name
+              `your auction for ${auction.itemAmount}x ${items[auction.itemId].emoji} ${
+                items[auction.itemId].name
               } has been bought by ${interaction.user.username} for $**${Math.floor(
                 Number(auction.bin) - taxedAmount
               ).toLocaleString()}**${taxedAmount != 0 ? `(${(tax * 100).toFixed(1)}% tax)` : ""} `

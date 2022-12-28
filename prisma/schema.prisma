@@ -256,7 +256,7 @@ model WordleStats {
 model Auction {
   id         String   @id @default(uuid())
   ownerId    String
-  itemName   String
+  itemId     String
   itemAmount Int      @default(1)
   bin        BigInt
   messageId  String   @unique
