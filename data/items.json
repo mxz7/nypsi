@@ -1440,5 +1440,18 @@
     "in_crates": true,
     "crate_runs": 2,
     "items": ["role:worker-upgrade"]
+  },
+  "boosters_crate": {
+    "id": "boosters_crate",
+    "name": "boosters crate",
+    "plural": "booster crates",
+    "emoji": "<:booster_crate:1057640419892133968>",
+    "role": "crate",
+    "longDesc": "open to receive three random boosters",
+    "aliases": ["boosterscrate", "boostercrate", "bcrate"],
+    "rarity": 3,
+    "in_crates": true,
+    "crate_runs": 3,
+    "items": ["role:booster"]
   }
 }
