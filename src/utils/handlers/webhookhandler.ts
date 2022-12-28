@@ -1,7 +1,6 @@
-import { ActionRowBuilder, ButtonBuilder, MessageActionRowComponentBuilder } from "@discordjs/builders";
 import * as topgg from "@top-gg/sdk";
 import { Manager } from "discord-hybrid-sharding";
-import { ButtonStyle } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder } from "discord.js";
 import * as express from "express";
 import prisma from "../../init/database";
 import redis from "../../init/redis";
