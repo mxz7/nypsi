@@ -312,13 +312,13 @@ export async function addToAuctionWatch(member: GuildMember, itemName: string) {
         userId: member.user.id,
       },
       data: {
-        auction_watch: { push: itemName },
+        auctionWatch: { push: itemName },
       },
       select: {
-        auction_watch: true,
+        auctionWatch: true,
       },
     })
-    .then((q) => q.auction_watch);
+    .then((q) => q.auctionWatch);
 }
 
 export async function setAuctionWatch(member: GuildMember, items: string[]) {
@@ -328,13 +328,13 @@ export async function setAuctionWatch(member: GuildMember, items: string[]) {
         userId: member.user.id,
       },
       data: {
-        auction_watch: items,
+        auctionWatch: items,
       },
       select: {
-        auction_watch: true,
+        auctionWatch: true,
       },
     })
-    .then((q) => q.auction_watch);
+    .then((q) => q.auctionWatch);
 }
 
 export async function getAuctionWatch(member: GuildMember) {
@@ -344,17 +344,17 @@ export async function getAuctionWatch(member: GuildMember) {
         userId: member.user.id,
       },
       select: {
-        auction_watch: true,
+        auctionWatch: true,
       },
     })
-    .then((q) => q.auction_watch);
+    .then((q) => q.auctionWatch);
 }
 
 async function checkWatchers(itemName: string, messageUrl: string, creatorId: string) {
   const users = await prisma.economy
     .findMany({
       where: {
-        AND: [{ auction_watch: { has: itemName } }, { userId: { not: creatorId } }],
+        AND: [{ auctionWatch: { has: itemName } }, { userId: { not: creatorId } }],
       },
       select: {
         userId: true,

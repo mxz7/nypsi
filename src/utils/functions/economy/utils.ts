@@ -327,7 +327,7 @@ export async function reset() {
           { prestige: 0 },
           { lastVote: { lt: new Date(Date.now() - ms("12 hours")) } },
           { dailyStreak: { lt: 2 } },
-          { auction_watch: { isEmpty: true } },
+          { auctionWatch: { isEmpty: true } },
         ],
       },
     })

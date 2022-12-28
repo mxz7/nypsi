@@ -174,7 +174,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
       )
       .disableFooter();
 
-    if (!(await getDmSettings(user)).vote_reminder) {
+    if (!(await getDmSettings(user)).voteReminder) {
       const chance = Math.floor(Math.random() * 10);
 
       if (chance == 7) {

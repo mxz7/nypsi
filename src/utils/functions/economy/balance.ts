@@ -144,7 +144,7 @@ export async function getMulti(member: GuildMember | string): Promise<number> {
   const boosters = await getBoosters(id);
   const items = getItems();
 
-  if ((await getDmSettings(id)).vote_reminder && !(await redis.sismember(Constants.redis.nypsi.VOTE_REMINDER_RECEIVED, id)))
+  if ((await getDmSettings(id)).voteReminder && !(await redis.sismember(Constants.redis.nypsi.VOTE_REMINDER_RECEIVED, id)))
     multi += 2;
 
   for (const boosterId of boosters.keys()) {
@@ -404,7 +404,7 @@ export async function calcNetWorth(member: GuildMember | string) {
       money: true,
       bank: true,
       Inventory: true,
-      net_worth: true,
+      netWorth: true,
       EconomyWorker: {
         include: {
           upgrades: true,
@@ -479,30 +479,30 @@ export async function calcNetWorth(member: GuildMember | string) {
       userId: id,
     },
     data: {
-      net_worth: Math.floor(worth),
+      netWorth: Math.floor(worth),
     },
   });
 
   setImmediate(async () => {
-    if (query.net_worth && (await getDmSettings(id)).net_worth > 0) {
+    if (query.netWorth && (await getDmSettings(id)).netWorth > 0) {
       const payload: NotificationPayload = {
         memberId: id,
         payload: {
           content: "",
           embed: new CustomEmbed(
             null,
-            `$${Number(query.net_worth).toLocaleString()} ➔ $${Math.floor(worth).toLocaleString()}`
+            `$${Number(query.netWorth).toLocaleString()} ➔ $${Math.floor(worth).toLocaleString()}`
           ).setColor(Constants.TRANSPARENT_EMBED_COLOR),
         },
       };
 
-      if (Number(query.net_worth) < Math.floor(worth) - (await getDmSettings(id)).net_worth) {
+      if (Number(query.netWorth) < Math.floor(worth) - (await getDmSettings(id)).netWorth) {
         payload.payload.content = `your net worth has increased by $${(
-          Math.floor(worth) - Number(query.net_worth)
+          Math.floor(worth) - Number(query.netWorth)
         ).toLocaleString()}`;
-      } else if (Number(query.net_worth) > Math.floor(worth) + (await getDmSettings(id)).net_worth) {
+      } else if (Number(query.netWorth) > Math.floor(worth) + (await getDmSettings(id)).netWorth) {
         payload.payload.content = `your net worth has decreased by $${(
-          Number(query.net_worth) - Math.floor(worth)
+          Number(query.netWorth) - Math.floor(worth)
         ).toLocaleString()}`;
       } else {
         return;

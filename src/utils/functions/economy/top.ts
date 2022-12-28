@@ -143,11 +143,11 @@ export async function topBalanceGlobal(amount: number, anon = true): Promise<str
 export async function topNetWorthGlobal(userId: string) {
   const query = await prisma.economy.findMany({
     where: {
-      AND: [{ net_worth: { gt: 0 } }, { user: { blacklisted: false } }],
+      AND: [{ netWorth: { gt: 0 } }, { user: { blacklisted: false } }],
     },
     select: {
       userId: true,
-      net_worth: true,
+      netWorth: true,
       banned: true,
       user: {
         select: {
@@ -156,7 +156,7 @@ export async function topNetWorthGlobal(userId: string) {
       },
     },
     orderBy: {
-      net_worth: "desc",
+      netWorth: "desc",
     },
   });
 
@@ -181,7 +181,7 @@ export async function topNetWorthGlobal(userId: string) {
     }
 
     out.push(
-      pos + " **" + (user.user.lastKnownTag?.split("#")[0] || user.userId) + "** $" + Number(user.net_worth).toLocaleString()
+      pos + " **" + (user.user.lastKnownTag?.split("#")[0] || user.userId) + "** $" + Number(user.netWorth).toLocaleString()
     );
   }
 
