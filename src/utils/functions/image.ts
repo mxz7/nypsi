@@ -2,7 +2,6 @@ import { variants } from "@catppuccin/palette";
 import { WholesomeImage, WholesomeSuggestion } from "@prisma/client";
 import { ColorResolvable, GuildMember, WebhookClient } from "discord.js";
 import ImgurClient from "imgur";
-import fetch from "node-fetch";
 import prisma from "../../init/database";
 import { NypsiClient } from "../../models/Client";
 import { CustomEmbed } from "../../models/EmbedBuilders";

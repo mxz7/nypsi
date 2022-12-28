@@ -132,6 +132,7 @@ export async function createAuction(member: GuildMember, itemId: string, itemAmo
 
         if (channel.isTextBased()) {
           const msg = await channel.send({ embeds: [embed], components: [row] });
+          msg.crosspost().catch(() => {});
 
           return { messageId: msg.id, messageUrl: msg.url };
         }
@@ -243,6 +244,7 @@ export async function bumpAuction(id: string, client: NypsiClient) {
           }
 
           const m = await channel.send({ embeds: [embed], components: [row] });
+          m.crosspost().catch(() => {});
 
           return [m.url, m.id];
         }

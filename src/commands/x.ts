@@ -36,11 +36,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       }
     }
 
-    if (!user) return message.react("❌");
+    if (!user) {
+      message.react("❌");
+      user = {} as User;
+    }
 
     const embed = new CustomEmbed(
       message.member,
-      `tag: ${user.username}#${user.discriminator}\nid: ${user.id}\ncreated: <t:${Math.floor(
+      `tag: ${user?.username}#${user?.discriminator}\nid: ${user?.id}\ncreated: <t:${Math.floor(
         user.createdTimestamp / 1000
       )}:R>`
     ).setHeader("discord");
@@ -60,10 +63,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       embed.addField("username history", msg, true);
     }
 
-    logger.info(`fetching data for ${user.id}...`);
+    logger.info(`fetching data for ${id}...`);
     const userData = await prisma.user.findUnique({
       where: {
-        id: user.id,
+        id: id,
       },
       include: {
         Economy: {
@@ -100,43 +103,45 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const moderationCases = await prisma.moderationCase.findMany({
       where: {
-        user: user.id,
+        user: id,
       },
     });
 
-    const moderationCasesModerator = await prisma.moderationCase.findMany({
-      where: {
-        moderator: user.tag,
-      },
-    });
+    const moderationCasesModerator = await prisma.moderationCase
+      .findMany({
+        where: {
+          moderator: user?.tag,
+        },
+      })
+      .catch(() => {});
 
     const moderationMutes = await prisma.moderationMute.findMany({
       where: {
-        userId: user.id,
+        userId: id,
       },
     });
 
     const moderationBans = await prisma.moderationBan.findMany({
       where: {
-        userId: user.id,
+        userId: id,
       },
     });
 
     const chatReactionStats = await prisma.chatReactionStats.findMany({
       where: {
-        userId: user.id,
+        userId: id,
       },
     });
 
-    const file = `temp/${user.id}.txt`;
+    const file = `temp/${id}.txt`;
 
-    logger.info(`packing into text file for ${user.id}...`);
+    logger.info(`packing into text file for ${id}...`);
 
     await fs.writeFile(
       file,
-      `nypsi data for ${user.username}#${user.discriminator} (${user.id} at time of request) requested by ${
-        message.author.tag
-      } ${message.author.id} - ${new Date().toUTCString()}\n\n----------\nYOUR USER DATA\n----------\n\n`
+      `nypsi data for ${user?.username}#${user?.discriminator} (${user?.id}) requested by ${message.author.tag} ${
+        message.author.id
+      } - ${new Date().toUTCString()}\n\n----------\nYOUR USER DATA\n----------\n\n`
     );
     await fs.appendFile(file, JSON.stringify(userData, null, 2));
 
