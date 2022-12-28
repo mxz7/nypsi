@@ -1342,7 +1342,7 @@
     "emoji": "<:nypsi_gem_green:1046866209326514206>",
     "longDesc": "a mysterious green, shiny gem. only found during a specific activity. it is widely known that the green gem is harmless... mostly. the most noble of all gems",
     "role": "item",
-    "rarity": 69,
+    "rarity": 2,
     "in_crates": false,
     "aliases": ["green"]
   },
@@ -1352,7 +1352,7 @@
     "emoji": "<:nypsi_gem_purple:1046932495184187452>",
     "longDesc": "a mysterious purple, shiny gem. only found during a specific activity. some say gems are magical, made by witches. and are dangerous...",
     "role": "item",
-    "rarity": 69,
+    "rarity": 3,
     "in_crates": false,
     "aliases": ["purple"]
   },
@@ -1362,7 +1362,7 @@
     "emoji": "<:nypsi_gem_pink:1046932847069499472>",
     "longDesc": "a mysterious pink, shiny gem. only found during a specific activity. some say gems were planted by aliens in the early stages of earth's creation",
     "role": "item",
-    "rarity": 69,
+    "rarity": 3,
     "in_crates": false,
     "aliases": ["pink"]
   },
@@ -1372,7 +1372,7 @@
     "emoji": "<:nypsi_gem_blue:1046933487770423406>",
     "longDesc": "a mysterious blue, shiny gem. only found during a specific activity. some say gems are ancient relics of a long past civilization",
     "role": "item",
-    "rarity": 69,
+    "rarity": 1,
     "in_crates": false,
     "aliases": ["blue"]
   },
@@ -1382,7 +1382,7 @@
     "emoji": "<:nypsi_gem_white:1046933670436552725>",
     "longDesc": "a mysterious white, shiny gem. the most ancient and most powerful of them all. ancient tablets claim that the holder of this gem has the power to create worlds. be careful.",
     "role": "item",
-    "rarity": 69,
+    "rarity": 4,
     "in_crates": false,
     "craft": {
       "time": 259200,
@@ -1396,7 +1396,7 @@
     "emoji": "<:nypsi_crystal_heart:1051624572694319124>",
     "longDesc": "it's widely understood throughout history, that nobody truly understands the origin of any gem, including the crystal heart. ancient hieroglyphs depict the crystal heart forming when all gems in existence fuse together. quite a sight to behold.",
     "role": "item",
-    "rarity": 69,
+    "rarity": 4,
     "in_crates": false,
     "aliases": ["heart", "crystal"]
   },
@@ -1453,5 +1453,18 @@
     "in_crates": true,
     "crate_runs": 3,
     "items": ["role:booster"]
+  },
+  "gem_crate": {
+    "id": "gem_crate",
+    "name": "gem crate",
+    "plural": "gem crates",
+    "emoji": "<:gem_crate:1057641447756660747>",
+    "role": "crate",
+    "longDesc": "open to receive one random gem",
+    "aliases": ["gemcrate", "gcrate", "gemscrate"],
+    "rarity": 3,
+    "in_crates": true,
+    "crate_runs": 1,
+    "items": ["id:white_gem", "id:blue_gem", "id:green_gem", "id:purple_gem", "id:pink_gem", "id:crystal_heart"]
   }
 }
