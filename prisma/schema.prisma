@@ -31,17 +31,17 @@ model User {
 model DMSettings {
   userId String @id
 
-  rob           Boolean         @default(true)
-  lottery       Boolean         @default(true)
-  premium       Boolean         @default(true)
-  auction       Boolean         @default(true)
-  vote          Boolean         @default(true)
-  vote_reminder Boolean         @default(false)
-  worker        WorkerDmSetting @default(OnlyWhenFull)
-  booster       Boolean         @default(false)
-  payment       Boolean         @default(true)
-  other         Boolean         @default(true)
-  net_worth     Int             @default(0)
+  rob          Boolean         @default(true)
+  lottery      Boolean         @default(true)
+  premium      Boolean         @default(true)
+  auction      Boolean         @default(true)
+  vote         Boolean         @default(true)
+  voteReminder Boolean         @default(false)
+  worker       WorkerDmSetting @default(OnlyWhenFull)
+  booster      Boolean         @default(false)
+  payment      Boolean         @default(true)
+  other        Boolean         @default(true)
+  netWorth     Int             @default(0)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
@@ -78,7 +78,7 @@ model Economy {
   money       BigInt  @default(500)
   bank        BigInt  @default(9500)
   bankStorage BigInt  @default(5000)
-  net_worth   BigInt  @default(0)
+  netWorth    BigInt  @default(0)
   defaultBet  Int?
   xp          Int     @default(0)
   prestige    Int     @default(0)
@@ -92,7 +92,7 @@ model Economy {
 
   banned DateTime?
 
-  auction_watch String[]
+  auctionWatch String[]
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String @id

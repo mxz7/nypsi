@@ -30,10 +30,10 @@ async function doTopNetworth() {
   const query = await prisma.economy.findMany({
     select: {
       userId: true,
-      net_worth: true,
+      netWorth: true,
     },
     orderBy: {
-      net_worth: "desc",
+      netWorth: "desc",
     },
     take: 25,
   });
@@ -44,7 +44,7 @@ async function doTopNetworth() {
     await prisma.graphMetrics.create({
       data: {
         userId: user.userId,
-        value: user.net_worth,
+        value: user.netWorth,
         date,
         category: "networth",
       },
@@ -90,7 +90,7 @@ async function doMembers() {
           Economy: {
             select: {
               money: true,
-              net_worth: true,
+              netWorth: true,
             },
           },
         },
@@ -111,13 +111,13 @@ async function doMembers() {
         },
       });
     }
-    if (user.user.Economy.net_worth) {
+    if (user.user.Economy.netWorth) {
       await prisma.graphMetrics.create({
         data: {
           category: "user-net",
           date,
           userId: user.userId,
-          value: user.user.Economy.net_worth,
+          value: user.user.Economy.netWorth,
         },
       });
     }
