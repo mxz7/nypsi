@@ -1,7 +1,8 @@
-import { ActionRowBuilder, ButtonBuilder, SelectMenuBuilder } from "@discordjs/builders";
 import { DMSettings } from "@prisma/client";
 import {
+  ActionRowBuilder,
   BaseMessageOptions,
+  ButtonBuilder,
   ButtonStyle,
   CommandInteraction,
   Interaction,
@@ -9,6 +10,7 @@ import {
   Message,
   MessageActionRowComponentBuilder,
   ModalBuilder,
+  StringSelectMenuBuilder,
   StringSelectMenuOptionBuilder,
   TextInputBuilder,
   TextInputStyle,
@@ -142,7 +144,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           boobies.push(option);
         }
 
-        userSelection.setComponents(new SelectMenuBuilder().setCustomId("typesetting").setOptions(boobies));
+        userSelection.setComponents(new StringSelectMenuBuilder().setCustomId("typesetting").setOptions(boobies));
       } else {
         // @ts-expect-error annoying grr
         if (settings[settingId]) {
@@ -157,7 +159,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           embeds: [embed],
           components: [
             new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-              new SelectMenuBuilder().setCustomId("setting").setOptions(options)
+              new StringSelectMenuBuilder().setCustomId("setting").setOptions(options)
             ),
             userSelection,
           ],
@@ -167,7 +169,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           embeds: [embed],
           components: [
             new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-              new SelectMenuBuilder().setCustomId("setting").setOptions(options)
+              new StringSelectMenuBuilder().setCustomId("setting").setOptions(options)
             ),
             userSelection,
           ],
