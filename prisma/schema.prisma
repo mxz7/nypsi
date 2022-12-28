@@ -185,7 +185,7 @@ model Booster {
 
 model Game {
   id       Int      @id @default(autoincrement())
-  userId   String
+  userId   String?
   game     String
   win      Int
   bet      BigInt
@@ -194,7 +194,7 @@ model Game {
   outcome  String
   date     DateTime @default(now())
 
-  economy Economy @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  economy Economy? @relation(fields: [userId], references: [userId])
 }
 
 model ItemUse {
