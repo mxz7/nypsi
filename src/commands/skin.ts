@@ -1,6 +1,5 @@
 import { CommandInteraction, Message } from "discord.js";
 import { getSkin } from "mc-names";
-import fetch from "node-fetch";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
