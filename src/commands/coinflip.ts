@@ -81,7 +81,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (!(await userExists(target))) await createUser(target);
 
-  const maxBet = await calcMaxBet(message.member);
+  const maxBet = (await calcMaxBet(message.member)) * 3;
 
   const bet = await formatBet(args[1], message.member);
 
@@ -105,12 +105,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return message.channel.send({ embeds: [new ErrorEmbed(`**${target.user.tag}** cannot afford this bet`)] });
   }
 
-  const targetMaxBet = await calcMaxBet(target);
+  const targetMaxBet = (await calcMaxBet(target)) * 3;
 
   if (bet > maxBet) {
     return message.channel.send({
       embeds: [
-        new ErrorEmbed(`your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`),
+        new ErrorEmbed(
+          `your max bet for coinflip is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
+        ),
       ],
     });
   }
