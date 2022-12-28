@@ -350,13 +350,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const embed = new CustomEmbed(
     message.member,
-    "~~---------------~~\n" +
+    "~~------------~~\n" +
       animatedEmojis.get(one) +
       " **|** " +
       animatedEmojis.get(two) +
       " **|** " +
       animatedEmojis.get(three) +
-      "\n~~---------------~~\n**bet** $" +
+      "\n~~------------~~\n**bet** $" +
       bet.toLocaleString()
   ).setHeader("slots", message.author.avatarURL());
 
@@ -371,13 +371,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   send({ embeds: [embed] }).then(async (m) => {
     embed.setDescription(
-      "~~---------------~~\n" +
+      "~~------------~~\n" +
         staticEmojis.get(one.split("-")[0]) +
         " **|** " +
         staticEmojis.get(two.split("-")[0]) +
         " **|** " +
         staticEmojis.get(three.split("-")[0]) +
-        "\n~~---------------~~\n**bet** $" +
+        "\n~~------------~~\n**bet** $" +
         bet.toLocaleString()
     );
 
