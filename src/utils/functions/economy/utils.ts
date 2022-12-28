@@ -2,7 +2,6 @@ import { exec } from "child_process";
 import { GuildMember } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import * as fs from "fs";
-import fetch from "node-fetch";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";

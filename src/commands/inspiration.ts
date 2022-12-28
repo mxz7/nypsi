@@ -1,5 +1,4 @@
 import { CommandInteraction, Message } from "discord.js";
-import fetch from "node-fetch";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { isImageUrl } from "../utils/functions/image";

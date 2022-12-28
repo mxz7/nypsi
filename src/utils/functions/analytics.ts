@@ -1,5 +1,4 @@
 import { inPlaceSort } from "fast-sort";
-import fetch from "node-fetch";
 import { cpu } from "node-os-utils";
 import * as os from "os";
 import prisma from "../../init/database";

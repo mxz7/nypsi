@@ -1,4 +1,3 @@
-import fetch from "node-fetch";
 import { RedditJSON, RedditJSONPost } from "../../types/Reddit";
 import { logger } from "../logger";
 
