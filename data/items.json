@@ -1462,8 +1462,8 @@
     "role": "crate",
     "longDesc": "open to receive one random gem",
     "aliases": ["gemcrate", "gcrate", "gemscrate"],
-    "rarity": 3,
-    "in_crates": true,
+    "rarity": 69,
+    "in_crates": false,
     "crate_runs": 1,
     "items": ["id:white_gem", "id:blue_gem", "id:green_gem", "id:purple_gem", "id:pink_gem", "id:crystal_heart"]
   }
