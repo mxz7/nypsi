@@ -307,7 +307,7 @@ export async function uploadImageToImgur(url: string): Promise<string> {
     fallback = true;
   }
 
-  if (fallback || !boobies) {
+  if (fallback || !boobies || typeof boobies?.data?.link != "string") {
     logger.info("using fallback uploader..");
 
     const res = await fallbackUpload(url);
@@ -324,14 +324,10 @@ export async function uploadImageToImgur(url: string): Promise<string> {
   return boobies.data.link;
 }
 
-async function fallbackUpload(url: string) {
+export async function fallbackUpload(url: string) {
   const res = await fetch(`https://api.imgbb.com/1/upload?key=${process.env.IMGBB_TOKEN}&image=${url}`).then((res) =>
     res.json()
   );
 
-  if (!res.success) {
-    return false;
-  }
-
-  return res.display_url;
+  return res.data.url;
 }
