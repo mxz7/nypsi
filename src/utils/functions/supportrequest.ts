@@ -36,7 +36,7 @@ export async function getSupportRequest(id: string) {
 
 export async function createSupportRequest(id: string, client: NypsiClient, username: string) {
   const clusterHas = await client.cluster.broadcastEval(async (c) => {
-    const client = c as NypsiClient;
+    const client = c as unknown as NypsiClient;
     const channel = await client.channels.fetch("1015299117934723173").catch(() => {});
 
     if (channel) {
@@ -61,7 +61,7 @@ export async function createSupportRequest(id: string, client: NypsiClient, user
 
   const res = await client.cluster.broadcastEval(
     async (c, { shard, username }) => {
-      const client = c as NypsiClient;
+      const client = c as unknown as NypsiClient;
       if (client.cluster.id != shard) return false;
 
       const channel = await client.channels.fetch("1015299117934723173");
@@ -113,7 +113,7 @@ export async function sendToRequestChannel(id: string, embed: CustomEmbed, clien
 
   const clusterHas = await client.cluster.broadcastEval(
     async (c, { channelId }) => {
-      const client = c as NypsiClient;
+      const client = c as unknown as NypsiClient;
       const channel = await client.channels.fetch(channelId).catch(() => {});
 
       if (channel) {
@@ -140,7 +140,7 @@ export async function sendToRequestChannel(id: string, embed: CustomEmbed, clien
 
   const res = await client.cluster.broadcastEval(
     async (c, { shard, embed, channelId }) => {
-      const client = c as NypsiClient;
+      const client = c as unknown as NypsiClient;
       if (client.cluster.id != shard) return false;
 
       const channel = await client.channels.fetch(channelId);

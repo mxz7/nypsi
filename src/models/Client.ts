@@ -1,4 +1,4 @@
-import * as Cluster from "discord-hybrid-sharding";
+import { ClusterClient, DjsClient } from "discord-hybrid-sharding";
 import { Client, ClientOptions } from "discord.js";
 import channelCreate from "../events/channelCreate";
 import channelDelete from "../events/channelDelete";
@@ -43,12 +43,12 @@ import { updateCache } from "../utils/handlers/imghandler";
 import { getWebhooks, logger, setClusterId } from "../utils/logger";
 
 export class NypsiClient extends Client {
-  public cluster: Cluster.Client;
+  public cluster: ClusterClient;
 
   constructor(options: ClientOptions) {
     super(options);
 
-    this.cluster = new Cluster.Client(this);
+    this.cluster = new ClusterClient(this as unknown as DjsClient);
 
     setClusterId(this.cluster.id);
     process.title = `nypsi v${getVersion()}: cluster ${this.cluster.id}`;
@@ -83,8 +83,8 @@ export class NypsiClient extends Client {
 
     this.once("ready", ready.bind(null, this));
 
-    this.cluster.on("message", (message) => {
-      if (message._sRequest) {
+    this.cluster.on("message", (message: any) => {
+      if (message._type) {
         if (message.alive) message.reply({ alive: true });
       }
     });

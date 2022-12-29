@@ -547,6 +547,7 @@ export default async function interactionCreate(interaction: Interaction) {
 
       return runCommand("bake", interaction as unknown as NypsiCommandInteraction, []);
     } else {
+      if (!interaction.guild) return;
       const reactionRoles = await getReactionRolesByGuild(interaction.guild);
 
       if (reactionRoles.length === 0) return;

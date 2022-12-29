@@ -1,4 +1,4 @@
-import * as Cluster from "discord-hybrid-sharding";
+import { getInfo } from "discord-hybrid-sharding";
 import { GatewayIntentBits, Options, Partials } from "discord.js";
 import { NypsiClient } from "./models/Client";
 
@@ -40,8 +40,8 @@ const client = new NypsiClient({
   rest: {
     offset: 0,
   },
-  shards: Cluster.Client.getInfo().SHARD_LIST,
-  shardCount: Cluster.Client.getInfo().TOTAL_SHARDS,
+  shards: getInfo().SHARD_LIST,
+  shardCount: getInfo().TOTAL_SHARDS,
   intents: [
     GatewayIntentBits.DirectMessages,
     GatewayIntentBits.MessageContent,

@@ -32,7 +32,7 @@ export function runChristmas(client: NypsiClient) {
     for (const guild of query) {
       const clusterHas = await client.cluster.broadcastEval(
         async (c, { channelId }) => {
-          const client = c as NypsiClient;
+          const client = c as unknown as NypsiClient;
           const channel = await client.channels.fetch(channelId).catch(() => {});
 
           if (channel) {
@@ -78,7 +78,7 @@ export function runChristmas(client: NypsiClient) {
 
       const res = await client.cluster.broadcastEval(
         async (c, { needed, embed, channelId }) => {
-          const client = c as NypsiClient;
+          const client = c as unknown as NypsiClient;
           if (client.cluster.id != needed) return false;
 
           const channel = await client.channels.fetch(channelId).catch(() => {});
