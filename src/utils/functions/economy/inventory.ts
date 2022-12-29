@@ -228,7 +228,7 @@ async function checkCollectorAchievement(id: string, inventory: Inventory) {
   }
 }
 
-export async function openCrate(member: GuildMember | string, item: Item) {
+export async function openCrate(member: GuildMember | string, item: Item): Promise<Map<string, number>> {
   let id: string;
   if (member instanceof GuildMember) {
     id = member.user.id;
@@ -239,7 +239,11 @@ export async function openCrate(member: GuildMember | string, item: Item) {
   const inventory = await getInventory(member);
   const items = getItems();
 
-  const crateItems = ["money:50000", "money:100000", "xp:25", "xp:50"];
+  if (!inventory.find((i) => i.item === item.id) || inventory.find((i) => i.item === item.id).amount < 1) {
+    return new Map();
+  }
+
+  const crateItems: string[] = [];
 
   for (const i of Array.from(Object.keys(items))) {
     if (!items[i].in_crates) continue;
