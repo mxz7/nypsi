@@ -1,6 +1,2 @@
-
-# *.md
-
-!lists.json
-
+pnpm-lock.yaml
 dist/
