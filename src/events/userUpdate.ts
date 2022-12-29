@@ -42,7 +42,7 @@ async function determineCluster(client: NypsiClient, userId: string) {
 
   const res = await client.cluster.broadcastEval(
     async (c, { currentId, userId }) => {
-      const client = c as NypsiClient;
+      const client = c as unknown as NypsiClient;
 
       if (client.cluster.id == currentId) return "current";
 

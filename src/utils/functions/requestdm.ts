@@ -1,4 +1,4 @@
-import { Manager } from "discord-hybrid-sharding";
+import { ClusterManager } from "discord-hybrid-sharding";
 import {
   ActionRowBuilder,
   APIEmbed,
@@ -15,7 +15,7 @@ interface RequestDMOptions {
   memberId: string;
   content: string;
   embed?: CustomEmbed;
-  client: NypsiClient | Manager;
+  client: NypsiClient | ClusterManager;
   components?: ActionRowBuilder<MessageActionRowComponentBuilder>;
 }
 
@@ -25,7 +25,7 @@ export default async function requestDM(options: RequestDMOptions): Promise<bool
   if (options.client instanceof NypsiClient) {
     const clusterHas = await options.client.cluster.broadcastEval(
       async (c, { userId }) => {
-        const client = c as NypsiClient;
+        const client = c as unknown as NypsiClient;
         const user = await client.users.fetch(userId).catch(() => {});
 
         if (user) {
@@ -75,7 +75,7 @@ export default async function requestDM(options: RequestDMOptions): Promise<bool
 
     const res = await options.client.cluster.broadcastEval(
       async (c, { needed, memberId, payload }) => {
-        const client = c as NypsiClient;
+        const client = c as unknown as NypsiClient;
         if (client.cluster.id != needed) return false;
 
         const user = await client.users.fetch(memberId).catch(() => {});
@@ -115,7 +115,7 @@ export default async function requestDM(options: RequestDMOptions): Promise<bool
   } else {
     const clusterHas = await options.client.broadcastEval(
       async (c, { userId }) => {
-        const client = c as NypsiClient;
+        const client = c as unknown as NypsiClient;
         const user = await client.users.fetch(userId).catch(() => {});
 
         if (user) {
@@ -165,7 +165,7 @@ export default async function requestDM(options: RequestDMOptions): Promise<bool
 
     const res = await options.client.broadcastEval(
       async (c, { needed, memberId, payload }) => {
-        const client = c as NypsiClient;
+        const client = c as unknown as NypsiClient;
         if (client.cluster.id != needed) return false;
 
         const user = await client.users.fetch(memberId).catch(() => {});

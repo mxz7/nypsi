@@ -105,7 +105,7 @@ export async function createAuction(member: GuildMember, itemId: string, itemAmo
   const clusters = await (member.client as NypsiClient).cluster.broadcastEval(async (client) => {
     const guild = await client.guilds.fetch("747056029795221513");
 
-    if (guild) return (client as NypsiClient).cluster.id;
+    if (guild) return (client as unknown as NypsiClient).cluster.id;
     return "not-found";
   });
 
@@ -121,7 +121,7 @@ export async function createAuction(member: GuildMember, itemId: string, itemAmo
   const { messageId, messageUrl } = await (member.client as NypsiClient).cluster
     .broadcastEval(
       async (client, { embed, row, cluster }) => {
-        if ((client as NypsiClient).cluster.id != cluster) return;
+        if ((client as unknown as NypsiClient).cluster.id != cluster) return;
         const guild = await client.guilds.fetch("747056029795221513");
 
         if (!guild) return;
@@ -207,7 +207,7 @@ export async function bumpAuction(id: string, client: NypsiClient) {
   const clusters = await client.cluster.broadcastEval(async (client) => {
     const guild = await client.guilds.fetch("747056029795221513");
 
-    if (guild) return (client as NypsiClient).cluster.id;
+    if (guild) return (client as unknown as NypsiClient).cluster.id;
     return "not-found";
   });
 
@@ -223,7 +223,7 @@ export async function bumpAuction(id: string, client: NypsiClient) {
   const [messageUrl, messageId] = await client.cluster
     .broadcastEval(
       async (client, { row, messageId, embed, cluster }) => {
-        if ((client as NypsiClient).cluster.id != cluster) return null;
+        if ((client as unknown as NypsiClient).cluster.id != cluster) return null;
         const guild = await client.guilds.fetch("747056029795221513");
 
         if (!guild) return;
