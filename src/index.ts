@@ -1,4 +1,5 @@
 import * as Cluster from "discord-hybrid-sharding";
+import { ClusterManager } from "discord-hybrid-sharding";
 import "dotenv/config";
 import { clearInterval } from "timers";
 import redis from "./init/redis";
@@ -19,7 +20,7 @@ process.title = `nypsi v${getVersion()}: main`;
 
 let heartBeatIntervals: NodeJS.Timer[] = [];
 
-const manager = new Cluster.Manager(`${__dirname}/nypsi.js`, {
+const manager = new ClusterManager(`${__dirname}/nypsi.js`, {
   token: process.env.BOT_TOKEN,
 
   execArgv: ["--trace-warnings"],

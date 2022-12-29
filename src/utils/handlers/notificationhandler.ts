@@ -1,4 +1,4 @@
-import { Manager } from "discord-hybrid-sharding";
+import { ClusterManager } from "discord-hybrid-sharding";
 import redis from "../../init/redis";
 import Constants from "../Constants";
 import requestDM from "../functions/requestdm";
@@ -8,7 +8,7 @@ import pAll = require("p-all");
 let lastRun = 0;
 const actions: (() => Promise<boolean>)[] = [];
 
-export function listenForDms(manager: Manager) {
+export function listenForDms(manager: ClusterManager) {
   setInterval(async () => {
     if (lastRun > Date.now() - 30000) return;
 
@@ -21,7 +21,7 @@ export function listenForDms(manager: Manager) {
   }, 5_000);
 }
 
-async function doDmQueueInterval(manager: Manager): Promise<void> {
+async function doDmQueueInterval(manager: ClusterManager): Promise<void> {
   if ((await redis.llen(Constants.redis.nypsi.DM_QUEUE)) == 0) {
     await pAll(actions, { concurrency: 5 });
 
