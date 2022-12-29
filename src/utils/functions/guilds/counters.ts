@@ -8,7 +8,7 @@ import { getItems } from "../economy/utils";
 export async function updateChannel(data: GuildCounter, client: NypsiClient) {
   const clusterHas = await client.cluster.broadcastEval(
     async (c, { channelId }) => {
-      const client = c as NypsiClient;
+      const client = c as unknown as NypsiClient;
       const channel = await client.channels.fetch(channelId).catch(() => {});
 
       if (channel) {
@@ -47,7 +47,7 @@ export async function updateChannel(data: GuildCounter, client: NypsiClient) {
     value = await client.cluster
       .broadcastEval(
         async (c, { channelId, shard }) => {
-          const client = c as NypsiClient;
+          const client = c as unknown as NypsiClient;
 
           if (client.cluster.id != shard) return;
 
@@ -71,7 +71,7 @@ export async function updateChannel(data: GuildCounter, client: NypsiClient) {
     value = await client.cluster
       .broadcastEval(
         async (c, { channelId, shard }) => {
-          const client = c as NypsiClient;
+          const client = c as unknown as NypsiClient;
 
           if (client.cluster.id != shard) return;
 
@@ -92,7 +92,7 @@ export async function updateChannel(data: GuildCounter, client: NypsiClient) {
     value = await client.cluster
       .broadcastEval(
         async (c, { channelId, shard }) => {
-          const client = c as NypsiClient;
+          const client = c as unknown as NypsiClient;
 
           if (client.cluster.id != shard) return;
 
@@ -113,7 +113,7 @@ export async function updateChannel(data: GuildCounter, client: NypsiClient) {
     const members = await client.cluster
       .broadcastEval(
         async (c, { channelId, shard }) => {
-          const client = c as NypsiClient;
+          const client = c as unknown as NypsiClient;
 
           if (client.cluster.id != shard) return;
 
@@ -153,7 +153,7 @@ export async function updateChannel(data: GuildCounter, client: NypsiClient) {
     const members = await client.cluster
       .broadcastEval(
         async (c, { channelId, shard }) => {
-          const client = c as NypsiClient;
+          const client = c as unknown as NypsiClient;
 
           if (client.cluster.id != shard) return;
 
@@ -192,7 +192,7 @@ export async function updateChannel(data: GuildCounter, client: NypsiClient) {
     const members = await client.cluster
       .broadcastEval(
         async (c, { channelId, shard }) => {
-          const client = c as NypsiClient;
+          const client = c as unknown as NypsiClient;
 
           if (client.cluster.id != shard) return;
 
@@ -234,7 +234,7 @@ export async function updateChannel(data: GuildCounter, client: NypsiClient) {
 
   const res = await client.cluster.broadcastEval(
     async (c, { shard, channelId, format }) => {
-      const client = c as NypsiClient;
+      const client = c as unknown as NypsiClient;
 
       if (client.cluster.id != shard) return;
 
