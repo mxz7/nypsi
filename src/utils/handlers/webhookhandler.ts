@@ -1,5 +1,5 @@
 import * as topgg from "@top-gg/sdk";
-import { Manager } from "discord-hybrid-sharding";
+import { ClusterManager } from "discord-hybrid-sharding";
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder } from "discord.js";
 import * as express from "express";
 import prisma from "../../init/database";
@@ -29,7 +29,7 @@ const webhook = new topgg.Webhook("123");
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-export function listen(manager: Manager) {
+export function listen(manager: ClusterManager) {
   app.post(
     "/dblwebhook",
     webhook.listener((vote) => {
@@ -59,7 +59,7 @@ export function listen(manager: Manager) {
   logger.info(`listening on port ${process.env.EXPRESS_PORT || 5000}`);
 }
 
-async function doVote(vote: topgg.WebhookPayload, manager: Manager) {
+async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
   const { user } = vote;
 
   await redis.srem(Constants.redis.nypsi.VOTE_REMINDER_RECEIVED, user);
