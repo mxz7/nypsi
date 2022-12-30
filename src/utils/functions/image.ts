@@ -161,12 +161,11 @@ export async function suggestWholesomeImage(submitter: GuildMember, image: strin
 
   const embed = new CustomEmbed()
     .setColor(variants.latte.base.hex as ColorResolvable)
-    .setTitle("wholesome suggestion #" + id)
-    .disableFooter();
+    .setTitle("wholesome suggestion #" + id);
 
   embed.setDescription(`**submitter** ${submitter.user.tag} (${submitter.user.id})\n**url** ${image}`);
 
-  embed.setFooter({ text: `$wholesome accept ${id} | $wholesome deny ${id}` });
+  embed.setFooter({ text: "$ws review" });
 
   embed.setImage(image);
 
