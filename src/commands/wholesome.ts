@@ -178,18 +178,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     embed.setImage(wholesome.image);
     embed.setFooter({ text: `submitted on ${formatDate(wholesome.uploadDate)}` });
   } else if (args[0].toLowerCase() == "accept" || args[0].toLowerCase() == "a") {
-    if (message.guild.id != "747056029795221513") return;
-
-    const roles = message.member.roles.cache;
-
-    let allow = false;
-
-    if (roles.has("747056620688900139")) allow = true;
-    if (roles.has("747059949770768475")) allow = true;
-    if (roles.has("845613231229370429")) allow = true;
-    if (roles.has("1023950187661635605")) allow = true;
-
-    if (!allow) return;
+    if (message.author.id !== Constants.TEKOH_ID) return;
 
     if (args.length == 1) {
       return send({ embeds: [new ErrorEmbed("you must include the suggestion id")] });
@@ -205,18 +194,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     return message.react("✅");
   } else if (args[0].toLowerCase() == "deny" || args[0].toLowerCase() == "d") {
-    if (message.guild.id != "747056029795221513") return;
-
-    const roles = message.member.roles.cache;
-
-    let allow = false;
-
-    if (roles.has("747056620688900139")) allow = true;
-    if (roles.has("747059949770768475")) allow = true;
-    if (roles.has("845613231229370429")) allow = true;
-    if (roles.has("1023950187661635605")) allow = true;
-
-    if (!allow) return;
+    if (message.author.id !== Constants.TEKOH_ID) return;
 
     if (args.length == 1) {
       return send({ embeds: [new ErrorEmbed("you must include the suggestion id")] });
@@ -368,8 +346,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (!allow) return;
 
     const doReview = async (msg: Message): Promise<any> => {
-      const count = await prisma.wholesomeSuggestion.count();
+      const count = await prisma.wholesomeSuggestion.count({
+        where: { submitterId: { not: message.author.id } },
+      });
       let suggestion = await prisma.wholesomeSuggestion.findFirst({
+        where: { submitterId: { not: message.author.id } },
         skip: Math.floor(Math.random() * count),
       });
 
