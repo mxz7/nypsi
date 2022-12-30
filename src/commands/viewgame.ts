@@ -62,7 +62,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   let components: ActionRowBuilder<MessageActionRowComponentBuilder>[];
 
   const desc =
-    `**id** \`${game.id.toString(36)}\`\n` +
+    `**id** \`${game.id.toString(36)}\` \`(${game.id})\`\n` +
     `**user** \`${username || "[redacted]"}\`\n` +
     `**game** \`${game.game}\`\n` +
     `**time** <t:${Math.floor(game.date.getTime() / 1000)}>\n` +
