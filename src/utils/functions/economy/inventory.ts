@@ -245,7 +245,7 @@ export async function openCrate(member: GuildMember | string, item: Item): Promi
 
   const inventory = await getInventory(member);
   const items = getItems();
-  
+
   if (!inventory.find((i) => i.item === item.id) || inventory.find((i) => i.item === item.id).amount < 1) {
     return new Map();
   }
