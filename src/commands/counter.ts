@@ -127,6 +127,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const format = message.options.getString("format");
     const item = message.options.getString("item-global");
 
+    if (!format.includes("%value%")) return send({ embeds: [new ErrorEmbed("invalid format. use %value%")] });
+
     const counters = await getGuildCounters(message.guild);
 
     let max = 3;
