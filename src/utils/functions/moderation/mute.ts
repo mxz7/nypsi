@@ -106,7 +106,7 @@ export async function setMuteRole(guild: Guild, role: Role | string) {
 export async function requestUnmute(guildId: string, member: string, client: NypsiClient) {
   const muteRoleId = await getMuteRole(guildId);
 
-  const res = await client.cluster.broadcastEval(
+  await client.cluster.broadcastEval(
     async (c, { guildId, memberId, muteRoleId }) => {
       const guild = await c.guilds.fetch(guildId).catch(() => {});
 
@@ -144,9 +144,7 @@ export async function requestUnmute(guildId: string, member: string, client: Nyp
     }
   );
 
-  if (res.includes(true) || res.includes("member") || res.includes("role")) {
-    await deleteMute(guildId, member);
-  }
+  await deleteMute(guildId, member);
 }
 
 export async function getMutedUsers(guild: Guild) {
