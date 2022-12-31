@@ -11,6 +11,7 @@ export async function updateCounters(client: NypsiClient) {
     const functions = [];
 
     for (const counter of counters) {
+      if (!counter.format.includes("%value%")) await prisma.guildCounter.delete({ where: { channel: counter.channel } });
       functions.push(async () => {
         updateChannel(counter, client);
       });
