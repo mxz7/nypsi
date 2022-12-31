@@ -38,8 +38,8 @@ import { getPrefix } from "../functions/guilds/utils";
 import { addKarma, getKarma } from "../functions/karma/karma";
 import { addUse, getCommand } from "../functions/premium/command";
 import { cleanString } from "../functions/string";
-import { addCommandUse, getLastCommand, updateLastCommand } from "../functions/users/commands";
-import { getLastKnownTag, updateLastKnowntag } from "../functions/users/tag";
+import { getLastCommand, updateUser } from "../functions/users/commands";
+import { getLastKnownTag } from "../functions/users/tag";
 import { createProfile, hasProfile } from "../functions/users/utils";
 import dayjs = require("dayjs");
 
@@ -577,8 +577,6 @@ export async function runCommand(
 
   if (!(await hasProfile(message.member))) {
     await createProfile(message.member.user);
-  } else {
-    updateLastKnowntag(message.author.id, message.author.tag);
   }
 
   if (!commandExists(cmd) && message instanceof Message) {
@@ -775,8 +773,7 @@ export async function runCommand(
   await Promise.all([
     a(message.author.id, message.author.tag, message.content),
     updateCommandUses(message.member),
-    updateLastCommand(message.member),
-    addCommandUse(message.author.id, command.name),
+    updateUser(message.author || message.member.user || null, command.name),
     redis.hincrby(Constants.redis.nypsi.TOP_COMMANDS, command.name, 1),
     redis.hincrby(Constants.redis.nypsi.TOP_COMMANDS_USER, message.author.tag, 1),
     redis.sadd(Constants.redis.nypsi.ACTIVE_USERS_ANALYTICS, message.author.id),

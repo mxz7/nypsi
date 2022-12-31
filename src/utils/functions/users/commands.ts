@@ -1,31 +1,8 @@
-import { GuildMember } from "discord.js";
+import { GuildMember, User } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import Constants from "../../Constants";
 import ms = require("ms");
-
-export async function updateLastCommand(member: GuildMember | string) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
-
-  const date = new Date();
-
-  await redis.set(`${Constants.redis.cache.user.LAST_COMMAND}:${id}`, date.getTime());
-  await redis.expire(`${Constants.redis.cache.user.LAST_COMMAND}:${id}`, ms("30 minutes") / 1000);
-
-  await prisma.user.update({
-    where: {
-      id: id,
-    },
-    data: {
-      lastCommand: date,
-    },
-  });
-}
 
 export async function getLastCommand(member: GuildMember | string): Promise<Date> {
   let id: string;
@@ -57,24 +34,6 @@ export async function getLastCommand(member: GuildMember | string): Promise<Date
   return query.lastCommand;
 }
 
-export async function addCommandUse(id: string, command: string) {
-  await prisma.commandUse.upsert({
-    where: {
-      userId_command: {
-        userId: id,
-        command: command,
-      },
-    },
-    update: {
-      uses: { increment: 1 },
-    },
-    create: {
-      command: command,
-      userId: id,
-    },
-  });
-}
-
 export async function getCommandUses(member: GuildMember) {
   const query = await prisma.commandUse.findMany({
     where: {
@@ -86,4 +45,40 @@ export async function getCommandUses(member: GuildMember) {
   });
 
   return query;
+}
+
+export async function updateUser(user: User, command: string) {
+  if (!user) return;
+  const date = new Date();
+
+  await redis.set(`${Constants.redis.cache.user.LAST_COMMAND}:${user.id}`, date.getTime());
+  await redis.expire(`${Constants.redis.cache.user.LAST_COMMAND}:${user.id}`, ms("30 minutes") / 1000);
+
+  await prisma.user.update({
+    where: {
+      id: user.id,
+    },
+    data: {
+      lastCommand: date,
+      lastKnownTag: user.username,
+      CommandUse: {
+        upsert: {
+          where: {
+            userId_command: {
+              command,
+              userId: user.id,
+            },
+          },
+          update: {
+            command,
+            uses: { increment: 1 },
+          },
+          create: {
+            command,
+            uses: 1,
+          },
+        },
+      },
+    },
+  });
 }
