@@ -483,7 +483,7 @@ async function addMention() {
   } else if (cpuUsage < 80) {
     currentInterval = 300;
   } else {
-    currentInterval = 75;
+    currentInterval = 40;
   }
 
   if (currentInterval != old) {
