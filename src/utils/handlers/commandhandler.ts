@@ -39,8 +39,8 @@ import { addKarma, getKarma } from "../functions/karma/karma";
 import { addUse, getCommand } from "../functions/premium/command";
 import { cleanString } from "../functions/string";
 import { isUserBlacklisted } from "../functions/users/blacklist";
-import { addCommandUse, getLastCommand, updateLastCommand } from "../functions/users/commands";
-import { getLastKnownTag, updateLastKnowntag } from "../functions/users/tag";
+import { getLastCommand, updateUser } from "../functions/users/commands";
+import { getLastKnownTag } from "../functions/users/tag";
 import { createProfile, hasProfile } from "../functions/users/utils";
 import dayjs = require("dayjs");
 
