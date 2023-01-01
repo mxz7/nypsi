@@ -35,12 +35,15 @@ import PageManager from "../utils/functions/page";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import requestDM from "../utils/functions/requestdm";
 import { addToNypsiBank, getTax } from "../utils/functions/tax";
+import { isUserBlacklisted } from "../utils/functions/users/blacklist";
 import { getDmSettings } from "../utils/functions/users/notifications";
 import { runCommand } from "../utils/handlers/commandhandler";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger, payment } from "../utils/logger";
 
 export default async function interactionCreate(interaction: Interaction) {
+  if (await isUserBlacklisted(interaction.user.id)) return;
+
   if (interaction.type == InteractionType.ApplicationCommandAutocomplete) {
     const focused = interaction.options.getFocused(true);
 
@@ -265,7 +268,7 @@ export default async function interactionCreate(interaction: Interaction) {
           id: true,
           ownerId: true,
           itemAmount: true,
-          itemName: true,
+          itemId: true,
           sold: true,
         },
       });
@@ -328,7 +331,7 @@ export default async function interactionCreate(interaction: Interaction) {
             id: true,
             ownerId: true,
             itemAmount: true,
-            itemName: true,
+            itemId: true,
             sold: true,
           },
         });
@@ -351,16 +354,24 @@ export default async function interactionCreate(interaction: Interaction) {
           return await interaction.reply({ embeds: [new ErrorEmbed("you cannot afford this")], ephemeral: true });
         }
 
-        await prisma.auction
-          .update({
+        if (Number(auction.bin) < 10_000) {
+          await prisma.auction.delete({
             where: {
               id: auction.id,
             },
-            data: {
-              sold: true,
-            },
-          })
-          .catch(() => {});
+          });
+        } else {
+          await prisma.auction
+            .update({
+              where: {
+                id: auction.id,
+              },
+              data: {
+                sold: true,
+              },
+            })
+            .catch(() => {});
+        }
 
         const tax = await getTax();
 
@@ -372,7 +383,7 @@ export default async function interactionCreate(interaction: Interaction) {
         }
 
         await Promise.all([
-          addInventoryItem(interaction.user.id, auction.itemName, auction.itemAmount),
+          addInventoryItem(interaction.user.id, auction.itemId, auction.itemAmount),
           updateBalance(interaction.user.id, balance - Number(auction.bin)),
           updateBalance(auction.ownerId, (await getBalance(auction.ownerId)) + (Number(auction.bin) - taxedAmount)),
         ]);
@@ -380,7 +391,7 @@ export default async function interactionCreate(interaction: Interaction) {
         payment(
           await interaction.client.users.fetch(auction.ownerId),
           interaction.user,
-          `${auction.itemName} x ${auction.itemAmount} (auction)`
+          `${auction.itemId} x ${auction.itemAmount} (auction)`
         );
 
         const items = getItems();
@@ -389,8 +400,8 @@ export default async function interactionCreate(interaction: Interaction) {
           const embedDm = new CustomEmbed()
             .setColor(Constants.TRANSPARENT_EMBED_COLOR)
             .setDescription(
-              `your auction for ${auction.itemAmount}x ${items[auction.itemName].emoji} ${
-                items[auction.itemName].name
+              `your auction for ${auction.itemAmount}x ${items[auction.itemId].emoji} ${
+                items[auction.itemId].name
               } has been bought by ${interaction.user.username} for $**${Math.floor(
                 Number(auction.bin) - taxedAmount
               ).toLocaleString()}**${taxedAmount != 0 ? `(${(tax * 100).toFixed(1)}% tax)` : ""} `
@@ -436,7 +447,7 @@ export default async function interactionCreate(interaction: Interaction) {
 
       let crateAmount = Math.floor((await getPrestige(interaction.user.id)) / 1.2 + 1);
 
-      if (crateAmount > 6) crateAmount = 6;
+      if (crateAmount > 5) crateAmount = 5;
 
       if (
         !inventory.find((i) => i.item === "vote_crate") ||
@@ -522,6 +533,19 @@ export default async function interactionCreate(interaction: Interaction) {
         .disableFooter();
 
       return interaction.reply({ embeds: [embed] });
+    } else if (interaction.customId === "bake") {
+      const int = interaction as unknown as NypsiCommandInteraction;
+
+      int.author = interaction.user;
+      int.commandName = "bake";
+
+      setTimeout(() => {
+        if (interaction.isRepliable()) {
+          interaction.deferReply().catch(() => {});
+        }
+      }, 2500);
+
+      return runCommand("bake", interaction as unknown as NypsiCommandInteraction, []);
     } else {
       if (!interaction.guild) return;
       const reactionRoles = await getReactionRolesByGuild(interaction.guild);

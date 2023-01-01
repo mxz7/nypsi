@@ -178,15 +178,15 @@
     "id": "baker_i",
     "name": "baker **I**",
     "emoji": "🍪",
-    "target": 50,
-    "description": "bake 50 cookies"
+    "target": 100,
+    "description": "bake 100 cookies"
   },
   "baker_ii": {
     "id": "baker_ii",
     "name": "baker **II**",
     "emoji": "🍪",
-    "target": 500,
-    "description": "bake 500 cookies"
+    "target": 750,
+    "description": "bake 750 cookies"
   },
   "baker_iii": {
     "id": "baker_iii",

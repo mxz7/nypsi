@@ -209,8 +209,8 @@ export default async function requestDM(options: RequestDMOptions): Promise<bool
 async function checkVoteReminder(userId: string) {
   const dmSettings = await getDmSettings(userId);
 
-  if (dmSettings.vote_reminder) {
-    dmSettings.vote_reminder = false;
+  if (dmSettings.voteReminder) {
+    dmSettings.voteReminder = false;
     await updateDmSettings(userId, dmSettings);
   }
 }

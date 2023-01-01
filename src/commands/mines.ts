@@ -24,10 +24,11 @@ import { addProgress } from "../utils/functions/economy/achievements.js";
 import { calcMaxBet, getBalance, getDefaultBet, getMulti, updateBalance } from "../utils/functions/economy/balance.js";
 import { addToGuildXP, getGuildByUser } from "../utils/functions/economy/guilds.js";
 import { addInventoryItem } from "../utils/functions/economy/inventory.js";
-import { addGamble } from "../utils/functions/economy/stats.js";
+import { createGame } from "../utils/functions/economy/stats.js";
 import { createUser, formatBet, userExists } from "../utils/functions/economy/utils.js";
 import { calcEarnedXp, getXp, updateXp } from "../utils/functions/economy/xp.js";
 import { getTier, isPremium } from "../utils/functions/premium/premium.js";
+import { percentChance } from "../utils/functions/random.js";
 import { addHourlyCommand } from "../utils/handlers/commandhandler.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 import { gamble, logger } from "../utils/logger.js";
@@ -314,9 +315,7 @@ async function prepareGame(
     }
   }
 
-  const spawnGem = randomInt(10);
-
-  if (spawnGem < 3) {
+  if (percentChance(20)) {
     let passes = 0;
     let achieved = false;
 
@@ -546,8 +545,15 @@ async function playGame(
   };
 
   const lose = async () => {
-    gamble(message.author, "mines", bet, false, 0);
-    await addGamble(message.member, "mines", false);
+    const id = await createGame({
+      userId: message.author.id,
+      bet: bet,
+      game: "mines",
+      win: false,
+      outcome: `mines:${JSON.stringify(getRows(grid, true))}`,
+    });
+    gamble(message.author, "mines", bet, false, id, 0);
+    embed.setFooter({ text: `id: ${id}` });
     embed.setColor(Constants.EMBED_FAIL_COLOR);
     embed.setDescription(
       "**bet** $" +
@@ -600,7 +606,7 @@ async function playGame(
       );
     }
 
-    const earnedXp = await calcEarnedXp(message.member, bet);
+    const earnedXp = await calcEarnedXp(message.member, bet, win);
 
     if (earnedXp > 0) {
       await updateXp(message.member, (await getXp(message.member)) + earnedXp);
@@ -613,10 +619,24 @@ async function playGame(
       }
     }
 
-    gamble(message.author, "mines", bet, true, winnings);
-    await addGamble(message.member, "mines", true);
+    const id = await createGame({
+      userId: message.author.id,
+      bet: bet,
+      game: "mines",
+      win: true,
+      outcome: `mines:${JSON.stringify(getRows(grid, true))}`,
+      earned: winnings,
+      xp: earnedXp,
+    });
+    gamble(message.author, "mines", bet, true, id, winnings);
 
-    if (win >= 7) await addProgress(message.author.id, "minesweeper_pro", 1);
+    if (embed.data.footer) {
+      embed.setFooter({ text: `+${earnedXp}xp | id: ${id}` });
+    } else {
+      embed.setFooter({ text: `id: ${id}` });
+    }
+
+    if (win >= 7) addProgress(message.author.id, "minesweeper_pro", 1);
 
     await updateBalance(message.member, (await getBalance(message.member)) + winnings);
     games.delete(message.author.id);
@@ -624,8 +644,15 @@ async function playGame(
   };
 
   const draw = async () => {
-    gamble(message.author, "mines", bet, true, bet);
-    await addGamble(message.member, "mines", true);
+    const id = await createGame({
+      userId: message.author.id,
+      bet: bet,
+      game: "mines",
+      win: false,
+      outcome: `mines:${JSON.stringify(getRows(grid, true))}`,
+    });
+    gamble(message.author, "mines", bet, true, id, bet);
+    embed.setFooter({ text: `id: ${id}` });
     embed.setColor(variants.macchiato.yellow.hex as ColorResolvable);
     embed.setDescription(
       "**bet** $" +
@@ -730,9 +757,7 @@ async function playGame(
         grid[location] = "gc";
         win += 3;
 
-        const caught = Math.floor(Math.random() * 50);
-
-        if (caught == 7) {
+        if (percentChance(0.5)) {
           addInventoryItem(message.member, "green_gem", 1);
           addProgress(message.author.id, "gem_hunter", 1);
           response.followUp({
@@ -740,16 +765,6 @@ async function playGame(
               new CustomEmbed(
                 message.member,
                 `${GEM_EMOJI} you found a **gem**!!\nit has been added to your inventory, i wonder what powers it has`
-              ),
-            ],
-            ephemeral: true,
-          });
-        } else {
-          response.followUp({
-            embeds: [
-              new CustomEmbed(
-                message.member,
-                `${GEM_EMOJI} you found a **gem**!!\nunfortunately you dropped it and it shattered. maybe next time`
               ),
             ],
             ephemeral: true,

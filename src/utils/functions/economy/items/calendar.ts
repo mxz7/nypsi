@@ -1,8 +1,7 @@
-import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions } from "discord.js";
+import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
 import { NypsiCommandInteraction } from "../../../../models/Command";
 import { CustomEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
-import sleep from "../../sleep";
 
 module.exports = new ItemUse("calendar", async (message: Message | (NypsiCommandInteraction & CommandInteraction)) => {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
@@ -23,27 +22,5 @@ module.exports = new ItemUse("calendar", async (message: Message | (NypsiCommand
     }
   };
 
-  const edit = async (data: MessageEditOptions, msg: Message) => {
-    if (!(message instanceof Message)) {
-      await message.editReply(data);
-      return await message.fetchReply();
-    } else {
-      return await msg.edit(data);
-    }
-  };
-
-  const embed = new CustomEmbed(message.member, "you look down at your calendar to check the date..");
-
-  const msg = await send({ embeds: [embed] });
-
-  await sleep(2000);
-
-  return edit(
-    {
-      embeds: [
-        embed.setDescription(`you look down at your calendar to check the date..\n\nits ${new Date().toDateString()}`),
-      ],
-    },
-    msg
-  );
+  return send({ embeds: [new CustomEmbed(message.member, "calendars will be used automatically")] });
 });

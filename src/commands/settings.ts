@@ -10,8 +10,8 @@ import {
   Message,
   MessageActionRowComponentBuilder,
   ModalBuilder,
-  SelectMenuBuilder,
-  SelectMenuOptionBuilder,
+  StringSelectMenuBuilder,
+  StringSelectMenuOptionBuilder,
   TextInputBuilder,
   TextInputStyle,
 } from "discord.js";
@@ -99,23 +99,39 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const showSetting = async (
       settings: DMSettings,
       settingId: string,
-      options: SelectMenuOptionBuilder[],
+      options: StringSelectMenuOptionBuilder[],
       msg?: Message
     ) => {
       const embed = new CustomEmbed(message.member).setHeader(notificationsData[settingId].name);
 
-      embed.setDescription(notificationsData[settingId].description);
+      embed.setDescription(
+        // @ts-expect-error loser
+        notificationsData[settingId].description.replace("{VALUE}", settings[settingId].toLocaleString())
+      );
 
       const userSelection = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder().setCustomId("enable-setting").setLabel("enable").setStyle(ButtonStyle.Success),
         new ButtonBuilder().setCustomId("disable-setting").setLabel("disable").setStyle(ButtonStyle.Danger)
       );
 
-      if (notificationsData[settingId].types) {
-        const boobies: SelectMenuOptionBuilder[] = [];
+      // @ts-expect-error hate life innit
+      if (typeof settings[settingId] === "number") {
+        const boobies = [
+          new ButtonBuilder().setCustomId("enable").setLabel("set value").setStyle(ButtonStyle.Success),
+          new ButtonBuilder()
+            .setCustomId("disable")
+            .setLabel("disable")
+            .setStyle(ButtonStyle.Danger)
+            // @ts-expect-error gay
+            .setDisabled(settings[settingId] === 0),
+        ];
+
+        userSelection.setComponents(boobies);
+      } else if (notificationsData[settingId].types) {
+        const boobies: StringSelectMenuOptionBuilder[] = [];
 
         for (const type of notificationsData[settingId].types) {
-          const option = new SelectMenuOptionBuilder()
+          const option = new StringSelectMenuOptionBuilder()
             .setLabel(type.name)
             .setDescription(type.description)
             .setValue(type.value);
@@ -128,7 +144,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           boobies.push(option);
         }
 
-        userSelection.setComponents(new SelectMenuBuilder().setCustomId("typesetting").setOptions(boobies));
+        userSelection.setComponents(new StringSelectMenuBuilder().setCustomId("typesetting").setOptions(boobies));
       } else {
         // @ts-expect-error annoying grr
         if (settings[settingId]) {
@@ -143,7 +159,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           embeds: [embed],
           components: [
             new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-              new SelectMenuBuilder().setCustomId("setting").setOptions(options)
+              new StringSelectMenuBuilder().setCustomId("setting").setOptions(options)
             ),
             userSelection,
           ],
@@ -153,7 +169,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           embeds: [embed],
           components: [
             new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-              new SelectMenuBuilder().setCustomId("setting").setOptions(options)
+              new StringSelectMenuBuilder().setCustomId("setting").setOptions(options)
             ),
             userSelection,
           ],
@@ -163,10 +179,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     let settings = await getDmSettings(message.member);
 
-    const options: SelectMenuOptionBuilder[] = [];
+    const options: StringSelectMenuOptionBuilder[] = [];
 
     for (const settingId of Object.keys(notificationsData)) {
-      options.push(new SelectMenuOptionBuilder().setValue(settingId).setLabel(notificationsData[settingId].name));
+      options.push(new StringSelectMenuOptionBuilder().setValue(settingId).setLabel(notificationsData[settingId].name));
     }
 
     if (settingId) {
@@ -180,13 +196,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const filter = (i: Interaction) => i.user.id == message.author.id;
 
     const pageManager: any = async () => {
-      const res = await msg
-        .awaitMessageComponent({ filter, time: 30_000 })
-        .then(async (i) => {
-          await i.deferUpdate();
-          return i;
-        })
-        .catch(() => {});
+      const res = await msg.awaitMessageComponent({ filter, time: 30_000 }).catch(() => {});
 
       if (!res) {
         msg.edit({ components: [] });
@@ -200,6 +210,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           if (option.data.value == res.values[0]) option.setDefault(true);
         }
 
+        await res.deferUpdate();
+
         msg = await showSetting(settings, res.values[0], options, res.message);
         return pageManager();
       } else if (res.isSelectMenu() && res.customId == "typesetting") {
@@ -208,6 +220,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         // @ts-expect-error silly ts
         settings[selected] = value.value;
+        await res.deferUpdate();
 
         settings = await updateDmSettings(message.member, settings);
         msg = await showSetting(settings, selected, options, res.message);
@@ -216,8 +229,46 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       } else if (res.customId.startsWith("enable")) {
         const selected = options.find((o) => o.data.default).data.value;
 
-        // @ts-expect-error doesnt like doing this!
-        settings[selected] = true;
+        // @ts-expect-error grr
+        if (typeof settings[selected] == "number") {
+          const modal = new ModalBuilder().setCustomId("settings-update").setTitle("net worth notifications");
+
+          modal.addComponents(
+            new ActionRowBuilder<TextInputBuilder>().addComponents(
+              new TextInputBuilder()
+                .setCustomId("val")
+                .setLabel("amount to be notified for")
+                .setPlaceholder("number")
+                .setStyle(TextInputStyle.Short)
+                .setRequired(true)
+                .setMinLength(0)
+            )
+          );
+
+          await res.showModal(modal);
+
+          const filter = (i: Interaction) => i.user.id == res.user.id;
+
+          const modalResponse = await res.awaitModalSubmit({ filter, time: 120000 }).catch(() => {});
+
+          if (!modalResponse) return;
+
+          if (!modalResponse.isModalSubmit()) return;
+
+          const value = formatNumber(modalResponse.fields.fields.first().value.toLowerCase());
+
+          if (typeof value !== "number") {
+            await modalResponse.reply({ embeds: [new ErrorEmbed("invalid value. must a number. use 0 to disable")] });
+          } else {
+            // @ts-expect-error ts is a loser !
+            settings[selected] = value;
+            await modalResponse.deferUpdate();
+          }
+        } else {
+          // @ts-expect-error doesnt like doing this!
+          settings[selected] = true;
+          await res.deferUpdate();
+        }
 
         settings = await updateDmSettings(message.member, settings);
         msg = await showSetting(settings, selected, options, res.message);
@@ -226,8 +277,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       } else if (res.customId.startsWith("disable")) {
         const selected = options.find((o) => o.data.default).data.value;
 
+        await res.deferUpdate();
+
         // @ts-expect-error doesnt like doing this!
-        settings[selected] = false;
+        if (typeof settings[selected] === "number") {
+          // @ts-expect-error doesnt like doing this!
+          settings[selected] = 0;
+        } else {
+          // @ts-expect-error doesnt like doing this!
+          settings[selected] = false;
+        }
 
         settings = await updateDmSettings(message.member, settings);
         msg = await showSetting(settings, selected, options, res.message);

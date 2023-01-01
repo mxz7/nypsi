@@ -24,8 +24,8 @@
     "name": "vote notificatons",
     "description": "get a dm when you vote to show your rewards for voting"
   },
-  "vote_reminder": {
-    "id": "vote_reminder",
+  "voteReminder": {
+    "id": "voteReminder",
     "name": "vote reminders",
     "description": "receive a reminder in your dms when you are able to vote again\n\n+**2**% multiplier"
   },
@@ -53,10 +53,10 @@
     "name": "payment notifications",
     "description": "get a dm when someone sends you money or gives you an item"
   },
-  "net_worth": {
-    "id": "net_worth",
+  "netWorth": {
+    "id": "netWorth",
     "name": "net worth updates",
-    "description": "get a dm when your net worth changes by 10 million or more"
+    "description": "get a dm when your net worth changes by the amount set. currently: ${VALUE}"
   },
   "other": {
     "id": "other",

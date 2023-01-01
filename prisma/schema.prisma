@@ -17,33 +17,31 @@ model User {
   tracking       Boolean  @default(true)
   lastfmUsername String?
   email          String?  @unique
+  blacklisted    Boolean  @default(false)
 
-  Economy            Economy?
-  Premium            Premium?
-  Username           Username[]
-  WordleStats        WordleStats?
-  EconomyGuildMember EconomyGuildMember?
-  EconomyGuild       EconomyGuild?
-  Auction            Auction[]
-  CommandUse         CommandUse[]
-  Achievements       Achievements[]
-  DMSettings         DMSettings?
+  Economy      Economy?
+  Premium      Premium?
+  Username     Username[]
+  WordleStats  WordleStats?
+  CommandUse   CommandUse[]
+  Achievements Achievements[]
+  DMSettings   DMSettings?
 }
 
 model DMSettings {
   userId String @id
 
-  rob           Boolean         @default(true)
-  lottery       Boolean         @default(true)
-  premium       Boolean         @default(true)
-  auction       Boolean         @default(true)
-  vote          Boolean         @default(true)
-  vote_reminder Boolean         @default(false)
-  worker        WorkerDmSetting @default(OnlyWhenFull)
-  booster       Boolean         @default(false)
-  payment       Boolean         @default(true)
-  other         Boolean         @default(true)
-  net_worth     Boolean         @default(false)
+  rob          Boolean         @default(true)
+  lottery      Boolean         @default(true)
+  premium      Boolean         @default(true)
+  auction      Boolean         @default(true)
+  vote         Boolean         @default(true)
+  voteReminder Boolean         @default(false)
+  worker       WorkerDmSetting @default(OnlyWhenFull)
+  booster      Boolean         @default(false)
+  payment      Boolean         @default(true)
+  other        Boolean         @default(true)
+  netWorth     Int             @default(0)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
@@ -80,30 +78,46 @@ model Economy {
   money       BigInt  @default(500)
   bank        BigInt  @default(9500)
   bankStorage BigInt  @default(5000)
-  net_worth   BigInt  @default(0)
+  netWorth    BigInt  @default(0)
   defaultBet  Int?
   xp          Int     @default(0)
   prestige    Int     @default(0)
   padlock     Boolean @default(false)
 
   lastDaily DateTime @default("1970-01-01T14:21:00+02:00")
-  lastVote  DateTime
+  lastVote  DateTime @default("1970-01-01T14:21:00+02:00")
+  lastBake  DateTime @default("1970-01-01T14:21:00+02:00")
 
   dailyStreak Int @default(0)
 
   banned DateTime?
 
-  auction_watch String[]
+  auctionWatch String[]
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String @id
 
-  Boosters      Booster[]
-  EconomyStats  EconomyStats[]
-  LotteryTicket LotteryTicket[]
-  EconomyWorker EconomyWorker[]
-  Inventory     Inventory[]
-  Crafting      Crafting[]
+  Boosters           Booster[]
+  LotteryTicket      LotteryTicket[]
+  EconomyWorker      EconomyWorker[]
+  Inventory          Inventory[]
+  Crafting           Crafting[]
+  Game               Game[]
+  ItemUse            ItemUse[]
+  BakeryUpgrade      BakeryUpgrade[]
+  Auction            Auction[]
+  EconomyGuild       EconomyGuild?
+  EconomyGuildMember EconomyGuildMember?
+}
+
+model BakeryUpgrade {
+  userId    String
+  upgradeId String
+  amount    Int
+
+  economy Economy @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@id([userId, upgradeId])
 }
 
 model Crafting {
@@ -120,7 +134,7 @@ model Inventory {
   userId String
 
   item   String
-  amount Int    @default(1)
+  amount BigInt @default(1)
 
   economy Economy @relation(fields: [userId], references: [userId], onDelete: Cascade)
 
@@ -169,16 +183,28 @@ model Booster {
   Economy Economy @relation(fields: [userId], references: [userId], onDelete: Cascade)
 }
 
-model EconomyStats {
-  type   String
-  win    BigInt  @default(0)
-  lose   BigInt  @default(0)
-  gamble Boolean
+model Game {
+  id       Int      @id @default(autoincrement())
+  userId   String?
+  game     String
+  win      Int
+  bet      BigInt
+  earned   BigInt?
+  xpEarned Int?
+  outcome  String
+  date     DateTime @default(now())
 
-  economy       Economy @relation(fields: [economyUserId], references: [userId], onDelete: Cascade)
-  economyUserId String
+  economy Economy? @relation(fields: [userId], references: [userId])
+}
 
-  @@id([type, economyUserId])
+model ItemUse {
+  userId String
+  itemId String
+  amount Int
+
+  economy Economy @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@id([userId, itemId])
 }
 
 model Premium {
@@ -230,14 +256,14 @@ model WordleStats {
 model Auction {
   id         String   @id @default(uuid())
   ownerId    String
-  itemName   String
+  itemId     String
   itemAmount Int      @default(1)
   bin        BigInt
   messageId  String   @unique
   createdAt  DateTime @default(now())
   sold       Boolean  @default(false)
 
-  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  owner Economy @relation(fields: [ownerId], references: [userId], onDelete: Cascade)
 }
 
 // guild specific tables
@@ -272,6 +298,7 @@ model ReactionRole {
   messageId   String           @unique
   title       String?
   description String
+  color       String?
   whitelist   String[]
   mode        ReactionRoleMode
 
@@ -432,8 +459,8 @@ model EconomyGuild {
   level     Int      @default(1)
   motd      String   @default("welcome to the guild fool (/guild motd)")
 
-  owner   User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  ownerId String @unique
+  owner   Economy @relation(fields: [ownerId], references: [userId], onDelete: Cascade)
+  ownerId String  @unique
 
   members EconomyGuildMember[]
 }
@@ -445,8 +472,8 @@ model EconomyGuildMember {
   contributedMoney BigInt   @default(0)
   contributedXp    Int      @default(0)
 
-  user  User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  guild EconomyGuild @relation(fields: [guildName], references: [guildName], onDelete: Cascade)
+  economy Economy      @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  guild   EconomyGuild @relation(fields: [guildName], references: [guildName], onDelete: Cascade)
 
   @@id([userId, guildName])
 }
@@ -491,4 +518,16 @@ model KofiPurchases {
 
   email String
   item  String
+}
+
+// data for creating graphs
+
+model GraphMetrics {
+  id Int @id @default(autoincrement())
+
+  category String
+
+  userId String
+  value  BigInt
+  date   DateTime
 }

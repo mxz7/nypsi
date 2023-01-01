@@ -147,7 +147,7 @@ export async function createAuction(member: GuildMember, itemId: string, itemAmo
   await prisma.auction.create({
     data: {
       bin: bin,
-      itemName: itemId,
+      itemId,
       messageId: messageId,
       itemAmount: itemAmount,
       ownerId: member.user.id,
@@ -169,13 +169,17 @@ export async function bumpAuction(id: string, client: NypsiClient) {
       ownerId: true,
       owner: {
         select: {
-          lastKnownTag: true,
+          user: {
+            select: {
+              lastKnownTag: true,
+            },
+          },
         },
       },
       createdAt: true,
       bin: true,
       itemAmount: true,
-      itemName: true,
+      itemId: true,
     },
   });
 
@@ -183,20 +187,20 @@ export async function bumpAuction(id: string, client: NypsiClient) {
 
   const embed = new CustomEmbed()
     .setColor(Constants.TRANSPARENT_EMBED_COLOR)
-    .setHeader(`${query.owner.lastKnownTag.split("#")[0]}'s auction`);
+    .setHeader(`${query.owner.user.lastKnownTag.split("#")[0]}'s auction`);
 
   const items = getItems();
 
   embed.setDescription(
     `started <t:${Math.floor(query.createdAt.getTime() / 1000)}:R>\n\n` +
-      `**${query.itemAmount.toLocaleString()}x** ${items[query.itemName].emoji} ${
-        items[query.itemName].name
+      `**${query.itemAmount.toLocaleString()}x** ${items[query.itemId].emoji} ${
+        items[query.itemId].name
       } for $**${query.bin.toLocaleString()}**`
   );
 
   if (query.itemAmount > 1 && query.bin > 69_420) {
     embed.setFooter({
-      text: `$${Math.floor(Number(query.bin) / query.itemAmount).toLocaleString()} per ${items[query.itemName].name}`,
+      text: `$${Math.floor(Number(query.bin) / query.itemAmount).toLocaleString()} per ${items[query.itemId].name}`,
     });
   }
 
@@ -270,7 +274,7 @@ export async function getAuctionAverage(item: string) {
 
   const auctions = await prisma.auction.findMany({
     where: {
-      AND: [{ sold: true }, { itemName: item }],
+      AND: [{ sold: true }, { itemId: item }],
     },
     select: {
       bin: true,
@@ -279,13 +283,13 @@ export async function getAuctionAverage(item: string) {
     orderBy: {
       createdAt: "desc",
     },
-    take: 1000,
+    take: 150,
   });
 
   const costs: number[] = [];
 
   for (const auction of auctions) {
-    if (costs.length >= 6969) break;
+    if (costs.length >= 5000) break;
 
     if (auction.itemAmount > 1) {
       costs.push(Math.floor(Number(auction.bin) / auction.itemAmount));
@@ -310,13 +314,13 @@ export async function addToAuctionWatch(member: GuildMember, itemName: string) {
         userId: member.user.id,
       },
       data: {
-        auction_watch: { push: itemName },
+        auctionWatch: { push: itemName },
       },
       select: {
-        auction_watch: true,
+        auctionWatch: true,
       },
     })
-    .then((q) => q.auction_watch);
+    .then((q) => q.auctionWatch);
 }
 
 export async function setAuctionWatch(member: GuildMember, items: string[]) {
@@ -326,13 +330,13 @@ export async function setAuctionWatch(member: GuildMember, items: string[]) {
         userId: member.user.id,
       },
       data: {
-        auction_watch: items,
+        auctionWatch: items,
       },
       select: {
-        auction_watch: true,
+        auctionWatch: true,
       },
     })
-    .then((q) => q.auction_watch);
+    .then((q) => q.auctionWatch);
 }
 
 export async function getAuctionWatch(member: GuildMember) {
@@ -342,17 +346,17 @@ export async function getAuctionWatch(member: GuildMember) {
         userId: member.user.id,
       },
       select: {
-        auction_watch: true,
+        auctionWatch: true,
       },
     })
-    .then((q) => q.auction_watch);
+    .then((q) => q.auctionWatch);
 }
 
 async function checkWatchers(itemName: string, messageUrl: string, creatorId: string) {
   const users = await prisma.economy
     .findMany({
       where: {
-        AND: [{ auction_watch: { has: itemName } }, { userId: { not: creatorId } }],
+        AND: [{ auctionWatch: { has: itemName } }, { userId: { not: creatorId } }],
       },
       select: {
         userId: true,
@@ -389,7 +393,7 @@ async function checkWatchers(itemName: string, messageUrl: string, creatorId: st
 export async function countItemOnAuction(itemId: string) {
   const amount = await prisma.auction.aggregate({
     where: {
-      AND: [{ sold: false }, { itemName: itemId }],
+      AND: [{ sold: false }, { itemId: itemId }],
     },
     _sum: {
       itemAmount: true,

@@ -2,9 +2,11 @@ import dayjs = require("dayjs");
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import Constants from "../utils/Constants";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { addInventoryItem } from "../utils/functions/economy/inventory";
 import { createUser, doDaily, getItems, getLastDaily, userExists } from "../utils/functions/economy/utils";
+import { percentChance } from "../utils/functions/random";
 import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
@@ -50,11 +52,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     });
   }
 
-  const gemChance = Math.floor(Math.random() * 500);
-
-  if (gemChance == 407) {
+  if (percentChance(0.3)) {
     await addInventoryItem(message.member, "blue_gem", 1);
-    await addProgress(message.author.id, "gem_hunter", 1);
+    addProgress(message.author.id, "gem_hunter", 1);
 
     if ((await getDmSettings(message.member)).other) {
       await addNotificationToQueue({
@@ -63,7 +63,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           embed: new CustomEmbed(
             message.member,
             `${getItems()["blue_gem"].emoji} you've found a gem! i wonder what powers it holds...`
-          ).setTitle("you've found a gem"),
+          )
+            .setTitle("you've found a gem")
+            .setColor(Constants.TRANSPARENT_EMBED_COLOR),
         },
       });
     }

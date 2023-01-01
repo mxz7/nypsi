@@ -1,11 +1,19 @@
-import { randomInt } from "crypto";
-import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
+import {
+  ActionRowBuilder,
+  BaseMessageOptions,
+  ButtonBuilder,
+  ButtonInteraction,
+  ButtonStyle,
+  CommandInteraction,
+  InteractionReplyOptions,
+  Message,
+  MessageActionRowComponentBuilder,
+} from "discord.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
-import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import { addProgress } from "../utils/functions/economy/achievements";
-import { getBoosters } from "../utils/functions/economy/boosters";
-import { addInventoryItem, getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
-import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
+import { ErrorEmbed } from "../models/EmbedBuilders";
+import { runBakery } from "../utils/functions/economy/bakery";
+import { getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
+import { createUser, userExists } from "../utils/functions/economy/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command(
@@ -17,6 +25,10 @@ const cmd = new Command(
 cmd.slashEnabled = true;
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
+  doBake(message);
+}
+
+async function doBake(message: Message | (NypsiCommandInteraction & CommandInteraction) | ButtonInteraction) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       if (message.deferred) {
@@ -35,15 +47,19 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
   };
 
-  if (await onCooldown(cmd.name, message.member)) {
-    const embed = await getResponse(cmd.name, message.member);
+  const member = await message.guild.members.fetch(message.member.user.id);
+
+  if (!member) return;
+
+  if (await onCooldown(cmd.name, member)) {
+    const embed = await getResponse(cmd.name, member);
 
     return send({ embeds: [embed], ephemeral: true });
   }
 
-  if (!(await userExists(message.member))) await createUser(message.member);
+  if (!(await userExists(member))) await createUser(member);
 
-  const inventory = await getInventory(message.member);
+  const inventory = await getInventory(member, false);
 
   let hasFurnace = false;
   let hasCoal = false;
@@ -70,56 +86,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     });
   }
 
-  await addCooldown(cmd.name, message.member, 1200);
+  await addCooldown(cmd.name, member, 15);
+  await setInventoryItem(member, "coal", inventory.find((i) => i.item === "coal").amount - 1, false);
 
-  let max = 4;
-  let maxCake = 1;
+  const response = await runBakery(member);
 
-  const boosters = await getBoosters(message.member);
+  const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+    new ButtonBuilder().setCustomId("bake").setLabel("bake").setStyle(ButtonStyle.Success)
+  );
 
-  for (const booster of boosters.keys()) {
-    if (getItems()[booster].boosterEffect.boosts.includes("cookie")) {
-      max += max * getItems()[booster].boosterEffect.effect * boosters.get(booster).length;
-      maxCake += boosters.get(booster).length;
-    }
-  }
-
-  let min = Math.floor(max / 25);
-  if (min < 1) min = 1;
-
-  const amount = randomInt(min, max);
-
-  await setInventoryItem(message.member, "coal", inventory.find((i) => i.item == "coal").amount - 1, false);
-  await addInventoryItem(message.member, "cookie", amount, false);
-
-  const chance = Math.floor(Math.random() * 15);
-  let foundCakes = 0;
-
-  if (chance == 7) {
-    foundCakes = 1;
-
-    if (maxCake > 1) {
-      foundCakes = Math.floor(Math.random() * maxCake) + 1;
-    }
-
-    await addInventoryItem(message.member, "cake", foundCakes);
-  }
-
-  let desc = `you baked **${amount}** cookie${amount > 1 ? "s" : ""}!! 🍪`;
-
-  if (chance == 7) {
-    desc += `\n\nyou also managed to bake ${foundCakes > 1 ? foundCakes : "a"} cake${
-      foundCakes > 1 ? "s" : ""
-    } <:nypsi_cake:1002977512630001725> good job!!`;
-  }
-
-  await send({
-    embeds: [
-      new CustomEmbed(message.member, desc).setHeader(`${message.author.username}'s bakery`, message.author.avatarURL()),
-    ],
-  });
-
-  await addProgress(message.author.id, "baker", amount);
+  return send({ embeds: [response], components: [row] });
 }
 
 cmd.setRun(run);

@@ -38,6 +38,7 @@ import { getPrefix } from "../functions/guilds/utils";
 import { addKarma, getKarma } from "../functions/karma/karma";
 import { addUse, getCommand } from "../functions/premium/command";
 import { cleanString } from "../functions/string";
+import { isUserBlacklisted } from "../functions/users/blacklist";
 import { getLastCommand, updateUser } from "../functions/users/commands";
 import { getLastKnownTag } from "../functions/users/tag";
 import { createProfile, hasProfile } from "../functions/users/utils";
@@ -578,6 +579,8 @@ export async function runCommand(
   if (!(await hasProfile(message.member))) {
     await createProfile(message.member.user);
   }
+
+  if (await isUserBlacklisted(message.author.id)) return;
 
   if (!commandExists(cmd) && message instanceof Message) {
     if (!aliases.has(cmd)) {

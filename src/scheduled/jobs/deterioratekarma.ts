@@ -2,7 +2,9 @@ import ms = require("ms");
 import { parentPort } from "worker_threads";
 import prisma from "../../init/database";
 import redis from "../../init/redis";
+import { CustomEmbed } from "../../models/EmbedBuilders";
 import Constants from "../../utils/Constants";
+import { addNotificationToQueue } from "../../utils/functions/users/notifications";
 
 (async () => {
   const now = Date.now();
@@ -17,6 +19,20 @@ import Constants from "../../utils/Constants";
       id: true,
       karma: true,
       lastCommand: true,
+      DMSettings: {
+        select: {
+          other: true,
+        },
+      },
+      Economy: {
+        select: {
+          Inventory: {
+            where: {
+              item: { contains: "gem" },
+            },
+          },
+        },
+      },
     },
   });
 
@@ -44,7 +60,7 @@ import Constants from "../../utils/Constants";
     }
 
     if (user.karma > 1000) {
-      karmaToRemove += user.karma * 0.1;
+      karmaToRemove += user.karma * 0.05;
     }
 
     if (user.karma > 10_000) {
@@ -53,6 +69,44 @@ import Constants from "../../utils/Constants";
 
     if (karmaToRemove > user.karma) {
       karmaToRemove = user.karma - 1;
+    }
+
+    if (user?.Economy?.Inventory.find((i) => i.item == "white_gem")?.amount > 0 && user.DMSettings?.other) {
+      const chance = Math.floor(Math.random() * 10);
+
+      if (chance < 5) {
+        await addNotificationToQueue({
+          memberId: user.id,
+          payload: {
+            embed: new CustomEmbed()
+              .setHeader("karma")
+              .setDescription(
+                "your <:nypsi_gem_white:1046933670436552725> white gem has saved your karma from being deteriorated\n" +
+                  `you would have lost **${karmaToRemove}** karma`
+              )
+              .setColor(Constants.TRANSPARENT_EMBED_COLOR),
+          },
+        });
+        continue;
+      }
+    } else if (user?.Economy?.Inventory.find((i) => i.item == "pink_gem")?.amount > 0 && user.DMSettings?.other) {
+      const chance = Math.floor(Math.random() * 13);
+
+      if (chance < 2) {
+        await addNotificationToQueue({
+          memberId: user.id,
+          payload: {
+            embed: new CustomEmbed()
+              .setHeader("karma")
+              .setDescription(
+                "your <:nypsi_gem_pink:1046932847069499472> pink gem has saved your karma from being deteriorated\n" +
+                  `you would have lost **${karmaToRemove}** karma`
+              )
+              .setColor(Constants.TRANSPARENT_EMBED_COLOR),
+          },
+        });
+        continue;
+      }
     }
 
     total += Math.floor(karmaToRemove);
