@@ -18,5 +18,8 @@ you would take the first card from a real deck of playing cards.
 
 ## earning xp
 
-to earn xp you must bet a minimum amount. this amount can be seen with `$minbet`, and it changes depending on your prestige.
-your prestige can also effect how much xp you are able to earn per game, up to a maximum of 5xp per win.
+to earn xp you must bet a minimum amount. this amount can be seen with `/settings me defaultbet`, and it changes depending on
+
+the amount of xp you earn is calculated on a number of variables, including your prestige, bet, win multiplier, premium level
+and inventory items. it works by creating a minmimum and a maximum value, and creating a random number between those. any
+bonuses from active boosters will then be applied to that generated number.
