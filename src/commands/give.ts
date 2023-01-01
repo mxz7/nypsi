@@ -10,7 +10,7 @@ import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
 import { getDmSettings } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import { payment } from "../utils/logger";
+import { transaction } from "../utils/logger";
 
 const cmd = new Command("give", "give other users items from your inventory", Categories.MONEY);
 
@@ -192,7 +192,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       .catch(() => {});
   }
 
-  payment(message.author, target.user, `${selected.id} x ${amount}`);
+  transaction(message.author, target.user, `${selected.id} x ${amount}`);
 
   if (selected.id == "ring") {
     return send({
