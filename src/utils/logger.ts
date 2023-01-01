@@ -111,17 +111,21 @@ export function gamble(user: User, game: string, amount: number, win: boolean, i
   if (!nextLogMsg.get("gamble")) {
     nextLogMsg.set(
       "gamble",
-      `**${user.tag}** (${user.id}) - **${game}** - ${win ? "won" : "lost"}${
-        win ? ` ($**${winAmount.toLocaleString()}**)` : ""
-      } - $**${amount.toLocaleString()}** **id** ${id}\n`
+      `**${user.tag}** (${user.id})\n` +
+        ` - **game** ${game}\n` +
+        ` - **bet** $${amount.toLocaleString()}\n` +
+        ` - **win** ${win}${win ? ` ($**${winAmount.toLocaleString()}**)` : ""}\n` +
+        ` - **id** ${id}\n\n`
     );
   } else {
     nextLogMsg.set(
       "gamble",
       nextLogMsg.get("gamble") +
-        `**${user.tag}** (${user.id}) - **${game}** - ${win ? "won" : "lost"}${
-          win ? ` ($**${winAmount.toLocaleString()}**)` : ""
-        } - $**${amount.toLocaleString()}** **id** ${id}\n`
+        `**${user.tag}** (${user.id})\n` +
+        ` - **game** ${game}\n` +
+        ` - **bet** $${amount.toLocaleString()}\n` +
+        ` - **win** ${win}${win ? ` ($**${winAmount.toLocaleString()}**)` : ""}\n` +
+        ` - **id** ${id}\n\n`
     );
   }
 }
