@@ -1,0 +1,16 @@
+{
+  "grandma": {
+    "id": "grandma",
+    "name": "grandma",
+    "emoji": "👵🏻",
+    "upgrades": "hourly",
+    "value": 0.5
+  },
+  "cursor": {
+    "id": "cursor",
+    "name": "cursor",
+    "emoji": "<:nypsi_cursor:1054771565557981244>",
+    "upgrades": "bake",
+    "value": 1
+  }
+}

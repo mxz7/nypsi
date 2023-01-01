@@ -96,7 +96,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   send({ embeds: [embed] });
 
-  await addProgress(message.author.id, "unsure", 1);
+  addProgress(message.author.id, "unsure", 1);
 }
 
 cmd.setRun(run);

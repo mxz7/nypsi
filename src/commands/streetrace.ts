@@ -483,7 +483,7 @@ async function startRace(id: string) {
     const winnings = race.bet * race.users.size;
 
     await updateBalance(winner.id, (await getBalance(winner.id)) + race.bet * race.users.size);
-    await addProgress(winner.id, "racer", 1);
+    addProgress(winner.id, "racer", 1);
 
     description +=
       `\n\n**${winner.tag}** has won with their ${race.users.get(winner.id).car.name} ${

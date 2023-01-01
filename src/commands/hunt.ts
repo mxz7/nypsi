@@ -186,7 +186,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     edit({ embeds: [embed] }, msg);
   }, 1500);
 
-  await addProgress(message.author.id, "hunter", foundItemsAmount);
+  addProgress(message.author.id, "hunter", foundItemsAmount);
 }
 
 cmd.setRun(run);

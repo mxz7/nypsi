@@ -9,6 +9,7 @@ import {
 } from "discord.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import Constants from "../utils/Constants";
 import {
   addRoleToReactionRole,
   createReactionRole,
@@ -16,6 +17,7 @@ import {
   deleteRoleFromReactionRole,
   getReactionRolesByGuild,
   sendReactionRole,
+  setReactionRoleColour,
   setReactionRoleDescription,
   setReactionRoleMode,
   setReactionRoleTitle,
@@ -58,7 +60,8 @@ cmd.slashData
           .setChoices(
             { name: "mode", value: "mode" },
             { name: "title", value: "title" },
-            { name: "description", value: "description" }
+            { name: "description", value: "description" },
+            { name: "color", value: "color" }
           )
           .setRequired(true)
       )
@@ -477,6 +480,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return send({
         embeds: [new CustomEmbed(message.member, "✅ updated description. you will have to resend the mesage")],
       });
+    } else if (args[2].toLowerCase() === "color") {
+      if (!args[3].match(Constants.COLOUR_REGEX))
+        return send({ embeds: [new ErrorEmbed("invalid hex colour. example: #abcdef")] });
+
+      await setReactionRoleColour(message.guild.id, reactionRole.messageId, args[3]);
+
+      return send({ embeds: [new CustomEmbed(message.member, "✅ updated color. you will have to resend the mesage")] });
     }
   } else if (args[0].toLowerCase() === "whitelist") {
     const reactionRoles = await getReactionRolesByGuild(message.guild);

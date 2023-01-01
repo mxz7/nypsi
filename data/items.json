@@ -342,40 +342,6 @@
     "sell": 10000,
     "in_crates": true
   },
-  "standard_watch": {
-    "id": "standard_watch",
-    "name": "standard watch",
-    "emoji": "⌚",
-    "longDesc": "tell the time",
-    "role": "item",
-    "rarity": 0,
-    "aliases": ["watch"],
-    "buy": 0,
-    "sell": 5000,
-    "in_crates": true
-  },
-  "golden_watch": {
-    "id": "golden_watch",
-    "name": "golden watch",
-    "emoji": "⌚",
-    "longDesc": "tell the time while flexing",
-    "role": "item",
-    "rarity": 1,
-    "buy": 0,
-    "sell": 75000,
-    "in_crates": true
-  },
-  "diamond_watch": {
-    "id": "diamond_watch",
-    "name": "diamond watch",
-    "emoji": "⌚",
-    "longDesc": "bling yourself out",
-    "role": "item",
-    "rarity": 3,
-    "buy": 0,
-    "sell": 250000,
-    "in_crates": true
-  },
   "bitcoin": {
     "id": "bitcoin",
     "name": "bitcoin",
@@ -533,10 +499,22 @@
     "plural": "mineshaft chests",
     "emoji": "<:nypsi_chest:1034843159647236190>",
     "role": "crate",
-    "longDesc": "open to receive one random item",
+    "longDesc": "open to receive 3 mining related items",
     "aliases": ["mineshaft", "chest"],
     "rarity": 3,
-    "in_crates": false
+    "in_crates": false,
+    "crate_runs": 3,
+    "items": [
+      "id:wooden_pickaxe",
+      "id:iron_pickaxe",
+      "id:diamond_pickaxe",
+      "role:ore",
+      "id:quartz",
+      "id:ancient_debris",
+      "id:emerald",
+      "id:diamond",
+      "id:gold_nugget"
+    ]
   },
   "vote_crate": {
     "id": "vote_crate",
@@ -546,6 +524,7 @@
     "role": "crate",
     "longDesc": "open to receive one random item",
     "aliases": ["vote", "crate"],
+    "crate_runs": 1,
     "in_crates": false
   },
   "basic_crate": {
@@ -557,6 +536,7 @@
     "longDesc": "open to receive two random items",
     "rarity": 1,
     "aliases": ["basic"],
+    "crate_runs": 2,
     "in_crates": true
   },
   "69420_crate": {
@@ -568,6 +548,7 @@
     "longDesc": "open to receive two random items and $69,420",
     "rarity": 1,
     "aliases": ["69420"],
+    "crate_runs": 2,
     "in_crates": true
   },
   "nypsi_crate": {
@@ -577,9 +558,10 @@
     "emoji": "<:xnypsi:819957267548864543>",
     "role": "crate",
     "longDesc": "open to receive 5 rare items",
-    "sell": 5000000,
+    "sell": 3000000,
     "rarity": 4,
     "aliases": ["nypsi"],
+    "crate_runs": 5,
     "in_crates": true
   },
   "calendar": {
@@ -587,11 +569,11 @@
     "name": "calendar",
     "plural": "calendars",
     "emoji": "📅",
-    "longDesc": "find out the current date",
+    "longDesc": "protects your daily streak in the event you forget to do /daily",
     "role": "item",
-    "rarity": 0,
+    "rarity": 2,
     "buy": 0,
-    "sell": 1000,
+    "sell": 100000,
     "in_crates": true
   },
   "padlock": {
@@ -610,7 +592,7 @@
     "plural": "lock picks",
     "emoji": "🧰",
     "longDesc": "destroy someone's padlock",
-    "rarity": 1,
+    "rarity": 0,
     "role": "item",
     "buy": 150000,
     "sell": 50000,
@@ -622,7 +604,7 @@
     "plural": "masks",
     "emoji": "😷",
     "longDesc": "bypass rob cooldown",
-    "rarity": 2,
+    "rarity": 0,
     "role": "item",
     "buy": 300000,
     "sell": 100000,
@@ -638,7 +620,7 @@
     "role": "booster",
     "booster_desc": "eat a cookie to get +**1**% multi for 30 seconds (stacks up to 7)",
     "buy": 0,
-    "sell": 2500,
+    "sell": 500,
     "stackable": true,
     "max": 7,
     "boosterEffect": {
@@ -668,17 +650,6 @@
     },
     "in_crates": true
   },
-  "potato": {
-    "id": "potato",
-    "name": "potato",
-    "emoji": "🥔",
-    "longDesc": "a potato.",
-    "rarity": 0,
-    "role": "sellable",
-    "buy": 0,
-    "sell": 5000,
-    "in_crates": true
-  },
   "tooth": {
     "id": "tooth",
     "name": "tooth",
@@ -689,12 +660,22 @@
     "role": "collectable",
     "in_crates": true
   },
+  "bitch": {
+    "id": "bitch",
+    "name": "bitch",
+    "plural": "bitches",
+    "emoji": "👧🏼",
+    "longDesc": "i coded some bitches",
+    "rarity": 2,
+    "role": "collectable",
+    "in_crates": true
+  },
   "clover": {
     "id": "clover",
     "name": "clover leaf",
     "emoji": "🍀",
     "longDesc": "ur pretty lucky",
-    "rarity": 3,
+    "rarity": 2,
     "role": "collectable",
     "aliases": ["leaf"],
     "in_crates": true
@@ -731,26 +712,6 @@
     "aliases": ["child", "children"],
     "in_crates": true
   },
-  "match_attax": {
-    "id": "match_attax",
-    "name": "2010 match attax pelé 100 club",
-    "emoji": "🃏",
-    "longDesc": "rarest match attax card",
-    "rarity": 4,
-    "role": "collectable",
-    "aliases": ["pele"],
-    "in_crates": true
-  },
-  "pokemon_card": {
-    "id": "pokemon_card",
-    "name": "pikachu illustrator",
-    "emoji": "🃏",
-    "longDesc": "rarest pokemon card",
-    "rarity": 3,
-    "role": "collectable",
-    "aliases": ["pokemon", "pikachu", "illustrator"],
-    "in_crates": true
-  },
   "skyline_r34": {
     "id": "skyline_r34",
     "name": "nissan skyline gtr r34",
@@ -760,7 +721,6 @@
     "role": "car",
     "speed": 6,
     "aliases": ["r34", "gtr"],
-    "worth": 230000,
     "in_crates": true
   },
   "toyota_supra": {
@@ -772,7 +732,6 @@
     "role": "car",
     "speed": 5,
     "aliases": ["supra", "toyota"],
-    "worth": 170000,
     "in_crates": true
   },
   "lawyer": {
@@ -781,7 +740,7 @@
     "plural": "lawyers",
     "emoji": "👨‍⚖️",
     "longDesc": "[if you're caught by the police on a robbery, you wont lose money](https://i.giphy.com/media/40dEau6bZRO3S/giphy.webp)",
-    "rarity": 1,
+    "rarity": 0,
     "role": "item",
     "boobies": "i got this idea while watching better call saul on netflix lol. if u havent seen it i would recommend that u go watch it. you're not seeing this file though so im talking to myself. its a prequel to breaking bad. im so weird.",
     "aliases": ["saulgoodman", "saul"],
@@ -816,7 +775,7 @@
     "plural": "police scanners",
     "emoji": "📻",
     "longDesc": "prevent someone from robbing people",
-    "rarity": 1,
+    "rarity": 0,
     "role": "item",
     "aliases": ["scanner", "policescanner"],
     "buy": 150000,
@@ -828,7 +787,7 @@
     "name": "mitsubishi lancer evo x",
     "emoji": "<:nypsi_evo:839788961399439380>",
     "longDesc": "mitsubishi > subuwu",
-    "rarity": 2,
+    "rarity": 0,
     "role": "car",
     "speed": 3,
     "aliases": ["evox", "evo", "lancer"],
@@ -880,9 +839,8 @@
     "plural": "chastity cages",
     "emoji": "<:nypsi_chastity_cage:839532763338113036>",
     "longDesc": "stop someone finding milfs",
-    "rarity": 1,
+    "rarity": 0,
     "role": "item",
-    "worth": 75000,
     "aliases": ["chastity"],
     "buy": 75000,
     "sell": 40000,
@@ -906,7 +864,7 @@
     "name": "handcuffs",
     "emoji": "<:nypsi_handcuffs:839797762404122654>",
     "longDesc": "simply handcuff someone",
-    "rarity": 3,
+    "rarity": 1,
     "role": "item",
     "aliases": ["handcuff"],
     "buy": 400000,
@@ -1175,7 +1133,13 @@
     "rarity": 0,
     "buy": 0,
     "sell": 25000,
-    "role": "sellable",
+    "role": "booster",
+    "stackable": false,
+    "boosterEffect": {
+      "boosts": ["fight"],
+      "effect": "improves fight strength",
+      "time": 1800
+    },
     "in_crates": true
   },
   "steroids": {
@@ -1286,17 +1250,10 @@
     "plural": "grandmas",
     "aliases": ["gran", "nan", "uncle"],
     "emoji": "👵🏻",
-    "longDesc": "grandma will help you bake more cookies (stacks to 5)",
-    "rarity": 1,
+    "longDesc": "bakes 0.5 cookies per hour",
+    "rarity": 2,
     "sell": 100000,
-    "role": "booster",
-    "stackable": true,
-    "max": 5,
-    "boosterEffect": {
-      "boosts": ["cookie"],
-      "effect": 2,
-      "time": 7200
-    },
+    "role": "bakery-upgrade",
     "in_crates": true
   },
   "highroller": {
@@ -1342,9 +1299,9 @@
     "longDesc": "it's the bot owner's actual necklace!!",
     "rarity": 5,
     "role": "collectable",
+    "sell": 50000000,
     "speed": 6,
     "aliases": ["palm", "tree", "necklace"],
-    "worth": 230000,
     "in_crates": true
   },
   "double_xp": {
@@ -1385,8 +1342,9 @@
     "name": "green gem",
     "emoji": "<:nypsi_gem_green:1046866209326514206>",
     "longDesc": "a mysterious green, shiny gem. only found during a specific activity. it is widely known that the green gem is harmless... mostly. the most noble of all gems",
-    "role": "collectable",
-    "rarity": 69,
+    "role": "item",
+    "sell": 1000000,
+    "rarity": 2,
     "in_crates": false,
     "aliases": ["green"]
   },
@@ -1395,8 +1353,9 @@
     "name": "purple gem",
     "emoji": "<:nypsi_gem_purple:1046932495184187452>",
     "longDesc": "a mysterious purple, shiny gem. only found during a specific activity. some say gems are magical, made by witches. and are dangerous...",
-    "role": "collectable",
-    "rarity": 69,
+    "role": "item",
+    "sell": 1000000,
+    "rarity": 3,
     "in_crates": false,
     "aliases": ["purple"]
   },
@@ -1405,8 +1364,9 @@
     "name": "pink gem",
     "emoji": "<:nypsi_gem_pink:1046932847069499472>",
     "longDesc": "a mysterious pink, shiny gem. only found during a specific activity. some say gems were planted by aliens in the early stages of earth's creation",
-    "role": "collectable",
-    "rarity": 69,
+    "role": "item",
+    "sell": 1000000,
+    "rarity": 3,
     "in_crates": false,
     "aliases": ["pink"]
   },
@@ -1415,8 +1375,9 @@
     "name": "blue gem",
     "emoji": "<:nypsi_gem_blue:1046933487770423406>",
     "longDesc": "a mysterious blue, shiny gem. only found during a specific activity. some say gems are ancient relics of a long past civilization",
-    "role": "collectable",
-    "rarity": 69,
+    "role": "item",
+    "sell": 1000000,
+    "rarity": 1,
     "in_crates": false,
     "aliases": ["blue"]
   },
@@ -1426,11 +1387,12 @@
     "emoji": "<:nypsi_gem_white:1046933670436552725>",
     "longDesc": "a mysterious white, shiny gem. the most ancient and most powerful of them all. ancient tablets claim that the holder of this gem has the power to create worlds. be careful.",
     "role": "item",
-    "rarity": 69,
+    "rarity": 4,
     "in_crates": false,
+    "sell": 2500000,
     "craft": {
       "time": 259200,
-      "ingrediants": ["blue_gem:1", "green_gem:1", "pink_gem:1", "purple_gem:1"]
+      "ingrediants": ["blue_gem:2", "green_gem:2", "pink_gem:1", "purple_gem:1"]
     },
     "aliases": ["white"]
   },
@@ -1440,7 +1402,8 @@
     "emoji": "<:nypsi_crystal_heart:1051624572694319124>",
     "longDesc": "it's widely understood throughout history, that nobody truly understands the origin of any gem, including the crystal heart. ancient hieroglyphs depict the crystal heart forming when all gems in existence fuse together. quite a sight to behold.",
     "role": "item",
-    "rarity": 69,
+    "rarity": 4,
+    "sell": 10000000,
     "in_crates": false,
     "aliases": ["heart", "crystal"]
   },
@@ -1448,16 +1411,67 @@
     "id": "beginner_booster",
     "name": "new player booster",
     "emoji": "✨",
-    "longDesc": "24 hour 17% multi and double xp booster for new players",
+    "longDesc": "24 hour 10% multi and double xp booster for new players",
     "rarity": 69,
     "role": "booster",
     "stackable": false,
     "boosterEffect": {
       "boosts": ["multi", "xp"],
-      "effect": 17,
+      "effect": 10,
       "time": 86400
     },
     "in_crates": false,
     "account_locked": true
+  },
+  "cursor": {
+    "id": "cursor",
+    "name": "cursor",
+    "plural": "cursors",
+    "aliases": ["pointer"],
+    "emoji": "<:nypsi_cursor:1054771565557981244>",
+    "longDesc": "gives you an extra cookie every time you bake",
+    "rarity": 2,
+    "sell": 100000,
+    "role": "bakery-upgrade",
+    "in_crates": true
+  },
+  "workers_crate": {
+    "id": "workers_crate",
+    "name": "workers crate",
+    "plural": "worker crates",
+    "emoji": "<:worker_crate:1057639345441476668>",
+    "role": "crate",
+    "longDesc": "open to receive two random worker upgrades",
+    "aliases": ["workerscrate", "wcrate"],
+    "rarity": 3,
+    "in_crates": true,
+    "crate_runs": 2,
+    "items": ["role:worker-upgrade"]
+  },
+  "boosters_crate": {
+    "id": "boosters_crate",
+    "name": "boosters crate",
+    "plural": "booster crates",
+    "emoji": "<:booster_crate:1057640419892133968>",
+    "role": "crate",
+    "longDesc": "open to receive three random boosters",
+    "aliases": ["boosterscrate", "boostercrate", "bcrate"],
+    "rarity": 3,
+    "in_crates": true,
+    "crate_runs": 3,
+    "items": ["role:booster"]
+  },
+  "gem_crate": {
+    "id": "gem_crate",
+    "name": "gem crate",
+    "plural": "gem crates",
+    "emoji": "<:gem_crate:1057641447756660747>",
+    "role": "crate",
+    "longDesc": "open to receive one random gem",
+    "aliases": ["gemcrate", "gcrate", "gemscrate"],
+    "rarity": 69,
+    "in_crates": false,
+    "crate_runs": 1,
+    "items": ["id:white_gem", "id:blue_gem", "id:green_gem", "id:purple_gem", "id:pink_gem", "id:crystal_heart"]
   }
 }

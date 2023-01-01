@@ -23,6 +23,7 @@ import { getKarma, removeKarma } from "../utils/functions/karma/karma";
 import { closeKarmaShop, getKarmaShopItems, isKarmaShopOpen, openKarmaShop } from "../utils/functions/karma/karmashop";
 import PageManager from "../utils/functions/page";
 import { addMember, getTier, isPremium, setExpireDate } from "../utils/functions/premium/premium";
+import { percentChance } from "../utils/functions/random";
 import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import dayjs = require("dayjs");
@@ -381,9 +382,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     addProgress(message.author.id, "wizard", 1);
 
-    const gemSpawn = Math.floor(Math.random() * 377);
-
-    if (gemSpawn == 307 && (await getDmSettings(message.member)).other) {
+    if (percentChance(0.25) && (await getDmSettings(message.member)).other) {
       await addInventoryItem(message.member, "purple_gem", 1);
       addProgress(message.author.id, "gem_hunter", 1);
       await addNotificationToQueue({
@@ -392,7 +391,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           embed: new CustomEmbed(
             message.member,
             `${getItems()["purple_gem"].emoji} you've found a gem! i wonder what powers it holds...`
-          ).setTitle("you've found a gem"),
+          )
+            .setTitle("you've found a gem")
+            .setColor(Constants.TRANSPARENT_EMBED_COLOR),
         },
       });
     }

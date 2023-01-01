@@ -16,7 +16,9 @@ import { getPrestige } from "../functions/economy/prestige";
 import { addTicket, getItems, getTickets, isEcoBanned, loadItems, userExists } from "../functions/economy/utils";
 import { addKarma } from "../functions/karma/karma";
 import { addMember, getPremiumProfile, isPremium, renewUser, setTier } from "../functions/premium/premium";
+import { percentChance } from "../functions/random";
 import requestDM from "../functions/requestdm";
+import { isUserBlacklisted } from "../functions/users/blacklist";
 import { addNotificationToQueue, getDmSettings } from "../functions/users/notifications";
 import { logger } from "../logger";
 import ms = require("ms");
@@ -66,6 +68,11 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
 
   if (!(await userExists(user))) {
     logger.warn(`${user} doesnt exist`);
+    return;
+  }
+
+  if (await isUserBlacklisted(user)) {
+    logger.info(`${user} blacklisted`);
     return;
   }
 
@@ -128,15 +135,13 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
 
   let crateAmount = Math.floor(prestige / 1.2 + 1);
 
-  if (crateAmount > 6) crateAmount = 6;
+  if (crateAmount > 5) crateAmount = 5;
 
   await addInventoryItem(user, "vote_crate", crateAmount, false);
 
-  const gemChance = Math.floor(Math.random() * 250);
-
-  if (gemChance == 107) {
+  if (percentChance(0.2)) {
     await addInventoryItem(user, "blue_gem", 1);
-    await addProgress(user, "gem_hunter", 1);
+    addProgress(user, "gem_hunter", 1);
 
     if ((await getDmSettings(user)).other) {
       await addNotificationToQueue({
@@ -144,7 +149,8 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
         payload: {
           embed: new CustomEmbed()
             .setDescription(`${getItems()["blue_gem"].emoji} you've found a gem! i wonder what powers it holds...`)
-            .setTitle("you've found a gem"),
+            .setTitle("you've found a gem")
+            .setColor(Constants.TRANSPARENT_EMBED_COLOR),
         },
       });
     }
@@ -167,7 +173,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
       )
       .disableFooter();
 
-    if (!(await getDmSettings(user)).vote_reminder) {
+    if (!(await getDmSettings(user)).voteReminder) {
       const chance = Math.floor(Math.random() * 10);
 
       if (chance == 7) {
@@ -194,9 +200,9 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
 }
 
 async function handleKofiData(data: KofiResponse) {
-  const user = await prisma.user.findUnique({
+  const user = await prisma.user.findFirst({
     where: {
-      email: data.email,
+      AND: [{ email: data.email }, { blacklisted: false }],
     },
   });
 
@@ -240,7 +246,7 @@ async function handleKofiData(data: KofiResponse) {
 
           if (gemChance == 7) {
             await addInventoryItem(user.id, "pink_gem", 1);
-            await addProgress(user.id, "gem_hunter", 1);
+            addProgress(user.id, "gem_hunter", 1);
 
             if ((await getDmSettings(user.id)).other) {
               await addNotificationToQueue({
@@ -248,13 +254,14 @@ async function handleKofiData(data: KofiResponse) {
                 payload: {
                   embed: new CustomEmbed()
                     .setDescription(`${getItems()["pink_gem"].emoji} you've found a gem! i wonder what powers it holds...`)
-                    .setTitle("you've found a gem"),
+                    .setTitle("you've found a gem")
+                    .setColor(Constants.TRANSPARENT_EMBED_COLOR),
                 },
               });
             }
           } else if (gemChance == 17) {
             await addInventoryItem(user.id, "blue_gem", 1);
-            await addProgress(user.id, "gem_hunter", 1);
+            addProgress(user.id, "gem_hunter", 1);
 
             if ((await getDmSettings(user.id)).other) {
               await addNotificationToQueue({
@@ -262,13 +269,14 @@ async function handleKofiData(data: KofiResponse) {
                 payload: {
                   embed: new CustomEmbed()
                     .setDescription(`${getItems()["blue_gem"].emoji} you've found a gem! i wonder what powers it holds...`)
-                    .setTitle("you've found a gem"),
+                    .setTitle("you've found a gem")
+                    .setColor(Constants.TRANSPARENT_EMBED_COLOR),
                 },
               });
             }
           } else if (gemChance == 77) {
             await addInventoryItem(user.id, "purple_gem", 1);
-            await addProgress(user.id, "gem_hunter", 1);
+            addProgress(user.id, "gem_hunter", 1);
 
             if ((await getDmSettings(user.id)).other) {
               await addNotificationToQueue({
@@ -282,7 +290,7 @@ async function handleKofiData(data: KofiResponse) {
             }
           } else if (gemChance == 27) {
             await addInventoryItem(user.id, "green_gem", 1);
-            await addProgress(user.id, "gem_hunter", 1);
+            addProgress(user.id, "gem_hunter", 1);
 
             if ((await getDmSettings(user.id)).other) {
               await addNotificationToQueue({
@@ -290,23 +298,25 @@ async function handleKofiData(data: KofiResponse) {
                 payload: {
                   embed: new CustomEmbed()
                     .setDescription(`${getItems()["green_gem"].emoji} you've found a gem! i wonder what powers it holds...`)
-                    .setTitle("you've found a gem"),
+                    .setTitle("you've found a gem")
+                    .setColor(Constants.TRANSPARENT_EMBED_COLOR),
                 },
               });
             }
           } else if (gemChance == 57) {
-            const gemChance2 = Math.floor(Math.random() * 15);
+            const gemChance2 = Math.floor(Math.random() * 50);
 
             if (gemChance2 == 7 && (await getDmSettings(user.id)).other) {
               await addInventoryItem(user.id, "white_gem", 1);
-              await addProgress(user.id, "gem_hunter", 1);
+              addProgress(user.id, "gem_hunter", 1);
 
               await addNotificationToQueue({
                 memberId: user.id,
                 payload: {
                   embed: new CustomEmbed()
                     .setDescription(`${getItems()["white_gem"].emoji} you've found a gem! i wonder what powers it holds...`)
-                    .setTitle("you've found a gem"),
+                    .setTitle("you've found a gem")
+                    .setColor(Constants.TRANSPARENT_EMBED_COLOR),
                 },
               });
             }

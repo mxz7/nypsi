@@ -190,6 +190,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (!color.startsWith("#") && color != "default") color = `#${color}`;
 
+    if (!color.match(Constants.COLOUR_REGEX))
+      return send({ embeds: [new ErrorEmbed("invalid hex color code. example: #abcdef")] });
+
     const embed = new CustomEmbed();
 
     try {

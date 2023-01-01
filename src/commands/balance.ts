@@ -155,15 +155,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       `${padlockStatus ? "🔒" : "💰"} $**${(await getBalance(target)).toLocaleString()}**\n` +
         `💳 $**${(await getBankBalance(target)).toLocaleString()}** / $**${(
           await getMaxBankBalance(target)
-        ).toLocaleString()}**${net > 1_000_000 ? `\n${gemLine}\n🌍 $**${net.toLocaleString()}**` : ""}`
+        ).toLocaleString()}**${net > 15_000_000 ? `\n${gemLine}\n🌍 $**${net.toLocaleString()}**` : ""}`
     )
     .setFooter({ text: footer });
 
-  if (target.user.id == message.author.id) {
-    embed.setHeader("your balance | season 4", message.author.avatarURL());
-  } else {
-    embed.setHeader(`${target.user.username}'s balance | season 4`, target.user.avatarURL());
-  }
+  embed.setHeader(`${target.user.username} | season 5`, target.user.avatarURL());
 
   if (message.member == target) {
     if (

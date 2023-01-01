@@ -10,12 +10,13 @@ import { addProgress } from "../../utils/functions/economy/achievements";
 import { getBalance, updateBalance } from "../../utils/functions/economy/balance";
 import { addInventoryItem } from "../../utils/functions/economy/inventory";
 import { getItems, lotteryTicketPrice } from "../../utils/functions/economy/utils";
-import { shuffle } from "../../utils/functions/random";
+import { percentChance, shuffle } from "../../utils/functions/random";
 import { addToNypsiBank, getTax } from "../../utils/functions/tax";
 import { addNotificationToQueue, getDmSettings } from "../../utils/functions/users/notifications";
 import { logger } from "../../utils/logger";
 import dayjs = require("dayjs");
 import ms = require("ms");
+import Constants from "../../utils/Constants";
 
 async function doLottery(client: Client) {
   await redis.del("lotterytickets:queue");
@@ -97,11 +98,9 @@ async function doLottery(client: Client) {
         logger.warn("failed to send notification to winner");
       });
 
-    const gemChance = Math.floor(Math.random() * 150);
-
-    if (gemChance == 17) {
+    if (percentChance(0.9)) {
       await addInventoryItem(user.id, "purple_gem", 1);
-      await addProgress(user.id, "gem_hunter", 1);
+      addProgress(user.id, "gem_hunter", 1);
 
       if ((await getDmSettings(user.id)).other) {
         await addNotificationToQueue({
@@ -109,7 +108,8 @@ async function doLottery(client: Client) {
           payload: {
             embed: new CustomEmbed()
               .setDescription(`${getItems()["purple_gem"].emoji} you've found a gem! i wonder what powers it holds...`)
-              .setTitle("you've found a gem"),
+              .setTitle("you've found a gem")
+              .setColor(Constants.TRANSPARENT_EMBED_COLOR),
           },
         });
       }

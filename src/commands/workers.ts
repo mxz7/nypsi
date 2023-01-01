@@ -10,8 +10,8 @@ import {
   InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
-  SelectMenuBuilder,
-  SelectMenuOptionBuilder,
+  StringSelectMenuBuilder,
+  StringSelectMenuOptionBuilder,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
@@ -191,11 +191,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return { embed: embed, buttonRow: row };
     };
 
-    const options: SelectMenuOptionBuilder[] = [];
+    const options: StringSelectMenuOptionBuilder[] = [];
 
     for (const worker of Object.keys(baseWorkers)) {
       options.push(
-        new SelectMenuOptionBuilder()
+        new StringSelectMenuOptionBuilder()
           .setLabel(
             `${baseWorkers[worker].name}${
               baseWorkers[worker].prestige_requirement > prestige ? " [locked]" : isOwned(worker) ? " [owned]" : ""
@@ -207,7 +207,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     let workersList = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new SelectMenuBuilder().setCustomId("worker").setOptions(options)
+      new StringSelectMenuBuilder().setCustomId("worker").setOptions(options)
     );
 
     const { buttonRow, embed } = await displayWorker(baseWorkers[defaultWorker]);
@@ -244,7 +244,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         workersList = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-          new SelectMenuBuilder().setCustomId("worker").setOptions(options)
+          new StringSelectMenuBuilder().setCustomId("worker").setOptions(options)
         );
 
         await res.message.edit({ embeds: [embed], components: [workersList, buttonRow] });

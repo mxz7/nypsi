@@ -201,9 +201,8 @@ export async function acceptWholesomeImage(id: number, accepter: GuildMember, cl
 
   clearWholesomeCache();
 
+  addProgress(query.submitterId, "wholesome", 1);
   logger.info(`${query.image} by ${query.submitterId} accepted by ${accepter.user.id}`);
-
-  await addProgress(query.submitterId, "wholesome", 1);
 
   await requestDM({
     memberId: query.submitterId,

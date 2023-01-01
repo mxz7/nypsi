@@ -3,6 +3,7 @@ import redis from "../init/redis";
 import Constants from "../utils/Constants";
 import { getColor } from "../utils/functions/color";
 import { getEmbedColor } from "../utils/functions/premium/color";
+import ms = require("ms");
 
 const embedColorCache = new Map<string, string>();
 
@@ -218,11 +219,11 @@ async function checkPremium(id: string) {
     embedColorCache.set(id, embedColor);
     setTimeout(() => {
       embedColorCache.delete(id);
-    }, 900 * 1000);
+    }, ms("1 hour"));
   } else {
     embedColorCache.set(id, "none");
     setTimeout(() => {
       embedColorCache.delete(id);
-    }, 900 * 1000);
+    }, ms("1 hour"));
   }
 }
