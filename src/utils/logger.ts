@@ -107,13 +107,13 @@ export function payment(from: User, to: User, value: string) {
   }
 }
 
-export function gamble(user: User, game: string, amount: number, win: boolean, winAmount?: number) {
+export function gamble(user: User, game: string, amount: number, win: boolean, id: string, winAmount?: number) {
   if (!nextLogMsg.get("gamble")) {
     nextLogMsg.set(
       "gamble",
       `**${user.tag}** (${user.id}) - **${game}** - ${win ? "won" : "lost"}${
         win ? ` ($**${winAmount.toLocaleString()}**)` : ""
-      } - $**${amount.toLocaleString()}**\n`
+      } - $**${amount.toLocaleString()}** **id** ${id}\n`
     );
   } else {
     nextLogMsg.set(
@@ -121,7 +121,7 @@ export function gamble(user: User, game: string, amount: number, win: boolean, w
       nextLogMsg.get("gamble") +
         `**${user.tag}** (${user.id}) - **${game}** - ${win ? "won" : "lost"}${
           win ? ` ($**${winAmount.toLocaleString()}**)` : ""
-        } - $**${amount.toLocaleString()}**\n`
+        } - $**${amount.toLocaleString()}** **id** ${id}\n`
     );
   }
 }

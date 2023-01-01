@@ -5,7 +5,7 @@ import * as fs from "fs";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
-import { AchievementData, Item } from "../../../types/Economy";
+import { AchievementData, BakeryUpgradeData, Item } from "../../../types/Economy";
 import { Worker, WorkerUpgrades } from "../../../types/Workers";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
@@ -23,6 +23,7 @@ let items: { [key: string]: Item };
 let achievements: { [key: string]: AchievementData };
 let baseWorkers: { [key: string]: Worker };
 let baseUpgrades: { [key: string]: WorkerUpgrades };
+let bakeryUpgrades: { [key: string]: BakeryUpgradeData };
 
 const lotteryTicketPrice = 15000;
 /**
@@ -34,13 +35,14 @@ export { lotteryTicketPrice };
 export function loadItems(crypto = true) {
   const itemsFile: any = fs.readFileSync("./data/items.json");
   const achievementsFile: any = fs.readFileSync("./data/achievements.json");
-
   const workersFile: any = fs.readFileSync("./data/workers.json");
+  const bakeryFile: any = fs.readFileSync("./data/bakery_upgrades.json");
 
   items = JSON.parse(itemsFile);
   achievements = JSON.parse(achievementsFile);
   baseWorkers = JSON.parse(workersFile).workers;
   baseUpgrades = JSON.parse(workersFile).upgrades;
+  bakeryUpgrades = JSON.parse(bakeryFile);
 
   const workerIds = Object.keys(baseWorkers);
 
@@ -79,7 +81,7 @@ async function updateCryptoWorth() {
   const btcworth = Math.floor(res.bpi.USD.rate_float);
 
   items["bitcoin"].buy = btcworth;
-  items["bitcoin"].sell = btcworth;
+  items["bitcoin"].sell = Math.floor(btcworth * 0.95);
   logger.info("bitcoin worth updated: $" + items["bitcoin"].buy.toLocaleString());
 
   res = await fetch("https://api.coinbase.com/v2/exchange-rates?currency=ETH").then((res) => res.json());
@@ -92,7 +94,7 @@ async function updateCryptoWorth() {
   }
 
   items["ethereum"].buy = ethWorth;
-  items["ethereum"].sell = ethWorth;
+  items["ethereum"].sell = Math.floor(ethWorth * 0.95);
   logger.info("ethereum worth updated: $" + items["ethereum"].buy.toLocaleString());
 }
 
@@ -300,7 +302,9 @@ export async function reset() {
   await prisma.lotteryTicket.deleteMany();
   await prisma.$executeRaw`ALTER SEQUENCE "LotteryTicket_id_seq" RESTART WITH 1;`;
   await prisma.booster.deleteMany();
-  await prisma.economyStats.deleteMany();
+  await prisma.game.deleteMany();
+  await prisma.$executeRaw`TRUNCATE TABLE "Game" RESTART IDENTITY;`;
+  await prisma.itemUse.deleteMany();
   await prisma.economyGuildMember.deleteMany();
   await prisma.economyGuild.deleteMany();
   await prisma.auction.deleteMany();
@@ -322,7 +326,7 @@ export async function reset() {
           { prestige: 0 },
           { lastVote: { lt: new Date(Date.now() - ms("12 hours")) } },
           { dailyStreak: { lt: 2 } },
-          { auction_watch: { isEmpty: true } },
+          { auctionWatch: { isEmpty: true } },
         ],
       },
     })
@@ -374,6 +378,10 @@ export function getItems(): { [key: string]: Item } {
   return items;
 }
 
+export function getBakeryUpgradesData() {
+  return bakeryUpgrades;
+}
+
 export function getAchievements() {
   return achievements;
 }
@@ -412,11 +420,6 @@ export async function deleteUser(member: GuildMember | string) {
 
   await prisma.booster.deleteMany({
     where: { userId: id },
-  });
-  await prisma.economyStats.deleteMany({
-    where: {
-      economyUserId: id,
-    },
   });
   await prisma.economy.delete({
     where: {

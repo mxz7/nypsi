@@ -9,6 +9,9 @@ products.set("bronze", "bronze");
 products.set("dfcfa66092", "basic_crate");
 products.set("595ba15808", "69420_crate");
 products.set("5569964b90", "nypsi_crate");
+products.set("1e62c44770", "workers_crate");
+products.set("4b1d3a70b2", "boosters_crate");
+products.set("4ec1ebe6b4", "gem_crate");
 
 export default {
   redis: {
@@ -31,6 +34,7 @@ export default {
         LAST_COMMAND: "cache:user:lastcmd",
         LASTFM: "cache:user:lastfm",
         TRACKING: "cache:user:tracking",
+        BLACKLIST: "cache:user:blacklist",
       },
       guild: {
         EXISTS: "cache:guild:exists",
@@ -55,6 +59,9 @@ export default {
         PRESTIGE: "cache:economy:prestige",
         VOTE: "cache:economy:vote",
         XP: "cache:economy:xp",
+        GAME_COUNT: "cache:economy:gamecount",
+        GUILD_LEVEL: "cache:economy:guild:level",
+        BAKERY_UPGRADES: "cache:economy:bakery:upgrades",
       },
     },
     nypsi: {
@@ -92,4 +99,5 @@ export default {
   TRANSPARENT_EMBED_COLOR: "#36393f" as ColorResolvable,
   ADMIN_IDS: ["672793821850894347", "449774710469689355"],
   EMOJI_REGEX: /(<:[A-z]+:[0-9]+>)/,
+  COLOUR_REGEX: /^#([A-Fa-f0-9]{6})$/,
 };

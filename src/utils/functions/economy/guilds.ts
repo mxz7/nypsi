@@ -20,12 +20,24 @@ export async function getGuildByName(name: string) {
         },
       },
       include: {
-        owner: true,
-        members: {
-          include: {
+        owner: {
+          select: {
             user: {
               select: {
                 lastKnownTag: true,
+              },
+            },
+          },
+        },
+        members: {
+          include: {
+            economy: {
+              select: {
+                user: {
+                  select: {
+                    lastKnownTag: true,
+                  },
+                },
               },
             },
           },
@@ -35,6 +47,51 @@ export async function getGuildByName(name: string) {
     .then((r) => r[0]);
 
   return guild;
+}
+
+export async function getGuildLevelByUser(member: GuildMember | string) {
+  let id: string;
+  if (member instanceof GuildMember) {
+    id = member.user.id;
+  } else {
+    id = member;
+  }
+
+  let guildName: string;
+
+  if (await redis.exists(`${Constants.redis.cache.economy.GUILD_USER}:${id}`)) {
+    guildName = await redis.get(`${Constants.redis.cache.economy.GUILD_USER}:${id}`);
+
+    if (guildName === "noguild") return 0;
+  } else {
+    const guild = await getGuildByUser(member);
+
+    if (!guild) return 0;
+
+    await redis.set(`${Constants.redis.cache.economy.GUILD_LEVEL}:${guild.guildName.toLowerCase()}`, guild.level);
+    await redis.expire(
+      `${Constants.redis.cache.economy.GUILD_LEVEL}:${guild.guildName.toLowerCase()}`,
+      Math.floor(ms("1 hour") / 1000)
+    );
+
+    return guild.level;
+  }
+
+  if (await redis.exists(`${Constants.redis.cache.economy.GUILD_LEVEL}:${guildName.toLowerCase()}`)) {
+    return parseInt(await redis.get(`${Constants.redis.cache.economy.GUILD_LEVEL}:${guildName.toLowerCase()}`));
+  } else {
+    const guild = await getGuildByName(guildName);
+
+    if (!guild) return 0;
+
+    await redis.set(`${Constants.redis.cache.economy.GUILD_LEVEL}:${guild.guildName.toLowerCase()}`, guild.level);
+    await redis.expire(
+      `${Constants.redis.cache.economy.GUILD_LEVEL}:${guild.guildName.toLowerCase()}`,
+      Math.floor(ms("1 hour") / 1000)
+    );
+
+    return guild.level;
+  }
 }
 
 export async function getGuildByUser(member: GuildMember | string) {
@@ -56,12 +113,24 @@ export async function getGuildByUser(member: GuildMember | string) {
       where: {
         userId: id,
       },
-      select: {
+      include: {
         guild: {
           include: {
-            owner: true,
             members: {
               include: {
+                economy: {
+                  select: {
+                    user: {
+                      select: {
+                        lastKnownTag: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            owner: {
+              select: {
                 user: {
                   select: {
                     lastKnownTag: true,
@@ -309,6 +378,7 @@ async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
     logger.info(`${guild.guildName} has upgraded to level ${guild.level + 1}`);
 
     await redis.del(`${Constants.redis.cache.economy.GUILD_REQUIREMENTS}:${guild.guildName}`);
+    await redis.del(`${Constants.redis.cache.economy.GUILD_LEVEL}:${guild.guildName.toLowerCase()}`);
 
     const embed = new CustomEmbed().setColor(Constants.EMBED_SUCCESS_COLOR);
 

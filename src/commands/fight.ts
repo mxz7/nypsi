@@ -15,7 +15,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { getBoosters } from "../utils/functions/economy/boosters";
 import { addInventoryItem } from "../utils/functions/economy/inventory";
-import { addGamble, getStats } from "../utils/functions/economy/stats";
+import { createGame, getGambleStats } from "../utils/functions/economy/stats";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
@@ -75,15 +75,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     embed.setDescription(`${prefix}**fight <member>** *challenge another member to a fight*`);
 
-    const stats = (await getStats(message.member)).gamble["fight"];
+    const stats = (await getGambleStats(message.member)).find((s) => s.game == "fight");
 
     if (stats) {
-      embed.setFooter({ text: `you are ${stats.wins}-${stats.lose}` });
+      embed.setFooter({ text: `you are ${stats._sum.win}-${stats._count._all - stats._sum.win}` });
     }
 
     return send({ embeds: [embed] });
   } else if (args[0].toLowerCase() == "stats" || args[0].toLowerCase() == "stat") {
-    const stats = (await getStats(message.member)).gamble["fight"];
+    const stats = (await getGambleStats(message.member)).find((s) => s.game == "fight");
 
     if (!stats) {
       return send({ embeds: [new ErrorEmbed("you have no fight stats")] });
@@ -91,7 +91,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const embed = new CustomEmbed(
       message.member,
-      `you have won **${stats.wins.toLocaleString()}** fights and lost **${stats.lose.toLocaleString()}**`
+      `you have won **${stats._sum.win.toLocaleString()}** fights and lost **${(
+        stats._count._all - stats._sum.win
+      ).toLocaleString()}**`
     ).setHeader("your fight stats", message.author.avatarURL());
 
     return send({ embeds: [embed] });
@@ -418,7 +420,7 @@ class Fight {
     }
 
     if (await userExists(winner.member.user.id)) {
-      await addProgress(winner.member.user.id, "fighter", 1);
+      addProgress(winner.member.user.id, "fighter", 1);
       if (!cookieRecent.has(winner.member.user.id)) {
         cookieRecent.add(winner.member.user.id);
 
@@ -426,12 +428,16 @@ class Fight {
 
         embed.setFooter({ text: "well done. enjoy this cookie 🍪" });
       }
-
-      await addGamble(winner.member, "fight", true);
     }
 
-    if (await userExists(loser.user.id)) {
-      await addGamble(loser, "fight", false);
+    if (await userExists(this.home.user.id)) {
+      await createGame({
+        userId: this.home.user.id,
+        bet: 0,
+        game: "fight",
+        win: this.home.user.id == winner.member.user.id,
+        outcome: `\`\`\`${this.log.join("\n")}\`\`\``,
+      });
     }
 
     embed.setHeader(`${this.home.user.username} vs ${this.away.user.username}`);

@@ -23,13 +23,15 @@ import { addProgress } from "../utils/functions/economy/achievements";
 import { calcMaxBet, getBalance, getDefaultBet, getMulti, updateBalance } from "../utils/functions/economy/balance";
 import { addToGuildXP, getGuildByUser } from "../utils/functions/economy/guilds";
 import { addInventoryItem } from "../utils/functions/economy/inventory";
-import { addGamble } from "../utils/functions/economy/stats";
+import { createGame } from "../utils/functions/economy/stats";
 import { createUser, formatBet, userExists } from "../utils/functions/economy/utils";
 import { calcEarnedXp, getXp, updateXp } from "../utils/functions/economy/xp";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
+import { percentChance } from "../utils/functions/random";
 import { addHourlyCommand } from "../utils/handlers/commandhandler";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { gamble, logger } from "../utils/logger";
+import _ = require("lodash");
 
 const cmd = new Command("tower", "play dragon tower", Categories.MONEY).setAliases([
   "dragon",
@@ -306,9 +308,7 @@ function createBoard(diff: string) {
   const createRow = () => {
     const populate = (eggs: number, row: string[]) => {
       while (row.filter((i) => ["b", "g"].includes(i)).length < eggs) {
-        const gemSpawnChance = Math.floor(Math.random() * 45);
-
-        if (gemSpawnChance == 7 && !spawnedGem) {
+        if (percentChance(1.5) && !spawnedGem) {
           const pos = randomInt(0, row.length);
           row[pos] = "g";
           spawnedGem = true;
@@ -497,8 +497,23 @@ async function playGame(
   };
 
   const lose = async () => {
-    gamble(message.author, "tower", game.bet, false, 0);
-    await addGamble(message.member, "tower", false);
+    const board = _.cloneDeep(game.board);
+
+    const id = await createGame({
+      userId: message.author.id,
+      bet: game.bet,
+      game: "tower",
+      win: false,
+      outcome:
+        `difficulty: ${game.difficulty}\n` +
+        "A = blank | B = egg | C = clicked egg | G = gem | GC = found gem | X = bad click\n" +
+        board
+          .map((row) => row.join("").toUpperCase())
+          .reverse()
+          .join("\n"),
+    });
+    gamble(message.author, "tower", game.bet, false, id, 0);
+    game.embed.setFooter({ text: `id: ${id}` });
     game.embed.setColor(Constants.EMBED_FAIL_COLOR);
     game.embed.setDescription(
       "**bet** $" +
@@ -529,7 +544,7 @@ async function playGame(
     );
     game.embed.setColor(Constants.EMBED_SUCCESS_COLOR);
 
-    const earnedXp = await calcEarnedXp(message.member, game.bet);
+    const earnedXp = await calcEarnedXp(message.member, game.bet, game.win);
 
     if (earnedXp > 0) {
       await updateXp(message.member, (await getXp(message.member)) + earnedXp);
@@ -542,8 +557,30 @@ async function playGame(
       }
     }
 
-    gamble(message.author, "tower", game.bet, true, winnings);
-    await addGamble(message.member, "tower", true);
+    const board = _.cloneDeep(game.board);
+
+    const id = await createGame({
+      userId: message.author.id,
+      bet: game.bet,
+      game: "tower",
+      win: true,
+      outcome:
+        `difficulty: ${game.difficulty}\n` +
+        "A = blank | B = egg | C = clicked egg | G = gem | GC = found gem | X = bad click\n" +
+        board
+          .map((row) => row.join("").toUpperCase())
+          .reverse()
+          .join("\n"),
+      earned: winnings,
+      xp: earnedXp,
+    });
+    gamble(message.author, "tower", game.bet, true, id, winnings);
+
+    if (game.embed.data.footer) {
+      game.embed.setFooter({ text: `+${earnedXp}xp | id: ${id}` });
+    } else {
+      game.embed.setFooter({ text: `id: ${id}` });
+    }
 
     await updateBalance(message.member, (await getBalance(message.member)) + winnings);
     games.delete(message.author.id);
@@ -551,8 +588,22 @@ async function playGame(
   };
 
   const draw = async () => {
-    gamble(message.author, "tower", game.bet, true, game.bet);
-    await addGamble(message.member, "tower", true);
+    const board = _.cloneDeep(game.board);
+
+    const id = await createGame({
+      userId: message.author.id,
+      bet: game.bet,
+      game: "tower",
+      win: false,
+      outcome:
+        `difficulty: ${game.difficulty}\n` +
+        "A = blank | B = egg | C = clicked egg | G = gem | GC = found gem | X = bad click\n" +
+        board
+          .map((row) => row.join("").toUpperCase())
+          .reverse()
+          .join("\n"),
+    });
+    gamble(message.author, "tower", game.bet, true, id, game.bet);
     game.embed.setColor(variants.macchiato.yellow.hex as ColorResolvable);
     game.embed.setDescription(
       "**bet** $" +
@@ -593,9 +644,7 @@ async function playGame(
           row[x] = "gc";
           game.win += 3;
 
-          const caught = Math.floor(Math.random() * 50);
-
-          if (caught == 7) {
+          if (percentChance(0.5)) {
             addInventoryItem(message.member, "green_gem", 1);
             addProgress(message.author.id, "gem_hunter", 1);
             response.followUp({
@@ -603,16 +652,6 @@ async function playGame(
                 new CustomEmbed(
                   message.member,
                   `${GEM_EMOJI} you found a **gem**!!\nit has been added to your inventory, i wonder what powers it has`
-                ),
-              ],
-              ephemeral: true,
-            });
-          } else {
-            response.followUp({
-              embeds: [
-                new CustomEmbed(
-                  message.member,
-                  `${GEM_EMOJI} you found a **gem**!!\nunfortunately you dropped it and it shattered. maybe next time`
                 ),
               ],
               ephemeral: true,

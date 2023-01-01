@@ -8,11 +8,10 @@ import {
   InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
-  SelectMenuBuilder,
-  SelectMenuOptionBuilder,
+  StringSelectMenuBuilder,
+  StringSelectMenuOptionBuilder,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
-import prisma from "../init/database.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants.js";
@@ -20,6 +19,7 @@ import { addProgress } from "../utils/functions/economy/achievements.js";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance.js";
 import { getInventory, setInventoryItem } from "../utils/functions/economy/inventory.js";
 import { getPrestige } from "../utils/functions/economy/prestige.js";
+import { createGame } from "../utils/functions/economy/stats.js";
 import { createUser, userExists } from "../utils/functions/economy/utils.js";
 import { addToNypsiBank, getNypsiBankBalance, removeFromNypsiBankBalance } from "../utils/functions/tax.js";
 import { addCooldown, getRemaining, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
@@ -28,11 +28,11 @@ import ms = require("ms");
 const cmd = new Command("bankrob", "attempt to rob a bank for a high reward", Categories.MONEY);
 
 const defaults = new Map<string, number>([
-  ["bank of america", 30_000_000],
-  ["maze bank", 10_000_000],
-  ["barclays", 5_000_000],
-  ["lloyds", 2_500_000],
-  ["monzo", 1_500_000],
+  ["bank of america", 5_000_000],
+  ["maze bank", 2_500_000],
+  ["barclays", 1_000_000],
+  ["lloyds", 750_000],
+  ["monzo", 500_000],
 ]);
 
 const requirements = new Map<string, number>([
@@ -196,26 +196,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         bankWorth.set(bank, Math.floor(bankWorth.get(bank) - stolen));
       }
 
-      await prisma.economyStats.upsert({
-        create: {
-          economyUserId: message.author.id,
-          gamble: true,
-          type: "bankrob",
-          win: stolen,
-        },
-        where: {
-          type_economyUserId: {
-            economyUserId: message.author.id,
-            type: "bankrob",
-          },
-        },
-        update: {
-          win: { increment: stolen },
-        },
+      const id = await createGame({
+        userId: message.author.id,
+        bet: 0,
+        win: true,
+        earned: stolen,
+        game: "bankrob",
+        outcome: `${message.author.username} robbed ${bank}`,
       });
 
       embed.setDescription(`**success!**\n\n**you stole** $${stolen.toLocaleString()} from **${bank}**`);
       embed.setColor(Constants.EMBED_SUCCESS_COLOR);
+      embed.setFooter({ text: `id: ${id}` });
 
       return embed;
     } else {
@@ -242,23 +234,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       embed.setColor(Constants.EMBED_FAIL_COLOR);
 
-      await prisma.economyStats.upsert({
-        create: {
-          economyUserId: message.author.id,
-          gamble: true,
-          type: "bankrob",
-          lose: totalLossed,
-        },
-        where: {
-          type_economyUserId: {
-            economyUserId: message.author.id,
-            type: "bankrob",
-          },
-        },
-        update: {
-          lose: { increment: totalLossed },
-        },
+      const id = await createGame({
+        userId: message.author.id,
+        bet: totalLossed,
+        win: false,
+        game: "bankrob",
+        outcome: `${message.author.username} robbed ${bank}`,
       });
+      embed.setFooter({ text: `id: ${id}` });
 
       if (lawyer) {
         embed.setDescription(
@@ -274,7 +257,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const embed = new CustomEmbed(message.member).setHeader("bank robbery", message.author.avatarURL());
 
-  const options: SelectMenuOptionBuilder[] = [];
+  const options: StringSelectMenuOptionBuilder[] = [];
 
   const bankNames = Array.from(bankWorths.keys());
 
@@ -287,7 +270,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (bankWorths.get(bankName) < defaults.get(bankName) * 0.1) continue;
 
     options.push(
-      new SelectMenuOptionBuilder()
+      new StringSelectMenuOptionBuilder()
         .setLabel(bankName)
         .setValue(bankName)
         .setDescription(`$${bankWorths.get(bankName).toLocaleString()}`)
@@ -300,7 +283,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if ((await getNypsiBankBalance()) > 500_000 && prestige >= 2) {
     options.push(
-      new SelectMenuOptionBuilder()
+      new StringSelectMenuOptionBuilder()
         .setLabel("nypsi bank")
         .setValue("nypsi")
         .setDefault(true)
@@ -320,7 +303,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   components.push(
     new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new SelectMenuBuilder().setCustomId("bank").setOptions(options)
+      new StringSelectMenuBuilder().setCustomId("bank").setOptions(options)
     )
   );
 
@@ -359,7 +342,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       }
 
       components[0] = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new SelectMenuBuilder().setCustomId("bank").setOptions(options)
+        new StringSelectMenuBuilder().setCustomId("bank").setOptions(options)
       );
 
       await res.message.edit({ embeds: [embed], components });

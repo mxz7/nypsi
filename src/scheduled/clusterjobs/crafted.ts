@@ -23,7 +23,7 @@ async function checkCraftItems() {
 
     await addInventoryItem(item.userId, item.itemId, item.amount, false);
 
-    await addProgress(item.userId, "crafter", item.amount);
+    addProgress(item.userId, "crafter", item.amount);
 
     if ((await getDmSettings(item.userId)).other) {
       await addNotificationToQueue({

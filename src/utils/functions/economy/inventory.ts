@@ -1,3 +1,4 @@
+import dayjs = require("dayjs");
 import { GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
@@ -6,6 +7,7 @@ import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { Item } from "../../../types/Economy";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
+import { percentChance } from "../random";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { addProgress, getAllAchievements, setAchievementProgress } from "./achievements";
 import { getBalance, updateBalance } from "./balance";
@@ -49,6 +51,11 @@ export async function getInventory(
         amount: true,
       },
     })
+    .then((q) =>
+      q.map((i) => {
+        return { item: i.item, amount: Number(i.amount) };
+      })
+    )
     .catch(() => {});
 
   if (!query || query.length == 0) {
@@ -245,26 +252,41 @@ export async function openCrate(member: GuildMember | string, item: Item): Promi
 
   const crateItems: string[] = [];
 
-  for (const i of Array.from(Object.keys(items))) {
-    if (!items[i].in_crates) continue;
-    crateItems.push(i);
+  if (item.items) {
+    for (const itemFilter of item.items) {
+      let filteredItems: string[];
+      if (itemFilter.startsWith("id:")) {
+        filteredItems = Object.keys(items).filter((i) => i === itemFilter.substring(3));
+      } else if (itemFilter.startsWith("role:")) {
+        filteredItems = Object.keys(items).filter((i) => items[i].role === itemFilter.substring(5));
+      } else {
+        crateItems.push(itemFilter);
+        continue;
+      }
+      for (const i of filteredItems) {
+        crateItems.push(i);
+      }
+    }
+  } else {
+    crateItems.push(...["money:50000", "money:100000", "xp:25", "xp:50"]);
+
+    for (const i of Object.keys(items)) {
+      if (!items[i].in_crates) continue;
+      crateItems.push(i);
+    }
   }
 
   await setInventoryItem(member, item.id, inventory.find((i) => i.item == item.id).amount - 1);
 
-  await addItemUse(id, item.id);
-  await addProgress(id, "unboxer", 1);
+  addItemUse(id, item.id);
+  addProgress(id, "unboxer", 1);
 
-  let times = 2;
+  const times = item.crate_runs || 1;
   const found = new Map<string, number>();
 
-  if (item.id.includes("vote") || item.id.includes("chest")) {
-    times = 1;
-  } else if (item.id.includes("69420")) {
+  if (item.id.includes("69420")) {
     await updateBalance(member, (await getBalance(member)) + 69420);
     found.set("money", 69420);
-  } else if (item.id == "nypsi_crate") {
-    times = 5;
   }
 
   for (let i = 0; i < times; i++) {
@@ -401,7 +423,7 @@ export async function getTotalAmountOfItem(itemId: string) {
     },
   });
 
-  return query._sum.amount;
+  return Number(query._sum.amount);
 }
 
 export function selectItem(search: string) {
@@ -435,35 +457,30 @@ export async function commandGemCheck(member: GuildMember, commandCategory: stri
   if (gemChanceCooldown.has(member.user.id)) return;
   gemChanceCooldown.add(member.user.id);
 
-  const chance = Math.floor(Math.random() * 100000);
-
-  if (chance == 777) {
+  if (percentChance(0.0001)) {
     const gems = ["green_gem", "blue_gem", "purple_gem", "pink_gem"];
 
     const gem = gems[Math.floor(Math.random() * gems.length)];
 
     await addInventoryItem(member, gem, 1);
-    await addProgress(member.user.id, "gem_hunter", 1);
+    addProgress(member.user.id, "gem_hunter", 1);
 
     if ((await getDmSettings(member)).other) {
       await addNotificationToQueue({
         memberId: member.user.id,
         payload: {
-          embed: new CustomEmbed(
-            member,
-            `${getItems()[gem].emoji} you've found a gem! i wonder what powers it holds...`
-          ).setTitle("you've found a gem"),
+          embed: new CustomEmbed(member, `${getItems()[gem].emoji} you've found a gem! i wonder what powers it holds...`)
+            .setTitle("you've found a gem")
+            .setColor(Constants.TRANSPARENT_EMBED_COLOR),
         },
       });
     }
   }
 
   if (commandCategory == Categories.MODERATION) {
-    const chance = Math.floor(Math.random() * 1000);
-
-    if (chance == 77) {
+    if (percentChance(0.02)) {
       await addInventoryItem(member, "pink_gem", 1);
-      await addProgress(member.user.id, "gem_hunter", 1);
+      addProgress(member.user.id, "gem_hunter", 1);
 
       if ((await getDmSettings(member)).other) {
         await addNotificationToQueue({
@@ -472,17 +489,17 @@ export async function commandGemCheck(member: GuildMember, commandCategory: stri
             embed: new CustomEmbed(
               member,
               `${getItems()["pink_gem"].emoji} you've found a gem! i wonder what powers it holds...`
-            ).setTitle("you've found a gem"),
+            )
+              .setTitle("you've found a gem")
+              .setColor(Constants.TRANSPARENT_EMBED_COLOR),
           },
         });
       }
     }
   } else if (commandCategory == Categories.ANIMALS || commandCategory == Categories.NSFW) {
-    const chance = Math.floor(Math.random() * 1000);
-
-    if (chance == 77) {
+    if (percentChance(0.001)) {
       await addInventoryItem(member, "purple_gem", 1);
-      await addProgress(member.user.id, "gem_hunter", 1);
+      addProgress(member.user.id, "gem_hunter", 1);
 
       if ((await getDmSettings(member)).other) {
         await addNotificationToQueue({
@@ -491,10 +508,80 @@ export async function commandGemCheck(member: GuildMember, commandCategory: stri
             embed: new CustomEmbed(
               member,
               `${getItems()["purple_gem"].emoji} you've found a gem! i wonder what powers it holds...`
-            ).setTitle("you've found a gem"),
+            )
+              .setTitle("you've found a gem")
+              .setColor(Constants.TRANSPARENT_EMBED_COLOR),
           },
         });
       }
     }
+  }
+}
+
+export async function gemBreak(userId: string, chance: number, gem: string) {
+  if (!percentChance(chance)) return;
+
+  const inventory = await getInventory(userId, false);
+
+  if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0) return;
+  if (!inventory.find((i) => i.item === gem)) return;
+
+  let uniqueGemCount = 0;
+
+  inventory.forEach((i) => {
+    if (i.item.includes("gem")) uniqueGemCount++;
+  });
+
+  if (uniqueGemCount === 5 && percentChance(5) && (await getDmSettings(userId)).other) {
+    await Promise.all([
+      setInventoryItem(userId, "pink_gem", inventory.find((i) => i.item === "pink_gem").amount - 1, false),
+      setInventoryItem(userId, "purple_gem", inventory.find((i) => i.item === "purple_gem").amount - 1, false),
+      setInventoryItem(userId, "blue_gem", inventory.find((i) => i.item === "blue_gem").amount - 1, false),
+      setInventoryItem(userId, "green_gem", inventory.find((i) => i.item === "green_gem").amount - 1, false),
+      setInventoryItem(userId, "white_gem", inventory.find((i) => i.item === "white_gem").amount - 1, false),
+      prisma.crafting.create({
+        data: {
+          amount: 1,
+          finished: dayjs().add(7, "days").toDate(),
+          itemId: "crystal_heart",
+          userId,
+        },
+      }),
+    ]);
+
+    await addNotificationToQueue({
+      memberId: userId,
+      payload: {
+        embed: new CustomEmbed()
+          .setColor(Constants.TRANSPARENT_EMBED_COLOR)
+          .setTitle("a very exciting moment")
+          .setFooter({ text: "use /craft to view the progress" })
+          .setDescription(
+            `${
+              getItems()["crystal_heart"].emoji
+            } a truly historic event is taking place\nyour gems are fusing together, into one crystal\n\n` +
+              `${getItems()["white_gem"].emoji} ${getItems()["pink_gem"].emoji} ${getItems()["purple_gem"].emoji} ${
+                getItems()["blue_gem"].emoji
+              } ${getItems()["green_gem"].emoji}`
+          ),
+      },
+    });
+    return;
+  }
+
+  await setInventoryItem(userId, gem, inventory.find((i) => i.item === gem).amount - 1, false);
+
+  if ((await getDmSettings(userId)).other) {
+    await addNotificationToQueue({
+      memberId: userId,
+      payload: {
+        embed: new CustomEmbed()
+          .setColor(Constants.TRANSPARENT_EMBED_COLOR)
+          .setTitle(`your ${getItems()[gem].name} has shattered`)
+          .setDescription(
+            `${getItems()[gem].emoji} your gem exerted too much power and destroyed itself. shattering into pieces`
+          ),
+      },
+    });
   }
 }

@@ -81,8 +81,8 @@
       "id": "warehouse_expansion",
       "name": "warehouse expansion",
       "upgrades": 2,
-      "effect": 0.75,
-      "stack_limit": 10,
+      "effect": 0.5,
+      "stack_limit": 15,
       "for": "amazon"
     },
     "underage_workers": {

@@ -3,6 +3,7 @@ import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
+  ColorResolvable,
   Guild,
   GuildTextBasedChannel,
   MessageActionRowComponentBuilder,
@@ -117,6 +118,7 @@ export async function sendReactionRole(
   const embed = new CustomEmbed().setColor(Constants.TRANSPARENT_EMBED_COLOR);
 
   if (reactionRole.title) embed.setHeader(reactionRole.title);
+  if (reactionRole.color) embed.setColor(reactionRole.color as ColorResolvable);
   embed.setDescription(reactionRole.description);
 
   const components: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [];
@@ -195,6 +197,19 @@ export async function setReactionRoleDescription(guildId: string, messageId: str
     },
     data: {
       description,
+    },
+  });
+
+  await redis.del(`${Constants.redis.cache.guild.REACTION_ROLES}:${guildId}`);
+}
+
+export async function setReactionRoleColour(guildId: string, messageId: string, colour: string) {
+  await prisma.reactionRole.update({
+    where: {
+      messageId,
+    },
+    data: {
+      color: colour,
     },
   });
 

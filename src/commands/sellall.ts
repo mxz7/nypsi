@@ -50,8 +50,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (items[item.item].role == "fish" || items[item.item].role == "prey" || items[item.item].role == "sellable") {
       if (items[item.item].id == "cookie" || items[item.item].id == "cake") continue;
       selected.set(item.item, inventory.find((i) => i.item == item.item).amount);
-    } else if (items[item.item].id.includes("watch") || items[item.item].id == "calendar") {
-      selected.set(item.item, inventory.find((i) => i.item == item.item).amount);
     }
   }
 
@@ -83,6 +81,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (items[item].role == "fish" || items[item].role == "prey" || items[item].role == "sellable") {
       sellWorth = Math.floor(sellWorth + sellWorth * multi);
     }
+
+    if (["bitcoin", "ethereum"].includes(item)) sellWorth = Math.floor(sellWorth - sellWorth * 0.05);
 
     if (taxEnabled) {
       taxedAmount += Math.floor(sellWorth * tax);

@@ -45,7 +45,7 @@ export async function getCraftingItems(member: GuildMember | string, deleteOld =
   }
 
   if (completed.length > 0) {
-    await addProgress(id, "crafter", completed.length);
+    addProgress(id, "crafter", completed.length);
   }
 
   return { current: query, completed };

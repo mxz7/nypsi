@@ -13,7 +13,7 @@ import { logger } from "../../utils/logger";
 
 export async function runAuctionChecks(client: NypsiClient) {
   setInterval(async () => {
-    let limit = dayjs().subtract(2, "days").toDate();
+    let limit = dayjs().subtract(7, "days").toDate();
 
     const query = await prisma.auction.findMany({
       where: {
@@ -22,7 +22,7 @@ export async function runAuctionChecks(client: NypsiClient) {
       select: {
         ownerId: true,
         itemAmount: true,
-        itemName: true,
+        itemId: true,
         id: true,
       },
     });
@@ -34,13 +34,13 @@ export async function runAuctionChecks(client: NypsiClient) {
 
       if (!(await userExists(auction.ownerId))) continue;
 
-      await addInventoryItem(auction.ownerId, auction.itemName, auction.itemAmount, false);
+      await addInventoryItem(auction.ownerId, auction.itemId, auction.itemAmount, false);
 
       const embed = new CustomEmbed().setColor(Constants.TRANSPARENT_EMBED_COLOR);
 
       embed.setDescription(
-        `your auction for ${auction.itemAmount}x ${items[auction.itemName].emoji} ${
-          items[auction.itemName].name
+        `your auction for ${auction.itemAmount}x ${items[auction.itemId].emoji} ${
+          items[auction.itemId].name
         } has expired. you have been given back your item${auction.itemAmount > 1 ? "s" : ""}`
       );
 
