@@ -33,7 +33,8 @@ const cmd = new Command("stats", "view your nypsi stats", Categories.INFO);
 
 cmd.slashEnabled = true;
 cmd.slashData
-  .addSubcommand((economy) => economy.setName("economy").setDescription("view your economy stats"))
+  .addSubcommand((economy) => economy.setName("gamble").setDescription("view your gamble stats"))
+  .addSubcommand((item) => item.setName("item").setDescription("view your item stats"))
   .addSubcommand((commands) => commands.setName("commands").setDescription("view your command usage stats"))
   .addSubcommand((bot) => bot.setName("bot").setDescription("view nypsi's stats"));
 
@@ -101,7 +102,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     const pages = PageManager.createPages(
-      itemStats.map((i) => `\`${getItems()[i.itemId]?.name}\` ${i.amount.toLocaleString()} uses`)
+      itemStats.map(
+        (i) => `${getItems()[i.itemId].emoji} **${getItems()[i.itemId].name}** ${i.amount.toLocaleString()} uses`
+      )
     );
 
     const embed = new CustomEmbed(message.member, pages.get(1).join("\n")).setHeader(
