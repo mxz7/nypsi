@@ -79,21 +79,21 @@ export async function calcEarnedXp(member: GuildMember, bet: number, multiplier:
   if (prestige) {
     if (prestige > 15) prestige = 15;
     min += prestige / 3.5;
-    max += prestige / 1.17;
+    max += prestige / 1.27;
   }
 
   if (await isPremium(member)) {
     min += await getTier(member);
   }
 
-  let betDivisor = 50_000;
+  let betDivisor = 75_000;
 
-  if (prestige > 5) betDivisor = 75_000;
-  if (prestige > 10) betDivisor = 100_000;
-  if (prestige > 20) betDivisor = 150_000;
+  if (prestige > 5) betDivisor = 100_000;
+  if (prestige > 10) betDivisor = 150_000;
+  if (prestige > 20) betDivisor = 200_000;
 
   max += bet / betDivisor;
-  max += multiplier;
+  max += multiplier * 1.7;
 
   if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0) max += Math.floor(Math.random() * 7);
   if (inventory.find((i) => i.item == "white_gem")?.amount > 0) {
