@@ -22,27 +22,13 @@ async function updateNetWorth() {
   const actions: (() => Promise<number>)[] = [];
 
   for (const user of query) {
-    await sleep(50);
+    await sleep(25);
     if (await redis.exists(`${Constants.redis.cache.economy.NETWORTH}:${user.userId}`)) continue;
 
-    if (actions.length == 0) {
-      await calcNetWorth(user.userId);
-
-      actions.push(() => {
-        return new Promise((resolve) => {
-          setTimeout(() => {
-            resolve(1);
-          }, 500);
-        });
-      });
-    } else {
-      actions.push(() => calcNetWorth(user.userId));
-    }
+    actions.push(() => calcNetWorth(user.userId));
   }
 
-  actions.splice(0, 1);
-
-  await pAll(actions, { concurrency: 5 });
+  await pAll(actions, { concurrency: 10 });
 
   logger.info(`net worth updated for ${actions.length} members in ${MStoTime(Date.now() - start)}`);
 }
