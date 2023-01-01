@@ -95,6 +95,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     })
   );
 
+  if (!data) return message.channel.send({ embeds: [new ErrorEmbed("you have no data to graph")] });
+
   console.log(data);
 
   const url = `${BASE_URL}${encodeURIComponent(JSON.stringify(data))}`;
