@@ -2,7 +2,7 @@ import { GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import ms = require("ms");
 
-const lastKnownTagCooldown = new Set<string>();
+export const lastKnownTagCooldown = new Set<string>();
 
 export async function updateLastKnowntag(member: GuildMember | string, tag: string) {
   let id: string;

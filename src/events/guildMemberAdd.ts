@@ -66,10 +66,10 @@ export default async function guildMemberAdd(member: GuildMember) {
   const userRoles = await getPersistantRolesForUser(member.guild, member.id);
 
   if (userRoles.length > 0 && persistantRoles.length > 0) {
-    logger.debug(userRoles);
-    logger.debug(persistantRoles);
+    let count = 0;
     for (const roleId of userRoles) {
       if (persistantRoles.includes(roleId)) {
+        count++;
         await member.roles.add(persistantRoles).catch(async () => {
           persistantRoles.splice(persistantRoles.indexOf(roleId));
           await setPersistantRoles(member.guild, persistantRoles);
@@ -77,7 +77,7 @@ export default async function guildMemberAdd(member: GuildMember) {
         await sleep(500);
       }
     }
-    logger.info(`persistant roles given to ${member.id} in ${member.guild.id}`);
+    if (count > 0) logger.info(`${count} persistant roles given to ${member.id} in ${member.guild.id}`);
   }
 
   if (!queue.has(member.guild.id)) {
