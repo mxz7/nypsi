@@ -86,7 +86,13 @@ export async function calcEarnedXp(member: GuildMember, bet: number, multiplier:
     min += await getTier(member);
   }
 
-  max += bet / 75_000;
+  let betDivisor = 50_000;
+
+  if (prestige > 5) betDivisor = 75_000;
+  if (prestige > 10) betDivisor = 100_000;
+  if (prestige > 20) betDivisor = 150_000;
+
+  max += bet / betDivisor;
   max += multiplier;
 
   if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0) max += Math.floor(Math.random() * 7);
