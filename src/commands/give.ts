@@ -123,7 +123,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({ embeds: [new ErrorEmbed("you dont have any " + selected.name)] });
   }
 
-  if (args[2].toLowerCase() === "all") args[2] = inventory.find((i) => i.item === selected.id).amount.toString();
+  if (args[2]?.toLowerCase() === "all") args[2] = inventory.find((i) => i.item === selected.id).amount.toString();
 
   let amount = parseInt(args[2]);
 
