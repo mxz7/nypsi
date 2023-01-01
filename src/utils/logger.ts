@@ -96,7 +96,7 @@ const logger = winston.createLogger({
 
 export { logger };
 
-export function payment(from: User, to: User, value: string) {
+export function transaction(from: User, to: User, value: string) {
   if (!nextLogMsg.get("pay")) {
     nextLogMsg.set("pay", `**${from.tag}** (${from.id}) -> **${to.tag}** (${to.id})\n - **${value}**\n\n`);
   } else {

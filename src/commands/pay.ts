@@ -11,7 +11,7 @@ import { isPremium } from "../utils/functions/premium/premium";
 import { addToNypsiBank, getTax } from "../utils/functions/tax";
 import { getDmSettings } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import { payment } from "../utils/logger";
+import { transaction } from "../utils/logger";
 import dayjs = require("dayjs");
 
 const cmd = new Command("pay", "give other users money", Categories.MONEY);
@@ -235,7 +235,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }, 1500);
   });
 
-  payment(message.author, target.user, `$${amount.toLocaleString()}`);
+  transaction(message.author, target.user, `$${amount.toLocaleString()}`);
 }
 
 cmd.setRun(run);

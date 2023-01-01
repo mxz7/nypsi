@@ -39,7 +39,7 @@ import { isUserBlacklisted } from "../utils/functions/users/blacklist";
 import { getDmSettings } from "../utils/functions/users/notifications";
 import { runCommand } from "../utils/handlers/commandhandler";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import { logger, payment } from "../utils/logger";
+import { logger, transaction } from "../utils/logger";
 
 export default async function interactionCreate(interaction: Interaction) {
   if (await isUserBlacklisted(interaction.user.id)) return;
@@ -388,7 +388,7 @@ export default async function interactionCreate(interaction: Interaction) {
           updateBalance(auction.ownerId, (await getBalance(auction.ownerId)) + (Number(auction.bin) - taxedAmount)),
         ]);
 
-        payment(
+        transaction(
           await interaction.client.users.fetch(auction.ownerId),
           interaction.user,
           `${auction.itemId} x ${auction.itemAmount} (auction)`
