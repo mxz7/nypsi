@@ -2,7 +2,7 @@
 
 ## pickaxes
 
-pickaxes work the same way as fishing rods and guns do [`more info here`](https://docs.nypsi.xyz/eco/fishingandhunting)
+pickaxes work the same way as fishing rods and guns do [`more info here`](https://docs.nypsi.xyz/economy/fishingandhunting)
 
 ## ores
 
