@@ -620,7 +620,7 @@
     "role": "booster",
     "booster_desc": "eat a cookie to get +**1**% multi for 30 seconds (stacks up to 7)",
     "buy": 0,
-    "sell": 500,
+    "sell": 250,
     "stackable": true,
     "max": 7,
     "boosterEffect": {
@@ -628,7 +628,7 @@
       "effect": 1,
       "time": 30
     },
-    "in_crates": true
+    "in_crates": false
   },
   "cake": {
     "id": "cake",
