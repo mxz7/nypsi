@@ -155,6 +155,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embed.data.fields.length = 0;
 
         embed.setDescription("✅ mentions cleared");
+        embed.disableFooter();
 
         await manager.message.edit({ embeds: [embed], components: [] });
         return;
