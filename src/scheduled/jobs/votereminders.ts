@@ -12,7 +12,7 @@ import dayjs = require("dayjs");
   const userIds = await prisma.dMSettings.findMany({
     where: {
       AND: [
-        { vote_reminder: true },
+        { voteReminder: true },
         {
           user: {
             Economy: {

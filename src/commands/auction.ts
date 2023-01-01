@@ -1,6 +1,7 @@
 import dayjs = require("dayjs");
 import {
   ActionRowBuilder,
+  APIMessageComponentEmoji,
   BaseMessageOptions,
   ButtonBuilder,
   ButtonStyle,
@@ -11,8 +12,8 @@ import {
   Message,
   MessageActionRowComponentBuilder,
   MessageEditOptions,
-  SelectMenuBuilder,
-  SelectMenuOptionBuilder,
+  StringSelectMenuBuilder,
+  StringSelectMenuOptionBuilder,
 } from "discord.js";
 import prisma from "../init/database";
 import { NypsiClient } from "../models/Client";
@@ -137,21 +138,21 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (inventory.length <= 25) {
       embed.setDescription("select the **item you want to sell** from the dropdown list below");
 
-      const options: SelectMenuOptionBuilder[] = [];
+      const options: StringSelectMenuOptionBuilder[] = [];
 
       for (const item of inventory) {
         if (item.amount != 0) {
           options.push(
-            new SelectMenuOptionBuilder()
+            new StringSelectMenuOptionBuilder()
               .setValue(items[item.item].id)
-              .setEmoji(items[item.item].emoji)
+              .setEmoji(items[item.item].emoji as APIMessageComponentEmoji)
               .setLabel(items[item.item].name)
           );
         }
       }
 
       const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new SelectMenuBuilder().setCustomId("item").setPlaceholder("item you want to sell").setOptions(options)
+        new StringSelectMenuBuilder().setCustomId("item").setPlaceholder("item you want to sell").setOptions(options)
       );
 
       await edit({ embeds: [embed], components: [row] }, msg);
@@ -355,8 +356,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       embed.setFields(
         {
           name: "item",
-          value: `**${auctions[page].itemAmount}x** ${items[auctions[page].itemName].emoji} ${
-            items[auctions[page].itemName].name
+          value: `**${auctions[page].itemAmount}x** ${items[auctions[page].itemId].emoji} ${
+            items[auctions[page].itemId].name
           }`,
           inline: true,
         },
@@ -488,7 +489,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (res) {
           await addInventoryItem(
             auctions[currentPage].ownerId,
-            auctions[currentPage].itemName,
+            auctions[currentPage].itemId,
             auctions[currentPage].itemAmount
           );
 
@@ -570,14 +571,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       if (!(await userExists(auction.ownerId))) return;
 
-      await addInventoryItem(auction.ownerId, auction.itemName, auction.itemAmount);
+      await addInventoryItem(auction.ownerId, auction.itemId, auction.itemAmount);
 
       if ((await getDmSettings(auction.ownerId)).auction) {
         const embed = new CustomEmbed().setColor(Constants.TRANSPARENT_EMBED_COLOR);
 
         embed.setDescription(
-          `your auction for ${auction.itemAmount}x ${items[auction.itemName].emoji} ${
-            items[auction.itemName].name
+          `your auction for ${auction.itemAmount}x ${items[auction.itemId].emoji} ${
+            items[auction.itemId].name
           } has been removed by a staff member. you have been given back your item${auction.itemAmount > 1 ? "s" : ""}`
         );
 

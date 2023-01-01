@@ -7,7 +7,7 @@ import { addProgress } from "../utils/functions/economy/achievements";
 import { getBalance, hasPadlock, setPadlock, updateBalance } from "../utils/functions/economy/balance";
 import { addToGuildXP, getGuildByUser } from "../utils/functions/economy/guilds";
 import { getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
-import { addItemUse, addRob } from "../utils/functions/economy/stats";
+import { addItemUse, createGame } from "../utils/functions/economy/stats";
 import { createUser, isEcoBanned, userExists } from "../utils/functions/economy/utils";
 import { calcEarnedXp, getXp, updateXp } from "../utils/functions/economy/xp";
 import { getPrefix } from "../utils/functions/guilds/utils";
@@ -149,6 +149,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     await updateBalance(target, (await getBalance(target)) + amountMoney);
     await updateBalance(message.member, (await getBalance(message.member)) - amountMoney);
 
+    createGame({
+      userId: message.author.id,
+      bet: amountMoney,
+      game: "rob",
+      outcome: `${message.author.username} failed to rob ${target.user.username}`,
+      win: false,
+    });
+
     embed2.setColor(Constants.EMBED_FAIL_COLOR);
     embed2.addField(
       "**fail!!**",
@@ -177,6 +185,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const amount = Math.floor(Math.random() * 35) + 5;
     const amountMoney = Math.round((await getBalance(target)) * (amount / 100));
 
+    createGame({
+      userId: message.author.id,
+      bet: 0,
+      game: "rob",
+      outcome: `${message.author.username} broke ${target.user.username}'s padlock`,
+      win: false,
+    });
+
     embed2.setColor(Constants.EMBED_FAIL_COLOR);
     embed2.addField("fail!!", "**" + target.user.tag + "** had a padlock, which has now been broken");
 
@@ -201,14 +217,23 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       const amount = Math.floor(Math.random() * 35) + 5;
       const amountMoney = Math.round((await getBalance(target)) * (amount / 100));
 
+      createGame({
+        userId: message.author.id,
+        bet: 0,
+        game: "rob",
+        outcome: `${message.author.username} successfully robbed ${target.user.username}`,
+        win: true,
+        earned: amountMoney,
+      });
+
       await updateBalance(target, (await getBalance(target)) - amountMoney);
       await updateBalance(message.member, (await getBalance(message.member)) + amountMoney);
 
       embed2.setColor(Constants.EMBED_SUCCESS_COLOR);
       embed2.addField("success!!", "you stole $**" + amountMoney.toLocaleString() + "**");
 
-      const earnedXp = await calcEarnedXp(message.member, 6942069);
-      await addProgress(message.author.id, "robber", 1);
+      const earnedXp = await calcEarnedXp(message.member, 1_000_000, 1);
+      addProgress(message.author.id, "robber", 1);
 
       if (earnedXp > 0) {
         await updateXp(message.member, (await getXp(message.member)) + earnedXp);
@@ -253,6 +278,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           addItemUse(message.member, "lawyer"),
         ]);
 
+        createGame({
+          userId: message.author.id,
+          bet: 0,
+          game: "rob",
+          outcome: `${message.author.username} failed to rob ${target.user.username}, but their lawyer saved their money`,
+          win: false,
+        });
+
         embed2.addField(
           "fail!!",
           `you were caught by the police, but your lawyer stopped you from losing any money\nyou would have lost $${amountMoney.toLocaleString()}`
@@ -268,6 +301,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       } else {
         await updateBalance(target, (await getBalance(target)) + amountMoney);
         await updateBalance(message.member, (await getBalance(message.member)) - amountMoney);
+
+        createGame({
+          userId: message.author.id,
+          bet: amountMoney,
+          game: "rob",
+          outcome: `${message.author.username} failed to rob ${target.user.username}`,
+          win: false,
+        });
+
         embed2.addField("fail!!", "you lost $**" + amountMoney.toLocaleString() + "**");
         embed3.setDescription(
           "**" +
@@ -303,10 +345,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       if ((await getDmSettings(target)).rob) {
         if (robberySuccess) {
-          await addRob(message.member, true);
           await target.send({ content: "you have been robbed!!", embeds: [embed3] }).catch(() => {});
         } else {
-          await addRob(message.member, false);
           await target.send({ content: "you were nearly robbed!!", embeds: [embed3] }).catch(() => {});
         }
       }

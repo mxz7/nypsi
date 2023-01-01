@@ -5,7 +5,7 @@ import prisma from "../../../init/database";
 import { logger } from "../../logger";
 import { getBalance, updateBalance } from "./balance";
 import { getBoosters } from "./boosters";
-import { getInventory } from "./inventory";
+import { gemBreak, getInventory } from "./inventory";
 import { getBaseUpgrades, getBaseWorkers, getItems } from "./utils";
 
 export async function getWorkers(member: GuildMember | string) {
@@ -119,6 +119,7 @@ export async function calcWorkerValues(
     if (chance < 5) {
       perItemBonus -= perItemBonus * 0.27;
     } else {
+      gemBreak(worker.userId, 0.01, "purple_gem");
       perItemBonus += perItemBonus * 0.17;
     }
   }
@@ -133,6 +134,7 @@ export async function calcWorkerValues(
     if (chance < 5) {
       perIntervalBonus -= perIntervalBonus * 0.27;
     } else {
+      gemBreak(worker.userId, 0.01, "blue_gem");
       perIntervalBonus += perIntervalBonus * 0.17;
     }
   }
@@ -144,6 +146,7 @@ export async function calcWorkerValues(
       perIntervalBonus -= perIntervalBonus * 0.97;
       perItemBonus -= perItemBonus * 0.97;
     } else {
+      gemBreak(worker.userId, 0.005, "white_gem");
       perIntervalBonus += perIntervalBonus * 0.7;
       perItemBonus += perItemBonus * 0.7;
     }

@@ -2,10 +2,11 @@ import { GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import Constants from "../../Constants";
+import { getTier, isPremium } from "../premium/premium";
 import { getRequiredBetForXp } from "./balance";
 import { getBoosters } from "./boosters";
-import { getGuildByUser } from "./guilds";
-import { getInventory } from "./inventory";
+import { getGuildLevelByUser } from "./guilds";
+import { gemBreak, getInventory } from "./inventory";
 import { getPrestige } from "./prestige";
 import { getItems } from "./utils";
 
@@ -57,49 +58,55 @@ export async function updateXp(member: GuildMember | string, amount: number) {
   await redis.del(`${Constants.redis.cache.economy.XP}:${id}`);
 }
 
-export async function calcMinimumEarnedXp(member: GuildMember): Promise<number> {
-  let earned = 1;
-  earned += (await getPrestige(member)) / 1.79; // i dont like 8
-
-  let max = 10;
-
-  const guild = await getGuildByUser(member);
-  const inventory = await getInventory(member);
-
-  if (guild) {
-    max += guild.level > 10 ? 10 : guild.level - 1;
-  }
-
-  if (inventory.find((i) => i.item == "white_gem")?.amount > 0) {
-    const chance = Math.floor(Math.random() * 10);
-
-    if (chance < 2) {
-      max -= Math.floor(Math.random() * 2) + 1;
-    } else {
-      max += Math.floor(Math.random() * 7) + 1;
-    }
-  } else if (inventory.find((i) => i.item == "pink_gem")?.amount > 0) {
-    max += 1;
-  }
-
-  if (earned > max) earned = max;
-  if (earned < 0) earned = 0;
-
-  return Math.floor(earned);
-}
-
-export async function calcEarnedXp(member: GuildMember, bet: number): Promise<number> {
+export async function calcEarnedXp(member: GuildMember, bet: number, multiplier: number): Promise<number> {
   const requiredBet = await getRequiredBetForXp(member);
 
   if (bet < requiredBet) {
     return 0;
   }
 
-  let earned = await calcMinimumEarnedXp(member);
+  let min = 1;
+  let max = 4;
 
-  const random = Math.floor(Math.random() * 4);
+  let prestige = await getPrestige(member);
+  const guildLevel = await getGuildLevelByUser(member);
+  const inventory = await getInventory(member);
 
-  earned += random;
+  if (guildLevel) {
+    max += guildLevel > 10 ? 10 : guildLevel - 1;
+  }
+
+  if (prestige) {
+    if (prestige > 15) prestige = 15;
+    min += prestige / 3.5;
+    max += prestige / 0.77;
+  }
+
+  if (await isPremium(member)) {
+    min += await getTier(member);
+  }
+
+  max += bet / 75_000;
+  max += multiplier;
+
+  if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0) max += Math.floor(Math.random() * 7);
+  if (inventory.find((i) => i.item == "white_gem")?.amount > 0) {
+    const chance = Math.floor(Math.random() * 10);
+
+    if (chance < 2) {
+      max -= Math.floor(Math.random() * 7) + 1;
+    } else {
+      gemBreak(member.user.id, 0.007, "white_gem");
+      max += Math.floor(Math.random() * 17) + 1;
+    }
+  } else if (inventory.find((i) => i.item == "pink_gem")?.amount > 0) {
+    gemBreak(member.user.id, 0.07, "pink_gem");
+    min += 3;
+  }
+
+  let earned = Math.floor(Math.random() * (max - min)) + min;
+
+  if (min > max) earned = max;
 
   const boosters = await getBoosters(member);
 

@@ -87,7 +87,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   let amount = 1;
 
   if (args.length != 1) {
-    amount = parseInt(args[1]);
+    amount =
+      args[1].toLowerCase() === "all" ? Math.floor((await getBalance(message.member)) / selected.buy) : parseInt(args[1]);
   }
 
   if (!amount) {

@@ -8,8 +8,8 @@ import { getTier, isPremium } from "../premium/premium";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { getAuctionAverage } from "./auctions";
 import { getBoosters } from "./boosters";
-import { getGuildByUser } from "./guilds";
-import { getInventory } from "./inventory";
+import { getGuildLevelByUser } from "./guilds";
+import { gemBreak, getInventory } from "./inventory";
 import { getPrestige } from "./prestige";
 import { getBaseUpgrades, getBaseWorkers, getItems } from "./utils";
 import { hasVoted } from "./vote";
@@ -118,7 +118,7 @@ export async function getMulti(member: GuildMember | string): Promise<number> {
 
   const prestige = await getPrestige(member);
 
-  const prestigeBonus = (prestige > 10 ? 10 : prestige) * 2;
+  const prestigeBonus = (prestige > 10 ? 10 : prestige) * 1.7;
 
   multi += prestigeBonus;
 
@@ -135,16 +135,16 @@ export async function getMulti(member: GuildMember | string): Promise<number> {
     }
   }
 
-  const guild = await getGuildByUser(id);
+  const guildLevel = await getGuildLevelByUser(id);
 
-  if (guild) {
-    multi += guild.level > 5 ? 5 : guild.level - 1;
+  if (guildLevel) {
+    multi += guildLevel > 5 ? 5 : guildLevel - 1;
   }
 
   const boosters = await getBoosters(id);
   const items = getItems();
 
-  if ((await getDmSettings(id)).vote_reminder && !(await redis.sismember(Constants.redis.nypsi.VOTE_REMINDER_RECEIVED, id)))
+  if ((await getDmSettings(id)).voteReminder && !(await redis.sismember(Constants.redis.nypsi.VOTE_REMINDER_RECEIVED, id)))
     multi += 2;
 
   for (const boosterId of boosters.keys()) {
@@ -154,13 +154,15 @@ export async function getMulti(member: GuildMember | string): Promise<number> {
   }
 
   const inventory = await getInventory(id, false);
+  if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0) multi += Math.floor(Math.random() * 7);
   if (inventory.find((i) => i.item == "white_gem")?.amount > 0) {
     const chance = Math.floor(Math.random() * 10);
 
     if (chance < 2) {
       multi -= Math.floor(Math.random() * 6) + 1;
     } else {
-      const choices = [7, 17, 3, 4, 5, 7, 2, 17, 17, 15, 16, 17, 13];
+      gemBreak(id, 0.01, "white_gem");
+      const choices = [7, 3, 4, 5, 7, 2, 17, 7, 4, 5, 3, 3, 3, 3, 4];
       multi += Math.floor(Math.random() * choices[Math.floor(Math.random() * choices.length)]) + 1;
     }
   } else if (inventory.find((i) => i.item == "pink_gem")?.amount > 0) {
@@ -169,7 +171,8 @@ export async function getMulti(member: GuildMember | string): Promise<number> {
     if (chance < 2) {
       multi -= 3;
     } else {
-      const choices = [7, 7, 7, 5, 4, 3, 2, 1, 3, 1, 1, 1];
+      gemBreak(id, 0.07, "pink_gem");
+      const choices = [7, 5, 4, 3, 2, 1, 3, 1, 1, 1, 3, 3];
       multi += choices[Math.floor(Math.random() * choices.length)];
     }
   }
@@ -401,20 +404,16 @@ export async function calcNetWorth(member: GuildMember | string) {
       money: true,
       bank: true,
       Inventory: true,
-      net_worth: true,
+      netWorth: true,
       EconomyWorker: {
         include: {
           upgrades: true,
         },
       },
-      user: {
+      EconomyGuild: {
         select: {
-          EconomyGuild: {
-            select: {
-              balance: true,
-              members: true,
-            },
-          },
+          balance: true,
+          members: true,
         },
       },
     },
@@ -431,16 +430,16 @@ export async function calcNetWorth(member: GuildMember | string) {
 
   worth += Number(query.money);
   worth += Number(query.bank);
-  worth += Number(Number(query.user.EconomyGuild?.balance) / query.user.EconomyGuild?.members.length) || 0;
+  worth += Number(Number(query.EconomyGuild?.balance) / query.EconomyGuild?.members.length) || 0;
 
   for (const item of query.Inventory) {
     if (getItems()[item.item].buy && getItems()[item.item].sell) {
-      worth += getItems()[item.item].sell * item.amount;
+      worth += getItems()[item.item].sell * Number(item.amount);
     } else {
       const auctionAvg = await getAuctionAverage(item.item);
 
       if (auctionAvg) {
-        worth += auctionAvg * item.amount;
+        worth += auctionAvg * Number(item.amount);
       }
     }
   }
@@ -480,30 +479,30 @@ export async function calcNetWorth(member: GuildMember | string) {
       userId: id,
     },
     data: {
-      net_worth: Math.floor(worth),
+      netWorth: Math.floor(worth),
     },
   });
 
   setImmediate(async () => {
-    if (query.net_worth && (await getDmSettings(id)).net_worth) {
+    if (query.netWorth && (await getDmSettings(id)).netWorth > 0) {
       const payload: NotificationPayload = {
         memberId: id,
         payload: {
           content: "",
           embed: new CustomEmbed(
             null,
-            `$${Number(query.net_worth).toLocaleString()} ➔ $${Math.floor(worth).toLocaleString()}`
+            `$${Number(query.netWorth).toLocaleString()} ➔ $${Math.floor(worth).toLocaleString()}`
           ).setColor(Constants.TRANSPARENT_EMBED_COLOR),
         },
       };
 
-      if (Number(query.net_worth) < Math.floor(worth) - 10_000_000) {
+      if (Number(query.netWorth) < Math.floor(worth) - (await getDmSettings(id)).netWorth) {
         payload.payload.content = `your net worth has increased by $${(
-          Math.floor(worth) - Number(query.net_worth)
+          Math.floor(worth) - Number(query.netWorth)
         ).toLocaleString()}`;
-      } else if (Number(query.net_worth) > Math.floor(worth) + 10_000_000) {
+      } else if (Number(query.netWorth) > Math.floor(worth) + (await getDmSettings(id)).netWorth) {
         payload.payload.content = `your net worth has decreased by $${(
-          Number(query.net_worth) - Math.floor(worth)
+          Number(query.netWorth) - Math.floor(worth)
         ).toLocaleString()}`;
       } else {
         return;
