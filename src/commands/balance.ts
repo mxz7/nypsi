@@ -20,7 +20,7 @@ import { getMember } from "../utils/functions/member.js";
 import { getNypsiBankBalance, getTax, getTaxRefreshTime } from "../utils/functions/tax.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command("balance", "check your balance", Categories.MONEY).setAliases(["bal", "money", "wallet"]);
+const cmd = new Command("balance", "check your balance", Categories.MONEY).setAliases(["bal", "money", "wallet", "bank"]);
 
 cmd.slashEnabled = true;
 
