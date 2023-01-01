@@ -23,3 +23,9 @@ to earn xp you must bet a minimum amount. this amount can be seen with `/setting
 the amount of xp you earn is calculated on a number of variables, including your prestige, bet, win multiplier, premium level
 and inventory items. it works by creating a minmimum and a maximum value, and creating a random number between those. any
 bonuses from active boosters will then be applied to that generated number.
+
+## game id
+
+everytime you gamble (including fights, coinflips etc) a game id may be shown at the bottom of the message. this id shows the
+related information for each game, such as who created it, win/lose, earnings and the outcome. this is how gambling stats are
+calculated (`/stats`)
