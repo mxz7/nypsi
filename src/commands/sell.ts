@@ -67,7 +67,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (args.length != 1) {
     if (args[1].toLowerCase() == "all") {
-      args[1] = inventory.find((i) => i.item == selected.id).amount.toString();
+      args[1] = (inventory.find((i) => i.item == selected.id)?.amount || 0).toString();
     } else if (isNaN(parseInt(args[1])) || parseInt(args[1]) <= 0) {
       return send({ embeds: [new ErrorEmbed("invalid amount")] });
     }
