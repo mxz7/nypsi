@@ -100,7 +100,7 @@ export async function updateChannel(data: GuildCounter, client: NypsiClient) {
 
           if (channel.isDMBased()) return;
 
-          return channel.guild.premiumSubscriptionCount.toLocaleString();
+          return (channel.guild.premiumSubscriptionCount || 0).toLocaleString();
         },
         { context: { channelId: data.channel, shard } }
       )
@@ -183,7 +183,7 @@ export async function updateChannel(data: GuildCounter, client: NypsiClient) {
       },
     });
 
-    value = total._sum.money.toLocaleString();
+    value = (total?._sum?.money || 0).toLocaleString();
   } else if (data.tracks === TrackingType.TOTAL_ITEM) {
     if (!data.totalItem || !getItems()[data.totalItem]) {
       logger.warn(`invalid item: ${JSON.stringify(data)}`);
@@ -222,7 +222,7 @@ export async function updateChannel(data: GuildCounter, client: NypsiClient) {
       },
     });
 
-    value = query?._sum.amount.toLocaleString() || "0";
+    value = (query?._sum?.amount || 0).toLocaleString();
   }
 
   const format = data.format.replace("%value%", value);
