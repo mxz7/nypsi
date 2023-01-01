@@ -60,7 +60,7 @@ export async function updateUser(user: User, command: string) {
     },
     data: {
       lastCommand: date,
-      lastKnownTag: user.username,
+      lastKnownTag: user.tag,
       CommandUse: {
         upsert: {
           where: {
