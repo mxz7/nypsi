@@ -746,7 +746,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         `${prefix}**guild stats** *show contribution stats of your guild*\n` +
         `${prefix}**guild upgrade** *show requirements for next upgrade*\n` +
         `${prefix}**guild motd <motd>** *set guild motd*\n` +
-        `${prefix}**guild top** *shows top 5 guilds*\n` +
+        `${prefix}**top guild** *view top guilds on nypsi*\n` +
         `${prefix}**guild (name)** *show guild info*`
     );
     embed.setFooter({ text: "you must be atleast prestige 1 to create a guild" });
