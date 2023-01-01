@@ -98,11 +98,11 @@ export { logger };
 
 export function payment(from: User, to: User, value: string) {
   if (!nextLogMsg.get("pay")) {
-    nextLogMsg.set("pay", `**${from.tag}** (${from.id}) -> **${to.tag}** (${to.id}) - **${value}**\n`);
+    nextLogMsg.set("pay", `**${from.tag}** (${from.id}) -> **${to.tag}** (${to.id})\n - **${value}**\n\n`);
   } else {
     nextLogMsg.set(
       "pay",
-      nextLogMsg.get("pay") + `**${from.tag}** (${from.id}) -> **${to.tag}** (${to.id}) - **${value}**\n`
+      nextLogMsg.get("pay") + `**${from.tag}** (${from.id}) -> **${to.tag}** (${to.id})\n - **${value}**\n\n`
     );
   }
 }
@@ -192,5 +192,5 @@ function runLogs() {
         nextLogMsg.set(k, "");
       }
     });
-  }, 5000);
+  }, 7500);
 }
