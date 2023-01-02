@@ -81,15 +81,46 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return send({ embeds: [new ErrorEmbed("you have no gamble stats")] });
     }
 
-    let desc = "";
+    const fields: { name: string; value: string; inline: boolean }[] = [];
 
     for (const stat of gambleStats) {
-      desc += `\`${stat.game}\` ${stat._sum.win.toLocaleString()}/${stat._count._all.toLocaleString()} profit: $${(
-        Number(stat._sum.earned) - Number(stat._sum.bet)
-      ).toLocaleString()} xp: ${Number(stat._sum.xpEarned).toLocaleString()}\n`;
+      fields.push({
+        name: stat.game,
+        value:
+          `${stat._sum.win.toLocaleString()}/${stat._count._all.toLocaleString()} (${
+            (stat._sum.win / stat._count._all) * 100
+          }%)\n` +
+          `profit: $${(Number(stat._sum.earned) - Number(stat._sum.bet)).toLocaleString()}\n` +
+          `xp: ${Number(stat._sum.xpEarned).toLocaleString()}\n`,
+        inline: true,
+      });
     }
 
-    const embed = new CustomEmbed(message.member, desc).setHeader("gamble stats", message.author.avatarURL());
+    const pages = PageManager.createPages(fields, 6);
+
+    const embed = new CustomEmbed(message.member)
+      .setFields(pages.get(1))
+      .setHeader("gamble stats", message.author.avatarURL());
+
+    if (pages.size > 1) {
+      const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
+        new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
+      );
+      const msg = await send({ embeds: [embed], components: [row] });
+      const manager = new PageManager({
+        embed,
+        row,
+        message: msg,
+        userId: message.author.id,
+        pages,
+        updateEmbed(page, embed) {
+          return embed.setFields(page);
+        },
+      });
+
+      return manager.listen();
+    }
 
     return send({ embeds: [embed] });
   };
