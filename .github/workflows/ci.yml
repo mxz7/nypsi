@@ -42,7 +42,7 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: install dependencies
-        run: pnpm install --frozen-lockfile -D
+        run: pnpm install --frozen-lockfile
 
       - name: prettier check
         run: npx prettier --check .
