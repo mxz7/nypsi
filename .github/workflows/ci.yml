@@ -157,7 +157,7 @@ jobs:
           mkdir deploy
           mv dist/ deploy/
           mv package.json deploy/
-          mv package-lock.json deploy/
+          mv pnpm-lock.yaml deploy/
           mv data/ deploy/
           mv prisma/ deploy/
           mv tsconfig.json deploy/
