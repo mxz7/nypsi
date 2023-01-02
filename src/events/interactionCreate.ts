@@ -396,7 +396,7 @@ export default async function interactionCreate(interaction: Interaction) {
         transaction(
           interaction.user,
           await interaction.client.users.fetch(auction.ownerId),
-          (Number(auction.bin) - taxedAmount).toLocaleString()
+          `$${(Number(auction.bin) - taxedAmount).toLocaleString()} (auction)`
         );
 
         const items = getItems();
