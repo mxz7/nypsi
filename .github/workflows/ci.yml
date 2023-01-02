@@ -87,6 +87,9 @@ jobs:
       - name: run setup.sh
         run: bash ${GITHUB_WORKSPACE}/setup.sh
 
+      - name: setup prisma
+        run: npx prisma gemerate
+
       - name: build
         run: npx tsc
 
@@ -142,6 +145,9 @@ jobs:
 
       - name: run setup.sh
         run: bash ${GITHUB_WORKSPACE}/setup.sh
+
+      - name: setup prisma
+        run: npx prisma gemerate
 
       - name: build
         run: npx tsc
