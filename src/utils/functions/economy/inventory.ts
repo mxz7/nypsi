@@ -454,6 +454,7 @@ export function selectItem(search: string) {
 
 export async function commandGemCheck(member: GuildMember, commandCategory: string) {
   if (!(await userExists(member))) return;
+  if (!(await getDmSettings(member)).other) return;
   if (gemChanceCooldown.has(member.user.id)) return;
   gemChanceCooldown.add(member.user.id);
 
