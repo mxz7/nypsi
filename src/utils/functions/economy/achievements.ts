@@ -81,7 +81,7 @@ export async function getAllAchievements(id: string, filter?: string) {
   if (filter) {
     return await prisma.achievements.findMany({
       where: {
-        AND: [{ userId: id }, { achievementId: { contains: filter } }],
+        AND: [{ userId: id }, { achievementId: { startsWith: filter } }],
       },
     });
   }
