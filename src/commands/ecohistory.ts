@@ -1,15 +1,16 @@
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
 import prisma from "../init/database";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
-import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import { ErrorEmbed } from "../models/EmbedBuilders";
 import { ChartData } from "../types/Chart";
 import Constants from "../utils/Constants";
 import { isPremium } from "../utils/functions/premium/premium";
 import getJsonGraphData from "../utils/functions/workers/jsongraph";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import { logger } from "../utils/logger";
 import dayjs = require("dayjs");
 
-const BASE_URL = "https://quickchart.io/chart?c=";
+const BASE_URL = "https://quickchart.io/chart/create";
 
 const cmd = new Command("ecohistory", "view your metric data history in a graph", Categories.MONEY).setAliases(["graph"]);
 
@@ -53,8 +54,21 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (args[0].toLowerCase() == "all" && Constants.ADMIN_IDS.includes(message.author.id)) {
     const res = await getJsonGraphData(args[1].toLowerCase());
 
+    const body = JSON.stringify({ chart: res });
+
+    const response: { success: boolean; url: string } = await fetch(BASE_URL, {
+      method: "POST",
+      body,
+      headers: { "Content-Type": "application/json" },
+    }).then((res) => res.json());
+
+    if (!response.success) {
+      logger.warn(res);
+      return message.channel.send({ embeds: [new ErrorEmbed("failed to create graph")] });
+    }
+
     return send({
-      embeds: [new CustomEmbed(message.member).setImage(`${BASE_URL}${encodeURIComponent(JSON.stringify(res))}`)],
+      content: response.url,
     });
   }
 
@@ -99,11 +113,20 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (!data) return message.channel.send({ embeds: [new ErrorEmbed("you have no data to graph")] });
 
-  const url = `${BASE_URL}${encodeURIComponent(JSON.stringify(data))}`;
+  const body = JSON.stringify({ chart: data });
 
-  return send({
-    embeds: [new CustomEmbed(message.member).setImage(url)],
-  });
+  const res: { success: boolean; url: string } = await fetch(BASE_URL, {
+    method: "POST",
+    body,
+    headers: { "Content-Type": "application/json" },
+  }).then((res) => res.json());
+
+  if (!res.success) {
+    logger.warn(res);
+    return message.channel.send({ embeds: [new ErrorEmbed("failed to create graph")] });
+  }
+
+  return message.channel.send({ content: res.url });
 }
 
 cmd.setRun(run);
