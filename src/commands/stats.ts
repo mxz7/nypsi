@@ -87,9 +87,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       fields.push({
         name: stat.game,
         value:
-          `${stat._sum.win.toLocaleString()}/${stat._count._all.toLocaleString()} (${
-            (stat._sum.win / stat._count._all) * 100
-          }%)\n` +
+          `${stat._sum.win.toLocaleString()}/${stat._count._all.toLocaleString()} (${(
+            (stat._sum.win / stat._count._all) *
+            100
+          ).toFixed(1)}%)\n` +
           `profit: $${(Number(stat._sum.earned) - Number(stat._sum.bet)).toLocaleString()}\n` +
           `xp: ${Number(stat._sum.xpEarned).toLocaleString()}\n`,
         inline: true,
