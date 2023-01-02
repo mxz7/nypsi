@@ -101,7 +101,7 @@ async function doMembers() {
   const date = new Date();
 
   for (const user of query) {
-    if (user.user.Economy.money) {
+    if (user.user?.Economy?.money) {
       await prisma.graphMetrics.create({
         data: {
           category: "user-money",
@@ -111,7 +111,7 @@ async function doMembers() {
         },
       });
     }
-    if (user.user.Economy.netWorth) {
+    if (user.user?.Economy?.netWorth) {
       await prisma.graphMetrics.create({
         data: {
           category: "user-net",
