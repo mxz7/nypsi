@@ -17,9 +17,32 @@ jobs:
 
       - name: setup node
         uses: actions/setup-node@v3
+        with:
+          node-version: 18
 
-      - name: install packages
-        run: npm install
+      - uses: pnpm/action-setup@v2
+        name: install pnpm
+        id: pnpm-install
+        with:
+          version: 7
+          run_install: false
+
+      - name: get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v3
+        name: setup pnpm cache
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: install dependencies
+        run: pnpm install --frozen-lockfile -D
 
       - name: prettier check
         run: npx prettier --check .
@@ -34,12 +57,35 @@ jobs:
 
       - name: setup node
         uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - uses: pnpm/action-setup@v2
+        name: install pnpm
+        id: pnpm-install
+        with:
+          version: 7
+          run_install: false
+
+      - name: get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v3
+        name: setup pnpm cache
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: install dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: run setup.sh
         run: bash ${GITHUB_WORKSPACE}/setup.sh
-
-      - name: install packages
-        run: npm install
 
       - name: build
         run: npx tsc
@@ -67,12 +113,35 @@ jobs:
 
       - name: setup node
         uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - uses: pnpm/action-setup@v2
+        name: install pnpm
+        id: pnpm-install
+        with:
+          version: 7
+          run_install: false
+
+      - name: get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v3
+        name: setup pnpm cache
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: run setup.sh
         run: bash ${GITHUB_WORKSPACE}/setup.sh
-
-      - name: install packages
-        run: npm install
 
       - name: build
         run: npx tsc
