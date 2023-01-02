@@ -1,7 +1,7 @@
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
 import prisma from "../init/database";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
-import { ErrorEmbed } from "../models/EmbedBuilders";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { ChartData } from "../types/Chart";
 import Constants from "../utils/Constants";
 import { isPremium } from "../utils/functions/premium/premium";
@@ -53,7 +53,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (args[0].toLowerCase() == "all" && Constants.ADMIN_IDS.includes(message.author.id)) {
     const res = await getJsonGraphData(args[1].toLowerCase());
 
-    return send({ content: `${BASE_URL}${encodeURIComponent(JSON.stringify(res))}` });
+    return send({
+      embeds: [new CustomEmbed(message.member).setImage(`${BASE_URL}${encodeURIComponent(JSON.stringify(res))}`)],
+    });
   }
 
   await addCooldown(cmd.name, message.member, 120);
@@ -97,14 +99,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (!data) return message.channel.send({ embeds: [new ErrorEmbed("you have no data to graph")] });
 
-  console.log(data);
-
   const url = `${BASE_URL}${encodeURIComponent(JSON.stringify(data))}`;
 
-  console.log(url);
-
   return send({
-    content: url,
+    embeds: [new CustomEmbed(message.member).setImage(url)],
   });
 }
 
