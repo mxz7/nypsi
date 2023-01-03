@@ -470,6 +470,7 @@ export async function runCommand(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
   args: string[]
 ) {
+  const preProcessLength = [Date.now()];
   if (!message.channel.isTextBased()) return;
   if (message.channel.isDMBased()) return;
 
@@ -739,6 +740,11 @@ export async function runCommand(
   }
 
   command.run(message, args);
+  preProcessLength[1] = Date.now();
+
+  if (preProcessLength[1] - preProcessLength[0] > 50) {
+    logger.debug(`command preprocess length: ${preProcessLength[1] - preProcessLength[0]}ms`);
+  }
 
   setTimeout(async () => {
     const news = await getNews();
