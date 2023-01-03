@@ -52,7 +52,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   }
 
   if (args[0].toLowerCase() == "all" && Constants.ADMIN_IDS.includes(message.author.id)) {
-    const res = await getJsonGraphData(args[1].toLowerCase());
+    const res = await getJsonGraphData(args[1].toLowerCase(), args.slice(2));
 
     const body = JSON.stringify({ chart: res });
 
