@@ -150,11 +150,11 @@ export async function userExists(member: GuildMember | string): Promise<boolean>
 
   if (query) {
     await redis.set(`${Constants.redis.cache.economy.EXISTS}:${id}`, "true");
-    await redis.expire(`${Constants.redis.cache.economy.EXISTS}:${id}`, ms("1 hour") / 1000);
+    await redis.expire(`${Constants.redis.cache.economy.EXISTS}:${id}`, ms("12 hour") / 1000);
     return true;
   } else {
     await redis.set(`${Constants.redis.cache.economy.EXISTS}:${id}`, "false");
-    await redis.expire(`${Constants.redis.cache.economy.EXISTS}:${id}`, ms("1 hour") / 1000);
+    await redis.expire(`${Constants.redis.cache.economy.EXISTS}:${id}`, ms("12 hour") / 1000);
     return false;
   }
 }
