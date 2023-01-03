@@ -21,11 +21,11 @@ export async function isLockedOut(userId: string) {
   return Boolean(await redis.sismember(Constants.redis.nypsi.LOCKED_OUT, userId));
 }
 
-export async function toggleLock(userId: string) {
+export async function toggleLock(userId: string, force = false) {
   if (await isLockedOut(userId)) {
     await redis.srem(Constants.redis.nypsi.LOCKED_OUT, userId);
   } else {
-    if (await isVerified(userId)) return;
+    if ((await isVerified(userId)) && !force) return;
     await redis.sadd(Constants.redis.nypsi.LOCKED_OUT, userId);
   }
 }
