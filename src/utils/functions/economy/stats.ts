@@ -19,6 +19,9 @@ export async function getGambleStats(member: GuildMember) {
     _count: {
       _all: true,
     },
+    _avg: {
+      bet: true,
+    },
     _sum: {
       win: true,
       bet: true,
