@@ -13,7 +13,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   }
 
   for (const user of args) {
-    toggleLock(user);
+    toggleLock(user, true);
   }
 
   if (!(message instanceof Message)) return;
