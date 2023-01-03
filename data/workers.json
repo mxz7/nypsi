@@ -81,7 +81,7 @@
       "id": "warehouse_expansion",
       "name": "warehouse expansion",
       "upgrades": 2,
-      "effect": 0.5,
+      "effect": 0.4,
       "stack_limit": 15,
       "for": "amazon"
     },
