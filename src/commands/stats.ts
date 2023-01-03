@@ -92,7 +92,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             100
           ).toFixed(1)}%)\n` +
           `profit: $${(Number(stat._sum.earned) - Number(stat._sum.bet)).toLocaleString()}\n` +
-          `xp: ${Number(stat._sum.xpEarned).toLocaleString()}\n`,
+          `xp: ${Number(stat._sum.xpEarned).toLocaleString()}\n` +
+          `avg bet: $${Math.floor(stat._avg.bet).toLocaleString()}`,
         inline: true,
       });
     }
