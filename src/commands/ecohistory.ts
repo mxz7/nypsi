@@ -54,6 +54,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (args[0].toLowerCase() == "all" && Constants.ADMIN_IDS.includes(message.author.id)) {
     const res = await getJsonGraphData(args[1].toLowerCase(), args.slice(2));
 
+    console.log(res);
+
     const body = JSON.stringify({ chart: res });
 
     const response: { success: boolean; url: string } = await fetch(BASE_URL, {
