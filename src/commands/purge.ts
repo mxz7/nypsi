@@ -102,20 +102,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (message.channel.isDMBased()) return;
 
     if (amount <= 100) {
-      let msg: Message;
-
-      if (!(message instanceof Message)) {
-        msg = await send({ embeds: [new CustomEmbed(message.member, "deleting messages...")], ephemeral: true });
-      }
       await message.channel.bulkDelete(amount, true).catch(() => {});
-      if (msg) {
-        await msg.edit({ embeds: [new CustomEmbed(message.member, "✅ messages deleted")] });
-      }
-
       if (!(message instanceof Message)) {
-        setTimeout(() => {
-          msg.delete().catch(() => {});
-        }, 1500);
+        return send({ embeds: [new CustomEmbed(message.member, "✅ messages deleted")], ephemeral: true });
       }
     } else {
       amount = amount - 1;
