@@ -2,9 +2,9 @@ import { GuildMember } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
+import Constants from "../../Constants";
 import { hasProfile } from "./utils";
 import ms = require("ms");
-import Constants from "../../Constants";
 
 export async function isTracking(member: GuildMember | string): Promise<boolean> {
   let id: string;
@@ -31,11 +31,11 @@ export async function isTracking(member: GuildMember | string): Promise<boolean>
 
   if (query.tracking) {
     await redis.set(`${Constants.redis.cache.user.TRACKING}:${id}`, "t");
-    await redis.expire(`${Constants.redis.cache.user.TRACKING}:${id}`, ms("1 hour") / 1000);
+    await redis.expire(`${Constants.redis.cache.user.TRACKING}:${id}`, ms("12 hour") / 1000);
     return true;
   } else {
     await redis.set(`${Constants.redis.cache.user.TRACKING}:${id}`, "f");
-    await redis.expire(`${Constants.redis.cache.user.TRACKING}:${id}`, ms("1 hour") / 1000);
+    await redis.expire(`${Constants.redis.cache.user.TRACKING}:${id}`, ms("12 hour") / 1000);
     return false;
   }
 }
