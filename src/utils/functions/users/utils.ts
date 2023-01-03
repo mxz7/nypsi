@@ -1,8 +1,8 @@
 import { GuildMember, User } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
-import ms = require("ms");
 import Constants from "../../Constants";
+import ms = require("ms");
 
 export async function hasProfile(member: GuildMember | string) {
   let id: string;
@@ -27,11 +27,11 @@ export async function hasProfile(member: GuildMember | string) {
 
   if (query) {
     await redis.set(`${Constants.redis.cache.user.EXISTS}:${id}`, "true");
-    await redis.expire(`${Constants.redis.cache.user.EXISTS}:${id}`, ms("1 hour") / 1000);
+    await redis.expire(`${Constants.redis.cache.user.EXISTS}:${id}`, Math.floor(ms("24 hour") / 1000));
     return true;
   } else {
     await redis.set(`${Constants.redis.cache.user.EXISTS}:${id}`, "false");
-    await redis.expire(`${Constants.redis.cache.user.EXISTS}:${id}`, ms("1 hour") / 1000);
+    await redis.expire(`${Constants.redis.cache.user.EXISTS}:${id}`, Math.floor(ms("24 hour") / 1000));
     return false;
   }
 }

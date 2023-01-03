@@ -4,6 +4,7 @@ import redis from "../../../init/redis";
 import { SnipedMessage } from "../../../types/Snipe";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
+import ms = require("ms");
 
 const snipe: Map<string, SnipedMessage> = new Map();
 const eSnipe: Map<string, SnipedMessage> = new Map();
@@ -96,7 +97,7 @@ export async function hasGuild(guild: Guild): Promise<boolean> {
 
   if (query) {
     await redis.set(`${Constants.redis.cache.guild.EXISTS}:${guild.id}`, "1");
-    await redis.expire(`${Constants.redis.cache.guild.EXISTS}:${guild.id}`, 43200);
+    await redis.expire(`${Constants.redis.cache.guild.EXISTS}:${guild.id}`, Math.floor(ms("24 hour") / 1000));
     return true;
   } else {
     return false;
@@ -124,7 +125,7 @@ export async function createGuild(guild: Guild) {
   });
 
   await redis.set(`${Constants.redis.cache.guild.EXISTS}:${guild.id}`, 1);
-  await redis.expire(`${Constants.redis.cache.guild.EXISTS}:${guild.id}`, 43200);
+  await redis.expire(`${Constants.redis.cache.guild.EXISTS}:${guild.id}`, Math.floor(ms("24 hour") / 1000));
 }
 
 export function addCooldown(guild: Guild, seconds: number) {
