@@ -4,10 +4,10 @@ import { isMainThread, parentPort, Worker, workerData } from "worker_threads";
 import prisma from "../../../init/database";
 import { ChartData } from "../../../types/Chart";
 
-export default function getJsonGraphData(category: string): Promise<ChartData> {
+export default function getJsonGraphData(category: string, userIds: string[]): Promise<ChartData> {
   return new Promise((resolve, reject) => {
     const worker = new Worker(__filename, {
-      workerData: category,
+      workerData: [category, userIds],
     });
     worker.on("message", resolve);
     worker.on("error", reject);
@@ -77,7 +77,7 @@ if (!isMainThread) {
         })
         .then((r) => r?.lastKnownTag);
 
-      chart.data.datasets.push({ label: tag || userId, data: balances.map((b) => parseInt(b)), fill: false });
+      chart.data.datasets.push({ label: tag?.split("#")[0] || userId, data: balances.map((b) => parseInt(b)), fill: false });
     }
 
     return chart;
@@ -87,7 +87,7 @@ if (!isMainThread) {
     const data = await createGraphData(
       await prisma.graphMetrics.findMany({
         where: {
-          category: workerData,
+          AND: [{ category: workerData[0] }, { userId: { in: workerData[1] } }],
         },
         select: {
           date: true,
