@@ -76,9 +76,14 @@ function randomOffset() {
 let padlockPrice = 25000 + randomOffset();
 
 async function updateCryptoWorth() {
-  let res = await fetch("https://api.coindesk.com/v1/bpi/currentprice/USD.json").then((res) => res.json());
+  let res = await fetch("https://api.coinbase.com/v2/exchange-rates?currency=BTC").then((res) => res.json());
 
-  const btcworth = Math.floor(res.bpi.USD.rate_float);
+  const btcworth = Math.floor(res.data.rates.USD);
+
+  if (btcworth > 1_000_000) {
+    logger.error("FATAL - something wrong with btc");
+    return;
+  }
 
   items["bitcoin"].buy = btcworth;
   items["bitcoin"].sell = Math.floor(btcworth * 0.95);
@@ -91,6 +96,11 @@ async function updateCryptoWorth() {
   if (!ethWorth) {
     logger.error("INVALID ETH WORTH");
     return logger.error(res);
+  }
+
+  if (ethWorth > 1_000_000) {
+    logger.error("FATAL - something wrong with btc");
+    return;
   }
 
   items["ethereum"].buy = ethWorth;
