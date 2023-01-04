@@ -129,15 +129,28 @@ export function runModerationChecks(client: NypsiClient) {
       select: {
         userId: true,
         guildId: true,
+        expire: true,
       },
     });
 
     for (const unban of query2) {
-      logger.log({
-        level: "auto",
-        message: `requesting unban in ${unban.guildId} for ${unban.userId}`,
-      });
-      await requestUnban(unban.guildId, unban.userId, client);
+      if (unbanTimeouts.has(`${unban.guildId}_${unban.userId}`)) continue;
+      if (unban.expire.getTime() - Date.now() < 1000) {
+        logger.log({
+          level: "auto",
+          message: `requesting unban in ${unban.guildId} for ${unban.userId}`,
+        });
+        await requestUnban(unban.guildId, unban.userId, client);
+      } else {
+        unbanTimeouts.add(`${unban.guildId}_${unban.userId}`);
+        setTimeout(() => {
+          logger.log({
+            level: "auto",
+            message: `requesting unban in ${unban.guildId} for ${unban.userId}`,
+          });
+          requestUnban(unban.guildId, unban.userId, client);
+        }, unban.expire.getTime() - Date.now());
+      }
     }
 
     const query3 = await prisma.moderation.findMany({
