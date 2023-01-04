@@ -215,5 +215,5 @@ export function runModerationChecks(client: NypsiClient) {
         message: `${modLogCount.toLocaleString()} modlogs sent`,
       });
     }
-  }, 30000);
+  }, 90000);
 }
