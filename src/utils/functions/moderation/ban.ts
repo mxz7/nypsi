@@ -1,6 +1,9 @@
 import { Guild, GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import { NypsiClient } from "../../../models/Client";
+import { unbanTimeouts } from "../../../scheduled/clusterjobs/moderationchecks";
+import { logger } from "../../logger";
+import ms = require("ms");
 
 export async function newBan(guild: Guild, userIDs: string[] | string, date: Date) {
   if (!(userIDs instanceof Array)) {
@@ -15,6 +18,20 @@ export async function newBan(guild: Guild, userIDs: string[] | string, date: Dat
         guildId: guild.id,
       },
     });
+  }
+
+  if (date.getTime() - Date.now() < ms("2 minutes")) {
+    for (const userId of userIDs) {
+      if (unbanTimeouts.has(`${guild.id}_${userId}`)) continue;
+      unbanTimeouts.add(`${guild.id}_${userId}`);
+      setTimeout(() => {
+        logger.log({
+          level: "auto",
+          message: `requesting unban in ${guild.id} for ${userId}`,
+        });
+        requestUnban(guild.id, userId, guild.client as NypsiClient);
+      }, date.getTime() - Date.now());
+    }
   }
 }
 

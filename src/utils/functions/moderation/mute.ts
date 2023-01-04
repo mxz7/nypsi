@@ -1,6 +1,8 @@
 import { Guild, GuildMember, Role } from "discord.js";
 import prisma from "../../../init/database";
 import { NypsiClient } from "../../../models/Client";
+import { unmuteTimeouts } from "../../../scheduled/clusterjobs/moderationchecks";
+import { logger } from "../../logger";
 import sleep from "../sleep";
 import { createProfile, profileExists } from "./utils";
 import ms = require("ms");
@@ -34,6 +36,20 @@ export async function newMute(guild: Guild, userIDs: string[], date: Date) {
         guildId: guild.id,
       },
     });
+  }
+
+  if (date.getTime() - Date.now() < ms("2 minutes")) {
+    for (const userId of userIDs) {
+      if (unmuteTimeouts.has(`${guild.id}_${userId}`)) continue;
+      unmuteTimeouts.add(`${guild.id}_${userId}`);
+      setTimeout(() => {
+        logger.log({
+          level: "auto",
+          message: `requesting unmute in ${guild.id} for ${userId}`,
+        });
+        requestUnmute(guild.id, userId, guild.client as NypsiClient);
+      }, date.getTime() - Date.now());
+    }
   }
 }
 
@@ -104,6 +120,7 @@ export async function setMuteRole(guild: Guild, role: Role | string) {
 }
 
 export async function requestUnmute(guildId: string, member: string, client: NypsiClient) {
+  unmuteTimeouts.delete(`${guildId}_${member}`);
   const muteRoleId = await getMuteRole(guildId);
 
   await client.cluster.broadcastEval(
