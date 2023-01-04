@@ -19,16 +19,18 @@ async function updateNetWorth() {
     },
   });
 
-  const actions: (() => Promise<number>)[] = [];
+  const actions = [];
 
   for (const user of query) {
     await sleep(25);
     if (await redis.exists(`${Constants.redis.cache.economy.NETWORTH}:${user.userId}`)) continue;
 
-    actions.push(() => calcNetWorth(user.userId));
+    actions.push(async () => {
+      await calcNetWorth(user.userId);
+    });
   }
 
-  await pAll(actions, { concurrency: 10 });
+  await pAll(actions, { concurrency: 7 });
 
   logger.info(`net worth updated for ${actions.length} members in ${MStoTime(Date.now() - start)}`);
 }
