@@ -1,5 +1,6 @@
 import { ChannelType, Guild, Message, TextChannel } from "discord.js";
 import prisma from "../../../init/database";
+import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
@@ -135,9 +136,13 @@ export async function createReactionProfile(guild: Guild) {
       guildId: guild.id,
     },
   });
+
+  await redis.set(`${Constants.redis.cache.chatReaction.EXISTS}:${guild.id}`, "t");
+  await redis.expire(`${Constants.redis.cache.chatReaction.EXISTS}:${guild.id}`, Math.floor(ms("12 hours") / 1000));
 }
 
 export async function hasReactionProfile(guild: Guild) {
+  if (await redis.exists(`${Constants.redis.cache.chatReaction.EXISTS}:${guild.id}`)) return true;
   const query = await prisma.chatReaction.findUnique({
     where: {
       guildId: guild.id,
@@ -148,6 +153,9 @@ export async function hasReactionProfile(guild: Guild) {
   });
 
   if (query) {
+    await redis.set(`${Constants.redis.cache.chatReaction.EXISTS}:${guild.id}`, "t");
+    await redis.expire(`${Constants.redis.cache.chatReaction.EXISTS}:${guild.id}`, Math.floor(ms("12 hours") / 1000));
+
     return true;
   } else {
     return false;
