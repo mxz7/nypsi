@@ -22,11 +22,6 @@ export function runCountdowns(client: NypsiClient) {
     const query = await prisma.guildCountdown.findMany();
 
     for (const countdown of query) {
-      if (dayjs(countdown.date).isBefore(dayjs())) {
-        await prisma.guildCountdown.delete({ where: { guildId_id: { guildId: countdown.guildId, id: countdown.id } } });
-        return;
-      }
-
       const clusterHas = await client.cluster.broadcastEval(
         async (c, { channelId }) => {
           const client = c as unknown as NypsiClient;
@@ -63,6 +58,9 @@ export function runCountdowns(client: NypsiClient) {
 
       if (days == 0) {
         message = countdown.finalFormat;
+      } else if (days < 0) {
+        await prisma.guildCountdown.delete({ where: { guildId_id: { guildId: countdown.guildId, id: countdown.id } } });
+        return;
       } else {
         message = countdown.format.split("%days%").join(days.toLocaleString());
       }
