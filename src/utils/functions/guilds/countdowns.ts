@@ -1,3 +1,4 @@
+import dayjs = require("dayjs");
 import { Guild } from "discord.js";
 import prisma from "../../../init/database";
 import { NypsiClient } from "../../../models/Client";
@@ -21,6 +22,11 @@ export function runCountdowns(client: NypsiClient) {
     const query = await prisma.guildCountdown.findMany();
 
     for (const countdown of query) {
+      if (dayjs(countdown.date).isBefore(dayjs())) {
+        await prisma.guildCountdown.delete({ where: { guildId_id: { guildId: countdown.guildId, id: countdown.id } } });
+        return;
+      }
+
       const clusterHas = await client.cluster.broadcastEval(
         async (c, { channelId }) => {
           const client = c as unknown as NypsiClient;
