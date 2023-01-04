@@ -48,6 +48,9 @@ export default {
       moderation: {
         EXISTS: "cache:moderation:exists",
       },
+      chatReaction: {
+        EXISTS: "cache:chatreaction:exists",
+      },
       economy: {
         AUCTION_AVG: "cache:economy:auctionavg",
         BALANCE: "cache:economy:balance",
