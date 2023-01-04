@@ -4,7 +4,7 @@ import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { NotificationPayload } from "../../../types/Notification";
 import Constants from "../../Constants";
-import { getTier, isPremium } from "../premium/premium";
+import { getTier } from "../premium/premium";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { getAuctionAverage } from "./auctions";
 import { getBoosters } from "./boosters";
@@ -122,17 +122,16 @@ export async function getMulti(member: GuildMember | string): Promise<number> {
 
   multi += prestigeBonus;
 
-  if (await isPremium(id)) {
-    switch (await getTier(id)) {
-      case 2:
-        multi += 4;
-        break;
-      case 3:
-        multi += 6;
-        break;
-      case 4:
-        multi += 10;
-    }
+  switch (await getTier(id)) {
+    case 2:
+      multi += 4;
+      break;
+    case 3:
+      multi += 6;
+      break;
+    case 4:
+      multi += 10;
+      break;
   }
 
   const guildLevel = await getGuildLevelByUser(id);

@@ -45,6 +45,12 @@ export default {
         SLASH_ONLY: "cache:guild:slashonly",
         REACTION_ROLES: "cache:guild:reactionroles",
       },
+      moderation: {
+        EXISTS: "cache:moderation:exists",
+      },
+      chatReaction: {
+        EXISTS: "cache:chatreaction:exists",
+      },
       economy: {
         AUCTION_AVG: "cache:economy:auctionavg",
         BALANCE: "cache:economy:balance",
