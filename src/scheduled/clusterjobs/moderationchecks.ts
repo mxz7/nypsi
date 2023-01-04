@@ -1,4 +1,6 @@
+import dayjs = require("dayjs");
 import { APIEmbed, WebhookClient } from "discord.js";
+
 import prisma from "../../init/database";
 import redis from "../../init/redis";
 import { NypsiClient } from "../../models/Client";
@@ -6,6 +8,9 @@ import Constants from "../../utils/Constants";
 import { requestUnban } from "../../utils/functions/moderation/ban";
 import { requestUnmute } from "../../utils/functions/moderation/mute";
 import { logger } from "../../utils/logger";
+
+export const unmuteTimeouts = new Set<string>();
+export const unbanTimeouts = new Set<string>();
 
 export function runLogs() {
   setInterval(async () => {
@@ -84,7 +89,7 @@ export function runLogs() {
 
 export function runModerationChecks(client: NypsiClient) {
   setInterval(async () => {
-    const date = new Date();
+    const date = dayjs().add(2, "minute").toDate();
 
     const query1 = await prisma.moderationMute.findMany({
       where: {
@@ -93,15 +98,32 @@ export function runModerationChecks(client: NypsiClient) {
       select: {
         userId: true,
         guildId: true,
+        expire: true,
       },
     });
 
+    console.log("fetched");
+
     for (const unmute of query1) {
-      logger.log({
-        level: "auto",
-        message: `requesting unmute in ${unmute.guildId} for ${unmute.userId}`,
-      });
-      await requestUnmute(unmute.guildId, unmute.userId, client);
+      if (unmuteTimeouts.has(`${unmute.guildId}_${unmute.userId}`)) continue;
+      if (unmute.expire.getTime() - Date.now() < 1000) {
+        console.log("a");
+        logger.log({
+          level: "auto",
+          message: `requesting unmute in ${unmute.guildId} for ${unmute.userId}`,
+        });
+        await requestUnmute(unmute.guildId, unmute.userId, client);
+      } else {
+        console.log("b");
+        unmuteTimeouts.add(`${unmute.guildId}_${unmute.userId}`);
+        setTimeout(() => {
+          logger.log({
+            level: "auto",
+            message: `requesting unmute in ${unmute.guildId} for ${unmute.userId}`,
+          });
+          requestUnmute(unmute.guildId, unmute.userId, client);
+        }, unmute.expire.getTime() - Date.now());
+      }
     }
 
     const query2 = await prisma.moderationBan.findMany({
