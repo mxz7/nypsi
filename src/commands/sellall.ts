@@ -8,6 +8,7 @@ import { createUser, getItems, userExists } from "../utils/functions/economy/uti
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { addToNypsiBank, getTax } from "../utils/functions/tax";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import pAll = require("p-all");
 
 const cmd = new Command("sellall", "sell all commonly sold items", Categories.MONEY);
 
@@ -69,12 +70,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if ((await isPremium(message.member)) && (await getTier(message.member)) == 4) taxEnabled = false;
 
-  const promises = [];
+  const functions = [];
   const desc: string[] = [];
   const amounts = new Map<string, number>();
 
   for (const item of selected.keys()) {
-    promises.push(setInventoryItem(message.member, item, 0, false));
+    functions.push(async () => {
+      await setInventoryItem(message.member, item, 0, false);
+    });
 
     let sellWorth = Math.floor(items[item].sell * selected.get(item));
 
@@ -98,10 +101,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     );
   }
 
-  promises.push(addToNypsiBank(taxedAmount));
-  promises.push(updateBalance(message.member, (await getBalance(message.member)) + total));
+  functions.push(async () => {
+    await addToNypsiBank(taxedAmount);
+  });
+  functions.push(async () => {
+    await updateBalance(message.member, (await getBalance(message.member)) + total);
+  });
 
-  await Promise.all(promises);
+  await pAll(functions, { concurrency: 5 });
 
   inPlaceSort(desc).desc((i) => amounts.get(i));
 
