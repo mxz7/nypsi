@@ -1,4 +1,3 @@
-import dayjs = require("dayjs");
 import { Guild } from "discord.js";
 import prisma from "../../../init/database";
 import { NypsiClient } from "../../../models/Client";
