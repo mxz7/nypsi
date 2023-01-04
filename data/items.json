@@ -1458,7 +1458,7 @@
     "aliases": ["boosterscrate", "boostercrate", "bcrate"],
     "rarity": 3,
     "in_crates": true,
-    "crate_runs": 3,
+    "crate_runs": 2,
     "items": ["role:booster"]
   },
   "gem_crate": {
