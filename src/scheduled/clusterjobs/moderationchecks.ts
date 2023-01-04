@@ -102,19 +102,15 @@ export function runModerationChecks(client: NypsiClient) {
       },
     });
 
-    console.log("fetched");
-
     for (const unmute of query1) {
       if (unmuteTimeouts.has(`${unmute.guildId}_${unmute.userId}`)) continue;
       if (unmute.expire.getTime() - Date.now() < 1000) {
-        console.log("a");
         logger.log({
           level: "auto",
           message: `requesting unmute in ${unmute.guildId} for ${unmute.userId}`,
         });
         await requestUnmute(unmute.guildId, unmute.userId, client);
       } else {
-        console.log("b");
         unmuteTimeouts.add(`${unmute.guildId}_${unmute.userId}`);
         setTimeout(() => {
           logger.log({
