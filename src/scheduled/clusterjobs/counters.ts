@@ -13,10 +13,10 @@ export async function updateCounters(client: NypsiClient) {
     for (const counter of counters) {
       if (!counter.format.includes("%value%")) await prisma.guildCounter.delete({ where: { channel: counter.channel } });
       functions.push(async () => {
-        updateChannel(counter, client);
+        await updateChannel(counter, client);
       });
     }
 
-    pAll(functions, { concurrency: 5 });
+    await pAll(functions, { concurrency: 5 });
   }, ms("10 minutes"));
 }
