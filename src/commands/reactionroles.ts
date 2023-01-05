@@ -203,7 +203,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let title = await message.channel
       .awaitMessages({ filter, max: 1, time: 90_000 })
       .then((m) => {
-        m.first().delete();
+        m.first()
+          .delete()
+          .catch(() => {
+            fail = true;
+            message.channel.send({
+              content: "i am missing some permissions. if you need support join: https://discord.gg/hJTDNST",
+            });
+          });
         return m.first().content;
       })
       .catch(() => {
@@ -228,7 +235,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const description = await message.channel
       .awaitMessages({ filter, max: 1, time: 90_000 })
       .then((m) => {
-        m.first().delete();
+        m.first()
+          .delete()
+          .catch(() => {
+            fail = true;
+            message.channel.send({
+              content: "i am missing some permissions. if you need support join: https://discord.gg/hJTDNST",
+            });
+          });
         return m.first().content;
       })
       .catch(() => {
@@ -253,7 +267,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const channel = await message.channel
       .awaitMessages({ filter, max: 1, time: 90_000 })
       .then((m) => {
-        m.first().delete();
+        m.first()
+          .delete()
+          .catch(() => {
+            fail = true;
+            message.channel.send({
+              content: "i am missing some permissions. if you need support join: https://discord.gg/hJTDNST",
+            });
+          });
         return m.first().mentions.channels.first();
       })
       .catch(() => {
