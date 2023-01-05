@@ -26,6 +26,7 @@ export default {
       SUPPORT: "cache:support",
       premium: {
         LEVEL: "cache:premium:level",
+        ALIASES: "cache:premium:aliases",
       },
       user: {
         DM_SETTINGS: "cache:user:dmsettings",
