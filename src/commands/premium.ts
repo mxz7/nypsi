@@ -5,7 +5,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { daysAgo, daysUntil, formatDate } from "../utils/functions/date";
 import { getEmbedColor, setEmbedColor } from "../utils/functions/premium/color";
-import { getUserCommand } from "../utils/functions/premium/command";
+import { getCommand, getUserCommand, setCommand } from "../utils/functions/premium/command";
 import {
   addMember,
   getPremiumProfile,
@@ -16,7 +16,32 @@ import {
   setStatus,
   setTier,
 } from "../utils/functions/premium/premium";
+import { cleanString } from "../utils/functions/string";
+import { commandExists } from "../utils/handlers/commandhandler";
 import dayjs = require("dayjs");
+
+const commandFilter = [
+  "nigger",
+  "nigga",
+  "faggot",
+  "fag",
+  "nig",
+  "ugly",
+  "discordgg",
+  "discordcom",
+  "discordappcom",
+  "gay",
+  "tranny",
+  "cracker",
+  "chink",
+  "pornhub",
+  "porn",
+  "xvideos",
+  "xhamster",
+  "redtube",
+  "grabify",
+  "bitly",
+];
 
 const cmd = new Command("premium", "view your premium status", Categories.INFO)
   .setAliases(["patreon", "donate", "prem", "kofi"])
@@ -31,6 +56,23 @@ cmd.slashData
       .setDescription("set your custom color")
       .addStringOption((option) =>
         option.setName("color").setDescription("color you want to be used on all messages (hex format)").setRequired(true)
+      )
+  )
+  .addSubcommandGroup((mycmd) =>
+    mycmd
+      .setName("mycmd")
+      .setDescription("create a custom command (gold+)")
+      .addSubcommand((view) => view.setName("view").setDescription("view your custom command"))
+      .addSubcommand((update) =>
+        update
+          .setName("update")
+          .setDescription("update your custom command")
+          .addStringOption((option) =>
+            option.setName("trigger").setDescription("trigger for your command").setRequired(true)
+          )
+          .addStringOption((option) =>
+            option.setName("value").setDescription("set the content for your custom command").setRequired(true)
+          )
       )
   );
 
@@ -214,6 +256,55 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     });
   };
 
+  const doCustomCommand = async () => {
+    if ((await getTier(message.author.id)) < 3) {
+      return send({ embeds: [new ErrorEmbed("you must be **GOLD** tier to create a custom command")] });
+    }
+    if (!(message instanceof CommandInteraction)) {
+      return send({ embeds: [new ErrorEmbed("you must use /premium mycmd for this")] });
+    }
+    if (!message.isChatInputCommand()) return;
+
+    if (args[1].toLowerCase() === "view") {
+      const cmd = await getUserCommand(message.author.id);
+
+      const embed = new CustomEmbed(message.member);
+
+      if (cmd) {
+        if (cmd.content) {
+          embed.addField("content", cmd.content, true);
+          embed.addField("trigger", cmd.trigger, true);
+          embed.addField("uses", cmd.uses ? cmd.uses.toLocaleString() : "0", true);
+        } else {
+          embed.setDescription("you don't have a custom command");
+        }
+      } else {
+        embed.setDescription("you don't have a custom command");
+      }
+
+      return send({ embeds: [embed] });
+    } else {
+      const commandTrigger = cleanString(message.options.getString("trigger").toLowerCase().normalize("NFD"));
+      const commandContent = cleanString(message.options.getString("value").toLowerCase().normalize("NFD"));
+
+      for (const word of commandFilter) {
+        if (commandContent.includes(word) || commandTrigger.includes(word)) {
+          return send({ embeds: [new ErrorEmbed("explicit content 🙄")] });
+        }
+      }
+
+      if (commandExists(commandTrigger)) return send({ embeds: [new ErrorEmbed("this is already a nypsi command")] });
+
+      const cmd = await getCommand(commandTrigger);
+
+      if (cmd) return send({ embeds: [new ErrorEmbed("this custom command already exists")] });
+
+      await setCommand(message.author.id, commandTrigger, commandContent);
+
+      return send({ embeds: [new CustomEmbed(message.member, "✅ your command has been updated")] });
+    }
+  };
+
   if (args.length == 0 || args[0].toLowerCase() == "view") {
     return defaultMessage();
   } else if (args[0].toLowerCase() == "check" || args[0].toLowerCase() == "status") {
@@ -349,6 +440,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({ embeds: [new CustomEmbed(message.member, "✅ membership will expire soon")] });
   } else if (args[0].toLowerCase() == "color") {
     return setColor();
+  } else if (args[0].toLowerCase() === "mycmd") {
+    return doCustomCommand();
   }
 }
 
