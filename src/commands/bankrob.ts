@@ -332,7 +332,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return;
     }
 
-    if (res.isSelectMenu() && res.customId == "bank") {
+    if (res.isStringSelectMenu() && res.customId == "bank") {
       embed.setDescription(await displayBankInfo(res.values[0], bankWorths));
 
       for (const option of options) {
