@@ -32,7 +32,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   }
 
   if (content.length > 50) {
-    content = content.substr(0, 50);
+    content = content.substring(0, 50);
   }
 
   const embed = new CustomEmbed(message.member, `press **F** to pay your respects to **${content}**`);

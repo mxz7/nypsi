@@ -103,7 +103,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       }
     }
     if (description.length > 50) {
-      description = description.substr(0, 50) + "...";
+      description = description.substring(0, 50) + "...";
     }
   }
 
