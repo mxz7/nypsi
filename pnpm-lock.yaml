@@ -51,7 +51,7 @@ specifiers:
   utf-8-validate: ^6.0.0
   winston: ^3.8.2
   winston-daily-rotate-file: ^4.6.1
-  winston-discord-webhook: ^1.1.4
+  winston-discord-webhook: ^2.0.0
 
 dependencies:
   '@catppuccin/palette': 0.1.5
@@ -88,7 +88,7 @@ dependencies:
   utf-8-validate: 6.0.0
   winston: 3.8.2
   winston-daily-rotate-file: 4.7.1_winston@3.8.2
-  winston-discord-webhook: 1.1.4
+  winston-discord-webhook: 2.0.0_b534fhs3xgzvdbz5qzlfkrhjjm
 
 devDependencies:
   '@commitlint/cli': 17.3.0
@@ -1417,15 +1417,6 @@ packages:
   /discord-hybrid-sharding/2.0.5:
     resolution: {integrity: sha512-w4xbTGG0Kyx98DFoCU9QRYGP2xcK9OPwzmSpB786SJPi7W4DNdTVHrZwkB3WMmfdOjTbiaZ/LDSI5KZ4fbNAYQ==}
     dependencies:
-      node-fetch: 2.6.7
-    transitivePeerDependencies:
-      - encoding
-    dev: false
-
-  /discord-webhook-node/1.1.8:
-    resolution: {integrity: sha512-3u0rrwywwYGc6HrgYirN/9gkBYqmdpvReyQjapoXARAHi0P0fIyf3W5tS5i3U3cc7e44E+e7dIHYUeec7yWaug==}
-    dependencies:
-      form-data: 3.0.1
       node-fetch: 2.6.7
     transitivePeerDependencies:
       - encoding
@@ -3801,13 +3792,14 @@ packages:
       winston-transport: 4.5.0
     dev: false
 
-  /winston-discord-webhook/1.1.4:
-    resolution: {integrity: sha512-DSyyWRW3vEDGAtqdsS3lBdcTH2mEF8EpCwOzGIn98UK7Yfq2ntIBz+13MEeI5017SWP04o58+l8d26EOqxFRYw==}
+  /winston-discord-webhook/2.0.0_b534fhs3xgzvdbz5qzlfkrhjjm:
+    resolution: {integrity: sha512-1NcTjMKMDzz3efDHGcQoyddtmFNPu5QH1OTPU6DMCW311x0yxQhXoUhvDqCDf8NAX7u1qolgDM7TgzJ/lwKuFA==}
     dependencies:
-      discord-webhook-node: 1.1.8
+      discord.js: 14.7.1_b534fhs3xgzvdbz5qzlfkrhjjm
       winston-transport: 4.5.0
     transitivePeerDependencies:
-      - encoding
+      - bufferutil
+      - utf-8-validate
     dev: false
 
   /winston-transport/4.5.0:
