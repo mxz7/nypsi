@@ -5,7 +5,7 @@ import redis from "../../../init/redis";
 import Constants from "../../Constants";
 import ms = require("ms");
 
-export async function getAliases(member: GuildMember | string) {
+export async function getUserAliases(member: GuildMember | string) {
   let id: string;
   if (member instanceof GuildMember) {
     id = member.user.id;
@@ -27,4 +27,43 @@ export async function getAliases(member: GuildMember | string) {
   await redis.expire(`${Constants.redis.cache.premium.ALIASES}:${id}`, Math.floor(ms("12 hour") / 1000));
 
   return query;
+}
+
+export async function addUserAlias(member: GuildMember | string, alias: string, command: string) {
+  let id: string;
+  if (member instanceof GuildMember) {
+    id = member.user.id;
+  } else {
+    id = member;
+  }
+
+  await prisma.userAlias.create({
+    data: {
+      alias,
+      command,
+      userId: id,
+    },
+  });
+
+  await redis.del(`${Constants.redis.cache.premium.ALIASES}:${id}`);
+}
+
+export async function removeUserAlias(member: GuildMember | string, alias: string) {
+  let id: string;
+  if (member instanceof GuildMember) {
+    id = member.user.id;
+  } else {
+    id = member;
+  }
+
+  await prisma.userAlias.delete({
+    where: {
+      userId_alias: {
+        alias,
+        userId: id,
+      },
+    },
+  });
+
+  await redis.del(`${Constants.redis.cache.premium.ALIASES}:${id}`);
 }
