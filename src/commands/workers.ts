@@ -234,7 +234,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return;
       }
 
-      if (res.isSelectMenu()) {
+      if (res.isStringSelectMenu()) {
         const { buttonRow, embed } = await displayWorker(baseWorkers[res.values[0]]);
 
         for (const option of options) {
