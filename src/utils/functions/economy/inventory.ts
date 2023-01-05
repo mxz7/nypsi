@@ -11,7 +11,6 @@ import { percentChance } from "../random";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { addProgress, getAllAchievements, setAchievementProgress } from "./achievements";
 import { getBalance, updateBalance } from "./balance";
-import { addItemUse } from "./stats";
 import { createUser, getItems, userExists } from "./utils";
 import { getXp, updateXp } from "./xp";
 
@@ -236,13 +235,6 @@ async function checkCollectorAchievement(id: string, inventory: Inventory) {
 }
 
 export async function openCrate(member: GuildMember | string, item: Item): Promise<Map<string, number>> {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
-
   const inventory = await getInventory(member);
   const items = getItems();
 
@@ -276,11 +268,7 @@ export async function openCrate(member: GuildMember | string, item: Item): Promi
     }
   }
 
-  await Promise.all([
-    addProgress(id, "unboxer", 1),
-    addItemUse(id, item.id),
-    setInventoryItem(member, item.id, inventory.find((i) => i.item == item.id).amount - 1),
-  ]);
+  await setInventoryItem(member, item.id, inventory.find((i) => i.item == item.id).amount - 1);
 
   const times = item.crate_runs || 1;
   const found = new Map<string, number>();
