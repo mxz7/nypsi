@@ -78,7 +78,7 @@ function timeSince(date: number) {
   if (sec > 0) {
     output = output + sec + "s";
   } else if (output != "") {
-    output = output.substr(0, output.length - 1);
+    output = output.substring(0, output.length - 1);
   }
 
   if (output == "") {

@@ -63,8 +63,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const role = roles.find((r) => r.id == sortedRoleIDs[i]);
 
     if (role.hexColor != "#000000") {
-      if (colors.indexOf(role.hexColor.substr(1, 7)) != -1) continue;
-      colors.push(role.hexColor.substr(1, 7));
+      if (colors.indexOf(role.hexColor.substring(1, 7)) != -1) continue;
+      colors.push(role.hexColor.substring(1, 7));
     }
   }
 
@@ -90,7 +90,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     color = "dbdbdb";
   } else {
     if (color.startsWith("#")) {
-      color = color.substr(1, color.length);
+      color = color.substring(1, color.length);
     }
 
     if (color.length != 6) {

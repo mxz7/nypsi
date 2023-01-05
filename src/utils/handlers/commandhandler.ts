@@ -870,7 +870,7 @@ export function logCommand(message: Message | (NypsiCommandInteraction & Command
     let content = message.content;
 
     if (content.length > 100) {
-      content = content.substr(0, 75) + "...";
+      content = content.substring(0, 75) + "...";
     }
 
     msg = `${message.guild.id} - ${message.author.tag}: ${content}`;

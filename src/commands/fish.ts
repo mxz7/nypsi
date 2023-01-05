@@ -229,12 +229,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (chosen.includes("money:") || chosen.includes("xp:")) {
       if (chosen.includes("money:")) {
-        const amount = parseInt(chosen.substr(6));
+        const amount = parseInt(chosen.substring(6));
 
         await updateBalance(message.member, (await getBalance(message.member)) + amount);
         foundItems.push("$" + amount.toLocaleString());
       } else if (chosen.includes("xp:")) {
-        const amount = parseInt(chosen.substr(3));
+        const amount = parseInt(chosen.substring(3));
 
         await updateXp(message.member, (await getXp(message.member)) + amount);
         foundItems.push(amount + "xp");
