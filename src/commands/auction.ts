@@ -163,7 +163,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         .awaitMessageComponent({ filter, time: 30000 })
         .then(async (i) => {
           await i.deferUpdate();
-          if (!i.isSelectMenu()) return;
+          if (!i.isStringSelectMenu()) return;
           return i.values[0];
         })
         .catch(() => {
