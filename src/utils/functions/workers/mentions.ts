@@ -33,7 +33,7 @@ if (!isMainThread) {
   let content = collection.message.content;
 
   if (content.length > 100) {
-    content = content.substr(0, 97) + "...";
+    content = content.substring(0, 97) + "...";
   }
 
   content = content.replace(/(\r\n|\n|\r)/gm, " ");

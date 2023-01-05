@@ -26,7 +26,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (!member) {
       color = args[0].split("#").join("");
       if (color.length > 6) {
-        color = color.substr(0, 6);
+        color = color.substring(0, 6);
       }
     } else {
       color = member.displayHexColor;

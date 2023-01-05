@@ -117,7 +117,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (hypixelData.player.prefix) {
-      rank = hypixelData.player.prefix.substr(3, hypixelData.player.prefix.length - 4);
+      rank = hypixelData.player.prefix.substring(3, hypixelData.player.prefix.length - 4);
     }
 
     if (!streak) {
