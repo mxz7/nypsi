@@ -455,7 +455,7 @@ export async function getTickets(member: GuildMember | string) {
   return query;
 }
 
-export async function addTicket(member: GuildMember | string) {
+export async function addTicket(member: GuildMember | string, amount = 1) {
   let id: string;
   if (member instanceof GuildMember) {
     id = member.user.id;
@@ -463,15 +463,15 @@ export async function addTicket(member: GuildMember | string) {
     id = member;
   }
 
-  await prisma.lotteryTicket.create({
-    data: {
-      userId: id,
-    },
+  const data: { userId: string }[] = new Array(amount).fill({ userId: id });
+
+  await prisma.lotteryTicket.createMany({
+    data,
   });
 
   if (!(member instanceof GuildMember)) return;
 
-  await redis.hincrby("lotterytickets:queue", member.user.username, 1);
+  await redis.hincrby("lotterytickets:queue", member.user.username, amount);
 }
 
 export async function isHandcuffed(id: string): Promise<boolean> {
