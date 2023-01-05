@@ -36,6 +36,7 @@ import { getDisabledCommands } from "../functions/guilds/disabledcommands";
 import { getChatFilter } from "../functions/guilds/filters";
 import { getPrefix } from "../functions/guilds/utils";
 import { addKarma, getKarma } from "../functions/karma/karma";
+import { getUserAliases } from "../functions/premium/aliases";
 import { addUse, getCommand } from "../functions/premium/command";
 import { cleanString } from "../functions/string";
 import { isUserBlacklisted } from "../functions/users/blacklist";
@@ -491,15 +492,9 @@ export async function runCommand(
   if (cmd == "help" && message instanceof Message) {
     return helpCmd(message, args);
   }
-
-  let alias = false;
   let command: Command;
 
   if (!commands.has(cmd) && aliases.has(cmd)) {
-    alias = true;
-  }
-
-  if (alias) {
     command = commands.get(aliases.get(cmd));
   } else {
     command = commands.get(cmd);
@@ -585,52 +580,63 @@ export async function runCommand(
 
   if (!commandExists(cmd) && message instanceof Message) {
     if (!aliases.has(cmd)) {
-      if (await isLockedOut(message.author.id)) return;
-      const customCommand = await getCommand(cmd);
+      const userAliases = await getUserAliases(message.author.id);
+      const foundAlias = userAliases.find((alias) => alias.alias === cmd);
 
-      if (!customCommand) {
-        return;
-      }
+      if (foundAlias) {
+        cmd = foundAlias.command.split(" ")[0];
+        command = commands.get(cmd);
 
-      const content = customCommand.content;
+        args = message.content.split(" ").splice(1, Infinity);
+        message.content = foundAlias.command + " " + args.join(" ");
+      } else {
+        if (await isLockedOut(message.author.id)) return;
+        const customCommand = await getCommand(cmd);
 
-      if ((await getDisabledCommands(message.guild)).indexOf("customcommand") != -1) {
-        return message.channel.send({
-          embeds: [new ErrorEmbed("custom commands have been disabled in this server")],
-        });
-      }
+        if (!customCommand) {
+          return;
+        }
 
-      const filter = await getChatFilter(message.guild);
+        const content = customCommand.content;
 
-      let contentToCheck: string | string[] = cleanString(content.toLowerCase().normalize("NFD"));
-
-      contentToCheck = contentToCheck.split(" ");
-
-      for (const word of filter) {
-        if (contentToCheck.indexOf(word.toLowerCase()) != -1) {
+        if ((await getDisabledCommands(message.guild)).indexOf("customcommand") != -1) {
           return message.channel.send({
-            embeds: [new ErrorEmbed("this custom command is not allowed in this server")],
+            embeds: [new ErrorEmbed("custom commands have been disabled in this server")],
           });
         }
-      }
 
-      message.content += ` [custom cmd - ${customCommand.owner}]`;
+        const filter = await getChatFilter(message.guild);
 
-      const ownerTag = await getLastKnownTag(customCommand.owner);
-      await addUse(customCommand.owner);
-      logCommand(message, ["", "", ""]);
+        let contentToCheck: string | string[] = cleanString(content.toLowerCase().normalize("NFD"));
 
-      const embed = new CustomEmbed(message.member, content).setFooter({
-        text: `${customCommand.uses.toLocaleString()} use${customCommand.uses == 1 ? "" : "s"}`,
-      });
+        contentToCheck = contentToCheck.split(" ");
 
-      if (ownerTag) {
-        embed.setFooter({
-          text: `by ${ownerTag} | ${customCommand.uses.toLocaleString()} use${customCommand.uses == 1 ? "" : "s"}`,
+        for (const word of filter) {
+          if (contentToCheck.indexOf(word.toLowerCase()) != -1) {
+            return message.channel.send({
+              embeds: [new ErrorEmbed("this custom command is not allowed in this server")],
+            });
+          }
+        }
+
+        message.content += ` [custom cmd - ${customCommand.owner}]`;
+
+        const ownerTag = await getLastKnownTag(customCommand.owner);
+        await addUse(customCommand.owner);
+        logCommand(message, ["", "", ""]);
+
+        const embed = new CustomEmbed(message.member, content).setFooter({
+          text: `${customCommand.uses.toLocaleString()} use${customCommand.uses == 1 ? "" : "s"}`,
         });
-      }
 
-      return message.channel.send({ embeds: [embed] });
+        if (ownerTag) {
+          embed.setFooter({
+            text: `by ${ownerTag} | ${customCommand.uses.toLocaleString()} use${customCommand.uses == 1 ? "" : "s"}`,
+          });
+        }
+
+        return message.channel.send({ embeds: [embed] });
+      }
     }
   }
 
