@@ -359,6 +359,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const aliases = await getUserAliases(message.author.id);
 
     if (args[1].toLowerCase() === "list") {
+      if (aliases.length === 0) return send({ embeds: [new ErrorEmbed("you have no aliases")] });
       const pages = PageManager.createPages(aliases.map((i) => `\`${i.alias}\` -> \`${i.command}\``));
 
       const embed = new CustomEmbed(message.member, pages.get(1).join("\n"));
