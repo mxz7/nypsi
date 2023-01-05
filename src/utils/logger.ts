@@ -1,3 +1,4 @@
+import { variants } from "@catppuccin/palette";
 import * as chalk from "chalk";
 import { Client, User, WebhookClient } from "discord.js";
 import * as winston from "winston";
@@ -177,7 +178,17 @@ export async function getWebhooks(client?: Client) {
   logger.add(
     new DiscordTransport({
       webhook: process.env.BOTLOGS_HOOK,
-      useCodeblock: true,
+      mode: "hybrid",
+      interval: 5000,
+      colors: new Map([
+        ["error", variants.mocha.red.hex as `#${string}`],
+        ["warn", variants.mocha.yellow.hex as `#${string}`],
+        ["guild", variants.mocha.pink.hex as `#${string}`],
+        ["auto", variants.mocha.blue.hex as `#${string}`],
+        ["success", variants.mocha.green.hex as `#${string}`],
+        ["cmd", variants.mocha.sky.hex as `#${string}`],
+        ["info", "#fffffe"],
+      ]),
     })
   );
 }
