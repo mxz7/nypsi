@@ -23,7 +23,7 @@ export async function getUserAliases(member: GuildMember | string) {
     },
   });
 
-  await redis.set(`${Constants.redis.cache.premium.ALIASES}:${id}`, JSON.stringify(query));
+  await redis.set(`${Constants.redis.cache.premium.ALIASES}:${id}`, JSON.stringify(query || []));
   await redis.expire(`${Constants.redis.cache.premium.ALIASES}:${id}`, Math.floor(ms("12 hour") / 1000));
 
   return query;
