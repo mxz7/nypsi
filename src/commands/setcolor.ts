@@ -42,7 +42,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (color.toLowerCase() == "reset") color = "default";
 
   if (color.length > 6 && color != "default") {
-    color = color.substr(0, 6);
+    color = color.substring(0, 6);
   }
 
   if (!color.startsWith("#")) color = `#${color}`;

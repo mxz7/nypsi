@@ -372,12 +372,12 @@ export async function openCrate(member: GuildMember | string, item: Item): Promi
 
     if (chosen.includes("money:") || chosen.includes("xp:")) {
       if (chosen.includes("money:")) {
-        const amount = parseInt(chosen.substr(6));
+        const amount = parseInt(chosen.substring(6));
 
         await updateBalance(member, (await getBalance(member)) + amount);
         found.set("money", found.has("money") ? found.get("money") + amount : amount);
       } else if (chosen.includes("xp:")) {
-        const amount = parseInt(chosen.substr(3));
+        const amount = parseInt(chosen.substring(3));
 
         await updateXp(member, (await getXp(member)) + amount);
         found.set("xp", found.has("xp") ? found.get("xp") + amount : amount);

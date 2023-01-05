@@ -61,7 +61,7 @@ export function doChatReactions(client: NypsiClient) {
         if (!channel.isTextBased()) return;
         if (channel.isThread()) return;
         if (channel.type == ChannelType.GuildVoice) return;
-        if (channel.type == ChannelType.GuildNews) return;
+        if (channel.type == ChannelType.GuildAnnouncement) return;
 
         const messages = await channel.messages.fetch({ limit: 50 }).catch(() => {});
         let stop = false;
@@ -220,7 +220,7 @@ export async function startReaction(guild: Guild, channel: TextChannel) {
   for (let i = 0; i < zeroWidthCount; i++) {
     const pos = Math.floor(Math.random() * chosenWord.length + 1);
 
-    displayWord = displayWord.substr(0, pos) + zeroWidthChar + displayWord.substr(pos);
+    displayWord = displayWord.substring(0, pos) + zeroWidthChar + displayWord.substring(pos);
   }
 
   const embed = new CustomEmbed().setColor(Constants.EMBED_SUCCESS_COLOR);

@@ -263,7 +263,7 @@ export default async function messageCreate(message: Message) {
             let content = message.content;
 
             if (content.length > 100) {
-              content = content.substr(0, 97) + "...";
+              content = content.substring(0, 97) + "...";
             }
 
             content = content.replace(/(\r\n|\n|\r)/gm, " ");
@@ -378,7 +378,7 @@ async function addMention() {
     let content = mention.message.content;
 
     if (content.length > 100) {
-      content = content.substr(0, 97) + "...";
+      content = content.substring(0, 97) + "...";
     }
 
     content = content.replace(/(\r\n|\n|\r)/gm, " ");
