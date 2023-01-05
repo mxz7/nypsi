@@ -203,7 +203,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return;
       }
 
-      if (res.isSelectMenu() && res.customId == "setting") {
+      if (res.isStringSelectMenu() && res.customId == "setting") {
         for (const option of options) {
           option.setDefault(false);
 
@@ -214,7 +214,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         msg = await showSetting(settings, res.values[0], options, res.message);
         return pageManager();
-      } else if (res.isSelectMenu() && res.customId == "typesetting") {
+      } else if (res.isStringSelectMenu() && res.customId == "typesetting") {
         const selected = options.find((o) => o.data.default).data.value;
         const value = notificationsData[selected].types.find((x) => x.value == res.values[0]);
 
