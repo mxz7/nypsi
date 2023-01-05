@@ -23,9 +23,11 @@ import { NypsiClient } from "../models/Client";
 import { createNypsiInteraction, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
+import { addProgress } from "../utils/functions/economy/achievements";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
 import { addInventoryItem, getInventory, openCrate } from "../utils/functions/economy/inventory";
 import { getPrestige } from "../utils/functions/economy/prestige";
+import { addItemUse } from "../utils/functions/economy/stats";
 import { createUser, getAchievements, getItems, isEcoBanned, userExists } from "../utils/functions/economy/utils";
 import { claimFromWorkers } from "../utils/functions/economy/workers";
 import { getReactionRolesByGuild } from "../utils/functions/guilds/reactionroles";
@@ -467,6 +469,11 @@ export default async function interactionCreate(interaction: Interaction) {
         `${interaction.user.username}'s ${crateAmount} vote crate${crateAmount > 1 ? "s" : ""}`,
         interaction.user.avatarURL()
       );
+
+      await Promise.all([
+        addProgress(interaction.user.id, "unboxer", crateAmount),
+        addItemUse(interaction.user.id, "vote_crate", crateAmount),
+      ]);
 
       const foundItems = new Map<string, number>();
 
