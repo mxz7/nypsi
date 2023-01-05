@@ -130,7 +130,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
   const tickets = await getTickets(user);
 
   if (tickets.length <= Constants.LOTTERY_TICKETS_MAX - 5) {
-    await Promise.all([addTicket(user), addTicket(user), addTicket(user), addTicket(user), addTicket(user)]);
+    await addTicket(user, 5);
   }
 
   let crateAmount = Math.floor(prestige / 1.2 + 1);
