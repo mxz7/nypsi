@@ -587,8 +587,10 @@ export async function runCommand(
         cmd = foundAlias.command.split(" ")[0];
         command = commands.get(cmd);
 
-        args = message.content.split(" ").splice(1, Infinity);
-        message.content = foundAlias.command + " " + args.join(" ");
+        args = foundAlias.command.split(" ");
+        args.push(...message.content.split(" ").splice(1, Infinity));
+
+        message.content = `${message.content[0]}${command.name} ${args.slice(1, Infinity).join(" ")}`;
       } else {
         if (await isLockedOut(message.author.id)) return;
         const customCommand = await getCommand(cmd);
