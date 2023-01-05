@@ -29,5 +29,6 @@ export async function getCustomPresence() {
 }
 
 export async function setCustomPresence(text?: string) {
+  if (!text) return await redis.del(Constants.redis.nypsi.PRESENCE);
   await redis.set(Constants.redis.nypsi.PRESENCE, text);
 }
