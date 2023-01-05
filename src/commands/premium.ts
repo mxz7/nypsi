@@ -1,9 +1,21 @@
-import { BaseMessageOptions, ColorResolvable, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
+import {
+  ActionRowBuilder,
+  BaseMessageOptions,
+  ButtonBuilder,
+  ButtonStyle,
+  ColorResolvable,
+  CommandInteraction,
+  InteractionReplyOptions,
+  Message,
+  MessageActionRowComponentBuilder,
+} from "discord.js";
 import { NypsiClient } from "../models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { daysAgo, daysUntil, formatDate } from "../utils/functions/date";
+import PageManager from "../utils/functions/page";
+import { addUserAlias, getUserAliases, removeUserAlias } from "../utils/functions/premium/aliases";
 import { getEmbedColor, setEmbedColor } from "../utils/functions/premium/color";
 import { getCommand, getUserCommand, setCommand } from "../utils/functions/premium/command";
 import {
@@ -72,6 +84,35 @@ cmd.slashData
           )
           .addStringOption((option) =>
             option.setName("value").setDescription("set the content for your custom command").setRequired(true)
+          )
+      )
+  )
+  .addSubcommandGroup((aliases) =>
+    aliases
+      .setName("alias")
+      .setDescription("manage your custom aliases")
+      .addSubcommand((list) => list.setName("list").setDescription("list your aliases"))
+      .addSubcommand((add) =>
+        add
+          .setName("add")
+          .setDescription("create a custom alias")
+          .addStringOption((option) =>
+            option.setName("alias").setDescription("alias for your command").setRequired(true).setMaxLength(15)
+          )
+          .addStringOption((option) =>
+            option
+              .setName("command")
+              .setDescription("command you would like to run when doing your alias")
+              .setRequired(true)
+              .setMaxLength(50)
+          )
+      )
+      .addSubcommand((del) =>
+        del
+          .setName("del")
+          .setDescription("delete a custom alias")
+          .addStringOption((option) =>
+            option.setName("alias").setDescription("alias for your command").setRequired(true).setMaxLength(15)
           )
       )
   );
@@ -305,6 +346,92 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
   };
 
+  const doAliases = async () => {
+    if ((await getTier(message.author.id)) < 1) {
+      return send({ embeds: [new ErrorEmbed("you must be **BRONZE** tier to create a custom alias")] });
+    }
+    if (!(message instanceof CommandInteraction)) {
+      return send({ embeds: [new ErrorEmbed("you must use /premium alias for this")] });
+    }
+
+    if (!message.isChatInputCommand()) return;
+
+    const aliases = await getUserAliases(message.author.id);
+
+    if (args[1].toLowerCase() === "list") {
+      const pages = PageManager.createPages(aliases.map((i) => `\`${i.alias}\` -> \`${i.command}\``));
+
+      const embed = new CustomEmbed(message.member, pages.get(1).join("\n"));
+
+      const msg = await send({ embeds: [embed] });
+
+      if (pages.size === 1) return;
+
+      const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
+        new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
+      );
+
+      const manager = new PageManager({
+        embed,
+        message: msg,
+        row,
+        userId: message.author.id,
+        pages,
+      });
+
+      return manager.listen();
+    } else if (args[1].toLowerCase() === "add") {
+      let max = 5;
+
+      for (let i = 0; i < (await getTier(message.author.id)); i++) {
+        max *= 1.7;
+      }
+
+      max = Math.floor(max);
+
+      if (aliases.length >= max) {
+        return send({ embeds: [new ErrorEmbed(`you have reached your limit of custom aliases (${max})`)] });
+      }
+
+      const trigger = cleanString(message.options.getString("alias").toLowerCase().normalize("NFD").split(" ")[0]);
+      const command = cleanString(message.options.getString("command").toLowerCase().normalize("NFD"));
+
+      for (const word of commandFilter) {
+        if (trigger.includes(word) || command.includes(word)) {
+          return send({ embeds: [new ErrorEmbed("explicit content 🙄")] });
+        }
+      }
+
+      if (aliases.find((i) => i.alias === trigger))
+        return send({ embeds: [new ErrorEmbed("you already have this alias set")] });
+
+      if (!commandExists(command.split(" ")[0])) {
+        return send({
+          embeds: [
+            new ErrorEmbed(
+              `\`${command.split(" ")[0]}\` is not a command. use $help <alias> to find the actual command name`
+            ),
+          ],
+        });
+      }
+
+      await addUserAlias(message.author.id, trigger, command);
+
+      return send({ embeds: [new CustomEmbed(message.member, `✅ added \`${trigger}\` -> \`${command}\``)] });
+    } else if (args[1].toLowerCase() === "del") {
+      const foundAlias = aliases.find((i) => i.alias === args[2]);
+
+      if (!foundAlias) {
+        return send({ embeds: [new ErrorEmbed(`couldnt find alias \`${args[2]}\``)] });
+      }
+
+      await removeUserAlias(message.author.id, args[2]);
+
+      return send({ embeds: [new CustomEmbed(message.member, `✅ removed \`${args[2]}\``)] });
+    }
+  };
+
   if (args.length == 0 || args[0].toLowerCase() == "view") {
     return defaultMessage();
   } else if (args[0].toLowerCase() == "check" || args[0].toLowerCase() == "status") {
@@ -442,6 +569,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return setColor();
   } else if (args[0].toLowerCase() === "mycmd") {
     return doCustomCommand();
+  } else if (args[0].toLowerCase() === "alias") {
+    return doAliases();
   }
 }
 
