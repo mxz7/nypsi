@@ -98,11 +98,11 @@ export { logger };
 
 export function transaction(from: User, to: User, value: string) {
   if (!nextLogMsg.get("pay")) {
-    nextLogMsg.set("pay", `**${from.tag}** (${from.id}) -> **${to.tag}** (${to.id})\n - **${value}**\n\n`);
+    nextLogMsg.set("pay", `**${from.tag}** (${from.id}) -> **${to.tag}** (${to.id})\n - **${value}**\n`);
   } else {
     nextLogMsg.set(
       "pay",
-      nextLogMsg.get("pay") + `**${from.tag}** (${from.id}) -> **${to.tag}** (${to.id})\n - **${value}**\n\n`
+      nextLogMsg.get("pay") + `**${from.tag}** (${from.id}) -> **${to.tag}** (${to.id})\n - **${value}**\n`
     );
   }
 }
@@ -115,7 +115,7 @@ export function gamble(user: User, game: string, amount: number, win: boolean, i
         ` - **game** ${game}\n` +
         ` - **bet** $${amount.toLocaleString()}\n` +
         ` - **win** ${win}${win ? ` ($**${winAmount.toLocaleString()}**)` : ""}\n` +
-        ` - **id** ${id}\n\n`
+        ` - **id** ${id}\n`
     );
   } else {
     nextLogMsg.set(
@@ -125,7 +125,7 @@ export function gamble(user: User, game: string, amount: number, win: boolean, i
         ` - **game** ${game}\n` +
         ` - **bet** $${amount.toLocaleString()}\n` +
         ` - **win** ${win}${win ? ` ($**${winAmount.toLocaleString()}**)` : ""}\n` +
-        ` - **id** ${id}\n\n`
+        ` - **id** ${id}\n`
     );
   }
 }
