@@ -486,7 +486,7 @@ export async function runCommand(
       } catch {
         cooldown.clear();
       }
-    }, 500);
+    }, 300);
   }
 
   if (cmd == "help" && message instanceof Message) {
