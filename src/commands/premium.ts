@@ -383,10 +383,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       return manager.listen();
     } else if (args[1].toLowerCase() === "add") {
-      let max = 5;
+      let max = 3;
 
       for (let i = 0; i < (await getTier(message.author.id)); i++) {
-        max *= 1.7;
+        max *= 1.75;
       }
 
       max = Math.floor(max);
