@@ -37,6 +37,7 @@ import { runCountdowns } from "../utils/functions/guilds/countdowns";
 import { runSnipeClearIntervals } from "../utils/functions/guilds/utils";
 import { runUploadReset } from "../utils/functions/image";
 import { startAutoMuteViolationInterval } from "../utils/functions/moderation/mute";
+import { getCustomPresence } from "../utils/functions/presence";
 import { getVersion } from "../utils/functions/version";
 import { runCommandUseTimers } from "../utils/handlers/commandhandler";
 import { updateCache } from "../utils/handlers/imghandler";
@@ -54,8 +55,6 @@ export class NypsiClient extends Client {
     process.title = `nypsi v${getVersion()}: cluster ${this.cluster.id}`;
 
     runEconomySetup();
-
-    redis.del(Constants.redis.nypsi.PRESENCE);
 
     if (this.cluster.maintenance) {
       logger.info(`started on maintenance mode with ${this.cluster.maintenance}`);
@@ -89,7 +88,7 @@ export class NypsiClient extends Client {
       }
     });
 
-    this.cluster.on("ready", async () => {
+    this.cluster.once("ready", async () => {
       await redis.del(Constants.redis.nypsi.RESTART);
       this.on("guildCreate", guildCreate.bind(null, this));
       this.on("guildDelete", guildDelete.bind(null, this));
@@ -113,8 +112,44 @@ export class NypsiClient extends Client {
       this.on("emojiDelete", emojiDelete.bind(null));
       this.on("emojiUpdate", emojiUpdate.bind(null));
 
-      setTimeout(() => {
+      setTimeout(async () => {
         this.runIntervals();
+
+        const presence = await getCustomPresence();
+
+        if (presence) {
+          if (presence.split(" ")[0].startsWith("https://www.youtube.com")) {
+            this.cluster.broadcastEval(
+              (c, { presence }) => {
+                const url = presence.shift();
+                c.user.setPresence({
+                  activities: [
+                    {
+                      type: 1,
+                      url: url,
+                      name: presence.join(" "),
+                    },
+                  ],
+                });
+              },
+              { context: { presence: presence.split(" ") } }
+            );
+          } else {
+            this.cluster.broadcastEval(
+              (c, { args }) => {
+                c.user.setPresence({
+                  activities: [
+                    {
+                      type: 0,
+                      name: args.join(" "),
+                    },
+                  ],
+                });
+              },
+              { context: { args: presence.split(" ") } }
+            );
+          }
+        }
       }, 60000);
     });
   }
