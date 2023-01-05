@@ -276,10 +276,11 @@ export async function openCrate(member: GuildMember | string, item: Item): Promi
     }
   }
 
-  await setInventoryItem(member, item.id, inventory.find((i) => i.item == item.id).amount - 1);
-
-  addItemUse(id, item.id);
-  addProgress(id, "unboxer", 1);
+  await Promise.all([
+    addProgress(id, "unboxer", 1),
+    addItemUse(id, item.id),
+    setInventoryItem(member, item.id, inventory.find((i) => i.item == item.id).amount - 1),
+  ]);
 
   const times = item.crate_runs || 1;
   const found = new Map<string, number>();
