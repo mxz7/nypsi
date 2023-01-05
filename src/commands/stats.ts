@@ -418,6 +418,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       _sum: {
         amount: true,
       },
+      orderBy: {
+        _sum: {
+          amount: "desc",
+        },
+      },
     });
 
     const embed = new CustomEmbed(message.member);
