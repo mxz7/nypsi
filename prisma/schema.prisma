@@ -218,6 +218,17 @@ model Premium {
   user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId         String          @id
   PremiumCommand PremiumCommand?
+  UserAlias      UserAlias[]
+}
+
+model UserAlias {
+  userId  String
+  alias   String
+  command String
+
+  premium Premium @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@id([userId, alias])
 }
 
 model PremiumCommand {
