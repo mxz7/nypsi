@@ -32,6 +32,7 @@ import {
 } from "../utils/functions/image";
 import { getMember } from "../utils/functions/member";
 import PageManager from "../utils/functions/page";
+import { getLastKnownTag } from "../utils/functions/users/tag";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const uploadCooldown = new Map<string, number>();
@@ -345,7 +346,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (!allow) return;
 
-    const doReview = async (msg: Message): Promise<any> => {
+    const reviewSuggestions = async (msg: Message): Promise<any> => {
       const count = await prisma.wholesomeSuggestion.count({
         where: { submitterId: { not: message.author.id } },
       });
@@ -395,17 +396,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           embeds: [new CustomEmbed(message.member, "this suggestion no longer exists, perhaps someone beat you to it")],
           ephemeral: true,
         });
-        return doReview(msg);
+        return reviewSuggestions(msg);
       }
 
       if (res.customId === "accept") {
         await res.deferUpdate();
         await acceptWholesomeImage(suggestion.id, message.member, message.client as NypsiClient);
-        return doReview(msg);
+        return reviewSuggestions(msg);
       } else {
         await res.deferUpdate();
         await denyWholesomeImage(suggestion.id, message.member);
-        return doReview(msg);
+        return reviewSuggestions(msg);
       }
     };
 
@@ -414,9 +415,65 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       new ButtonBuilder().setCustomId("deny").setLabel("deny").setStyle(ButtonStyle.Danger)
     );
 
+    const reviewExisting = async (msg: Message): Promise<any> => {
+      let suggestion = await getWholesomeImage();
+
+      if (!suggestion)
+        return msg.edit({
+          embeds: [new CustomEmbed(message.member, "failed to find image")],
+          components: [],
+        });
+
+      const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder().setCustomId("accept").setLabel("keep").setStyle(ButtonStyle.Success),
+        new ButtonBuilder().setCustomId("deny").setLabel("remove").setStyle(ButtonStyle.Danger)
+      );
+
+      await msg.edit({
+        embeds: [
+          new CustomEmbed(
+            message.member,
+            `suggested by ${await getLastKnownTag(suggestion.submitterId)} (${suggestion.submitterId}) on <t:${Math.floor(
+              suggestion.uploadDate.getTime() / 1000
+            )}>\naccepted by ${await getLastKnownTag(suggestion.accepterId)} (${suggestion.accepterId})\n${suggestion.image}`
+          ).setImage(suggestion.image),
+        ],
+        components: [row],
+      });
+
+      const filter = (interaction: Interaction) => interaction.user.id === message.author.id;
+      let fail = false;
+
+      const res = await msg.awaitMessageComponent({ filter, time: 30000 }).catch(() => {
+        fail = true;
+      });
+
+      if (fail || !res) return msg.edit({ components: [] });
+
+      suggestion = await getWholesomeImage(suggestion.id);
+
+      if (!suggestion) {
+        await res.reply({
+          embeds: [new CustomEmbed(message.member, "this suggestion no longer exists, perhaps someone beat you to it")],
+          ephemeral: true,
+        });
+        return reviewExisting(msg);
+      }
+
+      if (res.customId === "accept") {
+        await res.deferUpdate();
+        return reviewExisting(msg);
+      } else {
+        await res.deferUpdate();
+        await deleteFromWholesome(suggestion.id);
+        return reviewExisting(msg);
+      }
+    };
+
     const msg = await message.channel.send({ embeds: [new CustomEmbed(message.member, "loading...")], components: [row] });
 
-    return doReview(msg);
+    if (args[1].toLowerCase() === "existing") return reviewExisting(msg);
+    return reviewSuggestions(msg);
   } else {
     let member;
 
