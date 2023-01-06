@@ -80,5 +80,5 @@ export function MStoTime(ms: number, long = false) {
     }
   }
 
-  return output;
+  return output.trim();
 }
