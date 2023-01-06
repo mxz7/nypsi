@@ -1,11 +1,15 @@
+import dayjs = require("dayjs");
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
 import redis from "../init/redis.js";
+import { NypsiClient } from "../models/Client.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import { MilfSearchData } from "../types/Sex.js";
+
 import Constants from "../utils/Constants.js";
 import { addProgress } from "../utils/functions/economy/achievements.js";
 import { cleanString } from "../utils/functions/string.js";
+import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications.js";
+import { getLastKnownTag } from "../utils/functions/users/tag.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 
 const cmd = new Command("sex", "find horny milfs in ur area 😏", Categories.FUN).setAliases([
@@ -16,12 +20,40 @@ const cmd = new Command("sex", "find horny milfs in ur area 😏", Categories.FU
   "milf",
 ]);
 
-// cmd.slashEnabled = true;
-// cmd.slashData.addStringOption((option) => option.setName("message").setDescription("a good pickup line always works (;"));
+interface MilfSearchData {
+  userId: string;
+  guildId: string;
+  guildName: string;
+  channelId: string;
+  description: string;
+  date: number;
+}
 
-const looking = new Map<string, MilfSearchData>();
+cmd.slashEnabled = true;
+cmd.slashData.addStringOption((option) => option.setName("message").setDescription("a good pickup line always works (;"));
 
-const descFilter = ["nigger", "nigga", "faggot", "fag", "nig", "ugly", "discordgg", "discordcom", "discordappcom"];
+const descFilter = [
+  "nigger",
+  "nigga",
+  "faggot",
+  "fag",
+  "nig",
+  "ugly",
+  "discordgg",
+  "discordcom",
+  "discordappcom",
+  "gay",
+  "tranny",
+  "cracker",
+  "chink",
+  "pornhub",
+  "porn",
+  "xvideos",
+  "xhamster",
+  "redtube",
+  "grabify",
+  "bitly",
+];
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
@@ -78,16 +110,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   await addCooldown(cmd.name, message.member, 45);
 
-  const addToLooking = (description: string) => {
-    const obj = {
-      user: message.author,
-      guild: message.guild,
-      channel: message.channel.id,
+  const addToLooking = async (description: string) => {
+    const obj: MilfSearchData = {
+      userId: message.author.id,
+      guildId: message.guild.id,
+      guildName: message.guild.name,
+      channelId: message.channel.id,
       description: description,
       date: new Date().getTime(),
     };
 
-    looking.set(message.author.id, obj);
+    await redis.rpush(Constants.redis.nypsi.MILF_QUEUE, JSON.stringify(obj));
   };
 
   let description = "";
@@ -107,8 +140,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
   }
 
-  if (looking.size == 0) {
-    addToLooking(description);
+  if ((await redis.llen(Constants.redis.nypsi.MILF_QUEUE)) < 1) {
+    await addToLooking(description);
     return send({
       embeds: [
         new CustomEmbed(
@@ -118,41 +151,45 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       ],
     });
   } else {
-    if (looking.has(message.author.id)) {
+    if (
+      (await redis.lrange(Constants.redis.nypsi.MILF_QUEUE, 0, -1)).find(
+        (i) => (JSON.parse(i) as MilfSearchData).userId === message.author.id
+      )
+    ) {
       return send({
         embeds: [new ErrorEmbed("we're already searching for a match.. calm down you horny shit")],
       });
     }
 
-    for (const k of looking.keys()) {
-      const key = looking.get(k);
+    for (const milf of (await redis.lrange(Constants.redis.nypsi.MILF_QUEUE, 0, -1)).map(
+      (i) => JSON.parse(i) as MilfSearchData
+    )) {
+      if (message.guild.id == milf.guildId) continue;
 
-      if (message.guild.id == key.guild.id) continue;
-
-      looking.delete(key.user.id);
+      await redis.lrem(Constants.redis.nypsi.MILF_QUEUE, 1, JSON.stringify(milf));
 
       const embed = new CustomEmbed(
         message.member,
         `a match has been made from **${
-          key.guild.id == "747056029795221513" ? "[nypsi](https://discord.gg/hJTDNST)" : key.guild.name
-        }**\n\n` + `go ahead and send **${key.user.tag}** a *private* message 😉😏`
+          milf.guildId == "747056029795221513" ? "[nypsi](https://discord.gg/hJTDNST)" : milf.guildName
+        }**\n\n` + `go ahead and send **${await getLastKnownTag(milf.userId)}** a *private* message 😉😏`
       ).setHeader("milf finder");
 
-      if (key.description != "") {
+      if (milf.description != "") {
         embed.setDescription(
           `a match has been made from **${
-            key.guild.id == "747056029795221513" ? "[nypsi](https://discord.gg/hJTDNST)" : key.guild.name
+            milf.guildId == "747056029795221513" ? "[nypsi](https://discord.gg/hJTDNST)" : milf.guildName
           }**\n\n` +
-            `**${key.user.tag}** - ${key.description}\n\n` +
+            `**${await getLastKnownTag(milf.userId)}** - ${milf.description}\n\n` +
             "go ahead and send them a *private* message 😉😏"
         );
       }
 
-      await send({ embeds: [embed] });
-
-      const channel = await key.guild.channels.fetch(key.channel);
-
-      if (!channel.isTextBased()) return;
+      await Promise.all([
+        send({ embeds: [embed] }),
+        addProgress(message.author.id, "whore", 1),
+        addProgress(milf.userId, "whore", 1),
+      ]);
 
       const embed2 = new CustomEmbed(
         undefined,
@@ -163,22 +200,54 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         .setHeader("milf finder")
         .setColor(Constants.EMBED_SUCCESS_COLOR);
 
-      if (description != "") {
-        embed2.setDescription(
-          `a match has been made from **${
-            message.guild.id == "747056029795221513" ? "[nypsi](https://discord.gg/hJTDNST)" : message.guild.name
-          }**\n\n` +
-            `**${message.author.tag}** - ${description}\n\n` +
-            "go ahead and send them a *private* message 😉😏"
-        );
+      const clusters = await (message.client as NypsiClient).cluster.broadcastEval(
+        async (client, { guildId }) => {
+          const guild = await client.guilds.fetch(guildId);
+
+          if (guild) return (client as unknown as NypsiClient).cluster.id;
+          return "not-found";
+        },
+        { context: { guildId: milf.guildId } }
+      );
+
+      let cluster: number;
+
+      for (const i of clusters) {
+        if (i != "not-found") {
+          cluster = i;
+          break;
+        }
       }
 
-      addProgress(message.author.id, "whore", 1);
-      addProgress(key.user.id, "whore", 1);
+      return await (message.client as NypsiClient).cluster.broadcastEval(
+        async (client, { embed, cluster, userId, channelId, guildId }) => {
+          if ((client as unknown as NypsiClient).cluster.id != cluster) return;
+          const guild = await client.guilds.fetch(guildId);
 
-      return await channel
-        .send({ content: key.user.toString() + " a match has been found", embeds: [embed2] })
-        .catch(() => {});
+          if (!guild) return;
+
+          const channel = await guild.channels.fetch(channelId);
+
+          if (!channel) return;
+
+          if (channel.isTextBased()) {
+            const member = await guild.members.fetch(userId);
+            if (!member) return;
+            await channel.send({ content: member.toString(), embeds: [embed] });
+
+            return;
+          }
+        },
+        {
+          context: {
+            embed: embed2.toJSON(),
+            cluster: cluster,
+            userId: milf.userId,
+            channelId: milf.channelId,
+            guildId: milf.guildId,
+          },
+        }
+      );
     }
 
     addToLooking(description);
@@ -197,26 +266,24 @@ cmd.setRun(run);
 
 module.exports = cmd;
 
-setInterval(() => {
-  if (looking.size == 0) return;
+setInterval(async () => {
+  const milfs = await redis.lrange(Constants.redis.nypsi.MILF_QUEUE, 0, -1);
 
-  const now = new Date().getTime();
-
-  const expire = 10800000;
-
-  looking.forEach(async (obj) => {
-    if (now - obj.date >= expire) {
-      await obj.user
-        .send({
-          embeds: [
-            new CustomEmbed(undefined, "unfortunately we couldn't find you a milf 😢")
+  milfs.forEach(async (obj) => {
+    const milf = JSON.parse(obj) as MilfSearchData;
+    if (dayjs(milf.date).isBefore(dayjs().subtract(6, "hours"))) {
+      if ((await getDmSettings(milf.userId)).other) {
+        await addNotificationToQueue({
+          memberId: milf.userId,
+          payload: {
+            embed: new CustomEmbed(undefined, "unfortunately we couldn't find you a milf 😢")
               .setColor(Constants.EMBED_FAIL_COLOR)
               .setHeader("milf finder"),
-          ],
-        })
-        .catch(() => {});
+          },
+        });
+      }
 
-      looking.delete(obj.user.id);
+      await redis.lrem(Constants.redis.nypsi.MILF_QUEUE, 1, JSON.stringify(obj));
     }
   });
 }, 600000);
