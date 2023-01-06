@@ -98,6 +98,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (items[i].role == "tool") continue;
     if (items[i].role == "car") continue;
     if (items[i].role == "booster") continue;
+    if (items[i].role == "crate") continue;
 
     if (
       [
@@ -113,7 +114,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         "ancient_debris",
         "netherite_scrap",
         "netherite_ingot",
-      ].includes(items[i].id)
+      ].includes(items[i].id) ||
+      items[i].id.includes("gem")
     )
       continue;
     fishItems.push(i);
