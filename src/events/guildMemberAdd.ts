@@ -70,7 +70,7 @@ export default async function guildMemberAdd(member: GuildMember) {
     for (const roleId of userRoles) {
       if (persistantRoles.includes(roleId)) {
         count++;
-        await member.roles.add(persistantRoles).catch(async () => {
+        await member.roles.add(roleId).catch(async () => {
           persistantRoles.splice(persistantRoles.indexOf(roleId));
           await setPersistantRoles(member.guild, persistantRoles);
         });
