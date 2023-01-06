@@ -13,6 +13,7 @@ import {
 } from "discord.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import { MStoTime } from "../utils/functions/date";
 import { getAutoJoinRoles, getPersistantRoles, setAutoJoinRoles, setPersistantRoles } from "../utils/functions/guilds/roles";
 import { addCooldown, inCooldown } from "../utils/functions/guilds/utils";
 import { getMember, getRole } from "../utils/functions/member";
@@ -234,11 +235,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           });
         }
 
+        const remaining = MStoTime((members.length - count) * 0.75 * 1000, true);
+
         return msg.edit({
           embeds: [
             new CustomEmbed(
               message.member,
-              `adding ${role.toString()} to ${members.length.toLocaleString()} members...\n\nprogress: ${count.toLocaleString()}/${members.length.toLocaleString()}`
+              `adding ${role.toString()} to ${members.length.toLocaleString()} members...\n\nprogress: ${count.toLocaleString()}/${members.length.toLocaleString()}\n\`${remaining}\` remaining`
             ),
           ],
         });
@@ -249,7 +252,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           fail = true;
         });
         count++;
-        await sleep(500);
+        await sleep(750);
       }
 
       done = true;
@@ -348,11 +351,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           });
         }
 
+        const remaining = MStoTime((members.length - count) * 0.75 * 1000, true);
+
         return msg.edit({
           embeds: [
             new CustomEmbed(
               message.member,
-              `removing ${role.toString()} from ${members.length.toLocaleString()} members...\n\nprogress: ${count.toLocaleString()}/${members.length.toLocaleString()}`
+              `removing ${role.toString()} from ${members.length.toLocaleString()} members...\n\nprogress: ${count.toLocaleString()}/${members.length.toLocaleString()}\n\`${remaining}\` remaining`
             ),
           ],
         });
@@ -363,7 +368,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           fail = true;
         });
         count++;
-        await sleep(500);
+        await sleep(750);
       }
 
       done = true;
