@@ -174,7 +174,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return;
     }
 
-    const members = await getMembers();
+    let members = await getMembers();
 
     if (!members || members.length == 0) {
       return send({ embeds: [new ErrorEmbed("/role add <member|all> (member - if in member mode) (role)")] });
@@ -194,6 +194,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return send({ embeds: [new ErrorEmbed("invalid role")] });
     }
 
+    members = members.filter((m) => !m.roles.cache.has(role.id));
+
+    if (!members || members.length === 0)
+      return send({ embeds: [new ErrorEmbed("there are no members to give this role to")] });
+
     let highest = 0;
 
     message.member.roles.cache.forEach((r) => {
@@ -203,7 +208,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (highest < role.position)
       return send({ embeds: [new ErrorEmbed(`you do not have permission to modify ${role.toString()}`)] });
 
-    if (members.length > 50) {
+    if (members.length > 10) {
       const msg = await send({
         embeds: [
           new CustomEmbed(message.member, `adding ${role.toString()} to ${members.length.toLocaleString()} members...`),
