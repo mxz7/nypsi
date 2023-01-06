@@ -385,8 +385,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     } else if (args[1].toLowerCase() === "add") {
       let max = 3;
 
-      for (let i = 0; i < (await getTier(message.author.id)); i++) {
+      const tier = await getTier(message.author.id);
+
+      for (let i = 0; i < tier; i++) {
         max *= 1.75;
+        if (i === 3) max *= 2;
       }
 
       max = Math.floor(max);
