@@ -249,7 +249,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           fail = true;
         });
         count++;
-        await sleep(750);
+        await sleep(500);
       }
 
       done = true;
@@ -363,7 +363,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           fail = true;
         });
         count++;
-        await sleep(750);
+        await sleep(500);
       }
 
       done = true;
