@@ -17,6 +17,7 @@ import { getAutoJoinRoles, getPersistantRoles, setAutoJoinRoles, setPersistantRo
 import { addCooldown, inCooldown } from "../utils/functions/guilds/utils";
 import { getMember, getRole } from "../utils/functions/member";
 import PageManager from "../utils/functions/page";
+import sleep from "../utils/functions/sleep";
 
 const cmd = new Command("role", "role utilities", Categories.UTILITY);
 
@@ -248,6 +249,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           fail = true;
         });
         count++;
+        await sleep(750);
       }
 
       done = true;
@@ -361,6 +363,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           fail = true;
         });
         count++;
+        await sleep(750);
       }
 
       done = true;
