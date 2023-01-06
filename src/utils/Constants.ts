@@ -71,6 +71,7 @@ export default {
       },
     },
     nypsi: {
+      MILF_QUEUE: "nypsi:milf:queue",
       CAPTCHA_VERIFIED: "nypsi:captcha_verified",
       DM_QUEUE: "nypsi:dmqueue",
       GUILD_LOG_QUEUE: "nypsi:guild:logs:queue",
