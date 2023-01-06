@@ -99,8 +99,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (items[i].role == "tool") continue;
     if (items[i].role == "car") continue;
     if (items[i].role == "booster") continue;
-    if (items[i].role == "crate" && !percentChance(5)) continue;
-    if (items[i].id.includes("gem") && !percentChance(0.01)) continue;
+    if (items[i].id == "crystal_heart") continue;
+    if (items[i].role == "crate" && !percentChance(20)) continue;
+    if (items[i].id.includes("gem") && !percentChance(0.77)) continue;
 
     if (
       [
