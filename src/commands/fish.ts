@@ -8,6 +8,7 @@ import { addInventoryItem, getInventory, setInventoryItem } from "../utils/funct
 import { addItemUse } from "../utils/functions/economy/stats";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import { getXp, updateXp } from "../utils/functions/economy/xp";
+import { percentChance } from "../utils/functions/random";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("fish", "go to a pond and fish", Categories.MONEY);
@@ -98,7 +99,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (items[i].role == "tool") continue;
     if (items[i].role == "car") continue;
     if (items[i].role == "booster") continue;
-    if (items[i].role == "crate") continue;
+    if (items[i].role == "crate" && !percentChance(5)) continue;
+    if (items[i].id.includes("gem") && !percentChance(0.01)) continue;
 
     if (
       [
@@ -114,8 +116,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         "ancient_debris",
         "netherite_scrap",
         "netherite_ingot",
-      ].includes(items[i].id) ||
-      items[i].id.includes("gem")
+      ].includes(items[i].id)
     )
       continue;
     fishItems.push(i);
