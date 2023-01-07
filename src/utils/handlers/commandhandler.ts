@@ -750,9 +750,9 @@ export async function runCommand(
   command.run(message, args);
   preProcessLength[1] = Date.now();
 
-  // if (preProcessLength[1] - preProcessLength[0] > 50) {
-  logger.debug(`command preprocess length: ${preProcessLength[1] - preProcessLength[0]}ms`);
-  // }
+  if (preProcessLength[1] - preProcessLength[0] > 30) {
+    logger.debug(`command preprocess length: ${preProcessLength[1] - preProcessLength[0]}ms`);
+  }
 
   setTimeout(async () => {
     const news = await getNews();
