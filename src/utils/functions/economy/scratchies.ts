@@ -20,11 +20,13 @@ export default class ScratchCard {
   public area: string[][];
   private member: GuildMember;
   public remainingClicks: number;
+  public won: boolean;
 
   constructor(member: GuildMember, item: Item, area?: string[][]) {
     this.item = item;
     this.member = member;
     this.remainingClicks = item.clicks;
+    this.won = false;
 
     this.area = area || this.createScratchArea(this.item) || [];
 
@@ -141,6 +143,7 @@ export default class ScratchCard {
     };
 
     const giveReward = async () => {
+      this.won = true;
       const clickedType = this.area[y][x].split(":")[0];
       const clickedItem = this.area[y][x].split(":")[1];
 
