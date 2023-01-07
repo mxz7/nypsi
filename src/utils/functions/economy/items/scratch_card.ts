@@ -130,6 +130,7 @@ async function prepare(
           return prepare(message, args, response);
         }
       }
+      return;
     }
 
     const response = await msg
