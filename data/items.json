@@ -1481,7 +1481,6 @@
     "role": "item",
     "shortDesc": "7 days of bronze credit",
     "longDesc": "use to receive 7 days of bronze (as long as you don't have a better tier currently)",
-    "aliases": ["bronze"],
     "rarity": 69,
     "in_crates": false
   },
@@ -1492,7 +1491,6 @@
     "role": "item",
     "shortDesc": "7 days of silver credit",
     "longDesc": "use to receive 7 days of silver (as long as you don't have a better tier currently)",
-    "aliases": ["silver"],
     "rarity": 69,
     "in_crates": false
   },
@@ -1503,7 +1501,6 @@
     "role": "item",
     "shortDesc": "7 days of gold credit",
     "longDesc": "use to receive 7 days of gold (as long as you don't have a better tier currently)",
-    "aliases": ["gold"],
     "rarity": 69,
     "in_crates": false
   },
@@ -1514,7 +1511,6 @@
     "role": "item",
     "shortDesc": "7 days of platinum credit",
     "longDesc": "use to receive 7 days of platinum (as long as you don't have a better tier currently)",
-    "aliases": ["platinum"],
     "rarity": 69,
     "in_crates": false
   },
