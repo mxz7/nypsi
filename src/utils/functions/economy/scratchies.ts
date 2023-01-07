@@ -1,4 +1,3 @@
-import { randomInt } from "crypto";
 import { Item } from "../../../types/Economy";
 import { percentChance, shuffle } from "../random";
 
@@ -32,12 +31,24 @@ export class ScratchCard {
     }
 
     for (let i = 0; i < 2; i++) {
-      const pos = randomInt(5);
-      const item = items[randomInt(items.length)];
+      const pos = Math.floor(Math.random() * 5);
+      const item = items[Math.floor(Math.random() * items.length)];
       arr[pos] = [item, item, item];
     }
 
     arr = shuffle(arr);
+
+    let nothingCount = 0;
+
+    arr.forEach((arr2) => arr2.forEach((i) => (i === "nothing" ? nothingCount++ : null)));
+
+    for (let i = 0; i < nothingCount - 5; i++) {
+      const index = [Math.floor(Math.random() * 5), Math.floor(Math.random() * 3)];
+
+      if (arr[index[0]][index[1]] === "nothing") {
+        arr[index[0]][index[1]] = item.items[Math.floor(Math.random() * item.items.length)].split(":").slice(0, 2).join(":");
+      }
+    }
 
     return arr;
   }
