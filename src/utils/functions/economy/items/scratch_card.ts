@@ -112,6 +112,7 @@ async function prepare(
           .catch(() => {
             fail = true;
             redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+            msg.edit({ components: card.getButtons(true) });
           });
 
         if (fail) return;
