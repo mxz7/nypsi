@@ -1485,6 +1485,39 @@
     "rarity": 69,
     "in_crates": false
   },
+  "silver_credit": {
+    "id": "silver_credit",
+    "name": "silver credit",
+    "emoji": "<:nypsi_silver:1061353458650845184>",
+    "role": "item",
+    "shortDesc": "7 days of silver credit",
+    "longDesc": "use to receive 7 days of silver (as long as you don't have a better tier currently)",
+    "aliases": ["silver"],
+    "rarity": 69,
+    "in_crates": false
+  },
+  "gold_credit": {
+    "id": "gold_credit",
+    "name": "gold credit",
+    "emoji": "<:nypsi_gold:1061353521825456229>",
+    "role": "item",
+    "shortDesc": "7 days of gold credit",
+    "longDesc": "use to receive 7 days of gold (as long as you don't have a better tier currently)",
+    "aliases": ["gold"],
+    "rarity": 69,
+    "in_crates": false
+  },
+  "platinum_credit": {
+    "id": "platinum_credit",
+    "name": "platinum credit",
+    "emoji": "<:nypsi_plat:1061353557644824596>",
+    "role": "item",
+    "shortDesc": "7 days of platinum credit",
+    "longDesc": "use to receive 7 days of platinum (as long as you don't have a better tier currently)",
+    "aliases": ["platinum"],
+    "rarity": 69,
+    "in_crates": false
+  },
   "daily_scratch_card": {
     "id": "daily_scratch_card",
     "name": "daily scratch card",
