@@ -155,6 +155,7 @@ export default class ScratchCard {
       this.won = true;
       const clickedType = this.area[y][x].split(":")[0];
       const clickedItem = this.area[y][x].split(":")[1];
+      if (clickedItem.includes("gem")) await addProgress(this.member.user.id, "gem_hunter", 1);
 
       const embed = new CustomEmbed(this.member)
         .setColor(Constants.EMBED_SUCCESS_COLOR)
