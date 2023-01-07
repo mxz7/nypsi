@@ -3,5 +3,5 @@
   "extends": ["config:base"],
   "labels": ["dependencies"],
   "dependencyDashboard": false,
-  "schedule": ["before 2am"]
+  "schedule": ["at any time"]
 }
