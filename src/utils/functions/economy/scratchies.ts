@@ -3,7 +3,7 @@ import { Item } from "../../../types/Economy";
 import { percentChance, shuffle } from "../random";
 import { getItems } from "./utils";
 
-export class ScratchCard {
+export default class ScratchCard {
   private item: Item;
   public area: string[][];
 
