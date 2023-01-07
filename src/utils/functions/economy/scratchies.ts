@@ -9,6 +9,7 @@ import {
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { Item } from "../../../types/Economy";
 import Constants from "../../Constants";
+import { addKarma } from "../karma/karma";
 import { percentChance, shuffle } from "../random";
 import { getBalance, updateBalance } from "./balance";
 import { addInventoryItem } from "./inventory";
@@ -53,6 +54,8 @@ export default class ScratchCard {
             button.setEmoji("✨");
           } else if (col.startsWith("money:")) {
             button.setEmoji("💰");
+          } else if (col.startsWith("karma:")) {
+            button.setEmoji("🔮");
           } else {
             button.setLabel("\u200B");
             button.setStyle(ButtonStyle.Danger);
@@ -67,6 +70,8 @@ export default class ScratchCard {
             button.setEmoji("✨");
           } else if (col.startsWith("money:")) {
             button.setEmoji("💰");
+          } else if (col.startsWith("karma:")) {
+            button.setEmoji("🔮");
           } else {
             button.setLabel("\u200B");
             button.setStyle(ButtonStyle.Danger);
@@ -82,6 +87,8 @@ export default class ScratchCard {
             button.setEmoji("✨");
           } else if (col.startsWith("money:")) {
             button.setEmoji("💰");
+          } else if (col.startsWith("karma:")) {
+            button.setEmoji("🔮");
           } else {
             button.setLabel("\u200B");
             if (col.endsWith(":x")) button.setStyle(ButtonStyle.Danger);
@@ -156,6 +163,9 @@ export default class ScratchCard {
       } else if (clickedType === "money") {
         await updateBalance(this.member, (await getBalance(this.member)) + parseInt(clickedItem));
         embed.setDescription(`you found $**${parseInt(clickedItem).toLocaleString()}**`);
+      } else if (clickedType === "karma") {
+        await addKarma(this.member, parseInt(clickedItem));
+        embed.setDescription(`you found **${parseInt(clickedItem).toLocaleString()} karma 🔮`);
       } else {
         let amount = 1;
         if (clickedItem.includes("gun") || clickedItem.includes("fishing_rod") || clickedItem.includes("pickaxe")) {
