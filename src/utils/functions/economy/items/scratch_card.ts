@@ -63,7 +63,7 @@ async function prepare(
   if (selected.role !== "scratch-card") return send({ embeds: [new ErrorEmbed("that is not a scratch card")] });
 
   await setInventoryItem(message.member, selected.id, inventory.find((i) => i.item == selected.id).amount - 1, false);
-  await addItemUse(message.member, "daily_scratch_card");
+  await addItemUse(message.member, selected.id);
 
   await redis.sadd(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
 
