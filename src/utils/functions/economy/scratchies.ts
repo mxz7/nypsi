@@ -58,6 +58,7 @@ export default class ScratchCard {
         } else if (col.endsWith(":x")) {
           button.setDisabled(true);
           button.setStyle(ButtonStyle.Secondary);
+          if (end) button.setStyle(ButtonStyle.Danger);
           if (col.startsWith("id:")) {
             button.setEmoji(items[col.split(":")[1]].emoji);
           } else if (col.startsWith("xp:")) {
