@@ -1,16 +1,70 @@
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder } from "discord.js";
 import { Item } from "../../../types/Economy";
 import { percentChance, shuffle } from "../random";
+import { getItems } from "./utils";
 
 export class ScratchCard {
   private item: Item;
   public area: string[][];
 
-  constructor(item: Item) {
+  constructor(item: Item, area?: string[][]) {
     this.item = item;
 
-    this.area = this.createScratchArea(this.item) || [];
+    this.area = area || this.createScratchArea(this.item) || [];
 
     return this;
+  }
+
+  public getButtons(end = false) {
+    const items = getItems();
+
+    const rows: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [];
+
+    const index = [0, 0];
+    for (const row of this.area) {
+      const buttonRow = new ActionRowBuilder<MessageActionRowComponentBuilder>();
+      for (const col of row) {
+        const button = new ButtonBuilder().setCustomId(index.join("-"));
+
+        if (col.endsWith(":x")) {
+          button.setStyle(ButtonStyle.Success);
+          if (col.startsWith("id:")) {
+            button.setEmoji(items[col.split(":")[1]].emoji);
+          } else if (col.startsWith("xp:")) {
+            button.setEmoji("✨");
+          } else if (col.startsWith("money:")) {
+            button.setEmoji("💰");
+          } else {
+            button.setLabel("\u200B");
+            button.setStyle(ButtonStyle.Danger);
+          }
+        } else if (end) {
+          button.setStyle(ButtonStyle.Secondary);
+          if (col.endsWith(":x")) button.setStyle(ButtonStyle.Success);
+          if (col.startsWith("id:")) {
+            button.setEmoji(items[col.split(":")[1]].emoji);
+          } else if (col.startsWith("xp:")) {
+            button.setEmoji("✨");
+          } else if (col.startsWith("money:")) {
+            button.setEmoji("💰");
+          } else {
+            button.setLabel("\u200B");
+            if (col.endsWith(":x")) button.setStyle(ButtonStyle.Danger);
+          }
+        } else {
+          button.setStyle(ButtonStyle.Secondary);
+          button.setLabel("\u200B");
+        }
+
+        buttonRow.addComponents(button);
+
+        index[1]++;
+      }
+      rows.push(buttonRow);
+      index[0]++;
+    }
+
+    return rows;
   }
 
   private createScratchArea(item: Item) {
