@@ -11,6 +11,7 @@ import { Item } from "../../../types/Economy";
 import Constants from "../../Constants";
 import { addKarma } from "../karma/karma";
 import { percentChance, shuffle } from "../random";
+import { addProgress } from "./achievements";
 import { getBalance, updateBalance } from "./balance";
 import { addInventoryItem } from "./inventory";
 import { getItems } from "./utils";
@@ -150,6 +151,7 @@ export default class ScratchCard {
     };
 
     const giveReward = async () => {
+      await addProgress(this.member.user.id, "scratchies_pro", 1);
       this.won = true;
       const clickedType = this.area[y][x].split(":")[0];
       const clickedItem = this.area[y][x].split(":")[1];

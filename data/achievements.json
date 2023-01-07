@@ -946,5 +946,40 @@
     "emoji": "🐲",
     "target": 500,
     "description": "complete the dragons tower 500 times on medium or higher"
+  },
+  "scratchies_pro_i": {
+    "id": "scratchies_pro_i",
+    "name": "scratchies professional **I**",
+    "emoji": "<:nypsi_daily_scratch:1061368847522869289>",
+    "target": 10,
+    "description": "win something from a scratch card 10 times"
+  },
+  "scratchies_pro_ii": {
+    "id": "scratchies_pro_ii",
+    "name": "scratchies professional **II**",
+    "emoji": "<:nypsi_daily_scratch:1061368847522869289>",
+    "target": 25,
+    "description": "win something from a scratch card 25 times"
+  },
+  "scratchies_pro_iii": {
+    "id": "scratchies_pro_iii",
+    "name": "scratchies professional **III**",
+    "emoji": "<:nypsi_daily_scratch:1061368847522869289>",
+    "target": 100,
+    "description": "win something from a scratch card 100 times"
+  },
+  "scratchies_pro_iv": {
+    "id": "scratchies_pro_iv",
+    "name": "scratchies professional **IV**",
+    "emoji": "<:nypsi_daily_scratch:1061368847522869289>",
+    "target": 250,
+    "description": "win something from a scratch card 250 times"
+  },
+  "scratchies_pro_v": {
+    "id": "scratchies_pro_v",
+    "name": "scratchies professional **V**",
+    "emoji": "<:nypsi_daily_scratch:1061368847522869289>",
+    "target": 1000,
+    "description": "win something from a scratch card 1,000 times"
   }
 }
