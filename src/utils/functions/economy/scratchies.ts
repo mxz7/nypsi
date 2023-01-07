@@ -162,7 +162,8 @@ export default class ScratchCard {
         embed.setDescription(`you found a ${getItems()[clickedItem].emoji} **${getItems()[clickedItem].name}**!`);
       }
 
-      return interaction.followUp({ embeds: [embed] });
+      interaction.followUp({ embeds: [embed] });
+      return;
     };
 
     if (checkHorizontal()) {
