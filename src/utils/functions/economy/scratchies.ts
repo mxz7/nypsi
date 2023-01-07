@@ -256,7 +256,7 @@ export default class ScratchCard {
 
     arr.forEach((arr2) => arr2.forEach((i) => (i === "nothing" ? nothingCount++ : null)));
 
-    for (let i = 0; i < nothingCount + 6; i++) {
+    for (let i = 0; i < nothingCount + 7; i++) {
       const index = [Math.floor(Math.random() * 5), Math.floor(Math.random() * 3)];
 
       if (arr[index[0]][index[1]] === "nothing") {
