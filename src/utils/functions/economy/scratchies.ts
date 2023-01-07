@@ -145,7 +145,7 @@ export default class ScratchCard {
 
       const embed = new CustomEmbed(this.member)
         .setColor(Constants.EMBED_SUCCESS_COLOR)
-        .setHeader(`${this.member.user.username}'s ${this.item.name}`);
+        .setHeader(`${this.member.user.username}'s ${this.item.name}`, this.member.user.avatarURL());
       if (clickedType === "xp") {
         await updateXp(this.member, (await getXp(this.member)) + parseInt(clickedItem));
         embed.setDescription(`you found **${parseInt(clickedItem).toLocaleString()}**xp!`);
