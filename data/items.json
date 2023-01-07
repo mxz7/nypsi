@@ -1489,7 +1489,7 @@
     "id": "daily_scratch_card",
     "name": "daily scratch card",
     "plural": "daily scratch cards",
-    "emoji": "📄",
+    "emoji": "🎴",
     "role": "scratch-card",
     "longDesc": "scratch card",
     "aliases": ["dailyscratch"],
@@ -1499,6 +1499,7 @@
     "items": [
       "money:75000",
       "xp:50",
+      "id:calendar",
       "id:stolen_credit_card",
       "id:streak_token:90",
       "id:grandma:60",
@@ -1506,9 +1507,10 @@
       "id:wooden_pickaxe:75",
       "id:fishing_rod:75",
       "id:gun:75",
-      "id:basic_crate:50",
-      "id:bronze_credit:5",
-      "id:green_gem:1"
+      "id:basic_crate:60",
+      "id:bronze_credit:10",
+      "id:green_gem:3",
+      "id:blue_gem:3"
     ]
   }
 }
