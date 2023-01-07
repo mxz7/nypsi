@@ -1496,6 +1496,17 @@
     "rarity": 69,
     "in_crates": false,
     "clicks": 4,
-    "items": ["money:50000", "xp:50", "id:basic_crate:50", "id:bronze_credit:2"]
+    "items": [
+      "money:75000",
+      "xp:50",
+      "id:grandma:60",
+      "id:iron_pickaxe:70",
+      "id:wooden_pickaxe:75",
+      "id:fishing_rod:75",
+      "id:gun:75",
+      "id:basic_crate:50",
+      "id:bronze_credit:5",
+      "id:green_gem:1"
+    ]
   }
 }
