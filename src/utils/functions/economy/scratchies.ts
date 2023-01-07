@@ -168,7 +168,7 @@ export default class ScratchCard {
         embed.setDescription(`you found $**${parseInt(clickedItem).toLocaleString()}**`);
       } else if (clickedType === "karma") {
         await addKarma(this.member, parseInt(clickedItem));
-        embed.setDescription(`you found **${parseInt(clickedItem).toLocaleString()} karma 🔮`);
+        embed.setDescription(`you found **${parseInt(clickedItem).toLocaleString()}** karma 🔮`);
       } else {
         let amount = 1;
         if (clickedItem.includes("gun") || clickedItem.includes("fishing_rod") || clickedItem.includes("pickaxe")) {
