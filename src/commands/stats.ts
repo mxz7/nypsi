@@ -20,7 +20,7 @@ import { Categories, Command, NypsiCommandInteraction } from "../models/Command"
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { MStoTime } from "../utils/functions/date";
-import { getGambleStats, getItemStats } from "../utils/functions/economy/stats";
+import { getGambleStats, getItemStats, getScratchCardStats } from "../utils/functions/economy/stats";
 import { getItems } from "../utils/functions/economy/utils";
 import PageManager from "../utils/functions/page";
 import { getCommandUses } from "../utils/functions/users/commands";
@@ -103,6 +103,55 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const embed = new CustomEmbed(message.member)
       .setFields(pages.get(1))
       .setHeader("gamble stats", message.author.avatarURL());
+
+    if (pages.size > 1) {
+      const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
+        new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
+      );
+      const msg = await send({ embeds: [embed], components: [row] });
+      const manager = new PageManager({
+        embed,
+        row,
+        message: msg,
+        userId: message.author.id,
+        pages,
+        updateEmbed(page, embed) {
+          return embed.setFields(page);
+        },
+      });
+
+      return manager.listen();
+    }
+
+    return send({ embeds: [embed] });
+  };
+
+  const scratchStats = async () => {
+    const scratchStats = await getScratchCardStats(message.member);
+
+    if (scratchStats.length == 0) {
+      return send({ embeds: [new ErrorEmbed("you have no scratch card stats")] });
+    }
+
+    const fields: { name: string; value: string; inline: boolean }[] = [];
+
+    for (const stat of scratchStats) {
+      fields.push({
+        name: getItems()[stat.game].name,
+        value: `${stat._sum.win.toLocaleString()}/${stat._count._all.toLocaleString()} (${(
+          (stat._sum.win / stat._count._all) *
+          100
+        ).toFixed(1)}%)`,
+        inline: true,
+      });
+    }
+
+    const pages = PageManager.createPages(fields, 6);
+
+    const embed = new CustomEmbed(message.member)
+      .setFields(pages.get(1))
+      .setHeader("scratch card stats", message.author.avatarURL());
 
     if (pages.size > 1) {
       const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -463,6 +512,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return dbStats();
   } else if (args[0].toLowerCase().includes("item")) {
     return itemStats();
+  } else if (args[0].toLowerCase().includes("scratch")) {
+    return scratchStats();
   } else {
     return gambleStats();
   }
