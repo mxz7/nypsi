@@ -218,6 +218,7 @@ export default class ScratchCard {
     let totalCount = 2;
 
     if (item.id.includes("daily") || item.buy) totalCount = 1;
+    if (item.id.includes("legendary")) totalCount = 3;
 
     let createVert = -1;
     const hCount = Math.floor(Math.random() * totalCount) + 1;
