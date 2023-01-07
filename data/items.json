@@ -1584,7 +1584,7 @@
     "id": "legendary_scratch_card",
     "name": "legendary scratch card",
     "plural": "legendary scratch cards",
-    "emoji": "<:nypsi_daily_scratch:1061368847522869289>",
+    "emoji": "<:nypsi_legendary_scratch:1061405285245272074>",
     "role": "scratch-card",
     "longDesc": "match 3 in a row to win!",
     "aliases": ["legendaryscratch", "lescratch"],
