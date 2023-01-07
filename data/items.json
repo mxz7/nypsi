@@ -1473,5 +1473,29 @@
     "in_crates": false,
     "crate_runs": 1,
     "items": ["id:white_gem", "id:blue_gem", "id:green_gem", "id:purple_gem", "id:pink_gem", "id:crystal_heart"]
+  },
+  "bronze_credit": {
+    "id": "bronze_credit",
+    "name": "bronze credit",
+    "emoji": "<:xbronze:820243846461128736>",
+    "role": "item",
+    "shortDesc": "7 days of bronze credit",
+    "longDesc": "use to receive 7 days of bronze (as long as you don't have a better tier currently)",
+    "aliases": ["bronze"],
+    "rarity": 69,
+    "in_crates": false
+  },
+  "daily_scratch_card": {
+    "id": "daily_scratch_card",
+    "name": "daily scratch card",
+    "plural": "daily scratch cards",
+    "emoji": "📄",
+    "role": "scratch-card",
+    "longDesc": "scratch card",
+    "aliases": ["dailyscratch"],
+    "rarity": 69,
+    "in_crates": false,
+    "clicks": 4,
+    "items": ["money:50000", "xp:50", "id:basic_crate:50", "id:bronze_credit:2"]
   }
 }
