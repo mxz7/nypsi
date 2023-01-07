@@ -13,6 +13,7 @@ import { NypsiCommandInteraction } from "../../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
 import Constants from "../../../Constants";
+import { logger } from "../../../logger";
 import { getInventory, selectItem, setInventoryItem } from "../inventory";
 import ScratchCard from "../scratchies";
 import { addItemUse, createGame } from "../stats";
@@ -122,6 +123,10 @@ async function prepare(
         if (!response || !response.isButton()) return;
 
         if (response.customId === "retry") {
+          logger.log({
+            level: "cmd",
+            message: `${message.guild.id} ${message.author.tag}: replaying ${selected.id}`,
+          });
           return prepare(message, args, response);
         }
       }
