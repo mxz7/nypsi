@@ -24,7 +24,7 @@ async function prepare(
 ): Promise<any> {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (interaction) {
-      return interaction.followUp(data);
+      return interaction.message.edit(data as BaseMessageOptions);
     }
     if (!(message instanceof Message)) {
       if (message.deferred) {
