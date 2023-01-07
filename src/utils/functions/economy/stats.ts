@@ -35,6 +35,32 @@ export async function getGambleStats(member: GuildMember) {
   return query;
 }
 
+export async function getScratchCardStats(member: GuildMember) {
+  let id: string;
+  if (member instanceof GuildMember) {
+    id = member.user.id;
+  } else {
+    id = member;
+  }
+
+  const query = await prisma.game.groupBy({
+    where: {
+      AND: [{ userId: id }, { game: { contains: "scratch_card" } }],
+    },
+    by: ["game"],
+    _count: {
+      _all: true,
+    },
+    _sum: {
+      win: true,
+    },
+  });
+
+  inPlaceSort(query).desc((i) => i._count._all);
+
+  return query;
+}
+
 export async function getItemStats(member: GuildMember) {
   const query = await prisma.itemUse.findMany({
     where: {
