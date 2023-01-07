@@ -1642,7 +1642,7 @@
     "emoji": "<:nypsi_daily_scratch:1061368847522869289>",
     "role": "scratch-card",
     "longDesc": "match 3 in a row to win",
-    "aliases": [],
+    "aliases": ["cscratch", "cscratchie", "cornershop"],
     "rarity": 69,
     "in_crates": false,
     "buy": 750000,
