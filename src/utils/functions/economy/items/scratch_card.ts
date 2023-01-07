@@ -91,6 +91,7 @@ async function prepare(
         win: false,
       });
 
+      embed.setDescription(`**${card.remainingClicks}** clicks left`);
       embed.setFooter({ text: `id: ${gameId}` });
 
       if (inventory.find((i) => i.item === selected.id) && inventory.find((i) => i.item === selected.id)?.amount > 0) {
@@ -142,9 +143,10 @@ async function prepare(
     if (!response || !response.isButton()) return;
 
     await card.clicked(response);
+
     if (card.remainingClicks !== 0) {
       embed.setDescription(`**${card.remainingClicks}** clicks left`);
-      await msg.edit({ components: card.getButtons() });
+      await msg.edit({ embeds: [embed], components: card.getButtons() });
     }
     return play();
   };
