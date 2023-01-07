@@ -1,4 +1,4 @@
-import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
+import { BaseMessageOptions, CommandInteraction, Interaction, InteractionReplyOptions, Message } from "discord.js";
 import redis from "../../../../init/redis";
 import { NypsiCommandInteraction } from "../../../../models/Command";
 import { ErrorEmbed } from "../../../../models/EmbedBuilders";
@@ -48,10 +48,36 @@ module.exports = new ItemUse(
 
     // await redis.sadd(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
 
-    const card = new ScratchCard(selected);
+    const card = new ScratchCard(message.member, selected);
 
     console.log(card.area);
 
     const msg = await send({ content: "area", components: card.getButtons() });
+
+    const play = async (): Promise<void> => {
+      const filter = (i: Interaction) => i.user.id == message.author.id;
+      let fail = false;
+
+      const response = await msg
+        .awaitMessageComponent({ filter, time: 90000 })
+        .then(async (collected) => {
+          await collected.deferUpdate();
+          return collected;
+        })
+        .catch(() => {
+          fail = true;
+          redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+          message.channel.send({ content: message.author.toString() + " scratch card expired" });
+        });
+
+      if (fail) return;
+
+      if (!response || !response.isButton()) return;
+
+      await card.clicked(response);
+      await msg.edit({ components: card.getButtons() });
+      return play();
+    };
+    return play();
   }
 );
