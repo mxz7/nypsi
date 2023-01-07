@@ -215,8 +215,12 @@ export default class ScratchCard {
       items.push(`${type}:${value}`);
     }
 
+    let totalCount = 2;
+
+    if (item.id.includes("daily") || item.buy) totalCount = 1;
+
     let createVert = -1;
-    const hCount = Math.floor(Math.random() * 2) + 1;
+    const hCount = Math.floor(Math.random() * totalCount) + 1;
 
     for (let i = 0; i < hCount; i++) {
       let pos = Math.floor(Math.random() * 5);
