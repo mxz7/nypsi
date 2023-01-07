@@ -15,7 +15,7 @@ import { ItemUse } from "../../../../models/ItemUse";
 import Constants from "../../../Constants";
 import { getInventory, selectItem, setInventoryItem } from "../inventory";
 import ScratchCard from "../scratchies";
-import { createGame } from "../stats";
+import { addItemUse, createGame } from "../stats";
 
 async function prepare(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
@@ -62,6 +62,7 @@ async function prepare(
   if (selected.role !== "scratch-card") return send({ embeds: [new ErrorEmbed("that is not a scratch card")] });
 
   await setInventoryItem(message.member, selected.id, inventory.find((i) => i.item == selected.id).amount - 1, false);
+  await addItemUse(message.member, "daily_scratch_card");
 
   await redis.sadd(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
 
