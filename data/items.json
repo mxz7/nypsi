@@ -1499,6 +1499,8 @@
     "items": [
       "money:75000",
       "xp:50",
+      "id:stolen_credit_card",
+      "id:streak_token:90",
       "id:grandma:60",
       "id:iron_pickaxe:70",
       "id:wooden_pickaxe:75",
