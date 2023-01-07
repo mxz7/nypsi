@@ -402,12 +402,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   } else if (args[0].toLowerCase() == "global" && message.author.id == Constants.TEKOH_ID) {
     const byTypeGamble = await prisma.game.groupBy({
       by: ["game"],
-      _count: {
+      _sum: {
         win: true,
+      },
+      _count: {
         _all: true,
       },
       orderBy: {
-        _count: {
+        _sum: {
           win: "desc",
         },
       },
@@ -430,10 +432,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const gambleMsg: string[] = [];
 
     for (const gamble of byTypeGamble) {
-      const percent = ((Number(gamble._count.win) / gamble._count._all) * 100).toFixed(2);
+      const percent = ((Number(gamble._sum.win) / gamble._count._all) * 100).toFixed(2);
 
       gambleMsg.push(
-        ` - **${gamble.game}** ${gamble._count.win.toLocaleString()} / ${gamble._count._all.toLocaleString()} (${percent}%)`
+        ` - **${gamble.game}** ${gamble._sum.win.toLocaleString()} / ${gamble._count._all.toLocaleString()} (${percent}%)`
       );
     }
 
