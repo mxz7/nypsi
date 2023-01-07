@@ -75,7 +75,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     ) as ActionRowBuilder<MessageActionRowComponentBuilder>[];
 
     components[components.length - 1].components.length = 4;
-  } else if (game.game.includes("scratch_card")) {
+  } else if (game.game.includes("scratch_card") || game.game.includes("scratchie")) {
     components = JSON.parse(game.outcome);
   } else {
     embed.addField("outcome", game.outcome, true);
