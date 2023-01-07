@@ -1489,7 +1489,7 @@
     "id": "daily_scratch_card",
     "name": "daily scratch card",
     "plural": "daily scratch cards",
-    "emoji": "🎴",
+    "emoji": "<:nypsi_daily_scratch:1061368847522869289>",
     "role": "scratch-card",
     "longDesc": "scratch card",
     "aliases": ["dailyscratch"],
