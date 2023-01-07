@@ -1524,6 +1524,7 @@
     "aliases": ["dailyscratch"],
     "rarity": 69,
     "in_crates": false,
+    "sell": 2500,
     "clicks": 4,
     "items": [
       "money:75000",
