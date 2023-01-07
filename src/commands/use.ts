@@ -285,6 +285,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     });
   } else if (selected.role == "crate") {
     return itemFunctions.get("crates").run(message, args);
+  } else if (selected.role == "scratch-card") {
+    return itemFunctions.get("scratch_card").run(message, args);
   } else if (selected.role === "bakery-upgrade") {
     await Promise.all([
       setInventoryItem(message.member, selected.id, inventory.find((i) => i.item == selected.id).amount - 1, false),

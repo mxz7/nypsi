@@ -30,6 +30,7 @@ export interface Item {
   account_locked?: boolean;
   items?: string[]; // used for crates with specific items format: <id|role>:(value)
   crate_runs?: number; // how many times to do crate thing
+  clicks?: number; // amount of clicks for scratch cards
 }
 
 export interface LotteryTicket {

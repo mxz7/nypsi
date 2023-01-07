@@ -572,6 +572,8 @@ export async function doDaily(member: GuildMember) {
 
   total += Math.floor(total * (await getMulti(member)));
 
+  if (total > 1_000_000) total = 1_000_000;
+
   let xp = 1;
   let crate = 0;
 
@@ -579,27 +581,37 @@ export async function doDaily(member: GuildMember) {
     xp = Math.floor((streak - 5) / 10);
   }
 
+  if (xp > 69) xp = 69;
+
+  const promises = [];
+
   if (streak > 0 && streak % 7 == 0) {
     crate++;
 
     crate += Math.floor(streak / 30);
 
-    await addInventoryItem(member, "basic_crate", crate);
+    promises.push(addInventoryItem(member, "basic_crate", crate));
   }
 
   if (streak == 69) {
-    await addInventoryItem(member, "69420_crate", 3);
+    promises.push(addInventoryItem(member, "69420_crate", 3));
   }
 
-  await updateBalance(member, (await getBalance(member)) + total);
-  await updateLastDaily(member);
+  promises.push(updateBalance(member, (await getBalance(member)) + total));
+  promises.push(updateLastDaily(member));
+  promises.push(addInventoryItem(member, "daily_scratch_card", 1));
+
+  await Promise.all(promises);
 
   const embed = new CustomEmbed(member);
   embed.setHeader("daily", member.user.avatarURL());
-  embed.setDescription(
-    `+$**${total.toLocaleString()}**${
-      crate ? `\n+ **${crate}** basic crate${crate > 1 ? "s" : ""}` : streak == 69 ? "\n+ **3** 69420 crates" : ""
-    }\ndaily streak: \`${streak}\``
+  embed.setDescription(`daily streak: \`${streak}\``);
+
+  embed.addField(
+    "rewards",
+    `+$**${total.toLocaleString()}**` +
+      `${crate ? `\n + **${crate}** basic crate${crate > 1 ? "s" : ""}` : streak == 69 ? "\n + **3** 69420 crates" : ""}\n` +
+      ` + 1 ${items["daily_scratch_card"].emoji} ${items["daily_scratch_card"].name}`
   );
 
   if (xp > 0) {
