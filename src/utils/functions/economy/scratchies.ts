@@ -112,7 +112,7 @@ export default class ScratchCard {
 
     const checkHorizontal = (xCheck = 0, horizontalMatches = 1): boolean => {
       if (horizontalMatches === 3) return true;
-      if (x === xCheck) return checkHorizontal(xCheck + 1);
+      if (x === xCheck) return checkHorizontal(xCheck + 1, horizontalMatches);
       if (!this.area[y][xCheck].endsWith(":x")) return false;
 
       if (this.area[y][x].split(":")[1] !== this.area[y][xCheck].split(":")[1]) return false;
