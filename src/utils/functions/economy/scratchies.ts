@@ -116,7 +116,7 @@ export default class ScratchCard {
     this.area[y][x] += ":x";
     this.remainingClicks--;
 
-    if (this.area[y][x].split(":")[1].includes("nothing")) return;
+    if (this.area[y][x].includes("nothing")) return;
 
     const checkHorizontal = (xCheck = 0, horizontalMatches = 1): boolean => {
       if (horizontalMatches === 3) return true;
