@@ -4,18 +4,10 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "test": "npx eslint . && npx prettier --check",
     "format": "prettier --write .",
-    "configure-husky": "npx husky install && npx husky add .husky/pre-commit \"npx --no-install lint-staged\"",
-    "prepare": "husky install",
     "clean": "rm -rf dist node_modules",
-    "build": "tsc --build",
+    "build": "tsc",
     "watch": "tsc --build --watch"
-  },
-  "lint-staged": {
-    "**/*.{ts,md,json}": [
-      "prettier --write ."
-    ]
   },
   "author": "tekoh",
   "license": "ISC",
@@ -40,7 +32,6 @@
     "express": "^4.18.2",
     "fast-sort": "^3.2.0",
     "figlet": "^1.5.2",
-    "husky": "^8.0.2",
     "imgur": "^2.2.0",
     "ioredis": "^5.2.4",
     "lodash": "^4.17.21",
@@ -70,7 +61,7 @@
     "@typescript-eslint/eslint-plugin": "^5.47.1",
     "@typescript-eslint/parser": "^5.47.1",
     "eslint": "^8.30.0",
-    "lint-staged": "^13.1.0",
+    "husky": "^8.0.3",
     "prettier": "2.8.2",
     "prisma": "^4.8.0",
     "typescript": "^4.9.4"
