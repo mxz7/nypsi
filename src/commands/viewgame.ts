@@ -81,7 +81,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     embed.addField("outcome", game.outcome, true);
   }
 
-  if (game.win) {
+  if (game.win && !(game.game.includes("scratchie") || game.game.includes("scratch_card"))) {
     embed.addField("rewards", `$${game.earned.toLocaleString()}\n${game.xpEarned}xp`, true);
   }
 
