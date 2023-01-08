@@ -1588,7 +1588,7 @@
     "role": "scratch-card",
     "longDesc": "match 3 in a row to win!",
     "aliases": ["legendaryscratch", "lescratch", "lescratchie"],
-    "rarity": 5,
+    "rarity": 4,
     "in_crates": true,
     "sell": 1000000,
     "clicks": 10,
