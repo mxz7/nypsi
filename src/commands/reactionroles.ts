@@ -569,7 +569,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           const role = await message.guild.roles
             .fetch(reactionRole.whitelist[0])
             .then((r) => r.toString())
-            .catch(() => {});
+            .catch(async () => {
+              reactionRole.whitelist.splice(reactionRole.whitelist.indexOf(roleId), 1);
+              await setReactionRoleWhitelist(message.guild.id, reactionRole.messageId, reactionRole.whitelist);
+              run(message, args);
+              return;
+            });
+
+          if (!role) return;
 
           roles.push(role || roleId);
         }
