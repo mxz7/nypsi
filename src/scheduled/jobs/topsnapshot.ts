@@ -1,3 +1,4 @@
+import dayjs = require("dayjs");
 import prisma from "../../init/database";
 
 async function doTopBalance() {
@@ -91,6 +92,7 @@ async function doMembers() {
             select: {
               money: true,
               netWorth: true,
+              Inventory: true,
             },
           },
         },
@@ -121,11 +123,29 @@ async function doMembers() {
         },
       });
     }
+    if (user.user?.Economy?.Inventory) {
+      await prisma.graphMetrics.createMany({
+        data: user.user.Economy.Inventory.map((i) => ({
+          category: `user-item-${i.item}`,
+          date: new Date(),
+          userId: i.userId,
+          value: i.amount,
+        })),
+      });
+    }
   }
 }
 
+async function clearOld() {
+  await prisma.graphMetrics.deleteMany({
+    where: {
+      AND: [{ category: { contains: "user" } }, { date: { lt: dayjs().subtract(90, "day").toDate() } }],
+    },
+  });
+}
+
 (async () => {
-  await Promise.all([doTopBalance(), doTopNetworth(), doCookies(), doMembers()]);
+  await Promise.all([doTopBalance(), doTopNetworth(), doCookies(), doMembers(), clearOld()]);
 
   process.exit(0);
 })();
