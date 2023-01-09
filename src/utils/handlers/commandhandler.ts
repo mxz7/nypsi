@@ -945,7 +945,7 @@ export function runCommandUseTimers(client: NypsiClient) {
           }) performed **${uses}** commands in an hour`
         );
 
-        if (uses > 600 && typeof id === "string") {
+        if (uses > 500 && typeof id === "string") {
           const lastCommand = await getLastCommand(id);
 
           if (dayjs().subtract(30, "seconds").unix() * 1000 > lastCommand.getTime()) continue; // dont lock if last command was more than 5 minutes ago
