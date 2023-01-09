@@ -91,6 +91,7 @@ async function doMembers() {
             select: {
               money: true,
               netWorth: true,
+              Inventory: true,
             },
           },
         },
@@ -119,6 +120,16 @@ async function doMembers() {
           userId: user.userId,
           value: user.user.Economy.netWorth,
         },
+      });
+    }
+    if (user.user?.Economy?.Inventory) {
+      await prisma.graphMetrics.createMany({
+        data: user.user.Economy.Inventory.map((i) => ({
+          category: `user-item-${i.item}`,
+          date: new Date(),
+          userId: i.userId,
+          value: i.amount,
+        })),
       });
     }
   }
