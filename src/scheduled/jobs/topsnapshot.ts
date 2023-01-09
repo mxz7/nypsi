@@ -1,3 +1,4 @@
+import dayjs = require("dayjs");
 import prisma from "../../init/database";
 
 async function doTopBalance() {
@@ -135,8 +136,16 @@ async function doMembers() {
   }
 }
 
+async function clearOld() {
+  await prisma.graphMetrics.deleteMany({
+    where: {
+      AND: [{ category: { contains: "user" } }, { date: { lt: dayjs().subtract(90, "day").toDate() } }],
+    },
+  });
+}
+
 (async () => {
-  await Promise.all([doTopBalance(), doTopNetworth(), doCookies(), doMembers()]);
+  await Promise.all([doTopBalance(), doTopNetworth(), doCookies(), doMembers(), clearOld()]);
 
   process.exit(0);
 })();
