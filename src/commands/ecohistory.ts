@@ -4,6 +4,7 @@ import { Categories, Command, NypsiCommandInteraction } from "../models/Command"
 import { ErrorEmbed } from "../models/EmbedBuilders";
 import { ChartData } from "../types/Chart";
 import Constants from "../utils/Constants";
+import { selectItem } from "../utils/functions/economy/inventory";
 import { isPremium } from "../utils/functions/premium/premium";
 import getJsonGraphData from "../utils/functions/workers/jsongraph";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -46,7 +47,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (args.length == 0) {
     return send({
       embeds: [
-        new ErrorEmbed("**$graph balance** graph your balance history\n**$graph networth** graph your networth history"),
+        new ErrorEmbed(
+          "**$graph balance** graph your balance history\n**$graph networth** graph your networth history\n**$graph item <item>** graph an item"
+        ),
       ],
     });
   }
@@ -74,10 +77,19 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     });
   }
 
-  await addCooldown(cmd.name, message.member, 120);
+  await addCooldown(cmd.name, message.member, 30);
 
   if (args[0].toLowerCase() == "balance") args[0] = "user-money";
   if (args[0].toLowerCase() == "networth") args[0] = "user-net";
+  if (args[0].toLowerCase() == "item") {
+    if (args.length === 1) {
+      return send({ embeds: [new ErrorEmbed("you must give an item to graph")] });
+    }
+    const item = selectItem(args.slice(1).join(" "));
+
+    if (!item) return send({ embeds: [new ErrorEmbed("invalid item")] });
+    args[0] == `user-item-${item.id}`;
+  }
 
   const formatDataForUser = (data: { date: Date; value: number | bigint; userId?: string }[]): ChartData => {
     if (data.length == 0) {
