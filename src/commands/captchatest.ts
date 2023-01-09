@@ -6,7 +6,7 @@ import { toggleLock } from "../utils/functions/captcha";
 const cmd = new Command("captchatest", "test an account", Categories.NONE);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-  if (message.author.id != Constants.TEKOH_ID) return;
+  if (!Constants.ADMIN_IDS.includes(message.author.id)) return;
 
   if (args.length == 0) {
     return message.channel.send({ content: "dumbass" });
