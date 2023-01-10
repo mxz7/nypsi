@@ -325,8 +325,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       return send({ embeds: [embed] });
     } else {
-      const commandTrigger = cleanString(message.options.getString("trigger").toLowerCase().normalize("NFD"));
-      const commandContent = cleanString(message.options.getString("value").toLowerCase().normalize("NFD"));
+      const commandTrigger = cleanString(message.options.getString("trigger").toLowerCase().normalize("NFD")).trim();
+      const commandContent = cleanString(message.options.getString("value").toLowerCase().normalize("NFD")).trim();
+
+      if (commandTrigger.length === 0 || commandContent.length === 0) {
+        return send({ embeds: [new ErrorEmbed("content or trigger cannot be empty")] });
+      }
 
       for (const word of commandFilter) {
         if (commandContent.includes(word) || commandTrigger.includes(word)) {
