@@ -23,7 +23,7 @@ if (!isMainThread) {
     const resultsFile = `temp/search_results_${Date.now()}.txt`;
 
     const execCmd = promisify(exec);
-    await execCmd(`grep -rh ${searchTerm} out/logs > ${resultsFile}`);
+    await execCmd(`grep -rh "${searchTerm}" out/logs > ${resultsFile}`);
 
     const buffer = await fs.readFile(resultsFile);
 
