@@ -26,6 +26,8 @@ import {
   bumpAuction,
   createAuction,
   deleteAuction,
+  findAuctions,
+  getAuctionAverage,
   getAuctions,
   getAuctionWatch,
   setAuctionWatch,
@@ -34,6 +36,7 @@ import { addInventoryItem, getInventory, selectItem, setInventoryItem } from "..
 import { getPrestige } from "../utils/functions/economy/prestige";
 import { formatBet, getItems, userExists } from "../utils/functions/economy/utils";
 import { getXp } from "../utils/functions/economy/xp";
+import PageManager from "../utils/functions/page";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import requestDM from "../utils/functions/requestdm";
 import { getDmSettings } from "../utils/functions/users/notifications";
@@ -56,6 +59,14 @@ cmd.slashData
       )
       .addStringOption((option) =>
         option.setName("cost").setDescription("amount you would like this item to sell for").setRequired(true)
+      )
+  )
+  .addSubcommand((search) =>
+    search
+      .setName("search")
+      .setDescription("search for an auction")
+      .addStringOption((option) =>
+        option.setName("item-global").setDescription("item to find auctions for").setAutocomplete(true).setRequired(true)
       )
   )
   .addSubcommand((watch) =>
@@ -775,6 +786,59 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     return send({ embeds: [embed] });
+  } else if (args[0].toLowerCase().includes("search") || args[0].toLowerCase().includes("find")) {
+    if (args.length === 1) return send({ embeds: [new ErrorEmbed("/auction search <item>")] });
+
+    const item = selectItem(args.slice(1).join(" "));
+
+    if (!item) return send({ embeds: [new ErrorEmbed("invalid item")] });
+
+    const auctions = await findAuctions(item.id);
+
+    if (auctions.length === 0) return send({ embeds: [new ErrorEmbed(`no auctions found for ${item.name}`)] });
+
+    const pages = PageManager.createPages(
+      auctions.map(
+        (a) =>
+          `**${a.itemAmount}x** ${items[a.itemId].emoji} ${items[a.itemId].name}\n` +
+          ` - $**${a.bin.toLocaleString()}**${
+            a.itemAmount > 1 ? ` ($${Math.floor(Number(a.bin) / a.itemAmount).toLocaleString()} each)` : ""
+          }\n` +
+          `- by ${a.owner.user.lastKnownTag}\n` +
+          ` - [jump to auction](https://discord.com/channels/747056029795221513/1008467335973179482/${a.messageId})`
+      ),
+      3
+    );
+
+    const avg = await getAuctionAverage(item.id);
+
+    const embed = new CustomEmbed(message.member, pages.get(1).join("\n")).setHeader(
+      `current auctions for ${item.name}`,
+      message.author.avatarURL()
+    );
+
+    if (avg) embed.setFooter({ text: `average price per item: $${avg.toLocaleString()}` });
+
+    if (pages.size === 1) {
+      return send({ embeds: [embed] });
+    }
+
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
+      new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
+    );
+
+    const msg = await send({ embeds: [embed], components: [row] });
+
+    const manager = new PageManager({
+      embed,
+      message: msg,
+      row,
+      userId: message.author.id,
+      pages,
+    });
+
+    return manager.listen();
   }
 }
 
