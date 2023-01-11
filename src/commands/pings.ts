@@ -75,7 +75,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (!qualified) {
     const embed = new ErrorEmbed(
-      `this server does not qualify to track mentions (${prefix}pings)\nhttps://docs.nypsi.xyz/#my-server-does-not-qualify-for-the-pings-command\njoin the support server for help (${prefix}support)`
+      `this server does not qualify to track mentions (/pings)\n[more information](https://docs.nypsi.xyz/#my-server-does-not-qualify-for-the-pings-command)\njoin the support server for help (${prefix}support)`
     );
 
     return send({ embeds: [embed] });
