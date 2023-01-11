@@ -123,7 +123,7 @@ async function doMembers() {
         },
       });
     }
-    if (user.user?.Economy?.Inventory) {
+    if (user.user?.Economy?.Inventory.length > 0) {
       await prisma.graphMetrics.createMany({
         data: user.user.Economy.Inventory.map((i) => ({
           category: `user-item-${i.item}`,
