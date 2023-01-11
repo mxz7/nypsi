@@ -409,13 +409,11 @@ export async function findAuctions(itemId: string) {
     where: {
       AND: [{ sold: false }, { itemId: itemId }],
     },
-    orderBy: {
-      bin: "asc",
-    },
+    orderBy: [{ bin: "asc" }, { createdAt: "asc" }],
     take: 50,
   });
 
-  inPlaceSort(query).asc((i) => Number(i.bin) / i.itemAmount);
+  inPlaceSort(query).asc([(i) => Number(i.bin) / i.itemAmount, (i) => i.createdAt.getTime()]);
 
   return query;
 }
