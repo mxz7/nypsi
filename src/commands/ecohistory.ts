@@ -81,14 +81,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (["balance", "bal"].includes(args[0].toLowerCase())) args[0] = "user-money";
   if (["networth", "net"].includes(args[0].toLowerCase())) args[0] = "user-net";
-  if (args[0].toLowerCase() == "item") {
+  if (args[0].toLowerCase() === "item") {
     if (args.length === 1) {
       return send({ embeds: [new ErrorEmbed("you must give an item to graph")] });
     }
     const item = selectItem(args.slice(1).join(" "));
 
     if (!item) return send({ embeds: [new ErrorEmbed("invalid item")] });
-    args[0] == `user-item-${item.id}`;
+    args[0] = `user-item-${item.id}`;
   }
 
   const formatDataForUser = (data: { date: Date; value: number | bigint; userId?: string }[]): ChartData => {
