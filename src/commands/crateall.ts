@@ -44,7 +44,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return message.channel.send({ embeds: [new ErrorEmbed(`couldnt find \`${args[0]}\``)] });
   }
 
-  if (selected.role != "crate") {
+  if (!["crate", "scratch-card"].includes(selected.role)) {
     return message.channel.send({ embeds: [new ErrorEmbed(`${selected.name} is not a crate`)] });
   }
 
