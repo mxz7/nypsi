@@ -611,9 +611,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     return;
   } else if (args[0].toLowerCase() == "create") {
-    if (message instanceof Message) {
-      return send({ embeds: [new ErrorEmbed("please use /auction create to create auctions in a command")] });
-    }
+    // if (message instanceof Message) {
+    //   return send({ embeds: [new ErrorEmbed("please use /auction create to create auctions in a command")] });
+    // }
 
     let maxAuctions = 1;
 
@@ -657,14 +657,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return send({ embeds: [new ErrorEmbed("invalid amount")] });
     }
 
-    if (inventory.find((i) => i.item == selected.id).amount < amount) {
+    if (!inventory.find((i) => i.item === selected.id) || inventory.find((i) => i.item == selected.id).amount < amount) {
       return send({ embeds: [new ErrorEmbed(`you dont have this many ${selected.name}`)] });
     }
 
     const cost = await formatBet(args[3].toLowerCase(), message.member).catch(() => {});
 
     if (!cost) {
-      return message.channel.send({ embeds: [new ErrorEmbed("invalid amount")] });
+      return send({ embeds: [new ErrorEmbed("invalid amount")] });
     }
 
     if (cost <= 0) {
