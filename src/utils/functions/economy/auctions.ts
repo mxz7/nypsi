@@ -402,3 +402,15 @@ export async function countItemOnAuction(itemId: string) {
 
   return amount?._sum?.itemAmount || 0;
 }
+
+export async function findAuctions(itemId: string) {
+  return await prisma.auction.findMany({
+    where: {
+      AND: [{ sold: false }, { itemId: itemId }],
+    },
+    orderBy: {
+      bin: "desc",
+    },
+    take: 50,
+  });
+}
