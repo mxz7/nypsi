@@ -79,8 +79,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   await addCooldown(cmd.name, message.member, 30);
 
-  if (args[0].toLowerCase() == "balance") args[0] = "user-money";
-  if (args[0].toLowerCase() == "networth") args[0] = "user-net";
+  if (["balance", "bal"].includes(args[0].toLowerCase())) args[0] = "user-money";
+  if (["networth", "net"].includes(args[0].toLowerCase())) args[0] = "user-net";
   if (args[0].toLowerCase() == "item") {
     if (args.length === 1) {
       return send({ embeds: [new ErrorEmbed("you must give an item to graph")] });
