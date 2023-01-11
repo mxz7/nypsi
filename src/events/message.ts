@@ -351,7 +351,7 @@ async function addMention() {
   if (typeof mention != "string" && mention.type == "collection") {
     const members = mention.members;
 
-    if (members.size > 1000) {
+    if (members.size > 500) {
       if (workerCount >= 4) {
         mentionQueue.push(mention);
         return;
