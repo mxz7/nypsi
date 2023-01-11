@@ -1,4 +1,5 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, GuildMember, MessageActionRowComponentBuilder } from "discord.js";
+import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
@@ -404,7 +405,7 @@ export async function countItemOnAuction(itemId: string) {
 }
 
 export async function findAuctions(itemId: string) {
-  return await prisma.auction.findMany({
+  const query = await prisma.auction.findMany({
     where: {
       AND: [{ sold: false }, { itemId: itemId }],
     },
@@ -413,4 +414,8 @@ export async function findAuctions(itemId: string) {
     },
     take: 50,
   });
+
+  inPlaceSort(query).asc((i) => Number(i.bin) / i.itemAmount);
+
+  return query;
 }
