@@ -408,17 +408,6 @@ export async function findAuctions(itemId: string) {
     where: {
       AND: [{ sold: false }, { itemId: itemId }],
     },
-    include: {
-      owner: {
-        select: {
-          user: {
-            select: {
-              lastKnownTag: true,
-            },
-          },
-        },
-      },
-    },
     orderBy: {
       bin: "asc",
     },

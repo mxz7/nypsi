@@ -804,8 +804,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           ` - $**${a.bin.toLocaleString()}**${
             a.itemAmount > 1 ? ` ($${Math.floor(Number(a.bin) / a.itemAmount).toLocaleString()} each)` : ""
           }\n` +
-          `- by ${a.owner.user.lastKnownTag}\n` +
-          ` - [jump to auction](https://discord.com/channels/747056029795221513/1008467335973179482/${a.messageId})\n `
+          ` - [jump](https://discord.com/channels/747056029795221513/1008467335973179482/${a.messageId})\n `
       ),
       3
     );
