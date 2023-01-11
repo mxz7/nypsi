@@ -27,7 +27,6 @@ import {
   createAuction,
   deleteAuction,
   findAuctions,
-  getAuctionAverage,
   getAuctions,
   getAuctionWatch,
   setAuctionWatch,
@@ -809,14 +808,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       3
     );
 
-    const avg = await getAuctionAverage(item.id);
-
     const embed = new CustomEmbed(message.member, pages.get(1).join("\n")).setHeader(
       `current auctions for ${item.name}`,
       message.author.avatarURL()
     );
-
-    if (avg) embed.setFooter({ text: `average price per item: $${avg.toLocaleString()}` });
 
     if (pages.size === 1) {
       return send({ embeds: [embed] });
