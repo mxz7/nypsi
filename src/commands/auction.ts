@@ -760,9 +760,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       current = await setAuctionWatch(message.member, current);
     } else {
-      let max = 3;
+      let max = 5;
 
-      if (await isPremium(message.member)) max += await getTier(message.member);
+      if (await isPremium(message.member)) max *= await getTier(message.member);
 
       if (current.length >= max) {
         let desc = `you have reached the limit of auction watches (**${max}**)`;
