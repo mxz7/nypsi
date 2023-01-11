@@ -1179,7 +1179,7 @@
     "id": "coffee",
     "name": "coffee",
     "aliases": ["caffeine"],
-    "emoji": "☕️",
+    "emoji": "\u2615",
     "longDesc": "feed your workers with coffee and produce 50% more items per hour for 6 hours (stacks to 3)",
     "rarity": 2,
     "sell": 100000,
