@@ -420,7 +420,7 @@ export async function findAuctions(itemId: string) {
       },
     },
     orderBy: {
-      bin: "desc",
+      bin: "asc",
     },
     take: 50,
   });
