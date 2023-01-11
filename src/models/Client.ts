@@ -37,7 +37,7 @@ import { runCountdowns } from "../utils/functions/guilds/countdowns";
 import { runSnipeClearIntervals } from "../utils/functions/guilds/utils";
 import { runUploadReset } from "../utils/functions/image";
 import { startAutoMuteViolationInterval } from "../utils/functions/moderation/mute";
-import { getCustomPresence } from "../utils/functions/presence";
+import { getCustomPresence, setCustomPresence } from "../utils/functions/presence";
 import { getVersion } from "../utils/functions/version";
 import { runCommandUseTimers } from "../utils/handlers/commandhandler";
 import { updateCache } from "../utils/handlers/imghandler";
@@ -118,6 +118,7 @@ export class NypsiClient extends Client {
         const presence = await getCustomPresence();
 
         if (presence) {
+          if (presence.includes("rebooting")) return setCustomPresence();
           if (presence.split(" ")[0].startsWith("https://www.youtube.com")) {
             this.cluster.broadcastEval(
               (c, { presence }) => {
