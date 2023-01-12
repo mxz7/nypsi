@@ -1670,8 +1670,8 @@
       "id:gun:45",
       "id:mineshaft_chest:15",
       "id:basic_crate:15",
-      "id:workers_crate:10",
-      "id:boosters_crate:10",
+      "id:workers_crate:6",
+      "id:boosters_crate:6",
       "id:bronze_credit:0.2",
       "id:purple_gem:0.1"
     ]
