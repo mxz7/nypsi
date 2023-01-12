@@ -53,6 +53,7 @@ export default {
         EXISTS: "cache:chatreaction:exists",
       },
       economy: {
+        PADLOCK: "cache:economy:padlock",
         AUCTION_AVG: "cache:economy:auctionavg",
         BALANCE: "cache:economy:balance",
         BANNED: "cache:economy:banned",
