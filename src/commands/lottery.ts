@@ -7,7 +7,6 @@ import { getBalance, updateBalance } from "../utils/functions/economy/balance";
 import { addTicket, createUser, getTickets, lotteryTicketPrice, userExists } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import pAll = require("p-all");
 
 const cmd = new Command("lottery", "enter the weekly lottery draw", Categories.MONEY).setAliases(["lotto"]);
 
@@ -114,15 +113,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await updateBalance(message.member, (await getBalance(message.member)) - lotteryTicketPrice * amount);
 
-    const functions = [];
-
-    for (let i = 0; i < amount; i++) {
-      functions.push(async () => {
-        await addTicket(message.member);
-      });
-    }
-
-    await pAll(functions, { concurrency: 5 });
+    await addTicket(message.member, amount);
 
     const embed = new CustomEmbed(
       message.member,
