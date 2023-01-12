@@ -303,7 +303,7 @@ export async function getAuctionAverage(item: string) {
   const avg = Math.floor(sum / costs.length) || 0;
 
   await redis.set(`${Constants.redis.cache.economy.AUCTION_AVG}:${item}`, avg);
-  await redis.expire(`${Constants.redis.cache.economy.AUCTION_AVG}:${item}`, ms("1 hour") / 1000);
+  await redis.expire(`${Constants.redis.cache.economy.AUCTION_AVG}:${item}`, ms("3 hour") / 1000);
 
   return avg;
 }
