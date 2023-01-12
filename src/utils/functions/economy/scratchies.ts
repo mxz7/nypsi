@@ -216,17 +216,24 @@ export default class ScratchCard {
     }
 
     let totalCount = 2;
-
-    if (item.id.includes("daily") || item.buy) totalCount = 1;
-    if (item.id.includes("legendary")) totalCount = 3;
-
     let createVert = -1;
+
+    if (item.buy) {
+      totalCount = 1;
+
+      if (percentChance(50)) {
+        totalCount = 0;
+        createVert = Math.floor(Math.random() * 4);
+      }
+    }
+
+    if (item.id.includes("legendary")) totalCount = 3;
     const hCount = Math.floor(Math.random() * totalCount) + 1;
 
     for (let i = 0; i < hCount; i++) {
       let pos = Math.floor(Math.random() * 5);
 
-      while (hCount === 1 && pos === 2) {
+      while (hCount === 1 && pos === 2 && createVert != -1) {
         pos = Math.floor(Math.random() * 5);
       }
 
@@ -235,7 +242,7 @@ export default class ScratchCard {
       arr[pos] = [item, item, item];
     }
 
-    if (createVert !== -1) {
+    if (createVert !== -1 && totalCount !== 1) {
       const item = items[Math.floor(Math.random() * items.length)];
       const x = Math.floor(Math.random() * 3);
 
