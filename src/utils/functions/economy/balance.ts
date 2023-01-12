@@ -482,7 +482,7 @@ export async function calcNetWorth(member: GuildMember | string) {
   }
 
   await redis.set(`${Constants.redis.cache.economy.NETWORTH}:${id}`, Math.floor(worth));
-  await redis.expire(`${Constants.redis.cache.economy.NETWORTH}:${id}`, ms("30 minutes") / 1000);
+  await redis.expire(`${Constants.redis.cache.economy.NETWORTH}:${id}`, ms("2 hour") / 1000);
 
   await prisma.economy.update({
     where: {
