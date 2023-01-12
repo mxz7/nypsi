@@ -114,20 +114,29 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({ embeds: [embed] });
   }
 
-  let footer = `xp: ${(await getXp(target)).toLocaleString()}`;
+  const [balance, xp, prestige, inventory, net, bankBalance, bankMaxBalance, padlock] = await Promise.all([
+    getBalance(target),
+    getXp(target),
+    getPrestige(target),
+    getInventory(target),
+    calcNetWorth(target),
+    getBankBalance(target),
+    getMaxBankBalance(target),
+    hasPadlock(target),
+  ]);
 
-  if ((await getPrestige(target)) > 0) {
-    footer += ` | prestige: ${await getPrestige(target)}`;
+  let footer = `xp: ${xp.toLocaleString()}`;
+
+  if (prestige > 0) {
+    footer += ` | prestige: ${prestige}`;
   }
 
   let padlockStatus = false;
 
-  if (target.user.id == message.author.id && (await hasPadlock(message.member))) {
+  if (target.user.id == message.author.id && padlock) {
     padlockStatus = true;
   }
 
-  const inventory = await getInventory(target);
-  const net = await calcNetWorth(target);
   let gemLine = "";
 
   const gems: string[] = [];
@@ -152,21 +161,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const embed = new CustomEmbed(message.member)
     .setDescription(
-      `${padlockStatus ? "🔒" : "💰"} $**${(await getBalance(target)).toLocaleString()}**\n` +
-        `💳 $**${(await getBankBalance(target)).toLocaleString()}** / $**${(
-          await getMaxBankBalance(target)
-        ).toLocaleString()}**${net > 15_000_000 ? `\n${gemLine}\n🌍 $**${net.toLocaleString()}**` : ""}`
+      `${padlockStatus ? "🔒" : "💰"} $**${balance.toLocaleString()}**\n` +
+        `💳 $**${bankBalance.toLocaleString()}** / $**${bankMaxBalance.toLocaleString()}**${
+          net > 15_000_000 ? `\n${gemLine}\n🌍 $**${net.toLocaleString()}**` : ""
+        }`
     )
     .setFooter({ text: footer });
 
   embed.setHeader(`${target.user.username} | season 5`, target.user.avatarURL());
 
   if (message.member == target) {
-    if (
-      (await getXp(target)) >= (await getPrestigeRequirement(target)) &&
-      (await getBankBalance(target)) >= getPrestigeRequirementBal(await getXp(target)) &&
-      (await getPrestige(target)) < 20
-    ) {
+    if (xp >= (await getPrestigeRequirement(target)) && bankBalance >= getPrestigeRequirementBal(xp)) {
       return send({
         content: `you are eligible to prestige, use ${await getPrefix(message.guild)}prestige for more info`,
         embeds: [embed],
