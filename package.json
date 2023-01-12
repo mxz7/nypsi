@@ -33,7 +33,7 @@
     "lodash": "4.17.21",
     "mc-names": "1.2.6",
     "ms": "2.1.3",
-    "node-os-utils": "1.3.6",
+    "node-os-utils": "1.3.7",
     "p-all": "3.0.0",
     "string-similarity": "4.0.4",
     "table": "6.8",
