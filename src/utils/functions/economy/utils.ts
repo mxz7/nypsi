@@ -611,7 +611,7 @@ export async function doDaily(member: GuildMember) {
     "rewards",
     `+$**${total.toLocaleString()}**` +
       `${crate ? `\n + **${crate}** basic crate${crate > 1 ? "s" : ""}` : streak == 69 ? "\n + **3** 69420 crates" : ""}\n` +
-      ` + ${items["daily_scratch_card"].emoji} ${items["daily_scratch_card"].name}`
+      `+ ${items["daily_scratch_card"].emoji} ${items["daily_scratch_card"].name}`
   );
 
   if (xp > 0) {
