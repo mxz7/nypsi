@@ -38,7 +38,7 @@ specifiers:
   lodash: 4.17.21
   mc-names: 1.2.6
   ms: 2.1.3
-  node-os-utils: 1.3.6
+  node-os-utils: 1.3.7
   p-all: 3.0.0
   prettier: 2.8.2
   prisma: 4.8.0
@@ -72,7 +72,7 @@ dependencies:
   lodash: 4.17.21
   mc-names: 1.2.6
   ms: 2.1.3
-  node-os-utils: 1.3.6
+  node-os-utils: 1.3.7
   p-all: 3.0.0
   string-similarity: 4.0.4
   table: 6.8.1
@@ -2656,8 +2656,8 @@ packages:
     hasBin: true
     dev: false
 
-  /node-os-utils/1.3.6:
-    resolution: {integrity: sha512-WympE9ELtdOzNak/rAuuIV5DwvX/PTJtN0LjyWeGyTTR2Kt0sY56ldLoGbVBnfM1dz46VeO3sHcNZI5BZ+EB+w==}
+  /node-os-utils/1.3.7:
+    resolution: {integrity: sha512-fvnX9tZbR7WfCG5BAy3yO/nCLyjVWD6MghEq0z5FDfN+ZXpLWNITBdbifxQkQ25ebr16G0N7eRWJisOcMEHG3Q==}
     dev: false
 
   /nopt/5.0.0:
