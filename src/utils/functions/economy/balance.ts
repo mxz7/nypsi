@@ -278,6 +278,12 @@ export async function bottomAmount(guild: Guild, amount: number): Promise<string
 }
 
 export async function hasPadlock(member: GuildMember): Promise<boolean> {
+  const cache = await redis.get(`${Constants.redis.cache.economy.PADLOCK}:${member.user.id}`);
+
+  if (cache) {
+    return cache === "y";
+  }
+
   const query = await prisma.economy.findUnique({
     where: {
       userId: member.user.id,
@@ -286,6 +292,9 @@ export async function hasPadlock(member: GuildMember): Promise<boolean> {
       padlock: true,
     },
   });
+
+  await redis.set(`${Constants.redis.cache.economy.PADLOCK}:${member.user.id}`, query.padlock ? "y" : "n");
+  await redis.expire(`${Constants.redis.cache.economy.PADLOCK}:${member.user.id}`, Math.floor(ms("6 hours") / 1000));
 
   return query.padlock;
 }
@@ -299,6 +308,8 @@ export async function setPadlock(member: GuildMember, setting: boolean) {
       padlock: setting,
     },
   });
+
+  await redis.del(`${Constants.redis.cache.economy.PADLOCK}:${member.user.id}`);
 }
 
 export async function getDefaultBet(member: GuildMember): Promise<number> {
