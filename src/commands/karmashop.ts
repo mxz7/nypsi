@@ -388,7 +388,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     addProgress(message.author.id, "wizard", 1);
 
-    if (percentChance(0.25) && (await getDmSettings(message.member)).other) {
+    if (percentChance(0.1) && (await getDmSettings(message.member)).other) {
       await addInventoryItem(message.member, "purple_gem", 1);
       addProgress(message.author.id, "gem_hunter", 1);
       await addNotificationToQueue({
