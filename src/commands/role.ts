@@ -240,7 +240,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           });
         }
 
-        const remaining = MStoTime((members.length - count) * 0.75 * 1000, true);
+        const remaining = MStoTime((members.length - count) * 1.25 * 1000, true);
 
         return msg.edit({
           embeds: [
@@ -257,7 +257,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           fail = true;
         });
         count++;
-        await sleep(750);
+        await sleep(1000);
       }
 
       done = true;
@@ -373,7 +373,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           fail = true;
         });
         count++;
-        await sleep(750);
+        await sleep(1000);
       }
 
       done = true;
