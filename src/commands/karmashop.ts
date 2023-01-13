@@ -360,6 +360,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       case "nypsi_crate":
         await addInventoryItem(message.member, "nypsi_crate", 1);
         break;
+      case "legendary_scratch_card":
+        await addInventoryItem(message.member, "legendary_scratch_card", 1);
+        break;
+      case "karma_scratch_card":
+        await addInventoryItem(message.member, "karma_scratch_card", 1);
+        break;
     }
 
     if (selected.id == "bronze" || selected.id == "silver" || selected.id == "gold") {
