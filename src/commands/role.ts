@@ -22,6 +22,8 @@ import sleep from "../utils/functions/sleep";
 
 const cmd = new Command("role", "role utilities", Categories.UTILITY);
 
+const massOperations = new Set<string>();
+
 cmd.slashEnabled = true;
 cmd.slashData
   .addSubcommand((members) =>
@@ -174,6 +176,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return;
     }
 
+    if (massOperations.has(message.guild.id))
+      return send({ embeds: [new ErrorEmbed("please wait until the current mass operation has finished")] });
+
     let members = await getMembers();
 
     if (!members || members.length == 0) {
@@ -219,8 +224,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       let done = false;
       let fail = false;
 
+      massOperations.add(message.guild.id);
+
       const i = setInterval(async () => {
         if (fail) {
+          massOperations.delete(message.guild.id);
           clearInterval(i);
 
           return msg.edit({
@@ -233,6 +241,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         if (done) {
+          massOperations.delete(message.guild.id);
           clearInterval(i);
 
           return msg.edit({
@@ -272,6 +281,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (fail) {
+      massOperations.delete(message.guild.id);
       return send({
         embeds: [
           new ErrorEmbed(
@@ -288,6 +298,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (!message.member.permissions.has(PermissionFlagsBits.ManageRoles)) {
       return;
     }
+
+    if (massOperations.has(message.guild.id))
+      return send({ embeds: [new ErrorEmbed("please wait until the current mass operation has finished")] });
 
     let members = await getMembers();
 
@@ -331,12 +344,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         ],
       });
 
+      massOperations.add(message.guild.id);
+
       let count = 0;
       let done = false;
       let fail = false;
 
       const i = setInterval(async () => {
         if (fail) {
+          massOperations.delete(message.guild.id);
           clearInterval(i);
 
           return msg.edit({
@@ -349,6 +365,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         if (done) {
+          massOperations.delete(message.guild.id);
           clearInterval(i);
 
           return msg.edit({
@@ -388,6 +405,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (fail) {
+      massOperations.delete(message.guild.id);
       return send({
         embeds: [
           new ErrorEmbed(
