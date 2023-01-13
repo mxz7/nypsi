@@ -159,7 +159,7 @@ export async function getBoosters(member: GuildMember | string): Promise<Map<str
   return map;
 }
 
-export async function addBooster(member: GuildMember | string, boosterId: string) {
+export async function addBooster(member: GuildMember | string, boosterId: string, amount = 1) {
   let id: string;
   if (member instanceof GuildMember) {
     id = member.user.id;
@@ -169,12 +169,12 @@ export async function addBooster(member: GuildMember | string, boosterId: string
 
   const items = getItems();
 
-  await prisma.booster.create({
-    data: {
+  await prisma.booster.createMany({
+    data: new Array(amount).fill({
       boosterId: boosterId,
       expire: new Date(Date.now() + items[boosterId].boosterEffect.time * 1000),
       userId: id,
-    },
+    }),
   });
 
   await redis.del(`${Constants.redis.cache.economy.BOOSTERS}:${id}`);
