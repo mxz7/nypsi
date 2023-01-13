@@ -59,7 +59,9 @@ import { addNotificationToQueue } from "../../utils/functions/users/notification
       karmaToRemove += 69420;
     }
 
-    if (user.karma > 1000) {
+    if (user.karma > 1000) karmaToRemove += 7;
+
+    if (user.karma > 1500) {
       karmaToRemove += user.karma * 0.05;
     }
 
