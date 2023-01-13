@@ -159,12 +159,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (!inventory.find((i) => i.item === selected.id) || inventory.find((i) => i.item == selected.id)?.amount < amount)
       return send({ embeds: [new ErrorEmbed(`you don't have ${amount}x ${selected.name}`)] });
 
-    for (let i = 0; i < amount; i++) {
-      await addBooster(message.member, selected.id);
-    }
-
-    await addItemUse(message.member, selected.id, amount);
-    await setInventoryItem(message.member, selected.id, inventory.find((i) => i.item == selected.id).amount - amount, false);
+    await Promise.all([
+      addBooster(message.member, selected.id, amount),
+      addItemUse(message.member, selected.id, amount),
+      setInventoryItem(message.member, selected.id, inventory.find((i) => i.item == selected.id).amount - amount, false),
+    ]);
 
     boosters = await getBoosters(message.member);
 
