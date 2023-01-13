@@ -32,6 +32,8 @@ import { cleanString } from "../utils/functions/string";
 import { commandExists } from "../utils/handlers/commandhandler";
 import dayjs = require("dayjs");
 
+let doingRoles = false;
+
 const commandFilter = [
   "nigger",
   "nigga",
@@ -137,6 +139,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   };
 
   const checkRoles = async () => {
+    if (doingRoles) return;
+    doingRoles = true;
     for (const guildMember of message.guild.members.cache.values()) {
       const roleIds = Array.from(guildMember.roles.cache.keys());
       if (!(await isPremium(guildMember)) || guildMember.user.id == Constants.TEKOH_ID) {
@@ -188,6 +192,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
       }
     }
+    doingRoles = false;
   };
 
   const defaultMessage = async () => {
