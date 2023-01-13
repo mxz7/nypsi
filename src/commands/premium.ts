@@ -28,6 +28,7 @@ import {
   setStatus,
   setTier,
 } from "../utils/functions/premium/premium";
+import sleep from "../utils/functions/sleep";
 import { cleanString } from "../utils/functions/string";
 import { commandExists } from "../utils/handlers/commandhandler";
 import dayjs = require("dayjs");
@@ -142,6 +143,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (doingRoles) return;
     doingRoles = true;
     for (const guildMember of message.guild.members.cache.values()) {
+      await sleep(250);
       const roleIds = Array.from(guildMember.roles.cache.keys());
       if (!(await isPremium(guildMember)) || guildMember.user.id == Constants.TEKOH_ID) {
         // i dont want plat role lol
@@ -168,7 +170,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           break;
       }
 
-      if (requiredRole != "none" && !roleIds.includes(requiredRole)) guildMember.roles.add(requiredRole);
+      if (requiredRole != "none" && !roleIds.includes(requiredRole)) await guildMember.roles.add(requiredRole);
 
       for (const role of guildMember.roles.cache.values()) {
         let requiredLevel = 0;
@@ -180,7 +182,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             requiredLevel = 3;
             break;
           case Constants.SILVER_ROLE_ID:
-            if (roleIds.includes(Constants.BOOST_ROLE_ID)) guildMember.roles.remove(Constants.SILVER_ROLE_ID);
+            if (roleIds.includes(Constants.BOOST_ROLE_ID)) await guildMember.roles.remove(Constants.SILVER_ROLE_ID);
             requiredLevel = 2;
             break;
           case Constants.BRONZE_ROLE_ID:
@@ -188,7 +190,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             break;
         }
         if (requiredLevel !== 0) {
-          if ((await getTier(guildMember)) != requiredLevel) guildMember.roles.remove(role.id);
+          if ((await getTier(guildMember)) != requiredLevel) await guildMember.roles.remove(role.id);
         }
       }
     }
