@@ -47,7 +47,7 @@ specifiers:
   typescript: 4.9.4
   urban-dictionary: 3.0.2
   winston: 3.8.2
-  winston-daily-rotate-file: 4.6.1
+  winston-daily-rotate-file: 4.7.1
   winston-discord-webhook: 2.0.0
 
 dependencies:
@@ -78,7 +78,7 @@ dependencies:
   table: 6.8.1
   urban-dictionary: 3.0.2
   winston: 3.8.2
-  winston-daily-rotate-file: 4.6.1_winston@3.8.2
+  winston-daily-rotate-file: 4.7.1_winston@3.8.2
   winston-discord-webhook: 2.0.0_bufferutil@4.0.7
 
 devDependencies:
@@ -3582,8 +3582,8 @@ packages:
       string-width: 4.2.3
     dev: false
 
-  /winston-daily-rotate-file/4.6.1_winston@3.8.2:
-    resolution: {integrity: sha512-Ycch4LZmTycbhgiI2eQXBKI1pKcEQgAqmBjyq7/dC6Dk77nasdxvhLKraqTdCw7wNDSs8/M0jXaLATHquG7xYg==}
+  /winston-daily-rotate-file/4.7.1_winston@3.8.2:
+    resolution: {integrity: sha512-7LGPiYGBPNyGHLn9z33i96zx/bd71pjBn9tqQzO3I4Tayv94WPmBNwKC7CO1wPHdP9uvu+Md/1nr6VSH9h0iaA==}
     engines: {node: '>=8'}
     peerDependencies:
       winston: ^3
