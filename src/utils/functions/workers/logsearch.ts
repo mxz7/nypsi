@@ -43,7 +43,15 @@ if (!isMainThread) {
 
         return date.unix();
       } catch {
-        return null;
+        try {
+          const timestamp: string = JSON.parse(i.substring(i.length - 35)).timestamp;
+
+          const date = dayjs(timestamp);
+
+          return date.unix();
+        } catch {
+          return null;
+        }
       }
     });
 

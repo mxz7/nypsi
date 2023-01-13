@@ -74,7 +74,7 @@ const logger = winston.createLogger({
       datePattern: "YYYY-MM",
       maxSize: "7m",
       maxFiles: "14d",
-      format: winston.format.simple(),
+      format: winston.format.combine(winston.format.timestamp(), winston.format.simple()),
       level: "warn",
       handleExceptions: true,
       handleRejections: true,
@@ -85,7 +85,7 @@ const logger = winston.createLogger({
       level: "debug",
       maxSize: "7m",
       maxFiles: "90d",
-      format: winston.format.simple(),
+      format: winston.format.combine(winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }), winston.format.simple()),
     }),
     new winston.transports.Console({
       level: "debug",
