@@ -13,7 +13,7 @@ export async function getGambleStats(member: GuildMember) {
 
   const query = await prisma.game.groupBy({
     where: {
-      AND: [{ userId: id }, { game: { not: { contains: "scratch_card" } } }, { game: { not: { contains: "scratchie" } } }],
+      AND: [{ userId: id }, { game: { not: { contains: "scratch" } } }],
     },
     by: ["game"],
     _count: {
@@ -45,7 +45,7 @@ export async function getScratchCardStats(member: GuildMember) {
 
   const query = await prisma.game.groupBy({
     where: {
-      AND: [{ userId: id }, { game: { contains: "scratch_card" } }],
+      AND: [{ userId: id }, { game: { contains: "scratch" } }],
     },
     by: ["game"],
     _count: {
