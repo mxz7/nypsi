@@ -1,4 +1,4 @@
-import { ClusterClient, DjsClient } from "discord-hybrid-sharding";
+import { ClusterClient } from "discord-hybrid-sharding";
 import { Client, ClientOptions } from "discord.js";
 import channelCreate from "../events/channelCreate";
 import channelDelete from "../events/channelDelete";
@@ -44,12 +44,12 @@ import { updateCache } from "../utils/handlers/imghandler";
 import { getWebhooks, logger, setClusterId } from "../utils/logger";
 
 export class NypsiClient extends Client {
-  public cluster: ClusterClient;
+  public cluster: ClusterClient<Client>;
 
   constructor(options: ClientOptions) {
     super(options);
 
-    this.cluster = new ClusterClient(this as unknown as DjsClient);
+    this.cluster = new ClusterClient(this);
 
     setClusterId(this.cluster.id);
     process.title = `nypsi v${getVersion()}: cluster ${this.cluster.id}`;
