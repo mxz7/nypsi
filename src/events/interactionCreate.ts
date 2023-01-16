@@ -546,6 +546,8 @@ export default async function interactionCreate(interaction: Interaction) {
 
       return interaction.reply({ embeds: [embed] });
     } else if (interaction.customId === "bake") {
+      if (!interaction.channel.permissionsFor(interaction.user.id).has("SendMessages")) return;
+
       const int = interaction as unknown as NypsiCommandInteraction;
 
       int.author = interaction.user;
