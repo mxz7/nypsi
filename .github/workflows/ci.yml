@@ -144,7 +144,6 @@ jobs:
             cd ~/nypsi
             nvm use lts
             pnpm install --frozen-lockfile -P
-            npx prisma generate
 
       - name: update deployment status
         uses: bobheadxi/deployments@v1
