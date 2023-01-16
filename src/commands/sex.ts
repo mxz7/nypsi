@@ -200,6 +200,35 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         .setHeader("milf finder")
         .setColor(Constants.EMBED_SUCCESS_COLOR);
 
+      let description = "";
+
+      if (args.length != 0) {
+        if (args.length > 0) {
+          description = args.join(" ");
+          const descriptionCheck = cleanString(description);
+
+          for (const word of descFilter) {
+            if (descriptionCheck.includes(word)) {
+              description = "";
+              break;
+            }
+          }
+          if (description.length > 50) {
+            description = description.substring(0, 50) + "...";
+          }
+        }
+      }
+
+      if (description !== "") {
+        embed.setDescription(
+          `a match has been made from **${
+            message.guild.id == "747056029795221513" ? "[nypsi](https://discord.gg/hJTDNST)" : message.guild.name
+          }**\n\n` +
+            `**${message.author.tag}** - ${description}\n\n` +
+            "go ahead and send them a *private* message 😉😏"
+        );
+      }
+
       const clusters = await (message.client as NypsiClient).cluster.broadcastEval(
         async (client, { guildId }) => {
           const guild = await client.guilds.fetch(guildId);
