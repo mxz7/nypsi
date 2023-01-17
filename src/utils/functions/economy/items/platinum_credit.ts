@@ -14,6 +14,7 @@ import { NypsiCommandInteraction } from "../../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
 import { addMember, getPremiumProfile, getTier, setExpireDate, setTier } from "../../premium/premium";
+import { getInventory, setInventoryItem } from "../inventory";
 import dayjs = require("dayjs");
 
 const PLAT_TIER = 4;
@@ -49,6 +50,13 @@ module.exports = new ItemUse(
 
       profile.expireDate = dayjs(profile.expireDate).add(7, "day").toDate();
 
+      const inventory = await getInventory(message.member, false);
+      await setInventoryItem(
+        message.member,
+        "platinum_credit",
+        inventory.find((i) => i.item === "platinum_credit").amount - 1
+      );
+
       await setExpireDate(message.author.id, profile.expireDate, message.client as NypsiClient);
       return send({
         embeds: [
@@ -61,6 +69,13 @@ module.exports = new ItemUse(
     } else if (currentTier === 0) {
       await addMember(message.author.id, PLAT_TIER, message.client as NypsiClient);
       await setExpireDate(message.author.id, dayjs().add(7, "day").toDate(), message.client as NypsiClient);
+
+      const inventory = await getInventory(message.member, false);
+      await setInventoryItem(
+        message.member,
+        "platinum_credit",
+        inventory.find((i) => i.item === "platinum_credit").amount - 1
+      );
 
       return send({
         embeds: [
@@ -89,6 +104,21 @@ module.exports = new ItemUse(
       if (!res) return msg.edit({ components: [] });
 
       await res.deferUpdate();
+
+      const inventory = await getInventory(message.member, false);
+
+      if (
+        !inventory.find((i) => i.item === "platinum_credit") ||
+        inventory.find((i) => i.item === "platinum_credit").amount < 1
+      ) {
+        return send({ embeds: [new ErrorEmbed("lol!")] });
+      }
+
+      await setInventoryItem(
+        message.member,
+        "platinum_credit",
+        inventory.find((i) => i.item === "platinum_credit").amount - 1
+      );
 
       await setTier(message.author.id, PLAT_TIER, message.client as NypsiClient);
       await setExpireDate(message.author.id, dayjs().add(7, "day").toDate(), message.client as NypsiClient);
