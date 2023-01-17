@@ -14,6 +14,7 @@ import { NypsiCommandInteraction } from "../../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
 import { addMember, getPremiumProfile, getTier, setExpireDate, setTier } from "../../premium/premium";
+import { getInventory, setInventoryItem } from "../inventory";
 import dayjs = require("dayjs");
 
 const GOLD_TIER = 3;
@@ -46,6 +47,9 @@ module.exports = new ItemUse("gold_credit", async (message: Message | (NypsiComm
 
     profile.expireDate = dayjs(profile.expireDate).add(7, "day").toDate();
 
+    const inventory = await getInventory(message.member, false);
+    await setInventoryItem(message.member, "gold_credit", inventory.find((i) => i.item === "gold_credit").amount - 1);
+
     await setExpireDate(message.author.id, profile.expireDate, message.client as NypsiClient);
     return send({
       embeds: [
@@ -56,6 +60,8 @@ module.exports = new ItemUse("gold_credit", async (message: Message | (NypsiComm
       ],
     });
   } else if (currentTier === 0) {
+    const inventory = await getInventory(message.member, false);
+    await setInventoryItem(message.member, "gold_credit", inventory.find((i) => i.item === "gold_credit").amount - 1);
     await addMember(message.author.id, GOLD_TIER, message.client as NypsiClient);
     await setExpireDate(message.author.id, dayjs().add(7, "day").toDate(), message.client as NypsiClient);
 
@@ -87,6 +93,11 @@ module.exports = new ItemUse("gold_credit", async (message: Message | (NypsiComm
 
     await res.deferUpdate();
 
+    const inventory = await getInventory(message.member, false);
+    if (!inventory.find((i) => i.item === "gold_credit") || inventory.find((i) => i.item === "gold_credit").amount < 1) {
+      return send({ embeds: [new ErrorEmbed("lol!")] });
+    }
+    await setInventoryItem(message.member, "gold_credit", inventory.find((i) => i.item === "gold_credit").amount - 1);
     await setTier(message.author.id, GOLD_TIER, message.client as NypsiClient);
     await setExpireDate(message.author.id, dayjs().add(7, "day").toDate(), message.client as NypsiClient);
 
