@@ -10,6 +10,7 @@ import { getAuctionAverage } from "./auctions";
 import { getBoosters } from "./boosters";
 import { getGuildLevelByUser } from "./guilds";
 import { gemBreak, getInventory } from "./inventory";
+import { isPassive } from "./passive";
 import { getPrestige } from "./prestige";
 import { getBaseUpgrades, getBaseWorkers, getItems } from "./utils";
 import { hasVoted } from "./vote";
@@ -145,6 +146,8 @@ export async function getMulti(member: GuildMember | string): Promise<number> {
 
   if ((await getDmSettings(id)).voteReminder && !(await redis.sismember(Constants.redis.nypsi.VOTE_REMINDER_RECEIVED, id)))
     multi += 2;
+
+  if (await isPassive(id)) multi -= 3;
 
   for (const boosterId of boosters.keys()) {
     if (items[boosterId].boosterEffect.boosts.includes("multi")) {
