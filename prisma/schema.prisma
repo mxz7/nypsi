@@ -83,6 +83,7 @@ model Economy {
   xp          Int     @default(0)
   prestige    Int     @default(0)
   padlock     Boolean @default(false)
+  passive     Boolean @default(false)
 
   lastDaily DateTime @default("1970-01-01T14:21:00+02:00")
   lastVote  DateTime @default("1970-01-01T14:21:00+02:00")
