@@ -15,10 +15,12 @@ import {
   TextInputBuilder,
   TextInputStyle,
 } from "discord.js";
+import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { calcMaxBet, getDefaultBet, getRequiredBetForXp, setDefaultBet } from "../utils/functions/economy/balance";
+import { isPassive, setPassive } from "../utils/functions/economy/passive";
 import { createUser, formatNumber, userExists } from "../utils/functions/economy/utils";
 import { setSlashOnly } from "../utils/functions/guilds/slash";
 import { cleanString } from "../utils/functions/string";
@@ -26,6 +28,7 @@ import { checkPurchases, getEmail, setEmail } from "../utils/functions/users/ema
 import { getLastfmUsername, setLastfmUsername } from "../utils/functions/users/lastfm";
 import { getDmSettings, getNotificationsData, updateDmSettings } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import ms = require("ms");
 
 const cmd = new Command("settings", "manage nypsi settings for your server and you", Categories.UTILITY);
 
@@ -37,6 +40,17 @@ cmd.slashData
       .setDescription("modify your own settings")
       .addSubcommand((notifications) =>
         notifications.setName("notifications").setDescription("manage your notifications settings")
+      )
+      .addSubcommand((passive) =>
+        passive
+          .setName("passive")
+          .setDescription("enable/disasble passive mode")
+          .addStringOption((option) =>
+            option
+              .setName("toggle")
+              .setDescription("on/off")
+              .setChoices({ name: "on", value: "on" }, { name: "off", value: "off" })
+          )
       )
       .addSubcommand((defaultbet) =>
         defaultbet
@@ -514,6 +528,42 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
   };
 
+  const doPassiveMode = async () => {
+    const enabled = await isPassive(message.member);
+    if (args.length === 2) {
+      return send({
+        embeds: [
+          new CustomEmbed(message.member, enabled ? "you are currently in passive mode" : "you are not in passive mode"),
+        ],
+      });
+    }
+
+    if (args[2].toLowerCase() === "on") {
+      if (await redis.exists(`cd:passive_toggle:${message.author.id}`)) {
+        return send({ embeds: [new ErrorEmbed("you have already toggled passive mode recently")] });
+      }
+      await setPassive(message.member, true);
+      await redis.set(`cd:passive_toggle:${message.author.id}`, "boobs");
+      await redis.expire(`cd:passive_toggle:${message.author.id}`, Math.floor(ms("20 minutes") / 1000));
+      return send({
+        embeds: [
+          new CustomEmbed(message.member, "you are now in passive mode and cannot be robbed").addField(
+            "effects",
+            " - cannot be robbed\n - reduced multiplier\n - reduced xp gain"
+          ),
+        ],
+      });
+    } else if (args[2].toLowerCase() === "off") {
+      if (await redis.exists(`cd:passive_toggle:${message.author.id}`)) {
+        return send({ embeds: [new ErrorEmbed("you have already toggled passive mode recently")] });
+      }
+      await setPassive(message.member, false);
+      await redis.set(`cd:passive_toggle:${message.author.id}`, "boobs");
+      await redis.expire(`cd:passive_toggle:${message.author.id}`, Math.floor(ms("20 minutes") / 1000));
+      return send({ embeds: [new CustomEmbed(message.member, "you are no longer in passive mode and can be robbed")] });
+    }
+  };
+
   if (args.length == 0) {
     return send({ embeds: [new CustomEmbed(message.member, "/settings me\n/settings server")] });
   } else if (args[0].toLowerCase() == "me") {
@@ -525,6 +575,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return setLastFm();
     } else if (args[1].toLowerCase() == "email") {
       return doEmail();
+    } else if (args[1].toLowerCase() == "passive") {
+      return doPassiveMode();
     }
   } else if (args[0].toLowerCase() == "server") {
     if (args[1].toLowerCase() == "slash-only") {
