@@ -7,6 +7,7 @@ import { getRequiredBetForXp } from "./balance";
 import { getBoosters } from "./boosters";
 import { getGuildLevelByUser } from "./guilds";
 import { gemBreak, getInventory } from "./inventory";
+import { isPassive } from "./passive";
 import { getPrestige } from "./prestige";
 import { getItems } from "./utils";
 
@@ -92,6 +93,11 @@ export async function calcEarnedXp(member: GuildMember, bet: number, multiplier:
 
   max += bet / betDivisor;
   max += multiplier * 1.7;
+
+  if (await isPassive(member)) {
+    max -= 5;
+    min -= 5;
+  }
 
   if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0) max += Math.floor(Math.random() * 7);
   if (inventory.find((i) => i.item == "white_gem")?.amount > 0) {
