@@ -2,6 +2,7 @@ import { GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import Constants from "../../Constants";
+import ms = require("ms");
 
 export async function isPassive(member: GuildMember | string) {
   let id: string;
@@ -27,6 +28,7 @@ export async function isPassive(member: GuildMember | string) {
   });
 
   await redis.set(`${Constants.redis.cache.economy.PASSIVE}:${id}`, query.passive ? "t" : "f");
+  await redis.expire(`${Constants.redis.cache.economy.PASSIVE}:${id}`, Math.floor(ms("6 hours") / 1000));
 
   return query.passive;
 }
