@@ -5,6 +5,7 @@ import { ItemUse } from "../../../../models/ItemUse";
 import { getDisabledCommands } from "../../guilds/disabledcommands";
 import { getMember } from "../../member";
 import { getInventory, setInventoryItem } from "../inventory";
+import { isPassive } from "../passive";
 import { addHandcuffs, isHandcuffed } from "../utils";
 
 module.exports = new ItemUse(
@@ -66,6 +67,11 @@ module.exports = new ItemUse(
         embeds: [new ErrorEmbed(`**${handcuffsTarget.user.tag}** is already restrained`)],
       });
     }
+
+    if (await isPassive(handcuffsTarget))
+      return send({ embeds: [new ErrorEmbed(`${handcuffsTarget.toString()} is currently in passive mode`)] });
+
+    if (await isPassive(message.member)) return send({ embeds: [new ErrorEmbed("you are currently in passive mode")] });
 
     const inventory = await getInventory(message.member, false);
 

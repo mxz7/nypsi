@@ -4,7 +4,6 @@ import { Categories, Command, NypsiCommandInteraction } from "../models/Command"
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { formatDate } from "../utils/functions/date";
 import { addCooldown, inCooldown } from "../utils/functions/guilds/utils";
-import { getKarma } from "../utils/functions/karma/karma";
 import { getMember } from "../utils/functions/member";
 import { fetchUsernameHistory } from "../utils/functions/users/history";
 import workerSort from "../utils/functions/workers/sort";
@@ -117,8 +116,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       true
     )
 
-    .addField("\u200B", "\u200B", true)
-    .setFooter({ text: `${(await getKarma(member)).toLocaleString()} karma` });
+    .addField("\u200B", "\u200B", true);
 
   if (member.roles.cache.size > 1) {
     embed.addField("roles [" + (member.roles.cache.size - 1) + "]", rolesText.join(" "), true);
