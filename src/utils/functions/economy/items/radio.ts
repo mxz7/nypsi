@@ -14,6 +14,7 @@ import Constants from "../../../Constants";
 import { getMember } from "../../member";
 import sleep from "../../sleep";
 import { getInventory, setInventoryItem } from "../inventory";
+import { isPassive } from "../passive";
 
 module.exports = new ItemUse(
   "radio",
@@ -64,6 +65,11 @@ module.exports = new ItemUse(
     if (message.member == radioTarget) {
       return send({ embeds: [new ErrorEmbed("invalid user")] });
     }
+
+    if (await isPassive(radioTarget))
+      return send({ embeds: [new ErrorEmbed(`${radioTarget.toString()} is currently in passive mode`)] });
+
+    if (await isPassive(message.member)) return send({ embeds: [new ErrorEmbed("you are currently in passive mode")] });
 
     if ((await redis.exists(`${Constants.redis.cooldown.ROB_RADIO}:${radioTarget.user.id}`)) == 1) {
       return send({

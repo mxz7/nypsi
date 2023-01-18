@@ -69,6 +69,7 @@ export default {
         XP: "cache:economy:xp",
         GUILD_LEVEL: "cache:economy:guild:level",
         BAKERY_UPGRADES: "cache:economy:bakery:upgrades",
+        PASSIVE: "cache:economy:passive",
       },
     },
     nypsi: {
