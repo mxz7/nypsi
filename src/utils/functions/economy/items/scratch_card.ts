@@ -123,6 +123,16 @@ async function prepare(
         if (!response || !response.isButton()) return;
 
         if (response.customId === "retry") {
+          if ((await redis.get(Constants.redis.nypsi.RESTART)) == "t") {
+            if (message.author.id == Constants.TEKOH_ID && message instanceof Message) {
+              message.react("💀");
+            } else {
+              response.message.edit({
+                embeds: [new CustomEmbed(message.member, "nypsi is rebooting, try again in a few minutes")],
+              });
+              return;
+            }
+          }
           logger.log({
             level: "cmd",
             message: `${message.guild.id} ${message.author.tag}: replaying ${selected.id}`,
