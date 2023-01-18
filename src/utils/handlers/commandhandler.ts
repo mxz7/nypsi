@@ -44,11 +44,17 @@ import { getLastCommand, updateUser } from "../functions/users/commands";
 import { getLastKnownTag } from "../functions/users/tag";
 import { createProfile, hasProfile } from "../functions/users/utils";
 import dayjs = require("dayjs");
+import ms = require("ms");
 
 const commands = new Map<string, Command>();
 const aliases = new Map<string, string>();
 const hourlyCommandCount = new Map<string, number>();
 const commandUses = new Map<string, number>();
+const recentlyUsedUserAliases = new Map<string, Map<string, string>>();
+
+setInterval(() => {
+  recentlyUsedUserAliases.clear();
+}, ms("15 minutes"));
 
 const karmaCooldown = new Set<string>();
 const xpCooldown = new Set<string>();
@@ -584,6 +590,10 @@ export async function runCommand(
       const foundAlias = userAliases.find((alias) => alias.alias === cmd);
 
       if (foundAlias) {
+        if (!recentlyUsedUserAliases.has(message.channel.id)) recentlyUsedUserAliases.set(message.channel.id, new Map());
+        if (!recentlyUsedUserAliases.get(message.channel.id).has(cmd))
+          recentlyUsedUserAliases.get(message.channel.id).set(cmd, message.author.tag);
+
         cmd = foundAlias.command.split(" ")[0];
         command = commands.get(cmd);
 
@@ -591,6 +601,17 @@ export async function runCommand(
         args.push(...message.content.split(" ").splice(1, Infinity));
 
         message.content = `${message.content[0]}${command.name} ${args.slice(1, Infinity).join(" ")}`;
+      } else if (recentlyUsedUserAliases.get(message.channel.id)?.has(cmd)) {
+        const owner = recentlyUsedUserAliases.get(message.channel.id).get(cmd);
+
+        return message.channel.send({
+          embeds: [
+            new ErrorEmbed(
+              `\`${cmd}\` is a custom alias owned by **${owner}**. to create your own custom aliases you need a premium membership\n` +
+                "/premium"
+            ),
+          ],
+        });
       } else {
         if (await isLockedOut(message.author.id)) return;
         const customCommand = await getCommand(cmd);
