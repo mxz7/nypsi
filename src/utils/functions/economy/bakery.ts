@@ -12,7 +12,7 @@ import { addInventoryItem, getInventory } from "./inventory";
 import { getBakeryUpgradesData } from "./utils";
 import ms = require("ms");
 
-export async function getLastBake(member: GuildMember | string) {
+async function getLastBake(member: GuildMember | string) {
   let id: string;
   if (member instanceof GuildMember) {
     id = member.user.id;
