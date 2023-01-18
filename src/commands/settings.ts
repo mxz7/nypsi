@@ -547,7 +547,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       await redis.expire(`cd:passive_toggle:${message.author.id}`, Math.floor(ms("20 minutes") / 1000));
       return send({
         embeds: [
-          new CustomEmbed(message.member, "you are now in passive mode and cannot be robbed").addField(
+          new CustomEmbed(message.member, "you are now in passive mode").addField(
             "effects",
             " - cannot be robbed\n - reduced multiplier\n - reduced xp gain"
           ),
