@@ -134,5 +134,7 @@ export async function calcEarnedXp(member: GuildMember, bet: number, multiplier:
 
   earned += boosterEffect * earned;
 
+  if (earned < 0) earned = 0;
+
   return Math.floor(earned);
 }
