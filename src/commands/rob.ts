@@ -7,6 +7,7 @@ import { addProgress } from "../utils/functions/economy/achievements";
 import { getBalance, hasPadlock, setPadlock, updateBalance } from "../utils/functions/economy/balance";
 import { addToGuildXP, getGuildByUser } from "../utils/functions/economy/guilds";
 import { getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
+import { isPassive } from "../utils/functions/economy/passive";
 import { addItemUse, createGame } from "../utils/functions/economy/stats";
 import { createUser, isEcoBanned, userExists } from "../utils/functions/economy/utils";
 import { calcEarnedXp, getXp, updateXp } from "../utils/functions/economy/xp";
@@ -113,6 +114,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (!(await userExists(target)) || (await getBalance(target)) <= 500) {
     return send({ embeds: [new ErrorEmbed("this user doesnt have sufficient funds")] });
   }
+
+  if (await isPassive(target))
+    return send({ embeds: [new ErrorEmbed(`${target.toString()} is currently in passive mode`)] });
+
+  if (await isPassive(message.member)) return send({ embeds: [new ErrorEmbed("you are currently in passive mode")] });
 
   const targetGuild = await getGuildByUser(target);
 
