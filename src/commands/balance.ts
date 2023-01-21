@@ -102,7 +102,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (!(await userExists(target))) await createUser(target);
 
-  if (target.user.id == "678711738845102087") {
+  if (target.user.id == Constants.BOT_USER_ID) {
     const embed = new CustomEmbed(message.member).setHeader("nypsi bank", target.user.avatarURL());
 
     embed.setDescription(

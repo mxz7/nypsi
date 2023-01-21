@@ -8,7 +8,7 @@ export function updateStats(guildCount: number, shardCount: number) {
     shardCount: shardCount,
   });
 
-  // fetch("https://discord.bots.gg/bots/678711738845102087/stats", {
+  // fetch("https://discord.bots.gg/bots/Constants.BOT_USER_ID/stats", {
   //     method: "POST",
   //     body: JSON.stringify({ shardCount: shardCount, guildCount: guildCount }),
   //     headers: { "Content-Type": "application/json", "Authorization": "removed token" }
