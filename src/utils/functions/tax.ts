@@ -32,7 +32,7 @@ export async function addToNypsiBank(amount: number) {
   await prisma.economy
     .upsert({
       where: {
-        userId: "678711738845102087",
+        userId: Constants.BOT_USER_ID,
       },
       update: {
         bank: { increment: Math.floor(amount * 0.5) },
@@ -40,7 +40,7 @@ export async function addToNypsiBank(amount: number) {
       create: {
         bank: Math.floor(amount),
         lastVote: new Date(0),
-        userId: "678711738845102087",
+        userId: "Constants.BOT_USER_ID",
       },
     })
     .catch(() => {});
@@ -49,7 +49,7 @@ export async function addToNypsiBank(amount: number) {
 export async function getNypsiBankBalance() {
   const query = await prisma.economy.findUnique({
     where: {
-      userId: "678711738845102087",
+      userId: "Constants.BOT_USER_ID",
     },
     select: {
       bank: true,
@@ -62,7 +62,7 @@ export async function getNypsiBankBalance() {
 export async function removeFromNypsiBankBalance(amount: number) {
   await prisma.economy.update({
     where: {
-      userId: "678711738845102087",
+      userId: "Constants.BOT_USER_ID",
     },
     data: {
       bank: { decrement: Math.floor(amount) },

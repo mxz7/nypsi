@@ -37,7 +37,7 @@ import dayjs = require("dayjs");
       components: new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()
           .setStyle(ButtonStyle.Link)
-          .setURL("https://top.gg/bot/678711738845102087/vote")
+          .setURL("https://top.gg/bot/Constants.BOT_USER_ID/vote")
           .setLabel("top.gg")
       ),
     },
