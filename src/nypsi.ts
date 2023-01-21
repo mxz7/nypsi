@@ -1,6 +1,7 @@
 import { getInfo } from "discord-hybrid-sharding";
 import { GatewayIntentBits, Options, Partials } from "discord.js";
 import { NypsiClient } from "./models/Client";
+import Constants from "./utils/Constants";
 
 const client = new NypsiClient({
   allowedMentions: {
@@ -22,13 +23,14 @@ const client = new NypsiClient({
     ThreadMemberManager: 0,
     VoiceStateManager: 0,
     GuildEmojiManager: 0,
-  }),
-  sweepers: {
-    messages: {
-      lifetime: 60,
-      interval: 180,
+    AutoModerationRuleManager: 0,
+    GuildForumThreadManager: 0,
+    GuildTextThreadManager: 0,
+    GuildMemberManager: {
+      maxSize: 500,
+      keepOverLimit: (member) => member.id === Constants.BOT_USER_ID,
     },
-  },
+  }),
   presence: {
     status: "dnd",
     activities: [
