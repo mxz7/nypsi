@@ -125,7 +125,7 @@ setTimeout(async () => {
 setTimeout(async () => {
   const userId = await manager.fetchClientValues("user.id");
 
-  if (userId[0] != "678711738845102087") return;
+  if (userId[0] != Constants.BOT_USER_ID) return;
 
   const guildCount = (await manager
     .fetchClientValues("guilds.cache.size")
