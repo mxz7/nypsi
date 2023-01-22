@@ -25,7 +25,8 @@ export default async function guildMemberAdd(member: GuildMember) {
   if (await isLogsEnabled(member.guild)) {
     const embed = new CustomEmbed().disableFooter().setTimestamp();
 
-    embed.setHeader("member joined");
+    embed.setHeader(member.user.tag, member.user.avatarURL());
+    embed.setTitle("member joined");
     embed.setDescription(
       `${member.toString()} \`${member.id}\`\n\n**tag** ${member.user.tag}\n**created** ${daysAgo(
         member.user.createdAt

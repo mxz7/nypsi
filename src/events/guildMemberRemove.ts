@@ -13,7 +13,8 @@ export default async function guildMemberRemove(member: GuildMember) {
   if (await isLogsEnabled(member.guild)) {
     const embed = new CustomEmbed().disableFooter().setTimestamp();
 
-    embed.setHeader("member left");
+    embed.setHeader(member.user.tag, member.user.avatarURL());
+    embed.setTitle("member left");
     embed.setDescription(
       `${member.toString()} \`${member.id}\`\n\n**tag** ${member.user.tag}\n**joined** ${daysAgo(member.joinedAt)} days ago`
     );
