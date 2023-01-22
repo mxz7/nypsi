@@ -1,8 +1,14 @@
 import { Guild } from "discord.js";
 import prisma from "../../../init/database";
+import ms = require("ms");
 
 const autoRoleCache = new Map<string, string[]>();
 const persistantRoleCache = new Map<string, string[]>();
+
+setInterval(() => {
+  autoRoleCache.clear();
+  persistantRoleCache.clear();
+}, ms("1 hour"));
 
 export async function getAutoJoinRoles(guild: Guild) {
   if (autoRoleCache.has(guild.id)) return autoRoleCache.get(guild.id);
