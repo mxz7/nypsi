@@ -17,7 +17,8 @@ export default async function messageDelete(message: Message) {
     if (await isLogsEnabled(message.guild)) {
       const embed = new CustomEmbed().disableFooter().setTimestamp();
 
-      embed.setHeader("message deleted");
+      embed.setHeader(message.author.tag, message.author.avatarURL());
+      embed.setTitle("message deleted");
       embed.setDescription(
         `${message.member.toString()} \`${message.author.id}\`\n\n**channel** ${message.channel.toString()} \`${
           message.channelId
