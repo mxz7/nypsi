@@ -10,7 +10,7 @@ export default async function messageDeleteBulk(messages: Collection<Snowflake, 
   if (await isLogsEnabled(channel.guild)) {
     const embed = new CustomEmbed().disableFooter().setTimestamp();
 
-    embed.setHeader(`${messages.size} messages deleted in #${channel.name} [bulk delete]`);
+    embed.setTitle(`${messages.size} messages deleted in #${channel.name} [bulk delete]`);
 
     const desc: string[] = [];
 

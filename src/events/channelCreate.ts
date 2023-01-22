@@ -11,7 +11,7 @@ export default async function channelCreate(channel: GuildChannel) {
   if (await isLogsEnabled(channel.guild)) {
     const embed = new CustomEmbed().disableFooter().setTimestamp();
 
-    embed.setHeader("channel created");
+    embed.setTitle("channel created");
     embed.setDescription(
       `${channel.toString()} \`${channel.id}\`\n\n**name** ${channel.name}\n${
         channel.parent ? `**category** ${channel.parent.name}\n` : ""

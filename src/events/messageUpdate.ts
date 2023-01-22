@@ -16,7 +16,8 @@ export default async function messageUpdate(message: Message, newMessage: Messag
     if (message.content != newMessage.content) {
       const embed = new CustomEmbed().disableFooter().setTimestamp();
 
-      embed.setHeader("message updated");
+      embed.setHeader(message.author.tag, message.author.avatarURL());
+      embed.setTitle("message updated");
       embed.setDescription(
         `[jump](${message.url})\n\n${message.member.toString()} \`${
           message.author.id

@@ -60,7 +60,8 @@ export default async function guildMemberUpdate(oldMember: GuildMember, newMembe
 async function createLog(member: GuildMember, roles: Role[], added: boolean) {
   const embed = new CustomEmbed().disableFooter().setTimestamp();
 
-  embed.setHeader(!added ? "role removed" : "role added");
+  embed.setHeader(member.user.tag, member.user.avatarURL());
+  embed.setTitle(!added ? "role removed" : "role added");
   embed.setDescription(`${member.toString()} \`${member.id}\``);
   embed.addField("role", roles.map((r) => r.toString()).join(" "));
 
