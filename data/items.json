@@ -1538,8 +1538,8 @@
       "id:fishing_rod:75",
       "id:gun:75",
       "id:basic_crate:60",
-      "id:bronze_credit:7",
-      "id:silver_credit:4",
+      "id:bronze_credit:5",
+      "id:silver_credit:2",
       "id:green_gem:3",
       "id:blue_gem:3"
     ]
@@ -1572,8 +1572,8 @@
       "id:basic_crate:95",
       "id:69420_crate:90",
       "id:nypsi_crate:20",
-      "id:bronze_credit:13",
-      "id:silver_credit:4",
+      "id:bronze_credit:6",
+      "id:silver_credit:2",
       "id:gold_credit:2",
       "id:green_gem:3",
       "id:blue_gem:3",
@@ -1602,9 +1602,10 @@
       "id:nether_portal:75",
       "id:incredible_fishing_rod",
       "id:nypsi_crate:30",
-      "id:platinum_credit:7",
-      "id:silver_credit:15",
-      "id:gold_credit:10",
+      "id:platinum_credit:3",
+      "id:bronze_credit:10",
+      "id:silver_credit:5",
+      "id:gold_credit:6",
       "id:pink_gem:5"
     ]
   },
@@ -1630,9 +1631,9 @@
       "id:incredible_gun:90",
       "id:69420_crate",
       "id:nypsi_crate:30",
-      "id:silver_credit:7",
-      "id:gold_credit:5",
-      "id:platinum_credit:1.5",
+      "id:silver_credit:5",
+      "id:gold_credit:3",
+      "id:platinum_credit:1",
       "id:pink_gem:1"
     ]
   },
