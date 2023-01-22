@@ -1541,7 +1541,8 @@
       "id:bronze_credit:5",
       "id:silver_credit:2",
       "id:green_gem:3",
-      "id:blue_gem:3"
+      "id:blue_gem:3",
+      "id:pink_gem:0.3"
     ]
   },
   "lucky_scratch_card": {
@@ -1577,7 +1578,8 @@
       "id:gold_credit:2",
       "id:green_gem:3",
       "id:blue_gem:3",
-      "id:purple_gem:2"
+      "id:purple_gem:2",
+      "id:gem_crate:0.5"
     ]
   },
   "legendary_scratch_card": {
@@ -1606,7 +1608,8 @@
       "id:bronze_credit:10",
       "id:silver_credit:5",
       "id:gold_credit:6",
-      "id:pink_gem:5"
+      "id:pink_gem:5",
+      "id:gem_crate:2.5"
     ]
   },
   "karma_scratch_card": {
