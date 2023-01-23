@@ -29,13 +29,11 @@ export async function getDmSettings(member: GuildMember | string) {
     return (await JSON.parse(await redis.get(`${Constants.redis.cache.user.DM_SETTINGS}:${id}`))) as DMSettings;
   }
 
-  let query = await prisma.dMSettings
-    .findUnique({
-      where: {
-        userId: id,
-      },
-    })
-    .catch(() => {});
+  let query = await prisma.dMSettings.findUnique({
+    where: {
+      userId: id,
+    },
+  });
 
   if (!query) {
     query = await prisma.dMSettings.create({
