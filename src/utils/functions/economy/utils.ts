@@ -590,6 +590,8 @@ export async function doDaily(member: GuildMember) {
 
     crate += Math.floor(streak / 30);
 
+    if (crate > 5) crate = 5;
+
     promises.push(addInventoryItem(member, "basic_crate", crate));
   }
 
