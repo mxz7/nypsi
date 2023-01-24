@@ -9,7 +9,7 @@ import { addNotificationToQueue } from "../../utils/functions/users/notification
 (async () => {
   const now = Date.now();
 
-  const threshold = now - ms("7 hours");
+  const threshold = now - ms("6 hours");
 
   const users = await prisma.user.findMany({
     where: {
@@ -72,6 +72,8 @@ import { addNotificationToQueue } from "../../utils/functions/users/notification
     if (karmaToRemove > user.karma) {
       karmaToRemove = user.karma - 1;
     }
+
+    if (karmaToRemove < 1) continue;
 
     if (user?.Economy?.Inventory.find((i) => i.item == "white_gem")?.amount > 0 && user.DMSettings?.other) {
       const chance = Math.floor(Math.random() * 10);
