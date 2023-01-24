@@ -106,10 +106,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     });
   }
 
-  let cooldownLength = 10;
+  let cooldownLength = 7;
 
   if (selected.role == "booster") {
-    cooldownLength = 5;
+    cooldownLength = 3;
   }
 
   await addCooldown(cmd.name, message.member, cooldownLength);
