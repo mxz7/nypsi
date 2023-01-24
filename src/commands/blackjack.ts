@@ -711,7 +711,7 @@ async function playGame(
     let fail = false;
 
     const reaction = await m
-      .awaitMessageComponent({ filter, time: 30000 })
+      .awaitMessageComponent({ filter, time: 90000 })
       .then(async (collected) => {
         await collected.deferUpdate();
         return collected.customId;
