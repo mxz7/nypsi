@@ -154,7 +154,7 @@ async function calculateCooldownLength(seconds: number, member: GuildMember | st
     seconds = seconds * items["redbull"].boosterEffect.effect;
   }
 
-  if (seconds < 2) seconds = 2;
+  if (seconds < 1) seconds = 1;
 
   return Math.ceil(seconds);
 }
