@@ -109,5 +109,5 @@ export default {
   ADMIN_IDS: ["672793821850894347", "449774710469689355"],
   EMOJI_REGEX: /(<:[A-z]+:[0-9]+>)/,
   COLOUR_REGEX: /^#([A-Fa-f0-9]{6})$/,
-  BOT_USER_ID: "Constants.BOT_USER_ID",
+  BOT_USER_ID: "678711738845102087",
 };
