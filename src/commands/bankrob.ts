@@ -320,7 +320,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const pageManager: any = async () => {
     const res = await msg
-      .awaitMessageComponent({ filter, time: 30_000 })
+      .awaitMessageComponent({ filter, time: 60_000 })
       .then(async (i) => {
         await i.deferUpdate();
         return i;
