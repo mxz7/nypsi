@@ -208,7 +208,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         },
       });
 
-      const file = `temp/${message.author.id}.txt`;
+      const file = `/tmp/nypsi_data_${message.author.id}.txt`;
 
       logger.info(`packing into text file for ${message.author.tag}...`);
 
@@ -285,7 +285,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embed.setDescription("check your direct messages");
       }
       await edit({ embeds: [embed] }, m);
-      await fs.unlink(file);
     }
   } else if (args[0].toLowerCase() === "delete") {
     if (await onCooldown(cmd.name + "_delete", message.member)) {

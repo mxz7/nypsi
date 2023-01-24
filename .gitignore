@@ -3,7 +3,6 @@ backup/
 logs/
 dist/
 out/
-temp/
 
 *.env
 *.db

@@ -133,7 +133,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       },
     });
 
-    const file = `temp/${id}.txt`;
+    const file = `/tmp/nypsi_data_${id}.txt`;
 
     logger.info(`packing into text file for ${id}...`);
 

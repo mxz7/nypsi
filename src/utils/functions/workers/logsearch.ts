@@ -22,7 +22,7 @@ if (!isMainThread) {
   process.title = "nypsi: logsearch worker";
   (async () => {
     const searchTerm: string = workerData[0];
-    const resultsFile = `temp/search_results_${Date.now()}.txt`;
+    const resultsFile = `/tmp/nypsi_logsearch_results_${Date.now()}.txt`;
 
     const execCmd = promisify(exec);
     await execCmd(`grep -rh "${searchTerm}" out/logs > ${resultsFile}`);
@@ -54,8 +54,6 @@ if (!isMainThread) {
         }
       }
     });
-
-    await fs.unlink(resultsFile);
 
     if (buffer) {
       parentPort.postMessage([values.join("\n"), buffer.toString().split("\n").length]);
