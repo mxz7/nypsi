@@ -37,7 +37,7 @@ if (!isMainThread) {
 
     header.push(...dates.map((d) => dayjs(d).format("YYYY-MM-DD")));
 
-    await writeFile(`temp/${fileName}`, header.join(","));
+    await writeFile(`/tmp/${fileName}`, header.join(","));
 
     const users = new Map<string, string[]>();
 
@@ -73,13 +73,13 @@ if (!isMainThread) {
         })
         .then((r) => r?.lastKnownTag);
 
-      await appendFile(`temp/${fileName}`, `\n${tag || userId},${balances.join(",")}`);
+      await appendFile(`/tmp/${fileName}`, `\n${tag || userId},${balances.join(",")}`);
     }
   };
 
   (async () => {
     await toCsv(
-      "topbalance.csv",
+      "nypsi_topbalance.csv",
       await prisma.graphMetrics.findMany({
         where: {
           category: "balance",
@@ -91,7 +91,7 @@ if (!isMainThread) {
     );
 
     await toCsv(
-      "topnetworth.csv",
+      "nypsi_topnetworth.csv",
       await prisma.graphMetrics.findMany({
         where: {
           category: "networth",
@@ -103,7 +103,7 @@ if (!isMainThread) {
     );
 
     await toCsv(
-      "topcookies.csv",
+      "nypsi_topcookies.csv",
       await prisma.graphMetrics.findMany({
         where: {
           category: "cookies",
