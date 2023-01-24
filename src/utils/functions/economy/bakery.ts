@@ -115,9 +115,9 @@ export async function runBakery(member: GuildMember) {
     click[1] += await getTier(member);
   }
 
-  if (inventory.find((i) => i.item === "blue_gem")?.amount > 0) click[1] += Math.floor(Math.random() * 3);
-  if (inventory.find((i) => i.item === "white_gem")?.amount > 0) click[1] += Math.floor(Math.random() * 3);
-  if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0) click[1] += Math.floor(Math.random() * 5);
+  if (inventory.find((i) => i.item === "blue_gem")?.amount > 0) click[1] += Math.floor(Math.random() * 7);
+  if (inventory.find((i) => i.item === "white_gem")?.amount > 0) click[0] += Math.floor(Math.random() * 3);
+  if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0) click[0] += Math.floor(Math.random() * 5);
 
   const diffMs = Date.now() - lastBaked.getTime();
 
@@ -137,9 +137,8 @@ export async function runBakery(member: GuildMember) {
       if (amount > 0) {
         earned.set(upgrade.upgradeId, amount);
       }
-    } else {
+    } else if (getBakeryUpgradesData()[upgrade.upgradeId].upgrades === "bake") {
       click[0] += upgrade.amount * getBakeryUpgradesData()[upgrade.upgradeId].value;
-      click[1] += upgrade.amount * getBakeryUpgradesData()[upgrade.upgradeId].value;
     }
   }
 
