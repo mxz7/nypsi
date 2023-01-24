@@ -43,7 +43,7 @@ export async function topBalance(guild: Guild, userId?: string) {
   let count = 0;
 
   const getMemberID = (guild: Guild, id: string) => {
-    const target = guild.members.cache.find((member) => {
+    const target = members.find((member) => {
       return member.user.id == id;
     });
 
