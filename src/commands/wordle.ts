@@ -178,7 +178,7 @@ async function play(message: Message | (NypsiCommandInteraction & CommandInterac
   let fail = false;
 
   const response: any = await message.channel
-    .awaitMessages({ filter, max: 1, time: 180_000, errors: ["time"] })
+    .awaitMessages({ filter, max: 1, time: 300_000, errors: ["time"] })
     .then(async (collected) => {
       await collected.first().delete();
       return collected.first().content.toLowerCase();
