@@ -1,5 +1,4 @@
 mkdir out
-mkdir temp
 mkdir jobs
 
 cd src
