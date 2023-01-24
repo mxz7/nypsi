@@ -32,8 +32,7 @@
     "name": "collector **V**",
     "emoji": "🎒",
     "target": 50000,
-    "description": "have 50,000 items in your inventory",
-    "prize": "lucky_scratch_card"
+    "description": "have 50,000 items in your inventory"
   },
   "gambler_i": {
     "id": "gambler_i",
