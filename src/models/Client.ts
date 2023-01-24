@@ -37,7 +37,7 @@ import { runCountdowns } from "../utils/functions/guilds/countdowns";
 import { runSnipeClearIntervals } from "../utils/functions/guilds/utils";
 import { runUploadReset } from "../utils/functions/image";
 import { startAutoMuteViolationInterval } from "../utils/functions/moderation/mute";
-import { getCustomPresence, setCustomPresence } from "../utils/functions/presence";
+import { getCustomPresence, randomPresence, setCustomPresence } from "../utils/functions/presence";
 import { getVersion } from "../utils/functions/version";
 import { runCommandUseTimers } from "../utils/handlers/commandhandler";
 import { updateCache } from "../utils/handlers/imghandler";
@@ -150,6 +150,19 @@ export class NypsiClient extends Client {
               { context: { args: presence.split(" ") } }
             );
           }
+        } else {
+          this.cluster.broadcastEval(
+            (c, { presence }) => {
+              c.user.setPresence({
+                activities: [
+                  {
+                    name: presence,
+                  },
+                ],
+              });
+            },
+            { context: { presence: randomPresence() } }
+          );
         }
       }, 60000);
     });
