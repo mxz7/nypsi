@@ -254,7 +254,7 @@ export async function topNetWorth(guild: Guild, userId?: string) {
   let count = 0;
 
   const getMemberID = (guild: Guild, id: string) => {
-    const target = guild.members.cache.find((member) => {
+    const target = members.find((member) => {
       return member.user.id == id;
     });
 
@@ -326,7 +326,7 @@ export async function topPrestige(guild: Guild, userId?: string) {
   let count = 0;
 
   const getMemberID = (guild: Guild, id: string) => {
-    const target = guild.members.cache.find((member) => {
+    const target = members.find((member) => {
       return member.user.id == id;
     });
 
@@ -481,7 +481,7 @@ export async function topItem(guild: Guild, item: string, userId: string) {
   let count = 0;
 
   const getMemberID = (guild: Guild, id: string) => {
-    const target = guild.members.cache.find((member) => {
+    const target = members.find((member) => {
       return member.user.id == id;
     });
 
@@ -668,7 +668,7 @@ export async function topCompletion(guild: Guild, userId: string) {
   let count = 0;
 
   const getMemberID = (guild: Guild, id: string) => {
-    const target = guild.members.cache.find((member) => {
+    const target = members.find((member) => {
       return member.user.id == id;
     });
 
@@ -771,7 +771,7 @@ export async function topDailyStreak(guild: Guild, userId?: string) {
   let count = 0;
 
   const getMemberID = (guild: Guild, id: string) => {
-    const target = guild.members.cache.find((member) => {
+    const target = members.find((member) => {
       return member.user.id == id;
     });
 
