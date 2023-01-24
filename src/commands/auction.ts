@@ -170,7 +170,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       const filter = (i: Interaction) => i.user.id == message.author.id;
 
       const res = await msg
-        .awaitMessageComponent({ filter, time: 30000 })
+        .awaitMessageComponent({ filter, time: 60000 })
         .then(async (i) => {
           await i.deferUpdate();
           if (!i.isStringSelectMenu()) return;
@@ -451,7 +451,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       let fail = false;
 
       const response = await msg
-        .awaitMessageComponent({ filter, time: 30000 })
+        .awaitMessageComponent({ filter, time: 60000 })
         .then(async (collected) => {
           await collected.deferUpdate();
           return { res: collected.customId, interaction: collected };
