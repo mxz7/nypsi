@@ -349,7 +349,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       const cmd = await getCommand(commandTrigger);
 
-      if (cmd) return send({ embeds: [new ErrorEmbed("this custom command already exists")] });
+      if (cmd && cmd.owner !== message.author.id)
+        return send({ embeds: [new ErrorEmbed("this custom command already exists")] });
 
       await setCommand(message.author.id, commandTrigger, commandContent);
 
