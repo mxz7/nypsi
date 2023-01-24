@@ -1429,7 +1429,7 @@
     "plural": "cursors",
     "aliases": ["pointer"],
     "emoji": "<:nypsi_cursor:1054771565557981244>",
-    "longDesc": "gives you an extra cookie every time you bake",
+    "longDesc": "+1 max cookie when baking",
     "rarity": 2,
     "sell": 100000,
     "role": "bakery-upgrade",
