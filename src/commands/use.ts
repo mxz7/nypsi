@@ -150,6 +150,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (amount > selected.max) amount = selected.max;
+    if (!selected.stackable) amount = 1;
 
     if (amount <= 0)
       return send({
