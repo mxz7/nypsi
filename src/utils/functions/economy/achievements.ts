@@ -11,6 +11,7 @@ import { getLastKnownTag } from "../users/tag";
 import { addInventoryItem } from "./inventory";
 import { createUser, getAchievements, getItems, isEcoBanned, userExists } from "./utils";
 import { getXp, updateXp } from "./xp";
+import ms = require("ms");
 
 /**
  * returns true if user has met requirements for achievement
@@ -179,7 +180,9 @@ async function completeAchievement(userId: string, achievementId: string) {
 
     await addNotificationToQueue(payload);
 
-    if (percentChance(0.7)) {
+    if (percentChance(0.7) && !(await redis.exists(Constants.redis.nypsi.GEM_GIVEN))) {
+      await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t");
+      await redis.expire(Constants.redis.nypsi.GEM_GIVEN, Math.floor(ms("3 days") / 1000));
       const gems = ["green_gem", "purple_gem", "pink_gem"];
 
       const gem = gems[Math.floor(Math.random() * gems.length)];

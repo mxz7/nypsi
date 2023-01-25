@@ -10,6 +10,7 @@ import {
   MessageActionRowComponentBuilder,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
+import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
@@ -27,6 +28,7 @@ import { percentChance } from "../utils/functions/random";
 import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import dayjs = require("dayjs");
+import ms = require("ms");
 
 const cmd = new Command("karmashop", "buy stuff with your karma", Categories.INFO).setAliases(["ks"]);
 
@@ -388,7 +390,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     addProgress(message.author.id, "wizard", 1);
 
-    if (percentChance(0.1) && (await getDmSettings(message.member)).other) {
+    if (
+      percentChance(0.1) &&
+      (await getDmSettings(message.member)).other &&
+      !(await redis.exists(Constants.redis.nypsi.GEM_GIVEN))
+    ) {
+      await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t");
+      await redis.expire(Constants.redis.nypsi.GEM_GIVEN, Math.floor(ms("3 days") / 1000));
       await addInventoryItem(message.member, "purple_gem", 1);
       addProgress(message.author.id, "gem_hunter", 1);
       await addNotificationToQueue({
