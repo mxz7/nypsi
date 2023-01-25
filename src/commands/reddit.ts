@@ -6,7 +6,7 @@ import { getPrefix } from "../utils/functions/guilds/utils";
 import { redditImage } from "../utils/functions/image";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const blacklisted = ["body", "shit"];
+const blacklisted = ["body", "shit", "poop"];
 
 const cmd = new Command("reddit", "get a random image from any subreddit", Categories.UTILITY);
 
