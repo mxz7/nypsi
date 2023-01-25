@@ -13,7 +13,6 @@ import { listenForDms } from "./utils/handlers/notificationhandler";
 import { listen } from "./utils/handlers/webhookhandler";
 import { getWebhooks, logger, setClusterId } from "./utils/logger";
 import ms = require("ms");
-import dayjs = require("dayjs");
 
 setClusterId("main");
 getWebhooks();
