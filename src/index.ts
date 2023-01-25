@@ -13,6 +13,7 @@ import { listenForDms } from "./utils/handlers/notificationhandler";
 import { listen } from "./utils/handlers/webhookhandler";
 import { getWebhooks, logger, setClusterId } from "./utils/logger";
 import ms = require("ms");
+import dayjs = require("dayjs");
 
 setClusterId("main");
 getWebhooks();
@@ -147,3 +148,13 @@ setTimeout(async () => {
     message: "guild count posted to top.gg: " + guildCount,
   });
 }, 60000);
+
+setInterval(async () => {
+  const queries = await redis.lrange(Constants.redis.nypsi.HOURLY_DB_REPORT, 0, -1);
+  await redis.del(Constants.redis.nypsi.HOURLY_DB_REPORT);
+
+  const total = parseInt(queries.reduce((a, b) => (parseInt(a) + parseInt(b)).toString()));
+  const avg = Math.floor(total / queries.length);
+
+  logger.info(`average query takes ${avg}ms (${total.toLocaleString()} queries in the last hour)`);
+}, dayjs().add(1, "hour").set("second", 0).set("minute", 0).unix() * 1000 - Date.now());
