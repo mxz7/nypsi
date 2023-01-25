@@ -1,5 +1,6 @@
 import dayjs = require("dayjs");
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
+import redis from "../init/redis";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
@@ -9,6 +10,7 @@ import { createUser, doDaily, getItems, getLastDaily, userExists } from "../util
 import { percentChance } from "../utils/functions/random";
 import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import ms = require("ms");
 
 const cmd = new Command("daily", "get your daily bonus", Categories.MONEY);
 
@@ -52,7 +54,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     });
   }
 
-  if (percentChance(0.07)) {
+  if (percentChance(0.07) && !(await redis.exists(Constants.redis.nypsi.GEM_GIVEN))) {
+    await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t");
+    await redis.expire(Constants.redis.nypsi.GEM_GIVEN, Math.floor(ms("3 days") / 1000));
     await addInventoryItem(message.member, "blue_gem", 1);
     addProgress(message.author.id, "gem_hunter", 1);
 
