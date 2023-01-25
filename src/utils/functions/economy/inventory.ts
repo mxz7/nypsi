@@ -13,6 +13,7 @@ import { addProgress, getAllAchievements, setAchievementProgress } from "./achie
 import { getBalance, updateBalance } from "./balance";
 import { createUser, getItems, userExists } from "./utils";
 import { getXp, updateXp } from "./xp";
+import ms = require("ms");
 
 const inventoryAchievementCheckCooldown = new Set<string>();
 const gemChanceCooldown = new Set<string>();
@@ -442,12 +443,15 @@ export function selectItem(search: string) {
 }
 
 export async function commandGemCheck(member: GuildMember, commandCategory: string) {
+  if (await redis.exists(Constants.redis.nypsi.GEM_GIVEN)) return;
   if (!(await userExists(member))) return;
   if (!(await getDmSettings(member)).other) return;
   if (gemChanceCooldown.has(member.user.id)) return;
   gemChanceCooldown.add(member.user.id);
 
   if (percentChance(0.0001)) {
+    await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t");
+    await redis.expire(Constants.redis.nypsi.GEM_GIVEN, Math.floor(ms("3 days") / 1000));
     const gems = ["green_gem", "blue_gem", "purple_gem", "pink_gem"];
 
     const gem = gems[Math.floor(Math.random() * gems.length)];

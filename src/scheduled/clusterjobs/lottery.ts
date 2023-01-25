@@ -5,6 +5,7 @@ import prisma from "../../init/database";
 import redis from "../../init/redis";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 import { LotteryTicket } from "../../types/Economy";
+import Constants from "../../utils/Constants";
 import { MStoTime } from "../../utils/functions/date";
 import { addProgress } from "../../utils/functions/economy/achievements";
 import { getBalance, updateBalance } from "../../utils/functions/economy/balance";
@@ -16,7 +17,6 @@ import { addNotificationToQueue, getDmSettings } from "../../utils/functions/use
 import { logger } from "../../utils/logger";
 import dayjs = require("dayjs");
 import ms = require("ms");
-import Constants from "../../utils/Constants";
 
 async function doLottery(client: Client) {
   await redis.del("lotterytickets:queue");
@@ -98,7 +98,9 @@ async function doLottery(client: Client) {
         logger.warn("failed to send notification to winner");
       });
 
-    if (percentChance(0.9)) {
+    if (percentChance(0.9) && !(await redis.exists(Constants.redis.nypsi.GEM_GIVEN))) {
+      await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t");
+      await redis.expire(Constants.redis.nypsi.GEM_GIVEN, Math.floor(ms("3 days") / 1000));
       await addInventoryItem(user.id, "purple_gem", 1);
       addProgress(user.id, "gem_hunter", 1);
 
