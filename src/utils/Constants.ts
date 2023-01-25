@@ -91,6 +91,7 @@ export default {
       USERS_PLAYING: "nypsi:users:playing",
       LOCKED_OUT: "nypsi:requirescaptcha",
       GEM_GIVEN: "nypsi:gemgiven",
+      HOURLY_DB_REPORT: "nypsi:hourlydbreport",
     },
   },
   BOOST_ROLE_ID: "747066190530347089",
