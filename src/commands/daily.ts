@@ -52,7 +52,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     });
   }
 
-  if (percentChance(0.3)) {
+  if (percentChance(0.07)) {
     await addInventoryItem(message.member, "blue_gem", 1);
     addProgress(message.author.id, "gem_hunter", 1);
 
