@@ -180,7 +180,7 @@ async function completeAchievement(userId: string, achievementId: string) {
     await addNotificationToQueue(payload);
 
     if (percentChance(0.7)) {
-      const gems = ["green_gem", "blue_gem", "purple_gem", "pink_gem"];
+      const gems = ["green_gem", "purple_gem", "pink_gem"];
 
       const gem = gems[Math.floor(Math.random() * gems.length)];
 
