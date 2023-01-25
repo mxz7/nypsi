@@ -1,5 +1,4 @@
 import { BakeryUpgrade } from "@prisma/client";
-import { randomInt } from "crypto";
 import { GuildMember } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
@@ -138,7 +137,7 @@ export async function runBakery(member: GuildMember) {
         earned.set(upgrade.upgradeId, amount);
       }
     } else if (getBakeryUpgradesData()[upgrade.upgradeId].upgrades === "bake") {
-      click[0] += upgrade.amount * getBakeryUpgradesData()[upgrade.upgradeId].value;
+      click[1] += upgrade.amount * getBakeryUpgradesData()[upgrade.upgradeId].value;
     }
   }
 
@@ -153,7 +152,13 @@ export async function runBakery(member: GuildMember) {
     });
   }
 
-  const chosenAmount = randomInt(click[0], click[1] + 1);
+  let chosenAmount: number;
+
+  if (click[0] >= click[1]) {
+    chosenAmount = click[1];
+  } else {
+    chosenAmount = Math.floor(Math.random() * (click[1] - click[0])) + click[0];
+  }
 
   await addInventoryItem(member, "cookie", chosenAmount + passive);
 
