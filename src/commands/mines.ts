@@ -14,6 +14,7 @@ import {
   MessageActionRowComponentBuilder,
   MessageEditOptions,
 } from "discord.js";
+import ms = require("ms");
 import redis from "../init/redis.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command.js";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
@@ -757,7 +758,9 @@ async function playGame(
         grid[location] = "gc";
         win += 3;
 
-        if (percentChance(0.5)) {
+        if (percentChance(0.5) && !(await redis.exists(Constants.redis.nypsi.GEM_GIVEN))) {
+          await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t");
+          await redis.expire(Constants.redis.nypsi.GEM_GIVEN, Math.floor(ms("3 days") / 1000));
           addInventoryItem(message.member, "green_gem", 1);
           addProgress(message.author.id, "gem_hunter", 1);
           response.followUp({

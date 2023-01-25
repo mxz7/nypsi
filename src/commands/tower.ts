@@ -32,6 +32,7 @@ import { addHourlyCommand } from "../utils/handlers/commandhandler";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { gamble, logger } from "../utils/logger";
 import _ = require("lodash");
+import ms = require("ms");
 
 const cmd = new Command("tower", "play dragon tower", Categories.MONEY).setAliases([
   "dragon",
@@ -644,7 +645,9 @@ async function playGame(
           row[x] = "gc";
           game.win += 3;
 
-          if (percentChance(0.5)) {
+          if (percentChance(0.5) && !(await redis.exists(Constants.redis.nypsi.GEM_GIVEN))) {
+            await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t");
+            await redis.expire(Constants.redis.nypsi.GEM_GIVEN, Math.floor(ms("3 days") / 1000));
             addInventoryItem(message.member, "green_gem", 1);
             addProgress(message.author.id, "gem_hunter", 1);
             response.followUp({
