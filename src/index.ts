@@ -156,5 +156,5 @@ setInterval(async () => {
   const total = parseInt(queries.reduce((a, b) => (parseInt(a) + parseInt(b)).toString()));
   const avg = Math.floor(total / queries.length);
 
-  logger.info(`average query takes ${avg}ms (${total.toLocaleString()} queries in the last hour)`);
-}, dayjs().add(1, "hour").set("second", 0).set("minute", 0).unix() * 1000 - Date.now());
+  logger.info(`average query takes ${avg}ms (${total.toLocaleString()} queries in the last 15 mins)`);
+}, ms("15 minutes"));
