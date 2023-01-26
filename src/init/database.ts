@@ -13,14 +13,14 @@ prisma.$use(async (params, next) => {
 
   const timeTaken = Date.now() - before;
 
+  if (params.model === "Mention") return result;
+
   if (timeTaken > 100 && !parentPort) {
     logger.warn(`query ${params.model}.${params.action} took ${timeTaken}ms`);
     console.trace();
   }
 
   setImmediate(async () => {
-    if (params.model === "Mention") return;
-
     await redis.lpush(Constants.redis.nypsi.HOURLY_DB_REPORT, timeTaken);
   });
 
