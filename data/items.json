@@ -1527,12 +1527,13 @@
     "sell": 2500,
     "clicks": 3,
     "items": [
-      "money:75000",
+      "money:150000",
       "xp:50",
-      "id:calendar:70",
+      "id:calendar:50",
       "id:stolen_credit_card",
       "id:streak_token:50",
       "id:grandma:60",
+      "id:diamond_pickaxe:40",
       "id:iron_pickaxe:70",
       "id:wooden_pickaxe:75",
       "id:fishing_rod:75",
@@ -1542,7 +1543,7 @@
       "id:silver_credit:2",
       "id:green_gem:3",
       "id:blue_gem:3",
-      "id:pink_gem:0.3"
+      "id:pink_gem:0.7"
     ]
   },
   "lucky_scratch_card": {
