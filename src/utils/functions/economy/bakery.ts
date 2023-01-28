@@ -87,7 +87,7 @@ async function getMaxAfkHours(member: GuildMember | string) {
   let max = 2;
 
   if (await isPremium(member)) {
-    max += await getTier(member);
+    max += 1;
   }
 
   const upgrades = await getBakeryUpgrades(member).then((u) =>
