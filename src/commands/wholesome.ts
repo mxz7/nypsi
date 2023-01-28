@@ -472,7 +472,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const msg = await message.channel.send({ embeds: [new CustomEmbed(message.member, "loading...")], components: [row] });
 
-    if (args[1].toLowerCase() === "existing") return reviewExisting(msg);
+    if (args[1]?.toLowerCase() === "existing") return reviewExisting(msg);
     return reviewSuggestions(msg);
   } else {
     let member;
