@@ -713,7 +713,10 @@ async function playGame(
     const reaction = await m
       .awaitMessageComponent({ filter, time: 90000 })
       .then(async (collected) => {
-        await collected.deferUpdate();
+        await collected.deferUpdate().catch(() => {
+          fail = true;
+          return playGame(message, m, args);
+        });
         return collected.customId;
       })
       .catch((e) => {
