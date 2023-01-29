@@ -149,7 +149,8 @@ async function prepare(
         await collected.deferUpdate();
         return collected;
       })
-      .catch(() => {
+      .catch((e) => {
+        logger.warn(e);
         fail = true;
         redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
         message.channel.send({ content: message.author.toString() + " scratch card expired" });

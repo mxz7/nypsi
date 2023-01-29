@@ -685,7 +685,8 @@ async function playGame(
       await collected.deferUpdate();
       return collected;
     })
-    .catch(() => {
+    .catch((e) => {
+      logger.warn(e);
       fail = true;
       games.delete(message.author.id);
       redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
