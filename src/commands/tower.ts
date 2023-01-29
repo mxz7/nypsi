@@ -708,7 +708,10 @@ async function playGame(
   const response = await msg
     .awaitMessageComponent({ filter, time: 90000 })
     .then(async (collected) => {
-      await collected.deferUpdate();
+      await collected.deferUpdate().catch(() => {
+        fail = true;
+        return playGame(message, msg, args);
+      });
       return collected;
     })
     .catch((e) => {

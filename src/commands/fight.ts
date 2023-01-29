@@ -152,7 +152,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const response = await m
     .awaitMessageComponent({ filter, time: 60000 })
     .then(async (collected) => {
-      await collected.deferUpdate();
+      await collected.deferUpdate().catch();
       waiting.delete(message.author.id);
       return collected.customId;
     })
