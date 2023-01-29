@@ -453,7 +453,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       const response = await msg
         .awaitMessageComponent({ filter, time: 60000 })
         .then(async (collected) => {
-          await collected.deferUpdate();
+          await collected.deferUpdate().catch(() => {
+            fail = true;
+            return pageManager();
+          });
           return { res: collected.customId, interaction: collected };
         })
         .catch(async () => {

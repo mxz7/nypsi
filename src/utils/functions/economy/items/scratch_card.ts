@@ -146,7 +146,10 @@ async function prepare(
     const response = await msg
       .awaitMessageComponent({ filter, time: 90000 })
       .then(async (collected) => {
-        await collected.deferUpdate();
+        await collected.deferUpdate().catch(() => {
+          fail = true;
+          return play();
+        });
         return collected;
       })
       .catch((e) => {
