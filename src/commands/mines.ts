@@ -14,7 +14,6 @@ import {
   MessageActionRowComponentBuilder,
   MessageEditOptions,
 } from "discord.js";
-import ms = require("ms");
 import redis from "../init/redis.js";
 import { Categories, Command, NypsiCommandInteraction } from "../models/Command.js";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
@@ -33,6 +32,7 @@ import { percentChance } from "../utils/functions/random.js";
 import { addHourlyCommand } from "../utils/handlers/commandhandler.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 import { gamble, logger } from "../utils/logger.js";
+import ms = require("ms");
 
 const games = new Map<
   string,
@@ -90,13 +90,25 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
+      let usedNewMessage = false;
+      let res;
+
       if (message.deferred) {
-        await message.editReply(data);
+        res = await message.editReply(data).catch(async () => {
+          usedNewMessage = true;
+          return await message.channel.send(data as BaseMessageOptions);
+        });
       } else {
-        await message.reply(data as InteractionReplyOptions).catch(() => {
-          return message.editReply(data);
+        res = await message.reply(data as InteractionReplyOptions).catch(() => {
+          return message.editReply(data).catch(async () => {
+            usedNewMessage = true;
+            return await message.channel.send(data as BaseMessageOptions);
+          });
         });
       }
+
+      if (usedNewMessage && res instanceof Message) return res;
+
       const replyMsg = await message.fetchReply();
       if (replyMsg instanceof Message) {
         return replyMsg;
@@ -146,13 +158,25 @@ async function prepareGame(
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
+      let usedNewMessage = false;
+      let res;
+
       if (message.deferred) {
-        await message.editReply(data);
+        res = await message.editReply(data).catch(async () => {
+          usedNewMessage = true;
+          return await message.channel.send(data as BaseMessageOptions);
+        });
       } else {
-        await message.reply(data as InteractionReplyOptions).catch(() => {
-          return message.editReply(data);
+        res = await message.reply(data as InteractionReplyOptions).catch(() => {
+          return message.editReply(data).catch(async () => {
+            usedNewMessage = true;
+            return await message.channel.send(data as BaseMessageOptions);
+          });
         });
       }
+
+      if (usedNewMessage && res instanceof Message) return res;
+
       const replyMsg = await message.fetchReply();
       if (replyMsg instanceof Message) {
         return replyMsg;
