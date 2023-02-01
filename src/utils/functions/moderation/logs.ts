@@ -84,6 +84,17 @@ export async function isLogsEnabled(guild: Guild) {
     return (await redis.get(`${Constants.redis.cache.guild.LOGS}:${guild.id}`)) === "t" ? true : false;
   }
 
+  if (await redis.exists(`nypsi:query:islogsenabled:searching:${guild.id}`)) {
+    return (await new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(isLogsEnabled(guild));
+      }, 200);
+    })) as boolean;
+  }
+
+  await redis.set(`nypsi:query:islogsenabled:searching:${guild.id}`, "t");
+  await redis.expire(`nypsi:query:islogsenabled:searching:${guild.id}`, 60);
+
   const query = await prisma.moderation.findUnique({
     where: {
       guildId: guild.id,
@@ -92,6 +103,8 @@ export async function isLogsEnabled(guild: Guild) {
       logs: true,
     },
   });
+
+  await redis.del(`nypsi:query:islogsenabled:searching:${guild.id}`);
 
   if (!query || !query.logs) {
     await redis.set(`${Constants.redis.cache.guild.LOGS}:${guild.id}`, "f");
