@@ -14,7 +14,7 @@ cmd.slashData
   .addStringOption((option) =>
     option.setName("item-buy").setRequired(true).setAutocomplete(true).setDescription("item you want to buy")
   )
-  .addIntegerOption((option) => option.setMinValue(1).setName("amount").setDescription("amount you want to buy"));
+  .addStringOption((option) => option.setName("amount").setDescription("amount you want to buy"));
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (!(await userExists(message.member))) await createUser(message.member);
