@@ -26,6 +26,8 @@ import dayjs = require("dayjs");
       parentPort.postMessage("failed to send global baltop");
       process.exit(1);
     });
+
+  hook.destroy();
 })();
 
 async function topAmountGlobal(amount: number, anon = true): Promise<string[]> {

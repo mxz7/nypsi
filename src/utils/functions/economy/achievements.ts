@@ -222,7 +222,8 @@ async function completeAchievement(userId: string, achievementId: string) {
 
   const hook = new WebhookClient({ url: process.env.ACHIEVEMENTS_HOOK });
 
-  hook.send({ embeds: [embed] });
+  await hook.send({ embeds: [embed] });
+  hook.destroy();
 }
 
 export async function getUserAchievement(userId: string, achievementId: string) {

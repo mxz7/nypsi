@@ -65,4 +65,6 @@ import Constants from "../../utils/Constants";
       parentPort.postMessage("failed to send top commands");
       process.exit(1);
     });
+
+  hook.destroy();
 })();
