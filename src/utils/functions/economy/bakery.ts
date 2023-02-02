@@ -8,6 +8,7 @@ import Constants from "../../Constants";
 import { getTier, isPremium } from "../premium/premium";
 import { addProgress } from "./achievements";
 import { addInventoryItem, getInventory } from "./inventory";
+import { isPassive } from "./passive";
 import { getBakeryUpgradesData } from "./utils";
 import ms = require("ms");
 
@@ -139,6 +140,16 @@ export async function runBakery(member: GuildMember) {
     } else if (getBakeryUpgradesData()[upgrade.upgradeId].upgrades === "bake") {
       click[1] += upgrade.amount * getBakeryUpgradesData()[upgrade.upgradeId].value;
     }
+  }
+
+  if (await isPassive(member)) {
+    click[1] -= 2;
+
+    if (click[1] > 10) click[1] -= 5;
+    if (click[1] > 30) click[1] -= 5;
+    if (click[1] > 50) click[1] -= 5;
+    if (click[1] > 100) click[1] *= 0.75;
+    if (click[1] > 100) click[1] -= 10;
   }
 
   if (passive > 0) {
