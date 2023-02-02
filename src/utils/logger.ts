@@ -6,7 +6,7 @@ import "winston-daily-rotate-file";
 import * as DiscordTransport from "winston-discord-webhook";
 import Constants from "./Constants";
 
-const webhook = new Map<string, WebhookClient>();
+const webhook = new Map<string, string>();
 const nextLogMsg = new Map<string, string>();
 
 let clusterId: number | string;
@@ -159,19 +159,9 @@ export async function getWebhooks(client?: Client) {
   if (client && client.user.id != Constants.BOT_USER_ID) return;
 
   if (client) {
-    webhook.set(
-      "pay",
-      new WebhookClient({
-        url: process.env.PAYMENTS_HOOK,
-      })
-    );
+    webhook.set("pay", process.env.PAYMENTS_HOOK);
 
-    webhook.set(
-      "gamble",
-      new WebhookClient({
-        url: process.env.GAMBLE_HOOK,
-      })
-    );
+    webhook.set("gamble", process.env.GAMBLE_HOOK);
 
     runLogs();
   }
@@ -200,8 +190,10 @@ function runLogs() {
       const msg = nextLogMsg.get(k);
 
       if (msg != "" && msg) {
-        v.send({ content: msg });
+        const hook = new WebhookClient({ url: v });
+        hook.send({ content: msg });
         nextLogMsg.set(k, "");
+        hook.destroy();
       }
     });
   }, 7500);

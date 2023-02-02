@@ -38,7 +38,9 @@ async function doLottery(client: Client) {
     embed.setColor(variants.latte.base.hex as ColorResolvable);
     embed.disableFooter();
 
-    return hook.send({ embeds: [embed] });
+    await hook.send({ embeds: [embed] });
+    hook.destroy();
+    return;
   }
 
   const taxedAmount = Math.floor(tickets.length * lotteryTicketPrice * (await getTax()));
@@ -80,6 +82,8 @@ async function doLottery(client: Client) {
   embed.setColor(variants.latte.base.hex as ColorResolvable);
 
   await hook.send({ embeds: [embed] });
+
+  hook.destroy();
 
   if ((await getDmSettings(user.id)).lottery) {
     embed.setTitle("you have won the lottery!");

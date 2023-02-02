@@ -33,5 +33,7 @@ import redis from "../../init/redis";
 
   await hook.send({ embeds: [embed] });
 
+  hook.destroy();
+
   process.exit(0);
 })();

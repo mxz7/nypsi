@@ -28,10 +28,6 @@ export function runUploadReset() {
   }, 86400000);
 }
 
-const wholesomeWebhook = new WebhookClient({
-  url: process.env.WHOLESOME_HOOK,
-});
-
 let wholesomeCache: WholesomeImage[];
 
 export function isImageUrl(url: string): boolean {
@@ -169,7 +165,10 @@ export async function suggestWholesomeImage(submitter: GuildMember, image: strin
 
   embed.setImage(image);
 
-  await wholesomeWebhook.send({ embeds: [embed] });
+  const hook = new WebhookClient({ url: process.env.WHOLESOME_HOOK });
+
+  await hook.send({ embeds: [embed] });
+  hook.destroy();
 
   return true;
 }
