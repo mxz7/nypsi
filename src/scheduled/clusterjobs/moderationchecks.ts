@@ -79,6 +79,7 @@ export function runLogs() {
             },
           });
         });
+      hook.destroy();
     }
 
     if (count > 0) {
@@ -207,6 +208,7 @@ export function runModerationChecks(client: NypsiClient) {
           },
         });
       });
+      webhook.destroy();
     }
 
     if (modLogCount > 0) {

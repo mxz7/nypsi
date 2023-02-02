@@ -977,6 +977,7 @@ export function runCommandUseTimers(client: NypsiClient) {
         }
       }
     }
+    hook.destroy();
     hourlyCommandCount.clear();
     return;
   };

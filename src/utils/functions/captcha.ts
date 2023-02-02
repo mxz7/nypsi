@@ -62,6 +62,7 @@ export async function passedCaptcha(member: GuildMember) {
 
   await redis.set(`${Constants.redis.nypsi.CAPTCHA_VERIFIED}:${member.user.id}`, member.user.id);
   await redis.expire(`${Constants.redis.nypsi.CAPTCHA_VERIFIED}:${member.user.id}`, ms("30 minutes") / 1000);
+  hook.destroy();
 }
 
 export async function failedCaptcha(member: GuildMember) {
@@ -80,6 +81,7 @@ export async function failedCaptcha(member: GuildMember) {
       member.user.id
     )})${captchaFails.get(member.user.id) % 15 === 0 ? " <@&747059949770768475> <@672793821850894347>" : ""}`
   );
+  hook.destroy();
 }
 
 export async function verifyUser(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
