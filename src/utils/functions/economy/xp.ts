@@ -2,7 +2,7 @@ import { GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import Constants from "../../Constants";
-import { getTier } from "../premium/premium";
+import { getTier, isPremium } from "../premium/premium";
 import { getRequiredBetForXp } from "./balance";
 import { getBoosters } from "./boosters";
 import { getGuildLevelByUser } from "./guilds";
@@ -95,8 +95,13 @@ export async function calcEarnedXp(member: GuildMember, bet: number, multiplier:
   max += multiplier * 1.7;
 
   if (await isPassive(member)) {
-    max -= 5;
-    min -= 5;
+    if (await isPremium(member)) {
+      max -= 2.5;
+      min -= 2.5;
+    } else {
+      max -= 5;
+      min -= 5;
+    }
   }
 
   if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0) max += Math.floor(Math.random() * 7);
