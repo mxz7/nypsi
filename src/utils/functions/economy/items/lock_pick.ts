@@ -41,7 +41,7 @@ module.exports = new ItemUse(
     };
 
     if ((await getDisabledCommands(message.guild)).includes("rob")) {
-      return send({ embeds: [new ErrorEmbed("that command has been disabled")] });
+      return send({ embeds: [new ErrorEmbed(`lockpicks have been disabled in ${message.guild.name}`)] });
     }
 
     if (args.length == 1) {
