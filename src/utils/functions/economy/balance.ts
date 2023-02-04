@@ -164,7 +164,7 @@ export async function getMulti(member: GuildMember | string): Promise<number> {
       multi -= Math.floor(Math.random() * 6) + 1;
     } else {
       gemBreak(id, 0.01, "white_gem");
-      const choices = [7, 3, 4, 5, 7, 2, 17, 7, 4, 5, 3, 3, 3, 3, 4];
+      const choices = [7, 3, 4, 5, 7, 2, 17, 7, 4, 5, 3, 3, 3, 3, 4, 3, 3, 3, 3, 3, 3, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3];
       multi += Math.floor(Math.random() * choices[Math.floor(Math.random() * choices.length)]) + 1;
     }
   } else if (inventory.find((i) => i.item == "pink_gem")?.amount > 0) {
