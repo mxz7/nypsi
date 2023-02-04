@@ -220,6 +220,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       embed.setHeader("premium status", message.author.avatarURL());
 
       const profile = await getPremiumProfile(message.member);
+      const aliases = await getUserAliases(message.member);
 
       const timeStarted = formatDate(profile.startDate);
       const timeAgo = daysAgo(profile.startDate);
@@ -227,18 +228,20 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       const timeUntil = daysUntil(profile.expireDate);
       const embedColor = profile.embedColor;
 
-      let description = `**tier** ${profile.getLevelString()}\n**started** ${timeStarted} (${timeAgo} days ago)\n**expires** ${expires} (${timeUntil} days left)`;
-
-      description += `\n\n**color** ${embedColor} - /premium color`;
+      let description =
+        `**tier** ${profile.getLevelString()}` +
+        `\n**started** ${timeStarted} (${timeAgo} days ago)` +
+        `\n**expires** ${expires} (${timeUntil} days left)` +
+        `\n\n**color** ${embedColor} - /premium color` +
+        `\n**aliases** ${aliases.length.toLocaleString()}`;
 
       if (profile.level > 2) {
         const cmd = await getUserCommand(message.author.id);
-        description += `\n**custom command** ${cmd ? cmd.content : "none"}`;
+        description += `\n**custom command** ${cmd ? cmd.trigger : "none"}`;
       }
 
       if (profile.level < 4) {
-        description +=
-          "\n\nyou can upgrade your tier at [patreon](https://www.patreon.com/nypsi) or [ko-fi](https://ko-fi.com/tekoh/tiers)";
+        description += "\n\nyou can upgrade your tier at [ko-fi](https://ko-fi.com/tekoh/tiers)";
       }
 
       embed.setDescription(description);
