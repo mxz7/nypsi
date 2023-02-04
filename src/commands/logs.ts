@@ -1,11 +1,11 @@
 import { Channel, CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getLogsChannelHook, setLogsChannelHook } from "../utils/functions/moderation/logs";
 import { createProfile, profileExists } from "../utils/functions/moderation/utils";
 
-const cmd = new Command("logs", "set/update the logs channel", Categories.ADMIN).setPermissions(["MANAGE_SERVER"]);
+const cmd = new Command("logs", "set/update the logs channel", "admin").setPermissions(["MANAGE_SERVER"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {

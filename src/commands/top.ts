@@ -9,7 +9,7 @@ import {
   Message,
   MessageActionRowComponentBuilder,
 } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { Item } from "../types/Economy.js";
 import { getGuildByUser } from "../utils/functions/economy/guilds";
@@ -30,7 +30,7 @@ import { getItems } from "../utils/functions/economy/utils.js";
 import PageManager from "../utils/functions/page";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 
-const cmd = new Command("top", "view top etc. in the server", Categories.MONEY).setAliases(["baltop", "gangsters"]);
+const cmd = new Command("top", "view top etc. in the server", "money").setAliases(["baltop", "gangsters"]);
 
 const scopeChoices: APIApplicationCommandOptionChoice<string>[] = [
   { name: "global", value: "global" },

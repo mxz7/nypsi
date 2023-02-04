@@ -14,7 +14,7 @@ import {
 import { inPlaceSort } from "fast-sort";
 import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { daysAgo, formatDate } from "../utils/functions/date";
@@ -42,7 +42,7 @@ import { getDmSettings } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import ms = require("ms");
 
-const cmd = new Command("guild", "create and manage your guild/clan", Categories.MONEY)
+const cmd = new Command("guild", "create and manage your guild/clan", "money")
   .setAliases(["g", "clan"])
   .setDocs("https://docs.nypsi.xyz/economy/guilds");
 
@@ -385,7 +385,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await addCooldown(cmd.name, message.member, 20);
 
-    const res = await removeMember(message.author.id, RemoveMemberMode.ID);
+    const res = await removeMember(message.author.id, "id");
 
     if (res) {
       return message.channel.send({
@@ -405,7 +405,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return send({ embeds: [new ErrorEmbed(`${prefix}guild kick <tag>`)] });
     }
 
-    return await removeMember(args[1], RemoveMemberMode.ID);
+    return await removeMember(args[1], "id");
   }
 
   if (args[0].toLowerCase() == "setowner") {
@@ -432,7 +432,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     let target: string;
-    let mode = RemoveMemberMode.ID;
+    let mode: RemoveMemberMode = "id";
 
     if (message.mentions?.members?.first()) {
       let found = false;
@@ -455,11 +455,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       for (const m of guild.members) {
         if (m.userId == args[1]) {
           found = true;
-          mode = RemoveMemberMode.ID;
+          mode = "id";
           break;
         } else if (m.economy.user.lastKnownTag == args[1]) {
           found = true;
-          mode = RemoveMemberMode.TAG;
+          mode = "tag";
           break;
         }
       }

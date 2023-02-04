@@ -12,7 +12,7 @@ import {
 export class Command {
   public name: string;
   public description: string;
-  public category: string;
+  public category: CommandCategory;
   public docs?: string;
   public permissions?: string[];
   public aliases?: string[];
@@ -21,19 +21,19 @@ export class Command {
   public data?: any;
   public run: (message: Message | (NypsiCommandInteraction & CommandInteraction), args?: string[]) => void;
 
-  constructor(name: string, description: string, category: Categories) {
+  constructor(name: string, description: string, category: CommandCategory) {
     this.name = name.toLowerCase();
     this.description = description.toLowerCase();
-    this.category = category.toLowerCase();
+    this.category = category;
 
     switch (category) {
-      case Categories.MONEY:
+      case "money":
         this.docs = "https://docs.nypsi.xyz/economy/";
         break;
-      case Categories.MUSIC:
+      case "music":
         this.docs = "https://docs.nypsi.xyz/music/";
         break;
-      case Categories.MODERATION:
+      case "moderation":
         this.docs = "https://docs.nypsi.xyz/moderation/";
         break;
     }
@@ -70,19 +70,18 @@ export class Command {
   }
 }
 
-export enum Categories {
-  NONE = "none",
-  ANIMALS = "animals",
-  FUN = "fun",
-  INFO = "info",
-  MONEY = "money",
-  MODERATION = "moderation",
-  ADMIN = "admin",
-  MINECRAFT = "minecraft",
-  MUSIC = "music",
-  UTILITY = "utility",
-  NSFW = "nsfw",
-}
+export type CommandCategory =
+  | "none"
+  | "animals"
+  | "fun"
+  | "info"
+  | "money"
+  | "moderation"
+  | "admin"
+  | "minecraft"
+  | "music"
+  | "utility"
+  | "nsfw";
 
 export interface NypsiCommandInteraction extends CommandInteraction {
   author?: User;

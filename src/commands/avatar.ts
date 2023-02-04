@@ -11,11 +11,11 @@ import {
   MessageActionRowComponentBuilder,
   MessageEditOptions,
 } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { getMember } from "../utils/functions/member";
 
-const avatar = new Command("avatar", "get a person's avatar", Categories.INFO);
+const avatar = new Command("avatar", "get a person's avatar", "info");
 
 avatar.setAliases(["av", "pfp", "picture"]);
 

@@ -17,7 +17,7 @@ import * as fs from "fs";
 import { getBorderCharacters, table } from "table";
 import redis from "../../init/redis";
 import { NypsiClient } from "../../models/Client";
-import { Categories, Command, NypsiCommandInteraction } from "../../models/Command";
+import { Command, NypsiCommandInteraction } from "../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../models/EmbedBuilders";
 import { isLockedOut, toggleLock, verifyUser } from "../functions/captcha";
 import { formatDate, MStoTime } from "../functions/date";
@@ -778,7 +778,7 @@ export async function runCommand(
   setTimeout(async () => {
     const news = await getNews();
 
-    if (news.text != "" && command.category == Categories.MONEY && !(await hasSeenNews(message.author.id))) {
+    if (news.text != "" && command.category == "money" && !(await hasSeenNews(message.author.id))) {
       await redis.rpush(Constants.redis.nypsi.NEWS_SEEN, message.author.id);
 
       const pos = await hasSeenNews(message.author.id);

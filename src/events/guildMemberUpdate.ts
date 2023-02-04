@@ -1,7 +1,6 @@
 import { GuildMember, Role } from "discord.js";
 import { NypsiClient } from "../models/Client";
 import { CustomEmbed } from "../models/EmbedBuilders";
-import { LogType } from "../types/Moderation";
 import Constants from "../utils/Constants";
 import { addLog, isLogsEnabled } from "../utils/functions/moderation/logs";
 import { addMember, expireUser, getTier, isPremium, setTier } from "../utils/functions/premium/premium";
@@ -65,5 +64,5 @@ async function createLog(member: GuildMember, roles: Role[], added: boolean) {
   embed.setDescription(`${member.toString()} \`${member.id}\``);
   embed.addField("role", roles.map((r) => r.toString()).join(" "));
 
-  await addLog(member.guild, LogType.MEMBER, embed);
+  await addLog(member.guild, "member", embed);
 }

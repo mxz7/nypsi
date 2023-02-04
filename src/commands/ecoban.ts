@@ -1,9 +1,9 @@
 import { CommandInteraction, Message } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import Constants from "../utils/Constants";
 import { isEcoBanned, setEcoBan } from "../utils/functions/economy/utils";
 
-const cmd = new Command("ecoban", "ban an account from eco", Categories.NONE);
+const cmd = new Command("ecoban", "ban an account from eco", "none");
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (!Constants.ADMIN_IDS.includes(message.author.id)) return;

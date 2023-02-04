@@ -1,5 +1,5 @@
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import {
   getBalance,
@@ -12,7 +12,7 @@ import { createUser, formatNumber, userExists } from "../utils/functions/economy
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 
-const cmd = new Command("withdraw", "withdraw money from your bank", Categories.MONEY).setAliases(["with"]);
+const cmd = new Command("withdraw", "withdraw money from your bank", "money").setAliases(["with"]);
 
 cmd.slashEnabled = true;
 cmd.slashData.addStringOption((option) => option.setName("amount").setDescription("amount to withdraw").setRequired(true));

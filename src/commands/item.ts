@@ -1,12 +1,12 @@
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { countItemOnAuction, getAuctionAverage } from "../utils/functions/economy/auctions";
 import { getInventory, getTotalAmountOfItem, selectItem } from "../utils/functions/economy/inventory";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command("item", "view information about an item", Categories.MONEY);
+const cmd = new Command("item", "view information about an item", "money");
 
 cmd.slashEnabled = true;
 cmd.slashData.addStringOption((option) =>

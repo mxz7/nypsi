@@ -1,5 +1,5 @@
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getBalance, getMulti, updateBalance } from "../utils/functions/economy/balance";
 import { getInventory, selectItem, setInventoryItem } from "../utils/functions/economy/inventory";
@@ -8,7 +8,7 @@ import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { getTax } from "../utils/functions/tax";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command("sell", "sell items", Categories.MONEY);
+const cmd = new Command("sell", "sell items", "money");
 
 cmd.slashEnabled = true;
 cmd.slashData

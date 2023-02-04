@@ -17,7 +17,7 @@ import {
 } from "discord.js";
 import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { calcMaxBet, getDefaultBet, getRequiredBetForXp, setDefaultBet } from "../utils/functions/economy/balance";
 import { isPassive, setPassive } from "../utils/functions/economy/passive";
@@ -30,7 +30,7 @@ import { getDmSettings, getNotificationsData, updateDmSettings } from "../utils/
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import ms = require("ms");
 
-const cmd = new Command("settings", "manage nypsi settings for your server and you", Categories.UTILITY);
+const cmd = new Command("settings", "manage nypsi settings for your server and you", "utility");
 
 cmd.slashEnabled = true;
 cmd.slashData

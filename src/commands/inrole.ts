@@ -10,12 +10,12 @@ import {
   MessageActionRowComponentBuilder,
   Role,
 } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { addCooldown as addGuildCooldown, getPrefix, inCooldown } from "../utils/functions/guilds/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command("inrole", "get the members in a role", Categories.UTILITY);
+const cmd = new Command("inrole", "get the members in a role", "utility");
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (await onCooldown(cmd.name, message.member)) {

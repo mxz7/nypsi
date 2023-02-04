@@ -11,7 +11,7 @@ import {
   MessageActionRowComponentBuilder,
   MessageEditOptions,
 } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { calcMaxBet, getBankBalance, getMulti, updateBankBalance } from "../utils/functions/economy/balance.js";
 import { addBooster, getBoosters } from "../utils/functions/economy/boosters.js";
@@ -26,7 +26,7 @@ import { createUser, userExists } from "../utils/functions/economy/utils.js";
 import { getXp, updateXp } from "../utils/functions/economy/xp.js";
 import { addCooldown, addExpiry, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 
-const cmd = new Command("prestige", "prestige to gain extra benefits", Categories.MONEY);
+const cmd = new Command("prestige", "prestige to gain extra benefits", "money");
 
 cmd.slashEnabled = true;
 

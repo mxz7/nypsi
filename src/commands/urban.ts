@@ -1,12 +1,12 @@
 import { CommandInteraction, Message } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import * as urban from "urban-dictionary";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command("urban", "get a definition from urban dictionary", Categories.INFO).setAliases(["define"]);
+const cmd = new Command("urban", "get a definition from urban dictionary", "info").setAliases(["define"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (await onCooldown(cmd.name, message.member)) {

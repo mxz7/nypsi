@@ -11,7 +11,7 @@ import {
   PermissionFlagsBits,
   Role,
 } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { MStoTime } from "../utils/functions/date";
 import { getAutoJoinRoles, getPersistantRoles, setAutoJoinRoles, setPersistantRoles } from "../utils/functions/guilds/roles";
@@ -20,7 +20,7 @@ import { getMember, getRole } from "../utils/functions/member";
 import PageManager from "../utils/functions/page";
 import sleep from "../utils/functions/sleep";
 
-const cmd = new Command("role", "role utilities", Categories.UTILITY);
+const cmd = new Command("role", "role utilities", "utility");
 
 const massOperations = new Set<string>();
 

@@ -1,9 +1,9 @@
 import { CommandInteraction, Message } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import Constants from "../utils/Constants";
 import { toggleLock } from "../utils/functions/captcha";
 
-const cmd = new Command("captchatest", "test an account", Categories.NONE);
+const cmd = new Command("captchatest", "test an account", "none");
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (!Constants.ADMIN_IDS.includes(message.author.id)) return;

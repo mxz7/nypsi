@@ -7,9 +7,8 @@ import {
   Role,
   ThreadChannel,
 } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
-import { PunishmentType } from "../types/Moderation";
 import { addCooldown, getPrefix, inCooldown } from "../utils/functions/guilds/utils";
 import { getExactMember } from "../utils/functions/member";
 import { newCase } from "../utils/functions/moderation/cases";
@@ -18,7 +17,7 @@ import { createProfile, profileExists } from "../utils/functions/moderation/util
 import ms = require("ms");
 import dayjs = require("dayjs");
 
-const cmd = new Command("mute", "mute one or more users", Categories.MODERATION).setPermissions([
+const cmd = new Command("mute", "mute one or more users", "moderation").setPermissions([
   "MANAGE_MESSAGES",
   "MODERATE_MEMBERS",
 ]);
@@ -363,7 +362,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
   }
 
-  await newCase(message.guild, PunishmentType.MUTE, members1, message.author.tag, storeReason);
+  await newCase(message.guild, "mute", members1, message.author.tag, storeReason);
 
   for (const m of members1) {
     if (await isMuted(message.guild, members.get(m))) {

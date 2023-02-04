@@ -1,11 +1,11 @@
 import { CommandInteraction, Message } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { getBakeryUpgrades } from "../utils/functions/economy/bakery";
 import { getBakeryUpgradesData } from "../utils/functions/economy/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command("bakery", "view your current bakery upgrades", Categories.MONEY);
+const cmd = new Command("bakery", "view your current bakery upgrades", "money");
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
   if (await onCooldown(cmd.name, message.member)) {

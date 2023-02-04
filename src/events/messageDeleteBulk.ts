@@ -1,6 +1,5 @@
 import { Collection, Message, Snowflake, TextBasedChannel } from "discord.js";
 import { CustomEmbed } from "../models/EmbedBuilders";
-import { LogType } from "../types/Moderation";
 import { addLog, isLogsEnabled } from "../utils/functions/moderation/logs";
 import dayjs = require("dayjs");
 
@@ -32,6 +31,6 @@ export default async function messageDeleteBulk(messages: Collection<Snowflake, 
 
     embed.setDescription(`\`\`\`${desc.join("\n")}\`\`\``);
 
-    await addLog(channel.guild, LogType.MESSAGE, embed);
+    await addLog(channel.guild, "message", embed);
   }
 }

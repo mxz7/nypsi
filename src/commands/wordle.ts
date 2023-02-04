@@ -1,6 +1,6 @@
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions } from "discord.js";
 import * as fs from "fs/promises";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { MStoTime } from "../utils/functions/date";
@@ -10,7 +10,7 @@ import { addWordleGame, getWordleStats } from "../utils/functions/users/wordle";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import ms = require("ms");
 
-const cmd = new Command("wordle", "play wordle on discord", Categories.FUN).setAliases(["w"]);
+const cmd = new Command("wordle", "play wordle on discord", "fun").setAliases(["w"]);
 
 cmd.slashEnabled = true;
 cmd.slashData
@@ -28,11 +28,7 @@ interface Game {
   start: number;
 }
 
-enum Response {
-  WIN,
-  CONTINUE,
-  LOSE,
-}
+type Response = "win" | "continue" | "lose";
 
 const emojis = new Map<string, string>();
 const games = new Map<string, Game>();
@@ -264,9 +260,9 @@ async function play(message: Message | (NypsiCommandInteraction & CommandInterac
       return;
     }
 
-    if (res == Response.CONTINUE) {
+    if (res == "continue") {
       return play(message);
-    } else if (res == Response.LOSE) {
+    } else if (res == "lose") {
       return lose(message, m);
     } else {
       return win(message, m);
@@ -423,12 +419,12 @@ function guessWord(word: string, id: string): Response {
   }
 
   if (word == game.word) {
-    return Response.WIN;
+    return "win" as Response;
   } else if (game.guesses.length == 5) {
-    return Response.LOSE;
+    return "lose" as Response;
   } else {
     game.guesses.push(word);
-    return Response.CONTINUE;
+    return "continue" as Response;
   }
 }
 

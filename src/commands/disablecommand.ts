@@ -1,12 +1,12 @@
 import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { getDisabledCommands, updateDisabledCommands } from "../utils/functions/guilds/disabledcommands";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { cleanString } from "../utils/functions/string";
 import { commandExists } from "../utils/handlers/commandhandler";
 
-const cmd = new Command("disablecommand", "disable certain commands in your server", Categories.ADMIN)
+const cmd = new Command("disablecommand", "disable certain commands in your server", "admin")
   .setAliases(["disablecmd", "disable"])
   .setPermissions(["MANAGE_SERVER"]);
 

@@ -14,7 +14,7 @@ import {
   PermissionFlagsBits,
   TextChannel,
 } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getBlacklisted, setBlacklisted } from "../utils/functions/chatreactions/blacklisted";
 import {
@@ -38,7 +38,7 @@ import { isPremium } from "../utils/functions/premium/premium";
 import sleep from "../utils/functions/sleep";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command("chatreaction", "see who can type the fastest", Categories.FUN)
+const cmd = new Command("chatreaction", "see who can type the fastest", "fun")
   .setAliases(["cr", "reaction"])
   .setDocs("https://docs.nypsi.xyz/chatreactions/setup");
 

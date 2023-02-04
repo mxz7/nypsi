@@ -1,6 +1,6 @@
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
 import prisma from "../init/database";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { ErrorEmbed } from "../models/EmbedBuilders";
 import { ChartData } from "../types/Chart";
 import Constants from "../utils/Constants";
@@ -13,7 +13,7 @@ import dayjs = require("dayjs");
 
 const BASE_URL = "https://quickchart.io/chart/create";
 
-const cmd = new Command("ecohistory", "view your metric data history in a graph", Categories.MONEY).setAliases(["graph"]);
+const cmd = new Command("ecohistory", "view your metric data history in a graph", "money").setAliases(["graph"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {

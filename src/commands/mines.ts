@@ -15,7 +15,7 @@ import {
   MessageEditOptions,
 } from "discord.js";
 import redis from "../init/redis.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command.js";
+import { Command, NypsiCommandInteraction } from "../models/Command.js";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants.js";
 import { a } from "../utils/functions/anticheat.js";
@@ -69,7 +69,7 @@ abcde.set("c", 2);
 abcde.set("d", 3);
 abcde.set("e", 4);
 
-const cmd = new Command("mines", "play mines", Categories.MONEY).setAliases(["minesweeper", "ms"]);
+const cmd = new Command("mines", "play mines", "money").setAliases(["minesweeper", "ms"]);
 
 cmd.slashEnabled = true;
 cmd.slashData

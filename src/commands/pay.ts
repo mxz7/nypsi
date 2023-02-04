@@ -1,5 +1,5 @@
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
 import { getPrestige } from "../utils/functions/economy/prestige";
@@ -14,7 +14,7 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 import { transaction } from "../utils/logger";
 import dayjs = require("dayjs");
 
-const cmd = new Command("pay", "give other users money", Categories.MONEY);
+const cmd = new Command("pay", "give other users money", "money");
 
 cmd.slashEnabled = true;
 cmd.slashData

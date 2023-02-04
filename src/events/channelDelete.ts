@@ -1,6 +1,5 @@
 import { GuildChannel } from "discord.js";
 import { CustomEmbed } from "../models/EmbedBuilders";
-import { LogType } from "../types/Moderation";
 import { addLog, isLogsEnabled } from "../utils/functions/moderation/logs";
 
 export default async function channelDelete(channel: GuildChannel) {
@@ -16,6 +15,6 @@ export default async function channelDelete(channel: GuildChannel) {
       }`
     );
 
-    await addLog(channel.guild, LogType.CHANNEL, embed);
+    await addLog(channel.guild, "channel", embed);
   }
 }

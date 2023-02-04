@@ -1,7 +1,7 @@
 import dayjs = require("dayjs");
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
 import redis from "../init/redis";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { addProgress } from "../utils/functions/economy/achievements";
@@ -12,7 +12,7 @@ import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import ms = require("ms");
 
-const cmd = new Command("daily", "get your daily bonus", Categories.MONEY);
+const cmd = new Command("daily", "get your daily bonus", "money");
 
 cmd.slashEnabled = true;
 

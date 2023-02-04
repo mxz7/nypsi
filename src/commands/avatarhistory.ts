@@ -8,7 +8,7 @@ import {
   Message,
   MessageActionRowComponentBuilder,
 } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { formatDate } from "../utils/functions/date";
 import { uploadImageToImgur } from "../utils/functions/image";
@@ -21,7 +21,7 @@ import {
 } from "../utils/functions/users/history";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command("avatarhistory", "view a user's avatar history", Categories.INFO).setAliases([
+const cmd = new Command("avatarhistory", "view a user's avatar history", "info").setAliases([
   "avh",
   "avhistory",
   "pfphistory",

@@ -8,7 +8,7 @@ import {
   Message,
   MessageActionRowComponentBuilder,
 } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { calcMaxBet, getBalance, updateBalance } from "../utils/functions/economy/balance";
 import { createGame } from "../utils/functions/economy/stats";
@@ -20,7 +20,7 @@ import { gamble } from "../utils/logger.js";
 
 const waiting = new Set<string>();
 
-const cmd = new Command("coinflip", "flip a coin, double or nothing", Categories.MONEY).setAliases(["cf"]);
+const cmd = new Command("coinflip", "flip a coin, double or nothing", "money").setAliases(["cf"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (!(await userExists(message.member))) {

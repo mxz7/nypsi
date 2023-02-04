@@ -3,7 +3,7 @@
     "deep_pockets": {
       "id": "deep_pockets",
       "name": "deep pockets",
-      "upgrades": 2,
+      "upgrades": "max_storage",
       "effect": 0.25,
       "stack_limit": 25,
       "base_cost": 10000
@@ -11,7 +11,7 @@
     "premium_quality": {
       "id": "premium_quality",
       "name": "premium quality",
-      "upgrades": 0,
+      "upgrades": "per_item",
       "effect": 0.5,
       "stack_limit": 50,
       "base_cost": 15000
@@ -19,7 +19,7 @@
     "immigrant_farmers": {
       "id": "immigrant_farmers",
       "name": "immigrant farmers",
-      "upgrades": 1,
+      "upgrades": "per_interval",
       "effect": 0.2,
       "stack_limit": 20,
       "base_cost": 30000,
@@ -28,7 +28,7 @@
     "bait": {
       "id": "bait",
       "name": "bait",
-      "upgrades": 1,
+      "upgrades": "per_interval",
       "effect": 0.2,
       "stack_limit": 20,
       "base_cost": 30000,
@@ -37,7 +37,7 @@
     "sweatshop_workers": {
       "id": "sweatshop_workers",
       "name": "sweatshop workers",
-      "upgrades": 1,
+      "upgrades": "per_interval",
       "effect": 0.2,
       "stack_limit": 20,
       "base_cost": 30000,
@@ -46,7 +46,7 @@
     "ipad_kids": {
       "id": "ipad_kids",
       "name": "ipad kids",
-      "upgrades": 1,
+      "upgrades": "per_interval",
       "effect": 0.2,
       "stack_limit": 20,
       "base_cost": 30000,
@@ -55,7 +55,7 @@
     "warehouse_workers": {
       "id": "warehouse_workers",
       "name": "warehouse workers",
-      "upgrades": 1,
+      "upgrades": "per_interval",
       "effect": 0.2,
       "stack_limit": 20,
       "base_cost": 30000,
@@ -64,7 +64,7 @@
     "nasa_computers": {
       "id": "nasa_computers",
       "name": "nasa computers",
-      "upgrades": 1,
+      "upgrades": "per_interval",
       "effect": 0.75,
       "stack_limit": 15,
       "for": "spacex"
@@ -72,7 +72,7 @@
     "launchpad": {
       "id": "launchpad",
       "name": "launchpad",
-      "upgrades": 2,
+      "upgrades": "max_storage",
       "effect": 1.2,
       "stack_limit": 10,
       "for": "spacex"
@@ -80,7 +80,7 @@
     "warehouse_expansion": {
       "id": "warehouse_expansion",
       "name": "warehouse expansion",
-      "upgrades": 2,
+      "upgrades": "max_storage",
       "effect": 0.4,
       "stack_limit": 15,
       "for": "amazon"
@@ -88,7 +88,7 @@
     "underage_workers": {
       "id": "underage_workers",
       "name": "underage workers",
-      "upgrades": 0,
+      "upgrades": "per_item",
       "effect": 0.75,
       "stack_limit": 10,
       "for": "amazon"

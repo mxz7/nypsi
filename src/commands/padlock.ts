@@ -1,12 +1,12 @@
 import { CommandInteraction, Message } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
 import { hasPadlock } from "../utils/functions/economy/balance";
 import { createUser, getPadlockPrice, userExists } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
 
-const cmd = new Command("padlock", "buy a padlock to protect your wallet", Categories.MONEY);
+const cmd = new Command("padlock", "buy a padlock to protect your wallet", "money");
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (!(await userExists(message.member))) await createUser(message.member);

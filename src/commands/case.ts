@@ -11,13 +11,13 @@ import {
   MessageEditOptions,
   PermissionFlagsBits,
 } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { deleteCase, getCase } from "../utils/functions/moderation/cases";
 import { createProfile, profileExists } from "../utils/functions/moderation/utils";
 
-const cmd = new Command("case", "get information about a given case", Categories.MODERATION)
+const cmd = new Command("case", "get information about a given case", "moderation")
   .setPermissions(["MANAGE_MESSAGES", "MANAGE_SERVER", "MODERATE_MEMBERS"])
   .setDocs("https://docs.nypsi.xyz/moderation/cases");
 

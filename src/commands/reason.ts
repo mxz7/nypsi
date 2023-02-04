@@ -1,12 +1,10 @@
 import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getCase, setReason } from "../utils/functions/moderation/cases";
 
-const cmd = new Command("reason", "set a reason for a case/punishment", Categories.MODERATION).setPermissions([
-  "MANAGE_MESSAGES",
-]);
+const cmd = new Command("reason", "set a reason for a case/punishment", "moderation").setPermissions(["MANAGE_MESSAGES"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) return;
