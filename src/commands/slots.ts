@@ -7,7 +7,7 @@ import {
   Message,
   MessageEditOptions,
 } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants.js";
 import { addProgress } from "../utils/functions/economy/achievements.js";
@@ -118,7 +118,7 @@ reels.set(3, [
   "cherry-3",
 ]);
 
-const cmd = new Command("slots", "play slots", Categories.MONEY).setAliases(["bet", "slot"]);
+const cmd = new Command("slots", "play slots", "money").setAliases(["bet", "slot"]);
 
 cmd.slashEnabled = true;
 

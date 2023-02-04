@@ -1,5 +1,5 @@
 import { CommandInteraction, Message } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { addNotificationToQueue } from "../utils/functions/users/notifications";
@@ -7,7 +7,7 @@ import { addNotificationToQueue } from "../utils/functions/users/notifications";
 const cmd = new Command(
   "requestdm",
   "attempt to send a DM to a given user (this is my way of having fun leave me alone)",
-  Categories.NONE
+  "none"
 );
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {

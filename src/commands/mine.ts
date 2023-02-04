@@ -1,5 +1,5 @@
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { getBoosters } from "../utils/functions/economy/boosters";
@@ -22,9 +22,7 @@ veins.set("quartz", [1, 4, 6, 12]);
 
 const areas = ["cave", "mineshaft", "strip mine", "1x1 hole you dug", "staircase to bedrock", "nether", "nether", "nether"];
 
-const cmd = new Command("mine", "go to a cave and mine", Categories.MONEY).setDocs(
-  "https://docs.nypsi.xyz/economy/minecraft"
-);
+const cmd = new Command("mine", "go to a cave and mine", "money").setDocs("https://docs.nypsi.xyz/economy/minecraft");
 
 cmd.slashEnabled = true;
 

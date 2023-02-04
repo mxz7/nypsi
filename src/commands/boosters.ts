@@ -8,14 +8,14 @@ import {
   Message,
   MessageActionRowComponentBuilder,
 } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { getBoosters } from "../utils/functions/economy/boosters";
 import { getItems } from "../utils/functions/economy/utils";
 import PageManager from "../utils/functions/page";
 import { getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command("boosters", "view your current active boosters", Categories.MONEY).setAliases(["booster"]);
+const cmd = new Command("boosters", "view your current active boosters", "money").setAliases(["booster"]);
 
 cmd.slashEnabled = true;
 

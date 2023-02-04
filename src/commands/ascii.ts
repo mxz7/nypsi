@@ -1,11 +1,11 @@
 import { CommandInteraction, Message } from "discord.js";
 import * as ascii from "figlet";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command("ascii", "create ascii text", Categories.FUN);
+const cmd = new Command("ascii", "create ascii text", "fun");
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   const prefix = await getPrefix(message.guild);

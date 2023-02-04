@@ -1,13 +1,10 @@
 import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders.js";
 import { bottomAmount } from "../utils/functions/economy/balance";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 
-const cmd = new Command("balbottom", "view bottom balances in the server", Categories.MONEY).setAliases([
-  "bottom",
-  "brokeboys",
-]);
+const cmd = new Command("balbottom", "view bottom balances in the server", "money").setAliases(["bottom", "brokeboys"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (await onCooldown(cmd.name, message.member)) {

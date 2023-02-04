@@ -1,5 +1,5 @@
 import { BaseMessageOptions, CommandInteraction, GuildMember, InteractionReplyOptions, Message } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { getMember } from "../utils/functions/member";
@@ -8,7 +8,7 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 
 const cache = new Map<string, number>();
 
-const cmd = new Command("pp", "accurate prediction of your pp size", Categories.FUN).setAliases([
+const cmd = new Command("pp", "accurate prediction of your pp size", "fun").setAliases([
   "penis",
   "12inchmonster",
   "1inchwarrior",

@@ -1,6 +1,5 @@
 import { Message, PermissionFlagsBits } from "discord.js";
 import { CustomEmbed } from "../models/EmbedBuilders";
-import { LogType } from "../types/Moderation";
 import { checkAutoMute, checkMessageContent, getChatFilter, getSnipeFilter } from "../utils/functions/guilds/filters";
 import { createGuild, eSnipe, hasGuild } from "../utils/functions/guilds/utils";
 import { addLog, isLogsEnabled } from "../utils/functions/moderation/logs";
@@ -26,7 +25,7 @@ export default async function messageUpdate(message: Message, newMessage: Messag
       embed.addField("old content", `\`\`\`${message.content}\`\`\``, true);
       embed.addField("new content", `\`\`\`${newMessage.content}\`\`\``, true);
 
-      await addLog(message.guild, LogType.MESSAGE, embed);
+      await addLog(message.guild, "message", embed);
     }
   }
 

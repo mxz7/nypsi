@@ -1,5 +1,5 @@
 import { BaseMessageOptions, CommandInteraction, GuildMember, InteractionReplyOptions, Message } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addProgress } from "../utils/functions/economy/achievements.js";
 import { createUser, userExists } from "../utils/functions/economy/utils.js";
@@ -9,10 +9,7 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 
 const cache = new Map<string, number>();
 
-const cmd = new Command("furry", "measure how much of a furry you are", Categories.FUN).setAliases([
-  "howfurry",
-  "stfufurry",
-]);
+const cmd = new Command("furry", "measure how much of a furry you are", "fun").setAliases(["howfurry", "stfufurry"]);
 
 cmd.slashEnabled = true;
 cmd.slashData.addUserOption((option) => option.setName("user").setDescription("is this dude a furry"));

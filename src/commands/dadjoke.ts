@@ -1,11 +1,11 @@
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { RedditJSON, RedditJSONPost } from "../types/Reddit";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import ms = require("ms");
 
-const cmd = new Command("dadjoke", "get a hilarious dad joke straight from r/dadjokes", Categories.FUN).setAliases([
+const cmd = new Command("dadjoke", "get a hilarious dad joke straight from r/dadjokes", "fun").setAliases([
   "dadjokes",
   "dj",
 ]);

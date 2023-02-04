@@ -1,10 +1,10 @@
 import { CommandInteraction, Message } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { reset } from "../utils/functions/economy/utils";
 
-const cmd = new Command("reseteco", "reset economy except prestige and karma", Categories.NONE);
+const cmd = new Command("reseteco", "reset economy except prestige and karma", "none");
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
   if (message.author.id != Constants.TEKOH_ID) return;

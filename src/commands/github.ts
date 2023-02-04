@@ -1,8 +1,8 @@
 import { CommandInteraction, Message } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders.js";
 
-const cmd = new Command("github", "view code for the bot on github", Categories.INFO).setAliases(["git"]);
+const cmd = new Command("github", "view code for the bot on github", "info").setAliases(["git"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
   const embed = new CustomEmbed(

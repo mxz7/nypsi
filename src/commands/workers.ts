@@ -14,7 +14,7 @@ import {
   StringSelectMenuOptionBuilder,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { Worker } from "../types/Workers";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
@@ -31,7 +31,7 @@ import {
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import _ = require("lodash");
 
-const cmd = new Command("workers", "view the available workers and manage your own", Categories.MONEY).setAliases([
+const cmd = new Command("workers", "view the available workers and manage your own", "money").setAliases([
   "worker",
   "minion",
   "minions",

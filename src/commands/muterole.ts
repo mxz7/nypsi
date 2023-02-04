@@ -1,11 +1,11 @@
 import { CommandInteraction, Message, PermissionFlagsBits, Role, ThreadChannel } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMuteRole, setMuteRole } from "../utils/functions/moderation/mute";
 import { createProfile, profileExists } from "../utils/functions/moderation/utils";
 
-const cmd = new Command("muterole", "set the muterole for the server", Categories.ADMIN)
+const cmd = new Command("muterole", "set the muterole for the server", "admin")
   .setPermissions(["MANAGE_SERVER"])
   .setDocs("https://docs.nypsi.xyz/moderation/muterole");
 

@@ -1,5 +1,5 @@
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getMember } from "../utils/functions/member";
 import { getLastfmUsername } from "../utils/functions/users/lastfm";
@@ -8,7 +8,7 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 const cmd = new Command(
   "nowplaying",
   "view yours or another user's currently playing song using last.fm",
-  Categories.MUSIC
+  "music"
 ).setAliases(["np"]);
 
 cmd.slashEnabled = true;

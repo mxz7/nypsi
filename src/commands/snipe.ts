@@ -1,9 +1,9 @@
 import { Channel, CommandInteraction, GuildMember, Message } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { snipe } from "../utils/functions/guilds/utils";
 
-const cmd = new Command("snipe", "snipe the most recently deleted message", Categories.FUN).setAliases(["s"]);
+const cmd = new Command("snipe", "snipe the most recently deleted message", "fun").setAliases(["s"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   let channel: Channel = message.channel;

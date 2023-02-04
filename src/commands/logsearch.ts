@@ -1,9 +1,9 @@
 import { CommandInteraction, Message } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import Constants from "../utils/Constants";
 import searchLogs from "../utils/functions/workers/logsearch";
 
-const cmd = new Command("logsearch", "search through logs", Categories.NONE).setPermissions(["bot owner"]);
+const cmd = new Command("logsearch", "search through logs", "none").setPermissions(["bot owner"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (!Constants.ADMIN_IDS.includes(message.author.id)) return;

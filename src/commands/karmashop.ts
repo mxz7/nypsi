@@ -12,7 +12,7 @@ import {
 import { inPlaceSort } from "fast-sort";
 import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
 import { addProgress } from "../utils/functions/economy/achievements";
@@ -30,7 +30,7 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 import dayjs = require("dayjs");
 import ms = require("ms");
 
-const cmd = new Command("karmashop", "buy stuff with your karma", Categories.INFO).setAliases(["ks"]);
+const cmd = new Command("karmashop", "buy stuff with your karma", "info").setAliases(["ks"]);
 
 cmd.slashEnabled = true;
 cmd.slashData

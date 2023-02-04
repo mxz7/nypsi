@@ -9,13 +9,13 @@ import {
   MessageActionRowComponentBuilder,
   PermissionFlagsBits,
 } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { getMutedUsers } from "../utils/functions/moderation/mute";
 import { createProfile, profileExists } from "../utils/functions/moderation/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command("muted", "view the currently muted members in the server", Categories.MODERATION).setPermissions([
+const cmd = new Command("muted", "view the currently muted members in the server", "moderation").setPermissions([
   "MANAGE_MESSAGES",
   "MODERATE_MEMBERS",
 ]);

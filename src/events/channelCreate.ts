@@ -1,6 +1,5 @@
 import { GuildChannel } from "discord.js";
 import { CustomEmbed } from "../models/EmbedBuilders";
-import { LogType } from "../types/Moderation";
 import { addLog, isLogsEnabled } from "../utils/functions/moderation/logs";
 import { getMuteRole } from "../utils/functions/moderation/mute";
 import { profileExists } from "../utils/functions/moderation/utils";
@@ -18,7 +17,7 @@ export default async function channelCreate(channel: GuildChannel) {
       }**type** ${channel.type}`
     );
 
-    await addLog(channel.guild, LogType.CHANNEL, embed);
+    await addLog(channel.guild, "channel", embed);
   }
 
   if (!(await profileExists(channel.guild))) return;

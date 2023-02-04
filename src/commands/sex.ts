@@ -2,7 +2,7 @@ import dayjs = require("dayjs");
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
 import redis from "../init/redis.js";
 import { NypsiClient } from "../models/Client.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 
 import Constants from "../utils/Constants.js";
@@ -12,7 +12,7 @@ import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/
 import { getLastKnownTag } from "../utils/functions/users/tag.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 
-const cmd = new Command("sex", "find horny milfs in ur area 😏", Categories.FUN).setAliases([
+const cmd = new Command("sex", "find horny milfs in ur area 😏", "fun").setAliases([
   "findhornymilfsinmyarea",
   "milffinder",
   "findamilf",

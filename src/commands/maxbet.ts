@@ -1,10 +1,10 @@
 import { CommandInteraction, Message } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { calcMaxBet } from "../utils/functions/economy/balance";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 
-const cmd = new Command("maxbet", "calculate your maximum bet", Categories.MONEY);
+const cmd = new Command("maxbet", "calculate your maximum bet", "money");
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
   if (!(await userExists(message.member))) await createUser(message.member);

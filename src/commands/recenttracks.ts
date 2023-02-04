@@ -1,15 +1,14 @@
 import { CommandInteraction, Message } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getMember } from "../utils/functions/member";
 import { getLastfmUsername } from "../utils/functions/users/lastfm";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command(
-  "recenttracks",
-  "view yours or another user's recently listened to songs",
-  Categories.MUSIC
-).setAliases(["recentsongs", "recents"]);
+const cmd = new Command("recenttracks", "view yours or another user's recently listened to songs", "music").setAliases([
+  "recentsongs",
+  "recents",
+]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (await onCooldown(cmd.name, message.member)) {

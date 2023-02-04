@@ -2,7 +2,7 @@ import dayjs = require("dayjs");
 import { GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
-import { Categories } from "../../../models/Command";
+import { CommandCategory } from "../../../models/Command";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { Item } from "../../../types/Economy";
 import Constants from "../../Constants";
@@ -442,7 +442,7 @@ export function selectItem(search: string) {
   return selected;
 }
 
-export async function commandGemCheck(member: GuildMember, commandCategory: string) {
+export async function commandGemCheck(member: GuildMember, commandCategory: CommandCategory) {
   if (await redis.exists(Constants.redis.nypsi.GEM_GIVEN)) return;
   if (!(await userExists(member))) return;
   if (!(await getDmSettings(member)).other) return;
@@ -471,7 +471,7 @@ export async function commandGemCheck(member: GuildMember, commandCategory: stri
     }
   }
 
-  if (commandCategory == Categories.MODERATION) {
+  if (commandCategory == "moderation") {
     if (percentChance(0.02)) {
       await addInventoryItem(member, "pink_gem", 1);
       addProgress(member.user.id, "gem_hunter", 1);
@@ -490,7 +490,7 @@ export async function commandGemCheck(member: GuildMember, commandCategory: stri
         });
       }
     }
-  } else if (commandCategory == Categories.ANIMALS || commandCategory == Categories.NSFW) {
+  } else if (commandCategory == "animals" || commandCategory == "nsfw") {
     if (percentChance(0.001)) {
       await addInventoryItem(member, "purple_gem", 1);
       addProgress(member.user.id, "gem_hunter", 1);

@@ -1,9 +1,9 @@
 import { CommandInteraction, Message } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import Constants from "../utils/Constants";
 import { deleteSlashCommands, deleteSlashCommandsFromGuild } from "../utils/handlers/commandhandler";
 
-const cmd = new Command("deleteslash", "delete slash commands", Categories.NONE).setPermissions(["bot owner"]);
+const cmd = new Command("deleteslash", "delete slash commands", "none").setPermissions(["bot owner"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (message.member.user.id != Constants.TEKOH_ID) return;

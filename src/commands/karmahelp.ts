@@ -1,9 +1,9 @@
 import { CommandInteraction, Message } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
 
-const cmd = new Command("karmahelp", "help about the karma system", Categories.INFO);
+const cmd = new Command("karmahelp", "help about the karma system", "info");
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
   const embed = new CustomEmbed(message.member).setTitle("karma help");

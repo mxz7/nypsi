@@ -1,6 +1,6 @@
 import { CommandInteraction, Message, User } from "discord.js";
 import { NypsiClient } from "../models/Client";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { formatDate } from "../utils/functions/date";
@@ -16,7 +16,7 @@ import { getPremiumProfile, isPremium } from "../utils/functions/premium/premium
 import { getLastCommand } from "../utils/functions/users/commands";
 import { fetchUsernameHistory } from "../utils/functions/users/history";
 
-const cmd = new Command("find", "find info", Categories.NONE).setPermissions(["bot owner"]);
+const cmd = new Command("find", "find info", "none").setPermissions(["bot owner"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (message.member.user.id != Constants.TEKOH_ID) return;

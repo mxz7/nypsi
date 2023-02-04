@@ -6,7 +6,7 @@ import {
   Message,
   MessageEditOptions,
 } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants.js";
 import { addProgress } from "../utils/functions/economy/achievements.js";
@@ -59,7 +59,7 @@ const values = [
   "r",
 ];
 
-const cmd = new Command("roulette", "play roulette", Categories.MONEY).setAliases(["r"]);
+const cmd = new Command("roulette", "play roulette", "money").setAliases(["r"]);
 
 cmd.slashEnabled = true;
 cmd.slashData

@@ -6,16 +6,13 @@ import {
   Message,
   MessageActionRowComponentBuilder,
 } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { fetchGame } from "../utils/functions/economy/stats";
 import { getLastKnownTag } from "../utils/functions/users/tag";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command("viewgame", "view information about a completed gambling game", Categories.INFO).setAliases([
-  "game",
-  "id",
-]);
+const cmd = new Command("viewgame", "view information about a completed gambling game", "info").setAliases(["game", "id"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {

@@ -1,12 +1,11 @@
 import { CommandInteraction, Message, MessageReaction, PermissionFlagsBits, User } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
-import { PunishmentType } from "../types/Moderation";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { newCase } from "../utils/functions/moderation/cases";
 import { createProfile, profileExists } from "../utils/functions/moderation/utils";
 
-const cmd = new Command("kicksince", "kick members that joined after a certain time", Categories.ADMIN)
+const cmd = new Command("kicksince", "kick members that joined after a certain time", "admin")
   .setPermissions(["ADMINISTRATOR"])
   .setAliases(["fuckoffsince"]);
 
@@ -203,7 +202,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
   }
 
-  await newCase(message.guild, PunishmentType.KICK, members1, message.author.tag, reason.split(": ")[1]);
+  await newCase(message.guild, "kick", members1, message.author.tag, reason.split(": ")[1]);
 
   for (const member of members1) {
     const m = members.get(member);
