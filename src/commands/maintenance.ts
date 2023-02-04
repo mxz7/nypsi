@@ -1,9 +1,9 @@
 import { CommandInteraction, Message } from "discord.js";
 import redis from "../init/redis";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import Constants from "../utils/Constants";
 
-const cmd = new Command("maintenance", "maintenance", Categories.NONE).setPermissions(["bot owner"]);
+const cmd = new Command("maintenance", "maintenance", "none").setPermissions(["bot owner"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
   if (message.member.user.id != Constants.TEKOH_ID) return;

@@ -1,5 +1,5 @@
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { getPrefix } from "../utils/functions/guilds/utils";
@@ -8,7 +8,7 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 
 const cache = new Map<string, number>();
 
-const cmd = new Command("love", "calculate your love with another person", Categories.FUN);
+const cmd = new Command("love", "calculate your love with another person", "fun");
 
 cmd.slashEnabled = true;
 cmd.slashData.addUserOption((option) => option.setName("user").setDescription("is this person your one true love?!"));

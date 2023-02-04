@@ -1,5 +1,5 @@
 import { CommandInteraction, Message } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { cleanString } from "../utils/functions/string";
@@ -21,7 +21,7 @@ ranks.set("MVP", "MVP");
 ranks.set("VIP_PLUS", "VIP+");
 ranks.set("VIP", "VIP");
 
-const cmd = new Command("hypixel", "view hypixel stats for a minecraft account", Categories.MINECRAFT).setAliases(["h"]);
+const cmd = new Command("hypixel", "view hypixel stats for a minecraft account", "minecraft").setAliases(["h"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   const prefix = await getPrefix(message.guild);

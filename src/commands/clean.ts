@@ -1,12 +1,10 @@
 import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { isPremium } from "../utils/functions/premium/premium";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command("clean", "clean up bot commands and responses", Categories.MODERATION).setPermissions([
-  "MANAGE_MESSAGES",
-]);
+const cmd = new Command("clean", "clean up bot commands and responses", "moderation").setPermissions(["MANAGE_MESSAGES"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {

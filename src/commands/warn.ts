@@ -6,15 +6,14 @@ import {
   PermissionFlagsBits,
   User,
 } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
-import { PunishmentType } from "../types/Moderation";
 import { addCooldown, getPrefix, inCooldown } from "../utils/functions/guilds/utils";
 import { getExactMember } from "../utils/functions/member";
 import { newCase } from "../utils/functions/moderation/cases";
 import { createProfile, profileExists } from "../utils/functions/moderation/utils";
 
-const cmd = new Command("warn", "warn one or more users", Categories.MODERATION).setPermissions(["MANAGE_MESSAGES"]);
+const cmd = new Command("warn", "warn one or more users", "moderation").setPermissions(["MANAGE_MESSAGES"]);
 
 cmd.slashEnabled = true;
 cmd.slashData
@@ -195,7 +194,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
   }
 
-  await newCase(message.guild, PunishmentType.WARN, members1, message.author.tag, reason);
+  await newCase(message.guild, "warn", members1, message.author.tag, reason);
 }
 
 cmd.setRun(run);

@@ -1,5 +1,5 @@
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import {
   getBalance,
@@ -12,7 +12,7 @@ import { createUser, formatNumber, userExists } from "../utils/functions/economy
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 
-const cmd = new Command("deposit", "deposit money into your bank", Categories.MONEY).setAliases(["dep"]);
+const cmd = new Command("deposit", "deposit money into your bank", "money").setAliases(["dep"]);
 
 cmd.slashEnabled = true;
 cmd.slashData.addStringOption((option) => option.setName("amount").setDescription("amount to deposit").setRequired(true));

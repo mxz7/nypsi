@@ -2,7 +2,6 @@ import { Guild, Message, Role, ThreadChannel } from "discord.js";
 import * as stringSimilarity from "string-similarity";
 import prisma from "../../../init/database";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
-import { PunishmentType } from "../../../types/Moderation";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { MStoTime } from "../date";
@@ -99,15 +98,7 @@ export async function checkMessageContent(message: Message) {
   if (content.length >= 69) {
     for (const word of filter) {
       if (content.indexOf(word.toLowerCase()) != -1) {
-        addModLog(
-          message.guild,
-          PunishmentType.FILTER_VIOLATION,
-          message.author.id,
-          "nypsi",
-          content.join(" "),
-          -1,
-          message.channel.id
-        );
+        addModLog(message.guild, "filter violation", message.author.id, "nypsi", content.join(" "), -1, message.channel.id);
         await message.delete().catch(() => {});
         return false;
       }
@@ -122,7 +113,7 @@ export async function checkMessageContent(message: Message) {
 
           addModLog(
             message.guild,
-            PunishmentType.FILTER_VIOLATION,
+            "filter violation",
             message.author.id,
             "nypsi",
             contentModified,
@@ -211,7 +202,7 @@ export async function checkAutoMute(message: Message) {
     await Promise.all([
       newCase(
         message.guild,
-        PunishmentType.MUTE,
+        "mute",
         message.author.id,
         message.guild.members.me.user.tag,
         `[${MStoTime(length * 1000, true).trim()}] filter violation`

@@ -10,7 +10,7 @@ import {
   MessageActionRowComponentBuilder,
 } from "discord.js";
 import { NypsiClient } from "../models/Client";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { daysAgo, daysUntil, formatDate } from "../utils/functions/date";
@@ -58,7 +58,7 @@ const commandFilter = [
   "bitly",
 ];
 
-const cmd = new Command("premium", "view your premium status", Categories.INFO)
+const cmd = new Command("premium", "view your premium status", "info")
   .setAliases(["patreon", "donate", "prem", "kofi"])
   .setDocs("https://docs.nypsi.xyz/premium");
 

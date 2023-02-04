@@ -9,7 +9,7 @@ import {
   MessageActionRowComponentBuilder,
 } from "discord.js";
 import { readdir } from "fs/promises";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { ItemUse } from "../models/ItemUse";
 import { addBakeryUpgrade, getBakeryUpgrades } from "../utils/functions/economy/bakery";
@@ -32,12 +32,7 @@ import { logger } from "../utils/logger";
 
 const itemFunctions = new Map<string, ItemUse>();
 
-const cmd = new Command("use", "use an item or open crates", Categories.MONEY).setAliases([
-  "open",
-  "activate",
-  "eat",
-  "cuddle",
-]);
+const cmd = new Command("use", "use an item or open crates", "money").setAliases(["open", "activate", "eat", "cuddle"]);
 
 cmd.slashEnabled = true;
 cmd.slashData

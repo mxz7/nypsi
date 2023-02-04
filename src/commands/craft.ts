@@ -10,7 +10,7 @@ import {
   MessageActionRowComponentBuilder,
   MessageEditOptions,
 } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getCraftingItems, newCraftItem } from "../utils/functions/economy/crafting";
 import { getInventory, selectItem, setInventoryItem } from "../utils/functions/economy/inventory";
@@ -19,7 +19,7 @@ import { createUser, getItems, userExists } from "../utils/functions/economy/uti
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command("craft", "craft items", Categories.MONEY);
+const cmd = new Command("craft", "craft items", "money");
 
 cmd.slashEnabled = true;
 cmd.slashData

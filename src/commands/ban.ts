@@ -6,18 +6,15 @@ import {
   PermissionFlagsBits,
   User,
 } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
-import { PunishmentType } from "../types/Moderation";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getExactMember } from "../utils/functions/member";
 import { newBan } from "../utils/functions/moderation/ban";
 import { newCase } from "../utils/functions/moderation/cases";
 import { createProfile, profileExists } from "../utils/functions/moderation/utils";
 
-const cmd = new Command("ban", "ban one or more users from the server", Categories.MODERATION).setPermissions([
-  "BAN_MEMBERS",
-]);
+const cmd = new Command("ban", "ban one or more users from the server", "moderation").setPermissions(["BAN_MEMBERS"]);
 
 cmd.slashEnabled = true;
 cmd.slashData
@@ -268,7 +265,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   }
 
   if (idOnly) {
-    await newCase(message.guild, PunishmentType.BAN, id, message.member.user.tag, reason.split(": ")[1]);
+    await newCase(message.guild, "ban", id, message.member.user.tag, reason.split(": ")[1]);
     if (temporary) {
       await newBan(message.guild, id, unbanDate);
     }
@@ -283,7 +280,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       }
     }
 
-    await newCase(message.guild, PunishmentType.BAN, members1, message.author.tag, reason.split(": ")[1]);
+    await newCase(message.guild, "ban", members1, message.author.tag, reason.split(": ")[1]);
 
     if (temporary) {
       await newBan(message.guild, members1, unbanDate);

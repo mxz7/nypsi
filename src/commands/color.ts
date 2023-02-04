@@ -1,9 +1,9 @@
 import { ColorResolvable, CommandInteraction, Message } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { getMember } from "../utils/functions/member";
 
-const cmd = new Command("color", "get a random hex color code", Categories.INFO).setAliases(["colour"]);
+const cmd = new Command("color", "get a random hex color code", "info").setAliases(["colour"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   let color;

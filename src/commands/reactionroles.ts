@@ -7,7 +7,7 @@ import {
   Message,
   PermissionFlagsBits,
 } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import {
@@ -26,7 +26,7 @@ import {
 import { getRole } from "../utils/functions/member";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 
-const cmd = new Command("reactionroles", "create & manage the server's reaction roles", Categories.ADMIN)
+const cmd = new Command("reactionroles", "create & manage the server's reaction roles", "admin")
   .setPermissions(["MANAGE_SERVER"])
   .setAliases(["rr"]);
 

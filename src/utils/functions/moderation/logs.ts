@@ -9,20 +9,20 @@ import Constants from "../../Constants";
 const logColors = new Map<LogType, ColorResolvable>();
 const modLogColors = new Map<PunishmentType, ColorResolvable>();
 
-logColors.set(LogType.SERVER, variants.mocha.red.hex as ColorResolvable);
-logColors.set(LogType.ROLE, variants.mocha.pink.hex as ColorResolvable);
-logColors.set(LogType.CHANNEL, variants.mocha.green.hex as ColorResolvable);
-logColors.set(LogType.EMOJI, variants.mocha.peach.hex as ColorResolvable);
-logColors.set(LogType.MEMBER, variants.mocha.sky.hex as ColorResolvable);
-logColors.set(LogType.MESSAGE, variants.mocha.flamingo.hex as ColorResolvable);
+logColors.set("server", variants.mocha.red.hex as ColorResolvable);
+logColors.set("role", variants.mocha.pink.hex as ColorResolvable);
+logColors.set("channel", variants.mocha.green.hex as ColorResolvable);
+logColors.set("emoji", variants.mocha.peach.hex as ColorResolvable);
+logColors.set("member", variants.mocha.sky.hex as ColorResolvable);
+logColors.set("message", variants.mocha.flamingo.hex as ColorResolvable);
 
-modLogColors.set(PunishmentType.MUTE, variants.macchiato.yellow.hex as ColorResolvable);
-modLogColors.set(PunishmentType.UNMUTE, variants.macchiato.yellow.hex as ColorResolvable);
-modLogColors.set(PunishmentType.BAN, variants.macchiato.red.hex as ColorResolvable);
-modLogColors.set(PunishmentType.UNBAN, variants.macchiato.red.hex as ColorResolvable);
-modLogColors.set(PunishmentType.WARN, variants.macchiato.flamingo.hex as ColorResolvable);
-modLogColors.set(PunishmentType.KICK, variants.macchiato.sky.hex as ColorResolvable);
-modLogColors.set(PunishmentType.FILTER_VIOLATION, variants.macchiato.sapphire.hex as ColorResolvable);
+modLogColors.set("mute", variants.macchiato.yellow.hex as ColorResolvable);
+modLogColors.set("unmute", variants.macchiato.yellow.hex as ColorResolvable);
+modLogColors.set("ban", variants.macchiato.red.hex as ColorResolvable);
+modLogColors.set("unban", variants.macchiato.red.hex as ColorResolvable);
+modLogColors.set("warn", variants.macchiato.flamingo.hex as ColorResolvable);
+modLogColors.set("kick", variants.macchiato.sky.hex as ColorResolvable);
+modLogColors.set("filter violation", variants.macchiato.sapphire.hex as ColorResolvable);
 
 export async function addModLog(
   guild: Guild,
@@ -64,7 +64,7 @@ export async function addModLog(
     }
   }
 
-  if (caseType == PunishmentType.FILTER_VIOLATION) {
+  if (caseType == "filter violation") {
     embed.addField("message content", command);
   } else {
     embed.addField("reason", command);

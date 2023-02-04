@@ -8,7 +8,7 @@ import {
   Message,
   MessageActionRowComponentBuilder,
 } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { formatDate } from "../utils/functions/date";
 import { getMember } from "../utils/functions/member";
@@ -17,10 +17,7 @@ import { clearUsernameHistory, fetchUsernameHistory, isTracking } from "../utils
 import { hasProfile } from "../utils/functions/users/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command("usernamehistory", "view a user's username history", Categories.INFO).setAliases([
-  "un",
-  "usernames",
-]);
+const cmd = new Command("usernamehistory", "view a user's username history", "info").setAliases(["un", "usernames"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (await onCooldown(cmd.name, message.member)) {

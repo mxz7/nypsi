@@ -17,7 +17,7 @@ import {
 } from "discord.js";
 import prisma from "../init/database";
 import { NypsiClient } from "../models/Client";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { Item } from "../types/Economy";
 import Constants from "../utils/Constants";
@@ -41,7 +41,7 @@ import requestDM from "../utils/functions/requestdm";
 import { getDmSettings } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command("auction", "create and manage your item auctions", Categories.MONEY).setAliases(["ah"]);
+const cmd = new Command("auction", "create and manage your item auctions", "money").setAliases(["ah"]);
 
 cmd.slashEnabled = true;
 cmd.slashData

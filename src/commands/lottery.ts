@@ -1,6 +1,6 @@
 import dayjs = require("dayjs");
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
@@ -8,7 +8,7 @@ import { addTicket, createUser, getTickets, lotteryTicketPrice, userExists } fro
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command("lottery", "enter the weekly lottery draw", Categories.MONEY).setAliases(["lotto"]);
+const cmd = new Command("lottery", "enter the weekly lottery draw", "money").setAliases(["lotto"]);
 
 cmd.slashEnabled = true;
 cmd.slashData

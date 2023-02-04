@@ -12,7 +12,7 @@ import {
   StringSelectMenuOptionBuilder,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants.js";
 import { addProgress } from "../utils/functions/economy/achievements.js";
@@ -25,7 +25,7 @@ import { addToNypsiBank, getNypsiBankBalance, removeFromNypsiBankBalance } from 
 import { addCooldown, getRemaining, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 import ms = require("ms");
 
-const cmd = new Command("bankrob", "attempt to rob a bank for a high reward", Categories.MONEY);
+const cmd = new Command("bankrob", "attempt to rob a bank for a high reward", "money");
 
 const defaults = new Map<string, number>([
   ["bank of america", 3_000_000],

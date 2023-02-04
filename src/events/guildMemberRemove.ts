@@ -2,7 +2,6 @@ import { GuildMember } from "discord.js";
 import prisma from "../init/database";
 import { NypsiClient } from "../models/Client";
 import { CustomEmbed } from "../models/EmbedBuilders";
-import { LogType } from "../types/Moderation";
 import { daysAgo, formatDate } from "../utils/functions/date";
 import { getPersistantRoles } from "../utils/functions/guilds/roles";
 import { addLog, isLogsEnabled } from "../utils/functions/moderation/logs";
@@ -47,7 +46,7 @@ export default async function guildMemberRemove(member: GuildMember) {
       embed.addField(`roles [${roles.size - 1}]`, rolesText.join(" "), true);
     }
 
-    await addLog(member.guild, LogType.MEMBER, embed);
+    await addLog(member.guild, "member", embed);
   }
 
   if (member.roles.cache.size > 0 && (await getPersistantRoles(member.guild)).length > 0) {

@@ -1,5 +1,5 @@
 import { CommandInteraction, Message } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { RedditJSON } from "../types/Reddit";
 import { getPrefix } from "../utils/functions/guilds/utils";
@@ -8,7 +8,7 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 
 const blacklisted = ["body", "shit", "poop"];
 
-const cmd = new Command("reddit", "get a random image from any subreddit", Categories.UTILITY);
+const cmd = new Command("reddit", "get a random image from any subreddit", "utility");
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (await onCooldown(cmd.name, message.member)) {

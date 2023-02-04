@@ -1,12 +1,12 @@
 import { TrackingType } from "@prisma/client";
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message, PermissionFlagsBits } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { getItems } from "../utils/functions/economy/utils";
 import { createGuildCounter, deleteGuildCounter, getGuildCounters } from "../utils/functions/guilds/counters";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 
-const cmd = new Command("counter", "create updating count channels for your server", Categories.ADMIN)
+const cmd = new Command("counter", "create updating count channels for your server", "admin")
   .setAliases(["counters"])
   .setPermissions(["MANAGE_SERVER"]);
 

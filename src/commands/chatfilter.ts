@@ -1,11 +1,11 @@
 import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { getChatFilter, updateChatFilter } from "../utils/functions/guilds/filters";
 import { getPercentMatch, getPrefix, setPercentMatch } from "../utils/functions/guilds/utils";
 import { cleanString } from "../utils/functions/string";
 
-const cmd = new Command("chatfilter", "change the chat filter for your server", Categories.ADMIN)
+const cmd = new Command("chatfilter", "change the chat filter for your server", "admin")
   .setAliases(["filter"])
   .setPermissions(["MANAGE_SERVER"]);
 

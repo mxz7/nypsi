@@ -293,13 +293,10 @@ export async function addMember(name: string, member: GuildMember) {
   return true;
 }
 
-export enum RemoveMemberMode {
-  ID,
-  TAG,
-}
+export type RemoveMemberMode = "id" | "tag";
 
 export async function removeMember(member: string, mode: RemoveMemberMode) {
-  if (mode == RemoveMemberMode.ID) {
+  if (mode == "id") {
     await prisma.economyGuildMember.delete({
       where: {
         userId: member,

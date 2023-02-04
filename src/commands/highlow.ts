@@ -14,7 +14,7 @@ import {
   MessageEditOptions,
 } from "discord.js";
 import redis from "../init/redis.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command.js";
+import { Command, NypsiCommandInteraction } from "../models/Command.js";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants.js";
 import { a } from "../utils/functions/anticheat.js";
@@ -36,7 +36,7 @@ const games = new Map<
   { bet: number; win: number; deck: string[]; card: string; id: number; voted: number; oldCard?: string }
 >();
 
-const cmd = new Command("highlow", "higher or lower game", Categories.MONEY).setAliases(["hl"]);
+const cmd = new Command("highlow", "higher or lower game", "money").setAliases(["hl"]);
 
 cmd.slashEnabled = true;
 cmd.slashData.addStringOption((option) =>

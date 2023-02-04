@@ -1,13 +1,10 @@
 import { CommandInteraction, Message } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders.js";
 import { formatDate } from "../utils/functions/date";
 import { addCooldown, getPeaks, inCooldown, runCheck } from "../utils/functions/guilds/utils";
 
-const cmd = new Command("server", "view information about the server", Categories.INFO).setAliases([
-  "serverinfo",
-  "membercount",
-]);
+const cmd = new Command("server", "view information about the server", "info").setAliases(["serverinfo", "membercount"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   const server = message.guild;

@@ -1,5 +1,5 @@
 import { CommandInteraction, Message } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
@@ -26,7 +26,7 @@ const answers = [
   "you may rely on it",
 ];
 
-const cmd = new Command("8ball", "ask the 8ball a question", Categories.FUN).setAliases(["8"]);
+const cmd = new Command("8ball", "ask the 8ball a question", "fun").setAliases(["8"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (await onCooldown(cmd.name, message.member)) {

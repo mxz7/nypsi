@@ -86,14 +86,14 @@ export async function calcWorkerValues(
 
   for (const upgrade of worker.upgrades) {
     switch (baseUpgrades[upgrade.upgradeId].upgrades) {
-      case 0:
+      case "per_item":
         perItemBonus += baseUpgrades[upgrade.upgradeId].effect * upgrade.amount * baseWorkers[worker.workerId].base.per_item;
         break;
-      case 1:
+      case "per_interval":
         perIntervalBonus +=
           baseUpgrades[upgrade.upgradeId].effect * upgrade.amount * baseWorkers[worker.workerId].base.per_interval;
         break;
-      case 2:
+      case "max_storage":
         maxStoredBonus +=
           baseUpgrades[upgrade.upgradeId].effect * upgrade.amount * baseWorkers[worker.workerId].base.max_storage;
         break;

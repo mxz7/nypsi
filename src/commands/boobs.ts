@@ -1,12 +1,12 @@
 import { CommandInteraction, Message } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { redditImage } from "../utils/functions/image";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { images } from "../utils/handlers/imghandler";
 
-const cmd = new Command("boobs", "get a random boob image", Categories.NSFW).setAliases([
+const cmd = new Command("boobs", "get a random boob image", "nsfw").setAliases([
   "boobies",
   "tits",
   "titties",

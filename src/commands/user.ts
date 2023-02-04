@@ -1,6 +1,6 @@
 import { CommandInteraction, Message } from "discord.js";
 import { inPlaceSort } from "fast-sort";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { formatDate } from "../utils/functions/date";
 import { addCooldown, inCooldown } from "../utils/functions/guilds/utils";
@@ -8,7 +8,7 @@ import { getMember } from "../utils/functions/member";
 import { fetchUsernameHistory } from "../utils/functions/users/history";
 import workerSort from "../utils/functions/workers/sort";
 
-const cmd = new Command("user", "view info about a user in the server", Categories.INFO).setAliases(["whois", "who"]);
+const cmd = new Command("user", "view info about a user in the server", "info").setAliases(["whois", "who"]);
 
 const sortCache = new Map<string, string[]>();
 
