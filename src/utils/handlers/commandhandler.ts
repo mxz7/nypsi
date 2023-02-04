@@ -762,9 +762,9 @@ export async function runCommand(
 
   if ((await getDisabledCommands(message.guild)).includes(command.name)) {
     if (message instanceof Message) {
-      return message.channel.send({ embeds: [new ErrorEmbed("that command has been disabled")] });
+      return message.channel.send({ embeds: [new ErrorEmbed(`that command has been disabled in ${message.guild.name}`)] });
     } else {
-      return message.reply({ embeds: [new ErrorEmbed("that command has been disabled")] });
+      return message.reply({ embeds: [new ErrorEmbed(`that command has been disabled in ${message.guild.name}`)] });
     }
   }
 
