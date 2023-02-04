@@ -151,20 +151,20 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   embed.setDescription(desc.join("\n"));
 
-  if (!selected.emoji.split(":")[2]) {
-    return message.channel.send({ embeds: [new ErrorEmbed("invalid emoji - please use a custom emoji")] });
-  }
-
   await addCooldown(cmd.name, message.member, 5);
 
-  const emojiID = selected.emoji.split(":")[2].slice(0, selected.emoji.split(":")[2].length - 1);
+  let thumbnail: string;
 
-  let thumbnail = `https://cdn.discordapp.com/emojis/${emojiID}`;
+  if (selected.emoji.split(":")[2]) {
+    const emojiID = selected.emoji.split(":")[2].slice(0, selected.emoji.split(":")[2].length - 1);
 
-  if (selected.emoji.split(":")[0].includes("a")) {
-    thumbnail = thumbnail + ".gif";
-  } else {
-    thumbnail = thumbnail + ".png";
+    thumbnail = `https://cdn.discordapp.com/emojis/${emojiID}`;
+
+    if (selected.emoji.split(":")[0].includes("a")) {
+      thumbnail = thumbnail + ".gif";
+    } else {
+      thumbnail = thumbnail + ".png";
+    }
   }
 
   embed.setThumbnail(thumbnail);
