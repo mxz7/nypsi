@@ -25,7 +25,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       levels.map((secs, index) => `${index + 1} \`${MStoTime(secs * 1000, true).trim() || "no mute"}\``).join("\n")
     )
       .setHeader("current auto mute lengths")
-      .setFooter({ text: `${prefix}automute <vl> <length | none>` });
+      .setFooter({ text: `${prefix}automute <vl> <length | delete>` });
 
     if (levels.length == 0) {
       embed.setDescription("automute is disabled");
@@ -42,7 +42,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (!parseInt(args[0])) {
     return message.channel.send({
-      embeds: [new ErrorEmbed(`${prefix}automute <vl> <length | none>\n${prefix}automute disable`)],
+      embeds: [
+        new ErrorEmbed(
+          `${prefix}automute <vl> <length | delete>\n${prefix}automute disable\n${prefix}automute <vl> 0 to set a vl to not mute`
+        ),
+      ],
     });
   }
 
@@ -54,7 +58,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return message.channel.send({ embeds: [new ErrorEmbed("cannot have more than 10 levels")] });
   }
 
-  if (args[1].toLowerCase() == "none") {
+  if (args[1].toLowerCase() == "delete") {
     levels.splice(level, 1);
 
     await setAutoMuteLevels(message.guild, levels);
@@ -64,7 +68,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const duration = getDuration(args[1].toLowerCase());
 
-  if (!duration && duration !== 0)
+  if (duration < 0 || isNaN(duration) || typeof duration !== "number")
     return message.channel.send({ embeds: [new ErrorEmbed("invalid duration. format: 15m = 15 minutes")] });
 
   levels[level] = duration;
@@ -108,4 +112,6 @@ function getDuration(duration: string): number {
 
     return num;
   }
+
+  return 0;
 }
