@@ -12,13 +12,13 @@ import {
   MessageActionRowComponentBuilder,
   MessageEditOptions,
 } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getLastfmUsername } from "../utils/functions/users/lastfm";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger } from "../utils/logger";
 
-const cmd = new Command("toptracks", "view your top tracks", Categories.MUSIC).setAliases(["tt"]);
+const cmd = new Command("toptracks", "view your top tracks", "music").setAliases(["tt"]);
 
 const lengthChoices: APIApplicationCommandOptionChoice<string>[] = [
   { name: "1 week", value: "week" },

@@ -14,7 +14,7 @@ import {
   MessageEditOptions,
 } from "discord.js";
 import redis from "../init/redis";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
 import { a } from "../utils/functions/anticheat";
@@ -44,7 +44,7 @@ const games = new Map<
   }
 >();
 
-const cmd = new Command("blackjack", "play blackjack", Categories.MONEY).setAliases(["bj", "blowjob"]);
+const cmd = new Command("blackjack", "play blackjack", "money").setAliases(["bj", "blowjob"]);
 
 cmd.slashEnabled = true;
 cmd.slashData.addStringOption((option) =>

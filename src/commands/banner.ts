@@ -1,9 +1,9 @@
 import { CommandInteraction, GuildMember, Message } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { getMember } from "../utils/functions/member";
 
-const cmd = new Command("banner", "get a person's banner", Categories.INFO);
+const cmd = new Command("banner", "get a person's banner", "info");
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   let member: GuildMember;

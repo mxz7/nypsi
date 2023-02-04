@@ -1,12 +1,12 @@
 import { CommandInteraction, Message } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { redditImage } from "../utils/functions/image";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { images } from "../utils/handlers/imghandler";
 
-const cmd = new Command("hands", "get a random hand image. horny slut", Categories.NSFW).setAliases(["hand"]);
+const cmd = new Command("hands", "get a random hand image. horny slut", "nsfw").setAliases(["hand"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
   if (await onCooldown(cmd.name, message.member)) {

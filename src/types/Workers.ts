@@ -21,8 +21,4 @@ export interface WorkerUpgrades {
   for?: string;
 }
 
-enum PossibleUpgrade {
-  PER_ITEM,
-  PER_INTERVAL,
-  MAX_STORAGE,
-}
+export type PossibleUpgrade = "per_item" | "per_interval" | "max_storage";

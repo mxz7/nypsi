@@ -1,9 +1,9 @@
 import { CommandInteraction, Message, MessageReaction, PermissionFlagsBits, User } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { deleteServer, profileExists } from "../utils/functions/moderation/utils";
 
-const cmd = new Command("deleteallcases", "delete all cases in a server", Categories.ADMIN)
+const cmd = new Command("deleteallcases", "delete all cases in a server", "admin")
   .setAliases(["dac"])
   .setPermissions(["server owner"]);
 

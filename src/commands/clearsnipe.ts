@@ -1,9 +1,9 @@
 import { Channel, CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { eSnipe, snipe } from "../utils/functions/guilds/utils";
 
-const cmd = new Command("clearsnipe", "delete the current sniped thing", Categories.MODERATION)
+const cmd = new Command("clearsnipe", "delete the current sniped thing", "moderation")
   .setAliases(["cs"])
   .setPermissions(["MANAGE_MESSAGES"]);
 

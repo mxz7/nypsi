@@ -14,7 +14,7 @@ import {
   MessageActionRowComponentBuilder,
 } from "discord.js";
 import redis from "../init/redis";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { a } from "../utils/functions/anticheat";
@@ -34,12 +34,7 @@ import { gamble, logger } from "../utils/logger";
 import _ = require("lodash");
 import ms = require("ms");
 
-const cmd = new Command("tower", "play dragon tower", Categories.MONEY).setAliases([
-  "dragon",
-  "dragontower",
-  "dt",
-  "dragonstower",
-]);
+const cmd = new Command("tower", "play dragon tower", "money").setAliases(["dragon", "dragontower", "dt", "dragonstower"]);
 
 interface Game {
   gameId: number;

@@ -1,6 +1,5 @@
 import { Message } from "discord.js";
 import { CustomEmbed } from "../models/EmbedBuilders";
-import { LogType } from "../types/Moderation";
 import { getChatFilter, getSnipeFilter } from "../utils/functions/guilds/filters";
 import { createGuild, hasGuild, snipe } from "../utils/functions/guilds/utils";
 import { addLog, isLogsEnabled } from "../utils/functions/moderation/logs";
@@ -26,7 +25,7 @@ export default async function messageDelete(message: Message) {
       );
       embed.addField("content", `\`\`\`${message.content}\`\`\``);
 
-      await addLog(message.guild, LogType.MESSAGE, embed);
+      await addLog(message.guild, "message", embed);
     }
 
     const filter = await getSnipeFilter(message.guild);

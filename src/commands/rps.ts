@@ -1,5 +1,5 @@
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants.js";
 import { calcMaxBet, getBalance, getDefaultBet, getMulti, updateBalance } from "../utils/functions/economy/balance.js";
@@ -12,7 +12,7 @@ import { shuffle } from "../utils/functions/random";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 import { gamble } from "../utils/logger.js";
 
-const cmd = new Command("rps", "play rock paper scissors", Categories.MONEY).setAliases(["rockpaperscissors"]);
+const cmd = new Command("rps", "play rock paper scissors", "money").setAliases(["rockpaperscissors"]);
 
 cmd.slashEnabled = true;
 cmd.slashData

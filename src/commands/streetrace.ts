@@ -1,6 +1,6 @@
 import { BaseMessageOptions, ChannelType, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
 import { randomInt } from "node:crypto";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { Item } from "../types/Economy";
 import { RaceDetails, RaceUserDetails } from "../types/StreetRace";
@@ -11,7 +11,7 @@ import { createUser, formatBet, getItems, userExists } from "../utils/functions/
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command("streetrace", "create or join a street race", Categories.MONEY).setAliases(["sr"]);
+const cmd = new Command("streetrace", "create or join a street race", "money").setAliases(["sr"]);
 
 cmd.slashEnabled = true;
 cmd.slashData

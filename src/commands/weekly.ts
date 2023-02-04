@@ -1,5 +1,5 @@
 import { CommandInteraction, Message } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { getBalance, getMulti, updateBalance } from "../utils/functions/economy/balance.js";
 import { createUser, userExists } from "../utils/functions/economy/utils.js";
@@ -8,7 +8,7 @@ import { getTier, isPremium } from "../utils/functions/premium/premium.js";
 import { getLastWeekly, setLastWeekly } from "../utils/functions/premium/weekly.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 
-const cmd = new Command("weekly", "get your weekly bonus (premium only)", Categories.MONEY);
+const cmd = new Command("weekly", "get your weekly bonus (premium only)", "money");
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
   if (await onCooldown(cmd.name, message.member)) {

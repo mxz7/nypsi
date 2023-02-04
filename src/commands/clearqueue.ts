@@ -1,9 +1,9 @@
 import { CommandInteraction, Message } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import Constants from "../utils/Constants";
 import { mentionQueue } from "../utils/functions/users/mentions";
 
-const cmd = new Command("clearqueue", "clear the mentions queue", Categories.NONE).setPermissions(["bot owner"]);
+const cmd = new Command("clearqueue", "clear the mentions queue", "none").setPermissions(["bot owner"]);
 
 async function run(message: Message | (CommandInteraction & NypsiCommandInteraction)) {
   if (message.author.id != Constants.TEKOH_ID) return;

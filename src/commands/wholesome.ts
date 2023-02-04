@@ -14,7 +14,7 @@ import {
 } from "discord.js";
 import prisma from "../init/database";
 import { NypsiClient } from "../models/Client";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { formatDate } from "../utils/functions/date";
@@ -37,12 +37,7 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 
 const uploadCooldown = new Map<string, number>();
 
-const cmd = new Command("wholesome", "get a random wholesome picture", Categories.FUN).setAliases([
-  "iloveyou",
-  "loveu",
-  "ws",
-  "ily",
-]);
+const cmd = new Command("wholesome", "get a random wholesome picture", "fun").setAliases(["iloveyou", "loveu", "ws", "ily"]);
 
 cmd.slashEnabled = true;
 

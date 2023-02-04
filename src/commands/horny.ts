@@ -1,5 +1,5 @@
 import { BaseMessageOptions, CommandInteraction, GuildMember, InteractionReplyOptions, Message } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { getMember } from "../utils/functions/member";
@@ -7,11 +7,7 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 
 const cache = new Map<string, number>();
 
-const cmd = new Command("horny", "measure how horny you are", Categories.FUN).setAliases([
-  "howhorny",
-  "fuckmedaddy",
-  "makemecum",
-]);
+const cmd = new Command("horny", "measure how horny you are", "fun").setAliases(["howhorny", "fuckmedaddy", "makemecum"]);
 
 cmd.slashEnabled = true;
 cmd.slashData.addUserOption((option) => option.setName("user").setDescription("how horny are u"));

@@ -14,7 +14,7 @@ import {
   TextInputStyle,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { Item } from "../types/Economy";
 import { getInventory } from "../utils/functions/economy/inventory";
@@ -22,7 +22,7 @@ import { createUser, getItems, userExists } from "../utils/functions/economy/uti
 import PageManager from "../utils/functions/page";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command("inventory", "view items in your inventory", Categories.MONEY).setAliases(["inv"]);
+const cmd = new Command("inventory", "view items in your inventory", "money").setAliases(["inv"]);
 
 cmd.slashEnabled = true;
 cmd.slashData.addStringOption((option) =>

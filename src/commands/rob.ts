@@ -1,6 +1,6 @@
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions } from "discord.js";
 import redis from "../init/redis";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
 import { addProgress } from "../utils/functions/economy/achievements";
@@ -18,7 +18,7 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 
 const playerCooldown = new Set<string>();
 
-const cmd = new Command("rob", "rob other server members", Categories.MONEY).setAliases(["steal"]);
+const cmd = new Command("rob", "rob other server members", "money").setAliases(["steal"]);
 
 cmd.slashEnabled = true;
 cmd.slashData.addUserOption((option) => option.setName("user").setDescription("who do u wanna rob").setRequired(true));

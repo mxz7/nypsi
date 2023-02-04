@@ -7,15 +7,11 @@ import {
   PermissionFlagsBits,
   PermissionsBitField,
 } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command(
-  "lockdown",
-  "lockdown a channel (will only work if permissions are setup correctly)",
-  Categories.MODERATION
-)
+const cmd = new Command("lockdown", "lockdown a channel (will only work if permissions are setup correctly)", "moderation")
   .setAliases(["lock", "shutup"])
   .setPermissions(["MANAGE_MESSAGES", "MANAGE_CHANNELS"]);
 

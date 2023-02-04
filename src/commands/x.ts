@@ -2,7 +2,7 @@ import { CommandInteraction, Message, User } from "discord.js";
 import * as fs from "fs/promises";
 import prisma from "../init/database";
 import { NypsiClient } from "../models/Client";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { formatDate } from "../utils/functions/date";
@@ -11,7 +11,7 @@ import { getItems } from "../utils/functions/economy/utils";
 import { fetchUsernameHistory } from "../utils/functions/users/history";
 import { logger } from "../utils/logger";
 
-const cmd = new Command("x", "admincmd", Categories.NONE).setPermissions(["bot owner"]);
+const cmd = new Command("x", "admincmd", "none").setPermissions(["bot owner"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (!(message instanceof Message)) return;

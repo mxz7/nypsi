@@ -9,14 +9,14 @@ import {
   Message,
   MessageActionRowComponentBuilder,
 } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
 import { getPrestige } from "../utils/functions/economy/prestige";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { getLastVote, hasVoted } from "../utils/functions/economy/vote";
 
-const cmd = new Command("vote", "vote every 12 hours to get rewards", Categories.MONEY);
+const cmd = new Command("vote", "vote every 12 hours to get rewards", "money");
 
 cmd.slashEnabled = true;
 

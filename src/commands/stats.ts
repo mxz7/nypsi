@@ -16,7 +16,7 @@ import { workerCount } from "../events/message";
 import prisma from "../init/database";
 import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { MStoTime } from "../utils/functions/date";
@@ -29,7 +29,7 @@ import { getVersion } from "../utils/functions/version";
 import { aliasesSize, commandsSize } from "../utils/handlers/commandhandler";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command("stats", "view your nypsi stats", Categories.INFO);
+const cmd = new Command("stats", "view your nypsi stats", "info");
 
 cmd.slashEnabled = true;
 cmd.slashData

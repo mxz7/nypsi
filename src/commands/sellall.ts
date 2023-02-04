@@ -1,6 +1,6 @@
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
 import { inPlaceSort } from "fast-sort";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getBalance, getMulti, updateBalance } from "../utils/functions/economy/balance";
 import { getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
@@ -10,7 +10,7 @@ import { addToNypsiBank, getTax } from "../utils/functions/tax";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import pAll = require("p-all");
 
-const cmd = new Command("sellall", "sell all commonly sold items", Categories.MONEY);
+const cmd = new Command("sellall", "sell all commonly sold items", "money");
 
 cmd.slashEnabled = true;
 

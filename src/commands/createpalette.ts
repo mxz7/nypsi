@@ -1,6 +1,6 @@
 import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
 import { inPlaceSort } from "fast-sort";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { isPremium } from "../utils/functions/premium/premium";
@@ -9,7 +9,7 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 const cmd = new Command(
   "createpalette",
   "create a color palette for color.tekoh.net from role colors",
-  Categories.UTILITY
+  "utility"
 ).setAliases(["palette", "rolepalette"]);
 
 const regex = /[^a-f0-9]/g;

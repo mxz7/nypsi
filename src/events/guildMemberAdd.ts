@@ -1,6 +1,5 @@
 import { GuildMember } from "discord.js";
 import { CustomEmbed } from "../models/EmbedBuilders";
-import { LogType } from "../types/Moderation";
 import { daysAgo, formatDate } from "../utils/functions/date";
 import {
   getAutoJoinRoles,
@@ -46,7 +45,7 @@ export default async function guildMemberAdd(member: GuildMember) {
       embed.addField("username history", text.join("\n"));
     }
 
-    await addLog(member.guild, LogType.MEMBER, embed);
+    await addLog(member.guild, "member", embed);
   }
 
   const autoRoles = await getAutoJoinRoles(member.guild);

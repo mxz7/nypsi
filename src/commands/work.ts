@@ -1,13 +1,13 @@
 import { CommandInteraction, Message } from "discord.js";
 // @ts-expect-error doesnt like getting from json file
 import { workMessages } from "../../data/lists.json";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command("work", "work a random job and safely earn a random amount of money", Categories.MONEY);
+const cmd = new Command("work", "work a random job and safely earn a random amount of money", "money");
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
   if (await onCooldown(cmd.name, message.member)) {

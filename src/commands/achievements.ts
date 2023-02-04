@@ -10,7 +10,7 @@ import {
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import prisma from "../init/database";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { AchievementData } from "../types/Economy";
 import { daysAgo } from "../utils/functions/date";
@@ -24,10 +24,7 @@ import { getAchievements } from "../utils/functions/economy/utils";
 import PageManager from "../utils/functions/page";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command("achievements", "view your achievement progress", Categories.MONEY).setAliases([
-  "ach",
-  "achievement",
-]);
+const cmd = new Command("achievements", "view your achievement progress", "money").setAliases(["ach", "achievement"]);
 
 cmd.slashEnabled = true;
 cmd.slashData

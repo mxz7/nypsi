@@ -9,7 +9,7 @@ import {
   Message,
   MessageActionRowComponentBuilder,
 } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { ErrorEmbed } from "../models/EmbedBuilders";
 import { runBakery } from "../utils/functions/economy/bakery";
 import { getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
@@ -19,7 +19,7 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 const cmd = new Command(
   "bake",
   "use your furnace to bake cookies and cakes! (doesnt remove your furnace because cookies are cool)",
-  Categories.MONEY
+  "money"
 );
 
 cmd.slashEnabled = true;

@@ -1,11 +1,11 @@
 import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { getSnipeFilter, updateSnipeFilter } from "../utils/functions/guilds/filters";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { cleanString } from "../utils/functions/string";
 
-const cmd = new Command("snipefilter", "change the snipe filter for your server", Categories.ADMIN)
+const cmd = new Command("snipefilter", "change the snipe filter for your server", "admin")
   .setAliases(["sf"])
   .setPermissions(["MANAGE_SERVER"]);
 

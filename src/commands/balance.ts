@@ -1,6 +1,6 @@
 import { BaseMessageOptions, CommandInteraction, GuildMember, InteractionReplyOptions, Message } from "discord.js";
 import prisma from "../init/database";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants.js";
 import {
@@ -20,7 +20,7 @@ import { getMember } from "../utils/functions/member.js";
 import { getNypsiBankBalance, getTax, getTaxRefreshTime } from "../utils/functions/tax.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command("balance", "check your balance", Categories.MONEY).setAliases(["bal", "money", "wallet", "bank"]);
+const cmd = new Command("balance", "check your balance", "money").setAliases(["bal", "money", "wallet", "bank"]);
 
 cmd.slashEnabled = true;
 

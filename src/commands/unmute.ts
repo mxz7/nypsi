@@ -7,16 +7,15 @@ import {
   PermissionFlagsBits,
   Role,
 } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
-import { PunishmentType } from "../types/Moderation";
 import { addCooldown, getPrefix, inCooldown } from "../utils/functions/guilds/utils";
 import { getExactMember } from "../utils/functions/member";
 import { newCase } from "../utils/functions/moderation/cases";
 import { deleteMute, getMuteRole, isMuted } from "../utils/functions/moderation/mute";
 import { createProfile, profileExists } from "../utils/functions/moderation/utils";
 
-const cmd = new Command("unmute", "unmute one or more users", Categories.MODERATION).setPermissions([
+const cmd = new Command("unmute", "unmute one or more users", "moderation").setPermissions([
   "MANAGE_MESSAGES",
   "MODERATE_MEMBERS",
 ]);
@@ -232,7 +231,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
   }
 
-  await newCase(message.guild, PunishmentType.UNMUTE, members1, message.author.tag, message.content);
+  await newCase(message.guild, "unmute", members1, message.author.tag, message.content);
 }
 
 cmd.setRun(run);

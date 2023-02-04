@@ -1,9 +1,9 @@
 import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getPrefix, setPrefix } from "../utils/functions/guilds/utils";
 
-const cmd = new Command("prefix", "change the bot's prefix", Categories.ADMIN).setPermissions(["MANAGE_GUILD"]);
+const cmd = new Command("prefix", "change the bot's prefix", "admin").setPermissions(["MANAGE_GUILD"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   const prefix = await getPrefix(message.guild);

@@ -6,16 +6,15 @@ import {
   PermissionFlagsBits,
   User,
 } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
-import { PunishmentType } from "../types/Moderation";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { deleteBan } from "../utils/functions/moderation/ban";
 import { newCase } from "../utils/functions/moderation/cases";
 import { createProfile, profileExists } from "../utils/functions/moderation/utils";
 import { logger } from "../utils/logger";
 
-const cmd = new Command("unban", "unban one or more users", Categories.MODERATION).setPermissions(["BAN_MEMBERS"]);
+const cmd = new Command("unban", "unban one or more users", "moderation").setPermissions(["BAN_MEMBERS"]);
 
 cmd.slashEnabled = true;
 cmd.slashData.addStringOption((option) =>
@@ -159,7 +158,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     members1.push(m.id);
   }
 
-  await newCase(message.guild, PunishmentType.UNBAN, members1, message.member.user.tag, message.content);
+  await newCase(message.guild, "unban", members1, message.member.user.tag, message.content);
 }
 
 cmd.setRun(run);

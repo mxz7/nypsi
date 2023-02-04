@@ -1,10 +1,10 @@
 import { CommandInteraction, Message } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { isImageUrl } from "../utils/functions/image";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command("inspiration", "generate an inspirational quote (inspirobot.me)", Categories.FUN).setAliases([
+const cmd = new Command("inspiration", "generate an inspirational quote (inspirobot.me)", "fun").setAliases([
   "quote",
   "inspire",
 ]);

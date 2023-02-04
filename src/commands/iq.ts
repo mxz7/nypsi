@@ -1,5 +1,5 @@
 import { BaseMessageOptions, CommandInteraction, GuildMember, InteractionReplyOptions, Message } from "discord.js";
-import { Categories, Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { getMember } from "../utils/functions/member";
@@ -8,7 +8,7 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 
 const cache = new Map<string, number>();
 
-const cmd = new Command("iq", "accurate prediction of your iq", Categories.FUN);
+const cmd = new Command("iq", "accurate prediction of your iq", "fun");
 
 cmd.slashEnabled = true;
 cmd.slashData.addUserOption((option) => option.setName("user").setDescription("how large is your iq"));
