@@ -1,7 +1,7 @@
 lockfileVersion: 5.4
 
 specifiers:
-  '@catppuccin/palette': 0.1.5
+  '@catppuccin/palette': 0.1.6
   '@commitlint/cli': 17.4.2
   '@commitlint/config-conventional': 17.4.2
   '@discordjs/rest': 1.5.0
@@ -51,7 +51,7 @@ specifiers:
   winston-discord-webhook: 2.0.0
 
 dependencies:
-  '@catppuccin/palette': 0.1.5
+  '@catppuccin/palette': 0.1.6
   '@discordjs/rest': 1.5.0
   '@prisma/client': 4.9.0_prisma@4.9.0
   '@top-gg/sdk': 3.1.3
@@ -137,8 +137,8 @@ packages:
     engines: {node: '>= 10'}
     dev: false
 
-  /@catppuccin/palette/0.1.5:
-    resolution: {integrity: sha512-IQLsZwXDMpLc5CFGjIMa/gFnnFL/QLB280F11B51JweZHerZ/FgPXdIR4eQqn1CgrqI3wGfgnj1LVPx12DV/Uw==}
+  /@catppuccin/palette/0.1.6:
+    resolution: {integrity: sha512-Jf4UD510Q0n1CadMY0OoSJU0wBpphWDGAvToGrb/1mub9v2/ZSGUBMfvAKyOdKB4yyfkN8Ym1n8+1bNAW18doA==}
     dev: false
 
   /@colors/colors/1.5.0:
