@@ -28,10 +28,7 @@ export function runSnipeClearIntervals() {
     });
 
     if (snipeCount > 0) {
-      logger.log({
-        level: "auto",
-        message: "deleted " + snipeCount.toLocaleString() + " sniped messages",
-      });
+      logger.info("::auto deleted " + snipeCount.toLocaleString() + " sniped messages");
     }
 
     eSnipe.forEach((msg) => {
@@ -44,10 +41,7 @@ export function runSnipeClearIntervals() {
     });
 
     if (eSnipeCount > 0) {
-      logger.log({
-        level: "auto",
-        message: "deleted " + eSnipeCount.toLocaleString() + " edit sniped messages",
-      });
+      logger.info("::auto deleted " + eSnipeCount.toLocaleString() + " edit sniped messages");
     }
   }, 3600000);
 }

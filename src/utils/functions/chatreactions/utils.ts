@@ -122,10 +122,7 @@ export function doChatReactions(client: NypsiClient) {
     }
 
     if (count > 0) {
-      logger.log({
-        level: "auto",
-        message: `${count} chat reaction${count > 1 ? "s" : ""} started`,
-      });
+      logger.info(`::auto ${count} chat reaction${count > 1 ? "s" : ""} started`);
     }
   }, ms("15m"));
 }

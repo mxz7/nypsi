@@ -210,7 +210,7 @@ export async function checkAutoMute(message: Message) {
       newMute(message.guild, [message.author.id], new Date(Date.now() + length * 1000)),
     ]);
 
-    logger.log({ message: `${message.guild.id} ${message.author.id} automuted ${length}s`, level: "auto" });
+    logger.info(`::auto ${message.guild.id} ${message.author.id} automuted ${length}s`);
 
     let successful = false;
 

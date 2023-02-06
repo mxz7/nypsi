@@ -47,8 +47,5 @@ export function runNetWorthInterval() {
     }, ms("1 day"));
   }, needed);
 
-  logger.log({
-    level: "auto",
-    message: `net worth for all users will update in ${MStoTime(needed)}`,
-  });
+  logger.info(`::auto net worth for all users will update in ${MStoTime(needed)}`);
 }

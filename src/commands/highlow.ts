@@ -412,10 +412,7 @@ async function playGame(
 
     if (res && res.customId == "rp") {
       await res.deferUpdate();
-      logger.log({
-        level: "cmd",
-        message: `${message.guild.id} - ${message.author.tag}: replaying highlow`,
-      });
+      logger.info(`::cmd ${message.guild.id} - ${message.author.tag}: replaying highlow`);
       if (await isLockedOut(message.author.id)) return verifyUser(message);
 
       addHourlyCommand(message.member);

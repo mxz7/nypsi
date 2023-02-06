@@ -107,10 +107,7 @@ export function runChristmas(client: NypsiClient) {
       );
 
       if (res.includes(true)) {
-        logger.log({
-          level: "auto",
-          message: `sent christmas countdown in ${guild.guildId} - ${format}`,
-        });
+        logger.info(`::auto sent christmas countdown in ${guild.guildId} - ${format}`);
       } else {
         logger.warn(`failed to send christmas countdown: ${guild.guildId} ${guild.channel}`);
       }
@@ -124,10 +121,7 @@ export function runChristmas(client: NypsiClient) {
     runChristmasThing();
   }, needed.getTime() - now.getTime());
 
-  logger.log({
-    level: "auto",
-    message: `christmas countdowns will run in ${MStoTime(needed.getTime() - now.getTime())}`,
-  });
+  logger.info(`::auto christmas countdowns will run in ${MStoTime(needed.getTime() - now.getTime())}`);
 }
 
 export async function hasChristmasCountdown(guild: Guild) {
@@ -213,10 +207,7 @@ export async function checkChristmasCountdown(guild: Guild) {
       ],
     })
     .then(() => {
-      logger.log({
-        level: "auto",
-        message: `sent christmas countdown in ${guild.name} ~ ${format}`,
-      });
+      logger.info(`::auto sent christmas countdown in ${guild.name} ~ ${format}`);
     })
     .catch(async () => {
       logger.error(`error sending christmas countdown in ${guild.name}`);

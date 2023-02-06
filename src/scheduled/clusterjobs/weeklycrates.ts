@@ -97,8 +97,5 @@ export function runPremiumCrateInterval(client: NypsiClient) {
     }, 86400 * 1000 * 7);
   }, needed);
 
-  logger.log({
-    level: "auto",
-    message: `premium crates will run in ${MStoTime(needed)}`,
-  });
+  logger.info(`::auto premium crates will run in ${MStoTime(needed)}`);
 }
