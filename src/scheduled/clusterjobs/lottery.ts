@@ -14,7 +14,7 @@ import { getItems, lotteryTicketPrice } from "../../utils/functions/economy/util
 import { percentChance, shuffle } from "../../utils/functions/random";
 import { addToNypsiBank, getTax } from "../../utils/functions/tax";
 import { addNotificationToQueue, getDmSettings } from "../../utils/functions/users/notifications";
-import { logger } from "../../utils/logger";
+import { logger } from "../../utils/logger/logger";
 import dayjs = require("dayjs");
 import ms = require("ms");
 

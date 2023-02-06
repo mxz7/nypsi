@@ -20,7 +20,7 @@ import { percentChance } from "../functions/random";
 import requestDM from "../functions/requestdm";
 import { isUserBlacklisted } from "../functions/users/blacklist";
 import { addNotificationToQueue, getDmSettings } from "../functions/users/notifications";
-import { logger } from "../logger";
+import { logger } from "../logger/logger";
 import ms = require("ms");
 
 loadItems(false);

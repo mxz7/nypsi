@@ -2,7 +2,7 @@ import { Guild, GuildMember, Role } from "discord.js";
 import prisma from "../../../init/database";
 import { NypsiClient } from "../../../models/Client";
 import { unmuteTimeouts } from "../../../scheduled/clusterjobs/moderationchecks";
-import { logger } from "../../logger";
+import { logger } from "../../logger/logger";
 import sleep from "../sleep";
 import { createProfile, profileExists } from "./utils";
 import ms = require("ms");

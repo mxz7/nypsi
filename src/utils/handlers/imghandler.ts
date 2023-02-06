@@ -1,5 +1,5 @@
 import { RedditJSON, RedditJSONPost } from "../../types/Reddit";
-import { logger } from "../logger";
+import { logger } from "../logger/logger";
 
 const images = new Map<string, Map<string, RedditJSONPost[]>>();
 

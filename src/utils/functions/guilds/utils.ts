@@ -3,7 +3,7 @@ import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { SnipedMessage } from "../../../types/Snipe";
 import Constants from "../../Constants";
-import { logger } from "../../logger";
+import { logger } from "../../logger/logger";
 import ms = require("ms");
 
 const snipe: Map<string, SnipedMessage> = new Map();

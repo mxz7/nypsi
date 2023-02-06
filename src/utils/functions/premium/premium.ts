@@ -4,7 +4,7 @@ import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
 import { PremUser, requestRemoveRole } from "../../../models/PremStorage";
 import Constants from "../../Constants";
-import { logger } from "../../logger";
+import { logger } from "../../logger/logger";
 import { formatDate } from "../date";
 import requestDM from "../requestdm";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";

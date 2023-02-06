@@ -7,7 +7,7 @@ import { addInventoryItem } from "../../utils/functions/economy/inventory";
 import { userExists } from "../../utils/functions/economy/utils";
 import requestDM from "../../utils/functions/requestdm";
 import { getDmSettings } from "../../utils/functions/users/notifications";
-import { logger } from "../../utils/logger";
+import { logger } from "../../utils/logger/logger";
 
 async function doCrates(client: NypsiClient) {
   const query = await prisma.premium.findMany({

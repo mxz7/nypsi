@@ -1,7 +1,7 @@
 import { Cluster } from "discord-hybrid-sharding";
 import redis from "../../init/redis";
 import Constants from "../Constants";
-import { logger } from "../logger";
+import { logger } from "../logger/logger";
 
 const failedHeartbeats = new Map<number, number>();
 

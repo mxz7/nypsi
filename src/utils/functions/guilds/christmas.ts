@@ -3,7 +3,7 @@ import { ColorResolvable, Guild } from "discord.js";
 import prisma from "../../../init/database";
 import { NypsiClient } from "../../../models/Client";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
-import { logger } from "../../logger";
+import { logger } from "../../logger/logger";
 import { daysUntilChristmas, MStoTime } from "../date";
 
 export function runChristmas(client: NypsiClient) {

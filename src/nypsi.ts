@@ -54,7 +54,7 @@ const client = new NypsiClient({
 });
 
 import { loadCommands } from "./utils/handlers/commandhandler";
-import { logger } from "./utils/logger";
+import { logger } from "./utils/logger/logger";
 
 loadCommands();
 client.loadEvents();

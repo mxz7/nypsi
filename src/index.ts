@@ -11,7 +11,7 @@ import { updateStats } from "./utils/functions/topgg";
 import { getVersion } from "./utils/functions/version";
 import { listenForDms } from "./utils/handlers/notificationhandler";
 import { listen } from "./utils/handlers/webhookhandler";
-import { getWebhooks, logger, setClusterId } from "./utils/logger";
+import { getWebhooks, logger, setClusterId } from "./utils/logger/logger";
 import ms = require("ms");
 
 setClusterId("main");

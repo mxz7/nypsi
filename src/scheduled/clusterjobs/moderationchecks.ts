@@ -7,7 +7,7 @@ import { NypsiClient } from "../../models/Client";
 import Constants from "../../utils/Constants";
 import { requestUnban } from "../../utils/functions/moderation/ban";
 import { requestUnmute } from "../../utils/functions/moderation/mute";
-import { logger } from "../../utils/logger";
+import { logger } from "../../utils/logger/logger";
 
 export const unmuteTimeouts = new Set<string>();
 export const unbanTimeouts = new Set<string>();
