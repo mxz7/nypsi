@@ -6,8 +6,6 @@ const images = new Map<string, Map<string, RedditJSONPost[]>>();
 const bdsmLinks = [
   "https://www.reddit.com/r/bdsm/top.json?limit=6969&t=month",
   "https://www.reddit.com/r/bondage/top.json?limit=6969&t=month",
-  "https://www.reddit.com/r/dominated/top.json?limit=6969&t=month",
-  "https://www.reddit.com/r/femdom/top.json?limit=6969&t=month",
 ];
 const thighsLinks = [
   "https://www.reddit.com/r/legs/top.json?limit=6969&t=month",
@@ -23,11 +21,8 @@ const assLinks = [
   "https://www.reddit.com/r/facedownassup/top.json?limit=6969&t=month",
   "https://www.reddit.com/r/assinthong/top.json?limit=6969&t=month",
   "https://www.reddit.com/r/buttplug/top.json?limit=6969&t=month",
-  "https://www.reddit.com/r/booty/top.json?limit=6969&t=month",
-  "https://www.reddit.com/r/thickwhitegirls/top.json?limit=6969&t=month",
 ];
 const pornLinks = [
-  "https://www.reddit.com/r/collegesluts/top.json?limit=6969&t=month",
   "https://www.reddit.com/r/legalteens/top.json?limit=6969&t=month",
   "https://www.reddit.com/r/amateur/top.json?limit=6969&t=month",
   "https://www.reddit.com/r/gonewild/top.json?limit=6969&t=month",
@@ -54,20 +49,12 @@ const catLinks = [
   "https://www.reddit.com/r/Kitten/top.json?limit=6969&t=month",
   "https://www.reddit.com/r/kitty/top.json?limit=6969&t=month",
   "https://www.reddit.com/r/catpics/top.json?limit=6969&t=month",
-  "https://www.reddit.com/r/CatsInSinks/top.json?limit=6969&t=month",
-  "https://www.reddit.com/r/CatsInBusinessAttire/top.json?limit=6969&t=month",
-  "https://www.reddit.com/r/MildlyStartledCats/top.json?limit=6969&t=month",
-  "https://www.reddit.com/r/tuckedinkitties/top.json?limit=6969&t=month",
-  "https://www.reddit.com/r/Blep/top.json?limit=6969&t=month",
-  "https://www.reddit.com/r/Floof/top.json?limit=6969&t=month",
-  "https://www.reddit.com/r/Catloaf/top.json?limit=6969&t=month",
 ];
 const dogLinks = [
   "https://www.reddit.com/r/dog/top.json?limit=6969&t=month",
   "https://www.reddit.com/r/corgi/top.json?limit=6969&t=month",
   "https://www.reddit.com/r/dogpictures/top.json?limit=6969&t=month",
   "https://www.reddit.com/r/goldenretrievers/top.json?limit=6969&t=month",
-  "https://www.reddit.com/r/shiba/top.json?limit=6969&t=month",
 ];
 const duckLinks = ["https://www.reddit.com/r/duck/top.json?limit=6969&t=month"];
 const lizardLinks = [
