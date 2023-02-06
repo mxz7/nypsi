@@ -7,6 +7,7 @@ const nextLogMsg = new Map<string, string>();
 
 const baseLogger = pino({
   base: undefined,
+  level: "debug",
   transport: {
     targets: [
       { target: "./pino-pretty-transport", level: "trace", options: { colorize: true } },
