@@ -1,99 +1,27 @@
-import { variants } from "@catppuccin/palette";
-import * as chalk from "chalk";
 import { Client, User, WebhookClient } from "discord.js";
 import { pino } from "pino";
-import * as winston from "winston";
-import "winston-daily-rotate-file";
 import Constants from "../Constants";
-import DiscordTransport = require("winston-discord-webhook");
 
 const webhook = new Map<string, string>();
 const nextLogMsg = new Map<string, string>();
 
-let clusterId: number | string;
+const baseLogger = pino({
+  base: undefined,
+  transport: {
+    targets: [
+      { target: "./pino-pretty-transport", level: "trace", options: { colorize: true } },
+      { target: "pino/file", level: "trace", options: { destination: "./out/combined.log", mkdir: true } },
+      { target: "pino/file", level: "warn", options: { destination: "./out/errors.log", mkdir: true } },
+    ],
+  },
+});
+
+export { baseLogger as logger };
 
 export function setClusterId(id: number | string) {
-  clusterId = id;
+  const childLogger = baseLogger.child({ pid: id });
+  exports.logger = childLogger;
 }
-
-const format = winston.format.printf(({ level, message, timestamp }) => {
-  let color = chalk.reset;
-  let prefix = `${chalk.green("[info]")}`;
-
-  if (typeof message == "object") message = JSON.stringify(message, null, 2);
-
-  switch (level) {
-    case "guild":
-      color = chalk.magenta;
-      break;
-    case "auto":
-      color = chalk.blue;
-      break;
-    case "cmd":
-      color = chalk.cyan;
-      break;
-    case "success":
-      color = chalk.green;
-      break;
-    case "error":
-      color = chalk.red;
-      prefix = `${chalk.bold.redBright("[error]")}`;
-      break;
-    case "warn":
-      color = chalk.yellowBright;
-      prefix = `${chalk.bold.yellowBright("[warn]")}`;
-      break;
-    case "debug":
-      prefix = `${chalk.gray("[debug]")}`;
-      break;
-  }
-
-  return `[${chalk.blackBright.italic(timestamp)}] [${
-    typeof clusterId != "undefined" ? `${chalk.blackBright(clusterId)}` : ""
-  }] ${prefix} ${color(message)}`;
-});
-
-const levels = {
-  error: 0,
-  warn: 1,
-  info: 2,
-  guild: 2,
-  auto: 2,
-  cmd: 2,
-  img: 2,
-  success: 2,
-  debug: 3,
-};
-
-const logger = winston.createLogger({
-  format: winston.format.combine(winston.format.timestamp({ format: "DD/MM HH:mm:ss" }), format),
-  exitOnError: false,
-  levels: levels,
-
-  transports: [
-    new winston.transports.File({
-      filename: "./out/logs/errors-%DATE%.log",
-      maxsize: 5e7,
-      format: winston.format.combine(winston.format.timestamp(), winston.format.simple()),
-      level: "warn",
-      handleExceptions: true,
-      handleRejections: true,
-    }),
-    new winston.transports.File({
-      filename: "./out/logs/out-%DATE%.log",
-      level: "debug",
-      maxsize: 5e7,
-      format: winston.format.combine(winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }), winston.format.simple()),
-    }),
-    new winston.transports.Console({
-      level: "debug",
-      handleExceptions: true,
-      handleRejections: true,
-    }),
-  ],
-});
-
-export { logger };
 
 export function transaction(from: User, to: User, value: string) {
   if (!nextLogMsg.get("pay")) {
@@ -162,23 +90,6 @@ export async function getWebhooks(client?: Client) {
 
     runLogs();
   }
-
-  logger.add(
-    new DiscordTransport({
-      webhook: process.env.BOTLOGS_HOOK,
-      mode: "hybrid",
-      interval: 5000,
-      colors: new Map([
-        ["error", variants.mocha.red.hex as `#${string}`],
-        ["warn", variants.mocha.yellow.hex as `#${string}`],
-        ["guild", variants.mocha.pink.hex as `#${string}`],
-        ["auto", variants.mocha.blue.hex as `#${string}`],
-        ["success", variants.mocha.green.hex as `#${string}`],
-        ["cmd", variants.mocha.sky.hex as `#${string}`],
-        ["info", "#fffffe"],
-      ]),
-    })
-  );
 }
 
 function runLogs() {
@@ -195,20 +106,3 @@ function runLogs() {
     });
   }, 7500);
 }
-
-const baseLogger = pino({
-  base: undefined,
-  transport: {
-    targets: [
-      { target: "./pino-pretty-transport", level: "trace", options: { colorize: true } },
-      { target: "pino/file", level: "trace", options: { destination: "./out/combined.log", mkdir: true } },
-    ],
-  },
-});
-
-baseLogger.info("boobs");
-
-const childLogger = baseLogger.child({ pid: "boob" });
-
-childLogger.info("boobies boobies boobies");
-childLogger.info(chalk.green("test"));
