@@ -10,7 +10,7 @@ import ms = require("ms");
 const muteRoleCache = new Map<string, string>();
 const autoMuteLevelCache = new Map<string, number[]>();
 
-const violations = new Map<string, Map<string, { vl: number; startedAt: number }>>();
+export const violations = new Map<string, Map<string, { vl: number; startedAt: number }>>();
 
 export function startAutoMuteViolationInterval() {
   setInterval(async () => {
