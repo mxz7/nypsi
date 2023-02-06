@@ -135,17 +135,11 @@ setTimeout(async () => {
 
   setInterval(() => {
     updateStats(guildCount, shardCount);
-    logger.log({
-      level: "auto",
-      message: "guild count posted to top.gg: " + guildCount,
-    });
+    logger.info(`::guild guild count posted to top.gg: ${guildCount}`);
   }, 3600000);
 
   updateStats(guildCount, shardCount);
-  logger.log({
-    level: "auto",
-    message: "guild count posted to top.gg: " + guildCount,
-  });
+  logger.info(`::guild guild count posted to top.gg: ${guildCount}`);
 }, 60000);
 
 setInterval(async () => {

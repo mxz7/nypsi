@@ -103,10 +103,7 @@ export default async function requestDM(options: RequestDMOptions): Promise<bool
     );
 
     if (res.includes(true)) {
-      logger.log({
-        level: "success",
-        message: `DM sent: ${options.memberId}`,
-      });
+      logger.info(`::success DM sent: ${options.memberId}`);
       return true;
     } else {
       logger.warn(`failed to send DM: ${options.memberId}`);
@@ -193,10 +190,7 @@ export default async function requestDM(options: RequestDMOptions): Promise<bool
     );
 
     if (res.includes(true)) {
-      logger.log({
-        level: "success",
-        message: `DM sent: ${options.memberId}`,
-      });
+      logger.info(`::success DM sent: ${options.memberId}`);
       return true;
     } else {
       logger.warn(`failed to send DM: ${options.memberId}`);

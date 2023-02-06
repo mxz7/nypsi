@@ -124,10 +124,7 @@ export async function postAnalytics(userId: string, serverCount: number) {
       return resolve(true);
     });
   } else {
-    logger.log({
-      level: "success",
-      message: "sucessfully posted analytics",
-    });
+    logger.info("::success sucessfully posted analytics");
     return true;
   }
 }

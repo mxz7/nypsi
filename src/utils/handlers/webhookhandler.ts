@@ -158,10 +158,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
     }
   }
 
-  logger.log({
-    level: "success",
-    message: `vote processed for ${user}`,
-  });
+  logger.info(`::success vote processed for ${user}`);
 
   if ((await getDmSettings(user)).vote) {
     const embed = new CustomEmbed()

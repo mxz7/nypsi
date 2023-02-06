@@ -95,10 +95,7 @@ async function cacheUpdate(links: string[], name: string) {
 
 export async function updateCache() {
   const start = new Date().getTime();
-  logger.log({
-    level: "img",
-    message: "img caches updating..",
-  });
+  logger.info("img caches updating..");
   await cacheUpdate(bdsmLinks, "bdsm");
   await cacheUpdate(thighsLinks, "thighs");
   await cacheUpdate(boobLinks, "boob");
@@ -115,10 +112,7 @@ export async function updateCache() {
   await cacheUpdate(snekLinks, "snek");
   const end = new Date().getTime();
   const total = (end - start) / 1000 + "s";
-  logger.log({
-    level: "img",
-    message: "images updated (" + total + ")",
-  });
+  logger.info("images updated (" + total + ")");
 }
 
 export { images };

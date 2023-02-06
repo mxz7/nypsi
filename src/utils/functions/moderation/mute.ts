@@ -43,10 +43,7 @@ export async function newMute(guild: Guild, userIDs: string[], date: Date) {
       if (unmuteTimeouts.has(`${guild.id}_${userId}`)) continue;
       unmuteTimeouts.add(`${guild.id}_${userId}`);
       setTimeout(() => {
-        logger.log({
-          level: "auto",
-          message: `requesting unmute in ${guild.id} for ${userId}`,
-        });
+        logger.info(`::auto requesting unmute in ${guild.id} for ${userId}`);
         requestUnmute(guild.id, userId, guild.client as NypsiClient);
       }, date.getTime() - Date.now());
     }

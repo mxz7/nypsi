@@ -133,10 +133,7 @@ async function prepare(
               return;
             }
           }
-          logger.log({
-            level: "cmd",
-            message: `${message.guild.id} ${message.author.tag}: replaying ${selected.id}`,
-          });
+          logger.info(`::cmd ${message.guild.id} ${message.author.tag}: replaying ${selected.id}`);
           return prepare(message, args, response);
         }
       }

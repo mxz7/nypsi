@@ -101,10 +101,7 @@ export function runCountdowns(client: NypsiClient) {
       );
 
       if (res.includes(true)) {
-        logger.log({
-          level: "auto",
-          message: `sent custom countdown (${countdown.id}) in ${countdown.guildId}`,
-        });
+        logger.info(`::auto sent custom countdown (${countdown.id}) in ${countdown.guildId}`);
       } else {
         logger.warn(`failed to send custom countdown (${countdown.id}) in ${countdown.guildId}`);
       }
@@ -118,10 +115,7 @@ export function runCountdowns(client: NypsiClient) {
     doCountdowns();
   }, needed.getTime() - now.getTime());
 
-  logger.log({
-    level: "auto",
-    message: `custom countdowns will run in ${MStoTime(needed.getTime() - now.getTime())}`,
-  });
+  logger.info(`::auto custom countdowns will run in ${MStoTime(needed.getTime() - now.getTime())}`);
 }
 
 export async function getCountdowns(guild: Guild | string) {

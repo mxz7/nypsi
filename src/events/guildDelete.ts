@@ -10,10 +10,7 @@ export default async function guildDelete(client: Client, guild: Guild) {
     return;
   }
 
-  logger.log({
-    level: "guild",
-    message: `removed from ${guild.name} (${guild.id})`,
-  });
+  logger.info(`::guild removed from ${guild.name} (${guild.id})`);
 
   await setPrefix(guild, "$");
   await updateDisabledCommands(guild, []);

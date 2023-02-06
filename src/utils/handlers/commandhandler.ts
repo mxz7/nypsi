@@ -897,10 +897,7 @@ export function logCommand(message: Message | (NypsiCommandInteraction & Command
     msg = `${message.guild.id} - ${message.author.tag}: ${content}`;
   }
 
-  logger.log({
-    level: "cmd",
-    message: msg,
-  });
+  logger.info(`::cmd ${msg}`);
 }
 
 export function addHourlyCommand(member: GuildMember) {
