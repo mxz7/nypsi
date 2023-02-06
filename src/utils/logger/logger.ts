@@ -2,7 +2,6 @@ import { variants } from "@catppuccin/palette";
 import * as chalk from "chalk";
 import { Client, User, WebhookClient } from "discord.js";
 import { pino } from "pino";
-import PinoPretty from "pino-pretty";
 import * as winston from "winston";
 import "winston-daily-rotate-file";
 import Constants from "../Constants";
@@ -197,18 +196,19 @@ function runLogs() {
   }, 7500);
 }
 
-const pinolog = pino(PinoPretty());
+const baseLogger = pino({
+  base: undefined,
+  transport: {
+    targets: [
+      { target: "./pino-pretty-transport", level: "trace", options: { colorize: true } },
+      { target: "pino/file", level: "trace", options: { destination: "./out/combined.log", mkdir: true } },
+    ],
+  },
+});
 
-pinolog.info("test test test");
+baseLogger.info("boobs");
 
-setTimeout(async () => {
-  console.time("1");
-  for (let i = 0; i < 69420; i++) {
-    pinolog.info(`test ${i} ${Math.random()}`);
-    pinolog.debug(`test ${i} ${Math.random()}`);
-    pinolog.warn(`test ${i} ${Math.random()}`);
-    pinolog.error(`test ${i} ${Math.random()}`);
-    pinolog.fatal(`test ${i} ${Math.random()}`);
-  }
-  console.timeEnd("1");
-}, 60000);
+const childLogger = baseLogger.child({ pid: "boob" });
+
+childLogger.info("boobies boobies boobies");
+childLogger.info(chalk.green("test"));
