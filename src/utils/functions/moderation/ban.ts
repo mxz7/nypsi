@@ -2,7 +2,7 @@ import { Guild, GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import { NypsiClient } from "../../../models/Client";
 import { unbanTimeouts } from "../../../scheduled/clusterjobs/moderationchecks";
-import { logger } from "../../logger";
+import { logger } from "../../logger/logger";
 import ms = require("ms");
 
 export async function newBan(guild: Guild, userIDs: string[] | string, date: Date) {

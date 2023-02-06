@@ -1,9 +1,11 @@
 import { variants } from "@catppuccin/palette";
 import * as chalk from "chalk";
 import { Client, User, WebhookClient } from "discord.js";
+import { pino } from "pino";
+import PinoPretty from "pino-pretty";
 import * as winston from "winston";
 import "winston-daily-rotate-file";
-import Constants from "./Constants";
+import Constants from "../Constants";
 import DiscordTransport = require("winston-discord-webhook");
 
 const webhook = new Map<string, string>();
@@ -70,22 +72,18 @@ const logger = winston.createLogger({
   levels: levels,
 
   transports: [
-    new winston.transports.DailyRotateFile({
+    new winston.transports.File({
       filename: "./out/logs/errors-%DATE%.log",
-      datePattern: "YYYY-MM",
-      maxSize: "7m",
-      maxFiles: "14d",
+      maxsize: 5e7,
       format: winston.format.combine(winston.format.timestamp(), winston.format.simple()),
       level: "warn",
       handleExceptions: true,
       handleRejections: true,
     }),
-    new winston.transports.DailyRotateFile({
+    new winston.transports.File({
       filename: "./out/logs/out-%DATE%.log",
-      datePattern: "YYYY-MM-DD",
       level: "debug",
-      maxSize: "7m",
-      maxFiles: "90d",
+      maxsize: 5e7,
       format: winston.format.combine(winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }), winston.format.simple()),
     }),
     new winston.transports.Console({
@@ -198,3 +196,19 @@ function runLogs() {
     });
   }, 7500);
 }
+
+const pinolog = pino(PinoPretty());
+
+pinolog.info("test test test");
+
+setTimeout(async () => {
+  console.time("1");
+  for (let i = 0; i < 69420; i++) {
+    pinolog.info(`test ${i} ${Math.random()}`);
+    pinolog.debug(`test ${i} ${Math.random()}`);
+    pinolog.warn(`test ${i} ${Math.random()}`);
+    pinolog.error(`test ${i} ${Math.random()}`);
+    pinolog.fatal(`test ${i} ${Math.random()}`);
+  }
+  console.timeEnd("1");
+}, 60000);

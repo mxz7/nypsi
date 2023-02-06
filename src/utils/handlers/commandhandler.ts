@@ -22,7 +22,7 @@ import { CustomEmbed, ErrorEmbed } from "../../models/EmbedBuilders";
 import { isLockedOut, toggleLock, verifyUser } from "../functions/captcha";
 import { formatDate, MStoTime } from "../functions/date";
 import { getNews, hasSeenNews } from "../functions/news";
-import { getTimestamp, logger } from "../logger";
+import { getTimestamp, logger } from "../logger/logger";
 // @ts-expect-error typescript doesnt like opening package.json
 import { version } from "../../../package.json";
 import { Item } from "../../types/Economy";

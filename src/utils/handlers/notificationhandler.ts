@@ -2,7 +2,7 @@ import { ClusterManager } from "discord-hybrid-sharding";
 import redis from "../../init/redis";
 import Constants from "../Constants";
 import requestDM from "../functions/requestdm";
-import { logger } from "../logger";
+import { logger } from "../logger/logger";
 import pAll = require("p-all");
 
 let lastRun = 0;

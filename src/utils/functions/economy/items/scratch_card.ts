@@ -13,7 +13,7 @@ import { NypsiCommandInteraction } from "../../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
 import Constants from "../../../Constants";
-import { logger } from "../../../logger";
+import { logger } from "../../../logger/logger";
 import { getInventory, selectItem, setInventoryItem } from "../inventory";
 import ScratchCard from "../scratchies";
 import { addItemUse, createGame } from "../stats";

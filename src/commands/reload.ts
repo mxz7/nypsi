@@ -3,7 +3,7 @@ import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
 import { loadCommands, reloadCommand } from "../utils/handlers/commandhandler";
-import { logger } from "../utils/logger";
+import { logger } from "../utils/logger/logger";
 
 const cmd = new Command("reload", "reload commands", "none").setPermissions(["bot owner"]);
 
