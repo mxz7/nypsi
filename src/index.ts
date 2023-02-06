@@ -157,3 +157,11 @@ setInterval(async () => {
 
   logger.info(`average query takes ${avg}ms (${total.toLocaleString()} queries in the last hour)`);
 }, ms("1 hour"));
+
+process.on("uncaughtException", (error) => {
+  logger.fatal(error);
+});
+
+process.on("unhandledRejection", (error) => {
+  logger.error(error);
+});
