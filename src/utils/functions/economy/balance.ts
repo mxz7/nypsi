@@ -19,6 +19,8 @@ import { getXp } from "./xp";
 import ms = require("ms");
 import _ = require("lodash");
 
+export const prestigeMultiEffect = [0, 1, 3, 5, 6, 7, 7, 9, 10, 11, 12];
+
 export async function getBalance(member: GuildMember | string) {
   let id: string;
   if (member instanceof GuildMember) {
@@ -119,7 +121,9 @@ export async function getMulti(member: GuildMember | string): Promise<number> {
 
   const prestige = await getPrestige(member);
 
-  const prestigeBonus = (prestige > 10 ? 10 : prestige) * 1.45;
+  let prestigeBonus = prestigeMultiEffect[prestige];
+
+  if (!prestigeBonus && prestigeBonus !== 0) prestigeBonus = prestigeMultiEffect[prestigeMultiEffect.length - 1];
 
   multi += prestigeBonus;
 
