@@ -20,7 +20,7 @@ const baseLogger = pino({
 export { baseLogger as logger };
 
 export function setClusterId(id: number | string) {
-  const childLogger = baseLogger.child({ pid: id });
+  const childLogger = baseLogger.child({ pid: id.toString() });
   exports.logger = childLogger;
 }
 
