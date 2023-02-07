@@ -12,7 +12,7 @@ module.exports = (opts: PrettyOptions) =>
       // level: (level) => `${levels.labels[level as unknown as number]}`,
     },
     messageFormat: (log, msgKey) => {
-      let color = chalk.reset;
+      let color = chalk.white;
       if (log.level >= 50) color = chalk.red;
 
       if ((log[msgKey] as string).startsWith("::")) {
