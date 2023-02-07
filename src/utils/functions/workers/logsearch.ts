@@ -36,7 +36,7 @@ if (!isMainThread) {
           const entry = JSON.parse(i);
 
           const newEntry = {
-            date: dayjs(entry.time).format("YYYY-MM-DD hh:mm:ss"),
+            date: dayjs(entry.time).format("YYYY-MM-DD HH:mm:ss"),
             msg: entry.msg.replace(/::\w+/gm, "").trim(),
             cluster: entry.pid || "null",
             time: entry.time,
