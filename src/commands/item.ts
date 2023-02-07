@@ -1,4 +1,5 @@
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
+import { parse } from "twemoji-parser";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { countItemOnAuction, getAuctionAverage } from "../utils/functions/economy/auctions";
@@ -164,6 +165,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       thumbnail = thumbnail + ".gif";
     } else {
       thumbnail = thumbnail + ".png";
+    }
+  } else {
+    try {
+      thumbnail = parse(selected.emoji, { assetType: "png" })[0].url;
+    } catch {
+      /* happy linter */
     }
   }
 
