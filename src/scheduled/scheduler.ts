@@ -71,10 +71,6 @@ const bree = new Bree({
       interval: "15m",
     },
     {
-      name: "purgelogs",
-      interval: "on the first day of the month",
-    },
-    {
       name: "purgeusers",
       cron: "0 1 * * 1",
     },
