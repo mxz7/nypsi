@@ -1377,7 +1377,7 @@
     "longDesc": "a mysterious blue, shiny gem. only found during a specific activity. some say gems are ancient relics of a long past civilization",
     "role": "item",
     "sell": 1000000,
-    "rarity": 1,
+    "rarity": 2,
     "in_crates": false,
     "aliases": ["blue"]
   },
