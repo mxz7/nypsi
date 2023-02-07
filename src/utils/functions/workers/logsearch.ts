@@ -25,21 +25,39 @@ if (!isMainThread) {
     const resultsFile = `/tmp/nypsi_logsearch_results_${Date.now()}.txt`;
 
     const execCmd = promisify(exec);
-    await execCmd(`grep -rh "${searchTerm}" out/logs > ${resultsFile}`);
+    await execCmd(`grep -rh "${searchTerm}" out > ${resultsFile}`);
 
     const buffer = await fs.readFile(resultsFile);
-    const values = buffer.toString().split("\n");
+    const values = buffer
+      .toString()
+      .split("\n")
+      .map((i) => {
+        try {
+          const entry = JSON.parse(i);
+
+          const newEntry = {
+            date: dayjs(entry.time).format("YYYY-MM-DD hh:mm:ss"),
+            msg: entry.msg.replace(/::\w+/gm, "").trim(),
+            cluster: entry.pid || "null",
+            time: entry.time,
+          };
+
+          return JSON.stringify(newEntry);
+        } catch {
+          return null;
+        }
+      });
 
     inPlaceSort(values).desc((i) => {
       try {
-        const timestamp: string = JSON.parse(i.substring(i.length - 30)).timestamp;
+        const timestamp: string = JSON.parse(i).time;
 
-        const date = dayjs()
-          .set("month", parseInt(timestamp.substring(3, 5)) - 1)
-          .set("date", parseInt(timestamp.substring(0, 2)))
-          .set("hour", parseInt(timestamp.split(":")[0].split(" ")[1]))
-          .set("minute", parseInt(timestamp.split(":")[1]))
-          .set("second", parseInt(timestamp.split(":")[2]));
+        const date = dayjs(timestamp);
+        // .set("month", parseInt(timestamp.substring(3, 5)) - 1)
+        // .set("date", parseInt(timestamp.substring(0, 2)))
+        // .set("hour", parseInt(timestamp.split(":")[0].split(" ")[1]))
+        // .set("minute", parseInt(timestamp.split(":")[1]))
+        // .set("second", parseInt(timestamp.split(":")[2]));
 
         return date.unix();
       } catch {
