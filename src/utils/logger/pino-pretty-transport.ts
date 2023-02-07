@@ -14,6 +14,7 @@ module.exports = (opts: PrettyOptions) =>
     messageFormat: (log, msgKey) => {
       let color = chalk.white;
       if (log.level >= 50) color = chalk.red;
+      if (log.level >= 40) color = chalk.yellow;
 
       if ((log[msgKey] as string).startsWith("::")) {
         const category = (log[msgKey] as string).split(" ").splice(0, 1)[0].substring(2);
