@@ -183,9 +183,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       await addBooster(message.member, "xp_potion");
     }
 
-    let crateAmount = Math.floor((await getPrestige(message.member)) / 1.2 + 1);
+    let crateAmount = Math.floor((await getPrestige(message.member)) * 0.5) + 1;
 
-    if (crateAmount > 5) crateAmount = 5;
+    if (crateAmount > 3) crateAmount = 3;
 
     let prestige = await getPrestige(message.author.id);
 
