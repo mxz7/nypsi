@@ -7,7 +7,7 @@ import { NypsiClient } from "../../models/Client";
 import Constants from "../../utils/Constants";
 import { requestUnban } from "../../utils/functions/moderation/ban";
 import { requestUnmute } from "../../utils/functions/moderation/mute";
-import { logger } from "../../utils/logger";
+import { logger } from "../../utils/logger/logger";
 
 export const unmuteTimeouts = new Set<string>();
 export const unbanTimeouts = new Set<string>();
@@ -83,7 +83,7 @@ export function runLogs() {
     }
 
     if (count > 0) {
-      logger.log({ level: "auto", message: `sent ${count} logs` });
+      logger.info(`::auto sent ${count} logs`);
     }
   }, 5000);
 }
@@ -106,18 +106,12 @@ export function runModerationChecks(client: NypsiClient) {
     for (const unmute of query1) {
       if (unmuteTimeouts.has(`${unmute.guildId}_${unmute.userId}`)) continue;
       if (unmute.expire.getTime() - Date.now() < 1000) {
-        logger.log({
-          level: "auto",
-          message: `requesting unmute in ${unmute.guildId} for ${unmute.userId}`,
-        });
+        logger.info(`::auto requesting unmute in ${unmute.guildId} for ${unmute.userId}`);
         await requestUnmute(unmute.guildId, unmute.userId, client);
       } else {
         unmuteTimeouts.add(`${unmute.guildId}_${unmute.userId}`);
         setTimeout(() => {
-          logger.log({
-            level: "auto",
-            message: `requesting unmute in ${unmute.guildId} for ${unmute.userId}`,
-          });
+          logger.info(`::auto requesting unmute in ${unmute.guildId} for ${unmute.userId}`);
           requestUnmute(unmute.guildId, unmute.userId, client);
         }, unmute.expire.getTime() - Date.now());
       }
@@ -137,18 +131,12 @@ export function runModerationChecks(client: NypsiClient) {
     for (const unban of query2) {
       if (unbanTimeouts.has(`${unban.guildId}_${unban.userId}`)) continue;
       if (unban.expire.getTime() - Date.now() < 1000) {
-        logger.log({
-          level: "auto",
-          message: `requesting unban in ${unban.guildId} for ${unban.userId}`,
-        });
+        logger.info(`::auto requesting unban in ${unban.guildId} for ${unban.userId}`);
         await requestUnban(unban.guildId, unban.userId, client);
       } else {
         unbanTimeouts.add(`${unban.guildId}_${unban.userId}`);
         setTimeout(() => {
-          logger.log({
-            level: "auto",
-            message: `requesting unban in ${unban.guildId} for ${unban.userId}`,
-          });
+          logger.info(`::auto requesting unban in ${unban.guildId} for ${unban.userId}`);
           requestUnban(unban.guildId, unban.userId, client);
         }, unban.expire.getTime() - Date.now());
       }
@@ -212,10 +200,7 @@ export function runModerationChecks(client: NypsiClient) {
     }
 
     if (modLogCount > 0) {
-      logger.log({
-        level: "auto",
-        message: `${modLogCount.toLocaleString()} modlogs sent`,
-      });
+      logger.info(`::auto ${modLogCount.toLocaleString()} modlogs sent`);
     }
   }, 90000);
 }

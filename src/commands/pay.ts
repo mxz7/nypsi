@@ -11,7 +11,7 @@ import { isPremium } from "../utils/functions/premium/premium";
 import { addToNypsiBank, getTax } from "../utils/functions/tax";
 import { getDmSettings } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import { transaction } from "../utils/logger";
+import { transaction } from "../utils/logger/logger";
 import dayjs = require("dayjs");
 
 const cmd = new Command("pay", "give other users money", "money");

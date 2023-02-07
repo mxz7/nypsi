@@ -12,7 +12,7 @@ import { getPrefix } from "../utils/functions/guilds/utils";
 import { deleteBan } from "../utils/functions/moderation/ban";
 import { newCase } from "../utils/functions/moderation/cases";
 import { createProfile, profileExists } from "../utils/functions/moderation/utils";
-import { logger } from "../utils/logger";
+import { logger } from "../utils/logger/logger";
 
 const cmd = new Command("unban", "unban one or more users", "moderation").setPermissions(["BAN_MEMBERS"]);
 

@@ -9,7 +9,7 @@ import { formatDate } from "../utils/functions/date";
 import { getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
 import { getItems } from "../utils/functions/economy/utils";
 import { fetchUsernameHistory } from "../utils/functions/users/history";
-import { logger } from "../utils/logger";
+import { logger } from "../utils/logger/logger";
 
 const cmd = new Command("x", "admincmd", "none").setPermissions(["bot owner"]);
 

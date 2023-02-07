@@ -3,7 +3,7 @@ import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { SnipedMessage } from "../../../types/Snipe";
 import Constants from "../../Constants";
-import { logger } from "../../logger";
+import { logger } from "../../logger/logger";
 import ms = require("ms");
 
 const snipe: Map<string, SnipedMessage> = new Map();
@@ -28,10 +28,7 @@ export function runSnipeClearIntervals() {
     });
 
     if (snipeCount > 0) {
-      logger.log({
-        level: "auto",
-        message: "deleted " + snipeCount.toLocaleString() + " sniped messages",
-      });
+      logger.info("::auto deleted " + snipeCount.toLocaleString() + " sniped messages");
     }
 
     eSnipe.forEach((msg) => {
@@ -44,10 +41,7 @@ export function runSnipeClearIntervals() {
     });
 
     if (eSnipeCount > 0) {
-      logger.log({
-        level: "auto",
-        message: "deleted " + eSnipeCount.toLocaleString() + " edit sniped messages",
-      });
+      logger.info("::auto deleted " + eSnipeCount.toLocaleString() + " edit sniped messages");
     }
   }, 3600000);
 }

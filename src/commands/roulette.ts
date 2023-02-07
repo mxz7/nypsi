@@ -17,7 +17,7 @@ import { createUser, formatBet, userExists } from "../utils/functions/economy/ut
 import { calcEarnedXp, getXp, updateXp } from "../utils/functions/economy/xp.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
-import { gamble } from "../utils/logger.js";
+import { gamble } from "../utils/logger/logger.js";
 
 const values = [
   "b",

@@ -10,7 +10,7 @@ import { calcEarnedXp, getXp, updateXp } from "../utils/functions/economy/xp.js"
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { shuffle } from "../utils/functions/random";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
-import { gamble } from "../utils/logger.js";
+import { gamble } from "../utils/logger/logger.js";
 
 const cmd = new Command("rps", "play rock paper scissors", "money").setAliases(["rockpaperscissors"]);
 

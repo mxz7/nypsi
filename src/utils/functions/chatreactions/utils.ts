@@ -4,7 +4,7 @@ import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
-import { logger } from "../../logger";
+import { logger } from "../../logger/logger";
 import { getZeroWidth } from "../string";
 import { getBlacklisted } from "./blacklisted";
 import { add2ndPlace, add3rdPlace, addWin, createReactionStatsProfile, hasReactionStatsProfile } from "./stats";
@@ -122,10 +122,7 @@ export function doChatReactions(client: NypsiClient) {
     }
 
     if (count > 0) {
-      logger.log({
-        level: "auto",
-        message: `${count} chat reaction${count > 1 ? "s" : ""} started`,
-      });
+      logger.info(`::auto ${count} chat reaction${count > 1 ? "s" : ""} started`);
     }
   }, ms("15m"));
 }

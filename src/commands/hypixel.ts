@@ -4,7 +4,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { cleanString } from "../utils/functions/string";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import { logger } from "../utils/logger";
+import { logger } from "../utils/logger/logger";
 
 const cache = new Map<string, { hypixel: string; mojang: string }>();
 
