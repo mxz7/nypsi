@@ -211,7 +211,7 @@ export async function getMaxBankBalance(member: GuildMember | string): Promise<n
     .then((q) => Number(q.bankStorage));
 
   const xp = await getXp(id);
-  const constant = 550;
+  const constant = 1000;
   const starting = 15000;
   const bonus = xp * constant;
   const max = bonus + starting;
