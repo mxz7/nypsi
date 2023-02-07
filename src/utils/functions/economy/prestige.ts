@@ -52,7 +52,7 @@ export async function getPrestigeRequirement(member: GuildMember): Promise<numbe
 }
 
 export function getPrestigeRequirementBal(xp: number): number {
-  const constant = 500;
+  const constant = 750;
   const bonus = xp * constant;
 
   return bonus;
