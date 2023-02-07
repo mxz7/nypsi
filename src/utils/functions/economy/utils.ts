@@ -8,7 +8,7 @@ import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { AchievementData, BakeryUpgradeData, Item } from "../../../types/Economy";
 import { Worker, WorkerUpgrades } from "../../../types/Workers";
 import Constants from "../../Constants";
-import { logger } from "../../logger";
+import { logger } from "../../logger/logger";
 import { getTier, isPremium } from "../premium/premium";
 import { createProfile, hasProfile } from "../users/utils";
 import { setProgress } from "./achievements";

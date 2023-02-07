@@ -11,7 +11,7 @@ import { updateStats } from "./utils/functions/topgg";
 import { getVersion } from "./utils/functions/version";
 import { listenForDms } from "./utils/handlers/notificationhandler";
 import { listen } from "./utils/handlers/webhookhandler";
-import { getWebhooks, logger, setClusterId } from "./utils/logger";
+import { getWebhooks, logger, setClusterId } from "./utils/logger/logger";
 import ms = require("ms");
 
 setClusterId("main");
@@ -135,17 +135,11 @@ setTimeout(async () => {
 
   setInterval(() => {
     updateStats(guildCount, shardCount);
-    logger.log({
-      level: "auto",
-      message: "guild count posted to top.gg: " + guildCount,
-    });
+    logger.info(`::guild guild count posted to top.gg: ${guildCount}`);
   }, 3600000);
 
   updateStats(guildCount, shardCount);
-  logger.log({
-    level: "auto",
-    message: "guild count posted to top.gg: " + guildCount,
-  });
+  logger.info(`::guild guild count posted to top.gg: ${guildCount}`);
 }, 60000);
 
 setInterval(async () => {
@@ -157,3 +151,11 @@ setInterval(async () => {
 
   logger.info(`average query takes ${avg}ms (${total.toLocaleString()} queries in the last hour)`);
 }, ms("1 hour"));
+
+process.on("uncaughtException", (error) => {
+  logger.fatal(error);
+});
+
+process.on("unhandledRejection", (error) => {
+  logger.error(error);
+});

@@ -1,4 +1,3 @@
-mkdir out
 mkdir jobs
 
 cd src
@@ -10,7 +9,4 @@ cd ..
 cd ..
 cd ..
 
-cd out
-mkdir logs
-cd ..
 cp -i .env.example .env

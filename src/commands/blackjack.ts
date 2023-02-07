@@ -28,7 +28,7 @@ import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { shuffle } from "../utils/functions/random";
 import { addHourlyCommand } from "../utils/handlers/commandhandler";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
-import { gamble, logger } from "../utils/logger";
+import { gamble, logger } from "../utils/logger/logger";
 
 const games = new Map<
   string,
@@ -542,10 +542,7 @@ async function playGame(
 
     if (res && res.customId == "rp") {
       await res.deferUpdate();
-      logger.log({
-        level: "cmd",
-        message: `${message.guild.id} - ${message.author.tag}: replaying blackjack`,
-      });
+      logger.info(`::cmd ${message.guild.id} - ${message.author.tag}: replaying blackjack`);
       if (await isLockedOut(message.author.id)) return verifyUser(message);
 
       addHourlyCommand(message.member);

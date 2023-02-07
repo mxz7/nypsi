@@ -34,7 +34,7 @@ import { getLastCommand } from "../utils/functions/users/commands";
 import { mentionQueue, MentionQueueItem } from "../utils/functions/users/mentions";
 import doCollection from "../utils/functions/workers/mentions";
 import { runCommand } from "../utils/handlers/commandhandler";
-import { logger } from "../utils/logger";
+import { logger } from "../utils/logger/logger";
 import ms = require("ms");
 
 const dmCooldown = new Set<string>();

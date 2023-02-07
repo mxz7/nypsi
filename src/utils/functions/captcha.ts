@@ -5,7 +5,7 @@ import redis from "../../init/redis";
 import { NypsiCommandInteraction } from "../../models/Command";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 import Constants from "../Constants";
-import { getTimestamp, logger } from "../logger";
+import { getTimestamp, logger } from "../logger/logger";
 import ms = require("ms");
 
 const beingVerified = new Set<string>();

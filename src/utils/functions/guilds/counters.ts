@@ -2,7 +2,7 @@ import { GuildCounter, TrackingType } from "@prisma/client";
 import { ChannelType, Guild, PermissionFlagsBits } from "discord.js";
 import prisma from "../../../init/database";
 import { NypsiClient } from "../../../models/Client";
-import { logger } from "../../logger";
+import { logger } from "../../logger/logger";
 import { getItems } from "../economy/utils";
 
 export async function updateChannel(data: GuildCounter, client: NypsiClient) {

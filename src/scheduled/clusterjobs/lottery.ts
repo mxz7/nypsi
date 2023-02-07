@@ -14,7 +14,7 @@ import { getItems, lotteryTicketPrice } from "../../utils/functions/economy/util
 import { percentChance, shuffle } from "../../utils/functions/random";
 import { addToNypsiBank, getTax } from "../../utils/functions/tax";
 import { addNotificationToQueue, getDmSettings } from "../../utils/functions/users/notifications";
-import { logger } from "../../utils/logger";
+import { logger } from "../../utils/logger/logger";
 import dayjs = require("dayjs");
 import ms = require("ms");
 
@@ -60,10 +60,7 @@ async function doLottery(client: Client) {
     user = await client.users.fetch(chosen.userId);
   }
 
-  logger.log({
-    level: "success",
-    message: `winner: ${user.tag} (${user.id}) with ticket #${chosen.id}`,
-  });
+  logger.info(`::success winner: ${user.tag} (${user.id}) with ticket #${chosen.id}`);
 
   await Promise.all([
     updateBalance(user.id, (await getBalance(user.id)) + total),
@@ -93,10 +90,7 @@ async function doLottery(client: Client) {
     await user
       .send({ embeds: [embed] })
       .then(() => {
-        logger.log({
-          level: "success",
-          message: "sent notification to winner",
-        });
+        logger.info("::success sent notification to winner");
       })
       .catch(() => {
         logger.warn("failed to send notification to winner");
@@ -141,8 +135,5 @@ export function runLotteryInterval(client: Client) {
     }, ms("1 day"));
   }, needed);
 
-  logger.log({
-    level: "auto",
-    message: `lottery will run in ${MStoTime(needed)}`,
-  });
+  logger.info(`::auto lottery will run in ${MStoTime(needed)}`);
 }

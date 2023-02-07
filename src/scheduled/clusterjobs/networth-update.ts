@@ -4,7 +4,7 @@ import Constants from "../../utils/Constants";
 import { MStoTime } from "../../utils/functions/date";
 import { calcNetWorth } from "../../utils/functions/economy/balance";
 import sleep from "../../utils/functions/sleep";
-import { logger } from "../../utils/logger";
+import { logger } from "../../utils/logger/logger";
 
 import dayjs = require("dayjs");
 import ms = require("ms");
@@ -47,8 +47,5 @@ export function runNetWorthInterval() {
     }, ms("1 day"));
   }, needed);
 
-  logger.log({
-    level: "auto",
-    message: `net worth for all users will update in ${MStoTime(needed)}`,
-  });
+  logger.info(`::auto net worth for all users will update in ${MStoTime(needed)}`);
 }
