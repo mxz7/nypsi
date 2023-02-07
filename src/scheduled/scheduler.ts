@@ -3,7 +3,7 @@ import dayjs = require("dayjs");
 import ms = require("ms");
 import path = require("path");
 import { getGuilds } from "..";
-import { logger } from "../utils/logger";
+import { logger } from "../utils/logger/logger";
 
 const bree = new Bree({
   root: path.join(__dirname, "jobs"),
@@ -69,10 +69,6 @@ const bree = new Bree({
       name: "votereminders",
       timeout: dayjs().add(1, "hour").set("minutes", 10).set("seconds", 0).diff(dayjs(), "milliseconds"),
       interval: "15m",
-    },
-    {
-      name: "purgelogs",
-      interval: "on the first day of the month",
     },
     {
       name: "purgeusers",

@@ -4,7 +4,7 @@ import * as os from "os";
 import prisma from "../../init/database";
 import redis from "../../init/redis";
 import Constants from "../Constants";
-import { logger } from "../logger";
+import { logger } from "../logger/logger";
 
 const KEY = process.env.STATCORD_KEY;
 const BASE_URL = "https://api.statcord.com/v3/stats";
@@ -124,10 +124,7 @@ export async function postAnalytics(userId: string, serverCount: number) {
       return resolve(true);
     });
   } else {
-    logger.log({
-      level: "success",
-      message: "sucessfully posted analytics",
-    });
+    logger.info("::success sucessfully posted analytics");
     return true;
   }
 }

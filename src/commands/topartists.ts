@@ -17,7 +17,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getLastfmUsername } from "../utils/functions/users/lastfm";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import { logger } from "../utils/logger";
+import { logger } from "../utils/logger/logger";
 
 const cmd = new Command("topartists", "view your top artists", "music").setAliases(["ta"]);
 

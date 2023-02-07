@@ -7,7 +7,7 @@ import { addInventoryItem } from "../../utils/functions/economy/inventory";
 import { userExists } from "../../utils/functions/economy/utils";
 import requestDM from "../../utils/functions/requestdm";
 import { getDmSettings } from "../../utils/functions/users/notifications";
-import { logger } from "../../utils/logger";
+import { logger } from "../../utils/logger/logger";
 
 async function doCrates(client: NypsiClient) {
   const query = await prisma.premium.findMany({
@@ -97,8 +97,5 @@ export function runPremiumCrateInterval(client: NypsiClient) {
     }, 86400 * 1000 * 7);
   }, needed);
 
-  logger.log({
-    level: "auto",
-    message: `premium crates will run in ${MStoTime(needed)}`,
-  });
+  logger.info(`::auto premium crates will run in ${MStoTime(needed)}`);
 }
