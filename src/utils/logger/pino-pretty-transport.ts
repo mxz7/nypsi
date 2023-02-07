@@ -8,7 +8,7 @@ module.exports = (opts: PrettyOptions) =>
     colorize: true,
     translateTime: false,
     customPrettifiers: {
-      time: (timestamp) => `${chalk.blackBright.italic(dayjs(Number(timestamp)).format("MM-DD hh:mm:ss"))}`,
+      time: (timestamp) => `${chalk.blackBright.italic(dayjs(Number(timestamp)).format("MM-DD HH:mm:ss"))}`,
       // level: (level) => `${levels.labels[level as unknown as number]}`,
     },
     messageFormat: (log, msgKey) => {
