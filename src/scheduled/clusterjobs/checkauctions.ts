@@ -13,7 +13,7 @@ import { logger } from "../../utils/logger/logger";
 
 export async function runAuctionChecks(client: NypsiClient) {
   setInterval(async () => {
-    let limit = dayjs().subtract(7, "days").toDate();
+    let limit = dayjs().subtract(14, "days").toDate();
 
     const query = await prisma.auction.findMany({
       where: {
