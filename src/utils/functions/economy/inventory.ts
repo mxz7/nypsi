@@ -6,7 +6,7 @@ import { CommandCategory } from "../../../models/Command";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { Item } from "../../../types/Economy";
 import Constants from "../../Constants";
-import { logger } from "../../logger";
+import { logger } from "../../logger/logger";
 import { percentChance } from "../random";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { addProgress, getAllAchievements, setAchievementProgress } from "./achievements";

@@ -54,7 +54,7 @@ const client = new NypsiClient({
 });
 
 import { loadCommands } from "./utils/handlers/commandhandler";
-import { logger } from "./utils/logger";
+import { logger } from "./utils/logger/logger";
 
 loadCommands();
 client.loadEvents();
@@ -63,3 +63,11 @@ setTimeout(() => {
   logger.info("logging in...");
   client.login(process.env.BOT_TOKEN);
 }, 500);
+
+process.on("uncaughtException", (error) => {
+  logger.fatal(error);
+});
+
+process.on("unhandledRejection", (error) => {
+  logger.error(error);
+});

@@ -3,17 +3,14 @@ import { updateDisabledCommands } from "../utils/functions/guilds/disabledcomman
 import { setPrefix } from "../utils/functions/guilds/utils";
 import { setMuteRole } from "../utils/functions/moderation/mute";
 import { profileExists } from "../utils/functions/moderation/utils";
-import { logger } from "../utils/logger";
+import { logger } from "../utils/logger/logger";
 
 export default async function guildDelete(client: Client, guild: Guild) {
   if (!guild.name) {
     return;
   }
 
-  logger.log({
-    level: "guild",
-    message: `removed from ${guild.name} (${guild.id})`,
-  });
+  logger.info(`::guild removed from ${guild.name} (${guild.id})`);
 
   await setPrefix(guild, "$");
   await updateDisabledCommands(guild, []);

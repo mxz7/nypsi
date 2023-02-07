@@ -8,7 +8,7 @@ import { selectItem } from "../utils/functions/economy/inventory";
 import { isPremium } from "../utils/functions/premium/premium";
 import getJsonGraphData from "../utils/functions/workers/jsongraph";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import { logger } from "../utils/logger";
+import { logger } from "../utils/logger/logger";
 import dayjs = require("dayjs");
 
 const BASE_URL = "https://quickchart.io/chart/create";

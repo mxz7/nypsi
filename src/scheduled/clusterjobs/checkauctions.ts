@@ -9,7 +9,7 @@ import { addInventoryItem } from "../../utils/functions/economy/inventory";
 import { getItems, userExists } from "../../utils/functions/economy/utils";
 import requestDM from "../../utils/functions/requestdm";
 import { getDmSettings } from "../../utils/functions/users/notifications";
-import { logger } from "../../utils/logger";
+import { logger } from "../../utils/logger/logger";
 
 export async function runAuctionChecks(client: NypsiClient) {
   setInterval(async () => {
