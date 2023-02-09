@@ -1308,7 +1308,7 @@
     "id": "double_xp",
     "name": "double xp",
     "emoji": "✨",
-    "longDesc": "earn double xp for 12 hours",
+    "longDesc": "earn double xp for 8 hours",
     "rarity": 4,
     "buy": 0,
     "sell": 1000000,
@@ -1317,7 +1317,7 @@
     "boosterEffect": {
       "boosts": ["xp"],
       "effect": 1,
-      "time": 43200
+      "time": 28800
     },
     "in_crates": true
   },
