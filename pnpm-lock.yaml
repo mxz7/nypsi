@@ -15,6 +15,7 @@ specifiers:
   '@types/node': 18.13.0
   '@types/node-os-utils': 1.3.0
   '@types/string-similarity': 4.0.0
+  '@types/twemoji-parser': ^13.1.1
   '@types/urban-dictionary': 3.0.0
   '@typescript-eslint/eslint-plugin': 5.51.0
   '@typescript-eslint/parser': 5.51.0
@@ -46,6 +47,7 @@ specifiers:
   prisma: 4.9.0
   string-similarity: 4.0.4
   table: '6.8'
+  twemoji-parser: ^14.0.0
   typescript: 4.9.5
   urban-dictionary: 3.0.2
 
@@ -77,6 +79,7 @@ dependencies:
   pino-pretty: 9.1.1
   string-similarity: 4.0.4
   table: 6.8.1
+  twemoji-parser: 14.0.0
   urban-dictionary: 3.0.2
 
 devDependencies:
@@ -90,6 +93,7 @@ devDependencies:
   '@types/node': 18.13.0
   '@types/node-os-utils': 1.3.0
   '@types/string-similarity': 4.0.0
+  '@types/twemoji-parser': 13.1.1
   '@types/urban-dictionary': 3.0.0
   '@typescript-eslint/eslint-plugin': 5.51.0_b635kmla6dsb4frxfihkw4m47e
   '@typescript-eslint/parser': 5.51.0_4vsywjlpuriuw3tl5oq6zy5a64
@@ -604,6 +608,10 @@ packages:
 
   /@types/string-similarity/4.0.0:
     resolution: {integrity: sha512-dMS4S07fbtY1AILG/RhuwmptmzK1Ql8scmAebOTJ/8iBtK/KI17NwGwKzu1uipjj8Kk+3mfPxum56kKZE93mzQ==}
+    dev: true
+
+  /@types/twemoji-parser/13.1.1:
+    resolution: {integrity: sha512-KhGr5xLxf8XCITgMMG8CIHpnZ5EzbVFPmStoEPd6KqtX7Lc7pc7OZyicfcWJgPv68lq/+y52zu+S5A58oOdVJw==}
     dev: true
 
   /@types/urban-dictionary/3.0.0:
@@ -3537,6 +3545,10 @@ packages:
       tslib: 1.14.1
       typescript: 4.9.5
     dev: true
+
+  /twemoji-parser/14.0.0:
+    resolution: {integrity: sha512-9DUOTGLOWs0pFWnh1p6NF+C3CkQ96PWmEFwhOVmT3WbecRC+68AIqpsnJXygfkFcp4aXbOp8Dwbhh/HQgvoRxA==}
+    dev: false
 
   /type-check/0.4.0:
     resolution: {integrity: sha512-XleUoc9uwGXqjWwXaUTZAmzMcFZ5858QA2vvx1Ur5xIcixXIP+8LnFDgRplU30us6teqdlskFfu+ae4K79Ooew==}
