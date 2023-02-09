@@ -118,30 +118,34 @@ async function doWorkerThing() {
       if (worker.stored >= maxStorage) full.push(worker.workerId);
     }
 
-    if (full.length == workers.length) {
-      data.payload.content = null;
-      data.payload.embed = new CustomEmbed()
-        .setDescription("all of your workers are full")
-        .setColor(Constants.TRANSPARENT_EMBED_COLOR);
-    } else if (full.length == 1 && (await getDmSettings(userId)).worker == "All") {
-      data.payload.embed = new CustomEmbed()
-        .setDescription(`your ${getBaseWorkers()[full[0]].item_emoji} ${getBaseWorkers()[full[0]].name} is full`)
-        .setColor(Constants.TRANSPARENT_EMBED_COLOR);
-    } else if ((await getDmSettings(userId)).worker == "All") {
-      data.payload.content = `${full.length} of your workers are full`;
-      data.payload.embed = new CustomEmbed()
-        .setDescription(
-          full.map((workerId) => `${getBaseWorkers()[workerId].item_emoji} ${getBaseWorkers()[workerId].name}`).join("\n")
-        )
-        .setHeader("full workers:")
-        .setColor(Constants.TRANSPARENT_EMBED_COLOR)
-        .setFooter({ text: "/settings me notifications" });
+    try {
+      if (full.length == workers.length) {
+        data.payload.content = null;
+        data.payload.embed = new CustomEmbed()
+          .setDescription("all of your workers are full")
+          .setColor(Constants.TRANSPARENT_EMBED_COLOR);
+      } else if (full.length == 1 && (await getDmSettings(userId)).worker == "All") {
+        data.payload.embed = new CustomEmbed()
+          .setDescription(`your ${getBaseWorkers()[full[0]].item_emoji} ${getBaseWorkers()[full[0]].name} is full`)
+          .setColor(Constants.TRANSPARENT_EMBED_COLOR);
+      } else if ((await getDmSettings(userId)).worker == "All") {
+        data.payload.content = `${full.length} of your workers are full`;
+        data.payload.embed = new CustomEmbed()
+          .setDescription(
+            full.map((workerId) => `${getBaseWorkers()[workerId].item_emoji} ${getBaseWorkers()[workerId].name}`).join("\n")
+          )
+          .setHeader("full workers:")
+          .setColor(Constants.TRANSPARENT_EMBED_COLOR)
+          .setFooter({ text: "/settings me notifications" });
+      }
+
+      if (!data.payload.embed) continue;
+
+      await addNotificationToQueue(data);
+      amount++;
+    } catch {
+      /* happy linter */
     }
-
-    if (!data.payload.embed) continue;
-
-    await addNotificationToQueue(data);
-    amount++;
   }
 
   if (amount > 0) logger.info(`${amount} worker notifications queued`);
