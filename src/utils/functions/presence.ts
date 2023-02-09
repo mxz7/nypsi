@@ -3,7 +3,7 @@ import Constants from "../Constants";
 import { daysUntilChristmas } from "./date";
 
 export function randomPresence(): string {
-  const possibilities = ["nypsi.xyz", "tekoh.net", "nypsi.xyz", "xmas", "nypsi.xyz"];
+  const possibilities = ["nypsi.xyz", "nypsi.xyz", "xmas", "nypsi.xyz"];
 
   const chosen = possibilities[Math.floor(Math.random() * possibilities.length)];
 
