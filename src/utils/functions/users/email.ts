@@ -52,7 +52,7 @@ export async function checkPurchases(id: string, client: NypsiClient) {
   const premiums = ["platinum", "gold", "silver", "bronze"].reverse();
 
   for (const item of query) {
-    logger.info(item);
+    logger.info(`giving purchased item to ${id}`, item);
 
     if (premiums.includes(item.item)) {
       if (await isPremium(id)) {
