@@ -43,12 +43,11 @@ export function listen(manager: ClusterManager) {
   app.post("/kofi", async (req, response) => {
     const data = JSON.parse(req.body.data) as KofiResponse;
 
-    logger.info("received kofi data");
-    logger.info(data);
+    logger.info("received kofi data", data);
 
     if (data.verification_token != process.env.KOFI_VERIFICATION) {
-      logger.error("received faulty kofi data");
-      return logger.error(data);
+      logger.error("received faulty kofi data", data);
+      return;
     }
 
     response.status(200).send();
