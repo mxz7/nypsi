@@ -748,13 +748,17 @@ export async function buyAuctionOne(interaction: ButtonInteraction, auction: Auc
       setTimeout(async () => {
         const buyers = dmQueue.get(`${auction.ownerId}-${auction.itemId}`).buyers;
         const total = Array.from(buyers.values()).reduce((a, b) => a + b);
-        const embedDm = new CustomEmbed().setColor(Constants.TRANSPARENT_EMBED_COLOR).setDescription(
-          `${total.toLocaleString()}x of your ${items[auction.itemId].emoji} ${
-            items[auction.itemId].name
-          } auction(s) has been bought by: \n${Array.from(buyers.entries())
-            .map((i) => `**${i[0]}**: ${i[1]}`)
-            .join("\n")}`
-        );
+        const moneyReceived = Math.floor((Number(auction.bin) / auction.itemAmount) * total);
+        const embedDm = new CustomEmbed()
+          .setColor(Constants.TRANSPARENT_EMBED_COLOR)
+          .setDescription(
+            `${total.toLocaleString()}x of your ${items[auction.itemId].emoji} ${
+              items[auction.itemId].name
+            } auction(s) has been bought by: \n${Array.from(buyers.entries())
+              .map((i) => `**${i[0]}**: ${i[1]}`)
+              .join("\n")}`
+          )
+          .setFooter({ text: `+$${moneyReceived.toLocaleString()}` });
         dmQueue.delete(`${auction.ownerId}-${auction.itemId}`);
 
         await requestDM({
