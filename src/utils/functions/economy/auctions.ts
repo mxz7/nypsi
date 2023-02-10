@@ -755,7 +755,9 @@ export async function buyAuctionOne(interaction: ButtonInteraction, auction: Auc
 
   if (auction.itemAmount > 2) {
     buttonRow.addComponents(new ButtonBuilder().setCustomId("b-one").setLabel("buy one").setStyle(ButtonStyle.Secondary));
-    embed.setFooter({ text: `$${Math.floor(Number(auction.bin) / auction.itemAmount)} per ${items[auction.itemId].name}` });
+    embed.setFooter({
+      text: `$${Math.floor(Number(auction.bin) / auction.itemAmount).toLocaleString()} per ${items[auction.itemId].name}`,
+    });
   }
 
   await interaction.message.edit({ embeds: [embed], components: [buttonRow] });
