@@ -158,7 +158,6 @@ export async function createAuction(member: GuildMember, itemId: string, itemAmo
 
         if (channel.isTextBased()) {
           const msg = await channel.send({ embeds: [embed], components: [row] });
-          msg.crosspost().catch(() => {});
 
           return { messageId: msg.id, messageUrl: msg.url };
         }
@@ -230,9 +229,12 @@ export async function bumpAuction(id: string, client: NypsiClient) {
     });
   }
 
-  const button = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+  const buttonRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder().setCustomId("b").setLabel("buy").setStyle(ButtonStyle.Success)
   );
+
+  if (query.itemAmount > 1)
+    buttonRow.addComponents(new ButtonBuilder().setCustomId("b-one").setLabel("buy one").setStyle(ButtonStyle.Secondary));
 
   const clusters = await client.cluster.broadcastEval(async (client) => {
     const guild = await client.guilds.fetch("747056029795221513");
@@ -270,12 +272,11 @@ export async function bumpAuction(id: string, client: NypsiClient) {
           }
 
           const m = await channel.send({ embeds: [embed], components: [row] });
-          m.crosspost().catch(() => {});
 
           return [m.url, m.id];
         }
       },
-      { context: { messageId: query.messageId, row: button.toJSON(), embed: embed.toJSON(), cluster } }
+      { context: { messageId: query.messageId, row: buttonRow.toJSON(), embed: embed.toJSON(), cluster } }
     )
     .then((res) => {
       return res.filter((i) => Boolean(i))[0];
@@ -627,7 +628,7 @@ export async function buyAuctionOne(interaction: ButtonInteraction, auction: Auc
       return;
     }
 
-    if ((await getBalance(interaction.user.id)) < Number(auction.bin)) {
+    if ((await getBalance(interaction.user.id)) < Math.floor(Number(auction.bin) / auction.itemAmount)) {
       beingBought.delete(auction.id);
       return await interaction.followUp({ embeds: [new ErrorEmbed("you cannot afford this")], ephemeral: true });
     }
@@ -782,7 +783,7 @@ export async function buyAuctionOne(interaction: ButtonInteraction, auction: Auc
     });
   }
 
+  beingBought.delete(auction.id);
   await interaction.deferUpdate().catch(() => {});
   await interaction.message.edit({ embeds: [embed], components: [buttonRow] });
-  beingBought.delete(auction.id);
 }
