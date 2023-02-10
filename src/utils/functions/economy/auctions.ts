@@ -591,6 +591,7 @@ export async function buyFullAuction(interaction: ButtonInteraction, auction: Au
     embed.setFooter({ text: embed.data.footer.text });
   }
 
+  await interaction.deferUpdate().catch(() => {});
   await interaction.message.edit({ embeds: [embed], components: [] });
 }
 
@@ -760,6 +761,7 @@ export async function buyAuctionOne(interaction: ButtonInteraction, auction: Auc
     });
   }
 
+  await interaction.deferUpdate().catch(() => {});
   await interaction.message.edit({ embeds: [embed], components: [buttonRow] });
   beingBought.delete(auction.id);
 }
