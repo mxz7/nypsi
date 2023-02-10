@@ -711,31 +711,31 @@ export async function buyAuctionOne(interaction: ButtonInteraction, auction: Auc
 
   if ((await getDmSettings(auction.ownerId)).auction) {
     if (dmQueue.has(`${auction.ownerId}-${auction.itemId}`)) {
-      if (dmQueue.get(`${auction.ownerId}-${auction.itemId}`).buyers.has(interaction.user.id)) {
+      if (dmQueue.get(`${auction.ownerId}-${auction.itemId}`).buyers.has(interaction.user.tag)) {
         dmQueue
           .get(`${auction.ownerId}-${auction.itemId}`)
           .buyers.set(
-            interaction.user.id,
-            dmQueue.get(`${auction.ownerId}-${auction.itemId}`).buyers.get(interaction.user.id) + 1
+            interaction.user.tag,
+            dmQueue.get(`${auction.ownerId}-${auction.itemId}`).buyers.get(interaction.user.tag) + 1
           );
       } else {
-        dmQueue.get(`${auction.ownerId}-${auction.itemId}`).buyers.set(interaction.user.id, 1);
+        dmQueue.get(`${auction.ownerId}-${auction.itemId}`).buyers.set(interaction.user.tag, 1);
       }
     } else {
       dmQueue.set(`${auction.ownerId}-${auction.itemId}`, {
-        buyers: new Map([[interaction.user.id, 1]]),
+        buyers: new Map([[interaction.user.tag, 1]]),
       });
 
       setTimeout(async () => {
         const buyers = dmQueue.get(`${auction.ownerId}-${auction.itemId}`).buyers;
         const total = Array.from(buyers.values()).reduce((a, b) => a + b);
-        const embedDm = new CustomEmbed()
-          .setColor(Constants.TRANSPARENT_EMBED_COLOR)
-          .setDescription(
-            `${total.toLocaleString()}x of your ${items[auction.itemId].emoji} ${
-              items[auction.itemId].name
-            } auction(s) has been bought by: \n${Array.from(buyers.entries()).join("\n")}`
-          );
+        const embedDm = new CustomEmbed().setColor(Constants.TRANSPARENT_EMBED_COLOR).setDescription(
+          `${total.toLocaleString()}x of your ${items[auction.itemId].emoji} ${
+            items[auction.itemId].name
+          } auction(s) has been bought by: \n${Array.from(buyers.entries())
+            .map((i) => `**${i[0]}**: ${i[1]}`)
+            .join("\n")}`
+        );
         dmQueue.delete(`${auction.ownerId}-${auction.itemId}`);
 
         await requestDM({
