@@ -31,6 +31,7 @@ import ms = require("ms");
 import dayjs = require("dayjs");
 
 const beingBought = new Set<string>();
+const dmQueue = new Map<string, { buyers: Map<string, number> }>();
 
 export async function getAuctions(member: GuildMember | string) {
   let id: string;
@@ -722,22 +723,42 @@ export async function buyAuctionOne(interaction: ButtonInteraction, auction: Auc
   const items = getItems();
 
   if ((await getDmSettings(auction.ownerId)).auction) {
-    const embedDm = new CustomEmbed()
-      .setColor(Constants.TRANSPARENT_EMBED_COLOR)
-      .setDescription(
-        `your auction for ${auction.itemAmount}x ${items[auction.itemId].emoji} ${
-          items[auction.itemId].name
-        } has been bought by ${interaction.user.username} for $**${Math.floor(
-          Number(auction.bin) / auction.itemAmount - taxedAmount
-        ).toLocaleString()}**${taxedAmount != 0 ? `(${(tax * 100).toFixed(1)}% tax)` : ""} `
-      );
+    if (dmQueue.has(`${auction.ownerId}-${auction.itemId}`)) {
+      if (dmQueue.get(`${auction.ownerId}-${auction.itemId}`).buyers.has(interaction.user.id)) {
+        dmQueue
+          .get(`${auction.ownerId}-${auction.itemId}`)
+          .buyers.set(
+            interaction.user.id,
+            dmQueue.get(`${auction.ownerId}-${auction.itemId}`).buyers.get(interaction.user.id) + 1
+          );
+      } else {
+        dmQueue.get(`${auction.ownerId}-${auction.itemId}`).buyers.set(interaction.user.id, 1);
+      }
+    } else {
+      dmQueue.set(`${auction.ownerId}-${auction.itemId}`, {
+        buyers: new Map([[interaction.user.id, 1]]),
+      });
 
-    await requestDM({
-      client: interaction.client as NypsiClient,
-      memberId: auction.ownerId,
-      content: "your auction has been bought",
-      embed: embedDm,
-    });
+      setTimeout(async () => {
+        const buyers = dmQueue.get(`${auction.ownerId}-${auction.itemId}`).buyers;
+        const total = Array.from(buyers.values()).reduce((a, b) => a + b);
+        const embedDm = new CustomEmbed()
+          .setColor(Constants.TRANSPARENT_EMBED_COLOR)
+          .setDescription(
+            `${total.toLocaleString()}x of your ${items[auction.itemId].emoji} ${
+              items[auction.itemId].name
+            } auction(s) has been bought by: \n${Array.from(buyers.entries()).join("\n")}`
+          );
+        dmQueue.delete(`${auction.ownerId}-${auction.itemId}`);
+
+        await requestDM({
+          client: interaction.client as NypsiClient,
+          memberId: auction.ownerId,
+          content: `${total.toLocaleString()}x of your auctioned items have been bought`,
+          embed: embedDm,
+        });
+      }, ms("10 minutes"));
+    }
   }
 
   const embed = new EmbedBuilder(interaction.message.embeds[0].data);
