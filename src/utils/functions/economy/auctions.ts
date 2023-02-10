@@ -613,6 +613,10 @@ export async function buyAuctionOne(interaction: ButtonInteraction, auction: Auc
 
   beingBought.add(auction.id);
 
+  setTimeout(() => {
+    beingBought.delete(auction.id);
+  }, ms("10 minutes"));
+
   if (Math.floor(Number(auction.bin) / auction.itemAmount) >= 10_000_000) {
     const modalResponse = await showAuctionConfirmation(interaction, Math.floor(Number(auction.bin) / auction.itemAmount));
 
@@ -690,14 +694,17 @@ export async function buyAuctionOne(interaction: ButtonInteraction, auction: Auc
   let taxedAmount = 0;
 
   if (!(await isPremium(auction.ownerId)) || (await getTier(auction.ownerId)) != 4) {
-    taxedAmount = Math.floor(Number(auction.bin) * tax);
+    taxedAmount = Math.floor(Math.floor(Number(auction.bin) / auction.itemAmount) * tax);
     addToNypsiBank(taxedAmount);
   }
 
   await Promise.all([
-    addInventoryItem(interaction.user.id, auction.itemId, auction.itemAmount),
-    updateBalance(interaction.user.id, balance - Number(auction.bin)),
-    updateBalance(auction.ownerId, (await getBalance(auction.ownerId)) + (Number(auction.bin) - taxedAmount)),
+    addInventoryItem(interaction.user.id, auction.itemId, 1),
+    updateBalance(interaction.user.id, balance - Math.floor(Number(auction.bin) / auction.itemAmount)),
+    updateBalance(
+      auction.ownerId,
+      (await getBalance(auction.ownerId)) + (Math.floor(Number(auction.bin) / auction.itemAmount) - taxedAmount)
+    ),
   ]);
 
   transaction(
@@ -708,7 +715,7 @@ export async function buyAuctionOne(interaction: ButtonInteraction, auction: Auc
   transaction(
     interaction.user,
     await interaction.client.users.fetch(auction.ownerId),
-    `$${(Number(auction.bin) - taxedAmount).toLocaleString()} (auction)`
+    `$${(Math.floor(Number(auction.bin) / auction.itemAmount) - taxedAmount).toLocaleString()} (auction)`
   );
 
   const items = getItems();
@@ -720,7 +727,7 @@ export async function buyAuctionOne(interaction: ButtonInteraction, auction: Auc
         `your auction for ${auction.itemAmount}x ${items[auction.itemId].emoji} ${
           items[auction.itemId].name
         } has been bought by ${interaction.user.username} for $**${Math.floor(
-          Number(auction.bin) - taxedAmount
+          Number(auction.bin) / auction.itemAmount - taxedAmount
         ).toLocaleString()}**${taxedAmount != 0 ? `(${(tax * 100).toFixed(1)}% tax)` : ""} `
       );
 
