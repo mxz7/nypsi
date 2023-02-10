@@ -1,13 +1,32 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, GuildMember, MessageActionRowComponentBuilder } from "discord.js";
+import { Auction } from "@prisma/client";
+import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonInteraction,
+  ButtonStyle,
+  EmbedBuilder,
+  GuildMember,
+  Interaction,
+  MessageActionRowComponentBuilder,
+  ModalBuilder,
+  TextInputBuilder,
+  TextInputStyle,
+  User,
+} from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
-import { CustomEmbed } from "../../../models/EmbedBuilders";
+import { CustomEmbed, ErrorEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
-import { isPremium } from "../premium/premium";
+import { transaction } from "../../logger/logger";
+import { getTier, isPremium } from "../premium/premium";
+import requestDM from "../requestdm";
+import { addToNypsiBank, getTax } from "../tax";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
-import { getItems } from "./utils";
+import { getBalance, updateBalance } from "./balance";
+import { addInventoryItem } from "./inventory";
+import { createUser, getItems, userExists } from "./utils";
 import ms = require("ms");
 import dayjs = require("dayjs");
 
@@ -416,4 +435,150 @@ export async function findAuctions(itemId: string) {
   inPlaceSort(query).asc([(i) => Number(i.bin) / i.itemAmount, (i) => i.createdAt.getTime()]);
 
   return query;
+}
+
+export async function buyFullAuction(interaction: ButtonInteraction, user: User, auction: Auction) {
+  if (auction.bin >= 10_000_000) {
+    const modal = new ModalBuilder().setCustomId("auction-confirm").setTitle("confirmation");
+
+    modal.addComponents(
+      new ActionRowBuilder<TextInputBuilder>().addComponents(
+        new TextInputBuilder()
+          .setCustomId("confirmation")
+          .setLabel("type 'yes' to confirm")
+          .setPlaceholder(`this will cost $${auction.bin.toLocaleString()}`)
+          .setStyle(TextInputStyle.Short)
+          .setRequired(true)
+          .setMaxLength(3)
+      )
+    );
+
+    await interaction.showModal(modal);
+
+    const filter = (i: Interaction) => i.user.id == interaction.user.id;
+
+    const res = await interaction.awaitModalSubmit({ filter, time: 120000 }).catch(() => {});
+
+    if (!res) return;
+
+    if (!res.isModalSubmit()) return;
+
+    if (res.fields.fields.first().value.toLowerCase() != "yes") {
+      return res.reply({ embeds: [new CustomEmbed().setDescription("✅ cancelled purchase")], ephemeral: true });
+    }
+
+    const balance = await getBalance(interaction.user.id);
+
+    if (balance < Number(auction.bin)) {
+      return await res.reply({ embeds: [new ErrorEmbed("you cannot afford this")], ephemeral: true });
+    }
+
+    await res.deferUpdate();
+
+    interaction = res as unknown as ButtonInteraction;
+  }
+
+  auction = await prisma.auction.findFirst({
+    where: {
+      AND: [{ messageId: interaction.message.id }],
+    },
+  });
+
+  if (!auction) {
+    await interaction.reply({ embeds: [new ErrorEmbed("invalid auction")], ephemeral: true });
+    await interaction.message.delete();
+    return;
+  }
+
+  if (auction.sold) {
+    return await interaction.reply({ embeds: [new ErrorEmbed("too slow ):").removeTitle()], ephemeral: true });
+  }
+
+  if (!(await userExists(interaction.user.id))) await createUser(interaction.user.id);
+
+  const balance = await getBalance(interaction.user.id);
+
+  if (balance < Number(auction.bin)) {
+    return await interaction.reply({ embeds: [new ErrorEmbed("you cannot afford this")], ephemeral: true });
+  }
+
+  if (Number(auction.bin) < 10_000) {
+    await prisma.auction.delete({
+      where: {
+        id: auction.id,
+      },
+    });
+  } else {
+    await prisma.auction
+      .update({
+        where: {
+          id: auction.id,
+        },
+        data: {
+          sold: true,
+        },
+      })
+      .catch(() => {});
+  }
+
+  const tax = await getTax();
+
+  let taxedAmount = 0;
+
+  if (!(await isPremium(auction.ownerId)) || (await getTier(auction.ownerId)) != 4) {
+    taxedAmount = Math.floor(Number(auction.bin) * tax);
+    addToNypsiBank(taxedAmount);
+  }
+
+  await Promise.all([
+    addInventoryItem(interaction.user.id, auction.itemId, auction.itemAmount),
+    updateBalance(interaction.user.id, balance - Number(auction.bin)),
+    updateBalance(auction.ownerId, (await getBalance(auction.ownerId)) + (Number(auction.bin) - taxedAmount)),
+  ]);
+
+  transaction(
+    await interaction.client.users.fetch(auction.ownerId),
+    interaction.user,
+    `${auction.itemId} x ${auction.itemAmount} (auction)`
+  );
+  transaction(
+    interaction.user,
+    await interaction.client.users.fetch(auction.ownerId),
+    `$${(Number(auction.bin) - taxedAmount).toLocaleString()} (auction)`
+  );
+
+  const items = getItems();
+
+  if ((await getDmSettings(auction.ownerId)).auction) {
+    const embedDm = new CustomEmbed()
+      .setColor(Constants.TRANSPARENT_EMBED_COLOR)
+      .setDescription(
+        `your auction for ${auction.itemAmount}x ${items[auction.itemId].emoji} ${
+          items[auction.itemId].name
+        } has been bought by ${interaction.user.username} for $**${Math.floor(
+          Number(auction.bin) - taxedAmount
+        ).toLocaleString()}**${taxedAmount != 0 ? `(${(tax * 100).toFixed(1)}% tax)` : ""} `
+      );
+
+    await requestDM({
+      client: interaction.client as NypsiClient,
+      memberId: auction.ownerId,
+      content: "your auction has been bought",
+      embed: embedDm,
+    });
+  }
+
+  const embed = new EmbedBuilder(interaction.message.embeds[0].data);
+
+  const desc = embed.data.description.split("\n\n");
+
+  desc[0] = `**bought** by ${interaction.user.username} <t:${Math.floor(Date.now() / 1000)}:R>`;
+
+  embed.setDescription(desc.join("\n\n"));
+
+  if (embed.data.footer?.text) {
+    embed.setFooter({ text: embed.data.footer.text });
+  }
+
+  await interaction.message.edit({ embeds: [embed], components: [] });
 }
