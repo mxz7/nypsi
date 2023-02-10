@@ -2,46 +2,38 @@ import {
   ActionRowBuilder,
   ApplicationCommandOptionType,
   ButtonBuilder,
+  ButtonInteraction,
   ButtonStyle,
   Collection,
   CommandInteraction,
   CommandInteractionOption,
-  EmbedBuilder,
   GuildBasedChannel,
   GuildMember,
   Interaction,
   InteractionType,
   MessageActionRowComponentBuilder,
-  ModalBuilder,
   Role,
-  TextInputBuilder,
-  TextInputStyle,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import prisma from "../init/database";
-import { NypsiClient } from "../models/Client";
 import { createNypsiInteraction, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { addProgress } from "../utils/functions/economy/achievements";
-import { getBalance, updateBalance } from "../utils/functions/economy/balance";
-import { addInventoryItem, getInventory, openCrate } from "../utils/functions/economy/inventory";
+import { buyAuctionOne, buyFullAuction } from "../utils/functions/economy/auctions";
+import { getInventory, openCrate } from "../utils/functions/economy/inventory";
 import { getPrestige } from "../utils/functions/economy/prestige";
 import { addItemUse } from "../utils/functions/economy/stats";
-import { createUser, getAchievements, getItems, isEcoBanned, userExists } from "../utils/functions/economy/utils";
+import { getAchievements, getItems, isEcoBanned, userExists } from "../utils/functions/economy/utils";
 import { claimFromWorkers } from "../utils/functions/economy/workers";
 import { getReactionRolesByGuild } from "../utils/functions/guilds/reactionroles";
 import { getKarma } from "../utils/functions/karma/karma";
 import { getKarmaShopItems, isKarmaShopOpen } from "../utils/functions/karma/karmashop";
 import PageManager from "../utils/functions/page";
-import { getTier, isPremium } from "../utils/functions/premium/premium";
-import requestDM from "../utils/functions/requestdm";
-import { addToNypsiBank, getTax } from "../utils/functions/tax";
 import { isUserBlacklisted } from "../utils/functions/users/blacklist";
-import { getDmSettings } from "../utils/functions/users/notifications";
 import { runCommand } from "../utils/handlers/commandhandler";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import { logger, transaction } from "../utils/logger/logger";
+import { logger } from "../utils/logger/logger";
 
 export default async function interactionCreate(interaction: Interaction) {
   if (await isUserBlacklisted(interaction.user.id)) return;
@@ -260,18 +252,9 @@ export default async function interactionCreate(interaction: Interaction) {
   if (interaction.type == InteractionType.MessageComponent) {
     if (interaction.customId == "b") {
       if (await isEcoBanned(interaction.user.id)) return;
-      let auction = await prisma.auction.findFirst({
+      const auction = await prisma.auction.findFirst({
         where: {
           AND: [{ messageId: interaction.message.id }],
-        },
-        select: {
-          bin: true,
-          messageId: true,
-          id: true,
-          ownerId: true,
-          itemAmount: true,
-          itemId: true,
-          sold: true,
         },
       });
 
@@ -283,159 +266,31 @@ export default async function interactionCreate(interaction: Interaction) {
           });
         }
 
-        if (auction.bin >= 10_000_000) {
-          const modal = new ModalBuilder().setCustomId("auction-confirm").setTitle("confirmation");
+        return buyFullAuction(interaction as ButtonInteraction, auction);
+      } else if (auction.sold || auction.itemAmount === 0) {
+        return await interaction.reply({ embeds: [new ErrorEmbed("too slow ):").removeTitle()], ephemeral: true });
+      } else {
+        await interaction.reply({ embeds: [new ErrorEmbed("invalid auction")], ephemeral: true });
+        await interaction.message.delete();
+      }
+    } else if (interaction.customId === "b-one") {
+      if (await isEcoBanned(interaction.user.id)) return;
+      const auction = await prisma.auction.findFirst({
+        where: {
+          AND: [{ messageId: interaction.message.id }],
+        },
+      });
 
-          modal.addComponents(
-            new ActionRowBuilder<TextInputBuilder>().addComponents(
-              new TextInputBuilder()
-                .setCustomId("confirmation")
-                .setLabel("type 'yes' to confirm")
-                .setPlaceholder(`this will cost $${auction.bin.toLocaleString()}`)
-                .setStyle(TextInputStyle.Short)
-                .setRequired(true)
-                .setMaxLength(3)
-            )
-          );
-
-          await interaction.showModal(modal);
-
-          const filter = (i: Interaction) => i.user.id == interaction.user.id;
-
-          const res = await interaction.awaitModalSubmit({ filter, time: 120000 }).catch(() => {});
-
-          if (!res) return;
-
-          if (!res.isModalSubmit()) return;
-
-          if (res.fields.fields.first().value.toLowerCase() != "yes") {
-            return res.reply({ embeds: [new CustomEmbed().setDescription("✅ cancelled purchase")], ephemeral: true });
-          }
-
-          const balance = await getBalance(interaction.user.id);
-
-          if (balance < Number(auction.bin)) {
-            return await res.reply({ embeds: [new ErrorEmbed("you cannot afford this")], ephemeral: true });
-          }
-
-          await res.deferUpdate();
-
-          interaction = res;
-        }
-
-        auction = await prisma.auction.findFirst({
-          where: {
-            AND: [{ messageId: interaction.message.id }],
-          },
-          select: {
-            bin: true,
-            messageId: true,
-            id: true,
-            ownerId: true,
-            itemAmount: true,
-            itemId: true,
-            sold: true,
-          },
-        });
-
-        if (!auction) {
-          await interaction.reply({ embeds: [new ErrorEmbed("invalid auction")], ephemeral: true });
-          await interaction.message.delete();
-          return;
-        }
-
-        if (auction.sold) {
-          return await interaction.reply({ embeds: [new ErrorEmbed("too slow ):").removeTitle()], ephemeral: true });
-        }
-
-        if (!(await userExists(interaction.user.id))) await createUser(interaction.user.id);
-
-        const balance = await getBalance(interaction.user.id);
-
-        if (balance < Number(auction.bin)) {
-          return await interaction.reply({ embeds: [new ErrorEmbed("you cannot afford this")], ephemeral: true });
-        }
-
-        if (Number(auction.bin) < 10_000) {
-          await prisma.auction.delete({
-            where: {
-              id: auction.id,
-            },
-          });
-        } else {
-          await prisma.auction
-            .update({
-              where: {
-                id: auction.id,
-              },
-              data: {
-                sold: true,
-              },
-            })
-            .catch(() => {});
-        }
-
-        const tax = await getTax();
-
-        let taxedAmount = 0;
-
-        if (!(await isPremium(auction.ownerId)) || (await getTier(auction.ownerId)) != 4) {
-          taxedAmount = Math.floor(Number(auction.bin) * tax);
-          addToNypsiBank(taxedAmount);
-        }
-
-        await Promise.all([
-          addInventoryItem(interaction.user.id, auction.itemId, auction.itemAmount),
-          updateBalance(interaction.user.id, balance - Number(auction.bin)),
-          updateBalance(auction.ownerId, (await getBalance(auction.ownerId)) + (Number(auction.bin) - taxedAmount)),
-        ]);
-
-        transaction(
-          await interaction.client.users.fetch(auction.ownerId),
-          interaction.user,
-          `${auction.itemId} x ${auction.itemAmount} (auction)`
-        );
-        transaction(
-          interaction.user,
-          await interaction.client.users.fetch(auction.ownerId),
-          `$${(Number(auction.bin) - taxedAmount).toLocaleString()} (auction)`
-        );
-
-        const items = getItems();
-
-        if ((await getDmSettings(auction.ownerId)).auction) {
-          const embedDm = new CustomEmbed()
-            .setColor(Constants.TRANSPARENT_EMBED_COLOR)
-            .setDescription(
-              `your auction for ${auction.itemAmount}x ${items[auction.itemId].emoji} ${
-                items[auction.itemId].name
-              } has been bought by ${interaction.user.username} for $**${Math.floor(
-                Number(auction.bin) - taxedAmount
-              ).toLocaleString()}**${taxedAmount != 0 ? `(${(tax * 100).toFixed(1)}% tax)` : ""} `
-            );
-
-          await requestDM({
-            client: interaction.client as NypsiClient,
-            memberId: auction.ownerId,
-            content: "your auction has been bought",
-            embed: embedDm,
+      if (auction && !auction.sold && (await userExists(auction.ownerId))) {
+        if (auction.ownerId == interaction.user.id) {
+          return await interaction.reply({
+            embeds: [new ErrorEmbed("you cannot buy your own auction")],
+            ephemeral: true,
           });
         }
 
-        const embed = new EmbedBuilder(interaction.message.embeds[0].data);
-
-        const desc = embed.data.description.split("\n\n");
-
-        desc[0] = `**bought** by ${interaction.user.username} <t:${Math.floor(Date.now() / 1000)}:R>`;
-
-        embed.setDescription(desc.join("\n\n"));
-
-        if (embed.data.footer?.text) {
-          embed.setFooter({ text: embed.data.footer.text });
-        }
-
-        await interaction.message.edit({ embeds: [embed], components: [] });
-      } else if (auction.sold) {
+        return buyAuctionOne(interaction as ButtonInteraction, auction);
+      } else if (auction.sold || auction.itemAmount === 0) {
         return await interaction.reply({ embeds: [new ErrorEmbed("too slow ):").removeTitle()], ephemeral: true });
       } else {
         await interaction.reply({ embeds: [new ErrorEmbed("invalid auction")], ephemeral: true });
