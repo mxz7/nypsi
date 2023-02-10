@@ -620,20 +620,6 @@ export async function buyAuctionOne(interaction: ButtonInteraction, auction: Auc
     beingBought.delete(auction.id);
   }, ms("10 minutes"));
 
-  if (Math.floor(Number(auction.bin) / auction.itemAmount) >= 10_000_000) {
-    const modalResponse = await showAuctionConfirmation(interaction, Math.floor(Number(auction.bin) / auction.itemAmount));
-
-    if (!modalResponse) {
-      beingBought.delete(auction.id);
-      return;
-    }
-
-    if ((await getBalance(interaction.user.id)) < Math.floor(Number(auction.bin) / auction.itemAmount)) {
-      beingBought.delete(auction.id);
-      return await interaction.followUp({ embeds: [new ErrorEmbed("you cannot afford this")], ephemeral: true });
-    }
-  }
-
   auction = await prisma.auction.findFirst({
     where: {
       AND: [{ messageId: interaction.message.id }],
