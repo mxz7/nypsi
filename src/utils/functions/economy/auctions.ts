@@ -477,16 +477,31 @@ async function showAuctionConfirmation(interaction: ButtonInteraction, cost: num
 }
 
 export async function buyFullAuction(interaction: ButtonInteraction, auction: Auction) {
+  if (beingBought.has(auction.id)) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(buyFullAuction(interaction, auction));
+      }, 75);
+    });
+  }
+
   if ((await getBalance(interaction.user.id)) < Number(auction.bin)) {
     return await interaction.reply({ embeds: [new ErrorEmbed("you cannot afford this")], ephemeral: true });
   }
 
+  beingBought.add(auction.id);
+
+  setTimeout(() => {
+    beingBought.delete(auction.id);
+  }, ms("10 minutes"));
+
   if (auction.bin >= 10_000_000) {
     const modalResponse = await showAuctionConfirmation(interaction, Number(auction.bin));
 
-    if (!modalResponse) return;
+    if (!modalResponse) return beingBought.delete(auction.id);
 
     if ((await getBalance(interaction.user.id)) < Number(auction.bin)) {
+      beingBought.delete(auction.id);
       return await interaction.followUp({ embeds: [new ErrorEmbed("you cannot afford this")], ephemeral: true });
     }
   }
@@ -500,10 +515,12 @@ export async function buyFullAuction(interaction: ButtonInteraction, auction: Au
   if (!auction) {
     await interaction.reply({ embeds: [new ErrorEmbed("invalid auction")], ephemeral: true });
     await interaction.message.delete();
+    beingBought.delete(auction.id);
     return;
   }
 
   if (auction.sold || auction.itemAmount === 0) {
+    beingBought.delete(auction.id);
     return await interaction.reply({ embeds: [new ErrorEmbed("too slow ):").removeTitle()], ephemeral: true });
   }
 
@@ -512,6 +529,7 @@ export async function buyFullAuction(interaction: ButtonInteraction, auction: Au
   const balance = await getBalance(interaction.user.id);
 
   if (balance < Number(auction.bin)) {
+    beingBought.delete(auction.id);
     return await interaction.reply({ embeds: [new ErrorEmbed("you cannot afford this")], ephemeral: true });
   }
 
@@ -593,6 +611,7 @@ export async function buyFullAuction(interaction: ButtonInteraction, auction: Au
     embed.setFooter({ text: embed.data.footer.text });
   }
 
+  beingBought.delete(auction.id);
   await interaction.deferUpdate().catch(() => {});
   await interaction.message.edit({ embeds: [embed], components: [] });
 }
