@@ -10,6 +10,7 @@ import { Worker, WorkerUpgrades } from "../../../types/Workers";
 import Constants from "../../Constants";
 import { logger } from "../../logger/logger";
 import { getTier, isPremium } from "../premium/premium";
+import { isUserBlacklisted } from "../users/blacklist";
 import { createProfile, hasProfile } from "../users/utils";
 import { setProgress } from "./achievements";
 import { calcMaxBet, getBalance, getMulti, updateBalance } from "./balance";
@@ -238,6 +239,7 @@ export function formatNumber(number: string | number): number | void {
 }
 
 export async function isEcoBanned(id: string) {
+  if (await isUserBlacklisted(id)) return true;
   if (await redis.exists(`${Constants.redis.cache.economy.BANNED}:${id}`)) {
     const res = (await redis.get(`${Constants.redis.cache.economy.BANNED}:${id}`)) === "t" ? true : false;
 
