@@ -438,6 +438,10 @@ export async function findAuctions(itemId: string) {
 }
 
 export async function buyFullAuction(interaction: ButtonInteraction, user: User, auction: Auction) {
+  if ((await getBalance(user.id)) < Number(auction.bin)) {
+    return await interaction.reply({ embeds: [new ErrorEmbed("you cannot afford this")], ephemeral: true });
+  }
+
   if (auction.bin >= 10_000_000) {
     const modal = new ModalBuilder().setCustomId("auction-confirm").setTitle("confirmation");
 
@@ -467,9 +471,7 @@ export async function buyFullAuction(interaction: ButtonInteraction, user: User,
       return res.reply({ embeds: [new CustomEmbed().setDescription("✅ cancelled purchase")], ephemeral: true });
     }
 
-    const balance = await getBalance(interaction.user.id);
-
-    if (balance < Number(auction.bin)) {
+    if ((await getBalance(user.id)) < Number(auction.bin)) {
       return await res.reply({ embeds: [new ErrorEmbed("you cannot afford this")], ephemeral: true });
     }
 
