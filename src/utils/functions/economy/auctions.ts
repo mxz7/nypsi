@@ -1,4 +1,5 @@
 import { Auction } from "@prisma/client";
+import { randomUUID } from "crypto";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -28,6 +29,8 @@ import { addInventoryItem } from "./inventory";
 import { createUser, getItems, userExists } from "./utils";
 import ms = require("ms");
 import dayjs = require("dayjs");
+
+const beingBought = new Set<string>();
 
 export async function getAuctions(member: GuildMember | string) {
   let id: string;
@@ -439,7 +442,7 @@ export async function findAuctions(itemId: string) {
   return query;
 }
 
-async function showAuctionConfirmation(interaction: ButtonInteraction, auction: Auction) {
+async function showAuctionConfirmation(interaction: ButtonInteraction, cost: number) {
   const modal = new ModalBuilder().setCustomId("auction-confirm").setTitle("confirmation");
 
   modal.addComponents(
@@ -447,7 +450,7 @@ async function showAuctionConfirmation(interaction: ButtonInteraction, auction: 
       new TextInputBuilder()
         .setCustomId("confirmation")
         .setLabel("type 'yes' to confirm")
-        .setPlaceholder(`this will cost $${auction.bin.toLocaleString()}`)
+        .setPlaceholder(`this will cost $${cost.toLocaleString()}`)
         .setStyle(TextInputStyle.Short)
         .setRequired(true)
         .setMaxLength(3)
@@ -477,7 +480,7 @@ export async function buyFullAuction(interaction: ButtonInteraction, auction: Au
   }
 
   if (auction.bin >= 10_000_000) {
-    const modalResponse = await showAuctionConfirmation(interaction, auction);
+    const modalResponse = await showAuctionConfirmation(interaction, Number(auction.bin));
 
     if (!modalResponse) return;
 
@@ -589,4 +592,165 @@ export async function buyFullAuction(interaction: ButtonInteraction, auction: Au
   }
 
   await interaction.message.edit({ embeds: [embed], components: [] });
+}
+
+export async function buyAuctionOne(interaction: ButtonInteraction, auction: Auction) {
+  if (beingBought.has(auction.id)) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(buyAuctionOne(interaction, auction));
+      }, 75);
+    });
+  }
+
+  if (auction.itemAmount === 1) return buyFullAuction(interaction, auction);
+
+  if (!(await userExists(interaction.user.id))) await createUser(interaction.user.id);
+
+  if ((await getBalance(interaction.user.id)) < Math.floor(Number(auction.bin) / auction.itemAmount)) {
+    return await interaction.reply({ embeds: [new ErrorEmbed("you cannot afford this")], ephemeral: true });
+  }
+
+  beingBought.add(auction.id);
+
+  if (Math.floor(Number(auction.bin) / auction.itemAmount) >= 10_000_000) {
+    const modalResponse = await showAuctionConfirmation(interaction, Math.floor(Number(auction.bin) / auction.itemAmount));
+
+    if (!modalResponse) {
+      beingBought.delete(auction.id);
+      return;
+    }
+
+    if ((await getBalance(interaction.user.id)) < Number(auction.bin)) {
+      beingBought.delete(auction.id);
+      return await interaction.followUp({ embeds: [new ErrorEmbed("you cannot afford this")], ephemeral: true });
+    }
+  }
+
+  auction = await prisma.auction.findFirst({
+    where: {
+      AND: [{ messageId: interaction.message.id }],
+    },
+  });
+
+  if (!auction) {
+    await interaction.reply({ embeds: [new ErrorEmbed("invalid auction")], ephemeral: true });
+    await interaction.message.delete();
+    beingBought.delete(auction.id);
+    return;
+  }
+
+  if (auction.sold || auction.itemAmount === 0) {
+    beingBought.delete(auction.id);
+    return await interaction.reply({ embeds: [new ErrorEmbed("too slow ):").removeTitle()], ephemeral: true });
+  }
+
+  const balance = await getBalance(interaction.user.id);
+
+  if (balance < Number(auction.bin)) {
+    beingBought.delete(auction.id);
+    return await interaction.reply({ embeds: [new ErrorEmbed("you cannot afford this")], ephemeral: true });
+  }
+
+  if (Number(auction.bin) < 10_000 && auction.itemAmount === 1) {
+    await prisma.auction.delete({
+      where: {
+        id: auction.id,
+      },
+    });
+  } else {
+    if (Math.floor(Number(auction.bin) / auction.itemAmount) > 10_000) {
+      await prisma.auction.create({
+        data: {
+          sold: true,
+          itemId: auction.itemId,
+          itemAmount: 1,
+          bin: Math.floor(Number(auction.bin) / auction.itemAmount),
+          messageId: randomUUID(),
+          ownerId: auction.ownerId,
+        },
+      });
+    }
+
+    await prisma.auction
+      .update({
+        where: {
+          id: auction.id,
+        },
+        data: {
+          itemAmount: { decrement: 1 },
+          bin: { decrement: Math.floor(Number(auction.bin) / auction.itemAmount) },
+        },
+      })
+      .catch(() => {});
+  }
+
+  const tax = await getTax();
+
+  let taxedAmount = 0;
+
+  if (!(await isPremium(auction.ownerId)) || (await getTier(auction.ownerId)) != 4) {
+    taxedAmount = Math.floor(Number(auction.bin) * tax);
+    addToNypsiBank(taxedAmount);
+  }
+
+  await Promise.all([
+    addInventoryItem(interaction.user.id, auction.itemId, auction.itemAmount),
+    updateBalance(interaction.user.id, balance - Number(auction.bin)),
+    updateBalance(auction.ownerId, (await getBalance(auction.ownerId)) + (Number(auction.bin) - taxedAmount)),
+  ]);
+
+  transaction(
+    await interaction.client.users.fetch(auction.ownerId),
+    interaction.user,
+    `${auction.itemId} x ${auction.itemAmount} (auction)`
+  );
+  transaction(
+    interaction.user,
+    await interaction.client.users.fetch(auction.ownerId),
+    `$${(Number(auction.bin) - taxedAmount).toLocaleString()} (auction)`
+  );
+
+  const items = getItems();
+
+  if ((await getDmSettings(auction.ownerId)).auction) {
+    const embedDm = new CustomEmbed()
+      .setColor(Constants.TRANSPARENT_EMBED_COLOR)
+      .setDescription(
+        `your auction for ${auction.itemAmount}x ${items[auction.itemId].emoji} ${
+          items[auction.itemId].name
+        } has been bought by ${interaction.user.username} for $**${Math.floor(
+          Number(auction.bin) - taxedAmount
+        ).toLocaleString()}**${taxedAmount != 0 ? `(${(tax * 100).toFixed(1)}% tax)` : ""} `
+      );
+
+    await requestDM({
+      client: interaction.client as NypsiClient,
+      memberId: auction.ownerId,
+      content: "your auction has been bought",
+      embed: embedDm,
+    });
+  }
+
+  const embed = new EmbedBuilder(interaction.message.embeds[0].data);
+
+  const desc = embed.data.description.split("\n\n");
+
+  desc[1] = `**${(auction.itemAmount - 1).toLocaleString()}x** ${items[auction.itemId].emoji} ${
+    items[auction.itemId].name
+  } for $**${Math.floor(Number(auction.bin) - Math.floor(Number(auction.bin) / auction.itemAmount)).toLocaleString()}**`;
+
+  embed.setDescription(desc.join("\n\n"));
+
+  const buttonRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+    new ButtonBuilder().setCustomId("b").setLabel("buy").setStyle(ButtonStyle.Success)
+  );
+
+  if (auction.itemAmount > 2) {
+    buttonRow.addComponents(new ButtonBuilder().setCustomId("b-one").setLabel("buy one").setStyle(ButtonStyle.Secondary));
+    embed.setFooter({ text: `$${Math.floor(Number(auction.bin) / auction.itemAmount)} per ${items[auction.itemId].name}` });
+  }
+
+  await interaction.message.edit({ embeds: [embed], components: [buttonRow] });
+  beingBought.delete(auction.id);
 }

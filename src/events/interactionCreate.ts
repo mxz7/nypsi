@@ -20,7 +20,7 @@ import { createNypsiInteraction, NypsiCommandInteraction } from "../models/Comma
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { addProgress } from "../utils/functions/economy/achievements";
-import { buyFullAuction } from "../utils/functions/economy/auctions";
+import { buyAuctionOne, buyFullAuction } from "../utils/functions/economy/auctions";
 import { getInventory, openCrate } from "../utils/functions/economy/inventory";
 import { getPrestige } from "../utils/functions/economy/prestige";
 import { addItemUse } from "../utils/functions/economy/stats";
@@ -267,6 +267,29 @@ export default async function interactionCreate(interaction: Interaction) {
         }
 
         return buyFullAuction(interaction as ButtonInteraction, auction);
+      } else if (auction.sold || auction.itemAmount === 0) {
+        return await interaction.reply({ embeds: [new ErrorEmbed("too slow ):").removeTitle()], ephemeral: true });
+      } else {
+        await interaction.reply({ embeds: [new ErrorEmbed("invalid auction")], ephemeral: true });
+        await interaction.message.delete();
+      }
+    } else if (interaction.customId === "b-one") {
+      if (await isEcoBanned(interaction.user.id)) return;
+      const auction = await prisma.auction.findFirst({
+        where: {
+          AND: [{ messageId: interaction.message.id }],
+        },
+      });
+
+      if (auction && !auction.sold && (await userExists(auction.ownerId))) {
+        if (auction.ownerId == interaction.user.id) {
+          return await interaction.reply({
+            embeds: [new ErrorEmbed("you cannot buy your own auction")],
+            ephemeral: true,
+          });
+        }
+
+        return buyAuctionOne(interaction as ButtonInteraction, auction);
       } else if (auction.sold || auction.itemAmount === 0) {
         return await interaction.reply({ embeds: [new ErrorEmbed("too slow ):").removeTitle()], ephemeral: true });
       } else {
