@@ -117,9 +117,12 @@ export async function createAuction(member: GuildMember, itemId: string, itemAmo
     embed.setFooter({ text: `$${Math.floor(bin / itemAmount).toLocaleString()} per ${items[itemId].name}` });
   }
 
-  const button = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+  const buttonRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder().setCustomId("b").setLabel("buy").setStyle(ButtonStyle.Success)
   );
+
+  if (itemAmount > 1)
+    buttonRow.addComponents(new ButtonBuilder().setCustomId("b-one").setLabel("buy one").setStyle(ButtonStyle.Secondary));
 
   const clusters = await (member.client as NypsiClient).cluster.broadcastEval(async (client) => {
     const guild = await client.guilds.fetch("747056029795221513");
@@ -156,7 +159,7 @@ export async function createAuction(member: GuildMember, itemId: string, itemAmo
           return { messageId: msg.id, messageUrl: msg.url };
         }
       },
-      { context: { embed: embed.toJSON(), row: button.toJSON(), cluster: cluster } }
+      { context: { embed: embed.toJSON(), row: buttonRow.toJSON(), cluster: cluster } }
     )
     .then((res) => {
       res.filter((i) => Boolean(i));
