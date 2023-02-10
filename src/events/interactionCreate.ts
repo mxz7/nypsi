@@ -266,8 +266,8 @@ export default async function interactionCreate(interaction: Interaction) {
           });
         }
 
-        return buyFullAuction(interaction as ButtonInteraction, interaction.user, auction);
-      } else if (auction.sold) {
+        return buyFullAuction(interaction as ButtonInteraction, auction);
+      } else if (auction.sold || auction.itemAmount === 0) {
         return await interaction.reply({ embeds: [new ErrorEmbed("too slow ):").removeTitle()], ephemeral: true });
       } else {
         await interaction.reply({ embeds: [new ErrorEmbed("invalid auction")], ephemeral: true });

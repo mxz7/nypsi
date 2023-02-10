@@ -11,7 +11,6 @@ import {
   ModalBuilder,
   TextInputBuilder,
   TextInputStyle,
-  User,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
@@ -437,47 +436,51 @@ export async function findAuctions(itemId: string) {
   return query;
 }
 
-export async function buyFullAuction(interaction: ButtonInteraction, user: User, auction: Auction) {
-  if ((await getBalance(user.id)) < Number(auction.bin)) {
+async function showAuctionConfirmation(interaction: ButtonInteraction, auction: Auction) {
+  const modal = new ModalBuilder().setCustomId("auction-confirm").setTitle("confirmation");
+
+  modal.addComponents(
+    new ActionRowBuilder<TextInputBuilder>().addComponents(
+      new TextInputBuilder()
+        .setCustomId("confirmation")
+        .setLabel("type 'yes' to confirm")
+        .setPlaceholder(`this will cost $${auction.bin.toLocaleString()}`)
+        .setStyle(TextInputStyle.Short)
+        .setRequired(true)
+        .setMaxLength(3)
+    )
+  );
+
+  await interaction.showModal(modal);
+
+  const filter = (i: Interaction) => i.user.id == interaction.user.id;
+
+  const res = await interaction.awaitModalSubmit({ filter, time: 120000 }).catch(() => {});
+
+  if (!res) return;
+
+  if (!res.isModalSubmit()) return;
+
+  if (res.fields.fields.first().value.toLowerCase() != "yes") {
+    res.reply({ embeds: [new CustomEmbed().setDescription("✅ cancelled purchase")], ephemeral: true });
+    return false;
+  }
+  return true;
+}
+
+export async function buyFullAuction(interaction: ButtonInteraction, auction: Auction) {
+  if ((await getBalance(interaction.user.id)) < Number(auction.bin)) {
     return await interaction.reply({ embeds: [new ErrorEmbed("you cannot afford this")], ephemeral: true });
   }
 
   if (auction.bin >= 10_000_000) {
-    const modal = new ModalBuilder().setCustomId("auction-confirm").setTitle("confirmation");
+    const modalResponse = await showAuctionConfirmation(interaction, auction);
 
-    modal.addComponents(
-      new ActionRowBuilder<TextInputBuilder>().addComponents(
-        new TextInputBuilder()
-          .setCustomId("confirmation")
-          .setLabel("type 'yes' to confirm")
-          .setPlaceholder(`this will cost $${auction.bin.toLocaleString()}`)
-          .setStyle(TextInputStyle.Short)
-          .setRequired(true)
-          .setMaxLength(3)
-      )
-    );
+    if (!modalResponse) return;
 
-    await interaction.showModal(modal);
-
-    const filter = (i: Interaction) => i.user.id == interaction.user.id;
-
-    const res = await interaction.awaitModalSubmit({ filter, time: 120000 }).catch(() => {});
-
-    if (!res) return;
-
-    if (!res.isModalSubmit()) return;
-
-    if (res.fields.fields.first().value.toLowerCase() != "yes") {
-      return res.reply({ embeds: [new CustomEmbed().setDescription("✅ cancelled purchase")], ephemeral: true });
+    if ((await getBalance(interaction.user.id)) < Number(auction.bin)) {
+      return await interaction.followUp({ embeds: [new ErrorEmbed("you cannot afford this")], ephemeral: true });
     }
-
-    if ((await getBalance(user.id)) < Number(auction.bin)) {
-      return await res.reply({ embeds: [new ErrorEmbed("you cannot afford this")], ephemeral: true });
-    }
-
-    await res.deferUpdate();
-
-    interaction = res as unknown as ButtonInteraction;
   }
 
   auction = await prisma.auction.findFirst({
@@ -492,7 +495,7 @@ export async function buyFullAuction(interaction: ButtonInteraction, user: User,
     return;
   }
 
-  if (auction.sold) {
+  if (auction.sold || auction.itemAmount === 0) {
     return await interaction.reply({ embeds: [new ErrorEmbed("too slow ):").removeTitle()], ephemeral: true });
   }
 
