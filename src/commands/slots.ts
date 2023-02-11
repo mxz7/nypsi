@@ -328,16 +328,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   }
 
   if (await redis.sismember(Constants.redis.nypsi.FORCE_LOSE, message.author.id)) {
-    if (one.includes("melon")) {
-      two = "cherry-2";
-    } else if (one.includes("grape")) {
-      two = "cherry-2";
-    } else if (one.includes("orange")) {
-      two = "cherry-2";
-    } else if (one.includes("lemon")) {
-      two = "cherry-2";
-    } else if (one.includes("cherry")) {
-      two = "lemon-2";
+    while (one.substring(0, one.length - 2) == two.substring(0, two.length - 2)) {
+      const reel = reels.get(2);
+      two = reel[randomInt(reel.length)];
     }
   }
 
