@@ -715,11 +715,7 @@ export async function buyAuctionOne(interaction: ButtonInteraction, auction: Auc
     ),
   ]);
 
-  transaction(
-    await interaction.client.users.fetch(auction.ownerId),
-    interaction.user,
-    `${auction.itemId} x ${auction.itemAmount} (auction)`
-  );
+  transaction(await interaction.client.users.fetch(auction.ownerId), interaction.user, `${auction.itemId} x ${1} (auction)`);
   transaction(
     interaction.user,
     await interaction.client.users.fetch(auction.ownerId),
