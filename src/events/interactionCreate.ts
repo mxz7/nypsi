@@ -307,9 +307,9 @@ export default async function interactionCreate(interaction: Interaction) {
 
       const inventory = await getInventory(interaction.user.id, false);
 
-      let crateAmount = Math.floor((await getPrestige(interaction.user.id)) * 0.5) + 1;
-
-      if (crateAmount > 3) crateAmount = 3;
+      const crateAmount =
+        Constants.VOTE_CRATE_PROGRESSION[await getPrestige(interaction.user.id)] ||
+        Constants.VOTE_CRATE_PROGRESSION[Constants.VOTE_CRATE_PROGRESSION.length - 1];
 
       if (
         !inventory.find((i) => i.item === "vote_crate") ||

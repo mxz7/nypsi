@@ -13,6 +13,7 @@ import {
 } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders";
+import Constants from "../utils/Constants";
 import { calcMaxBet, getBankBalance, getMulti, updateBankBalance } from "../utils/functions/economy/balance.js";
 import { addBooster, getBoosters } from "../utils/functions/economy/boosters.js";
 import { addInventoryItem } from "../utils/functions/economy/inventory.js";
@@ -183,9 +184,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       await addBooster(message.member, "xp_potion");
     }
 
-    let crateAmount = Math.floor((await getPrestige(message.member)) * 0.5) + 1;
-
-    if (crateAmount > 3) crateAmount = 3;
+    const crateAmount =
+      Constants.VOTE_CRATE_PROGRESSION[await getPrestige(message.member)] ||
+      Constants.VOTE_CRATE_PROGRESSION[Constants.VOTE_CRATE_PROGRESSION.length - 1];
 
     let prestige = await getPrestige(message.author.id);
 
