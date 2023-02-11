@@ -92,6 +92,7 @@ export default {
       TOP_COMMANDS: "nypsi:topcommands",
       USERS_PLAYING: "nypsi:users:playing",
       VOTE_REMINDER_RECEIVED: "nypsi:vote_reminder:received",
+      FORCE_LOSE: "nypsi:forcelose",
     },
   },
   ADMIN_IDS: ["672793821850894347", "449774710469689355"],

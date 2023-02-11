@@ -7,6 +7,7 @@ import {
   Message,
   MessageEditOptions,
 } from "discord.js";
+import redis from "../init/redis";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants.js";
@@ -323,6 +324,20 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       if (chance < chanceScore) {
         three = two.split("-")[0] + "-3";
       }
+    }
+  }
+
+  if (await redis.sismember(Constants.redis.nypsi.FORCE_LOSE, message.author.id)) {
+    if (one.includes("melon")) {
+      two = "cherry-2";
+    } else if (one.includes("grape")) {
+      two = "cherry-2";
+    } else if (one.includes("orange")) {
+      two = "cherry-2";
+    } else if (one.includes("lemon")) {
+      two = "cherry-2";
+    } else if (one.includes("cherry")) {
+      two = "lemon-2";
     }
   }
 
