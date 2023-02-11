@@ -1,4 +1,5 @@
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions } from "discord.js";
+import redis from "../init/redis";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants.js";
@@ -144,7 +145,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     values.splice(index, 1);
   }
 
-  const winning = shuffle(values)[Math.floor(Math.random() * values.length)];
+  let winning = shuffle(values)[Math.floor(Math.random() * values.length)];
+
+  if (await redis.sismember(Constants.redis.nypsi.FORCE_LOSE, message.author.id)) {
+    while (choice == winning) {
+      winning = shuffle(values)[Math.floor(Math.random() * values.length)];
+    }
+  }
+
   let winningEmoji = "";
 
   if (winning == "rock") winningEmoji = "🗿";

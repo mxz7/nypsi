@@ -6,6 +6,7 @@ import {
   Message,
   MessageEditOptions,
 } from "discord.js";
+import redis from "../init/redis";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants.js";
@@ -16,6 +17,7 @@ import { createGame } from "../utils/functions/economy/stats";
 import { createUser, formatBet, userExists } from "../utils/functions/economy/utils.js";
 import { calcEarnedXp, getXp, updateXp } from "../utils/functions/economy/xp.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
+import { shuffle } from "../utils/functions/random";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 import { gamble } from "../utils/logger/logger.js";
 
@@ -217,6 +219,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   let colorBet = args[0].toLowerCase();
 
   let roll = values[Math.floor(Math.random() * values.length)];
+
+  if (await redis.sismember(Constants.redis.nypsi.FORCE_LOSE, message.author.id)) {
+    while (colorBet == roll) {
+      roll = shuffle(values)[Math.floor(Math.random() * values.length)];
+    }
+  }
 
   let win = false;
   let winnings = 0;
