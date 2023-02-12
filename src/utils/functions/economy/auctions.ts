@@ -745,6 +745,10 @@ export async function buyAuctionOne(interaction: ButtonInteraction, auction: Auc
         const buyers = dmQueue.get(`${auction.ownerId}-${auction.itemId}`).buyers;
         const total = Array.from(buyers.values()).reduce((a, b) => a + b);
         const moneyReceived = Math.floor((Number(auction.bin) / auction.itemAmount) * total);
+        let taxedAmount = 0;
+
+        if ((await getTier(auction.ownerId)) != 4) taxedAmount = Math.floor(moneyReceived * tax);
+
         const embedDm = new CustomEmbed()
           .setColor(Constants.TRANSPARENT_EMBED_COLOR)
           .setDescription(
@@ -754,7 +758,7 @@ export async function buyAuctionOne(interaction: ButtonInteraction, auction: Auc
               .map((i) => `**${i[0]}**: ${i[1]}`)
               .join("\n")}`
           )
-          .setFooter({ text: `+$${moneyReceived.toLocaleString()}` });
+          .setFooter({ text: `+$${(moneyReceived - taxedAmount).toLocaleString()}` });
         dmQueue.delete(`${auction.ownerId}-${auction.itemId}`);
 
         await requestDM({
