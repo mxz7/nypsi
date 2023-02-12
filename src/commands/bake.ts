@@ -98,7 +98,7 @@ async function doBake(message: Message | (NypsiCommandInteraction & CommandInter
     });
   }
 
-  await addCooldown(cmd.name, member, 30);
+  await addCooldown(cmd.name, member, 120);
   await setInventoryItem(member, "coal", inventory.find((i) => i.item === "coal").amount - 1, false);
 
   const response = await runBakery(member);
