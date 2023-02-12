@@ -581,6 +581,34 @@ export async function buyFullAuction(interaction: ButtonInteraction, auction: Au
   const items = getItems();
 
   if ((await getDmSettings(auction.ownerId)).auction) {
+    if (dmQueue.has(`${auction.ownerId}-${auction.itemId}`)) {
+      const buyers = dmQueue.get(`${auction.ownerId}-${auction.itemId}`).buyers;
+      const total = Array.from(buyers.values()).reduce((a, b) => a + b);
+      const moneyReceived = Math.floor((Number(auction.bin) / auction.itemAmount) * total);
+      let taxedAmount = 0;
+
+      if ((await getTier(auction.ownerId)) != 4) taxedAmount = Math.floor(moneyReceived * tax);
+
+      const embedDm = new CustomEmbed()
+        .setColor(Constants.TRANSPARENT_EMBED_COLOR)
+        .setDescription(
+          `${total.toLocaleString()}x of your ${items[auction.itemId].emoji} ${
+            items[auction.itemId].name
+          } auction(s) has been bought by: \n${Array.from(buyers.entries())
+            .map((i) => `**${i[0]}**: ${i[1]}`)
+            .join("\n")}`
+        )
+        .setFooter({ text: `+$${(moneyReceived - taxedAmount).toLocaleString()}` });
+      dmQueue.delete(`${auction.ownerId}-${auction.itemId}`);
+
+      await requestDM({
+        client: interaction.client as NypsiClient,
+        memberId: auction.ownerId,
+        content: `${total.toLocaleString()}x of your auctioned items have been bought`,
+        embed: embedDm,
+      });
+    }
+
     const embedDm = new CustomEmbed()
       .setColor(Constants.TRANSPARENT_EMBED_COLOR)
       .setDescription(
@@ -742,6 +770,7 @@ export async function buyAuctionOne(interaction: ButtonInteraction, auction: Auc
       });
 
       setTimeout(async () => {
+        if (!dmQueue.has(`${auction.ownerId}-${auction.itemId}`)) return;
         const buyers = dmQueue.get(`${auction.ownerId}-${auction.itemId}`).buyers;
         const total = Array.from(buyers.values()).reduce((a, b) => a + b);
         const moneyReceived = Math.floor((Number(auction.bin) / auction.itemAmount) * total);
