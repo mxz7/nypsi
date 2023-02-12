@@ -479,8 +479,8 @@ async function showAuctionConfirmation(interaction: ButtonInteraction, cost: num
 export async function buyFullAuction(interaction: ButtonInteraction, auction: Auction) {
   if (beingBought.has(auction.id)) {
     return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(buyFullAuction(interaction, auction));
+      setTimeout(async () => {
+        resolve(buyFullAuction(interaction, await prisma.auction.findUnique({ where: { id: auction.id } })));
       }, 75);
     });
   }
@@ -619,8 +619,8 @@ export async function buyFullAuction(interaction: ButtonInteraction, auction: Au
 export async function buyAuctionOne(interaction: ButtonInteraction, auction: Auction) {
   if (beingBought.has(auction.id)) {
     return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(buyAuctionOne(interaction, auction));
+      setTimeout(async () => {
+        resolve(buyAuctionOne(interaction, await prisma.auction.findUnique({ where: { id: auction.id } })));
       }, 75);
     });
   }
