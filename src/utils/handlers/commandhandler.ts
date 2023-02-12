@@ -814,8 +814,6 @@ export async function runCommand(
     updateUser(message.author || message.member.user || null, command.name),
     redis.hincrby(Constants.redis.nypsi.TOP_COMMANDS, command.name, 1),
     redis.hincrby(Constants.redis.nypsi.TOP_COMMANDS_USER, message.author.tag, 1),
-    redis.sadd(Constants.redis.nypsi.ACTIVE_USERS_ANALYTICS, message.author.id),
-    redis.hincrby(Constants.redis.nypsi.TOP_COMMANDS_ANALYTICS, command.name, 1),
     addProgress(message.author.id, "nypsi", 1),
     commandGemCheck(message.member, command.category),
   ]);
