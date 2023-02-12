@@ -419,8 +419,6 @@ async function playGame(
 
       await a(message.author.id, message.author.tag, message.content);
 
-      await redis.hincrby(Constants.redis.nypsi.TOP_COMMANDS_ANALYTICS, "highlow", 1);
-
       if ((await redis.get(Constants.redis.nypsi.RESTART)) == "t") {
         if (message.author.id == Constants.TEKOH_ID && message instanceof Message) {
           message.react("💀");

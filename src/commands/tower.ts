@@ -483,7 +483,6 @@ async function playGame(
 
       addHourlyCommand(message.member);
 
-      await redis.hincrby(Constants.redis.nypsi.TOP_COMMANDS_ANALYTICS, "tower", 1);
       await a(message.author.id, message.author.tag, message.content);
 
       if ((await redis.get(Constants.redis.nypsi.RESTART)) == "t") {
