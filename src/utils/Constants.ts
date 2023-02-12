@@ -73,7 +73,6 @@ export default {
       },
     },
     nypsi: {
-      ACTIVE_USERS_ANALYTICS: "nypsi:active:user:anal",
       CAPTCHA_VERIFIED: "nypsi:captcha_verified",
       DM_QUEUE: "nypsi:dmqueue",
       GEM_GIVEN: "nypsi:gemgiven",
@@ -87,7 +86,6 @@ export default {
       RESTART: "nypsi:restarting",
       STEVE_EARNED: "nypsi:steveearned",
       TAX: "nypsi:tax",
-      TOP_COMMANDS_ANALYTICS: "nypsi:topcommands:anal",
       TOP_COMMANDS_USER: "nypsi:topcommands:user",
       TOP_COMMANDS: "nypsi:topcommands",
       USERS_PLAYING: "nypsi:users:playing",
