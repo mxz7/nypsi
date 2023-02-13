@@ -29,7 +29,7 @@ import { getTier, isPremium } from "../utils/functions/premium/premium.js";
 import { shuffle } from "../utils/functions/random.js";
 import { addHourlyCommand } from "../utils/handlers/commandhandler.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
-import { gamble, logger } from "../utils/logger/logger.js";
+import { gamble, logger } from "../utils/logger.js";
 
 const games = new Map<
   string,

@@ -33,7 +33,7 @@ import PageManager from "../utils/functions/page";
 import { isUserBlacklisted } from "../utils/functions/users/blacklist";
 import { runCommand } from "../utils/handlers/commandhandler";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import { logger } from "../utils/logger/logger";
+import { logger } from "../utils/logger";
 
 export default async function interactionCreate(interaction: Interaction) {
   if (await isUserBlacklisted(interaction.user.id)) return;

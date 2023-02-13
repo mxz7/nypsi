@@ -4,7 +4,7 @@ import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { NotificationPayload } from "../../../types/Notification";
 import Constants from "../../Constants";
-import { logger } from "../../logger/logger";
+import { logger } from "../../logger";
 import { percentChance } from "../random";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { getLastKnownTag } from "../users/tag";
