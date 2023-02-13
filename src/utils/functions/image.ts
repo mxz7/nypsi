@@ -6,7 +6,7 @@ import prisma from "../../init/database";
 import { NypsiClient } from "../../models/Client";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 import { RedditJSONPost } from "../../types/Reddit";
-import { logger } from "../logger/logger";
+import { logger } from "../logger";
 import { addProgress } from "./economy/achievements";
 import requestDM from "./requestdm";
 

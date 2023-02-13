@@ -3,7 +3,7 @@ import prisma from "../../../init/database";
 import { NypsiClient } from "../../../models/Client";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
-import { logger } from "../../logger/logger";
+import { logger } from "../../logger";
 import { daysUntil, MStoTime } from "../date";
 
 export function runCountdowns(client: NypsiClient) {

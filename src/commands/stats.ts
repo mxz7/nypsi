@@ -30,7 +30,7 @@ import { mentionQueue } from "../utils/functions/users/mentions";
 import { getVersion } from "../utils/functions/version";
 import { aliasesSize, commandsSize } from "../utils/handlers/commandhandler";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import { logger } from "../utils/logger/logger";
+import { logger } from "../utils/logger";
 
 const cmd = new Command("stats", "view your nypsi stats", "info");
 

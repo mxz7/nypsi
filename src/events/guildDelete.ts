@@ -3,7 +3,7 @@ import { updateDisabledCommands } from "../utils/functions/guilds/disabledcomman
 import { setPrefix } from "../utils/functions/guilds/utils";
 import { setMuteRole } from "../utils/functions/moderation/mute";
 import { profileExists } from "../utils/functions/moderation/utils";
-import { logger } from "../utils/logger/logger";
+import { logger } from "../utils/logger";
 
 export default async function guildDelete(client: Client, guild: Guild) {
   if (!guild.name) {

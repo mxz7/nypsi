@@ -8,7 +8,7 @@ import { selectItem } from "../utils/functions/economy/inventory";
 import { isPremium } from "../utils/functions/premium/premium";
 import getJsonGraphData from "../utils/functions/workers/jsongraph";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import { logger } from "../utils/logger/logger";
+import { logger } from "../utils/logger";
 import dayjs = require("dayjs");
 
 const BASE_URL = "https://quickchart.io/chart/create";
@@ -80,7 +80,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }).then((res) => res.json());
 
     if (!response.success) {
-      logger.warn(res);
+      logger.warn("failed to create graph", res);
       return message.channel.send({ embeds: [new ErrorEmbed("failed to create graph")] });
     }
 
@@ -148,7 +148,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   }).then((res) => res.json());
 
   if (!res.success) {
-    logger.warn(res);
+    logger.warn("failed to create graph", res);
     return message.channel.send({ embeds: [new ErrorEmbed("failed to create graph")] });
   }
 

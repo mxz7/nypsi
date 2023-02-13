@@ -54,7 +54,7 @@ const client = new NypsiClient({
 });
 
 import { loadCommands } from "./utils/handlers/commandhandler";
-import { logger } from "./utils/logger/logger";
+import { logger } from "./utils/logger";
 
 loadCommands();
 client.loadEvents();
@@ -65,9 +65,9 @@ setTimeout(() => {
 }, 500);
 
 process.on("uncaughtException", (error) => {
-  logger.fatal(error);
+  logger.error(error.message, error);
 });
 
-process.on("unhandledRejection", (error) => {
-  logger.error(error);
+process.on("unhandledRejection", (error: any) => {
+  logger.error(error.message, error);
 });

@@ -1,7 +1,7 @@
 import dayjs = require("dayjs");
 import requestDM from "../utils/functions/requestdm";
 import { getDmSettings } from "../utils/functions/users/notifications";
-import { logger } from "../utils/logger/logger";
+import { logger } from "../utils/logger";
 import { NypsiClient } from "./Client";
 
 export class PremUser {
