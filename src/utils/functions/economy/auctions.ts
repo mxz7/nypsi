@@ -19,7 +19,7 @@ import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
 import { CustomEmbed, ErrorEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
-import { transaction } from "../../logger/logger";
+import { logger, transaction } from "../../logger/logger";
 import { getTier, isPremium } from "../premium/premium";
 import requestDM from "../requestdm";
 import { addToNypsiBank, getTax } from "../tax";
@@ -479,6 +479,7 @@ async function showAuctionConfirmation(interaction: ButtonInteraction, cost: num
 export async function buyFullAuction(interaction: ButtonInteraction, auction: Auction) {
   if (beingBought.has(auction.id)) {
     return new Promise((resolve) => {
+      logger.debug(`repeating auction buy full - ${auction.itemId} - ${auction.ownerId}`);
       setTimeout(async () => {
         resolve(buyFullAuction(interaction, await prisma.auction.findUnique({ where: { id: auction.id } })));
       }, 75);
@@ -647,6 +648,7 @@ export async function buyFullAuction(interaction: ButtonInteraction, auction: Au
 export async function buyAuctionOne(interaction: ButtonInteraction, auction: Auction) {
   if (beingBought.has(auction.id)) {
     return new Promise((resolve) => {
+      logger.debug(`repeating auction buy one - ${auction.itemId} - ${auction.ownerId}`);
       setTimeout(async () => {
         resolve(buyAuctionOne(interaction, await prisma.auction.findUnique({ where: { id: auction.id } })));
       }, 75);
