@@ -20,7 +20,7 @@ import { percentChance } from "../functions/random";
 import requestDM from "../functions/requestdm";
 import { isUserBlacklisted } from "../functions/users/blacklist";
 import { addNotificationToQueue, getDmSettings } from "../functions/users/notifications";
-import { logger } from "../logger/logger";
+import { logger } from "../logger";
 import ms = require("ms");
 
 loadItems(false);
@@ -211,8 +211,7 @@ async function handleKofiData(data: KofiResponse) {
       const item = Constants.KOFI_PRODUCTS.get(shopItem.direct_link_code);
 
       if (!item) {
-        logger.error(`invalid item: ${shopItem.direct_link_code}`);
-        return logger.error(data);
+        return logger.error(`invalid item: ${shopItem.direct_link_code}`, data);
       }
 
       if (!shopItem.quantity) {
@@ -337,15 +336,16 @@ async function handleKofiData(data: KofiResponse) {
     const item = Constants.KOFI_PRODUCTS.get(data.tier_name.toLowerCase());
 
     if (!item) {
-      logger.error(`invalid tier: ${data.tier_name}`);
-      return logger.error(data);
+      logger.error(`invalid tier: ${data.tier_name}`, data);
+      console.log(data);
+      return;
     }
 
     const premiums = ["platinum", "gold", "silver", "bronze"].reverse();
 
     if (!premiums.includes(item)) {
-      logger.error("invalid premium");
-      return logger.error(data);
+      logger.error("invalid premium", data);
+      return;
     }
 
     if (user) {

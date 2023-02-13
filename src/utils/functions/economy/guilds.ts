@@ -5,7 +5,7 @@ import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { GuildUpgradeRequirements } from "../../../types/Economy";
 import { NotificationPayload } from "../../../types/Notification";
 import Constants from "../../Constants";
-import { logger } from "../../logger/logger";
+import { logger } from "../../logger";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { addInventoryItem } from "./inventory";
 import ms = require("ms");

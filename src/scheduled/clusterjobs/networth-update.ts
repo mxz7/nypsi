@@ -4,7 +4,7 @@ import Constants from "../../utils/Constants";
 import { MStoTime } from "../../utils/functions/date";
 import { calcNetWorth } from "../../utils/functions/economy/balance";
 import sleep from "../../utils/functions/sleep";
-import { logger } from "../../utils/logger/logger";
+import { logger } from "../../utils/logger";
 
 import dayjs = require("dayjs");
 import ms = require("ms");

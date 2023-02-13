@@ -28,7 +28,7 @@ import { addWorkerUpgrade, getWorkers } from "../utils/functions/economy/workers
 import { getPrefix } from "../utils/functions/guilds/utils";
 import PageManager from "../utils/functions/page";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import { logger } from "../utils/logger/logger";
+import { logger } from "../utils/logger";
 
 const itemFunctions = new Map<string, ItemUse>();
 
