@@ -9,6 +9,7 @@ import {
   Message,
   MessageActionRowComponentBuilder,
 } from "discord.js";
+import { readFile, writeFile } from "node:fs/promises";
 import prisma from "../init/database";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
@@ -142,7 +143,32 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
     );
 
-    const msg = await message.channel.send({ embeds: [embed], components: [row] });
+    await writeFile(
+      `/tmp/${message.author.id}.txt`,
+      JSON.stringify(
+        query.map((game) => {
+          return {
+            id: game.id.toString(36),
+            user: game.economy?.user?.lastKnownTag?.split("#")[0] || "unknown",
+            game: game.game,
+            time: game.date,
+            bet: game.bet,
+            won: Boolean(game.win),
+            earnedMoney: game.earned,
+            earnedXp: game.xpEarned,
+            outcome: game.outcome,
+          };
+        }),
+        null,
+        2
+      )
+    );
+
+    const msg = await message.channel.send({
+      embeds: [embed],
+      components: [row],
+      files: [{ attachment: await readFile(`/tmp/${message.author.id}.txt`), name: "data.txt" }],
+    });
 
     const manager = new PageManager({
       embed,
