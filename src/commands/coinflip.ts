@@ -16,7 +16,7 @@ import { createUser, formatBet, isEcoBanned, userExists } from "../utils/functio
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
-import { gamble } from "../utils/logger/logger.js";
+import { gamble } from "../utils/logger.js";
 
 const waiting = new Set<string>();
 

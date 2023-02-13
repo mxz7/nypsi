@@ -3,7 +3,7 @@ import { NypsiClient } from "../../../models/Client";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { NotificationPayload } from "../../../types/Notification";
 import Constants from "../../Constants";
-import { logger } from "../../logger/logger";
+import { logger } from "../../logger";
 import { addInventoryItem } from "../economy/inventory";
 import { getItems } from "../economy/utils";
 import { addMember, getPremiumProfile, isPremium, renewUser, setTier } from "../premium/premium";

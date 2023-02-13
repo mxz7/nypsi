@@ -10,7 +10,7 @@ import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
 import { getDmSettings } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import { transaction } from "../utils/logger/logger";
+import { transaction } from "../utils/logger";
 
 const cmd = new Command("give", "give other users items from your inventory", "money");
 

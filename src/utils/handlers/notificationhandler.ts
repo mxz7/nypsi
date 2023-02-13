@@ -2,7 +2,7 @@ import { ClusterManager } from "discord-hybrid-sharding";
 import redis from "../../init/redis";
 import Constants from "../Constants";
 import requestDM from "../functions/requestdm";
-import { logger } from "../logger/logger";
+import { logger } from "../logger";
 import pAll = require("p-all");
 
 let lastRun = 0;
@@ -33,9 +33,7 @@ async function doDmQueueInterval(manager: ClusterManager): Promise<void> {
 
   const item = JSON.parse(await redis.rpop(Constants.redis.nypsi.DM_QUEUE));
 
-  if (!item) {
-    logger.info(await redis.llen(Constants.redis.nypsi.DM_QUEUE));
-  }
+  if (!item) return;
 
   actions.push(() =>
     requestDM({

@@ -2,7 +2,7 @@ import { EconomyWorker, EconomyWorkerUpgrades } from "@prisma/client";
 import { GuildMember } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
-import { logger } from "../../logger/logger";
+import { logger } from "../../logger";
 import { getBalance, updateBalance } from "./balance";
 import { getBoosters } from "./boosters";
 import { gemBreak, getInventory } from "./inventory";

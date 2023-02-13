@@ -8,7 +8,7 @@ import {
 } from "discord.js";
 import { NypsiClient } from "../../models/Client";
 import { CustomEmbed } from "../../models/EmbedBuilders";
-import { logger } from "../logger/logger";
+import { logger } from "../logger";
 import { getDmSettings, updateDmSettings } from "./users/notifications";
 
 interface RequestDMOptions {

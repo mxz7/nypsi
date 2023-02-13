@@ -10,7 +10,7 @@ import { updateStats } from "./utils/functions/topgg";
 import { getVersion } from "./utils/functions/version";
 import { listenForDms } from "./utils/handlers/notificationhandler";
 import { listen } from "./utils/handlers/webhookhandler";
-import { getWebhooks, logger, setClusterId } from "./utils/logger/logger";
+import { getWebhooks, logger, setClusterId } from "./utils/logger";
 import ms = require("ms");
 
 setClusterId("main");
@@ -79,12 +79,12 @@ manager.on("debug", (m) => {
   logger.debug(m);
 });
 
-process.on("unhandledRejection", (e) => {
-  logger.error(e);
+process.on("unhandledRejection", (e: any) => {
+  logger.error(e.message, e);
 });
 
 process.on("uncaughtException", (e) => {
-  logger.error(e);
+  logger.error(e.message, e);
 });
 
 manager.spawn();
@@ -141,11 +141,3 @@ setInterval(async () => {
 
   logger.info(`average query takes ${avg}ms (${total.toLocaleString()} queries in the last hour)`);
 }, ms("1 hour"));
-
-process.on("uncaughtException", (error) => {
-  logger.fatal(error);
-});
-
-process.on("unhandledRejection", (error) => {
-  logger.error(error);
-});
