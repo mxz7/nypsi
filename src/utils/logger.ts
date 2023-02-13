@@ -1,14 +1,16 @@
-import chalk = require("chalk");
-import dayjs = require("dayjs");
+import { variants } from "@catppuccin/palette";
 import { Client, User, WebhookClient } from "discord.js";
 import { createWriteStream, existsSync, WriteStream } from "fs";
 import { rename, stat } from "fs/promises";
+import DiscordTransport from "../models/DiscordLogs";
 import Constants from "./Constants";
+import chalk = require("chalk");
+import dayjs = require("dayjs");
 
-type WriteData = { level: number; label: string; date: number; message: string; data?: Record<string, any> };
-type Levels = "debug" | "info" | "warn" | "error";
+export type WriteData = { level: number; label: string; date: number; message: string; data?: Record<string, any> };
+export type Levels = "debug" | "info" | "warn" | "error";
 
-interface Transport {
+export interface Transport {
   levels: Levels[];
   write: (data: WriteData) => any;
 }
@@ -223,6 +225,70 @@ class ConsoleTransport implements Transport {
 
 export const logger = new Logger();
 
+const formatter = (data: WriteData) => {
+  let labelColor = chalk.green;
+  let jsonColor = chalk.reset;
+  let messageColor = chalk.white;
+
+  switch (data.label) {
+    case "debug":
+      labelColor = chalk.gray;
+      break;
+    case "info":
+      labelColor = chalk.green;
+      break;
+    case "warn":
+      labelColor = chalk.yellowBright;
+      jsonColor = chalk.yellow;
+      messageColor = chalk.yellow;
+      break;
+    case "error":
+      labelColor = chalk.redBright;
+      jsonColor = chalk.red;
+      messageColor = chalk.red;
+      break;
+  }
+
+  if (data.message.startsWith("::")) {
+    const category = data.message.split(" ").splice(0, 1)[0].substring(2);
+    data.message = data.message.split(" ").slice(1).join(" ");
+
+    switch (category.toLowerCase()) {
+      case "guild":
+        messageColor = chalk.magenta;
+        break;
+      case "auto":
+        messageColor = chalk.blue;
+        break;
+      case "cmd":
+        messageColor = chalk.cyan;
+        break;
+      case "success":
+        messageColor = chalk.green;
+        break;
+    }
+  }
+
+  let jsonData = "";
+
+  if (Boolean(data.data) && Object.keys(data.data).length > 0) {
+    jsonData = JSON.stringify(data.data, null, 2);
+    jsonData = jsonColor(
+      jsonData
+        .substring(1, jsonData.length - 1)
+        .trim()
+        .replaceAll("\\n", "\n")
+    );
+  }
+
+  return `${chalk.blackBright.italic(dayjs(data.date).format("MM-DD HH:mm:ss"))} ${labelColor(
+    data.label.toUpperCase()
+    // @ts-expect-error grrrr
+  )}${typeof data["cluster"] != "undefined" ? ` ${chalk.white(`(${data["cluster"]})`)}` : ""}: ${messageColor(
+    data.message
+  )}${jsonData ? `\n  ${jsonData}` : ""}`;
+};
+
 logger.addTransport(
   new FileTransport({ path: "./out/test.log", levels: ["debug", "info", "warn", "error"], rotateAfterBytes: 5e10 })
 );
@@ -230,69 +296,22 @@ logger.addTransport(new FileTransport({ path: "./out/testerr.log", levels: ["war
 logger.addTransport(
   new ConsoleTransport({
     levels: ["debug", "info", "warn", "error"],
-    formatter(data) {
-      let labelColor = chalk.green;
-      let jsonColor = chalk.reset;
-      let messageColor = chalk.white;
-
-      switch (data.label) {
-        case "debug":
-          labelColor = chalk.gray;
-          break;
-        case "info":
-          labelColor = chalk.green;
-          break;
-        case "warn":
-          labelColor = chalk.yellowBright;
-          jsonColor = chalk.yellow;
-          messageColor = chalk.yellow;
-          break;
-        case "error":
-          labelColor = chalk.redBright;
-          jsonColor = chalk.red;
-          messageColor = chalk.red;
-          break;
-      }
-
-      if (data.message.startsWith("::")) {
-        const category = data.message.split(" ").splice(0, 1)[0].substring(2);
-        data.message = data.message.split(" ").slice(1).join(" ");
-
-        switch (category.toLowerCase()) {
-          case "guild":
-            messageColor = chalk.magenta;
-            break;
-          case "auto":
-            messageColor = chalk.blue;
-            break;
-          case "cmd":
-            messageColor = chalk.cyan;
-            break;
-          case "success":
-            messageColor = chalk.green;
-            break;
-        }
-      }
-
-      let jsonData = "";
-
-      if (Boolean(data.data) && Object.keys(data.data).length > 0) {
-        jsonData = JSON.stringify(data.data, null, 2);
-        jsonData = jsonColor(
-          jsonData
-            .substring(1, jsonData.length - 1)
-            .trim()
-            .replaceAll("\\n", "\n")
-        );
-      }
-
-      return `${chalk.blackBright.italic(dayjs(data.date).format("MM-DD HH:mm:ss"))} ${labelColor(
-        data.label.toUpperCase()
-        // @ts-expect-error grrrr
-      )}${typeof data["cluster"] != "undefined" ? ` ${chalk.white(`(${data["cluster"]})`)}` : ""}: ${messageColor(
-        data.message
-      )}${jsonData ? `\n  ${jsonData}` : ""}`;
-    },
+    formatter,
+  })
+);
+logger.addTransport(
+  new DiscordTransport({
+    formatter,
+    levels: ["info", "debug", "warn", "error"],
+    webhook: process.env.BOTLOGS_HOOK,
+    mode: "hybrid",
+    interval: 5000,
+    colors: new Map([
+      ["error", variants.mocha.red.hex as `#${string}`],
+      ["warn", variants.mocha.yellow.hex as `#${string}`],
+      ["debug", variants.mocha.pink.hex as `#${string}`],
+      ["info", variants.mocha.sky.hex as `#${string}`],
+    ]),
   })
 );
 
