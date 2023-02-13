@@ -526,7 +526,7 @@ export async function gemBreak(userId: string, chance: number, gem: string) {
     if (i.item.includes("gem")) uniqueGemCount++;
   });
 
-  if (uniqueGemCount === 5 && percentChance(5) && (await getDmSettings(userId)).other) {
+  if (uniqueGemCount === 5 && percentChance(40) && (await getDmSettings(userId)).other) {
     await Promise.all([
       setInventoryItem(userId, "pink_gem", inventory.find((i) => i.item === "pink_gem").amount - 1, false),
       setInventoryItem(userId, "purple_gem", inventory.find((i) => i.item === "purple_gem").amount - 1, false),
