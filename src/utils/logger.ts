@@ -218,7 +218,66 @@ logger.addTransport(
   new FileTransport({ path: "./out/test.log", levels: ["debug", "info", "warn", "error"], rotateAfterBytes: 5e10 })
 );
 logger.addTransport(new FileTransport({ path: "./out/testerr.log", levels: ["warn", "error"], rotateAfterBytes: 5e10 }));
-logger.addTransport(new ConsoleTransport({ levels: ["debug", "info", "warn", "error"] }));
+logger.addTransport(
+  new ConsoleTransport({
+    levels: ["debug", "info", "warn", "error"],
+    formatter(data) {
+      let labelColor = chalk.green;
+      let jsonColor = chalk.reset;
+      let messageColor = chalk.white;
+
+      switch (data.label) {
+        case "debug":
+          labelColor = chalk.gray;
+          break;
+        case "info":
+          labelColor = chalk.green;
+          break;
+        case "warn":
+          labelColor = chalk.yellowBright;
+          jsonColor = chalk.yellow;
+          messageColor = chalk.yellow;
+          break;
+        case "error":
+          labelColor = chalk.redBright;
+          jsonColor = chalk.red;
+          messageColor = chalk.red;
+          break;
+      }
+
+      if (data.message.startsWith("::")) {
+        const category = data.message.split(" ").splice(0, 1)[0].substring(2);
+        data.message = data.message.split(" ").slice(1).join(" ");
+
+        switch (category.toLowerCase()) {
+          case "guild":
+            messageColor = chalk.magenta;
+            break;
+          case "auto":
+            messageColor = chalk.blue;
+            break;
+          case "cmd":
+            messageColor = chalk.cyan;
+            break;
+          case "success":
+            messageColor = chalk.green;
+            break;
+        }
+      }
+
+      let jsonData = "";
+
+      if (Boolean(data.data) && Object.keys(data.data).length > 0) {
+        jsonData = JSON.stringify(data.data, null, 2);
+        jsonData = jsonColor(jsonData.substring(1, jsonData.length - 1).trim());
+      }
+
+      return `${chalk.blackBright.italic(dayjs(data.date).format("MM-DD HH:mm:ss"))} ${labelColor(
+        data.label.toUpperCase()
+      )}: ${messageColor(data.message)}${jsonData ? `\n  ${jsonData}` : ""}`;
+    },
+  })
+);
 
 (async () => {
   for (let i = 0; i < 10; i++) {
