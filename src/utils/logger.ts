@@ -7,7 +7,14 @@ import Constants from "./Constants";
 import chalk = require("chalk");
 import dayjs = require("dayjs");
 
-export type WriteData = { level: number; label: string; date: number; message: string; data?: Record<string, any> };
+export type WriteData = {
+  level: number;
+  label: string;
+  date: number;
+  message: string;
+  meta?: Record<string, any>;
+  data?: Record<string, any>;
+};
 export type Levels = "debug" | "info" | "warn" | "error";
 
 export interface Transport {
@@ -48,13 +55,13 @@ class Logger {
       message: message,
       label: levelLabelMap.get(level),
       level,
+      meta: {},
       data: {},
     };
 
     if (this.meta) {
       for (const i of Object.keys(this.meta)) {
-        // @ts-expect-error grrrrr
-        data[i] = this.meta[i];
+        data.meta[i] = this.meta[i];
       }
     }
 
@@ -131,12 +138,17 @@ class FileTransport implements Transport {
     const out = {
       level: data.label,
       msg: data.message,
-      date: data.date,
+      time: data.date,
     };
 
     for (const item in data.data) {
       // @ts-expect-error grrrr
       out[item] = data.data[item];
+    }
+
+    for (const item in data.meta) {
+      // @ts-expect-error grrrr
+      out[item] = data.meta[item];
     }
 
     this.stream.write(JSON.stringify(out) + "\n");
@@ -281,12 +293,9 @@ const formatter = (data: WriteData) => {
     );
   }
 
-  return `${chalk.blackBright.italic(dayjs(data.date).format("MM-DD HH:mm:ss"))} ${labelColor(
-    data.label.toUpperCase()
-    // @ts-expect-error grrrr
-  )}${typeof data["cluster"] != "undefined" ? ` ${chalk.white(`(${data["cluster"]})`)}` : ""}: ${messageColor(
-    data.message
-  )}${jsonData ? `\n  ${jsonData}` : ""}`;
+  return `${chalk.blackBright.italic(dayjs(data.date).format("MM-DD HH:mm:ss"))} ${labelColor(data.label.toUpperCase())}${
+    typeof data.meta["cluster"] != "undefined" ? ` ${chalk.white(`(${data.meta["cluster"]})`)}` : ""
+  }: ${messageColor(data.message)}${jsonData ? `\n  ${jsonData}` : ""}`;
 };
 
 logger.addTransport(
