@@ -157,8 +157,9 @@ class ConsoleTransport implements Transport {
   public levels: Levels[];
   public formatter: (data: WriteData) => Promise<string> | string;
 
-  constructor(opts: { levels: Levels[] }) {
+  constructor(opts: { levels: Levels[]; formatter?: (data: WriteData) => Promise<string> | string }) {
     this.levels = opts.levels;
+    this.formatter = opts.formatter;
   }
 
   public async write(data: WriteData) {
