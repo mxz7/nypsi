@@ -30,7 +30,7 @@ import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { percentChance } from "../utils/functions/random";
 import { addHourlyCommand } from "../utils/handlers/commandhandler";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import { gamble, logger } from "../utils/logger/logger";
+import { gamble, logger } from "../utils/logger";
 import _ = require("lodash");
 import ms = require("ms");
 

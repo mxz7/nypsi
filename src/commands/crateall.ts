@@ -5,7 +5,7 @@ import Constants from "../utils/Constants";
 import { addInventoryItem } from "../utils/functions/economy/inventory";
 import { getItems, userExists } from "../utils/functions/economy/utils";
 import { addCooldown, inCooldown } from "../utils/functions/guilds/utils";
-import { logger } from "../utils/logger/logger";
+import { logger } from "../utils/logger";
 
 const cmd = new Command("crateall", "give every user in the current guild a crate", "none").setPermissions(["bot owner"]);
 

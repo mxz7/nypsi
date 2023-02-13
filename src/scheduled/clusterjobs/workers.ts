@@ -9,7 +9,7 @@ import { getBoosters } from "../../utils/functions/economy/boosters";
 import { getBaseWorkers } from "../../utils/functions/economy/utils";
 import { calcWorkerValues, getWorkers } from "../../utils/functions/economy/workers";
 import { addNotificationToQueue, getDmSettings } from "../../utils/functions/users/notifications";
-import { logger } from "../../utils/logger/logger";
+import { logger } from "../../utils/logger";
 import ms = require("ms");
 import dayjs = require("dayjs");
 
