@@ -48,6 +48,14 @@ class Logger {
       level,
       data: {},
     };
+
+    if (this.meta) {
+      for (const i of Object.keys(this.meta)) {
+        // @ts-expect-error grrrrr
+        data[i] = this.meta[i];
+      }
+    }
+
     if (meta) {
       for (const i of Object.keys(meta)) {
         data.data[i] = meta[i];
@@ -275,7 +283,10 @@ logger.addTransport(
 
       return `${chalk.blackBright.italic(dayjs(data.date).format("MM-DD HH:mm:ss"))} ${labelColor(
         data.label.toUpperCase()
-      )}: ${messageColor(data.message)}${jsonData ? `\n  ${jsonData}` : ""}`;
+        // @ts-expect-error grrrr
+      )}${typeof data["cluster"] != "undefined" ? ` ${chalk.white(`(${data["cluster"]})`)}` : ""}: ${messageColor(
+        data.message
+      )}${jsonData ? `\n  ${jsonData}` : ""}`;
     },
   })
 );
