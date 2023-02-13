@@ -94,8 +94,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       (search.where.AND as Array<Prisma.GameWhereInput>).push({ game: args[1].toLowerCase() });
     if (args[2].toLowerCase() !== "null") {
       const start = dayjs(args[2]).set("hour", 0).set("minute", 0).set("second", 0);
-      (search.where.AND as Array<Prisma.GameWhereInput>).push({ date: start.toDate() });
-      (search.where.AND as Array<Prisma.GameWhereInput>).push({ date: start.add(1, "day").toDate() });
+      (search.where.AND as Array<Prisma.GameWhereInput>).push({ date: { gte: start.toDate() } });
+      (search.where.AND as Array<Prisma.GameWhereInput>).push({ date: { lte: start.add(1, "day").toDate() } });
     }
     if (args[3].toLowerCase() !== "null") (search.where.AND as Array<Prisma.GameWhereInput>).push({ userId: args[3] });
     if (args[4].toLowerCase() !== "null")
