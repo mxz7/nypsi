@@ -19,7 +19,7 @@ import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
 import { CustomEmbed, ErrorEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
-import { logger, transaction } from "../../logger/logger";
+import { logger, transaction } from "../../logger";
 import { getTier, isPremium } from "../premium/premium";
 import requestDM from "../requestdm";
 import { addToNypsiBank, getTax } from "../tax";

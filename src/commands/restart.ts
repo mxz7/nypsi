@@ -6,7 +6,7 @@ import { CustomEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
 import { setCustomPresence } from "../utils/functions/presence";
 import { startRestart } from "../utils/handlers/commandhandler";
-import { logger } from "../utils/logger/logger";
+import { logger } from "../utils/logger";
 
 const cmd = new Command("restart", "restart", "none").setPermissions(["bot owner"]);
 

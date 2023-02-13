@@ -3,7 +3,7 @@ import dayjs = require("dayjs");
 import ms = require("ms");
 import path = require("path");
 import { getGuilds } from "..";
-import { logger } from "../utils/logger/logger";
+import { logger } from "../utils/logger";
 
 const bree = new Bree({
   root: path.join(__dirname, "jobs"),

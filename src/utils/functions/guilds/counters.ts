@@ -2,7 +2,7 @@ import { GuildCounter, TrackingType } from "@prisma/client";
 import { ChannelType, Guild, PermissionFlagsBits } from "discord.js";
 import prisma from "../../../init/database";
 import { NypsiClient } from "../../../models/Client";
-import { logger } from "../../logger/logger";
+import { logger } from "../../logger";
 import { getItems } from "../economy/utils";
 
 export async function updateChannel(data: GuildCounter, client: NypsiClient) {
@@ -261,10 +261,7 @@ export async function updateChannel(data: GuildCounter, client: NypsiClient) {
       if (r === "failed") {
         logger.warn(`failed to update counter ${JSON.stringify(data)}`);
       } else if (r === "updated") {
-        logger.info({
-          message: `updated counter for ${data.guildId} type: ${data.tracks}`,
-          level: "success",
-        });
+        logger.info(`::success updated counter for ${data.guildId} type: ${data.tracks}`);
       }
     }
   }

@@ -3,7 +3,7 @@ import * as stringSimilarity from "string-similarity";
 import prisma from "../../../init/database";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
-import { logger } from "../../logger/logger";
+import { logger } from "../../logger";
 import { MStoTime } from "../date";
 import { newCase } from "../moderation/cases";
 import { addModLog } from "../moderation/logs";

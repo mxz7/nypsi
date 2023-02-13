@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { parentPort } from "worker_threads";
 import Constants from "../utils/Constants";
-import { logger } from "../utils/logger/logger";
+import { logger } from "../utils/logger";
 import redis from "./redis";
 
 const prisma = new PrismaClient();

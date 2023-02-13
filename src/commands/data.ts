@@ -17,7 +17,7 @@ import prisma from "../init/database";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addCooldown, onCooldown } from "../utils/handlers/cooldownhandler.js";
-import { logger } from "../utils/logger/logger";
+import { logger } from "../utils/logger";
 import ms = require("ms");
 
 const cmd = new Command("data", "view your raw data stored in nypsi's database", "info").setAliases([

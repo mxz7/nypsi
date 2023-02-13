@@ -41,7 +41,7 @@ import { getCustomPresence, randomPresence, setCustomPresence } from "../utils/f
 import { getVersion } from "../utils/functions/version";
 import { runCommandUseTimers } from "../utils/handlers/commandhandler";
 import { updateCache } from "../utils/handlers/imghandler";
-import { getWebhooks, logger, setClusterId } from "../utils/logger/logger";
+import { getWebhooks, logger, setClusterId } from "../utils/logger";
 
 export class NypsiClient extends Client {
   public cluster: ClusterClient<Client>;

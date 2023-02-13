@@ -38,7 +38,7 @@ if (!isMainThread) {
           const newEntry = {
             date: dayjs(entry.time).format("YYYY-MM-DD HH:mm:ss"),
             msg: entry.msg.replace(/::\w+/gm, "").trim(),
-            cluster: entry.pid || "null",
+            cluster: entry.cluster,
             time: entry.time,
           };
 
