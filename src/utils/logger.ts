@@ -278,7 +278,12 @@ logger.addTransport(
 
       if (Boolean(data.data) && Object.keys(data.data).length > 0) {
         jsonData = JSON.stringify(data.data, null, 2);
-        jsonData = jsonColor(jsonData.substring(1, jsonData.length - 1).trim());
+        jsonData = jsonColor(
+          jsonData
+            .substring(1, jsonData.length - 1)
+            .trim()
+            .replaceAll("\\n", "\n")
+        );
       }
 
       return `${chalk.blackBright.italic(dayjs(data.date).format("MM-DD HH:mm:ss"))} ${labelColor(

@@ -65,9 +65,9 @@ setTimeout(() => {
 }, 500);
 
 process.on("uncaughtException", (error) => {
-  logger.error(error.message, error);
+  logger.error(error.message, { type: error.name, stack: error.stack });
 });
 
 process.on("unhandledRejection", (error: any) => {
-  logger.error(error.message, error);
+  logger.error(error.message, { type: error.name, stack: error.stack });
 });
