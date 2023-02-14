@@ -10,7 +10,7 @@ import {
 } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
-import { calcMaxBet, getBalance, updateBalance } from "../utils/functions/economy/balance";
+import { getBalance, updateBalance } from "../utils/functions/economy/balance";
 import { createGame } from "../utils/functions/economy/stats";
 import { createUser, formatBet, isEcoBanned, userExists } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
@@ -81,8 +81,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (!(await userExists(target))) await createUser(target);
 
-  const maxBet = (await calcMaxBet(message.member)) * 3;
-
   const bet = await formatBet(args[1], message.member);
 
   if (!bet) {
@@ -103,24 +101,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (bet > (await getBalance(target))) {
     return message.channel.send({ embeds: [new ErrorEmbed(`**${target.user.tag}** cannot afford this bet`)] });
-  }
-
-  const targetMaxBet = (await calcMaxBet(target)) * 3;
-
-  if (bet > maxBet) {
-    return message.channel.send({
-      embeds: [
-        new ErrorEmbed(
-          `your max bet for coinflip is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
-        ),
-      ],
-    });
-  }
-
-  if (bet > targetMaxBet) {
-    return message.channel.send({
-      embeds: [new ErrorEmbed(`**${target.user.tag}**'s max bet is too low for this bet`)],
-    });
   }
 
   waiting.add(message.author.id);
