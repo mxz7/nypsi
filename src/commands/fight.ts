@@ -37,6 +37,7 @@ const gifs = [
   "https://c.tenor.com/JmQOPxjJ6yYAAAAC/weji-deji.gif",
   "https://c.tenor.com/EkWAL6XhODIAAAAC/deji-boxing-deji.gif",
   "https://c.tenor.com/OHZwNy6nr5IAAAAC/conor-mcgregor-ufc.gif",
+  "https://media.tenor.com/5bvwDvOIZ28AAAAd/ksi-knockout-ksiko.gif",
 ];
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
