@@ -250,12 +250,12 @@ const formatter = (data: WriteData) => {
       labelColor = chalk.green;
       break;
     case "warn":
-      labelColor = chalk.yellowBright;
+      labelColor = chalk.yellowBright.bold;
       jsonColor = chalk.yellow;
       messageColor = chalk.yellow;
       break;
     case "error":
-      labelColor = chalk.redBright;
+      labelColor = chalk.redBright.bold;
       jsonColor = chalk.red;
       messageColor = chalk.red;
       break;
@@ -294,7 +294,7 @@ const formatter = (data: WriteData) => {
   }
 
   return `${chalk.blackBright.italic(dayjs(data.date).format("MM-DD HH:mm:ss"))} ${labelColor(data.label.toUpperCase())}${
-    typeof data.meta["cluster"] != "undefined" ? ` ${chalk.white(`(${data.meta["cluster"]})`)}` : ""
+    typeof data.meta["cluster"] != "undefined" ? ` (${data.meta["cluster"]})` : ""
   }: ${messageColor(data.message)}${jsonData ? `\n  ${jsonData}` : ""}`;
 };
 
