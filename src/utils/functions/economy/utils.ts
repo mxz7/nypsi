@@ -200,14 +200,16 @@ export async function createUser(member: GuildMember | string) {
 export async function formatBet(bet: string | number, member: GuildMember): Promise<number | void> {
   const maxBet = await calcMaxBet(member);
 
-  if (bet.toString().toLowerCase() == "all") {
+  bet = bet.toString().toLowerCase();
+
+  if (bet == "all") {
     bet = await getBalance(member);
     if (bet > maxBet) {
       bet = maxBet;
     }
-  } else if (bet.toString().toLowerCase() == "max") {
+  } else if (bet == "max") {
     bet = maxBet;
-  } else if (bet.toString().toLowerCase() == "half") {
+  } else if (bet == "half") {
     bet = Math.floor((await getBalance(member)) / 2);
   }
 
