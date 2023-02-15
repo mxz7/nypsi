@@ -18,6 +18,7 @@ import { getInventory, selectItem, setInventoryItem } from "../utils/functions/e
 import { addItemUse } from "../utils/functions/economy/stats";
 import {
   createUser,
+  formatNumber,
   getBakeryUpgradesData,
   getBaseUpgrades,
   getBaseWorkers,
@@ -266,6 +267,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     let allowed = false;
+    let amount = 1;
 
     if (!userUpgrade) allowed = true;
 
@@ -275,17 +277,46 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return send({ embeds: [new ErrorEmbed("you have reached the limit for this upgrade")] });
     }
 
-    await Promise.all([
-      setInventoryItem(message.member, selected.id, inventory.find((i) => i.item == selected.id).amount - 1, false),
-      addWorkerUpgrade(message.member, upgrade.for, upgrade.id),
-    ]);
+    if (args[1]) {
+      amount = formatNumber(args[1]);
+
+      if (amount) {
+        console.log(userUpgrade.amount + amount);
+        console.log(userUpgrade.amount + amount <= upgrade.stack_limit);
+        console.log(upgrade.stack_limit);
+
+        if (userUpgrade && userUpgrade.amount + amount <= upgrade.stack_limit) {
+          allowed = true;
+        } else {
+          allowed = false;
+        }
+      }
+    }
+
+    if (!allowed) {
+      return send({ embeds: [new ErrorEmbed("you cannot use this many upgrades")] });
+    }
+
+    if (inventory.find((i) => i.item === selected.id).amount < amount)
+      return send({ embeds: [new ErrorEmbed(`you don't have this many ${selected.name}`)] });
+
+    if (!amount || isNaN(amount) || amount < 1) return send({ embeds: [new ErrorEmbed("invalid amount")] });
+
+    for (let i = 0; i < amount; i++) {
+      await Promise.all([
+        setInventoryItem(message.member, selected.id, inventory.find((i) => i.item == selected.id).amount - 1, false),
+        addWorkerUpgrade(message.member, upgrade.for, upgrade.id),
+      ]);
+    }
+
+    addItemUse(message.member, selected.id, amount);
 
     return send({
       embeds: [
         new CustomEmbed(
           message.member,
           `you have activated **${upgrade.name}** on your **${getBaseWorkers()[upgrade.for].name}**\n\n${
-            userUpgrade ? userUpgrade.amount + 1 : 1
+            userUpgrade ? userUpgrade.amount + amount : amount
           }/${upgrade.stack_limit}`
         ).setHeader("use", message.author.avatarURL()),
       ],

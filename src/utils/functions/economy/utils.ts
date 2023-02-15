@@ -226,7 +226,7 @@ export async function formatBet(bet: string | number, member: GuildMember): Prom
   return bet;
 }
 
-export function formatNumber(number: string | number): number | void {
+export function formatNumber(number: string | number) {
   if (number.toString().includes("b")) {
     number = parseFloat(number.toString()) * 1000000000;
   } else if (number.toString().includes("m")) {
