@@ -401,7 +401,7 @@ export async function getRequiredBetForXp(member: GuildMember): Promise<number> 
   return requiredBet;
 }
 
-export async function calcNetWorth(member: GuildMember | string) {
+export async function calcNetWorth(member: GuildMember | string, breakdown = false) {
   let id: string;
   if (member instanceof GuildMember) {
     id = member.user.id;
@@ -409,8 +409,8 @@ export async function calcNetWorth(member: GuildMember | string) {
     id = member;
   }
 
-  if (await redis.exists(`${Constants.redis.cache.economy.NETWORTH}:${id}`)) {
-    return parseInt(await redis.get(`${Constants.redis.cache.economy.NETWORTH}:${id}`));
+  if (!breakdown && (await redis.exists(`${Constants.redis.cache.economy.NETWORTH}:${id}`))) {
+    return { amount: parseInt(await redis.get(`${Constants.redis.cache.economy.NETWORTH}:${id}`)) };
   }
 
   const query = await prisma.economy.findUnique({
@@ -437,29 +437,46 @@ export async function calcNetWorth(member: GuildMember | string) {
   });
 
   let worth = 0;
+  const breakdownItems = new Map<string, number>();
 
   if (!query) {
     await redis.set(`${Constants.redis.cache.economy.NETWORTH}:${id}`, worth);
     await redis.expire(`${Constants.redis.cache.economy.NETWORTH}:${id}`, ms("1 hour") / 1000);
 
-    return worth;
+    return { amount: worth };
   }
 
   worth += Number(query.money);
   worth += Number(query.bank);
+
+  if (breakdown) breakdownItems.set("balance", worth);
+
   worth += Number(Number(query.EconomyGuild?.balance) / query.EconomyGuild?.members.length) || 0;
 
+  if (breakdown)
+    breakdownItems.set("guild", Number(Number(query.EconomyGuild?.balance) / query.EconomyGuild?.members.length) || 0);
+
   for (const item of query.Inventory) {
-    if (getItems()[item.item].buy && getItems()[item.item].sell) {
+    if (item.item === "cookie") {
       worth += getItems()[item.item].sell * Number(item.amount);
+      if (breakdown) breakdownItems.set(item.item, getItems()[item.item].sell * Number(item.amount));
+    } else if (getItems()[item.item].buy && getItems()[item.item].sell) {
+      worth += getItems()[item.item].sell * Number(item.amount);
+      if (breakdown) breakdownItems.set(item.item, getItems()[item.item].sell * Number(item.amount));
     } else {
       const auctionAvg = await getAuctionAverage(item.item);
 
       if (auctionAvg) {
         worth += auctionAvg * Number(item.amount);
+        if (breakdown) breakdownItems.set(item.item, auctionAvg * Number(item.amount));
+      } else if (getItems()[item.item].sell) {
+        worth += getItems()[item.item].sell * Number(item.amount);
+        if (breakdown) breakdownItems.set(item.item, getItems()[item.item].sell * Number(item.amount));
       }
     }
   }
+
+  let workersBreakdown = 0;
 
   for (const worker of query.EconomyWorker) {
     const baseUpgrades = getBaseUpgrades();
@@ -481,12 +498,16 @@ export async function calcNetWorth(member: GuildMember | string) {
       const cost = ((baseCost + upgrade.amount * baseCost) * upgrade.amount) / 2;
 
       worth += cost;
+      workersBreakdown += cost;
     }
 
     const { perItem } = await calcWorkerValues(worker);
 
     worth += worker.stored * perItem;
+    workersBreakdown += worker.stored * perItem;
   }
+
+  breakdownItems.set("workers", workersBreakdown);
 
   await redis.set(`${Constants.redis.cache.economy.NETWORTH}:${id}`, Math.floor(worth));
   await redis.expire(`${Constants.redis.cache.economy.NETWORTH}:${id}`, ms("2 hour") / 1000);
@@ -529,5 +550,5 @@ export async function calcNetWorth(member: GuildMember | string) {
     }
   });
 
-  return Math.floor(worth);
+  return { amount: Math.floor(worth), breakdown: breakdownItems };
 }
