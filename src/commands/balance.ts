@@ -175,7 +175,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     .setDescription(
       `${padlockStatus ? "🔒" : "💰"} $**${balance.toLocaleString()}**\n` +
         `💳 $**${bankBalance.toLocaleString()}** / $**${bankMaxBalance.toLocaleString()}**${
-          net > 15_000_000 ? `\n${gemLine}\n🌍 $**${net.toLocaleString()}**` : ""
+          net.amount > 15_000_000 ? `\n${gemLine}\n🌍 $**${net.amount.toLocaleString()}**` : ""
         }`
     )
     .setFooter({ text: footer });

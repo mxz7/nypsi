@@ -196,7 +196,7 @@ async function showUser(message: Message, user: User) {
             💳 $**${(await getBankBalance(user.id)).toLocaleString()}** / $**${(
         await getMaxBankBalance(user.id)
       ).toLocaleString()}**
-      🌍 $**${(await calcNetWorth(user.id)).toLocaleString()}**
+      🌍 $**${(await calcNetWorth(user.id)).amount.toLocaleString()}**
             **xp** ${(await getXp(user.id)).toLocaleString()}
             **voted** ${voted}
             **prestige** ${await getPrestige(user.id)}
