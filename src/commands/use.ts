@@ -281,10 +281,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       amount = formatNumber(args[1]);
 
       if (amount) {
-        console.log(userUpgrade.amount + amount);
-        console.log(userUpgrade.amount + amount <= upgrade.stack_limit);
-        console.log(upgrade.stack_limit);
-
         if (userUpgrade && userUpgrade.amount + amount <= upgrade.stack_limit) {
           allowed = true;
         } else {
@@ -326,10 +322,24 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   } else if (selected.role == "scratch-card") {
     return itemFunctions.get("scratch_card").run(message, args);
   } else if (selected.role === "bakery-upgrade") {
-    await Promise.all([
-      setInventoryItem(message.member, selected.id, inventory.find((i) => i.item == selected.id).amount - 1, false),
-      addBakeryUpgrade(message.member, selected.id),
-    ]);
+    let amount = 1;
+
+    if (args[1]) {
+      amount = formatNumber(args[1]);
+    }
+
+    if (!amount || isNaN(amount) || amount < 1) return send({ embeds: [new ErrorEmbed("invalid amount")] });
+
+    if (inventory.find((i) => i.item === selected.id).amount < amount)
+      return send({ embeds: [new ErrorEmbed(`you don't have this many ${selected.name}`)] });
+
+    for (let i = 0; i < amount; i++) {
+      await Promise.all([
+        setInventoryItem(message.member, selected.id, inventory.find((i) => i.item == selected.id).amount - 1, false),
+        addBakeryUpgrade(message.member, selected.id),
+      ]);
+    }
+    addItemUse(message.member, selected.id, amount);
 
     const upgrades = await getBakeryUpgrades(message.member);
 
