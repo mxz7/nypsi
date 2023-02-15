@@ -457,7 +457,7 @@ export async function calcNetWorth(member: GuildMember | string, breakdown = fal
     breakdownItems.set("guild", Number(Number(query.EconomyGuild?.balance) / query.EconomyGuild?.members.length) || 0);
 
   for (const item of query.Inventory) {
-    if (item.item === "cookie") {
+    if (item.item === "cookie" || ["prey", "fish", "sellable"].includes(getItems()[item.item].role)) {
       worth += getItems()[item.item].sell * Number(item.amount);
       if (breakdown) breakdownItems.set(item.item, getItems()[item.item].sell * Number(item.amount));
     } else if (getItems()[item.item].buy && getItems()[item.item].sell) {
