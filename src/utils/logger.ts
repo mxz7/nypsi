@@ -299,9 +299,9 @@ const formatter = (data: WriteData) => {
 };
 
 logger.addTransport(
-  new FileTransport({ path: "./out/test.log", levels: ["debug", "info", "warn", "error"], rotateAfterBytes: 10e6 })
+  new FileTransport({ path: "./out/combined.log", levels: ["debug", "info", "warn", "error"], rotateAfterBytes: 10e6 })
 );
-logger.addTransport(new FileTransport({ path: "./out/testerr.log", levels: ["warn", "error"], rotateAfterBytes: 10e6 }));
+logger.addTransport(new FileTransport({ path: "./out/combined.log", levels: ["warn", "error"], rotateAfterBytes: 10e6 }));
 logger.addTransport(
   new ConsoleTransport({
     levels: ["debug", "info", "warn", "error"],
