@@ -311,7 +311,7 @@ logger.addTransport(
 logger.addTransport(
   new DiscordTransport({
     formatter,
-    levels: ["info", "debug", "warn", "error"],
+    levels: ["info", "warn", "error"],
     webhook: process.env.BOTLOGS_HOOK,
     mode: "hybrid",
     interval: 5000,
