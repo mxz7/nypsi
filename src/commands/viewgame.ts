@@ -85,7 +85,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           },
         },
       },
-      take: 1000,
+      take: 6969,
       orderBy: {
         date: "desc",
       },
