@@ -299,13 +299,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (!amount || isNaN(amount) || amount < 1) return send({ embeds: [new ErrorEmbed("invalid amount")] });
 
     for (let i = 0; i < amount; i++) {
-      await Promise.all([
-        setInventoryItem(message.member, selected.id, inventory.find((i) => i.item == selected.id).amount - 1, false),
-        addWorkerUpgrade(message.member, upgrade.for, upgrade.id),
-      ]);
+      await addWorkerUpgrade(message.member, upgrade.for, upgrade.id);
     }
 
-    addItemUse(message.member, selected.id, amount);
+    await setInventoryItem(message.member, selected.id, inventory.find((i) => i.item == selected.id).amount - amount, false);
+    await addItemUse(message.member, selected.id, amount);
 
     return send({
       embeds: [
