@@ -482,7 +482,7 @@ export async function buyFullAuction(interaction: ButtonInteraction, auction: Au
       logger.debug(`repeating auction buy full - ${auction.itemId} - ${auction.ownerId}`);
       setTimeout(async () => {
         resolve(buyFullAuction(interaction, await prisma.auction.findUnique({ where: { id: auction.id } })));
-      }, 75);
+      }, 200);
     });
   }
 
@@ -651,7 +651,7 @@ export async function buyAuctionOne(interaction: ButtonInteraction, auction: Auc
       logger.debug(`repeating auction buy one - ${auction.itemId} - ${auction.ownerId}`);
       setTimeout(async () => {
         resolve(buyAuctionOne(interaction, await prisma.auction.findUnique({ where: { id: auction.id } })));
-      }, 75);
+      }, 200);
     });
   }
 
