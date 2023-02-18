@@ -227,11 +227,12 @@ export async function formatBet(bet: string | number, member: GuildMember): Prom
 }
 
 export function formatNumber(number: string | number) {
-  if (number.toString().includes("b")) {
+  number = number.toString().replaceAll(",", "");
+  if (number.includes("b")) {
     number = parseFloat(number.toString()) * 1000000000;
-  } else if (number.toString().includes("m")) {
+  } else if (number.includes("m")) {
     number = parseFloat(number.toString()) * 1000000;
-  } else if (number.toString().includes("k")) {
+  } else if (number.includes("k")) {
     number = parseFloat(number.toString()) * 1000;
   }
 
