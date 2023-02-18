@@ -30,7 +30,7 @@ import { createUser, getItems, userExists } from "./utils";
 import ms = require("ms");
 import dayjs = require("dayjs");
 
-const beingBought = new Set<string>();
+const beingBought = new Set<number>();
 const dmQueue = new Map<string, { buyers: Map<string, number> }>();
 
 export async function getAuctions(member: GuildMember | string) {
@@ -60,7 +60,7 @@ export async function getAuctionByMessage(id: string) {
   return auction;
 }
 
-export async function deleteAuction(id: string, client: NypsiClient) {
+export async function deleteAuction(id: number, client: NypsiClient) {
   const auction = await prisma.auction
     .findFirst({
       where: {
@@ -184,7 +184,7 @@ export async function createAuction(member: GuildMember, itemId: string, itemAmo
   return messageUrl;
 }
 
-export async function bumpAuction(id: string, client: NypsiClient) {
+export async function bumpAuction(id: number, client: NypsiClient) {
   const query = await prisma.auction.findUnique({
     where: {
       id: id,
