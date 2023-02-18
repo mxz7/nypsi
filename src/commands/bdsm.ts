@@ -32,7 +32,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return message.channel.send({ embeds: [new ErrorEmbed("please wait a couple more seconds..")] });
   }
 
-  if (bdsmCache.size <= 2) {
+  if (bdsmCache.size < 2) {
     return message.channel.send({ embeds: [new ErrorEmbed("please wait a couple more seconds..")] });
   }
 
