@@ -384,6 +384,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       case "karma_scratch_card":
         await addInventoryItem(message.member, "karma_scratch_card", 1);
         break;
+      case "gem_crate":
+        await addInventoryItem(message.member, "gem_crate", 1);
+        break;
     }
 
     if (selected.id == "bronze" || selected.id == "silver" || selected.id == "gold") {
