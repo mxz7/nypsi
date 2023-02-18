@@ -42,6 +42,15 @@ if (!isMainThread) {
             time: entry.time,
           };
 
+          delete entry.time;
+          delete entry.cluster;
+          delete entry.msg;
+
+          for (const [k, v] of Object.entries(entry)) {
+            // @ts-expect-error grrrrr
+            newEntry[k] = v;
+          }
+
           return JSON.stringify(newEntry);
         } catch {
           return null;
