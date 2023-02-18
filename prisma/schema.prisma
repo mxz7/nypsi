@@ -190,8 +190,8 @@ model Game {
   game     String
   win      Int
   bet      BigInt
-  earned   BigInt?
-  xpEarned Int?
+  earned   BigInt   @default(0)
+  xpEarned Int      @default(0)
   outcome  String
   date     DateTime @default(now())
 
