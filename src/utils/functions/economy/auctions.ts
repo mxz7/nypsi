@@ -473,6 +473,8 @@ async function showAuctionConfirmation(interaction: ButtonInteraction, cost: num
     res.reply({ embeds: [new CustomEmbed().setDescription("✅ cancelled purchase")], ephemeral: true });
     return false;
   }
+  res.reply({ embeds: [new CustomEmbed(null, "✅ confirmation accepted")], ephemeral: true });
+
   return true;
 }
 
