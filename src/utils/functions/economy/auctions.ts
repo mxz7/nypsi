@@ -481,7 +481,7 @@ export async function buyFullAuction(interaction: ButtonInteraction, auction: Au
     return new Promise((resolve) => {
       logger.debug(`repeating auction buy full - ${auction.itemId} - ${auction.ownerId}`);
       setTimeout(async () => {
-        if (repeatCount > 500) beingBought.delete(auction.id);
+        if (repeatCount > 100) beingBought.delete(auction.id);
         resolve(
           buyFullAuction(interaction, await prisma.auction.findUnique({ where: { id: auction.id } }), repeatCount + 1)
         );
@@ -655,7 +655,7 @@ export async function buyAuctionOne(interaction: ButtonInteraction, auction: Auc
     return new Promise((resolve) => {
       logger.debug(`repeating auction buy one - ${auction.itemId} - ${auction.ownerId}`);
       setTimeout(async () => {
-        if (repeatCount > 500) beingBought.delete(auction.id);
+        if (repeatCount > 100) beingBought.delete(auction.id);
         resolve(buyAuctionOne(interaction, await prisma.auction.findUnique({ where: { id: auction.id } }), repeatCount + 1));
       }, 200);
     });
