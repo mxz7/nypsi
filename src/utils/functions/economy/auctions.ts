@@ -476,12 +476,15 @@ async function showAuctionConfirmation(interaction: ButtonInteraction, cost: num
   return true;
 }
 
-export async function buyFullAuction(interaction: ButtonInteraction, auction: Auction) {
+export async function buyFullAuction(interaction: ButtonInteraction, auction: Auction, repeatCount = 1) {
   if (beingBought.has(auction.id)) {
     return new Promise((resolve) => {
       logger.debug(`repeating auction buy full - ${auction.itemId} - ${auction.ownerId}`);
       setTimeout(async () => {
-        resolve(buyFullAuction(interaction, await prisma.auction.findUnique({ where: { id: auction.id } })));
+        if (repeatCount > 500) beingBought.delete(auction.id);
+        resolve(
+          buyFullAuction(interaction, await prisma.auction.findUnique({ where: { id: auction.id } }), repeatCount + 1)
+        );
       }, 200);
     });
   }
@@ -494,7 +497,7 @@ export async function buyFullAuction(interaction: ButtonInteraction, auction: Au
 
   setTimeout(() => {
     beingBought.delete(auction.id);
-  }, ms("10 minutes"));
+  }, ms("5 minutes"));
 
   if (auction.bin >= 10_000_000) {
     const modalResponse = await showAuctionConfirmation(interaction, Number(auction.bin));
@@ -645,12 +648,13 @@ export async function buyFullAuction(interaction: ButtonInteraction, auction: Au
   await interaction.message.edit({ embeds: [embed], components: [] });
 }
 
-export async function buyAuctionOne(interaction: ButtonInteraction, auction: Auction) {
+export async function buyAuctionOne(interaction: ButtonInteraction, auction: Auction, repeatCount = 1) {
   if (beingBought.has(auction.id)) {
     return new Promise((resolve) => {
       logger.debug(`repeating auction buy one - ${auction.itemId} - ${auction.ownerId}`);
       setTimeout(async () => {
-        resolve(buyAuctionOne(interaction, await prisma.auction.findUnique({ where: { id: auction.id } })));
+        if (repeatCount > 500) beingBought.delete(auction.id);
+        resolve(buyAuctionOne(interaction, await prisma.auction.findUnique({ where: { id: auction.id } }), repeatCount + 1));
       }, 200);
     });
   }
