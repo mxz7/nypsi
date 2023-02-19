@@ -128,8 +128,8 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
 
   const tickets = await getTickets(user);
 
-  if (tickets.length <= Constants.LOTTERY_TICKETS_MAX - 5) {
-    await addTicket(user, 5);
+  if (tickets.length <= Constants.LOTTERY_TICKETS_MAX - 3) {
+    await addTicket(user, 3);
   }
 
   const crateAmount =
@@ -167,7 +167,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
           `+ $**${amount.toLocaleString()}**\n` +
           "+ **5**% multiplier\n" +
           `+ **${crateAmount}** vote crates` +
-          `${tickets.length <= Constants.LOTTERY_TICKETS_MAX - 5 ? "\n+ **5** lottery tickets" : ""}`
+          `${tickets.length <= Constants.LOTTERY_TICKETS_MAX - 5 ? "\n+ **3** lottery tickets" : ""}`
       )
       .disableFooter();
 
