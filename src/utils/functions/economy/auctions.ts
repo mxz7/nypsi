@@ -463,7 +463,7 @@ async function showAuctionConfirmation(interaction: ButtonInteraction, cost: num
 
   const filter = (i: Interaction) => i.user.id == interaction.user.id;
 
-  const res = await interaction.awaitModalSubmit({ filter, time: 120000 }).catch(() => {});
+  const res = await interaction.awaitModalSubmit({ filter, time: 30000 }).catch(() => {});
 
   if (!res) return;
 
@@ -504,7 +504,8 @@ export async function buyFullAuction(interaction: ButtonInteraction, auction: Au
   }, ms("5 minutes"));
 
   if (auction.bin >= 10_000_000) {
-    const modalResponse = await showAuctionConfirmation(interaction, Number(auction.bin));
+    beingBought.delete(auction.id);
+    const modalResponse = await showAuctionConfirmation(interaction, Number(auction.bin)).catch(() => {});
 
     if (!modalResponse) return beingBought.delete(auction.id);
 
@@ -512,6 +513,7 @@ export async function buyFullAuction(interaction: ButtonInteraction, auction: Au
       beingBought.delete(auction.id);
       return await interaction.followUp({ embeds: [new ErrorEmbed("you cannot afford this")], ephemeral: true });
     }
+    beingBought.add(auction.id);
   }
 
   auction = await prisma.auction.findFirst({
