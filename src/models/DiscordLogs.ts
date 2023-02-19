@@ -1,3 +1,4 @@
+import dayjs = require("dayjs");
 import { ColorResolvable, EmbedBuilder, WebhookClient } from "discord.js";
 import { Levels, Transport, WriteData } from "../utils/logger";
 
@@ -85,15 +86,15 @@ export default class DiscordTransport implements Transport {
       if (this.colors.has(data.label)) embed.setColor(this.colors.get(data.label) as ColorResolvable);
 
       if (this.mode == "hybrid") {
-        embed.setDescription(`\`\`\`ansi\n${data.message}\`\`\``);
+        embed.setDescription(`\`\`\`[${dayjs(data.date).format("YYYY-MM-DD HH:mm:ss")}] ${data.message}\`\`\``);
       } else {
-        embed.setDescription(data.message);
+        embed.setDescription(`[${dayjs(data.date).format("YYYY-MM-DD HH:mm:ss")}] ${data.message}`);
       }
       this.queue.push(embed);
     } else if (this.mode == "codeblock") {
-      this.queue.push(`\`\`\`ansi\n${data.message}\n\n\n`);
+      this.queue.push(`\`\`\`[${dayjs(data.date).format("YYYY-MM-DD HH:mm:ss")}] ${data.message}\`\`\``);
     } else {
-      this.queue.push(data.message);
+      this.queue.push(`[${dayjs(data.date).format("YYYY-MM-DD HH:mm:ss")}] ${data.message}`);
     }
   }
 }
