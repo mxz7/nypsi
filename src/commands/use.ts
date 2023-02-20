@@ -332,11 +332,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return send({ embeds: [new ErrorEmbed(`you don't have this many ${selected.name}`)] });
 
     for (let i = 0; i < amount; i++) {
-      await Promise.all([
-        setInventoryItem(message.member, selected.id, inventory.find((i) => i.item == selected.id).amount - 1, false),
-        addBakeryUpgrade(message.member, selected.id),
-      ]);
+      await addBakeryUpgrade(message.member, selected.id);
     }
+    setInventoryItem(message.member, selected.id, inventory.find((i) => i.item == selected.id).amount - amount, false);
     addItemUse(message.member, selected.id, amount);
 
     const upgrades = await getBakeryUpgrades(message.member);
