@@ -1,10 +1,12 @@
 import {
   ActionRowBuilder,
+  BaseMessageOptions,
   ButtonBuilder,
   ButtonStyle,
   CommandInteraction,
   GuildMember,
   Interaction,
+  InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
 } from "discord.js";
@@ -13,42 +15,64 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
 import { createGame } from "../utils/functions/economy/stats";
 import { createUser, formatBet, isEcoBanned, userExists } from "../utils/functions/economy/utils";
-import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 import { gamble } from "../utils/logger.js";
 
-const waiting = new Set<string>();
-
 const cmd = new Command("coinflip", "flip a coin, double or nothing", "money").setAliases(["cf"]);
+
+const playing = new Set<string>();
+
+cmd.slashEnabled = true;
+cmd.slashData
+  .addUserOption((option) => option.setName("user").setDescription("user you want to challenge").setRequired(true))
+  .addStringOption((option) => option.setName("bet").setDescription("how much do you want to bet"));
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (!(await userExists(message.member))) {
     await createUser(message.member);
   }
 
+  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
+    if (!(message instanceof Message)) {
+      let usedNewMessage = false;
+      let res;
+
+      if (message.deferred) {
+        res = await message.editReply(data).catch(async () => {
+          usedNewMessage = true;
+          return await message.channel.send(data as BaseMessageOptions);
+        });
+      } else {
+        res = await message.reply(data as InteractionReplyOptions).catch(() => {
+          return message.editReply(data).catch(async () => {
+            usedNewMessage = true;
+            return await message.channel.send(data as BaseMessageOptions);
+          });
+        });
+      }
+
+      if (usedNewMessage && res instanceof Message) return res;
+
+      const replyMsg = await message.fetchReply();
+      if (replyMsg instanceof Message) {
+        return replyMsg;
+      }
+    } else {
+      return await message.channel.send(data as BaseMessageOptions);
+    }
+  };
+
   if (await onCooldown(cmd.name, message.member)) {
     const embed = await getResponse(cmd.name, message.member);
 
-    return message.channel.send({ embeds: [embed] });
+    return send({ embeds: [embed] });
   }
-
-  const prefix = await getPrefix(message.guild);
 
   if (args.length != 2) {
-    const embed = new CustomEmbed(message.member)
-      .setHeader("coinflip help")
-      .addField("usage", `${prefix}coinflip @user <bet>`)
-      .addField("help", "if you win, you will double your bet")
-      .addField("example", `${prefix}coinflip @user 100`);
+    const embed = new CustomEmbed(message.member).setHeader("coinflip help").setDescription("/coinflip user bet");
 
-    return message.channel.send({ embeds: [embed] });
-  }
-
-  if (waiting.has(message.author.id)) {
-    return message.channel.send({
-      embeds: [new ErrorEmbed("please wait until your game has been accepted or denied")],
-    });
+    return send({ embeds: [embed] });
   }
 
   if (args[0].toLowerCase() == "t") args[0] = "tails";
@@ -64,19 +88,19 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   }
 
   if (!target) {
-    return message.channel.send({ embeds: [new ErrorEmbed("unable to find that member")] });
+    return send({ embeds: [new ErrorEmbed("unable to find that member")] });
   }
 
   if (message.member == target) {
-    return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] });
+    return send({ embeds: [new ErrorEmbed("invalid user")] });
   }
 
   if (target.user.bot) {
-    return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] });
+    return send({ embeds: [new ErrorEmbed("invalid user")] });
   }
 
   if (await isEcoBanned(target.user.id)) {
-    return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] });
+    return send({ embeds: [new ErrorEmbed("they are banned. lol.")] });
   }
 
   if (!(await userExists(target))) await createUser(target);
@@ -84,26 +108,30 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const bet = await formatBet(args[1], message.member);
 
   if (!bet) {
-    return message.channel.send({ embeds: [new ErrorEmbed("invalid bet")] });
+    return send({ embeds: [new ErrorEmbed("invalid bet")] });
   }
 
   if (isNaN(bet)) {
-    return message.channel.send({ embeds: [new ErrorEmbed("invalid bet")] });
+    return send({ embeds: [new ErrorEmbed("invalid bet")] });
   }
 
   if (bet <= 0) {
-    return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}coinflip @user 100`)] });
+    return send({ embeds: [new ErrorEmbed("/coinflip user bet")] });
   }
 
   if (bet > (await getBalance(message.member))) {
-    return message.channel.send({ embeds: [new ErrorEmbed("you cannot afford this bet")] });
+    return send({ embeds: [new ErrorEmbed("you cannot afford this bet")] });
   }
 
   if (bet > (await getBalance(target))) {
-    return message.channel.send({ embeds: [new ErrorEmbed(`**${target.user.tag}** cannot afford this bet`)] });
+    return send({ embeds: [new ErrorEmbed(`**${target.user.tag}** cannot afford this bet`)] });
   }
 
-  waiting.add(message.author.id);
+  await addCooldown(cmd.name, message.member, 10);
+  playing.add(message.author.id);
+  setTimeout(() => {
+    if (playing.has(message.author.id)) playing.delete(message.author.id);
+  }, 120000);
 
   await updateBalance(message.member, (await getBalance(message.member)) - bet);
 
@@ -117,7 +145,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     `**${message.author.tag}** has challenged you to a coinflip\n\n**bet** $${bet.toLocaleString()}\n\ndo you accept?`
   ).setFooter({ text: "expires in 60 seconds" });
 
-  const m = await message.channel.send({
+  const m = await send({
     content: `${target.user.toString()} you have been invited to a coinflip worth $${bet.toLocaleString()}`,
     embeds: [requestEmbed],
     components: [row],
@@ -130,26 +158,23 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     .awaitMessageComponent({ filter, time: 60000 })
     .then(async (collected) => {
       await collected.deferUpdate();
-      await m.delete();
-      return collected.customId;
+      m.edit({ components: [] });
+      playing.delete(message.author.id);
+      return collected;
     })
     .catch(async () => {
       fail = true;
-      waiting.delete(message.author.id);
+      playing.delete(message.author.id);
       await updateBalance(message.member, (await getBalance(message.member)) + bet);
-      return message.channel.send({ content: message.author.toString() + " coinflip request expired" });
+      m.edit({ components: [] });
     });
 
-  if (fail) return;
+  if (fail || !response) return;
 
-  if (typeof response != "string") return;
-
-  if (response == "y") {
+  if (response.customId == "y") {
     if (bet > (await getBalance(target))) {
-      return message.channel.send({ embeds: [new ErrorEmbed("you cannot afford this bet")] });
+      return send({ embeds: [new ErrorEmbed("you cannot afford this bet")] });
     }
-
-    await addCooldown(cmd.name, message.member, 10);
 
     await updateBalance(target, (await getBalance(target)) - bet);
 
@@ -212,31 +237,28 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await updateBalance(winner, (await getBalance(winner)) + bet * 2);
 
-    waiting.delete(message.author.id);
-
     const embed = new CustomEmbed(message.member, `*throwing..*\n\n${thingy}\n\n**bet** $${bet.toLocaleString()}`).setHeader(
       "coinflip"
     );
 
-    return message.channel.send({ embeds: [embed] }).then((msg) => {
-      if (winner == message.member) {
-        thingy = `**${message.author.username}** +$${bet.toLocaleString()}\n${target.user.username}`;
-      } else {
-        thingy = `${message.author.username}\n**${target.user.username}** +$${bet.toLocaleString()}`;
-      }
+    const msg = await response.followUp({ embeds: [embed] });
 
-      embed.setDescription(`**winner** ${winner.user.tag}\n\n${thingy}\n\n**bet** $${bet.toLocaleString()}`);
-      embed.setColor(winner.displayHexColor);
-      embed.setFooter({ text: `id: ${id}` });
+    if (winner == message.member) {
+      thingy = `**${message.author.username}** +$${bet.toLocaleString()}\n${target.user.username}`;
+    } else {
+      thingy = `${message.author.username}\n**${target.user.username}** +$${bet.toLocaleString()}`;
+    }
 
-      return setTimeout(() => {
-        return msg.edit({ embeds: [embed] });
-      }, 2000);
-    });
+    embed.setDescription(`**winner** ${winner.user.tag}\n\n${thingy}\n\n**bet** $${bet.toLocaleString()}`);
+    embed.setColor(winner.displayHexColor);
+    embed.setFooter({ text: `id: ${id}` });
+
+    setTimeout(() => {
+      return msg.edit({ embeds: [embed] });
+    }, 2000);
   } else {
     await updateBalance(message.member, (await getBalance(message.member)) + bet);
-    waiting.delete(message.author.id);
-    return message.channel.send({ embeds: [new CustomEmbed(target, "✅ coinflip request denied")] });
+    response.followUp({ embeds: [new CustomEmbed(target, "✅ coinflip request denied")] });
   }
 }
 
