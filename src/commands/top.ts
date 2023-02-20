@@ -274,7 +274,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     return show(data.pages, data.pos, `top daily streak ${global ? "[global]" : `for ${message.guild.name}`}`);
   } else {
-    const selected = selectItem(args.join(" ")) || selectItem(args[0]);
+    const selected =
+      selectItem(args.join(" ")) || selectItem(args.slice(0, args.length - 1).join(" ")) || selectItem(args[0]);
 
     if (!selected) return send({ embeds: [new ErrorEmbed("invalid option")] });
 
