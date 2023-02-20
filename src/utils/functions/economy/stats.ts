@@ -1,6 +1,7 @@
 import { GuildMember } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
+import { logger } from "../../logger";
 import { addProgress } from "./achievements";
 
 export async function getGambleStats(member: GuildMember) {
@@ -77,15 +78,18 @@ export async function getItemStats(member: GuildMember) {
   return query;
 }
 
-export async function createGame(opts: {
-  userId: string;
-  game: string;
-  win: boolean;
-  bet: number;
-  earned?: number;
-  xp?: number;
-  outcome: string;
-}): Promise<string> {
+export async function createGame(
+  opts: {
+    userId: string;
+    game: string;
+    win: boolean;
+    bet: number;
+    earned?: number;
+    xp?: number;
+    outcome: string;
+  },
+  attempts = 1
+): Promise<string> {
   let fail = false;
   const res = await prisma.game
     .create({
@@ -94,20 +98,23 @@ export async function createGame(opts: {
         game: opts.game,
         win: opts.win ? 1 : 0,
         bet: opts.bet,
-        earned: opts.earned,
-        xpEarned: opts.xp,
+        earned: opts.earned || 0,
+        xpEarned: opts.xp || 0,
         outcome: opts.outcome,
       },
       select: {
         id: true,
       },
     })
-    .catch(() => {
+    .catch((e) => {
+      logger.warn(e);
       fail = true;
     });
 
-  if (fail) return createGame(opts);
-  if (!res) return createGame(opts);
+  if (fail || !res) {
+    if (attempts > 10) return "failed to create game";
+    return createGame(opts, attempts + 1);
+  }
 
   addProgress(opts.userId, "gambler", 1);
 
