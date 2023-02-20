@@ -29,7 +29,7 @@ import { Item } from "../../types/Economy";
 import Constants from "../Constants";
 import { a } from "../functions/anticheat";
 import { addProgress } from "../functions/economy/achievements";
-import { commandGemCheck } from "../functions/economy/inventory";
+import { commandGemCheck, gemBreak, getInventory } from "../functions/economy/inventory";
 import { createUser, getEcoBanTime, getItems, isEcoBanned, isHandcuffed, userExists } from "../functions/economy/utils";
 import { getXp, updateXp } from "../functions/economy/xp";
 import { getDisabledCommands } from "../functions/guilds/disabledcommands";
@@ -38,6 +38,7 @@ import { getPrefix } from "../functions/guilds/utils";
 import { addKarma, getKarma } from "../functions/karma/karma";
 import { getUserAliases } from "../functions/premium/aliases";
 import { addUse, getCommand } from "../functions/premium/command";
+import { percentChance } from "../functions/random";
 import { cleanString } from "../functions/string";
 import { isUserBlacklisted } from "../functions/users/blacklist";
 import { getLastCommand, updateUser } from "../functions/users/commands";
@@ -979,12 +980,22 @@ export function runCommandUseTimers(client: NypsiClient) {
 
   const updateKarma = async () => {
     for (const user of commandUses.keys()) {
-      let modifier = 3;
+      let modifier = 2;
 
       if ((await getKarma(user)) > 300) modifier = 2.5;
       if ((await getKarma(user)) > 400) modifier = 3;
       if ((await getKarma(user)) > 500) modifier = 3.5;
       if ((await getKarma(user)) > 1000) modifier = 7;
+      if ((await getKarma(user)) > 1400) modifier = 7.7777;
+
+      const inventory = await getInventory(user);
+
+      if (inventory.find((i) => i.item === "purple_gem") && inventory.find((i) => i.item === "purple_gem").amount > 0) {
+        if (percentChance(50)) {
+          modifier = modifier / 1.77777;
+          gemBreak(user, 0.00777, "purple_gem");
+        }
+      }
 
       const amount = Math.floor(commandUses.get(user) / modifier);
 
