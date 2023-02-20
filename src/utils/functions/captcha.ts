@@ -2,11 +2,15 @@ import { CaptchaGenerator } from "captcha-canvas";
 import { CommandInteraction, GuildMember, Message, WebhookClient } from "discord.js";
 import * as crypto from "node:crypto";
 import redis from "../../init/redis";
+import { NypsiClient } from "../../models/Client";
 import { NypsiCommandInteraction } from "../../models/Command";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 import Constants from "../Constants";
 import { getTimestamp, logger } from "../logger";
+import { isEcoBanned, setEcoBan } from "./economy/utils";
+import requestDM from "./requestdm";
 import ms = require("ms");
+import dayjs = require("dayjs");
 
 const beingVerified = new Set<string>();
 
@@ -16,6 +20,11 @@ const generator = new CaptchaGenerator().setDecoy({ opacity: 0.6, total: 15 });
 
 const captchaFails = new Map<string, number>();
 const captchaPasses = new Map<string, number>();
+
+setInterval(() => {
+  captchaFails.clear();
+  captchaPasses.clear();
+}, ms("16 hours"));
 
 export async function isLockedOut(userId: string) {
   return Boolean(await redis.sismember(Constants.redis.nypsi.LOCKED_OUT, userId));
@@ -74,6 +83,18 @@ export async function failedCaptcha(member: GuildMember) {
     captchaFails.set(member.user.id, captchaFails.get(member.user.id) + 1);
   } else {
     captchaFails.set(member.user.id, 1);
+  }
+
+  if (captchaFails.get(member.user.id) >= 69 && !(await isEcoBanned(member.user.id))) {
+    await setEcoBan(member.user.id, dayjs().add(1, "day").toDate());
+    await hook.send(
+      `[${getTimestamp()}] **${member.user.tag}** (${member.user.id}) has been banned for 24 hours for failing 69 captchas`
+    );
+    await requestDM({
+      client: member.client as NypsiClient,
+      content: "you have been banned from nypsi economy for 24 hours for failing too many captchas",
+      memberId: member.user.id,
+    });
   }
 
   await hook.send(
