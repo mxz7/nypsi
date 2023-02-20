@@ -523,7 +523,7 @@ export async function gemBreak(userId: string, chance: number, gem: string) {
   let uniqueGemCount = 0;
 
   inventory.forEach((i) => {
-    if (i.item.includes("gem")) uniqueGemCount++;
+    if (i.item.includes("_gem")) uniqueGemCount++;
   });
 
   if (uniqueGemCount === 5 && percentChance(40) && (await getDmSettings(userId)).other) {
