@@ -183,7 +183,7 @@ async function completeAchievement(userId: string, achievementId: string) {
     if (percentChance(0.7) && !(await redis.exists(Constants.redis.nypsi.GEM_GIVEN))) {
       await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t");
       await redis.expire(Constants.redis.nypsi.GEM_GIVEN, Math.floor(ms("3 days") / 1000));
-      const gems = ["green_gem", "purple_gem", "pink_gem"];
+      const gems = ["green_gem", "blue_gem", "purple_gem", "pink_gem"];
 
       const gem = gems[Math.floor(Math.random() * gems.length)];
 

@@ -117,7 +117,7 @@ export async function calcWorkerValues(
     const chance = Math.floor(Math.random() * 10);
 
     if (chance < 5) {
-      perItemBonus -= perItemBonus * 0.27;
+      perItemBonus -= perItemBonus * 0.17;
     } else {
       gemBreak(worker.userId, 0.01, "purple_gem");
       perItemBonus += perItemBonus * 0.17;
