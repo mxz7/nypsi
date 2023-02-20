@@ -129,13 +129,13 @@ export async function getMulti(member: GuildMember | string): Promise<number> {
 
   switch (await getTier(id)) {
     case 2:
-      multi += 4;
+      multi += 2;
       break;
     case 3:
-      multi += 6;
+      multi += 4;
       break;
     case 4:
-      multi += 10;
+      multi += 8;
       break;
   }
 
