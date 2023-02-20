@@ -13,6 +13,7 @@ import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { Item } from "../types/Economy.js";
 import { getGuildByUser } from "../utils/functions/economy/guilds";
+import { selectItem } from "../utils/functions/economy/inventory";
 import {
   topBalance,
   topCompletion,
@@ -272,6 +273,24 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     return show(data.pages, data.pos, `top daily streak ${global ? "[global]" : `for ${message.guild.name}`}`);
+  } else {
+    const selected = selectItem(args.join(" ")) || selectItem(args[0]);
+
+    if (!selected) return send({ embeds: [new ErrorEmbed("invalid option")] });
+
+    let global = false;
+
+    if (args[args.length - 1].toLowerCase() == "global") global = true;
+
+    let data: { pages: Map<number, string[]>; pos: number };
+
+    if (global) {
+      data = await topItemGlobal(selected.id, message.author.id);
+    } else {
+      data = await topItem(message.guild, selected.id, message.author.id);
+    }
+
+    return show(data.pages, data.pos, `top ${selected.name} ${global ? "[global]" : `for ${message.guild.name}`}`);
   }
 }
 
