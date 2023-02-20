@@ -4,6 +4,7 @@ import prisma from "../../init/database";
 import redis from "../../init/redis";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 import Constants from "../../utils/Constants";
+import { gemBreak } from "../../utils/functions/economy/inventory";
 import { addNotificationToQueue } from "../../utils/functions/users/notifications";
 
 (async () => {
@@ -78,6 +79,8 @@ import { addNotificationToQueue } from "../../utils/functions/users/notification
     if (user?.Economy?.Inventory.find((i) => i.item == "white_gem")?.amount > 0 && user.DMSettings?.other) {
       const chance = Math.floor(Math.random() * 10);
 
+      gemBreak(user.id, 0.007, "white_gem");
+
       if (chance < 5) {
         await addNotificationToQueue({
           memberId: user.id,
@@ -93,17 +96,19 @@ import { addNotificationToQueue } from "../../utils/functions/users/notification
         });
         continue;
       }
-    } else if (user?.Economy?.Inventory.find((i) => i.item == "pink_gem")?.amount > 0 && user.DMSettings?.other) {
+    } else if (user?.Economy?.Inventory.find((i) => i.item == "purple_gem")?.amount > 0 && user.DMSettings?.other) {
       const chance = Math.floor(Math.random() * 13);
 
-      if (chance < 2) {
+      gemBreak(user.id, 0.077, "purple_gem");
+
+      if (chance < 5) {
         await addNotificationToQueue({
           memberId: user.id,
           payload: {
             embed: new CustomEmbed()
               .setHeader("karma")
               .setDescription(
-                "your <:nypsi_gem_pink:1046932847069499472> pink gem has saved your karma from being deteriorated\n" +
+                "your <:nypsi_gem_purple:1046932495184187452> purple gem has saved your karma from being deteriorated\n" +
                   `you would have lost **${karmaToRemove}** karma`
               )
               .setColor(Constants.TRANSPARENT_EMBED_COLOR),
