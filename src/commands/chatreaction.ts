@@ -261,7 +261,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       const embed = new CustomEmbed(
         message.member,
-        "click the button below to vote start a chat reaction\n\n1/5",
+        "click the button below to vote start a chat reaction\n\n1/4",
         true
       ).setHeader(`${message.author.username}'s chat reaction`, message.author.avatarURL());
 
@@ -277,14 +277,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       const filter = (i: Interaction) => !blacklisted.includes(i.user.id);
 
-      const collector = msg.createMessageComponentCollector({ filter, time: 45_000, max: 5 });
+      const collector = msg.createMessageComponentCollector({ filter, time: 45_000, max: 4 });
 
       const i = setInterval(async () => {
-        embed.setDescription(`click the button below to vote start a chat reaction\n\n${voted.length}/5`);
+        embed.setDescription(`click the button below to vote start a chat reaction\n\n${voted.length}/4`);
 
         if (embed.data.description == msg.embeds[0].description) return;
 
-        if (voted.length == 5) {
+        if (voted.length == 4) {
           clearInterval(i);
           await msg.edit({ embeds: [embed], components: [] });
 
@@ -331,7 +331,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         clearInterval(i);
 
         if (voted.length != 5) {
-          embed.setDescription(`chat reaction not started\n\nonly received ${voted.length}/5 votes ):`);
+          embed.setDescription(`chat reaction not started\n\nonly received ${voted.length}/4 votes ):`);
           msg.edit({ embeds: [embed], components: [] });
           return;
         }
