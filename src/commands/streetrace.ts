@@ -5,7 +5,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { Item } from "../types/Economy";
 import { RaceDetails, RaceUserDetails } from "../types/StreetRace";
 import { addProgress } from "../utils/functions/economy/achievements";
-import { calcMaxBet, getBalance, updateBalance } from "../utils/functions/economy/balance";
+import { getBalance, updateBalance } from "../utils/functions/economy/balance";
 import { getInventory } from "../utils/functions/economy/inventory";
 import { createUser, formatBet, getItems, userExists } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
@@ -122,10 +122,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return send({ embeds: [new ErrorEmbed("entry fee cannot be less than $1k")] });
     }
 
-    if (bet > 5000000) {
-      return send({ embeds: [new ErrorEmbed("entry fee cannot be over $5m")] });
-    }
-
     let speedLimit = 0;
 
     if (args[2]) {
@@ -235,18 +231,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (race.bet > (await getBalance(message.member))) {
       return send({ embeds: [new ErrorEmbed("you cant afford the entry fee")] });
-    }
-
-    const maxBet = (await calcMaxBet(message.member)) * 5;
-
-    if (race.bet > maxBet) {
-      return send({
-        embeds: [
-          new ErrorEmbed(
-            `your max bet for races is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
-          ),
-        ],
-      });
     }
 
     const items = getItems();
