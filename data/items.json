@@ -1530,6 +1530,7 @@
       "money:1000000",
       "xp:100",
       "id:calendar:50",
+      "id:bob:60",
       "id:stolen_credit_card",
       "id:streak_token:50",
       "id:grandma:60",
@@ -1562,6 +1563,7 @@
       "money:2500000",
       "xp:125",
       "id:calendar",
+      "id:bob",
       "id:lucky_7:80",
       "id:coffee:90",
       "id:streak_token:90",
@@ -1630,6 +1632,7 @@
       "xp:175",
       "karma:25",
       "id:cursor:75",
+      "id:bob",
       "id:diamond_pickaxe:80",
       "id:incredible_fishing_rod:95",
       "id:incredible_gun:90",
@@ -1683,5 +1686,17 @@
       "id:bronze_credit:0.2",
       "id:purple_gem:0.1"
     ]
+  },
+  "bob": {
+    "id": "bob",
+    "name": "bob the builder",
+    "plural": "bob the builders",
+    "emoji": "<:nypsi_bob:1078776552067694672>",
+    "longDesc": "remove an hour of time from all your items being crafted",
+    "role": "item",
+    "rarity": 1,
+    "buy": 0,
+    "sell": 100000,
+    "in_crates": true
   }
 }
