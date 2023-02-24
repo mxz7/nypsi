@@ -57,7 +57,7 @@ module.exports = new ItemUse("bob", async (message: Message | (NypsiCommandInter
   const inventory = await getInventory(message.member, false);
   await setInventoryItem(message.member, "bob", inventory.find((i) => i.item === "bob").amount - 1);
 
-  let breakdown: string[] = [];
+  const breakdown: string[] = [];
 
   for (const item of crafting) {
     const newDate = dayjs(item.finished).subtract(1, "hour").toDate();
