@@ -263,7 +263,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         xp: earnedXp,
       });
 
-      if (embed.data.footer) {
+      if (embed.data.footer && !embed.data.footer.text.includes("nypsi")) {
         embed.setFooter({ text: `+${earnedXp}xp | id: ${id}` });
       } else {
         embed.setFooter({ text: `id: ${id}` });
