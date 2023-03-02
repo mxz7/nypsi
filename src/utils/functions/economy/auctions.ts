@@ -701,7 +701,7 @@ export async function buyAuctionOne(interaction: ButtonInteraction, auction: Auc
 
   const balance = await getBalance(interaction.user.id);
 
-  if (balance < Number(auction.bin)) {
+  if (balance < Math.floor(Number(auction.bin) / auction.itemAmount)) {
     beingBought.delete(auction.id);
     return await interaction.reply({ embeds: [new ErrorEmbed("you cannot afford this")], ephemeral: true });
   }
