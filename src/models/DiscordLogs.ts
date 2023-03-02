@@ -1,4 +1,3 @@
-import dayjs = require("dayjs");
 import { ColorResolvable, EmbedBuilder, WebhookClient } from "discord.js";
 import { Levels, Transport, WriteData } from "../utils/logger";
 
@@ -23,6 +22,7 @@ export default class DiscordTransport implements Transport {
   private maxLength: number;
   private queue: (string | EmbedBuilder)[];
   private hook: WebhookClient;
+  private formatter: (data: WriteData) => Promise<string> | string;
 
   constructor(opts: {
     webhook: string;
@@ -38,6 +38,11 @@ export default class DiscordTransport implements Transport {
     }
 
     this.levels = opts.levels;
+    if (opts.formatter) {
+      this.formatter = opts.formatter;
+    } else {
+      this.formatter = (d) => d.message;
+    }
 
     /**
      * @type {boolean}
@@ -86,15 +91,15 @@ export default class DiscordTransport implements Transport {
       if (this.colors.has(data.label)) embed.setColor(this.colors.get(data.label) as ColorResolvable);
 
       if (this.mode == "hybrid") {
-        embed.setDescription(`\`\`\`[${dayjs(data.date).format("YYYY-MM-DD HH:mm:ss")}] ${data.message}\`\`\``);
+        embed.setDescription(`\`\`\`${this.formatter(data)}\`\`\``);
       } else {
-        embed.setDescription(`[${dayjs(data.date).format("YYYY-MM-DD HH:mm:ss")}] ${data.message}`);
+        embed.setDescription(`${this.formatter(data)}`);
       }
       this.queue.push(embed);
     } else if (this.mode == "codeblock") {
-      this.queue.push(`\`\`\`[${dayjs(data.date).format("YYYY-MM-DD HH:mm:ss")}] ${data.message}\`\`\``);
+      this.queue.push(`\`\`\`${this.formatter(data)}\`\`\``);
     } else {
-      this.queue.push(`[${dayjs(data.date).format("YYYY-MM-DD HH:mm:ss")}] ${data.message}`);
+      this.queue.push(`${this.formatter(data)}`);
     }
   }
 }
