@@ -84,22 +84,40 @@ export default class DiscordTransport implements Transport {
     }
   }
 
-  public write(data: WriteData) {
-    if (["hybrid", "embed"].includes(this.mode)) {
-      const embed = new EmbedBuilder();
+  public async write(data: WriteData) {
+    const doThing = (message: string): void => {
+      let repeat = false;
+      let next = "";
 
-      if (this.colors.has(data.label)) embed.setColor(this.colors.get(data.label) as ColorResolvable);
-
-      if (this.mode == "hybrid") {
-        embed.setDescription(`\`\`\`${this.formatter(data)}\`\`\``);
-      } else {
-        embed.setDescription(`${this.formatter(data)}`);
+      if (message.length > 1500) {
+        repeat = true;
+        next = message.substring(1500, message.length - 1500);
+        message = message.substring(0, 1500);
       }
-      this.queue.push(embed);
-    } else if (this.mode == "codeblock") {
-      this.queue.push(`\`\`\`${this.formatter(data)}\`\`\``);
-    } else {
-      this.queue.push(`${this.formatter(data)}`);
-    }
+
+      if (["hybrid", "embed"].includes(this.mode)) {
+        const embed = new EmbedBuilder();
+
+        if (this.colors.has(data.label)) embed.setColor(this.colors.get(data.label) as ColorResolvable);
+
+        if (this.mode == "hybrid") {
+          embed.setDescription(`\`\`\`${this.formatter(data)}\`\`\``);
+        } else {
+          embed.setDescription(`${this.formatter(data)}`);
+        }
+        this.queue.push(embed);
+      } else if (this.mode == "codeblock") {
+        this.queue.push(`\`\`\`${this.formatter(data)}\`\`\``);
+      } else {
+        this.queue.push(`${this.formatter(data)}`);
+      }
+
+      if (repeat) return doThing(next);
+    };
+
+    const formatted = await this.formatter(data);
+
+    doThing(formatted);
+    return;
   }
 }
