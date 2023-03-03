@@ -99,6 +99,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({ embeds: [new ErrorEmbed("invalid user")] });
   }
 
+  if (playing.has(target.user.id))
+    return send({ embeds: [new ErrorEmbed("this user is waiting for a response on a coinflip")] });
+
   if (await isEcoBanned(target.user.id)) {
     return send({ embeds: [new ErrorEmbed("they are banned. lol.")] });
   }
