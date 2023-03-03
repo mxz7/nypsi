@@ -1,7 +1,7 @@
 lockfileVersion: 5.4
 
 specifiers:
-  '@catppuccin/palette': 0.1.6
+  '@catppuccin/palette': 0.1.7
   '@commitlint/cli': 17.4.4
   '@commitlint/config-conventional': 17.4.4
   '@discordjs/rest': 1.5.0
@@ -50,7 +50,7 @@ specifiers:
   urban-dictionary: 3.0.2
 
 dependencies:
-  '@catppuccin/palette': 0.1.6
+  '@catppuccin/palette': 0.1.7
   '@discordjs/rest': 1.5.0
   '@prisma/client': 4.11.0_prisma@4.11.0
   '@top-gg/sdk': 3.1.3
@@ -135,8 +135,8 @@ packages:
     engines: {node: '>= 10'}
     dev: false
 
-  /@catppuccin/palette/0.1.6:
-    resolution: {integrity: sha512-Jf4UD510Q0n1CadMY0OoSJU0wBpphWDGAvToGrb/1mub9v2/ZSGUBMfvAKyOdKB4yyfkN8Ym1n8+1bNAW18doA==}
+  /@catppuccin/palette/0.1.7:
+    resolution: {integrity: sha512-tgYE1PQLEs4Nz/OA28/kD0WhJKQEvXcuL2BPVdyHYQr0zb9l03lAwRXt7ZAP5PPuczFq0BgemPPdAdG+T2FZug==}
     dev: false
 
   /@commitlint/cli/17.4.4:
