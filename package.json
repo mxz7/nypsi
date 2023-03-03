@@ -12,7 +12,7 @@
   "author": "tekoh",
   "license": "ISC",
   "dependencies": {
-    "@catppuccin/palette": "0.1.6",
+    "@catppuccin/palette": "0.1.7",
     "@discordjs/rest": "1.5.0",
     "@prisma/client": "4.11.0",
     "@top-gg/sdk": "3.1.3",
