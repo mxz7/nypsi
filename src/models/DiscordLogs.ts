@@ -101,13 +101,13 @@ export default class DiscordTransport implements Transport {
         if (this.colors.has(data.label)) embed.setColor(this.colors.get(data.label) as ColorResolvable);
 
         if (this.mode == "hybrid") {
-          embed.setDescription(`\`\`\`${this.formatter(data)}\`\`\``);
+          embed.setDescription(`\`\`\`ansi\n${this.formatter(data)}\`\`\``);
         } else {
           embed.setDescription(`${this.formatter(data)}`);
         }
         this.queue.push(embed);
       } else if (this.mode == "codeblock") {
-        this.queue.push(`\`\`\`${this.formatter(data)}\`\`\``);
+        this.queue.push(`\`\`\`ansi\n${this.formatter(data)}\`\`\``);
       } else {
         this.queue.push(`${this.formatter(data)}`);
       }
