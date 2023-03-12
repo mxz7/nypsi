@@ -6,7 +6,7 @@ import Constants from "../utils/Constants";
 const cmd = new Command("forcelose", "make an account lose 100% of the time", "none");
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-  if (message.author.id !== Constants.TEKOH_ID) return;
+  if (!Constants.ADMIN_IDS.includes(message.author.id)) return;
 
   if (args.length == 0) {
     return message.channel.send({ content: "dumbass" });
