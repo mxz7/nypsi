@@ -148,7 +148,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   let winning = shuffle(values)[Math.floor(Math.random() * values.length)];
 
   if (await redis.sismember(Constants.redis.nypsi.FORCE_LOSE, message.author.id)) {
-    while (choice == winning) {
+    while (
+      choice == "rock"
+        ? winning != "paper"
+        : choice == "paper"
+        ? winning != "scissors"
+        : choice == "scissors"
+        ? winning != "rock"
+        : false
+    ) {
       winning = shuffle(values)[Math.floor(Math.random() * values.length)];
     }
   }
