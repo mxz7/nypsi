@@ -28,19 +28,19 @@ async function updateTax() {
   return tax;
 }
 
-export async function addToNypsiBank(amount: number) {
+export async function addToNypsiBank(amount: number, half = true) {
   await prisma.economy
     .upsert({
       where: {
         userId: Constants.BOT_USER_ID,
       },
       update: {
-        bank: { increment: Math.floor(amount * 0.5) },
+        bank: { increment: half ? Math.floor(amount * 0.5) : amount },
       },
       create: {
         bank: Math.floor(amount),
         lastVote: new Date(0),
-        userId: "Constants.BOT_USER_ID",
+        userId: `${Constants.BOT_USER_ID}`,
       },
     })
     .catch(() => {});
@@ -49,7 +49,7 @@ export async function addToNypsiBank(amount: number) {
 export async function getNypsiBankBalance() {
   const query = await prisma.economy.findUnique({
     where: {
-      userId: "Constants.BOT_USER_ID",
+      userId: `${Constants.BOT_USER_ID}`,
     },
     select: {
       bank: true,
@@ -62,7 +62,7 @@ export async function getNypsiBankBalance() {
 export async function removeFromNypsiBankBalance(amount: number) {
   await prisma.economy.update({
     where: {
-      userId: "Constants.BOT_USER_ID",
+      userId: `${Constants.BOT_USER_ID}`,
     },
     data: {
       bank: { decrement: Math.floor(amount) },
