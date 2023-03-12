@@ -120,7 +120,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (target.user.id == message.client.user.id) {
     await updateBalance(message.member, (await getBalance(message.member)) - amount);
-    await addToNypsiBank(amount);
+    await addToNypsiBank(amount, false);
 
     return send({
       embeds: [new CustomEmbed(message.member, `thank you for your donation of $${amount.toLocaleString()} 🙂`)],
