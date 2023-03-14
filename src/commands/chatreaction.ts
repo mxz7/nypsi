@@ -461,7 +461,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       if (typeof response === "string") await updateBalance(result, (await getBalance(result)) + wager * 2);
     } else {
       await updateBalance(message.member, (await getBalance(message.member)) + wager);
-      response.followUp({ embeds: [new CustomEmbed(target, "✅ coinflip request denied")] });
+      response.followUp({ embeds: [new CustomEmbed(target, "✅ duel request denied")] });
     }
     return;
   } else if (args[0].toLowerCase() == "blacklist" || args[0].toLowerCase() == "bl") {
