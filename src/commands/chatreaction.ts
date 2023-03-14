@@ -400,6 +400,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let wager = formatNumber(args[2] || 0);
 
     if (wager < 0) wager = 0;
+    if (!wager) wager = 0;
+    if (isNaN(wager)) wager = 0;
 
     if ((await getBalance(target)) < wager)
       return send({ embeds: [new ErrorEmbed(`${target.user.toString()} cannot afford this wager`)] });
