@@ -288,7 +288,7 @@ export async function startChatReactionDuel(
 
   gamble(
     challenger.user,
-    "chatreaction",
+    "chatreactionduel",
     wager,
     winningMessage.author.id == challenger.user.id,
     gameId,
@@ -296,7 +296,7 @@ export async function startChatReactionDuel(
   );
   gamble(
     target.user,
-    "chatreaction",
+    "chatreactionduel",
     wager,
     winningMessage.author.id == target.user.id,
     gameId,
