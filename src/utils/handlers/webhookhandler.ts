@@ -140,7 +140,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
 
   if (percentChance(0.2) && !(await redis.exists(Constants.redis.nypsi.GEM_GIVEN))) {
     await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t");
-    await redis.expire(Constants.redis.nypsi.GEM_GIVEN, Math.floor(ms("3 days") / 1000));
+    await redis.expire(Constants.redis.nypsi.GEM_GIVEN, Math.floor(ms("1 days") / 1000));
     await addInventoryItem(user, "blue_gem", 1);
     addProgress(user, "gem_hunter", 1);
 
