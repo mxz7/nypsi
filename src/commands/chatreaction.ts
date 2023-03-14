@@ -17,6 +17,7 @@ import {
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getBlacklisted, setBlacklisted } from "../utils/functions/chatreactions/blacklisted";
+import { startChatReactionDuel, startOpenChatReaction } from "../utils/functions/chatreactions/game";
 import {
   createReactionStatsProfile,
   deleteStats,
@@ -28,11 +29,13 @@ import {
   createReactionProfile,
   getReactionSettings,
   hasReactionProfile,
-  startReaction,
   updateReactionSettings,
 } from "../utils/functions/chatreactions/utils";
 import { getWordList, updateWords } from "../utils/functions/chatreactions/words";
+import { getBalance, updateBalance } from "../utils/functions/economy/balance";
+import { formatNumber } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
+import { getMember } from "../utils/functions/member";
 import PageManager from "../utils/functions/page";
 import { isPremium } from "../utils/functions/premium/premium";
 import sleep from "../utils/functions/sleep";
@@ -129,6 +132,8 @@ cmd.slashData
       )
   );
 
+const duelRequests = new Set<string>();
+
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -181,7 +186,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         `${prefix}**cr words** *view/modify the chat reaction word list*\n` +
         `${prefix}**cr blacklist** *add/remove people to the blacklist*\n` +
         `${prefix}**cr stats** *view your chat reaction stats*\n` +
-        `${prefix}**cr lb** *view the server leaderboard*`
+        `${prefix}**cr lb** *view the server leaderboard*\n` +
+        `${prefix}**cr duel** *duel a member at a chat reaction*`
     );
 
     return send({ embeds: [embed] });
@@ -303,7 +309,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           await sleep(1500);
 
           await countdownMsg.delete().catch(() => {});
-          const a = await startReaction(message.guild, message.channel as TextChannel);
+          const a = await startOpenChatReaction(message.guild, message.channel as TextChannel);
 
           if (a == "xoxo69") {
             return send({
@@ -340,7 +346,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return;
     }
 
-    const a = await startReaction(message.guild, message.channel);
+    const a = await startOpenChatReaction(message.guild, message.channel);
 
     if (a == "xoxo69") {
       return send({
@@ -369,6 +375,97 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return showStats();
   } else if (args[0].toLowerCase() == "leaderboard" || args[0].toLowerCase() == "lb" || args[0].toLowerCase() == "top") {
     return showLeaderboard();
+  } else if (["duel", "1v1", "wager"].includes(args[0].toLowerCase())) {
+    if (args.length < 2) return send({ embeds: [new ErrorEmbed("/chatreaction duel <member> (wager)")] });
+
+    const blacklisted = await getBlacklisted(message.guild);
+
+    if (blacklisted.includes(message.author.id))
+      return send({ embeds: [new ErrorEmbed("you are blacklisted from chat reactions in this server")] });
+
+    const target = message.mentions?.members?.first() || (await getMember(message.guild, args[1]));
+
+    if (!target) return send({ embeds: [new ErrorEmbed("invalid target")] });
+
+    if (blacklisted.includes(target.user.id))
+      return send({ embeds: [new ErrorEmbed("that user is blacklisted from chat reactions in this server")] });
+
+    let wager = formatNumber(args[2] || 0);
+
+    if (wager < 0) wager = 0;
+
+    if ((await getBalance(target)) < wager)
+      return send({ embeds: [new ErrorEmbed(`${target.user.toString()} cannot afford this wager`)] });
+
+    if (duelRequests.has(message.author.id)) return send({ embeds: [new ErrorEmbed("you already have a duel request!")] });
+    if (duelRequests.has(target.user.id)) return send({ embeds: [new ErrorEmbed("they already have a duel request!")] });
+
+    duelRequests.add(message.author.id);
+
+    await updateBalance(message.member, (await getBalance(message.member)) - wager);
+
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder().setCustomId("y").setLabel("accept").setStyle(ButtonStyle.Success),
+      new ButtonBuilder().setCustomId("n").setLabel("deny").setStyle(ButtonStyle.Danger)
+    );
+
+    const requestEmbed = new CustomEmbed(
+      message.member,
+      `**${
+        message.author.tag
+      }** has challenged you to a chat reaction duel\n\n**wager** $${wager.toLocaleString()}\n\ndo you accept?`
+    ).setFooter({ text: "expires in 60 seconds" });
+
+    const m = await send({
+      content: `${target.user.toString()} you have been invited to a chat reaction duel worth $${wager.toLocaleString()}`,
+      embeds: [requestEmbed],
+      components: [row],
+    });
+
+    const filter = (i: Interaction) => i.user.id == target.id;
+    let fail = false;
+
+    const response = await m
+      .awaitMessageComponent({ filter, time: 60000 })
+      .then(async (collected) => {
+        await collected.deferUpdate();
+        m.edit({ components: [] });
+        duelRequests.delete(message.author.id);
+
+        return collected;
+      })
+      .catch(async () => {
+        fail = true;
+        duelRequests.delete(message.author.id);
+        await updateBalance(message.member, (await getBalance(message.member)) + wager);
+        m.edit({ components: [] });
+      });
+
+    if (fail || !response) return;
+
+    if (response.customId === "y") {
+      const balance = await getBalance(target);
+
+      if (balance < wager) return response.followUp({ embeds: [new ErrorEmbed("you cannot afford this")] });
+
+      await updateBalance(target, balance - wager);
+
+      if (m.deletable) m.delete();
+
+      const result = await startChatReactionDuel(
+        message.guild,
+        message.channel as TextChannel,
+        message.member,
+        target,
+        wager
+      );
+
+      if (typeof result === "string") await updateBalance(result, (await getBalance(result)) + wager * 2);
+    } else {
+      await updateBalance(message.member, (await getBalance(message.member)) + wager);
+      response.followUp({ embeds: [new CustomEmbed(target, "✅ duel request denied")] });
+    }
+    return;
   } else if (args[0].toLowerCase() == "blacklist" || args[0].toLowerCase() == "bl") {
     if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) return;
     if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
