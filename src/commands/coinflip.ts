@@ -235,6 +235,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       earned: winner.user.id == message.author.id ? bet * 2 : null,
     });
 
+    await createGame({
+      userId: target.user.id,
+      bet: bet,
+      game: "coinflip",
+      outcome: `**winner** ${winner.user.tag}\n**loser** ${loser.user.tag}`,
+      win: winner.user.id == target.user.id,
+      earned: winner.user.id == target.user.id ? bet * 2 : null,
+    });
+
     gamble(winner.user, "coinflip", bet, true, id, bet * 2);
     gamble(loser.user, "coinflip", bet, false, id);
 
