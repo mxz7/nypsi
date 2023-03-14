@@ -213,16 +213,20 @@ export async function startChatReactionDuel(
   embed.setHeader(`${challenger.user.username} vs ${target.user.username}`);
   embed.setDescription(`**wager** $${wager.toLocaleString()}\n\ntype: \`${word.display}\``);
 
+  if (countdownMsg && countdownMsg.deletable) await countdownMsg.delete().catch(() => {});
+
   const msg = await channel.send({ embeds: [embed] });
 
   const start = new Date().getTime();
 
-  const filter = async (m: Message) =>
-    m.content.toLowerCase() == word.actual.toLowerCase() && [challenger.user.id, target.user.id].includes(m.author.id);
+  const filter = async (m: Message) => {
+    const a = m.content.toLowerCase() == word.actual.toLowerCase();
+    const b = [challenger.user.id, target.user.id].includes(m.author.id);
+
+    return a && b;
+  };
 
   let fail = false;
-
-  if (countdownMsg && countdownMsg.deletable) countdownMsg.delete().catch(() => {});
 
   const winningMessage = await channel
     .awaitMessages({
@@ -246,6 +250,8 @@ export async function startChatReactionDuel(
     "winner",
     `**${winningMessage.author.username}** won in \`${((Date.now() - start) / 1000).toFixed(2)}s\`!!`
   );
+
+  await msg.edit({ embeds: [embed] });
 
   return winningMessage.author.id;
 }
