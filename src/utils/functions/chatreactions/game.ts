@@ -214,7 +214,7 @@ export async function startChatReactionDuel(
   const embed = new CustomEmbed().setColor(Constants.EMBED_SUCCESS_COLOR);
 
   embed.setHeader(`${challenger.user.username} vs ${target.user.username}`);
-  embed.setDescription(`**wager** $${wager.toLocaleString()}\n\ntype: \`${word.display}\``);
+  embed.setDescription(`${wager > 0 ? ` **wager** $${wager.toLocaleString()}\n\n` : ""}type: \`${word.display}\``);
 
   if (countdownMsg && countdownMsg.deletable) await countdownMsg.delete().catch(() => {});
 
@@ -262,9 +262,9 @@ export async function startChatReactionDuel(
 
   embed.addField(
     "winner",
-    `🏅 ${winningMessage.author.toString()} in \`${((Date.now() - start) / 1000).toFixed(
-      2
-    )}s\`\n\n+$**${winnings.toLocaleString()}**${tax ? ` (${(tax * 100).toFixed(1)}% tax)` : ""}`
+    `🏅 ${winningMessage.author.toString()} in \`${((Date.now() - start) / 1000).toFixed(2)}s\`${
+      winnings > 0 ? `\n\n+$**${winnings.toLocaleString()}**${tax ? ` (${(tax * 100).toFixed(1)}% tax)` : ""}` : ""
+    }`
   );
 
   const gameId = await createGame({
