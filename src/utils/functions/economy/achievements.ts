@@ -150,7 +150,10 @@ async function completeAchievement(userId: string, achievementId: string) {
     earnedXp = 250;
   }
 
-  if (achievementId.includes("collector")) earnedCrates = 0;
+  if (achievementId.includes("collector")) {
+    earnedCrates = 0;
+    earnedXp = 0;
+  }
 
   userEmbed.setDescription(
     (userEmbed.data.description += `\n\nrewards:\n + ${earnedXp.toLocaleString()}xp${
