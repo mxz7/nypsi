@@ -273,7 +273,7 @@ export async function startChatReactionDuel(
   const gameId = await createGame({
     bet: wager,
     game: "chatreactionduel",
-    outcome: `${winningMessage.author.tag} won in ${winTime}s`,
+    outcome: `${winningMessage.author.username} won in ${winTime}s`,
     userId: challenger.user.id,
     win: winningMessage.author.id === challenger.user.id,
     earned: winningMessage.author.id === challenger.user.id ? winnings : 0,
@@ -282,7 +282,7 @@ export async function startChatReactionDuel(
   await createGame({
     bet: wager,
     game: "chatreactionduel",
-    outcome: `${winningMessage.author.tag} won in ${winTime}s`,
+    outcome: `${winningMessage.author.username} won in ${winTime}s`,
     userId: target.user.id,
     win: winningMessage.author.id === target.user.id,
     earned: winningMessage.author.id === target.user.id ? winnings : 0,
