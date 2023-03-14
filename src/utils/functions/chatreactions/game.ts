@@ -261,9 +261,11 @@ export async function startChatReactionDuel(
     winnings -= taxed;
   }
 
+  const winTime = ((Date.now() - start) / 1000).toFixed(2);
+
   embed.addField(
     "winner",
-    `🏅 ${winningMessage.author.toString()} in \`${((Date.now() - start) / 1000).toFixed(2)}s\`${
+    `🏅 ${winningMessage.author.toString()} in \`${winTime}s\`${
       winnings > 0 ? `\n\n+$**${winnings.toLocaleString()}**${tax ? ` (${(tax * 100).toFixed(1)}% tax)` : ""}` : ""
     }`
   );
@@ -271,7 +273,7 @@ export async function startChatReactionDuel(
   const gameId = await createGame({
     bet: wager,
     game: "chatreactionduel",
-    outcome: `${winningMessage.author.tag} won in ${((Date.now() - start) / 1000).toFixed(2)}s`,
+    outcome: `${winningMessage.author.tag} won in ${winTime}s`,
     userId: challenger.user.id,
     win: winningMessage.author.id === challenger.user.id,
     earned: winningMessage.author.id === challenger.user.id ? winnings : 0,
@@ -280,7 +282,7 @@ export async function startChatReactionDuel(
   await createGame({
     bet: wager,
     game: "chatreactionduel",
-    outcome: `${winningMessage.author.tag} won in ${((Date.now() - start) / 1000).toFixed(2)}s`,
+    outcome: `${winningMessage.author.tag} won in ${winTime}s`,
     userId: target.user.id,
     win: winningMessage.author.id === target.user.id,
     earned: winningMessage.author.id === target.user.id ? winnings : 0,
