@@ -450,6 +450,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       await updateBalance(target, balance - wager);
 
+      if (m.deletable) m.delete();
+
       const result = await startChatReactionDuel(
         message.guild,
         message.channel as TextChannel,
