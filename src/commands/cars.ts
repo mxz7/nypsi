@@ -53,6 +53,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   let pageOfItems: string[] = [];
   for (const item of itemIDs) {
+    if (item === "bicycle") return;
     if (items[item].role != "car") continue;
     totalCars++;
 
