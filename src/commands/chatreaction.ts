@@ -48,6 +48,13 @@ const cmd = new Command("chatreaction", "see who can type the fastest", "fun")
 cmd.slashEnabled = true;
 cmd.slashData
   .addSubcommand((option) => option.setName("start").setDescription("start a chat reaction in the current channel"))
+  .addSubcommand((option) =>
+    option
+      .setName("duel")
+      .setDescription("duel a member to a chat reaction")
+      .addUserOption((option) => option.setName("member").setDescription("member to duel").setRequired(true))
+      .addStringOption((option) => option.setName("wager").setDescription("how much do you want to wager / bet"))
+  )
   .addSubcommand((option) => option.setName("stats").setDescription("view your chat reaction stats"))
   .addSubcommand((option) => option.setName("leaderboard").setDescription("view the chat reaction leaderboard"))
   .addSubcommandGroup((words) =>
