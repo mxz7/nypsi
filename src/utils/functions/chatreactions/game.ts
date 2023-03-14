@@ -1,6 +1,7 @@
 import { Guild, GuildMember, Message, TextChannel } from "discord.js";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
+import { gamble } from "../../logger";
 import { createGame } from "../economy/stats";
 import { isPremium } from "../premium/premium";
 import sleep from "../sleep";
@@ -284,6 +285,23 @@ export async function startChatReactionDuel(
     win: winningMessage.author.id === target.user.id,
     earned: winningMessage.author.id === target.user.id ? winnings : 0,
   });
+
+  gamble(
+    challenger.user,
+    "chatreaction",
+    wager,
+    winningMessage.author.id == challenger.user.id,
+    gameId,
+    winningMessage.author.id == challenger.user.id ? winnings : null
+  );
+  gamble(
+    target.user,
+    "chatreaction",
+    wager,
+    winningMessage.author.id == target.user.id,
+    gameId,
+    winningMessage.author.id == target.user.id ? winnings : null
+  );
 
   embed.setFooter({ text: `id: ${gameId}` });
 
