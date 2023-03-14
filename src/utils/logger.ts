@@ -261,6 +261,12 @@ const formatter = (data: WriteData) => {
       break;
   }
 
+  if (!data.message) {
+    logger.error("no message", data);
+    console.trace();
+    return;
+  }
+
   if (data.message.startsWith("::")) {
     const category = data.message.split(" ").splice(0, 1)[0].substring(2);
     data.message = data.message.split(" ").slice(1).join(" ");
