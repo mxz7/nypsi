@@ -40,14 +40,21 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       });
     });
 
+    await message.channel.send({
+      embeds: [new CustomEmbed(message.member, "✅ all clusters will be restarted soon")],
+    });
+
     await redis.set(Constants.redis.nypsi.RESTART, "t");
     logger.info("starting graceful restart..");
 
-    client.cluster.send("restart");
+    const check = setInterval(async () => {
+      const thingy = await redis.scard(Constants.redis.nypsi.USERS_PLAYING);
 
-    return message.channel.send({
-      embeds: [new CustomEmbed(message.member, "✅ all clusters will be restarted soon")],
-    });
+      if (thingy == 0) {
+        clearInterval(check);
+        client.cluster.send("restart");
+      }
+    }, 1000);
   }
 }
 
