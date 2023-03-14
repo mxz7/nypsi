@@ -1,17 +1,14 @@
-import { Guild, Message, TextChannel } from "discord.js";
+import { Guild, GuildMember, Message, TextChannel } from "discord.js";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
+import sleep from "../sleep";
 import { getZeroWidth } from "../string";
 import { getBlacklisted } from "./blacklisted";
 import { add2ndPlace, add3rdPlace, addWin, createReactionStatsProfile, hasReactionStatsProfile } from "./stats";
 import { currentChannels, getReactionSettings } from "./utils";
 import { getWords } from "./words";
 
-export async function startOpenChatReaction(guild: Guild, channel: TextChannel) {
-  if (currentChannels.has(channel.id)) return "xoxo69";
-
-  currentChannels.add(channel.id);
-
+async function generateWord(guild: Guild) {
   const words = await getWords(guild);
 
   const chosenWord = words[Math.floor(Math.random() * words.length)];
@@ -27,10 +24,20 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel) 
     displayWord = displayWord.substring(0, pos) + zeroWidthChar + displayWord.substring(pos);
   }
 
+  return { actual: chosenWord, display: displayWord };
+}
+
+export async function startOpenChatReaction(guild: Guild, channel: TextChannel) {
+  if (currentChannels.has(channel.id)) return "xoxo69";
+
+  currentChannels.add(channel.id);
+
+  const word = await generateWord(guild);
+
   const embed = new CustomEmbed().setColor(Constants.EMBED_SUCCESS_COLOR);
 
   embed.setHeader("chat reaction");
-  embed.setDescription(`type: \`${displayWord}\``);
+  embed.setDescription(`type: \`${word.display}\``);
 
   let msg = await channel.send({ embeds: [embed] });
 
@@ -41,7 +48,7 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel) 
   const blacklisted = await getBlacklisted(guild);
 
   const filter = async (m: Message) =>
-    m.content.toLowerCase() == chosenWord.toLowerCase() &&
+    m.content.toLowerCase() == word.actual.toLowerCase() &&
     winnersIDs.indexOf(m.author.id) == -1 &&
     !m.member.user.bot &&
     blacklisted.indexOf(m.author.id) == -1;
@@ -152,4 +159,93 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel) 
       await msg.edit({ embeds: [embed] }).catch(() => {});
     }, 1000);
   });
+}
+
+export async function startChatReactionDuel(
+  guild: Guild,
+  channel: TextChannel,
+  challenger: GuildMember,
+  target: GuildMember,
+  wager: number
+): Promise<null | string> {
+  const word = await generateWord(guild);
+
+  const countdownMsg = await channel
+    .send({
+      embeds: [
+        new CustomEmbed(challenger, `**wager** $${wager.toLocaleString()}\n\nstarting in 3 seconds`).setHeader(
+          `${challenger.user.username} vs ${target.user.username}`
+        ),
+      ],
+    })
+    .catch(() => {});
+
+  await sleep(1500);
+
+  if (countdownMsg)
+    await countdownMsg
+      .edit({
+        embeds: [
+          new CustomEmbed(challenger, `**wager** $${wager.toLocaleString()}\n\nstarting in 2 seconds`).setHeader(
+            `${challenger.user.username} vs ${target.user.username}`
+          ),
+        ],
+      })
+      .catch(() => {});
+
+  await sleep(1500);
+
+  if (countdownMsg)
+    await countdownMsg
+      .edit({
+        embeds: [
+          new CustomEmbed(challenger, `**wager** $${wager.toLocaleString()}\n\nstarting in 1 second`).setHeader(
+            `${challenger.user.username} vs ${target.user.username}`
+          ),
+        ],
+      })
+      .catch(() => {});
+
+  await sleep(1500);
+
+  const embed = new CustomEmbed().setColor(Constants.EMBED_SUCCESS_COLOR);
+
+  embed.setHeader(`${challenger.user.username} vs ${target.user.username}`);
+  embed.setDescription(`**wager** $${wager.toLocaleString()}\n\ntype: \`${word.display}\``);
+
+  const msg = await channel.send({ embeds: [embed] });
+
+  const start = new Date().getTime();
+
+  const filter = async (m: Message) =>
+    m.content.toLowerCase() == word.actual.toLowerCase() && [challenger.user.id, target.user.id].includes(m.author.id);
+
+  let fail = false;
+
+  if (countdownMsg && countdownMsg.deletable) countdownMsg.delete().catch(() => {});
+
+  const winningMessage = await channel
+    .awaitMessages({
+      filter,
+      time: 30000,
+      max: 1,
+    })
+    .then((messages) => messages.first())
+    .catch(() => {
+      fail = true;
+    });
+
+  if (fail || !winningMessage) {
+    embed.addField("winner", "nobody won... losers.");
+
+    await msg.edit({ embeds: [embed] });
+    return null;
+  }
+
+  embed.addField(
+    "winner",
+    `**${winningMessage.author.username}** won in \`${((Date.now() - start) / 1000).toFixed(2)}s\`!!`
+  );
+
+  return winningMessage.author.id;
 }
