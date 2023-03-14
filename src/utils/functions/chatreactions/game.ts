@@ -1,6 +1,7 @@
 import { Guild, GuildMember, Message, TextChannel } from "discord.js";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
+import { createGame } from "../economy/stats";
 import { isPremium } from "../premium/premium";
 import sleep from "../sleep";
 import { getZeroWidth } from "../string";
@@ -265,6 +266,26 @@ export async function startChatReactionDuel(
       2
     )}s\`\n\n+$**${winnings.toLocaleString()}**${tax ? ` (${(tax * 100).toFixed(1)}% tax)` : ""}`
   );
+
+  const gameId = await createGame({
+    bet: wager,
+    game: "chatreactionduel",
+    outcome: `${winningMessage.author.tag} won in ${((Date.now() - start) / 1000).toFixed(2)}s`,
+    userId: challenger.user.id,
+    win: winningMessage.author.id === challenger.user.id,
+    earned: winningMessage.author.id === challenger.user.id ? winnings : 0,
+  });
+
+  await createGame({
+    bet: wager,
+    game: "chatreactionduel",
+    outcome: `${winningMessage.author.tag} won in ${((Date.now() - start) / 1000).toFixed(2)}s`,
+    userId: target.user.id,
+    win: winningMessage.author.id === target.user.id,
+    earned: winningMessage.author.id === target.user.id ? winnings : 0,
+  });
+
+  embed.setFooter({ text: `id: ${gameId}` });
 
   await msg.edit({ embeds: [embed] });
 
