@@ -451,7 +451,7 @@ export async function commandGemCheck(member: GuildMember, commandCategory: Comm
 
   if (percentChance(0.0001)) {
     await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t");
-    await redis.expire(Constants.redis.nypsi.GEM_GIVEN, Math.floor(ms("3 days") / 1000));
+    await redis.expire(Constants.redis.nypsi.GEM_GIVEN, Math.floor(ms("1 days") / 1000));
     const gems = ["green_gem", "blue_gem", "purple_gem", "pink_gem"];
 
     const gem = gems[Math.floor(Math.random() * gems.length)];

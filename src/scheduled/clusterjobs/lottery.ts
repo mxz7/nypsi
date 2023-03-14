@@ -98,7 +98,7 @@ async function doLottery(client: Client) {
 
     if (percentChance(0.9) && !(await redis.exists(Constants.redis.nypsi.GEM_GIVEN))) {
       await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t");
-      await redis.expire(Constants.redis.nypsi.GEM_GIVEN, Math.floor(ms("3 days") / 1000));
+      await redis.expire(Constants.redis.nypsi.GEM_GIVEN, Math.floor(ms("1 days") / 1000));
       await addInventoryItem(user.id, "purple_gem", 1);
       addProgress(user.id, "gem_hunter", 1);
 
