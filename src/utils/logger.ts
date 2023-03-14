@@ -356,7 +356,8 @@ export function gamble(user: User, game: string, amount: number, win: boolean, i
         ` - **game** ${game}\n` +
         ` - **bet** $${amount.toLocaleString()}\n` +
         ` - **win** ${win}${win ? ` ($**${winAmount.toLocaleString()}**)` : ""}\n` +
-        ` - **id** ${id}\n`
+        ` - **id** ${id}\n` +
+        ` - **time** <t:${Math.floor(Date.now() / 1000)}>`
     );
   } else {
     nextLogMsg.set(
@@ -366,7 +367,8 @@ export function gamble(user: User, game: string, amount: number, win: boolean, i
         ` - **game** ${game}\n` +
         ` - **bet** $${amount.toLocaleString()}\n` +
         ` - **win** ${win}${win ? ` ($**${winAmount.toLocaleString()}**)` : ""}\n` +
-        ` - **id** ${id}\n`
+        ` - **id** ${id}\n` +
+        ` - **time** <t:${Math.floor(Date.now() / 1000)}>`
     );
   }
 }
