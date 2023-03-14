@@ -152,7 +152,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return await message.guild.members.fetch().then((r) => Array.from(r.values()));
       }
     } else {
-      if (message.mentions.members.first()) {
+      if (message.mentions?.members?.first()) {
         return [message.mentions.members.first()];
       } else {
         const member = await getMember(message.guild, args[2]);
@@ -201,7 +201,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (!(message instanceof Message) && message.isChatInputCommand()) {
       role = await message.guild.roles.fetch(message.options.getRole("role").id);
-    } else if (message.mentions.roles.first()) {
+    } else if (message.mentions?.roles?.first()) {
       role = message.mentions.roles.first();
     } else {
       role = await getRole(message.guild, members.length == 1 ? args[3] : args[2]);
@@ -324,7 +324,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (!(message instanceof Message) && message.isChatInputCommand()) {
       role = await message.guild.roles.fetch(message.options.getRole("role").id);
-    } else if (message.mentions.roles.first()) {
+    } else if (message.mentions?.roles?.first()) {
       role = message.mentions.roles.first();
     } else {
       role = await getRole(message.guild, members.length == 1 ? args[3] : args[2]);
@@ -472,7 +472,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     let chosenRole: Role;
 
-    if (message.mentions.roles.first()) {
+    if (message.mentions?.roles?.first()) {
       chosenRole = message.mentions.roles.first();
     } else {
       chosenRole = await getRole(message.guild, args[2]);
@@ -550,7 +550,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     let chosenRole: Role;
 
-    if (message.mentions.roles.first()) {
+    if (message.mentions?.roles?.first()) {
       chosenRole = message.mentions.roles.first();
     } else {
       chosenRole = await getRole(message.guild, args[2]);
@@ -587,7 +587,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     args.shift();
 
-    const role = message.mentions.roles.first() || (await getRole(message.guild, args.join(" ")));
+    const role = message.mentions?.roles?.first() || (await getRole(message.guild, args.join(" ")));
 
     if (!role) {
       return send({ embeds: [new ErrorEmbed(`couldnt find a role with the name\`${args.join(" ")}\``)] });
