@@ -1,8 +1,10 @@
 import { Guild, GuildMember, Message, TextChannel } from "discord.js";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
+import { isPremium } from "../premium/premium";
 import sleep from "../sleep";
 import { getZeroWidth } from "../string";
+import { addToNypsiBank, getTax } from "../tax";
 import { getBlacklisted } from "./blacklisted";
 import { add2ndPlace, add3rdPlace, addWin, createReactionStatsProfile, hasReactionStatsProfile } from "./stats";
 import { currentChannels, getReactionSettings } from "./utils";
@@ -78,7 +80,7 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel) 
       if (winnersText.length >= 3) break;
       const pos = medals.get(winnersList.indexOf(winner) + 1);
 
-      winnersText.push(`${pos} ${winner.user} in \`${winner.time}\``);
+      winnersText.push(`${pos} ${winner.user} in \`${winner.time}s\``);
     }
   };
 
@@ -246,9 +248,22 @@ export async function startChatReactionDuel(
     return null;
   }
 
+  let winnings = wager * 2;
+  let tax = 0;
+
+  if (winnings > 1_000_000 && !(await isPremium(winningMessage.author.id))) {
+    tax = await getTax();
+
+    const taxed = Math.floor(winnings * tax);
+    await addToNypsiBank(taxed);
+    winnings -= taxed;
+  }
+
   embed.addField(
     "winner",
-    `**${winningMessage.author.username}** won in \`${((Date.now() - start) / 1000).toFixed(2)}s\`!!`
+    `🏅 ${winningMessage.author.toString()} in \`${((Date.now() - start) / 1000).toFixed(
+      2
+    )}s\`\n\n+$**${winnings.toLocaleString()}**${tax ? ` (${(tax * 100).toFixed(1)}% tax)` : ""}`
   );
 
   await msg.edit({ embeds: [embed] });
