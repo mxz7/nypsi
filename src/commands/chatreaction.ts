@@ -458,7 +458,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         wager
       );
 
-      if (typeof response === "string") await updateBalance(result, (await getBalance(result)) + wager * 2);
+      if (typeof result === "string") await updateBalance(result, (await getBalance(result)) + wager * 2);
     } else {
       await updateBalance(message.member, (await getBalance(message.member)) + wager);
       response.followUp({ embeds: [new CustomEmbed(target, "✅ duel request denied")] });
