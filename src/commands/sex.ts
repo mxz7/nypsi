@@ -6,6 +6,7 @@ import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 
 import Constants from "../utils/Constants.js";
+import { MStoTime } from "../utils/functions/date.js";
 import { addProgress } from "../utils/functions/economy/achievements.js";
 import { cleanString } from "../utils/functions/string.js";
 import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications.js";
@@ -100,20 +101,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if ((await redis.exists(`${Constants.redis.cooldown.SEX_CHASTITY}:${message.author.id}`)) == 1) {
     const init = parseInt(await redis.get(`${Constants.redis.cooldown.SEX_CHASTITY}:${message.author.id}`));
-    const curr = new Date();
-    const diff = Math.round((curr.getTime() - init) / 1000);
-    const time = 10800 - diff;
-
-    const minutes = Math.floor(time / 60);
-    const seconds = time - minutes * 60;
-
-    let remaining: string;
-
-    if (minutes != 0) {
-      remaining = `${minutes}m${seconds}s`;
-    } else {
-      remaining = `${seconds}s`;
-    }
+    const remaining = MStoTime(Date.now() + 10800000 - init);
 
     return send({
       embeds: [new ErrorEmbed(`you have been equipped with a *chastity cage*, it will be removed in **${remaining}**`)],
