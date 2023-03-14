@@ -33,7 +33,7 @@ import {
 } from "../utils/functions/chatreactions/utils";
 import { getWordList, updateWords } from "../utils/functions/chatreactions/words";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
-import { formatNumber } from "../utils/functions/economy/utils";
+import { formatNumber, isEcoBanned } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
 import PageManager from "../utils/functions/page";
@@ -384,6 +384,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   } else if (args[0].toLowerCase() == "leaderboard" || args[0].toLowerCase() == "lb" || args[0].toLowerCase() == "top") {
     return showLeaderboard();
   } else if (["duel", "1v1", "wager"].includes(args[0].toLowerCase())) {
+    if (await isEcoBanned(message.author.id)) return send({ embeds: [new ErrorEmbed("you cant do this")] });
     if (args.length < 2) return send({ embeds: [new ErrorEmbed("/chatreaction duel <member> (wager)")] });
 
     const blacklisted = await getBlacklisted(message.guild);
@@ -397,6 +398,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (blacklisted.includes(target.user.id))
       return send({ embeds: [new ErrorEmbed("that user is blacklisted from chat reactions in this server")] });
+
+    if (await isEcoBanned(target.user.id)) return send({ embeds: [new ErrorEmbed("this user is banned from nypsi")] });
 
     let wager = formatNumber(args[2] || 0);
 
