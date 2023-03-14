@@ -16,6 +16,8 @@ import { getBalance, updateBalance } from "../utils/functions/economy/balance";
 import { createGame } from "../utils/functions/economy/stats";
 import { createUser, formatBet, isEcoBanned, userExists } from "../utils/functions/economy/utils";
 import { getMember } from "../utils/functions/member.js";
+import { isPremium } from "../utils/functions/premium/premium";
+import { addToNypsiBank, getTax } from "../utils/functions/tax";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 import { gamble } from "../utils/logger.js";
 
@@ -226,13 +228,24 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       loser = message.member;
     }
 
+    let winnings = bet * 2;
+    let tax = 0;
+
+    if (winnings > 1_000_000 && !(await isPremium(winner.user.id))) {
+      tax = await getTax();
+
+      const taxed = Math.floor(winnings * tax);
+      await addToNypsiBank(taxed);
+      winnings -= taxed;
+    }
+
     const id = await createGame({
       userId: message.author.id,
       bet: bet,
       game: "coinflip",
       outcome: `**winner** ${winner.user.tag}\n**loser** ${loser.user.tag}`,
       win: winner.user.id == message.author.id,
-      earned: winner.user.id == message.author.id ? bet * 2 : null,
+      earned: winner.user.id == message.author.id ? winnings : null,
     });
 
     await createGame({
@@ -241,13 +254,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       game: "coinflip",
       outcome: `**winner** ${winner.user.tag}\n**loser** ${loser.user.tag}`,
       win: winner.user.id == target.user.id,
-      earned: winner.user.id == target.user.id ? bet * 2 : null,
+      earned: winner.user.id == target.user.id ? winnings : null,
     });
 
     gamble(winner.user, "coinflip", bet, true, id, bet * 2);
     gamble(loser.user, "coinflip", bet, false, id);
 
-    await updateBalance(winner, (await getBalance(winner)) + bet * 2);
+    await updateBalance(winner, (await getBalance(winner)) + winnings);
 
     const embed = new CustomEmbed(message.member, `*throwing..*\n\n${thingy}\n\n**bet** $${bet.toLocaleString()}`).setHeader(
       "coinflip"
@@ -256,9 +269,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const msg = await response.followUp({ embeds: [embed] });
 
     if (winner == message.member) {
-      thingy = `**${message.author.username}** +$${bet.toLocaleString()}\n${target.user.username}`;
+      thingy = `**${message.author.username}** +$${winnings.toLocaleString()}${
+        tax ? ` (${(tax * 100).toFixed(1)}% tax)` : ""
+      }\n${target.user.username}`;
     } else {
-      thingy = `${message.author.username}\n**${target.user.username}** +$${bet.toLocaleString()}`;
+      thingy = `${message.author.username}\n**${target.user.username}** +$${winnings.toLocaleString()}${
+        tax ? ` (${(tax * 100).toFixed(1)}% tax)` : ""
+      }`;
     }
 
     embed.setDescription(`**winner** ${winner.user.tag}\n\n${thingy}\n\n**bet** $${bet.toLocaleString()}`);
