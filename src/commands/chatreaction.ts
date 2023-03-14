@@ -17,6 +17,7 @@ import {
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getBlacklisted, setBlacklisted } from "../utils/functions/chatreactions/blacklisted";
+import { startOpenChatReaction } from "../utils/functions/chatreactions/game";
 import {
   createReactionStatsProfile,
   deleteStats,
@@ -28,7 +29,6 @@ import {
   createReactionProfile,
   getReactionSettings,
   hasReactionProfile,
-  startReaction,
   updateReactionSettings,
 } from "../utils/functions/chatreactions/utils";
 import { getWordList, updateWords } from "../utils/functions/chatreactions/words";
@@ -303,7 +303,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           await sleep(1500);
 
           await countdownMsg.delete().catch(() => {});
-          const a = await startReaction(message.guild, message.channel as TextChannel);
+          const a = await startOpenChatReaction(message.guild, message.channel as TextChannel);
 
           if (a == "xoxo69") {
             return send({
@@ -340,7 +340,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return;
     }
 
-    const a = await startReaction(message.guild, message.channel);
+    const a = await startOpenChatReaction(message.guild, message.channel);
 
     if (a == "xoxo69") {
       return send({
