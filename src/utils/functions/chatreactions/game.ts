@@ -2,6 +2,7 @@ import { Guild, GuildMember, Message, TextChannel } from "discord.js";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
 import { gamble } from "../../logger";
+import { addProgress } from "../economy/achievements";
 import { createGame } from "../economy/stats";
 import { isPremium } from "../premium/premium";
 import sleep from "../sleep";
@@ -269,6 +270,8 @@ export async function startChatReactionDuel(
       winnings > 0 ? `\n\n+$**${winnings.toLocaleString()}**${tax ? ` (${(tax * 100).toFixed(1)}% tax)` : ""}` : ""
     }`
   );
+
+  await addProgress(winningMessage.author.id, "fast_typer", 1)
 
   const gameId = await createGame({
     bet: wager,
