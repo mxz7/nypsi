@@ -1026,5 +1026,42 @@
     "target": 1000,
     "description": "win something from a scratch card 1,000 times",
     "prize": "legendary_scratch_card"
+  },
+  "fast_typer_i": {
+    "id": "fast_typer_i",
+    "name": "fast typer **I**",
+    "emoji": "⌨️",
+    "target": 15,
+    "description": "win 15 chat reaction duels"
+  },
+  "fast_typer_ii": {
+    "id": "fast_typer_ii",
+    "name": "fast typer **II**",
+    "emoji": "⌨️",
+    "target": 50,
+    "description": "win 50 chat reaction duels"
+  },
+  "fast_typer_iii": {
+    "id": "fast_typer_iii",
+    "name": "fast typer **III**",
+    "emoji": "⌨️",
+    "target": 250,
+    "description": "win 250 chat reaction duels"
+  },
+  "fast_typer_iv": {
+    "id": "fast_typer_iv",
+    "name": "fast typer **IV**",
+    "emoji": "⌨️",
+    "target": 500,
+    "description": "win 500 chat reaction duels",
+    "prize": "legendary_scratch_card"
+  },
+  "fast_typer_v": {
+    "id": "fast_typer_v",
+    "name": "fast typer **V**",
+    "emoji": "⌨️",
+    "target": 1000,
+    "description": "win 1,000 chat reaction duels",
+    "prize": "legendary_scratch_card"
   }
 }
