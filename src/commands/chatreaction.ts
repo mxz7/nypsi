@@ -407,6 +407,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (!wager) wager = 0;
     if (isNaN(wager)) wager = 0;
 
+    if ((await getBalance(message.member)) < wager) return send({ embeds: [new ErrorEmbed("you cannot afford this")] });
+
     if ((await getBalance(target)) < wager)
       return send({ embeds: [new ErrorEmbed(`${target.user.toString()} cannot afford this wager`)] });
 
