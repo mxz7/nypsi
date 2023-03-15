@@ -79,20 +79,20 @@ export async function calcEarnedXp(member: GuildMember, bet: number, multiplier:
 
   if (prestige) {
     if (prestige > 15) prestige = 15;
-    min += prestige / 3.5;
-    max += prestige / 1.27;
+    min += prestige / 3;
+    max += prestige / 1.777;
   }
 
   min += await getTier(member);
 
-  let betDivisor = 75_000;
+  let betDivisor = 10_000;
 
-  if (prestige > 5) betDivisor = 100_000;
-  if (prestige > 10) betDivisor = 150_000;
-  if (prestige > 20) betDivisor = 200_000;
+  if (prestige > 5) betDivisor = 25_000;
+  if (prestige > 10) betDivisor = 50_000;
+  if (prestige > 20) betDivisor = 100_000;
 
   max += bet / betDivisor;
-  max += multiplier * 1.7;
+  max += multiplier * 2.7;
 
   if (await isPassive(member)) {
     if (await isPremium(member)) {
