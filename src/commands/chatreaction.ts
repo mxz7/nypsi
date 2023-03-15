@@ -399,13 +399,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (blacklisted.includes(target.user.id))
       return send({ embeds: [new ErrorEmbed("that user is blacklisted from chat reactions in this server")] });
 
-    if (await isEcoBanned(target.user.id)) return send({ embeds: [new ErrorEmbed("this user is banned from nypsi")] });
-
     let wager = formatNumber(args[2] || 0);
 
     if (wager < 0) wager = 0;
     if (!wager) wager = 0;
     if (isNaN(wager)) wager = 0;
+
+    if ((await isEcoBanned(target.user.id)) && wager > 0)
+      return send({ embeds: [new ErrorEmbed("this user is banned from nypsi")] });
 
     if ((await getBalance(message.member)) < wager) return send({ embeds: [new ErrorEmbed("you cannot afford this")] });
 
