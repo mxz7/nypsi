@@ -9,6 +9,7 @@ import {
   InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
+  User,
 } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
@@ -20,6 +21,7 @@ import { isPremium } from "../utils/functions/premium/premium";
 import { addToNypsiBank, getTax } from "../utils/functions/tax";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 import { gamble } from "../utils/logger.js";
+import { MessageReaction } from "discord.js";
 
 const cmd = new Command("coinflip", "flip a coin, double or nothing", "money").setAliases(["cf"]);
 
@@ -159,7 +161,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const filter = (i: Interaction) => i.user.id == target.id;
   let fail = false;
 
-  const response = await m
+  const response = await Promise.race([m
     .awaitMessageComponent({ filter, time: 60000 })
     .then(async (collected) => {
       await collected.deferUpdate();
@@ -172,8 +174,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       playing.delete(message.author.id);
       await updateBalance(message.member, (await getBalance(message.member)) + bet);
       m.edit({ components: [] });
-    });
-
+    }),
+  m.awaitReactions({ filter: (reaction: MessageReaction, user: User) => (reaction.emoji.name == "🚫" && user.id == message.author.id), time: 60000, max: 1 })
+    .then(async () => {
+      fail = true;
+      playing.delete(message.author.id);
+      await updateBalance(message.member, (await getBalance(message.member)) + bet);
+      m.edit({ components: [] });
+     })
+     .catch(async () => {
+     })
+                                       
   if (fail || !response) return;
 
   if (response.customId == "y") {
