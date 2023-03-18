@@ -155,9 +155,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const checkRoles = async () => {
     if (doingRoles) return;
     doingRoles = true;
+
     for (const guildMember of message.guild.members.cache.values()) {
       await sleep(250);
+
       const roleIds = Array.from(guildMember.roles.cache.keys());
+
+      if (roleIds.includes(Constants.BOOST_ROLE_ID)) {
+        if (!(await isBooster(guildMember.user.id))) await setBooster(guildMember.user.id, true).catch(() => {});
+      } else if (await isBooster(guildMember.user.id)) {
+        await setBooster(guildMember.user.id, false);
+      }
+
       if (!(await isPremium(guildMember)) || guildMember.user.id == Constants.TEKOH_ID) {
         // i dont want plat role lol
         if (roleIds.includes(Constants.PLATINUM_ROLE_ID)) guildMember.roles.remove(Constants.PLATINUM_ROLE_ID);
@@ -165,12 +174,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (roleIds.includes(Constants.SILVER_ROLE_ID)) guildMember.roles.remove(Constants.SILVER_ROLE_ID);
         if (roleIds.includes(Constants.BRONZE_ROLE_ID)) guildMember.roles.remove(Constants.BRONZE_ROLE_ID);
         continue;
-      }
-
-      if (roleIds.includes(Constants.BOOST_ROLE_ID)) {
-        if (!(await isBooster(guildMember.user.id))) await setBooster(guildMember.user.id, true).catch(() => {});
-      } else if (await isBooster(guildMember.user.id)) {
-        await setBooster(guildMember.user.id, false);
       }
 
       let requiredRole = "none";
