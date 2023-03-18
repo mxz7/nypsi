@@ -301,6 +301,7 @@ setInterval(async () => {
   milfs.forEach(async (obj) => {
     const milf = JSON.parse(obj) as MilfSearchData;
     if (dayjs(milf.date).isBefore(dayjs().subtract(6, "hours"))) {
+      await redis.lrem(Constants.redis.nypsi.MILF_QUEUE, 1, obj);
       if ((await getDmSettings(milf.userId)).other) {
         await addNotificationToQueue({
           memberId: milf.userId,
@@ -311,8 +312,6 @@ setInterval(async () => {
           },
         });
       }
-
-      await redis.lrem(Constants.redis.nypsi.MILF_QUEUE, 1, JSON.stringify(obj));
     }
   });
 }, 600000);
