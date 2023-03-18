@@ -30,11 +30,11 @@ async function doCrates(client: NypsiClient) {
 
     const embed = new CustomEmbed().setHeader("thank you for supporting nypsi!").setColor(Constants.EMBED_SUCCESS_COLOR);
 
-    if (member.Premium.level == 2) {
+    if (member.Premium?.level == 2) {
       rewards.set("basic_crate", 2);
-    } else if (member.Premium.level == 3) {
+    } else if (member.Premium?.level == 3) {
       rewards.set("basic_crate", 4);
-    } else if (member.Premium.level == 4) {
+    } else if (member.Premium?.level == 4) {
       rewards.set("basic_crate", 4);
       rewards.set("69420_crate", 2);
       rewards.set("lucky_scratch_card", 1);
