@@ -6,7 +6,8 @@
     "id": "bronze",
     "cost": 200,
     "unlimited": false,
-    "items_left": 1
+    "items_left": 1,
+    "aliases": []
   },
   "silver": {
     "name": "silver membership",
@@ -15,7 +16,8 @@
     "id": "silver",
     "cost": 350,
     "unlimited": false,
-    "items_left": 1
+    "items_left": 1,
+    "aliases": []
   },
   "gold": {
     "name": "gold membership",
@@ -24,7 +26,8 @@
     "id": "gold",
     "cost": 500,
     "unlimited": false,
-    "items_left": 1
+    "items_left": 1,
+    "aliases": []
   },
   "100xp": {
     "name": "100 xp",
@@ -33,7 +36,8 @@
     "id": "100xp",
     "cost": 20,
     "unlimited": false,
-    "items_left": 30
+    "items_left": 30,
+    "aliases": []
   },
   "1000xp": {
     "name": "1000 xp",
@@ -42,7 +46,8 @@
     "id": "1000xp",
     "cost": 150,
     "unlimited": false,
-    "items_left": 15
+    "items_left": 15,
+    "aliases": []
   },
   "basic_crate": {
     "name": "basic crate",
@@ -51,7 +56,8 @@
     "id": "basic_crate",
     "cost": 30,
     "unlimited": false,
-    "items_left": 30
+    "items_left": 30,
+    "aliases": ["basic"]
   },
   "karma_scratch_card": {
     "name": "karma scratch card",
@@ -60,7 +66,8 @@
     "id": "karma_scratch_card",
     "cost": 25,
     "unlimited": false,
-    "items_left": 30
+    "items_left": 30,
+    "aliases": ["karma"]
   },
   "legendary_scratch_card": {
     "name": "legendary scratch card",
@@ -69,7 +76,8 @@
     "id": "legendary_scratch_card",
     "cost": 500,
     "unlimited": false,
-    "items_left": 2
+    "items_left": 2,
+    "aliases": ["legendary"]
   },
   "nypsi_crate": {
     "name": "nypsi crate",
@@ -78,7 +86,8 @@
     "id": "nypsi_crate",
     "cost": 300,
     "unlimited": false,
-    "items_left": 2
+    "items_left": 2,
+    "aliases": ["nypsi"]
   },
   "gem_crate": {
     "name": "gem crate",
@@ -87,6 +96,7 @@
     "id": "gem_crate",
     "cost": 1500,
     "unlimited": false,
-    "items_left": 1
+    "items_left": 1,
+    "aliases": ["gem"]
   }
 }

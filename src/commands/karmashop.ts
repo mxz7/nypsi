@@ -307,6 +307,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       } else if (searchTag == itemName.split("_").join("")) {
         selected = itemName;
         break;
+      } else if (items[itemName].aliases) {
+        for (const alias of items[itemName].aliases) {
+          if (alias === searchTag) {
+            selected = itemName;
+            break;
+          }
+        }
       }
     }
 

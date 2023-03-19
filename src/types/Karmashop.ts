@@ -6,4 +6,5 @@ export interface KarmaShopItem {
   cost: number;
   unlimited: boolean;
   items_left: number;
+  aliases: string[];
 }
