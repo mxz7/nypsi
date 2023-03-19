@@ -271,14 +271,14 @@ export async function startChatReactionDuel(
     }`
   );
 
-  await addProgress(winningMessage.author.id, "fast_typer", 1)
+  await addProgress(winningMessage.author.id, "fast_typer", 1);
 
   const gameId = await createGame({
     bet: wager,
     game: "chatreactionduel",
     outcome: `${winningMessage.author.username} won in ${winTime}s vs ${
       winningMessage.author.id === challenger.user.id ? target.user.username : challenger.user.username
-    }`,
+    }\nword: ${word.actual}`,
     userId: challenger.user.id,
     win: winningMessage.author.id === challenger.user.id,
     earned: winningMessage.author.id === challenger.user.id ? winnings : 0,
@@ -289,7 +289,7 @@ export async function startChatReactionDuel(
     game: "chatreactionduel",
     outcome: `${winningMessage.author.username} won in ${winTime}s vs ${
       winningMessage.author.id === target.user.id ? challenger.user.username : target.user.username
-    }`,
+    }\nword: ${word.actual}`,
     userId: target.user.id,
     win: winningMessage.author.id === target.user.id,
     earned: winningMessage.author.id === target.user.id ? winnings : 0,
