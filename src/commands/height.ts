@@ -75,7 +75,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (cache.has(member.user.id)) {
     size = cache.get(member.user.id);
     feet = size.split("'")[0];
-    inches = size.split("'")[1];
+    inches = parseInt(size.split("'")[1]);
   } else {
     feet = Math.floor(Math.random() * 6) + 4;
     inches = Math.floor(Math.random() * 12);
