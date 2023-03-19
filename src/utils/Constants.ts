@@ -37,6 +37,7 @@ export default {
         LAST_COMMAND: "cache:user:lastcmd",
         LASTFM: "cache:user:lastfm",
         TRACKING: "cache:user:tracking",
+        ADMIN_LEVEL: "cache:user:adminlvl",
       },
       guild: {
         EXISTS: "cache:guild:exists",
