@@ -39,6 +39,7 @@ import { getMember } from "../utils/functions/member";
 import PageManager from "../utils/functions/page";
 import { isPremium } from "../utils/functions/premium/premium";
 import sleep from "../utils/functions/sleep";
+import { getPreferences } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("chatreaction", "see who can type the fastest", "fun")
@@ -405,8 +406,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (!wager) wager = 0;
     if (isNaN(wager)) wager = 0;
 
-    if ((await isEcoBanned(target.user.id)) && wager > 0)
-      return send({ embeds: [new ErrorEmbed("this user is banned from nypsi")] });
+    if (!(await getPreferences(target.user.id)).duelRequests) {
+      return send({ embeds: [new ErrorEmbed(`${target.user.toString()} has requests disabled`)] });
+    }
+
+    if ((await isEcoBanned(target.user.id)) && wager > 0) return send({ embeds: [new ErrorEmbed("they are banned. lol.")] });
 
     if ((await getBalance(message.member)) < wager) return send({ embeds: [new ErrorEmbed("you cannot afford this")] });
 
