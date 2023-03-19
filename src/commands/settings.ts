@@ -356,7 +356,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       );
 
       // @ts-expect-error hate life innit
-      if (typeof settings[settingId] === "number" || typeof settings[settingId] == "bigint") {
+      if (typeof settings[settingId] === "number") {
         const boobies = [
           new ButtonBuilder().setCustomId("enable").setLabel("set value").setStyle(ButtonStyle.Success),
           new ButtonBuilder()
@@ -471,7 +471,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         const selected = options.find((o) => o.data.default).data.value;
 
         // @ts-expect-error grr
-        if (typeof settings[settingId] === "number" || typeof settings[settingId] == "bigint") {
+        if (typeof settings[selected] == "number") {
           const modal = new ModalBuilder().setCustomId("settings-update").setTitle("net worth notifications");
 
           modal.addComponents(
@@ -498,7 +498,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
           const value = formatNumber(modalResponse.fields.fields.first().value.toLowerCase());
 
-          if (typeof value !== "number" && typeof value !== "bigint") {
+          if (typeof value !== "number") {
             await modalResponse.reply({ embeds: [new ErrorEmbed("invalid value. must a number. use 0 to disable")] });
           } else {
             // @ts-expect-error ts is a loser !
@@ -521,7 +521,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         await res.deferUpdate();
 
         // @ts-expect-error doesnt like doing this!
-        if (typeof settings[settingId] === "number" || typeof settings[settingId] == "bigint") {
+        if (typeof settings[selected] === "number") {
           // @ts-expect-error doesnt like doing this!
           settings[selected] = 0;
         } else {
