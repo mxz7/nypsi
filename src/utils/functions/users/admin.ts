@@ -8,7 +8,7 @@ export async function getAdminLevel(userId: string) {
     return parseInt(await redis.get(`${Constants.redis.cache.user.ADMIN_LEVEL}:${userId}`));
   }
 
-  const query = await prisma.user.findUnique({
+  let query = await prisma.user.findUnique({
     where: {
       id: userId,
     },
@@ -16,6 +16,12 @@ export async function getAdminLevel(userId: string) {
       adminLevel: true,
     },
   });
+
+  if (!query) {
+    query = {
+      adminLevel: 0,
+    };
+  }
 
   await redis.set(`${Constants.redis.cache.user.ADMIN_LEVEL}:${userId}`, query.adminLevel);
   await redis.expire(`${Constants.redis.cache.user.ADMIN_LEVEL}:${userId}`, Math.floor(ms("3 hours") / 1000));
