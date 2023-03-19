@@ -74,7 +74,7 @@ export async function calcEarnedXp(member: GuildMember, bet: number, multiplier:
   const inventory = await getInventory(member);
 
   if (guildLevel) {
-    max += guildLevel > 10 ? 10 : guildLevel - 1;
+    max += guildLevel;
   }
 
   if (prestige) {

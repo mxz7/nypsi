@@ -392,9 +392,7 @@ async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
       desc.push(" +**1**% multiplier");
     }
 
-    if (guild.level < 10) {
-      desc.push(" +**1** max xp gain");
-    }
+    desc.push(" +**1** max xp gain");
 
     embed.setHeader(guild.guildName);
     embed.setDescription(desc.join("\n"));
