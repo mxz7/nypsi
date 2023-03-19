@@ -73,7 +73,7 @@ if (!isMainThread) {
         })
         .then((r) => r?.lastKnownTag);
 
-      await appendFile(`/tmp/${fileName}`, `\n${tag || userId},${balances.join(",")}`);
+      await appendFile(`/tmp/${fileName}`, `\n${tag.replace(",", "") || userId},${balances.join(",")}`);
     }
   };
 
