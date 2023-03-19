@@ -161,7 +161,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           },
           Username: true,
           WordleStats: true,
-
+          Preferences: true,
           CommandUse: true,
           Achievements: true,
           DMSettings: true,
