@@ -15,6 +15,7 @@ import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
+import { b, c } from "../utils/functions/anticheat";
 import { getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
 import { getItems, isEcoBanned } from "../utils/functions/economy/utils";
 import { getAdminLevel, setAdminLevel } from "../utils/functions/users/admin";
@@ -283,6 +284,25 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           return waitForButton();
         }
         await setAdminLevel(user.id, parseInt(msg.content));
+      } else if (res.customId === "ac-hist") {
+        if ((await getAdminLevel(message.author.id)) < 1) {
+          await res.editReply({ embeds: [new ErrorEmbed("you require admin level **2** to do this")] });
+          return waitForButton();
+        }
+        const data = b(user.id);
+
+        await res.editReply({ embeds: [new CustomEmbed(message.member, `\`\`\`${JSON.stringify(data, null, 2)}\`\`\``)] });
+        return waitForButton();
+      } else if (res.customId === "ac-clear") {
+        if ((await getAdminLevel(message.author.id)) < 1) {
+          await res.editReply({ embeds: [new ErrorEmbed("you require admin level **3** to do this")] });
+          return waitForButton();
+        }
+
+        c(user.id);
+
+        await res.editReply({ content: "✅" });
+        return waitForButton();
       }
     };
     return waitForButton();
