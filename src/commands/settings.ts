@@ -71,13 +71,16 @@ cmd.slashData
           )
       )
       .addSubcommand((email) => email.setName("email").setDescription("get/set your email for purchases"))
+      .addSubcommand((lastfm) =>
+        lastfm
+          .setName("lastfm")
+          .setDescription("set your last.fm username")
+          .addStringOption((option) =>
+            option.setName("username").setDescription("your username on last.fm").setRequired(false)
+          )
+      )
   )
-  .addSubcommand((lastfm) =>
-    lastfm
-      .setName("lastfm")
-      .setDescription("set your last.fm username")
-      .addStringOption((option) => option.setName("username").setDescription("your username on last.fm").setRequired(false))
-  )
+
   .addSubcommandGroup((server) =>
     server
       .setName("server")
