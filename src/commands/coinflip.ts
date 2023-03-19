@@ -18,6 +18,7 @@ import { createUser, formatBet, isEcoBanned, userExists } from "../utils/functio
 import { getMember } from "../utils/functions/member.js";
 import { isPremium } from "../utils/functions/premium/premium";
 import { addToNypsiBank, getTax } from "../utils/functions/tax";
+import { getPreferences } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 import { gamble } from "../utils/logger.js";
 
@@ -99,6 +100,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (target.user.bot) {
     return send({ embeds: [new ErrorEmbed("invalid user")] });
+  }
+
+  if (!(await getPreferences(target.user.id)).duelRequests) {
+    return send({ embeds: [new ErrorEmbed(`${target.user.toString()} has requests disabled`)] });
   }
 
   if (playing.has(target.user.id))

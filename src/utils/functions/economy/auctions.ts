@@ -23,7 +23,7 @@ import { logger, transaction } from "../../logger";
 import { getTier, isPremium } from "../premium/premium";
 import requestDM from "../requestdm";
 import { addToNypsiBank, getTax } from "../tax";
-import { addNotificationToQueue, getDmSettings } from "../users/notifications";
+import { addNotificationToQueue, getDmSettings, getPreferences } from "../users/notifications";
 import { getBalance, updateBalance } from "./balance";
 import { addInventoryItem } from "./inventory";
 import { createUser, getItems, userExists } from "./utils";
@@ -503,7 +503,9 @@ export async function buyFullAuction(interaction: ButtonInteraction, auction: Au
     beingBought.delete(auction.id);
   }, ms("5 minutes"));
 
-  if (auction.bin >= 10_000_000) {
+  const preferences = await getPreferences(interaction.user.id);
+
+  if (auction.bin >= preferences.auctionConfirm && Number(preferences.auctionConfirm) !== 0) {
     beingBought.delete(auction.id);
     const modalResponse = await showAuctionConfirmation(interaction, Number(auction.bin)).catch(() => {});
 
