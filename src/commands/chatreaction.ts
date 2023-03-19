@@ -14,8 +14,10 @@ import {
   PermissionFlagsBits,
   TextChannel,
 } from "discord.js";
+import redis from "../init/redis";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import Constants from "../utils/Constants";
 import { getBlacklisted, setBlacklisted } from "../utils/functions/chatreactions/blacklisted";
 import { startChatReactionDuel, startOpenChatReaction } from "../utils/functions/chatreactions/game";
 import {
@@ -385,6 +387,22 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   } else if (args[0].toLowerCase() == "leaderboard" || args[0].toLowerCase() == "lb" || args[0].toLowerCase() == "top") {
     return showLeaderboard();
   } else if (["duel", "1v1", "wager"].includes(args[0].toLowerCase())) {
+    if ((await redis.get(Constants.redis.nypsi.RESTART)) == "t") {
+      if (message.author.id == Constants.TEKOH_ID && message instanceof Message) {
+        message.react("💀");
+      } else {
+        if (message instanceof Message) {
+          return message.channel.send({
+            embeds: [new CustomEmbed(message.member, "nypsi is rebooting, try again in a few minutes")],
+          });
+        } else {
+          return message.reply({
+            embeds: [new CustomEmbed(message.member, "nypsi is rebooting, try again in a few minutes")],
+          });
+        }
+      }
+    }
+
     if (await isEcoBanned(message.author.id)) return send({ embeds: [new ErrorEmbed("you cant do this")] });
     if (args.length < 2) return send({ embeds: [new ErrorEmbed("/chatreaction duel <member> (wager)")] });
 
