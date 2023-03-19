@@ -449,7 +449,7 @@ export async function commandGemCheck(member: GuildMember, commandCategory: Comm
   if (gemChanceCooldown.has(member.user.id)) return;
   gemChanceCooldown.add(member.user.id);
 
-  if (percentChance(0.0001)) {
+  if (percentChance(0.001)) {
     await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t");
     await redis.expire(Constants.redis.nypsi.GEM_GIVEN, Math.floor(ms("1 days") / 1000));
     const gems = ["green_gem", "blue_gem", "purple_gem", "pink_gem"];
@@ -472,7 +472,7 @@ export async function commandGemCheck(member: GuildMember, commandCategory: Comm
   }
 
   if (commandCategory == "moderation") {
-    if (percentChance(0.02)) {
+    if (percentChance(0.07)) {
       await addInventoryItem(member, "pink_gem", 1);
       addProgress(member.user.id, "gem_hunter", 1);
 
@@ -491,7 +491,7 @@ export async function commandGemCheck(member: GuildMember, commandCategory: Comm
       }
     }
   } else if (commandCategory == "animals" || commandCategory == "nsfw") {
-    if (percentChance(0.001)) {
+    if (percentChance(0.007)) {
       await addInventoryItem(member, "purple_gem", 1);
       addProgress(member.user.id, "gem_hunter", 1);
 
