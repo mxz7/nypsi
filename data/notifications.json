@@ -1,66 +1,80 @@
 {
-  "rob": {
-    "id": "rob",
-    "name": "robbery notifications",
-    "description": "get a dm when someone attempts to rob you"
+  "notifications": {
+    "rob": {
+      "id": "rob",
+      "name": "robbery notifications",
+      "description": "get a dm when someone attempts to rob you"
+    },
+    "lottery": {
+      "id": "lottery",
+      "name": "lottery notifications",
+      "description": "get a dm when you win the lottery"
+    },
+    "premium": {
+      "id": "premium",
+      "name": "premium notifications",
+      "description": "get dm notifications for updates on your premium membership"
+    },
+    "auction": {
+      "id": "auction",
+      "name": "auction notifications",
+      "description": "get a dm when someone buys your auctions"
+    },
+    "vote": {
+      "id": "vote",
+      "name": "vote notificatons",
+      "description": "get a dm when you vote to show your rewards for voting"
+    },
+    "voteReminder": {
+      "id": "voteReminder",
+      "name": "vote reminders",
+      "description": "receive a reminder in your dms when you are able to vote again\n\n+**2**% multiplier"
+    },
+    "worker": {
+      "id": "worker",
+      "name": "worker notifications",
+      "description": "get a dm when one of your workers has reached full capacity",
+      "types": [
+        { "name": "disabled", "description": "no worker notifications", "value": "Disabled" },
+        {
+          "name": "only when full",
+          "description": "only receive a notification when all of your workers are full",
+          "value": "OnlyWhenFull"
+        },
+        { "name": "all", "description": "receive a notification when any amount of workers are full", "value": "All" }
+      ]
+    },
+    "booster": {
+      "id": "booster",
+      "name": "booster notifications",
+      "description": "get a dm when one or more of your boosters have expired"
+    },
+    "payment": {
+      "id": "payment",
+      "name": "payment notifications",
+      "description": "get a dm when someone sends you money or gives you an item"
+    },
+    "netWorth": {
+      "id": "netWorth",
+      "name": "net worth updates",
+      "description": "get a dm when your net worth changes by the amount set. currently: ${VALUE}"
+    },
+    "other": {
+      "id": "other",
+      "name": "miscellaneous",
+      "description": "get a dm for miscellaneous things, such as guild level upgrades"
+    }
   },
-  "lottery": {
-    "id": "lottery",
-    "name": "lottery notifications",
-    "description": "get a dm when you win the lottery"
-  },
-  "premium": {
-    "id": "premium",
-    "name": "premium notifications",
-    "description": "get dm notifications for updates on your premium membership"
-  },
-  "auction": {
-    "id": "auction",
-    "name": "auction notifications",
-    "description": "get a dm when someone buys your auctions"
-  },
-  "vote": {
-    "id": "vote",
-    "name": "vote notificatons",
-    "description": "get a dm when you vote to show your rewards for voting"
-  },
-  "voteReminder": {
-    "id": "voteReminder",
-    "name": "vote reminders",
-    "description": "receive a reminder in your dms when you are able to vote again\n\n+**2**% multiplier"
-  },
-  "worker": {
-    "id": "worker",
-    "name": "worker notifications",
-    "description": "get a dm when one of your workers has reached full capacity",
-    "types": [
-      { "name": "disabled", "description": "no worker notifications", "value": "Disabled" },
-      {
-        "name": "only when full",
-        "description": "only receive a notification when all of your workers are full",
-        "value": "OnlyWhenFull"
-      },
-      { "name": "all", "description": "receive a notification when any amount of workers are full", "value": "All" }
-    ]
-  },
-  "booster": {
-    "id": "booster",
-    "name": "booster notifications",
-    "description": "get a dm when one or more of your boosters have expired"
-  },
-  "payment": {
-    "id": "payment",
-    "name": "payment notifications",
-    "description": "get a dm when someone sends you money or gives you an item"
-  },
-  "netWorth": {
-    "id": "netWorth",
-    "name": "net worth updates",
-    "description": "get a dm when your net worth changes by the amount set. currently: ${VALUE}"
-  },
-  "other": {
-    "id": "other",
-    "name": "miscellaneous",
-    "description": "get a dm for miscellaneous things, such as guild level upgrades"
+  "preferences": {
+    "duelRequests": {
+      "id": "duelRequests",
+      "name": "duel requests",
+      "description": "receive coinflip/chatreaction requests"
+    },
+    "auctionConfirm": {
+      "id": "auctionConfirm",
+      "name": "auction confirmation",
+      "description": "require auction confirmation on items more expensive than: ${VALUE} (0 = never)"
+    }
   }
 }
