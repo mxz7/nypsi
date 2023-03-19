@@ -21,6 +21,7 @@ import { getItems, isEcoBanned } from "../utils/functions/economy/utils";
 import { getAdminLevel, setAdminLevel } from "../utils/functions/users/admin";
 import { isUserBlacklisted } from "../utils/functions/users/blacklist";
 import { getCommandUses } from "../utils/functions/users/commands";
+import { hasProfile } from "../utils/functions/users/utils";
 import { logger } from "../utils/logger";
 
 const cmd = new Command("x", "admincmd", "none").setPermissions(["bot owner"]);
@@ -176,6 +177,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       user.createdTimestamp / 1000
     )}:R>\nadmin level: ${await getAdminLevel(user.id)}`;
 
+    if (!(await hasProfile(user.id))) desc += "\n**has no user profile**";
+
     if (await isUserBlacklisted(user.id)) {
       desc += "\n**currently blacklisted**";
     } else if (await isEcoBanned(user.id)) {
@@ -284,6 +287,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           return waitForButton();
         }
         await setAdminLevel(user.id, parseInt(msg.content));
+        await res.editReply({ embeds: [new CustomEmbed(message.member, "✅")] });
+        return waitForButton();
       } else if (res.customId === "ac-hist") {
         if ((await getAdminLevel(message.author.id)) < 1) {
           await res.editReply({ embeds: [new ErrorEmbed("you require admin level **2** to do this")] });
