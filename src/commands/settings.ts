@@ -1,4 +1,4 @@
-import { DMSettings } from "@prisma/client";
+import { DMSettings, Preferences } from "@prisma/client";
 import {
   ActionRowBuilder,
   BaseMessageOptions,
@@ -26,7 +26,14 @@ import { setSlashOnly } from "../utils/functions/guilds/slash";
 import { cleanString } from "../utils/functions/string";
 import { checkPurchases, getEmail, setEmail } from "../utils/functions/users/email";
 import { getLastfmUsername, setLastfmUsername } from "../utils/functions/users/lastfm";
-import { getDmSettings, getNotificationsData, updateDmSettings } from "../utils/functions/users/notifications";
+import {
+  getDmSettings,
+  getNotificationsData,
+  getPreferences,
+  getPreferencesData,
+  updateDmSettings,
+  updatePreferences,
+} from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import ms = require("ms");
 
@@ -40,6 +47,9 @@ cmd.slashData
       .setDescription("modify your own settings")
       .addSubcommand((notifications) =>
         notifications.setName("notifications").setDescription("manage your notifications settings")
+      )
+      .addSubcommand((notifications) =>
+        notifications.setName("preferences").setDescription("manage your personal preferences")
       )
       .addSubcommand((passive) =>
         passive
@@ -324,6 +334,211 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return pageManager();
   };
 
+  const showPreferences = async (settingId?: string) => {
+    const preferencesData = getPreferencesData();
+
+    const showSetting = async (
+      settings: Preferences,
+      settingId: string,
+      options: StringSelectMenuOptionBuilder[],
+      msg?: Message
+    ) => {
+      const embed = new CustomEmbed(message.member).setHeader(preferencesData[settingId].name);
+
+      embed.setDescription(
+        // @ts-expect-error loser
+        preferencesData[settingId].description.replace("{VALUE}", settings[settingId].toLocaleString())
+      );
+
+      const userSelection = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder().setCustomId("enable-setting").setLabel("enable").setStyle(ButtonStyle.Success),
+        new ButtonBuilder().setCustomId("disable-setting").setLabel("disable").setStyle(ButtonStyle.Danger)
+      );
+
+      // @ts-expect-error hate life innit
+      if (typeof settings[settingId] === "number") {
+        const boobies = [
+          new ButtonBuilder().setCustomId("enable").setLabel("set value").setStyle(ButtonStyle.Success),
+          new ButtonBuilder()
+            .setCustomId("disable")
+            .setLabel("disable")
+            .setStyle(ButtonStyle.Danger)
+            // @ts-expect-error gay
+            .setDisabled(settings[settingId] === 0),
+        ];
+
+        userSelection.setComponents(boobies);
+      } else if (preferencesData[settingId].types) {
+        const boobies: StringSelectMenuOptionBuilder[] = [];
+
+        for (const type of preferencesData[settingId].types) {
+          const option = new StringSelectMenuOptionBuilder()
+            .setLabel(type.name)
+            .setDescription(type.description)
+            .setValue(type.value);
+
+          //@ts-expect-error silly ts
+          if (settings[settingId] == type.value) {
+            option.setDefault(true);
+          }
+
+          boobies.push(option);
+        }
+
+        userSelection.setComponents(new StringSelectMenuBuilder().setCustomId("typesetting").setOptions(boobies));
+      } else {
+        // @ts-expect-error annoying grr
+        if (settings[settingId]) {
+          userSelection.components[0].setDisabled(true);
+        } else {
+          userSelection.components[1].setDisabled(true);
+        }
+      }
+
+      if (!msg) {
+        return await send({
+          embeds: [embed],
+          components: [
+            new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+              new StringSelectMenuBuilder().setCustomId("setting").setOptions(options)
+            ),
+            userSelection,
+          ],
+        });
+      } else {
+        return await msg.edit({
+          embeds: [embed],
+          components: [
+            new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+              new StringSelectMenuBuilder().setCustomId("setting").setOptions(options)
+            ),
+            userSelection,
+          ],
+        });
+      }
+    };
+
+    let settings = await getPreferences(message.member);
+
+    const options: StringSelectMenuOptionBuilder[] = [];
+
+    for (const settingId of Object.keys(preferencesData)) {
+      options.push(new StringSelectMenuOptionBuilder().setValue(settingId).setLabel(preferencesData[settingId].name));
+    }
+
+    if (settingId) {
+      options.find((o) => o.data.value == settingId).setDefault(true);
+    } else {
+      options[0].setDefault(true);
+    }
+
+    let msg = await showSetting(settings, settingId || options[0].data.value, options);
+
+    const filter = (i: Interaction) => i.user.id == message.author.id;
+
+    const pageManager: any = async () => {
+      const res = await msg.awaitMessageComponent({ filter, time: 30_000 }).catch(() => {});
+
+      if (!res) {
+        msg.edit({ components: [] });
+        return;
+      }
+
+      if (res.isStringSelectMenu() && res.customId == "setting") {
+        for (const option of options) {
+          option.setDefault(false);
+
+          if (option.data.value == res.values[0]) option.setDefault(true);
+        }
+
+        await res.deferUpdate();
+
+        msg = await showSetting(settings, res.values[0], options, res.message);
+        return pageManager();
+      } else if (res.isStringSelectMenu() && res.customId == "typesetting") {
+        const selected = options.find((o) => o.data.default).data.value;
+        const value = preferencesData[selected].types.find((x) => x.value == res.values[0]);
+
+        // @ts-expect-error silly ts
+        settings[selected] = value.value;
+        await res.deferUpdate();
+
+        settings = await updatePreferences(message.member, settings);
+        msg = await showSetting(settings, selected, options, res.message);
+
+        return pageManager();
+      } else if (res.customId.startsWith("enable")) {
+        const selected = options.find((o) => o.data.default).data.value;
+
+        // @ts-expect-error grr
+        if (typeof settings[selected] == "number") {
+          const modal = new ModalBuilder().setCustomId("settings-update").setTitle("net worth notifications");
+
+          modal.addComponents(
+            new ActionRowBuilder<TextInputBuilder>().addComponents(
+              new TextInputBuilder()
+                .setCustomId("val")
+                .setLabel("amount to be notified for")
+                .setPlaceholder("number")
+                .setStyle(TextInputStyle.Short)
+                .setRequired(true)
+                .setMinLength(0)
+            )
+          );
+
+          await res.showModal(modal);
+
+          const filter = (i: Interaction) => i.user.id == res.user.id;
+
+          const modalResponse = await res.awaitModalSubmit({ filter, time: 120000 }).catch(() => {});
+
+          if (!modalResponse) return;
+
+          if (!modalResponse.isModalSubmit()) return;
+
+          const value = formatNumber(modalResponse.fields.fields.first().value.toLowerCase());
+
+          if (typeof value !== "number") {
+            await modalResponse.reply({ embeds: [new ErrorEmbed("invalid value. must a number. use 0 to disable")] });
+          } else {
+            // @ts-expect-error ts is a loser !
+            settings[selected] = value;
+            await modalResponse.deferUpdate();
+          }
+        } else {
+          // @ts-expect-error doesnt like doing this!
+          settings[selected] = true;
+          await res.deferUpdate();
+        }
+
+        settings = await updatePreferences(message.member, settings);
+        msg = await showSetting(settings, selected, options, res.message);
+
+        return pageManager();
+      } else if (res.customId.startsWith("disable")) {
+        const selected = options.find((o) => o.data.default).data.value;
+
+        await res.deferUpdate();
+
+        // @ts-expect-error doesnt like doing this!
+        if (typeof settings[selected] === "number") {
+          // @ts-expect-error doesnt like doing this!
+          settings[selected] = 0;
+        } else {
+          // @ts-expect-error doesnt like doing this!
+          settings[selected] = false;
+        }
+
+        settings = await updatePreferences(message.member, settings);
+        msg = await showSetting(settings, selected, options, res.message);
+
+        return pageManager();
+      }
+    };
+
+    return pageManager();
+  };
+
   const defaultBet = async () => {
     if (!(await userExists(message.member))) await createUser(message.member);
 
@@ -581,6 +796,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   } else if (args[0].toLowerCase() == "me") {
     if (args[1].toLowerCase() == "notifications") {
       return showDmSettings();
+    } else if (args[1].toLowerCase() == "preferences") {
+      return showPreferences();
     } else if (args[1].toLowerCase() == "defaultbet") {
       return defaultBet();
     } else if (args[1].toLowerCase() == "lastfm") {
