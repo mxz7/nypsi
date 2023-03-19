@@ -1,72 +1,38 @@
-import { CommandInteraction, Message, User } from "discord.js";
+import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  CommandInteraction,
+  Interaction,
+  Message,
+  MessageActionRowComponentBuilder,
+  User,
+} from "discord.js";
 import * as fs from "fs/promises";
 import prisma from "../init/database";
+import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
-import { formatDate } from "../utils/functions/date";
 import { getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
-import { getItems } from "../utils/functions/economy/utils";
-import { fetchUsernameHistory } from "../utils/functions/users/history";
+import { getItems, isEcoBanned } from "../utils/functions/economy/utils";
+import { getAdminLevel, setAdminLevel } from "../utils/functions/users/admin";
+import { isUserBlacklisted } from "../utils/functions/users/blacklist";
+import { getCommandUses } from "../utils/functions/users/commands";
 import { logger } from "../utils/logger";
 
 const cmd = new Command("x", "admincmd", "none").setPermissions(["bot owner"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (!(message instanceof Message)) return;
-  if (!Constants.ADMIN_IDS.includes(message.author.id)) return message.react("🫦");
+  if ((await getAdminLevel(message.author.id)) < 1) return message.react("🫦");
 
-  const showUser = async (id: string) => {
-    const res = await (message.client as NypsiClient).cluster.broadcastEval(
-      async (c, { userId }) => {
-        const g = await c.users.fetch(userId);
-
-        return g;
-      },
-      { context: { userId: id } }
-    );
-
-    let user: User;
-
-    for (const i of res) {
-      if ((i as any).username) {
-        user = i as User;
-        break;
-      }
-    }
-
-    if (!user) {
-      message.react("❌");
-      user = {} as User;
-    }
-
-    const embed = new CustomEmbed(
-      message.member,
-      `tag: ${user?.username}#${user?.discriminator}\nid: ${user?.id}\ncreated: <t:${Math.floor(
-        user.createdTimestamp / 1000
-      )}:R>`
-    ).setHeader("discord");
-
-    const usernameHistory = await fetchUsernameHistory(user.id);
-
-    if (usernameHistory.length > 0) {
-      let msg = "";
-
-      let count = 0;
-      for (const un of usernameHistory) {
-        if (count >= 10) break;
-        msg += `\`${un.value}\` | \`${formatDate(un.date)}\`\n`;
-        count++;
-      }
-
-      embed.addField("username history", msg, true);
-    }
-
-    logger.info(`fetching data for ${id}...`);
+  const getDbData = async (user: User) => {
+    logger.info(`fetching data for ${user.id}...`);
     const userData = await prisma.user.findUnique({
       where: {
-        id: id,
+        id: user.id,
       },
       include: {
         Economy: {
@@ -104,7 +70,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const moderationCases = await prisma.moderationCase.findMany({
       where: {
-        user: id,
+        user: user.id,
       },
     });
 
@@ -118,25 +84,25 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const moderationMutes = await prisma.moderationMute.findMany({
       where: {
-        userId: id,
+        userId: user.id,
       },
     });
 
     const moderationBans = await prisma.moderationBan.findMany({
       where: {
-        userId: id,
+        userId: user.id,
       },
     });
 
     const chatReactionStats = await prisma.chatReactionStats.findMany({
       where: {
-        userId: id,
+        userId: user.id,
       },
     });
 
-    const file = `/tmp/nypsi_data_${id}.txt`;
+    const file = `/tmp/nypsi_data_${user.id}.txt`;
 
-    logger.info(`packing into text file for ${id}...`);
+    logger.info(`packing into text file for ${user.id}...`);
 
     await fs.writeFile(
       file,
@@ -178,7 +144,148 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const buffer = await fs.readFile(file);
 
-    return message.channel.send({ embeds: [embed], files: [{ attachment: buffer, name: `data_for_${user.id}.txt` }] });
+    return { attachment: buffer, name: `data_for_${user.id}.txt` };
+  };
+
+  const showUser = async (id: string) => {
+    const res = await (message.client as NypsiClient).cluster.broadcastEval(
+      async (c, { userId }) => {
+        const g = await c.users.fetch(userId);
+
+        return g;
+      },
+      { context: { userId: id } }
+    );
+
+    let user: User;
+
+    for (const i of res) {
+      if ((i as any).username) {
+        user = i as User;
+        break;
+      }
+    }
+
+    if (!user) {
+      message.react("❌");
+      user = {} as User;
+    }
+
+    let desc = `tag: ${user?.username}#${user?.discriminator}\nid: ${user?.id}\ncreated: <t:${Math.floor(
+      user.createdTimestamp / 1000
+    )}:R>\nadmin level: ${await getAdminLevel(user.id)}`;
+
+    if (await isUserBlacklisted(user.id)) {
+      desc += "\n**currently blacklisted**";
+    } else if (await isEcoBanned(user.id)) {
+      desc += "\n**currently economy banned**";
+    }
+
+    const embed = new CustomEmbed(message.member, desc).setHeader(`${user.username}'s discord data`);
+
+    const rows: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [
+      new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder().setCustomId("db-data").setLabel("view all db data").setStyle(ButtonStyle.Primary).setEmoji("💻"),
+        new ButtonBuilder().setCustomId("cmds").setLabel("command count").setStyle(ButtonStyle.Primary).setEmoji("⌨️"),
+        new ButtonBuilder().setCustomId("view-premium").setLabel("premium").setStyle(ButtonStyle.Primary).setEmoji("💎"),
+        new ButtonBuilder().setCustomId("set-admin").setLabel("set admin level").setStyle(ButtonStyle.Primary).setEmoji("👨🏻‍💼")
+      ),
+      new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder().setCustomId("ac-hist").setLabel("anticheat info").setStyle(ButtonStyle.Primary).setEmoji("🤥"),
+        new ButtonBuilder().setCustomId("ac-clear").setLabel("clear violations").setStyle(ButtonStyle.Primary).setEmoji("😃")
+      ),
+      new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder().setCustomId("set-bal").setLabel("set balance").setStyle(ButtonStyle.Danger).setEmoji("💰"),
+        new ButtonBuilder().setCustomId("set-bank").setLabel("set bank").setStyle(ButtonStyle.Danger).setEmoji("💳"),
+        new ButtonBuilder().setCustomId("set-prestige").setLabel("set prestige").setStyle(ButtonStyle.Danger).setEmoji("🌟"),
+        new ButtonBuilder().setCustomId("set-xp").setLabel("set xp").setStyle(ButtonStyle.Danger).setEmoji("✨"),
+        new ButtonBuilder().setCustomId("set-inv").setLabel("modify inventory").setStyle(ButtonStyle.Danger).setEmoji("🎒")
+      ),
+      new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder().setCustomId("set-karma").setLabel("set karma").setStyle(ButtonStyle.Danger).setEmoji("🔮"),
+        new ButtonBuilder().setCustomId("ecoban").setLabel("economy ban").setStyle(ButtonStyle.Danger).setEmoji("❌"),
+        new ButtonBuilder().setCustomId("blacklist").setLabel("blacklist").setStyle(ButtonStyle.Danger).setEmoji("❌")
+      ),
+    ];
+
+    const msg = await message.channel.send({ embeds: [embed], components: rows });
+
+    const waitForButton = async (): Promise<void> => {
+      const filter = (i: Interaction) => i.user.id == message.author.id;
+
+      const res = await msg.awaitMessageComponent({ filter, time: 120000 }).catch(async () => {
+        await msg.edit({ components: [] });
+      });
+
+      if (!res) return;
+
+      await res.deferReply();
+
+      if (res.customId === "db-data") {
+        if ((await getAdminLevel(message.author.id)) < 1) {
+          await res.editReply({ embeds: [new ErrorEmbed("you require admin level **1** to do this")] });
+          return waitForButton();
+        }
+
+        const files = [await getDbData(user)];
+
+        await res.editReply({ files });
+        return waitForButton();
+      } else if (res.customId === "cmds") {
+        if ((await getAdminLevel(message.author.id)) < 1) {
+          await res.editReply({ embeds: [new ErrorEmbed("you require admin level **1** to do this")] });
+          return waitForButton();
+        }
+        const uses = await getCommandUses(user.id);
+        const total = uses.map((x) => x.uses).reduce((a, b) => a + b);
+
+        const daily = parseInt(await redis.hget(Constants.redis.nypsi.TOP_COMMANDS_USER, user.tag));
+
+        const embed = new CustomEmbed(
+          message.member,
+          `**total** ${total.toLocaleString()}\n**daily** ${daily.toLocaleString()}\n\n${uses
+            .map((i) => `\`${i.command}\`: ${i.uses.toLocaleString()}`)
+            .join("\n")}`
+        );
+
+        await res.editReply({ embeds: [embed] });
+        return waitForButton();
+      } else if (res.customId === "view-premium") {
+        // dod later
+      } else if (res.customId === "set-admin") {
+        if ((await getAdminLevel(message.author.id)) < 69) {
+          await res.editReply({ embeds: [new ErrorEmbed("you require admin level **69** to do this")] });
+          return waitForButton();
+        }
+
+        await res.editReply({ embeds: [new CustomEmbed(message.member, "enter new admin level")] });
+
+        const msg = await message.channel
+          .awaitMessages({
+            filter: (msg: Message) => msg.author.id === message.author.id,
+            max: 1,
+            time: 30000,
+          })
+          .then((collected) => collected.first())
+          .catch(() => {
+            res.editReply({ embeds: [new CustomEmbed(message.member, "expired")] });
+          });
+
+        if (!msg) return;
+        if (!parseInt(msg.content)) {
+          await res.editReply({ embeds: [new CustomEmbed(message.member, "invalid value")] });
+          return waitForButton();
+        }
+        if (parseInt(msg.content) > (await getAdminLevel(message.author.id))) {
+          await res.editReply({
+            embeds: [new CustomEmbed(message.member, "nice try bozo ! suck this dick you wANK STAIN")],
+          });
+          return waitForButton();
+        }
+        await setAdminLevel(user.id, parseInt(msg.content));
+      }
+    };
+    return waitForButton();
   };
 
   const findId = async (tag: string) => {
