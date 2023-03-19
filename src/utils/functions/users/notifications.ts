@@ -87,7 +87,7 @@ export async function getPreferences(member: GuildMember | string) {
   }
 
   if (await redis.exists(`${Constants.redis.cache.user.PREFERENCES}:${id}`)) {
-    return (await JSON.parse(await redis.get(`${Constants.redis.cache.user.PREFERENCES}:${id}`))) as DMSettings;
+    return (await JSON.parse(await redis.get(`${Constants.redis.cache.user.PREFERENCES}:${id}`))) as Preferences;
   }
 
   let query = await prisma.preferences.findUnique({
