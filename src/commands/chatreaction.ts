@@ -407,7 +407,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (isNaN(wager)) wager = 0;
 
     if (!(await getPreferences(target.user.id)).duelRequests) {
-      return send({ embeds: [new ErrorEmbed(`${target.user.toString} has requests disabled`)] });
+      return send({ embeds: [new ErrorEmbed(`${target.user.toString()} has requests disabled`)] });
     }
 
     if ((await isEcoBanned(target.user.id)) && wager > 0) return send({ embeds: [new ErrorEmbed("they are banned. lol.")] });

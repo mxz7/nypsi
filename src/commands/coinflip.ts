@@ -103,7 +103,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   }
 
   if (!(await getPreferences(target.user.id)).duelRequests) {
-    return send({ embeds: [new ErrorEmbed(`${target.user.toString} has requests disabled`)] });
+    return send({ embeds: [new ErrorEmbed(`${target.user.toString()} has requests disabled`)] });
   }
 
   if (playing.has(target.user.id))
