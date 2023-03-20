@@ -236,6 +236,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       let description =
         `**tier** ${profile.getLevelString()}` +
+        `\n**booster** ${await isBooster(message.author.id)}` +
         `\n**started** ${timeStarted} (${timeAgo} days ago)` +
         `\n**expires** ${expires} (${timeUntil} days left)` +
         `\n\n**color** ${embedColor} - /premium color` +
@@ -254,6 +255,19 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       embed.setFooter({ text: "thank you so much for supporting!" });
 
       return send({ embeds: [embed] });
+    } else if (await isBooster(message.author.id)) {
+      const embed = new CustomEmbed(
+        message.member,
+        "you are currently boosting the nypsi server!! thank you, your booster rewards are seperate from premium, meaning that they can stack together.\n\nyou currently have no premium membership, this is what helps keep nypsi running, any donations are massively greatful :heart:"
+      );
+
+      embed.addField(
+        "payment methods",
+        "[ko-fi](https://ko-fi.com/tekoh/tiers)\n\n" +
+          "if you'd like to pay another way (crypto, paypal, etc) join the [support server](https://discord.gg/hJTDNST)"
+      );
+
+      return send({ embeds: [embed] });
     } else {
       const embed = new CustomEmbed(
         message.member,
@@ -262,8 +276,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       embed.addField(
         "payment methods",
-        "[ko-fi](https://ko-fi.com/tekoh/tiers)\n[patreon](https://patreon.com/join/nypsi)\n\n" +
-          "if you'd like to pay another way (crypto, paypal) join the [support server](https://discord.gg/hJTDNST)"
+        "[ko-fi](https://ko-fi.com/tekoh/tiers)\n\n" +
+          "if you'd like to pay another way (crypto, paypal, etc) join the [support server](https://discord.gg/hJTDNST)"
       );
 
       return send({ embeds: [embed] });
