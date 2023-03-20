@@ -16,6 +16,7 @@ import Constants from "../utils/Constants";
 import { daysAgo, daysUntil, formatDate } from "../utils/functions/date";
 import PageManager from "../utils/functions/page";
 import { addUserAlias, getUserAliases, removeUserAlias } from "../utils/functions/premium/aliases";
+import { isBooster, setBooster } from "../utils/functions/premium/boosters";
 import { getEmbedColor, setEmbedColor } from "../utils/functions/premium/color";
 import { getCommand, getUserCommand, setCommand } from "../utils/functions/premium/command";
 import {
@@ -154,9 +155,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const checkRoles = async () => {
     if (doingRoles) return;
     doingRoles = true;
+
     for (const guildMember of message.guild.members.cache.values()) {
       await sleep(250);
+
       const roleIds = Array.from(guildMember.roles.cache.keys());
+
+      if (roleIds.includes(Constants.BOOST_ROLE_ID)) {
+        if (!(await isBooster(guildMember.user.id))) await setBooster(guildMember.user.id, true).catch(() => {});
+      } else if (await isBooster(guildMember.user.id)) {
+        await setBooster(guildMember.user.id, false);
+      }
+
       if (!(await isPremium(guildMember)) || guildMember.user.id == Constants.TEKOH_ID) {
         // i dont want plat role lol
         if (roleIds.includes(Constants.PLATINUM_ROLE_ID)) guildMember.roles.remove(Constants.PLATINUM_ROLE_ID);
@@ -172,7 +182,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           requiredRole = Constants.BRONZE_ROLE_ID;
           break;
         case 2:
-          if (!roleIds.includes(Constants.BOOST_ROLE_ID)) requiredRole = Constants.SILVER_ROLE_ID;
+          requiredRole = Constants.SILVER_ROLE_ID;
           break;
         case 3:
           requiredRole = Constants.GOLD_ROLE_ID;
@@ -194,7 +204,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             requiredLevel = 3;
             break;
           case Constants.SILVER_ROLE_ID:
-            if (roleIds.includes(Constants.BOOST_ROLE_ID)) await guildMember.roles.remove(Constants.SILVER_ROLE_ID);
             requiredLevel = 2;
             break;
           case Constants.BRONZE_ROLE_ID:
@@ -210,11 +219,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   };
 
   const defaultMessage = async () => {
-    if (await isPremium(message.member)) {
-      if (message.guild.id == Constants.NYPSI_SERVER_ID) {
-        checkRoles();
-      }
+    if (message.guild.id == Constants.NYPSI_SERVER_ID) {
+      checkRoles();
+    }
 
+    if (await isPremium(message.member)) {
       const embed = new CustomEmbed(message.member);
 
       embed.setHeader("premium status", message.author.avatarURL());
@@ -230,6 +239,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       let description =
         `**tier** ${profile.getLevelString()}` +
+        `\n**booster** ${await isBooster(message.author.id)}` +
         `\n**started** ${timeStarted} (${timeAgo} days ago)` +
         `\n**expires** ${expires} (${timeUntil} days left)` +
         `\n\n**color** ${embedColor} - /premium color` +
@@ -248,6 +258,19 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       embed.setFooter({ text: "thank you so much for supporting!" });
 
       return send({ embeds: [embed] });
+    } else if (await isBooster(message.author.id)) {
+      const embed = new CustomEmbed(
+        message.member,
+        "you are currently boosting the nypsi server!! thank you, your booster rewards are seperate from premium, meaning that they can stack together.\n\nyou currently have no premium membership, this is what helps keep nypsi running, any donations are massively greatful :heart:"
+      );
+
+      embed.addField(
+        "payment methods",
+        "[ko-fi](https://ko-fi.com/tekoh/tiers)\n\n" +
+          "if you'd like to pay another way (crypto, paypal, etc) join the [support server](https://discord.gg/hJTDNST)"
+      );
+
+      return send({ embeds: [embed] });
     } else {
       const embed = new CustomEmbed(
         message.member,
@@ -256,8 +279,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       embed.addField(
         "payment methods",
-        "[ko-fi](https://ko-fi.com/tekoh/tiers)\n[patreon](https://patreon.com/join/nypsi)\n\n" +
-          "if you'd like to pay another way (crypto, paypal) join the [support server](https://discord.gg/hJTDNST)"
+        "[ko-fi](https://ko-fi.com/tekoh/tiers)\n\n" +
+          "if you'd like to pay another way (crypto, paypal, etc) join the [support server](https://discord.gg/hJTDNST)"
       );
 
       return send({ embeds: [embed] });
