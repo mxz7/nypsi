@@ -22,6 +22,7 @@ import { updateBalance, updateBankBalance } from "../utils/functions/economy/bal
 import { getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
 import { setPrestige } from "../utils/functions/economy/prestige";
 import { getItems, isEcoBanned } from "../utils/functions/economy/utils";
+import { addKarma, getKarma, removeKarma } from "../utils/functions/karma/karma";
 import { getUserAliases } from "../utils/functions/premium/aliases";
 import { addMember, getPremiumProfile, isPremium, setExpireDate, setTier } from "../utils/functions/premium/premium";
 import { getAdminLevel, setAdminLevel } from "../utils/functions/users/admin";
@@ -362,8 +363,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           return waitForButton();
         }
 
-        logger.info(`admin: ${message.author.tag} (${message.author.id}) set ${user.id} balance to ${message.content}`);
-        await updateBalance(user.id, parseInt(message.content));
+        logger.info(`admin: ${message.author.tag} (${message.author.id}) set ${user.id} balance to ${msg.content}`);
+        await updateBalance(user.id, parseInt(msg.content));
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "set-bank") {
@@ -398,8 +399,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           return waitForButton();
         }
 
-        logger.info(`admin: ${message.author.tag} (${message.author.id}) set ${user.id} bank balance to ${message.content}`);
-        await updateBankBalance(user.id, parseInt(message.content));
+        logger.info(`admin: ${message.author.tag} (${message.author.id}) set ${user.id} bank balance to ${msg.content}`);
+        await updateBankBalance(user.id, parseInt(msg.content));
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "set-prestige") {
@@ -429,8 +430,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           return waitForButton();
         }
 
-        logger.info(`admin: ${message.author.tag} (${message.author.id}) set ${user.id} prestige to ${message.content}`);
-        await setPrestige(user.id, parseInt(message.content));
+        logger.info(`admin: ${message.author.tag} (${message.author.id}) set ${user.id} prestige to ${msg.content}`);
+        await setPrestige(user.id, parseInt(msg.content));
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "set-inv") {
@@ -465,10 +466,51 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           return waitForButton();
         }
 
-        logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) set ${user.id} inventory item to ${message.content}`
-        );
-        await setInventoryItem(user.id, message.content.split(" ")[0], parseInt(message.content.split(" ")[1]));
+        logger.info(`admin: ${message.author.tag} (${message.author.id}) set ${user.id} inventory item to ${msg.content}`);
+        await setInventoryItem(user.id, msg.content.split(" ")[0], parseInt(msg.content.split(" ")[1]));
+        msg.react("✅");
+        return waitForButton();
+      } else if (res.customId === "set-karma") {
+        if ((await getAdminLevel(message.author.id)) < 4) {
+          await res.editReply({ embeds: [new ErrorEmbed("you require admin level **4** to do this")] });
+          return waitForButton();
+        }
+
+        await res.editReply({
+          embeds: [new CustomEmbed(message.member, "enter new karma value")],
+        });
+
+        const msg = await message.channel
+          .awaitMessages({
+            filter: (msg: Message) => msg.author.id === message.author.id,
+            max: 1,
+            time: 30000,
+          })
+          .then((collected) => collected.first())
+          .catch(() => {
+            res.editReply({ embeds: [new CustomEmbed(message.member, "expired")] });
+          });
+
+        if (!msg) return;
+        if (!parseInt(msg.content)) {
+          await res.editReply({ embeds: [new CustomEmbed(message.member, "invalid value")] });
+          return waitForButton();
+        }
+
+        const karma = await getKarma(user.id);
+
+        let amount = 0;
+        let remove = false;
+
+        if (parseInt(msg.content) < karma) {
+          remove = true;
+          amount = karma - parseInt(msg.content);
+        } else {
+          amount = parseInt(msg.content) - karma;
+        }
+
+        logger.info(`admin: ${message.author.tag} (${message.author.id}) set ${user.id} karma to ${msg.content}`);
+        remove ? await removeKarma(user.id, amount) : addKarma(user.id, amount);
         msg.react("✅");
         return waitForButton();
       }
