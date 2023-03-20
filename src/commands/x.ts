@@ -344,11 +344,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           .setCustomId("set-expire")
           .setLabel("set expire date")
           .setStyle(ButtonStyle.Primary)
-          .setEmoji("😣")
+          .setEmoji("😣"),
+        new ButtonBuilder().setCustomId("raw-data").setLabel("view raw data").setStyle(ButtonStyle.Primary).setEmoji("🥩")
       ),
+
       new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder().setCustomId("del-cmd").setLabel("delete cmd").setStyle(ButtonStyle.Danger).setEmoji("❌"),
-        new ButtonBuilder().setCustomId("del-aliases").setLabel("set tier").setStyle(ButtonStyle.Danger).setEmoji("❌"),
+        new ButtonBuilder()
+          .setCustomId("del-aliases")
+          .setLabel("delete aliases")
+          .setStyle(ButtonStyle.Danger)
+          .setEmoji("❌"),
         new ButtonBuilder().setCustomId("expire-now").setLabel("expire now").setStyle(ButtonStyle.Danger).setEmoji("❌")
       ),
     ];
@@ -475,7 +481,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           return waitForButton();
         }
 
-        if (await isPremium(user.id)) {
+        if (!(await isPremium(user.id))) {
           await res.editReply({ embeds: [new ErrorEmbed("idiot bro")] });
           return waitForButton();
         }
@@ -514,13 +520,24 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         await setExpireDate(user.id, date.toDate(), message.client as NypsiClient);
         msg.react("✅");
         return waitForButton();
+      } else if (res.customId === "raw-data") {
+        if ((await getAdminLevel(message.author.id)) < 1) {
+          await res.editReply({ embeds: [new ErrorEmbed("you require admin level **1** to do this")] });
+          return waitForButton();
+        }
+        logger.info(`admin: ${message.author.tag} (${message.author.id}) viewed ${user.id} raw premium data`);
+        const profile = await getPremiumProfile(user.id);
+        await res.editReply({
+          embeds: [new CustomEmbed(message.member, `\`\`\`${JSON.stringify(profile, null, 2)}\`\`\``)],
+        });
+        return waitForButton();
       } else if (res.customId === "del-cmd") {
         if ((await getAdminLevel(message.author.id)) < 3) {
           await res.editReply({ embeds: [new ErrorEmbed("you require admin level **3** to do this")] });
           return waitForButton();
         }
         logger.info(`admin: ${message.author.tag} (${message.author.id}) deleted ${user.id} custom command`);
-        await prisma.premiumCommand.delete({ where: { owner: user.id } });
+        await prisma.premiumCommand.delete({ where: { owner: user.id } }).catch(() => {});
         await res.editReply({ embeds: [new CustomEmbed(message.member, "deleted custom command")] });
         return waitForButton();
       } else if (res.customId === "del-aliases") {
