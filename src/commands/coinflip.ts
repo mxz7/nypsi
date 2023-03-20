@@ -2,6 +2,7 @@ import {
   ActionRowBuilder,
   BaseMessageOptions,
   ButtonBuilder,
+  ButtonInteraction,
   ButtonStyle,
   CommandInteraction,
   GuildMember,
@@ -161,7 +162,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     components: [row],
   });
 
-  const filter = (i: Interaction) => i.user.id == target.id;
+  const filter = (i: Interaction) =>
+    i.user.id == target.id || (message.author.id === i.user.id && (i as ButtonInteraction).customId === "n");
   let fail = false;
 
   const response = await m
@@ -292,7 +294,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }, 2000);
   } else {
     await updateBalance(message.member, (await getBalance(message.member)) + bet);
-    response.followUp({ embeds: [new CustomEmbed(target, "✅ coinflip request denied")] });
+    if (message.author.id === response.user.id) {
+      response.followUp({ embeds: [new CustomEmbed(message.member, "✅ coinflip request cancelled")] });
+    } else {
+      response.followUp({ embeds: [new CustomEmbed(target, "✅ coinflip request denied")] });
+    }
   }
 }
 
