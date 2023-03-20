@@ -514,6 +514,34 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         await setExpireDate(user.id, date.toDate(), message.client as NypsiClient);
         msg.react("✅");
         return waitForButton();
+      } else if (res.customId === "del-cmd") {
+        if ((await getAdminLevel(message.author.id)) < 3) {
+          await res.editReply({ embeds: [new ErrorEmbed("you require admin level **3** to do this")] });
+          return waitForButton();
+        }
+        logger.info(`admin: ${message.author.tag} (${message.author.id}) deleted ${user.id} custom command`);
+        await prisma.premiumCommand.delete({ where: { owner: user.id } });
+        await res.editReply({ embeds: [new CustomEmbed(message.member, "deleted custom command")] });
+        return waitForButton();
+      } else if (res.customId === "del-aliases") {
+        if ((await getAdminLevel(message.author.id)) < 3) {
+          await res.editReply({ embeds: [new ErrorEmbed("you require admin level **3** to do this")] });
+          return waitForButton();
+        }
+        logger.info(`admin: ${message.author.tag} (${message.author.id}) deleted ${user.id} aliases`);
+        await prisma.userAlias.deleteMany({ where: { userId: user.id } });
+        await res.editReply({ embeds: [new CustomEmbed(message.member, "deleted all aliases for that user")] });
+        return waitForButton();
+      } else if (res.customId === "expire-now") {
+        if ((await getAdminLevel(message.author.id)) < 5) {
+          await res.editReply({ embeds: [new ErrorEmbed("you require admin level **5** to do this")] });
+          return waitForButton();
+        }
+        logger.info(`admin: ${message.author.tag} (${message.author.id}) set ${user.id} expire to now`);
+        const profile = await getPremiumProfile(user.id);
+        profile.expire(message.client as NypsiClient);
+        await res.editReply({ embeds: [new CustomEmbed(message.member, "done sir.")] });
+        return waitForButton();
       }
     };
     return waitForButton();
