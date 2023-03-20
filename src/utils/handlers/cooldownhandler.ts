@@ -3,6 +3,7 @@ import redis from "../../init/redis";
 import { ErrorEmbed } from "../../models/EmbedBuilders";
 import { getBoosters } from "../functions/economy/boosters";
 import { getItems } from "../functions/economy/utils";
+import { isBooster } from "../functions/premium/boosters";
 import { getTier, isPremium } from "../functions/premium/premium";
 
 export async function onCooldown(cmd: string, member: GuildMember | string): Promise<boolean> {
@@ -145,6 +146,10 @@ async function calculateCooldownLength(seconds: number, member: GuildMember | st
     } else {
       seconds = seconds * 0.5;
     }
+  }
+
+  if (await isBooster(typeof member === "string" ? member : member.user.id)) {
+    seconds = seconds * 0.9;
   }
 
   const boosters = await getBoosters(member);
