@@ -1,7 +1,9 @@
 import ms = require("ms");
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
+import { CustomEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
+import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 
 export async function isBooster(userId: string) {
   if (await redis.exists(`${Constants.redis.cache.premium.BOOSTER}:${userId}`)) {
@@ -34,4 +36,18 @@ export async function setBooster(userId: string, value: boolean) {
   });
 
   await redis.del(`${Constants.redis.cache.premium.BOOSTER}:${userId}`);
+
+  if (value && (await getDmSettings(userId)).premium) {
+    await addNotificationToQueue({
+      memberId: userId,
+      payload: {
+        embed: new CustomEmbed(
+          null,
+          "thank you for boosting the nypsi server, you can see your rewards [here](https://discord.com/channels/747056029795221513/1031950370206924903/1087414749366587422)"
+        )
+          .setColor(Constants.EMBED_SUCCESS_COLOR)
+          .setHeader("thank you for supporting nypsi!!"),
+      },
+    });
+  }
 }
