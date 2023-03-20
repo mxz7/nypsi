@@ -20,6 +20,7 @@ import Constants from "../utils/Constants";
 import { b, c } from "../utils/functions/anticheat";
 import { updateBalance, updateBankBalance } from "../utils/functions/economy/balance";
 import { getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
+import { setPrestige } from "../utils/functions/economy/prestige";
 import { getItems, isEcoBanned } from "../utils/functions/economy/utils";
 import { getUserAliases } from "../utils/functions/premium/aliases";
 import { addMember, getPremiumProfile, isPremium, setExpireDate, setTier } from "../utils/functions/premium/premium";
@@ -399,6 +400,37 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         logger.info(`admin: ${message.author.tag} (${message.author.id}) set ${user.id} bank balance to ${message.content}`);
         await updateBankBalance(user.id, parseInt(message.content));
+        msg.react("✅");
+        return waitForButton();
+      } else if (res.customId === "set-prestige") {
+        if ((await getAdminLevel(message.author.id)) < 4) {
+          await res.editReply({ embeds: [new ErrorEmbed("you require admin level **4** to do this")] });
+          return waitForButton();
+        }
+
+        await res.editReply({
+          embeds: [new CustomEmbed(message.member, "enter new prestige")],
+        });
+
+        const msg = await message.channel
+          .awaitMessages({
+            filter: (msg: Message) => msg.author.id === message.author.id,
+            max: 1,
+            time: 30000,
+          })
+          .then((collected) => collected.first())
+          .catch(() => {
+            res.editReply({ embeds: [new CustomEmbed(message.member, "expired")] });
+          });
+
+        if (!msg) return;
+        if (!parseInt(msg.content)) {
+          await res.editReply({ embeds: [new CustomEmbed(message.member, "invalid value")] });
+          return waitForButton();
+        }
+
+        logger.info(`admin: ${message.author.tag} (${message.author.id}) set ${user.id} prestige to ${message.content}`);
+        await setPrestige(user.id, parseInt(message.content));
         msg.react("✅");
         return waitForButton();
       }
