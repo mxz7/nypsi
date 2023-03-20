@@ -1,6 +1,8 @@
 import { GuildMember, Role } from "discord.js";
 import { CustomEmbed } from "../models/EmbedBuilders";
+import Constants from "../utils/Constants";
 import { addLog, isLogsEnabled } from "../utils/functions/moderation/logs";
+import { isBooster, setBooster } from "../utils/functions/premium/boosters";
 
 export default async function guildMemberUpdate(oldMember: GuildMember, newMember: GuildMember) {
   const oldRoleIds = Array.from(oldMember.roles.cache.keys());
@@ -24,6 +26,14 @@ export default async function guildMemberUpdate(oldMember: GuildMember, newMembe
     }
 
     if (roles.length != 0) await createLog(oldMember, roles, false);
+  }
+
+  if (
+    newMember.guild.id === Constants.NYPSI_SERVER_ID &&
+    newMember.roles.cache.has(Constants.BOOST_ROLE_ID) &&
+    !(await isBooster(newMember.user.id))
+  ) {
+    await setBooster(newMember.user.id, true);
   }
 }
 
