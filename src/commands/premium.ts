@@ -216,11 +216,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   };
 
   const defaultMessage = async () => {
-    if (await isPremium(message.member)) {
-      if (message.guild.id == Constants.NYPSI_SERVER_ID) {
-        checkRoles();
-      }
+    if (message.guild.id == Constants.NYPSI_SERVER_ID) {
+      checkRoles();
+    }
 
+    if (await isPremium(message.member)) {
       const embed = new CustomEmbed(message.member);
 
       embed.setHeader("premium status", message.author.avatarURL());
