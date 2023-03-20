@@ -327,11 +327,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       });
     }
 
-    if (cost > Constants.MAX_AUCTION_PER_ITEM * amount && selected.rarity < 3 && selected.in_crates) {
-      return message.channel.send({
+    if (
+      (cost > Constants.MAX_AUCTION_PER_ITEM * amount && selected.rarity < 3) ||
+      ["prey", "fish", "ore", "sellable"].includes(selected.role)
+    ) {
+      return send({
         embeds: [new ErrorEmbed(`the maximum cost per item is $${Constants.MAX_AUCTION_PER_ITEM.toLocaleString()}`)],
       });
-    }
+    } else if (cost > 10_000_000_000)
+      return send({
+        embeds: [new ErrorEmbed("the maximum cost per item is $10,000,000,000")],
+      });
 
     const shopCost = (items[selected.id].buy || 0) * amount;
 
@@ -687,11 +693,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       });
     }
 
-    if (cost > Constants.MAX_AUCTION_PER_ITEM * amount && selected.rarity < 3 && selected.in_crates) {
+    if (
+      (cost > Constants.MAX_AUCTION_PER_ITEM * amount && selected.rarity < 3) ||
+      ["prey", "fish", "ore", "sellable"].includes(selected.role)
+    ) {
       return send({
         embeds: [new ErrorEmbed(`the maximum cost per item is $${Constants.MAX_AUCTION_PER_ITEM.toLocaleString()}`)],
       });
-    }
+    } else if (cost > 10_000_000_000)
+      return send({
+        embeds: [new ErrorEmbed("the maximum cost per item is $10,000,000,000")],
+      });
 
     const shopCost = (items[selected.id].buy || 0) * amount;
 
