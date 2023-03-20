@@ -34,10 +34,17 @@ export async function getLastCommand(member: GuildMember | string): Promise<Date
   return query.lastCommand;
 }
 
-export async function getCommandUses(member: GuildMember) {
+export async function getCommandUses(member: GuildMember | string) {
+  let id: string;
+  if (member instanceof GuildMember) {
+    id = member.user.id;
+  } else {
+    id = member;
+  }
+
   const query = await prisma.commandUse.findMany({
     where: {
-      userId: member.user.id,
+      userId: id,
     },
     orderBy: {
       uses: "desc",
