@@ -4,6 +4,7 @@ import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { NotificationPayload } from "../../../types/Notification";
 import Constants from "../../Constants";
+import { isBooster } from "../premium/boosters";
 import { getTier } from "../premium/premium";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { getAuctionAverage } from "./auctions";
@@ -142,14 +143,16 @@ export async function getMulti(member: GuildMember | string): Promise<number> {
       multi += 4;
       break;
     case 4:
-      multi += 8;
+      multi += 7;
       break;
   }
+
+  if (await isBooster(id)) multi += 3;
 
   const guildLevel = await getGuildLevelByUser(id);
 
   if (guildLevel) {
-    multi += guildLevel > 5 ? 5 : guildLevel - 1;
+    multi += guildLevel > 7 ? 7 : guildLevel - 1;
   }
 
   const boosters = await getBoosters(id);
@@ -382,6 +385,8 @@ export async function calcMaxBet(member: GuildMember): Promise<number> {
   let calculated = total + bonus * prestige;
 
   if (calculated > 1_000_000) calculated = 1_000_000;
+
+  if (await isBooster(member.user.id)) calculated += 100_000;
 
   const boosters = await getBoosters(member);
 

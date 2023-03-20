@@ -144,14 +144,10 @@ export class PremUser {
         break;
     }
 
-    const e = await requestRemoveRole(this.id, roleID, client).catch((e: any) => {
+    await requestRemoveRole(this.id, roleID, client).catch((e: any) => {
       logger.error(`error removing role (premium) ${this.id}`);
       logger.error(e);
     });
-
-    if (e == "boost") {
-      return "boost";
-    }
 
     if ((await getDmSettings(this.id)).premium) {
       await requestDM({
@@ -188,7 +184,7 @@ export enum status {
 }
 
 export async function requestRemoveRole(id: string, roleID: string, client: NypsiClient) {
-  const res = await client.cluster.broadcastEval(
+  await client.cluster.broadcastEval(
     async (c, { guildId, memberId, roleId }) => {
       const guild = await c.guilds.fetch(guildId).catch(() => {});
 
@@ -200,23 +196,10 @@ export async function requestRemoveRole(id: string, roleID: string, client: Nyps
 
       await guild.roles.fetch();
 
-      if (roleId == "819870727834566696") {
-        if (
-          user.roles.cache.find((r) => r.id == "747066190530347089") &&
-          !user.roles.cache.find((r) => r.id == "819870727834566696")
-        ) {
-          return "boost";
-        }
-      }
-
       return await user.roles.remove(roleId);
     },
     {
       context: { guildId: "747056029795221513", memberId: id, roleId: roleID },
     }
   );
-
-  for (const r of res) {
-    if (r == "boost") return "boost";
-  }
 }
