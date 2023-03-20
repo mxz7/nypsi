@@ -938,7 +938,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return message.channel.send({ embeds: [new ErrorEmbed("$x findid (tag)")] });
     }
 
-    return findId(args[1]);
+    return findId(args.slice(1, args.length).join(" "));
   }
 }
 
