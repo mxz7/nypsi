@@ -571,7 +571,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (await isEcoBanned(user.id)) {
           logger.info(`admin: ${message.author.tag} (${message.author.id}) removed ecoban for ${user.id} `);
           await setEcoBan(user.id);
-          await res.editReply({ embeds: [new ErrorEmbed("removed eco ban")] });
+          await res.editReply({ embeds: [new CustomEmbed(message.member, "removed eco ban")] });
           return;
         }
 
@@ -592,7 +592,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         if (!msg) return;
 
-        const time = new Date(Date.now() + getDuration(args[1].toLowerCase()) * 1000);
+        const time = new Date(Date.now() + getDuration(msg.content.toLowerCase()) * 1000);
 
         if (!time) {
           await res.editReply({ embeds: [new ErrorEmbed("invalid length")] });
