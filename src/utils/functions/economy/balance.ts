@@ -18,6 +18,7 @@ import { calcWorkerValues } from "./workers";
 import { getXp } from "./xp";
 import ms = require("ms");
 import _ = require("lodash");
+import { isBooster } from "../premium/boosters";
 
 export const prestigeMultiEffect = [0, 1, 2, 3, 4, 5, 6, 7, 7, 9, 10];
 
@@ -142,14 +143,16 @@ export async function getMulti(member: GuildMember | string): Promise<number> {
       multi += 4;
       break;
     case 4:
-      multi += 8;
+      multi += 7;
       break;
   }
+
+  if (await isBooster(id)) multi += 3;
 
   const guildLevel = await getGuildLevelByUser(id);
 
   if (guildLevel) {
-    multi += guildLevel > 5 ? 5 : guildLevel - 1;
+    multi += guildLevel > 7 ? 7 : guildLevel - 1;
   }
 
   const boosters = await getBoosters(id);
