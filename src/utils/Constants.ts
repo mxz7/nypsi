@@ -27,6 +27,7 @@ export default {
       premium: {
         ALIASES: "cache:premium:aliases",
         LEVEL: "cache:premium:level",
+        BOOSTER: "cache:premium:booster",
       },
       user: {
         BLACKLIST: "cache:user:blacklist",
