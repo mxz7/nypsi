@@ -37,7 +37,7 @@ async function doCrates(client: NypsiClient) {
     } else if (member.Premium.level == 4) {
       rewards.set("basic_crate", 4);
       rewards.set("69420_crate", 2);
-      rewards.set("nypsi_crate", 1);
+      rewards.set("lucky_scratch_card", 1);
     }
 
     if (member.booster) {
@@ -46,13 +46,11 @@ async function doCrates(client: NypsiClient) {
       } else {
         rewards.set("basic_crate", 1);
       }
-      if (rewards.has("69420_crate")) {
-        rewards.set("69420_crate", rewards.get("69420_crate") + 1);
+      if (rewards.has("lucky_scratch_card")) {
+        rewards.set("lucky_scratch_card", rewards.get("lucky_scratch_card") + 1);
       } else {
-        rewards.set("69420_crate", 1);
+        rewards.set("lucky_scratch_card", 1);
       }
-
-      rewards.set("lucky_scratch_card", 1);
     }
 
     const desc: string[] = [];
