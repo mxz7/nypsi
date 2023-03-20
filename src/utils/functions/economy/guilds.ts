@@ -242,7 +242,7 @@ export async function getMaxMembersForGuild(name: string) {
 
   const amount = 3 + Math.floor(level / 2) * 3;
 
-  return (amount < 3 ? 3 : amount) > 10 ? 10 : amount < 3 ? 3 : amount;
+  return (amount < 3 ? 3 : amount) > 9 ? 9 : amount < 3 ? 3 : amount;
 }
 
 export async function getRequiredForGuildUpgrade(name: string): Promise<GuildUpgradeRequirements> {
@@ -252,8 +252,8 @@ export async function getRequiredForGuildUpgrade(name: string): Promise<GuildUpg
 
   const guild = await getGuildByName(name);
 
-  const baseMoney = 3000000 * Math.pow(guild.level, 2);
-  const baseXP = 1225 * Math.pow(guild.level, 2);
+  const baseMoney = 3000000 * Math.pow(guild.level, 2.57);
+  const baseXP = 1750 * Math.pow(guild.level, 2.1);
 
   const bonusMoney = 100000 * guild.members.length;
   const bonusXP = 75 * guild.members.length;
