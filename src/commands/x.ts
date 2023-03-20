@@ -26,7 +26,7 @@ import { addKarma, getKarma, removeKarma } from "../utils/functions/karma/karma"
 import { getUserAliases } from "../utils/functions/premium/aliases";
 import { addMember, getPremiumProfile, isPremium, setExpireDate, setTier } from "../utils/functions/premium/premium";
 import { getAdminLevel, setAdminLevel } from "../utils/functions/users/admin";
-import { isUserBlacklisted } from "../utils/functions/users/blacklist";
+import { isUserBlacklisted, setUserBlacklist } from "../utils/functions/users/blacklist";
 import { getCommandUses } from "../utils/functions/users/commands";
 import { hasProfile } from "../utils/functions/users/utils";
 import { logger } from "../utils/logger";
@@ -521,6 +521,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         if (await isEcoBanned(user.id)) {
+          logger.info(`admin: ${message.author.tag} (${message.author.id}) removed ecoban for ${user.id} `);
           await setEcoBan(user.id);
           await res.editReply({ embeds: [new ErrorEmbed("removed eco ban")] });
           return;
@@ -554,6 +555,23 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         await setEcoBan(user.id, time);
         msg.react("✅");
         return waitForButton();
+      } else if (res.customId === "blacklist") {
+        if ((await getAdminLevel(message.author.id)) < 3) {
+          await res.editReply({ embeds: [new ErrorEmbed("you require admin level **3** to do this")] });
+          return waitForButton();
+        }
+
+        if (await isUserBlacklisted(user.id)) {
+          logger.info(`admin: ${message.author.tag} (${message.author.id}) removed blacklist for ${user.id} `);
+          await setUserBlacklist(user.id, false);
+          await res.editReply({ embeds: [new CustomEmbed(message.member, "user unblacklisted")] });
+          return waitForButton();
+        } else {
+          logger.info(`admin: ${message.author.tag} (${message.author.id}) added blacklist for ${user.id} `);
+          await setUserBlacklist(user.id, true);
+          await res.editReply({ embeds: [new CustomEmbed(message.member, "user blacklisted")] });
+          return waitForButton();
+        }
       }
     };
     return waitForButton();
