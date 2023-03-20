@@ -332,7 +332,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embeds: [new ErrorEmbed(`the maximum cost per item is $${Constants.MAX_AUCTION_PER_ITEM.toLocaleString()}`)],
       });
     } else if (cost > 10_000_000_000) return message.channel.send({
-      embeds: [new ErrorEmbed(`the maximum cost per item is $1,000,000,000()}`)],
+      embeds: [new ErrorEmbed("the maximum cost per item is $1,000,000,000")],
     });
     
     const shopCost = (items[selected.id].buy || 0) * amount;
