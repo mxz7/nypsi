@@ -16,6 +16,7 @@ import Constants from "../utils/Constants";
 import { daysAgo, daysUntil, formatDate } from "../utils/functions/date";
 import PageManager from "../utils/functions/page";
 import { addUserAlias, getUserAliases, removeUserAlias } from "../utils/functions/premium/aliases";
+import { isBooster, setBooster } from "../utils/functions/premium/boosters";
 import { getEmbedColor, setEmbedColor } from "../utils/functions/premium/color";
 import { getCommand, getUserCommand, setCommand } from "../utils/functions/premium/command";
 import {
@@ -165,6 +166,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (roleIds.includes(Constants.BRONZE_ROLE_ID)) guildMember.roles.remove(Constants.BRONZE_ROLE_ID);
         continue;
       }
+
+      if (roleIds.includes(Constants.BOOST_ROLE_ID) && !(await isBooster(guildMember.user.id)))
+        await setBooster(guildMember.user.id, true).catch(() => {});
 
       let requiredRole = "none";
       switch (await getTier(guildMember)) {
