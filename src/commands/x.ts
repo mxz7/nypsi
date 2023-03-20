@@ -18,6 +18,7 @@ import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { b, c } from "../utils/functions/anticheat";
+import { updateBalance } from "../utils/functions/economy/balance";
 import { getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
 import { getItems, isEcoBanned } from "../utils/functions/economy/utils";
 import { getUserAliases } from "../utils/functions/premium/aliases";
@@ -327,6 +328,42 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         c(user.id);
 
         await res.editReply({ content: "✅" });
+        return waitForButton();
+      } else if (res.customId === "set-bal") {
+        if ((await getAdminLevel(message.author.id)) < 4) {
+          await res.editReply({ embeds: [new ErrorEmbed("you require admin level **4** to do this")] });
+          return waitForButton();
+        }
+
+        await res.editReply({
+          embeds: [
+            new CustomEmbed(
+              message.member,
+              "enter a none stupid number pls remember if you do this for a joke this money could very easily be distributed between members & put into items"
+            ),
+          ],
+        });
+
+        const msg = await message.channel
+          .awaitMessages({
+            filter: (msg: Message) => msg.author.id === message.author.id,
+            max: 1,
+            time: 30000,
+          })
+          .then((collected) => collected.first())
+          .catch(() => {
+            res.editReply({ embeds: [new CustomEmbed(message.member, "expired")] });
+          });
+
+        if (!msg) return;
+        if (!parseInt(msg.content)) {
+          await res.editReply({ embeds: [new CustomEmbed(message.member, "invalid value")] });
+          return waitForButton();
+        }
+
+        logger.info(`admin: ${message.author.tag} (${message.author.id}) set ${user.id} balance to ${message.content}`);
+        await updateBalance(user.id, parseInt(message.content));
+        msg.react("✅");
         return waitForButton();
       }
     };
