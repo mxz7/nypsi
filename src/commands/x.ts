@@ -235,6 +235,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           return waitForButton();
         }
 
+        logger.info(`admin: ${message.author.tag} (${message.author.id}) viewd ${user.id} db data`);
+
         const files = [await getDbData(user)];
 
         await res.editReply({ files });
@@ -256,6 +258,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             .join("\n")}`
         );
 
+        logger.info(`admin: ${message.author.tag} (${message.author.id}) viewed ${user.id} command data`);
+
         await res.editReply({ embeds: [embed] });
         return waitForButton();
       } else if (res.customId === "view-premium") {
@@ -263,6 +267,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           await res.editReply({ embeds: [new ErrorEmbed("you require admin level **1** to do this")] });
           return waitForButton();
         }
+        logger.info(`admin: ${message.author.tag} (${message.author.id}) viewed ${user.id} premium data`);
         doPremium(user, res as ButtonInteraction);
         return waitForButton();
       } else if (res.customId === "set-admin") {
@@ -295,23 +300,29 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           });
           return waitForButton();
         }
+        logger.info(`admin: ${message.author.tag} (${message.author.id}) updated ${user.id} admin level to ${msg.content}`);
         await setAdminLevel(user.id, parseInt(msg.content));
         await res.editReply({ embeds: [new CustomEmbed(message.member, "✅")] });
         return waitForButton();
       } else if (res.customId === "ac-hist") {
-        if ((await getAdminLevel(message.author.id)) < 1) {
+        if ((await getAdminLevel(message.author.id)) < 2) {
           await res.editReply({ embeds: [new ErrorEmbed("you require admin level **2** to do this")] });
           return waitForButton();
         }
+
+        logger.info(`admin: ${message.author.tag} (${message.author.id}) viewed ${user.id} ac data`);
+
         const data = b(user.id);
 
         await res.editReply({ embeds: [new CustomEmbed(message.member, `\`\`\`${JSON.stringify(data, null, 2)}\`\`\``)] });
         return waitForButton();
       } else if (res.customId === "ac-clear") {
-        if ((await getAdminLevel(message.author.id)) < 1) {
+        if ((await getAdminLevel(message.author.id)) < 3) {
           await res.editReply({ embeds: [new ErrorEmbed("you require admin level **3** to do this")] });
           return waitForButton();
         }
+
+        logger.info(`admin: ${message.author.tag} (${message.author.id}) cleared ${user.id} violations`);
 
         c(user.id);
 
@@ -412,6 +423,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           return waitForButton();
         }
 
+        logger.info(`admin: ${message.author.tag} (${message.author.id}) added ${user.id} premium at level ${msg.content}`);
+
         await addMember(user.id, parseInt(msg.content), message.client as NypsiClient);
         msg.react("✅");
         return waitForButton();
@@ -450,6 +463,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           });
           return waitForButton();
         }
+
+        logger.info(`admin: ${message.author.tag} (${message.author.id}) set ${user.id} premium tier to ${msg.content}`);
 
         await setTier(user.id, parseInt(msg.content), message.client as NypsiClient);
         msg.react("✅");
