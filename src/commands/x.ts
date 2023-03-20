@@ -374,7 +374,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       embed.setDescription("no premium");
     }
 
-    const msg = await response.editReply({ embeds: [embed] });
+    const msg = await response.editReply({ embeds: [embed], components: rows });
 
     const waitForButton = async (): Promise<void> => {
       const filter = (i: Interaction) => i.user.id == message.author.id;
