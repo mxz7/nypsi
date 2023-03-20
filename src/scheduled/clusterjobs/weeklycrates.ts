@@ -4,80 +4,75 @@ import { CustomEmbed } from "../../models/EmbedBuilders";
 import Constants from "../../utils/Constants";
 import { MStoTime } from "../../utils/functions/date";
 import { addInventoryItem } from "../../utils/functions/economy/inventory";
-import { userExists } from "../../utils/functions/economy/utils";
+import { getItems } from "../../utils/functions/economy/utils";
 import requestDM from "../../utils/functions/requestdm";
 import { getDmSettings } from "../../utils/functions/users/notifications";
 import { logger } from "../../utils/logger";
 
 async function doCrates(client: NypsiClient) {
-  const query = await prisma.premium.findMany({
+  const query = await prisma.user.findMany({
     where: {
-      AND: [
-        {
-          status: 1,
-        },
-        {
-          level: { gt: 1 },
-        },
-      ],
+      OR: [{ booster: true }, { Premium: { AND: [{ level: { gt: 1 } }, { status: 1 }] } }],
     },
     select: {
-      userId: true,
-      level: true,
+      id: true,
+      booster: true,
+      Premium: {
+        select: {
+          level: true,
+        },
+      },
     },
   });
 
   for (const member of query) {
-    if (!(await userExists(member.userId))) continue;
+    const rewards = new Map<string, number>();
 
-    if (member.level == 2) {
-      await addInventoryItem(member.userId, "basic_crate", 1, false);
+    const embed = new CustomEmbed().setHeader("thank you for supporting nypsi!").setColor(Constants.EMBED_SUCCESS_COLOR);
 
-      const embed = new CustomEmbed().setHeader("thank you for supporting nypsi!").setColor(Constants.EMBED_SUCCESS_COLOR);
+    if (member.Premium.level == 2) {
+      rewards.set("basic_crate", 2);
+    } else if (member.Premium.level == 3) {
+      rewards.set("basic_crate", 4);
+    } else if (member.Premium.level == 4) {
+      rewards.set("basic_crate", 4);
+      rewards.set("69420_crate", 2);
+      rewards.set("nypsi_crate", 1);
+    }
 
-      embed.setDescription("you have received 1 **basic crate** 🙂");
-
-      if ((await getDmSettings(member.userId)).premium) {
-        await requestDM({
-          client: client,
-          memberId: member.userId,
-          content: "enjoy your weekly crate (:",
-          embed: embed,
-        }).catch(() => {});
+    if (member.booster) {
+      if (rewards.has("basic_crate")) {
+        rewards.set("basic_crate", rewards.get("basic_crate") + 1);
+      } else {
+        rewards.set("basic_crate", 1);
       }
-    } else if (member.level == 3) {
-      await addInventoryItem(member.userId, "basic_crate", 2, false);
-
-      const embed = new CustomEmbed().setHeader("thank you for supporting nypsi!").setColor(Constants.EMBED_SUCCESS_COLOR);
-
-      embed.setDescription("you have received 2 **basic crates** 🙂");
-
-      if ((await getDmSettings(member.userId)).premium) {
-        await requestDM({
-          client: client,
-          memberId: member.userId,
-          content: "enjoy your weekly crates (:",
-          embed: embed,
-        }).catch(() => {});
+      if (rewards.has("69420_crate")) {
+        rewards.set("69420_crate", rewards.get("69420_crate") + 1);
+      } else {
+        rewards.set("69420_crate", 1);
       }
-    } else if (member.level == 4) {
-      await Promise.all([
-        addInventoryItem(member.userId, "basic_crate", 2, false),
-        addInventoryItem(member.userId, "69420_crate", 1, false),
-      ]);
 
-      const embed = new CustomEmbed().setHeader("thank you for supporting nypsi!").setColor(Constants.EMBED_SUCCESS_COLOR);
+      rewards.set("lucky_scratch_card", 1);
+    }
 
-      embed.setDescription("you have received 2 **basic crates** and 1 **69420 crate** 🙂");
+    const desc: string[] = [];
 
-      if ((await getDmSettings(member.userId)).premium) {
-        await requestDM({
-          client: client,
-          memberId: member.userId,
-          content: "enjoy your weekly crates (:",
-          embed: embed,
-        }).catch(() => {});
-      }
+    for (const [key, value] of rewards.entries()) {
+      await addInventoryItem(member.id, key, value, false);
+      desc.push(
+        `+**${value}** ${getItems()[key].emoji} ${
+          value > 1 ? (getItems()[key].plural ? getItems()[key].plural : getItems()[key].name) : getItems()[key].name
+        }`
+      );
+    }
+
+    if ((await getDmSettings(member.id)).premium) {
+      await requestDM({
+        client: client,
+        memberId: member.id,
+        content: "enjoy your weekly crates (:",
+        embed: embed,
+      }).catch(() => {});
     }
   }
 }
