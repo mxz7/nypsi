@@ -146,7 +146,7 @@ export class PremUser {
 
     await requestRemoveRole(this.id, roleID, client).catch((e: any) => {
       logger.error(`error removing role (premium) ${this.id}`);
-      logger.error(e);
+      logger.error("unban error", e);
     });
 
     if ((await getDmSettings(this.id)).premium) {

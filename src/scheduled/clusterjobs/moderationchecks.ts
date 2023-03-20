@@ -185,7 +185,7 @@ export function runModerationChecks(client: NypsiClient) {
 
       await webhook.send({ embeds: embeds }).catch(async (e) => {
         logger.error(`error sending modlogs to webhook (${modlog.guildId}) - removing modlogs`);
-        logger.error(e);
+        logger.error("moderation checks error", e);
 
         await prisma.moderation.update({
           where: {
