@@ -167,8 +167,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         continue;
       }
 
-      if (roleIds.includes(Constants.BOOST_ROLE_ID) && !(await isBooster(guildMember.user.id)))
-        await setBooster(guildMember.user.id, true).catch(() => {});
+      if (roleIds.includes(Constants.BOOST_ROLE_ID)) {
+        if (!(await isBooster(guildMember.user.id))) await setBooster(guildMember.user.id, true).catch(() => {});
+      } else if (await isBooster(guildMember.user.id)) {
+        await setBooster(guildMember.user.id, false);
+      }
 
       let requiredRole = "none";
       switch (await getTier(guildMember)) {
