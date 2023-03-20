@@ -503,7 +503,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
 
         if (
-          ["crate", "scratch-card"].includes(getItems()[msg.content.split(" ")[0]].role) &&
+          (["crate", "scratch-card"].includes(getItems()[msg.content.split(" ")[0]].role) ||
+            msg.content.split(" ").includes("credit")) &&
           (await getAdminLevel(message.author.id)) < 10
         ) {
           await res.editReply({
