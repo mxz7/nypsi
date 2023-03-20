@@ -96,7 +96,7 @@ async function updateCryptoWorth() {
 
   if (!ethWorth) {
     logger.error("INVALID ETH WORTH");
-    return logger.error(res);
+    return logger.error("eth error", res);
   }
 
   if (ethWorth > 1_000_000) {

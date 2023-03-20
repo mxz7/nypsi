@@ -120,7 +120,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             });
         }
       } catch (e) {
-        logger.error(e);
+        logger.error("unban error", e);
       }
     }
   }

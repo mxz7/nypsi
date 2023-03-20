@@ -310,9 +310,9 @@ async function prepareGame(
     msg = await send({ embeds: [embed], components });
   }
 
-  playGame(message, msg, args).catch((e: string) => {
+  playGame(message, msg, args).catch((e) => {
     logger.error(`error occured playing tower - ${message.author.tag} (${message.author.id})`);
-    logger.error(e);
+    logger.error("tower error", e);
     console.trace();
     redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
     return send({
@@ -730,7 +730,7 @@ async function playGame(
       return collected;
     })
     .catch((e) => {
-      logger.warn(e);
+      logger.warn("tower error", e);
       fail = true;
       games.delete(message.author.id);
       redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
