@@ -172,7 +172,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           requiredRole = Constants.BRONZE_ROLE_ID;
           break;
         case 2:
-          if (!roleIds.includes(Constants.BOOST_ROLE_ID)) requiredRole = Constants.SILVER_ROLE_ID;
+          requiredRole = Constants.SILVER_ROLE_ID;
           break;
         case 3:
           requiredRole = Constants.GOLD_ROLE_ID;
@@ -194,7 +194,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             requiredLevel = 3;
             break;
           case Constants.SILVER_ROLE_ID:
-            if (roleIds.includes(Constants.BOOST_ROLE_ID)) await guildMember.roles.remove(Constants.SILVER_ROLE_ID);
             requiredLevel = 2;
             break;
           case Constants.BRONZE_ROLE_ID:
