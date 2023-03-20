@@ -2,6 +2,7 @@ import {
   ActionRowBuilder,
   BaseMessageOptions,
   ButtonBuilder,
+  ButtonInteraction,
   ButtonStyle,
   Channel,
   CommandInteraction,
@@ -460,7 +461,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       components: [row],
     });
 
-    const filter = (i: Interaction) => i.user.id == target.id;
+    const filter = (i: Interaction) =>
+      i.user.id == target.id || (message.author.id === i.user.id && (i as ButtonInteraction).customId === "n");
+
     let fail = false;
 
     const response = await m
@@ -501,7 +504,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       if (typeof result === "string") await updateBalance(result, (await getBalance(result)) + wager * 2);
     } else {
       await updateBalance(message.member, (await getBalance(message.member)) + wager);
-      response.followUp({ embeds: [new CustomEmbed(target, "✅ duel request denied")] });
+      if (message.author.id === response.user.id) {
+        response.followUp({ embeds: [new CustomEmbed(message.member, "✅ duel request cancelled")] });
+      } else {
+        response.followUp({ embeds: [new CustomEmbed(target, "✅ duel request denied")] });
+      }
     }
     return;
   } else if (args[0].toLowerCase() == "blacklist" || args[0].toLowerCase() == "bl") {
