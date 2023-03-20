@@ -21,7 +21,7 @@ import { b, c } from "../utils/functions/anticheat";
 import { updateBalance, updateBankBalance } from "../utils/functions/economy/balance";
 import { getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
 import { setPrestige } from "../utils/functions/economy/prestige";
-import { getItems, isEcoBanned } from "../utils/functions/economy/utils";
+import { getItems, isEcoBanned, setEcoBan } from "../utils/functions/economy/utils";
 import { addKarma, getKarma, removeKarma } from "../utils/functions/karma/karma";
 import { getUserAliases } from "../utils/functions/premium/aliases";
 import { addMember, getPremiumProfile, isPremium, setExpireDate, setTier } from "../utils/functions/premium/premium";
@@ -180,20 +180,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       user = {} as User;
     }
 
-    let desc = `tag: ${user?.username}#${user?.discriminator}\nid: ${user?.id}\ncreated: <t:${Math.floor(
-      user.createdTimestamp / 1000
-    )}:R>\nadmin level: ${await getAdminLevel(user.id)}`;
-
-    if (!(await hasProfile(user.id))) desc += "\n**has no user profile**";
-
-    if (await isUserBlacklisted(user.id)) {
-      desc += "\n**currently blacklisted**";
-    } else if (await isEcoBanned(user.id)) {
-      desc += "\n**currently economy banned**";
-    }
-
-    const embed = new CustomEmbed(message.member, desc).setHeader(`${user.username}'s discord data`);
-
     const rows: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [
       new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder().setCustomId("db-data").setLabel("view all db data").setStyle(ButtonStyle.Primary).setEmoji("💻"),
@@ -218,6 +204,21 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         new ButtonBuilder().setCustomId("blacklist").setLabel("blacklist").setStyle(ButtonStyle.Danger).setEmoji("❌")
       ),
     ];
+
+    let desc = `tag: ${user?.username}#${user?.discriminator}\nid: ${user?.id}\ncreated: <t:${Math.floor(
+      user.createdTimestamp / 1000
+    )}:R>\nadmin level: ${await getAdminLevel(user.id)}`;
+
+    if (!(await hasProfile(user.id))) desc += "\n**has no user profile**";
+
+    if (await isUserBlacklisted(user.id)) {
+      rows[3].components[1].setDisabled(true);
+      desc += "\n**currently blacklisted**";
+    } else if (await isEcoBanned(user.id)) {
+      desc += "\n**currently economy banned**";
+    }
+
+    const embed = new CustomEmbed(message.member, desc).setHeader(`${user.username}'s discord data`);
 
     const msg = await message.channel.send({ embeds: [embed], components: rows });
 
@@ -511,6 +512,46 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         logger.info(`admin: ${message.author.tag} (${message.author.id}) set ${user.id} karma to ${msg.content}`);
         remove ? await removeKarma(user.id, amount) : addKarma(user.id, amount);
+        msg.react("✅");
+        return waitForButton();
+      } else if (res.customId === "ecoban") {
+        if ((await getAdminLevel(message.author.id)) < 4) {
+          await res.editReply({ embeds: [new ErrorEmbed("you require admin level **2** to do this")] });
+          return waitForButton();
+        }
+
+        if (await isEcoBanned(user.id)) {
+          await setEcoBan(user.id);
+          await res.editReply({ embeds: [new ErrorEmbed("removed eco ban")] });
+          return;
+        }
+
+        await res.editReply({
+          embeds: [new CustomEmbed(message.member, "ban length format pls")],
+        });
+
+        const msg = await message.channel
+          .awaitMessages({
+            filter: (msg: Message) => msg.author.id === message.author.id,
+            max: 1,
+            time: 30000,
+          })
+          .then((collected) => collected.first())
+          .catch(() => {
+            res.editReply({ embeds: [new CustomEmbed(message.member, "expired")] });
+          });
+
+        if (!msg) return;
+
+        const time = new Date(Date.now() + getDuration(args[1].toLowerCase()) * 1000);
+
+        if (!time) {
+          await res.editReply({ embeds: [new ErrorEmbed("invalid length")] });
+          return waitForButton();
+        }
+
+        logger.info(`admin: ${message.author.tag} (${message.author.id}) set ${user.id} ecoban to ${msg.content}`);
+        await setEcoBan(user.id, time);
         msg.react("✅");
         return waitForButton();
       }
@@ -857,3 +898,33 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 cmd.setRun(run);
 
 module.exports = cmd;
+
+function getDuration(duration: string): number {
+  duration.toLowerCase();
+
+  if (duration.includes("d")) {
+    if (!parseInt(duration.split("d")[0])) return undefined;
+
+    const num = parseInt(duration.split("d")[0]);
+
+    return num * 86400;
+  } else if (duration.includes("h")) {
+    if (!parseInt(duration.split("h")[0])) return undefined;
+
+    const num = parseInt(duration.split("h")[0]);
+
+    return num * 3600;
+  } else if (duration.includes("m")) {
+    if (!parseInt(duration.split("m")[0])) return undefined;
+
+    const num = parseInt(duration.split("m")[0]);
+
+    return num * 60;
+  } else if (duration.includes("s")) {
+    if (!parseInt(duration.split("s")[0])) return undefined;
+
+    const num = parseInt(duration.split("s")[0]);
+
+    return num;
+  }
+}
