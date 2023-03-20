@@ -279,11 +279,7 @@ export async function renewUser(member: string, client?: NypsiClient) {
 export async function expireUser(member: string, client: NypsiClient) {
   const profile = await getPremiumProfile(member);
 
-  const expire = await profile.expire(client);
-
-  if (expire == "boost") {
-    return renewUser(member, client);
-  }
+  await profile.expire(client);
 
   await prisma.premium.delete({
     where: {
