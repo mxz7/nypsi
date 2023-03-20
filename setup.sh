@@ -3,7 +3,7 @@ mkdir jobs
 cd src
 cd utils
 cd functions
-echo "export function a(b: string, c: string, d:string) {};export function b(69: string): any {};export function c(69: string) {}" > anticheat.ts
+echo "export function a(b: string, c: string, d:string) {};export function b(a: string): any {};export function c(a: string) {}" > anticheat.ts
 
 cd ..
 cd ..
