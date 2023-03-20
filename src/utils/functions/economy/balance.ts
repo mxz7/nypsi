@@ -4,6 +4,7 @@ import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { NotificationPayload } from "../../../types/Notification";
 import Constants from "../../Constants";
+import { isBooster } from "../premium/boosters";
 import { getTier } from "../premium/premium";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { getAuctionAverage } from "./auctions";
@@ -18,7 +19,6 @@ import { calcWorkerValues } from "./workers";
 import { getXp } from "./xp";
 import ms = require("ms");
 import _ = require("lodash");
-import { isBooster } from "../premium/boosters";
 
 export const prestigeMultiEffect = [0, 1, 2, 3, 4, 5, 6, 7, 7, 9, 10];
 
@@ -385,6 +385,8 @@ export async function calcMaxBet(member: GuildMember): Promise<number> {
   let calculated = total + bonus * prestige;
 
   if (calculated > 1_000_000) calculated = 1_000_000;
+
+  if (await isBooster(member.user.id)) calculated += 100_000;
 
   const boosters = await getBoosters(member);
 
