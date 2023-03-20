@@ -1,6 +1,8 @@
+import dayjs = require("dayjs");
 import {
   ActionRowBuilder,
   ButtonBuilder,
+  ButtonInteraction,
   ButtonStyle,
   CommandInteraction,
   Interaction,
@@ -18,6 +20,8 @@ import Constants from "../utils/Constants";
 import { b, c } from "../utils/functions/anticheat";
 import { getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
 import { getItems, isEcoBanned } from "../utils/functions/economy/utils";
+import { getUserAliases } from "../utils/functions/premium/aliases";
+import { addMember, getPremiumProfile, isPremium, setExpireDate, setTier } from "../utils/functions/premium/premium";
 import { getAdminLevel, setAdminLevel } from "../utils/functions/users/admin";
 import { isUserBlacklisted } from "../utils/functions/users/blacklist";
 import { getCommandUses } from "../utils/functions/users/commands";
@@ -255,7 +259,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         await res.editReply({ embeds: [embed] });
         return waitForButton();
       } else if (res.customId === "view-premium") {
-        // dod later
+        if ((await getAdminLevel(message.author.id)) < 1) {
+          await res.editReply({ embeds: [new ErrorEmbed("you require admin level **1** to do this")] });
+          return waitForButton();
+        }
+        doPremium(user, res as ButtonInteraction);
+        return waitForButton();
       } else if (res.customId === "set-admin") {
         if ((await getAdminLevel(message.author.id)) < 69) {
           await res.editReply({ embeds: [new ErrorEmbed("you require admin level **69** to do this")] });
@@ -307,6 +316,188 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         c(user.id);
 
         await res.editReply({ content: "✅" });
+        return waitForButton();
+      }
+    };
+    return waitForButton();
+  };
+
+  const doPremium = async (user: User, response: ButtonInteraction) => {
+    let desc = "";
+
+    const rows: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [
+      new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder().setCustomId("add-premium").setLabel("add premium").setStyle(ButtonStyle.Primary).setEmoji("➕"),
+        new ButtonBuilder().setCustomId("set-tier").setLabel("set tier").setStyle(ButtonStyle.Primary).setEmoji("😁"),
+        new ButtonBuilder()
+          .setCustomId("set-expire")
+          .setLabel("set expire date")
+          .setStyle(ButtonStyle.Primary)
+          .setEmoji("😣")
+      ),
+      new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder().setCustomId("del-cmd").setLabel("delete cmd").setStyle(ButtonStyle.Danger).setEmoji("❌"),
+        new ButtonBuilder().setCustomId("del-aliases").setLabel("set tier").setStyle(ButtonStyle.Danger).setEmoji("❌"),
+        new ButtonBuilder().setCustomId("expire-now").setLabel("expire now").setStyle(ButtonStyle.Danger).setEmoji("❌")
+      ),
+    ];
+
+    const embed = new CustomEmbed(message.member);
+
+    if (await isPremium(user.id)) {
+      const profile = await getPremiumProfile(user.id);
+      const aliases = await getUserAliases(user.id);
+
+      rows[0].components[0].setDisabled(true);
+      desc +=
+        `**level** ${profile.getLevelString()}\n` + `**expires** <t:${Math.floor(profile.expireDate.getTime() / 1000)}>`;
+
+      embed.setDescription(desc);
+      if (aliases.length > 0) {
+        embed.addField("aliases", aliases.map((i) => `\`${i.alias}\` -> \`${i.command}\``).join("\n"));
+      }
+    } else {
+      rows.forEach((i) => i.components.forEach((j) => j.setDisabled(true)));
+      rows[0].components[0].setDisabled(false);
+
+      embed.setDescription("no premium");
+    }
+
+    const msg = await response.editReply({ embeds: [embed] });
+
+    const waitForButton = async (): Promise<void> => {
+      const filter = (i: Interaction) => i.user.id == message.author.id;
+
+      const res = await msg.awaitMessageComponent({ filter, time: 120000 }).catch(async () => {
+        await msg.edit({ components: [] });
+      });
+
+      if (!res) return;
+
+      await res.deferReply();
+
+      if (res.customId === "add-premium") {
+        if ((await getAdminLevel(message.author.id)) < 5) {
+          await res.editReply({ embeds: [new ErrorEmbed("you require admin level **5** to do this")] });
+          return waitForButton();
+        }
+
+        if (await isPremium(user.id)) {
+          await res.editReply({ embeds: [new ErrorEmbed("idiot bro")] });
+          return waitForButton();
+        }
+
+        await res.editReply({ embeds: [new CustomEmbed(message.member, "1-4?")] });
+
+        const msg = await message.channel
+          .awaitMessages({
+            filter: (msg: Message) => msg.author.id === message.author.id,
+            max: 1,
+            time: 30000,
+          })
+          .then((collected) => collected.first())
+          .catch(() => {
+            res.editReply({ embeds: [new CustomEmbed(message.member, "expired")] });
+          });
+
+        if (!msg) return;
+        if (!parseInt(msg.content)) {
+          await res.editReply({ embeds: [new CustomEmbed(message.member, "invalid value")] });
+          return waitForButton();
+        }
+        if (parseInt(msg.content) > 4 || parseInt(msg.content) < 1) {
+          await res.editReply({
+            embeds: [new CustomEmbed(message.member, "nice try bozo ! suck this dick you wANK STAIN")],
+          });
+          return waitForButton();
+        }
+
+        await addMember(user.id, parseInt(msg.content), message.client as NypsiClient);
+        msg.react("✅");
+        return waitForButton();
+      } else if (res.customId === "set-tier") {
+        if ((await getAdminLevel(message.author.id)) < 5) {
+          await res.editReply({ embeds: [new ErrorEmbed("you require admin level **5** to do this")] });
+          return waitForButton();
+        }
+
+        if (!(await isPremium(user.id))) {
+          await res.editReply({ embeds: [new ErrorEmbed("idiot bro")] });
+          return waitForButton();
+        }
+
+        await res.editReply({ embeds: [new CustomEmbed(message.member, "1-4?")] });
+
+        const msg = await message.channel
+          .awaitMessages({
+            filter: (msg: Message) => msg.author.id === message.author.id,
+            max: 1,
+            time: 30000,
+          })
+          .then((collected) => collected.first())
+          .catch(() => {
+            res.editReply({ embeds: [new CustomEmbed(message.member, "expired")] });
+          });
+
+        if (!msg) return;
+        if (!parseInt(msg.content)) {
+          await res.editReply({ embeds: [new CustomEmbed(message.member, "invalid value")] });
+          return waitForButton();
+        }
+        if (parseInt(msg.content) > 4 || parseInt(msg.content) < 1) {
+          await res.editReply({
+            embeds: [new CustomEmbed(message.member, "nice try bozo ! suck this dick you wANK STAIN")],
+          });
+          return waitForButton();
+        }
+
+        await setTier(user.id, parseInt(msg.content), message.client as NypsiClient);
+        msg.react("✅");
+        return waitForButton();
+      } else if (res.customId === "set-expire") {
+        if ((await getAdminLevel(message.author.id)) < 5) {
+          await res.editReply({ embeds: [new ErrorEmbed("you require admin level **5** to do this")] });
+          return waitForButton();
+        }
+
+        if (await isPremium(user.id)) {
+          await res.editReply({ embeds: [new ErrorEmbed("idiot bro")] });
+          return waitForButton();
+        }
+
+        await res.editReply({ embeds: [new CustomEmbed(message.member, "pls use format mm/dd/yyyy")] });
+
+        const msg = await message.channel
+          .awaitMessages({
+            filter: (msg: Message) => msg.author.id === message.author.id,
+            max: 1,
+            time: 30000,
+          })
+          .then((collected) => collected.first())
+          .catch(() => {
+            res.editReply({ embeds: [new CustomEmbed(message.member, "expired")] });
+          });
+
+        if (!msg) return;
+        const date = dayjs(msg.content);
+
+        if (!date) {
+          await res.editReply({
+            embeds: [
+              new ErrorEmbed(
+                "invalid date you absolute fucking idiot like how do you mess that up are you actually like fucked in the head were you dropped on your head you special cunt go get a fucking helmet before I PUT A STICK IN YOUR CRANIUM YOU FUCKING WANKER"
+              ),
+            ],
+          });
+          return waitForButton();
+        }
+
+        logger.info(
+          `admin: ${message.author.tag} (${message.author.id}) set ${user.id} premium expire date to ${date.format()}`
+        );
+
+        await setExpireDate(user.id, date.toDate(), message.client as NypsiClient);
+        msg.react("✅");
         return waitForButton();
       }
     };
