@@ -317,9 +317,9 @@ async function prepareGame(
     msg = await send({ embeds: [embed], components: [row] });
   }
 
-  playGame(message, msg, args).catch((e: string) => {
+  playGame(message, msg, args).catch((e) => {
     logger.error(`error occured playing highlow - ${message.author.tag} (${message.author.id})`);
-    logger.error(e);
+    logger.error("highlow error", e);
     redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
     return send({
       embeds: [new ErrorEmbed("an error occured while running - join support server")],
@@ -595,7 +595,7 @@ async function playGame(
       return collected.customId;
     })
     .catch((e) => {
-      logger.warn(e);
+      logger.warn("hl error", e);
       fail = true;
       games.delete(message.author.id);
       redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);

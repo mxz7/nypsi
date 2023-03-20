@@ -709,7 +709,7 @@ async function playGame(
       return collected;
     })
     .catch((e) => {
-      logger.warn(e);
+      logger.warn("mines error", e);
       fail = true;
       games.delete(message.author.id);
       redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
