@@ -327,7 +327,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       });
     }
 
-    if (cost > Constants.MAX_AUCTION_PER_ITEM * amount && selected.rarity < 3) {
+    if (
+      (cost > Constants.MAX_AUCTION_PER_ITEM * amount && selected.rarity < 3) ||
+      ["prey", "fish", "ore", "sellable"].includes(selected.role)
+    ) {
       return send({
         embeds: [new ErrorEmbed(`the maximum cost per item is $${Constants.MAX_AUCTION_PER_ITEM.toLocaleString()}`)],
       });
@@ -690,7 +693,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       });
     }
 
-    if (cost > Constants.MAX_AUCTION_PER_ITEM * amount && selected.rarity < 3) {
+    if (
+      (cost > Constants.MAX_AUCTION_PER_ITEM * amount && selected.rarity < 3) ||
+      ["prey", "fish", "ore", "sellable"].includes(selected.role)
+    ) {
       return send({
         embeds: [new ErrorEmbed(`the maximum cost per item is $${Constants.MAX_AUCTION_PER_ITEM.toLocaleString()}`)],
       });
