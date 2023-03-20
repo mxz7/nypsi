@@ -31,17 +31,24 @@ export async function getPrestige(member: GuildMember | string): Promise<number>
   return query.prestige;
 }
 
-export async function setPrestige(member: GuildMember, amount: number) {
+export async function setPrestige(member: GuildMember | string, amount: number) {
+  let id: string;
+  if (member instanceof GuildMember) {
+    id = member.user.id;
+  } else {
+    id = member;
+  }
+
   await prisma.economy.update({
     where: {
-      userId: member.user.id,
+      userId: id,
     },
     data: {
       prestige: amount,
     },
   });
 
-  await redis.del(`${Constants.redis.cache.economy.PRESTIGE}:${member.user.id}`);
+  await redis.del(`${Constants.redis.cache.economy.PRESTIGE}:${id}`);
 }
 
 export async function getPrestigeRequirement(member: GuildMember): Promise<number> {

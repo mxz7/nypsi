@@ -18,6 +18,7 @@ model User {
   lastfmUsername String?
   email          String?  @unique
   blacklisted    Boolean  @default(false)
+  adminLevel     Int      @default(0)
 
   Economy      Economy?
   Premium      Premium?
