@@ -4,6 +4,7 @@ import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
+import { createProfile } from "../users/utils";
 
 export async function isBooster(userId: string) {
   if (await redis.exists(`${Constants.redis.cache.premium.BOOSTER}:${userId}`)) {
@@ -19,21 +20,36 @@ export async function isBooster(userId: string) {
     },
   });
 
+  if (!query) {
+    return false;
+  }
+
   await redis.set(`${Constants.redis.cache.premium.BOOSTER}:${userId}`, query.booster ? "t" : "f");
   await redis.expire(`${Constants.redis.cache.premium.BOOSTER}:${userId}`, Math.floor(ms("3 hours") / 1000));
 
   return query.booster;
 }
 
-export async function setBooster(userId: string, value: boolean) {
-  await prisma.user.update({
-    where: {
-      id: userId,
-    },
-    data: {
-      booster: value,
-    },
-  });
+export async function setBooster(userId: string, value: boolean): Promise<void> {
+  let fail = false;
+
+  await prisma.user
+    .update({
+      where: {
+        id: userId,
+      },
+      data: {
+        booster: value,
+      },
+    })
+    .catch(() => {
+      fail = true;
+    });
+
+  if (fail) {
+    await createProfile(userId);
+    return setBooster(userId, value);
+  }
 
   await redis.del(`${Constants.redis.cache.premium.BOOSTER}:${userId}`);
 
