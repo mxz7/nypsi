@@ -2,7 +2,8 @@ import { GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import Constants from "../../Constants";
-import { getTier, isPremium } from "../premium/premium";
+import { isBooster } from "../premium/boosters";
+import { getTier } from "../premium/premium";
 import { getRequiredBetForXp } from "./balance";
 import { getBoosters } from "./boosters";
 import { getGuildLevelByUser } from "./guilds";
@@ -72,18 +73,19 @@ export async function calcEarnedXp(member: GuildMember, bet: number, multiplier:
   let prestige = await getPrestige(member);
   const guildLevel = await getGuildLevelByUser(member);
   const inventory = await getInventory(member);
+  const tier = await getTier(member);
+  const booster = await isBooster(member.user.id);
 
-  if (guildLevel) {
-    max += guildLevel;
-  }
+  if (booster) max += 10;
+  if (guildLevel) max += guildLevel;
 
   if (prestige) {
-    if (prestige > 15) prestige = 15;
-    min += prestige / 3;
-    max += prestige / 1.777;
+    if (prestige > 20) prestige = 20;
+    min += prestige / 5;
+    max += prestige / 2.3;
   }
 
-  min += await getTier(member);
+  min += tier;
 
   let betDivisor = 10_000;
 
@@ -95,7 +97,7 @@ export async function calcEarnedXp(member: GuildMember, bet: number, multiplier:
   max += multiplier * 2.7;
 
   if (await isPassive(member)) {
-    if (await isPremium(member)) {
+    if (tier > 0) {
       max -= 2.5;
       min -= 2.5;
     } else {
