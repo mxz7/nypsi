@@ -19,6 +19,7 @@ model User {
   email          String?  @unique
   blacklisted    Boolean  @default(false)
   adminLevel     Int      @default(0)
+  booster        Boolean  @default(false)
 
   Economy      Economy?
   Premium      Premium?
