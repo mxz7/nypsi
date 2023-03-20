@@ -119,10 +119,10 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
         redis.del(`${Constants.redis.cache.economy.VOTE}:${user}`),
         redis.del(`${Constants.redis.cache.economy.BOOSTERS}:${user}`),
       ]).catch((e) => {
-        logger.error(e);
+        logger.error("vote error", e);
       });
     } catch (e) {
-      logger.error(e);
+      logger.error("vote error", e);
     }
   }
 

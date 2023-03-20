@@ -150,7 +150,7 @@ async function prepare(
         return collected;
       })
       .catch((e) => {
-        logger.warn(e);
+        logger.warn("scratch error", e);
         fail = true;
         redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
         message.channel.send({ content: message.author.toString() + " scratch card expired" });

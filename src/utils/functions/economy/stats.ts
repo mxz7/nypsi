@@ -107,7 +107,7 @@ export async function createGame(
       },
     })
     .catch((e) => {
-      logger.warn(e);
+      logger.warn("stats error", e);
       fail = true;
     });
 

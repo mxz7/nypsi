@@ -60,7 +60,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     try {
       hypixelData = await fetch(hypixelURL).then((hypixelData) => hypixelData.json());
     } catch (e) {
-      logger.error(e);
+      logger.error("hypixel error", e);
       return await message.channel.send({ embeds: [new ErrorEmbed("error fetching data")] });
     }
 
