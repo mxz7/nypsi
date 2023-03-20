@@ -327,12 +327,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       });
     }
 
-    if (cost > Constants.MAX_AUCTION_PER_ITEM * amount && selected.rarity < 3 && selected.in_crates) {
+    if (cost > Constants.MAX_AUCTION_PER_ITEM * amount && selected.rarity < 3) {
       return message.channel.send({
         embeds: [new ErrorEmbed(`the maximum cost per item is $${Constants.MAX_AUCTION_PER_ITEM.toLocaleString()}`)],
       });
-    }
-
+    } else if (cost > 10_000_000_000) return message.channel.send({
+      embeds: [new ErrorEmbed(`the maximum cost per item is $1,000,000,000()}`)],
+    });
+    
     const shopCost = (items[selected.id].buy || 0) * amount;
 
     if (shopCost != 0 && cost > shopCost) {
