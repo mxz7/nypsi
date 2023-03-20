@@ -463,8 +463,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           return waitForButton();
         }
 
-        logger.info(`admin: ${message.author.tag} (${message.author.id}) set ${user.id} xp to ${message.content}`);
-        await updateXp(user.id, parseInt(message.content));
+        logger.info(`admin: ${message.author.tag} (${message.author.id}) set ${user.id} xp to ${msg.content}`);
+        await updateXp(user.id, parseInt(msg.content));
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "set-inv") {
