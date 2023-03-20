@@ -489,6 +489,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           });
 
         if (!msg) return;
+
+        logger.info(`admin: ${message.author.tag} (${message.author.id}) set ${user.id} inventory item to ${msg.content}`);
+
         if (!getItems()[msg.content.split(" ")[0]]) {
           await res.editReply({ embeds: [new CustomEmbed(message.member, "invalid item")] });
           return waitForButton();
@@ -499,7 +502,20 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           return waitForButton();
         }
 
-        logger.info(`admin: ${message.author.tag} (${message.author.id}) set ${user.id} inventory item to ${msg.content}`);
+        if (
+          ["crate", "scratch-card"].includes(getItems()[msg.content.split(" ")[0]].role) &&
+          (await getAdminLevel(message.author.id)) < 10
+        ) {
+          await res.editReply({
+            embeds: [
+              new ErrorEmbed("nice try LOSER HAHAHAHHAHAHAHAHAAHHAHAHAH wanker.").setImage(
+                "https://giphy.com/clips/thefastsaga-fast-and-furious-saga-fate-of-the-Pv2AsOz7eYUkAqh1d5"
+              ),
+            ],
+          });
+          return waitForButton();
+        }
+
         await setInventoryItem(user.id, msg.content.split(" ")[0], parseInt(msg.content.split(" ")[1]));
         msg.react("✅");
         return waitForButton();
