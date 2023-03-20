@@ -87,10 +87,17 @@ export async function getBankBalance(member: GuildMember | string): Promise<numb
   return Number(query.bank);
 }
 
-export async function updateBankBalance(member: GuildMember, amount: number) {
+export async function updateBankBalance(member: GuildMember | string, amount: number) {
+  let id: string;
+  if (member instanceof GuildMember) {
+    id = member.user.id;
+  } else {
+    id = member;
+  }
+
   await prisma.economy.update({
     where: {
-      userId: member.user.id,
+      userId: id,
     },
     data: {
       bank: amount,
