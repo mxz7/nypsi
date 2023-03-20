@@ -22,6 +22,7 @@ import { updateBalance, updateBankBalance } from "../utils/functions/economy/bal
 import { setInventoryItem } from "../utils/functions/economy/inventory";
 import { setPrestige } from "../utils/functions/economy/prestige";
 import { getItems, isEcoBanned, setEcoBan } from "../utils/functions/economy/utils";
+import { updateXp } from "../utils/functions/economy/xp";
 import { addKarma, getKarma, removeKarma } from "../utils/functions/karma/karma";
 import { getUserAliases } from "../utils/functions/premium/aliases";
 import { addMember, getPremiumProfile, isPremium, setExpireDate, setTier } from "../utils/functions/premium/premium";
@@ -433,6 +434,37 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         logger.info(`admin: ${message.author.tag} (${message.author.id}) set ${user.id} prestige to ${msg.content}`);
         await setPrestige(user.id, parseInt(msg.content));
+        msg.react("✅");
+        return waitForButton();
+      } else if (res.customId === "set-xp") {
+        if ((await getAdminLevel(message.author.id)) < 4) {
+          await res.editReply({ embeds: [new ErrorEmbed("you require admin level **4** to do this")] });
+          return waitForButton();
+        }
+
+        await res.editReply({
+          embeds: [new CustomEmbed(message.member, "enter new xp value")],
+        });
+
+        const msg = await message.channel
+          .awaitMessages({
+            filter: (msg: Message) => msg.author.id === message.author.id,
+            max: 1,
+            time: 30000,
+          })
+          .then((collected) => collected.first())
+          .catch(() => {
+            res.editReply({ embeds: [new CustomEmbed(message.member, "expired")] });
+          });
+
+        if (!msg) return;
+        if (!parseInt(msg.content)) {
+          await res.editReply({ embeds: [new CustomEmbed(message.member, "invalid value")] });
+          return waitForButton();
+        }
+
+        logger.info(`admin: ${message.author.tag} (${message.author.id}) set ${user.id} xp to ${message.content}`);
+        await updateXp(user.id, parseInt(message.content));
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "set-inv") {
