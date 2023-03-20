@@ -28,12 +28,12 @@ export default async function guildMemberUpdate(oldMember: GuildMember, newMembe
     if (roles.length != 0) await createLog(oldMember, roles, false);
   }
 
-  if (
-    newMember.guild.id === Constants.NYPSI_SERVER_ID &&
-    newMember.roles.cache.has(Constants.BOOST_ROLE_ID) &&
-    !(await isBooster(newMember.user.id))
-  ) {
-    await setBooster(newMember.user.id, true);
+  if (newMember.guild.id === Constants.NYPSI_SERVER_ID) {
+    if (newMember.roles.cache.has(Constants.BOOST_ROLE_ID) && !(await isBooster(newMember.user.id))) {
+      await setBooster(newMember.user.id, true);
+    } else if (!newMember.roles.cache.has(Constants.BOOST_ROLE_ID) && (await isBooster(newMember.user.id))) {
+      await setBooster(newMember.user.id, false);
+    }
   }
 }
 
