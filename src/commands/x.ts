@@ -433,6 +433,44 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         await setPrestige(user.id, parseInt(message.content));
         msg.react("✅");
         return waitForButton();
+      } else if (res.customId === "set-inv") {
+        if ((await getAdminLevel(message.author.id)) < 4) {
+          await res.editReply({ embeds: [new ErrorEmbed("you require admin level **4** to do this")] });
+          return waitForButton();
+        }
+
+        await res.editReply({
+          embeds: [new CustomEmbed(message.member, "<item_id> <amount>")],
+        });
+
+        const msg = await message.channel
+          .awaitMessages({
+            filter: (msg: Message) => msg.author.id === message.author.id,
+            max: 1,
+            time: 30000,
+          })
+          .then((collected) => collected.first())
+          .catch(() => {
+            res.editReply({ embeds: [new CustomEmbed(message.member, "expired")] });
+          });
+
+        if (!msg) return;
+        if (!getItems()[msg.content.split(" ")[0]]) {
+          await res.editReply({ embeds: [new CustomEmbed(message.member, "invalid item")] });
+          return waitForButton();
+        }
+
+        if (!parseInt(msg.content.split(" ")[1])) {
+          await res.editReply({ embeds: [new CustomEmbed(message.member, "invalid number")] });
+          return waitForButton();
+        }
+
+        logger.info(
+          `admin: ${message.author.tag} (${message.author.id}) set ${user.id} inventory item to ${message.content}`
+        );
+        await setInventoryItem(user.id, message.content.split(" ")[0], parseInt(message.content.split(" ")[1]));
+        msg.react("✅");
+        return waitForButton();
       }
     };
     return waitForButton();
