@@ -64,6 +64,8 @@ async function doCrates(client: NypsiClient) {
       );
     }
 
+    embed.addField("rewards", desc.join("\n"));
+
     if ((await getDmSettings(member.id)).premium) {
       await requestDM({
         client: client,
