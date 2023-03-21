@@ -155,13 +155,16 @@ async function completeAchievement(userId: string, achievementId: string) {
     earnedXp = 0;
   }
 
-  userEmbed.setDescription(
-    (userEmbed.data.description += `\n\nrewards:\n + ${earnedXp.toLocaleString()}xp${
-      earnedCrates > 0 ? `\n + ${earnedCrates} 🎁 69420 crate${earnedCrates > 1 ? "s" : ""}` : ""
-    }`)
-  );
+  if (earnedXp > 0 && earnedCrates > 0) {
+    userEmbed.setDescription(
+      (userEmbed.data.description += `\n\nrewards:\n + ${earnedXp.toLocaleString()}xp${
+        earnedCrates > 0 ? `\n + ${earnedCrates} 🎁 69420 crate${earnedCrates > 1 ? "s" : ""}` : ""
+      }`)
+    );
 
-  await updateXp(userId, (await getXp(userId)) + earnedXp);
+    await updateXp(userId, (await getXp(userId)) + earnedXp);
+  }
+
   if (earnedCrates > 0) await addInventoryItem(userId, "69420_crate", earnedCrates);
 
   if (achievements[achievementId].prize) {
