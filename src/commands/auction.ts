@@ -328,7 +328,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (
-      (cost > Constants.MAX_AUCTION_PER_ITEM * amount && selected.rarity < 3) ||
+      (cost > Constants.MAX_AUCTION_PER_ITEM * amount && selected.rarity < 3 && selected.in_crates) ||
       ["prey", "fish", "ore", "sellable"].includes(selected.role)
     ) {
       return send({
@@ -694,7 +694,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (
-      (cost > Constants.MAX_AUCTION_PER_ITEM * amount && selected.rarity < 3) ||
+      (cost > Constants.MAX_AUCTION_PER_ITEM * amount && selected.rarity < 3 && selected.in_crates) ||
       ["prey", "fish", "ore", "sellable"].includes(selected.role)
     ) {
       return send({
