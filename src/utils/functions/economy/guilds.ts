@@ -261,15 +261,15 @@ export async function getRequiredForGuildUpgrade(name: string): Promise<GuildUpg
   await redis.set(
     `${Constants.redis.cache.economy.GUILD_REQUIREMENTS}:${name}`,
     JSON.stringify({
-      money: baseMoney + bonusMoney,
-      xp: baseXP + bonusXP,
+      money: Math.floor(baseMoney + bonusMoney),
+      xp: Math.floor(baseXP + bonusXP),
     })
   );
   await redis.expire(`${Constants.redis.cache.economy.GUILD_REQUIREMENTS}:${name}`, ms("1 hour") / 1000);
 
   return {
-    money: baseMoney + bonusMoney,
-    xp: baseXP + bonusXP,
+    money: Math.floor(baseMoney + bonusMoney),
+    xp: Math.floor(baseXP + bonusXP),
   };
 }
 
