@@ -495,22 +495,29 @@ export async function calcNetWorth(member: GuildMember | string, breakdown = fal
     const baseWorkers = getBaseWorkers();
 
     for (const upgrade of worker.upgrades) {
-      if (!baseUpgrades[upgrade.upgradeId].base_cost) continue;
+      if (!baseUpgrades[upgrade.upgradeId].base_cost) {
+        const itemId = Array.from(Object.keys(getItems())).find(
+          (i) => getItems()[i].worker_upgrade_id === upgrade.upgradeId
+        );
+        if (!itemId) continue;
 
-      let baseCost = _.clone(baseUpgrades[upgrade.upgradeId]).base_cost;
+        worth += upgrade.amount * ((await getAuctionAverage(itemId)) || 100000);
+      } else {
+        let baseCost = _.clone(baseUpgrades[upgrade.upgradeId]).base_cost;
 
-      baseCost =
-        baseCost *
-        (baseWorkers[upgrade.workerId].prestige_requirement >= 4
-          ? baseWorkers[upgrade.workerId].prestige_requirement / 2
-          : baseWorkers[upgrade.workerId].prestige_requirement - 0.5);
+        baseCost =
+          baseCost *
+          (baseWorkers[upgrade.workerId].prestige_requirement >= 4
+            ? baseWorkers[upgrade.workerId].prestige_requirement / 2
+            : baseWorkers[upgrade.workerId].prestige_requirement - 0.5);
 
-      // zack's formula ((price+amount×price)×amount)/2
+        // zack's formula ((price+amount×price)×amount)/2
 
-      const cost = ((baseCost + upgrade.amount * baseCost) * upgrade.amount) / 2;
+        const cost = ((baseCost + upgrade.amount * baseCost) * upgrade.amount) / 2;
 
-      worth += cost;
-      workersBreakdown += cost;
+        worth += cost;
+        workersBreakdown += cost;
+      }
     }
 
     const { perItem } = await calcWorkerValues(worker);
