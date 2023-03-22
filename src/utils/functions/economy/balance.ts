@@ -442,7 +442,12 @@ export async function calcNetWorth(member: GuildMember | string, breakdown = fal
       EconomyGuild: {
         select: {
           balance: true,
-          members: true,
+          level: true,
+          members: {
+            select: {
+              userId: true,
+            },
+          },
         },
       },
     },
@@ -463,10 +468,21 @@ export async function calcNetWorth(member: GuildMember | string, breakdown = fal
 
   if (breakdown) breakdownItems.set("balance", worth);
 
-  worth += Number(Number(query.EconomyGuild?.balance) / query.EconomyGuild?.members.length) || 0;
+  if (query.EconomyGuild) {
+    let guildWorth = 0;
 
-  if (breakdown)
-    breakdownItems.set("guild", Number(Number(query.EconomyGuild?.balance) / query.EconomyGuild?.members.length) || 0);
+    for (let i = 0; i < query.EconomyGuild.level; i++) {
+      const baseMoney = 3000000 * Math.pow(i, 2.57);
+      const bonusMoney = 100000 * query.EconomyGuild.members.length;
+
+      guildWorth += Math.floor(baseMoney + bonusMoney);
+    }
+
+    worth += guildWorth / query.EconomyGuild.members.length;
+    if (breakdown) breakdownItems.set("guild", guildWorth);
+  } else if (breakdown) {
+    breakdownItems.set("guild", 0);
+  }
 
   for (const item of query.Inventory) {
     if (item.item === "cookie" || ["prey", "fish", "sellable", "ore"].includes(getItems()[item.item].role)) {
