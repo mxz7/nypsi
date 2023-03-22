@@ -650,7 +650,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embed.setDescription("your username has not been set, /settings me lastfm");
       }
 
-      return message.channel.send({ embeds: [embed] });
+      return send({ embeds: [embed] });
     }
 
     const res = await setLastfmUsername(message.member, args[2]);
