@@ -1355,7 +1355,7 @@
     "longDesc": "a mysterious purple, shiny gem. only found during a specific activity. some say gems are magical, made by witches. and are dangerous...",
     "role": "item",
     "sell": 1000000,
-    "rarity": 3,
+    "rarity": 2,
     "in_crates": false,
     "aliases": ["purple"]
   },
@@ -1366,7 +1366,7 @@
     "longDesc": "a mysterious pink, shiny gem. only found during a specific activity. some say gems were planted by aliens in the early stages of earth's creation",
     "role": "item",
     "sell": 1000000,
-    "rarity": 3,
+    "rarity": 2,
     "in_crates": false,
     "aliases": ["pink"]
   },
@@ -1387,7 +1387,7 @@
     "emoji": "<:nypsi_gem_white:1046933670436552725>",
     "longDesc": "a mysterious white, shiny gem. the most ancient and most powerful of them all. ancient tablets claim that the holder of this gem has the power to create worlds. be careful.",
     "role": "item",
-    "rarity": 4,
+    "rarity": 3,
     "in_crates": false,
     "sell": 2500000,
     "craft": {
