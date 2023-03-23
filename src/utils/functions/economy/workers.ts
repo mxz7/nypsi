@@ -6,6 +6,7 @@ import { logger } from "../../logger";
 import { getBalance, updateBalance } from "./balance";
 import { getBoosters } from "./boosters";
 import { gemBreak, getInventory } from "./inventory";
+import { getPrestige } from "./prestige";
 import { getBaseUpgrades, getBaseWorkers, getItems } from "./utils";
 
 export async function getWorkers(member: GuildMember | string) {
@@ -83,6 +84,16 @@ export async function calcWorkerValues(
   let perIntervalBonus = 0;
   let perItemBonus = 0;
   let maxStoredBonus = 0;
+
+  if (worker.workerId === "quarry") {
+    const prestige = await getPrestige(worker.userId);
+
+    for (let i = 0; i < (prestige > 50 ? 50 : prestige); i++) {
+      perIntervalBonus += i;
+      perItemBonus += i;
+      maxStoredBonus += i;
+    }
+  }
 
   for (const upgrade of worker.upgrades) {
     switch (baseUpgrades[upgrade.upgradeId].upgrades) {
