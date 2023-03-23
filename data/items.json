@@ -1346,7 +1346,11 @@
     "sell": 1000000,
     "rarity": 2,
     "in_crates": false,
-    "aliases": ["green"]
+    "aliases": ["green"],
+    "craft": {
+      "time": 172800,
+      "ingrediants": ["gem_shard:10"]
+    }
   },
   "purple_gem": {
     "id": "purple_gem",
@@ -1357,7 +1361,11 @@
     "sell": 1000000,
     "rarity": 2,
     "in_crates": false,
-    "aliases": ["purple"]
+    "aliases": ["purple"],
+    "craft": {
+      "time": 172800,
+      "ingrediants": ["gem_shard:15"]
+    }
   },
   "pink_gem": {
     "id": "pink_gem",
@@ -1368,7 +1376,11 @@
     "sell": 1000000,
     "rarity": 2,
     "in_crates": false,
-    "aliases": ["pink"]
+    "aliases": ["pink"],
+    "craft": {
+      "time": 172800,
+      "ingrediants": ["gem_shard:20"]
+    }
   },
   "blue_gem": {
     "id": "blue_gem",
@@ -1379,7 +1391,11 @@
     "sell": 1000000,
     "rarity": 2,
     "in_crates": false,
-    "aliases": ["blue"]
+    "aliases": ["blue"],
+    "craft": {
+      "time": 172800,
+      "ingrediants": ["gem_shard:5"]
+    }
   },
   "white_gem": {
     "id": "white_gem",
