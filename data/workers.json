@@ -95,6 +95,18 @@
     }
   },
   "workers": {
+    "quarry": {
+      "id": "quarry",
+      "name": "quarry",
+      "item_emoji": "🪨",
+      "prestige_requirement": 0,
+      "cost": 100000,
+      "base": {
+        "per_item": 4,
+        "max_storage": 500,
+        "per_interval": 150
+      }
+    },
     "potato_farmer": {
       "id": "potato_farmer",
       "name": "potato farmer",
