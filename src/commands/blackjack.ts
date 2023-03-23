@@ -649,7 +649,7 @@ async function playGame(
     });
 
     gamble(message.author, "blackjack", bet, true, id, winnings);
-    if (newEmbed.data.footer && !newEmbed.data.footer.text.includes("nypsi")) {
+    if (earnedXp > 0) {
       newEmbed.setFooter({ text: `+${earnedXp}xp | id: ${id}` });
     } else {
       newEmbed.setFooter({ text: `id: ${id}` });
