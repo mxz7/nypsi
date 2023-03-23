@@ -251,6 +251,7 @@ export async function startChatReactionDuel(
     return null;
   }
 
+  const winTime = ((Date.now() - start) / 1000).toFixed(2);
   let winnings = wager * 2;
   let tax = 0;
 
@@ -261,8 +262,6 @@ export async function startChatReactionDuel(
     await addToNypsiBank(taxed);
     winnings -= taxed;
   }
-
-  const winTime = ((Date.now() - start) / 1000).toFixed(2);
 
   embed.addField(
     "winner",
