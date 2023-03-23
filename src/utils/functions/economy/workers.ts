@@ -86,7 +86,7 @@ export async function calcWorkerValues(
   let perItemBonus = 0;
   let maxStoredBonus = 0;
   let gemChance = 0;
-  let scrapChance = 0.0001;
+  let scrapChance = 0.0007;
 
   if (worker.workerId === "quarry") {
     const prestige = await getPrestige(worker.userId);

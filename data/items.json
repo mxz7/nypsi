@@ -251,7 +251,6 @@
   "netherite_scrap": {
     "id": "netherite_scrap",
     "name": "netherite scrap",
-    "aliases": ["scrap"],
     "emoji": "<:nypsi_nscrap:1034591769662341170>",
     "longDesc": "can be crafted into a netherite ingot",
     "role": "resource",
@@ -771,13 +770,13 @@
   },
   "radio": {
     "id": "radio",
-    "name": "police scanner",
-    "plural": "police scanners",
+    "name": "police radio",
+    "plural": "police radios",
     "emoji": "📻",
     "longDesc": "prevent someone from robbing people",
     "rarity": 0,
     "role": "item",
-    "aliases": ["scanner", "policescanner"],
+    "aliases": ["policescanner"],
     "buy": 150000,
     "sell": 25000,
     "in_crates": true
@@ -1732,12 +1731,76 @@
     "id": "quarry_scrap",
     "name": "quarry scrap",
     "plural": "quarry scraps",
+    "aliases": ["scrap", "scraps"],
     "emoji": "🪨",
     "longDesc": "rarely found from your quarry, can be crafted into quarry upgrades",
     "role": "item",
     "rarity": 1,
     "buy": 0,
-    "sell": 50000,
+    "sell": 1000000,
     "in_crates": false
+  },
+  "gem_radar": {
+    "id": "gem_radar",
+    "name": "gem radar",
+    "plural": "gem radars",
+    "aliases": ["radar"],
+    "emoji": "📡",
+    "longDesc": "increase chance of finding gem shards from your quarry",
+    "role": "worker-upgrade",
+    "rarity": 3,
+    "buy": 0,
+    "sell": 1000000,
+    "in_crates": false,
+    "worker_upgrade_id": "quarry",
+    "craft": {
+      "time": 43200,
+      "ingrediants": ["quarry_scrap:15"]
+    }
+  },
+  "earth_scanner": {
+    "id": "earth_scanner",
+    "name": "earth scanner",
+    "plural": "earth scanners",
+    "aliases": ["scanner", "earth"],
+    "emoji": "📟",
+    "longDesc": "increase chance of finding quarry scraps from your quarry",
+    "role": "worker-upgrade",
+    "rarity": 3,
+    "buy": 0,
+    "sell": 1000000,
+    "in_crates": false,
+    "worker_upgrade_id": "earth_scanner",
+    "craft": {
+      "time": 43200,
+      "ingrediants": ["quarry_scrap:15"]
+    }
+  },
+  "manager": {
+    "id": "manager",
+    "name": "manager",
+    "plural": "manager",
+    "emoji": "👨🏻‍💼",
+    "longDesc": "increases profit per item in your quarry",
+    "role": "worker-upgrade",
+    "rarity": 1,
+    "buy": 0,
+    "sell": 100000,
+    "in_crates": true,
+    "worker_upgrade_id": "manager"
+  },
+  "shipping_container": {
+    "id": "shipping_container",
+    "name": "shipping container",
+    "plural": "shipping containers",
+    "aliases": ["container", "containers", "shipping", "ship"],
+    "emoji": "<:nypsi_container:1088558592187179188>",
+    "longDesc": "increases storage for your quarry",
+    "role": "worker-upgrade",
+    "rarity": 2,
+    "buy": 0,
+    "sell": 150000,
+    "in_crates": true,
+    "worker_upgrade_id": "shipping_containers"
   }
 }

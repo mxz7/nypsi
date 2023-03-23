@@ -92,6 +92,47 @@
       "effect": 0.75,
       "stack_limit": 10,
       "for": "amazon"
+    },
+    "drill": {
+      "id": "drill",
+      "name": "drill",
+      "upgrades": "per_interval",
+      "effect": 0.2,
+      "stack_limit": 15,
+      "base_cost": 55000,
+      "for": "quarry"
+    },
+    "manager": {
+      "id": "manager",
+      "name": "manager",
+      "upgrades": "per_item",
+      "effect": 0.4,
+      "stack_limit": 15,
+      "for": "quarry"
+    },
+    "shipping_containers": {
+      "id": "shipping_containers",
+      "name": "shipping_containers",
+      "upgrades": "max_storage",
+      "effect": 0.4,
+      "stack_limit": 10,
+      "for": "quarry"
+    },
+    "gem_radar": {
+      "id": "gem_radar",
+      "name": "gem radar",
+      "upgrades": "gem_chance",
+      "effect": 0.00005,
+      "stack_limit": 10,
+      "for": "quarry"
+    },
+    "earth_scanner": {
+      "id": "earth_scanner",
+      "name": "earth scanner",
+      "upgrades": "scrap_chance",
+      "effect": 0.0005,
+      "stack_limit": 10,
+      "for": "quarry"
     }
   },
   "workers": {
