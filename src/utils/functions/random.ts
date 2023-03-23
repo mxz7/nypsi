@@ -13,6 +13,7 @@ export function shuffle<T>(array: T[]): T[] {
 }
 
 export function percentChance(percent: number) {
+  if (percent <= 0) return false;
   let max = 100;
 
   while (percent < 1 || Boolean(percent % 1)) {
