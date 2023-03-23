@@ -99,7 +99,7 @@
       "upgrades": "per_interval",
       "effect": 0.2,
       "stack_limit": 15,
-      "base_cost": 55000,
+      "base_cost": 30000,
       "for": "quarry"
     },
     "manager": {
