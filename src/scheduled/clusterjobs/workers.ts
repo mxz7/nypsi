@@ -3,11 +3,14 @@ import prisma from "../../init/database";
 import redis from "../../init/redis";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 import { NotificationPayload } from "../../types/Notification";
+import { SteveData } from "../../types/Workers";
 import Constants from "../../utils/Constants";
 import { getBalance, updateBalance } from "../../utils/functions/economy/balance";
 import { getBoosters } from "../../utils/functions/economy/boosters";
+import { addInventoryItem } from "../../utils/functions/economy/inventory";
 import { getBaseWorkers } from "../../utils/functions/economy/utils";
 import { calcWorkerValues, getWorkers } from "../../utils/functions/economy/workers";
+import { percentChance } from "../../utils/functions/random";
 import { addNotificationToQueue, getDmSettings } from "../../utils/functions/users/notifications";
 import { logger } from "../../utils/logger";
 import ms = require("ms");
@@ -24,7 +27,7 @@ async function doWorkerThing() {
   const hasSteve = new Set<string>();
 
   for (const worker of query) {
-    const { maxStorage, perInterval, perItem } = await calcWorkerValues(worker);
+    const { maxStorage, perInterval, perItem, scrapChance, gemChance } = await calcWorkerValues(worker);
 
     if (!hasSteve.has(worker.userId)) {
       const boosters = await getBoosters(worker.userId);
@@ -45,6 +48,14 @@ async function doWorkerThing() {
     }
 
     if (hasSteve.has(worker.userId)) {
+      let steveStorage: SteveData;
+
+      if (await redis.exists(`${Constants.redis.nypsi.STEVE_EARNED}:${worker.userId}`)) {
+        steveStorage = JSON.parse(await redis.get(`${Constants.redis.nypsi.STEVE_EARNED}:${worker.userId}`));
+      } else {
+        steveStorage = { money: 0, gemShards: 0, scraps: 0 };
+      }
+
       let earned = 0;
 
       if (worker.stored != 0) {
@@ -67,16 +78,20 @@ async function doWorkerThing() {
 
       await updateBalance(worker.userId, (await getBalance(worker.userId)) + earned);
 
-      if (await redis.exists(`${Constants.redis.nypsi.STEVE_EARNED}:${worker.userId}`)) {
-        await redis.set(
-          `${Constants.redis.nypsi.STEVE_EARNED}:${worker.userId}`,
-          parseInt(await redis.get(`${Constants.redis.nypsi.STEVE_EARNED}:${worker.userId}`)) + earned
-        );
-        await redis.expire(`${Constants.redis.nypsi.STEVE_EARNED}:${worker.userId}`, ms("24 hours") / 1000);
-      } else {
-        await redis.set(`${Constants.redis.nypsi.STEVE_EARNED}:${worker.userId}`, earned);
-        await redis.expire(`${Constants.redis.nypsi.STEVE_EARNED}:${worker.userId}`, ms("24 hours") / 1000);
+      steveStorage.money += earned;
+
+      while (percentChance(gemChance * incrementAmount)) {
+        steveStorage.gemShards++;
+        await addInventoryItem(worker.userId, "gem_scrap", 1, false);
       }
+
+      while (percentChance(scrapChance * incrementAmount)) {
+        steveStorage.scraps++;
+        await addInventoryItem(worker.userId, "quarry_scrap", 1, false);
+      }
+
+      await redis.set(`${Constants.redis.nypsi.STEVE_EARNED}:${worker.userId}`, JSON.stringify(steveStorage));
+      await redis.expire(`${Constants.redis.nypsi.STEVE_EARNED}:${worker.userId}`, ms("24 hours") / 1000);
     } else {
       await prisma.economyWorker.update({
         where: {

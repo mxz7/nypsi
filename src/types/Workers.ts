@@ -22,3 +22,5 @@ export interface WorkerUpgrades {
 }
 
 export type PossibleUpgrade = "per_item" | "per_interval" | "max_storage" | "scrap_chance" | "gem_chance";
+
+export type SteveData = { money: number; scraps: number; gemShards: number };
