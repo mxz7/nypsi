@@ -1752,10 +1752,10 @@
     "buy": 0,
     "sell": 1000000,
     "in_crates": false,
-    "worker_upgrade_id": "quarry",
+    "worker_upgrade_id": "gem_radar",
     "craft": {
       "time": 43200,
-      "ingrediants": ["quarry_scrap:15"]
+      "ingrediants": ["quarry_scrap:12"]
     }
   },
   "earth_scanner": {
@@ -1773,7 +1773,7 @@
     "worker_upgrade_id": "earth_scanner",
     "craft": {
       "time": 43200,
-      "ingrediants": ["quarry_scrap:15"]
+      "ingrediants": ["quarry_scrap:5"]
     }
   },
   "manager": {
