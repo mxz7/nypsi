@@ -1698,5 +1698,30 @@
     "buy": 0,
     "sell": 100000,
     "in_crates": true
+  },
+  "gem_shard": {
+    "id": "gem_shard",
+    "name": "gem shard",
+    "plural": "gem shards",
+    "emoji": "<:nypsi_gem_shard:1088524343367188510>",
+    "longDesc": "gem shards have no known powers unlike intact shards, however, it is known that when you put enough gem shards together they will reliably form into full shards, if you're lucky...",
+    "role": "item",
+    "aliases": ["shard", "shards"],
+    "rarity": 1,
+    "buy": 0,
+    "sell": 500000,
+    "in_crates": false
+  },
+  "quarry_scrap": {
+    "id": "quarry_scrap",
+    "name": "quarry scrap",
+    "plural": "quarry scraps",
+    "emoji": "🪨",
+    "longDesc": "rarely found from your quarry, can be crafted into quarry upgrades",
+    "role": "item",
+    "rarity": 1,
+    "buy": 0,
+    "sell": 50000,
+    "in_crates": false
   }
 }
