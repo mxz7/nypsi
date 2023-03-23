@@ -592,7 +592,7 @@ async function playGame(
     });
     gamble(message.author, "tower", game.bet, true, id, winnings);
 
-    if (game.embed.data.footer) {
+    if (earnedXp > 0) {
       game.embed.setFooter({ text: `+${earnedXp}xp | id: ${id}` });
     } else {
       game.embed.setFooter({ text: `id: ${id}` });
