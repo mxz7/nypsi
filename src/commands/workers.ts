@@ -141,7 +141,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return Math.floor(cost);
   };
 
-  const showWorkers = async (defaultWorker = "potato_farmer", msg?: Message) => {
+  const showWorkers = async (defaultWorker = "quarry", msg?: Message) => {
     const displayWorker = async (worker: Worker) => {
       const embed = new CustomEmbed(message.member).disableFooter();
 
