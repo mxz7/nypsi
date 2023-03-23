@@ -134,6 +134,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       baseCost *
       (baseWorkers[workerId].prestige_requirement >= 4
         ? baseWorkers[workerId].prestige_requirement / 2
+        : baseWorkers[workerId].prestige_requirement - 0.5 < 1
+        ? 1
         : baseWorkers[workerId].prestige_requirement - 0.5);
 
     const cost = baseCost + baseCost * owned;
