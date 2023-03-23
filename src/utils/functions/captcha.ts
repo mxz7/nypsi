@@ -64,9 +64,9 @@ export async function passedCaptcha(member: GuildMember) {
   }
 
   await hook.send(
-    `[${getTimestamp()}] **${member.user.tag}** (${member.user.id}) has passed a captcha (${captchaPasses.get(
+    `[${getTimestamp()}] **${member.user.tag}** (${member.user.id}) has passed a captcha [${captchaPasses.get(
       member.user.id
-    )})`
+    )}]`
   );
 
   await redis.set(`${Constants.redis.nypsi.CAPTCHA_VERIFIED}:${member.user.id}`, member.user.id);
@@ -74,7 +74,7 @@ export async function passedCaptcha(member: GuildMember) {
   hook.destroy();
 }
 
-export async function failedCaptcha(member: GuildMember) {
+export async function failedCaptcha(member: GuildMember, content: string) {
   const hook = new WebhookClient({
     url: process.env.ANTICHEAT_HOOK,
   });
@@ -98,9 +98,9 @@ export async function failedCaptcha(member: GuildMember) {
   }
 
   await hook.send(
-    `[${getTimestamp()}] **${member.user.tag}** (${member.user.id}) has failed a captcha (${captchaFails.get(
+    `[${getTimestamp()}] **${member.user.tag}** (${member.user.id}) has failed a captcha (${content}) [${captchaFails.get(
       member.user.id
-    )})${captchaFails.get(member.user.id) % 15 === 0 ? " <@&747059949770768475> <@672793821850894347>" : ""}`
+    )}]${captchaFails.get(member.user.id) % 15 === 0 ? " <@&747059949770768475> <@672793821850894347>" : ""}`
   );
   hook.destroy();
 }
@@ -145,7 +145,7 @@ export async function verifyUser(message: Message | (NypsiCommandInteraction & C
     .catch(() => {
       fail = true;
       logger.info(`captcha (${message.author.id}) failed`);
-      failedCaptcha(message.member);
+      failedCaptcha(message.member, "captcha timed out");
       message.channel.send({
         content: message.author.toString() + " captcha failed, please **type** the letter/number combination shown",
       });
@@ -164,7 +164,7 @@ export async function verifyUser(message: Message | (NypsiCommandInteraction & C
   } else {
     logger.info(`${message.guild} - ${message.author.tag}: ${message.content}`);
     logger.info(`captcha (${message.author.id}) failed`);
-    failedCaptcha(message.member);
+    failedCaptcha(message.member, response.content);
     return message.channel.send({
       content: message.author.toString() + " captcha failed, please **type** the letter/number combination shown",
     });

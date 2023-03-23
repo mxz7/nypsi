@@ -651,7 +651,7 @@ async function playGame(
     });
     gamble(message.author, "mines", bet, true, id, winnings);
 
-    if (embed.data.footer && !embed.data.footer.text.includes("nypsi")) {
+    if (earnedXp > 0) {
       embed.setFooter({ text: `+${earnedXp}xp | id: ${id}` });
     } else {
       embed.setFooter({ text: `id: ${id}` });
