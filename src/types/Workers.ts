@@ -21,4 +21,4 @@ export interface WorkerUpgrades {
   for?: string;
 }
 
-export type PossibleUpgrade = "per_item" | "per_interval" | "max_storage";
+export type PossibleUpgrade = "per_item" | "per_interval" | "max_storage" | "scrap_chance" | "gem_chance";
