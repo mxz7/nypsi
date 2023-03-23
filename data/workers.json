@@ -112,7 +112,7 @@
     },
     "shipping_containers": {
       "id": "shipping_containers",
-      "name": "shipping_containers",
+      "name": "shipping containers",
       "upgrades": "max_storage",
       "effect": 0.4,
       "stack_limit": 10,
