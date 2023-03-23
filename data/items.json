@@ -1064,7 +1064,7 @@
     "name": "xp potion",
     "plural": "xp potions",
     "emoji": "<:nypsi_potion:1001463080582131843>",
-    "longDesc": "earn 50% more xp for 30 minutes (stacks to 3)",
+    "longDesc": "earn 30% more xp for 30 minutes (stacks to 3)",
     "rarity": 1,
     "buy": 0,
     "sell": 75000,
@@ -1074,7 +1074,7 @@
     "max": 3,
     "boosterEffect": {
       "boosts": ["xp"],
-      "effect": 0.5,
+      "effect": 0.3,
       "time": 1800
     },
     "in_crates": true
