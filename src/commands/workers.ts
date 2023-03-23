@@ -40,6 +40,7 @@ const cmd = new Command("workers", "view the available workers and manage your o
 ]);
 
 const workerChoices: APIApplicationCommandOptionChoice<string>[] = [
+  { name: "quarry", value: "quarry" },
   { name: "potato farmer", value: "potato_farmer" },
   { name: "fisherman", value: "fisherman" },
   { name: "miner", value: "miner" },
@@ -300,6 +301,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     for (const upgradeId of Object.keys(baseUpgrades)) {
       if (baseUpgrades[upgradeId].for && !baseUpgrades[upgradeId].for.includes(worker.id)) continue;
+
+      if (worker.id === "quarry" && !baseUpgrades[upgradeId].for) continue;
 
       if (baseUpgrades[upgradeId].base_cost) {
         const owned = userWorker.upgrades.find((u) => u.upgradeId == upgradeId)?.amount || 0;
