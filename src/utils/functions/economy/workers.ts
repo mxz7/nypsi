@@ -93,9 +93,9 @@ export async function calcWorkerValues(
     const prestige = await getPrestige(worker.userId);
 
     for (let i = 0; i < (prestige > 50 ? 50 : prestige); i++) {
-      perIntervalBonus += i;
-      perItemBonus += i;
-      maxStoredBonus += i;
+      perIntervalBonus += i / 3.7;
+      perItemBonus += i / 3.5;
+      maxStoredBonus += i / 4;
     }
   }
 

@@ -143,7 +143,7 @@
       "prestige_requirement": 0,
       "cost": 100000,
       "base": {
-        "per_item": 4,
+        "per_item": 17,
         "max_storage": 500,
         "per_interval": 150
       }
