@@ -89,7 +89,8 @@ export async function calcWorkerValues(
   let scrapChance = 0;
 
   if (worker.workerId === "quarry") {
-    scrapChance = 0.0007;
+    scrapChance = 0.00227;
+    gemChance = 0.0002;
     const prestige = await getPrestige(worker.userId);
 
     for (let i = 0; i < (prestige > 50 ? 50 : prestige); i++) {
@@ -229,12 +230,16 @@ export async function claimFromWorkers(userId: string): Promise<string> {
 
     amountEarned += Math.floor(perItem * worker.stored);
 
-    while (percentChance(gemChance * worker.stored)) {
+    console.log(gemChance * worker.stored);
+    console.log(scrapChance * worker.stored);
+    console.log(gemChance, scrapChance);
+
+    while (gemChance > 0 && percentChance(gemChance * worker.stored)) {
       amounts.set("gem_scrap", amounts.has("gem_scrap") ? amounts.get("gem_scrap") + 1 : 1);
       await addInventoryItem(worker.userId, "gem_scrap", 1, false);
     }
 
-    while (percentChance(scrapChance * worker.stored)) {
+    while (scrapChance > 0 && percentChance(scrapChance * worker.stored)) {
       amounts.set("quarry_scrap", amounts.has("quarry_scrap") ? amounts.get("quarry_scrap") + 1 : 1);
       await addInventoryItem(worker.userId, "quarry_scrap", 1, false);
     }
@@ -261,19 +266,24 @@ export async function claimFromWorkers(userId: string): Promise<string> {
   await emptyWorkersStored(userId);
   await updateBalance(userId, (await getBalance(userId)) + amountEarned);
 
-  let res = `+$**${amountEarned.toLocaleString()}**\n\n${earnedBreakdown.join("\n")}`;
+  const res = `+$**${amountEarned.toLocaleString()}**\n\n${earnedBreakdown.join("\n")}`;
+  const footer: string[] = [];
 
   if (amounts.has("gem_scrap")) {
-    res += `\n\nyour quarry found **${amounts.get("gem_scrap")}** ${getItems()["gem_shard"].emoji} gem shard${
-      amounts.get("gem_scrap") > 1 ? "s" : ""
-    }`;
+    footer.push(
+      `you found **${amounts.get("gem_scrap")}** ${getItems()["gem_shard"].emoji} gem shard${
+        amounts.get("gem_scrap") > 1 ? "s" : ""
+      }`
+    );
   }
 
   if (amounts.has("quarry_scrap")) {
-    res += `\n\nyour quarry found **${amounts.get("quarry_scrap")}** ${getItems()["quarry_scrap"].emoji} quarry scrap${
-      amounts.get("quarry_scrap") > 1 ? "s" : ""
-    }`;
+    footer.push(
+      `you found **${amounts.get("quarry_scrap")}** ${getItems()["quarry_scrap"].emoji} quarry scrap${
+        amounts.get("quarry_scrap") > 1 ? "s" : ""
+      }`
+    );
   }
 
-  return res;
+  return footer.length > 0 ? res + `\n\n${footer.join("\n")}` : res;
 }

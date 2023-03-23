@@ -122,7 +122,7 @@
       "id": "gem_radar",
       "name": "gem radar",
       "upgrades": "gem_chance",
-      "effect": 0.00005,
+      "effect": 0.002,
       "stack_limit": 10,
       "for": "quarry"
     },
@@ -130,7 +130,7 @@
       "id": "earth_scanner",
       "name": "earth scanner",
       "upgrades": "scrap_chance",
-      "effect": 0.0005,
+      "effect": 0.0025,
       "stack_limit": 10,
       "for": "quarry"
     }
