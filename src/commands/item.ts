@@ -63,7 +63,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({ embeds: [new ErrorEmbed(`couldnt find \`${args.join(" ")}\``)] });
   }
 
-  await addCooldown(cmd.name, message.member, 7);
+  await addCooldown(cmd.name, message.member, 4);
 
   const embed = new CustomEmbed(message.member).setTitle(`${selected.emoji} ${selected.name}`);
 
@@ -151,8 +151,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   }
 
   embed.setDescription(desc.join("\n"));
-
-  await addCooldown(cmd.name, message.member, 5);
 
   let thumbnail: string;
 
