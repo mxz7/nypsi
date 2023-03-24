@@ -230,10 +230,6 @@ export async function claimFromWorkers(userId: string): Promise<string> {
 
     amountEarned += Math.floor(perItem * worker.stored);
 
-    console.log(gemChance * worker.stored);
-    console.log(scrapChance * worker.stored);
-    console.log(gemChance, scrapChance);
-
     while (gemChance > 0 && percentChance(gemChance * worker.stored)) {
       amounts.set("gem_scrap", amounts.has("gem_scrap") ? amounts.get("gem_scrap") + 1 : 1);
       await addInventoryItem(worker.userId, "gem_scrap", 1, false);
