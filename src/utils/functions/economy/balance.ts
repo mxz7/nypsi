@@ -386,7 +386,7 @@ export async function calcMaxBet(member: GuildMember): Promise<number> {
 
   if (calculated > 1_000_000) calculated = 1_000_000;
 
-  if (await isBooster(member.user.id)) calculated += 100_000;
+  if (await isBooster(member.user.id)) calculated += 250_000;
 
   const boosters = await getBoosters(member);
 
