@@ -133,14 +133,15 @@ export default async function interactionCreate(interaction: Interaction) {
       if (interaction.guild.id != "747056029795221513") return;
       if (!isKarmaShopOpen()) return;
 
-      const items = getKarmaShopItems();
+      const items = await getKarmaShopItems();
       const karma = await getKarma(interaction.user.id);
 
       let options = Object.keys(items).filter(
         (item) =>
           (item.includes(focused.value) || items[item].name.includes(focused.value)) &&
           items[item].items_left > 0 &&
-          items[item].cost <= karma
+          items[item].cost <= karma &&
+          items[item].limit > (items[item].bought.has(interaction.user.id) ? items[item].bought.get(interaction.user.id) : 0)
       );
 
       if (options.length > 25) options = options.splice(0, 24);
