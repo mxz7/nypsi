@@ -54,6 +54,10 @@ export async function getKarmaShopItems() {
   return JSON.parse(await redis.get(Constants.redis.nypsi.KARMA_SHOP_ITEMS)) as { [key: string]: KarmaShopItem };
 }
 
+export async function setKarmaShopItems(items: { [key: string]: KarmaShopItem }) {
+  await redis.set(Constants.redis.nypsi.KARMA_SHOP_ITEMS, JSON.stringify(items));
+}
+
 export async function openKarmaShop(client: NypsiClient, now = false) {
   const open = async () => {
     if (!now && (await getNextKarmaShopOpen()).getTime() > Date.now()) return;

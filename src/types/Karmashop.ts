@@ -7,6 +7,6 @@ export type KarmaShopItem = {
   aliases: string[];
   type: "item" | "premium" | "xp";
   value: string;
-  bought: Map<string, number>;
+  bought: string[];
   limit: number;
 };

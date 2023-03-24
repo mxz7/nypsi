@@ -141,7 +141,7 @@ export default async function interactionCreate(interaction: Interaction) {
           (item.includes(focused.value) || items[item].name.includes(focused.value)) &&
           items[item].items_left > 0 &&
           items[item].cost <= karma &&
-          items[item].limit > (items[item].bought.has(interaction.user.id) ? items[item].bought.get(interaction.user.id) : 0)
+          items[item].limit > items[item].bought.filter((i) => i === message.author.id).length
       );
 
       if (options.length > 25) options = options.splice(0, 24);
