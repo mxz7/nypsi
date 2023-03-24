@@ -24,7 +24,7 @@ const captchaPasses = new Map<string, number>();
 setInterval(() => {
   captchaFails.clear();
   captchaPasses.clear();
-}, ms("16 hours"));
+}, ms("24 hours"));
 
 export async function isLockedOut(userId: string) {
   return Boolean(await redis.sismember(Constants.redis.nypsi.LOCKED_OUT, userId));
