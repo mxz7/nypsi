@@ -21,7 +21,14 @@ import { getPrestige } from "../utils/functions/economy/prestige";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import { getXp, updateXp } from "../utils/functions/economy/xp";
 import { getKarma, removeKarma } from "../utils/functions/karma/karma";
-import { closeKarmaShop, getKarmaShopItems, isKarmaShopOpen, openKarmaShop } from "../utils/functions/karma/karmashop";
+import {
+  closeKarmaShop,
+  getKarmaShopItems,
+  getLastKarmaShopOpen,
+  getNextKarmaShopOpen,
+  isKarmaShopOpen,
+  openKarmaShop,
+} from "../utils/functions/karma/karmashop";
 import PageManager from "../utils/functions/page";
 import { addMember, getTier, isPremium, setExpireDate } from "../utils/functions/premium/premium";
 import { percentChance } from "../utils/functions/random";
@@ -54,13 +61,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (!(await userExists(message.member))) await createUser(message.member);
   if (message.author.id == Constants.TEKOH_ID) {
     if (args[0] && args[0].toLowerCase() == "open") {
-      return openKarmaShop();
+      return openKarmaShop(message.client as NypsiClient, true);
     } else if (args[0] && args[0].toLowerCase() == "close") {
       return closeKarmaShop();
     }
   }
-
-  const items = getKarmaShopItems();
 
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -98,22 +103,21 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({ embeds: [embed], ephemeral: true });
   }
 
-  if (!isKarmaShopOpen() && message.guild.id == "747056029795221513") {
+  if (!(await isKarmaShopOpen())) {
     const embed = new CustomEmbed(message.member);
 
     embed.setDescription(
-      "the karma shop is currently **closed**\nkeep server notifications enabled to see when the karma shop is opened!"
+      `the karma shop is currently **closed**, it was last open at <t:${Math.floor(
+        (await getLastKarmaShopOpen()).getTime() / 1000
+      )}>\n\nwill **next open at** <t:${Math.floor((await getNextKarmaShopOpen()).getTime() / 1000)}> (<t:${Math.floor(
+        (await getNextKarmaShopOpen()).getTime() / 1000
+      )}:R>)`
     );
 
     return send({ embeds: [embed] });
   }
 
-  if (message.guild.id != "747056029795221513") {
-    return send({
-      content: "discord.gg/hJTDNST",
-      embeds: [new CustomEmbed(message.member, "the karma shop can **only be** accessed in the official nypsi server")],
-    });
-  }
+  const items = await getKarmaShopItems();
 
   let limit = 7;
 
