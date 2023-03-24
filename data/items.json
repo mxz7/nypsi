@@ -1126,7 +1126,7 @@
   "blue_rocks": {
     "id": "blue_rocks",
     "name": "blue rocks",
-    "aliases": ["blue", "meth", "C10H15N"],
+    "aliases": ["meth", "C10H15N"],
     "emoji": "<:nypsi_bluerock:1003408529954177144>",
     "longDesc": "https://youtu.be/Dbt-OfbQTpw?t=28",
     "rarity": 0,
