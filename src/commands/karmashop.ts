@@ -14,6 +14,7 @@ import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
+import { KarmaShopItem } from "../types/Karmashop";
 import Constants from "../utils/Constants";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { addInventoryItem } from "../utils/functions/economy/inventory";
@@ -119,18 +120,24 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const items = await getKarmaShopItems();
 
-  let limit = 7;
-
-  if (await isPremium(message.author.id)) {
-    limit = 15;
-    if ((await getTier(message.author.id)) == 4) {
-      limit = 25;
-    }
-  }
-
   const itemIDs = Array.from(Object.keys(items));
 
-  if (args.length == 0 || args.length == 1) {
+  const getUserLimit = (item: KarmaShopItem) => {
+    let count = item.bought.get(message.author.id) || 0;
+
+    if (item.type === "premium") {
+      for (const item of Array.from(Object.values(items)).filter((i) => i.type === "premium")) {
+        if (item.bought.has(message.author.id)) {
+          count = 1;
+          break;
+        }
+      }
+    }
+
+    return count;
+  };
+
+  const showShop = async () => {
     inPlaceSort(itemIDs).desc((i) => items[i].items_left);
 
     const pages = PageManager.createPages(
@@ -140,28 +147,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const embed = new CustomEmbed(message.member);
 
-    const displayItemsLeft = () => {
-      let text;
-      if (amount.has(message.author.id)) {
-        text = `| ${amount.get(message.author.id)}/${limit}`;
-      } else {
-        text = `| 0/${limit}`;
-      }
-
-      return text;
-    };
-
     embed.setHeader("karma shop", message.author.avatarURL());
     embed.setFooter({
-      text: `page 1/${pages.size} | you have ${(
-        await getKarma(message.member)
-      ).toLocaleString()} karma ${displayItemsLeft()}`,
+      text: `page 1/${pages.size} | you have ${(await getKarma(message.member)).toLocaleString()} karma`,
     });
 
     for (const item of pages.get(1)) {
       embed.addField(
         item.id,
-        `${item.emoji} **${item.name}**\n**cost** ${item.cost.toLocaleString()} karma\n*${item.items_left}* available`,
+        `${item.emoji} **${item.name}**\n` +
+          `**cost** ${item.cost.toLocaleString()} karma\n` +
+          `*${item.items_left}* available\n` +
+          `${getUserLimit(item)}/${item.limit}`,
         true
       );
     }
@@ -209,16 +206,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             for (const item of pages.get(currentPage)) {
               newEmbed.addField(
                 item.id,
-                `${item.emoji} **${item.name}**\n**cost** ${item.cost.toLocaleString()} karma\n*${
-                  item.items_left
-                }* available`,
+                `${item.emoji} **${item.name}**\n` +
+                  `**cost** ${item.cost.toLocaleString()} karma\n` +
+                  `*${item.items_left}* available\n` +
+                  `${getUserLimit(item)}/${item.limit}`,
                 true
               );
             }
             newEmbed.setFooter({
               text: `page ${currentPage}/${pages.size} | you have ${(
                 await getKarma(message.member)
-              ).toLocaleString()} karma ${displayItemsLeft()}`,
+              ).toLocaleString()} karma`,
             });
             if (currentPage == 1) {
               row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -242,16 +240,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             for (const item of pages.get(currentPage)) {
               newEmbed.addField(
                 item.id,
-                `${item.emoji} **${item.name}**\n**cost** ${item.cost.toLocaleString()} karma\n*${
-                  item.items_left
-                }* available`,
+                `${item.emoji} **${item.name}**\n` +
+                  `**cost** ${item.cost.toLocaleString()} karma\n` +
+                  `*${item.items_left}* available\n` +
+                  `${getUserLimit(item)}/${item.limit}`,
                 true
               );
             }
             newEmbed.setFooter({
               text: `page ${currentPage}/${pages.size} | you have ${(
                 await getKarma(message.member)
-              ).toLocaleString()} karma ${displayItemsLeft()}`,
+              ).toLocaleString()} karma`,
             });
             if (currentPage == lastPage) {
               row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -271,7 +270,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       };
       return pageManager();
     }
-  } else if (args[0].toLowerCase() == "buy") {
+  };
+
+  if (args[0].toLowerCase() == "buy") {
     if (message.author.createdTimestamp > dayjs().subtract(7, "day").unix() * 1000) {
       return send({
         embeds: [
@@ -450,6 +451,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         ),
       ],
     });
+  } else {
+    return showShop();
   }
 }
 
