@@ -1,102 +1,112 @@
 {
   "bronze": {
-    "name": "bronze membership",
+    "name": "bronze membership (7 days)",
     "emoji": "<:nypsi_bronze:1061353493497118840>",
-    "description": "access to nypsi's bronze tier for 7 days",
     "id": "bronze",
     "cost": 350,
-    "unlimited": false,
     "items_left": 1,
-    "aliases": []
+    "aliases": [],
+    "type": "premium",
+    "value": "bronze_credit",
+    "limit": 1
   },
   "silver": {
-    "name": "silver membership",
+    "name": "silver membership (7 days)",
     "emoji": "<:nypsi_silver:1061353458650845184>",
-    "description": "access to nypsi's silver tier for 7 days",
     "id": "silver",
     "cost": 450,
-    "unlimited": false,
     "items_left": 1,
-    "aliases": []
+    "aliases": [],
+    "type": "premium",
+    "value": "silver_credit",
+    "limit": 1
   },
   "gold": {
-    "name": "gold membership",
+    "name": "gold membership (7 days)",
     "emoji": "<:nypsi_gold:1061353521825456229>",
-    "description": "access to nypsi's gold tier for 7 days",
     "id": "gold",
     "cost": 700,
-    "unlimited": false,
     "items_left": 1,
-    "aliases": []
+    "aliases": [],
+    "type": "premium",
+    "value": "gold_credit",
+    "limit": 1
   },
   "100xp": {
     "name": "100 xp",
     "emoji": "🌟",
-    "description": "100 xp will be added to your economy profile",
     "id": "100xp",
     "cost": 20,
-    "unlimited": false,
     "items_left": 30,
-    "aliases": []
+    "aliases": [],
+    "type": "xp",
+    "value": 100,
+    "limit": 10
   },
   "1000xp": {
     "name": "1000 xp",
     "emoji": "🌟",
-    "description": "1000 xp will be added to your economy profile",
     "id": "1000xp",
     "cost": 150,
-    "unlimited": false,
     "items_left": 15,
-    "aliases": []
+    "aliases": [],
+    "type": "xp",
+    "value": 1000,
+    "limit": 10
   },
   "basic_crate": {
     "name": "basic crate",
     "emoji": "📦",
-    "description": "a basic crate will be added to your inventory",
     "id": "basic_crate",
     "cost": 30,
-    "unlimited": false,
     "items_left": 30,
-    "aliases": ["basic"]
+    "aliases": ["basic"],
+    "type": "item",
+    "value": "basic_crate",
+    "limit": 10
   },
   "karma_scratch_card": {
     "name": "karma scratch card",
     "emoji": "<:nypsi_daily_scratch:1061368847522869289>",
-    "description": "a karma scratch card will be added to your inventory",
     "id": "karma_scratch_card",
     "cost": 25,
-    "unlimited": false,
     "items_left": 30,
-    "aliases": ["karma"]
+    "aliases": ["karma", "scratch"],
+    "type": "item",
+    "value": "karma_scratch_card",
+    "limit": 10
   },
   "legendary_scratch_card": {
     "name": "legendary scratch card",
     "emoji": "<:nypsi_legendary_scratch:1061405285245272074>",
-    "description": "a legendary scratch card will be added to your inventory",
     "id": "legendary_scratch_card",
     "cost": 500,
-    "unlimited": false,
     "items_left": 2,
-    "aliases": ["legendary"]
+    "aliases": ["legendary"],
+    "type": "item",
+    "value": "legendary_scratch_card",
+    "limit": 1
   },
   "nypsi_crate": {
     "name": "nypsi crate",
     "emoji": "<:xnypsi:819957267548864543>",
-    "description": "a nypsi crate will be added to your inventory",
     "id": "nypsi_crate",
     "cost": 300,
-    "unlimited": false,
     "items_left": 2,
-    "aliases": ["nypsi"]
+    "aliases": ["nypsi"],
+    "type": "item",
+    "value": "nypsi_crate",
+    "limit": 1
   },
   "gem_crate": {
     "name": "gem crate",
     "emoji": "<:gem_crate:1057641447756660747>",
-    "description": "a gem crate will be added to your inventory",
     "id": "gem_crate",
     "cost": 1500,
-    "unlimited": false,
     "items_left": 1,
-    "aliases": ["gem"]
+    "aliases": ["gem"],
+    "type": "item",
+    "value": "gem_crate",
+    "limit": 1
   }
 }
