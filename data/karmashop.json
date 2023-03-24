@@ -7,7 +7,7 @@
     "items_left": 1,
     "aliases": [],
     "type": "premium",
-    "value": 1,
+    "value": "bronze_credit",
     "limit": 1
   },
   "silver": {
@@ -18,7 +18,7 @@
     "items_left": 1,
     "aliases": [],
     "type": "premium",
-    "value": 2,
+    "value": "silver_credit",
     "limit": 1
   },
   "gold": {
@@ -29,7 +29,7 @@
     "items_left": 1,
     "aliases": [],
     "type": "premium",
-    "value": 3,
+    "value": "gold_credit",
     "limit": 1
   },
   "100xp": {
