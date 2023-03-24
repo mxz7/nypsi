@@ -41,7 +41,7 @@
     "aliases": [],
     "type": "xp",
     "value": 100,
-    "limit": 10
+    "limit": 5
   },
   "1000xp": {
     "name": "1000 xp",
@@ -52,18 +52,18 @@
     "aliases": [],
     "type": "xp",
     "value": 1000,
-    "limit": 10
+    "limit": 3
   },
   "basic_crate": {
     "name": "basic crate",
     "emoji": "📦",
     "id": "basic_crate",
     "cost": 30,
-    "items_left": 30,
+    "items_left": 40,
     "aliases": ["basic"],
     "type": "item",
     "value": "basic_crate",
-    "limit": 10
+    "limit": 5
   },
   "karma_scratch_card": {
     "name": "karma scratch card",
@@ -74,7 +74,7 @@
     "aliases": ["karma", "scratch"],
     "type": "item",
     "value": "karma_scratch_card",
-    "limit": 10
+    "limit": 5
   },
   "legendary_scratch_card": {
     "name": "legendary scratch card",
