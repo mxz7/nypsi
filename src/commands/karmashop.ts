@@ -344,7 +344,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     });
   };
 
-  if (args[0].toLowerCase() == "buy") {
+  if (args[0]?.toLowerCase() == "buy") {
     if (message.author.createdTimestamp > dayjs().subtract(7, "day").unix() * 1000) {
       return send({
         embeds: [new ErrorEmbed("your accont must be at least 1 week old to access karma shop")],
