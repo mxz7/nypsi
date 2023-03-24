@@ -564,7 +564,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "ecoban") {
-        if ((await getAdminLevel(message.author.id)) < 4) {
+        if ((await getAdminLevel(message.author.id)) < 2) {
           await res.editReply({ embeds: [new ErrorEmbed("you require admin level **2** to do this")] });
           return waitForButton();
         }
@@ -921,8 +921,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (args.length == 0) {
     const embed = new CustomEmbed(
       message.member,
-      "$x userid (id) - view disc info and db info" +
-        "\n$x removeitem (id) (item_id) (amount) - remove item from user inventory" +
+      "$x userid (id) - view/edit disc info and db info" +
         "\n$x findid (tag/username) - will attempt to find user id from cached users and database"
     );
 
