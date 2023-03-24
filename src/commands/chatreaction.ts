@@ -36,7 +36,7 @@ import {
 } from "../utils/functions/chatreactions/utils";
 import { getWordList, updateWords } from "../utils/functions/chatreactions/words";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
-import { formatNumber, isEcoBanned } from "../utils/functions/economy/utils";
+import { createUser, formatNumber, isEcoBanned, userExists } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
 import PageManager from "../utils/functions/page";
@@ -418,6 +418,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (blacklisted.includes(target.user.id))
       return send({ embeds: [new ErrorEmbed("that user is blacklisted from chat reactions in this server")] });
+
+    if (!(await userExists(target.user.id))) await createUser(target.user.id);
 
     let wager = formatNumber(args[2] || 0);
 
