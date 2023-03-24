@@ -1487,7 +1487,15 @@
     "rarity": 69,
     "in_crates": false,
     "crate_runs": 1,
-    "items": ["id:white_gem", "id:blue_gem", "id:green_gem", "id:purple_gem", "id:pink_gem", "id:crystal_heart"]
+    "items": [
+      "id:white_gem",
+      "id:blue_gem",
+      "id:green_gem",
+      "id:purple_gem",
+      "id:pink_gem",
+      "id:crystal_heart",
+      "id:gem_shard"
+    ]
   },
   "bronze_credit": {
     "id": "bronze_credit",
@@ -1557,6 +1565,8 @@
       "id:basic_crate:60",
       "id:bronze_credit:3",
       "id:silver_credit:2",
+      "id:gem_shard:4",
+      "id:quarry_scrap:4",
       "id:green_gem:3",
       "id:blue_gem:3",
       "id:pink_gem:0.7"
@@ -1594,6 +1604,7 @@
       "id:bronze_credit:6",
       "id:silver_credit:2",
       "id:gold_credit:2",
+      "id:gem_shard:10",
       "id:green_gem:3",
       "id:blue_gem:3",
       "id:purple_gem:2",
@@ -1627,6 +1638,7 @@
       "id:silver_credit:5",
       "id:gold_credit:6",
       "id:pink_gem:5",
+      "id:gem_shard:50",
       "id:gem_crate:2.5"
     ]
   },
@@ -1656,7 +1668,9 @@
       "id:silver_credit:5",
       "id:gold_credit:3",
       "id:platinum_credit:1",
-      "id:pink_gem:1"
+      "id:pink_gem:1",
+      "id:gem_shard:15",
+      "id:quarry_scrap:15"
     ]
   },
   "corner_shop_scratchie": {
@@ -1722,7 +1736,7 @@
     "longDesc": "gem shards have no known powers unlike intact shards, however, it is known that when you put enough gem shards together they will reliably form into full shards, if you're lucky...",
     "role": "item",
     "aliases": ["shard", "shards"],
-    "rarity": 1,
+    "rarity": 2,
     "buy": 0,
     "sell": 500000,
     "in_crates": false
