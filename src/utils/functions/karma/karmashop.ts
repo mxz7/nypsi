@@ -104,7 +104,7 @@ export async function openKarmaShop(client: NypsiClient, now = false) {
         },
         {
           context: {
-            content: `🔮 <@&1088800175532806187> karma shop has been opened!! it will next open on <t:${Math.floor(
+            content: `🔮 <@&1088800175532806187> karma shop has been opened!! it will next open at <t:${Math.floor(
               (await getNextKarmaShopOpen()).getTime() / 1000
             )}>`,
             cluster: cluster,
