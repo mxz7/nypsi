@@ -10,7 +10,7 @@ import { MStoTime } from "../date";
 declare function require(name: string): any;
 
 async function createNextDate() {
-  const nextOpen = new Date(Date.now() + (Math.floor(Math.random() * ms("7 days")) + ms("7 days")));
+  const nextOpen = new Date(Date.now() + (Math.floor(Math.random() * ms("16 days")) + ms("5 days")));
   const adjusted = dayjs(nextOpen).set("minutes", 0).set("seconds", 0);
 
   await redis.set(Constants.redis.nypsi.KARMA_NEXT_OPEN, adjusted.toDate().getTime());
