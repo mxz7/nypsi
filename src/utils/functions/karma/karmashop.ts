@@ -45,7 +45,7 @@ async function restock() {
   const items = require("../../../../data/karmashop.json");
 
   for (const key of Object.keys(items as { [key: string]: KarmaShopItem })) {
-    items[key].bought = new Map<string, number>();
+    items[key].bought = [];
   }
   await redis.set(Constants.redis.nypsi.KARMA_SHOP_ITEMS, JSON.stringify(items));
 }
