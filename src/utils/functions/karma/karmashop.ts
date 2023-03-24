@@ -8,8 +8,6 @@ import { MStoTime } from "../date";
 
 declare function require(name: string): any;
 
-let items: { [key: string]: KarmaShopItem } = require("../../../../data/karmashop.json");
-
 async function createNextDate() {
   const nextOpen = new Date(Date.now() + (Math.floor(Math.random() * ms("7 days")) + ms("7 days")));
 
@@ -43,12 +41,14 @@ export async function closeKarmaShop() {
   restock();
 }
 
-function restock() {
-  items = require("../../../../data/karmashop.json");
+async function restock() {
+  const items = require("../../../../data/karmashop.json");
+
+  await redis.set(Constants.redis.nypsi.KARMA_SHOP_ITEMS, JSON.stringify(items));
 }
 
-export function getKarmaShopItems() {
-  return items;
+export async function getKarmaShopItems() {
+  return JSON.parse(await redis.get(Constants.redis.nypsi.KARMA_SHOP_ITEMS)) as { [key: string]: KarmaShopItem };
 }
 
 export async function openKarmaShop(client: NypsiClient, now = false) {

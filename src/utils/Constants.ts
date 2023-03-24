@@ -97,6 +97,7 @@ export default {
       KARMA_SHOP_OPEN: "nypsi:ks:open",
       KARMA_LAST_OPEN: "nypsi:ks:lastopen",
       KARMA_NEXT_OPEN: "nypsi:ks:nextopen",
+      KARMA_SHOP_ITEMS: "nypsi:ks:items",
     },
   },
   ADMIN_IDS: ["672793821850894347", "449774710469689355"],
