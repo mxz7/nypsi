@@ -13,8 +13,7 @@ export function shuffle<T>(array: T[]): T[] {
 }
 
 export function percentChance(percent: number) {
-  if (percent >= 100) throw new TypeError("percent must be less than 100");
-  if (percent < 0.0001) throw new TypeError("cannot accurately create a chance less than 0.0001%");
+  if (percent <= 0) return false;
   let max = 100;
 
   while (percent < 1 || Boolean(percent % 1)) {

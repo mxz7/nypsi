@@ -40,6 +40,7 @@ const cmd = new Command("workers", "view the available workers and manage your o
 ]);
 
 const workerChoices: APIApplicationCommandOptionChoice<string>[] = [
+  { name: "quarry", value: "quarry" },
   { name: "potato farmer", value: "potato_farmer" },
   { name: "fisherman", value: "fisherman" },
   { name: "miner", value: "miner" },
@@ -133,6 +134,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       baseCost *
       (baseWorkers[workerId].prestige_requirement >= 4
         ? baseWorkers[workerId].prestige_requirement / 2
+        : baseWorkers[workerId].prestige_requirement - 0.5 < 1
+        ? 1
         : baseWorkers[workerId].prestige_requirement - 0.5);
 
     const cost = baseCost + baseCost * owned;
@@ -140,7 +143,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return Math.floor(cost);
   };
 
-  const showWorkers = async (defaultWorker = "potato_farmer", msg?: Message) => {
+  const showWorkers = async (defaultWorker = "quarry", msg?: Message) => {
     const displayWorker = async (worker: Worker) => {
       const embed = new CustomEmbed(message.member).disableFooter();
 
@@ -300,6 +303,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     for (const upgradeId of Object.keys(baseUpgrades)) {
       if (baseUpgrades[upgradeId].for && !baseUpgrades[upgradeId].for.includes(worker.id)) continue;
+
+      if (worker.id === "quarry" && !baseUpgrades[upgradeId].for) continue;
 
       if (baseUpgrades[upgradeId].base_cost) {
         const owned = userWorker.upgrades.find((u) => u.upgradeId == upgradeId)?.amount || 0;
