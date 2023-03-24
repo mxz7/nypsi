@@ -1713,7 +1713,8 @@
       "id:workers_crate:3",
       "id:boosters_crate:3",
       "id:bronze_credit:0.2",
-      "id:purple_gem:0.1"
+      "id:purple_gem:0.1",
+      "id:quarry_scrap:1"
     ]
   },
   "bob": {
