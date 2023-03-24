@@ -439,13 +439,17 @@ export async function calcNetWorth(member: GuildMember | string, breakdown = fal
           upgrades: true,
         },
       },
-      EconomyGuild: {
+      EconomyGuildMember: {
         select: {
-          balance: true,
-          level: true,
-          members: {
+          guild: {
             select: {
-              userId: true,
+              balance: true,
+              level: true,
+              members: {
+                select: {
+                  userId: true,
+                },
+              },
             },
           },
         },
@@ -468,19 +472,19 @@ export async function calcNetWorth(member: GuildMember | string, breakdown = fal
 
   if (breakdown) breakdownItems.set("balance", worth);
 
-  if (query.EconomyGuild) {
+  if (query.EconomyGuildMember?.guild) {
     let guildWorth = 0;
 
-    for (let i = 0; i < query.EconomyGuild.level; i++) {
+    for (let i = 0; i < query.EconomyGuildMember.guild.level; i++) {
       const baseMoney = 3000000 * Math.pow(i, 2.57);
-      const bonusMoney = 100000 * query.EconomyGuild.members.length;
+      const bonusMoney = 100000 * query.EconomyGuildMember.guild.members.length;
 
       guildWorth += Math.floor(baseMoney + bonusMoney);
     }
 
-    worth += Number(query.EconomyGuild.balance);
+    worth += Number(query.EconomyGuildMember.guild.balance);
 
-    worth += guildWorth / query.EconomyGuild.members.length;
+    worth += guildWorth / query.EconomyGuildMember.guild.members.length;
     if (breakdown) breakdownItems.set("guild", guildWorth);
   } else if (breakdown) {
     breakdownItems.set("guild", 0);
