@@ -135,7 +135,18 @@ export async function setLogsChannelHook(guild: Guild, hook: string) {
   });
 }
 
-export async function getLogsChannelHook(guild: Guild): Promise<WebhookClient | undefined> {
+export async function getLogsChannelHook(guild: Guild) {
+  if (await redis.exists(`nypsi:query:islogsenabled:searching:${guild.id}`)) {
+    return (await new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(getLogsChannelHook(guild));
+      }, 200);
+    })) as WebhookClient;
+  }
+
+  await redis.set(`nypsi:query:islogsenabled:searching:${guild.id}`, "t");
+  await redis.expire(`nypsi:query:islogsenabled:searching:${guild.id}`, 60);
+
   const query = await prisma.moderation.findUnique({
     where: {
       guildId: guild.id,
