@@ -3,6 +3,7 @@ import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { Booster } from "../../../types/Economy";
+import { SteveData } from "../../../types/Workers";
 import Constants from "../../Constants";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { getItems } from "./utils";
@@ -63,12 +64,30 @@ async function checkBoosters(member: string | GuildMember, boosters: Map<string,
         total += expired.get(expiredBoosterId);
 
         if (expiredBoosterId == "steve") {
-          const earned = parseInt((await redis.get(`${Constants.redis.nypsi.STEVE_EARNED}:${userId}`)) || "0");
+          let earned: SteveData = JSON.parse(await redis.get(`${Constants.redis.nypsi.STEVE_EARNED}:${userId}`));
           await redis.del(`${Constants.redis.nypsi.STEVE_EARNED}:${userId}`);
+
+          if (!earned) earned = { money: 0, gemShards: 0, scraps: 0 };
 
           desc += `\`${expired.get(expiredBoosterId)}x\` ${items[expiredBoosterId].emoji} ${
             items[expiredBoosterId].name
-          } (earned $${earned.toLocaleString()})\n`;
+          } (earned $${earned.money.toLocaleString()})\n`;
+
+          const descOther: string[] = [];
+
+          if (earned.gemShards > 0) {
+            descOther.push(
+              `steve found **${earned.gemShards}x** ${getItems()["gem_shard"].emoji} ${getItems()["gem_shard"].name}`
+            );
+          }
+
+          if (earned.scraps > 0) {
+            descOther.push(
+              `steve found **${earned.scraps}x** ${getItems()["quarry_scrap"].emoji} ${getItems()["quarry_scrap"].name}`
+            );
+          }
+
+          if (descOther.length > 0) desc += `\n${descOther.join("\n")}`;
         } else {
           desc += `\`${expired.get(expiredBoosterId)}x\` ${items[expiredBoosterId].emoji} ${items[expiredBoosterId].name}\n`;
         }
