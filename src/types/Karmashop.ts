@@ -1,10 +1,12 @@
-export interface KarmaShopItem {
+export type KarmaShopItem = {
   name: string;
   emoji: string;
-  description: string;
   id: string;
   cost: number;
-  unlimited: boolean;
   items_left: number;
   aliases: string[];
-}
+  type: "item" | "premium" | "xp";
+  value: string;
+  bought: string[];
+  limit: number;
+};

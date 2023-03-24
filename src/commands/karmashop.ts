@@ -14,6 +14,7 @@ import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
+import { KarmaShopItem } from "../types/Karmashop";
 import Constants from "../utils/Constants";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { addInventoryItem } from "../utils/functions/economy/inventory";
@@ -21,10 +22,18 @@ import { getPrestige } from "../utils/functions/economy/prestige";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import { getXp, updateXp } from "../utils/functions/economy/xp";
 import { getKarma, removeKarma } from "../utils/functions/karma/karma";
-import { closeKarmaShop, getKarmaShopItems, isKarmaShopOpen, openKarmaShop } from "../utils/functions/karma/karmashop";
+import {
+  closeKarmaShop,
+  getKarmaShopItems,
+  getLastKarmaShopOpen,
+  getNextKarmaShopOpen,
+  isKarmaShopOpen,
+  openKarmaShop,
+  setKarmaShopItems,
+} from "../utils/functions/karma/karmashop";
 import PageManager from "../utils/functions/page";
-import { addMember, getTier, isPremium, setExpireDate } from "../utils/functions/premium/premium";
 import { percentChance } from "../utils/functions/random";
+import sleep from "../utils/functions/sleep";
 import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import dayjs = require("dayjs");
@@ -48,19 +57,15 @@ cmd.slashData
       )
   );
 
-const amount = new Map<string, number>();
-
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (!(await userExists(message.member))) await createUser(message.member);
   if (message.author.id == Constants.TEKOH_ID) {
     if (args[0] && args[0].toLowerCase() == "open") {
-      return openKarmaShop();
+      return openKarmaShop(message.client as NypsiClient, true);
     } else if (args[0] && args[0].toLowerCase() == "close") {
       return closeKarmaShop();
     }
   }
-
-  const items = getKarmaShopItems();
 
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -98,35 +103,40 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({ embeds: [embed], ephemeral: true });
   }
 
-  if (!isKarmaShopOpen() && message.guild.id == "747056029795221513") {
+  if (!(await isKarmaShopOpen())) {
     const embed = new CustomEmbed(message.member);
 
     embed.setDescription(
-      "the karma shop is currently **closed**\nkeep server notifications enabled to see when the karma shop is opened!"
+      `the karma shop is currently **closed**, it was last open at <t:${Math.floor(
+        (await getLastKarmaShopOpen()).getTime() / 1000
+      )}>\n\nwill **next open at** <t:${Math.floor((await getNextKarmaShopOpen()).getTime() / 1000)}> (<t:${Math.floor(
+        (await getNextKarmaShopOpen()).getTime() / 1000
+      )}:R>)`
     );
 
     return send({ embeds: [embed] });
   }
 
-  if (message.guild.id != "747056029795221513") {
-    return send({
-      content: "discord.gg/hJTDNST",
-      embeds: [new CustomEmbed(message.member, "the karma shop can **only be** accessed in the official nypsi server")],
-    });
-  }
-
-  let limit = 7;
-
-  if (await isPremium(message.author.id)) {
-    limit = 15;
-    if ((await getTier(message.author.id)) == 4) {
-      limit = 25;
-    }
-  }
+  const items = await getKarmaShopItems();
 
   const itemIDs = Array.from(Object.keys(items));
 
-  if (args.length == 0 || args.length == 1) {
+  const getUserLimit = (item: KarmaShopItem, items: { [key: string]: KarmaShopItem }) => {
+    let count = item.bought.filter((i) => i === message.author.id).length;
+
+    if (item.type === "premium") {
+      for (const item of Array.from(Object.values(items)).filter((i) => i.type === "premium")) {
+        if (item.bought.includes(message.author.id)) {
+          count = 1;
+          break;
+        }
+      }
+    }
+
+    return count;
+  };
+
+  const showShop = async () => {
     inPlaceSort(itemIDs).desc((i) => items[i].items_left);
 
     const pages = PageManager.createPages(
@@ -136,28 +146,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const embed = new CustomEmbed(message.member);
 
-    const displayItemsLeft = () => {
-      let text;
-      if (amount.has(message.author.id)) {
-        text = `| ${amount.get(message.author.id)}/${limit}`;
-      } else {
-        text = `| 0/${limit}`;
-      }
-
-      return text;
-    };
-
     embed.setHeader("karma shop", message.author.avatarURL());
     embed.setFooter({
-      text: `page 1/${pages.size} | you have ${(
-        await getKarma(message.member)
-      ).toLocaleString()} karma ${displayItemsLeft()}`,
+      text: `page 1/${pages.size} | you have ${(await getKarma(message.member)).toLocaleString()} karma`,
     });
 
     for (const item of pages.get(1)) {
       embed.addField(
         item.id,
-        `${item.emoji} **${item.name}**\n**cost** ${item.cost.toLocaleString()} karma\n*${item.items_left}* available`,
+        `${item.emoji} **${item.name}**\n` +
+          `**cost** ${item.cost.toLocaleString()} karma\n` +
+          `*${item.items_left}* available\n` +
+          `${getUserLimit(item, items)}/${item.limit}`,
         true
       );
     }
@@ -205,16 +205,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             for (const item of pages.get(currentPage)) {
               newEmbed.addField(
                 item.id,
-                `${item.emoji} **${item.name}**\n**cost** ${item.cost.toLocaleString()} karma\n*${
-                  item.items_left
-                }* available`,
+                `${item.emoji} **${item.name}**\n` +
+                  `**cost** ${item.cost.toLocaleString()} karma\n` +
+                  `*${item.items_left}* available\n` +
+                  `${getUserLimit(item, items)}/${item.limit}`,
                 true
               );
             }
             newEmbed.setFooter({
               text: `page ${currentPage}/${pages.size} | you have ${(
                 await getKarma(message.member)
-              ).toLocaleString()} karma ${displayItemsLeft()}`,
+              ).toLocaleString()} karma`,
             });
             if (currentPage == 1) {
               row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -238,16 +239,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             for (const item of pages.get(currentPage)) {
               newEmbed.addField(
                 item.id,
-                `${item.emoji} **${item.name}**\n**cost** ${item.cost.toLocaleString()} karma\n*${
-                  item.items_left
-                }* available`,
+                `${item.emoji} **${item.name}**\n` +
+                  `**cost** ${item.cost.toLocaleString()} karma\n` +
+                  `*${item.items_left}* available\n` +
+                  `${getUserLimit(item, items)}/${item.limit}`,
                 true
               );
             }
             newEmbed.setFooter({
               text: `page ${currentPage}/${pages.size} | you have ${(
                 await getKarma(message.member)
-              ).toLocaleString()} karma ${displayItemsLeft()}`,
+              ).toLocaleString()} karma`,
             });
             if (currentPage == lastPage) {
               row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -267,33 +269,94 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       };
       return pageManager();
     }
-  } else if (args[0].toLowerCase() == "buy") {
+  };
+
+  const buyItem = async (itemId: string, attempts = 1): Promise<any> => {
+    if (await redis.exists(Constants.redis.nypsi.KARMA_SHOP_BUYING)) {
+      await sleep(15);
+      if (attempts > 500) {
+        await redis.del(Constants.redis.nypsi.KARMA_SHOP_BUYING);
+        attempts = 0;
+      }
+      return buyItem(itemId, attempts++);
+    }
+
+    const items = await getKarmaShopItems();
+    const wanted = items[itemId];
+
+    if (wanted.items_left < 1) {
+      await redis.del(Constants.redis.nypsi.KARMA_SHOP_BUYING);
+      return send({ embeds: [new ErrorEmbed(`there is no ${wanted.name} left`)] });
+    }
+
+    if (getUserLimit(wanted, items) >= wanted.limit) {
+      await redis.del(Constants.redis.nypsi.KARMA_SHOP_BUYING);
+      return send({ embeds: [new ErrorEmbed(`you have hit the user limit for ${wanted.name}`)] });
+    }
+
+    if ((await getKarma(message.member)) < wanted.cost) {
+      await redis.del(Constants.redis.nypsi.KARMA_SHOP_BUYING);
+      return send({ embeds: [new ErrorEmbed(`you cannot afford ${wanted.name}`)] });
+    }
+
+    items[wanted.id].items_left -= 1;
+    items[wanted.id].bought.push(message.author.id);
+
+    await removeKarma(message.member, wanted.cost);
+    await setKarmaShopItems(items);
+    await redis.del(Constants.redis.nypsi.KARMA_SHOP_BUYING);
+    addProgress(message.author.id, "wizard", 1);
+
+    switch (wanted.type) {
+      case "item":
+      case "premium":
+        await addInventoryItem(message.member, wanted.value, 1, false);
+        break;
+      case "xp":
+        await updateXp(message.member, (await getXp(message.member)) + parseInt(wanted.value));
+        break;
+    }
+
+    if (
+      percentChance(0.1) &&
+      (await getDmSettings(message.member)).other &&
+      !(await redis.exists(Constants.redis.nypsi.GEM_GIVEN))
+    ) {
+      await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t");
+      await redis.expire(Constants.redis.nypsi.GEM_GIVEN, Math.floor(ms("1 days") / 1000));
+      await addInventoryItem(message.member, "purple_gem", 1);
+      addProgress(message.author.id, "gem_hunter", 1);
+      await addNotificationToQueue({
+        memberId: message.author.id,
+        payload: {
+          embed: new CustomEmbed(
+            message.member,
+            `${getItems()["purple_gem"].emoji} you've found a gem! i wonder what powers it holds...`
+          )
+            .setTitle("you've found a gem")
+            .setColor(Constants.TRANSPARENT_EMBED_COLOR),
+        },
+      });
+    }
+
+    return await send({
+      embeds: [new CustomEmbed(message.member, `you have bought ${wanted.emoji} ${wanted.name} for ${wanted.cost} karma`)],
+    });
+  };
+
+  if (args[0]?.toLowerCase() == "buy") {
     if (message.author.createdTimestamp > dayjs().subtract(7, "day").unix() * 1000) {
       return send({
-        embeds: [
-          new ErrorEmbed(
-            "you cannot use this command yet. u might be an alt. or a bot 😳 (your account must be at least one week old)"
-          ),
-        ],
+        embeds: [new ErrorEmbed("your accont must be at least 1 week old to access karma shop")],
       });
     }
 
     if ((await getPrestige(message.member)) < 1) {
       if ((await getXp(message.member)) < 50) {
         return send({
-          embeds: [new ErrorEmbed("you cannot use this command yet. u might be an alt. or a bot 😳")],
+          embeds: [new ErrorEmbed("you need at least 50xp to access karma shop")],
         });
       }
-    }
-
-    const amountBought = amount.get(message.author.id);
-
-    if (amountBought >= limit) {
-      return send({
-        embeds: [
-          new CustomEmbed(message.member, `you have reached your limit for buying from the karma shop (${limit} items)`),
-        ],
-      });
     }
 
     const searchTag = args[1].toLowerCase();
@@ -323,129 +386,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return send({ embeds: [new ErrorEmbed(`couldnt find \`${args[1]}\``)] });
     }
 
-    if (selected.items_left <= 0) {
-      return send({ embeds: [new ErrorEmbed("there is none of this item left in the shop")] });
-    }
-
     if ((await getKarma(message.member)) < selected.cost) {
       return send({ embeds: [new ErrorEmbed("you cannot afford this")] });
     }
 
-    await addCooldown(cmd.name, message.member, 10);
+    await addCooldown(cmd.name, message.member, 7);
 
-    switch (selected.id) {
-      case "bronze":
-        if ((await isPremium(message.member)) && (await getTier(message.member)) >= 1) {
-          return send({ embeds: [new ErrorEmbed("you already have this membership or better")] });
-        } else {
-          if (message.guild.id != "747056029795221513") {
-            return send({
-              embeds: [new ErrorEmbed("you must be in the offical nypsi server to buy premium (discord.gg/hJTDNST)")],
-            });
-          } else {
-            await addMember(message.member, 1, message.client as NypsiClient);
-          }
-        }
-        break;
-      case "silver":
-        if ((await isPremium(message.member)) && (await getTier(message.member)) >= 2) {
-          return send({ embeds: [new ErrorEmbed("you already have this membership or better")] });
-        } else {
-          if (message.guild.id != "747056029795221513") {
-            return send({
-              embeds: [new ErrorEmbed("you must be in the offical nypsi server to buy premium (discord.gg/hJTDNST)")],
-            });
-          } else {
-            await addMember(message.member, 2, message.client as NypsiClient);
-          }
-        }
-        break;
-      case "gold":
-        if ((await isPremium(message.member)) && (await getTier(message.member)) >= 3) {
-          return send({ embeds: [new ErrorEmbed("you already have this membership or better")] });
-        } else {
-          if (message.guild.id != "747056029795221513") {
-            return send({
-              embeds: [new ErrorEmbed("you must be in the offical nypsi server to buy premium (discord.gg/hJTDNST)")],
-            });
-          } else {
-            await addMember(message.member, 3, message.client as NypsiClient);
-          }
-        }
-        break;
-      case "100xp":
-        await updateXp(message.member, (await getXp(message.member)) + 100);
-        break;
-      case "1000xp":
-        await updateXp(message.member, (await getXp(message.member)) + 1000);
-        break;
-      case "basic_crate":
-        await addInventoryItem(message.member, "basic_crate", 1);
-        break;
-      case "nypsi_crate":
-        await addInventoryItem(message.member, "nypsi_crate", 1);
-        break;
-      case "legendary_scratch_card":
-        await addInventoryItem(message.member, "legendary_scratch_card", 1);
-        break;
-      case "karma_scratch_card":
-        await addInventoryItem(message.member, "karma_scratch_card", 1);
-        break;
-      case "gem_crate":
-        await addInventoryItem(message.member, "gem_crate", 1);
-        break;
-    }
-
-    if (selected.id == "bronze" || selected.id == "silver" || selected.id == "gold") {
-      setTimeout(async () => {
-        await setExpireDate(message.member, dayjs().add(7, "days").toDate(), message.client as NypsiClient);
-      }, 1000);
-    }
-
-    if (amount.has(message.author.id)) {
-      amount.set(message.author.id, amount.get(message.author.id) + 1);
-    } else {
-      amount.set(message.author.id, 1);
-    }
-
-    await removeKarma(message.member, selected.cost);
-
-    if (!selected.unlimited) {
-      items[selected.id].items_left -= 1;
-    }
-
-    addProgress(message.author.id, "wizard", 1);
-
-    if (
-      percentChance(0.1) &&
-      (await getDmSettings(message.member)).other &&
-      !(await redis.exists(Constants.redis.nypsi.GEM_GIVEN))
-    ) {
-      await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t");
-      await redis.expire(Constants.redis.nypsi.GEM_GIVEN, Math.floor(ms("1 days") / 1000));
-      await addInventoryItem(message.member, "purple_gem", 1);
-      addProgress(message.author.id, "gem_hunter", 1);
-      await addNotificationToQueue({
-        memberId: message.author.id,
-        payload: {
-          embed: new CustomEmbed(
-            message.member,
-            `${getItems()["purple_gem"].emoji} you've found a gem! i wonder what powers it holds...`
-          )
-            .setTitle("you've found a gem")
-            .setColor(Constants.TRANSPARENT_EMBED_COLOR),
-        },
-      });
-    }
-
-    return send({
-      embeds: [
-        new CustomEmbed(
-          message.member,
-          `you have bought ${selected.emoji} ${selected.name} for ${selected.cost.toLocaleString()} karma`
-        ),
-      ],
-    });
+    return buyItem(selected.id);
+  } else {
+    return showShop();
   }
 }
 

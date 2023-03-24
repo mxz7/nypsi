@@ -36,6 +36,7 @@ import { runChristmas } from "../utils/functions/guilds/christmas";
 import { runCountdowns } from "../utils/functions/guilds/countdowns";
 import { runSnipeClearIntervals } from "../utils/functions/guilds/utils";
 import { runUploadReset } from "../utils/functions/image";
+import { openKarmaShop } from "../utils/functions/karma/karmashop";
 import { startAutoMuteViolationInterval } from "../utils/functions/moderation/mute";
 import { getCustomPresence, randomPresence, setCustomPresence } from "../utils/functions/presence";
 import { getVersion } from "../utils/functions/version";
@@ -187,6 +188,7 @@ export class NypsiClient extends Client {
     runCountdowns(this);
     runChristmas(this);
     updateCounters(this);
+    openKarmaShop(this);
     runLogs();
     runWorkerInterval();
     runNetWorthInterval();
