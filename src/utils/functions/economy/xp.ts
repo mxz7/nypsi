@@ -82,7 +82,7 @@ export async function calcEarnedXp(member: GuildMember, bet: number, multiplier:
   if (prestige) {
     if (prestige > 20) prestige = 20;
     min += prestige / 5;
-    max += prestige / 2.3;
+    max += prestige / 3;
   }
 
   min += tier;
@@ -94,7 +94,7 @@ export async function calcEarnedXp(member: GuildMember, bet: number, multiplier:
   if (prestige > 20) betDivisor = 100_000;
 
   max += bet / betDivisor;
-  max += multiplier * 2.7;
+  max += multiplier * 1.7;
 
   if (await isPassive(member)) {
     if (tier > 0) {
