@@ -3,9 +3,11 @@ import { GuildMember } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
 import { logger } from "../../logger";
+import { percentChance } from "../random";
 import { getBalance, updateBalance } from "./balance";
 import { getBoosters } from "./boosters";
-import { gemBreak, getInventory } from "./inventory";
+import { addInventoryItem, gemBreak, getInventory } from "./inventory";
+import { getPrestige } from "./prestige";
 import { getBaseUpgrades, getBaseWorkers, getItems } from "./utils";
 
 export async function getWorkers(member: GuildMember | string) {
@@ -83,6 +85,20 @@ export async function calcWorkerValues(
   let perIntervalBonus = 0;
   let perItemBonus = 0;
   let maxStoredBonus = 0;
+  let gemChance = 0;
+  let scrapChance = 0;
+
+  if (worker.workerId === "quarry") {
+    scrapChance = 0.00227;
+    gemChance = 0.0002;
+    const prestige = await getPrestige(worker.userId);
+
+    for (let i = 0; i < (prestige > 50 ? 50 : prestige); i++) {
+      perIntervalBonus += i / 3.7;
+      perItemBonus += i / 3.5;
+      maxStoredBonus += i / 4;
+    }
+  }
 
   for (const upgrade of worker.upgrades) {
     switch (baseUpgrades[upgrade.upgradeId].upgrades) {
@@ -96,6 +112,12 @@ export async function calcWorkerValues(
       case "max_storage":
         maxStoredBonus +=
           baseUpgrades[upgrade.upgradeId].effect * upgrade.amount * baseWorkers[worker.workerId].base.max_storage;
+        break;
+      case "scrap_chance":
+        scrapChance += baseUpgrades[upgrade.upgradeId].effect;
+        break;
+      case "gem_chance":
+        gemChance += baseUpgrades[upgrade.upgradeId].effect;
         break;
     }
   }
@@ -158,11 +180,15 @@ export async function calcWorkerValues(
     perInterval: Math.floor(baseWorkers[worker.workerId].base.per_interval + perIntervalBonus),
     perItem: Math.floor(baseWorkers[worker.workerId].base.per_item + perItemBonus),
     maxStorage: Math.floor(baseWorkers[worker.workerId].base.max_storage + maxStoredBonus),
+    scrapChance,
+    gemChance,
   };
 
   if (res.perInterval < 0) res.perInterval = 0;
   if (res.perItem < 0) res.perItem = 0;
   if (res.maxStorage < 0) res.maxStorage = 0;
+  if (res.scrapChance > 0.5) res.scrapChance = 0.5;
+  if (res.gemChance > 0.1) res.gemChance = 0.1;
 
   return res;
 }
@@ -200,9 +226,24 @@ export async function claimFromWorkers(userId: string): Promise<string> {
     if (worker.stored == 0) continue;
     const baseWorker = baseWorkers[worker.workerId];
 
-    const { perItem } = await calcWorkerValues(worker);
+    const { perItem, gemChance, scrapChance } = await calcWorkerValues(worker);
 
     amountEarned += Math.floor(perItem * worker.stored);
+
+    console.log(gemChance * worker.stored);
+    console.log(scrapChance * worker.stored);
+    console.log(gemChance, scrapChance);
+
+    while (gemChance > 0 && percentChance(gemChance * worker.stored)) {
+      amounts.set("gem_scrap", amounts.has("gem_scrap") ? amounts.get("gem_scrap") + 1 : 1);
+      await addInventoryItem(worker.userId, "gem_scrap", 1, false);
+    }
+
+    while (scrapChance > 0 && percentChance(scrapChance * worker.stored)) {
+      amounts.set("quarry_scrap", amounts.has("quarry_scrap") ? amounts.get("quarry_scrap") + 1 : 1);
+      await addInventoryItem(worker.userId, "quarry_scrap", 1, false);
+    }
+
     earnedBreakdown.push(
       `${baseWorker.name} +$${Math.floor(perItem * worker.stored).toLocaleString()} (${worker.stored.toLocaleString()} ${
         baseWorker.item_emoji
@@ -225,5 +266,24 @@ export async function claimFromWorkers(userId: string): Promise<string> {
   await emptyWorkersStored(userId);
   await updateBalance(userId, (await getBalance(userId)) + amountEarned);
 
-  return `+$**${amountEarned.toLocaleString()}**\n\n${earnedBreakdown.join("\n")}`;
+  const res = `+$**${amountEarned.toLocaleString()}**\n\n${earnedBreakdown.join("\n")}`;
+  const footer: string[] = [];
+
+  if (amounts.has("gem_scrap")) {
+    footer.push(
+      `you found **${amounts.get("gem_scrap")}** ${getItems()["gem_shard"].emoji} gem shard${
+        amounts.get("gem_scrap") > 1 ? "s" : ""
+      }`
+    );
+  }
+
+  if (amounts.has("quarry_scrap")) {
+    footer.push(
+      `you found **${amounts.get("quarry_scrap")}** ${getItems()["quarry_scrap"].emoji} quarry scrap${
+        amounts.get("quarry_scrap") > 1 ? "s" : ""
+      }`
+    );
+  }
+
+  return footer.length > 0 ? res + `\n\n${footer.join("\n")}` : res;
 }

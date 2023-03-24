@@ -92,9 +92,62 @@
       "effect": 0.75,
       "stack_limit": 10,
       "for": "amazon"
+    },
+    "drill": {
+      "id": "drill",
+      "name": "drill",
+      "upgrades": "per_interval",
+      "effect": 0.2,
+      "stack_limit": 15,
+      "base_cost": 30000,
+      "for": "quarry"
+    },
+    "manager": {
+      "id": "manager",
+      "name": "manager",
+      "upgrades": "per_item",
+      "effect": 0.4,
+      "stack_limit": 15,
+      "for": "quarry"
+    },
+    "shipping_containers": {
+      "id": "shipping_containers",
+      "name": "shipping containers",
+      "upgrades": "max_storage",
+      "effect": 0.4,
+      "stack_limit": 10,
+      "for": "quarry"
+    },
+    "gem_radar": {
+      "id": "gem_radar",
+      "name": "gem radar",
+      "upgrades": "gem_chance",
+      "effect": 0.002,
+      "stack_limit": 10,
+      "for": "quarry"
+    },
+    "earth_scanner": {
+      "id": "earth_scanner",
+      "name": "earth scanner",
+      "upgrades": "scrap_chance",
+      "effect": 0.0025,
+      "stack_limit": 10,
+      "for": "quarry"
     }
   },
   "workers": {
+    "quarry": {
+      "id": "quarry",
+      "name": "quarry",
+      "item_emoji": "🪨",
+      "prestige_requirement": 0,
+      "cost": 100000,
+      "base": {
+        "per_item": 17,
+        "max_storage": 500,
+        "per_interval": 150
+      }
+    },
     "potato_farmer": {
       "id": "potato_farmer",
       "name": "potato farmer",
