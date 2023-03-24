@@ -1,3 +1,4 @@
+import dayjs = require("dayjs");
 import ms = require("ms");
 import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
@@ -10,8 +11,9 @@ declare function require(name: string): any;
 
 async function createNextDate() {
   const nextOpen = new Date(Date.now() + (Math.floor(Math.random() * ms("7 days")) + ms("7 days")));
+  const adjusted = dayjs(nextOpen).set("minutes", 0).set("seconds", 0);
 
-  await redis.set(Constants.redis.nypsi.KARMA_NEXT_OPEN, nextOpen.getTime());
+  await redis.set(Constants.redis.nypsi.KARMA_NEXT_OPEN, adjusted.toDate().getTime());
 }
 
 export async function getNextKarmaShopOpen() {
