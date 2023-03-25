@@ -116,6 +116,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           {
             label: message.author.tag,
             data: [],
+            lineTension: 0.4,
           },
         ],
       },

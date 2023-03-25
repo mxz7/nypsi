@@ -69,6 +69,11 @@ if (!isMainThread) {
         ],
       },
       options: {
+        elements: {
+          point: {
+            pointStyle: "line",
+          },
+        },
         plugins: {
           tickFormat: {
             style: "currency",
