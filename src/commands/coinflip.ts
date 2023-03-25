@@ -377,6 +377,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const target = await message.guild.members.fetch(response.user.id);
 
+    if (!target) return message.channel.send({ embeds: [new ErrorEmbed("invalid guild member")] });
+
     if (response.customId == "y") {
       return doGame(message.member, target, bet, response as ButtonInteraction);
     } else {
