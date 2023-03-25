@@ -128,8 +128,8 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
 
   const tickets = await getTickets(user);
 
-  if (tickets.length <= Constants.LOTTERY_TICKETS_MAX - 3) {
-    await addTicket(user, 3);
+  if (tickets.length <= Constants.LOTTERY_TICKETS_MAX - 1) {
+    await addTicket(user, 1);
   }
 
   const crateAmount =
@@ -138,7 +138,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
 
   await addInventoryItem(user, "vote_crate", crateAmount, false);
 
-  if (percentChance(0.2) && !(await redis.exists(Constants.redis.nypsi.GEM_GIVEN))) {
+  if (percentChance(0.05) && !(await redis.exists(Constants.redis.nypsi.GEM_GIVEN))) {
     await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t");
     await redis.expire(Constants.redis.nypsi.GEM_GIVEN, Math.floor(ms("1 days") / 1000));
     await addInventoryItem(user, "blue_gem", 1);
@@ -167,7 +167,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
           `+ $**${amount.toLocaleString()}**\n` +
           "+ **5**% multiplier\n" +
           `+ **${crateAmount}** vote crates` +
-          `${tickets.length <= Constants.LOTTERY_TICKETS_MAX - 5 ? "\n+ **3** lottery tickets" : ""}`
+          `${tickets.length <= Constants.LOTTERY_TICKETS_MAX - 1 ? "\n+ **1** lottery ticket" : ""}`
       )
       .disableFooter();
 
