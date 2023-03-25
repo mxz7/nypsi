@@ -1604,7 +1604,7 @@
       "id:bronze_credit:6",
       "id:silver_credit:2",
       "id:gold_credit:2",
-      "id:gem_shard:10",
+      "id:gem_shard:7",
       "id:green_gem:3",
       "id:blue_gem:3",
       "id:purple_gem:2",
@@ -1669,8 +1669,7 @@
       "id:gold_credit:3",
       "id:platinum_credit:1",
       "id:pink_gem:1",
-      "id:gem_shard:15",
-      "id:quarry_scrap:15"
+      "id:gem_shard:15"
     ]
   },
   "corner_shop_scratchie": {
@@ -1683,21 +1682,19 @@
     "aliases": ["cscratch", "cscratchie", "cornershop"],
     "rarity": 69,
     "in_crates": false,
-    "buy": 600000,
-    "sell": 100000,
+    "buy": 300000,
+    "sell": 50000,
     "clicks": 4,
     "items": [
-      "money:250000",
+      "money:300000",
       "xp:100",
       "id:lawyer",
       "id:cake",
       "id:diamond",
       "id:cookie",
-      "id:bitcoin",
-      "id:ethereum",
       "id:worm",
       "id:blue_rocks:65",
-      "karma:15:60",
+      "karma:15:85",
       "id:ancient_debris:60",
       "id:stolen_credit_card:90",
       "id:grandma:20",
@@ -1714,7 +1711,7 @@
       "id:boosters_crate:3",
       "id:bronze_credit:0.2",
       "id:purple_gem:0.1",
-      "id:quarry_scrap:1"
+      "id:quarry_scrap:3"
     ]
   },
   "bob": {
