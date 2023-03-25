@@ -16,9 +16,9 @@ if you need further help, feel free to join the [support server](https://discord
 
 ### when will karmashop be open
 
-the karmashop (`/karmashop view`) opens 1-3 times every month. everyone will be notified in the
-[official nypsi server](http://discord.nypsi.xyz) when it is opened. make sure to join to stay
-updated (:
+you can see when the karma shop will be opened by doing `/karmashop view`. the opening time is
+decided randomly by nypsi to provide a fair opportunit for people around the world. the chosen time
+is between 5-21 days
 
 ### how do i get vote reminders
 
