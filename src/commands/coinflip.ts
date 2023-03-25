@@ -352,7 +352,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return false;
       }
 
-      if (i.user.id === message.author.id) return false;
+      if (i.user.id === message.author.id) {
+        if ((i as ButtonInteraction).customId === "n") return true;
+        return false;
+      }
 
       return true;
     };

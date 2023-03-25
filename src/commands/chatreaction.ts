@@ -434,7 +434,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (blacklisted.includes(message.author.id))
       return send({ embeds: [new ErrorEmbed("you are blacklisted from chat reactions in this server")] });
 
-    if (args.length === 2) {
+    if (args.length === 3) {
       const target = message.mentions?.members?.first() || (await getMember(message.guild, args[1]));
 
       if (!target) return send({ embeds: [new ErrorEmbed("invalid target")] });
@@ -520,7 +520,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           response.followUp({ embeds: [new CustomEmbed(target, "✅ duel request denied")] });
         }
       }
-    } else if (args.length === 1) {
+    } else if (args.length === 2) {
       let wager = formatNumber(args[1] || 0);
 
       if (wager < 0) wager = 0;
@@ -537,7 +537,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder().setCustomId("y").setLabel("accept").setStyle(ButtonStyle.Success),
-        new ButtonBuilder().setCustomId("n").setLabel("deny").setStyle(ButtonStyle.Danger)
+        new ButtonBuilder().setCustomId("n").setLabel("cancel").setStyle(ButtonStyle.Danger)
       );
 
       const requestEmbed = new CustomEmbed(
@@ -561,7 +561,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           return false;
         }
 
-        if (i.user.id === message.author.id) return false;
+        if (i.user.id === message.author.id) {
+          if ((i as ButtonInteraction).customId === "n") return true;
+          return false;
+        }
 
         return true;
       };
