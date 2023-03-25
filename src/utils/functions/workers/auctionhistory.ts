@@ -4,7 +4,7 @@ import prisma from "../../../init/database";
 import { ChartData } from "../../../types/Chart";
 import dayjs = require("dayjs");
 
-export default function auctionHistoryWorker(itemId: string): Promise<string> {
+export default function auctionHistoryWorker(itemId: string): Promise<{ url: string; totalSales: number }> {
   return new Promise((resolve, reject) => {
     const worker = new Worker(__filename, {
       workerData: [itemId],
@@ -69,12 +69,14 @@ if (!isMainThread) {
         ],
       },
     };
+    let totalSales = 0;
 
     for (const key of inPlaceSort(Array.from(gettingAverages.keys())).asc()) {
       graphData.data.labels.push(dayjs(key).format("YYYY-MM-DD"));
       graphData.data.datasets[0].data.push(
         gettingAverages.get(key).reduce((a, b) => a + b) / gettingAverages.get(key).length
       );
+      totalSales += gettingAverages.get(key).length;
     }
 
     const body = JSON.stringify({ chart: graphData });
@@ -90,7 +92,7 @@ if (!isMainThread) {
       process.exit(0);
     }
 
-    parentPort.postMessage(res.url);
+    parentPort.postMessage({ url: res.url, totalSales });
     process.exit(0);
   })();
 }
