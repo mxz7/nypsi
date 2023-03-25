@@ -845,16 +845,13 @@ export async function buyAuctionOne(interaction: ButtonInteraction, auction: Auc
 
 export async function getItemHistoryGraph(itemId: string) {
   if (await redis.exists(`${Constants.redis.cache.economy.AUCTION_ITEM_GRAPH_DATA}:${itemId}`)) {
-    return JSON.parse(await redis.get(`${Constants.redis.cache.economy.AUCTION_ITEM_GRAPH_DATA}:${itemId}`)) as {
-      url: string;
-      totalSales: number;
-    };
+    return await redis.get(`${Constants.redis.cache.economy.AUCTION_ITEM_GRAPH_DATA}:${itemId}`);
   }
 
   const res = await auctionHistoryWorker(itemId);
 
-  if (res.totalSales) {
-    await redis.set(`${Constants.redis.cache.economy.AUCTION_ITEM_GRAPH_DATA}:${itemId}`, JSON.stringify(res));
+  if (typeof res === "string") {
+    await redis.set(`${Constants.redis.cache.economy.AUCTION_ITEM_GRAPH_DATA}:${itemId}`, res);
     await redis.expire(`${Constants.redis.cache.economy.AUCTION_ITEM_GRAPH_DATA}:${itemId}`, Math.floor(ms("1 day") / 1000));
   }
 

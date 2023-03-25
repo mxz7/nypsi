@@ -4,7 +4,7 @@ import prisma from "../../../init/database";
 import { ChartData } from "../../../types/Chart";
 import dayjs = require("dayjs");
 
-export default function auctionHistoryWorker(itemId: string): Promise<{ url: string; totalSales: number }> {
+export default function auctionHistoryWorker(itemId: string): Promise<string> {
   return new Promise((resolve, reject) => {
     const worker = new Worker(__filename, {
       workerData: [itemId],
@@ -92,7 +92,7 @@ if (!isMainThread) {
       process.exit(0);
     }
 
-    parentPort.postMessage({ url: res.url, totalSales });
+    parentPort.postMessage(res.url);
     process.exit(0);
   })();
 }

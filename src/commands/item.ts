@@ -201,9 +201,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const msg = await send({ embeds: [embed], components });
 
-  const res = await msg.awaitMessageComponent({ filter: (i) => i.user.id === message.author.id, time: 10000 }).catch(() => {
-    msg.edit({ components: [] });
-  });
+  const res = await msg
+    .awaitMessageComponent({ filter: (i) => i.user.id === message.author.id, time: 10000 })
+    .catch(() => {});
+
+  msg.edit({ components: [] });
 
   if (!res) return;
 
@@ -211,14 +213,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const response = await getItemHistoryGraph(selected.id);
 
-  if (!response.totalSales) {
+  if (typeof response !== "string") {
     logger.error(`error creating graph for ${selected.id}`, response);
     return res.editReply({ embeds: [new ErrorEmbed("error creating graph")] });
   }
 
   return res.editReply({
-    content: response.url,
-    embeds: [new CustomEmbed(message.member, `${response.totalSales.toLocaleString()} sales data used for the graph`)],
+    content: response,
   });
 }
 
