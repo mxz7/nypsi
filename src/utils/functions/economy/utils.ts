@@ -327,6 +327,7 @@ export async function reset() {
   await prisma.economyWorker.deleteMany();
   await prisma.inventory.deleteMany();
   await prisma.crafting.deleteMany();
+  await prisma.bakeryUpgrade.deleteMany();
 
   await prisma.economy.deleteMany({
     where: {
