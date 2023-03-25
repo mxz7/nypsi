@@ -12,7 +12,7 @@ import { getBalance, updateBalance } from "../../utils/functions/economy/balance
 import { addInventoryItem } from "../../utils/functions/economy/inventory";
 import { getItems, lotteryTicketPrice } from "../../utils/functions/economy/utils";
 import { percentChance, shuffle } from "../../utils/functions/random";
-import { addToNypsiBank, getTax } from "../../utils/functions/tax";
+import { getTax } from "../../utils/functions/tax";
 import { addNotificationToQueue, getDmSettings } from "../../utils/functions/users/notifications";
 import { logger } from "../../utils/logger";
 import dayjs = require("dayjs");
@@ -43,7 +43,7 @@ async function doLottery(client: Client) {
     return;
   }
 
-  const taxedAmount = Math.floor(tickets.length * lotteryTicketPrice * (await getTax()));
+  const taxedAmount = Math.floor(tickets.length * lotteryTicketPrice * (await getTax())) * 2;
 
   const total = Math.floor(tickets.length * lotteryTicketPrice - taxedAmount);
 
@@ -62,11 +62,7 @@ async function doLottery(client: Client) {
 
   logger.info(`::success winner: ${user.tag} (${user.id}) with ticket #${chosen.id}`);
 
-  await Promise.all([
-    updateBalance(user.id, (await getBalance(user.id)) + total),
-    addProgress(user.id, "lucky", 1),
-    addToNypsiBank(taxedAmount),
-  ]);
+  await Promise.all([updateBalance(user.id, (await getBalance(user.id)) + total), addProgress(user.id, "lucky", 1)]);
 
   const embed = new CustomEmbed();
 

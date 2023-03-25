@@ -26,7 +26,7 @@ let baseWorkers: { [key: string]: Worker };
 let baseUpgrades: { [key: string]: WorkerUpgrades };
 let bakeryUpgrades: { [key: string]: BakeryUpgradeData };
 
-const lotteryTicketPrice = 5000;
+const lotteryTicketPrice = 50000;
 /**
  * higher ticket price = more favourable to rich people cus poor people cant buy tickets resulting in less tickets overall
  * the goal is to have more tickets overall for a more random outcome
