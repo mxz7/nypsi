@@ -113,7 +113,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (items[i].role == "booster") continue;
     if (items[i].id == "crystal_heart") continue;
     if (items[i].id.includes("credit")) continue;
-    if (items[i].role == "crate" && !percentChance(20)) continue;
+    if (items[i].role === "worker-upgrade" && !percentChance(20)) continue;
+    if (items[i].role == "crate" && !percentChance(35)) continue;
     if (items[i].id.includes("gem") && !percentChance(0.77)) continue;
 
     if (
