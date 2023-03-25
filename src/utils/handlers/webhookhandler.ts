@@ -167,7 +167,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
           `+ $**${amount.toLocaleString()}**\n` +
           "+ **5**% multiplier\n" +
           `+ **${crateAmount}** vote crates` +
-          `${tickets.length <= Constants.LOTTERY_TICKETS_MAX - 5 ? "\n+ **3** lottery tickets" : ""}`
+          `${tickets.length <= Constants.LOTTERY_TICKETS_MAX - 1 ? "\n+ **1** lottery ticket" : ""}`
       )
       .disableFooter();
 
