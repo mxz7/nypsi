@@ -4,7 +4,7 @@ import prisma from "../../../init/database";
 import { ChartData } from "../../../types/Chart";
 import dayjs = require("dayjs");
 
-export default function searchLogs(itemId: string): Promise<[Buffer, number]> {
+export default function auctionHistoryWorker(itemId: string): Promise<string> {
   return new Promise((resolve, reject) => {
     const worker = new Worker(__filename, {
       workerData: [itemId],

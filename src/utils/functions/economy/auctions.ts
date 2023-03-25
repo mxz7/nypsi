@@ -24,6 +24,7 @@ import { getTier, isPremium } from "../premium/premium";
 import requestDM from "../requestdm";
 import { addToNypsiBank, getTax } from "../tax";
 import { addNotificationToQueue, getDmSettings, getPreferences } from "../users/notifications";
+import auctionHistoryWorker from "../workers/auctionhistory";
 import { getBalance, updateBalance } from "./balance";
 import { addInventoryItem } from "./inventory";
 import { createUser, getItems, userExists } from "./utils";
@@ -840,4 +841,8 @@ export async function buyAuctionOne(interaction: ButtonInteraction, auction: Auc
   beingBought.delete(auction.id);
   await interaction.deferUpdate().catch(() => {});
   await interaction.message.edit({ embeds: [embed], components: [buttonRow] });
+}
+
+export async function getItemHistoryGraph(itemId: string) {
+  return await auctionHistoryWorker(itemId);
 }
