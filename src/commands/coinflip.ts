@@ -335,9 +335,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const requestEmbed = new CustomEmbed(
       message.member,
-      `**${
-        message.author.tag
-      }** has created an open coinflip - press accept to play\n\n**bet** $${bet.toLocaleString()}\n\ndo you accept?`
+      `**${message.author.tag}** has created an open coinflip - press accept to play\n\n**bet** $${bet.toLocaleString()}`
     ).setFooter({ text: "expires in 60 seconds" });
 
     const msg = await send({
