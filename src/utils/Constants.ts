@@ -120,4 +120,6 @@ export default {
   TEKOH_ID: "672793821850894347",
   TRANSPARENT_EMBED_COLOR: "#36393f" as ColorResolvable,
   VOTE_CRATE_PROGRESSION: [1, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 5],
+  SEASON_START: new Date("01/01/2023"),
+  SEASON_NUMBER: 5,
 };
