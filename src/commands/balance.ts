@@ -180,7 +180,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     )
     .setFooter({ text: footer });
 
-  embed.setHeader(`${target.user.username} | season 5`, target.user.avatarURL());
+  embed.setHeader(`${target.user.username} | season ${Constants.SEASON_NUMBER}`, target.user.avatarURL());
 
   if (message.member == target) {
     if (xp >= (await getPrestigeRequirement(target)) && bankBalance >= getPrestigeRequirementBal(xp)) {
