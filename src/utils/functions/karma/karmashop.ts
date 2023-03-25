@@ -123,6 +123,8 @@ export async function openKarmaShop(client: NypsiClient, now = false) {
 
   const needed = nextOpen - Date.now();
 
+  if (client.user.id !== Constants.BOT_USER_ID) return;
+
   setTimeout(open, now ? 1000 : needed);
   if (!now) logger.info(`::auto karma shop will open in ${MStoTime(needed, true)}`);
 }
