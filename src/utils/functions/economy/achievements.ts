@@ -139,13 +139,13 @@ async function completeAchievement(userId: string, achievementId: string) {
 
   if (achievementId.endsWith("_v")) {
     earnedXp = 5000;
-    earnedCrates = 3;
+    earnedCrates = 5;
   } else if (achievementId.endsWith("_iv")) {
     earnedXp = 1500;
-    earnedCrates = 2;
+    earnedCrates = 4;
   } else if (achievementId.endsWith("_iii")) {
     earnedXp = 750;
-    earnedCrates = 1;
+    earnedCrates = 3;
   } else if (achievementId.endsWith("_ii")) {
     earnedXp = 250;
   }
@@ -155,17 +155,22 @@ async function completeAchievement(userId: string, achievementId: string) {
     earnedXp = 0;
   }
 
-  if (earnedXp > 0 && earnedCrates > 0) {
-    userEmbed.setDescription(
-      (userEmbed.data.description += `\n\nrewards:\n + ${earnedXp.toLocaleString()}xp${
-        earnedCrates > 0 ? `\n + ${earnedCrates} 🎁 69420 crate${earnedCrates > 1 ? "s" : ""}` : ""
-      }`)
-    );
+  const rewardsDesc: string[] = [];
+
+  if (earnedXp > 0) {
+    rewardsDesc.push(`+ ${earnedXp.toLocaleString()}xp`);
 
     await updateXp(userId, (await getXp(userId)) + earnedXp);
   }
 
-  if (earnedCrates > 0) await addInventoryItem(userId, "69420_crate", earnedCrates);
+  if (earnedCrates > 0) {
+    rewardsDesc.push(`+ ${earnedCrates} 🎁 69420 crate${earnedCrates > 1 ? "s" : ""}`);
+    await addInventoryItem(userId, "69420_crate", earnedCrates);
+  }
+
+  if (rewardsDesc.length > 0) {
+    userEmbed.setDescription((userEmbed.data.description += `\n\nrewardsL:\n${rewardsDesc.join("\n")}`));
+  }
 
   if (achievements[achievementId].prize) {
     await addInventoryItem(userId, achievements[achievementId].prize, 1, false);
