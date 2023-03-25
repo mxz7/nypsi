@@ -119,11 +119,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           },
         ],
       },
-      
     };
 
     if (!args[0].includes("item")) {
-      chartData.options =  {
+      chartData.options = {
         plugins: {
           tickFormat: {
             style: "currency",
@@ -131,7 +130,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             minimumFractionDigits: 0,
           },
         },
-      },
+      };
     }
 
     for (const item of data) {
