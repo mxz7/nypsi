@@ -404,94 +404,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       }
     }
 
-    if (await isEcoBanned(message.author.id)) return send({ embeds: [new ErrorEmbed("you cant do this")] });
-    if (args.length < 2) return send({ embeds: [new ErrorEmbed("/chatreaction duel <member> (wager)")] });
+    const doGame = async (player: GuildMember, wager: number, response: ButtonInteraction, m: Message) => {
+      const balance = await getBalance(player);
 
-    const blacklisted = await getBlacklisted(message.guild);
+      if (balance < wager)
+        return response.followUp({ embeds: [new ErrorEmbed(`${player.user.toString()} cannot afford this`)] });
 
-    if (blacklisted.includes(message.author.id))
-      return send({ embeds: [new ErrorEmbed("you are blacklisted from chat reactions in this server")] });
-
-    const target = message.mentions?.members?.first() || (await getMember(message.guild, args[1]));
-
-    if (!target) return send({ embeds: [new ErrorEmbed("invalid target")] });
-
-    if (blacklisted.includes(target.user.id))
-      return send({ embeds: [new ErrorEmbed("that user is blacklisted from chat reactions in this server")] });
-
-    if (!(await userExists(target.user.id))) await createUser(target.user.id);
-
-    let wager = formatNumber(args[2] || 0);
-
-    if (wager < 0) wager = 0;
-    if (!wager) wager = 0;
-    if (isNaN(wager)) wager = 0;
-
-    if (!(await getPreferences(target.user.id)).duelRequests) {
-      return send({ embeds: [new ErrorEmbed(`${target.user.toString()} has requests disabled`)] });
-    }
-
-    if ((await isEcoBanned(target.user.id)) && wager > 0) return send({ embeds: [new ErrorEmbed("they are banned. lol.")] });
-
-    if ((await getBalance(message.member)) < wager) return send({ embeds: [new ErrorEmbed("you cannot afford this")] });
-
-    if ((await getBalance(target)) < wager)
-      return send({ embeds: [new ErrorEmbed(`${target.user.toString()} cannot afford this wager`)] });
-
-    if (duelRequests.has(message.author.id)) return send({ embeds: [new ErrorEmbed("you already have a duel request!")] });
-    if (duelRequests.has(target.user.id)) return send({ embeds: [new ErrorEmbed("they already have a duel request!")] });
-
-    duelRequests.add(message.author.id);
-
-    await updateBalance(message.member, (await getBalance(message.member)) - wager);
-
-    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder().setCustomId("y").setLabel("accept").setStyle(ButtonStyle.Success),
-      new ButtonBuilder().setCustomId("n").setLabel("deny").setStyle(ButtonStyle.Danger)
-    );
-
-    const requestEmbed = new CustomEmbed(
-      message.member,
-      `**${
-        message.author.tag
-      }** has challenged you to a chat reaction duel\n\n**wager** $${wager.toLocaleString()}\n\ndo you accept?`
-    ).setFooter({ text: "expires in 60 seconds" });
-
-    const m = await send({
-      content: `${target.user.toString()} you have been invited to a chat reaction duel worth $${wager.toLocaleString()}`,
-      embeds: [requestEmbed],
-      components: [row],
-    });
-
-    const filter = (i: Interaction) =>
-      i.user.id == target.id || (message.author.id === i.user.id && (i as ButtonInteraction).customId === "n");
-
-    let fail = false;
-
-    const response = await m
-      .awaitMessageComponent({ filter, time: 60000 })
-      .then(async (collected) => {
-        await collected.deferUpdate();
-        m.edit({ components: [] });
-        duelRequests.delete(message.author.id);
-
-        return collected;
-      })
-      .catch(async () => {
-        fail = true;
-        duelRequests.delete(message.author.id);
-        await updateBalance(message.member, (await getBalance(message.member)) + wager);
-        m.edit({ components: [] });
-      });
-
-    if (fail || !response) return;
-
-    if (response.customId === "y") {
-      const balance = await getBalance(target);
-
-      if (balance < wager) return response.followUp({ embeds: [new ErrorEmbed("you cannot afford this")] });
-
-      await updateBalance(target, balance - wager);
+      await updateBalance(player, balance - wager);
 
       if (m.deletable) m.delete();
 
@@ -499,17 +418,190 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         message.guild,
         message.channel as TextChannel,
         message.member,
-        target,
+        player,
         wager
       );
 
       if (typeof result === "string") await updateBalance(result, (await getBalance(result)) + wager * 2);
-    } else {
-      await updateBalance(message.member, (await getBalance(message.member)) + wager);
-      if (message.author.id === response.user.id) {
-        response.followUp({ embeds: [new CustomEmbed(message.member, "✅ duel request cancelled")] });
+    };
+
+    if (await isEcoBanned(message.author.id)) return send({ embeds: [new ErrorEmbed("you cant do this")] });
+
+    if (args.length === 0) return send({ embeds: [new ErrorEmbed("/chatreaction duel <member> (wager)")] });
+
+    const blacklisted = await getBlacklisted(message.guild);
+
+    if (blacklisted.includes(message.author.id))
+      return send({ embeds: [new ErrorEmbed("you are blacklisted from chat reactions in this server")] });
+
+    if (args.length === 3) {
+      const target = message.mentions?.members?.first() || (await getMember(message.guild, args[1]));
+
+      if (!target) return send({ embeds: [new ErrorEmbed("invalid target")] });
+
+      if (blacklisted.includes(target.user.id))
+        return send({ embeds: [new ErrorEmbed("that user is blacklisted from chat reactions in this server")] });
+
+      if (!(await userExists(target.user.id))) await createUser(target.user.id);
+
+      let wager = formatNumber(args[2] || 0);
+
+      if (wager < 0) wager = 0;
+      if (!wager) wager = 0;
+      if (isNaN(wager)) wager = 0;
+
+      if (!(await getPreferences(target.user.id)).duelRequests) {
+        return send({ embeds: [new ErrorEmbed(`${target.user.toString()} has requests disabled`)] });
+      }
+
+      if ((await isEcoBanned(target.user.id)) && wager > 0)
+        return send({ embeds: [new ErrorEmbed("they are banned. lol.")] });
+
+      if ((await getBalance(message.member)) < wager) return send({ embeds: [new ErrorEmbed("you cannot afford this")] });
+
+      if ((await getBalance(target)) < wager)
+        return send({ embeds: [new ErrorEmbed(`${target.user.toString()} cannot afford this wager`)] });
+
+      if (duelRequests.has(message.author.id)) return send({ embeds: [new ErrorEmbed("you already have a duel request!")] });
+      if (duelRequests.has(target.user.id)) return send({ embeds: [new ErrorEmbed("they already have a duel request!")] });
+
+      duelRequests.add(message.author.id);
+
+      await updateBalance(message.member, (await getBalance(message.member)) - wager);
+
+      const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder().setCustomId("y").setLabel("accept").setStyle(ButtonStyle.Success),
+        new ButtonBuilder().setCustomId("n").setLabel("deny").setStyle(ButtonStyle.Danger)
+      );
+
+      const requestEmbed = new CustomEmbed(
+        message.member,
+        `**${
+          message.author.tag
+        }** has challenged you to a chat reaction duel\n\n**wager** $${wager.toLocaleString()}\n\ndo you accept?`
+      ).setFooter({ text: "expires in 60 seconds" });
+
+      const m = await send({
+        content: `${target.user.toString()} you have been invited to a chat reaction duel worth $${wager.toLocaleString()}`,
+        embeds: [requestEmbed],
+        components: [row],
+      });
+
+      const filter = (i: Interaction) =>
+        i.user.id == target.id || (message.author.id === i.user.id && (i as ButtonInteraction).customId === "n");
+
+      let fail = false;
+
+      const response = await m
+        .awaitMessageComponent({ filter, time: 60000 })
+        .then(async (collected) => {
+          await collected.deferUpdate();
+          m.edit({ components: [] });
+          duelRequests.delete(message.author.id);
+
+          return collected;
+        })
+        .catch(async () => {
+          fail = true;
+          duelRequests.delete(message.author.id);
+          await updateBalance(message.member, (await getBalance(message.member)) + wager);
+          m.edit({ components: [] });
+        });
+
+      if (fail || !response) return;
+
+      if (response.customId === "y") {
+        return doGame(target, wager, response as ButtonInteraction, m);
       } else {
-        response.followUp({ embeds: [new CustomEmbed(target, "✅ duel request denied")] });
+        await updateBalance(message.member, (await getBalance(message.member)) + wager);
+        if (message.author.id === response.user.id) {
+          response.followUp({ embeds: [new CustomEmbed(message.member, "✅ duel request cancelled")] });
+        } else {
+          response.followUp({ embeds: [new CustomEmbed(target, "✅ duel request denied")] });
+        }
+      }
+    } else if (args.length === 2) {
+      let wager = formatNumber(args[1] || 0);
+
+      if (wager < 0) wager = 0;
+      if (!wager) wager = 0;
+      if (isNaN(wager)) wager = 0;
+
+      if ((await getBalance(message.member)) < wager) return send({ embeds: [new ErrorEmbed("you cannot afford this")] });
+
+      if (duelRequests.has(message.author.id)) return send({ embeds: [new ErrorEmbed("you already have a duel request!")] });
+
+      duelRequests.add(message.author.id);
+
+      await updateBalance(message.member, (await getBalance(message.member)) - wager);
+
+      const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder().setCustomId("y").setLabel("accept").setStyle(ButtonStyle.Success),
+        new ButtonBuilder().setCustomId("n").setLabel("cancel").setStyle(ButtonStyle.Danger)
+      );
+
+      const requestEmbed = new CustomEmbed(
+        message.member,
+        `**${
+          message.author.tag
+        }** has created an open chat reaction duel - press accept to play\n\n**wager** $${wager.toLocaleString()}`
+      ).setFooter({ text: "expires in 60 seconds" });
+
+      const m = await send({
+        embeds: [requestEmbed],
+        components: [row],
+      });
+
+      const filter = async (i: Interaction): Promise<boolean> => {
+        if (i.user.id != message.author.id && (i as ButtonInteraction).customId == "n") return false;
+        if (await isEcoBanned(i.user.id)) return false;
+
+        if (!(await userExists(i.user.id)) || (await getBalance(i.user.id)) < wager) {
+          if (i.isRepliable()) await i.reply({ ephemeral: true, embeds: [new ErrorEmbed("you cannot afford this wager")] });
+          return false;
+        }
+
+        if (i.user.id === message.author.id) {
+          if ((i as ButtonInteraction).customId === "n") return true;
+          return false;
+        }
+
+        return true;
+      };
+
+      let fail = false;
+
+      const response = await m
+        .awaitMessageComponent({ filter, time: 60000 })
+        .then(async (collected) => {
+          await collected.deferUpdate();
+          m.edit({ components: [] });
+          duelRequests.delete(message.author.id);
+
+          return collected;
+        })
+        .catch(async () => {
+          fail = true;
+          duelRequests.delete(message.author.id);
+          await updateBalance(message.member, (await getBalance(message.member)) + wager);
+          m.edit({ components: [] });
+        });
+
+      if (fail || !response) return;
+
+      const target = await message.guild.members.fetch(response.user.id);
+
+      if (!target) return message.channel.send({ embeds: [new ErrorEmbed("invalid guild member")] });
+
+      if (response.customId === "y") {
+        return doGame(target, wager, response as ButtonInteraction, m);
+      } else {
+        await updateBalance(message.member, (await getBalance(message.member)) + wager);
+        if (message.author.id === response.user.id) {
+          response.followUp({ embeds: [new CustomEmbed(message.member, "✅ duel request cancelled")] });
+        } else {
+          response.followUp({ embeds: [new CustomEmbed(target, "✅ duel request denied")] });
+        }
       }
     }
     return;
