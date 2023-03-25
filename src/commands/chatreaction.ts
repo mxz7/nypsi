@@ -408,7 +408,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       const balance = await getBalance(player);
 
       if (balance < wager)
-        return response.editReply({ embeds: [new ErrorEmbed(`${player.user.toString()} cannot afford this`)] });
+        return response.followUp({ embeds: [new ErrorEmbed(`${player.user.toString()} cannot afford this`)] });
 
       await updateBalance(player, balance - wager);
 
@@ -495,7 +495,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       const response = await m
         .awaitMessageComponent({ filter, time: 60000 })
         .then(async (collected) => {
-          await collected.deferReply();
+          await collected.deferUpdate();
           m.edit({ components: [] });
           duelRequests.delete(message.author.id);
 
@@ -574,7 +574,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       const response = await m
         .awaitMessageComponent({ filter, time: 60000 })
         .then(async (collected) => {
-          await collected.deferReply();
+          await collected.deferUpdate();
           m.edit({ components: [] });
           duelRequests.delete(message.author.id);
 
