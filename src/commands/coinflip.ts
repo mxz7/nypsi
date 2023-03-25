@@ -73,122 +73,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({ embeds: [embed] });
   }
 
-  if (args.length != 2) {
+  if (args.length == 0) {
     const embed = new CustomEmbed(message.member).setHeader("coinflip help").setDescription("/coinflip user bet");
 
     return send({ embeds: [embed] });
   }
 
-  if (args[0].toLowerCase() == "t") args[0] = "tails";
-
-  if (args[0].toLowerCase() == "h") args[0] = "heads";
-
-  let target: GuildMember;
-
-  if (!message.mentions.members.first()) {
-    target = await getMember(message.guild, args[0]);
-  } else {
-    target = message.mentions.members.first();
-  }
-
-  if (!target) {
-    return send({ embeds: [new ErrorEmbed("unable to find that member")] });
-  }
-
-  if (message.member == target) {
-    return send({ embeds: [new ErrorEmbed("invalid user")] });
-  }
-
-  if (target.user.bot) {
-    return send({ embeds: [new ErrorEmbed("invalid user")] });
-  }
-
-  if (!(await getPreferences(target.user.id)).duelRequests) {
-    return send({ embeds: [new ErrorEmbed(`${target.user.toString()} has requests disabled`)] });
-  }
-
-  if (playing.has(target.user.id))
-    return send({ embeds: [new ErrorEmbed("this user is waiting for a response on a coinflip")] });
-
-  if (await isEcoBanned(target.user.id)) {
-    return send({ embeds: [new ErrorEmbed("they are banned. lol.")] });
-  }
-
-  if (!(await userExists(target))) await createUser(target);
-
-  const bet = await formatBet(args[1], message.member);
-
-  if (!bet) {
-    return send({ embeds: [new ErrorEmbed("invalid bet")] });
-  }
-
-  if (isNaN(bet)) {
-    return send({ embeds: [new ErrorEmbed("invalid bet")] });
-  }
-
-  if (bet <= 0) {
-    return send({ embeds: [new ErrorEmbed("/coinflip user bet")] });
-  }
-
-  if (bet > (await getBalance(message.member))) {
-    return send({ embeds: [new ErrorEmbed("you cannot afford this bet")] });
-  }
-
-  if (bet > (await getBalance(target))) {
-    return send({ embeds: [new ErrorEmbed(`**${target.user.tag}** cannot afford this bet`)] });
-  }
-
-  await addCooldown(cmd.name, message.member, 10);
-  playing.add(message.author.id);
-  setTimeout(() => {
-    if (playing.has(message.author.id)) playing.delete(message.author.id);
-  }, 120000);
-
-  await updateBalance(message.member, (await getBalance(message.member)) - bet);
-
-  const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder().setCustomId("y").setLabel("accept").setStyle(ButtonStyle.Success),
-    new ButtonBuilder().setCustomId("n").setLabel("deny").setStyle(ButtonStyle.Danger)
-  );
-
-  const requestEmbed = new CustomEmbed(
-    message.member,
-    `**${message.author.tag}** has challenged you to a coinflip\n\n**bet** $${bet.toLocaleString()}\n\ndo you accept?`
-  ).setFooter({ text: "expires in 60 seconds" });
-
-  const m = await send({
-    content: `${target.user.toString()} you have been invited to a coinflip worth $${bet.toLocaleString()}`,
-    embeds: [requestEmbed],
-    components: [row],
-  });
-
-  const filter = (i: Interaction) =>
-    i.user.id == target.id || (message.author.id === i.user.id && (i as ButtonInteraction).customId === "n");
-  let fail = false;
-
-  const response = await m
-    .awaitMessageComponent({ filter, time: 60000 })
-    .then(async (collected) => {
-      await collected.deferUpdate();
-      m.edit({ components: [] });
-      playing.delete(message.author.id);
-      return collected;
-    })
-    .catch(async () => {
-      fail = true;
-      playing.delete(message.author.id);
-      await updateBalance(message.member, (await getBalance(message.member)) + bet);
-      m.edit({ components: [] });
-    });
-
-  if (fail || !response) return;
-
-  if (response.customId == "y") {
-    if (bet > (await getBalance(target))) {
-      return send({ embeds: [new ErrorEmbed("you cannot afford this bet")] });
+  const doGame = async (player1: GuildMember, player2: GuildMember, bet: number, response: ButtonInteraction) => {
+    if (bet > (await getBalance(player2))) {
+      return message.channel.send({ embeds: [new ErrorEmbed(`${player2.user.toString()} cannot afford this bet`)] });
     }
 
-    await updateBalance(target, (await getBalance(target)) - bet);
+    await updateBalance(player2, (await getBalance(player2)) - bet);
 
     // its big to make sure that theres little to no deviation in chance cus of rounding
     const lols = [
@@ -222,17 +118,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       "tails",
     ];
     const choice = lols[Math.floor(Math.random() * lols.length)];
-    let thingy = `${message.author.username}\n${target.user.username}`;
+    let thingy = `${player1.user.username}\n${player2.user.username}`;
 
     let winner: GuildMember;
     let loser: GuildMember;
 
     if (choice == "heads") {
-      winner = message.member;
-      loser = target;
+      winner = player1;
+      loser = player2;
     } else {
-      winner = target;
-      loser = message.member;
+      winner = player2;
+      loser = player1;
     }
 
     let winnings = bet * 2;
@@ -256,12 +152,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     });
 
     await createGame({
-      userId: target.user.id,
+      userId: player2.user.id,
       bet: bet,
       game: "coinflip",
       outcome: `**winner** ${winner.user.tag}\n**loser** ${loser.user.tag}`,
-      win: winner.user.id == target.user.id,
-      earned: winner.user.id == target.user.id ? winnings : null,
+      win: winner.user.id == player2.user.id,
+      earned: winner.user.id == player2.user.id ? winnings : null,
     });
 
     gamble(winner.user, "coinflip", bet, true, id, bet * 2);
@@ -273,14 +169,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       "coinflip"
     );
 
-    const msg = await response.followUp({ embeds: [embed] });
+    const msg = await response.editReply({ embeds: [embed] });
 
     if (winner == message.member) {
       thingy = `**${message.author.username}** +$${winnings.toLocaleString()}${
         tax ? ` (${(tax * 100).toFixed(1)}% tax)` : ""
-      }\n${target.user.username}`;
+      }\n${player2.user.username}`;
     } else {
-      thingy = `${message.author.username}\n**${target.user.username}** +$${winnings.toLocaleString()}${
+      thingy = `${message.author.username}\n**${player2.user.username}** +$${winnings.toLocaleString()}${
         tax ? ` (${(tax * 100).toFixed(1)}% tax)` : ""
       }`;
     }
@@ -292,12 +188,206 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     setTimeout(() => {
       return msg.edit({ embeds: [embed] });
     }, 2000);
-  } else {
-    await updateBalance(message.member, (await getBalance(message.member)) + bet);
-    if (message.author.id === response.user.id) {
-      response.followUp({ embeds: [new CustomEmbed(message.member, "✅ coinflip request cancelled")] });
+  };
+
+  if (args.length == 2) {
+    let target: GuildMember;
+
+    if (!message.mentions.members.first()) {
+      target = await getMember(message.guild, args[0]);
     } else {
-      response.followUp({ embeds: [new CustomEmbed(target, "✅ coinflip request denied")] });
+      target = message.mentions.members.first();
+    }
+
+    if (!target) {
+      return send({ embeds: [new ErrorEmbed("unable to find that member")] });
+    }
+
+    if (message.member == target) {
+      return send({ embeds: [new ErrorEmbed("invalid user")] });
+    }
+
+    if (target.user.bot) {
+      return send({ embeds: [new ErrorEmbed("invalid user")] });
+    }
+
+    if (!(await getPreferences(target.user.id)).duelRequests) {
+      return send({ embeds: [new ErrorEmbed(`${target.user.toString()} has requests disabled`)] });
+    }
+
+    if (playing.has(target.user.id))
+      return send({ embeds: [new ErrorEmbed("this user is waiting for a response on a coinflip")] });
+
+    if (await isEcoBanned(target.user.id)) {
+      return send({ embeds: [new ErrorEmbed("they are banned. lol.")] });
+    }
+
+    if (!(await userExists(target))) await createUser(target);
+
+    const bet = await formatBet(args[1], message.member);
+
+    if (!bet) {
+      return send({ embeds: [new ErrorEmbed("invalid bet")] });
+    }
+
+    if (isNaN(bet)) {
+      return send({ embeds: [new ErrorEmbed("invalid bet")] });
+    }
+
+    if (bet <= 0) {
+      return send({ embeds: [new ErrorEmbed("/coinflip user bet")] });
+    }
+
+    if (bet > (await getBalance(message.member))) {
+      return send({ embeds: [new ErrorEmbed("you cannot afford this bet")] });
+    }
+
+    if (bet > (await getBalance(target))) {
+      return send({ embeds: [new ErrorEmbed(`**${target.user.tag}** cannot afford this bet`)] });
+    }
+
+    await addCooldown(cmd.name, message.member, 10);
+    playing.add(message.author.id);
+    setTimeout(() => {
+      if (playing.has(message.author.id)) playing.delete(message.author.id);
+    }, 120000);
+
+    await updateBalance(message.member, (await getBalance(message.member)) - bet);
+
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder().setCustomId("y").setLabel("accept").setStyle(ButtonStyle.Success),
+      new ButtonBuilder().setCustomId("n").setLabel("deny").setStyle(ButtonStyle.Danger)
+    );
+
+    const requestEmbed = new CustomEmbed(
+      message.member,
+      `**${message.author.tag}** has challenged you to a coinflip\n\n**bet** $${bet.toLocaleString()}\n\ndo you accept?`
+    ).setFooter({ text: "expires in 60 seconds" });
+
+    const msg = await send({
+      content: `${target.user.toString()} you have been invited to a coinflip worth $${bet.toLocaleString()}`,
+      embeds: [requestEmbed],
+      components: [row],
+    });
+
+    const filter = (i: Interaction) =>
+      i.user.id == target.id || (message.author.id === i.user.id && (i as ButtonInteraction).customId === "n");
+    let fail = false;
+
+    const response = await msg
+      .awaitMessageComponent({ filter, time: 60000 })
+      .then(async (collected) => {
+        await collected.deferReply();
+        msg.edit({ components: [] });
+        playing.delete(message.author.id);
+        return collected;
+      })
+      .catch(async () => {
+        fail = true;
+        playing.delete(message.author.id);
+        await updateBalance(message.member, (await getBalance(message.member)) + bet);
+        msg.edit({ components: [] });
+      });
+
+    if (fail || !response) return;
+
+    if (response.customId == "y") {
+      return doGame(message.member, target, bet, response as ButtonInteraction);
+    } else {
+      await updateBalance(message.member, (await getBalance(message.member)) + bet);
+      if (message.author.id === response.user.id) {
+        response.editReply({ embeds: [new CustomEmbed(message.member, "✅ coinflip request cancelled")] });
+      } else {
+        response.editReply({ embeds: [new CustomEmbed(target, "✅ coinflip request denied")] });
+      }
+    }
+  } else if (args.length == 1) {
+    const bet = await formatBet(args[0], message.member);
+
+    if (!bet) {
+      return send({ embeds: [new ErrorEmbed("invalid bet")] });
+    }
+
+    if (isNaN(bet)) {
+      return send({ embeds: [new ErrorEmbed("invalid bet")] });
+    }
+
+    if (bet <= 0) {
+      return send({ embeds: [new ErrorEmbed("/coinflip user bet")] });
+    }
+
+    if (bet > (await getBalance(message.member))) {
+      return send({ embeds: [new ErrorEmbed("you cannot afford this bet")] });
+    }
+
+    await addCooldown(cmd.name, message.member, 10);
+    playing.add(message.author.id);
+    setTimeout(() => {
+      if (playing.has(message.author.id)) playing.delete(message.author.id);
+    }, 120000);
+
+    await updateBalance(message.member, (await getBalance(message.member)) - bet);
+
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder().setCustomId("y").setLabel("accept").setStyle(ButtonStyle.Success),
+      new ButtonBuilder().setCustomId("n").setLabel("cancel").setStyle(ButtonStyle.Danger)
+    );
+
+    const requestEmbed = new CustomEmbed(
+      message.member,
+      `**${
+        message.author.tag
+      }** has created an open coinflip - press accept to play\n\n**bet** $${bet.toLocaleString()}\n\ndo you accept?`
+    ).setFooter({ text: "expires in 60 seconds" });
+
+    const msg = await send({
+      embeds: [requestEmbed],
+      components: [row],
+    });
+
+    const filter = async (i: Interaction): Promise<boolean> => {
+      if (i.user.id != message.author.id && (i as ButtonInteraction).customId == "n") return false;
+      if (await isEcoBanned(i.user.id)) return false;
+
+      if (!(await userExists(i.user.id)) || (await getBalance(i.user.id)) < bet) {
+        if (i.isRepliable()) await i.reply({ ephemeral: true, embeds: [new ErrorEmbed("you cannot afford this bet")] });
+        return false;
+      }
+
+      if (i.user.id === message.author.id) return false;
+
+      return true;
+    };
+    let fail = false;
+
+    const response = await msg
+      .awaitMessageComponent({ filter, time: 60000 })
+      .then(async (collected) => {
+        await collected.deferReply();
+        msg.edit({ components: [] });
+        playing.delete(message.author.id);
+        return collected;
+      })
+      .catch(async () => {
+        fail = true;
+        playing.delete(message.author.id);
+        await updateBalance(message.member, (await getBalance(message.member)) + bet);
+        msg.edit({ components: [] });
+      });
+
+    if (fail || !response) return;
+
+    const target = await message.guild.members.fetch(response.user.id);
+
+    if (response.customId == "y") {
+      return doGame(message.member, target, bet, response as ButtonInteraction);
+    } else {
+      await updateBalance(message.member, (await getBalance(message.member)) + bet);
+      if (message.author.id === response.user.id) {
+        response.editReply({ embeds: [new CustomEmbed(message.member, "✅ coinflip request cancelled")] });
+      } else {
+        response.editReply({ embeds: [new CustomEmbed(target, "✅ coinflip request denied")] });
+      }
     }
   }
 }
