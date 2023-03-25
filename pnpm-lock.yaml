@@ -41,7 +41,7 @@ specifiers:
   ms: 2.1.3
   node-os-utils: 1.3.7
   p-all: 3.0.0
-  prettier: 2.8.6
+  prettier: 2.8.7
   prisma: 4.11.0
   string-similarity: 4.0.4
   table: '6.8'
@@ -96,7 +96,7 @@ devDependencies:
   eslint: 8.36.0
   eslint-plugin-deprecation: 1.3.3_j4766f7ecgqbon3u7zlxn5zszu
   husky: 8.0.3
-  prettier: 2.8.6
+  prettier: 2.8.7
   prisma: 4.11.0
   typescript: 5.0.2
 
@@ -2837,8 +2837,8 @@ packages:
     engines: {node: '>= 0.8.0'}
     dev: true
 
-  /prettier/2.8.6:
-    resolution: {integrity: sha512-mtuzdiBbHwPEgl7NxWlqOkithPyp4VN93V7VeHVWBF+ad3I5avc0RVDT4oImXQy9H/AqxA2NSQH8pSxHW6FYbQ==}
+  /prettier/2.8.7:
+    resolution: {integrity: sha512-yPngTo3aXUUmyuTjeTUT75txrf+aMh9FiD7q9ZE/i6r0bPb22g4FsE6Y338PQX1bmfy08i9QQCB7/rcUAVntfw==}
     engines: {node: '>=10.13.0'}
     hasBin: true
     dev: true
