@@ -1,11 +1,23 @@
-import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
+import {
+  ActionRowBuilder,
+  BaseMessageOptions,
+  ButtonBuilder,
+  ButtonStyle,
+  CommandInteraction,
+  InteractionReplyOptions,
+  Message,
+  MessageActionRowComponentBuilder,
+} from "discord.js";
 import { parse } from "twemoji-parser";
+import prisma from "../init/database";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import { countItemOnAuction, getAuctionAverage } from "../utils/functions/economy/auctions";
+import { countItemOnAuction, getAuctionAverage, getItemHistoryGraph } from "../utils/functions/economy/auctions";
 import { getInventory, getTotalAmountOfItem, selectItem } from "../utils/functions/economy/inventory";
 import { createUser, userExists } from "../utils/functions/economy/utils";
+import { isPremium } from "../utils/functions/premium/premium";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import { logger } from "../utils/logger";
 
 const cmd = new Command("item", "view information about an item", "money");
 
@@ -173,8 +185,41 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   }
 
   embed.setThumbnail(thumbnail);
+  const components: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [
+    new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder()
+        .setStyle(ButtonStyle.Secondary)
+        .setCustomId("hist")
+        .setLabel("graph auction history")
+        .setEmoji("📈")
+    ),
+  ];
 
-  return await send({ embeds: [embed] });
+  if (!(await isPremium(message.member)) || (await prisma.auction.count({ where: { itemId: selected.id } })) < 5) {
+    return await send({ embeds: [embed] });
+  }
+
+  const msg = await send({ embeds: [embed], components });
+
+  const res = await msg.awaitMessageComponent({ filter: (i) => i.user.id === message.author.id, time: 10000 }).catch(() => {
+    msg.edit({ components: [] });
+  });
+
+  if (!res) return;
+
+  await res.deferReply({ ephemeral: true });
+
+  const response = await getItemHistoryGraph(selected.id);
+
+  if (!response.totalSales) {
+    logger.error(`error creating graph for ${selected.id}`, response);
+    return res.editReply({ embeds: [new ErrorEmbed("error creating graph")] });
+  }
+
+  return res.editReply({
+    content: response.url,
+    embeds: [new CustomEmbed(message.member, `${response.totalSales.toLocaleString()} sales data used for the graph`)],
+  });
 }
 
 cmd.setRun(run);
