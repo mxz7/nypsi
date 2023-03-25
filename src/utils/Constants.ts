@@ -57,6 +57,7 @@ export default {
       },
       economy: {
         AUCTION_AVG: "cache:economy:auctionavg",
+        AUCTION_ITEM_GRAPH_DATA: "cache:economy:auction:historydata",
         BAKERY_UPGRADES: "cache:economy:bakery:upgrades",
         BALANCE: "cache:economy:balance",
         BANNED: "cache:economy:banned",

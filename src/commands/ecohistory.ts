@@ -116,10 +116,23 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           {
             label: message.author.tag,
             data: [],
+            lineTension: 0.4,
           },
         ],
       },
     };
+
+    if (!args[0].includes("item")) {
+      chartData.options = {
+        plugins: {
+          tickFormat: {
+            style: "currency",
+            currency: "USD",
+            minimumFractionDigits: 0,
+          },
+        },
+      };
+    }
 
     for (const item of data) {
       chartData.data.labels.push(dayjs(item.date).format("YYYY-MM-DD"));
