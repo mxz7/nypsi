@@ -68,15 +68,35 @@ if (!isMainThread) {
           },
         ],
       },
+      options: {
+        plugins: {
+          tickFormat: {
+            style: "currency",
+            currency: "USD",
+            minimumFractionDigits: 0,
+          },
+        },
+      },
     };
-    let totalSales = 0;
 
     for (const key of inPlaceSort(Array.from(gettingAverages.keys())).asc()) {
       graphData.data.labels.push(dayjs(key).format("YYYY-MM-DD"));
       graphData.data.datasets[0].data.push(
         gettingAverages.get(key).reduce((a, b) => a + b) / gettingAverages.get(key).length
       );
-      totalSales += gettingAverages.get(key).length;
+    }
+
+    for (let i = 0; i < graphData.data.labels.length; i++) {
+      // if (graphData.data.labels.length > 100) break;
+      if (!graphData.data.labels[i + 1]) break;
+
+      const date1 = dayjs(graphData.data.labels[i], "YYYY-MM-DD");
+      const date2 = dayjs(graphData.data.labels[i + 1], "YYYY-MM-DD");
+
+      if (!date1.add(1, "day").isSame(date2)) {
+        graphData.data.labels.splice(i + 1, 0, date1.add(1, "day").format("YYYY-MM-DD"));
+        graphData.data.datasets[0].data.splice(i + 1, 0, graphData.data.datasets[0].data[i]);
+      }
     }
 
     const body = JSON.stringify({ chart: graphData });

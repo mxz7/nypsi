@@ -119,7 +119,20 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           },
         ],
       },
+      
     };
+
+    if (!args[0].includes("item")) {
+      chartData.options =  {
+        plugins: {
+          tickFormat: {
+            style: "currency",
+            currency: "USD",
+            minimumFractionDigits: 0,
+          },
+        },
+      },
+    }
 
     for (const item of data) {
       chartData.data.labels.push(dayjs(item.date).format("YYYY-MM-DD"));
