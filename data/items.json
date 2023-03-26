@@ -1189,7 +1189,7 @@
     "boosterEffect": {
       "boosts": ["multi"],
       "effect": 5,
-      "time": 7200
+      "time": 3600
     },
     "in_crates": false
   },
