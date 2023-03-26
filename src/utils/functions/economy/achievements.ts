@@ -164,7 +164,7 @@ async function completeAchievement(userId: string, achievementId: string) {
   }
 
   if (earnedCrates > 0) {
-    rewardsDesc.push(`+ ${earnedCrates} 🎁 69420 crate${earnedCrates > 1 ? "s" : ""}`);
+    rewardsDesc.push(`+ \`${earnedCrates}x\` 🎁 69420 crate`);
     await addInventoryItem(userId, "69420_crate", earnedCrates);
   }
 
