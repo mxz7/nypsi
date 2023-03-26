@@ -91,7 +91,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({ embeds: [embed], ephemeral: true });
   }
 
-  await addCooldown(cmd.name, message.member, 10);
+  await addCooldown(cmd.name, message.member, 7);
 
   let inventory = await getInventory(message.member, true);
 
