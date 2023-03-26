@@ -570,7 +570,7 @@
     "emoji": "📅",
     "longDesc": "protects your daily streak in the event you forget to do /daily",
     "role": "item",
-    "rarity": 2,
+    "rarity": 3,
     "buy": 0,
     "sell": 100000,
     "in_crates": true
@@ -1643,7 +1643,7 @@
     "sell": 1000000,
     "clicks": 10,
     "items": [
-      "money:1000000",
+      "money:10000000",
       "karma:250",
       "id:double_xp",
       "id:steve",
