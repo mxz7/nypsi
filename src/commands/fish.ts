@@ -135,6 +135,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     )
       continue;
     fishItems.push(i);
+
+    if (items[i].role === "fish") fishItems.push(i);
   }
 
   await addItemUse(message.member, fishingRod);
