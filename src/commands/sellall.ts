@@ -1,10 +1,20 @@
-import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
+import {
+  ActionRowBuilder,
+  BaseMessageOptions,
+  ButtonBuilder,
+  ButtonStyle,
+  CommandInteraction,
+  InteractionReplyOptions,
+  Message,
+  MessageActionRowComponentBuilder,
+} from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getBalance, getMulti, updateBalance } from "../utils/functions/economy/balance";
 import { getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
+import PageManager from "../utils/functions/page";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { addToNypsiBank, getTax } from "../utils/functions/tax";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -106,9 +116,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     total += sellWorth;
 
-    desc.push(`${items[item].emoji} ${items[item].name} +$${sellWorth.toLocaleString()} (${selected.get(item)})`);
+    desc.push(
+      `\`${selected.get(item).toLocaleString()}x\` ${items[item].emoji} ${items[item].name} +$${sellWorth.toLocaleString()}`
+    );
     amounts.set(
-      `${items[item].emoji} ${items[item].name} +$${sellWorth.toLocaleString()} (${selected.get(item)})`,
+      `\`${selected.get(item).toLocaleString()}x\` ${items[item].emoji} ${items[item].name} +$${sellWorth.toLocaleString()}`,
       sellWorth
     );
   }
@@ -126,10 +138,35 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const embed = new CustomEmbed(message.member);
 
-  embed.setDescription(`+$**${total.toLocaleString()}**\n\n${desc.join("\n")}`);
+  embed.setDescription(`+$**${total.toLocaleString()}**`);
   if (taxEnabled) embed.setFooter({ text: `${((await getTax()) * 100).toFixed(1)}% tax` });
 
-  return send({ embeds: [embed] });
+  const pages = PageManager.createPages(desc, 10);
+
+  embed.addField("items sold", pages.get(1).join("\n"));
+
+  const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+    new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
+    new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
+  );
+  if (pages.size == 1) return send({ embeds: [embed] });
+  const msg = await send({ embeds: [embed], components: [row] });
+
+  const manager = new PageManager({
+    embed,
+    message: msg,
+    row,
+    userId: message.author.id,
+    pages,
+    updateEmbed(page, embed) {
+      embed.data.fields.length = 0;
+      embed.addField("items sold", page.join("\n"));
+
+      return embed;
+    },
+  });
+
+  return manager.listen();
 }
 
 cmd.setRun(run);
