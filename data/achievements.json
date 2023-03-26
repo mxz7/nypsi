@@ -40,7 +40,7 @@
     "emoji": "🎰",
     "target": 1000,
     "description": "gamble 1,000 times",
-    "prize": "lucky_scratch_card"
+    "prize": ["lucky_scratch_card:1"]
   },
   "gambler_ii": {
     "id": "gambler_ii",
@@ -48,7 +48,7 @@
     "emoji": "🎰",
     "target": 5000,
     "description": "gamble 5,000 times",
-    "prize": "lucky_scratch_card"
+    "prize": ["lucky_scratch_card:1"]
   },
   "gambler_iii": {
     "id": "gambler_iii",
@@ -56,7 +56,7 @@
     "emoji": "🎰",
     "target": 15000,
     "description": "gamble 15,000 times",
-    "prize": "legendary_scratch_card"
+    "prize": ["legendary_scratch_card:1"]
   },
   "gambler_iv": {
     "id": "gambler_iv",
@@ -64,7 +64,7 @@
     "emoji": "🎰",
     "target": 50000,
     "description": "gamble 50,000 times",
-    "prize": "legendary_scratch_card"
+    "prize": ["legendary_scratch_card:1"]
   },
   "gambler_v": {
     "id": "gambler_v",
@@ -72,7 +72,7 @@
     "emoji": "🎰",
     "target": 100000,
     "description": "gamble 100,000 times",
-    "prize": "nypsi_crate"
+    "prize": ["nypsi_crate:1", "legendary_scratch_card:1"]
   },
   "fisher_i": {
     "id": "fisher_i",
@@ -80,7 +80,7 @@
     "emoji": "🎣",
     "target": 100,
     "description": "find 100 fish",
-    "prize": "lucky_scratch_card"
+    "prize": ["lucky_scratch_card:1"]
   },
   "fisher_ii": {
     "id": "fisher_ii",
@@ -88,7 +88,7 @@
     "emoji": "🎣",
     "target": 500,
     "description": "find 500 fish",
-    "prize": "lucky_scratch_card"
+    "prize": ["lucky_scratch_card:2"]
   },
   "fisher_iii": {
     "id": "fisher_iii",
@@ -96,7 +96,7 @@
     "emoji": "🎣",
     "target": 1000,
     "description": "find 1,000 fish",
-    "prize": "lucky_scratch_card"
+    "prize": ["legendary_scratch_card:1"]
   },
   "fisher_iv": {
     "id": "fisher_iv",
@@ -104,7 +104,7 @@
     "emoji": "🎣",
     "target": 10000,
     "description": "find 10,000 fish",
-    "prize": "legendary_scratch_card"
+    "prize": ["legendary_scratch_card:2"]
   },
   "fisher_v": {
     "id": "fisher_v",
@@ -112,7 +112,7 @@
     "emoji": "🎣",
     "target": 25000,
     "description": "find 25,000 fish",
-    "prize": "nypsi_crate"
+    "prize": ["nypsi_crate:1"]
   },
   "hunter_i": {
     "id": "hunter_i",
@@ -120,7 +120,7 @@
     "emoji": ":gun:",
     "target": 100,
     "description": "hunt 100 animals",
-    "prize": "lucky_scratch_card"
+    "prize": ["lucky_scratch_card:1"]
   },
   "hunter_ii": {
     "id": "hunter_ii",
@@ -128,7 +128,7 @@
     "emoji": ":gun:",
     "target": 500,
     "description": "hunt 500 animals",
-    "prize": "lucky_scratch_card"
+    "prize": ["lucky_scratch_card:2"]
   },
   "hunter_iii": {
     "id": "hunter_iii",
@@ -136,7 +136,7 @@
     "emoji": ":gun:",
     "target": 1000,
     "description": "hunt 1,000 animals",
-    "prize": "legendary_scratch_card"
+    "prize": ["legendary_scratch_card:1"]
   },
   "hunter_iv": {
     "id": "hunter_iv",
@@ -144,7 +144,7 @@
     "emoji": ":gun:",
     "target": 10000,
     "description": "hunt 10,000 animals",
-    "prize": "legendary_scratch_card"
+    "prize": ["legendary_scratch_card:2"]
   },
   "hunter_v": {
     "id": "hunter_v",
@@ -152,7 +152,7 @@
     "emoji": ":gun:",
     "target": 25000,
     "description": "hunt 25,000 animals",
-    "prize": "nypsi_crate"
+    "prize": ["nypsi_crate:1"]
   },
   "miner_i": {
     "id": "miner_i",
@@ -160,7 +160,7 @@
     "emoji": "⛏️",
     "target": 500,
     "description": "mine 500 items",
-    "prize": "lucky_scratch_card"
+    "prize": ["lucky_scratch_card:1"]
   },
   "miner_ii": {
     "id": "miner_ii",
@@ -168,7 +168,7 @@
     "emoji": "⛏️",
     "target": 1000,
     "description": "mine 1,000 items",
-    "prize": "lucky_scratch_card"
+    "prize": ["lucky_scratch_card:1"]
   },
   "miner_iii": {
     "id": "miner_iii",
@@ -176,7 +176,7 @@
     "emoji": "⛏️",
     "target": 5000,
     "description": "mine 5,000 items",
-    "prize": "lucky_scratch_card"
+    "prize": ["legendary_scratch_card:1"]
   },
   "miner_iv": {
     "id": "miner_iv",
@@ -184,7 +184,7 @@
     "emoji": "⛏️",
     "target": 15000,
     "description": "mine 15,000 items",
-    "prize": "legendary_scratch_card"
+    "prize": ["legendary_scratch_card:2"]
   },
   "miner_v": {
     "id": "miner_v",
@@ -192,7 +192,7 @@
     "emoji": "⛏️",
     "target": 50000,
     "description": "mine 50,000 items",
-    "prize": "nypsi_crate"
+    "prize": ["nypsi_crate:1"]
   },
   "baker_i": {
     "id": "baker_i",
@@ -200,7 +200,7 @@
     "emoji": "🍪",
     "target": 100,
     "description": "bake 100 cookies",
-    "prize": "lucky_scratch_card"
+    "prize": ["lucky_scratch_card:1"]
   },
   "baker_ii": {
     "id": "baker_ii",
@@ -208,7 +208,7 @@
     "emoji": "🍪",
     "target": 750,
     "description": "bake 750 cookies",
-    "prize": "lucky_scratch_card"
+    "prize": ["lucky_scratch_card:2"]
   },
   "baker_iii": {
     "id": "baker_iii",
@@ -216,7 +216,7 @@
     "emoji": "🍪",
     "target": 2500,
     "description": "bake 2,500 cookies",
-    "prize": "lucky_scratch_card"
+    "prize": ["lucky_scratch_card:3"]
   },
   "baker_iv": {
     "id": "baker_iv",
@@ -224,7 +224,7 @@
     "emoji": "🍪",
     "target": 10000,
     "description": "bake 10,000 cookies",
-    "prize": "legendary_scratch_card"
+    "prize": ["legendary_scratch_card:1"]
   },
   "baker_v": {
     "id": "baker_v",
@@ -232,7 +232,7 @@
     "emoji": "🍪",
     "target": 50000,
     "description": "bake 50,000 cookies",
-    "prize": "nypsi_crate"
+    "prize": ["nypsi_crate:1"]
   },
   "wizard_i": {
     "id": "wizard_i",
@@ -240,7 +240,7 @@
     "emoji": "🧙‍♂️",
     "target": 25,
     "description": "buy 25 items from karma shop",
-    "prize": "lucky_scratch_card"
+    "prize": ["karma_scratch_card:1"]
   },
   "wizard_ii": {
     "id": "wizard_ii",
@@ -248,7 +248,7 @@
     "emoji": "🧙‍♂️",
     "target": 75,
     "description": "buy 75 items from karma shop",
-    "prize": "karma_scratch_card"
+    "prize": ["karma_scratch_card:2"]
   },
   "wizard_iii": {
     "id": "wizard_iii",
@@ -256,7 +256,7 @@
     "emoji": "🧙‍♂️",
     "target": 150,
     "description": "buy 150 items from karma shop",
-    "prize": "legendary_scratch_card"
+    "prize": ["legendary_scratch_card:1"]
   },
   "wizard_iv": {
     "id": "wizard_iv",
@@ -264,7 +264,7 @@
     "emoji": "🧙‍♂️",
     "target": 500,
     "description": "buy 500 items from karma shop",
-    "prize": "legendary_scratch_card"
+    "prize": ["legendary_scratch_card:2"]
   },
   "wizard_v": {
     "id": "wizard_v",
@@ -272,7 +272,7 @@
     "emoji": "🧙‍♂️",
     "target": 1000,
     "description": "buy 1,000 items from karma shop",
-    "prize": "nypsi_crate"
+    "prize": ["nypsi_crate:1", "legendary_scratch_card:2"]
   },
   "robber_i": {
     "id": "robber_i",
@@ -294,7 +294,7 @@
     "emoji": "🥷",
     "target": 500,
     "description": "complete 500 successful robberies",
-    "prize": "lucky_scratch_card"
+    "prize": ["lucky_scratch_card:1"]
   },
   "robber_iv": {
     "id": "robber_iv",
@@ -302,7 +302,7 @@
     "emoji": "🥷",
     "target": 1000,
     "description": "complete 1,000 successful robberies",
-    "prize": "legendary_scratch_card"
+    "prize": ["legendary_scratch_card:1"]
   },
   "robber_v": {
     "id": "robber_v",
@@ -310,7 +310,7 @@
     "emoji": "🥷",
     "target": 10000,
     "description": "complete 10,000 successful robberies",
-    "prize": "legendary_scratch_card"
+    "prize": ["legendary_scratch_card:2"]
   },
   "whore_i": {
     "id": "whore_i",
@@ -332,7 +332,7 @@
     "emoji": "🍑",
     "target": 100,
     "description": "find 100 milfs",
-    "prize": "lucky_scratch_card"
+    "prize": ["lucky_scratch_card:1"]
   },
   "whore_iv": {
     "id": "whore_iv",
@@ -340,7 +340,7 @@
     "emoji": "🍑",
     "target": 1000,
     "description": "find 1,000 milfs",
-    "prize": "legendary_scratch_card"
+    "prize": ["legendary_scratch_card:1"]
   },
   "whore_v": {
     "id": "whore_v",
@@ -348,7 +348,7 @@
     "emoji": "🍑",
     "target": 15000,
     "description": "find 15,000 milfs",
-    "prize": "nypsi_crate"
+    "prize": ["nypsi_crate:1", "legendary_scratch_card:2"]
   },
   "streaker_i": {
     "id": "streaker_i",
@@ -356,7 +356,7 @@
     "emoji": "📅",
     "target": 7,
     "description": "get a daily streak for 7 days",
-    "prize": "streak_token"
+    "prize": ["streak_token:1"]
   },
   "streaker_ii": {
     "id": "streaker_ii",
@@ -364,7 +364,7 @@
     "emoji": "📅",
     "target": 14,
     "description": "get a daily streak for 14 days",
-    "prize": "lucky_scratch_card"
+    "prize": ["lucky_scratch_card:1", "streak_token:2"]
   },
   "streaker_iii": {
     "id": "streaker_iii",
@@ -372,7 +372,7 @@
     "emoji": "📅",
     "target": 30,
     "description": "get a daily streak for 30 days",
-    "prize": "legendary_scratch_card"
+    "prize": ["legendary_scratch_card:1", "streak_token:3"]
   },
   "streaker_iv": {
     "id": "streaker_iv",
@@ -380,7 +380,7 @@
     "emoji": "📅",
     "target": 69,
     "description": "get a daily streak for 69 days",
-    "prize": "legendary_scratch_card"
+    "prize": ["legendary_scratch_card:2", "streak_token:4"]
   },
   "streaker_v": {
     "id": "streaker_v",
@@ -388,7 +388,7 @@
     "emoji": "📅",
     "target": 100,
     "description": "get a daily streak for 100 days",
-    "prize": "nypsi_crate"
+    "prize": ["nypsi_crate:1", "legendary_scratch_card:2", "streak_token:5"]
   },
   "unboxer_i": {
     "id": "unboxer_i",
@@ -396,7 +396,7 @@
     "emoji": "📦",
     "target": 25,
     "description": "open 25 crates",
-    "prize": "lucky_scratch_card"
+    "prize": ["lucky_scratch_card:1"]
   },
   "unboxer_ii": {
     "id": "unboxer_ii",
@@ -404,7 +404,7 @@
     "emoji": "📦",
     "target": 100,
     "description": "open 100 crates",
-    "prize": "lucky_scratch_card"
+    "prize": ["lucky_scratch_card:2"]
   },
   "unboxer_iii": {
     "id": "unboxer_iii",
@@ -412,7 +412,7 @@
     "emoji": "📦",
     "target": 500,
     "description": "open 500 crates",
-    "prize": "legendary_scratch_card"
+    "prize": ["legendary_scratch_card:1"]
   },
   "unboxer_iv": {
     "id": "unboxer_iv",
@@ -420,7 +420,7 @@
     "emoji": "📦",
     "target": 1000,
     "description": "open 1,000 crates",
-    "prize": "nypsi_crate"
+    "prize": ["nypsi_crate:1"]
   },
   "unboxer_v": {
     "id": "unboxer_v",
@@ -428,7 +428,7 @@
     "emoji": "📦",
     "target": 10000,
     "description": "open 10,000 crates",
-    "prize": "gem_crate"
+    "prize": ["gem_crate:1"]
   },
   "wholesome_i": {
     "id": "wholesome_i",
@@ -436,7 +436,7 @@
     "emoji": "💖",
     "target": 1,
     "description": "have 1 wholesome image accepted",
-    "prize": "lucky_scratch_card"
+    "prize": ["lucky_scratch_card:1", "teddy:1"]
   },
   "wholesome_ii": {
     "id": "wholesome_ii",
@@ -444,7 +444,7 @@
     "emoji": "💖",
     "target": 5,
     "description": "have 5 wholesome images accepted",
-    "prize": "lucky_scratch_card"
+    "prize": ["lucky_scratch_card:2", "teddy:2"]
   },
   "wholesome_iii": {
     "id": "wholesome_iii",
@@ -452,7 +452,7 @@
     "emoji": "💖",
     "target": 15,
     "description": "have 15 wholesome images accepted",
-    "prize": "lucky_scratch_card"
+    "prize": ["lucky_scratch_card:3", "teddy:3"]
   },
   "wholesome_iv": {
     "id": "wholesome_iv",
@@ -460,7 +460,7 @@
     "emoji": "💖",
     "target": 25,
     "description": "have 25 wholesome images accepted",
-    "prize": "lucky_scratch_card"
+    "prize": ["lucky_scratch_card:4", "teddy:4"]
   },
   "wholesome_v": {
     "id": "wholesome_v",
@@ -468,7 +468,7 @@
     "emoji": "💖",
     "target": 50,
     "description": "have 50 wholesome images accepted",
-    "prize": "legendary_scratch_card"
+    "prize": ["legendary_scratch_card:1", "teddy:5"]
   },
   "racer_i": {
     "id": "racer_i",
@@ -483,7 +483,7 @@
     "emoji": "🏎️",
     "target": 50,
     "description": "win 50 street races",
-    "prize": "lucky_scratch_card"
+    "prize": ["lucky_scratch_card:1"]
   },
   "racer_iii": {
     "id": "racer_iii",
@@ -491,7 +491,7 @@
     "emoji": "🏎️",
     "target": 100,
     "description": "win 100 street races",
-    "prize": "lucky_scratch_card"
+    "prize": ["lucky_scratch_card:2"]
   },
   "racer_iv": {
     "id": "racer_iv",
@@ -499,7 +499,7 @@
     "emoji": "🏎️",
     "target": 1000,
     "description": "win 1,000 street races",
-    "prize": "legendary_scratch_card"
+    "prize": ["legendary_scratch_card:1"]
   },
   "racer_v": {
     "id": "racer_v",
@@ -507,7 +507,7 @@
     "emoji": "🏎️",
     "target": 5000,
     "description": "win 5,000 street races",
-    "prize": "nypsi_crate"
+    "prize": ["nypsi_crate:1", "legendary_scratch_card:1", "skyline_r34:1"]
   },
   "minesweeper_pro_i": {
     "id": "minesweeper_pro_i",
@@ -515,7 +515,7 @@
     "emoji": "💣",
     "target": 5,
     "description": "reach a 7x multiplier in mines 5 times",
-    "prize": "lucky_scratch_card"
+    "prize": ["lucky_scratch_card:1"]
   },
   "minesweeper_pro_ii": {
     "id": "minesweeper_pro_ii",
@@ -523,7 +523,7 @@
     "emoji": "💣",
     "target": 25,
     "description": "reach a 7x multiplier in mines 25 times",
-    "prize": "lucky_scratch_card"
+    "prize": ["lucky_scratch_card:2"]
   },
   "minesweeper_pro_iii": {
     "id": "minesweeper_pro_iii",
@@ -531,7 +531,7 @@
     "emoji": "💣",
     "target": 100,
     "description": "reach a 7x multiplier in mines 100 times",
-    "prize": "legendary_scratch_card"
+    "prize": ["legendary_scratch_card:1"]
   },
   "minesweeper_pro_iv": {
     "id": "minesweeper_pro_iv",
@@ -539,7 +539,7 @@
     "emoji": "💣",
     "target": 500,
     "description": "reach a 7x multiplier in mines 500 times",
-    "prize": "legendary_scratch_card"
+    "prize": ["legendary_scratch_card:2"]
   },
   "minesweeper_pro_v": {
     "id": "minesweeper_pro_v",
@@ -547,7 +547,7 @@
     "emoji": "💣",
     "target": 1000,
     "description": "reach a 7x multiplier in mines 1,000 times",
-    "prize": "nypsi_crate"
+    "prize": ["nypsi_crate:1", "legendary_scratch_card:2"]
   },
   "highlow_pro_i": {
     "id": "highlow_pro_i",
@@ -555,7 +555,7 @@
     "emoji": "🃏",
     "target": 5,
     "description": "reach a 7x multiplier in highlow 5 times",
-    "prize": "lucky_scratch_card"
+    "prize": ["lucky_scratch_card:1"]
   },
   "highlow_pro_ii": {
     "id": "highlow_pro_ii",
@@ -563,7 +563,7 @@
     "emoji": "🃏",
     "target": 25,
     "description": "reach a 7x multiplier in highlow 25 times",
-    "prize": "lucky_scratch_card"
+    "prize": ["lucky_scratch_card:2"]
   },
   "highlow_pro_iii": {
     "id": "highlow_pro_iii",
@@ -571,7 +571,7 @@
     "emoji": "🃏",
     "target": 100,
     "description": "reach a 7x multiplier in highlow 100 times",
-    "prize": "legendary_scratch_card"
+    "prize": ["legendary_scratch_card:1"]
   },
   "highlow_pro_iv": {
     "id": "highlow_pro_iv",
@@ -579,7 +579,7 @@
     "emoji": "🃏",
     "target": 500,
     "description": "reach a 7x multiplier in highlow 500 times",
-    "prize": "legendary_scratch_card"
+    "prize": ["legendary_scratch_card:2"]
   },
   "highlow_pro_v": {
     "id": "highlow_pro_v",
@@ -587,7 +587,7 @@
     "emoji": "🃏",
     "target": 1000,
     "description": "reach a 7x multiplier in highlow 1,000 times",
-    "prize": "nypsi_crate"
+    "prize": ["nypsi_crate:1", "legendary_scratch_card:2"]
   },
   "roulette_pro_i": {
     "id": "roulette_pro_i",
@@ -595,7 +595,7 @@
     "emoji": "🟢",
     "target": 5,
     "description": "win a bet on green 5 times",
-    "prize": "lucky_scratch_card"
+    "prize": ["lucky_scratch_card:1"]
   },
   "roulette_pro_ii": {
     "id": "roulette_pro_ii",
@@ -603,7 +603,7 @@
     "emoji": "🟢",
     "target": 25,
     "description": "win a bet on green 25 times",
-    "prize": "lucky_scratch_card"
+    "prize": ["lucky_scratch_card:2"]
   },
   "roulette_pro_iii": {
     "id": "roulette_pro_iii",
@@ -611,7 +611,7 @@
     "emoji": "🟢",
     "target": 100,
     "description": "win a bet on green 100 times",
-    "prize": "legendary_scratch_card"
+    "prize": ["legendary_scratch_card:1"]
   },
   "roulette_pro_iv": {
     "id": "roulette_pro_iv",
@@ -619,7 +619,7 @@
     "emoji": "🟢",
     "target": 500,
     "description": "win a bet on green 500 times",
-    "prize": "legendary_scratch_card"
+    "prize": ["legendary_scratch_card:2"]
   },
   "roulette_pro_v": {
     "id": "roulette_pro_v",
@@ -627,7 +627,7 @@
     "emoji": "🟢",
     "target": 1000,
     "description": "win a bet on green 1,000 times",
-    "prize": "nypsi_crate"
+    "prize": ["nypsi_crate:1", "legendary_scratch_card:2"]
   },
   "slots_pro_i": {
     "id": "slots_pro_i",
@@ -635,7 +635,7 @@
     "emoji": "🍒",
     "target": 5,
     "description": "win on cherries 5 times",
-    "prize": "lucky_scratch_card"
+    "prize": ["lucky_scratch_card:1"]
   },
   "slots_pro_ii": {
     "id": "slots_pro_ii",
@@ -643,7 +643,7 @@
     "emoji": "🍒",
     "target": 25,
     "description": "win on cherries 25 times",
-    "prize": "lucky_scratch_card"
+    "prize": ["lucky_scratch_card:2"]
   },
   "slots_pro_iii": {
     "id": "slots_pro_iii",
@@ -651,7 +651,7 @@
     "emoji": "🍒",
     "target": 100,
     "description": "win on cherries 100 times",
-    "prize": "legendary_scratch_card"
+    "prize": ["legendary_scratch_card:1"]
   },
   "slots_pro_iv": {
     "id": "slots_pro_iv",
@@ -659,7 +659,7 @@
     "emoji": "🍒",
     "target": 500,
     "description": "win on cherries 500 times",
-    "prize": "legendary_scratch_card"
+    "prize": ["legendary_scratch_card:2"]
   },
   "slots_pro_v": {
     "id": "slots_pro_v",
@@ -667,7 +667,7 @@
     "emoji": "🍒",
     "target": 1000,
     "description": "win on cherries 1,000 times",
-    "prize": "nypsi_crate"
+    "prize": ["nypsi_crate:1", "legendary_scratch_card:2"]
   },
   "horny_i": {
     "id": "horny_i",
@@ -689,7 +689,7 @@
     "emoji": "💦",
     "target": 1000,
     "description": "view 1,000 nsfw images",
-    "prize": "lucky_scratch_card"
+    "prize": ["lucky_scratch_card:1"]
   },
   "horny_iv": {
     "id": "horny_iv",
@@ -697,7 +697,7 @@
     "emoji": "💦",
     "target": 5000,
     "description": "view 5,000 nsfw images",
-    "prize": "legendary_scratch_card"
+    "prize": ["legendary_scratch_card:2"]
   },
   "horny_v": {
     "id": "horny_v",
@@ -705,7 +705,7 @@
     "emoji": "💦",
     "target": 15000,
     "description": "view 15,000 nsfw images",
-    "prize": "legendary_scratch_card"
+    "prize": ["legendary_scratch_card:3", "test_tube:69"]
   },
   "cute_i": {
     "id": "cute_i",
@@ -727,7 +727,7 @@
     "emoji": "🐶",
     "target": 1000,
     "description": "view 1,000 animal images",
-    "prize": "legendary_scratch_card"
+    "prize": ["legendary_scratch_card:1"]
   },
   "cute_iv": {
     "id": "cute_iv",
@@ -735,7 +735,7 @@
     "emoji": "🐶",
     "target": 5000,
     "description": "view 5,000 animal images",
-    "prize": "legendary_scratch_card"
+    "prize": ["legendary_scratch_card:2"]
   },
   "cute_v": {
     "id": "cute_v",
@@ -743,7 +743,7 @@
     "emoji": "🐶",
     "target": 15000,
     "description": "view 15,000 animal images",
-    "prize": "legendary_scratch_card"
+    "prize": ["legendary_scratch_card:3", "teddy:69"]
   },
   "unsure_i": {
     "id": "unsure_i",
@@ -765,7 +765,7 @@
     "emoji": "📏",
     "target": 1000,
     "description": "use 1,000 measurement commands",
-    "prize": "lucky_scratch_card"
+    "prize": ["lucky_scratch_card:1"]
   },
   "unsure_iv": {
     "id": "unsure_iv",
@@ -773,7 +773,7 @@
     "emoji": "📏",
     "target": 5000,
     "description": "use 5,000 measurement commands",
-    "prize": "legendary_scratch_card"
+    "prize": ["legendary_scratch_card:1"]
   },
   "unsure_v": {
     "id": "unsure_v",
@@ -781,7 +781,7 @@
     "emoji": "📏",
     "target": 15000,
     "description": "use 15,000 measurement commands",
-    "prize": "legendary_scratch_card"
+    "prize": ["legendary_scratch_card:2"]
   },
   "nypsi_i": {
     "id": "nypsi_i",
@@ -789,7 +789,7 @@
     "emoji": "<:xnypsi:819957267548864543>",
     "target": 5000,
     "description": "use 5,000 nypsi commands",
-    "prize": "lucky_scratch_card"
+    "prize": ["legendary_scratch_card:1"]
   },
   "nypsi_ii": {
     "id": "nypsi_ii",
@@ -797,7 +797,7 @@
     "emoji": "<:xnypsi:819957267548864543>",
     "target": 25000,
     "description": "use 25,000 nypsi commands",
-    "prize": "legendary_scratch_card"
+    "prize": ["legendary_scratch_card:2", "bronze_credit:3"]
   },
   "nypsi_iii": {
     "id": "nypsi_iii",
@@ -805,7 +805,7 @@
     "emoji": "<:xnypsi:819957267548864543>",
     "target": 100000,
     "description": "use 100,000 nypsi commands",
-    "prize": "nypsi_crate"
+    "prize": ["nypsi_crate:1", "legendary_scratch_card:3", "silver_credit:3"]
   },
   "nypsi_iv": {
     "id": "nypsi_iv",
@@ -813,7 +813,7 @@
     "emoji": "<:xnypsi:819957267548864543>",
     "target": 250000,
     "description": "use 250,000 nypsi commands",
-    "prize": "gem_crate"
+    "prize": ["gem_crate:1", "nypsi_crate:2", "legendary_scratch_card:4", "gold_credit:3"]
   },
   "nypsi_v": {
     "id": "nypsi_v",
@@ -821,7 +821,7 @@
     "emoji": "<:xnypsi:819957267548864543>",
     "target": 500000,
     "description": "use 500,000 nypsi commands",
-    "prize": "crystal_heart"
+    "prize": ["crystal_heart:1", "nypsi_crate:3", "legendary_scratch_card:5", "platinum_credit:3"]
   },
   "fighter_i": {
     "id": "fighter_i",
@@ -836,7 +836,7 @@
     "emoji": "🥊",
     "target": 50,
     "description": "win 50 fights",
-    "prize": "lucky_scratch_card"
+    "prize": ["lucky_scratch_card:1"]
   },
   "fighter_iii": {
     "id": "fighter_iii",
@@ -844,7 +844,7 @@
     "emoji": "🥊",
     "target": 250,
     "description": "win 250 fights",
-    "prize": "lucky_scratch_card"
+    "prize": ["lucky_scratch_card:2"]
   },
   "fighter_iv": {
     "id": "fighter_iv",
@@ -852,7 +852,7 @@
     "emoji": "🥊",
     "target": 500,
     "description": "win 500 fights",
-    "prize": "legendary_scratch_card"
+    "prize": ["legendary_scratch_card:1"]
   },
   "fighter_v": {
     "id": "fighter_v",
@@ -860,7 +860,7 @@
     "emoji": "🥊",
     "target": 1000,
     "description": "win 1,000 fights",
-    "prize": "legendary_scratch_card"
+    "prize": ["legendary_scratch_card:2"]
   },
   "lucky_i": {
     "id": "lucky_i",
@@ -868,7 +868,7 @@
     "emoji": "🍀",
     "target": 2,
     "description": "win the lottery twice",
-    "prize": "lucky_scratch_card"
+    "prize": ["lucky_scratch_card:1"]
   },
   "lucky_ii": {
     "id": "lucky_ii",
@@ -876,7 +876,7 @@
     "emoji": "🍀",
     "target": 15,
     "description": "win the lottery 15 times",
-    "prize": "lucky_scratch_card"
+    "prize": ["lucky_scratch_card:2"]
   },
   "lucky_iii": {
     "id": "lucky_iii",
@@ -884,7 +884,7 @@
     "emoji": "🍀",
     "target": 50,
     "description": "win the lottery 50 times",
-    "prize": "legendary_scratch_card"
+    "prize": ["legendary_scratch_card:1"]
   },
   "lucky_iv": {
     "id": "lucky_iv",
@@ -892,7 +892,7 @@
     "emoji": "🍀",
     "target": 75,
     "description": "win the lottery 75 times",
-    "prize": "legendary_scratch_card"
+    "prize": ["legendary_scratch_card:2"]
   },
   "lucky_v": {
     "id": "lucky_v",
@@ -900,7 +900,7 @@
     "emoji": "🍀",
     "target": 150,
     "description": "win the lottery 150 times",
-    "prize": "legendary_scratch_card"
+    "prize": ["nypsi_crate:1", "platinum_credit:1"]
   },
   "wordle_i": {
     "id": "wordle_i",
@@ -908,7 +908,7 @@
     "emoji": "💬",
     "target": 15,
     "description": "win 15 wordles",
-    "prize": "lucky_scratch_card"
+    "prize": ["lucky_scratch_card:1"]
   },
   "wordle_ii": {
     "id": "wordle_ii",
@@ -916,7 +916,7 @@
     "emoji": "💬",
     "target": 75,
     "description": "win 75 wordles",
-    "prize": "lucky_scratch_card"
+    "prize": ["lucky_scratch_card:2"]
   },
   "wordle_iii": {
     "id": "wordle_iii",
@@ -924,7 +924,7 @@
     "emoji": "💬",
     "target": 250,
     "description": "win 250 wordles",
-    "prize": "lucky_scratch_card"
+    "prize": ["lucky_scratch_card:3"]
   },
   "wordle_iv": {
     "id": "wordle_iv",
@@ -932,7 +932,7 @@
     "emoji": "💬",
     "target": 1000,
     "description": "win 1,000 wordles",
-    "prize": "legendary_scratch_card"
+    "prize": ["legendary_scratch_card:1"]
   },
   "wordle_v": {
     "id": "wordle_v",
@@ -940,7 +940,7 @@
     "emoji": "💬",
     "target": 2500,
     "description": "win 2,500 wordles",
-    "prize": "legendary_scratch_card"
+    "prize": ["legendary_scratch_card:2", "gold_credit:3"]
   },
   "crafter_i": {
     "id": "crafter_i",
@@ -948,7 +948,7 @@
     "emoji": "<:Craft:615426524862087191>",
     "target": 100,
     "description": "craft 100 items",
-    "prize": "lucky_scratch_card"
+    "prize": ["lucky_scratch_card:1"]
   },
   "crafter_ii": {
     "id": "crafter_ii",
@@ -956,7 +956,7 @@
     "emoji": "<:Craft:615426524862087191>",
     "target": 1000,
     "description": "craft 1,000 items",
-    "prize": "lucky_scratch_card"
+    "prize": ["lucky_scratch_card:2"]
   },
   "crafter_iii": {
     "id": "crafter_iii",
@@ -964,7 +964,7 @@
     "emoji": "<:Craft:615426524862087191>",
     "target": 2500,
     "description": "craft 2,500 items",
-    "prize": "legendary_scratch_card"
+    "prize": ["legendary_scratch_card:1"]
   },
   "crafter_iv": {
     "id": "crafter_iv",
@@ -972,7 +972,7 @@
     "emoji": "<:Craft:615426524862087191>",
     "target": 5000,
     "description": "craft 5,000 items",
-    "prize": "nypsi_crate"
+    "prize": ["nypsi_crate:1"]
   },
   "crafter_v": {
     "id": "crafter_v",
@@ -980,7 +980,7 @@
     "emoji": "<:Craft:615426524862087191>",
     "target": 10000,
     "description": "craft 10,000 items",
-    "prize": "nypsi_crate"
+    "prize": ["nypsi_crate:3"]
   },
   "gem_hunter_i": {
     "id": "gem_hunter_i",
@@ -988,7 +988,7 @@
     "emoji": "<:nypsi_gem_white:1046933670436552725>",
     "target": 2,
     "description": "find 2 gems",
-    "prize": "legendary_scratch_card"
+    "prize": ["legendary_scratch_card:1"]
   },
   "gem_hunter_ii": {
     "id": "gem_hunter_ii",
@@ -996,7 +996,7 @@
     "emoji": "<:nypsi_gem_white:1046933670436552725>",
     "target": 10,
     "description": "find 10 gems",
-    "prize": "legendary_scratch_card"
+    "prize": ["legendary_scratch_card:2"]
   },
   "gem_hunter_iii": {
     "id": "gem_hunter_iii",
@@ -1004,7 +1004,7 @@
     "emoji": "<:nypsi_gem_white:1046933670436552725>",
     "target": 25,
     "description": "find 25 gems",
-    "prize": "legendary_scratch_card"
+    "prize": ["legendary_scratch_card:3", "gem_crate:1"]
   },
   "gem_hunter_iv": {
     "id": "gem_hunter_iv",
@@ -1012,7 +1012,7 @@
     "emoji": "<:nypsi_gem_white:1046933670436552725>",
     "target": 50,
     "description": "find 50 gems",
-    "prize": "legendary_scratch_card"
+    "prize": ["legendary_scratch_card:4", "gem_crate:1"]
   },
   "gem_hunter_v": {
     "id": "gem_hunter_v",
@@ -1020,7 +1020,7 @@
     "emoji": "<:nypsi_gem_white:1046933670436552725>",
     "target": 100,
     "description": "find 100 gems",
-    "prize": "crystal_heart"
+    "prize": ["crystal_heart:1", "legendary_scratch_card:5"]
   },
   "tower_pro_i": {
     "id": "tower_pro_i",
@@ -1028,7 +1028,7 @@
     "emoji": "🐲",
     "target": 2,
     "description": "complete the dragons tower twice on medium or higher",
-    "prize": "lucky_scratch_card"
+    "prize": ["lucky_scratch_card:1"]
   },
   "tower_pro_ii": {
     "id": "tower_pro_ii",
@@ -1036,7 +1036,7 @@
     "emoji": "🐲",
     "target": 5,
     "description": "complete the dragons tower 5 times on medium or higher",
-    "prize": "lucky_scratch_card"
+    "prize": ["lucky_scratch_card:2"]
   },
   "tower_pro_iii": {
     "id": "tower_pro_iii",
@@ -1044,7 +1044,7 @@
     "emoji": "🐲",
     "target": 25,
     "description": "complete the dragons tower 25 times on medium or higher",
-    "prize": "legendary_scratch_card"
+    "prize": ["legendary_scratch_card:1"]
   },
   "tower_pro_iv": {
     "id": "tower_pro_iv",
@@ -1052,7 +1052,7 @@
     "emoji": "🐲",
     "target": 100,
     "description": "complete the dragons tower 100 times on medium or higher",
-    "prize": "legendary_scratch_card"
+    "prize": ["legendary_scratch_card:2"]
   },
   "tower_pro_v": {
     "id": "tower_pro_v",
@@ -1060,7 +1060,7 @@
     "emoji": "🐲",
     "target": 500,
     "description": "complete the dragons tower 500 times on medium or higher",
-    "prize": "legendary_scratch_card"
+    "prize": ["legendary_scratch_card:3", "nypsi_crate:1"]
   },
   "scratchies_pro_i": {
     "id": "scratchies_pro_i",
@@ -1068,7 +1068,7 @@
     "emoji": "<:nypsi_daily_scratch:1061368847522869289>",
     "target": 10,
     "description": "win something from a scratch card 10 times",
-    "prize": "lucky_scratch_card"
+    "prize": ["lucky_scratch_card:1"]
   },
   "scratchies_pro_ii": {
     "id": "scratchies_pro_ii",
@@ -1076,7 +1076,7 @@
     "emoji": "<:nypsi_daily_scratch:1061368847522869289>",
     "target": 25,
     "description": "win something from a scratch card 25 times",
-    "prize": "lucky_scratch_card"
+    "prize": ["lucky_scratch_card:2"]
   },
   "scratchies_pro_iii": {
     "id": "scratchies_pro_iii",
@@ -1084,7 +1084,7 @@
     "emoji": "<:nypsi_daily_scratch:1061368847522869289>",
     "target": 100,
     "description": "win something from a scratch card 100 times",
-    "prize": "lucky_scratch_card"
+    "prize": ["lucky_scratch_card:3"]
   },
   "scratchies_pro_iv": {
     "id": "scratchies_pro_iv",
@@ -1092,7 +1092,7 @@
     "emoji": "<:nypsi_daily_scratch:1061368847522869289>",
     "target": 250,
     "description": "win something from a scratch card 250 times",
-    "prize": "legendary_scratch_card"
+    "prize": ["legendary_scratch_card:1"]
   },
   "scratchies_pro_v": {
     "id": "scratchies_pro_v",
@@ -1100,7 +1100,7 @@
     "emoji": "<:nypsi_daily_scratch:1061368847522869289>",
     "target": 1000,
     "description": "win something from a scratch card 1,000 times",
-    "prize": "legendary_scratch_card"
+    "prize": ["legendary_scratch_card:2"]
   },
   "fast_typer_i": {
     "id": "fast_typer_i",
@@ -1114,14 +1114,16 @@
     "name": "fast typer **II**",
     "emoji": "⌨️",
     "target": 50,
-    "description": "win 50 chat reaction duels"
+    "description": "win 50 chat reaction duels",
+    "prize": ["lucky_scratch_card:1"]
   },
   "fast_typer_iii": {
     "id": "fast_typer_iii",
     "name": "fast typer **III**",
     "emoji": "⌨️",
     "target": 250,
-    "description": "win 250 chat reaction duels"
+    "description": "win 250 chat reaction duels",
+    "prize": ["lucky_scratch_card:2"]
   },
   "fast_typer_iv": {
     "id": "fast_typer_iv",
@@ -1129,7 +1131,7 @@
     "emoji": "⌨️",
     "target": 500,
     "description": "win 500 chat reaction duels",
-    "prize": "legendary_scratch_card"
+    "prize": ["legendary_scratch_card:1"]
   },
   "fast_typer_v": {
     "id": "fast_typer_v",
@@ -1137,6 +1139,6 @@
     "emoji": "⌨️",
     "target": 1000,
     "description": "win 1,000 chat reaction duels",
-    "prize": "legendary_scratch_card"
+    "prize": ["legendary_scratch_card:2"]
   }
 }

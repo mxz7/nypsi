@@ -20,7 +20,7 @@ import {
   getUncompletedAchievements,
   getUserAchievement,
 } from "../utils/functions/economy/achievements";
-import { getAchievements } from "../utils/functions/economy/utils";
+import { getAchievements, getItems } from "../utils/functions/economy/utils";
 import PageManager from "../utils/functions/page";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
@@ -284,6 +284,19 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     embed.setDescription(desc);
+
+    if (selected.prize) {
+      embed.addField(
+        "reward",
+        selected.prize
+          .map((prize) => {
+            const amount = parseInt(prize.split(":")[1]);
+
+            return `\`${amount}x\` ${getItems()[prize.split(":")[0]].emoji} ${getItems()[prize.split(":")[0]].name}`;
+          })
+          .join("\n")
+      );
+    }
 
     return send({ embeds: [embed] });
   };
