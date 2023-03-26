@@ -21,7 +21,7 @@ ranks.set("MVP", "MVP");
 ranks.set("VIP_PLUS", "VIP+");
 ranks.set("VIP", "VIP");
 
-const cmd = new Command("hypixel", "view hypixel stats for a minecraft account", "minecraft").setAliases(["h"]);
+const cmd = new Command("hypixel", "view hypixel stats for a minecraft account", "minecraft");
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   const prefix = await getPrefix(message.guild);
