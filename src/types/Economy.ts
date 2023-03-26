@@ -55,7 +55,7 @@ export interface AchievementData {
   emoji: string;
   target: number;
   description: string;
-  prize?: string;
+  prize?: string[];
 }
 
 export interface BakeryUpgradeData {
