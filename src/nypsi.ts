@@ -54,9 +54,11 @@ const client = new NypsiClient({
 });
 
 import { loadCommands } from "./utils/handlers/commandhandler";
+import { loadInteractions } from "./utils/handlers/interactions";
 import { logger } from "./utils/logger";
 
 loadCommands();
+loadInteractions();
 client.loadEvents();
 
 setTimeout(() => {
