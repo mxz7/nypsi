@@ -29,8 +29,8 @@ const playing = new Set<string>();
 
 cmd.slashEnabled = true;
 cmd.slashData
-  .addUserOption((option) => option.setName("user").setDescription("user you want to challenge").setRequired(true))
-  .addStringOption((option) => option.setName("bet").setDescription("how much do you want to bet"));
+  .addUserOption((option) => option.setName("user").setDescription("user you want to challenge").setRequired(false))
+  .addStringOption((option) => option.setName("bet").setDescription("how much do you want to bet").setRequired(true));
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (!(await userExists(message.member))) {
