@@ -29,7 +29,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const net = await calcNetWorth(message.member, true);
   const inventory = await getInventory(message.member);
 
-  const embed = new CustomEmbed(message.member).setHeader("networth breakdown", message.author.avatarURL());
+  const embed = new CustomEmbed(message.member).setHeader(
+    `${message.author.username}'s networth`,
+    message.author.avatarURL()
+  );
 
   let mainValues = `🌍 $**${net.amount.toLocaleString()}**\n`;
   const itemValues: { itemId: string; value: number }[] = [];
