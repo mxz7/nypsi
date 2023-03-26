@@ -473,7 +473,7 @@ export async function calcNetWorth(member: GuildMember | string, breakdown = fal
   if (breakdown) breakdownItems.set("balance", worth);
 
   if (query.EconomyGuildMember?.guild) {
-    let guildWorth = 0;
+    let guildWorth = Number(query.EconomyGuildMember.guild.balance) / query.EconomyGuildMember.guild.members.length;
 
     for (let i = 0; i < query.EconomyGuildMember.guild.level; i++) {
       const baseMoney = 3000000 * Math.pow(i, 2.57);
@@ -482,10 +482,8 @@ export async function calcNetWorth(member: GuildMember | string, breakdown = fal
       guildWorth += Math.floor(baseMoney + bonusMoney);
     }
 
-    worth += Number(query.EconomyGuildMember.guild.balance);
-
     worth += guildWorth / query.EconomyGuildMember.guild.members.length;
-    if (breakdown) breakdownItems.set("guild", guildWorth);
+    if (breakdown) breakdownItems.set("guild", worth);
   } else if (breakdown) {
     breakdownItems.set("guild", 0);
   }
