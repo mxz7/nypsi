@@ -56,8 +56,10 @@ cmd.slashData
     option
       .setName("duel")
       .setDescription("duel a member to a chat reaction")
-      .addUserOption((option) => option.setName("member").setDescription("member to duel").setRequired(true))
-      .addStringOption((option) => option.setName("wager").setDescription("how much do you want to wager / bet"))
+      .addUserOption((option) => option.setName("member").setDescription("member to duel").setRequired(false))
+      .addStringOption((option) =>
+        option.setName("wager").setDescription("how much do you want to wager / bet").setRequired(true)
+      )
   )
   .addSubcommand((option) => option.setName("stats").setDescription("view your chat reaction stats"))
   .addSubcommand((option) => option.setName("leaderboard").setDescription("view the chat reaction leaderboard"))
