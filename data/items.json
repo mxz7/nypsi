@@ -126,7 +126,7 @@
     "in_crates": false,
     "craft": {
       "ingrediants": ["gold_nugget:9"],
-      "time": 60
+      "time": 180
     }
   },
   "diamond": {
@@ -270,7 +270,7 @@
     "buy": 0,
     "sell": 1500000,
     "craft": {
-      "time": 600,
+      "time": 1200,
       "ingrediants": ["netherite_scrap:4", "gold_ingot:4"]
     },
     "in_crates": false
@@ -1350,7 +1350,7 @@
     "sell": 1000000,
     "craft": {
       "ingrediants": ["obsidian:10"],
-      "time": 1800
+      "time": 3600
     },
     "in_crates": false,
     "aliases": ["portal"]
