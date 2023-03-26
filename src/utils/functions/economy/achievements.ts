@@ -169,7 +169,7 @@ async function completeAchievement(userId: string, achievementId: string) {
   }
 
   if (rewardsDesc.length > 0) {
-    userEmbed.setDescription((userEmbed.data.description += `\n\nrewardsL:\n${rewardsDesc.join("\n")}`));
+    userEmbed.setDescription((userEmbed.data.description += `\n\nrewards:\n${rewardsDesc.join("\n")}`));
   }
 
   if (achievements[achievementId].prize) {
