@@ -3,6 +3,7 @@ import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
 import { loadCommands, reloadCommand } from "../utils/handlers/commandhandler";
+import { reloadInteractions } from "../utils/handlers/interactions";
 import { logger } from "../utils/logger";
 
 const cmd = new Command("reload", "reload commands", "none").setPermissions(["bot owner"]);
@@ -16,6 +17,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       message.react("✅");
     }
     logger.info("commands reloaded");
+  } else if (args[0] === "interactions") {
+    reloadInteractions();
+    if (message instanceof Message) {
+      message.react("✅");
+    }
   } else {
     let msg;
 
