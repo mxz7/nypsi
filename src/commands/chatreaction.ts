@@ -556,13 +556,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (i.user.id != message.author.id && (i as ButtonInteraction).customId == "n") return false;
         if (await isEcoBanned(i.user.id)) return false;
 
-        if (!(await userExists(i.user.id)) || (await getBalance(i.user.id)) < wager) {
-          if (i.isRepliable()) await i.reply({ ephemeral: true, embeds: [new ErrorEmbed("you cannot afford this wager")] });
+        if (i.user.id === message.author.id) {
+          if ((i as ButtonInteraction).customId === "n") return true;
           return false;
         }
 
-        if (i.user.id === message.author.id) {
-          if ((i as ButtonInteraction).customId === "n") return true;
+        if (!(await userExists(i.user.id)) || (await getBalance(i.user.id)) < wager) {
+          if (i.isRepliable()) await i.reply({ ephemeral: true, embeds: [new ErrorEmbed("you cannot afford this wager")] });
           return false;
         }
 
