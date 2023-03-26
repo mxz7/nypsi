@@ -985,6 +985,25 @@
     },
     "in_crates": true
   },
+  "extended_mag": {
+    "id": "extended_mag",
+    "name": "extended magazine",
+    "plural": "extended magazines",
+    "emoji": "<:nypsi_extendedmag:1089515476922683495>",
+    "longDesc": "increased luck when hunting",
+    "aliases": ["mag"],
+    "rarity": 0,
+    "role": "booster",
+    "buy": 45000,
+    "sell": 25000,
+    "stackable": false,
+    "boosterEffect": {
+      "boosts": ["hunt"],
+      "effect": 1,
+      "time": 3600
+    },
+    "in_crates": true
+  },
   "multi_potion": {
     "id": "multi_potion",
     "name": "multiplier potion",
