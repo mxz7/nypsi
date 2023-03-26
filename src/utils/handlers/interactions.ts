@@ -39,7 +39,7 @@ export async function reloadInteractions() {
 
 export async function runInteraction(interaction: Interaction) {
   if (interaction.isAutocomplete()) {
-    return autocompleteHanders.get(interaction.options.getFocused(true).value.toLowerCase())?.run(interaction);
+    return autocompleteHanders.get(interaction.options.getFocused(true).name)?.run(interaction);
   } else if (interaction.isMessageComponent() && !interactionHandlers.has(interaction.customId)) {
     if (!interaction.guild) return;
     const reactionRoles = await getReactionRolesByGuild(interaction.guild);
