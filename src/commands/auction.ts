@@ -734,6 +734,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return await send({ embeds: [new CustomEmbed(message.member, desc)] });
   } else if (args[0].toLowerCase() == "watch") {
     let current = await getAuctionWatch(message.member);
+    let max = 5;
+
+    if (await isPremium(message.member)) max *= await getTier(message.member);
+
+    if (current.length > max) current = await setAuctionWatch(message.member, current.splice(0, max));
 
     const items = getItems();
 
@@ -788,10 +793,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       current = await setAuctionWatch(message.member, current);
     } else {
-      let max = 5;
-
-      if (await isPremium(message.member)) max *= await getTier(message.member);
-
       if (current.length >= max) {
         let desc = `you have reached the limit of auction watches (**${max}**)`;
 
