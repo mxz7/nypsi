@@ -22,6 +22,8 @@ export async function loadInteractions() {
       interactionHandlers.set(res.name, res);
     }
   }
+
+  logger.info(`${autocompleteHanders.size + interactionHandlers.size} interactions loaded`);
 }
 
 export async function reloadInteractions() {
