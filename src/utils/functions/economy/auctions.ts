@@ -20,7 +20,7 @@ import { NypsiClient } from "../../../models/Client";
 import { CustomEmbed, ErrorEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
 import { logger, transaction } from "../../logger";
-import { getTier, isPremium } from "../premium/premium";
+import { isPremium } from "../premium/premium";
 import requestDM from "../requestdm";
 import { addToNypsiBank, getTax } from "../tax";
 import { addNotificationToQueue, getDmSettings, getPreferences } from "../users/notifications";
@@ -569,7 +569,7 @@ export async function buyFullAuction(interaction: ButtonInteraction, auction: Au
 
   let taxedAmount = 0;
 
-  if (!(await isPremium(auction.ownerId)) || (await getTier(auction.ownerId)) != 4) {
+  if (!(await isPremium(auction.ownerId))) {
     taxedAmount = Math.floor(Number(auction.bin) * tax);
     addToNypsiBank(taxedAmount);
   }
@@ -600,7 +600,7 @@ export async function buyFullAuction(interaction: ButtonInteraction, auction: Au
       const moneyReceived = Math.floor((Number(auction.bin) / auction.itemAmount) * total);
       let taxedAmount = 0;
 
-      if ((await getTier(auction.ownerId)) != 4) taxedAmount = Math.floor(moneyReceived * tax);
+      if (!(await isPremium(auction.ownerId))) taxedAmount = Math.floor(moneyReceived * tax);
 
       const embedDm = new CustomEmbed()
         .setColor(Constants.TRANSPARENT_EMBED_COLOR)
@@ -746,7 +746,7 @@ export async function buyAuctionOne(interaction: ButtonInteraction, auction: Auc
 
   let taxedAmount = 0;
 
-  if (!(await isPremium(auction.ownerId)) || (await getTier(auction.ownerId)) != 4) {
+  if (!(await isPremium(auction.ownerId))) {
     taxedAmount = Math.floor(Math.floor(Number(auction.bin) / auction.itemAmount) * tax);
     addToNypsiBank(taxedAmount);
   }
@@ -793,7 +793,7 @@ export async function buyAuctionOne(interaction: ButtonInteraction, auction: Auc
         const moneyReceived = Math.floor((Number(auction.bin) / auction.itemAmount) * total);
         let taxedAmount = 0;
 
-        if ((await getTier(auction.ownerId)) != 4) taxedAmount = Math.floor(moneyReceived * tax);
+        if (!(await isPremium(auction.ownerId))) taxedAmount = Math.floor(moneyReceived * tax);
 
         const embedDm = new CustomEmbed()
           .setColor(Constants.TRANSPARENT_EMBED_COLOR)
