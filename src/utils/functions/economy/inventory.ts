@@ -567,6 +567,18 @@ export async function gemBreak(userId: string, chance: number, gem: string) {
 
   await setInventoryItem(userId, gem, inventory.find((i) => i.item === gem).amount - 1, false);
 
+  const shardMax = new Map<string, number>([
+    ["green_gem", 3],
+    ["blue_gem", 3],
+    ["purple_gem", 10],
+    ["pink_gem", 15],
+    ["white_gem", 30],
+  ]);
+
+  const amount = Math.floor(Math.random() * shardMax.get(gem) - 1) + 1;
+
+  await addInventoryItem(userId, "gem_shard", amount, false);
+
   if ((await getDmSettings(userId)).other) {
     await addNotificationToQueue({
       memberId: userId,
@@ -575,7 +587,9 @@ export async function gemBreak(userId: string, chance: number, gem: string) {
           .setColor(Constants.TRANSPARENT_EMBED_COLOR)
           .setTitle(`your ${getItems()[gem].name} has shattered`)
           .setDescription(
-            `${getItems()[gem].emoji} your gem exerted too much power and destroyed itself. shattering into pieces`
+            `${getItems()[gem].emoji} your gem exerted too much power and destroyed itself. shattering into ${amount} piece${
+              amount > 1 ? "s" : ""
+            }`
           ),
       },
     });
