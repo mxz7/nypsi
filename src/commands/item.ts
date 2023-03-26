@@ -19,7 +19,7 @@ import { isPremium } from "../utils/functions/premium/premium";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger } from "../utils/logger";
 
-const cmd = new Command("item", "view information about an item", "money");
+const cmd = new Command("item", "view information about an item", "money").setAliases(["i"]);
 
 cmd.slashEnabled = true;
 cmd.slashData.addStringOption((option) =>
