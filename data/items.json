@@ -282,7 +282,7 @@
     "longDesc": "allows you to mine",
     "role": "tool",
     "rarity": 0,
-    "buy": 0,
+    "buy": 30000,
     "sell": 5000,
     "in_crates": true
   },
@@ -315,7 +315,7 @@
     "longDesc": "allows you to fish",
     "role": "tool",
     "rarity": 0,
-    "buy": 0,
+    "buy": 30000,
     "sell": 5000,
     "in_crates": true
   },
@@ -369,7 +369,7 @@
     "longDesc": "allows you to hunt",
     "role": "tool",
     "rarity": 0,
-    "buy": 0,
+    "buy": 30000,
     "sell": 5000,
     "in_crates": true
   },
