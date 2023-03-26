@@ -173,12 +173,17 @@ async function completeAchievement(userId: string, achievementId: string) {
   }
 
   if (achievements[achievementId].prize) {
-    await addInventoryItem(userId, achievements[achievementId].prize, 1, false);
-    userEmbed.setDescription(
-      (userEmbed.data.description += `\n + 1 ${getItems()[achievements[achievementId].prize].emoji} ${
-        getItems()[achievements[achievementId].prize].name
-      }`)
-    );
+    const prizes: string[] = [];
+    for (const prize of achievements[achievementId].prize) {
+      const amount = parseInt(prize.split(":")[1]);
+
+      if (!amount) break;
+
+      await addInventoryItem(userId, prize.split(":")[0], amount, false);
+      prizes.push(`+ \`${amount}x\` ${getItems()[prize.split(":")[0]].emoji} ${getItems()[prize.split(":")[0]].name}`);
+    }
+
+    userEmbed.setDescription((userEmbed.data.description += `\n ${prizes.join("\n")}`));
   }
 
   if ((await getDmSettings(userId)).other) {
