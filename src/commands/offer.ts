@@ -1,4 +1,3 @@
-import dayjs = require("dayjs");
 import {
   ActionRowBuilder,
   BaseMessageOptions,
@@ -10,6 +9,7 @@ import {
   InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
+  MessageEditOptions,
 } from "discord.js";
 import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction } from "../models/Command";
@@ -30,6 +30,7 @@ import { getXp } from "../utils/functions/economy/xp";
 import { getMember } from "../utils/functions/member";
 import { getPreferences } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import dayjs = require("dayjs");
 
 const cmd = new Command("offer", "create and manage offers", "money").setAliases(["offers", "of"]);
 
@@ -154,10 +155,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     updateButtons(0);
 
+    const payload: BaseMessageOptions | InteractionReplyOptions = {
+      embeds: [embed],
+      components: [row],
+    };
+
+    if (row.components.length == 0) delete payload.components;
+
     if (msg) {
-      msg = await msg.edit({ embeds: [embed], components: [row] });
+      msg = await msg.edit(payload as MessageEditOptions);
     } else {
-      msg = await send({ embeds: [embed], components: [row] });
+      msg = await send(payload);
     }
 
     const filter = (i: Interaction) => i.user.id == message.author.id;
@@ -231,7 +239,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return pageManager();
   };
 
-  if (args[0].toLowerCase() === "create") args.shift();
+  if (args.length != 0 && args[0].toLowerCase() === "create") args.shift();
 
   if (args.length == 0 || args[0].toLowerCase() == "manage") {
     return manageOffers();
