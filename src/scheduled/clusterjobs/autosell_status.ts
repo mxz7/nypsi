@@ -14,6 +14,7 @@ async function autosellThing() {
   for (const user of users) {
     if (!(await getDmSettings(user)).autosellStatus) continue;
     const items = await redis.hgetall(`${Constants.redis.nypsi.AUTO_SELL_ITEMS}:${user}`);
+    await redis.del(`${Constants.redis.nypsi.AUTO_SELL_ITEMS}:${user}`);
 
     const amounts = new Map<string, number>();
     const moneys = new Map<string, number>();

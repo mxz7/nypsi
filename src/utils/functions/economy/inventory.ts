@@ -122,7 +122,7 @@ async function doAutosellThing(userId: string, itemId: string, amount: number): 
 
   await redis.hincrby(`${Constants.redis.nypsi.AUTO_SELL_ITEMS}:${userId}`, `${itemId}-money`, sellWorth);
   await redis.hincrby(`${Constants.redis.nypsi.AUTO_SELL_ITEMS}:${userId}`, `${itemId}-amount`, amount);
-  if ((await redis.lpos(Constants.redis.nypsi.AUTO_SELL_ITEMS_MEMBERS, userId)) < 1)
+  if (!(await redis.lrange(Constants.redis.nypsi.AUTO_SELL_ITEMS_MEMBERS, 0, -1)).includes(userId))
     await redis.lpush(Constants.redis.nypsi.AUTO_SELL_ITEMS_MEMBERS, userId);
 
   await redis.del(`${Constants.redis.nypsi.AUTO_SELL_PROCESS}:${userId}`);
