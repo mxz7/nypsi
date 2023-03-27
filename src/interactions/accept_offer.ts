@@ -10,6 +10,7 @@ import { addInventoryItem, getInventory, setInventoryItem } from "../utils/funct
 import { checkOffer } from "../utils/functions/economy/offers";
 import { getItems, isEcoBanned } from "../utils/functions/economy/utils";
 import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications";
+import { transaction } from "../utils/logger";
 
 export default {
   name: "accept-offer",
@@ -96,5 +97,12 @@ export default {
     }
 
     await redis.del(`${Constants.redis.nypsi.OFFER_PROCESS}:${interaction.user.id}`);
+
+    transaction(
+      interaction.user,
+      await interaction.client.users.fetch(offer.ownerId),
+      `${offer.itemAmount}x ${offer.itemId}`
+    );
+    transaction(await interaction.client.users.fetch(offer.ownerId), interaction.user, `$${offer.money.toLocaleString()}`);
   },
 } as InteractionHandler;
