@@ -106,6 +106,7 @@ model Economy {
   banned DateTime?
 
   auctionWatch String[]
+  autosell     String[]
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String @id
