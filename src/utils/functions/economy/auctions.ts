@@ -226,7 +226,7 @@ export async function bumpAuction(id: number, client: NypsiClient) {
 
   if (query.itemAmount > 1 && query.bin > 69_420) {
     embed.setFooter({
-      text: `$${Math.floor(Number(query.bin) / query.itemAmount).toLocaleString()} per ${items[query.itemId].name}`,
+      text: `$${Math.floor(Number(query.bin / query.itemAmount)).toLocaleString()} per ${items[query.itemId].name}`,
     });
   }
 
@@ -320,7 +320,7 @@ export async function getAuctionAverage(item: string) {
     if (costs.length >= 5000) break;
 
     if (auction.itemAmount > 1) {
-      costs.push(Math.floor(Number(auction.bin) / auction.itemAmount));
+      costs.push(Math.floor(Number(auction.bin / auction.itemAmount)));
     } else {
       costs.push(Number(auction.bin));
     }
@@ -440,7 +440,7 @@ export async function findAuctions(itemId: string) {
     take: 50,
   });
 
-  inPlaceSort(query).asc([(i) => Number(i.bin) / i.itemAmount, (i) => i.createdAt.getTime()]);
+  inPlaceSort(query).asc([(i) => Number(i.bin / i.itemAmount), (i) => i.createdAt.getTime()]);
 
   return query;
 }
@@ -532,7 +532,7 @@ export async function buyFullAuction(interaction: ButtonInteraction, auction: Au
     return;
   }
 
-  if (auction.sold || auction.itemAmount === 0) {
+  if (auction.sold || Number(auction.itemAmount) === 0) {
     beingBought.delete(auction.id);
     return await interaction.reply({ embeds: [new ErrorEmbed("too slow ):").removeTitle()], ephemeral: true });
   }
@@ -575,7 +575,7 @@ export async function buyFullAuction(interaction: ButtonInteraction, auction: Au
   }
 
   await Promise.all([
-    addInventoryItem(interaction.user.id, auction.itemId, auction.itemAmount),
+    addInventoryItem(interaction.user.id, auction.itemId, Number(auction.itemAmount)),
     updateBalance(interaction.user.id, balance - Number(auction.bin)),
     updateBalance(auction.ownerId, (await getBalance(auction.ownerId)) + (Number(auction.bin) - taxedAmount)),
   ]);
@@ -597,7 +597,7 @@ export async function buyFullAuction(interaction: ButtonInteraction, auction: Au
     if (dmQueue.has(`${auction.ownerId}-${auction.itemId}`)) {
       const buyers = dmQueue.get(`${auction.ownerId}-${auction.itemId}`).buyers;
       const total = Array.from(buyers.values()).reduce((a, b) => a + b);
-      const moneyReceived = Math.floor((Number(auction.bin) / auction.itemAmount) * total);
+      const moneyReceived = Math.floor(Number(auction.bin / auction.itemAmount) * total);
       let taxedAmount = 0;
 
       if (!(await isPremium(auction.ownerId))) taxedAmount = Math.floor(moneyReceived * tax);
@@ -670,11 +670,11 @@ export async function buyAuctionOne(interaction: ButtonInteraction, auction: Auc
 
   if (interaction.createdTimestamp < Date.now() - 5000) return;
 
-  if (auction.itemAmount === 1) return buyFullAuction(interaction, auction);
+  if (Number(auction.itemAmount) === 1) return buyFullAuction(interaction, auction);
 
   if (!(await userExists(interaction.user.id))) await createUser(interaction.user.id);
 
-  if ((await getBalance(interaction.user.id)) < Math.floor(Number(auction.bin) / auction.itemAmount)) {
+  if ((await getBalance(interaction.user.id)) < Math.floor(Number(auction.bin / auction.itemAmount))) {
     return await interaction.reply({ embeds: [new ErrorEmbed("you cannot afford this")], ephemeral: true });
   }
 
@@ -697,32 +697,32 @@ export async function buyAuctionOne(interaction: ButtonInteraction, auction: Auc
     return;
   }
 
-  if (auction.sold || auction.itemAmount === 0) {
+  if (auction.sold || Number(auction.itemAmount) === 0) {
     beingBought.delete(auction.id);
     return await interaction.reply({ embeds: [new ErrorEmbed("too slow ):").removeTitle()], ephemeral: true });
   }
 
   const balance = await getBalance(interaction.user.id);
 
-  if (balance < Math.floor(Number(auction.bin) / auction.itemAmount)) {
+  if (balance < Math.floor(Number(auction.bin / auction.itemAmount))) {
     beingBought.delete(auction.id);
     return await interaction.reply({ embeds: [new ErrorEmbed("you cannot afford this")], ephemeral: true });
   }
 
-  if (Number(auction.bin) < 10_000 && auction.itemAmount === 1) {
+  if (Number(auction.bin) < 10_000 && Number(auction.itemAmount) === 1) {
     await prisma.auction.delete({
       where: {
         id: auction.id,
       },
     });
   } else {
-    if (Math.floor(Number(auction.bin) / auction.itemAmount) > 10_000) {
+    if (Math.floor(Number(auction.bin / auction.itemAmount)) > 10_000) {
       await prisma.auction.create({
         data: {
           sold: true,
           itemId: auction.itemId,
           itemAmount: 1,
-          bin: Math.floor(Number(auction.bin) / auction.itemAmount),
+          bin: Math.floor(Number(auction.bin / auction.itemAmount)),
           messageId: randomUUID(),
           ownerId: auction.ownerId,
         },
@@ -736,7 +736,7 @@ export async function buyAuctionOne(interaction: ButtonInteraction, auction: Auc
         },
         data: {
           itemAmount: { decrement: 1 },
-          bin: { decrement: Math.floor(Number(auction.bin) / auction.itemAmount) },
+          bin: { decrement: Math.floor(Number(auction.bin / auction.itemAmount)) },
         },
       })
       .catch(() => {});
@@ -747,16 +747,16 @@ export async function buyAuctionOne(interaction: ButtonInteraction, auction: Auc
   let taxedAmount = 0;
 
   if (!(await isPremium(auction.ownerId))) {
-    taxedAmount = Math.floor(Math.floor(Number(auction.bin) / auction.itemAmount) * tax);
+    taxedAmount = Math.floor(Math.floor(Number(auction.bin / auction.itemAmount)) * tax);
     addToNypsiBank(taxedAmount);
   }
 
   await Promise.all([
     addInventoryItem(interaction.user.id, auction.itemId, 1),
-    updateBalance(interaction.user.id, balance - Math.floor(Number(auction.bin) / auction.itemAmount)),
+    updateBalance(interaction.user.id, balance - Math.floor(Number(auction.bin / auction.itemAmount))),
     updateBalance(
       auction.ownerId,
-      (await getBalance(auction.ownerId)) + (Math.floor(Number(auction.bin) / auction.itemAmount) - taxedAmount)
+      (await getBalance(auction.ownerId)) + (Math.floor(Number(auction.bin / auction.itemAmount)) - taxedAmount)
     ),
   ]);
 
@@ -764,7 +764,7 @@ export async function buyAuctionOne(interaction: ButtonInteraction, auction: Auc
   transaction(
     interaction.user,
     await interaction.client.users.fetch(auction.ownerId),
-    `$${(Math.floor(Number(auction.bin) / auction.itemAmount) - taxedAmount).toLocaleString()} (auction)`
+    `$${(Math.floor(Number(auction.bin / auction.itemAmount)) - taxedAmount).toLocaleString()} (auction)`
   );
 
   const items = getItems();
@@ -790,7 +790,7 @@ export async function buyAuctionOne(interaction: ButtonInteraction, auction: Auc
         if (!dmQueue.has(`${auction.ownerId}-${auction.itemId}`)) return;
         const buyers = dmQueue.get(`${auction.ownerId}-${auction.itemId}`).buyers;
         const total = Array.from(buyers.values()).reduce((a, b) => a + b);
-        const moneyReceived = Math.floor((Number(auction.bin) / auction.itemAmount) * total);
+        const moneyReceived = Math.floor(Number(auction.bin / auction.itemAmount) * total);
         let taxedAmount = 0;
 
         if (!(await isPremium(auction.ownerId))) taxedAmount = Math.floor(moneyReceived * tax);
@@ -821,9 +821,9 @@ export async function buyAuctionOne(interaction: ButtonInteraction, auction: Auc
 
   const desc = embed.data.description.split("\n\n");
 
-  desc[1] = `**${(auction.itemAmount - 1).toLocaleString()}x** ${items[auction.itemId].emoji} ${
+  desc[1] = `**${(Number(auction.itemAmount) - 1).toLocaleString()}x** ${items[auction.itemId].emoji} ${
     items[auction.itemId].name
-  } for $**${Math.floor(Number(auction.bin) - Math.floor(Number(auction.bin) / auction.itemAmount)).toLocaleString()}**`;
+  } for $**${Math.floor(Number(auction.bin) - Math.floor(Number(auction.bin / auction.itemAmount))).toLocaleString()}**`;
 
   embed.setDescription(desc.join("\n\n"));
 
@@ -834,7 +834,7 @@ export async function buyAuctionOne(interaction: ButtonInteraction, auction: Auc
   if (auction.itemAmount > 2) {
     buttonRow.addComponents(new ButtonBuilder().setCustomId("b-one").setLabel("buy one").setStyle(ButtonStyle.Secondary));
     embed.setFooter({
-      text: `$${Math.floor(Number(auction.bin) / auction.itemAmount).toLocaleString()} per ${items[auction.itemId].name}`,
+      text: `$${Math.floor(Number(auction.bin / auction.itemAmount)).toLocaleString()} per ${items[auction.itemId].name}`,
     });
   }
 

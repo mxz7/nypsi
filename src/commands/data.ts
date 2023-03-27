@@ -147,6 +147,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
               Auction: true,
               BakeryUpgrade: true,
               EconomyGuildMember: true,
+              OffersGiven: true,
+              OffersReceived: true,
               EconomyWorker: {
                 include: {
                   upgrades: true,
