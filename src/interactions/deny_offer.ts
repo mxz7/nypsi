@@ -1,3 +1,4 @@
+import { EmbedBuilder } from "discord.js";
 import prisma from "../init/database";
 import redis from "../init/redis";
 import { CustomEmbed } from "../models/EmbedBuilders";
@@ -51,8 +52,9 @@ export default {
       embeds: [new CustomEmbed(null, "offer denied").setColor(Constants.EMBED_SUCCESS_COLOR)],
     });
 
-    const embed = interaction.message.embeds[0] as any;
-    embed.description = embed.description.split("\n")[0] += "\n\n**offer denied**";
+    const embed = new EmbedBuilder(interaction.message.embeds[0]);
+
+    embed.setDescription((embed.data.description.split("\n")[0] += "\n\n**offer denied**"));
 
     await redis.del(`${Constants.redis.nypsi.OFFER_PROCESS}:${interaction.user.id}`);
 
