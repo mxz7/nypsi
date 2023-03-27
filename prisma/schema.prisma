@@ -297,7 +297,6 @@ model Auction {
 }
 
 model Offer {
-  id         Int    @id @default(autoincrement())
   ownerId    String
   itemId     String
   itemAmount BigInt @default(1)

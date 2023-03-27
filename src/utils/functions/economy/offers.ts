@@ -73,7 +73,7 @@ export async function setBlockedList(userId: string, list: string[]) {
 }
 
 export async function deleteOffer(offer: Offer, client: NypsiClient) {
-  await prisma.offer.delete({ where: { id: offer.id } });
+  await prisma.offer.delete({ where: { messageId: offer.messageId } });
 
   await updateBalance(offer.ownerId, (await getBalance(offer.ownerId)) + Number(offer.money));
 
