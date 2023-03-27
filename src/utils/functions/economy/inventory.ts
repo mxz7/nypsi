@@ -9,6 +9,7 @@ import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { getTier, isPremium } from "../premium/premium";
 import { percentChance } from "../random";
+import sleep from "../sleep";
 import { getTax } from "../tax";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { addProgress, getAllAchievements, setAchievementProgress } from "./achievements";
@@ -84,6 +85,50 @@ export async function getInventory(
   return query;
 }
 
+async function doAutosellThing(userId: string, itemId: string, amount: number): Promise<void> {
+  if (await redis.exists(`${Constants.redis.nypsi.AUTO_SELL_PROCESS}:${userId}`)) {
+    await sleep(100);
+    return doAutosellThing(userId, itemId, amount);
+  }
+
+  await redis.set(`${Constants.redis.nypsi.AUTO_SELL_PROCESS}:${userId}`, "t");
+  await redis.expire(`${Constants.redis.nypsi.AUTO_SELL_PROCESS}:${userId}`, 69);
+
+  const item = getItems()[itemId];
+
+  let sellWorth = Math.floor(item.sell * amount);
+
+  const multi = await getMulti(userId);
+
+  if (item.role == "fish" || item.role == "prey" || item.role == "sellable") {
+    sellWorth = Math.floor(sellWorth + sellWorth * multi);
+  } else if (!item.sell) {
+    sellWorth = 1000 * amount;
+  }
+
+  if (["bitcoin", "ethereum"].includes(item.id)) sellWorth = Math.floor(sellWorth - sellWorth * 0.05);
+
+  let tax = true;
+
+  if ((await isPremium(userId)) && (await getTier(userId)) == 4) tax = false;
+
+  if (tax) {
+    const taxedAmount = Math.floor(sellWorth * (await getTax()));
+
+    sellWorth = sellWorth - taxedAmount;
+  }
+
+  await updateBalance(userId, (await getBalance(userId)) + sellWorth);
+
+  await redis.hincrby(`${Constants.redis.nypsi.AUTO_SELL_ITEMS}:${userId}`, `${itemId}-money`, sellWorth);
+  await redis.hincrby(`${Constants.redis.nypsi.AUTO_SELL_ITEMS}:${userId}`, `${itemId}-amount`, amount);
+  if (!(await redis.lrange(Constants.redis.nypsi.AUTO_SELL_ITEMS_MEMBERS, 0, -1)).includes(userId))
+    await redis.lpush(Constants.redis.nypsi.AUTO_SELL_ITEMS_MEMBERS, userId);
+
+  await redis.del(`${Constants.redis.nypsi.AUTO_SELL_PROCESS}:${userId}`);
+  return;
+}
+
 export async function addInventoryItem(
   member: GuildMember | string,
   itemId: string,
@@ -105,37 +150,7 @@ export async function addInventoryItem(
   }
 
   if ((await getAutosellItems(id)).includes(itemId)) {
-    const item = getItems()[itemId];
-
-    let sellWorth = Math.floor(item.sell * amount);
-
-    const multi = await getMulti(id);
-
-    if (item.role == "fish" || item.role == "prey" || item.role == "sellable") {
-      sellWorth = Math.floor(sellWorth + sellWorth * multi);
-    } else if (!item.sell) {
-      sellWorth = 1000 * amount;
-    }
-
-    if (["bitcoin", "ethereum"].includes(item.id)) sellWorth = Math.floor(sellWorth - sellWorth * 0.05);
-
-    let tax = true;
-
-    if ((await isPremium(id)) && (await getTier(id)) == 4) tax = false;
-
-    if (tax) {
-      const taxedAmount = Math.floor(sellWorth * (await getTax()));
-
-      sellWorth = sellWorth - taxedAmount;
-    }
-
-    await updateBalance(id, (await getBalance(id)) + sellWorth);
-
-    await redis.hincrby(`${Constants.redis.nypsi.AUTO_SELL_ITEMS}:${id}`, `${itemId}-money`, sellWorth);
-    await redis.hincrby(`${Constants.redis.nypsi.AUTO_SELL_ITEMS}:${id}`, `${itemId}-amount`, amount);
-    if ((await redis.lpos(Constants.redis.nypsi.AUTO_SELL_ITEMS_MEMBERS, id)) < 1)
-      await redis.sadd(Constants.redis.nypsi.AUTO_SELL_ITEMS_MEMBERS, id);
-    return;
+    return doAutosellThing(id, itemId, amount);
   }
 
   await prisma.inventory.upsert({

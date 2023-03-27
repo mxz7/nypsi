@@ -522,7 +522,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           await addInventoryItem(
             auctions[currentPage].ownerId,
             auctions[currentPage].itemId,
-            auctions[currentPage].itemAmount
+            Number(auctions[currentPage].itemAmount)
           );
 
           await interaction.followUp({
@@ -603,7 +603,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       if (!(await userExists(auction.ownerId))) return;
 
-      await addInventoryItem(auction.ownerId, auction.itemId, auction.itemAmount);
+      await addInventoryItem(auction.ownerId, auction.itemId, Number(auction.itemAmount));
 
       if ((await getDmSettings(auction.ownerId)).auction) {
         const embed = new CustomEmbed().setColor(Constants.TRANSPARENT_EMBED_COLOR);
@@ -831,7 +831,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         (a) =>
           `**${a.itemAmount}x** ${items[a.itemId].emoji} ${items[a.itemId].name}\n` +
           ` - $**${a.bin.toLocaleString()}**${
-            a.itemAmount > 1 ? ` ($${Math.floor(Number(a.bin) / a.itemAmount).toLocaleString()} each)` : ""
+            a.itemAmount > 1 ? ` ($${Math.floor(Number(a.bin / a.itemAmount)).toLocaleString()} each)` : ""
           }\n` +
           ` - [jump](https://discord.com/channels/747056029795221513/1008467335973179482/${a.messageId})\n `
       ),
