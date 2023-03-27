@@ -83,7 +83,7 @@ export async function deleteOffer(offer: Offer, client: NypsiClient) {
   if (!msg) return true;
   const embed = msg.embeds[0] as any;
 
-  embed.data.description = embed.data.description.split("\n")[0] + "**offer no longer valid**";
+  embed.data.description = embed.data.description.split("\n")[0] + "\n\n**offer no longer valid**";
 
   await msg.edit({ components: [], embeds: [embed] });
   return true;
