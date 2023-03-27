@@ -597,7 +597,7 @@ export async function gemBreak(userId: string, chance: number, gem: string) {
 }
 
 export async function setAutosellItems(member: GuildMember, items: string[]) {
-  return await prisma.economy
+  const query = await prisma.economy
     .update({
       where: {
         userId: member.user.id,
@@ -610,10 +610,18 @@ export async function setAutosellItems(member: GuildMember, items: string[]) {
       },
     })
     .then((q) => q.autosell);
+
+  await redis.del(`${Constants.redis.cache.economy.AUTO_SELL}:${member.user.id}`);
+
+  return query;
 }
 
 export async function getAutosellItems(member: GuildMember) {
-  return await prisma.economy
+  if (await redis.exists(`${Constants.redis.cache.economy.AUTO_SELL}:${member.user.id}`)) {
+    return JSON.parse(await redis.get(`${Constants.redis.cache.economy.AUTO_SELL}:${member.user.id}`)) as string[];
+  }
+
+  const query = await prisma.economy
     .findUnique({
       where: {
         userId: member.user.id,
@@ -623,4 +631,9 @@ export async function getAutosellItems(member: GuildMember) {
       },
     })
     .then((q) => q.autosell);
+
+  await redis.set(`${Constants.redis.cache.economy.AUTO_SELL}:${member.user.id}`, JSON.stringify(query));
+  await redis.expire(`${Constants.redis.cache.economy.AUTO_SELL}:${member.user.id}`, Math.floor(ms("1 hour") / 1000));
+
+  return query;
 }

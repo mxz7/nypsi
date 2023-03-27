@@ -56,6 +56,7 @@ export default {
         EXISTS: "cache:chatreaction:exists",
       },
       economy: {
+        AUTO_SELL: "cache:economy:autosell",
         AUCTION_AVG: "cache:economy:auctionavg",
         AUCTION_ITEM_GRAPH_DATA: "cache:economy:auction:historydata",
         BAKERY_UPGRADES: "cache:economy:bakery:upgrades",
