@@ -8,6 +8,7 @@ import { getPreferences, updatePreferences } from "../utils/functions/users/noti
 
 export default {
   name: "disable-offers",
+  type: "interaction",
   async run(interaction) {
     if (!interaction.isButton()) return;
     if (await isEcoBanned(interaction.user.id)) return;

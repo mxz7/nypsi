@@ -9,6 +9,7 @@ import { getLastKnownTag } from "../utils/functions/users/tag";
 
 export default {
   name: "block-user",
+  type: "interaction",
   async run(interaction) {
     if (!interaction.isButton()) return;
     if (await isEcoBanned(interaction.user.id)) return;

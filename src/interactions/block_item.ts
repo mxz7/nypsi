@@ -8,6 +8,7 @@ import { getItems, isEcoBanned } from "../utils/functions/economy/utils";
 
 export default {
   name: "block-item",
+  type: "interaction",
   async run(interaction) {
     if (!interaction.isButton()) return;
     if (await isEcoBanned(interaction.user.id)) return;
