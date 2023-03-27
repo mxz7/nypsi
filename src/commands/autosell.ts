@@ -100,7 +100,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   selected = items[selected];
 
   if (!selected) {
-    return send({ embeds: [new ErrorEmbed(`couldnt find \`${args[1]}\``)] });
+    return send({ embeds: [new ErrorEmbed(`couldnt find \`${args[0]}\``)] });
   }
 
   let desc = "";
