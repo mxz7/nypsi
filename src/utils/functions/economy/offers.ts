@@ -25,7 +25,7 @@ export async function createOffer(target: User, itemId: string, itemAmount: numb
 
   const embed = new CustomEmbed(
     owner,
-    `${owner.user.tag} offers $**${money.toLocaleString()}** for your *${itemAmount.toLocaleString()}x* ${
+    `${owner.user.tag} offers $**${money.toLocaleString()}** for your **${itemAmount.toLocaleString()}x** ${
       getItems()[itemId].emoji
     } ${getItems()[itemId].name}\n\ndo you accept?`
   ).setHeader(`${owner.user.username}'s offer`, owner.user.avatarURL());
