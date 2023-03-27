@@ -4,7 +4,7 @@ import redis from "../../init/redis";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 import Constants from "../../utils/Constants";
 import { getItems } from "../../utils/functions/economy/utils";
-import { addNotificationToQueue } from "../../utils/functions/users/notifications";
+import { addNotificationToQueue, getDmSettings } from "../../utils/functions/users/notifications";
 import ms = require("ms");
 
 async function autosellThing() {
@@ -12,6 +12,7 @@ async function autosellThing() {
   await redis.del(Constants.redis.nypsi.AUTO_SELL_ITEMS_MEMBERS);
 
   for (const user of users) {
+    if (!(await getDmSettings(user)).autosellStatus) continue;
     const items = await redis.hgetall(`${Constants.redis.nypsi.AUTO_SELL_ITEMS}:${user}`);
 
     const amounts = new Map<string, number>();
@@ -29,14 +30,30 @@ async function autosellThing() {
 
     const msg: string[] = [];
 
+    msg.push(
+      `+$**${Array.from(moneys.values())
+        .reduce((a, b) => a + b)
+        .toLocaleString()}**`
+    );
+
     inPlaceSort(itemIds).desc((i) => moneys.get(i));
 
+    let remaining = 0;
+
     for (const item of itemIds) {
+      if (msg.length > 10) {
+        remaining += amounts.get(item);
+        continue;
+      }
       msg.push(
         `\`${amounts.get(item).toLocaleString()}x\` ${getItems()[item].emoji} ${getItems()[item].name} ($${moneys
           .get(item)
           .toLocaleString()})`
       );
+    }
+
+    if (remaining > 0) {
+      msg.push(`${remaining.toLocaleString()} more items sold`);
     }
 
     await addNotificationToQueue({
