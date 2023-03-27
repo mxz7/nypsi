@@ -61,7 +61,7 @@ model Preferences {
 
   duelRequests   Boolean @default(true)
   auctionConfirm Int     @default(25000000)
-  offers         Boolean @default(true)
+  offers         Int     @default(5)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
