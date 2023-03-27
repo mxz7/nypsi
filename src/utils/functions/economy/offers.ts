@@ -1,3 +1,4 @@
+import { Offer } from "@prisma/client";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -7,7 +8,10 @@ import {
   User,
 } from "discord.js";
 import prisma from "../../../init/database";
+import { NypsiClient } from "../../../models/Client";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
+import { getBalance, updateBalance } from "./balance";
+import { getInventory } from "./inventory";
 import { getItems } from "./utils";
 
 export async function createOffer(target: User, itemId: string, itemAmount: number, money: number, owner: GuildMember) {
@@ -68,4 +72,28 @@ export async function setBlockedList(userId: string, list: string[]) {
   return await prisma.economy.update({ where: { userId: userId }, data: { offersBlock: list } }).then((r) => r.offersBlock);
 }
 
-export async function checkOffer(offer: Offer);
+export async function deleteOffer(offer: Offer, client: NypsiClient) {
+  await prisma.offer.delete({ where: { id: offer.id } });
+
+  await updateBalance(offer.ownerId, (await getBalance(offer.ownerId)) + Number(offer.money));
+
+  const user = await client.users.fetch(offer.targetId);
+  if (!user) return;
+  const msg = await user.dmChannel.messages.fetch(offer.messageId);
+  if (!msg) return;
+  const embed = msg.embeds[0] as any;
+
+  embed.data.description = embed.data.description.split("\n")[0] + "**offer no longer valid**";
+
+  await msg.edit({ components: [], embeds: [embed] });
+}
+
+export async function checkOffer(offer: Offer, client: NypsiClient) {
+  const inventory = await getInventory(offer.targetId);
+
+  if (
+    !inventory.find((i) => i.item === offer.itemId) ||
+    inventory.find((i) => i.item === offer.itemId).amount < offer.itemAmount
+  )
+    return deleteOffer(offer, client);
+}
