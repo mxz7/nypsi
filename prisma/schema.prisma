@@ -61,6 +61,7 @@ model Preferences {
 
   duelRequests   Boolean @default(true)
   auctionConfirm Int     @default(25000000)
+  offers         Boolean @default(true)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
@@ -108,6 +109,7 @@ model Economy {
 
   auctionWatch String[]
   autosell     String[]
+  offersBlock  String[]
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String @id
@@ -123,6 +125,8 @@ model Economy {
   Auction            Auction[]
   EconomyGuild       EconomyGuild?
   EconomyGuildMember EconomyGuildMember?
+  OffersReceived     Offers[]            @relation(name: "target")
+  OffersGiven        Offers[]            @relation(name: "owner")
 }
 
 model BakeryUpgrade {
@@ -283,13 +287,26 @@ model Auction {
   id         Int      @id @default(autoincrement())
   ownerId    String
   itemId     String
-  itemAmount Int      @default(1)
+  itemAmount BigInt   @default(1)
   bin        BigInt
   messageId  String   @unique
   createdAt  DateTime @default(now())
   sold       Boolean  @default(false)
 
   owner Economy @relation(fields: [ownerId], references: [userId], onDelete: Cascade)
+}
+
+model Offers {
+  id         Int    @id @default(autoincrement())
+  ownerId    String
+  itemId     String
+  itemAmount BigInt @default(1)
+  money      BigInt
+  messageId  String @unique
+  targetId   String
+
+  target Economy @relation(fields: [targetId], references: [userId], onDelete: Cascade, name: "target")
+  owner  Economy @relation(fields: [ownerId], references: [userId], onDelete: Cascade, name: "owner")
 }
 
 // guild specific tables
