@@ -30,6 +30,10 @@ export async function createOffer(target: User, itemId: string, itemAmount: numb
     } ${getItems()[itemId].name}\n\ndo you accept?`
   ).setHeader(`${owner.user.username}'s offer`, owner.user.avatarURL());
 
+  if (itemAmount > 1 && money > 1000) {
+    embed.setFooter({ text: `$${Math.floor(money / itemAmount).toLocaleString()} per ${getItems()[itemId].name}` });
+  }
+
   const msg = await target
     .send({
       content: `you've received an offer for ${itemAmount.toLocaleString()}x ${getItems()[itemId].name}`,
