@@ -44,6 +44,8 @@ export default {
 
     await setBlockedList(interaction.user.id, current);
 
+    await redis.del(`${Constants.redis.nypsi.OFFER_PROCESS}:${interaction.user.id}`);
+
     return interaction.editReply({
       embeds: [
         new CustomEmbed(
