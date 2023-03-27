@@ -3,6 +3,7 @@ import { getReactionRolesByGuild } from "../utils/functions/guilds/reactionroles
 
 export default {
   name: "reaction-role",
+  type: "autocomplete",
   async run(interaction) {
     const focused = interaction.options.getFocused(true);
     focused.value = focused.value.toLowerCase();

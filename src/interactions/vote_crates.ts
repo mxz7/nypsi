@@ -13,6 +13,7 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 
 export default {
   name: "vote-crates",
+  type: "interaction",
   async run(interaction) {
     if (!interaction.isButton()) return;
     if (await isEcoBanned(interaction.user.id)) return;

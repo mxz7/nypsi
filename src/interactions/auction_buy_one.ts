@@ -7,6 +7,7 @@ import { isEcoBanned, userExists } from "../utils/functions/economy/utils";
 
 export default {
   name: "b-one",
+  type: "interaction",
   async run(interaction) {
     if (!interaction.isButton()) return;
     if (await isEcoBanned(interaction.user.id)) return;
