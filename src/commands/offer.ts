@@ -272,12 +272,25 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const searchTag = args[1].toLowerCase();
 
+    const selectedItem = selectItem(searchTag);
+    const selectedMember = message.mentions?.members?.first() || (await getMember(message.guild, searchTag));
+
+    if (!selectedItem && !selectedMember) return send({ embeds: [new ErrorEmbed("invalid member or item")] });
+
+    let value = "";
+
+    if (selectedItem) {
+      value = selectedItem.id;
+    } else {
+      value = selectedMember.id;
+    }
+
     let desc = "";
 
-    if (current.includes(searchTag)) {
-      desc = `✅ removed \`${searchTag}\``;
+    if (current.includes(value)) {
+      desc = `✅ removed \`${value}\``;
 
-      current.splice(current.indexOf(searchTag), 1);
+      current.splice(current.indexOf(value), 1);
 
       current = await setBlockedList(message.author.id, current);
     } else {
@@ -285,9 +298,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [new ErrorEmbed("you have reached the limit of your blocklist")] });
       }
 
-      desc = `✅ added \`${searchTag}\``;
+      desc = `✅ added \`${value}\``;
 
-      current.push(searchTag);
+      current.push(value);
       current = await setBlockedList(message.author.id, current);
     }
 
