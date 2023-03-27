@@ -5,6 +5,7 @@ import { InteractionHandler } from "../types/InteractionHandler";
 import Constants from "../utils/Constants";
 import { getBlockedList, setBlockedList } from "../utils/functions/economy/offers";
 import { isEcoBanned } from "../utils/functions/economy/utils";
+import { getLastKnownTag } from "../utils/functions/users/tag";
 
 export default {
   name: "block-user",
@@ -47,7 +48,7 @@ export default {
     await redis.del(`${Constants.redis.nypsi.OFFER_PROCESS}:${interaction.user.id}`);
 
     return interaction.editReply({
-      embeds: [new CustomEmbed(null, `✅ added \`${offer.ownerId}\` to your block list`)],
+      embeds: [new CustomEmbed(null, `✅ added **${await getLastKnownTag(offer.ownerId)}** to your block list`)],
     });
   },
 } as InteractionHandler;
