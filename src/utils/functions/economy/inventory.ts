@@ -595,3 +595,32 @@ export async function gemBreak(userId: string, chance: number, gem: string) {
     });
   }
 }
+
+export async function setAutosellItems(member: GuildMember, items: string[]) {
+  return await prisma.economy
+    .update({
+      where: {
+        userId: member.user.id,
+      },
+      data: {
+        autosell: items,
+      },
+      select: {
+        autosell: true,
+      },
+    })
+    .then((q) => q.autosell);
+}
+
+export async function getAutosellItems(member: GuildMember) {
+  return await prisma.economy
+    .findUnique({
+      where: {
+        userId: member.user.id,
+      },
+      select: {
+        autosell: true,
+      },
+    })
+    .then((q) => q.autosell);
+}
