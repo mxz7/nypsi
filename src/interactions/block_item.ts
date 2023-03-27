@@ -15,7 +15,7 @@ export default {
     if (await redis.exists(`${Constants.redis.nypsi.OFFER_PROCESS}:${interaction.user.id}`)) {
       return interaction.reply({
         embeds: [
-          new CustomEmbed(null, "please wait until your other offer has processed").setColor(
+          new CustomEmbed(null, "please wait until your offer has been processed").setColor(
             Constants.TRANSPARENT_EMBED_COLOR
           ),
         ],
