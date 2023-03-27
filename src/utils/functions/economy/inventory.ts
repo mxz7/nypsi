@@ -131,8 +131,10 @@ export async function addInventoryItem(
 
     await updateBalance(id, (await getBalance(id)) + sellWorth);
 
-    await redis.hincrby(`${Constants.redis.nypsi.AUTO_SELL_ITEMS}`, itemId, sellWorth);
-
+    await redis.hincrby(`${Constants.redis.nypsi.AUTO_SELL_ITEMS}:${id}`, `${itemId}-money`, sellWorth);
+    await redis.hincrby(`${Constants.redis.nypsi.AUTO_SELL_ITEMS}:${id}`, `${itemId}-amount`, amount);
+    if ((await redis.lpos(Constants.redis.nypsi.AUTO_SELL_ITEMS_MEMBERS, id)) < 1)
+      await redis.sadd(Constants.redis.nypsi.AUTO_SELL_ITEMS_MEMBERS, id);
     return;
   }
 
