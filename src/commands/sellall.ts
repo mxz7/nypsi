@@ -117,10 +117,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     total += sellWorth;
 
     desc.push(
-      `\`${selected.get(item).toLocaleString()}x\` ${items[item].emoji} ${items[item].name} +$${sellWorth.toLocaleString()}`
+      `\`${selected.get(item).toLocaleString()}x\` ${items[item].emoji} ${items[item].name} ($${sellWorth.toLocaleString()})`
     );
     amounts.set(
-      `\`${selected.get(item).toLocaleString()}x\` ${items[item].emoji} ${items[item].name} +$${sellWorth.toLocaleString()}`,
+      `\`${selected.get(item).toLocaleString()}x\` ${items[item].emoji} ${
+        items[item].name
+      } ($${sellWorth.toLocaleString()})`,
       sellWorth
     );
   }
