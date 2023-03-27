@@ -1038,8 +1038,7 @@ export async function uploadSlashCommandsToGuild(guildID: string, clientID: stri
 
     logger.info("finished refresh of [/] commands");
   } catch (error) {
-    logger.error("failed refresh of [/] commands");
-    logger.error(error);
+    logger.error("failed refresh of [/] commands", error);
   }
 }
 

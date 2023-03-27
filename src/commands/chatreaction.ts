@@ -58,7 +58,7 @@ cmd.slashData
       .setDescription("duel a member to a chat reaction")
       .addUserOption((option) => option.setName("member").setDescription("member to duel").setRequired(false))
       .addStringOption((option) =>
-        option.setName("wager").setDescription("how much do you want to wager / bet").setRequired(true)
+        option.setName("wager").setDescription("how much do you want to wager / bet").setRequired(false)
       )
   )
   .addSubcommand((option) => option.setName("stats").setDescription("view your chat reaction stats"))
