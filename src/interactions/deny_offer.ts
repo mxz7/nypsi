@@ -38,7 +38,7 @@ export default {
       return await redis.del(`${Constants.redis.nypsi.OFFER_PROCESS}:${interaction.user.id}`);
     }
 
-    await interaction.deferReply();
+    await interaction.deferReply({ ephemeral: true });
 
     await prisma.offer.delete({
       where: {
