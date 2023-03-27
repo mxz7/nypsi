@@ -49,3 +49,11 @@ export async function createOffer(target: User, itemId: string, itemAmount: numb
 
   return true;
 }
+
+export async function getOwnedOffers(userId: string) {
+  return await prisma.offers.findMany({ where: { ownerId: userId } });
+}
+
+export async function getTargetedOffers(userId: string) {
+  return await prisma.offers.findMany({ where: { targetId: userId } });
+}
