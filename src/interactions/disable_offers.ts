@@ -44,6 +44,8 @@ export default {
 
     await updatePreferences(interaction.user.id, preferences);
 
+    await redis.del(`${Constants.redis.nypsi.OFFER_PROCESS}:${interaction.user.id}`);
+
     return interaction.editReply({
       embeds: [new CustomEmbed(null, "✅ you will not receive anymore offers")],
     });
