@@ -1060,8 +1060,7 @@ export async function uploadSlashCommands(clientID: string) {
 
     logger.info("finished refresh of global [/] commands");
   } catch (error) {
-    logger.error("failed refresh of global [/] commands");
-    logger.error(error);
+    logger.error("failed refresh of global [/] commands", error);
   }
 }
 

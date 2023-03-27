@@ -42,9 +42,8 @@ cmd.slashData
       .setName("block")
       .setDescription("manage your blocked users/items")
       .addStringOption((option) =>
-        option.setName("item-global").setDescription("item to block/unblock").setAutocomplete(true)
+        option.setName("item-global").setDescription("item or user to block/unblock").setAutocomplete(true).setRequired(true)
       )
-      .addUserOption((option) => option.setName("user").setDescription("user to block/unblock"))
   )
   .addSubcommand((create) =>
     create
