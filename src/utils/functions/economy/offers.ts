@@ -57,3 +57,13 @@ export async function getOwnedOffers(userId: string) {
 export async function getTargetedOffers(userId: string) {
   return await prisma.offers.findMany({ where: { targetId: userId } });
 }
+
+export async function getBlockedList(userId: string) {
+  return await prisma.economy
+    .findUnique({ where: { userId: userId }, select: { offersBlock: true } })
+    .then((r) => r.offersBlock);
+}
+
+export async function setBlockedList(userId: string, list: string[]) {
+  return await prisma.economy.update({ where: { userId: userId }, data: { offersBlock: list } }).then((r) => r.offersBlock);
+}
