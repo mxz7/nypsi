@@ -56,6 +56,7 @@ export default {
         EXISTS: "cache:chatreaction:exists",
       },
       economy: {
+        AUTO_SELL: "cache:economy:autosell",
         AUCTION_AVG: "cache:economy:auctionavg",
         AUCTION_ITEM_GRAPH_DATA: "cache:economy:auction:historydata",
         BAKERY_UPGRADES: "cache:economy:bakery:upgrades",
@@ -100,6 +101,8 @@ export default {
       KARMA_NEXT_OPEN: "nypsi:ks:nextopen",
       KARMA_SHOP_ITEMS: "nypsi:ks:items",
       KARMA_SHOP_BUYING: "nypsi:ks:buying",
+      AUTO_SELL_ITEMS: "nypsi:autosell:items",
+      AUTO_SELL_ITEMS_MEMBERS: "nypsi:autosell:items:members",
     },
   },
   ADMIN_IDS: ["672793821850894347", "449774710469689355"],
