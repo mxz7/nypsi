@@ -7,10 +7,12 @@ import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { Item } from "../../../types/Economy";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
+import { getTier, isPremium } from "../premium/premium";
 import { percentChance } from "../random";
+import { getTax } from "../tax";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { addProgress, getAllAchievements, setAchievementProgress } from "./achievements";
-import { getBalance, updateBalance } from "./balance";
+import { getBalance, getMulti, updateBalance } from "./balance";
 import { createUser, getItems, userExists } from "./utils";
 import { getXp, updateXp } from "./xp";
 import ms = require("ms");
@@ -100,6 +102,38 @@ export async function addInventoryItem(
   if (!getItems()[itemId]) {
     console.trace();
     return logger.error(`invalid item: ${itemId}`);
+  }
+
+  if ((await getAutosellItems(id)).includes(itemId)) {
+    const item = getItems()[itemId];
+
+    let sellWorth = Math.floor(item.sell * amount);
+
+    const multi = await getMulti(id);
+
+    if (item.role == "fish" || item.role == "prey" || item.role == "sellable") {
+      sellWorth = Math.floor(sellWorth + sellWorth * multi);
+    } else if (!item.sell) {
+      sellWorth = 1000 * amount;
+    }
+
+    if (["bitcoin", "ethereum"].includes(item.id)) sellWorth = Math.floor(sellWorth - sellWorth * 0.05);
+
+    let tax = true;
+
+    if ((await isPremium(id)) && (await getTier(id)) == 4) tax = false;
+
+    if (tax) {
+      const taxedAmount = Math.floor(sellWorth * (await getTax()));
+
+      sellWorth = sellWorth - taxedAmount;
+    }
+
+    await updateBalance(id, (await getBalance(id)) + sellWorth);
+
+    await redis.hincrby(`${Constants.redis.nypsi.AUTO_SELL_ITEMS}`, itemId, sellWorth);
+
+    return;
   }
 
   await prisma.inventory.upsert({
@@ -616,15 +650,22 @@ export async function setAutosellItems(member: GuildMember, items: string[]) {
   return query;
 }
 
-export async function getAutosellItems(member: GuildMember) {
-  if (await redis.exists(`${Constants.redis.cache.economy.AUTO_SELL}:${member.user.id}`)) {
-    return JSON.parse(await redis.get(`${Constants.redis.cache.economy.AUTO_SELL}:${member.user.id}`)) as string[];
+export async function getAutosellItems(member: GuildMember | string) {
+  let id: string;
+  if (member instanceof GuildMember) {
+    id = member.user.id;
+  } else {
+    id = member;
+  }
+
+  if (await redis.exists(`${Constants.redis.cache.economy.AUTO_SELL}:${id}`)) {
+    return JSON.parse(await redis.get(`${Constants.redis.cache.economy.AUTO_SELL}:${id}`)) as string[];
   }
 
   const query = await prisma.economy
     .findUnique({
       where: {
-        userId: member.user.id,
+        userId: id,
       },
       select: {
         autosell: true,
@@ -632,8 +673,8 @@ export async function getAutosellItems(member: GuildMember) {
     })
     .then((q) => q.autosell);
 
-  await redis.set(`${Constants.redis.cache.economy.AUTO_SELL}:${member.user.id}`, JSON.stringify(query));
-  await redis.expire(`${Constants.redis.cache.economy.AUTO_SELL}:${member.user.id}`, Math.floor(ms("1 hour") / 1000));
+  await redis.set(`${Constants.redis.cache.economy.AUTO_SELL}:${id}`, JSON.stringify(query));
+  await redis.expire(`${Constants.redis.cache.economy.AUTO_SELL}:${id}`, Math.floor(ms("1 hour") / 1000));
 
   return query;
 }
