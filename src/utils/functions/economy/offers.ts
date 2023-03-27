@@ -36,5 +36,16 @@ export async function createOffer(target: User, itemId: string, itemAmount: numb
 
   if (!msg) return false;
 
-  await prisma.offers.create({});
+  await prisma.offers.create({
+    data: {
+      messageId: msg.id,
+      itemId,
+      money,
+      itemAmount,
+      ownerId: owner.id,
+      targetId: target.id,
+    },
+  });
+
+  return true;
 }
