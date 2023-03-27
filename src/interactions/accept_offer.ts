@@ -1,11 +1,13 @@
 import { EmbedBuilder } from "discord.js";
 import prisma from "../init/database";
 import redis from "../init/redis";
+import { NypsiClient } from "../models/Client";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { InteractionHandler } from "../types/InteractionHandler";
 import Constants from "../utils/Constants";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
 import { addInventoryItem, getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
+import { checkOffer } from "../utils/functions/economy/offers";
 import { getItems, isEcoBanned } from "../utils/functions/economy/utils";
 import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications";
 
@@ -74,8 +76,6 @@ export default {
 
     embed.setDescription((embed.data.description.split("\n")[0] += "\n\n**offer accepted**"));
 
-    await redis.del(`${Constants.redis.nypsi.OFFER_PROCESS}:${interaction.user.id}`);
-
     await interaction.message.edit({ embeds: [embed], components: [] });
 
     if ((await getDmSettings(offer.ownerId)).auction) {
@@ -88,5 +88,13 @@ export default {
         },
       });
     }
+
+    for (const testOffer of await prisma.offer.findMany({
+      where: { AND: [{ targetId: interaction.user.id }, { itemId: offer.itemId }] },
+    })) {
+      await checkOffer(testOffer, interaction.client as NypsiClient);
+    }
+
+    await redis.del(`${Constants.redis.nypsi.OFFER_PROCESS}:${interaction.user.id}`);
   },
 } as InteractionHandler;
