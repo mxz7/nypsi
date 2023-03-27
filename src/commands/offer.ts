@@ -375,6 +375,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (!selected) return send({ embeds: [new ErrorEmbed("invalid item")] });
 
+    if (selected.account_locked) return send({ embeds: [new ErrorEmbed("this item cant be traded")] });
+
     const blocked = await getBlockedList(target.user.id);
 
     if (blocked.includes(selected.id))
