@@ -35,7 +35,30 @@ import dayjs = require("dayjs");
 const cmd = new Command("offer", "create and manage offers", "money").setAliases(["offers", "of"]);
 
 cmd.slashEnabled = true;
-cmd.slashData;
+cmd.slashData
+  .addSubcommand((manage) => manage.setName("manage").setDescription("manage your current offers"))
+  .addSubcommand((block) =>
+    block
+      .setName("block")
+      .setDescription("manage your blocked users/items")
+      .addStringOption((option) =>
+        option.setName("item-global").setDescription("item to block/unblock").setAutocomplete(true)
+      )
+      .addUserOption((option) => option.setName("user").setDescription("user to block/unblock"))
+  )
+  .addSubcommand((create) =>
+    create
+      .setName("create")
+      .setDescription("create an offer")
+      .addUserOption((option) =>
+        option.setName("user").setDescription("user you want to offer something to").setRequired(true)
+      )
+      .addStringOption((option) =>
+        option.setName("item").setDescription("item you want to buy").setAutocomplete(true).setRequired(true)
+      )
+      .addIntegerOption((option) => option.setName("amount").setDescription("amount you want to buy").setRequired(true))
+      .addStringOption((option) => option.setName("money").setDescription("how much $ you want to offer").setRequired(true))
+  );
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
