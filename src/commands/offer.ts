@@ -160,7 +160,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       components: [row],
     };
 
-    if (row.components.length == 0) delete payload.components;
+    if (row.components.length == 0) payload.components = [];
 
     if (msg) {
       msg = await msg.edit(payload as MessageEditOptions);
