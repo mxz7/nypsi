@@ -59,6 +59,11 @@
       "name": "net worth updates",
       "description": "get a dm when your net worth changes by the amount set. currently: ${VALUE}"
     },
+    "autosell": {
+      "id": "autosell",
+      "name": "autosell status",
+      "description": "get a dm hourly for autosell status (/autosell)"
+    },
     "other": {
       "id": "other",
       "name": "miscellaneous",
@@ -75,6 +80,11 @@
       "id": "auctionConfirm",
       "name": "auction confirmation",
       "description": "require auction confirmation on items more expensive than: ${VALUE} (0 = never)"
+    },
+    "offers": {
+      "id": "offers",
+      "name": "receive offers",
+      "description": "how many offers do you want to be able to receive at once? current: {VALUE}"
     }
   }
 }

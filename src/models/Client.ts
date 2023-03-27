@@ -20,6 +20,7 @@ import ready from "../events/ready";
 import roleDelete from "../events/roleDelete";
 import userUpdate from "../events/userUpdate";
 import redis from "../init/redis";
+import { doAutosellSitrep } from "../scheduled/clusterjobs/autosell_status";
 import { runAuctionChecks } from "../scheduled/clusterjobs/checkauctions";
 import { updateCounters } from "../scheduled/clusterjobs/counters";
 import { runCraftItemsJob } from "../scheduled/clusterjobs/crafted";
@@ -193,5 +194,6 @@ export class NypsiClient extends Client {
     runWorkerInterval();
     runNetWorthInterval();
     runCraftItemsJob();
+    doAutosellSitrep();
   }
 }
