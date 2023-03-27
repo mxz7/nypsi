@@ -61,7 +61,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const items = getItems();
 
-  if (args.length == 1) {
+  if (args.length == 0) {
     if (current.length == 0) {
       return send({ embeds: [new CustomEmbed(message.member, "there is nothing being automatically sold")] });
     }
@@ -76,7 +76,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     });
   }
 
-  const searchTag = args[1].toLowerCase();
+  const searchTag = args[0].toLowerCase();
 
   let selected;
 
