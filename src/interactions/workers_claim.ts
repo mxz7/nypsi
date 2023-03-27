@@ -6,6 +6,7 @@ import { claimFromWorkers } from "../utils/functions/economy/workers";
 
 export default {
   name: "w-claim",
+  type: "interaction",
   async run(interaction) {
     if (!interaction.isButton()) return;
     if (await isEcoBanned(interaction.user.id)) return;

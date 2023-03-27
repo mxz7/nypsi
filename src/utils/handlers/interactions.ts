@@ -5,7 +5,7 @@ import { AutocompleteHandler, InteractionHandler } from "../../types/Interaction
 import { getReactionRolesByGuild } from "../functions/guilds/reactionroles";
 import { logger } from "../logger";
 
-const autocompleteHanders = new Map<string, AutocompleteHandler>();
+const autocompleteHandlers = new Map<string, AutocompleteHandler>();
 const interactionHandlers = new Map<string, InteractionHandler>();
 
 export async function loadInteractions() {
@@ -17,17 +17,17 @@ export async function loadInteractions() {
     );
 
     if (res.type === "autocomplete") {
-      autocompleteHanders.set(res.name, res);
+      autocompleteHandlers.set(res.name, res);
     } else {
       interactionHandlers.set(res.name, res);
     }
   }
 
-  logger.info(`${autocompleteHanders.size + interactionHandlers.size} interactions loaded`);
+  logger.info(`${autocompleteHandlers.size + interactionHandlers.size} interactions loaded`);
 }
 
 export async function reloadInteractions() {
-  autocompleteHanders.clear();
+  autocompleteHandlers.clear();
   interactionHandlers.clear();
   const files = await readdir("./dist/interactions").then((r) => r.filter((i) => i.endsWith(".js")));
 
@@ -39,7 +39,7 @@ export async function reloadInteractions() {
 
 export async function runInteraction(interaction: Interaction) {
   if (interaction.isAutocomplete()) {
-    return autocompleteHanders.get(interaction.options.getFocused(true).name)?.run(interaction);
+    return autocompleteHandlers.get(interaction.options.getFocused(true).name)?.run(interaction);
   } else if (interaction.isMessageComponent() && !interactionHandlers.has(interaction.customId)) {
     if (!interaction.guild) return;
     const reactionRoles = await getReactionRolesByGuild(interaction.guild);

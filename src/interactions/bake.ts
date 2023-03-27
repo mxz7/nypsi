@@ -5,6 +5,7 @@ import { runCommand } from "../utils/handlers/commandhandler";
 
 export default {
   name: "bake",
+  type: "interaction",
   async run(interaction) {
     if (!interaction.isButton()) return;
     if (await isEcoBanned(interaction.user.id)) return;

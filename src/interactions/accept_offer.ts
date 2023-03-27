@@ -14,6 +14,7 @@ import { transaction } from "../utils/logger";
 
 export default {
   name: "accept-offer",
+  type: "interaction",
   async run(interaction) {
     if (!interaction.isButton()) return;
     if (await isEcoBanned(interaction.user.id)) return;

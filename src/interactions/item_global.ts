@@ -3,6 +3,7 @@ import { getItems } from "../utils/functions/economy/utils";
 
 export default {
   name: "item-global",
+  type: "autocomplete",
   async run(interaction) {
     const focused = interaction.options.getFocused(true);
     focused.value = focused.value.toLowerCase();

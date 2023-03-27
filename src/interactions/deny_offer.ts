@@ -10,6 +10,7 @@ import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/
 
 export default {
   name: "deny-offer",
+  type: "interaction",
   async run(interaction) {
     if (!interaction.isButton()) return;
     if (await isEcoBanned(interaction.user.id)) return;

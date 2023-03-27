@@ -4,6 +4,7 @@ import { getKarmaShopItems, isKarmaShopOpen } from "../utils/functions/karma/kar
 
 export default {
   name: "item-karmashop",
+  type: "autocomplete",
   async run(interaction) {
     const focused = interaction.options.getFocused(true);
     focused.value = focused.value.toLowerCase();
