@@ -125,8 +125,8 @@ model Economy {
   Auction            Auction[]
   EconomyGuild       EconomyGuild?
   EconomyGuildMember EconomyGuildMember?
-  OffersReceived     Offers[]            @relation(name: "target")
-  OffersGiven        Offers[]            @relation(name: "owner")
+  OffersReceived     Offer[]             @relation(name: "target")
+  OffersGiven        Offer[]             @relation(name: "owner")
 }
 
 model BakeryUpgrade {
@@ -296,7 +296,7 @@ model Auction {
   owner Economy @relation(fields: [ownerId], references: [userId], onDelete: Cascade)
 }
 
-model Offers {
+model Offer {
   id         Int    @id @default(autoincrement())
   ownerId    String
   itemId     String

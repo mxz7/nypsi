@@ -36,7 +36,7 @@ export async function createOffer(target: User, itemId: string, itemAmount: numb
 
   if (!msg) return false;
 
-  await prisma.offers.create({
+  await prisma.offer.create({
     data: {
       messageId: msg.id,
       itemId,
@@ -51,11 +51,11 @@ export async function createOffer(target: User, itemId: string, itemAmount: numb
 }
 
 export async function getOwnedOffers(userId: string) {
-  return await prisma.offers.findMany({ where: { ownerId: userId } });
+  return await prisma.offer.findMany({ where: { ownerId: userId } });
 }
 
 export async function getTargetedOffers(userId: string) {
-  return await prisma.offers.findMany({ where: { targetId: userId } });
+  return await prisma.offer.findMany({ where: { targetId: userId } });
 }
 
 export async function getBlockedList(userId: string) {
@@ -67,3 +67,5 @@ export async function getBlockedList(userId: string) {
 export async function setBlockedList(userId: string, list: string[]) {
   return await prisma.economy.update({ where: { userId: userId }, data: { offersBlock: list } }).then((r) => r.offersBlock);
 }
+
+export async function checkOffer(offer: Offer);
