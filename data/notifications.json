@@ -84,7 +84,7 @@
     "offers": {
       "id": "offers",
       "name": "receive offers",
-      "description": "how many offers do you want to be able to receive at once? current: ${VALUE}"
+      "description": "how many offers do you want to be able to receive at once? current: {VALUE}"
     }
   }
 }
