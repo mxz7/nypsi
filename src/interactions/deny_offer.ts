@@ -52,7 +52,7 @@ export default {
     });
 
     const embed = interaction.message.embeds[0] as any;
-    embed.description.split("\n")[0] += "\n\n**offer denied**";
+    embed.description = embed.description.split("\n")[0] += "\n\n**offer denied**";
 
     await redis.del(`${Constants.redis.nypsi.OFFER_PROCESS}:${interaction.user.id}`);
 

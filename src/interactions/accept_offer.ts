@@ -70,7 +70,7 @@ export default {
     });
 
     const embed = interaction.message.embeds[0] as any;
-    embed.description.split("\n")[0] += "\n\n**offer accepted**";
+    embed.description = embed.description.split("\n")[0] += "\n\n**offer accepted**";
 
     await redis.del(`${Constants.redis.nypsi.OFFER_PROCESS}:${interaction.user.id}`);
 
