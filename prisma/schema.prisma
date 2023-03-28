@@ -567,7 +567,7 @@ model KofiPurchases {
 // data for creating graphs
 
 model GraphMetrics {
-  id Int @id @default(autoincrement())
+  id String @id @default(uuid())
 
   category String
 
