@@ -79,7 +79,7 @@ export async function setBlockedList(userId: string, list: string[]) {
 
 export async function deleteOffer(offer: Offer, client: NypsiClient) {
   offer = await prisma.offer.findUnique({ where: { messageId: offer.messageId } });
-  if (offer.sold) return false;
+  if (offer.sold || !offer) return false;
 
   await prisma.offer.delete({ where: { messageId: offer.messageId } });
 
