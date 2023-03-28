@@ -1,4 +1,4 @@
-import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions } from "discord.js";
+import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addProgress } from "../utils/functions/economy/achievements";
@@ -167,9 +167,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     await setInventoryItem(message.member, fishingRod, inventory.find((i) => i.item == fishingRod).amount - 1, false);
   }
 
-  const foundItems = [];
-
-  let foundItemsAmount = 0;
+  const foundItems = new Map<string, number>();
 
   for (let i = 0; i < times; i++) {
     const fishItemsModified = [];
@@ -252,12 +250,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         const amount = parseInt(chosen.substring(6));
 
         await updateBalance(message.member, (await getBalance(message.member)) + amount);
-        foundItems.push("$" + amount.toLocaleString());
+        foundItems.set("money", foundItems.has("money") ? foundItems.get("money") + amount : amount);
       } else if (chosen.includes("xp:")) {
         const amount = parseInt(chosen.substring(3));
 
         await updateXp(message.member, (await getXp(message.member)) + amount);
-        foundItems.push(amount + "xp");
+        foundItems.set("xp", foundItems.has("xp") ? foundItems.get("xp") + amount : amount);
       }
     } else if (items[chosen]?.role == "fish") {
       let amount = 1;
@@ -267,13 +265,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       } else if (fishingRod == "fishing_rod" && items[chosen].rarity < 2) {
         amount = Math.floor(Math.random() * 3) + 1;
       } else if (fishingRod == "incredible_fishing_rod") {
-        amount = Math.floor(Math.random() * 3) + 1;
+        amount = Math.floor(Math.random() * 4) + 1;
       }
 
       await addInventoryItem(message.member, chosen, amount);
 
-      foundItems.push(`${amount} ${items[chosen].emoji} ${items[chosen].name}`);
-      foundItemsAmount += amount;
+      foundItems.set(chosen, foundItems.has(chosen) ? foundItems.get(chosen) + amount : amount);
     } else {
       let amount = 1;
 
@@ -287,8 +284,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       await addInventoryItem(message.member, chosen, amount);
 
-      foundItems.push(`${items[chosen].emoji} ${items[chosen].name}`);
-      if (items[chosen].role == "fish") foundItemsAmount += amount;
+      foundItems.set(chosen, foundItems.has(chosen) ? foundItems.get(chosen) + amount : amount);
     }
   }
 
@@ -296,26 +292,25 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const msg = await send({ embeds: [embed] });
 
+  const total = Array.from(foundItems.entries())
+    .map((i) => (["money", "xp"].includes(i[0]) ? 0 : i[1]))
+    .reduce((a, b) => a + b);
+
   embed.setDescription(
     `you go to the pond and cast your **${items[fishingRod].name}**\n\nyou caught${
-      foundItems.length > 0 ? `: \n - ${foundItems.join("\n - ")}` : " **nothing**"
+      total > 0
+        ? `: \n${Array.from(foundItems.entries())
+            .map((i) => `- \`${i[1]}x\` ${items[i[0]].emoji} ${items[i[0]].name}`)
+            .join("\n")}`
+        : " **nothing**"
     }`
   );
 
-  const edit = async (data: MessageEditOptions, msg: Message) => {
-    if (!(message instanceof Message)) {
-      await message.editReply(data);
-      return await message.fetchReply();
-    } else {
-      return await msg.edit(data);
-    }
-  };
-
   setTimeout(() => {
-    edit({ embeds: [embed] }, msg);
+    msg.edit({ embeds: [embed] });
   }, 1500);
 
-  addProgress(message.author.id, "fisher", foundItemsAmount);
+  addProgress(message.author.id, "fisher", total);
 }
 
 cmd.setRun(run);
