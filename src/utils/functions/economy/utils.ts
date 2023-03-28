@@ -323,6 +323,7 @@ export async function reset() {
   await prisma.economyGuildMember.deleteMany();
   await prisma.economyGuild.deleteMany();
   await prisma.auction.deleteMany({ where: { sold: false } });
+  await prisma.offer.deleteMany({ where: { sold: false } });
   await prisma.economyWorkerUpgrades.deleteMany();
   await prisma.economyWorker.deleteMany();
   await prisma.inventory.deleteMany();
