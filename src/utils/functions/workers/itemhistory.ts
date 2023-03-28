@@ -41,7 +41,7 @@ if (!isMainThread) {
 
     const itemCount = await prisma.graphMetrics.findMany({
       where: {
-        category: "item-count-" + itemId,
+        AND: [{ category: "item-count-" + itemId }, { userId: "global" }],
       },
     });
 
@@ -50,23 +50,38 @@ if (!isMainThread) {
       process.exit(0);
     }
 
-    const gettingAverages = new Map<number, number[]>();
+    const auctionAverages = new Map<string, number[]>();
 
     for (const item of auctions) {
-      item.createdAt = dayjs(item.createdAt)
-        .set("hours", 0)
-        .set("minutes", 0)
-        .set("seconds", 0)
-        .set("milliseconds", 0)
-        .toDate();
+      const date = dayjs(item.createdAt).format("YYYY-MM-DD");
 
       item.bin /= BigInt(item.itemAmount);
 
-      if (gettingAverages.has(item.createdAt.getTime())) {
-        gettingAverages.get(item.createdAt.getTime()).push(Number(item.bin));
+      if (auctionAverages.has(date)) {
+        auctionAverages.get(date).push(Number(item.bin));
       } else {
-        gettingAverages.set(item.createdAt.getTime(), [Number(item.bin)]);
+        auctionAverages.set(date, [Number(item.bin)]);
       }
+    }
+
+    const offerAverages = new Map<string, number[]>();
+
+    for (const item of offers) {
+      const date = dayjs(item.soldAt).format("YYYY-MM-DD");
+
+      item.money /= item.itemAmount;
+
+      if (offerAverages.has(date)) {
+        offerAverages.get(date).push(Number(item.soldAt));
+      } else {
+        offerAverages.set(date, [Number(item.soldAt)]);
+      }
+    }
+
+    const itemCounts = new Map<string, number>();
+
+    for (const item of itemCount) {
+      itemCounts.set(dayjs(item.date).format("YYYY-MM-DD"), Number(item.value));
     }
 
     const graphData: ChartData = {
@@ -113,20 +128,30 @@ if (!isMainThread) {
             style: "currency",
             currency: "USD",
             minimumFractionDigits: 0,
+            //yAxisID: "y1",
           },
         },
       },
     };
 
-    for (const key of inPlaceSort(Array.from(gettingAverages.keys())).asc()) {
-      graphData.data.labels.push(dayjs(key).format("YYYY-MM-DD"));
-      graphData.data.datasets[0].data.push(
-        gettingAverages.get(key).reduce((a, b) => a + b) / gettingAverages.get(key).length
-      );
+    for (const key of auctionAverages.keys()) {
+      if (!graphData.data.labels.includes(dayjs(key).format("YYYY-MM-DD")))
+        graphData.data.labels.push(dayjs(key).format("YYYY-MM-DD"));
     }
 
+    for (const key of offerAverages.keys()) {
+      if (!graphData.data.labels.includes(dayjs(key).format("YYYY-MM-DD")))
+        graphData.data.labels.push(dayjs(key).format("YYYY-MM-DD"));
+    }
+
+    for (const i of itemCount) {
+      if (!graphData.data.labels.includes(dayjs(i.date).format("YYYY-MM-DD")))
+        graphData.data.labels.push(dayjs(i.date).format("YYYY-MM-DD"));
+    }
+
+    inPlaceSort(graphData.data.labels).desc((i) => dayjs(i, "YYYY-MM-DD").unix());
+
     for (let i = 0; i < graphData.data.labels.length; i++) {
-      // if (graphData.data.labels.length > 100) break;
       if (!graphData.data.labels[i + 1]) break;
 
       const date1 = dayjs(graphData.data.labels[i], "YYYY-MM-DD");
@@ -134,7 +159,38 @@ if (!isMainThread) {
 
       if (!date1.add(1, "day").isSame(date2)) {
         graphData.data.labels.splice(i + 1, 0, date1.add(1, "day").format("YYYY-MM-DD"));
-        graphData.data.datasets[0].data.splice(i + 1, 0, graphData.data.datasets[0].data[i]);
+      }
+    }
+
+    for (const dateString of graphData.data.labels) {
+      const index = graphData.data.labels.indexOf(dateString);
+
+      if (auctionAverages.has(dateString)) {
+        graphData.data.datasets[0].data.push(
+          auctionAverages.get(dateString).reduce((a, b) => a + b) / auctionAverages.get(dateString).length
+        );
+      } else if (index > 0) {
+        graphData.data.datasets[0].data.push(graphData.data.datasets[0].data[index - 1]);
+      } else {
+        graphData.data.datasets[0].data.push(0);
+      }
+
+      if (offerAverages.has(dateString)) {
+        graphData.data.datasets[0].data.push(
+          offerAverages.get(dateString).reduce((a, b) => a + b) / offerAverages.get(dateString).length
+        );
+      } else if (index > 0) {
+        graphData.data.datasets[0].data.push(graphData.data.datasets[0].data[index - 1]);
+      } else {
+        graphData.data.datasets[0].data.push(0);
+      }
+
+      if (itemCounts.has(dateString)) {
+        graphData.data.datasets[0].data.push(itemCounts.get(dateString));
+      } else if (index > 0) {
+        graphData.data.datasets[0].data.push(graphData.data.datasets[0].data[index - 1]);
+      } else {
+        graphData.data.datasets[0].data.push(0);
       }
     }
 
