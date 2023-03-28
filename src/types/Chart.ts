@@ -7,7 +7,13 @@ export interface ChartData {
   options?: {
     title?: string;
     scales?: {
-      yAxes: { id: string; display: true; position: "left" | "right"; stacked: true }[];
+      yAxes: {
+        id: string;
+        display: true;
+        position: "left" | "right";
+        stacked: true;
+        ticks: { min?: number; max?: number };
+      }[];
     };
     elements?: {
       point?: {

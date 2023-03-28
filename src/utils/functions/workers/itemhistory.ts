@@ -123,12 +123,18 @@ if (!isMainThread) {
               display: true,
               position: "left",
               stacked: true,
+              ticks: {
+                min: 0,
+              },
             },
             {
               id: "y2",
               display: true,
               position: "right",
               stacked: true,
+              ticks: {
+                min: 0,
+              },
             },
           ],
         },
