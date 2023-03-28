@@ -5,6 +5,7 @@ export interface ChartData {
     datasets: { yAxisID?: string; label: string; data: number[]; fill?: boolean; lineTension?: number }[];
   };
   options?: {
+    title?: string;
     scales?: {
       yAxes: { id: string; display: true; position: "left" | "right"; stacked: true }[];
     };
