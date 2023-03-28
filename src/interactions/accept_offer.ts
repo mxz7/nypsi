@@ -102,7 +102,7 @@ export default {
     }
 
     for (const testOffer of await prisma.offer.findMany({
-      where: { AND: [{ targetId: interaction.user.id }, { itemId: offer.itemId }] },
+      where: { AND: [{ targetId: interaction.user.id }, { itemId: offer.itemId }, { sold: false }] },
     })) {
       await checkOffer(testOffer, interaction.client as NypsiClient);
     }
