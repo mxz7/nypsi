@@ -1,3 +1,4 @@
+
 import { inPlaceSort } from "fast-sort";
 import { isMainThread, parentPort, Worker, workerData } from "worker_threads";
 import prisma from "../../../init/database";
@@ -22,7 +23,7 @@ if (!isMainThread) {
   (async () => {
     const itemId: string = workerData[0];
 
-    const query = await prisma.auction.findMany({
+    const auctions = await prisma.auction.findMany({
       where: {
         AND: [{ itemId, sold: true }],
       },
@@ -63,16 +64,35 @@ if (!isMainThread) {
         labels: [],
         datasets: [
           {
-            label: itemId,
+            yAxisID: "y1",
+            label: "auctions",
             data: [],
           },
+          {
+            yAxisID: "y1",
+            label: "offers",
+            data: []
+          },
+          {
+            yAxisID: "y2",
+            label: "items in world",
+            data: []
+          }
         ],
       },
       options: {
-        elements: {
-          point: {
-            pointStyle: "line",
-          },
+        scales: {
+          yAxes: [{
+            id: "y1",
+            display: true,
+            position: "left",
+            stacked: true
+          }, {
+            id: "y2",
+            display: true,
+            position: "right",
+            stacked: true
+          }]
         },
         plugins: {
           tickFormat: {
