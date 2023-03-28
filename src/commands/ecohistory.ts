@@ -1,5 +1,6 @@
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
 import prisma from "../init/database";
+import redis from "../init/redis";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { ErrorEmbed } from "../models/EmbedBuilders";
 import { ChartData } from "../types/Chart";
@@ -89,7 +90,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     });
   }
 
-  await addCooldown(cmd.name, message.member, 30);
+  await addCooldown(cmd.name, message.member, 10);
 
   if (["balance", "bal"].includes(args[0].toLowerCase())) args[0] = "user-money";
   if (["networth", "net"].includes(args[0].toLowerCase())) args[0] = "user-net";
@@ -142,30 +143,48 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return chartData;
   };
 
-  const data = formatDataForUser(
-    await prisma.graphMetrics.findMany({
-      where: {
-        AND: [{ category: args[0] }, { userId: message.author.id }],
-      },
-    })
-  );
+  const createGraph = async () => {
+    if (await redis.exists(`cache:ecograph:${args[0]}:${message.author.id}`)) {
+      return await redis.get(`cache:ecograph:${args[0]}:${message.author.id}`);
+    }
 
-  if (!data) return message.channel.send({ embeds: [new ErrorEmbed("you have no data to graph")] });
+    const data = formatDataForUser(
+      await prisma.graphMetrics.findMany({
+        where: {
+          AND: [{ category: args[0] }, { userId: message.author.id }],
+        },
+      })
+    );
 
-  const body = JSON.stringify({ chart: data });
+    if (!data) return message.channel.send({ embeds: [new ErrorEmbed("you have no data to graph")] });
 
-  const res: { success: boolean; url: string } = await fetch(BASE_URL, {
-    method: "POST",
-    body,
-    headers: { "Content-Type": "application/json" },
-  }).then((res) => res.json());
+    const body = JSON.stringify({ chart: data });
 
-  if (!res.success) {
-    logger.warn("failed to create graph", res);
-    return message.channel.send({ embeds: [new ErrorEmbed("failed to create graph")] });
-  }
+    const res: { success: boolean; url: string } = await fetch(BASE_URL, {
+      method: "POST",
+      body,
+      headers: { "Content-Type": "application/json" },
+    }).then((res) => res.json());
 
-  return message.channel.send({ content: res.url });
+    if (!res.success) {
+      logger.warn("failed to create graph", res);
+      return message.channel.send({ embeds: [new ErrorEmbed("failed to create graph")] });
+    }
+
+    await redis.set(`cache:ecograph:${args[0]}:${message.author.id}`, res.url);
+    await redis.expire(
+      `cache:ecograph:${args[0]}:${message.author.id}`,
+      Math.floor((dayjs().add(1, "day").set("hour", 0).set("minutes", 0).toDate().getTime() - Date.now()) / 1000)
+    );
+
+    return res.url;
+  };
+
+  const url = await createGraph();
+
+  if (typeof url !== "string") return;
+
+  return message.channel.send({ content: url });
 }
 
 cmd.setRun(run);
