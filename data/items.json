@@ -1835,5 +1835,24 @@
     "sell": 150000,
     "in_crates": true,
     "worker_upgrade_id": "shipping_containers"
+  },
+  "viagra": {
+    "id": "viagra",
+    "name": "viagra",
+    "plural": "viagras",
+    "emoji": "<:nypsi_viagra:1090257077227761694>",
+    "longDesc": "if you cant get it up...",
+    "rarity": 2,
+    "role": "booster",
+    "booster_desc": "gets it up",
+    "buy": 0,
+    "sell": 50000,
+    "stackable": false,
+    "boosterEffect": {
+      "boosts": ["pp"],
+      "effect": 5,
+      "time": 1800
+    },
+    "in_crates": true
   }
 }
