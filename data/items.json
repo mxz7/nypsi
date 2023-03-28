@@ -1469,6 +1469,22 @@
     "role": "bakery-upgrade",
     "in_crates": true
   },
+  "super_cursor": {
+    "id": "super_cursor",
+    "name": "super cursor",
+    "plural": "super cursors",
+    "aliases": ["super_pointer", "super pointer"],
+    "emoji": "<:super_cursor:1090263183278739517>",
+    "longDesc": "+1 min & max cookie when baking",
+    "rarity": 69,
+    "sell": 300000,
+    "role": "bakery-upgrade",
+    "craft": {
+      "time": 21600,
+      "ingrediants": ["cursor:3"]
+    },
+    "in_crates": false
+  },
   "workers_crate": {
     "id": "workers_crate",
     "name": "workers crate",
