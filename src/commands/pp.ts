@@ -2,6 +2,8 @@ import { BaseMessageOptions, CommandInteraction, GuildMember, InteractionReplyOp
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { addProgress } from "../utils/functions/economy/achievements";
+import { getBoosters } from "../utils/functions/economy/boosters";
+import { getItems } from "../utils/functions/economy/utils";
 import { getMember } from "../utils/functions/member";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -99,6 +101,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     setTimeout(() => {
       cache.delete(member.user.id);
     }, 60 * 1000);
+  }
+
+  const boosters = await getBoosters(message.member);
+
+  for (const boosterId of boosters.keys()) {
+    if (getItems()[boosterId].boosterEffect.boosts.includes("pp")) {
+      size *= getItems()[boosterId].boosterEffect.effect;
+    }
   }
 
   for (let i = 0; i < size; i++) {
