@@ -96,6 +96,8 @@ export async function deleteOffer(offer: Offer, client: NypsiClient) {
 export async function checkOffer(offer: Offer, client: NypsiClient) {
   const inventory = await getInventory(offer.targetId);
 
+  if (offer.sold) return;
+
   if (
     !inventory.find((i) => i.item === offer.itemId) ||
     inventory.find((i) => i.item === offer.itemId).amount < offer.itemAmount
