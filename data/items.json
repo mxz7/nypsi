@@ -444,6 +444,39 @@
     "sell": 50000,
     "in_crates": false
   },
+  "llama": {
+    "id": "llama",
+    "name": "llama",
+    "emoji": "🦙",
+    "longDesc": "cant spit anymore can it. how could you.",
+    "role": "prey",
+    "rarity": 2,
+    "buy": 0,
+    "sell": 60000,
+    "in_crates": false
+  },
+  "monkey": {
+    "id": "monkey",
+    "name": "monkey",
+    "emoji": "🦧",
+    "longDesc": "meeeee and my monkey... monkey doesnt wear any pants",
+    "role": "prey",
+    "rarity": 2,
+    "buy": 0,
+    "sell": 50000,
+    "in_crates": false
+  },
+  "harambe": {
+    "id": "harambe",
+    "name": "harambe",
+    "emoji": "🦍",
+    "longDesc": "he was innocent ):",
+    "role": "prey",
+    "rarity": 3,
+    "buy": 0,
+    "sell": 100000,
+    "in_crates": false
+  },
   "rat": {
     "id": "rat",
     "name": "rat",

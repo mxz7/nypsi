@@ -187,11 +187,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   embed.setThumbnail(thumbnail);
   const components: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [
     new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder()
-        .setStyle(ButtonStyle.Secondary)
-        .setCustomId("hist")
-        .setLabel("graph auction history")
-        .setEmoji("📈")
+      new ButtonBuilder().setStyle(ButtonStyle.Secondary).setCustomId("hist").setLabel("history").setEmoji("📈")
     ),
   ];
 
