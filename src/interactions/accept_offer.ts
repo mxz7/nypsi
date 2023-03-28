@@ -91,6 +91,12 @@ export default {
           content: `your offer to ${interaction.user.tag} for ${offer.itemAmount}x ${
             getItems()[offer.itemId].name
           } has been accepted`,
+          embed: new CustomEmbed(
+            null,
+            `you paid $${offer.money.toLocaleString()} for **${offer.itemAmount.toLocaleString()}x** ${
+              getItems()[offer.itemId].emoji
+            } **${getItems()[offer.itemId].name}**`
+          ).setColor(Constants.EMBED_SUCCESS_COLOR),
         },
       });
     }

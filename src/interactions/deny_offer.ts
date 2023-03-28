@@ -68,6 +68,9 @@ export default {
           content: `your offer to ${interaction.user.tag} for ${offer.itemAmount}x ${
             getItems()[offer.itemId].name
           } has been denied`,
+          embed: new CustomEmbed(null, `your $${offer.money.toLocaleString()} has been returned`).setColor(
+            Constants.EMBED_FAIL_COLOR
+          ),
         },
       });
     }
