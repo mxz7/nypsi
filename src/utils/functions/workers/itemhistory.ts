@@ -72,9 +72,9 @@ if (!isMainThread) {
       item.money /= item.itemAmount;
 
       if (offerAverages.has(date)) {
-        offerAverages.get(date).push(Number(item.soldAt));
+        offerAverages.get(date).push(Number(item.money));
       } else {
-        offerAverages.set(date, [Number(item.soldAt)]);
+        offerAverages.set(date, [Number(item.money)]);
       }
     }
 
@@ -149,7 +149,7 @@ if (!isMainThread) {
         graphData.data.labels.push(dayjs(i.date).format("YYYY-MM-DD"));
     }
 
-    inPlaceSort(graphData.data.labels).desc((i) => dayjs(i, "YYYY-MM-DD").unix());
+    inPlaceSort(graphData.data.labels).asc((i) => dayjs(i, "YYYY-MM-DD").unix());
 
     for (let i = 0; i < graphData.data.labels.length; i++) {
       if (!graphData.data.labels[i + 1]) break;
@@ -176,21 +176,21 @@ if (!isMainThread) {
       }
 
       if (offerAverages.has(dateString)) {
-        graphData.data.datasets[0].data.push(
+        graphData.data.datasets[1].data.push(
           offerAverages.get(dateString).reduce((a, b) => a + b) / offerAverages.get(dateString).length
         );
       } else if (index > 0) {
-        graphData.data.datasets[0].data.push(graphData.data.datasets[0].data[index - 1]);
+        graphData.data.datasets[1].data.push(graphData.data.datasets[1].data[index - 1]);
       } else {
-        graphData.data.datasets[0].data.push(0);
+        graphData.data.datasets[1].data.push(0);
       }
 
       if (itemCounts.has(dateString)) {
-        graphData.data.datasets[0].data.push(itemCounts.get(dateString));
+        graphData.data.datasets[2].data.push(itemCounts.get(dateString));
       } else if (index > 0) {
-        graphData.data.datasets[0].data.push(graphData.data.datasets[0].data[index - 1]);
+        graphData.data.datasets[2].data.push(graphData.data.datasets[2].data[index - 1]);
       } else {
-        graphData.data.datasets[0].data.push(0);
+        graphData.data.datasets[2].data.push(0);
       }
     }
 
