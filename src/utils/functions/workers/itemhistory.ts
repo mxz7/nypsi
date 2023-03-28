@@ -1,11 +1,10 @@
-
 import { inPlaceSort } from "fast-sort";
 import { isMainThread, parentPort, Worker, workerData } from "worker_threads";
 import prisma from "../../../init/database";
 import { ChartData } from "../../../types/Chart";
 import dayjs = require("dayjs");
 
-export default function auctionHistoryWorker(itemId: string): Promise<string> {
+export default function itemHistoryWorker(itemId: string): Promise<string> {
   return new Promise((resolve, reject) => {
     const worker = new Worker(__filename, {
       workerData: [itemId],
@@ -19,7 +18,7 @@ export default function auctionHistoryWorker(itemId: string): Promise<string> {
 }
 
 if (!isMainThread) {
-  process.title = "nypsi: auction history worker";
+  process.title = "nypsi: item history worker";
   (async () => {
     const itemId: string = workerData[0];
 
@@ -34,7 +33,19 @@ if (!isMainThread) {
       },
     });
 
-    if (auctions.length < 1) {
+    const offers = await prisma.offer.findMany({
+      where: {
+        AND: [{ itemId }, { sold: true }],
+      },
+    });
+
+    const itemCount = await prisma.graphMetrics.findMany({
+      where: {
+        category: "item-count-" + itemId,
+      },
+    });
+
+    if (auctions.length < 2 && offers.length < 2 && itemCount.length < 2) {
       parentPort.postMessage(null);
       process.exit(0);
     }
@@ -71,28 +82,31 @@ if (!isMainThread) {
           {
             yAxisID: "y1",
             label: "offers",
-            data: []
+            data: [],
           },
           {
             yAxisID: "y2",
             label: "items in world",
-            data: []
-          }
+            data: [],
+          },
         ],
       },
       options: {
         scales: {
-          yAxes: [{
-            id: "y1",
-            display: true,
-            position: "left",
-            stacked: true
-          }, {
-            id: "y2",
-            display: true,
-            position: "right",
-            stacked: true
-          }]
+          yAxes: [
+            {
+              id: "y1",
+              display: true,
+              position: "left",
+              stacked: true,
+            },
+            {
+              id: "y2",
+              display: true,
+              position: "right",
+              stacked: true,
+            },
+          ],
         },
         plugins: {
           tickFormat: {
