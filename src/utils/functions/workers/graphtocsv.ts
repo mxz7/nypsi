@@ -102,18 +102,6 @@ if (!isMainThread) {
       })
     );
 
-    await toCsv(
-      "nypsi_topcookies.csv",
-      await prisma.graphMetrics.findMany({
-        where: {
-          category: "cookies",
-        },
-        orderBy: {
-          date: "asc",
-        },
-      })
-    );
-
     parentPort.postMessage(true);
     process.exit(0);
   })();
