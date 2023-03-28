@@ -274,7 +274,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     } else {
       const embed = new CustomEmbed(
         message.member,
-        "you currently have no premium membership, this is what helps keep nypsi running, any donations are massively greatful :heart:"
+        "you currently have no premium membership, this is what helps keep nypsi running. i (max) am massively grateful for any donations :heart:"
       );
 
       embed.addField(
