@@ -11,7 +11,7 @@ import {
   MessageActionRowComponentBuilder,
   ModalBuilder,
   TextInputBuilder,
-  TextInputStyle,
+  TextInputStyle
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { Command, NypsiCommandInteraction } from "../models/Command";
@@ -75,6 +75,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
       }
       if (
+        item.id.includes(filter) ||
         item.name.includes(filter) ||
         item.longDesc.includes(filter) ||
         item.shortDesc?.includes(filter) ||
