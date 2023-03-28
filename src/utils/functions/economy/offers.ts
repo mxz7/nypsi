@@ -59,11 +59,11 @@ export async function createOffer(target: User, itemId: string, itemAmount: numb
 }
 
 export async function getOwnedOffers(userId: string) {
-  return await prisma.offer.findMany({ where: { ownerId: userId } });
+  return await prisma.offer.findMany({ where: { AND: [{ ownerId: userId }, { sold: false }] } });
 }
 
 export async function getTargetedOffers(userId: string) {
-  return await prisma.offer.findMany({ where: { targetId: userId } });
+  return await prisma.offer.findMany({ where: { AND: [{ targetId: userId }, { sold: false }] } });
 }
 
 export async function getBlockedList(userId: string) {

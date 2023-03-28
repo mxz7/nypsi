@@ -24,7 +24,7 @@ import { isPremium } from "../premium/premium";
 import requestDM from "../requestdm";
 import { addToNypsiBank, getTax } from "../tax";
 import { addNotificationToQueue, getDmSettings, getPreferences } from "../users/notifications";
-import auctionHistoryWorker from "../workers/auctionhistory";
+import itemHistoryWorker from "../workers/itemhistory";
 import { getBalance, updateBalance } from "./balance";
 import { addInventoryItem } from "./inventory";
 import { createUser, getItems, userExists } from "./utils";
@@ -848,7 +848,7 @@ export async function getItemHistoryGraph(itemId: string) {
     return await redis.get(`${Constants.redis.cache.economy.AUCTION_ITEM_GRAPH_DATA}:${itemId}`);
   }
 
-  const res = await auctionHistoryWorker(itemId);
+  const res = await itemHistoryWorker(itemId);
 
   if (typeof res === "string") {
     await redis.set(`${Constants.redis.cache.economy.AUCTION_ITEM_GRAPH_DATA}:${itemId}`, res);

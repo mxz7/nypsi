@@ -29,9 +29,9 @@ export default {
     await redis.set(`${Constants.redis.nypsi.OFFER_PROCESS}:${interaction.user.id}`, "t");
     await redis.expire(`${Constants.redis.nypsi.OFFER_PROCESS}:${interaction.user.id}`, 69);
 
-    const offer = await prisma.offer.findUnique({
+    const offer = await prisma.offer.findFirst({
       where: {
-        messageId: interaction.message.id,
+        AND: [{ messageId: interaction.message.id }, { sold: false }],
       },
     });
 
@@ -68,6 +68,9 @@ export default {
           content: `your offer to ${interaction.user.tag} for ${offer.itemAmount}x ${
             getItems()[offer.itemId].name
           } has been denied`,
+          embed: new CustomEmbed(null, `your $${offer.money.toLocaleString()} has been returned`).setColor(
+            Constants.EMBED_FAIL_COLOR
+          ),
         },
       });
     }
