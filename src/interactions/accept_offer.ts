@@ -33,9 +33,9 @@ export default {
     await redis.set(`${Constants.redis.nypsi.OFFER_PROCESS}:${interaction.user.id}`, "t");
     await redis.expire(`${Constants.redis.nypsi.OFFER_PROCESS}:${interaction.user.id}`, 69);
 
-    const offer = await prisma.offer.findUnique({
+    const offer = await prisma.offer.findFirst({
       where: {
-        messageId: interaction.message.id,
+        AND: [{ messageId: interaction.message.id }, { sold: false }],
       },
     });
 
@@ -55,9 +55,13 @@ export default {
       return interaction.editReply({ embeds: [new ErrorEmbed("you don't have the items for this offer")] });
     }
 
-    await prisma.offer.delete({
+    await prisma.offer.update({
       where: {
         messageId: offer.messageId,
+      },
+      data: {
+        sold: true,
+        soldAt: new Date(),
       },
     });
 
@@ -87,6 +91,12 @@ export default {
           content: `your offer to ${interaction.user.tag} for ${offer.itemAmount}x ${
             getItems()[offer.itemId].name
           } has been accepted`,
+          embed: new CustomEmbed(
+            null,
+            `you paid $${offer.money.toLocaleString()} for **${offer.itemAmount.toLocaleString()}x** ${
+              getItems()[offer.itemId].emoji
+            } **${getItems()[offer.itemId].name}**`
+          ).setColor(Constants.EMBED_SUCCESS_COLOR),
         },
       });
     }

@@ -53,30 +53,23 @@ async function doTopNetworth() {
   }
 }
 
-async function doCookies() {
-  const query = await prisma.inventory.findMany({
-    where: {
-      item: "cookie",
-    },
-    select: {
-      userId: true,
+async function doItems() {
+  const query = await prisma.inventory.groupBy({
+    by: ["item"],
+    _sum: {
       amount: true,
     },
-    orderBy: {
-      amount: "desc",
-    },
-    take: 25,
   });
 
   const date = new Date();
 
-  for (const user of query) {
+  for (const i of query) {
     await prisma.graphMetrics.create({
       data: {
-        userId: user.userId,
-        value: user.amount,
+        category: `item-count-${i.item}`,
         date,
-        category: "cookies",
+        userId: "global",
+        value: i._sum.amount,
       },
     });
   }
@@ -139,13 +132,16 @@ async function doMembers() {
 async function clearOld() {
   await prisma.graphMetrics.deleteMany({
     where: {
-      AND: [{ category: { contains: "user" } }, { date: { lt: dayjs().subtract(90, "day").toDate() } }],
+      AND: [
+        { OR: [{ category: { contains: "user" } }, { category: { contains: "item-count" } }] },
+        { date: { lt: dayjs().subtract(90, "day").toDate() } },
+      ],
     },
   });
 }
 
 (async () => {
-  await Promise.all([doTopBalance(), doTopNetworth(), doCookies(), doMembers(), clearOld()]);
+  await Promise.all([doTopBalance(), doTopNetworth(), doItems(), doMembers(), clearOld()]);
 
   process.exit(0);
 })();

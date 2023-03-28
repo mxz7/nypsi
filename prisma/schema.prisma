@@ -299,10 +299,12 @@ model Auction {
 model Offer {
   ownerId    String
   itemId     String
-  itemAmount BigInt @default(1)
+  itemAmount BigInt    @default(1)
   money      BigInt
-  messageId  String @unique
+  messageId  String    @unique
   targetId   String
+  sold       Boolean   @default(false)
+  soldAt     DateTime?
 
   target Economy @relation(fields: [targetId], references: [userId], onDelete: Cascade, name: "target")
   owner  Economy @relation(fields: [ownerId], references: [userId], onDelete: Cascade, name: "owner")
