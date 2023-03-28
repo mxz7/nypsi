@@ -1,4 +1,4 @@
-import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions } from "discord.js";
+import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addProgress } from "../utils/functions/economy/achievements";
@@ -161,9 +161,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (chosenArea == "nether") await addItemUse(message.member, "nether_portal");
 
-  const foundItems = [];
-
-  let foundItemsAmount = 0;
+  const foundItems = new Map<string, number>();
 
   for (let i = 0; i < times; i++) {
     const mineItemsModified = [];
@@ -258,34 +256,32 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await addInventoryItem(message.member, chosen, amount);
 
-    foundItems.push(`${amount} ${items[chosen].emoji} ${items[chosen].name}`);
-    foundItemsAmount += amount;
+    foundItems.set(chosen, foundItems.has(chosen) ? foundItems.get(chosen) + amount : amount);
   }
 
   const embed = new CustomEmbed(message.member, `you go to the ${chosenArea} and swing your **${items[pickaxe].name}**`);
 
   const msg = await send({ embeds: [embed] });
 
+  const total = Array.from(foundItems.entries())
+    .map((i) => (["money", "xp"].includes(i[0]) ? 0 : i[1]))
+    .reduce((a, b) => a + b);
+
   embed.setDescription(
     `you go to the ${chosenArea} and swing your **${items[pickaxe].name}**\n\nyou found${
-      foundItems.length > 0 ? `: \n - ${foundItems.join("\n - ")}` : " **nothing**"
+      total > 0
+        ? `: \n${Array.from(foundItems.entries())
+            .map((i) => `- \`${i[1]}x\` ${items[i[0]].emoji} ${items[i[0]].name}`)
+            .join("\n")}`
+        : " **nothing**"
     }`
   );
 
-  const edit = async (data: MessageEditOptions, msg: Message) => {
-    if (!(message instanceof Message)) {
-      await message.editReply(data);
-      return await message.fetchReply();
-    } else {
-      return await msg.edit(data);
-    }
-  };
-
   setTimeout(() => {
-    edit({ embeds: [embed] }, msg);
+    msg.edit({ embeds: [embed] });
   }, 1500);
 
-  addProgress(message.author.id, "miner", foundItemsAmount);
+  addProgress(message.author.id, "miner", total);
 }
 
 cmd.setRun(run);
