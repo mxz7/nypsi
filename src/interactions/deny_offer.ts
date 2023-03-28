@@ -29,9 +29,9 @@ export default {
     await redis.set(`${Constants.redis.nypsi.OFFER_PROCESS}:${interaction.user.id}`, "t");
     await redis.expire(`${Constants.redis.nypsi.OFFER_PROCESS}:${interaction.user.id}`, 69);
 
-    const offer = await prisma.offer.findUnique({
+    const offer = await prisma.offer.findFirst({
       where: {
-        messageId: interaction.message.id,
+        AND: [{ messageId: interaction.message.id }, { sold: false }],
       },
     });
 
