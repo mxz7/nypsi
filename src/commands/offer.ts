@@ -28,6 +28,7 @@ import { getPrestige } from "../utils/functions/economy/prestige";
 import { formatNumber, getItems, isEcoBanned } from "../utils/functions/economy/utils";
 import { getXp } from "../utils/functions/economy/xp";
 import { getMember } from "../utils/functions/member";
+import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { getPreferences } from "../utils/functions/users/notifications";
 import { getLastKnownTag } from "../utils/functions/users/tag";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -345,6 +346,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({ embeds: [embed] });
   } else {
     if (args.length != 4) return send({ embeds: [new ErrorEmbed("/offer create <target> <item> <amount> <money>")] });
+    let max = 3;
+
+    if (await isPremium(message.member)) {
+      max *= await getTier(message.member);
+    }
+
+    const currentOffers = await getOwnedOffers(message.author.id);
+
+    if (currentOffers.length + 1 > max)
+      return send({ embeds: [new ErrorEmbed(`you have reached the max amount of offers (${max})`)] });
+
     let target: GuildMember;
 
     if (!message.mentions.members.first()) {
