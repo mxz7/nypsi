@@ -117,15 +117,19 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         let chance: number;
         switch (items[boosterId].id) {
           case "fortune":
-            chance = Math.floor(Math.random() * 5);
-            if (chance > 1) {
-              multi += items[boosterId].boosterEffect.effect;
+            for (let i = 0; i < boosters.get(boosterId).length; i++) {
+              chance = Math.floor(Math.random() * 5);
+              if (chance > 1) {
+                multi += items[boosterId].boosterEffect.effect;
+              }
             }
             break;
           case "efficiency":
-            chance = Math.floor(Math.random() * 5);
-            if (chance > 1) {
-              times += items[boosterId].boosterEffect.effect;
+            for (let i = 0; i < boosters.get(boosterId).length; i++) {
+              chance = Math.floor(Math.random() * 5);
+              if (chance > 1) {
+                times += items[boosterId].boosterEffect.effect;
+              }
             }
             break;
           case "unbreaking":
