@@ -56,6 +56,7 @@ export default {
     const embed = new EmbedBuilder(interaction.message.embeds[0]);
 
     embed.setDescription((embed.data.description.split("\n")[0] += "\n\n**offer denied**"));
+    embed.setColor(Constants.EMBED_FAIL_COLOR);
 
     await redis.del(`${Constants.redis.nypsi.OFFER_PROCESS}:${interaction.user.id}`);
 

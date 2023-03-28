@@ -10,6 +10,7 @@ import {
 import prisma from "../../../init/database";
 import { NypsiClient } from "../../../models/Client";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
+import Constants from "../../Constants";
 import { getBalance, updateBalance } from "./balance";
 import { getInventory } from "./inventory";
 import { getItems } from "./utils";
@@ -88,6 +89,7 @@ export async function deleteOffer(offer: Offer, client: NypsiClient) {
   const embed = msg.embeds[0] as any;
 
   embed.data.description = embed.data.description.split("\n")[0] + "\n\n**no longer valid**";
+  embed.data.color = Constants.EMBED_FAIL_COLOR;
 
   await msg.edit({ components: [], embeds: [embed] });
   return true;
