@@ -110,6 +110,7 @@ if (!isMainThread) {
         ],
       },
       options: {
+        title: `${itemId} history`,
         elements: {
           point: {
             radius: 0,
