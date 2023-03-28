@@ -9,7 +9,7 @@ import {
   InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
-  MessageEditOptions
+  MessageEditOptions,
 } from "discord.js";
 import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction } from "../models/Command";
@@ -22,7 +22,7 @@ import {
   getBlockedList,
   getOwnedOffers,
   getTargetedOffers,
-  setBlockedList
+  setBlockedList,
 } from "../utils/functions/economy/offers";
 import { getPrestige } from "../utils/functions/economy/prestige";
 import { formatNumber, getItems, isEcoBanned } from "../utils/functions/economy/utils";
@@ -170,10 +170,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (offers.length == 0) {
       embed.setDescription("you don't have any active offers");
     } else if (offers.length > 1) {
-      displayOffer(0);
+      await displayOffer(0);
     } else {
       row.addComponents(new ButtonBuilder().setCustomId("del").setLabel("delete").setStyle(ButtonStyle.Danger));
-      displayOffer(0);
+      await displayOffer(0);
     }
 
     updateButtons(0);
@@ -222,7 +222,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         currentPage--;
 
-        displayOffer(currentPage);
+        await displayOffer(currentPage);
 
         updateButtons(currentPage);
 
@@ -235,7 +235,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         currentPage++;
 
-        displayOffer(currentPage);
+        await displayOffer(currentPage);
         updateButtons(currentPage);
 
         await msg.edit({ embeds: [embed], components: [row] });
@@ -358,7 +358,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (target.user.id == message.author.id) {
-      return send({embeds: [new ErrorEmbed("lol xd cant offer yourself something")]})
+      return send({ embeds: [new ErrorEmbed("lol xd cant offer yourself something")] });
     }
 
     if (await isEcoBanned(target.user.id))
