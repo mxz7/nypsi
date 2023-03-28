@@ -54,7 +54,7 @@ cmd.slashData
         option.setName("user").setDescription("user you want to offer something to").setRequired(true)
       )
       .addStringOption((option) =>
-        option.setName("item").setDescription("item you want to buy").setAutocomplete(true).setRequired(true)
+        option.setName("item-global").setDescription("item you want to buy").setAutocomplete(true).setRequired(true)
       )
       .addIntegerOption((option) => option.setName("amount").setDescription("amount you want to buy").setRequired(true))
       .addStringOption((option) => option.setName("money").setDescription("how much $ you want to offer").setRequired(true))
