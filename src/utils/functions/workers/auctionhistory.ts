@@ -34,14 +34,14 @@ if (!isMainThread) {
       },
     });
 
-    if (query.length < 1) {
+    if (auctions.length < 1) {
       parentPort.postMessage(null);
       process.exit(0);
     }
 
     const gettingAverages = new Map<number, number[]>();
 
-    for (const item of query) {
+    for (const item of auctions) {
       item.createdAt = dayjs(item.createdAt)
         .set("hours", 0)
         .set("minutes", 0)
