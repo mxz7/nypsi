@@ -85,16 +85,18 @@ export async function deleteOffer(offer: Offer, client: NypsiClient) {
 
   await updateBalance(offer.ownerId, (await getBalance(offer.ownerId)) + Number(offer.money));
 
-  const user = await client.users.fetch(offer.targetId);
-  if (!user) return true;
-  const msg = await user.dmChannel.messages.fetch(offer.messageId);
-  if (!msg) return true;
-  const embed = msg.embeds[0] as any;
+  (async () => {
+    const user = await client.users.fetch(offer.targetId);
+    if (!user) return true;
+    const msg = await user.dmChannel.messages.fetch(offer.messageId);
+    if (!msg) return true;
+    const embed = msg.embeds[0] as any;
 
-  embed.data.description = embed.data.description.split("\n")[0] + "\n\n**no longer valid**";
-  embed.data.color = Constants.EMBED_FAIL_COLOR;
+    embed.data.description = embed.data.description.split("\n")[0] + "\n\n**no longer valid**";
+    embed.data.color = Constants.EMBED_FAIL_COLOR;
 
-  await msg.edit({ components: [], embeds: [embed] });
+    await msg.edit({ components: [], embeds: [embed] });
+  })();
   return true;
 }
 
