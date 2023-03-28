@@ -9,7 +9,7 @@ import {
   InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
-  MessageEditOptions,
+  MessageEditOptions
 } from "discord.js";
 import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction } from "../models/Command";
@@ -22,7 +22,7 @@ import {
   getBlockedList,
   getOwnedOffers,
   getTargetedOffers,
-  setBlockedList,
+  setBlockedList
 } from "../utils/functions/economy/offers";
 import { getPrestige } from "../utils/functions/economy/prestige";
 import { formatNumber, getItems, isEcoBanned } from "../utils/functions/economy/utils";
@@ -353,7 +353,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (!target) {
-      return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] });
+      return send({ embeds: [new ErrorEmbed("invalid user")] });
+    }
+
+    if (target.user.id == message.author.id) {
+      return send({embeds: [new ErrorEmbed("lol xd cant offer yourself something")]})
     }
 
     if (await isEcoBanned(target.user.id))
