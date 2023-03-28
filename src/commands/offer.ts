@@ -29,6 +29,7 @@ import { formatNumber, getItems, isEcoBanned } from "../utils/functions/economy/
 import { getXp } from "../utils/functions/economy/xp";
 import { getMember } from "../utils/functions/member";
 import { getPreferences } from "../utils/functions/users/notifications";
+import { getLastKnownTag } from "../utils/functions/users/tag";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import dayjs = require("dayjs");
 
@@ -124,7 +125,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let currentPage = 0;
     const maxPage = offers.length - 1;
 
-    const displayOffer = (page: number) => {
+    const displayOffer = async (page: number) => {
       embed.setFields(
         {
           name: "item",
@@ -138,7 +139,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         },
         {
           name: "target",
-          value: `<@${offers[page].targetId}> (${offers[page].targetId})`,
+          value: `${(await getLastKnownTag(offers[page].targetId)) || "unknown user"} (${offers[page].targetId})`,
           inline: true,
         }
       );
@@ -283,7 +284,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             `blocklist: \n\n${current
               .map((i) => {
                 if (items[i]) return `${items[i].emoji} ${items[i].name}`;
-                if (message.guild.members.cache.has(i)) return `\`${i}\` (${message.guild.members.cache.get(i).toString()})`;
+                if (message.guild.members.cache.has(i)) return `\`${i}\` (${message.guild.members.cache.get(i).user.tag})`;
                 return `\`${i}\``;
               })
               .join("\n")}`
@@ -334,7 +335,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         current
           .map((i) => {
             if (items[i]) return `${items[i].emoji} ${items[i].name}`;
-            if (message.guild.members.cache.has(i)) return `\`${i}\` (${message.guild.members.cache.get(i).toString()})`;
+            if (message.guild.members.cache.has(i)) return `\`${i}\` (${message.guild.members.cache.get(i).user.tag})`;
             return `\`${i}\``;
           })
           .join("\n")
@@ -361,11 +362,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if ((await getPreferences(target)).offers <= (await getTargetedOffers(target.user.id)).length) {
       if ((await getPreferences(target)).offers === 0)
-        return send({ embeds: [new ErrorEmbed(`${target.toString()} has disabled offers`)] });
+        return send({ embeds: [new ErrorEmbed(`**${target.user.tag}** has disabled offers`)] });
       return send({
         embeds: [
           new ErrorEmbed(
-            `${target.toString()} has already received their max amount of offers (${(await getPreferences(target)).offers})`
+            `**${target.user.tag}** has already received their max amount of offers (${
+              (await getPreferences(target)).offers
+            })`
           ),
         ],
       });
@@ -381,11 +384,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (blocked.includes(selected.id))
       return send({
-        embeds: [new ErrorEmbed(`${target.toString()} has blocked offers for ${selected.emoji} ${selected.name}`)],
+        embeds: [new ErrorEmbed(`**${target.user.tag}** has blocked offers for ${selected.emoji} ${selected.name}`)],
       });
 
     if (blocked.includes(message.author.id))
-      return send({ embeds: [new ErrorEmbed(`${target.toString()} has blocked offers from you`)] });
+      return send({ embeds: [new ErrorEmbed(`**${target.user.tag}** has blocked offers from you`)] });
 
     const amount = parseInt(args[2]);
 
@@ -395,7 +398,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (!inventory.find((i) => i.item === selected.id) || inventory.find((i) => i.item === selected.id).amount < amount)
       return send({
-        embeds: [new ErrorEmbed(`${target.toString()} doesnt have ${amount}x ${selected.emoji} ${selected.name}`)],
+        embeds: [new ErrorEmbed(`**${target.user.tag}** doesnt have ${amount}x ${selected.emoji} ${selected.name}`)],
       });
 
     const money = formatNumber(args[3]);
@@ -412,7 +415,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       await updateBalance(message.member, balance + money);
       return send({ embeds: [new ErrorEmbed("failed to create offer")] });
     } else {
-      return send({ embeds: [new CustomEmbed(message.member, `✅ offer has been sent to ${target.toString()}`)] });
+      return send({ embeds: [new CustomEmbed(message.member, `✅ offer has been sent to **${target.user.tag}**`)] });
     }
   }
 }
