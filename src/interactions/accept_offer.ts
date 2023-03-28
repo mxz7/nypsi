@@ -81,6 +81,7 @@ export default {
     const embed = new EmbedBuilder(interaction.message.embeds[0]);
 
     embed.setDescription((embed.data.description.split("\n")[0] += "\n\n**offer accepted**"));
+    embed.setColor(Constants.EMBED_SUCCESS_COLOR);
 
     await interaction.message.edit({ embeds: [embed], components: [] });
 
