@@ -9,8 +9,9 @@ export interface ChartData {
       yAxes: { id: string; display: true; position: "left" | "right"; stacked: true }[];
     };
     elements?: {
-      point: {
-        pointStyle: "line";
+      point?: {
+        pointStyle?: string;
+        radius: number;
       };
     };
     plugins: {

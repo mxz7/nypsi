@@ -93,20 +93,28 @@ if (!isMainThread) {
             yAxisID: "y1",
             label: "auctions",
             data: [],
+            fill: false,
           },
           {
             yAxisID: "y1",
             label: "offers",
             data: [],
+            fill: false,
           },
           {
             yAxisID: "y2",
             label: "items in world",
             data: [],
+            fill: true,
           },
         ],
       },
       options: {
+        elements: {
+          point: {
+            radius: 0,
+          },
+        },
         scales: {
           yAxes: [
             {
