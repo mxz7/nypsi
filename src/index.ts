@@ -31,7 +31,7 @@ const manager = new ClusterManager(`${__dirname}/nypsi.js`, {
   },
 
   // totalShards: 6,
-  shardsPerClusters: 3, // force clusters
+  // shardsPerClusters: 3, // force clusters
   spawnOptions: {
     delay: 0,
   },
