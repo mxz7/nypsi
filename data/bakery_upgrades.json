@@ -12,5 +12,12 @@
     "emoji": "<:nypsi_cursor:1054771565557981244>",
     "upgrades": "bake",
     "value": 1
+  },
+  "super_cursor": {
+    "id": "super_cursor",
+    "name": "super cursor",
+    "emoji": "<:super_cursor:1090263183278739517>",
+    "upgrades": "bake",
+    "value": 1
   }
 }

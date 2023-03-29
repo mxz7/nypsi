@@ -18,7 +18,7 @@ export default function graphToCsv(): Promise<void> {
 if (!isMainThread) {
   process.title = "nypsi: graph to csv";
 
-  const toCsv = async (fileName: string, data: { userId: string; value: bigint | number; date: Date; id: number }[]) => {
+  const toCsv = async (fileName: string, data: { userId: string; value: bigint | number; date: Date; id: string }[]) => {
     const dates: number[] = [];
     const map = new Map<string, { value: number; date: number }[]>();
 
@@ -95,18 +95,6 @@ if (!isMainThread) {
       await prisma.graphMetrics.findMany({
         where: {
           category: "networth",
-        },
-        orderBy: {
-          date: "asc",
-        },
-      })
-    );
-
-    await toCsv(
-      "nypsi_topcookies.csv",
-      await prisma.graphMetrics.findMany({
-        where: {
-          category: "cookies",
         },
         orderBy: {
           date: "asc",

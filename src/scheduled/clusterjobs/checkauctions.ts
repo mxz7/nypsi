@@ -60,14 +60,24 @@ export async function runAuctionChecks(client: NypsiClient) {
 
     limit = dayjs().subtract(90, "days").toDate();
 
-    const { count } = await prisma.auction.deleteMany({
+    const { count: deletedSoldAuctions } = await prisma.auction.deleteMany({
       where: {
         AND: [{ sold: true }, { createdAt: { lte: limit } }],
       },
     });
 
-    if (count > 0) {
-      logger.info(`${count.toLocaleString()} sold auctions deleted`);
+    if (deletedSoldAuctions > 0) {
+      logger.info(`${deletedSoldAuctions.toLocaleString()} sold auctions deleted`);
+    }
+
+    const { count: deletedSoldOffers } = await prisma.offer.deleteMany({
+      where: {
+        AND: [{ sold: true }, { soldAt: { lte: limit } }],
+      },
+    });
+
+    if (deletedSoldOffers > 0) {
+      logger.info(`${deletedSoldOffers.toLocaleString()} sold offers deleted`);
     }
   }, ms("3 hours"));
 }

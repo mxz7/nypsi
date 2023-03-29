@@ -3,6 +3,7 @@ import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
+  EmbedBuilder,
   GuildMember,
   MessageActionRowComponentBuilder,
   User,
@@ -10,6 +11,7 @@ import {
 import prisma from "../../../init/database";
 import { NypsiClient } from "../../../models/Client";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
+import Constants from "../../Constants";
 import { getBalance, updateBalance } from "./balance";
 import { getInventory } from "./inventory";
 import { getItems } from "./utils";
@@ -59,11 +61,11 @@ export async function createOffer(target: User, itemId: string, itemAmount: numb
 }
 
 export async function getOwnedOffers(userId: string) {
-  return await prisma.offer.findMany({ where: { ownerId: userId } });
+  return await prisma.offer.findMany({ where: { AND: [{ ownerId: userId }, { sold: false }] } });
 }
 
 export async function getTargetedOffers(userId: string) {
-  return await prisma.offer.findMany({ where: { targetId: userId } });
+  return await prisma.offer.findMany({ where: { AND: [{ targetId: userId }, { sold: false }] } });
 }
 
 export async function getBlockedList(userId: string) {
@@ -77,24 +79,32 @@ export async function setBlockedList(userId: string, list: string[]) {
 }
 
 export async function deleteOffer(offer: Offer, client: NypsiClient) {
+  offer = await prisma.offer.findUnique({ where: { messageId: offer.messageId } });
+  if (offer.sold || !offer) return false;
+
   await prisma.offer.delete({ where: { messageId: offer.messageId } });
 
   await updateBalance(offer.ownerId, (await getBalance(offer.ownerId)) + Number(offer.money));
 
-  const user = await client.users.fetch(offer.targetId);
-  if (!user) return true;
-  const msg = await user.dmChannel.messages.fetch(offer.messageId);
-  if (!msg) return true;
-  const embed = msg.embeds[0] as any;
+  (async () => {
+    const user = await client.users.fetch(offer.targetId);
+    if (!user) return true;
+    const msg = await user.dmChannel.messages.fetch(offer.messageId);
+    if (!msg) return true;
+    const embed = new EmbedBuilder(msg.embeds[0]);
 
-  embed.data.description = embed.data.description.split("\n")[0] + "\n\n**no longer valid**";
+    embed.data.description = embed.data.description.split("\n")[0] + "\n\n**no longer valid**";
+    embed.setColor(Constants.EMBED_FAIL_COLOR);
 
-  await msg.edit({ components: [], embeds: [embed] });
+    await msg.edit({ components: [], embeds: [embed] });
+  })();
   return true;
 }
 
 export async function checkOffer(offer: Offer, client: NypsiClient) {
   const inventory = await getInventory(offer.targetId);
+
+  if (offer.sold) return;
 
   if (
     !inventory.find((i) => i.item === offer.itemId) ||

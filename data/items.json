@@ -444,6 +444,40 @@
     "sell": 50000,
     "in_crates": false
   },
+  "llama": {
+    "id": "llama",
+    "name": "llama",
+    "emoji": "🦙",
+    "longDesc": "cant spit anymore can it. how could you.",
+    "role": "prey",
+    "rarity": 2,
+    "buy": 0,
+    "sell": 60000,
+    "in_crates": false
+  },
+  "monkey": {
+    "id": "monkey",
+    "name": "monkey",
+    "aliases": ["monke"],
+    "emoji": "🦧",
+    "longDesc": "meeeee and my monkey... monkey doesnt wear any pants",
+    "role": "prey",
+    "rarity": 2,
+    "buy": 0,
+    "sell": 50000,
+    "in_crates": false
+  },
+  "harambe": {
+    "id": "harambe",
+    "name": "harambe",
+    "emoji": "🦍",
+    "longDesc": "he was innocent ):",
+    "role": "prey",
+    "rarity": 3,
+    "buy": 0,
+    "sell": 100000,
+    "in_crates": false
+  },
   "rat": {
     "id": "rat",
     "name": "rat",
@@ -1469,6 +1503,22 @@
     "role": "bakery-upgrade",
     "in_crates": true
   },
+  "super_cursor": {
+    "id": "super_cursor",
+    "name": "super cursor",
+    "plural": "super cursors",
+    "aliases": ["super_pointer", "super pointer"],
+    "emoji": "<:super_cursor:1090263183278739517>",
+    "longDesc": "+1 min & max cookie when baking",
+    "rarity": 69,
+    "sell": 300000,
+    "role": "bakery-upgrade",
+    "craft": {
+      "time": 21600,
+      "ingrediants": ["cursor:3"]
+    },
+    "in_crates": false
+  },
   "workers_crate": {
     "id": "workers_crate",
     "name": "workers crate",
@@ -1623,7 +1673,7 @@
       "id:bronze_credit:6",
       "id:silver_credit:2",
       "id:gold_credit:2",
-      "id:gem_shard:7",
+      "id:gem_shard:5",
       "id:green_gem:3",
       "id:blue_gem:3",
       "id:purple_gem:2",
@@ -1835,5 +1885,24 @@
     "sell": 150000,
     "in_crates": true,
     "worker_upgrade_id": "shipping_containers"
+  },
+  "viagra": {
+    "id": "viagra",
+    "name": "viagra",
+    "plural": "viagras",
+    "emoji": "<:nypsi_viagra:1090257077227761694>",
+    "longDesc": "if you cant get it up...",
+    "rarity": 2,
+    "role": "booster",
+    "booster_desc": "gets it up",
+    "buy": 0,
+    "sell": 50000,
+    "stackable": false,
+    "boosterEffect": {
+      "boosts": ["pp"],
+      "effect": 5,
+      "time": 1800
+    },
+    "in_crates": true
   }
 }

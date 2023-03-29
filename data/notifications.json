@@ -59,8 +59,8 @@
       "name": "net worth updates",
       "description": "get a dm when your net worth changes by the amount set. currently: ${VALUE}"
     },
-    "autosell": {
-      "id": "autosell",
+    "autosellStatus": {
+      "id": "autosellStatus",
       "name": "autosell status",
       "description": "get a dm hourly for autosell status (/autosell)"
     },

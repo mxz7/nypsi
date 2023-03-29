@@ -261,7 +261,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     } else if (await isBooster(message.author.id)) {
       const embed = new CustomEmbed(
         message.member,
-        "you are currently boosting the nypsi server!! thank you, your booster rewards are seperate from premium, meaning that they can stack together.\n\nyou currently have no premium membership, this is what helps keep nypsi running, any donations are massively greatful :heart:"
+        "you are currently boosting the nypsi server!! thank you, your booster rewards are seperate from premium, meaning that they can stack together.\n\nyou currently have no premium membership, this is what helps keep nypsi running. i (max) am massively grateful for any donations :heart:"
       );
 
       embed.addField(
@@ -274,7 +274,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     } else {
       const embed = new CustomEmbed(
         message.member,
-        "you currently have no premium membership, this is what helps keep nypsi running, any donations are massively greatful :heart:"
+        "you currently have no premium membership, this is what helps keep nypsi running. i (max) am massively grateful for any donations :heart:"
       );
 
       embed.addField(
