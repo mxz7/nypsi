@@ -119,6 +119,9 @@ if (!isMainThread) {
               display: true,
               position: "left",
               stacked: true,
+              gridLines: {
+                display: false,
+              },
               ticks: {
                 min: 0,
               },
@@ -128,6 +131,9 @@ if (!isMainThread) {
               display: true,
               position: "right",
               stacked: true,
+              gridLines: {
+                display: false,
+              },
               ticks: {
                 min: 0,
                 callback(val) {
