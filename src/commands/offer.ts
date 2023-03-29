@@ -32,6 +32,7 @@ import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { getPreferences } from "../utils/functions/users/notifications";
 import { getLastKnownTag } from "../utils/functions/users/tag";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import { logger } from "../utils/logger";
 import dayjs = require("dayjs");
 
 const cmd = new Command("offer", "create and manage offers", "money").setAliases(["offers", "of"]);
@@ -242,7 +243,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         await msg.edit({ embeds: [embed], components: [row] });
         return pageManager();
       } else if (res == "del") {
-        const res = await deleteOffer(offers[currentPage], message.client as NypsiClient).catch(() => {});
+        const res = await deleteOffer(offers[currentPage], message.client as NypsiClient).catch((e) => {
+          logger.warn("failed to delete offer", e);
+        });
 
         if (res) {
           await interaction.followUp({
