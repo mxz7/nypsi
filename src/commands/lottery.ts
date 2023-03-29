@@ -1,5 +1,6 @@
 import dayjs = require("dayjs");
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
+import prisma from "../init/database";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
@@ -59,25 +60,22 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const embed = new CustomEmbed(message.member);
 
     embed.setHeader("lottery", message.author.avatarURL());
-    embed.setDescription(
+    let desc =
       `nypsi lottery is a daily draw which happens in the [official nypsi server](https://discord.gg/hJTDNST)\nnext draw <t:${dayjs()
         .add(1, "day")
         .startOf("day")
         .unix()}:R>\n\n` +
-        `you can buy lottery tickets for $**${lotteryTicketPrice.toLocaleString()}** with ${await getPrefix(
-          message.guild
-        )}**lotto buy**\nyou can have a maximum of **${Constants.LOTTERY_TICKETS_MAX}** tickets`
-    );
+      `you can buy lottery tickets for $**${lotteryTicketPrice.toLocaleString()}** with ${await getPrefix(
+        message.guild
+      )}**lotto buy**\nyou can have a maximum of **${Constants.LOTTERY_TICKETS_MAX}** tickets`;
 
     if (tickets.length > 0) {
-      const t = [];
+      const winChance = (tickets.length / (await prisma.lotteryTicket.count())).toFixed(3);
 
-      for (const ticket of tickets) {
-        t.push(`**#${ticket.id}**`);
-      }
-
-      embed.addField(`your tickets [${tickets.length}]`, t.join(" "));
+      desc += `\n\nyou have **${tickets.length.toLocaleString()}** tickets (${winChance}%)`;
     }
+
+    embed.setDescription(desc);
 
     return send({ embeds: [embed] });
   };
