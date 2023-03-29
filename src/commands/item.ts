@@ -207,7 +207,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   await res.deferReply({ ephemeral: true });
 
-  const response = await getItemHistoryGraph(selected.id);
+  const response = await getItemHistoryGraph(selected.id, message.author.id);
 
   if (typeof response !== "string") {
     logger.error(`error creating graph for ${selected.id}`, response);
