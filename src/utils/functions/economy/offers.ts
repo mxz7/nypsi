@@ -3,6 +3,7 @@ import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
+  EmbedBuilder,
   GuildMember,
   MessageActionRowComponentBuilder,
   User,
@@ -90,10 +91,10 @@ export async function deleteOffer(offer: Offer, client: NypsiClient) {
     if (!user) return true;
     const msg = await user.dmChannel.messages.fetch(offer.messageId);
     if (!msg) return true;
-    const embed = msg.embeds[0] as any;
+    const embed = new EmbedBuilder(msg.embeds[0]);
 
     embed.data.description = embed.data.description.split("\n")[0] + "\n\n**no longer valid**";
-    embed.data.color = Constants.EMBED_FAIL_COLOR;
+    embed.setColor(Constants.EMBED_FAIL_COLOR);
 
     await msg.edit({ components: [], embeds: [embed] });
   })();
