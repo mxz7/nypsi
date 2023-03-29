@@ -86,7 +86,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   }
 
   if (mode == "attachment" && message instanceof Message) {
-    url = message.attachments.first().attachment;
+    url = message.attachments.first().proxyURL;
     if (args.length != 0) {
       name = args[0];
     } else {
@@ -133,7 +133,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   await message.guild.emojis
     .create({
-      attachment: url as Buffer,
+      attachment: url,
       name: name,
     })
     .catch((e) => {

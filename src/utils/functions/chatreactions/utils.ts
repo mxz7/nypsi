@@ -1,11 +1,11 @@
-import { ChannelType, Guild } from "discord.js";
+import { ChannelType, Guild, TextChannel } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
-import ms = require("ms");
 import { startOpenChatReaction } from "./game";
+import ms = require("ms");
 
 export const currentChannels = new Set<string>();
 const lastGame = new Map<string, number>();
@@ -79,7 +79,7 @@ export function doChatReactions(client: NypsiClient) {
           continue;
         }
 
-        const a = await startOpenChatReaction(guild, channel);
+        const a = await startOpenChatReaction(guild, channel as TextChannel);
 
         if (a != "xoxo69") {
           count++;
