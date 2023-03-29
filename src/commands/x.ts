@@ -36,7 +36,8 @@ const cmd = new Command("x", "admincmd", "none").setPermissions(["bot owner"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (!(message instanceof Message)) return;
-  if ((await getAdminLevel(message.author.id)) < 1) return message.react("🫦");
+  if ((await getAdminLevel(message.author.id)) < 1)
+    return message.react(["🫦", "💦", "🍑", "🍆", "😩"][Math.floor(Math.random() * ["🫦", "💦", "🍑", "🍆", "😩"].length)]);
 
   const getDbData = async (user: User) => {
     logger.info(`fetching data for ${user.id}...`);
