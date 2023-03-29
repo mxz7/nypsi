@@ -4,10 +4,10 @@ import prisma from "../../../init/database";
 import { ChartData } from "../../../types/Chart";
 import dayjs = require("dayjs");
 
-export default function itemHistoryWorker(itemId: string): Promise<string> {
+export default function itemHistoryWorker(itemId: string, userId: string): Promise<string> {
   return new Promise((resolve, reject) => {
     const worker = new Worker(__filename, {
-      workerData: [itemId],
+      workerData: [itemId, userId],
     });
     worker.on("message", resolve);
     worker.on("error", reject);
@@ -20,7 +20,7 @@ export default function itemHistoryWorker(itemId: string): Promise<string> {
 if (!isMainThread) {
   process.title = "nypsi: item history worker";
   (async () => {
-    const itemId: string = workerData[0];
+    const [itemId, userId] = workerData as string[];
 
     const auctions = await prisma.auction.findMany({
       where: {
@@ -37,15 +37,34 @@ if (!isMainThread) {
       where: {
         AND: [{ itemId }, { sold: true }],
       },
+      select: {
+        itemAmount: true,
+        money: true,
+        soldAt: true,
+      },
     });
 
     const itemCount = await prisma.graphMetrics.findMany({
       where: {
         AND: [{ category: "item-count-" + itemId }, { userId: "global" }],
       },
+      select: {
+        date: true,
+        value: true,
+      },
     });
 
-    if (auctions.length < 2 && offers.length < 2 && itemCount.length < 2) {
+    const userItemCount = await prisma.graphMetrics.findMany({
+      where: {
+        AND: [{ category: `user-item-${itemId}` }, { userId }],
+      },
+      select: {
+        date: true,
+        value: true,
+      },
+    });
+
+    if (auctions.length < 2 && offers.length < 2 && itemCount.length < 2 && userItemCount.length < 2) {
       parentPort.postMessage(null);
       process.exit(0);
     }
@@ -84,6 +103,12 @@ if (!isMainThread) {
       itemCounts.set(dayjs(item.date).format("YYYY-MM-DD"), Number(item.value));
     }
 
+    const userItemCounts = new Map<string, number>();
+
+    for (const item of userItemCount) {
+      userItemCounts.set(dayjs(item.date).format("YYYY-MM-DD"), Number(item.value));
+    }
+
     const graphData: ChartData = {
       type: "line",
       data: {
@@ -103,9 +128,15 @@ if (!isMainThread) {
           },
           {
             yAxisID: "y2",
-            label: "items in world",
+            label: "in world",
             data: [],
             fill: true,
+          },
+          {
+            yAxisID: "y2",
+            label: "your inventory",
+            data: [],
+            fill: false,
           },
         ],
       },
@@ -149,6 +180,8 @@ if (!isMainThread) {
       },
     };
 
+    if (userItemCount.length === 0) delete graphData.data.datasets[3];
+
     for (const key of auctionAverages.keys()) {
       if (!graphData.data.labels.includes(dayjs(key).format("YYYY-MM-DD")))
         graphData.data.labels.push(dayjs(key).format("YYYY-MM-DD"));
@@ -160,6 +193,11 @@ if (!isMainThread) {
     }
 
     for (const i of itemCount) {
+      if (!graphData.data.labels.includes(dayjs(i.date).format("YYYY-MM-DD")))
+        graphData.data.labels.push(dayjs(i.date).format("YYYY-MM-DD"));
+    }
+
+    for (const i of userItemCount) {
       if (!graphData.data.labels.includes(dayjs(i.date).format("YYYY-MM-DD")))
         graphData.data.labels.push(dayjs(i.date).format("YYYY-MM-DD"));
     }
@@ -206,6 +244,15 @@ if (!isMainThread) {
         graphData.data.datasets[2].data.push(graphData.data.datasets[2].data[index - 1]);
       } else {
         graphData.data.datasets[2].data.push(0);
+      }
+
+      if (userItemCount.length === 0) continue;
+      if (userItemCounts.has(dateString)) {
+        graphData.data.datasets[3].data.push(itemCounts.get(dateString));
+      } else if (index > 0) {
+        graphData.data.datasets[3].data.push(graphData.data.datasets[3].data[index - 1]);
+      } else {
+        graphData.data.datasets[3].data.push(0);
       }
     }
 
