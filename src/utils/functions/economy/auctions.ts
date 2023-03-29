@@ -843,12 +843,12 @@ export async function buyAuctionOne(interaction: ButtonInteraction, auction: Auc
   await interaction.message.edit({ embeds: [embed], components: [buttonRow] });
 }
 
-export async function getItemHistoryGraph(itemId: string) {
+export async function getItemHistoryGraph(itemId: string, userId: string) {
   if (await redis.exists(`${Constants.redis.cache.economy.AUCTION_ITEM_GRAPH_DATA}:${itemId}`)) {
     return await redis.get(`${Constants.redis.cache.economy.AUCTION_ITEM_GRAPH_DATA}:${itemId}`);
   }
 
-  const res = await itemHistoryWorker(itemId);
+  const res = await itemHistoryWorker(itemId, userId);
 
   if (typeof res === "string") {
     await redis.set(`${Constants.redis.cache.economy.AUCTION_ITEM_GRAPH_DATA}:${itemId}`, res);
