@@ -76,7 +76,9 @@ module.exports = new ItemUse(
     const breakdown: string[] = [];
 
     for (const item of crafting) {
-      const newDate = dayjs(item.finished).subtract(amount, "hour").toDate();
+      let newDate = dayjs(item.finished).subtract(amount, "hour").toDate();
+
+      if (Date.now() > newDate.getTime()) newDate = dayjs().add(1, "second").toDate();
 
       breakdown.push(
         `\`${item.amount.toLocaleString()}x\` ${getItems()[item.itemId].emoji} ${getItems()[item.itemId].name}: \`${MStoTime(
