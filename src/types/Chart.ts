@@ -5,7 +5,10 @@ export interface ChartData {
     datasets: { yAxisID?: string; label: string; data: number[]; fill?: boolean; lineTension?: number }[];
   };
   options?: {
-    title?: string;
+    title?: {
+      display: boolean;
+      text: string;
+    };
     scales?: {
       yAxes: {
         id: string;

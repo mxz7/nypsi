@@ -106,7 +106,10 @@ if (!isMainThread) {
         ],
       },
       options: {
-        title: `${itemId} history`,
+        title: {
+          display: true,
+          text: `${itemId} history`,
+        },
         elements: {
           point: {
             radius: 0,
