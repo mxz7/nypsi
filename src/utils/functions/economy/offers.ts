@@ -89,7 +89,10 @@ export async function deleteOffer(offer: Offer, client: NypsiClient) {
   (async () => {
     const user = await client.users.fetch(offer.targetId);
     if (!user) return true;
-    const msg = await user.dmChannel.messages.fetch(offer.messageId);
+
+    const channel = await user.createDM();
+
+    const msg = await channel.messages.fetch(offer.messageId);
     if (!msg) return true;
     const embed = new EmbedBuilder(msg.embeds[0]);
 
