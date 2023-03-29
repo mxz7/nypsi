@@ -59,23 +59,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const help = async () => {
     const embed = new CustomEmbed(message.member);
 
+    const winChance = (tickets.length / (await prisma.lotteryTicket.count())).toFixed(5);
+
     embed.setHeader("lottery", message.author.avatarURL());
-    let desc =
+    embed.setDescription(
       `nypsi lottery is a daily draw which happens in the [official nypsi server](https://discord.gg/hJTDNST)\nnext draw <t:${dayjs()
         .add(1, "day")
         .startOf("day")
         .unix()}:R>\n\n` +
-      `you can buy lottery tickets for $**${lotteryTicketPrice.toLocaleString()}** with ${await getPrefix(
-        message.guild
-      )}**lotto buy**\nyou can have a maximum of **${Constants.LOTTERY_TICKETS_MAX}** tickets`;
-
-    if (tickets.length > 0) {
-      const winChance = (tickets.length / (await prisma.lotteryTicket.count())).toFixed(3);
-
-      desc += `\n\nyou have **${tickets.length.toLocaleString()}** tickets (${winChance}%)`;
-    }
-
-    embed.setDescription(desc);
+        `you can buy lottery tickets for $**${lotteryTicketPrice.toLocaleString()}** with ${await getPrefix(
+          message.guild
+        )}**lotto buy**\nyou have **${tickets.length.toLocaleString()}**/${Constants.LOTTERY_TICKETS_MAX.toLocaleString()} tickets (${winChance}% chance of winning)`
+    );
 
     return send({ embeds: [embed] });
   };
