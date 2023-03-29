@@ -439,6 +439,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       prisma.moderationMute.count(),
       prisma.moderationCase.count(),
       prisma.mention.count(),
+      prisma.graphMetrics.count(),
     ]);
 
     const embed = new CustomEmbed(
@@ -459,7 +460,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         `**bans** ${res[13].toLocaleString()}\n` +
         `**mutes** ${res[14].toLocaleString()}\n` +
         `**cases** ${res[15].toLocaleString()}\n` +
-        `**mentions** ${res[16].toLocaleString()}`
+        `**mentions** ${res[16].toLocaleString()}\n` +
+        `**graph data** ${res[17].toLocaleString()}`
     );
 
     return send({ embeds: [embed] });
