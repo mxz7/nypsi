@@ -12,7 +12,7 @@ export interface ChartData {
         display: true;
         position: "left" | "right";
         stacked: true;
-        ticks: { min?: number; max?: number };
+        ticks: { min?: number; max?: number; callback?: (val: number) => string };
       }[];
     };
     elements?: {
