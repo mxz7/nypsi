@@ -55,12 +55,10 @@ if (!isMainThread) {
     for (const item of auctions) {
       const date = dayjs(item.createdAt).format("YYYY-MM-DD");
 
-      item.bin /= BigInt(item.itemAmount);
-
       if (auctionAverages.has(date)) {
-        auctionAverages.get(date).push(Number(item.bin));
+        auctionAverages.get(date).push(Number(item.bin / item.itemAmount));
       } else {
-        auctionAverages.set(date, [Number(item.bin)]);
+        auctionAverages.set(date, [Number(item.bin / item.itemAmount)]);
       }
     }
 
@@ -69,12 +67,10 @@ if (!isMainThread) {
     for (const item of offers) {
       const date = dayjs(item.soldAt).format("YYYY-MM-DD");
 
-      item.money /= item.itemAmount;
-
       if (offerAverages.has(date)) {
-        offerAverages.get(date).push(Number(item.money));
+        offerAverages.get(date).push(Number(item.money / item.itemAmount));
       } else {
-        offerAverages.set(date, [Number(item.money)]);
+        offerAverages.set(date, [Number(item.money / item.itemAmount)]);
       }
     }
 
