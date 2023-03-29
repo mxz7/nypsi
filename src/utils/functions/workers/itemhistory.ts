@@ -165,6 +165,9 @@ if (!isMainThread) {
               stacked: true,
               ticks: {
                 min: 0,
+                callback(val) {
+                  return val.toLocaleString();
+                },
               },
             },
           ],
