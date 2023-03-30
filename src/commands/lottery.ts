@@ -59,7 +59,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const help = async () => {
     const embed = new CustomEmbed(message.member);
 
-    const winChance = (tickets.length / (await prisma.lotteryTicket.count())).toFixed(5);
+    const winChance = ((tickets.length / (await prisma.lotteryTicket.count())) * 100).toFixed(5);
 
     embed.setHeader("lottery", message.author.avatarURL());
     embed.setDescription(
