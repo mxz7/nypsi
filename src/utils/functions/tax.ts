@@ -28,14 +28,14 @@ async function updateTax() {
   return tax;
 }
 
-export async function addToNypsiBank(amount: number, half = true) {
+export async function addToNypsiBank(amount: number, reduce = true) {
   await prisma.economy
     .upsert({
       where: {
         userId: Constants.BOT_USER_ID,
       },
       update: {
-        bank: { increment: half ? Math.floor(amount * 0.5) : amount },
+        bank: { increment: reduce ? Math.floor(amount * 0.1) : amount },
       },
       create: {
         bank: Math.floor(amount),
