@@ -126,7 +126,7 @@ if (!isMainThread) {
               position: "left",
               // stacked: true,
               gridLines: {
-                display: false,
+                display: true,
               },
               ticks: {
                 min: 0,
