@@ -31,6 +31,7 @@ import {
   getAuctionWatch,
   setAuctionWatch,
 } from "../utils/functions/economy/auctions";
+import { getBalance, updateBalance } from "../utils/functions/economy/balance";
 import { addInventoryItem, getInventory, selectItem, setInventoryItem } from "../utils/functions/economy/inventory";
 import { getPrestige } from "../utils/functions/economy/prestige";
 import { formatBet, getItems, userExists } from "../utils/functions/economy/utils";
@@ -38,6 +39,7 @@ import { getXp } from "../utils/functions/economy/xp";
 import PageManager from "../utils/functions/page";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import requestDM from "../utils/functions/requestdm";
+import { addToNypsiBank, getTax } from "../utils/functions/tax";
 import { getDmSettings } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
@@ -327,18 +329,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       });
     }
 
-    if (
-      cost > Constants.MAX_AUCTION_PER_ITEM * amount &&
-      selected.rarity < 3 &&
-      (selected.in_crates || ["prey", "fish", "ore", "sellable"].includes(selected.role))
-    ) {
-      return send({
-        embeds: [new ErrorEmbed(`the maximum cost per item is $${Constants.MAX_AUCTION_PER_ITEM.toLocaleString()}`)],
-      });
-    } else if (cost > 10_000_000_000)
-      return send({
-        embeds: [new ErrorEmbed("the maximum cost per item is $10,000,000,000")],
-      });
+    // if (
+    //   cost > Constants.MAX_AUCTION_PER_ITEM * amount &&
+    //   selected.rarity < 3 &&
+    //   (selected.in_crates || ["prey", "fish", "ore", "sellable"].includes(selected.role))
+    // ) {
+    //   return send({
+    //     embeds: [new ErrorEmbed(`the maximum cost per item is $${Constants.MAX_AUCTION_PER_ITEM.toLocaleString()}`)],
+    //   });
+    // } else if (cost > 10_000_000_000)
+    //   return send({
+    //     embeds: [new ErrorEmbed("the maximum cost per item is $10,000,000,000")],
+    //   });
 
     const shopCost = (items[selected.id].buy || 0) * amount;
 
@@ -350,6 +352,52 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           ),
         ],
       });
+    }
+
+    let fee = Math.floor((await getTax()) * cost);
+
+    if (cost < 1_000_000) {
+      fee = 0;
+    } else if ((await getTier(message.member)) === 4) {
+      fee = Math.floor(fee * 0.1);
+    } else if ((await getTier(message.member)) >= 2) {
+      fee = Math.floor(fee / 2);
+    }
+
+    if (fee > 0) {
+      const filter = (i: Interaction) => i.user.id === message.author.id;
+
+      const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder().setCustomId("accept-fee").setLabel("yes").setStyle(ButtonStyle.Success),
+        new ButtonBuilder().setCustomId("deny-fee").setLabel("no").setStyle(ButtonStyle.Danger)
+      );
+
+      await msg.edit({
+        embeds: [
+          new CustomEmbed(
+            message.member,
+            `you must pay a fee of $**${fee.toLocaleString()}** (${((await getTax()) * 100).toFixed(
+              1
+            )}%) to create this auction`
+          ),
+        ],
+        components: [row],
+      });
+
+      const res = await msg.awaitMessageComponent({ filter, time: 15000 }).catch(() => {});
+
+      if (!res || res.customId === "deny-fee") {
+        await msg.edit({ components: [] });
+        return;
+      }
+
+      await res.deferUpdate();
+      const balance = await getBalance(message.member);
+
+      if (balance < fee) return msg.edit({ embeds: [new ErrorEmbed("you cant afford this fee")] });
+
+      await updateBalance(message.member, balance - fee);
+      await addToNypsiBank(fee);
     }
 
     inventory = await getInventory(message.member);
@@ -658,7 +706,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return send({ embeds: [new ErrorEmbed("couldnt find that item")] });
     }
 
-    const inventory = await getInventory(message.member);
+    let inventory = await getInventory(message.member);
 
     if (!inventory.find((i) => i.item == selected.id) || inventory.find((i) => i.item == selected.id).amount == 0) {
       return send({ embeds: [new ErrorEmbed(`you dont have a ${selected.name}`)] });
@@ -694,18 +742,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       });
     }
 
-    if (
-      cost > Constants.MAX_AUCTION_PER_ITEM * amount &&
-      selected.rarity < 3 &&
-      (selected.in_crates || ["prey", "fish", "ore", "sellable"].includes(selected.role))
-    ) {
-      return send({
-        embeds: [new ErrorEmbed(`the maximum cost per item is $${Constants.MAX_AUCTION_PER_ITEM.toLocaleString()}`)],
-      });
-    } else if (cost > 10_000_000_000)
-      return send({
-        embeds: [new ErrorEmbed("the maximum cost per item is $10,000,000,000")],
-      });
+    // if (
+    //   cost > Constants.MAX_AUCTION_PER_ITEM * amount &&
+    //   selected.rarity < 3 &&
+    //   (selected.in_crates || ["prey", "fish", "ore", "sellable"].includes(selected.role))
+    // ) {
+    //   return send({
+    //     embeds: [new ErrorEmbed(`the maximum cost per item is $${Constants.MAX_AUCTION_PER_ITEM.toLocaleString()}`)],
+    //   });
+    // } else if (cost > 10_000_000_000)
+    //   return send({
+    //     embeds: [new ErrorEmbed("the maximum cost per item is $10,000,000,000")],
+    //   });
 
     const shopCost = (items[selected.id].buy || 0) * amount;
 
@@ -717,6 +765,67 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           ),
         ],
       });
+    }
+
+    let fee = Math.floor((await getTax()) * cost);
+
+    if (cost < 1_000_000) {
+      fee = 0;
+    } else if ((await getTier(message.member)) === 4) {
+      fee = Math.floor(fee * 0.1);
+    } else if ((await getTier(message.member)) >= 2) {
+      fee = Math.floor(fee / 2);
+    }
+
+    let msg: Message;
+
+    if (fee > 0) {
+      const filter = (i: Interaction) => i.user.id === message.author.id;
+
+      const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder().setCustomId("accept-fee").setLabel("yes").setStyle(ButtonStyle.Success),
+        new ButtonBuilder().setCustomId("deny-fee").setLabel("no").setStyle(ButtonStyle.Danger)
+      );
+
+      msg = await send({
+        embeds: [
+          new CustomEmbed(
+            message.member,
+            `you must pay a fee of $**${fee.toLocaleString()}** (${((await getTax()) * 100).toFixed(
+              1
+            )}%) to create this auction`
+          ).setHeader("auction fee"),
+        ],
+        components: [row],
+      });
+
+      const res = await msg.awaitMessageComponent({ filter, time: 15000 }).catch(() => {});
+
+      if (!res || res.customId === "deny-fee") {
+        await msg.edit({ components: [] });
+        return;
+      }
+
+      await res.deferUpdate();
+    }
+
+    const balance = await getBalance(message.member);
+
+    if (balance < fee) return send({ embeds: [new ErrorEmbed("you cant afford this fee")] });
+    fee > 0 ? await addToNypsiBank(fee) : null;
+    await updateBalance(message.member, balance - fee);
+    await addToNypsiBank(fee);
+
+    inventory = await getInventory(message.member);
+
+    if (!inventory.find((i) => i.item == selected.id) || inventory.find((i) => i.item == selected.id).amount == 0) {
+      if (msg) return msg.edit({ embeds: [new ErrorEmbed(`you dont have a ${selected.name}`)] });
+      return send({ embeds: [new ErrorEmbed(`you dont have a ${selected.name}`)] });
+    }
+
+    if (!inventory.find((i) => i.item === selected.id) || inventory.find((i) => i.item == selected.id).amount < amount) {
+      if (msg) return msg.edit({ embeds: [new ErrorEmbed(`you dont have this many ${selected.name}`)] });
+      return send({ embeds: [new ErrorEmbed(`you dont have this many ${selected.name}`)] });
     }
 
     await setInventoryItem(message.member, selected.id, inventory.find((i) => i.item == selected.id).amount - amount, false);
@@ -731,6 +840,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       desc = "there was an error while creating your auction";
     }
 
+    if (msg) return msg.edit({ embeds: [new CustomEmbed(message.member, desc)], components: [] });
     return await send({ embeds: [new CustomEmbed(message.member, desc)] });
   } else if (args[0].toLowerCase() == "watch") {
     let current = await getAuctionWatch(message.member);
