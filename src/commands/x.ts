@@ -851,8 +851,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           return waitForButton();
         }
         logger.info(`admin: ${message.author.tag} (${message.author.id}) set ${user.id} expire to now`);
-        const profile = await getPremiumProfile(user.id);
-        profile.expire(message.client as NypsiClient);
+        await setExpireDate(message.author.id, new Date(0), message.client as NypsiClient);
         await res.editReply({ embeds: [new CustomEmbed(message.member, "done sir.")] });
         return waitForButton();
       }
