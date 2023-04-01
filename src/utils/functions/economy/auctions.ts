@@ -22,7 +22,6 @@ import Constants from "../../Constants";
 import { logger, transaction } from "../../logger";
 import { isPremium } from "../premium/premium";
 import requestDM from "../requestdm";
-import { addToNypsiBank, getTax } from "../tax";
 import { addNotificationToQueue, getDmSettings, getPreferences } from "../users/notifications";
 import itemHistoryWorker from "../workers/itemhistory";
 import { getBalance, updateBalance } from "./balance";
@@ -565,19 +564,10 @@ export async function buyFullAuction(interaction: ButtonInteraction, auction: Au
       .catch(() => {});
   }
 
-  const tax = await getTax();
-
-  let taxedAmount = 0;
-
-  if (!(await isPremium(auction.ownerId))) {
-    taxedAmount = Math.floor(Number(auction.bin) * tax);
-    addToNypsiBank(taxedAmount);
-  }
-
   await Promise.all([
     addInventoryItem(interaction.user.id, auction.itemId, Number(auction.itemAmount)),
     updateBalance(interaction.user.id, balance - Number(auction.bin)),
-    updateBalance(auction.ownerId, (await getBalance(auction.ownerId)) + (Number(auction.bin) - taxedAmount)),
+    updateBalance(auction.ownerId, (await getBalance(auction.ownerId)) + Number(auction.bin)),
   ]);
 
   transaction(
@@ -588,7 +578,7 @@ export async function buyFullAuction(interaction: ButtonInteraction, auction: Au
   transaction(
     interaction.user,
     await interaction.client.users.fetch(auction.ownerId),
-    `$${(Number(auction.bin) - taxedAmount).toLocaleString()} (auction)`
+    `$${Number(auction.bin).toLocaleString()} (auction)`
   );
 
   const items = getItems();
@@ -598,9 +588,6 @@ export async function buyFullAuction(interaction: ButtonInteraction, auction: Au
       const buyers = dmQueue.get(`${auction.ownerId}-${auction.itemId}`).buyers;
       const total = Array.from(buyers.values()).reduce((a, b) => a + b);
       const moneyReceived = Math.floor(Number(auction.bin / auction.itemAmount) * total);
-      let taxedAmount = 0;
-
-      if (!(await isPremium(auction.ownerId))) taxedAmount = Math.floor(moneyReceived * tax);
 
       const embedDm = new CustomEmbed()
         .setColor(Constants.TRANSPARENT_EMBED_COLOR)
@@ -611,7 +598,7 @@ export async function buyFullAuction(interaction: ButtonInteraction, auction: Au
             .map((i) => `**${i[0]}**: ${i[1]}`)
             .join("\n")}`
         )
-        .setFooter({ text: `+$${(moneyReceived - taxedAmount).toLocaleString()}` });
+        .setFooter({ text: `+$${moneyReceived.toLocaleString()}` });
       dmQueue.delete(`${auction.ownerId}-${auction.itemId}`);
 
       await requestDM({
@@ -627,9 +614,7 @@ export async function buyFullAuction(interaction: ButtonInteraction, auction: Au
       .setDescription(
         `your auction for ${auction.itemAmount}x ${items[auction.itemId].emoji} ${
           items[auction.itemId].name
-        } has been bought by ${interaction.user.username} for $**${Math.floor(
-          Number(auction.bin) - taxedAmount
-        ).toLocaleString()}**${taxedAmount != 0 ? `(${(tax * 100).toFixed(1)}% tax)` : ""} `
+        } has been bought by ${interaction.user.username} for $**${Math.floor(Number(auction.bin)).toLocaleString()}**}`
       );
 
     await requestDM({
@@ -742,21 +727,12 @@ export async function buyAuctionOne(interaction: ButtonInteraction, auction: Auc
       .catch(() => {});
   }
 
-  const tax = await getTax();
-
-  let taxedAmount = 0;
-
-  if (!(await isPremium(auction.ownerId))) {
-    taxedAmount = Math.floor(Math.floor(Number(auction.bin / auction.itemAmount)) * tax);
-    addToNypsiBank(taxedAmount);
-  }
-
   await Promise.all([
     addInventoryItem(interaction.user.id, auction.itemId, 1),
     updateBalance(interaction.user.id, balance - Math.floor(Number(auction.bin / auction.itemAmount))),
     updateBalance(
       auction.ownerId,
-      (await getBalance(auction.ownerId)) + (Math.floor(Number(auction.bin / auction.itemAmount)) - taxedAmount)
+      (await getBalance(auction.ownerId)) + Math.floor(Number(auction.bin / auction.itemAmount))
     ),
   ]);
 
@@ -764,7 +740,7 @@ export async function buyAuctionOne(interaction: ButtonInteraction, auction: Auc
   transaction(
     interaction.user,
     await interaction.client.users.fetch(auction.ownerId),
-    `$${(Math.floor(Number(auction.bin / auction.itemAmount)) - taxedAmount).toLocaleString()} (auction)`
+    `$${Math.floor(Number(auction.bin / auction.itemAmount)).toLocaleString()} (auction)`
   );
 
   const items = getItems();
@@ -791,9 +767,6 @@ export async function buyAuctionOne(interaction: ButtonInteraction, auction: Auc
         const buyers = dmQueue.get(`${auction.ownerId}-${auction.itemId}`).buyers;
         const total = Array.from(buyers.values()).reduce((a, b) => a + b);
         const moneyReceived = Math.floor(Number(auction.bin / auction.itemAmount) * total);
-        let taxedAmount = 0;
-
-        if (!(await isPremium(auction.ownerId))) taxedAmount = Math.floor(moneyReceived * tax);
 
         const embedDm = new CustomEmbed()
           .setColor(Constants.TRANSPARENT_EMBED_COLOR)
@@ -804,7 +777,7 @@ export async function buyAuctionOne(interaction: ButtonInteraction, auction: Auc
               .map((i) => `**${i[0]}**: ${i[1]}`)
               .join("\n")}`
           )
-          .setFooter({ text: `+$${(moneyReceived - taxedAmount).toLocaleString()}` });
+          .setFooter({ text: `+$${moneyReceived.toLocaleString()}` });
         dmQueue.delete(`${auction.ownerId}-${auction.itemId}`);
 
         await requestDM({
