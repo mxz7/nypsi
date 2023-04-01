@@ -374,12 +374,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       await msg.edit({
         embeds: [
-          new CustomEmbed(
-            message.member,
-            `you must pay a fee of $**${fee.toLocaleString()}** (${((await getTax()) * 100).toFixed(
-              1
-            )}%) to create this auction`
-          ),
+          new CustomEmbed(message.member, `you must pay a fee of $**${fee.toLocaleString()}** to create this auction`),
         ],
         components: [row],
       });
@@ -791,9 +786,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embeds: [
           new CustomEmbed(
             message.member,
-            `you must pay a fee of $**${fee.toLocaleString()}** (${((await getTax()) * 100).toFixed(
-              1
-            )}%) to create this auction`
+            `you must pay a fee of $**${fee.toLocaleString()}** to create this auction`
           ).setHeader("auction fee"),
         ],
         components: [row],
