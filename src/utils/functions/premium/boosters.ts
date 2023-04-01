@@ -59,7 +59,7 @@ export async function setBooster(userId: string, value: boolean): Promise<void> 
       payload: {
         embed: new CustomEmbed(
           null,
-          "thank you for boosting the nypsi server, you can see your rewards [here](https://discord.com/channels/747056029795221513/1031950370206924903/1089545304099016765)"
+          "thank you for boosting the nypsi server, you can see your rewards [here](https://discord.com/channels/747056029795221513/1031950370206924903/1091698012817985676)"
         )
           .setColor(Constants.EMBED_SUCCESS_COLOR)
           .setHeader("thank you for supporting nypsi!!"),
