@@ -124,7 +124,7 @@ if (!isMainThread) {
               id: "y1",
               display: true,
               position: "left",
-              stacked: true,
+              // stacked: true,
               gridLines: {
                 display: false,
               },
@@ -136,7 +136,6 @@ if (!isMainThread) {
               id: "y2",
               display: true,
               position: "right",
-              stacked: true,
               gridLines: {
                 display: false,
               },

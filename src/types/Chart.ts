@@ -14,7 +14,6 @@ export interface ChartData {
         id: string;
         display: true;
         position: "left" | "right";
-        stacked: true;
         gridLines?: { display?: boolean };
         ticks: { min?: number; max?: number; callback?: (val: number) => string };
       }[];
