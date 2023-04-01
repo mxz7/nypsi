@@ -449,6 +449,8 @@ export async function openCrate(member: GuildMember | string, item: Item): Promi
 
       await addInventoryItem(member, chosen, amount);
 
+      if (chosen.includes("_gem")) await addProgress(typeof member === "string" ? member : member.user.id, "gem_hunter", 1);
+
       found.set(chosen, found.has(chosen) ? found.get(chosen) + amount : amount);
     }
   }
