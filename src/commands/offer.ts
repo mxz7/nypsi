@@ -449,9 +449,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embeds: [
           new CustomEmbed(
             message.member,
-            `you must pay a fee of $**${fee.toLocaleString()}** (${((await getTax()) * 100).toFixed(
-              1
-            )}%) to create this offer`
+            `you must pay a fee of $**${fee.toLocaleString()}** to create this offer`
           ).setHeader("offer fee"),
         ],
         components: [row],
