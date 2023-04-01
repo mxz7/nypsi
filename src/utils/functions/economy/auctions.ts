@@ -614,7 +614,7 @@ export async function buyFullAuction(interaction: ButtonInteraction, auction: Au
       .setDescription(
         `your auction for ${auction.itemAmount}x ${items[auction.itemId].emoji} ${
           items[auction.itemId].name
-        } has been bought by ${interaction.user.username} for $**${Math.floor(Number(auction.bin)).toLocaleString()}**}`
+        } has been bought by ${interaction.user.username} for $**${Math.floor(Number(auction.bin)).toLocaleString()}**`
       );
 
     await requestDM({
