@@ -104,7 +104,7 @@ export async function setMuteRole(guild: Guild, role: Role | string) {
     id = role;
   }
 
-  if (muteRoleCache.has(id)) muteRoleCache.delete(id);
+  if (muteRoleCache.has(guild.id)) muteRoleCache.delete(guild.id);
 
   await prisma.moderation.update({
     where: {
