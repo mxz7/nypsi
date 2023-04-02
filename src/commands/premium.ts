@@ -340,7 +340,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         new CustomEmbed(
           message.member,
           `your message color has been updated to **${await getEmbedColor(message.author.id)}**`
-        ),
+        ).setColor((await getEmbedColor(message.author.id)) as `#${string}`),
       ],
     });
   };
