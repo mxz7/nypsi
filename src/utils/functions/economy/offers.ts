@@ -12,6 +12,8 @@ import prisma from "../../../init/database";
 import { NypsiClient } from "../../../models/Client";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
+import { isPremium } from "../premium/premium";
+import { getTax } from "../tax";
 import { getBalance, updateBalance } from "./balance";
 import { getInventory } from "./inventory";
 import { getItems } from "./utils";
@@ -25,11 +27,18 @@ export async function createOffer(target: User, itemId: string, itemAmount: numb
     new ButtonBuilder().setCustomId("disable-offers").setLabel("disable all offers").setStyle(ButtonStyle.Secondary)
   );
 
+  const tax = await getTax();
+  let taxedAmount = 0;
+
+  if (!(await isPremium(owner))) taxedAmount = Math.floor(money * tax);
+
   const embed = new CustomEmbed(
     owner,
-    `${owner.user.tag} offers $**${money.toLocaleString()}** for your **${itemAmount.toLocaleString()}x** ${
-      getItems()[itemId].emoji
-    } ${getItems()[itemId].name}\n\ndo you accept?`
+    `${owner.user.tag} offers $**${Math.floor(money - taxedAmount).toLocaleString()}**${
+      taxedAmount != 0 ? `(${(tax * 100).toFixed(1)}% tax)` : ""
+    }** for your **${itemAmount.toLocaleString()}x** ${getItems()[itemId].emoji} ${
+      getItems()[itemId].name
+    }\n\ndo you accept?`
   ).setHeader(`${owner.user.username}'s offer`, owner.user.avatarURL());
 
   if (itemAmount > 1 && money > 1000) {
