@@ -139,8 +139,8 @@ export async function runBakery(member: GuildMember) {
       }
     } else if (getBakeryUpgradesData()[upgrade.upgradeId].upgrades === "bake") {
       if (upgrade.upgradeId === "super_cursor")
-        click[0] += upgrade.amount * getBakeryUpgradesData()[upgrade.upgradeId].value;
-      click[1] += upgrade.amount * getBakeryUpgradesData()[upgrade.upgradeId].value;
+        click[0] += Math.floor(upgrade.amount * getBakeryUpgradesData()[upgrade.upgradeId].value);
+      click[1] += Math.floor(upgrade.amount * getBakeryUpgradesData()[upgrade.upgradeId].value);
     }
   }
 
