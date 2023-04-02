@@ -120,8 +120,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     sellWorth = 1000 * amount;
   }
 
-  if (["bitcoin", "ethereum"].includes(selected.id)) sellWorth = Math.floor(sellWorth - sellWorth * 0.05);
-
   let tax = true;
 
   if ((await isPremium(message.member)) && (await getTier(message.member)) == 4) tax = false;
