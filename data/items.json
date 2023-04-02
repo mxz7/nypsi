@@ -1513,6 +1513,10 @@
     "rarity": 3,
     "sell": 300000,
     "role": "bakery-upgrade",
+    "craft": {
+      "time": 21600,
+      "ingrediants": ["cursor:3"]
+    },
     "in_crates": true
   },
   "workers_crate": {
