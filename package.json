@@ -13,7 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "@catppuccin/palette": "0.1.8",
-    "@discordjs/rest": "1.6.0",
+    "@discordjs/rest": "1.7.0",
     "@prisma/client": "4.12.0",
     "@top-gg/sdk": "3.1.4",
     "bree": "9.1.3",
