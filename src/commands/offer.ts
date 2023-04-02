@@ -29,7 +29,6 @@ import { formatNumber, getItems, isEcoBanned } from "../utils/functions/economy/
 import { getXp } from "../utils/functions/economy/xp";
 import { getMember } from "../utils/functions/member";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
-import { addToNypsiBank, getTax } from "../utils/functions/tax";
 import { getPreferences } from "../utils/functions/users/notifications";
 import { getLastKnownTag } from "../utils/functions/users/tag";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -425,63 +424,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (!money || money < 1 || isNaN(money)) return send({ embeds: [new ErrorEmbed("invalid amount")] });
 
-    let fee = Math.floor((await getTax()) * money);
-
-    if (money < 1_000_000) {
-      fee = 0;
-    } else if ((await getTier(message.member)) === 4) {
-      fee = Math.floor(fee * 0.1);
-    } else if ((await getTier(message.member)) >= 2) {
-      fee = Math.floor(fee / 2);
-    }
-
-    let msg: Message;
-
-    if (fee > 0) {
-      const filter = (i: Interaction) => i.user.id === message.author.id;
-
-      const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder().setCustomId("accept-fee").setLabel("yes").setStyle(ButtonStyle.Success),
-        new ButtonBuilder().setCustomId("deny-fee").setLabel("no").setStyle(ButtonStyle.Danger)
-      );
-
-      msg = await send({
-        embeds: [
-          new CustomEmbed(
-            message.member,
-            `you must pay a fee of $**${fee.toLocaleString()}** to create this offer`
-          ).setHeader("offer fee"),
-        ],
-        components: [row],
-      });
-
-      const res = await msg.awaitMessageComponent({ filter, time: 15000 }).catch(() => {});
-
-      if (!res || res.customId === "deny-fee") {
-        await msg.edit({ components: [] });
-        return;
-      }
-
-      await res.deferUpdate();
-    }
-
     const balance = await getBalance(message.member);
 
-    if (balance < money + fee) return send({ embeds: [new ErrorEmbed("you cant afford this")] });
-    fee > 0 ? await addToNypsiBank(fee) : null;
-    await updateBalance(message.member, balance - (money + fee));
+    if (balance < money) return send({ embeds: [new ErrorEmbed("you cant afford this")] });
+    await updateBalance(message.member, balance - money);
     const res = await createOffer(target.user, selected.id, amount, money, message.member);
 
     if (!res) {
-      await updateBalance(message.member, balance + (money + fee));
-      if (msg) return msg.edit({ embeds: [new ErrorEmbed("failed to create offer")], components: [] });
+      await updateBalance(message.member, balance + money);
       return send({ embeds: [new ErrorEmbed("failed to create offer")] });
     } else {
-      if (msg)
-        return msg.edit({
-          embeds: [new CustomEmbed(message.member, `✅ offer has been sent to **${target.user.tag}**`)],
-          components: [],
-        });
       return send({ embeds: [new CustomEmbed(message.member, `✅ offer has been sent to **${target.user.tag}**`)] });
     }
   }
