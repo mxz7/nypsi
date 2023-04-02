@@ -216,7 +216,7 @@ async function prepareGame(
     }
   }
 
-  await addCooldown(cmd.name, message.member, 25);
+  await addCooldown(cmd.name, message.member, 15);
   await redis.sadd(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
   await updateBalance(message.member, (await getBalance(message.member)) - bet);
 

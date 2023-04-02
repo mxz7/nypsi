@@ -133,7 +133,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({ embeds: [embed], ephemeral: true });
   }
 
-  await addCooldown(cmd.name, message.member, 15);
+  await addCooldown(cmd.name, message.member, 5);
 
   const show = async (pages: Map<number, string[]>, pos: number, title: string) => {
     const embed = new CustomEmbed(message.member).setHeader(
