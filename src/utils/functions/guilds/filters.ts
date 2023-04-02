@@ -8,7 +8,6 @@ import { MStoTime } from "../date";
 import { newCase } from "../moderation/cases";
 import { addModLog } from "../moderation/logs";
 import { deleteMute, getAutoMuteLevels, getMuteRole, getMuteViolations, isMuted, newMute } from "../moderation/mute";
-import { cleanString } from "../string";
 import { getPercentMatch } from "./utils";
 
 const chatFilterCache = new Map<string, string[]>();
@@ -91,38 +90,55 @@ export async function checkMessageContent(message: Message) {
   const filter = await getChatFilter(message.guild);
   const match = await getPercentMatch(message.guild);
 
-  let content: string | string[] = cleanString(message.content.toLowerCase().normalize("NFD"));
-
-  content = content.split(" ");
+  const content = message.content.toLowerCase().normalize("NFD");
 
   if (content.length >= 69) {
     for (const word of filter) {
-      if (content.indexOf(word.toLowerCase()) != -1) {
-        addModLog(message.guild, "filter violation", message.author.id, "nypsi", content.join(" "), -1, message.channel.id);
-        await message.delete().catch(() => {});
-        return false;
+      if (word.includes(" ")) {
+        if (content.includes(word.toLowerCase())) {
+          const contentModified = content.replace(word, `**${word}**`);
+          addModLog(message.guild, "filter violation", message.author.id, "nypsi", contentModified, -1, message.channel.id);
+          await message.delete().catch(() => {});
+          return false;
+        }
+      } else {
+        if (content.split(" ").indexOf(word.toLowerCase()) != -1) {
+          const contentModified = content.replace(word, `**${word}**`);
+          addModLog(message.guild, "filter violation", message.author.id, "nypsi", contentModified, -1, message.channel.id);
+          await message.delete().catch(() => {});
+          return false;
+        }
       }
     }
   } else {
     for (const word of filter) {
-      for (const contentWord of content) {
-        const similarity = stringSimilarity.compareTwoStrings(word, contentWord);
-
-        if (similarity >= match / 100) {
-          const contentModified = content.join(" ").replace(contentWord, `**${contentWord}**`);
-
-          addModLog(
-            message.guild,
-            "filter violation",
-            message.author.id,
-            "nypsi",
-            contentModified,
-            -1,
-            message.channel.id,
-            (similarity * 100).toFixed(2)
-          );
+      if (word.includes(" ")) {
+        if (content.includes(word.toLowerCase())) {
+          const contentModified = content.replace(word, `**${word}**`);
+          addModLog(message.guild, "filter violation", message.author.id, "nypsi", contentModified, -1, message.channel.id);
           await message.delete().catch(() => {});
           return false;
+        }
+      } else {
+        for (const contentWord of content) {
+          const similarity = stringSimilarity.compareTwoStrings(word, contentWord);
+
+          if (similarity >= match / 100) {
+            const contentModified = content.replace(contentWord, `**${contentWord}**`);
+
+            addModLog(
+              message.guild,
+              "filter violation",
+              message.author.id,
+              "nypsi",
+              contentModified,
+              -1,
+              message.channel.id,
+              (similarity * 100).toFixed(2)
+            );
+            await message.delete().catch(() => {});
+            return false;
+          }
         }
       }
     }
