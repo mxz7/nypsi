@@ -87,7 +87,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({ embeds: [embed], ephemeral: true });
   }
 
-  await addCooldown(cmd.name, message.member, 25);
+  await addCooldown(cmd.name, message.member, 15);
 
   const gambleStats = async () => {
     const gambleStats = await getGambleStats(message.member);
