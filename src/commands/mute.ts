@@ -370,11 +370,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
   }
 
-  if (timedMute) {
+  if (timedMute && mode !== "timeout") {
     await newMute(message.guild, members1, unmuteDate);
   }
 
-  if (!timedMute) {
+  if (!timedMute && mode !== "timeout") {
     await newMute(message.guild, members1, new Date(3130000000000));
   }
 
