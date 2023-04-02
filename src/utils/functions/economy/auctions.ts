@@ -746,7 +746,7 @@ export async function buyAuctionOne(interaction: ButtonInteraction, auction: Auc
 
   let taxedAmount = 0;
 
-  if (!(await isPremium(auction.ownerId))) {
+  if (!(await isPremium(auction.ownerId)) && Number(auction.bin / auction.itemAmount) > 1_000_000) {
     taxedAmount = Math.floor(Math.floor(Number(auction.bin / auction.itemAmount)) * tax);
     addToNypsiBank(taxedAmount);
   }

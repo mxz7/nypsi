@@ -77,7 +77,8 @@ export default {
     const tax = await getTax();
     let taxedAmount = 0;
 
-    if (!(await isPremium(offer.ownerId))) taxedAmount = Math.floor(Number(offer.money) * tax);
+    if (!(await isPremium(offer.ownerId)) && Number(offer.money) > 1_000_000)
+      taxedAmount = Math.floor(Number(offer.money) * tax);
 
     await addToNypsiBank(taxedAmount);
     await updateBalance(interaction.user.id, (await getBalance(interaction.user.id)) + (Number(offer.money) - taxedAmount));
