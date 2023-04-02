@@ -114,13 +114,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     });
   }
 
-  let cooldownLength = 7;
-
-  if (selected.role == "booster") {
-    cooldownLength = 3;
-  }
-
-  await addCooldown(cmd.name, message.member, cooldownLength);
+  await addCooldown(cmd.name, message.member, 5);
 
   if (selected.id.includes("gun")) {
     return send({
