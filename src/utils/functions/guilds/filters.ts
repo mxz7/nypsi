@@ -199,18 +199,16 @@ export async function checkAutoMute(message: Message) {
       await deleteMute(message.guild, message.member);
     }
 
-    await Promise.all([
-      newCase(
-        message.guild,
-        "mute",
-        message.author.id,
-        message.guild.members.me.user.tag,
-        `[${MStoTime(length * 1000, true).trim()}] filter violation`
-      ),
+    await newCase(
+      message.guild,
+      "mute",
+      message.author.id,
+      message.guild.members.me.user.tag,
+      `[${MStoTime(length * 1000, true).trim()}] filter violation`
+    );
+    if (mode !== "timeout")
       newMute(message.guild, [message.author.id], new Date(Date.now() + length * 1000)),
-    ]);
-
-    logger.info(`::auto ${message.guild.id} ${message.author.id} automuted ${length}s`);
+        logger.info(`::auto ${message.guild.id} ${message.author.id} automuted ${length}s`);
 
     let successful = false;
 
