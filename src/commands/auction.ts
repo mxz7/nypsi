@@ -411,7 +411,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       embed.setDescription("there was an error while creating your auction");
     }
 
-    return await edit({ embeds: [embed] }, msg);
+    return await edit({ embeds: [embed], components: [] }, msg);
   };
 
   const manageAuctions = async (msg?: Message) => {
