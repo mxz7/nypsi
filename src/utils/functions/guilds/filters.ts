@@ -216,7 +216,10 @@ export async function checkAutoMute(message: Message) {
 
     if (mode == "timeout") {
       await message.member
-        .timeout(length, `filter violation auto mute - ${MStoTime(length * 1000, true).trim()}`)
+        .disableCommunicationUntil(
+          new Date(Date.now() + length * 1000),
+          `filter violation auto mute - ${MStoTime(length * 1000, true).trim()}`
+        )
         .then(() => {
           successful = true;
         })
