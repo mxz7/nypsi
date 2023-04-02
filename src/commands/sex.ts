@@ -202,25 +202,23 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       let description = "";
 
-      if (args.length != 0) {
-        if (args.length > 0) {
-          description = args.join(" ");
-          const descriptionCheck = cleanString(description);
+      if (args.length > 0) {
+        description = args.join(" ");
+        const descriptionCheck = cleanString(description);
 
-          for (const word of descFilter) {
-            if (descriptionCheck.includes(word)) {
-              description = "";
-              break;
-            }
+        for (const word of descFilter) {
+          if (descriptionCheck.includes(word)) {
+            description = "";
+            break;
           }
-          if (description.length > 50) {
-            description = description.substring(0, 50) + "...";
-          }
+        }
+        if (description.length > 50) {
+          description = description.substring(0, 50) + "...";
         }
       }
 
       if (description !== "") {
-        embed.setDescription(
+        embed2.setDescription(
           `a match has been made from **${
             message.guild.id == "747056029795221513" ? "[nypsi](https://discord.gg/hJTDNST)" : message.guild.name
           }**\n\n` +
