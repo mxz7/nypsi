@@ -9,6 +9,8 @@ import { getBalance, updateBalance } from "../utils/functions/economy/balance";
 import { addInventoryItem, getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
 import { checkOffer } from "../utils/functions/economy/offers";
 import { getItems, isEcoBanned } from "../utils/functions/economy/utils";
+import { isPremium } from "../utils/functions/premium/premium";
+import { addToNypsiBank, getTax } from "../utils/functions/tax";
 import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications";
 import { transaction } from "../utils/logger";
 
@@ -71,7 +73,15 @@ export default {
       inventory.find((i) => i.item === offer.itemId).amount - Number(offer.itemAmount),
       false
     );
-    await updateBalance(interaction.user.id, (await getBalance(interaction.user.id)) + Number(offer.money));
+
+    const tax = await getTax();
+    let taxedAmount = 0;
+
+    if (!(await isPremium(offer.ownerId)) && Number(offer.money) > 1_000_000)
+      taxedAmount = Math.floor(Number(offer.money) * tax);
+
+    await addToNypsiBank(taxedAmount);
+    await updateBalance(interaction.user.id, (await getBalance(interaction.user.id)) + (Number(offer.money) - taxedAmount));
     await addInventoryItem(offer.ownerId, offer.itemId, Number(offer.itemAmount));
 
     await interaction.editReply({
