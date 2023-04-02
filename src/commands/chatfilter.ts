@@ -1,8 +1,18 @@
-import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
+import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  CommandInteraction,
+  Message,
+  MessageActionRowComponentBuilder,
+  PermissionFlagsBits,
+} from "discord.js";
+import { inPlaceSort } from "fast-sort";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { getChatFilter, updateChatFilter } from "../utils/functions/guilds/filters";
 import { getPercentMatch, getPrefix, setPercentMatch } from "../utils/functions/guilds/utils";
+import PageManager from "../utils/functions/page";
 
 const cmd = new Command("chatfilter", "change the chat filter for your server", "admin")
   .setAliases(["filter"])
@@ -21,7 +31,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const prefix = await getPrefix(message.guild);
 
   if (args.length == 0) {
-    const embed = new CustomEmbed(message.member, "`" + filter.join("`\n`") + "`")
+    const pages = PageManager.createPages(inPlaceSort(filter).asc(), 15);
+
+    const embed = new CustomEmbed(message.member, "`" + pages.get(1).join("`\n`") + "`")
       .setHeader("current chat filter")
       .setFooter({ text: `use ${prefix}filter (add/del/+/-) to modify the filter` });
 
@@ -29,7 +41,24 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       embed.setDescription("`❌` empty chat filter");
     }
 
-    return message.channel.send({ embeds: [embed] });
+    if (pages.size === 1) return message.channel.send({ embeds: [embed] });
+
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
+      new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
+    );
+
+    const msg = await message.channel.send({ embeds: [embed], components: [row] });
+
+    const manager = new PageManager({
+      embed,
+      message: msg,
+      row,
+      userId: message.author.id,
+      pages,
+    });
+
+    return manager.listen();
   }
 
   if (args[0].toLowerCase() == "help") {
