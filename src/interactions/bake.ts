@@ -22,6 +22,6 @@ export default {
       }
     }, 2500);
 
-    return runCommand("bake", interaction as unknown as NypsiCommandInteraction, []);
+    return runCommand("bake", int, []);
   },
 } as InteractionHandler;
