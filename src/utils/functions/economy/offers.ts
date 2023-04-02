@@ -35,10 +35,8 @@ export async function createOffer(target: User, itemId: string, itemAmount: numb
   const embed = new CustomEmbed(
     owner,
     `${owner.user.tag} offers $**${Math.floor(money - taxedAmount).toLocaleString()}**${
-      taxedAmount != 0 ? `(${(tax * 100).toFixed(1)}% tax)` : ""
-    }** for your **${itemAmount.toLocaleString()}x** ${getItems()[itemId].emoji} ${
-      getItems()[itemId].name
-    }\n\ndo you accept?`
+      taxedAmount != 0 ? ` (${(tax * 100).toFixed(1)}% tax)` : ""
+    } for your **${itemAmount.toLocaleString()}x** ${getItems()[itemId].emoji} ${getItems()[itemId].name}\n\ndo you accept?`
   ).setHeader(`${owner.user.username}'s offer`, owner.user.avatarURL());
 
   if (itemAmount > 1 && money > 1000) {
