@@ -30,7 +30,7 @@ export async function createOffer(target: User, itemId: string, itemAmount: numb
   const tax = await getTax();
   let taxedAmount = 0;
 
-  if (!(await isPremium(owner)) && money > 1_000_000) taxedAmount = Math.floor(money * tax);
+  if (!(await isPremium(owner)) && money >= 1_000_000) taxedAmount = Math.floor(money * tax);
 
   const embed = new CustomEmbed(
     owner,
