@@ -273,6 +273,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           await res.followUp({ embeds: [new ErrorEmbed("you cannot afford this worker")], ephemeral: true });
           return pageManager();
         } else {
+          await updateBalance(message.member, balance - baseWorkers[selected].cost);
           await addWorker(message.member, selected);
 
           userWorkers = await getWorkers(message.member);
