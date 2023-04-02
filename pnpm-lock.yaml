@@ -2,8 +2,8 @@ lockfileVersion: '6.0'
 
 dependencies:
   '@catppuccin/palette':
-    specifier: 0.1.7
-    version: 0.1.7
+    specifier: 0.1.8
+    version: 0.1.8
   '@discordjs/rest':
     specifier: 1.6.0
     version: 1.6.0
@@ -180,8 +180,8 @@ packages:
     engines: {node: '>= 10'}
     dev: false
 
-  /@catppuccin/palette@0.1.7:
-    resolution: {integrity: sha512-tgYE1PQLEs4Nz/OA28/kD0WhJKQEvXcuL2BPVdyHYQr0zb9l03lAwRXt7ZAP5PPuczFq0BgemPPdAdG+T2FZug==}
+  /@catppuccin/palette@0.1.8:
+    resolution: {integrity: sha512-41quIj08vgPMy8kQxQb0+VqxuTlo2xfNYGSgOuiJXNojWnGuhLxBc61jgu2jiZYGNXVqgVNGWwmWEUf6s32jiA==}
     dev: false
 
   /@commitlint/cli@17.5.1:
