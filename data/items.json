@@ -1510,14 +1510,10 @@
     "aliases": ["super_pointer", "super pointer"],
     "emoji": "<:super_cursor:1090263183278739517>",
     "longDesc": "+1 min & max cookie when baking",
-    "rarity": 69,
+    "rarity": 3,
     "sell": 300000,
     "role": "bakery-upgrade",
-    "craft": {
-      "time": 21600,
-      "ingrediants": ["cursor:3"]
-    },
-    "in_crates": false
+    "in_crates": true
   },
   "workers_crate": {
     "id": "workers_crate",
@@ -1626,6 +1622,7 @@
       "id:stolen_credit_card",
       "id:streak_token:50",
       "id:grandma:60",
+      "id:super_cursor:40",
       "id:diamond_pickaxe:40",
       "id:iron_pickaxe:70",
       "id:wooden_pickaxe:75",
@@ -1662,6 +1659,7 @@
       "id:streak_token",
       "id:grandma:70",
       "id:cursor:70",
+      "id:super_cursor:50",
       "id:diamond_pickaxe:50",
       "id:iron_pickaxe:75",
       "id:incredible_fishing_rod:50",
@@ -1694,6 +1692,7 @@
       "money:10000000",
       "karma:250",
       "id:double_xp",
+      "id:super_cursor",
       "id:steve",
       "id:obsidian",
       "id:diamond_pickaxe",
@@ -1727,7 +1726,7 @@
       "money:3000000",
       "xp:175",
       "karma:25",
-      "id:cursor:75",
+      "id:super_cursor",
       "id:bob",
       "id:diamond_pickaxe:80",
       "id:incredible_fishing_rod:95",
@@ -1766,6 +1765,7 @@
       "id:ancient_debris:60",
       "id:stolen_credit_card:90",
       "id:grandma:20",
+      "id:super_cursor:5",
       "id:lightning_mcqueen:40",
       "id:redbull:10",
       "id:xp_potion:10",
