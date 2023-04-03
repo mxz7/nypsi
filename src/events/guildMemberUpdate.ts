@@ -30,7 +30,7 @@ export default async function guildMemberUpdate(oldMember: GuildMember, newMembe
     if (oldMember.displayName !== newMember.displayName && newMember.guild) { //not sure if newMember.guild is necessary
       const embed = new CustomEmbed().disableFooter().setTimestamp()
 
-      embed.setTitle('user nickname changed')
+      embed.setTitle("user nickname changed")
       embed.setDescription(
         `**${oldMember.displayName}** -> **${newMember.displayName}**`
       )
