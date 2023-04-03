@@ -33,7 +33,7 @@ export default async function guildMemberUpdate(oldMember: GuildMember, newMembe
 
       embed.setTitle("user nickname changed")
       embed.setDescription(
-        `${newMember} (${newMember.id})\n**${oldMember.displayName}** -> **${newMember.displayName}**`
+        `${newMember.toString()} (${newMember.id})\n**${oldMember.displayName}** -> **${newMember.displayName}**`
       )
       await addLog(newMember.guild, "member", embed)
     }
