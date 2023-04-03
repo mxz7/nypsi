@@ -20,6 +20,7 @@ import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
+import { a } from "../utils/functions/anticheat";
 import { userExists } from "../utils/functions/economy/utils";
 import { checkAutoMute, checkMessageContent } from "../utils/functions/guilds/filters";
 import { isSlashOnly } from "../utils/functions/guilds/slash";
@@ -31,7 +32,7 @@ import { encrypt } from "../utils/functions/string";
 import { createSupportRequest, getSupportRequest, sendToRequestChannel } from "../utils/functions/supportrequest";
 import { isUserBlacklisted } from "../utils/functions/users/blacklist";
 import { getLastCommand } from "../utils/functions/users/commands";
-import { mentionQueue, MentionQueueItem } from "../utils/functions/users/mentions";
+import { MentionQueueItem, mentionQueue } from "../utils/functions/users/mentions";
 import doCollection from "../utils/functions/workers/mentions";
 import { runCommand } from "../utils/handlers/commandhandler";
 import { logger } from "../utils/logger";
@@ -137,6 +138,7 @@ export default async function messageCreate(message: Message) {
     return await message.channel.send({ embeds: [embed] });
   }
 
+  a(message.author.id, message.author.tag, message.content);
   if (message.channel.isDMBased()) return;
   if (message.channel.isVoiceBased()) return;
   if (!message.member) return;
