@@ -322,7 +322,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         const data = b(user.id);
 
-        await res.editReply({ embeds: [new CustomEmbed(message.member, `\`\`\`${JSON.stringify(data, null, 2)}\`\`\``)] });
+        await fs.writeFile(`/tmp/nypsi_ac_${user.id}.txt`, JSON.stringify(data, null, 2));
+
+        await res.editReply({
+          files: [{ attachment: await fs.readFile(`/tmp/nypsi_ac_${user.id}.txt`), name: `nypsi_ac_${user.id}.txt` }],
+        });
         return waitForButton();
       } else if (res.customId === "ac-clear") {
         if ((await getAdminLevel(message.author.id)) < 3) {
