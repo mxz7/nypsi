@@ -34,9 +34,11 @@ export async function toggleLock(userId: string, force = false) {
   if (await isLockedOut(userId)) {
     await redis.srem(Constants.redis.nypsi.LOCKED_OUT, userId);
   } else {
-    if ((await isVerified(userId)) && !force) return;
+    if ((await isVerified(userId)) && !force) return false;
     await redis.sadd(Constants.redis.nypsi.LOCKED_OUT, userId);
   }
+
+  return true;
 }
 
 export async function createCaptcha() {
