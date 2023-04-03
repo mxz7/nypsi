@@ -232,7 +232,7 @@ export async function claimFromWorkers(userId: string): Promise<string> {
 
     while (gemChance > 0 && percentChance(gemChance * worker.stored)) {
       amounts.set("gem_scrap", amounts.has("gem_scrap") ? amounts.get("gem_scrap") + 1 : 1);
-      await addInventoryItem(worker.userId, "gem_scrap", 1, false);
+      await addInventoryItem(worker.userId, "gem_shard", 1, false);
     }
 
     while (scrapChance > 0 && percentChance(scrapChance * worker.stored)) {
