@@ -810,7 +810,7 @@ export async function runCommand(
   }, 2000);
 
   await Promise.all([
-    a(message.author.id, message.author.tag, message.content),
+    a(message.author.id, message.author.tag, message.content, cmd),
     updateCommandUses(message.member),
     updateUser(message.author || message.member.user || null, command.name),
     redis.hincrby(Constants.redis.nypsi.TOP_COMMANDS, command.name, 1),
