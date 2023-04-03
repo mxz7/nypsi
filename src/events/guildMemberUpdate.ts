@@ -35,6 +35,18 @@ export default async function guildMemberUpdate(oldMember: GuildMember, newMembe
       await setBooster(newMember.user.id, false);
     }
   }
+
+  if (oldMember.displayName !== newMember.displayName && newMember.guild) { //not sure if newMember.guild is necessary
+
+    const embed = new CustomEmbed().disableFooter().setTimestamp()
+
+    embed.setTitle('user nickname changed')
+    embed.setDescription(
+      `**${oldMember.displayName}** -> **${newMember.displayName}**`
+    )
+
+    await addLog(newMember.guild, "member", embed)
+  }
 }
 
 async function createLog(member: GuildMember, roles: Role[], added: boolean) {
