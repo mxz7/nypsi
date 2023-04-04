@@ -403,7 +403,6 @@ async function addMention() {
 
       members.delete(memberID);
 
-      if (member.user.bot) continue;
       if (member.user.id == mention.message.author.id) continue;
 
       try {
