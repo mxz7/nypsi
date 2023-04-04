@@ -6,10 +6,11 @@ import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
 import { getTier, isPremium } from "../premium/premium";
+import { percentChance } from "../random";
 import { addProgress } from "./achievements";
 import { addInventoryItem, getInventory } from "./inventory";
 import { isPassive } from "./passive";
-import { getBakeryUpgradesData } from "./utils";
+import { getBakeryUpgradesData, getItems } from "./utils";
 import ms = require("ms");
 
 async function getLastBake(member: GuildMember | string) {
@@ -109,6 +110,7 @@ export async function runBakery(member: GuildMember) {
   const inventory = await getInventory(member);
 
   let passive = 0;
+  let cakeChance = 0;
   const click = [1, 3];
 
   if (await isPremium(member)) {
@@ -141,6 +143,8 @@ export async function runBakery(member: GuildMember) {
       if (upgrade.upgradeId === "super_cursor")
         click[0] += Math.floor(upgrade.amount * getBakeryUpgradesData()[upgrade.upgradeId].value);
       click[1] += Math.floor(upgrade.amount * getBakeryUpgradesData()[upgrade.upgradeId].value);
+    } else if (getBakeryUpgradesData()[upgrade.upgradeId].upgrades === "cake") {
+      cakeChance += upgrade.amount * getBakeryUpgradesData()[upgrade.upgradeId].value;
     }
   }
 
@@ -166,6 +170,7 @@ export async function runBakery(member: GuildMember) {
   }
 
   let chosenAmount: number;
+  let cakeAmount = 0;
 
   if (click[0] >= click[1]) {
     chosenAmount = click[1];
@@ -173,7 +178,10 @@ export async function runBakery(member: GuildMember) {
     chosenAmount = Math.floor(Math.random() * (click[1] - click[0])) + click[0];
   }
 
+  while (percentChance(cakeChance > 25 ? 25 : cakeChance)) cakeAmount++;
+
   await addInventoryItem(member, "cookie", chosenAmount + passive);
+  if (cakeAmount > 0) await addInventoryItem(member, "cake", cakeAmount);
 
   const embed = new CustomEmbed(member).setHeader(`${member.user.username}'s bakery`, member.user.avatarURL());
 
@@ -189,9 +197,17 @@ export async function runBakery(member: GuildMember) {
     );
   }
 
-  embed.setDescription(
-    `you baked **${(chosenAmount + passive).toLocaleString()}** cookie${chosenAmount + passive > 1 ? "s" : ""}!! 🍪`
-  );
+  if (cakeAmount > 0) {
+    embed.setDescription(
+      `you baked **${(chosenAmount + passive).toLocaleString()}** cookie${
+        chosenAmount + passive > 1 ? "s" : ""
+      } 🍪 and ${cakeAmount.toLocaleString()} cakes ${getItems()["cake"].emoji} !!`
+    );
+  } else {
+    embed.setDescription(
+      `you baked **${(chosenAmount + passive).toLocaleString()}** cookie${chosenAmount + passive > 1 ? "s" : ""} 🍪 !!`
+    );
+  }
 
   if (breakdownDesc.length > 0) {
     embed.addField("stats", breakdownDesc.join("\n"));
