@@ -19,5 +19,12 @@
     "emoji": "<:super_cursor:1090263183278739517>",
     "upgrades": "bake",
     "value": 1.5
+  },
+  "grandpa": {
+    "id": "grandpa",
+    "name": "grandpa",
+    "emoji": "👴🏻",
+    "upgrades": "cake",
+    "value": 0.5
   }
 }

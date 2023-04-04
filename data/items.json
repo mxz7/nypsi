@@ -1308,6 +1308,18 @@
     "role": "bakery-upgrade",
     "in_crates": true
   },
+  "grandpa": {
+    "id": "grandpa",
+    "name": "grandpa",
+    "plural": "grandpas",
+    "aliases": ["grandad", "granda", "grandaddy"],
+    "emoji": "👴🏻",
+    "longDesc": "+0.5% chance of baking a cake",
+    "rarity": 2,
+    "sell": 100000,
+    "role": "bakery-upgrade",
+    "in_crates": true
+  },
   "highroller": {
     "id": "highroller",
     "name": "highroller",
@@ -1626,6 +1638,7 @@
       "id:stolen_credit_card",
       "id:streak_token:50",
       "id:grandma:60",
+      "id:grandpa:50",
       "id:super_cursor:40",
       "id:diamond_pickaxe:40",
       "id:iron_pickaxe:70",
@@ -1662,6 +1675,7 @@
       "id:coffee:40",
       "id:streak_token",
       "id:grandma:70",
+      "id:grandpa:60",
       "id:cursor:70",
       "id:super_cursor:50",
       "id:diamond_pickaxe:50",
@@ -1769,6 +1783,7 @@
       "id:ancient_debris:60",
       "id:stolen_credit_card:90",
       "id:grandma:20",
+      "id:grandpa:10",
       "id:super_cursor:5",
       "id:lightning_mcqueen:40",
       "id:redbull:10",
