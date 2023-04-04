@@ -120,7 +120,7 @@ export async function checkMessageContent(message: Message) {
           return false;
         }
       } else {
-        for (const contentWord of content) {
+        for (const contentWord of content.split(" ")) {
           const similarity = stringSimilarity.compareTwoStrings(word, contentWord);
 
           if (similarity >= match / 100) {
