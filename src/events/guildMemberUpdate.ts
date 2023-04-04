@@ -30,9 +30,12 @@ export default async function guildMemberUpdate(oldMember: GuildMember, newMembe
 
   if (oldMember.displayName !== newMember.displayName && (await isLogsEnabled(newMember.guild))) {
     //not sure if newMember.guild is necessary
-    const embed = new CustomEmbed().disableFooter().setTimestamp();
+    const embed = new CustomEmbed()
+      .disableFooter()
+      .setTimestamp()
+      .setHeader(newMember.user.username, newMember.user.avatarURL());
 
-    embed.setTitle("user nickname changed");
+    embed.setTitle("nickname changed");
     embed.setDescription(
       `${newMember.toString()} (${newMember.id})\n**${oldMember.displayName}** -> **${newMember.displayName}**`
     );
