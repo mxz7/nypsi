@@ -680,7 +680,7 @@
       "effect": 0.5,
       "time": 300
     },
-    "in_crates": true
+    "in_crates": false
   },
   "tooth": {
     "id": "tooth",
@@ -1773,7 +1773,6 @@
       "money:300000",
       "xp:100",
       "id:lawyer",
-      "id:cake",
       "id:diamond",
       "id:cookie",
       "id:worm",
