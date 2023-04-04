@@ -669,16 +669,15 @@
     "plural": "cakes",
     "emoji": "<:nypsi_cake:1002977512630001725>",
     "longDesc": "yum yum 😋",
-    "rarity": 0,
+    "rarity": 69,
     "role": "booster",
-    "booster_desc": "eat a cake to get +**10**% xp (stacks up to 3)",
+    "booster_desc": "eat a cake to get +**50**% xp",
     "buy": 0,
     "sell": 50000,
-    "stackable": true,
-    "max": 3,
+    "stackable": false,
     "boosterEffect": {
       "boosts": ["xp"],
-      "effect": 0.1,
+      "effect": 0.5,
       "time": 300
     },
     "in_crates": true
