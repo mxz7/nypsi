@@ -28,15 +28,16 @@ export default async function guildMemberUpdate(oldMember: GuildMember, newMembe
     if (roles.length != 0) await createLog(oldMember, roles, false);
   }
 
-  if (oldMember.displayName !== newMember.displayName && newMember.guild && (await isLogsEnabled(newMember.guild))) { //not sure if newMember.guild is necessary
-      const embed = new CustomEmbed().disableFooter().setTimestamp()
+  if (oldMember.displayName !== newMember.displayName && (await isLogsEnabled(newMember.guild))) {
+    //not sure if newMember.guild is necessary
+    const embed = new CustomEmbed().disableFooter().setTimestamp();
 
-      embed.setTitle("user nickname changed")
-      embed.setDescription(
-        `${newMember.toString()} (${newMember.id})\n**${oldMember.displayName}** -> **${newMember.displayName}**`
-      )
-      await addLog(newMember.guild, "member", embed)
-    }
+    embed.setTitle("user nickname changed");
+    embed.setDescription(
+      `${newMember.toString()} (${newMember.id})\n**${oldMember.displayName}** -> **${newMember.displayName}**`
+    );
+    await addLog(newMember.guild, "member", embed);
+  }
 
   if (newMember.guild.id === Constants.NYPSI_SERVER_ID) {
     if (newMember.roles.cache.has(Constants.BOOST_ROLE_ID) && !(await isBooster(newMember.user.id))) {
@@ -45,7 +46,6 @@ export default async function guildMemberUpdate(oldMember: GuildMember, newMembe
       await setBooster(newMember.user.id, false);
     }
   }
-
 }
 
 async function createLog(member: GuildMember, roles: Role[], added: boolean) {
