@@ -106,7 +106,7 @@
       "id": "manager",
       "name": "manager",
       "upgrades": "per_item",
-      "effect": 0.4,
+      "effect": 0.75,
       "stack_limit": 15,
       "for": "quarry"
     },
