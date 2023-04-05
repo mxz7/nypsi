@@ -70,12 +70,6 @@ export function loadItems(crypto = true) {
   }
 }
 
-function randomOffset() {
-  return Math.floor(Math.random() * 50000);
-}
-
-let padlockPrice = 25000 + randomOffset();
-
 async function updateCryptoWorth() {
   let res = await fetch("https://api.coinbase.com/v2/exchange-rates?currency=BTC").then((res) => res.json());
 
@@ -117,23 +111,10 @@ export function getBaseUpgrades() {
   return baseUpgrades;
 }
 
-export function getPadlockPrice(): number {
-  return padlockPrice;
-}
-
 export function runEconomySetup() {
   setInterval(updateCryptoWorth, 1500000);
 
   loadItems();
-
-  items["padlock"].buy = padlockPrice;
-  items["padlock"].sell = padlockPrice / 3;
-
-  setInterval(() => {
-    padlockPrice = 25000 + randomOffset();
-    items["padlock"].buy = padlockPrice;
-    items["padlock"].sell = Math.floor(padlockPrice / 3);
-  }, 3600000);
 }
 
 export async function userExists(member: GuildMember | string): Promise<boolean> {
