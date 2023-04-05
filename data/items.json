@@ -532,7 +532,7 @@
     "plural": "mineshaft chests",
     "emoji": "<:nypsi_chest:1034843159647236190>",
     "role": "crate",
-    "longDesc": "open to receive 3 mining related items",
+    "longDesc": "open to receive 5 mining related items",
     "aliases": ["mineshaft", "chest"],
     "rarity": 3,
     "in_crates": false,
