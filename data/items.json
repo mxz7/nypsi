@@ -536,7 +536,7 @@
     "aliases": ["mineshaft", "chest"],
     "rarity": 3,
     "in_crates": false,
-    "crate_runs": 5,
+    "crate_runs": 7,
     "items": [
       "id:wooden_pickaxe",
       "id:iron_pickaxe",
