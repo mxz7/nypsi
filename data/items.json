@@ -619,6 +619,8 @@
     "longDesc": "protect your balance",
     "role": "item",
     "rarity": 0,
+    "buy": 50000,
+    "sell": 25000,
     "in_crates": true
   },
   "lock_pick": {
