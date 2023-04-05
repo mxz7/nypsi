@@ -1823,7 +1823,7 @@
     "longDesc": "gem shards have no known powers unlike intact shards, however, it is known that when you put enough gem shards together they will reliably form into full shards, if you're lucky...",
     "role": "item",
     "aliases": ["shard", "shards"],
-    "rarity": 69,
+    "rarity": 3,
     "buy": 0,
     "sell": 500000,
     "in_crates": false
