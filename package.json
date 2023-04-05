@@ -57,7 +57,7 @@
     "@typescript-eslint/eslint-plugin": "5.57.1",
     "@typescript-eslint/parser": "5.57.1",
     "eslint": "8.37.0",
-    "eslint-plugin-deprecation": "1.4.0",
+    "eslint-plugin-deprecation": "1.4.1",
     "husky": "8.0.3",
     "prettier": "2.8.7",
     "prisma": "4.12.0",
