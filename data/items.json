@@ -109,7 +109,7 @@
     "rarity": 69,
     "aliases": ["iron"],
     "buy": 0,
-    "sell": 15000,
+    "sell": 30000,
     "in_crates": false
   },
   "gold_ingot": {
@@ -122,7 +122,7 @@
     "rarity": 69,
     "aliases": ["gold"],
     "buy": 0,
-    "sell": 20000,
+    "sell": 45000,
     "in_crates": false,
     "craft": {
       "ingrediants": ["gold_nugget:9"],
@@ -138,7 +138,7 @@
     "role": "sellable",
     "rarity": 3,
     "buy": 0,
-    "sell": 50000,
+    "sell": 75000,
     "in_crates": false
   },
   "obsidian": {
@@ -149,7 +149,7 @@
     "role": "resource",
     "rarity": 4,
     "buy": 0,
-    "sell": 75000,
+    "sell": 100000,
     "in_crates": false
   },
   "emerald": {
@@ -161,7 +161,7 @@
     "role": "sellable",
     "rarity": 3,
     "buy": 0,
-    "sell": 75000,
+    "sell": 100000,
     "in_crates": false
   },
   "amethyst": {
@@ -173,7 +173,7 @@
     "role": "sellable",
     "rarity": 3,
     "buy": 0,
-    "sell": 50000,
+    "sell": 85000,
     "in_crates": false
   },
   "furnace": {
@@ -220,7 +220,7 @@
     "role": "sellable",
     "rarity": 1,
     "buy": 0,
-    "sell": 5000,
+    "sell": 25000,
     "in_crates": false
   },
   "gold_ore": {
@@ -268,7 +268,7 @@
     "role": "sellable",
     "rarity": 69,
     "buy": 0,
-    "sell": 1500000,
+    "sell": 5000000,
     "craft": {
       "time": 1200,
       "ingrediants": ["netherite_scrap:4", "gold_ingot:4"]
