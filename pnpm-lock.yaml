@@ -47,8 +47,8 @@ dependencies:
     specifier: 3.2.1
     version: 3.2.1
   figlet:
-    specifier: 1.5.2
-    version: 1.5.2
+    specifier: 1.6.0
+    version: 1.6.0
   imgur:
     specifier: 2.2.0
     version: 2.2.0
@@ -1712,9 +1712,10 @@ packages:
       reusify: 1.0.4
     dev: true
 
-  /figlet@1.5.2:
-    resolution: {integrity: sha512-WOn21V8AhyE1QqVfPIVxe3tupJacq1xGkPTB4iagT6o+P2cAgEOOwIxMftr4+ZCTI6d551ij9j61DFr0nsP2uQ==}
+  /figlet@1.6.0:
+    resolution: {integrity: sha512-31EQGhCEITv6+hi2ORRPyn3bulaV9Fl4xOdR169cBzH/n1UqcxsiSB/noo6SJdD7Kfb1Ljit+IgR1USvF/XbdA==}
     engines: {node: '>= 0.4.0'}
+    hasBin: true
     dev: false
 
   /file-entry-cache@6.0.1:
