@@ -211,35 +211,27 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   let banLength = "";
 
-  const embed = new CustomEmbed(message.member).setDescription(
-    "✅ **" + count + "** members banned for: " + reason.split(": ")[1]
-  );
+  const embed = new CustomEmbed(message.member).setDescription("✅ **" + count + "** members banned");
 
   if (temporary) {
     banLength = getTime(duration * 1000);
-    embed.setDescription(`✅ **${count}** members banned for: **${banLength}**`);
-  } else if (reason.split(": ")[1] == "no reason given") {
-    embed.setDescription(`✅ **${count}** members banned`);
+    embed.setDescription(`✅ **${count}** members banned for **${banLength}**`);
   } else {
-    embed.setDescription(`✅ **${count}** members banned for: ${reason.split(": ")[1]}`);
+    embed.setDescription(`✅ **${count}** members banned`);
   }
 
   if (count == 1 && failed.length == 0) {
     if (idOnly) {
       if (temporary) {
-        embed.setDescription(`✅ \`${idUser}\` has been banned for: **${banLength}**`);
-      } else if (reason.split(": ")[1] == "no reason given") {
-        embed.setDescription(`✅ \`${idUser}\` has been banned`);
+        embed.setDescription(`✅ \`${idUser}\` has been banned for **${banLength}**`);
       } else {
-        embed.setDescription(`✅ \`${idUser}\` has been banned for: ${reason.split(": ")[1]}`);
+        embed.setDescription(`✅ \`${idUser}\` has been banned`);
       }
     } else {
       if (temporary) {
-        embed.setDescription(`✅ \`${members.first().user.tag}\` has been banned for: **${banLength}**`);
-      } else if (reason.split(": ")[1] == "no reason given") {
-        embed.setDescription("✅ `" + members.first().user.tag + "` has been banned");
+        embed.setDescription(`✅ \`${members.first().user.tag}\` has been banned for **${banLength}**`);
       } else {
-        embed.setDescription("✅ `" + members.first().user.tag + "` has been banned for: " + reason.split(": ")[1]);
+        embed.setDescription("✅ `" + members.first().user.tag + "` has been banned");
       }
     }
   }
@@ -264,8 +256,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     await send({ embeds: [embed] });
   }
 
+  let storeReason = reason.split(": ")[1];
+  if (temporary) {
+    storeReason = `[${banLength}] ${storeReason}`;
+  } else {
+    storeReason = `[perm] ${storeReason}`;
+  }
+
   if (idOnly) {
-    await newCase(message.guild, "ban", id, message.member.user.tag, reason.split(": ")[1]);
+    await newCase(message.guild, "ban", id, message.member.user.tag, storeReason);
     if (temporary) {
       await newBan(message.guild, id, unbanDate);
     }
