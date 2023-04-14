@@ -1,6 +1,6 @@
 import * as topgg from "@top-gg/sdk";
 import { ClusterManager } from "discord-hybrid-sharding";
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder, WebhookClient } from "discord.js";
 import * as express from "express";
 import prisma from "../../init/database";
 import redis from "../../init/redis";
@@ -231,12 +231,26 @@ async function handleKofiData(data: KofiResponse) {
               payload: {
                 content: "thank you for your purchase",
                 embed: new CustomEmbed()
-                  .setDescription(`you have received 1 ${item}`)
+                  .setDescription(`you have received 1 ${getItems()[item].emoji} **${getItems()[item].name}**`)
                   .setColor(Constants.TRANSPARENT_EMBED_COLOR),
               },
             };
 
             await addNotificationToQueue(payload);
+            if (data.is_public) {
+              const hook = new WebhookClient({ url: process.env.THANKYOU_HOOK });
+              await hook.send({
+                embeds: [
+                  new CustomEmbed(
+                    null,
+                    `${user.lastKnownTag.split("#")[0]} just bought a ${getItems()[item].emoji} **${
+                      getItems()[item].name
+                    }**!!!!`
+                  ).setFooter({ text: "thank you for your purchase (:" }),
+                ],
+              });
+              hook.destroy();
+            }
           }
 
           const gemChance = Math.floor(Math.random() * 77);
@@ -353,11 +367,33 @@ async function handleKofiData(data: KofiResponse) {
         if ((await getPremiumProfile(user.id)).getLevelString().toLowerCase() != item) {
           await setTier(user.id, premiums.indexOf(item) + 1);
           await renewUser(user.id);
+          if (data.is_public) {
+            const hook = new WebhookClient({ url: process.env.THANKYOU_HOOK });
+            await hook.send({
+              embeds: [
+                new CustomEmbed(null, `${user.lastKnownTag.split("#")[0]} just bought **${item}**!!!!`).setFooter({
+                  text: "thank you for your purchase (:",
+                }),
+              ],
+            });
+            hook.destroy();
+          }
         } else {
           await renewUser(user.id);
         }
       } else {
         await addMember(user.id, premiums.indexOf(item) + 1);
+        if (data.is_public) {
+          const hook = new WebhookClient({ url: process.env.THANKYOU_HOOK });
+          await hook.send({
+            embeds: [
+              new CustomEmbed(null, `${user.lastKnownTag.split("#")[0]} just bought **${item}**!!!!`).setFooter({
+                text: "thank you for your purchase (:",
+              }),
+            ],
+          });
+          hook.destroy();
+        }
       }
     } else {
       await prisma.kofiPurchases.create({
