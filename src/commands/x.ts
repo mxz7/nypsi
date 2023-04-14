@@ -860,6 +860,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
         logger.info(`admin: ${message.author.tag} (${message.author.id}) deleted ${user.id} aliases`);
         await prisma.userAlias.deleteMany({ where: { userId: user.id } });
+        await redis.del(`${Constants.redis.cache.premium.ALIASES}:${user.id}`);
         await res.editReply({ embeds: [new CustomEmbed(message.member, "deleted all aliases for that user")] });
         return waitForButton();
       } else if (res.customId === "expire-now") {
