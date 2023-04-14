@@ -103,8 +103,8 @@ devDependencies:
     specifier: 1.5.5
     version: 1.5.5
   '@types/lodash':
-    specifier: 4.14.192
-    version: 4.14.192
+    specifier: 4.14.194
+    version: 4.14.194
   '@types/ms':
     specifier: 0.7.31
     version: 0.7.31
@@ -645,8 +645,8 @@ packages:
     resolution: {integrity: sha512-wOuvG1SN4Us4rez+tylwwwCV1psiNVOkJeM3AUWUNWg/jDQY2+HE/444y5gc+jBmRqASOm2Oeh5c1axHobwRKQ==}
     dev: true
 
-  /@types/lodash@4.14.192:
-    resolution: {integrity: sha512-km+Vyn3BYm5ytMO13k9KTp27O75rbQ0NFw+U//g+PX7VZyjCioXaRFisqSIJRECljcTv73G3i6BpglNGHgUQ5A==}
+  /@types/lodash@4.14.194:
+    resolution: {integrity: sha512-r22s9tAS7imvBt2lyHC9B8AGwWnXaYb1tY09oyLkXDs4vArpYJzw09nj8MLx5VfciBPGIb+ZwG0ssYnEPJxn/g==}
 
   /@types/mime@3.0.1:
     resolution: {integrity: sha512-Y4XFY5VJAuw0FgAqPNd6NNoV44jbq9Bz2L7Rh/J6jLTiHBSBJa9fxqQIvkIld4GsoDOcCbvzOUAbLPsSKKg+uA==}
@@ -3675,7 +3675,7 @@ packages:
     engines: {node: '>=10'}
     dependencies:
       '@babel/runtime': 7.20.7
-      '@types/lodash': 4.14.192
+      '@types/lodash': 4.14.194
       lodash: 4.17.21
       lodash-es: 4.17.21
       nanoclone: 0.2.1
