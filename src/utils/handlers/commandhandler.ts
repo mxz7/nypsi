@@ -479,6 +479,7 @@ export async function runCommand(
   args: string[]
 ) {
   const preProcessLength = [Date.now()];
+  if (message.author.bot) return;
   if (!message.channel.isTextBased()) return;
   if (message.channel.isDMBased()) return;
 
