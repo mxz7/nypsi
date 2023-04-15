@@ -1,4 +1,5 @@
 import dayjs = require("dayjs");
+import { parentPort } from "worker_threads";
 import prisma from "../../init/database";
 
 async function doTopBalance() {
@@ -13,7 +14,7 @@ async function doTopBalance() {
     take: 25,
   });
 
-  const date = new Date();
+  const date = dayjs().set("hours", 0).set("minutes", 0).set("seconds", 0).set("milliseconds", 0).toDate();
 
   for (const user of query) {
     await prisma.graphMetrics.create({
@@ -25,6 +26,8 @@ async function doTopBalance() {
       },
     });
   }
+
+  return query.length;
 }
 
 async function doTopNetworth() {
@@ -39,7 +42,7 @@ async function doTopNetworth() {
     take: 25,
   });
 
-  const date = new Date();
+  const date = dayjs().set("hours", 0).set("minutes", 0).set("seconds", 0).set("milliseconds", 0).toDate();
 
   for (const user of query) {
     await prisma.graphMetrics.create({
@@ -51,6 +54,8 @@ async function doTopNetworth() {
       },
     });
   }
+
+  return query.length;
 }
 
 async function doItems() {
@@ -61,7 +66,7 @@ async function doItems() {
     },
   });
 
-  const date = new Date();
+  const date = dayjs().set("hours", 0).set("minutes", 0).set("seconds", 0).set("milliseconds", 0).toDate();
 
   for (const i of query) {
     await prisma.graphMetrics.create({
@@ -73,6 +78,8 @@ async function doItems() {
       },
     });
   }
+
+  return query.length;
 }
 
 async function doMembers() {
@@ -94,7 +101,8 @@ async function doMembers() {
     },
   });
 
-  const date = new Date();
+  const date = dayjs().set("hours", 0).set("minutes", 0).set("seconds", 0).set("milliseconds", 0).toDate();
+  let count = 0;
 
   for (const user of query) {
     if (user.user?.Economy?.money) {
@@ -106,6 +114,7 @@ async function doMembers() {
           value: user.user.Economy.money,
         },
       });
+      count += 1;
     }
     if (user.user?.Economy?.netWorth) {
       await prisma.graphMetrics.create({
@@ -116,16 +125,18 @@ async function doMembers() {
           value: user.user.Economy.netWorth,
         },
       });
+      count += 1;
     }
     if (user.user?.Economy?.Inventory.length > 0) {
       await prisma.graphMetrics.createMany({
         data: user.user.Economy.Inventory.map((i) => ({
           category: `user-item-${i.item}`,
-          date: new Date(),
+          date,
           userId: i.userId,
           value: i.amount,
         })),
       });
+      count += user.user.Economy.Inventory.length;
     }
     if (user.user?.karma) {
       await prisma.graphMetrics.create({
@@ -136,12 +147,15 @@ async function doMembers() {
           value: user.user.karma,
         },
       });
+      count += 1;
     }
   }
+
+  return count;
 }
 
 async function clearOld() {
-  await prisma.graphMetrics.deleteMany({
+  const deleted = await prisma.graphMetrics.deleteMany({
     where: {
       AND: [
         { OR: [{ category: { contains: "user" } }, { category: { contains: "item-count" } }] },
@@ -149,10 +163,16 @@ async function clearOld() {
       ],
     },
   });
+
+  parentPort.postMessage(`deleted ${deleted.count.toLocaleString()} entries from graph data`);
+
+  return 0;
 }
 
 (async () => {
-  await Promise.all([doTopBalance(), doTopNetworth(), doItems(), doMembers(), clearOld()]);
+  const count = await Promise.all([doTopBalance(), doTopNetworth(), doItems(), doMembers(), clearOld()]);
+
+  parentPort.postMessage(`created ${count.reduce((a, b) => a + b).toLocaleString()} entries in graph data`);
 
   process.exit(0);
 })();
