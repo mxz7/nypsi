@@ -84,7 +84,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         new CustomEmbed(
           message.member,
           "**/data request** *receive a downloadable txt file including all of the data currently held about you in the database*\n" +
-            "**/data delete** *request deletion of all of your data. where this is not possible, your data will be anonymized. the exception for this is moderation data."
+            "**/data delete** *request deletion of all of your data. where this is not possible, your data will be anonymized. the exception for this is moderation data.*"
         ),
       ],
     });
