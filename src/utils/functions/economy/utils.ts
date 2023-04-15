@@ -9,7 +9,6 @@ import { AchievementData, BakeryUpgradeData, Item } from "../../../types/Economy
 import { Worker, WorkerUpgrades } from "../../../types/Workers";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
-import { getTier, isPremium } from "../premium/premium";
 import { isUserBlacklisted } from "../users/blacklist";
 import { createProfile, hasProfile } from "../users/utils";
 import { setProgress } from "./achievements";
@@ -19,6 +18,7 @@ import { addInventoryItem } from "./inventory";
 import { getXp, updateXp } from "./xp";
 import ms = require("ms");
 import dayjs = require("dayjs");
+import math = require("mathjs");
 
 let items: { [key: string]: Item };
 let achievements: { [key: string]: AchievementData };
@@ -533,30 +533,7 @@ export async function getDailyStreak(member: GuildMember | string) {
 export async function doDaily(member: GuildMember) {
   const streak = (await getDailyStreak(member)) + 1;
 
-  const base = 20000;
-
-  let streakBonus = 5000;
-
-  if (await isPremium(member)) {
-    const tier = await getTier(member);
-
-    switch (tier) {
-      case 1:
-        streakBonus = 5500;
-        break;
-      case 2:
-        streakBonus = 6000;
-        break;
-      case 3:
-        streakBonus = 6500;
-        break;
-      case 4:
-        streakBonus = 7500;
-        break;
-    }
-  }
-
-  let total = base + streakBonus * streak;
+  let total = Math.floor(math.square(streak * 7) + 25_000);
 
   total += Math.floor(total * (await getMulti(member)));
 
@@ -572,19 +549,36 @@ export async function doDaily(member: GuildMember) {
   if (xp > 69) xp = 69;
 
   const promises = [];
+  const rewards: string[] = [`+$**${total.toLocaleString()}**`, `+ ${items["daily_scratch_card"].emoji} daily scratch card`];
 
   if (streak > 0 && streak % 7 == 0) {
     crate++;
 
-    crate += Math.floor(streak / 30);
+    crate += Math.floor(math.sqrt(streak / 1.3) as number);
 
-    if (crate > 5) crate = 5;
+    if (crate > 10) crate = 10;
 
     promises.push(addInventoryItem(member, "basic_crate", crate));
+
+    rewards.push(`+ **${crate.toLocaleString()}** 📦 basic crate${crate > 1 ? "s" : ""}`);
   }
 
-  if (streak == 69) {
-    promises.push(addInventoryItem(member, "69420_crate", 3));
+  if (streak > 1 && streak % 69 == 0) {
+    promises.push(addInventoryItem(member, "69420_crate", 5));
+
+    rewards.push("+ **5** 🎁 69420 crates");
+  }
+
+  if (streak > 1 && streak % 100 == 0) {
+    promises.push(addInventoryItem(member, "nypsi_crate", 1));
+
+    rewards.push(`+ **1** ${items["nypsi_crate"].emoji} nypsi crate`);
+  }
+
+  if (streak > 1 && streak % 500 == 0) {
+    promises.push(addInventoryItem(member, "gem_crate", 1));
+
+    rewards.push(`+ **1** ${items["gem_crate"].emoji} gem crate`);
   }
 
   promises.push(updateBalance(member, (await getBalance(member)) + total));
@@ -597,12 +591,7 @@ export async function doDaily(member: GuildMember) {
   embed.setHeader("daily", member.user.avatarURL());
   embed.setDescription(`daily streak: \`${streak}\``);
 
-  embed.addField(
-    "rewards",
-    `+$**${total.toLocaleString()}**` +
-      `${crate ? `\n + **${crate}** basic crate${crate > 1 ? "s" : ""}` : streak == 69 ? "\n + **3** 69420 crates" : ""}\n` +
-      `+ ${items["daily_scratch_card"].emoji} ${items["daily_scratch_card"].name}`
-  );
+  embed.addField("rewards", rewards.join("\n"));
 
   if (xp > 0) {
     await updateXp(member, (await getXp(member)) + xp);
