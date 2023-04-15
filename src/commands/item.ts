@@ -15,6 +15,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { countItemOnAuction, getAuctionAverage, getItemHistoryGraph } from "../utils/functions/economy/auctions";
 import { getInventory, getTotalAmountOfItem, selectItem } from "../utils/functions/economy/inventory";
 import { createUser, userExists } from "../utils/functions/economy/utils";
+import { isBooster } from "../utils/functions/premium/boosters";
 import { isPremium } from "../utils/functions/premium/premium";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger } from "../utils/logger";
@@ -191,7 +192,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     ),
   ];
 
-  if (!(await isPremium(message.member)) || (await prisma.auction.count({ where: { itemId: selected.id } })) < 5) {
+  if (
+    (!(await isPremium(message.member)) && !(await isBooster(message.author.id))) ||
+    ((await prisma.auction.count({ where: { AND: [{ itemId: selected.id }, { sold: true }] } })) < 5 &&
+      (await prisma.offer.count({ where: { AND: [{ itemId: selected.id }, { sold: true }] } })) < 5 &&
+      (await prisma.graphMetrics.count({ where: { category: `item-count-${selected.id}` } })) < 5)
+  ) {
     return await send({ embeds: [embed] });
   }
 
