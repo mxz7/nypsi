@@ -81,6 +81,7 @@ async function doMembers() {
       userId: true,
       user: {
         select: {
+          karma: true,
           Economy: {
             select: {
               money: true,
@@ -124,6 +125,16 @@ async function doMembers() {
           userId: i.userId,
           value: i.amount,
         })),
+      });
+    }
+    if (user.user?.karma) {
+      await prisma.graphMetrics.create({
+        data: {
+          category: "user-karma",
+          date,
+          userId: user.userId,
+          value: user.user.karma,
+        },
       });
     }
   }
