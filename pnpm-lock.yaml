@@ -44,8 +44,8 @@ dependencies:
     specifier: 4.18.2
     version: 4.18.2
   fast-sort:
-    specifier: 3.2.1
-    version: 3.2.1
+    specifier: 3.4.0
+    version: 3.4.0
   figlet:
     specifier: 1.6.0
     version: 1.6.0
@@ -1764,8 +1764,8 @@ packages:
     resolution: {integrity: sha512-DCXu6Ifhqcks7TZKY3Hxp3y6qphY5SJZmrWMDrKcERSOXWQdMhU9Ig/PYrzyw/ul9jOIyh0N4M0tbC5hodg8dw==}
     dev: true
 
-  /fast-sort@3.2.1:
-    resolution: {integrity: sha512-ECGwVH57yCv3C8v+4BQkQf65bNR4nFetxfGRRLYmzFEAK3oZBr7zCakBjOY/AptmmoU3ffMPJLLN1rdKdMHoUA==}
+  /fast-sort@3.4.0:
+    resolution: {integrity: sha512-c/cMBGA5mH3OYjaXedtLIM3hQjv+KuZuiD2QEH5GofNOZeQVDIYIN7Okc2AW1KPhk44g5PTZnXp8t2lOMl8qhQ==}
     dev: false
 
   /fastq@1.14.0:
