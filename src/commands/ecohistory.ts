@@ -94,6 +94,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (["balance", "bal"].includes(args[0].toLowerCase())) args[0] = "user-money";
   if (["networth", "net"].includes(args[0].toLowerCase())) args[0] = "user-net";
+  if (["karma"].includes(args[0].toLowerCase())) args[0] = "user-karma";
   if (args[0].toLowerCase() === "item") {
     if (args.length === 1) {
       return send({ embeds: [new ErrorEmbed("you must give an item to graph")] });
@@ -123,7 +124,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       },
     };
 
-    if (!args[0].includes("item")) {
+    if (!args[0].includes("item") && !args[0].includes("karma")) {
       chartData.options = {
         plugins: {
           tickFormat: {
