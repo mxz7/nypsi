@@ -201,7 +201,7 @@ export async function runBakery(member: GuildMember) {
     embed.setDescription(
       `you baked **${(chosenAmount + passive).toLocaleString()}** cookie${
         chosenAmount + passive > 1 ? "s" : ""
-      } 🍪 and ${cakeAmount.toLocaleString()} cakes ${getItems()["cake"].emoji} !!`
+      } 🍪 and **${cakeAmount.toLocaleString()}** cake${cakeAmount > 1 ? "s" : ""} ${getItems()["cake"].emoji} !!`
     );
   } else {
     embed.setDescription(
