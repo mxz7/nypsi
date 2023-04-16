@@ -14,8 +14,10 @@ import {
 } from "discord.js";
 import * as fs from "fs/promises";
 import prisma from "../init/database";
+import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import { checkOffer } from "../utils/functions/economy/offers";
 import { addCooldown, onCooldown } from "../utils/handlers/cooldownhandler.js";
 import { logger } from "../utils/logger";
 import ms = require("ms");
@@ -343,6 +345,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       await m.edit({ embeds: [embed], components: [] });
 
       logger.info(`deleting data for ${message.author.tag}...`);
+
+      await prisma.inventory.deleteMany({
+        where: {
+          userId: message.author.id,
+        },
+      });
+
+      for (const testOffer of await prisma.offer.findMany({
+        where: { AND: [{ targetId: message.author.id }, { sold: false }] },
+      })) {
+        await checkOffer(testOffer, message.client as NypsiClient);
+      }
 
       await prisma.booster.deleteMany({
         where: {
