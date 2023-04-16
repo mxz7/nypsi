@@ -43,7 +43,7 @@ const dmCooldown = new Set<string>();
 let mentionInterval: NodeJS.Timer;
 
 export default async function messageCreate(message: Message) {
-  if (message.channel.isDMBased()) {
+  if (message.channel.isDMBased() && !message.author.bot) {
     logger.info("message in DM from " + message.author.tag + ": " + message.content);
 
     if (await isUserBlacklisted(message.author.id))
