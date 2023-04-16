@@ -402,13 +402,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         },
       });
 
-      await prisma.economy.deleteMany({
+      await prisma.economy.delete({
         where: {
           userId: message.author.id,
         },
       });
 
-      await prisma.premium.deleteMany({
+      await prisma.premium.delete({
         where: {
           userId: message.author.id,
         },
