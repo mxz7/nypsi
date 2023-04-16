@@ -11,8 +11,8 @@ dependencies:
     specifier: 4.12.0
     version: 4.12.0(prisma@4.12.0)
   '@top-gg/sdk':
-    specifier: 3.1.4
-    version: 3.1.4
+    specifier: 3.1.5
+    version: 3.1.5
   bree:
     specifier: 9.1.3
     version: 9.1.3
@@ -580,8 +580,8 @@ packages:
     resolution: {integrity: sha512-OvjF+z51L3ov0OyAU0duzsYuvO01PH7x4t6DJx+guahgTnBHkhJdG7soQeTSFLWN3efnHyibZ4Z8l2EuWwJN3A==}
     dev: false
 
-  /@top-gg/sdk@3.1.4:
-    resolution: {integrity: sha512-BOW3AxNKShiCl4YjxUYtKv0WxwKySuhcDWroz3i3fxx7l8T+vIKAFsuPqC9YPdLVSJuU/MVWdiK8NjFc53wGmQ==}
+  /@top-gg/sdk@3.1.5:
+    resolution: {integrity: sha512-eIqyqKDuC/F8nXRDrUWwuvmcBgnJ65EhI8xQQPcBJL9QNpBf0IeggHjyzuNiDE2MnMDEoJHYJKeCI4bf7b811g==}
     dependencies:
       raw-body: 2.5.2
       undici: 5.21.0
