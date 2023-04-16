@@ -420,7 +420,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         },
       });
 
-      exec(`redis-cli KEYS "*:${message.author.id}:*" | xargs redis-cli DEL`);
+      exec(`redis-cli KEYS "*${message.author.id}*" | xargs redis-cli DEL`);
 
       logger.info(`data deleted for ${message.author.id}`);
 
