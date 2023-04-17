@@ -179,8 +179,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       }
 
       if (members.get(member).user.id == message.client.user.id) {
-        await send({ content: "well... i guess this is goodbye ):" });
-        await message.guild.leave();
+        await send({ content: "NICE TRY LOSER CANT KICK THE BEST WORLDWIDE" });
         return;
       }
 
