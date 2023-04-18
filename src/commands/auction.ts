@@ -228,6 +228,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return message.channel.send({ embeds: [new ErrorEmbed(`you dont have a ${selected.name}`)] });
     }
 
+    if (selected.account_locked) return send({ embeds: [new ErrorEmbed("this item cant be traded")] });
+
     embed.setDescription(`how many ${selected.emoji} ${selected.name} do you want to sell?`);
 
     await edit({ embeds: [embed], components: [] }, msg);
@@ -663,6 +665,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (!inventory.find((i) => i.item == selected.id) || inventory.find((i) => i.item == selected.id).amount == 0) {
       return send({ embeds: [new ErrorEmbed(`you dont have a ${selected.name}`)] });
     }
+
+    if (selected.account_locked) return send({ embeds: [new ErrorEmbed("this item cant be traded")] });
 
     if (args[2].toLowerCase() == "all") {
       args[2] = inventory.find((i) => i.item == selected.id).amount.toString();
