@@ -65,7 +65,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     `items (${itemValues
       .map((i) => (i.value / net.amount) * 100)
       .reduce((a, b) => a + b)
-      .toFixed(3)}%)`,
+      .toFixed(2)}%)`,
     pages.get(1).join("\n")
   );
 
