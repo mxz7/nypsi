@@ -455,7 +455,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       const command = cleanString(message.options.getString("command").toLowerCase().normalize("NFD"));
 
       for (const word of commandFilter) {
-        if (trigger.includes(word) || command.includes(word)) {
+        if (trigger.includes(word) || command.toLowerCase().includes(word)) {
           return send({ embeds: [new ErrorEmbed("explicit content 🙄")] });
         }
       }
