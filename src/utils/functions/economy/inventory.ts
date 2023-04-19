@@ -444,7 +444,7 @@ export async function openCrate(member: GuildMember | string, item: Item): Promi
       } else if (chosen == "incredible_fishing_rod" || chosen == "incredible_gun" || chosen == "diamond_pickaxe") {
         amount = 10;
       } else if (chosen == "gem_shard" && item.id === "gem_crate") {
-        amount = Math.floor(Math.random() * 11) + 4;
+        amount = Math.floor(Math.random() * 15) + 5;
       }
 
       await addInventoryItem(member, chosen, amount);
