@@ -12,6 +12,7 @@ products.set("5569964b90", "nypsi_crate");
 products.set("1e62c44770", "workers_crate");
 products.set("4b1d3a70b2", "boosters_crate");
 products.set("4ec1ebe6b4", "gem_crate");
+products.set("d18331a5bb", "gem_shard");
 
 export default {
   redis: {
