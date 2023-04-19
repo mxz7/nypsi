@@ -374,7 +374,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return send({ embeds: [embed] });
     } else {
       const commandTrigger = cleanString(message.options.getString("trigger").toLowerCase().normalize("NFD")).trim();
-      const commandContent = message.options.getString("value").toLowerCase().normalize("NFD").trim();
+      const commandContent = message.options.getString("value").normalize("NFD").trim();
 
       if (commandTrigger.length === 0 || commandContent.length === 0) {
         return send({ embeds: [new ErrorEmbed("content or trigger cannot be empty")] });
