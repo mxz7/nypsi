@@ -40,16 +40,16 @@ import { addNotificationToQueue } from "../../utils/functions/users/notification
   let total = 0;
 
   for (const user of users) {
-    let karmaToRemove = 2;
+    let karmaToRemove = 3;
 
     if (user.lastCommand.getTime() > threshold) karmaToRemove = 0;
 
     if (now - ms("2 days") > user.lastCommand.getTime()) {
-      karmaToRemove += 7;
+      karmaToRemove += 10;
     }
 
     if (now - ms("1 week") > user.lastCommand.getTime()) {
-      karmaToRemove += 10;
+      karmaToRemove += 15;
     }
 
     if (now - ms("30 days") > user.lastCommand.getTime()) {
