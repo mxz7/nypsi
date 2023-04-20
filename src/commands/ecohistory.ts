@@ -154,6 +154,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         where: {
           AND: [{ category: args[0] }, { userId: message.author.id }],
         },
+        orderBy: {
+          date: "asc",
+        },
       })
     );
 
