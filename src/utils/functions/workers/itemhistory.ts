@@ -142,7 +142,7 @@ if (!isMainThread) {
               ticks: {
                 min: 0,
                 callback(val) {
-                  return val.toLocaleString();
+                  return Number(val).toLocaleString();
                 },
               },
             },
