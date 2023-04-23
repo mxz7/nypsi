@@ -218,7 +218,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const stats = await getReactionStats(message.guild, message.member);
 
     embed.setDescription(
-      `first place **${stats.wins}**\nsecond place **${stats.secondPlace}**\nthird place **${stats.thirdPlace}**`
+      `first place **${stats.wins.toLocaleString()}**\nsecond place **${stats.secondPlace.toLocaleString()}**\nthird place **${stats.thirdPlace.toLocaleString()}**\n\noverall **${(
+        stats.wins +
+        stats.secondPlace +
+        stats.thirdPlace
+      ).toLocaleString()}**`
     );
 
     const blacklisted = await getBlacklisted(message.guild);
