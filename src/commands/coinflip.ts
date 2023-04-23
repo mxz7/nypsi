@@ -329,13 +329,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     await updateBalance(message.member, (await getBalance(message.member)) - bet);
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder().setCustomId("y").setLabel("accept").setStyle(ButtonStyle.Success),
+      new ButtonBuilder().setCustomId("y").setLabel("play").setStyle(ButtonStyle.Success),
       new ButtonBuilder().setCustomId("n").setLabel("cancel").setStyle(ButtonStyle.Danger)
     );
 
     const requestEmbed = new CustomEmbed(
       message.member,
-      `**${message.author.tag}** has created an open coinflip - press accept to play\n\n**bet** $${bet.toLocaleString()}`
+      `**${message.author.tag}** has created an open coinflip\n\n**bet** $${bet.toLocaleString()}`
     ).setFooter({ text: "expires in 60 seconds" });
 
     const msg = await send({

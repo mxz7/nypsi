@@ -538,15 +538,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       await updateBalance(message.member, (await getBalance(message.member)) - wager);
 
       const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder().setCustomId("y").setLabel("accept").setStyle(ButtonStyle.Success),
+        new ButtonBuilder().setCustomId("y").setLabel("play").setStyle(ButtonStyle.Success),
         new ButtonBuilder().setCustomId("n").setLabel("cancel").setStyle(ButtonStyle.Danger)
       );
 
       const requestEmbed = new CustomEmbed(
         message.member,
-        `**${
-          message.author.tag
-        }** has created an open chat reaction duel - press accept to play\n\n**wager** $${wager.toLocaleString()}`
+        `**${message.author.tag}** has created an open chat reaction duel\n\n**wager** $${wager.toLocaleString()}`
       ).setFooter({ text: "expires in 60 seconds" });
 
       const m = await send({
