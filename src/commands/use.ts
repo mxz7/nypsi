@@ -136,7 +136,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let boosters = await getBoosters(message.member);
     let amount = parseInt(args[1]) || 1;
 
-    if (args[1].toLowerCase() === "all") amount = inventory.find((i) => i.item === selected.id)?.amount || 1;
+    if (args[1]?.toLowerCase() === "all") amount = inventory.find((i) => i.item === selected.id)?.amount || 1;
 
     if (boosters.has(selected.id)) {
       if (selected.stackable) {
@@ -274,7 +274,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (args[1]) {
-      if (args[1].toLowerCase() === "all") {
+      if (args[1]?.toLowerCase() === "all") {
         amount = inventory.find((i) => i.item === selected.id)?.amount || 1;
       } else {
         amount = formatNumber(args[1]);
@@ -322,7 +322,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   } else if (selected.role === "bakery-upgrade") {
     let amount = 1;
 
-    if (args[1].toLowerCase() === "all") {
+    if (args[1]?.toLowerCase() === "all") {
       amount = inventory.find((i) => i.item === selected.id)?.amount || 1;
     } else if (args[1]) {
       amount = formatNumber(args[1]);
