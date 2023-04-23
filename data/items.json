@@ -1325,9 +1325,9 @@
   },
   "oven": {
     "id": "oven",
-    "name": "oven",
+    "name": "easy bake oven",
     "plural": "ovens",
-    "aliases": ["cooker"],
+    "aliases": ["cooker", "easybakeoven", "easybake", "easy_bake_oven"],
     "emoji": "<:nypsi_oven:1099724311138414743>",
     "longDesc": "+1 hour afk time",
     "rarity": 3,
