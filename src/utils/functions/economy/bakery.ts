@@ -86,7 +86,7 @@ export async function getBakeryUpgrades(member: GuildMember | string) {
 }
 
 async function getMaxAfkHours(member: GuildMember | string) {
-  let max = 2;
+  let max = 1;
 
   if (await isPremium(member)) {
     max += 1;
