@@ -26,5 +26,12 @@
     "emoji": "👴🏻",
     "upgrades": "cake",
     "value": 0.5
+  },
+  "oven": {
+    "id": "oven",
+    "name": "oven",
+    "emoji": "<:nypsi_oven:1099724311138414743>",
+    "upgrades": "maxafk",
+    "value": 1
   }
 }
