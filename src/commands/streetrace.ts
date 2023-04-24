@@ -134,8 +134,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [new ErrorEmbed("invalid speed limit")] });
       }
 
-      if (speedLimit > 6 || speedLimit < 1) {
-        return send({ embeds: [new ErrorEmbed("speed limit must be a number 1-6")] });
+      if (speedLimit > 6 || speedLimit < 0) {
+        return send({ embeds: [new ErrorEmbed("speed limit must be a number 0-6")] });
       }
     }
 
