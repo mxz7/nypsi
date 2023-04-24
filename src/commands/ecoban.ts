@@ -7,7 +7,7 @@ import { getAdminLevel } from "../utils/functions/users/admin";
 const cmd = new Command("ecoban", "ban an account from eco", "none");
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-  if (await getAdminLevel(message.author.id)) < 2) return;
+  if (await getAdminLevel(message.author.id) < 2) return;
 
   if (args.length == 0) {
     return message.channel.send({ content: "dumbass" });
