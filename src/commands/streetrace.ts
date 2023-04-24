@@ -122,7 +122,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return send({ embeds: [new ErrorEmbed("entry fee cannot be less than $1k")] });
     }
 
-    let speedLimit = 0;
+    let speedLimit = 7;
 
     if (args[2]) {
       if (!parseInt(args[2])) {
@@ -134,8 +134,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({ embeds: [new ErrorEmbed("invalid speed limit")] });
       }
 
-      if (speedLimit > 6 || speedLimit < 0) {
-        return send({ embeds: [new ErrorEmbed("speed limit must be a number 0-6")] });
+      if (speedLimit > 6 || speedLimit < 1) {
+        return send({ embeds: [new ErrorEmbed("speed limit must be a number 1-6")] });
       }
     }
 
@@ -161,7 +161,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     embed.setFooter({ text: `use ${prefix}sr join to join` });
 
     embed.setDescription(
-      `no racers\n\nentry fee: $${bet.toLocaleString()}${speedLimit != 0 ? `\nspeed limit: ${speedLimit}` : ""}`
+      `no racers\n\nentry fee: $${bet.toLocaleString()}${speedLimit != 7 ? `\nspeed limit: ${speedLimit}` : ""}`
     );
 
     let msg = await send({ embeds: [embed] });
@@ -299,7 +299,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       car = items["cycle"];
     }
 
-    if (race.speedLimit > 0 && car.speed > race.speedLimit) {
+    if (race.speedLimit != 7 && car.speed > race.speedLimit) {
       return send({
         embeds: [
           new ErrorEmbed(`your ${car.name} is too fast for this race, select another with ${prefix}**sr join <car>**`),
@@ -368,7 +368,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const speedLimit = race.speedLimit;
 
-    description += `\n\nentry fee: $${race.bet.toLocaleString()}${speedLimit != 0 ? `\nspeed limit: ${speedLimit}` : ""}`;
+    description += `\n\nentry fee: $${race.bet.toLocaleString()}${speedLimit != 7 ? `\nspeed limit: ${speedLimit}` : ""}`;
 
     embed.setDescription(description);
 
