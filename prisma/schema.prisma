@@ -507,8 +507,8 @@ model EconomyGuild {
   owner   Economy @relation(fields: [ownerId], references: [userId], onDelete: Cascade)
   ownerId String  @unique
 
-  members              EconomyGuildMember[]
-  EconomyGuildUpgrades EconomyGuildUpgrades[]
+  members  EconomyGuildMember[]
+  upgrades EconomyGuildUpgrades[]
 }
 
 model EconomyGuildMember {
