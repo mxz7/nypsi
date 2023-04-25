@@ -20,6 +20,7 @@ import Constants from "../utils/Constants";
 import { daysAgo, formatDate } from "../utils/functions/date";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
 import {
+  RemoveMemberMode,
   addMember,
   addToGuildBank,
   createGuild,
@@ -29,7 +30,6 @@ import {
   getMaxMembersForGuild,
   getRequiredForGuildUpgrade,
   removeMember,
-  RemoveMemberMode,
   setGuildMOTD,
   setOwner,
 } from "../utils/functions/economy/guilds";
@@ -500,10 +500,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     for (const guildMember of guild.members) {
       const contributedMoney = guildMember.contributedMoney;
 
-      if (contributedMoney > 100) {
+      if (contributedMoney > 100_000) {
         await updateBalance(
           guildMember.userId,
-          (await getBalance(guildMember.userId)) + Math.floor(Number(contributedMoney) * 0.25)
+          (await getBalance(guildMember.userId)) + Math.floor(Number(contributedMoney) * 0.1)
         );
 
         if ((await getDmSettings(guildMember.userId)).other) {
@@ -511,7 +511,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
           embed.setDescription(
             `since you contributed money to this guild, you have been repaid $**${Math.floor(
-              Number(contributedMoney) * 0.25
+              Number(contributedMoney) * 0.1
             ).toLocaleString()}**`
           );
 
