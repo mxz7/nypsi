@@ -193,7 +193,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         true
       );
       if (guild.level < Constants.MAX_GUILD_LEVEL) {
-        embed.addField("bank", `**money** $${guild.balance.toLocaleString()}\n**xp** ${guild.xp.toLocaleString()}`, true);
+        embed.addField(
+          "bank",
+          `**money** $${guild.balance.toLocaleString()}\n**xp** ${guild.xp.toLocaleString()}\n**tokens** ${guild.tokens.toLocaleString()}`,
+          true
+        );
       }
 
       let membersText = "";
