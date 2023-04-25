@@ -151,7 +151,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     loveEmoji = "💝";
   } else if (lovePercent > 25) {
     loveLevel = "uhh..";
-    loveEmoji = "❤";
+    loveEmoji = "❤️";
   } else if (lovePercent < 5 && lovePercent != 0) {
     loveLevel = "alone forever";
     loveEmoji = "😭";
@@ -166,25 +166,25 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const loveBarNum = Math.ceil(lovePercent / 10) * 10;
 
   if (loveBarNum == 100) {
-    loveBar = "**❤❤❤❤❤❤❤❤❤**";
+    loveBar = "**❤️❤️❤️❤️❤️❤️❤️❤️❤️**";
   } else if (loveBarNum > 90) {
-    loveBar = "**❤❤❤❤❤❤❤❤❤** 💔";
+    loveBar = "**❤️❤️❤️❤️❤️❤️❤️❤️❤️** 💔";
   } else if (loveBarNum > 80) {
-    loveBar = "**❤❤❤❤❤❤❤❤** 💔💔";
+    loveBar = "**❤️❤️❤️❤️❤️❤️❤️❤️** 💔💔";
   } else if (loveBarNum > 70) {
-    loveBar = "**❤❤❤❤❤❤❤** 💔💔💔";
+    loveBar = "**❤️❤️❤️❤️❤️❤️❤️** 💔💔💔";
   } else if (loveBarNum > 60) {
-    loveBar = "**❤❤❤❤❤❤** 💔💔💔💔";
+    loveBar = "**❤️❤️❤️❤️❤️❤️** 💔💔💔💔";
   } else if (loveBarNum > 50) {
-    loveBar = "**❤❤❤❤❤** 💔💔💔💔💔";
+    loveBar = "**❤️❤️❤️❤️❤️** 💔💔💔💔💔";
   } else if (loveBarNum > 40) {
-    loveBar = "**❤❤❤❤** 💔💔💔💔💔💔";
+    loveBar = "**❤️❤️❤️❤️** 💔💔💔💔💔💔";
   } else if (loveBarNum > 30) {
-    loveBar = "**❤❤❤** 💔💔💔💔💔💔💔";
+    loveBar = "**❤️❤️❤️** 💔💔💔💔💔💔💔";
   } else if (loveBarNum > 20) {
-    loveBar = "**❤❤** 💔💔💔💔💔💔";
+    loveBar = "**❤️❤️** 💔💔💔💔💔💔";
   } else if (loveBarNum > 10) {
-    loveBar = "**❤** 💔💔💔💔💔💔💔";
+    loveBar = "**❤️** 💔💔💔💔💔💔💔";
   } else {
     loveBar = "💔💔💔💔💔💔💔💔💔💔";
   }
