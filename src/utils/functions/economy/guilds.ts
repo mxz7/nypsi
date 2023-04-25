@@ -1,3 +1,4 @@
+import { EconomyGuildUpgrades } from "@prisma/client";
 import { GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
@@ -20,6 +21,7 @@ export async function getGuildByName(name: string) {
         },
       },
       include: {
+        upgrades: true,
         owner: {
           select: {
             user: {
@@ -116,6 +118,7 @@ export async function getGuildByUser(member: GuildMember | string) {
       include: {
         guild: {
           include: {
+            upgrades: true,
             members: {
               include: {
                 economy: {
@@ -435,4 +438,43 @@ export async function setOwner(guild: string, newOwner: string) {
       ownerId: newOwner,
     },
   });
+}
+
+export async function getGuildUpgradesByUser(member: GuildMember | string): Promise<EconomyGuildUpgrades[]> {
+  let id: string;
+  if (member instanceof GuildMember) {
+    id = member.user.id;
+  } else {
+    id = member;
+  }
+
+  if (!(await redis.exists(`${Constants.redis.cache.economy.GUILD_USER}:${id}`))) {
+    const guild = await getGuildByUser(member);
+
+    if (!guild) return [];
+
+    await redis.set(`${Constants.redis.cache.economy.GUILD_UPGRADES}:${guild.guildName}`, JSON.stringify(guild.upgrades));
+    await redis.expire(
+      `${Constants.redis.cache.economy.GUILD_UPGRADES}:${guild.guildName}`,
+      Math.floor(ms("6 hours") / 1000)
+    );
+
+    return guild.upgrades;
+  }
+
+  const guildName = await redis.get(`${Constants.redis.cache.economy.GUILD_USER}:${id}`);
+
+  if (guildName === "noguild") return [];
+
+  if (await redis.exists(`${Constants.redis.cache.economy.GUILD_UPGRADES}:${guildName}`))
+    return JSON.parse(await redis.get(`${Constants.redis.cache.economy.GUILD_UPGRADES}:${guildName}`));
+
+  const guild = await getGuildByName(guildName);
+
+  if (!guild) return [];
+
+  await redis.set(`${Constants.redis.cache.economy.GUILD_UPGRADES}:${guild.guildName}`, JSON.stringify(guild.upgrades));
+  await redis.expire(`${Constants.redis.cache.economy.GUILD_UPGRADES}:${guild.guildName}`, Math.floor(ms("6 hours") / 1000));
+
+  return guild.upgrades;
 }
