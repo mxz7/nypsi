@@ -12,6 +12,7 @@ import {
   MessageEditOptions,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
+import prisma from "../init/database";
 import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction } from "../models/Command";
@@ -21,6 +22,7 @@ import { daysAgo, formatDate } from "../utils/functions/date";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
 import {
   RemoveMemberMode,
+  addGuildUpgrade,
   addMember,
   addToGuildBank,
   createGuild,
@@ -771,6 +773,34 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     embed.setFooter({ text: "you must be atleast prestige 1 to create a guild" });
 
     return send({ embeds: [embed] });
+  }
+
+  if (args[0].toLowerCase() == "buy") {
+    if (!guild) return send({ embeds: [new ErrorEmbed("you are not in a guild")] });
+    if (guild.ownerId !== message.author.id) return send({ embeds: [new ErrorEmbed("you must be the guild owner")] });
+
+    if (args.length === 1) return send({ embeds: [new ErrorEmbed("/guild buy <item>")] });
+
+    const upgrades = getGuildUpgradeData();
+
+    const selected = Object.values(upgrades).find((i) => i.id === args[1].toLowerCase());
+    if (!selected) return send({ embeds: [new ErrorEmbed("invalid upgrade")] });
+
+    const cost =
+      selected.cost + (guild.upgrades.find((i) => i.upgradeId === selected.id)?.amount || 0) * selected.increment_per_level;
+
+    if (guild.tokens < cost) return send({ embeds: [new ErrorEmbed("you cannot afford this upgrade")] });
+
+    await prisma.economyGuild.update({
+      where: { guildName: guild.guildName },
+      data: {
+        tokens: { decrement: cost },
+      },
+    });
+
+    await addGuildUpgrade(guild.guildName, selected.id);
+
+    return send({ embeds: [new CustomEmbed(message.member, `✅ you have bought **${selected.name}** for ${cost} tokens`)] });
   }
 
   if (args[0].toLowerCase() == "shop") {
