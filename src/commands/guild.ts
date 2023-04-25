@@ -34,8 +34,9 @@ import {
   setOwner,
 } from "../utils/functions/economy/guilds";
 import { getPrestige } from "../utils/functions/economy/prestige";
-import { createUser, formatNumber, isEcoBanned, userExists } from "../utils/functions/economy/utils";
+import { createUser, formatNumber, getGuildUpgradeData, isEcoBanned, userExists } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
+import PageManager from "../utils/functions/page";
 import requestDM from "../utils/functions/requestdm";
 import { cleanString } from "../utils/functions/string";
 import { getDmSettings } from "../utils/functions/users/notifications";
@@ -760,6 +761,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         `${prefix}**guild delete** *delete your guild*\n` +
         `${prefix}**guild deposit <amount>** *deposit money into your guild*\n` +
         `${prefix}**guild stats** *show contribution stats of your guild*\n` +
+        `${prefix}**guild shop** *view guild upgrades that are available to buy\n` +
+        `${prefix}**guild buy** *buy guild upgrades with tokens*\n` +
         `${prefix}**guild upgrade** *show requirements for next upgrade*\n` +
         `${prefix}**guild motd <motd>** *set guild motd*\n` +
         `${prefix}**top guild** *view top guilds on nypsi*\n` +
@@ -768,6 +771,58 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     embed.setFooter({ text: "you must be atleast prestige 1 to create a guild" });
 
     return send({ embeds: [embed] });
+  }
+
+  if (args[0].toLowerCase() == "shop") {
+    if (!guild) return send({ embeds: [new ErrorEmbed("you are not in a guild")] });
+    const upgrades = getGuildUpgradeData();
+
+    const pages = new Map<number, { name: string; value: string; inline: true }[]>();
+
+    for (const upgrade of Object.values(upgrades)) {
+      const name = upgrade.id;
+      const value =
+        `**${upgrade.name}**\n` +
+        `*${upgrade.description}*\n` +
+        `**cost** ${upgrade.cost + (guild.upgrades.find((i) => i.upgradeId)?.amount || 0) * upgrade.increment_per_level}\n` +
+        `*you have ${guild.upgrades.find((i) => i.upgradeId)?.amount || 0}*`;
+
+      if (pages.size === 0) {
+        pages.set(1, [{ name, value, inline: true }]);
+      } else if (pages.get(pages.size).length >= 6) {
+        pages.set(pages.size + 1, [{ name, value, inline: true }]);
+      } else {
+        pages.get(pages.size).push({ name, value, inline: true });
+      }
+    }
+
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
+      new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
+      new ButtonBuilder().setCustomId("❌").setLabel("clear mentions").setStyle(ButtonStyle.Danger)
+    );
+
+    const embed = new CustomEmbed(message.member)
+      .setHeader(`${guild.guildName} upgrades`, message.author.avatarURL())
+      .setFields(...pages.get(1));
+
+    if (pages.size === 1) return send({ embeds: [embed] });
+
+    const msg = await send({ embeds: [embed], components: [row] });
+
+    const manager = new PageManager({
+      embed,
+      message: msg,
+      row,
+      userId: message.author.id,
+      pages,
+      updateEmbed(page, embed) {
+        embed.setFields(...page);
+        return embed;
+      },
+    });
+
+    return manager.listen();
   }
 
   if (args[0].toLowerCase() == "view") {
