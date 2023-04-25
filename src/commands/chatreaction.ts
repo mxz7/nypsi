@@ -441,7 +441,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return send({ embeds: [new ErrorEmbed("you are blacklisted from chat reactions in this server")] });
 
     if (args.length === 3) {
-      const target = message.mentions?.members?.first() || (await getMember(message.guild, args[1]));
+      const target = await getMember(message.guild, args[1]);
 
       if (!target) return send({ embeds: [new ErrorEmbed("invalid target")] });
 

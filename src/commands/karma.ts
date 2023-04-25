@@ -1,9 +1,8 @@
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
-import Constants from "../utils/Constants";
 import { getPrefix } from "../utils/functions/guilds/utils";
-import { getKarma, removeKarma } from "../utils/functions/karma/karma";
+import { getKarma } from "../utils/functions/karma/karma";
 import { getMember } from "../utils/functions/member";
 
 const cmd = new Command("karma", "check how much karma you have", "info").setDocs("https://docs.nypsi.xyz/economy/karma");
@@ -45,20 +44,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   };
 
   if (args.length >= 1) {
-    if (message.author.id == Constants.TEKOH_ID && args[0] == "remove") {
-      if (!args[1] || !args[2]) {
-        return send({
-          embeds: [new CustomEmbed(message.member, "$karma remove <userid> <amount>")],
-        });
-      }
-
-      await removeKarma(args[1], parseInt(args[2]));
-    }
-    target = message.mentions.members.first();
-
-    if (!target) {
-      target = await getMember(message.guild, args.join(" "));
-    }
+    target = await getMember(message.guild, args.join(" "));
 
     if (!target) {
       return send({ embeds: [new ErrorEmbed("invalid user")] });

@@ -50,13 +50,7 @@ module.exports = new ItemUse(
       });
     }
 
-    let lockPickTarget; // eslint-disable-line
-
-    if (!message.mentions.members.first()) {
-      lockPickTarget = await getMember(message.guild, args[1]);
-    } else {
-      lockPickTarget = message.mentions.members.first();
-    }
+    const lockPickTarget = await getMember(message.guild, args[1]);
 
     if (!lockPickTarget) {
       return send({ embeds: [new ErrorEmbed("invalid user")] });

@@ -4,7 +4,6 @@ import {
   ButtonBuilder,
   ButtonStyle,
   CommandInteraction,
-  GuildMember,
   Interaction,
   InteractionReplyOptions,
   Message,
@@ -300,7 +299,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const searchTag = args[1].toLowerCase();
 
     const selectedItem = selectItem(searchTag);
-    const selectedMember = message.mentions?.members?.first() || (await getMember(message.guild, searchTag));
+    const selectedMember = await getMember(message.guild, searchTag);
 
     if (!selectedItem && !selectedMember) return send({ embeds: [new ErrorEmbed("invalid member or item")] });
 
@@ -360,13 +359,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (currentOffers.length + 1 > max)
       return send({ embeds: [new ErrorEmbed(`you have reached the max amount of offers (${max})`)] });
 
-    let target: GuildMember;
-
-    if (!message.mentions.members.first()) {
-      target = await getMember(message.guild, args[0].toLowerCase());
-    } else {
-      target = message.mentions.members.first();
-    }
+    const target = await getMember(message.guild, args[0].toLowerCase());
 
     if (!target) {
       return send({ embeds: [new ErrorEmbed("invalid user")] });

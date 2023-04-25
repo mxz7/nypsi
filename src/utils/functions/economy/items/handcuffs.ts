@@ -46,13 +46,7 @@ module.exports = new ItemUse(
       });
     }
 
-    let handcuffsTarget; // eslint-disable-line
-
-    if (!message.mentions.members.first()) {
-      handcuffsTarget = await getMember(message.guild, args[1]);
-    } else {
-      handcuffsTarget = message.mentions.members.first();
-    }
+    const handcuffsTarget = await getMember(message.guild, args[1]);
 
     if (!handcuffsTarget) {
       return send({ embeds: [new ErrorEmbed("invalid user")] });

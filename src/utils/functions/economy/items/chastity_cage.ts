@@ -1,11 +1,4 @@
-import {
-  BaseMessageOptions,
-  CommandInteraction,
-  GuildMember,
-  InteractionReplyOptions,
-  Message,
-  MessageEditOptions,
-} from "discord.js";
+import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions } from "discord.js";
 import redis from "../../../../init/redis";
 import { NypsiCommandInteraction } from "../../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
@@ -63,13 +56,7 @@ module.exports = new ItemUse(
       });
     }
 
-    let chastityTarget: GuildMember; // eslint-disable-line
-
-    if (!message.mentions.members.first()) {
-      chastityTarget = await getMember(message.guild, args[1]);
-    } else {
-      chastityTarget = message.mentions.members.first();
-    }
+    const chastityTarget = await getMember(message.guild, args[1]);
 
     if (!chastityTarget) {
       return send({ embeds: [new ErrorEmbed("invalid user")] });

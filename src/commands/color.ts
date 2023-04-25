@@ -17,11 +17,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   }
 
   if (args.length != 0) {
-    if (!message.mentions.members.first()) {
-      member = await getMember(message.guild, args[0]);
-    } else {
-      member = message.mentions.members.first();
-    }
+    member = await getMember(message.guild, args.join(" "));
 
     if (!member) {
       color = args[0].split("#").join("");
