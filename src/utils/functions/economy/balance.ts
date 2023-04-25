@@ -9,6 +9,7 @@ import { getTier } from "../premium/premium";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { getAuctionAverage } from "./auctions";
 import { getBoosters } from "./boosters";
+import { getGuildUpgradesByUser } from "./guilds";
 import { gemBreak, getInventory } from "./inventory";
 import { isPassive } from "./passive";
 import { getPrestige } from "./prestige";
@@ -150,6 +151,9 @@ export async function getMulti(member: GuildMember | string): Promise<number> {
 
   const boosters = await getBoosters(id);
   const items = getItems();
+  const guildUpgrades = await getGuildUpgradesByUser(member);
+
+  if (guildUpgrades.find((i) => i.upgradeId === "multi")) multi += guildUpgrades.find((i) => i.upgradeId === "multi").amount;
 
   if ((await getDmSettings(id)).voteReminder && !(await redis.sismember(Constants.redis.nypsi.VOTE_REMINDER_RECEIVED, id)))
     multi += 2;
