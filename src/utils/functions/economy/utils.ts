@@ -5,7 +5,7 @@ import * as fs from "fs";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
-import { AchievementData, BakeryUpgradeData, Item } from "../../../types/Economy";
+import { AchievementData, BakeryUpgradeData, GuildUpgrade, Item } from "../../../types/Economy";
 import { Worker, WorkerUpgrades } from "../../../types/Workers";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
@@ -25,6 +25,7 @@ let achievements: { [key: string]: AchievementData };
 let baseWorkers: { [key: string]: Worker };
 let baseUpgrades: { [key: string]: WorkerUpgrades };
 let bakeryUpgrades: { [key: string]: BakeryUpgradeData };
+let guildUpgrades: { [key: string]: GuildUpgrade };
 
 const lotteryTicketPrice = 50000;
 /**
@@ -38,12 +39,14 @@ export function loadItems(crypto = true) {
   const achievementsFile: any = fs.readFileSync("./data/achievements.json");
   const workersFile: any = fs.readFileSync("./data/workers.json");
   const bakeryFile: any = fs.readFileSync("./data/bakery_upgrades.json");
+  const guildUpgradesFile: any = fs.readFileSync("./data/guild_upgrades.json");
 
   items = JSON.parse(itemsFile);
   achievements = JSON.parse(achievementsFile);
   baseWorkers = JSON.parse(workersFile).workers;
   baseUpgrades = JSON.parse(workersFile).upgrades;
   bakeryUpgrades = JSON.parse(bakeryFile);
+  guildUpgrades = JSON.parse(guildUpgradesFile);
 
   const workerIds = Object.keys(baseWorkers);
 
@@ -109,6 +112,10 @@ export function getBaseWorkers() {
 
 export function getBaseUpgrades() {
   return baseUpgrades;
+}
+
+export function getGuildUpgradeData() {
+  return guildUpgrades;
 }
 
 export function runEconomySetup() {

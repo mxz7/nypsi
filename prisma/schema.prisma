@@ -500,13 +500,15 @@ model EconomyGuild {
   createdAt DateTime
   balance   BigInt   @default(0)
   xp        Int      @default(0)
+  tokens    Int      @default(0)
   level     Int      @default(1)
   motd      String   @default("welcome to the guild fool (/guild motd)")
 
   owner   Economy @relation(fields: [ownerId], references: [userId], onDelete: Cascade)
   ownerId String  @unique
 
-  members EconomyGuildMember[]
+  members  EconomyGuildMember[]
+  upgrades EconomyGuildUpgrades[]
 }
 
 model EconomyGuildMember {
@@ -520,6 +522,16 @@ model EconomyGuildMember {
   guild   EconomyGuild @relation(fields: [guildName], references: [guildName], onDelete: Cascade)
 
   @@id([userId, guildName])
+}
+
+model EconomyGuildUpgrades {
+  guildName String
+  upgradeId String
+  amount    Int
+
+  guild EconomyGuild @relation(fields: [guildName], references: [guildName], onDelete: Cascade)
+
+  @@id([guildName, upgradeId])
 }
 
 // wholesome tables

@@ -65,3 +65,11 @@ export interface BakeryUpgradeData {
   emoji: string;
   value: number;
 }
+
+export type GuildUpgrade = {
+  id: string;
+  name: string;
+  description: string;
+  cost: number;
+  increment_per_level: number;
+};
