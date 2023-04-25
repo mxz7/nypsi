@@ -367,8 +367,6 @@ async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
       },
       data: {
         level: { increment: 1 },
-        balance: { decrement: requirements.money },
-        xp: { decrement: requirements.xp },
       },
     });
 
