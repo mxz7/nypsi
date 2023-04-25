@@ -808,6 +808,19 @@ export async function runCommand(
         message.followUp({ embeds: [embed] });
       }
     }
+
+    if (await redis.exists(`${Constants.redis.nypsi.RICKROLL}:${message.author.id}`)) {
+      if (!percentChance(10)) return;
+
+      const userId = await redis.get(`${Constants.redis.nypsi.RICKROLL}:${message.author.id}`);
+      await redis.del(`${Constants.redis.nypsi.RICKROLL}:${message.author.id}`);
+
+      await message.channel.send({
+        content: `${message.author.toString()} you have been **RICK ROLLED** by ${await getLastKnownTag(
+          userId
+        )}\n\nhttps://www.youtube.com/watch?v=dQw4w9WgXcQ`,
+      });
+    }
   }, 2000);
 
   await Promise.all([

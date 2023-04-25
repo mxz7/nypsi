@@ -1938,5 +1938,16 @@
       "time": 1800
     },
     "in_crates": true
+  },
+  "rick_astley": {
+    "id": "rick_astley",
+    "name": "rick astley",
+    "emoji": "<a:rick_astley:1100529748796506203>",
+    "longDesc": "rick roll someone",
+    "rarity": 2,
+    "role": "item",
+    "aliases": ["rick", "rickroll"],
+    "sell": 1000000,
+    "in_crates": true
   }
 }
