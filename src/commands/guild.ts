@@ -93,7 +93,23 @@ cmd.slashData
       .setName("view")
       .setDescription("view a guild")
       .addStringOption((option) => option.setName("guild-name").setDescription("guild to show").setRequired(false))
-  );
+  )
+  .addSubcommand((buy) =>
+    buy
+      .setName("buy")
+      .setDescription("buy guild upgrades with tokens")
+      .addStringOption((option) =>
+        option
+          .setName("upgrade")
+          .setDescription("upgrade you want to buy")
+          .setChoices(
+            { name: "25k max bet", value: "maxbet" },
+            { name: "member slot", value: "value" },
+            { name: "1% multiplier", value: "multi" }
+          )
+      )
+  )
+  .addSubcommand((shop) => shop.setName("shop").setDescription("view guild upgrades"));
 
 const filter = [
   "nig",
