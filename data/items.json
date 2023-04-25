@@ -29,7 +29,7 @@
     "role": "fish",
     "rarity": 1,
     "buy": 0,
-    "sell": 25000,
+    "sell": 20000,
     "in_crates": false
   },
   "pufferfish": {
@@ -40,7 +40,7 @@
     "role": "fish",
     "rarity": 1,
     "buy": 0,
-    "sell": 30000,
+    "sell": 25000,
     "in_crates": false
   },
   "large_fish": {
@@ -74,7 +74,7 @@
     "rarity": 0,
     "aliases": ["cobble"],
     "buy": 0,
-    "sell": 1000,
+    "sell": 750,
     "in_crates": false
   },
   "netherrack": {
@@ -85,7 +85,7 @@
     "role": "sellable",
     "rarity": 0,
     "buy": 0,
-    "sell": 6000,
+    "sell": 5000,
     "in_crates": false
   },
   "coal": {
@@ -441,7 +441,7 @@
     "role": "prey",
     "rarity": 2,
     "buy": 0,
-    "sell": 50000,
+    "sell": 30000,
     "in_crates": false
   },
   "llama": {
@@ -452,7 +452,7 @@
     "role": "prey",
     "rarity": 2,
     "buy": 0,
-    "sell": 60000,
+    "sell": 40000,
     "in_crates": false
   },
   "monkey": {
@@ -464,7 +464,7 @@
     "role": "prey",
     "rarity": 2,
     "buy": 0,
-    "sell": 50000,
+    "sell": 30000,
     "in_crates": false
   },
   "harambe": {
@@ -475,7 +475,7 @@
     "role": "prey",
     "rarity": 3,
     "buy": 0,
-    "sell": 100000,
+    "sell": 75000,
     "in_crates": false
   },
   "rat": {
@@ -511,7 +511,7 @@
     "role": "prey",
     "rarity": 3,
     "buy": 0,
-    "sell": 60000,
+    "sell": 50000,
     "in_crates": false
   },
   "wolf": {
@@ -523,7 +523,7 @@
     "role": "prey",
     "rarity": 3,
     "buy": 0,
-    "sell": 150000,
+    "sell": 110000,
     "in_crates": false
   },
   "mineshaft_chest": {
