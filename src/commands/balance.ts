@@ -63,11 +63,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   let target = message.member;
 
   if (args.length >= 1) {
-    target = message.mentions.members.first();
-
-    if (!target) {
-      target = await getMember(message.guild, args.join(" "));
-    }
+    target = await getMember(message.guild, args.join(" "));
 
     if (!target) {
       return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] });

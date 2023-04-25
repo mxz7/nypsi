@@ -191,13 +191,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   };
 
   if (args.length == 2) {
-    let target: GuildMember;
-
-    if (!message.mentions.members.first()) {
-      target = await getMember(message.guild, args[0]);
-    } else {
-      target = message.mentions.members.first();
-    }
+    const target = await getMember(message.guild, args[0]);
 
     if (!target) {
       return send({ embeds: [new ErrorEmbed("unable to find that member")] });

@@ -484,11 +484,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   } else {
     let member;
 
-    if (!message.mentions.members.first()) {
-      member = await getMember(message.guild, args.join(" "));
-    } else {
-      member = message.mentions.members.first();
-    }
+    member = await getMember(message.guild, args.join(" "));
 
     if (member) {
       target = member;
