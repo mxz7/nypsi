@@ -369,6 +369,7 @@ async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
       },
       data: {
         level: { increment: 1 },
+        tokens: { increment: 1 },
       },
     });
 
@@ -387,6 +388,7 @@ async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
     if (cratesEarned > 5) cratesEarned = 5;
 
     desc.push(` +**${cratesEarned}** 69420 crates`);
+    desc.push(` +**1** upgrade token`);
 
     embed.setHeader(guild.guildName);
     embed.setDescription(desc.join("\n"));
