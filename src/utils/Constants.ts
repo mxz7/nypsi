@@ -106,6 +106,7 @@ export default {
       AUTO_SELL_ITEMS_MEMBERS: "nypsi:autosell:items:members",
       AUTO_SELL_PROCESS: "nypsi:autosell:process",
       OFFER_PROCESS: "nypsi:offer:process",
+      RICKROLL: "nypsi:rickroll",
     },
   },
   ADMIN_IDS: ["672793821850894347", "449774710469689355"],
