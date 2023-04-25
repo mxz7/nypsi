@@ -369,7 +369,14 @@ export async function setDefaultBet(member: GuildMember, setting: number) {
   await redis.del(`${Constants.redis.cache.economy.DEFAULT_BET}:${member.user.id}`);
 }
 
-export async function calcMaxBet(member: GuildMember): Promise<number> {
+export async function calcMaxBet(member: GuildMember | string): Promise<number> {
+  let id: string;
+  if (member instanceof GuildMember) {
+    id = member.user.id;
+  } else {
+    id = member;
+  }
+
   const base = 100000;
   const voted = await hasVoted(member);
   const bonus = 50000;
@@ -386,7 +393,7 @@ export async function calcMaxBet(member: GuildMember): Promise<number> {
 
   if (calculated > 1_000_000) calculated = 1_000_000;
 
-  if (await isBooster(member.user.id)) calculated += 250_000;
+  if (await isBooster(id)) calculated += 250_000;
 
   const boosters = await getBoosters(member);
 

@@ -35,7 +35,7 @@ import {
   updateReactionSettings,
 } from "../utils/functions/chatreactions/utils";
 import { getWordList, updateWords } from "../utils/functions/chatreactions/words";
-import { getBalance, updateBalance } from "../utils/functions/economy/balance";
+import { calcMaxBet, getBalance, updateBalance } from "../utils/functions/economy/balance";
 import { createUser, formatNumber, isEcoBanned, userExists } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
@@ -468,6 +468,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       if ((await getBalance(target)) < wager)
         return send({ embeds: [new ErrorEmbed(`${target.user.toString()} cannot afford this wager`)] });
 
+      if (wager > (await calcMaxBet(message.member)) * 10)
+        return send({
+          embeds: [new ErrorEmbed(`your max bet is $**${((await calcMaxBet(message.member)) * 10).toLocaleString()}**`)],
+        });
+
+      if (wager > (await calcMaxBet(target)) * 10)
+        return send({
+          embeds: [new ErrorEmbed(`their max bet is $**${((await calcMaxBet(target)) * 10).toLocaleString()}**`)],
+        });
+
       if (duelRequests.has(message.author.id)) return send({ embeds: [new ErrorEmbed("you already have a duel request!")] });
       if (duelRequests.has(target.user.id)) return send({ embeds: [new ErrorEmbed("they already have a duel request!")] });
 
@@ -535,6 +545,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       if ((await getBalance(message.member)) < wager) return send({ embeds: [new ErrorEmbed("you cannot afford this")] });
 
+      if (wager > (await calcMaxBet(message.member)) * 10)
+        return send({
+          embeds: [new ErrorEmbed(`your max bet is $**${((await calcMaxBet(message.member)) * 10).toLocaleString()}**`)],
+        });
+
       if (duelRequests.has(message.author.id)) return send({ embeds: [new ErrorEmbed("you already have a duel request!")] });
 
       duelRequests.add(message.author.id);
@@ -567,6 +582,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
         if (!(await userExists(i.user.id)) || (await getBalance(i.user.id)) < wager) {
           if (i.isRepliable()) await i.reply({ ephemeral: true, embeds: [new ErrorEmbed("you cannot afford this wager")] });
+          return false;
+        }
+
+        if ((await calcMaxBet(i.user.id)) * 10 < wager) {
+          if (i.isRepliable())
+            i.reply({
+              embeds: [new ErrorEmbed(`your max bet is $**${((await calcMaxBet(message.member)) * 10).toLocaleString()}**`)],
+            });
+
           return false;
         }
 
