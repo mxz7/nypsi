@@ -478,3 +478,24 @@ export async function getGuildUpgradesByUser(member: GuildMember | string): Prom
 
   return guild.upgrades;
 }
+
+export async function addGuildUpgrade(guildName: string, upgradeId: string) {
+  await prisma.economyGuildUpgrades.upsert({
+    where: {
+      guildName_upgradeId: {
+        guildName,
+        upgradeId,
+      },
+    },
+    update: {
+      amount: { increment: 1 },
+    },
+    create: {
+      guildName,
+      upgradeId,
+      amount: 1,
+    },
+  });
+
+  await redis.del(`${Constants.redis.cache.economy.GUILD_UPGRADES}:${guildName}`);
+}
