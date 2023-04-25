@@ -1,11 +1,4 @@
-import {
-  BaseMessageOptions,
-  CommandInteraction,
-  GuildMember,
-  InteractionReplyOptions,
-  Message,
-  MessageEditOptions,
-} from "discord.js";
+import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions } from "discord.js";
 import redis from "../../../../init/redis";
 import { NypsiCommandInteraction } from "../../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
@@ -50,13 +43,7 @@ module.exports = new ItemUse(
       });
     }
 
-    let radioTarget: GuildMember; // eslint-disable-line
-
-    if (!message.mentions.members.first()) {
-      radioTarget = await getMember(message.guild, args[1]);
-    } else {
-      radioTarget = message.mentions.members.first();
-    }
+    const radioTarget = await getMember(message.guild, args[1]);
 
     if (!radioTarget) {
       return send({ embeds: [new ErrorEmbed("invalid user")] });

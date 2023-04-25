@@ -113,6 +113,7 @@ export default {
   BOT_USER_ID: "678711738845102087",
   BRONZE_ROLE_ID: "819870590718181391",
   COLOUR_REGEX: /^#([A-Fa-f0-9]{6})$/,
+  MENTION_REGEX: /<@!*&*[0-9]+>/,
   EMBED_FAIL_COLOR: "#e31e3b" as ColorResolvable,
   EMBED_SUCCESS_COLOR: "#68f78c" as ColorResolvable,
   EMOJI_REGEX: /(<:[A-z]+:[0-9]+>)/,

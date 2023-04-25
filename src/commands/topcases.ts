@@ -124,29 +124,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       embed.setFooter({ text: `${prefix}topcases <user> | ${cases.length.toLocaleString()} total cases` });
     }
   } else {
-    let member;
+    const member = await getMember(message.guild, args.join(" "));
 
-    if (message.mentions.members.first()) {
-      member = message.mentions.members.first();
-    } else {
-      if (await message.guild.members.fetch(args[0]).catch(() => {})) {
-        member = await message.guild.members.fetch(args[0]);
-
-        if (!member) {
-          return message.channel.send({
-            embeds: [new ErrorEmbed("couldn't find that member")],
-          });
-        }
-      } else {
-        member = await getMember(message.guild, args.join(" "));
-
-        if (!member) {
-          return message.channel.send({
-            embeds: [new ErrorEmbed("can't find `" + args.join(" ") + "`")],
-          });
-        }
-      }
-    }
+    if (!member) return message.channel.send({ embeds: [new ErrorEmbed("invalid member")] });
 
     let deletedCasesModerator = 0;
     let deletedCases = 0;
