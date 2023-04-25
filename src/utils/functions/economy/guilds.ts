@@ -384,13 +384,7 @@ async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
     if (cratesEarned < 1) cratesEarned = 1;
     if (cratesEarned > 5) cratesEarned = 5;
 
-    desc.push(` +**${cratesEarned}** basic crates`);
-
-    if (guild.level < 5) {
-      desc.push(" +**1**% multiplier");
-    }
-
-    desc.push(" +**1** max xp gain");
+    desc.push(` +**${cratesEarned}** 69420 crates`);
 
     embed.setHeader(guild.guildName);
     embed.setDescription(desc.join("\n"));
@@ -405,7 +399,7 @@ async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
     };
 
     for (const member of guild.members) {
-      await addInventoryItem(member.userId, "basic_crate", cratesEarned, false);
+      await addInventoryItem(member.userId, "69420_crate", cratesEarned, false);
 
       if ((await getDmSettings(member.userId)).other) {
         payload.memberId = member.userId;
