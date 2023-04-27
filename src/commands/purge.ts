@@ -131,7 +131,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       const embed = new CustomEmbed(
         message.member,
-        "deleting `" + amount + "` messages..\n - if you'd like to cancel this operation, delete this message"
+        "deleting `" + amount + "` messages..\n- if you'd like to cancel this operation, delete this message"
       ).setHeader("purge", message.author.avatarURL());
 
       const m = await send({ embeds: [embed] });
@@ -163,7 +163,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
               amount +
               " / " +
               amount1 +
-              "` messages..\n - if you'd like to cancel this operation, delete this message"
+              "` messages..\n- if you'd like to cancel this operation, delete this message"
           );
           let stop = false;
           await edit({ embeds: [embed] }, m).catch(() => {
@@ -196,7 +196,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
               amount +
               " / " +
               amount1 +
-              "` messages..\n - if you'd like to cancel this operation, delete this message"
+              "` messages..\n- if you'd like to cancel this operation, delete this message"
           );
           let stop = false;
           await edit({ embeds: [embed] }, m).catch(() => {

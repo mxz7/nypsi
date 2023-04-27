@@ -167,7 +167,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       for (const [key, value] of owned.entries()) {
         const needed = parseInt(items[itemId].craft.ingrediants.find((i) => i.split(":")[0] == key).split(":")[1]);
 
-        item += `\n - ${items[key].emoji} ${items[key].name} \`${value.toLocaleString()} / ${needed}\``;
+        item += `\n- ${items[key].emoji} ${items[key].name} \`${value.toLocaleString()} / ${needed}\``;
 
         const recipeAvailableToCraft = Math.floor(value / needed);
 

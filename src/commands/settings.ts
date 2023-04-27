@@ -779,7 +779,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embeds: [
           new CustomEmbed(message.member, "you are now in passive mode").addField(
             "effects",
-            " - cannot be robbed\n - reduced multiplier\n - reduced xp gain\n - reduced cookie production"
+            "- cannot be robbed\n- reduced multiplier\n- reduced xp gain\n- reduced cookie production"
           ),
         ],
       });
