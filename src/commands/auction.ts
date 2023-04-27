@@ -834,10 +834,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       auctions.map(
         (a) =>
           `**${a.itemAmount}x** ${items[a.itemId].emoji} ${items[a.itemId].name}\n` +
-          ` - $**${a.bin.toLocaleString()}**${
+          `- $**${a.bin.toLocaleString()}**${
             a.itemAmount > 1 ? ` ($${Math.floor(Number(a.bin / a.itemAmount)).toLocaleString()} each)` : ""
           }\n` +
-          ` - [jump](https://discord.com/channels/747056029795221513/1008467335973179482/${a.messageId})\n `
+          `- [jump](https://discord.com/channels/747056029795221513/1008467335973179482/${a.messageId})\n `
       ),
       3
     );

@@ -1,6 +1,6 @@
 import { variants } from "@catppuccin/palette";
 import { Client, User, WebhookClient } from "discord.js";
-import { createWriteStream, existsSync, WriteStream } from "fs";
+import { WriteStream, createWriteStream, existsSync } from "fs";
 import { rename, stat } from "fs/promises";
 import DiscordTransport from "../models/DiscordLogs";
 import Constants from "./Constants";
@@ -339,11 +339,11 @@ export function setClusterId(id: number | string) {
 
 export function transaction(from: User, to: User, value: string) {
   if (!nextLogMsg.get("pay")) {
-    nextLogMsg.set("pay", `**${from.tag}** (${from.id}) -> **${to.tag}** (${to.id})\n - **${value}**\n`);
+    nextLogMsg.set("pay", `**${from.tag}** (${from.id}) -> **${to.tag}** (${to.id})\n- **${value}**\n`);
   } else {
     nextLogMsg.set(
       "pay",
-      nextLogMsg.get("pay") + `**${from.tag}** (${from.id}) -> **${to.tag}** (${to.id})\n - **${value}**\n`
+      nextLogMsg.get("pay") + `**${from.tag}** (${from.id}) -> **${to.tag}** (${to.id})\n- **${value}**\n`
     );
   }
 }
@@ -353,22 +353,22 @@ export function gamble(user: User, game: string, amount: number, win: boolean, i
     nextLogMsg.set(
       "gamble",
       `**${user.tag}** (${user.id})\n` +
-        ` - **game** ${game}\n` +
-        ` - **bet** $${amount.toLocaleString()}\n` +
-        ` - **win** ${win}${win ? ` ($**${winAmount.toLocaleString()}**)` : ""}\n` +
-        ` - **id** ${id}\n` +
-        ` - **time** <t:${Math.floor(Date.now() / 1000)}>\n`
+        `- **game** ${game}\n` +
+        `- **bet** $${amount.toLocaleString()}\n` +
+        `- **win** ${win}${win ? ` ($**${winAmount.toLocaleString()}**)` : ""}\n` +
+        `- **id** ${id}\n` +
+        `- **time** <t:${Math.floor(Date.now() / 1000)}>\n`
     );
   } else {
     nextLogMsg.set(
       "gamble",
       nextLogMsg.get("gamble") +
         `**${user.tag}** (${user.id})\n` +
-        ` - **game** ${game}\n` +
-        ` - **bet** $${amount.toLocaleString()}\n` +
-        ` - **win** ${win}${win ? ` ($**${winAmount.toLocaleString()}**)` : ""}\n` +
-        ` - **id** ${id}\n` +
-        ` - **time** <t:${Math.floor(Date.now() / 1000)}>\n`
+        `- **game** ${game}\n` +
+        `- **bet** $${amount.toLocaleString()}\n` +
+        `- **win** ${win}${win ? ` ($**${winAmount.toLocaleString()}**)` : ""}\n` +
+        `- **id** ${id}\n` +
+        `- **time** <t:${Math.floor(Date.now() / 1000)}>\n`
     );
   }
 }
