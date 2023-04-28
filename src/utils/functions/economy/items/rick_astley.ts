@@ -40,6 +40,8 @@ module.exports = new ItemUse(
       }
     };
 
+    if (args.length === 1) return send({ embeds: [new ErrorEmbed("invalid member")] });
+
     const target = await getMember(message.guild, args.slice(1, args.length).join(" "));
 
     if (!target) return send({ embeds: [new ErrorEmbed("invalid member")] });
