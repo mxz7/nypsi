@@ -16,18 +16,15 @@ import dayjs = require("dayjs");
 
   const hook = new WebhookClient({ url: process.env.TOPGLOBAL_HOOK });
 
-  await hook
-    .send({ embeds: [embed] })
-    .then(() => {
-      parentPort.postMessage("sent global baltop");
-      process.exit(0);
-    })
-    .catch(() => {
-      parentPort.postMessage("failed to send global baltop");
-      process.exit(1);
-    });
+  await hook.send({ embeds: [embed] }).catch(() => {
+    parentPort.postMessage("failed to send global baltop");
+    process.exit(1);
+  });
+
+  parentPort.postMessage("sent global baltop");
 
   hook.destroy();
+  process.exit(0);
 })();
 
 async function topAmountGlobal(amount: number, anon = true): Promise<string[]> {
