@@ -667,6 +667,19 @@ export async function runCommand(
 
   logCommand(message, args);
 
+  if (await redis.exists(`${Constants.redis.nypsi.COMMAND_WATCH}:${message.author.id}:${command.name}`)) {
+    const hook = new WebhookClient({ url: process.env.ANTICHEAT_HOOK });
+
+    const embed = new CustomEmbed(
+      null,
+      `\`\`\`[${getTimestamp()}] ${message.author.tag}: ${message.content}\`\`\``
+    ).setHeader(`command watch (${message.author.id} - ${command.name})`);
+
+    hook.send({ embeds: [embed] }).then(() => {
+      hook.destroy();
+    });
+  }
+
   if (await isLockedOut(message.author.id)) {
     return verifyUser(message);
   }

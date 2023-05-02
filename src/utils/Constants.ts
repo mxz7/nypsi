@@ -107,6 +107,7 @@ export default {
       AUTO_SELL_PROCESS: "nypsi:autosell:process",
       OFFER_PROCESS: "nypsi:offer:process",
       RICKROLL: "nypsi:rickroll",
+      COMMAND_WATCH: "nypsi:cmdwatch",
     },
   },
   ADMIN_IDS: ["672793821850894347", "449774710469689355"],
