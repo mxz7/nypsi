@@ -34,10 +34,13 @@ app.use(express.urlencoded({ extended: true }));
 export function listen(manager: ClusterManager) {
   app.post(
     "/topgg",
-    webhook.listener((vote) => {
-      logger.info(`received vote: ${vote.user}`);
-      doVote(vote, manager);
-    })
+    (req) => {
+      console.log(req);
+    }
+    // webhook.listener((vote) => {
+    //   logger.info(`received vote: ${vote.user}`);
+    //   doVote(vote, manager);
+    // })
   );
 
   app.post("/kofi", async (req, response) => {
