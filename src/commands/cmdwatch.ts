@@ -18,10 +18,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (await redis.exists(`${Constants.redis.nypsi.COMMAND_WATCH}:${args[0]}:${args[1]}`)) {
     await redis.del(`${Constants.redis.nypsi.COMMAND_WATCH}:${args[0]}:${args[1]}`);
-    message.react("heavy_minus_sign:");
+    await message.react("➖");
   } else {
     await redis.set(`${Constants.redis.nypsi.COMMAND_WATCH}:${args[0]}:${args[1]}`, "t");
-    message.react(":heavy_plus_sign:");
+    await message.react("➕");
   }
 
   logger.info(`admin: ${message.author.id} (${message.author.tag}) toggled command watch - ${args.join(" ")}`);
