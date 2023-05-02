@@ -14,17 +14,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return message.channel.send({ content: "dumbass - $cmdwatch <userid> <cmd>" });
   }
 
+  if (!(message instanceof Message)) return; // never gonna give you up. never gonna let you down. never gonna run around. and. DESERT YOU
+
   if (await redis.exists(`${Constants.redis.nypsi.COMMAND_WATCH}:${args[0]}:${args[1]}`)) {
     await redis.del(`${Constants.redis.nypsi.COMMAND_WATCH}:${args[0]}:${args[1]}`);
+    message.react("heavy_minus_sign:");
   } else {
     await redis.set(`${Constants.redis.nypsi.COMMAND_WATCH}:${args[0]}:${args[1]}`, "t");
+    message.react(":heavy_plus_sign:");
   }
 
   logger.info(`admin: ${message.author.id} (${message.author.tag}) toggled command watch - ${args.join(" ")}`);
-
-  if (!(message instanceof Message)) return; // never gonna give you up. never gonna let you down. never gonna run around. and. DESERT YOU
-
-  message.react("✅");
 }
 
 cmd.setRun(run);
