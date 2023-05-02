@@ -670,10 +670,9 @@ export async function runCommand(
   if (await redis.exists(`${Constants.redis.nypsi.COMMAND_WATCH}:${message.author.id}:${command.name}`)) {
     const hook = new WebhookClient({ url: process.env.ANTICHEAT_HOOK });
 
-    const embed = new CustomEmbed(
-      null,
-      `\`\`\`[${getTimestamp()}] ${message.author.tag}: ${message.content}\`\`\``
-    ).setHeader(`command watch (${message.author.id} - ${command.name})`);
+    const embed = new CustomEmbed(null, `\`\`\`[${getTimestamp()}] ${message.author.tag}: ${message.content}\`\`\``)
+      .setHeader(`command watch (${message.author.id} - ${command.name})`)
+      .setColor(Constants.TRANSPARENT_EMBED_COLOR);
 
     hook.send({ embeds: [embed] }).then(() => {
       hook.destroy();
