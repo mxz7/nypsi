@@ -26,14 +26,14 @@ import ms = require("ms");
 loadItems(false);
 
 const app = express();
-const webhook = new topgg.Webhook("123");
+const webhook = new topgg.Webhook(process.env.TOPGG_AUTH);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 export function listen(manager: ClusterManager) {
   app.post(
-    "/dblwebhook",
+    "/topgg",
     webhook.listener((vote) => {
       logger.info(`received vote: ${vote.user}`);
       doVote(vote, manager);
