@@ -81,7 +81,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const doGame = async (player1: GuildMember, player2: GuildMember, bet: number, response: ButtonInteraction) => {
     if (bet > (await getBalance(player2))) {
-      return message.channel.send({ embeds: [new ErrorEmbed(`${player2.user.toString()} cannot afford this bet`)] });
+      await updateBalance(player1.user.id, (await getBalance(player1.user.id)) + bet);
+      return response.editReply({ embeds: [new ErrorEmbed(`${player2.user.toString()} cannot afford this bet`)] });
     }
 
     await updateBalance(player2, (await getBalance(player2)) - bet);

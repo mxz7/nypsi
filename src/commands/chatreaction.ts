@@ -413,8 +413,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const doGame = async (player: GuildMember, wager: number, response: ButtonInteraction, m: Message) => {
       const balance = await getBalance(player);
 
-      if (balance < wager)
+      if (balance < wager) {
+        await updateBalance(message.member, (await getBalance(message.member)) + wager);
         return response.followUp({ embeds: [new ErrorEmbed(`${player.user.toString()} cannot afford this`)] });
+      }
 
       await updateBalance(player, balance - wager);
 
