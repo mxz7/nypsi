@@ -52,6 +52,9 @@ async function doWorkerThing() {
 
       if (await redis.exists(`${Constants.redis.nypsi.STEVE_EARNED}:${worker.userId}`)) {
         steveStorage = JSON.parse(await redis.get(`${Constants.redis.nypsi.STEVE_EARNED}:${worker.userId}`));
+        steveStorage.money = parseInt(steveStorage.money as unknown as string);
+        steveStorage.gemShards = parseInt(steveStorage.gemShards as unknown as string);
+        steveStorage.scraps = parseInt(steveStorage.scraps as unknown as string);
       } else {
         steveStorage = { money: 0, gemShards: 0, scraps: 0 };
       }
