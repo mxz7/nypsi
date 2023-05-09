@@ -252,6 +252,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       if (profile.level < 4) {
         description += "\n\nyou can upgrade your tier at [ko-fi](https://ko-fi.com/tekoh/tiers)";
+      if(profile.level > 4)
+        description += "\n\nyou can view a list of all available tiers at [ko-fi](https://ko-fi.com/tekoh/tiers)";
       }
 
       embed.setDescription(description);
@@ -267,8 +269,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       embed.addField(
         "payment methods",
         "[ko-fi](https://ko-fi.com/tekoh/tiers)\n\n" +
-          "if you'd like to pay another way (crypto, paypal, etc) join the [support server](https://discord.gg/hJTDNST)"
-      );
+          "if you'd like to pay another way (crypto, paypal, etc) join the [support server](https://discord.gg/hJTDNST)\nif you are just looking to buy crates, you can do so from the [nypsi shop](https://ko-fi.com/U7U4AEDXM/shop)"
+          );
 
       return send({ embeds: [embed] });
     } else {
@@ -280,7 +282,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       embed.addField(
         "payment methods",
         "[ko-fi](https://ko-fi.com/tekoh/tiers)\n\n" +
-          "if you'd like to pay another way (crypto, paypal, etc) join the [support server](https://discord.gg/hJTDNST)"
+          "if you'd like to pay another way (crypto, paypal, etc) join the [support server](https://discord.gg/hJTDNST)\nif you are just looking to buy crates, you can do so from the [nypsi shop](https://ko-fi.com/U7U4AEDXM/shop)"
       );
 
       return send({ embeds: [embed] });
