@@ -252,8 +252,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       if (profile.level < 4) {
         description += "\n\nyou can upgrade your tier at [ko-fi](https://ko-fi.com/tekoh/tiers)";
-      if(profile.level > 4)
-        description += "\n\nyou can view a list of all available tiers at [ko-fi](https://ko-fi.com/tekoh/tiers)";
       }
 
       embed.setDescription(description);
