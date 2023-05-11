@@ -61,7 +61,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({
       embeds: [
         new ErrorEmbed(
-          "**$graph balance** graph your balance history\n**$graph networth** graph your networth history\n**$graph item <item>** graph an item"
+          "**$graph balance** graph your balance history\n**$graph networth** graph your networth history\n**$graph karma** graph your karma history\n**$graph item <item>** graph an item"
         ),
       ],
     });
