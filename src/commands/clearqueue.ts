@@ -1,12 +1,12 @@
 import { CommandInteraction, Message } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
-import Constants from "../utils/Constants";
 import { mentionQueue } from "../utils/functions/users/mentions";
+import { getAdminLevel } from "../utils/functions/users/admin";
 
 const cmd = new Command("clearqueue", "clear the mentions queue", "none").setPermissions(["bot owner"]);
 
 async function run(message: Message | (CommandInteraction & NypsiCommandInteraction)) {
-  if (message.author.id != Constants.TEKOH_ID) return;
+  if ((await getAdminLevel(message.author.id)) < 69) return;
 
   mentionQueue.length = 0;
 
