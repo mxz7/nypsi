@@ -6,7 +6,7 @@ import { getAdminLevel } from "../utils/functions/users/admin";
 const cmd = new Command("getcsvdata", "get csv data", "none").setPermissions(["bot owner"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-  if ((await getAdminLevel(message.author.id)) < 1) return;
+  if ((await getAdminLevel(message.author.id)) < 69) return;
 
   const msg = await message.channel.send({ content: "processing..." });
 
