@@ -1,12 +1,13 @@
 import { CommandInteraction, Message } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
-import Constants from "../utils/Constants";
 import { deleteSlashCommands, deleteSlashCommandsFromGuild } from "../utils/handlers/commandhandler";
+import { getAdminLevel } from "../utils/functions/users/admin";
+
 
 const cmd = new Command("deleteslash", "delete slash commands", "none").setPermissions(["bot owner"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
-  if (message.member.user.id != Constants.TEKOH_ID) return;
+  if ((await getAdminLevel(message.author.id)) < 69) return;
 
   if (args.length == 0) {
     await deleteSlashCommandsFromGuild(message.guild.id, message.client.user.id);
