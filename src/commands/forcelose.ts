@@ -1,6 +1,7 @@
 import { CommandInteraction, Message } from "discord.js";
 import redis from "../init/redis";
 import { Command, NypsiCommandInteraction } from "../models/Command";
+import Constants from "../utils/Constants";
 import { getAdminLevel } from "../utils/functions/users/admin";
 
 const cmd = new Command("forcelose", "make an account lose 100% of the time", "none");
