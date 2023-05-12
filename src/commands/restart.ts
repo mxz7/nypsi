@@ -7,13 +7,14 @@ import Constants from "../utils/Constants";
 import { setCustomPresence } from "../utils/functions/presence";
 import { startRestart } from "../utils/handlers/commandhandler";
 import { logger } from "../utils/logger";
+import { getAdminLevel } from "../utils/functions/users/admin";
 
 const cmd = new Command("restart", "restart", "none").setPermissions(["bot owner"]);
 
 let confirm = false;
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-  if (message.member.user.id != Constants.TEKOH_ID) return;
+  if ((await getAdminLevel(message.author.id)) < 69) return;
 
   if (confirm == false) {
     confirm = true;
