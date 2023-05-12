@@ -1,12 +1,12 @@
 import { CommandInteraction, Message } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
-import Constants from "../utils/Constants";
 import graphToCsv from "../utils/functions/workers/graphtocsv";
+import { getAdminLevel } from "../utils/functions/users/admin";
 
 const cmd = new Command("getcsvdata", "get csv data", "none").setPermissions(["bot owner"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-  if (!Constants.ADMIN_IDS.includes(message.author.id)) return;
+  if ((await getAdminLevel(message.author.id)) < 1) return;
 
   const msg = await message.channel.send({ content: "processing..." });
 
