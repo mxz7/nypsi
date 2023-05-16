@@ -210,7 +210,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       components[components.length - 1].components.length = 4;
     } else if (game.game.includes("scratch_card") || game.game.includes("scratchie")) {
-      components = JSON.parse(game.outcome);
+      components = JSON.parse(
+        game.outcome
+          .replaceAll("1061353493497118840", "1108083689478443058")
+          .replaceAll("1061353458650845184", "1108083725813686334")
+          .replaceAll("1061353521825456229", "1108083767236640818")
+          .replaceAll("1061353557644824596", "1108083805841002678") // remove after season 5
+      );
     } else {
       embed.addField("outcome", game.outcome, true);
     }
