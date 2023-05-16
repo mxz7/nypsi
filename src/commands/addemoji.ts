@@ -50,13 +50,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({ embeds: [embed], ephemeral: true });
   }
 
-  if (!message.guild.members.me.permissions.has(PermissionFlagsBits.ManageEmojisAndStickers)) {
+  if (!message.guild.members.me.permissions.has(PermissionFlagsBits.ManageGuildExpressions)) {
     return send({
       embeds: [new ErrorEmbed("i need the `manage emojis` permission for this command to work")],
     });
   }
 
-  if (!message.member.permissions.has(PermissionFlagsBits.ManageEmojisAndStickers)) {
+  if (!message.member.permissions.has(PermissionFlagsBits.ManageGuildExpressions)) {
     if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
       return send({ embeds: [new ErrorEmbed("you need the `manage emojis` permission")] });
     }
