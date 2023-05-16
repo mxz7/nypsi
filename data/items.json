@@ -1096,7 +1096,7 @@
     "buy": 0,
     "sell": 150000,
     "role": "booster",
-    "stackable": true,
+    "stackable": false,
     "max": 3,
     "boosterEffect": {
       "boosts": ["mine", "fish", "hunt"],
