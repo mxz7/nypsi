@@ -51,7 +51,11 @@ export default async function messageCreate(message: Message) {
 
     if (await redis.exists(`${Constants.redis.cooldown.SUPPORT}:${message.author.id}`)) {
       return message.reply({
-        embeds: [new ErrorEmbed("you have created a support request recently, try again later.\nif you need support and don't want to wait, you can join the nypsi support server [here](https://discord.gg/hJTDNST)")],
+        embeds: [
+          new ErrorEmbed(
+            "you have created a support request recently, try again later.\nif you need support and don't want to wait, you can join the nypsi support server [here](https://discord.gg/hJTDNST)"
+          ),
+        ],
       });
     }
 
