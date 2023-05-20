@@ -579,6 +579,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (roles.has("747056620688900139")) allow = true;
     if (roles.has("747059949770768475")) allow = true;
     if (roles.has("845613231229370429")) allow = true;
+    if (roles.has("1105179633919471707")) allow = true;
 
     if (!allow) return;
 
