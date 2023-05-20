@@ -1,6 +1,6 @@
 import { CommandInteraction, Message } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
-import { ErrorEmbed } from "../models/EmbedBuilders";\
+import { ErrorEmbed } from "../models/EmbedBuilders";
 import { addNotificationToQueue } from "../utils/functions/users/notifications";
 import { getAdminLevel } from "../utils/functions/users/admin";
 
