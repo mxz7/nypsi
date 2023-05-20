@@ -160,7 +160,9 @@ async function prepare(
 
     if (!response || !response.isButton()) return;
 
-    await card.clicked(response);
+    await card.clicked(response).catch(() => {
+      logger.error("scratch card weird error !", card);
+    });
 
     if (card.remainingClicks !== 0) {
       embed.setDescription(`**${card.remainingClicks}** clicks left`);
