@@ -62,7 +62,7 @@ export async function getScratchCardStats(member: GuildMember) {
   return query;
 }
 
-export async function getItemStats(member: GuildMember) {
+export async function getStats(member: GuildMember) {
   const query = await prisma.stats.findMany({
     where: {
       userId: member.user.id,
@@ -129,7 +129,7 @@ export async function fetchGame(id: string) {
   });
 }
 
-export async function addItemUse(member: GuildMember | string, item: string, amount = 1) {
+export async function addStat(member: GuildMember | string, item: string, amount = 1) {
   let id: string;
   if (member instanceof GuildMember) {
     id = member.user.id;

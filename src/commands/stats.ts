@@ -21,7 +21,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { unbanTimeouts, unmuteTimeouts } from "../scheduled/clusterjobs/moderationchecks";
 import Constants from "../utils/Constants";
 import { MStoTime } from "../utils/functions/date";
-import { getGambleStats, getItemStats, getScratchCardStats } from "../utils/functions/economy/stats";
+import { getGambleStats, getScratchCardStats, getStats } from "../utils/functions/economy/stats";
 import { getItems } from "../utils/functions/economy/utils";
 import { violations } from "../utils/functions/moderation/mute";
 import PageManager from "../utils/functions/page";
@@ -192,7 +192,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   };
 
   const itemStats = async () => {
-    const itemStats = await getItemStats(message.member);
+    const itemStats = await getStats(message.member);
 
     if (itemStats.length == 0) {
       return send({ embeds: [new ErrorEmbed("you have no item stats")] });

@@ -17,7 +17,7 @@ import { getTier, isPremium } from "../../premium/premium";
 import sleep from "../../sleep";
 import { addProgress } from "../achievements";
 import { getInventory, openCrate, selectItem } from "../inventory";
-import { addItemUse } from "../stats";
+import { addStat } from "../stats";
 import { getItems } from "../utils";
 
 module.exports = new ItemUse(
@@ -89,10 +89,7 @@ module.exports = new ItemUse(
 
     const foundItems = new Map<string, number>();
 
-    await Promise.all([
-      addProgress(message.author.id, "unboxer", amount),
-      addItemUse(message.author.id, selected.id, amount),
-    ]);
+    await Promise.all([addProgress(message.author.id, "unboxer", amount), addStat(message.author.id, selected.id, amount)]);
 
     for (let i = 0; i < amount; i++) {
       const found = await openCrate(message.member, selected);
