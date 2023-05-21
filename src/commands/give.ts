@@ -177,7 +177,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
   }
 
-  await addCooldown(cmd.name, message.member, 15);
+  await addCooldown(cmd.name, message.member, 5);
 
   await Promise.all([
     addInventoryItem(target, selected.id, amount),
