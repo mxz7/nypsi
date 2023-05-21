@@ -27,6 +27,7 @@ import { addNotificationToQueue, getDmSettings, getPreferences } from "../users/
 import itemHistoryWorker from "../workers/itemhistory";
 import { getBalance, updateBalance } from "./balance";
 import { addInventoryItem } from "./inventory";
+import { addStat } from "./stats";
 import { createUser, getItems, userExists } from "./utils";
 import ms = require("ms");
 import dayjs = require("dayjs");
@@ -181,6 +182,8 @@ export async function createAuction(member: GuildMember, itemId: string, itemAmo
   });
 
   checkWatchers(itemId, messageUrl, member.user.id);
+
+  addStat(member.user.id, "auction-created");
 
   return messageUrl;
 }
