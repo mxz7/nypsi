@@ -165,3 +165,29 @@ export async function addStat(member: GuildMember | string, item: string, amount
     },
   });
 }
+
+export async function setStat(member: GuildMember | string, item: string, amount: number) {
+  let id: string;
+  if (member instanceof GuildMember) {
+    id = member.user.id;
+  } else {
+    id = member;
+  }
+
+  await prisma.stats.upsert({
+    where: {
+      userId_itemId: {
+        itemId: item,
+        userId: id,
+      },
+    },
+    update: {
+      amount: amount,
+    },
+    create: {
+      userId: id,
+      itemId: item,
+      amount: amount,
+    },
+  });
+}
