@@ -307,7 +307,7 @@ export async function reset() {
   await prisma.booster.deleteMany();
   await prisma.game.deleteMany();
   await prisma.$executeRaw`TRUNCATE TABLE "Game" RESTART IDENTITY;`;
-  await prisma.itemUse.deleteMany();
+  await prisma.stats.deleteMany();
   await prisma.economyGuildMember.deleteMany();
   await prisma.economyGuild.deleteMany();
   await prisma.auction.deleteMany({ where: { sold: false } });

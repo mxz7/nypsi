@@ -63,7 +63,7 @@ export async function getScratchCardStats(member: GuildMember) {
 }
 
 export async function getItemStats(member: GuildMember) {
-  const query = await prisma.itemUse.findMany({
+  const query = await prisma.stats.findMany({
     where: {
       userId: member.user.id,
     },
@@ -137,7 +137,7 @@ export async function addItemUse(member: GuildMember | string, item: string, amo
     id = member;
   }
 
-  await prisma.itemUse.upsert({
+  await prisma.stats.upsert({
     where: {
       userId_itemId: {
         itemId: item,

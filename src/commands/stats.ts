@@ -485,7 +485,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       },
     });
 
-    const byItem = await prisma.itemUse.groupBy({
+    const byItem = await prisma.stats.groupBy({
       by: ["itemId"],
       _sum: {
         amount: true,

@@ -120,7 +120,7 @@ model Economy {
   Inventory          Inventory[]
   Crafting           Crafting[]
   Game               Game[]
-  ItemUse            ItemUse[]
+  Stats              Stats[]
   BakeryUpgrade      BakeryUpgrade[]
   Auction            Auction[]
   EconomyGuild       EconomyGuild?
@@ -216,7 +216,7 @@ model Game {
   economy Economy? @relation(fields: [userId], references: [userId])
 }
 
-model ItemUse {
+model Stats {
   userId String
   itemId String
   amount Int
