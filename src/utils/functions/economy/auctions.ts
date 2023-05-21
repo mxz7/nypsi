@@ -581,6 +581,8 @@ export async function buyFullAuction(interaction: ButtonInteraction, auction: Au
     addInventoryItem(interaction.user.id, auction.itemId, Number(auction.itemAmount)),
     updateBalance(interaction.user.id, balance - Number(auction.bin)),
     updateBalance(auction.ownerId, (await getBalance(auction.ownerId)) + (Number(auction.bin) - taxedAmount)),
+    addStat(interaction.user.id, "auction-bought-items", Number(auction.itemAmount)),
+    addStat(auction.ownerId, "auction-sold-items", Number(auction.itemAmount)),
   ]);
 
   transaction(
@@ -761,6 +763,8 @@ export async function buyAuctionOne(interaction: ButtonInteraction, auction: Auc
       auction.ownerId,
       (await getBalance(auction.ownerId)) + (Math.floor(Number(auction.bin / auction.itemAmount)) - taxedAmount)
     ),
+    addStat(interaction.user.id, "auction-bought-items"),
+    addStat(auction.ownerId, "auction-sold-items"),
   ]);
 
   transaction(await interaction.client.users.fetch(auction.ownerId), interaction.user, `${auction.itemId} x ${1} (auction)`);
