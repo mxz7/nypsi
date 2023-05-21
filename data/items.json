@@ -1611,7 +1611,11 @@
     "shortDesc": "7 days of silver credit",
     "longDesc": "use to receive 7 days of silver (as long as you don't have a better tier currently)",
     "rarity": 69,
-    "in_crates": false
+    "in_crates": false,
+    "craft": {
+      "ingrediants": ["bronze_credit:3"],
+      "time": 86400
+    }
   },
   "gold_credit": {
     "id": "gold_credit",
@@ -1621,7 +1625,11 @@
     "shortDesc": "7 days of gold credit",
     "longDesc": "use to receive 7 days of gold (as long as you don't have a better tier currently)",
     "rarity": 69,
-    "in_crates": false
+    "in_crates": false,
+    "craft": {
+      "ingrediants": ["silver_credit:3"],
+      "time": 86400
+    }
   },
   "platinum_credit": {
     "id": "platinum_credit",
@@ -1631,7 +1639,11 @@
     "shortDesc": "7 days of platinum credit",
     "longDesc": "use to receive 7 days of platinum (as long as you don't have a better tier currently)",
     "rarity": 69,
-    "in_crates": false
+    "in_crates": false,
+    "craft": {
+      "ingrediants": ["gold_credit:3"],
+      "time": 86400
+    }
   },
   "daily_scratch_card": {
     "id": "daily_scratch_card",
