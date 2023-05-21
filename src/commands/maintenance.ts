@@ -1,12 +1,12 @@
 import { CommandInteraction, Message } from "discord.js";
 import redis from "../init/redis";
 import { Command, NypsiCommandInteraction } from "../models/Command";
-import Constants from "../utils/Constants";
+import { getAdminLevel } from "../utils/functions/users/admin";
 
 const cmd = new Command("maintenance", "maintenance", "none").setPermissions(["bot owner"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-  if (message.member.user.id != Constants.TEKOH_ID) return;
+  if ((await getAdminLevel(message.author.id)) < 69) return;
 
   if ((await redis.get("nypsi:maintenance")) == "t") {
     await redis.del("nypsi:maintenance");
