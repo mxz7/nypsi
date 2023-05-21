@@ -2,10 +2,7 @@ import ms = require("ms");
 import { parentPort } from "worker_threads";
 import prisma from "../../init/database";
 import redis from "../../init/redis";
-import { CustomEmbed } from "../../models/EmbedBuilders";
 import Constants from "../../utils/Constants";
-import { gemBreak } from "../../utils/functions/economy/inventory";
-import { addNotificationToQueue } from "../../utils/functions/users/notifications";
 
 (async () => {
   const now = Date.now();
@@ -20,20 +17,6 @@ import { addNotificationToQueue } from "../../utils/functions/users/notification
       id: true,
       karma: true,
       lastCommand: true,
-      DMSettings: {
-        select: {
-          other: true,
-        },
-      },
-      Economy: {
-        select: {
-          Inventory: {
-            where: {
-              item: { contains: "gem" },
-            },
-          },
-        },
-      },
     },
   });
 
@@ -44,7 +27,7 @@ import { addNotificationToQueue } from "../../utils/functions/users/notification
 
     if (user.lastCommand.getTime() > threshold) karmaToRemove = 0;
 
-    if (now - ms("2 days") > user.lastCommand.getTime()) {
+    if (now - ms("1 day") > user.lastCommand.getTime()) {
       karmaToRemove += 10;
     }
 
@@ -75,48 +58,6 @@ import { addNotificationToQueue } from "../../utils/functions/users/notification
     }
 
     if (karmaToRemove < 1) continue;
-
-    if (user?.Economy?.Inventory.find((i) => i.item == "white_gem")?.amount > 0 && user.DMSettings?.other) {
-      const chance = Math.floor(Math.random() * 10);
-
-      gemBreak(user.id, 0.007, "white_gem");
-
-      if (chance < 5) {
-        await addNotificationToQueue({
-          memberId: user.id,
-          payload: {
-            embed: new CustomEmbed()
-              .setHeader("karma")
-              .setDescription(
-                "your <:nypsi_gem_white:1046933670436552725> white gem has saved your karma from being deteriorated\n" +
-                  `you would have lost **${karmaToRemove}** karma`
-              )
-              .setColor(Constants.TRANSPARENT_EMBED_COLOR),
-          },
-        });
-        continue;
-      }
-    } else if (user?.Economy?.Inventory.find((i) => i.item == "purple_gem")?.amount > 0 && user.DMSettings?.other) {
-      const chance = Math.floor(Math.random() * 13);
-
-      gemBreak(user.id, 0.077, "purple_gem");
-
-      if (chance < 5) {
-        await addNotificationToQueue({
-          memberId: user.id,
-          payload: {
-            embed: new CustomEmbed()
-              .setHeader("karma")
-              .setDescription(
-                "your <:nypsi_gem_purple:1046932495184187452> purple gem has saved your karma from being deteriorated\n" +
-                  `you would have lost **${karmaToRemove}** karma`
-              )
-              .setColor(Constants.TRANSPARENT_EMBED_COLOR),
-          },
-        });
-        continue;
-      }
-    }
 
     total += Math.floor(karmaToRemove);
 
