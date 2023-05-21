@@ -21,7 +21,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { unbanTimeouts, unmuteTimeouts } from "../scheduled/clusterjobs/moderationchecks";
 import Constants from "../utils/Constants";
 import { MStoTime } from "../utils/functions/date";
-import { getGambleStats, getItemStats, getScratchCardStats } from "../utils/functions/economy/stats";
+import { getGambleStats, getScratchCardStats, getStats } from "../utils/functions/economy/stats";
 import { getItems } from "../utils/functions/economy/utils";
 import { violations } from "../utils/functions/moderation/mute";
 import PageManager from "../utils/functions/page";
@@ -39,7 +39,8 @@ cmd.slashData
   .addSubcommand((economy) => economy.setName("gamble").setDescription("view your gamble stats"))
   .addSubcommand((item) => item.setName("item").setDescription("view your item stats"))
   .addSubcommand((commands) => commands.setName("commands").setDescription("view your command usage stats"))
-  .addSubcommand((bot) => bot.setName("bot").setDescription("view nypsi's stats"));
+  .addSubcommand((bot) => bot.setName("bot").setDescription("view nypsi's stats"))
+  .addSubcommand((auction) => auction.setName("auction").setDescription("view your auction stats"));
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
@@ -87,7 +88,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({ embeds: [embed], ephemeral: true });
   }
 
-  await addCooldown(cmd.name, message.member, 15);
+  await addCooldown(cmd.name, message.member, 10);
 
   const gambleStats = async () => {
     const gambleStats = await getGambleStats(message.member);
@@ -192,7 +193,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   };
 
   const itemStats = async () => {
-    const itemStats = await getItemStats(message.member);
+    const itemStats = await getStats(message.member);
 
     if (itemStats.length == 0) {
       return send({ embeds: [new ErrorEmbed("you have no item stats")] });
@@ -467,6 +468,25 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({ embeds: [embed] });
   };
 
+  const auctionStats = async () => {
+    const stats = await getStats(message.member);
+
+    return send({
+      embeds: [
+        new CustomEmbed(
+          message.member,
+          `you have created **${
+            stats.find((i) => i.itemId === "auction-created")?.amount.toLocaleString() || 0
+          }** auctions and sold **${
+            stats.find((i) => i.itemId === "auction-sold")?.amount.toLocaleString() || 0
+          }** items\n\nyou have bought **${
+            stats.find((i) => i.itemId === "auction-bought")?.amount.toLocaleString() || 0
+          }** items through auctions`
+        ),
+      ],
+    });
+  };
+
   if (args.length == 0) {
     return gambleStats();
   } else if (args[0].toLowerCase() == "global" && message.author.id == Constants.TEKOH_ID) {
@@ -485,7 +505,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       },
     });
 
-    const byItem = await prisma.itemUse.groupBy({
+    const byItem = await prisma.stats.groupBy({
       by: ["itemId"],
       _sum: {
         amount: true,
@@ -535,6 +555,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return itemStats();
   } else if (args[0].toLowerCase().includes("scratch")) {
     return scratchStats();
+  } else if (args[0].toLowerCase().includes("auction")) {
+    return auctionStats();
   } else {
     return gambleStats();
   }

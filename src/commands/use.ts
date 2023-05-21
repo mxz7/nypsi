@@ -15,7 +15,7 @@ import { ItemUse } from "../models/ItemUse";
 import { addBakeryUpgrade, getBakeryUpgrades } from "../utils/functions/economy/bakery";
 import { addBooster, getBoosters } from "../utils/functions/economy/boosters";
 import { getInventory, selectItem, setInventoryItem } from "../utils/functions/economy/inventory";
-import { addItemUse } from "../utils/functions/economy/stats";
+import { addStat } from "../utils/functions/economy/stats";
 import {
   createUser,
   formatNumber,
@@ -166,7 +166,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await Promise.all([
       addBooster(message.member, selected.id, amount),
-      addItemUse(message.member, selected.id, amount),
+      addStat(message.member, selected.id, amount),
       setInventoryItem(message.member, selected.id, inventory.find((i) => i.item == selected.id).amount - amount, false),
     ]);
 
@@ -303,7 +303,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     await setInventoryItem(message.member, selected.id, inventory.find((i) => i.item == selected.id).amount - amount, false);
-    await addItemUse(message.member, selected.id, amount);
+    await addStat(message.member, selected.id, amount);
 
     return send({
       embeds: [
@@ -337,7 +337,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       await addBakeryUpgrade(message.member, selected.id);
     }
     setInventoryItem(message.member, selected.id, inventory.find((i) => i.item == selected.id).amount - amount, false);
-    addItemUse(message.member, selected.id, amount);
+    addStat(message.member, selected.id, amount);
 
     const upgrades = await getBakeryUpgrades(message.member);
 
@@ -361,7 +361,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({ embeds: [embed] });
   } else {
     if (itemFunctions.has(selected.id)) {
-      await addItemUse(message.member, selected.id);
+      await addStat(message.member, selected.id);
       return itemFunctions.get(selected.id).run(message, args);
     } else {
       return send({ embeds: [new CustomEmbed(message.member, "unfortunately you can't use this item.")] });

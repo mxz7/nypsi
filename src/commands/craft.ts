@@ -14,7 +14,7 @@ import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getCraftingItems, newCraftItem } from "../utils/functions/economy/crafting";
 import { getInventory, selectItem, setInventoryItem } from "../utils/functions/economy/inventory";
-import { addItemUse } from "../utils/functions/economy/stats";
+import { addStat } from "../utils/functions/economy/stats";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -401,7 +401,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         )
       );
 
-      promises.push(addItemUse(message.member, item, amount).catch(() => {}));
+      promises.push(addStat(message.member, item, amount).catch(() => {}));
     }
 
     await Promise.all(promises);

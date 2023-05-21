@@ -27,6 +27,7 @@ import { addNotificationToQueue, getDmSettings, getPreferences } from "../users/
 import itemHistoryWorker from "../workers/itemhistory";
 import { getBalance, updateBalance } from "./balance";
 import { addInventoryItem } from "./inventory";
+import { addStat } from "./stats";
 import { createUser, getItems, userExists } from "./utils";
 import ms = require("ms");
 import dayjs = require("dayjs");
@@ -181,6 +182,8 @@ export async function createAuction(member: GuildMember, itemId: string, itemAmo
   });
 
   checkWatchers(itemId, messageUrl, member.user.id);
+
+  addStat(member.user.id, "auction-created");
 
   return messageUrl;
 }
@@ -578,6 +581,8 @@ export async function buyFullAuction(interaction: ButtonInteraction, auction: Au
     addInventoryItem(interaction.user.id, auction.itemId, Number(auction.itemAmount)),
     updateBalance(interaction.user.id, balance - Number(auction.bin)),
     updateBalance(auction.ownerId, (await getBalance(auction.ownerId)) + (Number(auction.bin) - taxedAmount)),
+    addStat(interaction.user.id, "auction-bought-items", Number(auction.itemAmount)),
+    addStat(auction.ownerId, "auction-sold-items", Number(auction.itemAmount)),
   ]);
 
   transaction(
@@ -758,6 +763,8 @@ export async function buyAuctionOne(interaction: ButtonInteraction, auction: Auc
       auction.ownerId,
       (await getBalance(auction.ownerId)) + (Math.floor(Number(auction.bin / auction.itemAmount)) - taxedAmount)
     ),
+    addStat(interaction.user.id, "auction-bought-items"),
+    addStat(auction.ownerId, "auction-sold-items"),
   ]);
 
   transaction(await interaction.client.users.fetch(auction.ownerId), interaction.user, `${auction.itemId} x ${1} (auction)`);
