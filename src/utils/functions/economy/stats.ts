@@ -62,6 +62,17 @@ export async function getScratchCardStats(member: GuildMember) {
   return query;
 }
 
+export async function getStat(userId: string, stat: string) {
+  return await prisma.stats.findUnique({
+    where: {
+      userId_itemId: {
+        userId,
+        itemId: stat,
+      },
+    },
+  });
+}
+
 export async function getStats(member: GuildMember) {
   const query = await prisma.stats.findMany({
     where: {
