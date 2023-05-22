@@ -582,6 +582,8 @@ export async function buyFullAuction(interaction: ButtonInteraction, auction: Au
     updateBalance(auction.ownerId, (await getBalance(auction.ownerId)) + (Number(auction.bin) - taxedAmount)),
   ]);
 
+  logger.debug(`auction full sold owner: ${auction.ownerId} - ${auction.itemId} to ${interaction.user.id}`);
+
   transaction(
     await interaction.client.users.fetch(auction.ownerId),
     interaction.user,
