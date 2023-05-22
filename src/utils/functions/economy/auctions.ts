@@ -488,7 +488,7 @@ export async function buyFullAuction(interaction: ButtonInteraction, auction: Au
         resolve(
           buyFullAuction(interaction, await prisma.auction.findUnique({ where: { id: auction.id } }), repeatCount + 1)
         );
-      }, 200);
+      }, 500);
     });
   }
 
@@ -664,7 +664,7 @@ export async function buyAuctionOne(interaction: ButtonInteraction, auction: Auc
       setTimeout(async () => {
         if (repeatCount > 100) beingBought.delete(auction.id);
         resolve(buyAuctionOne(interaction, await prisma.auction.findUnique({ where: { id: auction.id } }), repeatCount + 1));
-      }, 200);
+      }, 500);
     });
   }
 
