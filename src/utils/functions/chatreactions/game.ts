@@ -3,6 +3,7 @@ import { CustomEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
 import { gamble } from "../../logger";
 import { addProgress } from "../economy/achievements";
+import { getBalance, updateBalance } from "../economy/balance";
 import { createGame } from "../economy/stats";
 import { isPremium } from "../premium/premium";
 import sleep from "../sleep";
@@ -248,6 +249,8 @@ export async function startChatReactionDuel(
     embed.addField("winner", "nobody won... losers.");
 
     await msg.edit({ embeds: [embed] });
+    await updateBalance(challenger, (await getBalance(challenger)) + wager);
+    await updateBalance(target, (await getBalance(target)) + wager);
     return null;
   }
 
