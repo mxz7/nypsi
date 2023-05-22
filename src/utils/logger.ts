@@ -299,9 +299,11 @@ const formatter = (data: WriteData) => {
     );
   }
 
-  return `${chalk.blackBright.italic(dayjs(data.date).format("MM-DD HH:mm:ss"))} ${labelColor(data.label.toUpperCase())}${
-    typeof data.meta["cluster"] != "undefined" ? ` (${data.meta["cluster"]})` : ""
-  }: ${messageColor(data.message)}${jsonData ? `\n  ${jsonData}` : ""}`;
+  return `${chalk.blackBright.italic(dayjs(data.date).format("MM-DD HH:mm:ss.SSS"))} ${labelColor(
+    data.label.toUpperCase()
+  )}${typeof data.meta["cluster"] != "undefined" ? ` (${data.meta["cluster"]})` : ""}: ${messageColor(data.message)}${
+    jsonData ? `\n  ${jsonData}` : ""
+  }`;
 };
 
 logger.addTransport(
