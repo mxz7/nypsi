@@ -492,17 +492,19 @@ export async function buyFullAuction(interaction: ButtonInteraction, auction: Au
     });
   }
 
-  if (interaction.createdTimestamp < Date.now() - 5000) return;
-
-  if ((await getBalance(interaction.user.id)) < Number(auction.bin)) {
-    return await interaction.reply({ embeds: [new ErrorEmbed("you cannot afford this")], ephemeral: true });
-  }
-
   beingBought.add(auction.id);
-
   setTimeout(() => {
     beingBought.delete(auction.id);
   }, ms("5 minutes"));
+
+  if (interaction.createdTimestamp < Date.now() - 5000) {
+    beingBought.delete(auction.id);
+  }
+
+  if ((await getBalance(interaction.user.id)) < Number(auction.bin)) {
+    beingBought.delete(auction.id);
+    return await interaction.reply({ embeds: [new ErrorEmbed("you cannot afford this")], ephemeral: true });
+  }
 
   const preferences = await getPreferences(interaction.user.id);
 
