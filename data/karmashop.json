@@ -69,7 +69,7 @@
     "name": "karma scratch card",
     "emoji": "<:nypsi_daily_scratch:1061368847522869289>",
     "id": "karma_scratch_card",
-    "cost": 35,
+    "cost": 50,
     "items_left": 30,
     "aliases": ["karma", "scratch"],
     "type": "item",
