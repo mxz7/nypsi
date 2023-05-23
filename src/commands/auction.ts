@@ -127,7 +127,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({ embeds: [embed], ephemeral: true });
   }
 
-  await addCooldown(cmd.name, message.member, 10);
+  await addCooldown(cmd.name, message.member, 7);
 
   if (message.author.createdTimestamp > dayjs().subtract(1, "day").unix() * 1000) {
     return send({
