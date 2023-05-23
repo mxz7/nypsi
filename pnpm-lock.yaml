@@ -50,8 +50,8 @@ dependencies:
     specifier: 1.6.0
     version: 1.6.0
   imgur:
-    specifier: 2.2.0
-    version: 2.2.0
+    specifier: 2.3.0
+    version: 2.3.0
   ioredis:
     specifier: 5.3.2
     version: 5.3.2
@@ -2134,8 +2134,8 @@ packages:
     engines: {node: '>= 4'}
     dev: true
 
-  /imgur@2.2.0:
-    resolution: {integrity: sha512-O6713RN9zaCdw7QuVEi0XRXjkEHTfKDkhjL1EEtlTW6VeRxVnj1JDQGBeqk2Bzj6d7WJp0WKdac2i0IO33nidQ==}
+  /imgur@2.3.0:
+    resolution: {integrity: sha512-ZAgK0YXHfrR+P1KavYSBRQyr0kSvBFrSYrCAr0Zm8EddAakTn8T5WcdX+NvI6GMvHuzwMePjNvV9sFD4sETIUg==}
     engines: {node: '>=14'}
     dependencies:
       axios: 0.25.0
