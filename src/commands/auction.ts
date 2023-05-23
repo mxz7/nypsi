@@ -820,8 +820,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return send({ embeds: [new ErrorEmbed(`you dont have this many ${selected.name}`)] });
     }
 
-    console.log(args);
-
     const cost = formatNumber(args.length === 2 ? args[1] : args[2]);
 
     if (!cost) {
