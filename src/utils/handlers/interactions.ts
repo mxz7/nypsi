@@ -98,7 +98,7 @@ export async function runInteraction(interaction: Interaction) {
     const responseDesc: string[] = [];
 
     if (member.roles.cache.has(roleId)) {
-      responseDesc.push(`- ${member.roles.cache.find((r) => r.id === roleId).toString()}`);
+      responseDesc.push(`\\- ${member.roles.cache.find((r) => r.id === roleId).toString()}`);
       await member.roles.remove(roleId);
     } else {
       if (reactionRole.mode === "UNIQUE") {
