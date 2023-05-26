@@ -107,13 +107,13 @@ model Economy {
 
   banned DateTime?
 
-  auctionWatch String[]
-  autosell     String[]
-  offersBlock  String[]
+  autosell    String[]
+  offersBlock String[]
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String @id
 
+  auctionWatch       AuctionWatch[]
   Boosters           Booster[]
   LotteryTicket      LotteryTicket[]
   EconomyWorker      EconomyWorker[]
@@ -127,6 +127,16 @@ model Economy {
   EconomyGuildMember EconomyGuildMember?
   OffersReceived     Offer[]             @relation(name: "target")
   OffersGiven        Offer[]             @relation(name: "owner")
+}
+
+model AuctionWatch {
+  userId  String
+  itemId  String
+  maxCost BigInt @default(0)
+
+  Economy Economy? @relation(fields: [userId], references: [userId])
+
+  @@id([userId, itemId])
 }
 
 model BakeryUpgrade {
@@ -158,7 +168,7 @@ model Inventory {
   economy Economy @relation(fields: [userId], references: [userId], onDelete: Cascade)
 
   @@unique([userId, item])
-  @@index([userId, item])
+  @@index([userId])
 }
 
 model EconomyWorker {
@@ -214,6 +224,8 @@ model Game {
   date     DateTime @default(now())
 
   economy Economy? @relation(fields: [userId], references: [userId])
+
+  @@index([userId])
 }
 
 model Stats {

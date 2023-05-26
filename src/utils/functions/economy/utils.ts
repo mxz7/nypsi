@@ -327,12 +327,7 @@ export async function reset() {
   const deleted = await prisma.economy
     .deleteMany({
       where: {
-        AND: [
-          { prestige: 0 },
-          { lastVote: { lt: new Date(Date.now() - ms("12 hours")) } },
-          { dailyStreak: { lt: 2 } },
-          { auctionWatch: { isEmpty: true } },
-        ],
+        AND: [{ prestige: 0 }, { lastVote: { lt: new Date(Date.now() - ms("12 hours")) } }, { dailyStreak: { lt: 2 } }],
       },
     })
     .then((r) => r.count);
