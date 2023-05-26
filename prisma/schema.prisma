@@ -168,7 +168,7 @@ model Inventory {
   economy Economy @relation(fields: [userId], references: [userId], onDelete: Cascade)
 
   @@unique([userId, item])
-  @@index([userId, item])
+  @@index([userId])
 }
 
 model EconomyWorker {
@@ -224,6 +224,8 @@ model Game {
   date     DateTime @default(now())
 
   economy Economy? @relation(fields: [userId], references: [userId])
+
+  @@index([userId])
 }
 
 model Stats {
