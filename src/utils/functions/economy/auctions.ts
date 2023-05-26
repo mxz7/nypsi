@@ -181,7 +181,7 @@ export async function createAuction(member: GuildMember, itemId: string, itemAmo
     },
   });
 
-  checkWatchers(itemId, messageUrl, member.user.id, bin);
+  checkWatchers(itemId, messageUrl, member.user.id, bin / itemAmount);
 
   addStat(member.user.id, "auction-created");
 
