@@ -80,6 +80,9 @@ cmd.slashData
           .setRequired(false)
           .setAutocomplete(true)
       )
+      .addStringOption((option) =>
+        option.setName("max-cost").setDescription("max cost you want to be notified for").setRequired(false)
+      )
   );
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
