@@ -30,10 +30,11 @@ import {
   getAuctions,
   getAuctionWatch,
   setAuctionWatch,
+  updateAuctionWatch,
 } from "../utils/functions/economy/auctions";
 import { addInventoryItem, getInventory, selectItem, setInventoryItem } from "../utils/functions/economy/inventory";
 import { getPrestige } from "../utils/functions/economy/prestige";
-import { formatBet, getItems, userExists } from "../utils/functions/economy/utils";
+import { formatBet, formatNumber, getItems, userExists } from "../utils/functions/economy/utils";
 import { getXp } from "../utils/functions/economy/xp";
 import PageManager from "../utils/functions/page";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
@@ -763,28 +764,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       });
     }
 
-    const searchTag = args[1].toLowerCase();
-
-    let selected;
-
-    for (const itemName of Array.from(Object.keys(items))) {
-      const aliases = items[itemName].aliases ? items[itemName].aliases : [];
-      if (searchTag == itemName) {
-        selected = itemName;
-        break;
-      } else if (searchTag == itemName.split("_").join("")) {
-        selected = itemName;
-        break;
-      } else if (aliases.indexOf(searchTag) != -1) {
-        selected = itemName;
-        break;
-      } else if (searchTag == items[itemName].name) {
-        selected = itemName;
-        break;
-      }
-    }
-
-    selected = items[selected];
+    const selected = selectItem(args[1].toLowerCase());
 
     if (!selected) {
       return send({ embeds: [new ErrorEmbed(`couldnt find \`${args[1]}\``)] });
@@ -792,14 +772,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     let desc = "";
 
-    if (current.includes(selected.id)) {
+    if (current.find((i) => i.itemId === selected.id) && !args[2]) {
       desc = `✅ removed ${selected.emoji} ${selected.name}`;
-
-      current.splice(current.indexOf(selected.id), 1);
 
       current = await deleteAuctionWatch(message.member, selected.id);
     } else {
-      if (current.length >= max) {
+      if (current.length >= max && !current.find((i) => i.itemId === selected.id)) {
         let desc = `you have reached the limit of auction watches (**${max}**)`;
 
         if (max == 1) {
@@ -811,13 +789,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       desc = `✅ added ${selected.emoji} ${selected.name}`;
 
-      current = await addToAuctionWatch(message.member, selected.id);
+      current = await updateAuctionWatch(message.member, selected.id, args[2] ? formatNumber(args[2]) : undefined);
     }
 
     const embed = new CustomEmbed(message.member, desc).setHeader("auction watch", message.author.avatarURL());
 
     if (current.length > 0) {
-      embed.addField("currently watching", current.map((i) => `${items[i].emoji} ${items[i].name}`).join("\n"));
+      embed.addField(
+        "currently watching",
+        current.map((i) => `- ${items[i.itemId].emoji} ${items[i.itemId].name} $${i.maxCost.toLocaleString()}`).join("\n")
+      );
     }
 
     return send({ embeds: [embed] });
