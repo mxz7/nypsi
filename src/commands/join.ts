@@ -29,11 +29,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (args.length == 0) {
     member = message.member;
   } else {
-    if (!message.mentions.members.first()) {
-      member = await getMember(message.guild, args[0]);
-    } else {
-      member = message.mentions.members.first();
-    }
+    member = await getMember(message.guild, args.join(" "));
   }
 
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
@@ -128,7 +124,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const embed = new CustomEmbed(
     message.member,
-    `joined on **${joinedServer}**\n - **${timeAgo.toLocaleString()}** days ago\njoin position is **${
+    `joined on **${joinedServer}**\n- **${timeAgo.toLocaleString()}** days ago\njoin position is **${
       joinPos != "invalid" ? joinPos.toLocaleString() : "--"
     }**`
   )

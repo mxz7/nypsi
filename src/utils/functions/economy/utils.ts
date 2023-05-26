@@ -215,7 +215,7 @@ export async function formatBet(bet: string | number, member: GuildMember): Prom
 }
 
 export function formatNumber(number: string | number) {
-  number = number.toString().replaceAll(",", "");
+  number = number.toString().toLowerCase().replaceAll(",", "");
   if (number.includes("b")) {
     number = parseFloat(number.toString()) * 1000000000;
   } else if (number.includes("m")) {

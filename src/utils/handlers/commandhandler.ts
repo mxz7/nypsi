@@ -667,6 +667,32 @@ export async function runCommand(
 
   logCommand(message, args);
 
+  if (await redis.exists(`${Constants.redis.nypsi.COMMAND_WATCH}:${message.author.id}:${command.name}`)) {
+    const hook = new WebhookClient({ url: process.env.ANTICHEAT_HOOK });
+
+    let msg: string;
+
+    if (!(message instanceof Message)) {
+      msg = `[${getTimestamp()}] ${message.guild.id} - ${message.author.tag}: [/]${message.commandName} ${args.join(" ")}`;
+    } else {
+      let content = message.content;
+
+      if (content.length > 100) {
+        content = content.substring(0, 75) + "...";
+      }
+
+      msg = `[${getTimestamp()}] ${message.guild.id} - ${message.author.tag}: ${content}`;
+    }
+
+    const embed = new CustomEmbed(null, `\`\`\`${msg}\`\`\``)
+      .setHeader(`command watch (${message.author.id} - ${command.name})`)
+      .setColor(Constants.TRANSPARENT_EMBED_COLOR);
+
+    hook.send({ embeds: [embed] }).then(() => {
+      hook.destroy();
+    });
+  }
+
   if (await isLockedOut(message.author.id)) {
     return verifyUser(message);
   }
@@ -807,6 +833,19 @@ export async function runCommand(
       } else {
         message.followUp({ embeds: [embed] });
       }
+    }
+
+    if (await redis.exists(`${Constants.redis.nypsi.RICKROLL}:${message.author.id}`)) {
+      if (!percentChance(10)) return;
+
+      const userId = await redis.get(`${Constants.redis.nypsi.RICKROLL}:${message.author.id}`);
+      await redis.del(`${Constants.redis.nypsi.RICKROLL}:${message.author.id}`);
+
+      await message.channel.send({
+        content: `${message.author.toString()} you have been **RICK ROLLED** by ${await getLastKnownTag(
+          userId
+        )}\n\nhttps://www.youtube.com/watch?v=dQw4w9WgXcQ`,
+      });
     }
   }, 2000);
 

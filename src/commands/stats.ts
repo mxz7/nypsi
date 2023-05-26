@@ -525,7 +525,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       const percent = ((Number(gamble._sum.win) / gamble._count._all) * 100).toFixed(2);
 
       gambleMsg.push(
-        ` - **${gamble.game}** ${gamble._sum.win.toLocaleString()} / ${gamble._count._all.toLocaleString()} (${percent}%)`
+        `- **${gamble.game}** ${gamble._sum.win.toLocaleString()} / ${gamble._count._all.toLocaleString()} (${percent}%)`
       );
     }
 
@@ -536,7 +536,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     for (const item of byItem) {
       if (itemMsg.length >= gambleMsg.length) break;
 
-      itemMsg.push(` - **${item.itemId}** ${item._sum.amount.toLocaleString()}`);
+      itemMsg.push(`- **${item.itemId}** ${item._sum.amount.toLocaleString()}`);
     }
 
     embed.addField("item stats", itemMsg.join("\n"), true);

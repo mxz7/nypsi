@@ -205,7 +205,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       desc = `eating ${amount > 1 ? `${amount} ` : ""}**${
         amount > 1 ? selected.plural || selected.name : selected.name
       }**...`;
-      desc2 = `you have ate ${amount > 1 ? `${amount} ` : "a "}**${
+      desc2 = `you have eaten ${amount > 1 ? `${amount} ` : "a "}**${
         amount > 1 ? selected.plural || selected.name : selected.name
       }** 😋`;
     }

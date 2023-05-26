@@ -70,11 +70,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({ embeds: [embed] });
   }
 
-  let target = message.mentions.members.first();
-
-  if (!target) {
-    target = await getMember(message.guild, args[0]);
-  }
+  const target = await getMember(message.guild, args[0]);
 
   if (!target) {
     return send({ embeds: [new ErrorEmbed("invalid user")] });
@@ -181,7 +177,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
   }
 
-  await addCooldown(cmd.name, message.member, 15);
+  await addCooldown(cmd.name, message.member, 5);
 
   await Promise.all([
     addInventoryItem(target, selected.id, amount),

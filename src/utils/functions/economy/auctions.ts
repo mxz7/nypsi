@@ -502,21 +502,23 @@ export async function buyFullAuction(interaction: ButtonInteraction, auction: Au
         resolve(
           buyFullAuction(interaction, await prisma.auction.findUnique({ where: { id: auction.id } }), repeatCount + 1)
         );
-      }, 200);
+      }, 500);
     });
   }
 
-  if (interaction.createdTimestamp < Date.now() - 5000) return;
-
-  if ((await getBalance(interaction.user.id)) < Number(auction.bin)) {
-    return await interaction.reply({ embeds: [new ErrorEmbed("you cannot afford this")], ephemeral: true });
-  }
-
   beingBought.add(auction.id);
-
   setTimeout(() => {
     beingBought.delete(auction.id);
   }, ms("5 minutes"));
+
+  if (interaction.createdTimestamp < Date.now() - 5000) {
+    beingBought.delete(auction.id);
+  }
+
+  if ((await getBalance(interaction.user.id)) < Number(auction.bin)) {
+    beingBought.delete(auction.id);
+    return await interaction.reply({ embeds: [new ErrorEmbed("you cannot afford this")], ephemeral: true });
+  }
 
   const preferences = await getPreferences(interaction.user.id);
 
@@ -595,6 +597,8 @@ export async function buyFullAuction(interaction: ButtonInteraction, auction: Au
     addStat(interaction.user.id, "auction-bought-items", Number(auction.itemAmount)),
     addStat(auction.ownerId, "auction-sold-items", Number(auction.itemAmount)),
   ]);
+
+  logger.debug(`auction full sold owner: ${auction.ownerId} - ${auction.itemId} to ${interaction.user.id}`);
 
   transaction(
     await interaction.client.users.fetch(auction.ownerId),
@@ -680,7 +684,7 @@ export async function buyAuctionOne(interaction: ButtonInteraction, auction: Auc
       setTimeout(async () => {
         if (repeatCount > 100) beingBought.delete(auction.id);
         resolve(buyAuctionOne(interaction, await prisma.auction.findUnique({ where: { id: auction.id } }), repeatCount + 1));
-      }, 200);
+      }, 500);
     });
   }
 

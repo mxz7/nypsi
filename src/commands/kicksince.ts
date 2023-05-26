@@ -93,7 +93,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (members.size >= 15) {
     status = new CustomEmbed(
       message.member,
-      statusDesc + "\n\n - if you'd like to cancel this operation, delete this message"
+      statusDesc + "\n\n- if you'd like to cancel this operation, delete this message"
     );
   }
 
@@ -140,9 +140,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       if (interval >= 10 && status) {
         statusDesc = `\`${count}/${members.size}\` members kicked..${
-          failed.length != 0 ? `\n - **${failed.length}** failed` : ""
+          failed.length != 0 ? `\n- **${failed.length}** failed` : ""
         }`;
-        status.setDescription(statusDesc + "\n\n - if you'd like to cancel this operation, delete this message");
+        status.setDescription(statusDesc + "\n\n- if you'd like to cancel this operation, delete this message");
         let fail = false;
         await msg.edit({ embeds: [status] }).catch(() => {
           fail = true;

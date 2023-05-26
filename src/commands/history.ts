@@ -85,29 +85,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (!(await profileExists(message.guild))) await createProfile(message.guild);
 
-  let member: GuildMember | string;
-
-  if (!message.interaction && message.mentions.members.first()) {
-    member = message.mentions.members.first();
-  } else {
-    const members = message.guild.members.cache;
-
-    if (args[0].length == 18 || args[0].length == 19) {
-      member = members.find((m) => m.user.id == args[0]);
-
-      if (!member) {
-        member = args[0];
-      }
-    } else {
-      member = await getMember(message.guild, args.join(" "));
-
-      if (!member) {
-        return send({
-          embeds: [new ErrorEmbed(`can't find \`${args[0]}\` - please use a user ID if they are no longer in the server`)],
-        });
-      }
-    }
-  }
+  const member = (await getMember(message.guild, args.join(" "))) || args[0];
 
   let cases: ModerationCase[];
   const pages: ModerationCase[][] = [];

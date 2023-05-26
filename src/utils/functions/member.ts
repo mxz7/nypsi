@@ -1,8 +1,13 @@
 import { Collection, Guild, GuildMember, Role } from "discord.js";
+import Constants from "../Constants";
 import chooseMember from "./workers/choosemember";
 
 export async function getMember(guild: Guild, memberName: string): Promise<GuildMember> {
   if (!guild) return null;
+
+  if (memberName.match(Constants.MENTION_REGEX)) {
+    return (await guild.members.fetch(memberName.replaceAll(/\D/g, ""))) || null;
+  }
 
   let members: Collection<string, GuildMember>;
 
@@ -82,6 +87,10 @@ export async function getMember(guild: Guild, memberName: string): Promise<Guild
 
 export async function getExactMember(guild: Guild, memberName: string): Promise<GuildMember> {
   if (!guild) return null;
+
+  if (memberName.match(Constants.MENTION_REGEX)) {
+    return (await guild.members.fetch(memberName.replaceAll(/\D/g, ""))) || null;
+  }
 
   let members: Collection<string, GuildMember>;
 

@@ -413,8 +413,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const doGame = async (player: GuildMember, wager: number, response: ButtonInteraction, m: Message) => {
       const balance = await getBalance(player);
 
-      if (balance < wager)
+      if (balance < wager) {
+        await updateBalance(message.member, (await getBalance(message.member)) + wager);
         return response.followUp({ embeds: [new ErrorEmbed(`${player.user.toString()} cannot afford this`)] });
+      }
 
       await updateBalance(player, balance - wager);
 
@@ -441,7 +443,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return send({ embeds: [new ErrorEmbed("you are blacklisted from chat reactions in this server")] });
 
     if (args.length === 3) {
-      const target = message.mentions?.members?.first() || (await getMember(message.guild, args[1]));
+      const target = await getMember(message.guild, args[1]);
 
       if (!target) return send({ embeds: [new ErrorEmbed("invalid target")] });
 

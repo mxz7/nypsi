@@ -482,13 +482,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (args[1]?.toLowerCase() === "existing") return reviewExisting(msg);
     return reviewSuggestions(msg);
   } else {
-    let member;
-
-    if (!message.mentions.members.first()) {
-      member = await getMember(message.guild, args.join(" "));
-    } else {
-      member = message.mentions.members.first();
-    }
+    const member = await getMember(message.guild, args.join(" "));
 
     if (member) {
       target = member;

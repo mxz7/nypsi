@@ -4,7 +4,6 @@ import {
   ButtonBuilder,
   ButtonStyle,
   CommandInteraction,
-  GuildMember,
   Interaction,
   InteractionReplyOptions,
   Message,
@@ -300,7 +299,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const searchTag = args[1].toLowerCase();
 
     const selectedItem = selectItem(searchTag);
-    const selectedMember = message.mentions?.members?.first() || (await getMember(message.guild, searchTag));
+    const selectedMember = await getMember(message.guild, searchTag);
 
     if (!selectedItem && !selectedMember) return send({ embeds: [new ErrorEmbed("invalid member or item")] });
 
@@ -348,7 +347,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     return send({ embeds: [embed] });
   } else {
-    if (args.length != 4) return send({ embeds: [new ErrorEmbed("/offer create <target> <item> <amount> <money>")] });
+    if (args.length < 3) return send({ embeds: [new ErrorEmbed("/offer create <target> <item> <amount> <money>")] });
     let max = 3;
 
     if (await isPremium(message.member)) {
@@ -360,13 +359,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (currentOffers.length + 1 > max)
       return send({ embeds: [new ErrorEmbed(`you have reached the max amount of offers (${max})`)] });
 
-    let target: GuildMember;
-
-    if (!message.mentions.members.first()) {
-      target = await getMember(message.guild, args[0].toLowerCase());
-    } else {
-      target = message.mentions.members.first();
-    }
+    const target = await getMember(message.guild, args[0].toLowerCase());
 
     if (!target) {
       return send({ embeds: [new ErrorEmbed("invalid user")] });
@@ -409,7 +402,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (blocked.includes(message.author.id))
       return send({ embeds: [new ErrorEmbed(`**${target.user.tag}** has blocked offers from you`)] });
 
-    const amount = parseInt(args[2]);
+    let amount = parseInt(args[2]);
+
+    if (args.length === 3) amount = 1;
 
     if (!amount || isNaN(amount) || amount < 1) return send({ embeds: [new ErrorEmbed("invalid amount")] });
 
@@ -420,7 +415,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embeds: [new ErrorEmbed(`**${target.user.tag}** doesnt have ${amount}x ${selected.emoji} ${selected.name}`)],
       });
 
-    const money = formatNumber(args[3]);
+    const money = formatNumber(args.length === 3 ? args[2] : args[3]);
 
     if (!money || money < 1 || isNaN(money)) return send({ embeds: [new ErrorEmbed("invalid amount")] });
 

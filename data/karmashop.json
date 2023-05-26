@@ -1,7 +1,7 @@
 {
   "bronze": {
     "name": "bronze membership (7 days)",
-    "emoji": "<:nypsi_bronze:1061353493497118840>",
+    "emoji": "<:nypsi_bronze:1108083689478443058>",
     "id": "bronze",
     "cost": 350,
     "items_left": 1,
@@ -12,7 +12,7 @@
   },
   "silver": {
     "name": "silver membership (7 days)",
-    "emoji": "<:nypsi_silver:1061353458650845184>",
+    "emoji": "<:nypsi_silver:1108083725813686334>",
     "id": "silver",
     "cost": 450,
     "items_left": 1,
@@ -23,7 +23,7 @@
   },
   "gold": {
     "name": "gold membership (7 days)",
-    "emoji": "<:nypsi_gold:1061353521825456229>",
+    "emoji": "<:nypsi_gold:1108083767236640818>",
     "id": "gold",
     "cost": 700,
     "items_left": 1,
@@ -69,7 +69,7 @@
     "name": "karma scratch card",
     "emoji": "<:nypsi_daily_scratch:1061368847522869289>",
     "id": "karma_scratch_card",
-    "cost": 35,
+    "cost": 50,
     "items_left": 30,
     "aliases": ["karma", "scratch"],
     "type": "item",

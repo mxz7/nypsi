@@ -61,13 +61,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   );
 
   embed.setDescription(mainValues);
-  embed.addField(
-    `items (${itemValues
-      .map((i) => (i.value / net.amount) * 100)
-      .reduce((a, b) => a + b)
-      .toFixed(2)}%)`,
-    pages.get(1).join("\n")
-  );
+  if (itemValues && itemValues.length > 1)
+    embed.addField(
+      `items (${itemValues
+        .map((i) => (i.value / net.amount) * 100)
+        .reduce((a, b) => a + b)
+        .toFixed(2)}%)`,
+      pages.get(1).join("\n")
+    );
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),

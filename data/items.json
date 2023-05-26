@@ -280,6 +280,7 @@
     "name": "wooden pickaxe",
     "emoji": "<:nypsi_wood_pickaxe:959441224731852850>",
     "longDesc": "allows you to mine",
+    "aliases": ["wpickaxe", "wpick"],
     "role": "tool",
     "rarity": 0,
     "buy": 30000,
@@ -291,6 +292,7 @@
     "name": "iron pickaxe",
     "emoji": "<:nypsi_iron_pickaxe:959441877956960326>",
     "longDesc": "allows you to mine",
+    "aliases": ["ironpick", "ipick"],
     "role": "tool",
     "rarity": 1,
     "buy": 0,
@@ -302,6 +304,7 @@
     "name": "diamond pickaxe",
     "emoji": "<:nypsi_diamond_pickaxe:959442215736844368>",
     "longDesc": "allows you to mine",
+    "aliases": ["diamondpick", "dpick"],
     "role": "tool",
     "rarity": 2,
     "buy": 0,
@@ -313,6 +316,7 @@
     "name": "terrible fishing rod",
     "emoji": "🎣",
     "longDesc": "allows you to fish",
+    "aliases": ["tfishing", "tfish"],
     "role": "tool",
     "rarity": 0,
     "buy": 30000,
@@ -324,6 +328,7 @@
     "name": "fishing rod",
     "emoji": "🎣",
     "longDesc": "allows you to fish with better luck",
+    "aliases": ["fishing"],
     "role": "tool",
     "rarity": 1,
     "buy": 0,
@@ -335,6 +340,7 @@
     "name": "incredible fishing rod",
     "emoji": "🎣",
     "longDesc": "allows you to fish with amazing luck",
+    "aliases": ["ifishing", "ifish"],
     "role": "tool",
     "rarity": 2,
     "buy": 0,
@@ -367,6 +373,7 @@
     "plural": "terrible guns",
     "emoji": "🔫",
     "longDesc": "allows you to hunt",
+    "aliases": ["tgun"],
     "role": "tool",
     "rarity": 0,
     "buy": 30000,
@@ -391,6 +398,7 @@
     "plural": "incredible guns",
     "emoji": "🔫",
     "longDesc": "allows you to hunt with amazing luck",
+    "aliases": ["igun", "ak47"],
     "role": "tool",
     "rarity": 2,
     "buy": 0,
@@ -657,7 +665,7 @@
     "role": "booster",
     "booster_desc": "eat a cookie to get +**1**% multi for 30 seconds (stacks up to 7)",
     "buy": 0,
-    "sell": 250,
+    "sell": 1000,
     "stackable": true,
     "max": 7,
     "boosterEffect": {
@@ -735,7 +743,7 @@
     "longDesc": "we're getting old now",
     "rarity": 2,
     "role": "collectable",
-    "aliases": ["save", "icon"],
+    "aliases": ["save", "icon", "floppy", "disk"],
     "in_crates": true
   },
   "test_tube": {
@@ -745,7 +753,7 @@
     "longDesc": "no comment",
     "rarity": 1,
     "role": "collectable",
-    "aliases": ["child", "children"],
+    "aliases": ["child", "children", "somebodys"],
     "in_crates": true
   },
   "skyline_r34": {
@@ -1045,7 +1053,7 @@
     "id": "multi_potion",
     "name": "multiplier potion",
     "plural": "multiplier potions",
-    "aliases": ["multi"],
+    "aliases": ["multi", "multiplierpotion", "multiplier_potion", "multiplier"],
     "emoji": "<:nypsi_potion:1001463080582131843>",
     "longDesc": "increase your multiplier by 3% for 30 minutes (stacks to 3)",
     "rarity": 1,
@@ -1088,7 +1096,7 @@
     "buy": 0,
     "sell": 150000,
     "role": "booster",
-    "stackable": true,
+    "stackable": false,
     "max": 3,
     "boosterEffect": {
       "boosts": ["mine", "fish", "hunt"],
@@ -1138,7 +1146,7 @@
   "lucky_7": {
     "id": "lucky_7",
     "name": "lucky 7",
-    "aliases": ["7"],
+    "aliases": ["lucky", "7"],
     "emoji": "<:nypsi_7:1001553113368506538>",
     "longDesc": "improved chances for slots for 3 minutes",
     "rarity": 3,
@@ -1425,7 +1433,7 @@
     "sell": 1000000,
     "rarity": 2,
     "in_crates": false,
-    "aliases": ["green"],
+    "aliases": ["green", "gem"],
     "craft": {
       "time": 172800,
       "ingrediants": ["gem_shard:10"]
@@ -1596,20 +1604,22 @@
   "bronze_credit": {
     "id": "bronze_credit",
     "name": "bronze credit",
-    "emoji": "<:nypsi_bronze:1061353493497118840>",
+    "emoji": "<:nypsi_bronze:1108083689478443058>",
     "role": "item",
     "shortDesc": "7 days of bronze credit",
     "longDesc": "use to receive 7 days of bronze (as long as you don't have a better tier currently)",
+    "aliases": ["bronze"],
     "rarity": 69,
     "in_crates": false
   },
   "silver_credit": {
     "id": "silver_credit",
     "name": "silver credit",
-    "emoji": "<:nypsi_silver:1061353458650845184>",
+    "emoji": "<:nypsi_silver:1108083725813686334>",
     "role": "item",
     "shortDesc": "7 days of silver credit",
     "longDesc": "use to receive 7 days of silver (as long as you don't have a better tier currently)",
+    "aliases": ["silver"],
     "rarity": 69,
     "in_crates": false,
     "craft": {
@@ -1620,10 +1630,11 @@
   "gold_credit": {
     "id": "gold_credit",
     "name": "gold credit",
-    "emoji": "<:nypsi_gold:1061353521825456229>",
+    "emoji": "<:nypsi_gold:1108083767236640818>",
     "role": "item",
     "shortDesc": "7 days of gold credit",
     "longDesc": "use to receive 7 days of gold (as long as you don't have a better tier currently)",
+    "aliases": ["gold"],
     "rarity": 69,
     "in_crates": false,
     "craft": {
@@ -1634,10 +1645,11 @@
   "platinum_credit": {
     "id": "platinum_credit",
     "name": "platinum credit",
-    "emoji": "<:nypsi_plat:1061353557644824596>",
+    "emoji": "<:nypsi_plat:1108083805841002678>",
     "role": "item",
     "shortDesc": "7 days of platinum credit",
     "longDesc": "use to receive 7 days of platinum (as long as you don't have a better tier currently)",
+    "aliases": ["plat", "platinum"],
     "rarity": 69,
     "in_crates": false,
     "craft": {
@@ -1674,7 +1686,7 @@
       "id:fishing_rod:75",
       "id:gun:75",
       "id:basic_crate:60",
-      "id:bronze_credit:2",
+      "id:bronze_credit:1",
       "id:silver_credit:1",
       "id:quarry_scrap:4",
       "id:green_gem:3",
@@ -1714,7 +1726,7 @@
       "id:basic_crate:95",
       "id:69420_crate:90",
       "id:nypsi_crate:20",
-      "id:bronze_credit:5",
+      "id:bronze_credit:3",
       "id:silver_credit:2",
       "id:gold_credit:2",
       "id:green_gem:3",
@@ -1750,7 +1762,7 @@
       "id:quarry_scrap",
       "id:nypsi_crate:50",
       "id:platinum_credit:3",
-      "id:bronze_credit:10",
+      "id:bronze_credit:7",
       "id:silver_credit:5",
       "id:gold_credit:5",
       "id:pink_gem:5",
@@ -1802,7 +1814,7 @@
     "sell": 50000,
     "clicks": 4,
     "items": [
-      "money:300000",
+      "money:600000",
       "xp:100",
       "id:lawyer",
       "id:diamond",
@@ -1817,6 +1829,7 @@
       "id:super_cursor:5",
       "id:lightning_mcqueen:40",
       "id:redbull:10",
+      "id:rick_astley:40",
       "id:xp_potion:10",
       "id:wooden_pickaxe:55",
       "id:iron_pickaxe:30",
@@ -1860,7 +1873,7 @@
     "id": "quarry_scrap",
     "name": "quarry scrap",
     "plural": "quarry scraps",
-    "aliases": ["scrap", "scraps"],
+    "aliases": ["scrap", "scraps", "quarry"],
     "emoji": "🪨",
     "longDesc": "rarely found from your quarry, can be crafted into quarry upgrades",
     "role": "item",
@@ -1949,6 +1962,17 @@
       "effect": 5,
       "time": 1800
     },
+    "in_crates": true
+  },
+  "rick_astley": {
+    "id": "rick_astley",
+    "name": "rick astley",
+    "emoji": "<a:rick_astley:1100529748796506203>",
+    "longDesc": "rick roll someone",
+    "rarity": 2,
+    "role": "item",
+    "aliases": ["rick", "rickroll"],
+    "sell": 1000000,
     "in_crates": true
   }
 }

@@ -18,29 +18,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (args.length == 0) {
     member = message.member;
   } else {
-    if (!message.mentions.members.first()) {
-      let username = args.join(" ");
-
-      if (username.includes(" -id")) {
-        username = username.split(" -id").join("");
-      } else if (username.includes("-id ")) {
-        username = username.split("-id ").join("");
-      }
-
-      member = await getMember(message.guild, username);
-    } else {
-      member = message.mentions.members.first();
-    }
-    if (args[0] == "-id" && args.length == 1) {
-      member = message.member;
-    }
+    member = await getMember(message.guild, args.join(" ").replace("-id", ""));
   }
 
   if (!member) {
     return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] });
   }
 
-  if (args.join(" ").includes("-id")) {
+  if (args.includes("-id")) {
     const embed = new CustomEmbed(message.member, "`" + member.user.id + "`").setHeader(member.user.tag);
     return message.channel.send({ embeds: [embed] });
   }

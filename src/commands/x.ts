@@ -243,7 +243,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           return waitForButton();
         }
 
-        logger.info(`admin: ${message.author.tag} (${message.author.id}) viewd ${user.id} db data`);
+        logger.info(`admin: ${message.author.tag} (${message.author.id}) viewed ${user.id} db data`);
 
         const files = [await getDbData(user)];
 
@@ -363,7 +363,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           embeds: [
             new CustomEmbed(
               message.member,
-              "enter a none stupid number pls remember if you do this for a joke this money could very easily be distributed between members & put into items"
+              "enter a non stupid number pls remember if you do this for a joke this money could very easily be distributed between members & put into items"
             ),
           ],
         });
@@ -399,7 +399,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           embeds: [
             new CustomEmbed(
               message.member,
-              "enter a none stupid number pls remember if you do this for a joke this money could very easily be distributed between members & put into items"
+              "enter a non stupid number pls remember if you do this for a joke this money could very easily be distributed between members & put into items"
             ),
           ],
         });
@@ -592,7 +592,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         if (await isEcoBanned(user.id)) {
           logger.info(`admin: ${message.author.tag} (${message.author.id}) removed ecoban for ${user.id} `);
           await setEcoBan(user.id);
-          await res.editReply({ embeds: [new CustomEmbed(message.member, "removed eco ban")] });
+          await res.editReply({ embeds: [new CustomEmbed(message.member, "removed ecoban")] });
           return;
         }
 
