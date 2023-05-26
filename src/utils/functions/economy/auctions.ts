@@ -1,4 +1,4 @@
-import { Auction } from "@prisma/client";
+import { Auction, AuctionWatch } from "@prisma/client";
 import { randomUUID } from "crypto";
 import {
   ActionRowBuilder,
@@ -181,7 +181,7 @@ export async function createAuction(member: GuildMember, itemId: string, itemAmo
     },
   });
 
-  checkWatchers(itemId, messageUrl, member.user.id);
+  checkWatchers(itemId, messageUrl, member.user.id, bin);
 
   addStat(member.user.id, "auction-created");
 
@@ -338,36 +338,47 @@ export async function getAuctionAverage(item: string) {
   return avg;
 }
 
-export async function addToAuctionWatch(member: GuildMember, itemName: string) {
-  return await prisma.economy
-    .update({
-      where: {
+export async function updateAuctionWatch(member: GuildMember, itemName: string, itemCost?: number) {
+  await prisma.auctionWatch.upsert({
+    where: {
+      userId_itemId: {
         userId: member.user.id,
+        itemId: itemName,
       },
-      data: {
-        auctionWatch: { push: itemName },
-      },
-      select: {
-        auctionWatch: true,
-      },
-    })
-    .then((q) => q.auctionWatch);
+    },
+    update: {
+      userId: member.user.id,
+      itemId: itemName,
+      maxCost: itemCost,
+    },
+    create: {
+      userId: member.user.id,
+      itemId: itemName,
+      maxCost: itemCost,
+    },
+  });
+
+  return getAuctionWatch(member);
 }
 
-export async function setAuctionWatch(member: GuildMember, items: string[]) {
-  return await prisma.economy
-    .update({
-      where: {
+export async function setAuctionWatch(member: GuildMember, items: AuctionWatch[]) {
+  await prisma.auctionWatch.deleteMany({ where: { userId: member.user.id } });
+
+  await prisma.auctionWatch.createMany({ data: items });
+  return items;
+}
+
+export async function deleteAuctionWatch(member: GuildMember, itemId: string) {
+  await prisma.auctionWatch.delete({
+    where: {
+      userId_itemId: {
         userId: member.user.id,
+        itemId: itemId,
       },
-      data: {
-        auctionWatch: items,
-      },
-      select: {
-        auctionWatch: true,
-      },
-    })
-    .then((q) => q.auctionWatch);
+    },
+  });
+
+  return getAuctionWatch(member);
 }
 
 export async function getAuctionWatch(member: GuildMember) {
@@ -383,17 +394,17 @@ export async function getAuctionWatch(member: GuildMember) {
     .then((q) => q.auctionWatch);
 }
 
-async function checkWatchers(itemName: string, messageUrl: string, creatorId: string) {
-  const users = await prisma.economy
+async function checkWatchers(itemName: string, messageUrl: string, creatorId: string, cost: number) {
+  const users = await prisma.auctionWatch
     .findMany({
       where: {
-        AND: [{ auctionWatch: { has: itemName } }, { userId: { not: creatorId } }],
+        AND: [{ itemId: itemName }, { userId: { not: creatorId } }, { maxCost: { gte: cost } }],
       },
       select: {
         userId: true,
       },
     })
-    .then((q) => q.map((q) => q.userId));
+    .then((q) => q.map((i) => i.userId));
 
   const payload = {
     payload: {

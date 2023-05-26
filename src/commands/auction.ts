@@ -22,10 +22,10 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { Item } from "../types/Economy";
 import Constants from "../utils/Constants";
 import {
-  addToAuctionWatch,
   bumpAuction,
   createAuction,
   deleteAuction,
+  deleteAuctionWatch,
   findAuctions,
   getAuctions,
   getAuctionWatch,
@@ -755,7 +755,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embeds: [
           new CustomEmbed(
             message.member,
-            `you are currently watching: \n\n${current.map((i) => `${items[i].emoji} ${items[i].name}`).join("\n")}`
+            `you are currently watching: \n\n${current
+              .map((i) => `- ${items[i.itemId].emoji} ${items[i.itemId].name}: $${i.maxCost.toLocaleString()}`)
+              .join("\n")}`
           ).setHeader("auction watch", message.author.avatarURL()),
         ],
       });
@@ -795,7 +797,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       current.splice(current.indexOf(selected.id), 1);
 
-      current = await setAuctionWatch(message.member, current);
+      current = await deleteAuctionWatch(message.member, selected.id);
     } else {
       if (current.length >= max) {
         let desc = `you have reached the limit of auction watches (**${max}**)`;
