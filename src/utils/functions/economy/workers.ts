@@ -100,7 +100,7 @@ export async function calcWorkerValues(
       maxStoredBonus += i / 4;
     }
   } else if (worker.workerId === "amazon") {
-    crateChance = 0.002;
+    crateChance = 0.0005;
   }
 
   for (const upgrade of worker.upgrades) {
