@@ -87,7 +87,6 @@ export async function calcWorkerValues(
   let maxStoredBonus = 0;
   let gemChance = 0;
   let scrapChance = 0;
-  let crateChance = 0;
 
   if (worker.workerId === "quarry") {
     scrapChance = 0.003;
@@ -99,8 +98,6 @@ export async function calcWorkerValues(
       perItemBonus += i / 3.5;
       maxStoredBonus += i / 4;
     }
-  } else if (worker.workerId === "amazon") {
-    crateChance = 0.002;
   }
 
   for (const upgrade of worker.upgrades) {
@@ -185,7 +182,6 @@ export async function calcWorkerValues(
     maxStorage: Math.floor(baseWorkers[worker.workerId].base.max_storage + maxStoredBonus),
     scrapChance,
     gemChance,
-    crateChance,
   };
 
   if (res.perInterval < 0) res.perInterval = 0;
@@ -230,7 +226,7 @@ export async function claimFromWorkers(userId: string): Promise<string> {
     if (worker.stored == 0) continue;
     const baseWorker = baseWorkers[worker.workerId];
 
-    const { perItem, gemChance, scrapChance, crateChance } = await calcWorkerValues(worker);
+    const { perItem, gemChance, scrapChance } = await calcWorkerValues(worker);
 
     amountEarned += Math.floor(perItem * worker.stored);
 
@@ -242,11 +238,6 @@ export async function claimFromWorkers(userId: string): Promise<string> {
     while (scrapChance > 0 && percentChance(scrapChance * worker.stored)) {
       amounts.set("quarry_scrap", amounts.has("quarry_scrap") ? amounts.get("quarry_scrap") + 1 : 1);
       await addInventoryItem(worker.userId, "quarry_scrap", 1, false);
-    }
-
-    while (crateChance > 0 && percentChance(crateChance * worker.stored)) {
-      amounts.set("crates", amounts.has("crates") ? amounts.get("crates") + 1 : 1);
-      await addInventoryItem(worker.userId, "basic_crate", 1, false);
     }
 
     earnedBreakdown.push(
@@ -286,14 +277,6 @@ export async function claimFromWorkers(userId: string): Promise<string> {
     footer.push(
       `you found **${amounts.get("quarry_scrap")}** ${getItems()["quarry_scrap"].emoji} quarry scrap${
         amounts.get("quarry_scrap") > 1 ? "s" : ""
-      }`
-    );
-  }
-
-  if (amounts.has("crates")) {
-    footer.push(
-      `you found **${amounts.get("crates")}** ${getItems()["basic_crate"].emoji} basic crate${
-        amounts.get("crates") > 1 ? "s" : ""
       }`
     );
   }
