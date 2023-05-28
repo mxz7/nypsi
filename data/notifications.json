@@ -89,7 +89,7 @@
     "leaderboards": {
       "id": "leaderboards",
       "name": "global leaderboards",
-      "description": "should your username be hidden from global leaderboards?"
+      "description": "show your username on public leaderboards?"
     }
   }
 }
