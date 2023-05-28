@@ -137,7 +137,7 @@ export async function topBalanceGlobal(amount: number, anon = true): Promise<str
     usersFinal[count] =
       pos + " **" + (await getPreferences(user.userId))?.leaderboards
         ? username
-        : "anonymous" + "** $" + Number(user.money).toLocaleString();
+        : "[hidden]" + "** $" + Number(user.money).toLocaleString();
     count++;
   }
 
@@ -189,7 +189,7 @@ export async function topNetWorthGlobal(userId: string) {
         " **" +
         ((await getPreferences(user.userId))?.leaderboards
           ? user.user.lastKnownTag?.split("#")[0] || user.userId
-          : "anonymous") +
+          : "[hidden]") +
         "** $" +
         Number(user.netWorth).toLocaleString()
     );
@@ -435,7 +435,7 @@ export async function topPrestigeGlobal(userId: string) {
       " **" +
       ((await getPreferences(user.userId))?.leaderboards
         ? user.user.lastKnownTag?.split("#")[0] || user.userId
-        : "anonymous") +
+        : "[hidden]") +
       "** " +
       user.prestige +
       (thing[(v - 20) % 10] || thing[v] || thing[0]) +
@@ -595,7 +595,7 @@ export async function topItemGlobal(item: string, userId: string) {
       " **" +
       ((await getPreferences(user.userId))?.leaderboards
         ? user.economy.user.lastKnownTag?.split("#")[0] || user.userId
-        : "anonymous") +
+        : "[hidden]") +
       "** " +
       user.amount.toLocaleString() +
       ` ${user.amount > 1 ? items[item].plural || items[item].name : items[item].name}`;
@@ -872,7 +872,7 @@ export async function topDailyStreakGlobal(userId: string) {
       " **" +
       ((await getPreferences(user.userId))?.leaderboards
         ? user.user.lastKnownTag?.split("#")[0] || user.userId
-        : "anonymous") +
+        : "[hidden]") +
       "** " +
       user.dailyStreak;
     count++;
