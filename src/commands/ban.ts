@@ -154,16 +154,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return;
     }
 
-    // await message.guild.members
-    //   .ban(target, {
-    //     reason: reason,
-    //   })
-    //   .catch(() => {
-    //     fail = true;
-    //     return send({
-    //       embeds: [new ErrorEmbed(`unable to ban ${target.toString()}`)],
-    //     });
-    //   });
+    await message.guild.members
+      .ban(target, {
+        reason: reason,
+      })
+      .catch(() => {
+        fail = true;
+        return send({
+          embeds: [new ErrorEmbed(`unable to ban ${target.toString()}`)],
+        });
+      });
   }
 
   if (fail) return;
