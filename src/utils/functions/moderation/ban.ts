@@ -35,6 +35,16 @@ export async function newBan(guild: Guild, userIDs: string[] | string, date: Dat
   }
 }
 
+export async function getBannedUsers(guild: Guild) {
+  const query = await prisma.moderationBan.findMany({
+    where: {
+      guildId: guild.id,
+    },
+  });
+
+  return query;
+}
+
 export async function isBanned(guild: Guild, member: GuildMember) {
   const query = await prisma.moderationBan.findFirst({
     where: {
