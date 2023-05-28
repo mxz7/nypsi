@@ -93,8 +93,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
   }
 
-  console.log(mode);
-
   let reason = message.author.tag + ": ";
   let unbanDate: Date;
   let temporary = false;
