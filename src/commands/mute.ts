@@ -9,7 +9,6 @@ import {
 } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
-import { addCooldown, getPrefix, inCooldown } from "../utils/functions/guilds/utils";
 import { getExactMember } from "../utils/functions/member";
 import { newCase } from "../utils/functions/moderation/cases";
 import { deleteMute, getMuteRole, isMuted, newMute } from "../utils/functions/moderation/mute";
@@ -81,62 +80,23 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     });
   }
 
-  const prefix = await getPrefix(message.guild);
-
   if (args.length == 0 || !args[0]) {
     const embed = new CustomEmbed(message.member)
       .setHeader("mute help")
-      .addField("usage", `${prefix}mute <@user(s)> (time) [-s]`)
-      .addField(
-        "help",
-        "to mute multiple people in one command you just have to tag all of those you wish to be muted\nif the mute role isnt setup correctly this wont work"
-      )
+      .addField("usage", "/mute <user> (time) (reason) [-s]")
+      .addField("help", "if the mute role isnt setup correctly this wont work")
       .addField("time format examples", "**1d** *1 day*\n**10h** *10 hours*\n**15m** *15 minutes*\n**30s** *30 seconds*");
     return send({ embeds: [embed] });
   }
 
-  if ((await message.guild.members.fetch(args[0]).catch(() => {})) && message.mentions.members.first() == null) {
-    let members;
+  const target = await getExactMember(message.guild, args[0]);
+  let reason = "";
 
-    if (inCooldown(message.guild)) {
-      members = message.guild.members.cache;
-    } else {
-      members = await message.guild.members.fetch();
-      addCooldown(message.guild, 3600);
-    }
-
-    const member = members.find((m) => m.id == args[0]);
-
-    if (!member) {
-      return send({
-        embeds: [new ErrorEmbed("unable to find member with ID `" + args[0] + "`")],
-      });
-    }
-
-    message.mentions.members.set(member.user.id, member);
-  } else if (message.mentions.members.first() == null) {
-    const member = await getExactMember(message.guild, args[0]);
-
-    if (!member) {
-      return send({ embeds: [new ErrorEmbed("unable to find member `" + args[0] + "`")] });
-    }
-
-    message.mentions.members.set(member.user.id, member);
+  if (args.length > 1) {
+    reason = args.slice(1).join(" ");
   }
 
-  const members = message.mentions.members;
-  let reason: string | string[] = "";
-
-  if (args.length != members.size) {
-    for (let i = 0; i < members.size; i++) {
-      args.shift();
-    }
-    reason = args.join(" ");
-  }
-
-  let count = 0;
   let mode = "role";
-  const failed = [];
 
   const guildMuteRole = await getMuteRole(message.guild);
 
@@ -210,9 +170,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (time) {
       timedMute = true;
-      reason = reason.split(" ");
-      reason.shift();
-      reason = reason.join(" ");
+      reason = reason.split(" ").slice(1).join(" ");
     }
   }
 
@@ -226,74 +184,47 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   let fail = false;
 
   if (mode == "role") {
-    for (const member of members.keys()) {
-      if (members.get(member).user.id == message.client.user.id) {
-        await message.channel.send({ content: "youll never shut me up 😏" });
-        continue;
-      }
-
-      const targetHighestRole = members.get(member).roles.highest;
-      const memberHighestRole = message.member.roles.highest;
-
-      if (targetHighestRole.position >= memberHighestRole.position && message.guild.ownerId != message.member.user.id) {
-        failed.push(members.get(member).user);
-      } else if (members.get(member).roles.cache.find((r) => r.id == muteRole.id)) {
-        if (Array.from(members.keys()).length == 1) {
-          return send({ embeds: [new ErrorEmbed("that user is already muted")] });
-        }
-
-        failed.push(members.get(member).user);
-      } else {
-        await members
-          .get(member)
-          .roles.add(muteRole)
-          .then(() => count++)
-          .catch(() => {
-            fail = true;
-            console.log(muteRole);
-            console.log(Array.from(message.guild.roles.cache.keys()));
-
-            return send({
-              embeds: [new ErrorEmbed("i am unable to give users the mute role - ensure my role is above the 'muted' role")],
-            });
-          });
-      }
-      if (fail) break;
+    if (target.user.id == message.client.user.id) {
+      await message.channel.send({ content: "you'll never shut me up 😏" });
+      return;
     }
+
+    const targetHighestRole = target.roles.highest;
+    const memberHighestRole = message.member.roles.highest;
+
+    if (targetHighestRole.position >= memberHighestRole.position && message.guild.ownerId != message.member.user.id) {
+      return send({ embeds: [new ErrorEmbed(`your role is not high enough to punish ${target.toString()}`)] });
+    } else {
+      await target.roles.add(muteRole).catch(() => {
+        fail = true;
+
+        return send({
+          embeds: [new ErrorEmbed("i am unable to give users the mute role - ensure my role is above the 'muted' role")],
+        });
+      });
+    }
+    if (fail) return;
   } else if (mode == "timeout") {
-    for (const member of members.keys()) {
-      if (members.get(member).user.id == message.client.user.id) {
-        await message.channel.send({ content: "youll never shut me up 😏" });
-        continue;
-      }
-
-      const targetHighestRole = members.get(member).roles.highest;
-      const memberHighestRole = message.member.roles.highest;
-
-      if (targetHighestRole.position >= memberHighestRole.position && message.guild.ownerId != message.member.user.id) {
-        failed.push(members.get(member).user);
-      } else if (members.get(member).isCommunicationDisabled()) {
-        if (Array.from(members.keys()).length == 1) {
-          return send({ embeds: [new ErrorEmbed("that user is already muted")] });
-        }
-
-        failed.push(members.get(member).user);
-      } else {
-        await members
-          .get(member)
-          .disableCommunicationUntil(unmuteDate, reason)
-          .then(() => count++)
-          .catch(() => {
-            fail = true;
-            return send({
-              embeds: [
-                new ErrorEmbed("i am unable to timeout users, ensure my role is high enough and i have the permission"),
-              ],
-            });
-          });
-      }
-      if (fail) break;
+    if (target.user.id == message.client.user.id) {
+      return await message.channel.send({ content: "youll never shut me up 😏" });
     }
+
+    const targetHighestRole = target.roles.highest;
+    const memberHighestRole = message.member.roles.highest;
+
+    if (targetHighestRole.position >= memberHighestRole.position && message.guild.ownerId != message.member.user.id) {
+      return send({ embeds: [new ErrorEmbed(`your role is not high enough to punish ${target.toString()}`)] });
+    } else if (target.isCommunicationDisabled() as boolean) {
+      return send({ embeds: [new ErrorEmbed(`${target.user.toString()} is already timed out`)] });
+    } else {
+      await target.disableCommunicationUntil(unmuteDate, reason).catch(() => {
+        fail = true;
+        return send({
+          embeds: [new ErrorEmbed("i am unable to timeout users, ensure my role is high enough and i have the permission")],
+        });
+      });
+    }
+    if (fail) return;
   }
 
   if (fail) return;
@@ -304,34 +235,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     mutedLength = getTime(time * 1000);
   }
 
-  if (count == 0) {
-    return send({ embeds: [new ErrorEmbed("i was unable to mute any users")] });
-  }
+  const embed = new CustomEmbed(message.member);
 
-  const embed = new CustomEmbed(message.member, `✅ **${count}** member(s) muted`);
+  let msg = `✅ \`${target.user.tag}\` has been muted`;
 
   if (timedMute) {
-    if (count == 1 && failed.length == 0) {
-      embed.setDescription("✅ `" + members.first().user.tag + "` has been muted for **" + mutedLength + "**");
-    } else {
-      embed.setDescription("✅ **" + count + "** members muted for **" + mutedLength + "**");
-    }
-  } else {
-    if (count == 1 && failed.length == 0) {
-      embed.setDescription("✅ `" + members.first().user.tag + "` has been muted");
-    } else {
-      embed.setDescription("✅ **" + count + "** members muted");
-    }
+    msg += ` for **${mutedLength}**`;
+  } else if (reason) {
+    msg += ` for **${reason}**`;
   }
 
-  if (failed.length != 0) {
-    const failedTags = [];
-    for (const fail1 of failed) {
-      failedTags.push(fail1.tag);
-    }
-
-    embed.addField("error", "unable to mute: " + failedTags.join(", "));
-  }
+  embed.setDescription(msg);
 
   if (args.join(" ").includes("-s")) {
     if (message instanceof Message) {
@@ -352,56 +266,41 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     storeReason = `[${mutedLength}] ${reason}`;
   }
 
-  const members1 = Array.from(members.keys());
+  await newCase(message.guild, "mute", target.user.id, message.author.tag, storeReason);
 
-  if (failed.length != 0) {
-    for (const fail1 of failed) {
-      if (members1.includes(fail1.id)) {
-        members1.splice(members1.indexOf(fail1.id), 1);
-      }
-    }
-  }
-
-  await newCase(message.guild, "mute", members1, message.author.tag, storeReason);
-
-  for (const m of members1) {
-    if (await isMuted(message.guild, members.get(m))) {
-      await deleteMute(message.guild, members.get(m));
-    }
+  if (await isMuted(message.guild, target)) {
+    await deleteMute(message.guild, target);
   }
 
   if (timedMute && mode !== "timeout") {
-    await newMute(message.guild, members1, unmuteDate);
+    await newMute(message.guild, [target.user.id], unmuteDate);
   }
 
   if (!timedMute && mode !== "timeout") {
-    await newMute(message.guild, members1, new Date(3130000000000));
+    await newMute(message.guild, [target.user.id], new Date(3130000000000));
   }
 
   if (args.join(" ").includes("-s")) return;
-  for (const m of members1) {
-    const mem = members.get(m);
-    if (!timedMute) {
-      const embed = new CustomEmbed(mem).setTitle(`muted in ${message.guild.name}`).addField("length", "`permanent`", true);
+  if (!timedMute) {
+    const embed = new CustomEmbed(target).setTitle(`muted in ${message.guild.name}`).addField("length", "`permanent`", true);
 
-      if (reason != "") {
-        embed.addField("reason", `\`${reason}\``, true);
-      }
-
-      await mem.send({ content: `you have been muted in ${message.guild.name}`, embeds: [embed] }).catch(() => {});
-    } else {
-      const embed = new CustomEmbed(mem)
-        .setTitle(`muted in ${message.guild.name}`)
-        .addField("length", `\`${mutedLength}\``, true)
-        .setFooter({ text: "unmuted at:" })
-        .setTimestamp(unmuteDate);
-
-      if (reason != "") {
-        embed.addField("reason", `\`${reason}\``, true);
-      }
-
-      await mem.send({ content: `you have been muted in ${message.guild.name}`, embeds: [embed] }).catch(() => {});
+    if (reason != "") {
+      embed.addField("reason", `\`${reason}\``, true);
     }
+
+    await target.send({ content: `you have been muted in ${message.guild.name}`, embeds: [embed] }).catch(() => {});
+  } else {
+    const embed = new CustomEmbed(target)
+      .setTitle(`muted in ${message.guild.name}`)
+      .addField("length", `\`${mutedLength}\``, true)
+      .setFooter({ text: "unmuted at:" })
+      .setTimestamp(unmuteDate);
+
+    if (reason != "") {
+      embed.addField("reason", `\`${reason}\``, true);
+    }
+
+    await target.send({ content: `you have been muted in ${message.guild.name}`, embeds: [embed] }).catch(() => {});
   }
 }
 

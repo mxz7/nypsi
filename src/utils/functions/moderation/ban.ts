@@ -11,6 +11,9 @@ export async function newBan(guild: Guild, userIDs: string[] | string, date: Dat
   }
 
   for (const userID of userIDs) {
+    if (await prisma.moderationBan.findUnique({ where: { userId_guildId: { guildId: guild.id, userId: userID } } }))
+      await prisma.moderationBan.delete({ where: { userId_guildId: { guildId: guild.id, userId: userID } } });
+
     await prisma.moderationBan.create({
       data: {
         userId: userID,
@@ -30,6 +33,16 @@ export async function newBan(guild: Guild, userIDs: string[] | string, date: Dat
       }, date.getTime() - Date.now());
     }
   }
+}
+
+export async function getBannedUsers(guild: Guild) {
+  const query = await prisma.moderationBan.findMany({
+    where: {
+      guildId: guild.id,
+    },
+  });
+
+  return query;
 }
 
 export async function isBanned(guild: Guild, member: GuildMember) {
