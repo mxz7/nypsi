@@ -85,6 +85,11 @@
       "id": "offers",
       "name": "receive offers",
       "description": "how many offers do you want to be able to receive at once? current: {VALUE}"
+    },
+    "leaderboards": {
+      "id": "leaderboards",
+      "name": "global leaderboards",
+      "description": "should your username be hidden from global leaderboards?"
     }
   }
 }

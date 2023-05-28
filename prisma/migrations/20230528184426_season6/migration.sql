@@ -17,6 +17,9 @@ ALTER TABLE "Economy" DROP COLUMN "auctionWatch";
 -- AlterTable
 ALTER TABLE "EconomyGuild" ADD COLUMN     "tokens" INTEGER NOT NULL DEFAULT 0;
 
+-- AlterTable
+ALTER TABLE "Preferences" ADD COLUMN     "leaderboards" BOOLEAN NOT NULL DEFAULT true;
+
 -- DropTable
 DROP TABLE "ItemUse";
 
