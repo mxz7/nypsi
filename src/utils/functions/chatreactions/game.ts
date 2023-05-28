@@ -151,6 +151,7 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel) 
         if (winnersList.length == 1) {
           embed.setFooter({ text: "ended with 1 winner" });
         } else {
+          addProgress(winnersIDs[0], "fast_typer", 1);
           embed.setFooter({ text: `ended with ${winnersList.length} winners` });
         }
         updateWinnersText();

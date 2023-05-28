@@ -133,4 +133,5 @@ export default {
   VOTE_CRATE_PROGRESSION: [1, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 5],
   SEASON_START: new Date("01/01/2023"),
   SEASON_NUMBER: 5,
+  SNOWFLAKE_REGEX: /^\d{17,19}$/,
 };

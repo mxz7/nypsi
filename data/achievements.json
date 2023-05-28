@@ -1107,14 +1107,14 @@
     "name": "fast typer **I**",
     "emoji": "⌨️",
     "target": 15,
-    "description": "win 15 chat reaction duels"
+    "description": "win 15 chat reactions"
   },
   "fast_typer_ii": {
     "id": "fast_typer_ii",
     "name": "fast typer **II**",
     "emoji": "⌨️",
     "target": 50,
-    "description": "win 50 chat reaction duels",
+    "description": "win 50 chat reactions",
     "prize": ["lucky_scratch_card:1"]
   },
   "fast_typer_iii": {
@@ -1122,7 +1122,7 @@
     "name": "fast typer **III**",
     "emoji": "⌨️",
     "target": 250,
-    "description": "win 250 chat reaction duels",
+    "description": "win 250 chat reactions",
     "prize": ["lucky_scratch_card:2"]
   },
   "fast_typer_iv": {
@@ -1130,7 +1130,7 @@
     "name": "fast typer **IV**",
     "emoji": "⌨️",
     "target": 500,
-    "description": "win 500 chat reaction duels",
+    "description": "win 500 chat reactions",
     "prize": ["lucky_scratch_card:3"]
   },
   "fast_typer_v": {
@@ -1138,7 +1138,7 @@
     "name": "fast typer **V**",
     "emoji": "⌨️",
     "target": 1000,
-    "description": "win 1,000 chat reaction duels",
+    "description": "win 1,000 chat reactions",
     "prize": ["legendary_scratch_card:1"]
   }
 }
