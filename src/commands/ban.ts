@@ -143,7 +143,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const targetHighestRole = target.roles.highest;
     const memberHighestRole = message.member.roles.highest;
 
-    if (targetHighestRole >= memberHighestRole) {
+    if (targetHighestRole >= memberHighestRole && message.author.id !== message.guild.ownerId) {
       return send({ embeds: [new ErrorEmbed(`your role is not high enough to punish ${target.toString()}`)] });
     }
 
