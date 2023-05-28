@@ -1,7 +1,7 @@
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message, PermissionFlagsBits } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
-import { addCooldown, getPrefix, inCooldown } from "../utils/functions/guilds/utils";
+import { getPrefix } from "../utils/functions/guilds/utils";
 import { getExactMember } from "../utils/functions/member";
 import { newCase } from "../utils/functions/moderation/cases";
 import { createProfile, profileExists } from "../utils/functions/moderation/utils";
@@ -66,118 +66,50 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (args.length == 0 || !args[0]) {
     const embed = new CustomEmbed(message.member)
       .setHeader("kick help")
-      .addField("usage", `${prefix}kick <@user(s)> (reason) [-s]`)
+      .addField("usage", `${prefix}kick <user> (reason) [-s]`)
       .addField(
         "help",
         "**<>** required | **()** optional | **[]** parameter\n" +
-          "**<@users>** you can kick one or more members in one command (must tag them)\n" +
+          "**<user>** can tag user or use their usernames\n" +
           "**(reason)** reason for the kick, will be given to all kicked members\n" +
           "**[-s]** if used, command message will be deleted and the output will be sent to moderator as a DM if possible"
-      )
-      .addField(
-        "examples",
-        `${prefix}kick @member hacking\n${prefix}kick @member @member2 @member3 hacking\n${prefix}kick @member hacking -s`
       );
 
     return send({ embeds: [embed] });
   }
 
-  if ((await message.guild.members.fetch(args[0]).catch(() => {})) && message.mentions.members.first() == null) {
-    let members;
-
-    if (inCooldown(message.guild)) {
-      members = message.guild.members.cache;
-    } else {
-      members = await message.guild.members.fetch();
-      addCooldown(message.guild, 3600);
-    }
-
-    const member = members.find((m) => m.id == args[0]);
-
-    if (!member) {
-      return send({
-        embeds: [new ErrorEmbed("unable to find member with ID `" + args[0] + "`")],
-      });
-    }
-
-    message.mentions.members.set(member.user.id, member);
-  } else if (message.mentions.members.first() == null) {
-    const member = await getExactMember(message.guild, args[0]);
-
-    if (!member) {
-      return send({ embeds: [new ErrorEmbed("unable to find member `" + args[0] + "`")] });
-    }
-
-    message.mentions.members.set(member.user.id, member);
-  }
-
-  const members = message.mentions.members;
+  const target = await getExactMember(message.guild, args[0]);
   let reason = message.member.user.tag + ": ";
 
-  if (args.length != members.size) {
-    for (let i = 0; i < members.size; i++) {
-      args.shift();
-    }
-    reason = reason + args.join(" ");
+  if (args.length > 1) {
+    reason = reason + args.slice(1);
   } else {
     reason = reason + "no reason given";
   }
 
-  let count = 0;
-  const failed = [];
+  const targetHighestRole = target.roles.highest;
+  const memberHighestRole = message.member.roles.highest;
 
-  for (const member of members.keys()) {
-    const targetHighestRole = members.get(member).roles.highest;
-    const memberHighestRole = message.member.roles.highest;
-
-    if (targetHighestRole.position >= memberHighestRole.position && message.guild.ownerId != message.member.user.id) {
-      failed.push(members.get(member).user);
-    } else {
-      if (members.get(member).user.id == message.client.user.id) {
-        await send({ content: "NICE TRY LOSER CANT KICK THE BEST WORLDWIDE" });
-        return;
-      }
-
-      await members
-        .get(member)
-        .kick(reason)
-        .then(() => {
-          count++;
-        })
-        .catch(() => {
-          failed.push(members.get(member).user);
-        });
+  if (targetHighestRole.position >= memberHighestRole.position && message.guild.ownerId != message.member.user.id) {
+    return send({ embeds: [new ErrorEmbed(`your role is not high enough to punish ${target.toString()}`)] });
+  } else {
+    if (target.user.id == message.client.user.id) {
+      await send({ content: "NICE TRY LOSER CANT KICK THE BEST WORLDWIDE" });
+      return;
     }
-  }
 
-  if (count == 0) {
-    return send({ embeds: [new ErrorEmbed("i was unable to kick any users")] });
+    await target.kick(reason);
   }
 
   const embed = new CustomEmbed(message.member);
 
-  if (reason.split(": ")[1] == "no reason given") {
-    embed.setDescription(`✅ **${count}** members kicked`);
-  } else {
-    embed.setDescription(`✅ **${count}** members kicked for: ${reason.split(": ")[1]}`);
+  let msg = `✅ \`${target.user.tag}\` has been kicked`;
+
+  if (reason.split(": ")[1] !== "no reason given") {
+    msg += ` for **${reason.split(": ")[1]}**`;
   }
 
-  if (failed.length != 0) {
-    const failedTags = [];
-    for (const fail1 of failed) {
-      failedTags.push(fail1.tag);
-    }
-
-    embed.addField("error", "unable to kick: " + failedTags.join(", "));
-  }
-
-  if (count == 1) {
-    if (reason.split(": ")[1] == "no reason given") {
-      embed.setDescription("✅ `" + members.first().user.tag + "` has been kicked");
-    } else {
-      embed.setDescription("✅ `" + members.first().user.tag + "` has been kicked for: " + reason.split(": ")[1]);
-    }
-  }
+  embed.setDescription(msg);
 
   if (args.join(" ").includes("-s")) {
     if (message instanceof Message) {
@@ -190,31 +122,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     await send({ embeds: [embed] });
   }
 
-  const members1 = Array.from(members.keys());
-
-  if (failed.length != 0) {
-    for (const fail of failed) {
-      if (members1.includes(fail.id)) {
-        members1.splice(members1.indexOf(fail.id), 1);
-      }
-    }
-  }
-
-  await newCase(message.guild, "kick", members1, message.author.tag, reason.split(": ")[1]);
+  await newCase(message.guild, "kick", target.user.id, message.author.tag, reason.split(": ")[1]);
 
   if (args.join(" ").includes("-s")) return;
-  for (const member of members1) {
-    const m = members.get(member);
 
-    if (reason.split(": ")[1] == "no reason given") {
-      await m.send({ content: `you have been kicked from ${message.guild.name}` }).catch(() => {});
-    } else {
-      const embed = new CustomEmbed(m)
-        .setTitle(`kicked from ${message.guild.name}`)
-        .addField("reason", `\`${reason.split(": ")[1]}\``);
+  if (reason.split(": ")[1] == "no reason given") {
+    await target.send({ content: `you have been kicked from ${message.guild.name}` }).catch(() => {});
+  } else {
+    const embed = new CustomEmbed(target)
+      .setTitle(`kicked from ${message.guild.name}`)
+      .addField("reason", `\`${reason.split(": ")[1]}\``);
 
-      await m.send({ content: `you have been kicked from ${message.guild.name}`, embeds: [embed] }).catch(() => {});
-    }
+    await target.send({ content: `you have been kicked from ${message.guild.name}`, embeds: [embed] }).catch(() => {});
   }
 }
 
