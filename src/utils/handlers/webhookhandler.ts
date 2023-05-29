@@ -19,7 +19,7 @@ import { addMember, getPremiumProfile, isPremium, renewUser, setTier } from "../
 import { percentChance } from "../functions/random";
 import requestDM from "../functions/requestdm";
 import { isUserBlacklisted } from "../functions/users/blacklist";
-import { addNotificationToQueue, getDmSettings } from "../functions/users/notifications";
+import { addNotificationToQueue, getDmSettings, getPreferences } from "../functions/users/notifications";
 import { logger } from "../logger";
 import ms = require("ms");
 
@@ -237,7 +237,7 @@ async function handleKofiData(data: KofiResponse) {
             };
 
             await addNotificationToQueue(payload);
-            if (data.is_public) {
+            if (data.is_public && (await getPreferences(user.id)).leaderboards) {
               const hook = new WebhookClient({ url: process.env.THANKYOU_HOOK });
               await hook.send({
                 embeds: [
@@ -367,7 +367,7 @@ async function handleKofiData(data: KofiResponse) {
         if ((await getPremiumProfile(user.id)).getLevelString().toLowerCase() != item) {
           await setTier(user.id, premiums.indexOf(item) + 1);
           await renewUser(user.id);
-          if (data.is_public) {
+          if (data.is_public && (await getPreferences(user.id)).leaderboards) {
             const hook = new WebhookClient({ url: process.env.THANKYOU_HOOK });
             await hook.send({
               embeds: [
@@ -383,7 +383,7 @@ async function handleKofiData(data: KofiResponse) {
         }
       } else {
         await addMember(user.id, premiums.indexOf(item) + 1);
-        if (data.is_public) {
+        if (data.is_public && (await getPreferences(user.id)).leaderboards) {
           const hook = new WebhookClient({ url: process.env.THANKYOU_HOOK });
           await hook.send({
             embeds: [
