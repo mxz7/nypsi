@@ -61,7 +61,7 @@ export function listen(manager: ClusterManager) {
   });
 
   app.get("/commands-today", async (req, response) => {
-    const ip = req.body.address;
+    const ip = req.headers["x-forwarded-for"] as string;
 
     if (apiRateLimits.has(ip)) {
       apiRateLimits.set(ip, apiRateLimits.get(ip) + 1);
