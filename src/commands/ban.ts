@@ -111,7 +111,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       args.shift();
     }
 
-    reason = reason + args.slice(1);
+    reason = reason + args.slice(1).join(" ");
   } else {
     reason = reason + "no reason given";
   }
