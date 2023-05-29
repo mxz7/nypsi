@@ -12,15 +12,21 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (!support) return;
 
-  if (args.length == 0) {
+  if (!(message instanceof Message)) return;
+
+  if (args.length == 0 && !message.attachments.first()) {
     return message.channel.send({ embeds: [new ErrorEmbed("dumbass")] });
   }
 
-  if (!(message instanceof Message)) return;
+  const embed = new CustomEmbed(message.member).setHeader(message.author.tag, message.author.avatarURL());
 
-  const embed = new CustomEmbed(message.member)
-    .setDescription(args.join(" "))
-    .setHeader(message.author.tag, message.author.avatarURL());
+  if (args.length > 0) {
+    embed.setDescription(args.join(" "));
+  }
+
+  if (message.attachments.first()) {
+    embed.setImage(message.attachments.first().url);
+  }
 
   Promise.all([
     sendToRequestChannel(support.userId, embed, message.client as NypsiClient),
