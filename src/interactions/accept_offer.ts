@@ -45,6 +45,16 @@ export default {
       return await redis.del(`${Constants.redis.nypsi.OFFER_PROCESS}:${interaction.user.id}`);
     }
 
+    if (await isEcoBanned(offer.ownerId)) {
+      await prisma.offer.delete({
+        where: {
+          messageId: offer.messageId,
+        },
+      });
+      await redis.del(`${Constants.redis.nypsi.OFFER_PROCESS}:${interaction.user.id}`);
+      return interaction.reply({ embeds: [new ErrorEmbed("they are banned.")] });
+    }
+
     await interaction.deferReply({ ephemeral: true });
 
     const inventory = await getInventory(interaction.user.id, false);
