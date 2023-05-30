@@ -1686,12 +1686,11 @@
       "id:fishing_rod:75",
       "id:gun:75",
       "id:basic_crate:60",
-      "id:bronze_credit:1",
-      "id:silver_credit:1",
+      "id:bronze_credit:0.7",
       "id:quarry_scrap:4",
-      "id:green_gem:3",
-      "id:blue_gem:3",
-      "id:pink_gem:0.7"
+      "id:green_gem:1",
+      "id:blue_gem:1",
+      "id:pink_gem:0.3"
     ]
   },
   "lucky_scratch_card": {
@@ -1728,11 +1727,11 @@
       "id:nypsi_crate:20",
       "id:bronze_credit:3",
       "id:silver_credit:2",
-      "id:gold_credit:2",
-      "id:green_gem:3",
-      "id:blue_gem:3",
-      "id:purple_gem:2",
-      "id:gem_crate:0.5"
+      "id:gold_credit:1",
+      "id:green_gem:2",
+      "id:blue_gem:2",
+      "id:purple_gem:1",
+      "id:gem_crate:0.2"
     ]
   },
   "legendary_scratch_card": {
@@ -1762,10 +1761,10 @@
       "id:quarry_scrap",
       "id:nypsi_crate:50",
       "id:platinum_credit:3",
-      "id:bronze_credit:7",
-      "id:silver_credit:5",
-      "id:gold_credit:5",
-      "id:pink_gem:5",
+      "id:bronze_credit:5",
+      "id:silver_credit:4",
+      "id:gold_credit:3",
+      "id:pink_gem:3",
       "id:gem_shard:50",
       "id:gem_crate:2.5"
     ]
