@@ -682,7 +682,7 @@ export async function runCommand(
         content = content.substring(0, 75) + "...";
       }
 
-      msg = `[${getTimestamp()}] ${message.guild.id} - ${message.author.tag}: ${content}`;
+      msg = `[${getTimestamp()}] ${message.guildId}:${message.channelId} - ${message.author.tag}: ${content}`;
     }
 
     const embed = new CustomEmbed(null, `\`\`\`${msg}\`\`\``)

@@ -140,6 +140,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
   }
 
+  if (inventory.find((i) => i.item === "purple_gem")?.amount > 0) times++;
+  if (inventory.find((i) => i.item === "white_gem")?.amount > 0) times++;
+  if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0) times++;
+
   if (!unbreakable) {
     await setInventoryItem(message.member, pickaxe, inventory.find((i) => i.item == pickaxe).amount - 1, false);
   }

@@ -82,7 +82,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   let reason = message.member.user.tag + ": ";
 
   if (args.length > 1) {
-    reason = reason + args.slice(1);
+    reason = reason + args.slice(1).join(" ");
   } else {
     reason = reason + "no reason given";
   }

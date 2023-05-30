@@ -1,7 +1,7 @@
 import { EmbedBuilder } from "discord.js";
 import prisma from "../init/database";
 import redis from "../init/redis";
-import { CustomEmbed } from "../models/EmbedBuilders";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { InteractionHandler } from "../types/InteractionHandler";
 import Constants from "../utils/Constants";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
@@ -37,6 +37,16 @@ export default {
 
     if (!offer) {
       return await redis.del(`${Constants.redis.nypsi.OFFER_PROCESS}:${interaction.user.id}`);
+    }
+
+    if (await isEcoBanned(offer.ownerId)) {
+      await prisma.offer.delete({
+        where: {
+          messageId: offer.messageId,
+        },
+      });
+      await redis.del(`${Constants.redis.nypsi.OFFER_PROCESS}:${interaction.user.id}`);
+      return interaction.reply({ embeds: [new ErrorEmbed("they are banned.")] });
     }
 
     await interaction.deferReply({ ephemeral: true });
