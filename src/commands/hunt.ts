@@ -4,7 +4,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { getBoosters } from "../utils/functions/economy/boosters";
 import { addInventoryItem, getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
-import { addItemUse } from "../utils/functions/economy/stats";
+import { addStat } from "../utils/functions/economy/stats";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
@@ -74,7 +74,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   await addCooldown(cmd.name, message.member, 300);
 
-  await addItemUse(message.member, gun);
+  await addStat(message.member, gun);
 
   const huntItems = Array.from(Object.keys(items));
 

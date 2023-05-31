@@ -29,7 +29,7 @@
     "role": "fish",
     "rarity": 1,
     "buy": 0,
-    "sell": 25000,
+    "sell": 20000,
     "in_crates": false
   },
   "pufferfish": {
@@ -40,7 +40,7 @@
     "role": "fish",
     "rarity": 1,
     "buy": 0,
-    "sell": 30000,
+    "sell": 25000,
     "in_crates": false
   },
   "large_fish": {
@@ -74,7 +74,7 @@
     "rarity": 0,
     "aliases": ["cobble"],
     "buy": 0,
-    "sell": 1000,
+    "sell": 750,
     "in_crates": false
   },
   "netherrack": {
@@ -85,7 +85,7 @@
     "role": "sellable",
     "rarity": 0,
     "buy": 0,
-    "sell": 6000,
+    "sell": 5000,
     "in_crates": false
   },
   "coal": {
@@ -449,7 +449,7 @@
     "role": "prey",
     "rarity": 2,
     "buy": 0,
-    "sell": 50000,
+    "sell": 30000,
     "in_crates": false
   },
   "llama": {
@@ -460,7 +460,7 @@
     "role": "prey",
     "rarity": 2,
     "buy": 0,
-    "sell": 60000,
+    "sell": 40000,
     "in_crates": false
   },
   "monkey": {
@@ -472,7 +472,7 @@
     "role": "prey",
     "rarity": 2,
     "buy": 0,
-    "sell": 50000,
+    "sell": 30000,
     "in_crates": false
   },
   "harambe": {
@@ -483,7 +483,7 @@
     "role": "prey",
     "rarity": 3,
     "buy": 0,
-    "sell": 100000,
+    "sell": 75000,
     "in_crates": false
   },
   "rat": {
@@ -519,7 +519,7 @@
     "role": "prey",
     "rarity": 3,
     "buy": 0,
-    "sell": 60000,
+    "sell": 50000,
     "in_crates": false
   },
   "wolf": {
@@ -531,7 +531,7 @@
     "role": "prey",
     "rarity": 3,
     "buy": 0,
-    "sell": 150000,
+    "sell": 110000,
     "in_crates": false
   },
   "mineshaft_chest": {
@@ -1621,7 +1621,11 @@
     "longDesc": "use to receive 7 days of silver (as long as you don't have a better tier currently)",
     "aliases": ["silver"],
     "rarity": 69,
-    "in_crates": false
+    "in_crates": false,
+    "craft": {
+      "ingrediants": ["bronze_credit:3"],
+      "time": 86400
+    }
   },
   "gold_credit": {
     "id": "gold_credit",
@@ -1632,7 +1636,11 @@
     "longDesc": "use to receive 7 days of gold (as long as you don't have a better tier currently)",
     "aliases": ["gold"],
     "rarity": 69,
-    "in_crates": false
+    "in_crates": false,
+    "craft": {
+      "ingrediants": ["silver_credit:3"],
+      "time": 86400
+    }
   },
   "platinum_credit": {
     "id": "platinum_credit",
@@ -1643,7 +1651,11 @@
     "longDesc": "use to receive 7 days of platinum (as long as you don't have a better tier currently)",
     "aliases": ["plat", "platinum"],
     "rarity": 69,
-    "in_crates": false
+    "in_crates": false,
+    "craft": {
+      "ingrediants": ["gold_credit:3"],
+      "time": 86400
+    }
   },
   "daily_scratch_card": {
     "id": "daily_scratch_card",
@@ -1674,12 +1686,11 @@
       "id:fishing_rod:75",
       "id:gun:75",
       "id:basic_crate:60",
-      "id:bronze_credit:1",
-      "id:silver_credit:1",
+      "id:bronze_credit:0.7",
       "id:quarry_scrap:4",
-      "id:green_gem:3",
-      "id:blue_gem:3",
-      "id:pink_gem:0.7"
+      "id:green_gem:1",
+      "id:blue_gem:1",
+      "id:pink_gem:0.3"
     ]
   },
   "lucky_scratch_card": {
@@ -1716,11 +1727,11 @@
       "id:nypsi_crate:20",
       "id:bronze_credit:3",
       "id:silver_credit:2",
-      "id:gold_credit:2",
-      "id:green_gem:3",
-      "id:blue_gem:3",
-      "id:purple_gem:2",
-      "id:gem_crate:0.5"
+      "id:gold_credit:1",
+      "id:green_gem:2",
+      "id:blue_gem:2",
+      "id:purple_gem:1",
+      "id:gem_crate:0.2"
     ]
   },
   "legendary_scratch_card": {
@@ -1750,10 +1761,10 @@
       "id:quarry_scrap",
       "id:nypsi_crate:50",
       "id:platinum_credit:3",
-      "id:bronze_credit:7",
-      "id:silver_credit:5",
-      "id:gold_credit:5",
-      "id:pink_gem:5",
+      "id:bronze_credit:5",
+      "id:silver_credit:4",
+      "id:gold_credit:3",
+      "id:pink_gem:3",
       "id:gem_shard:50",
       "id:gem_crate:2.5"
     ]

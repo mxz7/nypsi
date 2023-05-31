@@ -62,8 +62,19 @@ export async function getScratchCardStats(member: GuildMember) {
   return query;
 }
 
-export async function getItemStats(member: GuildMember) {
-  const query = await prisma.itemUse.findMany({
+export async function getStat(userId: string, stat: string) {
+  return await prisma.stats.findUnique({
+    where: {
+      userId_itemId: {
+        userId,
+        itemId: stat,
+      },
+    },
+  });
+}
+
+export async function getStats(member: GuildMember) {
+  const query = await prisma.stats.findMany({
     where: {
       userId: member.user.id,
     },
@@ -129,7 +140,7 @@ export async function fetchGame(id: string) {
   });
 }
 
-export async function addItemUse(member: GuildMember | string, item: string, amount = 1) {
+export async function addStat(member: GuildMember | string, item: string, amount = 1) {
   let id: string;
   if (member instanceof GuildMember) {
     id = member.user.id;
@@ -137,7 +148,7 @@ export async function addItemUse(member: GuildMember | string, item: string, amo
     id = member;
   }
 
-  await prisma.itemUse.upsert({
+  await prisma.stats.upsert({
     where: {
       userId_itemId: {
         itemId: item,
@@ -146,6 +157,32 @@ export async function addItemUse(member: GuildMember | string, item: string, amo
     },
     update: {
       amount: { increment: amount },
+    },
+    create: {
+      userId: id,
+      itemId: item,
+      amount: amount,
+    },
+  });
+}
+
+export async function setStat(member: GuildMember | string, item: string, amount: number) {
+  let id: string;
+  if (member instanceof GuildMember) {
+    id = member.user.id;
+  } else {
+    id = member;
+  }
+
+  await prisma.stats.upsert({
+    where: {
+      userId_itemId: {
+        itemId: item,
+        userId: id,
+      },
+    },
+    update: {
+      amount: amount,
     },
     create: {
       userId: id,

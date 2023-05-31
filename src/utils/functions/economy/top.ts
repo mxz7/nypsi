@@ -3,6 +3,7 @@ import { Collection, Guild, GuildMember } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
 import PageManager from "../page";
+import { getPreferences } from "../users/notifications";
 import workerSort from "../workers/sort";
 import { calcNetWorth } from "./balance";
 import { getAchievements, getItems } from "./utils";
@@ -133,7 +134,10 @@ export async function topBalanceGlobal(amount: number, anon = true): Promise<str
       username = username.split("#")[0];
     }
 
-    usersFinal[count] = pos + " **" + username + "** $" + Number(user.money).toLocaleString();
+    usersFinal[count] =
+      pos + " **" + (await getPreferences(user.userId))?.leaderboards
+        ? username
+        : "[hidden]" + "** $" + Number(user.money).toLocaleString();
     count++;
   }
 
@@ -181,7 +185,13 @@ export async function topNetWorthGlobal(userId: string) {
     }
 
     out.push(
-      pos + " **" + (user.user.lastKnownTag?.split("#")[0] || user.userId) + "** $" + Number(user.netWorth).toLocaleString()
+      pos +
+        " **" +
+        ((await getPreferences(user.userId))?.leaderboards
+          ? user.user.lastKnownTag?.split("#")[0] || user.userId
+          : "[hidden]") +
+        "** $" +
+        Number(user.netWorth).toLocaleString()
     );
   }
 
@@ -423,7 +433,9 @@ export async function topPrestigeGlobal(userId: string) {
     out[count] =
       pos +
       " **" +
-      (user.user.lastKnownTag.split("#")[0] || user.userId) +
+      ((await getPreferences(user.userId))?.leaderboards
+        ? user.user.lastKnownTag?.split("#")[0] || user.userId
+        : "[hidden]") +
       "** " +
       user.prestige +
       (thing[(v - 20) % 10] || thing[v] || thing[0]) +
@@ -581,7 +593,9 @@ export async function topItemGlobal(item: string, userId: string) {
     out[count] =
       pos +
       " **" +
-      user.economy.user.lastKnownTag.split("#")[0] +
+      ((await getPreferences(user.userId))?.leaderboards
+        ? user.economy.user.lastKnownTag?.split("#")[0] || user.userId
+        : "[hidden]") +
       "** " +
       user.amount.toLocaleString() +
       ` ${user.amount > 1 ? items[item].plural || items[item].name : items[item].name}`;
@@ -853,7 +867,14 @@ export async function topDailyStreakGlobal(userId: string) {
     } else if (pos == 3) {
       pos = "🥉";
     }
-    out[count] = pos + " **" + (user.user.lastKnownTag.split("#")[0] || user.userId) + "** " + user.dailyStreak;
+    out[count] =
+      pos +
+      " **" +
+      ((await getPreferences(user.userId))?.leaderboards
+        ? user.user.lastKnownTag?.split("#")[0] || user.userId
+        : "[hidden]") +
+      "** " +
+      user.dailyStreak;
     count++;
   }
 

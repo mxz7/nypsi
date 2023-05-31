@@ -42,6 +42,7 @@ import { percentChance } from "../functions/random";
 import { cleanString } from "../functions/string";
 import { isUserBlacklisted } from "../functions/users/blacklist";
 import { getLastCommand, updateUser } from "../functions/users/commands";
+import { getPreferences } from "../functions/users/notifications";
 import { getLastKnownTag } from "../functions/users/tag";
 import { createProfile, hasProfile } from "../functions/users/utils";
 import dayjs = require("dayjs");
@@ -854,10 +855,13 @@ export async function runCommand(
     updateCommandUses(message.member),
     updateUser(message.author || message.member.user || null, command.name),
     redis.hincrby(Constants.redis.nypsi.TOP_COMMANDS, command.name, 1),
-    redis.hincrby(Constants.redis.nypsi.TOP_COMMANDS_USER, message.author.tag, 1),
+
     addProgress(message.author.id, "nypsi", 1),
     commandGemCheck(message.member, command.category),
   ]);
+
+  if ((await getPreferences(message.member)).leaderboards)
+    await redis.hincrby(Constants.redis.nypsi.TOP_COMMANDS_USER, message.author.tag, 1);
 
   if (command.category == "money") {
     if (!message.member) return;

@@ -5,7 +5,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { Item } from "../types/Economy";
 import { RaceDetails, RaceUserDetails } from "../types/StreetRace";
 import { addProgress } from "../utils/functions/economy/achievements";
-import { getBalance, updateBalance } from "../utils/functions/economy/balance";
+import { calcMaxBet, getBalance, updateBalance } from "../utils/functions/economy/balance";
 import { getInventory } from "../utils/functions/economy/inventory";
 import { createUser, formatBet, getItems, userExists } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
@@ -232,6 +232,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (race.bet > (await getBalance(message.member))) {
       return send({ embeds: [new ErrorEmbed("you cant afford the entry fee")] });
     }
+
+    if (race.bet > (await calcMaxBet(message.member)) * 10)
+      return send({
+        embeds: [new ErrorEmbed(`your max bet is $**${((await calcMaxBet(message.member)) * 10).toLocaleString()}**`)],
+      });
 
     const items = getItems();
     const inventory = await getInventory(message.member);

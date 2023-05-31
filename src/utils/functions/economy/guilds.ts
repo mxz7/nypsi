@@ -1,3 +1,4 @@
+import { EconomyGuildUpgrades } from "@prisma/client";
 import { GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
@@ -20,6 +21,7 @@ export async function getGuildByName(name: string) {
         },
       },
       include: {
+        upgrades: true,
         owner: {
           select: {
             user: {
@@ -116,6 +118,7 @@ export async function getGuildByUser(member: GuildMember | string) {
       include: {
         guild: {
           include: {
+            upgrades: true,
             members: {
               include: {
                 economy: {
@@ -236,13 +239,12 @@ export async function addToGuildXP(name: string, amount: number, member: GuildMe
 export async function getMaxMembersForGuild(name: string) {
   const guild = await getGuildByName(name);
 
-  let level = guild.level;
+  let slots = 5;
 
-  if (level > 10) level = 10;
+  if (guild.upgrades.find((i) => i.upgradeId === "member"))
+    slots += guild.upgrades.find((i) => i.upgradeId === "member").amount;
 
-  const amount = 3 + Math.floor(level / 2) * 3;
-
-  return (amount < 3 ? 3 : amount) > 9 ? 9 : amount < 3 ? 3 : amount;
+  return slots;
 }
 
 export async function getRequiredForGuildUpgrade(name: string): Promise<GuildUpgradeRequirements> {
@@ -252,8 +254,8 @@ export async function getRequiredForGuildUpgrade(name: string): Promise<GuildUpg
 
   const guild = await getGuildByName(name);
 
-  const baseMoney = 3000000 * Math.pow(guild.level, 2.57);
-  const baseXP = 1750 * Math.pow(guild.level, 2.1);
+  const baseMoney = 3000000 * Math.pow(guild.level, 2.07);
+  const baseXP = 1750 * Math.pow(guild.level, 1.77);
 
   const bonusMoney = 100000 * guild.members.length;
   const bonusXP = 75 * guild.members.length;
@@ -367,8 +369,7 @@ async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
       },
       data: {
         level: { increment: 1 },
-        balance: { decrement: requirements.money },
-        xp: { decrement: requirements.xp },
+        tokens: { increment: 1 },
       },
     });
 
@@ -386,13 +387,8 @@ async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
     if (cratesEarned < 1) cratesEarned = 1;
     if (cratesEarned > 5) cratesEarned = 5;
 
-    desc.push(` +**${cratesEarned}** basic crates`);
-
-    if (guild.level < 5) {
-      desc.push(" +**1**% multiplier");
-    }
-
-    desc.push(" +**1** max xp gain");
+    desc.push(` +**${cratesEarned}** 69420 crates`);
+    desc.push(" +**1** upgrade token");
 
     embed.setHeader(guild.guildName);
     embed.setDescription(desc.join("\n"));
@@ -407,7 +403,7 @@ async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
     };
 
     for (const member of guild.members) {
-      await addInventoryItem(member.userId, "basic_crate", cratesEarned, false);
+      await addInventoryItem(member.userId, "69420_crate", cratesEarned, false);
 
       if ((await getDmSettings(member.userId)).other) {
         payload.memberId = member.userId;
@@ -443,4 +439,64 @@ export async function setOwner(guild: string, newOwner: string) {
       ownerId: newOwner,
     },
   });
+}
+
+export async function getGuildUpgradesByUser(member: GuildMember | string): Promise<EconomyGuildUpgrades[]> {
+  let id: string;
+  if (member instanceof GuildMember) {
+    id = member.user.id;
+  } else {
+    id = member;
+  }
+
+  if (!(await redis.exists(`${Constants.redis.cache.economy.GUILD_USER}:${id}`))) {
+    const guild = await getGuildByUser(member);
+
+    if (!guild) return [];
+
+    await redis.set(`${Constants.redis.cache.economy.GUILD_UPGRADES}:${guild.guildName}`, JSON.stringify(guild.upgrades));
+    await redis.expire(
+      `${Constants.redis.cache.economy.GUILD_UPGRADES}:${guild.guildName}`,
+      Math.floor(ms("6 hours") / 1000)
+    );
+
+    return guild.upgrades;
+  }
+
+  const guildName = await redis.get(`${Constants.redis.cache.economy.GUILD_USER}:${id}`);
+
+  if (guildName === "noguild") return [];
+
+  if (await redis.exists(`${Constants.redis.cache.economy.GUILD_UPGRADES}:${guildName}`))
+    return JSON.parse(await redis.get(`${Constants.redis.cache.economy.GUILD_UPGRADES}:${guildName}`));
+
+  const guild = await getGuildByName(guildName);
+
+  if (!guild) return [];
+
+  await redis.set(`${Constants.redis.cache.economy.GUILD_UPGRADES}:${guild.guildName}`, JSON.stringify(guild.upgrades));
+  await redis.expire(`${Constants.redis.cache.economy.GUILD_UPGRADES}:${guild.guildName}`, Math.floor(ms("6 hours") / 1000));
+
+  return guild.upgrades;
+}
+
+export async function addGuildUpgrade(guildName: string, upgradeId: string) {
+  await prisma.economyGuildUpgrades.upsert({
+    where: {
+      guildName_upgradeId: {
+        guildName,
+        upgradeId,
+      },
+    },
+    update: {
+      amount: { increment: 1 },
+    },
+    create: {
+      guildName,
+      upgradeId,
+      amount: 1,
+    },
+  });
+
+  await redis.del(`${Constants.redis.cache.economy.GUILD_UPGRADES}:${guildName}`);
 }

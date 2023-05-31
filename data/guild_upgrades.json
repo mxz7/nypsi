@@ -1,0 +1,23 @@
+{
+  "member": {
+    "id": "member",
+    "name": "member slot",
+    "description": "+1 member slot",
+    "cost": 1,
+    "increment_per_level": 1
+  },
+  "maxbet": {
+    "id": "maxbet",
+    "name": "max bet increase",
+    "description": "+25k maxbet",
+    "cost": 1,
+    "increment_per_level": 0
+  },
+  "multi": {
+    "id": "multi",
+    "name": "multiplier",
+    "description": "+1% multiplier",
+    "cost": 2,
+    "increment_per_level": 2
+  }
+}

@@ -4,7 +4,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { getBoosters } from "../utils/functions/economy/boosters";
 import { addInventoryItem, getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
-import { addItemUse } from "../utils/functions/economy/stats";
+import { addStat } from "../utils/functions/economy/stats";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
@@ -91,7 +91,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   await addCooldown(cmd.name, message.member, 300);
 
-  await addItemUse(message.member, pickaxe);
+  await addStat(message.member, pickaxe);
 
   const mineItems = Array.from(Object.keys(items));
 
@@ -167,7 +167,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   chosenArea = choseArea();
 
-  if (chosenArea == "nether") await addItemUse(message.member, "nether_portal");
+  if (chosenArea == "nether") await addStat(message.member, "nether_portal");
 
   const foundItems = new Map<string, number>();
 

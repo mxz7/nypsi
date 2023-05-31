@@ -5,7 +5,7 @@ import { addProgress } from "../utils/functions/economy/achievements";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
 import { getBoosters } from "../utils/functions/economy/boosters";
 import { addInventoryItem, getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
-import { addItemUse } from "../utils/functions/economy/stats";
+import { addStat } from "../utils/functions/economy/stats";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import { getXp, updateXp } from "../utils/functions/economy/xp";
 import { percentChance } from "../utils/functions/random";
@@ -139,7 +139,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (items[i].role === "fish") fishItems.push(i);
   }
 
-  await addItemUse(message.member, fishingRod);
+  await addStat(message.member, fishingRod);
 
   let times = 1;
 
