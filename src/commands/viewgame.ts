@@ -80,6 +80,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           select: {
             user: {
               select: {
+                Preferences: {
+                  select: {
+                    leaderboards: true,
+                  },
+                },
                 lastKnownTag: true,
               },
             },
@@ -103,7 +108,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (args[4].toLowerCase() !== "null")
       (search.where.AND as Array<Prisma.GameWhereInput>).push({ win: args[4].toLowerCase() == "true" ? 1 : 0 });
 
-    const query: (Game & { economy?: { user?: { lastKnownTag?: string } } })[] = await prisma.game.findMany(search);
+    const query: (Game & { economy?: { user?: { lastKnownTag?: string; Preferences?: { leaderboards: boolean } } } })[] =
+      await prisma.game.findMany(search);
 
     if (query.length === 0) return send({ embeds: [new ErrorEmbed("no results found")] });
 
@@ -115,7 +121,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       query.map((game) => {
         let out =
           `**id** \`${game.id.toString(36)}\` \`(${game.id})\`\n` +
-          `**user** \`${game.economy?.user?.lastKnownTag?.split("#")[0] || "[redacted]"}\`\n` +
+          `**user** \`${
+            game.economy.user.Preferences?.leaderboards ? game.economy.user.lastKnownTag.split("#")[0] : "[hidden]"
+          }\`\n` +
           `**game** \`${game.game}\`\n` +
           `**time** <t:${Math.floor(game.date.getTime() / 1000)}>\n` +
           `**bet** $${game.bet.toLocaleString()}\n` +
@@ -150,7 +158,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         query.map((game) => {
           return {
             id: game.id.toString(36),
-            user: game.economy?.user?.lastKnownTag?.split("#")[0] || "unknown",
+            user: game.economy.user.Preferences?.leaderboards ? game.economy.user.lastKnownTag.split("#")[0] : "[hidden]",
             game: game.game,
             time: game.date,
             bet: game.bet,
