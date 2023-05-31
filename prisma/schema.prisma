@@ -62,6 +62,7 @@ model Preferences {
   duelRequests   Boolean @default(true)
   auctionConfirm Int     @default(25000000)
   offers         Int     @default(3)
+  leaderboards   Boolean @default(true)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
@@ -107,26 +108,36 @@ model Economy {
 
   banned DateTime?
 
-  auctionWatch String[]
-  autosell     String[]
-  offersBlock  String[]
+  autosell    String[]
+  offersBlock String[]
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String @id
 
+  auctionWatch       AuctionWatch[]
   Boosters           Booster[]
   LotteryTicket      LotteryTicket[]
   EconomyWorker      EconomyWorker[]
   Inventory          Inventory[]
   Crafting           Crafting[]
   Game               Game[]
-  ItemUse            ItemUse[]
+  Stats              Stats[]
   BakeryUpgrade      BakeryUpgrade[]
   Auction            Auction[]
   EconomyGuild       EconomyGuild?
   EconomyGuildMember EconomyGuildMember?
   OffersReceived     Offer[]             @relation(name: "target")
   OffersGiven        Offer[]             @relation(name: "owner")
+}
+
+model AuctionWatch {
+  userId  String
+  itemId  String
+  maxCost BigInt @default(0)
+
+  Economy Economy? @relation(fields: [userId], references: [userId])
+
+  @@id([userId, itemId])
 }
 
 model BakeryUpgrade {
@@ -158,7 +169,7 @@ model Inventory {
   economy Economy @relation(fields: [userId], references: [userId], onDelete: Cascade)
 
   @@unique([userId, item])
-  @@index([userId, item])
+  @@index([userId])
 }
 
 model EconomyWorker {
@@ -214,9 +225,11 @@ model Game {
   date     DateTime @default(now())
 
   economy Economy? @relation(fields: [userId], references: [userId])
+
+  @@index([userId])
 }
 
-model ItemUse {
+model Stats {
   userId String
   itemId String
   amount Int
@@ -500,13 +513,15 @@ model EconomyGuild {
   createdAt DateTime
   balance   BigInt   @default(0)
   xp        Int      @default(0)
+  tokens    Int      @default(0)
   level     Int      @default(1)
   motd      String   @default("welcome to the guild fool (/guild motd)")
 
   owner   Economy @relation(fields: [ownerId], references: [userId], onDelete: Cascade)
   ownerId String  @unique
 
-  members EconomyGuildMember[]
+  members  EconomyGuildMember[]
+  upgrades EconomyGuildUpgrades[]
 }
 
 model EconomyGuildMember {
@@ -520,6 +535,16 @@ model EconomyGuildMember {
   guild   EconomyGuild @relation(fields: [guildName], references: [guildName], onDelete: Cascade)
 
   @@id([userId, guildName])
+}
+
+model EconomyGuildUpgrades {
+  guildName String
+  upgradeId String
+  amount    Int
+
+  guild EconomyGuild @relation(fields: [guildName], references: [guildName], onDelete: Cascade)
+
+  @@id([guildName, upgradeId])
 }
 
 // wholesome tables

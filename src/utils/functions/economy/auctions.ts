@@ -1,4 +1,4 @@
-import { Auction } from "@prisma/client";
+import { Auction, AuctionWatch } from "@prisma/client";
 import { randomUUID } from "crypto";
 import {
   ActionRowBuilder,
@@ -27,6 +27,7 @@ import { addNotificationToQueue, getDmSettings, getPreferences } from "../users/
 import itemHistoryWorker from "../workers/itemhistory";
 import { getBalance, updateBalance } from "./balance";
 import { addInventoryItem } from "./inventory";
+import { addStat } from "./stats";
 import { createUser, getItems, userExists } from "./utils";
 import ms = require("ms");
 import dayjs = require("dayjs");
@@ -180,7 +181,9 @@ export async function createAuction(member: GuildMember, itemId: string, itemAmo
     },
   });
 
-  checkWatchers(itemId, messageUrl, member.user.id);
+  checkWatchers(itemId, messageUrl, member.user.id, bin / itemAmount);
+
+  addStat(member.user.id, "auction-created");
 
   return messageUrl;
 }
@@ -335,36 +338,47 @@ export async function getAuctionAverage(item: string) {
   return avg;
 }
 
-export async function addToAuctionWatch(member: GuildMember, itemName: string) {
-  return await prisma.economy
-    .update({
-      where: {
+export async function updateAuctionWatch(member: GuildMember, itemName: string, itemCost?: number) {
+  await prisma.auctionWatch.upsert({
+    where: {
+      userId_itemId: {
         userId: member.user.id,
+        itemId: itemName,
       },
-      data: {
-        auctionWatch: { push: itemName },
-      },
-      select: {
-        auctionWatch: true,
-      },
-    })
-    .then((q) => q.auctionWatch);
+    },
+    update: {
+      userId: member.user.id,
+      itemId: itemName,
+      maxCost: itemCost,
+    },
+    create: {
+      userId: member.user.id,
+      itemId: itemName,
+      maxCost: itemCost,
+    },
+  });
+
+  return getAuctionWatch(member);
 }
 
-export async function setAuctionWatch(member: GuildMember, items: string[]) {
-  return await prisma.economy
-    .update({
-      where: {
+export async function setAuctionWatch(member: GuildMember, items: AuctionWatch[]) {
+  await prisma.auctionWatch.deleteMany({ where: { userId: member.user.id } });
+
+  await prisma.auctionWatch.createMany({ data: items });
+  return items;
+}
+
+export async function deleteAuctionWatch(member: GuildMember, itemId: string) {
+  await prisma.auctionWatch.delete({
+    where: {
+      userId_itemId: {
         userId: member.user.id,
+        itemId: itemId,
       },
-      data: {
-        auctionWatch: items,
-      },
-      select: {
-        auctionWatch: true,
-      },
-    })
-    .then((q) => q.auctionWatch);
+    },
+  });
+
+  return getAuctionWatch(member);
 }
 
 export async function getAuctionWatch(member: GuildMember) {
@@ -380,17 +394,17 @@ export async function getAuctionWatch(member: GuildMember) {
     .then((q) => q.auctionWatch);
 }
 
-async function checkWatchers(itemName: string, messageUrl: string, creatorId: string) {
-  const users = await prisma.economy
+async function checkWatchers(itemName: string, messageUrl: string, creatorId: string, cost: number) {
+  const users = await prisma.auctionWatch
     .findMany({
       where: {
-        AND: [{ auctionWatch: { has: itemName } }, { userId: { not: creatorId } }],
+        AND: [{ itemId: itemName }, { userId: { not: creatorId } }, { maxCost: { gte: cost } }],
       },
       select: {
         userId: true,
       },
     })
-    .then((q) => q.map((q) => q.userId));
+    .then((q) => q.map((i) => i.userId));
 
   const payload = {
     payload: {
@@ -580,6 +594,8 @@ export async function buyFullAuction(interaction: ButtonInteraction, auction: Au
     addInventoryItem(interaction.user.id, auction.itemId, Number(auction.itemAmount)),
     updateBalance(interaction.user.id, balance - Number(auction.bin)),
     updateBalance(auction.ownerId, (await getBalance(auction.ownerId)) + (Number(auction.bin) - taxedAmount)),
+    addStat(interaction.user.id, "auction-bought-items", Number(auction.itemAmount)),
+    addStat(auction.ownerId, "auction-sold-items", Number(auction.itemAmount)),
   ]);
 
   logger.debug(`auction full sold owner: ${auction.ownerId} - ${auction.itemId} to ${interaction.user.id}`);
@@ -762,6 +778,8 @@ export async function buyAuctionOne(interaction: ButtonInteraction, auction: Auc
       auction.ownerId,
       (await getBalance(auction.ownerId)) + (Math.floor(Number(auction.bin / auction.itemAmount)) - taxedAmount)
     ),
+    addStat(interaction.user.id, "auction-bought-items"),
+    addStat(auction.ownerId, "auction-sold-items"),
   ]);
 
   transaction(await interaction.client.users.fetch(auction.ownerId), interaction.user, `${auction.itemId} x ${1} (auction)`);

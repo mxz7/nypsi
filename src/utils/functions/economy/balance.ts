@@ -9,7 +9,7 @@ import { getTier } from "../premium/premium";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { getAuctionAverage } from "./auctions";
 import { getBoosters } from "./boosters";
-import { getGuildLevelByUser } from "./guilds";
+import { getGuildUpgradesByUser } from "./guilds";
 import { gemBreak, getInventory } from "./inventory";
 import { isPassive } from "./passive";
 import { getPrestige } from "./prestige";
@@ -149,14 +149,11 @@ export async function getMulti(member: GuildMember | string): Promise<number> {
 
   if (await isBooster(id)) multi += 3;
 
-  const guildLevel = await getGuildLevelByUser(id);
-
-  if (guildLevel) {
-    multi += guildLevel > 7 ? 7 : guildLevel - 1;
-  }
-
   const boosters = await getBoosters(id);
   const items = getItems();
+  const guildUpgrades = await getGuildUpgradesByUser(member);
+
+  if (guildUpgrades.find((i) => i.upgradeId === "multi")) multi += guildUpgrades.find((i) => i.upgradeId === "multi").amount;
 
   if ((await getDmSettings(id)).voteReminder && !(await redis.sismember(Constants.redis.nypsi.VOTE_REMINDER_RECEIVED, id)))
     multi += 2;
@@ -369,36 +366,42 @@ export async function setDefaultBet(member: GuildMember, setting: number) {
   await redis.del(`${Constants.redis.cache.economy.DEFAULT_BET}:${member.user.id}`);
 }
 
-export async function calcMaxBet(member: GuildMember): Promise<number> {
-  const base = 100000;
-  const voted = await hasVoted(member);
-  const bonus = 50000;
+export async function calcMaxBet(member: GuildMember | string): Promise<number> {
+  let id: string;
+  if (member instanceof GuildMember) {
+    id = member.user.id;
+  } else {
+    id = member;
+  }
 
-  let total = base;
+  let total = 100000;
+
+  const voted = await hasVoted(member);
+  const prestige = await getPrestige(member);
+  const boosters = await getBoosters(member);
+  const guildUpgrades = await getGuildUpgradesByUser(member);
 
   if (voted) {
     total += 50000;
   }
 
-  const prestige = await getPrestige(member);
+  total = total + 50000 * prestige;
 
-  let calculated = total + bonus * prestige;
+  if (total > 1_000_000) total = 1_000_000;
 
-  if (calculated > 1_000_000) calculated = 1_000_000;
-
-  if (await isBooster(member.user.id)) calculated += 250_000;
-
-  const boosters = await getBoosters(member);
+  if (await isBooster(id)) total += 250_000;
+  if (guildUpgrades.find((i) => i.upgradeId === "maxbet"))
+    total += guildUpgrades.find((i) => i.upgradeId === "maxbet").amount * 25000;
 
   for (const boosterId of boosters.keys()) {
     if (getItems()[boosterId].boosterEffect.boosts.includes("maxbet")) {
       for (let i = 0; i < boosters.get(boosterId).length; i++) {
-        calculated += calculated * getItems()[boosterId].boosterEffect.effect;
+        total += total * getItems()[boosterId].boosterEffect.effect;
       }
     }
   }
 
-  return calculated;
+  return total;
 }
 
 export async function getRequiredBetForXp(member: GuildMember): Promise<number> {
@@ -473,14 +476,7 @@ export async function calcNetWorth(member: GuildMember | string, breakdown = fal
   if (breakdown) breakdownItems.set("balance", worth);
 
   if (query.EconomyGuildMember?.guild) {
-    let guildWorth = Number(query.EconomyGuildMember.guild.balance) / query.EconomyGuildMember.guild.members.length;
-
-    for (let i = 0; i < query.EconomyGuildMember.guild.level; i++) {
-      const baseMoney = 3000000 * Math.pow(i, 2.57);
-      const bonusMoney = 100000 * query.EconomyGuildMember.guild.members.length;
-
-      guildWorth += Math.floor(baseMoney + bonusMoney);
-    }
+    const guildWorth = Number(query.EconomyGuildMember.guild.balance) / query.EconomyGuildMember.guild.members.length;
 
     worth += Math.floor(guildWorth / query.EconomyGuildMember.guild.members.length);
     if (breakdown) breakdownItems.set("guild", Math.floor(guildWorth / query.EconomyGuildMember.guild.members.length));

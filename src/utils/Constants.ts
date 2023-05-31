@@ -69,6 +69,7 @@ export default {
         GUILD_LEVEL: "cache:economy:guild:level",
         GUILD_REQUIREMENTS: "cache:economy:guild:requirements",
         GUILD_USER: "cache:economy:guild:user",
+        GUILD_UPGRADES: "cache:economy:guild:upgrades",
         INVENTORY: "cache:economy:inventory",
         NETWORTH: "cache:economy:networth",
         PADLOCK: "cache:economy:padlock",
@@ -130,7 +131,7 @@ export default {
   TEKOH_ID: "672793821850894347",
   TRANSPARENT_EMBED_COLOR: "#2c2d31" as ColorResolvable,
   VOTE_CRATE_PROGRESSION: [1, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 5],
-  SEASON_START: new Date("01/01/2023"),
-  SEASON_NUMBER: 5,
+  SEASON_START: new Date("06/01/2023"),
+  SEASON_NUMBER: 6,
   SNOWFLAKE_REGEX: /^\d{17,19}$/,
 };

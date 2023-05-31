@@ -89,8 +89,8 @@ export async function calcWorkerValues(
   let scrapChance = 0;
 
   if (worker.workerId === "quarry") {
-    scrapChance = 0.003;
-    gemChance = 0.0002;
+    scrapChance = 0.001;
+    gemChance = 0.0001;
     const prestige = await getPrestige(worker.userId);
 
     for (let i = 0; i < (prestige > 50 ? 50 : prestige); i++) {

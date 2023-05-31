@@ -12,6 +12,7 @@ import {
   MessageEditOptions,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
+import prisma from "../init/database";
 import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction } from "../models/Command";
@@ -20,6 +21,8 @@ import Constants from "../utils/Constants";
 import { daysAgo, formatDate } from "../utils/functions/date";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
 import {
+  RemoveMemberMode,
+  addGuildUpgrade,
   addMember,
   addToGuildBank,
   createGuild,
@@ -29,13 +32,13 @@ import {
   getMaxMembersForGuild,
   getRequiredForGuildUpgrade,
   removeMember,
-  RemoveMemberMode,
   setGuildMOTD,
   setOwner,
 } from "../utils/functions/economy/guilds";
 import { getPrestige } from "../utils/functions/economy/prestige";
-import { createUser, formatNumber, isEcoBanned, userExists } from "../utils/functions/economy/utils";
+import { createUser, formatNumber, getGuildUpgradeData, isEcoBanned, userExists } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
+import PageManager from "../utils/functions/page";
 import requestDM from "../utils/functions/requestdm";
 import { cleanString } from "../utils/functions/string";
 import { getDmSettings } from "../utils/functions/users/notifications";
@@ -90,7 +93,23 @@ cmd.slashData
       .setName("view")
       .setDescription("view a guild")
       .addStringOption((option) => option.setName("guild-name").setDescription("guild to show").setRequired(false))
-  );
+  )
+  .addSubcommand((buy) =>
+    buy
+      .setName("buy")
+      .setDescription("buy guild upgrades with tokens")
+      .addStringOption((option) =>
+        option
+          .setName("upgrade")
+          .setDescription("upgrade you want to buy")
+          .setChoices(
+            { name: "25k max bet", value: "maxbet" },
+            { name: "member slot", value: "value" },
+            { name: "1% multiplier", value: "multi" }
+          )
+      )
+  )
+  .addSubcommand((shop) => shop.setName("shop").setDescription("view guild upgrades"));
 
 const filter = [
   "nig",
@@ -193,7 +212,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         true
       );
       if (guild.level < Constants.MAX_GUILD_LEVEL) {
-        embed.addField("bank", `**money** $${guild.balance.toLocaleString()}\n**xp** ${guild.xp.toLocaleString()}`, true);
+        embed.addField(
+          "bank",
+          `**money** $${guild.balance.toLocaleString()}\n**xp** ${guild.xp.toLocaleString()}\n**tokens** ${guild.tokens.toLocaleString()}`,
+          true
+        );
       }
 
       let membersText = "";
@@ -500,10 +523,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     for (const guildMember of guild.members) {
       const contributedMoney = guildMember.contributedMoney;
 
-      if (contributedMoney > 100) {
+      if (contributedMoney > 100_000) {
         await updateBalance(
           guildMember.userId,
-          (await getBalance(guildMember.userId)) + Math.floor(Number(contributedMoney) * 0.25)
+          (await getBalance(guildMember.userId)) + Math.floor(Number(contributedMoney) * 0.1)
         );
 
         if ((await getDmSettings(guildMember.userId)).other) {
@@ -511,7 +534,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
           embed.setDescription(
             `since you contributed money to this guild, you have been repaid $**${Math.floor(
-              Number(contributedMoney) * 0.25
+              Number(contributedMoney) * 0.1
             ).toLocaleString()}**`
           );
 
@@ -756,6 +779,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         `${prefix}**guild delete** *delete your guild*\n` +
         `${prefix}**guild deposit <amount>** *deposit money into your guild*\n` +
         `${prefix}**guild stats** *show contribution stats of your guild*\n` +
+        `${prefix}**guild shop** *view guild upgrades that are available to buy\n` +
+        `${prefix}**guild buy** *buy guild upgrades with tokens*\n` +
         `${prefix}**guild upgrade** *show requirements for next upgrade*\n` +
         `${prefix}**guild motd <motd>** *set guild motd*\n` +
         `${prefix}**top guild** *view top guilds on nypsi*\n` +
@@ -764,6 +789,86 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     embed.setFooter({ text: "you must be atleast prestige 1 to create a guild" });
 
     return send({ embeds: [embed] });
+  }
+
+  if (args[0].toLowerCase() == "buy") {
+    if (!guild) return send({ embeds: [new ErrorEmbed("you are not in a guild")] });
+    if (guild.ownerId !== message.author.id) return send({ embeds: [new ErrorEmbed("you must be the guild owner")] });
+
+    if (args.length === 1) return send({ embeds: [new ErrorEmbed("/guild buy <item>")] });
+
+    const upgrades = getGuildUpgradeData();
+
+    const selected = Object.values(upgrades).find((i) => i.id === args[1].toLowerCase());
+    if (!selected) return send({ embeds: [new ErrorEmbed("invalid upgrade")] });
+
+    const cost =
+      selected.cost + (guild.upgrades.find((i) => i.upgradeId === selected.id)?.amount || 0) * selected.increment_per_level;
+
+    if (guild.tokens < cost) return send({ embeds: [new ErrorEmbed("you cannot afford this upgrade")] });
+
+    await prisma.economyGuild.update({
+      where: { guildName: guild.guildName },
+      data: {
+        tokens: { decrement: cost },
+      },
+    });
+
+    await addGuildUpgrade(guild.guildName, selected.id);
+
+    return send({ embeds: [new CustomEmbed(message.member, `✅ you have bought **${selected.name}** for ${cost} tokens`)] });
+  }
+
+  if (args[0].toLowerCase() == "shop") {
+    if (!guild) return send({ embeds: [new ErrorEmbed("you are not in a guild")] });
+    const upgrades = getGuildUpgradeData();
+
+    const pages = new Map<number, { name: string; value: string; inline: true }[]>();
+
+    for (const upgrade of Object.values(upgrades)) {
+      const name = upgrade.id;
+      const value =
+        `**${upgrade.name}**\n` +
+        `*${upgrade.description}*\n` +
+        `**cost** ${upgrade.cost + (guild.upgrades.find((i) => i.upgradeId)?.amount || 0) * upgrade.increment_per_level}\n` +
+        `*you have ${guild.upgrades.find((i) => i.upgradeId)?.amount || 0}*`;
+
+      if (pages.size === 0) {
+        pages.set(1, [{ name, value, inline: true }]);
+      } else if (pages.get(pages.size).length >= 6) {
+        pages.set(pages.size + 1, [{ name, value, inline: true }]);
+      } else {
+        pages.get(pages.size).push({ name, value, inline: true });
+      }
+    }
+
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
+      new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
+      new ButtonBuilder().setCustomId("❌").setLabel("clear mentions").setStyle(ButtonStyle.Danger)
+    );
+
+    const embed = new CustomEmbed(message.member)
+      .setHeader(`${guild.guildName} upgrades`, message.author.avatarURL())
+      .setFields(...pages.get(1));
+
+    if (pages.size === 1) return send({ embeds: [embed] });
+
+    const msg = await send({ embeds: [embed], components: [row] });
+
+    const manager = new PageManager({
+      embed,
+      message: msg,
+      row,
+      userId: message.author.id,
+      pages,
+      updateEmbed(page, embed) {
+        embed.setFields(...page);
+        return embed;
+      },
+    });
+
+    return manager.listen();
   }
 
   if (args[0].toLowerCase() == "view") {

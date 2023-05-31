@@ -8,7 +8,7 @@ import { getBalance, hasPadlock, setPadlock, updateBalance } from "../utils/func
 import { addToGuildXP, getGuildByUser } from "../utils/functions/economy/guilds";
 import { getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
 import { isPassive } from "../utils/functions/economy/passive";
-import { addItemUse, createGame } from "../utils/functions/economy/stats";
+import { addStat, createGame } from "../utils/functions/economy/stats";
 import { createUser, isEcoBanned, userExists } from "../utils/functions/economy/utils";
 import { calcEarnedXp, getXp, updateXp } from "../utils/functions/economy/xp";
 import { getPrefix } from "../utils/functions/guilds/utils";
@@ -289,7 +289,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       if (inventory.find((i) => i.item == "lawyer") && inventory.find((i) => i.item == "lawyer").amount > 0) {
         await Promise.all([
           setInventoryItem(message.member, "lawyer", inventory.find((i) => i.item == "lawyer").amount - 1, false),
-          addItemUse(message.member, "lawyer"),
+          addStat(message.member, "lawyer"),
         ]);
 
         createGame({
