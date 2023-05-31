@@ -6,7 +6,6 @@ import { isBooster } from "../premium/boosters";
 import { getTier } from "../premium/premium";
 import { getRequiredBetForXp } from "./balance";
 import { getBoosters } from "./boosters";
-import { getGuildLevelByUser } from "./guilds";
 import { gemBreak, getInventory } from "./inventory";
 import { isPassive } from "./passive";
 import { getPrestige } from "./prestige";
@@ -71,13 +70,11 @@ export async function calcEarnedXp(member: GuildMember, bet: number, multiplier:
   let max = 4;
 
   let prestige = await getPrestige(member);
-  const guildLevel = await getGuildLevelByUser(member);
   const inventory = await getInventory(member);
   const tier = await getTier(member);
   const booster = await isBooster(member.user.id);
 
   if (booster) max += 10;
-  if (guildLevel) max += guildLevel;
 
   if (prestige) {
     if (prestige > 20) prestige = 20;

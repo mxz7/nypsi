@@ -13,7 +13,7 @@ import {
 } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
-import { getBalance, updateBalance } from "../utils/functions/economy/balance";
+import { calcMaxBet, getBalance, updateBalance } from "../utils/functions/economy/balance";
 import { createGame } from "../utils/functions/economy/stats";
 import { createUser, formatBet, isEcoBanned, userExists } from "../utils/functions/economy/utils";
 import { getMember } from "../utils/functions/member.js";
@@ -241,6 +241,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return send({ embeds: [new ErrorEmbed(`**${target.user.tag}** cannot afford this bet`)] });
     }
 
+    if (bet > (await calcMaxBet(message.member)) * 10)
+      return send({
+        embeds: [new ErrorEmbed(`your max bet is $**${((await calcMaxBet(message.member)) * 10).toLocaleString()}**`)],
+      });
+
+    if (bet > (await calcMaxBet(target)) * 10)
+      return send({
+        embeds: [new ErrorEmbed(`their max bet is $**${((await calcMaxBet(target)) * 10).toLocaleString()}**`)],
+      });
+
     await addCooldown(cmd.name, message.member, 10);
     playing.add(message.author.id);
     setTimeout(() => {
@@ -315,6 +325,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return send({ embeds: [new ErrorEmbed("you cannot afford this bet")] });
     }
 
+    if (bet > (await calcMaxBet(message.member)) * 10)
+      return send({
+        embeds: [new ErrorEmbed(`your max bet is $**${((await calcMaxBet(message.member)) * 10).toLocaleString()}**`)],
+      });
+
     await addCooldown(cmd.name, message.member, 10);
     playing.add(message.author.id);
     setTimeout(() => {
@@ -349,6 +364,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       if (!(await userExists(i.user.id)) || (await getBalance(i.user.id)) < bet) {
         if (i.isRepliable()) await i.reply({ ephemeral: true, embeds: [new ErrorEmbed("you cannot afford this bet")] });
+        return false;
+      }
+
+      if ((await calcMaxBet(i.user.id)) * 10 < bet) {
+        if (i.isRepliable())
+          i.reply({
+            embeds: [new ErrorEmbed(`your max bet is $**${((await calcMaxBet(message.member)) * 10).toLocaleString()}**`)],
+          });
+
         return false;
       }
 

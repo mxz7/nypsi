@@ -14,7 +14,7 @@
       "upgrades": "per_item",
       "effect": 0.5,
       "stack_limit": 50,
-      "base_cost": 15000
+      "base_cost": 10000
     },
     "immigrant_farmers": {
       "id": "immigrant_farmers",
@@ -22,7 +22,7 @@
       "upgrades": "per_interval",
       "effect": 0.2,
       "stack_limit": 20,
-      "base_cost": 30000,
+      "base_cost": 17000,
       "for": "potato_farmer"
     },
     "bait": {
@@ -31,7 +31,7 @@
       "upgrades": "per_interval",
       "effect": 0.2,
       "stack_limit": 20,
-      "base_cost": 30000,
+      "base_cost": 17000,
       "for": "fisherman"
     },
     "sweatshop_workers": {
@@ -40,7 +40,7 @@
       "upgrades": "per_interval",
       "effect": 0.2,
       "stack_limit": 20,
-      "base_cost": 30000,
+      "base_cost": 17000,
       "for": "tailor"
     },
     "ipad_kids": {
@@ -49,7 +49,7 @@
       "upgrades": "per_interval",
       "effect": 0.2,
       "stack_limit": 20,
-      "base_cost": 30000,
+      "base_cost": 17000,
       "for": "mcdonalds"
     },
     "warehouse_workers": {
@@ -58,7 +58,7 @@
       "upgrades": "per_interval",
       "effect": 0.2,
       "stack_limit": 20,
-      "base_cost": 30000,
+      "base_cost": 17000,
       "for": "amazon"
     },
     "nasa_computers": {
@@ -99,7 +99,7 @@
       "upgrades": "per_interval",
       "effect": 0.2,
       "stack_limit": 15,
-      "base_cost": 30000,
+      "base_cost": 25000,
       "for": "quarry"
     },
     "manager": {
@@ -122,7 +122,7 @@
       "id": "gem_radar",
       "name": "gem radar",
       "upgrades": "gem_chance",
-      "effect": 0.0032,
+      "effect": 0.003,
       "stack_limit": 10,
       "for": "quarry"
     },
@@ -130,7 +130,7 @@
       "id": "earth_scanner",
       "name": "earth scanner",
       "upgrades": "scrap_chance",
-      "effect": 0.0035,
+      "effect": 0.003,
       "stack_limit": 10,
       "for": "quarry"
     }
@@ -155,8 +155,8 @@
       "prestige_requirement": 1,
       "cost": 50000,
       "base": {
-        "per_item": 4,
-        "max_storage": 600,
+        "per_item": 3,
+        "max_storage": 500,
         "per_interval": 204
       }
     },
@@ -167,8 +167,8 @@
       "prestige_requirement": 2,
       "cost": 75000,
       "base": {
-        "per_item": 10,
-        "max_storage": 350,
+        "per_item": 6,
+        "max_storage": 250,
         "per_interval": 120
       }
     },
@@ -179,8 +179,8 @@
       "prestige_requirement": 2,
       "cost": 100000,
       "base": {
-        "per_item": 17,
-        "max_storage": 400,
+        "per_item": 13,
+        "max_storage": 300,
         "per_interval": 168
       }
     },
@@ -191,8 +191,8 @@
       "prestige_requirement": 3,
       "cost": 250000,
       "base": {
-        "per_item": 25,
-        "max_storage": 350,
+        "per_item": 16,
+        "max_storage": 300,
         "per_interval": 120
       }
     },
@@ -203,8 +203,8 @@
       "prestige_requirement": 2,
       "cost": 500000,
       "base": {
-        "per_item": 13,
-        "max_storage": 600,
+        "per_item": 10,
+        "max_storage": 450,
         "per_interval": 300
       }
     },
@@ -213,10 +213,10 @@
       "name": "tailor",
       "item_emoji": "👕",
       "prestige_requirement": 3,
-      "cost": 700000,
+      "cost": 500000,
       "base": {
-        "per_item": 15,
-        "max_storage": 750,
+        "per_item": 10,
+        "max_storage": 700,
         "per_interval": 360
       }
     },
@@ -225,10 +225,10 @@
       "name": "spacex",
       "item_emoji": "🚀",
       "prestige_requirement": 4,
-      "cost": 1000000,
+      "cost": 750000,
       "base": {
-        "per_item": 50,
-        "max_storage": 215,
+        "per_item": 40,
+        "max_storage": 180,
         "per_interval": 84
       }
     },
@@ -237,10 +237,10 @@
       "name": "mcdonalds",
       "item_emoji": "🍟",
       "prestige_requirement": 2,
-      "cost": 1000000,
+      "cost": 100000,
       "base": {
-        "per_item": 15,
-        "max_storage": 400,
+        "per_item": 10,
+        "max_storage": 350,
         "per_interval": 250
       }
     },
@@ -249,9 +249,9 @@
       "name": "amazon",
       "item_emoji": "📦",
       "prestige_requirement": 5,
-      "cost": 2000000,
+      "cost": 1000000,
       "base": {
-        "per_item": 10,
+        "per_item": 6,
         "max_storage": 5000,
         "per_interval": 450
       }

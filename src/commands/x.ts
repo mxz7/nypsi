@@ -55,7 +55,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             Inventory: true,
             Boosters: true,
             Game: true,
-            ItemUse: true,
+            Stats: true,
             Crafting: true,
             LotteryTicket: true,
             OffersGiven: true,

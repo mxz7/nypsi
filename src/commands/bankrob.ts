@@ -8,17 +8,13 @@ import {
   InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
-  StringSelectMenuBuilder,
-  StringSelectMenuOptionBuilder,
 } from "discord.js";
-import { inPlaceSort } from "fast-sort";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants.js";
 import { addProgress } from "../utils/functions/economy/achievements.js";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance.js";
 import { getInventory, setInventoryItem } from "../utils/functions/economy/inventory.js";
-import { getPrestige } from "../utils/functions/economy/prestige.js";
 import { createGame } from "../utils/functions/economy/stats.js";
 import { createUser, userExists } from "../utils/functions/economy/utils.js";
 import { addToNypsiBank, getNypsiBankBalance, removeFromNypsiBankBalance } from "../utils/functions/tax.js";
@@ -26,28 +22,6 @@ import { addCooldown, getRemaining, getResponse, onCooldown } from "../utils/han
 import ms = require("ms");
 
 const cmd = new Command("bankrob", "attempt to rob a bank for a high reward", "money");
-
-const defaults = new Map<string, number>([
-  ["bank of america", 3_000_000],
-  ["maze bank", 2_000_000],
-  ["barclays", 1_000_000],
-  ["lloyds", 750_000],
-  ["monzo", 500_000],
-]);
-
-const requirements = new Map<string, number>([
-  ["bank of america", 4],
-  ["maze bank", 3],
-  ["barclays", 2],
-  ["lloyds", 1],
-  ["monzo", 0],
-]);
-
-let bankWorths = new Map<string, number>(defaults);
-
-setInterval(() => {
-  bankWorths = new Map(defaults);
-}, ms("24 hours"));
 
 cmd.slashEnabled = true;
 
@@ -113,30 +87,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return { loss: Math.floor(maxLoss), steal: Math.floor(maxSteal), lawyer };
   };
 
-  const displayBankInfo = async (bank: string, bankWorth: Map<string, number>) => {
-    let loss: number;
-    let steal: number;
-    let lawyer: boolean;
+  const displayBankInfo = async () => {
+    const worth = await getNypsiBankBalance();
+    const res = await getMaxValues(worth);
+    const loss = res.loss;
+    const steal = res.steal;
+    const lawyer = res.lawyer;
 
-    let worth: number;
-
-    if (bank == "nypsi") {
-      worth = await getNypsiBankBalance();
-      const res = await getMaxValues(worth);
-
-      loss = res.loss;
-      steal = res.steal;
-      lawyer = res.lawyer;
-    } else {
-      worth = bankWorth.get(bank);
-      const res = await getMaxValues(bankWorth.get(bank));
-
-      loss = res.loss;
-      steal = res.steal;
-      lawyer = res.lawyer;
-    }
-
-    return `**${bank}**\n*$${worth.toLocaleString()}*\n\n**max steal** $${steal.toLocaleString()}\n**max loss** $${loss.toLocaleString()}${
+    return `**nypsi**\n*$${worth.toLocaleString()}*\n\n**max steal** $${steal.toLocaleString()}\n**max loss** $${loss.toLocaleString()}${
       lawyer ? " 🧑‍⚖️" : ""
     }${
       (await onCooldown(cmd.name, message.member))
@@ -145,7 +103,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }`;
   };
 
-  const robBank = async (bank: string, bankWorth: Map<string, number>) => {
+  const robBank = async (bank: string) => {
     if (await onCooldown(cmd.name, message.member)) {
       const embed = await getResponse(cmd.name, message.member);
 
@@ -170,20 +128,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await addCooldown(cmd.name, message.member, 900);
 
-    let loss: number;
-    let steal: number;
+    const res = await getMaxValues(await getNypsiBankBalance());
 
-    if (bank == "nypsi") {
-      const res = await getMaxValues(await getNypsiBankBalance());
-
-      loss = res.loss;
-      steal = res.steal;
-    } else {
-      const res = await getMaxValues(bankWorth.get(bank));
-
-      loss = res.loss;
-      steal = res.steal;
-    }
+    const loss = res.loss;
+    const steal = res.steal;
 
     const chance = Math.floor(Math.random() * 100);
 
@@ -202,11 +150,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         addProgress(message.author.id, "robber", 1),
       ]);
 
-      if (bank == "nypsi") {
-        await removeFromNypsiBankBalance(stolen);
-      } else {
-        bankWorth.set(bank, Math.floor(bankWorth.get(bank) - stolen));
-      }
+      await removeFromNypsiBankBalance(stolen);
 
       const id = await createGame({
         userId: message.author.id,
@@ -237,12 +181,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       await updateBalance(message.member, (await getBalance(message.member)) - totalLossed);
 
-      if (bank == "nypsi") {
-        await addToNypsiBank(totalLossed * 0.9);
-      } else {
-        await addToNypsiBank(totalLossed * 0.7);
-        bankWorth.set(bank, bankWorth.get(bank) + Math.floor(totalLossed * 0.2));
-      }
+      await addToNypsiBank(totalLossed * 0.9);
 
       embed.setColor(Constants.EMBED_FAIL_COLOR);
 
@@ -267,57 +206,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return embed;
   };
 
-  const embed = new CustomEmbed(message.member).setHeader("bank robbery", message.author.avatarURL());
+  const embed = new CustomEmbed(message.member)
+    .setHeader("bank robbery", message.author.avatarURL())
+    .setDescription(await displayBankInfo());
 
-  const options: StringSelectMenuOptionBuilder[] = [];
-
-  const bankNames = Array.from(bankWorths.keys());
-
-  inPlaceSort(bankNames).desc((i) => bankWorths.get(i));
-
-  const prestige = await getPrestige(message.member);
-
-  for (const bankName of bankNames) {
-    if (requirements.get(bankName) > prestige) continue;
-    if (bankWorths.get(bankName) < defaults.get(bankName) * 0.1) continue;
-
-    options.push(
-      new StringSelectMenuOptionBuilder()
-        .setLabel(bankName)
-        .setValue(bankName)
-        .setDescription(`$${bankWorths.get(bankName).toLocaleString()}`)
-    );
-  }
-
-  if (options.length == 0) {
-    return send({ embeds: [new ErrorEmbed("there are no available banks for you to rob")] });
-  }
-
-  if ((await getNypsiBankBalance()) > 500_000 && prestige >= 2) {
-    options.push(
-      new StringSelectMenuOptionBuilder()
-        .setLabel("nypsi bank")
-        .setValue("nypsi")
-        .setDefault(true)
-        .setDescription(`$${(await getNypsiBankBalance()).toLocaleString()}`)
-    );
-    embed.setDescription(await displayBankInfo("nypsi", bankWorths));
-  } else {
-    options[0].setDefault(true);
-    embed.setDescription(await displayBankInfo(options[0].data.value, bankWorths));
-  }
-
-  if (options.length == 0) {
-    return send({ embeds: [new CustomEmbed(message.member, "there are currently no banks to rob")] });
+  if ((await getNypsiBankBalance()) < 100_000) {
+    return send({ embeds: [new CustomEmbed(message.member, "nypsi bank is currently closed")] });
   }
 
   const components: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [];
-
-  components.push(
-    new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new StringSelectMenuBuilder().setCustomId("bank").setOptions(options)
-    )
-  );
 
   if (!(await onCooldown(cmd.name, message.member)))
     components.push(
@@ -344,25 +241,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return;
     }
 
-    if (res.isStringSelectMenu() && res.customId == "bank") {
-      embed.setDescription(await displayBankInfo(res.values[0], bankWorths));
-
-      for (const option of options) {
-        option.setDefault(false);
-
-        if (option.data.value == res.values[0]) option.setDefault(true);
-      }
-
-      components[0] = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new StringSelectMenuBuilder().setCustomId("bank").setOptions(options)
-      );
-
-      await res.message.edit({ embeds: [embed], components });
-      return pageManager();
-    } else if (res.customId == "ro") {
-      const selected = options.filter((o) => o.data.default)[0].data.value;
-
-      const newEmbed = await robBank(selected, bankWorths);
+    if (res.customId == "ro") {
+      const newEmbed = await robBank("nypsi");
 
       if (!newEmbed) return await res.message.edit({ components: [] });
 

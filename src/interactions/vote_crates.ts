@@ -6,7 +6,7 @@ import Constants from "../utils/Constants";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { getInventory, openCrate } from "../utils/functions/economy/inventory";
 import { getPrestige } from "../utils/functions/economy/prestige";
-import { addItemUse } from "../utils/functions/economy/stats";
+import { addStat } from "../utils/functions/economy/stats";
 import { getItems, isEcoBanned } from "../utils/functions/economy/utils";
 import PageManager from "../utils/functions/page";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -47,7 +47,7 @@ export default {
 
     await Promise.all([
       addProgress(interaction.user.id, "unboxer", crateAmount),
-      addItemUse(interaction.user.id, "vote_crate", crateAmount),
+      addStat(interaction.user.id, "vote_crate", crateAmount),
     ]);
 
     const foundItems = new Map<string, number>();
