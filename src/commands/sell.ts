@@ -1,7 +1,7 @@
 import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import { getBalance, getMulti, updateBalance } from "../utils/functions/economy/balance";
+import { getBalance, getSellMulti, updateBalance } from "../utils/functions/economy/balance";
 import { getInventory, selectItem, setInventoryItem } from "../utils/functions/economy/inventory";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
@@ -112,7 +112,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   let sellWorth = Math.floor(selected.sell * amount);
 
-  const multi = await getMulti(message.member);
+  const multi = await getSellMulti(message.member);
 
   if (selected.role == "fish" || selected.role == "prey" || selected.role == "sellable") {
     sellWorth = Math.floor(sellWorth + sellWorth * multi);

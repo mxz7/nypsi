@@ -14,7 +14,13 @@ import {
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
-import { calcMaxBet, getBankBalance, getMulti, updateBankBalance } from "../utils/functions/economy/balance.js";
+import {
+  calcMaxBet,
+  getBankBalance,
+  getGambleMulti,
+  getSellMulti,
+  updateBankBalance,
+} from "../utils/functions/economy/balance.js";
 import { addBooster, getBoosters } from "../utils/functions/economy/boosters.js";
 import { addInventoryItem } from "../utils/functions/economy/inventory.js";
 import {
@@ -155,7 +161,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     await updateXp(message.member, currentXp - neededXp);
     await setPrestige(message.member, (await getPrestige(message.member)) + 1);
 
-    const multi = await getMulti(message.member);
+    const gambleMulti = await getGambleMulti(message.member);
+    const sellMulti = await getSellMulti(message.member);
     const maxBet = await calcMaxBet(message.member);
 
     let amount = 1;
@@ -194,10 +201,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     embed.setDescription(
       `you are now prestige **${await getPrestige(message.member)}**\n\n` +
-        `new vote rewards: $**${Math.floor(
-          15000 * (prestige / 2 + 1)
-        ).toLocaleString()}**, **${crateAmount}** vote crates\n` +
-        `your new multiplier: **${Math.floor(multi * 100)}**%\n` +
+        `vote rewards: $**${Math.floor(15000 * (prestige / 2 + 1)).toLocaleString()}**, **${crateAmount}** vote crates\n` +
+        `gamble multiplier: **${Math.floor(gambleMulti * 100)}**%\n` +
+        `sell multiplier: **${Math.floor(sellMulti * 100)}**%\n` +
         `your maximum bet: $**${maxBet.toLocaleString()}**\n` +
         `you have received **${amount}** basic crate${amount > 1 ? "s" : ""}${
           booster ? " and an xp booster for 30 minutes" : ""

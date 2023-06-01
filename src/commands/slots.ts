@@ -12,7 +12,7 @@ import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants.js";
 import { addProgress } from "../utils/functions/economy/achievements.js";
-import { calcMaxBet, getBalance, getDefaultBet, getMulti, updateBalance } from "../utils/functions/economy/balance.js";
+import { calcMaxBet, getBalance, getDefaultBet, getGambleMulti, updateBalance } from "../utils/functions/economy/balance.js";
 import { getBoosters } from "../utils/functions/economy/boosters.js";
 import { addToGuildXP, getGuildByUser } from "../utils/functions/economy/guilds.js";
 import { createGame } from "../utils/functions/economy/stats";
@@ -355,7 +355,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   let multi = 0;
 
   if (win) {
-    multi = await getMulti(message.member);
+    multi = await getGambleMulti(message.member);
     winnings -= bet;
 
     if (multi > 0) {

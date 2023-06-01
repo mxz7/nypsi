@@ -11,11 +11,13 @@ import {
 import { inPlaceSort } from "fast-sort";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import { getBalance, getMulti, updateBalance } from "../utils/functions/economy/balance";
-import { getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
+import Constants from "../utils/Constants";
+import { getBalance, getSellMulti, updateBalance } from "../utils/functions/economy/balance";
+import { addInventoryItem, getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import PageManager from "../utils/functions/page";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
+import { percentChance } from "../utils/functions/random";
 import { addToNypsiBank, getTax } from "../utils/functions/tax";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import pAll = require("p-all");
@@ -82,9 +84,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   await addCooldown(cmd.name, message.member, 30);
 
-  const multi = await getMulti(message.member);
+  const multi = await getSellMulti(message.member);
 
   let total = 0;
+  let totalSold = 0;
   let taxedAmount = 0;
 
   const tax = await getTax();
@@ -115,6 +118,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     total += sellWorth;
+    totalSold = selected.get(item);
 
     desc.push(
       `\`${selected.get(item).toLocaleString()}x\` ${items[item].emoji} ${items[item].name} ($${sellWorth.toLocaleString()})`
@@ -141,9 +145,19 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const embed = new CustomEmbed(message.member);
 
   embed.setDescription(`+$**${total.toLocaleString()}**`);
-  if (taxEnabled) embed.setFooter({ text: `${((await getTax()) * 100).toFixed(1)}% tax` });
+
+  const footer: string[] = [];
+
+  if (taxEnabled) footer.push(`${((await getTax()) * 100).toFixed(1)}% tax`);
+  if (multi > 0) footer.push(`${Math.floor(multi * 100)}% bonus`);
+  if (footer.length > 0) embed.setFooter({ text: footer.join(" | ") });
 
   const pages = PageManager.createPages(desc, 10);
+
+  if (percentChance(totalSold * Constants.LUCKY_CHEESE_CHANCE)) {
+    await addInventoryItem(message.member, "lucky_cheese", 1, false);
+    pages.get(1).push("\n you found a 🧀 **lucky cheese**!");
+  }
 
   embed.addField("items sold", pages.get(1).join("\n"));
 

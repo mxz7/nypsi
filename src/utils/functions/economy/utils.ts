@@ -13,7 +13,7 @@ import { isUserBlacklisted } from "../users/blacklist";
 import { getPreferences } from "../users/notifications";
 import { createProfile, hasProfile } from "../users/utils";
 import { setProgress } from "./achievements";
-import { calcMaxBet, getBalance, getMulti, updateBalance } from "./balance";
+import { calcMaxBet, getBalance, updateBalance } from "./balance";
 import { getGuildByUser } from "./guilds";
 import { addInventoryItem } from "./inventory";
 import { getXp, updateXp } from "./xp";
@@ -542,8 +542,6 @@ export async function doDaily(member: GuildMember) {
   const streak = (await getDailyStreak(member)) + 1;
 
   let total = Math.floor(math.square(streak * 7) + 25_000);
-
-  total += Math.floor(total * (await getMulti(member)));
 
   if (total > 1_000_000) total = 1_000_000;
 

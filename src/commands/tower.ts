@@ -20,7 +20,7 @@ import Constants from "../utils/Constants";
 import { a } from "../utils/functions/anticheat";
 import { isLockedOut, verifyUser } from "../utils/functions/captcha";
 import { addProgress } from "../utils/functions/economy/achievements";
-import { calcMaxBet, getBalance, getDefaultBet, getMulti, updateBalance } from "../utils/functions/economy/balance";
+import { calcMaxBet, getBalance, getDefaultBet, getGambleMulti, updateBalance } from "../utils/functions/economy/balance";
 import { addToGuildXP, getGuildByUser } from "../utils/functions/economy/guilds";
 import { addInventoryItem } from "../utils/functions/economy/inventory";
 import { createGame } from "../utils/functions/economy/stats";
@@ -547,7 +547,7 @@ async function playGame(
 
   const win1 = async () => {
     let winnings = Math.round(game.bet * game.win);
-    const multi = await getMulti(game.userId);
+    const multi = await getGambleMulti(game.userId);
 
     if (multi > 0) {
       winnings += Math.round(winnings * multi);
