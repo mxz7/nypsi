@@ -24,7 +24,7 @@ jobs:
         name: install pnpm
         id: pnpm-install
         with:
-          version: 8
+          version: latest
           run_install: false
 
       - name: get pnpm store directory
@@ -83,7 +83,7 @@ jobs:
         name: install pnpm
         id: pnpm-install
         with:
-          version: 8
+          version: latest
           run_install: false
 
       - name: get pnpm store directory
