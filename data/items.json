@@ -1063,7 +1063,7 @@
     "stackable": true,
     "max": 3,
     "boosterEffect": {
-      "boosts": ["multi"],
+      "boosts": ["multi", "sellmulti"],
       "effect": 3,
       "time": 1800
     },
