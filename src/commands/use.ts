@@ -201,7 +201,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let desc = `activating ${amount > 1 ? `${amount}x ` : ""}**${selected.name}** booster...`;
     let desc2 = `you have activated ${amount > 1 ? `${amount}x ` : ""}**${selected.name}**`;
 
-    if (["cake", "cookie"].includes(selected.id)) {
+    if (["cake", "cookie", "lucky_cheese"].includes(selected.id)) {
       desc = `eating ${amount > 1 ? `${amount} ` : ""}**${
         amount > 1 ? selected.plural || selected.name : selected.name
       }**...`;
