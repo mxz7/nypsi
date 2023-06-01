@@ -105,7 +105,8 @@ cmd.slashData
           .setChoices(
             { name: "25k max bet", value: "maxbet" },
             { name: "member slot", value: "member" },
-            { name: "1% multiplier", value: "multi" }
+            { name: "gamble multiplier", value: "multi" },
+            { name: "sell multiplier", value: "sellmulti" }
           )
       )
   )
