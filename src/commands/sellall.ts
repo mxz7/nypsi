@@ -145,7 +145,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const embed = new CustomEmbed(message.member);
 
   embed.setDescription(`+$**${total.toLocaleString()}**`);
-  if (taxEnabled) embed.setFooter({ text: `${((await getTax()) * 100).toFixed(1)}% tax` });
+
+  const footer: string[] = [];
+
+  if (taxEnabled) footer.push(`${((await getTax()) * 100).toFixed(1)}% tax`);
+  if (multi > 0) footer.push(`${Math.floor(multi * 100)}% bonus`);
+  if (footer.length > 0) embed.setFooter({ text: footer.join(" | ") });
 
   const pages = PageManager.createPages(desc, 10);
 
