@@ -4,7 +4,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
 import { getBoosters } from "../utils/functions/economy/boosters";
-import { addInventoryItem, getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
+import { addInventoryItem, gemBreak, getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
 import { addStat } from "../utils/functions/economy/stats";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import { getXp, updateXp } from "../utils/functions/economy/xp";
@@ -163,9 +163,23 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
   }
 
-  if (inventory.find((i) => i.item === "purple_gem")?.amount > 0) times++;
-  if (inventory.find((i) => i.item === "white_gem")?.amount > 0) times++;
-  if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0) times++;
+  if (inventory.find((i) => i.item === "purple_gem")?.amount > 0) {
+    if (percentChance(0.2)) {
+      gemBreak(message.author.id, 0.07, "purple_gem");
+      times++;
+    }
+  }
+  if (inventory.find((i) => i.item === "white_gem")?.amount > 0) {
+    if (percentChance(0.2)) {
+      gemBreak(message.author.id, 0.07, "white_gem");
+      times++;
+    }
+  }
+  if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0) {
+    if (percentChance(0.1)) {
+      times++;
+    }
+  }
 
   if (!unbreaking) {
     await setInventoryItem(message.member, fishingRod, inventory.find((i) => i.item == fishingRod).amount - 1, false);
