@@ -104,7 +104,7 @@ cmd.slashData
           .setDescription("upgrade you want to buy")
           .setChoices(
             { name: "25k max bet", value: "maxbet" },
-            { name: "member slot", value: "value" },
+            { name: "member slot", value: "member" },
             { name: "1% multiplier", value: "multi" }
           )
       )
