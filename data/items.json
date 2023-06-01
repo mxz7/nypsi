@@ -1520,7 +1520,7 @@
     "role": "booster",
     "stackable": false,
     "boosterEffect": {
-      "boosts": ["multi", "xp"],
+      "boosts": ["multi", "xp", "sellmulti"],
       "effect": 10,
       "time": 86400
     },
