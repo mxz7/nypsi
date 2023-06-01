@@ -20,7 +20,7 @@ import { getXp } from "./xp";
 import ms = require("ms");
 import _ = require("lodash");
 
-export const prestigeMultiEffect = [0, 1, 2, 3, 4, 5, 6, 7, 7, 9, 10];
+const prestigeGambleMultiEffect = [0, 1, 1, 1, 2, 2, 3, 3, 4, 4, 5];
 
 export async function getBalance(member: GuildMember | string) {
   let id: string;
@@ -117,7 +117,7 @@ export async function increaseBaseBankStorage(member: GuildMember, amount: numbe
   });
 }
 
-export async function getMulti(member: GuildMember | string): Promise<number> {
+export async function getGambleMulti(member: GuildMember | string): Promise<number> {
   let id: string;
   if (member instanceof GuildMember) {
     id = member.user.id;
@@ -129,25 +129,25 @@ export async function getMulti(member: GuildMember | string): Promise<number> {
 
   const prestige = await getPrestige(member);
 
-  let prestigeBonus = prestigeMultiEffect[prestige];
+  let prestigeBonus = prestigeGambleMultiEffect[prestige];
 
-  if (!prestigeBonus && prestigeBonus !== 0) prestigeBonus = prestigeMultiEffect[prestigeMultiEffect.length - 1];
+  if (!prestigeBonus && prestigeBonus !== 0) prestigeBonus = prestigeGambleMultiEffect[prestigeGambleMultiEffect.length - 1];
 
   multi += prestigeBonus;
 
   switch (await getTier(id)) {
     case 2:
-      multi += 2;
+      multi += 1;
       break;
     case 3:
-      multi += 4;
+      multi += 2;
       break;
     case 4:
-      multi += 7;
+      multi += 5;
       break;
   }
 
-  if (await isBooster(id)) multi += 3;
+  if (await isBooster(id)) multi += 2;
 
   const boosters = await getBoosters(id);
   const items = getItems();
@@ -158,7 +158,7 @@ export async function getMulti(member: GuildMember | string): Promise<number> {
   if ((await getDmSettings(id)).voteReminder && !(await redis.sismember(Constants.redis.nypsi.VOTE_REMINDER_RECEIVED, id)))
     multi += 2;
 
-  if (await isPassive(id)) multi -= 3;
+  if (await isPassive(id)) multi -= 4;
 
   for (const boosterId of boosters.keys()) {
     if (items[boosterId].boosterEffect.boosts.includes("multi")) {
@@ -176,6 +176,87 @@ export async function getMulti(member: GuildMember | string): Promise<number> {
     } else {
       gemBreak(id, 0.01, "white_gem");
       const choices = [7, 3, 4, 5, 7, 2, 17, 7, 4, 5, 3, 3, 3, 3, 4, 3, 3, 3, 3, 3, 3, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3];
+      multi += Math.floor(Math.random() * choices[Math.floor(Math.random() * choices.length)]) + 1;
+    }
+  } else if (inventory.find((i) => i.item == "pink_gem")?.amount > 0) {
+    const chance = Math.floor(Math.random() * 10);
+
+    if (chance < 2) {
+      multi -= 3;
+    } else {
+      gemBreak(id, 0.07, "pink_gem");
+      const choices = [7, 5, 4, 3, 2, 1, 3, 1, 1, 1, 3, 3];
+      multi += choices[Math.floor(Math.random() * choices.length)];
+    }
+  }
+
+  multi = Math.floor(multi);
+  if (multi < 0) multi = 0;
+
+  multi = multi / 100;
+
+  return parseFloat(multi.toFixed(2));
+}
+
+export async function getSellMulti(member: GuildMember | string): Promise<number> {
+  let id: string;
+  if (member instanceof GuildMember) {
+    id = member.user.id;
+  } else {
+    id = member;
+  }
+
+  let multi = 0;
+
+  const prestige = await getPrestige(member);
+
+  multi += Math.floor(prestige * 0.3);
+
+  switch (await getTier(id)) {
+    case 1:
+      multi += 2;
+      break;
+    case 2:
+      multi += 5;
+      break;
+    case 3:
+      multi += 10;
+      break;
+    case 4:
+      multi += 15;
+      break;
+  }
+
+  if (await isBooster(id)) multi += 3;
+
+  const boosters = await getBoosters(id);
+  const items = getItems();
+  const guildUpgrades = await getGuildUpgradesByUser(member);
+
+  if (guildUpgrades.find((i) => i.upgradeId === "sellmulti"))
+    multi += guildUpgrades.find((i) => i.upgradeId === "sellmulti").amount * 5;
+
+  if ((await getDmSettings(id)).voteReminder && !(await redis.sismember(Constants.redis.nypsi.VOTE_REMINDER_RECEIVED, id)))
+    multi += 2;
+
+  if (await isPassive(id)) multi -= 5;
+
+  for (const boosterId of boosters.keys()) {
+    if (items[boosterId].boosterEffect.boosts.includes("sellmulti")) {
+      multi += items[boosterId].boosterEffect.effect * boosters.get(boosterId).length;
+    }
+  }
+
+  const inventory = await getInventory(id, false);
+  if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0) multi += Math.floor(Math.random() * 7);
+  if (inventory.find((i) => i.item == "white_gem")?.amount > 0) {
+    const chance = Math.floor(Math.random() * 10);
+
+    if (chance < 2) {
+      multi -= Math.floor(Math.random() * 6) + 1;
+    } else {
+      gemBreak(id, 0.01, "white_gem");
+      const choices = [7, 3, 4, 5, 7, 2, 17, 7, 4, 5, 2, 2, 2, 2, 2, 3, 3, 3];
       multi += Math.floor(Math.random() * choices[Math.floor(Math.random() * choices.length)]) + 1;
     }
   } else if (inventory.find((i) => i.item == "pink_gem")?.amount > 0) {

@@ -18,14 +18,19 @@ async function autosellThing() {
 
     const amounts = new Map<string, number>();
     const moneys = new Map<string, number>();
+    let cheese = 0;
     const itemIds: string[] = [];
 
     for (const [k, v] of Object.entries(items)) {
-      if (!itemIds.includes(k.split("-")[0])) itemIds.push(k.split("-")[0]);
-      if (k.split("-")[1] === "amount") {
-        amounts.set(k.split("-")[0], parseInt(v));
+      if (k === "cheese") {
+        cheese += parseInt(v);
       } else {
-        moneys.set(k.split("-")[0], parseInt(v));
+        if (!itemIds.includes(k.split("-")[0])) itemIds.push(k.split("-")[0]);
+        if (k.split("-")[1] === "amount") {
+          amounts.set(k.split("-")[0], parseInt(v));
+        } else {
+          moneys.set(k.split("-")[0], parseInt(v));
+        }
       }
     }
 
@@ -55,6 +60,10 @@ async function autosellThing() {
 
     if (remaining > 0) {
       msg.push(`${remaining.toLocaleString()} more items sold`);
+    }
+
+    if (cheese > 0) {
+      msg.push(`\nyou found **${cheese.toLocaleString()}** 🧀 lucky cheese`);
     }
 
     await addNotificationToQueue({

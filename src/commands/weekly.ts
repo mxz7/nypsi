@@ -1,7 +1,7 @@
 import { CommandInteraction, Message } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders";
-import { getBalance, getMulti, updateBalance } from "../utils/functions/economy/balance.js";
+import { getBalance, getSellMulti, updateBalance } from "../utils/functions/economy/balance.js";
 import { createUser, userExists } from "../utils/functions/economy/utils.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getTier, isPremium } from "../utils/functions/premium/premium.js";
@@ -48,7 +48,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       await setLastWeekly(message.author.id, now);
 
       let amount = 150000;
-      const multi = await getMulti(message.member);
+      const multi = await getSellMulti(message.member);
 
       let description = `$${(await getBalance(message.member)).toLocaleString()}\n + $**${amount.toLocaleString()}**`;
 

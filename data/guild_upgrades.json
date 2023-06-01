@@ -15,8 +15,15 @@
   },
   "multi": {
     "id": "multi",
-    "name": "multiplier",
-    "description": "+1% multiplier",
+    "name": "gamble multiplier",
+    "description": "+1% gamble multiplier",
+    "cost": 2,
+    "increment_per_level": 2
+  },
+  "sellmulti": {
+    "id": "sellmulti",
+    "name": "sell multiplier",
+    "description": "+5% sell multiplier",
     "cost": 2,
     "increment_per_level": 2
   }
