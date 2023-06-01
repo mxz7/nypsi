@@ -10,6 +10,7 @@ import { Worker, WorkerUpgrades } from "../../../types/Workers";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { isUserBlacklisted } from "../users/blacklist";
+import { getPreferences } from "../users/notifications";
 import { createProfile, hasProfile } from "../users/utils";
 import { setProgress } from "./achievements";
 import { calcMaxBet, getBalance, getMulti, updateBalance } from "./balance";
@@ -462,7 +463,11 @@ export async function addTicket(member: GuildMember | string, amount = 1) {
 
   if (!(member instanceof GuildMember)) return;
 
-  await redis.hincrby("lotterytickets:queue", member.user.username, amount);
+  await redis.hincrby(
+    "lotterytickets:queue",
+    (await getPreferences(id)).leaderboards ? member.user.username : "[hidden]",
+    amount
+  );
 }
 
 export async function isHandcuffed(id: string): Promise<boolean> {
