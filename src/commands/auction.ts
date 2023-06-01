@@ -660,7 +660,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           new CustomEmbed(
             message.member,
             `you are currently watching: \n\n${current
-              .map((i) => `- ${items[i.itemId].emoji} ${items[i.itemId].name}: $${i.maxCost.toLocaleString()}`)
+              .map(
+                (i) =>
+                  `- ${items[i.itemId].emoji} ${items[i.itemId].name}${
+                    i.maxCost > 0 ? `: <$$${i.maxCost.toLocaleString()}` : ""
+                  }`
+              )
               .join("\n")}`
           ).setHeader("auction watch", message.author.avatarURL()),
         ],
@@ -700,7 +705,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (current.length > 0) {
       embed.addField(
         "currently watching",
-        current.map((i) => `- ${items[i.itemId].emoji} ${items[i.itemId].name} $${i.maxCost.toLocaleString()}`).join("\n")
+        current
+          .map(
+            (i) =>
+              `- ${items[i.itemId].emoji} ${items[i.itemId].name}${
+                i.maxCost > 0 ? `: <$$${i.maxCost.toLocaleString()}` : ""
+              }`
+          )
+          .join("\n")
       );
     }
 
