@@ -13,7 +13,7 @@ import sleep from "../sleep";
 import { getTax } from "../tax";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { addProgress, getAllAchievements, setAchievementProgress } from "./achievements";
-import { getBalance, getMulti, updateBalance } from "./balance";
+import { getBalance, getSellMulti, updateBalance } from "./balance";
 import { createUser, getItems, userExists } from "./utils";
 import { getXp, updateXp } from "./xp";
 import ms = require("ms");
@@ -41,7 +41,7 @@ export async function getInventory(
   }
 
   if (await redis.exists(`${Constants.redis.cache.economy.INVENTORY}:${id}`)) {
-    return JSON.parse(await redis.get(`${Constants.redis.cache.economy.INVENTORY}:${id}`));
+    return JSON.parse(await redis.get(`${Constants.redis.cache.economy.INVENTORY}:${id}`)) || [];
   }
 
   const query = await prisma.inventory
@@ -98,7 +98,7 @@ async function doAutosellThing(userId: string, itemId: string, amount: number): 
 
   let sellWorth = Math.floor(item.sell * amount);
 
-  const multi = await getMulti(userId);
+  const multi = await getSellMulti(userId);
 
   if (item.role == "fish" || item.role == "prey" || item.role == "sellable") {
     sellWorth = Math.floor(sellWorth + sellWorth * multi);
@@ -120,8 +120,14 @@ async function doAutosellThing(userId: string, itemId: string, amount: number): 
 
   await updateBalance(userId, (await getBalance(userId)) + sellWorth);
 
+  if (percentChance(amount * Constants.LUCKY_CHEESE_CHANCE)) {
+    await addInventoryItem(userId, "lucky_cheese", 1, false);
+    await redis.hincrby(`${Constants.redis.nypsi.AUTO_SELL_ITEMS}:${userId}`, "cheese", 1);
+  }
+
   await redis.hincrby(`${Constants.redis.nypsi.AUTO_SELL_ITEMS}:${userId}`, `${itemId}-money`, sellWorth);
   await redis.hincrby(`${Constants.redis.nypsi.AUTO_SELL_ITEMS}:${userId}`, `${itemId}-amount`, amount);
+
   if (!(await redis.lrange(Constants.redis.nypsi.AUTO_SELL_ITEMS_MEMBERS, 0, -1)).includes(userId))
     await redis.lpush(Constants.redis.nypsi.AUTO_SELL_ITEMS_MEMBERS, userId);
 

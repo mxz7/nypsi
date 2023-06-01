@@ -7,7 +7,7 @@
     "role": "fish",
     "rarity": 0,
     "buy": 0,
-    "sell": 7500,
+    "sell": 3500,
     "in_crates": false
   },
   "medium_fish": {
@@ -18,7 +18,7 @@
     "role": "fish",
     "rarity": 1,
     "buy": 0,
-    "sell": 15000,
+    "sell": 10000,
     "in_crates": false
   },
   "salmon": {
@@ -29,7 +29,7 @@
     "role": "fish",
     "rarity": 1,
     "buy": 0,
-    "sell": 20000,
+    "sell": 12500,
     "in_crates": false
   },
   "pufferfish": {
@@ -40,7 +40,7 @@
     "role": "fish",
     "rarity": 1,
     "buy": 0,
-    "sell": 25000,
+    "sell": 12500,
     "in_crates": false
   },
   "large_fish": {
@@ -51,7 +51,7 @@
     "role": "fish",
     "rarity": 2,
     "buy": 0,
-    "sell": 35000,
+    "sell": 17500,
     "in_crates": false
   },
   "nemo": {
@@ -62,7 +62,7 @@
     "role": "fish",
     "rarity": 3,
     "buy": 0,
-    "sell": 50000,
+    "sell": 23500,
     "in_crates": false
   },
   "cobblestone": {
@@ -74,7 +74,7 @@
     "rarity": 0,
     "aliases": ["cobble"],
     "buy": 0,
-    "sell": 750,
+    "sell": 450,
     "in_crates": false
   },
   "netherrack": {
@@ -85,7 +85,7 @@
     "role": "sellable",
     "rarity": 0,
     "buy": 0,
-    "sell": 5000,
+    "sell": 900,
     "in_crates": false
   },
   "coal": {
@@ -96,7 +96,7 @@
     "role": "fuel",
     "rarity": 0,
     "buy": 3000,
-    "sell": 2000,
+    "sell": 1500,
     "in_crates": false
   },
   "iron_ingot": {
@@ -109,7 +109,7 @@
     "rarity": 69,
     "aliases": ["iron"],
     "buy": 0,
-    "sell": 30000,
+    "sell": 20000,
     "in_crates": false
   },
   "gold_ingot": {
@@ -122,7 +122,7 @@
     "rarity": 69,
     "aliases": ["gold"],
     "buy": 0,
-    "sell": 45000,
+    "sell": 33000,
     "in_crates": false,
     "craft": {
       "ingrediants": ["gold_nugget:9"],
@@ -138,7 +138,7 @@
     "role": "sellable",
     "rarity": 3,
     "buy": 0,
-    "sell": 75000,
+    "sell": 60000,
     "in_crates": false
   },
   "obsidian": {
@@ -149,7 +149,7 @@
     "role": "resource",
     "rarity": 4,
     "buy": 0,
-    "sell": 100000,
+    "sell": 75000,
     "in_crates": false
   },
   "emerald": {
@@ -161,7 +161,7 @@
     "role": "sellable",
     "rarity": 3,
     "buy": 0,
-    "sell": 100000,
+    "sell": 70000,
     "in_crates": false
   },
   "amethyst": {
@@ -173,7 +173,7 @@
     "role": "sellable",
     "rarity": 3,
     "buy": 0,
-    "sell": 85000,
+    "sell": 50000,
     "in_crates": false
   },
   "furnace": {
@@ -220,7 +220,7 @@
     "role": "sellable",
     "rarity": 1,
     "buy": 0,
-    "sell": 25000,
+    "sell": 17500,
     "in_crates": false
   },
   "gold_ore": {
@@ -268,7 +268,7 @@
     "role": "sellable",
     "rarity": 69,
     "buy": 0,
-    "sell": 5000000,
+    "sell": 3000000,
     "craft": {
       "time": 1200,
       "ingrediants": ["netherite_scrap:4", "gold_ingot:4"]
@@ -414,7 +414,7 @@
     "role": "prey",
     "rarity": 0,
     "buy": 0,
-    "sell": 5000,
+    "sell": 2500,
     "in_crates": false
   },
   "normal_rabbit": {
@@ -426,7 +426,7 @@
     "role": "prey",
     "rarity": 1,
     "buy": 0,
-    "sell": 7500,
+    "sell": 5000,
     "in_crates": false
   },
   "large_rabbit": {
@@ -438,7 +438,7 @@
     "role": "prey",
     "rarity": 2,
     "buy": 0,
-    "sell": 15000,
+    "sell": 7500,
     "in_crates": false
   },
   "deer": {
@@ -449,7 +449,7 @@
     "role": "prey",
     "rarity": 2,
     "buy": 0,
-    "sell": 30000,
+    "sell": 10000,
     "in_crates": false
   },
   "llama": {
@@ -460,7 +460,7 @@
     "role": "prey",
     "rarity": 2,
     "buy": 0,
-    "sell": 40000,
+    "sell": 12500,
     "in_crates": false
   },
   "monkey": {
@@ -472,7 +472,7 @@
     "role": "prey",
     "rarity": 2,
     "buy": 0,
-    "sell": 30000,
+    "sell": 12500,
     "in_crates": false
   },
   "harambe": {
@@ -483,7 +483,7 @@
     "role": "prey",
     "rarity": 3,
     "buy": 0,
-    "sell": 75000,
+    "sell": 20000,
     "in_crates": false
   },
   "rat": {
@@ -495,7 +495,7 @@
     "role": "prey",
     "rarity": 0,
     "buy": 0,
-    "sell": 3000,
+    "sell": 1500,
     "in_crates": false
   },
   "mouse": {
@@ -507,7 +507,7 @@
     "role": "prey",
     "rarity": 0,
     "buy": 0,
-    "sell": 5000,
+    "sell": 1250,
     "in_crates": false
   },
   "kangaroo": {
@@ -519,7 +519,7 @@
     "role": "prey",
     "rarity": 3,
     "buy": 0,
-    "sell": 50000,
+    "sell": 25000,
     "in_crates": false
   },
   "wolf": {
@@ -531,7 +531,7 @@
     "role": "prey",
     "rarity": 3,
     "buy": 0,
-    "sell": 110000,
+    "sell": 30000,
     "in_crates": false
   },
   "mineshaft_chest": {
@@ -548,6 +548,7 @@
     "items": [
       "id:efficiency",
       "id:fortune",
+      "id:unbreaking",
       "id:diamond_pickaxe",
       "id:iron_ingot",
       "id:gold_ingot",
@@ -663,13 +664,13 @@
     "longDesc": "yum yum",
     "rarity": 0,
     "role": "booster",
-    "booster_desc": "eat a cookie to get +**1**% multi for 30 seconds (stacks up to 7)",
+    "booster_desc": "eat a cookie to get +**1**% multi for 30 seconds (stacks up to 3)",
     "buy": 0,
     "sell": 1000,
     "stackable": true,
-    "max": 7,
+    "max": 3,
     "boosterEffect": {
-      "boosts": ["multi"],
+      "boosts": ["multi", "sellmulti"],
       "effect": 1,
       "time": 30
     },
@@ -874,7 +875,7 @@
     "rarity": 3,
     "role": "prey",
     "buy": 0,
-    "sell": 75000,
+    "sell": 25000,
     "in_crates": true
   },
   "chastity_cage": {
@@ -1056,14 +1057,14 @@
     "aliases": ["multi", "multiplierpotion", "multiplier_potion", "multiplier"],
     "emoji": "<:nypsi_potion:1001463080582131843>",
     "longDesc": "increase your multiplier by 3% for 30 minutes (stacks to 3)",
-    "rarity": 1,
+    "rarity": 3,
     "buy": 0,
     "sell": 100000,
     "role": "booster",
     "stackable": true,
     "max": 3,
     "boosterEffect": {
-      "boosts": ["multi"],
+      "boosts": ["multi", "sellmulti"],
       "effect": 3,
       "time": 1800
     },
@@ -1129,7 +1130,7 @@
     "plural": "xp potions",
     "emoji": "<:nypsi_potion:1001463080582131843>",
     "longDesc": "earn 30% more xp for 30 minutes (stacks to 3)",
-    "rarity": 1,
+    "rarity": 2,
     "buy": 0,
     "sell": 75000,
     "aliases": ["xp"],
@@ -1973,5 +1974,25 @@
     "aliases": ["rick", "rickroll"],
     "sell": 1000000,
     "in_crates": true
+  },
+  "lucky_cheese": {
+    "id": "lucky_cheese",
+    "name": "lucky cheese",
+    "plural": "lucky cheese",
+    "aliases": ["cheese"],
+    "emoji": "🧀",
+    "longDesc": "increase your sell by 5% for 30 minutes (stacks to 10)",
+    "rarity": 4,
+    "buy": 0,
+    "sell": 100000,
+    "role": "booster",
+    "stackable": true,
+    "max": 10,
+    "boosterEffect": {
+      "boosts": ["sellmulti"],
+      "effect": 5,
+      "time": 1800
+    },
+    "in_crates": false
   }
 }

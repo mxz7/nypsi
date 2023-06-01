@@ -21,7 +21,7 @@ import Constants from "../utils/Constants.js";
 import { a } from "../utils/functions/anticheat.js";
 import { isLockedOut, verifyUser } from "../utils/functions/captcha.js";
 import { addProgress } from "../utils/functions/economy/achievements.js";
-import { calcMaxBet, getBalance, getDefaultBet, getMulti, updateBalance } from "../utils/functions/economy/balance.js";
+import { calcMaxBet, getBalance, getDefaultBet, getGambleMulti, updateBalance } from "../utils/functions/economy/balance.js";
 import { addToGuildXP, getGuildByUser } from "../utils/functions/economy/guilds.js";
 import { addInventoryItem } from "../utils/functions/economy/inventory.js";
 import { createGame } from "../utils/functions/economy/stats.js";
@@ -360,7 +360,7 @@ async function prepareGame(
     }
   }
 
-  const multi = await getMulti(message.member);
+  const multi = await getGambleMulti(message.member);
 
   games.set(message.author.id, {
     bet: bet,

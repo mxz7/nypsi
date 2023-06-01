@@ -19,7 +19,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
 import { a } from "../utils/functions/anticheat";
 import { isLockedOut, verifyUser } from "../utils/functions/captcha";
-import { calcMaxBet, getBalance, getDefaultBet, getMulti, updateBalance } from "../utils/functions/economy/balance.js";
+import { calcMaxBet, getBalance, getDefaultBet, getGambleMulti, updateBalance } from "../utils/functions/economy/balance.js";
 import { addToGuildXP, getGuildByUser } from "../utils/functions/economy/guilds";
 import { createGame } from "../utils/functions/economy/stats";
 import { createUser, formatBet, userExists } from "../utils/functions/economy/utils.js";
@@ -277,7 +277,7 @@ async function prepareGame(
     "K♦️",
   ];
 
-  const multi = await getMulti(message.member);
+  const multi = await getGambleMulti(message.member);
 
   games.set(message.member.user.id, {
     bet: bet,
