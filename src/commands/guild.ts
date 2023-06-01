@@ -830,7 +830,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       const value =
         `**${upgrade.name}**\n` +
         `*${upgrade.description}*\n` +
-        `**cost** ${upgrade.cost + (guild.upgrades.find((i) => i.upgradeId)?.amount || 0) * upgrade.increment_per_level}\n` +
+        `**cost** ${
+          upgrade.cost + (guild.upgrades.find((i) => i.upgradeId)?.amount || 0) * upgrade.increment_per_level
+        } tokens\n` +
         `*you have ${guild.upgrades.find((i) => i.upgradeId)?.amount || 0}*`;
 
       if (pages.size === 0) {
