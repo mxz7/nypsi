@@ -242,7 +242,9 @@ export async function getSellMulti(member: GuildMember | string): Promise<number
   if (await isPassive(id)) multi -= 5;
 
   for (const boosterId of boosters.keys()) {
-    if (items[boosterId].boosterEffect.boosts.includes("sellmulti")) {
+    if (boosterId == "beginner_booster") {
+      multi += 50;
+    } else if (items[boosterId].boosterEffect.boosts.includes("sellmulti")) {
       multi += items[boosterId].boosterEffect.effect * boosters.get(boosterId).length;
     }
   }
