@@ -210,24 +210,24 @@ export async function getSellMulti(member: GuildMember | string): Promise<number
 
   const prestige = await getPrestige(member);
 
-  multi += prestige;
+  multi += Math.floor(prestige * 0.3);
 
   switch (await getTier(id)) {
     case 1:
-      multi += 5;
+      multi += 2;
       break;
     case 2:
-      multi += 10;
+      multi += 5;
       break;
     case 3:
-      multi += 15;
+      multi += 10;
       break;
     case 4:
-      multi += 20;
+      multi += 15;
       break;
   }
 
-  if (await isBooster(id)) multi += 5;
+  if (await isBooster(id)) multi += 3;
 
   const boosters = await getBoosters(id);
   const items = getItems();
@@ -237,9 +237,9 @@ export async function getSellMulti(member: GuildMember | string): Promise<number
     multi += guildUpgrades.find((i) => i.upgradeId === "sellmulti").amount * 5;
 
   if ((await getDmSettings(id)).voteReminder && !(await redis.sismember(Constants.redis.nypsi.VOTE_REMINDER_RECEIVED, id)))
-    multi += 3;
+    multi += 2;
 
-  if (await isPassive(id)) multi -= 10;
+  if (await isPassive(id)) multi -= 5;
 
   for (const boosterId of boosters.keys()) {
     if (items[boosterId].boosterEffect.boosts.includes("sellmulti")) {

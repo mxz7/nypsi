@@ -162,11 +162,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let amount = 1;
 
     if (gun == "terrible_gun") {
-      amount = Math.floor(Math.random() * 2) + 1;
+      amount = Math.floor(Math.random() * 1) + 1;
     } else if (gun == "gun") {
-      amount = Math.floor(Math.random() * 4) + 1;
+      amount = Math.floor(Math.random() * 3) + 1;
     } else if (gun == "incredible_gun") {
-      amount = Math.floor(Math.random() * 6) + 2;
+      amount = Math.floor(Math.random() * 5) + 1;
     }
 
     await addInventoryItem(message.member, chosen, amount);
