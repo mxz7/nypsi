@@ -4,7 +4,13 @@ import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { formatDate } from "../utils/functions/date";
-import { calcNetWorth, getBalance, getBankBalance, getMaxBankBalance, getMulti } from "../utils/functions/economy/balance";
+import {
+  calcNetWorth,
+  getBalance,
+  getBankBalance,
+  getGambleMulti,
+  getMaxBankBalance,
+} from "../utils/functions/economy/balance";
 import { getPrestige } from "../utils/functions/economy/prestige";
 import { topBalanceGlobal } from "../utils/functions/economy/top";
 import { isEcoBanned, userExists } from "../utils/functions/economy/utils";
@@ -200,7 +206,7 @@ async function showUser(message: Message, user: User) {
             **xp** ${(await getXp(user.id)).toLocaleString()}
             **voted** ${voted}
             **prestige** ${await getPrestige(user.id)}
-            **bonus** ${Math.floor((await getMulti(user.id)) * 100)}%`,
+            **bonus** ${Math.floor((await getGambleMulti(user.id)) * 100)}%`,
       true
     );
   }

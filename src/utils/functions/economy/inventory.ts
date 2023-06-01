@@ -13,7 +13,7 @@ import sleep from "../sleep";
 import { getTax } from "../tax";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { addProgress, getAllAchievements, setAchievementProgress } from "./achievements";
-import { getBalance, getMulti, updateBalance } from "./balance";
+import { getBalance, getSellMulti, updateBalance } from "./balance";
 import { createUser, getItems, userExists } from "./utils";
 import { getXp, updateXp } from "./xp";
 import ms = require("ms");
@@ -98,7 +98,7 @@ async function doAutosellThing(userId: string, itemId: string, amount: number): 
 
   let sellWorth = Math.floor(item.sell * amount);
 
-  const multi = await getMulti(userId);
+  const multi = await getSellMulti(userId);
 
   if (item.role == "fish" || item.role == "prey" || item.role == "sellable") {
     sellWorth = Math.floor(sellWorth + sellWorth * multi);

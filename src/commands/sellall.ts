@@ -11,7 +11,7 @@ import {
 import { inPlaceSort } from "fast-sort";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import { getBalance, getMulti, updateBalance } from "../utils/functions/economy/balance";
+import { getBalance, getSellMulti, updateBalance } from "../utils/functions/economy/balance";
 import { getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import PageManager from "../utils/functions/page";
@@ -82,7 +82,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   await addCooldown(cmd.name, message.member, 30);
 
-  const multi = await getMulti(message.member);
+  const multi = await getSellMulti(message.member);
 
   let total = 0;
   let taxedAmount = 0;
