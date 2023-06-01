@@ -1673,7 +1673,7 @@
     "items": [
       "money:1000000",
       "xp:100",
-      "id:calendar:50",
+      "id:calendar:35",
       "id:bob:60",
       "id:stolen_credit_card",
       "id:streak_token:50",
@@ -1709,7 +1709,7 @@
     "items": [
       "money:2500000",
       "xp:150",
-      "id:calendar:90",
+      "id:calendar:60",
       "id:bob",
       "id:lucky_7:40",
       "id:coffee:40",
