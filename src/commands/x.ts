@@ -120,7 +120,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     await fs.writeFile(
       file,
       `nypsi data for ${user?.username}#${user?.discriminator} (${user?.id}) requested by ${message.author.tag} ${
-        (message.author.id)
+        message.author.id
       } - ${new Date().toUTCString()}\n\n----------\nYOUR USER DATA\n----------\n\n`
     );
     await fs.appendFile(file, JSON.stringify(userData, null, 2));
