@@ -583,6 +583,9 @@ export async function calcNetWorth(member: GuildMember | string, breakdown = fal
       } else if (getItems()[item.item].sell) {
         worth += getItems()[item.item].sell * Number(item.amount);
         if (breakdown) breakdownItems.set(item.item, getItems()[item.item].sell * Number(item.amount));
+      } else {
+        worth += 1000 * Number(item.amount);
+        if (breakdown) breakdownItems.set(item.item, 1000 * Number(item.amount));
       }
     }
   }
