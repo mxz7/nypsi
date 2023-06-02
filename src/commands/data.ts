@@ -416,17 +416,21 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         },
       });
 
-      await prisma.economy.delete({
-        where: {
-          userId: message.author.id,
-        },
-      });
+      await prisma.economy
+        .delete({
+          where: {
+            userId: message.author.id,
+          },
+        })
+        .catch(() => {});
 
-      await prisma.premium.delete({
-        where: {
-          userId: message.author.id,
-        },
-      });
+      await prisma.premium
+        .delete({
+          where: {
+            userId: message.author.id,
+          },
+        })
+        .catch(() => {});
 
       await prisma.user.delete({
         where: {
