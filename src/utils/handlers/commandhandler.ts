@@ -940,7 +940,7 @@ export function logCommand(message: Message | (NypsiCommandInteraction & Command
     msg = `${message.guild.id} - ${message.author.tag}: ${content}`;
   }
 
-  logger.info(`::cmd ${msg}`);
+  logger.info(`::cmd ${msg}`, { userId: message.author.id, channelId: message.channelId });
 }
 
 export function addHourlyCommand(member: GuildMember) {
