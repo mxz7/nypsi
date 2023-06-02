@@ -7,7 +7,6 @@ import { percentChance } from "../random";
 import { getBalance, updateBalance } from "./balance";
 import { getBoosters } from "./boosters";
 import { addInventoryItem, gemBreak, getInventory } from "./inventory";
-import { getPrestige } from "./prestige";
 import { getBaseUpgrades, getBaseWorkers, getItems } from "./utils";
 
 export async function getWorkers(member: GuildMember | string) {
@@ -91,13 +90,6 @@ export async function calcWorkerValues(
   if (worker.workerId === "quarry") {
     scrapChance = 0.001;
     gemChance = 0.0001;
-    const prestige = await getPrestige(worker.userId);
-
-    for (let i = 0; i < (prestige > 50 ? 50 : prestige); i++) {
-      perIntervalBonus += i / 3.7;
-      perItemBonus += i / 3.5;
-      maxStoredBonus += i / 4;
-    }
   }
 
   for (const upgrade of worker.upgrades) {
