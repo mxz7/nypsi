@@ -822,7 +822,7 @@
     "longDesc": "prevent someone from robbing people",
     "rarity": 0,
     "role": "item",
-    "aliases": ["policescanner"],
+    "aliases": ["policescanner, policeradio, police"],
     "buy": 150000,
     "sell": 25000,
     "in_crates": true
