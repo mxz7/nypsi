@@ -101,8 +101,8 @@ export class CustomEmbed extends EmbedBuilder {
     return this;
   }
 
-  setHeader(text: string, image?: string) {
-    super.setAuthor({ name: text, iconURL: image });
+  setHeader(text: string, image?: string, url?: string) {
+    super.setAuthor({ name: text, iconURL: image, url });
 
     return this;
   }
