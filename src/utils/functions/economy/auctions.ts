@@ -398,7 +398,7 @@ async function checkWatchers(itemName: string, messageUrl: string, creatorId: st
   const users = await prisma.auctionWatch
     .findMany({
       where: {
-        AND: [{ itemId: itemName }, { userId: { not: creatorId } }, { maxCost: { gte: cost } }],
+        AND: [{ itemId: itemName }, { userId: { not: creatorId } }, { maxCost: { gte: Math.floor(cost) } }],
       },
       select: {
         userId: true,
