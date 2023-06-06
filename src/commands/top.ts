@@ -135,10 +135,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   await addCooldown(cmd.name, message.member, 5);
 
-  const show = async (pages: Map<number, string[]>, pos: number, title: string) => {
+  const show = async (pages: Map<number, string[]>, pos: number, title: string, url?: string) => {
     const embed = new CustomEmbed(message.member).setHeader(
       title,
-      title.includes("global") || title.includes("guild") ? message.guild.iconURL() : message.client.user.avatarURL()
+      title.includes("global") || title.includes("guild") ? message.guild.iconURL() : message.client.user.avatarURL(),
+      url
     );
 
     if (pages.size == 0) {
@@ -194,7 +195,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       data = await topPrestige(message.guild, message.author.id);
     }
 
-    return show(data.pages, data.pos, `top prestige ${global ? "[global]" : `for ${message.guild.name}`}`);
+    return show(
+      data.pages,
+      data.pos,
+      `top prestige ${global ? "[global]" : `for ${message.guild.name}`}`,
+      global ? "https://nypsi.xyz/leaderboard/prestige" : ""
+    );
   } else if (args[0].toLowerCase() == "item") {
     const items = getItems();
     const searchTag = args[1].toLowerCase();
@@ -234,7 +240,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       data = await topItem(message.guild, item.id, message.author.id);
     }
 
-    return show(data.pages, data.pos, `top ${item.name} ${global ? "[global]" : `for ${message.guild.name}`}`);
+    return show(
+      data.pages,
+      data.pos,
+      `top ${item.name} ${global ? "[global]" : `for ${message.guild.name}`}`,
+      global ? `https://nypsi.xyz/leaderboard/${item.id}` : ""
+    );
   } else if (args[0].toLowerCase() == "completion") {
     const data = await topCompletion(message.guild, message.author.id);
 
@@ -252,7 +263,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       data = await topNetWorth(message.guild, message.author.id);
     }
 
-    return show(data.pages, data.pos, `top net worth ${global ? "[global]" : `for ${message.guild.name}`}`);
+    return show(
+      data.pages,
+      data.pos,
+      `top net worth ${global ? "[global]" : `for ${message.guild.name}`}`,
+      global ? "https://nypsi.xyz/leaderboard/networth" : ""
+    );
   } else if (args[0].toLowerCase().includes("guild")) {
     const userGuild = await getGuildByUser(message.member);
 
@@ -272,7 +288,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       data = await topDailyStreak(message.guild, message.author.id);
     }
 
-    return show(data.pages, data.pos, `top daily streak ${global ? "[global]" : `for ${message.guild.name}`}`);
+    return show(
+      data.pages,
+      data.pos,
+      `top daily streak ${global ? "[global]" : `for ${message.guild.name}`}`,
+      global ? "https://nypsi.xyz/leaderboard/streak" : ""
+    );
   } else {
     const selected =
       selectItem(args.join(" ")) || selectItem(args.slice(0, args.length - 1).join(" ")) || selectItem(args[0]);
