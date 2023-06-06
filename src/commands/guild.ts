@@ -829,12 +829,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     for (const upgrade of Object.values(upgrades)) {
       const name = upgrade.id;
       const value =
-        `**${upgrade.name}**\n` +
+        `**${upgrade.name}** (${guild.upgrades.find((i) => i.upgradeId)?.amount || 0})\n` +
         `*${upgrade.description}*\n` +
         `**cost** ${
           upgrade.cost + (guild.upgrades.find((i) => i.upgradeId)?.amount || 0) * upgrade.increment_per_level
-        } tokens\n` +
-        `*you have ${guild.upgrades.find((i) => i.upgradeId)?.amount || 0}*`;
+        } tokens`;
 
       if (pages.size === 0) {
         pages.set(1, [{ name, value, inline: true }]);
@@ -853,7 +852,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const embed = new CustomEmbed(message.member)
       .setHeader(`${guild.guildName} upgrades`, message.author.avatarURL())
-      .setFields(...pages.get(1));
+      .setFields(...pages.get(1))
+      .setFooter({ text: `you have ${guild.tokens} tokens` });
 
     if (pages.size === 1) return send({ embeds: [embed] });
 
