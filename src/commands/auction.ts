@@ -41,6 +41,7 @@ import { getTier, isPremium } from "../utils/functions/premium/premium";
 import requestDM from "../utils/functions/requestdm";
 import { getDmSettings } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import { logger } from "../utils/logger";
 
 const cmd = new Command("auction", "create and manage your item auctions", "money").setAliases(["ah"]);
 
@@ -600,6 +601,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     });
 
     if (!auction) return message.channel.send({ embeds: [new ErrorEmbed("invalid auction bro")] });
+
+    logger.info(`admin: ${message.author.tag} (${message.author.id}) deleted auction`, auction);
 
     if (auction.sold) {
       await prisma.auction.delete({
