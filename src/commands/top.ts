@@ -312,7 +312,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       data = await topItem(message.guild, selected.id, message.author.id);
     }
 
-    return show(data.pages, data.pos, `top ${selected.name} ${global ? "[global]" : `for ${message.guild.name}`}`);
+    return show(
+      data.pages,
+      data.pos,
+      `top ${selected.name} ${global ? "[global]" : `for ${message.guild.name}`}`,
+      global ? `https://nypsi.xyz/leaderboard/${selected.id}` : ""
+    );
   }
 }
 
