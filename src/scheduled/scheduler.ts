@@ -78,6 +78,10 @@ const bree = new Bree({
       name: "topsnapshot",
       interval: "at 2:00am",
     },
+    {
+      name: "purgelogs",
+      interval: "0 3 1 * *",
+    },
   ],
 });
 
