@@ -1810,11 +1810,11 @@
     "aliases": ["cscratch", "cscratchie", "cornershop"],
     "rarity": 69,
     "in_crates": false,
-    "buy": 450000,
+    "buy": 250000,
     "sell": 50000,
     "clicks": 4,
     "items": [
-      "money:600000",
+      "money:500000",
       "xp:100",
       "id:lawyer",
       "id:diamond",
