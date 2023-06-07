@@ -296,6 +296,8 @@ export async function bumpAuction(id: number, client: NypsiClient) {
     },
   });
 
+  checkWatchers(query.itemId, messageUrl, query.ownerId, Math.floor(Number(query.bin / query.itemAmount)))
+
   return messageUrl;
 }
 
