@@ -12,13 +12,6 @@
   },
   "plugins": ["@typescript-eslint", "deprecation"],
   "rules": {
-    // "no-unused-vars": "error",
-    // "jsdoc/no-undefined-types": 1,
-    "indent": "off",
-    "linebreak-style": "off",
-    "quotes": ["error", "double"],
-    "semi": "off",
-    "@typescript-eslint/semi": ["off"],
     "no-unreachable": "error",
     "no-case-declarations": "off",
     "@typescript-eslint/no-explicit-any": "off",
