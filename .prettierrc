@@ -1,5 +1,6 @@
 {
   "printWidth": 125,
   "tabWidth": 2,
-  "endOfLine": "lf"
+  "endOfLine": "lf",
+  "plugins": ["prettier-plugin-organize-imports"]
 }
