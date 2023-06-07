@@ -176,8 +176,6 @@ export async function addInventoryItem(
     },
   });
 
-  if (itemId.endsWith("gem")) logger.debug(`${id} received: ${itemId}`);
-
   await redis.del(`${Constants.redis.cache.economy.INVENTORY}:${id}`);
 
   setTimeout(async () => {
