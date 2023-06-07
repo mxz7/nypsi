@@ -598,7 +598,7 @@ export async function buyFullAuction(interaction: ButtonInteraction, auction: Au
     addStat(auction.ownerId, "auction-sold-items", Number(auction.itemAmount)),
   ]);
 
-  logger.debug(`auction full sold owner: ${auction.ownerId} - ${auction.itemId} to ${interaction.user.id}`);
+  logger.info(`auction full sold owner: ${auction.ownerId} - ${auction.itemId} to ${interaction.user.id}`);
 
   transaction(
     await interaction.client.users.fetch(auction.ownerId),
@@ -781,6 +781,8 @@ export async function buyAuctionOne(interaction: ButtonInteraction, auction: Auc
     addStat(interaction.user.id, "auction-bought-items"),
     addStat(auction.ownerId, "auction-sold-items"),
   ]);
+
+  logger.info(`auction one sold owner: ${auction.ownerId} - ${auction.itemId} to ${interaction.user.id}`);
 
   transaction(await interaction.client.users.fetch(auction.ownerId), interaction.user, `${auction.itemId} x ${1} (auction)`);
   transaction(
