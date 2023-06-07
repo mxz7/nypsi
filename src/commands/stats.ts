@@ -478,9 +478,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           `you have created **${
             stats.find((i) => i.itemId === "auction-created")?.amount.toLocaleString() || 0
           }** auctions and sold **${
-            stats.find((i) => i.itemId === "auction-sold")?.amount.toLocaleString() || 0
+            stats.find((i) => i.itemId === "auction-sold-items")?.amount.toLocaleString() || 0
           }** items\n\nyou have bought **${
-            stats.find((i) => i.itemId === "auction-bought")?.amount.toLocaleString() || 0
+            stats.find((i) => i.itemId === "auction-bought-items")?.amount.toLocaleString() || 0
           }** items through auctions`
         ),
       ],
