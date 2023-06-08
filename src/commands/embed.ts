@@ -4,9 +4,14 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
 import { getPrefix } from "../utils/functions/guilds/utils";
 
-const cmd = new Command("embed", "create an embed message", "utility").setPermissions(["MANAGE_MESSAGES"]);
+const cmd = new Command("embed", "create an embed message", "utility").setPermissions([
+  "MANAGE_MESSAGES",
+]);
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[]
+) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
     return;
   }
@@ -17,7 +22,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const embed = new CustomEmbed(message.member)
       .setHeader("embed help")
       .addField("usage", `${prefix}embed <title> | (text) | (hex color)`)
-      .addField("help", "with this command you can create a simple embed message\n" + "**<>** required | **()** optional\n")
+      .addField(
+        "help",
+        "with this command you can create a simple embed message\n" +
+          "**<>** required | **()** optional\n"
+      )
       .addField(
         "examples",
         `${prefix}embed hello\n` +
@@ -51,7 +60,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (!(message instanceof Message)) return;
 
-  if (message.author.id != Constants.TEKOH_ID) embed.setFooter({ text: `sent by: ${message.author.tag}` });
+  if (message.author.id != Constants.TEKOH_ID)
+    embed.setFooter({ text: `sent by: ${message.author.tag}` });
 
   message.channel
     .send({ embeds: [embed] })

@@ -1,6 +1,12 @@
 import * as topgg from "@top-gg/sdk";
 import { ClusterManager } from "discord-hybrid-sharding";
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder, WebhookClient } from "discord.js";
+import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  MessageActionRowComponentBuilder,
+  WebhookClient,
+} from "discord.js";
 import * as express from "express";
 import prisma from "../../init/database";
 import redis from "../../init/redis";
@@ -13,13 +19,30 @@ import { getBalance, updateBalance } from "../functions/economy/balance";
 import { addBooster } from "../functions/economy/boosters";
 import { addInventoryItem } from "../functions/economy/inventory";
 import { getPrestige } from "../functions/economy/prestige";
-import { addTicket, getItems, getTickets, isEcoBanned, loadItems, userExists } from "../functions/economy/utils";
+import {
+  addTicket,
+  getItems,
+  getTickets,
+  isEcoBanned,
+  loadItems,
+  userExists,
+} from "../functions/economy/utils";
 import { addKarma } from "../functions/karma/karma";
-import { addMember, getPremiumProfile, isPremium, renewUser, setTier } from "../functions/premium/premium";
+import {
+  addMember,
+  getPremiumProfile,
+  isPremium,
+  renewUser,
+  setTier,
+} from "../functions/premium/premium";
 import { percentChance } from "../functions/random";
 import requestDM from "../functions/requestdm";
 import { isUserBlacklisted } from "../functions/users/blacklist";
-import { addNotificationToQueue, getDmSettings, getPreferences } from "../functions/users/notifications";
+import {
+  addNotificationToQueue,
+  getDmSettings,
+  getPreferences,
+} from "../functions/users/notifications";
 import { logger } from "../logger";
 import ms = require("ms");
 
@@ -77,9 +100,11 @@ export function listen(manager: ClusterManager) {
     const total = Object.values(await redis.hgetall(Constants.redis.nypsi.TOP_COMMANDS))
       .map((i) => parseInt(i))
       .reduce((a, b) => a + b);
-    const users = Object.entries(await redis.hgetall(Constants.redis.nypsi.TOP_COMMANDS_USER)).map((i) => {
-      return { user: i[0].split("#")[0], amount: parseInt(i[1]) };
-    });
+    const users = Object.entries(await redis.hgetall(Constants.redis.nypsi.TOP_COMMANDS_USER)).map(
+      (i) => {
+        return { user: i[0].split("#")[0], amount: parseInt(i[1]) };
+      }
+    );
 
     return response.status(200).send(JSON.stringify({ total, users }));
   });
@@ -178,7 +203,9 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
         memberId: user,
         payload: {
           embed: new CustomEmbed()
-            .setDescription(`${getItems()["blue_gem"].emoji} you've found a gem! i wonder what powers it holds...`)
+            .setDescription(
+              `${getItems()["blue_gem"].emoji} you've found a gem! i wonder what powers it holds...`
+            )
             .setTitle("you've found a gem")
             .setColor(Constants.TRANSPARENT_EMBED_COLOR),
         },
@@ -209,7 +236,10 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
     }
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder().setLabel("open crates").setCustomId("vote-crates").setStyle(ButtonStyle.Success)
+      new ButtonBuilder()
+        .setLabel("open crates")
+        .setCustomId("vote-crates")
+        .setStyle(ButtonStyle.Success)
     );
 
     const res = await requestDM({
@@ -233,7 +263,11 @@ async function handleKofiData(data: KofiResponse) {
     },
   });
 
-  logger.info(`received kofi purchase for email: ${data.email} item ${data.tier_name || JSON.stringify(data.shop_items)}`);
+  logger.info(
+    `received kofi purchase for email: ${data.email} item ${
+      data.tier_name || JSON.stringify(data.shop_items)
+    }`
+  );
 
   if (data.shop_items && data.shop_items.length > 0) {
     for (const shopItem of data.shop_items) {
@@ -260,7 +294,9 @@ async function handleKofiData(data: KofiResponse) {
               payload: {
                 content: "thank you for your purchase",
                 embed: new CustomEmbed()
-                  .setDescription(`you have received 1 ${getItems()[item].emoji} **${getItems()[item].name}**`)
+                  .setDescription(
+                    `you have received 1 ${getItems()[item].emoji} **${getItems()[item].name}**`
+                  )
                   .setColor(Constants.TRANSPARENT_EMBED_COLOR),
               },
             };
@@ -293,7 +329,11 @@ async function handleKofiData(data: KofiResponse) {
                 memberId: user.id,
                 payload: {
                   embed: new CustomEmbed()
-                    .setDescription(`${getItems()["pink_gem"].emoji} you've found a gem! i wonder what powers it holds...`)
+                    .setDescription(
+                      `${
+                        getItems()["pink_gem"].emoji
+                      } you've found a gem! i wonder what powers it holds...`
+                    )
                     .setTitle("you've found a gem")
                     .setColor(Constants.TRANSPARENT_EMBED_COLOR),
                 },
@@ -308,7 +348,11 @@ async function handleKofiData(data: KofiResponse) {
                 memberId: user.id,
                 payload: {
                   embed: new CustomEmbed()
-                    .setDescription(`${getItems()["blue_gem"].emoji} you've found a gem! i wonder what powers it holds...`)
+                    .setDescription(
+                      `${
+                        getItems()["blue_gem"].emoji
+                      } you've found a gem! i wonder what powers it holds...`
+                    )
                     .setTitle("you've found a gem")
                     .setColor(Constants.TRANSPARENT_EMBED_COLOR),
                 },
@@ -323,7 +367,11 @@ async function handleKofiData(data: KofiResponse) {
                 memberId: user.id,
                 payload: {
                   embed: new CustomEmbed()
-                    .setDescription(`${getItems()["purple_gem"].emoji} you've found a gem! i wonder what powers it holds...`)
+                    .setDescription(
+                      `${
+                        getItems()["purple_gem"].emoji
+                      } you've found a gem! i wonder what powers it holds...`
+                    )
                     .setTitle("you've found a gem"),
                 },
               });
@@ -337,7 +385,11 @@ async function handleKofiData(data: KofiResponse) {
                 memberId: user.id,
                 payload: {
                   embed: new CustomEmbed()
-                    .setDescription(`${getItems()["green_gem"].emoji} you've found a gem! i wonder what powers it holds...`)
+                    .setDescription(
+                      `${
+                        getItems()["green_gem"].emoji
+                      } you've found a gem! i wonder what powers it holds...`
+                    )
                     .setTitle("you've found a gem")
                     .setColor(Constants.TRANSPARENT_EMBED_COLOR),
                 },
@@ -354,7 +406,11 @@ async function handleKofiData(data: KofiResponse) {
                 memberId: user.id,
                 payload: {
                   embed: new CustomEmbed()
-                    .setDescription(`${getItems()["white_gem"].emoji} you've found a gem! i wonder what powers it holds...`)
+                    .setDescription(
+                      `${
+                        getItems()["white_gem"].emoji
+                      } you've found a gem! i wonder what powers it holds...`
+                    )
                     .setTitle("you've found a gem")
                     .setColor(Constants.TRANSPARENT_EMBED_COLOR),
                 },
@@ -400,7 +456,10 @@ async function handleKofiData(data: KofiResponse) {
             const hook = new WebhookClient({ url: process.env.THANKYOU_HOOK });
             await hook.send({
               embeds: [
-                new CustomEmbed(null, `${user.lastKnownTag.split("#")[0]} just bought **${item}**!!!!`).setFooter({
+                new CustomEmbed(
+                  null,
+                  `${user.lastKnownTag.split("#")[0]} just bought **${item}**!!!!`
+                ).setFooter({
                   text: "thank you for your purchase (:",
                 }),
               ],
@@ -416,7 +475,10 @@ async function handleKofiData(data: KofiResponse) {
           const hook = new WebhookClient({ url: process.env.THANKYOU_HOOK });
           await hook.send({
             embeds: [
-              new CustomEmbed(null, `${user.lastKnownTag.split("#")[0]} just bought **${item}**!!!!`).setFooter({
+              new CustomEmbed(
+                null,
+                `${user.lastKnownTag.split("#")[0]} just bought **${item}**!!!!`
+              ).setFooter({
                 text: "thank you for your purchase (:",
               }),
             ],

@@ -10,7 +10,13 @@ import sleep from "../sleep";
 import { getZeroWidth } from "../string";
 import { addToNypsiBank, getTax } from "../tax";
 import { getBlacklisted } from "./blacklisted";
-import { add2ndPlace, add3rdPlace, addWin, createReactionStatsProfile, hasReactionStatsProfile } from "./stats";
+import {
+  add2ndPlace,
+  add3rdPlace,
+  addWin,
+  createReactionStatsProfile,
+  hasReactionStatsProfile,
+} from "./stats";
 import { currentChannels, getReactionSettings } from "./utils";
 import { getWords } from "./words";
 
@@ -123,7 +129,8 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel) 
 
     winnersIDs.push(message.author.id);
 
-    if (!(await hasReactionStatsProfile(guild, message.member))) await createReactionStatsProfile(guild, message.member);
+    if (!(await hasReactionStatsProfile(guild, message.member)))
+      await createReactionStatsProfile(guild, message.member);
 
     switch (winnersList.length) {
       case 1:
@@ -180,9 +187,10 @@ export async function startChatReactionDuel(
   const countdownMsg = await channel
     .send({
       embeds: [
-        new CustomEmbed(challenger, `**wager** $${wager.toLocaleString()}\n\nstarting in 3 seconds`).setHeader(
-          `${challenger.user.username} vs ${target.user.username}`
-        ),
+        new CustomEmbed(
+          challenger,
+          `**wager** $${wager.toLocaleString()}\n\nstarting in 3 seconds`
+        ).setHeader(`${challenger.user.username} vs ${target.user.username}`),
       ],
     })
     .catch(() => {});
@@ -193,9 +201,10 @@ export async function startChatReactionDuel(
     await countdownMsg
       .edit({
         embeds: [
-          new CustomEmbed(challenger, `**wager** $${wager.toLocaleString()}\n\nstarting in 2 seconds`).setHeader(
-            `${challenger.user.username} vs ${target.user.username}`
-          ),
+          new CustomEmbed(
+            challenger,
+            `**wager** $${wager.toLocaleString()}\n\nstarting in 2 seconds`
+          ).setHeader(`${challenger.user.username} vs ${target.user.username}`),
         ],
       })
       .catch(() => {});
@@ -206,9 +215,10 @@ export async function startChatReactionDuel(
     await countdownMsg
       .edit({
         embeds: [
-          new CustomEmbed(challenger, `**wager** $${wager.toLocaleString()}\n\nstarting in 1 second`).setHeader(
-            `${challenger.user.username} vs ${target.user.username}`
-          ),
+          new CustomEmbed(
+            challenger,
+            `**wager** $${wager.toLocaleString()}\n\nstarting in 1 second`
+          ).setHeader(`${challenger.user.username} vs ${target.user.username}`),
         ],
       })
       .catch(() => {});
@@ -218,7 +228,9 @@ export async function startChatReactionDuel(
   const embed = new CustomEmbed().setColor(Constants.EMBED_SUCCESS_COLOR);
 
   embed.setHeader(`${challenger.user.username} vs ${target.user.username}`);
-  embed.setDescription(`${wager > 0 ? ` **wager** $${wager.toLocaleString()}\n\n` : ""}type: \`${word.display}\``);
+  embed.setDescription(
+    `${wager > 0 ? ` **wager** $${wager.toLocaleString()}\n\n` : ""}type: \`${word.display}\``
+  );
 
   if (countdownMsg && countdownMsg.deletable) await countdownMsg.delete().catch(() => {});
 
@@ -270,7 +282,9 @@ export async function startChatReactionDuel(
   embed.addField(
     "winner",
     `🏅 ${winningMessage.author.toString()} in \`${winTime}s\`${
-      winnings > 0 ? `\n\n+$**${winnings.toLocaleString()}**${tax ? ` (${(tax * 100).toFixed(1)}% tax)` : ""}` : ""
+      winnings > 0
+        ? `\n\n+$**${winnings.toLocaleString()}**${tax ? ` (${(tax * 100).toFixed(1)}% tax)` : ""}`
+        : ""
     }`
   );
 
@@ -280,7 +294,9 @@ export async function startChatReactionDuel(
     bet: wager,
     game: "chatreactionduel",
     outcome: `${winningMessage.author.username} won in ${winTime}s vs ${
-      winningMessage.author.id === challenger.user.id ? target.user.username : challenger.user.username
+      winningMessage.author.id === challenger.user.id
+        ? target.user.username
+        : challenger.user.username
     }\nword: ${word.actual}`,
     userId: challenger.user.id,
     win: winningMessage.author.id === challenger.user.id,

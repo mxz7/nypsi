@@ -7,7 +7,10 @@ import { getNews, setNews } from "../utils/functions/news";
 
 const cmd = new Command("news", "set the news for the help command", "info");
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[]
+) {
   if (args.length == 0 || message.member.user.id != Constants.TEKOH_ID) {
     const news = await getNews();
 

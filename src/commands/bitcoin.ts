@@ -4,7 +4,11 @@ import { CustomEmbed } from "../models/EmbedBuilders";
 import { getInventory } from "../utils/functions/economy/inventory";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 
-const cmd = new Command("bitcoin", "view the current bitcoin value (reflects real life USD)", "money").setAliases(["btc"]);
+const cmd = new Command(
+  "bitcoin",
+  "view the current bitcoin value (reflects real life USD)",
+  "money"
+).setAliases(["btc"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
   if (!(await userExists(message.member))) await createUser(message.member);

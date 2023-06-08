@@ -6,7 +6,10 @@ import { logger } from "../utils/logger";
 
 const cmd = new Command("captchatest", "test an account", "none");
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[]
+) {
   if ((await getAdminLevel(message.author.id)) < 1) return;
 
   if (args.length == 0) {

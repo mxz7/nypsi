@@ -13,7 +13,9 @@ export async function hasProfile(member: GuildMember | string) {
   }
 
   if (await redis.exists(`${Constants.redis.cache.user.EXISTS}:${id}`)) {
-    return (await redis.get(`${Constants.redis.cache.user.EXISTS}:${id}`)) === "true" ? true : false;
+    return (await redis.get(`${Constants.redis.cache.user.EXISTS}:${id}`)) === "true"
+      ? true
+      : false;
   }
 
   const query = await prisma.user.findUnique({
@@ -27,11 +29,17 @@ export async function hasProfile(member: GuildMember | string) {
 
   if (query) {
     await redis.set(`${Constants.redis.cache.user.EXISTS}:${id}`, "true");
-    await redis.expire(`${Constants.redis.cache.user.EXISTS}:${id}`, Math.floor(ms("24 hour") / 1000));
+    await redis.expire(
+      `${Constants.redis.cache.user.EXISTS}:${id}`,
+      Math.floor(ms("24 hour") / 1000)
+    );
     return true;
   } else {
     await redis.set(`${Constants.redis.cache.user.EXISTS}:${id}`, "false");
-    await redis.expire(`${Constants.redis.cache.user.EXISTS}:${id}`, Math.floor(ms("24 hour") / 1000));
+    await redis.expire(
+      `${Constants.redis.cache.user.EXISTS}:${id}`,
+      Math.floor(ms("24 hour") / 1000)
+    );
     return false;
   }
 }

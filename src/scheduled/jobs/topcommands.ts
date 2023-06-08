@@ -51,7 +51,9 @@ import Constants from "../../utils/Constants";
   embed.setTitle("top 10 commands");
   embed.setDescription(msg.join("\n"));
   embed.setColor(variants.latte.base.hex as ColorResolvable);
-  embed.setFooter({ text: `${users[0]} has no life (${parseInt(topUsers[users[0]]).toLocaleString()} commands)` });
+  embed.setFooter({
+    text: `${users[0]} has no life (${parseInt(topUsers[users[0]]).toLocaleString()} commands)`,
+  });
 
   const hook = new WebhookClient({ url: process.env.TOPCOMMANDS_HOOK });
 

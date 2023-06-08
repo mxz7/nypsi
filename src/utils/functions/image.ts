@@ -34,7 +34,10 @@ export function isImageUrl(url: string): boolean {
   return /\.(jpg|jpeg|png|webp|avif|gif|svg)$/.test(url);
 }
 
-export async function redditImage(post: RedditJSONPost, allowed: RedditJSONPost[]): Promise<string> {
+export async function redditImage(
+  post: RedditJSONPost,
+  allowed: RedditJSONPost[]
+): Promise<string> {
   let image = post.data.url;
 
   if (image.includes("imgur.com/a/")) {
@@ -51,7 +54,9 @@ export async function redditImage(post: RedditJSONPost, allowed: RedditJSONPost[
   }
 
   if (image.includes("gfycat")) {
-    const link = await fetch("https://api.gfycat.com/v1/gfycats/" + image.split("/")[3]).then((url) => url.json());
+    const link = await fetch("https://api.gfycat.com/v1/gfycats/" + image.split("/")[3]).then(
+      (url) => url.json()
+    );
 
     if (link.gfyItem) {
       image = link.gfyItem.max5mbGif;
@@ -87,7 +92,9 @@ export async function redditImage(post: RedditJSONPost, allowed: RedditJSONPost[
     }
 
     if (image.includes("gfycat")) {
-      const link = await fetch("https://api.gfycat.com/v1/gfycats/" + image.split("/")[3]).then((url) => url.json());
+      const link = await fetch("https://api.gfycat.com/v1/gfycats/" + image.split("/")[3]).then(
+        (url) => url.json()
+      );
 
       if (link) {
         image = link.gfyItem.max5mbGif;
@@ -119,7 +126,10 @@ export async function redditImage(post: RedditJSONPost, allowed: RedditJSONPost[
   return image + "|" + title + "|" + post.data.permalink + "|" + post.data.author;
 }
 
-export async function suggestWholesomeImage(submitter: GuildMember, image: string): Promise<boolean> {
+export async function suggestWholesomeImage(
+  submitter: GuildMember,
+  image: string
+): Promise<boolean> {
   const query1 = await prisma.wholesomeImage.findUnique({
     where: {
       image: image,
@@ -159,7 +169,9 @@ export async function suggestWholesomeImage(submitter: GuildMember, image: strin
     .setColor(variants.latte.base.hex as ColorResolvable)
     .setTitle("wholesome suggestion #" + id);
 
-  embed.setDescription(`**submitter** ${submitter.user.tag} (${submitter.user.id})\n**url** ${image}`);
+  embed.setDescription(
+    `**submitter** ${submitter.user.tag} (${submitter.user.id})\n**url** ${image}`
+  );
 
   embed.setFooter({ text: "$ws review" });
 
@@ -173,7 +185,11 @@ export async function suggestWholesomeImage(submitter: GuildMember, image: strin
   return true;
 }
 
-export async function acceptWholesomeImage(id: number, accepter: GuildMember, client: NypsiClient): Promise<boolean> {
+export async function acceptWholesomeImage(
+  id: number,
+  accepter: GuildMember,
+  client: NypsiClient
+): Promise<boolean> {
   const query = await prisma.wholesomeSuggestion.findUnique({
     where: {
       id: id,
@@ -330,9 +346,9 @@ export async function uploadImageToImgur(url: string): Promise<string> {
 }
 
 export async function fallbackUpload(url: string): Promise<string> {
-  const res = await fetch(`https://api.imgbb.com/1/upload?key=${process.env.IMGBB_TOKEN}&image=${url}`).then((res) =>
-    res.json()
-  );
+  const res = await fetch(
+    `https://api.imgbb.com/1/upload?key=${process.env.IMGBB_TOKEN}&image=${url}`
+  ).then((res) => res.json());
 
   return res.data.url;
 }

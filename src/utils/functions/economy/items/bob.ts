@@ -1,4 +1,9 @@
-import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
+import {
+  BaseMessageOptions,
+  CommandInteraction,
+  InteractionReplyOptions,
+  Message,
+} from "discord.js";
 import prisma from "../../../../init/database";
 import { NypsiCommandInteraction } from "../../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
@@ -54,24 +59,31 @@ module.exports = new ItemUse(
       },
     });
 
-    if (crafting.length < 1) return send({ embeds: [new ErrorEmbed("you are not currently crafting anything")] });
+    if (crafting.length < 1)
+      return send({ embeds: [new ErrorEmbed("you are not currently crafting anything")] });
 
     const inventory = await getInventory(message.member, false);
 
     let amount = 1;
 
-    if (args[1] && args[1].toLowerCase() === "all") args[1] = inventory.find((i) => i.item === "bob").amount.toString();
+    if (args[1] && args[1].toLowerCase() === "all")
+      args[1] = inventory.find((i) => i.item === "bob").amount.toString();
 
     if (args[1]) {
       amount = formatNumber(args[1]);
     }
 
-    if (!amount || isNaN(amount) || amount < 1) return send({ embeds: [new ErrorEmbed("invalid amount")] });
+    if (!amount || isNaN(amount) || amount < 1)
+      return send({ embeds: [new ErrorEmbed("invalid amount")] });
 
     if (inventory.find((i) => i.item === "bob").amount < amount)
       return send({ embeds: [new ErrorEmbed("you dont have this many bobs")] });
 
-    await setInventoryItem(message.member, "bob", inventory.find((i) => i.item === "bob").amount - amount);
+    await setInventoryItem(
+      message.member,
+      "bob",
+      inventory.find((i) => i.item === "bob").amount - amount
+    );
 
     const breakdown: string[] = [];
 
@@ -81,9 +93,11 @@ module.exports = new ItemUse(
       if (Date.now() > newDate.getTime()) newDate = dayjs().add(1, "second").toDate();
 
       breakdown.push(
-        `\`${item.amount.toLocaleString()}x\` ${getItems()[item.itemId].emoji} ${getItems()[item.itemId].name}: \`${MStoTime(
-          item.finished.getTime() - Date.now()
-        )}\` → \`${MStoTime(newDate.getTime() - Date.now())}\``
+        `\`${item.amount.toLocaleString()}x\` ${getItems()[item.itemId].emoji} ${
+          getItems()[item.itemId].name
+        }: \`${MStoTime(item.finished.getTime() - Date.now())}\` → \`${MStoTime(
+          newDate.getTime() - Date.now()
+        )}\``
       );
 
       await prisma.crafting.update({
@@ -97,7 +111,9 @@ module.exports = new ItemUse(
     }
 
     const msg = await send({
-      embeds: [new CustomEmbed(message.member, "<:nypsi_bob:1078776552067694672> sending bob to work...")],
+      embeds: [
+        new CustomEmbed(message.member, "<:nypsi_bob:1078776552067694672> sending bob to work..."),
+      ],
     });
 
     await sleep(2000);
@@ -106,9 +122,9 @@ module.exports = new ItemUse(
       embeds: [
         new CustomEmbed(
           message.member,
-          `<:nypsi_bob:1078776552067694672> bob has removed ${amount} hour${amount > 1 ? "s" : ""} of crafting time from ${
-            crafting.length
-          } items\n\n${breakdown.join("\n")}`
+          `<:nypsi_bob:1078776552067694672> bob has removed ${amount} hour${
+            amount > 1 ? "s" : ""
+          } of crafting time from ${crafting.length} items\n\n${breakdown.join("\n")}`
         ),
       ],
     });

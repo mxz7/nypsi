@@ -28,7 +28,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   doBake(message);
 }
 
-async function doBake(message: Message | (NypsiCommandInteraction & CommandInteraction) | ButtonInteraction) {
+async function doBake(
+  message: Message | (NypsiCommandInteraction & CommandInteraction) | ButtonInteraction
+) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       let usedNewMessage = false;
@@ -76,30 +78,49 @@ async function doBake(message: Message | (NypsiCommandInteraction & CommandInter
   let hasFurnace = false;
   let hasCoal = false;
 
-  if (inventory.find((i) => i.item == "furnace") && inventory.find((i) => i.item == "furnace").amount > 0) {
+  if (
+    inventory.find((i) => i.item == "furnace") &&
+    inventory.find((i) => i.item == "furnace").amount > 0
+  ) {
     hasFurnace = true;
   }
 
-  if (inventory.find((i) => i.item == "coal") && inventory.find((i) => i.item == "coal").amount > 0) {
+  if (
+    inventory.find((i) => i.item == "coal") &&
+    inventory.find((i) => i.item == "coal").amount > 0
+  ) {
     hasCoal = true;
   }
 
   if (!hasFurnace) {
     return send({
-      embeds: [new ErrorEmbed("you need a furnace to bake. furnaces can be found in crates or bought from the shop")],
+      embeds: [
+        new ErrorEmbed(
+          "you need a furnace to bake. furnaces can be found in crates or bought from the shop"
+        ),
+      ],
       ephemeral: true,
     });
   }
 
   if (!hasCoal) {
     return send({
-      embeds: [new ErrorEmbed("you need coal to bake. coal can be found when mining or bought from the shop")],
+      embeds: [
+        new ErrorEmbed(
+          "you need coal to bake. coal can be found when mining or bought from the shop"
+        ),
+      ],
       ephemeral: true,
     });
   }
 
   await addCooldown(cmd.name, member, 120);
-  await setInventoryItem(member, "coal", inventory.find((i) => i.item === "coal").amount - 1, false);
+  await setInventoryItem(
+    member,
+    "coal",
+    inventory.find((i) => i.item === "coal").amount - 1,
+    false
+  );
 
   const response = await runBakery(member);
 

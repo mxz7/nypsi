@@ -16,7 +16,10 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 
 const cmd = new Command("cars", "view the current cars available", "money").setAliases(["car"]);
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[]
+) {
   if (await onCooldown(cmd.name, message.member)) {
     const embed = await getResponse(cmd.name, message.member);
 
@@ -57,7 +60,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (items[item].role != "car") continue;
     totalCars++;
 
-    if (inventory.find((i) => i.item == item) && inventory.find((i) => i.item == item).amount > 0) totalOwned++;
+    if (inventory.find((i) => i.item == item) && inventory.find((i) => i.item == item).amount > 0)
+      totalOwned++;
 
     if (pageOfItems.length == 6) {
       pages.push(pageOfItems);
@@ -85,17 +89,27 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let owned = false;
     const item = items[i];
 
-    if (inventory.find((i) => i.item == item.id) && inventory.find((i) => i.item == item.id).amount > 0) owned = true;
+    if (
+      inventory.find((i) => i.item == item.id) &&
+      inventory.find((i) => i.item == item.id).amount > 0
+    )
+      owned = true;
 
     embed.addField(
       item.id,
-      `${item.emoji} **${item.name}**\n${item.longDesc}\n**speed** ${item.speed}${owned ? "\n*owned*" : ""}`,
+      `${item.emoji} **${item.name}**\n${item.longDesc}\n**speed** ${item.speed}${
+        owned ? "\n*owned*" : ""
+      }`,
       true
     );
   }
 
   let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
+    new ButtonBuilder()
+      .setCustomId("⬅")
+      .setLabel("back")
+      .setStyle(ButtonStyle.Primary)
+      .setDisabled(true),
     new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
   );
 
@@ -125,7 +139,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           await msg.edit({ components: [] });
         });
 
-      const newEmbed = new CustomEmbed(message.member).setHeader("car magazine", message.author.avatarURL());
+      const newEmbed = new CustomEmbed(message.member).setHeader(
+        "car magazine",
+        message.author.avatarURL()
+      );
 
       if (!reaction) return;
 
@@ -138,12 +155,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             let owned = false;
             const item = items[i];
 
-            if (inventory.find((i) => i.item == item.id) && inventory.find((i) => i.item == item.id).amount > 0)
+            if (
+              inventory.find((i) => i.item == item.id) &&
+              inventory.find((i) => i.item == item.id).amount > 0
+            )
               owned = true;
 
             newEmbed.addField(
               item.id,
-              `${item.emoji} **${item.name}**\n${item.longDesc}\n**speed** ${item.speed}${owned ? "\n*owned*" : ""}`,
+              `${item.emoji} **${item.name}**\n${item.longDesc}\n**speed** ${item.speed}${
+                owned ? "\n*owned*" : ""
+              }`,
               true
             );
           }
@@ -152,13 +174,29 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           });
           if (currentPage == 0) {
             row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-              new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
-              new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(false)
+              new ButtonBuilder()
+                .setCustomId("⬅")
+                .setLabel("back")
+                .setStyle(ButtonStyle.Primary)
+                .setDisabled(true),
+              new ButtonBuilder()
+                .setCustomId("➡")
+                .setLabel("next")
+                .setStyle(ButtonStyle.Primary)
+                .setDisabled(false)
             );
           } else {
             row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-              new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(false),
-              new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(false)
+              new ButtonBuilder()
+                .setCustomId("⬅")
+                .setLabel("back")
+                .setStyle(ButtonStyle.Primary)
+                .setDisabled(false),
+              new ButtonBuilder()
+                .setCustomId("➡")
+                .setLabel("next")
+                .setStyle(ButtonStyle.Primary)
+                .setDisabled(false)
             );
           }
           await msg.edit({ embeds: [newEmbed], components: [row] });
@@ -173,12 +211,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             let owned = false;
             const item = items[i];
 
-            if (inventory.find((i) => i.item == item.id) && inventory.find((i) => i.item == item.id).amount > 0)
+            if (
+              inventory.find((i) => i.item == item.id) &&
+              inventory.find((i) => i.item == item.id).amount > 0
+            )
               owned = true;
 
             newEmbed.addField(
               item.id,
-              `${item.emoji} **${item.name}**\n${item.longDesc}\n**speed** ${item.speed}${owned ? "\n*owned*" : ""}`,
+              `${item.emoji} **${item.name}**\n${item.longDesc}\n**speed** ${item.speed}${
+                owned ? "\n*owned*" : ""
+              }`,
               true
             );
           }
@@ -187,13 +230,29 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           });
           if (currentPage + 1 == lastPage) {
             row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-              new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(false),
-              new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(true)
+              new ButtonBuilder()
+                .setCustomId("⬅")
+                .setLabel("back")
+                .setStyle(ButtonStyle.Primary)
+                .setDisabled(false),
+              new ButtonBuilder()
+                .setCustomId("➡")
+                .setLabel("next")
+                .setStyle(ButtonStyle.Primary)
+                .setDisabled(true)
             );
           } else {
             row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-              new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(false),
-              new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(false)
+              new ButtonBuilder()
+                .setCustomId("⬅")
+                .setLabel("back")
+                .setStyle(ButtonStyle.Primary)
+                .setDisabled(false),
+              new ButtonBuilder()
+                .setCustomId("➡")
+                .setLabel("next")
+                .setStyle(ButtonStyle.Primary)
+                .setDisabled(false)
             );
           }
           await msg.edit({ embeds: [newEmbed], components: [row] });

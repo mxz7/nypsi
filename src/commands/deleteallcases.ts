@@ -1,4 +1,10 @@
-import { CommandInteraction, Message, MessageReaction, PermissionFlagsBits, User } from "discord.js";
+import {
+  CommandInteraction,
+  Message,
+  MessageReaction,
+  PermissionFlagsBits,
+  User,
+} from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { deleteServer, profileExists } from "../utils/functions/moderation/utils";
@@ -22,7 +28,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (!(await profileExists(message.guild)))
     return await message.channel.send({ embeds: [new ErrorEmbed("there are no cases to delete")] });
 
-  const embed = new CustomEmbed(message.member, "react with ✅ to delete all punishment/moderation cases")
+  const embed = new CustomEmbed(
+    message.member,
+    "react with ✅ to delete all punishment/moderation cases"
+  )
     .setHeader("confirmation")
     .setFooter({ text: "this cannot be reversed" });
 
@@ -46,9 +55,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (reaction == "✅") {
     await deleteServer(message.guild);
 
-    const newEmbed = new CustomEmbed(message.member, "✅ all cases have been deleted").setDescription(
+    const newEmbed = new CustomEmbed(
+      message.member,
       "✅ all cases have been deleted"
-    );
+    ).setDescription("✅ all cases have been deleted");
 
     await msg.edit({ embeds: [newEmbed] });
   }

@@ -9,7 +9,7 @@ import {
   InteractionType,
   Role,
 } from "discord.js";
-import { createNypsiInteraction, NypsiCommandInteraction } from "../models/Command";
+import { NypsiCommandInteraction, createNypsiInteraction } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { isUserBlacklisted } from "../utils/functions/users/blacklist";
@@ -20,7 +20,11 @@ import { logger } from "../utils/logger";
 export default async function interactionCreate(interaction: Interaction) {
   if (await isUserBlacklisted(interaction.user.id)) return;
 
-  if ([InteractionType.ApplicationCommandAutocomplete, InteractionType.MessageComponent].includes(interaction.type)) {
+  if (
+    [InteractionType.ApplicationCommandAutocomplete, InteractionType.MessageComponent].includes(
+      interaction.type
+    )
+  ) {
     return runInteraction(interaction);
   }
 
@@ -49,7 +53,9 @@ export default async function interactionCreate(interaction: Interaction) {
     if (interaction.replied) return;
     await interaction.deferReply().catch(() => {
       if (!interaction.isCommand()) return;
-      logger.warn(`failed to defer slash command. ${interaction.commandName} by ${interaction.member.user.username}`);
+      logger.warn(
+        `failed to defer slash command. ${interaction.commandName} by ${interaction.member.user.username}`
+      );
       fail = true;
     });
   }, 2000);

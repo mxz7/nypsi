@@ -12,7 +12,12 @@ export async function getWordleStats(member: GuildMember) {
   return query;
 }
 
-export async function addWordleGame(member: GuildMember, win: boolean, attempts?: number, seconds?: number) {
+export async function addWordleGame(
+  member: GuildMember,
+  win: boolean,
+  attempts?: number,
+  seconds?: number
+) {
   const profile = await getWordleStats(member);
 
   if (!win) {

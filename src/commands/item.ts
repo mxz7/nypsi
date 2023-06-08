@@ -12,8 +12,16 @@ import { parse } from "twemoji-parser";
 import prisma from "../init/database";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import { countItemOnAuction, getAuctionAverage, getItemHistoryGraph } from "../utils/functions/economy/auctions";
-import { getInventory, getTotalAmountOfItem, selectItem } from "../utils/functions/economy/inventory";
+import {
+  countItemOnAuction,
+  getAuctionAverage,
+  getItemHistoryGraph,
+} from "../utils/functions/economy/auctions";
+import {
+  getInventory,
+  getTotalAmountOfItem,
+  selectItem,
+} from "../utils/functions/economy/inventory";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { isBooster } from "../utils/functions/premium/boosters";
 import { isPremium } from "../utils/functions/premium/premium";
@@ -24,10 +32,17 @@ const cmd = new Command("item", "view information about an item", "money").setAl
 
 cmd.slashEnabled = true;
 cmd.slashData.addStringOption((option) =>
-  option.setName("item-global").setDescription("item you want to view info for").setAutocomplete(true).setRequired(true)
+  option
+    .setName("item-global")
+    .setDescription("item you want to view info for")
+    .setAutocomplete(true)
+    .setRequired(true)
 );
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[]
+) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       let usedNewMessage = false;
@@ -139,7 +154,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   }
 
   if (selected.role) {
-    embed.addField("role", `\`${selected.role}${selected.role == "car" ? ` (${selected.speed})` : ""}\``, true);
+    embed.addField(
+      "role",
+      `\`${selected.role}${selected.role == "car" ? ` (${selected.speed})` : ""}\``,
+      true
+    );
   }
 
   const rarityMap = new Map<number, string>();
@@ -158,7 +177,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (inventory.find((i) => i.item == selected.id)) {
     embed.setFooter({
       text: `you have ${inventory.find((i) => i.item == selected.id).amount.toLocaleString()} ${
-        inventory.find((i) => i.item == selected.id).amount > 1 ? selected.plural || selected.name : selected.name
+        inventory.find((i) => i.item == selected.id).amount > 1
+          ? selected.plural || selected.name
+          : selected.name
       }`,
     });
   }
@@ -188,14 +209,20 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   embed.setThumbnail(thumbnail);
   const components: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [
     new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder().setStyle(ButtonStyle.Secondary).setCustomId("hist").setLabel("history").setEmoji("📈")
+      new ButtonBuilder()
+        .setStyle(ButtonStyle.Secondary)
+        .setCustomId("hist")
+        .setLabel("history")
+        .setEmoji("📈")
     ),
   ];
 
   if (
     (!(await isPremium(message.member)) && !(await isBooster(message.author.id))) ||
-    ((await prisma.auction.count({ where: { AND: [{ itemId: selected.id }, { sold: true }] } })) < 5 &&
-      (await prisma.offer.count({ where: { AND: [{ itemId: selected.id }, { sold: true }] } })) < 5 &&
+    ((await prisma.auction.count({ where: { AND: [{ itemId: selected.id }, { sold: true }] } })) <
+      5 &&
+      (await prisma.offer.count({ where: { AND: [{ itemId: selected.id }, { sold: true }] } })) <
+        5 &&
       (await prisma.graphMetrics.count({ where: { category: `item-count-${selected.id}` } })) < 5)
   ) {
     return await send({ embeds: [embed] });

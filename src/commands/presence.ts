@@ -6,7 +6,10 @@ import { setCustomPresence } from "../utils/functions/presence";
 
 const cmd = new Command("presence", "set custom a presence for nypsi", "none");
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[]
+) {
   if (message.author.id != Constants.TEKOH_ID) return;
 
   if (args.length == 0) {

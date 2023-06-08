@@ -1,4 +1,9 @@
-import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
+import {
+  BaseMessageOptions,
+  CommandInteraction,
+  InteractionReplyOptions,
+  Message,
+} from "discord.js";
 import redis from "../../../../init/redis";
 import { NypsiCommandInteraction } from "../../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
@@ -49,9 +54,15 @@ module.exports = new ItemUse(
     const inventory = await getInventory(message.member, false);
 
     if (await redis.exists(`${Constants.redis.nypsi.RICKROLL}:${target.user.id}`))
-      return send({ embeds: [new ErrorEmbed(`${target.user.tag} already has a rick roll queued`)] });
+      return send({
+        embeds: [new ErrorEmbed(`${target.user.tag} already has a rick roll queued`)],
+      });
 
-    await setInventoryItem(message.member, "rick_astley", inventory.find((i) => i.item === "rick_astley").amount - 1);
+    await setInventoryItem(
+      message.member,
+      "rick_astley",
+      inventory.find((i) => i.item === "rick_astley").amount - 1
+    );
 
     await redis.set(`${Constants.redis.nypsi.RICKROLL}:${target.user.id}`, message.author.id);
 

@@ -64,7 +64,9 @@ async function checkBoosters(member: string | GuildMember, boosters: Map<string,
         total += expired.get(expiredBoosterId);
 
         if (expiredBoosterId == "steve") {
-          let earned: SteveData = JSON.parse(await redis.get(`${Constants.redis.nypsi.STEVE_EARNED}:${userId}`));
+          let earned: SteveData = JSON.parse(
+            await redis.get(`${Constants.redis.nypsi.STEVE_EARNED}:${userId}`)
+          );
           await redis.del(`${Constants.redis.nypsi.STEVE_EARNED}:${userId}`);
 
           if (!earned) earned = { money: 0, gemShards: 0, scraps: 0 };
@@ -77,19 +79,25 @@ async function checkBoosters(member: string | GuildMember, boosters: Map<string,
 
           if (earned.gemShards > 0) {
             descOther.push(
-              `steve found **${earned.gemShards}x** ${getItems()["gem_shard"].emoji} ${getItems()["gem_shard"].name}`
+              `steve found **${earned.gemShards}x** ${getItems()["gem_shard"].emoji} ${
+                getItems()["gem_shard"].name
+              }`
             );
           }
 
           if (earned.scraps > 0) {
             descOther.push(
-              `steve found **${earned.scraps}x** ${getItems()["quarry_scrap"].emoji} ${getItems()["quarry_scrap"].name}`
+              `steve found **${earned.scraps}x** ${getItems()["quarry_scrap"].emoji} ${
+                getItems()["quarry_scrap"].name
+              }`
             );
           }
 
           if (descOther.length > 0) desc += `\n${descOther.join("\n")}`;
         } else {
-          desc += `\`${expired.get(expiredBoosterId)}x\` ${items[expiredBoosterId].emoji} ${items[expiredBoosterId].name}\n`;
+          desc += `\`${expired.get(expiredBoosterId)}x\` ${items[expiredBoosterId].emoji} ${
+            items[expiredBoosterId].name
+          }\n`;
         }
       }
 
@@ -172,7 +180,10 @@ export async function getBoosters(member: GuildMember | string): Promise<Map<str
 
   map = await checkBoosters(member, map);
 
-  await redis.set(`${Constants.redis.cache.economy.BOOSTERS}:${id}`, JSON.stringify(Object.fromEntries(map)));
+  await redis.set(
+    `${Constants.redis.cache.economy.BOOSTERS}:${id}`,
+    JSON.stringify(Object.fromEntries(map))
+  );
   await redis.expire(`${Constants.redis.cache.economy.BOOSTERS}:${id}`, 300);
 
   return map;

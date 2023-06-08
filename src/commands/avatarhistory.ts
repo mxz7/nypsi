@@ -28,7 +28,10 @@ const cmd = new Command("avatarhistory", "view a user's avatar history", "info")
   "pfph",
 ]);
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[]
+) {
   if (await onCooldown(cmd.name, message.member)) {
     const embed = await getResponse(cmd.name, message.member);
 
@@ -57,7 +60,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   let history = await fetchAvatarHistory(member);
 
   if (history.length == 0) {
-    const url = await uploadImageToImgur(member.user.displayAvatarURL({ extension: "png", size: 256 }));
+    const url = await uploadImageToImgur(
+      member.user.displayAvatarURL({ extension: "png", size: 256 })
+    );
     if (url) {
       await addNewAvatar(member, url);
       history = await fetchAvatarHistory(member);
@@ -80,7 +85,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     .setFooter({ text: formatDate(history[index].date) });
 
   if (history.length > 1) {
-    embed.setFooter({ text: `${formatDate(history[index].date)} | ${index + 1}/${history.length}` });
+    embed.setFooter({
+      text: `${formatDate(history[index].date)} | ${index + 1}/${history.length}`,
+    });
   }
 
   if (!(await isTracking(member))) {
@@ -88,7 +95,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   }
 
   let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
+    new ButtonBuilder()
+      .setCustomId("⬅")
+      .setLabel("back")
+      .setStyle(ButtonStyle.Primary)
+      .setDisabled(true),
     new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
     new ButtonBuilder().setCustomId("d").setLabel("delete").setStyle(ButtonStyle.Danger)
   );
@@ -138,14 +149,30 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
         if (currentPage == 1) {
           row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-            new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
-            new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(false),
+            new ButtonBuilder()
+              .setCustomId("⬅")
+              .setLabel("back")
+              .setStyle(ButtonStyle.Primary)
+              .setDisabled(true),
+            new ButtonBuilder()
+              .setCustomId("➡")
+              .setLabel("next")
+              .setStyle(ButtonStyle.Primary)
+              .setDisabled(false),
             new ButtonBuilder().setCustomId("d").setLabel("delete").setStyle(ButtonStyle.Danger)
           );
         } else {
           row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-            new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(false),
-            new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(false),
+            new ButtonBuilder()
+              .setCustomId("⬅")
+              .setLabel("back")
+              .setStyle(ButtonStyle.Primary)
+              .setDisabled(false),
+            new ButtonBuilder()
+              .setCustomId("➡")
+              .setLabel("next")
+              .setStyle(ButtonStyle.Primary)
+              .setDisabled(false),
             new ButtonBuilder().setCustomId("d").setLabel("delete").setStyle(ButtonStyle.Danger)
           );
         }
@@ -165,14 +192,30 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         });
         if (currentPage == lastPage) {
           row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-            new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(false),
-            new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(true),
+            new ButtonBuilder()
+              .setCustomId("⬅")
+              .setLabel("back")
+              .setStyle(ButtonStyle.Primary)
+              .setDisabled(false),
+            new ButtonBuilder()
+              .setCustomId("➡")
+              .setLabel("next")
+              .setStyle(ButtonStyle.Primary)
+              .setDisabled(true),
             new ButtonBuilder().setCustomId("d").setLabel("delete").setStyle(ButtonStyle.Danger)
           );
         } else {
           row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-            new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(false),
-            new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(false),
+            new ButtonBuilder()
+              .setCustomId("⬅")
+              .setLabel("back")
+              .setStyle(ButtonStyle.Primary)
+              .setDisabled(false),
+            new ButtonBuilder()
+              .setCustomId("➡")
+              .setLabel("next")
+              .setStyle(ButtonStyle.Primary)
+              .setDisabled(false),
             new ButtonBuilder().setCustomId("d").setLabel("delete").setStyle(ButtonStyle.Danger)
           );
         }

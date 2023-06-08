@@ -14,7 +14,9 @@ export async function getUserAliases(member: GuildMember | string) {
   }
 
   if (await redis.exists(`${Constants.redis.cache.premium.ALIASES}:${id}`)) {
-    return JSON.parse(await redis.get(`${Constants.redis.cache.premium.ALIASES}:${id}`)) as UserAlias[];
+    return JSON.parse(
+      await redis.get(`${Constants.redis.cache.premium.ALIASES}:${id}`)
+    ) as UserAlias[];
   }
 
   const query = await prisma.userAlias.findMany({
@@ -24,7 +26,10 @@ export async function getUserAliases(member: GuildMember | string) {
   });
 
   await redis.set(`${Constants.redis.cache.premium.ALIASES}:${id}`, JSON.stringify(query || []));
-  await redis.expire(`${Constants.redis.cache.premium.ALIASES}:${id}`, Math.floor(ms("12 hour") / 1000));
+  await redis.expire(
+    `${Constants.redis.cache.premium.ALIASES}:${id}`,
+    Math.floor(ms("12 hour") / 1000)
+  );
 
   return query;
 }

@@ -1,4 +1,10 @@
-import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message, PermissionFlagsBits } from "discord.js";
+import {
+  BaseMessageOptions,
+  CommandInteraction,
+  InteractionReplyOptions,
+  Message,
+  PermissionFlagsBits,
+} from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
@@ -12,10 +18,17 @@ const cmd = new Command("kick", "kick one or more users", "moderation")
 
 cmd.slashEnabled = true;
 cmd.slashData
-  .addUserOption((option) => option.setName("user").setDescription("user to kick").setRequired(true))
-  .addStringOption((option) => option.setName("reason").setDescription("reason for kick").setRequired(true));
+  .addUserOption((option) =>
+    option.setName("user").setDescription("user to kick").setRequired(true)
+  )
+  .addStringOption((option) =>
+    option.setName("reason").setDescription("reason for kick").setRequired(true)
+  );
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[]
+) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       let usedNewMessage = false;
@@ -90,8 +103,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const targetHighestRole = target.roles.highest;
   const memberHighestRole = message.member.roles.highest;
 
-  if (targetHighestRole.position >= memberHighestRole.position && message.guild.ownerId != message.member.user.id) {
-    return send({ embeds: [new ErrorEmbed(`your role is not high enough to punish ${target.toString()}`)] });
+  if (
+    targetHighestRole.position >= memberHighestRole.position &&
+    message.guild.ownerId != message.member.user.id
+  ) {
+    return send({
+      embeds: [new ErrorEmbed(`your role is not high enough to punish ${target.toString()}`)],
+    });
   } else {
     if (target.user.id == message.client.user.id) {
       await send({ content: "NICE TRY LOSER CANT KICK THE BEST WORLDWIDE" });
@@ -127,13 +145,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (args.join(" ").includes("-s")) return;
 
   if (reason.split(": ")[1] == "no reason given") {
-    await target.send({ content: `you have been kicked from ${message.guild.name}` }).catch(() => {});
+    await target
+      .send({ content: `you have been kicked from ${message.guild.name}` })
+      .catch(() => {});
   } else {
     const embed = new CustomEmbed(target)
       .setTitle(`kicked from ${message.guild.name}`)
       .addField("reason", `\`${reason.split(": ")[1]}\``);
 
-    await target.send({ content: `you have been kicked from ${message.guild.name}`, embeds: [embed] }).catch(() => {});
+    await target
+      .send({ content: `you have been kicked from ${message.guild.name}`, embeds: [embed] })
+      .catch(() => {});
   }
 }
 

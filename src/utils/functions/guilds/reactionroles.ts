@@ -17,7 +17,9 @@ import ms = require("ms");
 
 export async function getReactionRolesByGuild(guild: Guild) {
   if (await redis.exists(`${Constants.redis.cache.guild.REACTION_ROLES}:${guild.id}`)) {
-    return JSON.parse(await redis.get(`${Constants.redis.cache.guild.REACTION_ROLES}:${guild.id}`)) as (ReactionRole & {
+    return JSON.parse(
+      await redis.get(`${Constants.redis.cache.guild.REACTION_ROLES}:${guild.id}`)
+    ) as (ReactionRole & {
       roles: ReactionRoleRoles[];
     })[];
   }
@@ -35,8 +37,14 @@ export async function getReactionRolesByGuild(guild: Guild) {
     },
   });
 
-  await redis.set(`${Constants.redis.cache.guild.REACTION_ROLES}:${guild.id}`, JSON.stringify(query));
-  await redis.expire(`${Constants.redis.cache.guild.REACTION_ROLES}:${guild.id}`, Math.floor(ms("1 hour") / 1000));
+  await redis.set(
+    `${Constants.redis.cache.guild.REACTION_ROLES}:${guild.id}`,
+    JSON.stringify(query)
+  );
+  await redis.expire(
+    `${Constants.redis.cache.guild.REACTION_ROLES}:${guild.id}`,
+    Math.floor(ms("1 hour") / 1000)
+  );
 
   return query;
 }
@@ -88,7 +96,11 @@ export async function addRoleToReactionRole(options: {
   await redis.del(`${Constants.redis.cache.guild.REACTION_ROLES}:${options.guildId}`);
 }
 
-export async function deleteRoleFromReactionRole(guildId: string, messageId: string, roleId: string) {
+export async function deleteRoleFromReactionRole(
+  guildId: string,
+  messageId: string,
+  roleId: string
+) {
   await prisma.reactionRoleRoles.delete({
     where: {
       messageId_roleId: {
@@ -138,9 +150,12 @@ export async function sendReactionRole(
     }
 
     if (components.length === 0) {
-      components[0] = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(button);
+      components[0] = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        button
+      );
     } else if (components[components.length - 1].components.length >= 5) {
-      components[components.length] = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(button);
+      components[components.length] =
+        new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(button);
     } else {
       components[components.length - 1].addComponents(button);
     }
@@ -164,7 +179,11 @@ export async function sendReactionRole(
   await redis.del(`${Constants.redis.cache.guild.REACTION_ROLES}:${reactionRole.guildId}`);
 }
 
-export async function setReactionRoleMode(guildId: string, messageId: string, mode: ReactionRoleMode) {
+export async function setReactionRoleMode(
+  guildId: string,
+  messageId: string,
+  mode: ReactionRoleMode
+) {
   await prisma.reactionRole.update({
     where: {
       messageId,
@@ -190,7 +209,11 @@ export async function setReactionRoleTitle(guildId: string, messageId: string, t
   await redis.del(`${Constants.redis.cache.guild.REACTION_ROLES}:${guildId}`);
 }
 
-export async function setReactionRoleDescription(guildId: string, messageId: string, description: string) {
+export async function setReactionRoleDescription(
+  guildId: string,
+  messageId: string,
+  description: string
+) {
   await prisma.reactionRole.update({
     where: {
       messageId,
@@ -216,7 +239,11 @@ export async function setReactionRoleColour(guildId: string, messageId: string, 
   await redis.del(`${Constants.redis.cache.guild.REACTION_ROLES}:${guildId}`);
 }
 
-export async function setReactionRoleWhitelist(guildId: string, messageId: string, whitelist: string[]) {
+export async function setReactionRoleWhitelist(
+  guildId: string,
+  messageId: string,
+  whitelist: string[]
+) {
   await prisma.reactionRole.update({
     where: {
       messageId,

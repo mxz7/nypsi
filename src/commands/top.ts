@@ -31,7 +31,10 @@ import { getItems } from "../utils/functions/economy/utils.js";
 import PageManager from "../utils/functions/page";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 
-const cmd = new Command("top", "view top etc. in the server", "money").setAliases(["baltop", "gangsters"]);
+const cmd = new Command("top", "view top etc. in the server", "money").setAliases([
+  "baltop",
+  "gangsters",
+]);
 
 const scopeChoices: APIApplicationCommandOptionChoice<string>[] = [
   { name: "global", value: "global" },
@@ -40,7 +43,9 @@ const scopeChoices: APIApplicationCommandOptionChoice<string>[] = [
 
 cmd.slashEnabled = true;
 cmd.slashData
-  .addSubcommand((balance) => balance.setName("balance").setDescription("view top balances in the server"))
+  .addSubcommand((balance) =>
+    balance.setName("balance").setDescription("view top balances in the server")
+  )
   .addSubcommand((prestige) =>
     prestige
       .setName("prestige")
@@ -70,7 +75,11 @@ cmd.slashData
       .setName("item")
       .setDescription("view top item holders in the server")
       .addStringOption((option) =>
-        option.setName("item-global").setDescription("item to query").setRequired(true).setAutocomplete(true)
+        option
+          .setName("item-global")
+          .setDescription("item to query")
+          .setRequired(true)
+          .setAutocomplete(true)
       )
       .addStringOption((option) =>
         option
@@ -81,7 +90,9 @@ cmd.slashData
       )
   )
   .addSubcommand((guild) => guild.setName("guilds").setDescription("view top nypsi guilds"))
-  .addSubcommand((completion) => completion.setName("completion").setDescription("view top completion in the server"))
+  .addSubcommand((completion) =>
+    completion.setName("completion").setDescription("view top completion in the server")
+  )
   .addSubcommand((networth) =>
     networth
       .setName("networth")
@@ -96,7 +107,10 @@ cmd.slashData
       )
   );
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[]
+) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       let usedNewMessage = false;
@@ -138,7 +152,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const show = async (pages: Map<number, string[]>, pos: number, title: string, url?: string) => {
     const embed = new CustomEmbed(message.member).setHeader(
       title,
-      title.includes("global") || title.includes("guild") ? message.guild.iconURL() : message.client.user.avatarURL(),
+      title.includes("global") || title.includes("guild")
+        ? message.guild.iconURL()
+        : message.client.user.avatarURL(),
       url
     );
 
@@ -153,7 +169,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
+      new ButtonBuilder()
+        .setCustomId("⬅")
+        .setLabel("back")
+        .setStyle(ButtonStyle.Primary)
+        .setDisabled(true),
       new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
     );
 
@@ -296,7 +316,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     );
   } else {
     const selected =
-      selectItem(args.join(" ")) || selectItem(args.slice(0, args.length - 1).join(" ")) || selectItem(args[0]);
+      selectItem(args.join(" ")) ||
+      selectItem(args.slice(0, args.length - 1).join(" ")) ||
+      selectItem(args[0]);
 
     if (!selected) return send({ embeds: [new ErrorEmbed("invalid option")] });
 
