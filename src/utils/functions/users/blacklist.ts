@@ -5,7 +5,8 @@ import Constants from "../../Constants";
 
 export async function isUserBlacklisted(id: string) {
   if (await redis.exists(`${Constants.redis.cache.user.BLACKLIST}:${id}`)) {
-    const res = (await redis.get(`${Constants.redis.cache.user.BLACKLIST}:${id}`)) === "t" ? true : false;
+    const res =
+      (await redis.get(`${Constants.redis.cache.user.BLACKLIST}:${id}`)) === "t" ? true : false;
 
     return res;
   }

@@ -25,7 +25,10 @@ avatar.slashData.addUserOption((option) =>
   option.setName("user").setDescription("view avatar of this user").setRequired(false)
 );
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[]
+) {
   let member: GuildMember;
 
   if (args.length == 0) {
@@ -59,7 +62,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   }
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder().setCustomId("x").setLabel("show server avatar").setStyle(ButtonStyle.Primary)
+    new ButtonBuilder()
+      .setCustomId("x")
+      .setLabel("show server avatar")
+      .setStyle(ButtonStyle.Primary)
   );
 
   const embed = new CustomEmbed(member).setHeader(member.user.tag).setImage(avatar);

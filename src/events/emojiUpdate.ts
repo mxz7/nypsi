@@ -7,7 +7,9 @@ export default async function emojiUpdate(oldEmoji: GuildEmoji, newEmoji: GuildE
     const embed = new CustomEmbed().disableFooter().setTimestamp();
 
     embed.setHeader("emoji updated");
-    embed.setDescription(`\`${newEmoji.name}\` - \`${newEmoji.id}\`\n${oldEmoji.name} -> ${newEmoji.name}`);
+    embed.setDescription(
+      `\`${newEmoji.name}\` - \`${newEmoji.id}\`\n${oldEmoji.name} -> ${newEmoji.name}`
+    );
     embed.setImage(newEmoji.url);
   }
 }

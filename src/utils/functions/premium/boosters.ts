@@ -25,7 +25,10 @@ export async function isBooster(userId: string) {
   }
 
   await redis.set(`${Constants.redis.cache.premium.BOOSTER}:${userId}`, query.booster ? "t" : "f");
-  await redis.expire(`${Constants.redis.cache.premium.BOOSTER}:${userId}`, Math.floor(ms("3 hours") / 1000));
+  await redis.expire(
+    `${Constants.redis.cache.premium.BOOSTER}:${userId}`,
+    Math.floor(ms("3 hours") / 1000)
+  );
 
   return query.booster;
 }

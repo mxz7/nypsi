@@ -11,7 +11,9 @@ export default {
     const achievements = getAchievements();
 
     let options = Object.keys(achievements).filter(
-      (i) => i.includes(focused.value) || achievements[i].name.replaceAll("*", "").toLowerCase().includes(focused.value)
+      (i) =>
+        i.includes(focused.value) ||
+        achievements[i].name.replaceAll("*", "").toLowerCase().includes(focused.value)
     );
 
     if (options.length > 25) options = options.splice(0, 24);

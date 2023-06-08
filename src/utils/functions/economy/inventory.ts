@@ -106,7 +106,8 @@ async function doAutosellThing(userId: string, itemId: string, amount: number): 
     sellWorth = 1000 * amount;
   }
 
-  if (["bitcoin", "ethereum"].includes(item.id)) sellWorth = Math.floor(sellWorth - sellWorth * 0.05);
+  if (["bitcoin", "ethereum"].includes(item.id))
+    sellWorth = Math.floor(sellWorth - sellWorth * 0.05);
 
   let tax = true;
 
@@ -125,8 +126,16 @@ async function doAutosellThing(userId: string, itemId: string, amount: number): 
     await redis.hincrby(`${Constants.redis.nypsi.AUTO_SELL_ITEMS}:${userId}`, "cheese", 1);
   }
 
-  await redis.hincrby(`${Constants.redis.nypsi.AUTO_SELL_ITEMS}:${userId}`, `${itemId}-money`, sellWorth);
-  await redis.hincrby(`${Constants.redis.nypsi.AUTO_SELL_ITEMS}:${userId}`, `${itemId}-amount`, amount);
+  await redis.hincrby(
+    `${Constants.redis.nypsi.AUTO_SELL_ITEMS}:${userId}`,
+    `${itemId}-money`,
+    sellWorth
+  );
+  await redis.hincrby(
+    `${Constants.redis.nypsi.AUTO_SELL_ITEMS}:${userId}`,
+    `${itemId}-amount`,
+    amount
+  );
 
   if (!(await redis.lrange(Constants.redis.nypsi.AUTO_SELL_ITEMS_MEMBERS, 0, -1)).includes(userId))
     await redis.lpush(Constants.redis.nypsi.AUTO_SELL_ITEMS_MEMBERS, userId);
@@ -290,11 +299,17 @@ async function checkCollectorAchievement(id: string, inventory: Inventory) {
   }
 }
 
-export async function openCrate(member: GuildMember | string, item: Item): Promise<Map<string, number>> {
+export async function openCrate(
+  member: GuildMember | string,
+  item: Item
+): Promise<Map<string, number>> {
   const inventory = await getInventory(member);
   const items = getItems();
 
-  if (!inventory.find((i) => i.item === item.id) || inventory.find((i) => i.item === item.id).amount < 1) {
+  if (
+    !inventory.find((i) => i.item === item.id) ||
+    inventory.find((i) => i.item === item.id).amount < 1
+  ) {
     return new Map();
   }
 
@@ -441,11 +456,19 @@ export async function openCrate(member: GuildMember | string, item: Item): Promi
     } else {
       let amount = 1;
 
-      if (chosen == "terrible_fishing_rod" || chosen == "terrible_gun" || chosen == "wooden_pickaxe") {
+      if (
+        chosen == "terrible_fishing_rod" ||
+        chosen == "terrible_gun" ||
+        chosen == "wooden_pickaxe"
+      ) {
         amount = 5;
       } else if (chosen == "fishing_rod" || chosen == "gun" || chosen == "iron_pickaxe") {
         amount = 10;
-      } else if (chosen == "incredible_fishing_rod" || chosen == "incredible_gun" || chosen == "diamond_pickaxe") {
+      } else if (
+        chosen == "incredible_fishing_rod" ||
+        chosen == "incredible_gun" ||
+        chosen == "diamond_pickaxe"
+      ) {
         amount = 10;
       } else if (chosen == "gem_shard" && item.id === "gem_crate") {
         amount = Math.floor(Math.random() * 15) + 5;
@@ -453,7 +476,8 @@ export async function openCrate(member: GuildMember | string, item: Item): Promi
 
       await addInventoryItem(member, chosen, amount);
 
-      if (chosen.includes("_gem")) await addProgress(typeof member === "string" ? member : member.user.id, "gem_hunter", 1);
+      if (chosen.includes("_gem"))
+        await addProgress(typeof member === "string" ? member : member.user.id, "gem_hunter", 1);
 
       found.set(chosen, found.has(chosen) ? found.get(chosen) + amount : amount);
     }
@@ -522,7 +546,10 @@ export async function commandGemCheck(member: GuildMember, commandCategory: Comm
       await addNotificationToQueue({
         memberId: member.user.id,
         payload: {
-          embed: new CustomEmbed(member, `${getItems()[gem].emoji} you've found a gem! i wonder what powers it holds...`)
+          embed: new CustomEmbed(
+            member,
+            `${getItems()[gem].emoji} you've found a gem! i wonder what powers it holds...`
+          )
             .setTitle("you've found a gem")
             .setColor(Constants.TRANSPARENT_EMBED_COLOR),
         },
@@ -560,7 +587,9 @@ export async function commandGemCheck(member: GuildMember, commandCategory: Comm
           payload: {
             embed: new CustomEmbed(
               member,
-              `${getItems()["purple_gem"].emoji} you've found a gem! i wonder what powers it holds...`
+              `${
+                getItems()["purple_gem"].emoji
+              } you've found a gem! i wonder what powers it holds...`
             )
               .setTitle("you've found a gem")
               .setColor(Constants.TRANSPARENT_EMBED_COLOR),
@@ -587,11 +616,36 @@ export async function gemBreak(userId: string, chance: number, gem: string) {
 
   if (uniqueGemCount === 5 && percentChance(77) && (await getDmSettings(userId)).other) {
     await Promise.all([
-      setInventoryItem(userId, "pink_gem", inventory.find((i) => i.item === "pink_gem").amount - 1, false),
-      setInventoryItem(userId, "purple_gem", inventory.find((i) => i.item === "purple_gem").amount - 1, false),
-      setInventoryItem(userId, "blue_gem", inventory.find((i) => i.item === "blue_gem").amount - 1, false),
-      setInventoryItem(userId, "green_gem", inventory.find((i) => i.item === "green_gem").amount - 1, false),
-      setInventoryItem(userId, "white_gem", inventory.find((i) => i.item === "white_gem").amount - 1, false),
+      setInventoryItem(
+        userId,
+        "pink_gem",
+        inventory.find((i) => i.item === "pink_gem").amount - 1,
+        false
+      ),
+      setInventoryItem(
+        userId,
+        "purple_gem",
+        inventory.find((i) => i.item === "purple_gem").amount - 1,
+        false
+      ),
+      setInventoryItem(
+        userId,
+        "blue_gem",
+        inventory.find((i) => i.item === "blue_gem").amount - 1,
+        false
+      ),
+      setInventoryItem(
+        userId,
+        "green_gem",
+        inventory.find((i) => i.item === "green_gem").amount - 1,
+        false
+      ),
+      setInventoryItem(
+        userId,
+        "white_gem",
+        inventory.find((i) => i.item === "white_gem").amount - 1,
+        false
+      ),
       prisma.crafting.create({
         data: {
           amount: 1,
@@ -613,9 +667,9 @@ export async function gemBreak(userId: string, chance: number, gem: string) {
             `${
               getItems()["crystal_heart"].emoji
             } a truly historic event is taking place\nyour gems are fusing together, into one crystal\n\n` +
-              `${getItems()["white_gem"].emoji} ${getItems()["pink_gem"].emoji} ${getItems()["purple_gem"].emoji} ${
-                getItems()["blue_gem"].emoji
-              } ${getItems()["green_gem"].emoji}`
+              `${getItems()["white_gem"].emoji} ${getItems()["pink_gem"].emoji} ${
+                getItems()["purple_gem"].emoji
+              } ${getItems()["blue_gem"].emoji} ${getItems()["green_gem"].emoji}`
           ),
       },
     });
@@ -644,7 +698,9 @@ export async function gemBreak(userId: string, chance: number, gem: string) {
           .setColor(Constants.TRANSPARENT_EMBED_COLOR)
           .setTitle(`your ${getItems()[gem].name} has shattered`)
           .setDescription(
-            `${getItems()[gem].emoji} your gem exerted too much power and destroyed itself. shattering into ${amount} piece${
+            `${
+              getItems()[gem].emoji
+            } your gem exerted too much power and destroyed itself. shattering into ${amount} piece${
               amount > 1 ? "s" : ""
             }`
           ),
@@ -682,7 +738,9 @@ export async function getAutosellItems(member: GuildMember | string) {
   }
 
   if (await redis.exists(`${Constants.redis.cache.economy.AUTO_SELL}:${id}`)) {
-    return JSON.parse(await redis.get(`${Constants.redis.cache.economy.AUTO_SELL}:${id}`)) as string[];
+    return JSON.parse(
+      await redis.get(`${Constants.redis.cache.economy.AUTO_SELL}:${id}`)
+    ) as string[];
   }
 
   const query = await prisma.economy
@@ -697,7 +755,10 @@ export async function getAutosellItems(member: GuildMember | string) {
     .then((q) => q.autosell);
 
   await redis.set(`${Constants.redis.cache.economy.AUTO_SELL}:${id}`, JSON.stringify(query));
-  await redis.expire(`${Constants.redis.cache.economy.AUTO_SELL}:${id}`, Math.floor(ms("1 hour") / 1000));
+  await redis.expire(
+    `${Constants.redis.cache.economy.AUTO_SELL}:${id}`,
+    Math.floor(ms("1 hour") / 1000)
+  );
 
   return query;
 }

@@ -1,7 +1,7 @@
 import dayjs = require("dayjs");
 import { inPlaceSort } from "fast-sort";
 import { appendFile, writeFile } from "fs/promises";
-import { isMainThread, parentPort, Worker } from "worker_threads";
+import { Worker, isMainThread, parentPort } from "worker_threads";
 import prisma from "../../../init/database";
 
 export default function graphToCsv(): Promise<void> {
@@ -18,7 +18,10 @@ export default function graphToCsv(): Promise<void> {
 if (!isMainThread) {
   process.title = "nypsi: graph to csv";
 
-  const toCsv = async (fileName: string, data: { userId: string; value: bigint | number; date: Date; id: string }[]) => {
+  const toCsv = async (
+    fileName: string,
+    data: { userId: string; value: bigint | number; date: Date; id: string }[]
+  ) => {
     const dates: number[] = [];
     const map = new Map<string, { value: number; date: number }[]>();
 
@@ -73,7 +76,10 @@ if (!isMainThread) {
         })
         .then((r) => r?.lastKnownTag);
 
-      await appendFile(`/tmp/${fileName}`, `\n${tag.replace(",", "") || userId},${balances.join(",")}`);
+      await appendFile(
+        `/tmp/${fileName}`,
+        `\n${tag.replace(",", "") || userId},${balances.join(",")}`
+      );
     }
   };
 

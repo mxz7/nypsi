@@ -14,14 +14,19 @@ import { newCase } from "../utils/functions/moderation/cases";
 import { createProfile, profileExists } from "../utils/functions/moderation/utils";
 import { logger } from "../utils/logger";
 
-const cmd = new Command("unban", "unban one or more users", "moderation").setPermissions(["BAN_MEMBERS"]);
+const cmd = new Command("unban", "unban one or more users", "moderation").setPermissions([
+  "BAN_MEMBERS",
+]);
 
 cmd.slashEnabled = true;
 cmd.slashData.addStringOption((option) =>
   option.setName("user").setDescription("tag/id of user to unban").setRequired(true)
 );
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[]
+) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       let usedNewMessage = false;
@@ -105,7 +110,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       try {
         const memberCache = message.client.users.cache;
 
-        const findingMember = memberCache.find((m) => (m.username + "#" + m.discriminator).includes(arg));
+        const findingMember = memberCache.find((m) =>
+          (m.username + "#" + m.discriminator).includes(arg)
+        );
 
         if (findingMember) {
           const id = findingMember.id;
@@ -132,7 +139,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const embed = new CustomEmbed(message.member);
 
   if (members.length == 1) {
-    embed.setDescription("✅ `" + members[0].username + "#" + members[0].discriminator + "` was unbanned");
+    embed.setDescription(
+      "✅ `" + members[0].username + "#" + members[0].discriminator + "` was unbanned"
+    );
   } else {
     embed.setDescription("✅ **" + members.length + "** members have been unbanned");
   }

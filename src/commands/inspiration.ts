@@ -4,10 +4,11 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { isImageUrl } from "../utils/functions/image";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command("inspiration", "generate an inspirational quote (inspirobot.me)", "fun").setAliases([
-  "quote",
-  "inspire",
-]);
+const cmd = new Command(
+  "inspiration",
+  "generate an inspirational quote (inspirobot.me)",
+  "fun"
+).setAliases(["quote", "inspire"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
   if (await onCooldown(cmd.name, message.member)) {

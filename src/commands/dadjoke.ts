@@ -1,14 +1,20 @@
-import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
+import {
+  BaseMessageOptions,
+  CommandInteraction,
+  InteractionReplyOptions,
+  Message,
+} from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { RedditJSON, RedditJSONPost } from "../types/Reddit";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import ms = require("ms");
 
-const cmd = new Command("dadjoke", "get a hilarious dad joke straight from r/dadjokes", "fun").setAliases([
-  "dadjokes",
-  "dj",
-]);
+const cmd = new Command(
+  "dadjoke",
+  "get a hilarious dad joke straight from r/dadjokes",
+  "fun"
+).setAliases(["dadjokes", "dj"]);
 
 cmd.slashEnabled = true;
 

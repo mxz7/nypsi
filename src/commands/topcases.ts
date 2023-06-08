@@ -7,12 +7,16 @@ import { getAllCases } from "../utils/functions/moderation/cases";
 import { profileExists } from "../utils/functions/moderation/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command("topcases", "see who has the top moderation cases", "moderation").setPermissions([
-  "MANAGE_MESSAGES",
-  "MODERATE_MEMBERS",
-]);
+const cmd = new Command(
+  "topcases",
+  "see who has the top moderation cases",
+  "moderation"
+).setPermissions(["MANAGE_MESSAGES", "MODERATE_MEMBERS"]);
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[]
+) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
     if (!message.member.permissions.has(PermissionFlagsBits.ModerateMembers)) {
       return;
@@ -30,7 +34,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const cases = await getAllCases(message.guild);
 
-  if (cases.length <= 0) return message.channel.send({ embeds: [new ErrorEmbed("no data for this server")] });
+  if (cases.length <= 0)
+    return message.channel.send({ embeds: [new ErrorEmbed("no data for this server")] });
 
   await addCooldown(cmd.name, message.member, 15);
 
@@ -90,7 +95,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     for (const s of staff) {
       if (count >= 5) break;
 
-      staffText[count] = count + 1 + " `" + s + "` **" + topStaff.get(s).toLocaleString() + "** punishments given";
+      staffText[count] =
+        count + 1 + " `" + s + "` **" + topStaff.get(s).toLocaleString() + "** punishments given";
 
       count++;
     }
@@ -108,7 +114,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         username = username.user.tag;
       }
 
-      memberText[count] = count + 1 + " `" + username + "` **" + topMembers.get(m).toLocaleString() + "** punishments taken";
+      memberText[count] =
+        count +
+        1 +
+        " `" +
+        username +
+        "` **" +
+        topMembers.get(m).toLocaleString() +
+        "** punishments taken";
 
       count++;
     }
@@ -121,7 +134,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         text: `${prefix}topcases <user> | ${cases.length.toLocaleString()} total cases | ${deletedCaseCount.toLocaleString()} deleted cases`,
       });
     } else {
-      embed.setFooter({ text: `${prefix}topcases <user> | ${cases.length.toLocaleString()} total cases` });
+      embed.setFooter({
+        text: `${prefix}topcases <user> | ${cases.length.toLocaleString()} total cases`,
+      });
     }
   } else {
     const member = await getMember(message.guild, args.join(" "));
@@ -205,7 +220,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
     embed.addField(
       "member stats",
-      "punishments `" + punishments.toLocaleString() + "`\ndeleted `" + deletedCases.toLocaleString() + "`",
+      "punishments `" +
+        punishments.toLocaleString() +
+        "`\ndeleted `" +
+        deletedCases.toLocaleString() +
+        "`",
       true
     );
   }

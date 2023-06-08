@@ -52,9 +52,9 @@ async function autosellThing() {
         continue;
       }
       msg.push(
-        `\`${amounts.get(item).toLocaleString()}x\` ${getItems()[item].emoji} ${getItems()[item].name} ($${moneys
-          .get(item)
-          .toLocaleString()})`
+        `\`${amounts.get(item).toLocaleString()}x\` ${getItems()[item].emoji} ${
+          getItems()[item].name
+        } ($${moneys.get(item).toLocaleString()})`
       );
     }
 
@@ -69,7 +69,9 @@ async function autosellThing() {
     await addNotificationToQueue({
       memberId: user,
       payload: {
-        embed: new CustomEmbed(null, msg.join("\n")).setColor(Constants.TRANSPARENT_EMBED_COLOR).setHeader("autosell"),
+        embed: new CustomEmbed(null, msg.join("\n"))
+          .setColor(Constants.TRANSPARENT_EMBED_COLOR)
+          .setHeader("autosell"),
       },
     });
   }

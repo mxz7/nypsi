@@ -26,20 +26,28 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (message.channel.isDMBased()) return;
 
   if (message.channel.isThread())
-    return message.channel.send({ embeds: [new ErrorEmbed("you must do this in an nsfw channel")] });
+    return message.channel.send({
+      embeds: [new ErrorEmbed("you must do this in an nsfw channel")],
+    });
 
   if (!message.channel.nsfw) {
-    return message.channel.send({ embeds: [new ErrorEmbed("you must do this in an nsfw channel")] });
+    return message.channel.send({
+      embeds: [new ErrorEmbed("you must do this in an nsfw channel")],
+    });
   }
 
   const boobCache = images.get("boob");
 
   if (!boobCache) {
-    return message.channel.send({ embeds: [new ErrorEmbed("please wait a couple more seconds..")] });
+    return message.channel.send({
+      embeds: [new ErrorEmbed("please wait a couple more seconds..")],
+    });
   }
 
   if (boobCache.size <= 2) {
-    return message.channel.send({ embeds: [new ErrorEmbed("please wait a couple more seconds..")] });
+    return message.channel.send({
+      embeds: [new ErrorEmbed("please wait a couple more seconds..")],
+    });
   }
 
   await addCooldown(cmd.name, message.member, 7);

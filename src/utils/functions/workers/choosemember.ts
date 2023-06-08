@@ -1,7 +1,10 @@
 import { Collection, GuildMember } from "discord.js";
-import { isMainThread, parentPort, Worker, workerData } from "worker_threads";
+import { Worker, isMainThread, parentPort, workerData } from "worker_threads";
 
-export default function chooseMember(members: Collection<string, GuildMember>, targetName: string): Promise<string | null> {
+export default function chooseMember(
+  members: Collection<string, GuildMember>,
+  targetName: string
+): Promise<string | null> {
   return new Promise((resolve, reject) => {
     const worker = new Worker(__filename, {
       workerData: [members, targetName],

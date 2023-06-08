@@ -27,7 +27,9 @@ async function doLottery(client: Client) {
   const tickets = await prisma.lotteryTicket.findMany();
 
   if (tickets.length < 100) {
-    logger.info(`${tickets.length} tickets were bought ): maybe next week you'll have something to live for`);
+    logger.info(
+      `${tickets.length} tickets were bought ): maybe next week you'll have something to live for`
+    );
 
     const embed = new CustomEmbed();
 
@@ -62,7 +64,10 @@ async function doLottery(client: Client) {
 
   logger.info(`::success winner: ${user.tag} (${user.id}) with ticket #${chosen.id}`);
 
-  await Promise.all([updateBalance(user.id, (await getBalance(user.id)) + total), addProgress(user.id, "lucky", 1)]);
+  await Promise.all([
+    updateBalance(user.id, (await getBalance(user.id)) + total),
+    addProgress(user.id, "lucky", 1),
+  ]);
 
   const embed = new CustomEmbed();
 
@@ -81,7 +86,11 @@ async function doLottery(client: Client) {
 
   if ((await getDmSettings(user.id)).lottery) {
     embed.setTitle("you have won the lottery!");
-    embed.setDescription(`you have won a total of $**${total.toLocaleString()}**\n\nyour winning ticket was #${chosen.id}`);
+    embed.setDescription(
+      `you have won a total of $**${total.toLocaleString()}**\n\nyour winning ticket was #${
+        chosen.id
+      }`
+    );
     embed.setColor(variants.latte.base.hex as ColorResolvable);
 
     await user
@@ -104,7 +113,11 @@ async function doLottery(client: Client) {
           memberId: user.id,
           payload: {
             embed: new CustomEmbed()
-              .setDescription(`${getItems()["purple_gem"].emoji} you've found a gem! i wonder what powers it holds...`)
+              .setDescription(
+                `${
+                  getItems()["purple_gem"].emoji
+                } you've found a gem! i wonder what powers it holds...`
+              )
               .setTitle("you've found a gem")
               .setColor(Constants.TRANSPARENT_EMBED_COLOR),
           },

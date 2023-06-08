@@ -23,7 +23,10 @@ ranks.set("VIP", "VIP");
 
 const cmd = new Command("hypixel", "view hypixel stats for a minecraft account", "minecraft");
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[]
+) {
   const prefix = await getPrefix(message.guild);
 
   if (args.length == 0) {
@@ -183,7 +186,9 @@ cmd.setRun(run);
 module.exports = cmd;
 
 function getLevel(exp: number) {
-  return exp < 0 ? 1 : Math.floor(1 + REVERSE_PQ_PREFIX + Math.sqrt(REVERSE_CONST + GROWTH_DIVIDES_2 * exp));
+  return exp < 0
+    ? 1
+    : Math.floor(1 + REVERSE_PQ_PREFIX + Math.sqrt(REVERSE_CONST + GROWTH_DIVIDES_2 * exp));
 }
 
 function timeSince(date: number) {
