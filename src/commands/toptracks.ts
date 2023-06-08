@@ -35,7 +35,10 @@ cmd.slashData.addStringOption((option) =>
     .setChoices(...lengthChoices)
 );
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[]
+) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       let usedNewMessage = false;
@@ -99,7 +102,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       lengthDisplay = "1 week";
     } else {
       return send({
-        embeds: [new ErrorEmbed("invalid length. use one of the following: `all` `year` `month` `week`")],
+        embeds: [
+          new ErrorEmbed("invalid length. use one of the following: `all` `year` `month` `week`"),
+        ],
       });
     }
   }
@@ -170,7 +175,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   embed.setFooter({ text: `${total.toLocaleString()} total plays | page 1/${pages.size}` });
 
   let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
+    new ButtonBuilder()
+      .setCustomId("⬅")
+      .setLabel("back")
+      .setStyle(ButtonStyle.Primary)
+      .setDisabled(true),
     new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
   );
 
@@ -204,16 +213,34 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       } else {
         currentPage--;
         embed.setDescription(pages.get(currentPage).join("\n"));
-        embed.setFooter({ text: `${total.toLocaleString()} total plays | page ${currentPage}/${pages.size}` });
+        embed.setFooter({
+          text: `${total.toLocaleString()} total plays | page ${currentPage}/${pages.size}`,
+        });
         if (currentPage == 1) {
           row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-            new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
-            new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(false)
+            new ButtonBuilder()
+              .setCustomId("⬅")
+              .setLabel("back")
+              .setStyle(ButtonStyle.Primary)
+              .setDisabled(true),
+            new ButtonBuilder()
+              .setCustomId("➡")
+              .setLabel("next")
+              .setStyle(ButtonStyle.Primary)
+              .setDisabled(false)
           );
         } else {
           row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-            new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(false),
-            new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(false)
+            new ButtonBuilder()
+              .setCustomId("⬅")
+              .setLabel("back")
+              .setStyle(ButtonStyle.Primary)
+              .setDisabled(false),
+            new ButtonBuilder()
+              .setCustomId("➡")
+              .setLabel("next")
+              .setStyle(ButtonStyle.Primary)
+              .setDisabled(false)
           );
         }
         await edit({ embeds: [embed], components: [row] }, msg);
@@ -225,16 +252,34 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       } else {
         currentPage++;
         embed.setDescription(pages.get(currentPage).join("\n"));
-        embed.setFooter({ text: `${total.toLocaleString()} total plays | page ${currentPage}/${pages.size}` });
+        embed.setFooter({
+          text: `${total.toLocaleString()} total plays | page ${currentPage}/${pages.size}`,
+        });
         if (currentPage == lastPage) {
           row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-            new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(false),
-            new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(true)
+            new ButtonBuilder()
+              .setCustomId("⬅")
+              .setLabel("back")
+              .setStyle(ButtonStyle.Primary)
+              .setDisabled(false),
+            new ButtonBuilder()
+              .setCustomId("➡")
+              .setLabel("next")
+              .setStyle(ButtonStyle.Primary)
+              .setDisabled(true)
           );
         } else {
           row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-            new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(false),
-            new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(false)
+            new ButtonBuilder()
+              .setCustomId("⬅")
+              .setLabel("back")
+              .setStyle(ButtonStyle.Primary)
+              .setDisabled(false),
+            new ButtonBuilder()
+              .setCustomId("➡")
+              .setLabel("next")
+              .setStyle(ButtonStyle.Primary)
+              .setDisabled(false)
           );
         }
         await edit({ embeds: [embed], components: [row] }, msg);

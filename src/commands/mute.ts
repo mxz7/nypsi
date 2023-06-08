@@ -23,10 +23,15 @@ const cmd = new Command("mute", "mute one or more users", "moderation").setPermi
 
 cmd.slashEnabled = true;
 cmd.slashData
-  .addUserOption((option) => option.setName("user").setDescription("user to mute").setRequired(true))
+  .addUserOption((option) =>
+    option.setName("user").setDescription("user to mute").setRequired(true)
+  )
   .addStringOption((option) => option.setName("reason").setDescription("reason for the mute"));
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[]
+) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
     if (!message.member.permissions.has(PermissionFlagsBits.ModerateMembers)) {
       return;
@@ -70,7 +75,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     !message.guild.members.me.permissions.has(PermissionFlagsBits.ManageChannels)
   ) {
     return send({
-      embeds: [new ErrorEmbed("i need the `manage roles` and `manage channels` permission for this command to work")],
+      embeds: [
+        new ErrorEmbed(
+          "i need the `manage roles` and `manage channels` permission for this command to work"
+        ),
+      ],
     });
   }
 
@@ -85,7 +94,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       .setHeader("mute help")
       .addField("usage", "/mute <user> (time) (reason) [-s]")
       .addField("help", "if the mute role isnt setup correctly this wont work")
-      .addField("time format examples", "**1d** *1 day*\n**10h** *10 hours*\n**15m** *15 minutes*\n**30s** *30 seconds*");
+      .addField(
+        "time format examples",
+        "**1d** *1 day*\n**10h** *10 hours*\n**15m** *15 minutes*\n**30s** *30 seconds*"
+      );
     return send({ embeds: [embed] });
   }
 
@@ -138,14 +150,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       } catch (e) {
         return send({
           embeds: [
-            new ErrorEmbed("error creating mute role - make sure i have `manage roles` permission and `manage channels`"),
+            new ErrorEmbed(
+              "error creating mute role - make sure i have `manage roles` permission and `manage channels`"
+            ),
           ],
         });
       }
       if (channelError) {
         return send({
           embeds: [
-            new ErrorEmbed("error creating mute role - make sure i have `manage roles` permission and `manage channels`"),
+            new ErrorEmbed(
+              "error creating mute role - make sure i have `manage roles` permission and `manage channels`"
+            ),
           ],
         });
       }
@@ -192,14 +208,23 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const targetHighestRole = target.roles.highest;
     const memberHighestRole = message.member.roles.highest;
 
-    if (targetHighestRole.position >= memberHighestRole.position && message.guild.ownerId != message.member.user.id) {
-      return send({ embeds: [new ErrorEmbed(`your role is not high enough to punish ${target.toString()}`)] });
+    if (
+      targetHighestRole.position >= memberHighestRole.position &&
+      message.guild.ownerId != message.member.user.id
+    ) {
+      return send({
+        embeds: [new ErrorEmbed(`your role is not high enough to punish ${target.toString()}`)],
+      });
     } else {
       await target.roles.add(muteRole).catch(() => {
         fail = true;
 
         return send({
-          embeds: [new ErrorEmbed("i am unable to give users the mute role - ensure my role is above the 'muted' role")],
+          embeds: [
+            new ErrorEmbed(
+              "i am unable to give users the mute role - ensure my role is above the 'muted' role"
+            ),
+          ],
         });
       });
     }
@@ -212,15 +237,24 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const targetHighestRole = target.roles.highest;
     const memberHighestRole = message.member.roles.highest;
 
-    if (targetHighestRole.position >= memberHighestRole.position && message.guild.ownerId != message.member.user.id) {
-      return send({ embeds: [new ErrorEmbed(`your role is not high enough to punish ${target.toString()}`)] });
+    if (
+      targetHighestRole.position >= memberHighestRole.position &&
+      message.guild.ownerId != message.member.user.id
+    ) {
+      return send({
+        embeds: [new ErrorEmbed(`your role is not high enough to punish ${target.toString()}`)],
+      });
     } else if (target.isCommunicationDisabled() as boolean) {
       return send({ embeds: [new ErrorEmbed(`${target.user.toString()} is already timed out`)] });
     } else {
       await target.disableCommunicationUntil(unmuteDate, reason).catch(() => {
         fail = true;
         return send({
-          embeds: [new ErrorEmbed("i am unable to timeout users, ensure my role is high enough and i have the permission")],
+          embeds: [
+            new ErrorEmbed(
+              "i am unable to timeout users, ensure my role is high enough and i have the permission"
+            ),
+          ],
         });
       });
     }
@@ -282,13 +316,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (args.join(" ").includes("-s")) return;
   if (!timedMute) {
-    const embed = new CustomEmbed(target).setTitle(`muted in ${message.guild.name}`).addField("length", "`permanent`", true);
+    const embed = new CustomEmbed(target)
+      .setTitle(`muted in ${message.guild.name}`)
+      .addField("length", "`permanent`", true);
 
     if (reason != "") {
       embed.addField("reason", `\`${reason}\``, true);
     }
 
-    await target.send({ content: `you have been muted in ${message.guild.name}`, embeds: [embed] }).catch(() => {});
+    await target
+      .send({ content: `you have been muted in ${message.guild.name}`, embeds: [embed] })
+      .catch(() => {});
   } else {
     const embed = new CustomEmbed(target)
       .setTitle(`muted in ${message.guild.name}`)
@@ -300,7 +338,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       embed.addField("reason", `\`${reason}\``, true);
     }
 
-    await target.send({ content: `you have been muted in ${message.guild.name}`, embeds: [embed] }).catch(() => {});
+    await target
+      .send({ content: `you have been muted in ${message.guild.name}`, embeds: [embed] })
+      .catch(() => {});
   }
 }
 

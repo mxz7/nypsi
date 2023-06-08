@@ -1,4 +1,10 @@
-import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message, PermissionFlagsBits } from "discord.js";
+import {
+  BaseMessageOptions,
+  CommandInteraction,
+  InteractionReplyOptions,
+  Message,
+  PermissionFlagsBits,
+} from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
@@ -6,14 +12,21 @@ import { getExactMember } from "../utils/functions/member";
 import { newCase } from "../utils/functions/moderation/cases";
 import { createProfile, profileExists } from "../utils/functions/moderation/utils";
 
-const cmd = new Command("warn", "warn one or more users", "moderation").setPermissions(["MANAGE_MESSAGES"]);
+const cmd = new Command("warn", "warn one or more users", "moderation").setPermissions([
+  "MANAGE_MESSAGES",
+]);
 
 cmd.slashEnabled = true;
 cmd.slashData
-  .addUserOption((option) => option.setName("user").setDescription("user to warn").setRequired(true))
+  .addUserOption((option) =>
+    option.setName("user").setDescription("user to warn").setRequired(true)
+  )
   .addStringOption((option) => option.setName("reason").setDescription("reason for the warn"));
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[]
+) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) return;
 
   if (!(await profileExists(message.guild))) await createProfile(message.guild);
@@ -62,7 +75,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           "**[-s]** if used, command message will be deleted and the output will be sent to moderator as a DM if possible\n\n" +
           "if the bot was unable to DM a user on warn, the warning will still be logged"
       )
-      .addField("examples", `${prefix}warn @member toxicity\n${prefix}warn @member @member2 toxicity`);
+      .addField(
+        "examples",
+        `${prefix}warn @member toxicity\n${prefix}warn @member @member2 toxicity`
+      );
 
     return send({ embeds: [embed] });
   }
@@ -87,20 +103,34 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   let dmFail = false;
 
-  if (targetHighestRole.position >= memberHighestRole.position && message.guild.ownerId != message.member.user.id) {
-    return send({ embeds: [new ErrorEmbed(`your role is not high enough to punish ${target.toString()}`)] });
-  } else {
-    const embed = new CustomEmbed(target).setTitle(`warned in ${message.guild.name}`).addField("reason", `\`${reason}\``);
-
-    await target.send({ content: `you have been warned in ${message.guild.name}`, embeds: [embed] }).catch(() => {
-      dmFail = true;
+  if (
+    targetHighestRole.position >= memberHighestRole.position &&
+    message.guild.ownerId != message.member.user.id
+  ) {
+    return send({
+      embeds: [new ErrorEmbed(`your role is not high enough to punish ${target.toString()}`)],
     });
+  } else {
+    const embed = new CustomEmbed(target)
+      .setTitle(`warned in ${message.guild.name}`)
+      .addField("reason", `\`${reason}\``);
+
+    await target
+      .send({ content: `you have been warned in ${message.guild.name}`, embeds: [embed] })
+      .catch(() => {
+        dmFail = true;
+      });
   }
 
-  const embed = new CustomEmbed(message.member, `✅ \`${target.user.tag}\` has been warned for **${reason}**`);
+  const embed = new CustomEmbed(
+    message.member,
+    `✅ \`${target.user.tag}\` has been warned for **${reason}**`
+  );
 
   if (dmFail) {
-    embed.setDescription(`⚠️ failed to send message to \`${target.user.tag}\`. warn has still been logged`);
+    embed.setDescription(
+      `⚠️ failed to send message to \`${target.user.tag}\`. warn has still been logged`
+    );
   }
 
   if (args.join(" ").includes("-s")) {

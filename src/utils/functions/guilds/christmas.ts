@@ -4,7 +4,7 @@ import prisma from "../../../init/database";
 import { NypsiClient } from "../../../models/Client";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { logger } from "../../logger";
-import { daysUntilChristmas, MStoTime } from "../date";
+import { MStoTime, daysUntilChristmas } from "../date";
 
 export function runChristmas(client: NypsiClient) {
   const now = new Date();
@@ -121,7 +121,9 @@ export function runChristmas(client: NypsiClient) {
     runChristmasThing();
   }, needed.getTime() - now.getTime());
 
-  logger.info(`::auto christmas countdowns will run in ${MStoTime(needed.getTime() - now.getTime())}`);
+  logger.info(
+    `::auto christmas countdowns will run in ${MStoTime(needed.getTime() - now.getTime())}`
+  );
 }
 
 export async function hasChristmasCountdown(guild: Guild) {

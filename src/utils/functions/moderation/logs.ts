@@ -70,18 +70,26 @@ export async function addModLog(
     embed.addField("reason", command);
   }
 
-  await redis.lpush(`${Constants.redis.cache.guild.MODLOGS}:${guild.id}`, JSON.stringify(embed.toJSON()));
+  await redis.lpush(
+    `${Constants.redis.cache.guild.MODLOGS}:${guild.id}`,
+    JSON.stringify(embed.toJSON())
+  );
 }
 
 export async function addLog(guild: Guild, type: LogType, embed: CustomEmbed) {
   embed.setColor(logColors.get(type));
 
-  await redis.lpush(`${Constants.redis.nypsi.GUILD_LOG_QUEUE}:${guild.id}`, JSON.stringify(embed.toJSON()));
+  await redis.lpush(
+    `${Constants.redis.nypsi.GUILD_LOG_QUEUE}:${guild.id}`,
+    JSON.stringify(embed.toJSON())
+  );
 }
 
 export async function isLogsEnabled(guild: Guild) {
   if (await redis.exists(`${Constants.redis.cache.guild.LOGS}:${guild.id}`)) {
-    return (await redis.get(`${Constants.redis.cache.guild.LOGS}:${guild.id}`)) === "t" ? true : false;
+    return (await redis.get(`${Constants.redis.cache.guild.LOGS}:${guild.id}`)) === "t"
+      ? true
+      : false;
   }
 
   if (await redis.exists(`nypsi:query:islogsenabled:searching:${guild.id}`)) {

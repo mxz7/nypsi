@@ -5,12 +5,19 @@ import { MStoTime } from "../utils/functions/date";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getAutoMuteLevels, setAutoMuteLevels } from "../utils/functions/moderation/mute";
 
-const cmd = new Command("automute", "change auto mute lengths", "admin").setPermissions(["MANAGE_SERVER"]);
+const cmd = new Command("automute", "change auto mute lengths", "admin").setPermissions([
+  "MANAGE_SERVER",
+]);
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[]
+) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
     if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
-      return message.channel.send({ embeds: [new ErrorEmbed("you need the `manage server` permission")] });
+      return message.channel.send({
+        embeds: [new ErrorEmbed("you need the `manage server` permission")],
+      });
     }
     return;
   }
@@ -22,7 +29,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (args.length == 0) {
     const embed = new CustomEmbed(
       message.member,
-      levels.map((secs, index) => `${index + 1} \`${MStoTime(secs * 1000, true).trim() || "no mute"}\``).join("\n")
+      levels
+        .map((secs, index) => `${index + 1} \`${MStoTime(secs * 1000, true).trim() || "no mute"}\``)
+        .join("\n")
     )
       .setHeader("current auto mute lengths")
       .setFooter({ text: `${prefix}automute <vl> <length | delete>` });
@@ -37,7 +46,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (args[0].toLowerCase() == "disable") {
     await setAutoMuteLevels(message.guild, []);
 
-    return message.channel.send({ embeds: [new CustomEmbed(message.member, "✅ auto mute has been disabled")] });
+    return message.channel.send({
+      embeds: [new CustomEmbed(message.member, "✅ auto mute has been disabled")],
+    });
   }
 
   if (!parseInt(args[0])) {
@@ -63,20 +74,29 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await setAutoMuteLevels(message.guild, levels);
 
-    return message.channel.send({ embeds: [new CustomEmbed(message.member, `✅ level \`${level + 1}\` has been removed`)] });
+    return message.channel.send({
+      embeds: [new CustomEmbed(message.member, `✅ level \`${level + 1}\` has been removed`)],
+    });
   }
 
   const duration = getDuration(args[1].toLowerCase());
 
   if (duration < 0 || isNaN(duration) || typeof duration !== "number")
-    return message.channel.send({ embeds: [new ErrorEmbed("invalid duration. format: 15m = 15 minutes")] });
+    return message.channel.send({
+      embeds: [new ErrorEmbed("invalid duration. format: 15m = 15 minutes")],
+    });
 
   levels[level] = duration;
 
   await setAutoMuteLevels(message.guild, levels);
 
   return message.channel.send({
-    embeds: [new CustomEmbed(message.member, `✅ set \`${level + 1}\` to \`${duration.toLocaleString()}\` seconds`)],
+    embeds: [
+      new CustomEmbed(
+        message.member,
+        `✅ set \`${level + 1}\` to \`${duration.toLocaleString()}\` seconds`
+      ),
+    ],
   });
 }
 

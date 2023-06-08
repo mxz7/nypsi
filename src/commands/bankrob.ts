@@ -17,8 +17,17 @@ import { getBalance, updateBalance } from "../utils/functions/economy/balance.js
 import { getInventory, setInventoryItem } from "../utils/functions/economy/inventory.js";
 import { createGame } from "../utils/functions/economy/stats.js";
 import { createUser, userExists } from "../utils/functions/economy/utils.js";
-import { addToNypsiBank, getNypsiBankBalance, removeFromNypsiBankBalance } from "../utils/functions/tax.js";
-import { addCooldown, getRemaining, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
+import {
+  addToNypsiBank,
+  getNypsiBankBalance,
+  removeFromNypsiBankBalance,
+} from "../utils/functions/tax.js";
+import {
+  addCooldown,
+  getRemaining,
+  getResponse,
+  onCooldown,
+} from "../utils/handlers/cooldownhandler.js";
 import ms = require("ms");
 
 const cmd = new Command("bankrob", "attempt to rob a bank for a high reward", "money");
@@ -79,7 +88,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     let lawyer = false;
 
-    if (inventory.find((i) => i.item == "lawyer") && inventory.find((i) => i.item == "lawyer").amount > 0) {
+    if (
+      inventory.find((i) => i.item == "lawyer") &&
+      inventory.find((i) => i.item == "lawyer").amount > 0
+    ) {
       lawyer = true;
       maxLoss = maxLoss * 0.35;
     }
@@ -161,7 +173,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         outcome: `${message.author.username} robbed ${bank}`,
       });
 
-      embed.setDescription(`**success!**\n\n**you stole** $${stolen.toLocaleString()} from **${bank}**`);
+      embed.setDescription(
+        `**success!**\n\n**you stole** $${stolen.toLocaleString()} from **${bank}**`
+      );
       embed.setColor(Constants.EMBED_SUCCESS_COLOR);
       embed.setFooter({ text: `id: ${id}` });
 
@@ -170,10 +184,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       const inventory = await getInventory(message.member);
       let lawyer = false;
 
-      if (inventory.find((i) => i.item == "lawyer") && inventory.find((i) => i.item == "lawyer").amount > 0) {
+      if (
+        inventory.find((i) => i.item == "lawyer") &&
+        inventory.find((i) => i.item == "lawyer").amount > 0
+      ) {
         lawyer = true;
 
-        await setInventoryItem(message.member, "lawyer", inventory.find((i) => i.item == "lawyer").amount - 1, false);
+        await setInventoryItem(
+          message.member,
+          "lawyer",
+          inventory.find((i) => i.item == "lawyer").amount - 1,
+          false
+        );
       }
 
       const minLoss = Math.floor(loss * 0.4);
@@ -199,7 +221,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           `**you were caught**\n\nthanks to your lawyer, you only lost $**${totalLossed.toLocaleString()}**`
         );
       } else {
-        embed.setDescription(`**you were caught**\n\nyou lost $**${totalLossed.toLocaleString()}**`);
+        embed.setDescription(
+          `**you were caught**\n\nyou lost $**${totalLossed.toLocaleString()}**`
+        );
       }
     }
 

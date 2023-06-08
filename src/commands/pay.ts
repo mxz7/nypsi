@@ -1,9 +1,20 @@
-import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions } from "discord.js";
+import {
+  BaseMessageOptions,
+  CommandInteraction,
+  InteractionReplyOptions,
+  Message,
+  MessageEditOptions,
+} from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
 import { getPrestige } from "../utils/functions/economy/prestige";
-import { createUser, formatNumber, isEcoBanned, userExists } from "../utils/functions/economy/utils";
+import {
+  createUser,
+  formatNumber,
+  isEcoBanned,
+  userExists,
+} from "../utils/functions/economy/utils";
 import { getXp } from "../utils/functions/economy/xp";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
@@ -18,10 +29,17 @@ const cmd = new Command("pay", "give other users money", "money");
 
 cmd.slashEnabled = true;
 cmd.slashData
-  .addUserOption((option) => option.setName("user").setDescription("who would you like to send money to").setRequired(true))
-  .addStringOption((option) => option.setName("amount").setDescription("how much would you like to send").setRequired(true));
+  .addUserOption((option) =>
+    option.setName("user").setDescription("who would you like to send money to").setRequired(true)
+  )
+  .addStringOption((option) =>
+    option.setName("amount").setDescription("how much would you like to send").setRequired(true)
+  );
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[]
+) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       let usedNewMessage = false;
@@ -61,7 +79,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const prefix = await getPrefix(message.guild);
 
   if (args.length < 2) {
-    const embed = new CustomEmbed(message.member).setHeader("pay help").addField("usage", `${prefix}pay <user> <amount>`);
+    const embed = new CustomEmbed(message.member)
+      .setHeader("pay help")
+      .addField("usage", `${prefix}pay <user> <amount>`);
 
     return send({ embeds: [embed] });
   }
@@ -119,7 +139,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     await addToNypsiBank(amount, false);
 
     return send({
-      embeds: [new CustomEmbed(message.member, `thank you for your donation of $${amount.toLocaleString()} 🙂`)],
+      embeds: [
+        new CustomEmbed(
+          message.member,
+          `thank you for your donation of $${amount.toLocaleString()} 🙂`
+        ),
+      ],
     });
   }
 
@@ -168,13 +193,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if ((await getDmSettings(target)).payment) {
     const embed = new CustomEmbed(
       target,
-      `**${message.author.tag}** has sent you $**${Math.floor(amount - taxedAmount).toLocaleString()}**`
+      `**${message.author.tag}** has sent you $**${Math.floor(
+        amount - taxedAmount
+      ).toLocaleString()}**`
     )
       .setHeader("you have received a payment")
       .setFooter({ text: "/settings me notifications" });
 
     await target
-      .send({ embeds: [embed], content: `you have received $${Math.floor(amount - taxedAmount).toLocaleString()}` })
+      .send({
+        embeds: [embed],
+        content: `you have received $${Math.floor(amount - taxedAmount).toLocaleString()}`,
+      })
       .catch(() => {});
   }
 
@@ -182,12 +212,20 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     .setHeader("payment", message.author.avatarURL())
     .addField(
       message.member.user.tag,
-      "$" + ((await getBalance(message.member)) + amount).toLocaleString() + "\n**-** $" + amount.toLocaleString()
+      "$" +
+        ((await getBalance(message.member)) + amount).toLocaleString() +
+        "\n**-** $" +
+        amount.toLocaleString()
     );
 
   if (tax > 0) {
     embed.setDescription(
-      message.member.user.toString() + " -> " + target.user.toString() + "\n**" + (tax * 100).toFixed(1) + "**% tax"
+      message.member.user.toString() +
+        " -> " +
+        target.user.toString() +
+        "\n**" +
+        (tax * 100).toFixed(1) +
+        "**% tax"
     );
     embed.addField(
       target.user.tag,
@@ -200,7 +238,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     embed.setDescription(message.member.user.toString() + " -> " + target.user.toString());
     embed.addField(
       target.user.tag,
-      "$" + ((await getBalance(target)) - amount).toLocaleString() + "\n**+** $" + amount.toLocaleString()
+      "$" +
+        ((await getBalance(target)) - amount).toLocaleString() +
+        "\n**+** $" +
+        amount.toLocaleString()
     );
   }
 
@@ -229,12 +270,21 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           "**)"
       );
       embed.setDescription(
-        message.member.user.toString() + " -> " + target.user.toString() + "\n**" + (tax * 100).toFixed(1) + "**% tax"
+        message.member.user.toString() +
+          " -> " +
+          target.user.toString() +
+          "\n**" +
+          (tax * 100).toFixed(1) +
+          "**% tax"
       );
     } else {
       embed.addField(
         target.user.tag,
-        "$" + (await getBalance(target)).toLocaleString() + " (+$**" + amount.toLocaleString() + "**)"
+        "$" +
+          (await getBalance(target)).toLocaleString() +
+          " (+$**" +
+          amount.toLocaleString() +
+          "**)"
       );
     }
 

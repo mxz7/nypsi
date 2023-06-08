@@ -7,7 +7,10 @@ const cmd = new Command("clearsnipe", "delete the current sniped thing", "modera
   .setAliases(["cs"])
   .setPermissions(["MANAGE_MESSAGES"]);
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[]
+) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) return;
   let channel: Channel = message.channel;
 

@@ -1,4 +1,9 @@
-import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
+import {
+  BaseMessageOptions,
+  CommandInteraction,
+  InteractionReplyOptions,
+  Message,
+} from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getBalance, getSellMulti, updateBalance } from "../utils/functions/economy/balance";
@@ -13,11 +18,18 @@ const cmd = new Command("sell", "sell items", "money");
 cmd.slashEnabled = true;
 cmd.slashData
   .addStringOption((option) =>
-    option.setName("item").setRequired(true).setAutocomplete(true).setDescription("item you want to sell")
+    option
+      .setName("item")
+      .setRequired(true)
+      .setAutocomplete(true)
+      .setDescription("item you want to sell")
   )
   .addStringOption((option) => option.setName("amount").setDescription("amount you want to sell"));
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[]
+) {
   if (!(await userExists(message.member))) await createUser(message.member);
 
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
@@ -98,7 +110,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({ embeds: [new ErrorEmbed("invalid amount")] });
   }
 
-  if (!inventory.find((i) => i.item == selected.id) || inventory.find((i) => i.item == selected.id).amount == 0) {
+  if (
+    !inventory.find((i) => i.item == selected.id) ||
+    inventory.find((i) => i.item == selected.id).amount == 0
+  ) {
     return send({ embeds: [new ErrorEmbed("you dont have any " + selected.name)] });
   }
 
@@ -108,7 +123,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   await addCooldown(cmd.name, message.member, 5);
 
-  await setInventoryItem(message.member, selected.id, inventory.find((i) => i.item == selected.id).amount - amount, false);
+  await setInventoryItem(
+    message.member,
+    selected.id,
+    inventory.find((i) => i.item == selected.id).amount - amount,
+    false
+  );
 
   let sellWorth = Math.floor(selected.sell * amount);
 
@@ -135,8 +155,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const embed = new CustomEmbed(message.member);
 
   embed.setDescription(
-    `you sold **${amount.toLocaleString()}** ${selected.emoji} ${selected.name} for $${sellWorth.toLocaleString()} ${
-      multi > 0 && (selected.role == "fish" || selected.role == "prey" || selected.role == "sellable")
+    `you sold **${amount.toLocaleString()}** ${selected.emoji} ${
+      selected.name
+    } for $${sellWorth.toLocaleString()} ${
+      multi > 0 &&
+      (selected.role == "fish" || selected.role == "prey" || selected.role == "sellable")
         ? `(+**${Math.floor(multi * 100).toString()}**% bonus)`
         : ""
     }`

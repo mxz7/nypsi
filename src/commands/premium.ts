@@ -71,7 +71,10 @@ cmd.slashData
       .setName("color")
       .setDescription("set your custom color")
       .addStringOption((option) =>
-        option.setName("color").setDescription("color you want to be used on all messages (hex format)").setRequired(true)
+        option
+          .setName("color")
+          .setDescription("color you want to be used on all messages (hex format)")
+          .setRequired(true)
       )
   )
   .addSubcommandGroup((mycmd) =>
@@ -87,7 +90,10 @@ cmd.slashData
             option.setName("trigger").setDescription("trigger for your command").setRequired(true)
           )
           .addStringOption((option) =>
-            option.setName("value").setDescription("set the content for your custom command").setRequired(true)
+            option
+              .setName("value")
+              .setDescription("set the content for your custom command")
+              .setRequired(true)
           )
       )
   )
@@ -101,7 +107,11 @@ cmd.slashData
           .setName("add")
           .setDescription("create a custom alias")
           .addStringOption((option) =>
-            option.setName("alias").setDescription("alias for your command").setRequired(true).setMaxLength(15)
+            option
+              .setName("alias")
+              .setDescription("alias for your command")
+              .setRequired(true)
+              .setMaxLength(15)
           )
           .addStringOption((option) =>
             option
@@ -116,12 +126,19 @@ cmd.slashData
           .setName("del")
           .setDescription("delete a custom alias")
           .addStringOption((option) =>
-            option.setName("alias").setDescription("alias for your command").setRequired(true).setMaxLength(15)
+            option
+              .setName("alias")
+              .setDescription("alias for your command")
+              .setRequired(true)
+              .setMaxLength(15)
           )
       )
   );
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[]
+) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       let usedNewMessage = false;
@@ -162,17 +179,22 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       const roleIds = Array.from(guildMember.roles.cache.keys());
 
       if (roleIds.includes(Constants.BOOST_ROLE_ID)) {
-        if (!(await isBooster(guildMember.user.id))) await setBooster(guildMember.user.id, true).catch(() => {});
+        if (!(await isBooster(guildMember.user.id)))
+          await setBooster(guildMember.user.id, true).catch(() => {});
       } else if (await isBooster(guildMember.user.id)) {
         await setBooster(guildMember.user.id, false);
       }
 
       if (!(await isPremium(guildMember)) || guildMember.user.id == Constants.TEKOH_ID) {
         // i dont want plat role lol
-        if (roleIds.includes(Constants.PLATINUM_ROLE_ID)) guildMember.roles.remove(Constants.PLATINUM_ROLE_ID);
-        if (roleIds.includes(Constants.GOLD_ROLE_ID)) guildMember.roles.remove(Constants.GOLD_ROLE_ID);
-        if (roleIds.includes(Constants.SILVER_ROLE_ID)) guildMember.roles.remove(Constants.SILVER_ROLE_ID);
-        if (roleIds.includes(Constants.BRONZE_ROLE_ID)) guildMember.roles.remove(Constants.BRONZE_ROLE_ID);
+        if (roleIds.includes(Constants.PLATINUM_ROLE_ID))
+          guildMember.roles.remove(Constants.PLATINUM_ROLE_ID);
+        if (roleIds.includes(Constants.GOLD_ROLE_ID))
+          guildMember.roles.remove(Constants.GOLD_ROLE_ID);
+        if (roleIds.includes(Constants.SILVER_ROLE_ID))
+          guildMember.roles.remove(Constants.SILVER_ROLE_ID);
+        if (roleIds.includes(Constants.BRONZE_ROLE_ID))
+          guildMember.roles.remove(Constants.BRONZE_ROLE_ID);
         continue;
       }
 
@@ -192,7 +214,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           break;
       }
 
-      if (requiredRole != "none" && !roleIds.includes(requiredRole)) await guildMember.roles.add(requiredRole);
+      if (requiredRole != "none" && !roleIds.includes(requiredRole))
+        await guildMember.roles.add(requiredRole);
 
       for (const role of guildMember.roles.cache.values()) {
         let requiredLevel = 0;
@@ -211,7 +234,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             break;
         }
         if (requiredLevel !== 0) {
-          if ((await getTier(guildMember)) != requiredLevel) await guildMember.roles.remove(role.id);
+          if ((await getTier(guildMember)) != requiredLevel)
+            await guildMember.roles.remove(role.id);
         }
       }
     }
@@ -290,7 +314,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const setColor = async () => {
     if (!(await isPremium(message.author.id))) {
       return send({
-        embeds: [new ErrorEmbed("you must be a BRONZE tier patreon for this command\n\nhttps://www.patreon.com/nypsi")],
+        embeds: [
+          new ErrorEmbed(
+            "you must be a BRONZE tier patreon for this command\n\nhttps://www.patreon.com/nypsi"
+          ),
+        ],
       });
     }
 
@@ -329,7 +357,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       }
     } catch {
       return send({
-        embeds: [new ErrorEmbed("invalid color, please use a hex color ([color.tekoh.net](https://color.tekoh.net))")],
+        embeds: [
+          new ErrorEmbed(
+            "invalid color, please use a hex color ([color.tekoh.net](https://color.tekoh.net))"
+          ),
+        ],
       });
     }
 
@@ -347,7 +379,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const doCustomCommand = async () => {
     if ((await getTier(message.author.id)) < 3) {
-      return send({ embeds: [new ErrorEmbed("you must be **GOLD** tier to create a custom command")] });
+      return send({
+        embeds: [new ErrorEmbed("you must be **GOLD** tier to create a custom command")],
+      });
     }
     if (!(message instanceof CommandInteraction)) {
       return send({ embeds: [new ErrorEmbed("you must use /premium mycmd for this")] });
@@ -373,7 +407,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       return send({ embeds: [embed] });
     } else {
-      const commandTrigger = cleanString(message.options.getString("trigger").toLowerCase().normalize("NFD")).trim();
+      const commandTrigger = cleanString(
+        message.options.getString("trigger").toLowerCase().normalize("NFD")
+      ).trim();
       const commandContent = message.options.getString("value").normalize("NFD").trim();
 
       if (commandTrigger.length === 0 || commandContent.length === 0) {
@@ -386,7 +422,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         }
       }
 
-      if (commandExists(commandTrigger)) return send({ embeds: [new ErrorEmbed("this is already a nypsi command")] });
+      if (commandExists(commandTrigger))
+        return send({ embeds: [new ErrorEmbed("this is already a nypsi command")] });
 
       const cmd = await getCommand(commandTrigger);
 
@@ -395,13 +432,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       await setCommand(message.author.id, commandTrigger, commandContent);
 
-      return send({ embeds: [new CustomEmbed(message.member, "✅ your command has been updated")] });
+      return send({
+        embeds: [new CustomEmbed(message.member, "✅ your command has been updated")],
+      });
     }
   };
 
   const doAliases = async () => {
     if ((await getTier(message.author.id)) < 1) {
-      return send({ embeds: [new ErrorEmbed("you must be **BRONZE** tier to create a custom alias")] });
+      return send({
+        embeds: [new ErrorEmbed("you must be **BRONZE** tier to create a custom alias")],
+      });
     }
     if (!(message instanceof CommandInteraction)) {
       return send({ embeds: [new ErrorEmbed("you must use /premium alias for this")] });
@@ -413,7 +454,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (args[1].toLowerCase() === "list") {
       if (aliases.length === 0) return send({ embeds: [new ErrorEmbed("you have no aliases")] });
-      const pages = PageManager.createPages(aliases.map((i) => `\`${i.alias}\` -> \`${i.command}\``));
+      const pages = PageManager.createPages(
+        aliases.map((i) => `\`${i.alias}\` -> \`${i.command}\``)
+      );
 
       const embed = new CustomEmbed(message.member, pages.get(1).join("\n"));
 
@@ -422,7 +465,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       if (pages.size === 1) return;
 
       const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
+        new ButtonBuilder()
+          .setCustomId("⬅")
+          .setLabel("back")
+          .setStyle(ButtonStyle.Primary)
+          .setDisabled(true),
         new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
       );
 
@@ -448,11 +495,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       max = Math.floor(max);
 
       if (aliases.length >= max) {
-        return send({ embeds: [new ErrorEmbed(`you have reached your limit of custom aliases (${max})`)] });
+        return send({
+          embeds: [new ErrorEmbed(`you have reached your limit of custom aliases (${max})`)],
+        });
       }
 
-      const trigger = cleanString(message.options.getString("alias").toLowerCase().normalize("NFD").split(" ")[0]);
-      const command = cleanString(message.options.getString("command").toLowerCase().normalize("NFD"));
+      const trigger = cleanString(
+        message.options.getString("alias").toLowerCase().normalize("NFD").split(" ")[0]
+      );
+      const command = cleanString(
+        message.options.getString("command").toLowerCase().normalize("NFD")
+      );
 
       for (const word of commandFilter) {
         if (trigger.includes(word) || command.toLowerCase().includes(word)) {
@@ -467,7 +520,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return send({
           embeds: [
             new ErrorEmbed(
-              `\`${command.split(" ")[0]}\` is not a command. use $help <alias> to find the actual command name`
+              `\`${
+                command.split(" ")[0]
+              }\` is not a command. use $help <alias> to find the actual command name`
             ),
           ],
         });
@@ -475,7 +530,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       await addUserAlias(message.author.id, trigger, command);
 
-      return send({ embeds: [new CustomEmbed(message.member, `✅ added \`${trigger}\` -> \`${command}\``)] });
+      return send({
+        embeds: [new CustomEmbed(message.member, `✅ added \`${trigger}\` -> \`${command}\``)],
+      });
     } else if (args[1].toLowerCase() === "del") {
       const foundAlias = aliases.find((i) => i.alias === args[2]);
 
@@ -542,7 +599,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (!(await isPremium(args[2]))) {
       return send({
-        embeds: [new ErrorEmbed("this user does not have a profile, use $premium add dumbass check it before u update it")],
+        embeds: [
+          new ErrorEmbed(
+            "this user does not have a profile, use $premium add dumbass check it before u update it"
+          ),
+        ],
       });
     }
 

@@ -11,7 +11,10 @@ const cmd = new Command("countdown", "create and manage your server countdowns",
   .setAliases(["countdowns"])
   .setPermissions(["MANAGE_SERVER"]);
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[]
+) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
     if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
       message.channel.send({ embeds: [new ErrorEmbed("you need the `manage server` permission")] });
@@ -57,7 +60,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       if (max == 1) {
         error += "\n\nbecome a patreon to upgrade this limt (https://patreon.com/join/nypsi)";
       } else if (max != 5) {
-        error += "\n\nyou can upgrade your subscription to get access to more countdowns per server";
+        error +=
+          "\n\nyou can upgrade your subscription to get access to more countdowns per server";
       }
 
       return message.channel.send({ embeds: [new ErrorEmbed(error)] });
@@ -74,10 +78,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     let fail = false;
 
-    let res: any = await message.channel.awaitMessages({ filter, max: 1, time: 60000, errors: ["time"] }).catch(() => {
-      fail = true;
-      message.channel.send({ embeds: [new ErrorEmbed("you ran out of time - cancelled")] });
-    });
+    let res: any = await message.channel
+      .awaitMessages({ filter, max: 1, time: 60000, errors: ["time"] })
+      .catch(() => {
+        fail = true;
+        message.channel.send({ embeds: [new ErrorEmbed("you ran out of time - cancelled")] });
+      });
 
     if (fail) return;
 
@@ -100,7 +106,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const now = new Date().getTime();
 
     if (date.getTime() < now) {
-      return message.channel.send({ embeds: [new ErrorEmbed("unfortunately i cant go back in time")] });
+      return message.channel.send({
+        embeds: [new ErrorEmbed("unfortunately i cant go back in time")],
+      });
     }
 
     if (date.getTime() - now < 172800000) {
@@ -123,10 +131,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await message.channel.send({ embeds: [embed] });
 
-    res = await message.channel.awaitMessages({ filter, max: 1, time: 60000, errors: ["time"] }).catch(() => {
-      fail = true;
-      message.channel.send({ embeds: [new ErrorEmbed("you ran out of time - cancelled")] });
-    });
+    res = await message.channel
+      .awaitMessages({ filter, max: 1, time: 60000, errors: ["time"] })
+      .catch(() => {
+        fail = true;
+        message.channel.send({ embeds: [new ErrorEmbed("you ran out of time - cancelled")] });
+      });
 
     if (fail) return;
 
@@ -140,14 +150,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const channel = res.mentions.channels.first();
 
-    embed.setDescription("what format would you like to use?\n\n%days% will be replaced with how many days are left");
+    embed.setDescription(
+      "what format would you like to use?\n\n%days% will be replaced with how many days are left"
+    );
 
     await message.channel.send({ embeds: [embed] });
 
-    res = await message.channel.awaitMessages({ filter, max: 1, time: 60000, errors: ["time"] }).catch(() => {
-      fail = true;
-      message.channel.send({ embeds: [new ErrorEmbed("you ran out of time - cancelled")] });
-    });
+    res = await message.channel
+      .awaitMessages({ filter, max: 1, time: 60000, errors: ["time"] })
+      .catch(() => {
+        fail = true;
+        message.channel.send({ embeds: [new ErrorEmbed("you ran out of time - cancelled")] });
+      });
 
     if (fail) return;
 
@@ -158,7 +172,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     if (res.length > 250) {
-      return message.channel.send({ embeds: [new ErrorEmbed("cannot be longer than 250 characters")] });
+      return message.channel.send({
+        embeds: [new ErrorEmbed("cannot be longer than 250 characters")],
+      });
     }
 
     const format = res;
@@ -169,17 +185,21 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await message.channel.send({ embeds: [embed] });
 
-    res = await message.channel.awaitMessages({ filter, max: 1, time: 60000, errors: ["time"] }).catch(() => {
-      fail = true;
-      message.channel.send({ embeds: [new ErrorEmbed("you ran out of time - cancelled")] });
-    });
+    res = await message.channel
+      .awaitMessages({ filter, max: 1, time: 60000, errors: ["time"] })
+      .catch(() => {
+        fail = true;
+        message.channel.send({ embeds: [new ErrorEmbed("you ran out of time - cancelled")] });
+      });
 
     if (fail) return;
 
     res = res.first().content;
 
     if (res.length > 250) {
-      return message.channel.send({ embeds: [new ErrorEmbed("cannot be longer than 250 characters")] });
+      return message.channel.send({
+        embeds: [new ErrorEmbed("cannot be longer than 250 characters")],
+      });
     }
 
     const finalFormat = res;
@@ -203,7 +223,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     embed.setDescription("✅ countdown added");
 
     return message.channel.send({ embeds: [embed] });
-  } else if (args[0].toLowerCase() == "del" || args[0].toLowerCase() == "-" || args[0].toLowerCase() == "delete") {
+  } else if (
+    args[0].toLowerCase() == "del" ||
+    args[0].toLowerCase() == "-" ||
+    args[0].toLowerCase() == "delete"
+  ) {
     if (args.length == 1 || isNaN(parseInt(args[1]))) {
       return message.channel.send({
         embeds: [new ErrorEmbed(`${prefix}countdown delete <countdown id>`)],
@@ -213,12 +237,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const countdowns = await getCountdowns(message.guild);
 
     if (!countdowns[parseInt(args[1]) - 1]) {
-      return message.channel.send({ embeds: [new ErrorEmbed("invalid countdown - use the countdown id")] });
+      return message.channel.send({
+        embeds: [new ErrorEmbed("invalid countdown - use the countdown id")],
+      });
     }
 
     await deleteCountdown(message.guild, args[1].toString());
 
-    return message.channel.send({ embeds: [new CustomEmbed(message.member, "✅ countdown deleted")] });
+    return message.channel.send({
+      embeds: [new CustomEmbed(message.member, "✅ countdown deleted")],
+    });
   } else {
     const embed = new CustomEmbed(message.member);
 

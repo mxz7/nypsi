@@ -7,7 +7,11 @@ import { getBalance, updateBalance } from "../utils/functions/economy/balance";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command("work", "work a random job and safely earn a random amount of money", "money");
+const cmd = new Command(
+  "work",
+  "work a random job and safely earn a random amount of money",
+  "money"
+);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
   if (await onCooldown(cmd.name, message.member)) {
@@ -23,7 +27,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   }
 
   if ((await getBalance(message.member)) > 1000000) {
-    return message.channel.send({ embeds: [new ErrorEmbed("you're too rich for this command bro")] });
+    return message.channel.send({
+      embeds: [new ErrorEmbed("you're too rich for this command bro")],
+    });
   }
 
   await addCooldown(cmd.name, message.member, 1800);
