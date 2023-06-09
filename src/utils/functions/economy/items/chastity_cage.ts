@@ -1,10 +1,4 @@
-import {
-  BaseMessageOptions,
-  CommandInteraction,
-  InteractionReplyOptions,
-  Message,
-  MessageEditOptions,
-} from "discord.js";
+import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions } from "discord.js";
 import redis from "../../../../init/redis";
 import { NypsiCommandInteraction } from "../../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
@@ -74,21 +68,13 @@ module.exports = new ItemUse(
       });
     }
 
-    if (
-      (await redis.exists(`${Constants.redis.cooldown.SEX_CHASTITY}:${chastityTarget.user.id}`)) ==
-      1
-    ) {
+    if ((await redis.exists(`${Constants.redis.cooldown.SEX_CHASTITY}:${chastityTarget.user.id}`)) == 1) {
       return send({
-        embeds: [
-          new ErrorEmbed(`**${chastityTarget.user.tag}** is already equipped with a chastity cage`),
-        ],
+        embeds: [new ErrorEmbed(`**${chastityTarget.user.tag}** is already equipped with a chastity cage`)],
       });
     }
 
-    await redis.set(
-      `${Constants.redis.cooldown.SEX_CHASTITY}:${chastityTarget.user.id}`,
-      Date.now()
-    );
+    await redis.set(`${Constants.redis.cooldown.SEX_CHASTITY}:${chastityTarget.user.id}`, Date.now());
     await redis.expire(`${Constants.redis.cooldown.SEX_CHASTITY}:${chastityTarget.user.id}`, 10800);
 
     const inventory = await getInventory(message.member, false);
@@ -100,9 +86,7 @@ module.exports = new ItemUse(
       false
     );
 
-    const msg = await send({
-      embeds: [new CustomEmbed(message.member, "locking chastity cage...")],
-    });
+    const msg = await send({ embeds: [new CustomEmbed(message.member, "locking chastity cage...")] });
 
     await sleep(2000);
 

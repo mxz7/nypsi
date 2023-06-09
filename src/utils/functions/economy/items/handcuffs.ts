@@ -1,10 +1,4 @@
-import {
-  BaseMessageOptions,
-  CommandInteraction,
-  InteractionReplyOptions,
-  Message,
-  MessageEditOptions,
-} from "discord.js";
+import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions } from "discord.js";
 import { NypsiCommandInteraction } from "../../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
@@ -43,9 +37,7 @@ module.exports = new ItemUse(
     };
 
     if ((await getDisabledCommands(message.guild)).includes("rob")) {
-      return send({
-        embeds: [new ErrorEmbed(`handcuffs have been disabled in ${message.guild.name}`)],
-      });
+      return send({ embeds: [new ErrorEmbed(`handcuffs have been disabled in ${message.guild.name}`)] });
     }
 
     if (args.length == 1) {
@@ -71,28 +63,18 @@ module.exports = new ItemUse(
     }
 
     if (await isPassive(handcuffsTarget))
-      return send({
-        embeds: [new ErrorEmbed(`${handcuffsTarget.toString()} is currently in passive mode`)],
-      });
+      return send({ embeds: [new ErrorEmbed(`${handcuffsTarget.toString()} is currently in passive mode`)] });
 
-    if (await isPassive(message.member))
-      return send({ embeds: [new ErrorEmbed("you are currently in passive mode")] });
+    if (await isPassive(message.member)) return send({ embeds: [new ErrorEmbed("you are currently in passive mode")] });
 
     const inventory = await getInventory(message.member, false);
 
     await Promise.all([
-      setInventoryItem(
-        message.member,
-        "handcuffs",
-        inventory.find((i) => i.item == "handcuffs").amount - 1,
-        false
-      ),
+      setInventoryItem(message.member, "handcuffs", inventory.find((i) => i.item == "handcuffs").amount - 1, false),
       addHandcuffs(handcuffsTarget.id),
     ]);
 
-    const msg = await send({
-      embeds: [new CustomEmbed(message.member, `restraining **${handcuffsTarget.user.tag}**...`)],
-    });
+    const msg = await send({ embeds: [new CustomEmbed(message.member, `restraining **${handcuffsTarget.user.tag}**...`)] });
 
     return edit(
       {

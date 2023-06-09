@@ -19,12 +19,7 @@ import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import {
-  calcMaxBet,
-  getDefaultBet,
-  getRequiredBetForXp,
-  setDefaultBet,
-} from "../utils/functions/economy/balance";
+import { calcMaxBet, getDefaultBet, getRequiredBetForXp, setDefaultBet } from "../utils/functions/economy/balance";
 import { isPassive, setPassive } from "../utils/functions/economy/passive";
 import { createUser, formatNumber, userExists } from "../utils/functions/economy/utils";
 import { setSlashOnly } from "../utils/functions/guilds/slash";
@@ -72,15 +67,10 @@ cmd.slashData
           .setName("defaultbet")
           .setDescription("set or reset your default bet")
           .addStringOption((option) =>
-            option
-              .setName("bet")
-              .setDescription("type reset to disable your default bet")
-              .setRequired(false)
+            option.setName("bet").setDescription("type reset to disable your default bet").setRequired(false)
           )
       )
-      .addSubcommand((email) =>
-        email.setName("email").setDescription("get/set your email for purchases")
-      )
+      .addSubcommand((email) => email.setName("email").setDescription("get/set your email for purchases"))
       .addSubcommand((lastfm) =>
         lastfm
           .setName("lastfm")
@@ -99,16 +89,11 @@ cmd.slashData
         slashonly
           .setName("slash-only")
           .setDescription("set the server to only use slash commands")
-          .addBooleanOption((option) =>
-            option.setName("value").setDescription("yes/no").setRequired(true)
-          )
+          .addBooleanOption((option) => option.setName("value").setDescription("yes/no").setRequired(true))
       )
   );
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       let usedNewMessage = false;
@@ -160,30 +145,18 @@ async function run(
 
       embed.setDescription(
         // @ts-expect-error loser
-        notificationsData[settingId].description.replace(
-          "{VALUE}",
-          settings[settingId].toLocaleString()
-        )
+        notificationsData[settingId].description.replace("{VALUE}", settings[settingId].toLocaleString())
       );
 
       const userSelection = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder()
-          .setCustomId("enable-setting")
-          .setLabel("enable")
-          .setStyle(ButtonStyle.Success),
-        new ButtonBuilder()
-          .setCustomId("disable-setting")
-          .setLabel("disable")
-          .setStyle(ButtonStyle.Danger)
+        new ButtonBuilder().setCustomId("enable-setting").setLabel("enable").setStyle(ButtonStyle.Success),
+        new ButtonBuilder().setCustomId("disable-setting").setLabel("disable").setStyle(ButtonStyle.Danger)
       );
 
       // @ts-expect-error hate life innit
       if (typeof settings[settingId] === "number") {
         const boobies = [
-          new ButtonBuilder()
-            .setCustomId("enable")
-            .setLabel("set value")
-            .setStyle(ButtonStyle.Success),
+          new ButtonBuilder().setCustomId("enable").setLabel("set value").setStyle(ButtonStyle.Success),
           new ButtonBuilder()
             .setCustomId("disable")
             .setLabel("disable")
@@ -210,9 +183,7 @@ async function run(
           boobies.push(option);
         }
 
-        userSelection.setComponents(
-          new StringSelectMenuBuilder().setCustomId("typesetting").setOptions(boobies)
-        );
+        userSelection.setComponents(new StringSelectMenuBuilder().setCustomId("typesetting").setOptions(boobies));
       } else {
         // @ts-expect-error annoying grr
         if (settings[settingId]) {
@@ -250,11 +221,7 @@ async function run(
     const options: StringSelectMenuOptionBuilder[] = [];
 
     for (const settingId of Object.keys(notificationsData)) {
-      options.push(
-        new StringSelectMenuOptionBuilder()
-          .setValue(settingId)
-          .setLabel(notificationsData[settingId].name)
-      );
+      options.push(new StringSelectMenuOptionBuilder().setValue(settingId).setLabel(notificationsData[settingId].name));
     }
 
     if (settingId) {
@@ -303,9 +270,7 @@ async function run(
 
         // @ts-expect-error grr
         if (typeof settings[selected] == "number") {
-          const modal = new ModalBuilder()
-            .setCustomId("settings-update")
-            .setTitle("net worth notifications");
+          const modal = new ModalBuilder().setCustomId("settings-update").setTitle("net worth notifications");
 
           modal.addComponents(
             new ActionRowBuilder<TextInputBuilder>().addComponents(
@@ -323,9 +288,7 @@ async function run(
 
           const filter = (i: Interaction) => i.user.id == res.user.id;
 
-          const modalResponse = await res
-            .awaitModalSubmit({ filter, time: 120000 })
-            .catch(() => {});
+          const modalResponse = await res.awaitModalSubmit({ filter, time: 120000 }).catch(() => {});
 
           if (!modalResponse) return;
 
@@ -334,9 +297,7 @@ async function run(
           const value = formatNumber(modalResponse.fields.fields.first().value.toLowerCase());
 
           if (typeof value !== "number") {
-            await modalResponse.reply({
-              embeds: [new ErrorEmbed("invalid value. must a number. use 0 to disable")],
-            });
+            await modalResponse.reply({ embeds: [new ErrorEmbed("invalid value. must a number. use 0 to disable")] });
           } else {
             // @ts-expect-error ts is a loser !
             settings[selected] = value;
@@ -389,30 +350,18 @@ async function run(
 
       embed.setDescription(
         // @ts-expect-error loser
-        preferencesData[settingId].description.replace(
-          "{VALUE}",
-          settings[settingId].toLocaleString()
-        )
+        preferencesData[settingId].description.replace("{VALUE}", settings[settingId].toLocaleString())
       );
 
       const userSelection = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder()
-          .setCustomId("enable-setting")
-          .setLabel("enable")
-          .setStyle(ButtonStyle.Success),
-        new ButtonBuilder()
-          .setCustomId("disable-setting")
-          .setLabel("disable")
-          .setStyle(ButtonStyle.Danger)
+        new ButtonBuilder().setCustomId("enable-setting").setLabel("enable").setStyle(ButtonStyle.Success),
+        new ButtonBuilder().setCustomId("disable-setting").setLabel("disable").setStyle(ButtonStyle.Danger)
       );
 
       // @ts-expect-error hate life innit
       if (typeof settings[settingId] === "number") {
         const boobies = [
-          new ButtonBuilder()
-            .setCustomId("enable")
-            .setLabel("set value")
-            .setStyle(ButtonStyle.Success),
+          new ButtonBuilder().setCustomId("enable").setLabel("set value").setStyle(ButtonStyle.Success),
           new ButtonBuilder()
             .setCustomId("disable")
             .setLabel("disable")
@@ -439,9 +388,7 @@ async function run(
           boobies.push(option);
         }
 
-        userSelection.setComponents(
-          new StringSelectMenuBuilder().setCustomId("typesetting").setOptions(boobies)
-        );
+        userSelection.setComponents(new StringSelectMenuBuilder().setCustomId("typesetting").setOptions(boobies));
       } else {
         // @ts-expect-error annoying grr
         if (settings[settingId]) {
@@ -479,11 +426,7 @@ async function run(
     const options: StringSelectMenuOptionBuilder[] = [];
 
     for (const settingId of Object.keys(preferencesData)) {
-      options.push(
-        new StringSelectMenuOptionBuilder()
-          .setValue(settingId)
-          .setLabel(preferencesData[settingId].name)
-      );
+      options.push(new StringSelectMenuOptionBuilder().setValue(settingId).setLabel(preferencesData[settingId].name));
     }
 
     if (settingId) {
@@ -532,9 +475,7 @@ async function run(
 
         // @ts-expect-error grr
         if (typeof settings[selected] == "number") {
-          const modal = new ModalBuilder()
-            .setCustomId("settings-update")
-            .setTitle("net worth notifications");
+          const modal = new ModalBuilder().setCustomId("settings-update").setTitle("net worth notifications");
 
           modal.addComponents(
             new ActionRowBuilder<TextInputBuilder>().addComponents(
@@ -552,9 +493,7 @@ async function run(
 
           const filter = (i: Interaction) => i.user.id == res.user.id;
 
-          const modalResponse = await res
-            .awaitModalSubmit({ filter, time: 120000 })
-            .catch(() => {});
+          const modalResponse = await res.awaitModalSubmit({ filter, time: 120000 }).catch(() => {});
 
           if (!modalResponse) return;
 
@@ -563,9 +502,7 @@ async function run(
           const value = formatNumber(modalResponse.fields.fields.first().value.toLowerCase());
 
           if (typeof value !== "number") {
-            await modalResponse.reply({
-              embeds: [new ErrorEmbed("invalid value. must a number. use 0 to disable")],
-            });
+            await modalResponse.reply({ embeds: [new ErrorEmbed("invalid value. must a number. use 0 to disable")] });
           } else {
             // @ts-expect-error ts is a loser !
             settings[selected] = value;
@@ -614,10 +551,7 @@ async function run(
       const requiredBet = await getRequiredBetForXp(message.member);
 
       if (!defaultBet) {
-        const embed = new CustomEmbed(message.member).setHeader(
-          "default bet",
-          message.author.avatarURL()
-        );
+        const embed = new CustomEmbed(message.member).setHeader("default bet", message.author.avatarURL());
 
         embed.setDescription(
           "you do not currently have a default bet. use `/settings me defaultbet <amount/reset>` to set your default bet\n\n" +
@@ -626,10 +560,7 @@ async function run(
 
         return send({ embeds: [embed] });
       } else {
-        const embed = new CustomEmbed(message.member).setHeader(
-          "default bet",
-          message.author.avatarURL()
-        );
+        const embed = new CustomEmbed(message.member).setHeader("default bet", message.author.avatarURL());
 
         embed.setDescription(
           `your default bet is $**${defaultBet.toLocaleString()}**` +
@@ -666,9 +597,7 @@ async function run(
     if (bet > maxBet) {
       return send({
         embeds: [
-          new ErrorEmbed(
-            `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
-          ),
+          new ErrorEmbed(`your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`),
         ],
       });
     }
@@ -679,9 +608,7 @@ async function run(
 
     const embed = new CustomEmbed(message.member);
 
-    embed.setDescription(
-      `:white_check_mark: your default bet has been set to $${bet.toLocaleString()}`
-    );
+    embed.setDescription(`:white_check_mark: your default bet has been set to $${bet.toLocaleString()}`);
 
     return send({ embeds: [embed] });
   };
@@ -704,9 +631,7 @@ async function run(
         new CustomEmbed(
           message.member,
           `✅ this server will now use ${
-            message.options.getBoolean("value")
-              ? "slash commands only"
-              : "slash commands and message commands"
+            message.options.getBoolean("value") ? "slash commands only" : "slash commands and message commands"
           }`
         ),
       ],
@@ -746,22 +671,14 @@ async function run(
 
     const embed = new CustomEmbed(message.member);
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder()
-        .setCustomId("setemail")
-        .setLabel("set email")
-        .setStyle(ButtonStyle.Success)
+      new ButtonBuilder().setCustomId("setemail").setLabel("set email").setStyle(ButtonStyle.Success)
     );
 
     if (email) {
       embed.setDescription(
         "your email has been set. if you would like to view it, use the button below. this will be sent in your dms."
       );
-      row.addComponents(
-        new ButtonBuilder()
-          .setCustomId("viewemail")
-          .setLabel("view email")
-          .setStyle(ButtonStyle.Danger)
-      );
+      row.addComponents(new ButtonBuilder().setCustomId("viewemail").setLabel("view email").setStyle(ButtonStyle.Danger));
     } else {
       embed.setDescription(
         "your email as not been set. use the button to set it below via form. this will not be shared with anyone.\n\nnypsi uses your email address for purchases only. if you do not intend to make any purchases, do not set your email address."
@@ -783,11 +700,9 @@ async function run(
 
       let fail = false;
 
-      await message.author
-        .send({ embeds: [new CustomEmbed(message.member, `your email: \`${email}\``)] })
-        .catch(() => {
-          fail = true;
-        });
+      await message.author.send({ embeds: [new CustomEmbed(message.member, `your email: \`${email}\``)] }).catch(() => {
+        fail = true;
+      });
 
       if (fail) {
         return msg.edit({
@@ -834,18 +749,12 @@ async function run(
       });
 
       if (fail) {
-        return res.message.edit({
-          embeds: [new ErrorEmbed("that email has already been set")],
-          components: [],
-        });
+        return res.message.edit({ embeds: [new ErrorEmbed("that email has already been set")], components: [] });
       }
 
       checkPurchases(message.author.id, message.client as NypsiClient);
 
-      return res.message.edit({
-        embeds: [new CustomEmbed(message.member, "✅ your email has been set")],
-        components: [],
-      });
+      return res.message.edit({ embeds: [new CustomEmbed(message.member, "✅ your email has been set")], components: [] });
     }
   };
 
@@ -854,10 +763,7 @@ async function run(
     if (args.length === 2) {
       return send({
         embeds: [
-          new CustomEmbed(
-            message.member,
-            enabled ? "you are currently in passive mode" : "you are not in passive mode"
-          ),
+          new CustomEmbed(message.member, enabled ? "you are currently in passive mode" : "you are not in passive mode"),
         ],
       });
     }
@@ -868,10 +774,7 @@ async function run(
       }
       await setPassive(message.member, true);
       await redis.set(`cd:passive_toggle:${message.author.id}`, "boobs");
-      await redis.expire(
-        `cd:passive_toggle:${message.author.id}`,
-        Math.floor(ms("20 minutes") / 1000)
-      );
+      await redis.expire(`cd:passive_toggle:${message.author.id}`, Math.floor(ms("20 minutes") / 1000));
       return send({
         embeds: [
           new CustomEmbed(message.member, "you are now in passive mode").addField(
@@ -886,15 +789,8 @@ async function run(
       }
       await setPassive(message.member, false);
       await redis.set(`cd:passive_toggle:${message.author.id}`, "boobs");
-      await redis.expire(
-        `cd:passive_toggle:${message.author.id}`,
-        Math.floor(ms("20 minutes") / 1000)
-      );
-      return send({
-        embeds: [
-          new CustomEmbed(message.member, "you are no longer in passive mode and can be robbed"),
-        ],
-      });
+      await redis.expire(`cd:passive_toggle:${message.author.id}`, Math.floor(ms("20 minutes") / 1000));
+      return send({ embeds: [new CustomEmbed(message.member, "you are no longer in passive mode and can be robbed")] });
     }
   };
 

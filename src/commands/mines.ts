@@ -21,13 +21,7 @@ import Constants from "../utils/Constants.js";
 import { a } from "../utils/functions/anticheat.js";
 import { isLockedOut, verifyUser } from "../utils/functions/captcha.js";
 import { addProgress } from "../utils/functions/economy/achievements.js";
-import {
-  calcMaxBet,
-  getBalance,
-  getDefaultBet,
-  getGambleMulti,
-  updateBalance,
-} from "../utils/functions/economy/balance.js";
+import { calcMaxBet, getBalance, getDefaultBet, getGambleMulti, updateBalance } from "../utils/functions/economy/balance.js";
 import { addToGuildXP, getGuildByUser } from "../utils/functions/economy/guilds.js";
 import { addInventoryItem } from "../utils/functions/economy/inventory.js";
 import { createGame } from "../utils/functions/economy/stats.js";
@@ -79,9 +73,7 @@ const cmd = new Command("mines", "play mines", "money").setAliases(["minesweeper
 
 cmd.slashEnabled = true;
 cmd.slashData
-  .addStringOption((option) =>
-    option.setName("bet").setDescription("how much would you like to bet").setRequired(false)
-  )
+  .addStringOption((option) => option.setName("bet").setDescription("how much would you like to bet").setRequired(false))
   .addIntegerOption((option) =>
     option
       .setName("mine-count")
@@ -93,10 +85,7 @@ cmd.slashData
       )
   );
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (!(await userExists(message.member))) await createUser(message.member);
 
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
@@ -249,17 +238,13 @@ async function prepareGame(
     if (msg) {
       return msg.edit({
         embeds: [
-          new ErrorEmbed(
-            `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
-          ),
+          new ErrorEmbed(`your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`),
         ],
       });
     } else {
       return send({
         embeds: [
-          new ErrorEmbed(
-            `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
-          ),
+          new ErrorEmbed(`your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`),
         ],
       });
     }
@@ -277,21 +262,13 @@ async function prepareGame(
     if (msg) {
       return msg.edit({
         embeds: [
-          new ErrorEmbed(
-            `you cannot use this amount of mines\nallowed: ${Array.from(mineIncrements.keys()).join(
-              ", "
-            )}`
-          ),
+          new ErrorEmbed(`you cannot use this amount of mines\nallowed: ${Array.from(mineIncrements.keys()).join(", ")}`),
         ],
       });
     } else {
       return send({
         embeds: [
-          new ErrorEmbed(
-            `you cannot use this amount of mines\nallowed: ${Array.from(mineIncrements.keys()).join(
-              ", "
-            )}`
-          ),
+          new ErrorEmbed(`you cannot use this amount of mines\nallowed: ${Array.from(mineIncrements.keys()).join(", ")}`),
         ],
       });
     }
@@ -394,10 +371,10 @@ async function prepareGame(
     increment: incrementAmount,
   });
 
-  const embed = new CustomEmbed(
-    message.member,
-    "**bet** $" + bet.toLocaleString() + "\n**0**x ($0)"
-  ).setHeader("mines", message.author.avatarURL());
+  const embed = new CustomEmbed(message.member, "**bet** $" + bet.toLocaleString() + "\n**0**x ($0)").setHeader(
+    "mines",
+    message.author.avatarURL()
+  );
 
   const rows = getRows(grid, false);
 
@@ -468,10 +445,7 @@ function getRows(grid: string[], end: boolean) {
     current.addComponents(button);
   }
 
-  const button = new ButtonBuilder()
-    .setCustomId("finish")
-    .setLabel("finish")
-    .setStyle(ButtonStyle.Success);
+  const button = new ButtonBuilder().setCustomId("finish").setLabel("finish").setStyle(ButtonStyle.Success);
 
   if (end) button.setDisabled(true);
 
@@ -533,11 +507,7 @@ async function playGame(
 
     const components = getRows(grid, true);
 
-    (
-      components[components.length - 1].components[
-        components[components.length - 1].components.length - 1
-      ] as ButtonBuilder
-    )
+    (components[components.length - 1].components[components[components.length - 1].components.length - 1] as ButtonBuilder)
       .setCustomId("rp")
       .setLabel("play again")
       .setDisabled(false);
@@ -545,10 +515,7 @@ async function playGame(
     await msg.edit({ embeds: [embed], components });
 
     const res = await msg
-      .awaitMessageComponent({
-        filter: (i: Interaction) => i.user.id == message.author.id,
-        time: 30000,
-      })
+      .awaitMessageComponent({ filter: (i: Interaction) => i.user.id == message.author.id, time: 30000 })
       .catch(() => {
         (
           components[components.length - 1].components[
@@ -575,11 +542,7 @@ async function playGame(
         if (message.author.id == Constants.TEKOH_ID && message instanceof Message) {
           message.react("💀");
         } else {
-          return msg.edit({
-            embeds: [
-              new CustomEmbed(message.member, "nypsi is rebooting, try again in a few minutes"),
-            ],
-          });
+          return msg.edit({ embeds: [new CustomEmbed(message.member, "nypsi is rebooting, try again in a few minutes")] });
         }
       }
 
@@ -758,9 +721,7 @@ async function playGame(
   if (!response) return;
 
   if (response.customId.length != 2 && response.customId != "finish") {
-    await message.channel.send({
-      content: message.author.toString() + " invalid coordinate, example: `a3`",
-    });
+    await message.channel.send({ content: message.author.toString() + " invalid coordinate, example: `a3`" });
     return playGame(message, msg, args);
   }
 

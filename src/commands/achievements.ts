@@ -24,34 +24,22 @@ import { getAchievements, getItems } from "../utils/functions/economy/utils";
 import PageManager from "../utils/functions/page";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command("achievements", "view your achievement progress", "money").setAliases([
-  "ach",
-  "achievement",
-]);
+const cmd = new Command("achievements", "view your achievement progress", "money").setAliases(["ach", "achievement"]);
 
 cmd.slashEnabled = true;
 cmd.slashData
-  .addSubcommand((progress) =>
-    progress.setName("progress").setDescription("view achievements in progress")
-  )
+  .addSubcommand((progress) => progress.setName("progress").setDescription("view achievements in progress"))
   .addSubcommand((all) => all.setName("all").setDescription("view all achievements"))
   .addSubcommand((show) =>
     show
       .setName("view")
       .setDescription("show information about a specific achievement")
       .addStringOption((option) =>
-        option
-          .setName("achievement")
-          .setDescription("achievement you want to view")
-          .setRequired(true)
-          .setAutocomplete(true)
+        option.setName("achievement").setDescription("achievement you want to view").setRequired(true).setAutocomplete(true)
       )
   );
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       let usedNewMessage = false;
@@ -100,9 +88,7 @@ async function run(
 
     const desc: string[] = [];
 
-    inPlaceSort(achievements).desc(
-      (i) => (i.progress / allAchievementData[i.achievementId].target) * 100
-    );
+    inPlaceSort(achievements).desc((i) => (i.progress / allAchievementData[i.achievementId].target) * 100);
 
     for (const achievement of achievements) {
       if (achievement.completed) continue;
@@ -124,10 +110,9 @@ async function run(
 
     const completedAchievements = await getCompletedAchievements(message.member);
 
-    const completion = `${(
-      (completedAchievements.length / Object.keys(allAchievementData).length) *
-      100
-    ).toFixed(1)}% completion`;
+    const completion = `${((completedAchievements.length / Object.keys(allAchievementData).length) * 100).toFixed(
+      1
+    )}% completion`;
 
     const embed = new CustomEmbed(message.member, pages.get(1).join("\n")).setHeader(
       "your achievement progress",
@@ -141,11 +126,7 @@ async function run(
     embed.setFooter({ text: `page 1/${pages.size} | ${completion}` });
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder()
-        .setCustomId("⬅")
-        .setLabel("back")
-        .setStyle(ButtonStyle.Primary)
-        .setDisabled(true),
+      new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
       new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
     );
 
@@ -158,9 +139,7 @@ async function run(
       row,
       pages,
       onPageUpdate(manager) {
-        manager.embed.setFooter({
-          text: `page ${manager.currentPage}/${manager.lastPage} | ${completion}`,
-        });
+        manager.embed.setFooter({ text: `page ${manager.currentPage}/${manager.lastPage} | ${completion}` });
         return manager.embed;
       },
     });
@@ -214,21 +193,16 @@ async function run(
 
     const completedAchievements = await getCompletedAchievements(message.member);
 
-    const completion = `${(
-      (completedAchievements.length / Object.keys(allAchievements).length) *
-      100
-    ).toFixed(1)}% completion`;
+    const completion = `${((completedAchievements.length / Object.keys(allAchievements).length) * 100).toFixed(
+      1
+    )}% completion`;
 
     const embed = new CustomEmbed(message.member, pages.get(1).join("\n"))
       .setHeader("all achievements", message.author.avatarURL())
       .setFooter({ text: `page 1/${pages.size} | ${completion}` });
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder()
-        .setCustomId("⬅")
-        .setLabel("back")
-        .setStyle(ButtonStyle.Primary)
-        .setDisabled(true),
+      new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
       new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
     );
 
@@ -318,9 +292,7 @@ async function run(
           .map((prize) => {
             const amount = parseInt(prize.split(":")[1]);
 
-            return `\`${amount}x\` ${getItems()[prize.split(":")[0]].emoji} ${
-              getItems()[prize.split(":")[0]].name
-            }`;
+            return `\`${amount}x\` ${getItems()[prize.split(":")[0]].emoji} ${getItems()[prize.split(":")[0]].name}`;
           })
           .join("\n")
       );

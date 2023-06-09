@@ -7,21 +7,15 @@ export default async function channelUpdate(oldChannel: GuildChannel, newChannel
     const embed = new CustomEmbed().disableFooter().setTimestamp();
 
     embed.setTitle("channel renamed");
-    embed.setDescription(
-      `${newChannel.toString()} \`${newChannel.id}\`\n` + `${oldChannel.name} -> ${newChannel.name}`
-    );
+    embed.setDescription(`${newChannel.toString()} \`${newChannel.id}\`\n` + `${oldChannel.name} -> ${newChannel.name}`);
 
     await addLog(newChannel.guild, "channel", embed);
-  } else if (
-    oldChannel.parentId != newChannel.parentId &&
-    (await isLogsEnabled(newChannel.guild))
-  ) {
+  } else if (oldChannel.parentId != newChannel.parentId && (await isLogsEnabled(newChannel.guild))) {
     const embed = new CustomEmbed().disableFooter().setTimestamp();
 
     embed.setTitle("channel moved category");
     embed.setDescription(
-      `${newChannel.toString()} \`${newChannel.id}\`\n` +
-        `${oldChannel.parent.name} -> ${newChannel.parent.name}`
+      `${newChannel.toString()} \`${newChannel.id}\`\n` + `${oldChannel.parent.name} -> ${newChannel.parent.name}`
     );
 
     await addLog(newChannel.guild, "channel", embed);

@@ -3,14 +3,9 @@ import { Command, NypsiCommandInteraction } from "../models/Command";
 import Constants from "../utils/Constants";
 import { uploadSlashCommands, uploadSlashCommandsToGuild } from "../utils/handlers/commandhandler";
 
-const cmd = new Command("reloadslash", "reload data for slash commands", "none").setPermissions([
-  "bot owner",
-]);
+const cmd = new Command("reloadslash", "reload data for slash commands", "none").setPermissions(["bot owner"]);
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (message.member.user.id != Constants.TEKOH_ID) return;
 
   if (args.length == 0) {

@@ -1,19 +1,9 @@
 import { TrackingType } from "@prisma/client";
-import {
-  BaseMessageOptions,
-  CommandInteraction,
-  InteractionReplyOptions,
-  Message,
-  PermissionFlagsBits,
-} from "discord.js";
+import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message, PermissionFlagsBits } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { getItems } from "../utils/functions/economy/utils";
-import {
-  createGuildCounter,
-  deleteGuildCounter,
-  getGuildCounters,
-} from "../utils/functions/guilds/counters";
+import { createGuildCounter, deleteGuildCounter, getGuildCounters } from "../utils/functions/guilds/counters";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 
 const cmd = new Command("counter", "create updating count channels for your server", "admin")
@@ -26,9 +16,7 @@ cmd.slashData
     del
       .setName("delete")
       .setDescription("delete a guild counter")
-      .addChannelOption((option) =>
-        option.setName("channel").setDescription("channel to delete").setRequired(true)
-      )
+      .addChannelOption((option) => option.setName("channel").setDescription("channel to delete").setRequired(true))
   )
   .addSubcommand((list) => list.setName("list").setDescription("list all active counters"))
   .addSubcommand((create) =>
@@ -56,15 +44,10 @@ cmd.slashData
           .setMaxLength(50)
           .setRequired(true)
       )
-      .addStringOption((option) =>
-        option.setName("item-global").setDescription("item to show").setAutocomplete(true)
-      )
+      .addStringOption((option) => option.setName("item-global").setDescription("item to show").setAutocomplete(true))
   );
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       let usedNewMessage = false;
@@ -132,10 +115,7 @@ async function run(
     });
   } else if (args[0].toLowerCase() === "list") {
     const counters = await getGuildCounters(message.guild);
-    const embed = new CustomEmbed(message.member).setHeader(
-      `counters in ${message.guild.name}`,
-      message.guild.iconURL()
-    );
+    const embed = new CustomEmbed(message.member).setHeader(`counters in ${message.guild.name}`, message.guild.iconURL());
 
     if (counters.length === 0) {
       embed.setDescription("this server has no counters");
@@ -159,8 +139,7 @@ async function run(
     const format = message.options.getString("format");
     const item = message.options.getString("item-global");
 
-    if (!format.includes("%value%"))
-      return send({ embeds: [new ErrorEmbed("invalid format. use %value%")] });
+    if (!format.includes("%value%")) return send({ embeds: [new ErrorEmbed("invalid format. use %value%")] });
 
     const counters = await getGuildCounters(message.guild);
 
@@ -173,9 +152,7 @@ async function run(
         embeds: [
           new ErrorEmbed(
             `you have reached the limit of counters (\`${max}\`)${
-              (await getTier(message.member)) < 4
-                ? "\nupgrade your tier (/premium) to get more"
-                : ""
+              (await getTier(message.member)) < 4 ? "\nupgrade your tier (/premium) to get more" : ""
             }`
           ),
         ],
@@ -185,9 +162,7 @@ async function run(
     if (mode == TrackingType.TOTAL_ITEM && (!item || !getItems()[item])) {
       return send({
         embeds: [
-          new ErrorEmbed(
-            "since you have chosen the mode as total item, you must choose a valid item to show the total of"
-          ),
+          new ErrorEmbed("since you have chosen the mode as total item, you must choose a valid item to show the total of"),
         ],
       });
     }
@@ -205,15 +180,9 @@ async function run(
 
     const res = await deleteGuildCounter(channel.id);
 
-    if (!res)
-      return send({ embeds: [new ErrorEmbed("that channel does not have a counter tied to it")] });
+    if (!res) return send({ embeds: [new ErrorEmbed("that channel does not have a counter tied to it")] });
     return send({
-      embeds: [
-        new CustomEmbed(
-          message.member,
-          "✅ counter removed, you will have to manually delete the channel"
-        ),
-      ],
+      embeds: [new CustomEmbed(message.member, "✅ counter removed, you will have to manually delete the channel")],
     });
   }
 }

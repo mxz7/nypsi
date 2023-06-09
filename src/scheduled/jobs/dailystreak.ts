@@ -65,8 +65,7 @@ import { addNotificationToQueue } from "../../utils/functions/users/notification
 
   for (const user of users) {
     if (user.Inventory.find((i) => i.item == "calendar")?.amount > 0) {
-      if (user.user.DMSettings.other)
-        notifications.push({ memberId: user.userId, payload: { embed: calendarSavedEmbed } });
+      if (user.user.DMSettings.other) notifications.push({ memberId: user.userId, payload: { embed: calendarSavedEmbed } });
 
       if (Number(user.Inventory.find((i) => i.item == "calendar").amount) == 1) {
         await prisma.inventory.delete({
@@ -126,8 +125,7 @@ import { addNotificationToQueue } from "../../utils/functions/users/notification
       }
     }
 
-    if (user.user.DMSettings.other)
-      notifications.push({ memberId: user.userId, payload: { embed: resetEmbed } });
+    if (user.user.DMSettings.other) notifications.push({ memberId: user.userId, payload: { embed: resetEmbed } });
 
     await prisma.economy.update({
       where: {

@@ -1,8 +1,8 @@
 import { CommandInteraction, Message } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { ErrorEmbed } from "../models/EmbedBuilders";
-import { getAdminLevel } from "../utils/functions/users/admin";
 import { addNotificationToQueue } from "../utils/functions/users/notifications";
+import { getAdminLevel } from "../utils/functions/users/admin";
 
 const cmd = new Command(
   "requestdm",
@@ -10,10 +10,7 @@ const cmd = new Command(
   "none"
 );
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if ((await getAdminLevel(message.author.id)) < 2) return;
 
   if (args.length < 2) {

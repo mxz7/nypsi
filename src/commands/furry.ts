@@ -1,10 +1,4 @@
-import {
-  BaseMessageOptions,
-  CommandInteraction,
-  GuildMember,
-  InteractionReplyOptions,
-  Message,
-} from "discord.js";
+import { BaseMessageOptions, CommandInteraction, GuildMember, InteractionReplyOptions, Message } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addProgress } from "../utils/functions/economy/achievements.js";
@@ -15,20 +9,12 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 
 const cache = new Map<string, number>();
 
-const cmd = new Command("furry", "measure how much of a furry you are", "fun").setAliases([
-  "howfurry",
-  "stfufurry",
-]);
+const cmd = new Command("furry", "measure how much of a furry you are", "fun").setAliases(["howfurry", "stfufurry"]);
 
 cmd.slashEnabled = true;
-cmd.slashData.addUserOption((option) =>
-  option.setName("user").setDescription("is this dude a furry")
-);
+cmd.slashData.addUserOption((option) => option.setName("user").setDescription("is this dude a furry"));
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       let usedNewMessage = false;

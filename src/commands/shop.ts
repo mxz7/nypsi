@@ -13,16 +13,9 @@ import { CustomEmbed } from "../models/EmbedBuilders";
 import { getItems } from "../utils/functions/economy/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command(
-  "shop",
-  "view current items that are available to buy/sell",
-  "money"
-).setAliases(["store"]);
+const cmd = new Command("shop", "view current items that are available to buy/sell", "money").setAliases(["store"]);
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (await onCooldown(cmd.name, message.member)) {
     const embed = await getResponse(cmd.name, message.member);
 
@@ -67,9 +60,7 @@ async function run(
     pages.push(pageOfItems);
   }
 
-  const embed = new CustomEmbed(message.member).setFooter({
-    text: `page ${page + 1}/${pages.length}`,
-  });
+  const embed = new CustomEmbed(message.member).setFooter({ text: `page ${page + 1}/${pages.length}` });
 
   embed.setHeader("shop", message.author.avatarURL());
 
@@ -87,11 +78,7 @@ async function run(
   }
 
   let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder()
-      .setCustomId("⬅")
-      .setLabel("back")
-      .setStyle(ButtonStyle.Primary)
-      .setDisabled(true),
+    new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
     new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
   );
 
@@ -121,10 +108,7 @@ async function run(
           await msg.edit({ components: [] });
         });
 
-      const newEmbed = new CustomEmbed(message.member).setHeader(
-        "shop",
-        message.author.avatarURL()
-      );
+      const newEmbed = new CustomEmbed(message.member).setHeader("shop", message.author.avatarURL());
 
       if (!reaction) return;
 
@@ -137,38 +121,20 @@ async function run(
             const item = items[i];
             newEmbed.addField(
               item.id,
-              `${item.emoji} **${item.name}**\n${
-                item.longDesc
-              }\n**cost** $${item.buy.toLocaleString()}`,
+              `${item.emoji} **${item.name}**\n${item.longDesc}\n**cost** $${item.buy.toLocaleString()}`,
               true
             );
           }
           newEmbed.setFooter({ text: `page ${currentPage + 1}/${pages.length}` });
           if (currentPage == 0) {
             row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-              new ButtonBuilder()
-                .setCustomId("⬅")
-                .setLabel("back")
-                .setStyle(ButtonStyle.Primary)
-                .setDisabled(true),
-              new ButtonBuilder()
-                .setCustomId("➡")
-                .setLabel("next")
-                .setStyle(ButtonStyle.Primary)
-                .setDisabled(false)
+              new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
+              new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(false)
             );
           } else {
             row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-              new ButtonBuilder()
-                .setCustomId("⬅")
-                .setLabel("back")
-                .setStyle(ButtonStyle.Primary)
-                .setDisabled(false),
-              new ButtonBuilder()
-                .setCustomId("➡")
-                .setLabel("next")
-                .setStyle(ButtonStyle.Primary)
-                .setDisabled(false)
+              new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(false),
+              new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(false)
             );
           }
           await msg.edit({ embeds: [newEmbed], components: [row] });
@@ -183,38 +149,20 @@ async function run(
             const item = items[i];
             newEmbed.addField(
               item.id,
-              `${item.emoji} **${item.name}**\n${
-                item.longDesc
-              }\n**cost** $${item.buy.toLocaleString()}`,
+              `${item.emoji} **${item.name}**\n${item.longDesc}\n**cost** $${item.buy.toLocaleString()}`,
               true
             );
           }
           newEmbed.setFooter({ text: `page ${currentPage + 1}/${pages.length}` });
           if (currentPage + 1 == lastPage) {
             row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-              new ButtonBuilder()
-                .setCustomId("⬅")
-                .setLabel("back")
-                .setStyle(ButtonStyle.Primary)
-                .setDisabled(false),
-              new ButtonBuilder()
-                .setCustomId("➡")
-                .setLabel("next")
-                .setStyle(ButtonStyle.Primary)
-                .setDisabled(true)
+              new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(false),
+              new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(true)
             );
           } else {
             row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-              new ButtonBuilder()
-                .setCustomId("⬅")
-                .setLabel("back")
-                .setStyle(ButtonStyle.Primary)
-                .setDisabled(false),
-              new ButtonBuilder()
-                .setCustomId("➡")
-                .setLabel("next")
-                .setStyle(ButtonStyle.Primary)
-                .setDisabled(false)
+              new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(false),
+              new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(false)
             );
           }
           await msg.edit({ embeds: [newEmbed], components: [row] });

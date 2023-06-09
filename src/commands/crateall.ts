@@ -7,16 +7,9 @@ import { getItems, userExists } from "../utils/functions/economy/utils";
 import { addCooldown, inCooldown } from "../utils/functions/guilds/utils";
 import { logger } from "../utils/logger";
 
-const cmd = new Command(
-  "crateall",
-  "give every user in the current guild a crate",
-  "none"
-).setPermissions(["bot owner"]);
+const cmd = new Command("crateall", "give every user in the current guild a crate", "none").setPermissions(["bot owner"]);
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (message.member.user.id != Constants.TEKOH_ID) return;
 
   if (args.length == 0) {
@@ -93,12 +86,7 @@ async function run(
   await Promise.all(promises);
 
   return message.channel.send({
-    embeds: [
-      new CustomEmbed(
-        message.member,
-        `**${count}** ${selected.name}${count != 1 ? "s" : ""} given`
-      ),
-    ],
+    embeds: [new CustomEmbed(message.member, `**${count}** ${selected.name}${count != 1 ? "s" : ""} given`)],
   });
 }
 

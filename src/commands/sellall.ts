@@ -13,11 +13,7 @@ import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { getBalance, getSellMulti, updateBalance } from "../utils/functions/economy/balance";
-import {
-  addInventoryItem,
-  getInventory,
-  setInventoryItem,
-} from "../utils/functions/economy/inventory";
+import { addInventoryItem, getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import PageManager from "../utils/functions/page";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
@@ -76,11 +72,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const selected = new Map<string, number>();
 
   for (const item of inventory) {
-    if (
-      items[item.item].role == "fish" ||
-      items[item.item].role == "prey" ||
-      items[item.item].role == "sellable"
-    ) {
+    if (items[item.item].role == "fish" || items[item.item].role == "prey" || items[item.item].role == "sellable") {
       if (items[item.item].id == "cookie" || items[item.item].id == "cake") continue;
       selected.set(item.item, inventory.find((i) => i.item == item.item).amount);
     }
@@ -114,16 +106,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     let sellWorth = Math.floor(items[item].sell * selected.get(item));
 
-    if (
-      items[item].role == "fish" ||
-      items[item].role == "prey" ||
-      items[item].role == "sellable"
-    ) {
+    if (items[item].role == "fish" || items[item].role == "prey" || items[item].role == "sellable") {
       sellWorth = Math.floor(sellWorth + sellWorth * multi);
     }
 
-    if (["bitcoin", "ethereum"].includes(item))
-      sellWorth = Math.floor(sellWorth - sellWorth * 0.05);
+    if (["bitcoin", "ethereum"].includes(item)) sellWorth = Math.floor(sellWorth - sellWorth * 0.05);
 
     if (taxEnabled) {
       taxedAmount += Math.floor(sellWorth * tax);
@@ -134,9 +121,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     totalSold = selected.get(item);
 
     desc.push(
-      `\`${selected.get(item).toLocaleString()}x\` ${items[item].emoji} ${
-        items[item].name
-      } ($${sellWorth.toLocaleString()})`
+      `\`${selected.get(item).toLocaleString()}x\` ${items[item].emoji} ${items[item].name} ($${sellWorth.toLocaleString()})`
     );
     amounts.set(
       `\`${selected.get(item).toLocaleString()}x\` ${items[item].emoji} ${
@@ -177,11 +162,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   embed.addField("items sold", pages.get(1).join("\n"));
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder()
-      .setCustomId("⬅")
-      .setLabel("back")
-      .setStyle(ButtonStyle.Primary)
-      .setDisabled(true),
+    new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
     new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
   );
   if (pages.size == 1) return send({ embeds: [embed] });

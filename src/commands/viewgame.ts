@@ -20,16 +20,9 @@ import { getLastKnownTag } from "../utils/functions/users/tag";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import dayjs = require("dayjs");
 
-const cmd = new Command(
-  "viewgame",
-  "view information about a completed gambling game",
-  "info"
-).setAliases(["game", "id"]);
+const cmd = new Command("viewgame", "view information about a completed gambling game", "info").setAliases(["game", "id"]);
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       let usedNewMessage = false;
@@ -109,20 +102,14 @@ async function run(
     if (args[2].toLowerCase() !== "null") {
       const start = dayjs(args[2]).set("hour", 0).set("minute", 0).set("second", 0);
       (search.where.AND as Array<Prisma.GameWhereInput>).push({ date: { gte: start.toDate() } });
-      (search.where.AND as Array<Prisma.GameWhereInput>).push({
-        date: { lte: start.add(1, "day").toDate() },
-      });
+      (search.where.AND as Array<Prisma.GameWhereInput>).push({ date: { lte: start.add(1, "day").toDate() } });
     }
-    if (args[3].toLowerCase() !== "null")
-      (search.where.AND as Array<Prisma.GameWhereInput>).push({ userId: args[3] });
+    if (args[3].toLowerCase() !== "null") (search.where.AND as Array<Prisma.GameWhereInput>).push({ userId: args[3] });
     if (args[4].toLowerCase() !== "null")
-      (search.where.AND as Array<Prisma.GameWhereInput>).push({
-        win: args[4].toLowerCase() == "true" ? 1 : 0,
-      });
+      (search.where.AND as Array<Prisma.GameWhereInput>).push({ win: args[4].toLowerCase() == "true" ? 1 : 0 });
 
-    const query: (Game & {
-      economy?: { user?: { lastKnownTag?: string; Preferences?: { leaderboards: boolean } } };
-    })[] = await prisma.game.findMany(search);
+    const query: (Game & { economy?: { user?: { lastKnownTag?: string; Preferences?: { leaderboards: boolean } } } })[] =
+      await prisma.game.findMany(search);
 
     if (query.length === 0) return send({ embeds: [new ErrorEmbed("no results found")] });
 
@@ -135,9 +122,7 @@ async function run(
         let out =
           `**id** \`${game.id.toString(36)}\` \`(${game.id})\`\n` +
           `**user** \`${
-            game.economy.user.Preferences?.leaderboards
-              ? game.economy.user.lastKnownTag.split("#")[0]
-              : "[hidden]"
+            game.economy.user.Preferences?.leaderboards ? game.economy.user.lastKnownTag.split("#")[0] : "[hidden]"
           }\`\n` +
           `**game** \`${game.game}\`\n` +
           `**time** <t:${Math.floor(game.date.getTime() / 1000)}>\n` +
@@ -149,11 +134,7 @@ async function run(
           out += `**won xp** ${(game.xpEarned || 0).toLocaleString()}\n`;
         }
 
-        if (
-          game.outcome.startsWith("mines:") ||
-          game.game.includes("scratch_card") ||
-          game.game.includes("scratchie")
-        ) {
+        if (game.outcome.startsWith("mines:") || game.game.includes("scratch_card") || game.game.includes("scratchie")) {
           out += `**outcome** do $id ${game.id.toString(36)}`;
         } else {
           out += `**outcome** ${game.outcome}`;
@@ -167,11 +148,7 @@ async function run(
     embed.setDescription(pages.get(1)[0]);
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder()
-        .setCustomId("⬅")
-        .setLabel("back")
-        .setStyle(ButtonStyle.Primary)
-        .setDisabled(true),
+      new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
       new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
     );
 
@@ -181,9 +158,7 @@ async function run(
         query.map((game) => {
           return {
             id: game.id.toString(36),
-            user: game.economy.user.Preferences?.leaderboards
-              ? game.economy.user.lastKnownTag.split("#")[0]
-              : "[hidden]",
+            user: game.economy.user.Preferences?.leaderboards ? game.economy.user.lastKnownTag.split("#")[0] : "[hidden]",
             game: game.game,
             time: game.date,
             bet: game.bet,
@@ -218,8 +193,7 @@ async function run(
 
     const game = await fetchGame(args[0].toLowerCase());
 
-    if (!game)
-      return send({ embeds: [new ErrorEmbed(`couldn't find a game with id \`${args[0]}\``)] });
+    if (!game) return send({ embeds: [new ErrorEmbed(`couldn't find a game with id \`${args[0]}\``)] });
 
     const username = (await getPreferences(game.userId))?.leaderboards
       ? (await getLastKnownTag(game.userId).catch(() => null))?.split("#")[0]

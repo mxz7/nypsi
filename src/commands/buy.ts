@@ -1,9 +1,4 @@
-import {
-  BaseMessageOptions,
-  CommandInteraction,
-  InteractionReplyOptions,
-  Message,
-} from "discord.js";
+import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
@@ -17,18 +12,11 @@ const cmd = new Command("buy", "buy items from the shop", "money");
 cmd.slashEnabled = true;
 cmd.slashData
   .addStringOption((option) =>
-    option
-      .setName("item-buy")
-      .setRequired(true)
-      .setAutocomplete(true)
-      .setDescription("item you want to buy")
+    option.setName("item-buy").setRequired(true).setAutocomplete(true).setDescription("item you want to buy")
   )
   .addStringOption((option) => option.setName("amount").setDescription("amount you want to buy"));
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (!(await userExists(message.member))) await createUser(message.member);
 
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
@@ -72,9 +60,7 @@ async function run(
       embeds: [
         new CustomEmbed(
           message.member,
-          `buy items from ${await getPrefix(
-            message.guild
-          )}shop by using the item id or item name without spaces`
+          `buy items from ${await getPrefix(message.guild)}shop by using the item id or item name without spaces`
         ),
       ],
     });
@@ -114,9 +100,7 @@ async function run(
 
   if (args.length != 1) {
     amount =
-      args[1].toLowerCase() === "all"
-        ? Math.floor((await getBalance(message.member)) / selected.buy)
-        : parseInt(args[1]);
+      args[1].toLowerCase() === "all" ? Math.floor((await getBalance(message.member)) / selected.buy) : parseInt(args[1]);
   }
 
   if (!amount) {

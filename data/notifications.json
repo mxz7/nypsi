@@ -41,11 +41,7 @@
           "description": "only receive a notification when all of your workers are full",
           "value": "OnlyWhenFull"
         },
-        {
-          "name": "all",
-          "description": "receive a notification when any amount of workers are full",
-          "value": "All"
-        }
+        { "name": "all", "description": "receive a notification when any amount of workers are full", "value": "All" }
       ]
     },
     "booster": {

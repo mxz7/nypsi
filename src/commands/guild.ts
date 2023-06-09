@@ -36,13 +36,7 @@ import {
   setOwner,
 } from "../utils/functions/economy/guilds";
 import { getPrestige } from "../utils/functions/economy/prestige";
-import {
-  createUser,
-  formatNumber,
-  getGuildUpgradeData,
-  isEcoBanned,
-  userExists,
-} from "../utils/functions/economy/utils";
+import { createUser, formatNumber, getGuildUpgradeData, isEcoBanned, userExists } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import PageManager from "../utils/functions/page";
 import requestDM from "../utils/functions/requestdm";
@@ -62,62 +56,43 @@ cmd.slashData
     create
       .setName("create")
       .setDescription("create a guild")
-      .addStringOption((option) =>
-        option.setName("name").setDescription("name of the guild").setRequired(true)
-      )
+      .addStringOption((option) => option.setName("name").setDescription("name of the guild").setRequired(true))
   )
   .addSubcommand((invite) =>
     invite
       .setName("invite")
       .setDescription("invite a member to your guild")
-      .addUserOption((option) =>
-        option.setName("member").setDescription("member to invite to the guild").setRequired(true)
-      )
+      .addUserOption((option) => option.setName("member").setDescription("member to invite to the guild").setRequired(true))
   )
   .addSubcommand((leave) => leave.setName("leave").setDescription("leave your current guild"))
-  .addSubcommand((deleteOpt) =>
-    deleteOpt.setName("delete").setDescription("delete your current guild")
-  )
+  .addSubcommand((deleteOpt) => deleteOpt.setName("delete").setDescription("delete your current guild"))
   .addSubcommand((kick) =>
     kick
       .setName("kick")
       .setDescription("kick a member from your guild")
-      .addUserOption((option) =>
-        option.setName("member").setDescription("member to kick from the guild").setRequired(true)
-      )
+      .addUserOption((option) => option.setName("member").setDescription("member to kick from the guild").setRequired(true))
   )
   .addSubcommand((deposit) =>
     deposit
       .setName("deposit")
       .setDescription("deposit money into the guild")
       .addIntegerOption((option) =>
-        option
-          .setName("amount")
-          .setDescription("amount to deposit into the guild")
-          .setRequired(true)
+        option.setName("amount").setDescription("amount to deposit into the guild").setRequired(true)
       )
   )
-  .addSubcommand((stats) =>
-    stats.setName("stats").setDescription("view stats for the guild members")
-  )
-  .addSubcommand((upgrade) =>
-    upgrade.setName("upgrade").setDescription("view the requirements for the next guild upgrade")
-  )
+  .addSubcommand((stats) => stats.setName("stats").setDescription("view stats for the guild members"))
+  .addSubcommand((upgrade) => upgrade.setName("upgrade").setDescription("view the requirements for the next guild upgrade"))
   .addSubcommand((motd) =>
     motd
       .setName("motd")
       .setDescription("set the motd for the guild")
-      .addStringOption((option) =>
-        option.setName("text").setDescription("text for the motd").setRequired(true)
-      )
+      .addStringOption((option) => option.setName("text").setDescription("text for the motd").setRequired(true))
   )
   .addSubcommand((view) =>
     view
       .setName("view")
       .setDescription("view a guild")
-      .addStringOption((option) =>
-        option.setName("guild-name").setDescription("guild to show").setRequired(false)
-      )
+      .addStringOption((option) => option.setName("guild-name").setDescription("guild to show").setRequired(false))
   )
   .addSubcommand((buy) =>
     buy
@@ -155,10 +130,7 @@ const filter = [
 
 const invited = new Set<string>();
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (await onCooldown(cmd.name, message.member)) {
     const embed = await getResponse(cmd.name, message.member);
 
@@ -282,18 +254,12 @@ async function run(
     }
 
     if ((await getBalance(message.member)) < 500000) {
-      return send({
-        embeds: [new ErrorEmbed("it costs $500,000 to create a guild. you cannot afford this")],
-      });
+      return send({ embeds: [new ErrorEmbed("it costs $500,000 to create a guild. you cannot afford this")] });
     }
 
     if (guild) {
       return send({
-        embeds: [
-          new ErrorEmbed(
-            "you are already in a guild, you must leave this guild to create your own"
-          ),
-        ],
+        embeds: [new ErrorEmbed("you are already in a guild, you must leave this guild to create your own")],
       });
     }
 
@@ -326,31 +292,18 @@ async function run(
     await createGuild(name, message.member);
 
     await redis.set(`${Constants.redis.cooldown.GUILD_CREATE}:${message.author.id}`, "t");
-    await redis.expire(
-      `${Constants.redis.cooldown.GUILD_CREATE}:${message.author.id}`,
-      ms("2 days") / 1000
-    );
+    await redis.expire(`${Constants.redis.cooldown.GUILD_CREATE}:${message.author.id}`, ms("2 days") / 1000);
 
-    return send({
-      embeds: [new CustomEmbed(message.member, `you are now the owner of **${name}**`)],
-    });
+    return send({ embeds: [new CustomEmbed(message.member, `you are now the owner of **${name}**`)] });
   }
 
-  if (
-    args[0].toLowerCase() == "invite" ||
-    args[0].toLowerCase() == "add" ||
-    args[0].toLowerCase() == "inv"
-  ) {
+  if (args[0].toLowerCase() == "invite" || args[0].toLowerCase() == "add" || args[0].toLowerCase() == "inv") {
     if (!guild) {
-      return send({
-        embeds: [new ErrorEmbed("you must be the owner of a guild to invite members")],
-      });
+      return send({ embeds: [new ErrorEmbed("you must be the owner of a guild to invite members")] });
     }
 
     if (guild.ownerId != message.author.id) {
-      return send({
-        embeds: [new ErrorEmbed("you must be the owner of a guild to invite members")],
-      });
+      return send({ embeds: [new ErrorEmbed("you must be the owner of a guild to invite members")] });
     }
 
     if (guild.members.length >= (await getMaxMembersForGuild(guild.guildName))) {
@@ -402,11 +355,9 @@ async function run(
       new ButtonBuilder().setCustomId("yes").setLabel("accept").setStyle(ButtonStyle.Success)
     );
 
-    const msg = await message.channel
-      .send({ content: target.toString(), embeds: [embed], components: [row] })
-      .catch(() => {
-        invited.delete(target.user.id);
-      });
+    const msg = await message.channel.send({ content: target.toString(), embeds: [embed], components: [row] }).catch(() => {
+      invited.delete(target.user.id);
+    });
 
     const filter = (i: Interaction) => i.user.id == target.user.id;
     let fail = false;
@@ -434,9 +385,7 @@ async function run(
 
       if (targetGuild) {
         embed.setDescription("❌ you are already in a guild");
-      } else if (
-        refreshedGuild.members.length >= (await getMaxMembersForGuild(refreshedGuild.guildName))
-      ) {
+      } else if (refreshedGuild.members.length >= (await getMaxMembersForGuild(refreshedGuild.guildName))) {
         embed.setDescription("❌ this guild has too many members");
       } else {
         await addMember(guild.guildName, target);
@@ -455,9 +404,7 @@ async function run(
     }
 
     if (guild.ownerId == message.author.id) {
-      return send({
-        embeds: [new ErrorEmbed("you are the guild owner, you must delete the guild")],
-      });
+      return send({ embeds: [new ErrorEmbed("you are the guild owner, you must delete the guild")] });
     }
 
     await addCooldown(cmd.name, message.member, 20);
@@ -522,11 +469,7 @@ async function run(
 
       if (!found) {
         return send({
-          embeds: [
-            new ErrorEmbed(
-              `\`${message.mentions.members.first().user.tag}\` is not in **${guild.guildName}**`
-            ),
-          ],
+          embeds: [new ErrorEmbed(`\`${message.mentions.members.first().user.tag}\` is not in **${guild.guildName}**`)],
         });
       }
 
@@ -546,9 +489,7 @@ async function run(
       }
 
       if (!found) {
-        return send({
-          embeds: [new ErrorEmbed(`\`${args[1]}\` is not in **${guild.guildName}**`)],
-        });
+        return send({ embeds: [new ErrorEmbed(`\`${args[1]}\` is not in **${guild.guildName}**`)] });
       }
 
       target = args[1];
@@ -560,12 +501,7 @@ async function run(
 
     if (res) {
       return send({
-        embeds: [
-          new CustomEmbed(
-            message.member,
-            `✅ \`${target}\` has been kicked from **${guild.guildName}**`
-          ),
-        ],
+        embeds: [new CustomEmbed(message.member, `✅ \`${target}\` has been kicked from **${guild.guildName}**`)],
       });
     } else {
       return send({
@@ -615,9 +551,7 @@ async function run(
 
     await deleteGuild(guild.guildName);
 
-    return send({
-      embeds: [new CustomEmbed(message.member, `✅ **${guild.guildName}** has been deleted`)],
-    });
+    return send({ embeds: [new CustomEmbed(message.member, `✅ **${guild.guildName}** has been deleted`)] });
   }
 
   if (args[0].toLowerCase() == "forcedelete") {
@@ -659,9 +593,7 @@ async function run(
 
     await deleteGuild(guild.guildName);
 
-    return send({
-      embeds: [new CustomEmbed(message.member, `✅ **${guild.guildName}** has been deleted`)],
-    });
+    return send({ embeds: [new CustomEmbed(message.member, `✅ **${guild.guildName}** has been deleted`)] });
   }
 
   if (args[0].toLowerCase() == "deposit" || args[0].toLowerCase() == "dep") {
@@ -710,10 +642,7 @@ async function run(
     });
 
     const reaction = await msg
-      .awaitMessageComponent({
-        filter: (i: Interaction) => i.user.id == message.author.id,
-        time: 15000,
-      })
+      .awaitMessageComponent({ filter: (i: Interaction) => i.user.id == message.author.id, time: 15000 })
       .then(async (collected) => {
         await collected.deferUpdate();
         return collected;
@@ -728,23 +657,16 @@ async function run(
 
     if (reaction.customId == "✅") {
       if (amount > (await getBalance(message.member))) {
-        return reaction.message.edit({
-          embeds: [new ErrorEmbed("you cannot afford this payment")],
-        });
+        return reaction.message.edit({ embeds: [new ErrorEmbed("you cannot afford this payment")] });
       }
 
       await updateBalance(message.member, (await getBalance(message.member)) - amount);
 
       await addToGuildBank(guild.guildName, amount, message.member);
 
-      const embed = new CustomEmbed(message.member).setHeader(
-        "guild deposit",
-        message.author.avatarURL()
-      );
+      const embed = new CustomEmbed(message.member).setHeader("guild deposit", message.author.avatarURL());
 
-      embed.setDescription(
-        `$**${guild.balance.toLocaleString()}**\n  +$**${amount.toLocaleString()}**`
-      );
+      embed.setDescription(`$**${guild.balance.toLocaleString()}**\n  +$**${amount.toLocaleString()}**`);
 
       await reaction.message.edit({ embeds: [embed], components: [] });
 
@@ -767,10 +689,7 @@ async function run(
 
     inPlaceSort(members).desc([(i) => i.contributedXp, (i) => i.contributedMoney]);
 
-    const embed = new CustomEmbed(message.member).setHeader(
-      `${guild.guildName} stats`,
-      message.author.avatarURL()
-    );
+    const embed = new CustomEmbed(message.member).setHeader(`${guild.guildName} stats`, message.author.avatarURL());
 
     let desc = "";
 
@@ -797,9 +716,7 @@ async function run(
     }
 
     if (guild.level >= Constants.MAX_GUILD_LEVEL) {
-      return send({
-        embeds: [new CustomEmbed(message.member, `**${guild.guildName}** is at max level`)],
-      });
+      return send({ embeds: [new CustomEmbed(message.member, `**${guild.guildName}** is at max level`)] });
     }
 
     await addCooldown(cmd.name, message.member, 3);
@@ -841,8 +758,7 @@ async function run(
     }
 
     for (const word of filter) {
-      if (cleanString(motd).toLowerCase().includes(word))
-        return send({ embeds: [new ErrorEmbed("invalid guild motd")] });
+      if (cleanString(motd).toLowerCase().includes(word)) return send({ embeds: [new ErrorEmbed("invalid guild motd")] });
     }
 
     await addCooldown(cmd.name, message.member, 3);
@@ -878,8 +794,7 @@ async function run(
 
   if (args[0].toLowerCase() == "buy") {
     if (!guild) return send({ embeds: [new ErrorEmbed("you are not in a guild")] });
-    if (guild.ownerId !== message.author.id)
-      return send({ embeds: [new ErrorEmbed("you must be the guild owner")] });
+    if (guild.ownerId !== message.author.id) return send({ embeds: [new ErrorEmbed("you must be the guild owner")] });
 
     if (args.length === 1) return send({ embeds: [new ErrorEmbed("/guild buy <item>")] });
 
@@ -889,12 +804,9 @@ async function run(
     if (!selected) return send({ embeds: [new ErrorEmbed("invalid upgrade")] });
 
     const cost =
-      selected.cost +
-      (guild.upgrades.find((i) => i.upgradeId === selected.id)?.amount || 0) *
-        selected.increment_per_level;
+      selected.cost + (guild.upgrades.find((i) => i.upgradeId === selected.id)?.amount || 0) * selected.increment_per_level;
 
-    if (guild.tokens < cost)
-      return send({ embeds: [new ErrorEmbed("you cannot afford this upgrade")] });
+    if (guild.tokens < cost) return send({ embeds: [new ErrorEmbed("you cannot afford this upgrade")] });
 
     await prisma.economyGuild.update({
       where: { guildName: guild.guildName },
@@ -905,14 +817,7 @@ async function run(
 
     await addGuildUpgrade(guild.guildName, selected.id);
 
-    return send({
-      embeds: [
-        new CustomEmbed(
-          message.member,
-          `✅ you have bought **${selected.name}** for ${cost} tokens`
-        ),
-      ],
-    });
+    return send({ embeds: [new CustomEmbed(message.member, `✅ you have bought **${selected.name}** for ${cost} tokens`)] });
   }
 
   if (args[0].toLowerCase() == "shop") {
@@ -927,8 +832,7 @@ async function run(
         `**${upgrade.name}** (${guild.upgrades.find((i) => i.upgradeId)?.amount || 0})\n` +
         `*${upgrade.description}*\n` +
         `**cost** ${
-          upgrade.cost +
-          (guild.upgrades.find((i) => i.upgradeId)?.amount || 0) * upgrade.increment_per_level
+          upgrade.cost + (guild.upgrades.find((i) => i.upgradeId)?.amount || 0) * upgrade.increment_per_level
         } tokens`;
 
       if (pages.size === 0) {
@@ -941,11 +845,7 @@ async function run(
     }
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder()
-        .setCustomId("⬅")
-        .setLabel("back")
-        .setStyle(ButtonStyle.Primary)
-        .setDisabled(true),
+      new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
       new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
       new ButtonBuilder().setCustomId("❌").setLabel("clear mentions").setStyle(ButtonStyle.Danger)
     );

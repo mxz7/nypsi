@@ -30,14 +30,7 @@ import Constants from "../Constants";
 import { a } from "../functions/anticheat";
 import { addProgress } from "../functions/economy/achievements";
 import { commandGemCheck, gemBreak, getInventory } from "../functions/economy/inventory";
-import {
-  createUser,
-  getEcoBanTime,
-  getItems,
-  isEcoBanned,
-  isHandcuffed,
-  userExists,
-} from "../functions/economy/utils";
+import { createUser, getEcoBanTime, getItems, isEcoBanned, isHandcuffed, userExists } from "../functions/economy/utils";
 import { getXp, updateXp } from "../functions/economy/xp";
 import { getDisabledCommands } from "../functions/guilds/disabledcommands";
 import { getChatFilter } from "../functions/guilds/filters";
@@ -72,7 +65,7 @@ const cooldown = new Set<string>();
 let commandsSize = 0;
 let aliasesSize = 0;
 
-export { aliasesSize, commandsSize };
+export { commandsSize, aliasesSize };
 
 let restarting = false;
 
@@ -105,11 +98,7 @@ export function loadCommands() {
         if (command.aliases) {
           for (const a of command.aliases) {
             if (aliases.has(a)) {
-              logger.warn(
-                `duplicate alias: ${a} [original: ${aliases.get(a)} copy: ${
-                  command.name
-                }] - not overwriting`
-              );
+              logger.warn(`duplicate alias: ${a} [original: ${aliases.get(a)} copy: ${command.name}] - not overwriting`);
             } else {
               aliases.set(a, command.name);
             }
@@ -162,9 +151,7 @@ export function reloadCommand(commandsArray: string[]) {
           for (const a of commandData.aliases) {
             if (aliases.has(a) && aliases.get(a) != commandData.name) {
               logger.error(
-                `duplicate alias: ${a} [original: ${aliases.get(a)} copy: ${
-                  commandData.name
-                }] - not overwriting`
+                `duplicate alias: ${a} [original: ${aliases.get(a)} copy: ${commandData.name}] - not overwriting`
               );
             } else {
               aliases.set(a, commandData.name);
@@ -307,14 +294,7 @@ async function helpCmd(message: Message, args: string[]) {
       }
 
       let desc =
-        "**name** " +
-        cmd.name +
-        "\n" +
-        "**description** " +
-        cmd.description +
-        "\n" +
-        "**category** " +
-        cmd.category;
+        "**name** " + cmd.name + "\n" + "**description** " + cmd.description + "\n" + "**category** " + cmd.category;
 
       if (cmd.permissions) {
         desc = desc + "\n**permission(s) required** `" + cmd.permissions.join("`, `") + "`";
@@ -342,10 +322,7 @@ async function helpCmd(message: Message, args: string[]) {
     } else if (selectedItem) {
       embed.setTitle(`${selectedItem.emoji} ${selectedItem.name}`);
 
-      const desc: string[] = [
-        `**id** \`${selectedItem.id}\``,
-        `**description** ${selectedItem.longDesc}`,
-      ];
+      const desc: string[] = [`**id** \`${selectedItem.id}\``, `**description** ${selectedItem.longDesc}`];
 
       if (selectedItem.aliases) {
         desc.push(`**aliases** \`${selectedItem.aliases.join("`, `")}\``);
@@ -399,11 +376,7 @@ async function helpCmd(message: Message, args: string[]) {
             "collectable info",
             "collectables don't do anything, theyre just *collectables*. if you dont want them, you can get rid of them by selling them"
           );
-        } else if (
-          selectedItem.role == "sellable" ||
-          selectedItem.role == "prey" ||
-          selectedItem.role == "fish"
-        ) {
+        } else if (selectedItem.role == "sellable" || selectedItem.role == "prey" || selectedItem.role == "fish") {
           embed.addField(
             "sellable",
             `this item is just meant to be sold. you can use the ${prefix}**sellall** command to do so quickly`
@@ -420,11 +393,7 @@ async function helpCmd(message: Message, args: string[]) {
   let msg: Message;
 
   let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder()
-      .setCustomId("⬅")
-      .setLabel("back")
-      .setStyle(ButtonStyle.Primary)
-      .setDisabled(true),
+    new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
     new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
   );
 
@@ -466,29 +435,13 @@ async function helpCmd(message: Message, args: string[]) {
         embed.setFooter({ text: `page ${currentPage}/${lastPage} | v${version}` });
         if (currentPage == 1) {
           row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-            new ButtonBuilder()
-              .setCustomId("⬅")
-              .setLabel("back")
-              .setStyle(ButtonStyle.Primary)
-              .setDisabled(true),
-            new ButtonBuilder()
-              .setCustomId("➡")
-              .setLabel("next")
-              .setStyle(ButtonStyle.Primary)
-              .setDisabled(false)
+            new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
+            new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(false)
           );
         } else {
           row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-            new ButtonBuilder()
-              .setCustomId("⬅")
-              .setLabel("back")
-              .setStyle(ButtonStyle.Primary)
-              .setDisabled(false),
-            new ButtonBuilder()
-              .setCustomId("➡")
-              .setLabel("next")
-              .setStyle(ButtonStyle.Primary)
-              .setDisabled(false)
+            new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(false),
+            new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(false)
           );
         }
         await msg.edit({ embeds: [embed], components: [row] });
@@ -503,29 +456,13 @@ async function helpCmd(message: Message, args: string[]) {
         embed.setFooter({ text: `page ${currentPage}/${lastPage} | v${version}` });
         if (currentPage == lastPage) {
           row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-            new ButtonBuilder()
-              .setCustomId("⬅")
-              .setLabel("back")
-              .setStyle(ButtonStyle.Primary)
-              .setDisabled(false),
-            new ButtonBuilder()
-              .setCustomId("➡")
-              .setLabel("next")
-              .setStyle(ButtonStyle.Primary)
-              .setDisabled(true)
+            new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(false),
+            new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(true)
           );
         } else {
           row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-            new ButtonBuilder()
-              .setCustomId("⬅")
-              .setLabel("back")
-              .setStyle(ButtonStyle.Primary)
-              .setDisabled(false),
-            new ButtonBuilder()
-              .setCustomId("➡")
-              .setLabel("next")
-              .setStyle(ButtonStyle.Primary)
-              .setDisabled(false)
+            new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(false),
+            new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(false)
           );
         }
         await msg.edit({ embeds: [embed], components: [row] });
@@ -579,18 +516,12 @@ export async function runCommand(
     ) {
       if (message instanceof Message) {
         return message.member
-          .send(
-            "i don't have access to that channel. please contact server staff if this is an error"
-          )
+          .send("i don't have access to that channel. please contact server staff if this is an error")
           .catch(() => {});
       } else {
         return message
           .reply({
-            embeds: [
-              new ErrorEmbed(
-                "i don't have access to this channel. please contact server staff if this is an error"
-              ),
-            ],
+            embeds: [new ErrorEmbed("i don't have access to this channel. please contact server staff if this is an error")],
           })
           .catch(() => {});
       }
@@ -608,9 +539,7 @@ export async function runCommand(
     }
 
     if (
-      !message.channel
-        .permissionsFor(message.client.user)
-        .has(PermissionFlagsBits.UseApplicationCommands) ||
+      !message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.UseApplicationCommands) ||
       !message.guild.members.me.permissions.has(PermissionFlagsBits.UseApplicationCommands)
     ) {
       return message.member
@@ -632,9 +561,7 @@ export async function runCommand(
     }
 
     if (
-      !message.channel
-        .permissionsFor(message.client.user)
-        .has(PermissionFlagsBits.ManageMessages) ||
+      !message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.ManageMessages) ||
       !message.guild.members.me.permissions.has(PermissionFlagsBits.ManageMessages)
     ) {
       return message.channel.send(
@@ -644,11 +571,7 @@ export async function runCommand(
       );
     }
 
-    if (
-      !message.channel
-        .permissionsFor(message.client.user)
-        .has(PermissionFlagsBits.UseExternalEmojis)
-    ) {
+    if (!message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.UseExternalEmojis)) {
       return message.channel.send({
         content:
           "❌ i don't have the `use external emojis` permission, this is a required permission for nypsi to work\n\n" +
@@ -670,8 +593,7 @@ export async function runCommand(
       const foundAlias = userAliases.find((alias) => alias.alias === cmd);
 
       if (foundAlias) {
-        if (!recentlyUsedUserAliases.has(message.channel.id))
-          recentlyUsedUserAliases.set(message.channel.id, new Map());
+        if (!recentlyUsedUserAliases.has(message.channel.id)) recentlyUsedUserAliases.set(message.channel.id, new Map());
         if (!recentlyUsedUserAliases.get(message.channel.id).has(cmd))
           recentlyUsedUserAliases.get(message.channel.id).set(cmd, message.author.tag);
 
@@ -681,9 +603,7 @@ export async function runCommand(
         args = foundAlias.command.split(" ");
         args.push(...message.content.split(" ").splice(1, Infinity));
 
-        message.content = `${message.content[0]}${command.name} ${args
-          .slice(1, Infinity)
-          .join(" ")}`;
+        message.content = `${message.content[0]}${command.name} ${args.slice(1, Infinity).join(" ")}`;
       } else if (recentlyUsedUserAliases.get(message.channel.id)?.has(cmd)) {
         const owner = recentlyUsedUserAliases.get(message.channel.id).get(cmd);
 
@@ -737,9 +657,7 @@ export async function runCommand(
 
         if (ownerTag) {
           embed.setFooter({
-            text: `by ${ownerTag} | ${customCommand.uses.toLocaleString()} use${
-              customCommand.uses == 1 ? "" : "s"
-            }`,
+            text: `by ${ownerTag} | ${customCommand.uses.toLocaleString()} use${customCommand.uses == 1 ? "" : "s"}`,
           });
         }
 
@@ -750,19 +668,13 @@ export async function runCommand(
 
   logCommand(message, args);
 
-  if (
-    await redis.exists(
-      `${Constants.redis.nypsi.COMMAND_WATCH}:${message.author.id}:${command.name}`
-    )
-  ) {
+  if (await redis.exists(`${Constants.redis.nypsi.COMMAND_WATCH}:${message.author.id}:${command.name}`)) {
     const hook = new WebhookClient({ url: process.env.ANTICHEAT_HOOK });
 
     let msg: string;
 
     if (!(message instanceof Message)) {
-      msg = `[${getTimestamp()}] ${message.guild.id} - ${message.author.tag}: [/]${
-        message.commandName
-      } ${args.join(" ")}`;
+      msg = `[${getTimestamp()}] ${message.guild.id} - ${message.author.tag}: [/]${message.commandName} ${args.join(" ")}`;
     } else {
       let content = message.content;
 
@@ -770,9 +682,7 @@ export async function runCommand(
         content = content.substring(0, 75) + "...";
       }
 
-      msg = `[${getTimestamp()}] ${message.guildId}:${message.channelId} - ${
-        message.author.tag
-      }: ${content}`;
+      msg = `[${getTimestamp()}] ${message.guildId}:${message.channelId} - ${message.author.tag}: ${content}`;
     }
 
     const embed = new CustomEmbed(null, `\`\`\`${msg}\`\`\``)
@@ -795,15 +705,11 @@ export async function runCommand(
       } else {
         if (message instanceof Message) {
           return message.channel.send({
-            embeds: [
-              new CustomEmbed(message.member, "nypsi is rebooting, try again in a few minutes"),
-            ],
+            embeds: [new CustomEmbed(message.member, "nypsi is rebooting, try again in a few minutes")],
           });
         } else {
           return message.reply({
-            embeds: [
-              new CustomEmbed(message.member, "nypsi is rebooting, try again in a few minutes"),
-            ],
+            embeds: [new CustomEmbed(message.member, "nypsi is rebooting, try again in a few minutes")],
           });
         }
       }
@@ -873,15 +779,11 @@ export async function runCommand(
 
       if (message instanceof Message) {
         return message.channel.send({
-          embeds: [
-            new ErrorEmbed(`you have been handcuffed, they will be removed in **${remaining}**`),
-          ],
+          embeds: [new ErrorEmbed(`you have been handcuffed, they will be removed in **${remaining}**`)],
         });
       } else {
         return message.editReply({
-          embeds: [
-            new ErrorEmbed(`you have been handcuffed, they will be removed in **${remaining}**`),
-          ],
+          embeds: [new ErrorEmbed(`you have been handcuffed, they will be removed in **${remaining}**`)],
         });
       }
     }
@@ -889,13 +791,9 @@ export async function runCommand(
 
   if ((await getDisabledCommands(message.guild)).includes(command.name)) {
     if (message instanceof Message) {
-      return message.channel.send({
-        embeds: [new ErrorEmbed(`that command has been disabled in ${message.guild.name}`)],
-      });
+      return message.channel.send({ embeds: [new ErrorEmbed(`that command has been disabled in ${message.guild.name}`)] });
     } else {
-      return message.reply({
-        embeds: [new ErrorEmbed(`that command has been disabled in ${message.guild.name}`)],
-      });
+      return message.reply({ embeds: [new ErrorEmbed(`that command has been disabled in ${message.guild.name}`)] });
     }
   }
 
@@ -928,9 +826,7 @@ export async function runCommand(
 
     if (await redis.exists(`achievements:completed:${message.author.id}`)) {
       if (!(await userExists(message.member))) await createUser(message.member);
-      const embed: APIEmbed = JSON.parse(
-        await redis.get(`achievements:completed:${message.author.id}`)
-      );
+      const embed: APIEmbed = JSON.parse(await redis.get(`achievements:completed:${message.author.id}`));
       await redis.del(`achievements:completed:${message.author.id}`);
 
       if (message instanceof Message) {
@@ -1027,18 +923,13 @@ export function getRandomCommand(): Command {
   return choice;
 }
 
-export function logCommand(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+export function logCommand(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   args.shift();
 
   let msg: string;
 
   if (!(message instanceof Message)) {
-    msg = `${message.guild.id} - ${message.author.tag}: [/]${message.commandName} ${args.join(
-      " "
-    )}`;
+    msg = `${message.guild.id} - ${message.author.tag}: [/]${message.commandName} ${args.join(" ")}`;
   } else {
     let content = message.content;
 
@@ -1143,10 +1034,7 @@ export function runCommandUseTimers(client: NypsiClient) {
 
       const inventory = await getInventory(user);
 
-      if (
-        inventory.find((i) => i.item === "purple_gem") &&
-        inventory.find((i) => i.item === "purple_gem").amount > 0
-      ) {
+      if (inventory.find((i) => i.item === "purple_gem") && inventory.find((i) => i.item === "purple_gem").amount > 0) {
         if (percentChance(50)) {
           modifier = modifier / 1.77777;
           gemBreak(user, 0.00777, "purple_gem");

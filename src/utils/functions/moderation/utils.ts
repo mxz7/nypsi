@@ -28,10 +28,7 @@ export async function profileExists(guild: Guild) {
     return false;
   } else {
     await redis.set(`${Constants.redis.cache.moderation.EXISTS}:${guild.id}`, "t");
-    await redis.expire(
-      `${Constants.redis.cache.moderation.EXISTS}:${guild.id}`,
-      Math.floor(ms("12 hours") / 1000)
-    );
+    await redis.expire(`${Constants.redis.cache.moderation.EXISTS}:${guild.id}`, Math.floor(ms("12 hours") / 1000));
     return true;
   }
 }

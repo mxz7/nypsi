@@ -5,19 +5,12 @@ import { getPrefix } from "../utils/functions/guilds/utils";
 import { getLogsChannelHook, setLogsChannelHook } from "../utils/functions/moderation/logs";
 import { createProfile, profileExists } from "../utils/functions/moderation/utils";
 
-const cmd = new Command("logs", "set/update the logs channel", "admin").setPermissions([
-  "MANAGE_SERVER",
-]);
+const cmd = new Command("logs", "set/update the logs channel", "admin").setPermissions(["MANAGE_SERVER"]);
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
     if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
-      return message.channel.send({
-        embeds: [new ErrorEmbed("you need the `manage server` permission")],
-      });
+      return message.channel.send({ embeds: [new ErrorEmbed("you need the `manage server` permission")] });
     }
     return;
   }
@@ -27,11 +20,7 @@ async function run(
     !message.guild.members.me.permissions.has(PermissionFlagsBits.ManageChannels)
   ) {
     return message.channel.send({
-      embeds: [
-        new ErrorEmbed(
-          "i need the `manage webhooks` and `manage channels` permissions for this command"
-        ),
-      ],
+      embeds: [new ErrorEmbed("i need the `manage webhooks` and `manage channels` permissions for this command")],
     });
   }
 
@@ -70,9 +59,7 @@ async function run(
   } else if (args[0].toLowerCase() == "disable") {
     await setLogsChannelHook(message.guild, "");
 
-    return message.channel.send({
-      embeds: [new CustomEmbed(message.member, "✅ logs have been disabled")],
-    });
+    return message.channel.send({ embeds: [new CustomEmbed(message.member, "✅ logs have been disabled")] });
   } else {
     let channel: string | Channel = args[0];
 
@@ -116,11 +103,7 @@ async function run(
       .catch(() => {
         fail = true;
         message.channel.send({
-          embeds: [
-            new ErrorEmbed(
-              "i was unable to make a webhook in that channel, please check my permissions"
-            ),
-          ],
+          embeds: [new ErrorEmbed("i was unable to make a webhook in that channel, please check my permissions")],
         });
       });
 

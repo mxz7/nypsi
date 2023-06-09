@@ -1,28 +1,16 @@
-import {
-  BaseMessageOptions,
-  CommandInteraction,
-  InteractionReplyOptions,
-  Message,
-} from "discord.js";
+import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getKarma } from "../utils/functions/karma/karma";
 import { getMember } from "../utils/functions/member";
 
-const cmd = new Command("karma", "check how much karma you have", "info").setDocs(
-  "https://docs.nypsi.xyz/economy/karma"
-);
+const cmd = new Command("karma", "check how much karma you have", "info").setDocs("https://docs.nypsi.xyz/economy/karma");
 
 cmd.slashEnabled = true;
-cmd.slashData.addUserOption((option) =>
-  option.setName("user").setDescription("user to get karma of")
-);
+cmd.slashData.addUserOption((option) => option.setName("user").setDescription("user to get karma of"));
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   let target = message.member;
 
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {

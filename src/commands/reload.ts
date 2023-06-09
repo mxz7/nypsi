@@ -8,10 +8,7 @@ import { logger } from "../utils/logger";
 
 const cmd = new Command("reload", "reload commands", "none").setPermissions(["bot owner"]);
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (message.member.user.id != Constants.TEKOH_ID) return;
 
   if (args.length == 0) {

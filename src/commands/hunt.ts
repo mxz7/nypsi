@@ -1,23 +1,13 @@
-import {
-  BaseMessageOptions,
-  CommandInteraction,
-  InteractionReplyOptions,
-  Message,
-} from "discord.js";
+import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { getBoosters } from "../utils/functions/economy/boosters";
-import {
-  addInventoryItem,
-  gemBreak,
-  getInventory,
-  setInventoryItem,
-} from "../utils/functions/economy/inventory";
+import { addInventoryItem, gemBreak, getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
 import { addStat } from "../utils/functions/economy/stats";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
-import { percentChance } from "../utils/functions/random";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import { percentChance } from "../utils/functions/random";
 
 const cmd = new Command("hunt", "go to a field and hunt", "money");
 
@@ -67,29 +57,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   let gun: string;
 
-  if (
-    inventory.find((i) => i.item == "incredible_gun") &&
-    inventory.find((i) => i.item == "incredible_gun").amount > 0
-  ) {
+  if (inventory.find((i) => i.item == "incredible_gun") && inventory.find((i) => i.item == "incredible_gun").amount > 0) {
     gun = "incredible_gun";
-  } else if (
-    inventory.find((i) => i.item == "gun") &&
-    inventory.find((i) => i.item == "gun").amount > 0
-  ) {
+  } else if (inventory.find((i) => i.item == "gun") && inventory.find((i) => i.item == "gun").amount > 0) {
     gun = "gun";
-  } else if (
-    inventory.find((i) => i.item == "terrible_gun") &&
-    inventory.find((i) => i.item == "terrible_gun").amount > 0
-  ) {
+  } else if (inventory.find((i) => i.item == "terrible_gun") && inventory.find((i) => i.item == "terrible_gun").amount > 0) {
     gun = "terrible_gun";
   }
 
   if (!gun) {
     return send({
       embeds: [
-        new ErrorEmbed(
-          "you need a gun to hunt\n[how do i get a gun?](https://docs.nypsi.xyz/economy/fishinghunting)"
-        ),
+        new ErrorEmbed("you need a gun to hunt\n[how do i get a gun?](https://docs.nypsi.xyz/economy/fishinghunting)"),
       ],
     });
   }
@@ -140,12 +119,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   }
 
   if (!unbreaking) {
-    await setInventoryItem(
-      message.member,
-      gun,
-      inventory.find((i) => i.item == gun).amount - 1,
-      false
-    );
+    await setInventoryItem(message.member, gun, inventory.find((i) => i.item == gun).amount - 1, false);
   }
 
   for (let i = 0; i < 15; i++) {
@@ -217,9 +191,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const embed = new CustomEmbed(
     message.member,
-    `you go to the ${["field", "forest"][Math.floor(Math.random() * 2)]} and prepare your **${
-      items[gun].name
-    }**`
+    `you go to the ${["field", "forest"][Math.floor(Math.random() * 2)]} and prepare your **${items[gun].name}**`
   );
 
   const msg = await send({ embeds: [embed] });

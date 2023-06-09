@@ -58,9 +58,7 @@ export function runCountdowns(client: NypsiClient) {
       if (days == 0) {
         message = countdown.finalFormat;
       } else if (days < 0) {
-        await prisma.guildCountdown.delete({
-          where: { guildId_id: { guildId: countdown.guildId, id: countdown.id } },
-        });
+        await prisma.guildCountdown.delete({ where: { guildId_id: { guildId: countdown.guildId, id: countdown.id } } });
         return;
       } else {
         message = countdown.format.split("%days%").join(days.toLocaleString());
@@ -156,13 +154,7 @@ export async function getCountdown(guild: Guild | string, id: string) {
   return query;
 }
 
-export async function addCountdown(
-  guild: Guild,
-  date: Date | number,
-  format: string,
-  finalFormat: string,
-  channel: string
-) {
+export async function addCountdown(guild: Guild, date: Date | number, format: string, finalFormat: string, channel: string) {
   const countdowns = await getCountdowns(guild);
 
   const id = countdowns.length + 1;

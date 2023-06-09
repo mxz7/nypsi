@@ -59,11 +59,7 @@ export async function updateXp(member: GuildMember | string, amount: number) {
   await redis.del(`${Constants.redis.cache.economy.XP}:${id}`);
 }
 
-export async function calcEarnedXp(
-  member: GuildMember,
-  bet: number,
-  multiplier: number
-): Promise<number> {
+export async function calcEarnedXp(member: GuildMember, bet: number, multiplier: number): Promise<number> {
   const requiredBet = await getRequiredBetForXp(member);
 
   if (bet < requiredBet) {
@@ -107,8 +103,7 @@ export async function calcEarnedXp(
     }
   }
 
-  if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0)
-    max += Math.floor(Math.random() * 7);
+  if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0) max += Math.floor(Math.random() * 7);
   if (inventory.find((i) => i.item == "white_gem")?.amount > 0) {
     const chance = Math.floor(Math.random() * 10);
 

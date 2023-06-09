@@ -6,9 +6,7 @@ import { redditImage } from "../utils/functions/image";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { images } from "../utils/handlers/imghandler";
 
-const cmd = new Command("rabbit", "get a random picture of a rabbit", "animals").setAliases([
-  "bunny",
-]);
+const cmd = new Command("rabbit", "get a random picture of a rabbit", "animals").setAliases(["bunny"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
   if (await onCooldown(cmd.name, message.member)) {
@@ -20,15 +18,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const rabbitCache = images.get("rabbit");
 
   if (!rabbitCache) {
-    return message.channel.send({
-      embeds: [new ErrorEmbed("please wait a couple more seconds..")],
-    });
+    return message.channel.send({ embeds: [new ErrorEmbed("please wait a couple more seconds..")] });
   }
 
   if (rabbitCache.size < 1) {
-    return message.channel.send({
-      embeds: [new ErrorEmbed("please wait a couple more seconds..")],
-    });
+    return message.channel.send({ embeds: [new ErrorEmbed("please wait a couple more seconds..")] });
   }
 
   await addCooldown(cmd.name, message.member, 7);

@@ -59,10 +59,7 @@ export async function updateUser(user: User, command: string) {
   const date = new Date();
 
   await redis.set(`${Constants.redis.cache.user.LAST_COMMAND}:${user.id}`, date.getTime());
-  await redis.expire(
-    `${Constants.redis.cache.user.LAST_COMMAND}:${user.id}`,
-    ms("30 minutes") / 1000
-  );
+  await redis.expire(`${Constants.redis.cache.user.LAST_COMMAND}:${user.id}`, ms("30 minutes") / 1000);
 
   await prisma.user.update({
     where: {

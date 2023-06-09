@@ -10,9 +10,9 @@ export default async function channelDelete(channel: GuildChannel) {
 
     embed.setTitle("channel deleted");
     embed.setDescription(
-      `${channel.toString()} \`${channel.id}\`\n\n**name** ${channel.name}\n**category** ${
-        channel.parent.name
-      }\n**type** ${channel.type}`
+      `${channel.toString()} \`${channel.id}\`\n\n**name** ${channel.name}\n**category** ${channel.parent.name}\n**type** ${
+        channel.type
+      }`
     );
 
     await addLog(channel.guild, "channel", embed);

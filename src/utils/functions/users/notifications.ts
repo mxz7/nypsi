@@ -15,10 +15,8 @@ interface NotificationData {
   types?: { name: string; description: string; value: string }[];
 }
 
-const notificationsData: { [key: string]: NotificationData } =
-  require("../../../../data/notifications.json").notifications;
-const preferencesData: { [key: string]: NotificationData } =
-  require("../../../../data/notifications.json").preferences;
+const notificationsData: { [key: string]: NotificationData } = require("../../../../data/notifications.json").notifications;
+const preferencesData: { [key: string]: NotificationData } = require("../../../../data/notifications.json").preferences;
 
 export async function getDmSettings(member: GuildMember | string) {
   let id: string;
@@ -29,9 +27,7 @@ export async function getDmSettings(member: GuildMember | string) {
   }
 
   if (await redis.exists(`${Constants.redis.cache.user.DM_SETTINGS}:${id}`)) {
-    return (await JSON.parse(
-      await redis.get(`${Constants.redis.cache.user.DM_SETTINGS}:${id}`)
-    )) as DMSettings;
+    return (await JSON.parse(await redis.get(`${Constants.redis.cache.user.DM_SETTINGS}:${id}`))) as DMSettings;
   }
 
   let query = await prisma.dMSettings.findUnique({
@@ -91,9 +87,7 @@ export async function getPreferences(member: GuildMember | string) {
   }
 
   if (await redis.exists(`${Constants.redis.cache.user.PREFERENCES}:${id}`)) {
-    return (await JSON.parse(
-      await redis.get(`${Constants.redis.cache.user.PREFERENCES}:${id}`)
-    )) as Preferences;
+    return (await JSON.parse(await redis.get(`${Constants.redis.cache.user.PREFERENCES}:${id}`))) as Preferences;
   }
 
   let query = await prisma.preferences.findUnique({

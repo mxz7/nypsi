@@ -34,16 +34,10 @@ cmd.slashData
       .setName("member")
       .setDescription("delete messages by a specific member")
       .addUserOption((option) =>
-        option
-          .setName("member")
-          .setDescription("member you want to delete messages from")
-          .setRequired(true)
+        option.setName("member").setDescription("member you want to delete messages from").setRequired(true)
       )
       .addIntegerOption((option) =>
-        option
-          .setName("amount")
-          .setDescription("amount of messages you want to delete")
-          .setRequired(true)
+        option.setName("amount").setDescription("amount of messages you want to delete").setRequired(true)
       )
   )
   .addSubcommand((bot) =>
@@ -58,21 +52,14 @@ cmd.slashData
     includes
       .setName("includes")
       .setDescription("delete messages including specific text")
-      .addStringOption((option) =>
-        option.setName("includes").setDescription("text to search for").setRequired(true)
-      )
+      .addStringOption((option) => option.setName("includes").setDescription("text to search for").setRequired(true))
       .addIntegerOption((option) =>
         option.setName("amount").setDescription("amount of messages to delete").setRequired(true)
       )
   )
-  .addSubcommand((clean) =>
-    clean.setName("clean").setDescription("clean up bot commands and responses")
-  );
+  .addSubcommand((clean) => clean.setName("clean").setDescription("clean up bot commands and responses"));
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
     return;
   }
@@ -129,10 +116,7 @@ async function run(
     if (amount <= 100) {
       await message.channel.bulkDelete(amount, true).catch(() => {});
       if (!(message instanceof Message)) {
-        return send({
-          embeds: [new CustomEmbed(message.member, "✅ messages deleted")],
-          ephemeral: true,
-        });
+        return send({ embeds: [new CustomEmbed(message.member, "✅ messages deleted")], ephemeral: true });
       }
     } else {
       amount = amount - 1;
@@ -147,9 +131,7 @@ async function run(
 
       const embed = new CustomEmbed(
         message.member,
-        "deleting `" +
-          amount +
-          "` messages..\n- if you'd like to cancel this operation, delete this message"
+        "deleting `" + amount + "` messages..\n- if you'd like to cancel this operation, delete this message"
       ).setHeader("purge", message.author.avatarURL());
 
       const m = await send({ embeds: [embed] });
@@ -230,9 +212,7 @@ async function run(
         }
       }
       if (!(message instanceof Message)) {
-        message
-          .editReply({ embeds: [new CustomEmbed(message.member, "operation complete (:")] })
-          .catch(() => {});
+        message.editReply({ embeds: [new CustomEmbed(message.member, "operation complete (:")] }).catch(() => {});
       }
       return m.delete().catch(() => {});
     }
@@ -245,10 +225,7 @@ async function run(
     if (message instanceof Message) {
       await message.delete();
     } else {
-      await send({
-        embeds: [new CustomEmbed(message.member, "deleting messages...")],
-        ephemeral: true,
-      });
+      await send({ embeds: [new CustomEmbed(message.member, "deleting messages...")], ephemeral: true });
     }
 
     let collected = await message.channel.messages.fetch({ limit: 100 });
@@ -276,9 +253,7 @@ async function run(
     await message.channel.bulkDelete(collected);
 
     if (!(message instanceof Message)) {
-      return edit({
-        embeds: [new CustomEmbed(message.member, `✅ **${collected.size}** messages deleted`)],
-      });
+      return edit({ embeds: [new CustomEmbed(message.member, `✅ **${collected.size}** messages deleted`)] });
     }
   };
 
@@ -289,10 +264,7 @@ async function run(
     if (message instanceof Message) {
       await message.delete();
     } else {
-      await send({
-        embeds: [new CustomEmbed(message.member, "deleting messages...")],
-        ephemeral: true,
-      });
+      await send({ embeds: [new CustomEmbed(message.member, "deleting messages...")], ephemeral: true });
     }
 
     let collected = await message.channel.messages.fetch({ limit: 100 });
@@ -317,9 +289,7 @@ async function run(
     await message.channel.bulkDelete(collected);
 
     if (!(message instanceof Message)) {
-      return edit({
-        embeds: [new CustomEmbed(message.member, `✅ **${collected.size}** messages deleted`)],
-      });
+      return edit({ embeds: [new CustomEmbed(message.member, `✅ **${collected.size}** messages deleted`)] });
     }
   };
 
@@ -330,10 +300,7 @@ async function run(
     if (message instanceof Message) {
       await message.delete();
     } else {
-      await send({
-        embeds: [new CustomEmbed(message.member, "deleting messages...")],
-        ephemeral: true,
-      });
+      await send({ embeds: [new CustomEmbed(message.member, "deleting messages...")], ephemeral: true });
     }
 
     let collected = await message.channel.messages.fetch({ limit: 100 });
@@ -358,9 +325,7 @@ async function run(
     await message.channel.bulkDelete(collected);
 
     if (!(message instanceof Message)) {
-      return edit({
-        embeds: [new CustomEmbed(message.member, `✅ **${collected.size}** messages deleted`)],
-      });
+      return edit({ embeds: [new CustomEmbed(message.member, `✅ **${collected.size}** messages deleted`)] });
     }
   };
 
@@ -452,8 +417,7 @@ async function run(
 
     return deleteBotMessages(amount);
   } else if (args[0].toLowerCase() == "includes") {
-    if (message instanceof Message)
-      return send({ embeds: [new ErrorEmbed("please use /purge includes")] });
+    if (message instanceof Message) return send({ embeds: [new ErrorEmbed("please use /purge includes")] });
 
     if (!message.isChatInputCommand()) return;
 
@@ -489,9 +453,7 @@ async function run(
 
     const collected = await message.channel.messages.fetch({ limit: amount });
 
-    const collecteda = collected.filter(
-      (msg) => msg.author.id == message.client.user.id || msg.content.startsWith(prefix)
-    );
+    const collecteda = collected.filter((msg) => msg.author.id == message.client.user.id || msg.content.startsWith(prefix));
 
     await message.channel.bulkDelete(collecteda);
 

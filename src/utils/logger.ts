@@ -180,10 +180,7 @@ class ConsoleTransport implements Transport {
   public levels: Levels[];
   public formatter: (data: WriteData) => Promise<string> | string;
 
-  constructor(opts: {
-    levels: Levels[];
-    formatter?: (data: WriteData) => Promise<string> | string;
-  }) {
+  constructor(opts: { levels: Levels[]; formatter?: (data: WriteData) => Promise<string> | string }) {
     this.levels = opts.levels;
     this.formatter = opts.formatter;
   }
@@ -304,25 +301,15 @@ const formatter = (data: WriteData) => {
 
   return `${chalk.blackBright.italic(dayjs(data.date).format("MM-DD HH:mm:ss.SSS"))} ${labelColor(
     data.label.toUpperCase()
-  )}${
-    typeof data.meta["cluster"] != "undefined" ? ` (${data.meta["cluster"]})` : ""
-  }: ${messageColor(data.message)}${jsonData ? `\n  ${jsonData}` : ""}`;
+  )}${typeof data.meta["cluster"] != "undefined" ? ` (${data.meta["cluster"]})` : ""}: ${messageColor(data.message)}${
+    jsonData ? `\n  ${jsonData}` : ""
+  }`;
 };
 
 logger.addTransport(
-  new FileTransport({
-    path: "./out/combined.log",
-    levels: ["debug", "info", "warn", "error"],
-    rotateAfterBytes: 10e6,
-  })
+  new FileTransport({ path: "./out/combined.log", levels: ["debug", "info", "warn", "error"], rotateAfterBytes: 10e6 })
 );
-logger.addTransport(
-  new FileTransport({
-    path: "./out/combined.log",
-    levels: ["warn", "error"],
-    rotateAfterBytes: 10e6,
-  })
-);
+logger.addTransport(new FileTransport({ path: "./out/combined.log", levels: ["warn", "error"], rotateAfterBytes: 10e6 }));
 logger.addTransport(
   new ConsoleTransport({
     levels: ["debug", "info", "warn", "error"],
@@ -354,27 +341,16 @@ export function setClusterId(id: number | string) {
 
 export function transaction(from: User, to: User, value: string) {
   if (!nextLogMsg.get("pay")) {
-    nextLogMsg.set(
-      "pay",
-      `**${from.tag}** (${from.id}) -> **${to.tag}** (${to.id})\n- **${value}**\n`
-    );
+    nextLogMsg.set("pay", `**${from.tag}** (${from.id}) -> **${to.tag}** (${to.id})\n- **${value}**\n`);
   } else {
     nextLogMsg.set(
       "pay",
-      nextLogMsg.get("pay") +
-        `**${from.tag}** (${from.id}) -> **${to.tag}** (${to.id})\n- **${value}**\n`
+      nextLogMsg.get("pay") + `**${from.tag}** (${from.id}) -> **${to.tag}** (${to.id})\n- **${value}**\n`
     );
   }
 }
 
-export function gamble(
-  user: User,
-  game: string,
-  amount: number,
-  win: boolean,
-  id: string,
-  winAmount?: number
-) {
+export function gamble(user: User, game: string, amount: number, win: boolean, id: string, winAmount?: number) {
   if (!nextLogMsg.get("gamble")) {
     nextLogMsg.set(
       "gamble",

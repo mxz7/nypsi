@@ -29,17 +29,10 @@ const playing = new Set<string>();
 
 cmd.slashEnabled = true;
 cmd.slashData
-  .addUserOption((option) =>
-    option.setName("user").setDescription("user you want to challenge").setRequired(false)
-  )
-  .addStringOption((option) =>
-    option.setName("bet").setDescription("how much do you want to bet").setRequired(false)
-  );
+  .addUserOption((option) => option.setName("user").setDescription("user you want to challenge").setRequired(false))
+  .addStringOption((option) => option.setName("bet").setDescription("how much do you want to bet").setRequired(false));
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (!(await userExists(message.member))) {
     await createUser(message.member);
   }
@@ -81,24 +74,15 @@ async function run(
   }
 
   if (args.length == 0) {
-    const embed = new CustomEmbed(message.member)
-      .setHeader("coinflip help")
-      .setDescription("/coinflip user bet");
+    const embed = new CustomEmbed(message.member).setHeader("coinflip help").setDescription("/coinflip user bet");
 
     return send({ embeds: [embed] });
   }
 
-  const doGame = async (
-    player1: GuildMember,
-    player2: GuildMember,
-    bet: number,
-    response: ButtonInteraction
-  ) => {
+  const doGame = async (player1: GuildMember, player2: GuildMember, bet: number, response: ButtonInteraction) => {
     if (bet > (await getBalance(player2))) {
       await updateBalance(player1.user.id, (await getBalance(player1.user.id)) + bet);
-      return response.editReply({
-        embeds: [new ErrorEmbed(`${player2.user.toString()} cannot afford this bet`)],
-      });
+      return response.editReply({ embeds: [new ErrorEmbed(`${player2.user.toString()} cannot afford this bet`)] });
     }
 
     await updateBalance(player2, (await getBalance(player2)) - bet);
@@ -182,10 +166,9 @@ async function run(
 
     await updateBalance(winner, (await getBalance(winner)) + winnings);
 
-    const embed = new CustomEmbed(
-      message.member,
-      `*throwing..*\n\n${thingy}\n\n**bet** $${bet.toLocaleString()}`
-    ).setHeader("coinflip");
+    const embed = new CustomEmbed(message.member, `*throwing..*\n\n${thingy}\n\n**bet** $${bet.toLocaleString()}`).setHeader(
+      "coinflip"
+    );
 
     const msg = await response.editReply({ embeds: [embed] });
 
@@ -194,14 +177,12 @@ async function run(
         tax ? ` (${(tax * 100).toFixed(1)}% tax)` : ""
       }\n${player2.user.username}`;
     } else {
-      thingy = `${message.author.username}\n**${
-        player2.user.username
-      }** +$${winnings.toLocaleString()}${tax ? ` (${(tax * 100).toFixed(1)}% tax)` : ""}`;
+      thingy = `${message.author.username}\n**${player2.user.username}** +$${winnings.toLocaleString()}${
+        tax ? ` (${(tax * 100).toFixed(1)}% tax)` : ""
+      }`;
     }
 
-    embed.setDescription(
-      `**winner** ${winner.user.tag}\n\n${thingy}\n\n**bet** $${bet.toLocaleString()}`
-    );
+    embed.setDescription(`**winner** ${winner.user.tag}\n\n${thingy}\n\n**bet** $${bet.toLocaleString()}`);
     embed.setColor(winner.displayHexColor);
     embed.setFooter({ text: `id: ${id}` });
 
@@ -230,9 +211,7 @@ async function run(
     }
 
     if (playing.has(target.user.id))
-      return send({
-        embeds: [new ErrorEmbed("this user is waiting for a response on a coinflip")],
-      });
+      return send({ embeds: [new ErrorEmbed("this user is waiting for a response on a coinflip")] });
 
     if (await isEcoBanned(target.user.id)) {
       return send({ embeds: [new ErrorEmbed("they are banned. lol.")] });
@@ -264,20 +243,12 @@ async function run(
 
     if (bet > (await calcMaxBet(message.member)) * 10)
       return send({
-        embeds: [
-          new ErrorEmbed(
-            `your max bet is $**${((await calcMaxBet(message.member)) * 10).toLocaleString()}**`
-          ),
-        ],
+        embeds: [new ErrorEmbed(`your max bet is $**${((await calcMaxBet(message.member)) * 10).toLocaleString()}**`)],
       });
 
     if (bet > (await calcMaxBet(target)) * 10)
       return send({
-        embeds: [
-          new ErrorEmbed(
-            `their max bet is $**${((await calcMaxBet(target)) * 10).toLocaleString()}**`
-          ),
-        ],
+        embeds: [new ErrorEmbed(`their max bet is $**${((await calcMaxBet(target)) * 10).toLocaleString()}**`)],
       });
 
     await addCooldown(cmd.name, message.member, 10);
@@ -295,9 +266,7 @@ async function run(
 
     const requestEmbed = new CustomEmbed(
       message.member,
-      `**${
-        message.author.tag
-      }** has challenged you to a coinflip\n\n**bet** $${bet.toLocaleString()}\n\ndo you accept?`
+      `**${message.author.tag}** has challenged you to a coinflip\n\n**bet** $${bet.toLocaleString()}\n\ndo you accept?`
     ).setFooter({ text: "expires in 60 seconds" });
 
     const msg = await send({
@@ -307,8 +276,7 @@ async function run(
     });
 
     const filter = (i: Interaction) =>
-      i.user.id == target.id ||
-      (message.author.id === i.user.id && (i as ButtonInteraction).customId === "n");
+      i.user.id == target.id || (message.author.id === i.user.id && (i as ButtonInteraction).customId === "n");
     let fail = false;
 
     const response = await msg
@@ -333,9 +301,7 @@ async function run(
     } else {
       await updateBalance(message.member, (await getBalance(message.member)) + bet);
       if (message.author.id === response.user.id) {
-        response.editReply({
-          embeds: [new CustomEmbed(message.member, "✅ coinflip request cancelled")],
-        });
+        response.editReply({ embeds: [new CustomEmbed(message.member, "✅ coinflip request cancelled")] });
       } else {
         response.editReply({ embeds: [new CustomEmbed(target, "✅ coinflip request denied")] });
       }
@@ -361,11 +327,7 @@ async function run(
 
     if (bet > (await calcMaxBet(message.member)) * 10)
       return send({
-        embeds: [
-          new ErrorEmbed(
-            `your max bet is $**${((await calcMaxBet(message.member)) * 10).toLocaleString()}**`
-          ),
-        ],
+        embeds: [new ErrorEmbed(`your max bet is $**${((await calcMaxBet(message.member)) * 10).toLocaleString()}**`)],
       });
 
     await addCooldown(cmd.name, message.member, 10);
@@ -401,22 +363,14 @@ async function run(
       }
 
       if (!(await userExists(i.user.id)) || (await getBalance(i.user.id)) < bet) {
-        if (i.isRepliable())
-          await i.reply({
-            ephemeral: true,
-            embeds: [new ErrorEmbed("you cannot afford this bet")],
-          });
+        if (i.isRepliable()) await i.reply({ ephemeral: true, embeds: [new ErrorEmbed("you cannot afford this bet")] });
         return false;
       }
 
       if ((await calcMaxBet(i.user.id)) * 10 < bet) {
         if (i.isRepliable())
           i.reply({
-            embeds: [
-              new ErrorEmbed(
-                `your max bet is $**${((await calcMaxBet(message.member)) * 10).toLocaleString()}**`
-              ),
-            ],
+            embeds: [new ErrorEmbed(`your max bet is $**${((await calcMaxBet(message.member)) * 10).toLocaleString()}**`)],
           });
 
         return false;
@@ -452,9 +406,7 @@ async function run(
     } else {
       await updateBalance(message.member, (await getBalance(message.member)) + bet);
       if (message.author.id === response.user.id) {
-        response.editReply({
-          embeds: [new CustomEmbed(message.member, "✅ coinflip request cancelled")],
-        });
+        response.editReply({ embeds: [new CustomEmbed(message.member, "✅ coinflip request cancelled")] });
       } else {
         response.editReply({ embeds: [new CustomEmbed(target, "✅ coinflip request denied")] });
       }

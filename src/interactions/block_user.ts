@@ -49,12 +49,7 @@ export default {
     await redis.del(`${Constants.redis.nypsi.OFFER_PROCESS}:${interaction.user.id}`);
 
     return interaction.editReply({
-      embeds: [
-        new CustomEmbed(
-          null,
-          `✅ added **${await getLastKnownTag(offer.ownerId)}** to your block list`
-        ),
-      ],
+      embeds: [new CustomEmbed(null, `✅ added **${await getLastKnownTag(offer.ownerId)}** to your block list`)],
     });
   },
 } as InteractionHandler;

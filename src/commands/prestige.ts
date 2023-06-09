@@ -31,12 +31,7 @@ import {
 } from "../utils/functions/economy/prestige.js";
 import { createUser, userExists } from "../utils/functions/economy/utils.js";
 import { getXp, updateXp } from "../utils/functions/economy/xp.js";
-import {
-  addCooldown,
-  addExpiry,
-  getResponse,
-  onCooldown,
-} from "../utils/handlers/cooldownhandler.js";
+import { addCooldown, addExpiry, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 
 const cmd = new Command("prestige", "prestige to gain extra benefits", "money");
 
@@ -206,9 +201,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     embed.setDescription(
       `you are now prestige **${await getPrestige(message.member)}**\n\n` +
-        `vote rewards: $**${Math.floor(
-          15000 * (prestige / 2 + 1)
-        ).toLocaleString()}**, **${crateAmount}** vote crates\n` +
+        `vote rewards: $**${Math.floor(15000 * (prestige / 2 + 1)).toLocaleString()}**, **${crateAmount}** vote crates\n` +
         `gamble multiplier: **${Math.floor(gambleMulti * 100)}**%\n` +
         `sell multiplier: **${Math.floor(sellMulti * 100)}**%\n` +
         `your maximum bet: $**${maxBet.toLocaleString()}**\n` +

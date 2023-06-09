@@ -1,10 +1,4 @@
-import {
-  BaseMessageOptions,
-  CommandInteraction,
-  InteractionReplyOptions,
-  Message,
-  MessageEditOptions,
-} from "discord.js";
+import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions } from "discord.js";
 import * as fs from "fs/promises";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
@@ -22,9 +16,7 @@ cmd.slashEnabled = true;
 cmd.slashData
   .addSubcommand((option) => option.setName("play").setDescription("play a game of wordle"))
   .addSubcommand((option) => option.setName("stats").setDescription("view your stats for wordle"))
-  .addSubcommand((option) =>
-    option.setName("help").setDescription("view the help menu for wordle")
-  );
+  .addSubcommand((option) => option.setName("help").setDescription("view the help menu for wordle"));
 
 interface Game {
   word: string;
@@ -44,10 +36,7 @@ const karmaCooldown = new Set<string>();
 
 let wordList: string[];
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       let usedNewMessage = false;
@@ -111,8 +100,7 @@ async function run(
     let desc = "";
 
     if (stats.win1) desc += `:green_square: **${stats.win1.toLocaleString()}**\n`;
-    if (stats.win2)
-      desc += `<:solid_grey:987046773157691452>:green_square: **${stats.win2.toLocaleString()}**\n`;
+    if (stats.win2) desc += `<:solid_grey:987046773157691452>:green_square: **${stats.win2.toLocaleString()}**\n`;
     if (stats.win3)
       desc += `<:solid_grey:987046773157691452><:solid_grey:987046773157691452>:green_square: **${stats.win3.toLocaleString()}**\n`;
     if (stats.win4)
@@ -134,11 +122,7 @@ async function run(
     return send({ embeds: [embed] });
   }
 
-  if (
-    args[0].toLowerCase() != "start" &&
-    args[0].toLowerCase() != "play" &&
-    args[0].toLowerCase() != "p"
-  ) {
+  if (args[0].toLowerCase() != "start" && args[0].toLowerCase() != "play" && args[0].toLowerCase() != "p") {
     return send({ embeds: [new ErrorEmbed(`${prefix}wordle play`)] });
   }
 
@@ -179,9 +163,7 @@ async function run(
   return play(message);
 }
 
-async function play(
-  message: Message | (NypsiCommandInteraction & CommandInteraction)
-): Promise<void> {
+async function play(message: Message | (NypsiCommandInteraction & CommandInteraction)): Promise<void> {
   const m = games.get(message.author.id).message;
   const edit = async (data: MessageEditOptions) => {
     if (!(message instanceof Message)) {
@@ -220,12 +202,7 @@ async function play(
 
   if (!(typeof response == "string")) return;
 
-  if (
-    response == "stop" ||
-    response == "cancel" ||
-    response == "" ||
-    response.startsWith(await getPrefix(message.guild))
-  ) {
+  if (response == "stop" || response == "cancel" || response == "" || response.startsWith(await getPrefix(message.guild))) {
     return cancel(message, m);
   }
 
@@ -270,10 +247,7 @@ async function play(
           inline: false,
         };
       } else {
-        embed.addField(
-          "letters not in wordle",
-          `~~${games.get(message.author.id).notInWord.join("~~ ~~")}~~`
-        );
+        embed.addField("letters not in wordle", `~~${games.get(message.author.id).notInWord.join("~~ ~~")}~~`);
       }
     }
 
@@ -339,13 +313,9 @@ async function win(message: Message | (NypsiCommandInteraction & CommandInteract
   );
 
   const embed = games.get(message.author.id).embed;
-  embed.setDescription(
-    `${renderBoard(games.get(message.author.id).board)}\n\n` + "you won!! congratulations"
-  );
+  embed.setDescription(`${renderBoard(games.get(message.author.id).board)}\n\n` + "you won!! congratulations");
   embed.setColor(Constants.EMBED_SUCCESS_COLOR);
-  embed.setFooter({
-    text: `completed in ${MStoTime(Date.now() - games.get(message.author.id).start)}`,
-  });
+  embed.setFooter({ text: `completed in ${MStoTime(Date.now() - games.get(message.author.id).start)}` });
 
   edit({ embeds: [embed] });
   games.delete(message.author.id);
@@ -544,8 +514,7 @@ cmd.setRun(run);
 module.exports = cmd;
 
 async function getWord() {
-  if (!wordList)
-    wordList = await fs.readFile("./data/wordle.txt").then((res) => res.toString().split("\n"));
+  if (!wordList) wordList = await fs.readFile("./data/wordle.txt").then((res) => res.toString().split("\n"));
 
   return wordList[Math.floor(Math.random() * wordList.length)];
 }

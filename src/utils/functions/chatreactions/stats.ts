@@ -82,10 +82,7 @@ export async function add3rdPlace(guild: Guild, member: GuildMember) {
   });
 }
 
-export async function getServerLeaderboard(
-  guild: Guild,
-  amount: number
-): Promise<Map<string, string>> {
+export async function getServerLeaderboard(guild: Guild, amount: number): Promise<Map<string, string>> {
   let members: Collection<string, GuildMember>;
 
   if (inCooldown(guild) || guild.memberCount == guild.members.cache.size) {
@@ -203,9 +200,7 @@ export async function getServerLeaderboard(
       pos = "🥉";
     }
 
-    secondMsg += `${pos} **${getMember(user).user.tag}** ${secondStats
-      .get(user)
-      .toLocaleString()}\n`;
+    secondMsg += `${pos} **${getMember(user).user.tag}** ${secondStats.get(user).toLocaleString()}\n`;
     count++;
   }
 
@@ -239,9 +234,7 @@ export async function getServerLeaderboard(
       pos = "🥉";
     }
 
-    overallMsg += `${pos} **${getMember(user).user.tag}** ${overallStats
-      .get(user)
-      .toLocaleString()}\n`;
+    overallMsg += `${pos} **${getMember(user).user.tag}** ${overallStats.get(user).toLocaleString()}\n`;
     count++;
   }
 

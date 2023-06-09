@@ -21,14 +21,9 @@ const cmd = new Command("unmute", "unmute one or more users", "moderation").setP
 ]);
 
 cmd.slashEnabled = true;
-cmd.slashData.addUserOption((option) =>
-  option.setName("user").setDescription("user to unmute").setRequired(true)
-);
+cmd.slashData.addUserOption((option) => option.setName("user").setDescription("user to unmute").setRequired(true));
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
     if (!message.member.permissions.has(PermissionFlagsBits.ModerateMembers)) {
       return;
@@ -70,11 +65,7 @@ async function run(
     !message.guild.members.me.permissions.has(PermissionFlagsBits.ManageChannels)
   ) {
     return send({
-      embeds: [
-        new ErrorEmbed(
-          "i need the `manage roles` and `manage channels` permission for this command to work"
-        ),
-      ],
+      embeds: [new ErrorEmbed("i need the `manage roles` and `manage channels` permission for this command to work")],
     });
   }
 
@@ -86,10 +77,7 @@ async function run(
     return send({ embeds: [new ErrorEmbed(`${prefix}unmute <@user(s)>`)] });
   }
 
-  if (
-    (await message.guild.members.fetch(args[0]).catch(() => {})) &&
-    message.mentions.members.first() == null
-  ) {
+  if ((await message.guild.members.fetch(args[0]).catch(() => {})) && message.mentions.members.first() == null) {
     let members;
 
     if (inCooldown(message.guild)) {
@@ -157,20 +145,14 @@ async function run(
             fail = true;
             return send({
               embeds: [
-                new ErrorEmbed(
-                  "there was an error when removing the role, please ensure i have the correct permissions"
-                ),
+                new ErrorEmbed("there was an error when removing the role, please ensure i have the correct permissions"),
               ],
             });
           });
       } else {
         if (message.mentions.members.size == 1) {
           return send({
-            embeds: [
-              new ErrorEmbed(
-                `**${m.user.tag}** does not have the muted role (${muteRole.toString()})`
-              ),
-            ],
+            embeds: [new ErrorEmbed(`**${m.user.tag}** does not have the muted role (${muteRole.toString()})`)],
           });
         }
         failed.push(m.user);
@@ -189,9 +171,7 @@ async function run(
             fail = true;
             return send({
               embeds: [
-                new ErrorEmbed(
-                  "there was an error when unmuting the user, please ensure i have the correct permissions"
-                ),
+                new ErrorEmbed("there was an error when unmuting the user, please ensure i have the correct permissions"),
               ],
             });
           });

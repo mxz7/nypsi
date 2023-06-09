@@ -1,9 +1,4 @@
-import {
-  BaseMessageOptions,
-  CommandInteraction,
-  InteractionReplyOptions,
-  Message,
-} from "discord.js";
+import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getMember } from "../utils/functions/member";
@@ -18,10 +13,7 @@ const cmd = new Command(
 
 cmd.slashEnabled = true;
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       let usedNewMessage = false;
@@ -74,9 +66,7 @@ async function run(
   if (!username) {
     if (message.author.id == member.user.id) {
       return send({
-        embeds: [
-          new ErrorEmbed("you have not set your last.fm username (**/settings me lastfm**)"),
-        ],
+        embeds: [new ErrorEmbed("you have not set your last.fm username (**/settings me lastfm**)")],
       });
     } else {
       return send({ embeds: [new ErrorEmbed("this user has not set their last.fm username")] });
@@ -124,10 +114,7 @@ async function run(
     }
   }
 
-  const embed = new CustomEmbed(message.member).setHeader(
-    `${username} is listening to`,
-    message.author.avatarURL()
-  );
+  const embed = new CustomEmbed(message.member).setHeader(`${username} is listening to`, message.author.avatarURL());
 
   embed.setThumbnail(track.image[3]["#text"]);
   embed.setTitle(track.name);
