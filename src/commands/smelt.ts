@@ -1,17 +1,7 @@
-import {
-  BaseMessageOptions,
-  CommandInteraction,
-  InteractionReplyOptions,
-  Message,
-  MessageEditOptions,
-} from "discord.js";
+import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import {
-  addInventoryItem,
-  getInventory,
-  setInventoryItem,
-} from "../utils/functions/economy/inventory";
+import { addInventoryItem, getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
 import { addStat } from "../utils/functions/economy/stats";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -68,20 +58,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   let coal = 0;
   const ores = [];
 
-  if (
-    inventory.find((i) => i.item == "furnace") &&
-    inventory.find((i) => i.item == "furnace").amount > 0
-  ) {
+  if (inventory.find((i) => i.item == "furnace") && inventory.find((i) => i.item == "furnace").amount > 0) {
     hasFurnace = true;
   }
 
   if (!hasFurnace) {
     return send({
-      embeds: [
-        new ErrorEmbed(
-          "you need a furnace to smelt ore. furnaces can be found in crates or bought from the shop"
-        ),
-      ],
+      embeds: [new ErrorEmbed("you need a furnace to smelt ore. furnaces can be found in crates or bought from the shop")],
     });
   }
 
@@ -100,10 +83,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     });
   }
 
-  if (
-    inventory.find((i) => i.item == "coal") &&
-    inventory.find((i) => i.item == "coal").amount > 0
-  ) {
+  if (inventory.find((i) => i.item == "coal") && inventory.find((i) => i.item == "coal").amount > 0) {
     coal = inventory.find((i) => i.item == "coal").amount;
 
     if (coal > ores.length) coal = ores.length;
@@ -111,11 +91,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (coal == 0) {
     return send({
-      embeds: [
-        new ErrorEmbed(
-          "you need coal to smelt ore. coal can be found in crates and through mining"
-        ),
-      ],
+      embeds: [new ErrorEmbed("you need coal to smelt ore. coal can be found in crates and through mining")],
     });
   }
 
@@ -139,12 +115,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   for (const ore of Array.from(smelted.keys())) {
     promises.push(
-      setInventoryItem(
-        message.member,
-        ore,
-        inventory.find((i) => i.item == ore).amount - smelted.get(ore),
-        false
-      )
+      setInventoryItem(message.member, ore, inventory.find((i) => i.item == ore).amount - smelted.get(ore), false)
     );
 
     const ingot = items[ore].ingot;
@@ -154,22 +125,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     promises.push(addInventoryItem(message.member, ingot, smelted.get(ore), false));
   }
 
-  promises.push(
-    setInventoryItem(
-      message.member,
-      "coal",
-      inventory.find((i) => i.item == "coal").amount - coal,
-      false
-    )
-  );
-  promises.push(
-    setInventoryItem(
-      message.member,
-      "furnace",
-      inventory.find((i) => i.item == "furnace").amount - 1,
-      false
-    )
-  );
+  promises.push(setInventoryItem(message.member, "coal", inventory.find((i) => i.item == "coal").amount - coal, false));
+  promises.push(setInventoryItem(message.member, "furnace", inventory.find((i) => i.item == "furnace").amount - 1, false));
 
   await Promise.all(promises);
 

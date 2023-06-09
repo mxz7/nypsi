@@ -7,10 +7,7 @@ import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 import ms = require("ms");
 
-const cmd = new Command("freemoney", "get some free money", "money").setAliases([
-  "poor",
-  "imbroke",
-]);
+const cmd = new Command("freemoney", "get some free money", "money").setAliases(["poor", "imbroke"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
   if (await onCooldown(cmd.name, message.member)) {
@@ -46,9 +43,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   message.channel.send({ embeds: [embed] }).then(async (msg) => {
     embed.setDescription(
-      `+$**${amount.toLocaleString()}**\nnew balance: $**${(
-        await getBalance(message.member)
-      ).toLocaleString()}**`
+      `+$**${amount.toLocaleString()}**\nnew balance: $**${(await getBalance(message.member)).toLocaleString()}**`
     );
     setTimeout(() => {
       msg.edit({ embeds: [embed] });

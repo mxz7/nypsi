@@ -3,14 +3,9 @@ import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getPrefix } from "../utils/functions/guilds/utils";
 
-const cmd = new Command("enlarge", "enlarge a custom emoji to its full size", "utility").setAliases(
-  ["emoji", "makebig"]
-);
+const cmd = new Command("enlarge", "enlarge a custom emoji to its full size", "utility").setAliases(["emoji", "makebig"]);
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   const prefix = await getPrefix(message.guild);
 
   if (args.length == 0) {
@@ -24,9 +19,7 @@ async function run(
   emoji = emoji.split(":");
 
   if (!emoji[2]) {
-    return message.channel.send({
-      embeds: [new ErrorEmbed("invalid emoji - please use a custom emoji")],
-    });
+    return message.channel.send({ embeds: [new ErrorEmbed("invalid emoji - please use a custom emoji")] });
   }
 
   const emojiID = emoji[2].slice(0, emoji[2].length - 1);

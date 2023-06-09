@@ -15,9 +15,7 @@ import { getItems } from "../utils/functions/economy/utils";
 import PageManager from "../utils/functions/page";
 import { getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command("boosters", "view your current active boosters", "money").setAliases([
-  "booster",
-]);
+const cmd = new Command("boosters", "view your current active boosters", "money").setAliases(["booster"]);
 
 cmd.slashEnabled = true;
 
@@ -101,11 +99,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (pages.size <= 1) return send({ embeds: [embed] });
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder()
-      .setCustomId("⬅")
-      .setLabel("back")
-      .setStyle(ButtonStyle.Primary)
-      .setDisabled(true),
+    new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
     new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
   );
 

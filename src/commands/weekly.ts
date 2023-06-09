@@ -26,10 +26,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const prefix = await getPrefix(message.guild);
 
   const notValidForYou = () => {
-    const embed = new CustomEmbed(
-      message.member,
-      `${prefix}weekly is for SILVER tier and higher`
-    ).setFooter({
+    const embed = new CustomEmbed(message.member, `${prefix}weekly is for SILVER tier and higher`).setFooter({
       text: `${prefix}patreon`,
     });
 
@@ -53,17 +50,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       let amount = 150000;
       const multi = await getSellMulti(message.member);
 
-      let description = `$${(
-        await getBalance(message.member)
-      ).toLocaleString()}\n + $**${amount.toLocaleString()}**`;
+      let description = `$${(await getBalance(message.member)).toLocaleString()}\n + $**${amount.toLocaleString()}**`;
 
       if (multi > 0) {
         amount = amount + Math.round(amount * multi);
         description = `$${(
           await getBalance(message.member)
-        ).toLocaleString()}\n + $**${amount.toLocaleString()}** (+**${Math.floor(
-          multi * 100
-        ).toLocaleString()}**% bonus)`;
+        ).toLocaleString()}\n + $**${amount.toLocaleString()}** (+**${Math.floor(multi * 100).toLocaleString()}**% bonus)`;
       }
 
       await updateBalance(message.member, (await getBalance(message.member)) + amount);
@@ -72,9 +65,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       return message.channel.send({ embeds: [embed] }).then((msg) => {
         setTimeout(async () => {
-          embed.setDescription(
-            `new balance: $**${(await getBalance(message.member)).toLocaleString()}**`
-          );
+          embed.setDescription(`new balance: $**${(await getBalance(message.member)).toLocaleString()}**`);
           msg.edit({ embeds: [embed] });
         }, 2000);
       });
@@ -82,10 +73,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       const timeRemaining = Math.abs(604800000 - diff);
       const dd = timeUntil(new Date().getTime() + timeRemaining);
 
-      const embed = new CustomEmbed(
-        message.member,
-        "you have already used your weekly reward! come back in **" + dd + "**"
-      );
+      const embed = new CustomEmbed(message.member, "you have already used your weekly reward! come back in **" + dd + "**");
 
       return message.channel.send({ embeds: [embed] });
     }

@@ -1,21 +1,10 @@
-import {
-  BaseMessageOptions,
-  CommandInteraction,
-  InteractionReplyOptions,
-  Message,
-  MessageEditOptions,
-} from "discord.js";
+import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions } from "discord.js";
 import redis from "../init/redis";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
 import { addProgress } from "../utils/functions/economy/achievements";
-import {
-  getBalance,
-  hasPadlock,
-  setPadlock,
-  updateBalance,
-} from "../utils/functions/economy/balance";
+import { getBalance, hasPadlock, setPadlock, updateBalance } from "../utils/functions/economy/balance";
 import { addToGuildXP, getGuildByUser } from "../utils/functions/economy/guilds";
 import { getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
 import { isPassive } from "../utils/functions/economy/passive";
@@ -32,14 +21,9 @@ const playerCooldown = new Set<string>();
 const cmd = new Command("rob", "rob other server members", "money").setAliases(["steal"]);
 
 cmd.slashEnabled = true;
-cmd.slashData.addUserOption((option) =>
-  option.setName("user").setDescription("who do u wanna rob").setRequired(true)
-);
+cmd.slashData.addUserOption((option) => option.setName("user").setDescription("who do u wanna rob").setRequired(true));
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       let usedNewMessage = false;
@@ -77,9 +61,7 @@ async function run(
   }
 
   if ((await redis.exists(`${Constants.redis.cooldown.ROB_RADIO}:${message.author.id}`)) == 1) {
-    const init = parseInt(
-      await redis.get(`${Constants.redis.cooldown.ROB_RADIO}:${message.author.id}`)
-    );
+    const init = parseInt(await redis.get(`${Constants.redis.cooldown.ROB_RADIO}:${message.author.id}`));
     const curr = new Date();
     const diff = Math.round((curr.getTime() - init) / 1000);
     const time = 900 - diff;
@@ -96,9 +78,7 @@ async function run(
     }
     return send({
       embeds: [
-        new ErrorEmbed(
-          `you have been reported to the police, they will continue looking for you for **${remaining}**`
-        ),
+        new ErrorEmbed(`you have been reported to the police, they will continue looking for you for **${remaining}**`),
       ],
     });
   }
@@ -146,8 +126,7 @@ async function run(
   if (await isPassive(target))
     return send({ embeds: [new ErrorEmbed(`${target.toString()} is currently in passive mode`)] });
 
-  if (await isPassive(message.member))
-    return send({ embeds: [new ErrorEmbed("you are currently in passive mode")] });
+  if (await isPassive(message.member)) return send({ embeds: [new ErrorEmbed("you are currently in passive mode")] });
 
   const targetGuild = await getGuildByUser(target);
 
@@ -163,15 +142,15 @@ async function run(
 
   await addCooldown(cmd.name, message.member, 700);
 
-  const embed = new CustomEmbed(
-    message.member,
-    "robbing " + target.user.toString() + ".."
-  ).setHeader("robbery", message.author.avatarURL());
+  const embed = new CustomEmbed(message.member, "robbing " + target.user.toString() + "..").setHeader(
+    "robbery",
+    message.author.avatarURL()
+  );
 
-  const embed2 = new CustomEmbed(
-    message.member,
-    "robbing " + target.user.toString() + ".."
-  ).setHeader("robbery", message.author.avatarURL());
+  const embed2 = new CustomEmbed(message.member, "robbing " + target.user.toString() + "..").setHeader(
+    "robbery",
+    message.author.avatarURL()
+  );
 
   const embed3 = new CustomEmbed();
 
@@ -229,10 +208,7 @@ async function run(
     });
 
     embed2.setColor(Constants.EMBED_FAIL_COLOR);
-    embed2.addField(
-      "fail!!",
-      "**" + target.user.tag + "** had a padlock, which has now been broken"
-    );
+    embed2.addField("fail!!", "**" + target.user.tag + "** had a padlock, which has now been broken");
 
     embed3.setTitle("you were nearly robbed");
     embed3.setColor(Constants.EMBED_SUCCESS_COLOR);
@@ -310,17 +286,9 @@ async function run(
 
       const inventory = await getInventory(message.member);
 
-      if (
-        inventory.find((i) => i.item == "lawyer") &&
-        inventory.find((i) => i.item == "lawyer").amount > 0
-      ) {
+      if (inventory.find((i) => i.item == "lawyer") && inventory.find((i) => i.item == "lawyer").amount > 0) {
         await Promise.all([
-          setInventoryItem(
-            message.member,
-            "lawyer",
-            inventory.find((i) => i.item == "lawyer").amount - 1,
-            false
-          ),
+          setInventoryItem(message.member, "lawyer", inventory.find((i) => i.item == "lawyer").amount - 1, false),
           addStat(message.member, "lawyer"),
         ]);
 
@@ -391,13 +359,9 @@ async function run(
 
       if ((await getDmSettings(target)).rob) {
         if (robberySuccess) {
-          await target
-            .send({ content: "you have been robbed!!", embeds: [embed3] })
-            .catch(() => {});
+          await target.send({ content: "you have been robbed!!", embeds: [embed3] }).catch(() => {});
         } else {
-          await target
-            .send({ content: "you were nearly robbed!!", embeds: [embed3] })
-            .catch(() => {});
+          await target.send({ content: "you were nearly robbed!!", embeds: [embed3] }).catch(() => {});
         }
       }
     }, 1500);

@@ -56,32 +56,23 @@ async function prepare(
     return send({ embeds: [new ErrorEmbed(`couldnt find \`${args[0]}\``)] });
   }
 
-  if (
-    !inventory.find((i) => i.item == selected.id) ||
-    inventory.find((i) => i.item == selected.id).amount == 0
-  ) {
+  if (!inventory.find((i) => i.item == selected.id) || inventory.find((i) => i.item == selected.id).amount == 0) {
     return send({ embeds: [new ErrorEmbed(`you dont have a ${selected.name}`)] });
   }
 
-  if (selected.role !== "scratch-card")
-    return send({ embeds: [new ErrorEmbed("that is not a scratch card")] });
+  if (selected.role !== "scratch-card") return send({ embeds: [new ErrorEmbed("that is not a scratch card")] });
 
-  await setInventoryItem(
-    message.member,
-    selected.id,
-    inventory.find((i) => i.item == selected.id).amount - 1,
-    false
-  );
+  await setInventoryItem(message.member, selected.id, inventory.find((i) => i.item == selected.id).amount - 1, false);
   await addStat(message.member, selected.id);
 
   await redis.sadd(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
 
   const card = new ScratchCard(message.member, selected);
 
-  const embed = new CustomEmbed(
-    message.member,
-    `**${card.remainingClicks}** clicks left`
-  ).setHeader(`${message.author.username}'s ${selected.name}`, message.author.avatarURL());
+  const embed = new CustomEmbed(message.member, `**${card.remainingClicks}** clicks left`).setHeader(
+    `${message.author.username}'s ${selected.name}`,
+    message.author.avatarURL()
+  );
 
   let msg = await send({ embeds: [embed], components: card.getButtons() });
 
@@ -105,15 +96,9 @@ async function prepare(
       embed.setDescription(`**${card.remainingClicks}** clicks left`);
       embed.setFooter({ text: `id: ${gameId}` });
 
-      if (
-        inventory.find((i) => i.item === selected.id) &&
-        inventory.find((i) => i.item === selected.id)?.amount > 0
-      ) {
+      if (inventory.find((i) => i.item === selected.id) && inventory.find((i) => i.item === selected.id)?.amount > 0) {
         buttons[0].addComponents(
-          new ButtonBuilder()
-            .setCustomId("retry")
-            .setLabel("play again")
-            .setStyle(ButtonStyle.Success)
+          new ButtonBuilder().setCustomId("retry").setLabel("play again").setStyle(ButtonStyle.Success)
         );
         retry = true;
       }
@@ -143,9 +128,7 @@ async function prepare(
               message.react("💀");
             } else {
               response.message.edit({
-                embeds: [
-                  new CustomEmbed(message.member, "nypsi is rebooting, try again in a few minutes"),
-                ],
+                embeds: [new CustomEmbed(message.member, "nypsi is rebooting, try again in a few minutes")],
               });
               return;
             }

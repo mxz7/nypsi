@@ -20,13 +20,7 @@ import { Worker } from "../types/Workers";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
 import { getBoosters } from "../utils/functions/economy/boosters";
 import { getPrestige } from "../utils/functions/economy/prestige";
-import {
-  createUser,
-  getBaseUpgrades,
-  getBaseWorkers,
-  getItems,
-  userExists,
-} from "../utils/functions/economy/utils";
+import { createUser, getBaseUpgrades, getBaseWorkers, getItems, userExists } from "../utils/functions/economy/utils";
 import {
   addWorker,
   addWorkerUpgrade,
@@ -37,11 +31,13 @@ import {
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import _ = require("lodash");
 
-const cmd = new Command(
-  "workers",
-  "view the available workers and manage your own",
-  "money"
-).setAliases(["worker", "minion", "minions", "slave", "slaves"]);
+const cmd = new Command("workers", "view the available workers and manage your own", "money").setAliases([
+  "worker",
+  "minion",
+  "minions",
+  "slave",
+  "slaves",
+]);
 
 const workerChoices: APIApplicationCommandOptionChoice<string>[] = [
   { name: "quarry", value: "quarry" },
@@ -61,9 +57,7 @@ inPlaceSort(workerChoices).asc((wch) => getBaseWorkers()[wch.value].prestige_req
 cmd.slashEnabled = true;
 cmd.slashData
   .addSubcommand((view) => view.setName("view").setDescription("view all workers"))
-  .addSubcommand((claim) =>
-    claim.setName("claim").setDescription("claim earned money from your workers")
-  )
+  .addSubcommand((claim) => claim.setName("claim").setDescription("claim earned money from your workers"))
   .addSubcommand((upgrade) =>
     upgrade
       .setName("upgrade")
@@ -77,10 +71,7 @@ cmd.slashData
       )
   );
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   const baseWorkers = getBaseWorkers();
 
   if (!(await userExists(message.member))) await createUser(message.member);
@@ -169,9 +160,9 @@ async function run(
         const { maxStorage, perInterval, perItem } = await calcWorkerValues(userWorker);
 
         let desc =
-          `**inventory** ${userWorker.stored.toLocaleString()} ${
+          `**inventory** ${userWorker.stored.toLocaleString()} ${worker.item_emoji} / ${maxStorage.toLocaleString()} ${
             worker.item_emoji
-          } / ${maxStorage.toLocaleString()} ${worker.item_emoji}\n` +
+          }\n` +
           `**worth** $${perItem.toLocaleString()} / ${worker.item_emoji}\n` +
           `**rate** ${perInterval.toLocaleString()} ${worker.item_emoji} / hour`;
 
@@ -192,9 +183,7 @@ async function run(
 
         embed.setDescription(desc);
 
-        row.addComponents(
-          new ButtonBuilder().setCustomId("upg").setLabel("upgrades").setStyle(ButtonStyle.Primary)
-        );
+        row.addComponents(new ButtonBuilder().setCustomId("upg").setLabel("upgrades").setStyle(ButtonStyle.Primary));
       } else {
         embed.setDescription(
           `**cost** $${worker.cost.toLocaleString()}\n` +
@@ -206,16 +195,10 @@ async function run(
         embed.setFooter({ text: `you are prestige ${prestige}` });
 
         if (prestige >= worker.prestige_requirement) {
-          row.addComponents(
-            new ButtonBuilder().setCustomId("bu").setLabel("buy").setStyle(ButtonStyle.Primary)
-          );
+          row.addComponents(new ButtonBuilder().setCustomId("bu").setLabel("buy").setStyle(ButtonStyle.Primary));
         } else {
           row.addComponents(
-            new ButtonBuilder()
-              .setCustomId("bu")
-              .setLabel("buy")
-              .setStyle(ButtonStyle.Primary)
-              .setDisabled(true)
+            new ButtonBuilder().setCustomId("bu").setLabel("buy").setStyle(ButtonStyle.Primary).setDisabled(true)
           );
         }
       }
@@ -230,11 +213,7 @@ async function run(
         new StringSelectMenuOptionBuilder()
           .setLabel(
             `${baseWorkers[worker].name}${
-              baseWorkers[worker].prestige_requirement > prestige
-                ? " [locked]"
-                : isOwned(worker)
-                ? " [owned]"
-                : ""
+              baseWorkers[worker].prestige_requirement > prestige ? " [locked]" : isOwned(worker) ? " [owned]" : ""
             }`
           )
           .setValue(baseWorkers[worker].id)
@@ -291,10 +270,7 @@ async function run(
         const selected = options.filter((o) => o.data.default)[0].data.value;
 
         if (balance < baseWorkers[selected].cost) {
-          await res.followUp({
-            embeds: [new ErrorEmbed("you cannot afford this worker")],
-            ephemeral: true,
-          });
+          await res.followUp({ embeds: [new ErrorEmbed("you cannot afford this worker")], ephemeral: true });
           return pageManager();
         } else {
           await updateBalance(message.member, balance - baseWorkers[selected].cost);
@@ -336,9 +312,7 @@ async function run(
 
         desc += `**${baseUpgrades[upgradeId].name}** ${owned}/${baseUpgrades[upgradeId].stack_limit}`;
 
-        const button = new ButtonBuilder()
-          .setCustomId(`up-${upgradeId}`)
-          .setLabel(`⬆️ ${baseUpgrades[upgradeId].name}`);
+        const button = new ButtonBuilder().setCustomId(`up-${upgradeId}`).setLabel(`⬆️ ${baseUpgrades[upgradeId].name}`);
 
         if (owned < baseUpgrades[upgradeId].stack_limit) {
           desc += ` - $${calcUpgradeCost(userWorker.workerId, upgradeId, owned).toLocaleString()}`;
@@ -351,9 +325,9 @@ async function run(
 
         row.addComponents(button);
       } else if (userWorker.upgrades.find((u) => u.upgradeId == upgradeId)) {
-        desc += `**${baseUpgrades[upgradeId].name}** ${
-          userWorker.upgrades.find((u) => u.upgradeId == upgradeId).amount
-        }/${baseUpgrades[upgradeId].stack_limit}\n`;
+        desc += `**${baseUpgrades[upgradeId].name}** ${userWorker.upgrades.find((u) => u.upgradeId == upgradeId).amount}/${
+          baseUpgrades[upgradeId].stack_limit
+        }\n`;
       }
     }
 
@@ -387,15 +361,10 @@ async function run(
         const upgradeId = res.customId.split("-")[1];
 
         if (
-          userWorkers
-            .find((w) => w.workerId == worker.id)
-            .upgrades.find((u) => u.upgradeId == upgradeId)?.amount >=
+          userWorkers.find((w) => w.workerId == worker.id).upgrades.find((u) => u.upgradeId == upgradeId)?.amount >=
           baseUpgrades[upgradeId].stack_limit
         ) {
-          await res.followUp({
-            embeds: [new ErrorEmbed("you have maxed out this upgrade")],
-            ephemeral: true,
-          });
+          await res.followUp({ embeds: [new ErrorEmbed("you have maxed out this upgrade")], ephemeral: true });
 
           userWorkers = await getWorkers(message.member);
 
@@ -405,18 +374,13 @@ async function run(
         const cost = calcUpgradeCost(
           worker.id,
           upgradeId,
-          userWorkers
-            .find((w) => w.workerId == worker.id)
-            .upgrades.find((u) => u.upgradeId == upgradeId)?.amount || 0
+          userWorkers.find((w) => w.workerId == worker.id).upgrades.find((u) => u.upgradeId == upgradeId)?.amount || 0
         );
 
         const balance = await getBalance(message.member);
 
         if (balance < cost) {
-          await res.followUp({
-            embeds: [new ErrorEmbed("you cannot afford this upgrade")],
-            ephemeral: true,
-          });
+          await res.followUp({ embeds: [new ErrorEmbed("you cannot afford this upgrade")], ephemeral: true });
 
           userWorkers = await getWorkers(message.member);
 
@@ -452,9 +416,7 @@ async function run(
   } else if (args[0].toLowerCase() == "claim" || args[0].toLowerCase() == "sell") {
     const desc = await claimFromWorkers(message.author.id);
 
-    const embed = new CustomEmbed(message.member, desc)
-      .setHeader("workers", message.author.avatarURL())
-      .disableFooter();
+    const embed = new CustomEmbed(message.member, desc).setHeader("workers", message.author.avatarURL()).disableFooter();
 
     return send({ embeds: [embed] });
   } else {

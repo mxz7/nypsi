@@ -95,22 +95,15 @@ export async function calcWorkerValues(
   for (const upgrade of worker.upgrades) {
     switch (baseUpgrades[upgrade.upgradeId].upgrades) {
       case "per_item":
-        perItemBonus +=
-          baseUpgrades[upgrade.upgradeId].effect *
-          upgrade.amount *
-          baseWorkers[worker.workerId].base.per_item;
+        perItemBonus += baseUpgrades[upgrade.upgradeId].effect * upgrade.amount * baseWorkers[worker.workerId].base.per_item;
         break;
       case "per_interval":
         perIntervalBonus +=
-          baseUpgrades[upgrade.upgradeId].effect *
-          upgrade.amount *
-          baseWorkers[worker.workerId].base.per_interval;
+          baseUpgrades[upgrade.upgradeId].effect * upgrade.amount * baseWorkers[worker.workerId].base.per_interval;
         break;
       case "max_storage":
         maxStoredBonus +=
-          baseUpgrades[upgrade.upgradeId].effect *
-          upgrade.amount *
-          baseWorkers[worker.workerId].base.max_storage;
+          baseUpgrades[upgrade.upgradeId].effect * upgrade.amount * baseWorkers[worker.workerId].base.max_storage;
         break;
       case "scrap_chance":
         scrapChance += baseUpgrades[upgrade.upgradeId].effect;
@@ -235,22 +228,19 @@ export async function claimFromWorkers(userId: string): Promise<string> {
     }
 
     while (scrapChance > 0 && percentChance(scrapChance * worker.stored)) {
-      amounts.set(
-        "quarry_scrap",
-        amounts.has("quarry_scrap") ? amounts.get("quarry_scrap") + 1 : 1
-      );
+      amounts.set("quarry_scrap", amounts.has("quarry_scrap") ? amounts.get("quarry_scrap") + 1 : 1);
       await addInventoryItem(worker.userId, "quarry_scrap", 1, false);
     }
 
     earnedBreakdown.push(
-      `${baseWorker.name} +$${Math.floor(
-        perItem * worker.stored
-      ).toLocaleString()} (${worker.stored.toLocaleString()} ${baseWorker.item_emoji})`
+      `${baseWorker.name} +$${Math.floor(perItem * worker.stored).toLocaleString()} (${worker.stored.toLocaleString()} ${
+        baseWorker.item_emoji
+      })`
     );
     amounts.set(
-      `${baseWorker.name} +$${Math.floor(
-        perItem * worker.stored
-      ).toLocaleString()} (${worker.stored.toLocaleString()} ${baseWorker.item_emoji})`,
+      `${baseWorker.name} +$${Math.floor(perItem * worker.stored).toLocaleString()} (${worker.stored.toLocaleString()} ${
+        baseWorker.item_emoji
+      })`,
       perItem * worker.stored
     );
   }
@@ -277,9 +267,9 @@ export async function claimFromWorkers(userId: string): Promise<string> {
 
   if (amounts.has("quarry_scrap")) {
     footer.push(
-      `you found **${amounts.get("quarry_scrap")}** ${
-        getItems()["quarry_scrap"].emoji
-      } quarry scrap${amounts.get("quarry_scrap") > 1 ? "s" : ""}`
+      `you found **${amounts.get("quarry_scrap")}** ${getItems()["quarry_scrap"].emoji} quarry scrap${
+        amounts.get("quarry_scrap") > 1 ? "s" : ""
+      }`
     );
   }
 

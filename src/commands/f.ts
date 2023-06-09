@@ -12,10 +12,7 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 
 const cmd = new Command("f", "pay your respects", "fun");
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (await onCooldown(cmd.name, message.member)) {
     const embed = await getResponse(cmd.name, message.member);
 
@@ -23,9 +20,7 @@ async function run(
   }
 
   if (args.length == 0) {
-    return message.channel.send({
-      embeds: [new ErrorEmbed("you need to pay respects to something")],
-    });
+    return message.channel.send({ embeds: [new ErrorEmbed("you need to pay respects to something")] });
   }
 
   await addCooldown(cmd.name, message.member, 30);
@@ -40,10 +35,7 @@ async function run(
     content = content.substring(0, 50);
   }
 
-  const embed = new CustomEmbed(
-    message.member,
-    `press **F** to pay your respects to **${content}**`
-  );
+  const embed = new CustomEmbed(message.member, `press **F** to pay your respects to **${content}**`);
 
   const customId = `${content}-${new Date().getTime()}`;
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -59,20 +51,13 @@ async function run(
   collector.on("collect", async (i): Promise<any> => {
     if (i.customId == customId) {
       if (reactions.includes(i.user.id)) {
-        return await i
-          .reply({ embeds: [new ErrorEmbed("you can only do this once")], ephemeral: true })
-          .catch(() => {});
+        return await i.reply({ embeds: [new ErrorEmbed("you can only do this once")], ephemeral: true }).catch(() => {});
       }
 
       reactions.push(i.user.id);
 
       return await i.reply({
-        embeds: [
-          new CustomEmbed(
-            message.member,
-            `${i.user.toString()} has paid respects to **${args.join(" ")}**`
-          ),
-        ],
+        embeds: [new CustomEmbed(message.member, `${i.user.toString()} has paid respects to **${args.join(" ")}**`)],
       });
     }
   });

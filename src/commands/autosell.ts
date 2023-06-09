@@ -1,9 +1,4 @@
-import {
-  BaseMessageOptions,
-  CommandInteraction,
-  InteractionReplyOptions,
-  Message,
-} from "discord.js";
+import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getAutosellItems, setAutosellItems } from "../utils/functions/economy/inventory";
@@ -15,16 +10,10 @@ const cmd = new Command("autosell", "add items to your autosell list", "money").
 
 cmd.slashEnabled = true;
 cmd.slashData.addStringOption((option) =>
-  option
-    .setName("item")
-    .setAutocomplete(true)
-    .setDescription("item to add/remove to your autosell list")
+  option.setName("item").setAutocomplete(true).setDescription("item to add/remove to your autosell list")
 );
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       let usedNewMessage = false;
@@ -68,25 +57,20 @@ async function run(
 
   if (await isPremium(message.member)) max *= await getTier(message.member);
 
-  if (current.length > max)
-    current = await setAutosellItems(message.member, current.splice(0, max));
+  if (current.length > max) current = await setAutosellItems(message.member, current.splice(0, max));
 
   const items = getItems();
 
   if (args.length == 0) {
     if (current.length == 0) {
-      return send({
-        embeds: [new CustomEmbed(message.member, "there is nothing being automatically sold")],
-      });
+      return send({ embeds: [new CustomEmbed(message.member, "there is nothing being automatically sold")] });
     }
 
     return send({
       embeds: [
         new CustomEmbed(
           message.member,
-          `automatically selling: \n\n${current
-            .map((i) => `${items[i].emoji} ${items[i].name}`)
-            .join("\n")}`
+          `automatically selling: \n\n${current.map((i) => `${items[i].emoji} ${items[i].name}`).join("\n")}`
         ).setHeader("autosell", message.author.avatarURL()),
       ],
     });
@@ -145,16 +129,10 @@ async function run(
     current = await setAutosellItems(message.member, current);
   }
 
-  const embed = new CustomEmbed(message.member, desc).setHeader(
-    "autosell",
-    message.author.avatarURL()
-  );
+  const embed = new CustomEmbed(message.member, desc).setHeader("autosell", message.author.avatarURL());
 
   if (current.length > 0) {
-    embed.addField(
-      "automatically selling",
-      current.map((i) => `${items[i].emoji} ${items[i].name}`).join("\n")
-    );
+    embed.addField("automatically selling", current.map((i) => `${items[i].emoji} ${items[i].name}`).join("\n"));
   }
 
   return send({ embeds: [embed] });

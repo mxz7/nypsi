@@ -1,10 +1,4 @@
-import {
-  BaseMessageOptions,
-  CommandInteraction,
-  GuildMember,
-  InteractionReplyOptions,
-  Message,
-} from "discord.js";
+import { BaseMessageOptions, CommandInteraction, GuildMember, InteractionReplyOptions, Message } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { addProgress } from "../utils/functions/economy/achievements";
@@ -17,14 +11,9 @@ const cache = new Map<string, number>();
 const cmd = new Command("iq", "accurate prediction of your iq", "fun");
 
 cmd.slashEnabled = true;
-cmd.slashData.addUserOption((option) =>
-  option.setName("user").setDescription("how large is your iq")
-);
+cmd.slashData.addUserOption((option) => option.setName("user").setDescription("how large is your iq"));
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       let usedNewMessage = false;
@@ -134,10 +123,10 @@ async function run(
     iqMsg = "uh. woah.";
   }
 
-  const embed = new CustomEmbed(
-    message.member,
-    `${member.user.toString()}\n\n**${iq}** IQ 🧠\n${iqMsg}`
-  ).setHeader("iq calculator", member.user.avatarURL());
+  const embed = new CustomEmbed(message.member, `${member.user.toString()}\n\n**${iq}** IQ 🧠\n${iqMsg}`).setHeader(
+    "iq calculator",
+    member.user.avatarURL()
+  );
 
   send({ embeds: [embed] });
 

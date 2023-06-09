@@ -19,10 +19,7 @@ export class Command {
   public slashData?: SlashCommandBuilder;
   public slashEnabled: boolean;
   public data?: any;
-  public run: (
-    message: Message | (NypsiCommandInteraction & CommandInteraction),
-    args?: string[]
-  ) => void;
+  public run: (message: Message | (NypsiCommandInteraction & CommandInteraction), args?: string[]) => void;
 
   constructor(name: string, description: string, category: CommandCategory) {
     this.name = name.toLowerCase();
@@ -58,12 +55,7 @@ export class Command {
     return this;
   }
 
-  public setRun(
-    run: (
-      message: Message | (NypsiCommandInteraction & CommandInteraction),
-      args?: string[]
-    ) => void
-  ) {
+  public setRun(run: (message: Message | (NypsiCommandInteraction & CommandInteraction), args?: string[]) => void) {
     this.run = run;
     return this;
   }
@@ -103,9 +95,7 @@ export interface NypsiCommandInteraction extends CommandInteraction {
   content?: string;
 }
 
-export function createNypsiInteraction(
-  interaction: any
-): NypsiCommandInteraction & CommandInteraction {
+export function createNypsiInteraction(interaction: any): NypsiCommandInteraction & CommandInteraction {
   interaction.author = interaction.user;
   interaction.interaction = true;
   return interaction;

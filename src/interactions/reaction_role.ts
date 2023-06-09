@@ -12,9 +12,7 @@ export default {
 
     const filtered = reactionRoles.filter(
       (rr) =>
-        rr.messageId.includes(focused.value) ||
-        rr.description.includes(focused.value) ||
-        rr.title.includes(focused.value)
+        rr.messageId.includes(focused.value) || rr.description.includes(focused.value) || rr.title.includes(focused.value)
     );
 
     return interaction.respond(

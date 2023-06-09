@@ -38,16 +38,11 @@ cmd.slashEnabled = true;
 cmd.slashData
   .addSubcommand((economy) => economy.setName("gamble").setDescription("view your gamble stats"))
   .addSubcommand((item) => item.setName("item").setDescription("view your item stats"))
-  .addSubcommand((commands) =>
-    commands.setName("commands").setDescription("view your command usage stats")
-  )
+  .addSubcommand((commands) => commands.setName("commands").setDescription("view your command usage stats"))
   .addSubcommand((bot) => bot.setName("bot").setDescription("view nypsi's stats"))
   .addSubcommand((auction) => auction.setName("auction").setDescription("view your auction stats"));
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       let usedNewMessage = false;
@@ -127,11 +122,7 @@ async function run(
 
     if (pages.size > 1) {
       const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder()
-          .setCustomId("⬅")
-          .setLabel("back")
-          .setStyle(ButtonStyle.Primary)
-          .setDisabled(true),
+        new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
         new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
       );
       const msg = await send({ embeds: [embed], components: [row] });
@@ -180,11 +171,7 @@ async function run(
 
     if (pages.size > 1) {
       const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder()
-          .setCustomId("⬅")
-          .setLabel("back")
-          .setStyle(ButtonStyle.Primary)
-          .setDisabled(true),
+        new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
         new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
       );
       const msg = await send({ embeds: [embed], components: [row] });
@@ -214,10 +201,7 @@ async function run(
 
     const pages = PageManager.createPages(
       itemStats.map(
-        (i) =>
-          `${getItems()[i.itemId].emoji} **${
-            getItems()[i.itemId].name
-          }** ${i.amount.toLocaleString()} uses`
+        (i) => `${getItems()[i.itemId].emoji} **${getItems()[i.itemId].name}** ${i.amount.toLocaleString()} uses`
       )
     );
 
@@ -227,11 +211,7 @@ async function run(
     );
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder()
-        .setCustomId("⬅")
-        .setLabel("back")
-        .setStyle(ButtonStyle.Primary)
-        .setDisabled(true),
+      new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
       new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
     );
 
@@ -260,28 +240,16 @@ async function run(
     const uses = await getCommandUses(message.member);
     const total = uses.map((x) => x.uses).reduce((a, b) => a + b);
 
-    const pages = PageManager.createPages(
-      uses.map((i) => `\`$${i.command}\` ${i.uses.toLocaleString()}`)
-    );
+    const pages = PageManager.createPages(uses.map((i) => `\`$${i.command}\` ${i.uses.toLocaleString()}`));
 
-    const commandUses = parseInt(
-      await redis.hget(Constants.redis.nypsi.TOP_COMMANDS_USER, message.author.tag)
-    );
+    const commandUses = parseInt(await redis.hget(Constants.redis.nypsi.TOP_COMMANDS_USER, message.author.tag));
 
     const embed = new CustomEmbed(message.member, pages.get(1).join("\n"))
       .setHeader("most used commands", message.author.avatarURL())
-      .setFooter({
-        text: `total: ${total.toLocaleString()} | today: ${commandUses.toLocaleString()} | 1/${
-          pages.size
-        }`,
-      });
+      .setFooter({ text: `total: ${total.toLocaleString()} | today: ${commandUses.toLocaleString()} | 1/${pages.size}` });
 
     let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder()
-        .setCustomId("⬅")
-        .setLabel("back")
-        .setStyle(ButtonStyle.Primary)
-        .setDisabled(true),
+      new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
       new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
     );
 
@@ -310,10 +278,7 @@ async function run(
 
       if (!reaction) return;
 
-      const newEmbed = new CustomEmbed(message.member).setHeader(
-        "most used commands",
-        message.author.avatarURL()
-      );
+      const newEmbed = new CustomEmbed(message.member).setHeader("most used commands", message.author.avatarURL());
 
       if (reaction == "⬅") {
         if (currentPage <= 1) {
@@ -324,36 +289,18 @@ async function run(
           newEmbed.setDescription(pages.get(currentPage).join("\n"));
 
           newEmbed.setFooter({
-            text: `total: ${total.toLocaleString()} | today: ${commandUses.toLocaleString()} | ${currentPage}/${
-              pages.size
-            }`,
+            text: `total: ${total.toLocaleString()} | today: ${commandUses.toLocaleString()} | ${currentPage}/${pages.size}`,
           });
 
           if (currentPage == 1) {
             row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-              new ButtonBuilder()
-                .setCustomId("⬅")
-                .setLabel("back")
-                .setStyle(ButtonStyle.Primary)
-                .setDisabled(true),
-              new ButtonBuilder()
-                .setCustomId("➡")
-                .setLabel("next")
-                .setStyle(ButtonStyle.Primary)
-                .setDisabled(false)
+              new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
+              new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(false)
             );
           } else {
             row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-              new ButtonBuilder()
-                .setCustomId("⬅")
-                .setLabel("back")
-                .setStyle(ButtonStyle.Primary)
-                .setDisabled(false),
-              new ButtonBuilder()
-                .setCustomId("➡")
-                .setLabel("next")
-                .setStyle(ButtonStyle.Primary)
-                .setDisabled(false)
+              new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(false),
+              new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(false)
             );
           }
           await edit({ embeds: [newEmbed], components: [row] }, msg);
@@ -368,36 +315,18 @@ async function run(
           newEmbed.setDescription(pages.get(currentPage).join("\n"));
 
           newEmbed.setFooter({
-            text: `total: ${total.toLocaleString()} | today: ${commandUses.toLocaleString()} | ${currentPage}/${
-              pages.size
-            }`,
+            text: `total: ${total.toLocaleString()} | today: ${commandUses.toLocaleString()} | ${currentPage}/${pages.size}`,
           });
 
           if (currentPage == pages.size) {
             row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-              new ButtonBuilder()
-                .setCustomId("⬅")
-                .setLabel("back")
-                .setStyle(ButtonStyle.Primary)
-                .setDisabled(false),
-              new ButtonBuilder()
-                .setCustomId("➡")
-                .setLabel("next")
-                .setStyle(ButtonStyle.Primary)
-                .setDisabled(true)
+              new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(false),
+              new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(true)
             );
           } else {
             row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-              new ButtonBuilder()
-                .setCustomId("⬅")
-                .setLabel("back")
-                .setStyle(ButtonStyle.Primary)
-                .setDisabled(false),
-              new ButtonBuilder()
-                .setCustomId("➡")
-                .setLabel("next")
-                .setStyle(ButtonStyle.Primary)
-                .setDisabled(false)
+              new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(false),
+              new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(false)
             );
           }
           await edit({ embeds: [newEmbed], components: [row] }, msg);
@@ -446,10 +375,7 @@ async function run(
     }
 
     const embed = new CustomEmbed(message.member)
-      .setHeader(
-        `nypsi stats | cluster: ${currentCluster + 1}/${clusterCount}`,
-        client.user.avatarURL()
-      )
+      .setHeader(`nypsi stats | cluster: ${currentCluster + 1}/${clusterCount}`, client.user.avatarURL())
       .addField(
         "bot",
         "**server count** " +
@@ -599,9 +525,7 @@ async function run(
       const percent = ((Number(gamble._sum.win) / gamble._count._all) * 100).toFixed(2);
 
       gambleMsg.push(
-        `- **${
-          gamble.game
-        }** ${gamble._sum.win.toLocaleString()} / ${gamble._count._all.toLocaleString()} (${percent}%)`
+        `- **${gamble.game}** ${gamble._sum.win.toLocaleString()} / ${gamble._count._all.toLocaleString()} (${percent}%)`
       );
     }
 

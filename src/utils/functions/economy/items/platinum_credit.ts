@@ -13,13 +13,7 @@ import { NypsiClient } from "../../../../models/Client";
 import { NypsiCommandInteraction } from "../../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
-import {
-  addMember,
-  getPremiumProfile,
-  getTier,
-  setExpireDate,
-  setTier,
-} from "../../premium/premium";
+import { addMember, getPremiumProfile, getTier, setExpireDate, setTier } from "../../premium/premium";
 import { getInventory, setInventoryItem } from "../inventory";
 import dayjs = require("dayjs");
 
@@ -49,9 +43,7 @@ module.exports = new ItemUse(
     const currentTier = await getTier(message.author.id);
 
     if (currentTier > PLAT_TIER)
-      return send({
-        embeds: [new ErrorEmbed("your current premium tier is higher than platinum")],
-      });
+      return send({ embeds: [new ErrorEmbed("your current premium tier is higher than platinum")] });
 
     if (currentTier == PLAT_TIER) {
       const profile = await getPremiumProfile(message.author.id);
@@ -70,19 +62,13 @@ module.exports = new ItemUse(
         embeds: [
           new CustomEmbed(
             message.member,
-            `your **platinum** membership will now expire <t:${Math.floor(
-              profile.expireDate.getTime() / 1000
-            )}:R>`
+            `your **platinum** membership will now expire <t:${Math.floor(profile.expireDate.getTime() / 1000)}:R>`
           ),
         ],
       });
     } else if (currentTier === 0) {
       await addMember(message.author.id, PLAT_TIER, message.client as NypsiClient);
-      await setExpireDate(
-        message.author.id,
-        dayjs().add(7, "day").toDate(),
-        message.client as NypsiClient
-      );
+      await setExpireDate(message.author.id, dayjs().add(7, "day").toDate(), message.client as NypsiClient);
 
       const inventory = await getInventory(message.member, false);
       await setInventoryItem(
@@ -93,10 +79,7 @@ module.exports = new ItemUse(
 
       return send({
         embeds: [
-          new CustomEmbed(
-            message.member,
-            `your **platinum** membership will expire <t:${dayjs().add(7, "day").unix()}:R>`
-          ),
+          new CustomEmbed(message.member, `your **platinum** membership will expire <t:${dayjs().add(7, "day").unix()}:R>`),
         ],
       });
     } else {
@@ -138,18 +121,11 @@ module.exports = new ItemUse(
       );
 
       await setTier(message.author.id, PLAT_TIER, message.client as NypsiClient);
-      await setExpireDate(
-        message.author.id,
-        dayjs().add(7, "day").toDate(),
-        message.client as NypsiClient
-      );
+      await setExpireDate(message.author.id, dayjs().add(7, "day").toDate(), message.client as NypsiClient);
 
       return send({
         embeds: [
-          new CustomEmbed(
-            message.member,
-            `your **platinum** membership will expire <t:${dayjs().add(7, "day").unix()}:R>`
-          ),
+          new CustomEmbed(message.member, `your **platinum** membership will expire <t:${dayjs().add(7, "day").unix()}:R>`),
         ],
       });
     }

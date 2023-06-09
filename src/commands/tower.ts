@@ -20,13 +20,7 @@ import Constants from "../utils/Constants";
 import { a } from "../utils/functions/anticheat";
 import { isLockedOut, verifyUser } from "../utils/functions/captcha";
 import { addProgress } from "../utils/functions/economy/achievements";
-import {
-  calcMaxBet,
-  getBalance,
-  getDefaultBet,
-  getGambleMulti,
-  updateBalance,
-} from "../utils/functions/economy/balance";
+import { calcMaxBet, getBalance, getDefaultBet, getGambleMulti, updateBalance } from "../utils/functions/economy/balance";
 import { addToGuildXP, getGuildByUser } from "../utils/functions/economy/guilds";
 import { addInventoryItem } from "../utils/functions/economy/inventory";
 import { createGame } from "../utils/functions/economy/stats";
@@ -40,12 +34,7 @@ import { gamble, logger } from "../utils/logger";
 import _ = require("lodash");
 import ms = require("ms");
 
-const cmd = new Command("tower", "play dragon tower", "money").setAliases([
-  "dragon",
-  "dragontower",
-  "dt",
-  "dragonstower",
-]);
+const cmd = new Command("tower", "play dragon tower", "money").setAliases(["dragon", "dragontower", "dt", "dragonstower"]);
 
 interface Game {
   gameId: number;
@@ -93,9 +82,7 @@ const GEM_EMOJI = "<:nypsi_gem_green:1046866209326514206>";
 
 cmd.slashEnabled = true;
 cmd.slashData
-  .addStringOption((option) =>
-    option.setName("bet").setDescription("how much would you like to bet").setRequired(false)
-  )
+  .addStringOption((option) => option.setName("bet").setDescription("how much would you like to bet").setRequired(false))
   .addStringOption((option) =>
     option
       .setName("difficulty")
@@ -107,10 +94,7 @@ cmd.slashData
       )
   );
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (!(await userExists(message.member))) await createUser(message.member);
 
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
@@ -149,8 +133,7 @@ async function run(
     return send({ embeds: [embed], ephemeral: true });
   }
 
-  if (games.has(message.author.id))
-    return send({ embeds: [new ErrorEmbed("you are already playing dragon tower")] });
+  if (games.has(message.author.id)) return send({ embeds: [new ErrorEmbed("you are already playing dragon tower")] });
 
   return prepareGame(message, args);
 }
@@ -207,8 +190,7 @@ async function prepareGame(
     });
   }
 
-  if (games.has(message.author.id))
-    return send({ embeds: [new ErrorEmbed("you are already playing dragon tower")] });
+  if (games.has(message.author.id)) return send({ embeds: [new ErrorEmbed("you are already playing dragon tower")] });
 
   if (await redis.sismember(Constants.redis.nypsi.USERS_PLAYING, message.author.id)) {
     if (msg) {
@@ -252,17 +234,13 @@ async function prepareGame(
     if (msg) {
       return msg.edit({
         embeds: [
-          new ErrorEmbed(
-            `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
-          ),
+          new ErrorEmbed(`your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`),
         ],
       });
     } else {
       return send({
         embeds: [
-          new ErrorEmbed(
-            `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
-          ),
+          new ErrorEmbed(`your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`),
         ],
       });
     }
@@ -279,19 +257,11 @@ async function prepareGame(
   } else if (!difficultyIncrements.has(chosenDifficulty)) {
     if (msg) {
       return msg.edit({
-        embeds: [
-          new ErrorEmbed(
-            `invalid difficulty\nallowed: ${Array.from(difficultyIncrements.keys()).join(", ")}`
-          ),
-        ],
+        embeds: [new ErrorEmbed(`invalid difficulty\nallowed: ${Array.from(difficultyIncrements.keys()).join(", ")}`)],
       });
     } else {
       return send({
-        embeds: [
-          new ErrorEmbed(
-            `invalid difficulty\nallowed: ${Array.from(difficultyIncrements.keys()).join(", ")}`
-          ),
-        ],
+        embeds: [new ErrorEmbed(`invalid difficulty\nallowed: ${Array.from(difficultyIncrements.keys()).join(", ")}`)],
       });
     }
   }
@@ -461,16 +431,8 @@ function createRows(board: string[][], end = false) {
   }
 
   rows[rows.length] = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder()
-      .setCustomId("finish")
-      .setLabel("finish")
-      .setStyle(ButtonStyle.Success)
-      .setDisabled(end),
-    new ButtonBuilder()
-      .setCustomId("random")
-      .setLabel("random")
-      .setStyle(ButtonStyle.Primary)
-      .setDisabled(end)
+    new ButtonBuilder().setCustomId("finish").setLabel("finish").setStyle(ButtonStyle.Success).setDisabled(end),
+    new ButtonBuilder().setCustomId("random").setLabel("random").setStyle(ButtonStyle.Primary).setDisabled(end)
   );
 
   return rows;
@@ -504,10 +466,7 @@ async function playGame(
     await msg.edit({ embeds: [embed], components });
 
     const res = await msg
-      .awaitMessageComponent({
-        filter: (i: Interaction) => i.user.id == message.author.id,
-        time: 30000,
-      })
+      .awaitMessageComponent({ filter: (i: Interaction) => i.user.id == message.author.id, time: 30000 })
       .catch(() => {
         (components[components.length - 1].components[0] as ButtonBuilder)
           .setCustomId("rp")
@@ -530,11 +489,7 @@ async function playGame(
         if (message.author.id == Constants.TEKOH_ID && message instanceof Message) {
           message.react("💀");
         } else {
-          return msg.edit({
-            embeds: [
-              new CustomEmbed(message.member, "nypsi is rebooting, try again in a few minutes"),
-            ],
-          });
+          return msg.edit({ embeds: [new CustomEmbed(message.member, "nypsi is rebooting, try again in a few minutes")] });
         }
       }
 
@@ -600,12 +555,8 @@ async function playGame(
 
     game.embed.setDescription(
       `**bet** $${game.bet.toLocaleString()}\n` +
-        `**${game.win.toFixed(2)}**x ($${Math.round(
-          game.bet * game.win
-        ).toLocaleString()})\n\n**winner!!**\n` +
-        `**you win** $${winnings.toLocaleString()}${
-          multi > 0 ? `\n**${Math.floor(multi * 100)}**% bonus` : ""
-        }`
+        `**${game.win.toFixed(2)}**x ($${Math.round(game.bet * game.win).toLocaleString()})\n\n**winner!!**\n` +
+        `**you win** $${winnings.toLocaleString()}${multi > 0 ? `\n**${Math.floor(multi * 100)}**% bonus` : ""}`
     );
     game.embed.setColor(Constants.EMBED_SUCCESS_COLOR);
 

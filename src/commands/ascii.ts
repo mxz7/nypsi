@@ -7,10 +7,7 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 
 const cmd = new Command("ascii", "create ascii text", "fun");
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   const prefix = await getPrefix(message.guild);
 
   if (await onCooldown(cmd.name, message.member)) {
@@ -22,19 +19,14 @@ async function run(
   if (args.length == 0) {
     const embed = new CustomEmbed(message.member)
       .setHeader("ascii help")
-      .addField(
-        "usage",
-        `${prefix}ascii hello\n${prefix}ascii hello | ghost\n${prefix}ascii <text> | <font>`
-      )
+      .addField("usage", `${prefix}ascii hello\n${prefix}ascii hello | ghost\n${prefix}ascii <text> | <font>`)
       .addField("help", `to view different fonts use ${prefix}ascii fonts <page (1/2/3/4/5)>`);
     return message.channel.send({ embeds: [embed] });
   }
 
   if (args[0] == "fonts") {
     if (args.length == 1) {
-      return message.channel.send({
-        embeds: [new ErrorEmbed(`${prefix}ascii fonts <page (1/2/3/4/5)>`)],
-      });
+      return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}ascii fonts <page (1/2/3/4/5)>`)] });
     } else if (args[1] == "1") {
       const embed = new CustomEmbed(
         message.member,
@@ -79,9 +71,7 @@ async function run(
 
       return message.channel.send({ embeds: [embed] });
     } else {
-      return message.channel.send({
-        embeds: [new ErrorEmbed(`${prefix}ascii fonts <page (1/2/3/4/5)>`)],
-      });
+      return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}ascii fonts <page (1/2/3/4/5)>`)] });
     }
   }
 
@@ -117,9 +107,7 @@ async function run(
     }
 
     if (asciiString.length >= 2000) {
-      return message.channel.send({
-        embeds: [new ErrorEmbed("ascii text exceeds discord message size")],
-      });
+      return message.channel.send({ embeds: [new ErrorEmbed("ascii text exceeds discord message size")] });
     }
 
     message.member

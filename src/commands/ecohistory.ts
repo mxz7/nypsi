@@ -1,9 +1,4 @@
-import {
-  BaseMessageOptions,
-  CommandInteraction,
-  InteractionReplyOptions,
-  Message,
-} from "discord.js";
+import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
 import prisma from "../init/database";
 import redis from "../init/redis";
 import { Command, NypsiCommandInteraction } from "../models/Command";
@@ -19,16 +14,9 @@ import dayjs = require("dayjs");
 
 const BASE_URL = "https://quickchart.io/chart/create";
 
-const cmd = new Command(
-  "ecohistory",
-  "view your metric data history in a graph",
-  "money"
-).setAliases(["graph"]);
+const cmd = new Command("ecohistory", "view your metric data history in a graph", "money").setAliases(["graph"]);
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       let usedNewMessage = false;
@@ -117,9 +105,7 @@ async function run(
     args[0] = `user-item-${item.id}`;
   }
 
-  const formatDataForUser = (
-    data: { date: Date; value: number | bigint; userId?: string }[]
-  ): ChartData => {
+  const formatDataForUser = (data: { date: Date; value: number | bigint; userId?: string }[]): ChartData => {
     if (data.length == 0) {
       return null;
     }
@@ -174,8 +160,7 @@ async function run(
       })
     );
 
-    if (!data)
-      return message.channel.send({ embeds: [new ErrorEmbed("you have no data to graph")] });
+    if (!data) return message.channel.send({ embeds: [new ErrorEmbed("you have no data to graph")] });
 
     const body = JSON.stringify({ chart: data });
 
@@ -193,10 +178,7 @@ async function run(
     await redis.set(`cache:ecograph:${args[0]}:${message.author.id}`, res.url);
     await redis.expire(
       `cache:ecograph:${args[0]}:${message.author.id}`,
-      Math.floor(
-        (dayjs().add(1, "day").set("hour", 0).set("minutes", 0).toDate().getTime() - Date.now()) /
-          1000
-      )
+      Math.floor((dayjs().add(1, "day").set("hour", 0).set("minutes", 0).toDate().getTime() - Date.now()) / 1000)
     );
 
     return res.url;

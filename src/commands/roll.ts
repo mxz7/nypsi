@@ -4,10 +4,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 
 const cmd = new Command("roll", "roll a dice", "utility");
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   let range = 6;
 
   if (args.length != 0) {
@@ -22,10 +19,7 @@ async function run(
 
   return message.channel.send({
     embeds: [
-      new CustomEmbed(
-        message.member,
-        "🎲 you rolled `" + (Math.floor(Math.random() * range) + 1).toLocaleString() + "`"
-      ),
+      new CustomEmbed(message.member, "🎲 you rolled `" + (Math.floor(Math.random() * range) + 1).toLocaleString() + "`"),
     ],
   });
 }

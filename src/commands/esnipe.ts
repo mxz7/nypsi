@@ -3,14 +3,9 @@ import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { eSnipe } from "../utils/functions/guilds/utils";
 
-const cmd = new Command("esnipe", "snipe the most recently edited message", "fun").setAliases([
-  "es",
-]);
+const cmd = new Command("esnipe", "snipe the most recently edited message", "fun").setAliases(["es"]);
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   let channel: Channel = message.channel;
 
   if (args.length == 1) {

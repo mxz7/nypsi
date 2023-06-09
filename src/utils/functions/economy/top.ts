@@ -26,11 +26,7 @@ export async function topBalance(guild: Guild, userId?: string) {
 
   const query = await prisma.economy.findMany({
     where: {
-      AND: [
-        { money: { gt: 0 } },
-        { userId: { in: Array.from(members.keys()) } },
-        { user: { blacklisted: false } },
-      ],
+      AND: [{ money: { gt: 0 } }, { userId: { in: Array.from(members.keys()) } }, { user: { blacklisted: false } }],
     },
     select: {
       userId: true,
@@ -73,12 +69,7 @@ export async function topBalance(guild: Guild, userId?: string) {
         pos = "🥉";
       }
 
-      out[count] =
-        pos +
-        " **" +
-        getMemberID(guild, user.userId).user.tag +
-        "** $" +
-        Number(user.money).toLocaleString();
+      out[count] = pos + " **" + getMemberID(guild, user.userId).user.tag + "** $" + Number(user.money).toLocaleString();
       count++;
     }
   }
@@ -294,12 +285,7 @@ export async function topNetWorth(guild: Guild, userId?: string) {
         pos = "🥉";
       }
 
-      out[count] =
-        pos +
-        " **" +
-        getMemberID(guild, user).user.tag +
-        "** $" +
-        amounts.get(user).toLocaleString();
+      out[count] = pos + " **" + getMemberID(guild, user).user.tag + "** $" + amounts.get(user).toLocaleString();
       count++;
     }
   }
@@ -332,11 +318,7 @@ export async function topPrestige(guild: Guild, userId?: string) {
 
   const query = await prisma.economy.findMany({
     where: {
-      AND: [
-        { prestige: { gt: 0 } },
-        { userId: { in: Array.from(members.keys()) } },
-        { user: { blacklisted: false } },
-      ],
+      AND: [{ prestige: { gt: 0 } }, { userId: { in: Array.from(members.keys()) } }, { user: { blacklisted: false } }],
     },
     select: {
       userId: true,
@@ -489,11 +471,7 @@ export async function topItem(guild: Guild, item: string, userId: string) {
 
   const query = await prisma.inventory.findMany({
     where: {
-      AND: [
-        { userId: { in: Array.from(members.keys()) } },
-        { item: item },
-        { economy: { user: { blacklisted: false } } },
-      ],
+      AND: [{ userId: { in: Array.from(members.keys()) } }, { item: item }, { economy: { user: { blacklisted: false } } }],
     },
     select: {
       userId: true,
@@ -652,11 +630,7 @@ export async function topCompletion(guild: Guild, userId: string) {
 
   const query = await prisma.achievements.findMany({
     where: {
-      AND: [
-        { completed: true },
-        { userId: { in: Array.from(members.keys()) } },
-        { user: { blacklisted: false } },
-      ],
+      AND: [{ completed: true }, { userId: { in: Array.from(members.keys()) } }, { user: { blacklisted: false } }],
     },
     select: {
       userId: true,
@@ -727,13 +701,7 @@ export async function topCompletion(guild: Guild, userId: string) {
         pos = "🥉";
       }
 
-      out[count] =
-        pos +
-        " **" +
-        getMemberID(guild, user).user.tag +
-        "** " +
-        completionRate.get(user).toFixed(1) +
-        "%";
+      out[count] = pos + " **" + getMemberID(guild, user).user.tag + "** " + completionRate.get(user).toFixed(1) + "%";
       count++;
     }
   }

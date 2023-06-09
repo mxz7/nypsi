@@ -1,20 +1,10 @@
-import {
-  BaseMessageOptions,
-  CommandInteraction,
-  InteractionReplyOptions,
-  Message,
-} from "discord.js";
+import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
 import { getBoosters } from "../utils/functions/economy/boosters";
-import {
-  addInventoryItem,
-  gemBreak,
-  getInventory,
-  setInventoryItem,
-} from "../utils/functions/economy/inventory";
+import { addInventoryItem, gemBreak, getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
 import { addStat } from "../utils/functions/economy/stats";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import { getXp, updateXp } from "../utils/functions/economy/xp";
@@ -74,10 +64,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     inventory.find((i) => i.item == "incredible_fishing_rod").amount > 0
   ) {
     fishingRod = "incredible_fishing_rod";
-  } else if (
-    inventory.find((i) => i.item == "fishing_rod") &&
-    inventory.find((i) => i.item == "fishing_rod").amount > 0
-  ) {
+  } else if (inventory.find((i) => i.item == "fishing_rod") && inventory.find((i) => i.item == "fishing_rod").amount > 0) {
     fishingRod = "fishing_rod";
   } else if (
     inventory.find((i) => i.item == "terrible_fishing_rod") &&
@@ -195,12 +182,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   }
 
   if (!unbreaking) {
-    await setInventoryItem(
-      message.member,
-      fishingRod,
-      inventory.find((i) => i.item == fishingRod).amount - 1,
-      false
-    );
+    await setInventoryItem(message.member, fishingRod, inventory.find((i) => i.item == fishingRod).amount - 1, false);
   }
 
   const foundItems = new Map<string, number>();
@@ -286,10 +268,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         const amount = parseInt(chosen.substring(6));
 
         await updateBalance(message.member, (await getBalance(message.member)) + amount);
-        foundItems.set(
-          "money",
-          foundItems.has("money") ? foundItems.get("money") + amount : amount
-        );
+        foundItems.set("money", foundItems.has("money") ? foundItems.get("money") + amount : amount);
       } else if (chosen.includes("xp:")) {
         const amount = parseInt(chosen.substring(3));
 
@@ -327,10 +306,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
   }
 
-  const embed = new CustomEmbed(
-    message.member,
-    `you go to the pond and cast your **${items[fishingRod].name}**`
-  );
+  const embed = new CustomEmbed(message.member, `you go to the pond and cast your **${items[fishingRod].name}**`);
 
   const msg = await send({ embeds: [embed] });
 

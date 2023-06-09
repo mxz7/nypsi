@@ -75,9 +75,7 @@ export function loadItems(crypto = true) {
 }
 
 async function updateCryptoWorth() {
-  let res = await fetch("https://api.coinbase.com/v2/exchange-rates?currency=BTC").then((res) =>
-    res.json()
-  );
+  let res = await fetch("https://api.coinbase.com/v2/exchange-rates?currency=BTC").then((res) => res.json());
 
   const btcworth = Math.floor(res.data.rates.USD);
 
@@ -90,9 +88,7 @@ async function updateCryptoWorth() {
   items["bitcoin"].sell = Math.floor(btcworth * 0.95);
   logger.info("bitcoin worth updated: $" + items["bitcoin"].buy.toLocaleString());
 
-  res = await fetch("https://api.coinbase.com/v2/exchange-rates?currency=ETH").then((res) =>
-    res.json()
-  );
+  res = await fetch("https://api.coinbase.com/v2/exchange-rates?currency=ETH").then((res) => res.json());
 
   const ethWorth = Math.floor(res.data.rates.USD);
 
@@ -140,9 +136,7 @@ export async function userExists(member: GuildMember | string): Promise<boolean>
   if (!id) return;
 
   if (await redis.exists(`${Constants.redis.cache.economy.EXISTS}:${id}`)) {
-    return (await redis.get(`${Constants.redis.cache.economy.EXISTS}:${id}`)) === "true"
-      ? true
-      : false;
+    return (await redis.get(`${Constants.redis.cache.economy.EXISTS}:${id}`)) === "true" ? true : false;
   }
 
   const query = await prisma.economy.findUnique({
@@ -239,8 +233,7 @@ export function formatNumber(number: string | number) {
 export async function isEcoBanned(id: string) {
   if (await isUserBlacklisted(id)) return true;
   if (await redis.exists(`${Constants.redis.cache.economy.BANNED}:${id}`)) {
-    const res =
-      (await redis.get(`${Constants.redis.cache.economy.BANNED}:${id}`)) === "t" ? true : false;
+    const res = (await redis.get(`${Constants.redis.cache.economy.BANNED}:${id}`)) === "t" ? true : false;
 
     if (res) await redis.del(`${Constants.redis.cache.economy.BANNED}:${id}`);
     return res;
@@ -325,9 +318,7 @@ export async function reset() {
   await prisma.inventory.deleteMany();
   await prisma.crafting.deleteMany();
   await prisma.bakeryUpgrade.deleteMany();
-  await prisma.graphMetrics.deleteMany({
-    where: { OR: [{ category: "networth" }, { category: "balance" }] },
-  });
+  await prisma.graphMetrics.deleteMany({ where: { OR: [{ category: "networth" }, { category: "balance" }] } });
 
   await prisma.economy.deleteMany({
     where: {
@@ -338,11 +329,7 @@ export async function reset() {
   const deleted = await prisma.economy
     .deleteMany({
       where: {
-        AND: [
-          { prestige: 0 },
-          { lastVote: { lt: new Date(Date.now() - ms("12 hours")) } },
-          { dailyStreak: { lt: 2 } },
-        ],
+        AND: [{ prestige: 0 }, { lastVote: { lt: new Date(Date.now() - ms("12 hours")) } }, { dailyStreak: { lt: 2 } }],
       },
     })
     .then((r) => r.count);
@@ -568,10 +555,7 @@ export async function doDaily(member: GuildMember) {
   if (xp > 69) xp = 69;
 
   const promises = [];
-  const rewards: string[] = [
-    `+$**${total.toLocaleString()}**`,
-    `+ ${items["daily_scratch_card"].emoji} daily scratch card`,
-  ];
+  const rewards: string[] = [`+$**${total.toLocaleString()}**`, `+ ${items["daily_scratch_card"].emoji} daily scratch card`];
 
   if (streak > 0 && streak % 7 == 0) {
     crate++;

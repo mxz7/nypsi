@@ -18,15 +18,10 @@ const cmd = new Command("chatfilter", "change the chat filter for your server", 
   .setAliases(["filter"])
   .setPermissions(["MANAGE_SERVER"]);
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
     if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
-      return message.channel.send({
-        embeds: [new ErrorEmbed("you need the `manage server` permission")],
-      });
+      return message.channel.send({ embeds: [new ErrorEmbed("you need the `manage server` permission")] });
     }
     return;
   }
@@ -51,11 +46,7 @@ async function run(
     if (pages.size <= 1) return message.channel.send({ embeds: [embed] });
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder()
-        .setCustomId("⬅")
-        .setLabel("back")
-        .setStyle(ButtonStyle.Primary)
-        .setDisabled(true),
+      new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
       new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
     );
 
@@ -103,28 +94,20 @@ async function run(
     const amount = parseInt(args[1]);
 
     if (amount < 0 || amount > 100) {
-      return message.channel.send({
-        embeds: [new ErrorEmbed("ur pretty stupid arent u. **PERCENTAGE** MATCH")],
-      });
+      return message.channel.send({ embeds: [new ErrorEmbed("ur pretty stupid arent u. **PERCENTAGE** MATCH")] });
     }
 
     await setPercentMatch(message.guild, amount);
 
     return message.channel.send({
-      embeds: [
-        new CustomEmbed(message.member, `✅ percentage match has been set to \`${amount}%\``),
-      ],
+      embeds: [new CustomEmbed(message.member, `✅ percentage match has been set to \`${amount}%\``)],
     });
   }
 
   if (args[0].toLowerCase() == "add" || args[0].toLowerCase() == "+") {
     if (args.length == 1) {
       return message.channel.send({
-        embeds: [
-          new ErrorEmbed(
-            `${prefix}filter add/+ <word> | cAsInG doesn't matter, it'll be filtered either way`
-          ),
-        ],
+        embeds: [new ErrorEmbed(`${prefix}filter add/+ <word> | cAsInG doesn't matter, it'll be filtered either way`)],
       });
     }
 
@@ -135,10 +118,7 @@ async function run(
     }
 
     if (filter.indexOf(word) > -1) {
-      const embed = new CustomEmbed(
-        message.member,
-        "❌ `" + word + "` already exists in the filter"
-      )
+      const embed = new CustomEmbed(message.member, "❌ `" + word + "` already exists in the filter")
         .setHeader("chat filter")
         .setFooter({ text: `you can use ${prefix}filter to view the filter` });
 
@@ -160,10 +140,7 @@ async function run(
 
     await updateChatFilter(message.guild, filter);
 
-    const embed = new CustomEmbed(
-      message.member,
-      "✅ added `" + word + "` to the filter"
-    ).setHeader("chat filter");
+    const embed = new CustomEmbed(message.member, "✅ added `" + word + "` to the filter").setHeader("chat filter");
     return message.channel.send({ embeds: [embed] });
   }
 
@@ -198,9 +175,7 @@ async function run(
 
     await updateChatFilter(message.guild, filter);
 
-    const embed = new CustomEmbed(message.member, "✅ filter has been reset").setHeader(
-      "chat filter"
-    );
+    const embed = new CustomEmbed(message.member, "✅ filter has been reset").setHeader("chat filter");
 
     return message.channel.send({ embeds: [embed] });
   }

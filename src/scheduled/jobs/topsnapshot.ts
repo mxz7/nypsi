@@ -14,12 +14,7 @@ async function doTopBalance() {
     take: 25,
   });
 
-  const date = dayjs()
-    .set("hours", 0)
-    .set("minutes", 0)
-    .set("seconds", 0)
-    .set("milliseconds", 0)
-    .toDate();
+  const date = dayjs().set("hours", 0).set("minutes", 0).set("seconds", 0).set("milliseconds", 0).toDate();
 
   for (const user of query) {
     await prisma.graphMetrics.create({
@@ -47,12 +42,7 @@ async function doTopNetworth() {
     take: 25,
   });
 
-  const date = dayjs()
-    .set("hours", 0)
-    .set("minutes", 0)
-    .set("seconds", 0)
-    .set("milliseconds", 0)
-    .toDate();
+  const date = dayjs().set("hours", 0).set("minutes", 0).set("seconds", 0).set("milliseconds", 0).toDate();
 
   for (const user of query) {
     await prisma.graphMetrics.create({
@@ -76,12 +66,7 @@ async function doItems() {
     },
   });
 
-  const date = dayjs()
-    .set("hours", 0)
-    .set("minutes", 0)
-    .set("seconds", 0)
-    .set("milliseconds", 0)
-    .toDate();
+  const date = dayjs().set("hours", 0).set("minutes", 0).set("seconds", 0).set("milliseconds", 0).toDate();
 
   for (const i of query) {
     await prisma.graphMetrics.create({
@@ -116,12 +101,7 @@ async function doMembers() {
     },
   });
 
-  const date = dayjs()
-    .set("hours", 0)
-    .set("minutes", 0)
-    .set("seconds", 0)
-    .set("milliseconds", 0)
-    .toDate();
+  const date = dayjs().set("hours", 0).set("minutes", 0).set("seconds", 0).set("milliseconds", 0).toDate();
   let count = 0;
 
   for (const user of query) {
@@ -190,17 +170,9 @@ async function clearOld() {
 }
 
 (async () => {
-  const count = await Promise.all([
-    doTopBalance(),
-    doTopNetworth(),
-    doItems(),
-    doMembers(),
-    clearOld(),
-  ]);
+  const count = await Promise.all([doTopBalance(), doTopNetworth(), doItems(), doMembers(), clearOld()]);
 
-  parentPort.postMessage(
-    `created ${count.reduce((a, b) => a + b).toLocaleString()} entries in graph data`
-  );
+  parentPort.postMessage(`created ${count.reduce((a, b) => a + b).toLocaleString()} entries in graph data`);
 
   process.exit(0);
 })();

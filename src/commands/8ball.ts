@@ -28,10 +28,7 @@ const answers = [
 
 const cmd = new Command("8ball", "ask the 8ball a question", "fun").setAliases(["8"]);
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (await onCooldown(cmd.name, message.member)) {
     const embed = await getResponse(cmd.name, message.member);
 
@@ -48,10 +45,7 @@ async function run(
 
   const response = answers[Math.floor(Math.random() * answers.length)];
 
-  const embed = new CustomEmbed(
-    message.member,
-    `**${question}** - ${message.member.user.toString()}\n\n🎱 ${response}`
-  );
+  const embed = new CustomEmbed(message.member, `**${question}** - ${message.member.user.toString()}\n\n🎱 ${response}`);
 
   message.channel.send({ embeds: [embed] });
 }

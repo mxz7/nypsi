@@ -11,18 +11,11 @@ import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command(
-  "lockdown",
-  "lockdown a channel (will only work if permissions are setup correctly)",
-  "moderation"
-)
+const cmd = new Command("lockdown", "lockdown a channel (will only work if permissions are setup correctly)", "moderation")
   .setAliases(["lock", "shutup"])
   .setPermissions(["MANAGE_MESSAGES", "MANAGE_CHANNELS"]);
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       let usedNewMessage = false;
@@ -70,11 +63,7 @@ async function run(
     !message.guild.members.me.permissions.has(PermissionFlagsBits.ManageRoles)
   ) {
     return send({
-      embeds: [
-        new ErrorEmbed(
-          "i need the `manage channels` and `manage roles` permission for this command to work"
-        ),
-      ],
+      embeds: [new ErrorEmbed("i need the `manage channels` and `manage roles` permission for this command to work")],
     });
   }
 
@@ -143,10 +132,7 @@ async function run(
     await channel.permissionOverwrites.edit(role, {
       SendMessages: null,
     });
-    const embed = new CustomEmbed(
-      message.member,
-      "✅ " + channel.toString() + " has been unlocked"
-    );
+    const embed = new CustomEmbed(message.member, "✅ " + channel.toString() + " has been unlocked");
 
     return send({ embeds: [embed] }).catch(() => {
       return message.member.send({ embeds: [embed] });

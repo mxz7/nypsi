@@ -107,18 +107,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const pages = PageManager.createPages(
     mentions.map(
-      (i) =>
-        `<t:${Math.floor(i.date.getTime() / 1000)}:R>|6|9|**${i.userTag}**: ${decrypt(
-          i.content
-        )}\n[jump](${i.url})`
+      (i) => `<t:${Math.floor(i.date.getTime() / 1000)}:R>|6|9|**${i.userTag}**: ${decrypt(i.content)}\n[jump](${i.url})`
     ),
     3
   );
 
-  const embed = new CustomEmbed(message.member).setHeader(
-    "recent mentions",
-    message.author.avatarURL()
-  );
+  const embed = new CustomEmbed(message.member).setHeader("recent mentions", message.author.avatarURL());
 
   for (const i of pages.get(1)) {
     const fieldName = i.split("|6|9|")[0];
@@ -131,11 +125,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   }
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder()
-      .setCustomId("⬅")
-      .setLabel("back")
-      .setStyle(ButtonStyle.Primary)
-      .setDisabled(true),
+    new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
     new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
     new ButtonBuilder().setCustomId("❌").setLabel("clear mentions").setStyle(ButtonStyle.Danger)
   );
@@ -170,21 +160,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         manager.embed.setFooter({ text: `page ${manager.currentPage}/${manager.lastPage}` });
         return manager.embed;
       },
-      handleResponses: new Map().set(
-        "❌",
-        async (manager: PageManager<string>, interaction: ButtonInteraction) => {
-          await interaction.deferUpdate();
-          await deleteUserMentions(manager.message.guild, manager.userId);
+      handleResponses: new Map().set("❌", async (manager: PageManager<string>, interaction: ButtonInteraction) => {
+        await interaction.deferUpdate();
+        await deleteUserMentions(manager.message.guild, manager.userId);
 
-          embed.data.fields.length = 0;
+        embed.data.fields.length = 0;
 
-          embed.setDescription("✅ mentions cleared");
-          embed.disableFooter();
+        embed.setDescription("✅ mentions cleared");
+        embed.disableFooter();
 
-          await manager.message.edit({ embeds: [embed], components: [] });
-          return;
-        }
-      ),
+        await manager.message.edit({ embeds: [embed], components: [] });
+        return;
+      }),
     });
 
     return manager.listen();

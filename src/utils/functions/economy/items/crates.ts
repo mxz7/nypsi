@@ -49,10 +49,7 @@ module.exports = new ItemUse(
       return send({ embeds: [new ErrorEmbed(`couldnt find \`${args[0]}\``)] });
     }
 
-    if (
-      !inventory.find((i) => i.item == selected.id) ||
-      inventory.find((i) => i.item == selected.id).amount == 0
-    ) {
+    if (!inventory.find((i) => i.item == selected.id) || inventory.find((i) => i.item == selected.id).amount == 0) {
       return send({ embeds: [new ErrorEmbed(`you dont have a ${selected.name}`)] });
     }
 
@@ -80,9 +77,7 @@ module.exports = new ItemUse(
 
     const embed = new CustomEmbed(
       message.member,
-      `opening **${amount}** ${
-        amount > 1 ? (selected.plural ? selected.plural : selected.name) : selected.name
-      }`
+      `opening **${amount}** ${amount > 1 ? (selected.plural ? selected.plural : selected.name) : selected.name}`
     ).setHeader(
       `${message.author.username}'s ${amount} ${
         amount > 1 ? (selected.plural ? selected.plural : selected.name) : selected.name
@@ -94,10 +89,7 @@ module.exports = new ItemUse(
 
     const foundItems = new Map<string, number>();
 
-    await Promise.all([
-      addProgress(message.author.id, "unboxer", amount),
-      addStat(message.author.id, selected.id, amount),
-    ]);
+    await Promise.all([addProgress(message.author.id, "unboxer", amount), addStat(message.author.id, selected.id, amount)]);
 
     for (let i = 0; i < amount; i++) {
       const found = await openCrate(message.member, selected);
@@ -142,11 +134,7 @@ module.exports = new ItemUse(
       return msg.edit({ embeds: [embed] });
     } else {
       const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder()
-          .setCustomId("⬅")
-          .setLabel("back")
-          .setStyle(ButtonStyle.Primary)
-          .setDisabled(true),
+        new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
         new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
       );
 

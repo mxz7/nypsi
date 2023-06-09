@@ -40,10 +40,7 @@ const gifs = [
   "https://media.tenor.com/5bvwDvOIZ28AAAAd/ksi-knockout-ksiko.gif",
 ];
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (!(await userExists(message.member))) {
     await createUser(message.member);
   }
@@ -141,10 +138,7 @@ async function run(
 
   waiting.add(message.author.id);
 
-  const embed = new CustomEmbed(message.member).setHeader(
-    "fight invitation",
-    message.author.avatarURL()
-  );
+  const embed = new CustomEmbed(message.member).setHeader("fight invitation", message.author.avatarURL());
 
   embed.setDescription(`${message.author.tag} has challenged you to a fight. do you accept?`);
 
@@ -172,9 +166,7 @@ async function run(
     .catch(async () => {
       fail = true;
       waiting.delete(message.author.id);
-      return message.channel.send({
-        content: message.author.toString() + " fight request expired",
-      });
+      return message.channel.send({ content: message.author.toString() + " fight request expired" });
     });
 
   if (fail) return;
@@ -191,9 +183,7 @@ async function run(
   if (!(await userExists(message.member))) await createUser(message.member);
   if (!(await userExists(target))) await createUser(target);
 
-  const countdownEmbed = new CustomEmbed(message.member).setHeader(
-    `${message.author.username} vs ${target.user.username}`
-  );
+  const countdownEmbed = new CustomEmbed(message.member).setHeader(`${message.author.username} vs ${target.user.username}`);
 
   countdownEmbed.setDescription("fight starting in 3 seconds...");
 
@@ -282,10 +272,7 @@ async function run(
         const res = fight.awayHeal();
 
         if (!res) {
-          await i.followUp({
-            embeds: [new CustomEmbed(target, "you have no more heals left")],
-            ephemeral: true,
-          });
+          await i.followUp({ embeds: [new CustomEmbed(target, "you have no more heals left")], ephemeral: true });
         }
       }
     }
@@ -406,14 +393,8 @@ class Fight {
       embed.setDescription(`\`\`\`${this.log.join("\n")}\`\`\``);
     }
 
-    embed.addField(
-      this.home.user.username,
-      `health: **${this.person1.health}**hp\nheals left: **${this.person1.heals}**/3`
-    );
-    embed.addField(
-      this.away.user.username,
-      `health: **${this.person2.health}**hp\nheals left: **${this.person2.heals}**/3`
-    );
+    embed.addField(this.home.user.username, `health: **${this.person1.health}**hp\nheals left: **${this.person1.heals}**/3`);
+    embed.addField(this.away.user.username, `health: **${this.person2.health}**hp\nheals left: **${this.person2.heals}**/3`);
 
     return embed;
   }
@@ -468,11 +449,9 @@ class Fight {
 
     embed.setHeader(`${this.home.user.username} vs ${this.away.user.username}`);
     embed.setDescription(
-      `\`\`\`${this.log.join("\n")}\`\`\`\n\n**${
-        winner.member.user.username
-      } has won this fight**\ndamage given: ${winner.stats.damageGiven}hp\ndamage received: ${
-        winner.stats.damageReceived
-      }hp`
+      `\`\`\`${this.log.join("\n")}\`\`\`\n\n**${winner.member.user.username} has won this fight**\ndamage given: ${
+        winner.stats.damageGiven
+      }hp\ndamage received: ${winner.stats.damageReceived}hp`
     );
 
     return embed;

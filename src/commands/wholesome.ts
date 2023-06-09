@@ -37,19 +37,11 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 
 const uploadCooldown = new Map<string, number>();
 
-const cmd = new Command("wholesome", "get a random wholesome picture", "fun").setAliases([
-  "iloveyou",
-  "loveu",
-  "ws",
-  "ily",
-]);
+const cmd = new Command("wholesome", "get a random wholesome picture", "fun").setAliases(["iloveyou", "loveu", "ws", "ily"]);
 
 cmd.slashEnabled = true;
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       let usedNewMessage = false;
@@ -97,11 +89,7 @@ async function run(
 
     embed.setHeader(`<3 | #${image.id}`);
     embed.setImage(image.image);
-  } else if (
-    args[0].toLowerCase() == "add" ||
-    args[0].toLowerCase() == "suggest" ||
-    args[0].toLowerCase() == "+"
-  ) {
+  } else if (args[0].toLowerCase() == "add" || args[0].toLowerCase() == "suggest" || args[0].toLowerCase() == "+") {
     if (uploadCooldown.has(message.member.id)) {
       const init = uploadCooldown.get(message.member.id);
       const curr = new Date();
@@ -143,11 +131,7 @@ async function run(
     if (!url.toLowerCase().startsWith("https://i.imgur.com/")) {
       if (!isImageUrl(url)) {
         return send({
-          embeds: [
-            new ErrorEmbed(
-              "must be an image hosted on https://imgur.com\n\ntutorial: https://youtu.be/xaRu40hawUE"
-            ),
-          ],
+          embeds: [new ErrorEmbed("must be an image hosted on https://imgur.com\n\ntutorial: https://youtu.be/xaRu40hawUE")],
         });
       }
 
@@ -155,11 +139,7 @@ async function run(
 
       if (!upload) {
         return send({
-          embeds: [
-            new ErrorEmbed(
-              "must be an image hosted on https://imgur.com\n\ntutorial: https://youtu.be/xaRu40hawUE"
-            ),
-          ],
+          embeds: [new ErrorEmbed("must be an image hosted on https://imgur.com\n\ntutorial: https://youtu.be/xaRu40hawUE")],
         });
       } else {
         uploadCooldown.set(message.member.id, new Date().getTime());
@@ -176,9 +156,7 @@ async function run(
     if (!res) {
       return send({
         embeds: [
-          new ErrorEmbed(
-            `error: maybe that image already exists? if this persists join the ${prefix}support server`
-          ),
+          new ErrorEmbed(`error: maybe that image already exists? if this persists join the ${prefix}support server`),
         ],
       });
     }
@@ -214,11 +192,7 @@ async function run(
       return send({ embeds: [new ErrorEmbed("you must include the suggestion id")] });
     }
 
-    const res = await acceptWholesomeImage(
-      parseInt(args[1]),
-      message.member,
-      message.client as NypsiClient
-    );
+    const res = await acceptWholesomeImage(parseInt(args[1]), message.member, message.client as NypsiClient);
 
     if (!res) {
       return send({
@@ -286,10 +260,7 @@ async function run(
     for (const image of queue) {
       if (embed.data.fields.length >= 6) break;
 
-      embed.addField(
-        image.id.toString(),
-        `**suggested** ${image.submitter} (${image.submitterId})\n**url** ${image.image}`
-      );
+      embed.addField(image.id.toString(), `**suggested** ${image.submitter} (${image.submitterId})\n**url** ${image.image}`);
     }
 
     embed.setHeader("wholesome queue");
@@ -429,12 +400,7 @@ async function run(
 
       if (!suggestion) {
         await res.reply({
-          embeds: [
-            new CustomEmbed(
-              message.member,
-              "this suggestion no longer exists, perhaps someone beat you to it"
-            ),
-          ],
+          embeds: [new CustomEmbed(message.member, "this suggestion no longer exists, perhaps someone beat you to it")],
           ephemeral: true,
         });
         return reviewSuggestions(msg);
@@ -474,13 +440,9 @@ async function run(
         embeds: [
           new CustomEmbed(
             message.member,
-            `suggested by ${await getLastKnownTag(suggestion.submitterId)} (${
-              suggestion.submitterId
-            }) on <t:${Math.floor(
+            `suggested by ${await getLastKnownTag(suggestion.submitterId)} (${suggestion.submitterId}) on <t:${Math.floor(
               suggestion.uploadDate.getTime() / 1000
-            )}>\naccepted by ${await getLastKnownTag(suggestion.accepterId)} (${
-              suggestion.accepterId
-            })\n${suggestion.image}`
+            )}>\naccepted by ${await getLastKnownTag(suggestion.accepterId)} (${suggestion.accepterId})\n${suggestion.image}`
           ).setImage(suggestion.image),
         ],
         components: [row],
@@ -499,12 +461,7 @@ async function run(
 
       if (!suggestion) {
         await res.reply({
-          embeds: [
-            new CustomEmbed(
-              message.member,
-              "this suggestion no longer exists, perhaps someone beat you to it"
-            ),
-          ],
+          embeds: [new CustomEmbed(message.member, "this suggestion no longer exists, perhaps someone beat you to it")],
           ephemeral: true,
         });
         return reviewExisting(msg);
@@ -520,10 +477,7 @@ async function run(
       }
     };
 
-    const msg = await message.channel.send({
-      embeds: [new CustomEmbed(message.member, "loading...")],
-      components: [row],
-    });
+    const msg = await message.channel.send({ embeds: [new CustomEmbed(message.member, "loading...")], components: [row] });
 
     if (args[1]?.toLowerCase() === "existing") return reviewExisting(msg);
     return reviewSuggestions(msg);
@@ -546,8 +500,7 @@ async function run(
 
   const chance = Math.floor(Math.random() * 25);
 
-  if (chance == 7)
-    embed.setFooter({ text: `submit your own image with ${prefix}wholesome suggest (:` });
+  if (chance == 7) embed.setFooter({ text: `submit your own image with ${prefix}wholesome suggest (:` });
 
   if (target) {
     if (message instanceof Message) {

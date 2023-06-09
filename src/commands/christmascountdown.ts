@@ -15,15 +15,10 @@ const cmd = new Command("christmascountdown", "create a christmas countdown", "a
   .setAliases(["christmas", "xmas"])
   .setPermissions(["MANAGE_SERVER"]);
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
     if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
-      return message.channel.send({
-        embeds: [new ErrorEmbed("you need the `manage server` permission")],
-      });
+      return message.channel.send({ embeds: [new ErrorEmbed("you need the `manage server` permission")] });
     }
     return message.channel.send({
       embeds: [new CustomEmbed(message.member, `${daysUntilChristmas()} days until christmas`)],
@@ -36,8 +31,7 @@ async function run(
     });
   }
 
-  if (!(await hasChristmasCountdown(message.guild)))
-    await createNewChristmasCountdown(message.guild);
+  if (!(await hasChristmasCountdown(message.guild))) await createNewChristmasCountdown(message.guild);
 
   let profile = await getChristmasCountdown(message.guild);
   const prefix = await getPrefix(message.guild);
@@ -56,8 +50,7 @@ async function run(
   if (args.length == 0) {
     const embed = new CustomEmbed(
       message.member,
-      `**enabled** \`${profile.enabled}\`\n` +
-        `**format** ${profile.format}\n**channel** \`${profile.channel}\``
+      `**enabled** \`${profile.enabled}\`\n` + `**format** ${profile.format}\n**channel** \`${profile.channel}\``
     )
       .setHeader("christmas countdown")
       .setFooter({ text: `use ${prefix}xmas help to view additional commands` });
@@ -154,9 +147,7 @@ async function run(
     }
 
     if (newFormat.length > 250) {
-      return message.channel.send({
-        embeds: [new ErrorEmbed("cannot be longer than 250 characters")],
-      });
+      return message.channel.send({ embeds: [new ErrorEmbed("cannot be longer than 250 characters")] });
     }
 
     profile.format = newFormat;
@@ -181,9 +172,7 @@ async function run(
       }
     }
 
-    const embed = new CustomEmbed(message.member, "✅ format updated").setHeader(
-      "christmas countdown"
-    );
+    const embed = new CustomEmbed(message.member, "✅ format updated").setHeader("christmas countdown");
 
     return message.channel.send({ embeds: [embed] });
   } else if (args[0].toLowerCase() == "channel") {
@@ -239,9 +228,7 @@ async function run(
       }
     }
 
-    const embed = new CustomEmbed(message.member, "✅ channel updated").setHeader(
-      "christmas countdown"
-    );
+    const embed = new CustomEmbed(message.member, "✅ channel updated").setHeader("christmas countdown");
 
     return message.channel.send({ embeds: [embed] });
   } else {

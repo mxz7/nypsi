@@ -18,15 +18,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const lizardCache = images.get("lizard");
 
   if (!lizardCache) {
-    return message.channel.send({
-      embeds: [new ErrorEmbed("please wait a couple more seconds..")],
-    });
+    return message.channel.send({ embeds: [new ErrorEmbed("please wait a couple more seconds..")] });
   }
 
   if (lizardCache.size < 1) {
-    return message.channel.send({
-      embeds: [new ErrorEmbed("please wait a couple more seconds..")],
-    });
+    return message.channel.send({ embeds: [new ErrorEmbed("please wait a couple more seconds..")] });
   }
 
   await addCooldown(cmd.name, message.member, 7);
