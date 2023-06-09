@@ -74,9 +74,7 @@ export async function checkPurchases(id: string, client: NypsiClient) {
           payload: {
             content: "thank you for your purchase",
             embed: new CustomEmbed()
-              .setDescription(
-                `you have received 1 ${getItems()[item.item].emoji} ${getItems()[item.item].name}`
-              )
+              .setDescription(`you have received 1 ${getItems()[item.item].emoji} ${getItems()[item.item].name}`)
               .setColor(Constants.TRANSPARENT_EMBED_COLOR),
           },
         };

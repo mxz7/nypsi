@@ -139,10 +139,7 @@ export async function getResponse(cmd: string, member: GuildMember | string): Pr
   return embed;
 }
 
-async function calculateCooldownLength(
-  seconds: number,
-  member: GuildMember | string
-): Promise<number> {
+async function calculateCooldownLength(seconds: number, member: GuildMember | string): Promise<number> {
   if (await isPremium(member)) {
     if ((await getTier(member)) == 4) {
       seconds = seconds * 0.25;

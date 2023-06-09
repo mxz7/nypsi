@@ -3,14 +3,9 @@ import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { snipe } from "../utils/functions/guilds/utils";
 
-const cmd = new Command("snipe", "snipe the most recently deleted message", "fun").setAliases([
-  "s",
-]);
+const cmd = new Command("snipe", "snipe the most recently deleted message", "fun").setAliases(["s"]);
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   let channel: Channel = message.channel;
 
   if (args.length == 1) {
@@ -33,9 +28,7 @@ async function run(
   }
 
   if (!snipe || !snipe.get(channel.id)) {
-    return message.channel.send({
-      embeds: [new ErrorEmbed("nothing to snipe in " + channel.toString())],
-    });
+    return message.channel.send({ embeds: [new ErrorEmbed("nothing to snipe in " + channel.toString())] });
   }
 
   let content = snipe.get(channel.id).content;

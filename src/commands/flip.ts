@@ -5,10 +5,7 @@ import Constants from "../utils/Constants";
 
 const cmd = new Command("flip", "flip a coin", "utility");
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   const headTails = [
     "heads",
     "tails",

@@ -30,30 +30,19 @@ export default async function guildMemberUpdate(oldMember: GuildMember, newMembe
 
   if (oldMember.displayName !== newMember.displayName && (await isLogsEnabled(newMember.guild))) {
     //not sure if newMember.guild is necessary
-    const embed = new CustomEmbed()
-      .disableFooter()
-      .setTimestamp()
-      .setHeader(newMember.user.tag, newMember.user.avatarURL());
+    const embed = new CustomEmbed().disableFooter().setTimestamp().setHeader(newMember.user.tag, newMember.user.avatarURL());
 
     embed.setTitle("nickname changed");
     embed.setDescription(
-      `${newMember.toString()} (${newMember.id})\n**${oldMember.displayName}** -> **${
-        newMember.displayName
-      }**`
+      `${newMember.toString()} (${newMember.id})\n**${oldMember.displayName}** -> **${newMember.displayName}**`
     );
     await addLog(newMember.guild, "member", embed);
   }
 
   if (newMember.guild.id === Constants.NYPSI_SERVER_ID) {
-    if (
-      newMember.roles.cache.has(Constants.BOOST_ROLE_ID) &&
-      !(await isBooster(newMember.user.id))
-    ) {
+    if (newMember.roles.cache.has(Constants.BOOST_ROLE_ID) && !(await isBooster(newMember.user.id))) {
       await setBooster(newMember.user.id, true);
-    } else if (
-      !newMember.roles.cache.has(Constants.BOOST_ROLE_ID) &&
-      (await isBooster(newMember.user.id))
-    ) {
+    } else if (!newMember.roles.cache.has(Constants.BOOST_ROLE_ID) && (await isBooster(newMember.user.id))) {
       await setBooster(newMember.user.id, false);
     }
   }

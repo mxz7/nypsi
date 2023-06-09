@@ -1,18 +1,8 @@
 import dayjs = require("dayjs");
-import {
-  BaseMessageOptions,
-  CommandInteraction,
-  InteractionReplyOptions,
-  Message,
-} from "discord.js";
+import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import {
-  addInventoryItem,
-  getInventory,
-  selectItem,
-  setInventoryItem,
-} from "../utils/functions/economy/inventory";
+import { addInventoryItem, getInventory, selectItem, setInventoryItem } from "../utils/functions/economy/inventory";
 import { getPrestige } from "../utils/functions/economy/prestige";
 import { createUser, isEcoBanned, userExists } from "../utils/functions/economy/utils";
 import { getXp } from "../utils/functions/economy/xp";
@@ -26,24 +16,13 @@ const cmd = new Command("give", "give other users items from your inventory", "m
 
 cmd.slashEnabled = true;
 cmd.slashData
-  .addUserOption((option) =>
-    option.setName("user").setDescription("user you want to give items to").setRequired(true)
-  )
+  .addUserOption((option) => option.setName("user").setDescription("user you want to give items to").setRequired(true))
   .addStringOption((option) =>
-    option
-      .setName("item")
-      .setDescription("item you want to give")
-      .setRequired(true)
-      .setAutocomplete(true)
+    option.setName("item").setDescription("item you want to give").setRequired(true).setAutocomplete(true)
   )
-  .addIntegerOption((option) =>
-    option.setName("amount").setDescription("amount of item you want to give").setMinValue(1)
-  );
+  .addIntegerOption((option) => option.setName("amount").setDescription("amount of item you want to give").setMinValue(1));
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       let usedNewMessage = false;
@@ -148,15 +127,11 @@ async function run(
     return send({ embeds: [new ErrorEmbed(`couldnt find \`${args[1]}\``)] });
   }
 
-  if (
-    !inventory.find((i) => i.item == selected.id) ||
-    inventory.find((i) => i.item == selected.id).amount == 0
-  ) {
+  if (!inventory.find((i) => i.item == selected.id) || inventory.find((i) => i.item == selected.id).amount == 0) {
     return send({ embeds: [new ErrorEmbed("you dont have any " + selected.name)] });
   }
 
-  if (args[2]?.toLowerCase() === "all")
-    args[2] = inventory.find((i) => i.item === selected.id).amount.toString();
+  if (args[2]?.toLowerCase() === "all") args[2] = inventory.find((i) => i.item === selected.id).amount.toString();
 
   let amount = parseInt(args[2]);
 
@@ -206,32 +181,21 @@ async function run(
 
   await Promise.all([
     addInventoryItem(target, selected.id, amount),
-    setInventoryItem(
-      message.member,
-      selected.id,
-      inventory.find((i) => i.item == selected.id).amount - amount,
-      false
-    ),
+    setInventoryItem(message.member, selected.id, inventory.find((i) => i.item == selected.id).amount - amount, false),
   ]);
 
   if ((await getDmSettings(target)).payment) {
     const embed = new CustomEmbed(
       target,
-      `**${message.author.tag}** has given you ${amount.toLocaleString()} ${selected.emoji} ${
-        selected.name
-      }`
+      `**${message.author.tag}** has given you ${amount.toLocaleString()} ${selected.emoji} ${selected.name}`
     )
-      .setHeader(
-        `you have received ${amount == 1 ? "an item" : `${amount.toLocaleString()} items`}`
-      )
+      .setHeader(`you have received ${amount == 1 ? "an item" : `${amount.toLocaleString()} items`}`)
       .setFooter({ text: "/settings me notifications" });
 
     await target
       .send({
         embeds: [embed],
-        content: `you have received ${
-          amount == 1 ? "an item" : `${amount.toLocaleString()} items`
-        }`,
+        content: `you have received ${amount == 1 ? "an item" : `${amount.toLocaleString()} items`}`,
       })
       .catch(() => {});
   }
@@ -248,9 +212,7 @@ async function run(
     embeds: [
       new CustomEmbed(
         message.member,
-        `you have given **${amount}** ${selected.emoji} ${
-          selected.name
-        } to **${target.toString()}**`
+        `you have given **${amount}** ${selected.emoji} ${selected.name} to **${target.toString()}**`
       ),
     ],
   });

@@ -1,35 +1,19 @@
-import {
-  BaseMessageOptions,
-  CommandInteraction,
-  InteractionReplyOptions,
-  Message,
-  PermissionFlagsBits,
-} from "discord.js";
+import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message, PermissionFlagsBits } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command(
-  "addemoji",
-  "add an emoji from a different server to your server",
-  "utility"
-)
+const cmd = new Command("addemoji", "add an emoji from a different server to your server", "utility")
   .setPermissions(["MANAGE_EMOJIS"])
   .setAliases(["stealemoji"]);
 
 cmd.slashEnabled = true;
 cmd.slashData.addStringOption((option) =>
-  option
-    .setName("emoji")
-    .setDescription("emoji from another server or url to an image")
-    .setRequired(true)
+  option.setName("emoji").setDescription("emoji from another server or url to an image").setRequired(true)
 );
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       let usedNewMessage = false;
@@ -91,10 +75,7 @@ async function run(
   let url;
   let name;
 
-  if (
-    args.length == 0 ||
-    (message instanceof Message && message.attachments && message.attachments.first())
-  ) {
+  if (args.length == 0 || (message instanceof Message && message.attachments && message.attachments.first())) {
     mode = "attachment";
   } else if (args[0]) {
     if (args[0].startsWith("http")) {

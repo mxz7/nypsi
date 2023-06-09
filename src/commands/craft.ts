@@ -24,17 +24,10 @@ const cmd = new Command("craft", "craft items", "money");
 
 cmd.slashEnabled = true;
 cmd.slashData
-  .addStringOption((option) =>
-    option.setName("craft-item").setAutocomplete(true).setDescription("item to craft")
-  )
-  .addStringOption((option) =>
-    option.setName("amount").setDescription("amount of item you want to craft")
-  );
+  .addStringOption((option) => option.setName("craft-item").setAutocomplete(true).setDescription("item to craft"))
+  .addStringOption((option) => option.setName("amount").setDescription("amount of item you want to craft"));
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (!(await userExists(message.member))) await createUser(message.member);
 
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
@@ -81,10 +74,7 @@ async function run(
   const craftingPage = async (msg: Message) => {
     const { current: crafting } = await getCraftingItems(message.member);
 
-    const embed = new CustomEmbed(message.member).setHeader(
-      "currently crafting",
-      message.author.avatarURL()
-    );
+    const embed = new CustomEmbed(message.member).setHeader("currently crafting", message.author.avatarURL());
 
     const desc: string[] = [];
 
@@ -147,11 +137,7 @@ async function run(
       const desc: string[] = [];
 
       for (const completed of crafting.completed) {
-        desc.push(
-          `\`${completed.amount}x\` ${items[completed.itemId].emoji} ${
-            items[completed.itemId].name
-          }`
-        );
+        desc.push(`\`${completed.amount}x\` ${items[completed.itemId].emoji} ${items[completed.itemId].name}`);
       }
 
       embed.addField("completed", desc.join("\n"));
@@ -182,13 +168,9 @@ async function run(
       let totalHas = 0;
 
       for (const [key, value] of owned.entries()) {
-        const needed = parseInt(
-          items[itemId].craft.ingrediants.find((i) => i.split(":")[0] == key).split(":")[1]
-        );
+        const needed = parseInt(items[itemId].craft.ingrediants.find((i) => i.split(":")[0] == key).split(":")[1]);
 
-        item += `\n- ${items[key].emoji} ${
-          items[key].name
-        } \`${value.toLocaleString()} / ${needed}\``;
+        item += `\n- ${items[key].emoji} ${items[key].name} \`${value.toLocaleString()} / ${needed}\``;
 
         const recipeAvailableToCraft = Math.floor(value / needed);
 
@@ -213,9 +195,7 @@ async function run(
     const pages = new Map<number, string[]>();
 
     if (availableToCraft.length == 0) {
-      availableToCraft.push(
-        "you can not currently craft anything. collect more items to discover craftable items"
-      );
+      availableToCraft.push("you can not currently craft anything. collect more items to discover craftable items");
     }
 
     const PER_PAGE = 4;
@@ -237,11 +217,7 @@ async function run(
 
     if (pages.size > 1) {
       components[0].addComponents(
-        new ButtonBuilder()
-          .setCustomId("⬅")
-          .setLabel("back")
-          .setStyle(ButtonStyle.Primary)
-          .setDisabled(true),
+        new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
         new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
       );
 
@@ -249,13 +225,9 @@ async function run(
     }
 
     if (crafting.current.length > 0) {
-      components[pages.size > 1 ? 1 : 0] =
-        new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-          new ButtonBuilder()
-            .setCustomId("prog")
-            .setLabel("currently crafting")
-            .setStyle(ButtonStyle.Success)
-        );
+      components[pages.size > 1 ? 1 : 0] = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder().setCustomId("prog").setLabel("currently crafting").setStyle(ButtonStyle.Success)
+      );
     }
 
     if (msg) {
@@ -309,29 +281,13 @@ async function run(
 
           if (currentPage == 1) {
             components[0].setComponents(
-              new ButtonBuilder()
-                .setCustomId("⬅")
-                .setLabel("back")
-                .setStyle(ButtonStyle.Primary)
-                .setDisabled(true),
-              new ButtonBuilder()
-                .setCustomId("➡")
-                .setLabel("next")
-                .setStyle(ButtonStyle.Primary)
-                .setDisabled(false)
+              new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
+              new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(false)
             );
           } else {
             components[0].setComponents(
-              new ButtonBuilder()
-                .setCustomId("⬅")
-                .setLabel("back")
-                .setStyle(ButtonStyle.Primary)
-                .setDisabled(false),
-              new ButtonBuilder()
-                .setCustomId("➡")
-                .setLabel("next")
-                .setStyle(ButtonStyle.Primary)
-                .setDisabled(false)
+              new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(false),
+              new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(false)
             );
           }
           await reaction.message.edit({ embeds: [embed], components });
@@ -347,29 +303,13 @@ async function run(
           embed.setFooter({ text: "page " + currentPage + "/" + pages.size });
           if (currentPage == pages.size) {
             components[0].setComponents(
-              new ButtonBuilder()
-                .setCustomId("⬅")
-                .setLabel("back")
-                .setStyle(ButtonStyle.Primary)
-                .setDisabled(false),
-              new ButtonBuilder()
-                .setCustomId("➡")
-                .setLabel("next")
-                .setStyle(ButtonStyle.Primary)
-                .setDisabled(true)
+              new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(false),
+              new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(true)
             );
           } else {
             components[0].setComponents(
-              new ButtonBuilder()
-                .setCustomId("⬅")
-                .setLabel("back")
-                .setStyle(ButtonStyle.Primary)
-                .setDisabled(false),
-              new ButtonBuilder()
-                .setCustomId("➡")
-                .setLabel("next")
-                .setStyle(ButtonStyle.Primary)
-                .setDisabled(false)
+              new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(false),
+              new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(false)
             );
           }
           await reaction.message.edit({ embeds: [embed], components });
@@ -454,11 +394,7 @@ async function run(
     }
 
     if (amount > craftable) {
-      return send({
-        embeds: [
-          new ErrorEmbed(`you can only craft ${craftable.toLocaleString()} ${selected.name}`),
-        ],
-      });
+      return send({ embeds: [new ErrorEmbed(`you can only craft ${craftable.toLocaleString()} ${selected.name}`)] });
     }
 
     const promises: Promise<any>[] = [];

@@ -8,17 +8,11 @@ import { getMember } from "../utils/functions/member";
 import { fetchUsernameHistory } from "../utils/functions/users/history";
 import workerSort from "../utils/functions/workers/sort";
 
-const cmd = new Command("user", "view info about a user in the server", "info").setAliases([
-  "whois",
-  "who",
-]);
+const cmd = new Command("user", "view info about a user in the server", "info").setAliases(["whois", "who"]);
 
 const sortCache = new Map<string, string[]>();
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   let member;
 
   if (args.length == 0) {
@@ -32,9 +26,7 @@ async function run(
   }
 
   if (args.includes("-id")) {
-    const embed = new CustomEmbed(message.member, "`" + member.user.id + "`").setHeader(
-      member.user.tag
-    );
+    const embed = new CustomEmbed(message.member, "`" + member.user.id + "`").setHeader(member.user.tag);
     return message.channel.send({ embeds: [embed] });
   }
 
@@ -49,10 +41,7 @@ async function run(
 
   let membersSorted: string[] = [];
 
-  if (
-    sortCache.has(message.guild.id) &&
-    sortCache.get(message.guild.id).length == message.guild.memberCount
-  ) {
+  if (sortCache.has(message.guild.id) && sortCache.get(message.guild.id).length == message.guild.memberCount) {
     membersSorted = sortCache.get(message.guild.id);
   } else if (message.guild.memberCount < 69420) {
     const membersMap = new Map<string, number>();
@@ -66,12 +55,7 @@ async function run(
 
     if (membersSorted.length > 1000) {
       const msg = await message.channel.send({
-        embeds: [
-          new CustomEmbed(
-            message.member,
-            `sorting ${membersSorted.length.toLocaleString()} members..`
-          ),
-        ],
+        embeds: [new CustomEmbed(message.member, `sorting ${membersSorted.length.toLocaleString()} members..`)],
       });
       membersSorted = await workerSort(membersSorted, membersMap);
       await msg.delete();
@@ -107,11 +91,7 @@ async function run(
     .setThumbnail(member.user.displayAvatarURL({ size: 128 }))
     .setHeader(member.user.tag)
 
-    .addField(
-      "account",
-      `**id** ${member.user.id}\n**created** ${created.toString().toLowerCase()}`,
-      true
-    )
+    .addField("account", `**id** ${member.user.id}\n**created** ${created.toString().toLowerCase()}`, true)
 
     .addField(
       "server",

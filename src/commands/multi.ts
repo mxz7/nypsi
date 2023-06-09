@@ -6,11 +6,7 @@ import { getGambleMulti, getSellMulti } from "../utils/functions/economy/balance
 import { createUser, userExists } from "../utils/functions/economy/utils.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command("multi", "check your multipliers", "money").setAliases([
-  "multis",
-  "multiplier",
-  "multipliers",
-]);
+const cmd = new Command("multi", "check your multipliers", "money").setAliases(["multis", "multiplier", "multipliers"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
   if (await onCooldown(cmd.name, message.member)) {

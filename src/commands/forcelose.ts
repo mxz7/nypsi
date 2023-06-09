@@ -6,10 +6,7 @@ import { getAdminLevel } from "../utils/functions/users/admin";
 
 const cmd = new Command("forcelose", "make an account lose 100% of the time", "none");
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if ((await getAdminLevel(message.author.id)) < 3) return;
 
   if (args.length == 0) {

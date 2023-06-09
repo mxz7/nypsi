@@ -24,9 +24,7 @@ export default {
 
     const formatted = options.map((i) => ({
       name: `${
-        items[i].emoji.startsWith("<:") ||
-        items[i].emoji.startsWith("<a:") ||
-        items[i].emoji.startsWith(":")
+        items[i].emoji.startsWith("<:") || items[i].emoji.startsWith("<a:") || items[i].emoji.startsWith(":")
           ? ""
           : `${items[i].emoji} `
       }${items[i].name}`,

@@ -1,10 +1,4 @@
-import {
-  BaseMessageOptions,
-  CommandInteraction,
-  GuildMember,
-  InteractionReplyOptions,
-  Message,
-} from "discord.js";
+import { BaseMessageOptions, CommandInteraction, GuildMember, InteractionReplyOptions, Message } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { addProgress } from "../utils/functions/economy/achievements";
@@ -23,14 +17,9 @@ const cmd = new Command("pp", "accurate prediction of your pp size", "fun").setA
 ]);
 
 cmd.slashEnabled = true;
-cmd.slashData.addUserOption((option) =>
-  option.setName("user").setDescription("how big is your willy")
-);
+cmd.slashData.addUserOption((option) => option.setName("user").setDescription("how big is your willy"));
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       let usedNewMessage = false;
@@ -124,10 +113,10 @@ async function run(
 
   sizeMsg = sizeMsg + "D";
 
-  const embed = new CustomEmbed(
-    message.member,
-    `${member.user.toString()}\n${sizeMsg}\n📏 ${size} inches`
-  ).setHeader("pp predictor 1337", member.user.avatarURL());
+  const embed = new CustomEmbed(message.member, `${member.user.toString()}\n${sizeMsg}\n📏 ${size} inches`).setHeader(
+    "pp predictor 1337",
+    member.user.avatarURL()
+  );
 
   send({ embeds: [embed] });
 

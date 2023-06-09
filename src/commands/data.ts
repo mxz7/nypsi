@@ -22,30 +22,25 @@ import { addCooldown, onCooldown } from "../utils/handlers/cooldownhandler.js";
 import { logger } from "../utils/logger";
 import ms = require("ms");
 
-const cmd = new Command("data", "view your raw data stored in nypsi's database", "info").setAliases(
-  ["requestdata", "viewdata", "showmemydatazuckerberg"]
-);
+const cmd = new Command("data", "view your raw data stored in nypsi's database", "info").setAliases([
+  "requestdata",
+  "viewdata",
+  "showmemydatazuckerberg",
+]);
 
 cmd.slashEnabled = true;
 cmd.slashData
   .addSubcommand((del) =>
-    del
-      .setName("delete")
-      .setDescription("request deletion of all data held on you by nypsi's database")
+    del.setName("delete").setDescription("request deletion of all data held on you by nypsi's database")
   )
-  .addSubcommand((view) =>
-    view.setName("request").setDescription("view all of the data held on you by nypsi's database")
-  );
+  .addSubcommand((view) => view.setName("request").setDescription("view all of the data held on you by nypsi's database"));
 
 // @ts-expect-error ts doesnt like that
 BigInt.prototype.toJSON = function () {
   return this.toString();
 };
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       let usedNewMessage = false;
@@ -102,10 +97,7 @@ async function run(
       return send({ embeds: [embed], ephemeral: true });
     }
 
-    const embed = new CustomEmbed(message.member).setHeader(
-      "data request",
-      message.author.avatarURL()
-    );
+    const embed = new CustomEmbed(message.member).setHeader("data request", message.author.avatarURL());
 
     embed.setDescription("you can request and view all of your data stored by nypsi");
 
@@ -317,14 +309,9 @@ async function run(
       return send({ embeds: [embed] });
     }
 
-    const embed = new CustomEmbed(message.member).setHeader(
-      "data deletion request",
-      message.author.avatarURL()
-    );
+    const embed = new CustomEmbed(message.member).setHeader("data deletion request", message.author.avatarURL());
 
-    embed.setDescription(
-      "by doing this, you will lose **all** of your data. this includes a full wipe on economy."
-    );
+    embed.setDescription("by doing this, you will lose **all** of your data. this includes a full wipe on economy.");
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder().setCustomId("y").setLabel("delete").setStyle(ButtonStyle.Danger)

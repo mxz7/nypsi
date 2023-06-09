@@ -6,10 +6,7 @@ import { logger } from "../utils/logger";
 
 const cmd = new Command("ecoban", "ban an account from eco", "none");
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if ((await getAdminLevel(message.author.id)) < 2) return;
 
   if (args.length == 0) {
@@ -19,18 +16,14 @@ async function run(
   if (!args[1]) {
     if (await isEcoBanned(args[0])) {
       await setEcoBan(args[0]); // unbans user
-      logger.info(
-        `admin: ${message.author.tag} (${message.author.id}) set ${args[0]} ecoban to unban`
-      );
+      logger.info(`admin: ${message.author.tag} (${message.author.id}) set ${args[0]} ecoban to unban`);
     }
   } else {
     const time = new Date(Date.now() + getDuration(args[1].toLowerCase()) * 1000);
 
     await setEcoBan(args[0], time);
 
-    logger.info(
-      `admin: ${message.author.tag} (${message.author.id}) set ${args[0]} ecoban to ${time}`
-    );
+    logger.info(`admin: ${message.author.tag} (${message.author.id}) set ${args[0]} ecoban to ${time}`);
   }
 
   if (!(message instanceof Message)) return; // never gonna give you up. never gonna let you down. never gonna run around. and. DESERT YOU

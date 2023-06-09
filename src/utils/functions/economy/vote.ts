@@ -1,8 +1,8 @@
 import { GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
-import Constants from "../../Constants";
 import ms = require("ms");
+import Constants from "../../Constants";
 
 export async function getLastVote(member: GuildMember | string) {
   let id: string;

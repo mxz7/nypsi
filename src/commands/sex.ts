@@ -1,10 +1,5 @@
 import dayjs = require("dayjs");
-import {
-  BaseMessageOptions,
-  CommandInteraction,
-  InteractionReplyOptions,
-  Message,
-} from "discord.js";
+import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
 import redis from "../init/redis.js";
 import { NypsiClient } from "../models/Client.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
@@ -36,9 +31,7 @@ interface MilfSearchData {
 }
 
 cmd.slashEnabled = true;
-cmd.slashData.addStringOption((option) =>
-  option.setName("message").setDescription("a good pickup line always works (;")
-);
+cmd.slashData.addStringOption((option) => option.setName("message").setDescription("a good pickup line always works (;"));
 
 const descFilter = [
   "nigger",
@@ -63,10 +56,7 @@ const descFilter = [
   "bitly",
 ];
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       let usedNewMessage = false;
@@ -110,17 +100,11 @@ async function run(
   }
 
   if ((await redis.exists(`${Constants.redis.cooldown.SEX_CHASTITY}:${message.author.id}`)) == 1) {
-    const init = parseInt(
-      await redis.get(`${Constants.redis.cooldown.SEX_CHASTITY}:${message.author.id}`)
-    );
+    const init = parseInt(await redis.get(`${Constants.redis.cooldown.SEX_CHASTITY}:${message.author.id}`));
     const remaining = MStoTime(Date.now() + 10800000 - init);
 
     return send({
-      embeds: [
-        new ErrorEmbed(
-          `you have been equipped with a *chastity cage*, it will be removed in **${remaining}**`
-        ),
-      ],
+      embeds: [new ErrorEmbed(`you have been equipped with a *chastity cage*, it will be removed in **${remaining}**`)],
     });
   }
 
@@ -187,19 +171,14 @@ async function run(
       const embed = new CustomEmbed(
         message.member,
         `a match has been made from **${
-          milf.guildId == "747056029795221513"
-            ? "[nypsi](https://discord.gg/hJTDNST)"
-            : milf.guildName
-        }**\n\n` +
-          `go ahead and send **${await getLastKnownTag(milf.userId)}** a *private* message 😉😏`
+          milf.guildId == "747056029795221513" ? "[nypsi](https://discord.gg/hJTDNST)" : milf.guildName
+        }**\n\n` + `go ahead and send **${await getLastKnownTag(milf.userId)}** a *private* message 😉😏`
       ).setHeader("milf finder");
 
       if (milf.description != "") {
         embed.setDescription(
           `a match has been made from **${
-            milf.guildId == "747056029795221513"
-              ? "[nypsi](https://discord.gg/hJTDNST)"
-              : milf.guildName
+            milf.guildId == "747056029795221513" ? "[nypsi](https://discord.gg/hJTDNST)" : milf.guildName
           }**\n\n` +
             `**${await getLastKnownTag(milf.userId)}** - ${milf.description}\n\n` +
             "go ahead and send them a *private* message 😉😏"
@@ -215,9 +194,7 @@ async function run(
       const embed2 = new CustomEmbed(
         undefined,
         `a match has been made from **${
-          message.guild.id == "747056029795221513"
-            ? "[nypsi](https://discord.gg/hJTDNST)"
-            : message.guild.name
+          message.guild.id == "747056029795221513" ? "[nypsi](https://discord.gg/hJTDNST)" : message.guild.name
         }**\n\ngo ahead and send **${message.author.tag}** a *private* message 😉😏`
       )
         .setHeader("milf finder")
@@ -243,9 +220,7 @@ async function run(
       if (description !== "") {
         embed2.setDescription(
           `a match has been made from **${
-            message.guild.id == "747056029795221513"
-              ? "[nypsi](https://discord.gg/hJTDNST)"
-              : message.guild.name
+            message.guild.id == "747056029795221513" ? "[nypsi](https://discord.gg/hJTDNST)" : message.guild.name
           }**\n\n` +
             `**${message.author.tag}** - ${description}\n\n` +
             "go ahead and send them a *private* message 😉😏"

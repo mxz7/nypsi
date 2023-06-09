@@ -20,9 +20,7 @@ export default function getJsonGraphData(category: string, userIds: string[]): P
 if (!isMainThread) {
   process.title = "nypsi: create json graph";
 
-  const createGraphData = async (
-    data: { userId: string; value: bigint | number; date: Date }[]
-  ): Promise<ChartData> => {
+  const createGraphData = async (data: { userId: string; value: bigint | number; date: Date }[]): Promise<ChartData> => {
     const dates: number[] = [];
     const map = new Map<string, { value: number; date: number }[]>();
 
@@ -79,11 +77,7 @@ if (!isMainThread) {
         })
         .then((r) => r?.lastKnownTag);
 
-      chart.data.datasets.push({
-        label: tag?.split("#")[0] || userId,
-        data: balances.map((b) => parseInt(b)),
-        fill: false,
-      });
+      chart.data.datasets.push({ label: tag?.split("#")[0] || userId, data: balances.map((b) => parseInt(b)), fill: false });
     }
 
     return chart;

@@ -3,17 +3,11 @@ import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import requestDM from "../utils/functions/requestdm";
-import {
-  getSupportRequestByChannelId,
-  sendToRequestChannel,
-} from "../utils/functions/supportrequest";
+import { getSupportRequestByChannelId, sendToRequestChannel } from "../utils/functions/supportrequest";
 
 const cmd = new Command("reply", "reply to a support ticket", "none");
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   const support = await getSupportRequestByChannelId(message.channel.id);
 
   if (!support) return;
@@ -24,10 +18,7 @@ async function run(
     return message.channel.send({ embeds: [new ErrorEmbed("dumbass")] });
   }
 
-  const embed = new CustomEmbed(message.member).setHeader(
-    message.author.tag,
-    message.author.avatarURL()
-  );
+  const embed = new CustomEmbed(message.member).setHeader(message.author.tag, message.author.avatarURL());
 
   if (args.length > 0) {
     embed.setDescription(args.join(" "));

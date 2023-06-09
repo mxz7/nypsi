@@ -12,13 +12,7 @@ import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants.js";
 import { addProgress } from "../utils/functions/economy/achievements.js";
-import {
-  calcMaxBet,
-  getBalance,
-  getDefaultBet,
-  getGambleMulti,
-  updateBalance,
-} from "../utils/functions/economy/balance.js";
+import { calcMaxBet, getBalance, getDefaultBet, getGambleMulti, updateBalance } from "../utils/functions/economy/balance.js";
 import { getBoosters } from "../utils/functions/economy/boosters.js";
 import { addToGuildXP, getGuildByUser } from "../utils/functions/economy/guilds.js";
 import { createGame } from "../utils/functions/economy/stats";
@@ -133,10 +127,7 @@ cmd.slashData.addStringOption((option) =>
   option.setName("bet").setDescription("how much would you like to bet").setRequired(false)
 );
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       let usedNewMessage = false;
@@ -184,10 +175,7 @@ async function run(
     const embed = new CustomEmbed(message.member)
       .setHeader("slots help")
       .addField("usage", `${prefix}slots <bet>\n${prefix}slots info`)
-      .addField(
-        "help",
-        "[slots has a ~39% winrate](https://github.com/tekoh/nypsi/blob/main/src/commands/slots.ts#279)"
-      );
+      .addField("help", "[slots has a ~39% winrate](https://github.com/tekoh/nypsi/blob/main/src/commands/slots.ts#279)");
     return send({ embeds: [embed] });
   }
 
@@ -195,9 +183,7 @@ async function run(
     let txt = "";
 
     for (const item of Object.keys(multipliers)) {
-      txt += `${staticEmojis.get(item)} | ${staticEmojis.get(item)} | ${staticEmojis.get(
-        item
-      )} **||** ${
+      txt += `${staticEmojis.get(item)} | ${staticEmojis.get(item)} | ${staticEmojis.get(item)} **||** ${
         // @ts-expect-error its weird
         multipliers[item]
       }**x**\n`;
@@ -218,9 +204,7 @@ async function run(
 
   if (bet <= 0) {
     return send({
-      embeds: [
-        new ErrorEmbed(`${prefix}slots <bet> | ${prefix}**slots info** shows the winning board`),
-      ],
+      embeds: [new ErrorEmbed(`${prefix}slots <bet> | ${prefix}**slots info** shows the winning board`)],
     });
   }
 
@@ -231,9 +215,7 @@ async function run(
   if (bet > maxBet) {
     return send({
       embeds: [
-        new ErrorEmbed(
-          `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
-        ),
+        new ErrorEmbed(`your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`),
       ],
     });
   }
@@ -377,10 +359,7 @@ async function run(
     winnings -= bet;
 
     if (multi > 0) {
-      await updateBalance(
-        message.member,
-        (await getBalance(message.member)) + winnings + Math.round(winnings * multi)
-      );
+      await updateBalance(message.member, (await getBalance(message.member)) + winnings + Math.round(winnings * multi));
       winnings = winnings + Math.round(winnings * multi);
     } else {
       await updateBalance(message.member, (await getBalance(message.member)) + winnings);
@@ -430,12 +409,7 @@ async function run(
       if (multi > 0) {
         embed.addField(
           "**winner!!**",
-          "**you win** $" +
-            winnings.toLocaleString() +
-            "\n" +
-            "+**" +
-            Math.floor(multi * 100).toString() +
-            "**% bonus"
+          "**you win** $" + winnings.toLocaleString() + "\n" + "+**" + Math.floor(multi * 100).toString() + "**% bonus"
         );
       } else {
         embed.addField("**winner!!**", "**you win** $" + winnings.toLocaleString());

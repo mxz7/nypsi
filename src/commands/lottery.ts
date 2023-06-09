@@ -1,22 +1,11 @@
 import dayjs = require("dayjs");
-import {
-  BaseMessageOptions,
-  CommandInteraction,
-  InteractionReplyOptions,
-  Message,
-} from "discord.js";
+import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
 import prisma from "../init/database";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
-import {
-  addTicket,
-  createUser,
-  getTickets,
-  lotteryTicketPrice,
-  userExists,
-} from "../utils/functions/economy/utils";
+import { addTicket, createUser, getTickets, lotteryTicketPrice, userExists } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
@@ -28,18 +17,11 @@ cmd.slashData
     buy
       .setName("buy")
       .setDescription("buy lottery tickets")
-      .addStringOption((option) =>
-        option.setName("amount").setDescription("amount of lottery tickets to buy")
-      )
+      .addStringOption((option) => option.setName("amount").setDescription("amount of lottery tickets to buy"))
   )
-  .addSubcommand((tickets) =>
-    tickets.setName("tickets").setDescription("view your current tickets")
-  );
+  .addSubcommand((tickets) => tickets.setName("tickets").setDescription("view your current tickets"));
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (!(await userExists(message.member))) await createUser(message.member);
 
   const tickets = await getTickets(message.member);
@@ -77,9 +59,7 @@ async function run(
   const help = async () => {
     const embed = new CustomEmbed(message.member);
 
-    const winChance = ((tickets.length / (await prisma.lotteryTicket.count())) * 100).toPrecision(
-      3
-    );
+    const winChance = ((tickets.length / (await prisma.lotteryTicket.count())) * 100).toPrecision(3);
 
     embed.setHeader("lottery", message.author.avatarURL());
     embed.setDescription(
@@ -125,11 +105,7 @@ async function run(
     }
 
     if (tickets.length >= Constants.LOTTERY_TICKETS_MAX) {
-      return send({
-        embeds: [
-          new ErrorEmbed(`you can only have ${Constants.LOTTERY_TICKETS_MAX} tickets at a time`),
-        ],
-      });
+      return send({ embeds: [new ErrorEmbed(`you can only have ${Constants.LOTTERY_TICKETS_MAX} tickets at a time`)] });
     }
 
     if ((await getBalance(message.member)) < lotteryTicketPrice * amount) {
@@ -140,10 +116,7 @@ async function run(
 
     await addCooldown(cmd.name, message.member, 10);
 
-    await updateBalance(
-      message.member,
-      (await getBalance(message.member)) - lotteryTicketPrice * amount
-    );
+    await updateBalance(message.member, (await getBalance(message.member)) - lotteryTicketPrice * amount);
 
     await addTicket(message.member, amount);
 

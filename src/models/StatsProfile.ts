@@ -1,10 +1,4 @@
-type StatsData = {
-  economyUserId: string;
-  type: string;
-  win: number | bigint;
-  lose: number | bigint;
-  gamble: boolean;
-};
+type StatsData = { economyUserId: string; type: string; win: number | bigint; lose: number | bigint; gamble: boolean };
 
 export class StatsProfile {
   public gamble: { [key: string]: { wins: number; lose: number } };

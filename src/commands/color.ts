@@ -5,10 +5,7 @@ import { getMember } from "../utils/functions/member";
 
 const cmd = new Command("color", "get a random hex color code", "info").setAliases(["colour"]);
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   let color;
   let member;
 
@@ -32,10 +29,7 @@ async function run(
     }
   }
 
-  const embed = new CustomEmbed(
-    message.member,
-    `[**#${color}**](https://color.tekoh.net/#${color})`
-  );
+  const embed = new CustomEmbed(message.member, `[**#${color}**](https://color.tekoh.net/#${color})`);
 
   try {
     embed.setColor(color as ColorResolvable);

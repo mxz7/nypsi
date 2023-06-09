@@ -1,10 +1,4 @@
-import {
-  BaseMessageOptions,
-  CommandInteraction,
-  GuildMember,
-  InteractionReplyOptions,
-  Message,
-} from "discord.js";
+import { BaseMessageOptions, CommandInteraction, GuildMember, InteractionReplyOptions, Message } from "discord.js";
 import prisma from "../init/database";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
@@ -18,11 +12,7 @@ import {
   updateBalance,
 } from "../utils/functions/economy/balance.js";
 import { getInventory } from "../utils/functions/economy/inventory";
-import {
-  getPrestige,
-  getPrestigeRequirement,
-  getPrestigeRequirementBal,
-} from "../utils/functions/economy/prestige.js";
+import { getPrestige, getPrestigeRequirement, getPrestigeRequirementBal } from "../utils/functions/economy/prestige.js";
 import { createUser, deleteUser, getItems, userExists } from "../utils/functions/economy/utils.js";
 import { getXp } from "../utils/functions/economy/xp.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
@@ -30,12 +20,7 @@ import { getMember } from "../utils/functions/member.js";
 import { getNypsiBankBalance, getTax, getTaxRefreshTime } from "../utils/functions/tax.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command("balance", "check your balance", "money").setAliases([
-  "bal",
-  "money",
-  "wallet",
-  "bank",
-]);
+const cmd = new Command("balance", "check your balance", "money").setAliases(["bal", "money", "wallet", "bank"]);
 
 cmd.slashEnabled = true;
 
@@ -43,10 +28,7 @@ cmd.slashData.addUserOption((option) =>
   option.setName("user").setDescription("view balance of this user").setRequired(false)
 );
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (message.member.user.id == Constants.TEKOH_ID && args.length == 2) {
     let target: GuildMember | string = message.mentions.members.first();
 
@@ -132,27 +114,24 @@ async function run(
     const embed = new CustomEmbed(message.member).setHeader("nypsi bank", target.user.avatarURL());
 
     embed.setDescription(
-      `**current balance** $${(
-        await getNypsiBankBalance()
-      ).toLocaleString()}\n**current tax rate** ${((await getTax()) * 100).toFixed(
-        1
-      )}%\n\ntax updates <t:${await getTaxRefreshTime()}:R>`
+      `**current balance** $${(await getNypsiBankBalance()).toLocaleString()}\n**current tax rate** ${(
+        (await getTax()) * 100
+      ).toFixed(1)}%\n\ntax updates <t:${await getTaxRefreshTime()}:R>`
     );
 
     return send({ embeds: [embed] });
   }
 
-  const [balance, xp, prestige, inventory, net, bankBalance, bankMaxBalance, padlock] =
-    await Promise.all([
-      getBalance(target),
-      getXp(target),
-      getPrestige(target),
-      getInventory(target),
-      calcNetWorth(target),
-      getBankBalance(target),
-      getMaxBankBalance(target),
-      hasPadlock(target),
-    ]);
+  const [balance, xp, prestige, inventory, net, bankBalance, bankMaxBalance, padlock] = await Promise.all([
+    getBalance(target),
+    getXp(target),
+    getPrestige(target),
+    getInventory(target),
+    calcNetWorth(target),
+    getBankBalance(target),
+    getMaxBankBalance(target),
+    hasPadlock(target),
+  ]);
 
   let footer = `xp: ${xp.toLocaleString()}`;
 
@@ -197,20 +176,12 @@ async function run(
     )
     .setFooter({ text: footer });
 
-  embed.setHeader(
-    `${target.user.username} | season ${Constants.SEASON_NUMBER}`,
-    target.user.avatarURL()
-  );
+  embed.setHeader(`${target.user.username} | season ${Constants.SEASON_NUMBER}`, target.user.avatarURL());
 
   if (message.member == target) {
-    if (
-      xp >= (await getPrestigeRequirement(target)) &&
-      bankBalance >= getPrestigeRequirementBal(xp)
-    ) {
+    if (xp >= (await getPrestigeRequirement(target)) && bankBalance >= getPrestigeRequirementBal(xp)) {
       return send({
-        content: `you are eligible to prestige, use ${await getPrefix(
-          message.guild
-        )}prestige for more info`,
+        content: `you are eligible to prestige, use ${await getPrefix(message.guild)}prestige for more info`,
         embeds: [embed],
       });
     }

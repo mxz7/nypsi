@@ -39,17 +39,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   for (const [key, value] of net.breakdown.entries()) {
     if (key === "balance") {
-      mainValues += `\n💰 $**${value.toLocaleString()}** (${((value / net.amount) * 100).toFixed(
-        2
-      )}%)`;
+      mainValues += `\n💰 $**${value.toLocaleString()}** (${((value / net.amount) * 100).toFixed(2)}%)`;
     } else if (key === "guild") {
-      mainValues += `\n👥 $**${value.toLocaleString()}** (${((value / net.amount) * 100).toFixed(
-        2
-      )}%)`;
+      mainValues += `\n👥 $**${value.toLocaleString()}** (${((value / net.amount) * 100).toFixed(2)}%)`;
     } else if (key === "workers") {
-      mainValues += `\n👷🏻‍♂️ $**${value.toLocaleString()}** (${((value / net.amount) * 100).toFixed(
-        2
-      )}%)`;
+      mainValues += `\n👷🏻‍♂️ $**${value.toLocaleString()}** (${((value / net.amount) * 100).toFixed(2)}%)`;
     } else {
       itemValues.push({ itemId: key, value });
     }
@@ -60,12 +54,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const pages = PageManager.createPages(
     itemValues.map(
       (i) =>
-        `\`${inventory.find((inv) => inv.item === i.itemId).amount.toLocaleString()}x\` ${
-          getItems()[i.itemId].emoji
-        } ${getItems()[i.itemId].name}: $**${i.value.toLocaleString()}** (${(
-          (i.value / net.amount) *
-          100
-        ).toFixed(2)}%)`
+        `\`${inventory.find((inv) => inv.item === i.itemId).amount.toLocaleString()}x\` ${getItems()[i.itemId].emoji} ${
+          getItems()[i.itemId].name
+        }: $**${i.value.toLocaleString()}** (${((i.value / net.amount) * 100).toFixed(2)}%)`
     )
   );
 
@@ -80,11 +71,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     );
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder()
-      .setCustomId("⬅")
-      .setLabel("back")
-      .setStyle(ButtonStyle.Primary)
-      .setDisabled(true),
+    new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
     new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
   );
   if (pages.size == 1) return message.channel.send({ embeds: [embed] });

@@ -14,12 +14,7 @@ import {
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { MStoTime } from "../utils/functions/date";
-import {
-  getAutoJoinRoles,
-  getPersistantRoles,
-  setAutoJoinRoles,
-  setPersistantRoles,
-} from "../utils/functions/guilds/roles";
+import { getAutoJoinRoles, getPersistantRoles, setAutoJoinRoles, setPersistantRoles } from "../utils/functions/guilds/roles";
 import { addCooldown, inCooldown } from "../utils/functions/guilds/utils";
 import { getMember, getRole } from "../utils/functions/member";
 import PageManager from "../utils/functions/page";
@@ -35,9 +30,7 @@ cmd.slashData
     members
       .setName("members")
       .setDescription("view members in a role")
-      .addRoleOption((option) =>
-        option.setName("role").setDescription("role to show members for").setRequired(true)
-      )
+      .addRoleOption((option) => option.setName("role").setDescription("role to show members for").setRequired(true))
   )
   .addSubcommandGroup((add) =>
     add
@@ -47,23 +40,16 @@ cmd.slashData
         all
           .setName("all")
           .setDescription("all members in server")
-          .addRoleOption((option) =>
-            option.setName("role").setDescription("role to add").setRequired(true)
-          )
+          .addRoleOption((option) => option.setName("role").setDescription("role to add").setRequired(true))
       )
       .addSubcommand((member) =>
         member
           .setName("member")
           .setDescription("specific member")
           .addUserOption((option) =>
-            option
-              .setName("member")
-              .setDescription("member you want to add role to")
-              .setRequired(true)
+            option.setName("member").setDescription("member you want to add role to").setRequired(true)
           )
-          .addRoleOption((option) =>
-            option.setName("role").setDescription("role to add").setRequired(true)
-          )
+          .addRoleOption((option) => option.setName("role").setDescription("role to add").setRequired(true))
       )
   )
   .addSubcommandGroup((remove) =>
@@ -74,23 +60,16 @@ cmd.slashData
         all
           .setName("all")
           .setDescription("all members in server")
-          .addRoleOption((option) =>
-            option.setName("role").setDescription("role to add").setRequired(true)
-          )
+          .addRoleOption((option) => option.setName("role").setDescription("role to add").setRequired(true))
       )
       .addSubcommand((member) =>
         member
           .setName("member")
           .setDescription("specific member")
           .addUserOption((option) =>
-            option
-              .setName("member")
-              .setDescription("member you want to add role to")
-              .setRequired(true)
+            option.setName("member").setDescription("member you want to add role to").setRequired(true)
           )
-          .addRoleOption((option) =>
-            option.setName("role").setDescription("role to add").setRequired(true)
-          )
+          .addRoleOption((option) => option.setName("role").setDescription("role to add").setRequired(true))
       )
   )
   .addSubcommandGroup((autojoin) =>
@@ -102,17 +81,13 @@ cmd.slashData
         add
           .setName("add")
           .setDescription("add a role to the autojoin list")
-          .addRoleOption((option) =>
-            option.setName("role").setDescription("role to add to list").setRequired(true)
-          )
+          .addRoleOption((option) => option.setName("role").setDescription("role to add to list").setRequired(true))
       )
       .addSubcommand((remove) =>
         remove
           .setName("remove")
           .setDescription("remove a role from the autojoin list")
-          .addRoleOption((option) =>
-            option.setName("role").setDescription("role to remove from the list").setRequired(true)
-          )
+          .addRoleOption((option) => option.setName("role").setDescription("role to remove from the list").setRequired(true))
       )
   )
   .addSubcommandGroup((persist) =>
@@ -124,24 +99,17 @@ cmd.slashData
         add
           .setName("add")
           .setDescription("add a role to the persistance list")
-          .addRoleOption((option) =>
-            option.setName("role").setDescription("role to add to list").setRequired(true)
-          )
+          .addRoleOption((option) => option.setName("role").setDescription("role to add to list").setRequired(true))
       )
       .addSubcommand((remove) =>
         remove
           .setName("remove")
           .setDescription("remove a role from the persistance list")
-          .addRoleOption((option) =>
-            option.setName("role").setDescription("role to remove from the list").setRequired(true)
-          )
+          .addRoleOption((option) => option.setName("role").setDescription("role to remove from the list").setRequired(true))
       )
   );
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       let usedNewMessage = false;
@@ -221,16 +189,12 @@ async function run(
     }
 
     if (massOperations.has(message.guild.id))
-      return send({
-        embeds: [new ErrorEmbed("please wait until the current mass operation has finished")],
-      });
+      return send({ embeds: [new ErrorEmbed("please wait until the current mass operation has finished")] });
 
     let members = await getMembers();
 
     if (!members || members.length == 0) {
-      return send({
-        embeds: [new ErrorEmbed("/role add <member|all> (member - if in member mode) (role)")],
-      });
+      return send({ embeds: [new ErrorEmbed("/role add <member|all> (member - if in member mode) (role)")] });
     }
 
     let role: Role;
@@ -259,17 +223,12 @@ async function run(
     });
 
     if (highest < role.position)
-      return send({
-        embeds: [new ErrorEmbed(`you do not have permission to modify ${role.toString()}`)],
-      });
+      return send({ embeds: [new ErrorEmbed(`you do not have permission to modify ${role.toString()}`)] });
 
     if (members.length > 10) {
       const msg = await send({
         embeds: [
-          new CustomEmbed(
-            message.member,
-            `adding ${role.toString()} to ${members.length.toLocaleString()} members...`
-          ),
+          new CustomEmbed(message.member, `adding ${role.toString()} to ${members.length.toLocaleString()} members...`),
         ],
       });
 
@@ -298,12 +257,7 @@ async function run(
           clearInterval(i);
 
           return msg.edit({
-            embeds: [
-              new CustomEmbed(
-                message.member,
-                `added ${role.toString()} to ${count.toLocaleString()} members`
-              ),
-            ],
+            embeds: [new CustomEmbed(message.member, `added ${role.toString()} to ${count.toLocaleString()} members`)],
           });
         }
 
@@ -350,12 +304,7 @@ async function run(
     }
 
     return send({
-      embeds: [
-        new CustomEmbed(
-          message.member,
-          `added ${role.toString()} to ${members.length.toLocaleString()} members`
-        ),
-      ],
+      embeds: [new CustomEmbed(message.member, `added ${role.toString()} to ${members.length.toLocaleString()} members`)],
     });
   } else if (args[0].toLowerCase() == "remove") {
     if (!message.member.permissions.has(PermissionFlagsBits.ManageRoles)) {
@@ -363,16 +312,12 @@ async function run(
     }
 
     if (massOperations.has(message.guild.id))
-      return send({
-        embeds: [new ErrorEmbed("please wait until the current mass operation has finished")],
-      });
+      return send({ embeds: [new ErrorEmbed("please wait until the current mass operation has finished")] });
 
     let members = await getMembers();
 
     if (!members || members.length == 0) {
-      return send({
-        embeds: [new ErrorEmbed("/role remove <member|all> (member - if in member mode) (role)")],
-      });
+      return send({ embeds: [new ErrorEmbed("/role remove <member|all> (member - if in member mode) (role)")] });
     }
 
     let role: Role;
@@ -396,9 +341,7 @@ async function run(
     });
 
     if (highest < role.position)
-      return send({
-        embeds: [new ErrorEmbed(`you do not have permission to modify ${role.toString()}`)],
-      });
+      return send({ embeds: [new ErrorEmbed(`you do not have permission to modify ${role.toString()}`)] });
 
     members = members.filter((m) => Array.from(m.roles.cache.keys()).includes(role.id));
 
@@ -409,10 +352,7 @@ async function run(
     if (members.length > 50) {
       const msg = await send({
         embeds: [
-          new CustomEmbed(
-            message.member,
-            `removing ${role.toString()} from ${members.length.toLocaleString()} members...`
-          ),
+          new CustomEmbed(message.member, `removing ${role.toString()} from ${members.length.toLocaleString()} members...`),
         ],
       });
 
@@ -441,12 +381,7 @@ async function run(
           clearInterval(i);
 
           return msg.edit({
-            embeds: [
-              new CustomEmbed(
-                message.member,
-                `removed ${role.toString()} from ${count.toLocaleString()} members`
-              ),
-            ],
+            embeds: [new CustomEmbed(message.member, `removed ${role.toString()} from ${count.toLocaleString()} members`)],
           });
         }
 
@@ -494,10 +429,7 @@ async function run(
 
     return send({
       embeds: [
-        new CustomEmbed(
-          message.member,
-          `removed ${role.toString()} from ${members.length.toLocaleString()} members`
-        ),
+        new CustomEmbed(message.member, `removed ${role.toString()} from ${members.length.toLocaleString()} members`),
       ],
     });
   } else if (args[0].toLowerCase() == "autojoin") {
@@ -528,11 +460,7 @@ async function run(
 
       const embed = new CustomEmbed(
         message.member,
-        `${
-          roles.length > 0
-            ? rolesDisplay.join("\n")
-            : "no roles will automatically be added to new members"
-        }`
+        `${roles.length > 0 ? rolesDisplay.join("\n") : "no roles will automatically be added to new members"}`
       );
 
       return send({ embeds: [embed] });
@@ -636,9 +564,7 @@ async function run(
 
     if (args[1].toLowerCase() == "add") {
       if (roles.includes(chosenRole.id)) {
-        return send({
-          embeds: [new ErrorEmbed("this role is already in the persistant role list")],
-        });
+        return send({ embeds: [new ErrorEmbed("this role is already in the persistant role list")] });
       }
       roles.push(chosenRole.id);
       embed.setDescription(`✅ added ${chosenRole.toString()} to the persistant role list`);
@@ -664,9 +590,7 @@ async function run(
     const role = message.mentions?.roles?.first() || (await getRole(message.guild, args.join(" ")));
 
     if (!role) {
-      return send({
-        embeds: [new ErrorEmbed(`couldnt find a role with the name\`${args.join(" ")}\``)],
-      });
+      return send({ embeds: [new ErrorEmbed(`couldnt find a role with the name\`${args.join(" ")}\``)] });
     }
 
     let members: GuildMember[];
@@ -683,14 +607,10 @@ async function run(
       addCooldown(message.guild, 3600);
     }
 
-    const filteredMembers = members
-      .filter((m) => m.roles.cache.has(role.id))
-      .map((m) => `\`${m.user.tag}\``);
+    const filteredMembers = members.filter((m) => m.roles.cache.has(role.id)).map((m) => `\`${m.user.tag}\``);
 
     if (filteredMembers.length == 0) {
-      return send({
-        embeds: [new CustomEmbed(message.member, `${role.toString()} has no members`)],
-      });
+      return send({ embeds: [new CustomEmbed(message.member, `${role.toString()} has no members`)] });
     }
 
     const pages = PageManager.createPages(filteredMembers);
@@ -702,11 +622,7 @@ async function run(
     let msg: Message;
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder()
-        .setCustomId("⬅")
-        .setLabel("back")
-        .setStyle(ButtonStyle.Primary)
-        .setDisabled(true),
+      new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
       new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
     );
 

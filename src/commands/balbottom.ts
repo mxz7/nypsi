@@ -4,15 +4,9 @@ import { CustomEmbed } from "../models/EmbedBuilders.js";
 import { bottomAmount } from "../utils/functions/economy/balance";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 
-const cmd = new Command("balbottom", "view bottom balances in the server", "money").setAliases([
-  "bottom",
-  "brokeboys",
-]);
+const cmd = new Command("balbottom", "view bottom balances in the server", "money").setAliases(["bottom", "brokeboys"]);
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (await onCooldown(cmd.name, message.member)) {
     const embed = await getResponse(cmd.name, message.member);
 
@@ -33,8 +27,7 @@ async function run(
 
   amount = parseInt(args[0]);
 
-  if (amount > 10 && !message.member.permissions.has(PermissionFlagsBits.Administrator))
-    amount = 10;
+  if (amount > 10 && !message.member.permissions.has(PermissionFlagsBits.Administrator)) amount = 10;
 
   if (amount < 5) amount = 5;
 
@@ -50,9 +43,7 @@ async function run(
     });
   }
 
-  const embed = new CustomEmbed(message.member)
-    .setHeader("bottom " + filtered.length)
-    .setDescription(filtered.join("\n"));
+  const embed = new CustomEmbed(message.member).setHeader("bottom " + filtered.length).setDescription(filtered.join("\n"));
 
   message.channel.send({ embeds: [embed] });
 }

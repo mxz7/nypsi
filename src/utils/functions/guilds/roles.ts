@@ -43,10 +43,7 @@ export async function setAutoJoinRoles(guild: Guild, roles: string[]) {
 export async function getPersistantRoles(guild: Guild) {
   if (persistantRoleCache.has(guild.id)) return persistantRoleCache.get(guild.id);
 
-  const query = await prisma.guild.findUnique({
-    where: { id: guild.id },
-    select: { persist_role: true },
-  });
+  const query = await prisma.guild.findUnique({ where: { id: guild.id }, select: { persist_role: true } });
 
   persistantRoleCache.set(guild.id, query.persist_role);
 

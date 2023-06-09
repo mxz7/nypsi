@@ -9,15 +9,10 @@ const cmd = new Command("snipefilter", "change the snipe filter for your server"
   .setAliases(["sf"])
   .setPermissions(["MANAGE_SERVER"]);
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
     if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
-      return message.channel.send({
-        embeds: [new ErrorEmbed("you need the `manage server` permission")],
-      });
+      return message.channel.send({ embeds: [new ErrorEmbed("you need the `manage server` permission")] });
     }
     return;
   }
@@ -41,27 +36,18 @@ async function run(
   if (args[0].toLowerCase() == "add" || args[0].toLowerCase() == "+") {
     if (args.length == 1) {
       return message.channel.send({
-        embeds: [
-          new ErrorEmbed(
-            `${prefix}sf add/+ <word> | cAsInG doesn't matter, it'll be filtered either way`
-          ),
-        ],
+        embeds: [new ErrorEmbed(`${prefix}sf add/+ <word> | cAsInG doesn't matter, it'll be filtered either way`)],
       });
     }
 
     const word = cleanString(args[1].toString().toLowerCase().normalize("NFD"));
 
     if (word == "" || word == " ") {
-      return message.channel.send({
-        embeds: [new ErrorEmbed("word must contain letters or numbers")],
-      });
+      return message.channel.send({ embeds: [new ErrorEmbed("word must contain letters or numbers")] });
     }
 
     if (filter.indexOf(word) > -1) {
-      const embed = new CustomEmbed(
-        message.member,
-        "❌ `" + word + "` already exists in the filter"
-      )
+      const embed = new CustomEmbed(message.member, "❌ `" + word + "` already exists in the filter")
         .setHeader("snipe filter")
         .setFooter({ text: `you can use ${prefix}sf to view the filter` });
 
@@ -83,10 +69,7 @@ async function run(
 
     await updateSnipeFilter(message.guild, filter);
 
-    const embed = new CustomEmbed(
-      message.member,
-      "✅ added `" + word + "` to the filter"
-    ).setHeader("snipe filter");
+    const embed = new CustomEmbed(message.member, "✅ added `" + word + "` to the filter").setHeader("snipe filter");
     return message.channel.send({ embeds: [embed] });
   }
 
@@ -121,9 +104,7 @@ async function run(
 
     await updateSnipeFilter(message.guild, filter);
 
-    const embed = new CustomEmbed(message.member, "✅ filter has been reset").setHeader(
-      "snipe filter"
-    );
+    const embed = new CustomEmbed(message.member, "✅ filter has been reset").setHeader("snipe filter");
 
     return message.channel.send({ embeds: [embed] });
   }

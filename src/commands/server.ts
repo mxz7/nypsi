@@ -4,15 +4,9 @@ import { CustomEmbed } from "../models/EmbedBuilders.js";
 import { formatDate } from "../utils/functions/date";
 import { addCooldown, getPeaks, inCooldown, runCheck } from "../utils/functions/guilds/utils";
 
-const cmd = new Command("server", "view information about the server", "info").setAliases([
-  "serverinfo",
-  "membercount",
-]);
+const cmd = new Command("server", "view information about the server", "info").setAliases(["serverinfo", "membercount"]);
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   const server = message.guild;
 
   await runCheck(server);
@@ -32,9 +26,7 @@ async function run(
   const bots = members.filter((member) => member.user.bot);
 
   if (args.length == 1 && args[0] == "-id") {
-    const embed = new CustomEmbed(message.member)
-      .setHeader(server.name)
-      .setDescription("`" + server.id + "`");
+    const embed = new CustomEmbed(message.member).setHeader(server.name).setDescription("`" + server.id + "`");
 
     return message.channel.send({ embeds: [embed] });
   }
@@ -61,11 +53,7 @@ async function run(
 
     .addField(
       "info",
-      "**owner** " +
-        server.members.cache.get(server.ownerId).user.tag +
-        "\n" +
-        "**created** " +
-        created,
+      "**owner** " + server.members.cache.get(server.ownerId).user.tag + "\n" + "**created** " + created,
       true
     )
 

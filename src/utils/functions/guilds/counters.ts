@@ -122,9 +122,7 @@ export async function updateChannel(data: GuildCounter, client: NypsiClient) {
           if (channel.isDMBased()) return;
 
           if (channel.guild.memberCount !== channel.guild.members.cache.size) {
-            return Array.from(
-              await channel.guild.members.fetch().then((members) => members.keys())
-            );
+            return Array.from(await channel.guild.members.fetch().then((members) => members.keys()));
           }
           return Array.from(channel.guild.members.cache.keys());
         },
@@ -164,9 +162,7 @@ export async function updateChannel(data: GuildCounter, client: NypsiClient) {
           if (channel.isDMBased()) return;
 
           if (channel.guild.memberCount !== channel.guild.members.cache.size) {
-            return Array.from(
-              await channel.guild.members.fetch().then((members) => members.keys())
-            );
+            return Array.from(await channel.guild.members.fetch().then((members) => members.keys()));
           }
           return Array.from(channel.guild.members.cache.keys());
         },
@@ -205,9 +201,7 @@ export async function updateChannel(data: GuildCounter, client: NypsiClient) {
           if (channel.isDMBased()) return;
 
           if (channel.guild.memberCount !== channel.guild.members.cache.size) {
-            return Array.from(
-              await channel.guild.members.fetch().then((members) => members.keys())
-            );
+            return Array.from(await channel.guild.members.fetch().then((members) => members.keys()));
           }
           return Array.from(channel.guild.members.cache.keys());
         },
@@ -273,12 +267,7 @@ export async function updateChannel(data: GuildCounter, client: NypsiClient) {
   }
 }
 
-export async function createGuildCounter(
-  guild: Guild,
-  mode: TrackingType,
-  item?: string,
-  format?: string
-) {
+export async function createGuildCounter(guild: Guild, mode: TrackingType, item?: string, format?: string) {
   let fail = false;
 
   const everyone = guild.roles.cache.find((r) => r.name == "@everyone");

@@ -70,9 +70,7 @@ export async function getBakeryUpgrades(member: GuildMember | string) {
   }
 
   if (await redis.exists(`${Constants.redis.cache.economy.BAKERY_UPGRADES}:${id}`)) {
-    return JSON.parse(
-      await redis.get(`${Constants.redis.cache.economy.BAKERY_UPGRADES}:${id}`)
-    ) as BakeryUpgrade[];
+    return JSON.parse(await redis.get(`${Constants.redis.cache.economy.BAKERY_UPGRADES}:${id}`)) as BakeryUpgrade[];
   }
 
   const query = await prisma.bakeryUpgrade.findMany({
@@ -82,10 +80,7 @@ export async function getBakeryUpgrades(member: GuildMember | string) {
   });
 
   await redis.set(`${Constants.redis.cache.economy.BAKERY_UPGRADES}:${id}`, JSON.stringify(query));
-  await redis.expire(
-    `${Constants.redis.cache.economy.BAKERY_UPGRADES}:${id}`,
-    Math.floor(ms("1 hour") / 1000)
-  );
+  await redis.expire(`${Constants.redis.cache.economy.BAKERY_UPGRADES}:${id}`, Math.floor(ms("1 hour") / 1000));
 
   return query;
 }
@@ -122,12 +117,9 @@ export async function runBakery(member: GuildMember) {
     click[1] += await getTier(member);
   }
 
-  if (inventory.find((i) => i.item === "blue_gem")?.amount > 0)
-    click[1] += Math.floor(Math.random() * 7);
-  if (inventory.find((i) => i.item === "white_gem")?.amount > 0)
-    click[0] += Math.floor(Math.random() * 3);
-  if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0)
-    click[0] += Math.floor(Math.random() * 5);
+  if (inventory.find((i) => i.item === "blue_gem")?.amount > 0) click[1] += Math.floor(Math.random() * 7);
+  if (inventory.find((i) => i.item === "white_gem")?.amount > 0) click[0] += Math.floor(Math.random() * 3);
+  if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0) click[0] += Math.floor(Math.random() * 5);
 
   const diffMs = Date.now() - lastBaked.getTime();
 
@@ -140,9 +132,7 @@ export async function runBakery(member: GuildMember) {
 
   for (const upgrade of upgrades) {
     if (getBakeryUpgradesData()[upgrade.upgradeId].upgrades === "hourly") {
-      const amount = Math.round(
-        upgrade.amount * getBakeryUpgradesData()[upgrade.upgradeId].value * diffHours
-      );
+      const amount = Math.round(upgrade.amount * getBakeryUpgradesData()[upgrade.upgradeId].value * diffHours);
 
       passive += amount;
 
@@ -193,10 +183,7 @@ export async function runBakery(member: GuildMember) {
   await addInventoryItem(member, "cookie", chosenAmount + passive);
   if (cakeAmount > 0) await addInventoryItem(member, "cake", cakeAmount);
 
-  const embed = new CustomEmbed(member).setHeader(
-    `${member.user.username}'s bakery`,
-    member.user.avatarURL()
-  );
+  const embed = new CustomEmbed(member).setHeader(`${member.user.username}'s bakery`, member.user.avatarURL());
 
   const earnedIds = Array.from(earned.keys());
   inPlaceSort(earnedIds).desc((i) => earned.get(i));
@@ -204,11 +191,9 @@ export async function runBakery(member: GuildMember) {
 
   for (const upgradeId of earnedIds) {
     breakdownDesc.push(
-      `${getBakeryUpgradesData()[upgradeId].emoji} ${
-        getBakeryUpgradesData()[upgradeId].name
-      } baked ${earned.get(upgradeId).toLocaleString()} cookie${
-        earned.get(upgradeId) > 1 ? "s" : ""
-      }`
+      `${getBakeryUpgradesData()[upgradeId].emoji} ${getBakeryUpgradesData()[upgradeId].name} baked ${earned
+        .get(upgradeId)
+        .toLocaleString()} cookie${earned.get(upgradeId) > 1 ? "s" : ""}`
     );
   }
 
@@ -216,15 +201,11 @@ export async function runBakery(member: GuildMember) {
     embed.setDescription(
       `you baked **${(chosenAmount + passive).toLocaleString()}** cookie${
         chosenAmount + passive > 1 ? "s" : ""
-      } 🍪 and **${cakeAmount.toLocaleString()}** cake${cakeAmount > 1 ? "s" : ""} ${
-        getItems()["cake"].emoji
-      } !!`
+      } 🍪 and **${cakeAmount.toLocaleString()}** cake${cakeAmount > 1 ? "s" : ""} ${getItems()["cake"].emoji} !!`
     );
   } else {
     embed.setDescription(
-      `you baked **${(chosenAmount + passive).toLocaleString()}** cookie${
-        chosenAmount + passive > 1 ? "s" : ""
-      } 🍪 !!`
+      `you baked **${(chosenAmount + passive).toLocaleString()}** cookie${chosenAmount + passive > 1 ? "s" : ""} 🍪 !!`
     );
   }
 

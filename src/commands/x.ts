@@ -25,13 +25,7 @@ import { getItems, isEcoBanned, setEcoBan } from "../utils/functions/economy/uti
 import { updateXp } from "../utils/functions/economy/xp";
 import { addKarma, getKarma, removeKarma } from "../utils/functions/karma/karma";
 import { getUserAliases } from "../utils/functions/premium/aliases";
-import {
-  addMember,
-  getPremiumProfile,
-  isPremium,
-  setExpireDate,
-  setTier,
-} from "../utils/functions/premium/premium";
+import { addMember, getPremiumProfile, isPremium, setExpireDate, setTier } from "../utils/functions/premium/premium";
 import { getAdminLevel, setAdminLevel } from "../utils/functions/users/admin";
 import { isUserBlacklisted, setUserBlacklist } from "../utils/functions/users/blacklist";
 import { getCommandUses } from "../utils/functions/users/commands";
@@ -40,17 +34,10 @@ import { logger } from "../utils/logger";
 
 const cmd = new Command("x", "admincmd", "none").setPermissions(["bot owner"]);
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   if (!(message instanceof Message)) return;
   if ((await getAdminLevel(message.author.id)) < 1)
-    return message.react(
-      ["🫦", "💦", "🍑", "🍆", "😩"][
-        Math.floor(Math.random() * ["🫦", "💦", "🍑", "🍆", "😩"].length)
-      ]
-    );
+    return message.react(["🫦", "💦", "🍑", "🍆", "😩"][Math.floor(Math.random() * ["🫦", "💦", "🍑", "🍆", "😩"].length)]);
 
   const getDbData = async (user: User) => {
     logger.info(`fetching data for ${user.id}...`);
@@ -132,9 +119,7 @@ async function run(
 
     await fs.writeFile(
       file,
-      `nypsi data for ${user?.username}#${user?.discriminator} (${user?.id}) requested by ${
-        message.author.tag
-      } ${
+      `nypsi data for ${user?.username}#${user?.discriminator} (${user?.id}) requested by ${message.author.tag} ${
         message.author.id
       } - ${new Date().toUTCString()}\n\n----------\nYOUR USER DATA\n----------\n\n`
     );
@@ -201,88 +186,30 @@ async function run(
 
     const rows: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [
       new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder()
-          .setCustomId("db-data")
-          .setLabel("view all db data")
-          .setStyle(ButtonStyle.Primary)
-          .setEmoji("💻"),
-        new ButtonBuilder()
-          .setCustomId("cmds")
-          .setLabel("command count")
-          .setStyle(ButtonStyle.Primary)
-          .setEmoji("⌨️"),
-        new ButtonBuilder()
-          .setCustomId("view-premium")
-          .setLabel("premium")
-          .setStyle(ButtonStyle.Primary)
-          .setEmoji("💎"),
-        new ButtonBuilder()
-          .setCustomId("set-admin")
-          .setLabel("set admin level")
-          .setStyle(ButtonStyle.Primary)
-          .setEmoji("👨🏻‍💼")
+        new ButtonBuilder().setCustomId("db-data").setLabel("view all db data").setStyle(ButtonStyle.Primary).setEmoji("💻"),
+        new ButtonBuilder().setCustomId("cmds").setLabel("command count").setStyle(ButtonStyle.Primary).setEmoji("⌨️"),
+        new ButtonBuilder().setCustomId("view-premium").setLabel("premium").setStyle(ButtonStyle.Primary).setEmoji("💎"),
+        new ButtonBuilder().setCustomId("set-admin").setLabel("set admin level").setStyle(ButtonStyle.Primary).setEmoji("👨🏻‍💼")
       ),
       new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder()
-          .setCustomId("ac-hist")
-          .setLabel("anticheat info")
-          .setStyle(ButtonStyle.Primary)
-          .setEmoji("🤥"),
-        new ButtonBuilder()
-          .setCustomId("ac-clear")
-          .setLabel("clear violations")
-          .setStyle(ButtonStyle.Primary)
-          .setEmoji("😃")
+        new ButtonBuilder().setCustomId("ac-hist").setLabel("anticheat info").setStyle(ButtonStyle.Primary).setEmoji("🤥"),
+        new ButtonBuilder().setCustomId("ac-clear").setLabel("clear violations").setStyle(ButtonStyle.Primary).setEmoji("😃")
       ),
       new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder()
-          .setCustomId("set-bal")
-          .setLabel("set balance")
-          .setStyle(ButtonStyle.Danger)
-          .setEmoji("💰"),
-        new ButtonBuilder()
-          .setCustomId("set-bank")
-          .setLabel("set bank")
-          .setStyle(ButtonStyle.Danger)
-          .setEmoji("💳"),
-        new ButtonBuilder()
-          .setCustomId("set-prestige")
-          .setLabel("set prestige")
-          .setStyle(ButtonStyle.Danger)
-          .setEmoji("🌟"),
-        new ButtonBuilder()
-          .setCustomId("set-xp")
-          .setLabel("set xp")
-          .setStyle(ButtonStyle.Danger)
-          .setEmoji("✨"),
-        new ButtonBuilder()
-          .setCustomId("set-inv")
-          .setLabel("modify inventory")
-          .setStyle(ButtonStyle.Danger)
-          .setEmoji("🎒")
+        new ButtonBuilder().setCustomId("set-bal").setLabel("set balance").setStyle(ButtonStyle.Danger).setEmoji("💰"),
+        new ButtonBuilder().setCustomId("set-bank").setLabel("set bank").setStyle(ButtonStyle.Danger).setEmoji("💳"),
+        new ButtonBuilder().setCustomId("set-prestige").setLabel("set prestige").setStyle(ButtonStyle.Danger).setEmoji("🌟"),
+        new ButtonBuilder().setCustomId("set-xp").setLabel("set xp").setStyle(ButtonStyle.Danger).setEmoji("✨"),
+        new ButtonBuilder().setCustomId("set-inv").setLabel("modify inventory").setStyle(ButtonStyle.Danger).setEmoji("🎒")
       ),
       new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder()
-          .setCustomId("set-karma")
-          .setLabel("set karma")
-          .setStyle(ButtonStyle.Danger)
-          .setEmoji("🔮"),
-        new ButtonBuilder()
-          .setCustomId("ecoban")
-          .setLabel("economy ban")
-          .setStyle(ButtonStyle.Danger)
-          .setEmoji("❌"),
-        new ButtonBuilder()
-          .setCustomId("blacklist")
-          .setLabel("blacklist")
-          .setStyle(ButtonStyle.Danger)
-          .setEmoji("❌")
+        new ButtonBuilder().setCustomId("set-karma").setLabel("set karma").setStyle(ButtonStyle.Danger).setEmoji("🔮"),
+        new ButtonBuilder().setCustomId("ecoban").setLabel("economy ban").setStyle(ButtonStyle.Danger).setEmoji("❌"),
+        new ButtonBuilder().setCustomId("blacklist").setLabel("blacklist").setStyle(ButtonStyle.Danger).setEmoji("❌")
       ),
     ];
 
-    let desc = `tag: ${user?.username}#${user?.discriminator}\nid: ${
-      user?.id
-    }\ncreated: <t:${Math.floor(
+    let desc = `tag: ${user?.username}#${user?.discriminator}\nid: ${user?.id}\ncreated: <t:${Math.floor(
       user.createdTimestamp / 1000
     )}:R>\nadmin level: ${await getAdminLevel(user.id)}`;
 
@@ -295,9 +222,7 @@ async function run(
       desc += "\n**currently economy banned**";
     }
 
-    const embed = new CustomEmbed(message.member, desc).setHeader(
-      `${user.username}'s discord data`
-    );
+    const embed = new CustomEmbed(message.member, desc).setHeader(`${user.username}'s discord data`);
 
     const msg = await message.channel.send({ embeds: [embed], components: rows });
 
@@ -314,15 +239,11 @@ async function run(
 
       if (res.customId === "db-data") {
         if ((await getAdminLevel(message.author.id)) < 1) {
-          await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **1** to do this")],
-          });
+          await res.editReply({ embeds: [new ErrorEmbed("you require admin level **1** to do this")] });
           return waitForButton();
         }
 
-        logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) viewed ${user.id} db data`
-        );
+        logger.info(`admin: ${message.author.tag} (${message.author.id}) viewed ${user.id} db data`);
 
         const files = [await getDbData(user)];
 
@@ -330,9 +251,7 @@ async function run(
         return waitForButton();
       } else if (res.customId === "cmds") {
         if ((await getAdminLevel(message.author.id)) < 1) {
-          await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **1** to do this")],
-          });
+          await res.editReply({ embeds: [new ErrorEmbed("you require admin level **1** to do this")] });
           return waitForButton();
         }
         const uses = await getCommandUses(user.id);
@@ -347,29 +266,21 @@ async function run(
             .join("\n")}`
         );
 
-        logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) viewed ${user.id} command data`
-        );
+        logger.info(`admin: ${message.author.tag} (${message.author.id}) viewed ${user.id} command data`);
 
         await res.editReply({ embeds: [embed] });
         return waitForButton();
       } else if (res.customId === "view-premium") {
         if ((await getAdminLevel(message.author.id)) < 1) {
-          await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **1** to do this")],
-          });
+          await res.editReply({ embeds: [new ErrorEmbed("you require admin level **1** to do this")] });
           return waitForButton();
         }
-        logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) viewed ${user.id} premium data`
-        );
+        logger.info(`admin: ${message.author.tag} (${message.author.id}) viewed ${user.id} premium data`);
         doPremium(user, res as ButtonInteraction);
         return waitForButton();
       } else if (res.customId === "set-admin") {
         if ((await getAdminLevel(message.author.id)) < 69) {
-          await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **69** to do this")],
-          });
+          await res.editReply({ embeds: [new ErrorEmbed("you require admin level **69** to do this")] });
           return waitForButton();
         }
 
@@ -393,29 +304,21 @@ async function run(
         }
         if (parseInt(msg.content) > (await getAdminLevel(message.author.id))) {
           await res.editReply({
-            embeds: [
-              new CustomEmbed(message.member, "nice try bozo ! suck this dick you wANK STAIN"),
-            ],
+            embeds: [new CustomEmbed(message.member, "nice try bozo ! suck this dick you wANK STAIN")],
           });
           return waitForButton();
         }
-        logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) updated ${user.id} admin level to ${msg.content}`
-        );
+        logger.info(`admin: ${message.author.tag} (${message.author.id}) updated ${user.id} admin level to ${msg.content}`);
         await setAdminLevel(user.id, parseInt(msg.content));
         await res.editReply({ embeds: [new CustomEmbed(message.member, "✅")] });
         return waitForButton();
       } else if (res.customId === "ac-hist") {
         if ((await getAdminLevel(message.author.id)) < 2) {
-          await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **2** to do this")],
-          });
+          await res.editReply({ embeds: [new ErrorEmbed("you require admin level **2** to do this")] });
           return waitForButton();
         }
 
-        logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) viewed ${user.id} ac data`
-        );
+        logger.info(`admin: ${message.author.tag} (${message.author.id}) viewed ${user.id} ac data`);
 
         const data = b(user.id);
 
@@ -435,25 +338,16 @@ async function run(
         );
 
         await res.editReply({
-          files: [
-            {
-              attachment: await fs.readFile(`/tmp/nypsi_ac_${user.id}.txt`),
-              name: `nypsi_ac_${user.id}.txt`,
-            },
-          ],
+          files: [{ attachment: await fs.readFile(`/tmp/nypsi_ac_${user.id}.txt`), name: `nypsi_ac_${user.id}.txt` }],
         });
         return waitForButton();
       } else if (res.customId === "ac-clear") {
         if ((await getAdminLevel(message.author.id)) < 3) {
-          await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **3** to do this")],
-          });
+          await res.editReply({ embeds: [new ErrorEmbed("you require admin level **3** to do this")] });
           return waitForButton();
         }
 
-        logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) cleared ${user.id} violations`
-        );
+        logger.info(`admin: ${message.author.tag} (${message.author.id}) cleared ${user.id} violations`);
 
         c(user.id);
 
@@ -461,9 +355,7 @@ async function run(
         return waitForButton();
       } else if (res.customId === "set-bal") {
         if ((await getAdminLevel(message.author.id)) < 4) {
-          await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
-          });
+          await res.editReply({ embeds: [new ErrorEmbed("you require admin level **4** to do this")] });
           return waitForButton();
         }
 
@@ -493,17 +385,13 @@ async function run(
           return waitForButton();
         }
 
-        logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) set ${user.id} balance to ${msg.content}`
-        );
+        logger.info(`admin: ${message.author.tag} (${message.author.id}) set ${user.id} balance to ${msg.content}`);
         await updateBalance(user.id, parseInt(msg.content));
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "set-bank") {
         if ((await getAdminLevel(message.author.id)) < 4) {
-          await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
-          });
+          await res.editReply({ embeds: [new ErrorEmbed("you require admin level **4** to do this")] });
           return waitForButton();
         }
 
@@ -533,17 +421,13 @@ async function run(
           return waitForButton();
         }
 
-        logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) set ${user.id} bank balance to ${msg.content}`
-        );
+        logger.info(`admin: ${message.author.tag} (${message.author.id}) set ${user.id} bank balance to ${msg.content}`);
         await updateBankBalance(user.id, parseInt(msg.content));
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "set-prestige") {
         if ((await getAdminLevel(message.author.id)) < 4) {
-          await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
-          });
+          await res.editReply({ embeds: [new ErrorEmbed("you require admin level **4** to do this")] });
           return waitForButton();
         }
 
@@ -568,17 +452,13 @@ async function run(
           return waitForButton();
         }
 
-        logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) set ${user.id} prestige to ${msg.content}`
-        );
+        logger.info(`admin: ${message.author.tag} (${message.author.id}) set ${user.id} prestige to ${msg.content}`);
         await setPrestige(user.id, parseInt(msg.content));
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "set-xp") {
         if ((await getAdminLevel(message.author.id)) < 4) {
-          await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
-          });
+          await res.editReply({ embeds: [new ErrorEmbed("you require admin level **4** to do this")] });
           return waitForButton();
         }
 
@@ -603,17 +483,13 @@ async function run(
           return waitForButton();
         }
 
-        logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) set ${user.id} xp to ${msg.content}`
-        );
+        logger.info(`admin: ${message.author.tag} (${message.author.id}) set ${user.id} xp to ${msg.content}`);
         await updateXp(user.id, parseInt(msg.content));
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "set-inv") {
         if ((await getAdminLevel(message.author.id)) < 4) {
-          await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
-          });
+          await res.editReply({ embeds: [new ErrorEmbed("you require admin level **4** to do this")] });
           return waitForButton();
         }
 
@@ -634,9 +510,7 @@ async function run(
 
         if (!msg) return;
 
-        logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) set ${user.id} inventory item to ${msg.content}`
-        );
+        logger.info(`admin: ${message.author.tag} (${message.author.id}) set ${user.id} inventory item to ${msg.content}`);
 
         if (!getItems()[msg.content.split(" ")[0]]) {
           await res.editReply({ embeds: [new CustomEmbed(message.member, "invalid item")] });
@@ -663,18 +537,12 @@ async function run(
           return waitForButton();
         }
 
-        await setInventoryItem(
-          user.id,
-          msg.content.split(" ")[0],
-          parseInt(msg.content.split(" ")[1])
-        );
+        await setInventoryItem(user.id, msg.content.split(" ")[0], parseInt(msg.content.split(" ")[1]));
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "set-karma") {
         if ((await getAdminLevel(message.author.id)) < 4) {
-          await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
-          });
+          await res.editReply({ embeds: [new ErrorEmbed("you require admin level **4** to do this")] });
           return waitForButton();
         }
 
@@ -711,24 +579,18 @@ async function run(
           amount = parseInt(msg.content) - karma;
         }
 
-        logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) set ${user.id} karma to ${msg.content}`
-        );
+        logger.info(`admin: ${message.author.tag} (${message.author.id}) set ${user.id} karma to ${msg.content}`);
         remove ? await removeKarma(user.id, amount) : addKarma(user.id, amount);
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "ecoban") {
         if ((await getAdminLevel(message.author.id)) < 2) {
-          await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **2** to do this")],
-          });
+          await res.editReply({ embeds: [new ErrorEmbed("you require admin level **2** to do this")] });
           return waitForButton();
         }
 
         if (await isEcoBanned(user.id)) {
-          logger.info(
-            `admin: ${message.author.tag} (${message.author.id}) removed ecoban for ${user.id} `
-          );
+          logger.info(`admin: ${message.author.tag} (${message.author.id}) removed ecoban for ${user.id} `);
           await setEcoBan(user.id);
           await res.editReply({ embeds: [new CustomEmbed(message.member, "removed ecoban")] });
           return;
@@ -758,31 +620,23 @@ async function run(
           return waitForButton();
         }
 
-        logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) set ${user.id} ecoban to ${msg.content}`
-        );
+        logger.info(`admin: ${message.author.tag} (${message.author.id}) set ${user.id} ecoban to ${msg.content}`);
         await setEcoBan(user.id, time);
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "blacklist") {
         if ((await getAdminLevel(message.author.id)) < 3) {
-          await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **3** to do this")],
-          });
+          await res.editReply({ embeds: [new ErrorEmbed("you require admin level **3** to do this")] });
           return waitForButton();
         }
 
         if (await isUserBlacklisted(user.id)) {
-          logger.info(
-            `admin: ${message.author.tag} (${message.author.id}) removed blacklist for ${user.id} `
-          );
+          logger.info(`admin: ${message.author.tag} (${message.author.id}) removed blacklist for ${user.id} `);
           await setUserBlacklist(user.id, false);
           await res.editReply({ embeds: [new CustomEmbed(message.member, "user unblacklisted")] });
           return waitForButton();
         } else {
-          logger.info(
-            `admin: ${message.author.tag} (${message.author.id}) added blacklist for ${user.id} `
-          );
+          logger.info(`admin: ${message.author.tag} (${message.author.id}) added blacklist for ${user.id} `);
           await setUserBlacklist(user.id, true);
           await res.editReply({ embeds: [new CustomEmbed(message.member, "user blacklisted")] });
           return waitForButton();
@@ -797,44 +651,24 @@ async function run(
 
     const rows: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [
       new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder()
-          .setCustomId("add-premium")
-          .setLabel("add premium")
-          .setStyle(ButtonStyle.Primary)
-          .setEmoji("➕"),
-        new ButtonBuilder()
-          .setCustomId("set-tier")
-          .setLabel("set tier")
-          .setStyle(ButtonStyle.Primary)
-          .setEmoji("😁"),
+        new ButtonBuilder().setCustomId("add-premium").setLabel("add premium").setStyle(ButtonStyle.Primary).setEmoji("➕"),
+        new ButtonBuilder().setCustomId("set-tier").setLabel("set tier").setStyle(ButtonStyle.Primary).setEmoji("😁"),
         new ButtonBuilder()
           .setCustomId("set-expire")
           .setLabel("set expire date")
           .setStyle(ButtonStyle.Primary)
           .setEmoji("😣"),
-        new ButtonBuilder()
-          .setCustomId("raw-data")
-          .setLabel("view raw data")
-          .setStyle(ButtonStyle.Primary)
-          .setEmoji("🥩")
+        new ButtonBuilder().setCustomId("raw-data").setLabel("view raw data").setStyle(ButtonStyle.Primary).setEmoji("🥩")
       ),
 
       new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder()
-          .setCustomId("del-cmd")
-          .setLabel("delete cmd")
-          .setStyle(ButtonStyle.Danger)
-          .setEmoji("❌"),
+        new ButtonBuilder().setCustomId("del-cmd").setLabel("delete cmd").setStyle(ButtonStyle.Danger).setEmoji("❌"),
         new ButtonBuilder()
           .setCustomId("del-aliases")
           .setLabel("delete aliases")
           .setStyle(ButtonStyle.Danger)
           .setEmoji("❌"),
-        new ButtonBuilder()
-          .setCustomId("expire-now")
-          .setLabel("expire now")
-          .setStyle(ButtonStyle.Danger)
-          .setEmoji("❌")
+        new ButtonBuilder().setCustomId("expire-now").setLabel("expire now").setStyle(ButtonStyle.Danger).setEmoji("❌")
       ),
     ];
 
@@ -846,15 +680,11 @@ async function run(
 
       rows[0].components[0].setDisabled(true);
       desc +=
-        `**level** ${profile.getLevelString()}\n` +
-        `**expires** <t:${Math.floor(profile.expireDate.getTime() / 1000)}>`;
+        `**level** ${profile.getLevelString()}\n` + `**expires** <t:${Math.floor(profile.expireDate.getTime() / 1000)}>`;
 
       embed.setDescription(desc);
       if (aliases.length > 0) {
-        embed.addField(
-          "aliases",
-          aliases.map((i) => `\`${i.alias}\` -> \`${i.command}\``).join("\n")
-        );
+        embed.addField("aliases", aliases.map((i) => `\`${i.alias}\` -> \`${i.command}\``).join("\n"));
       }
     } else {
       rows.forEach((i) => i.components.forEach((j) => j.setDisabled(true)));
@@ -878,9 +708,7 @@ async function run(
 
       if (res.customId === "add-premium") {
         if ((await getAdminLevel(message.author.id)) < 5) {
-          await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **5** to do this")],
-          });
+          await res.editReply({ embeds: [new ErrorEmbed("you require admin level **5** to do this")] });
           return waitForButton();
         }
 
@@ -909,25 +737,19 @@ async function run(
         }
         if (parseInt(msg.content) > 4 || parseInt(msg.content) < 1) {
           await res.editReply({
-            embeds: [
-              new CustomEmbed(message.member, "nice try bozo ! suck this dick you wANK STAIN"),
-            ],
+            embeds: [new CustomEmbed(message.member, "nice try bozo ! suck this dick you wANK STAIN")],
           });
           return waitForButton();
         }
 
-        logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) added ${user.id} premium at level ${msg.content}`
-        );
+        logger.info(`admin: ${message.author.tag} (${message.author.id}) added ${user.id} premium at level ${msg.content}`);
 
         await addMember(user.id, parseInt(msg.content), message.client as NypsiClient);
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "set-tier") {
         if ((await getAdminLevel(message.author.id)) < 5) {
-          await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **5** to do this")],
-          });
+          await res.editReply({ embeds: [new ErrorEmbed("you require admin level **5** to do this")] });
           return waitForButton();
         }
 
@@ -956,25 +778,19 @@ async function run(
         }
         if (parseInt(msg.content) > 4 || parseInt(msg.content) < 1) {
           await res.editReply({
-            embeds: [
-              new CustomEmbed(message.member, "nice try bozo ! suck this dick you wANK STAIN"),
-            ],
+            embeds: [new CustomEmbed(message.member, "nice try bozo ! suck this dick you wANK STAIN")],
           });
           return waitForButton();
         }
 
-        logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) set ${user.id} premium tier to ${msg.content}`
-        );
+        logger.info(`admin: ${message.author.tag} (${message.author.id}) set ${user.id} premium tier to ${msg.content}`);
 
         await setTier(user.id, parseInt(msg.content), message.client as NypsiClient);
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "set-expire") {
         if ((await getAdminLevel(message.author.id)) < 5) {
-          await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **5** to do this")],
-          });
+          await res.editReply({ embeds: [new ErrorEmbed("you require admin level **5** to do this")] });
           return waitForButton();
         }
 
@@ -983,9 +799,7 @@ async function run(
           return waitForButton();
         }
 
-        await res.editReply({
-          embeds: [new CustomEmbed(message.member, "pls use format mm/dd/yyyy")],
-        });
+        await res.editReply({ embeds: [new CustomEmbed(message.member, "pls use format mm/dd/yyyy")] });
 
         const msg = await message.channel
           .awaitMessages({
@@ -1013,9 +827,7 @@ async function run(
         }
 
         logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) set ${
-            user.id
-          } premium expire date to ${date.format()}`
+          `admin: ${message.author.tag} (${message.author.id}) set ${user.id} premium expire date to ${date.format()}`
         );
 
         await setExpireDate(user.id, date.toDate(), message.client as NypsiClient);
@@ -1023,62 +835,40 @@ async function run(
         return waitForButton();
       } else if (res.customId === "raw-data") {
         if ((await getAdminLevel(message.author.id)) < 1) {
-          await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **1** to do this")],
-          });
+          await res.editReply({ embeds: [new ErrorEmbed("you require admin level **1** to do this")] });
           return waitForButton();
         }
-        logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) viewed ${user.id} raw premium data`
-        );
+        logger.info(`admin: ${message.author.tag} (${message.author.id}) viewed ${user.id} raw premium data`);
         const profile = await getPremiumProfile(user.id);
         await res.editReply({
-          embeds: [
-            new CustomEmbed(message.member, `\`\`\`${JSON.stringify(profile, null, 2)}\`\`\``),
-          ],
+          embeds: [new CustomEmbed(message.member, `\`\`\`${JSON.stringify(profile, null, 2)}\`\`\``)],
         });
         return waitForButton();
       } else if (res.customId === "del-cmd") {
         if ((await getAdminLevel(message.author.id)) < 3) {
-          await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **3** to do this")],
-          });
+          await res.editReply({ embeds: [new ErrorEmbed("you require admin level **3** to do this")] });
           return waitForButton();
         }
-        logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) deleted ${user.id} custom command`
-        );
+        logger.info(`admin: ${message.author.tag} (${message.author.id}) deleted ${user.id} custom command`);
         await prisma.premiumCommand.delete({ where: { owner: user.id } }).catch(() => {});
-        await res.editReply({
-          embeds: [new CustomEmbed(message.member, "deleted custom command")],
-        });
+        await res.editReply({ embeds: [new CustomEmbed(message.member, "deleted custom command")] });
         return waitForButton();
       } else if (res.customId === "del-aliases") {
         if ((await getAdminLevel(message.author.id)) < 3) {
-          await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **3** to do this")],
-          });
+          await res.editReply({ embeds: [new ErrorEmbed("you require admin level **3** to do this")] });
           return waitForButton();
         }
-        logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) deleted ${user.id} aliases`
-        );
+        logger.info(`admin: ${message.author.tag} (${message.author.id}) deleted ${user.id} aliases`);
         await prisma.userAlias.deleteMany({ where: { userId: user.id } });
         await redis.del(`${Constants.redis.cache.premium.ALIASES}:${user.id}`);
-        await res.editReply({
-          embeds: [new CustomEmbed(message.member, "deleted all aliases for that user")],
-        });
+        await res.editReply({ embeds: [new CustomEmbed(message.member, "deleted all aliases for that user")] });
         return waitForButton();
       } else if (res.customId === "expire-now") {
         if ((await getAdminLevel(message.author.id)) < 5) {
-          await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **5** to do this")],
-          });
+          await res.editReply({ embeds: [new ErrorEmbed("you require admin level **5** to do this")] });
           return waitForButton();
         }
-        logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) set ${user.id} expire to now`
-        );
+        logger.info(`admin: ${message.author.tag} (${message.author.id}) set ${user.id} expire to now`);
         await setExpireDate(user.id, new Date(0), message.client as NypsiClient);
         await res.editReply({ embeds: [new CustomEmbed(message.member, "done sir.")] });
         return waitForButton();

@@ -1,19 +1,9 @@
-import {
-  BaseMessageOptions,
-  CommandInteraction,
-  InteractionReplyOptions,
-  Message,
-} from "discord.js";
+import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { getBoosters } from "../utils/functions/economy/boosters";
-import {
-  addInventoryItem,
-  gemBreak,
-  getInventory,
-  setInventoryItem,
-} from "../utils/functions/economy/inventory";
+import { addInventoryItem, gemBreak, getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
 import { addStat } from "../utils/functions/economy/stats";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import { percentChance } from "../utils/functions/random";
@@ -31,20 +21,9 @@ veins.set("netherrack", [5, 7, 15, 25]);
 veins.set("gold_nugget", [2, 8, 12, 18, 28]);
 veins.set("quartz", [1, 4, 6, 12]);
 
-const areas = [
-  "cave",
-  "mineshaft",
-  "strip mine",
-  "1x1 hole you dug",
-  "staircase to bedrock",
-  "nether",
-  "nether",
-  "nether",
-];
+const areas = ["cave", "mineshaft", "strip mine", "1x1 hole you dug", "staircase to bedrock", "nether", "nether", "nether"];
 
-const cmd = new Command("mine", "go to a cave and mine", "money").setDocs(
-  "https://docs.nypsi.xyz/economy/minecraft"
-);
+const cmd = new Command("mine", "go to a cave and mine", "money").setDocs("https://docs.nypsi.xyz/economy/minecraft");
 
 cmd.slashEnabled = true;
 
@@ -92,15 +71,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   let pickaxe: string;
 
-  if (
-    inventory.find((i) => i.item == "diamond_pickaxe") &&
-    inventory.find((i) => i.item == "diamond_pickaxe").amount > 0
-  ) {
+  if (inventory.find((i) => i.item == "diamond_pickaxe") && inventory.find((i) => i.item == "diamond_pickaxe").amount > 0) {
     pickaxe = "diamond_pickaxe";
-  } else if (
-    inventory.find((i) => i.item == "iron_pickaxe") &&
-    inventory.find((i) => i.item == "iron_pickaxe").amount > 0
-  ) {
+  } else if (inventory.find((i) => i.item == "iron_pickaxe") && inventory.find((i) => i.item == "iron_pickaxe").amount > 0) {
     pickaxe = "iron_pickaxe";
   } else if (
     inventory.find((i) => i.item == "wooden_pickaxe") &&
@@ -112,9 +85,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (!pickaxe) {
     return send({
       embeds: [
-        new ErrorEmbed(
-          "you need a pickaxe to mine\n[how do i get a pickaxe?](https://docs.nypsi.xyz/economy/minecraft)"
-        ),
+        new ErrorEmbed("you need a pickaxe to mine\n[how do i get a pickaxe?](https://docs.nypsi.xyz/economy/minecraft)"),
       ],
     });
   }
@@ -189,12 +160,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   }
 
   if (!unbreakable) {
-    await setInventoryItem(
-      message.member,
-      pickaxe,
-      inventory.find((i) => i.item == pickaxe).amount - 1,
-      false
-    );
+    await setInventoryItem(message.member, pickaxe, inventory.find((i) => i.item == pickaxe).amount - 1, false);
   }
 
   let chosenArea: string;
@@ -226,8 +192,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     for (const i of mineItems) {
       if (items[i]) {
         if (chosenArea == "nether") {
-          if (!["netherrack", "ancient_debris", "quartz", "gold_nugget"].includes(items[i].id))
-            continue;
+          if (!["netherrack", "ancient_debris", "quartz", "gold_nugget"].includes(items[i].id)) continue;
         } else {
           if (
             ![
@@ -317,10 +282,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     foundItems.set(chosen, foundItems.has(chosen) ? foundItems.get(chosen) + amount : amount);
   }
 
-  const embed = new CustomEmbed(
-    message.member,
-    `you go to the ${chosenArea} and swing your **${items[pickaxe].name}**`
-  );
+  const embed = new CustomEmbed(message.member, `you go to the ${chosenArea} and swing your **${items[pickaxe].name}**`);
 
   const msg = await send({ embeds: [embed] });
 

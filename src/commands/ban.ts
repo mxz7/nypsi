@@ -14,25 +14,14 @@ import { newBan } from "../utils/functions/moderation/ban";
 import { newCase } from "../utils/functions/moderation/cases";
 import { createProfile, profileExists } from "../utils/functions/moderation/utils";
 
-const cmd = new Command(
-  "ban",
-  "ban one or more users from the server",
-  "moderation"
-).setPermissions(["BAN_MEMBERS"]);
+const cmd = new Command("ban", "ban one or more users from the server", "moderation").setPermissions(["BAN_MEMBERS"]);
 
 cmd.slashEnabled = true;
 cmd.slashData
-  .addUserOption((option) =>
-    option.setName("user").setDescription("member to ban from the server").setRequired(true)
-  )
-  .addStringOption((option) =>
-    option.setName("reason").setDescription("reason for the ban").setRequired(false)
-  );
+  .addUserOption((option) => option.setName("user").setDescription("member to ban from the server").setRequired(true))
+  .addStringOption((option) => option.setName("reason").setDescription("reason for the ban").setRequired(false));
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       let usedNewMessage = false;
@@ -155,9 +144,7 @@ async function run(
     const memberHighestRole = message.member.roles.highest;
 
     if (targetHighestRole >= memberHighestRole && message.author.id !== message.guild.ownerId) {
-      return send({
-        embeds: [new ErrorEmbed(`your role is not high enough to punish ${target.toString()}`)],
-      });
+      return send({ embeds: [new ErrorEmbed(`your role is not high enough to punish ${target.toString()}`)] });
     }
 
     if (target.user.id == message.client.user.id) {
@@ -236,9 +223,7 @@ async function run(
     if (reason.split(": ")[1] == "no reason given") {
       await target
         .send({
-          content: `you have been banned from ${message.guild.name}${
-            temporary ? `\n\nexpires in **${banLength}**}` : ""
-          }`,
+          content: `you have been banned from ${message.guild.name}${temporary ? `\n\nexpires in **${banLength}**}` : ""}`,
         })
         .catch(() => {});
     } else {
@@ -252,9 +237,7 @@ async function run(
         embed.setTimestamp(unbanDate);
       }
 
-      await target
-        .send({ content: `you have been banned from ${message.guild.name}`, embeds: [embed] })
-        .catch(() => {});
+      await target.send({ content: `you have been banned from ${message.guild.name}`, embeds: [embed] }).catch(() => {});
     }
   }
 }

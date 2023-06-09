@@ -3,10 +3,7 @@ import { CustomEmbed } from "../models/EmbedBuilders";
 import { addLog, isLogsEnabled } from "../utils/functions/moderation/logs";
 import dayjs = require("dayjs");
 
-export default async function messageDeleteBulk(
-  messages: Collection<Snowflake, Message>,
-  channel: TextBasedChannel
-) {
+export default async function messageDeleteBulk(messages: Collection<Snowflake, Message>, channel: TextBasedChannel) {
   if (channel.isDMBased()) return;
 
   if (await isLogsEnabled(channel.guild)) {
@@ -19,9 +16,7 @@ export default async function messageDeleteBulk(
     messages.each((message) => {
       if (message.content) {
         desc.push(
-          `[${dayjs(message.createdTimestamp).format("YYYY-MM-DD HH:mm:ss")}] ${
-            message.author.tag
-          }: ${message.content}`
+          `[${dayjs(message.createdTimestamp).format("YYYY-MM-DD HH:mm:ss")}] ${message.author.tag}: ${message.content}`
         );
       }
 

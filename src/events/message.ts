@@ -29,11 +29,7 @@ import { getKarma } from "../utils/functions/karma/karma";
 import { addMuteViolation } from "../utils/functions/moderation/mute";
 import { isPremium } from "../utils/functions/premium/premium";
 import { encrypt } from "../utils/functions/string";
-import {
-  createSupportRequest,
-  getSupportRequest,
-  sendToRequestChannel,
-} from "../utils/functions/supportrequest";
+import { createSupportRequest, getSupportRequest, sendToRequestChannel } from "../utils/functions/supportrequest";
 import { isUserBlacklisted } from "../utils/functions/users/blacklist";
 import { getLastCommand } from "../utils/functions/users/commands";
 import { MentionQueueItem, mentionQueue } from "../utils/functions/users/mentions";
@@ -51,9 +47,7 @@ export default async function messageCreate(message: Message) {
     logger.info("message in DM from " + message.author.tag + ": " + message.content);
 
     if (await isUserBlacklisted(message.author.id))
-      return message.reply({
-        content: "you are blacklisted from nypsi. this punishment will not be removed.",
-      });
+      return message.reply({ content: "you are blacklisted from nypsi. this punishment will not be removed." });
 
     if (await redis.exists(`${Constants.redis.cooldown.SUPPORT}:${message.author.id}`)) {
       return message.reply({
@@ -83,17 +77,10 @@ export default async function messageCreate(message: Message) {
         );
 
       const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder()
-          .setCustomId("s")
-          .setLabel("talk to a staff member")
-          .setStyle(ButtonStyle.Danger)
+        new ButtonBuilder().setCustomId("s").setLabel("talk to a staff member").setStyle(ButtonStyle.Danger)
       );
 
-      const msg = await message.reply({
-        content: "discord.gg/hJTDNST",
-        embeds: [embed],
-        components: [row],
-      });
+      const msg = await message.reply({ content: "discord.gg/hJTDNST", embeds: [embed], components: [row] });
 
       const filter = (i: Interaction) => i.user.id == message.author.id;
 
@@ -109,22 +96,14 @@ export default async function messageCreate(message: Message) {
 
         if (a) return;
 
-        const r = await createSupportRequest(
-          message.author.id,
-          message.client as NypsiClient,
-          message.author.username
-        );
+        const r = await createSupportRequest(message.author.id, message.client as NypsiClient, message.author.username);
 
         if (!r) {
-          return res.followUp({
-            embeds: [new CustomEmbed().setDescription("failed to create support request")],
-          });
+          return res.followUp({ embeds: [new CustomEmbed().setDescription("failed to create support request")] });
         } else {
           return res.followUp({
             embeds: [
-              new CustomEmbed().setDescription(
-                "✅ created support request, you can now talk directly to nypsi staff"
-              ),
+              new CustomEmbed().setDescription("✅ created support request, you can now talk directly to nypsi staff"),
             ],
           });
         }
@@ -142,11 +121,7 @@ export default async function messageCreate(message: Message) {
         embed.setImage(message.attachments.first().url);
       }
 
-      const res = await sendToRequestChannel(
-        message.author.id,
-        embed,
-        message.client as NypsiClient
-      );
+      const res = await sendToRequestChannel(message.author.id, embed, message.client as NypsiClient);
 
       if (res) {
         return await message.react("✅");
@@ -176,23 +151,15 @@ export default async function messageCreate(message: Message) {
 
   if (message.client.user.id == "685193083570094101") prefix = "£";
 
-  if (
-    message.content == `<@!${message.client.user.id}>` ||
-    message.content == `<@${message.client.user.id}>`
-  ) {
-    return message.channel
-      .send({ content: `my prefix for this server is \`${prefix}\`` })
-      .catch(() => {
-        return message.member.send({
-          content: `my prefix for this server is \`${prefix}\` -- i do not have permission to send messages in that channel`,
-        });
+  if (message.content == `<@!${message.client.user.id}>` || message.content == `<@${message.client.user.id}>`) {
+    return message.channel.send({ content: `my prefix for this server is \`${prefix}\`` }).catch(() => {
+      return message.member.send({
+        content: `my prefix for this server is \`${prefix}\` -- i do not have permission to send messages in that channel`,
       });
+    });
   }
 
-  if (
-    (await hasGuild(message.guild)) &&
-    !message.member.permissions.has(PermissionsBitField.Flags.ManageMessages)
-  ) {
+  if ((await hasGuild(message.guild)) && !message.member.permissions.has(PermissionsBitField.Flags.ManageMessages)) {
     const res = await checkMessageContent(message);
 
     if (!res) {
@@ -219,17 +186,13 @@ export default async function messageCreate(message: Message) {
         (await getLastCommand(message.guild.ownerId)).getTime() >= Date.now() - ms("30 days"))
     ) {
       if (message.mentions.everyone) {
-        if (
-          !inCooldown(message.guild) &&
-          message.guild.members.cache.size != message.guild.memberCount
-        ) {
+        if (!inCooldown(message.guild) && message.guild.members.cache.size != message.guild.memberCount) {
           await message.guild.members.fetch();
           addCooldown(message.guild, 3600);
         }
 
         // @ts-expect-error TYPESCRIPT STUPID IT WILL NOT BE DMCHANNEL
-        let members: Collection<string, GuildMember | ThreadMember> | ThreadMemberManager =
-          message.channel.members;
+        let members: Collection<string, GuildMember | ThreadMember> | ThreadMemberManager = message.channel.members;
 
         if (members instanceof ThreadMemberManager) {
           members = members.cache;
@@ -250,10 +213,7 @@ export default async function messageCreate(message: Message) {
         }
       } else {
         if (message.mentions.roles.first()) {
-          if (
-            !inCooldown(message.guild) &&
-            message.guild.members.cache.size != message.guild.memberCount
-          ) {
+          if (!inCooldown(message.guild) && message.guild.members.cache.size != message.guild.memberCount) {
             await message.guild.members.fetch();
             addCooldown(message.guild, 3600);
           }
@@ -289,9 +249,7 @@ export default async function messageCreate(message: Message) {
             try {
               if ((message.channel as TextChannel).members?.keys()) {
                 if (
-                  !Array.from((message.channel as TextChannel).members.keys()).includes(
-                    message.mentions.members.first().id
-                  )
+                  !Array.from((message.channel as TextChannel).members.keys()).includes(message.mentions.members.first().id)
                 ) {
                   return; // return if user doesnt have access to channel
                 }
@@ -399,9 +357,7 @@ async function addMention() {
         return;
       }
       workerCount++;
-      logger.debug(
-        `${members.size.toLocaleString()} mentions being inserted with worker.. (${workerCount})`
-      );
+      logger.debug(`${members.size.toLocaleString()} mentions being inserted with worker.. (${workerCount})`);
       const start = Date.now();
       const res = await doCollection(mention).catch((e) => {
         logger.error("error inserting mentions with worker");
@@ -410,14 +366,10 @@ async function addMention() {
       workerCount--;
 
       if (res == 0) {
-        logger.debug(
-          `${members.size.toLocaleString()} mentions inserted in ${(Date.now() - start) / 1000}s`
-        );
+        logger.debug(`${members.size.toLocaleString()} mentions inserted in ${(Date.now() - start) / 1000}s`);
       } else {
         logger.warn("worker timed out");
-        logger.debug(
-          `${members.size.toLocaleString()} mentions inserted in ${(Date.now() - start) / 1000}s`
-        );
+        logger.debug(`${members.size.toLocaleString()} mentions inserted in ${(Date.now() - start) / 1000}s`);
       }
 
       return;

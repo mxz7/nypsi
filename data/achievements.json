@@ -821,13 +821,7 @@
     "emoji": "<:xnypsi:819957267548864543>",
     "target": 500000,
     "description": "use 500,000 nypsi commands",
-    "prize": [
-      "crystal_heart:1",
-      "gem_crate:2",
-      "nypsi_crate:3",
-      "legendary_scratch_card:5",
-      "platinum_credit:2"
-    ]
+    "prize": ["crystal_heart:1", "gem_crate:2", "nypsi_crate:3", "legendary_scratch_card:5", "platinum_credit:2"]
   },
   "fighter_i": {
     "id": "fighter_i",

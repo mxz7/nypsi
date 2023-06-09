@@ -91,10 +91,7 @@ export async function hasGuild(guild: Guild): Promise<boolean> {
 
   if (query) {
     await redis.set(`${Constants.redis.cache.guild.EXISTS}:${guild.id}`, "1");
-    await redis.expire(
-      `${Constants.redis.cache.guild.EXISTS}:${guild.id}`,
-      Math.floor(ms("24 hour") / 1000)
-    );
+    await redis.expire(`${Constants.redis.cache.guild.EXISTS}:${guild.id}`, Math.floor(ms("24 hour") / 1000));
     return true;
   } else {
     return false;
@@ -122,10 +119,7 @@ export async function createGuild(guild: Guild) {
   });
 
   await redis.set(`${Constants.redis.cache.guild.EXISTS}:${guild.id}`, 1);
-  await redis.expire(
-    `${Constants.redis.cache.guild.EXISTS}:${guild.id}`,
-    Math.floor(ms("24 hour") / 1000)
-  );
+  await redis.expire(`${Constants.redis.cache.guild.EXISTS}:${guild.id}`, Math.floor(ms("24 hour") / 1000));
 }
 
 export function addCooldown(guild: Guild, seconds: number) {

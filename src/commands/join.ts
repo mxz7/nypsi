@@ -14,9 +14,7 @@ import { addCooldown, inCooldown } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
 import workerSort from "../utils/functions/workers/sort";
 
-const cmd = new Command("join", "view your join position in the server", "info").setAliases([
-  "joined",
-]);
+const cmd = new Command("join", "view your join position in the server", "info").setAliases(["joined"]);
 
 cmd.slashEnabled = true;
 cmd.slashData.addUserOption((option) =>
@@ -25,10 +23,7 @@ cmd.slashData.addUserOption((option) =>
 
 const sortCache = new Map<string, string[]>();
 
-async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
-) {
+async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
   let member: GuildMember;
 
   if (args.length == 0) {
@@ -85,10 +80,7 @@ async function run(
 
   let membersSorted: string[] = [];
 
-  if (
-    sortCache.has(message.guild.id) &&
-    sortCache.get(message.guild.id).length == message.guild.memberCount
-  ) {
+  if (sortCache.has(message.guild.id) && sortCache.get(message.guild.id).length == message.guild.memberCount) {
     membersSorted = sortCache.get(message.guild.id);
   } else if (message.guild.memberCount < 69420) {
     const membersMap = new Map<string, number>();
@@ -104,12 +96,7 @@ async function run(
       let msg;
       if (message instanceof Message) {
         msg = await send({
-          embeds: [
-            new CustomEmbed(
-              message.member,
-              `sorting ${membersSorted.length.toLocaleString()} members..`
-            ),
-          ],
+          embeds: [new CustomEmbed(message.member, `sorting ${membersSorted.length.toLocaleString()} members..`)],
         });
       }
       membersSorted = await workerSort(membersSorted, membersMap);

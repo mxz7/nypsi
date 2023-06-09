@@ -28,10 +28,7 @@ export async function isPassive(member: GuildMember | string) {
   });
 
   await redis.set(`${Constants.redis.cache.economy.PASSIVE}:${id}`, query.passive ? "t" : "f");
-  await redis.expire(
-    `${Constants.redis.cache.economy.PASSIVE}:${id}`,
-    Math.floor(ms("6 hours") / 1000)
-  );
+  await redis.expire(`${Constants.redis.cache.economy.PASSIVE}:${id}`, Math.floor(ms("6 hours") / 1000));
 
   return query.passive;
 }
