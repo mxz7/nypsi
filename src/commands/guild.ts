@@ -890,8 +890,10 @@ async function run(
 
     const cost =
       selected.cost +
-      (guild.upgrades.find((i) => i.upgradeId === selected.id)?.amount || 0) *
-        selected.increment_per_level;
+      Math.floor(
+        (guild.upgrades.find((i) => i.upgradeId === selected.id)?.amount || 0) *
+          selected.increment_per_level
+      );
 
     if (guild.tokens < cost)
       return send({ embeds: [new ErrorEmbed("you cannot afford this upgrade")] });
@@ -924,11 +926,16 @@ async function run(
     for (const upgrade of Object.values(upgrades)) {
       const name = upgrade.id;
       const value =
-        `**${upgrade.name}** (${guild.upgrades.find((i) => i.upgradeId)?.amount || 0})\n` +
+        `**${upgrade.name}** (${
+          guild.upgrades.find((i) => i.upgradeId === upgrade.id)?.amount || 0
+        })\n` +
         `*${upgrade.description}*\n` +
         `**cost** ${
           upgrade.cost +
-          (guild.upgrades.find((i) => i.upgradeId)?.amount || 0) * upgrade.increment_per_level
+          Math.floor(
+            (guild.upgrades.find((i) => i.upgradeId === upgrade.id)?.amount || 0) *
+              upgrade.increment_per_level
+          )
         } tokens`;
 
       if (pages.size === 0) {

@@ -266,11 +266,11 @@ export async function getRequiredForGuildUpgrade(name: string): Promise<GuildUpg
 
   const guild = await getGuildByName(name);
 
-  const baseMoney = 3000000 * Math.pow(guild.level, 2.07);
-  const baseXP = 1750 * Math.pow(guild.level, 1.77);
+  const baseMoney = 3000000 * Math.pow(guild.level, 2.77);
+  const baseXP = 1750 * Math.pow(guild.level, 2.07);
 
-  const bonusMoney = 100000 * guild.members.length;
-  const bonusXP = 75 * guild.members.length;
+  const bonusMoney = 1000000 * guild.members.length;
+  const bonusXP = 2500 * guild.members.length;
 
   await redis.set(
     `${Constants.redis.cache.economy.GUILD_REQUIREMENTS}:${name}`,

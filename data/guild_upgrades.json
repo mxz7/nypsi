@@ -11,7 +11,7 @@
     "name": "max bet increase",
     "description": "+25k maxbet",
     "cost": 1,
-    "increment_per_level": 0
+    "increment_per_level": 0.5
   },
   "multi": {
     "id": "multi",
