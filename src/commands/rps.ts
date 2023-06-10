@@ -1,9 +1,21 @@
-import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions } from "discord.js";
+import {
+  BaseMessageOptions,
+  CommandInteraction,
+  InteractionReplyOptions,
+  Message,
+  MessageEditOptions,
+} from "discord.js";
 import redis from "../init/redis";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants.js";
-import { calcMaxBet, getBalance, getDefaultBet, getGambleMulti, updateBalance } from "../utils/functions/economy/balance.js";
+import {
+  calcMaxBet,
+  getBalance,
+  getDefaultBet,
+  getGambleMulti,
+  updateBalance,
+} from "../utils/functions/economy/balance.js";
 import { addToGuildXP, getGuildByUser } from "../utils/functions/economy/guilds.js";
 import { createGame } from "../utils/functions/economy/stats";
 import { createUser, formatBet, userExists } from "../utils/functions/economy/utils.js";
@@ -13,7 +25,9 @@ import { shuffle } from "../utils/functions/random";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 import { gamble } from "../utils/logger.js";
 
-const cmd = new Command("rps", "play rock paper scissors", "money").setAliases(["rockpaperscissors"]);
+const cmd = new Command("rps", "play rock paper scissors", "money").setAliases([
+  "rockpaperscissors",
+]);
 
 cmd.slashEnabled = true;
 cmd.slashData
@@ -28,9 +42,14 @@ cmd.slashData
         { name: "✂ scissors", value: "scissors" }
       )
   )
-  .addStringOption((option) => option.setName("bet").setDescription("how much would you like to bet").setRequired(false));
+  .addStringOption((option) =>
+    option.setName("bet").setDescription("how much would you like to bet").setRequired(false)
+  );
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[]
+) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       let usedNewMessage = false;
@@ -80,7 +99,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       .addField("usage", `${prefix}rps <**r**ock/**p**aper/**s**cissors> <bet>`)
       .addField(
         "help",
-        "rock paper scissors works exactly how this game does in real life\n" + "**2**x multiplier for winning"
+        "rock paper scissors works exactly how this game does in real life\n" +
+          "**2**x multiplier for winning"
       );
 
     return send({ embeds: [embed] });
@@ -89,7 +109,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   let choice = args[0];
   let memberEmoji = "";
 
-  if (choice != "rock" && choice != "paper" && choice != "scissors" && choice != "r" && choice != "p" && choice != "s") {
+  if (
+    choice != "rock" &&
+    choice != "paper" &&
+    choice != "scissors" &&
+    choice != "r" &&
+    choice != "p" &&
+    choice != "s"
+  ) {
     return send({
       embeds: [new ErrorEmbed(`${prefix}rps <**r**ock/**p**aper/**s**cissors> <bet>`)],
     });
@@ -130,7 +157,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (bet > maxBet) {
     return send({
       embeds: [
-        new ErrorEmbed(`your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`),
+        new ErrorEmbed(
+          `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
+        ),
       ],
     });
   }
@@ -192,7 +221,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     winnings -= bet;
 
     if (multi > 0) {
-      await updateBalance(message.member, (await getBalance(message.member)) + winnings + Math.round(winnings * multi));
+      await updateBalance(
+        message.member,
+        (await getBalance(message.member)) + winnings + Math.round(winnings * multi)
+      );
       winnings = winnings + Math.round(winnings * multi);
     } else {
       await updateBalance(message.member, (await getBalance(message.member)) + winnings);
@@ -242,7 +274,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       if (multi > 0) {
         embed.addField(
           "**winner!!**",
-          "**you win** $" + winnings.toLocaleString() + "\n" + "+**" + Math.round(multi * 100).toString() + "**% bonus"
+          "**you win** $" +
+            winnings.toLocaleString() +
+            "\n" +
+            "+**" +
+            Math.round(multi * 100).toString() +
+            "**% bonus"
         );
       } else {
         embed.addField("**winner!!**", "**you win** $" + winnings.toLocaleString());

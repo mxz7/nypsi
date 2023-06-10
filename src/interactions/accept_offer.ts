@@ -6,7 +6,11 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { InteractionHandler } from "../types/InteractionHandler";
 import Constants from "../utils/Constants";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
-import { addInventoryItem, getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
+import {
+  addInventoryItem,
+  getInventory,
+  setInventoryItem,
+} from "../utils/functions/economy/inventory";
 import { checkOffer } from "../utils/functions/economy/offers";
 import { getItems, isEcoBanned } from "../utils/functions/economy/utils";
 import { isPremium } from "../utils/functions/premium/premium";
@@ -64,7 +68,9 @@ export default {
       inventory.find((i) => i.item === offer.itemId).amount < offer.itemAmount
     ) {
       await redis.del(`${Constants.redis.nypsi.OFFER_PROCESS}:${interaction.user.id}`);
-      return interaction.editReply({ embeds: [new ErrorEmbed("you don't have the items for this offer")] });
+      return interaction.editReply({
+        embeds: [new ErrorEmbed("you don't have the items for this offer")],
+      });
     }
 
     await prisma.offer.update({
@@ -91,7 +97,10 @@ export default {
       taxedAmount = Math.floor(Number(offer.money) * tax);
 
     await addToNypsiBank(taxedAmount);
-    await updateBalance(interaction.user.id, (await getBalance(interaction.user.id)) + (Number(offer.money) - taxedAmount));
+    await updateBalance(
+      interaction.user.id,
+      (await getBalance(interaction.user.id)) + (Number(offer.money) - taxedAmount)
+    );
     await addInventoryItem(offer.ownerId, offer.itemId, Number(offer.itemAmount));
 
     await interaction.editReply({
@@ -123,7 +132,9 @@ export default {
     }
 
     for (const testOffer of await prisma.offer.findMany({
-      where: { AND: [{ targetId: interaction.user.id }, { itemId: offer.itemId }, { sold: false }] },
+      where: {
+        AND: [{ targetId: interaction.user.id }, { itemId: offer.itemId }, { sold: false }],
+      },
     })) {
       await checkOffer(testOffer, interaction.client as NypsiClient);
     }
@@ -135,6 +146,10 @@ export default {
       await interaction.client.users.fetch(offer.ownerId),
       `${offer.itemAmount}x ${offer.itemId}`
     );
-    transaction(await interaction.client.users.fetch(offer.ownerId), interaction.user, `$${offer.money.toLocaleString()}`);
+    transaction(
+      await interaction.client.users.fetch(offer.ownerId),
+      interaction.user,
+      `$${offer.money.toLocaleString()}`
+    );
   },
 } as InteractionHandler;

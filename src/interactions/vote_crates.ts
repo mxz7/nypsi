@@ -1,4 +1,9 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder } from "discord.js";
+import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  MessageActionRowComponentBuilder,
+} from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { InteractionHandler } from "../types/InteractionHandler";
@@ -35,7 +40,9 @@ export default {
       !inventory.find((i) => i.item === "vote_crate") ||
       inventory.find((i) => i.item === "vote_crate")?.amount < crateAmount
     ) {
-      return interaction.reply({ embeds: [new ErrorEmbed(`you do not have ${crateAmount} vote crates`)] });
+      return interaction.reply({
+        embeds: [new ErrorEmbed(`you do not have ${crateAmount} vote crates`)],
+      });
     }
 
     await interaction.deferReply();
@@ -93,7 +100,11 @@ export default {
       return interaction.editReply({ embeds: [embed] });
     } else {
       const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
+        new ButtonBuilder()
+          .setCustomId("⬅")
+          .setLabel("back")
+          .setStyle(ButtonStyle.Primary)
+          .setDisabled(true),
         new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
       );
 

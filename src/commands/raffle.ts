@@ -3,9 +3,16 @@ import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command("raffle", "select a random user all server members or from a specific role", "fun");
+const cmd = new Command(
+  "raffle",
+  "select a random user all server members or from a specific role",
+  "fun"
+);
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[]
+) {
   if (await onCooldown(cmd.name, message.member)) {
     const embed = await getResponse(cmd.name, message.member);
 
@@ -19,10 +26,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (args.length == 0) {
     members = Array.from(message.guild.members.cache.keys());
   } else {
-    const role = message.guild.roles.cache.find((r) => r.name.toLowerCase().includes(args.join(" ").toLowerCase()));
+    const role = message.guild.roles.cache.find((r) =>
+      r.name.toLowerCase().includes(args.join(" ").toLowerCase())
+    );
 
     if (!role) {
-      return await message.channel.send({ embeds: [new ErrorEmbed("i wasn't able to find that role")] });
+      return await message.channel.send({
+        embeds: [new ErrorEmbed("i wasn't able to find that role")],
+      });
     }
 
     members = Array.from(role.members.keys());

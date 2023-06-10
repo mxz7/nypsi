@@ -7,7 +7,10 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 
 const cmd = new Command("ddos", "ddos other users (fake)", "fun").setAliases(["hitoff"]);
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[]
+) {
   if (await onCooldown(cmd.name, message.member)) {
     const embed = await getResponse(cmd.name, message.member);
 
@@ -48,13 +51,25 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   return message.channel.send({ embeds: [embed] }).then((m) => {
     embed.setDescription(
-      member.user.toString() + "\n\n" + `**ip** *${ip}*` + "\n" + "**port** *scanning..*" + "\n\n" + "**status** *online*"
+      member.user.toString() +
+        "\n\n" +
+        `**ip** *${ip}*` +
+        "\n" +
+        "**port** *scanning..*" +
+        "\n\n" +
+        "**status** *online*"
     );
 
     setTimeout(() => {
       m.edit({ embeds: [embed] }).then(() => {
         embed.setDescription(
-          member.user.toString() + "\n\n" + `**ip** *${ip}*` + "\n" + `**port** *${port}*` + "\n\n" + "**status** *online*"
+          member.user.toString() +
+            "\n\n" +
+            `**ip** *${ip}*` +
+            "\n" +
+            `**port** *${port}*` +
+            "\n\n" +
+            "**status** *online*"
         );
 
         setTimeout(() => {

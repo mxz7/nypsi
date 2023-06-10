@@ -19,9 +19,9 @@ export default async function messageDelete(message: Message) {
       embed.setHeader(message.author.tag, message.author.avatarURL());
       embed.setTitle("message deleted");
       embed.setDescription(
-        `${message.member.toString()} \`${message.author.id}\`\n\n**channel** ${message.channel.toString()} \`${
-          message.channelId
-        }\``
+        `${message.member.toString()} \`${
+          message.author.id
+        }\`\n\n**channel** ${message.channel.toString()} \`${message.channelId}\``
       );
       embed.addField("content", `\`\`\`${message.content}\`\`\``);
 

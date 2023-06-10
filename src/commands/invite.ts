@@ -2,7 +2,9 @@ import { CommandInteraction, Message } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders.js";
 
-const cmd = new Command("invite", "generate an invite link for the bot", "info").setAliases(["bot"]);
+const cmd = new Command("invite", "generate an invite link for the bot", "info").setAliases([
+  "bot",
+]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
   const embed = new CustomEmbed(

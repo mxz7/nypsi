@@ -17,7 +17,10 @@ interface PageManagerOptions<T> {
   embed: CustomEmbed;
   updateEmbed?: (page: any[], embed: CustomEmbed) => CustomEmbed;
   userId: string;
-  handleResponses?: Map<string, (manager: PageManager<T>, interaction: ButtonInteraction) => Promise<void>>;
+  handleResponses?: Map<
+    string,
+    (manager: PageManager<T>, interaction: ButtonInteraction) => Promise<void>
+  >;
   onPageUpdate?: (manager: PageManager<T>) => CustomEmbed;
 }
 
@@ -50,7 +53,10 @@ export default class PageManager<T> {
   public updatePageFunc: (page: T[], embed: CustomEmbed) => CustomEmbed;
 
   private filter: (i: Interaction) => boolean;
-  private handleResponses: Map<string, (manager: PageManager<T>, interaction: ButtonInteraction) => Promise<void>>;
+  private handleResponses: Map<
+    string,
+    (manager: PageManager<T>, interaction: ButtonInteraction) => Promise<void>
+  >;
   private onPageUpdate: (manager: PageManager<T>) => CustomEmbed;
 
   constructor(opts: PageManagerOptions<T>) {
@@ -88,7 +94,10 @@ export default class PageManager<T> {
     if (manager.updatePageFunc) {
       manager.embed = manager.updatePageFunc(manager.pages.get(manager.currentPage), manager.embed);
     } else {
-      manager.embed = PageManager.defaultUpdateEmbed(manager.pages.get(manager.currentPage), manager.embed);
+      manager.embed = PageManager.defaultUpdateEmbed(
+        manager.pages.get(manager.currentPage),
+        manager.embed
+      );
     }
 
     if (manager.onPageUpdate) {
@@ -118,7 +127,10 @@ export default class PageManager<T> {
     if (manager.updatePageFunc) {
       manager.embed = manager.updatePageFunc(manager.pages.get(manager.currentPage), manager.embed);
     } else {
-      manager.embed = PageManager.defaultUpdateEmbed(manager.pages.get(manager.currentPage), manager.embed);
+      manager.embed = PageManager.defaultUpdateEmbed(
+        manager.pages.get(manager.currentPage),
+        manager.embed
+      );
     }
 
     if (manager.onPageUpdate) {
@@ -139,7 +151,11 @@ export default class PageManager<T> {
 
   public async listen(): Promise<void> {
     const res = await this.message
-      .awaitMessageComponent({ filter: this.filter, time: 90000, componentType: ComponentType.Button })
+      .awaitMessageComponent({
+        filter: this.filter,
+        time: 90000,
+        componentType: ComponentType.Button,
+      })
       .catch(() => {});
 
     if (!res) {

@@ -1,4 +1,10 @@
-import { BaseMessageOptions, CommandInteraction, GuildMember, InteractionReplyOptions, Message } from "discord.js";
+import {
+  BaseMessageOptions,
+  CommandInteraction,
+  GuildMember,
+  InteractionReplyOptions,
+  Message,
+} from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { addProgress } from "../utils/functions/economy/achievements";
@@ -12,7 +18,10 @@ const cmd = new Command("height", "accurate prediction of your height", "fun");
 cmd.slashEnabled = true;
 cmd.slashData.addUserOption((option) => option.setName("user").setDescription("i bet ur short"));
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[]
+) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       let usedNewMessage = false;
@@ -99,10 +108,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     sizeMsg = "LOOOL UR TINY LMAO 😂🤣😆 IMAGINE";
   }
 
-  const embed = new CustomEmbed(message.member, `${member.user.toString()}\n\n📏 ${size}\n${sizeMsg}`).setHeader(
-    "short person calculator",
-    member.user.avatarURL()
-  );
+  const embed = new CustomEmbed(
+    message.member,
+    `${member.user.toString()}\n\n📏 ${size}\n${sizeMsg}`
+  ).setHeader("short person calculator", member.user.avatarURL());
 
   send({ embeds: [embed] });
 

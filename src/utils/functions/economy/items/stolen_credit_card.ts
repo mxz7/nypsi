@@ -1,4 +1,9 @@
-import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
+import {
+  BaseMessageOptions,
+  CommandInteraction,
+  InteractionReplyOptions,
+  Message,
+} from "discord.js";
 import { randomInt } from "node:crypto";
 import { NypsiCommandInteraction } from "../../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
@@ -52,7 +57,8 @@ module.exports = new ItemUse(
       amount = formatNumber(args[1]);
     }
 
-    if (!amount || isNaN(amount) || amount < 1) return send({ embeds: [new ErrorEmbed("invalid amount")] });
+    if (!amount || isNaN(amount) || amount < 1)
+      return send({ embeds: [new ErrorEmbed("invalid amount")] });
 
     if (inventory.find((i) => i.item === "stolen_credit_card").amount < amount)
       return send({ embeds: [new ErrorEmbed("you dont have this many stolen credit cards")] });
@@ -70,7 +76,12 @@ module.exports = new ItemUse(
     ]);
 
     const msg = await send({
-      embeds: [new CustomEmbed(message.member, `using ${amount} stolen credit card${amount > 1 ? "s" : ""}...`)],
+      embeds: [
+        new CustomEmbed(
+          message.member,
+          `using ${amount} stolen credit card${amount > 1 ? "s" : ""}...`
+        ),
+      ],
     });
 
     await sleep(2000);

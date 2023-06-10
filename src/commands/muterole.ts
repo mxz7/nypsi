@@ -9,10 +9,15 @@ const cmd = new Command("muterole", "set the muterole for the server", "admin")
   .setPermissions(["MANAGE_SERVER"])
   .setDocs("https://docs.nypsi.xyz/moderation/muterole");
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[]
+) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
     if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
-      return message.channel.send({ embeds: [new ErrorEmbed("you need the `manage server` permission")] });
+      return message.channel.send({
+        embeds: [new ErrorEmbed("you need the `manage server` permission")],
+      });
     }
     return;
   }
@@ -55,7 +60,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (args[0].toLowerCase() == "set") {
     if (args.length == 1) {
       return message.channel.send({
-        embeds: [new ErrorEmbed(`${prefix}**muterole set <role>**\n\nyou can mention the role, use the role's ID or name`)],
+        embeds: [
+          new ErrorEmbed(
+            `${prefix}**muterole set <role>**\n\nyou can mention the role, use the role's ID or name`
+          ),
+        ],
       });
     }
 
@@ -135,14 +144,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     } catch (e) {
       return message.channel.send({
         embeds: [
-          new ErrorEmbed("error creating mute role - make sure i have `manage roles` permission and `manage channels`"),
+          new ErrorEmbed(
+            "error creating mute role - make sure i have `manage roles` permission and `manage channels`"
+          ),
         ],
       });
     }
     if (channelError) {
       return message.channel.send({
         embeds: [
-          new ErrorEmbed("error creating mute role - make sure i have `manage roles` permission and `manage channels`"),
+          new ErrorEmbed(
+            "error creating mute role - make sure i have `manage roles` permission and `manage channels`"
+          ),
         ],
       });
     }

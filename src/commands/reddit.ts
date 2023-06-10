@@ -10,7 +10,10 @@ const blacklisted = ["body", "shit", "poop"];
 
 const cmd = new Command("reddit", "get a random image from any subreddit", "utility");
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[]
+) {
   if (await onCooldown(cmd.name, message.member)) {
     const embed = await getResponse(cmd.name, message.member);
 
@@ -28,13 +31,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (message.channel.isDMBased()) return;
 
   if (message.channel.isThread())
-    return message.channel.send({ embeds: [new ErrorEmbed("you cannot use this command in a thread")] });
+    return message.channel.send({
+      embeds: [new ErrorEmbed("you cannot use this command in a thread")],
+    });
 
   for (const bannedSubReddit of blacklisted) {
     if (args[0].toLowerCase() == bannedSubReddit && !message.channel.nsfw) {
       return message.channel.send({
         embeds: [
-          new ErrorEmbed("this subreddit is known for nsfw content without using nsfw flairs, please use an nsfw channel"),
+          new ErrorEmbed(
+            "this subreddit is known for nsfw content without using nsfw flairs, please use an nsfw channel"
+          ),
         ],
       });
     }
@@ -45,7 +52,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   let allowed;
 
   try {
-    const res: RedditJSON = await fetch("https://www.reddit.com/r/" + args[0] + ".json?limit=100").then((a) => a.json());
+    const res: RedditJSON = await fetch(
+      "https://www.reddit.com/r/" + args[0] + ".json?limit=100"
+    ).then((a) => a.json());
 
     allowed = res.data.children.filter((post) => !post.data.is_self);
   } catch (e) {
@@ -59,7 +68,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   }
 
   if (chosen.data.over_18 && !message.channel.nsfw) {
-    return message.channel.send({ embeds: [new ErrorEmbed("you must do this in an nsfw channel")] });
+    return message.channel.send({
+      embeds: [new ErrorEmbed("you must do this in an nsfw channel")],
+    });
   }
 
   const a = await redditImage(chosen, allowed);

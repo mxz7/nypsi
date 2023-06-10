@@ -5,7 +5,10 @@ import { getMember } from "../utils/functions/member";
 
 const cmd = new Command("banner", "get a person's banner", "info");
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[]
+) {
   let member: GuildMember;
 
   if (args.length == 0) {

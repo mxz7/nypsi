@@ -159,7 +159,10 @@ export default class ScratchCard {
 
       const embed = new CustomEmbed(this.member)
         .setColor(Constants.EMBED_SUCCESS_COLOR)
-        .setHeader(`${this.member.user.username}'s ${this.item.name}`, this.member.user.avatarURL());
+        .setHeader(
+          `${this.member.user.username}'s ${this.item.name}`,
+          this.member.user.avatarURL()
+        );
       if (clickedType === "xp") {
         await updateXp(this.member, (await getXp(this.member)) + parseInt(clickedItem));
         embed.setDescription(`you found **${parseInt(clickedItem).toLocaleString()}**xp!`);
@@ -171,12 +174,18 @@ export default class ScratchCard {
         embed.setDescription(`you found **${parseInt(clickedItem).toLocaleString()}** karma 🔮`);
       } else {
         let amount = 1;
-        if (clickedItem.includes("gun") || clickedItem.includes("fishing_rod") || clickedItem.includes("pickaxe")) {
+        if (
+          clickedItem.includes("gun") ||
+          clickedItem.includes("fishing_rod") ||
+          clickedItem.includes("pickaxe")
+        ) {
           amount = 5;
         }
 
         await addInventoryItem(this.member, clickedItem, amount);
-        embed.setDescription(`you found a ${getItems()[clickedItem].emoji} **${getItems()[clickedItem].name}**!`);
+        embed.setDescription(
+          `you found a ${getItems()[clickedItem].emoji} **${getItems()[clickedItem].name}**!`
+        );
       }
 
       interaction.followUp({ embeds: [embed] });
@@ -267,7 +276,10 @@ export default class ScratchCard {
       const index = [Math.floor(Math.random() * 5), Math.floor(Math.random() * 3)];
 
       if (arr[index[0]][index[1]] === "nothing") {
-        arr[index[0]][index[1]] = item.items[Math.floor(Math.random() * item.items.length)].split(":").slice(0, 2).join(":");
+        arr[index[0]][index[1]] = item.items[Math.floor(Math.random() * item.items.length)]
+          .split(":")
+          .slice(0, 2)
+          .join(":");
       }
     }
 

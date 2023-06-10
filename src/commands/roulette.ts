@@ -11,7 +11,13 @@ import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants.js";
 import { addProgress } from "../utils/functions/economy/achievements.js";
-import { calcMaxBet, getBalance, getDefaultBet, getGambleMulti, updateBalance } from "../utils/functions/economy/balance.js";
+import {
+  calcMaxBet,
+  getBalance,
+  getDefaultBet,
+  getGambleMulti,
+  updateBalance,
+} from "../utils/functions/economy/balance.js";
 import { addToGuildXP, getGuildByUser } from "../utils/functions/economy/guilds.js";
 import { createGame } from "../utils/functions/economy/stats";
 import { createUser, formatBet, userExists } from "../utils/functions/economy/utils.js";
@@ -76,9 +82,14 @@ cmd.slashData
         { name: "🟢 green", value: "green" }
       )
   )
-  .addStringOption((option) => option.setName("bet").setDescription("how much would you like to bet").setRequired(false));
+  .addStringOption((option) =>
+    option.setName("bet").setDescription("how much would you like to bet").setRequired(false)
+  );
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[]
+) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       let usedNewMessage = false;
@@ -146,7 +157,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (args.length != 2 && !defaultBet) {
     const embed = new CustomEmbed(message.member)
       .setHeader("roulette help")
-      .addField("usage", `${prefix}roulette <colour (**r**ed/**g**reen/**b**lack)> <bet>\n${prefix}roulette odds`)
+      .addField(
+        "usage",
+        `${prefix}roulette <colour (**r**ed/**g**reen/**b**lack)> <bet>\n${prefix}roulette odds`
+      )
       .addField(
         "help",
         "this is a bit of a simpler version of real roulette, as in you can only bet on red, black and green which mimics typical csgo roulette\n" +
@@ -156,7 +170,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({ embeds: [embed] });
   }
 
-  if (args[0] != "red" && args[0] != "green" && args[0] != "black" && args[0] != "r" && args[0] != "g" && args[0] != "b") {
+  if (
+    args[0] != "red" &&
+    args[0] != "green" &&
+    args[0] != "black" &&
+    args[0] != "r" &&
+    args[0] != "g" &&
+    args[0] != "b"
+  ) {
     return send({
       embeds: [
         new ErrorEmbed(
@@ -209,7 +230,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (bet > maxBet) {
     return send({
       embeds: [
-        new ErrorEmbed(`your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`),
+        new ErrorEmbed(
+          `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
+        ),
       ],
     });
   }
@@ -267,7 +290,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     winnings -= bet;
 
     if (multi > 0) {
-      await updateBalance(message.member, (await getBalance(message.member)) + winnings + Math.round(winnings * multi));
+      await updateBalance(
+        message.member,
+        (await getBalance(message.member)) + winnings + Math.round(winnings * multi)
+      );
       winnings = winnings + Math.round(winnings * multi);
     } else {
       await updateBalance(message.member, (await getBalance(message.member)) + winnings);
@@ -295,7 +321,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   };
 
   send({ embeds: [embed] }).then(async (m) => {
-    embed.setDescription("**landed on** " + roll + "\n\n**choice** " + colorBet + "\n**your bet** $" + bet.toLocaleString());
+    embed.setDescription(
+      "**landed on** " +
+        roll +
+        "\n\n**choice** " +
+        colorBet +
+        "\n**your bet** $" +
+        bet.toLocaleString()
+    );
 
     let id: string;
 
@@ -303,7 +336,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       if (multi > 0) {
         embed.addField(
           "**winner!!**",
-          "**you win** $" + winnings.toLocaleString() + "\n" + "+**" + Math.floor(multi * 100).toString() + "**% bonus"
+          "**you win** $" +
+            winnings.toLocaleString() +
+            "\n" +
+            "+**" +
+            Math.floor(multi * 100).toString() +
+            "**% bonus"
         );
       } else {
         embed.addField("**winner!!**", "**you win** $" + winnings.toLocaleString());
