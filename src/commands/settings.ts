@@ -159,9 +159,9 @@ async function run(
       const embed = new CustomEmbed(message.member).setHeader(notificationsData[settingId].name);
 
       embed.setDescription(
-        // @ts-expect-error loser
         notificationsData[settingId].description.replace(
           "{VALUE}",
+          // @ts-expect-error loser
           settings[settingId].toLocaleString()
         )
       );
@@ -388,9 +388,9 @@ async function run(
       const embed = new CustomEmbed(message.member).setHeader(preferencesData[settingId].name);
 
       embed.setDescription(
-        // @ts-expect-error loser
         preferencesData[settingId].description.replace(
           "{VALUE}",
+          // @ts-expect-error loser
           settings[settingId].toLocaleString()
         )
       );

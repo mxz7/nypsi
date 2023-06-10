@@ -227,8 +227,8 @@ export default async function messageCreate(message: Message) {
           addCooldown(message.guild, 3600);
         }
 
-        // @ts-expect-error TYPESCRIPT STUPID IT WILL NOT BE DMCHANNEL
         let members: Collection<string, GuildMember | ThreadMember> | ThreadMemberManager =
+          // @ts-expect-error TYPESCRIPT STUPID IT WILL NOT BE DMCHANNEL
           message.channel.members;
 
         if (members instanceof ThreadMemberManager) {
