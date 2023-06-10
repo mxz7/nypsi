@@ -1,4 +1,10 @@
-import { BaseMessageOptions, ChannelType, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
+import {
+  BaseMessageOptions,
+  ChannelType,
+  CommandInteraction,
+  InteractionReplyOptions,
+  Message,
+} from "discord.js";
 import { randomInt } from "node:crypto";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
@@ -20,13 +26,18 @@ cmd.slashData
       .setName("start")
       .setDescription("start a race")
       .addIntegerOption((option) =>
-        option.setName("bet").setDescription("this is the bet and the entry fee for the race").setRequired(true)
+        option
+          .setName("bet")
+          .setDescription("this is the bet and the entry fee for the race")
+          .setRequired(true)
       )
   )
   .addSubcommand((join) =>
     join
       .setName("join")
-      .setDescription("join an existing race in the channel (you will need a car, or you can use the bicycle)")
+      .setDescription(
+        "join an existing race in the channel (you will need a car, or you can use the bicycle)"
+      )
       .addStringOption((option) =>
         option.setName("car").setDescription("what car would you like to use").setAutocomplete(true)
       )
@@ -35,7 +46,10 @@ cmd.slashData
 const races = new Map<string, RaceDetails>();
 const carCooldown = new Map<string, string[]>();
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[]
+) {
   if (!(await userExists(message.member))) await createUser(message.member);
 
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
@@ -145,7 +159,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (message.channel.isDMBased()) return;
 
-    if (message.channel.isVoiceBased()) return send({ embeds: [new ErrorEmbed("invalid channel")] });
+    if (message.channel.isVoiceBased())
+      return send({ embeds: [new ErrorEmbed("invalid channel")] });
 
     if (message.channel.type != ChannelType.GuildText) return;
 
@@ -161,7 +176,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     embed.setFooter({ text: `use ${prefix}sr join to join` });
 
     embed.setDescription(
-      `no racers\n\nentry fee: $${bet.toLocaleString()}${speedLimit != 7 ? `\nspeed limit: ${speedLimit}` : ""}`
+      `no racers\n\nentry fee: $${bet.toLocaleString()}${
+        speedLimit != 7 ? `\nspeed limit: ${speedLimit}` : ""
+      }`
     );
 
     let msg = await send({ embeds: [embed] });
@@ -235,7 +252,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (race.bet > (await calcMaxBet(message.member)) * 10)
       return send({
-        embeds: [new ErrorEmbed(`your max bet is $**${((await calcMaxBet(message.member)) * 10).toLocaleString()}**`)],
+        embeds: [
+          new ErrorEmbed(
+            `your max bet is $**${((await calcMaxBet(message.member)) * 10).toLocaleString()}**`
+          ),
+        ],
       });
 
     const items = getItems();
@@ -247,7 +268,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (args.length == 1) {
       for (const item of inventory) {
         if (items[item.item].role == "car") {
-          if (inventory.find((i) => i.item == item.item) && inventory.find((i) => i.item == item.item).amount > 0) {
+          if (
+            inventory.find((i) => i.item == item.item) &&
+            inventory.find((i) => i.item == item.item).amount > 0
+          ) {
             if (car) {
               if (car.speed < items[item.item].speed) {
                 if (carCooldown.has(message.author.id)) {
@@ -293,7 +317,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       }
 
       if (
-        (!inventory.find((i) => i.item == car.id) || inventory.find((i) => i.item == car.id).amount == 0) &&
+        (!inventory.find((i) => i.item == car.id) ||
+          inventory.find((i) => i.item == car.id).amount == 0) &&
         car.id != "cycle"
       ) {
         return send({ embeds: [new ErrorEmbed(`you don't have a ${car.name}`)] });
@@ -307,7 +332,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (race.speedLimit != 7 && car.speed > race.speedLimit) {
       return send({
         embeds: [
-          new ErrorEmbed(`your ${car.name} is too fast for this race, select another with ${prefix}**sr join <car>**`),
+          new ErrorEmbed(
+            `your ${car.name} is too fast for this race, select another with ${prefix}**sr join <car>**`
+          ),
         ],
       });
     }
@@ -317,7 +344,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       if (current.includes(car.id)) {
         return send({
-          embeds: [new ErrorEmbed(`your ${car.name} is on cooldown, select another with ${prefix}**sr join <car>**`)],
+          embeds: [
+            new ErrorEmbed(
+              `your ${car.name} is on cooldown, select another with ${prefix}**sr join <car>**`
+            ),
+          ],
         });
       } else {
         current.push(car.id);
@@ -373,7 +404,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const speedLimit = race.speedLimit;
 
-    description += `\n\nentry fee: $${race.bet.toLocaleString()}${speedLimit != 7 ? `\nspeed limit: ${speedLimit}` : ""}`;
+    description += `\n\nentry fee: $${race.bet.toLocaleString()}${
+      speedLimit != 7 ? `\nspeed limit: ${speedLimit}` : ""
+    }`;
 
     embed.setDescription(description);
 
@@ -470,7 +503,9 @@ async function startRace(id: string) {
   for (const u of race.users.keys()) {
     const user = race.users.get(u);
 
-    description += `\n${getRacePosition(user.car.emoji, user.position)} 🏁 \`${user.user.username}\``;
+    description += `\n${getRacePosition(user.car.emoji, user.position)} 🏁 \`${
+      user.user.username
+    }\``;
   }
 
   embed.setDescription(description);

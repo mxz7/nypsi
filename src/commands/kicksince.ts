@@ -1,4 +1,10 @@
-import { CommandInteraction, Message, MessageReaction, PermissionFlagsBits, User } from "discord.js";
+import {
+  CommandInteraction,
+  Message,
+  MessageReaction,
+  PermissionFlagsBits,
+  User,
+} from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
@@ -9,10 +15,15 @@ const cmd = new Command("kicksince", "kick members that joined after a certain t
   .setPermissions(["ADMINISTRATOR"])
   .setAliases(["fuckoffsince"]);
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[]
+) {
   if (!message.member.permissions.has(PermissionFlagsBits.Administrator)) {
     if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
-      return message.channel.send({ embeds: [new ErrorEmbed("you need the `administrator` permission")] });
+      return message.channel.send({
+        embeds: [new ErrorEmbed("you need the `administrator` permission")],
+      });
     }
     return;
   }
@@ -38,7 +49,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           "**(reason)** reason for the kick, will be given to all kicked members\n"
       )
       .addField("examples", `${prefix}kicksince 1h bots`)
-      .addField("time format examples", "**1d** *1 day*\n**10h** *10 hours*\n**15m** *15 minutes*\n**30s** *30 seconds*");
+      .addField(
+        "time format examples",
+        "**1d** *1 day*\n**10h** *10 hours*\n**15m** *15 minutes*\n**30s** *30 seconds*"
+      );
 
     return message.channel.send({ embeds: [embed] });
   }
@@ -60,7 +74,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (members.size >= 50) {
     const confirm = await message.channel.send({
       embeds: [
-        new CustomEmbed(message.member, `this will kick **${members.size.toLocaleString()}** members, are you sure?`),
+        new CustomEmbed(
+          message.member,
+          `this will kick **${members.size.toLocaleString()}** members, are you sure?`
+        ),
       ],
     });
 
@@ -121,7 +138,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const targetHighestRole = members.get(member).roles.highest;
     const memberHighestRole = message.member.roles.highest;
 
-    if (targetHighestRole.position >= memberHighestRole.position && message.guild.ownerId != message.member.user.id) {
+    if (
+      targetHighestRole.position >= memberHighestRole.position &&
+      message.guild.ownerId != message.member.user.id
+    ) {
       failed.push(members.get(member).user);
     } else {
       if (members.get(member).user.id == message.client.user.id) {
@@ -142,7 +162,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         statusDesc = `\`${count}/${members.size}\` members kicked..${
           failed.length != 0 ? `\n- **${failed.length}** failed` : ""
         }`;
-        status.setDescription(statusDesc + "\n\n- if you'd like to cancel this operation, delete this message");
+        status.setDescription(
+          statusDesc + "\n\n- if you'd like to cancel this operation, delete this message"
+        );
         let fail = false;
         await msg.edit({ embeds: [status] }).catch(() => {
           fail = true;
@@ -182,7 +204,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (reason.split(": ")[1] == "no reason given") {
       embed.setDescription("✅ `" + members.first().user.tag + "` has been kicked");
     } else {
-      embed.setDescription("✅ `" + members.first().user.tag + "` has been kicked for: " + reason.split(": ")[1]);
+      embed.setDescription(
+        "✅ `" + members.first().user.tag + "` has been kicked for: " + reason.split(": ")[1]
+      );
     }
   }
 
@@ -214,7 +238,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         .setTitle(`kicked from ${message.guild.name}`)
         .addField("reason", `\`${reason.split(": ")[1]}\``);
 
-      await m.send({ content: `you have been kicked from ${message.guild.name}`, embeds: [embed] }).catch(() => {});
+      await m
+        .send({ content: `you have been kicked from ${message.guild.name}`, embeds: [embed] })
+        .catch(() => {});
     }
   }
 }

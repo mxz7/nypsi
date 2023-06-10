@@ -9,7 +9,9 @@ export default async function emojiCreate(emoji: GuildEmoji) {
     const creator = await emoji.fetchAuthor();
 
     embed.setHeader("emoji created");
-    embed.setDescription(`\`${emoji.name}\` - \`${emoji.id}\`\ncreated by ${creator.toString()} \`${creator.id}\``);
+    embed.setDescription(
+      `\`${emoji.name}\` - \`${emoji.id}\`\ncreated by ${creator.toString()} \`${creator.id}\``
+    );
     embed.setImage(emoji.url);
   }
 }

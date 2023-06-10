@@ -10,7 +10,10 @@ const cmd = new Command(
   "none"
 );
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[]
+) {
   if ((await getAdminLevel(message.author.id)) < 2) return;
 
   if (args.length < 2) {

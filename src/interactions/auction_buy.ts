@@ -27,7 +27,10 @@ export default {
 
       return buyFullAuction(interaction as ButtonInteraction, auction);
     } else if (auction.sold || Number(auction.itemAmount) === 0) {
-      return await interaction.reply({ embeds: [new ErrorEmbed("too slow ):").removeTitle()], ephemeral: true });
+      return await interaction.reply({
+        embeds: [new ErrorEmbed("too slow ):").removeTitle()],
+        ephemeral: true,
+      });
     } else {
       await interaction.reply({ embeds: [new ErrorEmbed("invalid auction")], ephemeral: true });
       await interaction.message.delete();

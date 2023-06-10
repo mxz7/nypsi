@@ -4,7 +4,11 @@ import { CustomEmbed } from "../models/EmbedBuilders";
 import { getInventory } from "../utils/functions/economy/inventory";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 
-const cmd = new Command("ethereum", "view the current ethereum value (reflects real life USD)", "money").setAliases(["eth"]);
+const cmd = new Command(
+  "ethereum",
+  "view the current ethereum value (reflects real life USD)",
+  "money"
+).setAliases(["eth"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
   if (!(await userExists(message.member))) await createUser(message.member);

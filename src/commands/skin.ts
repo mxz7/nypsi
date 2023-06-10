@@ -7,7 +7,10 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 
 const cmd = new Command("skin", "view the skin of a minecraft account", "minecraft");
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[]
+) {
   const prefix = await getPrefix(message.guild);
 
   if (args.length == 0) {
@@ -40,10 +43,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const skin = await getSkin(username);
 
   if (!skin) {
-    return message.channel.send({ embeds: [new ErrorEmbed("error while fetching skin. please try again")] });
+    return message.channel.send({
+      embeds: [new ErrorEmbed("error while fetching skin. please try again")],
+    });
   }
 
-  const embed = new CustomEmbed(message.member, `[download](https://mc-heads.net/download/${uuid.id})`)
+  const embed = new CustomEmbed(
+    message.member,
+    `[download](https://mc-heads.net/download/${uuid.id})`
+  )
     .setTitle(uuid.name)
     .setURL("https://namemc.com/profile/" + username)
     .setImage(skin.render);

@@ -24,7 +24,10 @@ export async function getAdminLevel(userId: string) {
   }
 
   await redis.set(`${Constants.redis.cache.user.ADMIN_LEVEL}:${userId}`, query.adminLevel);
-  await redis.expire(`${Constants.redis.cache.user.ADMIN_LEVEL}:${userId}`, Math.floor(ms("3 hours") / 1000));
+  await redis.expire(
+    `${Constants.redis.cache.user.ADMIN_LEVEL}:${userId}`,
+    Math.floor(ms("3 hours") / 1000)
+  );
 
   return query.adminLevel;
 }

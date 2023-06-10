@@ -24,7 +24,10 @@ import { fetchUsernameHistory } from "../utils/functions/users/history";
 
 const cmd = new Command("find", "find info", "none").setPermissions(["bot owner"]);
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[]
+) {
   if (message.member.user.id != Constants.TEKOH_ID) return;
 
   if (!(message instanceof Message)) return;
@@ -140,7 +143,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   } else if (args[0].toLowerCase() == "top") {
     const balTop = await topBalanceGlobal(10, false);
 
-    const embed = new CustomEmbed(message.member, balTop.join("\n")).setTitle("top " + balTop.length);
+    const embed = new CustomEmbed(message.member, balTop.join("\n")).setTitle(
+      "top " + balTop.length
+    );
 
     return message.channel.send({ embeds: [embed] });
   }
@@ -168,7 +173,10 @@ async function showGuild(message: Message, guild: any) {
     ); // if guild.members.length works add members field back
 
   if (invites && invites.length > 0) {
-    embed.addField(`invite (${invites.length})`, invites[Math.floor(Math.random() & invites.length)]);
+    embed.addField(
+      `invite (${invites.length})`,
+      invites[Math.floor(Math.random() & invites.length)]
+    );
   }
 
   return message.channel.send({ embeds: [embed] });
@@ -178,16 +186,20 @@ async function showUser(message: Message, user: User) {
   const embed = new CustomEmbed(message.member)
     .setTitle(user.tag)
     .setDescription(
-      `\`${user.id}\`${(await isPremium(user.id)) ? ` (${(await getPremiumProfile(user.id)).getLevelString()}) ` : ""} ${
-        (await isEcoBanned(user.id)) ? "[banned]" : ""
-      }`
+      `\`${user.id}\`${
+        (await isPremium(user.id))
+          ? ` (${(await getPremiumProfile(user.id)).getLevelString()}) `
+          : ""
+      } ${(await isEcoBanned(user.id)) ? "[banned]" : ""}`
     )
     .addField(
       "user",
       `**tag** ${user.tag}
             **created** ${formatDate(user.createdAt)}${
         (await getLastCommand(user.id))
-          ? `\n**last command** <t:${Math.floor((await getLastCommand(user.id)).getTime() / 1000)}:R>`
+          ? `\n**last command** <t:${Math.floor(
+              (await getLastCommand(user.id)).getTime() / 1000
+            )}:R>`
           : ""
       }`,
       true

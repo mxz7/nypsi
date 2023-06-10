@@ -29,7 +29,10 @@ cmd.slashData.addStringOption((option) =>
   option.setName("filter").setDescription("filter through your inventory with a search term")
 );
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[]
+) {
   if (!(await userExists(message.member))) await createUser(message.member);
 
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
@@ -99,7 +102,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (inventory.length == 0) {
     return send({
       embeds: [
-        new CustomEmbed(message.member, "your inventory is empty").setHeader("your inventory", message.author.avatarURL()),
+        new CustomEmbed(message.member, "your inventory is empty").setHeader(
+          "your inventory",
+          message.author.avatarURL()
+        ),
       ],
     });
   }
@@ -110,7 +116,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     inventory = setFilter(inventory, args.join(" "));
 
     if (inventory.length == 0) {
-      return send({ embeds: [new ErrorEmbed(`no items matched the filter: \`${args.join(" ")}\``)] });
+      return send({
+        embeds: [new ErrorEmbed(`no items matched the filter: \`${args.join(" ")}\``)],
+      });
     }
   }
 
@@ -131,9 +139,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     for (const item of page) {
       embed.addField(
         item.id,
-        `${item.emoji} **${item.name}** ~~--~~ *${inventory.find((i) => i.item == item.id).amount.toLocaleString()}*${
-          item.shortDesc ? `\n${item.shortDesc}` : ""
-        }`,
+        `${item.emoji} **${item.name}** ~~--~~ *${inventory
+          .find((i) => i.item == item.id)
+          .amount.toLocaleString()}*${item.shortDesc ? `\n${item.shortDesc}` : ""}`,
         true
       );
     }
@@ -144,7 +152,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   updatePage(pages.get(1), embed);
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
+    new ButtonBuilder()
+      .setCustomId("⬅")
+      .setLabel("back")
+      .setStyle(ButtonStyle.Primary)
+      .setDisabled(true),
     new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
     new ButtonBuilder().setCustomId("fil").setLabel("filter").setStyle(ButtonStyle.Secondary)
   );
@@ -165,70 +177,81 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     pages,
     onPageUpdate(manager) {
       manager.embed.setFooter({
-        text: `page ${manager.currentPage}/${manager.lastPage}${currentFilter ? ` | filter: ${currentFilter}` : ""}`,
+        text: `page ${manager.currentPage}/${manager.lastPage}${
+          currentFilter ? ` | filter: ${currentFilter}` : ""
+        }`,
       });
       return manager.embed;
     },
     updateEmbed: updatePage,
-    handleResponses: new Map().set("fil", async (manager: PageManager<Item>, interaction: ButtonInteraction) => {
-      const modal = new ModalBuilder()
-        .setCustomId("inv-filter")
-        .setTitle("filter inventory")
-        .addComponents(
-          new ActionRowBuilder<TextInputBuilder>().addComponents(
-            new TextInputBuilder()
-              .setCustomId("filter")
-              .setLabel("enter term to filter by")
-              .setPlaceholder("filter")
-              .setRequired(true)
-              .setStyle(TextInputStyle.Short)
-          )
+    handleResponses: new Map().set(
+      "fil",
+      async (manager: PageManager<Item>, interaction: ButtonInteraction) => {
+        const modal = new ModalBuilder()
+          .setCustomId("inv-filter")
+          .setTitle("filter inventory")
+          .addComponents(
+            new ActionRowBuilder<TextInputBuilder>().addComponents(
+              new TextInputBuilder()
+                .setCustomId("filter")
+                .setLabel("enter term to filter by")
+                .setPlaceholder("filter")
+                .setRequired(true)
+                .setStyle(TextInputStyle.Short)
+            )
+          );
+
+        await interaction.showModal(modal);
+
+        const filter = (i: Interaction) => i.user.id == interaction.user.id;
+
+        const res = await interaction.awaitModalSubmit({ filter, time: 120000 }).catch(() => {});
+
+        if (!res) return;
+
+        if (!res.isModalSubmit()) return;
+
+        if (currentFilter) inventory = await getInventory(message.member, false);
+
+        inventory = setFilter(inventory, res.fields.fields.first().value.toLowerCase());
+
+        if (inventory.length == 0) {
+          await res.reply({
+            embeds: [
+              new ErrorEmbed(
+                `no items matched the filter: \`${res.fields.fields.first().value.toLowerCase()}\``
+              ),
+            ],
+            ephemeral: true,
+          });
+          return manager.listen();
+        }
+
+        args = res.fields.fields.first().value.toLowerCase().split(" ");
+
+        manager.pages = PageManager.createPages(
+          inventory.map((i) => items[i.item]),
+          6
         );
 
-      await interaction.showModal(modal);
+        await res.deferUpdate();
 
-      const filter = (i: Interaction) => i.user.id == interaction.user.id;
+        manager.updatePageFunc(manager.pages.get(1), manager.embed);
+        manager.currentPage = 1;
+        manager.lastPage = manager.pages.size;
+        manager.row.components[0].setDisabled(true);
+        if (manager.lastPage == 1) manager.row.components[1].setDisabled(true);
+        manager.embed.setFooter({
+          text: `page 1/${manager.lastPage}${currentFilter ? ` | filter: ${currentFilter}` : ""}`,
+        });
 
-      const res = await interaction.awaitModalSubmit({ filter, time: 120000 }).catch(() => {});
-
-      if (!res) return;
-
-      if (!res.isModalSubmit()) return;
-
-      if (currentFilter) inventory = await getInventory(message.member, false);
-
-      inventory = setFilter(inventory, res.fields.fields.first().value.toLowerCase());
-
-      if (inventory.length == 0) {
-        await res.reply({
-          embeds: [new ErrorEmbed(`no items matched the filter: \`${res.fields.fields.first().value.toLowerCase()}\``)],
-          ephemeral: true,
+        await manager.message.edit({
+          embeds: [manager.embed],
+          components: [manager.row],
         });
         return manager.listen();
       }
-
-      args = res.fields.fields.first().value.toLowerCase().split(" ");
-
-      manager.pages = PageManager.createPages(
-        inventory.map((i) => items[i.item]),
-        6
-      );
-
-      await res.deferUpdate();
-
-      manager.updatePageFunc(manager.pages.get(1), manager.embed);
-      manager.currentPage = 1;
-      manager.lastPage = manager.pages.size;
-      manager.row.components[0].setDisabled(true);
-      if (manager.lastPage == 1) manager.row.components[1].setDisabled(true);
-      manager.embed.setFooter({ text: `page 1/${manager.lastPage}${currentFilter ? ` | filter: ${currentFilter}` : ""}` });
-
-      await manager.message.edit({
-        embeds: [manager.embed],
-        components: [manager.row],
-      });
-      return manager.listen();
-    }),
+    ),
   });
 
   return manager.listen();

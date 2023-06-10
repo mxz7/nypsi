@@ -5,12 +5,16 @@ import { getMember } from "../utils/functions/member";
 import { getLastfmUsername } from "../utils/functions/users/lastfm";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command("recenttracks", "view yours or another user's recently listened to songs", "music").setAliases([
-  "recentsongs",
-  "recents",
-]);
+const cmd = new Command(
+  "recenttracks",
+  "view yours or another user's recently listened to songs",
+  "music"
+).setAliases(["recentsongs", "recents"]);
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[]
+) {
   if (await onCooldown(cmd.name, message.member)) {
     const embed = await getResponse(cmd.name, message.member);
 
@@ -34,10 +38,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (!username) {
     if (message.author.id == member.user.id) {
       return message.channel.send({
-        embeds: [new ErrorEmbed("you have not set your last.fm username (**/settings me lastfm**)")],
+        embeds: [
+          new ErrorEmbed("you have not set your last.fm username (**/settings me lastfm**)"),
+        ],
       });
     } else {
-      return message.channel.send({ embeds: [new ErrorEmbed("this user has not set their last.fm username")] });
+      return message.channel.send({
+        embeds: [new ErrorEmbed("this user has not set their last.fm username")],
+      });
     }
   }
 

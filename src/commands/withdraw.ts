@@ -1,4 +1,10 @@
-import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions } from "discord.js";
+import {
+  BaseMessageOptions,
+  CommandInteraction,
+  InteractionReplyOptions,
+  Message,
+  MessageEditOptions,
+} from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import {
@@ -15,9 +21,14 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 const cmd = new Command("withdraw", "withdraw money from your bank", "money").setAliases(["with"]);
 
 cmd.slashEnabled = true;
-cmd.slashData.addStringOption((option) => option.setName("amount").setDescription("amount to withdraw").setRequired(true));
+cmd.slashData.addStringOption((option) =>
+  option.setName("amount").setDescription("amount to withdraw").setRequired(true)
+);
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[]
+) {
   if (!(await userExists(message.member))) await createUser(message.member);
 
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
@@ -62,7 +73,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const embed = new CustomEmbed(message.member)
       .setHeader("withdraw help")
       .addField("usage", `${prefix}withdraw <amount>`)
-      .addField("help", "you can withdraw money from your bank aslong as you have that amount available in your bank");
+      .addField(
+        "help",
+        "you can withdraw money from your bank aslong as you have that amount available in your bank"
+      );
     return send({ embeds: [embed] });
   }
 

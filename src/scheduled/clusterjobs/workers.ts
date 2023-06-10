@@ -1,4 +1,9 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, MessageActionRowComponentBuilder } from "discord.js";
+import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  MessageActionRowComponentBuilder,
+} from "discord.js";
 import prisma from "../../init/database";
 import redis from "../../init/redis";
 import { CustomEmbed } from "../../models/EmbedBuilders";
@@ -27,7 +32,9 @@ async function doWorkerThing() {
   const hasSteve = new Set<string>();
 
   for (const worker of query) {
-    const { maxStorage, perInterval, perItem, scrapChance, gemChance } = await calcWorkerValues(worker);
+    const { maxStorage, perInterval, perItem, scrapChance, gemChance } = await calcWorkerValues(
+      worker
+    );
 
     if (!hasSteve.has(worker.userId)) {
       const boosters = await getBoosters(worker.userId);
@@ -51,7 +58,9 @@ async function doWorkerThing() {
       let steveStorage: SteveData;
 
       if (await redis.exists(`${Constants.redis.nypsi.STEVE_EARNED}:${worker.userId}`)) {
-        steveStorage = JSON.parse(await redis.get(`${Constants.redis.nypsi.STEVE_EARNED}:${worker.userId}`));
+        steveStorage = JSON.parse(
+          await redis.get(`${Constants.redis.nypsi.STEVE_EARNED}:${worker.userId}`)
+        );
         steveStorage.money = parseInt(steveStorage.money as unknown as string);
         steveStorage.gemShards = parseInt(steveStorage.gemShards as unknown as string);
         steveStorage.scraps = parseInt(steveStorage.scraps as unknown as string);
@@ -93,8 +102,14 @@ async function doWorkerThing() {
         await addInventoryItem(worker.userId, "quarry_scrap", 1, false);
       }
 
-      await redis.set(`${Constants.redis.nypsi.STEVE_EARNED}:${worker.userId}`, JSON.stringify(steveStorage));
-      await redis.expire(`${Constants.redis.nypsi.STEVE_EARNED}:${worker.userId}`, ms("24 hours") / 1000);
+      await redis.set(
+        `${Constants.redis.nypsi.STEVE_EARNED}:${worker.userId}`,
+        JSON.stringify(steveStorage)
+      );
+      await redis.expire(
+        `${Constants.redis.nypsi.STEVE_EARNED}:${worker.userId}`,
+        ms("24 hours") / 1000
+      );
     } else {
       await prisma.economyWorker.update({
         where: {
@@ -144,13 +159,20 @@ async function doWorkerThing() {
           .setColor(Constants.TRANSPARENT_EMBED_COLOR);
       } else if (full.length == 1 && (await getDmSettings(userId)).worker == "All") {
         data.payload.embed = new CustomEmbed()
-          .setDescription(`your ${getBaseWorkers()[full[0]].item_emoji} ${getBaseWorkers()[full[0]].name} is full`)
+          .setDescription(
+            `your ${getBaseWorkers()[full[0]].item_emoji} ${getBaseWorkers()[full[0]].name} is full`
+          )
           .setColor(Constants.TRANSPARENT_EMBED_COLOR);
       } else if ((await getDmSettings(userId)).worker == "All") {
         data.payload.content = `${full.length} of your workers are full`;
         data.payload.embed = new CustomEmbed()
           .setDescription(
-            full.map((workerId) => `${getBaseWorkers()[workerId].item_emoji} ${getBaseWorkers()[workerId].name}`).join("\n")
+            full
+              .map(
+                (workerId) =>
+                  `${getBaseWorkers()[workerId].item_emoji} ${getBaseWorkers()[workerId].name}`
+              )
+              .join("\n")
           )
           .setHeader("full workers:")
           .setColor(Constants.TRANSPARENT_EMBED_COLOR)

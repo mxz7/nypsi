@@ -7,7 +7,14 @@ import { logger } from "../../logger";
 import { MStoTime } from "../date";
 import { newCase } from "../moderation/cases";
 import { addModLog } from "../moderation/logs";
-import { deleteMute, getAutoMuteLevels, getMuteRole, getMuteViolations, isMuted, newMute } from "../moderation/mute";
+import {
+  deleteMute,
+  getAutoMuteLevels,
+  getMuteRole,
+  getMuteViolations,
+  isMuted,
+  newMute,
+} from "../moderation/mute";
 import { getPercentMatch } from "./utils";
 
 const chatFilterCache = new Map<string, string[]>();
@@ -97,14 +104,30 @@ export async function checkMessageContent(message: Message) {
       if (word.includes(" ")) {
         if (content.includes(word.toLowerCase())) {
           const contentModified = content.replace(word, `**${word}**`);
-          addModLog(message.guild, "filter violation", message.author.id, "nypsi", contentModified, -1, message.channel.id);
+          addModLog(
+            message.guild,
+            "filter violation",
+            message.author.id,
+            "nypsi",
+            contentModified,
+            -1,
+            message.channel.id
+          );
           await message.delete().catch(() => {});
           return false;
         }
       } else {
         if (content.split(" ").indexOf(word.toLowerCase()) != -1) {
           const contentModified = content.replace(word, `**${word}**`);
-          addModLog(message.guild, "filter violation", message.author.id, "nypsi", contentModified, -1, message.channel.id);
+          addModLog(
+            message.guild,
+            "filter violation",
+            message.author.id,
+            "nypsi",
+            contentModified,
+            -1,
+            message.channel.id
+          );
           await message.delete().catch(() => {});
           return false;
         }
@@ -115,7 +138,15 @@ export async function checkMessageContent(message: Message) {
       if (word.includes(" ")) {
         if (content.includes(word.toLowerCase())) {
           const contentModified = content.replace(word, `**${word}**`);
-          addModLog(message.guild, "filter violation", message.author.id, "nypsi", contentModified, -1, message.channel.id);
+          addModLog(
+            message.guild,
+            "filter violation",
+            message.author.id,
+            "nypsi",
+            contentModified,
+            -1,
+            message.channel.id
+          );
           await message.delete().catch(() => {});
           return false;
         }

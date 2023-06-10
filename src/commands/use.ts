@@ -33,17 +33,33 @@ import { logger } from "../utils/logger";
 
 const itemFunctions = new Map<string, ItemUse>();
 
-const cmd = new Command("use", "use an item or open crates", "money").setAliases(["open", "activate", "eat", "cuddle"]);
+const cmd = new Command("use", "use an item or open crates", "money").setAliases([
+  "open",
+  "activate",
+  "eat",
+  "cuddle",
+]);
 
 cmd.slashEnabled = true;
 cmd.slashData
   .addStringOption((option) =>
-    option.setName("item").setDescription("the item you want to use").setRequired(true).setAutocomplete(true)
+    option
+      .setName("item")
+      .setDescription("the item you want to use")
+      .setRequired(true)
+      .setAutocomplete(true)
   )
-  .addStringOption((option) => option.setName("amount").setDescription("amount of item you want to use"))
-  .addUserOption((option) => option.setName("member").setDescription("member to use your item on, if applicable"));
+  .addStringOption((option) =>
+    option.setName("amount").setDescription("amount of item you want to use")
+  )
+  .addUserOption((option) =>
+    option.setName("member").setDescription("member to use your item on, if applicable")
+  );
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[]
+) {
   if (!(await userExists(message.member))) await createUser(message.member);
 
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
@@ -104,7 +120,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({ embeds: [new ErrorEmbed(`couldnt find \`${args[0]}\``)] });
   }
 
-  if (!inventory.find((i) => i.item == selected.id) || inventory.find((i) => i.item == selected.id).amount == 0) {
+  if (
+    !inventory.find((i) => i.item == selected.id) ||
+    inventory.find((i) => i.item == selected.id).amount == 0
+  ) {
     return send({ embeds: [new ErrorEmbed(`you dont have a ${selected.name}`)] });
   }
 
@@ -136,13 +155,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let boosters = await getBoosters(message.member);
     let amount = parseInt(args[1]) || 1;
 
-    if (args[1]?.toLowerCase() === "all") amount = inventory.find((i) => i.item === selected.id)?.amount || 1;
+    if (args[1]?.toLowerCase() === "all")
+      amount = inventory.find((i) => i.item === selected.id)?.amount || 1;
 
     if (boosters.has(selected.id)) {
       if (selected.stackable) {
         if (selected.max <= boosters.get(selected.id).length) {
           return send({
-            embeds: [new ErrorEmbed(`**${selected.name}** can only be stacked ${selected.max} times`)],
+            embeds: [
+              new ErrorEmbed(`**${selected.name}** can only be stacked ${selected.max} times`),
+            ],
           });
         }
         if (amount > selected.max - boosters.get(selected.id).length) {
@@ -161,13 +183,21 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         embeds: [new ErrorEmbed(`**${selected.name}** can only be stacked ${selected.max} times`)],
       });
 
-    if (!inventory.find((i) => i.item === selected.id) || inventory.find((i) => i.item == selected.id)?.amount < amount)
+    if (
+      !inventory.find((i) => i.item === selected.id) ||
+      inventory.find((i) => i.item == selected.id)?.amount < amount
+    )
       return send({ embeds: [new ErrorEmbed(`you don't have ${amount}x ${selected.name}`)] });
 
     await Promise.all([
       addBooster(message.member, selected.id, amount),
       addStat(message.member, selected.id, amount),
-      setInventoryItem(message.member, selected.id, inventory.find((i) => i.item == selected.id).amount - amount, false),
+      setInventoryItem(
+        message.member,
+        selected.id,
+        inventory.find((i) => i.item == selected.id).amount - amount,
+        false
+      ),
     ]);
 
     boosters = await getBoosters(message.member);
@@ -223,7 +253,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       if (pages.size <= 1) return msg.edit({ embeds: [embed] });
 
       const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
+        new ButtonBuilder()
+          .setCustomId("⬅")
+          .setLabel("back")
+          .setStyle(ButtonStyle.Primary)
+          .setDisabled(true),
         new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
       );
 
@@ -254,7 +288,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const upgrade = baseUpgrades[selected.worker_upgrade_id];
     const userWorkers = await getWorkers(message.member);
-    const userUpgrade = userWorkers.find((w) => upgrade.for == w.workerId)?.upgrades.find((u) => u.upgradeId == upgrade.id);
+    const userUpgrade = userWorkers
+      .find((w) => upgrade.for == w.workerId)
+      ?.upgrades.find((u) => u.upgradeId == upgrade.id);
 
     if (!userWorkers.find((w) => upgrade.for.includes(w.workerId))) {
       return send({
@@ -296,22 +332,28 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (inventory.find((i) => i.item === selected.id).amount < amount)
       return send({ embeds: [new ErrorEmbed(`you don't have this many ${selected.name}`)] });
 
-    if (!amount || isNaN(amount) || amount < 1) return send({ embeds: [new ErrorEmbed("invalid amount")] });
+    if (!amount || isNaN(amount) || amount < 1)
+      return send({ embeds: [new ErrorEmbed("invalid amount")] });
 
     for (let i = 0; i < amount; i++) {
       await addWorkerUpgrade(message.member, upgrade.for, upgrade.id);
     }
 
-    await setInventoryItem(message.member, selected.id, inventory.find((i) => i.item == selected.id).amount - amount, false);
+    await setInventoryItem(
+      message.member,
+      selected.id,
+      inventory.find((i) => i.item == selected.id).amount - amount,
+      false
+    );
     await addStat(message.member, selected.id, amount);
 
     return send({
       embeds: [
         new CustomEmbed(
           message.member,
-          `you have activated **${upgrade.name}** on your **${getBaseWorkers()[upgrade.for].name}**\n\n${
-            userUpgrade ? userUpgrade.amount + amount : amount
-          }/${upgrade.stack_limit}`
+          `you have activated **${upgrade.name}** on your **${
+            getBaseWorkers()[upgrade.for].name
+          }**\n\n${userUpgrade ? userUpgrade.amount + amount : amount}/${upgrade.stack_limit}`
         ).setHeader("use", message.author.avatarURL()),
       ],
     });
@@ -328,7 +370,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       amount = formatNumber(args[1]);
     }
 
-    if (!amount || isNaN(amount) || amount < 1) return send({ embeds: [new ErrorEmbed("invalid amount")] });
+    if (!amount || isNaN(amount) || amount < 1)
+      return send({ embeds: [new ErrorEmbed("invalid amount")] });
 
     if (inventory.find((i) => i.item === selected.id).amount < amount)
       return send({ embeds: [new ErrorEmbed(`you don't have this many ${selected.name}`)] });
@@ -336,14 +379,21 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     for (let i = 0; i < amount; i++) {
       await addBakeryUpgrade(message.member, selected.id);
     }
-    setInventoryItem(message.member, selected.id, inventory.find((i) => i.item == selected.id).amount - amount, false);
+    setInventoryItem(
+      message.member,
+      selected.id,
+      inventory.find((i) => i.item == selected.id).amount - amount,
+      false
+    );
     addStat(message.member, selected.id, amount);
 
     const upgrades = await getBakeryUpgrades(message.member);
 
     const embed = new CustomEmbed(
       message.member,
-      `you have activated the ${items[selected.id].emoji} ${items[selected.id].name} upgrade on your bakery`
+      `you have activated the ${items[selected.id].emoji} ${
+        items[selected.id].name
+      } upgrade on your bakery`
     ).setHeader("use", message.author.avatarURL());
 
     embed.addField(
@@ -364,7 +414,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       await addStat(message.member, selected.id);
       return itemFunctions.get(selected.id).run(message, args);
     } else {
-      return send({ embeds: [new CustomEmbed(message.member, "unfortunately you can't use this item.")] });
+      return send({
+        embeds: [new CustomEmbed(message.member, "unfortunately you can't use this item.")],
+      });
     }
   }
 }

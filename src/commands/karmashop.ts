@@ -57,7 +57,10 @@ cmd.slashData
       )
   );
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[]
+) {
   if (!(await userExists(message.member))) await createUser(message.member);
   if (message.author.id == Constants.TEKOH_ID) {
     if (args[0] && args[0].toLowerCase() == "open") {
@@ -109,9 +112,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     embed.setDescription(
       `the karma shop is currently **closed**, it was last open at <t:${Math.floor(
         (await getLastKarmaShopOpen()).getTime() / 1000
-      )}>\n\nwill **next open at** <t:${Math.floor((await getNextKarmaShopOpen()).getTime() / 1000)}> (<t:${Math.floor(
+      )}>\n\nwill **next open at** <t:${Math.floor(
         (await getNextKarmaShopOpen()).getTime() / 1000
-      )}:R>)`
+      )}> (<t:${Math.floor((await getNextKarmaShopOpen()).getTime() / 1000)}:R>)`
     );
 
     return send({ embeds: [embed] });
@@ -148,7 +151,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     embed.setHeader("karma shop", message.author.avatarURL());
     embed.setFooter({
-      text: `page 1/${pages.size} | you have ${(await getKarma(message.member)).toLocaleString()} karma`,
+      text: `page 1/${pages.size} | you have ${(
+        await getKarma(message.member)
+      ).toLocaleString()} karma`,
     });
 
     for (const item of pages.get(1)) {
@@ -163,7 +168,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
+      new ButtonBuilder()
+        .setCustomId("⬅")
+        .setLabel("back")
+        .setStyle(ButtonStyle.Primary)
+        .setDisabled(true),
       new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
     );
 
@@ -193,7 +202,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             await msg.edit({ components: [] });
           });
 
-        const newEmbed = new CustomEmbed(message.member).setHeader("karma shop", message.author.avatarURL());
+        const newEmbed = new CustomEmbed(message.member).setHeader(
+          "karma shop",
+          message.author.avatarURL()
+        );
 
         if (!reaction) return;
 
@@ -219,13 +231,29 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             });
             if (currentPage == 1) {
               row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-                new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
-                new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(false)
+                new ButtonBuilder()
+                  .setCustomId("⬅")
+                  .setLabel("back")
+                  .setStyle(ButtonStyle.Primary)
+                  .setDisabled(true),
+                new ButtonBuilder()
+                  .setCustomId("➡")
+                  .setLabel("next")
+                  .setStyle(ButtonStyle.Primary)
+                  .setDisabled(false)
               );
             } else {
               row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-                new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(false),
-                new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(false)
+                new ButtonBuilder()
+                  .setCustomId("⬅")
+                  .setLabel("back")
+                  .setStyle(ButtonStyle.Primary)
+                  .setDisabled(false),
+                new ButtonBuilder()
+                  .setCustomId("➡")
+                  .setLabel("next")
+                  .setStyle(ButtonStyle.Primary)
+                  .setDisabled(false)
               );
             }
             await msg.edit({ embeds: [newEmbed], components: [row] });
@@ -253,13 +281,29 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             });
             if (currentPage == lastPage) {
               row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-                new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(false),
-                new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(true)
+                new ButtonBuilder()
+                  .setCustomId("⬅")
+                  .setLabel("back")
+                  .setStyle(ButtonStyle.Primary)
+                  .setDisabled(false),
+                new ButtonBuilder()
+                  .setCustomId("➡")
+                  .setLabel("next")
+                  .setStyle(ButtonStyle.Primary)
+                  .setDisabled(true)
               );
             } else {
               row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-                new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(false),
-                new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(false)
+                new ButtonBuilder()
+                  .setCustomId("⬅")
+                  .setLabel("back")
+                  .setStyle(ButtonStyle.Primary)
+                  .setDisabled(false),
+                new ButtonBuilder()
+                  .setCustomId("➡")
+                  .setLabel("next")
+                  .setStyle(ButtonStyle.Primary)
+                  .setDisabled(false)
               );
             }
             await msg.edit({ embeds: [newEmbed], components: [row] });
@@ -340,7 +384,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
 
     return await send({
-      embeds: [new CustomEmbed(message.member, `you have bought ${wanted.emoji} ${wanted.name} for ${wanted.cost} karma`)],
+      embeds: [
+        new CustomEmbed(
+          message.member,
+          `you have bought ${wanted.emoji} ${wanted.name} for ${wanted.cost} karma`
+        ),
+      ],
     });
   };
 

@@ -1,7 +1,10 @@
 import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
-import { getDisabledCommands, updateDisabledCommands } from "../utils/functions/guilds/disabledcommands";
+import {
+  getDisabledCommands,
+  updateDisabledCommands,
+} from "../utils/functions/guilds/disabledcommands";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { cleanString } from "../utils/functions/string";
 import { commandExists } from "../utils/handlers/commandhandler";
@@ -10,10 +13,15 @@ const cmd = new Command("disablecommand", "disable certain commands in your serv
   .setAliases(["disablecmd", "disable"])
   .setPermissions(["MANAGE_SERVER"]);
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[]
+) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
     if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
-      return message.channel.send({ embeds: [new ErrorEmbed("you need the `manage server` permission")] });
+      return message.channel.send({
+        embeds: [new ErrorEmbed("you need the `manage server` permission")],
+      });
     }
     return;
   }
@@ -36,13 +44,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (args[0].toLowerCase() == "add" || args[0].toLowerCase() == "+") {
     if (args.length == 1) {
-      return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}disablecmd add/+ <command name>`)] });
+      return message.channel.send({
+        embeds: [new ErrorEmbed(`${prefix}disablecmd add/+ <command name>`)],
+      });
     }
 
     const word = cleanString(args[1].toString().toLowerCase().normalize("NFD"));
 
     if (filter.indexOf(word) > -1) {
-      const embed = new CustomEmbed(message.member, "❌ `" + prefix + word + "` is already disabled").setFooter({
+      const embed = new CustomEmbed(
+        message.member,
+        "❌ `" + prefix + word + "` is already disabled"
+      ).setFooter({
         text: `you can use ${prefix}disablecmd to view currently disabled commands`,
       });
 
@@ -51,7 +64,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (!commandExists(word)) {
       return message.channel.send({
-        embeds: [new ErrorEmbed(`you must use the command's name, you can use ${prefix}help <command> to find this`)],
+        embeds: [
+          new ErrorEmbed(
+            `you must use the command's name, you can use ${prefix}help <command> to find this`
+          ),
+        ],
       });
     }
 
@@ -74,13 +91,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await updateDisabledCommands(message.guild, filter);
 
-    const embed = new CustomEmbed(message.member, "✅ disabled `" + prefix + word + "` command").setHeader(
-      "disabled commands"
-    );
+    const embed = new CustomEmbed(
+      message.member,
+      "✅ disabled `" + prefix + word + "` command"
+    ).setHeader("disabled commands");
     return message.channel.send({ embeds: [embed] });
   } else if (args[0].toLowerCase() == "del" || args[0].toLowerCase() == "-") {
     if (args.length == 1) {
-      return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}disablecmd del/- <command>`)] });
+      return message.channel.send({
+        embeds: [new ErrorEmbed(`${prefix}disablecmd del/- <command>`)],
+      });
     }
 
     const word = cleanString(args[1].toString().toLowerCase().normalize("NFD"));
@@ -97,7 +117,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await updateDisabledCommands(message.guild, filter);
 
-    const embed = new CustomEmbed(message.member, "✅ `" + prefix + word + "` is no longer disabled")
+    const embed = new CustomEmbed(
+      message.member,
+      "✅ `" + prefix + word + "` is no longer disabled"
+    )
       .setHeader("disable commands")
       .setFooter({ text: `you can use ${prefix}disablecmd reset to reset disabled commands` });
 
@@ -107,7 +130,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     await updateDisabledCommands(message.guild, filter);
 
-    const embed = new CustomEmbed(message.member, "✅ disabled commands have been reset").setHeader("disabled commands");
+    const embed = new CustomEmbed(message.member, "✅ disabled commands have been reset").setHeader(
+      "disabled commands"
+    );
 
     return message.channel.send({ embeds: [embed] });
   } else {

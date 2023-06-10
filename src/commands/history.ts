@@ -30,7 +30,10 @@ cmd.slashData.addStringOption((option) =>
   option.setName("user").setDescription("use the user's id or username").setRequired(true)
 );
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[]
+) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
     if (!message.member.permissions.has(PermissionFlagsBits.ModerateMembers)) {
       return;
@@ -136,7 +139,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     } else {
       embed.addField(
         "case " + case0.caseId,
-        "`" + case0.type + "` - " + case0.command + "\non " + `<t:${Math.floor(case0.time.getTime() / 1000)}:d>`
+        "`" +
+          case0.type +
+          "` - " +
+          case0.command +
+          "\non " +
+          `<t:${Math.floor(case0.time.getTime() / 1000)}:d>`
       );
     }
   }
@@ -144,7 +152,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   let msg: Message;
 
   let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
+    new ButtonBuilder()
+      .setCustomId("⬅")
+      .setLabel("back")
+      .setStyle(ButtonStyle.Primary)
+      .setDisabled(true),
     new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
   );
 
@@ -202,7 +214,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             } else {
               newEmbed.addField(
                 "case " + case0.caseId,
-                "`" + case0.type + "` - " + case0.command + "\non " + `<t:${Math.floor(case0.time.getTime() / 1000)}:d>`
+                "`" +
+                  case0.type +
+                  "` - " +
+                  case0.command +
+                  "\non " +
+                  `<t:${Math.floor(case0.time.getTime() / 1000)}:d>`
               );
             }
           }
@@ -211,13 +228,29 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           });
           if (currentPage == 0) {
             row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-              new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(true),
-              new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(false)
+              new ButtonBuilder()
+                .setCustomId("⬅")
+                .setLabel("back")
+                .setStyle(ButtonStyle.Primary)
+                .setDisabled(true),
+              new ButtonBuilder()
+                .setCustomId("➡")
+                .setLabel("next")
+                .setStyle(ButtonStyle.Primary)
+                .setDisabled(false)
             );
           } else {
             row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-              new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(false),
-              new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(false)
+              new ButtonBuilder()
+                .setCustomId("⬅")
+                .setLabel("back")
+                .setStyle(ButtonStyle.Primary)
+                .setDisabled(false),
+              new ButtonBuilder()
+                .setCustomId("➡")
+                .setLabel("next")
+                .setStyle(ButtonStyle.Primary)
+                .setDisabled(false)
             );
           }
           await edit({ embeds: [newEmbed], components: [row] }, msg);
@@ -234,7 +267,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             } else {
               newEmbed.addField(
                 "case " + case0.caseId,
-                "`" + case0.type + "` - " + case0.command + "\nat " + `<t:${Math.floor(case0.time.getTime() / 1000)}:d>`
+                "`" +
+                  case0.type +
+                  "` - " +
+                  case0.command +
+                  "\nat " +
+                  `<t:${Math.floor(case0.time.getTime() / 1000)}:d>`
               );
             }
           }
@@ -243,13 +281,29 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           });
           if (currentPage + 1 == lastPage) {
             row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-              new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(false),
-              new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(true)
+              new ButtonBuilder()
+                .setCustomId("⬅")
+                .setLabel("back")
+                .setStyle(ButtonStyle.Primary)
+                .setDisabled(false),
+              new ButtonBuilder()
+                .setCustomId("➡")
+                .setLabel("next")
+                .setStyle(ButtonStyle.Primary)
+                .setDisabled(true)
             );
           } else {
             row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-              new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary).setDisabled(false),
-              new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary).setDisabled(false)
+              new ButtonBuilder()
+                .setCustomId("⬅")
+                .setLabel("back")
+                .setStyle(ButtonStyle.Primary)
+                .setDisabled(false),
+              new ButtonBuilder()
+                .setCustomId("➡")
+                .setLabel("next")
+                .setStyle(ButtonStyle.Primary)
+                .setDisabled(false)
             );
           }
           await edit({ embeds: [newEmbed], components: [row] }, msg);
