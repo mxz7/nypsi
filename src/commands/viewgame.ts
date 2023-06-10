@@ -227,7 +227,8 @@ async function run(
 
     const embed = new CustomEmbed(message.member).setHeader(
       username ? `${username}'s ${game.game} game` : `id: ${game.id.toString(36)}`,
-      message.author.avatarURL()
+      message.author.avatarURL(),
+      `https://nypsi.xyz/game/${game.id.toString(36)}`
     );
 
     let components: ActionRowBuilder<MessageActionRowComponentBuilder>[];
@@ -247,13 +248,9 @@ async function run(
 
       components[components.length - 1].components.length = 4;
     } else if (game.game.includes("scratch_card") || game.game.includes("scratchie")) {
-      components = JSON.parse(
-        game.outcome
-          .replaceAll("1061353493497118840", "1108083689478443058")
-          .replaceAll("1061353458650845184", "1108083725813686334")
-          .replaceAll("1061353521825456229", "1108083767236640818")
-          .replaceAll("1061353557644824596", "1108083805841002678") // remove after season 5
-      );
+      components = JSON.parse(game.outcome);
+    } else if (game.game === "tower") {
+      embed.addField("outcome", `https://nypsi.xyz/game/${game.id.toString(36)}`, true);
     } else {
       embed.addField("outcome", game.outcome, true);
     }
