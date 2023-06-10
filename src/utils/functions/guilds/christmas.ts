@@ -121,7 +121,9 @@ export function runChristmas(client: NypsiClient) {
     runChristmasThing();
   }, needed.getTime() - now.getTime());
 
-  logger.info(`::auto christmas countdowns will run in ${MStoTime(needed.getTime() - now.getTime())}`);
+  logger.info(
+    `::auto christmas countdowns will run in ${MStoTime(needed.getTime() - now.getTime())}`
+  );
 }
 
 export async function hasChristmasCountdown(guild: Guild) {

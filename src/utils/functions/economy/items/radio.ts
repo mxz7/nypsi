@@ -1,4 +1,10 @@
-import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions } from "discord.js";
+import {
+  BaseMessageOptions,
+  CommandInteraction,
+  InteractionReplyOptions,
+  Message,
+  MessageEditOptions,
+} from "discord.js";
 import redis from "../../../../init/redis";
 import { NypsiCommandInteraction } from "../../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
@@ -54,9 +60,12 @@ module.exports = new ItemUse(
     }
 
     if (await isPassive(radioTarget))
-      return send({ embeds: [new ErrorEmbed(`${radioTarget.toString()} is currently in passive mode`)] });
+      return send({
+        embeds: [new ErrorEmbed(`${radioTarget.toString()} is currently in passive mode`)],
+      });
 
-    if (await isPassive(message.member)) return send({ embeds: [new ErrorEmbed("you are currently in passive mode")] });
+    if (await isPassive(message.member))
+      return send({ embeds: [new ErrorEmbed("you are currently in passive mode")] });
 
     if ((await redis.exists(`${Constants.redis.cooldown.ROB_RADIO}:${radioTarget.user.id}`)) == 1) {
       return send({
@@ -69,9 +78,16 @@ module.exports = new ItemUse(
 
     const inventory = await getInventory(message.member, false);
 
-    await setInventoryItem(message.member, "radio", inventory.find((i) => i.item == "radio").amount - 1, false);
+    await setInventoryItem(
+      message.member,
+      "radio",
+      inventory.find((i) => i.item == "radio").amount - 1,
+      false
+    );
 
-    const msg = await send({ embeds: [new CustomEmbed(message.member, "putting report out on police scanner...")] });
+    const msg = await send({
+      embeds: [new CustomEmbed(message.member, "putting report out on police scanner...")],
+    });
 
     await sleep(2000);
 

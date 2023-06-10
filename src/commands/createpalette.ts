@@ -14,7 +14,10 @@ const cmd = new Command(
 
 const regex = /[^a-f0-9]/g;
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[]
+) {
   if (await onCooldown(cmd.name, message.member)) {
     const embed = await getResponse(cmd.name, message.member);
 
@@ -22,7 +25,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   }
 
   if (!(await isPremium(message.author.id))) {
-    return message.channel.send({ embeds: [new ErrorEmbed("you must be a patreon for this command")] });
+    return message.channel.send({
+      embeds: [new ErrorEmbed("you must be a patreon for this command")],
+    });
   }
 
   if (!message.guild.members.me.permissions.has(PermissionFlagsBits.ManageRoles)) {

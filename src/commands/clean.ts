@@ -4,9 +4,16 @@ import { getPrefix } from "../utils/functions/guilds/utils";
 import { isPremium } from "../utils/functions/premium/premium";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command("clean", "clean up bot commands and responses", "moderation").setPermissions(["MANAGE_MESSAGES"]);
+const cmd = new Command(
+  "clean",
+  "clean up bot commands and responses",
+  "moderation"
+).setPermissions(["MANAGE_MESSAGES"]);
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[]
+) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
     if (message.channel.id != "747056029795221516") return;
     if (!(await isPremium(message.member))) return;
@@ -36,7 +43,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const collected = await message.channel.messages.fetch({ limit: amount });
 
-  const collecteda = collected.filter((msg) => msg.author.id == message.client.user.id || msg.content.startsWith(prefix));
+  const collecteda = collected.filter(
+    (msg) => msg.author.id == message.client.user.id || msg.content.startsWith(prefix)
+  );
 
   await message.channel.bulkDelete(collecteda);
 }

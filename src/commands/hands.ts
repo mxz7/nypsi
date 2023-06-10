@@ -6,7 +6,9 @@ import { redditImage } from "../utils/functions/image";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { images } from "../utils/handlers/imghandler";
 
-const cmd = new Command("hands", "get a random hand image. horny slut", "nsfw").setAliases(["hand"]);
+const cmd = new Command("hands", "get a random hand image. horny slut", "nsfw").setAliases([
+  "hand",
+]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
   if (await onCooldown(cmd.name, message.member)) {
@@ -20,20 +22,28 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (message.channel.isDMBased()) return;
 
   if (message.channel.isThread())
-    return message.channel.send({ embeds: [new ErrorEmbed("you must do this in an nsfw channel")] });
+    return message.channel.send({
+      embeds: [new ErrorEmbed("you must do this in an nsfw channel")],
+    });
 
   if (!message.channel.nsfw) {
-    return message.channel.send({ embeds: [new ErrorEmbed("you must do this in an nsfw channel")] });
+    return message.channel.send({
+      embeds: [new ErrorEmbed("you must do this in an nsfw channel")],
+    });
   }
 
   const handCache = images.get("hands");
 
   if (!handCache) {
-    return message.channel.send({ embeds: [new ErrorEmbed("please wait a couple more seconds..")] });
+    return message.channel.send({
+      embeds: [new ErrorEmbed("please wait a couple more seconds..")],
+    });
   }
 
   if (handCache.size <= 1) {
-    return message.channel.send({ embeds: [new ErrorEmbed("please wait a couple more seconds..")] });
+    return message.channel.send({
+      embeds: [new ErrorEmbed("please wait a couple more seconds..")],
+    });
   }
 
   await addCooldown(cmd.name, message.member, 7);

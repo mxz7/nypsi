@@ -1,4 +1,10 @@
-import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions } from "discord.js";
+import {
+  BaseMessageOptions,
+  CommandInteraction,
+  InteractionReplyOptions,
+  Message,
+  MessageEditOptions,
+} from "discord.js";
 import redis from "../../../../init/redis";
 import { NypsiCommandInteraction } from "../../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
@@ -41,7 +47,9 @@ module.exports = new ItemUse(
     };
 
     if ((await getDisabledCommands(message.guild)).includes("rob")) {
-      return send({ embeds: [new ErrorEmbed(`lockpicks have been disabled in ${message.guild.name}`)] });
+      return send({
+        embeds: [new ErrorEmbed(`lockpicks have been disabled in ${message.guild.name}`)],
+      });
     }
 
     if (args.length == 1) {
@@ -57,15 +65,22 @@ module.exports = new ItemUse(
     }
 
     if (await isPassive(lockPickTarget))
-      return send({ embeds: [new ErrorEmbed(`${lockPickTarget.toString()} is currently in passive mode`)] });
+      return send({
+        embeds: [new ErrorEmbed(`${lockPickTarget.toString()} is currently in passive mode`)],
+      });
 
-    if (await isPassive(message.member)) return send({ embeds: [new ErrorEmbed("you are currently in passive mode")] });
+    if (await isPassive(message.member))
+      return send({ embeds: [new ErrorEmbed("you are currently in passive mode")] });
 
     if (message.member == lockPickTarget) {
-      if ((await redis.exists(`${Constants.redis.cooldown.SEX_CHASTITY}:${message.author.id}`)) == 1) {
+      if (
+        (await redis.exists(`${Constants.redis.cooldown.SEX_CHASTITY}:${message.author.id}`)) == 1
+      ) {
         await redis.del(`${Constants.redis.cooldown.SEX_CHASTITY}:${message.author.id}`);
 
-        const msg = await send({ embeds: [new CustomEmbed(message.member, "picking chastity cage...")] });
+        const msg = await send({
+          embeds: [new CustomEmbed(message.member, "picking chastity cage...")],
+        });
 
         await sleep(2000);
 
@@ -93,7 +108,12 @@ module.exports = new ItemUse(
     const inventory = await getInventory(message.member, false);
 
     await Promise.all([
-      setInventoryItem(message.member, "lock_pick", inventory.find((i) => i.item == "lock_pick").amount - 1, false),
+      setInventoryItem(
+        message.member,
+        "lock_pick",
+        inventory.find((i) => i.item == "lock_pick").amount - 1,
+        false
+      ),
       setPadlock(lockPickTarget, false),
     ]);
 
@@ -115,7 +135,9 @@ module.exports = new ItemUse(
     }
 
     const msg = await send({
-      embeds: [new CustomEmbed(message.member, `picking **${lockPickTarget.user.tag}**'s padlock...`)],
+      embeds: [
+        new CustomEmbed(message.member, `picking **${lockPickTarget.user.tag}**'s padlock...`),
+      ],
     });
 
     await sleep(2000);

@@ -84,7 +84,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     );
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder().setStyle(ButtonStyle.Link).setURL("https://top.gg/bot/678711738845102087/vote").setLabel("top.gg")
+      new ButtonBuilder()
+        .setStyle(ButtonStyle.Link)
+        .setURL("https://top.gg/bot/678711738845102087/vote")
+        .setLabel("top.gg")
     );
 
     send({ embeds: [embed], components: [row] });

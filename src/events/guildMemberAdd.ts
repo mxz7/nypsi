@@ -77,7 +77,8 @@ export default async function guildMemberAdd(member: GuildMember) {
         await sleep(500);
       }
     }
-    if (count > 0) logger.info(`${count} persistant roles given to ${member.id} in ${member.guild.id}`);
+    if (count > 0)
+      logger.info(`${count} persistant roles given to ${member.id} in ${member.guild.id}`);
   }
 
   if (!queue.has(member.guild.id)) {

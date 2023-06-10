@@ -51,7 +51,9 @@ export default {
       embeds: [
         new CustomEmbed(
           null,
-          `✅ added ${getItems()[offer.itemId].emoji} ${getItems()[offer.itemId].name} to your block list`
+          `✅ added ${getItems()[offer.itemId].emoji} ${
+            getItems()[offer.itemId].name
+          } to your block list`
         ),
       ],
     });

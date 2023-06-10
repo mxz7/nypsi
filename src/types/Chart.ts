@@ -2,7 +2,13 @@ export interface ChartData {
   type: string;
   data: {
     labels: string[];
-    datasets: { yAxisID?: string; label: string; data: number[]; fill?: boolean; lineTension?: number }[];
+    datasets: {
+      yAxisID?: string;
+      label: string;
+      data: number[];
+      fill?: boolean;
+      lineTension?: number;
+    }[];
   };
   options?: {
     title?: {

@@ -1,4 +1,10 @@
-import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message, MessageEditOptions } from "discord.js";
+import {
+  BaseMessageOptions,
+  CommandInteraction,
+  InteractionReplyOptions,
+  Message,
+  MessageEditOptions,
+} from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import {
@@ -15,9 +21,14 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 const cmd = new Command("deposit", "deposit money into your bank", "money").setAliases(["dep"]);
 
 cmd.slashEnabled = true;
-cmd.slashData.addStringOption((option) => option.setName("amount").setDescription("amount to deposit").setRequired(true));
+cmd.slashData.addStringOption((option) =>
+  option.setName("amount").setDescription("amount to deposit").setRequired(true)
+);
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[]
+) {
   if (!(await userExists(message.member))) await createUser(message.member);
 
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
@@ -73,8 +84,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (args[0].toLowerCase() == "all") {
     args[0] = (await getBalance(message.member)).toString();
     const amount = parseInt(args[0]);
-    if (amount > (await getMaxBankBalance(message.member)) - (await getBankBalance(message.member))) {
-      args[0] = ((await getMaxBankBalance(message.member)) - (await getBankBalance(message.member))).toString();
+    if (
+      amount >
+      (await getMaxBankBalance(message.member)) - (await getBankBalance(message.member))
+    ) {
+      args[0] = (
+        (await getMaxBankBalance(message.member)) - (await getBankBalance(message.member))
+      ).toString();
     }
   }
 

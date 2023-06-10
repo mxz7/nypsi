@@ -6,7 +6,10 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 
 const cmd = new Command("ezpoll", "simple poll builder", "utility");
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[]
+) {
   if (await onCooldown(cmd.name, message.member)) {
     const embed = await getResponse(cmd.name, message.member);
 

@@ -9,12 +9,14 @@ const autocompleteHandlers = new Map<string, AutocompleteHandler>();
 const interactionHandlers = new Map<string, InteractionHandler>();
 
 export async function loadInteractions() {
-  const files = await readdir("./dist/interactions").then((r) => r.filter((i) => i.endsWith(".js")));
+  const files = await readdir("./dist/interactions").then((r) =>
+    r.filter((i) => i.endsWith(".js"))
+  );
 
   for (const fileName of files) {
-    const res: InteractionHandler | AutocompleteHandler = await import(`../../interactions/${fileName}`).then(
-      (r) => r.default
-    );
+    const res: InteractionHandler | AutocompleteHandler = await import(
+      `../../interactions/${fileName}`
+    ).then((r) => r.default);
 
     if (res.type === "autocomplete") {
       autocompleteHandlers.set(res.name, res);
@@ -29,7 +31,9 @@ export async function loadInteractions() {
 export async function reloadInteractions() {
   autocompleteHandlers.clear();
   interactionHandlers.clear();
-  const files = await readdir("./dist/interactions").then((r) => r.filter((i) => i.endsWith(".js")));
+  const files = await readdir("./dist/interactions").then((r) =>
+    r.filter((i) => i.endsWith(".js"))
+  );
 
   for (const fileName of files) {
     delete require.cache[require.resolve(`../../interactions/${fileName}`)];
@@ -67,7 +71,9 @@ export async function runInteraction(interaction: Interaction) {
             .then((r) => r.toString())
             .catch(() => {});
           return interaction.reply({
-            embeds: [new ErrorEmbed(`you require ${role || reactionRole.whitelist[0]} to use this`)],
+            embeds: [
+              new ErrorEmbed(`you require ${role || reactionRole.whitelist[0]} to use this`),
+            ],
             ephemeral: true,
           });
         } else {

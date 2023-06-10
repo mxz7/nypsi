@@ -44,7 +44,11 @@ cmd.slashData
       .setName("block")
       .setDescription("manage your blocked users/items")
       .addStringOption((option) =>
-        option.setName("item-global").setDescription("item or user to block/unblock").setAutocomplete(true).setRequired(true)
+        option
+          .setName("item-global")
+          .setDescription("item or user to block/unblock")
+          .setAutocomplete(true)
+          .setRequired(true)
       )
   )
   .addSubcommand((create) =>
@@ -52,16 +56,30 @@ cmd.slashData
       .setName("create")
       .setDescription("create an offer")
       .addUserOption((option) =>
-        option.setName("user").setDescription("user you want to offer something to").setRequired(true)
+        option
+          .setName("user")
+          .setDescription("user you want to offer something to")
+          .setRequired(true)
       )
       .addStringOption((option) =>
-        option.setName("item-global").setDescription("item you want to buy").setAutocomplete(true).setRequired(true)
+        option
+          .setName("item-global")
+          .setDescription("item you want to buy")
+          .setAutocomplete(true)
+          .setRequired(true)
       )
-      .addIntegerOption((option) => option.setName("amount").setDescription("amount you want to buy").setRequired(true))
-      .addStringOption((option) => option.setName("money").setDescription("how much $ you want to offer").setRequired(true))
+      .addIntegerOption((option) =>
+        option.setName("amount").setDescription("amount you want to buy").setRequired(true)
+      )
+      .addStringOption((option) =>
+        option.setName("money").setDescription("how much $ you want to offer").setRequired(true)
+      )
   );
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[]
+) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       let usedNewMessage = false;
@@ -119,7 +137,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const manageOffers = async (msg?: Message) => {
     const offers = await getOwnedOffers(message.author.id);
 
-    const embed = new CustomEmbed(message.member).setHeader("your offers", message.author.avatarURL());
+    const embed = new CustomEmbed(message.member).setHeader(
+      "your offers",
+      message.author.avatarURL()
+    );
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>();
 
@@ -130,7 +151,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       embed.setFields(
         {
           name: "item",
-          value: `**${offers[page].itemAmount}x** ${items[offers[page].itemId].emoji} ${items[offers[page].itemId].name}`,
+          value: `**${offers[page].itemAmount}x** ${items[offers[page].itemId].emoji} ${
+            items[offers[page].itemId].name
+          }`,
           inline: true,
         },
         {
@@ -140,7 +163,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         },
         {
           name: "target",
-          value: `${(await getLastKnownTag(offers[page].targetId)) || "unknown user"} (${offers[page].targetId})`,
+          value: `${(await getLastKnownTag(offers[page].targetId)) || "unknown user"} (${
+            offers[page].targetId
+          })`,
           inline: true,
         }
       );
@@ -173,7 +198,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     } else if (offers.length > 1) {
       await displayOffer(0);
     } else {
-      row.addComponents(new ButtonBuilder().setCustomId("del").setLabel("delete").setStyle(ButtonStyle.Danger));
+      row.addComponents(
+        new ButtonBuilder().setCustomId("del").setLabel("delete").setStyle(ButtonStyle.Danger)
+      );
       await displayOffer(0);
     }
 
@@ -242,9 +269,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         await msg.edit({ embeds: [embed], components: [row] });
         return pageManager();
       } else if (res == "del") {
-        const res = await deleteOffer(offers[currentPage], message.client as NypsiClient).catch((e) => {
-          logger.warn("failed to delete offer", e);
-        });
+        const res = await deleteOffer(offers[currentPage], message.client as NypsiClient).catch(
+          (e) => {
+            logger.warn("failed to delete offer", e);
+          }
+        );
 
         if (res) {
           await interaction.followUp({
@@ -277,7 +306,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (args.length == 1) {
       if (current.length == 0) {
-        return send({ embeds: [new CustomEmbed(message.member, "you are have no items or people blocked")] });
+        return send({
+          embeds: [new CustomEmbed(message.member, "you are have no items or people blocked")],
+        });
       }
 
       return send({
@@ -287,7 +318,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             `blocklist: \n\n${current
               .map((i) => {
                 if (items[i]) return `${items[i].emoji} ${items[i].name}`;
-                if (message.guild.members.cache.has(i)) return `\`${i}\` (${message.guild.members.cache.get(i).user.tag})`;
+                if (message.guild.members.cache.has(i))
+                  return `\`${i}\` (${message.guild.members.cache.get(i).user.tag})`;
                 return `\`${i}\``;
               })
               .join("\n")}`
@@ -301,7 +333,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const selectedItem = selectItem(searchTag);
     const selectedMember = await getMember(message.guild, searchTag);
 
-    if (!selectedItem && !selectedMember) return send({ embeds: [new ErrorEmbed("invalid member or item")] });
+    if (!selectedItem && !selectedMember)
+      return send({ embeds: [new ErrorEmbed("invalid member or item")] });
 
     let value = "";
 
@@ -330,7 +363,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       current = await setBlockedList(message.author.id, current);
     }
 
-    const embed = new CustomEmbed(message.member, desc).setHeader("offer blocklist", message.author.avatarURL());
+    const embed = new CustomEmbed(message.member, desc).setHeader(
+      "offer blocklist",
+      message.author.avatarURL()
+    );
 
     if (current.length > 0) {
       embed.addField(
@@ -338,7 +374,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         current
           .map((i) => {
             if (items[i]) return `${items[i].emoji} ${items[i].name}`;
-            if (message.guild.members.cache.has(i)) return `\`${i}\` (${message.guild.members.cache.get(i).user.tag})`;
+            if (message.guild.members.cache.has(i))
+              return `\`${i}\` (${message.guild.members.cache.get(i).user.tag})`;
             return `\`${i}\``;
           })
           .join("\n")
@@ -347,7 +384,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     return send({ embeds: [embed] });
   } else {
-    if (args.length < 3) return send({ embeds: [new ErrorEmbed("/offer create <target> <item> <amount> <money>")] });
+    if (args.length < 3)
+      return send({ embeds: [new ErrorEmbed("/offer create <target> <item> <amount> <money>")] });
     let max = 3;
 
     if (await isPremium(message.member)) {
@@ -357,7 +395,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const currentOffers = await getOwnedOffers(message.author.id);
 
     if (currentOffers.length + 1 > max)
-      return send({ embeds: [new ErrorEmbed(`you have reached the max amount of offers (${max})`)] });
+      return send({
+        embeds: [new ErrorEmbed(`you have reached the max amount of offers (${max})`)],
+      });
 
     const target = await getMember(message.guild, args[0].toLowerCase());
 
@@ -390,34 +430,50 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if (!selected) return send({ embeds: [new ErrorEmbed("invalid item")] });
 
-    if (selected.account_locked) return send({ embeds: [new ErrorEmbed("this item cant be traded")] });
+    if (selected.account_locked)
+      return send({ embeds: [new ErrorEmbed("this item cant be traded")] });
 
     const blocked = await getBlockedList(target.user.id);
 
     if (blocked.includes(selected.id))
       return send({
-        embeds: [new ErrorEmbed(`**${target.user.tag}** has blocked offers for ${selected.emoji} ${selected.name}`)],
+        embeds: [
+          new ErrorEmbed(
+            `**${target.user.tag}** has blocked offers for ${selected.emoji} ${selected.name}`
+          ),
+        ],
       });
 
     if (blocked.includes(message.author.id))
-      return send({ embeds: [new ErrorEmbed(`**${target.user.tag}** has blocked offers from you`)] });
+      return send({
+        embeds: [new ErrorEmbed(`**${target.user.tag}** has blocked offers from you`)],
+      });
 
     let amount = parseInt(args[2]);
 
     if (args.length === 3) amount = 1;
 
-    if (!amount || isNaN(amount) || amount < 1) return send({ embeds: [new ErrorEmbed("invalid amount")] });
+    if (!amount || isNaN(amount) || amount < 1)
+      return send({ embeds: [new ErrorEmbed("invalid amount")] });
 
     const inventory = await getInventory(target);
 
-    if (!inventory.find((i) => i.item === selected.id) || inventory.find((i) => i.item === selected.id).amount < amount)
+    if (
+      !inventory.find((i) => i.item === selected.id) ||
+      inventory.find((i) => i.item === selected.id).amount < amount
+    )
       return send({
-        embeds: [new ErrorEmbed(`**${target.user.tag}** doesnt have ${amount}x ${selected.emoji} ${selected.name}`)],
+        embeds: [
+          new ErrorEmbed(
+            `**${target.user.tag}** doesnt have ${amount}x ${selected.emoji} ${selected.name}`
+          ),
+        ],
       });
 
     const money = formatNumber(args.length === 3 ? args[2] : args[3]);
 
-    if (!money || money < 1 || isNaN(money)) return send({ embeds: [new ErrorEmbed("invalid amount")] });
+    if (!money || money < 1 || isNaN(money))
+      return send({ embeds: [new ErrorEmbed("invalid amount")] });
 
     const balance = await getBalance(message.member);
 
@@ -429,7 +485,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       await updateBalance(message.member, balance + money);
       return send({ embeds: [new ErrorEmbed("failed to create offer")] });
     } else {
-      return send({ embeds: [new CustomEmbed(message.member, `✅ offer has been sent to **${target.user.tag}**`)] });
+      return send({
+        embeds: [
+          new CustomEmbed(message.member, `✅ offer has been sent to **${target.user.tag}**`),
+        ],
+      });
     }
   }
 }

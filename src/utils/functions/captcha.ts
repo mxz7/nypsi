@@ -66,13 +66,16 @@ export async function passedCaptcha(member: GuildMember) {
   }
 
   await hook.send(
-    `[${getTimestamp()}] **${member.user.tag}** (${member.user.id}) has passed a captcha [${captchaPasses.get(
+    `[${getTimestamp()}] **${member.user.tag}** (${
       member.user.id
-    )}]`
+    }) has passed a captcha [${captchaPasses.get(member.user.id)}]`
   );
 
   await redis.set(`${Constants.redis.nypsi.CAPTCHA_VERIFIED}:${member.user.id}`, member.user.id);
-  await redis.expire(`${Constants.redis.nypsi.CAPTCHA_VERIFIED}:${member.user.id}`, ms("30 minutes") / 1000);
+  await redis.expire(
+    `${Constants.redis.nypsi.CAPTCHA_VERIFIED}:${member.user.id}`,
+    ms("30 minutes") / 1000
+  );
   hook.destroy();
 }
 
@@ -90,7 +93,9 @@ export async function failedCaptcha(member: GuildMember, content: string) {
   if (captchaFails.get(member.user.id) >= 69 && !(await isEcoBanned(member.user.id))) {
     await setEcoBan(member.user.id, dayjs().add(1, "day").toDate());
     await hook.send(
-      `[${getTimestamp()}] **${member.user.tag}** (${member.user.id}) has been banned for 24 hours for failing 69 captchas`
+      `[${getTimestamp()}] **${member.user.tag}** (${
+        member.user.id
+      }) has been banned for 24 hours for failing 69 captchas`
     );
     await requestDM({
       client: member.client as NypsiClient,
@@ -100,14 +105,20 @@ export async function failedCaptcha(member: GuildMember, content: string) {
   }
 
   await hook.send(
-    `[${getTimestamp()}] **${member.user.tag}** (${member.user.id}) has failed a captcha (${content}) [${captchaFails.get(
+    `[${getTimestamp()}] **${member.user.tag}** (${
       member.user.id
-    )}]${captchaFails.get(member.user.id) % 15 === 0 ? " <@&747059949770768475> <@672793821850894347>" : ""}`
+    }) has failed a captcha (${content}) [${captchaFails.get(member.user.id)}]${
+      captchaFails.get(member.user.id) % 15 === 0
+        ? " <@&747059949770768475> <@672793821850894347>"
+        : ""
+    }`
   );
   hook.destroy();
 }
 
-export async function verifyUser(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
+export async function verifyUser(
+  message: Message | (NypsiCommandInteraction & CommandInteraction)
+) {
   if (beingVerified.has(message.author.id)) return;
 
   const { captcha, text } = await createCaptcha();
@@ -149,7 +160,9 @@ export async function verifyUser(message: Message | (NypsiCommandInteraction & C
       logger.info(`captcha (${message.author.id}) failed`);
       failedCaptcha(message.member, "captcha timed out");
       message.channel.send({
-        content: message.author.toString() + " captcha failed, please **type** the letter/number combination shown",
+        content:
+          message.author.toString() +
+          " captcha failed, please **type** the letter/number combination shown",
       });
     });
 
@@ -168,7 +181,9 @@ export async function verifyUser(message: Message | (NypsiCommandInteraction & C
     logger.info(`captcha (${message.author.id}) failed`);
     failedCaptcha(message.member, response.content);
     return message.channel.send({
-      content: message.author.toString() + " captcha failed, please **type** the letter/number combination shown",
+      content:
+        message.author.toString() +
+        " captcha failed, please **type** the letter/number combination shown",
     });
   }
 }

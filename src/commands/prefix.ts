@@ -3,14 +3,21 @@ import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getPrefix, setPrefix } from "../utils/functions/guilds/utils";
 
-const cmd = new Command("prefix", "change the bot's prefix", "admin").setPermissions(["MANAGE_GUILD"]);
+const cmd = new Command("prefix", "change the bot's prefix", "admin").setPermissions([
+  "MANAGE_GUILD",
+]);
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[]
+) {
   const prefix = await getPrefix(message.guild);
 
   if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
     if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
-      return message.channel.send({ embeds: [new ErrorEmbed("you need the `manage server` permission")] });
+      return message.channel.send({
+        embeds: [new ErrorEmbed("you need the `manage server` permission")],
+      });
     }
     return;
   }
@@ -18,19 +25,28 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (args.length == 0) {
     const embed = new CustomEmbed(
       message.member,
-      "current prefix: `" + prefix + "`\n\nuse " + prefix + "**prefix** <new prefix> to change the current prefix"
+      "current prefix: `" +
+        prefix +
+        "`\n\nuse " +
+        prefix +
+        "**prefix** <new prefix> to change the current prefix"
     ).setHeader("prefix");
 
     return message.channel.send({ embeds: [embed] });
   }
 
   if (args.join(" ").length > 3) {
-    return message.channel.send({ embeds: [new ErrorEmbed("prefix cannot be longer than 3 characters")] });
+    return message.channel.send({
+      embeds: [new ErrorEmbed("prefix cannot be longer than 3 characters")],
+    });
   }
 
   await setPrefix(message.guild, args.join(" "));
 
-  const embed = new CustomEmbed(message.member, "✅ prefix changed to `" + args.join(" ") + "`").setHeader("prefix");
+  const embed = new CustomEmbed(
+    message.member,
+    "✅ prefix changed to `" + args.join(" ") + "`"
+  ).setHeader("prefix");
 
   return await message.channel.send({ embeds: [embed] });
 }

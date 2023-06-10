@@ -7,7 +7,10 @@ import { logger } from "../utils/logger";
 
 const cmd = new Command("cmdwatch", "watch commands", "none");
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[]
+) {
   if ((await getAdminLevel(message.author.id)) < 2) return;
 
   if (args.length < 2) {
@@ -24,7 +27,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     await message.react("➕");
   }
 
-  logger.info(`admin: ${message.author.id} (${message.author.tag}) toggled command watch - ${args.join(" ")}`);
+  logger.info(
+    `admin: ${message.author.id} (${message.author.tag}) toggled command watch - ${args.join(" ")}`
+  );
 }
 
 cmd.setRun(run);

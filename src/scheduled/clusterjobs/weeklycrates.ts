@@ -28,7 +28,9 @@ async function doCrates(client: NypsiClient) {
   for (const member of query) {
     const rewards = new Map<string, number>();
 
-    const embed = new CustomEmbed().setHeader("thank you for supporting nypsi!").setColor(Constants.EMBED_SUCCESS_COLOR);
+    const embed = new CustomEmbed()
+      .setHeader("thank you for supporting nypsi!")
+      .setColor(Constants.EMBED_SUCCESS_COLOR);
 
     if (member.Premium?.level == 2) {
       rewards.set("basic_crate", 2);
@@ -59,7 +61,11 @@ async function doCrates(client: NypsiClient) {
       await addInventoryItem(member.id, key, value, false);
       desc.push(
         `+**${value}** ${getItems()[key].emoji} ${
-          value > 1 ? (getItems()[key].plural ? getItems()[key].plural : getItems()[key].name) : getItems()[key].name
+          value > 1
+            ? getItems()[key].plural
+              ? getItems()[key].plural
+              : getItems()[key].name
+            : getItems()[key].name
         }`
       );
     }

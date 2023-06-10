@@ -1,4 +1,9 @@
-import { BaseMessageOptions, CommandInteraction, InteractionReplyOptions, Message } from "discord.js";
+import {
+  BaseMessageOptions,
+  CommandInteraction,
+  InteractionReplyOptions,
+  Message,
+} from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { addProgress } from "../utils/functions/economy/achievements";
@@ -11,9 +16,14 @@ const cache = new Map<string, number>();
 const cmd = new Command("love", "calculate your love with another person", "fun");
 
 cmd.slashEnabled = true;
-cmd.slashData.addUserOption((option) => option.setName("user").setDescription("is this person your one true love?!"));
+cmd.slashData.addUserOption((option) =>
+  option.setName("user").setDescription("is this person your one true love?!")
+);
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) {
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[]
+) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       let usedNewMessage = false;

@@ -98,7 +98,8 @@ export default class DiscordTransport implements Transport {
       if (["hybrid", "embed"].includes(this.mode)) {
         const embed = new EmbedBuilder();
 
-        if (this.colors.has(data.label)) embed.setColor(this.colors.get(data.label) as ColorResolvable);
+        if (this.colors.has(data.label))
+          embed.setColor(this.colors.get(data.label) as ColorResolvable);
 
         if (this.mode == "hybrid") {
           embed.setDescription(`\`\`\`ansi\n${this.formatter(data)}\`\`\``);
