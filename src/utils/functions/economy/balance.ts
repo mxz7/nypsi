@@ -543,6 +543,12 @@ export async function calcNetWorth(member: GuildMember | string, breakdown = fal
       bank: true,
       Inventory: true,
       netWorth: true,
+      BakeryUpgrade: {
+        select: {
+          upgradeId: true,
+          amount: true,
+        },
+      },
       EconomyWorker: {
         include: {
           upgrades: true,
@@ -594,6 +600,19 @@ export async function calcNetWorth(member: GuildMember | string, breakdown = fal
       );
   } else if (breakdown) {
     breakdownItems.set("guild", 0);
+  }
+
+  for (const upgrade of query.BakeryUpgrade) {
+    const item = getItems()[upgrade.upgradeId];
+
+    const value = ((await getAuctionAverage(item.id)) || item.sell) * upgrade.amount;
+
+    worth += value;
+    if (breakdown) {
+      breakdownItems.has("bakery")
+        ? breakdownItems.set("bakery", breakdownItems.get("bakery") + value)
+        : breakdownItems.set("bakery", value);
+    }
   }
 
   for (const item of query.Inventory) {
