@@ -804,7 +804,10 @@ async function run(
 
     await addCooldown(cmd.name, message.member, 3);
 
-    const requirements = await getRequiredForGuildUpgrade(guild.guildName);
+    let requirements = await getRequiredForGuildUpgrade(guild.guildName);
+
+    if (guild.members.length !== requirements.members)
+      requirements = await getRequiredForGuildUpgrade(guild.guildName, false);
 
     const embed = new CustomEmbed(message.member);
 

@@ -257,8 +257,14 @@ export async function getMaxMembersForGuild(name: string) {
   return slots;
 }
 
-export async function getRequiredForGuildUpgrade(name: string): Promise<GuildUpgradeRequirements> {
-  if (await redis.exists(`${Constants.redis.cache.economy.GUILD_REQUIREMENTS}:${name}`)) {
+export async function getRequiredForGuildUpgrade(
+  name: string,
+  cache = true
+): Promise<GuildUpgradeRequirements> {
+  if (
+    (await redis.exists(`${Constants.redis.cache.economy.GUILD_REQUIREMENTS}:${name}`)) &&
+    cache
+  ) {
     return JSON.parse(
       await redis.get(`${Constants.redis.cache.economy.GUILD_REQUIREMENTS}:${name}`)
     );
@@ -269,14 +275,15 @@ export async function getRequiredForGuildUpgrade(name: string): Promise<GuildUpg
   const baseMoney = 3000000 * Math.pow(guild.level, 2.1);
   const baseXP = 1750 * Math.pow(guild.level, 1.8);
 
-  const bonusMoney = 1000000 * guild.members.length;
-  const bonusXP = 2500 * guild.members.length;
+  const bonusMoney = 1000000 * guild.members.length * Math.floor(guild.level / 7);
+  const bonusXP = 2500 * guild.members.length * Math.floor(guild.level / 7);
 
   await redis.set(
     `${Constants.redis.cache.economy.GUILD_REQUIREMENTS}:${name}`,
     JSON.stringify({
       money: Math.floor(baseMoney + bonusMoney),
       xp: Math.floor(baseXP + bonusXP),
+      members: guild.members.length,
     })
   );
   await redis.expire(
@@ -287,6 +294,7 @@ export async function getRequiredForGuildUpgrade(name: string): Promise<GuildUpg
   return {
     money: Math.floor(baseMoney + bonusMoney),
     xp: Math.floor(baseXP + bonusXP),
+    members: guild.members.length,
   };
 }
 
@@ -375,7 +383,9 @@ async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
   }
 
   if (guild.level >= Constants.MAX_GUILD_LEVEL) return;
-  const requirements = await getRequiredForGuildUpgrade(guild.guildName);
+  let requirements = await getRequiredForGuildUpgrade(guild.guildName);
+  if (guild.members?.length !== requirements.members)
+    requirements = await getRequiredForGuildUpgrade(guild.guildName, false);
 
   if (Number(guild.balance) >= requirements.money && guild.xp >= requirements.xp) {
     await prisma.economyGuild.update({

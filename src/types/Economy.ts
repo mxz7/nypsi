@@ -41,6 +41,7 @@ export interface LotteryTicket {
 export interface GuildUpgradeRequirements {
   money: number;
   xp: number;
+  members: number;
 }
 
 export interface Booster {
