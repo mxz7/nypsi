@@ -50,6 +50,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       mainValues += `\n👷🏻‍♂️ $**${value.toLocaleString()}** (${((value / net.amount) * 100).toFixed(
         2
       )}%)`;
+    } else if (key === "bakery") {
+      mainValues += `\n${getItems()["furnace"].emoji} $**${value.toLocaleString()}** (${(
+        (value / net.amount) *
+        100
+      ).toFixed(2)}%)`;
     } else {
       itemValues.push({ itemId: key, value });
     }
