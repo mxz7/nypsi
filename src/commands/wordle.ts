@@ -6,6 +6,7 @@ import {
   MessageEditOptions,
 } from "discord.js";
 import * as fs from "fs/promises";
+import redis from "../init/redis";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
@@ -82,6 +83,10 @@ async function run(
     return send({ embeds: [new ErrorEmbed("you are already playing wordle")] });
   }
 
+  if (await redis.sismember(Constants.redis.nypsi.USERS_PLAYING, message.author.id)) {
+    return send({ embeds: [new ErrorEmbed("you have an active game")] });
+  }
+
   const prefix = await getPrefix(message.guild);
 
   if (args.length == 0) {
@@ -149,6 +154,7 @@ async function run(
   }
 
   await addCooldown(cmd.name, message.member, 75);
+  await redis.sadd(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
 
   const board = createBoard();
   const word = await getWord();
@@ -186,12 +192,14 @@ async function play(
   const edit = async (data: MessageEditOptions) => {
     if (!(message instanceof Message)) {
       await message.editReply(data).catch(() => {
+        redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
         games.delete(message.author.id);
         return;
       });
       return await message.fetchReply();
     } else {
       return await m.edit(data).catch(() => {
+        redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
         games.delete(message.author.id);
         return;
       });
@@ -213,6 +221,7 @@ async function play(
       fail = true;
       cancel(message, m);
       games.delete(message.author.id);
+      redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
       message.channel.send({ content: message.author.toString() + " wordle game expired" });
     });
 
@@ -282,6 +291,7 @@ async function play(
       fail = true;
     });
     if (fail) {
+      redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
       games.delete(message.author.id);
       return;
     }
@@ -315,6 +325,7 @@ async function cancel(message: Message | (NypsiCommandInteraction & CommandInter
   embed.setFooter(null);
 
   edit({ embeds: [embed] });
+  redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
   games.delete(message.author.id);
 
   if (!message.member) return;
@@ -348,6 +359,7 @@ async function win(message: Message | (NypsiCommandInteraction & CommandInteract
   });
 
   edit({ embeds: [embed] });
+  redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
   games.delete(message.author.id);
 
   if (!karmaCooldown.has(message.author.id)) {
@@ -380,6 +392,7 @@ async function lose(message: Message | (NypsiCommandInteraction & CommandInterac
   embed.setFooter(null);
 
   edit({ embeds: [embed] });
+  redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
   games.delete(message.author.id);
 
   if (!message.member) return;
