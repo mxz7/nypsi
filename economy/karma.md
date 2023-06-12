@@ -27,4 +27,6 @@ items on the karma shop have a limited stock, so make sure to buy them before st
 
 ## how often is the karma shop open
 
-the karma shop opens at the bot's discretion, 2-5 times a month
+the karma shop opens a few times a month, use the `/karmashop view` command to see when it is next
+scheduled to be opened. **please note** that these times are generated at random by nypsi for
+fairness.

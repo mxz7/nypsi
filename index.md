@@ -16,9 +16,10 @@ if you need further help, feel free to join the [support server](https://discord
 
 ### when will karmashop be open
 
-you can see when the karma shop will be opened by doing `/karmashop view`. the opening time is
-decided randomly by nypsi to provide a fair opportunit for people around the world. the chosen time
-is between 5-21 days
+the karmashop (`/karmashop view`) opens a few times a month. you can use the karma shop command to
+see when it is next scheduled to be opened. you can also join the
+[official nypsi server](https://discord.gg/hJTDNST), and give yourself the karma shop role, to be
+notified when it does open
 
 ### how do i get vote reminders
 
