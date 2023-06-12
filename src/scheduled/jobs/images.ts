@@ -95,6 +95,7 @@ async function cacheUpdate(links: string[], name: string) {
     // await sleep(6250); if reddit api changes go ahead
   }
 
+  await redis.expire(`nypsi:images:${name}`, 604800); // 7 days
   // await sleep(6250); if reddit api changes go ahead
 }
 
