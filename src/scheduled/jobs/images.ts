@@ -1,7 +1,6 @@
+import { parentPort } from "worker_threads";
+import redis from "../../init/redis";
 import { RedditJSON, RedditJSONPost } from "../../types/Reddit";
-import { logger } from "../logger";
-
-const images = new Map<string, Map<string, RedditJSONPost[]>>();
 
 const bdsmLinks = [
   "https://www.reddit.com/r/bdsm/top.json?limit=6969&t=month",
@@ -65,37 +64,42 @@ const rabbitLinks = ["https://www.reddit.com/r/rabbits/top.json?limit=6969&t=mon
 const snekLinks = ["https://www.reddit.com/r/snek/top.json?limit=6969&t=month"];
 
 async function cacheUpdate(links: string[], name: string) {
-  const map = new Map<string, RedditJSONPost[]>();
+  await redis.del(`nypsi:images:${name}`);
 
   for (const link of links) {
     const res: RedditJSON = await fetch(link).then((a) => a.json());
 
     if (res.message == "Forbidden") {
-      logger.warn(`skipped ${link} due to private subreddit`);
+      if (res.reason === "private") {
+        parentPort.postMessage(`skipped ${link} due to private subreddit`);
+      } else {
+        parentPort.postMessage(`skipped ${link} due to 403 (forbidden)`);
+      }
       continue;
     }
 
-    let allowed;
+    let allowed: RedditJSONPost[];
 
     try {
       allowed = res.data.children.filter((post) => !post.data.is_self);
     } catch {
-      logger.error(`failed processing ${link}`);
+      parentPort.postMessage(`failed processing ${link}`);
     }
 
     if (allowed) {
-      map.set(link, allowed);
+      await redis.lpush(`nypsi:images:${name}`, ...allowed.map((i) => JSON.stringify(i)));
     } else {
-      logger.error(`no images @ ${link}`);
+      parentPort.postMessage(`no images @ ${link}`);
     }
+
+    // await sleep(6250); if reddit api changes go ahead
   }
 
-  images.set(name, map);
+  await redis.expire(`nypsi:images:${name}`, 604800); // 7 days
+  // await sleep(6250); if reddit api changes go ahead
 }
 
-export async function updateCache() {
-  const start = new Date().getTime();
-  logger.info("img caches updating..");
+(async () => {
   await cacheUpdate(bdsmLinks, "bdsm");
   await cacheUpdate(thighsLinks, "thighs");
   await cacheUpdate(boobLinks, "boob");
@@ -110,9 +114,6 @@ export async function updateCache() {
   await cacheUpdate(lizardLinks, "lizard");
   await cacheUpdate(rabbitLinks, "rabbit");
   await cacheUpdate(snekLinks, "snek");
-  const end = new Date().getTime();
-  const total = (end - start) / 1000 + "s";
-  logger.info("images updated (" + total + ")");
-}
 
-export { images };
+  process.exit(0);
+})();
