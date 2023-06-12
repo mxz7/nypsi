@@ -86,6 +86,10 @@ const bree = new Bree({
       name: "purgelogs",
       interval: "0 3 1 * *",
     },
+    {
+      name: "images",
+      interval: "at 1:00am",
+    },
   ],
 });
 
