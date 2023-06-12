@@ -109,4 +109,6 @@ async function cacheUpdate(links: string[], name: string) {
   await cacheUpdate(lizardLinks, "lizard");
   await cacheUpdate(rabbitLinks, "rabbit");
   await cacheUpdate(snekLinks, "snek");
+
+  process.exit(0);
 })();
