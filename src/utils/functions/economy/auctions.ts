@@ -296,6 +296,9 @@ export async function bumpAuction(id: number, client: NypsiClient) {
 
           if (msg) {
             await msg.delete();
+
+            embed.author = msg.embeds[0]?.author;
+            embed.color = msg.embeds[0]?.color;
           }
 
           const m = await channel.send({ embeds: [embed], components: [row] });
