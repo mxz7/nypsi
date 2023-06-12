@@ -91,8 +91,12 @@ const bree = new Bree({
   ],
 });
 
-export default async function startJobs() {
+export async function startJobs() {
   await bree.start();
 
   // await bree.run();
+}
+
+export function runJob(name: string) {
+  return bree.run(name);
 }
