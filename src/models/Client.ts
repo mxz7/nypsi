@@ -42,7 +42,6 @@ import { startAutoMuteViolationInterval } from "../utils/functions/moderation/mu
 import { getCustomPresence, randomPresence, setCustomPresence } from "../utils/functions/presence";
 import { getVersion } from "../utils/functions/version";
 import { runCommandUseTimers } from "../utils/handlers/commandhandler";
-import { updateCache } from "../utils/handlers/imghandler";
 import { getWebhooks, logger, setClusterId } from "../utils/logger";
 
 export class NypsiClient extends Client {
@@ -171,7 +170,6 @@ export class NypsiClient extends Client {
   }
 
   private runIntervals() {
-    updateCache();
     getWebhooks(this);
     runSnipeClearIntervals();
     doChatReactions(this);

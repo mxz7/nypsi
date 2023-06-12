@@ -1,8 +1,6 @@
 import Bree = require("bree");
 import dayjs = require("dayjs");
-import ms = require("ms");
 import path = require("path");
-import { getGuilds } from "..";
 import { logger } from "../utils/logger";
 
 const bree = new Bree({
@@ -27,15 +25,15 @@ const bree = new Bree({
       name: "topglobal",
       interval: "at 12:00am",
     },
-    {
-      name: "purgeguilds",
-      interval: "at 3:02am",
-      worker: {
-        workerData: {
-          guilds: [],
-        },
-      },
-    },
+    // {
+    //   name: "purgeguilds",
+    //   interval: "at 3:02am",
+    //   worker: {
+    //     workerData: {
+    //       guilds: [],
+    //     },
+    //   },
+    // },
     {
       name: "deterioratekarma",
       interval: "at 11:51pm",
@@ -84,7 +82,11 @@ const bree = new Bree({
     },
     {
       name: "purgelogs",
-      interval: "0 3 1 * *",
+      cron: "0 3 1 * *",
+    },
+    {
+      name: "images",
+      interval: "at 1:00am",
     },
   ],
 });
@@ -92,11 +94,5 @@ const bree = new Bree({
 export default async function startJobs() {
   await bree.start();
 
-  bree.config.jobs[2].worker.workerData.guilds = await getGuilds();
-
   // await bree.run();
-
-  setInterval(async () => {
-    bree.config.jobs[2].worker.workerData.guilds = await getGuilds();
-  }, ms("1 day"));
 }

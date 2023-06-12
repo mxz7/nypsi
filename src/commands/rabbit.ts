@@ -1,10 +1,11 @@
 import { CommandInteraction, Message } from "discord.js";
+import redis from "../init/redis";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
+import { RedditJSONPost } from "../types/Reddit";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { redditImage } from "../utils/functions/image";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import { images } from "../utils/handlers/imghandler";
 
 const cmd = new Command("rabbit", "get a random picture of a rabbit", "animals").setAliases([
   "bunny",
@@ -17,15 +18,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return message.channel.send({ embeds: [embed] });
   }
 
-  const rabbitCache = images.get("rabbit");
+  const posts = await redis
+    .lrange("nypsi:images:rabbit", 0, -1)
+    .then((i) => i.map((j) => JSON.parse(j) as RedditJSONPost));
 
-  if (!rabbitCache) {
-    return message.channel.send({
-      embeds: [new ErrorEmbed("please wait a couple more seconds..")],
-    });
-  }
-
-  if (rabbitCache.size < 1) {
+  if (posts.length < 10) {
     return message.channel.send({
       embeds: [new ErrorEmbed("please wait a couple more seconds..")],
     });
@@ -33,15 +30,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   await addCooldown(cmd.name, message.member, 7);
 
-  const rabbitLinks = Array.from(rabbitCache.keys());
+  const chosen = posts[Math.floor(Math.random() * posts.length)];
 
-  const subredditChoice = rabbitLinks[Math.floor(Math.random() * rabbitLinks.length)];
-
-  const allowed = rabbitCache.get(subredditChoice);
-
-  const chosen = allowed[Math.floor(Math.random() * allowed.length)];
-
-  const a = await redditImage(chosen, allowed);
+  const a = await redditImage(chosen, posts);
 
   if (a == "lol") {
     return message.channel.send({ embeds: [new ErrorEmbed("unable to find rabbit image")] });
@@ -54,11 +45,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   url = "https://reddit.com" + url;
 
-  const subreddit = subredditChoice.split("/")[4];
-
   const embed = new CustomEmbed(message.member)
     .setTitle(title)
-    .setHeader("u/" + author + " | r/" + subreddit)
+    .setHeader("u/" + author + " | r/" + chosen.data.subreddit)
     .setURL(url)
     .setImage(image);
 
