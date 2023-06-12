@@ -84,7 +84,7 @@ const bree = new Bree({
     },
     {
       name: "purgelogs",
-      interval: "0 3 1 * *",
+      cron: "0 3 1 * *",
     },
     {
       name: "images",
