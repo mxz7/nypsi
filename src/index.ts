@@ -117,16 +117,22 @@ setTimeout(async () => {
 
   if (userId[0] != Constants.BOT_USER_ID) return;
 
+  setInterval(async () => {
+    const guildCount = await manager
+      .fetchClientValues("guilds.cache.size")
+      .then((res: number[]) => res.reduce((a, b) => a + b));
+
+    const shardCount = manager.clusters.size;
+
+    updateStats(guildCount, shardCount);
+    logger.info(`::guild guild count posted to top.gg: ${guildCount}`);
+  }, 3600000);
+
   const guildCount = (await manager
     .fetchClientValues("guilds.cache.size")
     .then((res) => res.reduce((a: any, b: any) => a + b))) as number;
 
   const shardCount = manager.clusterList.length;
-
-  setInterval(() => {
-    updateStats(guildCount, shardCount);
-    logger.info(`::guild guild count posted to top.gg: ${guildCount}`);
-  }, 3600000);
 
   updateStats(guildCount, shardCount);
   logger.info(`::guild guild count posted to top.gg: ${guildCount}`);
