@@ -70,7 +70,11 @@ async function cacheUpdate(links: string[], name: string) {
     const res: RedditJSON = await fetch(link).then((a) => a.json());
 
     if (res.message == "Forbidden") {
-      parentPort.postMessage(`skipped ${link} due to private subreddit`);
+      if (res.reason === "private") {
+        parentPort.postMessage(`skipped ${link} due to private subreddit`);
+      } else {
+        parentPort.postMessage(`skipped ${link} due to 403 (forbidden)`);
+      }
       continue;
     }
 
