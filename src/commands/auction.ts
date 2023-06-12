@@ -755,7 +755,7 @@ async function run(
               .map(
                 (i) =>
                   `- ${items[i.itemId].emoji} ${items[i.itemId].name}${
-                    i.maxCost > 0 ? `: <$$${i.maxCost.toLocaleString()}` : ""
+                    i.maxCost > 0 ? `: $${i.maxCost.toLocaleString()}` : ""
                   }`
               )
               .join("\n")}`
@@ -808,7 +808,7 @@ async function run(
           .map(
             (i) =>
               `- ${items[i.itemId].emoji} ${items[i.itemId].name}${
-                i.maxCost > 0 ? `: <$$${i.maxCost.toLocaleString()}` : ""
+                i.maxCost > 0 ? `: $${i.maxCost.toLocaleString()}` : ""
               }`
           )
           .join("\n")
