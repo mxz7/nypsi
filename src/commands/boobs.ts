@@ -1,10 +1,11 @@
 import { CommandInteraction, Message } from "discord.js";
+import redis from "../init/redis";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
+import { RedditJSONPost } from "../types/Reddit";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { redditImage } from "../utils/functions/image";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import { images } from "../utils/handlers/imghandler";
 
 const cmd = new Command("boobs", "get a random boob image", "nsfw").setAliases([
   "boobies",
@@ -36,15 +37,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     });
   }
 
-  const boobCache = images.get("boob");
+  const posts = await redis
+    .lrange("nypsi:images:boobs", 0, -1)
+    .then((i) => i.map((j) => JSON.parse(j) as RedditJSONPost));
 
-  if (!boobCache) {
-    return message.channel.send({
-      embeds: [new ErrorEmbed("please wait a couple more seconds..")],
-    });
-  }
-
-  if (boobCache.size <= 2) {
+  if (posts.length < 10) {
     return message.channel.send({
       embeds: [new ErrorEmbed("please wait a couple more seconds..")],
     });
@@ -52,18 +49,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   await addCooldown(cmd.name, message.member, 7);
 
-  const boobLinks = Array.from(boobCache.keys());
+  const chosen = posts[Math.floor(Math.random() * posts.length)];
 
-  const subredditChoice = boobLinks[Math.floor(Math.random() * boobLinks.length)];
-
-  const allowed = boobCache.get(subredditChoice);
-
-  const chosen = allowed[Math.floor(Math.random() * allowed.length)];
-
-  const a = await redditImage(chosen, allowed);
+  const a = await redditImage(chosen, posts);
 
   if (a == "lol") {
-    return message.channel.send({ embeds: [new ErrorEmbed("unable to find boob image")] });
+    return message.channel.send({ embeds: [new ErrorEmbed("unable to find boobs image")] });
   }
 
   const image = a.split("|")[0];
@@ -73,11 +64,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   url = "https://reddit.com" + url;
 
-  const subreddit = subredditChoice.split("/")[4];
-
   const embed = new CustomEmbed(message.member)
     .setTitle(title)
-    .setHeader("u/" + author + " | r/" + subreddit)
+    .setHeader("u/" + author + " | r/" + chosen.data.subreddit)
     .setURL(url)
     .setImage(image);
 
