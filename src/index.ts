@@ -128,9 +128,9 @@ setTimeout(async () => {
     logger.info(`::guild guild count posted to top.gg: ${guildCount}`);
   }, 3600000);
 
-  const guildCount = (await manager
+  const guildCount = await manager
     .fetchClientValues("guilds.cache.size")
-    .then((res) => res.reduce((a: any, b: any) => a + b))) as number;
+    .then((res: number[]) => res.reduce((a, b) => a + b));
 
   const shardCount = manager.clusterList.length;
 
