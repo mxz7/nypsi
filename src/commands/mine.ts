@@ -119,7 +119,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     });
   }
 
-  await addCooldown(cmd.name, message.member, 300);
+  await addCooldown(cmd.name, message.member, 120);
 
   await addStat(message.member, pickaxe);
 
