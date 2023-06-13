@@ -13,9 +13,9 @@ updates:
     labels:
       - "dependencies"
 
-  # pnpm
-  - package-ecosystem: "pnpm" # See documentation for possible values
-    directory: "/" # Location of package manifests
+  # node packages
+  - package-ecosystem: "npm"
+    directory: "/"
     schedule:
       interval: "daily"
     labels:
