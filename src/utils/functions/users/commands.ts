@@ -70,7 +70,10 @@ export async function updateUser(user: User, command: string) {
     },
     data: {
       lastCommand: date,
-      lastKnownTag: user.tag,
+      lastKnownTag: user.username,
+      avatar: user.displayAvatarURL({ size: 256 }).endsWith("webp")
+        ? user.displayAvatarURL({ extension: "gif", size: 256 })
+        : user.displayAvatarURL({ extension: "png", size: 256 }),
       CommandUse: {
         upsert: {
           where: {
