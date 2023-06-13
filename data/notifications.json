@@ -92,8 +92,8 @@
     },
     "leaderboards": {
       "id": "leaderboards",
-      "name": "global leaderboards",
-      "description": "show your username on public leaderboards?\nnote: when *necessary*, this still might still be displayed.\nthis only prevents it from being searched without any interaction from you."
+      "name": "privacy",
+      "description": "should your username be shown publicly? disabling will also hide you from the nypsi website"
     }
   }
 }
