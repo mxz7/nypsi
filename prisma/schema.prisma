@@ -12,6 +12,7 @@ datasource db {
 model User {
   id             String   @id
   lastKnownTag   String
+  avatar         String   @default("https://cdn.discordapp.com/embed/avatars/0.png")
   karma          Int      @default(1)
   lastCommand    DateTime
   tracking       Boolean  @default(true)
