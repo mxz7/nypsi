@@ -1,9 +1,5 @@
 lockfileVersion: '6.0'
 
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false
-
 dependencies:
   '@catppuccin/palette':
     specifier: 0.1.8
@@ -82,7 +78,7 @@ dependencies:
     version: 4.0.4
   table:
     specifier: '6.8'
-    version: 6.8.0
+    version: 6.8.1
   twemoji-parser:
     specifier: ^14.0.0
     version: 14.0.0
@@ -3377,8 +3373,8 @@ packages:
     engines: {node: '>= 0.4'}
     dev: true
 
-  /table@6.8.0:
-    resolution: {integrity: sha512-s/fitrbVeEyHKFa7mFdkuQMWlH1Wgw/yEXMt5xACT4ZpzWFluehAxRtUUQKPuWhaLAWhFcVx6w3oC8VKaUfPGA==}
+  /table@6.8.1:
+    resolution: {integrity: sha512-Y4X9zqrCftUhMeH2EptSSERdVKt/nEdijTOacGD/97EKjhQ/Qs8RTlEGABSJNNN8lac9kheH+af7yAkEWlgneA==}
     engines: {node: '>=10.0.0'}
     dependencies:
       ajv: 8.12.0
@@ -3719,3 +3715,7 @@ packages:
       property-expr: 2.0.5
       toposort: 2.0.2
     dev: false
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
