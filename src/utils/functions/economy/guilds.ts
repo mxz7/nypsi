@@ -362,7 +362,7 @@ interface EconomyGuild {
   guildName: string;
   createdAt: Date;
   balance: bigint;
-  xp: number;
+  xp: bigint;
   level: number;
   motd: string;
   ownerId: string;
