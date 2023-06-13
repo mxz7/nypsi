@@ -92,7 +92,7 @@ async function run(
                     leaderboards: true,
                   },
                 },
-                lastKnownTag: true,
+                lastKnownUsername: true,
               },
             },
           },
@@ -121,7 +121,7 @@ async function run(
       });
 
     const query: (Game & {
-      economy?: { user?: { lastKnownTag?: string; Preferences?: { leaderboards: boolean } } };
+      economy?: { user?: { lastKnownUsername?: string; Preferences?: { leaderboards: boolean } } };
     })[] = await prisma.game.findMany(search);
 
     if (query.length === 0) return send({ embeds: [new ErrorEmbed("no results found")] });
@@ -136,7 +136,7 @@ async function run(
           `**id** \`${game.id.toString(36)}\` \`(${game.id})\`\n` +
           `**user** \`${
             game.economy.user.Preferences?.leaderboards
-              ? game.economy.user.lastKnownTag
+              ? game.economy.user.lastKnownUsername
               : "[hidden]"
           }\`\n` +
           `**game** \`${game.game}\`\n` +
@@ -182,7 +182,7 @@ async function run(
           return {
             id: game.id.toString(36),
             user: game.economy.user.Preferences?.leaderboards
-              ? game.economy.user.lastKnownTag
+              ? game.economy.user.lastKnownUsername
               : "[hidden]",
             game: game.game,
             time: game.date,

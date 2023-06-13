@@ -141,7 +141,7 @@ async function run(
 
     return showUser(message, user);
   } else if (args[0].toLowerCase() == "top") {
-    const balTop = await topBalanceGlobal(10, false);
+    const balTop = await topBalanceGlobal(10);
 
     const embed = new CustomEmbed(message.member, balTop.join("\n")).setTitle(
       "top " + balTop.length

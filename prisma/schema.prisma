@@ -10,16 +10,16 @@ datasource db {
 // user specific tables (economy etc.)
 
 model User {
-  id             String   @id
-  lastKnownTag   String
-  karma          Int      @default(1)
-  lastCommand    DateTime
-  tracking       Boolean  @default(true)
-  lastfmUsername String?
-  email          String?  @unique
-  blacklisted    Boolean  @default(false)
-  adminLevel     Int      @default(0)
-  booster        Boolean  @default(false)
+  id                String   @id
+  lastKnownUsername String   @map("lastKnownTag")
+  karma             Int      @default(1)
+  lastCommand       DateTime
+  tracking          Boolean  @default(true)
+  lastfmUsername    String?
+  email             String?  @unique
+  blacklisted       Boolean  @default(false)
+  adminLevel        Int      @default(0)
+  booster           Boolean  @default(false)
 
   Economy      Economy?
   Premium      Premium?

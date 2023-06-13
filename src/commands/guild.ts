@@ -210,13 +210,13 @@ async function run(
     guild: EconomyGuild & {
       owner: {
         user: {
-          lastKnownTag: string;
+          lastKnownUsername: string;
         };
       };
       members: (EconomyGuildMember & {
         economy: {
           user: {
-            lastKnownTag: string;
+            lastKnownUsername: string;
           };
         };
       })[];
@@ -237,7 +237,7 @@ async function run(
         "info",
         `**level** ${guild.level}\n` +
           `**created on** ${formatDate(guild.createdAt)}\n` +
-          `**owner** ${guild.owner.user.lastKnownTag}`,
+          `**owner** ${guild.owner.user.lastKnownUsername}`,
         true
       );
       if (guild.level < Constants.MAX_GUILD_LEVEL) {
@@ -252,7 +252,7 @@ async function run(
       const maxMembers = await getMaxMembersForGuild(guild.guildName);
 
       for (const m of guild.members) {
-        membersText += `\`${m.economy.user.lastKnownTag}\` `;
+        membersText += `\`${m.economy.user.lastKnownUsername}\` `;
 
         if (m.userId == message.author.id) {
           embed.setFooter({ text: `you joined ${daysAgo(m.joinedAt).toLocaleString()} days ago` });
@@ -540,7 +540,7 @@ async function run(
           found = true;
           mode = "id";
           break;
-        } else if (m.economy.user.lastKnownTag == args[1]) {
+        } else if (m.economy.user.lastKnownUsername == args[1]) {
           found = true;
           mode = "tag";
           break;
@@ -784,7 +784,7 @@ async function run(
       if (position == 3) position = "🥉";
 
       desc += `${position} **${
-        m.economy.user.lastKnownTag
+        m.economy.user.lastKnownUsername
       }** ${m.contributedXp.toLocaleString()}xp **|** $${m.contributedMoney.toLocaleString()}\n`;
     }
 

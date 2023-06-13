@@ -214,7 +214,7 @@ export async function bumpAuction(id: number, client: NypsiClient) {
         select: {
           user: {
             select: {
-              lastKnownTag: true,
+              lastKnownUsername: true,
             },
           },
         },
@@ -235,7 +235,7 @@ export async function bumpAuction(id: number, client: NypsiClient) {
 
   const embed = new CustomEmbed()
     .setColor(Constants.TRANSPARENT_EMBED_COLOR)
-    .setHeader(`${query.owner.user.lastKnownTag}'s auction`);
+    .setHeader(`${query.owner.user.lastKnownUsername}'s auction`);
 
   const items = getItems();
 

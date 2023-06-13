@@ -1117,7 +1117,7 @@ async function run(
 
     const knownTag = await prisma.user.findFirst({
       where: {
-        lastKnownTag: { contains: tag },
+        lastKnownUsername: { contains: tag },
       },
       select: {
         id: true,

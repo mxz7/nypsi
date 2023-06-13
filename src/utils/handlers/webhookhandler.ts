@@ -308,7 +308,7 @@ async function handleKofiData(data: KofiResponse) {
                 embeds: [
                   new CustomEmbed(
                     null,
-                    `${user.lastKnownTag} just bought a ${getItems()[item].emoji} **${
+                    `${user.lastKnownUsername} just bought a ${getItems()[item].emoji} **${
                       getItems()[item].name
                     }**!!!!`
                   ).setFooter({ text: "thank you for your purchase (:" }),
@@ -456,11 +456,12 @@ async function handleKofiData(data: KofiResponse) {
             const hook = new WebhookClient({ url: process.env.THANKYOU_HOOK });
             await hook.send({
               embeds: [
-                new CustomEmbed(null, `${user.lastKnownTag} just bought **${item}**!!!!`).setFooter(
-                  {
-                    text: "thank you for your purchase (:",
-                  }
-                ),
+                new CustomEmbed(
+                  null,
+                  `${user.lastKnownUsername} just bought **${item}**!!!!`
+                ).setFooter({
+                  text: "thank you for your purchase (:",
+                }),
               ],
             });
             hook.destroy();
@@ -474,7 +475,10 @@ async function handleKofiData(data: KofiResponse) {
           const hook = new WebhookClient({ url: process.env.THANKYOU_HOOK });
           await hook.send({
             embeds: [
-              new CustomEmbed(null, `${user.lastKnownTag} just bought **${item}**!!!!`).setFooter({
+              new CustomEmbed(
+                null,
+                `${user.lastKnownUsername} just bought **${item}**!!!!`
+              ).setFooter({
                 text: "thank you for your purchase (:",
               }),
             ],

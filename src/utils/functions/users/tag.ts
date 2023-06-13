@@ -14,7 +14,7 @@ export async function updateLastKnownUsername(member: GuildMember | string, tag:
       id: id,
     },
     data: {
-      lastKnownTag: tag,
+      lastKnownUsername: tag,
     },
   });
 }
@@ -25,9 +25,9 @@ export async function getLastKnownTag(id: string) {
       id: id,
     },
     select: {
-      lastKnownTag: true,
+      lastKnownUsername: true,
     },
   });
 
-  return query.lastKnownTag;
+  return query.lastKnownUsername;
 }

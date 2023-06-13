@@ -74,10 +74,10 @@ if (!isMainThread) {
             id: userId,
           },
           select: {
-            lastKnownTag: true,
+            lastKnownUsername: true,
           },
         })
-        .then((r) => r?.lastKnownTag);
+        .then((r) => r?.lastKnownUsername);
 
       chart.data.datasets.push({
         label: tag || userId,

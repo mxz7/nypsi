@@ -58,7 +58,7 @@ export async function createProfile(member: User | string) {
     .create({
       data: {
         id: id,
-        lastKnownTag: username,
+        lastKnownUsername: username,
         lastCommand: new Date(0),
       },
     })

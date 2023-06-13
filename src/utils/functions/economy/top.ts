@@ -105,7 +105,7 @@ export async function topBalanceGlobal(amount: number): Promise<string[]> {
       banned: true,
       user: {
         select: {
-          lastKnownTag: true,
+          lastKnownUsername: true,
         },
       },
     },
@@ -139,7 +139,7 @@ export async function topBalanceGlobal(amount: number): Promise<string[]> {
 
     usersFinal[count] =
       pos + " **" + (await getPreferences(user.userId))?.leaderboards
-        ? user.user.lastKnownTag
+        ? user.user.lastKnownUsername
         : "[hidden]" + "** $" + Number(user.money).toLocaleString();
     count++;
   }
@@ -158,7 +158,7 @@ export async function topNetWorthGlobal(userId: string) {
       banned: true,
       user: {
         select: {
-          lastKnownTag: true,
+          lastKnownUsername: true,
         },
       },
     },
@@ -191,7 +191,7 @@ export async function topNetWorthGlobal(userId: string) {
       pos +
         " **" +
         ((await getPreferences(user.userId))?.leaderboards
-          ? user.user.lastKnownTag || user.userId
+          ? user.user.lastKnownUsername || user.userId
           : "[hidden]") +
         "** $" +
         Number(user.netWorth).toLocaleString()
@@ -408,7 +408,7 @@ export async function topPrestigeGlobal(userId: string) {
       banned: true,
       user: {
         select: {
-          lastKnownTag: true,
+          lastKnownUsername: true,
         },
       },
     },
@@ -446,7 +446,7 @@ export async function topPrestigeGlobal(userId: string) {
       pos +
       " **" +
       ((await getPreferences(user.userId))?.leaderboards
-        ? user.user.lastKnownTag || user.userId
+        ? user.user.lastKnownUsername || user.userId
         : "[hidden]") +
       "** " +
       user.prestige +
@@ -569,7 +569,7 @@ export async function topItemGlobal(item: string, userId: string) {
         select: {
           user: {
             select: {
-              lastKnownTag: true,
+              lastKnownUsername: true,
             },
           },
           banned: true,
@@ -610,7 +610,7 @@ export async function topItemGlobal(item: string, userId: string) {
       pos +
       " **" +
       ((await getPreferences(user.userId))?.leaderboards
-        ? user.economy.user.lastKnownTag || user.userId
+        ? user.economy.user.lastKnownUsername || user.userId
         : "[hidden]") +
       "** " +
       user.amount.toLocaleString() +
@@ -863,7 +863,7 @@ export async function topDailyStreakGlobal(userId: string) {
       banned: true,
       user: {
         select: {
-          lastKnownTag: true,
+          lastKnownUsername: true,
         },
       },
     },
@@ -898,7 +898,7 @@ export async function topDailyStreakGlobal(userId: string) {
       pos +
       " **" +
       ((await getPreferences(user.userId))?.leaderboards
-        ? user.user.lastKnownTag || user.userId
+        ? user.user.lastKnownUsername || user.userId
         : "[hidden]") +
       "** " +
       user.dailyStreak;
