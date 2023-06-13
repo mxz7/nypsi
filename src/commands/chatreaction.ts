@@ -597,7 +597,7 @@ async function run(
       const requestEmbed = new CustomEmbed(
         message.member,
         `**${
-          message.author.tag
+          message.author.username
         }** has challenged you to a chat reaction duel\n\n**wager** $${wager.toLocaleString()}\n\ndo you accept?`
       ).setFooter({ text: "expires in 60 seconds" });
 
@@ -680,7 +680,7 @@ async function run(
       const requestEmbed = new CustomEmbed(
         message.member,
         `**${
-          message.author.tag
+          message.author.username
         }** has created an open chat reaction duel\n\n**wager** $${wager.toLocaleString()}`
       ).setFooter({ text: "expires in 60 seconds" });
 

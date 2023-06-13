@@ -141,7 +141,7 @@ async function run(
       joinPos != "invalid" ? joinPos.toLocaleString() : "--"
     }**`
   )
-    .setTitle(member.user.tag)
+    .setTitle(member.user.username)
     .setThumbnail(member.user.displayAvatarURL({ size: 128 }));
 
   return send({ embeds: [embed] });

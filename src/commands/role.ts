@@ -685,7 +685,7 @@ async function run(
 
     const filteredMembers = members
       .filter((m) => m.roles.cache.has(role.id))
-      .map((m) => `\`${m.user.tag}\``);
+      .map((m) => `\`${m.user.username}\``);
 
     if (filteredMembers.length == 0) {
       return send({

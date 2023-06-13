@@ -62,7 +62,7 @@ async function doLottery(client: Client) {
     user = await client.users.fetch(chosen.userId);
   }
 
-  logger.info(`::success winner: ${user.tag} (${user.id}) with ticket #${chosen.id}`);
+  logger.info(`::success winner: ${user.id} (${user.username}) with ticket #${chosen.id}`);
 
   await Promise.all([
     updateBalance(user.id, (await getBalance(user.id)) + total),

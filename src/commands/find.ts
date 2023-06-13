@@ -121,7 +121,7 @@ async function run(
     let user: any = await client.cluster.broadcastEval(
       async (c, { userId }) => {
         const g = await c.users.cache.find((u) => {
-          return `${u.username}#${u.discriminator}`.includes(userId);
+          return `${u.username}`.includes(userId);
         });
 
         return g;
@@ -184,7 +184,7 @@ async function showGuild(message: Message, guild: any) {
 
 async function showUser(message: Message, user: User) {
   const embed = new CustomEmbed(message.member)
-    .setTitle(user.tag)
+    .setTitle(user.username)
     .setDescription(
       `\`${user.id}\`${
         (await isPremium(user.id))
@@ -194,7 +194,7 @@ async function showUser(message: Message, user: User) {
     )
     .addField(
       "user",
-      `**tag** ${user.tag}
+      `**tag** ${user.username}
             **created** ${formatDate(user.createdAt)}${
         (await getLastCommand(user.id))
           ? `\n**last command** <t:${Math.floor(

@@ -52,7 +52,7 @@ export async function createOffer(
 
   const embed = new CustomEmbed(
     owner,
-    `${owner.user.tag} offers $**${Math.floor(money - taxedAmount).toLocaleString()}**${
+    `${owner.user.username} offers $**${Math.floor(money - taxedAmount).toLocaleString()}**${
       taxedAmount != 0 ? ` (${(tax * 100).toFixed(1)}% tax)` : ""
     } for your **${itemAmount.toLocaleString()}x** ${getItems()[itemId].emoji} ${
       getItems()[itemId].name

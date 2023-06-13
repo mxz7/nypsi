@@ -16,7 +16,7 @@ export default async function messageDelete(message: Message) {
     if (await isLogsEnabled(message.guild)) {
       const embed = new CustomEmbed().disableFooter().setTimestamp();
 
-      embed.setHeader(message.author.tag, message.author.avatarURL());
+      embed.setHeader(message.author.username, message.author.avatarURL());
       embed.setTitle("message deleted");
       embed.setDescription(
         `${message.member.toString()} \`${
@@ -44,7 +44,7 @@ export default async function messageDelete(message: Message) {
 
     snipe.set(message.channel.id, {
       content: message.content,
-      member: message.author.tag,
+      member: message.author.username,
       createdTimestamp: message.createdTimestamp,
       memberAvatar: message.author.avatarURL(),
       channel: {

@@ -68,7 +68,7 @@ async function run(
       .setStyle(ButtonStyle.Primary)
   );
 
-  const embed = new CustomEmbed(member).setHeader(member.user.tag).setImage(avatar);
+  const embed = new CustomEmbed(member).setHeader(member.user.username).setImage(avatar);
 
   let msg: Message;
 

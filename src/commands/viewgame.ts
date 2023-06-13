@@ -136,7 +136,7 @@ async function run(
           `**id** \`${game.id.toString(36)}\` \`(${game.id})\`\n` +
           `**user** \`${
             game.economy.user.Preferences?.leaderboards
-              ? game.economy.user.lastKnownTag.split("#")[0]
+              ? game.economy.user.lastKnownTag
               : "[hidden]"
           }\`\n` +
           `**game** \`${game.game}\`\n` +
@@ -182,7 +182,7 @@ async function run(
           return {
             id: game.id.toString(36),
             user: game.economy.user.Preferences?.leaderboards
-              ? game.economy.user.lastKnownTag.split("#")[0]
+              ? game.economy.user.lastKnownTag
               : "[hidden]",
             game: game.game,
             time: game.date,
@@ -222,7 +222,7 @@ async function run(
       return send({ embeds: [new ErrorEmbed(`couldn't find a game with id \`${args[0]}\``)] });
 
     const username = (await getPreferences(game.userId))?.leaderboards
-      ? (await getLastKnownTag(game.userId).catch(() => null))?.split("#")[0]
+      ? await getLastKnownTag(game.userId).catch(() => null)
       : "[hidden]";
 
     const embed = new CustomEmbed(message.member).setHeader(

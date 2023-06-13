@@ -6,7 +6,7 @@ import { NotificationPayload } from "../../../types/Notification";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { percentChance } from "../random";
-import { addNotificationToQueue, getDmSettings } from "../users/notifications";
+import { addNotificationToQueue, getDmSettings, getPreferences } from "../users/notifications";
 import { getLastKnownTag } from "../users/tag";
 import { addInventoryItem } from "./inventory";
 import { createUser, getAchievements, getItems, isEcoBanned, userExists } from "./utils";
@@ -234,7 +234,7 @@ async function completeAchievement(userId: string, achievementId: string) {
     await redis.set(`achievements:completed:${userId}`, JSON.stringify(userEmbed.toJSON()));
   }
 
-  if (!process.env.ACHIEVEMENTS_HOOK) return;
+  if (!process.env.ACHIEVEMENTS_HOOK || !(await getPreferences(userId))?.leaderboards) return;
 
   const completed = await prisma.achievements.count({
     where: {
@@ -244,7 +244,7 @@ async function completeAchievement(userId: string, achievementId: string) {
 
   const embed = new EmbedBuilder()
     .setAuthor({
-      name: `${(await getLastKnownTag(userId)).split("#")[0]} has unlocked an achievement`,
+      name: `${await getLastKnownTag(userId)} has unlocked an achievement`,
     })
     .setDescription(
       `${achievements[achievementId].emoji} ${achievements[achievementId].name}\n\n*${achievements[achievementId].description}*`

@@ -102,7 +102,7 @@ export function listen(manager: ClusterManager) {
       .reduce((a, b) => a + b);
     const users = Object.entries(await redis.hgetall(Constants.redis.nypsi.TOP_COMMANDS_USER)).map(
       (i) => {
-        return { user: i[0].split("#")[0], amount: parseInt(i[1]) };
+        return { user: i[0], amount: parseInt(i[1]) };
       }
     );
 
@@ -308,7 +308,7 @@ async function handleKofiData(data: KofiResponse) {
                 embeds: [
                   new CustomEmbed(
                     null,
-                    `${user.lastKnownTag.split("#")[0]} just bought a ${getItems()[item].emoji} **${
+                    `${user.lastKnownTag} just bought a ${getItems()[item].emoji} **${
                       getItems()[item].name
                     }**!!!!`
                   ).setFooter({ text: "thank you for your purchase (:" }),
@@ -456,12 +456,11 @@ async function handleKofiData(data: KofiResponse) {
             const hook = new WebhookClient({ url: process.env.THANKYOU_HOOK });
             await hook.send({
               embeds: [
-                new CustomEmbed(
-                  null,
-                  `${user.lastKnownTag.split("#")[0]} just bought **${item}**!!!!`
-                ).setFooter({
-                  text: "thank you for your purchase (:",
-                }),
+                new CustomEmbed(null, `${user.lastKnownTag} just bought **${item}**!!!!`).setFooter(
+                  {
+                    text: "thank you for your purchase (:",
+                  }
+                ),
               ],
             });
             hook.destroy();
@@ -475,10 +474,7 @@ async function handleKofiData(data: KofiResponse) {
           const hook = new WebhookClient({ url: process.env.THANKYOU_HOOK });
           await hook.send({
             embeds: [
-              new CustomEmbed(
-                null,
-                `${user.lastKnownTag.split("#")[0]} just bought **${item}**!!!!`
-              ).setFooter({
+              new CustomEmbed(null, `${user.lastKnownTag} just bought **${item}**!!!!`).setFooter({
                 text: "thank you for your purchase (:",
               }),
             ],

@@ -25,7 +25,7 @@ async function run(
 
   const banner = user.bannerURL({ size: 512 });
 
-  const embed = new CustomEmbed(member).setHeader(member.user.tag).setImage(banner);
+  const embed = new CustomEmbed(member).setHeader(member.user.username).setImage(banner);
 
   return message.channel.send({ embeds: [embed] });
 }

@@ -76,7 +76,7 @@ export default {
       await addNotificationToQueue({
         memberId: offer.ownerId,
         payload: {
-          content: `your offer to ${interaction.user.tag} for ${offer.itemAmount}x ${
+          content: `your offer to ${interaction.user.username} for ${offer.itemAmount}x ${
             getItems()[offer.itemId].name
           } has been denied`,
           embed: new CustomEmbed(

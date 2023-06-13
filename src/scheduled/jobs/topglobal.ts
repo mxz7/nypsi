@@ -71,7 +71,7 @@ async function topAmountGlobal(amount: number): Promise<string[]> {
     usersFinal[count] =
       pos +
       " **" +
-      (user.user?.Preferences?.leaderboards ? user.user.lastKnownTag.split("#")[0] : "[hidden]") +
+      (user.user?.Preferences?.leaderboards ? user.user.lastKnownTag : "[hidden]") +
       "** $" +
       user.money.toLocaleString();
     count++;

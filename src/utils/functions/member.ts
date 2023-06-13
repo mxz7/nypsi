@@ -30,23 +30,16 @@ export async function getMember(guild: Guild, memberName: string): Promise<Guild
       if (member.user.id == memberName) {
         target = member;
         break;
-      } else if (member.user.tag.toLowerCase() == memberName.toLowerCase()) {
+      } else if (member.user.username.toLowerCase() == memberName.toLowerCase()) {
         target = member;
         break;
-      } else if (member.user.username.toLowerCase() == memberName.toLowerCase()) {
-        if (member.user.bot) {
-          possible.set(3, member);
-        } else {
-          target = member;
-          break;
-        }
       } else if (member.displayName.toLowerCase() == memberName.toLowerCase()) {
         if (member.user.bot) {
           possible.set(4, member);
         } else {
           possible.set(1, member);
         }
-      } else if (member.user.tag.toLowerCase().includes(memberName.toLowerCase())) {
+      } else if (member.user.username.toLowerCase().includes(memberName.toLowerCase())) {
         if (member.user.bot) {
           possible.set(5, member);
         } else {
@@ -103,7 +96,7 @@ export async function getExactMember(guild: Guild, memberName: string): Promise<
   const target = members.find(
     (member) =>
       member.user.username.toLowerCase() == memberName.toLowerCase() ||
-      member.user.tag.toLowerCase() == memberName.toLowerCase() ||
+      member.user.username.toLowerCase() == memberName.toLowerCase() ||
       member.user.id == memberName
   );
 

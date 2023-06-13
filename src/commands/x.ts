@@ -103,7 +103,7 @@ async function run(
     const moderationCasesModerator = await prisma.moderationCase
       .findMany({
         where: {
-          moderator: user?.tag,
+          moderator: user?.username,
         },
       })
       .catch(() => {});
@@ -132,10 +132,8 @@ async function run(
 
     await fs.writeFile(
       file,
-      `nypsi data for ${user?.username}#${user?.discriminator} (${user?.id}) requested by ${
-        message.author.tag
-      } ${
-        message.author.id
+      `nypsi data for ${user?.username} (${user?.id}) requested by ${message.author.id} ${
+        message.author.username
       } - ${new Date().toUTCString()}\n\n----------\nYOUR USER DATA\n----------\n\n`
     );
     await fs.appendFile(file, JSON.stringify(userData, null, 2));
@@ -280,9 +278,7 @@ async function run(
       ),
     ];
 
-    let desc = `tag: ${user?.username}#${user?.discriminator}\nid: ${
-      user?.id
-    }\ncreated: <t:${Math.floor(
+    let desc = `tag: ${user?.username}\nid: ${user?.id}\ncreated: <t:${Math.floor(
       user.createdTimestamp / 1000
     )}:R>\nadmin level: ${await getAdminLevel(user.id)}`;
 
@@ -321,7 +317,7 @@ async function run(
         }
 
         logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) viewed ${user.id} db data`
+          `admin: ${message.author.id} (${message.author.username}) viewed ${user.id} db data`
         );
 
         const files = [await getDbData(user)];
@@ -338,7 +334,9 @@ async function run(
         const uses = await getCommandUses(user.id);
         const total = uses.map((x) => x.uses).reduce((a, b) => a + b);
 
-        const daily = parseInt(await redis.hget(Constants.redis.nypsi.TOP_COMMANDS_USER, user.tag));
+        const daily = parseInt(
+          await redis.hget(Constants.redis.nypsi.TOP_COMMANDS_USER, user.username)
+        );
 
         const embed = new CustomEmbed(
           message.member,
@@ -348,7 +346,7 @@ async function run(
         );
 
         logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) viewed ${user.id} command data`
+          `admin: ${message.author.id} (${message.author.username}) viewed ${user.id} command data`
         );
 
         await res.editReply({ embeds: [embed] });
@@ -361,7 +359,7 @@ async function run(
           return waitForButton();
         }
         logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) viewed ${user.id} premium data`
+          `admin: ${message.author.id} (${message.author.username}) viewed ${user.id} premium data`
         );
         doPremium(user, res as ButtonInteraction);
         return waitForButton();
@@ -400,7 +398,7 @@ async function run(
           return waitForButton();
         }
         logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) updated ${user.id} admin level to ${msg.content}`
+          `admin: ${message.author.id} (${message.author.id}) updated ${user.username} admin level to ${msg.content}`
         );
         await setAdminLevel(user.id, parseInt(msg.content));
         await res.editReply({ embeds: [new CustomEmbed(message.member, "✅")] });
@@ -414,7 +412,7 @@ async function run(
         }
 
         logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) viewed ${user.id} ac data`
+          `admin: ${message.author.id} (${message.author.username}) viewed ${user.id} ac data`
         );
 
         const data = b(user.id);
@@ -452,7 +450,7 @@ async function run(
         }
 
         logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) cleared ${user.id} violations`
+          `admin: ${message.author.id} (${message.author.username}) cleared ${user.id} violations`
         );
 
         c(user.id);
@@ -494,7 +492,7 @@ async function run(
         }
 
         logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) set ${user.id} balance to ${msg.content}`
+          `admin: ${message.author.id} (${message.author.username}) set ${user.id} balance to ${msg.content}`
         );
         await updateBalance(user.id, parseInt(msg.content));
         msg.react("✅");
@@ -534,7 +532,7 @@ async function run(
         }
 
         logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) set ${user.id} bank balance to ${msg.content}`
+          `admin: ${message.author.id} (${message.author.username}) set ${user.id} bank balance to ${msg.content}`
         );
         await updateBankBalance(user.id, parseInt(msg.content));
         msg.react("✅");
@@ -569,7 +567,7 @@ async function run(
         }
 
         logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) set ${user.id} prestige to ${msg.content}`
+          `admin: ${message.author.id} (${message.author.username}) set ${user.id} prestige to ${msg.content}`
         );
         await setPrestige(user.id, parseInt(msg.content));
         msg.react("✅");
@@ -604,7 +602,7 @@ async function run(
         }
 
         logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) set ${user.id} xp to ${msg.content}`
+          `admin: ${message.author.id} (${message.author.username}) set ${user.id} xp to ${msg.content}`
         );
         await updateXp(user.id, parseInt(msg.content));
         msg.react("✅");
@@ -635,7 +633,7 @@ async function run(
         if (!msg) return;
 
         logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) set ${user.id} inventory item to ${msg.content}`
+          `admin: ${message.author.id} (${message.author.username}) set ${user.id} inventory item to ${msg.content}`
         );
 
         if (!getItems()[msg.content.split(" ")[0]]) {
@@ -712,7 +710,7 @@ async function run(
         }
 
         logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) set ${user.id} karma to ${msg.content}`
+          `admin: ${message.author.id} (${message.author.username}) set ${user.id} karma to ${msg.content}`
         );
         remove ? await removeKarma(user.id, amount) : addKarma(user.id, amount);
         msg.react("✅");
@@ -727,7 +725,7 @@ async function run(
 
         if (await isEcoBanned(user.id)) {
           logger.info(
-            `admin: ${message.author.tag} (${message.author.id}) removed ecoban for ${user.id} `
+            `admin: ${message.author.id} (${message.author.username}) removed ecoban for ${user.id} `
           );
           await setEcoBan(user.id);
           await res.editReply({ embeds: [new CustomEmbed(message.member, "removed ecoban")] });
@@ -759,7 +757,7 @@ async function run(
         }
 
         logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) set ${user.id} ecoban to ${msg.content}`
+          `admin: ${message.author.id} (${message.author.username}) set ${user.id} ecoban to ${msg.content}`
         );
         await setEcoBan(user.id, time);
         msg.react("✅");
@@ -774,14 +772,14 @@ async function run(
 
         if (await isUserBlacklisted(user.id)) {
           logger.info(
-            `admin: ${message.author.tag} (${message.author.id}) removed blacklist for ${user.id} `
+            `admin: ${message.author.id} (${message.author.username}) removed blacklist for ${user.id} `
           );
           await setUserBlacklist(user.id, false);
           await res.editReply({ embeds: [new CustomEmbed(message.member, "user unblacklisted")] });
           return waitForButton();
         } else {
           logger.info(
-            `admin: ${message.author.tag} (${message.author.id}) added blacklist for ${user.id} `
+            `admin: ${message.author.id} (${message.author.username}) added blacklist for ${user.id} `
           );
           await setUserBlacklist(user.id, true);
           await res.editReply({ embeds: [new CustomEmbed(message.member, "user blacklisted")] });
@@ -917,7 +915,7 @@ async function run(
         }
 
         logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) added ${user.id} premium at level ${msg.content}`
+          `admin: ${message.author.id} (${message.author.username}) added ${user.id} premium at level ${msg.content}`
         );
 
         await addMember(user.id, parseInt(msg.content), message.client as NypsiClient);
@@ -964,7 +962,7 @@ async function run(
         }
 
         logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) set ${user.id} premium tier to ${msg.content}`
+          `admin: ${message.author.id} (${message.author.username}) set ${user.id} premium tier to ${msg.content}`
         );
 
         await setTier(user.id, parseInt(msg.content), message.client as NypsiClient);
@@ -1013,7 +1011,7 @@ async function run(
         }
 
         logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) set ${
+          `admin: ${message.author.id} (${message.author.username}) set ${
             user.id
           } premium expire date to ${date.format()}`
         );
@@ -1029,7 +1027,7 @@ async function run(
           return waitForButton();
         }
         logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) viewed ${user.id} raw premium data`
+          `admin: ${message.author.id} (${message.author.username}) viewed ${user.id} raw premium data`
         );
         const profile = await getPremiumProfile(user.id);
         await res.editReply({
@@ -1046,7 +1044,7 @@ async function run(
           return waitForButton();
         }
         logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) deleted ${user.id} custom command`
+          `admin: ${message.author.id} (${message.author.username}) deleted ${user.id} custom command`
         );
         await prisma.premiumCommand.delete({ where: { owner: user.id } }).catch(() => {});
         await res.editReply({
@@ -1061,7 +1059,7 @@ async function run(
           return waitForButton();
         }
         logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) deleted ${user.id} aliases`
+          `admin: ${message.author.id} (${message.author.username}) deleted ${user.id} aliases`
         );
         await prisma.userAlias.deleteMany({ where: { userId: user.id } });
         await redis.del(`${Constants.redis.cache.premium.ALIASES}:${user.id}`);
@@ -1077,7 +1075,7 @@ async function run(
           return waitForButton();
         }
         logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) set ${user.id} expire to now`
+          `admin: ${message.author.id} (${message.author.username}) set ${user.id} expire to now`
         );
         await setExpireDate(user.id, new Date(0), message.client as NypsiClient);
         await res.editReply({ embeds: [new CustomEmbed(message.member, "done sir.")] });
@@ -1092,7 +1090,7 @@ async function run(
       let user: any = await (message.client as NypsiClient).cluster.broadcastEval(
         async (c, { userId }) => {
           const g = await c.users.cache.find((u) => {
-            return `${u.username}#${u.discriminator}`.includes(userId);
+            return `${u.username}`.includes(userId);
           });
 
           return g;

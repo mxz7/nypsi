@@ -88,7 +88,7 @@ if (!isMainThread) {
           .replaceAll("delete from", "")
           .replaceAll("insert into", "")
           .replaceAll("update ", "")
-          .replaceAll("drop ", "")}#${collection.message.author.discriminator}`,
+          .replaceAll("drop ", "")}`,
       });
     }
 

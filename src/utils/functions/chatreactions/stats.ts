@@ -186,7 +186,9 @@ export async function getServerLeaderboard(
       pos = "🥉";
     }
 
-    winsMsg += `${pos} **${getMember(user).user.tag}** ${winsStats.get(user).toLocaleString()}\n`;
+    winsMsg += `${pos} **${getMember(user).user.username}** ${winsStats
+      .get(user)
+      .toLocaleString()}\n`;
     count++;
   }
 
@@ -203,7 +205,7 @@ export async function getServerLeaderboard(
       pos = "🥉";
     }
 
-    secondMsg += `${pos} **${getMember(user).user.tag}** ${secondStats
+    secondMsg += `${pos} **${getMember(user).user.username}** ${secondStats
       .get(user)
       .toLocaleString()}\n`;
     count++;
@@ -222,7 +224,9 @@ export async function getServerLeaderboard(
       pos = "🥉";
     }
 
-    thirdMsg += `${pos} **${getMember(user).user.tag}** ${thirdStats.get(user).toLocaleString()}\n`;
+    thirdMsg += `${pos} **${getMember(user).user.username}** ${thirdStats
+      .get(user)
+      .toLocaleString()}\n`;
     count++;
   }
 
@@ -239,7 +243,7 @@ export async function getServerLeaderboard(
       pos = "🥉";
     }
 
-    overallMsg += `${pos} **${getMember(user).user.tag}** ${overallStats
+    overallMsg += `${pos} **${getMember(user).user.username}** ${overallStats
       .get(user)
       .toLocaleString()}\n`;
     count++;

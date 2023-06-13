@@ -105,7 +105,7 @@ async function run(
 
   let status;
   let statusDesc = `\`0/${members.size}\` members kicked..`;
-  let reason = message.member.user.tag + ": ";
+  let reason = message.member.user.username + ": ";
 
   if (members.size >= 15) {
     status = new CustomEmbed(
@@ -194,7 +194,7 @@ async function run(
   if (failed.length != 0) {
     const failedTags = [];
     for (const fail1 of failed) {
-      failedTags.push(fail1.tag);
+      failedTags.push(fail1.username);
     }
 
     embed.addField("error", "unable to kick: " + failedTags.join(", "));
@@ -202,10 +202,10 @@ async function run(
 
   if (count == 1) {
     if (reason.split(": ")[1] == "no reason given") {
-      embed.setDescription("✅ `" + members.first().user.tag + "` has been kicked");
+      embed.setDescription("✅ `" + members.first().user.username + "` has been kicked");
     } else {
       embed.setDescription(
-        "✅ `" + members.first().user.tag + "` has been kicked for: " + reason.split(": ")[1]
+        "✅ `" + members.first().user.username + "` has been kicked for: " + reason.split(": ")[1]
       );
     }
   }
@@ -226,7 +226,7 @@ async function run(
     }
   }
 
-  await newCase(message.guild, "kick", members1, message.author.tag, reason.split(": ")[1]);
+  await newCase(message.guild, "kick", members1, message.author.username, reason.split(": ")[1]);
 
   for (const member of members1) {
     const m = members.get(member);

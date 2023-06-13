@@ -193,7 +193,7 @@ async function run(
   if ((await getDmSettings(target)).payment) {
     const embed = new CustomEmbed(
       target,
-      `**${message.author.tag}** has sent you $**${Math.floor(
+      `**${message.author.username}** has sent you $**${Math.floor(
         amount - taxedAmount
       ).toLocaleString()}**`
     )
@@ -211,7 +211,7 @@ async function run(
   const embed = new CustomEmbed(message.member)
     .setHeader("payment", message.author.avatarURL())
     .addField(
-      message.member.user.tag,
+      message.member.user.username,
       "$" +
         ((await getBalance(message.member)) + amount).toLocaleString() +
         "\n**-** $" +
@@ -228,7 +228,7 @@ async function run(
         "**% tax"
     );
     embed.addField(
-      target.user.tag,
+      target.user.username,
       "$" +
         ((await getBalance(target)) - amount).toLocaleString() +
         "\n**+** $" +
@@ -237,7 +237,7 @@ async function run(
   } else {
     embed.setDescription(message.member.user.toString() + " -> " + target.user.toString());
     embed.addField(
-      target.user.tag,
+      target.user.username,
       "$" +
         ((await getBalance(target)) - amount).toLocaleString() +
         "\n**+** $" +
@@ -258,11 +258,14 @@ async function run(
     const embed = new CustomEmbed(message.member)
       .setHeader("payment", message.author.avatarURL())
       .setDescription(message.member.user.toString() + " -> " + target.user.toString())
-      .addField(message.member.user.tag, "$" + (await getBalance(message.member)).toLocaleString());
+      .addField(
+        message.member.user.username,
+        "$" + (await getBalance(message.member)).toLocaleString()
+      );
 
     if (tax > 0) {
       embed.addField(
-        target.user.tag,
+        target.user.username,
         "$" +
           (await getBalance(target)).toLocaleString() +
           " (+$**" +
@@ -279,7 +282,7 @@ async function run(
       );
     } else {
       embed.addField(
-        target.user.tag,
+        target.user.username,
         "$" +
           (await getBalance(target)).toLocaleString() +
           " (+$**" +

@@ -80,7 +80,9 @@ module.exports = new ItemUse(
     ) {
       return send({
         embeds: [
-          new ErrorEmbed(`**${chastityTarget.user.tag}** is already equipped with a chastity cage`),
+          new ErrorEmbed(
+            `**${chastityTarget.user.username}** is already equipped with a chastity cage`
+          ),
         ],
       });
     }
@@ -111,7 +113,7 @@ module.exports = new ItemUse(
         embeds: [
           new CustomEmbed(
             message.member,
-            `locking chastity cage...\n\n**${chastityTarget.user.tag}**'s chastity cage is now locked in place`
+            `locking chastity cage...\n\n**${chastityTarget.user.username}**'s chastity cage is now locked in place`
           ),
         ],
       },

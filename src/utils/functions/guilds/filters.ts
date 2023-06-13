@@ -250,7 +250,7 @@ export async function checkAutoMute(message: Message) {
       message.guild,
       "mute",
       message.author.id,
-      message.guild.members.me.user.tag,
+      message.guild.members.me.user.username,
       `[${MStoTime(length * 1000, true).trim()}] filter violation`
     );
     if (mode !== "timeout")

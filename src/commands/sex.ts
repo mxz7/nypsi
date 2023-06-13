@@ -218,7 +218,7 @@ async function run(
           message.guild.id == "747056029795221513"
             ? "[nypsi](https://discord.gg/hJTDNST)"
             : message.guild.name
-        }**\n\ngo ahead and send **${message.author.tag}** a *private* message 😉😏`
+        }**\n\ngo ahead and send **${message.author.username}** a *private* message 😉😏`
       )
         .setHeader("milf finder")
         .setColor(Constants.EMBED_SUCCESS_COLOR);
@@ -247,7 +247,7 @@ async function run(
               ? "[nypsi](https://discord.gg/hJTDNST)"
               : message.guild.name
           }**\n\n` +
-            `**${message.author.tag}** - ${description}\n\n` +
+            `**${message.author.username}** - ${description}\n\n` +
             "go ahead and send them a *private* message 😉😏"
         );
       }

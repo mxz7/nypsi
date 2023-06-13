@@ -81,16 +81,16 @@ async function run(
         const currentPage = memberList.get(memberList.size);
 
         if (currentPage.length >= 10) {
-          const newPage = ["`" + m.user.tag + "`"];
+          const newPage = ["`" + m.user.username + "`"];
 
           memberList.set(memberList.size + 1, newPage);
         } else {
-          currentPage.push("`" + m.user.tag + "`");
+          currentPage.push("`" + m.user.username + "`");
 
           memberList.set(memberList.size, currentPage);
         }
       } else {
-        const newPage = ["`" + m.user.tag + "`"];
+        const newPage = ["`" + m.user.username + "`"];
 
         memberList.set(1, newPage);
       }

@@ -20,7 +20,7 @@ export default async function messageDeleteBulk(
       if (message.content) {
         desc.push(
           `[${dayjs(message.createdTimestamp).format("YYYY-MM-DD HH:mm:ss")}] ${
-            message.author.tag
+            message.author.username
           }: ${message.content}`
         );
       }

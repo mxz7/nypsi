@@ -159,7 +159,7 @@ export async function suggestWholesomeImage(
   const { id } = await prisma.wholesomeSuggestion.create({
     data: {
       image: image,
-      submitter: submitter.user.tag,
+      submitter: submitter.user.username,
       submitterId: submitter.user.id,
       uploadDate: new Date(),
     },
@@ -170,7 +170,7 @@ export async function suggestWholesomeImage(
     .setTitle("wholesome suggestion #" + id);
 
   embed.setDescription(
-    `**submitter** ${submitter.user.tag} (${submitter.user.id})\n**url** ${image}`
+    `**submitter** ${submitter.user.username} (${submitter.user.id})\n**url** ${image}`
   );
 
   embed.setFooter({ text: "$ws review" });

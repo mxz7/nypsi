@@ -124,12 +124,12 @@ async function run(
 
   const embed = new CustomEmbed(
     message.member,
-    `✅ \`${target.user.tag}\` has been warned for **${reason}**`
+    `✅ \`${target.user.username}\` has been warned for **${reason}**`
   );
 
   if (dmFail) {
     embed.setDescription(
-      `⚠️ failed to send message to \`${target.user.tag}\`. warn has still been logged`
+      `⚠️ failed to send message to \`${target.user.username}\`. warn has still been logged`
     );
   }
 
@@ -144,7 +144,7 @@ async function run(
     await send({ embeds: [embed] });
   }
 
-  await newCase(message.guild, "warn", target.user.id, message.author.tag, reason);
+  await newCase(message.guild, "warn", target.user.id, message.author.username, reason);
 }
 
 cmd.setRun(run);

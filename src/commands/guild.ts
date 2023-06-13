@@ -524,7 +524,9 @@ async function run(
         return send({
           embeds: [
             new ErrorEmbed(
-              `\`${message.mentions.members.first().user.tag}\` is not in **${guild.guildName}**`
+              `\`${message.mentions.members.first().user.username}\` is not in **${
+                guild.guildName
+              }**`
             ),
           ],
         });

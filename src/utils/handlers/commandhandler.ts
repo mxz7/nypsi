@@ -72,7 +72,7 @@ const cooldown = new Set<string>();
 let commandsSize = 0;
 let aliasesSize = 0;
 
-export { commandsSize, aliasesSize };
+export { aliasesSize, commandsSize };
 
 let restarting = false;
 
@@ -673,7 +673,7 @@ export async function runCommand(
         if (!recentlyUsedUserAliases.has(message.channel.id))
           recentlyUsedUserAliases.set(message.channel.id, new Map());
         if (!recentlyUsedUserAliases.get(message.channel.id).has(cmd))
-          recentlyUsedUserAliases.get(message.channel.id).set(cmd, message.author.tag);
+          recentlyUsedUserAliases.get(message.channel.id).set(cmd, message.author.username);
 
         cmd = foundAlias.command.split(" ")[0];
         command = commands.get(cmd);
@@ -760,7 +760,7 @@ export async function runCommand(
     let msg: string;
 
     if (!(message instanceof Message)) {
-      msg = `[${getTimestamp()}] ${message.guild.id} - ${message.author.tag}: [/]${
+      msg = `[${getTimestamp()}] ${message.guild.id} - ${message.author.username}: [/]${
         message.commandName
       } ${args.join(" ")}`;
     } else {
@@ -771,7 +771,7 @@ export async function runCommand(
       }
 
       msg = `[${getTimestamp()}] ${message.guildId}:${message.channelId} - ${
-        message.author.tag
+        message.author.username
       }: ${content}`;
     }
 
@@ -923,7 +923,7 @@ export async function runCommand(
       } else {
         message.followUp({ embeds: [embed], ephemeral: true });
       }
-      logger.info(`news shown to ${message.author.tag}`);
+      logger.info(`news shown to ${message.author.username}`);
     }
 
     if (await redis.exists(`achievements:completed:${message.author.id}`)) {
@@ -955,7 +955,7 @@ export async function runCommand(
   }, 2000);
 
   await Promise.all([
-    a(message.author.id, message.author.tag, message.content, cmd),
+    a(message.author.id, message.author.username, message.content, cmd),
     updateCommandUses(message.member),
     updateUser(message.author || message.member.user || null, command.name),
     redis.hincrby(Constants.redis.nypsi.TOP_COMMANDS, command.name, 1),
@@ -965,7 +965,7 @@ export async function runCommand(
   ]);
 
   if ((await getPreferences(message.member)).leaderboards)
-    await redis.hincrby(Constants.redis.nypsi.TOP_COMMANDS_USER, message.author.tag, 1);
+    await redis.hincrby(Constants.redis.nypsi.TOP_COMMANDS_USER, message.author.username, 1);
 
   if (command.category == "money") {
     if (!message.member) return;
@@ -1036,7 +1036,7 @@ export function logCommand(
   let msg: string;
 
   if (!(message instanceof Message)) {
-    msg = `${message.guild.id} - ${message.author.tag}: [/]${message.commandName} ${args.join(
+    msg = `${message.guild.id} - ${message.author.username}: [/]${message.commandName} ${args.join(
       " "
     )}`;
   } else {
@@ -1046,25 +1046,25 @@ export function logCommand(
       content = content.substring(0, 75) + "...";
     }
 
-    msg = `${message.guild.id} - ${message.author.tag}: ${content}`;
+    msg = `${message.guild.id} - ${message.author.username}: ${content}`;
   }
 
   logger.info(`::cmd ${msg}`);
 }
 
 export function addHourlyCommand(member: GuildMember) {
-  if (hourlyCommandCount.has(member.user.tag)) {
-    hourlyCommandCount.set(member.user.tag, hourlyCommandCount.get(member.user.tag) + 1);
+  if (hourlyCommandCount.has(member.user.username)) {
+    hourlyCommandCount.set(member.user.username, hourlyCommandCount.get(member.user.username) + 1);
   } else {
-    hourlyCommandCount.set(member.user.tag, 1);
+    hourlyCommandCount.set(member.user.username, 1);
   }
 }
 
 function updateCommandUses(member: GuildMember) {
-  if (hourlyCommandCount.has(member.user.tag)) {
-    hourlyCommandCount.set(member.user.tag, hourlyCommandCount.get(member.user.tag) + 1);
+  if (hourlyCommandCount.has(member.user.username)) {
+    hourlyCommandCount.set(member.user.username, hourlyCommandCount.get(member.user.username) + 1);
   } else {
-    hourlyCommandCount.set(member.user.tag, 1);
+    hourlyCommandCount.set(member.user.username, 1);
   }
 
   if (karmaCooldown.has(member.user.id)) return;
@@ -1098,7 +1098,7 @@ export function runCommandUseTimers(client: NypsiClient) {
       if (uses > 350) {
         const res = await client.cluster.broadcastEval(
           (c, { tag }) => {
-            const foundUser = c.users.cache.find((u) => `${u.username}#${u.discriminator}` == tag);
+            const foundUser = c.users.cache.find((u) => `${u.username}` == tag);
 
             if (foundUser) {
               return foundUser.id;

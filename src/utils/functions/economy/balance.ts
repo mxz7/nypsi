@@ -381,7 +381,7 @@ export async function bottomAmount(guild: Guild, amount: number): Promise<string
       usersFinal[count] =
         pos +
         " **" +
-        getMemberID(guild, user.userId).user.tag +
+        getMemberID(guild, user.userId).user.username +
         "** $" +
         Number(user.money).toLocaleString();
       count++;

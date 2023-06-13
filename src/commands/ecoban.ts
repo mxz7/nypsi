@@ -20,7 +20,7 @@ async function run(
     if (await isEcoBanned(args[0])) {
       await setEcoBan(args[0]); // unbans user
       logger.info(
-        `admin: ${message.author.tag} (${message.author.id}) set ${args[0]} ecoban to unban`
+        `admin: ${message.author.id} (${message.author.username}) set ${args[0]} ecoban to unban`
       );
     }
   } else {
@@ -29,7 +29,7 @@ async function run(
     await setEcoBan(args[0], time);
 
     logger.info(
-      `admin: ${message.author.tag} (${message.author.id}) set ${args[0]} ecoban to ${time}`
+      `admin: ${message.author.id} (${message.author.username}) set ${args[0]} ecoban to ${time}`
     );
   }
 

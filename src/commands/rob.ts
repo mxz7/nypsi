@@ -196,7 +196,7 @@ async function run(
     embed2.addField(
       "**fail!!**",
       "**" +
-        target.user.tag +
+        target.user.username +
         "** has been robbed recently and is protected by a private security team\n" +
         "you were caught and paid $" +
         amountMoney.toLocaleString()
@@ -206,7 +206,7 @@ async function run(
     embed3.setColor(Constants.EMBED_SUCCESS_COLOR);
     embed3.setDescription(
       "**" +
-        message.member.user.tag +
+        message.member.user.username +
         "** tried to rob you in **" +
         message.guild.name +
         "**\n" +
@@ -231,14 +231,14 @@ async function run(
     embed2.setColor(Constants.EMBED_FAIL_COLOR);
     embed2.addField(
       "fail!!",
-      "**" + target.user.tag + "** had a padlock, which has now been broken"
+      "**" + target.user.username + "** had a padlock, which has now been broken"
     );
 
     embed3.setTitle("you were nearly robbed");
     embed3.setColor(Constants.EMBED_SUCCESS_COLOR);
     embed3.setDescription(
       "**" +
-        message.member.user.tag +
+        message.member.user.username +
         "** tried to rob you in **" +
         message.guild.name +
         "**\n" +
@@ -288,7 +288,7 @@ async function run(
       embed3.setColor(Constants.EMBED_FAIL_COLOR);
       embed3.setDescription(
         "**" +
-          message.member.user.tag +
+          message.member.user.username +
           "** has robbed you in **" +
           message.guild.name +
           "**\n" +
@@ -338,7 +338,7 @@ async function run(
         );
         embed3.setDescription(
           "**" +
-            message.member.user.tag +
+            message.member.user.username +
             "** tried to rob you in **" +
             message.guild.name +
             "**\n" +
@@ -359,7 +359,7 @@ async function run(
         embed2.addField("fail!!", "you lost $**" + amountMoney.toLocaleString() + "**");
         embed3.setDescription(
           "**" +
-            message.member.user.tag +
+            message.member.user.username +
             "** tried to rob you in **" +
             message.guild.name +
             "**\n" +

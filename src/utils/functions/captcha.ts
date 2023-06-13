@@ -66,7 +66,7 @@ export async function passedCaptcha(member: GuildMember) {
   }
 
   await hook.send(
-    `[${getTimestamp()}] **${member.user.tag}** (${
+    `[${getTimestamp()}] **${member.user.username}** (${
       member.user.id
     }) has passed a captcha [${captchaPasses.get(member.user.id)}]`
   );
@@ -93,7 +93,7 @@ export async function failedCaptcha(member: GuildMember, content: string) {
   if (captchaFails.get(member.user.id) >= 69 && !(await isEcoBanned(member.user.id))) {
     await setEcoBan(member.user.id, dayjs().add(1, "day").toDate());
     await hook.send(
-      `[${getTimestamp()}] **${member.user.tag}** (${
+      `[${getTimestamp()}] **${member.user.username}** (${
         member.user.id
       }) has been banned for 24 hours for failing 69 captchas`
     );
@@ -105,7 +105,7 @@ export async function failedCaptcha(member: GuildMember, content: string) {
   }
 
   await hook.send(
-    `[${getTimestamp()}] **${member.user.tag}** (${
+    `[${getTimestamp()}] **${member.user.username}** (${
       member.user.id
     }) has failed a captcha (${content}) [${captchaFails.get(member.user.id)}]${
       captchaFails.get(member.user.id) % 15 === 0
@@ -177,7 +177,7 @@ export async function verifyUser(
     toggleLock(message.author.id);
     return response.react("✅");
   } else {
-    logger.info(`${message.guild} - ${message.author.tag}: ${message.content}`);
+    logger.info(`${message.guild} - ${message.author.username}: ${message.content}`);
     logger.info(`captcha (${message.author.id}) failed`);
     failedCaptcha(message.member, response.content);
     return message.channel.send({

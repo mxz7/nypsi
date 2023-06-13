@@ -319,7 +319,7 @@ async function run(
               .map((i) => {
                 if (items[i]) return `${items[i].emoji} ${items[i].name}`;
                 if (message.guild.members.cache.has(i))
-                  return `\`${i}\` (${message.guild.members.cache.get(i).user.tag})`;
+                  return `\`${i}\` (${message.guild.members.cache.get(i).user.username})`;
                 return `\`${i}\``;
               })
               .join("\n")}`
@@ -375,7 +375,7 @@ async function run(
           .map((i) => {
             if (items[i]) return `${items[i].emoji} ${items[i].name}`;
             if (message.guild.members.cache.has(i))
-              return `\`${i}\` (${message.guild.members.cache.get(i).user.tag})`;
+              return `\`${i}\` (${message.guild.members.cache.get(i).user.username})`;
             return `\`${i}\``;
           })
           .join("\n")
@@ -414,11 +414,13 @@ async function run(
 
     if ((await getPreferences(target)).offers <= (await getTargetedOffers(target.user.id)).length) {
       if ((await getPreferences(target)).offers === 0)
-        return send({ embeds: [new ErrorEmbed(`**${target.user.tag}** has disabled offers`)] });
+        return send({
+          embeds: [new ErrorEmbed(`**${target.user.username}** has disabled offers`)],
+        });
       return send({
         embeds: [
           new ErrorEmbed(
-            `**${target.user.tag}** has already received their max amount of offers (${
+            `**${target.user.username}** has already received their max amount of offers (${
               (await getPreferences(target)).offers
             })`
           ),
@@ -439,14 +441,14 @@ async function run(
       return send({
         embeds: [
           new ErrorEmbed(
-            `**${target.user.tag}** has blocked offers for ${selected.emoji} ${selected.name}`
+            `**${target.user.username}** has blocked offers for ${selected.emoji} ${selected.name}`
           ),
         ],
       });
 
     if (blocked.includes(message.author.id))
       return send({
-        embeds: [new ErrorEmbed(`**${target.user.tag}** has blocked offers from you`)],
+        embeds: [new ErrorEmbed(`**${target.user.username}** has blocked offers from you`)],
       });
 
     let amount = parseInt(args[2]);
@@ -465,7 +467,7 @@ async function run(
       return send({
         embeds: [
           new ErrorEmbed(
-            `**${target.user.tag}** doesnt have ${amount}x ${selected.emoji} ${selected.name}`
+            `**${target.user.username}** doesnt have ${amount}x ${selected.emoji} ${selected.name}`
           ),
         ],
       });
@@ -487,7 +489,7 @@ async function run(
     } else {
       return send({
         embeds: [
-          new CustomEmbed(message.member, `✅ offer has been sent to **${target.user.tag}**`),
+          new CustomEmbed(message.member, `✅ offer has been sent to **${target.user.username}**`),
         ],
       });
     }

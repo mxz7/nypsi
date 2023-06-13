@@ -130,7 +130,7 @@ async function run(
   if (!(member instanceof GuildMember)) {
     embed.setHeader("history for " + member);
   } else {
-    embed.setHeader("history for " + member.user.tag);
+    embed.setHeader("history for " + member.user.username);
   }
 
   for (const case0 of pages[0]) {
@@ -198,7 +198,7 @@ async function run(
       if (!(member instanceof GuildMember)) {
         newEmbed.setHeader("history for " + member);
       } else {
-        newEmbed.setHeader("history for " + member.user.tag);
+        newEmbed.setHeader("history for " + member.user.username);
       }
 
       if (!reaction) return;

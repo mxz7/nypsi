@@ -80,7 +80,7 @@ if (!isMainThread) {
         .then((r) => r?.lastKnownTag);
 
       chart.data.datasets.push({
-        label: tag?.split("#")[0] || userId,
+        label: tag || userId,
         data: balances.map((b) => parseInt(b)),
         fill: false,
       });

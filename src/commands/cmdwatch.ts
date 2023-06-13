@@ -28,7 +28,9 @@ async function run(
   }
 
   logger.info(
-    `admin: ${message.author.id} (${message.author.tag}) toggled command watch - ${args.join(" ")}`
+    `admin: ${message.author.id} (${message.author.username}) toggled command watch - ${args.join(
+      " "
+    )}`
   );
 }
 
