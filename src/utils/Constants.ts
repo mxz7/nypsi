@@ -135,5 +135,5 @@ export default {
   SEASON_NUMBER: 6,
   SNOWFLAKE_REGEX: /^\d{17,19}$/,
   LUCKY_CHEESE_CHANCE: 0.07,
-  BADGES: ["owner", "staff", "contributor", "season_winner", "og"],
+  BADGES: ["owner", "staff", "highroller", "contributor", "season_winner", "og"],
 };
