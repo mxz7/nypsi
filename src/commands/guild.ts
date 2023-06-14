@@ -252,7 +252,7 @@ async function run(
       const maxMembers = await getMaxMembersForGuild(guild.guildName);
 
       for (const m of guild.members) {
-        membersText += `\`${m.economy.user.lastKnownTag}\` `;
+        membersText += `[\`${m.economy.user.lastKnownTag}\`](https://nypsi.xyz/user/${m.userId}) `;
 
         if (m.userId == message.author.id) {
           embed.setFooter({ text: `you joined ${daysAgo(m.joinedAt).toLocaleString()} days ago` });
