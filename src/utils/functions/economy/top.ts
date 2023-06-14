@@ -5,6 +5,7 @@ import prisma from "../../../init/database";
 import PageManager from "../page";
 import { getPreferences } from "../users/notifications";
 import workerSort from "../workers/sort";
+import wordleSortWorker from "../workers/wordlesort";
 import { calcNetWorth } from "./balance";
 import { getAchievements, getItems } from "./utils";
 import pAll = require("p-all");
@@ -916,6 +917,186 @@ export async function topDailyStreakGlobal(userId: string) {
 
   if (userId) {
     pos = userIds.indexOf(userId) + 1;
+  }
+
+  return { pages, pos };
+}
+
+export async function topWordle(guild: Guild, userId: string) {
+  let members: Collection<string, GuildMember>;
+
+  if (guild.memberCount == guild.members.cache.size) {
+    members = guild.members.cache;
+  } else {
+    members = await guild.members.fetch();
+  }
+
+  if (!members) members = guild.members.cache;
+
+  members = members.filter((m) => {
+    return !m.user.bot;
+  });
+
+  const query = await prisma.wordleStats.findMany({
+    where: {
+      AND: [
+        { userId: { in: Array.from(members.keys()) } },
+        {
+          OR: [
+            { win1: { gt: 0 } },
+            { win2: { gt: 0 } },
+            { win3: { gt: 0 } },
+            { win4: { gt: 0 } },
+            { win5: { gt: 0 } },
+            { win6: { gt: 0 } },
+          ],
+        },
+      ],
+    },
+    select: {
+      win1: true,
+      win2: true,
+      win3: true,
+      win4: true,
+      win5: true,
+      win6: true,
+      user: {
+        select: {
+          id: true,
+          lastKnownTag: true,
+          blacklisted: true,
+        },
+      },
+    },
+  });
+
+  let sorted: {
+    wins: number;
+    user: {
+      lastKnownTag: string;
+      blacklisted: boolean;
+      id: string;
+    };
+  }[];
+
+  if (query.length > 500) {
+    sorted = await wordleSortWorker(query);
+  } else {
+    sorted = query
+      .filter((i) => !i.user.blacklisted)
+      .map((i) => {
+        return { wins: i.win1 + i.win2 + i.win3 + i.win4 + i.win5 + i.win6, user: i.user };
+      });
+
+    inPlaceSort(sorted).desc((i) => i.wins);
+
+    if (sorted.length > 100) sorted = sorted.slice(0, 100);
+  }
+
+  const out: string[] = [];
+
+  const getMemberID = (guild: Guild, id: string) => {
+    const target = members.find((member) => {
+      return member.user.id == id;
+    });
+
+    return target;
+  };
+
+  for (const user of sorted) {
+    let pos: number | string = out.length + 1;
+
+    if (pos == 1) {
+      pos = "🥇";
+    } else if (pos == 2) {
+      pos = "🥈";
+    } else if (pos == 3) {
+      pos = "🥉";
+    }
+
+    out.push(
+      pos +
+        " **" +
+        getMemberID(guild, user.user.id).user.tag +
+        "** " +
+        user.wins.toLocaleString() +
+        "wins"
+    );
+  }
+
+  const pages = PageManager.createPages(out);
+
+  let pos = 0;
+
+  if (userId) {
+    pos = sorted.findIndex((i) => i.user.id === userId);
+  }
+
+  return { pages, pos };
+}
+
+export async function topWordleGlobal(userId: string) {
+  const query = await prisma.wordleStats.findMany({
+    where: {
+      OR: [
+        { win1: { gt: 0 } },
+        { win2: { gt: 0 } },
+        { win3: { gt: 0 } },
+        { win4: { gt: 0 } },
+        { win5: { gt: 0 } },
+        { win6: { gt: 0 } },
+      ],
+    },
+    select: {
+      win1: true,
+      win2: true,
+      win3: true,
+      win4: true,
+      win5: true,
+      win6: true,
+      user: {
+        select: {
+          id: true,
+          lastKnownTag: true,
+          blacklisted: true,
+        },
+      },
+    },
+  });
+
+  const sorted = await wordleSortWorker(query);
+
+  const out: string[] = [];
+
+  for (const user of sorted) {
+    let pos: number | string = out.length + 1;
+
+    if (pos == 1) {
+      pos = "🥇";
+    } else if (pos == 2) {
+      pos = "🥈";
+    } else if (pos == 3) {
+      pos = "🥉";
+    }
+
+    out.push(
+      pos +
+        " **" +
+        ((await getPreferences(user.user.id))?.leaderboards
+          ? user.user.lastKnownTag?.split("#")[0] || user.user.id
+          : "[hidden]") +
+        "** " +
+        user.wins.toLocaleString() +
+        "wins"
+    );
+  }
+
+  const pages = PageManager.createPages(out);
+
+  let pos = 0;
+
+  if (userId) {
+    pos = sorted.findIndex((i) => i.user.id === userId);
   }
 
   return { pages, pos };
