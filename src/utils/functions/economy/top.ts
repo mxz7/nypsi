@@ -7,6 +7,7 @@ import { getPreferences } from "../users/notifications";
 import workerSort from "../workers/sort";
 import wordleSortWorker from "../workers/wordlesort";
 import { calcNetWorth } from "./balance";
+import { checkLeaderboardPositions } from "./stats";
 import { getAchievements, getItems } from "./utils";
 import pAll = require("p-all");
 
@@ -151,6 +152,11 @@ export async function topBalanceGlobal(amount: number, anon = true): Promise<str
     count++;
   }
 
+  checkLeaderboardPositions(
+    query.map((i) => i.userId),
+    "balance"
+  );
+
   return usersFinal;
 }
 
@@ -212,6 +218,8 @@ export async function topNetWorthGlobal(userId: string) {
   if (userId) {
     pos = userIds.indexOf(userId) + 1;
   }
+
+  checkLeaderboardPositions(userIds, "networth");
 
   return { pages, pos };
 }
@@ -470,6 +478,8 @@ export async function topPrestigeGlobal(userId: string) {
     pos = userIds.indexOf(userId) + 1;
   }
 
+  checkLeaderboardPositions(userIds, "prestige");
+
   return { pages, pos };
 }
 
@@ -632,6 +642,8 @@ export async function topItemGlobal(item: string, userId: string) {
   if (userId) {
     pos = userIds.indexOf(userId) + 1;
   }
+
+  checkLeaderboardPositions(userIds, `item-${item}`);
 
   return { pages, pos };
 }
@@ -919,6 +931,8 @@ export async function topDailyStreakGlobal(userId: string) {
     pos = userIds.indexOf(userId) + 1;
   }
 
+  checkLeaderboardPositions(userIds, "streak");
+
   return { pages, pos };
 }
 
@@ -1098,6 +1112,11 @@ export async function topWordleGlobal(userId: string) {
   if (userId) {
     pos = sorted.findIndex((i) => i.user.id === userId);
   }
+
+  checkLeaderboardPositions(
+    sorted.map((i) => i.user.id),
+    "wordle"
+  );
 
   return { pages, pos };
 }

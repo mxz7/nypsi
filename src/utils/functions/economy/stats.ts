@@ -191,3 +191,25 @@ export async function setStat(member: GuildMember | string, item: string, amount
     },
   });
 }
+
+export async function checkLeaderboardPositions(users: string[], leaderboard: string) {
+  for (const user of users) {
+    if (users.indexOf(user) > 100) return;
+    await prisma.leaderboards.upsert({
+      where: {
+        leaderboard_position: {
+          leaderboard,
+          position: users.indexOf(user) + 1,
+        },
+      },
+      update: {
+        userId: user,
+      },
+      create: {
+        leaderboard,
+        position: users.indexOf(user) + 1,
+        userId: user,
+      },
+    });
+  }
+}
