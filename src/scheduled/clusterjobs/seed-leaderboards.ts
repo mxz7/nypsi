@@ -50,7 +50,7 @@ export function doLeaderboardSeed() {
   setTimeout(() => {
     leaderboardThing();
     setInterval(leaderboardThing, ms("24 hours"));
-  }, 15000);
+  }, start - Date.now());
 
   logger.info(`::auto leaderboards will be seeded in ${MStoTime(start - Date.now())}`);
 }
