@@ -33,6 +33,7 @@ import {
   setTier,
 } from "../utils/functions/premium/premium";
 import { getAdminLevel, setAdminLevel } from "../utils/functions/users/admin";
+import { getBadges, setBadges } from "../utils/functions/users/badges";
 import { isUserBlacklisted, setUserBlacklist } from "../utils/functions/users/blacklist";
 import { getCommandUses } from "../utils/functions/users/commands";
 import { hasProfile } from "../utils/functions/users/utils";
@@ -232,7 +233,12 @@ async function run(
           .setCustomId("ac-clear")
           .setLabel("clear violations")
           .setStyle(ButtonStyle.Primary)
-          .setEmoji("😃")
+          .setEmoji("😃"),
+        new ButtonBuilder()
+          .setCustomId("badges")
+          .setLabel("badges")
+          .setStyle(ButtonStyle.Primary)
+          .setEmoji("🏷️")
       ),
       new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()
@@ -459,6 +465,15 @@ async function run(
 
         await res.editReply({ content: "✅" });
         return waitForButton();
+      } else if (res.customId === "badges") {
+        if ((await getAdminLevel(message.author.id)) < 4) {
+          await res.editReply({
+            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
+          });
+          return waitForButton();
+        }
+
+        return doBadges(user, res as ButtonInteraction);
       } else if (res.customId === "set-bal") {
         if ((await getAdminLevel(message.author.id)) < 4) {
           await res.editReply({
@@ -1081,6 +1096,166 @@ async function run(
         );
         await setExpireDate(user.id, new Date(0), message.client as NypsiClient);
         await res.editReply({ embeds: [new CustomEmbed(message.member, "done sir.")] });
+        return waitForButton();
+      }
+    };
+    return waitForButton();
+  };
+
+  const doBadges = async (user: User, response: ButtonInteraction) => {
+    const rows: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [
+      new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder()
+          .setCustomId("add-badge")
+          .setLabel("add badge")
+          .setStyle(ButtonStyle.Primary)
+          .setEmoji("👍🏻"),
+        new ButtonBuilder()
+          .setCustomId("remove-badge")
+          .setLabel("remove badge")
+          .setStyle(ButtonStyle.Primary)
+          .setEmoji("👎🏻")
+      ),
+    ];
+
+    const embed = new CustomEmbed(message.member);
+
+    let badges = await getBadges(user.id);
+
+    let edited = false;
+    for (const badge of badges) {
+      if (!Constants.BADGES.includes(badge)) {
+        edited = true;
+        badges.splice(badges.indexOf(badge), 1);
+      }
+    }
+
+    if (edited) badges = await setBadges(user.id, badges);
+
+    embed.setDescription(
+      `${
+        badges.length > 0 ? `\`${badges.join("` `")}\`` : "no badges"
+      }\n\nall badges: \`${Constants.BADGES.join("` `")}\``
+    );
+
+    const msg = await response.editReply({ embeds: [embed], components: rows });
+
+    const waitForButton = async (): Promise<void> => {
+      const filter = (i: Interaction) => i.user.id == message.author.id;
+
+      const res = await msg.awaitMessageComponent({ filter, time: 120000 }).catch(async () => {
+        await msg.edit({ components: [] });
+      });
+
+      if (!res) return;
+
+      await res.deferReply();
+
+      if (res.customId === "add-badge") {
+        if ((await getAdminLevel(message.author.id)) < 4) {
+          await res.editReply({
+            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
+          });
+          return waitForButton();
+        }
+
+        await res.editReply({ embeds: [new CustomEmbed(message.member, "what badge")] });
+
+        const msgResponse = await message.channel
+          .awaitMessages({
+            filter: (msg: Message) => msg.author.id === message.author.id,
+            max: 1,
+            time: 30000,
+          })
+          .then((collected) => collected.first())
+          .catch(() => {
+            res.editReply({ embeds: [new CustomEmbed(message.member, "expired")] });
+          });
+
+        if (!msgResponse) return;
+
+        if (!Constants.BADGES.includes(msgResponse.content)) {
+          await res.editReply({
+            embeds: [
+              new CustomEmbed(
+                message.member,
+                "THATS NOT EVEN A FUCKING BADGE YOU ABSOLUTE PIECE OF SHIT MORON I WROTE THIS PIECE OF CODE JUST FOR YOUR DUMBASS TO SEE IT HAHAHAHAHAHAH GET FUCKED FOUR EYES"
+              ).setImage("https://y.yarn.co/289bca9a-b01e-48b1-9352-6d437bb1d88e_text.gif"),
+            ],
+          });
+          return waitForButton();
+        }
+
+        logger.info(
+          `admin: ${message.author.id} (${message.author.username}) added ${msgResponse.content} badge to ${user.id}`
+        );
+
+        badges.push(msgResponse.content);
+        badges = await setBadges(user.id, badges);
+        msgResponse.react("✅");
+        await msg.edit({
+          embeds: [
+            new CustomEmbed(
+              message.member,
+              `${
+                badges.length > 0 ? `\`${badges.join("` `")}\`` : "no badges"
+              }\n\nall badges: \`${Constants.BADGES.join("` `")}\``
+            ),
+          ],
+        });
+        return waitForButton();
+      } else if (res.customId === "remove-badge") {
+        if ((await getAdminLevel(message.author.id)) < 4) {
+          await res.editReply({
+            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
+          });
+          return waitForButton();
+        }
+
+        await res.editReply({ embeds: [new CustomEmbed(message.member, "what badge")] });
+
+        const msgResponse = await message.channel
+          .awaitMessages({
+            filter: (msg: Message) => msg.author.id === message.author.id,
+            max: 1,
+            time: 30000,
+          })
+          .then((collected) => collected.first())
+          .catch(() => {
+            res.editReply({ embeds: [new CustomEmbed(message.member, "expired")] });
+          });
+
+        if (!msgResponse) return;
+
+        if (!badges.includes(msgResponse.content)) {
+          await res.editReply({
+            embeds: [
+              new CustomEmbed(
+                message.member,
+                "nah you stupid cunt how the fuck have you managed THAT he doesnt have that badge YOU FUCKING IDIOT HAHAHAHAHA GO SUCK A COCK"
+              ),
+            ],
+          });
+          return waitForButton();
+        }
+
+        logger.info(
+          `admin: ${message.author.id} (${message.author.username}) removed ${msgResponse.content} badge from ${user.id}`
+        );
+
+        badges.slice(badges.indexOf(msgResponse.content), 1);
+        badges = await setBadges(user.id, badges);
+        msgResponse.react("✅");
+        await msg.edit({
+          embeds: [
+            new CustomEmbed(
+              message.member,
+              `${
+                badges.length > 0 ? `\`${badges.join("` `")}\`` : "no badges"
+              }\n\nall badges: \`${Constants.BADGES.join("` `")}\``
+            ),
+          ],
+        });
         return waitForButton();
       }
     };
