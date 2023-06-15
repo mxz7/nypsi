@@ -1034,7 +1034,7 @@ export async function topWordle(guild: Guild, userId: string) {
         getMemberID(guild, user.user.id).user.tag +
         "** " +
         user.wins.toLocaleString() +
-        "wins"
+        " wins"
     );
   }
 
@@ -1101,7 +1101,7 @@ export async function topWordleGlobal(userId: string) {
           : "[hidden]") +
         "** " +
         user.wins.toLocaleString() +
-        "wins"
+        " wins"
     );
   }
 
