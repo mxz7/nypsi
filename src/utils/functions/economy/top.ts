@@ -972,7 +972,7 @@ export async function topWordle(guild: Guild, userId: string) {
       user: {
         select: {
           id: true,
-          lastKnownTag: true,
+          lastKnownUsername: true,
           blacklisted: true,
         },
       },
@@ -982,7 +982,7 @@ export async function topWordle(guild: Guild, userId: string) {
   let sorted: {
     wins: number;
     user: {
-      lastKnownTag: string;
+      lastKnownUsername: string;
       blacklisted: boolean;
       id: string;
     };
@@ -1026,7 +1026,7 @@ export async function topWordle(guild: Guild, userId: string) {
     out.push(
       pos +
         " **" +
-        getMemberID(guild, user.user.id).user.tag +
+        getMemberID(guild, user.user.id).user.username +
         "** " +
         user.wins.toLocaleString() +
         "wins"
@@ -1066,7 +1066,7 @@ export async function topWordleGlobal(userId: string) {
       user: {
         select: {
           id: true,
-          lastKnownTag: true,
+          lastKnownUsername: true,
           blacklisted: true,
         },
       },
@@ -1092,7 +1092,7 @@ export async function topWordleGlobal(userId: string) {
       pos +
         " **" +
         ((await getPreferences(user.user.id))?.leaderboards
-          ? user.user.lastKnownTag?.split("#")[0] || user.user.id
+          ? user.user.lastKnownUsername || user.user.id
           : "[hidden]") +
         "** " +
         user.wins.toLocaleString() +
