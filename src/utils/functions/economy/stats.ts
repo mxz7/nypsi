@@ -193,6 +193,14 @@ export async function setStat(member: GuildMember | string, item: string, amount
   });
 }
 
+export async function getLeaderboardPositions(userId: string) {
+  return await prisma.leaderboards.findMany({
+    where: {
+      userId,
+    },
+  });
+}
+
 export async function checkLeaderboardPositions(users: string[], leaderboard: string) {
   if (await redis.exists("nypsi:lb:cooldown:" + leaderboard)) return;
   await redis.set("nypsi:lb:cooldown" + leaderboard, "69");
