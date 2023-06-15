@@ -16,8 +16,8 @@ import {
 } from "../utils/functions/economy/inventory";
 import { addStat } from "../utils/functions/economy/stats";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
-import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { percentChance } from "../utils/functions/random";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("hunt", "go to a field and hunt", "money");
 

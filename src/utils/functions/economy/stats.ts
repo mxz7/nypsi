@@ -1,6 +1,7 @@
 import { GuildMember } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
+import redis from "../../../init/redis";
 import { logger } from "../../logger";
 import { addProgress } from "./achievements";
 
@@ -190,4 +191,42 @@ export async function setStat(member: GuildMember | string, item: string, amount
       amount: amount,
     },
   });
+}
+
+export async function getLeaderboardPositions(userId: string) {
+  return await prisma.leaderboards.findMany({
+    where: {
+      userId,
+    },
+    select: {
+      leaderboard: true,
+      position: true,
+    },
+  });
+}
+
+export async function checkLeaderboardPositions(users: string[], leaderboard: string) {
+  if (await redis.exists("nypsi:lb:cooldown:" + leaderboard)) return;
+  await redis.set("nypsi:lb:cooldown" + leaderboard, "69");
+  await redis.expire("nypsi:lb:cooldown" + leaderboard, 600);
+
+  for (const user of users) {
+    if (users.indexOf(user) > 100) return;
+    await prisma.leaderboards.upsert({
+      where: {
+        leaderboard_position: {
+          leaderboard,
+          position: users.indexOf(user) + 1,
+        },
+      },
+      update: {
+        userId: user,
+      },
+      create: {
+        leaderboard,
+        position: users.indexOf(user) + 1,
+        userId: user,
+      },
+    });
+  }
 }

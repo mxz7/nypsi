@@ -10,16 +10,18 @@ datasource db {
 // user specific tables (economy etc.)
 
 model User {
-  id                String   @id
-  lastKnownUsername String   @map("lastKnownTag")
-  karma             Int      @default(1)
-  lastCommand       DateTime
-  tracking          Boolean  @default(true)
-  lastfmUsername    String?
-  email             String?  @unique
-  blacklisted       Boolean  @default(false)
-  adminLevel        Int      @default(0)
-  booster           Boolean  @default(false)
+  id             String   @id
+  lastKnownUsername   String @map("lastKnownTag")
+  avatar         String   @default("https://cdn.discordapp.com/embed/avatars/0.png")
+  karma          Int      @default(1)
+  lastCommand    DateTime
+  tracking       Boolean  @default(true)
+  lastfmUsername String?
+  email          String?  @unique
+  blacklisted    Boolean  @default(false)
+  adminLevel     Int      @default(0)
+  booster        Boolean  @default(false)
+  badges         String[]
 
   Economy      Economy?
   Premium      Premium?
@@ -29,6 +31,19 @@ model User {
   Achievements Achievements[]
   DMSettings   DMSettings?
   Preferences  Preferences?
+  Leaderboards Leaderboards[]
+}
+
+model Leaderboards {
+  userId      String
+  leaderboard String
+  position    Int
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([leaderboard, position])
+  @@unique([userId, leaderboard])
+  @@index([userId])
 }
 
 model DMSettings {
@@ -512,7 +527,7 @@ model EconomyGuild {
   guildName String   @id
   createdAt DateTime
   balance   BigInt   @default(0)
-  xp        Int      @default(0)
+  xp        BigInt   @default(0)
   tokens    Int      @default(0)
   level     Int      @default(1)
   motd      String   @default("welcome to the guild fool (/guild motd)")

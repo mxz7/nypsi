@@ -10,6 +10,7 @@ import {
   MessageActionRowComponentBuilder,
   MessageEditOptions,
 } from "discord.js";
+import { inPlaceSort } from "fast-sort";
 import { cpu } from "node-os-utils";
 import * as os from "os";
 import { workerCount } from "../events/message";
@@ -21,7 +22,12 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { unbanTimeouts, unmuteTimeouts } from "../scheduled/clusterjobs/moderationchecks";
 import Constants from "../utils/Constants";
 import { MStoTime } from "../utils/functions/date";
-import { getGambleStats, getScratchCardStats, getStats } from "../utils/functions/economy/stats";
+import {
+  getGambleStats,
+  getLeaderboardPositions,
+  getScratchCardStats,
+  getStats,
+} from "../utils/functions/economy/stats";
 import { getItems } from "../utils/functions/economy/utils";
 import { violations } from "../utils/functions/moderation/mute";
 import PageManager from "../utils/functions/page";
@@ -42,7 +48,10 @@ cmd.slashData
     commands.setName("commands").setDescription("view your command usage stats")
   )
   .addSubcommand((bot) => bot.setName("bot").setDescription("view nypsi's stats"))
-  .addSubcommand((auction) => auction.setName("auction").setDescription("view your auction stats"));
+  .addSubcommand((auction) => auction.setName("auction").setDescription("view your auction stats"))
+  .addSubcommand((lb) =>
+    lb.setName("leaderboards").setDescription("view your leaderboard positions")
+  );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
@@ -561,6 +570,72 @@ async function run(
     });
   };
 
+  const lbStats = async () => {
+    const positions = await getLeaderboardPositions(message.author.id);
+
+    const embed = new CustomEmbed(message.member).setHeader(
+      "leaderboard positions",
+      message.author.avatarURL()
+    );
+
+    if (positions.length === 0) {
+      embed.setDescription("you are not on any leaderboards");
+      return send({ embeds: [embed] });
+    }
+
+    const out: string[] = [];
+
+    for (const position of inPlaceSort(positions).asc((i) => i.position)) {
+      if (position.leaderboard.startsWith("item-")) {
+        const item = getItems()[position.leaderboard.split("-")[1]];
+
+        out.push(
+          `${item.emoji} **${item.name}** ${
+            position.position === 1
+              ? "🥇"
+              : position.position === 2
+              ? "🥈"
+              : position.position === 3
+              ? "🥉"
+              : `#${position.position}`
+          }`
+        );
+      } else {
+        out.push(
+          `**${position.leaderboard}** ${
+            position.position === 1
+              ? "🥇"
+              : position.position === 2
+              ? "🥈"
+              : position.position === 3
+              ? "🥉"
+              : `#${position.position}`
+          }`
+        );
+      }
+    }
+
+    const pages = PageManager.createPages(out);
+
+    embed.setDescription(pages.get(1).join("\n"));
+    if (pages.size === 1) return send({ embeds: [embed] });
+
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder()
+        .setCustomId("⬅")
+        .setLabel("back")
+        .setStyle(ButtonStyle.Primary)
+        .setDisabled(true),
+      new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
+    );
+
+    const msg = await send({ embeds: [embed], components: [row] });
+
+    const manager = new PageManager({ embed, message: msg, row, userId: message.author.id, pages });
+
+    return manager.listen();
+  };
+
   if (args.length == 0) {
     return gambleStats();
   } else if (args[0].toLowerCase() == "global" && message.author.id == Constants.TEKOH_ID) {
@@ -633,6 +708,11 @@ async function run(
     return scratchStats();
   } else if (args[0].toLowerCase().includes("auction")) {
     return auctionStats();
+  } else if (
+    args[0].toLowerCase().includes("lb") ||
+    args[0].toLowerCase().includes("leaderboard")
+  ) {
+    return lbStats();
   } else {
     return gambleStats();
   }
