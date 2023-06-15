@@ -198,6 +198,10 @@ export async function getLeaderboardPositions(userId: string) {
     where: {
       userId,
     },
+    select: {
+      leaderboard: true,
+      position: true,
+    },
   });
 }
 
