@@ -26,6 +26,8 @@ import {
   topNetWorthGlobal,
   topPrestige,
   topPrestigeGlobal,
+  topWordle,
+  topWordleGlobal,
 } from "../utils/functions/economy/top";
 import { getItems } from "../utils/functions/economy/utils.js";
 import PageManager from "../utils/functions/page";
@@ -62,6 +64,18 @@ cmd.slashData
     prestige
       .setName("dailystreak")
       .setDescription("view top daily streaks in the server")
+      .addStringOption((option) =>
+        option
+          .setName("scope")
+          .setDescription("show global/server")
+          .setChoices(...scopeChoices)
+          .setRequired(false)
+      )
+  )
+  .addSubcommand((prestige) =>
+    prestige
+      .setName("wordle")
+      .setDescription("view top wordle wins in the server")
       .addStringOption((option) =>
         option
           .setName("scope")
@@ -313,6 +327,25 @@ async function run(
       data.pos,
       `top daily streak ${global ? "[global]" : `for ${message.guild.name}`}`,
       global ? "https://nypsi.xyz/leaderboard/streak" : null
+    );
+  } else if (args[0].toLowerCase().includes("wordle")) {
+    let global = false;
+
+    if (args[1]?.toLowerCase() == "global") global = true;
+
+    let data: { pages: Map<number, string[]>; pos: number };
+
+    if (global) {
+      data = await topWordleGlobal(message.author.id);
+    } else {
+      data = await topWordle(message.guild, message.author.id);
+    }
+
+    return show(
+      data.pages,
+      data.pos,
+      `top wordle wins ${global ? "[global]" : `for ${message.guild.name}`}`,
+      global ? "https://nypsi.xyz/leaderboard/wordle" : null
     );
   } else {
     const selected =

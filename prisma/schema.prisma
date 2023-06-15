@@ -21,6 +21,7 @@ model User {
   blacklisted    Boolean  @default(false)
   adminLevel     Int      @default(0)
   booster        Boolean  @default(false)
+  badges         String[]
 
   Economy      Economy?
   Premium      Premium?
@@ -30,6 +31,19 @@ model User {
   Achievements Achievements[]
   DMSettings   DMSettings?
   Preferences  Preferences?
+  Leaderboards Leaderboards[]
+}
+
+model Leaderboards {
+  userId      String
+  leaderboard String
+  position    Int
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([leaderboard, position])
+  @@unique([userId, leaderboard])
+  @@index([userId])
 }
 
 model DMSettings {
