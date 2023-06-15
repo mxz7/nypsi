@@ -1243,7 +1243,7 @@ async function run(
           `admin: ${message.author.id} (${message.author.username}) removed ${msgResponse.content} badge from ${user.id}`
         );
 
-        badges.slice(badges.indexOf(msgResponse.content), 1);
+        badges.splice(badges.indexOf(msgResponse.content), 1);
         badges = await setBadges(user.id, badges);
         msgResponse.react("✅");
         await msg.edit({
