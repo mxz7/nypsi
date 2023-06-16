@@ -473,7 +473,8 @@ async function run(
           return waitForButton();
         }
 
-        return doBadges(user, res as ButtonInteraction);
+        doBadges(user, res as ButtonInteraction);
+        return waitForButton();
       } else if (res.customId === "set-bal") {
         if ((await getAdminLevel(message.author.id)) < 4) {
           await res.editReply({
