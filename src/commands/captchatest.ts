@@ -18,7 +18,7 @@ async function run(
 
   for (const user of args) {
     toggleLock(user, true);
-    logger.info(`admin: ${message.author.username} (${message.author.id}) toggled ${user} captcha`);
+    logger.info(`admin: ${message.author.id} (${message.author.username}) toggled ${user} captcha`);
   }
 
   if (!(message instanceof Message)) return;
