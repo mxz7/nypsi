@@ -471,7 +471,8 @@ async function run(
           return waitForButton();
         }
 
-        return doBadges(user, res as ButtonInteraction);
+        doBadges(user, res as ButtonInteraction);
+        return waitForButton();
       } else if (res.customId === "set-bal") {
         if ((await getAdminLevel(message.author.id)) < 4) {
           await res.editReply({
@@ -1241,7 +1242,7 @@ async function run(
           `admin: ${message.author.id} (${message.author.username}) removed ${msgResponse.content} badge from ${user.id}`
         );
 
-        badges.slice(badges.indexOf(msgResponse.content), 1);
+        badges.splice(badges.indexOf(msgResponse.content), 1);
         badges = await setBadges(user.id, badges);
         msgResponse.react("✅");
         await msg.edit({

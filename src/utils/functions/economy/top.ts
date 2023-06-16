@@ -1029,7 +1029,7 @@ export async function topWordle(guild: Guild, userId: string) {
         getMemberID(guild, user.user.id).user.username +
         "** " +
         user.wins.toLocaleString() +
-        "wins"
+        " wins"
     );
   }
 
@@ -1038,7 +1038,7 @@ export async function topWordle(guild: Guild, userId: string) {
   let pos = 0;
 
   if (userId) {
-    pos = sorted.findIndex((i) => i.user.id === userId);
+    pos = sorted.findIndex((i) => i.user.id === userId) + 1;
   }
 
   return { pages, pos };
@@ -1096,7 +1096,7 @@ export async function topWordleGlobal(userId: string) {
           : "[hidden]") +
         "** " +
         user.wins.toLocaleString() +
-        "wins"
+        " wins"
     );
   }
 
@@ -1105,7 +1105,7 @@ export async function topWordleGlobal(userId: string) {
   let pos = 0;
 
   if (userId) {
-    pos = sorted.findIndex((i) => i.user.id === userId);
+    pos = sorted.findIndex((i) => i.user.id === userId) + 1;
   }
 
   checkLeaderboardPositions(
