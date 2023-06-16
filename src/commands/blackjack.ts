@@ -236,19 +236,19 @@ async function prepareGame(
   const id = Math.random();
 
   const newDeck = [
-    "A♠",
-    "2♠",
-    "3♠",
-    "4♠",
-    "5♠",
-    "6♠",
-    "7♠",
-    "8♠",
-    "9♠",
-    "10♠",
-    "J♠",
-    "Q♠",
-    "K♠",
+    "A♠️",
+    "2♠️",
+    "3♠️",
+    "4♠️",
+    "5♠️",
+    "6♠️",
+    "7♠️",
+    "8♠️",
+    "9♠️",
+    "10♠️",
+    "J♠️",
+    "Q♠️",
+    "K♠️",
     "A♣️",
     "2♣️",
     "3♣️",
@@ -429,7 +429,7 @@ function calcTotal(member: GuildMember) {
   let aceAs11 = false;
 
   for (let card of cards) {
-    card = card.split("♠").join().split("♣️").join().split("♥️").join().split("♦️").join();
+    card = card.split("♠️").join().split("♣️").join().split("♥️").join().split("♦️").join();
 
     if (card.includes("K") || card.includes("Q") || card.includes("J")) {
       total = total + 10;
@@ -467,7 +467,7 @@ function calcTotalDealer(member: GuildMember) {
   let aceAs11 = false;
 
   for (let card of cards) {
-    card = card.split("♠").join().split("♣️").join().split("♥️").join().split("♦️").join();
+    card = card.split("♠️").join().split("♣️").join().split("♥️").join().split("♦️").join();
 
     if (card.includes("K") || card.includes("Q") || card.includes("J")) {
       total = total + 10;
