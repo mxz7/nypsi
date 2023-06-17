@@ -212,9 +212,10 @@ export async function checkLeaderboardPositions(users: string[], leaderboard: st
 
   for (const user of users) {
     if (users.indexOf(user) > 100) return;
-    const query = await prisma.leaderboards.findUnique({
+    const query = await prisma.leaderboards.findFirst({
       where: {
-        userId_leaderboard: { leaderboard, userId: user },
+        leaderboard,
+        userId: user,
       },
       select: {
         position: true,
