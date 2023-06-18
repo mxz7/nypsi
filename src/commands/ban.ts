@@ -104,6 +104,8 @@ async function run(
     }
   }
 
+  if (!target && !userId) return send({ embeds: [new ErrorEmbed("invalid user")] });
+
   let reason = message.author.tag + ": ";
   let unbanDate: Date;
   let temporary = false;
