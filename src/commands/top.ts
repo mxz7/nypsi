@@ -16,6 +16,8 @@ import { getGuildByUser } from "../utils/functions/economy/guilds";
 import { selectItem } from "../utils/functions/economy/inventory";
 import {
   topBalance,
+  topCommand,
+  topCommandGlobal,
   topCompletion,
   topDailyStreak,
   topDailyStreakGlobal,
@@ -30,7 +32,9 @@ import {
   topWordleGlobal,
 } from "../utils/functions/economy/top";
 import { getItems } from "../utils/functions/economy/utils.js";
+import { getPrefix } from "../utils/functions/guilds/utils";
 import PageManager from "../utils/functions/page";
+import { commands } from "../utils/handlers/commandhandler";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 
 const cmd = new Command("top", "view top etc. in the server", "money").setAliases([
@@ -111,6 +115,19 @@ cmd.slashData
     networth
       .setName("networth")
       .setDescription("view top networths in the server")
+
+      .addStringOption((option) =>
+        option
+          .setName("scope")
+          .setDescription("show global/server")
+          .setChoices(...scopeChoices)
+          .setRequired(false)
+      )
+  )
+  .addSubcommand((command) =>
+    command
+      .setName("command")
+      .setDescription("view top command uses in the server")
 
       .addStringOption((option) =>
         option
@@ -346,6 +363,33 @@ async function run(
       data.pos,
       `top wordle wins ${global ? "[global]" : `for ${message.guild.name}`}`,
       global ? "https://nypsi.xyz/leaderboard/wordle" : null
+    );
+  } else if (args[0].toLowerCase() === "cmd" || args[0].toLowerCase() === "command") {
+    const searchTag = args[1].toLowerCase();
+
+    if (!commands.has(searchTag)) {
+      return send({ embeds: [new ErrorEmbed(`couldn't find ${searchTag}`)] });
+    }
+
+    let global = false;
+
+    if (args[2]?.toLowerCase() == "global") global = true;
+
+    let data: { pages: Map<number, string[]>; pos: number };
+
+    if (global) {
+      data = await topCommandGlobal(searchTag, message.author.id);
+    } else {
+      data = await topCommand(message.guild, searchTag, message.author.id);
+    }
+
+    return show(
+      data.pages,
+      data.pos,
+      `top ${await getPrefix(message.guild)}${searchTag} uses ${
+        global ? "[global]" : `for ${message.guild.name}`
+      }`
+      // global ? `https://nypsi.xyz/leaderboard/${item.id}` : null
     );
   } else {
     const selected =
