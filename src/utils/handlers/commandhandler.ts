@@ -55,7 +55,7 @@ import { createProfile, hasProfile } from "../functions/users/utils";
 import dayjs = require("dayjs");
 import ms = require("ms");
 
-const commands = new Map<string, Command>();
+export const commands = new Map<string, Command>();
 const aliases = new Map<string, string>();
 const hourlyCommandCount = new Map<string, number>();
 const commandUses = new Map<string, number>();
@@ -72,7 +72,7 @@ const cooldown = new Set<string>();
 let commandsSize = 0;
 let aliasesSize = 0;
 
-export { commandsSize, aliasesSize };
+export { aliasesSize, commandsSize };
 
 let restarting = false;
 
