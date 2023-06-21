@@ -1120,3 +1120,142 @@ export async function topWordleGlobal(userId: string) {
 
   return { pages, pos };
 }
+
+export async function topCommand(guild: Guild, command: string, userId: string) {
+  let members: Collection<string, GuildMember>;
+
+  if (guild.memberCount == guild.members.cache.size) {
+    members = guild.members.cache;
+  } else {
+    members = await guild.members.fetch();
+  }
+
+  if (!members) members = guild.members.cache;
+
+  members = members.filter((m) => {
+    return !m.user.bot;
+  });
+
+  const query = await prisma.commandUse.findMany({
+    where: {
+      AND: [
+        { userId: { in: Array.from(members.keys()) } },
+        { command: command },
+        { user: { blacklisted: false } },
+      ],
+    },
+    select: {
+      userId: true,
+      uses: true,
+    },
+    orderBy: {
+      uses: "desc",
+    },
+    take: 100,
+  });
+
+  const out = [];
+
+  let count = 0;
+
+  const getMemberID = (guild: Guild, id: string) => {
+    const target = members.find((member) => {
+      return member.user.id == id;
+    });
+
+    return target;
+  };
+
+  const userIds = query.map((i) => i.userId);
+
+  for (const user of query) {
+    let pos: number | string = count + 1;
+
+    if (pos == 1) {
+      pos = "🥇";
+    } else if (pos == 2) {
+      pos = "🥈";
+    } else if (pos == 3) {
+      pos = "🥉";
+    }
+
+    out[count] =
+      pos +
+      " **" +
+      getMemberID(guild, user.userId).user.tag +
+      "** " +
+      user.uses.toLocaleString() +
+      ` ${user.uses > 1 ? "uses" : "use"}`;
+    count++;
+  }
+
+  const pages = PageManager.createPages(out);
+
+  let pos = 0;
+
+  if (userId) {
+    pos = userIds.indexOf(userId) + 1;
+  }
+
+  return { pages, pos };
+}
+
+export async function topCommandGlobal(command: string, userId: string) {
+  const query = await prisma.commandUse.findMany({
+    where: {
+      AND: [{ command }, { user: { blacklisted: false } }],
+    },
+    select: {
+      userId: true,
+      uses: true,
+      user: {
+        select: {
+          lastKnownTag: true,
+        },
+      },
+    },
+    orderBy: {
+      uses: "desc",
+    },
+    take: 100,
+  });
+
+  const out = [];
+
+  let count = 0;
+
+  const userIds = query.map((i) => i.userId);
+
+  for (const user of query) {
+    let pos: number | string = count + 1;
+
+    if (pos == 1) {
+      pos = "🥇";
+    } else if (pos == 2) {
+      pos = "🥈";
+    } else if (pos == 3) {
+      pos = "🥉";
+    }
+
+    out[count] =
+      pos +
+      " **" +
+      ((await getPreferences(user.userId))?.leaderboards
+        ? user.user.lastKnownTag?.split("#")[0] || user.userId
+        : "[hidden]") +
+      "** " +
+      user.uses.toLocaleString() +
+      ` ${user.uses > 1 ? "uses" : "use"}`;
+    count++;
+  }
+
+  const pages = PageManager.createPages(out);
+
+  let pos = 0;
+
+  if (userId) {
+    pos = userIds.indexOf(userId) + 1;
+  }
+
+  return { pages, pos };
+}
