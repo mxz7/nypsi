@@ -949,7 +949,7 @@ export async function runCommand(
       await message.channel.send({
         content: `${message.author.toString()} you have been **RICK ROLLED** by ${await getLastKnownTag(
           userId
-        )}\n\nhttps://www.youtube.com/watch?v=dQw4w9WgXcQ`,
+        )}\n\nhttps://tenor.com/view/rickroll-roll-rick-never-gonna-give-you-up-never-gonna-gif-22954713`,
       });
     }
   }, 2000);
