@@ -57,7 +57,7 @@ const bree = new Bree({
     },
     {
       name: "dailystreak",
-      interval: "at 11:50pm",
+      interval: "at 11:59pm",
     },
     {
       name: "resetsuggestions",
