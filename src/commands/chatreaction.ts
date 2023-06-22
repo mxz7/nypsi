@@ -407,20 +407,28 @@ async function run(
           });
           return;
         }
-        await interaction.deferUpdate();
         voted.push(interaction.user.id);
+        await interaction.deferUpdate();
       });
 
       collector.on("end", () => {
-        clearInterval(i);
-
-        if (voted.length != 5) {
-          embed.setDescription(
-            `chat reaction not started\n\nonly received ${voted.length}/4 votes ):`
-          );
-          msg.edit({ embeds: [embed], components: [] });
-          return;
-        }
+        setTimeout(() => {
+          setTimeout(() => {
+            try {
+              clearInterval(i);
+            } catch {
+              /* dont get mad at me linter*/
+            }
+          }, 30000);
+          if (voted.length != 5) {
+            clearInterval(i);
+            embed.setDescription(
+              `chat reaction not started\n\nonly received ${voted.length}/4 votes ):`
+            );
+            msg.edit({ embeds: [embed], components: [] });
+            return;
+          }
+        }, 100);
       });
 
       return;
