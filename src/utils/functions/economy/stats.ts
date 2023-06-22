@@ -77,7 +77,7 @@ export async function getStat(userId: string, stat: string) {
 export async function getStats(member: GuildMember) {
   const query = await prisma.stats.findMany({
     where: {
-      AND: [{ userId: member.user.id }, { itemId: { not: { contains: "auction" } } }],
+      userId: member.user.id,
     },
     select: {
       amount: true,

@@ -215,7 +215,9 @@ async function run(
   };
 
   const itemStats = async () => {
-    const itemStats = await getStats(message.member);
+    const itemStats = await getStats(message.member).then((stats) =>
+      stats.filter((i) => Boolean(getItems()[i.itemId]))
+    );
 
     if (itemStats.length == 0) {
       return send({ embeds: [new ErrorEmbed("you have no item stats")] });
