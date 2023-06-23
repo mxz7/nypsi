@@ -8,8 +8,8 @@ dependencies:
     specifier: 1.7.1
     version: 1.7.1
   '@prisma/client':
-    specifier: 4.16.0
-    version: 4.16.0(prisma@4.16.1)
+    specifier: 4.16.1
+    version: 4.16.1(prisma@4.16.1)
   '@top-gg/sdk':
     specifier: 3.1.5
     version: 3.1.5
@@ -540,8 +540,8 @@ packages:
       fastq: 1.15.0
     dev: true
 
-  /@prisma/client@4.16.0(prisma@4.16.1):
-    resolution: {integrity: sha512-CBD+5IdZPiavhLkQokvsz1uz4r9ppixaqY/ajybWs4WXNnsDVMBKEqN3BiPzpSo79jiy22VKj/67pqt4VwIg9w==}
+  /@prisma/client@4.16.1(prisma@4.16.1):
+    resolution: {integrity: sha512-CoDHu7Bt+NuDo40ijoeHP79EHtECsPBTy3yte5Yo3op8TqXt/kV0OT5OrsWewKvQGKFMHhYQ+ePed3zzjYdGAw==}
     engines: {node: '>=14.17'}
     requiresBuild: true
     peerDependencies:
