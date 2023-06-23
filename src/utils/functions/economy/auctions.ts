@@ -446,7 +446,7 @@ async function checkWatchers(
         AND: [
           { itemId: itemName },
           { userId: { not: creatorId } },
-          { maxCost: { gte: Math.floor(cost) } },
+          { OR: [{ maxCost: { gte: Math.floor(cost) } }, { maxCost: 0 }] },
         ],
       },
       select: {
