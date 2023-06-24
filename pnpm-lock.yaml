@@ -1,5 +1,9 @@
 lockfileVersion: '6.0'
 
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
 dependencies:
   '@catppuccin/palette':
     specifier: 0.1.8
@@ -59,7 +63,7 @@ dependencies:
     specifier: 4.17.21
     version: 4.17.21
   mathjs:
-    specifier: ^11.8.2
+    specifier: 11.8.2
     version: 11.8.2
   mc-names:
     specifier: 1.2.6
@@ -80,7 +84,7 @@ dependencies:
     specifier: '6.8'
     version: 6.8.1
   twemoji-parser:
-    specifier: ^14.0.0
+    specifier: 14.0.0
     version: 14.0.0
   urban-dictionary:
     specifier: 3.0.2
@@ -118,7 +122,7 @@ devDependencies:
     specifier: 4.0.0
     version: 4.0.0
   '@types/twemoji-parser':
-    specifier: ^13.1.1
+    specifier: 13.1.1
     version: 13.1.1
   '@types/urban-dictionary':
     specifier: 3.0.0
@@ -3715,7 +3719,3 @@ packages:
       property-expr: 2.0.5
       toposort: 2.0.2
     dev: false
-
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false
