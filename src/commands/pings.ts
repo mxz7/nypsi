@@ -140,13 +140,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     new ButtonBuilder().setCustomId("❌").setLabel("clear mentions").setStyle(ButtonStyle.Danger)
   );
 
-  let msg: Message;
-
-  if (pages.size == 1) {
-    return await send({ embeds: [embed] });
-  } else {
-    msg = await send({ embeds: [embed], components: [row] });
+  if (pages.size === 1) {
+    row.components.splice(0, 2);
   }
+
+  const msg = await send({ embeds: [embed], components: [row] });
 
   if (pages.size >= 2) {
     const manager = new PageManager({
