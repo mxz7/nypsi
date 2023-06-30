@@ -146,47 +146,45 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const msg = await send({ embeds: [embed], components: [row] });
 
-  if (pages.size >= 2) {
-    const manager = new PageManager({
-      embed: embed,
-      message: msg,
-      row: row,
-      userId: message.author.id,
-      pages: pages,
-      updateEmbed(page: string[], embed) {
+  const manager = new PageManager({
+    embed: embed,
+    message: msg,
+    row: row,
+    userId: message.author.id,
+    pages: pages,
+    updateEmbed(page: string[], embed) {
+      embed.data.fields.length = 0;
+
+      for (const line of page) {
+        const fieldName = line.split("|6|9|")[0];
+        const fieldValue = line.split("|6|9|").splice(-1, 1).join("");
+        embed.addField(fieldName, fieldValue);
+      }
+
+      return embed;
+    },
+    onPageUpdate(manager) {
+      manager.embed.setFooter({ text: `page ${manager.currentPage}/${manager.lastPage}` });
+      return manager.embed;
+    },
+    handleResponses: new Map().set(
+      "❌",
+      async (manager: PageManager<string>, interaction: ButtonInteraction) => {
+        await interaction.deferUpdate();
+        await deleteUserMentions(manager.message.guild, manager.userId);
+
         embed.data.fields.length = 0;
 
-        for (const line of page) {
-          const fieldName = line.split("|6|9|")[0];
-          const fieldValue = line.split("|6|9|").splice(-1, 1).join("");
-          embed.addField(fieldName, fieldValue);
-        }
+        embed.setDescription("✅ mentions cleared");
+        embed.disableFooter();
 
-        return embed;
-      },
-      onPageUpdate(manager) {
-        manager.embed.setFooter({ text: `page ${manager.currentPage}/${manager.lastPage}` });
-        return manager.embed;
-      },
-      handleResponses: new Map().set(
-        "❌",
-        async (manager: PageManager<string>, interaction: ButtonInteraction) => {
-          await interaction.deferUpdate();
-          await deleteUserMentions(manager.message.guild, manager.userId);
+        await manager.message.edit({ embeds: [embed], components: [] });
+        return;
+      }
+    ),
+  });
 
-          embed.data.fields.length = 0;
-
-          embed.setDescription("✅ mentions cleared");
-          embed.disableFooter();
-
-          await manager.message.edit({ embeds: [embed], components: [] });
-          return;
-        }
-      ),
-    });
-
-    return manager.listen();
-  }
+  return manager.listen();
 }
 
 cmd.setRun(run);
