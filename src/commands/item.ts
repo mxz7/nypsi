@@ -206,7 +206,6 @@ async function run(
     new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
         .setStyle(ButtonStyle.Link)
-        .setCustomId("hist")
         .setLabel("history")
         .setEmoji("📈")
         .setURL("https://nypsi.xyz/item/history/" + selected.id)
