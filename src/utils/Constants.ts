@@ -81,6 +81,9 @@ export default {
     },
     nypsi: {
       MENTION_QUEUE: "nypsi:mention:queue",
+      MENTION_DELAY: "nypsi:mention:delay",
+      MENTION_MAX: "nypsi:mention:max",
+      MENTION_CURRENT: "nypsi:mention:current",
       CAPTCHA_VERIFIED: "nypsi:captcha_verified",
       DM_QUEUE: "nypsi:dmqueue",
       GEM_GIVEN: "nypsi:gemgiven",

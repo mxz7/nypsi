@@ -113,8 +113,8 @@ setTimeout(async () => {
   listenForDms(manager);
   startMentionInterval();
   logger.info("jobs triggered");
-}, 300000);
-// }, 15000);
+  // }, 300000);
+}, 15000);
 
 setTimeout(async () => {
   const userId = await manager.fetchClientValues("user.id");

@@ -467,7 +467,9 @@ async function run(
       .addField(
         "mentions",
         `**queue size** ${await redis.llen(Constants.redis.nypsi.MENTION_QUEUE)}
-        **current delay** ${Number(await redis.get("nypsi:mention:delay")) || 5}`,
+        **current delay** ${Number(await redis.get(Constants.redis.nypsi.MENTION_DELAY)) || 5}
+        **current** ${Number(await redis.get(Constants.redis.nypsi.MENTION_CURRENT)) || 0}
+        **max** ${Number(await redis.get(Constants.redis.nypsi.MENTION_MAX)) || 3}`,
         true
       )
       .addField(

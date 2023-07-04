@@ -6,22 +6,41 @@ import sleep from "../functions/sleep";
 import { encrypt } from "../functions/string";
 import { MentionQueueItem } from "../functions/users/mentions";
 
-let beingDone = 0;
-
 export function startMentionInterval() {
   setInterval(async () => {
-    if (beingDone >= 3 || (await redis.llen(Constants.redis.nypsi.MENTION_QUEUE)) < 1) return;
+    if (
+      (Number(await redis.get(Constants.redis.nypsi.MENTION_CURRENT)) || 0) >=
+        (Number(await redis.get(Constants.redis.nypsi.MENTION_MAX)) || 3) ||
+      (await redis.llen(Constants.redis.nypsi.MENTION_QUEUE)) < 1
+    )
+      return;
 
-    addMention(JSON.parse(await redis.lpop(Constants.redis.nypsi.MENTION_QUEUE)));
-  }, 10000);
+    for (
+      let i = Number(await redis.get(Constants.redis.nypsi.MENTION_CURRENT)) || 0;
+      i < (Number(await redis.get(Constants.redis.nypsi.MENTION_MAX)) || 3);
+      await redis.set(Constants.redis.nypsi.MENTION_CURRENT, i + 1)
+    ) {
+      addMention(JSON.parse(await redis.lpop(Constants.redis.nypsi.MENTION_QUEUE)))
+        .then(async () => {
+          redis.set(
+            Constants.redis.nypsi.MENTION_CURRENT,
+            Number((await redis.get(Constants.redis.nypsi.MENTION_CURRENT)) || 1) - 1
+          );
+        })
+        .catch(async () => {
+          redis.set(
+            Constants.redis.nypsi.MENTION_CURRENT,
+            Number((await redis.get(Constants.redis.nypsi.MENTION_CURRENT)) || 1) - 1
+          );
+        });
+    }
+  }, 5000);
 }
 
 async function addMention(item: MentionQueueItem) {
   if (!item) return;
   if (!item.members || item.members.length === 0) return;
   if (!item.channelMembers || item.channelMembers.length === 0) return;
-
-  beingDone++;
 
   item.content = item.content.replace(/(\r\n|\n|\r)/gm, " ");
 
@@ -30,8 +49,9 @@ async function addMention(item: MentionQueueItem) {
   const currentInsert: Mention[] = [];
 
   for (const member of item.members) {
-    await sleep(Number(await redis.get("nypsi:mention:delay")) || 5);
-    if (!item.channelMembers.includes(member)) return;
+    await sleep(Number(await redis.get(Constants.redis.nypsi.MENTION_DELAY)) || 5);
+    if (!item.channelMembers.includes(member)) continue;
+    // @ts-expect-error weird
     currentInsert.push({
       content: item.content,
       date: new Date(item.date),
@@ -42,14 +62,12 @@ async function addMention(item: MentionQueueItem) {
     });
 
     if (currentInsert.length >= 750) {
-      await prisma.mention.createMany({ data: currentInsert, skipDuplicates: true });
+      await prisma.mention.createMany({ data: currentInsert });
       currentInsert.length = 0;
     }
   }
 
   if (currentInsert.length > 0) {
-    await prisma.mention.createMany({ data: currentInsert, skipDuplicates: true });
+    await prisma.mention.createMany({ data: currentInsert });
   }
-
-  beingDone--;
 }
