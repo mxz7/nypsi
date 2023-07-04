@@ -8,6 +8,7 @@ import Constants from "./utils/Constants";
 import { addFailedHeatbeat, sendHeartbeat } from "./utils/functions/heartbeat";
 import { updateStats } from "./utils/functions/topgg";
 import { getVersion } from "./utils/functions/version";
+import { startMentionInterval } from "./utils/handlers/mentions";
 import { listenForDms } from "./utils/handlers/notificationhandler";
 import { listen } from "./utils/handlers/webhookhandler";
 import { getWebhooks, logger, setClusterId } from "./utils/logger";
@@ -110,6 +111,7 @@ listen(manager);
 setTimeout(async () => {
   await startJobs();
   listenForDms(manager);
+  startMentionInterval();
   logger.info("jobs triggered");
 }, 300000);
 // }, 15000);

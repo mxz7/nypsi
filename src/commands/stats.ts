@@ -13,7 +13,6 @@ import {
 import { inPlaceSort } from "fast-sort";
 import { cpu } from "node-os-utils";
 import * as os from "os";
-import { workerCount } from "../events/message";
 import prisma from "../init/database";
 import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
@@ -32,7 +31,7 @@ import { getItems } from "../utils/functions/economy/utils";
 import { violations } from "../utils/functions/moderation/mute";
 import PageManager from "../utils/functions/page";
 import { getCommandUses } from "../utils/functions/users/commands";
-import { mentionQueue } from "../utils/functions/users/mentions";
+
 import { getVersion } from "../utils/functions/version";
 import { aliasesSize, commandsSize } from "../utils/handlers/commandhandler";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -445,17 +444,6 @@ async function run(
       .broadcastEval("this.guilds.cache.size")
       .then((res) => res.reduce((a, b) => a + b));
 
-    let collections = 0;
-    let mentions = 0;
-
-    for (const mention of mentionQueue) {
-      if (mention.type == "collection") {
-        collections++;
-      } else if (mention.type == "mention") {
-        mentions++;
-      }
-    }
-
     const embed = new CustomEmbed(message.member)
       .setHeader(
         `nypsi stats | cluster: ${currentCluster + 1}/${clusterCount}`,
@@ -476,18 +464,7 @@ async function run(
           aliasesSize,
         true
       )
-      .addField(
-        "mention queue",
-        "**total** " +
-          mentionQueue.length.toLocaleString() +
-          "\n-- **collections** " +
-          collections.toLocaleString() +
-          "\n-- **mentions** " +
-          mentions.toLocaleString() +
-          "\n-- **workers** " +
-          workerCount.toLocaleString(),
-        true
-      )
+
       .addField(
         "system",
         `**memory** ${memUsage.toLocaleString()}mb/${totalMem.toLocaleString()}mb\n` +
