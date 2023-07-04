@@ -20,7 +20,10 @@ export function startMentionInterval() {
       i < (Number(await redis.get(Constants.redis.nypsi.MENTION_MAX)) || 3);
       await redis.set(Constants.redis.nypsi.MENTION_CURRENT, i + 1)
     ) {
-      addMention(JSON.parse(await redis.lpop(Constants.redis.nypsi.MENTION_QUEUE)))
+      const item = await redis.lpop(Constants.redis.nypsi.MENTION_QUEUE);
+      if (!item) return;
+
+      addMention(JSON.parse(item))
         .then(async () => {
           redis.set(
             Constants.redis.nypsi.MENTION_CURRENT,
