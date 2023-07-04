@@ -584,7 +584,7 @@ model WholesomeSuggestion {
 // tables with no relation for easiness
 
 model Mention {
-  id Int @id @default(autoincrement())
+  id String @id @default(uuid())
 
   guildId  String
   targetId String
