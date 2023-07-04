@@ -5,6 +5,7 @@ import Constants from "../Constants";
 import sleep from "../functions/sleep";
 import { encrypt } from "../functions/string";
 import { MentionQueueItem } from "../functions/users/mentions";
+import doMentionsWorker from "../functions/workers/mentions";
 import { logger } from "../logger";
 
 let current = 0;
@@ -45,6 +46,20 @@ async function addMention(item: MentionQueueItem) {
   item.content = item.content.replace(/(\r\n|\n|\r)/gm, " ");
 
   item.content = encrypt(item.content);
+
+  if (item.members.length >= 10000) {
+    logger.info(`${item.members.length.toLocaleString()} mentions being inserted with worker...`);
+    const start = Date.now();
+    const res = await doMentionsWorker(item).catch((e) => {
+      logger.error("error inserting mentions with worker", e);
+    });
+    if (res === 1) logger.warn("worker timed out");
+    logger.debug(
+      `${item.members.length.toLocaleString()} mentions inserted in ${(Date.now() - start) / 1000}s`
+    );
+
+    return;
+  }
 
   const currentInsert: Mention[] = [];
 
