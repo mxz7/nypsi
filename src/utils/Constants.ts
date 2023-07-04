@@ -80,6 +80,7 @@ export default {
       },
     },
     nypsi: {
+      MENTION_QUEUE: "nypsi:mention:queue",
       CAPTCHA_VERIFIED: "nypsi:captcha_verified",
       DM_QUEUE: "nypsi:dmqueue",
       GEM_GIVEN: "nypsi:gemgiven",
