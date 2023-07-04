@@ -73,7 +73,7 @@ async function run(
       embeds: [
         new CustomEmbed(
           message.member,
-          "sell items from your inventory\n\nyou will have to pay tax on your sold items, selling crypto has a 5% fee"
+          "sell items from your inventory\n\nyou will have to pay tax on your sold items"
         ),
       ],
     });
