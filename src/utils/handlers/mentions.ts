@@ -5,36 +5,33 @@ import Constants from "../Constants";
 import sleep from "../functions/sleep";
 import { encrypt } from "../functions/string";
 import { MentionQueueItem } from "../functions/users/mentions";
+import { logger } from "../logger";
+
+let current = 0;
 
 export function startMentionInterval() {
   setInterval(async () => {
     if (
-      (Number(await redis.get(Constants.redis.nypsi.MENTION_CURRENT)) || 0) >=
-        (Number(await redis.get(Constants.redis.nypsi.MENTION_MAX)) || 3) ||
+      current >= (Number(await redis.get(Constants.redis.nypsi.MENTION_MAX)) || 3) ||
       (await redis.llen(Constants.redis.nypsi.MENTION_QUEUE)) < 1
     )
       return;
 
     for (
-      let i = Number(await redis.get(Constants.redis.nypsi.MENTION_CURRENT)) || 0;
-      i < (Number(await redis.get(Constants.redis.nypsi.MENTION_MAX)) || 3);
-      await redis.set(Constants.redis.nypsi.MENTION_CURRENT, i + 1)
+      current;
+      current < (Number(await redis.get(Constants.redis.nypsi.MENTION_MAX)) || 3);
+      current++
     ) {
       const item = await redis.lpop(Constants.redis.nypsi.MENTION_QUEUE);
       if (!item) return;
 
       addMention(JSON.parse(item))
         .then(async () => {
-          redis.set(
-            Constants.redis.nypsi.MENTION_CURRENT,
-            Number((await redis.get(Constants.redis.nypsi.MENTION_CURRENT)) || 1) - 1
-          );
+          current--;
         })
-        .catch(async () => {
-          redis.set(
-            Constants.redis.nypsi.MENTION_CURRENT,
-            Number((await redis.get(Constants.redis.nypsi.MENTION_CURRENT)) || 1) - 1
-          );
+        .catch(async (e) => {
+          logger.error("mentions error", e);
+          current--;
         });
     }
   }, 5000);
