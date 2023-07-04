@@ -584,11 +584,13 @@ model WholesomeSuggestion {
 // tables with no relation for easiness
 
 model Mention {
+  id Int @id @default(autoincrement())
+
   guildId  String
   targetId String
   date     DateTime
   userTag  String
-  url      String   @id
+  url      String
   content  String
 }
 
