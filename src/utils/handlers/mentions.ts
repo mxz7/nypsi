@@ -35,7 +35,7 @@ export function startMentionInterval() {
           current--;
         });
     }
-  }, 5000);
+  }, 1000);
 }
 
 async function addMention(item: MentionQueueItem) {
