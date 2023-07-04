@@ -3,6 +3,7 @@ import prisma from "../../init/database";
 import redis from "../../init/redis";
 import Constants from "../Constants";
 import sleep from "../functions/sleep";
+import { encrypt } from "../functions/string";
 import { MentionQueueItem } from "../functions/users/mentions";
 
 let beingDone = 0;
@@ -21,6 +22,10 @@ async function addMention(item: MentionQueueItem) {
   if (!item.channelMembers || item.channelMembers.length === 0) return;
 
   beingDone++;
+
+  item.content = item.content.replace(/(\r\n|\n|\r)/gm, " ");
+
+  item.content = encrypt(item.content);
 
   const currentInsert: Mention[] = [];
 
