@@ -467,7 +467,8 @@ async function run(
       .addField(
         "mentions",
         `**queue size** ${await redis.llen(Constants.redis.nypsi.MENTION_QUEUE)}
-        **current delay** ${Number(await redis.get("nypsi:mention:delay")) || 5}`
+        **current delay** ${Number(await redis.get("nypsi:mention:delay")) || 5}`,
+        true
       )
       .addField(
         "system",
