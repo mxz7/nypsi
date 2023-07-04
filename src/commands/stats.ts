@@ -464,7 +464,11 @@ async function run(
           aliasesSize,
         true
       )
-
+      .addField(
+        "mentions",
+        `**queue size** ${await redis.llen(Constants.redis.nypsi.MENTION_QUEUE)}
+        **current delay** ${Number(await redis.get("nypsi:mention:delay")) || 5}`
+      )
       .addField(
         "system",
         `**memory** ${memUsage.toLocaleString()}mb/${totalMem.toLocaleString()}mb\n` +
