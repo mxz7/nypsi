@@ -93,7 +93,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({ embeds: [embed] });
   }
 
-  let limit = 3;
+  let limit = 9;
 
   if (await isPremium(message.author.id)) {
     limit = 207;
