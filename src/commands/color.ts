@@ -28,14 +28,11 @@ async function run(
         color = color.substring(0, 6);
       }
     } else {
-      color = member.displayHexColor;
+      color = member.displayHexColor.substring(1);
     }
   }
 
-  const embed = new CustomEmbed(
-    message.member,
-    `[**#${color}**](https://color.tekoh.net/#${color})`
-  );
+  const embed = new CustomEmbed(message.member).setHeader(`#${color}`);
 
   try {
     embed.setColor(color as ColorResolvable);
@@ -46,8 +43,9 @@ async function run(
   if (member) {
     embed.setDescription(member.user.toString());
     embed.setHeader(member.displayHexColor);
-    embed.setURL(`https://color.tekoh.net/${member.displayHexColor}`);
   }
+
+  embed.setImage(`https://singlecolorimage.com/get/${color}/54x42`);
 
   return await message.channel.send({ embeds: [embed] }).catch(() => {
     message.channel.send({ embeds: [new ErrorEmbed("invalid color")] });
