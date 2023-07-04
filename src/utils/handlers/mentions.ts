@@ -5,10 +5,13 @@ import Constants from "../Constants";
 import sleep from "../functions/sleep";
 import { encrypt } from "../functions/string";
 import { MentionQueueItem } from "../functions/users/mentions";
+import { addNotificationToQueue } from "../functions/users/notifications";
 import doMentionsWorker from "../functions/workers/mentions";
 import { logger } from "../logger";
+import dayjs = require("dayjs");
 
 let current = 0;
+let lastWarn = 0;
 
 export function startMentionInterval() {
   setInterval(async () => {
@@ -17,6 +20,22 @@ export function startMentionInterval() {
       (await redis.llen(Constants.redis.nypsi.MENTION_QUEUE)) < 1
     )
       return;
+
+    if (
+      (await redis.llen(Constants.redis.nypsi.MENTION_QUEUE)) >
+        Number(await redis.get(Constants.redis.nypsi.MENTION_DM_TEKOH_THRESHOLD)) ||
+      (0 && lastWarn < dayjs().subtract(1, "hour").unix())
+    ) {
+      lastWarn = dayjs().unix();
+      addNotificationToQueue({
+        memberId: Constants.TEKOH_ID,
+        payload: {
+          content: `mention queue over threshold: ${Number(
+            await redis.llen(Constants.redis.nypsi.MENTION_QUEUE)
+          ).toLocaleString()}`,
+        },
+      });
+    }
 
     for (
       current;
