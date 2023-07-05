@@ -11,6 +11,7 @@ import {
   PermissionFlagsBits,
   Role,
 } from "discord.js";
+import { sort } from "fast-sort";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { MStoTime } from "../utils/functions/date";
@@ -683,9 +684,9 @@ async function run(
       addCooldown(message.guild, 3600);
     }
 
-    const filteredMembers = members
-      .filter((m) => m.roles.cache.has(role.id))
-      .map((m) => `\`${m.user.tag}\``);
+    const filteredMembers = sort(
+      members.filter((m) => m.roles.cache.has(role.id)).map((m) => `\`${m.user.tag}\``)
+    ).asc();
 
     if (filteredMembers.length == 0) {
       return send({
