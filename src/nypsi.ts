@@ -13,6 +13,10 @@ const client = new NypsiClient({
       interval: 3600,
       lifetime: 1800,
     },
+    guildMembers: {
+      interval: 3600,
+      filter: () => (member) => member.id !== clientId,
+    },
   },
   makeCache: Options.cacheWithLimits({
     ApplicationCommandManager: 0,
