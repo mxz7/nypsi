@@ -41,6 +41,10 @@ const client = new NypsiClient({
       maxSize: 69_420,
       keepOverLimit: (user) => user.id === clientId,
     },
+    GuildMemberManager: {
+      maxSize: 69_420,
+      keepOverLimit: (user) => user.id === clientId,
+    },
   }),
   presence: {
     status: "dnd",
