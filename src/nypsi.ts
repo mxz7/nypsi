@@ -6,6 +6,12 @@ const client = new NypsiClient({
   allowedMentions: {
     parse: ["users", "roles"],
   },
+  sweepers: {
+    messages: {
+      interval: 3600,
+      lifetime: 1800,
+    },
+  },
   makeCache: Options.cacheWithLimits({
     ApplicationCommandManager: 0,
     BaseGuildEmojiManager: 0,
