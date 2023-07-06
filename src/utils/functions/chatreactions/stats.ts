@@ -1,7 +1,7 @@
 import { Collection, Guild, GuildMember } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
-import { addCooldown, inCooldown } from "../guilds/utils";
+import { logger } from "../../logger";
 import { getBlacklisted } from "./blacklisted";
 
 export async function getReactionStats(guild: Guild, member: GuildMember) {
@@ -88,12 +88,13 @@ export async function getServerLeaderboard(
 ): Promise<Map<string, string>> {
   let members: Collection<string, GuildMember>;
 
-  if (inCooldown(guild) || guild.memberCount == guild.members.cache.size) {
+  if (guild.memberCount == guild.members.cache.size) {
     members = guild.members.cache;
   } else {
-    members = await guild.members.fetch();
-
-    addCooldown(guild, 3600);
+    members = await guild.members.fetch().catch((e) => {
+      logger.error("failed to fetch guild members for chat reaction stats", e);
+      return guild.members.cache;
+    });
   }
 
   if (!members) members = guild.members.cache;

@@ -2,7 +2,8 @@ import { CommandInteraction, Message } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders.js";
 import { formatDate } from "../utils/functions/date";
-import { addCooldown, getPeaks, inCooldown, runCheck } from "../utils/functions/guilds/utils";
+import { getPeaks, runCheck } from "../utils/functions/guilds/utils";
+import { logger } from "../utils/logger";
 
 const cmd = new Command("server", "view information about the server", "info").setAliases([
   "serverinfo",
@@ -21,11 +22,13 @@ async function run(
 
   let members;
 
-  if (inCooldown(server) || message.guild.memberCount == message.guild.members.cache.size) {
+  if (message.guild.memberCount == message.guild.members.cache.size) {
     members = server.members.cache;
   } else {
-    members = await server.members.fetch();
-    addCooldown(server, 3600);
+    members = await server.members.fetch().catch((e) => {
+      logger.error("failed to fetch members for guild peaks on $server", e);
+      return message.guild.members.cache;
+    });
   }
 
   const users = members.filter((member) => !member.user.bot);

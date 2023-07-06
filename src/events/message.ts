@@ -19,7 +19,7 @@ import { a } from "../utils/functions/anticheat";
 import { userExists } from "../utils/functions/economy/utils";
 import { checkAutoMute, checkMessageContent } from "../utils/functions/guilds/filters";
 import { isSlashOnly } from "../utils/functions/guilds/slash";
-import { addCooldown, getPrefix, hasGuild, inCooldown } from "../utils/functions/guilds/utils";
+import { getPrefix, hasGuild } from "../utils/functions/guilds/utils";
 import { getKarma } from "../utils/functions/karma/karma";
 import { addMuteViolation } from "../utils/functions/moderation/mute";
 import { isPremium } from "../utils/functions/premium/premium";
@@ -214,12 +214,10 @@ export default async function messageCreate(message: Message) {
       let mentionMembers: string[] = [];
 
       if (message.mentions.everyone) {
-        if (
-          !inCooldown(message.guild) &&
-          message.guild.members.cache.size != message.guild.memberCount
-        ) {
-          await message.guild.members.fetch();
-          addCooldown(message.guild, 3600);
+        if (message.guild.members.cache.size != message.guild.memberCount) {
+          await message.guild.members.fetch().catch((e) => {
+            logger.error("failed to fetch guild members for @everyone mention", e);
+          });
         }
 
         let members: Collection<string, GuildMember | ThreadMember> | ThreadMemberManager =
@@ -231,12 +229,10 @@ export default async function messageCreate(message: Message) {
 
         mentionMembers = Array.from(members.mapValues((m) => m.user.id).values());
       } else if (message.mentions.roles.first()) {
-        if (
-          !inCooldown(message.guild) &&
-          message.guild.members.cache.size != message.guild.memberCount
-        ) {
-          await message.guild.members.fetch();
-          addCooldown(message.guild, 3600);
+        if (message.guild.members.cache.size != message.guild.memberCount) {
+          await message.guild.members.fetch().catch((e) => {
+            logger.error("failed to fetch members for role mention", e);
+          });
         }
 
         message.mentions.roles.forEach((r) => {

@@ -3,10 +3,11 @@ import { inPlaceSort } from "fast-sort";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { formatDate } from "../utils/functions/date";
-import { addCooldown, inCooldown } from "../utils/functions/guilds/utils";
+
 import { getMember } from "../utils/functions/member";
 import { fetchUsernameHistory } from "../utils/functions/users/history";
 import workerSort from "../utils/functions/workers/sort";
+import { logger } from "../utils/logger";
 
 const cmd = new Command("user", "view info about a user in the server", "info").setAliases([
   "whois",
@@ -40,11 +41,13 @@ async function run(
 
   let members;
 
-  if (inCooldown(message.guild) || message.guild.memberCount == message.guild.members.cache.size) {
+  if (message.guild.memberCount == message.guild.members.cache.size) {
     members = message.guild.members.cache;
   } else {
-    members = await message.guild.members.fetch();
-    addCooldown(message.guild, 3600);
+    members = await message.guild.members.fetch().catch((e) => {
+      logger.error("failed to fetch members for join position", e);
+      return message.guild.members.cache;
+    });
   }
 
   let membersSorted: string[] = [];
