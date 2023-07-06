@@ -13,13 +13,10 @@ import {
 import { inPlaceSort } from "fast-sort";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
-import {
-  addCooldown as addGuildCooldown,
-  getPrefix,
-  inCooldown,
-} from "../utils/functions/guilds/utils";
+import { getPrefix } from "../utils/functions/guilds/utils";
 import PageManager from "../utils/functions/page";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import { logger } from "../utils/logger";
 
 const cmd = new Command("inrole", "get the members in a role", "utility");
 
@@ -61,16 +58,13 @@ async function run(
 
   let members: Collection<string, GuildMember>;
 
-  if (
-    inCooldown(message.guild) ||
-    message.guild.memberCount == message.guild.members.cache.size ||
-    message.guild.memberCount <= 250
-  ) {
+  if (message.guild.memberCount == message.guild.members.cache.size) {
     members = message.guild.members.cache;
   } else {
-    members = await message.guild.members.fetch();
-
-    addGuildCooldown(message.guild, 3600);
+    members = await message.guild.members.fetch().catch((e) => {
+      logger.error("failed to fetch members for inrole cmd", e);
+      return message.guild.members.cache;
+    });
   }
 
   const memberList: string[] = [];
