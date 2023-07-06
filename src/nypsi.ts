@@ -2,6 +2,8 @@ import { getInfo } from "discord-hybrid-sharding";
 import { GatewayIntentBits, Options, Partials } from "discord.js";
 import { NypsiClient } from "./models/Client";
 
+let clientId = "";
+
 const client = new NypsiClient({
   allowedMentions: {
     parse: ["users", "roles"],
@@ -31,6 +33,10 @@ const client = new NypsiClient({
     AutoModerationRuleManager: 0,
     GuildForumThreadManager: 0,
     GuildTextThreadManager: 0,
+    UserManager: {
+      maxSize: 69_420,
+      keepOverLimit: (user) => user.id === clientId,
+    },
   }),
   presence: {
     status: "dnd",
@@ -69,7 +75,9 @@ client.loadEvents();
 
 setTimeout(() => {
   logger.info("logging in...");
-  client.login(process.env.BOT_TOKEN);
+  client.login(process.env.BOT_TOKEN).then(() => {
+    clientId = client.user.id;
+  });
 }, 500);
 
 process.on("uncaughtException", (error) => {
