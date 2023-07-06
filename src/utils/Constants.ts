@@ -24,6 +24,10 @@ export default {
       SUPPORT: "cd:support",
     },
     cache: {
+      minecraft: {
+        UUID: "cache:minecraft:uuid",
+        NAME_HISTORY: "cache:minecraft:namehistory",
+      },
       SUPPORT: "cache:support",
       premium: {
         ALIASES: "cache:premium:aliases",
