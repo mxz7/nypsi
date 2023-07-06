@@ -131,7 +131,7 @@ export async function getGambleMulti(member: GuildMember | string): Promise<numb
 
   let prestigeBonus = prestigeGambleMultiEffect[prestige];
 
-  if (!prestigeBonus && prestigeBonus !== 0)
+  if (!prestigeBonus && prestige > 0)
     prestigeBonus = prestigeGambleMultiEffect[prestigeGambleMultiEffect.length - 1];
 
   multi += prestigeBonus;
