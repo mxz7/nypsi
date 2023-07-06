@@ -9,11 +9,13 @@ import {
 } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
-import { addCooldown, getPrefix, inCooldown } from "../utils/functions/guilds/utils";
+
+import { getPrefix } from "../utils/functions/guilds/utils";
 import { getExactMember } from "../utils/functions/member";
 import { newCase } from "../utils/functions/moderation/cases";
 import { deleteMute, getMuteRole, isMuted } from "../utils/functions/moderation/mute";
 import { createProfile, profileExists } from "../utils/functions/moderation/utils";
+import { logger } from "../utils/logger";
 
 const cmd = new Command("unmute", "unmute one or more users", "moderation").setPermissions([
   "MANAGE_MESSAGES",
@@ -92,11 +94,13 @@ async function run(
   ) {
     let members;
 
-    if (inCooldown(message.guild)) {
+    if (message.guild.memberCount !== message.guild.members.cache.size) {
       members = message.guild.members.cache;
     } else {
-      members = await message.guild.members.fetch();
-      addCooldown(message.guild, 3600);
+      members = await message.guild.members.fetch().catch((e) => {
+        logger.error("failed to fetch members for unmute", e);
+        return message.guild.members.cache;
+      });
     }
 
     const member = members.find((m) => m.id == args[0]);

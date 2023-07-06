@@ -21,10 +21,10 @@ import {
   setAutoJoinRoles,
   setPersistantRoles,
 } from "../utils/functions/guilds/roles";
-import { addCooldown, inCooldown } from "../utils/functions/guilds/utils";
 import { getMember, getRole } from "../utils/functions/member";
 import PageManager from "../utils/functions/page";
 import sleep from "../utils/functions/sleep";
+import { logger } from "../utils/logger";
 
 const cmd = new Command("role", "role utilities", "utility");
 
@@ -672,16 +672,17 @@ async function run(
 
     let members: GuildMember[];
 
-    if (
-      inCooldown(message.guild) ||
-      message.guild.memberCount == message.guild.members.cache.size ||
-      message.guild.memberCount <= 250
-    ) {
+    if (message.guild.memberCount == message.guild.members.cache.size) {
       members = Array.from(message.guild.members.cache.values());
     } else {
-      members = Array.from((await message.guild.members.fetch()).values());
-
-      addCooldown(message.guild, 3600);
+      members = Array.from(
+        (
+          await message.guild.members.fetch().catch((e) => {
+            logger.error("failed to fetch members for role cmd", e);
+            return message.guild.members.cache;
+          })
+        ).values()
+      );
     }
 
     const filteredMembers = sort(
