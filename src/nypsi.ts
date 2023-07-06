@@ -2,8 +2,6 @@ import { getInfo } from "discord-hybrid-sharding";
 import { GatewayIntentBits, Options, Partials } from "discord.js";
 import { NypsiClient } from "./models/Client";
 
-let clientId = "";
-
 const client = new NypsiClient({
   allowedMentions: {
     parse: ["users", "roles"],
@@ -15,7 +13,7 @@ const client = new NypsiClient({
     },
     guildMembers: {
       interval: 3600,
-      filter: () => (member) => member.id !== clientId,
+      filter: () => (member) => member.id !== member.client.user.id,
     },
   },
   makeCache: Options.cacheWithLimits({
@@ -39,11 +37,11 @@ const client = new NypsiClient({
     GuildTextThreadManager: 0,
     UserManager: {
       maxSize: 69_420,
-      keepOverLimit: (user) => user.id === clientId,
+      keepOverLimit: (user) => user.id === user.client.user.id,
     },
     GuildMemberManager: {
       maxSize: 69_420,
-      keepOverLimit: (user) => user.id === clientId,
+      keepOverLimit: (user) => user.id === user.client.user.id,
     },
   }),
   presence: {
@@ -83,9 +81,7 @@ client.loadEvents();
 
 setTimeout(() => {
   logger.info("logging in...");
-  client.login(process.env.BOT_TOKEN).then(() => {
-    clientId = client.user.id;
-  });
+  client.login(process.env.BOT_TOKEN);
 }, 500);
 
 process.on("uncaughtException", (error) => {
