@@ -219,7 +219,7 @@ export async function getSellMulti(member: GuildMember | string): Promise<number
 
   const prestige = await getPrestige(member);
 
-  multi += Math.floor(prestige * 0.3);
+  multi += Math.floor(prestige * 0.69);
 
   switch (await getTier(id)) {
     case 1:
