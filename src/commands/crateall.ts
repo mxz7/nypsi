@@ -4,7 +4,6 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { addInventoryItem } from "../utils/functions/economy/inventory";
 import { getItems, userExists } from "../utils/functions/economy/utils";
-import { addCooldown, inCooldown } from "../utils/functions/guilds/utils";
 import { logger } from "../utils/logger";
 
 const cmd = new Command(
@@ -55,15 +54,13 @@ async function run(
 
   let members;
 
-  if (
-    inCooldown(message.guild) ||
-    message.guild.memberCount == message.guild.members.cache.size ||
-    message.guild.memberCount <= 50
-  ) {
+  if (message.guild.memberCount == message.guild.members.cache.size) {
     members = message.guild.members.cache;
   } else {
-    members = await message.guild.members.fetch();
-    addCooldown(message.guild, 3600);
+    members = await message.guild.members.fetch().catch((e) => {
+      logger.error("failed to fetch members for crateall", e);
+      return message.guild.members.cache;
+    });
   }
 
   let amount = 1;

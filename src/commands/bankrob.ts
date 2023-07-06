@@ -28,7 +28,6 @@ import {
   getResponse,
   onCooldown,
 } from "../utils/handlers/cooldownhandler.js";
-import ms = require("ms");
 
 const cmd = new Command("bankrob", "attempt to rob a bank for a high reward", "money");
 

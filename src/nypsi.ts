@@ -6,6 +6,16 @@ const client = new NypsiClient({
   allowedMentions: {
     parse: ["users", "roles"],
   },
+  sweepers: {
+    messages: {
+      interval: 3600,
+      lifetime: 1800,
+    },
+    guildMembers: {
+      interval: 3600,
+      filter: () => (member) => member.id !== member.client.user.id,
+    },
+  },
   makeCache: Options.cacheWithLimits({
     ApplicationCommandManager: 0,
     BaseGuildEmojiManager: 0,
@@ -25,6 +35,14 @@ const client = new NypsiClient({
     AutoModerationRuleManager: 0,
     GuildForumThreadManager: 0,
     GuildTextThreadManager: 0,
+    UserManager: {
+      maxSize: 69_420,
+      keepOverLimit: (user) => user.id === user.client.user.id,
+    },
+    GuildMemberManager: {
+      maxSize: 69_420,
+      keepOverLimit: (user) => user.id === user.client.user.id,
+    },
   }),
   presence: {
     status: "dnd",
