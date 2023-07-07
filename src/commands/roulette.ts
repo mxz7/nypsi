@@ -79,16 +79,16 @@ cmd.slashData
       .setChoices(
         { name: "🔴 red", value: "red" },
         { name: "⚫ black", value: "black" },
-        { name: "🟢 green", value: "green" }
-      )
+        { name: "🟢 green", value: "green" },
+      ),
   )
   .addStringOption((option) =>
-    option.setName("bet").setDescription("how much would you like to bet").setRequired(false)
+    option.setName("bet").setDescription("how much would you like to bet").setRequired(false),
   );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -145,7 +145,7 @@ async function run(
             " win **1.5**x\n" +
             "🟢 1/" +
             values.length +
-            " win **17**x"
+            " win **17**x",
         ),
       ],
     });
@@ -159,12 +159,12 @@ async function run(
       .setHeader("roulette help")
       .addField(
         "usage",
-        `${prefix}roulette <colour (**r**ed/**g**reen/**b**lack)> <bet>\n${prefix}roulette odds`
+        `${prefix}roulette <colour (**r**ed/**g**reen/**b**lack)> <bet>\n${prefix}roulette odds`,
       )
       .addField(
         "help",
         "this is a bit of a simpler version of real roulette, as in you can only bet on red, black and green which mimics typical csgo roulette\n" +
-          "red and black give a **1.5x** win and green gives a **17**x win"
+          "red and black give a **1.5x** win and green gives a **17**x win",
       );
 
     return send({ embeds: [embed] });
@@ -181,7 +181,7 @@ async function run(
     return send({
       embeds: [
         new ErrorEmbed(
-          `${prefix}roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | ${prefix}**roulette odds** shows the odds of winning`
+          `${prefix}roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | ${prefix}**roulette odds** shows the odds of winning`,
         ),
       ],
     });
@@ -207,7 +207,7 @@ async function run(
     return send({
       embeds: [
         new ErrorEmbed(
-          `${prefix}roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | ${prefix}**roulette odds** shows the odds of winning`
+          `${prefix}roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | ${prefix}**roulette odds** shows the odds of winning`,
         ),
       ],
     });
@@ -217,7 +217,7 @@ async function run(
     return send({
       embeds: [
         new ErrorEmbed(
-          `${prefix}roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | ${prefix}**roulette odds** shows the odds of winning`
+          `${prefix}roulette <colour (**r**ed/**g**reen/**b**lack)> <bet> | ${prefix}**roulette odds** shows the odds of winning`,
         ),
       ],
     });
@@ -231,7 +231,7 @@ async function run(
     return send({
       embeds: [
         new ErrorEmbed(
-          `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
+          `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`,
         ),
       ],
     });
@@ -292,7 +292,7 @@ async function run(
     if (multi > 0) {
       await updateBalance(
         message.member,
-        (await getBalance(message.member)) + winnings + Math.round(winnings * multi)
+        (await getBalance(message.member)) + winnings + Math.round(winnings * multi),
       );
       winnings = winnings + Math.round(winnings * multi);
     } else {
@@ -308,7 +308,7 @@ async function run(
 
   const embed = new CustomEmbed(
     message.member,
-    "*spinning wheel..*\n\n**choice** " + colorBet + "\n**your bet** $" + bet.toLocaleString()
+    "*spinning wheel..*\n\n**choice** " + colorBet + "\n**your bet** $" + bet.toLocaleString(),
   ).setHeader("roulette", message.author.avatarURL());
 
   const edit = async (data: MessageEditOptions, msg: Message | InteractionResponse) => {
@@ -327,7 +327,7 @@ async function run(
         "\n\n**choice** " +
         colorBet +
         "\n**your bet** $" +
-        bet.toLocaleString()
+        bet.toLocaleString(),
     );
 
     let id: string;
@@ -341,7 +341,7 @@ async function run(
             "\n" +
             "+**" +
             Math.floor(multi * 100).toString() +
-            "**% bonus"
+            "**% bonus",
         );
       } else {
         embed.addField("**winner!!**", "**you win** $" + winnings.toLocaleString());

@@ -27,22 +27,22 @@ const cmd = new Command("give", "give other users items from your inventory", "m
 cmd.slashEnabled = true;
 cmd.slashData
   .addUserOption((option) =>
-    option.setName("user").setDescription("user you want to give items to").setRequired(true)
+    option.setName("user").setDescription("user you want to give items to").setRequired(true),
   )
   .addStringOption((option) =>
     option
       .setName("item")
       .setDescription("item you want to give")
       .setRequired(true)
-      .setAutocomplete(true)
+      .setAutocomplete(true),
   )
   .addIntegerOption((option) =>
-    option.setName("amount").setDescription("amount of item you want to give").setMinValue(1)
+    option.setName("amount").setDescription("amount of item you want to give").setMinValue(1),
   );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -210,7 +210,7 @@ async function run(
       message.member,
       selected.id,
       inventory.find((i) => i.item == selected.id).amount - amount,
-      false
+      false,
     ),
   ]);
 
@@ -219,10 +219,10 @@ async function run(
       target,
       `**${message.author.tag}** has given you ${amount.toLocaleString()} ${selected.emoji} ${
         selected.name
-      }`
+      }`,
     )
       .setHeader(
-        `you have received ${amount == 1 ? "an item" : `${amount.toLocaleString()} items`}`
+        `you have received ${amount == 1 ? "an item" : `${amount.toLocaleString()} items`}`,
       )
       .setFooter({ text: "/settings me notifications" });
 
@@ -250,7 +250,7 @@ async function run(
         message.member,
         `you have given **${amount}** ${selected.emoji} ${
           selected.name
-        } to **${target.toString()}**`
+        } to **${target.toString()}**`,
       ),
     ],
   });

@@ -12,7 +12,7 @@ const cmd = new Command("deleteslash", "delete slash commands", "none").setPermi
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (message.member.user.id != Constants.TEKOH_ID) return;
 

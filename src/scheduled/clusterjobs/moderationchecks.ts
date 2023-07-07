@@ -49,7 +49,7 @@ export function runLogs() {
       if ((await redis.llen(`${Constants.redis.nypsi.GUILD_LOG_QUEUE}:${guild.guildId}`)) > 10) {
         for (let i = 0; i < 10; i++) {
           const current = await redis.rpop(
-            `${Constants.redis.nypsi.GUILD_LOG_QUEUE}:${guild.guildId}`
+            `${Constants.redis.nypsi.GUILD_LOG_QUEUE}:${guild.guildId}`,
           );
           embeds.push(JSON.parse(current) as APIEmbed);
         }
@@ -57,7 +57,7 @@ export function runLogs() {
         const current = await redis.lrange(
           `${Constants.redis.nypsi.GUILD_LOG_QUEUE}:${guild.guildId}`,
           0,
-          10
+          10,
         );
         await redis.del(`${Constants.redis.nypsi.GUILD_LOG_QUEUE}:${guild.guildId}`);
         for (const i of current) {
@@ -176,7 +176,7 @@ export function runModerationChecks(client: NypsiClient) {
       if ((await redis.llen(`${Constants.redis.cache.guild.MODLOGS}:${modlog.guildId}`)) > 10) {
         for (let i = 0; i < 10; i++) {
           const current = await redis.rpop(
-            `${Constants.redis.cache.guild.MODLOGS}:${modlog.guildId}`
+            `${Constants.redis.cache.guild.MODLOGS}:${modlog.guildId}`,
           );
           embeds.push(JSON.parse(current) as APIEmbed);
         }
@@ -184,7 +184,7 @@ export function runModerationChecks(client: NypsiClient) {
         const current = await redis.lrange(
           `${Constants.redis.cache.guild.MODLOGS}:${modlog.guildId}`,
           0,
-          10
+          10,
         );
         await redis.del(`${Constants.redis.cache.guild.MODLOGS}:${modlog.guildId}`);
         for (const i of current) {

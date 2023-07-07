@@ -19,7 +19,7 @@ export default {
         (item.includes(focused.value) || items[item].name.includes(focused.value)) &&
         items[item].items_left > 0 &&
         items[item].cost <= karma &&
-        items[item].limit > items[item].bought.filter((i) => i === interaction.user.id).length
+        items[item].limit > items[item].bought.filter((i) => i === interaction.user.id).length,
     );
 
     if (options.length > 25) options = options.splice(0, 24);

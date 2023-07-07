@@ -6,7 +6,7 @@ const cmd = new Command("roll", "roll a dice", "utility");
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   let range = 6;
 
@@ -24,7 +24,7 @@ async function run(
     embeds: [
       new CustomEmbed(
         message.member,
-        "🎲 you rolled `" + (Math.floor(Math.random() * range) + 1).toLocaleString() + "`"
+        "🎲 you rolled `" + (Math.floor(Math.random() * range) + 1).toLocaleString() + "`",
       ),
     ],
   });

@@ -200,6 +200,6 @@ export async function requestRemoveRole(id: string, roleID: string, client: Nyps
     },
     {
       context: { guildId: "747056029795221513", memberId: id, roleId: roleID },
-    }
+    },
   );
 }

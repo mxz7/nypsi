@@ -10,12 +10,12 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 const cmd = new Command(
   "topcases",
   "see who has the top moderation cases",
-  "moderation"
+  "moderation",
 ).setPermissions(["MANAGE_MESSAGES", "MODERATE_MEMBERS"]);
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
     if (!message.member.permissions.has(PermissionFlagsBits.ModerateMembers)) {
@@ -215,7 +215,7 @@ async function run(
           "`\nunmutes `" +
           unmutes.toLocaleString() +
           "`",
-        true
+        true,
       );
     }
     embed.addField(
@@ -225,7 +225,7 @@ async function run(
         "`\ndeleted `" +
         deletedCases.toLocaleString() +
         "`",
-      true
+      true,
     );
   }
 

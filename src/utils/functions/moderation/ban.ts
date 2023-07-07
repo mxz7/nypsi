@@ -104,7 +104,7 @@ export async function requestUnban(guildId: string, member: string, client: Nyps
       if (fail) return "unban";
       return true;
     },
-    { context: { guildId: guildId, memberId: member } }
+    { context: { guildId: guildId, memberId: member } },
   );
 
   await deleteBan(guildId, member);

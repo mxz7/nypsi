@@ -61,7 +61,7 @@ module.exports = new ItemUse(
     await setInventoryItem(
       message.member,
       "rick_astley",
-      inventory.find((i) => i.item === "rick_astley").amount - 1
+      inventory.find((i) => i.item === "rick_astley").amount - 1,
     );
 
     await redis.set(`${Constants.redis.nypsi.RICKROLL}:${target.user.id}`, message.author.id);
@@ -70,9 +70,9 @@ module.exports = new ItemUse(
       embeds: [
         new CustomEmbed(
           message.member,
-          `<a:rick_astley:1100529748796506203> **${target.user.tag}** will be rick rolled soon xd !!!!`
+          `<a:rick_astley:1100529748796506203> **${target.user.tag}** will be rick rolled soon xd !!!!`,
         ),
       ],
     });
-  }
+  },
 );

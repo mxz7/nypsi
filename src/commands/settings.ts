@@ -51,10 +51,10 @@ cmd.slashData
       .setName("me")
       .setDescription("modify your own settings")
       .addSubcommand((notifications) =>
-        notifications.setName("notifications").setDescription("manage your notifications settings")
+        notifications.setName("notifications").setDescription("manage your notifications settings"),
       )
       .addSubcommand((notifications) =>
-        notifications.setName("preferences").setDescription("manage your personal preferences")
+        notifications.setName("preferences").setDescription("manage your personal preferences"),
       )
       .addSubcommand((passive) =>
         passive
@@ -64,8 +64,8 @@ cmd.slashData
             option
               .setName("toggle")
               .setDescription("on/off")
-              .setChoices({ name: "on", value: "on" }, { name: "off", value: "off" })
-          )
+              .setChoices({ name: "on", value: "on" }, { name: "off", value: "off" }),
+          ),
       )
       .addSubcommand((defaultbet) =>
         defaultbet
@@ -75,20 +75,23 @@ cmd.slashData
             option
               .setName("bet")
               .setDescription("type reset to disable your default bet")
-              .setRequired(false)
-          )
+              .setRequired(false),
+          ),
       )
       .addSubcommand((email) =>
-        email.setName("email").setDescription("get/set your email for purchases")
+        email.setName("email").setDescription("get/set your email for purchases"),
       )
       .addSubcommand((lastfm) =>
         lastfm
           .setName("lastfm")
           .setDescription("set your last.fm username")
           .addStringOption((option) =>
-            option.setName("username").setDescription("your username on last.fm").setRequired(false)
-          )
-      )
+            option
+              .setName("username")
+              .setDescription("your username on last.fm")
+              .setRequired(false),
+          ),
+      ),
   )
 
   .addSubcommandGroup((server) =>
@@ -100,14 +103,14 @@ cmd.slashData
           .setName("slash-only")
           .setDescription("set the server to only use slash commands")
           .addBooleanOption((option) =>
-            option.setName("value").setDescription("yes/no").setRequired(true)
-          )
-      )
+            option.setName("value").setDescription("yes/no").setRequired(true),
+          ),
+      ),
   );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -154,7 +157,7 @@ async function run(
       settings: DMSettings,
       settingId: string,
       options: StringSelectMenuOptionBuilder[],
-      msg?: Message
+      msg?: Message,
     ) => {
       const embed = new CustomEmbed(message.member).setHeader(notificationsData[settingId].name);
 
@@ -162,8 +165,8 @@ async function run(
         notificationsData[settingId].description.replace(
           "{VALUE}",
           // @ts-expect-error loser
-          settings[settingId].toLocaleString()
-        )
+          settings[settingId].toLocaleString(),
+        ),
       );
 
       const userSelection = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -174,7 +177,7 @@ async function run(
         new ButtonBuilder()
           .setCustomId("disable-setting")
           .setLabel("disable")
-          .setStyle(ButtonStyle.Danger)
+          .setStyle(ButtonStyle.Danger),
       );
 
       // @ts-expect-error hate life innit
@@ -211,7 +214,7 @@ async function run(
         }
 
         userSelection.setComponents(
-          new StringSelectMenuBuilder().setCustomId("typesetting").setOptions(boobies)
+          new StringSelectMenuBuilder().setCustomId("typesetting").setOptions(boobies),
         );
       } else {
         // @ts-expect-error annoying grr
@@ -227,7 +230,7 @@ async function run(
           embeds: [embed],
           components: [
             new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-              new StringSelectMenuBuilder().setCustomId("setting").setOptions(options)
+              new StringSelectMenuBuilder().setCustomId("setting").setOptions(options),
             ),
             userSelection,
           ],
@@ -237,7 +240,7 @@ async function run(
           embeds: [embed],
           components: [
             new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-              new StringSelectMenuBuilder().setCustomId("setting").setOptions(options)
+              new StringSelectMenuBuilder().setCustomId("setting").setOptions(options),
             ),
             userSelection,
           ],
@@ -253,7 +256,7 @@ async function run(
       options.push(
         new StringSelectMenuOptionBuilder()
           .setValue(settingId)
-          .setLabel(notificationsData[settingId].name)
+          .setLabel(notificationsData[settingId].name),
       );
     }
 
@@ -315,8 +318,8 @@ async function run(
                 .setPlaceholder("number")
                 .setStyle(TextInputStyle.Short)
                 .setRequired(true)
-                .setMinLength(0)
-            )
+                .setMinLength(0),
+            ),
           );
 
           await res.showModal(modal);
@@ -383,7 +386,7 @@ async function run(
       settings: Preferences,
       settingId: string,
       options: StringSelectMenuOptionBuilder[],
-      msg?: Message
+      msg?: Message,
     ) => {
       const embed = new CustomEmbed(message.member).setHeader(preferencesData[settingId].name);
 
@@ -391,8 +394,8 @@ async function run(
         preferencesData[settingId].description.replace(
           "{VALUE}",
           // @ts-expect-error loser
-          settings[settingId].toLocaleString()
-        )
+          settings[settingId].toLocaleString(),
+        ),
       );
 
       const userSelection = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -403,7 +406,7 @@ async function run(
         new ButtonBuilder()
           .setCustomId("disable-setting")
           .setLabel("disable")
-          .setStyle(ButtonStyle.Danger)
+          .setStyle(ButtonStyle.Danger),
       );
 
       // @ts-expect-error hate life innit
@@ -440,7 +443,7 @@ async function run(
         }
 
         userSelection.setComponents(
-          new StringSelectMenuBuilder().setCustomId("typesetting").setOptions(boobies)
+          new StringSelectMenuBuilder().setCustomId("typesetting").setOptions(boobies),
         );
       } else {
         // @ts-expect-error annoying grr
@@ -456,7 +459,7 @@ async function run(
           embeds: [embed],
           components: [
             new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-              new StringSelectMenuBuilder().setCustomId("setting").setOptions(options)
+              new StringSelectMenuBuilder().setCustomId("setting").setOptions(options),
             ),
             userSelection,
           ],
@@ -466,7 +469,7 @@ async function run(
           embeds: [embed],
           components: [
             new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-              new StringSelectMenuBuilder().setCustomId("setting").setOptions(options)
+              new StringSelectMenuBuilder().setCustomId("setting").setOptions(options),
             ),
             userSelection,
           ],
@@ -482,7 +485,7 @@ async function run(
       options.push(
         new StringSelectMenuOptionBuilder()
           .setValue(settingId)
-          .setLabel(preferencesData[settingId].name)
+          .setLabel(preferencesData[settingId].name),
       );
     }
 
@@ -544,8 +547,8 @@ async function run(
                 .setPlaceholder("number")
                 .setStyle(TextInputStyle.Short)
                 .setRequired(true)
-                .setMinLength(0)
-            )
+                .setMinLength(0),
+            ),
           );
 
           await res.showModal(modal);
@@ -616,25 +619,25 @@ async function run(
       if (!defaultBet) {
         const embed = new CustomEmbed(message.member).setHeader(
           "default bet",
-          message.author.avatarURL()
+          message.author.avatarURL(),
         );
 
         embed.setDescription(
           "you do not currently have a default bet. use `/settings me defaultbet <amount/reset>` to set your default bet\n\n" +
-            `you must bet at least $**${requiredBet.toLocaleString()}** to earn xp`
+            `you must bet at least $**${requiredBet.toLocaleString()}** to earn xp`,
         );
 
         return send({ embeds: [embed] });
       } else {
         const embed = new CustomEmbed(message.member).setHeader(
           "default bet",
-          message.author.avatarURL()
+          message.author.avatarURL(),
         );
 
         embed.setDescription(
           `your default bet is $**${defaultBet.toLocaleString()}**` +
             "\n\nuse `/settings me defaultbet <amount/reset>` to change this\n" +
-            `you must bet at least $**${requiredBet.toLocaleString()}** to earn xp`
+            `you must bet at least $**${requiredBet.toLocaleString()}** to earn xp`,
         );
 
         return send({ embeds: [embed] });
@@ -667,7 +670,7 @@ async function run(
       return send({
         embeds: [
           new ErrorEmbed(
-            `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
+            `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`,
           ),
         ],
       });
@@ -680,7 +683,7 @@ async function run(
     const embed = new CustomEmbed(message.member);
 
     embed.setDescription(
-      `:white_check_mark: your default bet has been set to $${bet.toLocaleString()}`
+      `:white_check_mark: your default bet has been set to $${bet.toLocaleString()}`,
     );
 
     return send({ embeds: [embed] });
@@ -707,7 +710,7 @@ async function run(
             message.options.getBoolean("value")
               ? "slash commands only"
               : "slash commands and message commands"
-          }`
+          }`,
         ),
       ],
     });
@@ -749,22 +752,22 @@ async function run(
       new ButtonBuilder()
         .setCustomId("setemail")
         .setLabel("set email")
-        .setStyle(ButtonStyle.Success)
+        .setStyle(ButtonStyle.Success),
     );
 
     if (email) {
       embed.setDescription(
-        "your email has been set. if you would like to view it, use the button below. this will be sent in your dms."
+        "your email has been set. if you would like to view it, use the button below. this will be sent in your dms.",
       );
       row.addComponents(
         new ButtonBuilder()
           .setCustomId("viewemail")
           .setLabel("view email")
-          .setStyle(ButtonStyle.Danger)
+          .setStyle(ButtonStyle.Danger),
       );
     } else {
       embed.setDescription(
-        "your email as not been set. use the button to set it below via form. this will not be shared with anyone.\n\nnypsi uses your email address for purchases only. if you do not intend to make any purchases, do not set your email address."
+        "your email as not been set. use the button to set it below via form. this will not be shared with anyone.\n\nnypsi uses your email address for purchases only. if you do not intend to make any purchases, do not set your email address.",
       );
     }
 
@@ -809,8 +812,8 @@ async function run(
               .setPlaceholder("nypsi@example.com")
               .setStyle(TextInputStyle.Short)
               .setRequired(true)
-              .setMaxLength(50)
-          )
+              .setMaxLength(50),
+          ),
         );
 
       await res.showModal(modal);
@@ -856,7 +859,7 @@ async function run(
         embeds: [
           new CustomEmbed(
             message.member,
-            enabled ? "you are currently in passive mode" : "you are not in passive mode"
+            enabled ? "you are currently in passive mode" : "you are not in passive mode",
           ),
         ],
       });
@@ -870,13 +873,13 @@ async function run(
       await redis.set(`cd:passive_toggle:${message.author.id}`, "boobs");
       await redis.expire(
         `cd:passive_toggle:${message.author.id}`,
-        Math.floor(ms("20 minutes") / 1000)
+        Math.floor(ms("20 minutes") / 1000),
       );
       return send({
         embeds: [
           new CustomEmbed(message.member, "you are now in passive mode").addField(
             "effects",
-            "- cannot be robbed\n- reduced multiplier\n- reduced xp gain\n- reduced cookie production"
+            "- cannot be robbed\n- reduced multiplier\n- reduced xp gain\n- reduced cookie production",
           ),
         ],
       });
@@ -888,7 +891,7 @@ async function run(
       await redis.set(`cd:passive_toggle:${message.author.id}`, "boobs");
       await redis.expire(
         `cd:passive_toggle:${message.author.id}`,
-        Math.floor(ms("20 minutes") / 1000)
+        Math.floor(ms("20 minutes") / 1000),
       );
       return send({
         embeds: [

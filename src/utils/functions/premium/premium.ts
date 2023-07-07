@@ -146,7 +146,7 @@ export async function addMember(member: GuildMember | string, level: number, cli
         memberId: id,
         client: client,
         content: `you have been given **${profile.getLevelString()}** membership, this will expire on **${formatDate(
-          profile.expireDate
+          profile.expireDate,
         )}**\n\nplease join the support server if you have any problems, or questions. discord.gg/hJTDNST`,
       });
     } else {
@@ -154,7 +154,7 @@ export async function addMember(member: GuildMember | string, level: number, cli
         memberId: id,
         payload: {
           content: `you have been given **${profile.getLevelString()}** membership, this will expire on **${formatDate(
-            profile.expireDate
+            profile.expireDate,
           )}**\n\nplease join the support server if you have any problems, or questions. discord.gg/hJTDNST`,
         },
       });

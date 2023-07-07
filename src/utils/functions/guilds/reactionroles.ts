@@ -18,7 +18,7 @@ import ms = require("ms");
 export async function getReactionRolesByGuild(guild: Guild) {
   if (await redis.exists(`${Constants.redis.cache.guild.REACTION_ROLES}:${guild.id}`)) {
     return JSON.parse(
-      await redis.get(`${Constants.redis.cache.guild.REACTION_ROLES}:${guild.id}`)
+      await redis.get(`${Constants.redis.cache.guild.REACTION_ROLES}:${guild.id}`),
     ) as (ReactionRole & {
       roles: ReactionRoleRoles[];
     })[];
@@ -39,11 +39,11 @@ export async function getReactionRolesByGuild(guild: Guild) {
 
   await redis.set(
     `${Constants.redis.cache.guild.REACTION_ROLES}:${guild.id}`,
-    JSON.stringify(query)
+    JSON.stringify(query),
   );
   await redis.expire(
     `${Constants.redis.cache.guild.REACTION_ROLES}:${guild.id}`,
-    Math.floor(ms("1 hour") / 1000)
+    Math.floor(ms("1 hour") / 1000),
   );
 
   return query;
@@ -99,7 +99,7 @@ export async function addRoleToReactionRole(options: {
 export async function deleteRoleFromReactionRole(
   guildId: string,
   messageId: string,
-  roleId: string
+  roleId: string,
 ) {
   await prisma.reactionRoleRoles.delete({
     where: {
@@ -125,7 +125,7 @@ export async function deleteReactionRole(guildId: string, messageId: string) {
 
 export async function sendReactionRole(
   reactionRole: ReactionRole & { roles: ReactionRoleRoles[] },
-  channel: GuildTextBasedChannel
+  channel: GuildTextBasedChannel,
 ) {
   const embed = new CustomEmbed().setColor(Constants.TRANSPARENT_EMBED_COLOR);
 
@@ -151,7 +151,7 @@ export async function sendReactionRole(
 
     if (components.length === 0) {
       components[0] = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        button
+        button,
       );
     } else if (components[components.length - 1].components.length >= 5) {
       components[components.length] =
@@ -182,7 +182,7 @@ export async function sendReactionRole(
 export async function setReactionRoleMode(
   guildId: string,
   messageId: string,
-  mode: ReactionRoleMode
+  mode: ReactionRoleMode,
 ) {
   await prisma.reactionRole.update({
     where: {
@@ -212,7 +212,7 @@ export async function setReactionRoleTitle(guildId: string, messageId: string, t
 export async function setReactionRoleDescription(
   guildId: string,
   messageId: string,
-  description: string
+  description: string,
 ) {
   await prisma.reactionRole.update({
     where: {
@@ -242,7 +242,7 @@ export async function setReactionRoleColour(guildId: string, messageId: string, 
 export async function setReactionRoleWhitelist(
   guildId: string,
   messageId: string,
-  whitelist: string[]
+  whitelist: string[],
 ) {
   await prisma.reactionRole.update({
     where: {

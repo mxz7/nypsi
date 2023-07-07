@@ -12,7 +12,7 @@ const cmd = new Command("reddit", "get a random image from any subreddit", "util
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (await onCooldown(cmd.name, message.member)) {
     const embed = await getResponse(cmd.name, message.member);
@@ -40,7 +40,7 @@ async function run(
       return message.channel.send({
         embeds: [
           new ErrorEmbed(
-            "this subreddit is known for nsfw content without using nsfw flairs, please use an nsfw channel"
+            "this subreddit is known for nsfw content without using nsfw flairs, please use an nsfw channel",
           ),
         ],
       });
@@ -53,7 +53,7 @@ async function run(
 
   try {
     const res: RedditJSON = await fetch(
-      "https://www.reddit.com/r/" + args[0] + ".json?limit=100"
+      "https://www.reddit.com/r/" + args[0] + ".json?limit=100",
     ).then((a) => a.json());
 
     allowed = res.data.children.filter((post) => !post.data.is_self);

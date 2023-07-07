@@ -18,7 +18,7 @@ const cmd = new Command("cars", "view the current cars available", "money").setA
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (await onCooldown(cmd.name, message.member)) {
     const embed = await getResponse(cmd.name, message.member);
@@ -100,7 +100,7 @@ async function run(
       `${item.emoji} **${item.name}**\n${item.longDesc}\n**speed** ${item.speed}${
         owned ? "\n*owned*" : ""
       }`,
-      true
+      true,
     );
   }
 
@@ -110,7 +110,7 @@ async function run(
       .setLabel("back")
       .setStyle(ButtonStyle.Primary)
       .setDisabled(true),
-    new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
+    new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
   );
 
   let msg: Message;
@@ -141,7 +141,7 @@ async function run(
 
       const newEmbed = new CustomEmbed(message.member).setHeader(
         "car magazine",
-        message.author.avatarURL()
+        message.author.avatarURL(),
       );
 
       if (!reaction) return;
@@ -166,7 +166,7 @@ async function run(
               `${item.emoji} **${item.name}**\n${item.longDesc}\n**speed** ${item.speed}${
                 owned ? "\n*owned*" : ""
               }`,
-              true
+              true,
             );
           }
           newEmbed.setFooter({
@@ -183,7 +183,7 @@ async function run(
                 .setCustomId("➡")
                 .setLabel("next")
                 .setStyle(ButtonStyle.Primary)
-                .setDisabled(false)
+                .setDisabled(false),
             );
           } else {
             row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -196,7 +196,7 @@ async function run(
                 .setCustomId("➡")
                 .setLabel("next")
                 .setStyle(ButtonStyle.Primary)
-                .setDisabled(false)
+                .setDisabled(false),
             );
           }
           await msg.edit({ embeds: [newEmbed], components: [row] });
@@ -222,7 +222,7 @@ async function run(
               `${item.emoji} **${item.name}**\n${item.longDesc}\n**speed** ${item.speed}${
                 owned ? "\n*owned*" : ""
               }`,
-              true
+              true,
             );
           }
           newEmbed.setFooter({
@@ -239,7 +239,7 @@ async function run(
                 .setCustomId("➡")
                 .setLabel("next")
                 .setStyle(ButtonStyle.Primary)
-                .setDisabled(true)
+                .setDisabled(true),
             );
           } else {
             row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -252,7 +252,7 @@ async function run(
                 .setCustomId("➡")
                 .setLabel("next")
                 .setStyle(ButtonStyle.Primary)
-                .setDisabled(false)
+                .setDisabled(false),
             );
           }
           await msg.edit({ embeds: [newEmbed], components: [row] });

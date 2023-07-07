@@ -10,7 +10,7 @@ const interactionHandlers = new Map<string, InteractionHandler>();
 
 export async function loadInteractions() {
   const files = await readdir("./dist/interactions").then((r) =>
-    r.filter((i) => i.endsWith(".js"))
+    r.filter((i) => i.endsWith(".js")),
   );
 
   for (const fileName of files) {
@@ -32,7 +32,7 @@ export async function reloadInteractions() {
   autocompleteHandlers.clear();
   interactionHandlers.clear();
   const files = await readdir("./dist/interactions").then((r) =>
-    r.filter((i) => i.endsWith(".js"))
+    r.filter((i) => i.endsWith(".js")),
   );
 
   for (const fileName of files) {

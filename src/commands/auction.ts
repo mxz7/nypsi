@@ -55,7 +55,7 @@ const cmd = new Command("auction", "create and manage your item auctions", "mone
 cmd.slashEnabled = true;
 cmd.slashData
   .addSubcommand((manage) =>
-    manage.setName("manage").setDescription("manage your current auctions")
+    manage.setName("manage").setDescription("manage your current auctions"),
   )
   .addSubcommand((create) =>
     create
@@ -66,20 +66,20 @@ cmd.slashData
           .setName("item")
           .setDescription("item you would like to sell")
           .setAutocomplete(true)
-          .setRequired(true)
+          .setRequired(true),
       )
       .addStringOption((option) =>
         option
           .setName("amount")
           .setDescription("amount of items you would like to sell")
-          .setRequired(true)
+          .setRequired(true),
       )
       .addStringOption((option) =>
         option
           .setName("cost")
           .setDescription("amount you would like this item to sell for")
-          .setRequired(true)
-      )
+          .setRequired(true),
+      ),
   )
   .addSubcommand((search) =>
     search
@@ -90,8 +90,8 @@ cmd.slashData
           .setName("item-global")
           .setDescription("item to find auctions for")
           .setAutocomplete(true)
-          .setRequired(true)
-      )
+          .setRequired(true),
+      ),
   )
   .addSubcommand((watch) =>
     watch
@@ -102,19 +102,19 @@ cmd.slashData
           .setName("item-global")
           .setDescription("item you want to toggle on/off")
           .setRequired(false)
-          .setAutocomplete(true)
+          .setAutocomplete(true),
       )
       .addStringOption((option) =>
         option
           .setName("max-cost")
           .setDescription("max cost you want to be notified for")
-          .setRequired(false)
-      )
+          .setRequired(false),
+      ),
   );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -182,7 +182,7 @@ async function run(
   const createAuctionProcess = async (msg: Message) => {
     const embed = new CustomEmbed(message.member).setHeader(
       "create an auction",
-      message.author.avatarURL()
+      message.author.avatarURL(),
     );
 
     let inventory = await getInventory(message.member);
@@ -205,7 +205,7 @@ async function run(
             new StringSelectMenuOptionBuilder()
               .setValue(items[item.item].id)
               .setEmoji(items[item.item].emoji as APIMessageComponentEmoji)
-              .setLabel(items[item.item].name)
+              .setLabel(items[item.item].name),
           );
         }
       }
@@ -214,7 +214,7 @@ async function run(
         new StringSelectMenuBuilder()
           .setCustomId("item")
           .setPlaceholder("item you want to sell")
-          .setOptions(options)
+          .setOptions(options),
       );
 
       await edit({ embeds: [embed], components: [row] }, msg);
@@ -331,7 +331,7 @@ async function run(
     const amount = parseInt(res);
 
     embed.setDescription(
-      `how much do you want to sell ${amount}x ${selected.emoji} ${selected.name} for?`
+      `how much do you want to sell ${amount}x ${selected.emoji} ${selected.name} for?`,
     );
 
     await edit({ embeds: [embed], components: [] }, msg);
@@ -387,7 +387,7 @@ async function run(
       return send({
         embeds: [
           new ErrorEmbed(
-            `the maximum cost per item is $${Constants.MAX_AUCTION_PER_ITEM.toLocaleString()}`
+            `the maximum cost per item is $${Constants.MAX_AUCTION_PER_ITEM.toLocaleString()}`,
           ),
         ],
       });
@@ -404,7 +404,7 @@ async function run(
           new ErrorEmbed(
             `you can buy ${amount}x ${selected.emoji} ${
               selected.name
-            } from nypsi's shop for $${shopCost.toLocaleString()}`
+            } from nypsi's shop for $${shopCost.toLocaleString()}`,
           ),
         ],
       });
@@ -423,7 +423,7 @@ async function run(
       message.member,
       selected.id,
       inventory.find((i) => i.item == selected.id).amount - amount,
-      false
+      false,
     );
 
     const url = await createAuction(message.member, selected.id, amount, cost).catch(() => {});
@@ -442,7 +442,7 @@ async function run(
 
     const embed = new CustomEmbed(message.member).setHeader(
       "your auctions",
-      message.author.avatarURL()
+      message.author.avatarURL(),
     );
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>();
@@ -468,7 +468,7 @@ async function run(
           name: "created",
           value: `<t:${Math.floor(auctions[page].createdAt.getTime() / 1000)}:R>`,
           inline: true,
-        }
+        },
       );
       embed.setFooter({ text: `page ${page + 1}/${maxPage + 1}` });
     };
@@ -478,7 +478,7 @@ async function run(
         row.setComponents(
           new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary),
           new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
-          new ButtonBuilder().setCustomId("del").setLabel("delete").setStyle(ButtonStyle.Danger)
+          new ButtonBuilder().setCustomId("del").setLabel("delete").setStyle(ButtonStyle.Danger),
         );
 
         if (auctions.length == 1) {
@@ -494,7 +494,7 @@ async function run(
 
         if (
           dayjs(auctions[page].createdAt).isAfter(
-            dayjs().subtract((await isPremium(message.author.id)) ? 1 : 12, "hour")
+            dayjs().subtract((await isPremium(message.author.id)) ? 1 : 12, "hour"),
           )
         ) {
           row.addComponents(
@@ -502,7 +502,7 @@ async function run(
               .setCustomId("bump")
               .setLabel("bump")
               .setStyle(ButtonStyle.Secondary)
-              .setDisabled(true)
+              .setDisabled(true),
           );
         } else {
           row.addComponents(
@@ -510,7 +510,7 @@ async function run(
               .setCustomId("bump")
               .setLabel("bump")
               .setStyle(ButtonStyle.Secondary)
-              .setDisabled(false)
+              .setDisabled(false),
           );
         }
       }
@@ -526,7 +526,7 @@ async function run(
           new ButtonBuilder()
             .setLabel("create auction")
             .setCustomId("y")
-            .setStyle(ButtonStyle.Success)
+            .setStyle(ButtonStyle.Success),
         );
       }
     };
@@ -537,7 +537,7 @@ async function run(
       displayAuction(0);
     } else {
       row.addComponents(
-        new ButtonBuilder().setCustomId("del").setLabel("delete").setStyle(ButtonStyle.Danger)
+        new ButtonBuilder().setCustomId("del").setLabel("delete").setStyle(ButtonStyle.Danger),
       );
       displayAuction(0);
     }
@@ -604,14 +604,14 @@ async function run(
       } else if (res == "del") {
         const res = await deleteAuction(
           auctions[currentPage].id,
-          message.client as NypsiClient
+          message.client as NypsiClient,
         ).catch(() => {});
 
         if (res) {
           await addInventoryItem(
             auctions[currentPage].ownerId,
             auctions[currentPage].itemId,
-            Number(auctions[currentPage].itemAmount)
+            Number(auctions[currentPage].itemAmount),
           );
 
           await interaction.followUp({
@@ -707,7 +707,7 @@ async function run(
             items[auction.itemId].name
           } has been removed by a staff member. you have been given back your item${
             auction.itemAmount > 1 ? "s" : ""
-          }`
+          }`,
         );
 
         if (args.length > 2) {
@@ -756,9 +756,9 @@ async function run(
                 (i) =>
                   `- ${items[i.itemId].emoji} ${items[i.itemId].name}${
                     i.maxCost > 0 ? `: $${i.maxCost.toLocaleString()}` : ""
-                  }`
+                  }`,
               )
-              .join("\n")}`
+              .join("\n")}`,
           ).setHeader("auction watch", message.author.avatarURL()),
         ],
       });
@@ -792,13 +792,13 @@ async function run(
       current = await updateAuctionWatch(
         message.member,
         selected.id,
-        args[2] ? formatNumber(args[2]) : undefined
+        args[2] ? formatNumber(args[2]) : undefined,
       );
     }
 
     const embed = new CustomEmbed(message.member, desc).setHeader(
       "auction watch",
-      message.author.avatarURL()
+      message.author.avatarURL(),
     );
 
     if (current.length > 0) {
@@ -809,9 +809,9 @@ async function run(
             (i) =>
               `- ${items[i.itemId].emoji} ${items[i.itemId].name}${
                 i.maxCost > 0 ? `: $${i.maxCost.toLocaleString()}` : ""
-              }`
+              }`,
           )
-          .join("\n")
+          .join("\n"),
       );
     }
 
@@ -837,14 +837,14 @@ async function run(
               ? ` ($${Math.floor(Number(a.bin / a.itemAmount)).toLocaleString()} each)`
               : ""
           }\n` +
-          `- [jump](https://discord.com/channels/747056029795221513/1008467335973179482/${a.messageId})\n `
+          `- [jump](https://discord.com/channels/747056029795221513/1008467335973179482/${a.messageId})\n `,
       ),
-      3
+      3,
     );
 
     const embed = new CustomEmbed(message.member, pages.get(1).join("\n")).setHeader(
       `current auctions for ${item.name}`,
-      message.author.avatarURL()
+      message.author.avatarURL(),
     );
 
     if (pages.size === 1) {
@@ -857,7 +857,7 @@ async function run(
         .setLabel("back")
         .setStyle(ButtonStyle.Primary)
         .setDisabled(true),
-      new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
+      new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
     );
 
     const msg = await send({ embeds: [embed], components: [row] });
@@ -953,7 +953,7 @@ async function run(
       return send({
         embeds: [
           new ErrorEmbed(
-            `the maximum cost per item is $${Constants.MAX_AUCTION_PER_ITEM.toLocaleString()}`
+            `the maximum cost per item is $${Constants.MAX_AUCTION_PER_ITEM.toLocaleString()}`,
           ),
         ],
       });
@@ -970,7 +970,7 @@ async function run(
           new ErrorEmbed(
             `you can buy ${amount}x ${selected.emoji} ${
               selected.name
-            } from nypsi's shop for $${shopCost.toLocaleString()}`
+            } from nypsi's shop for $${shopCost.toLocaleString()}`,
           ),
         ],
       });
@@ -980,7 +980,7 @@ async function run(
       message.member,
       selected.id,
       inventory.find((i) => i.item == selected.id).amount - amount,
-      false
+      false,
     );
 
     const url = await createAuction(message.member, selected.id, amount, cost).catch(() => {});

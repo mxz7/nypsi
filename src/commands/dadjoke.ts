@@ -13,7 +13,7 @@ import ms = require("ms");
 const cmd = new Command(
   "dadjoke",
   "get a hilarious dad joke straight from r/dadjokes",
-  "fun"
+  "fun",
 ).setAliases(["dadjokes", "dj"]);
 
 cmd.slashEnabled = true;

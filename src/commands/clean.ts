@@ -7,12 +7,12 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 const cmd = new Command(
   "clean",
   "clean up bot commands and responses",
-  "moderation"
+  "moderation",
 ).setPermissions(["MANAGE_MESSAGES"]);
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
     if (message.channel.id != "747056029795221516") return;
@@ -44,7 +44,7 @@ async function run(
   const collected = await message.channel.messages.fetch({ limit: amount });
 
   const collecteda = collected.filter(
-    (msg) => msg.author.id == message.client.user.id || msg.content.startsWith(prefix)
+    (msg) => msg.author.id == message.client.user.id || msg.content.startsWith(prefix),
   );
 
   await message.channel.bulkDelete(collecteda);

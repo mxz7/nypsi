@@ -9,7 +9,7 @@ const cmd = new Command("clearsnipe", "delete the current sniped thing", "modera
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) return;
   let channel: Channel = message.channel;

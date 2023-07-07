@@ -11,7 +11,7 @@ const cmd = new Command("automute", "change auto mute lengths", "admin").setPerm
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
     if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
@@ -31,7 +31,7 @@ async function run(
       message.member,
       levels
         .map((secs, index) => `${index + 1} \`${MStoTime(secs * 1000, true).trim() || "no mute"}\``)
-        .join("\n")
+        .join("\n"),
     )
       .setHeader("current auto mute lengths")
       .setFooter({ text: `${prefix}automute <vl> <length | delete>` });
@@ -55,7 +55,7 @@ async function run(
     return message.channel.send({
       embeds: [
         new ErrorEmbed(
-          `${prefix}automute <vl> <length | delete>\n${prefix}automute disable\n${prefix}automute <vl> 0 to set a vl to not mute`
+          `${prefix}automute <vl> <length | delete>\n${prefix}automute disable\n${prefix}automute <vl> 0 to set a vl to not mute`,
         ),
       ],
     });
@@ -94,7 +94,7 @@ async function run(
     embeds: [
       new CustomEmbed(
         message.member,
-        `✅ set \`${level + 1}\` to \`${duration.toLocaleString()}\` seconds`
+        `✅ set \`${level + 1}\` to \`${duration.toLocaleString()}\` seconds`,
       ),
     ],
   });

@@ -32,7 +32,7 @@ export async function addModLog(
   command: string,
   caseID: number,
   channelId?: string,
-  similarity?: string
+  similarity?: string,
 ) {
   let punished: GuildMember | User | void = await guild.members.fetch(userID).catch(() => {});
 
@@ -72,7 +72,7 @@ export async function addModLog(
 
   await redis.lpush(
     `${Constants.redis.cache.guild.MODLOGS}:${guild.id}`,
-    JSON.stringify(embed.toJSON())
+    JSON.stringify(embed.toJSON()),
   );
 }
 
@@ -81,7 +81,7 @@ export async function addLog(guild: Guild, type: LogType, embed: CustomEmbed) {
 
   await redis.lpush(
     `${Constants.redis.nypsi.GUILD_LOG_QUEUE}:${guild.id}`,
-    JSON.stringify(embed.toJSON())
+    JSON.stringify(embed.toJSON()),
   );
 }
 

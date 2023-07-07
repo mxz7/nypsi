@@ -36,7 +36,7 @@ export default async function requestDM(options: RequestDMOptions): Promise<bool
       },
       {
         context: { userId: options.memberId },
-      }
+      },
     );
 
     let shard: number;
@@ -99,7 +99,7 @@ export default async function requestDM(options: RequestDMOptions): Promise<bool
           memberId: options.memberId,
           payload: payload,
         },
-      }
+      },
     );
 
     if (res.includes(true)) {
@@ -123,7 +123,7 @@ export default async function requestDM(options: RequestDMOptions): Promise<bool
       },
       {
         context: { userId: options.memberId },
-      }
+      },
     );
 
     let shard: number;
@@ -186,7 +186,7 @@ export default async function requestDM(options: RequestDMOptions): Promise<bool
           memberId: options.memberId,
           payload: payload,
         },
-      }
+      },
     );
 
     if (res.includes(true)) {

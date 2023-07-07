@@ -44,5 +44,5 @@ module.exports = new ItemUse(
     return send({
       embeds: [new CustomEmbed(message.member, "calendars will be used automatically")],
     });
-  }
+  },
 );

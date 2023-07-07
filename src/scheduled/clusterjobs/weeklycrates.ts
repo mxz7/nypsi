@@ -66,7 +66,7 @@ async function doCrates(client: NypsiClient) {
               ? getItems()[key].plural
               : getItems()[key].name
             : getItems()[key].name
-        }`
+        }`,
       );
     }
 
@@ -93,9 +93,12 @@ export function runPremiumCrateInterval(client: NypsiClient) {
 
   setTimeout(() => {
     doCrates(client);
-    setInterval(() => {
-      doCrates(client);
-    }, 86400 * 1000 * 7);
+    setInterval(
+      () => {
+        doCrates(client);
+      },
+      86400 * 1000 * 7,
+    );
   }, needed);
 
   logger.info(`::auto premium crates will run in ${MStoTime(needed)}`);

@@ -50,7 +50,7 @@ export async function addAchievementProgress(userId: string, achievementId: stri
 export async function setAchievementProgress(
   userId: string,
   achievementId: string,
-  progress: number
+  progress: number,
 ) {
   if (await isEcoBanned(userId)) return;
   const query = await prisma.achievements.upsert({
@@ -137,7 +137,7 @@ async function completeAchievement(userId: string, achievementId: string) {
     .setColor(Constants.TRANSPARENT_EMBED_COLOR)
     .setHeader("achievement unlocked")
     .setDescription(
-      `you have completed ${achievements[achievementId].emoji} ${achievements[achievementId].name}`
+      `you have completed ${achievements[achievementId].emoji} ${achievements[achievementId].name}`,
     );
 
   let earnedXp = 100;
@@ -176,7 +176,7 @@ async function completeAchievement(userId: string, achievementId: string) {
 
   if (rewardsDesc.length > 0) {
     userEmbed.setDescription(
-      (userEmbed.data.description += `\n\nrewards:\n${rewardsDesc.join("\n")}`)
+      (userEmbed.data.description += `\n\nrewards:\n${rewardsDesc.join("\n")}`),
     );
   }
 
@@ -191,7 +191,7 @@ async function completeAchievement(userId: string, achievementId: string) {
       prizes.push(
         `+ \`${amount}x\` ${getItems()[prize.split(":")[0]].emoji} ${
           getItems()[prize.split(":")[0]].name
-        }`
+        }`,
       );
     }
 
@@ -223,7 +223,7 @@ async function completeAchievement(userId: string, achievementId: string) {
         payload: {
           embed: new CustomEmbed(
             null,
-            `${getItems()[gem].emoji} you've found a gem! i wonder what powers it holds...`
+            `${getItems()[gem].emoji} you've found a gem! i wonder what powers it holds...`,
           )
             .setTitle("you've found a gem")
             .setColor(Constants.TRANSPARENT_EMBED_COLOR),
@@ -247,7 +247,7 @@ async function completeAchievement(userId: string, achievementId: string) {
       name: `${(await getLastKnownTag(userId)).split("#")[0]} has unlocked an achievement`,
     })
     .setDescription(
-      `${achievements[achievementId].emoji} ${achievements[achievementId].name}\n\n*${achievements[achievementId].description}*`
+      `${achievements[achievementId].emoji} ${achievements[achievementId].name}\n\n*${achievements[achievementId].description}*`,
     )
     .setFooter({
       text: `completed by ${completed.toLocaleString()} ${completed == 1 ? "person" : "people"}`,

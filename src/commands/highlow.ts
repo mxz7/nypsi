@@ -54,12 +54,12 @@ const cmd = new Command("highlow", "higher or lower game", "money").setAliases([
 
 cmd.slashEnabled = true;
 cmd.slashData.addStringOption((option) =>
-  option.setName("bet").setDescription("how much would you like to bet").setRequired(false)
+  option.setName("bet").setDescription("how much would you like to bet").setRequired(false),
 );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (!(await userExists(message.member))) await createUser(message.member);
 
@@ -109,7 +109,7 @@ module.exports = cmd;
 async function prepareGame(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
-  msg?: Message
+  msg?: Message,
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -149,7 +149,7 @@ async function prepareGame(
       .addField("usage", "/highlow <bet>")
       .addField(
         "game rules",
-        "you'll receive your first card and you have to predict whether the next card you pick up will be higher or lower in value than the card that you have, you can cash out after predicting correctly once."
+        "you'll receive your first card and you have to predict whether the next card you pick up will be higher or lower in value than the card that you have, you can cash out after predicting correctly once.",
       )
       .addField(
         "help",
@@ -157,7 +157,7 @@ async function prepareGame(
           "**Q**ueen | value of 12\n**K**ing | value of 13\n" +
           "⬆ **higher** the next card will be higher in value than your current card\n" +
           "⬇ **lower** the next card will be lower in value than your current card\n" +
-          "💰 **cash out** end the game and receive the current win\nmax win **15**x"
+          "💰 **cash out** end the game and receive the current win\nmax win **15**x",
       );
 
     return send({ embeds: [embed] });
@@ -169,7 +169,7 @@ async function prepareGame(
       "highlow works exactly how it would in real life\n" +
         "when you create a game, a full 52 deck is shuffled in a random order\n" +
         "for every new card you take, it is taken from the first in the deck (array) and then removed from the deck\n" +
-        "view the code for this [here](https://github.com/tekoh/nypsi/blob/main/src/commands/highlow.ts)"
+        "view the code for this [here](https://github.com/tekoh/nypsi/blob/main/src/commands/highlow.ts)",
     ).setHeader("highlow help");
 
     return send({ embeds: [embed] });
@@ -208,7 +208,7 @@ async function prepareGame(
       return msg.edit({
         embeds: [
           new ErrorEmbed(
-            `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
+            `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`,
           ),
         ],
       });
@@ -216,7 +216,7 @@ async function prepareGame(
       return send({
         embeds: [
           new ErrorEmbed(
-            `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
+            `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`,
           ),
         ],
       });
@@ -329,12 +329,12 @@ async function prepareGame(
       .setCustomId("💰")
       .setLabel("cash out")
       .setStyle(ButtonStyle.Success)
-      .setDisabled(true)
+      .setDisabled(true),
   );
 
   const embed = new CustomEmbed(
     message.member,
-    "**bet** $" + bet.toLocaleString() + "\n**0**x ($0)"
+    "**bet** $" + bet.toLocaleString() + "\n**0**x ($0)",
   )
     .setHeader("highlow", message.author.avatarURL())
     .addField("card", "| " + games.get(message.member.user.id).card + " |");
@@ -396,7 +396,7 @@ function getValue(member: GuildMember) {
 async function playGame(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
   m: Message,
-  args: string[]
+  args: string[],
 ): Promise<void> {
   if (!games.has(message.author.id)) return;
 
@@ -426,7 +426,7 @@ async function playGame(
     }
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder().setLabel("play again").setStyle(ButtonStyle.Success).setCustomId("rp")
+      new ButtonBuilder().setLabel("play again").setStyle(ButtonStyle.Success).setCustomId("rp"),
     );
 
     await m.edit({ embeds: [embed], components: [row] });
@@ -470,7 +470,7 @@ async function playGame(
             embeds: [
               new CustomEmbed(
                 message.member,
-                "fun & moderation commands are still available to you. maintenance mode only prevents certain commands to prevent loss of progress"
+                "fun & moderation commands are still available to you. maintenance mode only prevents certain commands to prevent loss of progress",
               ).setTitle("⚠️ nypsi is under maintenance"),
             ],
           });
@@ -502,7 +502,7 @@ async function playGame(
         "**x ($" +
         Math.round(bet * win).toLocaleString() +
         ")" +
-        "\n\n**you lose!!**"
+        "\n\n**you lose!!**",
     );
     newEmbed.addField("card", "| " + card + " |");
     games.delete(message.author.id);
@@ -530,7 +530,7 @@ async function playGame(
           "\n" +
           "+**" +
           Math.floor(games.get(message.member.user.id).voted * 100).toString() +
-          "**% bonus"
+          "**% bonus",
       );
     } else {
       newEmbed.setDescription(
@@ -543,7 +543,7 @@ async function playGame(
           Math.round(bet * win).toLocaleString() +
           ")" +
           "\n\n**winner!!**\n**you win** $" +
-          winnings.toLocaleString()
+          winnings.toLocaleString(),
       );
     }
 
@@ -609,7 +609,7 @@ async function playGame(
         Math.round(bet * win).toLocaleString() +
         ")" +
         "\n\n**draw!!**\nyou win $" +
-        bet.toLocaleString()
+        bet.toLocaleString(),
     );
     newEmbed.addField("card", "| " + card + " |");
     await updateBalance(message.member, (await getBalance(message.member)) + bet);
@@ -676,7 +676,7 @@ async function playGame(
           .setCustomId("💰")
           .setLabel("cash out")
           .setStyle(ButtonStyle.Success)
-          .setDisabled(true)
+          .setDisabled(true),
       );
 
       if (win >= 1) {
@@ -687,7 +687,7 @@ async function playGame(
             .setCustomId("💰")
             .setLabel("cash out")
             .setStyle(ButtonStyle.Success)
-            .setDisabled(false)
+            .setDisabled(false),
         );
       }
 
@@ -698,7 +698,7 @@ async function playGame(
           win +
           "**x ($" +
           Math.round(bet * win).toLocaleString() +
-          ")"
+          ")",
       );
       newEmbed.addField("card", "| " + card + " |");
       await edit({ embeds: [newEmbed], components: [row] });
@@ -711,7 +711,7 @@ async function playGame(
           win +
           "**x ($" +
           Math.round(bet * win).toLocaleString() +
-          ")"
+          ")",
       );
       newEmbed.addField("card", "| " + card + " |");
 
@@ -750,7 +750,7 @@ async function playGame(
           .setCustomId("💰")
           .setLabel("cash out")
           .setStyle(ButtonStyle.Success)
-          .setDisabled(true)
+          .setDisabled(true),
       );
 
       if (win >= 1) {
@@ -761,7 +761,7 @@ async function playGame(
             .setCustomId("💰")
             .setLabel("cash out")
             .setStyle(ButtonStyle.Success)
-            .setDisabled(false)
+            .setDisabled(false),
         );
       }
 
@@ -772,7 +772,7 @@ async function playGame(
           win +
           "**x ($" +
           Math.round(bet * win).toLocaleString() +
-          ")"
+          ")",
       );
       newEmbed.addField("card", "| " + card + " |");
       await edit({ embeds: [newEmbed], components: [row] });
@@ -785,7 +785,7 @@ async function playGame(
           win +
           "**x ($" +
           Math.round(bet * win).toLocaleString() +
-          ")"
+          ")",
       );
       newEmbed.addField("card", "| " + card + " |");
       await edit({ embeds: [newEmbed] });

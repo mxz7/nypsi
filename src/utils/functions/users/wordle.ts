@@ -16,7 +16,7 @@ export async function addWordleGame(
   member: GuildMember,
   win: boolean,
   attempts?: number,
-  seconds?: number
+  seconds?: number,
 ) {
   const profile = await getWordleStats(member);
 

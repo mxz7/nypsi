@@ -8,7 +8,7 @@ const cmd = new Command("ezpoll", "simple poll builder", "utility");
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (await onCooldown(cmd.name, message.member)) {
     const embed = await getResponse(cmd.name, message.member);
@@ -25,7 +25,7 @@ async function run(
       .addField(
         "help",
         "after creation your message will be deleted and an embed will be created to act as the poll\n" +
-          "every word will be an option in the poll, with a maximum of 4 and minimum of two - use _ to have a space"
+          "every word will be an option in the poll, with a maximum of 4 and minimum of two - use _ to have a space",
       )
       .addField("example", `${prefix}ezpoll option1 option2`);
 

@@ -180,7 +180,7 @@ export async function startChatReactionDuel(
   channel: TextChannel,
   challenger: GuildMember,
   target: GuildMember,
-  wager: number
+  wager: number,
 ): Promise<null | string> {
   const word = await generateWord(guild);
 
@@ -189,7 +189,7 @@ export async function startChatReactionDuel(
       embeds: [
         new CustomEmbed(
           challenger,
-          `**wager** $${wager.toLocaleString()}\n\nstarting in 3 seconds`
+          `**wager** $${wager.toLocaleString()}\n\nstarting in 3 seconds`,
         ).setHeader(`${challenger.user.username} vs ${target.user.username}`),
       ],
     })
@@ -203,7 +203,7 @@ export async function startChatReactionDuel(
         embeds: [
           new CustomEmbed(
             challenger,
-            `**wager** $${wager.toLocaleString()}\n\nstarting in 2 seconds`
+            `**wager** $${wager.toLocaleString()}\n\nstarting in 2 seconds`,
           ).setHeader(`${challenger.user.username} vs ${target.user.username}`),
         ],
       })
@@ -217,7 +217,7 @@ export async function startChatReactionDuel(
         embeds: [
           new CustomEmbed(
             challenger,
-            `**wager** $${wager.toLocaleString()}\n\nstarting in 1 second`
+            `**wager** $${wager.toLocaleString()}\n\nstarting in 1 second`,
           ).setHeader(`${challenger.user.username} vs ${target.user.username}`),
         ],
       })
@@ -229,7 +229,7 @@ export async function startChatReactionDuel(
 
   embed.setHeader(`${challenger.user.username} vs ${target.user.username}`);
   embed.setDescription(
-    `${wager > 0 ? ` **wager** $${wager.toLocaleString()}\n\n` : ""}type: \`${word.display}\``
+    `${wager > 0 ? ` **wager** $${wager.toLocaleString()}\n\n` : ""}type: \`${word.display}\``,
   );
 
   if (countdownMsg && countdownMsg.deletable) await countdownMsg.delete().catch(() => {});
@@ -285,7 +285,7 @@ export async function startChatReactionDuel(
       winnings > 0
         ? `\n\n+$**${winnings.toLocaleString()}**${tax ? ` (${(tax * 100).toFixed(1)}% tax)` : ""}`
         : ""
-    }`
+    }`,
   );
 
   await addProgress(winningMessage.author.id, "fast_typer", 1);
@@ -320,7 +320,7 @@ export async function startChatReactionDuel(
     wager,
     winningMessage.author.id == challenger.user.id,
     gameId,
-    winningMessage.author.id == challenger.user.id ? winnings : null
+    winningMessage.author.id == challenger.user.id ? winnings : null,
   );
   gamble(
     target.user,
@@ -328,7 +328,7 @@ export async function startChatReactionDuel(
     wager,
     winningMessage.author.id == target.user.id,
     gameId,
-    winningMessage.author.id == target.user.id ? winnings : null
+    winningMessage.author.id == target.user.id ? winnings : null,
   );
 
   embed.setFooter({ text: `id: ${gameId}` });

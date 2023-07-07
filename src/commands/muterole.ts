@@ -11,7 +11,7 @@ const cmd = new Command("muterole", "set the muterole for the server", "admin")
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
     if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
@@ -62,7 +62,7 @@ async function run(
       return message.channel.send({
         embeds: [
           new ErrorEmbed(
-            `${prefix}**muterole set <role>**\n\nyou can mention the role, use the role's ID or name`
+            `${prefix}**muterole set <role>**\n\nyou can mention the role, use the role's ID or name`,
           ),
         ],
       });
@@ -93,7 +93,7 @@ async function run(
       embeds: [
         new CustomEmbed(
           message.member,
-          `✅ muterole has been updated to ${role.toString()}\n\nnote: any currently muted users will be automatically unmuted. check these users with (${prefix}**muted**)`
+          `✅ muterole has been updated to ${role.toString()}\n\nnote: any currently muted users will be automatically unmuted. check these users with (${prefix}**muted**)`,
         ),
       ],
     });
@@ -145,7 +145,7 @@ async function run(
       return message.channel.send({
         embeds: [
           new ErrorEmbed(
-            "error creating mute role - make sure i have `manage roles` permission and `manage channels`"
+            "error creating mute role - make sure i have `manage roles` permission and `manage channels`",
           ),
         ],
       });
@@ -154,7 +154,7 @@ async function run(
       return message.channel.send({
         embeds: [
           new ErrorEmbed(
-            "error creating mute role - make sure i have `manage roles` permission and `manage channels`"
+            "error creating mute role - make sure i have `manage roles` permission and `manage channels`",
           ),
         ],
       });
@@ -168,7 +168,7 @@ async function run(
 
     const embed = new CustomEmbed(
       message.member,
-      `✅ now using **timeout** mode\n\nnote: any currently muted users will be automatically unmuted. check these users with (${prefix}**muted**)`
+      `✅ now using **timeout** mode\n\nnote: any currently muted users will be automatically unmuted. check these users with (${prefix}**muted**)`,
     );
 
     return message.channel.send({

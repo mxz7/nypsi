@@ -84,7 +84,7 @@ export async function add3rdPlace(guild: Guild, member: GuildMember) {
 
 export async function getServerLeaderboard(
   guild: Guild,
-  amount: number
+  amount: number,
 ): Promise<Map<string, string>> {
   let members: Collection<string, GuildMember>;
 

@@ -409,11 +409,11 @@ export async function hasPadlock(member: GuildMember): Promise<boolean> {
 
   await redis.set(
     `${Constants.redis.cache.economy.PADLOCK}:${member.user.id}`,
-    query.padlock ? "y" : "n"
+    query.padlock ? "y" : "n",
   );
   await redis.expire(
     `${Constants.redis.cache.economy.PADLOCK}:${member.user.id}`,
-    Math.floor(ms("6 hours") / 1000)
+    Math.floor(ms("6 hours") / 1000),
   );
 
   return query.padlock;
@@ -596,7 +596,7 @@ export async function calcNetWorth(member: GuildMember | string, breakdown = fal
     if (breakdown)
       breakdownItems.set(
         "guild",
-        Math.floor(guildWorth / query.EconomyGuildMember.guild.members.length)
+        Math.floor(guildWorth / query.EconomyGuildMember.guild.members.length),
       );
   } else if (breakdown) {
     breakdownItems.set("guild", 0);
@@ -653,7 +653,7 @@ export async function calcNetWorth(member: GuildMember | string, breakdown = fal
     for (const upgrade of worker.upgrades) {
       if (!baseUpgrades[upgrade.upgradeId].base_cost) {
         const itemId = Array.from(Object.keys(getItems())).find(
-          (i) => getItems()[i].worker_upgrade_id === upgrade.upgradeId
+          (i) => getItems()[i].worker_upgrade_id === upgrade.upgradeId,
         );
         if (!itemId) continue;
 
@@ -706,7 +706,7 @@ export async function calcNetWorth(member: GuildMember | string, breakdown = fal
           content: "",
           embed: new CustomEmbed(
             null,
-            `$${Number(query.netWorth).toLocaleString()} ➔ $${Math.floor(worth).toLocaleString()}`
+            `$${Number(query.netWorth).toLocaleString()} ➔ $${Math.floor(worth).toLocaleString()}`,
           ).setColor(Constants.TRANSPARENT_EMBED_COLOR),
         },
       };

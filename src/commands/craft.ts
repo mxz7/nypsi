@@ -25,15 +25,15 @@ const cmd = new Command("craft", "craft items", "money");
 cmd.slashEnabled = true;
 cmd.slashData
   .addStringOption((option) =>
-    option.setName("craft-item").setAutocomplete(true).setDescription("item to craft")
+    option.setName("craft-item").setAutocomplete(true).setDescription("item to craft"),
   )
   .addStringOption((option) =>
-    option.setName("amount").setDescription("amount of item you want to craft")
+    option.setName("amount").setDescription("amount of item you want to craft"),
   );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (!(await userExists(message.member))) await createUser(message.member);
 
@@ -83,7 +83,7 @@ async function run(
 
     const embed = new CustomEmbed(message.member).setHeader(
       "currently crafting",
-      message.author.avatarURL()
+      message.author.avatarURL(),
     );
 
     const desc: string[] = [];
@@ -92,7 +92,7 @@ async function run(
       desc.push(
         `\`${craftingItem.amount.toLocaleString()}x\` ${items[craftingItem.itemId].emoji} ${
           items[craftingItem.itemId].name
-        } finished <t:${Math.floor(craftingItem.finished.getTime() / 1000)}:R>`
+        } finished <t:${Math.floor(craftingItem.finished.getTime() / 1000)}:R>`,
       );
     }
 
@@ -100,7 +100,7 @@ async function run(
 
     const components = [
       new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder().setCustomId("bck").setLabel("back").setStyle(ButtonStyle.Primary)
+        new ButtonBuilder().setCustomId("bck").setLabel("back").setStyle(ButtonStyle.Primary),
       ),
     ];
 
@@ -150,7 +150,7 @@ async function run(
         desc.push(
           `\`${completed.amount}x\` ${items[completed.itemId].emoji} ${
             items[completed.itemId].name
-          }`
+          }`,
         );
       }
 
@@ -183,7 +183,7 @@ async function run(
 
       for (const [key, value] of owned.entries()) {
         const needed = parseInt(
-          items[itemId].craft.ingrediants.find((i) => i.split(":")[0] == key).split(":")[1]
+          items[itemId].craft.ingrediants.find((i) => i.split(":")[0] == key).split(":")[1],
         );
 
         item += `\n- ${items[key].emoji} ${
@@ -214,7 +214,7 @@ async function run(
 
     if (availableToCraft.length == 0) {
       availableToCraft.push(
-        "you can not currently craft anything. collect more items to discover craftable items"
+        "you can not currently craft anything. collect more items to discover craftable items",
       );
     }
 
@@ -242,7 +242,7 @@ async function run(
           .setLabel("back")
           .setStyle(ButtonStyle.Primary)
           .setDisabled(true),
-        new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
+        new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
       );
 
       embed.setFooter({ text: `1/${pages.size}` });
@@ -254,7 +254,7 @@ async function run(
           new ButtonBuilder()
             .setCustomId("prog")
             .setLabel("currently crafting")
-            .setStyle(ButtonStyle.Success)
+            .setStyle(ButtonStyle.Success),
         );
     }
 
@@ -318,7 +318,7 @@ async function run(
                 .setCustomId("➡")
                 .setLabel("next")
                 .setStyle(ButtonStyle.Primary)
-                .setDisabled(false)
+                .setDisabled(false),
             );
           } else {
             components[0].setComponents(
@@ -331,7 +331,7 @@ async function run(
                 .setCustomId("➡")
                 .setLabel("next")
                 .setStyle(ButtonStyle.Primary)
-                .setDisabled(false)
+                .setDisabled(false),
             );
           }
           await reaction.message.edit({ embeds: [embed], components });
@@ -356,7 +356,7 @@ async function run(
                 .setCustomId("➡")
                 .setLabel("next")
                 .setStyle(ButtonStyle.Primary)
-                .setDisabled(true)
+                .setDisabled(true),
             );
           } else {
             components[0].setComponents(
@@ -369,7 +369,7 @@ async function run(
                 .setCustomId("➡")
                 .setLabel("next")
                 .setStyle(ButtonStyle.Primary)
-                .setDisabled(false)
+                .setDisabled(false),
             );
           }
           await reaction.message.edit({ embeds: [embed], components });
@@ -400,7 +400,7 @@ async function run(
           new ErrorEmbed(
             `you have reached your crafting slots limit (${max})${
               max == 2 ? "\n\nyou can upgrade this with premium membership (`/premium`)" : ""
-            }`
+            }`,
           ),
         ],
       });
@@ -472,8 +472,8 @@ async function run(
           message.member,
           item,
           inventory.find((i) => i.item == item).amount - amount * ingrediantAmount,
-          false
-        )
+          false,
+        ),
       );
 
       promises.push(addStat(message.member, item, amount).catch(() => {}));
@@ -489,7 +489,7 @@ async function run(
           message.member,
           `\`${amount.toLocaleString()}x\` ${selected.emoji} ${
             amount > 1 ? selected.plural || selected.name : selected.name
-          } will be crafted <t:${Math.floor(craft.finished.getTime() / 1000)}:R>`
+          } will be crafted <t:${Math.floor(craft.finished.getTime() / 1000)}:R>`,
         ),
       ],
     });

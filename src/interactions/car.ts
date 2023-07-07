@@ -20,7 +20,7 @@ export default {
           (item.includes(focused.value) ||
             items[item].name.includes(focused.value) ||
             items[item].aliases?.includes(focused.value)) &&
-          items[item].role == "car"
+          items[item].role == "car",
       );
 
     options.push("cycle");

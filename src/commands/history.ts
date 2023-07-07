@@ -27,12 +27,12 @@ const cmd = new Command("history", "view punishment history for a given user", "
 
 cmd.slashEnabled = true;
 cmd.slashData.addStringOption((option) =>
-  option.setName("user").setDescription("use the user's id or username").setRequired(true)
+  option.setName("user").setDescription("use the user's id or username").setRequired(true),
 );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
     if (!message.member.permissions.has(PermissionFlagsBits.ModerateMembers)) {
@@ -144,7 +144,7 @@ async function run(
           "` - " +
           case0.command +
           "\non " +
-          `<t:${Math.floor(case0.time.getTime() / 1000)}:d>`
+          `<t:${Math.floor(case0.time.getTime() / 1000)}:d>`,
       );
     }
   }
@@ -157,7 +157,7 @@ async function run(
       .setLabel("back")
       .setStyle(ButtonStyle.Primary)
       .setDisabled(true),
-    new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
+    new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
   );
 
   if (pages.length >= 2) {
@@ -219,7 +219,7 @@ async function run(
                   "` - " +
                   case0.command +
                   "\non " +
-                  `<t:${Math.floor(case0.time.getTime() / 1000)}:d>`
+                  `<t:${Math.floor(case0.time.getTime() / 1000)}:d>`,
               );
             }
           }
@@ -237,7 +237,7 @@ async function run(
                 .setCustomId("➡")
                 .setLabel("next")
                 .setStyle(ButtonStyle.Primary)
-                .setDisabled(false)
+                .setDisabled(false),
             );
           } else {
             row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -250,7 +250,7 @@ async function run(
                 .setCustomId("➡")
                 .setLabel("next")
                 .setStyle(ButtonStyle.Primary)
-                .setDisabled(false)
+                .setDisabled(false),
             );
           }
           await edit({ embeds: [newEmbed], components: [row] }, msg);
@@ -272,7 +272,7 @@ async function run(
                   "` - " +
                   case0.command +
                   "\nat " +
-                  `<t:${Math.floor(case0.time.getTime() / 1000)}:d>`
+                  `<t:${Math.floor(case0.time.getTime() / 1000)}:d>`,
               );
             }
           }
@@ -290,7 +290,7 @@ async function run(
                 .setCustomId("➡")
                 .setLabel("next")
                 .setStyle(ButtonStyle.Primary)
-                .setDisabled(true)
+                .setDisabled(true),
             );
           } else {
             row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -303,7 +303,7 @@ async function run(
                 .setCustomId("➡")
                 .setLabel("next")
                 .setStyle(ButtonStyle.Primary)
-                .setDisabled(false)
+                .setDisabled(false),
             );
           }
           await edit({ embeds: [newEmbed], components: [row] }, msg);

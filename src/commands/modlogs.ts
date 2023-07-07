@@ -11,7 +11,7 @@ const cmd = new Command("modlogs", "set/update the modlogs channel", "admin").se
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
     if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
@@ -29,7 +29,7 @@ async function run(
     return message.channel.send({
       embeds: [
         new ErrorEmbed(
-          "i need the `manage webhooks` and `manage channels` permissions for this command"
+          "i need the `manage webhooks` and `manage channels` permissions for this command",
         ),
       ],
     });
@@ -81,7 +81,7 @@ async function run(
         return message.channel.send({
           embeds: [
             new ErrorEmbed(
-              "you need to mention a channel, you can use the channel ID, or mention the channel by putting a # before the channel name"
+              "you need to mention a channel, you can use the channel ID, or mention the channel by putting a # before the channel name",
             ),
           ],
         });
@@ -118,7 +118,7 @@ async function run(
         message.channel.send({
           embeds: [
             new ErrorEmbed(
-              "i was unable to make a webhook in that channel, please check my permissions"
+              "i was unable to make a webhook in that channel, please check my permissions",
             ),
           ],
         });

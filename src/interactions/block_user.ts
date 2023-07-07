@@ -18,7 +18,7 @@ export default {
       return interaction.reply({
         embeds: [
           new CustomEmbed(null, "please wait until your offer has been processed").setColor(
-            Constants.TRANSPARENT_EMBED_COLOR
+            Constants.TRANSPARENT_EMBED_COLOR,
           ),
         ],
         ephemeral: true,
@@ -52,7 +52,7 @@ export default {
       embeds: [
         new CustomEmbed(
           null,
-          `✅ added **${await getLastKnownTag(offer.ownerId)}** to your block list`
+          `✅ added **${await getLastKnownTag(offer.ownerId)}** to your block list`,
         ),
       ],
     });

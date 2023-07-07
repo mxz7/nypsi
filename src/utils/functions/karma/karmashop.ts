@@ -11,7 +11,7 @@ declare function require(name: string): any;
 
 async function createNextDate() {
   const nextOpen = new Date(
-    Date.now() + (Math.floor(Math.random() * ms("10 days")) + ms("10 days"))
+    Date.now() + (Math.floor(Math.random() * ms("10 days")) + ms("10 days")),
   );
   const adjusted = dayjs(nextOpen).set("minutes", 0).set("seconds", 0);
 
@@ -111,11 +111,11 @@ export async function openKarmaShop(client: NypsiClient, now = false) {
         {
           context: {
             content: `🔮 <@&1088800175532806187> karma shop has been opened!! it will next open at <t:${Math.floor(
-              (await getNextKarmaShopOpen()).getTime() / 1000
+              (await getNextKarmaShopOpen()).getTime() / 1000,
             )}>`,
             cluster: cluster,
           },
-        }
+        },
       )
       .then((res) => {
         res.filter((i) => Boolean(i));

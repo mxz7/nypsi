@@ -9,7 +9,7 @@ const cmd = new Command("skin", "view the skin of a minecraft account", "minecra
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   const prefix = await getPrefix(message.guild);
 
@@ -50,7 +50,7 @@ async function run(
 
   const embed = new CustomEmbed(
     message.member,
-    `[download](https://mc-heads.net/download/${uuid.id})`
+    `[download](https://mc-heads.net/download/${uuid.id})`,
   )
     .setTitle(uuid.name)
     .setURL("https://namemc.com/profile/" + username)

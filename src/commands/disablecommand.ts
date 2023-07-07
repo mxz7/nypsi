@@ -15,7 +15,7 @@ const cmd = new Command("disablecommand", "disable certain commands in your serv
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
     if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
@@ -54,7 +54,7 @@ async function run(
     if (filter.indexOf(word) > -1) {
       const embed = new CustomEmbed(
         message.member,
-        "❌ `" + prefix + word + "` is already disabled"
+        "❌ `" + prefix + word + "` is already disabled",
       ).setFooter({
         text: `you can use ${prefix}disablecmd to view currently disabled commands`,
       });
@@ -66,7 +66,7 @@ async function run(
       return message.channel.send({
         embeds: [
           new ErrorEmbed(
-            `you must use the command's name, you can use ${prefix}help <command> to find this`
+            `you must use the command's name, you can use ${prefix}help <command> to find this`,
           ),
         ],
       });
@@ -83,7 +83,7 @@ async function run(
 
       const embed = new CustomEmbed(
         message.member,
-        `❌ filter has exceeded the maximum size - please use *${prefix}disablecmd del/-* or *${prefix}disablecmd reset*`
+        `❌ filter has exceeded the maximum size - please use *${prefix}disablecmd del/-* or *${prefix}disablecmd reset*`,
       ).setHeader("chat filter");
 
       return message.channel.send({ embeds: [embed] });
@@ -93,7 +93,7 @@ async function run(
 
     const embed = new CustomEmbed(
       message.member,
-      "✅ disabled `" + prefix + word + "` command"
+      "✅ disabled `" + prefix + word + "` command",
     ).setHeader("disabled commands");
     return message.channel.send({ embeds: [embed] });
   } else if (args[0].toLowerCase() == "del" || args[0].toLowerCase() == "-") {
@@ -119,7 +119,7 @@ async function run(
 
     const embed = new CustomEmbed(
       message.member,
-      "✅ `" + prefix + word + "` is no longer disabled"
+      "✅ `" + prefix + word + "` is no longer disabled",
     )
       .setHeader("disable commands")
       .setFooter({ text: `you can use ${prefix}disablecmd reset to reset disabled commands` });
@@ -131,7 +131,7 @@ async function run(
     await updateDisabledCommands(message.guild, filter);
 
     const embed = new CustomEmbed(message.member, "✅ disabled commands have been reset").setHeader(
-      "disabled commands"
+      "disabled commands",
     );
 
     return message.channel.send({ embeds: [embed] });

@@ -148,7 +148,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const embed = new CustomEmbed(message.member).setHeader(
       `${message.author.username}'s robbery`,
-      message.author.avatarURL()
+      message.author.avatarURL(),
     );
 
     if (chance > 65) {
@@ -173,7 +173,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       });
 
       embed.setDescription(
-        `**success!**\n\n**you stole** $${stolen.toLocaleString()} from **${bank}**`
+        `**success!**\n\n**you stole** $${stolen.toLocaleString()} from **${bank}**`,
       );
       embed.setColor(Constants.EMBED_SUCCESS_COLOR);
       embed.setFooter({ text: `id: ${id}` });
@@ -193,7 +193,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           message.member,
           "lawyer",
           inventory.find((i) => i.item == "lawyer").amount - 1,
-          false
+          false,
         );
       }
 
@@ -217,11 +217,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       if (lawyer) {
         embed.setDescription(
-          `**you were caught**\n\nthanks to your lawyer, you only lost $**${totalLossed.toLocaleString()}**`
+          `**you were caught**\n\nthanks to your lawyer, you only lost $**${totalLossed.toLocaleString()}**`,
         );
       } else {
         embed.setDescription(
-          `**you were caught**\n\nyou lost $**${totalLossed.toLocaleString()}**`
+          `**you were caught**\n\nyou lost $**${totalLossed.toLocaleString()}**`,
         );
       }
     }
@@ -242,8 +242,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (!(await onCooldown(cmd.name, message.member)))
     components.push(
       new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder().setCustomId("ro").setLabel("rob").setStyle(ButtonStyle.Danger)
-      )
+        new ButtonBuilder().setCustomId("ro").setLabel("rob").setStyle(ButtonStyle.Danger),
+      ),
     );
 
   const msg = await send({ embeds: [embed], components });

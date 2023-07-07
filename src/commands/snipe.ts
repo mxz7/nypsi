@@ -9,7 +9,7 @@ const cmd = new Command("snipe", "snipe the most recently deleted message", "fun
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   let channel: Channel = message.channel;
 

@@ -22,12 +22,12 @@ avatar.setAliases(["av", "pfp", "picture"]);
 avatar.slashEnabled = true;
 
 avatar.slashData.addUserOption((option) =>
-  option.setName("user").setDescription("view avatar of this user").setRequired(false)
+  option.setName("user").setDescription("view avatar of this user").setRequired(false),
 );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   let member: GuildMember;
 
@@ -65,7 +65,7 @@ async function run(
     new ButtonBuilder()
       .setCustomId("x")
       .setLabel("show server avatar")
-      .setStyle(ButtonStyle.Primary)
+      .setStyle(ButtonStyle.Primary),
   );
 
   const embed = new CustomEmbed(member).setHeader(member.user.tag).setImage(avatar);

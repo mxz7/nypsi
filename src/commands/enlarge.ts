@@ -4,12 +4,12 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getPrefix } from "../utils/functions/guilds/utils";
 
 const cmd = new Command("enlarge", "enlarge a custom emoji to its full size", "utility").setAliases(
-  ["emoji", "makebig"]
+  ["emoji", "makebig"],
 );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   const prefix = await getPrefix(message.guild);
 

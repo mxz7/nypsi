@@ -80,7 +80,7 @@ const cmd = new Command("mines", "play mines", "money").setAliases(["minesweeper
 cmd.slashEnabled = true;
 cmd.slashData
   .addStringOption((option) =>
-    option.setName("bet").setDescription("how much would you like to bet").setRequired(false)
+    option.setName("bet").setDescription("how much would you like to bet").setRequired(false),
   )
   .addIntegerOption((option) =>
     option
@@ -89,13 +89,13 @@ cmd.slashData
       .setChoices(
         ...(Array.from(mineIncrements.keys()).map((n) => {
           return { name: n.toString(), value: n };
-        }) as APIApplicationCommandOptionChoice<number>[])
-      )
+        }) as APIApplicationCommandOptionChoice<number>[]),
+      ),
   );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (!(await userExists(message.member))) await createUser(message.member);
 
@@ -149,7 +149,7 @@ async function run(
         "game rules",
         "a 5x5 grid of white squares will be created\n" +
           "once youve chosen your square, it will become green if there was no mine, if there was, you will lose your bet\n" +
-          "if you don't choose an amount of mines, you will be given 3-6 mines, giving you 0.5x per square"
+          "if you don't choose an amount of mines, you will be given 3-6 mines, giving you 0.5x per square",
       );
 
     return send({ embeds: [embed] });
@@ -165,7 +165,7 @@ module.exports = cmd;
 async function prepareGame(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
-  msg?: Message
+  msg?: Message,
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -250,7 +250,7 @@ async function prepareGame(
       return msg.edit({
         embeds: [
           new ErrorEmbed(
-            `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
+            `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`,
           ),
         ],
       });
@@ -258,7 +258,7 @@ async function prepareGame(
       return send({
         embeds: [
           new ErrorEmbed(
-            `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
+            `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`,
           ),
         ],
       });
@@ -279,8 +279,8 @@ async function prepareGame(
         embeds: [
           new ErrorEmbed(
             `you cannot use this amount of mines\nallowed: ${Array.from(mineIncrements.keys()).join(
-              ", "
-            )}`
+              ", ",
+            )}`,
           ),
         ],
       });
@@ -289,8 +289,8 @@ async function prepareGame(
         embeds: [
           new ErrorEmbed(
             `you cannot use this amount of mines\nallowed: ${Array.from(mineIncrements.keys()).join(
-              ", "
-            )}`
+              ", ",
+            )}`,
           ),
         ],
       });
@@ -396,7 +396,7 @@ async function prepareGame(
 
   const embed = new CustomEmbed(
     message.member,
-    "**bet** $" + bet.toLocaleString() + "\n**0**x ($0)"
+    "**bet** $" + bet.toLocaleString() + "\n**0**x ($0)",
   ).setHeader("mines", message.author.avatarURL());
 
   const rows = getRows(grid, false);
@@ -501,7 +501,7 @@ function toLocation(coordinate: string) {
 async function playGame(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
   msg: Message,
-  args: string[]
+  args: string[],
 ): Promise<void> {
   if (!games.has(message.author.id)) return;
 
@@ -591,7 +591,7 @@ async function playGame(
             embeds: [
               new CustomEmbed(
                 message.member,
-                "fun & moderation commands are still available to you. maintenance mode only prevents certain commands to prevent loss of progress"
+                "fun & moderation commands are still available to you. maintenance mode only prevents certain commands to prevent loss of progress",
               ).setTitle("⚠️ nypsi is under maintenance"),
             ],
           });
@@ -620,7 +620,7 @@ async function playGame(
         win.toFixed(2) +
         "**x ($" +
         Math.round(bet * win).toLocaleString() +
-        ")\n\n**you lose!!**"
+        ")\n\n**you lose!!**",
     );
     games.delete(message.author.id);
     return replay(embed);
@@ -647,7 +647,7 @@ async function playGame(
           "\n" +
           "+**" +
           Math.floor(games.get(message.member.user.id).voted * 100).toString() +
-          "**% bonus"
+          "**% bonus",
       );
     } else {
       embed.setDescription(
@@ -660,7 +660,7 @@ async function playGame(
           Math.round(bet * win).toLocaleString() +
           ")" +
           "\n\n**winner!!**\n**you win** $" +
-          winnings.toLocaleString()
+          winnings.toLocaleString(),
       );
     }
 
@@ -721,7 +721,7 @@ async function playGame(
         Math.round(bet * win).toLocaleString() +
         ")" +
         "\n\n**draw!!**\nyou win $" +
-        bet.toLocaleString()
+        bet.toLocaleString(),
     );
     await updateBalance(message.member, (await getBalance(message.member)) + bet);
     games.delete(message.author.id);
@@ -830,7 +830,7 @@ async function playGame(
             embeds: [
               new CustomEmbed(
                 message.member,
-                `${GEM_EMOJI} you found a **gem**!!\nit has been added to your inventory, i wonder what powers it has`
+                `${GEM_EMOJI} you found a **gem**!!\nit has been added to your inventory, i wonder what powers it has`,
               ),
             ],
             ephemeral: true,
@@ -856,7 +856,7 @@ async function playGame(
           win.toFixed(2) +
           "**x ($" +
           Math.round(bet * win).toLocaleString() +
-          ")"
+          ")",
       );
 
       if (win >= 15) {

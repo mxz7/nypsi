@@ -94,7 +94,7 @@ const GEM_EMOJI = "<:nypsi_gem_green:1046866209326514206>";
 cmd.slashEnabled = true;
 cmd.slashData
   .addStringOption((option) =>
-    option.setName("bet").setDescription("how much would you like to bet").setRequired(false)
+    option.setName("bet").setDescription("how much would you like to bet").setRequired(false),
   )
   .addStringOption((option) =>
     option
@@ -103,13 +103,13 @@ cmd.slashData
       .setChoices(
         ...Array.from(difficultyIncrements.keys()).map((i) => {
           return { name: i, value: i };
-        })
-      )
+        }),
+      ),
   );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (!(await userExists(message.member))) await createUser(message.member);
 
@@ -162,7 +162,7 @@ module.exports = cmd;
 async function prepareGame(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
-  msg?: Message
+  msg?: Message,
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -253,7 +253,7 @@ async function prepareGame(
       return msg.edit({
         embeds: [
           new ErrorEmbed(
-            `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
+            `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`,
           ),
         ],
       });
@@ -261,7 +261,7 @@ async function prepareGame(
       return send({
         embeds: [
           new ErrorEmbed(
-            `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
+            `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`,
           ),
         ],
       });
@@ -281,7 +281,7 @@ async function prepareGame(
       return msg.edit({
         embeds: [
           new ErrorEmbed(
-            `invalid difficulty\nallowed: ${Array.from(difficultyIncrements.keys()).join(", ")}`
+            `invalid difficulty\nallowed: ${Array.from(difficultyIncrements.keys()).join(", ")}`,
           ),
         ],
       });
@@ -289,7 +289,7 @@ async function prepareGame(
       return send({
         embeds: [
           new ErrorEmbed(
-            `invalid difficulty\nallowed: ${Array.from(difficultyIncrements.keys()).join(", ")}`
+            `invalid difficulty\nallowed: ${Array.from(difficultyIncrements.keys()).join(", ")}`,
           ),
         ],
       });
@@ -470,7 +470,7 @@ function createRows(board: string[][], end = false) {
       .setCustomId("random")
       .setLabel("random")
       .setStyle(ButtonStyle.Primary)
-      .setDisabled(end)
+      .setDisabled(end),
   );
 
   return rows;
@@ -479,7 +479,7 @@ function createRows(board: string[][], end = false) {
 async function playGame(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
   msg: Message,
-  args: string[]
+  args: string[],
 ): Promise<void> {
   const game = games.get(message.author.id);
   const board = game.board;
@@ -546,7 +546,7 @@ async function playGame(
             embeds: [
               new CustomEmbed(
                 message.member,
-                "fun & moderation commands are still available to you. maintenance mode only prevents certain commands to prevent loss of progress"
+                "fun & moderation commands are still available to you. maintenance mode only prevents certain commands to prevent loss of progress",
               ).setTitle("⚠️ nypsi is under maintenance"),
             ],
           });
@@ -583,7 +583,7 @@ async function playGame(
         game.win.toFixed(2) +
         "**x ($" +
         Math.round(game.bet * game.win).toLocaleString() +
-        ")\n\n**you lose!!**"
+        ")\n\n**you lose!!**",
     );
 
     replay(game.embed);
@@ -601,11 +601,11 @@ async function playGame(
     game.embed.setDescription(
       `**bet** $${game.bet.toLocaleString()}\n` +
         `**${game.win.toFixed(2)}**x ($${Math.round(
-          game.bet * game.win
+          game.bet * game.win,
         ).toLocaleString()})\n\n**winner!!**\n` +
         `**you win** $${winnings.toLocaleString()}${
           multi > 0 ? `\n**${Math.floor(multi * 100)}**% bonus` : ""
-        }`
+        }`,
     );
     game.embed.setColor(Constants.EMBED_SUCCESS_COLOR);
 
@@ -679,7 +679,7 @@ async function playGame(
         Math.round(game.bet * game.win).toLocaleString() +
         ")" +
         "\n\n**draw!!**\nyou win $" +
-        game.bet.toLocaleString()
+        game.bet.toLocaleString(),
     );
     await updateBalance(message.member, (await getBalance(message.member)) + game.bet);
     games.delete(message.author.id);
@@ -718,7 +718,7 @@ async function playGame(
               embeds: [
                 new CustomEmbed(
                   message.member,
-                  `${GEM_EMOJI} you found a **gem**!!\nit has been added to your inventory, i wonder what powers it has`
+                  `${GEM_EMOJI} you found a **gem**!!\nit has been added to your inventory, i wonder what powers it has`,
                 ),
               ],
               ephemeral: true,
@@ -744,7 +744,7 @@ async function playGame(
             game.win.toFixed(2) +
             "**x ($" +
             Math.round(game.bet * game.win).toLocaleString() +
-            ")"
+            ")",
         );
 
         if (y >= 8) {

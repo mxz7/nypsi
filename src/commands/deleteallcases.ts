@@ -30,7 +30,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const embed = new CustomEmbed(
     message.member,
-    "react with ✅ to delete all punishment/moderation cases"
+    "react with ✅ to delete all punishment/moderation cases",
   )
     .setHeader("confirmation")
     .setFooter({ text: "this cannot be reversed" });
@@ -57,7 +57,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     const newEmbed = new CustomEmbed(
       message.member,
-      "✅ all cases have been deleted"
+      "✅ all cases have been deleted",
     ).setDescription("✅ all cases have been deleted");
 
     await msg.edit({ embeds: [newEmbed] });

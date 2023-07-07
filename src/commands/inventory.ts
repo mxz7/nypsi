@@ -26,12 +26,12 @@ const cmd = new Command("inventory", "view items in your inventory", "money").se
 
 cmd.slashEnabled = true;
 cmd.slashData.addStringOption((option) =>
-  option.setName("filter").setDescription("filter through your inventory with a search term")
+  option.setName("filter").setDescription("filter through your inventory with a search term"),
 );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (!(await userExists(message.member))) await createUser(message.member);
 
@@ -105,7 +105,7 @@ async function run(
         new CustomEmbed(message.member, "your inventory is empty").setHeader(
           "your inventory",
           message.author.avatarURL(),
-          `https://nypsi.xyz/user/${message.author.id}#inventory`
+          `https://nypsi.xyz/user/${message.author.id}#inventory`,
         ),
       ],
     });
@@ -125,7 +125,7 @@ async function run(
 
   const pages = PageManager.createPages(
     inventory.map((i) => items[i.item]),
-    6
+    6,
   );
 
   const embed = new CustomEmbed(message.member).setFooter({
@@ -135,7 +135,7 @@ async function run(
   embed.setHeader(
     "your inventory",
     message.author.avatarURL(),
-    `https://nypsi.xyz/user/${message.author.id}#inventory`
+    `https://nypsi.xyz/user/${message.author.id}#inventory`,
   );
 
   const updatePage = (page: Item[], embed: CustomEmbed) => {
@@ -147,7 +147,7 @@ async function run(
         `${item.emoji} **${item.name}** ~~--~~ *${inventory
           .find((i) => i.item == item.id)
           .amount.toLocaleString()}*${item.shortDesc ? `\n${item.shortDesc}` : ""}`,
-        true
+        true,
       );
     }
 
@@ -163,7 +163,7 @@ async function run(
       .setStyle(ButtonStyle.Primary)
       .setDisabled(true),
     new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
-    new ButtonBuilder().setCustomId("fil").setLabel("filter").setStyle(ButtonStyle.Secondary)
+    new ButtonBuilder().setCustomId("fil").setLabel("filter").setStyle(ButtonStyle.Secondary),
   );
 
   let msg: Message;
@@ -202,8 +202,8 @@ async function run(
                 .setLabel("enter term to filter by")
                 .setPlaceholder("filter")
                 .setRequired(true)
-                .setStyle(TextInputStyle.Short)
-            )
+                .setStyle(TextInputStyle.Short),
+            ),
           );
 
         await interaction.showModal(modal);
@@ -224,7 +224,7 @@ async function run(
           await res.reply({
             embeds: [
               new ErrorEmbed(
-                `no items matched the filter: \`${res.fields.fields.first().value.toLowerCase()}\``
+                `no items matched the filter: \`${res.fields.fields.first().value.toLowerCase()}\``,
               ),
             ],
             ephemeral: true,
@@ -236,7 +236,7 @@ async function run(
 
         manager.pages = PageManager.createPages(
           inventory.map((i) => items[i.item]),
-          6
+          6,
         );
 
         await res.deferUpdate();
@@ -255,7 +255,7 @@ async function run(
           components: [manager.row],
         });
         return manager.listen();
-      }
+      },
     ),
   });
 

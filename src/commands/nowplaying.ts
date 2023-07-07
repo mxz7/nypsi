@@ -13,14 +13,14 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 const cmd = new Command(
   "nowplaying",
   "view yours or another user's currently playing song using last.fm",
-  "music"
+  "music",
 ).setAliases(["np"]);
 
 cmd.slashEnabled = true;
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -86,7 +86,7 @@ async function run(
   await addCooldown(cmd.name, message.member, 10);
 
   const res = await fetch(
-    `http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${username}&api_key=${process.env.LASTFM_TOKEN}&format=json`
+    `http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${username}&api_key=${process.env.LASTFM_TOKEN}&format=json`,
   ).then((res) => res.json());
 
   if (!res.recenttracks) {
@@ -126,7 +126,7 @@ async function run(
 
   const embed = new CustomEmbed(message.member).setHeader(
     `${username} is listening to`,
-    message.author.avatarURL()
+    message.author.avatarURL(),
   );
 
   embed.setThumbnail(track.image[3]["#text"]);

@@ -21,7 +21,7 @@ export class Command {
   public data?: any;
   public run: (
     message: Message | (NypsiCommandInteraction & CommandInteraction),
-    args?: string[]
+    args?: string[],
   ) => void;
 
   constructor(name: string, description: string, category: CommandCategory) {
@@ -61,8 +61,8 @@ export class Command {
   public setRun(
     run: (
       message: Message | (NypsiCommandInteraction & CommandInteraction),
-      args?: string[]
-    ) => void
+      args?: string[],
+    ) => void,
   ) {
     this.run = run;
     return this;
@@ -104,7 +104,7 @@ export interface NypsiCommandInteraction extends CommandInteraction {
 }
 
 export function createNypsiInteraction(
-  interaction: any
+  interaction: any,
 ): NypsiCommandInteraction & CommandInteraction {
   interaction.author = interaction.user;
   interaction.interaction = true;

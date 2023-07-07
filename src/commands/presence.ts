@@ -8,7 +8,7 @@ const cmd = new Command("presence", "set custom a presence for nypsi", "none");
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (message.author.id != Constants.TEKOH_ID) return;
 
@@ -31,7 +31,7 @@ async function run(
             ],
           });
         },
-        { context: { args: args } }
+        { context: { args: args } },
       );
     } else {
       await setCustomPresence(args.join(" "));
@@ -47,7 +47,7 @@ async function run(
             ],
           });
         },
-        { context: { args: args } }
+        { context: { args: args } },
       );
     }
   }

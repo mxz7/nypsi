@@ -39,7 +39,7 @@ async function autosellThing() {
     msg.push(
       `+$**${Array.from(moneys.values())
         .reduce((a, b) => a + b)
-        .toLocaleString()}**`
+        .toLocaleString()}**`,
     );
 
     inPlaceSort(itemIds).desc((i) => moneys.get(i));
@@ -54,7 +54,7 @@ async function autosellThing() {
       msg.push(
         `\`${amounts.get(item).toLocaleString()}x\` ${getItems()[item].emoji} ${
           getItems()[item].name
-        } ($${moneys.get(item).toLocaleString()})`
+        } ($${moneys.get(item).toLocaleString()})`,
       );
     }
 

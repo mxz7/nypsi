@@ -96,7 +96,7 @@ export default class PageManager<T> {
     } else {
       manager.embed = PageManager.defaultUpdateEmbed(
         manager.pages.get(manager.currentPage),
-        manager.embed
+        manager.embed,
       );
     }
 
@@ -129,7 +129,7 @@ export default class PageManager<T> {
     } else {
       manager.embed = PageManager.defaultUpdateEmbed(
         manager.pages.get(manager.currentPage),
-        manager.embed
+        manager.embed,
       );
     }
 

@@ -7,7 +7,7 @@ const cmd = new Command("color", "get a random hex color code", "info").setAlias
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   let color;
   let member;
