@@ -8,7 +8,7 @@ const cmd = new Command("forcelose", "make an account lose 100% of the time", "n
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if ((await getAdminLevel(message.author.id)) < 3) return;
 

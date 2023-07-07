@@ -10,7 +10,7 @@ const cmd = new Command("embed", "create an embed message", "utility").setPermis
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
     return;
@@ -25,13 +25,13 @@ async function run(
       .addField(
         "help",
         "with this command you can create a simple embed message\n" +
-          "**<>** required | **()** optional\n"
+          "**<>** required | **()** optional\n",
       )
       .addField(
         "examples",
         `${prefix}embed hello\n` +
           `${prefix}embed hello | this is a description\n` +
-          `${prefix}embed hello | this is a description | #13c696`
+          `${prefix}embed hello | this is a description | #13c696`,
       );
 
     return message.channel.send({ embeds: [embed] });

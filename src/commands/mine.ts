@@ -43,7 +43,7 @@ const areas = [
 ];
 
 const cmd = new Command("mine", "go to a cave and mine", "money").setDocs(
-  "https://docs.nypsi.xyz/economy/minecraft"
+  "https://docs.nypsi.xyz/economy/minecraft",
 );
 
 cmd.slashEnabled = true;
@@ -113,7 +113,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({
       embeds: [
         new ErrorEmbed(
-          "you need a pickaxe to mine\n[how do i get a pickaxe?](https://docs.nypsi.xyz/economy/minecraft)"
+          "you need a pickaxe to mine\n[how do i get a pickaxe?](https://docs.nypsi.xyz/economy/minecraft)",
         ),
       ],
     });
@@ -193,7 +193,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       message.member,
       pickaxe,
       inventory.find((i) => i.item == pickaxe).amount - 1,
-      false
+      false,
     );
   }
 
@@ -319,7 +319,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const embed = new CustomEmbed(
     message.member,
-    `you go to the ${chosenArea} and swing your **${items[pickaxe].name}**`
+    `you go to the ${chosenArea} and swing your **${items[pickaxe].name}**`,
   );
 
   const msg = await send({ embeds: [embed] });
@@ -335,7 +335,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             .map((i) => `- \`${i[1]}x\` ${items[i[0]].emoji} ${items[i[0]].name}`)
             .join("\n")}`
         : " **nothing**"
-    }`
+    }`,
   );
 
   setTimeout(() => {

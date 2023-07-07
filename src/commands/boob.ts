@@ -19,12 +19,12 @@ const cmd = new Command("boob", "accurate prediction of your boob size", "fun").
 
 cmd.slashEnabled = true;
 cmd.slashData.addUserOption((option) =>
-  option.setName("user").setDescription("how big are your boobies")
+  option.setName("user").setDescription("how big are your boobies"),
 );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {

@@ -30,7 +30,7 @@ export async function profileExists(guild: Guild) {
     await redis.set(`${Constants.redis.cache.moderation.EXISTS}:${guild.id}`, "t");
     await redis.expire(
       `${Constants.redis.cache.moderation.EXISTS}:${guild.id}`,
-      Math.floor(ms("12 hours") / 1000)
+      Math.floor(ms("12 hours") / 1000),
     );
     return true;
   }

@@ -63,28 +63,28 @@ cmd.slashData
       .setName("create")
       .setDescription("create a guild")
       .addStringOption((option) =>
-        option.setName("name").setDescription("name of the guild").setRequired(true)
-      )
+        option.setName("name").setDescription("name of the guild").setRequired(true),
+      ),
   )
   .addSubcommand((invite) =>
     invite
       .setName("invite")
       .setDescription("invite a member to your guild")
       .addUserOption((option) =>
-        option.setName("member").setDescription("member to invite to the guild").setRequired(true)
-      )
+        option.setName("member").setDescription("member to invite to the guild").setRequired(true),
+      ),
   )
   .addSubcommand((leave) => leave.setName("leave").setDescription("leave your current guild"))
   .addSubcommand((deleteOpt) =>
-    deleteOpt.setName("delete").setDescription("delete your current guild")
+    deleteOpt.setName("delete").setDescription("delete your current guild"),
   )
   .addSubcommand((kick) =>
     kick
       .setName("kick")
       .setDescription("kick a member from your guild")
       .addUserOption((option) =>
-        option.setName("member").setDescription("member to kick from the guild").setRequired(true)
-      )
+        option.setName("member").setDescription("member to kick from the guild").setRequired(true),
+      ),
   )
   .addSubcommand((deposit) =>
     deposit
@@ -94,30 +94,30 @@ cmd.slashData
         option
           .setName("amount")
           .setDescription("amount to deposit into the guild")
-          .setRequired(true)
-      )
+          .setRequired(true),
+      ),
   )
   .addSubcommand((stats) =>
-    stats.setName("stats").setDescription("view stats for the guild members")
+    stats.setName("stats").setDescription("view stats for the guild members"),
   )
   .addSubcommand((upgrade) =>
-    upgrade.setName("upgrade").setDescription("view the requirements for the next guild upgrade")
+    upgrade.setName("upgrade").setDescription("view the requirements for the next guild upgrade"),
   )
   .addSubcommand((motd) =>
     motd
       .setName("motd")
       .setDescription("set the motd for the guild")
       .addStringOption((option) =>
-        option.setName("text").setDescription("text for the motd").setRequired(true)
-      )
+        option.setName("text").setDescription("text for the motd").setRequired(true),
+      ),
   )
   .addSubcommand((view) =>
     view
       .setName("view")
       .setDescription("view a guild")
       .addStringOption((option) =>
-        option.setName("guild-name").setDescription("guild to show").setRequired(false)
-      )
+        option.setName("guild-name").setDescription("guild to show").setRequired(false),
+      ),
   )
   .addSubcommand((buy) =>
     buy
@@ -131,9 +131,9 @@ cmd.slashData
             { name: "25k max bet", value: "maxbet" },
             { name: "member slot", value: "member" },
             { name: "gamble multiplier", value: "multi" },
-            { name: "sell multiplier", value: "sellmulti" }
-          )
-      )
+            { name: "sell multiplier", value: "sellmulti" },
+          ),
+      ),
   )
   .addSubcommand((shop) => shop.setName("shop").setDescription("view guild upgrades"));
 
@@ -157,7 +157,7 @@ const invited = new Set<string>();
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (await onCooldown(cmd.name, message.member)) {
     const embed = await getResponse(cmd.name, message.member);
@@ -220,14 +220,14 @@ async function run(
           };
         };
       })[];
-    }
+    },
   ) => {
     await addCooldown(cmd.name, message.member, 5);
     const embed = new CustomEmbed(message.member);
 
     if (!guild) {
       embed.setDescription(
-        `you are not in a guild. you can create one with ${prefix}guild create or join one if you have been invited`
+        `you are not in a guild. you can create one with ${prefix}guild create or join one if you have been invited`,
       );
     } else {
       embed.setHeader(guild.guildName, message.author.avatarURL());
@@ -238,13 +238,13 @@ async function run(
         `**level** ${guild.level}\n` +
           `**created on** ${formatDate(guild.createdAt)}\n` +
           `**owner** ${guild.owner.user.lastKnownTag}`,
-        true
+        true,
       );
       if (guild.level < Constants.MAX_GUILD_LEVEL) {
         embed.addField(
           "bank",
           `**money** $${guild.balance.toLocaleString()}\n**xp** ${guild.xp.toLocaleString()}\n**tokens** ${guild.tokens.toLocaleString()}`,
-          true
+          true,
         );
       }
 
@@ -291,7 +291,7 @@ async function run(
       return send({
         embeds: [
           new ErrorEmbed(
-            "you are already in a guild, you must leave this guild to create your own"
+            "you are already in a guild, you must leave this guild to create your own",
           ),
         ],
       });
@@ -328,7 +328,7 @@ async function run(
     await redis.set(`${Constants.redis.cooldown.GUILD_CREATE}:${message.author.id}`, "t");
     await redis.expire(
       `${Constants.redis.cooldown.GUILD_CREATE}:${message.author.id}`,
-      ms("2 days") / 1000
+      ms("2 days") / 1000,
     );
 
     return send({
@@ -399,7 +399,7 @@ async function run(
     embed.setDescription(`you have been invited to join **${guild.guildName}**\n\ndo you accept?`);
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder().setCustomId("yes").setLabel("accept").setStyle(ButtonStyle.Success)
+      new ButtonBuilder().setCustomId("yes").setLabel("accept").setStyle(ButtonStyle.Success),
     );
 
     const msg = await message.channel
@@ -524,7 +524,7 @@ async function run(
         return send({
           embeds: [
             new ErrorEmbed(
-              `\`${message.mentions.members.first().user.tag}\` is not in **${guild.guildName}**`
+              `\`${message.mentions.members.first().user.tag}\` is not in **${guild.guildName}**`,
             ),
           ],
         });
@@ -563,7 +563,7 @@ async function run(
         embeds: [
           new CustomEmbed(
             message.member,
-            `✅ \`${target}\` has been kicked from **${guild.guildName}**`
+            `✅ \`${target}\` has been kicked from **${guild.guildName}**`,
           ),
         ],
       });
@@ -591,7 +591,7 @@ async function run(
       if (contributedMoney > 100_000) {
         await updateBalance(
           guildMember.userId,
-          (await getBalance(guildMember.userId)) + Math.floor(Number(contributedMoney) * 0.1)
+          (await getBalance(guildMember.userId)) + Math.floor(Number(contributedMoney) * 0.1),
         );
 
         if ((await getDmSettings(guildMember.userId)).other) {
@@ -599,8 +599,8 @@ async function run(
 
           embed.setDescription(
             `since you contributed money to this guild, you have been repaid $**${Math.floor(
-              Number(contributedMoney) * 0.1
-            ).toLocaleString()}**`
+              Number(contributedMoney) * 0.1,
+            ).toLocaleString()}**`,
           );
 
           await requestDM({
@@ -635,7 +635,7 @@ async function run(
       if (contributedMoney > 100) {
         await updateBalance(
           guildMember.userId,
-          (await getBalance(guildMember.userId)) + Math.floor(Number(contributedMoney) * 0.25)
+          (await getBalance(guildMember.userId)) + Math.floor(Number(contributedMoney) * 0.25),
         );
 
         if ((await getDmSettings(guildMember.userId)).other) {
@@ -643,8 +643,8 @@ async function run(
 
           embed.setDescription(
             `since you contributed money to this guild, you have been repaid $**${Math.floor(
-              Number(contributedMoney) * 0.25
-            ).toLocaleString()}**`
+              Number(contributedMoney) * 0.25,
+            ).toLocaleString()}**`,
           );
 
           await requestDM({
@@ -694,7 +694,7 @@ async function run(
     }
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder().setCustomId("✅").setLabel("do it.").setStyle(ButtonStyle.Success)
+      new ButtonBuilder().setCustomId("✅").setLabel("do it.").setStyle(ButtonStyle.Success),
     );
 
     const msg = await send({
@@ -703,7 +703,7 @@ async function run(
           message.member,
           `are you sure you want to deposit $**${amount.toLocaleString()}** into **${
             guild.guildName
-          }** bank?\n\nyou **cannot** get this back`
+          }** bank?\n\nyou **cannot** get this back`,
         ),
       ],
       components: [row],
@@ -739,11 +739,11 @@ async function run(
 
       const embed = new CustomEmbed(message.member).setHeader(
         "guild deposit",
-        message.author.avatarURL()
+        message.author.avatarURL(),
       );
 
       embed.setDescription(
-        `$**${guild.balance.toLocaleString()}**\n  +$**${amount.toLocaleString()}**`
+        `$**${guild.balance.toLocaleString()}**\n  +$**${amount.toLocaleString()}**`,
       );
 
       await reaction.message.edit({ embeds: [embed], components: [] });
@@ -769,7 +769,7 @@ async function run(
 
     const embed = new CustomEmbed(message.member).setHeader(
       `${guild.guildName} stats`,
-      message.author.avatarURL()
+      message.author.avatarURL(),
     );
 
     let desc = "";
@@ -816,7 +816,7 @@ async function run(
       `requirements to upgrade to level **${guild.level + 1}**:\n\n` +
         `**money** $${guild.balance.toLocaleString()}/$${requirements.money.toLocaleString()}\n` +
         `**xp** ${guild.xp.toLocaleString()}xp/${requirements.xp.toLocaleString()}xp\n\n` +
-        "note: the upgrade will be handled automatically when all requirements are met"
+        "note: the upgrade will be handled automatically when all requirements are met",
     );
 
     return send({ embeds: [embed] });
@@ -872,7 +872,7 @@ async function run(
         `${prefix}**guild upgrade** *show requirements for next upgrade*\n` +
         `${prefix}**guild motd <motd>** *set guild motd*\n` +
         `${prefix}**top guild** *view top guilds on nypsi*\n` +
-        `${prefix}**guild (name)** *show guild info*`
+        `${prefix}**guild (name)** *show guild info*`,
     );
     embed.setFooter({ text: "you must be atleast prestige 1 to create a guild" });
 
@@ -895,7 +895,7 @@ async function run(
       selected.cost +
       Math.floor(
         (guild.upgrades.find((i) => i.upgradeId === selected.id)?.amount || 0) *
-          selected.increment_per_level
+          selected.increment_per_level,
       );
 
     if (guild.tokens < cost)
@@ -914,7 +914,7 @@ async function run(
       embeds: [
         new CustomEmbed(
           message.member,
-          `✅ you have bought **${selected.name}** for ${cost} tokens`
+          `✅ you have bought **${selected.name}** for ${cost} tokens`,
         ),
       ],
     });
@@ -937,7 +937,7 @@ async function run(
           upgrade.cost +
           Math.floor(
             (guild.upgrades.find((i) => i.upgradeId === upgrade.id)?.amount || 0) *
-              upgrade.increment_per_level
+              upgrade.increment_per_level,
           )
         } tokens`;
 
@@ -957,7 +957,7 @@ async function run(
         .setStyle(ButtonStyle.Primary)
         .setDisabled(true),
       new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
-      new ButtonBuilder().setCustomId("❌").setLabel("clear mentions").setStyle(ButtonStyle.Danger)
+      new ButtonBuilder().setCustomId("❌").setLabel("clear mentions").setStyle(ButtonStyle.Danger),
     );
 
     const embed = new CustomEmbed(message.member)

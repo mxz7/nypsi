@@ -161,7 +161,7 @@ export default class ScratchCard {
         .setColor(Constants.EMBED_SUCCESS_COLOR)
         .setHeader(
           `${this.member.user.username}'s ${this.item.name}`,
-          this.member.user.avatarURL()
+          this.member.user.avatarURL(),
         );
       if (clickedType === "xp") {
         await updateXp(this.member, (await getXp(this.member)) + parseInt(clickedItem));
@@ -184,7 +184,7 @@ export default class ScratchCard {
 
         await addInventoryItem(this.member, clickedItem, amount);
         embed.setDescription(
-          `you found a ${getItems()[clickedItem].emoji} **${getItems()[clickedItem].name}**!`
+          `you found a ${getItems()[clickedItem].emoji} **${getItems()[clickedItem].name}**!`,
         );
       }
 

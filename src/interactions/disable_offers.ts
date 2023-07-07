@@ -17,7 +17,7 @@ export default {
       return interaction.reply({
         embeds: [
           new CustomEmbed(null, "please wait until your offer has been processed").setColor(
-            Constants.TRANSPARENT_EMBED_COLOR
+            Constants.TRANSPARENT_EMBED_COLOR,
           ),
         ],
         ephemeral: true,

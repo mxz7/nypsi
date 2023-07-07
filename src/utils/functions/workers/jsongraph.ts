@@ -21,7 +21,7 @@ if (!isMainThread) {
   process.title = "nypsi: create json graph";
 
   const createGraphData = async (
-    data: { userId: string; value: bigint | number; date: Date }[]
+    data: { userId: string; value: bigint | number; date: Date }[],
   ): Promise<ChartData> => {
     const dates: number[] = [];
     const map = new Map<string, { value: number; date: number }[]>();
@@ -103,7 +103,7 @@ if (!isMainThread) {
         orderBy: {
           date: "desc",
         },
-      })
+      }),
     );
     parentPort.postMessage(data);
     process.exit(0);

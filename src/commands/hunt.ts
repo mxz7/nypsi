@@ -88,7 +88,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({
       embeds: [
         new ErrorEmbed(
-          "you need a gun to hunt\n[how do i get a gun?](https://docs.nypsi.xyz/economy/fishinghunting)"
+          "you need a gun to hunt\n[how do i get a gun?](https://docs.nypsi.xyz/economy/fishinghunting)",
         ),
       ],
     });
@@ -144,7 +144,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       message.member,
       gun,
       inventory.find((i) => i.item == gun).amount - 1,
-      false
+      false,
     );
   }
 
@@ -219,7 +219,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     message.member,
     `you go to the ${["field", "forest"][Math.floor(Math.random() * 2)]} and prepare your **${
       items[gun].name
-    }**`
+    }**`,
   );
 
   const msg = await send({ embeds: [embed] });
@@ -237,7 +237,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             .map((i) => `- \`${i[1]}x\` ${items[i[0]].emoji} ${items[i[0]].name}`)
             .join("\n")}`
         : " **nothing**"
-    }`
+    }`,
   );
 
   setTimeout(() => {

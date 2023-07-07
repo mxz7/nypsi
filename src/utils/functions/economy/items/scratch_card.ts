@@ -21,7 +21,7 @@ import { addStat, createGame } from "../stats";
 async function prepare(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
-  interaction?: ButtonInteraction
+  interaction?: ButtonInteraction,
 ): Promise<any> {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (interaction) {
@@ -70,7 +70,7 @@ async function prepare(
     message.member,
     selected.id,
     inventory.find((i) => i.item == selected.id).amount - 1,
-    false
+    false,
   );
   await addStat(message.member, selected.id);
 
@@ -80,7 +80,7 @@ async function prepare(
 
   const embed = new CustomEmbed(
     message.member,
-    `**${card.remainingClicks}** clicks left`
+    `**${card.remainingClicks}** clicks left`,
   ).setHeader(`${message.author.username}'s ${selected.name}`, message.author.avatarURL());
 
   let msg = await send({ embeds: [embed], components: card.getButtons() });
@@ -113,7 +113,7 @@ async function prepare(
           new ButtonBuilder()
             .setCustomId("retry")
             .setLabel("play again")
-            .setStyle(ButtonStyle.Success)
+            .setStyle(ButtonStyle.Success),
         );
         retry = true;
       }
@@ -194,5 +194,5 @@ module.exports = new ItemUse(
   "scratch_card",
   (message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) => {
     return prepare(message, args);
-  }
+  },
 );

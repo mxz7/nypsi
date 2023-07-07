@@ -32,7 +32,7 @@ const cmd = new Command("achievements", "view your achievement progress", "money
 cmd.slashEnabled = true;
 cmd.slashData
   .addSubcommand((progress) =>
-    progress.setName("progress").setDescription("view achievements in progress")
+    progress.setName("progress").setDescription("view achievements in progress"),
   )
   .addSubcommand((all) => all.setName("all").setDescription("view all achievements"))
   .addSubcommand((show) =>
@@ -44,13 +44,13 @@ cmd.slashData
           .setName("achievement")
           .setDescription("achievement you want to view")
           .setRequired(true)
-          .setAutocomplete(true)
-      )
+          .setAutocomplete(true),
+      ),
   );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -101,7 +101,7 @@ async function run(
     const desc: string[] = [];
 
     inPlaceSort(achievements).desc(
-      (i) => (i.progress / allAchievementData[i.achievementId].target) * 100
+      (i) => (i.progress / allAchievementData[i.achievementId].target) * 100,
     );
 
     for (const achievement of achievements) {
@@ -114,7 +114,7 @@ async function run(
         ].target.toLocaleString()} (${(
           (achievement.progress / allAchievementData[achievement.achievementId].target) *
           100
-        ).toFixed(1)}%)\``
+        ).toFixed(1)}%)\``,
       );
     }
 
@@ -131,7 +131,7 @@ async function run(
 
     const embed = new CustomEmbed(message.member, pages.get(1).join("\n")).setHeader(
       "your achievement progress",
-      message.author.avatarURL()
+      message.author.avatarURL(),
     );
 
     embed.setFooter({ text: completion });
@@ -146,7 +146,7 @@ async function run(
         .setLabel("back")
         .setStyle(ButtonStyle.Primary)
         .setDisabled(true),
-      new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
+      new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
     );
 
     const msg = await send({ embeds: [embed], components: [row] });
@@ -229,7 +229,7 @@ async function run(
         .setLabel("back")
         .setStyle(ButtonStyle.Primary)
         .setDisabled(true),
-      new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
+      new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
     );
 
     let msg: Message;
@@ -322,7 +322,7 @@ async function run(
               getItems()[prize.split(":")[0]].name
             }`;
           })
-          .join("\n")
+          .join("\n"),
       );
     }
 

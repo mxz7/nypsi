@@ -9,14 +9,14 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 const cmd = new Command(
   "createpalette",
   "create a color palette for color.tekoh.net from role colors",
-  "utility"
+  "utility",
 ).setAliases(["palette", "rolepalette"]);
 
 const regex = /[^a-f0-9]/g;
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (await onCooldown(cmd.name, message.member)) {
     const embed = await getResponse(cmd.name, message.member);
@@ -41,13 +41,13 @@ async function run(
   if (args.length == 0) {
     const embed = new CustomEmbed(
       message.member,
-      "create a color palette from the roles in the server, uses https://color.tekoh.net"
+      "create a color palette from the roles in the server, uses https://color.tekoh.net",
     );
 
     embed.setHeader("create palette");
     embed.addField(
       "usage",
-      `${prefix}palette <name> <background color>\nuse _ (underscores) for spaces in name, you can use ${prefix}color to find a color, or an [online color picker tool](https://color.tekoh.net)`
+      `${prefix}palette <name> <background color>\nuse _ (underscores) for spaces in name, you can use ${prefix}color to find a color, or an [online color picker tool](https://color.tekoh.net)`,
     );
     embed.addField("example", `${prefix}palette my_palette #ff0000`);
     return message.channel.send({ embeds: [embed] });
@@ -102,7 +102,7 @@ async function run(
       return message.channel.send({
         embeds: [
           new ErrorEmbed(
-            `invalid color, you can use ${prefix}color to find a color, or an [online color picker tool](https://color.tekoh.net)`
+            `invalid color, you can use ${prefix}color to find a color, or an [online color picker tool](https://color.tekoh.net)`,
           ),
         ],
       });
@@ -112,7 +112,7 @@ async function run(
       return message.channel.send({
         embeds: [
           new ErrorEmbed(
-            `invalid color, you can use ${prefix}color to find a color, or an [online color picker tool](https://color.tekoh.net)`
+            `invalid color, you can use ${prefix}color to find a color, or an [online color picker tool](https://color.tekoh.net)`,
           ),
         ],
       });

@@ -76,8 +76,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (boosters.get(boosterId).length == 1) {
       desc.push(
         `**${items[boosterId].name}** ${items[boosterId].emoji} - expires <t:${Math.round(
-          boosters.get(boosterId)[0].expire / 1000
-        )}:R>`
+          boosters.get(boosterId)[0].expire / 1000,
+        )}:R>`,
       );
     } else {
       let lowest = boosters.get(boosterId)[0].expire;
@@ -89,7 +89,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       desc.push(
         `**${items[boosterId].name}** ${items[boosterId].emoji} \`x${
           boosters.get(boosterId).length
-        }\` - next expires <t:${Math.round(boosters.get(boosterId)[0].expire / 1000)}:R>`
+        }\` - next expires <t:${Math.round(boosters.get(boosterId)[0].expire / 1000)}:R>`,
       );
     }
   }
@@ -106,7 +106,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       .setLabel("back")
       .setStyle(ButtonStyle.Primary)
       .setDisabled(true),
-    new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
+    new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
   );
 
   const msg = await send({ embeds: [embed], components: [row] });

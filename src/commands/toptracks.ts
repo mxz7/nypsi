@@ -32,12 +32,12 @@ cmd.slashData.addStringOption((option) =>
   option
     .setName("length")
     .setDescription("length to fetch results from")
-    .setChoices(...lengthChoices)
+    .setChoices(...lengthChoices),
 );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -120,7 +120,7 @@ async function run(
   await addCooldown(cmd.name, message.member, 10);
 
   const res = await fetch(
-    `http://ws.audioscrobbler.com/2.0/?method=user.gettoptracks&user=${username}&period=${length}&api_key=${process.env.LASTFM_TOKEN}&format=json`
+    `http://ws.audioscrobbler.com/2.0/?method=user.gettoptracks&user=${username}&period=${length}&api_key=${process.env.LASTFM_TOKEN}&format=json`,
   ).then((res) => res.json());
 
   if (res.error) {
@@ -151,7 +151,7 @@ async function run(
     }
 
     const text = `${pos} [**${track.name} - ${track.artist.name}**](${track.url}) - **${parseInt(
-      track.playcount
+      track.playcount,
     ).toLocaleString()}** plays`;
     if (pages.size == 0) {
       pages.set(1, [text]);
@@ -168,7 +168,7 @@ async function run(
 
   const embed = new CustomEmbed(message.member).setHeader(
     `${username}'s top tracks [${lengthDisplay}]`,
-    message.author.avatarURL()
+    message.author.avatarURL(),
   );
 
   embed.setDescription(pages.get(1).join("\n"));
@@ -180,7 +180,7 @@ async function run(
       .setLabel("back")
       .setStyle(ButtonStyle.Primary)
       .setDisabled(true),
-    new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
+    new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
   );
 
   if (pages.size == 0) {
@@ -227,7 +227,7 @@ async function run(
               .setCustomId("➡")
               .setLabel("next")
               .setStyle(ButtonStyle.Primary)
-              .setDisabled(false)
+              .setDisabled(false),
           );
         } else {
           row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -240,7 +240,7 @@ async function run(
               .setCustomId("➡")
               .setLabel("next")
               .setStyle(ButtonStyle.Primary)
-              .setDisabled(false)
+              .setDisabled(false),
           );
         }
         await edit({ embeds: [embed], components: [row] }, msg);
@@ -266,7 +266,7 @@ async function run(
               .setCustomId("➡")
               .setLabel("next")
               .setStyle(ButtonStyle.Primary)
-              .setDisabled(true)
+              .setDisabled(true),
           );
         } else {
           row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -279,7 +279,7 @@ async function run(
               .setCustomId("➡")
               .setLabel("next")
               .setStyle(ButtonStyle.Primary)
-              .setDisabled(false)
+              .setDisabled(false),
           );
         }
         await edit({ embeds: [embed], components: [row] }, msg);

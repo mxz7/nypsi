@@ -20,7 +20,7 @@ cmd.slashData.addUserOption((option) => option.setName("user").setDescription("i
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -110,7 +110,7 @@ async function run(
 
   const embed = new CustomEmbed(
     message.member,
-    `${member.user.toString()}\n\n📏 ${size}\n${sizeMsg}`
+    `${member.user.toString()}\n\n📏 ${size}\n${sizeMsg}`,
   ).setHeader("short person calculator", member.user.avatarURL());
 
   send({ embeds: [embed] });

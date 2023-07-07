@@ -20,12 +20,12 @@ const cmd = new Command("unban", "unban one or more users", "moderation").setPer
 
 cmd.slashEnabled = true;
 cmd.slashData.addStringOption((option) =>
-  option.setName("user").setDescription("tag/id of user to unban").setRequired(true)
+  option.setName("user").setDescription("tag/id of user to unban").setRequired(true),
 );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -82,11 +82,11 @@ async function run(
         "help",
         "**<>** required | **[]** parameter\n" +
           "**<users>** you can unban one or more members in one command\n" +
-          "**[-s]** if used, command message will be deleted and the output will be sent to moderator as a DM if possible"
+          "**[-s]** if used, command message will be deleted and the output will be sent to moderator as a DM if possible",
       )
       .addField(
         "examples",
-        `${prefix}unban user#1234 **(only works if members are in cache)**\n${prefix}unban 123456789012345678\n${prefix}unban 123456789012345678 123456789012345678 -s`
+        `${prefix}unban user#1234 **(only works if members are in cache)**\n${prefix}unban 123456789012345678\n${prefix}unban 123456789012345678 123456789012345678 -s`,
       );
 
     return send({ embeds: [embed] });
@@ -111,7 +111,7 @@ async function run(
         const memberCache = message.client.users.cache;
 
         const findingMember = memberCache.find((m) =>
-          (m.username + "#" + m.discriminator).includes(arg)
+          (m.username + "#" + m.discriminator).includes(arg),
         );
 
         if (findingMember) {
@@ -140,7 +140,7 @@ async function run(
 
   if (members.length == 1) {
     embed.setDescription(
-      "✅ `" + members[0].username + "#" + members[0].discriminator + "` was unbanned"
+      "✅ `" + members[0].username + "#" + members[0].discriminator + "` was unbanned",
     );
   } else {
     embed.setDescription("✅ **" + members.length + "** members have been unbanned");

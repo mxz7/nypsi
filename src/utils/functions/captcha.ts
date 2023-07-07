@@ -68,13 +68,13 @@ export async function passedCaptcha(member: GuildMember) {
   await hook.send(
     `[${getTimestamp()}] **${member.user.tag}** (${
       member.user.id
-    }) has passed a captcha [${captchaPasses.get(member.user.id)}]`
+    }) has passed a captcha [${captchaPasses.get(member.user.id)}]`,
   );
 
   await redis.set(`${Constants.redis.nypsi.CAPTCHA_VERIFIED}:${member.user.id}`, member.user.id);
   await redis.expire(
     `${Constants.redis.nypsi.CAPTCHA_VERIFIED}:${member.user.id}`,
-    ms("30 minutes") / 1000
+    ms("30 minutes") / 1000,
   );
   hook.destroy();
 }
@@ -95,7 +95,7 @@ export async function failedCaptcha(member: GuildMember, content: string) {
     await hook.send(
       `[${getTimestamp()}] **${member.user.tag}** (${
         member.user.id
-      }) has been banned for 24 hours for failing 69 captchas`
+      }) has been banned for 24 hours for failing 69 captchas`,
     );
     await requestDM({
       client: member.client as NypsiClient,
@@ -111,13 +111,13 @@ export async function failedCaptcha(member: GuildMember, content: string) {
       captchaFails.get(member.user.id) % 15 === 0
         ? " <@&747059949770768475> <@672793821850894347>"
         : ""
-    }`
+    }`,
   );
   hook.destroy();
 }
 
 export async function verifyUser(
-  message: Message | (NypsiCommandInteraction & CommandInteraction)
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
 ) {
   if (beingVerified.has(message.author.id)) return;
 
@@ -126,7 +126,7 @@ export async function verifyUser(
   const embed = new CustomEmbed(message.member).setTitle("you have been locked");
 
   embed.setDescription(
-    "please note that using macros / auto typers is not allowed with nypsi\n\nplease type the following:"
+    "please note that using macros / auto typers is not allowed with nypsi\n\nplease type the following:",
   );
 
   embed.setImage("attachment://captcha.png");

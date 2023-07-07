@@ -54,12 +54,12 @@ const cmd = new Command("blackjack", "play blackjack", "money").setAliases(["bj"
 
 cmd.slashEnabled = true;
 cmd.slashData.addStringOption((option) =>
-  option.setName("bet").setDescription("how much would you like to bet").setRequired(false)
+  option.setName("bet").setDescription("how much would you like to bet").setRequired(false),
 );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (!(await userExists(message.member))) await createUser(message.member);
 
@@ -109,7 +109,7 @@ module.exports = cmd;
 async function prepareGame(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
-  msg?: Message
+  msg?: Message,
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -163,7 +163,7 @@ async function prepareGame(
         "in blackjack, the aim is to get **21**, or as close as to **21** as you can get without going over\n" +
           "the dealer will always stand on or above **17**\n" +
           "**2**x multiplier for winning, on a draw you receive your bet back\n" +
-          "if your first 2 cards add up to 21, you get a **2.5**x win"
+          "if your first 2 cards add up to 21, you get a **2.5**x win",
       );
 
     return send({ embeds: [embed] });
@@ -175,7 +175,7 @@ async function prepareGame(
       "blackjack works exactly how it would in real life\n" +
         "when you create a game, a full 52 deck is shuffled in a random order\n" +
         "for every new card you take, it is taken from the first in the deck (array) and then removed from the deck\n" +
-        "view the code for this [here](https://github.com/tekoh/nypsi/blob/main/src/commands/blackjack.ts)"
+        "view the code for this [here](https://github.com/tekoh/nypsi/blob/main/src/commands/blackjack.ts)",
     ).setHeader("blackjack help");
 
     return send({ embeds: [embed] });
@@ -214,7 +214,7 @@ async function prepareGame(
       return msg.edit({
         embeds: [
           new ErrorEmbed(
-            `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
+            `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`,
           ),
         ],
       });
@@ -222,7 +222,7 @@ async function prepareGame(
       return send({
         embeds: [
           new ErrorEmbed(
-            `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
+            `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`,
           ),
         ],
       });
@@ -326,11 +326,11 @@ async function prepareGame(
         calcTotal(message.member) == 21
           ? `${getDealerCards(message.member)} **${calcTotalDealer(message.member)}**`
           : `| ${games.get(message.member.user.id).dealerCards[0]} |`
-      }`
+      }`,
     )
     .addField(
       message.author.username,
-      getCards(message.member) + " **" + calcTotal(message.member) + "**"
+      getCards(message.member) + " **" + calcTotal(message.member) + "**",
     );
 
   let row;
@@ -339,12 +339,12 @@ async function prepareGame(
     row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder().setCustomId("1️⃣").setLabel("hit").setStyle(ButtonStyle.Primary),
       new ButtonBuilder().setCustomId("2️⃣").setLabel("stand").setStyle(ButtonStyle.Primary),
-      new ButtonBuilder().setCustomId("3️⃣").setLabel("double down").setStyle(ButtonStyle.Secondary)
+      new ButtonBuilder().setCustomId("3️⃣").setLabel("double down").setStyle(ButtonStyle.Secondary),
     );
   } else {
     row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder().setCustomId("1️⃣").setLabel("hit").setStyle(ButtonStyle.Primary),
-      new ButtonBuilder().setCustomId("2️⃣").setLabel("stand").setStyle(ButtonStyle.Primary)
+      new ButtonBuilder().setCustomId("2️⃣").setLabel("stand").setStyle(ButtonStyle.Primary),
     );
   }
 
@@ -511,7 +511,7 @@ function getDealerCards(member: GuildMember) {
 async function playGame(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
   m: Message,
-  args: string[]
+  args: string[],
 ): Promise<void> {
   if (!games.has(message.author.id)) return;
 
@@ -530,7 +530,7 @@ async function playGame(
 
   const newEmbed = new CustomEmbed(message.member, "**bet** $" + bet.toLocaleString()).setHeader(
     "blackjack",
-    message.author.avatarURL()
+    message.author.avatarURL(),
   );
 
   const replay = async (embed: CustomEmbed) => {
@@ -544,7 +544,7 @@ async function playGame(
     }
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder().setLabel("play again").setStyle(ButtonStyle.Success).setCustomId("rp")
+      new ButtonBuilder().setLabel("play again").setStyle(ButtonStyle.Success).setCustomId("rp"),
     );
 
     await m.edit({ embeds: [embed], components: [row] });
@@ -588,7 +588,7 @@ async function playGame(
             embeds: [
               new CustomEmbed(
                 message.member,
-                "fun & moderation commands are still available to you. maintenance mode only prevents certain commands to prevent loss of progress"
+                "fun & moderation commands are still available to you. maintenance mode only prevents certain commands to prevent loss of progress",
               ).setTitle("⚠️ nypsi is under maintenance"),
             ],
           });
@@ -606,7 +606,7 @@ async function playGame(
       game: "blackjack",
       win: false,
       outcome: `dealer cards: ${getDealerCards(message.member)} (${calcTotalDealer(
-        message.member
+        message.member,
       )})\nmember cards: ${getCards(message.member)} (${calcTotal(message.member)})`,
     });
     gamble(message.author, "blackjack", bet, false, id, 0);
@@ -614,11 +614,11 @@ async function playGame(
     newEmbed.setDescription("**bet** $" + bet.toLocaleString() + "\n\n**you lose!!**");
     newEmbed.addField(
       "dealer",
-      getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**"
+      getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**",
     );
     newEmbed.addField(
       message.author.username,
-      getCards(message.member) + " **" + calcTotal(message.member) + "**"
+      getCards(message.member) + " **" + calcTotal(message.member) + "**",
     );
     newEmbed.setFooter({ text: `id: ${id}` });
     games.delete(message.author.id);
@@ -644,14 +644,14 @@ async function playGame(
           "\n" +
           "+**" +
           Math.floor(games.get(message.member.user.id).voted * 100).toString() +
-          "**% bonus"
+          "**% bonus",
       );
     } else {
       newEmbed.setDescription(
         "**bet** $" +
           bet.toLocaleString() +
           "\n\n**winner!!**\n**you win** $" +
-          winnings.toLocaleString()
+          winnings.toLocaleString(),
       );
     }
 
@@ -674,7 +674,7 @@ async function playGame(
       game: "blackjack",
       win: true,
       outcome: `dealer cards: ${getDealerCards(message.member)} (${calcTotalDealer(
-        message.member
+        message.member,
       )})\nmember cards: ${getCards(message.member)} (${calcTotal(message.member)})`,
       earned: winnings,
       xp: earnedXp,
@@ -689,11 +689,11 @@ async function playGame(
 
     newEmbed.addField(
       "dealer",
-      getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**"
+      getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**",
     );
     newEmbed.addField(
       message.author.username,
-      getCards(message.member) + " **" + calcTotal(message.member) + "**"
+      getCards(message.member) + " **" + calcTotal(message.member) + "**",
     );
     await updateBalance(message.member, (await getBalance(message.member)) + winnings);
     games.delete(message.author.id);
@@ -707,22 +707,22 @@ async function playGame(
       game: "blackjack",
       win: false,
       outcome: `dealer cards: ${getDealerCards(message.member)} (${calcTotalDealer(
-        message.member
+        message.member,
       )})\nmember cards: ${getCards(message.member)} (${calcTotal(message.member)})`,
     });
     gamble(message.author, "blackjack", bet, true, id, bet);
     newEmbed.setFooter({ text: `id: ${id}` });
     newEmbed.setColor(variants.macchiato.yellow.hex as ColorResolvable);
     newEmbed.setDescription(
-      "**bet** $" + bet.toLocaleString() + "\n\n**draw!!**\nyou win $" + bet.toLocaleString()
+      "**bet** $" + bet.toLocaleString() + "\n\n**draw!!**\nyou win $" + bet.toLocaleString(),
     );
     newEmbed.addField(
       "dealer",
-      getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**"
+      getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**",
     );
     newEmbed.addField(
       message.author.username,
-      getCards(message.member) + " **" + calcTotal(message.member) + "**"
+      getCards(message.member) + " **" + calcTotal(message.member) + "**",
     );
     await updateBalance(message.member, (await getBalance(message.member)) + bet);
     games.delete(message.author.id);
@@ -804,7 +804,7 @@ async function playGame(
 
       const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder().setCustomId("1️⃣").setLabel("hit").setStyle(ButtonStyle.Primary),
-        new ButtonBuilder().setCustomId("2️⃣").setLabel("stand").setStyle(ButtonStyle.Primary)
+        new ButtonBuilder().setCustomId("2️⃣").setLabel("stand").setStyle(ButtonStyle.Primary),
       );
 
       if (calcTotal(message.member) == 21) {
@@ -812,11 +812,11 @@ async function playGame(
           .setHeader("blackjack", message.author.avatarURL())
           .addField(
             "dealer",
-            getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**"
+            getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**",
           )
           .addField(
             message.author.username,
-            getCards(message.member) + " **" + calcTotal(message.member) + "**"
+            getCards(message.member) + " **" + calcTotal(message.member) + "**",
           );
 
         row.components.forEach((c) => c.setDisabled(true));
@@ -847,7 +847,7 @@ async function playGame(
           .addField("dealer", `| ${games.get(message.member.user.id).dealerCards[0]} |`)
           .addField(
             message.author.username,
-            getCards(message.member) + " **" + calcTotal(message.member) + "**"
+            getCards(message.member) + " **" + calcTotal(message.member) + "**",
           );
         await edit({ embeds: [newEmbed1], components: [row] });
       }
@@ -864,18 +864,18 @@ async function playGame(
           .setCustomId("2️⃣")
           .setLabel("stand")
           .setStyle(ButtonStyle.Primary)
-          .setDisabled(true)
+          .setDisabled(true),
       );
 
       const newEmbed1 = new CustomEmbed(message.member, "**bet** $" + bet.toLocaleString())
         .setHeader("blackjack", message.author.avatarURL())
         .addField(
           "dealer",
-          getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**"
+          getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**",
         )
         .addField(
           message.author.username,
-          getCards(message.member) + " **" + calcTotal(message.member) + "**"
+          getCards(message.member) + " **" + calcTotal(message.member) + "**",
         );
 
       await edit({ embeds: [newEmbed1], components: [row] });
@@ -943,18 +943,18 @@ async function playGame(
           .setCustomId("3️⃣")
           .setLabel("double down")
           .setStyle(ButtonStyle.Secondary)
-          .setDisabled(true)
+          .setDisabled(true),
       );
 
       const newEmbed1 = new CustomEmbed(message.member, "**bet** $" + bet.toLocaleString())
         .setHeader("blackjack", message.author.avatarURL())
         .addField(
           "dealer",
-          getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**"
+          getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**",
         )
         .addField(
           message.author.username,
-          getCards(message.member) + " **" + calcTotal(message.member) + "**"
+          getCards(message.member) + " **" + calcTotal(message.member) + "**",
         );
       await edit({ embeds: [newEmbed1], components: [row] });
 

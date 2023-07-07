@@ -19,7 +19,7 @@ export async function updateChannel(data: GuildCounter, client: NypsiClient) {
     },
     {
       context: { channelId: data.channel },
-    }
+    },
   );
 
   let shard: number;
@@ -60,7 +60,7 @@ export async function updateChannel(data: GuildCounter, client: NypsiClient) {
           }
           return channel.guild.memberCount.toLocaleString();
         },
-        { context: { channelId: data.channel, shard } }
+        { context: { channelId: data.channel, shard } },
       )
       .then((res) => {
         for (const r of res) {
@@ -81,7 +81,7 @@ export async function updateChannel(data: GuildCounter, client: NypsiClient) {
 
           return channel.guild.memberCount.toLocaleString();
         },
-        { context: { channelId: data.channel, shard } }
+        { context: { channelId: data.channel, shard } },
       )
       .then((res) => {
         for (const r of res) {
@@ -102,7 +102,7 @@ export async function updateChannel(data: GuildCounter, client: NypsiClient) {
 
           return (channel.guild.premiumSubscriptionCount || 0).toLocaleString();
         },
-        { context: { channelId: data.channel, shard } }
+        { context: { channelId: data.channel, shard } },
       )
       .then((res) => {
         for (const r of res) {
@@ -123,12 +123,12 @@ export async function updateChannel(data: GuildCounter, client: NypsiClient) {
 
           if (channel.guild.memberCount !== channel.guild.members.cache.size) {
             return Array.from(
-              await channel.guild.members.fetch().then((members) => members.keys())
+              await channel.guild.members.fetch().then((members) => members.keys()),
             );
           }
           return Array.from(channel.guild.members.cache.keys());
         },
-        { context: { channelId: data.channel, shard } }
+        { context: { channelId: data.channel, shard } },
       )
       .then((res) => {
         for (const r of res) {
@@ -165,12 +165,12 @@ export async function updateChannel(data: GuildCounter, client: NypsiClient) {
 
           if (channel.guild.memberCount !== channel.guild.members.cache.size) {
             return Array.from(
-              await channel.guild.members.fetch().then((members) => members.keys())
+              await channel.guild.members.fetch().then((members) => members.keys()),
             );
           }
           return Array.from(channel.guild.members.cache.keys());
         },
-        { context: { channelId: data.channel, shard } }
+        { context: { channelId: data.channel, shard } },
       )
       .then((res) => {
         for (const r of res) {
@@ -206,12 +206,12 @@ export async function updateChannel(data: GuildCounter, client: NypsiClient) {
 
           if (channel.guild.memberCount !== channel.guild.members.cache.size) {
             return Array.from(
-              await channel.guild.members.fetch().then((members) => members.keys())
+              await channel.guild.members.fetch().then((members) => members.keys()),
             );
           }
           return Array.from(channel.guild.members.cache.keys());
         },
-        { context: { channelId: data.channel, shard } }
+        { context: { channelId: data.channel, shard } },
       )
       .then((res) => {
         for (const r of res) {
@@ -259,7 +259,7 @@ export async function updateChannel(data: GuildCounter, client: NypsiClient) {
       if (fail) return "failed";
       return "updated";
     },
-    { context: { shard, channelId: data.channel, format } }
+    { context: { shard, channelId: data.channel, format } },
   );
 
   for (const r of res) {
@@ -277,7 +277,7 @@ export async function createGuildCounter(
   guild: Guild,
   mode: TrackingType,
   item?: string,
-  format?: string
+  format?: string,
 ) {
   let fail = false;
 

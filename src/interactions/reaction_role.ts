@@ -14,7 +14,7 @@ export default {
       (rr) =>
         rr.messageId.includes(focused.value) ||
         rr.description.includes(focused.value) ||
-        rr.title.includes(focused.value)
+        rr.title.includes(focused.value),
     );
 
     return interaction.respond(
@@ -24,7 +24,7 @@ export default {
         if (title.length > 20) title = title.substring(0, 20) + "...";
 
         return { name: title ? `${title} (${rr.messageId})` : rr.messageId, value: rr.messageId };
-      })
+      }),
     );
   },
 } as AutocompleteHandler;

@@ -11,8 +11,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       new CustomEmbed(
         message.member,
         `currently on season ${Constants.SEASON_NUMBER}\n\nstarted on <t:${Math.floor(
-          Constants.SEASON_START.getTime() / 1000
-        )}>`
+          Constants.SEASON_START.getTime() / 1000,
+        )}>`,
       ),
     ],
   });

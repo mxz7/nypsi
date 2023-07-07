@@ -22,7 +22,7 @@ export default async function interactionCreate(interaction: Interaction) {
 
   if (
     [InteractionType.ApplicationCommandAutocomplete, InteractionType.MessageComponent].includes(
-      interaction.type
+      interaction.type,
     )
   ) {
     return runInteraction(interaction);
@@ -38,7 +38,7 @@ export default async function interactionCreate(interaction: Interaction) {
       .setColor(Constants.TRANSPARENT_EMBED_COLOR)
       .setDescription(
         "unfortunately you can't do commands in direct messages ):\n\n" +
-          "if you need support or help for nypsi, please join the official nypsi server: https://discord.gg/hJTDNST"
+          "if you need support or help for nypsi, please join the official nypsi server: https://discord.gg/hJTDNST",
       );
     return await interaction.reply({ embeds: [embed] });
   }
@@ -54,7 +54,7 @@ export default async function interactionCreate(interaction: Interaction) {
     await interaction.deferReply().catch(() => {
       if (!interaction.isCommand()) return;
       logger.warn(
-        `failed to defer slash command. ${interaction.commandName} by ${interaction.member.user.username}`
+        `failed to defer slash command. ${interaction.commandName} by ${interaction.member.user.username}`,
       );
       fail = true;
     });

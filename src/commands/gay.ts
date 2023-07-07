@@ -23,7 +23,7 @@ cmd.slashData.addUserOption((option) => option.setName("user").setDescription("a
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -108,7 +108,7 @@ async function run(
 
   const embed = new CustomEmbed(
     message.member,
-    `${member.user.toString()}\n**${gayAmount}**% gay ${gayEmoji}\n${gayText}`
+    `${member.user.toString()}\n**${gayAmount}**% gay ${gayEmoji}\n${gayText}`,
   ).setHeader("gay calculator", member.user.avatarURL());
 
   await send({ embeds: [embed] });

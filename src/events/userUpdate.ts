@@ -52,7 +52,7 @@ async function determineCluster(client: NypsiClient, userId: string) {
 
       return client.cluster.id;
     },
-    { context: { currentId: thisId, userId: userId } }
+    { context: { currentId: thisId, userId: userId } },
   );
 
   let lowest = client.cluster.id;

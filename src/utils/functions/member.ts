@@ -104,7 +104,7 @@ export async function getExactMember(guild: Guild, memberName: string): Promise<
     (member) =>
       member.user.username.toLowerCase() == memberName.toLowerCase() ||
       member.user.tag.toLowerCase() == memberName.toLowerCase() ||
-      member.user.id == memberName
+      member.user.id == memberName,
   );
 
   return target;

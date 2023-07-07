@@ -24,13 +24,13 @@ const cmd = new Command("mute", "mute one or more users", "moderation").setPermi
 cmd.slashEnabled = true;
 cmd.slashData
   .addUserOption((option) =>
-    option.setName("user").setDescription("user to mute").setRequired(true)
+    option.setName("user").setDescription("user to mute").setRequired(true),
   )
   .addStringOption((option) => option.setName("reason").setDescription("reason for the mute"));
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
     if (!message.member.permissions.has(PermissionFlagsBits.ModerateMembers)) {
@@ -77,7 +77,7 @@ async function run(
     return send({
       embeds: [
         new ErrorEmbed(
-          "i need the `manage roles` and `manage channels` permission for this command to work"
+          "i need the `manage roles` and `manage channels` permission for this command to work",
         ),
       ],
     });
@@ -96,7 +96,7 @@ async function run(
       .addField("help", "if the mute role isnt setup correctly this wont work")
       .addField(
         "time format examples",
-        "**1d** *1 day*\n**10h** *10 hours*\n**15m** *15 minutes*\n**30s** *30 seconds*"
+        "**1d** *1 day*\n**10h** *10 hours*\n**15m** *15 minutes*\n**30s** *30 seconds*",
       );
     return send({ embeds: [embed] });
   }
@@ -153,7 +153,7 @@ async function run(
         return send({
           embeds: [
             new ErrorEmbed(
-              "error creating mute role - make sure i have `manage roles` permission and `manage channels`"
+              "error creating mute role - make sure i have `manage roles` permission and `manage channels`",
             ),
           ],
         });
@@ -162,7 +162,7 @@ async function run(
         return send({
           embeds: [
             new ErrorEmbed(
-              "error creating mute role - make sure i have `manage roles` permission and `manage channels`"
+              "error creating mute role - make sure i have `manage roles` permission and `manage channels`",
             ),
           ],
         });
@@ -224,7 +224,7 @@ async function run(
         return send({
           embeds: [
             new ErrorEmbed(
-              "i am unable to give users the mute role - ensure my role is above the 'muted' role"
+              "i am unable to give users the mute role - ensure my role is above the 'muted' role",
             ),
           ],
         });
@@ -254,7 +254,7 @@ async function run(
         return send({
           embeds: [
             new ErrorEmbed(
-              "i am unable to timeout users, ensure my role is high enough and i have the permission"
+              "i am unable to timeout users, ensure my role is high enough and i have the permission",
             ),
           ],
         });

@@ -9,7 +9,7 @@ const cmd = new Command("ddos", "ddos other users (fake)", "fun").setAliases(["h
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (await onCooldown(cmd.name, message.member)) {
     const embed = await getResponse(cmd.name, message.member);
@@ -46,7 +46,7 @@ async function run(
       "\n" +
       "**port** *waiting...*" +
       "\n\n" +
-      "**status** *online*"
+      "**status** *online*",
   ).setHeader("ddos tool");
 
   return message.channel.send({ embeds: [embed] }).then((m) => {
@@ -57,7 +57,7 @@ async function run(
         "\n" +
         "**port** *scanning..*" +
         "\n\n" +
-        "**status** *online*"
+        "**status** *online*",
     );
 
     setTimeout(() => {
@@ -69,7 +69,7 @@ async function run(
             "\n" +
             `**port** *${port}*` +
             "\n\n" +
-            "**status** *online*"
+            "**status** *online*",
         );
 
         setTimeout(() => {
@@ -81,7 +81,7 @@ async function run(
                 "\n" +
                 `**port** *${port}*` +
                 "\n\n" +
-                "**status** *offline*"
+                "**status** *offline*",
             );
             embed.setColor(Constants.EMBED_SUCCESS_COLOR);
 

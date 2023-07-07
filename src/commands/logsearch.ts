@@ -7,7 +7,7 @@ const cmd = new Command("logsearch", "search through logs", "none").setPermissio
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if ((await getAdminLevel(message.author.id)) < 3) return;
 

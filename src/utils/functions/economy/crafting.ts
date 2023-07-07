@@ -48,7 +48,7 @@ export async function getCraftingItems(member: GuildMember | string, deleteOld =
     addProgress(
       id,
       "crafter",
-      completed.map((i) => i.amount).reduce((a, b) => a + b)
+      completed.map((i) => i.amount).reduce((a, b) => a + b),
     );
   }
 

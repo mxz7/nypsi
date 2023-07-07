@@ -39,16 +39,16 @@ cmd.slashData
       .setChoices(
         { name: "🗿 rock", value: "rock" },
         { name: "📰 paper", value: "paper" },
-        { name: "✂ scissors", value: "scissors" }
-      )
+        { name: "✂ scissors", value: "scissors" },
+      ),
   )
   .addStringOption((option) =>
-    option.setName("bet").setDescription("how much would you like to bet").setRequired(false)
+    option.setName("bet").setDescription("how much would you like to bet").setRequired(false),
   );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -100,7 +100,7 @@ async function run(
       .addField(
         "help",
         "rock paper scissors works exactly how this game does in real life\n" +
-          "**2**x multiplier for winning"
+          "**2**x multiplier for winning",
       );
 
     return send({ embeds: [embed] });
@@ -158,7 +158,7 @@ async function run(
     return send({
       embeds: [
         new ErrorEmbed(
-          `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
+          `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`,
         ),
       ],
     });
@@ -223,7 +223,7 @@ async function run(
     if (multi > 0) {
       await updateBalance(
         message.member,
-        (await getBalance(message.member)) + winnings + Math.round(winnings * multi)
+        (await getBalance(message.member)) + winnings + Math.round(winnings * multi),
       );
       winnings = winnings + Math.round(winnings * multi);
     } else {
@@ -242,7 +242,7 @@ async function run(
       " " +
       memberEmoji +
       "\n**bet** $" +
-      bet.toLocaleString()
+      bet.toLocaleString(),
   ).setHeader("rock paper scissors", message.author.avatarURL());
 
   const edit = async (data: MessageEditOptions, msg: Message) => {
@@ -265,7 +265,7 @@ async function run(
         " " +
         memberEmoji +
         "\n**bet** $" +
-        bet.toLocaleString()
+        bet.toLocaleString(),
     );
 
     let id: string;
@@ -279,7 +279,7 @@ async function run(
             "\n" +
             "+**" +
             Math.round(multi * 100).toString() +
-            "**% bonus"
+            "**% bonus",
         );
       } else {
         embed.addField("**winner!!**", "**you win** $" + winnings.toLocaleString());

@@ -24,12 +24,12 @@ const cmd = new Command("unmute", "unmute one or more users", "moderation").setP
 
 cmd.slashEnabled = true;
 cmd.slashData.addUserOption((option) =>
-  option.setName("user").setDescription("user to unmute").setRequired(true)
+  option.setName("user").setDescription("user to unmute").setRequired(true),
 );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
     if (!message.member.permissions.has(PermissionFlagsBits.ModerateMembers)) {
@@ -74,7 +74,7 @@ async function run(
     return send({
       embeds: [
         new ErrorEmbed(
-          "i need the `manage roles` and `manage channels` permission for this command to work"
+          "i need the `manage roles` and `manage channels` permission for this command to work",
         ),
       ],
     });
@@ -162,7 +162,7 @@ async function run(
             return send({
               embeds: [
                 new ErrorEmbed(
-                  "there was an error when removing the role, please ensure i have the correct permissions"
+                  "there was an error when removing the role, please ensure i have the correct permissions",
                 ),
               ],
             });
@@ -172,7 +172,7 @@ async function run(
           return send({
             embeds: [
               new ErrorEmbed(
-                `**${m.user.tag}** does not have the muted role (${muteRole.toString()})`
+                `**${m.user.tag}** does not have the muted role (${muteRole.toString()})`,
               ),
             ],
           });
@@ -194,7 +194,7 @@ async function run(
             return send({
               embeds: [
                 new ErrorEmbed(
-                  "there was an error when unmuting the user, please ensure i have the correct permissions"
+                  "there was an error when unmuting the user, please ensure i have the correct permissions",
                 ),
               ],
             });

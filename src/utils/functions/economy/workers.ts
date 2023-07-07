@@ -72,7 +72,7 @@ export async function emptyWorkersStored(member: GuildMember | string) {
 export async function calcWorkerValues(
   worker: EconomyWorker & {
     upgrades: EconomyWorkerUpgrades[];
-  }
+  },
 ) {
   const baseUpgrades = getBaseUpgrades();
   const baseWorkers = getBaseWorkers();
@@ -237,21 +237,21 @@ export async function claimFromWorkers(userId: string): Promise<string> {
     while (scrapChance > 0 && percentChance(scrapChance * worker.stored)) {
       amounts.set(
         "quarry_scrap",
-        amounts.has("quarry_scrap") ? amounts.get("quarry_scrap") + 1 : 1
+        amounts.has("quarry_scrap") ? amounts.get("quarry_scrap") + 1 : 1,
       );
       await addInventoryItem(worker.userId, "quarry_scrap", 1, false);
     }
 
     earnedBreakdown.push(
       `${baseWorker.name} +$${Math.floor(
-        perItem * worker.stored
-      ).toLocaleString()} (${worker.stored.toLocaleString()} ${baseWorker.item_emoji})`
+        perItem * worker.stored,
+      ).toLocaleString()} (${worker.stored.toLocaleString()} ${baseWorker.item_emoji})`,
     );
     amounts.set(
       `${baseWorker.name} +$${Math.floor(
-        perItem * worker.stored
+        perItem * worker.stored,
       ).toLocaleString()} (${worker.stored.toLocaleString()} ${baseWorker.item_emoji})`,
-      perItem * worker.stored
+      perItem * worker.stored,
     );
   }
 
@@ -271,7 +271,7 @@ export async function claimFromWorkers(userId: string): Promise<string> {
     footer.push(
       `you found **${amounts.get("gem_scrap")}** ${getItems()["gem_shard"].emoji} gem shard${
         amounts.get("gem_scrap") > 1 ? "s" : ""
-      }`
+      }`,
     );
   }
 
@@ -279,7 +279,7 @@ export async function claimFromWorkers(userId: string): Promise<string> {
     footer.push(
       `you found **${amounts.get("quarry_scrap")}** ${
         getItems()["quarry_scrap"].emoji
-      } quarry scrap${amounts.get("quarry_scrap") > 1 ? "s" : ""}`
+      } quarry scrap${amounts.get("quarry_scrap") > 1 ? "s" : ""}`,
     );
   }
 

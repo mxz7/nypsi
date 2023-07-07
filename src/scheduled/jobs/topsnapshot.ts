@@ -199,7 +199,7 @@ async function clearOld() {
   ]);
 
   parentPort.postMessage(
-    `created ${count.reduce((a, b) => a + b).toLocaleString()} entries in graph data`
+    `created ${count.reduce((a, b) => a + b).toLocaleString()} entries in graph data`,
   );
 
   process.exit(0);

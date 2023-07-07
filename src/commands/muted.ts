@@ -18,7 +18,7 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 const cmd = new Command(
   "muted",
   "view the currently muted members in the server",
-  "moderation"
+  "moderation",
 ).setPermissions(["MANAGE_MESSAGES", "MODERATE_MEMBERS"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
@@ -85,7 +85,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       .setLabel("back")
       .setStyle(ButtonStyle.Primary)
       .setDisabled(true),
-    new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
+    new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
   );
 
   let msg: Message;
@@ -130,7 +130,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
               .setLabel("back")
               .setStyle(ButtonStyle.Primary)
               .setDisabled(true),
-            new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
+            new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
           );
         } else {
           row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -139,7 +139,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
               .setLabel("back")
               .setStyle(ButtonStyle.Primary)
               .setDisabled(false),
-            new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
+            new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
           );
         }
         await msg.edit({ embeds: [embed], components: [row] });
@@ -165,7 +165,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
               .setCustomId("➡")
               .setLabel("next")
               .setStyle(ButtonStyle.Primary)
-              .setDisabled(true)
+              .setDisabled(true),
           );
         } else {
           row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -178,7 +178,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
               .setCustomId("➡")
               .setLabel("next")
               .setStyle(ButtonStyle.Primary)
-              .setDisabled(false)
+              .setDisabled(false),
           );
         }
       }

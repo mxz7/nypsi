@@ -82,7 +82,7 @@ module.exports = new ItemUse(
     await setInventoryItem(
       message.member,
       "bob",
-      inventory.find((i) => i.item === "bob").amount - amount
+      inventory.find((i) => i.item === "bob").amount - amount,
     );
 
     const breakdown: string[] = [];
@@ -96,8 +96,8 @@ module.exports = new ItemUse(
         `\`${item.amount.toLocaleString()}x\` ${getItems()[item.itemId].emoji} ${
           getItems()[item.itemId].name
         }: \`${MStoTime(item.finished.getTime() - Date.now())}\` → \`${MStoTime(
-          newDate.getTime() - Date.now()
-        )}\``
+          newDate.getTime() - Date.now(),
+        )}\``,
       );
 
       await prisma.crafting.update({
@@ -124,9 +124,9 @@ module.exports = new ItemUse(
           message.member,
           `<:nypsi_bob:1078776552067694672> bob has removed ${amount} hour${
             amount > 1 ? "s" : ""
-          } of crafting time from ${crafting.length} items\n\n${breakdown.join("\n")}`
+          } of crafting time from ${crafting.length} items\n\n${breakdown.join("\n")}`,
         ),
       ],
     });
-  }
+  },
 );

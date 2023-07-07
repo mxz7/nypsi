@@ -21,7 +21,7 @@ const cmd = new Command("minecraft", "view minecraft name history", "minecraft")
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   const prefix = await getPrefix(message.guild);
 
@@ -57,9 +57,9 @@ async function run(
     names
       .reverse()
       .map(
-        (i) => `\`${i.username}\`${i.changed_at ? ` | <t:${dayjs(i.changed_at).unix()}:d>` : ""}`
+        (i) => `\`${i.username}\`${i.changed_at ? ` | <t:${dayjs(i.changed_at).unix()}:d>` : ""}`,
       ),
-    7
+    7,
   );
 
   const embed = new CustomEmbed(message.member)
@@ -76,7 +76,7 @@ async function run(
       .setLabel("back")
       .setStyle(ButtonStyle.Primary)
       .setDisabled(true),
-    new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
+    new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
   );
 
   const msg = await message.channel.send({ embeds: [embed], components: [row] });
@@ -95,7 +95,7 @@ async function getUUID(username: string): Promise<{ name: string; id: string }> 
   }
 
   let uuid = await fetch(`https://api.mojang.com/users/profiles/minecraft/${username}`).then(
-    (uuidURL) => uuidURL.json()
+    (uuidURL) => uuidURL.json(),
   );
 
   if (uuid.errorMessage) uuid = { id: "null", string: "null" };
@@ -104,7 +104,7 @@ async function getUUID(username: string): Promise<{ name: string; id: string }> 
     `${Constants.redis.cache.minecraft.UUID}:${username}`,
     JSON.stringify(uuid),
     "EX",
-    604800
+    604800,
   );
 
   return uuid;
@@ -121,7 +121,7 @@ async function getNameHistory(uuid: string): Promise<{ username: string; changed
       headers: {
         "User-Agent": `Mozilla/5.0 (compatible; nypsi/${getVersion()}; +https://github.com/tekoh)`,
       },
-    }
+    },
   ).then((r) => r.json());
 
   // @ts-expect-error possible
@@ -134,7 +134,7 @@ async function getNameHistory(uuid: string): Promise<{ username: string; changed
     `${Constants.redis.cache.minecraft.NAME_HISTORY}:${uuid}`,
     JSON.stringify(names),
     "EX",
-    300
+    300,
   );
 
   return names;

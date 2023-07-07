@@ -193,7 +193,7 @@ if (!isMainThread) {
       if (auctionAverages.has(dateString)) {
         graphData.data.datasets[0].data.push(
           auctionAverages.get(dateString).reduce((a, b) => a + b) /
-            auctionAverages.get(dateString).length
+            auctionAverages.get(dateString).length,
         );
       } else if (index > 0) {
         graphData.data.datasets[0].data.push(graphData.data.datasets[0].data[index - 1]);
@@ -204,7 +204,7 @@ if (!isMainThread) {
       if (offerAverages.has(dateString)) {
         graphData.data.datasets[1].data.push(
           offerAverages.get(dateString).reduce((a, b) => a + b) /
-            offerAverages.get(dateString).length
+            offerAverages.get(dateString).length,
         );
       } else if (index > 0) {
         graphData.data.datasets[1].data.push(graphData.data.datasets[1].data[index - 1]);
@@ -229,7 +229,7 @@ if (!isMainThread) {
         method: "POST",
         body,
         headers: { "Content-Type": "application/json" },
-      }
+      },
     ).then((res) => res.json());
 
     if (!res.success) {

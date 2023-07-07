@@ -23,7 +23,7 @@ cmd.slashData.addUserOption((option) => option.setName("user").setDescription("a
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -120,7 +120,7 @@ async function run(
 
   const embed = new CustomEmbed(
     message.member,
-    `${member.user.toString()}\n**${slutAmount}**% slut ${slutEmoji}\n${slutText}`
+    `${member.user.toString()}\n**${slutAmount}**% slut ${slutEmoji}\n${slutText}`,
   ).setTitle("slut calculator");
 
   return await send({ embeds: [embed] });

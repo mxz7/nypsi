@@ -17,7 +17,7 @@ import { createUser, getItems, userExists } from "../utils/functions/economy/uti
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("smelt", "smelt your ores into ingots with coal", "money").setDocs(
-  "https://docs.nypsi.xyz/economy/minecraft"
+  "https://docs.nypsi.xyz/economy/minecraft",
 );
 
 cmd.slashEnabled = true;
@@ -79,7 +79,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({
       embeds: [
         new ErrorEmbed(
-          "you need a furnace to smelt ore. furnaces can be found in crates or bought from the shop"
+          "you need a furnace to smelt ore. furnaces can be found in crates or bought from the shop",
         ),
       ],
     });
@@ -113,7 +113,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({
       embeds: [
         new ErrorEmbed(
-          "you need coal to smelt ore. coal can be found in crates and through mining"
+          "you need coal to smelt ore. coal can be found in crates and through mining",
         ),
       ],
     });
@@ -143,8 +143,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         message.member,
         ore,
         inventory.find((i) => i.item == ore).amount - smelted.get(ore),
-        false
-      )
+        false,
+      ),
     );
 
     const ingot = items[ore].ingot;
@@ -159,16 +159,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       message.member,
       "coal",
       inventory.find((i) => i.item == "coal").amount - coal,
-      false
-    )
+      false,
+    ),
   );
   promises.push(
     setInventoryItem(
       message.member,
       "furnace",
       inventory.find((i) => i.item == "furnace").amount - 1,
-      false
-    )
+      false,
+    ),
   );
 
   await Promise.all(promises);

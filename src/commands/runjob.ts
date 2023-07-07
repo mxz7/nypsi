@@ -7,7 +7,7 @@ const cmd = new Command("runjob", "run a job", "none").setPermissions(["bot owne
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (message.author.id !== Constants.TEKOH_ID) return;
 

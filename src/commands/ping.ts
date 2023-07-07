@@ -7,7 +7,7 @@ import { CustomEmbed } from "../models/EmbedBuilders.js";
 const cmd = new Command(
   "ping",
   "measured by timing how long it takes for a message to be sent - rate limiting can affect this",
-  "info"
+  "info",
 ).setAliases(["latency"]);
 
 let pingingDb = false;

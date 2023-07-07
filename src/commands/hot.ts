@@ -22,7 +22,7 @@ cmd.slashData.addUserOption((option) => option.setName("user").setDescription("h
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -127,7 +127,7 @@ async function run(
 
   const embed = new CustomEmbed(
     message.member,
-    `${member.user.toString()}\n**${hotAmount}**% hot ${hotEmoji}\n${hotText}`
+    `${member.user.toString()}\n**${hotAmount}**% hot ${hotEmoji}\n${hotText}`,
   ).setHeader("hotness calculator", member.user.avatarURL());
 
   if (hotAmount >= 95) {

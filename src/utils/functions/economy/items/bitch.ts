@@ -50,9 +50,9 @@ module.exports = new ItemUse(
           message.member,
           `you had fun with your bitch${
             inventory.find((i) => i.item === "bitch").amount > 1 ? "es" : ""
-          }`
+          }`,
         ),
       ],
     });
-  }
+  },
 );

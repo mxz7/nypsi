@@ -18,12 +18,12 @@ const cmd = new Command("iq", "accurate prediction of your iq", "fun");
 
 cmd.slashEnabled = true;
 cmd.slashData.addUserOption((option) =>
-  option.setName("user").setDescription("how large is your iq")
+  option.setName("user").setDescription("how large is your iq"),
 );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -136,7 +136,7 @@ async function run(
 
   const embed = new CustomEmbed(
     message.member,
-    `${member.user.toString()}\n\n**${iq}** IQ 🧠\n${iqMsg}`
+    `${member.user.toString()}\n\n**${iq}** IQ 🧠\n${iqMsg}`,
   ).setHeader("iq calculator", member.user.avatarURL());
 
   send({ embeds: [embed] });

@@ -25,7 +25,7 @@ export default async function messageUpdate(message: Message, newMessage: Messag
       embed.setDescription(
         `[jump](${message.url})\n\n${message.member.toString()} \`${
           message.author.id
-        }\`\n\n**channel** ${message.channel.toString()} \`${message.channelId}\``
+        }\`\n\n**channel** ${message.channel.toString()} \`${message.channelId}\``,
       );
       embed.addField("old content", `\`\`\`${message.content}\`\`\``, true);
       embed.addField("new content", `\`\`\`${newMessage.content}\`\`\``, true);

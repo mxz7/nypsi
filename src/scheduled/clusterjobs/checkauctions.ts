@@ -41,7 +41,7 @@ export async function runAuctionChecks(client: NypsiClient) {
       embed.setDescription(
         `your auction for ${auction.itemAmount}x ${items[auction.itemId].emoji} ${
           items[auction.itemId].name
-        } has expired. you have been given back your item${auction.itemAmount > 1 ? "s" : ""}`
+        } has expired. you have been given back your item${auction.itemAmount > 1 ? "s" : ""}`,
       );
 
       if ((await getDmSettings(auction.ownerId)).auction) {

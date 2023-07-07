@@ -15,7 +15,7 @@ import { readFile, readdir, unlink } from "fs/promises";
           } catch (e) {
             return undefined;
           }
-        })
+        }),
     );
 
     let attempts = 0;

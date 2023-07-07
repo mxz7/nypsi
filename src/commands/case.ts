@@ -23,12 +23,15 @@ const cmd = new Command("case", "get information about a given case", "moderatio
 
 cmd.slashEnabled = true;
 cmd.slashData.addIntegerOption((option) =>
-  option.setName("case-number").setDescription("what case would you like to view").setRequired(true)
+  option
+    .setName("case-number")
+    .setDescription("what case would you like to view")
+    .setRequired(true),
 );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
     if (!message.member.permissions.has(PermissionFlagsBits.ModerateMembers)) {
@@ -76,7 +79,7 @@ async function run(
         "help",
         "to delete a case, react with ❌ after running the command\n" +
           "dates are in MM/DD/YYYY format\n" +
-          `to delete data for the server, run ${prefix}**deleteallcases**\nto delete a case you need the \`manage server\` permission`
+          `to delete data for the server, run ${prefix}**deleteallcases**\nto delete a case you need the \`manage server\` permission`,
       );
 
     return send({ embeds: [embed] });
@@ -114,7 +117,7 @@ async function run(
   }
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder().setCustomId("❌").setLabel("delete").setStyle(ButtonStyle.Danger)
+    new ButtonBuilder().setCustomId("❌").setLabel("delete").setStyle(ButtonStyle.Danger),
   );
 
   let msg: Message;
@@ -151,7 +154,7 @@ async function run(
 
     const newEmbed = new CustomEmbed(
       message.member,
-      "✅ case `" + case0.caseId + "` successfully deleted by " + message.member.toString()
+      "✅ case `" + case0.caseId + "` successfully deleted by " + message.member.toString(),
     );
 
     await edit({ embeds: [newEmbed], components: [] }, msg);

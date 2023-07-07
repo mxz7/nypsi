@@ -36,7 +36,7 @@ export function isImageUrl(url: string): boolean {
 
 export async function redditImage(
   post: RedditJSONPost,
-  allowed: RedditJSONPost[]
+  allowed: RedditJSONPost[],
 ): Promise<string> {
   let image = post.data.url;
 
@@ -55,7 +55,7 @@ export async function redditImage(
 
   if (image.includes("gfycat")) {
     const link = await fetch("https://api.gfycat.com/v1/gfycats/" + image.split("/")[3]).then(
-      (url) => url.json()
+      (url) => url.json(),
     );
 
     if (link.gfyItem) {
@@ -93,7 +93,7 @@ export async function redditImage(
 
     if (image.includes("gfycat")) {
       const link = await fetch("https://api.gfycat.com/v1/gfycats/" + image.split("/")[3]).then(
-        (url) => url.json()
+        (url) => url.json(),
       );
 
       if (link) {
@@ -128,7 +128,7 @@ export async function redditImage(
 
 export async function suggestWholesomeImage(
   submitter: GuildMember,
-  image: string
+  image: string,
 ): Promise<boolean> {
   const query1 = await prisma.wholesomeImage.findUnique({
     where: {
@@ -170,7 +170,7 @@ export async function suggestWholesomeImage(
     .setTitle("wholesome suggestion #" + id);
 
   embed.setDescription(
-    `**submitter** ${submitter.user.tag} (${submitter.user.id})\n**url** ${image}`
+    `**submitter** ${submitter.user.tag} (${submitter.user.id})\n**url** ${image}`,
   );
 
   embed.setFooter({ text: "$ws review" });
@@ -188,7 +188,7 @@ export async function suggestWholesomeImage(
 export async function acceptWholesomeImage(
   id: number,
   accepter: GuildMember,
-  client: NypsiClient
+  client: NypsiClient,
 ): Promise<boolean> {
   const query = await prisma.wholesomeSuggestion.findUnique({
     where: {
@@ -347,7 +347,7 @@ export async function uploadImageToImgur(url: string): Promise<string> {
 
 export async function fallbackUpload(url: string): Promise<string> {
   const res = await fetch(
-    `https://api.imgbb.com/1/upload?key=${process.env.IMGBB_TOKEN}&image=${url}`
+    `https://api.imgbb.com/1/upload?key=${process.env.IMGBB_TOKEN}&image=${url}`,
   ).then((res) => res.json());
 
   return res.data.url;

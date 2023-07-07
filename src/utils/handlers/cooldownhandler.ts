@@ -141,7 +141,7 @@ export async function getResponse(cmd: string, member: GuildMember | string): Pr
 
 async function calculateCooldownLength(
   seconds: number,
-  member: GuildMember | string
+  member: GuildMember | string,
 ): Promise<number> {
   if (await isPremium(member)) {
     if ((await getTier(member)) == 4) {

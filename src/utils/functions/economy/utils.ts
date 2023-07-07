@@ -76,7 +76,7 @@ export function loadItems(crypto = true) {
 
 async function updateCryptoWorth() {
   let res = await fetch("https://api.coinbase.com/v2/exchange-rates?currency=BTC").then((res) =>
-    res.json()
+    res.json(),
   );
 
   const btcworth = Math.floor(res.data.rates.USD);
@@ -91,7 +91,7 @@ async function updateCryptoWorth() {
   logger.info("bitcoin worth updated: $" + items["bitcoin"].buy.toLocaleString());
 
   res = await fetch("https://api.coinbase.com/v2/exchange-rates?currency=ETH").then((res) =>
-    res.json()
+    res.json(),
   );
 
   const ethWorth = Math.floor(res.data.rates.USD);
@@ -479,7 +479,7 @@ export async function addTicket(member: GuildMember | string, amount = 1) {
   await redis.hincrby(
     "lotterytickets:queue",
     (await getPreferences(id)).leaderboards ? member.user.username : "[hidden]",
-    amount
+    amount,
   );
 }
 
