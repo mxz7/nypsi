@@ -56,11 +56,11 @@ module.exports = new ItemUse(
         message.member,
         "padlock",
         inventory.find((i) => i.item == "padlock").amount - 1,
-        false
+        false,
       ),
       setPadlock(message.member, true),
     ]);
 
     return send({ embeds: [new CustomEmbed(message.member, "✅ your padlock has been applied")] });
-  }
+  },
 );

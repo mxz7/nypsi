@@ -47,18 +47,18 @@ cmd.slashData
       .setName("item")
       .setDescription("the item you want to use")
       .setRequired(true)
-      .setAutocomplete(true)
+      .setAutocomplete(true),
   )
   .addStringOption((option) =>
-    option.setName("amount").setDescription("amount of item you want to use")
+    option.setName("amount").setDescription("amount of item you want to use"),
   )
   .addUserOption((option) =>
-    option.setName("member").setDescription("member to use your item on, if applicable")
+    option.setName("member").setDescription("member to use your item on, if applicable"),
   );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (!(await userExists(message.member))) await createUser(message.member);
 
@@ -105,7 +105,7 @@ async function run(
       embeds: [
         new CustomEmbed(
           message.member,
-          `${prefix}use <item>\n\nuse items to open crates or to simply use the item's function`
+          `${prefix}use <item>\n\nuse items to open crates or to simply use the item's function`,
         ).setHeader("use", message.author.avatarURL()),
       ],
     });
@@ -196,7 +196,7 @@ async function run(
         message.member,
         selected.id,
         inventory.find((i) => i.item == selected.id).amount - amount,
-        false
+        false,
       ),
     ]);
 
@@ -210,8 +210,8 @@ async function run(
       if (boosters.get(boosterId).length == 1) {
         currentBoosters.push(
           `**${items[boosterId].name}** ${items[boosterId].emoji} - expires <t:${Math.round(
-            boosters.get(boosterId)[0].expire / 1000
-          )}:R>`
+            boosters.get(boosterId)[0].expire / 1000,
+          )}:R>`,
         );
       } else {
         let lowest = boosters.get(boosterId)[0].expire;
@@ -223,7 +223,7 @@ async function run(
         currentBoosters.push(
           `**${items[boosterId].name}** ${items[boosterId].emoji} \`x${
             boosters.get(boosterId).length
-          }\` - next expires <t:${Math.round(boosters.get(boosterId)[0].expire / 1000)}:R>`
+          }\` - next expires <t:${Math.round(boosters.get(boosterId)[0].expire / 1000)}:R>`,
         );
       }
     }
@@ -258,7 +258,7 @@ async function run(
           .setLabel("back")
           .setStyle(ButtonStyle.Primary)
           .setDisabled(true),
-        new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
+        new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
       );
 
       await msg.edit({ embeds: [embed], components: [row] });
@@ -343,7 +343,7 @@ async function run(
       message.member,
       selected.id,
       inventory.find((i) => i.item == selected.id).amount - amount,
-      false
+      false,
     );
     await addStat(message.member, selected.id, amount);
 
@@ -353,7 +353,7 @@ async function run(
           message.member,
           `you have activated **${upgrade.name}** on your **${
             getBaseWorkers()[upgrade.for].name
-          }**\n\n${userUpgrade ? userUpgrade.amount + amount : amount}/${upgrade.stack_limit}`
+          }**\n\n${userUpgrade ? userUpgrade.amount + amount : amount}/${upgrade.stack_limit}`,
         ).setHeader("use", message.author.avatarURL()),
       ],
     });
@@ -383,7 +383,7 @@ async function run(
       message.member,
       selected.id,
       inventory.find((i) => i.item == selected.id).amount - amount,
-      false
+      false,
     );
     addStat(message.member, selected.id, amount);
 
@@ -393,7 +393,7 @@ async function run(
       message.member,
       `you have activated the ${items[selected.id].emoji} ${
         items[selected.id].name
-      } upgrade on your bakery`
+      } upgrade on your bakery`,
     ).setHeader("use", message.author.avatarURL());
 
     embed.addField(
@@ -403,9 +403,9 @@ async function run(
           (u) =>
             `\`${u.amount.toLocaleString()}x\` ${getBakeryUpgradesData()[u.upgradeId].emoji} ${
               getBakeryUpgradesData()[u.upgradeId].name
-            }`
+            }`,
         )
-        .join("\n")
+        .join("\n"),
     );
 
     return send({ embeds: [embed] });
@@ -427,7 +427,7 @@ module.exports = cmd;
 
 (async () => {
   const files = await readdir("./dist/utils/functions/economy/items").then((res) =>
-    res.filter((file) => file.endsWith(".js"))
+    res.filter((file) => file.endsWith(".js")),
   );
 
   for (const file of files) {

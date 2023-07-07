@@ -31,7 +31,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const embed = new CustomEmbed(message.member).setHeader(
     `${message.author.username}'s networth`,
-    message.author.avatarURL()
+    message.author.avatarURL(),
   );
 
   let mainValues = `🌍 $**${net.amount.toLocaleString()}**\n`;
@@ -40,15 +40,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   for (const [key, value] of net.breakdown.entries()) {
     if (key === "balance") {
       mainValues += `\n💰 $**${value.toLocaleString()}** (${((value / net.amount) * 100).toFixed(
-        2
+        2,
       )}%)`;
     } else if (key === "guild") {
       mainValues += `\n👥 $**${value.toLocaleString()}** (${((value / net.amount) * 100).toFixed(
-        2
+        2,
       )}%)`;
     } else if (key === "workers") {
       mainValues += `\n👷🏻‍♂️ $**${value.toLocaleString()}** (${((value / net.amount) * 100).toFixed(
-        2
+        2,
       )}%)`;
     } else if (key === "bakery") {
       mainValues += `\n${getItems()["furnace"].emoji} $**${value.toLocaleString()}** (${(
@@ -70,8 +70,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         } ${getItems()[i.itemId].name}: $**${i.value.toLocaleString()}** (${(
           (i.value / net.amount) *
           100
-        ).toFixed(2)}%)`
-    )
+        ).toFixed(2)}%)`,
+    ),
   );
 
   embed.setDescription(mainValues);
@@ -81,7 +81,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         .map((i) => (i.value / net.amount) * 100)
         .reduce((a, b) => a + b)
         .toFixed(2)}%)`,
-      pages.get(1).join("\n")
+      pages.get(1).join("\n"),
     );
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -90,7 +90,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       .setLabel("back")
       .setStyle(ButtonStyle.Primary)
       .setDisabled(true),
-    new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
+    new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
   );
   if (pages.size == 1) return message.channel.send({ embeds: [embed] });
   const msg = await message.channel.send({ embeds: [embed], components: [row] });

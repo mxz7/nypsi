@@ -24,7 +24,7 @@ cmd.slashData
   .addSubcommand((option) => option.setName("play").setDescription("play a game of wordle"))
   .addSubcommand((option) => option.setName("stats").setDescription("view your stats for wordle"))
   .addSubcommand((option) =>
-    option.setName("help").setDescription("view the help menu for wordle")
+    option.setName("help").setDescription("view the help menu for wordle"),
   );
 
 interface Game {
@@ -47,7 +47,7 @@ let wordList: string[];
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -94,7 +94,7 @@ async function run(
 
     embed.setHeader("wordle help");
     embed.setDescription(
-      `you have 6 attempts to guess the word\n\ngreen letters indicate that the letter is in the correct spot\nyellow letters indicate that the letter is in the word, but in the wrong spot\ngrey letters arent in the word at all\n\n[wordlist](https://github.com/tekoh/nypsi/blob/main/data/wordle.txt)\n**${prefix}wordle play**`
+      `you have 6 attempts to guess the word\n\ngreen letters indicate that the letter is in the correct spot\nyellow letters indicate that the letter is in the word, but in the wrong spot\ngrey letters arent in the word at all\n\n[wordlist](https://github.com/tekoh/nypsi/blob/main/data/wordle.txt)\n**${prefix}wordle play**`,
     );
     embed.setFooter({ text: "type 'stop' to cancel the game when you're playing" });
 
@@ -111,7 +111,7 @@ async function run(
     const embed = new CustomEmbed(message.member).setHeader(
       `${message.author.username}'s wordle stats`,
       message.author.avatarURL(),
-      `https://nypsi.xyz/user/${message.author.id}#wordle`
+      `https://nypsi.xyz/user/${message.author.id}#wordle`,
     );
 
     let desc = "";
@@ -189,7 +189,7 @@ async function run(
 }
 
 async function play(
-  message: Message | (NypsiCommandInteraction & CommandInteraction)
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
 ): Promise<void> {
   const m = games.get(message.author.id).message;
   const edit = async (data: MessageEditOptions) => {
@@ -284,7 +284,7 @@ async function play(
       } else {
         embed.addField(
           "letters not in wordle",
-          `~~${games.get(message.author.id).notInWord.join("~~ ~~")}~~`
+          `~~${games.get(message.author.id).notInWord.join("~~ ~~")}~~`,
         );
       }
     }
@@ -322,7 +322,7 @@ async function cancel(message: Message | (NypsiCommandInteraction & CommandInter
   const embed = games.get(message.author.id).embed;
   embed.setDescription(
     `${renderBoard(games.get(message.author.id).board)}\n\n` +
-      `game cancelled. the word was **${games.get(message.author.id).word}**`
+      `game cancelled. the word was **${games.get(message.author.id).word}**`,
   );
   embed.setColor(Constants.EMBED_FAIL_COLOR);
   embed.setFooter(null);
@@ -349,12 +349,12 @@ async function win(message: Message | (NypsiCommandInteraction & CommandInteract
     message.member,
     true,
     games.get(message.author.id).guesses.length,
-    Date.now() - games.get(message.author.id).start
+    Date.now() - games.get(message.author.id).start,
   );
 
   const embed = games.get(message.author.id).embed;
   embed.setDescription(
-    `${renderBoard(games.get(message.author.id).board)}\n\n` + "you won!! congratulations"
+    `${renderBoard(games.get(message.author.id).board)}\n\n` + "you won!! congratulations",
   );
   embed.setColor(Constants.EMBED_SUCCESS_COLOR);
   embed.setFooter({
@@ -389,7 +389,7 @@ async function lose(message: Message | (NypsiCommandInteraction & CommandInterac
   const embed = games.get(message.author.id).embed;
   embed.setDescription(
     `${renderBoard(games.get(message.author.id).board)}\n\n` +
-      `you lost ): the word was **${games.get(message.author.id).word}**`
+      `you lost ): the word was **${games.get(message.author.id).word}**`,
   );
   embed.setColor(Constants.EMBED_FAIL_COLOR);
   embed.setFooter(null);

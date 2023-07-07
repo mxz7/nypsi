@@ -31,7 +31,7 @@ export function startMentionInterval() {
         memberId: Constants.TEKOH_ID,
         payload: {
           content: `mention queue over threshold: ${Number(
-            await redis.llen(Constants.redis.nypsi.MENTION_QUEUE)
+            await redis.llen(Constants.redis.nypsi.MENTION_QUEUE),
           ).toLocaleString()}`,
         },
       });
@@ -74,7 +74,9 @@ async function addMention(item: MentionQueueItem) {
     });
     if (res === 1) logger.warn("worker timed out");
     logger.debug(
-      `${item.members.length.toLocaleString()} mentions inserted in ${(Date.now() - start) / 1000}s`
+      `${item.members.length.toLocaleString()} mentions inserted in ${
+        (Date.now() - start) / 1000
+      }s`,
     );
 
     return;

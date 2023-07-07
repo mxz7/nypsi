@@ -22,12 +22,12 @@ const cmd = new Command("furry", "measure how much of a furry you are", "fun").s
 
 cmd.slashEnabled = true;
 cmd.slashData.addUserOption((option) =>
-  option.setName("user").setDescription("is this dude a furry")
+  option.setName("user").setDescription("is this dude a furry"),
 );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -133,7 +133,7 @@ async function run(
 
   const embed = new CustomEmbed(
     message.member,
-    `${member.user.toString()}\n**${furryAmount}**% furry ${furryEmoji}\n${furryText}`
+    `${member.user.toString()}\n**${furryAmount}**% furry ${furryEmoji}\n${furryText}`,
   ).setHeader("furry detector 5000", member.user.avatarURL());
 
   if (furryAmount < 7) {

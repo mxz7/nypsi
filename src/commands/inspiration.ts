@@ -7,7 +7,7 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 const cmd = new Command(
   "inspiration",
   "generate an inspirational quote (inspirobot.me)",
-  "fun"
+  "fun",
 ).setAliases(["quote", "inspire"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {

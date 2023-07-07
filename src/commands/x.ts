@@ -43,14 +43,14 @@ const cmd = new Command("x", "admincmd", "none").setPermissions(["bot owner"]);
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (!(message instanceof Message)) return;
   if ((await getAdminLevel(message.author.id)) < 1)
     return message.react(
       ["🫦", "💦", "🍑", "🍆", "😩"][
         Math.floor(Math.random() * ["🫦", "💦", "🍑", "🍆", "😩"].length)
-      ]
+      ],
     );
 
   const getDbData = async (user: User) => {
@@ -137,37 +137,37 @@ async function run(
         message.author.tag
       } ${
         message.author.id
-      } - ${new Date().toUTCString()}\n\n----------\nYOUR USER DATA\n----------\n\n`
+      } - ${new Date().toUTCString()}\n\n----------\nYOUR USER DATA\n----------\n\n`,
     );
     await fs.appendFile(file, JSON.stringify(userData, null, 2));
 
     await fs.appendFile(
       file,
-      "\n----------------------------------------------\n\n----------\nYOUR MODERATION CASE DATA WHERE YOU GOT PUNISHED\n----------\n\n"
+      "\n----------------------------------------------\n\n----------\nYOUR MODERATION CASE DATA WHERE YOU GOT PUNISHED\n----------\n\n",
     );
     await fs.appendFile(file, JSON.stringify(moderationCases, null, 2));
 
     await fs.appendFile(
       file,
-      "\n----------------------------------------------\n\n----------\nYOUR MODERATION CASE DATA WHERE YOU WERE THE MODERATOR\n----------\n\n"
+      "\n----------------------------------------------\n\n----------\nYOUR MODERATION CASE DATA WHERE YOU WERE THE MODERATOR\n----------\n\n",
     );
     await fs.appendFile(file, JSON.stringify(moderationCasesModerator, null, 2));
 
     await fs.appendFile(
       file,
-      "\n----------------------------------------------\n\n----------\nYOUR MODERATION MUTE DATA\n----------\n\n"
+      "\n----------------------------------------------\n\n----------\nYOUR MODERATION MUTE DATA\n----------\n\n",
     );
     await fs.appendFile(file, JSON.stringify(moderationMutes, null, 2));
 
     await fs.appendFile(
       file,
-      "\n----------------------------------------------\n\n----------\nYOUR MODERATION BAN DATA\n----------\n\n"
+      "\n----------------------------------------------\n\n----------\nYOUR MODERATION BAN DATA\n----------\n\n",
     );
     await fs.appendFile(file, JSON.stringify(moderationBans, null, 2));
 
     await fs.appendFile(
       file,
-      "\n----------------------------------------------\n\n----------\nYOUR CHAT REACTION DATA\n----------\n\n"
+      "\n----------------------------------------------\n\n----------\nYOUR CHAT REACTION DATA\n----------\n\n",
     );
     await fs.appendFile(file, JSON.stringify(chatReactionStats, null, 2));
 
@@ -183,7 +183,7 @@ async function run(
 
         return g;
       },
-      { context: { userId: id } }
+      { context: { userId: id } },
     );
 
     let user: User;
@@ -221,7 +221,7 @@ async function run(
           .setCustomId("set-admin")
           .setLabel("set admin level")
           .setStyle(ButtonStyle.Primary)
-          .setEmoji("👨🏻‍💼")
+          .setEmoji("👨🏻‍💼"),
       ),
       new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()
@@ -238,7 +238,7 @@ async function run(
           .setCustomId("badges")
           .setLabel("badges")
           .setStyle(ButtonStyle.Primary)
-          .setEmoji("🏷️")
+          .setEmoji("🏷️"),
       ),
       new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()
@@ -265,7 +265,7 @@ async function run(
           .setCustomId("set-inv")
           .setLabel("modify inventory")
           .setStyle(ButtonStyle.Danger)
-          .setEmoji("🎒")
+          .setEmoji("🎒"),
       ),
       new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()
@@ -282,14 +282,12 @@ async function run(
           .setCustomId("blacklist")
           .setLabel("blacklist")
           .setStyle(ButtonStyle.Danger)
-          .setEmoji("❌")
+          .setEmoji("❌"),
       ),
     ];
 
-    let desc = `tag: ${user?.username}#${user?.discriminator}\nid: ${
-      user?.id
-    }\ncreated: <t:${Math.floor(
-      user.createdTimestamp / 1000
+    let desc = `tag: ${user?.username}#${user?.discriminator}\nid: ${user?.id}\ncreated: <t:${Math.floor(
+      user.createdTimestamp / 1000,
     )}:R>\nadmin level: ${await getAdminLevel(user.id)}`;
 
     if (!(await hasProfile(user.id))) desc += "\n**has no user profile**";
@@ -302,7 +300,7 @@ async function run(
     }
 
     const embed = new CustomEmbed(message.member, desc).setHeader(
-      `${user.username}'s discord data`
+      `${user.username}'s discord data`,
     );
 
     const msg = await message.channel.send({ embeds: [embed], components: rows });
@@ -327,7 +325,7 @@ async function run(
         }
 
         logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) viewed ${user.id} db data`
+          `admin: ${message.author.tag} (${message.author.id}) viewed ${user.id} db data`,
         );
 
         const files = [await getDbData(user)];
@@ -350,11 +348,11 @@ async function run(
           message.member,
           `**total** ${total.toLocaleString()}\n**daily** ${daily.toLocaleString()}\n\n${uses
             .map((i) => `\`${i.command}\`: ${i.uses.toLocaleString()}`)
-            .join("\n")}`
+            .join("\n")}`,
         );
 
         logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) viewed ${user.id} command data`
+          `admin: ${message.author.tag} (${message.author.id}) viewed ${user.id} command data`,
         );
 
         await res.editReply({ embeds: [embed] });
@@ -367,7 +365,7 @@ async function run(
           return waitForButton();
         }
         logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) viewed ${user.id} premium data`
+          `admin: ${message.author.tag} (${message.author.id}) viewed ${user.id} premium data`,
         );
         doPremium(user, res as ButtonInteraction);
         return waitForButton();
@@ -406,7 +404,7 @@ async function run(
           return waitForButton();
         }
         logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) updated ${user.id} admin level to ${msg.content}`
+          `admin: ${message.author.tag} (${message.author.id}) updated ${user.id} admin level to ${msg.content}`,
         );
         await setAdminLevel(user.id, parseInt(msg.content));
         await res.editReply({ embeds: [new CustomEmbed(message.member, "✅")] });
@@ -420,7 +418,7 @@ async function run(
         }
 
         logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) viewed ${user.id} ac data`
+          `admin: ${message.author.tag} (${message.author.id}) viewed ${user.id} ac data`,
         );
 
         const data = b(user.id);
@@ -436,8 +434,8 @@ async function run(
                 return value;
               }
             },
-            2
-          )
+            2,
+          ),
         );
 
         await res.editReply({
@@ -458,7 +456,7 @@ async function run(
         }
 
         logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) cleared ${user.id} violations`
+          `admin: ${message.author.tag} (${message.author.id}) cleared ${user.id} violations`,
         );
 
         c(user.id);
@@ -487,7 +485,7 @@ async function run(
           embeds: [
             new CustomEmbed(
               message.member,
-              "enter a non stupid number pls remember if you do this for a joke this money could very easily be distributed between members & put into items"
+              "enter a non stupid number pls remember if you do this for a joke this money could very easily be distributed between members & put into items",
             ),
           ],
         });
@@ -510,7 +508,7 @@ async function run(
         }
 
         logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) set ${user.id} balance to ${msg.content}`
+          `admin: ${message.author.tag} (${message.author.id}) set ${user.id} balance to ${msg.content}`,
         );
         await updateBalance(user.id, parseInt(msg.content));
         msg.react("✅");
@@ -527,7 +525,7 @@ async function run(
           embeds: [
             new CustomEmbed(
               message.member,
-              "enter a non stupid number pls remember if you do this for a joke this money could very easily be distributed between members & put into items"
+              "enter a non stupid number pls remember if you do this for a joke this money could very easily be distributed between members & put into items",
             ),
           ],
         });
@@ -550,7 +548,7 @@ async function run(
         }
 
         logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) set ${user.id} bank balance to ${msg.content}`
+          `admin: ${message.author.tag} (${message.author.id}) set ${user.id} bank balance to ${msg.content}`,
         );
         await updateBankBalance(user.id, parseInt(msg.content));
         msg.react("✅");
@@ -585,7 +583,7 @@ async function run(
         }
 
         logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) set ${user.id} prestige to ${msg.content}`
+          `admin: ${message.author.tag} (${message.author.id}) set ${user.id} prestige to ${msg.content}`,
         );
         await setPrestige(user.id, parseInt(msg.content));
         msg.react("✅");
@@ -620,7 +618,7 @@ async function run(
         }
 
         logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) set ${user.id} xp to ${msg.content}`
+          `admin: ${message.author.tag} (${message.author.id}) set ${user.id} xp to ${msg.content}`,
         );
         await updateXp(user.id, parseInt(msg.content));
         msg.react("✅");
@@ -651,7 +649,7 @@ async function run(
         if (!msg) return;
 
         logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) set ${user.id} inventory item to ${msg.content}`
+          `admin: ${message.author.tag} (${message.author.id}) set ${user.id} inventory item to ${msg.content}`,
         );
 
         if (!getItems()[msg.content.split(" ")[0]]) {
@@ -672,7 +670,7 @@ async function run(
           await res.editReply({
             embeds: [
               new ErrorEmbed("nice try LOSER HAHAHAHHAHAHAHAHAAHHAHAHAH wanker.").setImage(
-                "https://giphy.com/clips/thefastsaga-fast-and-furious-saga-fate-of-the-Pv2AsOz7eYUkAqh1d5"
+                "https://giphy.com/clips/thefastsaga-fast-and-furious-saga-fate-of-the-Pv2AsOz7eYUkAqh1d5",
               ),
             ],
           });
@@ -682,7 +680,7 @@ async function run(
         await setInventoryItem(
           user.id,
           msg.content.split(" ")[0],
-          parseInt(msg.content.split(" ")[1])
+          parseInt(msg.content.split(" ")[1]),
         );
         msg.react("✅");
         return waitForButton();
@@ -728,7 +726,7 @@ async function run(
         }
 
         logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) set ${user.id} karma to ${msg.content}`
+          `admin: ${message.author.tag} (${message.author.id}) set ${user.id} karma to ${msg.content}`,
         );
         remove ? await removeKarma(user.id, amount) : addKarma(user.id, amount);
         msg.react("✅");
@@ -743,7 +741,7 @@ async function run(
 
         if (await isEcoBanned(user.id)) {
           logger.info(
-            `admin: ${message.author.tag} (${message.author.id}) removed ecoban for ${user.id} `
+            `admin: ${message.author.tag} (${message.author.id}) removed ecoban for ${user.id} `,
           );
           await setEcoBan(user.id);
           await res.editReply({ embeds: [new CustomEmbed(message.member, "removed ecoban")] });
@@ -775,7 +773,7 @@ async function run(
         }
 
         logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) set ${user.id} ecoban to ${msg.content}`
+          `admin: ${message.author.tag} (${message.author.id}) set ${user.id} ecoban to ${msg.content}`,
         );
         await setEcoBan(user.id, time);
         msg.react("✅");
@@ -790,14 +788,14 @@ async function run(
 
         if (await isUserBlacklisted(user.id)) {
           logger.info(
-            `admin: ${message.author.tag} (${message.author.id}) removed blacklist for ${user.id} `
+            `admin: ${message.author.tag} (${message.author.id}) removed blacklist for ${user.id} `,
           );
           await setUserBlacklist(user.id, false);
           await res.editReply({ embeds: [new CustomEmbed(message.member, "user unblacklisted")] });
           return waitForButton();
         } else {
           logger.info(
-            `admin: ${message.author.tag} (${message.author.id}) added blacklist for ${user.id} `
+            `admin: ${message.author.tag} (${message.author.id}) added blacklist for ${user.id} `,
           );
           await setUserBlacklist(user.id, true);
           await res.editReply({ embeds: [new CustomEmbed(message.member, "user blacklisted")] });
@@ -832,7 +830,7 @@ async function run(
           .setCustomId("raw-data")
           .setLabel("view raw data")
           .setStyle(ButtonStyle.Primary)
-          .setEmoji("🥩")
+          .setEmoji("🥩"),
       ),
 
       new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -850,7 +848,7 @@ async function run(
           .setCustomId("expire-now")
           .setLabel("expire now")
           .setStyle(ButtonStyle.Danger)
-          .setEmoji("❌")
+          .setEmoji("❌"),
       ),
     ];
 
@@ -869,7 +867,7 @@ async function run(
       if (aliases.length > 0) {
         embed.addField(
           "aliases",
-          aliases.map((i) => `\`${i.alias}\` -> \`${i.command}\``).join("\n")
+          aliases.map((i) => `\`${i.alias}\` -> \`${i.command}\``).join("\n"),
         );
       }
     } else {
@@ -933,7 +931,7 @@ async function run(
         }
 
         logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) added ${user.id} premium at level ${msg.content}`
+          `admin: ${message.author.tag} (${message.author.id}) added ${user.id} premium at level ${msg.content}`,
         );
 
         await addMember(user.id, parseInt(msg.content), message.client as NypsiClient);
@@ -980,7 +978,7 @@ async function run(
         }
 
         logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) set ${user.id} premium tier to ${msg.content}`
+          `admin: ${message.author.tag} (${message.author.id}) set ${user.id} premium tier to ${msg.content}`,
         );
 
         await setTier(user.id, parseInt(msg.content), message.client as NypsiClient);
@@ -1021,7 +1019,7 @@ async function run(
           await res.editReply({
             embeds: [
               new ErrorEmbed(
-                "invalid date you absolute fucking idiot like how do you mess that up are you actually like fucked in the head were you dropped on your head you special cunt go get a fucking helmet before I PUT A STICK IN YOUR CRANIUM YOU FUCKING WANKER"
+                "invalid date you absolute fucking idiot like how do you mess that up are you actually like fucked in the head were you dropped on your head you special cunt go get a fucking helmet before I PUT A STICK IN YOUR CRANIUM YOU FUCKING WANKER",
               ),
             ],
           });
@@ -1031,7 +1029,7 @@ async function run(
         logger.info(
           `admin: ${message.author.tag} (${message.author.id}) set ${
             user.id
-          } premium expire date to ${date.format()}`
+          } premium expire date to ${date.format()}`,
         );
 
         await setExpireDate(user.id, date.toDate(), message.client as NypsiClient);
@@ -1045,7 +1043,7 @@ async function run(
           return waitForButton();
         }
         logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) viewed ${user.id} raw premium data`
+          `admin: ${message.author.tag} (${message.author.id}) viewed ${user.id} raw premium data`,
         );
         const profile = await getPremiumProfile(user.id);
         await res.editReply({
@@ -1062,7 +1060,7 @@ async function run(
           return waitForButton();
         }
         logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) deleted ${user.id} custom command`
+          `admin: ${message.author.tag} (${message.author.id}) deleted ${user.id} custom command`,
         );
         await prisma.premiumCommand.delete({ where: { owner: user.id } }).catch(() => {});
         await res.editReply({
@@ -1077,7 +1075,7 @@ async function run(
           return waitForButton();
         }
         logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) deleted ${user.id} aliases`
+          `admin: ${message.author.tag} (${message.author.id}) deleted ${user.id} aliases`,
         );
         await prisma.userAlias.deleteMany({ where: { userId: user.id } });
         await redis.del(`${Constants.redis.cache.premium.ALIASES}:${user.id}`);
@@ -1093,7 +1091,7 @@ async function run(
           return waitForButton();
         }
         logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) set ${user.id} expire to now`
+          `admin: ${message.author.tag} (${message.author.id}) set ${user.id} expire to now`,
         );
         await setExpireDate(user.id, new Date(0), message.client as NypsiClient);
         await res.editReply({ embeds: [new CustomEmbed(message.member, "done sir.")] });
@@ -1115,7 +1113,7 @@ async function run(
           .setCustomId("remove-badge")
           .setLabel("remove badge")
           .setStyle(ButtonStyle.Primary)
-          .setEmoji("👎🏻")
+          .setEmoji("👎🏻"),
       ),
     ];
 
@@ -1136,7 +1134,7 @@ async function run(
     embed.setDescription(
       `${
         badges.length > 0 ? `\`${badges.join("` `")}\`` : "no badges"
-      }\n\nall badges: \`${Constants.BADGES.join("` `")}\``
+      }\n\nall badges: \`${Constants.BADGES.join("` `")}\``,
     );
 
     const msg = await response.editReply({ embeds: [embed], components: rows });
@@ -1180,7 +1178,7 @@ async function run(
             embeds: [
               new CustomEmbed(
                 message.member,
-                "THATS NOT EVEN A FUCKING BADGE YOU ABSOLUTE PIECE OF SHIT MORON I WROTE THIS PIECE OF CODE JUST FOR YOUR DUMBASS TO SEE IT HAHAHAHAHAHAH GET FUCKED FOUR EYES"
+                "THATS NOT EVEN A FUCKING BADGE YOU ABSOLUTE PIECE OF SHIT MORON I WROTE THIS PIECE OF CODE JUST FOR YOUR DUMBASS TO SEE IT HAHAHAHAHAHAH GET FUCKED FOUR EYES",
               ).setImage("https://y.yarn.co/289bca9a-b01e-48b1-9352-6d437bb1d88e_text.gif"),
             ],
           });
@@ -1188,7 +1186,7 @@ async function run(
         }
 
         logger.info(
-          `admin: ${message.author.id} (${message.author.username}) added ${msgResponse.content} badge to ${user.id}`
+          `admin: ${message.author.id} (${message.author.username}) added ${msgResponse.content} badge to ${user.id}`,
         );
 
         badges.push(msgResponse.content);
@@ -1200,7 +1198,7 @@ async function run(
               message.member,
               `${
                 badges.length > 0 ? `\`${badges.join("` `")}\`` : "no badges"
-              }\n\nall badges: \`${Constants.BADGES.join("` `")}\``
+              }\n\nall badges: \`${Constants.BADGES.join("` `")}\``,
             ),
           ],
         });
@@ -1233,7 +1231,7 @@ async function run(
             embeds: [
               new CustomEmbed(
                 message.member,
-                "nah you stupid cunt how the fuck have you managed THAT he doesnt have that badge YOU FUCKING IDIOT HAHAHAHAHA GO SUCK A COCK"
+                "nah you stupid cunt how the fuck have you managed THAT he doesnt have that badge YOU FUCKING IDIOT HAHAHAHAHA GO SUCK A COCK",
               ),
             ],
           });
@@ -1241,7 +1239,7 @@ async function run(
         }
 
         logger.info(
-          `admin: ${message.author.id} (${message.author.username}) removed ${msgResponse.content} badge from ${user.id}`
+          `admin: ${message.author.id} (${message.author.username}) removed ${msgResponse.content} badge from ${user.id}`,
         );
 
         badges.splice(badges.indexOf(msgResponse.content), 1);
@@ -1253,7 +1251,7 @@ async function run(
               message.member,
               `${
                 badges.length > 0 ? `\`${badges.join("` `")}\`` : "no badges"
-              }\n\nall badges: \`${Constants.BADGES.join("` `")}\``
+              }\n\nall badges: \`${Constants.BADGES.join("` `")}\``,
             ),
           ],
         });
@@ -1273,7 +1271,7 @@ async function run(
 
           return g;
         },
-        { context: { userId: tag } }
+        { context: { userId: tag } },
       );
 
       for (const res of user) {
@@ -1328,7 +1326,7 @@ async function run(
     const embed = new CustomEmbed(
       message.member,
       "$x userid (id) - view/edit disc info and db info" +
-        "\n$x findid (tag/username) - will attempt to find user id from cached users and database"
+        "\n$x findid (tag/username) - will attempt to find user id from cached users and database",
     );
 
     return message.channel.send({ embeds: [embed] });

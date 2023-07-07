@@ -22,7 +22,7 @@ const cmd = new Command("inrole", "get the members in a role", "utility");
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (await onCooldown(cmd.name, message.member)) {
     const embed = await getResponse(cmd.name, message.member);
@@ -97,7 +97,7 @@ async function run(
       .setLabel("back")
       .setStyle(ButtonStyle.Primary)
       .setDisabled(true),
-    new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
+    new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
   );
 
   if (pages.size >= 2) {
@@ -144,7 +144,7 @@ async function run(
               .setCustomId("➡")
               .setLabel("next")
               .setStyle(ButtonStyle.Primary)
-              .setDisabled(false)
+              .setDisabled(false),
           );
         } else {
           row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -157,7 +157,7 @@ async function run(
               .setCustomId("➡")
               .setLabel("next")
               .setStyle(ButtonStyle.Primary)
-              .setDisabled(false)
+              .setDisabled(false),
           );
         }
         await msg.edit({ embeds: [embed], components: [row] });
@@ -181,7 +181,7 @@ async function run(
               .setCustomId("➡")
               .setLabel("next")
               .setStyle(ButtonStyle.Primary)
-              .setDisabled(true)
+              .setDisabled(true),
           );
         } else {
           row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -194,7 +194,7 @@ async function run(
               .setCustomId("➡")
               .setLabel("next")
               .setStyle(ButtonStyle.Primary)
-              .setDisabled(false)
+              .setDisabled(false),
           );
         }
         await msg.edit({ embeds: [embed], components: [row] });

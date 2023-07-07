@@ -7,7 +7,7 @@ import { createUser, getItems, userExists } from "../utils/functions/economy/uti
 const cmd = new Command(
   "ethereum",
   "view the current ethereum value (reflects real life USD)",
-  "money"
+  "money",
 ).setAliases(["eth"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
@@ -25,7 +25,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     message.member,
     `**worth** $${ethereum.sell.toLocaleString()}\n**owned** ${ethereumAmount.toLocaleString()} ($${(
       ethereumAmount * ethereum.sell
-    ).toLocaleString()})`
+    ).toLocaleString()})`,
   )
     .setFooter({ text: "not real ethereum, although it reflects current worth in USD" })
     .setHeader("your ethereum", message.author.avatarURL());

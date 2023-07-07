@@ -16,12 +16,12 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 const cmd = new Command(
   "shop",
   "view current items that are available to buy/sell",
-  "money"
+  "money",
 ).setAliases(["store"]);
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (await onCooldown(cmd.name, message.member)) {
     const embed = await getResponse(cmd.name, message.member);
@@ -82,7 +82,7 @@ async function run(
     embed.addField(
       item.id,
       `${item.emoji} **${item.name}**\n${item.longDesc}\n**cost** $${item.buy.toLocaleString()}`,
-      true
+      true,
     );
   }
 
@@ -92,7 +92,7 @@ async function run(
       .setLabel("back")
       .setStyle(ButtonStyle.Primary)
       .setDisabled(true),
-    new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
+    new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
   );
 
   let msg: Message;
@@ -123,7 +123,7 @@ async function run(
 
       const newEmbed = new CustomEmbed(message.member).setHeader(
         "shop",
-        message.author.avatarURL()
+        message.author.avatarURL(),
       );
 
       if (!reaction) return;
@@ -140,7 +140,7 @@ async function run(
               `${item.emoji} **${item.name}**\n${
                 item.longDesc
               }\n**cost** $${item.buy.toLocaleString()}`,
-              true
+              true,
             );
           }
           newEmbed.setFooter({ text: `page ${currentPage + 1}/${pages.length}` });
@@ -155,7 +155,7 @@ async function run(
                 .setCustomId("➡")
                 .setLabel("next")
                 .setStyle(ButtonStyle.Primary)
-                .setDisabled(false)
+                .setDisabled(false),
             );
           } else {
             row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -168,7 +168,7 @@ async function run(
                 .setCustomId("➡")
                 .setLabel("next")
                 .setStyle(ButtonStyle.Primary)
-                .setDisabled(false)
+                .setDisabled(false),
             );
           }
           await msg.edit({ embeds: [newEmbed], components: [row] });
@@ -186,7 +186,7 @@ async function run(
               `${item.emoji} **${item.name}**\n${
                 item.longDesc
               }\n**cost** $${item.buy.toLocaleString()}`,
-              true
+              true,
             );
           }
           newEmbed.setFooter({ text: `page ${currentPage + 1}/${pages.length}` });
@@ -201,7 +201,7 @@ async function run(
                 .setCustomId("➡")
                 .setLabel("next")
                 .setStyle(ButtonStyle.Primary)
-                .setDisabled(true)
+                .setDisabled(true),
             );
           } else {
             row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -214,7 +214,7 @@ async function run(
                 .setCustomId("➡")
                 .setLabel("next")
                 .setStyle(ButtonStyle.Primary)
-                .setDisabled(false)
+                .setDisabled(false),
             );
           }
           await msg.edit({ embeds: [newEmbed], components: [row] });

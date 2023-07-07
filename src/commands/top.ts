@@ -50,7 +50,7 @@ const scopeChoices: APIApplicationCommandOptionChoice<string>[] = [
 cmd.slashEnabled = true;
 cmd.slashData
   .addSubcommand((balance) =>
-    balance.setName("balance").setDescription("view top balances in the server")
+    balance.setName("balance").setDescription("view top balances in the server"),
   )
   .addSubcommand((prestige) =>
     prestige
@@ -61,8 +61,8 @@ cmd.slashData
           .setName("scope")
           .setDescription("show global/server")
           .setChoices(...scopeChoices)
-          .setRequired(false)
-      )
+          .setRequired(false),
+      ),
   )
   .addSubcommand((prestige) =>
     prestige
@@ -73,8 +73,8 @@ cmd.slashData
           .setName("scope")
           .setDescription("show global/server")
           .setChoices(...scopeChoices)
-          .setRequired(false)
-      )
+          .setRequired(false),
+      ),
   )
   .addSubcommand((prestige) =>
     prestige
@@ -85,8 +85,8 @@ cmd.slashData
           .setName("scope")
           .setDescription("show global/server")
           .setChoices(...scopeChoices)
-          .setRequired(false)
-      )
+          .setRequired(false),
+      ),
   )
   .addSubcommand((item) =>
     item
@@ -97,19 +97,19 @@ cmd.slashData
           .setName("item-global")
           .setDescription("item to query")
           .setRequired(true)
-          .setAutocomplete(true)
+          .setAutocomplete(true),
       )
       .addStringOption((option) =>
         option
           .setName("scope")
           .setDescription("show global/server")
           .setChoices(...scopeChoices)
-          .setRequired(false)
-      )
+          .setRequired(false),
+      ),
   )
   .addSubcommand((guild) => guild.setName("guilds").setDescription("view top nypsi guilds"))
   .addSubcommand((completion) =>
-    completion.setName("completion").setDescription("view top completion in the server")
+    completion.setName("completion").setDescription("view top completion in the server"),
   )
   .addSubcommand((networth) =>
     networth
@@ -121,8 +121,8 @@ cmd.slashData
           .setName("scope")
           .setDescription("show global/server")
           .setChoices(...scopeChoices)
-          .setRequired(false)
-      )
+          .setRequired(false),
+      ),
   )
   .addSubcommand((command) =>
     command
@@ -134,13 +134,13 @@ cmd.slashData
           .setName("scope")
           .setDescription("show global/server")
           .setChoices(...scopeChoices)
-          .setRequired(false)
-      )
+          .setRequired(false),
+      ),
   );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -186,7 +186,7 @@ async function run(
       title.includes("global") || title.includes("guild")
         ? message.guild.iconURL()
         : message.client.user.avatarURL(),
-      url
+      url,
     );
 
     if (pages.size == 0) {
@@ -205,7 +205,7 @@ async function run(
         .setLabel("back")
         .setStyle(ButtonStyle.Primary)
         .setDisabled(true),
-      new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
+      new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
     );
 
     if (pages.size <= 1) {
@@ -250,7 +250,7 @@ async function run(
       data.pages,
       data.pos,
       `top prestige ${global ? "[global]" : `for ${message.guild.name}`}`,
-      global ? "https://nypsi.xyz/leaderboard/prestige" : null
+      global ? "https://nypsi.xyz/leaderboard/prestige" : null,
     );
   } else if (args[0].toLowerCase() == "item") {
     const items = getItems();
@@ -295,7 +295,7 @@ async function run(
       data.pages,
       data.pos,
       `top ${item.name} ${global ? "[global]" : `for ${message.guild.name}`}`,
-      global ? `https://nypsi.xyz/leaderboard/${item.id}` : null
+      global ? `https://nypsi.xyz/leaderboard/${item.id}` : null,
     );
   } else if (args[0].toLowerCase() == "completion") {
     const data = await topCompletion(message.guild, message.author.id);
@@ -318,7 +318,7 @@ async function run(
       data.pages,
       data.pos,
       `top net worth ${global ? "[global]" : `for ${message.guild.name}`}`,
-      global ? "https://nypsi.xyz/leaderboard/networth" : null
+      global ? "https://nypsi.xyz/leaderboard/networth" : null,
     );
   } else if (args[0].toLowerCase().includes("guild")) {
     const userGuild = await getGuildByUser(message.member);
@@ -343,7 +343,7 @@ async function run(
       data.pages,
       data.pos,
       `top daily streak ${global ? "[global]" : `for ${message.guild.name}`}`,
-      global ? "https://nypsi.xyz/leaderboard/streak" : null
+      global ? "https://nypsi.xyz/leaderboard/streak" : null,
     );
   } else if (args[0].toLowerCase().includes("wordle")) {
     let global = false;
@@ -362,7 +362,7 @@ async function run(
       data.pages,
       data.pos,
       `top wordle wins ${global ? "[global]" : `for ${message.guild.name}`}`,
-      global ? "https://nypsi.xyz/leaderboard/wordle" : null
+      global ? "https://nypsi.xyz/leaderboard/wordle" : null,
     );
   } else if (args[0].toLowerCase() === "cmd" || args[0].toLowerCase() === "command") {
     const searchTag = args[1].toLowerCase();
@@ -388,7 +388,7 @@ async function run(
       data.pos,
       `top ${await getPrefix(message.guild)}${searchTag} uses ${
         global ? "[global]" : `for ${message.guild.name}`
-      }`
+      }`,
       // global ? `https://nypsi.xyz/leaderboard/${item.id}` : null
     );
   } else {
@@ -415,7 +415,7 @@ async function run(
       data.pages,
       data.pos,
       `top ${selected.name} ${global ? "[global]" : `for ${message.guild.name}`}`,
-      global ? `https://nypsi.xyz/leaderboard/${selected.id}` : null
+      global ? `https://nypsi.xyz/leaderboard/${selected.id}` : null,
     );
   }
 }

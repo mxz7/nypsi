@@ -25,13 +25,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         (u) =>
           `\`${u.amount.toLocaleString()}x\` ${getBakeryUpgradesData()[u.upgradeId].emoji} ${
             getBakeryUpgradesData()[u.upgradeId].name
-          }`
+          }`,
       )
-      .join("\n")
+      .join("\n"),
   ).setHeader(
     "your bakery upgrades",
 
-    message.author.avatarURL()
+    message.author.avatarURL(),
   );
 
   return message.channel.send({ embeds: [embed] });

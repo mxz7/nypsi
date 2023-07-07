@@ -27,8 +27,8 @@ cmd.slashData
       .setName("delete")
       .setDescription("delete a guild counter")
       .addChannelOption((option) =>
-        option.setName("channel").setDescription("channel to delete").setRequired(true)
-      )
+        option.setName("channel").setDescription("channel to delete").setRequired(true),
+      ),
   )
   .addSubcommand((list) => list.setName("list").setDescription("list all active counters"))
   .addSubcommand((create) =>
@@ -45,25 +45,25 @@ cmd.slashData
             { name: "boosts", value: "BOOSTS" },
             { name: "richest member in server", value: "RICHEST_MEMBER" },
             { name: "total item of server", value: "TOTAL_ITEM" },
-            { name: "total balance of server", value: "TOTAL_BALANCE" }
+            { name: "total balance of server", value: "TOTAL_BALANCE" },
           )
-          .setRequired(true)
+          .setRequired(true),
       )
       .addStringOption((option) =>
         option
           .setName("format")
           .setDescription("format of the channel name. use %value% for the number")
           .setMaxLength(50)
-          .setRequired(true)
+          .setRequired(true),
       )
       .addStringOption((option) =>
-        option.setName("item-global").setDescription("item to show").setAutocomplete(true)
-      )
+        option.setName("item-global").setDescription("item to show").setAutocomplete(true),
+      ),
   );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -112,7 +112,7 @@ async function run(
     return send({
       embeds: [
         new ErrorEmbed(
-          "unfortunately you must use this command as a slash command (/counter) due to the complexities involved"
+          "unfortunately you must use this command as a slash command (/counter) due to the complexities involved",
         ),
       ],
     });
@@ -126,7 +126,7 @@ async function run(
           "**/counters create** *create a counter*\n" +
             "**/counters list** *list all counters*\n" +
             "**/counters delete** *delete a counter*\n" +
-            "**/counters setting** *update a setting for a counter*"
+            "**/counters setting** *update a setting for a counter*",
         ).setFooter({ text: "counters update every 10 minutes" }),
       ],
     });
@@ -134,7 +134,7 @@ async function run(
     const counters = await getGuildCounters(message.guild);
     const embed = new CustomEmbed(message.member).setHeader(
       `counters in ${message.guild.name}`,
-      message.guild.iconURL()
+      message.guild.iconURL(),
     );
 
     if (counters.length === 0) {
@@ -148,7 +148,7 @@ async function run(
             counter.tracks === TrackingType.TOTAL_ITEM ? `\n**item** \`${counter.totalItem}\`` : ""
           }\n` +
             `**format** ${counter.format}\n` +
-            `**channel** ${channel?.toString()}`
+            `**channel** ${channel?.toString()}`,
         );
       }
     }
@@ -176,7 +176,7 @@ async function run(
               (await getTier(message.member)) < 4
                 ? "\nupgrade your tier (/premium) to get more"
                 : ""
-            }`
+            }`,
           ),
         ],
       });
@@ -186,7 +186,7 @@ async function run(
       return send({
         embeds: [
           new ErrorEmbed(
-            "since you have chosen the mode as total item, you must choose a valid item to show the total of"
+            "since you have chosen the mode as total item, you must choose a valid item to show the total of",
           ),
         ],
       });
@@ -211,7 +211,7 @@ async function run(
       embeds: [
         new CustomEmbed(
           message.member,
-          "✅ counter removed, you will have to manually delete the channel"
+          "✅ counter removed, you will have to manually delete the channel",
         ),
       ],
     });

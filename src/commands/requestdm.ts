@@ -7,12 +7,12 @@ import { getAdminLevel } from "../utils/functions/users/admin";
 const cmd = new Command(
   "requestdm",
   "attempt to send a DM to a given user (this is my way of having fun leave me alone)",
-  "none"
+  "none",
 );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if ((await getAdminLevel(message.author.id)) < 2) return;
 

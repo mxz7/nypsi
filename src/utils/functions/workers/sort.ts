@@ -3,7 +3,7 @@ import { isMainThread, parentPort, Worker, workerData } from "worker_threads";
 
 export default function workerSort(
   array: string[],
-  sortData: Map<string, number>
+  sortData: Map<string, number>,
 ): Promise<string[]> {
   return new Promise((resolve, reject) => {
     const worker = new Worker(__filename, {

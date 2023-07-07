@@ -9,7 +9,7 @@ const cmd = new Command("cmdwatch", "watch commands", "none");
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if ((await getAdminLevel(message.author.id)) < 2) return;
 
@@ -28,7 +28,7 @@ async function run(
   }
 
   logger.info(
-    `admin: ${message.author.id} (${message.author.tag}) toggled command watch - ${args.join(" ")}`
+    `admin: ${message.author.id} (${message.author.tag}) toggled command watch - ${args.join(" ")}`,
   );
 }
 

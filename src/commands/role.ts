@@ -37,8 +37,8 @@ cmd.slashData
       .setName("members")
       .setDescription("view members in a role")
       .addRoleOption((option) =>
-        option.setName("role").setDescription("role to show members for").setRequired(true)
-      )
+        option.setName("role").setDescription("role to show members for").setRequired(true),
+      ),
   )
   .addSubcommandGroup((add) =>
     add
@@ -49,8 +49,8 @@ cmd.slashData
           .setName("all")
           .setDescription("all members in server")
           .addRoleOption((option) =>
-            option.setName("role").setDescription("role to add").setRequired(true)
-          )
+            option.setName("role").setDescription("role to add").setRequired(true),
+          ),
       )
       .addSubcommand((member) =>
         member
@@ -60,12 +60,12 @@ cmd.slashData
             option
               .setName("member")
               .setDescription("member you want to add role to")
-              .setRequired(true)
+              .setRequired(true),
           )
           .addRoleOption((option) =>
-            option.setName("role").setDescription("role to add").setRequired(true)
-          )
-      )
+            option.setName("role").setDescription("role to add").setRequired(true),
+          ),
+      ),
   )
   .addSubcommandGroup((remove) =>
     remove
@@ -76,8 +76,8 @@ cmd.slashData
           .setName("all")
           .setDescription("all members in server")
           .addRoleOption((option) =>
-            option.setName("role").setDescription("role to add").setRequired(true)
-          )
+            option.setName("role").setDescription("role to add").setRequired(true),
+          ),
       )
       .addSubcommand((member) =>
         member
@@ -87,12 +87,12 @@ cmd.slashData
             option
               .setName("member")
               .setDescription("member you want to add role to")
-              .setRequired(true)
+              .setRequired(true),
           )
           .addRoleOption((option) =>
-            option.setName("role").setDescription("role to add").setRequired(true)
-          )
-      )
+            option.setName("role").setDescription("role to add").setRequired(true),
+          ),
+      ),
   )
   .addSubcommandGroup((autojoin) =>
     autojoin
@@ -104,17 +104,17 @@ cmd.slashData
           .setName("add")
           .setDescription("add a role to the autojoin list")
           .addRoleOption((option) =>
-            option.setName("role").setDescription("role to add to list").setRequired(true)
-          )
+            option.setName("role").setDescription("role to add to list").setRequired(true),
+          ),
       )
       .addSubcommand((remove) =>
         remove
           .setName("remove")
           .setDescription("remove a role from the autojoin list")
           .addRoleOption((option) =>
-            option.setName("role").setDescription("role to remove from the list").setRequired(true)
-          )
-      )
+            option.setName("role").setDescription("role to remove from the list").setRequired(true),
+          ),
+      ),
   )
   .addSubcommandGroup((persist) =>
     persist
@@ -126,22 +126,22 @@ cmd.slashData
           .setName("add")
           .setDescription("add a role to the persistance list")
           .addRoleOption((option) =>
-            option.setName("role").setDescription("role to add to list").setRequired(true)
-          )
+            option.setName("role").setDescription("role to add to list").setRequired(true),
+          ),
       )
       .addSubcommand((remove) =>
         remove
           .setName("remove")
           .setDescription("remove a role from the persistance list")
           .addRoleOption((option) =>
-            option.setName("role").setDescription("role to remove from the list").setRequired(true)
-          )
-      )
+            option.setName("role").setDescription("role to remove from the list").setRequired(true),
+          ),
+      ),
   );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -210,7 +210,7 @@ async function run(
             "/role persist add <role> - add a role to be added back to a user after they leave, if they had it. (data deleted after 30 days)\n" +
             "/role persist remove <role> - remove a role from the persistance list\n" +
             "/role persist list - show all current persistant roles\n" +
-            "/role members <role> - show members in a role"
+            "/role members <role> - show members in a role",
         ),
       ],
     });
@@ -269,7 +269,7 @@ async function run(
         embeds: [
           new CustomEmbed(
             message.member,
-            `adding ${role.toString()} to ${members.length.toLocaleString()} members...`
+            `adding ${role.toString()} to ${members.length.toLocaleString()} members...`,
           ),
         ],
       });
@@ -288,7 +288,7 @@ async function run(
           return msg.edit({
             embeds: [
               new ErrorEmbed(
-                "failed while adding roles. make sure my role is above the target role and that i have suitable permissions"
+                "failed while adding roles. make sure my role is above the target role and that i have suitable permissions",
               ),
             ],
           });
@@ -302,7 +302,7 @@ async function run(
             embeds: [
               new CustomEmbed(
                 message.member,
-                `added ${role.toString()} to ${count.toLocaleString()} members`
+                `added ${role.toString()} to ${count.toLocaleString()} members`,
               ),
             ],
           });
@@ -314,7 +314,7 @@ async function run(
           embeds: [
             new CustomEmbed(
               message.member,
-              `adding ${role.toString()} to ${members.length.toLocaleString()} members...\n\nprogress: ${count.toLocaleString()}/${members.length.toLocaleString()}\n\`${remaining}\` remaining`
+              `adding ${role.toString()} to ${members.length.toLocaleString()} members...\n\nprogress: ${count.toLocaleString()}/${members.length.toLocaleString()}\n\`${remaining}\` remaining`,
             ),
           ],
         });
@@ -344,7 +344,7 @@ async function run(
       return send({
         embeds: [
           new ErrorEmbed(
-            "failed while adding roles. make sure my role is above the target role and that i have suitable permissions"
+            "failed while adding roles. make sure my role is above the target role and that i have suitable permissions",
           ),
         ],
       });
@@ -354,7 +354,7 @@ async function run(
       embeds: [
         new CustomEmbed(
           message.member,
-          `added ${role.toString()} to ${members.length.toLocaleString()} members`
+          `added ${role.toString()} to ${members.length.toLocaleString()} members`,
         ),
       ],
     });
@@ -412,7 +412,7 @@ async function run(
         embeds: [
           new CustomEmbed(
             message.member,
-            `removing ${role.toString()} from ${members.length.toLocaleString()} members...`
+            `removing ${role.toString()} from ${members.length.toLocaleString()} members...`,
           ),
         ],
       });
@@ -431,7 +431,7 @@ async function run(
           return msg.edit({
             embeds: [
               new ErrorEmbed(
-                "failed while removing roles. make sure my role is above the target role and that i have suitable permissions"
+                "failed while removing roles. make sure my role is above the target role and that i have suitable permissions",
               ),
             ],
           });
@@ -445,7 +445,7 @@ async function run(
             embeds: [
               new CustomEmbed(
                 message.member,
-                `removed ${role.toString()} from ${count.toLocaleString()} members`
+                `removed ${role.toString()} from ${count.toLocaleString()} members`,
               ),
             ],
           });
@@ -457,7 +457,7 @@ async function run(
           embeds: [
             new CustomEmbed(
               message.member,
-              `removing ${role.toString()} from ${members.length.toLocaleString()} members...\n\nprogress: ${count.toLocaleString()}/${members.length.toLocaleString()}\n\`${remaining}\` remaining`
+              `removing ${role.toString()} from ${members.length.toLocaleString()} members...\n\nprogress: ${count.toLocaleString()}/${members.length.toLocaleString()}\n\`${remaining}\` remaining`,
             ),
           ],
         });
@@ -487,7 +487,7 @@ async function run(
       return send({
         embeds: [
           new ErrorEmbed(
-            "failed while removing roles. make sure my role is above the target role and that i have suitable permissions"
+            "failed while removing roles. make sure my role is above the target role and that i have suitable permissions",
           ),
         ],
       });
@@ -497,7 +497,7 @@ async function run(
       embeds: [
         new CustomEmbed(
           message.member,
-          `removed ${role.toString()} from ${members.length.toLocaleString()} members`
+          `removed ${role.toString()} from ${members.length.toLocaleString()} members`,
         ),
       ],
     });
@@ -533,7 +533,7 @@ async function run(
           roles.length > 0
             ? rolesDisplay.join("\n")
             : "no roles will automatically be added to new members"
-        }`
+        }`,
       );
 
       return send({ embeds: [embed] });
@@ -611,7 +611,7 @@ async function run(
           roles.length > 0
             ? rolesDisplay.join("\n")
             : "no roles will be added back to joining members (use /role autojoin if you want roles added to every new member)"
-        }`
+        }`,
       );
 
       return send({ embeds: [embed] });
@@ -681,12 +681,12 @@ async function run(
             logger.error("failed to fetch members for role cmd", e);
             return message.guild.members.cache;
           })
-        ).values()
+        ).values(),
       );
     }
 
     const filteredMembers = sort(
-      members.filter((m) => m.roles.cache.has(role.id)).map((m) => `\`${m.user.tag}\``)
+      members.filter((m) => m.roles.cache.has(role.id)).map((m) => `\`${m.user.tag}\``),
     ).asc();
 
     if (filteredMembers.length == 0) {
@@ -709,7 +709,7 @@ async function run(
         .setLabel("back")
         .setStyle(ButtonStyle.Primary)
         .setDisabled(true),
-      new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
+      new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
     );
 
     if (pages.size > 1) {

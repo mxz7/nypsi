@@ -46,7 +46,7 @@ export async function setLastfmUsername(member: GuildMember, username: string) {
   username = cleanString(username);
 
   const res = await fetch(
-    `https://ws.audioscrobbler.com/2.0/?method=user.getinfo&user=${username}&api_key=${process.env.LASTFM_TOKEN}&format=json`
+    `https://ws.audioscrobbler.com/2.0/?method=user.getinfo&user=${username}&api_key=${process.env.LASTFM_TOKEN}&format=json`,
   ).then((res) => res.json());
 
   if (res.error && res.error == 6) return false;

@@ -8,7 +8,7 @@ const cmd = new Command("ecoban", "ban an account from eco", "none");
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if ((await getAdminLevel(message.author.id)) < 2) return;
 
@@ -20,7 +20,7 @@ async function run(
     if (await isEcoBanned(args[0])) {
       await setEcoBan(args[0]); // unbans user
       logger.info(
-        `admin: ${message.author.tag} (${message.author.id}) set ${args[0]} ecoban to unban`
+        `admin: ${message.author.tag} (${message.author.id}) set ${args[0]} ecoban to unban`,
       );
     }
   } else {
@@ -29,7 +29,7 @@ async function run(
     await setEcoBan(args[0], time);
 
     logger.info(
-      `admin: ${message.author.tag} (${message.author.id}) set ${args[0]} ecoban to ${time}`
+      `admin: ${message.author.tag} (${message.author.id}) set ${args[0]} ecoban to ${time}`,
     );
   }
 

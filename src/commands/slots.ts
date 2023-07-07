@@ -130,12 +130,12 @@ const cmd = new Command("slots", "play slots", "money").setAliases(["bet", "slot
 cmd.slashEnabled = true;
 
 cmd.slashData.addStringOption((option) =>
-  option.setName("bet").setDescription("how much would you like to bet").setRequired(false)
+  option.setName("bet").setDescription("how much would you like to bet").setRequired(false),
 );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -186,7 +186,7 @@ async function run(
       .addField("usage", `${prefix}slots <bet>\n${prefix}slots info`)
       .addField(
         "help",
-        "[slots has a ~39% winrate](https://github.com/tekoh/nypsi/blob/main/src/commands/slots.ts#279)"
+        "[slots has a ~39% winrate](https://github.com/tekoh/nypsi/blob/main/src/commands/slots.ts#279)",
       );
     return send({ embeds: [embed] });
   }
@@ -196,7 +196,7 @@ async function run(
 
     for (const item of Object.keys(multipliers)) {
       txt += `${staticEmojis.get(item)} | ${staticEmojis.get(item)} | ${staticEmojis.get(
-        item
+        item,
       )} **||** ${
         // @ts-expect-error its weird
         multipliers[item]
@@ -232,7 +232,7 @@ async function run(
     return send({
       embeds: [
         new ErrorEmbed(
-          `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
+          `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`,
         ),
       ],
     });
@@ -379,7 +379,7 @@ async function run(
     if (multi > 0) {
       await updateBalance(
         message.member,
-        (await getBalance(message.member)) + winnings + Math.round(winnings * multi)
+        (await getBalance(message.member)) + winnings + Math.round(winnings * multi),
       );
       winnings = winnings + Math.round(winnings * multi);
     } else {
@@ -400,7 +400,7 @@ async function run(
       " **|** " +
       animatedEmojis.get(three) +
       "\n~~------------~~\n**bet** $" +
-      bet.toLocaleString()
+      bet.toLocaleString(),
   ).setHeader("slots", message.author.avatarURL());
 
   const edit = async (data: MessageEditOptions, msg: Message | InteractionResponse) => {
@@ -421,7 +421,7 @@ async function run(
         " **|** " +
         staticEmojis.get(three.split("-")[0]) +
         "\n~~------------~~\n**bet** $" +
-        bet.toLocaleString()
+        bet.toLocaleString(),
     );
 
     let id: string;
@@ -435,7 +435,7 @@ async function run(
             "\n" +
             "+**" +
             Math.floor(multi * 100).toString() +
-            "**% bonus"
+            "**% bonus",
         );
       } else {
         embed.addField("**winner!!**", "**you win** $" + winnings.toLocaleString());

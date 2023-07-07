@@ -70,9 +70,9 @@ module.exports = new ItemUse(
       message.member,
       "mask",
       inventory.find((i) => i.item == "mask").amount - 1,
-      false
+      false,
     );
 
     return send({ embeds: [embed] });
-  }
+  },
 );

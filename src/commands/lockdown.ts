@@ -14,14 +14,14 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 const cmd = new Command(
   "lockdown",
   "lockdown a channel (will only work if permissions are setup correctly)",
-  "moderation"
+  "moderation",
 )
   .setAliases(["lock", "shutup"])
   .setPermissions(["MANAGE_MESSAGES", "MANAGE_CHANNELS"]);
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -72,7 +72,7 @@ async function run(
     return send({
       embeds: [
         new ErrorEmbed(
-          "i need the `manage channels` and `manage roles` permission for this command to work"
+          "i need the `manage channels` and `manage roles` permission for this command to work",
         ),
       ],
     });
@@ -145,7 +145,7 @@ async function run(
     });
     const embed = new CustomEmbed(
       message.member,
-      "✅ " + channel.toString() + " has been unlocked"
+      "✅ " + channel.toString() + " has been unlocked",
     );
 
     return send({ embeds: [embed] }).catch(() => {

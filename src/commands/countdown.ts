@@ -13,7 +13,7 @@ const cmd = new Command("countdown", "create and manage your server countdowns",
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
     if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
@@ -37,7 +37,7 @@ async function run(
 
         embed.addField(
           countdown.id.toString(),
-          `**id** \`${countdown.id}\`\n**channel** \`${countdown.channel}\`\n**format** \`${countdown.format}\`\n**final format** \`${countdown.finalFormat}\`\n**date** \`${date}\``
+          `**id** \`${countdown.id}\`\n**channel** \`${countdown.channel}\`\n**format** \`${countdown.format}\`\n**final format** \`${countdown.finalFormat}\`\n**date** \`${date}\``,
         );
       }
     }
@@ -69,7 +69,7 @@ async function run(
 
     const embed = new CustomEmbed(
       message.member,
-      "what date do you want to count down to?\n\nplease use the following format: `MM/DD/YYYY` - example: 12/25/2069"
+      "what date do you want to count down to?\n\nplease use the following format: `MM/DD/YYYY` - example: 12/25/2069",
     );
 
     await message.channel.send({ embeds: [embed] });
@@ -126,7 +126,7 @@ async function run(
     }
 
     embed.setDescription(
-      "which channel would you like to send countdown messages to\n\nplease mention the channel using # - and make sure i have permission to send messages there"
+      "which channel would you like to send countdown messages to\n\nplease mention the channel using # - and make sure i have permission to send messages there",
     );
 
     await message.channel.send({ embeds: [embed] });
@@ -151,7 +151,7 @@ async function run(
     const channel = res.mentions.channels.first();
 
     embed.setDescription(
-      "what format would you like to use?\n\n%days% will be replaced with how many days are left"
+      "what format would you like to use?\n\n%days% will be replaced with how many days are left",
     );
 
     await message.channel.send({ embeds: [embed] });
@@ -180,7 +180,7 @@ async function run(
     const format = res;
 
     embed.setDescription(
-      "what final format would you like to use?\n\nthe final format is what will be used on the final day"
+      "what final format would you like to use?\n\nthe final format is what will be used on the final day",
     );
 
     await message.channel.send({ embeds: [embed] });
@@ -252,7 +252,7 @@ async function run(
 
     embed.setHeader("countdown");
     embed.setDescription(
-      `${prefix}**countdown create** *create a countdown*\n${prefix}**countdown del <id>** *delete a countdown*\n${prefix}**countdown** *list all active countdowns*`
+      `${prefix}**countdown create** *create a countdown*\n${prefix}**countdown del <id>** *delete a countdown*\n${prefix}**countdown** *list all active countdowns*`,
     );
 
     return message.channel.send({ embeds: [embed] });

@@ -8,7 +8,8 @@ export default async function channelUpdate(oldChannel: GuildChannel, newChannel
 
     embed.setTitle("channel renamed");
     embed.setDescription(
-      `${newChannel.toString()} \`${newChannel.id}\`\n` + `${oldChannel.name} -> ${newChannel.name}`
+      `${newChannel.toString()} \`${newChannel.id}\`\n` +
+        `${oldChannel.name} -> ${newChannel.name}`,
     );
 
     await addLog(newChannel.guild, "channel", embed);
@@ -21,7 +22,7 @@ export default async function channelUpdate(oldChannel: GuildChannel, newChannel
     embed.setTitle("channel moved category");
     embed.setDescription(
       `${newChannel.toString()} \`${newChannel.id}\`\n` +
-        `${oldChannel.parent.name} -> ${newChannel.parent.name}`
+        `${oldChannel.parent.name} -> ${newChannel.parent.name}`,
     );
 
     await addLog(newChannel.guild, "channel", embed);

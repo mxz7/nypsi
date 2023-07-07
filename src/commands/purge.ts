@@ -26,8 +26,8 @@ cmd.slashData
       .setName("messages")
       .setDescription("delete messages from current channel")
       .addIntegerOption((option) =>
-        option.setName("amount").setDescription("amount of messages to delete").setRequired(true)
-      )
+        option.setName("amount").setDescription("amount of messages to delete").setRequired(true),
+      ),
   )
   .addSubcommand((member) =>
     member
@@ -37,41 +37,41 @@ cmd.slashData
         option
           .setName("member")
           .setDescription("member you want to delete messages from")
-          .setRequired(true)
+          .setRequired(true),
       )
       .addIntegerOption((option) =>
         option
           .setName("amount")
           .setDescription("amount of messages you want to delete")
-          .setRequired(true)
-      )
+          .setRequired(true),
+      ),
   )
   .addSubcommand((bot) =>
     bot
       .setName("bot")
       .setDescription("delete messages by bots")
       .addIntegerOption((option) =>
-        option.setName("amount").setDescription("amount of messages to delete").setRequired(true)
-      )
+        option.setName("amount").setDescription("amount of messages to delete").setRequired(true),
+      ),
   )
   .addSubcommand((includes) =>
     includes
       .setName("includes")
       .setDescription("delete messages including specific text")
       .addStringOption((option) =>
-        option.setName("includes").setDescription("text to search for").setRequired(true)
+        option.setName("includes").setDescription("text to search for").setRequired(true),
       )
       .addIntegerOption((option) =>
-        option.setName("amount").setDescription("amount of messages to delete").setRequired(true)
-      )
+        option.setName("amount").setDescription("amount of messages to delete").setRequired(true),
+      ),
   )
   .addSubcommand((clean) =>
-    clean.setName("clean").setDescription("clean up bot commands and responses")
+    clean.setName("clean").setDescription("clean up bot commands and responses"),
   );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
     return;
@@ -149,7 +149,7 @@ async function run(
         message.member,
         "deleting `" +
           amount +
-          "` messages..\n- if you'd like to cancel this operation, delete this message"
+          "` messages..\n- if you'd like to cancel this operation, delete this message",
       ).setHeader("purge", message.author.avatarURL());
 
       const m = await send({ embeds: [embed] });
@@ -181,7 +181,7 @@ async function run(
               amount +
               " / " +
               amount1 +
-              "` messages..\n- if you'd like to cancel this operation, delete this message"
+              "` messages..\n- if you'd like to cancel this operation, delete this message",
           );
           let stop = false;
           await edit({ embeds: [embed] }, m).catch(() => {
@@ -214,7 +214,7 @@ async function run(
               amount +
               " / " +
               amount1 +
-              "` messages..\n- if you'd like to cancel this operation, delete this message"
+              "` messages..\n- if you'd like to cancel this operation, delete this message",
           );
           let stop = false;
           await edit({ embeds: [embed] }, m).catch(() => {
@@ -375,7 +375,7 @@ async function run(
         "/**purge member <@member> <amount>** *delete messages by a specific member*\n" +
         "/**purge bot <amount>** *delete messages by bots*\n" +
         "/**purge includes <text> <amount>** *delete messages containing certain text*\n" +
-        "/**purge clean** *clean up bot commands and responses*"
+        "/**purge clean** *clean up bot commands and responses*",
     );
 
     return send({ embeds: [embed] });
@@ -490,7 +490,7 @@ async function run(
     const collected = await message.channel.messages.fetch({ limit: amount });
 
     const collecteda = collected.filter(
-      (msg) => msg.author.id == message.client.user.id || msg.content.startsWith(prefix)
+      (msg) => msg.author.id == message.client.user.id || msg.content.startsWith(prefix),
     );
 
     await message.channel.bulkDelete(collecteda);

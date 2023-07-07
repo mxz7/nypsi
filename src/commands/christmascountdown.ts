@@ -17,7 +17,7 @@ const cmd = new Command("christmascountdown", "create a christmas countdown", "a
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
     if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
@@ -48,7 +48,7 @@ async function run(
       `${prefix}**xmas enable <channel>** *enables the christmas countdown in the given channel*\n` +
         `${prefix}**xmas disable** *disables the christmas countdown*\n` +
         `${prefix}**xmas channel <channel>** *change the channel used*\n` +
-        `${prefix}**xmas format <new format>** *change the format for the countdown*`
+        `${prefix}**xmas format <new format>** *change the format for the countdown*`,
     ).setHeader("christmas countdown");
     return message.channel.send({ embeds: [embed] });
   };
@@ -57,7 +57,7 @@ async function run(
     const embed = new CustomEmbed(
       message.member,
       `**enabled** \`${profile.enabled}\`\n` +
-        `**format** ${profile.format}\n**channel** \`${profile.channel}\``
+        `**format** ${profile.format}\n**channel** \`${profile.channel}\``,
     )
       .setHeader("christmas countdown")
       .setFooter({ text: `use ${prefix}xmas help to view additional commands` });
@@ -135,7 +135,7 @@ async function run(
 
       const embed = new CustomEmbed(
         message.member,
-        "this is how the message will appear\n%days% will be replaced with how many days are left until christmas"
+        "this is how the message will appear\n%days% will be replaced with how many days are left until christmas",
       )
         .setHeader("christmas countdown")
         .addField("current format", `\`${profile.format}\``, true)
@@ -182,7 +182,7 @@ async function run(
     }
 
     const embed = new CustomEmbed(message.member, "✅ format updated").setHeader(
-      "christmas countdown"
+      "christmas countdown",
     );
 
     return message.channel.send({ embeds: [embed] });
@@ -190,7 +190,7 @@ async function run(
     if (args.length == 1) {
       const embed = new CustomEmbed(
         message.member,
-        "by setting the channel it will change the channel that the message is sent in"
+        "by setting the channel it will change the channel that the message is sent in",
       )
         .setHeader("christmas countdown")
         .addField("current value", "`" + profile.channel + "`")
@@ -240,7 +240,7 @@ async function run(
     }
 
     const embed = new CustomEmbed(message.member, "✅ channel updated").setHeader(
-      "christmas countdown"
+      "christmas countdown",
     );
 
     return message.channel.send({ embeds: [embed] });

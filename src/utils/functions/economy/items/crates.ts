@@ -82,12 +82,12 @@ module.exports = new ItemUse(
       message.member,
       `opening **${amount}** ${
         amount > 1 ? (selected.plural ? selected.plural : selected.name) : selected.name
-      }`
+      }`,
     ).setHeader(
       `${message.author.username}'s ${amount} ${
         amount > 1 ? (selected.plural ? selected.plural : selected.name) : selected.name
       }`,
-      message.author.avatarURL()
+      message.author.avatarURL(),
     );
 
     const msg = await send({ embeds: [embed] });
@@ -147,7 +147,7 @@ module.exports = new ItemUse(
           .setLabel("back")
           .setStyle(ButtonStyle.Primary)
           .setDisabled(true),
-        new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
+        new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
       );
 
       await msg.edit({ embeds: [embed], components: [row] });
@@ -162,5 +162,5 @@ module.exports = new ItemUse(
 
       return manager.listen();
     }
-  }
+  },
 );

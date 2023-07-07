@@ -25,7 +25,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const embed = new CustomEmbed(message.member).setDescription(
     `gamble multiplier: **${Math.floor((await getGambleMulti(message.member)) * 100)}**%\n` +
-      `sell multiplier: **${Math.floor((await getSellMulti(message.member)) * 100)}**%`
+      `sell multiplier: **${Math.floor((await getSellMulti(message.member)) * 100)}**%`,
   );
 
   embed.setHeader(`${message.author.username}`, message.author.avatarURL());

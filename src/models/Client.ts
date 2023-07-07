@@ -135,7 +135,7 @@ export class NypsiClient extends Client {
                   ],
                 });
               },
-              { context: { presence: presence.split(" ") } }
+              { context: { presence: presence.split(" ") } },
             );
           } else {
             this.cluster.broadcastEval(
@@ -149,7 +149,7 @@ export class NypsiClient extends Client {
                   ],
                 });
               },
-              { context: { args: presence.split(" ") } }
+              { context: { args: presence.split(" ") } },
             );
           }
         } else {
@@ -163,7 +163,7 @@ export class NypsiClient extends Client {
                 ],
               });
             },
-            { context: { presence: randomPresence() } }
+            { context: { presence: randomPresence() } },
           );
         }
       }, 60000);

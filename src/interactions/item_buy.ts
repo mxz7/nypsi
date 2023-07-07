@@ -15,7 +15,7 @@ export default {
         (item.includes(focused.value) ||
           items[item].name.includes(focused.value) ||
           items[item].aliases?.includes(focused.value)) &&
-        items[item].buy
+        items[item].buy,
     );
 
     if (options.length > 25) options = options.splice(0, 24);

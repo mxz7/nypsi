@@ -7,12 +7,12 @@ import { getCase, setReason } from "../utils/functions/moderation/cases";
 const cmd = new Command(
   "reason",
   "set a reason for a case/punishment",
-  "moderation"
+  "moderation",
 ).setPermissions(["MANAGE_MESSAGES"]);
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) return;
 

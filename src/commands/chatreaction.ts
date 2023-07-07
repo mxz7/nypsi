@@ -60,27 +60,27 @@ const cmd = new Command("chatreaction", "see who can type the fastest", "fun")
 cmd.slashEnabled = true;
 cmd.slashData
   .addSubcommand((option) =>
-    option.setName("start").setDescription("start a chat reaction in the current channel")
+    option.setName("start").setDescription("start a chat reaction in the current channel"),
   )
   .addSubcommand((option) =>
     option
       .setName("duel")
       .setDescription("duel a member to a chat reaction")
       .addUserOption((option) =>
-        option.setName("member").setDescription("member to duel").setRequired(false)
+        option.setName("member").setDescription("member to duel").setRequired(false),
       )
       .addStringOption((option) =>
         option
           .setName("wager")
           .setDescription("how much do you want to wager / bet")
-          .setRequired(false)
-      )
+          .setRequired(false),
+      ),
   )
   .addSubcommand((option) =>
-    option.setName("stats").setDescription("view your chat reaction stats")
+    option.setName("stats").setDescription("view your chat reaction stats"),
   )
   .addSubcommand((option) =>
-    option.setName("leaderboard").setDescription("view the chat reaction leaderboard")
+    option.setName("leaderboard").setDescription("view the chat reaction leaderboard"),
   )
   .addSubcommandGroup((words) =>
     words
@@ -88,7 +88,7 @@ cmd.slashData
       .setDescription("add or remove words from the chat reactions word list")
       .addSubcommand((list) => list.setName("list").setDescription("show the current word list"))
       .addSubcommand((reset) =>
-        reset.setName("reset").setDescription("reset the word list back to default")
+        reset.setName("reset").setDescription("reset the word list back to default"),
       )
       .addSubcommand((add) =>
         add
@@ -98,8 +98,8 @@ cmd.slashData
             option
               .setName("word")
               .setDescription("what word would you like to add to the word list")
-              .setRequired(true)
-          )
+              .setRequired(true),
+          ),
       )
       .addSubcommand((remove) =>
         remove
@@ -109,24 +109,24 @@ cmd.slashData
             option
               .setName("word")
               .setDescription("what word would you like to remove from the word list")
-              .setRequired(true)
-          )
-      )
+              .setRequired(true),
+          ),
+      ),
   )
   .addSubcommandGroup((blacklist) =>
     blacklist
       .setName("blacklist")
       .setDescription("ban a user from chat reactions")
       .addSubcommand((list) =>
-        list.setName("list").setDescription("view currently blacklisted users")
+        list.setName("list").setDescription("view currently blacklisted users"),
       )
       .addSubcommand((add) =>
         add
           .setName("add")
           .setDescription("add a user to the blacklist")
           .addUserOption((option) =>
-            option.setName("user").setDescription("user to be blacklisted").setRequired(true)
-          )
+            option.setName("user").setDescription("user to be blacklisted").setRequired(true),
+          ),
       )
       .addSubcommand((remove) =>
         remove
@@ -136,30 +136,30 @@ cmd.slashData
             option
               .setName("user")
               .setDescription("user to remove from the blacklist")
-              .setRequired(true)
-          )
-      )
+              .setRequired(true),
+          ),
+      ),
   )
   .addSubcommandGroup((settings) =>
     settings
       .setName("settings")
       .setDescription("settings for chat reactions")
       .addSubcommand((view) =>
-        view.setName("view").setDescription("view the current configuration")
+        view.setName("view").setDescription("view the current configuration"),
       )
       .addSubcommand((enable) =>
-        enable.setName("enable").setDescription("enable chat reactions for the current channel")
+        enable.setName("enable").setDescription("enable chat reactions for the current channel"),
       )
       .addSubcommand((disable) =>
-        disable.setName("disable").setDescription("disable chat reactions")
+        disable.setName("disable").setDescription("disable chat reactions"),
       )
       .addSubcommand((offset) =>
         offset
           .setName("offset")
           .setDescription("set a maximum offset to be used with the cooldown")
           .addIntegerOption((option) =>
-            option.setName("seconds").setDescription("maximum offset").setRequired(true)
-          )
+            option.setName("seconds").setDescription("maximum offset").setRequired(true),
+          ),
       )
       .addSubcommand((length) =>
         length
@@ -169,8 +169,8 @@ cmd.slashData
             option
               .setName("seconds")
               .setDescription("amount of time a chat reaction can last")
-              .setRequired(true)
-          )
+              .setRequired(true),
+          ),
       )
       .addSubcommand((cooldown) =>
         cooldown
@@ -180,8 +180,8 @@ cmd.slashData
             option
               .setName("seconds")
               .setDescription("time between chat reactions")
-              .setRequired(true)
-          )
+              .setRequired(true),
+          ),
       )
       .addSubcommand((channel) =>
         channel
@@ -191,16 +191,16 @@ cmd.slashData
             option
               .setName("channel")
               .setDescription("channel to add/remove from automatic starting")
-              .setRequired(true)
-          )
-      )
+              .setRequired(true),
+          ),
+      ),
   );
 
 const duelRequests = new Set<string>();
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -255,7 +255,7 @@ async function run(
         `${prefix}**cr stats reset** *reset stats for the server*` +
         `${prefix}**cr stats** *view your chat reaction stats*\n` +
         `${prefix}**cr lb** *view the server leaderboard*\n` +
-        `${prefix}**cr duel** *duel a member at a chat reaction*`
+        `${prefix}**cr duel** *duel a member at a chat reaction*`,
     );
 
     return send({ embeds: [embed] });
@@ -266,7 +266,7 @@ async function run(
 
     const embed = new CustomEmbed(message.member).setHeader(
       `${message.author.username}'s stats`,
-      message.author.avatarURL()
+      message.author.avatarURL(),
     );
 
     const stats = await getReactionStats(message.guild, message.member);
@@ -276,7 +276,7 @@ async function run(
         stats.wins +
         stats.secondPlace +
         stats.thirdPlace
-      ).toLocaleString()}**`
+      ).toLocaleString()}**`,
     );
 
     const blacklisted = await getBlacklisted(message.guild);
@@ -340,12 +340,15 @@ async function run(
       const embed = new CustomEmbed(
         message.member,
         "click the button below to vote start a chat reaction\n\n1/4",
-        true
+        true,
       ).setHeader(`${message.author.username}'s chat reaction`, message.author.avatarURL());
 
       const components = [
         new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-          new ButtonBuilder().setLabel("vote start").setCustomId("vs").setStyle(ButtonStyle.Success)
+          new ButtonBuilder()
+            .setLabel("vote start")
+            .setCustomId("vs")
+            .setStyle(ButtonStyle.Success),
         ),
       ];
 
@@ -359,7 +362,7 @@ async function run(
 
       const i = setInterval(async () => {
         embed.setDescription(
-          `click the button below to vote start a chat reaction\n\n${voted.length}/4`
+          `click the button below to vote start a chat reaction\n\n${voted.length}/4`,
         );
 
         if (embed.data.description == msg.embeds[0].description) return;
@@ -415,7 +418,7 @@ async function run(
         if (voted.length < 4) {
           clearInterval(i);
           embed.setDescription(
-            `chat reaction not started\n\nonly received ${voted.length}/4 votes ):`
+            `chat reaction not started\n\nonly received ${voted.length}/4 votes ):`,
           );
           msg.edit({ embeds: [embed], components: [] });
           return;
@@ -486,7 +489,7 @@ async function run(
       player: GuildMember,
       wager: number,
       response: ButtonInteraction,
-      m: Message
+      m: Message,
     ) => {
       const balance = await getBalance(player);
 
@@ -506,7 +509,7 @@ async function run(
         message.channel as TextChannel,
         message.member,
         player,
-        wager
+        wager,
       );
 
       if (typeof result === "string")
@@ -565,7 +568,7 @@ async function run(
         return send({
           embeds: [
             new ErrorEmbed(
-              `your max bet is $**${((await calcMaxBet(message.member)) * 10).toLocaleString()}**`
+              `your max bet is $**${((await calcMaxBet(message.member)) * 10).toLocaleString()}**`,
             ),
           ],
         });
@@ -574,7 +577,7 @@ async function run(
         return send({
           embeds: [
             new ErrorEmbed(
-              `their max bet is $**${((await calcMaxBet(target)) * 10).toLocaleString()}**`
+              `their max bet is $**${((await calcMaxBet(target)) * 10).toLocaleString()}**`,
             ),
           ],
         });
@@ -590,14 +593,14 @@ async function run(
 
       const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder().setCustomId("y").setLabel("accept").setStyle(ButtonStyle.Success),
-        new ButtonBuilder().setCustomId("n").setLabel("deny").setStyle(ButtonStyle.Danger)
+        new ButtonBuilder().setCustomId("n").setLabel("deny").setStyle(ButtonStyle.Danger),
       );
 
       const requestEmbed = new CustomEmbed(
         message.member,
         `**${
           message.author.tag
-        }** has challenged you to a chat reaction duel\n\n**wager** $${wager.toLocaleString()}\n\ndo you accept?`
+        }** has challenged you to a chat reaction duel\n\n**wager** $${wager.toLocaleString()}\n\ndo you accept?`,
       ).setFooter({ text: "expires in 60 seconds" });
 
       const m = await send({
@@ -659,7 +662,7 @@ async function run(
         return send({
           embeds: [
             new ErrorEmbed(
-              `your max bet is $**${((await calcMaxBet(message.member)) * 10).toLocaleString()}**`
+              `your max bet is $**${((await calcMaxBet(message.member)) * 10).toLocaleString()}**`,
             ),
           ],
         });
@@ -673,14 +676,14 @@ async function run(
 
       const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder().setCustomId("y").setLabel("play").setStyle(ButtonStyle.Success),
-        new ButtonBuilder().setCustomId("n").setLabel("cancel").setStyle(ButtonStyle.Danger)
+        new ButtonBuilder().setCustomId("n").setLabel("cancel").setStyle(ButtonStyle.Danger),
       );
 
       const requestEmbed = new CustomEmbed(
         message.member,
         `**${
           message.author.tag
-        }** has created an open chat reaction duel\n\n**wager** $${wager.toLocaleString()}`
+        }** has created an open chat reaction duel\n\n**wager** $${wager.toLocaleString()}`,
       ).setFooter({ text: "expires in 60 seconds" });
 
       const m = await send({
@@ -714,7 +717,7 @@ async function run(
                 new ErrorEmbed(
                   `your max bet is $**${(
                     (await calcMaxBet(message.member)) * 10
-                  ).toLocaleString()}**`
+                  ).toLocaleString()}**`,
                 ),
               ],
             });
@@ -801,7 +804,7 @@ async function run(
             return send({
               embeds: [
                 new ErrorEmbed(
-                  "you need to mention a user, you can either use the user ID, or mention the user by putting @ before their name"
+                  "you need to mention a user, you can either use the user ID, or mention the user by putting @ before their name",
                 ),
               ],
             });
@@ -845,7 +848,7 @@ async function run(
             return send({
               embeds: [
                 new ErrorEmbed(
-                  "you need to mention a user, you can either use the user ID, or mention the user by putting @ before their name"
+                  "you need to mention a user, you can either use the user ID, or mention the user by putting @ before their name",
                 ),
               ],
             });
@@ -907,7 +910,7 @@ async function run(
           `**random channels** \`${channels}\`\n` +
           `**time between events** \`${settings.betweenEvents}s\`\n` +
           `**max offset** \`${settings.randomModifier}s\`\n` +
-          `**max game length** \`${settings.timeout}s\``
+          `**max game length** \`${settings.timeout}s\``,
       );
 
       embed.setFooter({ text: `use ${prefix}cr settings help to change this settings` });
@@ -925,7 +928,7 @@ async function run(
             `${prefix}**cr settings channel <channel>** *add/remove channels to be used for automatic starting*\n` +
             `${prefix}**cr settings cooldown <seconds>** *set the time between automatic chat reactions*\n` +
             `${prefix}**cr settings offset <seconds>** *set a maximum offset to be used with the cooldown*\n` +
-            `${prefix}**cr settings length <seconds>** *set a maximum game length*`
+            `${prefix}**cr settings length <seconds>** *set a maximum game length*`,
         );
 
         return send({ embeds: [embed] });
@@ -965,7 +968,7 @@ async function run(
         return send({
           embeds: [
             new ErrorEmbed(
-              "you need to mention a channel, you can use the channel ID, or mention the channel by putting a # before the channel name"
+              "you need to mention a channel, you can use the channel ID, or mention the channel by putting a # before the channel name",
             ),
           ],
         });
@@ -989,7 +992,7 @@ async function run(
             return send({
               embeds: [
                 new ErrorEmbed(
-                  "you need to mention a channel, you can use the channel ID, or mention the channel by putting a # before the channel name\nto remove a channel, simply mention a channel or use an id of a channel that is already selected as a random channel"
+                  "you need to mention a channel, you can use the channel ID, or mention the channel by putting a # before the channel name\nto remove a channel, simply mention a channel or use an id of a channel that is already selected as a random channel",
                 ),
               ],
             });
@@ -1024,12 +1027,12 @@ async function run(
         } else {
           if (settings.randomChannels.length >= max) {
             const embed = new ErrorEmbed(
-              `you have reached the maximum amount of random channels (${max})\nyou can subscribe on [patreon](https://patreon.com/join/nypsi) to have more`
+              `you have reached the maximum amount of random channels (${max})\nyou can subscribe on [patreon](https://patreon.com/join/nypsi) to have more`,
             );
 
             if (max > 1) {
               embed.setDescription(
-                `you have reached the maximum amount of random channels (${max})`
+                `you have reached the maximum amount of random channels (${max})`,
               );
             }
 
@@ -1153,7 +1156,7 @@ async function run(
         `${prefix}**cr words list** *view the current wordlist*\n` +
           `${prefix}**cr words add/+ <word/sentence>** *add a word or sentence to the wordlist*\n` +
           `${prefix}**cr words del/- <word/sentence>** *remove a word or sentence from the wordlist*\n` +
-          `${prefix}**cr words reset** *delete the custom word list and use the [default list](https://github.com/tekoh/nypsi/blob/main/data/cr_words.txt)*`
+          `${prefix}**cr words reset** *delete the custom word list and use the [default list](https://github.com/tekoh/nypsi/blob/main/data/cr_words.txt)*`,
       );
 
       return send({ embeds: [embed] });
@@ -1244,7 +1247,7 @@ async function run(
 
       if (words.length == 0) {
         embed.setDescription(
-          "using [default word list](https://github.com/tekoh/nypsi/blob/main/data/cr_words.txt)"
+          "using [default word list](https://github.com/tekoh/nypsi/blob/main/data/cr_words.txt)",
         );
         embed.setHeader("chat reactions");
       } else {
@@ -1261,7 +1264,7 @@ async function run(
               .setLabel("back")
               .setStyle(ButtonStyle.Primary)
               .setDisabled(true),
-            new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
+            new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
           );
           const msg = await send({ embeds: [embed], components: [row] });
 
@@ -1311,7 +1314,7 @@ async function run(
                       .setCustomId("➡")
                       .setLabel("next")
                       .setStyle(ButtonStyle.Primary)
-                      .setDisabled(false)
+                      .setDisabled(false),
                   );
                 } else {
                   row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -1324,7 +1327,7 @@ async function run(
                       .setCustomId("➡")
                       .setLabel("next")
                       .setStyle(ButtonStyle.Primary)
-                      .setDisabled(false)
+                      .setDisabled(false),
                   );
                 }
 
@@ -1350,7 +1353,7 @@ async function run(
                       .setCustomId("➡")
                       .setLabel("next")
                       .setStyle(ButtonStyle.Primary)
-                      .setDisabled(true)
+                      .setDisabled(true),
                   );
                 } else {
                   row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -1363,7 +1366,7 @@ async function run(
                       .setCustomId("➡")
                       .setLabel("next")
                       .setStyle(ButtonStyle.Primary)
-                      .setDisabled(false)
+                      .setDisabled(false),
                   );
                 }
 

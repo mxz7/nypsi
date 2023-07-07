@@ -31,12 +31,12 @@ cmd.slashData.addStringOption((option) =>
     .setName("item-global")
     .setDescription("item you want to view info for")
     .setAutocomplete(true)
-    .setRequired(true)
+    .setRequired(true),
 );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -152,7 +152,7 @@ async function run(
     embed.addField(
       "role",
       `\`${selected.role}${selected.role == "car" ? ` (${selected.speed})` : ""}\``,
-      true
+      true,
     );
   }
 
@@ -208,7 +208,7 @@ async function run(
         .setStyle(ButtonStyle.Link)
         .setLabel("history")
         .setEmoji("📈")
-        .setURL("https://nypsi.xyz/item/history/" + selected.id)
+        .setURL("https://nypsi.xyz/item/history/" + selected.id),
     ),
   ];
 

@@ -30,7 +30,7 @@ const cmd = new Command("avatarhistory", "view a user's avatar history", "info")
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (await onCooldown(cmd.name, message.member)) {
     const embed = await getResponse(cmd.name, message.member);
@@ -61,7 +61,7 @@ async function run(
 
   if (history.length == 0) {
     const url = await uploadImageToImgur(
-      member.user.displayAvatarURL({ extension: "png", size: 256 })
+      member.user.displayAvatarURL({ extension: "png", size: 256 }),
     );
     if (url) {
       await addNewAvatar(member, url);
@@ -101,7 +101,7 @@ async function run(
       .setStyle(ButtonStyle.Primary)
       .setDisabled(true),
     new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
-    new ButtonBuilder().setCustomId("d").setLabel("delete").setStyle(ButtonStyle.Danger)
+    new ButtonBuilder().setCustomId("d").setLabel("delete").setStyle(ButtonStyle.Danger),
   );
 
   let msg: Message;
@@ -159,7 +159,7 @@ async function run(
               .setLabel("next")
               .setStyle(ButtonStyle.Primary)
               .setDisabled(false),
-            new ButtonBuilder().setCustomId("d").setLabel("delete").setStyle(ButtonStyle.Danger)
+            new ButtonBuilder().setCustomId("d").setLabel("delete").setStyle(ButtonStyle.Danger),
           );
         } else {
           row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -173,7 +173,7 @@ async function run(
               .setLabel("next")
               .setStyle(ButtonStyle.Primary)
               .setDisabled(false),
-            new ButtonBuilder().setCustomId("d").setLabel("delete").setStyle(ButtonStyle.Danger)
+            new ButtonBuilder().setCustomId("d").setLabel("delete").setStyle(ButtonStyle.Danger),
           );
         }
         await msg.edit({ embeds: [newEmbed], components: [row] });
@@ -202,7 +202,7 @@ async function run(
               .setLabel("next")
               .setStyle(ButtonStyle.Primary)
               .setDisabled(true),
-            new ButtonBuilder().setCustomId("d").setLabel("delete").setStyle(ButtonStyle.Danger)
+            new ButtonBuilder().setCustomId("d").setLabel("delete").setStyle(ButtonStyle.Danger),
           );
         } else {
           row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -216,7 +216,7 @@ async function run(
               .setLabel("next")
               .setStyle(ButtonStyle.Primary)
               .setDisabled(false),
-            new ButtonBuilder().setCustomId("d").setLabel("delete").setStyle(ButtonStyle.Danger)
+            new ButtonBuilder().setCustomId("d").setLabel("delete").setStyle(ButtonStyle.Danger),
           );
         }
         await msg.edit({ embeds: [newEmbed], components: [row] });

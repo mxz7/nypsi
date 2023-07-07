@@ -11,7 +11,7 @@ const cmd = new Command("snipefilter", "change the snipe filter for your server"
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
     if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
@@ -43,7 +43,7 @@ async function run(
       return message.channel.send({
         embeds: [
           new ErrorEmbed(
-            `${prefix}sf add/+ <word> | cAsInG doesn't matter, it'll be filtered either way`
+            `${prefix}sf add/+ <word> | cAsInG doesn't matter, it'll be filtered either way`,
           ),
         ],
       });
@@ -60,7 +60,7 @@ async function run(
     if (filter.indexOf(word) > -1) {
       const embed = new CustomEmbed(
         message.member,
-        "❌ `" + word + "` already exists in the filter"
+        "❌ `" + word + "` already exists in the filter",
       )
         .setHeader("snipe filter")
         .setFooter({ text: `you can use ${prefix}sf to view the filter` });
@@ -75,7 +75,7 @@ async function run(
 
       const embed = new CustomEmbed(
         message.member,
-        `❌ filter has exceeded the maximum size - please use *${prefix}sf del/-* or *${prefix}sf reset*`
+        `❌ filter has exceeded the maximum size - please use *${prefix}sf del/-* or *${prefix}sf reset*`,
       ).setHeader("snipe filter");
 
       return message.channel.send({ embeds: [embed] });
@@ -85,7 +85,7 @@ async function run(
 
     const embed = new CustomEmbed(
       message.member,
-      "✅ added `" + word + "` to the filter"
+      "✅ added `" + word + "` to the filter",
     ).setHeader("snipe filter");
     return message.channel.send({ embeds: [embed] });
   }
@@ -122,7 +122,7 @@ async function run(
     await updateSnipeFilter(message.guild, filter);
 
     const embed = new CustomEmbed(message.member, "✅ filter has been reset").setHeader(
-      "snipe filter"
+      "snipe filter",
     );
 
     return message.channel.send({ embeds: [embed] });

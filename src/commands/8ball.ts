@@ -30,7 +30,7 @@ const cmd = new Command("8ball", "ask the 8ball a question", "fun").setAliases([
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (await onCooldown(cmd.name, message.member)) {
     const embed = await getResponse(cmd.name, message.member);
@@ -50,7 +50,7 @@ async function run(
 
   const embed = new CustomEmbed(
     message.member,
-    `**${question}** - ${message.member.user.toString()}\n\n🎱 ${response}`
+    `**${question}** - ${message.member.user.toString()}\n\n🎱 ${response}`,
   );
 
   message.channel.send({ embeds: [embed] });

@@ -49,7 +49,7 @@ export default {
 
     const embed = new CustomEmbed().setHeader(
       `${interaction.user.username}'s ${crateAmount} vote crate${crateAmount > 1 ? "s" : ""}`,
-      interaction.user.avatarURL()
+      interaction.user.avatarURL(),
     );
 
     await Promise.all([
@@ -105,7 +105,7 @@ export default {
           .setLabel("back")
           .setStyle(ButtonStyle.Primary)
           .setDisabled(true),
-        new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
+        new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
       );
 
       const msg = await interaction.editReply({ embeds: [embed], components: [row] });

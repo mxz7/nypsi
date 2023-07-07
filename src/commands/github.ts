@@ -8,13 +8,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const embed = new CustomEmbed(
     message.member,
     "nypsi is open source!!\n" +
-      "click [here](https://github.com/tekoh/nypsi) to view the source code on github"
+      "click [here](https://github.com/tekoh/nypsi) to view the source code on github",
   )
     .setTitle("github")
     .setURL("https://github.com/tekoh/nypsi")
     .addField(
       "what does this mean?",
-      "if you know how to code, you could fix bugs, add features, create your own commands.. the list goes on."
+      "if you know how to code, you could fix bugs, add features, create your own commands.. the list goes on.",
     );
 
   return message.channel.send({ embeds: [embed] });

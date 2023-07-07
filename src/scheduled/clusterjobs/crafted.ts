@@ -34,7 +34,9 @@ async function checkCraftItems() {
           }`,
           embed: new CustomEmbed()
             .setDescription(
-              `\`${item.amount}x\` ${getItems()[item.itemId].emoji} ${getItems()[item.itemId].name}`
+              `\`${item.amount}x\` ${getItems()[item.itemId].emoji} ${
+                getItems()[item.itemId].name
+              }`,
             )
             .setColor(Constants.TRANSPARENT_EMBED_COLOR),
         },

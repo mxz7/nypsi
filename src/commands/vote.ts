@@ -80,14 +80,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       "rewards",
       `× **5**% multiplier booster\n× +$**50k** max bet\n× $**${amount.toLocaleString()}** reward\n× **${crateAmount}** vote crate${
         crateAmount > 1 ? "s" : ""
-      }`
+      }`,
     );
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
         .setStyle(ButtonStyle.Link)
         .setURL("https://top.gg/bot/678711738845102087/vote")
-        .setLabel("top.gg")
+        .setLabel("top.gg"),
     );
 
     send({ embeds: [embed], components: [row] });

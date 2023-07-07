@@ -90,7 +90,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({
       embeds: [
         new ErrorEmbed(
-          "you need a fishing rod to fish\n[how do i get a fishing rod?](https://docs.nypsi.xyz/economy/fishinghunting)"
+          "you need a fishing rod to fish\n[how do i get a fishing rod?](https://docs.nypsi.xyz/economy/fishinghunting)",
         ),
       ],
     });
@@ -199,7 +199,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       message.member,
       fishingRod,
       inventory.find((i) => i.item == fishingRod).amount - 1,
-      false
+      false,
     );
   }
 
@@ -288,7 +288,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         await updateBalance(message.member, (await getBalance(message.member)) + amount);
         foundItems.set(
           "money",
-          foundItems.has("money") ? foundItems.get("money") + amount : amount
+          foundItems.has("money") ? foundItems.get("money") + amount : amount,
         );
       } else if (chosen.includes("xp:")) {
         const amount = parseInt(chosen.substring(3));
@@ -329,7 +329,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const embed = new CustomEmbed(
     message.member,
-    `you go to the pond and cast your **${items[fishingRod].name}**`
+    `you go to the pond and cast your **${items[fishingRod].name}**`,
   );
 
   const msg = await send({ embeds: [embed] });
@@ -345,7 +345,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             .map((i) => `- \`${i[1]}x\` ${items[i[0]].emoji} ${items[i[0]].name}`)
             .join("\n")}`
         : " **nothing**"
-    }`
+    }`,
   );
 
   setTimeout(() => {

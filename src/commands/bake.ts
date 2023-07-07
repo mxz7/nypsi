@@ -19,7 +19,7 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 const cmd = new Command(
   "bake",
   "use your furnace to bake cookies and cakes! (doesnt remove your furnace because cookies are cool)",
-  "money"
+  "money",
 );
 
 cmd.slashEnabled = true;
@@ -29,7 +29,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 }
 
 async function doBake(
-  message: Message | (NypsiCommandInteraction & CommandInteraction) | ButtonInteraction
+  message: Message | (NypsiCommandInteraction & CommandInteraction) | ButtonInteraction,
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -96,7 +96,7 @@ async function doBake(
     return send({
       embeds: [
         new ErrorEmbed(
-          "you need a furnace to bake. furnaces can be found in crates or bought from the shop"
+          "you need a furnace to bake. furnaces can be found in crates or bought from the shop",
         ),
       ],
       ephemeral: true,
@@ -107,7 +107,7 @@ async function doBake(
     return send({
       embeds: [
         new ErrorEmbed(
-          "you need coal to bake. coal can be found when mining or bought from the shop"
+          "you need coal to bake. coal can be found when mining or bought from the shop",
         ),
       ],
       ephemeral: true,
@@ -119,13 +119,13 @@ async function doBake(
     member,
     "coal",
     inventory.find((i) => i.item === "coal").amount - 1,
-    false
+    false,
   );
 
   const response = await runBakery(member);
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder().setCustomId("bake").setLabel("bake").setStyle(ButtonStyle.Success)
+    new ButtonBuilder().setCustomId("bake").setLabel("bake").setStyle(ButtonStyle.Success),
   );
 
   return send({ embeds: [response], components: [row] });

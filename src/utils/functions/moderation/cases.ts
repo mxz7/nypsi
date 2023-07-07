@@ -21,7 +21,7 @@ export async function newCase(
   caseType: PunishmentType,
   userIDs: string[] | string,
   moderator: string,
-  command: string
+  command: string,
 ) {
   if (!(userIDs instanceof Array)) {
     userIDs = [userIDs];

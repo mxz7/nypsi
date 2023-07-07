@@ -44,17 +44,17 @@ cmd.slashData
   .addSubcommand((economy) => economy.setName("gamble").setDescription("view your gamble stats"))
   .addSubcommand((item) => item.setName("item").setDescription("view your item stats"))
   .addSubcommand((commands) =>
-    commands.setName("commands").setDescription("view your command usage stats")
+    commands.setName("commands").setDescription("view your command usage stats"),
   )
   .addSubcommand((bot) => bot.setName("bot").setDescription("view nypsi's stats"))
   .addSubcommand((auction) => auction.setName("auction").setDescription("view your auction stats"))
   .addSubcommand((lb) =>
-    lb.setName("leaderboards").setDescription("view your leaderboard positions")
+    lb.setName("leaderboards").setDescription("view your leaderboard positions"),
   );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -140,7 +140,7 @@ async function run(
           .setLabel("back")
           .setStyle(ButtonStyle.Primary)
           .setDisabled(true),
-        new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
+        new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
       );
       const msg = await send({ embeds: [embed], components: [row] });
       const manager = new PageManager({
@@ -193,7 +193,7 @@ async function run(
           .setLabel("back")
           .setStyle(ButtonStyle.Primary)
           .setDisabled(true),
-        new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
+        new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
       );
       const msg = await send({ embeds: [embed], components: [row] });
       const manager = new PageManager({
@@ -215,7 +215,7 @@ async function run(
 
   const itemStats = async () => {
     const itemStats = await getStats(message.member).then((stats) =>
-      stats.filter((i) => Boolean(getItems()[i.itemId]))
+      stats.filter((i) => Boolean(getItems()[i.itemId])),
     );
 
     if (itemStats.length == 0) {
@@ -227,13 +227,13 @@ async function run(
         (i) =>
           `${getItems()[i.itemId].emoji} **${
             getItems()[i.itemId].name
-          }** ${i.amount.toLocaleString()} uses`
-      )
+          }** ${i.amount.toLocaleString()} uses`,
+      ),
     );
 
     const embed = new CustomEmbed(message.member, pages.get(1).join("\n")).setHeader(
       "item stats",
-      message.author.avatarURL()
+      message.author.avatarURL(),
     );
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -242,7 +242,7 @@ async function run(
         .setLabel("back")
         .setStyle(ButtonStyle.Primary)
         .setDisabled(true),
-      new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
+      new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
     );
 
     if (pages.size == 1) {
@@ -271,11 +271,11 @@ async function run(
     const total = uses.map((x) => x.uses).reduce((a, b) => a + b);
 
     const pages = PageManager.createPages(
-      uses.map((i) => `\`$${i.command}\` ${i.uses.toLocaleString()}`)
+      uses.map((i) => `\`$${i.command}\` ${i.uses.toLocaleString()}`),
     );
 
     const commandUses = parseInt(
-      await redis.hget(Constants.redis.nypsi.TOP_COMMANDS_USER, message.author.tag)
+      await redis.hget(Constants.redis.nypsi.TOP_COMMANDS_USER, message.author.tag),
     );
 
     const embed = new CustomEmbed(message.member, pages.get(1).join("\n"))
@@ -292,7 +292,7 @@ async function run(
         .setLabel("back")
         .setStyle(ButtonStyle.Primary)
         .setDisabled(true),
-      new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
+      new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
     );
 
     let msg: Message;
@@ -322,7 +322,7 @@ async function run(
 
       const newEmbed = new CustomEmbed(message.member).setHeader(
         "most used commands",
-        message.author.avatarURL()
+        message.author.avatarURL(),
       );
 
       if (reaction == "⬅") {
@@ -350,7 +350,7 @@ async function run(
                 .setCustomId("➡")
                 .setLabel("next")
                 .setStyle(ButtonStyle.Primary)
-                .setDisabled(false)
+                .setDisabled(false),
             );
           } else {
             row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -363,7 +363,7 @@ async function run(
                 .setCustomId("➡")
                 .setLabel("next")
                 .setStyle(ButtonStyle.Primary)
-                .setDisabled(false)
+                .setDisabled(false),
             );
           }
           await edit({ embeds: [newEmbed], components: [row] }, msg);
@@ -394,7 +394,7 @@ async function run(
                 .setCustomId("➡")
                 .setLabel("next")
                 .setStyle(ButtonStyle.Primary)
-                .setDisabled(true)
+                .setDisabled(true),
             );
           } else {
             row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -407,7 +407,7 @@ async function run(
                 .setCustomId("➡")
                 .setLabel("next")
                 .setStyle(ButtonStyle.Primary)
-                .setDisabled(false)
+                .setDisabled(false),
             );
           }
           await edit({ embeds: [newEmbed], components: [row] }, msg);
@@ -447,7 +447,7 @@ async function run(
     const embed = new CustomEmbed(message.member)
       .setHeader(
         `nypsi stats | cluster: ${currentCluster + 1}/${clusterCount}`,
-        client.user.avatarURL()
+        client.user.avatarURL(),
       )
       .addField(
         "bot",
@@ -462,14 +462,14 @@ async function run(
           "\n" +
           "**total aliases** " +
           aliasesSize,
-        true
+        true,
       )
       .addField(
         "mentions",
         `**queue size** ${await redis.llen(Constants.redis.nypsi.MENTION_QUEUE)}\n` +
           `**delay** ${Number(await redis.get(Constants.redis.nypsi.MENTION_DELAY)) || 5}\n` +
           `**max** ${Number(await redis.get(Constants.redis.nypsi.MENTION_MAX)) || 3}`,
-        true
+        true,
       )
       .addField(
         "system",
@@ -480,7 +480,7 @@ async function run(
             .loadavg()
             .map((i) => i.toFixed(2))
             .join(" ")}`,
-        true
+        true,
       )
       .addField("cluster", `**uptime** ${uptime}`, true);
 
@@ -530,7 +530,7 @@ async function run(
         `**mutes** ${res[14].toLocaleString()}\n` +
         `**cases** ${res[15].toLocaleString()}\n` +
         `**mentions** ${res[16].toLocaleString()}\n` +
-        `**graph data** ${res[17].toLocaleString()}`
+        `**graph data** ${res[17].toLocaleString()}`,
     );
 
     return send({ embeds: [embed] });
@@ -549,7 +549,7 @@ async function run(
             stats.find((i) => i.itemId === "auction-sold-items")?.amount.toLocaleString() || 0
           }** items\n\nyou have bought **${
             stats.find((i) => i.itemId === "auction-bought-items")?.amount.toLocaleString() || 0
-          }** items through auctions`
+          }** items through auctions`,
         ),
       ],
     });
@@ -560,7 +560,7 @@ async function run(
 
     const embed = new CustomEmbed(message.member).setHeader(
       "leaderboard positions",
-      message.author.avatarURL()
+      message.author.avatarURL(),
     );
 
     if (positions.length === 0) {
@@ -583,7 +583,7 @@ async function run(
               : position.position === 3
               ? "🥉"
               : `#${position.position}`
-          }`
+          }`,
         );
       } else {
         out.push(
@@ -595,7 +595,7 @@ async function run(
               : position.position === 3
               ? "🥉"
               : `#${position.position}`
-          }`
+          }`,
         );
       }
     }
@@ -611,7 +611,7 @@ async function run(
         .setLabel("back")
         .setStyle(ButtonStyle.Primary)
         .setDisabled(true),
-      new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
+      new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
     );
 
     const msg = await send({ embeds: [embed], components: [row] });
@@ -661,7 +661,7 @@ async function run(
       gambleMsg.push(
         `- **${
           gamble.game
-        }** ${gamble._sum.win.toLocaleString()} / ${gamble._count._all.toLocaleString()} (${percent}%)`
+        }** ${gamble._sum.win.toLocaleString()} / ${gamble._count._all.toLocaleString()} (${percent}%)`,
       );
     }
 

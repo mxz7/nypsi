@@ -24,12 +24,12 @@ const cmd = new Command("pp", "accurate prediction of your pp size", "fun").setA
 
 cmd.slashEnabled = true;
 cmd.slashData.addUserOption((option) =>
-  option.setName("user").setDescription("how big is your willy")
+  option.setName("user").setDescription("how big is your willy"),
 );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -126,7 +126,7 @@ async function run(
 
   const embed = new CustomEmbed(
     message.member,
-    `${member.user.toString()}\n${sizeMsg}\n📏 ${size} inches`
+    `${member.user.toString()}\n${sizeMsg}\n📏 ${size} inches`,
   ).setHeader("pp predictor 1337", member.user.avatarURL());
 
   send({ embeds: [embed] });

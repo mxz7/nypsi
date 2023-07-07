@@ -9,7 +9,7 @@ const cmd = new Command("bluser", "blacklist account from nypsi", "none").setPer
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if ((await getAdminLevel(message.author.id)) < 3) return;
 

@@ -155,7 +155,7 @@ export async function requestUnmute(guildId: string, member: string, client: Nyp
     },
     {
       context: { guildId: guildId, memberId: member, muteRoleId: muteRoleId },
-    }
+    },
   );
 
   await deleteMute(guildId, member);

@@ -29,16 +29,16 @@ cmd.slashData
       .setName("buy")
       .setDescription("buy lottery tickets")
       .addStringOption((option) =>
-        option.setName("amount").setDescription("amount of lottery tickets to buy")
-      )
+        option.setName("amount").setDescription("amount of lottery tickets to buy"),
+      ),
   )
   .addSubcommand((tickets) =>
-    tickets.setName("tickets").setDescription("view your current tickets")
+    tickets.setName("tickets").setDescription("view your current tickets"),
   );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (!(await userExists(message.member))) await createUser(message.member);
 
@@ -78,7 +78,7 @@ async function run(
     const embed = new CustomEmbed(message.member);
 
     const winChance = ((tickets.length / (await prisma.lotteryTicket.count())) * 100).toPrecision(
-      3
+      3,
     );
 
     embed.setHeader("lottery", message.author.avatarURL());
@@ -88,8 +88,8 @@ async function run(
         .startOf("day")
         .unix()}:R>\n\n` +
         `you can buy lottery tickets for $**${lotteryTicketPrice.toLocaleString()}** with ${await getPrefix(
-          message.guild
-        )}**lotto buy**\nyou have **${tickets.length.toLocaleString()}**/${Constants.LOTTERY_TICKETS_MAX.toLocaleString()} tickets (${winChance}% chance of winning)`
+          message.guild,
+        )}**lotto buy**\nyou have **${tickets.length.toLocaleString()}**/${Constants.LOTTERY_TICKETS_MAX.toLocaleString()} tickets (${winChance}% chance of winning)`,
     );
 
     return send({ embeds: [embed] });
@@ -142,7 +142,7 @@ async function run(
 
     await updateBalance(
       message.member,
-      (await getBalance(message.member)) - lotteryTicketPrice * amount
+      (await getBalance(message.member)) - lotteryTicketPrice * amount,
     );
 
     await addTicket(message.member, amount);
@@ -151,7 +151,7 @@ async function run(
       message.member,
       `you have bought **${amount}** lottery ticket${amount > 1 ? "s" : ""} for $**${(
         lotteryTicketPrice * amount
-      ).toLocaleString()}**`
+      ).toLocaleString()}**`,
     );
 
     return send({ embeds: [embed] });

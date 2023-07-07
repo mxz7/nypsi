@@ -5,15 +5,15 @@ export class ItemUse {
   public itemId: string;
   public run: (
     message: Message | (NypsiCommandInteraction & CommandInteraction),
-    args?: string[]
+    args?: string[],
   ) => void;
 
   constructor(
     itemId: string,
     func: (
       message: Message | (NypsiCommandInteraction & CommandInteraction),
-      args?: string[]
-    ) => void
+      args?: string[],
+    ) => void,
   ) {
     this.itemId = itemId;
     this.run = func;

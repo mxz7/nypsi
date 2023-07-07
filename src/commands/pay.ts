@@ -30,15 +30,15 @@ const cmd = new Command("pay", "give other users money", "money");
 cmd.slashEnabled = true;
 cmd.slashData
   .addUserOption((option) =>
-    option.setName("user").setDescription("who would you like to send money to").setRequired(true)
+    option.setName("user").setDescription("who would you like to send money to").setRequired(true),
   )
   .addStringOption((option) =>
-    option.setName("amount").setDescription("how much would you like to send").setRequired(true)
+    option.setName("amount").setDescription("how much would you like to send").setRequired(true),
   );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -142,7 +142,7 @@ async function run(
       embeds: [
         new CustomEmbed(
           message.member,
-          `thank you for your donation of $${amount.toLocaleString()} 🙂`
+          `thank you for your donation of $${amount.toLocaleString()} 🙂`,
         ),
       ],
     });
@@ -194,8 +194,8 @@ async function run(
     const embed = new CustomEmbed(
       target,
       `**${message.author.tag}** has sent you $**${Math.floor(
-        amount - taxedAmount
-      ).toLocaleString()}**`
+        amount - taxedAmount,
+      ).toLocaleString()}**`,
     )
       .setHeader("you have received a payment")
       .setFooter({ text: "/settings me notifications" });
@@ -215,7 +215,7 @@ async function run(
       "$" +
         ((await getBalance(message.member)) + amount).toLocaleString() +
         "\n**-** $" +
-        amount.toLocaleString()
+        amount.toLocaleString(),
     );
 
   if (tax > 0) {
@@ -225,14 +225,14 @@ async function run(
         target.user.toString() +
         "\n**" +
         (tax * 100).toFixed(1) +
-        "**% tax"
+        "**% tax",
     );
     embed.addField(
       target.user.tag,
       "$" +
         ((await getBalance(target)) - amount).toLocaleString() +
         "\n**+** $" +
-        (amount - Math.round(amount * tax)).toLocaleString()
+        (amount - Math.round(amount * tax)).toLocaleString(),
     );
   } else {
     embed.setDescription(message.member.user.toString() + " -> " + target.user.toString());
@@ -241,7 +241,7 @@ async function run(
       "$" +
         ((await getBalance(target)) - amount).toLocaleString() +
         "\n**+** $" +
-        amount.toLocaleString()
+        amount.toLocaleString(),
     );
   }
 
@@ -267,7 +267,7 @@ async function run(
           (await getBalance(target)).toLocaleString() +
           " (+$**" +
           (amount - Math.round(amount * tax)).toLocaleString() +
-          "**)"
+          "**)",
       );
       embed.setDescription(
         message.member.user.toString() +
@@ -275,7 +275,7 @@ async function run(
           target.user.toString() +
           "\n**" +
           (tax * 100).toFixed(1) +
-          "**% tax"
+          "**% tax",
       );
     } else {
       embed.addField(
@@ -284,7 +284,7 @@ async function run(
           (await getBalance(target)).toLocaleString() +
           " (+$**" +
           amount.toLocaleString() +
-          "**)"
+          "**)",
       );
     }
 
