@@ -39,7 +39,7 @@ model Leaderboards {
   leaderboard String
   position    Int
 
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([leaderboard, position])
   @@unique([userId, leaderboard])
