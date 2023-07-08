@@ -7,7 +7,6 @@ import { getTier } from "../premium/premium";
 import { getRequiredBetForXp } from "./balance";
 import { getBoosters } from "./boosters";
 import { gemBreak, getInventory } from "./inventory";
-import { isPassive } from "./passive";
 import { getPrestige } from "./prestige";
 import { getItems } from "./utils";
 
@@ -62,7 +61,7 @@ export async function updateXp(member: GuildMember | string, amount: number) {
 export async function calcEarnedXp(
   member: GuildMember,
   bet: number,
-  multiplier: number,
+  multiplier: number
 ): Promise<number> {
   const requiredBet = await getRequiredBetForXp(member);
 
@@ -96,16 +95,6 @@ export async function calcEarnedXp(
 
   max += bet / betDivisor;
   max += multiplier * 1.7;
-
-  if (await isPassive(member)) {
-    if (tier > 0) {
-      max -= 2.5;
-      min -= 2.5;
-    } else {
-      max -= 5;
-      min -= 5;
-    }
-  }
 
   if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0)
     max += Math.floor(Math.random() * 7);
