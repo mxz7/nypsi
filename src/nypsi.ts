@@ -45,10 +45,7 @@ const client = new NypsiClient({
     GuildTextThreadManager: 0,
     UserManager: {
       maxSize: 25_000,
-      keepOverLimit: (user) => {
-        logger.debug(`removed ${user.id} from user cache`);
-        return user.id === user.client.user.id;
-      },
+      keepOverLimit: (user) => user.id === user.client.user.id,
     },
     GuildMemberManager: {
       maxSize: 25_000,
