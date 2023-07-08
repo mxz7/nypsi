@@ -49,7 +49,7 @@ cmd.slashEnabled = true;
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -146,7 +146,7 @@ async function run(
         return send({
           embeds: [
             new ErrorEmbed(
-              "must be an image hosted on https://imgur.com\n\ntutorial: https://youtu.be/xaRu40hawUE"
+              "must be an image hosted on https://imgur.com\n\ntutorial: https://youtu.be/xaRu40hawUE",
             ),
           ],
         });
@@ -158,7 +158,7 @@ async function run(
         return send({
           embeds: [
             new ErrorEmbed(
-              "must be an image hosted on https://imgur.com\n\ntutorial: https://youtu.be/xaRu40hawUE"
+              "must be an image hosted on https://imgur.com\n\ntutorial: https://youtu.be/xaRu40hawUE",
             ),
           ],
         });
@@ -178,7 +178,7 @@ async function run(
       return send({
         embeds: [
           new ErrorEmbed(
-            `error: maybe that image already exists? if this persists join the ${prefix}support server`
+            `error: maybe that image already exists? if this persists join the ${prefix}support server`,
           ),
         ],
       });
@@ -202,7 +202,7 @@ async function run(
 
     if (message.author.id == Constants.TEKOH_ID) {
       embed.setDescription(
-        `**suggested by** ${wholesome.submitter} (${wholesome.submitterId})\n**accepted by** \`${wholesome.accepterId}\`\n**url** ${wholesome.image}`
+        `**suggested by** ${wholesome.submitter} (${wholesome.submitterId})\n**accepted by** \`${wholesome.accepterId}\`\n**url** ${wholesome.image}`,
       );
     }
 
@@ -218,7 +218,7 @@ async function run(
     const res = await acceptWholesomeImage(
       parseInt(args[1]),
       message.member,
-      message.client as NypsiClient
+      message.client as NypsiClient,
     );
 
     if (!res) {
@@ -289,7 +289,7 @@ async function run(
 
       embed.addField(
         image.id.toString(),
-        `**suggested** ${image.submitter} (${image.submitterId})\n**url** ${image.image}`
+        `**suggested** ${image.submitter} (${image.submitterId})\n**url** ${image.image}`,
       );
     }
 
@@ -340,7 +340,7 @@ async function run(
           for (const image of pages.get(currentPage)) {
             newEmbed.addField(
               image.id.toString(),
-              `**suggested** ${image.submitter} (${image.submitterId})\n**url** ${image.image})`
+              `**suggested** ${image.submitter} (${image.submitterId})\n**url** ${image.image})`,
             );
           }
 
@@ -357,7 +357,7 @@ async function run(
           for (const image of pages.get(currentPage)) {
             newEmbed.addField(
               image.id.toString(),
-              `**suggested** ${image.submitter} (${image.submitterId})\n**url** ${image.image})`
+              `**suggested** ${image.submitter} (${image.submitterId})\n**url** ${image.image})`,
             );
           }
 
@@ -404,8 +404,8 @@ async function run(
           new CustomEmbed(
             message.member,
             `suggested by ${suggestion.submitter} (${suggestion.submitterId}) on <t:${Math.floor(
-              suggestion.uploadDate.getTime() / 1000
-            )}>\n${suggestion.image}`
+              suggestion.uploadDate.getTime() / 1000,
+            )}>\n${suggestion.image}`,
           ).setImage(suggestion.image),
         ],
       });
@@ -434,7 +434,7 @@ async function run(
           embeds: [
             new CustomEmbed(
               message.member,
-              "this suggestion no longer exists, perhaps someone beat you to it"
+              "this suggestion no longer exists, perhaps someone beat you to it",
             ),
           ],
           ephemeral: true,
@@ -455,7 +455,7 @@ async function run(
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder().setCustomId("accept").setLabel("accept").setStyle(ButtonStyle.Success),
-      new ButtonBuilder().setCustomId("deny").setLabel("deny").setStyle(ButtonStyle.Danger)
+      new ButtonBuilder().setCustomId("deny").setLabel("deny").setStyle(ButtonStyle.Danger),
     );
 
     const reviewExisting = async (msg: Message): Promise<any> => {
@@ -469,7 +469,7 @@ async function run(
 
       const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder().setCustomId("accept").setLabel("keep").setStyle(ButtonStyle.Success),
-        new ButtonBuilder().setCustomId("deny").setLabel("remove").setStyle(ButtonStyle.Danger)
+        new ButtonBuilder().setCustomId("deny").setLabel("remove").setStyle(ButtonStyle.Danger),
       );
 
       await msg.edit({
@@ -479,10 +479,10 @@ async function run(
             `suggested by ${await getLastKnownTag(suggestion.submitterId)} (${
               suggestion.submitterId
             }) on <t:${Math.floor(
-              suggestion.uploadDate.getTime() / 1000
+              suggestion.uploadDate.getTime() / 1000,
             )}>\naccepted by ${await getLastKnownTag(suggestion.accepterId)} (${
               suggestion.accepterId
-            })\n${suggestion.image}`
+            })\n${suggestion.image}`,
           ).setImage(suggestion.image),
         ],
         components: [row],
@@ -504,7 +504,7 @@ async function run(
           embeds: [
             new CustomEmbed(
               message.member,
-              "this suggestion no longer exists, perhaps someone beat you to it"
+              "this suggestion no longer exists, perhaps someone beat you to it",
             ),
           ],
           ephemeral: true,
