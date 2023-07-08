@@ -1,9 +1,6 @@
 import { Mention } from "@prisma/client";
 import { Worker, isMainThread, parentPort, workerData } from "worker_threads";
 import prisma from "../../../init/database";
-import redis from "../../../init/redis";
-import Constants from "../../Constants";
-import sleep from "../sleep";
 import { MentionQueueItem } from "../users/mentions";
 import ms = require("ms");
 
@@ -33,7 +30,6 @@ if (!isMainThread) {
     const currentInsert: Mention[] = [];
 
     for (const member of item.members) {
-      await sleep(Number(await redis.get(Constants.redis.nypsi.MENTION_DELAY)) || 5);
       if (!item.channelMembers.includes(member)) continue;
       // @ts-expect-error weird
       currentInsert.push({
