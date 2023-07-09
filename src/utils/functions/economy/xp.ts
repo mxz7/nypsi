@@ -61,7 +61,7 @@ export async function updateXp(member: GuildMember | string, amount: number) {
 export async function calcEarnedXp(
   member: GuildMember,
   bet: number,
-  multiplier: number
+  multiplier: number,
 ): Promise<number> {
   const requiredBet = await getRequiredBetForXp(member);
 
