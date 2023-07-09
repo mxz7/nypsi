@@ -18,12 +18,12 @@ cmd.slashData.addStringOption((option) =>
   option
     .setName("item")
     .setAutocomplete(true)
-    .setDescription("item to add/remove to your autosell list")
+    .setDescription("item to add/remove to your autosell list"),
 );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -86,7 +86,7 @@ async function run(
           message.member,
           `automatically selling: \n\n${current
             .map((i) => `${items[i].emoji} ${items[i].name}`)
-            .join("\n")}`
+            .join("\n")}`,
         ).setHeader("autosell", message.author.avatarURL()),
       ],
     });
@@ -147,13 +147,13 @@ async function run(
 
   const embed = new CustomEmbed(message.member, desc).setHeader(
     "autosell",
-    message.author.avatarURL()
+    message.author.avatarURL(),
   );
 
   if (current.length > 0) {
     embed.addField(
       "automatically selling",
-      current.map((i) => `${items[i].emoji} ${items[i].name}`).join("\n")
+      current.map((i) => `${items[i].emoji} ${items[i].name}`).join("\n"),
     );
   }
 
