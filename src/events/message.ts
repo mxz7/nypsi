@@ -50,7 +50,7 @@ export default async function messageCreate(message: Message) {
       return message.reply({
         embeds: [
           new ErrorEmbed(
-            "you have created a support request recently, try again later.\nif you need support and don't want to wait, you can join the nypsi support server [here](https://discord.gg/hJTDNST)",
+            "you have created a support request recently, try again later.\nif you need support and don't want to wait, you can join the nypsi support server [here](https://discord.gg/hJTDNST)"
           ),
         ],
       });
@@ -70,14 +70,14 @@ export default async function messageCreate(message: Message) {
         .setHeader("support")
         .setColor(Constants.TRANSPARENT_EMBED_COLOR)
         .setDescription(
-          "if you need support, join the [**official nypsi server**](https://discord.gg/hJTDNST) or click the button below to talk to a staff member. only click the button if you actually need support",
+          "if you need support, join the [**official nypsi server**](https://discord.gg/hJTDNST) or click the button below to talk to a staff member. only click the button if you actually need support"
         );
 
       const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()
           .setCustomId("s")
           .setLabel("talk to a staff member")
-          .setStyle(ButtonStyle.Danger),
+          .setStyle(ButtonStyle.Danger)
       );
 
       const msg = await message.reply({
@@ -103,7 +103,7 @@ export default async function messageCreate(message: Message) {
         const r = await createSupportRequest(
           message.author.id,
           message.client as NypsiClient,
-          message.author.username,
+          message.author.username
         );
 
         if (!r) {
@@ -114,7 +114,7 @@ export default async function messageCreate(message: Message) {
           return res.followUp({
             embeds: [
               new CustomEmbed().setDescription(
-                "✅ created support request, you can now talk directly to nypsi staff",
+                "✅ created support request, you can now talk directly to nypsi staff"
               ),
             ],
           });
@@ -136,7 +136,7 @@ export default async function messageCreate(message: Message) {
       const res = await sendToRequestChannel(
         message.author.id,
         embed,
-        message.client as NypsiClient,
+        message.client as NypsiClient
       );
 
       if (res) {
@@ -151,7 +151,7 @@ export default async function messageCreate(message: Message) {
       .setColor(Constants.TRANSPARENT_EMBED_COLOR)
       .setDescription(
         "unfortunately you can't do commands in direct messages ):\n\n" +
-          "if you need support or help for nypsi, please join the official nypsi server: https://discord.gg/hJTDNST",
+          "if you need support or help for nypsi, please join the official nypsi server: https://discord.gg/hJTDNST"
       );
     return await message.channel.send({ embeds: [embed] });
   }
@@ -202,6 +202,7 @@ export default async function messageCreate(message: Message) {
   }
 
   setTimeout(async () => {
+    if (!message || !message.channel) return;
     if (message.channel.isDMBased()) return;
 
     if (
@@ -253,7 +254,7 @@ export default async function messageCreate(message: Message) {
           });
         } else {
           mentionMembers = Array.from(
-            message.mentions.members.mapValues((m) => m.user.id).values(),
+            message.mentions.members.mapValues((m) => m.user.id).values()
           );
         }
       }
@@ -279,9 +280,9 @@ export default async function messageCreate(message: Message) {
             username: message.author.username,
             date: message.createdTimestamp,
             guildId: message.guild.id,
-          } as MentionQueueItem),
+          } as MentionQueueItem)
         );
       }
     }
-  }, 1000);
+  }, 200);
 }
