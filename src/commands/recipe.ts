@@ -75,7 +75,7 @@ async function run(
     return send({ embeds: [new ErrorEmbed(`couldnt find \`${args.join(" ")}\``)] });
   }
 
-  if (!selected.craft || selected.craft.ingrediants.length == 0) {
+  if (!selected.craft || selected.craft.ingredients.length == 0) {
     return send({ embeds: [new ErrorEmbed(`that item is not craftable`)] });
   }
 
@@ -87,7 +87,7 @@ async function run(
 
   const desc: string[] = [];
 
-  selected.craft.ingrediants.forEach((ingredient) => {
+  selected.craft.ingredients.forEach((ingredient) => {
     const item = selectItem(ingredient.split(":")[0]);
     desc.push(`* ${ingredient.split(":")[1]} ${item.emoji} ${item.name}`);
   });
