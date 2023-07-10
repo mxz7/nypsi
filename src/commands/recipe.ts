@@ -1,9 +1,4 @@
-import {
-  BaseMessageOptions,
-  CommandInteraction,
-  InteractionReplyOptions,
-  Message,
-} from "discord.js";
+import { CommandInteraction, Message } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { selectItem } from "../utils/functions/economy/inventory";
@@ -14,74 +9,35 @@ const cmd = new Command("recipe", "view the recipe for a craftable item", "money
   "howcraftthing",
 ]);
 
-cmd.slashEnabled = true;
-cmd.slashData.addStringOption((option) =>
-  option
-    .setName("craft-item")
-    .setDescription("item to view the recipe of")
-    .setAutocomplete(true)
-    .setRequired(true),
-);
-
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
-  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
-    if (!(message instanceof Message)) {
-      let usedNewMessage = false;
-      let res;
-
-      if (message.deferred) {
-        res = await message.editReply(data).catch(async () => {
-          usedNewMessage = true;
-          return await message.channel.send(data as BaseMessageOptions);
-        });
-      } else {
-        res = await message.reply(data as InteractionReplyOptions).catch(() => {
-          return message.editReply(data).catch(async () => {
-            usedNewMessage = true;
-            return await message.channel.send(data as BaseMessageOptions);
-          });
-        });
-      }
-
-      if (usedNewMessage && res instanceof Message) return res;
-
-      const replyMsg = await message.fetchReply();
-      if (replyMsg instanceof Message) {
-        return replyMsg;
-      }
-    } else {
-      return await message.channel.send(data as BaseMessageOptions);
-    }
-  };
-
   if (!(await userExists(message.member))) await createUser(message.member);
-
+  
   if (await onCooldown(cmd.name, message.member)) {
     const embed = await getResponse(cmd.name, message.member);
 
-    return send({ embeds: [embed], ephemeral: true });
+    return message.channel.send({ embeds: [embed] });
   }
 
   if (args.length == 0) {
-    return send({ embeds: [new ErrorEmbed("/recipe <item>")] });
+    return message.channel.send({ embeds: [new ErrorEmbed("/recipe <item>")] });
   }
 
   const selected = selectItem(args.join(" ").toLowerCase());
 
   if (!selected) {
-    return send({ embeds: [new ErrorEmbed(`couldnt find \`${args.join(" ")}\``)] });
+    return message.channel.send({ embeds: [new ErrorEmbed(`couldnt find \`${args.join(" ")}\``)] });
   }
 
   if (!selected.craft || selected.craft.ingredients.length == 0) {
-    return send({ embeds: [new ErrorEmbed(`that item is not craftable`)] });
+    return message.channel.send({ embeds: [new ErrorEmbed(`that item is not craftable`)] });
   }
 
   await addCooldown(cmd.name, message.member, 4);
 
-  const embed = new CustomEmbed(message.member).setTitle(
+  const embed = new CustomEmbed(message.member).setHeader(
     `${selected.emoji} ${selected.name} recipe`,
   );
 
@@ -94,7 +50,7 @@ async function run(
 
   embed.setDescription(desc.join("\n"));
 
-  return send({ embeds: [embed] });
+  return message.channel.send({ embeds: [embed] });
 }
 
 cmd.setRun(run);
