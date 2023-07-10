@@ -10,7 +10,9 @@ import { selectItem } from "../utils/functions/economy/inventory";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command("recipe", "view the recipe for a craftable item", "money").setAliases(["howcraftthing"]);
+const cmd = new Command("recipe", "view the recipe for a craftable item", "money").setAliases([
+  "howcraftthing",
+]);
 
 cmd.slashEnabled = true;
 cmd.slashData.addStringOption((option) =>
@@ -79,18 +81,20 @@ async function run(
 
   await addCooldown(cmd.name, message.member, 4);
 
-  const embed = new CustomEmbed(message.member).setTitle(`${selected.emoji} ${selected.name} recipe`);
+  const embed = new CustomEmbed(message.member).setTitle(
+    `${selected.emoji} ${selected.name} recipe`,
+  );
 
   const desc: string[] = [];
 
   selected.craft.ingrediants.forEach((ingredient) => {
     const item = selectItem(ingredient.split(":")[0]);
     desc.push(`* ${ingredient.split(":")[1]} ${item.emoji} ${item.name}`);
-  })
+  });
 
   embed.setDescription(desc.join("\n"));
 
-  return send({ embeds: [embed]});
+  return send({ embeds: [embed] });
 }
 
 cmd.setRun(run);
