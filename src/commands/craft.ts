@@ -160,22 +160,22 @@ async function run(
     const availableToCraftUnsorted: [string, number][] = [];
 
     for (const itemId of craftableItemIds) {
-      const ingrediants = items[itemId].craft.ingrediants.map((i) => i.split(":")[0]);
+      const ingredients = items[itemId].craft.ingredients.map((i) => i.split(":")[0]);
 
       let item = `${items[itemId].emoji} **${items[itemId].name}**`;
 
       const owned = new Map<string, number>();
       let isZero = 0;
 
-      for (const ingrediantId of ingrediants) {
-        const ownedAmount = inventory.find((i) => i.item == ingrediantId)?.amount || 0;
+      for (const ingredientId of ingredients) {
+        const ownedAmount = inventory.find((i) => i.item == ingredientId)?.amount || 0;
 
-        owned.set(ingrediantId, ownedAmount);
+        owned.set(ingredientId, ownedAmount);
 
         if (ownedAmount == 0) isZero++;
       }
 
-      if (isZero == ingrediants.length) continue;
+      if (isZero == ingredients.length) continue;
 
       let craftable = 1e10;
       let totalNeeded = 0;
@@ -183,7 +183,7 @@ async function run(
 
       for (const [key, value] of owned.entries()) {
         const needed = parseInt(
-          items[itemId].craft.ingrediants.find((i) => i.split(":")[0] == key).split(":")[1],
+          items[itemId].craft.ingredients.find((i) => i.split(":")[0] == key).split(":")[1],
         );
 
         item += `\n- ${items[key].emoji} ${
@@ -419,10 +419,10 @@ async function run(
     const owned = new Map<string, number>();
     const inventory = await getInventory(message.member, false);
 
-    for (const ingrediantId of selected.craft.ingrediants) {
-      const ownedAmount = inventory.find((i) => i.item == ingrediantId.split(":")[0])?.amount || 0;
+    for (const ingredientId of selected.craft.ingredients) {
+      const ownedAmount = inventory.find((i) => i.item == ingredientId.split(":")[0])?.amount || 0;
 
-      owned.set(ingrediantId, ownedAmount);
+      owned.set(ingredientId, ownedAmount);
     }
 
     let craftable = 1e10;
@@ -463,15 +463,15 @@ async function run(
 
     const promises: Promise<any>[] = [];
 
-    for (const ingrediant of selected.craft.ingrediants) {
-      const item = ingrediant.split(":")[0];
-      const ingrediantAmount = parseInt(ingrediant.split(":")[1]);
+    for (const ingredient of selected.craft.ingredients) {
+      const item = ingredient.split(":")[0];
+      const ingredientAmount = parseInt(ingredient.split(":")[1]);
 
       promises.push(
         setInventoryItem(
           message.member,
           item,
-          inventory.find((i) => i.item == item).amount - amount * ingrediantAmount,
+          inventory.find((i) => i.item == item).amount - amount * ingredientAmount,
           false,
         ),
       );
