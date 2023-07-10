@@ -126,7 +126,7 @@ async function run(
 
   const embed = new CustomEmbed(
     message.member,
-    `${member.user.toString()}\n${sizeMsg}\n📏 ${size} ${size == 1 ? 'inch' : 'inches'}`,
+    `${member.user.toString()}\n${sizeMsg}\n📏 ${size} ${size == 1 ? "inch" : "inches"}`,
   ).setHeader("pp predictor 1337", member.user.avatarURL());
 
   send({ embeds: [embed] });
