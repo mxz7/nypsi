@@ -13,7 +13,7 @@ import { CustomEmbed } from "../../models/EmbedBuilders";
 import Constants from "../../utils/Constants";
 import { MStoTime } from "../../utils/functions/date";
 import { addInventoryItem } from "../../utils/functions/economy/inventory";
-import { createUser, getItems, userExists } from "../../utils/functions/economy/utils";
+import { createUser, getItems, isEcoBanned, userExists } from "../../utils/functions/economy/utils";
 import { percentChance, shuffle } from "../../utils/functions/random";
 import { getLastKnownUsername } from "../../utils/functions/users/tag";
 import { logger } from "../../utils/logger";
@@ -147,7 +147,8 @@ async function fastClickGame(client: NypsiClient, channelId: string, prize: stri
 
       const res = await msg
         .awaitMessageComponent({
-          filter: (i) => i.customId === buttonId,
+          filter: async (i) =>
+            i.customId === buttonId && !(await isEcoBanned(i.user.id).catch(() => false)),
           time: 30000,
         })
         .catch(() => {});
