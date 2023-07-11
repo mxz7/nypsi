@@ -23,7 +23,7 @@ import { logger } from "../../utils/logger";
 import dayjs = require("dayjs");
 
 const max = 3;
-const activityWithinSeconds = 15;
+const activityWithinSeconds = 30;
 const activeUsersRequired = 2;
 const words = [
   "nypsi",
@@ -38,7 +38,7 @@ const words = [
 ];
 
 function doRandomDrop(client: NypsiClient) {
-  const rand = Math.floor(Math.random() * ms("1 hour") + ms("30 minutes"));
+  const rand = Math.floor(Math.random() * ms("1 hour") + ms("15 minutes"));
   setTimeout(() => {
     randomDrop(client);
   }, rand);
