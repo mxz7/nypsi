@@ -2,7 +2,7 @@
 CREATE TABLE "ActiveChannels" (
     "userId" TEXT NOT NULL,
     "channelId" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "ActiveChannels_pkey" PRIMARY KEY ("userId","channelId")
 );

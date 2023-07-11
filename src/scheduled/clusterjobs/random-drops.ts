@@ -39,7 +39,7 @@ export default async function startRandomDrops(client: NypsiClient) {
 async function getChannels() {
   const query = await prisma.activeChannels.findMany({
     where: {
-      createdAt: { gte: dayjs().subtract(activityWithinSeconds, "seconds").toDate() },
+      date: { gte: dayjs().subtract(activityWithinSeconds, "seconds").toDate() },
     },
   });
 
