@@ -105,7 +105,13 @@ async function randomDrop(client: NypsiClient) {
           winner,
         )}) prize: ${prize}`,
       );
-      if (prize.startsWith("item:")) await addInventoryItem(winner, prize.substring(5), 1);
+      if (prize.startsWith("item:")) {
+        let amount = 1;
+
+        if (getItems()[prize.substring(5)].role === "tool") amount = 15;
+
+        await addInventoryItem(winner, prize.substring(5), amount);
+      }
     }
 
     if (count >= max) break;

@@ -1710,7 +1710,8 @@
       "id:green_gem:1",
       "id:blue_gem:1",
       "id:pink_gem:0.3"
-    ]
+    ],
+    "random_drop_chance": 65
   },
   "lucky_scratch_card": {
     "id": "lucky_scratch_card",
@@ -1751,7 +1752,8 @@
       "id:blue_gem:2",
       "id:purple_gem:1",
       "id:gem_crate:0.2"
-    ]
+    ],
+    "random_drop_chance": 60
   },
   "legendary_scratch_card": {
     "id": "legendary_scratch_card",
@@ -1786,7 +1788,8 @@
       "id:pink_gem:3",
       "id:gem_shard:50",
       "id:gem_crate:2.5"
-    ]
+    ],
+    "random_drop_chance": 15
   },
   "karma_scratch_card": {
     "id": "karma_scratch_card",
@@ -1816,7 +1819,8 @@
       "id:gold_credit:3",
       "id:platinum_credit:1",
       "id:pink_gem:1"
-    ]
+    ],
+    "random_drop_chance": 20
   },
   "corner_shop_scratchie": {
     "id": "corner_shop_scratchie",
@@ -1860,7 +1864,8 @@
       "id:bronze_credit:0.2",
       "id:purple_gem:0.1",
       "id:quarry_scrap:3"
-    ]
+    ],
+    "random_drop_chance": 90
   },
   "bob": {
     "id": "bob",
@@ -1885,7 +1890,8 @@
     "rarity": 3,
     "buy": 0,
     "sell": 500000,
-    "in_crates": false
+    "in_crates": false,
+    "random_drop_chance": 35
   },
   "quarry_scrap": {
     "id": "quarry_scrap",
