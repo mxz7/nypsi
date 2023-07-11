@@ -220,9 +220,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           `**you were caught**\n\nthanks to your lawyer, you only lost $**${totalLost.toLocaleString()}**`,
         );
       } else {
-        embed.setDescription(
-          `**you were caught**\n\nyou lost $**${totalLost.toLocaleString()}**`,
-        );
+        embed.setDescription(`**you were caught**\n\nyou lost $**${totalLost.toLocaleString()}**`);
       }
     }
 

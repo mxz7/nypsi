@@ -16,20 +16,17 @@ export default function ready(client: Client) {
     });
   }, 15000);
 
-  setInterval(
-    async () => {
-      if (await getCustomPresence()) return;
-      const presence = randomPresence();
+  setInterval(async () => {
+    if (await getCustomPresence()) return;
+    const presence = randomPresence();
 
-      client.user.setPresence({
-        status: "dnd",
-        activities: [
-          {
-            name: presence,
-          },
-        ],
-      });
-    },
-    30 * 60 * 1000,
-  );
+    client.user.setPresence({
+      status: "dnd",
+      activities: [
+        {
+          name: presence,
+        },
+      ],
+    });
+  }, 30 * 60 * 1000);
 }

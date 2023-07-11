@@ -278,7 +278,9 @@ async function run(
     }
 
     if ((await getPrestige(message.member)) < 1) {
-      return send({ embeds: [new ErrorEmbed("you must be at least prestige 1 to create a guild")] });
+      return send({
+        embeds: [new ErrorEmbed("you must be at least prestige 1 to create a guild")],
+      });
     }
 
     if ((await getBalance(message.member)) < 500000) {
