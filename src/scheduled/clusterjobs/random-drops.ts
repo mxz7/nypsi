@@ -89,6 +89,13 @@ async function randomDrop(client: NypsiClient) {
   for (const channelId of shuffle(channels)) {
     count++;
 
+    if (await redis.exists(`nypsi:lootdrop:channel:cd:${channelId}`)) {
+      count--;
+      continue;
+    }
+
+    await redis.set(`nypsi:lootdrop:channel:cd:${channelId}`, "69", "EX", 3600);
+
     const items = Array.from(Object.values(getItems()))
       .filter((i) => i.random_drop_chance && percentChance(i.random_drop_chance))
       .map((i) => `item:${i.id}`);
