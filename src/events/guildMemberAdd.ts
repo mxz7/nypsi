@@ -3,10 +3,10 @@ import { CustomEmbed } from "../models/EmbedBuilders";
 import { daysAgo, formatDate } from "../utils/functions/date";
 import {
   getAutoJoinRoles,
-  getPersistantRoles,
-  getPersistantRolesForUser,
+  getPersistentRoles,
+  getPersistentRolesForUser,
   setAutoJoinRoles,
-  setPersistantRoles,
+  setPersistentRoles,
 } from "../utils/functions/guilds/roles";
 import { createGuild, hasGuild, runCheck } from "../utils/functions/guilds/utils";
 import { addLog, isLogsEnabled } from "../utils/functions/moderation/logs";
@@ -62,23 +62,23 @@ export default async function guildMemberAdd(member: GuildMember) {
     logger.info(`autojoin roles given to ${member.id} in ${member.guild.id}`);
   }
 
-  const persistantRoles = await getPersistantRoles(member.guild);
-  const userRoles = await getPersistantRolesForUser(member.guild, member.id);
+  const persistentRoles = await getPersistentRoles(member.guild);
+  const userRoles = await getPersistentRolesForUser(member.guild, member.id);
 
-  if (userRoles.length > 0 && persistantRoles.length > 0) {
+  if (userRoles.length > 0 && persistentRoles.length > 0) {
     let count = 0;
     for (const roleId of userRoles) {
-      if (persistantRoles.includes(roleId)) {
+      if (persistentRoles.includes(roleId)) {
         count++;
         await member.roles.add(roleId).catch(async () => {
-          persistantRoles.splice(persistantRoles.indexOf(roleId));
-          await setPersistantRoles(member.guild, persistantRoles);
+          persistentRoles.splice(persistentRoles.indexOf(roleId));
+          await setPersistentRoles(member.guild, persistentRoles);
         });
         await sleep(500);
       }
     }
     if (count > 0)
-      logger.info(`${count} persistant roles given to ${member.id} in ${member.guild.id}`);
+      logger.info(`${count} persistent roles given to ${member.id} in ${member.guild.id}`);
   }
 
   if (!queue.has(member.guild.id)) {

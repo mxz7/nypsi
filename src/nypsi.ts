@@ -6,6 +6,19 @@ const client = new NypsiClient({
   allowedMentions: {
     parse: ["users", "roles"],
   },
+  sweepers: {
+    messages: {
+      interval: 3600,
+      lifetime: 1800,
+      filter: () => (msg) =>
+        msg.author.id === msg.client.user.id &&
+        msg.createdTimestamp > Date.now() - ms("30 minutes"),
+    },
+    guildMembers: {
+      interval: 3600,
+      filter: () => (member) => member.id !== member.client.user.id,
+    },
+  },
   makeCache: Options.cacheWithLimits({
     ApplicationCommandManager: 0,
     BaseGuildEmojiManager: 0,
@@ -13,7 +26,12 @@ const client = new NypsiClient({
     GuildInviteManager: 0,
     GuildStickerManager: 0,
     GuildScheduledEventManager: 0,
-    MessageManager: 50,
+    MessageManager: {
+      maxSize: 50,
+      keepOverLimit: (msg) =>
+        msg.author.id === msg.client.user.id &&
+        msg.createdTimestamp > Date.now() - ms("30 minutes"),
+    },
     PresenceManager: 0,
     ReactionManager: 0,
     ReactionUserManager: 0,
@@ -25,6 +43,14 @@ const client = new NypsiClient({
     AutoModerationRuleManager: 0,
     GuildForumThreadManager: 0,
     GuildTextThreadManager: 0,
+    UserManager: {
+      maxSize: 34710,
+      keepOverLimit: (user) => user.id === user.client.user.id,
+    },
+    GuildMemberManager: {
+      maxSize: 10_000,
+      keepOverLimit: (user) => user.id === user.client.user.id,
+    },
   }),
   presence: {
     status: "dnd",
@@ -56,6 +82,7 @@ const client = new NypsiClient({
 import { loadCommands } from "./utils/handlers/commandhandler";
 import { loadInteractions } from "./utils/handlers/interactions";
 import { logger } from "./utils/logger";
+import ms = require("ms");
 
 loadCommands();
 loadInteractions();

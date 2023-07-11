@@ -94,6 +94,8 @@ async function run(
   const target = await getExactMember(message.guild, args[0]);
   let reason = message.member.user.username + ": ";
 
+  if (!target) return send({ embeds: [new ErrorEmbed("invalid user")] });
+
   if (args.length > 1) {
     reason = reason + args.slice(1).join(" ");
   } else {

@@ -12,11 +12,7 @@ import { parse } from "twemoji-parser";
 import prisma from "../init/database";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import {
-  countItemOnAuction,
-  getAuctionAverage,
-  getItemHistoryGraph,
-} from "../utils/functions/economy/auctions";
+import { countItemOnAuction, getAuctionAverage } from "../utils/functions/economy/auctions";
 import {
   getInventory,
   getTotalAmountOfItem,
@@ -26,7 +22,6 @@ import { createUser, userExists } from "../utils/functions/economy/utils";
 import { isBooster } from "../utils/functions/premium/boosters";
 import { isPremium } from "../utils/functions/premium/premium";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import { logger } from "../utils/logger";
 
 const cmd = new Command("item", "view information about an item", "money").setAliases(["i"]);
 
@@ -210,10 +205,10 @@ async function run(
   const components: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [
     new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
-        .setStyle(ButtonStyle.Secondary)
-        .setCustomId("hist")
+        .setStyle(ButtonStyle.Link)
         .setLabel("history")
-        .setEmoji("📈"),
+        .setEmoji("📈")
+        .setURL("https://nypsi.xyz/item/history/" + selected.id),
     ),
   ];
 
@@ -228,28 +223,7 @@ async function run(
     return await send({ embeds: [embed] });
   }
 
-  const msg = await send({ embeds: [embed], components });
-
-  const res = await msg
-    .awaitMessageComponent({ filter: (i) => i.user.id === message.author.id, time: 10000 })
-    .catch(() => {});
-
-  msg.edit({ components: [] });
-
-  if (!res) return;
-
-  await res.deferReply({ ephemeral: true });
-
-  const response = await getItemHistoryGraph(selected.id);
-
-  if (typeof response !== "string") {
-    logger.error(`error creating graph for ${selected.id}`, response);
-    return res.editReply({ embeds: [new ErrorEmbed("error creating graph")] });
-  }
-
-  return res.editReply({
-    content: response,
-  });
+  return await send({ embeds: [embed], components });
 }
 
 cmd.setRun(run);

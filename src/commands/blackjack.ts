@@ -236,19 +236,19 @@ async function prepareGame(
   const id = Math.random();
 
   const newDeck = [
-    "A♠",
-    "2♠",
-    "3♠",
-    "4♠",
-    "5♠",
-    "6♠",
-    "7♠",
-    "8♠",
-    "9♠",
-    "10♠",
-    "J♠",
-    "Q♠",
-    "K♠",
+    "A♠️",
+    "2♠️",
+    "3♠️",
+    "4♠️",
+    "5♠️",
+    "6♠️",
+    "7♠️",
+    "8♠️",
+    "9♠️",
+    "10♠️",
+    "J♠️",
+    "Q♠️",
+    "K♠️",
     "A♣️",
     "2♣️",
     "3♣️",
@@ -358,12 +358,12 @@ async function prepareGame(
 
   playGame(message, msg, args).catch((e) => {
     logger.error(
-      `error occured playing blackjack - ${message.author.id} (${message.author.username})`,
+      `error occurred playing blackjack - ${message.author.username} (${message.author.id})`,
     );
     redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
     logger.error("bj error", e);
     message.channel.send({
-      embeds: [new ErrorEmbed("an error occured while running - join support server")],
+      embeds: [new ErrorEmbed("an error occurred while running - join support server")],
     });
   });
 }
@@ -431,7 +431,7 @@ function calcTotal(member: GuildMember) {
   let aceAs11 = false;
 
   for (let card of cards) {
-    card = card.split("♠").join().split("♣️").join().split("♥️").join().split("♦️").join();
+    card = card.split("♠️").join().split("♣️").join().split("♥️").join().split("♦️").join();
 
     if (card.includes("K") || card.includes("Q") || card.includes("J")) {
       total = total + 10;
@@ -469,7 +469,7 @@ function calcTotalDealer(member: GuildMember) {
   let aceAs11 = false;
 
   for (let card of cards) {
-    card = card.split("♠").join().split("♣️").join().split("♥️").join().split("♦️").join();
+    card = card.split("♠️").join().split("♣️").join().split("♥️").join().split("♦️").join();
 
     if (card.includes("K") || card.includes("Q") || card.includes("J")) {
       total = total + 10;

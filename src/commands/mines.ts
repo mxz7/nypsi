@@ -414,7 +414,7 @@ async function prepareGame(
     console.error(e);
     redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
     return send({
-      embeds: [new ErrorEmbed("an error occured while running - join support server")],
+      embeds: [new ErrorEmbed("an error occurred while running - join support server")],
     });
   });
 }

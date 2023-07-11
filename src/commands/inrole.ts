@@ -10,14 +10,13 @@ import {
   MessageActionRowComponentBuilder,
   Role,
 } from "discord.js";
+import { inPlaceSort } from "fast-sort";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
-import {
-  addCooldown as addGuildCooldown,
-  getPrefix,
-  inCooldown,
-} from "../utils/functions/guilds/utils";
+import { getPrefix } from "../utils/functions/guilds/utils";
+import PageManager from "../utils/functions/page";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import { logger } from "../utils/logger";
 
 const cmd = new Command("inrole", "get the members in a role", "utility");
 
@@ -59,53 +58,36 @@ async function run(
 
   let members: Collection<string, GuildMember>;
 
-  if (
-    inCooldown(message.guild) ||
-    message.guild.memberCount == message.guild.members.cache.size ||
-    message.guild.memberCount <= 250
-  ) {
+  if (message.guild.memberCount == message.guild.members.cache.size) {
     members = message.guild.members.cache;
   } else {
-    members = await message.guild.members.fetch();
-
-    addGuildCooldown(message.guild, 3600);
+    members = await message.guild.members.fetch().catch((e) => {
+      logger.error("failed to fetch members for inrole cmd", e);
+      return message.guild.members.cache;
+    });
   }
 
-  const memberList = new Map<number, string[]>();
-  let count = 0;
+  const memberList: string[] = [];
 
   members.forEach((m) => {
     if (m.roles.cache.has(role.id)) {
-      count++;
-      if (memberList.size >= 1) {
-        const currentPage = memberList.get(memberList.size);
-
-        if (currentPage.length >= 10) {
-          const newPage = ["`" + m.user.username + "`"];
-
-          memberList.set(memberList.size + 1, newPage);
-        } else {
-          currentPage.push("`" + m.user.username + "`");
-
-          memberList.set(memberList.size, currentPage);
-        }
-      } else {
-        const newPage = ["`" + m.user.username + "`"];
-
-        memberList.set(1, newPage);
-      }
+      memberList.push(`\`${m.user.username}\``);
     }
   });
 
-  if (!memberList.get(1)) {
+  inPlaceSort(memberList).asc();
+
+  const pages = PageManager.createPages(memberList, 10);
+
+  if (!pages.get(1)) {
     return message.channel.send({
       embeds: [new CustomEmbed(message.member, "that role has no members")],
     });
   }
 
-  const embed = new CustomEmbed(message.member, memberList.get(1).join("\n"))
-    .setHeader(role.name + " [" + count.toLocaleString() + "]")
-    .setFooter({ text: `page 1/${memberList.size}` });
+  const embed = new CustomEmbed(message.member, pages.get(1).join("\n"))
+    .setHeader(role.name + " [" + memberList.length.toLocaleString() + "]")
+    .setFooter({ text: `page 1/${pages.size}` });
 
   let msg: Message;
 
@@ -118,16 +100,16 @@ async function run(
     new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
   );
 
-  if (memberList.size >= 2) {
+  if (pages.size >= 2) {
     msg = await message.channel.send({ embeds: [embed], components: [row] });
   } else {
     return await message.channel.send({ embeds: [embed] });
   }
 
-  if (memberList.size <= 1) return;
+  if (pages.size <= 1) return;
 
   let currentPage = 1;
-  const lastPage = memberList.size;
+  const lastPage = pages.size;
 
   const filter = (i: Interaction) => i.user.id == message.author.id;
 
@@ -149,7 +131,7 @@ async function run(
         return pageManager();
       } else {
         currentPage--;
-        embed.setDescription(memberList.get(currentPage).join("\n"));
+        embed.setDescription(pages.get(currentPage).join("\n"));
         embed.setFooter({ text: `page ${currentPage}/${lastPage}` });
         if (currentPage == 1) {
           row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -186,7 +168,7 @@ async function run(
         return pageManager();
       } else {
         currentPage++;
-        embed.setDescription(memberList.get(currentPage).join("\n"));
+        embed.setDescription(pages.get(currentPage).join("\n"));
         embed.setFooter({ text: `page ${currentPage}/${lastPage}` });
         if (currentPage == lastPage) {
           row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(

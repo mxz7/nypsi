@@ -1,4 +1,3 @@
-import { Mention } from "@prisma/client";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -9,13 +8,9 @@ import {
   Message,
   MessageActionRowComponentBuilder,
   PermissionsBitField,
-  TextChannel,
-  ThreadChannel,
   ThreadMember,
   ThreadMemberManager,
 } from "discord.js";
-import { cpu } from "node-os-utils";
-import prisma from "../init/database";
 import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
@@ -24,11 +19,10 @@ import { a } from "../utils/functions/anticheat";
 import { userExists } from "../utils/functions/economy/utils";
 import { checkAutoMute, checkMessageContent } from "../utils/functions/guilds/filters";
 import { isSlashOnly } from "../utils/functions/guilds/slash";
-import { addCooldown, getPrefix, hasGuild, inCooldown } from "../utils/functions/guilds/utils";
+import { getPrefix, hasGuild } from "../utils/functions/guilds/utils";
 import { getKarma } from "../utils/functions/karma/karma";
 import { addMuteViolation } from "../utils/functions/moderation/mute";
 import { isPremium } from "../utils/functions/premium/premium";
-import { encrypt } from "../utils/functions/string";
 import {
   createSupportRequest,
   getSupportRequest,
@@ -36,15 +30,12 @@ import {
 } from "../utils/functions/supportrequest";
 import { isUserBlacklisted } from "../utils/functions/users/blacklist";
 import { getLastCommand } from "../utils/functions/users/commands";
-import { MentionQueueItem, mentionQueue } from "../utils/functions/users/mentions";
-import doCollection from "../utils/functions/workers/mentions";
+import { MentionQueueItem } from "../utils/functions/users/mentions";
 import { runCommand } from "../utils/handlers/commandhandler";
 import { logger } from "../utils/logger";
 import ms = require("ms");
 
 const dmCooldown = new Set<string>();
-
-let mentionInterval: NodeJS.Timer;
 
 export default async function messageCreate(message: Message) {
   if (message.channel.isDMBased() && !message.author.bot) {
@@ -211,6 +202,9 @@ export default async function messageCreate(message: Message) {
   }
 
   setTimeout(async () => {
+    if (!message || !message.channel) return;
+    if (message.channel.isDMBased()) return;
+
     if (
       message.guild.memberCount < 150000 &&
       ((await userExists(message.guild.ownerId)) ||
@@ -218,330 +212,77 @@ export default async function messageCreate(message: Message) {
         (await getKarma(message.guild.ownerId)) >= 10 ||
         (await getLastCommand(message.guild.ownerId)).getTime() >= Date.now() - ms("30 days"))
     ) {
+      let mentionMembers: string[] = [];
+
       if (message.mentions.everyone) {
-        if (
-          !inCooldown(message.guild) &&
-          message.guild.members.cache.size != message.guild.memberCount
-        ) {
-          await message.guild.members.fetch();
-          addCooldown(message.guild, 3600);
+        if (message.guild.members.cache.size != message.guild.memberCount) {
+          await message.guild.members.fetch().catch((e) => {
+            logger.error("failed to fetch guild members for @everyone mention", e);
+          });
         }
 
         let members: Collection<string, GuildMember | ThreadMember> | ThreadMemberManager =
-          // @ts-expect-error TYPESCRIPT STUPID IT WILL NOT BE DMCHANNEL
           message.channel.members;
 
         if (members instanceof ThreadMemberManager) {
           members = members.cache;
         }
 
-        mentionQueue.push({
-          type: "collection",
-          members: members.clone(),
-          message: message,
-          // @ts-expect-error TYPESCRIPT STUPID IT WILL NOT BE DMCHANNEL
-          channelMembers: message.channel.members,
-          guildId: message.guild.id,
-          url: message.url,
-        });
-
-        if (!mentionInterval) {
-          mentionInterval = setInterval(async () => await addMention(), 75);
-        }
-      } else {
-        if (message.mentions.roles.first()) {
-          if (
-            !inCooldown(message.guild) &&
-            message.guild.members.cache.size != message.guild.memberCount
-          ) {
-            await message.guild.members.fetch();
-            addCooldown(message.guild, 3600);
-          }
-
-          let members: Collection<string, GuildMember | ThreadMember> | ThreadMemberManager =
-            // @ts-expect-error TYPESCRIPT STUPID IT WILL NOT BE DMCHANNEL
-            message.channel.members;
-
-          if (members instanceof ThreadMemberManager) {
-            members = members.cache;
-          }
-
-          message.mentions.roles.forEach((r) => {
-            mentionQueue.push({
-              type: "collection",
-              members: r.members.clone(),
-              message: message,
-              channelMembers: members,
-              guildId: message.guild.id,
-              url: message.url,
-            });
+        mentionMembers = Array.from(members.mapValues((m) => m.user.id).values());
+      } else if (message.mentions.roles.first()) {
+        if (message.guild.members.cache.size != message.guild.memberCount) {
+          await message.guild.members.fetch().catch((e) => {
+            logger.error("failed to fetch members for role mention", e);
           });
-
-          if (!mentionInterval) {
-            mentionInterval = setInterval(async () => await addMention(), 75);
-          }
         }
 
-        if (message.mentions.members.first()) {
-          if (message.mentions.members.size == 1) {
-            if (message.mentions.members.first().user.id == message.author.id) return;
-
-            try {
-              if ((message.channel as TextChannel).members?.keys()) {
-                if (
-                  !Array.from((message.channel as TextChannel).members.keys()).includes(
-                    message.mentions.members.first().id,
-                  )
-                ) {
-                  return; // return if user doesnt have access to channel
-                }
-              }
-            } catch {
-              const members = await (message.channel as ThreadChannel).members.fetch();
-              if (!Array.from(members.keys()).includes(message.mentions.members.first().id)) return;
-              return;
+        message.mentions.roles.forEach((r) => {
+          r.members.forEach((m) => {
+            if (!mentionMembers.includes(m.user.id)) {
+              mentionMembers.push(m.user.id);
             }
-
-            let content = message.content;
-
-            if (content.length > 100) {
-              content = content.substring(0, 97) + "...";
-            }
-
-            content = content.replace(/(\r\n|\n|\r)/gm, " ");
-
-            mentionQueue.push({
-              type: "mention",
-              data: {
-                user: message.author.username,
-                content: content,
-                date: message.createdTimestamp,
-                link: message.url,
-              },
-              guildId: message.guild.id,
-              target: message.mentions.members.first().user.id,
-            });
-          } else {
-            mentionQueue.push({
-              type: "collection",
-              members: message.mentions.members.clone(),
-              message: message,
-              // @ts-expect-error TYPESCRIPT STUPID IT WILL NOT BE DMCHANNEL
-              channelMembers: message.channel.members,
-              guildId: message.guild.id,
-              url: message.url,
-            });
-          }
-
-          if (!mentionInterval) {
-            mentionInterval = setInterval(async () => await addMention(), 75);
-          }
-        }
-      }
-    }
-  }, 1000);
-}
-
-let currentInterval = 150;
-let lastChange = 0;
-let currentData: Mention[] = [];
-let workerCount = 0;
-let inserting = false;
-
-async function addMention() {
-  if (inserting) return;
-  let mention: MentionQueueItem | string;
-
-  if (currentData.length >= 500) {
-    inserting = true;
-    await prisma.mention
-      .createMany({
-        data: currentData,
-        skipDuplicates: true,
-      })
-      .catch(() => {});
-    currentData = [];
-    inserting = false;
-  }
-
-  if (mentionQueue.length == 0) {
-    clearInterval(mentionInterval);
-    mentionInterval = undefined;
-    currentInterval = 150;
-
-    if (currentData.length > 0) {
-      inserting = true;
-      await prisma.mention
-        .createMany({
-          data: currentData,
-          skipDuplicates: true,
-        })
-        .catch(() => {});
-      currentData = [];
-      inserting = false;
-    }
-  } else {
-    mention = mentionQueue.shift();
-  }
-
-  if (!mention) {
-    clearInterval(mentionInterval);
-    mentionInterval = undefined;
-    return;
-  }
-
-  if (typeof mention != "string" && mention.type == "collection") {
-    const members = mention.members;
-
-    if (members.size > 500) {
-      if (workerCount >= 4) {
-        mentionQueue.push(mention);
-        return;
-      }
-      workerCount++;
-      logger.debug(
-        `${members.size.toLocaleString()} mentions being inserted with worker.. (${workerCount})`,
-      );
-      const start = Date.now();
-      const res = await doCollection(mention).catch((e) => {
-        logger.error("error inserting mentions with worker");
-        console.error(e);
-      });
-      workerCount--;
-
-      if (res == 0) {
-        logger.debug(
-          `${members.size.toLocaleString()} mentions inserted in ${(Date.now() - start) / 1000}s`,
-        );
-      } else {
-        logger.warn("worker timed out");
-        logger.debug(
-          `${members.size.toLocaleString()} mentions inserted in ${(Date.now() - start) / 1000}s`,
-        );
-      }
-
-      return;
-    }
-
-    let content = mention.message.content;
-
-    if (content.length > 100) {
-      content = content.substring(0, 97) + "...";
-    }
-
-    content = content.replace(/(\r\n|\n|\r)/gm, " ");
-
-    let count = 0;
-
-    let channelMembers = mention.channelMembers;
-
-    for (const memberID of Array.from(members.keys())) {
-      if (count >= 50) {
-        return mentionQueue.push({
-          type: "collection",
-          members: members.clone(),
-          message: mention.message,
-          channelMembers: channelMembers,
-          guildId: mention.guildId,
+          });
         });
       }
-      const member = members.get(memberID);
 
-      members.delete(memberID);
-
-      if (member.user.id == mention.message.author.id) continue;
-
-      try {
-        if (!channelMembers.has(memberID)) continue;
-      } catch {
-        channelMembers = channelMembers.cache;
-        if (!channelMembers.has(memberID)) continue;
+      if (message.mentions?.members?.size > 0) {
+        if (mentionMembers) {
+          message.mentions.members.forEach((m) => {
+            if (!mentionMembers.includes(m.user.id)) {
+              mentionMembers.push(m.user.id);
+            }
+          });
+        } else {
+          mentionMembers = Array.from(
+            message.mentions.members.mapValues((m) => m.user.id).values(),
+          );
+        }
       }
 
-      const data = {
-        user: mention.message.author.username,
-        content: content,
-        date: mention.message.createdTimestamp,
-        link: mention.message.url,
-      };
+      if (mentionMembers.length > 0) {
+        let channelMembers: Collection<string, GuildMember | ThreadMember> | ThreadMemberManager =
+          message.channel.members;
 
-      const guild = mention.message.guild.id;
+        if (channelMembers instanceof ThreadMemberManager) {
+          channelMembers = channelMembers.cache;
+        }
 
-      mentionQueue.push({
-        type: "mention",
-        data: data,
-        guildId: guild,
-        target: member.user.id,
-      });
-      count++;
+        await redis.rpush(
+          Constants.redis.nypsi.MENTION_QUEUE,
+          JSON.stringify({
+            members: mentionMembers,
+            channelMembers: Array.from(channelMembers.mapValues((m) => m.user.id).values()),
+            content:
+              message.content.length > 100
+                ? message.content.substring(0, 97) + "..."
+                : message.content,
+            url: message.url,
+            username: message.author.username,
+            date: message.createdTimestamp,
+            guildId: message.guild.id,
+          } as MentionQueueItem),
+        );
+      }
     }
-  } else if (typeof mention != "string" && mention.type == "mention") {
-    for (let i = 0; i < 25; i++) {
-      const guild = mention.guildId;
-      const data = mention.data;
-      const target = mention.target;
-
-      const content: string = encrypt(data.content);
-
-      currentData.push({
-        guildId: guild,
-        content: content,
-        url: data.link,
-        date: new Date(data.date),
-        targetId: target,
-        userTag: data.user
-          .toLowerCase()
-          .replaceAll(";", "")
-          .replaceAll("'", "")
-          .replaceAll("delete from", "")
-          .replaceAll("insert into", "")
-          .replaceAll("update ", "")
-          .replaceAll("drop ", ""),
-      });
-    }
-  }
-
-  if (mentionQueue.length == 0) {
-    clearInterval(mentionInterval);
-    mentionInterval = undefined;
-    currentInterval = 150;
-
-    if (currentData.length > 0) {
-      inserting = true;
-      await prisma.mention
-        .createMany({
-          data: currentData,
-          skipDuplicates: true,
-        })
-        .catch(() => {});
-      currentData = [];
-      inserting = false;
-    }
-  }
-
-  const cpuUsage = await cpu.usage();
-
-  const old = currentInterval;
-
-  if (cpuUsage > 90) {
-    currentInterval = 1000;
-  } else if (cpuUsage > 80) {
-    currentInterval = 500;
-  } else if (cpuUsage < 80) {
-    currentInterval = 300;
-  } else {
-    currentInterval = 40;
-  }
-
-  if (currentInterval != old) {
-    if (Date.now() - lastChange < 5000) return;
-    clearInterval(mentionInterval);
-    mentionInterval = setInterval(async () => await addMention(), currentInterval);
-
-    lastChange = Date.now();
-  }
-
-  exports.mentionQueue = mentionQueue;
+  }, 200);
 }
-
-export { workerCount };

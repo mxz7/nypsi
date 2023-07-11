@@ -64,7 +64,7 @@ async function run(
   await addCooldown(cmd.name, message.member, 3);
 
   let current = await getAutosellItems(message.member);
-  let max = 5;
+  let max = 7;
 
   if (await isPremium(message.member)) max *= await getTier(message.member);
 

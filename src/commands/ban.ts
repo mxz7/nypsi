@@ -104,6 +104,8 @@ async function run(
     }
   }
 
+  if (!target && !userId) return send({ embeds: [new ErrorEmbed("invalid user")] });
+
   let reason = message.author.username + ": ";
   let unbanDate: Date;
   let temporary = false;
@@ -151,8 +153,8 @@ async function run(
         });
       });
   } else {
-    const targetHighestRole = target.roles.highest;
-    const memberHighestRole = message.member.roles.highest;
+    const targetHighestRole = target.roles.highest.position;
+    const memberHighestRole = message.member.roles.highest.position;
 
     if (targetHighestRole >= memberHighestRole && message.author.id !== message.guild.ownerId) {
       return send({

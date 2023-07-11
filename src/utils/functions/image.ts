@@ -304,7 +304,7 @@ export async function uploadImageToImgur(url: string): Promise<string> {
       image: url,
     })
     .catch((e) => {
-      logger.error("error occured uploading image to imgur");
+      logger.error("error occurred uploading image to imgur");
       logger.error("imgur error", e);
       fail = true;
     });

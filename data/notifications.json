@@ -22,13 +22,13 @@
     },
     "vote": {
       "id": "vote",
-      "name": "vote notificatons",
+      "name": "vote notifications",
       "description": "get a dm when you vote to show your rewards for voting"
     },
     "voteReminder": {
       "id": "voteReminder",
       "name": "vote reminders",
-      "description": "receive a reminder in your dms when you are able to vote again\n\n+**2**% multiplier"
+      "description": "receive a reminder in your dms when you are able to vote again\n\n+**2**% gamble multiplier\n+**5**% sell multiplier"
     },
     "worker": {
       "id": "worker",

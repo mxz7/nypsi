@@ -30,13 +30,13 @@ levelLabelMap.set(40, "debug");
 
 class Logger {
   public transports: Transport[];
-  public preproccessors: ((data: WriteData) => WriteData | Promise<WriteData>)[];
+  public preprocessors: ((data: WriteData) => WriteData | Promise<WriteData>)[];
   public meta: Record<string, any>;
 
   constructor(meta?: Record<string, any>) {
     this.meta = meta || {};
     this.transports = [];
-    this.preproccessors = [];
+    this.preprocessors = [];
   }
 
   public addTransport(transport: Transport) {
@@ -45,7 +45,7 @@ class Logger {
   }
 
   public addPreProcessor(preprocessor: (data: WriteData) => WriteData | Promise<WriteData>) {
-    this.preproccessors.push(preprocessor);
+    this.preprocessors.push(preprocessor);
     return this;
   }
 
@@ -71,7 +71,7 @@ class Logger {
       }
     }
 
-    for (const processor of this.preproccessors) {
+    for (const processor of this.preprocessors) {
       data = await processor(data);
     }
 

@@ -1,27 +1,15 @@
-import { Collection, Guild, GuildMember, Message, ThreadMember } from "discord.js";
+import { Guild, GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 
 export interface MentionQueueItem {
-  type: string;
-  members?: Collection<string, GuildMember | ThreadMember>;
-  channelMembers?: any;
-  message?: Message;
-  guildId: string;
-  url?: string;
-  target?: string;
-  data?: MentionData;
-}
-
-interface MentionData {
-  user: string;
+  members: string[];
+  channelMembers: string[];
   content: string;
+  url: string;
+  username: string;
   date: number;
-  link: string;
+  guildId: string;
 }
-
-const mentionQueue: MentionQueueItem[] = [];
-
-export { mentionQueue };
 
 export async function fetchUserMentions(guild: Guild, member: GuildMember | string, amount = 100) {
   let id: string;

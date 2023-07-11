@@ -125,7 +125,7 @@
     "sell": 33000,
     "in_crates": false,
     "craft": {
-      "ingrediants": ["gold_nugget:9"],
+      "ingredients": ["gold_nugget:9"],
       "time": 180
     }
   },
@@ -271,7 +271,7 @@
     "sell": 3000000,
     "craft": {
       "time": 1200,
-      "ingrediants": ["netherite_scrap:4", "gold_ingot:4"]
+      "ingredients": ["netherite_scrap:4", "gold_ingot:4"]
     },
     "in_crates": false
   },
@@ -445,7 +445,7 @@
     "id": "deer",
     "name": "deer",
     "emoji": "🦌",
-    "longDesc": "not one of santa's.. anymore atleast",
+    "longDesc": "not one of santa's.. anymore at least",
     "role": "prey",
     "rarity": 2,
     "buy": 0,
@@ -1419,7 +1419,7 @@
     "buy": 0,
     "sell": 1000000,
     "craft": {
-      "ingrediants": ["obsidian:10"],
+      "ingredients": ["obsidian:10"],
       "time": 3600
     },
     "in_crates": false,
@@ -1437,7 +1437,7 @@
     "aliases": ["green", "gem"],
     "craft": {
       "time": 172800,
-      "ingrediants": ["gem_shard:10"]
+      "ingredients": ["gem_shard:10"]
     }
   },
   "purple_gem": {
@@ -1452,7 +1452,7 @@
     "aliases": ["purple"],
     "craft": {
       "time": 172800,
-      "ingrediants": ["gem_shard:15"]
+      "ingredients": ["gem_shard:15"]
     }
   },
   "pink_gem": {
@@ -1467,7 +1467,7 @@
     "aliases": ["pink"],
     "craft": {
       "time": 172800,
-      "ingrediants": ["gem_shard:20"]
+      "ingredients": ["gem_shard:20"]
     }
   },
   "blue_gem": {
@@ -1482,7 +1482,7 @@
     "aliases": ["blue"],
     "craft": {
       "time": 172800,
-      "ingrediants": ["gem_shard:5"]
+      "ingredients": ["gem_shard:5"]
     }
   },
   "white_gem": {
@@ -1496,7 +1496,7 @@
     "sell": 2500000,
     "craft": {
       "time": 259200,
-      "ingrediants": ["blue_gem:2", "green_gem:2", "pink_gem:1", "purple_gem:1"]
+      "ingredients": ["blue_gem:2", "green_gem:2", "pink_gem:1", "purple_gem:1"]
     },
     "aliases": ["white"]
   },
@@ -1551,7 +1551,7 @@
     "role": "bakery-upgrade",
     "craft": {
       "time": 21600,
-      "ingrediants": ["cursor:3"]
+      "ingredients": ["cursor:3"]
     },
     "in_crates": true
   },
@@ -1624,7 +1624,7 @@
     "rarity": 69,
     "in_crates": false,
     "craft": {
-      "ingrediants": ["bronze_credit:3"],
+      "ingredients": ["bronze_credit:3"],
       "time": 86400
     }
   },
@@ -1639,7 +1639,7 @@
     "rarity": 69,
     "in_crates": false,
     "craft": {
-      "ingrediants": ["silver_credit:3"],
+      "ingredients": ["silver_credit:3"],
       "time": 86400
     }
   },
@@ -1654,7 +1654,7 @@
     "rarity": 69,
     "in_crates": false,
     "craft": {
-      "ingrediants": ["gold_credit:3"],
+      "ingredients": ["gold_credit:3"],
       "time": 86400
     }
   },
@@ -1897,7 +1897,7 @@
     "worker_upgrade_id": "gem_radar",
     "craft": {
       "time": 43200,
-      "ingrediants": ["quarry_scrap:12"]
+      "ingredients": ["quarry_scrap:12"]
     }
   },
   "earth_scanner": {
@@ -1915,7 +1915,7 @@
     "worker_upgrade_id": "earth_scanner",
     "craft": {
       "time": 43200,
-      "ingrediants": ["quarry_scrap:5"]
+      "ingredients": ["quarry_scrap:5"]
     }
   },
   "manager": {
@@ -1981,7 +1981,7 @@
     "plural": "lucky cheese",
     "aliases": ["cheese"],
     "emoji": "🧀",
-    "longDesc": "increase your sell by 5% for 30 minutes (stacks to 10)",
+    "longDesc": "increase your sell multiplier by 10% for 30 minutes (stacks to 10)",
     "rarity": 4,
     "buy": 0,
     "sell": 100000,
@@ -1990,7 +1990,7 @@
     "max": 10,
     "boosterEffect": {
       "boosts": ["sellmulti"],
-      "effect": 5,
+      "effect": 10,
       "time": 1800
     },
     "in_crates": false

@@ -24,6 +24,10 @@ export default {
       SUPPORT: "cd:support",
     },
     cache: {
+      minecraft: {
+        UUID: "cache:minecraft:uuid",
+        NAME_HISTORY: "cache:minecraft:namehistory",
+      },
       SUPPORT: "cache:support",
       premium: {
         ALIASES: "cache:premium:aliases",
@@ -80,6 +84,10 @@ export default {
       },
     },
     nypsi: {
+      MENTION_QUEUE: "nypsi:mention:queue",
+      MENTION_DELAY: "nypsi:mention:delay",
+      MENTION_MAX: "nypsi:mention:max",
+      MENTION_DM_TEKOH_THRESHOLD: "nypsi:mention:warn",
       CAPTCHA_VERIFIED: "nypsi:captcha_verified",
       DM_QUEUE: "nypsi:dmqueue",
       GEM_GIVEN: "nypsi:gemgiven",
@@ -134,6 +142,6 @@ export default {
   SEASON_START: new Date("06/01/2023"),
   SEASON_NUMBER: 6,
   SNOWFLAKE_REGEX: /^\d{17,19}$/,
-  LUCKY_CHEESE_CHANCE: 0.07,
+  LUCKY_CHEESE_CHANCE: 0.17,
   BADGES: ["owner", "staff", "highroller", "contributor", "season_winner", "og"],
 };

@@ -119,6 +119,19 @@ cmd.slashData
           .setChoices(...scopeChoices)
           .setRequired(false),
       ),
+  )
+  .addSubcommand((command) =>
+    command
+      .setName("command")
+      .setDescription("view top command uses in the server")
+
+      .addStringOption((option) =>
+        option
+          .setName("scope")
+          .setDescription("show global/server")
+          .setChoices(...scopeChoices)
+          .setRequired(false),
+      ),
   );
 
 async function run(
@@ -346,6 +359,33 @@ async function run(
       data.pos,
       `top wordle wins ${global ? "[global]" : `for ${message.guild.name}`}`,
       global ? "https://nypsi.xyz/leaderboard/wordle" : null,
+    );
+  } else if (args[0].toLowerCase() === "cmd" || args[0].toLowerCase() === "command") {
+    const searchTag = args[1].toLowerCase();
+
+    if (!commands.has(searchTag)) {
+      return send({ embeds: [new ErrorEmbed(`couldn't find ${searchTag}`)] });
+    }
+
+    let global = false;
+
+    if (args[2]?.toLowerCase() == "global") global = true;
+
+    let data: { pages: Map<number, string[]>; pos: number };
+
+    if (global) {
+      data = await topCommandGlobal(searchTag, message.author.id);
+    } else {
+      data = await topCommand(message.guild, searchTag, message.author.id);
+    }
+
+    return show(
+      data.pages,
+      data.pos,
+      `top ${await getPrefix(message.guild)}${searchTag} uses ${
+        global ? "[global]" : `for ${message.guild.name}`
+      }`,
+      // global ? `https://nypsi.xyz/leaderboard/${item.id}` : null
     );
   } else {
     const selected =

@@ -415,7 +415,7 @@ async function run(
     await addCooldown(cmd.name, message.member, 10);
 
     return deleteAnyMessages(amount);
-  } else if (args[0].toLowerCase() == "member") {
+  } else if (args[0].toLowerCase() === "member" || args[0].toLowerCase() === "user") {
     let member: GuildMember;
 
     if (!message.mentions.members.first()) {

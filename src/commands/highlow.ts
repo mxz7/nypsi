@@ -245,19 +245,19 @@ async function prepareGame(
   const id = Math.random();
 
   const newDeck = [
-    "A♠",
-    "2♠",
-    "3♠",
-    "4♠",
-    "5♠",
-    "6♠",
-    "7♠",
-    "8♠",
-    "9♠",
-    "10♠",
-    "J♠",
-    "Q♠",
-    "K♠",
+    "A♠️",
+    "2♠️",
+    "3♠️",
+    "4♠️",
+    "5♠️",
+    "6♠️",
+    "7♠️",
+    "8♠️",
+    "9♠️",
+    "10♠️",
+    "J♠️",
+    "Q♠️",
+    "K♠️",
     "A♣️",
     "2♣️",
     "3♣️",
@@ -352,7 +352,7 @@ async function prepareGame(
     logger.error("highlow error", e);
     redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
     return send({
-      embeds: [new ErrorEmbed("an error occured while running - join support server")],
+      embeds: [new ErrorEmbed("an error occurred while running - join support server")],
     });
   });
 }

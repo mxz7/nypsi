@@ -55,7 +55,7 @@ import { createProfile, hasProfile } from "../functions/users/utils";
 import dayjs = require("dayjs");
 import ms = require("ms");
 
-const commands = new Map<string, Command>();
+export const commands = new Map<string, Command>();
 const aliases = new Map<string, string>();
 const hourlyCommandCount = new Map<string, number>();
 const commandUses = new Map<string, number>();
@@ -558,7 +558,7 @@ export async function runCommand(
       } catch {
         cooldown.clear();
       }
-    }, 450);
+    }, 250);
   }
 
   if (cmd == "help" && message instanceof Message) {
@@ -947,9 +947,9 @@ export async function runCommand(
       await redis.del(`${Constants.redis.nypsi.RICKROLL}:${message.author.id}`);
 
       await message.channel.send({
-        content: `${message.author.toString()} you have been **RICK ROLLED** by ${await getLastKnownTag(
+        content: `${message.author.toString()} you have been **RICK ROLLED** by ${await getLastKnownUsername(
           userId,
-        )}\n\nhttps://www.youtube.com/watch?v=dQw4w9WgXcQ`,
+        )}\n\nhttps://tenor.com/view/rickroll-roll-rick-never-gonna-give-you-up-never-gonna-gif-22954713`,
       });
     }
   }, 2000);

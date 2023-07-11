@@ -23,7 +23,7 @@ export interface Item {
   worker_upgrade_id: string;
   plural?: string;
   craft?: {
-    ingrediants: string[]; // format: item_id:amount
+    ingredients: string[]; // format: item_id:amount
     time: number; // seconds
   };
   in_crates: boolean;

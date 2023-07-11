@@ -131,7 +131,7 @@ export async function getGambleMulti(member: GuildMember | string): Promise<numb
 
   let prestigeBonus = prestigeGambleMultiEffect[prestige];
 
-  if (!prestigeBonus && prestigeBonus !== 0)
+  if (!prestigeBonus && prestige > 0)
     prestigeBonus = prestigeGambleMultiEffect[prestigeGambleMultiEffect.length - 1];
 
   multi += prestigeBonus;
@@ -163,7 +163,7 @@ export async function getGambleMulti(member: GuildMember | string): Promise<numb
   )
     multi += 2;
 
-  if (await isPassive(id)) multi -= 4;
+  if (await isPassive(id)) multi -= 3;
 
   for (const boosterId of boosters.keys()) {
     if (items[boosterId].boosterEffect.boosts.includes("multi")) {
@@ -219,7 +219,7 @@ export async function getSellMulti(member: GuildMember | string): Promise<number
 
   const prestige = await getPrestige(member);
 
-  multi += Math.floor(prestige * 0.3);
+  multi += Math.floor(prestige * 0.69);
 
   switch (await getTier(id)) {
     case 1:
@@ -249,7 +249,7 @@ export async function getSellMulti(member: GuildMember | string): Promise<number
     (await getDmSettings(id)).voteReminder &&
     !(await redis.sismember(Constants.redis.nypsi.VOTE_REMINDER_RECEIVED, id))
   )
-    multi += 2;
+    multi += 5;
 
   if (await isPassive(id)) multi -= 5;
 

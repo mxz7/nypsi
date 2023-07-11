@@ -111,6 +111,7 @@ async function run(
     const embed = new CustomEmbed(message.member).setHeader(
       `${message.author.username}'s wordle stats`,
       message.author.avatarURL(),
+      `https://nypsi.xyz/user/${message.author.id}`,
     );
 
     let desc = "";
@@ -127,6 +128,8 @@ async function run(
     if (stats.win6)
       desc += `<:solid_grey:987046773157691452><:solid_grey:987046773157691452><:solid_grey:987046773157691452><:solid_grey:987046773157691452><:solid_grey:987046773157691452>:green_square: **${stats.win6.toLocaleString()}**\n`;
     if (stats.lose) desc += `:red_square: **${stats.lose.toLocaleString()}**\n`;
+
+    desc += `\n[view online](https://nypsi.xyz/user/${message.author.id}#wordle)`;
 
     embed.setDescription(desc);
 

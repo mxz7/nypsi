@@ -212,6 +212,24 @@ export async function checkLeaderboardPositions(users: string[], leaderboard: st
 
   for (const user of users) {
     if (users.indexOf(user) > 100) return;
+    const query = await prisma.leaderboards.findFirst({
+      where: {
+        leaderboard,
+        userId: user,
+      },
+      select: {
+        position: true,
+      },
+    });
+
+    if (query) {
+      if (query.position === users.indexOf(user)) return;
+
+      await prisma.leaderboards.delete({
+        where: { userId_leaderboard: { userId: user, leaderboard } },
+      });
+    }
+
     await prisma.leaderboards.upsert({
       where: {
         leaderboard_position: {

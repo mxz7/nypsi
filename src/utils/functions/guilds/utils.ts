@@ -46,8 +46,6 @@ export function runSnipeClearIntervals() {
   }, 3600000);
 }
 
-const fetchCooldown = new Set<string>();
-
 export async function runCheck(guild: Guild) {
   if (!(await hasGuild(guild))) await createGuild(guild);
 
@@ -126,22 +124,6 @@ export async function createGuild(guild: Guild) {
     `${Constants.redis.cache.guild.EXISTS}:${guild.id}`,
     Math.floor(ms("24 hour") / 1000),
   );
-}
-
-export function addCooldown(guild: Guild, seconds: number) {
-  fetchCooldown.add(guild.id);
-
-  setTimeout(() => {
-    fetchCooldown.delete(guild.id);
-  }, seconds * 1000);
-}
-
-export function inCooldown(guild: Guild): boolean {
-  if (fetchCooldown.has(guild.id)) {
-    return true;
-  } else {
-    return false;
-  }
 }
 
 export async function getPrefix(guild: Guild): Promise<string> {

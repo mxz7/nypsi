@@ -384,7 +384,7 @@ async function run(
       return message.channel.send({
         embeds: [
           new ErrorEmbed(
-            "error occured creating reaction role. does nypsi have permission to send messages in the channel?",
+            "error occurred creating reaction role. does nypsi have permission to send messages in the channel?",
           ),
         ],
       });
@@ -438,7 +438,7 @@ async function run(
             "**/reactionroles update <message id> <setting> <newvalue>** *update a setting for reaction roles*\n" +
             "**/reactionroles delete <message id>** *delete a reaction role*\n" +
             "**/reactionroles removerole <message id> <role>** *remove a role from a reaction role*\n" +
-            "**/reactionroles whilist add <message id> <role id>** *only allow members of this role to access*\n" +
+            "**/reactionroles whitelist add <message id> <role id>** *only allow members of this role to access*\n" +
             "**/reactionroles whitelist remove <message id> <role id>** *unwhitelist a role*\n" +
             "**/reactionroles whitelist list <message id>** *list all whitelisted roles*",
         ).setHeader("reaction roles", message.author.avatarURL()),
@@ -611,7 +611,7 @@ async function run(
 
       return send({
         embeds: [
-          new CustomEmbed(message.member, "✅ updated title. you will have to resend the mesage"),
+          new CustomEmbed(message.member, "✅ updated title. you will have to resend the message"),
         ],
       });
     } else if (args[2].toLowerCase() === "description") {
@@ -627,7 +627,7 @@ async function run(
         embeds: [
           new CustomEmbed(
             message.member,
-            "✅ updated description. you will have to resend the mesage",
+            "✅ updated description. you will have to resend the message",
           ),
         ],
       });
@@ -639,7 +639,7 @@ async function run(
 
       return send({
         embeds: [
-          new CustomEmbed(message.member, "✅ updated color. you will have to resend the mesage"),
+          new CustomEmbed(message.member, "✅ updated color. you will have to resend the message"),
         ],
       });
     }
@@ -681,7 +681,7 @@ async function run(
       );
 
       return send({
-        embeds: [new CustomEmbed(message.member, `✅ added ${role.toString()} to the whitlist`)],
+        embeds: [new CustomEmbed(message.member, `✅ added ${role.toString()} to the whitelist`)],
       });
     } else if (args[1].toLowerCase() === "remove") {
       if (args.length < 4) return send({ embeds: [new ErrorEmbed("/reactionroles whitelist")] });
@@ -712,7 +712,7 @@ async function run(
 
       return send({
         embeds: [
-          new CustomEmbed(message.member, `✅ removed ${role.toString()} from the whitlist`),
+          new CustomEmbed(message.member, `✅ removed ${role.toString()} from the whitelist`),
         ],
       });
     } else if (args[1].toLowerCase() === "list") {

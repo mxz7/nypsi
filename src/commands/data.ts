@@ -276,7 +276,7 @@ async function run(
 
       await fs.appendFile(
         file,
-        "\n----------------------------------------------\n\n----------\nYOUR MENTIONS DATA\n(mentions targetted at you)\n----------\n\n",
+        "\n----------------------------------------------\n\n----------\nYOUR MENTIONS DATA\n(mentions targeted at you)\n----------\n\n",
       );
       await fs.appendFile(file, JSON.stringify(mentionsTargetedData, null, 2));
 

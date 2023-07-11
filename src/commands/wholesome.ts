@@ -34,6 +34,7 @@ import { getMember } from "../utils/functions/member";
 import PageManager from "../utils/functions/page";
 import { getLastKnownTag } from "../utils/functions/users/tag";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import { logger } from "../utils/logger";
 
 const uploadCooldown = new Map<string, number>();
 
@@ -42,6 +43,12 @@ const cmd = new Command("wholesome", "get a random wholesome picture", "fun").se
   "loveu",
   "ws",
   "ily",
+  "ifuckingloveyouwithallmyfuckingheartsoletshaveroughkinkysexrightfuckingnow",
+  "ifuckingloveoyou",
+  "letsgetmarriediloveyoumysexydiscordegirl",
+  "heyyyyiloveyouuuuu",
+  "imissyouiloveyoucomebackmydiscordegirl",
+  "wannaedate",
 ]);
 
 cmd.slashEnabled = true;
@@ -379,6 +386,7 @@ async function run(
     if (roles.has("747059949770768475")) allow = true;
     if (roles.has("845613231229370429")) allow = true;
     if (roles.has("1023950187661635605")) allow = true;
+    if (roles.has("449774710469689355")) allow = true;
 
     if (!allow) return;
 
@@ -514,6 +522,7 @@ async function run(
         await res.deferUpdate();
         return reviewExisting(msg);
       } else {
+        logger.info(`wholesome image deleted by ${message.author.id}`, suggestion);
         await res.deferUpdate();
         await deleteFromWholesome(suggestion.id);
         return reviewExisting(msg);

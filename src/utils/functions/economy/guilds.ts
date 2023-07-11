@@ -32,6 +32,9 @@ export async function getGuildByName(name: string) {
           },
         },
         members: {
+          orderBy: {
+            joinedAt: "asc",
+          },
           include: {
             economy: {
               select: {
@@ -130,6 +133,9 @@ export async function getGuildByUser(member: GuildMember | string) {
           include: {
             upgrades: true,
             members: {
+              orderBy: {
+                joinedAt: "asc",
+              },
               include: {
                 economy: {
                   select: {

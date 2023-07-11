@@ -11,19 +11,20 @@ import {
   PermissionFlagsBits,
   Role,
 } from "discord.js";
+import { sort } from "fast-sort";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { MStoTime } from "../utils/functions/date";
 import {
   getAutoJoinRoles,
-  getPersistantRoles,
+  getPersistentRoles,
   setAutoJoinRoles,
-  setPersistantRoles,
+  setPersistentRoles,
 } from "../utils/functions/guilds/roles";
-import { addCooldown, inCooldown } from "../utils/functions/guilds/utils";
 import { getMember, getRole } from "../utils/functions/member";
 import PageManager from "../utils/functions/page";
 import sleep from "../utils/functions/sleep";
+import { logger } from "../utils/logger";
 
 const cmd = new Command("role", "role utilities", "utility");
 
@@ -119,7 +120,7 @@ cmd.slashData
     persist
       .setName("persist")
       .setDescription("persist settings")
-      .addSubcommand((list) => list.setName("list").setDescription("show all persistant roles"))
+      .addSubcommand((list) => list.setName("list").setDescription("show all persistent roles"))
       .addSubcommand((add) =>
         add
           .setName("add")
@@ -208,7 +209,7 @@ async function run(
             "/role autojoin list - show all current autojoin roles\n" +
             "/role persist add <role> - add a role to be added back to a user after they leave, if they had it. (data deleted after 30 days)\n" +
             "/role persist remove <role> - remove a role from the persistance list\n" +
-            "/role persist list - show all current persistant roles\n" +
+            "/role persist list - show all current persistent roles\n" +
             "/role members <role> - show members in a role",
         ),
       ],
@@ -587,7 +588,7 @@ async function run(
       return send({ embeds: [new ErrorEmbed("use slash commands")] });
     }
 
-    const roles = await getPersistantRoles(message.guild);
+    const roles = await getPersistentRoles(message.guild);
 
     if (args[1].toLowerCase() == "list") {
       const rolesDisplay: string[] = [];
@@ -597,7 +598,7 @@ async function run(
 
         if (!role) {
           roles.splice(roles.indexOf(r), 1);
-          await setPersistantRoles(message.guild, roles);
+          await setPersistentRoles(message.guild, roles);
           break;
         }
 
@@ -637,21 +638,21 @@ async function run(
     if (args[1].toLowerCase() == "add") {
       if (roles.includes(chosenRole.id)) {
         return send({
-          embeds: [new ErrorEmbed("this role is already in the persistant role list")],
+          embeds: [new ErrorEmbed("this role is already in the persistent role list")],
         });
       }
       roles.push(chosenRole.id);
-      embed.setDescription(`✅ added ${chosenRole.toString()} to the persistant role list`);
+      embed.setDescription(`✅ added ${chosenRole.toString()} to the persistent role list`);
     } else {
       if (!roles.includes(chosenRole.id)) {
-        return send({ embeds: [new ErrorEmbed("that role is not in the persistant role list")] });
+        return send({ embeds: [new ErrorEmbed("that role is not in the persistent role list")] });
       }
 
       roles.splice(roles.indexOf(chosenRole.id), 1);
-      embed.setDescription(`✅ removed ${chosenRole.toString()} from the persistant role list`);
+      embed.setDescription(`✅ removed ${chosenRole.toString()} from the persistent role list`);
     }
 
-    await setPersistantRoles(message.guild, roles);
+    await setPersistentRoles(message.guild, roles);
 
     return send({ embeds: [embed] });
   } else if (args[0].toLowerCase() == "members") {
@@ -671,21 +672,22 @@ async function run(
 
     let members: GuildMember[];
 
-    if (
-      inCooldown(message.guild) ||
-      message.guild.memberCount == message.guild.members.cache.size ||
-      message.guild.memberCount <= 250
-    ) {
+    if (message.guild.memberCount == message.guild.members.cache.size) {
       members = Array.from(message.guild.members.cache.values());
     } else {
-      members = Array.from((await message.guild.members.fetch()).values());
-
-      addCooldown(message.guild, 3600);
+      members = Array.from(
+        (
+          await message.guild.members.fetch().catch((e) => {
+            logger.error("failed to fetch members for role cmd", e);
+            return message.guild.members.cache;
+          })
+        ).values(),
+      );
     }
 
-    const filteredMembers = members
-      .filter((m) => m.roles.cache.has(role.id))
-      .map((m) => `\`${m.user.username}\``);
+    const filteredMembers = sort(
+      members.filter((m) => m.roles.cache.has(role.id)).map((m) => `\`${m.user.username}\``),
+    ).asc();
 
     if (filteredMembers.length == 0) {
       return send({

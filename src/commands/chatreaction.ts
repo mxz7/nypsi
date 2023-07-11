@@ -367,7 +367,7 @@ async function run(
 
         if (embed.data.description == msg.embeds[0].description) return;
 
-        if (voted.length == 4) {
+        if (voted.length >= 4) {
           clearInterval(i);
           await msg.edit({ embeds: [embed], components: [] });
 
@@ -400,7 +400,7 @@ async function run(
         } else {
           await msg.edit({ embeds: [embed] });
         }
-      }, 750);
+      }, 500);
 
       collector.on("collect", async (interaction) => {
         if (voted.includes(interaction.user.id)) {
@@ -410,14 +410,13 @@ async function run(
           });
           return;
         }
-        await interaction.deferUpdate();
         voted.push(interaction.user.id);
+        await interaction.deferUpdate();
       });
 
       collector.on("end", () => {
-        clearInterval(i);
-
-        if (voted.length != 5) {
+        if (voted.length < 4) {
+          clearInterval(i);
           embed.setDescription(
             `chat reaction not started\n\nonly received ${voted.length}/4 votes ):`,
           );

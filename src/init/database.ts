@@ -13,8 +13,6 @@ prisma.$use(async (params, next) => {
 
   const timeTaken = Date.now() - before;
 
-  if (params.model === "Mention") return result;
-
   if (timeTaken > 500 && !parentPort) {
     logger.warn(`query ${params.model}.${params.action} took ${timeTaken}ms`, params.args);
   }

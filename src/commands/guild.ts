@@ -278,7 +278,9 @@ async function run(
     }
 
     if ((await getPrestige(message.member)) < 1) {
-      return send({ embeds: [new ErrorEmbed("you must be atleast prestige 1 to create a guild")] });
+      return send({
+        embeds: [new ErrorEmbed("you must be at least prestige 1 to create a guild")],
+      });
     }
 
     if ((await getBalance(message.member)) < 500000) {
@@ -876,7 +878,7 @@ async function run(
         `${prefix}**top guild** *view top guilds on nypsi*\n` +
         `${prefix}**guild (name)** *show guild info*`,
     );
-    embed.setFooter({ text: "you must be atleast prestige 1 to create a guild" });
+    embed.setFooter({ text: "you must be at least prestige 1 to create a guild" });
 
     return send({ embeds: [embed] });
   }

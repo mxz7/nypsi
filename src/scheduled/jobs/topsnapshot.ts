@@ -179,7 +179,7 @@ async function clearOld() {
     where: {
       AND: [
         { OR: [{ category: { contains: "user" } }, { category: { contains: "item-count" } }] },
-        { date: { lt: dayjs().subtract(90, "day").toDate() } },
+        { date: { lt: dayjs().subtract(45, "day").toDate() } },
       ],
     },
   });

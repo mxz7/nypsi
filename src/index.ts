@@ -5,9 +5,10 @@ import { clearInterval } from "timers";
 import redis from "./init/redis";
 import { runJob, startJobs } from "./scheduled/scheduler";
 import Constants from "./utils/Constants";
-import { addFailedHeatbeat, sendHeartbeat } from "./utils/functions/heartbeat";
+import { addFailedHeartbeat, sendHeartbeat } from "./utils/functions/heartbeat";
 import { updateStats } from "./utils/functions/topgg";
 import { getVersion } from "./utils/functions/version";
+import { startMentionInterval } from "./utils/handlers/mentions";
 import { listenForDms } from "./utils/handlers/notificationhandler";
 import { listen } from "./utils/handlers/webhookhandler";
 import { getWebhooks, logger, setClusterId } from "./utils/logger";
@@ -32,9 +33,6 @@ const manager = new ClusterManager(`${__dirname}/nypsi.js`, {
 
   // totalShards: 6,
   // shardsPerClusters: 3, // force clusters
-  spawnOptions: {
-    delay: 0,
-  },
 });
 
 manager.extend(new Cluster.ReClusterManager());
@@ -49,7 +47,7 @@ manager.on("clusterCreate", (cluster) => {
 
         if (!heartbeat) {
           logger.warn(`cluster ${cluster.id} missed heartbeat`);
-          addFailedHeatbeat(cluster);
+          addFailedHeartbeat(cluster);
         }
       }, 25000);
       heartBeatIntervals.push(interval);
@@ -110,6 +108,7 @@ listen(manager);
 setTimeout(async () => {
   await startJobs();
   listenForDms(manager);
+  startMentionInterval();
   logger.info("jobs triggered");
 }, 300000);
 // }, 15000);

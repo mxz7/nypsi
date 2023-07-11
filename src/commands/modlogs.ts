@@ -97,13 +97,13 @@ async function run(
     }
 
     if (!channel.isTextBased()) {
-      return message.channel.send({ embeds: [new ErrorEmbed("invalid cahnnel")] });
+      return message.channel.send({ embeds: [new ErrorEmbed("invalid channel")] });
     }
 
     if (channel.isDMBased()) return;
 
     if (channel.isThread()) {
-      return message.channel.send({ embeds: [new ErrorEmbed("invalid cahnnel")] });
+      return message.channel.send({ embeds: [new ErrorEmbed("invalid channel")] });
     }
 
     let fail = false;

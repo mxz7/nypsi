@@ -13,7 +13,6 @@ import {
 import { inPlaceSort } from "fast-sort";
 import { cpu } from "node-os-utils";
 import * as os from "os";
-import { workerCount } from "../events/message";
 import prisma from "../init/database";
 import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
@@ -32,7 +31,7 @@ import { getItems } from "../utils/functions/economy/utils";
 import { violations } from "../utils/functions/moderation/mute";
 import PageManager from "../utils/functions/page";
 import { getCommandUses } from "../utils/functions/users/commands";
-import { mentionQueue } from "../utils/functions/users/mentions";
+
 import { getVersion } from "../utils/functions/version";
 import { aliasesSize, commandsSize } from "../utils/handlers/commandhandler";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -215,7 +214,9 @@ async function run(
   };
 
   const itemStats = async () => {
-    const itemStats = await getStats(message.member);
+    const itemStats = await getStats(message.member).then((stats) =>
+      stats.filter((i) => Boolean(getItems()[i.itemId])),
+    );
 
     if (itemStats.length == 0) {
       return send({ embeds: [new ErrorEmbed("you have no item stats")] });
@@ -274,7 +275,7 @@ async function run(
     );
 
     const commandUses = parseInt(
-      await redis.hget(Constants.redis.nypsi.TOP_COMMANDS_USER, message.author.username),
+      await redis.hget(Constants.redis.nypsi.TOP_COMMANDS_USER, message.author.tag),
     );
 
     const embed = new CustomEmbed(message.member, pages.get(1).join("\n"))
@@ -443,17 +444,6 @@ async function run(
       .broadcastEval("this.guilds.cache.size")
       .then((res) => res.reduce((a, b) => a + b));
 
-    let collections = 0;
-    let mentions = 0;
-
-    for (const mention of mentionQueue) {
-      if (mention.type == "collection") {
-        collections++;
-      } else if (mention.type == "mention") {
-        mentions++;
-      }
-    }
-
     const embed = new CustomEmbed(message.member)
       .setHeader(
         `nypsi stats | cluster: ${currentCluster + 1}/${clusterCount}`,
@@ -475,15 +465,10 @@ async function run(
         true,
       )
       .addField(
-        "mention queue",
-        "**total** " +
-          mentionQueue.length.toLocaleString() +
-          "\n-- **collections** " +
-          collections.toLocaleString() +
-          "\n-- **mentions** " +
-          mentions.toLocaleString() +
-          "\n-- **workers** " +
-          workerCount.toLocaleString(),
+        "mentions",
+        `**queue size** ${await redis.llen(Constants.redis.nypsi.MENTION_QUEUE)}\n` +
+          `**delay** ${Number(await redis.get(Constants.redis.nypsi.MENTION_DELAY)) || 5}\n` +
+          `**max** ${Number(await redis.get(Constants.redis.nypsi.MENTION_MAX)) || 3}`,
         true,
       )
       .addField(
