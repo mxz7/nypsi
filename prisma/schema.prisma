@@ -10,28 +10,29 @@ datasource db {
 // user specific tables (economy etc.)
 
 model User {
-  id             String   @id
-  lastKnownUsername   String @map("lastKnownTag")
-  avatar         String   @default("https://cdn.discordapp.com/embed/avatars/0.png")
-  karma          Int      @default(1)
-  lastCommand    DateTime
-  tracking       Boolean  @default(true)
-  lastfmUsername String?
-  email          String?  @unique
-  blacklisted    Boolean  @default(false)
-  adminLevel     Int      @default(0)
-  booster        Boolean  @default(false)
-  badges         String[]
+  id                String   @id
+  lastKnownUsername String   @map("lastKnownTag")
+  avatar            String   @default("https://cdn.discordapp.com/embed/avatars/0.png")
+  karma             Int      @default(1)
+  lastCommand       DateTime
+  tracking          Boolean  @default(true)
+  lastfmUsername    String?
+  email             String?  @unique
+  blacklisted       Boolean  @default(false)
+  adminLevel        Int      @default(0)
+  booster           Boolean  @default(false)
+  badges            String[]
 
-  Economy      Economy?
-  Premium      Premium?
-  Username     Username[]
-  WordleStats  WordleStats?
-  CommandUse   CommandUse[]
-  Achievements Achievements[]
-  DMSettings   DMSettings?
-  Preferences  Preferences?
-  Leaderboards Leaderboards[]
+  Economy        Economy?
+  Premium        Premium?
+  Username       Username[]
+  WordleStats    WordleStats?
+  CommandUse     CommandUse[]
+  Achievements   Achievements[]
+  DMSettings     DMSettings?
+  Preferences    Preferences?
+  Leaderboards   Leaderboards[]
+  ActiveChannels ActiveChannels[]
 }
 
 model Leaderboards {
@@ -618,4 +619,15 @@ model GraphMetrics {
   userId String
   value  BigInt
   date   DateTime
+}
+
+// for random drops
+model ActiveChannels {
+  userId    String
+  channelId String
+  date      DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@id([userId, channelId])
 }

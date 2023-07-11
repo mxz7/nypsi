@@ -25,6 +25,7 @@ import { getNews, hasSeenNews } from "../functions/news";
 import { getTimestamp, logger } from "../logger";
 // @ts-expect-error typescript doesnt like opening package.json
 import { version } from "../../../package.json";
+import prisma from "../../init/database";
 import { Item } from "../../types/Economy";
 import Constants from "../Constants";
 import { a } from "../functions/anticheat";
@@ -959,7 +960,6 @@ export async function runCommand(
     updateCommandUses(message.member),
     updateUser(message.author || message.member.user || null, command.name),
     redis.hincrby(Constants.redis.nypsi.TOP_COMMANDS, command.name, 1),
-
     addProgress(message.author.id, "nypsi", 1),
     commandGemCheck(message.member, command.category),
   ]);
@@ -968,6 +968,12 @@ export async function runCommand(
     await redis.hincrby(Constants.redis.nypsi.TOP_COMMANDS_USER, message.author.username, 1);
 
   if (command.category == "money") {
+    await prisma.activeChannels.upsert({
+      where: { userId_channelId: { channelId: message.channelId, userId: message.author.id } },
+      update: { date: new Date() },
+      create: { channelId: message.channelId, userId: message.author.id },
+    });
+
     if (!message.member) return;
 
     setTimeout(async () => {
