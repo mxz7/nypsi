@@ -29,7 +29,7 @@ import { getXp } from "../utils/functions/economy/xp";
 import { getMember } from "../utils/functions/member";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { getPreferences } from "../utils/functions/users/notifications";
-import { getLastKnownTag } from "../utils/functions/users/tag";
+import { getLastKnownUsername } from "../utils/functions/users/tag";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger } from "../utils/logger";
 import dayjs = require("dayjs");
@@ -163,7 +163,7 @@ async function run(
         },
         {
           name: "target",
-          value: `${(await getLastKnownTag(offers[page].targetId)) || "unknown user"} (${
+          value: `${(await getLastKnownUsername(offers[page].targetId)) || "unknown user"} (${
             offers[page].targetId
           })`,
           inline: true,

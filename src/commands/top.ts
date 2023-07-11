@@ -16,6 +16,8 @@ import { getGuildByUser } from "../utils/functions/economy/guilds";
 import { selectItem } from "../utils/functions/economy/inventory";
 import {
   topBalance,
+  topCommand,
+  topCommandGlobal,
   topCompletion,
   topDailyStreak,
   topDailyStreakGlobal,
@@ -30,7 +32,9 @@ import {
   topWordleGlobal,
 } from "../utils/functions/economy/top";
 import { getItems } from "../utils/functions/economy/utils.js";
+import { getPrefix } from "../utils/functions/guilds/utils";
 import PageManager from "../utils/functions/page";
+import { commands } from "../utils/handlers/commandhandler";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 
 const cmd = new Command("top", "view top etc. in the server", "money").setAliases([

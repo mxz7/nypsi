@@ -7,7 +7,7 @@ import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { percentChance } from "../random";
 import { addNotificationToQueue, getDmSettings, getPreferences } from "../users/notifications";
-import { getLastKnownTag } from "../users/tag";
+import { getLastKnownUsername } from "../users/tag";
 import { addInventoryItem } from "./inventory";
 import { createUser, getAchievements, getItems, isEcoBanned, userExists } from "./utils";
 import { getXp, updateXp } from "./xp";
@@ -244,7 +244,7 @@ async function completeAchievement(userId: string, achievementId: string) {
 
   const embed = new EmbedBuilder()
     .setAuthor({
-      name: `${await getLastKnownTag(userId)} has unlocked an achievement`,
+      name: `${await getLastKnownUsername(userId)} has unlocked an achievement`,
     })
     .setDescription(
       `${achievements[achievementId].emoji} ${achievements[achievementId].name}\n\n*${achievements[achievementId].description}*`,

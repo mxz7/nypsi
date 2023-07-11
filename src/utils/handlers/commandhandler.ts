@@ -50,7 +50,7 @@ import { cleanString } from "../functions/string";
 import { isUserBlacklisted } from "../functions/users/blacklist";
 import { getLastCommand, updateUser } from "../functions/users/commands";
 import { getPreferences } from "../functions/users/notifications";
-import { getLastKnownTag } from "../functions/users/tag";
+import { getLastKnownUsername } from "../functions/users/tag";
 import { createProfile, hasProfile } from "../functions/users/utils";
 import dayjs = require("dayjs");
 import ms = require("ms");
@@ -727,7 +727,7 @@ export async function runCommand(
 
         message.content += ` [custom cmd - ${customCommand.owner}]`;
 
-        const ownerTag = await getLastKnownTag(customCommand.owner);
+        const ownerTag = await getLastKnownUsername(customCommand.owner);
         await addUse(customCommand.owner);
         logCommand(message, ["", "", ""]);
 

@@ -19,7 +19,7 @@ export async function updateLastKnownUsername(member: GuildMember | string, tag:
   });
 }
 
-export async function getLastKnownTag(id: string) {
+export async function getLastKnownUsername(id: string) {
   const query = await prisma.user.findUnique({
     where: {
       id: id,

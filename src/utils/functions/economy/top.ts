@@ -1205,7 +1205,7 @@ export async function topCommandGlobal(command: string, userId: string) {
       uses: true,
       user: {
         select: {
-          lastKnownTag: true,
+          lastKnownUsername: true,
         },
       },
     },
@@ -1236,7 +1236,7 @@ export async function topCommandGlobal(command: string, userId: string) {
       pos +
       " **" +
       ((await getPreferences(user.userId))?.leaderboards
-        ? user.user.lastKnownTag?.split("#")[0] || user.userId
+        ? user.user.lastKnownUsername?.split("#")[0] || user.userId
         : "[hidden]") +
       "** " +
       user.uses.toLocaleString() +
