@@ -309,7 +309,8 @@
     "rarity": 2,
     "buy": 0,
     "sell": 10000,
-    "in_crates": true
+    "in_crates": true,
+    "random_drop_chance": 10
   },
   "terrible_fishing_rod": {
     "id": "terrible_fishing_rod",
@@ -345,7 +346,8 @@
     "rarity": 2,
     "buy": 0,
     "sell": 10000,
-    "in_crates": true
+    "in_crates": true,
+    "random_drop_chance": 10
   },
   "bitcoin": {
     "id": "bitcoin",
@@ -403,7 +405,8 @@
     "rarity": 2,
     "buy": 0,
     "sell": 10000,
-    "in_crates": true
+    "in_crates": true,
+    "random_drop_chance": 10
   },
   "baby_rabbit": {
     "id": "baby_rabbit",
@@ -558,7 +561,8 @@
       "id:diamond",
       "id:obsidian",
       "id:gold_nugget"
-    ]
+    ],
+    "random_drop_chance": 75
   },
   "vote_crate": {
     "id": "vote_crate",
@@ -581,7 +585,8 @@
     "rarity": 1,
     "aliases": ["basic"],
     "crate_runs": 2,
-    "in_crates": true
+    "in_crates": true,
+    "random_drop_chance": 100
   },
   "69420_crate": {
     "id": "69420_crate",
@@ -593,7 +598,8 @@
     "rarity": 1,
     "aliases": ["69420"],
     "crate_runs": 2,
-    "in_crates": true
+    "in_crates": true,
+    "random_drop_chance": 100
   },
   "nypsi_crate": {
     "id": "nypsi_crate",
@@ -606,7 +612,8 @@
     "rarity": 4,
     "aliases": ["nypsi"],
     "crate_runs": 5,
-    "in_crates": true
+    "in_crates": true,
+    "random_drop_chance": 6
   },
   "calendar": {
     "id": "calendar",
@@ -1104,7 +1111,8 @@
       "effect": 0.5,
       "time": 3600
     },
-    "in_crates": true
+    "in_crates": true,
+    "random_drop_chance": 15
   },
   "efficiency": {
     "id": "efficiency",
@@ -1318,7 +1326,8 @@
     "rarity": 2,
     "sell": 100000,
     "role": "bakery-upgrade",
-    "in_crates": true
+    "in_crates": true,
+    "random_drop_chance": 75
   },
   "grandpa": {
     "id": "grandpa",
@@ -1342,7 +1351,8 @@
     "rarity": 3,
     "sell": 1000000,
     "role": "bakery-upgrade",
-    "in_crates": true
+    "in_crates": true,
+    "random_drop_chance": 40
   },
   "highroller": {
     "id": "highroller",
@@ -1438,7 +1448,8 @@
     "craft": {
       "time": 172800,
       "ingredients": ["gem_shard:10"]
-    }
+    },
+    "random_drop_chance": 3
   },
   "purple_gem": {
     "id": "purple_gem",
@@ -1483,7 +1494,8 @@
     "craft": {
       "time": 172800,
       "ingredients": ["gem_shard:5"]
-    }
+    },
+    "random_drop_chance": 3
   },
   "white_gem": {
     "id": "white_gem",
@@ -1537,7 +1549,8 @@
     "rarity": 2,
     "sell": 100000,
     "role": "bakery-upgrade",
-    "in_crates": true
+    "in_crates": true,
+    "random_drop_chance": 75
   },
   "super_cursor": {
     "id": "super_cursor",
@@ -1553,7 +1566,8 @@
       "time": 21600,
       "ingredients": ["cursor:3"]
     },
-    "in_crates": true
+    "in_crates": true,
+    "random_drop_chance": 75
   },
   "workers_crate": {
     "id": "workers_crate",
@@ -1579,7 +1593,8 @@
     "rarity": 3,
     "in_crates": true,
     "crate_runs": 2,
-    "items": ["role:booster"]
+    "items": ["role:booster"],
+    "random_drop_chance": 70
   },
   "gem_crate": {
     "id": "gem_crate",
@@ -1600,7 +1615,8 @@
       "id:pink_gem",
       "id:crystal_heart",
       "id:gem_shard"
-    ]
+    ],
+    "random_drop_chance": 1
   },
   "bronze_credit": {
     "id": "bronze_credit",
@@ -1611,7 +1627,8 @@
     "longDesc": "use to receive 7 days of bronze (as long as you don't have a better tier currently)",
     "aliases": ["bronze"],
     "rarity": 69,
-    "in_crates": false
+    "in_crates": false,
+    "random_drop_chance": 7
   },
   "silver_credit": {
     "id": "silver_credit",
@@ -1626,7 +1643,8 @@
     "craft": {
       "ingredients": ["bronze_credit:3"],
       "time": 86400
-    }
+    },
+    "random_drop_chance": 2
   },
   "gold_credit": {
     "id": "gold_credit",
@@ -1692,7 +1710,8 @@
       "id:green_gem:1",
       "id:blue_gem:1",
       "id:pink_gem:0.3"
-    ]
+    ],
+    "random_drop_chance": 65
   },
   "lucky_scratch_card": {
     "id": "lucky_scratch_card",
@@ -1733,7 +1752,8 @@
       "id:blue_gem:2",
       "id:purple_gem:1",
       "id:gem_crate:0.2"
-    ]
+    ],
+    "random_drop_chance": 60
   },
   "legendary_scratch_card": {
     "id": "legendary_scratch_card",
@@ -1768,7 +1788,8 @@
       "id:pink_gem:3",
       "id:gem_shard:50",
       "id:gem_crate:2.5"
-    ]
+    ],
+    "random_drop_chance": 15
   },
   "karma_scratch_card": {
     "id": "karma_scratch_card",
@@ -1798,7 +1819,8 @@
       "id:gold_credit:3",
       "id:platinum_credit:1",
       "id:pink_gem:1"
-    ]
+    ],
+    "random_drop_chance": 20
   },
   "corner_shop_scratchie": {
     "id": "corner_shop_scratchie",
@@ -1842,7 +1864,8 @@
       "id:bronze_credit:0.2",
       "id:purple_gem:0.1",
       "id:quarry_scrap:3"
-    ]
+    ],
+    "random_drop_chance": 90
   },
   "bob": {
     "id": "bob",
@@ -1867,7 +1890,8 @@
     "rarity": 3,
     "buy": 0,
     "sell": 500000,
-    "in_crates": false
+    "in_crates": false,
+    "random_drop_chance": 35
   },
   "quarry_scrap": {
     "id": "quarry_scrap",

@@ -76,11 +76,19 @@ export async function runCheck(guild: Guild) {
   }
 }
 
-export async function hasGuild(guild: Guild): Promise<boolean> {
-  if (await redis.exists(`${Constants.redis.cache.guild.EXISTS}:${guild.id}`)) return true;
+export async function hasGuild(guild: Guild | string): Promise<boolean> {
+  let guildId: string;
+
+  if (guild instanceof Guild) {
+    guildId = guild.id;
+  } else {
+    guildId = guild;
+  }
+
+  if (await redis.exists(`${Constants.redis.cache.guild.EXISTS}:${guildId}`)) return true;
   const query = await prisma.guild.findUnique({
     where: {
-      id: guild.id,
+      id: guildId,
     },
     select: {
       id: true,
@@ -88,9 +96,9 @@ export async function hasGuild(guild: Guild): Promise<boolean> {
   });
 
   if (query) {
-    await redis.set(`${Constants.redis.cache.guild.EXISTS}:${guild.id}`, "1");
+    await redis.set(`${Constants.redis.cache.guild.EXISTS}:${guildId}`, "1");
     await redis.expire(
-      `${Constants.redis.cache.guild.EXISTS}:${guild.id}`,
+      `${Constants.redis.cache.guild.EXISTS}:${guildId}`,
       Math.floor(ms("24 hour") / 1000),
     );
     return true;
@@ -112,29 +120,45 @@ export async function getPeaks(guild: Guild) {
   return query.peak;
 }
 
-export async function createGuild(guild: Guild) {
+export async function createGuild(guild: Guild | string) {
+  let guildId: string;
+
+  if (guild instanceof Guild) {
+    guildId = guild.id;
+  } else {
+    guildId = guild;
+  }
+
   await prisma.guild.create({
     data: {
-      id: guild.id,
+      id: guildId,
     },
   });
 
-  await redis.set(`${Constants.redis.cache.guild.EXISTS}:${guild.id}`, 1);
+  await redis.set(`${Constants.redis.cache.guild.EXISTS}:${guildId}`, 1);
   await redis.expire(
-    `${Constants.redis.cache.guild.EXISTS}:${guild.id}`,
+    `${Constants.redis.cache.guild.EXISTS}:${guildId}`,
     Math.floor(ms("24 hour") / 1000),
   );
 }
 
-export async function getPrefix(guild: Guild): Promise<string> {
+export async function getPrefix(guild: Guild | string): Promise<string> {
+  let guildId: string;
+
+  if (guild instanceof Guild) {
+    guildId = guild.id;
+  } else {
+    guildId = guild;
+  }
+
   try {
-    if (await redis.exists(`${Constants.redis.cache.guild.PREFIX}:${guild.id}`)) {
-      return redis.get(`${Constants.redis.cache.guild.PREFIX}:${guild.id}`);
+    if (await redis.exists(`${Constants.redis.cache.guild.PREFIX}:${guildId}`)) {
+      return redis.get(`${Constants.redis.cache.guild.PREFIX}:${guildId}`);
     }
 
     const query = await prisma.guild.findUnique({
       where: {
-        id: guild.id,
+        id: guildId,
       },
       select: {
         prefix: true,
@@ -145,7 +169,7 @@ export async function getPrefix(guild: Guild): Promise<string> {
       query.prefix = "$";
       await prisma.guild.update({
         where: {
-          id: guild.id,
+          id: guildId,
         },
         data: {
           prefix: "$",
@@ -153,13 +177,13 @@ export async function getPrefix(guild: Guild): Promise<string> {
       });
     }
 
-    await redis.set(`${Constants.redis.cache.guild.PREFIX}:${guild.id}`, query.prefix);
-    await redis.expire(`${Constants.redis.cache.guild.PREFIX}:${guild.id}`, 3600);
+    await redis.set(`${Constants.redis.cache.guild.PREFIX}:${guildId}`, query.prefix);
+    await redis.expire(`${Constants.redis.cache.guild.PREFIX}:${guildId}`, 3600);
 
     return query.prefix;
   } catch (e) {
     if (!(await hasGuild(guild))) await createGuild(guild);
-    logger.warn("couldn't fetch prefix for server " + guild.id);
+    logger.warn("couldn't fetch prefix for server " + guildId);
     return "$";
   }
 }
