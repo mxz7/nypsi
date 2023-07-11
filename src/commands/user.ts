@@ -17,7 +17,7 @@ const sortCache = new Map<string, string[]>();
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   let member;
 
@@ -33,7 +33,7 @@ async function run(
 
   if (args.includes("-id")) {
     const embed = new CustomEmbed(message.member, "`" + member.user.id + "`").setHeader(
-      member.user.username
+      member.user.username,
     );
     return message.channel.send({ embeds: [embed] });
   }
@@ -69,7 +69,7 @@ async function run(
         embeds: [
           new CustomEmbed(
             message.member,
-            `sorting ${membersSorted.length.toLocaleString()} members..`
+            `sorting ${membersSorted.length.toLocaleString()} members..`,
           ),
         ],
       });
@@ -110,7 +110,7 @@ async function run(
     .addField(
       "account",
       `**id** ${member.user.id}\n**created** ${created.toString().toLowerCase()}`,
-      true
+      true,
     )
 
     .addField(
@@ -118,7 +118,7 @@ async function run(
       `**joined** ${joined.toString().toLowerCase()}\n**join pos** ${
         joinPos != "invalid" ? joinPos.toLocaleString() : "--"
       }`,
-      true
+      true,
     )
 
     .addField("\u200B", "\u200B", true);

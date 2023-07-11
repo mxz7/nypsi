@@ -10,7 +10,7 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 const cmd = new Command(
   "work",
   "work a random job and safely earn a random amount of money",
-  "money"
+  "money",
 );
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {

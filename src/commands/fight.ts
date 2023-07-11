@@ -26,7 +26,7 @@ const cmd = new Command("fight", "challenge another member to a fight", "fun");
 
 cmd.slashEnabled = true;
 cmd.slashData.addUserOption((option) =>
-  option.setName("member").setDescription("member you want to fight").setRequired(true)
+  option.setName("member").setDescription("member you want to fight").setRequired(true),
 );
 
 const waiting = new Set<string>();
@@ -42,7 +42,7 @@ const gifs = [
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (!(await userExists(message.member))) {
     await createUser(message.member);
@@ -109,7 +109,7 @@ async function run(
       message.member,
       `you have won **${stats._sum.win.toLocaleString()}** fights and lost **${(
         stats._count._all - stats._sum.win
-      ).toLocaleString()}**`
+      ).toLocaleString()}**`,
     ).setHeader("your fight stats", message.author.avatarURL());
 
     return send({ embeds: [embed] });
@@ -131,7 +131,7 @@ async function run(
     return send({
       embeds: [
         new ErrorEmbed("imbecile").setImage(
-          "https://media1.giphy.com/media/fjmH5BSfkHvVOkvRBs/giphy.gif?cid=790b7611184b72eeb610acf9c41e0f6a25c42f6e987583f6&rid=giphy.gif&ct=g"
+          "https://media1.giphy.com/media/fjmH5BSfkHvVOkvRBs/giphy.gif?cid=790b7611184b72eeb610acf9c41e0f6a25c42f6e987583f6&rid=giphy.gif&ct=g",
         ),
       ],
     });
@@ -143,14 +143,14 @@ async function run(
 
   const embed = new CustomEmbed(message.member).setHeader(
     "fight invitation",
-    message.author.avatarURL()
+    message.author.avatarURL(),
   );
 
   embed.setDescription(`${message.author.username} has challenged you to a fight. do you accept?`);
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder().setCustomId("y").setLabel("accept").setStyle(ButtonStyle.Success),
-    new ButtonBuilder().setCustomId("n").setLabel("deny").setStyle(ButtonStyle.Danger)
+    new ButtonBuilder().setCustomId("n").setLabel("deny").setStyle(ButtonStyle.Danger),
   );
 
   const m = await send({
@@ -192,7 +192,7 @@ async function run(
   if (!(await userExists(target))) await createUser(target);
 
   const countdownEmbed = new CustomEmbed(message.member).setHeader(
-    `${message.author.username} vs ${target.user.username}`
+    `${message.author.username} vs ${target.user.username}`,
   );
 
   countdownEmbed.setDescription("fight starting in 3 seconds...");
@@ -215,7 +215,7 @@ async function run(
 
   const fightRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder().setCustomId("at").setLabel("attack").setStyle(ButtonStyle.Danger),
-    new ButtonBuilder().setCustomId("he").setLabel("heal").setStyle(ButtonStyle.Success)
+    new ButtonBuilder().setCustomId("he").setLabel("heal").setStyle(ButtonStyle.Success),
   );
 
   const homeBoosters = await getBoosters(message.member);
@@ -408,11 +408,11 @@ class Fight {
 
     embed.addField(
       this.home.user.username,
-      `health: **${this.person1.health}**hp\nheals left: **${this.person1.heals}**/3`
+      `health: **${this.person1.health}**hp\nheals left: **${this.person1.heals}**/3`,
     );
     embed.addField(
       this.away.user.username,
-      `health: **${this.person2.health}**hp\nheals left: **${this.person2.heals}**/3`
+      `health: **${this.person2.health}**hp\nheals left: **${this.person2.heals}**/3`,
     );
 
     return embed;
@@ -472,7 +472,7 @@ class Fight {
         winner.member.user.username
       } has won this fight**\ndamage given: ${winner.stats.damageGiven}hp\ndamage received: ${
         winner.stats.damageReceived
-      }hp`
+      }hp`,
     );
 
     return embed;

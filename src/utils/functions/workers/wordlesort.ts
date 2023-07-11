@@ -14,7 +14,7 @@ export default function wordleSortWorker(
     win3: number;
     win2: number;
     win1: number;
-  }[]
+  }[],
 ): Promise<
   {
     wins: number;

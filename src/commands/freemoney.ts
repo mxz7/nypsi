@@ -41,14 +41,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const embed = new CustomEmbed(message.member, `+$**${amount.toLocaleString()}**`).setHeader(
     "free money",
-    message.author.avatarURL()
+    message.author.avatarURL(),
   );
 
   message.channel.send({ embeds: [embed] }).then(async (msg) => {
     embed.setDescription(
       `+$**${amount.toLocaleString()}**\nnew balance: $**${(
         await getBalance(message.member)
-      ).toLocaleString()}**`
+      ).toLocaleString()}**`,
     );
     setTimeout(() => {
       msg.edit({ embeds: [embed] });

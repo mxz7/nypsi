@@ -7,7 +7,7 @@ const cmd = new Command("color", "get a random hex color code", "info").setAlias
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   let color;
   let member;
@@ -34,7 +34,7 @@ async function run(
 
   const embed = new CustomEmbed(
     message.member,
-    `[**#${color}**](https://color.tekoh.net/#${color})`
+    `[**#${color}**](https://color.tekoh.net/#${color})`,
   );
 
   try {

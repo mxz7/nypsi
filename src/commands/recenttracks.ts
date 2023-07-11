@@ -8,12 +8,12 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 const cmd = new Command(
   "recenttracks",
   "view yours or another user's recently listened to songs",
-  "music"
+  "music",
 ).setAliases(["recentsongs", "recents"]);
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (await onCooldown(cmd.name, message.member)) {
     const embed = await getResponse(cmd.name, message.member);
@@ -52,7 +52,7 @@ async function run(
   await addCooldown(cmd.name, message.member, 10);
 
   const res = await fetch(
-    `http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${username}&api_key=${process.env.LASTFM_TOKEN}&format=json`
+    `http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${username}&api_key=${process.env.LASTFM_TOKEN}&format=json`,
   ).then((res) => res.json());
 
   if (!res.recenttracks) {

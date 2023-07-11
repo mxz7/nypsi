@@ -29,18 +29,21 @@ cmd.slashData
         option
           .setName("bet")
           .setDescription("this is the bet and the entry fee for the race")
-          .setRequired(true)
-      )
+          .setRequired(true),
+      ),
   )
   .addSubcommand((join) =>
     join
       .setName("join")
       .setDescription(
-        "join an existing race in the channel (you will need a car, or you can use the bicycle)"
+        "join an existing race in the channel (you will need a car, or you can use the bicycle)",
       )
       .addStringOption((option) =>
-        option.setName("car").setDescription("what car would you like to use").setAutocomplete(true)
-      )
+        option
+          .setName("car")
+          .setDescription("what car would you like to use")
+          .setAutocomplete(true),
+      ),
   );
 
 const races = new Map<string, RaceDetails>();
@@ -48,7 +51,7 @@ const carCooldown = new Map<string, string[]>();
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (!(await userExists(message.member))) await createUser(message.member);
 
@@ -89,7 +92,7 @@ async function run(
 
     embed.setDescription(
       `${prefix}**sr start <entry fee>** *start a street race*\n` +
-        `${prefix}**sr join** *join a street race in the current channel*`
+        `${prefix}**sr join** *join a street race in the current channel*`,
     );
 
     return send({ embeds: [embed] });
@@ -170,7 +173,7 @@ async function run(
 
     const embed = new CustomEmbed(message.member).setHeader(
       `${message.author.username}'s street race`,
-      message.author.avatarURL()
+      message.author.avatarURL(),
     );
 
     embed.setFooter({ text: `use ${prefix}sr join to join` });
@@ -178,7 +181,7 @@ async function run(
     embed.setDescription(
       `no racers\n\nentry fee: $${bet.toLocaleString()}${
         speedLimit != 7 ? `\nspeed limit: ${speedLimit}` : ""
-      }`
+      }`,
     );
 
     let msg = await send({ embeds: [embed] });
@@ -254,7 +257,7 @@ async function run(
       return send({
         embeds: [
           new ErrorEmbed(
-            `your max bet is $**${((await calcMaxBet(message.member)) * 10).toLocaleString()}**`
+            `your max bet is $**${((await calcMaxBet(message.member)) * 10).toLocaleString()}**`,
           ),
         ],
       });
@@ -333,7 +336,7 @@ async function run(
       return send({
         embeds: [
           new ErrorEmbed(
-            `your ${car.name} is too fast for this race, select another with ${prefix}**sr join <car>**`
+            `your ${car.name} is too fast for this race, select another with ${prefix}**sr join <car>**`,
           ),
         ],
       });
@@ -346,7 +349,7 @@ async function run(
         return send({
           embeds: [
             new ErrorEmbed(
-              `your ${car.name} is on cooldown, select another with ${prefix}**sr join <car>**`
+              `your ${car.name} is on cooldown, select another with ${prefix}**sr join <car>**`,
             ),
           ],
         });
@@ -418,7 +421,7 @@ async function run(
       }).then((m) =>
         setTimeout(() => {
           m.delete();
-        }, 3000)
+        }, 3000),
       );
     } else {
       await message.react("✅");

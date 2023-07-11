@@ -22,12 +22,12 @@ const BASE_URL = "https://quickchart.io/chart/create";
 const cmd = new Command(
   "ecohistory",
   "view your metric data history in a graph",
-  "money"
+  "money",
 ).setAliases(["graph"]);
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -73,7 +73,7 @@ async function run(
     return send({
       embeds: [
         new ErrorEmbed(
-          "**$graph balance** graph your balance history\n**$graph networth** graph your networth history\n**$graph karma** graph your karma history\n**$graph item <item>** graph an item"
+          "**$graph balance** graph your balance history\n**$graph networth** graph your networth history\n**$graph karma** graph your karma history\n**$graph item <item>** graph an item",
         ),
       ],
     });
@@ -118,7 +118,7 @@ async function run(
   }
 
   const formatDataForUser = (
-    data: { date: Date; value: number | bigint; userId?: string }[]
+    data: { date: Date; value: number | bigint; userId?: string }[],
   ): ChartData => {
     if (data.length == 0) {
       return null;
@@ -171,7 +171,7 @@ async function run(
         orderBy: {
           date: "asc",
         },
-      })
+      }),
     );
 
     if (!data)
@@ -195,8 +195,8 @@ async function run(
       `cache:ecograph:${args[0]}:${message.author.id}`,
       Math.floor(
         (dayjs().add(1, "day").set("hour", 0).set("minutes", 0).toDate().getTime() - Date.now()) /
-          1000
-      )
+          1000,
+      ),
     );
 
     return res.url;

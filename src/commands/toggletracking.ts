@@ -8,7 +8,7 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 const cmd = new Command(
   "toggletracking",
   "toggle tracking your username and avatar changes",
-  "info"
+  "info",
 );
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
@@ -26,7 +26,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       embeds: [
         new CustomEmbed(
           message.member,
-          "✅ username and avatar tracking has been disabled"
+          "✅ username and avatar tracking has been disabled",
         ).setFooter({
           text: `use ${await getPrefix(message.guild)}(un/avh) -clear to clear your history`,
         }),

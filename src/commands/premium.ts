@@ -74,8 +74,8 @@ cmd.slashData
         option
           .setName("color")
           .setDescription("color you want to be used on all messages (hex format)")
-          .setRequired(true)
-      )
+          .setRequired(true),
+      ),
   )
   .addSubcommandGroup((mycmd) =>
     mycmd
@@ -87,15 +87,15 @@ cmd.slashData
           .setName("update")
           .setDescription("update your custom command")
           .addStringOption((option) =>
-            option.setName("trigger").setDescription("trigger for your command").setRequired(true)
+            option.setName("trigger").setDescription("trigger for your command").setRequired(true),
           )
           .addStringOption((option) =>
             option
               .setName("value")
               .setDescription("set the content for your custom command")
-              .setRequired(true)
-          )
-      )
+              .setRequired(true),
+          ),
+      ),
   )
   .addSubcommandGroup((aliases) =>
     aliases
@@ -111,15 +111,15 @@ cmd.slashData
               .setName("alias")
               .setDescription("alias for your command")
               .setRequired(true)
-              .setMaxLength(15)
+              .setMaxLength(15),
           )
           .addStringOption((option) =>
             option
               .setName("command")
               .setDescription("command you would like to run when doing your alias")
               .setRequired(true)
-              .setMaxLength(50)
-          )
+              .setMaxLength(50),
+          ),
       )
       .addSubcommand((del) =>
         del
@@ -130,14 +130,14 @@ cmd.slashData
               .setName("alias")
               .setDescription("alias for your command")
               .setRequired(true)
-              .setMaxLength(15)
-          )
-      )
+              .setMaxLength(15),
+          ),
+      ),
   );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -285,26 +285,26 @@ async function run(
     } else if (await isBooster(message.author.id)) {
       const embed = new CustomEmbed(
         message.member,
-        "you are currently boosting the nypsi server!! thank you, your booster rewards are seperate from premium, meaning that they can stack together.\n\nyou currently have no premium membership, this is what helps keep nypsi running. i (max) am massively grateful for any donations :heart:"
+        "you are currently boosting the nypsi server!! thank you, your booster rewards are seperate from premium, meaning that they can stack together.\n\nyou currently have no premium membership, this is what helps keep nypsi running. i (max) am massively grateful for any donations :heart:",
       );
 
       embed.addField(
         "payment methods",
         "[ko-fi](https://ko-fi.com/tekoh/tiers)\n\n" +
-          "if you'd like to pay another way (crypto, paypal, etc) join the [support server](https://discord.gg/hJTDNST)\nif you are just looking to buy crates, you can do so from the [nypsi shop](https://ko-fi.com/U7U4AEDXM/shop)"
+          "if you'd like to pay another way (crypto, paypal, etc) join the [support server](https://discord.gg/hJTDNST)\nif you are just looking to buy crates, you can do so from the [nypsi shop](https://ko-fi.com/U7U4AEDXM/shop)",
       );
 
       return send({ embeds: [embed] });
     } else {
       const embed = new CustomEmbed(
         message.member,
-        "you currently have no premium membership, this is what helps keep nypsi running. i (max) am massively grateful for any donations :heart:"
+        "you currently have no premium membership, this is what helps keep nypsi running. i (max) am massively grateful for any donations :heart:",
       );
 
       embed.addField(
         "payment methods",
         "[ko-fi](https://ko-fi.com/tekoh/tiers)\n\n" +
-          "if you'd like to pay another way (crypto, paypal, etc) join the [support server](https://discord.gg/hJTDNST)\nif you are just looking to buy crates, you can do so from the [nypsi shop](https://ko-fi.com/U7U4AEDXM/shop)"
+          "if you'd like to pay another way (crypto, paypal, etc) join the [support server](https://discord.gg/hJTDNST)\nif you are just looking to buy crates, you can do so from the [nypsi shop](https://ko-fi.com/U7U4AEDXM/shop)",
       );
 
       return send({ embeds: [embed] });
@@ -316,7 +316,7 @@ async function run(
       return send({
         embeds: [
           new ErrorEmbed(
-            "you must be a BRONZE tier patreon for this command\n\nhttps://www.patreon.com/nypsi"
+            "you must be a BRONZE tier patreon for this command\n\nhttps://www.patreon.com/nypsi",
           ),
         ],
       });
@@ -326,7 +326,7 @@ async function run(
       return send({
         embeds: [
           new ErrorEmbed(
-            "you must be atleast BRONZE tier for this command, you are BRONZE\n\nhttps://www.patreon.com/nypsi"
+            "you must be atleast BRONZE tier for this command, you are BRONZE\n\nhttps://www.patreon.com/nypsi",
           ),
         ],
       });
@@ -359,7 +359,7 @@ async function run(
       return send({
         embeds: [
           new ErrorEmbed(
-            "invalid color, please use a hex color ([color.tekoh.net](https://color.tekoh.net))"
+            "invalid color, please use a hex color ([color.tekoh.net](https://color.tekoh.net))",
           ),
         ],
       });
@@ -371,7 +371,7 @@ async function run(
       embeds: [
         new CustomEmbed(
           message.member,
-          `your message color has been updated to **${await getEmbedColor(message.author.id)}**`
+          `your message color has been updated to **${await getEmbedColor(message.author.id)}**`,
         ).setColor((await getEmbedColor(message.author.id)) as `#${string}`),
       ],
     });
@@ -408,7 +408,7 @@ async function run(
       return send({ embeds: [embed] });
     } else {
       const commandTrigger = cleanString(
-        message.options.getString("trigger").toLowerCase().normalize("NFD")
+        message.options.getString("trigger").toLowerCase().normalize("NFD"),
       ).trim();
       const commandContent = message.options.getString("value").normalize("NFD").trim();
 
@@ -455,7 +455,7 @@ async function run(
     if (args[1].toLowerCase() === "list") {
       if (aliases.length === 0) return send({ embeds: [new ErrorEmbed("you have no aliases")] });
       const pages = PageManager.createPages(
-        aliases.map((i) => `\`${i.alias}\` -> \`${i.command}\``)
+        aliases.map((i) => `\`${i.alias}\` -> \`${i.command}\``),
       );
 
       const embed = new CustomEmbed(message.member, pages.get(1).join("\n"));
@@ -470,7 +470,7 @@ async function run(
           .setLabel("back")
           .setStyle(ButtonStyle.Primary)
           .setDisabled(true),
-        new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
+        new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
       );
 
       const manager = new PageManager({
@@ -501,10 +501,10 @@ async function run(
       }
 
       const trigger = cleanString(
-        message.options.getString("alias").toLowerCase().normalize("NFD").split(" ")[0]
+        message.options.getString("alias").toLowerCase().normalize("NFD").split(" ")[0],
       );
       const command = cleanString(
-        message.options.getString("command").toLowerCase().normalize("NFD")
+        message.options.getString("command").toLowerCase().normalize("NFD"),
       );
 
       for (const word of commandFilter) {
@@ -522,7 +522,7 @@ async function run(
             new ErrorEmbed(
               `\`${
                 command.split(" ")[0]
-              }\` is not a command. use $help <alias> to find the actual command name`
+              }\` is not a command. use $help <alias> to find the actual command name`,
             ),
           ],
         });
@@ -601,7 +601,7 @@ async function run(
       return send({
         embeds: [
           new ErrorEmbed(
-            "this user does not have a profile, use $premium add dumbass check it before u update it"
+            "this user does not have a profile, use $premium add dumbass check it before u update it",
           ),
         ],
       });

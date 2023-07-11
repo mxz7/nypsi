@@ -30,7 +30,7 @@ export async function getDmSettings(member: GuildMember | string) {
 
   if (await redis.exists(`${Constants.redis.cache.user.DM_SETTINGS}:${id}`)) {
     return (await JSON.parse(
-      await redis.get(`${Constants.redis.cache.user.DM_SETTINGS}:${id}`)
+      await redis.get(`${Constants.redis.cache.user.DM_SETTINGS}:${id}`),
     )) as DMSettings;
   }
 
@@ -92,7 +92,7 @@ export async function getPreferences(member: GuildMember | string) {
 
   if (await redis.exists(`${Constants.redis.cache.user.PREFERENCES}:${id}`)) {
     return (await JSON.parse(
-      await redis.get(`${Constants.redis.cache.user.PREFERENCES}:${id}`)
+      await redis.get(`${Constants.redis.cache.user.PREFERENCES}:${id}`),
     )) as Preferences;
   }
 

@@ -19,15 +19,15 @@ const cmd = new Command("kick", "kick one or more users", "moderation")
 cmd.slashEnabled = true;
 cmd.slashData
   .addUserOption((option) =>
-    option.setName("user").setDescription("user to kick").setRequired(true)
+    option.setName("user").setDescription("user to kick").setRequired(true),
   )
   .addStringOption((option) =>
-    option.setName("reason").setDescription("reason for kick").setRequired(true)
+    option.setName("reason").setDescription("reason for kick").setRequired(true),
   );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -85,7 +85,7 @@ async function run(
         "**<>** required | **()** optional | **[]** parameter\n" +
           "**<user>** can tag user or use their usernames\n" +
           "**(reason)** reason for the kick, will be given to all kicked members\n" +
-          "**[-s]** if used, command message will be deleted and the output will be sent to moderator as a DM if possible"
+          "**[-s]** if used, command message will be deleted and the output will be sent to moderator as a DM if possible",
       );
 
     return send({ embeds: [embed] });
@@ -145,7 +145,7 @@ async function run(
     "kick",
     target.user.id,
     message.author.username,
-    reason.split(": ")[1]
+    reason.split(": ")[1],
   );
 
   if (args.join(" ").includes("-s")) return;

@@ -13,7 +13,7 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 const cmd = new Command(
   "addemoji",
   "add an emoji from a different server to your server",
-  "utility"
+  "utility",
 )
   .setPermissions(["MANAGE_EMOJIS"])
   .setAliases(["stealemoji"]);
@@ -23,12 +23,12 @@ cmd.slashData.addStringOption((option) =>
   option
     .setName("emoji")
     .setDescription("emoji from another server or url to an image")
-    .setRequired(true)
+    .setRequired(true),
 );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {

@@ -84,7 +84,7 @@ module.exports = new ItemUse(
       message.member,
       "radio",
       inventory.find((i) => i.item == "radio").amount - 1,
-      false
+      false,
     );
 
     const msg = await send({
@@ -98,11 +98,11 @@ module.exports = new ItemUse(
         embeds: [
           new CustomEmbed(
             message.member,
-            `putting report out on police scanner...\n\nthe police are now looking for **${radioTarget.user.username}**`
+            `putting report out on police scanner...\n\nthe police are now looking for **${radioTarget.user.username}**`,
           ),
         ],
       },
-      msg
+      msg,
     );
-  }
+  },
 );

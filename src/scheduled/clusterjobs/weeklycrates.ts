@@ -66,7 +66,7 @@ async function doCrates(client: NypsiClient) {
               ? getItems()[key].plural
               : getItems()[key].name
             : getItems()[key].name
-        }`
+        }`,
       );
     }
 

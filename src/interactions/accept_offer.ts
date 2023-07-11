@@ -29,7 +29,7 @@ export default {
       return interaction.reply({
         embeds: [
           new CustomEmbed(null, "please wait until your offer has been processed").setColor(
-            Constants.TRANSPARENT_EMBED_COLOR
+            Constants.TRANSPARENT_EMBED_COLOR,
           ),
         ],
         ephemeral: true,
@@ -87,7 +87,7 @@ export default {
       interaction.user.id,
       offer.itemId,
       inventory.find((i) => i.item === offer.itemId).amount - Number(offer.itemAmount),
-      false
+      false,
     );
 
     const tax = await getTax();
@@ -99,7 +99,7 @@ export default {
     await addToNypsiBank(taxedAmount);
     await updateBalance(
       interaction.user.id,
-      (await getBalance(interaction.user.id)) + (Number(offer.money) - taxedAmount)
+      (await getBalance(interaction.user.id)) + (Number(offer.money) - taxedAmount),
     );
     await addInventoryItem(offer.ownerId, offer.itemId, Number(offer.itemAmount));
 
@@ -125,7 +125,7 @@ export default {
             null,
             `you paid $${offer.money.toLocaleString()} for **${offer.itemAmount.toLocaleString()}x** ${
               getItems()[offer.itemId].emoji
-            } **${getItems()[offer.itemId].name}**`
+            } **${getItems()[offer.itemId].name}**`,
           ).setColor(Constants.EMBED_SUCCESS_COLOR),
         },
       });
@@ -144,12 +144,12 @@ export default {
     transaction(
       interaction.user,
       await interaction.client.users.fetch(offer.ownerId),
-      `${offer.itemAmount}x ${offer.itemId}`
+      `${offer.itemAmount}x ${offer.itemId}`,
     );
     transaction(
       await interaction.client.users.fetch(offer.ownerId),
       interaction.user,
-      `$${offer.money.toLocaleString()}`
+      `$${offer.money.toLocaleString()}`,
     );
   },
 } as InteractionHandler;

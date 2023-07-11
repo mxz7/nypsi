@@ -74,7 +74,7 @@ module.exports = new ItemUse(
       await setInventoryItem(
         message.member,
         "silver_credit",
-        inventory.find((i) => i.item === "silver_credit").amount - 1
+        inventory.find((i) => i.item === "silver_credit").amount - 1,
       );
 
       return send({
@@ -82,8 +82,8 @@ module.exports = new ItemUse(
           new CustomEmbed(
             message.member,
             `your silver membership will now expire <t:${Math.floor(
-              profile.expireDate.getTime() / 1000
-            )}:R>`
+              profile.expireDate.getTime() / 1000,
+            )}:R>`,
           ),
         ],
       });
@@ -92,20 +92,20 @@ module.exports = new ItemUse(
       await setExpireDate(
         message.author.id,
         dayjs().add(7, "day").toDate(),
-        message.client as NypsiClient
+        message.client as NypsiClient,
       );
       const inventory = await getInventory(message.member, false);
       await setInventoryItem(
         message.member,
         "silver_credit",
-        inventory.find((i) => i.item === "silver_credit").amount - 1
+        inventory.find((i) => i.item === "silver_credit").amount - 1,
       );
 
       return send({
         embeds: [
           new CustomEmbed(
             message.member,
-            `your **silver** membership will expire <t:${dayjs().add(7, "day").unix()}:R>`
+            `your **silver** membership will expire <t:${dayjs().add(7, "day").unix()}:R>`,
           ),
         ],
       });
@@ -114,12 +114,15 @@ module.exports = new ItemUse(
         embeds: [
           new CustomEmbed(
             message.member,
-            "doing this will overwrite your current tier and you will not get the remaining time back. do you still want to continue?"
+            "doing this will overwrite your current tier and you will not get the remaining time back. do you still want to continue?",
           ),
         ],
         components: [
           new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-            new ButtonBuilder().setCustomId("con").setLabel("continue").setStyle(ButtonStyle.Danger)
+            new ButtonBuilder()
+              .setCustomId("con")
+              .setLabel("continue")
+              .setStyle(ButtonStyle.Danger),
           ),
         ],
       });
@@ -143,24 +146,24 @@ module.exports = new ItemUse(
       await setInventoryItem(
         message.member,
         "silver_credit",
-        inventory.find((i) => i.item === "silver_credit").amount - 1
+        inventory.find((i) => i.item === "silver_credit").amount - 1,
       );
 
       await setTier(message.author.id, SILVER_TIER, message.client as NypsiClient);
       await setExpireDate(
         message.author.id,
         dayjs().add(7, "day").toDate(),
-        message.client as NypsiClient
+        message.client as NypsiClient,
       );
 
       return send({
         embeds: [
           new CustomEmbed(
             message.member,
-            `your **silver** membership will expire <t:${dayjs().add(7, "day").unix()}:R>`
+            `your **silver** membership will expire <t:${dayjs().add(7, "day").unix()}:R>`,
           ),
         ],
       });
     }
-  }
+  },
 );

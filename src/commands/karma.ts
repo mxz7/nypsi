@@ -11,17 +11,17 @@ import { getKarma } from "../utils/functions/karma/karma";
 import { getMember } from "../utils/functions/member";
 
 const cmd = new Command("karma", "check how much karma you have", "info").setDocs(
-  "https://docs.nypsi.xyz/economy/karma"
+  "https://docs.nypsi.xyz/economy/karma",
 );
 
 cmd.slashEnabled = true;
 cmd.slashData.addUserOption((option) =>
-  option.setName("user").setDescription("user to get karma of")
+  option.setName("user").setDescription("user to get karma of"),
 );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   let target = message.member;
 

@@ -43,18 +43,18 @@ cmd.slashData
           .setName("reaction-role")
           .setDescription("reaction role to effect")
           .setRequired(true)
-          .setAutocomplete(true)
+          .setAutocomplete(true),
       )
       .addRoleOption((option) =>
-        option.setName("role").setDescription("role to add").setRequired(true)
+        option.setName("role").setDescription("role to add").setRequired(true),
       )
       .addStringOption((option) =>
         option
           .setName("label")
           .setDescription("either an emoji or some text")
           .setRequired(true)
-          .setMaxLength(80)
-      )
+          .setMaxLength(80),
+      ),
   )
   .addSubcommand((update) =>
     update
@@ -65,7 +65,7 @@ cmd.slashData
           .setName("reaction-role")
           .setDescription("reaction role to effect")
           .setRequired(true)
-          .setAutocomplete(true)
+          .setAutocomplete(true),
       )
       .addStringOption((option) =>
         option
@@ -75,13 +75,13 @@ cmd.slashData
             { name: "mode", value: "mode" },
             { name: "title", value: "title" },
             { name: "description", value: "description" },
-            { name: "color", value: "color" }
+            { name: "color", value: "color" },
           )
-          .setRequired(true)
+          .setRequired(true),
       )
       .addStringOption((option) =>
-        option.setName("value").setDescription("new value").setRequired(true)
-      )
+        option.setName("value").setDescription("new value").setRequired(true),
+      ),
   )
   .addSubcommand((send) =>
     send
@@ -92,8 +92,8 @@ cmd.slashData
           .setName("reaction-role")
           .setDescription("reaction role to effect")
           .setRequired(true)
-          .setAutocomplete(true)
-      )
+          .setAutocomplete(true),
+      ),
   )
   .addSubcommand((del) =>
     del
@@ -104,8 +104,8 @@ cmd.slashData
           .setName("reaction-role")
           .setDescription("reaction role to effect")
           .setRequired(true)
-          .setAutocomplete(true)
-      )
+          .setAutocomplete(true),
+      ),
   )
   .addSubcommand((removerole) =>
     removerole
@@ -116,11 +116,11 @@ cmd.slashData
           .setName("reaction-role")
           .setDescription("reaction role to effect")
           .setRequired(true)
-          .setAutocomplete(true)
+          .setAutocomplete(true),
       )
       .addRoleOption((option) =>
-        option.setName("role").setDescription("role to remove").setRequired(true)
-      )
+        option.setName("role").setDescription("role to remove").setRequired(true),
+      ),
   )
   .addSubcommandGroup((whitelist) =>
     whitelist
@@ -135,11 +135,11 @@ cmd.slashData
               .setName("reaction-role")
               .setDescription("reaction role to effect")
               .setRequired(true)
-              .setAutocomplete(true)
+              .setAutocomplete(true),
           )
           .addRoleOption((option) =>
-            option.setName("role").setDescription("role to add to the whitelist").setRequired(true)
-          )
+            option.setName("role").setDescription("role to add to the whitelist").setRequired(true),
+          ),
       )
       .addSubcommand((remove) =>
         remove
@@ -150,14 +150,14 @@ cmd.slashData
               .setName("reaction-role")
               .setDescription("reaction role to effect")
               .setRequired(true)
-              .setAutocomplete(true)
+              .setAutocomplete(true),
           )
           .addRoleOption((option) =>
             option
               .setName("role")
               .setDescription("role to remove from the whitelist")
-              .setRequired(true)
-          )
+              .setRequired(true),
+          ),
       )
       .addSubcommand((list) =>
         list
@@ -168,14 +168,14 @@ cmd.slashData
               .setName("reaction-role")
               .setDescription("reaction role to effect")
               .setRequired(true)
-              .setAutocomplete(true)
-          )
-      )
+              .setAutocomplete(true),
+          ),
+      ),
   );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -218,7 +218,7 @@ async function run(
   const listReactionRoles = async () => {
     const embed = new CustomEmbed(message.member).setHeader(
       "reaction roles",
-      message.author.avatarURL()
+      message.author.avatarURL(),
     );
     const reactionRoles = await getReactionRolesByGuild(message.guild);
 
@@ -253,7 +253,7 @@ async function run(
         embeds: [
           new CustomEmbed(
             message.member,
-            "what would you like the title to be? \n\nuse 'blank' for none\nuse 'cancel' to stop creating a reaction role"
+            "what would you like the title to be? \n\nuse 'blank' for none\nuse 'cancel' to stop creating a reaction role",
           ),
         ],
       });
@@ -262,7 +262,7 @@ async function run(
         embeds: [
           new CustomEmbed(
             message.member,
-            "what would you like the title to be? \n\nuse 'blank' for none\nuse 'cancel' to stop creating a reaction role"
+            "what would you like the title to be? \n\nuse 'blank' for none\nuse 'cancel' to stop creating a reaction role",
           ),
         ],
       });
@@ -302,7 +302,7 @@ async function run(
       embeds: [
         new CustomEmbed(
           message.member,
-          "what would you like the description of the message to be? max length: 1000 characters"
+          "what would you like the description of the message to be? max length: 1000 characters",
         ),
       ],
     });
@@ -337,7 +337,7 @@ async function run(
       embeds: [
         new CustomEmbed(
           message.member,
-          "what channel would you like to send the message to? please tag the message using #channel"
+          "what channel would you like to send the message to? please tag the message using #channel",
         ),
       ],
     });
@@ -384,7 +384,7 @@ async function run(
       return message.channel.send({
         embeds: [
           new ErrorEmbed(
-            "error occured creating reaction role. does nypsi have permission to send messages in the channel?"
+            "error occured creating reaction role. does nypsi have permission to send messages in the channel?",
           ),
         ],
       });
@@ -393,18 +393,18 @@ async function run(
       embeds: [
         new CustomEmbed(
           message.member,
-          "✅ reaction role created\n\nuse **/reactionroles addrole** to add roles to the reaction role"
+          "✅ reaction role created\n\nuse **/reactionroles addrole** to add roles to the reaction role",
         ),
       ],
     });
   };
 
   const displayReactionRole = async (
-    reactionRole: ReactionRole & { roles: ReactionRoleRoles[] }
+    reactionRole: ReactionRole & { roles: ReactionRoleRoles[] },
   ) => {
     const embed = new CustomEmbed(message.member).setHeader(
       "reaction roles",
-      message.author.avatarURL()
+      message.author.avatarURL(),
     );
 
     const fieldDesc: string[] = [
@@ -440,7 +440,7 @@ async function run(
             "**/reactionroles removerole <message id> <role>** *remove a role from a reaction role*\n" +
             "**/reactionroles whilist add <message id> <role id>** *only allow members of this role to access*\n" +
             "**/reactionroles whitelist remove <message id> <role id>** *unwhitelist a role*\n" +
-            "**/reactionroles whitelist list <message id>** *list all whitelisted roles*"
+            "**/reactionroles whitelist list <message id>** *list all whitelisted roles*",
         ).setHeader("reaction roles", message.author.avatarURL()),
       ],
     });
@@ -457,7 +457,7 @@ async function run(
       return send({
         embeds: [
           new ErrorEmbed(
-            `you have reached the max amount of reaction roles in this server (${max})`
+            `you have reached the max amount of reaction roles in this server (${max})`,
           ),
         ],
       });
@@ -489,7 +489,7 @@ async function run(
       return send({
         embeds: [
           new ErrorEmbed(
-            `couldn't find the role '${args[2]}', use the role id or mention the role`
+            `couldn't find the role '${args[2]}', use the role id or mention the role`,
           ),
         ],
       });
@@ -566,7 +566,7 @@ async function run(
       return send({
         embeds: [
           new ErrorEmbed(
-            `couldn't find the role '${args[2]}', use the role id or mention the role`
+            `couldn't find the role '${args[2]}', use the role id or mention the role`,
           ),
         ],
       });
@@ -596,7 +596,7 @@ async function run(
       await setReactionRoleMode(
         message.guild.id,
         args[1],
-        args[3].toUpperCase() as ReactionRoleMode
+        args[3].toUpperCase() as ReactionRoleMode,
       );
 
       return send({ embeds: [new CustomEmbed(message.member, "✅ updated mode")] });
@@ -627,7 +627,7 @@ async function run(
         embeds: [
           new CustomEmbed(
             message.member,
-            "✅ updated description. you will have to resend the mesage"
+            "✅ updated description. you will have to resend the mesage",
           ),
         ],
       });
@@ -664,7 +664,7 @@ async function run(
         return send({
           embeds: [
             new ErrorEmbed(
-              `couldn't find the role '${args[3]}', use the role id or mention the role`
+              `couldn't find the role '${args[3]}', use the role id or mention the role`,
             ),
           ],
         });
@@ -677,7 +677,7 @@ async function run(
       await setReactionRoleWhitelist(
         message.guild.id,
         reactionRole.messageId,
-        reactionRole.whitelist
+        reactionRole.whitelist,
       );
 
       return send({
@@ -694,7 +694,7 @@ async function run(
         return send({
           embeds: [
             new ErrorEmbed(
-              `couldn't find the role '${args[3]}', use the role id or mention the role`
+              `couldn't find the role '${args[3]}', use the role id or mention the role`,
             ),
           ],
         });
@@ -707,7 +707,7 @@ async function run(
       await setReactionRoleWhitelist(
         message.guild.id,
         reactionRole.messageId,
-        reactionRole.whitelist
+        reactionRole.whitelist,
       );
 
       return send({
@@ -732,7 +732,7 @@ async function run(
               await setReactionRoleWhitelist(
                 message.guild.id,
                 reactionRole.messageId,
-                reactionRole.whitelist
+                reactionRole.whitelist,
               );
               run(message, args);
               return;

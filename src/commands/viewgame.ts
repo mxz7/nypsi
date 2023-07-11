@@ -23,12 +23,12 @@ import dayjs = require("dayjs");
 const cmd = new Command(
   "viewgame",
   "view information about a completed gambling game",
-  "info"
+  "info",
 ).setAliases(["game", "id"]);
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -71,7 +71,7 @@ async function run(
       embeds: [
         new CustomEmbed(
           message.member,
-          "$viewgame <id> - view information about a game\n$viewgame search (game) (MM/DD/YYYY) (userid) (win) - use **null** to have any value"
+          "$viewgame <id> - view information about a game\n$viewgame search (game) (MM/DD/YYYY) (userid) (win) - use **null** to have any value",
         ),
       ],
     });
@@ -161,7 +161,7 @@ async function run(
 
         return out;
       }),
-      1
+      1,
     );
 
     embed.setDescription(pages.get(1)[0]);
@@ -172,7 +172,7 @@ async function run(
         .setLabel("back")
         .setStyle(ButtonStyle.Primary)
         .setDisabled(true),
-      new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
+      new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
     );
 
     await writeFile(
@@ -194,8 +194,8 @@ async function run(
           };
         }),
         null,
-        2
-      )
+        2,
+      ),
     );
 
     const msg = await message.channel.send({
@@ -228,7 +228,7 @@ async function run(
     const embed = new CustomEmbed(message.member).setHeader(
       username ? `${username}'s ${game.game} game` : `id: ${game.id.toString(36)}`,
       message.author.avatarURL(),
-      `https://nypsi.xyz/game/${game.id.toString(36)}`
+      `https://nypsi.xyz/game/${game.id.toString(36)}`,
     );
 
     let components: ActionRowBuilder<MessageActionRowComponentBuilder>[];
@@ -243,7 +243,7 @@ async function run(
 
     if (game.outcome.startsWith("mines:")) {
       components = JSON.parse(
-        game.outcome.slice(6, game.outcome.length)
+        game.outcome.slice(6, game.outcome.length),
       ) as ActionRowBuilder<MessageActionRowComponentBuilder>[];
 
       components[components.length - 1].components.length = 4;

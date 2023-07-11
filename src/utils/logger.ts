@@ -233,7 +233,7 @@ class ConsoleTransport implements Transport {
     }
 
     return `${chalk.blackBright.italic(dayjs(data.date).format("MM-DD HH:mm:ss"))} ${labelColor(
-      data.label.toUpperCase()
+      data.label.toUpperCase(),
     )}: ${data.message}${jsonData ? `\n  ${jsonData}` : ""}`;
   }
 }
@@ -298,12 +298,12 @@ const formatter = (data: WriteData) => {
       jsonData
         .substring(1, jsonData.length - 1)
         .trim()
-        .replaceAll("\\n", "\n")
+        .replaceAll("\\n", "\n"),
     );
   }
 
   return `${chalk.blackBright.italic(dayjs(data.date).format("MM-DD HH:mm:ss.SSS"))} ${labelColor(
-    data.label.toUpperCase()
+    data.label.toUpperCase(),
   )}${
     typeof data.meta["cluster"] != "undefined" ? ` (${data.meta["cluster"]})` : ""
   }: ${messageColor(data.message)}${jsonData ? `\n  ${jsonData}` : ""}`;
@@ -314,20 +314,20 @@ logger.addTransport(
     path: "./out/combined.log",
     levels: ["debug", "info", "warn", "error"],
     rotateAfterBytes: 10e6,
-  })
+  }),
 );
 logger.addTransport(
   new FileTransport({
     path: "./out/combined.log",
     levels: ["warn", "error"],
     rotateAfterBytes: 10e6,
-  })
+  }),
 );
 logger.addTransport(
   new ConsoleTransport({
     levels: ["debug", "info", "warn", "error"],
     formatter,
-  })
+  }),
 );
 logger.addTransport(
   new DiscordTransport({
@@ -342,7 +342,7 @@ logger.addTransport(
       ["debug", variants.mocha.pink.hex as `#${string}`],
       ["info", variants.mocha.sky.hex as `#${string}`],
     ]),
-  })
+  }),
 );
 
 const webhook = new Map<string, string>();
@@ -356,13 +356,13 @@ export function transaction(from: User, to: User, value: string) {
   if (!nextLogMsg.get("pay")) {
     nextLogMsg.set(
       "pay",
-      `**${from.username}** (${from.id}) -> **${to.username}** (${to.id})\n- **${value}**\n`
+      `**${from.username}** (${from.id}) -> **${to.username}** (${to.id})\n- **${value}**\n`,
     );
   } else {
     nextLogMsg.set(
       "pay",
       nextLogMsg.get("pay") +
-        `**${from.username}** (${from.id}) -> **${to.username}** (${to.id})\n- **${value}**\n`
+        `**${from.username}** (${from.id}) -> **${to.username}** (${to.id})\n- **${value}**\n`,
     );
   }
 }
@@ -373,7 +373,7 @@ export function gamble(
   amount: number,
   win: boolean,
   id: string,
-  winAmount?: number
+  winAmount?: number,
 ) {
   if (!nextLogMsg.get("gamble")) {
     nextLogMsg.set(
@@ -383,7 +383,7 @@ export function gamble(
         `- **bet** $${amount.toLocaleString()}\n` +
         `- **win** ${win}${win ? ` ($**${winAmount.toLocaleString()}**)` : ""}\n` +
         `- **id** ${id}\n` +
-        `- **time** <t:${Math.floor(Date.now() / 1000)}>\n`
+        `- **time** <t:${Math.floor(Date.now() / 1000)}>\n`,
     );
   } else {
     nextLogMsg.set(
@@ -394,7 +394,7 @@ export function gamble(
         `- **bet** $${amount.toLocaleString()}\n` +
         `- **win** ${win}${win ? ` ($**${winAmount.toLocaleString()}**)` : ""}\n` +
         `- **id** ${id}\n` +
-        `- **time** <t:${Math.floor(Date.now() / 1000)}>\n`
+        `- **time** <t:${Math.floor(Date.now() / 1000)}>\n`,
     );
   }
 }

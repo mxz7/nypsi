@@ -34,7 +34,7 @@ export function runCountdowns(client: NypsiClient) {
         },
         {
           context: { channelId: countdown.channel },
-        }
+        },
       );
 
       let shard: number;
@@ -99,7 +99,7 @@ export function runCountdowns(client: NypsiClient) {
             channelId: countdown.channel,
             embed: embed.toJSON(),
           },
-        }
+        },
       );
 
       if (res.includes(true)) {
@@ -161,7 +161,7 @@ export async function addCountdown(
   date: Date | number,
   format: string,
   finalFormat: string,
-  channel: string
+  channel: string,
 ) {
   const countdowns = await getCountdowns(guild);
 

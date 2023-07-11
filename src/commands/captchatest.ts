@@ -8,7 +8,7 @@ const cmd = new Command("captchatest", "test an account", "none");
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if ((await getAdminLevel(message.author.id)) < 1) return;
 

@@ -71,7 +71,7 @@ export async function getBakeryUpgrades(member: GuildMember | string) {
 
   if (await redis.exists(`${Constants.redis.cache.economy.BAKERY_UPGRADES}:${id}`)) {
     return JSON.parse(
-      await redis.get(`${Constants.redis.cache.economy.BAKERY_UPGRADES}:${id}`)
+      await redis.get(`${Constants.redis.cache.economy.BAKERY_UPGRADES}:${id}`),
     ) as BakeryUpgrade[];
   }
 
@@ -84,7 +84,7 @@ export async function getBakeryUpgrades(member: GuildMember | string) {
   await redis.set(`${Constants.redis.cache.economy.BAKERY_UPGRADES}:${id}`, JSON.stringify(query));
   await redis.expire(
     `${Constants.redis.cache.economy.BAKERY_UPGRADES}:${id}`,
-    Math.floor(ms("1 hour") / 1000)
+    Math.floor(ms("1 hour") / 1000),
   );
 
   return query;
@@ -98,7 +98,7 @@ async function getMaxAfkHours(member: GuildMember | string) {
   }
 
   const upgrades = await getBakeryUpgrades(member).then((u) =>
-    u.filter((i) => getBakeryUpgradesData()[i.upgradeId].upgrades === "maxafk")
+    u.filter((i) => getBakeryUpgradesData()[i.upgradeId].upgrades === "maxafk"),
   );
 
   for (const upgrade of upgrades) {
@@ -141,7 +141,7 @@ export async function runBakery(member: GuildMember) {
   for (const upgrade of upgrades) {
     if (getBakeryUpgradesData()[upgrade.upgradeId].upgrades === "hourly") {
       const amount = Math.round(
-        upgrade.amount * getBakeryUpgradesData()[upgrade.upgradeId].value * diffHours
+        upgrade.amount * getBakeryUpgradesData()[upgrade.upgradeId].value * diffHours,
       );
 
       passive += amount;
@@ -195,7 +195,7 @@ export async function runBakery(member: GuildMember) {
 
   const embed = new CustomEmbed(member).setHeader(
     `${member.user.username}'s bakery`,
-    member.user.avatarURL()
+    member.user.avatarURL(),
   );
 
   const earnedIds = Array.from(earned.keys());
@@ -208,7 +208,7 @@ export async function runBakery(member: GuildMember) {
         getBakeryUpgradesData()[upgradeId].name
       } baked ${earned.get(upgradeId).toLocaleString()} cookie${
         earned.get(upgradeId) > 1 ? "s" : ""
-      }`
+      }`,
     );
   }
 
@@ -218,13 +218,13 @@ export async function runBakery(member: GuildMember) {
         chosenAmount + passive > 1 ? "s" : ""
       } 🍪 and **${cakeAmount.toLocaleString()}** cake${cakeAmount > 1 ? "s" : ""} ${
         getItems()["cake"].emoji
-      } !!`
+      } !!`,
     );
   } else {
     embed.setDescription(
       `you baked **${(chosenAmount + passive).toLocaleString()}** cookie${
         chosenAmount + passive > 1 ? "s" : ""
-      } 🍪 !!`
+      } 🍪 !!`,
     );
   }
 

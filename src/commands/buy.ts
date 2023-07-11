@@ -21,13 +21,13 @@ cmd.slashData
       .setName("item-buy")
       .setRequired(true)
       .setAutocomplete(true)
-      .setDescription("item you want to buy")
+      .setDescription("item you want to buy"),
   )
   .addStringOption((option) => option.setName("amount").setDescription("amount you want to buy"));
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (!(await userExists(message.member))) await createUser(message.member);
 
@@ -73,8 +73,8 @@ async function run(
         new CustomEmbed(
           message.member,
           `buy items from ${await getPrefix(
-            message.guild
-          )}shop by using the item id or item name without spaces`
+            message.guild,
+          )}shop by using the item id or item name without spaces`,
         ),
       ],
     });
@@ -143,7 +143,7 @@ async function run(
         message.member,
         `you have bought **${amount.toLocaleString()}** ${selected.emoji} ${selected.name} for $${(
           selected.buy * amount
-        ).toLocaleString()}`
+        ).toLocaleString()}`,
       ),
     ],
   });

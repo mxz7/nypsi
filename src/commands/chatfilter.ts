@@ -20,7 +20,7 @@ const cmd = new Command("chatfilter", "change the chat filter for your server", 
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
     if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
@@ -56,7 +56,7 @@ async function run(
         .setLabel("back")
         .setStyle(ButtonStyle.Primary)
         .setDisabled(true),
-      new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
+      new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
     );
 
     const msg = await message.channel.send({ embeds: [embed], components: [row] });
@@ -76,7 +76,7 @@ async function run(
     const embed = new CustomEmbed(message.member).setHeader("chat filter help");
 
     embed.setDescription(
-      `${prefix}**filter add/+ <word>** *add a word to the chat filter*\n${prefix}**filter del/- <word>** *remove a word from the chat filter*\n${prefix}**filter reset** *reset the chat filter*\n${prefix}**filter match <percentage>** *percentage match required to delete message*`
+      `${prefix}**filter add/+ <word>** *add a word to the chat filter*\n${prefix}**filter del/- <word>** *remove a word from the chat filter*\n${prefix}**filter reset** *reset the chat filter*\n${prefix}**filter match <percentage>** *percentage match required to delete message*`,
     );
 
     return message.channel.send({ embeds: [embed] });
@@ -90,7 +90,7 @@ async function run(
 
       embed.setDescription(
         `current: \`${current}%\` match required\nuse ${prefix}**filter match <percent>** to change this.\n\n` +
-          "the percentage match setting allows nypsi to calculate a percentage difference from words in a user's message and with words in the filter, if a word has a high enough match rate, that can be deleted. set this to 100 for exact matches only"
+          "the percentage match setting allows nypsi to calculate a percentage difference from words in a user's message and with words in the filter, if a word has a high enough match rate, that can be deleted. set this to 100 for exact matches only",
       );
 
       return message.channel.send({ embeds: [embed] });
@@ -122,7 +122,7 @@ async function run(
       return message.channel.send({
         embeds: [
           new ErrorEmbed(
-            `${prefix}filter add/+ <word> | cAsInG doesn't matter, it'll be filtered either way`
+            `${prefix}filter add/+ <word> | cAsInG doesn't matter, it'll be filtered either way`,
           ),
         ],
       });
@@ -137,7 +137,7 @@ async function run(
     if (filter.indexOf(word) > -1) {
       const embed = new CustomEmbed(
         message.member,
-        "❌ `" + word + "` already exists in the filter"
+        "❌ `" + word + "` already exists in the filter",
       )
         .setHeader("chat filter")
         .setFooter({ text: `you can use ${prefix}filter to view the filter` });
@@ -152,7 +152,7 @@ async function run(
 
       const embed = new CustomEmbed(
         message.member,
-        `❌ filter has exceeded the maximum size - please use *${prefix}filter del/-* or *${prefix}filter reset*`
+        `❌ filter has exceeded the maximum size - please use *${prefix}filter del/-* or *${prefix}filter reset*`,
       ).setHeader("chat filter");
 
       return message.channel.send({ embeds: [embed] });
@@ -162,7 +162,7 @@ async function run(
 
     const embed = new CustomEmbed(
       message.member,
-      "✅ added `" + word + "` to the filter"
+      "✅ added `" + word + "` to the filter",
     ).setHeader("chat filter");
     return message.channel.send({ embeds: [embed] });
   }
@@ -199,7 +199,7 @@ async function run(
     await updateChatFilter(message.guild, filter);
 
     const embed = new CustomEmbed(message.member, "✅ filter has been reset").setHeader(
-      "chat filter"
+      "chat filter",
     );
 
     return message.channel.send({ embeds: [embed] });

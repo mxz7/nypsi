@@ -17,7 +17,7 @@ const cmd = new Command("kicksince", "kick members that joined after a certain t
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (!message.member.permissions.has(PermissionFlagsBits.Administrator)) {
     if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
@@ -46,12 +46,12 @@ async function run(
         "help",
         "**<>** required | **()** optional | **[]** parameter\n" +
           "**<length>** the amount of time to traceback to before kicking\n" +
-          "**(reason)** reason for the kick, will be given to all kicked members\n"
+          "**(reason)** reason for the kick, will be given to all kicked members\n",
       )
       .addField("examples", `${prefix}kicksince 1h bots`)
       .addField(
         "time format examples",
-        "**1d** *1 day*\n**10h** *10 hours*\n**15m** *15 minutes*\n**30s** *30 seconds*"
+        "**1d** *1 day*\n**10h** *10 hours*\n**15m** *15 minutes*\n**30s** *30 seconds*",
       );
 
     return message.channel.send({ embeds: [embed] });
@@ -76,7 +76,7 @@ async function run(
       embeds: [
         new CustomEmbed(
           message.member,
-          `this will kick **${members.size.toLocaleString()}** members, are you sure?`
+          `this will kick **${members.size.toLocaleString()}** members, are you sure?`,
         ),
       ],
     });
@@ -110,7 +110,7 @@ async function run(
   if (members.size >= 15) {
     status = new CustomEmbed(
       message.member,
-      statusDesc + "\n\n- if you'd like to cancel this operation, delete this message"
+      statusDesc + "\n\n- if you'd like to cancel this operation, delete this message",
     );
   }
 
@@ -163,7 +163,7 @@ async function run(
           failed.length != 0 ? `\n- **${failed.length}** failed` : ""
         }`;
         status.setDescription(
-          statusDesc + "\n\n- if you'd like to cancel this operation, delete this message"
+          statusDesc + "\n\n- if you'd like to cancel this operation, delete this message",
         );
         let fail = false;
         await msg.edit({ embeds: [status] }).catch(() => {
@@ -205,7 +205,7 @@ async function run(
       embed.setDescription("✅ `" + members.first().user.username + "` has been kicked");
     } else {
       embed.setDescription(
-        "✅ `" + members.first().user.username + "` has been kicked for: " + reason.split(": ")[1]
+        "✅ `" + members.first().user.username + "` has been kicked for: " + reason.split(": ")[1],
       );
     }
   }

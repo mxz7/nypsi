@@ -89,11 +89,11 @@ module.exports = new ItemUse(
             embeds: [
               new CustomEmbed(
                 message.member,
-                "picking *chastity cage*...\n\nyou are no longer equipped with a *chastity cage*"
+                "picking *chastity cage*...\n\nyou are no longer equipped with a *chastity cage*",
               ),
             ],
           },
-          msg
+          msg,
         );
       }
       return send({ embeds: [new ErrorEmbed("invalid user")] });
@@ -112,7 +112,7 @@ module.exports = new ItemUse(
         message.member,
         "lock_pick",
         inventory.find((i) => i.item == "lock_pick").amount - 1,
-        false
+        false,
       ),
       setPadlock(lockPickTarget, false),
     ]);
@@ -127,7 +127,7 @@ module.exports = new ItemUse(
         "** has picked your padlock in **" +
         message.guild.name +
         "**\n" +
-        "your money is no longer protected by a padlock"
+        "your money is no longer protected by a padlock",
     );
 
     if ((await getDmSettings(lockPickTarget)).rob) {
@@ -147,11 +147,11 @@ module.exports = new ItemUse(
         embeds: [
           new CustomEmbed(
             message.member,
-            `picking **${lockPickTarget.user.username}'**s padlock...\n\nyou have successfully picked their padlock`
+            `picking **${lockPickTarget.user.username}'**s padlock...\n\nyou have successfully picked their padlock`,
           ),
         ],
       },
-      msg
+      msg,
     );
-  }
+  },
 );

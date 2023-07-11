@@ -17,12 +17,12 @@ const cmd = new Command("love", "calculate your love with another person", "fun"
 
 cmd.slashEnabled = true;
 cmd.slashData.addUserOption((option) =>
-  option.setName("user").setDescription("is this person your one true love?!")
+  option.setName("user").setDescription("is this person your one true love?!"),
 );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -201,7 +201,7 @@ async function run(
 
   const embed = new CustomEmbed(
     message.member,
-    `${target1.user.username} **x** ${target2.user.username}\n\n${loveBar}\n**${lovePercent}**% **-** ${loveLevel} ${loveEmoji}`
+    `${target1.user.username} **x** ${target2.user.username}\n\n${loveBar}\n**${lovePercent}**% **-** ${loveLevel} ${loveEmoji}`,
   );
 
   send({ embeds: [embed] });

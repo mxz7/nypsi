@@ -28,7 +28,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const notValidForYou = () => {
     const embed = new CustomEmbed(
       message.member,
-      `${prefix}weekly is for SILVER tier and higher`
+      `${prefix}weekly is for SILVER tier and higher`,
     ).setFooter({
       text: `${prefix}patreon`,
     });
@@ -62,7 +62,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         description = `$${(
           await getBalance(message.member)
         ).toLocaleString()}\n + $**${amount.toLocaleString()}** (+**${Math.floor(
-          multi * 100
+          multi * 100,
         ).toLocaleString()}**% bonus)`;
       }
 
@@ -73,7 +73,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return message.channel.send({ embeds: [embed] }).then((msg) => {
         setTimeout(async () => {
           embed.setDescription(
-            `new balance: $**${(await getBalance(message.member)).toLocaleString()}**`
+            `new balance: $**${(await getBalance(message.member)).toLocaleString()}**`,
           );
           msg.edit({ embeds: [embed] });
         }, 2000);
@@ -84,7 +84,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       const embed = new CustomEmbed(
         message.member,
-        "you have already used your weekly reward! come back in **" + dd + "**"
+        "you have already used your weekly reward! come back in **" + dd + "**",
       );
 
       return message.channel.send({ embeds: [embed] });

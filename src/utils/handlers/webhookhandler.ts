@@ -65,7 +65,7 @@ export function listen(manager: ClusterManager) {
     webhook.listener((vote) => {
       logger.info(`received vote: ${vote.user}`);
       doVote(vote, manager);
-    })
+    }),
   );
 
   app.post("/kofi", async (req, response) => {
@@ -103,7 +103,7 @@ export function listen(manager: ClusterManager) {
     const users = Object.entries(await redis.hgetall(Constants.redis.nypsi.TOP_COMMANDS_USER)).map(
       (i) => {
         return { user: i[0], amount: parseInt(i[1]) };
-      }
+      },
     );
 
     return response.status(200).send(JSON.stringify({ total, users }));
@@ -204,7 +204,9 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
         payload: {
           embed: new CustomEmbed()
             .setDescription(
-              `${getItems()["blue_gem"].emoji} you've found a gem! i wonder what powers it holds...`
+              `${
+                getItems()["blue_gem"].emoji
+              } you've found a gem! i wonder what powers it holds...`,
             )
             .setTitle("you've found a gem")
             .setColor(Constants.TRANSPARENT_EMBED_COLOR),
@@ -223,7 +225,9 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
           `+ $**${amount.toLocaleString()}**\n` +
           "+ **5**% multiplier\n" +
           `+ **${crateAmount}** vote crates` +
-          `${tickets.length <= Constants.LOTTERY_TICKETS_MAX - 1 ? "\n+ **1** lottery ticket" : ""}`
+          `${
+            tickets.length <= Constants.LOTTERY_TICKETS_MAX - 1 ? "\n+ **1** lottery ticket" : ""
+          }`,
       )
       .disableFooter();
 
@@ -239,7 +243,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
       new ButtonBuilder()
         .setLabel("open crates")
         .setCustomId("vote-crates")
-        .setStyle(ButtonStyle.Success)
+        .setStyle(ButtonStyle.Success),
     );
 
     const res = await requestDM({
@@ -266,7 +270,7 @@ async function handleKofiData(data: KofiResponse) {
   logger.info(
     `received kofi purchase for email: ${data.email} item ${
       data.tier_name || JSON.stringify(data.shop_items)
-    }`
+    }`,
   );
 
   if (data.shop_items && data.shop_items.length > 0) {
@@ -295,7 +299,7 @@ async function handleKofiData(data: KofiResponse) {
                 content: "thank you for your purchase",
                 embed: new CustomEmbed()
                   .setDescription(
-                    `you have received 1 ${getItems()[item].emoji} **${getItems()[item].name}**`
+                    `you have received 1 ${getItems()[item].emoji} **${getItems()[item].name}**`,
                   )
                   .setColor(Constants.TRANSPARENT_EMBED_COLOR),
               },
@@ -310,7 +314,7 @@ async function handleKofiData(data: KofiResponse) {
                     null,
                     `${user.lastKnownUsername} just bought a ${getItems()[item].emoji} **${
                       getItems()[item].name
-                    }**!!!!`
+                    }**!!!!`,
                   ).setFooter({ text: "thank you for your purchase (:" }),
                 ],
               });
@@ -332,7 +336,7 @@ async function handleKofiData(data: KofiResponse) {
                     .setDescription(
                       `${
                         getItems()["pink_gem"].emoji
-                      } you've found a gem! i wonder what powers it holds...`
+                      } you've found a gem! i wonder what powers it holds...`,
                     )
                     .setTitle("you've found a gem")
                     .setColor(Constants.TRANSPARENT_EMBED_COLOR),
@@ -351,7 +355,7 @@ async function handleKofiData(data: KofiResponse) {
                     .setDescription(
                       `${
                         getItems()["blue_gem"].emoji
-                      } you've found a gem! i wonder what powers it holds...`
+                      } you've found a gem! i wonder what powers it holds...`,
                     )
                     .setTitle("you've found a gem")
                     .setColor(Constants.TRANSPARENT_EMBED_COLOR),
@@ -370,7 +374,7 @@ async function handleKofiData(data: KofiResponse) {
                     .setDescription(
                       `${
                         getItems()["purple_gem"].emoji
-                      } you've found a gem! i wonder what powers it holds...`
+                      } you've found a gem! i wonder what powers it holds...`,
                     )
                     .setTitle("you've found a gem"),
                 },
@@ -388,7 +392,7 @@ async function handleKofiData(data: KofiResponse) {
                     .setDescription(
                       `${
                         getItems()["green_gem"].emoji
-                      } you've found a gem! i wonder what powers it holds...`
+                      } you've found a gem! i wonder what powers it holds...`,
                     )
                     .setTitle("you've found a gem")
                     .setColor(Constants.TRANSPARENT_EMBED_COLOR),
@@ -409,7 +413,7 @@ async function handleKofiData(data: KofiResponse) {
                     .setDescription(
                       `${
                         getItems()["white_gem"].emoji
-                      } you've found a gem! i wonder what powers it holds...`
+                      } you've found a gem! i wonder what powers it holds...`,
                     )
                     .setTitle("you've found a gem")
                     .setColor(Constants.TRANSPARENT_EMBED_COLOR),
@@ -458,7 +462,7 @@ async function handleKofiData(data: KofiResponse) {
               embeds: [
                 new CustomEmbed(
                   null,
-                  `${user.lastKnownUsername} just bought **${item}**!!!!`
+                  `${user.lastKnownUsername} just bought **${item}**!!!!`,
                 ).setFooter({
                   text: "thank you for your purchase (:",
                 }),
@@ -477,7 +481,7 @@ async function handleKofiData(data: KofiResponse) {
             embeds: [
               new CustomEmbed(
                 null,
-                `${user.lastKnownUsername} just bought **${item}**!!!!`
+                `${user.lastKnownUsername} just bought **${item}**!!!!`,
               ).setFooter({
                 text: "thank you for your purchase (:",
               }),

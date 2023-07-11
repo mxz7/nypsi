@@ -12,7 +12,7 @@ const cmd = new Command("reply", "reply to a support ticket", "none");
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   const support = await getSupportRequestByChannelId(message.channel.id);
 
@@ -26,7 +26,7 @@ async function run(
 
   const embed = new CustomEmbed(message.member).setHeader(
     message.author.username,
-    message.author.avatarURL()
+    message.author.avatarURL(),
   );
 
   if (args.length > 0) {

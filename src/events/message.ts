@@ -59,7 +59,7 @@ export default async function messageCreate(message: Message) {
       return message.reply({
         embeds: [
           new ErrorEmbed(
-            "you have created a support request recently, try again later.\nif you need support and don't want to wait, you can join the nypsi support server [here](https://discord.gg/hJTDNST)"
+            "you have created a support request recently, try again later.\nif you need support and don't want to wait, you can join the nypsi support server [here](https://discord.gg/hJTDNST)",
           ),
         ],
       });
@@ -79,14 +79,14 @@ export default async function messageCreate(message: Message) {
         .setHeader("support")
         .setColor(Constants.TRANSPARENT_EMBED_COLOR)
         .setDescription(
-          "if you need support, join the [**official nypsi server**](https://discord.gg/hJTDNST) or click the button below to talk to a staff member. only click the button if you actually need support"
+          "if you need support, join the [**official nypsi server**](https://discord.gg/hJTDNST) or click the button below to talk to a staff member. only click the button if you actually need support",
         );
 
       const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()
           .setCustomId("s")
           .setLabel("talk to a staff member")
-          .setStyle(ButtonStyle.Danger)
+          .setStyle(ButtonStyle.Danger),
       );
 
       const msg = await message.reply({
@@ -112,7 +112,7 @@ export default async function messageCreate(message: Message) {
         const r = await createSupportRequest(
           message.author.id,
           message.client as NypsiClient,
-          message.author.username
+          message.author.username,
         );
 
         if (!r) {
@@ -123,7 +123,7 @@ export default async function messageCreate(message: Message) {
           return res.followUp({
             embeds: [
               new CustomEmbed().setDescription(
-                "✅ created support request, you can now talk directly to nypsi staff"
+                "✅ created support request, you can now talk directly to nypsi staff",
               ),
             ],
           });
@@ -145,7 +145,7 @@ export default async function messageCreate(message: Message) {
       const res = await sendToRequestChannel(
         message.author.id,
         embed,
-        message.client as NypsiClient
+        message.client as NypsiClient,
       );
 
       if (res) {
@@ -160,7 +160,7 @@ export default async function messageCreate(message: Message) {
       .setColor(Constants.TRANSPARENT_EMBED_COLOR)
       .setDescription(
         "unfortunately you can't do commands in direct messages ):\n\n" +
-          "if you need support or help for nypsi, please join the official nypsi server: https://discord.gg/hJTDNST"
+          "if you need support or help for nypsi, please join the official nypsi server: https://discord.gg/hJTDNST",
       );
     return await message.channel.send({ embeds: [embed] });
   }
@@ -290,7 +290,7 @@ export default async function messageCreate(message: Message) {
               if ((message.channel as TextChannel).members?.keys()) {
                 if (
                   !Array.from((message.channel as TextChannel).members.keys()).includes(
-                    message.mentions.members.first().id
+                    message.mentions.members.first().id,
                   )
                 ) {
                   return; // return if user doesnt have access to channel
@@ -400,7 +400,7 @@ async function addMention() {
       }
       workerCount++;
       logger.debug(
-        `${members.size.toLocaleString()} mentions being inserted with worker.. (${workerCount})`
+        `${members.size.toLocaleString()} mentions being inserted with worker.. (${workerCount})`,
       );
       const start = Date.now();
       const res = await doCollection(mention).catch((e) => {
@@ -411,12 +411,12 @@ async function addMention() {
 
       if (res == 0) {
         logger.debug(
-          `${members.size.toLocaleString()} mentions inserted in ${(Date.now() - start) / 1000}s`
+          `${members.size.toLocaleString()} mentions inserted in ${(Date.now() - start) / 1000}s`,
         );
       } else {
         logger.warn("worker timed out");
         logger.debug(
-          `${members.size.toLocaleString()} mentions inserted in ${(Date.now() - start) / 1000}s`
+          `${members.size.toLocaleString()} mentions inserted in ${(Date.now() - start) / 1000}s`,
         );
       }
 

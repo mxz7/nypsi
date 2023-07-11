@@ -6,12 +6,12 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 const cmd = new Command(
   "raffle",
   "select a random user all server members or from a specific role",
-  "fun"
+  "fun",
 );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (await onCooldown(cmd.name, message.member)) {
     const embed = await getResponse(cmd.name, message.member);
@@ -27,7 +27,7 @@ async function run(
     members = Array.from(message.guild.members.cache.keys());
   } else {
     const role = message.guild.roles.cache.find((r) =>
-      r.name.toLowerCase().includes(args.join(" ").toLowerCase())
+      r.name.toLowerCase().includes(args.join(" ").toLowerCase()),
     );
 
     if (!role) {

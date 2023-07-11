@@ -22,12 +22,12 @@ const cmd = new Command("deposit", "deposit money into your bank", "money").setA
 
 cmd.slashEnabled = true;
 cmd.slashData.addStringOption((option) =>
-  option.setName("amount").setDescription("amount to deposit").setRequired(true)
+  option.setName("amount").setDescription("amount to deposit").setRequired(true),
 );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (!(await userExists(message.member))) await createUser(message.member);
 
@@ -76,7 +76,7 @@ async function run(
       .addField(
         "help",
         "you can deposit money into your bank to keep it safe from robberies (and gambling if you have *issues*)\n" +
-          "however there is a limit to the size of your bank account, when starting, your bank has a capacity of $**15,000**, but will upgrade as you use the bot more."
+          "however there is a limit to the size of your bank account, when starting, your bank has a capacity of $**15,000**, but will upgrade as you use the bot more.",
       );
     return send({ embeds: [embed] });
   }
@@ -126,7 +126,7 @@ async function run(
         (await getBankBalance(message.member)).toLocaleString() +
         "** / $**" +
         (await getMaxBankBalance(message.member)).toLocaleString() +
-        "**"
+        "**",
     )
     .addField("transaction amount", "+$**" + amount.toLocaleString() + "**");
 
@@ -143,7 +143,7 @@ async function run(
         (await getBankBalance(message.member)).toLocaleString() +
         "** / $**" +
         (await getMaxBankBalance(message.member)).toLocaleString() +
-        "**"
+        "**",
     )
     .addField("transaction amount", "+$**" + amount.toLocaleString() + "**");
 

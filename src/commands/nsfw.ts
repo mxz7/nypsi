@@ -8,7 +8,7 @@ const cmd = new Command("nsfw", "toggle nsfw on a channel", "admin").setPermissi
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageChannels)) {
     if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {

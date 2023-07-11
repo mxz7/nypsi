@@ -133,7 +133,7 @@ export async function createReactionProfile(guild: Guild) {
   await redis.set(`${Constants.redis.cache.chatReaction.EXISTS}:${guild.id}`, "t");
   await redis.expire(
     `${Constants.redis.cache.chatReaction.EXISTS}:${guild.id}`,
-    Math.floor(ms("12 hours") / 1000)
+    Math.floor(ms("12 hours") / 1000),
   );
 }
 
@@ -152,7 +152,7 @@ export async function hasReactionProfile(guild: Guild) {
     await redis.set(`${Constants.redis.cache.chatReaction.EXISTS}:${guild.id}`, "t");
     await redis.expire(
       `${Constants.redis.cache.chatReaction.EXISTS}:${guild.id}`,
-      Math.floor(ms("12 hours") / 1000)
+      Math.floor(ms("12 hours") / 1000),
     );
 
     return true;
@@ -186,7 +186,7 @@ export async function updateReactionSettings(
     betweenEvents: number;
     randomModifier: number;
     timeout: number;
-  }
+  },
 ) {
   await prisma.chatReaction.update({
     where: {

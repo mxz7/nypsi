@@ -31,7 +31,7 @@ type Inventory = {
 
 export async function getInventory(
   member: GuildMember | string,
-  checkAchievement = false
+  checkAchievement = false,
 ): Promise<{ item: string; amount: number }[]> {
   let id: string;
   if (member instanceof GuildMember) {
@@ -57,7 +57,7 @@ export async function getInventory(
     .then((q) =>
       q.map((i) => {
         return { item: i.item, amount: Number(i.amount) };
-      })
+      }),
     )
     .catch(() => {});
 
@@ -129,12 +129,12 @@ async function doAutosellThing(userId: string, itemId: string, amount: number): 
   await redis.hincrby(
     `${Constants.redis.nypsi.AUTO_SELL_ITEMS}:${userId}`,
     `${itemId}-money`,
-    sellWorth
+    sellWorth,
   );
   await redis.hincrby(
     `${Constants.redis.nypsi.AUTO_SELL_ITEMS}:${userId}`,
     `${itemId}-amount`,
-    amount
+    amount,
   );
 
   if (!(await redis.lrange(Constants.redis.nypsi.AUTO_SELL_ITEMS_MEMBERS, 0, -1)).includes(userId))
@@ -148,7 +148,7 @@ export async function addInventoryItem(
   member: GuildMember | string,
   itemId: string,
   amount: number,
-  checkAchievement = true
+  checkAchievement = true,
 ) {
   let id: string;
   if (member instanceof GuildMember) {
@@ -203,7 +203,7 @@ export async function setInventoryItem(
   member: GuildMember | string,
   itemId: string,
   amount: number,
-  checkAchievement = true
+  checkAchievement = true,
 ) {
   let id: string;
   if (member instanceof GuildMember) {
@@ -301,7 +301,7 @@ async function checkCollectorAchievement(id: string, inventory: Inventory) {
 
 export async function openCrate(
   member: GuildMember | string,
-  item: Item
+  item: Item,
 ): Promise<Map<string, number>> {
   const inventory = await getInventory(member);
   const items = getItems();
@@ -548,7 +548,7 @@ export async function commandGemCheck(member: GuildMember, commandCategory: Comm
         payload: {
           embed: new CustomEmbed(
             member,
-            `${getItems()[gem].emoji} you've found a gem! i wonder what powers it holds...`
+            `${getItems()[gem].emoji} you've found a gem! i wonder what powers it holds...`,
           )
             .setTitle("you've found a gem")
             .setColor(Constants.TRANSPARENT_EMBED_COLOR),
@@ -568,7 +568,9 @@ export async function commandGemCheck(member: GuildMember, commandCategory: Comm
           payload: {
             embed: new CustomEmbed(
               member,
-              `${getItems()["pink_gem"].emoji} you've found a gem! i wonder what powers it holds...`
+              `${
+                getItems()["pink_gem"].emoji
+              } you've found a gem! i wonder what powers it holds...`,
             )
               .setTitle("you've found a gem")
               .setColor(Constants.TRANSPARENT_EMBED_COLOR),
@@ -589,7 +591,7 @@ export async function commandGemCheck(member: GuildMember, commandCategory: Comm
               member,
               `${
                 getItems()["purple_gem"].emoji
-              } you've found a gem! i wonder what powers it holds...`
+              } you've found a gem! i wonder what powers it holds...`,
             )
               .setTitle("you've found a gem")
               .setColor(Constants.TRANSPARENT_EMBED_COLOR),
@@ -620,31 +622,31 @@ export async function gemBreak(userId: string, chance: number, gem: string) {
         userId,
         "pink_gem",
         inventory.find((i) => i.item === "pink_gem").amount - 1,
-        false
+        false,
       ),
       setInventoryItem(
         userId,
         "purple_gem",
         inventory.find((i) => i.item === "purple_gem").amount - 1,
-        false
+        false,
       ),
       setInventoryItem(
         userId,
         "blue_gem",
         inventory.find((i) => i.item === "blue_gem").amount - 1,
-        false
+        false,
       ),
       setInventoryItem(
         userId,
         "green_gem",
         inventory.find((i) => i.item === "green_gem").amount - 1,
-        false
+        false,
       ),
       setInventoryItem(
         userId,
         "white_gem",
         inventory.find((i) => i.item === "white_gem").amount - 1,
-        false
+        false,
       ),
       prisma.crafting.create({
         data: {
@@ -669,7 +671,7 @@ export async function gemBreak(userId: string, chance: number, gem: string) {
             } a truly historic event is taking place\nyour gems are fusing together, into one crystal\n\n` +
               `${getItems()["white_gem"].emoji} ${getItems()["pink_gem"].emoji} ${
                 getItems()["purple_gem"].emoji
-              } ${getItems()["blue_gem"].emoji} ${getItems()["green_gem"].emoji}`
+              } ${getItems()["blue_gem"].emoji} ${getItems()["green_gem"].emoji}`,
           ),
       },
     });
@@ -702,7 +704,7 @@ export async function gemBreak(userId: string, chance: number, gem: string) {
               getItems()[gem].emoji
             } your gem exerted too much power and destroyed itself. shattering into ${amount} piece${
               amount > 1 ? "s" : ""
-            }`
+            }`,
           ),
       },
     });
@@ -739,7 +741,7 @@ export async function getAutosellItems(member: GuildMember | string) {
 
   if (await redis.exists(`${Constants.redis.cache.economy.AUTO_SELL}:${id}`)) {
     return JSON.parse(
-      await redis.get(`${Constants.redis.cache.economy.AUTO_SELL}:${id}`)
+      await redis.get(`${Constants.redis.cache.economy.AUTO_SELL}:${id}`),
     ) as string[];
   }
 
@@ -757,7 +759,7 @@ export async function getAutosellItems(member: GuildMember | string) {
   await redis.set(`${Constants.redis.cache.economy.AUTO_SELL}:${id}`, JSON.stringify(query));
   await redis.expire(
     `${Constants.redis.cache.economy.AUTO_SELL}:${id}`,
-    Math.floor(ms("1 hour") / 1000)
+    Math.floor(ms("1 hour") / 1000),
   );
 
   return query;

@@ -39,7 +39,7 @@ export default async function guildMemberUpdate(oldMember: GuildMember, newMembe
     embed.setDescription(
       `${newMember.toString()} (${newMember.id})\n**${oldMember.displayName}** -> **${
         newMember.displayName
-      }**`
+      }**`,
     );
     await addLog(newMember.guild, "member", embed);
   }

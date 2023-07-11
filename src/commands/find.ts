@@ -26,7 +26,7 @@ const cmd = new Command("find", "find info", "none").setPermissions(["bot owner"
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (message.member.user.id != Constants.TEKOH_ID) return;
 
@@ -38,7 +38,7 @@ async function run(
     const embed = new CustomEmbed(message.member);
 
     embed.setDescription(
-      "$find gid <guildid>\n$find gname <guild name>\n$find id <userid>\n$find tag <user tag>\n$find top"
+      "$find gid <guildid>\n$find gname <guild name>\n$find id <userid>\n$find tag <user tag>\n$find top",
     );
 
     return message.channel.send({ embeds: [embed] });
@@ -53,7 +53,7 @@ async function run(
 
         return g;
       },
-      { context: { guildId: args[1] } }
+      { context: { guildId: args[1] } },
     );
 
     for (const res of guild) {
@@ -78,7 +78,7 @@ async function run(
 
         return g;
       },
-      { context: { guildId: args.join(" ") } }
+      { context: { guildId: args.join(" ") } },
     );
 
     for (const res of guild) {
@@ -100,7 +100,7 @@ async function run(
 
         return g;
       },
-      { context: { userId: args[1] } }
+      { context: { userId: args[1] } },
     );
 
     for (const res of user) {
@@ -126,7 +126,7 @@ async function run(
 
         return g;
       },
-      { context: { userId: args.join(" ") } }
+      { context: { userId: args.join(" ") } },
     );
 
     for (const res of user) {
@@ -144,7 +144,7 @@ async function run(
     const balTop = await topBalanceGlobal(10);
 
     const embed = new CustomEmbed(message.member, balTop.join("\n")).setTitle(
-      "top " + balTop.length
+      "top " + balTop.length,
     );
 
     return message.channel.send({ embeds: [embed] });
@@ -163,19 +163,19 @@ async function showGuild(message: Message, guild: any) {
       "info",
       `**owner** ${owner}
             **created** ${formatDate(guild.createdAt)}`,
-      true
+      true,
     )
     .addField(
       "member info",
       `**members** ${guild.members.length}
     **peak** ${await getPeaks(guild)}`,
-      true
+      true,
     ); // if guild.members.length works add members field back
 
   if (invites && invites.length > 0) {
     embed.addField(
       `invite (${invites.length})`,
-      invites[Math.floor(Math.random() & invites.length)]
+      invites[Math.floor(Math.random() & invites.length)],
     );
   }
 
@@ -190,7 +190,7 @@ async function showUser(message: Message, user: User) {
         (await isPremium(user.id))
           ? ` (${(await getPremiumProfile(user.id)).getLevelString()}) `
           : ""
-      } ${(await isEcoBanned(user.id)) ? "[banned]" : ""}`
+      } ${(await isEcoBanned(user.id)) ? "[banned]" : ""}`,
     )
     .addField(
       "user",
@@ -198,11 +198,11 @@ async function showUser(message: Message, user: User) {
             **created** ${formatDate(user.createdAt)}${
         (await getLastCommand(user.id))
           ? `\n**last command** <t:${Math.floor(
-              (await getLastCommand(user.id)).getTime() / 1000
+              (await getLastCommand(user.id)).getTime() / 1000,
             )}:R>`
           : ""
       }`,
-      true
+      true,
     )
     .setFooter({ text: `${await getKarma(user.id)} karma` });
 
@@ -219,7 +219,7 @@ async function showUser(message: Message, user: User) {
             **voted** ${voted}
             **prestige** ${await getPrestige(user.id)}
             **bonus** ${Math.floor((await getGambleMulti(user.id)) * 100)}%`,
-      true
+      true,
     );
   }
 

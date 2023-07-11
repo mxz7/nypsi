@@ -24,7 +24,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   await sendToRequestChannel(support.userId, embed, message.client as NypsiClient);
 
   embed.setDescription(
-    "your support request has been closed, you will be able to create another in 24 hours"
+    "your support request has been closed, you will be able to create another in 24 hours",
   );
 
   await requestDM({
@@ -45,7 +45,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         return "not-found";
       }
     },
-    { context: { channelId: support.channelId } }
+    { context: { channelId: support.channelId } },
   );
 
   let shard: number;
@@ -76,7 +76,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       await channel.setLocked(true).catch(() => {});
       await channel.setArchived(true).catch(() => {});
     },
-    { context: { shard: shard, channelId: support.channelId } }
+    { context: { shard: shard, channelId: support.channelId } },
   );
 
   await prisma.supportRequest.delete({
@@ -90,7 +90,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   await redis.set(`${Constants.redis.cooldown.SUPPORT}:${support.userId}`, "t");
   await redis.expire(
     `${Constants.redis.cooldown.SUPPORT}:${support.userId}`,
-    Math.floor(ms("24 hours") / 1000)
+    Math.floor(ms("24 hours") / 1000),
   );
 }
 

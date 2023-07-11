@@ -11,7 +11,7 @@ const cmd = new Command("balbottom", "view bottom balances in the server", "mone
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (await onCooldown(cmd.name, message.member)) {
     const embed = await getResponse(cmd.name, message.member);

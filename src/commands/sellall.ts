@@ -136,13 +136,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     desc.push(
       `\`${selected.get(item).toLocaleString()}x\` ${items[item].emoji} ${
         items[item].name
-      } ($${sellWorth.toLocaleString()})`
+      } ($${sellWorth.toLocaleString()})`,
     );
     amounts.set(
       `\`${selected.get(item).toLocaleString()}x\` ${items[item].emoji} ${
         items[item].name
       } ($${sellWorth.toLocaleString()})`,
-      sellWorth
+      sellWorth,
     );
   }
 
@@ -182,7 +182,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       .setLabel("back")
       .setStyle(ButtonStyle.Primary)
       .setDisabled(true),
-    new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
+    new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
   );
   if (pages.size == 1) return send({ embeds: [embed] });
   const msg = await send({ embeds: [embed], components: [row] });

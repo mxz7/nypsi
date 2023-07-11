@@ -22,13 +22,13 @@ cmd.slashData
       .setName("item")
       .setRequired(true)
       .setAutocomplete(true)
-      .setDescription("item you want to sell")
+      .setDescription("item you want to sell"),
   )
   .addStringOption((option) => option.setName("amount").setDescription("amount you want to sell"));
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (!(await userExists(message.member))) await createUser(message.member);
 
@@ -73,7 +73,7 @@ async function run(
       embeds: [
         new CustomEmbed(
           message.member,
-          "sell items from your inventory\n\nyou will have to pay tax on your sold items, selling crypto has a 5% fee"
+          "sell items from your inventory\n\nyou will have to pay tax on your sold items, selling crypto has a 5% fee",
         ),
       ],
     });
@@ -127,7 +127,7 @@ async function run(
     message.member,
     selected.id,
     inventory.find((i) => i.item == selected.id).amount - amount,
-    false
+    false,
   );
 
   let sellWorth = Math.floor(selected.sell * amount);
@@ -162,7 +162,7 @@ async function run(
       (selected.role == "fish" || selected.role == "prey" || selected.role == "sellable")
         ? `(+**${Math.floor(multi * 100).toString()}**% bonus)`
         : ""
-    }`
+    }`,
   );
 
   if (tax) embed.setFooter({ text: `${((await getTax()) * 100).toFixed(1)}% tax` });

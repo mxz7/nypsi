@@ -82,7 +82,7 @@ export async function createSupportRequest(id: string, client: NypsiClient, user
 
       return thread.id;
     },
-    { context: { shard: shard, username: username } }
+    { context: { shard: shard, username: username } },
   );
 
   let channelId: string;
@@ -125,7 +125,7 @@ export async function sendToRequestChannel(id: string, embed: CustomEmbed, clien
         return "not-found";
       }
     },
-    { context: { channelId: channelId } }
+    { context: { channelId: channelId } },
   );
 
   let shard: number;
@@ -157,7 +157,7 @@ export async function sendToRequestChannel(id: string, embed: CustomEmbed, clien
       if (!msg) return false;
       return true;
     },
-    { context: { shard: shard, embed: embed.toJSON(), channelId: channelId } }
+    { context: { shard: shard, embed: embed.toJSON(), channelId: channelId } },
   );
 
   if (!res.includes(true)) return false;

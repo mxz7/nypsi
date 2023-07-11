@@ -14,7 +14,7 @@ const cmd = new Command("f", "pay your respects", "fun");
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (await onCooldown(cmd.name, message.member)) {
     const embed = await getResponse(cmd.name, message.member);
@@ -42,12 +42,12 @@ async function run(
 
   const embed = new CustomEmbed(
     message.member,
-    `press **F** to pay your respects to **${content}**`
+    `press **F** to pay your respects to **${content}**`,
   );
 
   const customId = `${content}-${new Date().getTime()}`;
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder().setStyle(ButtonStyle.Primary).setLabel("F").setCustomId(customId)
+    new ButtonBuilder().setStyle(ButtonStyle.Primary).setLabel("F").setCustomId(customId),
   );
 
   await message.channel.send({ embeds: [embed], components: [row] });
@@ -70,7 +70,7 @@ async function run(
         embeds: [
           new CustomEmbed(
             message.member,
-            `${i.user.toString()} has paid respects to **${args.join(" ")}**`
+            `${i.user.toString()} has paid respects to **${args.join(" ")}**`,
           ),
         ],
       });
@@ -84,7 +84,7 @@ async function run(
           message.member,
           `**${reactions.length.toLocaleString()}** ${
             reactions.length != 1 ? "people" : "person"
-          } paid their respects to **${content}**`
+          } paid their respects to **${content}**`,
         ),
       ],
     });

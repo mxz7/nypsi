@@ -23,7 +23,7 @@ import { logger } from "../utils/logger";
 import ms = require("ms");
 
 const cmd = new Command("data", "view your raw data stored in nypsi's database", "info").setAliases(
-  ["requestdata", "viewdata", "showmemydatazuckerberg"]
+  ["requestdata", "viewdata", "showmemydatazuckerberg"],
 );
 
 cmd.slashEnabled = true;
@@ -31,10 +31,10 @@ cmd.slashData
   .addSubcommand((del) =>
     del
       .setName("delete")
-      .setDescription("request deletion of all data held on you by nypsi's database")
+      .setDescription("request deletion of all data held on you by nypsi's database"),
   )
   .addSubcommand((view) =>
-    view.setName("request").setDescription("view all of the data held on you by nypsi's database")
+    view.setName("request").setDescription("view all of the data held on you by nypsi's database"),
   );
 
 // @ts-expect-error ts doesnt like that
@@ -44,7 +44,7 @@ BigInt.prototype.toJSON = function () {
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -91,7 +91,7 @@ async function run(
         new CustomEmbed(
           message.member,
           "**/data request** *receive a downloadable txt file including all of the data currently held about you in the database*\n" +
-            "**/data delete** *request deletion of all of your data. where this is not possible, your data will be anonymized. the exception for this is moderation data.*"
+            "**/data delete** *request deletion of all of your data. where this is not possible, your data will be anonymized. the exception for this is moderation data.*",
         ),
       ],
     });
@@ -104,13 +104,13 @@ async function run(
 
     const embed = new CustomEmbed(message.member).setHeader(
       "data request",
-      message.author.avatarURL()
+      message.author.avatarURL(),
     );
 
     embed.setDescription("you can request and view all of your data stored by nypsi");
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder().setCustomId("y").setLabel("request data").setStyle(ButtonStyle.Success)
+      new ButtonBuilder().setCustomId("y").setLabel("request data").setStyle(ButtonStyle.Success),
     );
 
     const m = await send({ embeds: [embed], components: [row] });
@@ -240,49 +240,49 @@ async function run(
         file,
         `nypsi data for ${message.author.id} (${
           message.author.username
-        } at time of request) - ${new Date().toUTCString()}\n\n----------\nYOUR USER DATA\n----------\n\n`
+        } at time of request) - ${new Date().toUTCString()}\n\n----------\nYOUR USER DATA\n----------\n\n`,
       );
       await fs.appendFile(file, JSON.stringify(userData, null, 2));
 
       await fs.appendFile(
         file,
-        "\n----------------------------------------------\n\n----------\nYOUR MODERATION CASE DATA WHERE YOU GOT PUNISHED\n----------\n\n"
+        "\n----------------------------------------------\n\n----------\nYOUR MODERATION CASE DATA WHERE YOU GOT PUNISHED\n----------\n\n",
       );
       await fs.appendFile(file, JSON.stringify(moderationCases, null, 2));
 
       await fs.appendFile(
         file,
-        "\n----------------------------------------------\n\n----------\nYOUR MODERATION CASE DATA WHERE YOU WERE THE MODERATOR\n----------\n\n"
+        "\n----------------------------------------------\n\n----------\nYOUR MODERATION CASE DATA WHERE YOU WERE THE MODERATOR\n----------\n\n",
       );
       await fs.appendFile(file, JSON.stringify(moderationCasesModerator, null, 2));
 
       await fs.appendFile(
         file,
-        "\n----------------------------------------------\n\n----------\nYOUR MODERATION MUTE DATA\n----------\n\n"
+        "\n----------------------------------------------\n\n----------\nYOUR MODERATION MUTE DATA\n----------\n\n",
       );
       await fs.appendFile(file, JSON.stringify(moderationMutes, null, 2));
 
       await fs.appendFile(
         file,
-        "\n----------------------------------------------\n\n----------\nYOUR MODERATION BAN DATA\n----------\n\n"
+        "\n----------------------------------------------\n\n----------\nYOUR MODERATION BAN DATA\n----------\n\n",
       );
       await fs.appendFile(file, JSON.stringify(moderationBans, null, 2));
 
       await fs.appendFile(
         file,
-        "\n----------------------------------------------\n\n----------\nYOUR CHAT REACTION DATA\n----------\n\n"
+        "\n----------------------------------------------\n\n----------\nYOUR CHAT REACTION DATA\n----------\n\n",
       );
       await fs.appendFile(file, JSON.stringify(chatReactionStats, null, 2));
 
       await fs.appendFile(
         file,
-        "\n----------------------------------------------\n\n----------\nYOUR MENTIONS DATA\n(mentions targetted at you)\n----------\n\n"
+        "\n----------------------------------------------\n\n----------\nYOUR MENTIONS DATA\n(mentions targetted at you)\n----------\n\n",
       );
       await fs.appendFile(file, JSON.stringify(mentionsTargetedData, null, 2));
 
       await fs.appendFile(
         file,
-        "\n----------------------------------------------\n\n----------\nYOUR MENTIONS DATA\n(mentions from you - based on current tag)\n----------\n\n"
+        "\n----------------------------------------------\n\n----------\nYOUR MENTIONS DATA\n(mentions from you - based on current tag)\n----------\n\n",
       );
       await fs.appendFile(file, JSON.stringify(mentionsSenderData, null, 2));
 
@@ -319,15 +319,15 @@ async function run(
 
     const embed = new CustomEmbed(message.member).setHeader(
       "data deletion request",
-      message.author.avatarURL()
+      message.author.avatarURL(),
     );
 
     embed.setDescription(
-      "by doing this, you will lose **all** of your data. this includes a full wipe on economy."
+      "by doing this, you will lose **all** of your data. this includes a full wipe on economy.",
     );
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder().setCustomId("y").setLabel("delete").setStyle(ButtonStyle.Danger)
+      new ButtonBuilder().setCustomId("y").setLabel("delete").setStyle(ButtonStyle.Danger),
     );
 
     const m = await send({ embeds: [embed], components: [row] });

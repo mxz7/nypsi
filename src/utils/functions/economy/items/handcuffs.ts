@@ -85,7 +85,7 @@ module.exports = new ItemUse(
         message.member,
         "handcuffs",
         inventory.find((i) => i.item == "handcuffs").amount - 1,
-        false
+        false,
       ),
       addHandcuffs(handcuffsTarget.id),
     ]);
@@ -101,11 +101,11 @@ module.exports = new ItemUse(
         embeds: [
           new CustomEmbed(
             message.member,
-            `restraining **${handcuffsTarget.user.username}**...\n\n**${handcuffsTarget.user.username}** has been restrained for one minute`
+            `restraining **${handcuffsTarget.user.username}**...\n\n**${handcuffsTarget.user.username}** has been restrained for one minute`,
           ),
         ],
       },
-      msg
+      msg,
     );
-  }
+  },
 );

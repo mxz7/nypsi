@@ -20,14 +20,14 @@ const cmd = new Command("join", "view your join position in the server", "info")
 
 cmd.slashEnabled = true;
 cmd.slashData.addUserOption((option) =>
-  option.setName("user").setDescription("view join position for this user").setRequired(false)
+  option.setName("user").setDescription("view join position for this user").setRequired(false),
 );
 
 const sortCache = new Map<string, string[]>();
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   let member: GuildMember;
 
@@ -107,7 +107,7 @@ async function run(
           embeds: [
             new CustomEmbed(
               message.member,
-              `sorting ${membersSorted.length.toLocaleString()} members..`
+              `sorting ${membersSorted.length.toLocaleString()} members..`,
             ),
           ],
         });
@@ -139,7 +139,7 @@ async function run(
     message.member,
     `joined on **${joinedServer}**\n- **${timeAgo.toLocaleString()}** days ago\njoin position is **${
       joinPos != "invalid" ? joinPos.toLocaleString() : "--"
-    }**`
+    }**`,
   )
     .setTitle(member.user.username)
     .setThumbnail(member.user.displayAvatarURL({ size: 128 }));

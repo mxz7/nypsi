@@ -111,7 +111,7 @@ export async function checkMessageContent(message: Message) {
             "nypsi",
             contentModified,
             -1,
-            message.channel.id
+            message.channel.id,
           );
           await message.delete().catch(() => {});
           return false;
@@ -126,7 +126,7 @@ export async function checkMessageContent(message: Message) {
             "nypsi",
             contentModified,
             -1,
-            message.channel.id
+            message.channel.id,
           );
           await message.delete().catch(() => {});
           return false;
@@ -145,7 +145,7 @@ export async function checkMessageContent(message: Message) {
             "nypsi",
             contentModified,
             -1,
-            message.channel.id
+            message.channel.id,
           );
           await message.delete().catch(() => {});
           return false;
@@ -165,7 +165,7 @@ export async function checkMessageContent(message: Message) {
               contentModified,
               -1,
               message.channel.id,
-              (similarity * 100).toFixed(2)
+              (similarity * 100).toFixed(2),
             );
             await message.delete().catch(() => {});
             return false;
@@ -251,7 +251,7 @@ export async function checkAutoMute(message: Message) {
       "mute",
       message.author.id,
       message.guild.members.me.user.username,
-      `[${MStoTime(length * 1000, true).trim()}] filter violation`
+      `[${MStoTime(length * 1000, true).trim()}] filter violation`,
     );
     if (mode !== "timeout")
       newMute(message.guild, [message.author.id], new Date(Date.now() + length * 1000)),
@@ -263,7 +263,7 @@ export async function checkAutoMute(message: Message) {
       await message.member
         .disableCommunicationUntil(
           new Date(Date.now() + length * 1000),
-          `filter violation auto mute - ${MStoTime(length * 1000, true).trim()}`
+          `filter violation auto mute - ${MStoTime(length * 1000, true).trim()}`,
         )
         .then(() => {
           successful = true;

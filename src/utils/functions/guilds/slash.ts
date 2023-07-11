@@ -26,13 +26,13 @@ export async function isSlashOnly(guild: Guild) {
     await redis.set(`${Constants.redis.cache.guild.SLASH_ONLY}:${guild.id}`, "t");
     await redis.expire(
       `${Constants.redis.cache.guild.SLASH_ONLY}:${guild.id}`,
-      ms("3 hours") / 1000
+      ms("3 hours") / 1000,
     );
   } else {
     await redis.set(`${Constants.redis.cache.guild.SLASH_ONLY}:${guild.id}`, "f");
     await redis.expire(
       `${Constants.redis.cache.guild.SLASH_ONLY}:${guild.id}`,
-      ms("3 hours") / 1000
+      ms("3 hours") / 1000,
     );
   }
 

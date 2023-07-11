@@ -5,7 +5,7 @@ import dayjs = require("dayjs");
 
 export default async function messageDeleteBulk(
   messages: Collection<Snowflake, Message>,
-  channel: TextBasedChannel
+  channel: TextBasedChannel,
 ) {
   if (channel.isDMBased()) return;
 
@@ -21,7 +21,7 @@ export default async function messageDeleteBulk(
         desc.push(
           `[${dayjs(message.createdTimestamp).format("YYYY-MM-DD HH:mm:ss")}] ${
             message.author.username
-          }: ${message.content}`
+          }: ${message.content}`,
         );
       }
 

@@ -148,7 +148,7 @@ export async function topBalanceGlobal(amount: number): Promise<string[]> {
 
   checkLeaderboardPositions(
     query.map((i) => i.userId),
-    "balance"
+    "balance",
   );
 
   return usersFinal;
@@ -201,7 +201,7 @@ export async function topNetWorthGlobal(userId: string) {
           ? user.user.lastKnownUsername || user.userId
           : "[hidden]") +
         "** $" +
-        Number(user.netWorth).toLocaleString()
+        Number(user.netWorth).toLocaleString(),
     );
   }
 
@@ -1029,7 +1029,7 @@ export async function topWordle(guild: Guild, userId: string) {
         getMemberID(guild, user.user.id).user.username +
         "** " +
         user.wins.toLocaleString() +
-        " wins"
+        " wins",
     );
   }
 
@@ -1096,7 +1096,7 @@ export async function topWordleGlobal(userId: string) {
           : "[hidden]") +
         "** " +
         user.wins.toLocaleString() +
-        " wins"
+        " wins",
     );
   }
 
@@ -1110,7 +1110,7 @@ export async function topWordleGlobal(userId: string) {
 
   checkLeaderboardPositions(
     sorted.map((i) => i.user.id),
-    "wordle"
+    "wordle",
   );
 
   return { pages, pos };

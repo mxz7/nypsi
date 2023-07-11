@@ -7,7 +7,7 @@ import { createUser, getItems, userExists } from "../utils/functions/economy/uti
 const cmd = new Command(
   "bitcoin",
   "view the current bitcoin value (reflects real life USD)",
-  "money"
+  "money",
 ).setAliases(["btc"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
@@ -25,7 +25,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     message.member,
     `**worth** $${bitcoin.sell.toLocaleString()}\n**owned** ${bitcoinAmount.toLocaleString()} ($${(
       bitcoinAmount * bitcoin.sell
-    ).toLocaleString()})`
+    ).toLocaleString()})`,
   )
     .setFooter({ text: "not real bitcoin, although it reflects current worth in USD" })
     .setHeader("your bitcoin", message.author.avatarURL());

@@ -108,7 +108,7 @@ export function loadCommands() {
               logger.warn(
                 `duplicate alias: ${a} [original: ${aliases.get(a)} copy: ${
                   command.name
-                }] - not overwriting`
+                }] - not overwriting`,
               );
             } else {
               aliases.set(a, command.name);
@@ -164,7 +164,7 @@ export function reloadCommand(commandsArray: string[]) {
               logger.error(
                 `duplicate alias: ${a} [original: ${aliases.get(a)} copy: ${
                   commandData.name
-                }] - not overwriting`
+                }] - not overwriting`,
               );
             } else {
               aliases.set(a, commandData.name);
@@ -248,7 +248,7 @@ async function helpCmd(message: Message, args: string[]) {
     embed.setDescription(
       "invite nypsi to your server: [invite.nypsi.xyz](http://invite.nypsi.xyz)\n\n" +
         "if you need support, want to report a bug or suggest a feature, you can join the nypsi server: https://discord.gg/hJTDNST\n\n" +
-        `my prefix for this server is \`${prefix}\``
+        `my prefix for this server is \`${prefix}\``,
     );
     embed.addField("command categories", categoriesMsg, true);
     embed.setThumbnail(message.client.user.displayAvatarURL({ size: 128 }));
@@ -337,7 +337,7 @@ async function helpCmd(message: Message, args: string[]) {
       embed.setDescription(
         `this is a custom command${
           member ? ` owned by ${member.toString()}` : ""
-        }\n\nto disable custom commands in your server you can do:\n${prefix}disablecmd + customcommand`
+        }\n\nto disable custom commands in your server you can do:\n${prefix}disablecmd + customcommand`,
       );
     } else if (selectedItem) {
       embed.setTitle(`${selectedItem.emoji} ${selectedItem.name}`);
@@ -386,18 +386,18 @@ async function helpCmd(message: Message, args: string[]) {
             `**boosts** ${selectedItem.boosterEffect.boosts}\n**effect** ${
               selectedItem.boosterEffect.effect
             }\n**time** ${MStoTime(
-              selectedItem.boosterEffect.time * 1000
-            )}\nyou can activate your booster with ${prefix}**activate <booster>**`
+              selectedItem.boosterEffect.time * 1000,
+            )}\nyou can activate your booster with ${prefix}**activate <booster>**`,
           );
         } else if (selectedItem.role == "car") {
           embed.addField(
             "car info",
-            `**speed** ${selectedItem.speed}\ncars are used for street races (${prefix}**streetrace**)`
+            `**speed** ${selectedItem.speed}\ncars are used for street races (${prefix}**streetrace**)`,
           );
         } else if (selectedItem.role == "collectable") {
           embed.addField(
             "collectable info",
-            "collectables don't do anything, theyre just *collectables*. if you dont want them, you can get rid of them by selling them"
+            "collectables don't do anything, theyre just *collectables*. if you dont want them, you can get rid of them by selling them",
           );
         } else if (
           selectedItem.role == "sellable" ||
@@ -406,7 +406,7 @@ async function helpCmd(message: Message, args: string[]) {
         ) {
           embed.addField(
             "sellable",
-            `this item is just meant to be sold. you can use the ${prefix}**sellall** command to do so quickly`
+            `this item is just meant to be sold. you can use the ${prefix}**sellall** command to do so quickly`,
           );
         }
       }
@@ -425,7 +425,7 @@ async function helpCmd(message: Message, args: string[]) {
       .setLabel("back")
       .setStyle(ButtonStyle.Primary)
       .setDisabled(true),
-    new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
+    new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
   );
 
   if (pageSystemNeeded) {
@@ -475,7 +475,7 @@ async function helpCmd(message: Message, args: string[]) {
               .setCustomId("➡")
               .setLabel("next")
               .setStyle(ButtonStyle.Primary)
-              .setDisabled(false)
+              .setDisabled(false),
           );
         } else {
           row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -488,7 +488,7 @@ async function helpCmd(message: Message, args: string[]) {
               .setCustomId("➡")
               .setLabel("next")
               .setStyle(ButtonStyle.Primary)
-              .setDisabled(false)
+              .setDisabled(false),
           );
         }
         await msg.edit({ embeds: [embed], components: [row] });
@@ -512,7 +512,7 @@ async function helpCmd(message: Message, args: string[]) {
               .setCustomId("➡")
               .setLabel("next")
               .setStyle(ButtonStyle.Primary)
-              .setDisabled(true)
+              .setDisabled(true),
           );
         } else {
           row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -525,7 +525,7 @@ async function helpCmd(message: Message, args: string[]) {
               .setCustomId("➡")
               .setLabel("next")
               .setStyle(ButtonStyle.Primary)
-              .setDisabled(false)
+              .setDisabled(false),
           );
         }
         await msg.edit({ embeds: [embed], components: [row] });
@@ -540,7 +540,7 @@ async function helpCmd(message: Message, args: string[]) {
 export async function runCommand(
   cmd: string,
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   const preProcessLength = [Date.now()];
   if (message.author.bot) return;
@@ -580,7 +580,7 @@ export async function runCommand(
       if (message instanceof Message) {
         return message.member
           .send(
-            "i don't have access to that channel. please contact server staff if this is an error"
+            "i don't have access to that channel. please contact server staff if this is an error",
           )
           .catch(() => {});
       } else {
@@ -588,7 +588,7 @@ export async function runCommand(
           .reply({
             embeds: [
               new ErrorEmbed(
-                "i don't have access to this channel. please contact server staff if this is an error"
+                "i don't have access to this channel. please contact server staff if this is an error",
               ),
             ],
           })
@@ -602,7 +602,7 @@ export async function runCommand(
     ) {
       return message.member
         .send(
-          "❌ i don't have permission to send messages in that channel - please contact server staff if this is an error"
+          "❌ i don't have permission to send messages in that channel - please contact server staff if this is an error",
         )
         .catch(() => {});
     }
@@ -615,7 +615,7 @@ export async function runCommand(
     ) {
       return message.member
         .send(
-          "❌ i don't have permission to perform commands in that channel - please contact server staff if this is an error"
+          "❌ i don't have permission to perform commands in that channel - please contact server staff if this is an error",
         )
         .catch(() => {});
     }
@@ -640,7 +640,7 @@ export async function runCommand(
       return message.channel.send(
         "❌ i don't have the `manage messages` permission, this is a required permission for nypsi to work\n\n" +
           "to fix this go to: server settings -> roles -> find my role and enable `manage messages`\n" +
-          "if this error still shows, check channel specific permissions"
+          "if this error still shows, check channel specific permissions",
       );
     }
 
@@ -691,7 +691,7 @@ export async function runCommand(
           embeds: [
             new ErrorEmbed(
               `\`${cmd}\` is a custom alias owned by **${owner}**. to create your own custom aliases you need a premium membership\n` +
-                "/premium"
+                "/premium",
             ),
           ],
         });
@@ -752,7 +752,7 @@ export async function runCommand(
 
   if (
     await redis.exists(
-      `${Constants.redis.nypsi.COMMAND_WATCH}:${message.author.id}:${command.name}`
+      `${Constants.redis.nypsi.COMMAND_WATCH}:${message.author.id}:${command.name}`,
     )
   ) {
     const hook = new WebhookClient({ url: process.env.ANTICHEAT_HOOK });
@@ -818,7 +818,7 @@ export async function runCommand(
             embeds: [
               new CustomEmbed(
                 message.member,
-                "fun & moderation commands are still available to you. maintenance mode only prevents certain commands"
+                "fun & moderation commands are still available to you. maintenance mode only prevents certain commands",
               ).setTitle("⚠️ nypsi is under maintenance"),
             ],
           });
@@ -827,7 +827,7 @@ export async function runCommand(
             embeds: [
               new CustomEmbed(
                 message.member,
-                "fun & moderation commands are still available to you. maintenance mode only prevents certain commands"
+                "fun & moderation commands are still available to you. maintenance mode only prevents certain commands",
               ).setTitle("⚠️ nypsi is under maintenance"),
             ],
           });
@@ -841,8 +841,8 @@ export async function runCommand(
       const embed = new CustomEmbed(
         message.member,
         `**you are banned from this command. dm me for help**\n\nyou'll be unbanned <t:${Math.floor(
-          unbanTime.getTime() / 1000
-        )}:R>`
+          unbanTime.getTime() / 1000,
+        )}:R>`,
       );
 
       if (message instanceof Message) {
@@ -929,7 +929,7 @@ export async function runCommand(
     if (await redis.exists(`achievements:completed:${message.author.id}`)) {
       if (!(await userExists(message.member))) await createUser(message.member);
       const embed: APIEmbed = JSON.parse(
-        await redis.get(`achievements:completed:${message.author.id}`)
+        await redis.get(`achievements:completed:${message.author.id}`),
       );
       await redis.del(`achievements:completed:${message.author.id}`);
 
@@ -948,7 +948,7 @@ export async function runCommand(
 
       await message.channel.send({
         content: `${message.author.toString()} you have been **RICK ROLLED** by ${await getLastKnownTag(
-          userId
+          userId,
         )}\n\nhttps://www.youtube.com/watch?v=dQw4w9WgXcQ`,
       });
     }
@@ -1029,7 +1029,7 @@ export function getRandomCommand(): Command {
 
 export function logCommand(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   args.shift();
 
@@ -1037,7 +1037,7 @@ export function logCommand(
 
   if (!(message instanceof Message)) {
     msg = `${message.guild.id} - ${message.author.username}: [/]${message.commandName} ${args.join(
-      " "
+      " ",
     )}`;
   } else {
     let content = message.content;
@@ -1104,7 +1104,7 @@ export function runCommandUseTimers(client: NypsiClient) {
               return foundUser.id;
             }
           },
-          { context: { tag: tag } }
+          { context: { tag: tag } },
         );
 
         const id = res.find((x) => typeof x === "string");
@@ -1112,7 +1112,7 @@ export function runCommandUseTimers(client: NypsiClient) {
         await hook.send(
           `[${getTimestamp()}] **${tag}** (${
             typeof id === "string" ? `${id}` : "invalid id"
-          }) performed **${uses}** commands in an hour`
+          }) performed **${uses}** commands in an hour`,
         );
 
         if (uses > 400 && typeof id === "string") {

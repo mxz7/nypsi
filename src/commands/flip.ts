@@ -7,7 +7,7 @@ const cmd = new Command("flip", "flip a coin", "utility");
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   const headTails = [
     "heads",
@@ -84,7 +84,7 @@ async function run(
       const tailsPercent = ((tails / amount) * 100).toFixed(2);
 
       embed.setDescription(
-        `results:\n\n heads: **${heads.toLocaleString()}** (${headsPercent}%)\ntails: **${tails.toLocaleString()}** (${tailsPercent}%)`
+        `results:\n\n heads: **${heads.toLocaleString()}** (${headsPercent}%)\ntails: **${tails.toLocaleString()}** (${tailsPercent}%)`,
       );
     }
   }

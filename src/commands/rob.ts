@@ -33,12 +33,12 @@ const cmd = new Command("rob", "rob other server members", "money").setAliases([
 
 cmd.slashEnabled = true;
 cmd.slashData.addUserOption((option) =>
-  option.setName("user").setDescription("who do u wanna rob").setRequired(true)
+  option.setName("user").setDescription("who do u wanna rob").setRequired(true),
 );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -78,7 +78,7 @@ async function run(
 
   if ((await redis.exists(`${Constants.redis.cooldown.ROB_RADIO}:${message.author.id}`)) == 1) {
     const init = parseInt(
-      await redis.get(`${Constants.redis.cooldown.ROB_RADIO}:${message.author.id}`)
+      await redis.get(`${Constants.redis.cooldown.ROB_RADIO}:${message.author.id}`),
     );
     const curr = new Date();
     const diff = Math.round((curr.getTime() - init) / 1000);
@@ -97,7 +97,7 @@ async function run(
     return send({
       embeds: [
         new ErrorEmbed(
-          `you have been reported to the police, they will continue looking for you for **${remaining}**`
+          `you have been reported to the police, they will continue looking for you for **${remaining}**`,
         ),
       ],
     });
@@ -113,7 +113,7 @@ async function run(
         "help",
         "robbing a user is a useful way for you to make money\nyou can steal a maximum of **40**% of their balance\n" +
           "but there is also a chance that you get caught by the police or just flat out failing the robbery\n" +
-          "you can lose up to **25**% of your balance by failing a robbery"
+          "you can lose up to **25**% of your balance by failing a robbery",
       );
 
     return send({ embeds: [embed] });
@@ -165,12 +165,12 @@ async function run(
 
   const embed = new CustomEmbed(
     message.member,
-    "robbing " + target.user.toString() + ".."
+    "robbing " + target.user.toString() + "..",
   ).setHeader("robbery", message.author.avatarURL());
 
   const embed2 = new CustomEmbed(
     message.member,
-    "robbing " + target.user.toString() + ".."
+    "robbing " + target.user.toString() + "..",
   ).setHeader("robbery", message.author.avatarURL());
 
   const embed3 = new CustomEmbed();
@@ -199,7 +199,7 @@ async function run(
         target.user.username +
         "** has been robbed recently and is protected by a private security team\n" +
         "you were caught and paid $" +
-        amountMoney.toLocaleString()
+        amountMoney.toLocaleString(),
     );
 
     embed3.setTitle("you were nearly robbed");
@@ -212,7 +212,7 @@ async function run(
         "**\n" +
         "since you have been robbed recently, you are protected by a private security team.\nyou have been given $**" +
         amountMoney.toLocaleString() +
-        "**"
+        "**",
     );
   } else if (await hasPadlock(target)) {
     await setPadlock(target, false);
@@ -231,7 +231,7 @@ async function run(
     embed2.setColor(Constants.EMBED_FAIL_COLOR);
     embed2.addField(
       "fail!!",
-      "**" + target.user.username + "** had a padlock, which has now been broken"
+      "**" + target.user.username + "** had a padlock, which has now been broken",
     );
 
     embed3.setTitle("you were nearly robbed");
@@ -244,7 +244,7 @@ async function run(
         "**\n" +
         "your padlock has saved you from a robbery, but it has been broken\nthey would have stolen $**" +
         amountMoney.toLocaleString() +
-        "**"
+        "**",
     );
   } else {
     const chance = Math.floor(Math.random() * 22);
@@ -294,7 +294,7 @@ async function run(
           "**\n" +
           "they stole a total of $**" +
           amountMoney.toLocaleString() +
-          "**"
+          "**",
       );
 
       playerCooldown.add(target.user.id);
@@ -319,7 +319,7 @@ async function run(
             message.member,
             "lawyer",
             inventory.find((i) => i.item == "lawyer").amount - 1,
-            false
+            false,
           ),
           addStat(message.member, "lawyer"),
         ]);
@@ -334,7 +334,7 @@ async function run(
 
         embed2.addField(
           "fail!!",
-          `you were caught by the police, but your lawyer stopped you from losing any money\nyou would have lost $${amountMoney.toLocaleString()}`
+          `you were caught by the police, but your lawyer stopped you from losing any money\nyou would have lost $${amountMoney.toLocaleString()}`,
         );
         embed3.setDescription(
           "**" +
@@ -342,7 +342,7 @@ async function run(
             "** tried to rob you in **" +
             message.guild.name +
             "**\n" +
-            "they were caught by the police, but a lawyer protected their money"
+            "they were caught by the police, but a lawyer protected their money",
         );
       } else {
         await updateBalance(target, (await getBalance(target)) + amountMoney);
@@ -365,7 +365,7 @@ async function run(
             "**\n" +
             "they were caught by the police and you received $**" +
             amountMoney.toLocaleString() +
-            "**"
+            "**",
         );
       }
 

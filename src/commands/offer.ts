@@ -48,8 +48,8 @@ cmd.slashData
           .setName("item-global")
           .setDescription("item or user to block/unblock")
           .setAutocomplete(true)
-          .setRequired(true)
-      )
+          .setRequired(true),
+      ),
   )
   .addSubcommand((create) =>
     create
@@ -59,26 +59,26 @@ cmd.slashData
         option
           .setName("user")
           .setDescription("user you want to offer something to")
-          .setRequired(true)
+          .setRequired(true),
       )
       .addStringOption((option) =>
         option
           .setName("item-global")
           .setDescription("item you want to buy")
           .setAutocomplete(true)
-          .setRequired(true)
+          .setRequired(true),
       )
       .addIntegerOption((option) =>
-        option.setName("amount").setDescription("amount you want to buy").setRequired(true)
+        option.setName("amount").setDescription("amount you want to buy").setRequired(true),
       )
       .addStringOption((option) =>
-        option.setName("money").setDescription("how much $ you want to offer").setRequired(true)
-      )
+        option.setName("money").setDescription("how much $ you want to offer").setRequired(true),
+      ),
   );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -139,7 +139,7 @@ async function run(
 
     const embed = new CustomEmbed(message.member).setHeader(
       "your offers",
-      message.author.avatarURL()
+      message.author.avatarURL(),
     );
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>();
@@ -167,7 +167,7 @@ async function run(
             offers[page].targetId
           })`,
           inline: true,
-        }
+        },
       );
       embed.setFooter({ text: `page ${page + 1}/${maxPage + 1}` });
     };
@@ -177,7 +177,7 @@ async function run(
         row.setComponents(
           new ButtonBuilder().setCustomId("⬅").setLabel("back").setStyle(ButtonStyle.Primary),
           new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
-          new ButtonBuilder().setCustomId("del").setLabel("delete").setStyle(ButtonStyle.Danger)
+          new ButtonBuilder().setCustomId("del").setLabel("delete").setStyle(ButtonStyle.Danger),
         );
 
         if (offers.length == 1) {
@@ -199,7 +199,7 @@ async function run(
       await displayOffer(0);
     } else {
       row.addComponents(
-        new ButtonBuilder().setCustomId("del").setLabel("delete").setStyle(ButtonStyle.Danger)
+        new ButtonBuilder().setCustomId("del").setLabel("delete").setStyle(ButtonStyle.Danger),
       );
       await displayOffer(0);
     }
@@ -272,7 +272,7 @@ async function run(
         const res = await deleteOffer(offers[currentPage], message.client as NypsiClient).catch(
           (e) => {
             logger.warn("failed to delete offer", e);
-          }
+          },
         );
 
         if (res) {
@@ -322,7 +322,7 @@ async function run(
                   return `\`${i}\` (${message.guild.members.cache.get(i).user.username})`;
                 return `\`${i}\``;
               })
-              .join("\n")}`
+              .join("\n")}`,
           ).setHeader("offer blocklist", message.author.avatarURL()),
         ],
       });
@@ -365,7 +365,7 @@ async function run(
 
     const embed = new CustomEmbed(message.member, desc).setHeader(
       "offer blocklist",
-      message.author.avatarURL()
+      message.author.avatarURL(),
     );
 
     if (current.length > 0) {
@@ -378,7 +378,7 @@ async function run(
               return `\`${i}\` (${message.guild.members.cache.get(i).user.username})`;
             return `\`${i}\``;
           })
-          .join("\n")
+          .join("\n"),
       );
     }
 
@@ -422,7 +422,7 @@ async function run(
           new ErrorEmbed(
             `**${target.user.username}** has already received their max amount of offers (${
               (await getPreferences(target)).offers
-            })`
+            })`,
           ),
         ],
       });
@@ -441,7 +441,7 @@ async function run(
       return send({
         embeds: [
           new ErrorEmbed(
-            `**${target.user.username}** has blocked offers for ${selected.emoji} ${selected.name}`
+            `**${target.user.username}** has blocked offers for ${selected.emoji} ${selected.name}`,
           ),
         ],
       });
@@ -467,7 +467,7 @@ async function run(
       return send({
         embeds: [
           new ErrorEmbed(
-            `**${target.user.username}** doesnt have ${amount}x ${selected.emoji} ${selected.name}`
+            `**${target.user.username}** doesnt have ${amount}x ${selected.emoji} ${selected.name}`,
           ),
         ],
       });

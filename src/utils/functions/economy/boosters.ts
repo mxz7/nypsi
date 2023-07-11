@@ -65,7 +65,7 @@ async function checkBoosters(member: string | GuildMember, boosters: Map<string,
 
         if (expiredBoosterId == "steve") {
           let earned: SteveData = JSON.parse(
-            await redis.get(`${Constants.redis.nypsi.STEVE_EARNED}:${userId}`)
+            await redis.get(`${Constants.redis.nypsi.STEVE_EARNED}:${userId}`),
           );
           await redis.del(`${Constants.redis.nypsi.STEVE_EARNED}:${userId}`);
 
@@ -81,7 +81,7 @@ async function checkBoosters(member: string | GuildMember, boosters: Map<string,
             descOther.push(
               `steve found **${earned.gemShards}x** ${getItems()["gem_shard"].emoji} ${
                 getItems()["gem_shard"].name
-              }`
+              }`,
             );
           }
 
@@ -89,7 +89,7 @@ async function checkBoosters(member: string | GuildMember, boosters: Map<string,
             descOther.push(
               `steve found **${earned.scraps}x** ${getItems()["quarry_scrap"].emoji} ${
                 getItems()["quarry_scrap"].name
-              }`
+              }`,
             );
           }
 
@@ -182,7 +182,7 @@ export async function getBoosters(member: GuildMember | string): Promise<Map<str
 
   await redis.set(
     `${Constants.redis.cache.economy.BOOSTERS}:${id}`,
-    JSON.stringify(Object.fromEntries(map))
+    JSON.stringify(Object.fromEntries(map)),
   );
   await redis.expire(`${Constants.redis.cache.economy.BOOSTERS}:${id}`, 300);
 

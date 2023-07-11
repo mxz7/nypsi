@@ -40,7 +40,7 @@ import _ = require("lodash");
 const cmd = new Command(
   "workers",
   "view the available workers and manage your own",
-  "money"
+  "money",
 ).setAliases(["worker", "minion", "minions", "slave", "slaves"]);
 
 const workerChoices: APIApplicationCommandOptionChoice<string>[] = [
@@ -62,7 +62,7 @@ cmd.slashEnabled = true;
 cmd.slashData
   .addSubcommand((view) => view.setName("view").setDescription("view all workers"))
   .addSubcommand((claim) =>
-    claim.setName("claim").setDescription("claim earned money from your workers")
+    claim.setName("claim").setDescription("claim earned money from your workers"),
   )
   .addSubcommand((upgrade) =>
     upgrade
@@ -73,13 +73,13 @@ cmd.slashData
           .setName("worker")
           .setDescription("worker you want to upgrade")
           .setChoices(...workerChoices)
-          .setRequired(true)
-      )
+          .setRequired(true),
+      ),
   );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   const baseWorkers = getBaseWorkers();
 
@@ -158,7 +158,7 @@ async function run(
 
       embed.setHeader(
         `${worker.name}${prestige < worker.prestige_requirement ? " [locked]" : ""}`,
-        message.author.avatarURL()
+        message.author.avatarURL(),
       );
 
       const row = new ActionRowBuilder<MessageActionRowComponentBuilder>();
@@ -193,21 +193,21 @@ async function run(
         embed.setDescription(desc);
 
         row.addComponents(
-          new ButtonBuilder().setCustomId("upg").setLabel("upgrades").setStyle(ButtonStyle.Primary)
+          new ButtonBuilder().setCustomId("upg").setLabel("upgrades").setStyle(ButtonStyle.Primary),
         );
       } else {
         embed.setDescription(
           `**cost** $${worker.cost.toLocaleString()}\n` +
             `**required prestige** ${worker.prestige_requirement}\n\n` +
             `**worth** $${worker.base.per_item.toLocaleString()} / ${worker.item_emoji}\n` +
-            `**rate** ${worker.base.per_interval.toLocaleString()} ${worker.item_emoji} / hour`
+            `**rate** ${worker.base.per_interval.toLocaleString()} ${worker.item_emoji} / hour`,
         );
 
         embed.setFooter({ text: `you are prestige ${prestige}` });
 
         if (prestige >= worker.prestige_requirement) {
           row.addComponents(
-            new ButtonBuilder().setCustomId("bu").setLabel("buy").setStyle(ButtonStyle.Primary)
+            new ButtonBuilder().setCustomId("bu").setLabel("buy").setStyle(ButtonStyle.Primary),
           );
         } else {
           row.addComponents(
@@ -215,7 +215,7 @@ async function run(
               .setCustomId("bu")
               .setLabel("buy")
               .setStyle(ButtonStyle.Primary)
-              .setDisabled(true)
+              .setDisabled(true),
           );
         }
       }
@@ -235,15 +235,15 @@ async function run(
                 : isOwned(worker)
                 ? " [owned]"
                 : ""
-            }`
+            }`,
           )
           .setValue(baseWorkers[worker].id)
-          .setDefault(baseWorkers[worker].id == defaultWorker ? true : false)
+          .setDefault(baseWorkers[worker].id == defaultWorker ? true : false),
       );
     }
 
     let workersList = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new StringSelectMenuBuilder().setCustomId("worker").setOptions(options)
+      new StringSelectMenuBuilder().setCustomId("worker").setOptions(options),
     );
 
     const { buttonRow, embed } = await displayWorker(baseWorkers[defaultWorker]);
@@ -280,7 +280,7 @@ async function run(
         }
 
         workersList = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-          new StringSelectMenuBuilder().setCustomId("worker").setOptions(options)
+          new StringSelectMenuBuilder().setCustomId("worker").setOptions(options),
         );
 
         await res.message.edit({ embeds: [embed], components: [workersList, buttonRow] });
@@ -323,7 +323,7 @@ async function run(
     const userWorker = userWorkers.find((w) => w.workerId == worker.id);
     const baseUpgrades = getBaseUpgrades();
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder().setCustomId("ba").setLabel("back").setStyle(ButtonStyle.Danger)
+      new ButtonBuilder().setCustomId("ba").setLabel("back").setStyle(ButtonStyle.Danger),
     );
 
     for (const upgradeId of Object.keys(baseUpgrades)) {
@@ -407,7 +407,7 @@ async function run(
           upgradeId,
           userWorkers
             .find((w) => w.workerId == worker.id)
-            .upgrades.find((u) => u.upgradeId == upgradeId)?.amount || 0
+            .upgrades.find((u) => u.upgradeId == upgradeId)?.amount || 0,
         );
 
         const balance = await getBalance(message.member);

@@ -20,12 +20,12 @@ const cmd = new Command("unban", "unban one or more users", "moderation").setPer
 
 cmd.slashEnabled = true;
 cmd.slashData.addStringOption((option) =>
-  option.setName("user").setDescription("tag/id of user to unban").setRequired(true)
+  option.setName("user").setDescription("tag/id of user to unban").setRequired(true),
 );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -82,11 +82,11 @@ async function run(
         "help",
         "**<>** required | **[]** parameter\n" +
           "**<users>** you can unban one or more members in one command\n" +
-          "**[-s]** if used, command message will be deleted and the output will be sent to moderator as a DM if possible"
+          "**[-s]** if used, command message will be deleted and the output will be sent to moderator as a DM if possible",
       )
       .addField(
         "examples",
-        `${prefix}unban user1234 **(only works if members are in cache)**\n${prefix}unban 123456789012345678\n${prefix}unban 123456789012345678 123456789012345678 -s`
+        `${prefix}unban user1234 **(only works if members are in cache)**\n${prefix}unban 123456789012345678\n${prefix}unban 123456789012345678 123456789012345678 -s`,
       );
 
     return send({ embeds: [embed] });

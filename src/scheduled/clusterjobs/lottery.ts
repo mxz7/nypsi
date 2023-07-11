@@ -28,14 +28,14 @@ async function doLottery(client: Client) {
 
   if (tickets.length < 100) {
     logger.info(
-      `${tickets.length} tickets were bought ): maybe next week you'll have something to live for`
+      `${tickets.length} tickets were bought ): maybe next week you'll have something to live for`,
     );
 
     const embed = new CustomEmbed();
 
     embed.setTitle("lottery cancelled");
     embed.setDescription(
-      `the lottery has been cancelled as only **${tickets.length}** tickets were bought ):\n\nthese tickets will remain and the lottery will happen next week`
+      `the lottery has been cancelled as only **${tickets.length}** tickets were bought ):\n\nthese tickets will remain and the lottery will happen next week`,
     );
     embed.setColor(variants.latte.base.hex as ColorResolvable);
     embed.disableFooter();
@@ -75,7 +75,7 @@ async function doLottery(client: Client) {
   embed.setDescription(
     `**${user.username}** has won the lottery with ${(
       await prisma.lotteryTicket.count({ where: { userId: user.id } })
-    ).toLocaleString()} tickets!!\n\n` + `they have won $**${total.toLocaleString()}**`
+    ).toLocaleString()} tickets!!\n\n` + `they have won $**${total.toLocaleString()}**`,
   );
   embed.setFooter({ text: `a total of ${tickets.length.toLocaleString()} tickets were bought` });
   embed.setColor(variants.latte.base.hex as ColorResolvable);
@@ -89,7 +89,7 @@ async function doLottery(client: Client) {
     embed.setDescription(
       `you have won a total of $**${total.toLocaleString()}**\n\nyour winning ticket was #${
         chosen.id
-      }`
+      }`,
     );
     embed.setColor(variants.latte.base.hex as ColorResolvable);
 
@@ -116,7 +116,7 @@ async function doLottery(client: Client) {
               .setDescription(
                 `${
                   getItems()["purple_gem"].emoji
-                } you've found a gem! i wonder what powers it holds...`
+                } you've found a gem! i wonder what powers it holds...`,
               )
               .setTitle("you've found a gem")
               .setColor(Constants.TRANSPARENT_EMBED_COLOR),

@@ -22,12 +22,12 @@ const cmd = new Command("withdraw", "withdraw money from your bank", "money").se
 
 cmd.slashEnabled = true;
 cmd.slashData.addStringOption((option) =>
-  option.setName("amount").setDescription("amount to withdraw").setRequired(true)
+  option.setName("amount").setDescription("amount to withdraw").setRequired(true),
 );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (!(await userExists(message.member))) await createUser(message.member);
 
@@ -75,7 +75,7 @@ async function run(
       .addField("usage", `${prefix}withdraw <amount>`)
       .addField(
         "help",
-        "you can withdraw money from your bank aslong as you have that amount available in your bank"
+        "you can withdraw money from your bank aslong as you have that amount available in your bank",
       );
     return send({ embeds: [embed] });
   }
@@ -118,7 +118,7 @@ async function run(
         (await getBankBalance(message.member)).toLocaleString() +
         "** / $**" +
         (await getMaxBankBalance(message.member)).toLocaleString() +
-        "**"
+        "**",
     )
     .addField("transaction amount", "-$**" + amount.toLocaleString() + "**");
 
@@ -135,7 +135,7 @@ async function run(
         (await getBankBalance(message.member)).toLocaleString() +
         "** / $**" +
         (await getMaxBankBalance(message.member)).toLocaleString() +
-        "**"
+        "**",
     );
 
   embed1.addField("transaction amount", "-$**" + amount.toLocaleString() + "**");

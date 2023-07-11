@@ -53,13 +53,13 @@ cmd.slashData
           .setName("item-karmashop")
           .setDescription("item you want to buy from the karma shop")
           .setRequired(true)
-          .setAutocomplete(true)
-      )
+          .setAutocomplete(true),
+      ),
   );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (!(await userExists(message.member))) await createUser(message.member);
   if (message.author.id == Constants.TEKOH_ID) {
@@ -111,10 +111,10 @@ async function run(
 
     embed.setDescription(
       `the karma shop is currently **closed**, it was last open at <t:${Math.floor(
-        (await getLastKarmaShopOpen()).getTime() / 1000
+        (await getLastKarmaShopOpen()).getTime() / 1000,
       )}>\n\nwill **next open at** <t:${Math.floor(
-        (await getNextKarmaShopOpen()).getTime() / 1000
-      )}> (<t:${Math.floor((await getNextKarmaShopOpen()).getTime() / 1000)}:R>)`
+        (await getNextKarmaShopOpen()).getTime() / 1000,
+      )}> (<t:${Math.floor((await getNextKarmaShopOpen()).getTime() / 1000)}:R>)`,
     );
 
     return send({ embeds: [embed] });
@@ -144,7 +144,7 @@ async function run(
 
     const pages = PageManager.createPages(
       itemIDs.map((i) => items[i]),
-      6
+      6,
     );
 
     const embed = new CustomEmbed(message.member);
@@ -163,7 +163,7 @@ async function run(
           `**cost** ${item.cost.toLocaleString()} karma\n` +
           `*${item.items_left}* available\n` +
           `${getUserLimit(item, items)}/${item.limit}`,
-        true
+        true,
       );
     }
 
@@ -173,7 +173,7 @@ async function run(
         .setLabel("back")
         .setStyle(ButtonStyle.Primary)
         .setDisabled(true),
-      new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary)
+      new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
     );
 
     let msg: Message;
@@ -204,7 +204,7 @@ async function run(
 
         const newEmbed = new CustomEmbed(message.member).setHeader(
           "karma shop",
-          message.author.avatarURL()
+          message.author.avatarURL(),
         );
 
         if (!reaction) return;
@@ -221,7 +221,7 @@ async function run(
                   `**cost** ${item.cost.toLocaleString()} karma\n` +
                   `*${item.items_left}* available\n` +
                   `${getUserLimit(item, items)}/${item.limit}`,
-                true
+                true,
               );
             }
             newEmbed.setFooter({
@@ -240,7 +240,7 @@ async function run(
                   .setCustomId("➡")
                   .setLabel("next")
                   .setStyle(ButtonStyle.Primary)
-                  .setDisabled(false)
+                  .setDisabled(false),
               );
             } else {
               row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -253,7 +253,7 @@ async function run(
                   .setCustomId("➡")
                   .setLabel("next")
                   .setStyle(ButtonStyle.Primary)
-                  .setDisabled(false)
+                  .setDisabled(false),
               );
             }
             await msg.edit({ embeds: [newEmbed], components: [row] });
@@ -271,7 +271,7 @@ async function run(
                   `**cost** ${item.cost.toLocaleString()} karma\n` +
                   `*${item.items_left}* available\n` +
                   `${getUserLimit(item, items)}/${item.limit}`,
-                true
+                true,
               );
             }
             newEmbed.setFooter({
@@ -290,7 +290,7 @@ async function run(
                   .setCustomId("➡")
                   .setLabel("next")
                   .setStyle(ButtonStyle.Primary)
-                  .setDisabled(true)
+                  .setDisabled(true),
               );
             } else {
               row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -303,7 +303,7 @@ async function run(
                   .setCustomId("➡")
                   .setLabel("next")
                   .setStyle(ButtonStyle.Primary)
-                  .setDisabled(false)
+                  .setDisabled(false),
               );
             }
             await msg.edit({ embeds: [newEmbed], components: [row] });
@@ -375,7 +375,9 @@ async function run(
         payload: {
           embed: new CustomEmbed(
             message.member,
-            `${getItems()["purple_gem"].emoji} you've found a gem! i wonder what powers it holds...`
+            `${
+              getItems()["purple_gem"].emoji
+            } you've found a gem! i wonder what powers it holds...`,
           )
             .setTitle("you've found a gem")
             .setColor(Constants.TRANSPARENT_EMBED_COLOR),
@@ -387,7 +389,7 @@ async function run(
       embeds: [
         new CustomEmbed(
           message.member,
-          `you have bought ${wanted.emoji} ${wanted.name} for ${wanted.cost} karma`
+          `you have bought ${wanted.emoji} ${wanted.name} for ${wanted.cost} karma`,
         ),
       ],
     });

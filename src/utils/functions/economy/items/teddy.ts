@@ -44,9 +44,9 @@ module.exports = new ItemUse(
     return send({
       embeds: [
         new CustomEmbed(message.member, "you cuddle your teddy bear").setImage(
-          "https://c.tenor.com/QGoHlSF2cSAAAAAM/hug-milk-and-mocha.gif"
+          "https://c.tenor.com/QGoHlSF2cSAAAAAM/hug-milk-and-mocha.gif",
         ),
       ],
     });
-  }
+  },
 );

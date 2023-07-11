@@ -9,7 +9,7 @@ const cmd = new Command("prefix", "change the bot's prefix", "admin").setPermiss
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   const prefix = await getPrefix(message.guild);
 
@@ -29,7 +29,7 @@ async function run(
         prefix +
         "`\n\nuse " +
         prefix +
-        "**prefix** <new prefix> to change the current prefix"
+        "**prefix** <new prefix> to change the current prefix",
     ).setHeader("prefix");
 
     return message.channel.send({ embeds: [embed] });
@@ -45,7 +45,7 @@ async function run(
 
   const embed = new CustomEmbed(
     message.member,
-    "✅ prefix changed to `" + args.join(" ") + "`"
+    "✅ prefix changed to `" + args.join(" ") + "`",
   ).setHeader("prefix");
 
   return await message.channel.send({ embeds: [embed] });

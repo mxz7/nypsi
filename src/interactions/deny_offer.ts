@@ -19,7 +19,7 @@ export default {
       return interaction.reply({
         embeds: [
           new CustomEmbed(null, "please wait until your offer has been processed").setColor(
-            Constants.TRANSPARENT_EMBED_COLOR
+            Constants.TRANSPARENT_EMBED_COLOR,
           ),
         ],
         ephemeral: true,
@@ -81,7 +81,7 @@ export default {
           } has been denied`,
           embed: new CustomEmbed(
             null,
-            `your $${offer.money.toLocaleString()} has been returned`
+            `your $${offer.money.toLocaleString()} has been returned`,
           ).setColor(Constants.EMBED_FAIL_COLOR),
         },
       });

@@ -19,13 +19,13 @@ const cmd = new Command("warn", "warn one or more users", "moderation").setPermi
 cmd.slashEnabled = true;
 cmd.slashData
   .addUserOption((option) =>
-    option.setName("user").setDescription("user to warn").setRequired(true)
+    option.setName("user").setDescription("user to warn").setRequired(true),
   )
   .addStringOption((option) => option.setName("reason").setDescription("reason for the warn"));
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) return;
 
@@ -73,11 +73,11 @@ async function run(
           "**<user>** can tag them or use their username\n" +
           "**(reason)** reason for the warn, will be given to all warned members\n" +
           "**[-s]** if used, command message will be deleted and the output will be sent to moderator as a DM if possible\n\n" +
-          "if the bot was unable to DM a user on warn, the warning will still be logged"
+          "if the bot was unable to DM a user on warn, the warning will still be logged",
       )
       .addField(
         "examples",
-        `${prefix}warn @member toxicity\n${prefix}warn @member @member2 toxicity`
+        `${prefix}warn @member toxicity\n${prefix}warn @member @member2 toxicity`,
       );
 
     return send({ embeds: [embed] });
@@ -124,12 +124,12 @@ async function run(
 
   const embed = new CustomEmbed(
     message.member,
-    `✅ \`${target.user.username}\` has been warned for **${reason}**`
+    `✅ \`${target.user.username}\` has been warned for **${reason}**`,
   );
 
   if (dmFail) {
     embed.setDescription(
-      `⚠️ failed to send message to \`${target.user.username}\`. warn has still been logged`
+      `⚠️ failed to send message to \`${target.user.username}\`. warn has still been logged`,
     );
   }
 

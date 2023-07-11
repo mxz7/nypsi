@@ -11,7 +11,7 @@ const cmd = new Command("server", "view information about the server", "info").s
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   const server = message.guild;
 
@@ -49,7 +49,7 @@ async function run(
         `**total** ${server.memberCount.toLocaleString()}\n` +
           `**humans** ${users.size.toLocaleString()}\n` +
           `**bots** ${bots.size.toLocaleString()}\n` +
-          `**member peak** ${(await getPeaks(message.guild)).toLocaleString()}`
+          `**member peak** ${(await getPeaks(message.guild)).toLocaleString()}`,
       );
 
     return message.channel.send({ embeds: [embed] });
@@ -66,7 +66,7 @@ async function run(
         "\n" +
         "**created** " +
         created,
-      true
+      true,
     )
 
     .addField(
@@ -79,7 +79,7 @@ async function run(
         "\n" +
         "**id** " +
         server.id,
-      true
+      true,
     )
 
     .addField(
@@ -87,7 +87,7 @@ async function run(
       `**total** ${server.memberCount.toLocaleString()}\n` +
         `**humans** ${users.size.toLocaleString()}\n` +
         `**bots** ${bots.size.toLocaleString()}\n` +
-        `**member peak** ${(await getPeaks(message.guild)).toLocaleString()}`
+        `**member peak** ${(await getPeaks(message.guild)).toLocaleString()}`,
     );
 
   if (server.memberCount >= 25000) {

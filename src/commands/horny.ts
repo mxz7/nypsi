@@ -24,7 +24,7 @@ cmd.slashData.addUserOption((option) => option.setName("user").setDescription("h
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -121,7 +121,7 @@ async function run(
 
   const embed = new CustomEmbed(
     message.member,
-    `${member.user.toString()}\n**${hornyAmount}**% horny ${hornyEmoji}\n${hornyText}`
+    `${member.user.toString()}\n**${hornyAmount}**% horny ${hornyEmoji}\n${hornyText}`,
   ).setHeader("horny calculator", member.user.avatarURL());
 
   await send({ embeds: [embed] });

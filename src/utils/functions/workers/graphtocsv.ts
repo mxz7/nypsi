@@ -20,7 +20,7 @@ if (!isMainThread) {
 
   const toCsv = async (
     fileName: string,
-    data: { userId: string; value: bigint | number; date: Date; id: string }[]
+    data: { userId: string; value: bigint | number; date: Date; id: string }[],
   ) => {
     const dates: number[] = [];
     const map = new Map<string, { value: number; date: number }[]>();
@@ -78,7 +78,7 @@ if (!isMainThread) {
 
       await appendFile(
         `/tmp/${fileName}`,
-        `\n${tag.replace(",", "") || userId},${balances.join(",")}`
+        `\n${tag.replace(",", "") || userId},${balances.join(",")}`,
       );
     }
   };
@@ -93,7 +93,7 @@ if (!isMainThread) {
         orderBy: {
           date: "asc",
         },
-      })
+      }),
     );
 
     await toCsv(
@@ -105,7 +105,7 @@ if (!isMainThread) {
         orderBy: {
           date: "asc",
         },
-      })
+      }),
     );
 
     parentPort.postMessage(true);

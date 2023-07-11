@@ -10,12 +10,12 @@ import { logger } from "../utils/logger";
 const cmd = new Command(
   "crateall",
   "give every user in the current guild a crate",
-  "none"
+  "none",
 ).setPermissions(["bot owner"]);
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (message.member.user.id != Constants.TEKOH_ID) return;
 
@@ -85,10 +85,10 @@ async function run(
         await addInventoryItem(member, selected.id, amount, false);
 
         logger.info(
-          `${amount} ${selected.id} given to ${member.user.id} (${member.user.username})`
+          `${amount} ${selected.id} given to ${member.user.id} (${member.user.username})`,
         );
         count += amount;
-      })()
+      })(),
     );
   }
 
@@ -98,7 +98,7 @@ async function run(
     embeds: [
       new CustomEmbed(
         message.member,
-        `**${count}** ${selected.name}${count != 1 ? "s" : ""} given`
+        `**${count}** ${selected.name}${count != 1 ? "s" : ""} given`,
       ),
     ],
   });

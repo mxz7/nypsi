@@ -70,7 +70,7 @@ module.exports = new ItemUse(
         message.member,
         "stolen_credit_card",
         inventory.find((i) => i.item == "stolen_credit_card").amount - amount,
-        false
+        false,
       ),
       increaseBaseBankStorage(message.member, addedAmount),
     ]);
@@ -79,7 +79,7 @@ module.exports = new ItemUse(
       embeds: [
         new CustomEmbed(
           message.member,
-          `using ${amount} stolen credit card${amount > 1 ? "s" : ""}...`
+          `using ${amount} stolen credit card${amount > 1 ? "s" : ""}...`,
         ),
       ],
     });
@@ -90,9 +90,9 @@ module.exports = new ItemUse(
       embeds: [
         new CustomEmbed(
           message.member,
-          `using stolen credit card...\n\nsuccessfully added $**${addedAmount.toLocaleString()}** to your bank capacity`
+          `using stolen credit card...\n\nsuccessfully added $**${addedAmount.toLocaleString()}** to your bank capacity`,
         ),
       ],
     });
-  }
+  },
 );

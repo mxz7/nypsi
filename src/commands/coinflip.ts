@@ -30,15 +30,15 @@ const playing = new Set<string>();
 cmd.slashEnabled = true;
 cmd.slashData
   .addUserOption((option) =>
-    option.setName("user").setDescription("user you want to challenge").setRequired(false)
+    option.setName("user").setDescription("user you want to challenge").setRequired(false),
   )
   .addStringOption((option) =>
-    option.setName("bet").setDescription("how much do you want to bet").setRequired(false)
+    option.setName("bet").setDescription("how much do you want to bet").setRequired(false),
   );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (!(await userExists(message.member))) {
     await createUser(message.member);
@@ -92,7 +92,7 @@ async function run(
     player1: GuildMember,
     player2: GuildMember,
     bet: number,
-    response: ButtonInteraction
+    response: ButtonInteraction,
   ) => {
     if (bet > (await getBalance(player2))) {
       await updateBalance(player1.user.id, (await getBalance(player1.user.id)) + bet);
@@ -184,7 +184,7 @@ async function run(
 
     const embed = new CustomEmbed(
       message.member,
-      `*throwing..*\n\n${thingy}\n\n**bet** $${bet.toLocaleString()}`
+      `*throwing..*\n\n${thingy}\n\n**bet** $${bet.toLocaleString()}`,
     ).setHeader("coinflip");
 
     const msg = await response.editReply({ embeds: [embed] });
@@ -200,7 +200,7 @@ async function run(
     }
 
     embed.setDescription(
-      `**winner** ${winner.user.username}\n\n${thingy}\n\n**bet** $${bet.toLocaleString()}`
+      `**winner** ${winner.user.username}\n\n${thingy}\n\n**bet** $${bet.toLocaleString()}`,
     );
     embed.setColor(winner.displayHexColor);
     embed.setFooter({ text: `id: ${id}` });
@@ -268,7 +268,7 @@ async function run(
       return send({
         embeds: [
           new ErrorEmbed(
-            `your max bet is $**${((await calcMaxBet(message.member)) * 10).toLocaleString()}**`
+            `your max bet is $**${((await calcMaxBet(message.member)) * 10).toLocaleString()}**`,
           ),
         ],
       });
@@ -277,7 +277,7 @@ async function run(
       return send({
         embeds: [
           new ErrorEmbed(
-            `their max bet is $**${((await calcMaxBet(target)) * 10).toLocaleString()}**`
+            `their max bet is $**${((await calcMaxBet(target)) * 10).toLocaleString()}**`,
           ),
         ],
       });
@@ -292,14 +292,14 @@ async function run(
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder().setCustomId("y").setLabel("accept").setStyle(ButtonStyle.Success),
-      new ButtonBuilder().setCustomId("n").setLabel("deny").setStyle(ButtonStyle.Danger)
+      new ButtonBuilder().setCustomId("n").setLabel("deny").setStyle(ButtonStyle.Danger),
     );
 
     const requestEmbed = new CustomEmbed(
       message.member,
       `**${
         message.author.username
-      }** has challenged you to a coinflip\n\n**bet** $${bet.toLocaleString()}\n\ndo you accept?`
+      }** has challenged you to a coinflip\n\n**bet** $${bet.toLocaleString()}\n\ndo you accept?`,
     ).setFooter({ text: "expires in 60 seconds" });
 
     const msg = await send({
@@ -365,7 +365,7 @@ async function run(
       return send({
         embeds: [
           new ErrorEmbed(
-            `your max bet is $**${((await calcMaxBet(message.member)) * 10).toLocaleString()}**`
+            `your max bet is $**${((await calcMaxBet(message.member)) * 10).toLocaleString()}**`,
           ),
         ],
       });
@@ -380,14 +380,14 @@ async function run(
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder().setCustomId("y").setLabel("play").setStyle(ButtonStyle.Success),
-      new ButtonBuilder().setCustomId("n").setLabel("cancel").setStyle(ButtonStyle.Danger)
+      new ButtonBuilder().setCustomId("n").setLabel("cancel").setStyle(ButtonStyle.Danger),
     );
 
     const requestEmbed = new CustomEmbed(
       message.member,
       `**${
         message.author.username
-      }** has created an open coinflip\n\n**bet** $${bet.toLocaleString()}`
+      }** has created an open coinflip\n\n**bet** $${bet.toLocaleString()}`,
     ).setFooter({ text: "expires in 60 seconds" });
 
     const msg = await send({
@@ -418,7 +418,9 @@ async function run(
           i.reply({
             embeds: [
               new ErrorEmbed(
-                `your max bet is $**${((await calcMaxBet(message.member)) * 10).toLocaleString()}**`
+                `your max bet is $**${(
+                  (await calcMaxBet(message.member)) * 10
+                ).toLocaleString()}**`,
               ),
             ],
           });

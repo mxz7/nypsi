@@ -42,7 +42,7 @@ async function doDmQueueInterval(manager: ClusterManager): Promise<void> {
       memberId: item.memberId,
       embed: item.payload.embed,
       components: item.payload.components,
-    })
+    }),
   );
 
   lastRun = Date.now();

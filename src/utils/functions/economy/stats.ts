@@ -100,7 +100,7 @@ export async function createGame(
     xp?: number;
     outcome: string;
   },
-  attempts = 1
+  attempts = 1,
 ): Promise<string> {
   let fail = false;
   const res = await prisma.game

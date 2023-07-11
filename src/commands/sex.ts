@@ -37,7 +37,7 @@ interface MilfSearchData {
 
 cmd.slashEnabled = true;
 cmd.slashData.addStringOption((option) =>
-  option.setName("message").setDescription("a good pickup line always works (;")
+  option.setName("message").setDescription("a good pickup line always works (;"),
 );
 
 const descFilter = [
@@ -65,7 +65,7 @@ const descFilter = [
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -111,14 +111,14 @@ async function run(
 
   if ((await redis.exists(`${Constants.redis.cooldown.SEX_CHASTITY}:${message.author.id}`)) == 1) {
     const init = parseInt(
-      await redis.get(`${Constants.redis.cooldown.SEX_CHASTITY}:${message.author.id}`)
+      await redis.get(`${Constants.redis.cooldown.SEX_CHASTITY}:${message.author.id}`),
     );
     const remaining = MStoTime(Date.now() + 10800000 - init);
 
     return send({
       embeds: [
         new ErrorEmbed(
-          `you have been equipped with a *chastity cage*, it will be removed in **${remaining}**`
+          `you have been equipped with a *chastity cage*, it will be removed in **${remaining}**`,
         ),
       ],
     });
@@ -162,14 +162,14 @@ async function run(
       embeds: [
         new CustomEmbed(
           message.member,
-          "you're now on the milf waiting list 😏\n\nyou'll be notified when a match is found"
+          "you're now on the milf waiting list 😏\n\nyou'll be notified when a match is found",
         ).setHeader("milf finder"),
       ],
     });
   } else {
     if (
       (await redis.lrange(Constants.redis.nypsi.MILF_QUEUE, 0, -1)).find(
-        (i) => (JSON.parse(i) as MilfSearchData).userId === message.author.id
+        (i) => (JSON.parse(i) as MilfSearchData).userId === message.author.id,
       )
     ) {
       return send({
@@ -178,7 +178,7 @@ async function run(
     }
 
     for (const milf of (await redis.lrange(Constants.redis.nypsi.MILF_QUEUE, 0, -1)).map(
-      (i) => JSON.parse(i) as MilfSearchData
+      (i) => JSON.parse(i) as MilfSearchData,
     )) {
       if (message.guild.id == milf.guildId) continue;
 
@@ -191,7 +191,7 @@ async function run(
             ? "[nypsi](https://discord.gg/hJTDNST)"
             : milf.guildName
         }**\n\n` +
-          `go ahead and send **${await getLastKnownTag(milf.userId)}** a *private* message 😉😏`
+          `go ahead and send **${await getLastKnownTag(milf.userId)}** a *private* message 😉😏`,
       ).setHeader("milf finder");
 
       if (milf.description != "") {
@@ -202,7 +202,7 @@ async function run(
               : milf.guildName
           }**\n\n` +
             `**${await getLastKnownTag(milf.userId)}** - ${milf.description}\n\n` +
-            "go ahead and send them a *private* message 😉😏"
+            "go ahead and send them a *private* message 😉😏",
         );
       }
 
@@ -218,7 +218,7 @@ async function run(
           message.guild.id == "747056029795221513"
             ? "[nypsi](https://discord.gg/hJTDNST)"
             : message.guild.name
-        }**\n\ngo ahead and send **${message.author.username}** a *private* message 😉😏`
+        }**\n\ngo ahead and send **${message.author.username}** a *private* message 😉😏`,
       )
         .setHeader("milf finder")
         .setColor(Constants.EMBED_SUCCESS_COLOR);
@@ -248,7 +248,7 @@ async function run(
               : message.guild.name
           }**\n\n` +
             `**${message.author.username}** - ${description}\n\n` +
-            "go ahead and send them a *private* message 😉😏"
+            "go ahead and send them a *private* message 😉😏",
         );
       }
 
@@ -259,7 +259,7 @@ async function run(
           if (guild) return (client as unknown as NypsiClient).cluster.id;
           return "not-found";
         },
-        { context: { guildId: milf.guildId } }
+        { context: { guildId: milf.guildId } },
       );
 
       let cluster: number;
@@ -298,7 +298,7 @@ async function run(
             channelId: milf.channelId,
             guildId: milf.guildId,
           },
-        }
+        },
       );
     }
 
@@ -307,7 +307,7 @@ async function run(
       embeds: [
         new CustomEmbed(
           message.member,
-          "you're now on the milf waiting list 😏\n\nyou'll be notified when a match is found"
+          "you're now on the milf waiting list 😏\n\nyou'll be notified when a match is found",
         ).setHeader("milf finder"),
       ],
     });

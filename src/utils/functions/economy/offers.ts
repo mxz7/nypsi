@@ -23,7 +23,7 @@ export async function createOffer(
   itemId: string,
   itemAmount: number,
   money: number,
-  owner: GuildMember
+  owner: GuildMember,
 ) {
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder()
@@ -42,7 +42,7 @@ export async function createOffer(
     new ButtonBuilder()
       .setCustomId("disable-offers")
       .setLabel("disable all offers")
-      .setStyle(ButtonStyle.Secondary)
+      .setStyle(ButtonStyle.Secondary),
   );
 
   const tax = await getTax();
@@ -56,7 +56,7 @@ export async function createOffer(
       taxedAmount != 0 ? ` (${(tax * 100).toFixed(1)}% tax)` : ""
     } for your **${itemAmount.toLocaleString()}x** ${getItems()[itemId].emoji} ${
       getItems()[itemId].name
-    }\n\ndo you accept?`
+    }\n\ndo you accept?`,
   ).setHeader(`${owner.user.username}'s offer`, owner.user.avatarURL());
 
   if (itemAmount > 1 && money > 1000) {

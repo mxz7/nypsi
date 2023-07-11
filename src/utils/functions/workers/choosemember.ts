@@ -3,7 +3,7 @@ import { Worker, isMainThread, parentPort, workerData } from "worker_threads";
 
 export default function chooseMember(
   members: Collection<string, GuildMember>,
-  targetName: string
+  targetName: string,
 ): Promise<string | null> {
   return new Promise((resolve, reject) => {
     const worker = new Worker(__filename, {

@@ -108,7 +108,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           message.member,
           `for prestige **${(await getPrestige(message.member)) + 1}**\n\n` +
             `**xp** ${currentXp.toLocaleString()}/${neededXp.toLocaleString()}\n` +
-            `**bank** $${currentBal.toLocaleString()}/$${neededBal.toLocaleString()}`
+            `**bank** $${currentBal.toLocaleString()}/$${neededBal.toLocaleString()}`,
         ).setHeader("prestige requirements", message.author.avatarURL()),
       ],
     });
@@ -117,13 +117,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const embed = new CustomEmbed(
     message.member,
     "are you sure you want to prestige?\n\n" +
-      `you will lose **${neededXp.toLocaleString()}**xp and $**${neededBal.toLocaleString()}**\n\n`
+      `you will lose **${neededXp.toLocaleString()}**xp and $**${neededBal.toLocaleString()}**\n\n`,
   ).setHeader("prestige", message.author.avatarURL());
 
   await addCooldown(cmd.name, message.member);
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder().setCustomId("✅").setLabel("do it.").setStyle(ButtonStyle.Success)
+    new ButtonBuilder().setCustomId("✅").setLabel("do it.").setStyle(ButtonStyle.Success),
   );
 
   const msg = await send({ embeds: [embed], components: [row] });
@@ -156,7 +156,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             message.member,
             `for prestige **${(await getPrestige(message.member)) + 1}**\n\n` +
               `**xp** ${currentXp.toLocaleString()}/${neededXp.toLocaleString()}\n` +
-              `**bank** $${currentBal.toLocaleString()}/$${neededBal.toLocaleString()}`
+              `**bank** $${currentBal.toLocaleString()}/$${neededBal.toLocaleString()}`,
           ).setHeader("prestige requirements", message.author.avatarURL()),
         ],
       });
@@ -207,14 +207,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     embed.setDescription(
       `you are now prestige **${await getPrestige(message.member)}**\n\n` +
         `vote rewards: $**${Math.floor(
-          15000 * (prestige / 2 + 1)
+          15000 * (prestige / 2 + 1),
         ).toLocaleString()}**, **${crateAmount}** vote crates\n` +
         `gamble multiplier: **${Math.floor(gambleMulti * 100)}**%\n` +
         `sell multiplier: **${Math.floor(sellMulti * 100)}**%\n` +
         `your maximum bet: $**${maxBet.toLocaleString()}**\n` +
         `you have received **${amount}** basic crate${amount > 1 ? "s" : ""}${
           booster ? " and an xp booster for 30 minutes" : ""
-        }`
+        }`,
     );
 
     await edit({ embeds: [embed], components: [] }, msg);

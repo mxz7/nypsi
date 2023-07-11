@@ -40,12 +40,12 @@ const cmd = new Command("balance", "check your balance", "money").setAliases([
 cmd.slashEnabled = true;
 
 cmd.slashData.addUserOption((option) =>
-  option.setName("user").setDescription("view balance of this user").setRequired(false)
+  option.setName("user").setDescription("view balance of this user").setRequired(false),
 );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (message.member.user.id == Constants.TEKOH_ID && args.length == 2) {
     let target: GuildMember | string = message.mentions.members.first();
@@ -135,8 +135,8 @@ async function run(
       `**current balance** $${(
         await getNypsiBankBalance()
       ).toLocaleString()}\n**current tax rate** ${((await getTax()) * 100).toFixed(
-        1
-      )}%\n\ntax updates <t:${await getTaxRefreshTime()}:R>`
+        1,
+      )}%\n\ntax updates <t:${await getTaxRefreshTime()}:R>`,
     );
 
     return send({ embeds: [embed] });
@@ -193,14 +193,14 @@ async function run(
       `${padlockStatus ? "🔒" : "💰"} $**${balance.toLocaleString()}**\n` +
         `💳 $**${bankBalance.toLocaleString()}** / $**${bankMaxBalance.toLocaleString()}**${
           net.amount > 15_000_000 ? `\n${gemLine}\n🌍 $**${net.amount.toLocaleString()}**` : ""
-        }`
+        }`,
     )
     .setFooter({ text: footer });
 
   embed.setHeader(
     `${target.user.username} | season ${Constants.SEASON_NUMBER}`,
     target.user.avatarURL(),
-    `https://nypsi.xyz/user/${target.id}`
+    `https://nypsi.xyz/user/${target.id}`,
   );
 
   if (message.member == target) {
@@ -210,7 +210,7 @@ async function run(
     ) {
       return send({
         content: `you are eligible to prestige, use ${await getPrefix(
-          message.guild
+          message.guild,
         )}prestige for more info`,
         embeds: [embed],
       });

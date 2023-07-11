@@ -87,7 +87,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (!qualified) {
     const embed = new ErrorEmbed(
-      `this server does not qualify to track mentions (/pings)\n[more information](https://docs.nypsi.xyz/#my-server-does-not-qualify-for-the-pings-command)\njoin the support server for help (${prefix}support)`
+      `this server does not qualify to track mentions (/pings)\n[more information](https://docs.nypsi.xyz/#my-server-does-not-qualify-for-the-pings-command)\njoin the support server for help (${prefix}support)`,
     );
 
     return send({ embeds: [embed] });
@@ -109,15 +109,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     mentions.map(
       (i) =>
         `<t:${Math.floor(i.date.getTime() / 1000)}:R>|6|9|**${i.userTag}**: ${decrypt(
-          i.content
-        )}\n[jump](${i.url})`
+          i.content,
+        )}\n[jump](${i.url})`,
     ),
-    3
+    3,
   );
 
   const embed = new CustomEmbed(message.member).setHeader(
     "recent mentions",
-    message.author.avatarURL()
+    message.author.avatarURL(),
   );
 
   for (const i of pages.get(1)) {
@@ -137,7 +137,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       .setStyle(ButtonStyle.Primary)
       .setDisabled(true),
     new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
-    new ButtonBuilder().setCustomId("❌").setLabel("clear mentions").setStyle(ButtonStyle.Danger)
+    new ButtonBuilder().setCustomId("❌").setLabel("clear mentions").setStyle(ButtonStyle.Danger),
   );
 
   let msg: Message;
@@ -183,7 +183,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
           await manager.message.edit({ embeds: [embed], components: [] });
           return;
-        }
+        },
       ),
     });
 

@@ -17,21 +17,21 @@ import { createProfile, profileExists } from "../utils/functions/moderation/util
 const cmd = new Command(
   "ban",
   "ban one or more users from the server",
-  "moderation"
+  "moderation",
 ).setPermissions(["BAN_MEMBERS"]);
 
 cmd.slashEnabled = true;
 cmd.slashData
   .addUserOption((option) =>
-    option.setName("user").setDescription("member to ban from the server").setRequired(true)
+    option.setName("user").setDescription("member to ban from the server").setRequired(true),
   )
   .addStringOption((option) =>
-    option.setName("reason").setDescription("reason for the ban").setRequired(false)
+    option.setName("reason").setDescription("reason for the ban").setRequired(false),
   );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -87,7 +87,7 @@ async function run(
         "**<>** required | **()** optional | **[]** parameter\n" +
           "**<user>** you can either tag the user or use their username\n" +
           "**(reason)** reason for the ban, will be given to all banned members\n" +
-          "**[-s]** if used, command message will be deleted and the output will be sent to moderator as a DM if possible"
+          "**[-s]** if used, command message will be deleted and the output will be sent to moderator as a DM if possible",
       );
 
     return send({ embeds: [embed] });
@@ -230,7 +230,7 @@ async function run(
       "ban",
       target.user.id,
       message.author.username,
-      reason.split(": ")[1]
+      reason.split(": ")[1],
     );
 
     if (temporary) {

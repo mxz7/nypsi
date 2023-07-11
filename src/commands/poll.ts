@@ -8,7 +8,7 @@ const cmd = new Command("poll", "create a poll with a lot of customisation", "ut
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (await onCooldown(cmd.name, message.member)) {
     const embed = await getResponse(cmd.name, message.member);
@@ -27,7 +27,7 @@ async function run(
         "**<>** required | **()** optional\n" +
           "after creation your message will be deleted and an embed will be created with your text and color if given\n" +
           "if a number isnt found for choices then 👍👎 emojis will be used\n" +
-          "largest number of choices is 10, and 1 is minimum"
+          "largest number of choices is 10, and 1 is minimum",
       )
       .addField("examples", `${prefix}poll question?\n` + `${prefix}poll 2 this or that`);
 

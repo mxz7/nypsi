@@ -43,7 +43,7 @@ export function runChristmas(client: NypsiClient) {
         },
         {
           context: { channelId: guild.channel },
-        }
+        },
       );
 
       let shard: number;
@@ -103,7 +103,7 @@ export function runChristmas(client: NypsiClient) {
             channelId: guild.channel,
             embed: embed.toJSON(),
           },
-        }
+        },
       );
 
       if (res.includes(true)) {
@@ -122,7 +122,7 @@ export function runChristmas(client: NypsiClient) {
   }, needed.getTime() - now.getTime());
 
   logger.info(
-    `::auto christmas countdowns will run in ${MStoTime(needed.getTime() - now.getTime())}`
+    `::auto christmas countdowns will run in ${MStoTime(needed.getTime() - now.getTime())}`,
   );
 }
 

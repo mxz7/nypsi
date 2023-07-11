@@ -27,7 +27,7 @@ export async function isBooster(userId: string) {
   await redis.set(`${Constants.redis.cache.premium.BOOSTER}:${userId}`, query.booster ? "t" : "f");
   await redis.expire(
     `${Constants.redis.cache.premium.BOOSTER}:${userId}`,
-    Math.floor(ms("3 hours") / 1000)
+    Math.floor(ms("3 hours") / 1000),
   );
 
   return query.booster;
@@ -62,7 +62,7 @@ export async function setBooster(userId: string, value: boolean): Promise<void> 
       payload: {
         embed: new CustomEmbed(
           null,
-          "thank you for boosting the nypsi server, you can see your rewards [here](https://discord.com/channels/747056029795221513/1031950370206924903/1092078265948188842)"
+          "thank you for boosting the nypsi server, you can see your rewards [here](https://discord.com/channels/747056029795221513/1031950370206924903/1092078265948188842)",
         )
           .setColor(Constants.EMBED_SUCCESS_COLOR)
           .setHeader("thank you for supporting nypsi!!"),
