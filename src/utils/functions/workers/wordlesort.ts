@@ -4,7 +4,7 @@ import { isMainThread, parentPort, Worker, workerData } from "worker_threads";
 export default function wordleSortWorker(
   query: {
     user: {
-      lastKnownTag: string;
+      lastKnownUsername: string;
       blacklisted: boolean;
       id: string;
     };
@@ -19,7 +19,7 @@ export default function wordleSortWorker(
   {
     wins: number;
     user: {
-      lastKnownTag: string;
+      lastKnownUsername: string;
       blacklisted: boolean;
       id: string;
     };

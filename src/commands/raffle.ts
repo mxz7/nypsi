@@ -49,7 +49,7 @@ async function run(
 
   const embed = new CustomEmbed(message.member)
     .setHeader(`${message.member.user.username}'s raffle`, message.author.avatarURL())
-    .setDescription(`${chosenMember.user.toString()} | \`${chosenMember.user.tag}\``);
+    .setDescription(`${chosenMember.user.toString()} | \`${chosenMember.user.username}\``);
 
   return message.channel.send({ embeds: [embed] });
 }

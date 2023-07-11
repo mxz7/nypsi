@@ -15,7 +15,7 @@ import { MStoTime } from "../utils/functions/date.js";
 import { addProgress } from "../utils/functions/economy/achievements.js";
 import { cleanString } from "../utils/functions/string.js";
 import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications.js";
-import { getLastKnownTag } from "../utils/functions/users/tag.js";
+import { getLastKnownUsername } from "../utils/functions/users/tag.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 
 const cmd = new Command("sex", "find horny milfs in ur area 😏", "fun").setAliases([
@@ -191,7 +191,7 @@ async function run(
             ? "[nypsi](https://discord.gg/hJTDNST)"
             : milf.guildName
         }**\n\n` +
-          `go ahead and send [**${await getLastKnownTag(
+          `go ahead and send [**${await getLastKnownUsername(
             milf.userId,
           )}**](https://discord.com/users/${milf.userId}) a *private* message 😉😏`,
       ).setHeader("milf finder");
@@ -203,7 +203,7 @@ async function run(
               ? "[nypsi](https://discord.gg/hJTDNST)"
               : milf.guildName
           }**\n\n` +
-            `[**${await getLastKnownTag(milf.userId)}**](https://discord.com/users/${
+            `[**${await getLastKnownUsername(milf.userId)}**](https://discord.com/users/${
               milf.userId
             }) - ${milf.description}\n\n` +
             "go ahead and send them a *private* message 😉😏",

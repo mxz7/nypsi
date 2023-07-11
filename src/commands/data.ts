@@ -139,7 +139,7 @@ async function run(
 
       await m.edit({ embeds: [embed], components: [] });
 
-      logger.info(`fetching data for ${message.author.tag}...`);
+      logger.info(`fetching data for ${message.author.username}...`);
       const userData = await prisma.user.findUnique({
         where: {
           id: message.author.id,
@@ -199,7 +199,7 @@ async function run(
 
       const moderationCasesModerator = await prisma.moderationCase.findMany({
         where: {
-          moderator: message.author.tag,
+          moderator: message.author.username,
         },
       });
 
@@ -228,18 +228,18 @@ async function run(
       });
       const mentionsSenderData = await prisma.mention.findMany({
         where: {
-          userTag: message.author.tag,
+          userTag: message.author.username,
         },
       });
 
       const file = `/tmp/nypsi_data_${message.author.id}.txt`;
 
-      logger.info(`packing into text file for ${message.author.tag}...`);
+      logger.info(`packing into text file for ${message.author.username}...`);
 
       await fs.writeFile(
         file,
         `nypsi data for ${message.author.id} (${
-          message.author.tag
+          message.author.username
         } at time of request) - ${new Date().toUTCString()}\n\n----------\nYOUR USER DATA\n----------\n\n`,
       );
       await fs.appendFile(file, JSON.stringify(userData, null, 2));
@@ -357,7 +357,7 @@ async function run(
 
       await m.edit({ embeds: [embed], components: [] });
 
-      logger.info(`deleting data for ${message.author.tag}...`);
+      logger.info(`deleting data for ${message.author.username}...`);
 
       await prisma.inventory.deleteMany({
         where: {

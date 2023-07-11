@@ -273,7 +273,7 @@ async function run(
 
   const embed = new CustomEmbed(message.member);
 
-  let msg = `✅ \`${target.user.tag}\` has been muted`;
+  let msg = `✅ \`${target.user.username}\` has been muted`;
 
   if (timedMute) {
     msg += ` for **${mutedLength}**`;
@@ -302,7 +302,7 @@ async function run(
     storeReason = `[${mutedLength}] ${reason}`;
   }
 
-  await newCase(message.guild, "mute", target.user.id, message.author.tag, storeReason);
+  await newCase(message.guild, "mute", target.user.id, message.author.username, storeReason);
 
   if (await isMuted(message.guild, target)) {
     await deleteMute(message.guild, target);

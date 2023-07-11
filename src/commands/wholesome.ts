@@ -32,7 +32,7 @@ import {
 } from "../utils/functions/image";
 import { getMember } from "../utils/functions/member";
 import PageManager from "../utils/functions/page";
-import { getLastKnownTag } from "../utils/functions/users/tag";
+import { getLastKnownUsername } from "../utils/functions/users/tag";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger } from "../utils/logger";
 
@@ -482,11 +482,11 @@ async function run(
         embeds: [
           new CustomEmbed(
             message.member,
-            `suggested by ${await getLastKnownTag(suggestion.submitterId)} (${
+            `suggested by ${await getLastKnownUsername(suggestion.submitterId)} (${
               suggestion.submitterId
             }) on <t:${Math.floor(
               suggestion.uploadDate.getTime() / 1000,
-            )}>\naccepted by ${await getLastKnownTag(suggestion.accepterId)} (${
+            )}>\naccepted by ${await getLastKnownUsername(suggestion.accepterId)} (${
               suggestion.accepterId
             })\n${suggestion.image}`,
           ).setImage(suggestion.image),

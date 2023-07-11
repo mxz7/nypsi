@@ -1,7 +1,7 @@
 import { GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 
-export async function updateLastKnownTag(member: GuildMember | string, tag: string) {
+export async function updateLastKnownUsername(member: GuildMember | string, tag: string) {
   let id: string;
   if (member instanceof GuildMember) {
     id = member.user.id;
@@ -14,20 +14,20 @@ export async function updateLastKnownTag(member: GuildMember | string, tag: stri
       id: id,
     },
     data: {
-      lastKnownTag: tag,
+      lastKnownUsername: tag,
     },
   });
 }
 
-export async function getLastKnownTag(id: string) {
+export async function getLastKnownUsername(id: string) {
   const query = await prisma.user.findUnique({
     where: {
       id: id,
     },
     select: {
-      lastKnownTag: true,
+      lastKnownUsername: true,
     },
   });
 
-  return query.lastKnownTag;
+  return query.lastKnownUsername;
 }

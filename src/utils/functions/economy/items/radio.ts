@@ -69,7 +69,9 @@ module.exports = new ItemUse(
 
     if ((await redis.exists(`${Constants.redis.cooldown.ROB_RADIO}:${radioTarget.user.id}`)) == 1) {
       return send({
-        embeds: [new ErrorEmbed(`the police are already looking for **${radioTarget.user.tag}**`)],
+        embeds: [
+          new ErrorEmbed(`the police are already looking for **${radioTarget.user.username}**`),
+        ],
       });
     }
 
@@ -96,7 +98,7 @@ module.exports = new ItemUse(
         embeds: [
           new CustomEmbed(
             message.member,
-            `putting report out on police scanner...\n\nthe police are now looking for **${radioTarget.user.tag}**`,
+            `putting report out on police scanner...\n\nthe police are now looking for **${radioTarget.user.username}**`,
           ),
         ],
       },

@@ -68,14 +68,14 @@ if (!isMainThread) {
         // .set("minute", parseInt(timestamp.split(":")[1]))
         // .set("second", parseInt(timestamp.split(":")[2]));
 
-        return date.unix();
+        return date.toDate().getTime();
       } catch {
         try {
           const timestamp: string = JSON.parse(i.substring(i.length - 35)).timestamp;
 
           const date = dayjs(timestamp);
 
-          return date.unix();
+          return date.toDate().getTime();
         } catch {
           return null;
         }

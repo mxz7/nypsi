@@ -214,7 +214,7 @@ export async function bumpAuction(id: number, client: NypsiClient) {
         select: {
           user: {
             select: {
-              lastKnownTag: true,
+              lastKnownUsername: true,
             },
           },
         },
@@ -235,7 +235,7 @@ export async function bumpAuction(id: number, client: NypsiClient) {
 
   const embed = new CustomEmbed()
     .setColor(Constants.TRANSPARENT_EMBED_COLOR)
-    .setHeader(`${query.owner.user.lastKnownTag.split("#")[0]}'s auction`);
+    .setHeader(`${query.owner.user.lastKnownUsername}'s auction`);
 
   const items = getItems();
 
@@ -917,20 +917,25 @@ export async function buyAuctionOne(
 
   if ((await getDmSettings(auction.ownerId)).auction) {
     if (dmQueue.has(`${auction.ownerId}-${auction.itemId}`)) {
-      if (dmQueue.get(`${auction.ownerId}-${auction.itemId}`).buyers.has(interaction.user.tag)) {
+      if (
+        dmQueue.get(`${auction.ownerId}-${auction.itemId}`).buyers.has(interaction.user.username)
+      ) {
         dmQueue
           .get(`${auction.ownerId}-${auction.itemId}`)
           .buyers.set(
-            interaction.user.tag,
-            dmQueue.get(`${auction.ownerId}-${auction.itemId}`).buyers.get(interaction.user.tag) +
-              1,
+            interaction.user.username,
+            dmQueue
+              .get(`${auction.ownerId}-${auction.itemId}`)
+              .buyers.get(interaction.user.username) + 1,
           );
       } else {
-        dmQueue.get(`${auction.ownerId}-${auction.itemId}`).buyers.set(interaction.user.tag, 1);
+        dmQueue
+          .get(`${auction.ownerId}-${auction.itemId}`)
+          .buyers.set(interaction.user.username, 1);
       }
     } else {
       dmQueue.set(`${auction.ownerId}-${auction.itemId}`, {
-        buyers: new Map([[interaction.user.tag, 1]]),
+        buyers: new Map([[interaction.user.username, 1]]),
       });
 
       setTimeout(async () => {

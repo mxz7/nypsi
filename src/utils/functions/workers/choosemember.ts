@@ -1,5 +1,5 @@
 import { Collection, GuildMember } from "discord.js";
-import { isMainThread, parentPort, Worker, workerData } from "worker_threads";
+import { Worker, isMainThread, parentPort, workerData } from "worker_threads";
 
 export default function chooseMember(
   members: Collection<string, GuildMember>,
@@ -27,7 +27,7 @@ if (!isMainThread) {
   for (const m of members.keys()) {
     const member = members.get(m);
 
-    const tag = (member.user.username + "#" + member.user.discriminator).toLowerCase();
+    const tag = member.user.username.toLowerCase();
 
     if (member.user.id == memberName) {
       target = member;

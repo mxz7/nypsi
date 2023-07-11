@@ -146,7 +146,7 @@ async function run(
     message.author.avatarURL(),
   );
 
-  embed.setDescription(`${message.author.tag} has challenged you to a fight. do you accept?`);
+  embed.setDescription(`${message.author.username} has challenged you to a fight. do you accept?`);
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder().setCustomId("y").setLabel("accept").setStyle(ButtonStyle.Success),

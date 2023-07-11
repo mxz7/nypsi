@@ -684,7 +684,10 @@ async function run(
 
     if (!auction) return message.channel.send({ embeds: [new ErrorEmbed("invalid auction bro")] });
 
-    logger.info(`admin: ${message.author.tag} (${message.author.id}) deleted auction`, auction);
+    logger.info(
+      `admin: ${message.author.id} (${message.author.username}) deleted auction`,
+      auction,
+    );
 
     if (auction.sold) {
       await prisma.auction.delete({
