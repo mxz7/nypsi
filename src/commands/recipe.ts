@@ -38,10 +38,11 @@ async function run(
   await addCooldown(cmd.name, message.member, 4);
 
   const embed = new CustomEmbed(message.member).setHeader(
-    `${selected.emoji} ${selected.name} recipe`,
+    "recipe",
+    message.author.avatarURL(),
   );
 
-  const desc: string[] = [];
+  const desc: string[] = [`${selected.emoji} ${selected.name}`];
 
   selected.craft.ingredients.forEach((ingredient) => {
     const item = selectItem(ingredient.split(":")[0]);
