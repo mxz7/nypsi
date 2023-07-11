@@ -51,7 +51,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   for (const m of banned) {
     const user: GuildMember | void = await message.guild.members.fetch(m.userId).catch(() => {});
 
-    const msg = `\`${user ? user.user.tag : m.userId}\` ${
+    const msg = `\`${user ? user.user.username : m.userId}\` ${
       m.expire.getTime() >= 3130000000000
         ? "is permanently banned"
         : `will be unbanned <t:${Math.floor(m.expire.getTime() / 1000)}:R>`

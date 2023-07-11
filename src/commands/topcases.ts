@@ -111,7 +111,7 @@ async function run(
       if (!username) {
         username = m;
       } else {
-        username = username.user.tag;
+        username = username.user.username;
       }
 
       memberText[count] =
@@ -157,7 +157,7 @@ async function run(
     let unmutes = 0;
 
     for (const case0 of cases) {
-      if (case0.moderator == member.user.tag) {
+      if (case0.moderator == member.user.username) {
         if (case0.deleted) {
           deletedCasesModerator++;
         } else {

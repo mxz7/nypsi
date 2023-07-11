@@ -24,12 +24,12 @@ export default async function guildMemberAdd(member: GuildMember) {
   if (await isLogsEnabled(member.guild)) {
     const embed = new CustomEmbed().disableFooter().setTimestamp();
 
-    embed.setHeader(member.user.tag, member.user.avatarURL());
+    embed.setHeader(member.user.username, member.user.avatarURL());
     embed.setTitle("member joined");
     embed.setDescription(
-      `${member.toString()} \`${member.id}\`\n\n**tag** ${member.user.tag}\n**created** ${daysAgo(
-        member.user.createdAt,
-      )} days ago`,
+      `${member.toString()} \`${member.id}\`\n\n**username** ${
+        member.user.username
+      }\n**created** ${daysAgo(member.user.createdAt)} days ago`,
     );
 
     const history = await fetchUsernameHistory(member);

@@ -78,7 +78,7 @@ export async function topBalance(guild: Guild, userId?: string) {
       out[count] =
         pos +
         " **" +
-        getMemberID(guild, user.userId).user.tag +
+        getMemberID(guild, user.userId).user.username +
         "** $" +
         Number(user.money).toLocaleString();
       count++;
@@ -96,7 +96,7 @@ export async function topBalance(guild: Guild, userId?: string) {
   return { pages, pos };
 }
 
-export async function topBalanceGlobal(amount: number, anon = true): Promise<string[]> {
+export async function topBalanceGlobal(amount: number): Promise<string[]> {
   const query = await prisma.economy.findMany({
     where: {
       AND: [{ user: { blacklisted: false } }, { money: { gt: 10_000 } }],
@@ -107,7 +107,7 @@ export async function topBalanceGlobal(amount: number, anon = true): Promise<str
       banned: true,
       user: {
         select: {
-          lastKnownTag: true,
+          lastKnownUsername: true,
         },
       },
     },
@@ -139,15 +139,9 @@ export async function topBalanceGlobal(amount: number, anon = true): Promise<str
       pos = "🥉";
     }
 
-    let username = user.user.lastKnownTag;
-
-    if (anon) {
-      username = username.split("#")[0];
-    }
-
     usersFinal[count] =
       pos + " **" + (await getPreferences(user.userId))?.leaderboards
-        ? username
+        ? user.user.lastKnownUsername
         : "[hidden]" + "** $" + Number(user.money).toLocaleString();
     count++;
   }
@@ -171,7 +165,7 @@ export async function topNetWorthGlobal(userId: string) {
       banned: true,
       user: {
         select: {
-          lastKnownTag: true,
+          lastKnownUsername: true,
         },
       },
     },
@@ -204,7 +198,7 @@ export async function topNetWorthGlobal(userId: string) {
       pos +
         " **" +
         ((await getPreferences(user.userId))?.leaderboards
-          ? user.user.lastKnownTag?.split("#")[0] || user.userId
+          ? user.user.lastKnownUsername || user.userId
           : "[hidden]") +
         "** $" +
         Number(user.netWorth).toLocaleString(),
@@ -306,7 +300,7 @@ export async function topNetWorth(guild: Guild, userId?: string) {
       out[count] =
         pos +
         " **" +
-        getMemberID(guild, user).user.tag +
+        getMemberID(guild, user).user.username +
         "** $" +
         amounts.get(user).toLocaleString();
       count++;
@@ -393,7 +387,7 @@ export async function topPrestige(guild: Guild, userId?: string) {
     out[count] =
       pos +
       " **" +
-      getMemberID(guild, user.userId).user.tag +
+      getMemberID(guild, user.userId).user.username +
       "** " +
       user.prestige +
       (thing[(v - 20) % 10] || thing[v] || thing[0]) +
@@ -423,7 +417,7 @@ export async function topPrestigeGlobal(userId: string) {
       banned: true,
       user: {
         select: {
-          lastKnownTag: true,
+          lastKnownUsername: true,
         },
       },
     },
@@ -461,7 +455,7 @@ export async function topPrestigeGlobal(userId: string) {
       pos +
       " **" +
       ((await getPreferences(user.userId))?.leaderboards
-        ? user.user.lastKnownTag?.split("#")[0] || user.userId
+        ? user.user.lastKnownUsername || user.userId
         : "[hidden]") +
       "** " +
       user.prestige +
@@ -556,7 +550,7 @@ export async function topItem(guild: Guild, item: string, userId: string) {
     out[count] =
       pos +
       " **" +
-      getMemberID(guild, user.userId).user.tag +
+      getMemberID(guild, user.userId).user.username +
       "** " +
       user.amount.toLocaleString() +
       ` ${user.amount > 1 ? items[item].plural || items[item].name : items[item].name}`;
@@ -586,7 +580,7 @@ export async function topItemGlobal(item: string, userId: string) {
         select: {
           user: {
             select: {
-              lastKnownTag: true,
+              lastKnownUsername: true,
             },
           },
           banned: true,
@@ -627,7 +621,7 @@ export async function topItemGlobal(item: string, userId: string) {
       pos +
       " **" +
       ((await getPreferences(user.userId))?.leaderboards
-        ? user.economy.user.lastKnownTag?.split("#")[0] || user.userId
+        ? user.economy.user.lastKnownUsername || user.userId
         : "[hidden]") +
       "** " +
       user.amount.toLocaleString() +
@@ -743,7 +737,7 @@ export async function topCompletion(guild: Guild, userId: string) {
       out[count] =
         pos +
         " **" +
-        getMemberID(guild, user).user.tag +
+        getMemberID(guild, user).user.username +
         "** " +
         completionRate.get(user).toFixed(1) +
         "%";
@@ -855,7 +849,8 @@ export async function topDailyStreak(guild: Guild, userId?: string) {
       pos = "🥉";
     }
 
-    out[count] = pos + " **" + getMemberID(guild, user.userId).user.tag + "** " + user.dailyStreak;
+    out[count] =
+      pos + " **" + getMemberID(guild, user.userId).user.username + "** " + user.dailyStreak;
     count++;
   }
 
@@ -881,7 +876,7 @@ export async function topDailyStreakGlobal(userId: string) {
       banned: true,
       user: {
         select: {
-          lastKnownTag: true,
+          lastKnownUsername: true,
         },
       },
     },
@@ -916,7 +911,7 @@ export async function topDailyStreakGlobal(userId: string) {
       pos +
       " **" +
       ((await getPreferences(user.userId))?.leaderboards
-        ? user.user.lastKnownTag?.split("#")[0] || user.userId
+        ? user.user.lastKnownUsername || user.userId
         : "[hidden]") +
       "** " +
       user.dailyStreak;
@@ -977,7 +972,7 @@ export async function topWordle(guild: Guild, userId: string) {
       user: {
         select: {
           id: true,
-          lastKnownTag: true,
+          lastKnownUsername: true,
           blacklisted: true,
         },
       },
@@ -987,7 +982,7 @@ export async function topWordle(guild: Guild, userId: string) {
   let sorted: {
     wins: number;
     user: {
-      lastKnownTag: string;
+      lastKnownUsername: string;
       blacklisted: boolean;
       id: string;
     };
@@ -1031,7 +1026,7 @@ export async function topWordle(guild: Guild, userId: string) {
     out.push(
       pos +
         " **" +
-        getMemberID(guild, user.user.id).user.tag +
+        getMemberID(guild, user.user.id).user.username +
         "** " +
         user.wins.toLocaleString() +
         " wins",
@@ -1071,7 +1066,7 @@ export async function topWordleGlobal(userId: string) {
       user: {
         select: {
           id: true,
-          lastKnownTag: true,
+          lastKnownUsername: true,
           blacklisted: true,
         },
       },
@@ -1097,7 +1092,7 @@ export async function topWordleGlobal(userId: string) {
       pos +
         " **" +
         ((await getPreferences(user.user.id))?.leaderboards
-          ? user.user.lastKnownTag?.split("#")[0] || user.user.id
+          ? user.user.lastKnownUsername || user.user.id
           : "[hidden]") +
         "** " +
         user.wins.toLocaleString() +
@@ -1210,7 +1205,7 @@ export async function topCommandGlobal(command: string, userId: string) {
       uses: true,
       user: {
         select: {
-          lastKnownTag: true,
+          lastKnownUsername: true,
         },
       },
     },
@@ -1241,7 +1236,7 @@ export async function topCommandGlobal(command: string, userId: string) {
       pos +
       " **" +
       ((await getPreferences(user.userId))?.leaderboards
-        ? user.user.lastKnownTag?.split("#")[0] || user.userId
+        ? user.user.lastKnownUsername?.split("#")[0] || user.userId
         : "[hidden]") +
       "** " +
       user.uses.toLocaleString() +

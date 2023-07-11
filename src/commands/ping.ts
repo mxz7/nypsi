@@ -39,7 +39,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     await prisma.user.create({
       data: {
         id: "test_user",
-        lastKnownTag: "",
+        lastKnownUsername: "",
         lastCommand: new Date(),
       },
     });

@@ -74,13 +74,13 @@ if (!isMainThread) {
             id: userId,
           },
           select: {
-            lastKnownTag: true,
+            lastKnownUsername: true,
           },
         })
-        .then((r) => r?.lastKnownTag);
+        .then((r) => r?.lastKnownUsername);
 
       chart.data.datasets.push({
-        label: tag?.split("#")[0] || userId,
+        label: tag || userId,
         data: balances.map((b) => parseInt(b)),
         fill: false,
       });

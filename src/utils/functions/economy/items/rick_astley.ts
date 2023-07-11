@@ -55,7 +55,7 @@ module.exports = new ItemUse(
 
     if (await redis.exists(`${Constants.redis.nypsi.RICKROLL}:${target.user.id}`))
       return send({
-        embeds: [new ErrorEmbed(`${target.user.tag} already has a rick roll queued`)],
+        embeds: [new ErrorEmbed(`${target.user.username} already has a rick roll queued`)],
       });
 
     await setInventoryItem(
@@ -70,7 +70,7 @@ module.exports = new ItemUse(
       embeds: [
         new CustomEmbed(
           message.member,
-          `<a:rick_astley:1100529748796506203> **${target.user.tag}** will be rick rolled soon xd !!!!`,
+          `<a:rick_astley:1100529748796506203> **${target.user.username}** will be rick rolled soon xd !!!!`,
         ),
       ],
     });

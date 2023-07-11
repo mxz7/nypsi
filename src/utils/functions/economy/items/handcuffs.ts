@@ -66,7 +66,7 @@ module.exports = new ItemUse(
 
     if (await isHandcuffed(handcuffsTarget.user.id)) {
       return send({
-        embeds: [new ErrorEmbed(`**${handcuffsTarget.user.tag}** is already restrained`)],
+        embeds: [new ErrorEmbed(`**${handcuffsTarget.user.username}** is already restrained`)],
       });
     }
 
@@ -91,7 +91,9 @@ module.exports = new ItemUse(
     ]);
 
     const msg = await send({
-      embeds: [new CustomEmbed(message.member, `restraining **${handcuffsTarget.user.tag}**...`)],
+      embeds: [
+        new CustomEmbed(message.member, `restraining **${handcuffsTarget.user.username}**...`),
+      ],
     });
 
     return edit(
@@ -99,7 +101,7 @@ module.exports = new ItemUse(
         embeds: [
           new CustomEmbed(
             message.member,
-            `restraining **${handcuffsTarget.user.tag}**...\n\n**${handcuffsTarget.user.tag}** has been restrained for one minute`,
+            `restraining **${handcuffsTarget.user.username}**...\n\n**${handcuffsTarget.user.username}** has been restrained for one minute`,
           ),
         ],
       },

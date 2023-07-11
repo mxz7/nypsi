@@ -5,21 +5,21 @@ import { userExists } from "../utils/functions/economy/utils";
 import { uploadImageToImgur } from "../utils/functions/image";
 import { isPremium } from "../utils/functions/premium/premium";
 import { addNewAvatar, addNewUsername, isTracking } from "../utils/functions/users/history";
-import { updateLastKnownTag } from "../utils/functions/users/tag";
+import { updateLastKnownUsername } from "../utils/functions/users/tag";
 import { hasProfile } from "../utils/functions/users/utils";
 
 const queue: User[] = [];
 let interval: NodeJS.Timer;
 
 export default async function userUpdate(oldUser: User, newUser: User) {
-  if (oldUser.tag != newUser.tag) {
+  if (oldUser.username != newUser.username) {
     if (await hasProfile(newUser.id)) {
       if (!(await determineCluster(newUser.client as NypsiClient, newUser.id))) return;
 
-      await updateLastKnownTag(newUser.id, newUser.tag);
+      await updateLastKnownUsername(newUser.id, newUser.username);
 
       if (!(await isTracking(newUser.id))) return;
-      await addNewUsername(newUser.id, newUser.tag);
+      await addNewUsername(newUser.id, newUser.username);
     }
   }
 

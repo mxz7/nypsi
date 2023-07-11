@@ -111,7 +111,7 @@ async function run(
     const embed = new CustomEmbed(message.member).setHeader(
       `${message.author.username}'s wordle stats`,
       message.author.avatarURL(),
-      `https://nypsi.xyz/user/${message.author.id}#wordle`,
+      `https://nypsi.xyz/user/${message.author.id}`,
     );
 
     let desc = "";

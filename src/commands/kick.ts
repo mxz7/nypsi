@@ -92,7 +92,7 @@ async function run(
   }
 
   const target = await getExactMember(message.guild, args[0]);
-  let reason = message.member.user.tag + ": ";
+  let reason = message.member.user.username + ": ";
 
   if (!target) return send({ embeds: [new ErrorEmbed("invalid user")] });
 
@@ -123,7 +123,7 @@ async function run(
 
   const embed = new CustomEmbed(message.member);
 
-  let msg = `✅ \`${target.user.tag}\` has been kicked`;
+  let msg = `✅ \`${target.user.username}\` has been kicked`;
 
   if (reason.split(": ")[1] !== "no reason given") {
     msg += ` for **${reason.split(": ")[1]}**`;
@@ -142,7 +142,13 @@ async function run(
     await send({ embeds: [embed] });
   }
 
-  await newCase(message.guild, "kick", target.user.id, message.author.tag, reason.split(": ")[1]);
+  await newCase(
+    message.guild,
+    "kick",
+    target.user.id,
+    message.author.username,
+    reason.split(": ")[1],
+  );
 
   if (args.join(" ").includes("-s")) return;
 

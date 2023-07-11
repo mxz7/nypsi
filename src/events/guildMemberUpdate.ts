@@ -33,7 +33,7 @@ export default async function guildMemberUpdate(oldMember: GuildMember, newMembe
     const embed = new CustomEmbed()
       .disableFooter()
       .setTimestamp()
-      .setHeader(newMember.user.tag, newMember.user.avatarURL());
+      .setHeader(newMember.user.username, newMember.user.avatarURL());
 
     embed.setTitle("nickname changed");
     embed.setDescription(
@@ -62,7 +62,7 @@ export default async function guildMemberUpdate(oldMember: GuildMember, newMembe
 async function createLog(member: GuildMember, roles: Role[], added: boolean) {
   const embed = new CustomEmbed().disableFooter().setTimestamp();
 
-  embed.setHeader(member.user.tag, member.user.avatarURL());
+  embed.setHeader(member.user.username, member.user.avatarURL());
   embed.setTitle(!added ? "role removed" : "role added");
   embed.setDescription(`${member.toString()} \`${member.id}\``);
   embed.addField("role", roles.map((r) => r.toString()).join(" "));

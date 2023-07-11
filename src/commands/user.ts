@@ -34,7 +34,7 @@ async function run(
 
   if (args.includes("-id")) {
     const embed = new CustomEmbed(message.member, "`" + member.user.id + "`").setHeader(
-      member.user.tag,
+      member.user.username,
     );
     return message.channel.send({ embeds: [embed] });
   }
@@ -108,7 +108,7 @@ async function run(
 
   const embed = new CustomEmbed(message.member, member.user.toString())
     .setThumbnail(member.user.displayAvatarURL({ size: 128 }))
-    .setHeader(member.user.tag)
+    .setHeader(member.user.username)
 
     .addField(
       "account",

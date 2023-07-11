@@ -172,7 +172,7 @@ async function run(
           return send({
             embeds: [
               new ErrorEmbed(
-                `**${m.user.tag}** does not have the muted role (${muteRole.toString()})`,
+                `**${m.user.username}** does not have the muted role (${muteRole.toString()})`,
               ),
             ],
           });
@@ -212,7 +212,9 @@ async function run(
   const embed = new CustomEmbed(message.member, "✅ **" + count + "** member(s) unmuted");
 
   if (count == 1) {
-    embed.setDescription("✅ `" + message.mentions.members.first().user.tag + "` has been unmuted");
+    embed.setDescription(
+      "✅ `" + message.mentions.members.first().user.username + "` has been unmuted",
+    );
   }
 
   if (count == 0) {
@@ -222,7 +224,7 @@ async function run(
   if (failed.length != 0) {
     const failedTags = [];
     for (const fail1 of failed) {
-      failedTags.push(fail1.tag);
+      failedTags.push(fail1.username);
     }
 
     embed.addField("error", "unable to unmute: " + failedTags.join(", "));
@@ -255,7 +257,7 @@ async function run(
     }
   }
 
-  await newCase(message.guild, "unmute", members1, message.author.tag, message.content);
+  await newCase(message.guild, "unmute", members1, message.author.username, message.content);
 }
 
 cmd.setRun(run);

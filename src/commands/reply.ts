@@ -25,7 +25,7 @@ async function run(
   }
 
   const embed = new CustomEmbed(message.member).setHeader(
-    message.author.tag,
+    message.author.username,
     message.author.avatarURL(),
   );
 

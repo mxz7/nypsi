@@ -143,14 +143,14 @@ export async function updateChannel(data: GuildCounter, client: NypsiClient) {
       select: {
         user: {
           select: {
-            lastKnownTag: true,
+            lastKnownUsername: true,
           },
         },
       },
       orderBy: { money: "desc" },
     });
 
-    value = topMember?.user?.lastKnownTag.split("#")[0] || "null";
+    value = topMember?.user?.lastKnownUsername || "null";
   } else if (data.tracks === TrackingType.TOTAL_BALANCE) {
     const members = await client.cluster
       .broadcastEval(

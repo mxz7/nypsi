@@ -105,7 +105,7 @@ async function run(
         new CustomEmbed(message.member, "your inventory is empty").setHeader(
           "your inventory",
           message.author.avatarURL(),
-          `https://nypsi.xyz/user/${message.author.id}#inventory`,
+          `https://nypsi.xyz/user/${message.author.id}`,
         ),
       ],
     });

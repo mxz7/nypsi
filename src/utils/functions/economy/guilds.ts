@@ -26,7 +26,7 @@ export async function getGuildByName(name: string) {
           select: {
             user: {
               select: {
-                lastKnownTag: true,
+                lastKnownUsername: true,
               },
             },
           },
@@ -40,7 +40,7 @@ export async function getGuildByName(name: string) {
               select: {
                 user: {
                   select: {
-                    lastKnownTag: true,
+                    lastKnownUsername: true,
                   },
                 },
               },
@@ -141,7 +141,7 @@ export async function getGuildByUser(member: GuildMember | string) {
                   select: {
                     user: {
                       select: {
-                        lastKnownTag: true,
+                        lastKnownUsername: true,
                       },
                     },
                   },
@@ -152,7 +152,7 @@ export async function getGuildByUser(member: GuildMember | string) {
               select: {
                 user: {
                   select: {
-                    lastKnownTag: true,
+                    lastKnownUsername: true,
                   },
                 },
               },
@@ -338,7 +338,7 @@ export async function removeMember(member: string, mode: RemoveMemberMode) {
   } else {
     const user = await prisma.user.findFirst({
       where: {
-        lastKnownTag: member,
+        lastKnownUsername: member,
       },
       select: {
         id: true,

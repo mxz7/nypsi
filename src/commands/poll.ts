@@ -68,7 +68,7 @@ async function run(
   embed.setDescription(args.join(" "));
 
   if (!message.member.permissions.has(PermissionFlagsBits.Administrator)) {
-    embed.setHeader(message.member.user.tag);
+    embed.setHeader(message.member.user.username);
   }
 
   if (!(message instanceof Message)) return;

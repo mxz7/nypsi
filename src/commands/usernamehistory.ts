@@ -80,7 +80,7 @@ async function run(
   const pages = PageManager.createPages(history, 7);
 
   const embed = new CustomEmbed(message.member)
-    .setTitle(member.user.tag)
+    .setTitle(member.user.username)
     .setThumbnail(member.user.displayAvatarURL({ size: 256 }));
 
   let description = "";
@@ -133,7 +133,7 @@ async function run(
     if (!reaction) return;
 
     const newEmbed = new CustomEmbed(message.member)
-      .setTitle(member.user.tag)
+      .setTitle(member.user.username)
       .setThumbnail(member.user.displayAvatarURL({ size: 256 }));
 
     if (reaction == "⬅") {

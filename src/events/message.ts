@@ -39,7 +39,7 @@ const dmCooldown = new Set<string>();
 
 export default async function messageCreate(message: Message) {
   if (message.channel.isDMBased() && !message.author.bot) {
-    logger.info("message in DM from " + message.author.tag + ": " + message.content);
+    logger.info("message in DM from " + message.author.username + ": " + message.content);
 
     if (await isUserBlacklisted(message.author.id))
       return message.reply({
@@ -122,7 +122,7 @@ export default async function messageCreate(message: Message) {
       }
     } else {
       const embed = new CustomEmbed()
-        .setHeader(message.author.tag, message.author.avatarURL())
+        .setHeader(message.author.username, message.author.avatarURL())
         .setColor(Constants.TRANSPARENT_EMBED_COLOR);
 
       if (message.content) {
@@ -156,7 +156,7 @@ export default async function messageCreate(message: Message) {
     return await message.channel.send({ embeds: [embed] });
   }
 
-  a(message.author.id, message.author.tag, message.content);
+  a(message.author.id, message.author.username, message.content);
   if (message.channel.isDMBased()) return;
   if (message.channel.isVoiceBased()) return;
   if (!message.member) return;
