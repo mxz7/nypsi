@@ -964,17 +964,18 @@ export async function runCommand(
     commandGemCheck(message.member, command.category),
   ]);
 
-  if (command.category === "money")
-    prisma.activeChannels.upsert({
-      where: { userId_channelId: { channelId: message.channelId, userId: message.author.id } },
-      update: { createdAt: new Date() },
-      create: { channelId: message.channelId, userId: message.author.id },
-    });
+  console.log(command.category);
 
   if ((await getPreferences(message.member)).leaderboards)
     await redis.hincrby(Constants.redis.nypsi.TOP_COMMANDS_USER, message.author.username, 1);
 
   if (command.category == "money") {
+    await prisma.activeChannels.upsert({
+      where: { userId_channelId: { channelId: message.channelId, userId: message.author.id } },
+      update: { date: new Date() },
+      create: { channelId: message.channelId, userId: message.author.id },
+    });
+
     if (!message.member) return;
 
     setTimeout(async () => {
