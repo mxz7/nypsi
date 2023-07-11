@@ -7,6 +7,7 @@ import {
   MessageActionRowComponentBuilder,
 } from "discord.js";
 import prisma from "../../init/database";
+import redis from "../../init/redis";
 import { NypsiClient } from "../../models/Client";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 import Constants from "../../utils/Constants";
@@ -14,14 +15,12 @@ import { MStoTime } from "../../utils/functions/date";
 import { addInventoryItem } from "../../utils/functions/economy/inventory";
 import { createUser, getItems, userExists } from "../../utils/functions/economy/utils";
 import { percentChance, shuffle } from "../../utils/functions/random";
-import requestDM from "../../utils/functions/requestdm";
-import { getDmSettings } from "../../utils/functions/users/notifications";
 import { getLastKnownUsername } from "../../utils/functions/users/tag";
 import { logger } from "../../utils/logger";
 import dayjs = require("dayjs");
 
 const max = 3;
-const activityWithinSeconds = 30;
+const activityWithinSeconds = 15;
 const activeUsersRequired = 2;
 
 function doRandomDrop(client: NypsiClient) {
@@ -62,7 +61,12 @@ async function getChannels() {
 async function randomDrop(client: NypsiClient) {
   const channels = await getChannels();
 
-  if (channels.length === 0) return doRandomDrop(client);
+  if (
+    channels.length === 0 ||
+    (await redis.get("nypsi:maintenance")) ||
+    (await redis.get(Constants.redis.nypsi.RESTART)) == "t"
+  )
+    return doRandomDrop(client);
 
   let count = 0;
 
@@ -79,6 +83,7 @@ async function randomDrop(client: NypsiClient) {
 
     const games = [fastClickGame];
 
+    logger.info(`random drop started in ${channelId}`);
     const winner = await games[Math.floor(Math.random() * games.length)](client, channelId, prize);
 
     if (winner) {
@@ -86,41 +91,34 @@ async function randomDrop(client: NypsiClient) {
         `random drop in ${channelId} winner: ${winner} (${await getLastKnownUsername(winner)})`,
       );
       if (prize.startsWith("item:")) await addInventoryItem(winner, prize.substring(5), 1);
-
-      if ((await getDmSettings(winner)).other) {
-        requestDM({
-          client,
-          memberId: winner,
-          embed: new CustomEmbed()
-            .setColor(Constants.TRANSPARENT_EMBED_COLOR)
-            .setDescription(
-              `you have won a ${
-                prize.startsWith("item:")
-                  ? `${getItems()[prize.substring(5)].emoji} **${
-                      getItems()[prize.substring(5)].name
-                    }**`
-                  : ""
-              }`,
-            ),
-          content: "you have won a random drop!!",
-        });
-      }
     }
 
     if (count >= max) break;
   }
+
+  return doRandomDrop(client);
 }
 
 async function fastClickGame(client: NypsiClient, channelId: string, prize: string) {
   const cluster = await findCluster(client, channelId);
 
-  if (!cluster) return;
+  if (typeof cluster !== "number") return;
 
   const embed = new CustomEmbed()
     .setColor(0xffffff)
-    .setHeader("random drop")
+    .setHeader("loot drop", client.user.avatarURL())
     .setDescription(
       `first to click the button wins ${
+        prize.startsWith("item:")
+          ? `a ${getItems()[prize.substring(5)].emoji} **${getItems()[prize.substring(5)].name}**`
+          : ""
+      }`,
+    );
+  const winEmbed = new CustomEmbed()
+    .setColor(Constants.EMBED_SUCCESS_COLOR)
+    .setHeader(`you've won a loot drop!`)
+    .setDescription(
+      `you've won ${
         prize.startsWith("item:")
           ? `a ${getItems()[prize.substring(5)].emoji} **${getItems()[prize.substring(5)].name}**`
           : ""
@@ -134,7 +132,7 @@ async function fastClickGame(client: NypsiClient, channelId: string, prize: stri
   );
 
   const winner = await client.cluster.broadcastEval(
-    async (c, { embed, row, channelId, cluster, buttonId }) => {
+    async (c, { embed, row, channelId, cluster, buttonId, winEmbed }) => {
       const client = c as unknown as NypsiClient;
 
       if (client.cluster.id != cluster) return;
@@ -163,13 +161,16 @@ async function fastClickGame(client: NypsiClient, channelId: string, prize: stri
         return;
       }
 
-      await res.deferUpdate();
-
       embed.description += `\n\n**${res.user.username}** has won!!`;
+
+      await Promise.all([
+        res.reply({ embeds: [winEmbed], ephemeral: true }),
+        msg.edit({ embeds: [embed], components: [row] }),
+      ]);
 
       return res.user.id;
     },
-    { context: { embed, row, channelId, cluster, buttonId } },
+    { context: { embed, row, channelId, cluster, buttonId, winEmbed } },
   );
 
   const winnerId = winner.filter((i) => Boolean(i))[0];
