@@ -28,7 +28,7 @@ function doRandomDrop(client: NypsiClient) {
   setTimeout(() => {
     randomDrop(client);
   }, rand);
-  logger.info(`next random drops will occur in ${MStoTime(rand)}`);
+  logger.info(`::auto next random drops will occur in ${MStoTime(rand)}`);
 }
 
 export default async function startRandomDrops(client: NypsiClient) {
