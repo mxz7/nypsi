@@ -59,7 +59,7 @@ cmd.slashData
       .addSubcommand((passive) =>
         passive
           .setName("passive")
-          .setDescription("enable/disasble passive mode")
+          .setDescription("enable/disable passive mode")
           .addStringOption((option) =>
             option
               .setName("toggle")

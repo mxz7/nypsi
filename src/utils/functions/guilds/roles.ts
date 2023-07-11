@@ -3,11 +3,11 @@ import prisma from "../../../init/database";
 import ms = require("ms");
 
 const autoRoleCache = new Map<string, string[]>();
-const persistantRoleCache = new Map<string, string[]>();
+const persistentRoleCache = new Map<string, string[]>();
 
 setInterval(() => {
   autoRoleCache.clear();
-  persistantRoleCache.clear();
+  persistentRoleCache.clear();
 }, ms("1 hour"));
 
 export async function getAutoJoinRoles(guild: Guild) {
@@ -40,20 +40,20 @@ export async function setAutoJoinRoles(guild: Guild, roles: string[]) {
   autoRoleCache.delete(guild.id);
 }
 
-export async function getPersistantRoles(guild: Guild) {
-  if (persistantRoleCache.has(guild.id)) return persistantRoleCache.get(guild.id);
+export async function getPersistentRoles(guild: Guild) {
+  if (persistentRoleCache.has(guild.id)) return persistentRoleCache.get(guild.id);
 
   const query = await prisma.guild.findUnique({
     where: { id: guild.id },
     select: { persist_role: true },
   });
 
-  persistantRoleCache.set(guild.id, query.persist_role);
+  persistentRoleCache.set(guild.id, query.persist_role);
 
   return query.persist_role;
 }
 
-export async function setPersistantRoles(guild: Guild, roles: string[]) {
+export async function setPersistentRoles(guild: Guild, roles: string[]) {
   await prisma.guild.update({
     where: {
       id: guild.id,
@@ -63,10 +63,10 @@ export async function setPersistantRoles(guild: Guild, roles: string[]) {
     },
   });
 
-  persistantRoleCache.delete(guild.id);
+  persistentRoleCache.delete(guild.id);
 }
 
-export async function getPersistantRolesForUser(guild: Guild, userId: string) {
+export async function getPersistentRolesForUser(guild: Guild, userId: string) {
   const query = await prisma.rolePersist
     .findUnique({
       where: {

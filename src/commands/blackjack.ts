@@ -357,11 +357,11 @@ async function prepareGame(
   }
 
   playGame(message, msg, args).catch((e) => {
-    logger.error(`error occured playing blackjack - ${message.author.tag} (${message.author.id})`);
+    logger.error(`error occurred playing blackjack - ${message.author.tag} (${message.author.id})`);
     redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
     logger.error("bj error", e);
     message.channel.send({
-      embeds: [new ErrorEmbed("an error occured while running - join support server")],
+      embeds: [new ErrorEmbed("an error occurred while running - join support server")],
     });
   });
 }
