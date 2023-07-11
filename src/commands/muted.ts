@@ -34,7 +34,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (!muted || muted.length == 0) {
     return message.channel.send({
-      embeds: [new CustomEmbed(message.member, "there is noone currently muted with nypsi")],
+      embeds: [new CustomEmbed(message.member, "there is no one currently muted with nypsi")],
     });
   }
 

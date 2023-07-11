@@ -22,7 +22,7 @@
     },
     "vote": {
       "id": "vote",
-      "name": "vote notificatons",
+      "name": "vote notifications",
       "description": "get a dm when you vote to show your rewards for voting"
     },
     "voteReminder": {
