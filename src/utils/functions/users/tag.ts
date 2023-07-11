@@ -1,7 +1,7 @@
 import { GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 
-export async function updateLastKnowntag(member: GuildMember | string, tag: string) {
+export async function updateLastKnownTag(member: GuildMember | string, tag: string) {
   let id: string;
   if (member instanceof GuildMember) {
     id = member.user.id;

@@ -17,9 +17,9 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { MStoTime } from "../utils/functions/date";
 import {
   getAutoJoinRoles,
-  getPersistantRoles,
+  getPersistentRoles,
   setAutoJoinRoles,
-  setPersistantRoles,
+  setPersistentRoles,
 } from "../utils/functions/guilds/roles";
 import { getMember, getRole } from "../utils/functions/member";
 import PageManager from "../utils/functions/page";
@@ -120,7 +120,7 @@ cmd.slashData
     persist
       .setName("persist")
       .setDescription("persist settings")
-      .addSubcommand((list) => list.setName("list").setDescription("show all persistant roles"))
+      .addSubcommand((list) => list.setName("list").setDescription("show all persistent roles"))
       .addSubcommand((add) =>
         add
           .setName("add")
@@ -209,7 +209,7 @@ async function run(
             "/role autojoin list - show all current autojoin roles\n" +
             "/role persist add <role> - add a role to be added back to a user after they leave, if they had it. (data deleted after 30 days)\n" +
             "/role persist remove <role> - remove a role from the persistance list\n" +
-            "/role persist list - show all current persistant roles\n" +
+            "/role persist list - show all current persistent roles\n" +
             "/role members <role> - show members in a role",
         ),
       ],
@@ -588,7 +588,7 @@ async function run(
       return send({ embeds: [new ErrorEmbed("use slash commands")] });
     }
 
-    const roles = await getPersistantRoles(message.guild);
+    const roles = await getPersistentRoles(message.guild);
 
     if (args[1].toLowerCase() == "list") {
       const rolesDisplay: string[] = [];
@@ -598,7 +598,7 @@ async function run(
 
         if (!role) {
           roles.splice(roles.indexOf(r), 1);
-          await setPersistantRoles(message.guild, roles);
+          await setPersistentRoles(message.guild, roles);
           break;
         }
 
@@ -638,21 +638,21 @@ async function run(
     if (args[1].toLowerCase() == "add") {
       if (roles.includes(chosenRole.id)) {
         return send({
-          embeds: [new ErrorEmbed("this role is already in the persistant role list")],
+          embeds: [new ErrorEmbed("this role is already in the persistent role list")],
         });
       }
       roles.push(chosenRole.id);
-      embed.setDescription(`✅ added ${chosenRole.toString()} to the persistant role list`);
+      embed.setDescription(`✅ added ${chosenRole.toString()} to the persistent role list`);
     } else {
       if (!roles.includes(chosenRole.id)) {
-        return send({ embeds: [new ErrorEmbed("that role is not in the persistant role list")] });
+        return send({ embeds: [new ErrorEmbed("that role is not in the persistent role list")] });
       }
 
       roles.splice(roles.indexOf(chosenRole.id), 1);
-      embed.setDescription(`✅ removed ${chosenRole.toString()} from the persistant role list`);
+      embed.setDescription(`✅ removed ${chosenRole.toString()} from the persistent role list`);
     }
 
-    await setPersistantRoles(message.guild, roles);
+    await setPersistentRoles(message.guild, roles);
 
     return send({ embeds: [embed] });
   } else if (args[0].toLowerCase() == "members") {

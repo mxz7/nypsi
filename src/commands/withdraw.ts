@@ -75,7 +75,7 @@ async function run(
       .addField("usage", `${prefix}withdraw <amount>`)
       .addField(
         "help",
-        "you can withdraw money from your bank aslong as you have that amount available in your bank",
+        "you can withdraw money from your bank as long as you have that amount available in your bank",
       );
     return send({ embeds: [embed] });
   }

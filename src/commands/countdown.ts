@@ -58,7 +58,7 @@ async function run(
       let error = `you have reached the maximum amount of countdowns for this server (${max})`;
 
       if (max == 1) {
-        error += "\n\nbecome a patreon to upgrade this limt (https://patreon.com/join/nypsi)";
+        error += "\n\nbecome a patreon to upgrade this limit (https://patreon.com/join/nypsi)";
       } else if (max != 5) {
         error +=
           "\n\nyou can upgrade your subscription to get access to more countdowns per server";
