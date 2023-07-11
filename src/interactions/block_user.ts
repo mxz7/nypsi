@@ -5,7 +5,7 @@ import { InteractionHandler } from "../types/InteractionHandler";
 import Constants from "../utils/Constants";
 import { getBlockedList, setBlockedList } from "../utils/functions/economy/offers";
 import { isEcoBanned } from "../utils/functions/economy/utils";
-import { getLastKnownTag } from "../utils/functions/users/tag";
+import { getLastKnownUsername } from "../utils/functions/users/tag";
 
 export default {
   name: "block-user",
@@ -52,7 +52,7 @@ export default {
       embeds: [
         new CustomEmbed(
           null,
-          `✅ added **${await getLastKnownTag(offer.ownerId)}** to your block list`,
+          `✅ added **${await getLastKnownUsername(offer.ownerId)}** to your block list`,
         ),
       ],
     });

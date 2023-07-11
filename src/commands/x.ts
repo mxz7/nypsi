@@ -104,7 +104,7 @@ async function run(
     const moderationCasesModerator = await prisma.moderationCase
       .findMany({
         where: {
-          moderator: user?.tag,
+          moderator: user?.username,
         },
       })
       .catch(() => {});
@@ -344,7 +344,9 @@ async function run(
         const uses = await getCommandUses(user.id);
         const total = uses.map((x) => x.uses).reduce((a, b) => a + b);
 
-        const daily = parseInt(await redis.hget(Constants.redis.nypsi.TOP_COMMANDS_USER, user.tag));
+        const daily = parseInt(
+          await redis.hget(Constants.redis.nypsi.TOP_COMMANDS_USER, user.username),
+        );
 
         const embed = new CustomEmbed(
           message.member,
@@ -1029,7 +1031,7 @@ async function run(
         }
 
         logger.info(
-          `admin: ${message.author.tag} (${message.author.id}) set ${
+          `admin: ${message.author.id} (${message.author.username}) set ${
             user.id
           } premium expire date to ${date.format()}`,
         );
@@ -1268,7 +1270,7 @@ async function run(
       let user: any = await (message.client as NypsiClient).cluster.broadcastEval(
         async (c, { userId }) => {
           const g = await c.users.cache.find((u) => {
-            return `${u.username}#${u.discriminator}`.includes(userId);
+            return `${u.username}`.includes(userId);
           });
 
           return g;
@@ -1295,7 +1297,7 @@ async function run(
 
     const knownTag = await prisma.user.findFirst({
       where: {
-        lastKnownTag: { contains: tag },
+        lastKnownUsername: { contains: tag },
       },
       select: {
         id: true,

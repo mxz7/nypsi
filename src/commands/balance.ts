@@ -200,7 +200,7 @@ async function run(
   embed.setHeader(
     `${target.user.username} | season ${Constants.SEASON_NUMBER}`,
     target.user.avatarURL(),
-    `https://nypsi.xyz/user/${target.id}#user`,
+    `https://nypsi.xyz/user/${target.id}`,
   );
 
   if (message.member == target) {

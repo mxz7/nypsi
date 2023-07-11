@@ -48,7 +48,7 @@ export async function createProfile(member: User | string) {
   let id: string;
   let username = "";
   if (member instanceof User) {
-    username = `${member.username}#${member.discriminator}`;
+    username = `${member.username}`;
     id = member.id;
   } else {
     id = member;
@@ -58,7 +58,7 @@ export async function createProfile(member: User | string) {
     .create({
       data: {
         id: id,
-        lastKnownTag: username,
+        lastKnownUsername: username,
         lastCommand: new Date(0),
       },
     })

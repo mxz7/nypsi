@@ -525,7 +525,7 @@ async function startRace(id: string) {
     addProgress(winner.id, "racer", 1);
 
     description +=
-      `\n\n**${winner.tag}** has won with their ${race.users.get(winner.id).car.name} ${
+      `\n\n**${winner.username}** has won with their ${race.users.get(winner.id).car.name} ${
         race.users.get(winner.id).car.emoji
       }\n` + `+$${winnings.toLocaleString()}`;
 

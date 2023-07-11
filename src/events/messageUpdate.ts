@@ -20,7 +20,7 @@ export default async function messageUpdate(message: Message, newMessage: Messag
     if (message.content != newMessage.content) {
       const embed = new CustomEmbed().disableFooter().setTimestamp();
 
-      embed.setHeader(message.author.tag, message.author.avatarURL());
+      embed.setHeader(message.author.username, message.author.avatarURL());
       embed.setTitle("message updated");
       embed.setDescription(
         `[jump](${message.url})\n\n${message.member.toString()} \`${
@@ -63,7 +63,7 @@ export default async function messageUpdate(message: Message, newMessage: Messag
 
     eSnipe.set(message.channel.id, {
       content: message.content,
-      member: message.author.tag,
+      member: message.author.username,
       createdTimestamp: message.createdTimestamp,
       memberAvatar: message.author.avatarURL(),
       channel: {

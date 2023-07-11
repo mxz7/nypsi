@@ -12,7 +12,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     "bot invite: [invite.nypsi.xyz](http://invite.nypsi.xyz)\nsupport server: https://discord.gg/hJTDNST",
   )
     .setHeader("nypsi")
-    .setFooter({ text: "made by max#0777 | tekoh.net" });
+    .setFooter({ text: "made by tekoh | github.com/tekoh" });
 
   message.channel.send({ embeds: [embed] });
 }

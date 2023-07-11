@@ -1,7 +1,7 @@
 import dayjs = require("dayjs");
 import { inPlaceSort } from "fast-sort";
 import { appendFile, writeFile } from "fs/promises";
-import { isMainThread, parentPort, Worker } from "worker_threads";
+import { Worker, isMainThread, parentPort } from "worker_threads";
 import prisma from "../../../init/database";
 
 export default function graphToCsv(): Promise<void> {
@@ -71,10 +71,10 @@ if (!isMainThread) {
             id: userId,
           },
           select: {
-            lastKnownTag: true,
+            lastKnownUsername: true,
           },
         })
-        .then((r) => r?.lastKnownTag);
+        .then((r) => r?.lastKnownUsername);
 
       await appendFile(
         `/tmp/${fileName}`,

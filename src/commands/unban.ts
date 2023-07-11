@@ -86,7 +86,7 @@ async function run(
       )
       .addField(
         "examples",
-        `${prefix}unban user#1234 **(only works if members are in cache)**\n${prefix}unban 123456789012345678\n${prefix}unban 123456789012345678 123456789012345678 -s`,
+        `${prefix}unban user1234 **(only works if members are in cache)**\n${prefix}unban 123456789012345678\n${prefix}unban 123456789012345678 123456789012345678 -s`,
       );
 
     return send({ embeds: [embed] });
@@ -98,7 +98,7 @@ async function run(
   for (const arg of args) {
     if (arg.length == 18 || args.length == 19) {
       await message.guild.members
-        .unban(arg, message.member.user.tag)
+        .unban(arg, message.member.user.username)
         .then(async (user) => {
           members.push(user);
           await deleteBan(message.guild, arg);
@@ -110,14 +110,12 @@ async function run(
       try {
         const memberCache = message.client.users.cache;
 
-        const findingMember = memberCache.find((m) =>
-          (m.username + "#" + m.discriminator).includes(arg),
-        );
+        const findingMember = memberCache.find((m) => m.username.includes(arg));
 
         if (findingMember) {
           const id = findingMember.id;
           await message.guild.members
-            .unban(id, message.member.user.tag)
+            .unban(id, message.member.user.username)
             .then(async (user) => {
               members.push(user);
               await deleteBan(message.guild, user.id);
@@ -139,9 +137,7 @@ async function run(
   const embed = new CustomEmbed(message.member);
 
   if (members.length == 1) {
-    embed.setDescription(
-      "✅ `" + members[0].username + "#" + members[0].discriminator + "` was unbanned",
-    );
+    embed.setDescription("✅ `" + members[0].username + "` was unbanned");
   } else {
     embed.setDescription("✅ **" + members.length + "** members have been unbanned");
   }
@@ -167,7 +163,7 @@ async function run(
     members1.push(m.id);
   }
 
-  await newCase(message.guild, "unban", members1, message.member.user.tag, message.content);
+  await newCase(message.guild, "unban", members1, message.member.user.username, message.content);
 }
 
 cmd.setRun(run);

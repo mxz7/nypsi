@@ -130,7 +130,7 @@ async function run(
         labels: [],
         datasets: [
           {
-            label: message.author.tag,
+            label: message.author.username,
             data: [],
             lineTension: 0.4,
           },

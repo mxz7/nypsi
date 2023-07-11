@@ -163,7 +163,7 @@ async function run(
       userId: message.author.id,
       bet: bet,
       game: "coinflip",
-      outcome: `**winner** ${winner.user.tag}\n**loser** ${loser.user.tag}`,
+      outcome: `**winner** ${winner.user.username}\n**loser** ${loser.user.username}`,
       win: winner.user.id == message.author.id,
       earned: winner.user.id == message.author.id ? winnings : null,
     });
@@ -172,7 +172,7 @@ async function run(
       userId: player2.user.id,
       bet: bet,
       game: "coinflip",
-      outcome: `**winner** ${winner.user.tag}\n**loser** ${loser.user.tag}`,
+      outcome: `**winner** ${winner.user.username}\n**loser** ${loser.user.username}`,
       win: winner.user.id == player2.user.id,
       earned: winner.user.id == player2.user.id ? winnings : null,
     });
@@ -200,7 +200,7 @@ async function run(
     }
 
     embed.setDescription(
-      `**winner** ${winner.user.tag}\n\n${thingy}\n\n**bet** $${bet.toLocaleString()}`,
+      `**winner** ${winner.user.username}\n\n${thingy}\n\n**bet** $${bet.toLocaleString()}`,
     );
     embed.setColor(winner.displayHexColor);
     embed.setFooter({ text: `id: ${id}` });
@@ -259,7 +259,9 @@ async function run(
     }
 
     if (bet > (await getBalance(target))) {
-      return send({ embeds: [new ErrorEmbed(`**${target.user.tag}** cannot afford this bet`)] });
+      return send({
+        embeds: [new ErrorEmbed(`**${target.user.username}** cannot afford this bet`)],
+      });
     }
 
     if (bet > (await calcMaxBet(message.member)) * 10)
@@ -296,7 +298,7 @@ async function run(
     const requestEmbed = new CustomEmbed(
       message.member,
       `**${
-        message.author.tag
+        message.author.username
       }** has challenged you to a coinflip\n\n**bet** $${bet.toLocaleString()}\n\ndo you accept?`,
     ).setFooter({ text: "expires in 60 seconds" });
 
@@ -383,7 +385,9 @@ async function run(
 
     const requestEmbed = new CustomEmbed(
       message.member,
-      `**${message.author.tag}** has created an open coinflip\n\n**bet** $${bet.toLocaleString()}`,
+      `**${
+        message.author.username
+      }** has created an open coinflip\n\n**bet** $${bet.toLocaleString()}`,
     ).setFooter({ text: "expires in 60 seconds" });
 
     const msg = await send({

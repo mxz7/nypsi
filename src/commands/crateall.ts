@@ -81,7 +81,9 @@ async function run(
 
         await addInventoryItem(member, selected.id, amount, false);
 
-        logger.info(`${amount} ${selected.id} given to ${member.user.tag} (${member.user.id})`);
+        logger.info(
+          `${amount} ${selected.id} given to ${member.user.id} (${member.user.username})`,
+        );
         count += amount;
       })(),
     );

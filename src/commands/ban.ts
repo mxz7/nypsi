@@ -106,7 +106,7 @@ async function run(
 
   if (!target && !userId) return send({ embeds: [new ErrorEmbed("invalid user")] });
 
-  let reason = message.author.tag + ": ";
+  let reason = message.author.username + ": ";
   let unbanDate: Date;
   let temporary = false;
   let duration;
@@ -141,9 +141,9 @@ async function run(
         if (typeof banned == "string") {
           idUser = banned;
         } else if (banned instanceof User) {
-          idUser = `${banned.username}#${banned.discriminator}`;
+          idUser = `${banned.username}`;
         } else {
-          idUser = `${banned.user.tag}`;
+          idUser = `${banned.user.username}`;
         }
       })
       .catch(() => {
@@ -192,7 +192,7 @@ async function run(
   if (mode === "id") {
     msg = `✅ \`${idUser}\` has been banned`;
   } else {
-    msg = `✅ \`${target.user.tag}\` has been banned`;
+    msg = `✅ \`${target.user.username}\` has been banned`;
   }
 
   if (temporary) {
@@ -222,12 +222,18 @@ async function run(
   }
 
   if (mode === "id") {
-    await newCase(message.guild, "ban", userId, message.member.user.tag, storeReason);
+    await newCase(message.guild, "ban", userId, message.member.user.username, storeReason);
     if (temporary) {
       await newBan(message.guild, userId, unbanDate);
     }
   } else {
-    await newCase(message.guild, "ban", target.user.id, message.author.tag, reason.split(": ")[1]);
+    await newCase(
+      message.guild,
+      "ban",
+      target.user.id,
+      message.author.username,
+      reason.split(": ")[1],
+    );
 
     if (temporary) {
       await newBan(message.guild, target.user.id, unbanDate);

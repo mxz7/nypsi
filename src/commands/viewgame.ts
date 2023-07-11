@@ -16,7 +16,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { fetchGame } from "../utils/functions/economy/stats";
 import PageManager from "../utils/functions/page";
 import { getPreferences } from "../utils/functions/users/notifications";
-import { getLastKnownTag } from "../utils/functions/users/tag";
+import { getLastKnownUsername } from "../utils/functions/users/tag";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import dayjs = require("dayjs");
 
@@ -92,7 +92,7 @@ async function run(
                     leaderboards: true,
                   },
                 },
-                lastKnownTag: true,
+                lastKnownUsername: true,
               },
             },
           },
@@ -121,7 +121,7 @@ async function run(
       });
 
     const query: (Game & {
-      economy?: { user?: { lastKnownTag?: string; Preferences?: { leaderboards: boolean } } };
+      economy?: { user?: { lastKnownUsername?: string; Preferences?: { leaderboards: boolean } } };
     })[] = await prisma.game.findMany(search);
 
     if (query.length === 0) return send({ embeds: [new ErrorEmbed("no results found")] });
@@ -136,7 +136,7 @@ async function run(
           `**id** \`${game.id.toString(36)}\` \`(${game.id})\`\n` +
           `**user** \`${
             game.economy.user.Preferences?.leaderboards
-              ? game.economy.user.lastKnownTag.split("#")[0]
+              ? game.economy.user.lastKnownUsername
               : "[hidden]"
           }\`\n` +
           `**game** \`${game.game}\`\n` +
@@ -182,7 +182,7 @@ async function run(
           return {
             id: game.id.toString(36),
             user: game.economy.user.Preferences?.leaderboards
-              ? game.economy.user.lastKnownTag.split("#")[0]
+              ? game.economy.user.lastKnownUsername
               : "[hidden]",
             game: game.game,
             time: game.date,
@@ -222,7 +222,7 @@ async function run(
       return send({ embeds: [new ErrorEmbed(`couldn't find a game with id \`${args[0]}\``)] });
 
     const username = (await getPreferences(game.userId))?.leaderboards
-      ? (await getLastKnownTag(game.userId).catch(() => null))?.split("#")[0]
+      ? await getLastKnownUsername(game.userId).catch(() => null)
       : "[hidden]";
 
     const embed = new CustomEmbed(message.member).setHeader(
