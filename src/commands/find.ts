@@ -196,12 +196,12 @@ async function showUser(message: Message, user: User) {
       "user",
       `**tag** ${user.tag}
             **created** ${formatDate(user.createdAt)}${
-              (await getLastCommand(user.id))
-                ? `\n**last command** <t:${Math.floor(
-                    (await getLastCommand(user.id)).getTime() / 1000,
-                  )}:R>`
-                : ""
-            }`,
+        (await getLastCommand(user.id))
+          ? `\n**last command** <t:${Math.floor(
+              (await getLastCommand(user.id)).getTime() / 1000,
+            )}:R>`
+          : ""
+      }`,
       true,
     )
     .setFooter({ text: `${await getKarma(user.id)} karma` });
@@ -212,8 +212,8 @@ async function showUser(message: Message, user: User) {
       "economy",
       `💰 $**${(await getBalance(user.id)).toLocaleString()}**
             💳 $**${(await getBankBalance(user.id)).toLocaleString()}** / $**${(
-              await getMaxBankBalance(user.id)
-            ).toLocaleString()}**
+        await getMaxBankBalance(user.id)
+      ).toLocaleString()}**
       🌍 $**${(await calcNetWorth(user.id)).amount.toLocaleString()}**
             **xp** ${(await getXp(user.id)).toLocaleString()}
             **voted** ${voted}
