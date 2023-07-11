@@ -579,7 +579,7 @@
     "emoji": "🃏",
     "target": 500,
     "description": "reach a 7x multiplier in highlow 500 times",
-    "prize": ["legendary_scratch_card:1"]
+    "prize": ["legendary_scratch_card:2"]
   },
   "highlow_pro_v": {
     "id": "highlow_pro_v",
@@ -587,7 +587,7 @@
     "emoji": "🃏",
     "target": 1000,
     "description": "reach a 7x multiplier in highlow 1,000 times",
-    "prize": ["nypsi_crate:1", "legendary_scratch_card:1"]
+    "prize": ["nypsi_crate:1", "legendary_scratch_card:3"]
   },
   "roulette_pro_i": {
     "id": "roulette_pro_i",
@@ -659,7 +659,7 @@
     "emoji": "🍒",
     "target": 500,
     "description": "win on cherries 500 times",
-    "prize": ["legendary_scratch_card:1"]
+    "prize": ["legendary_scratch_card:2"]
   },
   "slots_pro_v": {
     "id": "slots_pro_v",
@@ -667,7 +667,7 @@
     "emoji": "🍒",
     "target": 1000,
     "description": "win on cherries 1,000 times",
-    "prize": ["nypsi_crate:1", "legendary_scratch_card:2"]
+    "prize": ["nypsi_crate:1", "legendary_scratch_card:3"]
   },
   "horny_i": {
     "id": "horny_i",
@@ -1177,7 +1177,7 @@
     "emoji": "📦",
     "target": 100,
     "description": "win 100 loot drops",
-    "prize": ["legendary_scratch_card:1"]
+    "prize": ["legendary_scratch_card:2"]
   },
   "lootdrops_pro_v": {
     "id": "lootdrops_pro_v",
@@ -1185,6 +1185,6 @@
     "emoji": "📦",
     "target": 250,
     "description": "win 250 loot drops",
-    "prize": ["nypsi_crate:1", "legendary_scratch_card:2"]
+    "prize": ["nypsi_crate:1", "legendary_scratch_card:3"]
   }
 }
