@@ -28,6 +28,7 @@ import { runLotteryInterval } from "../scheduled/clusterjobs/lottery";
 import { runLogs, runModerationChecks } from "../scheduled/clusterjobs/moderationchecks";
 import { runNetWorthInterval } from "../scheduled/clusterjobs/networth-update";
 import { runPremiumChecks } from "../scheduled/clusterjobs/premiumexpire";
+import startRandomDrops from "../scheduled/clusterjobs/random-drops";
 import { doLeaderboardSeed } from "../scheduled/clusterjobs/seed-leaderboards";
 import { runPremiumCrateInterval } from "../scheduled/clusterjobs/weeklycrates";
 import { runWorkerInterval } from "../scheduled/clusterjobs/workers";
@@ -189,6 +190,7 @@ export class NypsiClient extends Client {
     runChristmas(this);
     updateCounters(this);
     openKarmaShop(this);
+    startRandomDrops(this);
     runLogs();
     runWorkerInterval();
     runNetWorthInterval();
