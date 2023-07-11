@@ -220,6 +220,7 @@ async function run(
       row: row,
       userId: message.author.id,
       pages: pages,
+      allowMessageDupe: true,
     });
 
     return manager.listen();
