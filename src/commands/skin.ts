@@ -1,7 +1,8 @@
 import { CommandInteraction, Message } from "discord.js";
-import { getSkin } from "mc-names";
+import redis from "../init/redis";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
+import Constants from "../utils/Constants";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
@@ -25,27 +26,10 @@ async function run(
 
   await addCooldown(cmd.name, message.member, 10);
 
-  const username = args[0];
+  const uuid = await getUUID(args[0]);
 
-  const uuidURL = "https://api.mojang.com/users/profiles/minecraft/" + username;
-  let uuid;
-
-  try {
-    uuid = await fetch(uuidURL).then((uuidURL) => uuidURL.json());
-  } catch (e) {
+  if (!uuid || uuid.id === "null") {
     return message.channel.send({ embeds: [new ErrorEmbed("invalid account")] });
-  }
-
-  if (uuid.error) {
-    return message.channel.send({ embeds: [new ErrorEmbed("invalid account")] });
-  }
-
-  const skin = await getSkin(username);
-
-  if (!skin) {
-    return message.channel.send({
-      embeds: [new ErrorEmbed("error while fetching skin. please try again")],
-    });
   }
 
   const embed = new CustomEmbed(
@@ -53,10 +37,31 @@ async function run(
     `[download](https://mc-heads.net/download/${uuid.id})`,
   )
     .setTitle(uuid.name)
-    .setURL("https://namemc.com/profile/" + username)
-    .setImage(skin.render);
+    .setURL("https://namemc.com/profile/" + args[0])
+    .setImage(`https://visage.surgeplay.com/full/${uuid.id}`);
 
   return message.channel.send({ embeds: [embed] });
+}
+
+async function getUUID(username: string): Promise<{ name: string; id: string }> {
+  if (await redis.exists(`${Constants.redis.cache.minecraft.UUID}:${username}`)) {
+    return JSON.parse(await redis.get(`${Constants.redis.cache.minecraft.UUID}:${username}`));
+  }
+
+  let uuid = await fetch(`https://api.mojang.com/users/profiles/minecraft/${username}`).then(
+    (uuidURL) => uuidURL.json(),
+  );
+
+  if (uuid.errorMessage) uuid = { id: "null", string: "null" };
+
+  await redis.set(
+    `${Constants.redis.cache.minecraft.UUID}:${username}`,
+    JSON.stringify(uuid),
+    "EX",
+    604800,
+  );
+
+  return uuid;
 }
 
 cmd.setRun(run);
