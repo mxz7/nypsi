@@ -724,6 +724,7 @@ async function run(
       message: msg,
       userId: message.author.id,
       pages,
+      allowMessageDupe: true,
       onPageUpdate(manager) {
         manager.embed.setFooter({ text: `page ${manager.currentPage}/${manager.lastPage}` });
         return manager.embed;

@@ -22,6 +22,7 @@ interface PageManagerOptions<T> {
     (manager: PageManager<T>, interaction: ButtonInteraction) => Promise<void>
   >;
   onPageUpdate?: (manager: PageManager<T>) => CustomEmbed;
+  allowMessageDupe?: boolean;
 }
 
 export default class PageManager<T> {
@@ -52,12 +53,13 @@ export default class PageManager<T> {
   public embed: CustomEmbed;
   public updatePageFunc: (page: T[], embed: CustomEmbed) => CustomEmbed;
 
-  private filter: (i: Interaction) => boolean;
+  private filter: ((i: Interaction) => boolean) | ((i: Interaction) => Promise<boolean>);
   private handleResponses: Map<
     string,
     (manager: PageManager<T>, interaction: ButtonInteraction) => Promise<void>
   >;
   private onPageUpdate: (manager: PageManager<T>) => CustomEmbed;
+  private allowMessageDupe: boolean;
 
   constructor(opts: PageManagerOptions<T>) {
     this.pages = opts.arr ? PageManager.createPages(opts.arr, opts.pageLength) : opts.pages;
@@ -68,8 +70,36 @@ export default class PageManager<T> {
     this.userId = opts.userId;
     this.embed = opts.embed;
     this.onPageUpdate = opts.onPageUpdate;
+    this.allowMessageDupe = opts.allowMessageDupe || false;
 
-    this.filter = (i: Interaction) => i.user.id == this.userId;
+    this.filter = async (i: Interaction) => {
+      if (i.user.id == this.userId) return true;
+
+      if (!this.allowMessageDupe) return false;
+
+      const msg = await (i as ButtonInteraction).reply({
+        embeds: [this.embed],
+        components: [this.row],
+        ephemeral: true,
+      });
+
+      const manager = new PageManager({
+        embed: this.embed,
+        message: msg as unknown as Message,
+        row: this.row,
+        userId: i.user.id,
+        pages: this.pages,
+        updateEmbed: this.updatePageFunc,
+        onPageUpdate: this.onPageUpdate,
+        handleResponses: this.handleResponses,
+      });
+
+      manager.currentPage = this.currentPage;
+
+      manager.listen();
+
+      return false;
+    };
 
     this.handleResponses = new Map();
 

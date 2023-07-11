@@ -81,7 +81,14 @@ async function run(
 
   const msg = await message.channel.send({ embeds: [embed], components: [row] });
 
-  const manager = new PageManager({ embed, message: msg, userId: message.author.id, row, pages });
+  const manager = new PageManager({
+    embed,
+    message: msg,
+    userId: message.author.id,
+    row,
+    pages,
+    allowMessageDupe: true,
+  });
   return manager.listen();
 }
 

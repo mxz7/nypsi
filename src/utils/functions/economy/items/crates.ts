@@ -158,6 +158,7 @@ module.exports = new ItemUse(
         row,
         userId: message.author.id,
         pages,
+        allowMessageDupe: true,
       });
 
       return manager.listen();
