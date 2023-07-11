@@ -67,7 +67,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   };
 
   if ((await getBalance(message.member)) < 5_000) {
-    return send({ embeds: [new ErrorEmbed("you must have atleast $5k")], ephemeral: true });
+    return send({ embeds: [new ErrorEmbed("you must have at least $5k")], ephemeral: true });
   }
 
   const getMaxValues = async (bankBalance: number) => {
@@ -129,10 +129,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     if ((await getBalance(message.member)) < 5_000) {
       if (message instanceof Message) {
-        message.channel.send({ embeds: [new ErrorEmbed("you must have atleast $5k")] });
+        message.channel.send({ embeds: [new ErrorEmbed("you must have at least $5k")] });
         return;
       } else {
-        message.followUp({ embeds: [new ErrorEmbed("you must have atleast $5k")] });
+        message.followUp({ embeds: [new ErrorEmbed("you must have at least $5k")] });
         return;
       }
     }
@@ -198,17 +198,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       }
 
       const minLoss = Math.floor(loss * 0.4);
-      const totalLossed = Math.floor(Math.random() * (loss - minLoss)) + minLoss;
+      const totalLost = Math.floor(Math.random() * (loss - minLoss)) + minLoss;
 
-      await updateBalance(message.member, (await getBalance(message.member)) - totalLossed);
+      await updateBalance(message.member, (await getBalance(message.member)) - totalLost);
 
-      await addToNypsiBank(totalLossed * 0.9);
+      await addToNypsiBank(totalLost * 0.9);
 
       embed.setColor(Constants.EMBED_FAIL_COLOR);
 
       const id = await createGame({
         userId: message.author.id,
-        bet: totalLossed,
+        bet: totalLost,
         win: false,
         game: "bankrob",
         outcome: `${message.author.username} robbed ${bank}`,
@@ -217,11 +217,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       if (lawyer) {
         embed.setDescription(
-          `**you were caught**\n\nthanks to your lawyer, you only lost $**${totalLossed.toLocaleString()}**`,
+          `**you were caught**\n\nthanks to your lawyer, you only lost $**${totalLost.toLocaleString()}**`,
         );
       } else {
         embed.setDescription(
-          `**you were caught**\n\nyou lost $**${totalLossed.toLocaleString()}**`,
+          `**you were caught**\n\nyou lost $**${totalLost.toLocaleString()}**`,
         );
       }
     }

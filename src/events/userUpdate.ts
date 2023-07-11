@@ -5,7 +5,7 @@ import { userExists } from "../utils/functions/economy/utils";
 import { uploadImageToImgur } from "../utils/functions/image";
 import { isPremium } from "../utils/functions/premium/premium";
 import { addNewAvatar, addNewUsername, isTracking } from "../utils/functions/users/history";
-import { updateLastKnowntag } from "../utils/functions/users/tag";
+import { updateLastKnownTag } from "../utils/functions/users/tag";
 import { hasProfile } from "../utils/functions/users/utils";
 
 const queue: User[] = [];
@@ -16,7 +16,7 @@ export default async function userUpdate(oldUser: User, newUser: User) {
     if (await hasProfile(newUser.id)) {
       if (!(await determineCluster(newUser.client as NypsiClient, newUser.id))) return;
 
-      await updateLastKnowntag(newUser.id, newUser.tag);
+      await updateLastKnownTag(newUser.id, newUser.tag);
 
       if (!(await isTracking(newUser.id))) return;
       await addNewUsername(newUser.id, newUser.tag);

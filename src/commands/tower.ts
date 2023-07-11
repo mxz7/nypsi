@@ -341,12 +341,12 @@ async function prepareGame(
   }
 
   playGame(message, msg, args).catch((e) => {
-    logger.error(`error occured playing tower - ${message.author.tag} (${message.author.id})`);
+    logger.error(`error occurred playing tower - ${message.author.tag} (${message.author.id})`);
     logger.error("tower error", e);
     console.trace();
     redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
     return send({
-      embeds: [new ErrorEmbed("an error occured while running - join support server")],
+      embeds: [new ErrorEmbed("an error occurred while running - join support server")],
     });
   });
 }

@@ -24,7 +24,7 @@ export async function sendHeartbeat(cluster: Cluster) {
   });
 }
 
-export async function addFailedHeatbeat(cluster: Cluster) {
+export async function addFailedHeartbeat(cluster: Cluster) {
   if (failedHeartbeats.has(cluster.id)) {
     if (failedHeartbeats.get(cluster.id) >= 5) {
       logger.info(`respawning cluster ${cluster.id} due to missing heartbeats`);

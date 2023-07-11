@@ -45,8 +45,8 @@ module.exports = new ItemUse(
 
     const robCooldown = (await redis.exists(`cd:rob:${message.author.id}`)) == 1;
     const bankRobCooldown = (await redis.exists(`cd:bankrob:${message.author.id}`)) == 1;
-    const storeRobcooldown = (await redis.exists(`cd:storerob:${message.author.id}`)) == 1;
-    if (!robCooldown && !bankRobCooldown && !storeRobcooldown) {
+    const storeRobCooldown = (await redis.exists(`cd:storerob:${message.author.id}`)) == 1;
+    if (!robCooldown && !bankRobCooldown && !storeRobCooldown) {
       return send({
         embeds: [new ErrorEmbed("you are currently not on a rob cooldown")],
       });
@@ -60,7 +60,7 @@ module.exports = new ItemUse(
     } else if (bankRobCooldown) {
       await redis.del(`cd:bankrob:${message.author.id}`);
       embed.setDescription("you're wearing your **mask** and can now rob a bank again");
-    } else if (storeRobcooldown) {
+    } else if (storeRobCooldown) {
       await redis.del(`cd:storerob:${message.author.id}`);
       embed.setDescription("you're wearing your **mask** and can now rob a store again");
     }

@@ -285,7 +285,7 @@ async function run(
     } else if (await isBooster(message.author.id)) {
       const embed = new CustomEmbed(
         message.member,
-        "you are currently boosting the nypsi server!! thank you, your booster rewards are seperate from premium, meaning that they can stack together.\n\nyou currently have no premium membership, this is what helps keep nypsi running. i (max) am massively grateful for any donations :heart:",
+        "you are currently boosting the nypsi server!! thank you, your booster rewards are separate from premium, meaning that they can stack together.\n\nyou currently have no premium membership, this is what helps keep nypsi running. i (max) am massively grateful for any donations :heart:",
       );
 
       embed.addField(
@@ -326,7 +326,7 @@ async function run(
       return send({
         embeds: [
           new ErrorEmbed(
-            "you must be atleast BRONZE tier for this command, you are BRONZE\n\nhttps://www.patreon.com/nypsi",
+            "you must be at least BRONZE tier for this command, you are BRONZE\n\nhttps://www.patreon.com/nypsi",
           ),
         ],
       });
