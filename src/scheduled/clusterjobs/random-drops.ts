@@ -40,7 +40,7 @@ function doRandomDrop(client: NypsiClient) {
   const rand = Math.floor(Math.random() * ms("1 hour") + ms("30 minutes"));
   setTimeout(() => {
     randomDrop(client);
-  }, 30000);
+  }, rand);
   logger.info(`::auto next random drops will occur in ${MStoTime(rand)}`);
 }
 
@@ -101,7 +101,9 @@ async function randomDrop(client: NypsiClient) {
 
     if (winner) {
       logger.info(
-        `random drop in ${channelId} winner: ${winner} (${await getLastKnownUsername(winner)})`,
+        `random drop in ${channelId} winner: ${winner} (${await getLastKnownUsername(
+          winner,
+        )}) prize: ${prize}`,
       );
       if (prize.startsWith("item:")) await addInventoryItem(winner, prize.substring(5), 1);
     }
