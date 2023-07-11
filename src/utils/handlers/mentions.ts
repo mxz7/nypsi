@@ -9,6 +9,7 @@ import { addNotificationToQueue } from "../functions/users/notifications";
 import doMentionsWorker from "../functions/workers/mentions";
 import { logger } from "../logger";
 import dayjs = require("dayjs");
+import ms = require("ms");
 
 let current = 0;
 let lastWarn = 0;
@@ -24,9 +25,9 @@ export function startMentionInterval() {
     if (
       (await redis.llen(Constants.redis.nypsi.MENTION_QUEUE)) >
         Number(await redis.get(Constants.redis.nypsi.MENTION_DM_TEKOH_THRESHOLD)) ||
-      (0 && lastWarn < dayjs().subtract(1, "hour").unix())
+      (0 && lastWarn < Date.now() - ms("1 hour"))
     ) {
-      lastWarn = dayjs().unix();
+      lastWarn = Date.now();
       addNotificationToQueue({
         memberId: Constants.TEKOH_ID,
         payload: {
