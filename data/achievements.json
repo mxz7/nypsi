@@ -1146,5 +1146,45 @@
     "target": 1000,
     "description": "win 1,000 chat reactions",
     "prize": ["legendary_scratch_card:1"]
+  },
+  "lootdrops_pro_i": {
+    "id": "lootdrops_pro_i",
+    "name": "lootdrops professional **I**",
+    "emoji": "📦",
+    "target": 3,
+    "description": "win 3 loot drops",
+    "prize": ["lucky_scratch_card:1"]
+  },
+  "lootdrops_pro_ii": {
+    "id": "lootdrops_pro_ii",
+    "name": "lootdrops professional **II**",
+    "emoji": "📦",
+    "target": 15,
+    "description": "win 15 loot drops",
+    "prize": ["lucky_scratch_card:2"]
+  },
+  "lootdrops_pro_iii": {
+    "id": "lootdrops_pro_iii",
+    "name": "lootdrops professional **III**",
+    "emoji": "📦",
+    "target": 50,
+    "description": "win 50 loot drops",
+    "prize": ["lucky_scratch_card:3"]
+  },
+  "lootdrops_pro_iv": {
+    "id": "lootdrops_pro_iv",
+    "name": "lootdrops professional **IV**",
+    "emoji": "📦",
+    "target": 100,
+    "description": "win 100 loot drops",
+    "prize": ["legendary_scratch_card:1"]
+  },
+  "lootdrops_pro_v": {
+    "id": "lootdrops_pro_v",
+    "name": "lootdrops professional **V**",
+    "emoji": "📦",
+    "target": 250,
+    "description": "win 250 loot drops",
+    "prize": ["nypsi_crate:1", "legendary_scratch_card:2"]
   }
 }

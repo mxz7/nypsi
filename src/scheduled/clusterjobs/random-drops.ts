@@ -12,6 +12,7 @@ import { NypsiClient } from "../../models/Client";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 import Constants from "../../utils/Constants";
 import { MStoTime } from "../../utils/functions/date";
+import { addProgress } from "../../utils/functions/economy/achievements";
 import { addInventoryItem } from "../../utils/functions/economy/inventory";
 import { createUser, getItems, userExists } from "../../utils/functions/economy/utils";
 import { getPrefix } from "../../utils/functions/guilds/utils";
@@ -105,6 +106,9 @@ async function randomDrop(client: NypsiClient) {
           winner,
         )}) prize: ${prize}`,
       );
+
+      addProgress(winner, "lootdrops_pro", 1);
+
       if (prize.startsWith("item:")) {
         let amount = 1;
 
