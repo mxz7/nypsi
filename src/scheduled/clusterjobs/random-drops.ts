@@ -69,7 +69,9 @@ async function getChannels() {
     }
   }
 
-  return channels.filter((i) => i.users >= activeUsersRequired).map((i) => i.channelId);
+  return channels
+    .filter((i) => i.users >= activeUsersRequired || percentChance(5))
+    .map((i) => i.channelId);
 }
 
 async function randomDrop(client: NypsiClient) {
