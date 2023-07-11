@@ -964,8 +964,6 @@ export async function runCommand(
     commandGemCheck(message.member, command.category),
   ]);
 
-  console.log(command.category);
-
   if ((await getPreferences(message.member)).leaderboards)
     await redis.hincrby(Constants.redis.nypsi.TOP_COMMANDS_USER, message.author.username, 1);
 
