@@ -16,6 +16,7 @@ import { createUser, getItems, userExists } from "../../utils/functions/economy/
 import { percentChance, shuffle } from "../../utils/functions/random";
 import requestDM from "../../utils/functions/requestdm";
 import { getDmSettings } from "../../utils/functions/users/notifications";
+import { getLastKnownUsername } from "../../utils/functions/users/tag";
 import { logger } from "../../utils/logger";
 import dayjs = require("dayjs");
 
@@ -81,6 +82,9 @@ async function randomDrop(client: NypsiClient) {
     const winner = await games[Math.floor(Math.random() * games.length)](client, channelId, prize);
 
     if (winner) {
+      logger.info(
+        `random drop in ${channelId} winner: ${winner} (${await getLastKnownUsername(winner)})`,
+      );
       if (prize.startsWith("item:")) await addInventoryItem(winner, prize.substring(5), 1);
 
       if ((await getDmSettings(winner)).other) {
