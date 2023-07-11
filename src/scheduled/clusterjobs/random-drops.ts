@@ -14,7 +14,9 @@ import Constants from "../../utils/Constants";
 import { MStoTime } from "../../utils/functions/date";
 import { addInventoryItem } from "../../utils/functions/economy/inventory";
 import { createUser, getItems, userExists } from "../../utils/functions/economy/utils";
+import { getPrefix } from "../../utils/functions/guilds/utils";
 import { percentChance, shuffle } from "../../utils/functions/random";
+import { getZeroWidth } from "../../utils/functions/string";
 import { getLastKnownUsername } from "../../utils/functions/users/tag";
 import { logger } from "../../utils/logger";
 import dayjs = require("dayjs");
@@ -22,12 +24,23 @@ import dayjs = require("dayjs");
 const max = 3;
 const activityWithinSeconds = 15;
 const activeUsersRequired = 2;
+const words = [
+  "nypsi",
+  "nypsi best discord bot",
+  "{prefix}boob",
+  "{prefix}pp",
+  "{prefix}bake",
+  "{prefix}slots all",
+  "{prefix}height",
+  "{prefix}findamilf",
+  "{prefix}wholesome",
+];
 
 function doRandomDrop(client: NypsiClient) {
   const rand = Math.floor(Math.random() * ms("1 hour") + ms("30 minutes"));
   setTimeout(() => {
     randomDrop(client);
-  }, rand);
+  }, 30000);
   logger.info(`::auto next random drops will occur in ${MStoTime(rand)}`);
 }
 
@@ -81,7 +94,7 @@ async function randomDrop(client: NypsiClient) {
 
     const prize = items[Math.floor(Math.random() * items.length)];
 
-    const games = [fastClickGame, clickSpecificGame];
+    const games = [fastClickGame, clickSpecificGame, typeFastGame];
 
     logger.info(`random drop started in ${channelId}`);
     const winner = await games[Math.floor(Math.random() * games.length)](client, channelId, prize);
@@ -102,7 +115,7 @@ async function randomDrop(client: NypsiClient) {
 async function fastClickGame(client: NypsiClient, channelId: string, prize: string) {
   const cluster = await findCluster(client, channelId);
 
-  if (typeof cluster !== "number") return;
+  if (typeof cluster.cluster !== "number") return;
 
   const embed = new CustomEmbed()
     .setColor(0xffffff)
@@ -147,7 +160,7 @@ async function fastClickGame(client: NypsiClient, channelId: string, prize: stri
 
       const res = await msg
         .awaitMessageComponent({
-          filter: async (i) => i.customId === buttonId,
+          filter: (i) => i.customId === buttonId,
           time: 30000,
         })
         .catch(() => {});
@@ -170,7 +183,84 @@ async function fastClickGame(client: NypsiClient, channelId: string, prize: stri
 
       return res.user.id;
     },
-    { context: { embed, row, channelId, cluster, buttonId, winEmbed } },
+    { context: { embed, row, channelId, cluster: cluster.cluster, buttonId, winEmbed } },
+  );
+
+  const winnerId = winner.filter((i) => Boolean(i))[0];
+
+  if (!(await userExists(winnerId))) await createUser(winnerId);
+
+  return winnerId;
+}
+
+async function typeFastGame(client: NypsiClient, channelId: string, prize: string) {
+  const cluster = await findCluster(client, channelId);
+
+  if (typeof cluster.cluster !== "number") return;
+
+  const chosenWord = words[Math.floor(Math.random() * words.length)].replace(
+    `{prefix}`,
+    await getPrefix(cluster.guildId),
+  );
+
+  let displayWord = chosenWord;
+
+  const zeroWidthCount = chosenWord.length / 2;
+
+  for (let i = 0; i < zeroWidthCount; i++) {
+    const pos = Math.floor(Math.random() * chosenWord.length + 1);
+
+    displayWord = displayWord.substring(0, pos) + getZeroWidth() + displayWord.substring(pos);
+  }
+
+  const embed = new CustomEmbed()
+    .setColor(0xffffff)
+    .setHeader("loot drop", client.user.avatarURL())
+    .setDescription(
+      `first to type \`${displayWord}\` wins ${
+        prize.startsWith("item:")
+          ? `a ${getItems()[prize.substring(5)].emoji} **${getItems()[prize.substring(5)].name}**`
+          : ""
+      }`,
+    );
+
+  const winner = await client.cluster.broadcastEval(
+    async (c, { embed, channelId, cluster, chosenWord }) => {
+      const client = c as unknown as NypsiClient;
+
+      if (client.cluster.id != cluster) return;
+
+      const channel = await client.channels.fetch(channelId).catch(() => {});
+
+      if (!channel) return;
+
+      if (!channel.isTextBased()) return;
+
+      const msg = await channel.send({ embeds: [embed] });
+
+      const res = await channel
+        .awaitMessages({
+          filter: (m) => m.content.toLowerCase() === chosenWord.toLowerCase(),
+          time: 30000,
+          max: 1,
+        })
+        .then((m) => m.first())
+        .catch(() => {});
+
+      if (!res) {
+        embed.description += "\n\nnobody clicked the button in time 😢";
+
+        await msg.edit({ embeds: [embed] });
+        return;
+      }
+
+      embed.description += `\n\n**${res.author.username}** has won!!`;
+
+      await msg.edit({ embeds: [embed] });
+
+      return res.author.id;
+    },
+    { context: { embed, channelId, cluster: cluster.cluster, chosenWord } },
   );
 
   const winnerId = winner.filter((i) => Boolean(i))[0];
@@ -183,7 +273,7 @@ async function fastClickGame(client: NypsiClient, channelId: string, prize: stri
 async function clickSpecificGame(client: NypsiClient, channelId: string, prize: string) {
   const cluster = await findCluster(client, channelId);
 
-  if (typeof cluster !== "number") return;
+  if (typeof cluster.cluster !== "number") return;
 
   const colours = ["red", "blue", "green", "gray"];
 
@@ -274,7 +364,7 @@ async function clickSpecificGame(client: NypsiClient, channelId: string, prize: 
 
       const res = await msg
         .awaitMessageComponent({
-          filter: async (i) => {
+          filter: (i) => {
             if (losers.includes(i.user.id)) return;
             if (i.customId !== winningId) {
               i.reply({ embeds: [failEmbed], ephemeral: true });
@@ -306,7 +396,9 @@ async function clickSpecificGame(client: NypsiClient, channelId: string, prize: 
 
       return res.user.id;
     },
-    { context: { embed, row, channelId, cluster, winningId, winEmbed, failEmbed } },
+    {
+      context: { embed, row, channelId, cluster: cluster.cluster, winningId, winEmbed, failEmbed },
+    },
   );
 
   const winnerId = winner.filter((i) => Boolean(i))[0];
@@ -323,8 +415,8 @@ async function findCluster(client: NypsiClient, channelId: string) {
 
       const channel = await client.channels.fetch(channelId).catch(() => {});
 
-      if (channel) {
-        return client.cluster.id;
+      if (channel && !channel.isDMBased()) {
+        return { cluster: client.cluster.id, guildId: channel.guildId };
       } else {
         return "not-found";
       }
@@ -334,18 +426,11 @@ async function findCluster(client: NypsiClient, channelId: string) {
     },
   );
 
-  let shard: number;
-
   for (const i of clusterHas) {
     if (i != "not-found") {
-      shard = i;
-      break;
+      return i;
     }
   }
 
-  if (isNaN(shard)) {
-    return null;
-  }
-
-  return shard;
+  return null;
 }
