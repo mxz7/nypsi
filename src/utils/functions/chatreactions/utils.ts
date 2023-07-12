@@ -79,7 +79,9 @@ export function doChatReactions(client: NypsiClient) {
           continue;
         }
 
-        const a = await startOpenChatReaction(guild, channel as TextChannel);
+        const a = await startOpenChatReaction(guild, channel as TextChannel).catch(() => {});
+
+        if (!a) continue;
 
         if (a != "xoxo69") {
           count++;
