@@ -104,7 +104,7 @@ async function run(
   }
 
   for (const item of descFilter) {
-    if (message.guild.name.toLowerCase().split(" ").join("").includes(item)) {
+    if (message.guild.name.toLowerCase().includes(item)) {
       return send({ embeds: [new ErrorEmbed("this server is not able to use this command")] });
     }
   }

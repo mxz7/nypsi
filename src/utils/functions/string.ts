@@ -1,7 +1,7 @@
 import * as CryptoJS from "crypto-js";
 
 export function cleanString(string: string): string {
-  return string.replace(/[^A-z0-9\s]/g, "");
+  return string.replace(/[^A-z0-9\s]/g, "").toLowerCase();
 }
 
 export function encrypt(content: string): string {
