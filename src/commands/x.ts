@@ -286,9 +286,7 @@ async function run(
       ),
     ];
 
-    let desc = `tag: ${user?.username}#${user?.discriminator}\nid: ${
-      user?.id
-    }\ncreated: <t:${Math.floor(
+    let desc = `tag: ${user?.username}#${user?.discriminator}\nid: ${user?.id}\ncreated: <t:${Math.floor(
       user.createdTimestamp / 1000,
     )}:R>\nadmin level: ${await getAdminLevel(user.id)}`;
 

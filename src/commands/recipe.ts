@@ -37,10 +37,7 @@ async function run(
 
   await addCooldown(cmd.name, message.member, 4);
 
-  const embed = new CustomEmbed(message.member).setHeader(
-    "recipe",
-    message.author.avatarURL(),
-  );
+  const embed = new CustomEmbed(message.member).setHeader("recipe", message.author.avatarURL());
 
   const desc: string[] = [`${selected.emoji} ${selected.name}`];
 
