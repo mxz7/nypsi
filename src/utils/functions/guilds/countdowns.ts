@@ -48,6 +48,7 @@ export function runCountdowns(client: NypsiClient) {
 
       if (isNaN(shard)) {
         logger.warn(`countdown channel not found: ${countdown.guildId} ${countdown.channel}`);
+        await deleteCountdown(countdown.guildId, countdown.id);
         continue;
       }
 
