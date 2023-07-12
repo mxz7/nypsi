@@ -464,7 +464,7 @@ async function run(
           staticEmojis.get(two.split("-")[0]) +
           " **|** " +
           staticEmojis.get(three.split("-")[0]),
-        win: true,
+        result: "win",
         earned: winnings,
         xp: earnedXp,
       });
@@ -490,7 +490,7 @@ async function run(
           staticEmojis.get(two.split("-")[0]) +
           " **|** " +
           staticEmojis.get(three.split("-")[0]),
-        win: false,
+        result: "lose",
       });
       embed.setFooter({ text: `id: ${id}` });
     }

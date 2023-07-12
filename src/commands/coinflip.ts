@@ -164,7 +164,7 @@ async function run(
       bet: bet,
       game: "coinflip",
       outcome: `**winner** ${winner.user.username}\n**loser** ${loser.user.username}`,
-      win: winner.user.id == message.author.id,
+      result: winner.user.id == message.author.id ? "win" : "lose",
       earned: winner.user.id == message.author.id ? winnings : null,
     });
 
@@ -173,7 +173,7 @@ async function run(
       bet: bet,
       game: "coinflip",
       outcome: `**winner** ${winner.user.username}\n**loser** ${loser.user.username}`,
-      win: winner.user.id == player2.user.id,
+      result: winner.user.id == player2.user.id ? "win" : "lose",
       earned: winner.user.id == player2.user.id ? winnings : null,
     });
 

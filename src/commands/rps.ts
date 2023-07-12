@@ -303,7 +303,7 @@ async function run(
         bet: bet,
         game: "rps",
         outcome: `**choice** ${choice}\n**landed** ${winning}`,
-        win: true,
+        result: "win",
         earned: winnings,
         xp: earnedXp,
       });
@@ -323,7 +323,7 @@ async function run(
         bet: bet,
         game: "rps",
         outcome: `**choice** ${choice}\n**landed** ${winning}`,
-        win: false,
+        result: "lose",
       });
       embed.setFooter({ text: `id: ${id}` });
     }

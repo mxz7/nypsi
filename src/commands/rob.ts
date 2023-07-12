@@ -189,7 +189,7 @@ async function run(
       bet: amountMoney,
       game: "rob",
       outcome: `${message.author.username} failed to rob ${target.user.username}`,
-      win: false,
+      result: "lose",
     });
 
     embed2.setColor(Constants.EMBED_FAIL_COLOR);
@@ -225,7 +225,7 @@ async function run(
       bet: 0,
       game: "rob",
       outcome: `${message.author.username} broke ${target.user.username}'s padlock`,
-      win: false,
+      result: "lose",
     });
 
     embed2.setColor(Constants.EMBED_FAIL_COLOR);
@@ -260,7 +260,7 @@ async function run(
         bet: 0,
         game: "rob",
         outcome: `${message.author.username} successfully robbed ${target.user.username}`,
-        win: true,
+        result: "win",
         earned: amountMoney,
       });
 
@@ -329,7 +329,7 @@ async function run(
           bet: 0,
           game: "rob",
           outcome: `${message.author.username} failed to rob ${target.user.username}, but their lawyer saved their money`,
-          win: false,
+          result: "lose",
         });
 
         embed2.addField(
@@ -353,7 +353,7 @@ async function run(
           bet: amountMoney,
           game: "rob",
           outcome: `${message.author.username} failed to rob ${target.user.username}`,
-          win: false,
+          result: "lose",
         });
 
         embed2.addField("fail!!", "you lost $**" + amountMoney.toLocaleString() + "**");

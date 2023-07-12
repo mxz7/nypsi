@@ -99,7 +99,7 @@ async function prepare(
         game: selected.id,
         outcome: JSON.stringify(buttons),
         userId: message.author.id,
-        win: card.won,
+        result: card.won ? "win" : "lose",
       });
 
       embed.setDescription(`**${card.remainingClicks}** clicks left`);

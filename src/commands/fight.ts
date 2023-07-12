@@ -15,7 +15,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { getBoosters } from "../utils/functions/economy/boosters";
 import { addInventoryItem } from "../utils/functions/economy/inventory";
-import { createGame, getGambleStats } from "../utils/functions/economy/stats";
+import { createGame, getGambleStats, getGameWins } from "../utils/functions/economy/stats";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
@@ -94,7 +94,8 @@ async function run(
     const stats = (await getGambleStats(message.member)).find((s) => s.game == "fight");
 
     if (stats) {
-      embed.setFooter({ text: `you are ${stats._sum.win}-${stats._count._all - stats._sum.win}` });
+      const win = await getGameWins(message.member, stats.game);
+      embed.setFooter({ text: `you are ${(win).toLocaleString()}-${stats._count._all - win}` });
     }
 
     return send({ embeds: [embed] });
@@ -105,10 +106,12 @@ async function run(
       return send({ embeds: [new ErrorEmbed("you have no fight stats")] });
     }
 
+    const win = await getGameWins(message.member, stats.game);
+
     const embed = new CustomEmbed(
       message.member,
-      `you have won **${stats._sum.win.toLocaleString()}** fights and lost **${(
-        stats._count._all - stats._sum.win
+      `you have won **${win.toLocaleString()}** fights and lost **${(
+        stats._count._all - win
       ).toLocaleString()}**`,
     ).setHeader("your fight stats", message.author.avatarURL());
 
@@ -461,7 +464,7 @@ class Fight {
         userId: this.home.user.id,
         bet: 0,
         game: "fight",
-        win: this.home.user.id == winner.member.user.id,
+        result: this.home.user.id == winner.member.user.id ? "win" : "lose",
         outcome: `\`\`\`${this.log.join("\n")}\`\`\``,
       });
     }

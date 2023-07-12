@@ -299,7 +299,7 @@ export async function startChatReactionDuel(
         : challenger.user.username
     }\nword: ${word.actual}`,
     userId: challenger.user.id,
-    win: winningMessage.author.id === challenger.user.id,
+    result: winningMessage.author.id === challenger.user.id ? "win" : "lose",
     earned: winningMessage.author.id === challenger.user.id ? winnings : 0,
   });
 
@@ -310,7 +310,7 @@ export async function startChatReactionDuel(
       winningMessage.author.id === target.user.id ? challenger.user.username : target.user.username
     }\nword: ${word.actual}`,
     userId: target.user.id,
-    win: winningMessage.author.id === target.user.id,
+    result: winningMessage.author.id === target.user.id ? "win" : "lose",
     earned: winningMessage.author.id === target.user.id ? winnings : 0,
   });
 

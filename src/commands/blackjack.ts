@@ -606,7 +606,7 @@ async function playGame(
       userId: message.author.id,
       bet: bet,
       game: "blackjack",
-      win: false,
+      result: "lose",
       outcome: `dealer cards: ${getDealerCards(message.member)} (${calcTotalDealer(
         message.member,
       )})\nmember cards: ${getCards(message.member)} (${calcTotal(message.member)})`,
@@ -674,7 +674,7 @@ async function playGame(
       userId: message.author.id,
       bet: bet,
       game: "blackjack",
-      win: true,
+      result: "win",
       outcome: `dealer cards: ${getDealerCards(message.member)} (${calcTotalDealer(
         message.member,
       )})\nmember cards: ${getCards(message.member)} (${calcTotal(message.member)})`,
@@ -707,10 +707,11 @@ async function playGame(
       userId: message.author.id,
       bet: bet,
       game: "blackjack",
-      win: false,
+      result: "draw",
       outcome: `dealer cards: ${getDealerCards(message.member)} (${calcTotalDealer(
         message.member,
       )})\nmember cards: ${getCards(message.member)} (${calcTotal(message.member)})`,
+      earned: bet,
     });
     gamble(message.author, "blackjack", bet, true, id, bet);
     newEmbed.setFooter({ text: `id: ${id}` });

@@ -410,7 +410,7 @@ async function prepareGame(
   }
 
   playGame(message, msg, args).catch((e: string) => {
-    logger.error(`error occured playing mines - ${message.author.id} (${message.author.username})`);
+    logger.error(`error occurred playing mines - ${message.author.id} (${message.author.username})`);
     console.error(e);
     redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
     return send({
@@ -607,7 +607,7 @@ async function playGame(
       userId: message.author.id,
       bet: bet,
       game: "mines",
-      win: false,
+      result: "lose",
       outcome: `mines:${JSON.stringify(getRows(grid, true))}`,
     });
     gamble(message.author, "mines", bet, false, id, 0);
@@ -681,7 +681,7 @@ async function playGame(
       userId: message.author.id,
       bet: bet,
       game: "mines",
-      win: true,
+      result: "win",
       outcome: `mines:${JSON.stringify(getRows(grid, true))}`,
       earned: winnings,
       xp: earnedXp,
@@ -706,8 +706,9 @@ async function playGame(
       userId: message.author.id,
       bet: bet,
       game: "mines",
-      win: false,
+      result: "draw",
       outcome: `mines:${JSON.stringify(getRows(grid, true))}`,
+      earned: bet,
     });
     gamble(message.author, "mines", bet, true, id, bet);
     embed.setFooter({ text: `id: ${id}` });
