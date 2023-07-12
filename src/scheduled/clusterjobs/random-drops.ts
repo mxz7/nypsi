@@ -41,6 +41,7 @@ function doRandomDrop(client: NypsiClient) {
   const rand = Math.floor(Math.random() * ms("1 hour") + ms("15 minutes"));
   setTimeout(() => {
     randomDrop(client);
+    doRandomDrop(client);
   }, rand);
   logger.info(`::auto next random drops will occur in ${MStoTime(rand)}`);
 }
@@ -82,17 +83,14 @@ async function randomDrop(client: NypsiClient) {
     (await redis.get("nypsi:maintenance")) ||
     (await redis.get(Constants.redis.nypsi.RESTART)) == "t"
   )
-    return doRandomDrop(client);
+    return;
 
   let count = 0;
 
   for (const channelId of shuffle(channels)) {
-    count++;
+    if (await redis.exists(`nypsi:lootdrop:channel:cd:${channelId}`)) continue;
 
-    if (await redis.exists(`nypsi:lootdrop:channel:cd:${channelId}`)) {
-      count--;
-      continue;
-    }
+    count++;
 
     await redis.set(`nypsi:lootdrop:channel:cd:${channelId}`, "69", "EX", 3600);
 
@@ -129,8 +127,6 @@ async function randomDrop(client: NypsiClient) {
 
     if (count >= max) break;
   }
-
-  return doRandomDrop(client);
 }
 
 async function fastClickGame(client: NypsiClient, channelId: string, prize: string) {
