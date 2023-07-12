@@ -347,7 +347,7 @@ async function prepareGame(
 
   playGame(message, msg, args).catch((e) => {
     logger.error(
-      `error occured playing highlow - ${message.author.id} (${message.author.username})`,
+      `error occurred playing highlow - ${message.author.id} (${message.author.username})`,
     );
     logger.error("highlow error", e);
     redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
@@ -488,7 +488,7 @@ async function playGame(
       userId: message.author.id,
       bet: bet,
       game: "highlow",
-      win: false,
+      result: "lose",
       outcome: `**old card** ${games.get(message.author.id).oldCard}\n**new card** ${
         games.get(message.author.id).card
       }`,
@@ -568,7 +568,7 @@ async function playGame(
       userId: message.author.id,
       bet: bet,
       game: "highlow",
-      win: true,
+      result: "win",
       outcome: `**old card** ${games.get(message.author.id).oldCard}\n**new card** ${
         games.get(message.author.id).card
       }`,
@@ -594,10 +594,11 @@ async function playGame(
       userId: message.author.id,
       bet: bet,
       game: "highlow",
-      win: false,
+      result: "draw",
       outcome: `**old card** ${games.get(message.author.id).oldCard}\n**new card** ${
         games.get(message.author.id).card
       }`,
+      earned: bet,
     });
     gamble(message.author, "highlow", bet, true, id, bet);
     newEmbed.setFooter({ text: `id: ${id}` });
