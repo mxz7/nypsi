@@ -11,6 +11,8 @@ prisma.$use(async (params, next) => {
 
   const result = await next(params);
 
+  if (params.model === "Mention") return result;
+
   const timeTaken = Date.now() - before;
 
   if (timeTaken > 500 && !parentPort) {
