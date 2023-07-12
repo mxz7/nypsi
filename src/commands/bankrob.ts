@@ -166,7 +166,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       const id = await createGame({
         userId: message.author.id,
         bet: 0,
-        win: true,
+        result: "win",
         earned: stolen,
         game: "bankrob",
         outcome: `${message.author.username} robbed ${bank}`,
@@ -209,7 +209,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       const id = await createGame({
         userId: message.author.id,
         bet: totalLost,
-        win: false,
+        result: "lose",
         game: "bankrob",
         outcome: `${message.author.username} robbed ${bank}`,
       });

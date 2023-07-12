@@ -365,7 +365,7 @@ async function run(
         bet: bet,
         game: "roulette",
         outcome: `**choice** ${colorBet}\n**landed** ${roll}`,
-        win: true,
+        result: "win",
         earned: winnings,
         xp: earnedXp,
       });
@@ -386,7 +386,7 @@ async function run(
         bet: bet,
         game: "roulette",
         outcome: `**choice** ${colorBet}\n**landed** ${roll}`,
-        win: false,
+        result: "lose",
       });
       embed.setFooter({ text: `id: ${id}` });
     }
