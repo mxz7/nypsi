@@ -31,45 +31,20 @@ export async function getGambleStats(member: GuildMember) {
     },
   });
 
-  inPlaceSort(query).desc((i) => i._count._all);
-
   return query;
 }
 
-export async function getGameWins(member: GuildMember, name: string) {
-  return getGameResult(member, name, 1);
-}
-
-export async function getGameLosses(member: GuildMember, name: string) {
-  return getGameResult(member, name, 0);
-}
-
-export async function getGameDraws(member: GuildMember, name: string) {
-  return getGameResult(member, name, 2);
+export async function getGameWins(member: GuildMember, game: string) {
+  return await prisma.game.count({
+    where: { AND: [{ userId: member.id }, { game }, { win: 1 }] },
+  });
 }
 
 export async function getAllGameWins(name: string) {
   const query = await prisma.game.count({
     where: {
-      AND: [{ game: { contains: name } }, { win: 1 }]
-    }
-  });
-
-  return query;
-}
-
-async function getGameResult(member: GuildMember, name: string, value: number) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
-
-  const query = await prisma.game.count({
-    where: {
-      AND: [{ userId: id }, { game: { contains: name } }, { win: 1 }]
-    }
+      AND: [{ game: { contains: name } }, { win: 1 }],
+    },
   });
 
   return query;
