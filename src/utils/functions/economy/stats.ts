@@ -25,7 +25,6 @@ export async function getGambleStats(member: GuildMember) {
       bet: true,
     },
     _sum: {
-      win: true,
       bet: true,
       earned: true,
       xpEarned: true,
@@ -33,6 +32,45 @@ export async function getGambleStats(member: GuildMember) {
   });
 
   inPlaceSort(query).desc((i) => i._count._all);
+
+  return query;
+}
+
+export async function getGameWins(member: GuildMember, name: string) {
+  return getGameResult(member, name, 1);
+}
+
+export async function getGameLosses(member: GuildMember, name: string) {
+  return getGameResult(member, name, 0);
+}
+
+export async function getGameDraws(member: GuildMember, name: string) {
+  return getGameResult(member, name, 2);
+}
+
+export async function getAllGameWins(name: string) {
+  const query = await prisma.game.count({
+    where: {
+      AND: [{ game: { contains: name } }, { win: 1 }]
+    }
+  });
+
+  return query;
+}
+
+async function getGameResult(member: GuildMember, name: string, value: number) {
+  let id: string;
+  if (member instanceof GuildMember) {
+    id = member.user.id;
+  } else {
+    id = member;
+  }
+
+  const query = await prisma.game.count({
+    where: {
+      AND: [{ userId: id }, { game: { contains: name } }, { win: 1 }]
+    }
+  });
 
   return query;
 }
@@ -94,7 +132,7 @@ export async function createGame(
   opts: {
     userId: string;
     game: string;
-    win: boolean;
+    result: string; // win, lose, draw
     bet: number;
     earned?: number;
     xp?: number;
@@ -108,7 +146,7 @@ export async function createGame(
       data: {
         userId: opts.userId,
         game: opts.game,
-        win: opts.win ? 1 : 0,
+        win: opts.result == "win" ? 1 : opts.result == "lose" ? 0 : 2,
         bet: opts.bet,
         earned: opts.earned || 0,
         xpEarned: opts.xp || 0,

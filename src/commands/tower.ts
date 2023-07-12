@@ -341,7 +341,7 @@ async function prepareGame(
   }
 
   playGame(message, msg, args).catch((e) => {
-    logger.error(`error occured playing tower - ${message.author.id} (${message.author.username})`);
+    logger.error(`error occurred playing tower - ${message.author.id} (${message.author.username})`);
     logger.error("tower error", e);
     console.trace();
     redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
@@ -564,7 +564,7 @@ async function playGame(
       userId: message.author.id,
       bet: game.bet,
       game: "tower",
-      win: false,
+      result: "lose",
       outcome:
         `difficulty: ${game.difficulty}\n` +
         "A = blank | B = egg | C = clicked egg | G = gem | GC = found gem | X = bad click\n" +
@@ -628,7 +628,7 @@ async function playGame(
       userId: message.author.id,
       bet: game.bet,
       game: "tower",
-      win: true,
+      result: "win",
       outcome:
         `difficulty: ${game.difficulty}\n` +
         "A = blank | B = egg | C = clicked egg | G = gem | GC = found gem | X = bad click\n" +
@@ -659,7 +659,7 @@ async function playGame(
       userId: message.author.id,
       bet: game.bet,
       game: "tower",
-      win: false,
+      result: "draw",
       outcome:
         `difficulty: ${game.difficulty}\n` +
         "A = blank | B = egg | C = clicked egg | G = gem | GC = found gem | X = bad click\n" +
@@ -667,6 +667,7 @@ async function playGame(
           .map((row) => row.join("").toUpperCase())
           .reverse()
           .join("\n"),
+      earned: game.bet,
     });
     gamble(message.author, "tower", game.bet, true, id, game.bet);
     game.embed.setColor(variants.macchiato.yellow.hex as ColorResolvable);

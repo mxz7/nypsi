@@ -22,7 +22,9 @@ import { unbanTimeouts, unmuteTimeouts } from "../scheduled/clusterjobs/moderati
 import Constants from "../utils/Constants";
 import { MStoTime } from "../utils/functions/date";
 import {
+  getAllGameWins,
   getGambleStats,
+  getGameWins,
   getLeaderboardPositions,
   getScratchCardStats,
   getStats,
@@ -113,11 +115,12 @@ async function run(
     const fields: { name: string; value: string; inline: boolean }[] = [];
 
     for (const stat of gambleStats) {
+      const wins = await getGameWins(message.member, stat.game);
       fields.push({
         name: stat.game,
         value:
-          `${stat._sum.win.toLocaleString()}/${stat._count._all.toLocaleString()} (${(
-            (stat._sum.win / stat._count._all) *
+          `${wins.toLocaleString()}/${stat._count._all.toLocaleString()} (${(
+            (wins / stat._count._all) *
             100
           ).toFixed(1)}%)\n` +
           `profit: $${(Number(stat._sum.earned) - Number(stat._sum.bet)).toLocaleString()}\n` +
@@ -656,12 +659,11 @@ async function run(
     const gambleMsg: string[] = [];
 
     for (const gamble of byTypeGamble) {
-      const percent = ((Number(gamble._sum.win) / gamble._count._all) * 100).toFixed(2);
-
+      const percent = ((Number(await getAllGameWins(gamble.game)) / gamble._count._all) * 100).toFixed(2);
       gambleMsg.push(
         `- **${
           gamble.game
-        }** ${gamble._sum.win.toLocaleString()} / ${gamble._count._all.toLocaleString()} (${percent}%)`,
+        }** ${(await getAllGameWins(gamble.game)).toLocaleString()} / ${gamble._count._all.toLocaleString()} (${percent}%)`,
       );
     }
 
