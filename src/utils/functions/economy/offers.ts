@@ -15,6 +15,7 @@ import { CustomEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
 import { isPremium } from "../premium/premium";
 import { getTax } from "../tax";
+import { getAuctionAverage } from "./auctions";
 import { getBalance, updateBalance } from "./balance";
 import { getInventory } from "./inventory";
 import { getItems } from "./utils";
@@ -169,9 +170,16 @@ export async function getOffersAverage(item: string) {
   });
 
   const costs: number[] = [];
+  const auctionAvg = await getAuctionAverage(item);
 
   for (const offer of offers) {
     if (costs.length >= 500) break;
+
+    if (
+      offer.money / offer.itemAmount < auctionAvg * 0.1 ||
+      offer.money / offer.itemAmount > auctionAvg * 15
+    )
+      continue;
 
     if (offer.itemAmount > 1) {
       costs.push(Math.floor(Number(offer.money / offer.itemAmount)));
