@@ -38,6 +38,7 @@ const gifs = [
   "https://c.tenor.com/EkWAL6XhODIAAAAC/deji-boxing-deji.gif",
   "https://c.tenor.com/OHZwNy6nr5IAAAAC/conor-mcgregor-ufc.gif",
   "https://media.tenor.com/5bvwDvOIZ28AAAAd/ksi-knockout-ksiko.gif",
+  "https://tenor.com/view/ksi-elbow-joe-fournier-gif-9557003097386058166",
 ];
 
 async function run(
