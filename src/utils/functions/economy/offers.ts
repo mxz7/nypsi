@@ -175,6 +175,8 @@ export async function getOffersAverage(item: string) {
   for (const offer of offers) {
     if (costs.length >= 500) break;
 
+    console.log("a");
+
     if (
       offer.money / offer.itemAmount < auctionAvg * 0.1 ||
       offer.money / offer.itemAmount > auctionAvg * 15
