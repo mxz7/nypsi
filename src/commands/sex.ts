@@ -222,7 +222,7 @@ async function run(
           message.guild.id == "747056029795221513"
             ? "[nypsi](https://discord.gg/hJTDNST)"
             : message.guild.name
-        }**\n\ngo ahead and send [**${message.author.tag}**](https://discord.com/users/${
+        }**\n\ngo ahead and send [**${message.author.username}**](https://discord.com/users/${
           message.author.id
         }) a *private* message 😉😏`,
       )
@@ -253,7 +253,7 @@ async function run(
               ? "[nypsi](https://discord.gg/hJTDNST)"
               : message.guild.name
           }**\n\n` +
-            `[**${message.author.tag}**](https://discord.com/users/${message.author.tag}) - ${description}\n\n` +
+            `[**${message.author.username}**](https://discord.com/users/${message.author.id}) - ${description}\n\n` +
             "go ahead and send them a *private* message 😉😏",
         );
       }
