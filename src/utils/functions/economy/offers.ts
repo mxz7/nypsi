@@ -9,6 +9,7 @@ import {
   User,
 } from "discord.js";
 import prisma from "../../../init/database";
+import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
@@ -147,4 +148,42 @@ export async function checkOffer(offer: Offer, client: NypsiClient) {
     inventory.find((i) => i.item === offer.itemId).amount < offer.itemAmount
   )
     return deleteOffer(offer, client);
+}
+
+export async function getOffersAverage(item: string) {
+  if (await redis.exists(`${Constants.redis.cache.economy.OFFER_AVG}:${item}`))
+    return parseInt(await redis.get(`${Constants.redis.cache.economy.OFFER_AVG}:${item}`));
+
+  const offers = await prisma.offer.findMany({
+    where: {
+      AND: [{ sold: true }, { itemId: item }, { soldAt: { gt: Constants.SEASON_START } }],
+    },
+    select: {
+      money: true,
+      itemAmount: true,
+    },
+    orderBy: {
+      soldAt: "desc",
+    },
+    take: 25,
+  });
+
+  const costs: number[] = [];
+
+  for (const offer of offers) {
+    if (costs.length >= 500) break;
+
+    if (offer.itemAmount > 1) {
+      costs.push(Math.floor(Number(offer.money / offer.itemAmount)));
+    } else {
+      costs.push(Number(offer.money));
+    }
+  }
+
+  const sum = costs.reduce((a, b) => a + b, 0);
+  const avg = Math.floor(sum / costs.length) || 0;
+
+  await redis.set(`${Constants.redis.cache.economy.OFFER_AVG}:${item}`, avg, "EX", 3600 * 3);
+
+  return avg;
 }

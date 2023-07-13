@@ -11,6 +11,7 @@ import { getAuctionAverage } from "./auctions";
 import { getBoosters } from "./boosters";
 import { getGuildUpgradesByUser } from "./guilds";
 import { gemBreak, getInventory } from "./inventory";
+import { getOffersAverage } from "./offers";
 import { isPassive } from "./passive";
 import { getPrestige } from "./prestige";
 import { getBaseUpgrades, getBaseWorkers, getItems } from "./utils";
@@ -629,8 +630,17 @@ export async function calcNetWorth(member: GuildMember | string, breakdown = fal
         breakdownItems.set(item.item, getItems()[item.item].sell * Number(item.amount));
     } else {
       const auctionAvg = await getAuctionAverage(item.item);
+      const offerAvg = await getOffersAverage(item.item);
 
-      if (auctionAvg) {
+      if (auctionAvg && offerAvg) {
+        const value = (auctionAvg + offerAvg) / 2;
+
+        worth += Math.floor(value * Number(item.amount));
+        if (breakdown) breakdownItems.set(item.item, value * Number(item.amount));
+      } else if (offerAvg) {
+        worth += offerAvg * Number(item.amount);
+        if (breakdown) breakdownItems.set(item.item, offerAvg * Number(item.amount));
+      } else if (auctionAvg) {
         worth += auctionAvg * Number(item.amount);
         if (breakdown) breakdownItems.set(item.item, auctionAvg * Number(item.amount));
       } else if (getItems()[item.item].sell) {
