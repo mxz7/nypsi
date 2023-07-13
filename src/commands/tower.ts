@@ -341,7 +341,9 @@ async function prepareGame(
   }
 
   playGame(message, msg, args).catch((e) => {
-    logger.error(`error occurred playing tower - ${message.author.id} (${message.author.username})`);
+    logger.error(
+      `error occurred playing tower - ${message.author.id} (${message.author.username})`,
+    );
     logger.error("tower error", e);
     console.trace();
     redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
