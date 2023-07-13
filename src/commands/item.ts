@@ -120,18 +120,11 @@ async function run(
     }
   }
 
-  console.log("1");
-
   const auctionAvg = await getAuctionAverage(selected.id);
-  console.log("2");
   const offerAvg = await getOffersAverage(selected.id);
-  console.log("3");
   const total = await getTotalAmountOfItem(selected.id);
-  console.log("4");
   const inventory = await getInventory(message.member);
-  console.log("5");
   const inAuction = await countItemOnAuction(selected.id);
-  console.log("6");
 
   if (auctionAvg) {
     if (selected.sell || selected.buy) {
