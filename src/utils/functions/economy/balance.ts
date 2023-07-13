@@ -11,6 +11,7 @@ import { getAuctionAverage } from "./auctions";
 import { getBoosters } from "./boosters";
 import { getGuildUpgradesByUser } from "./guilds";
 import { gemBreak, getInventory } from "./inventory";
+import { getOffersAverage } from "./offers";
 import { isPassive } from "./passive";
 import { getPrestige } from "./prestige";
 import { getBaseUpgrades, getBaseWorkers, getItems } from "./utils";
@@ -605,7 +606,20 @@ export async function calcNetWorth(member: GuildMember | string, breakdown = fal
   for (const upgrade of query.BakeryUpgrade) {
     const item = getItems()[upgrade.upgradeId];
 
-    const value = ((await getAuctionAverage(item.id)) || item.sell) * upgrade.amount;
+    let value = 0;
+
+    const auctionAvg = await getAuctionAverage(item.id);
+    const offersAvg = await getOffersAverage(item.id);
+
+    if (auctionAvg && offersAvg) {
+      worth += Math.floor(((auctionAvg + offersAvg) / 2) * upgrade.amount);
+    } else if (auctionAvg) {
+      worth += upgrade.amount * auctionAvg;
+    } else if (offersAvg) {
+      worth += upgrade.amount * offersAvg;
+    } else {
+      value = upgrade.amount * (item.sell || 1000);
+    }
 
     worth += value;
     if (breakdown) {
@@ -629,8 +643,17 @@ export async function calcNetWorth(member: GuildMember | string, breakdown = fal
         breakdownItems.set(item.item, getItems()[item.item].sell * Number(item.amount));
     } else {
       const auctionAvg = await getAuctionAverage(item.item);
+      const offerAvg = await getOffersAverage(item.item);
 
-      if (auctionAvg) {
+      if (auctionAvg && offerAvg) {
+        const value = (auctionAvg + offerAvg) / 2;
+
+        worth += Math.floor(value * Number(item.amount));
+        if (breakdown) breakdownItems.set(item.item, value * Number(item.amount));
+      } else if (offerAvg) {
+        worth += offerAvg * Number(item.amount);
+        if (breakdown) breakdownItems.set(item.item, offerAvg * Number(item.amount));
+      } else if (auctionAvg) {
         worth += auctionAvg * Number(item.amount);
         if (breakdown) breakdownItems.set(item.item, auctionAvg * Number(item.amount));
       } else if (getItems()[item.item].sell) {
@@ -657,7 +680,21 @@ export async function calcNetWorth(member: GuildMember | string, breakdown = fal
         );
         if (!itemId) continue;
 
-        worth += upgrade.amount * ((await getAuctionAverage(itemId)) || 100000);
+        const auctionAvg = await getAuctionAverage(itemId);
+        const offersAvg = await getOffersAverage(itemId);
+
+        if (auctionAvg && offersAvg) {
+          worth += Math.floor(((auctionAvg + offersAvg) / 2) * upgrade.amount);
+          workersBreakdown += Math.floor(((auctionAvg + offersAvg) / 2) * upgrade.amount);
+        } else if (auctionAvg) {
+          worth += upgrade.amount * auctionAvg;
+          workersBreakdown += upgrade.amount * auctionAvg;
+        } else if (offersAvg) {
+          worth += upgrade.amount * offersAvg;
+          workersBreakdown += upgrade.amount * offersAvg;
+        } else {
+          worth += 100_000;
+        }
       } else {
         let baseCost = _.clone(baseUpgrades[upgrade.upgradeId]).base_cost;
 

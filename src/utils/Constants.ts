@@ -63,6 +63,7 @@ export default {
       economy: {
         AUTO_SELL: "cache:economy:autosell",
         AUCTION_AVG: "cache:economy:auctionavg",
+        OFFER_AVG: "cache:economy:offeravg",
         AUCTION_ITEM_GRAPH_DATA: "cache:economy:auction:historydata",
         BAKERY_UPGRADES: "cache:economy:bakery:upgrades",
         BALANCE: "cache:economy:balance",
