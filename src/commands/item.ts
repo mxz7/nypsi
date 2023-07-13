@@ -120,11 +120,12 @@ async function run(
     }
   }
 
-  const total = await getTotalAmountOfItem(selected.id);
-  const inventory = await getInventory(message.member);
-  const inAuction = await countItemOnAuction(selected.id);
-
-  const value = await calcItemValue(selected.id);
+  const [total, inventory, inAuction, value] = await Promise.all([
+    getTotalAmountOfItem(selected.id),
+    getInventory(message.member),
+    countItemOnAuction(selected.id),
+    calcItemValue(selected.id),
+  ]);
 
   if (selected.sell || selected.buy) {
     desc.push(`**average worth** $${Math.floor(value).toLocaleString()}`);
