@@ -321,7 +321,7 @@
     "buy": 0,
     "sell": 10000,
     "in_crates": true,
-    "random_drop_chance": 10
+    "random_drop_chance": 70
   },
   "terrible_fishing_rod": {
     "id": "terrible_fishing_rod",
@@ -358,7 +358,7 @@
     "buy": 0,
     "sell": 10000,
     "in_crates": true,
-    "random_drop_chance": 10
+    "random_drop_chance": 70
   },
   "bitcoin": {
     "id": "bitcoin",
@@ -417,7 +417,7 @@
     "buy": 0,
     "sell": 10000,
     "in_crates": true,
-    "random_drop_chance": 10
+    "random_drop_chance": 70
   },
   "baby_rabbit": {
     "id": "baby_rabbit",
@@ -573,7 +573,7 @@
       "id:obsidian",
       "id:gold_nugget"
     ],
-    "random_drop_chance": 75
+    "random_drop_chance": 80
   },
   "vote_crate": {
     "id": "vote_crate",
@@ -624,7 +624,7 @@
     "aliases": ["nypsi"],
     "crate_runs": 5,
     "in_crates": true,
-    "random_drop_chance": 6
+    "random_drop_chance": 50
   },
   "calendar": {
     "id": "calendar",
@@ -1126,7 +1126,7 @@
       "time": 3600
     },
     "in_crates": true,
-    "random_drop_chance": 15
+    "random_drop_chance": 50
   },
   "efficiency": {
     "id": "efficiency",
@@ -1369,7 +1369,7 @@
     "sell": 1000000,
     "role": "bakery-upgrade",
     "in_crates": true,
-    "random_drop_chance": 40
+    "random_drop_chance": 60
   },
   "highroller": {
     "id": "highroller",
@@ -1466,7 +1466,7 @@
       "time": 172800,
       "ingredients": ["gem_shard:10"]
     },
-    "random_drop_chance": 3
+    "random_drop_chance": 10
   },
   "purple_gem": {
     "id": "purple_gem",
@@ -1512,7 +1512,7 @@
       "time": 172800,
       "ingredients": ["gem_shard:5"]
     },
-    "random_drop_chance": 3
+    "random_drop_chance": 10
   },
   "white_gem": {
     "id": "white_gem",
@@ -1770,7 +1770,7 @@
       "id:purple_gem:1",
       "id:gem_crate:0.2"
     ],
-    "random_drop_chance": 60
+    "random_drop_chance": 90
   },
   "legendary_scratch_card": {
     "id": "legendary_scratch_card",
@@ -1806,7 +1806,7 @@
       "id:gem_shard:50",
       "id:gem_crate:2.5"
     ],
-    "random_drop_chance": 15
+    "random_drop_chance": 40
   },
   "karma_scratch_card": {
     "id": "karma_scratch_card",
@@ -1837,7 +1837,7 @@
       "id:platinum_credit:1",
       "id:pink_gem:1"
     ],
-    "random_drop_chance": 20
+    "random_drop_chance": 50
   },
   "corner_shop_scratchie": {
     "id": "corner_shop_scratchie",
@@ -1882,7 +1882,7 @@
       "id:purple_gem:0.1",
       "id:quarry_scrap:3"
     ],
-    "random_drop_chance": 90
+    "random_drop_chance": 100
   },
   "bob": {
     "id": "bob",
@@ -1908,7 +1908,7 @@
     "buy": 0,
     "sell": 500000,
     "in_crates": false,
-    "random_drop_chance": 35
+    "random_drop_chance": 40
   },
   "quarry_scrap": {
     "id": "quarry_scrap",
