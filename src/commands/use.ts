@@ -376,9 +376,8 @@ async function run(
     if (inventory.find((i) => i.item === selected.id).amount < amount)
       return send({ embeds: [new ErrorEmbed(`you don't have this many ${selected.name}`)] });
 
-    for (let i = 0; i < amount; i++) {
-      await addBakeryUpgrade(message.member, selected.id);
-    }
+    await addBakeryUpgrade(message.member, selected.id, amount);
+
     setInventoryItem(
       message.member,
       selected.id,
