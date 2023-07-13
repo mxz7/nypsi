@@ -31,10 +31,8 @@ async function run(
     return;
   }
 
-  const [ filter, prefix ] = await Promise.all([
-    getChatFilter(message.guild),
-    getPrefix(message.guild)
-  ]);
+  let filter = await getChatFilter(message.guild);
+  const prefix = await getPrefix(message.guild);
 
   if (args.length == 0) {
     const pages = PageManager.createPages(inPlaceSort(filter).asc(), 15);
