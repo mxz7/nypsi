@@ -27,7 +27,6 @@ import { addNotificationToQueue, getDmSettings, getPreferences } from "../users/
 import itemHistoryWorker from "../workers/itemhistory";
 import { getBalance, updateBalance } from "./balance";
 import { addInventoryItem } from "./inventory";
-import { getOffersAverage } from "./offers";
 import { addStat } from "./stats";
 import { createUser, getItems, userExists } from "./utils";
 import ms = require("ms");
@@ -359,18 +358,9 @@ export async function getAuctionAverage(item: string) {
   });
 
   const costs: number[] = [];
-  const offersAvg = await getOffersAverage(item);
 
   for (const auction of auctions) {
     if (costs.length >= 500) break;
-
-    console.log("a");
-
-    if (
-      auction.bin / auction.itemAmount < offersAvg * 0.05 ||
-      auction.bin / auction.itemAmount > offersAvg * 20
-    )
-      continue;
 
     if (auction.itemAmount > 1) {
       costs.push(Math.floor(Number(auction.bin / auction.itemAmount)));
