@@ -18,6 +18,7 @@ import {
   getTotalAmountOfItem,
   selectItem,
 } from "../utils/functions/economy/inventory";
+import { getOffersAverage } from "../utils/functions/economy/offers";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { isBooster } from "../utils/functions/premium/boosters";
 import { isPremium } from "../utils/functions/premium/premium";
@@ -119,21 +120,46 @@ async function run(
     }
   }
 
-  const avg = await getAuctionAverage(selected.id);
+  const auctionAvg = await getAuctionAverage(selected.id);
+  const offerAvg = await getOffersAverage(selected.id);
   const total = await getTotalAmountOfItem(selected.id);
   const inventory = await getInventory(message.member);
   const inAuction = await countItemOnAuction(selected.id);
 
-  if (avg) {
+  if (auctionAvg) {
     if (selected.sell || selected.buy) {
-      desc.push(`**average auction sale** $${Math.floor(avg).toLocaleString()}`);
+      desc.push(`**auction average** $${Math.floor(auctionAvg).toLocaleString()}`);
     } else {
-      desc.push(`\n**average auction sale** $${Math.floor(avg).toLocaleString()}`);
+      desc.push(`\n**auction average** $${Math.floor(auctionAvg).toLocaleString()}`);
     }
   }
 
+  if (offerAvg) {
+    if (auctionAvg || selected.sell || selected.buy) {
+      desc.push(`**offer average** ${Math.floor(offerAvg).toLocaleString()}`);
+    } else {
+      desc.push(`\n**offer average** ${Math.floor(offerAvg).toLocaleString()}`);
+    }
+  }
+
+  if (auctionAvg && offerAvg) {
+    let value = 0;
+
+    if (
+      selected.id === "cookie" ||
+      ["prey", "fish", "sellable", "ore"].includes(selected.role) ||
+      (selected.buy && selected.sell)
+    ) {
+      value = selected.sell;
+    } else {
+      value = Math.floor((auctionAvg + offerAvg) / 2);
+    }
+
+    desc.push(`**value** ${Math.floor(value).toLocaleString()}\n`);
+  }
+
   if (total) {
-    if (avg || selected.sell || selected.buy) {
+    if (auctionAvg || offerAvg || selected.sell || selected.buy) {
       desc.push(`**in world** ${total.toLocaleString()}`);
     } else {
       desc.push(`\n**in world** ${total.toLocaleString()}`);
@@ -141,7 +167,7 @@ async function run(
   }
 
   if (inAuction) {
-    if (total || avg || selected.sell || selected.buy) {
+    if (total || auctionAvg || offerAvg || selected.sell || selected.buy) {
       desc.push(`**in auction** ${inAuction.toLocaleString()}`);
     } else {
       desc.push(`\n**in auction** ${inAuction.toLocaleString()}`);
