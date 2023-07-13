@@ -410,7 +410,9 @@ async function prepareGame(
   }
 
   playGame(message, msg, args).catch((e: string) => {
-    logger.error(`error occurred playing mines - ${message.author.id} (${message.author.username})`);
+    logger.error(
+      `error occurred playing mines - ${message.author.id} (${message.author.username})`,
+    );
     console.error(e);
     redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
     return send({
