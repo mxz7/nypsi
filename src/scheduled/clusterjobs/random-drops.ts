@@ -267,7 +267,7 @@ async function typeFastGame(client: NypsiClient, channelId: string, prize: strin
         .catch(() => {});
 
       if (!res) {
-        embed.description += "\n\nnobody clicked the button in time 😢";
+        embed.description += "\n\nnobody won 😢";
 
         await msg.edit({ embeds: [embed] });
         return;
