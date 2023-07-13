@@ -197,40 +197,14 @@ async function run(
         },
       });
 
-      const moderationCasesModerator = await prisma.moderationCase.findMany({
-        where: {
-          moderator: message.author.username,
-        },
-      });
-
-      const moderationMutes = await prisma.moderationMute.findMany({
-        where: {
-          userId: message.author.id,
-        },
-      });
-
-      const moderationBans = await prisma.moderationBan.findMany({
-        where: {
-          userId: message.author.id,
-        },
-      });
-
-      const chatReactionStats = await prisma.chatReactionStats.findMany({
-        where: {
-          userId: message.author.id,
-        },
-      });
-
-      const mentionsTargetedData = await prisma.mention.findMany({
-        where: {
-          targetId: message.author.id,
-        },
-      });
-      const mentionsSenderData = await prisma.mention.findMany({
-        where: {
-          userTag: message.author.username,
-        },
-      });
+      const [ moderationCasesModerator, moderationMutes, moderationBans, chatReactionStats, mentionsTargetedData, mentionsSenderData] = await Promise.all([
+        prisma.moderationCase.findMany({ where: { moderator: message.author.username } }),
+        prisma.moderationMute.findMany({ where: { userId: message.author.id } }),
+        prisma.moderationBan.findMany({ where: { userId: message.author.id } }),
+        prisma.chatReactionStats.findMany({ where: { userId: message.author.id } }),
+        prisma.mention.findMany({ where: { targetId: message.author.id } }),
+        prisma.mention.findMany({ where: { userTag: message.author.username } }),
+      ]);
 
       const file = `/tmp/nypsi_data_${message.author.id}.txt`;
 

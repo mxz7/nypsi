@@ -11,8 +11,10 @@ export default {
 
     if (!(await isKarmaShopOpen())) return;
 
-    const items = await getKarmaShopItems();
-    const karma = await getKarma(interaction.user.id);
+    const [ items, karma ] = await Promise.all([
+      getKarmaShopItems(),
+      getKarma(interaction.user.id),
+    ]);
 
     let options = Object.keys(items).filter(
       (item) =>

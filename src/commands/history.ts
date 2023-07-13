@@ -90,14 +90,8 @@ async function run(
 
   const member = (await getMember(message.guild, args.join(" "))) || args[0];
 
-  let cases: ModerationCase[];
+  let cases = await getCases(message.guild, member instanceof GuildMember ? member.user.id : member);
   const pages: ModerationCase[][] = [];
-
-  if (member instanceof GuildMember) {
-    cases = await getCases(message.guild, member.user.id);
-  } else {
-    cases = await getCases(message.guild, member);
-  }
 
   if (cases.length == 0) {
     return send({ embeds: [new ErrorEmbed("no history to display")] });

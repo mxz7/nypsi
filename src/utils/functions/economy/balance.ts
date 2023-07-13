@@ -151,9 +151,13 @@ export async function getGambleMulti(member: GuildMember | string): Promise<numb
 
   if (await isBooster(id)) multi += 2;
 
-  const boosters = await getBoosters(id);
+
+  const [ boosters, guildUpgrades ] = await Promise.all([
+    getBoosters(id),
+    getGuildUpgradesByUser(member),
+  ]);
+
   const items = getItems();
-  const guildUpgrades = await getGuildUpgradesByUser(member);
 
   if (guildUpgrades.find((i) => i.upgradeId === "multi"))
     multi += guildUpgrades.find((i) => i.upgradeId === "multi").amount;
@@ -239,9 +243,12 @@ export async function getSellMulti(member: GuildMember | string): Promise<number
 
   if (await isBooster(id)) multi += 3;
 
-  const boosters = await getBoosters(id);
+  const [ boosters, guildUpgrades ] = await Promise.all([
+    getBoosters(id),
+    getGuildUpgradesByUser(member),
+  ]);
+
   const items = getItems();
-  const guildUpgrades = await getGuildUpgradesByUser(member);
 
   if (guildUpgrades.find((i) => i.upgradeId === "sellmulti"))
     multi += guildUpgrades.find((i) => i.upgradeId === "sellmulti").amount * 5;
@@ -642,8 +649,10 @@ export async function calcNetWorth(member: GuildMember | string, breakdown = fal
       if (breakdown)
         breakdownItems.set(item.item, getItems()[item.item].sell * Number(item.amount));
     } else {
-      const auctionAvg = await getAuctionAverage(item.item);
-      const offerAvg = await getOffersAverage(item.item);
+      const [ auctionAvg, offerAvg ] = await Promise.all([
+        getAuctionAverage(item.item),
+        getOffersAverage(item.item),
+      ]);
 
       if (auctionAvg && offerAvg) {
         const value = await calcItemValue(item.item);
@@ -680,8 +689,10 @@ export async function calcNetWorth(member: GuildMember | string, breakdown = fal
         );
         if (!itemId) continue;
 
-        const auctionAvg = await getAuctionAverage(itemId);
-        const offersAvg = await getOffersAverage(itemId);
+        const [ auctionAvg, offersAvg ] = await Promise.all([
+          getAuctionAverage(itemId),
+          getOffersAverage(itemId),
+        ]);
 
         if (auctionAvg && offersAvg) {
           worth += Math.floor((await calcItemValue(itemId)) * upgrade.amount);

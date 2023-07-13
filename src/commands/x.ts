@@ -95,37 +95,13 @@ async function run(
       },
     });
 
-    const moderationCases = await prisma.moderationCase.findMany({
-      where: {
-        user: user.id,
-      },
-    });
-
-    const moderationCasesModerator = await prisma.moderationCase
-      .findMany({
-        where: {
-          moderator: user?.username,
-        },
-      })
-      .catch(() => {});
-
-    const moderationMutes = await prisma.moderationMute.findMany({
-      where: {
-        userId: user.id,
-      },
-    });
-
-    const moderationBans = await prisma.moderationBan.findMany({
-      where: {
-        userId: user.id,
-      },
-    });
-
-    const chatReactionStats = await prisma.chatReactionStats.findMany({
-      where: {
-        userId: user.id,
-      },
-    });
+    const [ moderationCases, moderationCasesModerator, moderationMutes, moderationBans, chatReactionStats ] = await Promise.all([
+      prisma.moderationCase.findMany({ where: { user: user.id } }),
+      prisma.moderationCase.findMany({ where: { moderator: user?.username } }),
+      prisma.moderationMute.findMany({ where: { userId: user.id } }),
+      prisma.moderationBan.findMany({ where: { userId: user.id } }),
+      prisma.chatReactionStats.findMany({ where: { userId: user.id } }),
+    ]);
 
     const file = `/tmp/nypsi_data_${user.id}.txt`;
 
@@ -857,8 +833,10 @@ async function run(
     const embed = new CustomEmbed(message.member);
 
     if (await isPremium(user.id)) {
-      const profile = await getPremiumProfile(user.id);
-      const aliases = await getUserAliases(user.id);
+      const [ profile, aliases ] = await Promise.all([
+        getPremiumProfile(user.id),
+        getUserAliases(user.id),
+      ]);
 
       rows[0].components[0].setDisabled(true);
       desc +=
