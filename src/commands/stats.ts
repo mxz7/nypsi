@@ -659,11 +659,14 @@ async function run(
     const gambleMsg: string[] = [];
 
     for (const gamble of byTypeGamble) {
-      const percent = ((Number(await getAllGameWins(gamble.game)) / gamble._count._all) * 100).toFixed(2);
+      const percent = (
+        (Number(await getAllGameWins(gamble.game)) / gamble._count._all) *
+        100
+      ).toFixed(2);
       gambleMsg.push(
-        `- **${
-          gamble.game
-        }** ${(await getAllGameWins(gamble.game)).toLocaleString()} / ${gamble._count._all.toLocaleString()} (${percent}%)`,
+        `- **${gamble.game}** ${(
+          await getAllGameWins(gamble.game)
+        ).toLocaleString()} / ${gamble._count._all.toLocaleString()} (${percent}%)`,
       );
     }
 

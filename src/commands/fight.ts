@@ -95,7 +95,7 @@ async function run(
 
     if (stats) {
       const win = await getGameWins(message.member, stats.game);
-      embed.setFooter({ text: `you are ${(win).toLocaleString()}-${stats._count._all - win}` });
+      embed.setFooter({ text: `you are ${win.toLocaleString()}-${stats._count._all - win}` });
     }
 
     return send({ embeds: [embed] });
