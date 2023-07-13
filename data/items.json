@@ -1798,8 +1798,8 @@
       "id:incredible_gun",
       "id:quarry_scrap",
       "id:nypsi_crate:50",
-      "id:platinum_credit:3",
-      "id:bronze_credit:5",
+      "id:platinum_credit:2",
+      "id:bronze_credit:4",
       "id:silver_credit:4",
       "id:gold_credit:3",
       "id:pink_gem:3",
@@ -1834,7 +1834,6 @@
       "id:nypsi_crate:30",
       "id:silver_credit:5",
       "id:gold_credit:3",
-      "id:platinum_credit:1",
       "id:pink_gem:1"
     ],
     "random_drop_chance": 50
@@ -1878,7 +1877,7 @@
       "id:basic_crate:15",
       "id:workers_crate:3",
       "id:boosters_crate:3",
-      "id:bronze_credit:0.2",
+      "id:bronze_credit:0.1",
       "id:purple_gem:0.1",
       "id:quarry_scrap:3"
     ],
