@@ -143,9 +143,9 @@ async function run(
 
   if (offerAvg) {
     if (auctionAvg || selected.sell || selected.buy) {
-      desc.push(`**offer average** $${Math.floor(offerAvg).toLocaleString()}`);
+      desc.push(`**offers average** $${Math.floor(offerAvg).toLocaleString()}`);
     } else {
-      desc.push(`\n**offer average** $${Math.floor(offerAvg).toLocaleString()}`);
+      desc.push(`\n**offers average** $${Math.floor(offerAvg).toLocaleString()}`);
     }
   }
 
