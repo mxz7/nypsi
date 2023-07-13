@@ -96,10 +96,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   //   });
   // }
 
-  let currentXp = await getXp(message.member),
-    neededXp = await getPrestigeRequirement(message.member);
-  let currentBal = await getBankBalance(message.member),
-    neededBal = getPrestigeRequirementBal(neededXp);
+  let [ currentXp, neededXp, currentBal ] = await Promise.all([
+    getXp(message.member),
+    getPrestigeRequirement(message.member),
+    getBankBalance(message.member),
+  ]);
+  
+  let neededBal = getPrestigeRequirementBal(neededXp);
 
   if (currentXp < neededXp || currentBal < neededBal) {
     return send({
@@ -144,9 +147,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (reaction == "✅") {
     await addExpiry(cmd.name, message.member, 1800);
-    currentXp = await getXp(message.member);
-    neededXp = await getPrestigeRequirement(message.member);
-    currentBal = await getBankBalance(message.member);
+    [ currentXp, neededXp, currentBal ] = await Promise.all([
+      getXp(message.member),
+      getPrestigeRequirement(message.member),
+      getBankBalance(message.member),
+    ]);
     neededBal = getPrestigeRequirementBal(neededXp);
 
     if (currentXp < neededXp || currentBal < neededBal) {
@@ -166,9 +171,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     await updateXp(message.member, currentXp - neededXp);
     await setPrestige(message.member, (await getPrestige(message.member)) + 1);
 
-    const gambleMulti = await getGambleMulti(message.member);
-    const sellMulti = await getSellMulti(message.member);
-    const maxBet = await calcMaxBet(message.member);
+    const [ gambleMulti, sellMulti, maxBet ] = await Promise.all([
+      getGambleMulti(message.member),
+      getSellMulti(message.member),
+      calcMaxBet(message.member),
+    ]);
 
     let amount = 1;
 

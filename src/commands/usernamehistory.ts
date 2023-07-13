@@ -63,9 +63,10 @@ async function run(
     });
   }
 
-  const isUserTracking = await isTracking(member);
-
-  const history = await fetchUsernameHistory(member);
+  const [ isUserTracking, history ] = await Promise.all([
+    isTracking(member),
+    fetchUsernameHistory(member),
+  ]);
 
   if (history.length == 0) {
     return message.channel.send({

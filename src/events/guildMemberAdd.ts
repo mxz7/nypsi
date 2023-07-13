@@ -62,8 +62,10 @@ export default async function guildMemberAdd(member: GuildMember) {
     logger.info(`autojoin roles given to ${member.id} in ${member.guild.id}`);
   }
 
-  const persistentRoles = await getPersistentRoles(member.guild);
-  const userRoles = await getPersistentRolesForUser(member.guild, member.id);
+  const [ persistentRoles, userRoles ] = await Promise.all([
+    getPersistentRoles(member.guild),
+    getPersistentRolesForUser(member.guild, member.id),
+  ]);
 
   if (userRoles.length > 0 && persistentRoles.length > 0) {
     let count = 0;
