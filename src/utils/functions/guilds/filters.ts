@@ -94,8 +94,10 @@ export async function updateChatFilter(guild: Guild, array: string[]) {
 }
 
 export async function checkMessageContent(message: Message) {
-  const filter = await getChatFilter(message.guild);
-  const match = await getPercentMatch(message.guild);
+  const [ filter, match ] = await Promise.all([
+    getChatFilter(message.guild),
+    getPercentMatch(message.guild),
+  ]);
 
   const content = message.content.toLowerCase().normalize("NFD");
 

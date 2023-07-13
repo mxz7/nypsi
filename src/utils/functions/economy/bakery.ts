@@ -109,10 +109,12 @@ async function getMaxAfkHours(member: GuildMember | string) {
 }
 
 export async function runBakery(member: GuildMember) {
-  const lastBaked = await getLastBake(member);
-  const upgrades = await getBakeryUpgrades(member);
-  const maxAfkHours = await getMaxAfkHours(member);
-  const inventory = await getInventory(member);
+  const [ lastBaked, upgrades, maxAfkHours, inventory ] = await Promise.all([
+    getLastBake(member),
+    getBakeryUpgrades(member),
+    getMaxAfkHours(member),
+    getInventory(member),
+  ]);
 
   let passive = 0;
   let cakeChance = 0;

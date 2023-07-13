@@ -26,8 +26,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   await addCooldown(cmd.name, message.member, 30);
 
-  const net = await calcNetWorth(message.member, true);
-  const inventory = await getInventory(message.member);
+  const [ net, inventory ] = await Promise.all([
+    calcNetWorth(message.member, true),
+    getInventory(message.member),
+  ]);
 
   const embed = new CustomEmbed(message.member).setHeader(
     `${message.author.username}'s networth`,

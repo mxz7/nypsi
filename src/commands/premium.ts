@@ -252,8 +252,10 @@ async function run(
 
       embed.setHeader("premium status", message.author.avatarURL());
 
-      const profile = await getPremiumProfile(message.member);
-      const aliases = await getUserAliases(message.member);
+      const [ profile, aliases ] = await Promise.all([
+        getPremiumProfile(message.member),
+        getUserAliases(message.member),
+      ]);
 
       const timeStarted = formatDate(profile.startDate);
       const timeAgo = daysAgo(profile.startDate);

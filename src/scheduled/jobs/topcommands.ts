@@ -6,8 +6,10 @@ import redis from "../../init/redis";
 import Constants from "../../utils/Constants";
 
 (async () => {
-  const topCommands = await redis.hgetall(Constants.redis.nypsi.TOP_COMMANDS);
-  const topUsers = await redis.hgetall(Constants.redis.nypsi.TOP_COMMANDS_USER);
+  const [ topCommands, topUsers ] = await Promise.all([
+    redis.hgetall(Constants.redis.nypsi.TOP_COMMANDS),
+    redis.hgetall(Constants.redis.nypsi.TOP_COMMANDS_USER),
+  ]);
   await redis.del(Constants.redis.nypsi.TOP_COMMANDS);
   await redis.del(Constants.redis.nypsi.TOP_COMMANDS_USER);
 
