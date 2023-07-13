@@ -14,6 +14,7 @@ import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { countItemOnAuction, getAuctionAverage } from "../utils/functions/economy/auctions";
 import {
+  calcItemValue,
   getInventory,
   getTotalAmountOfItem,
   selectItem,
@@ -143,17 +144,7 @@ async function run(
   }
 
   if (auctionAvg && offerAvg) {
-    let value = 0;
-
-    if (
-      selected.id === "cookie" ||
-      ["prey", "fish", "sellable", "ore"].includes(selected.role) ||
-      (selected.buy && selected.sell)
-    ) {
-      value = selected.sell;
-    } else {
-      value = Math.floor((auctionAvg + offerAvg) / 2);
-    }
+    const value = await calcItemValue(selected.id);
 
     desc.push(`**value** $${Math.floor(value).toLocaleString()}\n`);
   }
