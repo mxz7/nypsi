@@ -423,6 +423,7 @@ async function run(
                 ).toLocaleString()}**`,
               ),
             ],
+            ephemeral: true,
           });
 
         return false;
