@@ -2,6 +2,7 @@
   "small_fish": {
     "id": "small_fish",
     "name": "small fish",
+    "plural": "small fish",
     "emoji": "🐟",
     "longDesc": "commonly found while fishing",
     "role": "fish",
@@ -13,6 +14,7 @@
   "medium_fish": {
     "id": "medium_fish",
     "name": "medium fish",
+    "plural": "medium fish",
     "emoji": "🐠",
     "longDesc": "not as common as the small fish",
     "role": "fish",
@@ -24,6 +26,7 @@
   "salmon": {
     "id": "salmon",
     "name": "salmon",
+    "plural": "salmon",
     "emoji": "<:nypsi_salmon:1032766920476336148>",
     "longDesc": "😋",
     "role": "fish",
@@ -35,6 +38,7 @@
   "pufferfish": {
     "id": "pufferfish",
     "name": "pufferfish",
+    "plural": "pufferfish",
     "emoji": "<:nypsi_pufferfish:1032767867625668708>",
     "longDesc": "be very careful !!",
     "role": "fish",
@@ -46,6 +50,7 @@
   "large_fish": {
     "id": "large_fish",
     "name": "large fish",
+    "plural": "large fish",
     "emoji": "🦈",
     "longDesc": "maybe it'll give you a hug",
     "role": "fish",
@@ -68,6 +73,7 @@
   "cobblestone": {
     "id": "cobblestone",
     "name": "cobblestone",
+    "plural": "cobblestone",
     "emoji": "<:nypsi_cobblestone:959445739673616484>",
     "longDesc": "found when mining",
     "role": "sellable",
@@ -80,6 +86,7 @@
   "netherrack": {
     "id": "netherrack",
     "name": "netherrack",
+    "plural": "netherrack",
     "emoji": "<:nypsi_netherrack:1034510405101432963>",
     "longDesc": "found when mining in the nether",
     "role": "sellable",
@@ -91,6 +98,7 @@
   "coal": {
     "id": "coal",
     "name": "coal",
+    "plural": "coal",
     "emoji": "<:nypsi_coal:959442471388082176>",
     "longDesc": "can be used to smelt 1 ore in a furnace",
     "role": "fuel",
@@ -144,6 +152,7 @@
   "obsidian": {
     "id": "obsidian",
     "name": "obsidian",
+    "plural": "obsidian",
     "emoji": "<:nypsi_obsidian:1034510054008823849>",
     "longDesc": "found when mining and used to craft a nether portal",
     "role": "resource",
@@ -215,6 +224,7 @@
   "quartz": {
     "id": "quartz",
     "name": "quartz",
+    "plural": "quartz",
     "emoji": "<:nypsi_quartz:1034514057455222875>",
     "longDesc": "found when mining in the nether",
     "role": "sellable",
@@ -238,6 +248,7 @@
   "ancient_debris": {
     "id": "ancient_debris",
     "name": "ancient debris",
+    "plural": "ancient debris",
     "aliases": ["debris", "ancient"],
     "emoji": "<:nypsi_ancient_debris:1032256372068335647>",
     "longDesc": "can be smelted into a netherite scrap with a furnace and coal",
@@ -725,6 +736,7 @@
   "clover": {
     "id": "clover",
     "name": "clover leaf",
+    "plural": "clover leaves",
     "emoji": "🍀",
     "longDesc": "ur pretty lucky",
     "rarity": 2,
@@ -914,6 +926,7 @@
   "handcuffs": {
     "id": "handcuffs",
     "name": "handcuffs",
+    "plural": "handcuffs",
     "emoji": "<:nypsi_handcuffs:839797762404122654>",
     "longDesc": "simply handcuff someone",
     "rarity": 1,
@@ -966,6 +979,7 @@
   "fiat": {
     "id": "fiat",
     "name": "fiat from inbetweeners",
+    "plural": "fiats from inbetweeners",
     "emoji": "<:nypsi_fiat:840255037108256798>",
     "longDesc": "spread em. ill be there in half an hour",
     "rarity": 1,
@@ -1117,6 +1131,7 @@
   "efficiency": {
     "id": "efficiency",
     "name": "efficiency",
+    "plural": "efficiencies",
     "emoji": "<a:nypsi_book:1001459250163359786>",
     "longDesc": "enchant your pickaxe with efficiency (stacks to 4)",
     "rarity": 2,
@@ -1199,6 +1214,7 @@
   "blue_rocks": {
     "id": "blue_rocks",
     "name": "blue rocks",
+    "plural": "blue rocks",
     "aliases": ["meth", "C10H15N"],
     "emoji": "<:nypsi_bluerock:1003408529954177144>",
     "longDesc": "https://youtu.be/Dbt-OfbQTpw?t=28",
@@ -1217,6 +1233,7 @@
   "steroids": {
     "id": "steroids",
     "name": "steroids",
+    "plural": "steroids",
     "aliases": ["roids"],
     "emoji": "💉",
     "longDesc": "https://tenor.com/view/ambeeee-gif-19218531",
