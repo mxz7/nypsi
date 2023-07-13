@@ -264,8 +264,8 @@ async function run(
       let description =
         `**tier** ${profile.getLevelString()}` +
         `\n**booster** ${await isBooster(message.author.id)}` +
-        `\n**started** ${timeStarted} (${timeAgo} days ago)` +
-        `\n**expires** ${expires} (${timeUntil} days left)` +
+        `\n**started** ${timeStarted} (${timeAgo} day${timeAgo != 1 ? "s" : ""} ago)` +
+        `\n**expires** ${expires} (${timeUntil} day${timeUntil != 1 ? "s" : ""} left)` +
         `\n\n**color** ${embedColor} - /premium color` +
         `\n**aliases** ${aliases.length.toLocaleString()}`;
 
