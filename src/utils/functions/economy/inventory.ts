@@ -13,7 +13,9 @@ import sleep from "../sleep";
 import { getTax } from "../tax";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { addProgress, getAllAchievements, setAchievementProgress } from "./achievements";
+import { getAuctionAverage } from "./auctions";
 import { getBalance, getSellMulti, updateBalance } from "./balance";
+import { getOffersAverage } from "./offers";
 import { createUser, getItems, userExists } from "./utils";
 import { getXp, updateXp } from "./xp";
 import ms = require("ms");
@@ -763,4 +765,51 @@ export async function getAutosellItems(member: GuildMember | string) {
   );
 
   return query;
+}
+
+export async function calcItemValue(item: string) {
+  if (getItems()[item].buy) return getItems()[item].sell;
+  const [auctionAvg, offersAvg] = await Promise.all([
+    getAuctionAverage(item),
+    getOffersAverage(item),
+  ]);
+
+  if (!offersAvg && auctionAvg) return auctionAvg;
+  if (!auctionAvg && offersAvg) return offersAvg;
+  if (!auctionAvg && !offersAvg) return getItems()[item].sell || 1000;
+
+  const value = Math.floor(
+    [offersAvg, auctionAvg, auctionAvg, auctionAvg].reduce((a, b) => a + b) / 4,
+  );
+
+  (async () => {
+    if (await redis.exists(`nypsi:item:value:store:cache:delay:thing:${item}`)) return;
+    await redis.set(`nypsi:item:value:store:cache:delay:thing:${item}`, "69", "EX", 3600 * 12);
+
+    const date = dayjs()
+      .set("hours", 0)
+      .set("minutes", 0)
+      .set("seconds", 0)
+      .set("milliseconds", 0)
+      .toDate();
+
+    const itemCheck = await prisma.graphMetrics.findFirst({
+      where: {
+        AND: [{ date }, { category: `item-value-${item}` }, { userId: "global" }],
+      },
+    });
+
+    if (itemCheck) return;
+
+    await prisma.graphMetrics.create({
+      data: {
+        date,
+        category: `item-value-${item}`,
+        userId: "global",
+        value,
+      },
+    });
+  })();
+
+  return value;
 }

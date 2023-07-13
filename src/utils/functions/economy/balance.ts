@@ -10,7 +10,7 @@ import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { getAuctionAverage } from "./auctions";
 import { getBoosters } from "./boosters";
 import { getGuildUpgradesByUser } from "./guilds";
-import { gemBreak, getInventory } from "./inventory";
+import { calcItemValue, gemBreak, getInventory } from "./inventory";
 import { getOffersAverage } from "./offers";
 import { isPassive } from "./passive";
 import { getPrestige } from "./prestige";
@@ -612,7 +612,7 @@ export async function calcNetWorth(member: GuildMember | string, breakdown = fal
     const offersAvg = await getOffersAverage(item.id);
 
     if (auctionAvg && offersAvg) {
-      worth += Math.floor(((auctionAvg + offersAvg) / 2) * upgrade.amount);
+      worth += Math.floor((await calcItemValue(item.id)) * upgrade.amount);
     } else if (auctionAvg) {
       worth += upgrade.amount * auctionAvg;
     } else if (offersAvg) {
@@ -646,7 +646,7 @@ export async function calcNetWorth(member: GuildMember | string, breakdown = fal
       const offerAvg = await getOffersAverage(item.item);
 
       if (auctionAvg && offerAvg) {
-        const value = (auctionAvg + offerAvg) / 2;
+        const value = await calcItemValue(item.item);
 
         worth += Math.floor(value * Number(item.amount));
         if (breakdown) breakdownItems.set(item.item, value * Number(item.amount));
@@ -684,8 +684,8 @@ export async function calcNetWorth(member: GuildMember | string, breakdown = fal
         const offersAvg = await getOffersAverage(itemId);
 
         if (auctionAvg && offersAvg) {
-          worth += Math.floor(((auctionAvg + offersAvg) / 2) * upgrade.amount);
-          workersBreakdown += Math.floor(((auctionAvg + offersAvg) / 2) * upgrade.amount);
+          worth += Math.floor((await calcItemValue(itemId)) * upgrade.amount);
+          workersBreakdown += Math.floor((await calcItemValue(itemId)) * upgrade.amount);
         } else if (auctionAvg) {
           worth += upgrade.amount * auctionAvg;
           workersBreakdown += upgrade.amount * auctionAvg;
