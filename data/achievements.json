@@ -1224,7 +1224,7 @@
     "name": "blackjack professional **V**",
     "emoji": "♠️",
     "target": 1000,
-    "description": "reach a 7x multiplier in highlow 1,000 times",
+    "description": "get a blackjack 1,000 times",
     "prize": ["nypsi_crate:1", "legendary_scratch_card:3"]
   }
 }
