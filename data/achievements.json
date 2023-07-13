@@ -1186,5 +1186,45 @@
     "target": 250,
     "description": "win 250 loot drops",
     "prize": ["nypsi_crate:1", "legendary_scratch_card:3"]
+  },
+  "blackjack_pro_i": {
+    "id": "blackjack_pro_i",
+    "name": "blackjack professional **I**",
+    "emoji": "♠️",
+    "target": 5,
+    "description": "get a blackjack 5 times",
+    "prize": ["lucky_scratch_card:1"]
+  },
+  "blackjack_pro_ii": {
+    "id": "blackjack_pro_ii",
+    "name": "blackjack professional **II**",
+    "emoji": "♠️",
+    "target": 25,
+    "description": "get a blackjack 25 times",
+    "prize": ["lucky_scratch_card:2"]
+  },
+  "blackjack_pro_iii": {
+    "id": "blackjack_pro_iii",
+    "name": "blackjack professional **III**",
+    "emoji": "♠️",
+    "target": 100,
+    "description": "get a blackjack 100 times",
+    "prize": ["lucky_scratch_card:3"]
+  },
+  "blackjack_pro_iv": {
+    "id": "blackjack_pro_iv",
+    "name": "blackjack professional **IV**",
+    "emoji": "♠️",
+    "target": 500,
+    "description": "get a blackjack 500 times",
+    "prize": ["legendary_scratch_card:2"]
+  },
+  "blackjack_pro_v": {
+    "id": "blackjack_pro_v",
+    "name": "blackjack professional **V**",
+    "emoji": "♠️",
+    "target": 1000,
+    "description": "reach a 7x multiplier in highlow 1,000 times",
+    "prize": ["nypsi_crate:1", "legendary_scratch_card:3"]
   }
 }

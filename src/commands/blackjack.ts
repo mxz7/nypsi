@@ -19,6 +19,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
 import { a } from "../utils/functions/anticheat";
 import { isLockedOut, verifyUser } from "../utils/functions/captcha";
+import { addProgress } from "../utils/functions/economy/achievements";
 import {
   calcMaxBet,
   getBalance,
@@ -632,6 +633,7 @@ async function playGame(
 
     if (games.get(message.author.id).cards.length == 2 && calcTotal(message.member) == 21) {
       winnings = Math.floor(bet * 2.5);
+      addProgress(message.author.id, "blackjack_pro", 1);
     }
 
     newEmbed.setColor(Constants.EMBED_SUCCESS_COLOR);
@@ -698,6 +700,7 @@ async function playGame(
       getCards(message.member) + " **" + calcTotal(message.member) + "**",
     );
     await updateBalance(message.member, (await getBalance(message.member)) + winnings);
+
     games.delete(message.author.id);
     return replay(newEmbed);
   };
