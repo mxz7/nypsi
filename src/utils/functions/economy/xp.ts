@@ -73,9 +73,12 @@ export async function calcEarnedXp(
   let max = 4;
 
   let prestige = await getPrestige(member);
-  const inventory = await getInventory(member);
-  const tier = await getTier(member);
-  const booster = await isBooster(member.user.id);
+
+  const [ inventory, tier, booster ] = await Promise.all([
+    getInventory(member),
+    getTier(member),
+    isBooster(member.user.id),
+  ]);
 
   if (booster) max += 10;
 

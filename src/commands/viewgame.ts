@@ -142,7 +142,7 @@ async function run(
           `**game** \`${game.game}\`\n` +
           `**time** <t:${Math.floor(game.date.getTime() / 1000)}>\n` +
           `**bet** $${game.bet.toLocaleString()}\n` +
-          `**won** \`${Boolean(game.win)}\`\n`;
+          `**result** \`${game.win == 1 ? "won" : game.win == 0 ? "lost" : "draw"}\`\n`;
 
         if (game.win && !(game.game.includes("scratchie") || game.game.includes("scratch_card"))) {
           out += `**won money** $${game.earned.toLocaleString()}\n`;

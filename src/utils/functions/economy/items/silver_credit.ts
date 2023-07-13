@@ -64,13 +64,15 @@ module.exports = new ItemUse(
       return send({ embeds: [new ErrorEmbed("your current premium tier is higher than silver")] });
 
     if (currentTier == SILVER_TIER) {
-      const profile = await getPremiumProfile(message.author.id);
+      const [ profile, inventory ] = await Promise.all([
+        getPremiumProfile(message.author.id),
+        getInventory(message.member, false)
+      ]);
 
       profile.expireDate = dayjs(profile.expireDate).add(7, "day").toDate();
 
       await setExpireDate(message.author.id, profile.expireDate, message.client as NypsiClient);
 
-      const inventory = await getInventory(message.member, false);
       await setInventoryItem(
         message.member,
         "silver_credit",

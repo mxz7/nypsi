@@ -31,8 +31,6 @@ async function run(
 
   await addCooldown(cmd.name, message.member, 15);
 
-  const prefix = await getPrefix(message.guild);
-
   let amount = 50;
 
   if (args[0] && parseInt(args[0]) && !isNaN(parseInt(args[0]))) {
@@ -41,7 +39,10 @@ async function run(
     if (amount < 2 || amount > 100) amount = 50;
   }
 
-  const collected = await message.channel.messages.fetch({ limit: amount });
+  const [ prefix, collected ] = await Promise.all([
+    getPrefix(message.guild),
+    message.channel.messages.fetch({ limit: amount }),
+  ]);
 
   const collecteda = collected.filter(
     (msg) => msg.author.id == message.client.user.id || msg.content.startsWith(prefix),

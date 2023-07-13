@@ -32,7 +32,6 @@ async function run(
   }
 
   let filter = await getChatFilter(message.guild);
-
   const prefix = await getPrefix(message.guild);
 
   if (args.length == 0) {
