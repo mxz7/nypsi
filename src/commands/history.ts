@@ -90,7 +90,7 @@ async function run(
 
   const member = (await getMember(message.guild, args.join(" "))) || args[0];
 
-  let cases = await getCases(message.guild, member instanceof GuildMember ? member.user.id : member);
+  const cases = await getCases(message.guild, member instanceof GuildMember ? member.user.id : member);
   const pages: ModerationCase[][] = [];
 
   if (cases.length == 0) {
