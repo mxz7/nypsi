@@ -33,7 +33,7 @@ async function getLastBake(member: GuildMember | string) {
   return query.lastBake;
 }
 
-export async function addBakeryUpgrade(member: GuildMember | string, itemId: string) {
+export async function addBakeryUpgrade(member: GuildMember | string, itemId: string, amount = 1) {
   let id: string;
   if (member instanceof GuildMember) {
     id = member.user.id;
@@ -49,7 +49,7 @@ export async function addBakeryUpgrade(member: GuildMember | string, itemId: str
       },
     },
     update: {
-      amount: { increment: 1 },
+      amount: { increment: amount },
     },
     create: {
       userId: id,
@@ -109,7 +109,7 @@ async function getMaxAfkHours(member: GuildMember | string) {
 }
 
 export async function runBakery(member: GuildMember) {
-  const [ lastBaked, upgrades, maxAfkHours, inventory ] = await Promise.all([
+  const [lastBaked, upgrades, maxAfkHours, inventory] = await Promise.all([
     getLastBake(member),
     getBakeryUpgrades(member),
     getMaxAfkHours(member),
