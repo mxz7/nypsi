@@ -12,14 +12,13 @@ import { parse } from "twemoji-parser";
 import prisma from "../init/database";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import { countItemOnAuction, getAuctionAverage } from "../utils/functions/economy/auctions";
+import { countItemOnAuction } from "../utils/functions/economy/auctions";
 import {
   calcItemValue,
   getInventory,
   getTotalAmountOfItem,
   selectItem,
 } from "../utils/functions/economy/inventory";
-import { getOffersAverage } from "../utils/functions/economy/offers";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { isBooster } from "../utils/functions/premium/boosters";
 import { isPremium } from "../utils/functions/premium/premium";
@@ -121,36 +120,20 @@ async function run(
     }
   }
 
-  const auctionAvg = await getAuctionAverage(selected.id);
-  const offerAvg = await getOffersAverage(selected.id);
   const total = await getTotalAmountOfItem(selected.id);
   const inventory = await getInventory(message.member);
   const inAuction = await countItemOnAuction(selected.id);
 
-  if (auctionAvg) {
-    if (selected.sell || selected.buy) {
-      desc.push(`**auction average** $${Math.floor(auctionAvg).toLocaleString()}`);
-    } else {
-      desc.push(`\n**auction average** $${Math.floor(auctionAvg).toLocaleString()}`);
-    }
-  }
+  const value = await calcItemValue(selected.id);
 
-  if (offerAvg) {
-    if (auctionAvg || selected.sell || selected.buy) {
-      desc.push(`**offers average** $${Math.floor(offerAvg).toLocaleString()}`);
-    } else {
-      desc.push(`\n**offers average** $${Math.floor(offerAvg).toLocaleString()}`);
-    }
-  }
-
-  if (auctionAvg && offerAvg) {
-    const value = await calcItemValue(selected.id);
-
-    desc.push(`**value** $${Math.floor(value).toLocaleString()}\n`);
+  if (selected.sell || selected.buy) {
+    desc.push(`**average worth** $${Math.floor(value).toLocaleString()}`);
+  } else {
+    desc.push(`\n**average worth** $${Math.floor(value).toLocaleString()}\n`);
   }
 
   if (total) {
-    if (auctionAvg || offerAvg || selected.sell || selected.buy) {
+    if (selected.sell || selected.buy || value) {
       desc.push(`**in world** ${total.toLocaleString()}`);
     } else {
       desc.push(`\n**in world** ${total.toLocaleString()}`);
@@ -158,7 +141,7 @@ async function run(
   }
 
   if (inAuction) {
-    if (total || auctionAvg || offerAvg || selected.sell || selected.buy) {
+    if (total || selected.sell || selected.buy) {
       desc.push(`**in auction** ${inAuction.toLocaleString()}`);
     } else {
       desc.push(`\n**in auction** ${inAuction.toLocaleString()}`);
