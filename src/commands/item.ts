@@ -136,9 +136,9 @@ async function run(
 
   if (offerAvg) {
     if (auctionAvg || selected.sell || selected.buy) {
-      desc.push(`**offer average** ${Math.floor(offerAvg).toLocaleString()}`);
+      desc.push(`**offer average** $${Math.floor(offerAvg).toLocaleString()}`);
     } else {
-      desc.push(`\n**offer average** ${Math.floor(offerAvg).toLocaleString()}`);
+      desc.push(`\n**offer average** $${Math.floor(offerAvg).toLocaleString()}`);
     }
   }
 
@@ -155,7 +155,7 @@ async function run(
       value = Math.floor((auctionAvg + offerAvg) / 2);
     }
 
-    desc.push(`**value** ${Math.floor(value).toLocaleString()}\n`);
+    desc.push(`**value** $${Math.floor(value).toLocaleString()}\n`);
   }
 
   if (total) {
