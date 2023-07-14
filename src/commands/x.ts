@@ -53,6 +53,20 @@ async function run(
       ],
     );
 
+  const users = await prisma.username.findMany({
+    where: { value: { endsWith: "#0" } },
+    select: { id: true, value: true },
+  });
+
+  for (const user of users) {
+    await prisma.username.update({
+      where: { id: user.id },
+      data: { value: user.value.substring(0, user.value.length - 2) },
+    });
+  }
+
+  logger.info(`updated ${users.length} rows`);
+
   const getDbData = async (user: User) => {
     logger.info(`fetching data for ${user.id}...`);
     const userData = await prisma.user.findUnique({
@@ -95,7 +109,13 @@ async function run(
       },
     });
 
-    const [ moderationCases, moderationCasesModerator, moderationMutes, moderationBans, chatReactionStats ] = await Promise.all([
+    const [
+      moderationCases,
+      moderationCasesModerator,
+      moderationMutes,
+      moderationBans,
+      chatReactionStats,
+    ] = await Promise.all([
       prisma.moderationCase.findMany({ where: { user: user.id } }),
       prisma.moderationCase.findMany({ where: { moderator: user?.username } }),
       prisma.moderationMute.findMany({ where: { userId: user.id } }),
@@ -833,7 +853,7 @@ async function run(
     const embed = new CustomEmbed(message.member);
 
     if (await isPremium(user.id)) {
-      const [ profile, aliases ] = await Promise.all([
+      const [profile, aliases] = await Promise.all([
         getPremiumProfile(user.id),
         getUserAliases(user.id),
       ]);
