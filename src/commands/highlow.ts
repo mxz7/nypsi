@@ -27,10 +27,10 @@ import {
   getGambleMulti,
   updateBalance,
 } from "../utils/functions/economy/balance.js";
-import { addToGuildXP, getGuildByUser } from "../utils/functions/economy/guilds.js";
+import { addToGuildXP, getGuildName } from "../utils/functions/economy/guilds.js";
 import { createGame } from "../utils/functions/economy/stats.js";
 import { createUser, formatBet, userExists } from "../utils/functions/economy/utils.js";
-import { calcEarnedXp, getXp, updateXp } from "../utils/functions/economy/xp.js";
+import { calcEarnedGambleXp, getXp, updateXp } from "../utils/functions/economy/xp.js";
 import { getTier, isPremium } from "../utils/functions/premium/premium.js";
 import { shuffle } from "../utils/functions/random.js";
 import { addHourlyCommand } from "../utils/handlers/commandhandler.js";
@@ -549,16 +549,16 @@ async function playGame(
       );
     }
 
-    const earnedXp = await calcEarnedXp(message.member, bet, win);
+    const earnedXp = await calcEarnedGambleXp(message.member, bet, win);
 
     if (earnedXp > 0) {
       await updateXp(message.member, (await getXp(message.member)) + earnedXp);
       newEmbed.setFooter({ text: `+${earnedXp}xp` });
 
-      const guild = await getGuildByUser(message.member);
+      const guild = await getGuildName(message.member);
 
       if (guild) {
-        await addToGuildXP(guild.guildName, earnedXp, message.member);
+        await addToGuildXP(guild, earnedXp, message.member);
       }
     }
 

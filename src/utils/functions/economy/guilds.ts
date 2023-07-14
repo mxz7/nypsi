@@ -548,3 +548,16 @@ export async function addGuildUpgrade(guildName: string, upgradeId: string) {
 
   await redis.del(`${Constants.redis.cache.economy.GUILD_UPGRADES}:${guildName}`);
 }
+
+export async function getGuildName(member: GuildMember) {
+  const cache = await redis.get(`${Constants.redis.cache.economy.GUILD_USER}:${member.user.id}`);
+
+  if (cache) {
+    if (cache === "noguild") return null;
+    return cache;
+  } else {
+    const guild = await getGuildByUser(member);
+
+    if (guild) return guild.guildName;
+  }
+}

@@ -16,12 +16,12 @@ import {
   setPadlock,
   updateBalance,
 } from "../utils/functions/economy/balance";
-import { addToGuildXP, getGuildByUser } from "../utils/functions/economy/guilds";
+import { addToGuildXP, getGuildByUser, getGuildName } from "../utils/functions/economy/guilds";
 import { getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
 import { isPassive } from "../utils/functions/economy/passive";
 import { addStat, createGame } from "../utils/functions/economy/stats";
 import { createUser, isEcoBanned, userExists } from "../utils/functions/economy/utils";
-import { calcEarnedXp, getXp, updateXp } from "../utils/functions/economy/xp";
+import { calcEarnedGambleXp, getXp, updateXp } from "../utils/functions/economy/xp";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
 import { getDmSettings } from "../utils/functions/users/notifications";
@@ -270,17 +270,17 @@ async function run(
       embed2.setColor(Constants.EMBED_SUCCESS_COLOR);
       embed2.addField("success!!", "you stole $**" + amountMoney.toLocaleString() + "**");
 
-      const earnedXp = await calcEarnedXp(message.member, 1_000_000, 1);
+      const earnedXp = await calcEarnedGambleXp(message.member, 1_000_000, 1);
       addProgress(message.author.id, "robber", 1);
 
       if (earnedXp > 0) {
         await updateXp(message.member, (await getXp(message.member)) + earnedXp);
         embed2.setFooter({ text: `+${earnedXp}xp` });
 
-        const guild = await getGuildByUser(message.member);
+        const guild = await getGuildName(message.member);
 
         if (guild) {
-          await addToGuildXP(guild.guildName, earnedXp, message.member);
+          await addToGuildXP(guild, earnedXp, message.member);
         }
       }
 
