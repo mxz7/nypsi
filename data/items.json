@@ -500,6 +500,39 @@
     "sell": 20000,
     "in_crates": false
   },
+  "giraffe": {
+    "id": "giraffe",
+    "name": "giraffe",
+    "emoji": "🦒",
+    "longDesc": "its just a giraffe lol",
+    "role": "prey",
+    "rarity": 3,
+    "buy": 0,
+    "sell": 25000,
+    "in_crates": false
+  },
+  "lion": {
+    "id": "lion",
+    "name": "lion",
+    "emoji": "🦁",
+    "longDesc": "rawr",
+    "role": "prey",
+    "rarity": 4,
+    "buy": 0,
+    "sell": 40000,
+    "in_crates": false
+  },
+  "panda": {
+    "id": "panda",
+    "name": "panda",
+    "emoji": "🐼",
+    "longDesc": "useless and stupid but adorable",
+    "role": "prey",
+    "rarity": 3,
+    "buy": 0,
+    "sell": 25000,
+    "in_crates": false
+  },
   "rat": {
     "id": "rat",
     "name": "rat",
