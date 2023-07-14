@@ -618,11 +618,11 @@ export async function calcNetWorth(member: GuildMember | string, breakdown = fal
     const offersAvg = await getOffersAverage(item.id);
 
     if (auctionAvg && offersAvg) {
-      worth += Math.floor((await calcItemValue(item.id)) * upgrade.amount);
+      value += Math.floor((await calcItemValue(item.id)) * upgrade.amount);
     } else if (auctionAvg) {
-      worth += upgrade.amount * auctionAvg;
+      value += upgrade.amount * auctionAvg;
     } else if (offersAvg) {
-      worth += upgrade.amount * offersAvg;
+      value += upgrade.amount * offersAvg;
     } else {
       value = upgrade.amount * (item.sell || 1000);
     }
