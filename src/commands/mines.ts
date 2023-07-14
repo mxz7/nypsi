@@ -614,7 +614,7 @@ async function playGame(
       result: "lose",
       outcome: `mines:${JSON.stringify(getRows(grid, true))}`,
     });
-    gamble(message.author, "mines", bet, false, id, 0);
+    gamble(message.author, "mines", bet, "lose", id, 0);
     embed.setFooter({ text: `id: ${id}` });
     embed.setColor(Constants.EMBED_FAIL_COLOR);
     embed.setDescription(
@@ -690,7 +690,7 @@ async function playGame(
       earned: winnings,
       xp: earnedXp,
     });
-    gamble(message.author, "mines", bet, true, id, winnings);
+    gamble(message.author, "mines", bet, "win", id, winnings);
 
     if (earnedXp > 0) {
       embed.setFooter({ text: `+${earnedXp}xp | id: ${id}` });
@@ -714,7 +714,7 @@ async function playGame(
       outcome: `mines:${JSON.stringify(getRows(grid, true))}`,
       earned: bet,
     });
-    gamble(message.author, "mines", bet, true, id, bet);
+    gamble(message.author, "mines", bet, "draw", id, bet);
     embed.setFooter({ text: `id: ${id}` });
     embed.setColor(variants.macchiato.yellow.hex as ColorResolvable);
     embed.setDescription(

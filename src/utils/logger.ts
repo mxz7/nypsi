@@ -371,7 +371,7 @@ export function gamble(
   user: User,
   game: string,
   amount: number,
-  win: boolean,
+  result: string,
   id: string,
   winAmount?: number,
 ) {
@@ -381,7 +381,7 @@ export function gamble(
       `**${user.username}** (${user.id})\n` +
         `- **game** ${game}\n` +
         `- **bet** $${amount.toLocaleString()}\n` +
-        `- **win** ${win}${win ? ` ($**${winAmount.toLocaleString()}**)` : ""}\n` +
+        `- **result** ${result}${result == "win" ? ` ($**${winAmount.toLocaleString()}**)` : ""}\n` +
         `- **id** ${id}\n` +
         `- **time** <t:${Math.floor(Date.now() / 1000)}>\n`,
     );
@@ -392,7 +392,7 @@ export function gamble(
         `**${user.username}** (${user.id})\n` +
         `- **game** ${game}\n` +
         `- **bet** $${amount.toLocaleString()}\n` +
-        `- **win** ${win}${win ? ` ($**${winAmount.toLocaleString()}**)` : ""}\n` +
+        `- **result** ${result}${result == "win" ? ` ($**${winAmount.toLocaleString()}**)` : ""}\n` +
         `- **id** ${id}\n` +
         `- **time** <t:${Math.floor(Date.now() / 1000)}>\n`,
     );
