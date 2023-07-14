@@ -3,7 +3,7 @@ import { parentPort } from "worker_threads";
 import prisma from "../../init/database";
 
 (async () => {
-  const old = dayjs().subtract(180, "days").toDate();
+  const old = dayjs().subtract(365, "days").toDate();
 
   const d = await prisma.username.deleteMany({
     where: {
