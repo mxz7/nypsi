@@ -70,31 +70,26 @@ export async function calcEarnedXp(
   }
 
   let min = 1;
-  let max = 4;
+  let max = 10;
 
-  let prestige = await getPrestige(member);
-
-  const [inventory, tier, booster] = await Promise.all([
+  const [inventory, tier, booster, prestige, boosters] = await Promise.all([
     getInventory(member),
     getTier(member),
     isBooster(member.user.id),
+    getPrestige(member),
+    getBoosters(member),
   ]);
 
-  if (booster) max += 10;
+  max += (prestige > 50 ? 50 : prestige) / 5.7;
 
-  if (prestige) {
-    if (prestige > 20) prestige = 20;
-    min += prestige / 5;
-    max += prestige / 3;
-  }
+  if (booster) max += 7;
+  if (tier) max += tier * 2.7;
 
-  min += tier;
-
-  let betDivisor = 10_000;
+  let betDivisor = 7_777;
 
   if (prestige > 5) betDivisor = 25_000;
   if (prestige > 10) betDivisor = 50_000;
-  if (prestige > 20) betDivisor = 100_000;
+  if (prestige > 20) betDivisor = 75_000;
 
   max += bet / betDivisor;
   max += multiplier * 1.7;
@@ -110,16 +105,13 @@ export async function calcEarnedXp(
       gemBreak(member.user.id, 0.007, "white_gem");
       max += Math.floor(Math.random() * 17) + 1;
     }
-  } else if (inventory.find((i) => i.item == "pink_gem")?.amount > 0) {
-    gemBreak(member.user.id, 0.07, "pink_gem");
-    min += 3;
   }
+
+  if (min < max * 0.2) min = max * 0.2;
 
   let earned = Math.floor(Math.random() * (max - min)) + min;
 
   if (min > max) earned = max;
-
-  const boosters = await getBoosters(member);
 
   let boosterEffect = 0;
 
