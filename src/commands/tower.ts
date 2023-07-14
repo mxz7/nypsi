@@ -575,7 +575,7 @@ async function playGame(
           .reverse()
           .join("\n"),
     });
-    gamble(message.author, "tower", game.bet, false, id, 0);
+    gamble(message.author, "tower", game.bet, "lose", id, 0);
     game.embed.setFooter({ text: `id: ${id}` });
     game.embed.setColor(Constants.EMBED_FAIL_COLOR);
     game.embed.setDescription(
@@ -641,7 +641,7 @@ async function playGame(
       earned: winnings,
       xp: earnedXp,
     });
-    gamble(message.author, "tower", game.bet, true, id, winnings);
+    gamble(message.author, "tower", game.bet, "win", id, winnings);
 
     if (earnedXp > 0) {
       game.embed.setFooter({ text: `+${earnedXp}xp | id: ${id}` });
@@ -671,7 +671,7 @@ async function playGame(
           .join("\n"),
       earned: game.bet,
     });
-    gamble(message.author, "tower", game.bet, true, id, game.bet);
+    gamble(message.author, "tower", game.bet, "draw", id, game.bet);
     game.embed.setColor(variants.macchiato.yellow.hex as ColorResolvable);
     game.embed.setDescription(
       "**bet** $" +
