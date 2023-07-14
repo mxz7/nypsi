@@ -136,10 +136,12 @@ export function calcEarnedHFMXp(items: number) {
   let earned = 0;
 
   if (items > 25) {
-    earned += 25;
+    earned += Math.random() * 12.5 + 12.5;
     items -= 25;
 
     earned += items * 0.33369;
+  } else {
+    earned += Math.random() * (items / 2) + items / 2;
   }
 
   return Math.floor(earned);
