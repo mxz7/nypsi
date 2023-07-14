@@ -1,6 +1,7 @@
 import { parentPort } from "worker_threads";
 import redis from "../../init/redis";
 import { RedditJSON, RedditJSONPost } from "../../types/Reddit";
+import sleep from "../../utils/functions/sleep";
 
 const bdsmLinks = [
   "https://www.reddit.com/r/bdsm/top.json?limit=6969&t=month",
@@ -92,11 +93,11 @@ async function cacheUpdate(links: string[], name: string) {
       parentPort.postMessage(`no images @ ${link}`);
     }
 
-    // await sleep(6250); if reddit api changes go ahead
+    await sleep(6250);
   }
 
   await redis.expire(`nypsi:images:${name}`, 604800); // 7 days
-  // await sleep(6250); if reddit api changes go ahead
+  await sleep(6250);
 }
 
 (async () => {
