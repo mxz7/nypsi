@@ -31,6 +31,8 @@ export async function getGambleStats(member: GuildMember) {
     },
   });
 
+  inPlaceSort(query).desc((i) => i._count._all);
+
   return query;
 }
 
