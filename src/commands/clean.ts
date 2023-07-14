@@ -39,7 +39,7 @@ async function run(
     if (amount < 2 || amount > 100) amount = 50;
   }
 
-  const [ prefix, collected ] = await Promise.all([
+  const [prefix, collected] = await Promise.all([
     getPrefix(message.guild),
     message.channel.messages.fetch({ limit: amount }),
   ]);

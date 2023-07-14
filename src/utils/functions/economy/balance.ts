@@ -151,8 +151,7 @@ export async function getGambleMulti(member: GuildMember | string): Promise<numb
 
   if (await isBooster(id)) multi += 2;
 
-
-  const [ boosters, guildUpgrades ] = await Promise.all([
+  const [boosters, guildUpgrades] = await Promise.all([
     getBoosters(id),
     getGuildUpgradesByUser(member),
   ]);
@@ -243,7 +242,7 @@ export async function getSellMulti(member: GuildMember | string): Promise<number
 
   if (await isBooster(id)) multi += 3;
 
-  const [ boosters, guildUpgrades ] = await Promise.all([
+  const [boosters, guildUpgrades] = await Promise.all([
     getBoosters(id),
     getGuildUpgradesByUser(member),
   ]);
@@ -649,7 +648,7 @@ export async function calcNetWorth(member: GuildMember | string, breakdown = fal
       if (breakdown)
         breakdownItems.set(item.item, getItems()[item.item].sell * Number(item.amount));
     } else {
-      const [ auctionAvg, offerAvg ] = await Promise.all([
+      const [auctionAvg, offerAvg] = await Promise.all([
         getAuctionAverage(item.item),
         getOffersAverage(item.item),
       ]);
@@ -689,7 +688,7 @@ export async function calcNetWorth(member: GuildMember | string, breakdown = fal
         );
         if (!itemId) continue;
 
-        const [ auctionAvg, offersAvg ] = await Promise.all([
+        const [auctionAvg, offersAvg] = await Promise.all([
           getAuctionAverage(itemId),
           getOffersAverage(itemId),
         ]);

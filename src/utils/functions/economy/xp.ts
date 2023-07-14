@@ -74,7 +74,7 @@ export async function calcEarnedXp(
 
   let prestige = await getPrestige(member);
 
-  const [ inventory, tier, booster ] = await Promise.all([
+  const [inventory, tier, booster] = await Promise.all([
     getInventory(member),
     getTier(member),
     isBooster(member.user.id),

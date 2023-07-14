@@ -252,7 +252,7 @@ async function run(
 
       embed.setHeader("premium status", message.author.avatarURL());
 
-      const [ profile, aliases ] = await Promise.all([
+      const [profile, aliases] = await Promise.all([
         getPremiumProfile(message.member),
         getUserAliases(message.member),
       ]);

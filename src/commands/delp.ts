@@ -27,7 +27,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   await addCooldown(cmd.name, message.member, 20);
 
-  let collected: Collection<string, Message> = await message.channel.messages.fetch({ limit: amount == 25 ? 25 : 100 });
+  let collected: Collection<string, Message> = await message.channel.messages.fetch({
+    limit: amount == 25 ? 25 : 100,
+  });
 
   collected = collected.filter((msg) => {
     if (!msg.author) return;
