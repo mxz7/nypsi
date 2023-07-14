@@ -8,6 +8,7 @@ import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { getBoosters } from "../utils/functions/economy/boosters";
+import { addToGuildXP, getGuildName } from "../utils/functions/economy/guilds";
 import {
   addInventoryItem,
   gemBreak,
@@ -16,6 +17,7 @@ import {
 } from "../utils/functions/economy/inventory";
 import { addStat } from "../utils/functions/economy/stats";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
+import { calcEarnedHFMXp, getXp, updateXp } from "../utils/functions/economy/xp";
 import { percentChance } from "../utils/functions/random";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
@@ -229,6 +231,19 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const total = Array.from(foundItems.entries())
     .map((i) => (["money", "xp"].includes(i[0]) ? 0 : i[1]))
     .reduce((a, b) => a + b);
+
+  const earnedXp = calcEarnedHFMXp(total);
+
+  if (earnedXp > 0) {
+    embed.setFooter({ text: `+${earnedXp.toLocaleString()}xp` });
+    await updateXp(message.member, (await getXp(message.member)) + earnedXp);
+
+    const guild = await getGuildName(message.member);
+
+    if (guild) {
+      await addToGuildXP(guild, earnedXp, message.member);
+    }
+  }
 
   embed.setDescription(
     `you go to the ${chosenPlace} and prepare your **${items[gun].name}**\n\nyou killed${
