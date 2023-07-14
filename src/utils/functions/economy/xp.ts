@@ -85,11 +85,10 @@ export async function calcEarnedGambleXp(
   if (booster) max += 7;
   if (tier) max += tier * 2.7;
 
-  let betDivisor = 7_777;
+  let betDivisor = 3250 * prestige + 10_000;
 
-  if (prestige > 5) betDivisor = 25_000;
-  if (prestige > 10) betDivisor = 50_000;
-  if (prestige > 20) betDivisor = 75_000;
+  if (betDivisor > 75_000) betDivisor = 75_000;
+  if (betDivisor < 10_000) betDivisor = 10_000;
 
   max += bet / betDivisor;
   max += multiplier * 1.7;
