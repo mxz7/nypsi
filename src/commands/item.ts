@@ -128,9 +128,9 @@ async function run(
   ]);
 
   if (selected.sell || selected.buy) {
-    desc.push(`**average worth** $${Math.floor(value).toLocaleString()}`);
+    desc.push(`**worth** $${Math.floor(value).toLocaleString()}\n`);
   } else {
-    desc.push(`\n**average worth** $${Math.floor(value).toLocaleString()}\n`);
+    desc.push(`\n**worth** $${Math.floor(value).toLocaleString()}`);
   }
 
   if (total) {
