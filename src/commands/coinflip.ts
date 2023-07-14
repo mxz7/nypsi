@@ -177,8 +177,8 @@ async function run(
       earned: winner.user.id == player2.user.id ? winnings : null,
     });
 
-    gamble(winner.user, "coinflip", bet, true, id, bet * 2);
-    gamble(loser.user, "coinflip", bet, false, id);
+    gamble(winner.user, "coinflip", bet, "win", id, bet * 2);
+    gamble(loser.user, "coinflip", bet, "lose", id);
 
     await updateBalance(winner, (await getBalance(winner)) + winnings);
 
