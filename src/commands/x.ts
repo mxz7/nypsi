@@ -53,20 +53,6 @@ async function run(
       ],
     );
 
-  const users = await prisma.username.findMany({
-    where: { value: { endsWith: "#0" } },
-    select: { id: true, value: true },
-  });
-
-  for (const user of users) {
-    await prisma.username.update({
-      where: { id: user.id },
-      data: { value: user.value.substring(0, user.value.length - 2) },
-    });
-  }
-
-  logger.info(`updated ${users.length} rows`);
-
   const getDbData = async (user: User) => {
     logger.info(`fetching data for ${user.id}...`);
     const userData = await prisma.user.findUnique({
