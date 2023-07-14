@@ -597,14 +597,9 @@
       "id:fortune",
       "id:unbreaking",
       "id:diamond_pickaxe",
-      "id:iron_ingot",
-      "id:gold_ingot",
-      "id:quartz",
       "id:ancient_debris",
       "id:emerald",
-      "id:diamond",
-      "id:obsidian",
-      "id:gold_nugget"
+      "id:obsidian"
     ],
     "random_drop_chance": 80
   },
