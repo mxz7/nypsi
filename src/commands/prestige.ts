@@ -96,12 +96,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   //   });
   // }
 
-  let [ currentXp, neededXp, currentBal ] = await Promise.all([
+  let [currentXp, neededXp, currentBal] = await Promise.all([
     getXp(message.member),
     getPrestigeRequirement(message.member),
     getBankBalance(message.member),
   ]);
-  
+
   let neededBal = getPrestigeRequirementBal(neededXp);
 
   if (currentXp < neededXp || currentBal < neededBal) {
@@ -147,7 +147,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (reaction == "✅") {
     await addExpiry(cmd.name, message.member, 1800);
-    [ currentXp, neededXp, currentBal ] = await Promise.all([
+    [currentXp, neededXp, currentBal] = await Promise.all([
       getXp(message.member),
       getPrestigeRequirement(message.member),
       getBankBalance(message.member),
@@ -171,7 +171,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     await updateXp(message.member, currentXp - neededXp);
     await setPrestige(message.member, (await getPrestige(message.member)) + 1);
 
-    const [ gambleMulti, sellMulti, maxBet ] = await Promise.all([
+    const [gambleMulti, sellMulti, maxBet] = await Promise.all([
       getGambleMulti(message.member),
       getSellMulti(message.member),
       calcMaxBet(message.member),

@@ -197,7 +197,14 @@ async function run(
         },
       });
 
-      const [ moderationCasesModerator, moderationMutes, moderationBans, chatReactionStats, mentionsTargetedData, mentionsSenderData] = await Promise.all([
+      const [
+        moderationCasesModerator,
+        moderationMutes,
+        moderationBans,
+        chatReactionStats,
+        mentionsTargetedData,
+        mentionsSenderData,
+      ] = await Promise.all([
         prisma.moderationCase.findMany({ where: { moderator: message.author.username } }),
         prisma.moderationMute.findMany({ where: { userId: message.author.id } }),
         prisma.moderationBan.findMany({ where: { userId: message.author.id } }),

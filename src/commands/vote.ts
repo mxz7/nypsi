@@ -58,7 +58,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (prestige > 15) prestige = 15;
 
   const amount = Math.floor(15000 * (prestige / 2 + 1));
-  const [ voted, lastVote ] = await Promise.all([
+  const [voted, lastVote] = await Promise.all([
     hasVoted(message.member),
     getLastVote(message.member),
   ]);

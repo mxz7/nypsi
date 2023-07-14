@@ -212,7 +212,7 @@ async function prepareGame(
     return send({ embeds: [new ErrorEmbed("you have an active game")] });
   }
 
-  const [ maxBet, defaultBet ] = await Promise.all([
+  const [maxBet, defaultBet] = await Promise.all([
     calcMaxBet(message.member),
     getDefaultBet(message.member),
   ]);

@@ -62,7 +62,7 @@ export default async function guildMemberAdd(member: GuildMember) {
     logger.info(`autojoin roles given to ${member.id} in ${member.guild.id}`);
   }
 
-  const [ persistentRoles, userRoles ] = await Promise.all([
+  const [persistentRoles, userRoles] = await Promise.all([
     getPersistentRoles(member.guild),
     getPersistentRolesForUser(member.guild, member.id),
   ]);

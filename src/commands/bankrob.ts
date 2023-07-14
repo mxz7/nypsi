@@ -71,7 +71,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   }
 
   const getMaxValues = async (bankBalance: number) => {
-    const [ balance, inventory ] = await Promise.all([
+    const [balance, inventory] = await Promise.all([
       getBalance(message.member),
       getInventory(message.member),
     ]);

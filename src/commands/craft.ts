@@ -140,9 +140,9 @@ async function run(
 
   const mainPage = async (msg?: Message) => {
     const embed = new CustomEmbed(message.member).setHeader("craft", message.author.avatarURL());
-    const [ inventory, crafting ] = await Promise.all([
+    const [inventory, crafting] = await Promise.all([
       getInventory(message.member),
-      getCraftingItems(message.member)
+      getCraftingItems(message.member),
     ]);
 
     if (crafting.completed.length > 0) {
