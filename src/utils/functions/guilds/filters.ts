@@ -94,7 +94,7 @@ export async function updateChatFilter(guild: Guild, array: string[]) {
 }
 
 export async function checkMessageContent(message: Message) {
-  const [ filter, match ] = await Promise.all([
+  const [filter, match] = await Promise.all([
     getChatFilter(message.guild),
     getPercentMatch(message.guild),
   ]);

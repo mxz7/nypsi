@@ -222,7 +222,7 @@ async function run(
     new ButtonBuilder().setCustomId("he").setLabel("heal").setStyle(ButtonStyle.Success),
   );
 
-  const [ homeBoosters, awayBoosters ] = await Promise.all([
+  const [homeBoosters, awayBoosters] = await Promise.all([
     getBoosters(message.member),
     getBoosters(target),
   ]);

@@ -26,7 +26,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   await addCooldown(cmd.name, message.member, 30);
 
-  const [ net, inventory ] = await Promise.all([
+  const [net, inventory] = await Promise.all([
     calcNetWorth(message.member, true),
     getInventory(message.member),
   ]);
