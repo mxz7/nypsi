@@ -8,6 +8,7 @@ import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { getBoosters } from "../utils/functions/economy/boosters";
+import { addToGuildXP, getGuildName } from "../utils/functions/economy/guilds";
 import {
   addInventoryItem,
   gemBreak,
@@ -16,12 +17,26 @@ import {
 } from "../utils/functions/economy/inventory";
 import { addStat } from "../utils/functions/economy/stats";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
+import { calcEarnedHFMXp, getXp, updateXp } from "../utils/functions/economy/xp";
 import { percentChance } from "../utils/functions/random";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("hunt", "go to a field and hunt", "money");
 
 cmd.slashEnabled = true;
+
+const places = [
+  "field",
+  "forest",
+  "african plains",
+  "amazon rainforest",
+  "field",
+  "forest",
+  "field",
+  "forest",
+  "field",
+  "forest",
+];
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
   if (!(await userExists(message.member))) await createUser(message.member);
@@ -148,6 +163,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     );
   }
 
+  const chosenPlace = places[Math.floor(Math.random() * places.length)];
+
+  const embed = new CustomEmbed(
+    message.member,
+    `you go to the ${chosenPlace} and prepare your **${items[gun].name}**`,
+  );
+
+  const msg = await send({ embeds: [embed] });
+
   for (let i = 0; i < 15; i++) {
     huntItems.push("nothing");
   }
@@ -215,23 +239,25 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     foundItems.set(chosen, foundItems.has(chosen) ? foundItems.get(chosen) + amount : amount);
   }
 
-  const embed = new CustomEmbed(
-    message.member,
-    `you go to the ${["field", "forest"][Math.floor(Math.random() * 2)]} and prepare your **${
-      items[gun].name
-    }**`,
-  );
-
-  const msg = await send({ embeds: [embed] });
-
   const total = Array.from(foundItems.entries())
     .map((i) => (["money", "xp"].includes(i[0]) ? 0 : i[1]))
     .reduce((a, b) => a + b);
 
+  const earnedXp = calcEarnedHFMXp(total);
+
+  if (earnedXp > 0) {
+    embed.setFooter({ text: `+${earnedXp.toLocaleString()}xp` });
+    await updateXp(message.member, (await getXp(message.member)) + earnedXp);
+
+    const guild = await getGuildName(message.member);
+
+    if (guild) {
+      await addToGuildXP(guild, earnedXp, message.member);
+    }
+  }
+
   embed.setDescription(
-    `you go to the ${["field", "forest"][Math.floor(Math.random() * 2)]} and prepare your **${
-      items[gun].name
-    }**\n\nyou killed${
+    `you go to the ${chosenPlace} and prepare your **${items[gun].name}**\n\nyou killed${
       total > 0
         ? `: \n${Array.from(foundItems.entries())
             .map((i) => `- \`${i[1]}x\` ${items[i[0]].emoji} ${items[i[0]].name}`)

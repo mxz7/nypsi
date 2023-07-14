@@ -58,7 +58,7 @@ export async function updateXp(member: GuildMember | string, amount: number) {
   await redis.del(`${Constants.redis.cache.economy.XP}:${id}`);
 }
 
-export async function calcEarnedXp(
+export async function calcEarnedGambleXp(
   member: GuildMember,
   bet: number,
   multiplier: number,
@@ -128,6 +128,21 @@ export async function calcEarnedXp(
   earned += boosterEffect * earned;
 
   if (earned < 0) earned = 0;
+
+  return Math.floor(earned);
+}
+
+export function calcEarnedHFMXp(items: number) {
+  let earned = 0;
+
+  if (items > 25) {
+    earned += Math.random() * 12.5 + 12.5;
+    items -= 25;
+
+    earned += items * 0.33369;
+  } else {
+    earned += Math.random() * (items / 2) + items / 2;
+  }
 
   return Math.floor(earned);
 }
