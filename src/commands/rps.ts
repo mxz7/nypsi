@@ -328,7 +328,7 @@ async function run(
       embed.setFooter({ text: `id: ${id}` });
     }
 
-    gamble(message.author, "rock paper scissors", bet, win, id, winnings);
+    gamble(message.author, "rock paper scissors", bet, win ? "win" : "lose", id, winnings);
     setTimeout(() => {
       edit({ embeds: [embed] }, m);
     }, 1500);

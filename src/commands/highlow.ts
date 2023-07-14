@@ -493,7 +493,7 @@ async function playGame(
         games.get(message.author.id).card
       }`,
     });
-    gamble(message.author, "highlow", bet, false, id, 0);
+    gamble(message.author, "highlow", bet, "lose", id, 0);
     newEmbed.setFooter({ text: `id: ${id}` });
     newEmbed.setColor(Constants.EMBED_FAIL_COLOR);
     newEmbed.setDescription(
@@ -575,7 +575,7 @@ async function playGame(
       earned: winnings,
       xp: earnedXp,
     });
-    gamble(message.author, "highlow", bet, true, id, winnings);
+    gamble(message.author, "highlow", bet, "win", id, winnings);
 
     if (earnedXp > 0) {
       newEmbed.setFooter({ text: `+${earnedXp}xp | id: ${id}` });
@@ -600,7 +600,7 @@ async function playGame(
       }`,
       earned: bet,
     });
-    gamble(message.author, "highlow", bet, true, id, bet);
+    gamble(message.author, "highlow", bet, "draw", id, bet);
     newEmbed.setFooter({ text: `id: ${id}` });
     newEmbed.setColor(variants.macchiato.yellow.hex as ColorResolvable);
     newEmbed.setDescription(

@@ -612,7 +612,7 @@ async function playGame(
         message.member,
       )})\nmember cards: ${getCards(message.member)} (${calcTotal(message.member)})`,
     });
-    gamble(message.author, "blackjack", bet, false, id, 0);
+    gamble(message.author, "blackjack", bet, "lose", id, 0);
     newEmbed.setColor(Constants.EMBED_FAIL_COLOR);
     newEmbed.setDescription("**bet** $" + bet.toLocaleString() + "\n\n**you lose!!**");
     newEmbed.addField(
@@ -684,7 +684,7 @@ async function playGame(
       xp: earnedXp,
     });
 
-    gamble(message.author, "blackjack", bet, true, id, winnings);
+    gamble(message.author, "blackjack", bet, "win", id, winnings);
     if (earnedXp > 0) {
       newEmbed.setFooter({ text: `+${earnedXp}xp | id: ${id}` });
     } else {
@@ -716,7 +716,7 @@ async function playGame(
       )})\nmember cards: ${getCards(message.member)} (${calcTotal(message.member)})`,
       earned: bet,
     });
-    gamble(message.author, "blackjack", bet, true, id, bet);
+    gamble(message.author, "blackjack", bet, "draw", id, bet);
     newEmbed.setFooter({ text: `id: ${id}` });
     newEmbed.setColor(variants.macchiato.yellow.hex as ColorResolvable);
     newEmbed.setDescription(
