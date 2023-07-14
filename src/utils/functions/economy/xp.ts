@@ -131,3 +131,16 @@ export async function calcEarnedGambleXp(
 
   return Math.floor(earned);
 }
+
+export function calcEarnedHFMXp(items: number) {
+  let earned = 0;
+
+  if (items > 25) {
+    earned += 25;
+    items -= 25;
+
+    earned += items * 0.33369;
+  }
+
+  return Math.floor(earned);
+}
