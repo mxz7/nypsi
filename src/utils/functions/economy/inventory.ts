@@ -768,7 +768,13 @@ export async function getAutosellItems(member: GuildMember | string) {
 }
 
 export async function calcItemValue(item: string) {
-  if (getItems()[item].buy) return getItems()[item].sell;
+  if (
+    getItems()[item].buy ||
+    item === "cookie" ||
+    ["prey", "fish", "sellable", "ore"].includes(getItems()[item].role)
+  )
+    return getItems()[item].sell || 1000;
+
   const [auctionAvg, offersAvg] = await Promise.all([
     getAuctionAverage(item),
     getOffersAverage(item),
