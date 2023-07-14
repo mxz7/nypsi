@@ -25,7 +25,18 @@ const cmd = new Command("hunt", "go to a field and hunt", "money");
 
 cmd.slashEnabled = true;
 
-const places = ["field", "forest"];
+const places = [
+  "field",
+  "forest",
+  "african plains",
+  "amazon rainforest",
+  "field",
+  "forest",
+  "field",
+  "forest",
+  "field",
+  "forest",
+];
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
   if (!(await userExists(message.member))) await createUser(message.member);
