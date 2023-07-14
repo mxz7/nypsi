@@ -42,8 +42,6 @@ async function run(
   const help = async () => {
     const current = await getLogsChannelHook(message.guild);
 
-    console.log(current);
-
     const embed = new CustomEmbed(message.member);
 
     embed.setHeader("logs");
@@ -53,9 +51,7 @@ async function run(
     if (!current) {
       text += `logs have not been enabled\n\nuse ${prefix}**logs <channel>** to enable them`;
     } else {
-      console.log("a");
       const msg = await current.send({ content: "fetching channel..." });
-      console.log("b");
 
       const channel = await message.guild.channels.fetch(msg.channel_id);
 
