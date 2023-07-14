@@ -3,7 +3,6 @@ import { NypsiClient } from "../models/Client";
 import { getPrestige } from "../utils/functions/economy/prestige";
 import { userExists } from "../utils/functions/economy/utils";
 import { uploadImageToImgur } from "../utils/functions/image";
-import { isPremium } from "../utils/functions/premium/premium";
 import { addNewAvatar, addNewUsername, isTracking } from "../utils/functions/users/history";
 import { updateLastKnownUsername } from "../utils/functions/users/tag";
 import { hasProfile } from "../utils/functions/users/utils";
@@ -25,7 +24,7 @@ export default async function userUpdate(oldUser: User, newUser: User) {
 
   if (oldUser.displayAvatarURL({ size: 256 }) != newUser.displayAvatarURL({ size: 256 })) {
     if (!(await userExists(newUser.id))) return;
-    if (!(await isPremium(newUser.id)) && (await getPrestige(newUser.id)) < 1) return;
+    if ((await getPrestige(newUser.id)) < 2) return;
 
     if (!(await isTracking(newUser.id))) return;
 

@@ -3,7 +3,6 @@ import {
   ButtonBuilder,
   ButtonStyle,
   CommandInteraction,
-  GuildMember,
   Interaction,
   Message,
   MessageActionRowComponentBuilder,
@@ -11,6 +10,7 @@ import {
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { formatDate } from "../utils/functions/date";
+import { getPrestige } from "../utils/functions/economy/prestige";
 import { uploadImageToImgur } from "../utils/functions/image";
 import {
   addNewAvatar,
@@ -38,34 +38,33 @@ async function run(
     return message.channel.send({ embeds: [embed] });
   }
 
-  let member: GuildMember;
-
-  if (args.length == 0) {
-    member = message.member;
-  } else {
-    if (args[0].toLowerCase() == "-clear") {
-      await clearAvatarHistory(message.member);
-      return message.channel.send({
-        embeds: [new CustomEmbed(message.member, "✅ your avatar history has been cleared")],
-      });
-    }
-  }
-
-  if (!member) {
-    return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] });
+  if (args.length > 0 && args[0].toLowerCase() == "-clear") {
+    await clearAvatarHistory(message.member);
+    return message.channel.send({
+      embeds: [new CustomEmbed(message.member, "✅ your avatar history has been cleared")],
+    });
   }
 
   await addCooldown(cmd.name, message.member, 15);
 
-  let history = await fetchAvatarHistory(member);
+  if ((await getPrestige(message.member).catch(() => 0)) < 2)
+    return message.channel.send({
+      embeds: [
+        new ErrorEmbed(
+          "you require at least prestige 2 (/prestige) for nypsi to track your avatars\n\nyou can disable avatar tracking with $toggletracking",
+        ),
+      ],
+    });
+
+  let history = await fetchAvatarHistory(message.member);
 
   if (history.length == 0) {
     const url = await uploadImageToImgur(
-      member.user.displayAvatarURL({ extension: "png", size: 256 }),
+      message.author.displayAvatarURL({ extension: "png", size: 256 }),
     );
     if (url) {
-      await addNewAvatar(member, url);
-      history = await fetchAvatarHistory(member);
+      await addNewAvatar(message.member, url);
+      history = await fetchAvatarHistory(message.member);
     } else {
       return message.channel.send({ embeds: [new ErrorEmbed("no avatar history")] });
     }
@@ -90,7 +89,7 @@ async function run(
     });
   }
 
-  if (!(await isTracking(member))) {
+  if (!(await isTracking(message.member))) {
     embed.setDescription("`[tracking disabled]`");
   }
 
@@ -132,7 +131,7 @@ async function run(
 
     const newEmbed = new CustomEmbed(message.member);
 
-    if (!(await isTracking(member))) {
+    if (!(await isTracking(message.member))) {
       newEmbed.setDescription("`[tracking disabled]`");
     }
 
