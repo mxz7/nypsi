@@ -216,6 +216,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   chosenArea = choseArea();
 
+  const embed = new CustomEmbed(
+    message.member,
+    `you go to the ${chosenArea} and swing your **${items[pickaxe].name}**`,
+  );
+
+  const msg = await send({ embeds: [embed] });
+
   if (chosenArea == "nether") await addStat(message.member, "nether_portal");
 
   const foundItems = new Map<string, number>();
@@ -316,13 +323,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     foundItems.set(chosen, foundItems.has(chosen) ? foundItems.get(chosen) + amount : amount);
   }
-
-  const embed = new CustomEmbed(
-    message.member,
-    `you go to the ${chosenArea} and swing your **${items[pickaxe].name}**`,
-  );
-
-  const msg = await send({ embeds: [embed] });
 
   const total = Array.from(foundItems.entries())
     .map((i) => (["money", "xp"].includes(i[0]) ? 0 : i[1]))

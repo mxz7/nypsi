@@ -23,6 +23,8 @@ const cmd = new Command("hunt", "go to a field and hunt", "money");
 
 cmd.slashEnabled = true;
 
+const places = ["field", "forest"];
+
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
   if (!(await userExists(message.member))) await createUser(message.member);
 
@@ -148,6 +150,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     );
   }
 
+  const chosenPlace = places[Math.floor(Math.random() * places.length)];
+
+  const embed = new CustomEmbed(
+    message.member,
+    `you go to the ${chosenPlace} and prepare your **${items[gun].name}**`,
+  );
+
+  const msg = await send({ embeds: [embed] });
+
   for (let i = 0; i < 15; i++) {
     huntItems.push("nothing");
   }
@@ -215,23 +226,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     foundItems.set(chosen, foundItems.has(chosen) ? foundItems.get(chosen) + amount : amount);
   }
 
-  const embed = new CustomEmbed(
-    message.member,
-    `you go to the ${["field", "forest"][Math.floor(Math.random() * 2)]} and prepare your **${
-      items[gun].name
-    }**`,
-  );
-
-  const msg = await send({ embeds: [embed] });
-
   const total = Array.from(foundItems.entries())
     .map((i) => (["money", "xp"].includes(i[0]) ? 0 : i[1]))
     .reduce((a, b) => a + b);
 
   embed.setDescription(
-    `you go to the ${["field", "forest"][Math.floor(Math.random() * 2)]} and prepare your **${
-      items[gun].name
-    }**\n\nyou killed${
+    `you go to the ${chosenPlace} and prepare your **${items[gun].name}**\n\nyou killed${
       total > 0
         ? `: \n${Array.from(foundItems.entries())
             .map((i) => `- \`${i[1]}x\` ${items[i[0]].emoji} ${items[i[0]].name}`)

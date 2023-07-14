@@ -203,6 +203,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     );
   }
 
+  const embed = new CustomEmbed(
+    message.member,
+    `you go to the pond and cast your **${items[fishingRod].name}**`,
+  );
+
+  const msg = await send({ embeds: [embed] });
+
   const foundItems = new Map<string, number>();
 
   for (let i = 0; i < times; i++) {
@@ -326,13 +333,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       foundItems.set(chosen, foundItems.has(chosen) ? foundItems.get(chosen) + amount : amount);
     }
   }
-
-  const embed = new CustomEmbed(
-    message.member,
-    `you go to the pond and cast your **${items[fishingRod].name}**`,
-  );
-
-  const msg = await send({ embeds: [embed] });
 
   const total = Array.from(foundItems.entries())
     .map((i) => (["money", "xp"].includes(i[0]) ? 0 : i[1]))
