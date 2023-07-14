@@ -58,7 +58,7 @@ export async function updateXp(member: GuildMember | string, amount: number) {
   await redis.del(`${Constants.redis.cache.economy.XP}:${id}`);
 }
 
-export async function calcEarnedXp(
+export async function calcEarnedGambleXp(
   member: GuildMember,
   bet: number,
   multiplier: number,

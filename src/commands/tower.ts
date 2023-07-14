@@ -31,7 +31,7 @@ import { addToGuildXP, getGuildByUser } from "../utils/functions/economy/guilds"
 import { addInventoryItem } from "../utils/functions/economy/inventory";
 import { createGame } from "../utils/functions/economy/stats";
 import { createUser, formatBet, userExists } from "../utils/functions/economy/utils";
-import { calcEarnedXp, getXp, updateXp } from "../utils/functions/economy/xp";
+import { calcEarnedGambleXp, getXp, updateXp } from "../utils/functions/economy/xp";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { percentChance } from "../utils/functions/random";
 import { addHourlyCommand } from "../utils/handlers/commandhandler";
@@ -611,7 +611,7 @@ async function playGame(
     );
     game.embed.setColor(Constants.EMBED_SUCCESS_COLOR);
 
-    const earnedXp = await calcEarnedXp(message.member, game.bet, game.win);
+    const earnedXp = await calcEarnedGambleXp(message.member, game.bet, game.win);
 
     if (earnedXp > 0) {
       await updateXp(message.member, (await getXp(message.member)) + earnedXp);
