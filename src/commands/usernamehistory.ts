@@ -10,7 +10,6 @@ import {
 } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import { formatDate } from "../utils/functions/date";
 import { getMember } from "../utils/functions/member";
 import PageManager from "../utils/functions/page";
 import {
@@ -20,6 +19,7 @@ import {
 } from "../utils/functions/users/history";
 import { hasProfile } from "../utils/functions/users/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import dayjs = require("dayjs");
 
 const cmd = new Command("usernamehistory", "view a user's username history", "info").setAliases([
   "un",
@@ -63,7 +63,7 @@ async function run(
     });
   }
 
-  const [ isUserTracking, history ] = await Promise.all([
+  const [isUserTracking, history] = await Promise.all([
     isTracking(member),
     fetchUsernameHistory(member),
   ]);
@@ -87,7 +87,7 @@ async function run(
   let description = "";
 
   for (const item of pages.get(1)) {
-    description += `\`${item.value}\` | \`${formatDate(item.date)}\`\n`;
+    description += `\`${item.value}\` | <t:${dayjs(item.date).unix()}:d>\n`;
   }
 
   embed.setDescription(description);
@@ -146,7 +146,7 @@ async function run(
         let description = "";
 
         for (const item of pages.get(currentPage)) {
-          description += `\`${item.value}\` | \`${formatDate(item.date)}\`\n`;
+          description += `\`${item.value}\` | <t:${dayjs(item.date).unix()}:d>\n`;
         }
 
         newEmbed.setDescription(description);
@@ -191,7 +191,7 @@ async function run(
         let description = "";
 
         for (const item of pages.get(currentPage)) {
-          description += `\`${item.value}\` | \`${formatDate(item.date)}\`\n`;
+          description += `\`${item.value}\` | <t:${dayjs(item.date).unix()}:d>\n`;
         }
 
         newEmbed.setDescription(description);
