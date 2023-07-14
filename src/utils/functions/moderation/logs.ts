@@ -164,6 +164,8 @@ export async function getLogsChannelHook(guild: Guild) {
     },
   });
 
+  await redis.del(`nypsi:query:islogsenabled:searching:${guild.id}`);
+
   if (!query.logs) return undefined;
 
   return new WebhookClient({ url: query.logs });
