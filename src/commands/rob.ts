@@ -16,7 +16,7 @@ import {
   setPadlock,
   updateBalance,
 } from "../utils/functions/economy/balance";
-import { addToGuildXP, getGuildByUser } from "../utils/functions/economy/guilds";
+import { addToGuildXP, getGuildByUser, getGuildName } from "../utils/functions/economy/guilds";
 import { getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
 import { isPassive } from "../utils/functions/economy/passive";
 import { addStat, createGame } from "../utils/functions/economy/stats";
@@ -277,10 +277,10 @@ async function run(
         await updateXp(message.member, (await getXp(message.member)) + earnedXp);
         embed2.setFooter({ text: `+${earnedXp}xp` });
 
-        const guild = await getGuildByUser(message.member);
+        const guild = await getGuildName(message.member);
 
         if (guild) {
-          await addToGuildXP(guild.guildName, earnedXp, message.member);
+          await addToGuildXP(guild, earnedXp, message.member);
         }
       }
 
