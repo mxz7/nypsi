@@ -375,7 +375,7 @@ async function run(
           });
 
         if (!msg) return;
-        if (!parseInt(msg.content)) {
+        if (!parseInt(msg.content) && parseInt(msg.content) != 0) {
           await res.editReply({ embeds: [new CustomEmbed(message.member, "invalid value")] });
           return waitForButton();
         }
@@ -486,7 +486,7 @@ async function run(
           });
 
         if (!msg) return;
-        if (!parseInt(msg.content)) {
+        if (!parseInt(msg.content) && parseInt(msg.content) != 0) {
           await res.editReply({ embeds: [new CustomEmbed(message.member, "invalid value")] });
           return waitForButton();
         }
@@ -526,7 +526,7 @@ async function run(
           });
 
         if (!msg) return;
-        if (!parseInt(msg.content)) {
+        if (!parseInt(msg.content) && parseInt(msg.content) != 0) {
           await res.editReply({ embeds: [new CustomEmbed(message.member, "invalid value")] });
           return waitForButton();
         }
@@ -561,7 +561,7 @@ async function run(
           });
 
         if (!msg) return;
-        if (!parseInt(msg.content)) {
+        if (!parseInt(msg.content) && parseInt(msg.content) != 0) {
           await res.editReply({ embeds: [new CustomEmbed(message.member, "invalid value")] });
           return waitForButton();
         }
@@ -596,7 +596,7 @@ async function run(
           });
 
         if (!msg) return;
-        if (!parseInt(msg.content)) {
+        if (!parseInt(msg.content) && parseInt(msg.content) != 0) {
           await res.editReply({ embeds: [new CustomEmbed(message.member, "invalid value")] });
           return waitForButton();
         }
@@ -641,7 +641,7 @@ async function run(
           return waitForButton();
         }
 
-        if (!parseInt(msg.content.split(" ")[1])) {
+        if (!parseInt(msg.content.split(" ")[1]) && parseInt(msg.content.split(" ")[1]) != 0) {
           await res.editReply({ embeds: [new CustomEmbed(message.member, "invalid number")] });
           return waitForButton();
         }
@@ -692,7 +692,7 @@ async function run(
           });
 
         if (!msg) return;
-        if (!parseInt(msg.content)) {
+        if (!parseInt(msg.content) && parseInt(msg.content) != 0) {
           await res.editReply({ embeds: [new CustomEmbed(message.member, "invalid value")] });
           return waitForButton();
         }
@@ -903,7 +903,7 @@ async function run(
           });
 
         if (!msg) return;
-        if (!parseInt(msg.content)) {
+        if (!parseInt(msg.content) && parseInt(msg.content) != 0) {
           await res.editReply({ embeds: [new CustomEmbed(message.member, "invalid value")] });
           return waitForButton();
         }
@@ -950,7 +950,7 @@ async function run(
           });
 
         if (!msg) return;
-        if (!parseInt(msg.content)) {
+        if (!parseInt(msg.content) && parseInt(msg.content) != 0) {
           await res.editReply({ embeds: [new CustomEmbed(message.member, "invalid value")] });
           return waitForButton();
         }
