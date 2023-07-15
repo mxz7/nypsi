@@ -144,7 +144,10 @@ async function run(
           `**bet** $${game.bet.toLocaleString()}\n` +
           `**result** \`${game.win == 1 ? "won" : game.win == 0 ? "lost" : "draw"}\`\n`;
 
-        if (game.win == 1 && !(game.game.includes("scratchie") || game.game.includes("scratch_card"))) {
+        if (
+          game.win == 1 &&
+          !(game.game.includes("scratchie") || game.game.includes("scratch_card"))
+        ) {
           out += `**won money** $${game.earned.toLocaleString()}\n`;
           out += `**won xp** ${(game.xpEarned || 0).toLocaleString()}\n`;
         }
