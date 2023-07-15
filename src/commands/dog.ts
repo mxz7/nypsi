@@ -33,7 +33,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const a = await redditImage(chosen, posts);
 
   if (a == "lol") {
-    return message.channel.send({ embeds: [new ErrorEmbed("unable to find thighs image")] });
+    return message.channel.send({ embeds: [new ErrorEmbed("unable to find dog image")] });
   }
 
   const image = a.split("|")[0];
