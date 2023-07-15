@@ -643,7 +643,7 @@ export async function buyFullAuction(
     });
   }
 
-  if (Number(auction.bin) < 10_000) {
+  if (Number(auction.bin / auction.itemAmount) < 50_000) {
     await prisma.auction.delete({
       where: {
         id: auction.id,
