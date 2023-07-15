@@ -599,12 +599,8 @@ export async function calcNetWorth(member: GuildMember | string, breakdown = fal
       Number(query.EconomyGuildMember.guild.balance) /
       query.EconomyGuildMember.guild.members.length;
 
-    worth += Math.floor(guildWorth / query.EconomyGuildMember.guild.members.length);
-    if (breakdown)
-      breakdownItems.set(
-        "guild",
-        Math.floor(guildWorth / query.EconomyGuildMember.guild.members.length),
-      );
+    worth += Math.floor(guildWorth);
+    if (breakdown) breakdownItems.set("guild", Math.floor(guildWorth));
   } else if (breakdown) {
     breakdownItems.set("guild", 0);
   }
