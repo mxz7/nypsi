@@ -72,16 +72,23 @@ export default {
         embeds: [new ErrorEmbed("you don't have the items for this offer")],
       });
     }
-
-    await prisma.offer.update({
-      where: {
-        messageId: offer.messageId,
-      },
-      data: {
-        sold: true,
-        soldAt: new Date(),
-      },
-    });
+    if (Number(offer.money / offer.itemAmount) < 50_000) {
+      await prisma.offer.delete({
+        where: {
+          messageId: offer.messageId,
+        },
+      });
+    } else {
+      await prisma.offer.update({
+        where: {
+          messageId: offer.messageId,
+        },
+        data: {
+          sold: true,
+          soldAt: new Date(),
+        },
+      });
+    }
 
     await setInventoryItem(
       interaction.user.id,
