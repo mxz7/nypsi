@@ -225,6 +225,13 @@ export async function checkLeaderboardPositions(users: string[], leaderboard: st
   await redis.set("nypsi:lb:cooldown" + leaderboard, "69");
   await redis.expire("nypsi:lb:cooldown" + leaderboard, 600);
 
+  await prisma.leaderboards.deleteMany({
+    where: {
+      leaderboard,
+      position: { gt: users.length },
+    },
+  });
+
   for (const user of users) {
     if (users.indexOf(user) > 100) return;
     const query = await prisma.leaderboards.findFirst({
@@ -238,7 +245,7 @@ export async function checkLeaderboardPositions(users: string[], leaderboard: st
     });
 
     if (query) {
-      if (query.position === users.indexOf(user)) return;
+      if (query.position === users.indexOf(user)) continue;
 
       await prisma.leaderboards.delete({
         where: { userId_leaderboard: { userId: user, leaderboard } },
