@@ -141,7 +141,7 @@ async function run(
           }\`\n` +
           `**game** \`${game.game}\`\n` +
           `**time** <t:${Math.floor(game.date.getTime() / 1000)}>\n` +
-          `**bet** $${game.bet.toLocaleString()}\n` +
+          `${game.game.includes("scratch_card") || game.game.includes("scratchie") ? "" : `**bet** $${game.bet.toLocaleString()}\n`}` +
           `**result** \`${game.win == 1 ? "won" : game.win == 0 ? "lost" : "draw"}\`\n`;
 
         if (
@@ -241,7 +241,7 @@ async function run(
       `**user** \`${username || "[redacted]"}\`\n` +
       `**game** \`${game.game}\`\n` +
       `**time** <t:${Math.floor(game.date.getTime() / 1000)}>\n` +
-      `**bet** $${game.bet.toLocaleString()}\n` +
+      `${game.game.includes("scratch_card") || game.game.includes("scratchie") ? "" : `**bet** $${game.bet.toLocaleString()}\n`}` +
       `**result** \`${game.win == 1 ? "won" : game.win == 0 ? "lost" : "draw"}\`\n`;
 
     if (game.outcome.startsWith("mines:")) {
