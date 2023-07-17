@@ -243,7 +243,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     .map((i) => (["money", "xp"].includes(i[0]) ? 0 : i[1]))
     .reduce((a, b) => a + b);
 
-  const earnedXp = calcEarnedHFMXp(total);
+  const earnedXp = await calcEarnedHFMXp(message.member, total);
 
   if (earnedXp > 0) {
     embed.setFooter({ text: `+${earnedXp.toLocaleString()}xp` });
