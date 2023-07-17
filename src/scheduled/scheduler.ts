@@ -70,7 +70,7 @@ const bree = new Bree({
     },
     {
       name: "purge",
-      interval: "at: 1:00am",
+      interval: "at 1:00am",
     },
   ],
 });
