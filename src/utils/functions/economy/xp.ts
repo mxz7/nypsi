@@ -131,7 +131,7 @@ export async function calcEarnedGambleXp(
   return Math.floor(earned);
 }
 
-export function calcEarnedHFMXp(items: number) {
+export async function calcEarnedHFMXp(member: GuildMember, items: number) {
   let earned = 0;
 
   if (items > 25) {
@@ -142,6 +142,20 @@ export function calcEarnedHFMXp(items: number) {
   } else {
     earned += Math.random() * (items / 2) + items / 2;
   }
+
+  const boosters = await getBoosters(member);
+
+  let boosterEffect = 0;
+
+  for (const boosterId of boosters.keys()) {
+    if (boosterId == "beginner_booster") {
+      boosterEffect += 1;
+    } else if (getItems()[boosterId].boosterEffect.boosts.includes("xp")) {
+      boosterEffect += getItems()[boosterId].boosterEffect.effect * boosters.get(boosterId).length;
+    }
+  }
+
+  earned += boosterEffect * earned;
 
   return Math.floor(earned);
 }
