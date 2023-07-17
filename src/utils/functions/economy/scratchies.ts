@@ -184,7 +184,7 @@ export default class ScratchCard {
 
         await addInventoryItem(this.member, clickedItem, amount);
         embed.setDescription(
-          `you found a ${getItems()[clickedItem].emoji} **${getItems()[clickedItem].name}**!`,
+          `you found ${getItems()[clickedItem].article} ${getItems()[clickedItem].emoji} **${getItems()[clickedItem].name}**!`,
         );
       }
 

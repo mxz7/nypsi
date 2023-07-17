@@ -312,7 +312,7 @@ async function handleKofiData(data: KofiResponse) {
                 embeds: [
                   new CustomEmbed(
                     null,
-                    `${user.lastKnownUsername} just bought a ${getItems()[item].emoji} **${
+                    `${user.lastKnownUsername} just bought ${getItems()[item].article} ${getItems()[item].emoji} **${
                       getItems()[item].name
                     }**!!!!`,
                   ).setFooter({ text: "thank you for your purchase (:" }),
