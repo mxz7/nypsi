@@ -128,13 +128,13 @@ async function run(
   ]);
 
   if (selected.sell || selected.buy) {
-    desc.push(`**worth** $${Math.floor(value).toLocaleString()}\n`);
+    desc.push(`**worth** $${Math.floor(value).toLocaleString()}`);
   } else {
     desc.push(`\n**worth** $${Math.floor(value).toLocaleString()}`);
   }
 
   if (total) {
-    if (selected.sell || selected.buy || value) {
+    if (value) {
       desc.push(`**in world** ${total.toLocaleString()}`);
     } else {
       desc.push(`\n**in world** ${total.toLocaleString()}`);
