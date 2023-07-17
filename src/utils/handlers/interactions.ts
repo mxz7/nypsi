@@ -110,7 +110,7 @@ export async function runInteraction(interaction: Interaction) {
       if (reactionRole.mode === "UNIQUE") {
         for (const role of member.roles.cache.values()) {
           if (reactionRole.roles.find((r) => r.roleId === role.id)) {
-            responseDesc.push(`- ${role.toString()}`);
+            responseDesc.push(`\\- ${role.toString()}`);
             await member.roles.remove(role);
           }
         }
