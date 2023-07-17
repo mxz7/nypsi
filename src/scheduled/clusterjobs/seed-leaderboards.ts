@@ -1,5 +1,6 @@
 import dayjs = require("dayjs");
 import { MStoTime } from "../../utils/functions/date";
+import { calcItemValue } from "../../utils/functions/economy/inventory";
 import {
   topBalanceGlobal,
   topDailyStreakGlobal,
@@ -19,18 +20,19 @@ async function leaderboardThing() {
   const itemIds = Object.keys(getItems());
 
   await topBalanceGlobal(100);
-  await sleep(5000);
+  await sleep(1000);
   await topDailyStreakGlobal("");
-  await sleep(5000);
+  await sleep(1000);
   await topPrestigeGlobal("");
-  await sleep(5000);
+  await sleep(1000);
   await topNetWorthGlobal("");
-  await sleep(5000);
+  await sleep(1000);
   await topWordleGlobal("");
 
   for (const item of itemIds) {
-    await sleep(5000);
+    await sleep(1000);
     await topItemGlobal(item, "");
+    await calcItemValue(item);
   }
 
   const end = Date.now();
