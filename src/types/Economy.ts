@@ -22,6 +22,7 @@ export interface Item {
   };
   worker_upgrade_id: string;
   plural?: string;
+  article: string;
   craft?: {
     ingredients: string[]; // format: item_id:amount
     time: number; // seconds

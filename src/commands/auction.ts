@@ -268,7 +268,7 @@ async function run(
       !inventory.find((i) => i.item == selected.id) ||
       inventory.find((i) => i.item == selected.id).amount == 0
     ) {
-      return message.channel.send({ embeds: [new ErrorEmbed(`you dont have a ${selected.name}`)] });
+      return message.channel.send({ embeds: [new ErrorEmbed(`you dont have ${selected.article} ${selected.name}`)] });
     }
 
     if (selected.account_locked)
@@ -905,7 +905,7 @@ async function run(
       !inventory.find((i) => i.item == selected.id) ||
       inventory.find((i) => i.item == selected.id).amount == 0
     ) {
-      return send({ embeds: [new ErrorEmbed(`you dont have a ${selected.name}`)] });
+      return send({ embeds: [new ErrorEmbed(`you dont have ${selected.article} ${selected.name}`)] });
     }
 
     if (selected.account_locked)

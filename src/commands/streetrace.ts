@@ -324,7 +324,7 @@ async function run(
           inventory.find((i) => i.item == car.id).amount == 0) &&
         car.id != "cycle"
       ) {
-        return send({ embeds: [new ErrorEmbed(`you don't have a ${car.name}`)] });
+        return send({ embeds: [new ErrorEmbed(`you don't have ${car.article} ${car.name}`)] });
       }
     }
 

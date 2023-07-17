@@ -60,7 +60,7 @@ async function prepare(
     !inventory.find((i) => i.item == selected.id) ||
     inventory.find((i) => i.item == selected.id).amount == 0
   ) {
-    return send({ embeds: [new ErrorEmbed(`you dont have a ${selected.name}`)] });
+    return send({ embeds: [new ErrorEmbed(`you dont have ${selected.article} ${selected.name}`)] });
   }
 
   if (selected.role !== "scratch-card")
@@ -80,7 +80,7 @@ async function prepare(
 
   const embed = new CustomEmbed(
     message.member,
-    `**${card.remainingClicks}** click${card.remainingClicks} != 1 ? "s" : ""} left`,
+    `**${card.remainingClicks}** click${card.remainingClicks != 1 ? "s" : ""} left`,
   ).setHeader(`${message.author.username}'s ${selected.name}`, message.author.avatarURL());
 
   let msg = await send({ embeds: [embed], components: card.getButtons() });
@@ -103,7 +103,7 @@ async function prepare(
       });
 
       embed.setDescription(
-        `**${card.remainingClicks}** click${card.remainingClicks} != 1 ? "s" : ""} left`,
+        `**${card.remainingClicks}** click${card.remainingClicks != 1 ? "s" : ""} left`,
       );
       embed.setFooter({ text: `id: ${gameId}` });
 
@@ -187,7 +187,7 @@ async function prepare(
 
     if (card.remainingClicks !== 0) {
       embed.setDescription(
-        `**${card.remainingClicks}** click${card.remainingClicks} != 1 ? "" : ""} left`,
+        `**${card.remainingClicks}** click${card.remainingClicks != 1 ? "s" : ""} left`,
       );
       await msg.edit({ embeds: [embed], components: card.getButtons() });
     }
