@@ -35,7 +35,13 @@ export async function addToNypsiBank(amount: number, reduce = true) {
         userId: Constants.BOT_USER_ID,
       },
       update: {
-        bank: { increment: reduce ? Math.floor(amount * 0.1) : amount },
+        bank: {
+          increment: reduce
+            ? Math.floor(amount * 0.25) < 0
+              ? amount
+              : Math.floor(amount * 0.25)
+            : amount,
+        },
       },
       create: {
         bank: Math.floor(amount),
