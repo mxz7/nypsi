@@ -177,6 +177,7 @@ async function fastClickGame(client: NypsiClient, channelId: string, prize: stri
 
       const msg = await channel.send({ embeds: [embed], components: [row] });
 
+      const started = Date.now();
       const res = await msg
         .awaitMessageComponent({
           filter: (i) => i.customId === buttonId,
@@ -193,7 +194,10 @@ async function fastClickGame(client: NypsiClient, channelId: string, prize: stri
         return;
       }
 
-      embed.description += `\n\n**${res.user.username}** has won!!`;
+      embed.description += `\n\n**${res.user.username}** has won in \`${(
+        (Date.now() - started) /
+        1000
+      ).toFixed(2)}s\`!!`;
 
       await Promise.all([
         res.reply({ embeds: [winEmbed], ephemeral: true }),
@@ -257,6 +261,7 @@ async function typeFastGame(client: NypsiClient, channelId: string, prize: strin
 
       const msg = await channel.send({ embeds: [embed] });
 
+      const started = Date.now();
       const res = await channel
         .awaitMessages({
           filter: (m) => m.content.toLowerCase() === chosenWord.toLowerCase(),
@@ -273,7 +278,10 @@ async function typeFastGame(client: NypsiClient, channelId: string, prize: strin
         return;
       }
 
-      embed.description += `\n\n**${res.author.username}** has won!!`;
+      embed.description += `\n\n**${res.author.username}** has won in \`${(
+        (Date.now() - started) /
+        1000
+      ).toFixed(2)}s\`!!`;
 
       await msg.edit({ embeds: [embed] });
 
@@ -381,6 +389,7 @@ async function clickSpecificGame(client: NypsiClient, channelId: string, prize: 
 
       const losers: string[] = [];
 
+      const started = Date.now();
       const res = await msg
         .awaitMessageComponent({
           filter: (i) => {
@@ -406,7 +415,10 @@ async function clickSpecificGame(client: NypsiClient, channelId: string, prize: 
         return;
       }
 
-      embed.description += `\n\n**${res.user.username}** has won!!`;
+      embed.description += `\n\n**${res.user.username}** has won in \`${(
+        (Date.now() - started) /
+        1000
+      ).toFixed(2)}s\`!!`;
 
       await Promise.all([
         res.reply({ embeds: [winEmbed], ephemeral: true }),
