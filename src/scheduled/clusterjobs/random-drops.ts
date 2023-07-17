@@ -142,7 +142,7 @@ async function fastClickGame(client: NypsiClient, channelId: string, prize: stri
     .setDescription(
       `first to click the button wins ${
         prize.startsWith("item:")
-          ? `a ${getItems()[prize.substring(5)].emoji} **${getItems()[prize.substring(5)].name}**`
+          ? `${getItems()[prize.substring(5)].article} ${getItems()[prize.substring(5)].emoji} **${getItems()[prize.substring(5)].name}**`
           : ""
       }`,
     );
@@ -152,7 +152,7 @@ async function fastClickGame(client: NypsiClient, channelId: string, prize: stri
     .setDescription(
       `you've won ${
         prize.startsWith("item:")
-          ? `a ${getItems()[prize.substring(5)].emoji} **${getItems()[prize.substring(5)].name}**`
+          ? `${getItems()[prize.substring(5)].article} ${getItems()[prize.substring(5)].emoji} **${getItems()[prize.substring(5)].name}**`
           : ""
       }`,
     );
@@ -242,7 +242,7 @@ async function typeFastGame(client: NypsiClient, channelId: string, prize: strin
     .setDescription(
       `first to type \`${displayWord}\` wins ${
         prize.startsWith("item:")
-          ? `a ${getItems()[prize.substring(5)].emoji} **${getItems()[prize.substring(5)].name}**`
+          ? `${getItems()[prize.substring(5)].article} ${getItems()[prize.substring(5)].emoji} **${getItems()[prize.substring(5)].name}**`
           : ""
       }`,
     );
@@ -312,7 +312,7 @@ async function clickSpecificGame(client: NypsiClient, channelId: string, prize: 
     .setDescription(
       `first to click the **${chosenColour}** button wins ${
         prize.startsWith("item:")
-          ? `a ${getItems()[prize.substring(5)].emoji} **${getItems()[prize.substring(5)].name}**`
+          ? `${getItems()[prize.substring(5)].article} ${getItems()[prize.substring(5)].emoji} **${getItems()[prize.substring(5)].name}**`
           : ""
       }`,
     );
@@ -322,7 +322,7 @@ async function clickSpecificGame(client: NypsiClient, channelId: string, prize: 
     .setDescription(
       `you've won ${
         prize.startsWith("item:")
-          ? `a ${getItems()[prize.substring(5)].emoji} **${getItems()[prize.substring(5)].name}**`
+          ? `${getItems()[prize.substring(5)].article} ${getItems()[prize.substring(5)].emoji} **${getItems()[prize.substring(5)].name}**`
           : ""
       }`,
     );

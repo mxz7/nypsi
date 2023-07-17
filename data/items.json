@@ -2,6 +2,7 @@
   "small_fish": {
     "id": "small_fish",
     "name": "small fish",
+    "article": "a",
     "plural": "small fish",
     "emoji": "🐟",
     "longDesc": "commonly found while fishing",
@@ -14,6 +15,7 @@
   "medium_fish": {
     "id": "medium_fish",
     "name": "medium fish",
+    "article": "a",
     "plural": "medium fish",
     "emoji": "🐠",
     "longDesc": "not as common as the small fish",
@@ -26,6 +28,7 @@
   "salmon": {
     "id": "salmon",
     "name": "salmon",
+    "article": "a",
     "plural": "salmon",
     "emoji": "<:nypsi_salmon:1032766920476336148>",
     "longDesc": "😋",
@@ -38,6 +41,7 @@
   "pufferfish": {
     "id": "pufferfish",
     "name": "pufferfish",
+    "article": "a",
     "plural": "pufferfish",
     "emoji": "<:nypsi_pufferfish:1032767867625668708>",
     "longDesc": "be very careful !!",
@@ -50,6 +54,7 @@
   "large_fish": {
     "id": "large_fish",
     "name": "large fish",
+    "article": "a",
     "plural": "large fish",
     "emoji": "🦈",
     "longDesc": "maybe it'll give you a hug",
@@ -62,6 +67,7 @@
   "nemo": {
     "id": "nemo",
     "name": "nemo",
+    "article": "a",
     "emoji": "<:nypsi_nemo:1032768399928987668>",
     "longDesc": "just keep swimming.. just keep swimming..",
     "role": "fish",
@@ -73,6 +79,7 @@
   "cobblestone": {
     "id": "cobblestone",
     "name": "cobblestone",
+    "article": "a",
     "plural": "cobblestone",
     "emoji": "<:nypsi_cobblestone:959445739673616484>",
     "longDesc": "found when mining",
@@ -86,6 +93,7 @@
   "netherrack": {
     "id": "netherrack",
     "name": "netherrack",
+    "article": "a",
     "plural": "netherrack",
     "emoji": "<:nypsi_netherrack:1034510405101432963>",
     "longDesc": "found when mining in the nether",
@@ -98,6 +106,7 @@
   "coal": {
     "id": "coal",
     "name": "coal",
+    "article": "a",
     "plural": "coal",
     "emoji": "<:nypsi_coal:959442471388082176>",
     "longDesc": "can be used to smelt 1 ore in a furnace",
@@ -110,6 +119,7 @@
   "iron_ingot": {
     "id": "iron_ingot",
     "name": "iron ingot",
+    "article": "an",
     "plural": "iron ingots",
     "emoji": "<:nypsi_iron:959442548064141362>",
     "longDesc": "product of smelting iron ore",
@@ -123,6 +133,7 @@
   "gold_ingot": {
     "id": "gold_ingot",
     "name": "gold ingot",
+    "article": "a",
     "plural": "gold ingots",
     "emoji": "<:nypsi_gold:959443010205126656>",
     "longDesc": "product of smelting gold ore",
@@ -140,6 +151,7 @@
   "diamond": {
     "id": "diamond",
     "name": "diamond",
+    "article": "a",
     "plural": "diamonds",
     "emoji": "<:nypsi_diamond:959443043377897502>",
     "longDesc": "found when mining",
@@ -152,6 +164,7 @@
   "obsidian": {
     "id": "obsidian",
     "name": "obsidian",
+    "article": "an",
     "plural": "obsidian",
     "emoji": "<:nypsi_obsidian:1034510054008823849>",
     "longDesc": "found when mining and used to craft a nether portal",
@@ -164,6 +177,7 @@
   "emerald": {
     "id": "emerald",
     "name": "emerald",
+    "article": "an",
     "plural": "emeralds",
     "emoji": "<:nypsi_emerald:1017420625880551434>",
     "longDesc": "found when mining",
@@ -176,6 +190,7 @@
   "amethyst": {
     "id": "amethyst",
     "name": "amethyst",
+    "article": "an",
     "plural": "amethysts",
     "emoji": "<:nypsi_amethyst:1032257888699297872>",
     "longDesc": "found when mining",
@@ -188,6 +203,7 @@
   "furnace": {
     "id": "furnace",
     "name": "furnace",
+    "article": "a",
     "plural": "furnaces",
     "emoji": "<:nypsi_furnace:959445132585869373>",
     "longDesc": "used to smelt ore",
@@ -200,6 +216,7 @@
   "iron_ore": {
     "id": "iron_ore",
     "name": "iron ore",
+    "article": "an",
     "emoji": "<:nypsi_iron_ore:959444539435778078>",
     "longDesc": "can be smelted into an iron ingot with a furnace and coal",
     "role": "ore",
@@ -213,6 +230,7 @@
     "id": "gold_nugget",
     "name": "gold nugget",
     "aliases": ["nugget"],
+    "article": "a",
     "emoji": "<:nypsi_goldn:1034512597153742898>",
     "longDesc": "can be crafted into a gold ingot or sold as is",
     "role": "sellable",
@@ -225,6 +243,7 @@
     "id": "quartz",
     "name": "quartz",
     "plural": "quartz",
+    "article": "a",
     "emoji": "<:nypsi_quartz:1034514057455222875>",
     "longDesc": "found when mining in the nether",
     "role": "sellable",
@@ -236,6 +255,7 @@
   "gold_ore": {
     "id": "gold_ore",
     "name": "gold ore",
+    "article": "a",
     "emoji": "<:nypsi_gold_ore:959444923139121223>",
     "longDesc": "can be smelted into a gold ingot with a furnace and coal",
     "role": "ore",
@@ -249,6 +269,7 @@
     "id": "ancient_debris",
     "name": "ancient debris",
     "plural": "ancient debris",
+    "article": "an",
     "aliases": ["debris", "ancient"],
     "emoji": "<:nypsi_ancient_debris:1032256372068335647>",
     "longDesc": "can be smelted into a netherite scrap with a furnace and coal",
@@ -262,6 +283,7 @@
   "netherite_scrap": {
     "id": "netherite_scrap",
     "name": "netherite scrap",
+    "article": "a",
     "emoji": "<:nypsi_nscrap:1034591769662341170>",
     "longDesc": "can be crafted into a netherite ingot",
     "role": "resource",
@@ -273,6 +295,7 @@
   "netherite_ingot": {
     "id": "netherite_ingot",
     "name": "netherite ingot",
+    "article": "a",
     "aliases": ["netherite"],
     "emoji": "<:nypsi_ningot:1034591922473418792>",
     "longDesc": "crafted from netherite scraps and gold ingots",
@@ -289,6 +312,7 @@
   "wooden_pickaxe": {
     "id": "wooden_pickaxe",
     "name": "wooden pickaxe",
+    "article": "a",
     "emoji": "<:nypsi_wood_pickaxe:959441224731852850>",
     "longDesc": "allows you to mine",
     "aliases": ["wpickaxe", "wpick"],
@@ -301,6 +325,7 @@
   "iron_pickaxe": {
     "id": "iron_pickaxe",
     "name": "iron pickaxe",
+    "article": "an",
     "emoji": "<:nypsi_iron_pickaxe:959441877956960326>",
     "longDesc": "allows you to mine",
     "aliases": ["ironpick", "ipick"],
@@ -313,6 +338,7 @@
   "diamond_pickaxe": {
     "id": "diamond_pickaxe",
     "name": "diamond pickaxe",
+    "article": "a",
     "emoji": "<:nypsi_diamond_pickaxe:959442215736844368>",
     "longDesc": "allows you to mine",
     "aliases": ["diamondpick", "dpick"],
@@ -326,6 +352,7 @@
   "terrible_fishing_rod": {
     "id": "terrible_fishing_rod",
     "name": "terrible fishing rod",
+    "article": "a",
     "emoji": "🎣",
     "longDesc": "allows you to fish",
     "aliases": ["tfishing", "tfish"],
@@ -338,6 +365,7 @@
   "fishing_rod": {
     "id": "fishing_rod",
     "name": "fishing rod",
+    "article": "a",
     "emoji": "🎣",
     "longDesc": "allows you to fish with better luck",
     "aliases": ["fishing"],
@@ -350,6 +378,7 @@
   "incredible_fishing_rod": {
     "id": "incredible_fishing_rod",
     "name": "incredible fishing rod",
+    "article": "an",
     "emoji": "🎣",
     "longDesc": "allows you to fish with amazing luck",
     "aliases": ["ifishing", "ifish"],
@@ -363,6 +392,7 @@
   "bitcoin": {
     "id": "bitcoin",
     "name": "bitcoin",
+    "article": "a",
     "emoji": "<:nypsi_btc:1016409538020261908>",
     "longDesc": "a scary investment (actually matches the worth of bitcoin in real life)",
     "rarity": 0,
@@ -373,6 +403,7 @@
   "ethereum": {
     "id": "ethereum",
     "name": "ethereum",
+    "article": "an",
     "emoji": "<:nypsi_eth:1016409812067696691>",
     "longDesc": "less scary investment (actually matches the worth of ethereum in real life)",
     "rarity": 0,
@@ -383,6 +414,7 @@
   "terrible_gun": {
     "id": "terrible_gun",
     "name": "terrible gun",
+    "article": "a",
     "plural": "terrible guns",
     "emoji": "🔫",
     "longDesc": "allows you to hunt",
@@ -396,6 +428,7 @@
   "gun": {
     "id": "gun",
     "name": "gun",
+    "article": "a",
     "plural": "guns",
     "emoji": "🔫",
     "longDesc": "allows you to hunt with better luck",
@@ -408,6 +441,7 @@
   "incredible_gun": {
     "id": "incredible_gun",
     "name": "incredible gun",
+    "article": "an",
     "plural": "incredible guns",
     "emoji": "🔫",
     "longDesc": "allows you to hunt with amazing luck",
@@ -422,6 +456,7 @@
   "baby_rabbit": {
     "id": "baby_rabbit",
     "name": "baby rabbit",
+    "article": "a",
     "plural": "baby rabbits",
     "emoji": "🐰",
     "longDesc": "tiny small baby rabbit, ur cat could kill this",
@@ -434,6 +469,7 @@
   "normal_rabbit": {
     "id": "normal_rabbit",
     "name": "normal rabbit",
+    "article": "a",
     "plural": "normal rabbits",
     "emoji": "🐰",
     "longDesc": "jumps around in ur garden",
@@ -446,6 +482,7 @@
   "large_rabbit": {
     "id": "large_rabbit",
     "name": "large rabbit",
+    "article": "a",
     "plural": "large rabbits",
     "emoji": "🐰",
     "longDesc": "massive fuck off rabbit like a bear",
@@ -458,6 +495,7 @@
   "deer": {
     "id": "deer",
     "name": "deer",
+    "article": "a",
     "emoji": "🦌",
     "longDesc": "not one of santa's.. anymore at least",
     "role": "prey",
@@ -469,6 +507,7 @@
   "llama": {
     "id": "llama",
     "name": "llama",
+    "article": "a",
     "emoji": "🦙",
     "longDesc": "cant spit anymore can it. how could you.",
     "role": "prey",
@@ -480,6 +519,7 @@
   "monkey": {
     "id": "monkey",
     "name": "monkey",
+    "article": "a",
     "aliases": ["monke"],
     "emoji": "🦧",
     "longDesc": "meeeee and my monkey... monkey doesnt wear any pants",
@@ -492,6 +532,7 @@
   "harambe": {
     "id": "harambe",
     "name": "harambe",
+    "article": "a",
     "emoji": "🦍",
     "longDesc": "he was innocent ):",
     "role": "prey",
@@ -503,6 +544,7 @@
   "giraffe": {
     "id": "giraffe",
     "name": "giraffe",
+    "article": "a",
     "emoji": "🦒",
     "longDesc": "its just a giraffe lol",
     "role": "prey",
@@ -514,6 +556,7 @@
   "lion": {
     "id": "lion",
     "name": "lion",
+    "article": "a",
     "emoji": "🦁",
     "longDesc": "rawr",
     "role": "prey",
@@ -525,6 +568,7 @@
   "panda": {
     "id": "panda",
     "name": "panda",
+    "article": "a",
     "emoji": "🐼",
     "longDesc": "useless and stupid but adorable",
     "role": "prey",
@@ -536,6 +580,7 @@
   "rat": {
     "id": "rat",
     "name": "rat",
+    "article": "a",
     "plural": "rats",
     "emoji": "🐀",
     "longDesc": "https://youtu.be/1hhl9kFTuQ8?t=19",
@@ -548,6 +593,7 @@
   "mouse": {
     "id": "mouse",
     "name": "mouse",
+    "article": "a",
     "plural": "mice",
     "emoji": "🐁",
     "longDesc": "squeak squeak",
@@ -560,6 +606,7 @@
   "kangaroo": {
     "id": "kangaroo",
     "name": "kangaroo",
+    "article": "a",
     "plural": "kangaroos",
     "emoji": "🦘",
     "longDesc": "australia",
@@ -572,6 +619,7 @@
   "wolf": {
     "id": "wolf",
     "name": "wolf",
+    "article": "a",
     "plural": "wolves",
     "emoji": "🐺",
     "longDesc": "bark.",
@@ -584,6 +632,7 @@
   "mineshaft_chest": {
     "id": "mineshaft_chest",
     "name": "mineshaft chest",
+    "article": "a",
     "plural": "mineshaft chests",
     "emoji": "<:nypsi_chest:1034843159647236190>",
     "role": "crate",
@@ -606,6 +655,7 @@
   "vote_crate": {
     "id": "vote_crate",
     "name": "vote crate",
+    "article": "a",
     "plural": "vote crates",
     "emoji": "📦",
     "role": "crate",
@@ -617,6 +667,7 @@
   "basic_crate": {
     "id": "basic_crate",
     "name": "basic crate",
+    "article": "a",
     "plural": "basic crates",
     "emoji": "📦",
     "role": "crate",
@@ -630,6 +681,7 @@
   "69420_crate": {
     "id": "69420_crate",
     "name": "69420 crate",
+    "article": "a",
     "plural": "69420 crates",
     "emoji": "🎁",
     "role": "crate",
@@ -643,6 +695,7 @@
   "nypsi_crate": {
     "id": "nypsi_crate",
     "name": "nypsi crate",
+    "article": "a",
     "plural": "nypsi crates",
     "emoji": "<:xnypsi:819957267548864543>",
     "role": "crate",
@@ -657,6 +710,7 @@
   "calendar": {
     "id": "calendar",
     "name": "calendar",
+    "article": "a",
     "plural": "calendars",
     "emoji": "📅",
     "longDesc": "protects your daily streak in the event you forget to do /daily",
@@ -669,6 +723,7 @@
   "padlock": {
     "id": "padlock",
     "name": "padlock",
+    "article": "a",
     "plural": "padlocks",
     "emoji": "🔒",
     "longDesc": "protect your balance",
@@ -681,6 +736,7 @@
   "lock_pick": {
     "id": "lock_pick",
     "name": "lock pick",
+    "article": "a",
     "plural": "lock picks",
     "emoji": "🧰",
     "longDesc": "destroy someone's padlock",
@@ -693,6 +749,7 @@
   "mask": {
     "id": "mask",
     "name": "mask",
+    "article": "a",
     "plural": "masks",
     "emoji": "😷",
     "longDesc": "bypass rob cooldown",
@@ -705,6 +762,7 @@
   "cookie": {
     "id": "cookie",
     "name": "cookie",
+    "article": "a",
     "plural": "cookies",
     "emoji": "🍪",
     "longDesc": "yum yum",
@@ -725,6 +783,7 @@
   "cake": {
     "id": "cake",
     "name": "cake",
+    "article": "a",
     "plural": "cakes",
     "emoji": "<:nypsi_cake:1002977512630001725>",
     "longDesc": "yum yum 😋",
@@ -744,6 +803,7 @@
   "tooth": {
     "id": "tooth",
     "name": "tooth",
+    "article": "a",
     "plural": "teeth",
     "emoji": "🦷",
     "longDesc": "its a molar i think",
@@ -754,6 +814,7 @@
   "bitch": {
     "id": "bitch",
     "name": "bitch",
+    "article": "a",
     "plural": "bitches",
     "emoji": "👧🏼",
     "longDesc": "i coded some bitches",
@@ -764,6 +825,7 @@
   "clover": {
     "id": "clover",
     "name": "clover leaf",
+    "article": "a",
     "plural": "clover leaves",
     "emoji": "🍀",
     "longDesc": "ur pretty lucky",
@@ -775,6 +837,7 @@
   "teddy": {
     "id": "teddy",
     "name": "teddy bear",
+    "article": "a",
     "plural": "teddy bears",
     "emoji": "🧸",
     "shortDesc": "[i love you](https://64.media.tumblr.com/3020949b864ff6fdeecdd80fe5b5859c/tumblr_mg5tw61IIQ1r5rz5so1_500.gif)",
@@ -787,6 +850,7 @@
   "floppy_disk": {
     "id": "floppy_disk",
     "name": "3d printed save icon",
+    "article": "a",
     "emoji": "💾",
     "longDesc": "we're getting old now",
     "rarity": 2,
@@ -797,6 +861,7 @@
   "test_tube": {
     "id": "test_tube",
     "name": "somebodys children",
+    "article": "a",
     "emoji": "🧪",
     "longDesc": "no comment",
     "rarity": 1,
@@ -808,6 +873,7 @@
     "id": "skyline_r34",
     "name": "nissan skyline gtr r34",
     "emoji": "<:nypsi_r34:839788651763990538>",
+    "article": "a",
     "longDesc": "#rippaulwalker",
     "rarity": 4,
     "role": "car",
@@ -818,6 +884,7 @@
   "toyota_supra": {
     "id": "toyota_supra",
     "name": "toyota supra mk4",
+    "article": "a",
     "emoji": "<:nypsi_supra:839790774354313227>",
     "longDesc": "[is that a supra?!](https://www.youtube.com/watch?v=ybZmYvaqwEg)",
     "rarity": 3,
@@ -829,6 +896,7 @@
   "lawyer": {
     "id": "lawyer",
     "name": "lawyer",
+    "article": "a",
     "plural": "lawyers",
     "emoji": "👨‍⚖️",
     "longDesc": "[if you're caught by the police on a robbery, you wont lose money](https://i.giphy.com/media/40dEau6bZRO3S/giphy.webp)",
@@ -843,6 +911,7 @@
   "minecraft_account": {
     "id": "minecraft_account",
     "name": "minecraft account",
+    "article": "a",
     "plural": "minecraft accounts",
     "emoji": "<:nypsi_minecraft:839560490324721735>",
     "longDesc": "[mining away... i dont know what to mine ill mine this anyway](https://www.youtube.com/watch?v=dgha9S39Y6M)",
@@ -854,6 +923,7 @@
   "ring": {
     "id": "ring",
     "name": "ring",
+    "article": "a",
     "plural": "rings",
     "emoji": "💍",
     "longDesc": "maybe get married?",
@@ -864,6 +934,7 @@
   "radio": {
     "id": "radio",
     "name": "police radio",
+    "article": "a",
     "plural": "police radios",
     "emoji": "📻",
     "longDesc": "prevent someone from robbing people",
@@ -877,6 +948,7 @@
   "lancer_evox": {
     "id": "lancer_evox",
     "name": "mitsubishi lancer evo x",
+    "article": "a",
     "emoji": "<:nypsi_evo:839788961399439380>",
     "longDesc": "mitsubishi > subuwu",
     "rarity": 0,
@@ -890,6 +962,7 @@
   "honda_civic": {
     "id": "honda_civic",
     "name": "honda civic type r",
+    "article": "a",
     "emoji": "<:nypsi_civic:976564488805437512>",
     "longDesc": "wait for the vtec to kick in",
     "rarity": 3,
@@ -903,6 +976,7 @@
   "subaru_wrx": {
     "id": "subaru_wrx",
     "name": "subuwu",
+    "article": "a",
     "emoji": "<:nypsi_subuwu:839788518549356595>",
     "longDesc": "uwu",
     "rarity": 2,
@@ -916,6 +990,7 @@
   "flappy_bird": {
     "id": "flappy_bird",
     "name": "flappy bird",
+    "article": "a",
     "plural": "flappy birds",
     "emoji": "<:nypsi_flappy_bird:839531060194967582>",
     "longDesc": "flap flap",
@@ -928,6 +1003,7 @@
   "chastity_cage": {
     "id": "chastity_cage",
     "name": "chastity cage",
+    "article": "a",
     "plural": "chastity cages",
     "emoji": "<:nypsi_chastity_cage:839532763338113036>",
     "longDesc": "stop someone finding milfs",
@@ -941,6 +1017,7 @@
   "tesla_modelx": {
     "id": "tesla_modelx",
     "name": "tesla model x",
+    "article": "a",
     "emoji": "<:nypsi_tesla:839791898540638209>",
     "longDesc": "electric car go nyowm",
     "rarity": 2,
@@ -954,6 +1031,7 @@
   "handcuffs": {
     "id": "handcuffs",
     "name": "handcuffs",
+    "article": "a",
     "plural": "handcuffs",
     "emoji": "<:nypsi_handcuffs:839797762404122654>",
     "longDesc": "simply handcuff someone",
@@ -967,6 +1045,7 @@
   "cycle": {
     "id": "cycle",
     "name": "bicycle",
+    "article": "a",
     "emoji": "<:nypsi_bikeman:969327640001531904>",
     "longDesc": "wow",
     "rarity": 69,
@@ -980,6 +1059,7 @@
   "smart_car": {
     "id": "smart_car",
     "name": "smart car",
+    "article": "a",
     "plural": "smart cars",
     "emoji": "<:nypsi_smart_car:839967953306386442>",
     "longDesc": "you should be embarrassed of yourself",
@@ -994,6 +1074,7 @@
   "lightning_mcqueen": {
     "id": "lightning_mcqueen",
     "name": "lightning mcqueen",
+    "article": "a",
     "emoji": "<:nypsi_mcqueen:839969848297914418>",
     "longDesc": "it's lightning mcqueen!",
     "rarity": 2,
@@ -1007,6 +1088,7 @@
   "fiat": {
     "id": "fiat",
     "name": "fiat from inbetweeners",
+    "article": "a",
     "plural": "fiats from inbetweeners",
     "emoji": "<:nypsi_fiat:840255037108256798>",
     "longDesc": "spread em. ill be there in half an hour",
@@ -1021,6 +1103,7 @@
   "ford_fiesta": {
     "id": "ford_fiesta",
     "name": "ford fiesta",
+    "article": "a",
     "emoji": "<:nypsi_fiesta:840256269683523616>",
     "longDesc": "skrt skrt",
     "rarity": 1,
@@ -1034,6 +1117,7 @@
   "vauxhall_corsa": {
     "id": "vauxhall_corsa",
     "name": "corsa 2003",
+    "article": "a",
     "emoji": "<:nypsi_corsa:840256040083521636>",
     "longDesc": "ayo chav check",
     "rarity": 1,
@@ -1047,6 +1131,7 @@
   "redbull": {
     "id": "redbull",
     "name": "red bull",
+    "article": "a",
     "plural": "red bulls",
     "emoji": "<:nypsi_redbull:1001210452832964648>",
     "longDesc": "50% shorter cooldowns for 15 minutes",
@@ -1065,6 +1150,7 @@
   "worm": {
     "id": "worm",
     "name": "worm",
+    "article": "a",
     "plural": "worms",
     "emoji": "🪱",
     "longDesc": "increased luck when fishing",
@@ -1083,6 +1169,7 @@
   "extended_mag": {
     "id": "extended_mag",
     "name": "extended magazine",
+    "article": "an",
     "plural": "extended magazines",
     "emoji": "<:nypsi_extendedmag:1089515476922683495>",
     "longDesc": "increased luck when hunting",
@@ -1102,6 +1189,7 @@
   "multi_potion": {
     "id": "multi_potion",
     "name": "multiplier potion",
+    "article": "a",
     "plural": "multiplier potions",
     "aliases": ["multi", "multiplierpotion", "multiplier_potion", "multiplier"],
     "emoji": "<:nypsi_potion:1001463080582131843>",
@@ -1122,6 +1210,7 @@
   "fortune": {
     "id": "fortune",
     "name": "fortune",
+    "article": "a",
     "emoji": "<a:nypsi_book:1001459250163359786>",
     "longDesc": "enchant your pickaxe with fortune (stacks to 3)",
     "rarity": 2,
@@ -1140,6 +1229,7 @@
   "unbreaking": {
     "id": "unbreaking",
     "name": "unbreaking",
+    "article": "an",
     "emoji": "<a:nypsi_book:1001459250163359786>",
     "longDesc": "when mining, fishing or hunting it will not reduce durability",
     "rarity": 4,
@@ -1159,6 +1249,7 @@
   "efficiency": {
     "id": "efficiency",
     "name": "efficiency",
+    "article": "an",
     "plural": "efficiencies",
     "emoji": "<a:nypsi_book:1001459250163359786>",
     "longDesc": "enchant your pickaxe with efficiency (stacks to 4)",
@@ -1178,6 +1269,7 @@
   "xp_potion": {
     "id": "xp_potion",
     "name": "xp potion",
+    "article": "an",
     "plural": "xp potions",
     "emoji": "<:nypsi_potion:1001463080582131843>",
     "longDesc": "earn 30% more xp for 30 minutes (stacks to 3)",
@@ -1199,6 +1291,7 @@
     "id": "lucky_7",
     "name": "lucky 7",
     "aliases": ["lucky", "7"],
+    "article": "a",
     "emoji": "<:nypsi_7:1001553113368506538>",
     "longDesc": "improved chances for slots for 3 minutes",
     "rarity": 3,
@@ -1216,6 +1309,7 @@
   "stolen_credit_card": {
     "id": "stolen_credit_card",
     "name": "stolen credit card",
+    "article": "a",
     "plural": "stolen credit cards",
     "aliases": ["scc", "credit", "card", "cc"],
     "emoji": "💳",
@@ -1229,6 +1323,7 @@
   "streak_token": {
     "id": "streak_token",
     "name": "streak token",
+    "article": "a",
     "plural": "streak tokens",
     "aliases": ["streak"],
     "emoji": "🎟️",
@@ -1242,6 +1337,7 @@
   "blue_rocks": {
     "id": "blue_rocks",
     "name": "blue rocks",
+    "article": "a",
     "plural": "blue rocks",
     "aliases": ["meth", "C10H15N"],
     "emoji": "<:nypsi_bluerock:1003408529954177144>",
@@ -1261,6 +1357,7 @@
   "steroids": {
     "id": "steroids",
     "name": "steroids",
+    "article": "a",
     "plural": "steroids",
     "aliases": ["roids"],
     "emoji": "💉",
@@ -1280,6 +1377,7 @@
   "vote_booster": {
     "id": "vote_booster",
     "name": "vote booster",
+    "article": "a",
     "emoji": "✨",
     "longDesc": "increase your multiplier by 5% from voting",
     "rarity": 69,
@@ -1295,6 +1393,7 @@
   "coffee": {
     "id": "coffee",
     "name": "coffee",
+    "article": "a",
     "aliases": ["caffeine"],
     "emoji": "\u2615",
     "longDesc": "feed your workers with coffee and produce 50% more items per hour for 6 hours (stacks to 3)",
@@ -1313,6 +1412,7 @@
   "stolen_nasa_computer": {
     "id": "stolen_nasa_computer",
     "name": "stolen nasa computer",
+    "article": "a",
     "plural": "stolen nasa computers",
     "aliases": ["nasa", "computer"],
     "emoji": "🖥",
@@ -1326,6 +1426,7 @@
   "launchpad": {
     "id": "launchpad",
     "name": "launchpad",
+    "article": "a",
     "plural": "launchpads",
     "aliases": ["launch"],
     "emoji": "🚀",
@@ -1339,6 +1440,7 @@
   "warehouse_permit": {
     "id": "warehouse_permit",
     "name": "warehouse permit",
+    "article": "a",
     "plural": "warehouse permits",
     "aliases": ["warehouse", "permit"],
     "emoji": "📄",
@@ -1352,6 +1454,7 @@
   "orphan": {
     "id": "orphan",
     "name": "orphan",
+    "article": "an",
     "plural": "orphans",
     "emoji": "🧒🏼",
     "longDesc": "applies the underage workers upgrade to the amazon worker",
@@ -1364,6 +1467,7 @@
   "grandma": {
     "id": "grandma",
     "name": "grandma",
+    "article": "a",
     "plural": "grandmas",
     "aliases": ["gran", "nan", "uncle"],
     "emoji": "👵🏻",
@@ -1377,6 +1481,7 @@
   "grandpa": {
     "id": "grandpa",
     "name": "grandpa",
+    "article": "a",
     "plural": "grandpas",
     "aliases": ["grandad", "granda", "grandaddy"],
     "emoji": "👴🏻",
@@ -1389,6 +1494,8 @@
   "oven": {
     "id": "oven",
     "name": "easy bake oven",
+    "article": "an",
+    "plural": "ovens",
     "aliases": ["cooker", "easybakeoven", "easybake", "easy_bake_oven"],
     "emoji": "<:nypsi_oven:1099724311138414743>",
     "longDesc": "+1 hour afk time",
@@ -1401,6 +1508,7 @@
   "highroller": {
     "id": "highroller",
     "name": "highroller",
+    "article": "a",
     "plural": "highrollers",
     "aliases": ["high", "roller"],
     "emoji": "💸",
@@ -1419,6 +1527,7 @@
   "steve": {
     "id": "steve",
     "name": "steve",
+    "article": "a",
     "plural": "steves",
     "aliases": ["stevieee", "stephen", "stephen", "maxsdad", "ste_ste_ste"],
     "emoji": "👷🏻‍♂️",
@@ -1437,6 +1546,7 @@
   "palm_tree": {
     "id": "palm_tree",
     "name": "palm tree necklace",
+    "article": "a",
     "emoji": "<:nypsi_necklace:1032965107896029185>",
     "longDesc": "it's the bot owner's actual necklace!!",
     "rarity": 5,
@@ -1449,6 +1559,7 @@
   "double_xp": {
     "id": "double_xp",
     "name": "double xp",
+    "article": "a",
     "emoji": "✨",
     "longDesc": "earn double xp for 4 hours",
     "rarity": 4,
@@ -1466,6 +1577,7 @@
   "nether_portal": {
     "id": "nether_portal",
     "name": "nether portal",
+    "article": "a",
     "emoji": "<:nypsi_portal:1034509723749322843>",
     "longDesc": "used to enter the nether when mining",
     "role": "item",
@@ -1482,6 +1594,7 @@
   "green_gem": {
     "id": "green_gem",
     "name": "green gem",
+    "article": "a",
     "emoji": "<:nypsi_gem_green:1046866209326514206>",
     "longDesc": "a mysterious green, shiny gem. only found during a specific activity. it is widely known that the green gem is harmless... mostly. the most noble of all gems",
     "role": "item",
@@ -1498,6 +1611,7 @@
   "purple_gem": {
     "id": "purple_gem",
     "name": "purple gem",
+    "article": "a",
     "emoji": "<:nypsi_gem_purple:1046932495184187452>",
     "longDesc": "a mysterious purple, shiny gem. only found during a specific activity. some say gems are magical, made by witches. and are dangerous...",
     "role": "item",
@@ -1513,6 +1627,7 @@
   "pink_gem": {
     "id": "pink_gem",
     "name": "pink gem",
+    "article": "a",
     "emoji": "<:nypsi_gem_pink:1046932847069499472>",
     "longDesc": "a mysterious pink, shiny gem. only found during a specific activity. some say gems were planted by aliens in the early stages of earth's creation",
     "role": "item",
@@ -1528,6 +1643,7 @@
   "blue_gem": {
     "id": "blue_gem",
     "name": "blue gem",
+    "article": "a",
     "emoji": "<:nypsi_gem_blue:1046933487770423406>",
     "longDesc": "a mysterious blue, shiny gem. only found during a specific activity. some say gems are ancient relics of a long past civilization",
     "role": "item",
@@ -1544,6 +1660,7 @@
   "white_gem": {
     "id": "white_gem",
     "name": "white gem",
+    "article": "a",
     "emoji": "<:nypsi_gem_white:1046933670436552725>",
     "longDesc": "a mysterious white, shiny gem. the most ancient and most powerful of them all. ancient tablets claim that the holder of this gem has the power to create worlds. be careful.",
     "role": "item",
@@ -1559,6 +1676,7 @@
   "crystal_heart": {
     "id": "crystal_heart",
     "name": "crystal heart",
+    "article": "a",
     "emoji": "<:nypsi_crystal_heart:1051624572694319124>",
     "longDesc": "it's widely understood throughout history, that nobody truly understands the origin of any gem, including the crystal heart. ancient hieroglyphs depict the crystal heart forming when all gems in existence fuse together. quite a sight to behold.",
     "role": "item",
@@ -1570,6 +1688,7 @@
   "beginner_booster": {
     "id": "beginner_booster",
     "name": "new player booster",
+    "article": "a",
     "emoji": "✨",
     "longDesc": "24 hour 10% multi and double xp booster for new players",
     "rarity": 69,
@@ -1586,6 +1705,7 @@
   "cursor": {
     "id": "cursor",
     "name": "cursor",
+    "article": "a",
     "plural": "cursors",
     "aliases": ["pointer"],
     "emoji": "<:nypsi_cursor:1054771565557981244>",
@@ -1598,6 +1718,7 @@
   "super_cursor": {
     "id": "super_cursor",
     "name": "super cursor",
+    "article": "a",
     "plural": "super cursors",
     "aliases": ["super_pointer", "super pointer"],
     "emoji": "<:super_cursor:1090263183278739517>",
@@ -1615,6 +1736,7 @@
   "workers_crate": {
     "id": "workers_crate",
     "name": "workers crate",
+    "article": "a",
     "plural": "worker crates",
     "emoji": "<:worker_crate:1057639345441476668>",
     "role": "crate",
@@ -1628,6 +1750,7 @@
   "boosters_crate": {
     "id": "boosters_crate",
     "name": "boosters crate",
+    "article": "a",
     "plural": "booster crates",
     "emoji": "<:booster_crate:1057640419892133968>",
     "role": "crate",
@@ -1642,6 +1765,7 @@
   "gem_crate": {
     "id": "gem_crate",
     "name": "gem crate",
+    "article": "a",
     "plural": "gem crates",
     "emoji": "<:gem_crate:1057641447756660747>",
     "role": "crate",
@@ -1664,6 +1788,7 @@
   "bronze_credit": {
     "id": "bronze_credit",
     "name": "bronze credit",
+    "article": "a",
     "emoji": "<:nypsi_bronze:1108083689478443058>",
     "role": "item",
     "shortDesc": "7 days of bronze credit",
@@ -1676,6 +1801,7 @@
   "silver_credit": {
     "id": "silver_credit",
     "name": "silver credit",
+    "article": "a",
     "emoji": "<:nypsi_silver:1108083725813686334>",
     "role": "item",
     "shortDesc": "7 days of silver credit",
@@ -1692,6 +1818,7 @@
   "gold_credit": {
     "id": "gold_credit",
     "name": "gold credit",
+    "article": "a",
     "emoji": "<:nypsi_gold:1108083767236640818>",
     "role": "item",
     "shortDesc": "7 days of gold credit",
@@ -1707,6 +1834,7 @@
   "platinum_credit": {
     "id": "platinum_credit",
     "name": "platinum credit",
+    "article": "a",
     "emoji": "<:nypsi_plat:1108083805841002678>",
     "role": "item",
     "shortDesc": "7 days of platinum credit",
@@ -1722,6 +1850,7 @@
   "daily_scratch_card": {
     "id": "daily_scratch_card",
     "name": "daily scratch card",
+    "article": "a",
     "plural": "daily scratch cards",
     "emoji": "<:nypsi_daily_scratch:1061368847522869289>",
     "role": "scratch-card",
@@ -1758,6 +1887,7 @@
   "lucky_scratch_card": {
     "id": "lucky_scratch_card",
     "name": "lucky scratch card",
+    "article": "a",
     "plural": "lucky scratch cards",
     "emoji": "<:nypsi_daily_scratch:1061368847522869289>",
     "role": "scratch-card",
@@ -1800,6 +1930,7 @@
   "legendary_scratch_card": {
     "id": "legendary_scratch_card",
     "name": "legendary scratch card",
+    "article": "a",
     "plural": "legendary scratch cards",
     "emoji": "<:nypsi_legendary_scratch:1061405285245272074>",
     "role": "scratch-card",
@@ -1836,6 +1967,7 @@
   "karma_scratch_card": {
     "id": "karma_scratch_card",
     "name": "karma scratch card",
+    "article": "a",
     "plural": "karma scratch cards",
     "emoji": "<:nypsi_daily_scratch:1061368847522869289>",
     "role": "scratch-card",
@@ -1866,6 +1998,7 @@
   "corner_shop_scratchie": {
     "id": "corner_shop_scratchie",
     "name": "corner shop scratchie",
+    "article": "a",
     "plural": "corner shop scratchies",
     "emoji": "<:nypsi_daily_scratch:1061368847522869289>",
     "role": "scratch-card",
@@ -1910,6 +2043,7 @@
   "bob": {
     "id": "bob",
     "name": "bob the builder",
+    "article": "a",
     "plural": "bob the builders",
     "emoji": "<:nypsi_bob:1078776552067694672>",
     "longDesc": "remove an hour of time from all your items being crafted",
@@ -1922,6 +2056,7 @@
   "gem_shard": {
     "id": "gem_shard",
     "name": "gem shard",
+    "article": "a",
     "plural": "gem shards",
     "emoji": "<:nypsi_gem_shard:1088524343367188510>",
     "longDesc": "gem shards have no known powers unlike intact shards, however, it is known that when you put enough gem shards together they will reliably form into full shards, if you're lucky...",
@@ -1936,6 +2071,7 @@
   "quarry_scrap": {
     "id": "quarry_scrap",
     "name": "quarry scrap",
+    "article": "a",
     "plural": "quarry scraps",
     "aliases": ["scrap", "scraps", "quarry"],
     "emoji": "🪨",
@@ -1949,6 +2085,7 @@
   "gem_radar": {
     "id": "gem_radar",
     "name": "gem radar",
+    "article": "a",
     "plural": "gem radars",
     "aliases": ["radar"],
     "emoji": "📡",
@@ -1967,6 +2104,7 @@
   "earth_scanner": {
     "id": "earth_scanner",
     "name": "earth scanner",
+    "article": "an",
     "plural": "earth scanners",
     "aliases": ["scanner", "earth"],
     "emoji": "📟",
@@ -1985,6 +2123,7 @@
   "manager": {
     "id": "manager",
     "name": "manager",
+    "article": "a",
     "plural": "manager",
     "emoji": "👨🏻‍💼",
     "longDesc": "increases profit per item in your quarry",
@@ -1998,6 +2137,7 @@
   "shipping_container": {
     "id": "shipping_container",
     "name": "shipping container",
+    "article": "a",
     "plural": "shipping containers",
     "aliases": ["container", "containers", "shipping", "ship"],
     "emoji": "<:nypsi_container:1088558592187179188>",
@@ -2012,6 +2152,7 @@
   "viagra": {
     "id": "viagra",
     "name": "viagra",
+    "article": "a",
     "plural": "viagras",
     "emoji": "<:nypsi_viagra:1090257077227761694>",
     "longDesc": "if you cant get it up...",
@@ -2031,6 +2172,7 @@
   "rick_astley": {
     "id": "rick_astley",
     "name": "rick astley",
+    "article": "a",
     "emoji": "<a:rick_astley:1100529748796506203>",
     "longDesc": "rick roll someone",
     "rarity": 2,
@@ -2042,6 +2184,7 @@
   "lucky_cheese": {
     "id": "lucky_cheese",
     "name": "lucky cheese",
+    "article": "a",
     "plural": "lucky cheese",
     "aliases": ["cheese"],
     "emoji": "🧀",
