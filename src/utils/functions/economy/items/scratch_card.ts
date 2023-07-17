@@ -102,7 +102,9 @@ async function prepare(
         result: card.won ? "win" : "lose",
       });
 
-      embed.setDescription(`**${card.remainingClicks}** click${card.remainingClicks} != 1 ? "s" : ""} left`);
+      embed.setDescription(
+        `**${card.remainingClicks}** click${card.remainingClicks} != 1 ? "s" : ""} left`,
+      );
       embed.setFooter({ text: `id: ${gameId}` });
 
       if (
@@ -184,7 +186,9 @@ async function prepare(
     });
 
     if (card.remainingClicks !== 0) {
-      embed.setDescription(`**${card.remainingClicks}** click${card.remainingClicks} != 1 ? "" : ""} left`);
+      embed.setDescription(
+        `**${card.remainingClicks}** click${card.remainingClicks} != 1 ? "" : ""} left`,
+      );
       await msg.edit({ embeds: [embed], components: card.getButtons() });
     }
     return play();
