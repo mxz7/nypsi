@@ -53,7 +53,9 @@ module.exports = new ItemUse(
       !inventory.find((i) => i.item == selected.id) ||
       inventory.find((i) => i.item == selected.id).amount == 0
     ) {
-      return send({ embeds: [new ErrorEmbed(`you dont have ${selected.article} ${selected.name}`)] });
+      return send({
+        embeds: [new ErrorEmbed(`you dont have ${selected.article} ${selected.name}`)],
+      });
     }
 
     let amount = 1;
