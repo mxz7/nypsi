@@ -54,7 +54,7 @@ export async function addBakeryUpgrade(member: GuildMember | string, itemId: str
     create: {
       userId: id,
       upgradeId: itemId,
-      amount: 1,
+      amount: amount,
     },
   });
 
