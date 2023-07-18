@@ -106,7 +106,7 @@ export async function calcEarnedGambleXp(
     }
   }
 
-  if (min < max * 0.2) min = max * 0.2;
+  if (min < max * 0.3) min = max * 0.3;
 
   let earned = Math.floor(Math.random() * (max - min)) + min;
 
