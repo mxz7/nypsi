@@ -20,9 +20,9 @@ for (const item of Object.values(items)) {
       expect(typeof item.boosterEffect.effect).toBe("number");
       expect(typeof item.boosterEffect.time).toBe("number");
 
-      expect(Array.isArray(item.boosterEffect.effect)).toBe(true);
+      expect(Array.isArray(item.boosterEffect.boosts)).toBe(true);
 
-      for (const effect of item.boosterEffect.effect) {
+      for (const effect of item.boosterEffect.boosts) {
         expect(typeof effect).toBe("string");
       }
     }
@@ -31,10 +31,13 @@ for (const item of Object.values(items)) {
       expect(typeof item.clicks).toBe("number");
 
       for (const reward of item.items) {
-        if (reward.startsWith("money") || reward.startsWith("xp")) {
+        if (reward.startsWith("money") || reward.startsWith("xp") || reward.startsWith("karma")) {
           expect(Number(reward.split(":")[1])).toBeGreaterThan(0);
         } else {
           expect(Boolean(items[reward.split(":")[1]])).toBe(true);
+        }
+
+        if (reward.split(":")[2]) {
           expect(Number(reward.split(":")[2])).toBeGreaterThan(0);
           expect(Number(reward.split(":")[2])).toBeLessThanOrEqual(100);
         }
