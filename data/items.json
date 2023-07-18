@@ -1301,7 +1301,7 @@
     "stackable": false,
     "boosterEffect": {
       "boosts": ["slots"],
-      "effect": "improves slots win chance to 60%",
+      "effect": 7,
       "time": 180
     },
     "in_crates": true
@@ -1342,6 +1342,7 @@
     "aliases": ["meth", "C10H15N"],
     "emoji": "<:nypsi_bluerock:1003408529954177144>",
     "longDesc": "https://youtu.be/Dbt-OfbQTpw?t=28",
+    "booster_desc": "improves fight strength",
     "rarity": 0,
     "buy": 0,
     "sell": 25000,
@@ -1349,7 +1350,7 @@
     "stackable": false,
     "boosterEffect": {
       "boosts": ["fight"],
-      "effect": "improves fight strength",
+      "effect": 0,
       "time": 1800
     },
     "in_crates": true
@@ -1363,13 +1364,14 @@
     "emoji": "💉",
     "longDesc": "https://tenor.com/view/ambeeee-gif-19218531",
     "rarity": 0,
+    "booster_desc": "improves fight strength",
     "buy": 100000,
     "sell": 75000,
     "role": "booster",
     "stackable": false,
     "boosterEffect": {
       "boosts": ["fight"],
-      "effect": "improves fight strength",
+      "effect": 0,
       "time": 3600
     },
     "in_crates": true

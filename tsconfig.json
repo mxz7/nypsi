@@ -4,7 +4,6 @@
     "outDir": "./dist",
     "target": "ESNext",
     "module": "commonjs",
-    "allowJs": true,
     "strictFunctionTypes": true,
     "skipLibCheck": true,
     "noImplicitAny": true
