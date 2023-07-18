@@ -90,7 +90,9 @@ module.exports = new ItemUse(
       embeds: [
         new CustomEmbed(
           message.member,
-          `using ${amount} stolen credit card${amount > 1 ? "s" : ""}...\n\nsuccessfully added $**${addedAmount.toLocaleString()}** to your bank capacity`,
+          `using ${amount} stolen credit card${
+            amount > 1 ? "s" : ""
+          }...\n\nsuccessfully added $**${addedAmount.toLocaleString()}** to your bank capacity`,
         ),
       ],
     });
