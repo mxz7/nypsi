@@ -6,7 +6,7 @@ export interface Item {
   longDesc: string;
   buy?: number;
   sell?: number;
-  role?: string;
+  role: string;
   booster_desc?: string;
   aliases?: string[];
   speed?: number;
@@ -20,7 +20,7 @@ export interface Item {
     effect: number;
     time: number;
   };
-  worker_upgrade_id: string;
+  worker_upgrade_id?: string;
   plural?: string;
   article: string;
   craft?: {
