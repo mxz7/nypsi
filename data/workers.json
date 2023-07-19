@@ -63,7 +63,8 @@
     },
     "nasa_computers": {
       "id": "nasa_computers",
-      "name": "nasa computers",
+      "name": "nasa computer",
+      "plural": "nasa computers",
       "upgrades": "per_interval",
       "effect": 0.75,
       "stack_limit": 15,
@@ -72,6 +73,7 @@
     "launchpad": {
       "id": "launchpad",
       "name": "launchpad",
+      "plural": "launchpads",
       "upgrades": "max_storage",
       "effect": 1.2,
       "stack_limit": 10,
@@ -80,6 +82,7 @@
     "warehouse_expansion": {
       "id": "warehouse_expansion",
       "name": "warehouse expansion",
+      "plural": "warehouse expansions",
       "upgrades": "max_storage",
       "effect": 0.4,
       "stack_limit": 15,
@@ -87,7 +90,8 @@
     },
     "underage_workers": {
       "id": "underage_workers",
-      "name": "underage workers",
+      "name": "underage worker",
+      "plural": "underage workers",
       "upgrades": "per_item",
       "effect": 0.75,
       "stack_limit": 10,
@@ -96,6 +100,7 @@
     "drill": {
       "id": "drill",
       "name": "drill",
+      "plural": "drills",
       "upgrades": "per_interval",
       "effect": 0.2,
       "stack_limit": 15,
@@ -105,6 +110,7 @@
     "manager": {
       "id": "manager",
       "name": "manager",
+      "plural": "managers",
       "upgrades": "per_item",
       "effect": 0.75,
       "stack_limit": 15,
@@ -112,7 +118,8 @@
     },
     "shipping_containers": {
       "id": "shipping_containers",
-      "name": "shipping containers",
+      "name": "shipping container",
+      "plural": "shipping containers",
       "upgrades": "max_storage",
       "effect": 0.4,
       "stack_limit": 10,
@@ -121,6 +128,7 @@
     "gem_radar": {
       "id": "gem_radar",
       "name": "gem radar",
+      "plural": "gem radars",
       "upgrades": "gem_chance",
       "effect": 0.003,
       "stack_limit": 10,
@@ -129,6 +137,7 @@
     "earth_scanner": {
       "id": "earth_scanner",
       "name": "earth scanner",
+      "plural": "earth scanners",
       "upgrades": "scrap_chance",
       "effect": 0.003,
       "stack_limit": 10,

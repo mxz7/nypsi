@@ -351,7 +351,7 @@ async function run(
       embeds: [
         new CustomEmbed(
           message.member,
-          `you have activated **${upgrade.name}** on your **${
+          `you have activated ${amount} **${amount != 1 && upgrade.plural ? upgrade.plural : upgrade.name}** on your **${
             getBaseWorkers()[upgrade.for].name
           }**\n\n${userUpgrade ? userUpgrade.amount + amount : amount}/${upgrade.stack_limit}`,
         ).setHeader("use", message.author.avatarURL()),
@@ -390,9 +390,9 @@ async function run(
 
     const embed = new CustomEmbed(
       message.member,
-      `you have activated the ${items[selected.id].emoji} ${
+      `you have activated ${amount} ${items[selected.id].emoji} ${
         items[selected.id].name
-      } upgrade on your bakery`,
+      } upgrade${amount != 1 ? "s" : ""} on your bakery`,
     ).setHeader("use", message.author.avatarURL());
 
     embed.addField(
