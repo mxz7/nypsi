@@ -13,6 +13,7 @@ export interface Worker {
 
 export interface WorkerUpgrades {
   name: string;
+  plural?: string;
   id: string;
   upgrades: PossibleUpgrade;
   effect: number; // decimal

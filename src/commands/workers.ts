@@ -334,7 +334,7 @@ async function run(
       if (baseUpgrades[upgradeId].base_cost) {
         const owned = userWorker.upgrades.find((u) => u.upgradeId == upgradeId)?.amount || 0;
 
-        desc += `**${baseUpgrades[upgradeId].name}** ${owned}/${baseUpgrades[upgradeId].stack_limit}`;
+        desc += `**${baseUpgrades[upgradeId].plural ? baseUpgrades[upgradeId].plural : baseUpgrades[upgradeId].name}** ${owned}/${baseUpgrades[upgradeId].stack_limit}`;
 
         const button = new ButtonBuilder()
           .setCustomId(`up-${upgradeId}`)
@@ -351,7 +351,7 @@ async function run(
 
         row.addComponents(button);
       } else if (userWorker.upgrades.find((u) => u.upgradeId == upgradeId)) {
-        desc += `**${baseUpgrades[upgradeId].name}** ${
+        desc += `**${baseUpgrades[upgradeId].plural ? baseUpgrades[upgradeId].plural : baseUpgrades[upgradeId].name}** ${
           userWorker.upgrades.find((u) => u.upgradeId == upgradeId).amount
         }/${baseUpgrades[upgradeId].stack_limit}\n`;
       }
