@@ -539,6 +539,10 @@ async function run(
     return send({ embeds: [embed] });
   };
 
+  function findStatAmount(stats: {amount: number; itemId: string;}[], id: string) {
+    return stats.find((i) => i.itemId === id)?.amount.toLocaleString() || "0";
+  }
+
   const auctionStats = async () => {
     const stats = await getStats(message.member);
 
@@ -547,12 +551,12 @@ async function run(
         new CustomEmbed(
           message.member,
           `you have created **${
-            stats.find((i) => i.itemId === "auction-created")?.amount.toLocaleString() || 0
-          }** auctions and sold **${
-            stats.find((i) => i.itemId === "auction-sold-items")?.amount.toLocaleString() || 0
-          }** items\n\nyou have bought **${
-            stats.find((i) => i.itemId === "auction-bought-items")?.amount.toLocaleString() || 0
-          }** items through auctions`,
+            findStatAmount(stats, "auction-created")
+          }** auction${findStatAmount(stats, "auction-created") === "1" ? "" : "s"} and sold **${
+            findStatAmount(stats, "auction-sold-items")
+          }** item${findStatAmount(stats, "auction-sold-items") === "1" ? "" : "s"}\n\nyou have bought **${
+            findStatAmount(stats, "auction-bought-items")
+          }** item${findStatAmount(stats, "auction-bought-items") === "1" ? "" : "s"} through auctions`,
         ),
       ],
     });
