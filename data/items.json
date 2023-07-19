@@ -259,7 +259,7 @@
     "id": "gold_ore",
     "name": "gold ore",
     "article": "a",
-    "plural": "iron ore",
+    "plural": "gold ore",
     "emoji": "<:nypsi_gold_ore:959444923139121223>",
     "longDesc": "can be smelted into a gold ingot with a furnace and coal",
     "role": "ore",
