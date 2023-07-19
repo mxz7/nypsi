@@ -44,7 +44,7 @@ const client = new NypsiClient({
     GuildForumThreadManager: 0,
     GuildTextThreadManager: 0,
     UserManager: {
-      maxSize: 34710,
+      maxSize: 10_000,
       keepOverLimit: (user) => user.id === user.client.user.id,
     },
     GuildMemberManager: {
