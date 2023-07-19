@@ -564,7 +564,7 @@ async function playGame(
 
     if (res && res.customId == "rp") {
       await res.deferUpdate();
-      logger.info(`::cmd ${message.guild.id} - ${message.author.username}: replaying blackjack`);
+      logger.info(`::cmd ${message.guild.id} ${message.author.username}: replaying blackjack`);
       if (await isLockedOut(message.author.id)) return verifyUser(message);
 
       addHourlyCommand(message.member);
