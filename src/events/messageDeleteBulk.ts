@@ -1,6 +1,7 @@
 import { Collection, Message, Snowflake, TextBasedChannel } from "discord.js";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { addLog, isLogsEnabled } from "../utils/functions/moderation/logs";
+import { logger } from "../utils/logger";
 import dayjs = require("dayjs");
 
 export default async function messageDeleteBulk(
@@ -9,7 +10,10 @@ export default async function messageDeleteBulk(
 ) {
   if (channel.isDMBased()) return;
 
+  logger.debug(`bulk delete: ${channel.guildId} (${channel.guild.name})`);
+
   if (await isLogsEnabled(channel.guild)) {
+    logger.debug("logs enabled");
     const embed = new CustomEmbed().disableFooter().setTimestamp();
 
     embed.setTitle(`${messages.size} messages deleted in #${channel.name} [bulk delete]`);
@@ -36,6 +40,9 @@ export default async function messageDeleteBulk(
 
     embed.setDescription(`\`\`\`${desc.join("\n")}\`\`\``);
 
+    logger.debug(`formatted`);
+
     await addLog(channel.guild, "message", embed);
+    logger.debug("added logs");
   }
 }
