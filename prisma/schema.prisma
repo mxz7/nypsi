@@ -22,6 +22,7 @@ model User {
   adminLevel        Int      @default(0)
   booster           Boolean  @default(false)
   badges            String[]
+  totalSpend        Float    @default(0)
 
   Economy        Economy?
   Premium        Premium?
@@ -33,6 +34,7 @@ model User {
   Preferences    Preferences?
   Leaderboards   Leaderboards[]
   ActiveChannels ActiveChannels[]
+  KofiPurchases  KofiPurchases[]
 }
 
 model Leaderboards {
@@ -605,8 +607,12 @@ model SupportRequest {
 model KofiPurchases {
   id String @id @default(uuid())
 
-  email String
-  item  String
+  date   DateTime @default(now())
+  email  String?
+  item   String
+  userId String?
+
+  user User? @relation(fields: [userId], references: [id])
 }
 
 // data for creating graphs
@@ -627,7 +633,7 @@ model ActiveChannels {
   channelId String
   date      DateTime @default(now())
 
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([userId, channelId])
 }
