@@ -33,6 +33,7 @@ model User {
   Preferences    Preferences?
   Leaderboards   Leaderboards[]
   ActiveChannels ActiveChannels[]
+  KofiPurchases  KofiPurchases[]
 }
 
 model Leaderboards {
@@ -605,8 +606,13 @@ model SupportRequest {
 model KofiPurchases {
   id String @id @default(uuid())
 
-  email String
-  item  String
+  date   DateTime @default(now())
+  email  String?
+  item   String
+  cost   Float    @default(0)
+  userId String?
+
+  user User? @relation(fields: [userId], references: [id])
 }
 
 // data for creating graphs
