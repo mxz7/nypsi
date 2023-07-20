@@ -273,6 +273,27 @@ async function handleKofiData(data: KofiResponse) {
     }`,
   );
 
+  if (data.type === "Donation") {
+    if (user) {
+      await prisma.user.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          totalSpend: { increment: parseFloat(data.amount) },
+        },
+      });
+
+      await prisma.kofiPurchases.create({ data: { item: "donation", userId: user.id } });
+    } else {
+      await prisma.kofiPurchases.create({
+        data: { item: `donation-${data.amount}`, email: data.email },
+      });
+    }
+
+    return;
+  }
+
   if (data.shop_items && data.shop_items.length > 0) {
     for (const shopItem of data.shop_items) {
       const item = Constants.KOFI_PRODUCTS.get(shopItem.direct_link_code);

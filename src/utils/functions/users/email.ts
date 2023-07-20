@@ -59,47 +59,79 @@ export async function checkPurchases(id: string, client: NypsiClient) {
   for (const item of query) {
     logger.info(`giving purchased item to ${id}`, item);
 
-    await prisma.user.update({
-      where: {
-        id,
-      },
-      data: {
-        totalSpend: {
-          increment:
-            Array.from(Constants.KOFI_PRODUCTS.values()).find((i) => i.name === item.item)?.cost ||
-            0,
+    if (item.item.startsWith("donation-")) {
+      await prisma.user.update({
+        where: {
+          id,
         },
-      },
-    });
-
-    if (premiums.includes(item.item)) {
-      if (await isPremium(id)) {
-        if ((await getPremiumProfile(id)).getLevelString().toLowerCase() != item.item) {
-          await setTier(id, premiums.indexOf(item.item) + 1, client);
-          await renewUser(id, client);
-        } else {
-          await renewUser(id, client);
-        }
-      } else {
-        await addMember(id, premiums.indexOf(item.item) + 1, client);
-      }
-    } else {
-      await addInventoryItem(id, item.item, 1, false);
+        data: {
+          totalSpend: { increment: parseFloat(item.item.split("-")[1] || "0") },
+        },
+      });
 
       if ((await getDmSettings(id)).premium) {
         const payload: NotificationPayload = {
           memberId: id,
           payload: {
-            content: "thank you for your purchase",
+            content: "thank you for your donation",
             embed: new CustomEmbed()
               .setDescription(
-                `you have received 1 ${getItems()[item.item].emoji} ${getItems()[item.item].name}`,
+                `thank you very much for your donation of ${Intl.NumberFormat("en-GB", {
+                  style: "currency",
+                  currency: "GBP",
+                }).format(parseFloat(item.item.split("-")[1] || "0"))}`,
               )
               .setColor(Constants.TRANSPARENT_EMBED_COLOR),
           },
         };
 
         await addNotificationToQueue(payload);
+      }
+    } else {
+      await prisma.user.update({
+        where: {
+          id,
+        },
+        data: {
+          totalSpend: {
+            increment:
+              Array.from(Constants.KOFI_PRODUCTS.values()).find((i) => i.name === item.item)
+                ?.cost || 0,
+          },
+        },
+      });
+
+      if (premiums.includes(item.item)) {
+        if (await isPremium(id)) {
+          if ((await getPremiumProfile(id)).getLevelString().toLowerCase() != item.item) {
+            await setTier(id, premiums.indexOf(item.item) + 1, client);
+            await renewUser(id, client);
+          } else {
+            await renewUser(id, client);
+          }
+        } else {
+          await addMember(id, premiums.indexOf(item.item) + 1, client);
+        }
+      } else {
+        await addInventoryItem(id, item.item, 1, false);
+
+        if ((await getDmSettings(id)).premium) {
+          const payload: NotificationPayload = {
+            memberId: id,
+            payload: {
+              content: "thank you for your purchase",
+              embed: new CustomEmbed()
+                .setDescription(
+                  `you have received 1 ${getItems()[item.item].emoji} ${
+                    getItems()[item.item].name
+                  }`,
+                )
+                .setColor(Constants.TRANSPARENT_EMBED_COLOR),
+            },
+          };
+
+          await addNotificationToQueue(payload);
+        }
       }
     }
   }
