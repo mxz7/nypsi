@@ -42,10 +42,15 @@ export async function checkPurchases(id: string, client: NypsiClient) {
 
   const query = await prisma.kofiPurchases.findMany({
     where: {
-      email: {
-        equals: email,
-        mode: "insensitive",
-      },
+      AND: [
+        {
+          email: {
+            equals: email,
+            mode: "insensitive",
+          },
+        },
+        { userId: null },
+      ],
     },
   });
 
@@ -53,6 +58,19 @@ export async function checkPurchases(id: string, client: NypsiClient) {
 
   for (const item of query) {
     logger.info(`giving purchased item to ${id}`, item);
+
+    await prisma.user.update({
+      where: {
+        id,
+      },
+      data: {
+        totalSpend: {
+          increment:
+            Array.from(Constants.KOFI_PRODUCTS.values()).find((i) => i.name === item.item)?.cost ||
+            0,
+        },
+      },
+    });
 
     if (premiums.includes(item.item)) {
       if (await isPremium(id)) {
@@ -86,12 +104,16 @@ export async function checkPurchases(id: string, client: NypsiClient) {
     }
   }
 
-  await prisma.kofiPurchases.deleteMany({
+  await prisma.kofiPurchases.updateMany({
     where: {
       email: {
         equals: email,
         mode: "insensitive",
       },
+    },
+    data: {
+      email: null,
+      userId: id,
     },
   });
 }
