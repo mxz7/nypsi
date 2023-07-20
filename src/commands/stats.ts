@@ -539,7 +539,7 @@ async function run(
     return send({ embeds: [embed] });
   };
 
-  function findStatAmount(stats: {amount: number; itemId: string;}[], id: string) {
+  function findStatAmount(stats: { amount: number; itemId: string }[], id: string) {
     return stats.find((i) => i.itemId === id)?.amount.toLocaleString() || "0";
   }
 
@@ -550,13 +550,13 @@ async function run(
       embeds: [
         new CustomEmbed(
           message.member,
-          `you have created **${
-            findStatAmount(stats, "auction-created")
-          }** auction${findStatAmount(stats, "auction-created") === "1" ? "" : "s"} and sold **${
-            findStatAmount(stats, "auction-sold-items")
-          }** item${findStatAmount(stats, "auction-sold-items") === "1" ? "" : "s"}\n\nyou have bought **${
-            findStatAmount(stats, "auction-bought-items")
-          }** item${findStatAmount(stats, "auction-bought-items") === "1" ? "" : "s"} through auctions`,
+          `you have created **${findStatAmount(stats, "auction-created")}** auction${
+            findStatAmount(stats, "auction-created") === "1" ? "" : "s"
+          } and sold **${findStatAmount(stats, "auction-sold-items")}** item${
+            findStatAmount(stats, "auction-sold-items") === "1" ? "" : "s"
+          }\n\nyou have bought **${findStatAmount(stats, "auction-bought-items")}** item${
+            findStatAmount(stats, "auction-bought-items") === "1" ? "" : "s"
+          } through auctions`,
         ),
       ],
     });
