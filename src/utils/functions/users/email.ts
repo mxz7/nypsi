@@ -59,6 +59,19 @@ export async function checkPurchases(id: string, client: NypsiClient) {
   for (const item of query) {
     logger.info(`giving purchased item to ${id}`, item);
 
+    await prisma.user.update({
+      where: {
+        id,
+      },
+      data: {
+        totalSpend: {
+          increment:
+            Array.from(Constants.KOFI_PRODUCTS.values()).find((i) => i.name === item.item)?.cost ||
+            0,
+        },
+      },
+    });
+
     if (premiums.includes(item.item)) {
       if (await isPremium(id)) {
         if ((await getPremiumProfile(id)).getLevelString().toLowerCase() != item.item) {

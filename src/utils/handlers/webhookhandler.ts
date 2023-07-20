@@ -294,7 +294,7 @@ async function handleKofiData(data: KofiResponse) {
             where: {
               id: user.id,
             },
-            data: { totalSpend: { increment: parseFloat(data?.amount || item.cost.toString()) } },
+            data: { totalSpend: { increment: parseFloat(item.cost.toString()) } },
           });
 
           await prisma.kofiPurchases.create({
@@ -304,7 +304,7 @@ async function handleKofiData(data: KofiResponse) {
             },
           });
 
-          logger.info(`${item} given to ${user.id} (${user.email})`);
+          logger.info(`given to ${user.id} (${user.email})`, item);
 
           if ((await getDmSettings(user.id)).premium) {
             const payload: NotificationPayload = {
@@ -445,7 +445,7 @@ async function handleKofiData(data: KofiResponse) {
             },
           });
 
-          logger.info(`created purchase for ${data.email} ${item}`);
+          logger.info(`created purchase for ${data.email}`, item);
         }
       }
     }
@@ -472,7 +472,7 @@ async function handleKofiData(data: KofiResponse) {
         where: {
           id: user.id,
         },
-        data: { totalSpend: { increment: parseFloat(data?.amount || item.cost.toString()) } },
+        data: { totalSpend: { increment: parseFloat(item.cost.toString()) } },
       });
 
       await prisma.kofiPurchases.create({
@@ -527,7 +527,7 @@ async function handleKofiData(data: KofiResponse) {
           item: item.name,
         },
       });
-      logger.info(`created purchase for ${data.email} ${item}`);
+      logger.info(`created purchase for ${data.email}`, item);
     }
   }
 }
