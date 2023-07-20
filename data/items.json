@@ -671,7 +671,7 @@
       "id:emerald",
       "id:obsidian"
     ],
-    "random_drop_chance": 80
+    "random_drop_chance": 40
   },
   "vote_crate": {
     "id": "vote_crate",
@@ -1650,7 +1650,7 @@
       "time": 172800,
       "ingredients": ["gem_shard:10"]
     },
-    "random_drop_chance": 10
+    "random_drop_chance": 5
   },
   "purple_gem": {
     "id": "purple_gem",
@@ -1702,7 +1702,7 @@
       "time": 172800,
       "ingredients": ["gem_shard:5"]
     },
-    "random_drop_chance": 10
+    "random_drop_chance": 5
   },
   "white_gem": {
     "id": "white_gem",
@@ -1832,8 +1832,7 @@
       "id:pink_gem",
       "id:crystal_heart",
       "id:gem_shard"
-    ],
-    "random_drop_chance": 1
+    ]
   },
   "bronze_credit": {
     "id": "bronze_credit",
@@ -2060,7 +2059,7 @@
     "aliases": ["cscratch", "cscratchie", "cornershop"],
     "rarity": 69,
     "in_crates": false,
-    "buy": 75000,
+    "buy": 100000,
     "sell": 50000,
     "clicks": 4,
     "items": [
@@ -2120,7 +2119,7 @@
     "buy": 0,
     "sell": 500000,
     "in_crates": false,
-    "random_drop_chance": 40
+    "random_drop_chance": 25
   },
   "quarry_scrap": {
     "id": "quarry_scrap",
