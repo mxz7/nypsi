@@ -20,8 +20,6 @@ import {
   selectItem,
 } from "../utils/functions/economy/inventory";
 import { createUser, userExists } from "../utils/functions/economy/utils";
-import { isBooster } from "../utils/functions/premium/boosters";
-import { isPremium } from "../utils/functions/premium/premium";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("item", "view information about an item", "money").setAliases(["i"]);
@@ -214,12 +212,10 @@ async function run(
   ];
 
   if (
-    (!(await isPremium(message.member)) && !(await isBooster(message.author.id))) ||
-    ((await prisma.auction.count({ where: { AND: [{ itemId: selected.id }, { sold: true }] } })) <
+    (await prisma.auction.count({ where: { AND: [{ itemId: selected.id }, { sold: true }] } })) <
       5 &&
-      (await prisma.offer.count({ where: { AND: [{ itemId: selected.id }, { sold: true }] } })) <
-        5 &&
-      (await prisma.graphMetrics.count({ where: { category: `item-count-${selected.id}` } })) < 5)
+    (await prisma.offer.count({ where: { AND: [{ itemId: selected.id }, { sold: true }] } })) < 5 &&
+    (await prisma.graphMetrics.count({ where: { category: `item-count-${selected.id}` } })) < 5
   ) {
     return await send({ embeds: [embed] });
   }
