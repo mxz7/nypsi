@@ -22,6 +22,7 @@ model User {
   adminLevel        Int      @default(0)
   booster           Boolean  @default(false)
   badges            String[]
+  totalSpend        Float    @default(0)
 
   Economy        Economy?
   Premium        Premium?
@@ -609,7 +610,6 @@ model KofiPurchases {
   date   DateTime @default(now())
   email  String?
   item   String
-  cost   Float    @default(0)
   userId String?
 
   user User? @relation(fields: [userId], references: [id])
