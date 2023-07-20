@@ -42,10 +42,15 @@ export async function checkPurchases(id: string, client: NypsiClient) {
 
   const query = await prisma.kofiPurchases.findMany({
     where: {
-      email: {
-        equals: email,
-        mode: "insensitive",
-      },
+      AND: [
+        {
+          email: {
+            equals: email,
+            mode: "insensitive",
+          },
+        },
+        { userId: null },
+      ],
     },
   });
 
@@ -86,12 +91,16 @@ export async function checkPurchases(id: string, client: NypsiClient) {
     }
   }
 
-  await prisma.kofiPurchases.deleteMany({
+  await prisma.kofiPurchases.updateMany({
     where: {
       email: {
         equals: email,
         mode: "insensitive",
       },
+    },
+    data: {
+      email: null,
+      userId: id,
     },
   });
 }

@@ -288,7 +288,21 @@ async function handleKofiData(data: KofiResponse) {
 
       for (let i = 0; i < shopItem.quantity; i++) {
         if (user) {
-          await addInventoryItem(user.id, item, 1, false);
+          await addInventoryItem(user.id, item.name, 1, false);
+
+          await prisma.user.update({
+            where: {
+              id: user.id,
+            },
+            data: { totalSpend: { increment: parseFloat(data?.amount || item.cost.toString()) } },
+          });
+
+          await prisma.kofiPurchases.create({
+            data: {
+              userId: user.id,
+              item: item.name,
+            },
+          });
 
           logger.info(`${item} given to ${user.id} (${user.email})`);
 
@@ -299,7 +313,9 @@ async function handleKofiData(data: KofiResponse) {
                 content: "thank you for your purchase",
                 embed: new CustomEmbed()
                   .setDescription(
-                    `you have received 1 ${getItems()[item].emoji} **${getItems()[item].name}**`,
+                    `you have received 1 ${getItems()[item.name].emoji} **${
+                      getItems()[item.name].name
+                    }**`,
                   )
                   .setColor(Constants.TRANSPARENT_EMBED_COLOR),
               },
@@ -312,9 +328,9 @@ async function handleKofiData(data: KofiResponse) {
                 embeds: [
                   new CustomEmbed(
                     null,
-                    `${user.lastKnownUsername} just bought ${getItems()[item].article} ${
-                      getItems()[item].emoji
-                    } **${getItems()[item].name}**!!!!`,
+                    `${user.lastKnownUsername} just bought ${getItems()[item.name].article} ${
+                      getItems()[item.name].emoji
+                    } **${getItems()[item.name].name}**!!!!`,
                   ).setFooter({ text: "thank you for your purchase (:" }),
                 ],
               });
@@ -322,7 +338,7 @@ async function handleKofiData(data: KofiResponse) {
             }
           }
 
-          const gemChance = Math.floor(Math.random() * 144);
+          const gemChance = Math.floor(Math.random() * 250);
 
           if (gemChance == 7) {
             await addInventoryItem(user.id, "pink_gem", 1);
@@ -425,7 +441,7 @@ async function handleKofiData(data: KofiResponse) {
           await prisma.kofiPurchases.create({
             data: {
               email: data.email,
-              item: item,
+              item: item.name,
             },
           });
 
@@ -446,15 +462,29 @@ async function handleKofiData(data: KofiResponse) {
 
     const premiums = ["platinum", "gold", "silver", "bronze"].reverse();
 
-    if (!premiums.includes(item)) {
+    if (!premiums.includes(item.name)) {
       logger.error("invalid premium", data);
       return;
     }
 
     if (user) {
+      await prisma.user.update({
+        where: {
+          id: user.id,
+        },
+        data: { totalSpend: { increment: parseFloat(data?.amount || item.cost.toString()) } },
+      });
+
+      await prisma.kofiPurchases.create({
+        data: {
+          userId: user.id,
+          item: item.name,
+        },
+      });
+
       if (await isPremium(user.id)) {
-        if ((await getPremiumProfile(user.id)).getLevelString().toLowerCase() != item) {
-          await setTier(user.id, premiums.indexOf(item) + 1);
+        if ((await getPremiumProfile(user.id)).getLevelString().toLowerCase() != item.name) {
+          await setTier(user.id, premiums.indexOf(item.name) + 1);
           await renewUser(user.id);
           if (data.is_public && (await getPreferences(user.id)).leaderboards) {
             const hook = new WebhookClient({ url: process.env.THANKYOU_HOOK });
@@ -474,7 +504,7 @@ async function handleKofiData(data: KofiResponse) {
           await renewUser(user.id);
         }
       } else {
-        await addMember(user.id, premiums.indexOf(item) + 1);
+        await addMember(user.id, premiums.indexOf(item.name) + 1);
         if (data.is_public && (await getPreferences(user.id)).leaderboards) {
           const hook = new WebhookClient({ url: process.env.THANKYOU_HOOK });
           await hook.send({
@@ -494,7 +524,7 @@ async function handleKofiData(data: KofiResponse) {
       await prisma.kofiPurchases.create({
         data: {
           email: data.email,
-          item: item,
+          item: item.name,
         },
       });
       logger.info(`created purchase for ${data.email} ${item}`);
