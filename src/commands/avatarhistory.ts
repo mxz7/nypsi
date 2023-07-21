@@ -7,12 +7,12 @@ import {
   Message,
   MessageActionRowComponentBuilder,
 } from "discord.js";
+import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { formatDate } from "../utils/functions/date";
 import { getPrestige } from "../utils/functions/economy/prestige";
-import { uploadImageToImgur } from "../utils/functions/image";
-import { isPremium } from "../utils/functions/premium/premium";
+import { uploadImage } from "../utils/functions/image";
 import {
   addNewAvatar,
   clearAvatarHistory,
@@ -48,21 +48,23 @@ async function run(
 
   await addCooldown(cmd.name, message.member, 15);
 
-  if ((await getPrestige(message.author.id)) < 10 && !(await isPremium(message.author.id))) {
+  if ((await getPrestige(message.member).catch(() => 0)) < 2)
     return message.channel.send({
       embeds: [
         new ErrorEmbed(
-          "you do not meed the requirements for avatar tracking\n\nyou can disable avatar tracking with $toggletracking",
+          "you require at least prestige 2 (/prestige) for nypsi to track your avatars\n\nyou can disable avatar tracking with $toggletracking",
         ),
       ],
     });
-  }
 
   let history = await fetchAvatarHistory(message.member);
 
   if (history.length == 0) {
-    const url = await uploadImageToImgur(
+    const url = await uploadImage(
+      message.client as NypsiClient,
       message.author.displayAvatarURL({ extension: "png", size: 256 }),
+      "avatar",
+      `user: ${message.author.id} (${message.author.username})`,
     );
     if (url) {
       await addNewAvatar(message.member, url);

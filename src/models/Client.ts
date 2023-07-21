@@ -38,7 +38,6 @@ import { runEconomySetup } from "../utils/functions/economy/utils";
 import { runChristmas } from "../utils/functions/guilds/christmas";
 import { runCountdowns } from "../utils/functions/guilds/countdowns";
 import { runSnipeClearIntervals } from "../utils/functions/guilds/utils";
-import { runUploadReset } from "../utils/functions/image";
 import { openKarmaShop } from "../utils/functions/karma/karmashop";
 import { startAutoMuteViolationInterval } from "../utils/functions/moderation/mute";
 import { getCustomPresence, randomPresence, setCustomPresence } from "../utils/functions/presence";
@@ -176,7 +175,6 @@ export class NypsiClient extends Client {
     runSnipeClearIntervals();
     doChatReactions(this);
     runCommandUseTimers(this);
-    runUploadReset();
     startAutoMuteViolationInterval();
 
     if (this.cluster.id != 0) return;
