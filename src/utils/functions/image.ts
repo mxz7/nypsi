@@ -313,27 +313,31 @@ export async function uploadImage(
   if (typeof cluster.cluster !== "number") return;
 
   const res = await client.cluster.broadcastEval(
-    async (c, { buffer, channelId, content, extension }) => {
+    async (c, { buffer, channelId, content, extension, cluster }) => {
+      const client = c as unknown as NypsiClient;
+
+      if (client.cluster.id != cluster) return;
+
       const channel = await c.channels.fetch(channelId).catch((e) => e);
 
       if (!channel || !channel.isTextBased())
         return { msg: "err: fetching channel", error: channel };
 
-      const res = await channel.send({
-        content,
-        files: [
-          {
-            attachment: Buffer.from(buffer.data),
-            name: `${Math.floor(Math.random() * 69420)}_image${extension}`,
-          },
-        ],
-      });
+      const res = await channel
+        .send({
+          content,
+          files: [
+            {
+              attachment: Buffer.from(buffer.data),
+              name: `${Math.floor(Math.random() * 69420)}_image${extension}`,
+            },
+          ],
+        })
+        .catch((e: any) => e);
 
-      return res;
+      if (!res) return { error: res, msg: "err: message" };
 
-      // if (!res) return { error: res, msg: "err: message" };
-
-      // return res.attachments.first().url;
+      return res.attachments.first().url;
     },
     {
       context: {
@@ -341,6 +345,7 @@ export async function uploadImage(
         channelId,
         content,
         extension: `.${url.split(".")[url.split(".").length - 1]}`,
+        cluster: cluster.cluster,
       },
     },
   );
