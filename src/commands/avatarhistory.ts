@@ -12,6 +12,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { formatDate } from "../utils/functions/date";
 import { getPrestige } from "../utils/functions/economy/prestige";
 import { uploadImageToImgur } from "../utils/functions/image";
+import { isPremium } from "../utils/functions/premium/premium";
 import {
   addNewAvatar,
   clearAvatarHistory,
@@ -47,14 +48,15 @@ async function run(
 
   await addCooldown(cmd.name, message.member, 15);
 
-  if ((await getPrestige(message.member).catch(() => 0)) < 2)
+  if ((await getPrestige(message.author.id)) < 10 && !(await isPremium(message.author.id))) {
     return message.channel.send({
       embeds: [
         new ErrorEmbed(
-          "you require at least prestige 2 (/prestige) for nypsi to track your avatars\n\nyou can disable avatar tracking with $toggletracking",
+          "you do not meed the requirements for avatar tracking\n\nyou can disable avatar tracking with $toggletracking",
         ),
       ],
     });
+  }
 
   let history = await fetchAvatarHistory(message.member);
 
