@@ -314,9 +314,9 @@ export async function uploadImage(
 
   const res = await client.cluster.broadcastEval(
     async (c, { buffer, channelId, content, extension }) => {
-      const channel = await c.channels.fetch(channelId).catch(() => {});
+      const channel = await c.channels.fetch(channelId).catch((e) => e);
 
-      if (!channel || !channel.isTextBased()) return "err: channel";
+      if (!channel || !channel.isTextBased()) return { msg: "err: channel", error: channel };
 
       const res = await channel
         .send({
@@ -328,9 +328,9 @@ export async function uploadImage(
             },
           ],
         })
-        .catch(() => {});
+        .catch((e: any) => e);
 
-      if (!res) return "err: msg";
+      if (!res) return { error: res, msg: "err: channel" };
 
       return res.attachments.first().url;
     },
@@ -345,6 +345,11 @@ export async function uploadImage(
   );
 
   const uploaded = res.filter((i) => Boolean(i))[0];
+
+  if (typeof uploaded !== "string") {
+    logger.error("failed to upload image", { ...uploaded, url, content, type });
+    return;
+  }
 
   logger.info("uploaded image", { original: url, uploaded, content, type });
 
