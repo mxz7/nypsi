@@ -132,15 +132,11 @@ async function run(
   }
 
   if (total) {
-    if (value) {
-      desc.push(`**in world** ${total.toLocaleString()}`);
-    } else {
-      desc.push(`\n**in world** ${total.toLocaleString()}`);
-    }
+    desc.push(`\n**in world** ${total.toLocaleString()}`);
   }
 
   if (inAuction) {
-    if (total || selected.sell || selected.buy) {
+    if (total) {
       desc.push(`**in auction** ${inAuction.toLocaleString()}`);
     } else {
       desc.push(`\n**in auction** ${inAuction.toLocaleString()}`);
