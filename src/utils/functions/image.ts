@@ -307,7 +307,10 @@ export async function uploadImageToImgur(url: string): Promise<string> {
       logger.error("error occurred uploading image to imgur");
       logger.error("imgur error", e);
       fail = true;
+      return e;
     });
+
+  logger.debug(`imgur response`, boobies);
 
   if (fail) {
     uploadDisabled = true;
@@ -349,6 +352,8 @@ export async function fallbackUpload(url: string): Promise<string> {
   const res = await fetch(
     `https://api.imgbb.com/1/upload?key=${process.env.IMGBB_TOKEN}&image=${url}`,
   ).then((res) => res.json());
+
+  logger.debug(`imgbb response`, res);
 
   return res.data.url;
 }
