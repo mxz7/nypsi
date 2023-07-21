@@ -318,21 +318,21 @@ export async function uploadImage(
 
       if (!channel || !channel.isTextBased()) return { msg: "err: channel", error: channel };
 
-      const res = await channel
-        .send({
-          content,
-          files: [
-            {
-              attachment: Buffer.from(buffer.data),
-              name: `${Math.floor(Math.random() * 69420)}_image${extension}`,
-            },
-          ],
-        })
-        .catch((e: any) => e);
+      const res = await channel.send({
+        content,
+        files: [
+          {
+            attachment: Buffer.from(buffer.data),
+            name: `${Math.floor(Math.random() * 69420)}_image${extension}`,
+          },
+        ],
+      });
 
-      if (!res) return { error: res, msg: "err: channel" };
+      return res;
 
-      return res.attachments.first().url;
+      // if (!res) return { error: res, msg: "err: channel" };
+
+      // return res.attachments.first().url;
     },
     {
       context: {
