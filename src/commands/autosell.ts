@@ -94,6 +94,13 @@ async function run(
 
   const searchTag = args[0].toLowerCase();
 
+  if (searchTag == "clear") {
+    if (current.length == 0) return send({ embeds: [new ErrorEmbed(`you dont have anything being automatically sold`)] });
+    
+    await setAutosellItems(message.member, []);
+    return send({embeds: [new CustomEmbed(message.member, "✅ cleared autosell").setHeader("autosell", message.author.avatarURL())] });
+  }
+
   let selected;
 
   for (const itemName of Array.from(Object.keys(items))) {
