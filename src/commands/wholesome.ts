@@ -140,6 +140,8 @@ async function run(
     let url = args[1];
 
     if (message.attachments.first()) {
+      if (message.attachments.first().size > 7e6)
+        return send({ embeds: [new ErrorEmbed("file too big")] });
       url = message.attachments.first().url;
     }
 
