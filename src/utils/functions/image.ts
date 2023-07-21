@@ -1,32 +1,14 @@
 import { variants } from "@catppuccin/palette";
 import { WholesomeImage, WholesomeSuggestion } from "@prisma/client";
 import { ColorResolvable, GuildMember, WebhookClient } from "discord.js";
-import ImgurClient from "imgur";
 import prisma from "../../init/database";
 import { NypsiClient } from "../../models/Client";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 import { RedditJSONPost } from "../../types/Reddit";
 import { logger } from "../logger";
+import { findChannelCluster } from "./clusters";
 import { addProgress } from "./economy/achievements";
 import requestDM from "./requestdm";
-
-const imgur = new ImgurClient({
-  // accessToken: process.env.IMGUR_ACCESSTOKEN,
-  clientId: process.env.IMGUR_CLIENTID,
-  clientSecret: process.env.IMGUR_CLIENTSECRET,
-  refreshToken: process.env.IMGUR_REFRESHTOKEN,
-});
-
-let uploadDisabled = false;
-
-let uploadCount = 0;
-
-export function runUploadReset() {
-  setInterval(() => {
-    uploadCount = 0;
-    logger.info("imgur upload count reset");
-  }, 86400000);
-}
 
 let wholesomeCache: WholesomeImage[];
 
@@ -291,69 +273,80 @@ export async function getAllSuggestions(): Promise<WholesomeSuggestion[]> {
   return query;
 }
 
-export async function uploadImageToImgur(url: string): Promise<string> {
-  let fallback = false;
+export async function uploadImage(
+  client: NypsiClient,
+  url: string,
+  type: "avatar" | "wholesome",
+  content?: string,
+) {
+  const channelId =
+    type === "avatar"
+      ? process.env.DISCORD_IMAGE_AVATAR_CHANNEL
+      : process.env.DISCORD_IMAGE_WHOLESOME_CHANNEL;
 
-  if (uploadCount >= 775) fallback = true;
-  if (uploadDisabled) fallback = true;
-  let fail = false;
-
-  logger.info(`uploading ${url}`);
-  const boobies = await imgur
-    .upload({
-      image: url,
-    })
-    .catch((e) => {
-      logger.error("error occurred uploading image to imgur");
-      logger.error("imgur error", e);
-      fail = true;
-      return e;
-    });
-
-  logger.debug(`imgur response`, boobies);
-
-  if (fail) {
-    uploadDisabled = true;
-
-    setTimeout(() => {
-      uploadDisabled = false;
-    }, 1800000);
-
-    fallback = true;
+  if (!channelId) {
+    logger.error("invalid channel for image upload", { url, type, content });
+    return;
   }
 
-  if (fallback || !boobies || typeof boobies?.data?.link != "string") {
-    uploadDisabled = true;
+  const imageBlob = await fetch(url)
+    .then((r) => r.blob())
+    .catch(() => {});
 
-    setTimeout(() => {
-      uploadDisabled = false;
-    }, 1800000);
-
-    fallback = true;
-    logger.info("using fallback uploader..");
-
-    const res = await fallbackUpload(url);
-
-    if (!res) {
-      logger.error("fallback upload failed");
-      return null;
-    }
-
-    logger.info(`uploaded (${res})`);
-
-    return res;
+  if (!imageBlob) {
+    logger.error("failed converting image url to blob", { url, type, content });
+    return;
   }
 
-  logger.info(`uploaded (${boobies.data.link})`);
-  return boobies.data.link;
-}
+  const buffer = await imageBlob
+    .arrayBuffer()
+    .then((r) => Buffer.from(r))
+    .catch(() => {});
 
-export async function fallbackUpload(url: string): Promise<string> {
-  const res = await fetch(
-    `https://api.imgbb.com/1/upload?key=${process.env.IMGBB_TOKEN}&image=${url}`,
-  ).then((res) => res.json());
+  if (!buffer) {
+    logger.error("failed converting image blob to buffer", { url, type, content });
+    return;
+  }
 
-  logger.debug(`imgbb response`, res);
+  const cluster = await findChannelCluster(client, channelId);
 
-  return res.data.url;
+  if (typeof cluster.cluster !== "number") return;
+
+  const res = await client.cluster.broadcastEval(
+    async (c, { buffer, channelId, content, extension }) => {
+      const channel = await c.channels.fetch(channelId).catch(() => {});
+
+      if (!channel || !channel.isTextBased()) return "err: channel";
+
+      const res = await channel
+        .send({
+          content,
+          files: [
+            {
+              attachment: Buffer.from(buffer.data),
+              name: `${Math.floor(Math.random() * 69420)}_image${extension}`,
+            },
+          ],
+        })
+        .catch(() => {});
+
+      if (!res) return "err: msg";
+
+      return res.attachments.first().url;
+    },
+    {
+      context: {
+        buffer,
+        channelId,
+        content,
+        extension: `.${url.split(".")[url.split(".").length - 1]}`,
+      },
+    },
+  );
+
+  const uploaded = res.filter((i) => Boolean(i))[0];
+
+  logger.info("uploaded image", { original: url, uploaded, content, type });
+
+  return uploaded;
 }

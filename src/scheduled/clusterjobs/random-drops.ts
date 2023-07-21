@@ -11,6 +11,7 @@ import redis from "../../init/redis";
 import { NypsiClient } from "../../models/Client";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 import Constants from "../../utils/Constants";
+import { findChannelCluster } from "../../utils/functions/clusters";
 import { MStoTime } from "../../utils/functions/date";
 import { addProgress } from "../../utils/functions/economy/achievements";
 import { addInventoryItem } from "../../utils/functions/economy/inventory";
@@ -132,7 +133,7 @@ async function randomDrop(client: NypsiClient) {
 }
 
 async function fastClickGame(client: NypsiClient, channelId: string, prize: string) {
-  const cluster = await findCluster(client, channelId);
+  const cluster = await findChannelCluster(client, channelId);
 
   if (typeof cluster.cluster !== "number") return;
 
@@ -221,7 +222,7 @@ async function fastClickGame(client: NypsiClient, channelId: string, prize: stri
 }
 
 async function typeFastGame(client: NypsiClient, channelId: string, prize: string) {
-  const cluster = await findCluster(client, channelId);
+  const cluster = await findChannelCluster(client, channelId);
 
   if (typeof cluster.cluster !== "number") return;
 
@@ -304,7 +305,7 @@ async function typeFastGame(client: NypsiClient, channelId: string, prize: strin
 }
 
 async function clickSpecificGame(client: NypsiClient, channelId: string, prize: string) {
-  const cluster = await findCluster(client, channelId);
+  const cluster = await findChannelCluster(client, channelId);
 
   if (typeof cluster.cluster !== "number") return;
 
@@ -447,31 +448,4 @@ async function clickSpecificGame(client: NypsiClient, channelId: string, prize: 
   if (!(await userExists(winnerId))) await createUser(winnerId);
 
   return winnerId;
-}
-
-async function findCluster(client: NypsiClient, channelId: string) {
-  const clusterHas = await client.cluster.broadcastEval(
-    async (c, { channelId }) => {
-      const client = c as unknown as NypsiClient;
-
-      const channel = await client.channels.fetch(channelId).catch(() => {});
-
-      if (channel && !channel.isDMBased()) {
-        return { cluster: client.cluster.id, guildId: channel.guildId };
-      } else {
-        return "not-found";
-      }
-    },
-    {
-      context: { channelId },
-    },
-  );
-
-  for (const i of clusterHas) {
-    if (i != "not-found") {
-      return i;
-    }
-  }
-
-  return null;
 }
