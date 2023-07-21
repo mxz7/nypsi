@@ -316,7 +316,8 @@ export async function uploadImage(
     async (c, { buffer, channelId, content, extension }) => {
       const channel = await c.channels.fetch(channelId).catch((e) => e);
 
-      if (!channel || !channel.isTextBased()) return { msg: "err: channel", error: channel };
+      if (!channel || !channel.isTextBased())
+        return { msg: "err: fetching channel", error: channel };
 
       const res = await channel.send({
         content,
@@ -330,7 +331,7 @@ export async function uploadImage(
 
       return res;
 
-      // if (!res) return { error: res, msg: "err: channel" };
+      // if (!res) return { error: res, msg: "err: message" };
 
       // return res.attachments.first().url;
     },
