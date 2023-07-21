@@ -2,7 +2,7 @@ import { User } from "discord.js";
 import { NypsiClient } from "../models/Client";
 import { getPrestige } from "../utils/functions/economy/prestige";
 import { userExists } from "../utils/functions/economy/utils";
-import { uploadImageToImgur } from "../utils/functions/image";
+import { uploadImage } from "../utils/functions/image";
 import { addNewAvatar, addNewUsername, isTracking } from "../utils/functions/users/history";
 import { updateLastKnownUsername } from "../utils/functions/users/tag";
 import { hasProfile } from "../utils/functions/users/utils";
@@ -83,7 +83,12 @@ async function doQueue(client: NypsiClient) {
     uploadUrl = user.displayAvatarURL({ extension: "png", size: 256 });
   }
 
-  const url = await uploadImageToImgur(uploadUrl);
+  const url = await uploadImage(
+    user.client as NypsiClient,
+    uploadUrl,
+    "avatar",
+    `user: ${user.id} (${user.username})`,
+  );
 
   if (!url) return;
 

@@ -7,11 +7,12 @@ import {
   Message,
   MessageActionRowComponentBuilder,
 } from "discord.js";
+import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { formatDate } from "../utils/functions/date";
 import { getPrestige } from "../utils/functions/economy/prestige";
-import { uploadImageToImgur } from "../utils/functions/image";
+import { uploadImage } from "../utils/functions/image";
 import {
   addNewAvatar,
   clearAvatarHistory,
@@ -59,8 +60,11 @@ async function run(
   let history = await fetchAvatarHistory(message.member);
 
   if (history.length == 0) {
-    const url = await uploadImageToImgur(
+    const url = await uploadImage(
+      message.client as NypsiClient,
       message.author.displayAvatarURL({ extension: "png", size: 256 }),
+      "avatar",
+      `user: ${message.author.id} (${message.author.username})`,
     );
     if (url) {
       await addNewAvatar(message.member, url);

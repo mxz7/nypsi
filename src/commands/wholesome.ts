@@ -28,7 +28,7 @@ import {
   getWholesomeImage,
   isImageUrl,
   suggestWholesomeImage,
-  uploadImageToImgur,
+  uploadImage,
 } from "../utils/functions/image";
 import { getMember } from "../utils/functions/member";
 import PageManager from "../utils/functions/page";
@@ -158,7 +158,12 @@ async function run(
         });
       }
 
-      const upload = await uploadImageToImgur(url);
+      const upload = await uploadImage(
+        message.client as NypsiClient,
+        url,
+        "wholesome",
+        `user: ${message.author.id} (${message.author.username})`,
+      );
 
       if (!upload) {
         return send({
