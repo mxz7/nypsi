@@ -344,7 +344,7 @@ export async function uploadImage(
         buffer,
         channelId,
         content,
-        extension: `.${url.split(".")[url.split(".").length - 1]}`,
+        extension: `.${url.split(".")[url.split(".").length - 1].split("?")[0]}`,
         cluster: cluster.cluster,
       },
     },
