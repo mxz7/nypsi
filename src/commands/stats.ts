@@ -230,7 +230,7 @@ async function run(
         (i) =>
           `${getItems()[i.itemId].emoji} **${
             getItems()[i.itemId].name
-          }** ${i.amount.toLocaleString()} uses`,
+          }** ${i.amount.toLocaleString()} use${i.amount != 1 ? "s" : ""}`,
       ),
     );
 

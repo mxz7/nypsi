@@ -8,7 +8,6 @@ import { MentionQueueItem } from "../functions/users/mentions";
 import { addNotificationToQueue } from "../functions/users/notifications";
 import doMentionsWorker from "../functions/workers/mentions";
 import { logger } from "../logger";
-import dayjs = require("dayjs");
 import ms = require("ms");
 
 let current = 0;
