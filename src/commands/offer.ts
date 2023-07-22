@@ -477,6 +477,20 @@ async function run(
     if (!money || money < 1 || isNaN(money))
       return send({ embeds: [new ErrorEmbed("invalid amount")] });
 
+    if (target.user.createdTimestamp > dayjs().subtract(1, "day").unix() * 1000) {
+      return send({
+        embeds: [new ErrorEmbed(`${target.user.toString()} cannot use offers yet`)],
+      });
+    }
+
+    if ((await getPrestige(target)) < 1) {
+      if ((await getXp(target)) < 50) {
+        return send({
+          embeds: [new ErrorEmbed(`${target.user.toString()} cannot use offers yet`)],
+        });
+      }
+    }
+
     const balance = await getBalance(message.member);
 
     if (balance < money) return send({ embeds: [new ErrorEmbed("you cant afford this")] });

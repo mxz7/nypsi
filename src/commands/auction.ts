@@ -170,9 +170,9 @@ async function run(
   }
 
   if ((await getPrestige(message.member)) < 1) {
-    if ((await getXp(message.member)) < 30) {
+    if ((await getXp(message.member)) < 50) {
       return send({
-        embeds: [new ErrorEmbed("you need at least 30xp before you can create an auction")],
+        embeds: [new ErrorEmbed("you need at least 50xp before you can create an auction")],
       });
     }
   }
