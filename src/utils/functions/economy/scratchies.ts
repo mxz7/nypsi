@@ -6,6 +6,7 @@ import {
   GuildMember,
   MessageActionRowComponentBuilder,
 } from "discord.js";
+import { addToGuildXP, getGuildName } from "../../../utils/functions/economy/guilds";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { Item } from "../../../types/Economy";
 import Constants from "../../Constants";
@@ -166,6 +167,8 @@ export default class ScratchCard {
       if (clickedType === "xp") {
         await updateXp(this.member, (await getXp(this.member)) + parseInt(clickedItem));
         embed.setDescription(`you found **${parseInt(clickedItem).toLocaleString()}**xp!`);
+        const guild = await getGuildName(this.member);
+        if (guild) await addToGuildXP(guild, parseInt(clickedItem), this.member);
       } else if (clickedType === "money") {
         await updateBalance(this.member, (await getBalance(this.member)) + parseInt(clickedItem));
         embed.setDescription(`you found $**${parseInt(clickedItem).toLocaleString()}**`);
