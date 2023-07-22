@@ -13,6 +13,8 @@ import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
+import { logger } from "../../logger";
+import { filterOutliers } from "../outliers";
 import { isPremium } from "../premium/premium";
 import { getTax } from "../tax";
 import { getBalance, updateBalance } from "./balance";
@@ -178,6 +180,13 @@ export async function getOffersAverage(item: string) {
     } else {
       costs.push(Number(offer.money));
     }
+  }
+
+  let filtered = filterOutliers(costs);
+
+  if (!filtered) {
+    logger.warn("failed to filter outliers (offers)", { costs, item, offers });
+    filtered = costs;
   }
 
   const sum = costs.reduce((a, b) => a + b, 0);
