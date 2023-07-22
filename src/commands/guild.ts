@@ -943,7 +943,13 @@ async function run(
             (guild.upgrades.find((i) => i.upgradeId === upgrade.id)?.amount || 0) *
               upgrade.increment_per_level,
           )
-        } tokens`;
+        } token${
+          upgrade.cost +
+          Math.floor(
+            (guild.upgrades.find((i) => i.upgradeId === upgrade.id)?.amount || 0) *
+              upgrade.increment_per_level,
+          ) != 1 ? "s" : ""
+        }`;
 
       if (pages.size === 0) {
         pages.set(1, [{ name, value, inline: true }]);
@@ -967,7 +973,7 @@ async function run(
     const embed = new CustomEmbed(message.member)
       .setHeader(`${guild.guildName} upgrades`, message.author.avatarURL())
       .setFields(...pages.get(1))
-      .setFooter({ text: `you have ${guild.tokens} tokens` });
+      .setFooter({ text: `you have ${guild.tokens} token${guild.tokens != 1 ? "s" : ""}` });
 
     if (pages.size === 1) return send({ embeds: [embed] });
 

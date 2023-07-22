@@ -8,9 +8,9 @@ import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { isPremium } from "../utils/functions/premium/premium";
 import { getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import dayjs = require("dayjs");
+//import dayjs = require("dayjs");
 
-const BASE_URL = "https://quickchart.io/chart/create";
+//const BASE_URL = "https://quickchart.io/chart/create";
 
 const cmd = new Command(
   "ecohistory",
@@ -20,7 +20,7 @@ const cmd = new Command(
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[],
+  //args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
