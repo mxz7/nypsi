@@ -9,10 +9,10 @@ const client = new NypsiClient({
   sweepers: {
     messages: {
       interval: 3600,
-      lifetime: 1800,
+      lifetime: 900,
       filter: () => (msg) =>
         msg.author.id === msg.client.user.id &&
-        msg.createdTimestamp > Date.now() - ms("30 minutes"),
+        (msg.editedTimestamp || msg.createdTimestamp) > Date.now() - ms("10 minutes"),
     },
     guildMembers: {
       interval: 3600,
@@ -27,10 +27,11 @@ const client = new NypsiClient({
     GuildStickerManager: 0,
     GuildScheduledEventManager: 0,
     MessageManager: {
-      maxSize: 50,
+      maxSize: 25,
       keepOverLimit: (msg) =>
-        msg.author.id === msg.client.user.id &&
-        msg.createdTimestamp > Date.now() - ms("30 minutes"),
+        (msg.author.id === msg.client.user.id &&
+          (msg.editedTimestamp || msg.createdTimestamp) > Date.now() - ms("10 minutes")) ||
+        msg.createdTimestamp > Date.now() - ms("5 minutes"),
     },
     PresenceManager: 0,
     ReactionManager: 0,
