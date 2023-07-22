@@ -422,7 +422,7 @@ async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
     if (cratesEarned < 1) cratesEarned = 1;
     if (cratesEarned > 5) cratesEarned = 5;
 
-    desc.push(` +**${cratesEarned}** 69420 crates`);
+    desc.push(` +**${cratesEarned}** 69420 crate${cratesEarned != 1 ? "s" : ""}`);
     desc.push(" +**1** upgrade token");
 
     embed.setHeader(guild.guildName);
