@@ -20,6 +20,7 @@ import { NypsiClient } from "../../../models/Client";
 import { CustomEmbed, ErrorEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
 import { logger, transaction } from "../../logger";
+import { filterOutliers } from "../outliers";
 import { isPremium } from "../premium/premium";
 import requestDM from "../requestdm";
 import { addToNypsiBank, getTax } from "../tax";
@@ -354,7 +355,7 @@ export async function getAuctionAverage(item: string) {
     orderBy: {
       createdAt: "desc",
     },
-    take: 25,
+    take: 30,
   });
 
   const costs: number[] = [];
@@ -369,8 +370,15 @@ export async function getAuctionAverage(item: string) {
     }
   }
 
-  const sum = costs.reduce((a, b) => a + b, 0);
-  const avg = Math.floor(sum / costs.length) || 0;
+  let filtered = filterOutliers(costs);
+
+  if (!filtered) {
+    logger.warn("failed to filter outliers (auctions)", { costs, item, auctions });
+    filtered = costs;
+  }
+
+  const sum = filtered.reduce((a, b) => a + b, 0);
+  const avg = Math.floor(sum / filtered.length) || 0;
 
   await redis.set(`${Constants.redis.cache.economy.AUCTION_AVG}:${item}`, avg);
   await redis.expire(`${Constants.redis.cache.economy.AUCTION_AVG}:${item}`, ms("3 hour") / 1000);
