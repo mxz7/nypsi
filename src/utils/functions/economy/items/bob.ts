@@ -124,7 +124,9 @@ module.exports = new ItemUse(
           message.member,
           `<:nypsi_bob:1078776552067694672> bob has removed ${amount} hour${
             amount > 1 ? "s" : ""
-          } of crafting time from ${crafting.length} item${crafting.length != 1 ? "s" : ""}\n\n${breakdown.join("\n")}`,
+          } of crafting time from ${crafting.length} item${
+            crafting.length != 1 ? "s" : ""
+          }\n\n${breakdown.join("\n")}`,
         ),
       ],
     });

@@ -945,10 +945,13 @@ async function run(
           )
         } token${
           upgrade.cost +
-          Math.floor(
-            (guild.upgrades.find((i) => i.upgradeId === upgrade.id)?.amount || 0) *
-              upgrade.increment_per_level,
-          ) != 1 ? "s" : ""
+            Math.floor(
+              (guild.upgrades.find((i) => i.upgradeId === upgrade.id)?.amount || 0) *
+                upgrade.increment_per_level,
+            ) !=
+          1
+            ? "s"
+            : ""
         }`;
 
       if (pages.size === 0) {
