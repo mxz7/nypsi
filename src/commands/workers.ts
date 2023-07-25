@@ -141,16 +141,16 @@ async function run(
 
     let baseCost = _.clone(baseUpgrades[upgradeId]).base_cost;
 
-    for (let i = 0; i < amount; i++) {
-      baseCost =
-        baseCost *
-        (baseWorkers[workerId].prestige_requirement >= 4
-          ? baseWorkers[workerId].prestige_requirement / 2
-          : baseWorkers[workerId].prestige_requirement - 0.5 < 1
-          ? 1
-          : baseWorkers[workerId].prestige_requirement - 0.5);
+    baseCost =
+      baseCost *
+      (baseWorkers[workerId].prestige_requirement >= 4
+        ? baseWorkers[workerId].prestige_requirement / 2
+        : baseWorkers[workerId].prestige_requirement - 0.5 < 1
+        ? 1
+        : baseWorkers[workerId].prestige_requirement - 0.5);
 
-      const cost = baseCost + baseCost * owned;
+    for (let i = owned; i < owned + amount; i++) {
+      const cost = baseCost + baseCost * i;
 
       totalCost += cost;
     }
