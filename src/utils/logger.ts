@@ -1,8 +1,6 @@
-import { variants } from "@catppuccin/palette";
 import { Client, User, WebhookClient } from "discord.js";
 import { WriteStream, createWriteStream, existsSync } from "fs";
 import { rename, stat } from "fs/promises";
-import DiscordTransport from "../models/DiscordLogs";
 import Constants from "./Constants";
 import chalk = require("chalk");
 import dayjs = require("dayjs");
@@ -121,13 +119,58 @@ class FileTransport implements Transport {
   private stream: WriteStream;
   private rotateAfterBytes: number;
   private queue: WriteData[];
+  private checkingFile: boolean;
+  private lastCheck: number;
 
   constructor(opts: { path: string; levels: Levels[]; rotateAfterBytes?: number }) {
     this.path = opts.path;
     this.levels = opts.levels;
     this.rotateAfterBytes = opts.rotateAfterBytes || 0;
     this.queue = [];
-    this.stream = createWriteStream(this.path, { flags: "a" });
+    this.stream = createWriteStream(this.path.replace(`%DATE%`, dayjs().format("YYYY-MM-DD")), {
+      flags: "a",
+    });
+    this.checkingFile = false;
+    this.lastCheck = Date.now();
+  }
+
+  private async checkFile() {
+    if (this.checkingFile || this.lastCheck > Date.now() - 30000) return;
+    this.checkingFile = true;
+
+    const stats = await stat(this.stream.path);
+
+    if (stats.size >= this.rotateAfterBytes && this.rotateAfterBytes > 0) {
+      logger.debug("rotating file");
+
+      if (existsSync(this.path.replace(`%DATE%`, dayjs().format("YYYY-MM-DD")))) {
+        let oldFileNameModifier = 1;
+
+        while (existsSync(this.stream.path + "." + oldFileNameModifier)) oldFileNameModifier++;
+        await rename(this.stream.path, this.stream.path + "." + oldFileNameModifier);
+
+        this.stream?.end();
+        this.stream = null;
+
+        this.stream = createWriteStream(this.path.replace(`%DATE%`, dayjs().format("YYYY-MM-DD")), {
+          flags: "a",
+        });
+      } else {
+        this.stream?.end();
+        this.stream = null;
+
+        this.stream = createWriteStream(this.path.replace(`%DATE%`, dayjs().format("YYYY-MM-DD")), {
+          flags: "a",
+        });
+      }
+
+      if (this.queue) {
+        this.queue.forEach(this.write);
+        this.queue.length = 0;
+      }
+    }
+
+    this.checkingFile = false;
   }
 
   public async write(data: WriteData) {
@@ -135,6 +178,7 @@ class FileTransport implements Transport {
       this.queue.push(data);
       return;
     }
+
     const out = {
       level: data.label,
       msg: data.message,
@@ -153,26 +197,7 @@ class FileTransport implements Transport {
 
     this.stream.write(JSON.stringify(out) + "\n");
 
-    const stats = await stat(this.path);
-
-    if (stats.size >= this.rotateAfterBytes && this.rotateAfterBytes > 0) {
-      if (!this.stream) return;
-      logger.debug("rotating file");
-      this.stream.end();
-      this.stream = null;
-
-      let oldFileNameModifier = 1;
-
-      while (existsSync(this.path + "." + oldFileNameModifier)) oldFileNameModifier++;
-
-      await rename(this.path, this.path + "." + oldFileNameModifier);
-      this.stream = createWriteStream(this.path);
-
-      if (this.queue) {
-        this.queue.forEach(this.write);
-        this.queue.length = 0;
-      }
-    }
+    this.checkFile();
   }
 }
 
@@ -311,14 +336,14 @@ const formatter = (data: WriteData) => {
 
 logger.addTransport(
   new FileTransport({
-    path: "./out/combined.log",
+    path: "./out/combined-%DATE%.log",
     levels: ["debug", "info", "warn", "error"],
     rotateAfterBytes: 10e6,
   }),
 );
 logger.addTransport(
   new FileTransport({
-    path: "./out/combined.log",
+    path: "./out/error-%DATE%.log",
     levels: ["warn", "error"],
     rotateAfterBytes: 10e6,
   }),
@@ -329,21 +354,21 @@ logger.addTransport(
     formatter,
   }),
 );
-logger.addTransport(
-  new DiscordTransport({
-    formatter,
-    levels: ["info", "warn", "error"],
-    webhook: process.env.BOTLOGS_HOOK,
-    mode: "hybrid",
-    interval: 5000,
-    colors: new Map([
-      ["error", variants.mocha.red.hex as `#${string}`],
-      ["warn", variants.mocha.yellow.hex as `#${string}`],
-      ["debug", variants.mocha.pink.hex as `#${string}`],
-      ["info", variants.mocha.sky.hex as `#${string}`],
-    ]),
-  }),
-);
+// logger.addTransport(
+//   new DiscordTransport({
+//     formatter,
+//     levels: ["info", "warn", "error"],
+//     webhook: process.env.BOTLOGS_HOOK,
+//     mode: "hybrid",
+//     interval: 5000,
+//     colors: new Map([
+//       ["error", variants.mocha.red.hex as `#${string}`],
+//       ["warn", variants.mocha.yellow.hex as `#${string}`],
+//       ["debug", variants.mocha.pink.hex as `#${string}`],
+//       ["info", variants.mocha.sky.hex as `#${string}`],
+//     ]),
+//   }),
+// );
 
 const webhook = new Map<string, string>();
 const nextLogMsg = new Map<string, string>();
