@@ -68,7 +68,7 @@ async function run(
   if (args.length == 0) {
     return help();
   } else if (args[0].toLowerCase() == "disable") {
-    await setModLogs(message.guild, "");
+    await setModLogs(message.guild, null);
 
     return message.channel.send({
       embeds: [new CustomEmbed(message.member, "✅ modlogs have been disabled")],
