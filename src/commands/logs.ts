@@ -68,7 +68,7 @@ async function run(
   if (args.length == 0) {
     return help();
   } else if (args[0].toLowerCase() == "disable") {
-    await setLogsChannelHook(message.guild, "");
+    await setLogsChannelHook(message.guild, null);
 
     return message.channel.send({
       embeds: [new CustomEmbed(message.member, "✅ logs have been disabled")],
