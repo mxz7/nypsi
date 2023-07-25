@@ -1241,7 +1241,7 @@
     "emoji": "👷🏻‍♂️",
     "target": 1000000,
     "description": "earn $1,000,000 from your workers",
-    "prize": ["lucky_scratch_card:2", "earth_scanner:1"]
+    "prize": ["lucky_scratch_card:2"]
   },
   "capitalist_iii": {
     "id": "capitalist_iii",
@@ -1249,7 +1249,7 @@
     "emoji": "👷🏻‍♂️",
     "target": 50000000,
     "description": "earn $50,000,000 from your workers",
-    "prize": ["lucky_scratch_card:3", "earth_scanner:2"]
+    "prize": ["lucky_scratch_card:3"]
   },
   "capitalist_iv": {
     "id": "capitalist_iv",
@@ -1257,7 +1257,7 @@
     "emoji": "👷🏻‍♂️",
     "target": 250000000,
     "description": "earn $250,000,000 from your workers",
-    "prize": ["legendary_scratch_card:2", "gem_radar:1"]
+    "prize": ["legendary_scratch_card:2", "earth_scanner:1"]
   },
   "capitalist_v": {
     "id": "capitalist_v",
@@ -1265,6 +1265,6 @@
     "emoji": "👷🏻‍♂️",
     "target": 1000000000,
     "description": "earn $1,000,000,000 from your workers",
-    "prize": ["nypsi_crate:1", "legendary_scratch_card:3", "gem_radar:2", "earth_scanner:2"]
+    "prize": ["nypsi_crate:1", "legendary_scratch_card:3", "gem_radar:1", "earth_scanner:2"]
   }
 }
