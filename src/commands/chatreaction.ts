@@ -428,7 +428,7 @@ async function run(
       return;
     }
 
-    const a = await startOpenChatReaction(message.guild, message.channel);
+    const a = await startOpenChatReaction(message.guild, message.channel, true);
 
     if (a == "xoxo69") {
       return send({
