@@ -192,7 +192,12 @@ export async function calcWorkerValues(
   return res;
 }
 
-export async function addWorkerUpgrade(member: GuildMember, workerId: string, upgradeId: string) {
+export async function addWorkerUpgrade(
+  member: GuildMember,
+  workerId: string,
+  upgradeId: string,
+  amount = 1,
+) {
   await prisma.economyWorkerUpgrades.upsert({
     where: {
       userId_workerId_upgradeId: {
@@ -202,13 +207,13 @@ export async function addWorkerUpgrade(member: GuildMember, workerId: string, up
       },
     },
     update: {
-      amount: { increment: 1 },
+      amount: { increment: amount },
     },
     create: {
       upgradeId: upgradeId,
       userId: member.user.id,
       workerId: workerId,
-      amount: 1,
+      amount,
     },
   });
 }
