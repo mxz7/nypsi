@@ -10,6 +10,7 @@ import { CustomEmbed } from "../../models/EmbedBuilders";
 import { NotificationPayload } from "../../types/Notification";
 import { SteveData } from "../../types/Workers";
 import Constants from "../../utils/Constants";
+import { addProgress } from "../../utils/functions/economy/achievements";
 import { getBalance, updateBalance } from "../../utils/functions/economy/balance";
 import { getBoosters } from "../../utils/functions/economy/boosters";
 import { addInventoryItem } from "../../utils/functions/economy/inventory";
@@ -89,6 +90,7 @@ async function doWorkerThing() {
       earned += Math.floor(incrementAmount * perItem);
 
       await updateBalance(worker.userId, (await getBalance(worker.userId)) + earned);
+      await addProgress(worker.userId, "capitalist", earned);
 
       steveStorage.money += earned;
 
