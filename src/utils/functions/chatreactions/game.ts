@@ -39,8 +39,8 @@ async function generateWord(guild: Guild) {
   return { actual: chosenWord, display: displayWord };
 }
 
-export async function startOpenChatReaction(guild: Guild, channel: TextChannel) {
-  if (currentChannels.has(channel.id)) return "xoxo69";
+export async function startOpenChatReaction(guild: Guild, channel: TextChannel, force = false) {
+  if (currentChannels.has(channel.id) && !force) return "xoxo69";
 
   currentChannels.add(channel.id);
 
