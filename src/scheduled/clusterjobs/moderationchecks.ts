@@ -14,15 +14,26 @@ export const unbanTimeouts = new Set<string>();
 
 export function runLogs() {
   setInterval(async () => {
-    const query = await prisma.moderation.findMany({
-      where: {
-        logs: { not: null },
-      },
-      select: {
-        guildId: true,
-        logs: true,
-      },
-    });
+    let query: {
+      guildId: string;
+      logs: string;
+    }[];
+
+    if (await redis.exists(Constants.redis.cache.guild.LOGS_GUILDS)) {
+      query = JSON.parse(await redis.get(Constants.redis.cache.guild.LOGS_GUILDS));
+    } else {
+      query = await prisma.moderation.findMany({
+        where: {
+          logs: { not: null },
+        },
+        select: {
+          guildId: true,
+          logs: true,
+        },
+      });
+
+      await redis.set(Constants.redis.cache.guild.LOGS_GUILDS, JSON.stringify(query), "EX", 3600);
+    }
 
     let count = 0;
 
@@ -91,7 +102,90 @@ export function runLogs() {
     if (count > 0) {
       logger.info(`::auto sent ${count} logs`);
     }
-  }, 5000);
+
+    let modlogsQuery: {
+      guildId: string;
+      modlogs: string;
+    }[];
+
+    if (await redis.exists(Constants.redis.cache.guild.MODLOGS_GUILDS)) {
+      modlogsQuery = JSON.parse(await redis.get(Constants.redis.cache.guild.MODLOGS_GUILDS));
+    } else {
+      modlogsQuery = await prisma.moderation.findMany({
+        where: {
+          modlogs: { not: null },
+        },
+        select: {
+          guildId: true,
+          modlogs: true,
+        },
+      });
+
+      await redis.set(
+        Constants.redis.cache.guild.MODLOGS_GUILDS,
+        JSON.stringify(modlogsQuery),
+        "EX",
+        3600,
+      );
+    }
+
+    let modLogCount = 0;
+
+    for (const modlog of modlogsQuery) {
+      if (
+        !(await redis.exists(`${Constants.redis.cache.guild.MODLOGS}:${modlog.guildId}`)) ||
+        (await redis.llen(`${Constants.redis.cache.guild.MODLOGS}:${modlog.guildId}`)) == 0
+      )
+        continue;
+
+      const webhook = new WebhookClient({
+        url: modlog.modlogs,
+      });
+
+      const embeds: APIEmbed[] = [];
+
+      if ((await redis.llen(`${Constants.redis.cache.guild.MODLOGS}:${modlog.guildId}`)) > 10) {
+        for (let i = 0; i < 10; i++) {
+          const current = await redis.rpop(
+            `${Constants.redis.cache.guild.MODLOGS}:${modlog.guildId}`,
+          );
+          embeds.push(JSON.parse(current) as APIEmbed);
+        }
+      } else {
+        const current = await redis.lrange(
+          `${Constants.redis.cache.guild.MODLOGS}:${modlog.guildId}`,
+          0,
+          10,
+        );
+        await redis.del(`${Constants.redis.cache.guild.MODLOGS}:${modlog.guildId}`);
+        for (const i of current) {
+          embeds.push(JSON.parse(i) as APIEmbed);
+        }
+        embeds.reverse();
+      }
+
+      modLogCount += embeds.length;
+
+      await webhook.send({ embeds: embeds }).catch(async (e) => {
+        logger.error(`error sending modlogs to webhook (${modlog.guildId}) - removing modlogs`);
+        logger.error("moderation checks error", e);
+
+        await prisma.moderation.update({
+          where: {
+            guildId: modlog.guildId,
+          },
+          data: {
+            modlogs: "",
+          },
+        });
+      });
+      webhook.destroy();
+    }
+
+    if (modLogCount > 0) {
+      logger.info(`::auto ${modLogCount.toLocaleString()} modlogs sent`);
+    }
+  }, 2500);
 }
 
 export function runModerationChecks(client: NypsiClient) {
@@ -146,73 +240,6 @@ export function runModerationChecks(client: NypsiClient) {
           requestUnban(unban.guildId, unban.userId, client);
         }, unban.expire.getTime() - Date.now());
       }
-    }
-
-    const query3 = await prisma.moderation.findMany({
-      where: {
-        NOT: { modlogs: "" },
-      },
-      select: {
-        modlogs: true,
-        guildId: true,
-      },
-    });
-
-    let modLogCount = 0;
-
-    for (const modlog of query3) {
-      if (
-        !(await redis.exists(`${Constants.redis.cache.guild.MODLOGS}:${modlog.guildId}`)) ||
-        (await redis.llen(`${Constants.redis.cache.guild.MODLOGS}:${modlog.guildId}`)) == 0
-      )
-        continue;
-
-      const webhook = new WebhookClient({
-        url: modlog.modlogs,
-      });
-
-      const embeds: APIEmbed[] = [];
-
-      if ((await redis.llen(`${Constants.redis.cache.guild.MODLOGS}:${modlog.guildId}`)) > 10) {
-        for (let i = 0; i < 10; i++) {
-          const current = await redis.rpop(
-            `${Constants.redis.cache.guild.MODLOGS}:${modlog.guildId}`,
-          );
-          embeds.push(JSON.parse(current) as APIEmbed);
-        }
-      } else {
-        const current = await redis.lrange(
-          `${Constants.redis.cache.guild.MODLOGS}:${modlog.guildId}`,
-          0,
-          10,
-        );
-        await redis.del(`${Constants.redis.cache.guild.MODLOGS}:${modlog.guildId}`);
-        for (const i of current) {
-          embeds.push(JSON.parse(i) as APIEmbed);
-        }
-        embeds.reverse();
-      }
-
-      modLogCount += embeds.length;
-
-      await webhook.send({ embeds: embeds }).catch(async (e) => {
-        logger.error(`error sending modlogs to webhook (${modlog.guildId}) - removing modlogs`);
-        logger.error("moderation checks error", e);
-
-        await prisma.moderation.update({
-          where: {
-            guildId: modlog.guildId,
-          },
-          data: {
-            modlogs: "",
-          },
-        });
-      });
-      webhook.destroy();
-    }
-
-    if (modLogCount > 0) {
-      logger.info(`::auto ${modLogCount.toLocaleString()} modlogs sent`);
     }
   }, 90000);
 }
