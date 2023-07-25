@@ -134,22 +134,28 @@ async function run(
     return false;
   };
 
-  const calcUpgradeCost = (workerId: string, upgradeId: string, owned: number) => {
+  const calcUpgradeCost = (workerId: string, upgradeId: string, owned: number, amount: number) => {
     const baseUpgrades = getBaseUpgrades();
+
+    let totalCost = 0;
 
     let baseCost = _.clone(baseUpgrades[upgradeId]).base_cost;
 
-    baseCost =
-      baseCost *
-      (baseWorkers[workerId].prestige_requirement >= 4
-        ? baseWorkers[workerId].prestige_requirement / 2
-        : baseWorkers[workerId].prestige_requirement - 0.5 < 1
-        ? 1
-        : baseWorkers[workerId].prestige_requirement - 0.5);
+    for (let i = 0; i < amount; i++) {
+      baseCost =
+        baseCost *
+        (baseWorkers[workerId].prestige_requirement >= 4
+          ? baseWorkers[workerId].prestige_requirement / 2
+          : baseWorkers[workerId].prestige_requirement - 0.5 < 1
+          ? 1
+          : baseWorkers[workerId].prestige_requirement - 0.5);
 
-    const cost = baseCost + baseCost * owned;
+      const cost = baseCost + baseCost * owned;
 
-    return Math.floor(cost);
+      totalCost += cost;
+    }
+
+    return Math.floor(totalCost);
   };
 
   const showWorkers = async (defaultWorker = "quarry", msg?: Message) => {
@@ -325,6 +331,9 @@ async function run(
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder().setCustomId("ba").setLabel("back").setStyle(ButtonStyle.Danger),
     );
+    const maxRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder().setCustomId("ba2").setLabel("back").setStyle(ButtonStyle.Danger),
+    );
 
     for (const upgradeId of Object.keys(baseUpgrades)) {
       if (baseUpgrades[upgradeId].for && !baseUpgrades[upgradeId].for.includes(worker.id)) continue;
@@ -342,18 +351,32 @@ async function run(
 
         const button = new ButtonBuilder()
           .setCustomId(`up-${upgradeId}`)
-          .setLabel(`⬆️ ${baseUpgrades[upgradeId].name}`);
+          .setEmoji("⬆️")
+          .setLabel(`${baseUpgrades[upgradeId].name}`);
+        const maxButton = new ButtonBuilder()
+          .setCustomId(`up-${upgradeId}-max`)
+          .setEmoji("⏫")
+          .setLabel(baseUpgrades[upgradeId].name);
 
         if (owned < baseUpgrades[upgradeId].stack_limit) {
-          desc += ` - $${calcUpgradeCost(userWorker.workerId, upgradeId, owned).toLocaleString()}`;
+          desc += ` - $${calcUpgradeCost(
+            userWorker.workerId,
+            upgradeId,
+            owned,
+            1,
+          ).toLocaleString()}`;
           button.setStyle(ButtonStyle.Success);
+          maxButton.setStyle(ButtonStyle.Success);
         } else {
           button.setStyle(ButtonStyle.Secondary);
+          maxButton.setStyle(ButtonStyle.Secondary);
           button.setDisabled(true);
+          maxButton.setDisabled(true);
         }
         desc += "\n";
 
         row.addComponents(button);
+        maxRow.addComponents(maxButton);
       } else if (userWorker.upgrades.find((u) => u.upgradeId == upgradeId)) {
         desc += `**${
           baseUpgrades[upgradeId].plural
@@ -368,9 +391,9 @@ async function run(
     embed.setDescription(desc);
 
     if (!msg) {
-      msg = await send({ embeds: [embed], components: [row] });
+      msg = await send({ embeds: [embed], components: [row, maxRow] });
     } else {
-      msg = await msg.edit({ embeds: [embed], components: [row] });
+      msg = await msg.edit({ embeds: [embed], components: [row, maxRow] });
     }
 
     const filter = (i: Interaction) => i.user.id == message.author.id;
@@ -389,7 +412,7 @@ async function run(
         return;
       }
 
-      if (res.customId == "ba") {
+      if (res.customId == "ba" || res.customId === "ba2") {
         return showWorkers(worker.id, msg);
       } else if (res.customId.startsWith("up-")) {
         const upgradeId = res.customId.split("-")[1];
@@ -416,13 +439,19 @@ async function run(
           userWorkers
             .find((w) => w.workerId == worker.id)
             .upgrades.find((u) => u.upgradeId == upgradeId)?.amount || 0,
+          res.customId.endsWith("-max")
+            ? baseUpgrades[upgradeId].stack_limit -
+                (userWorkers
+                  .find((w) => w.workerId === worker.id)
+                  .upgrades.find((u) => u.upgradeId === upgradeId)?.amount || 0)
+            : 1,
         );
 
         const balance = await getBalance(message.member);
 
         if (balance < cost) {
           await res.followUp({
-            embeds: [new ErrorEmbed("you cannot afford this upgrade")],
+            embeds: [new ErrorEmbed(`you cannot afford this ($${cost.toLocaleString()})`)],
             ephemeral: true,
           });
 
@@ -432,7 +461,17 @@ async function run(
         }
 
         await updateBalance(message.member, balance - cost);
-        await addWorkerUpgrade(message.member, worker.id, upgradeId);
+        await addWorkerUpgrade(
+          message.member,
+          worker.id,
+          upgradeId,
+          res.customId.endsWith("-max")
+            ? baseUpgrades[upgradeId].stack_limit -
+                (userWorkers
+                  .find((w) => w.workerId === worker.id)
+                  .upgrades.find((u) => u.upgradeId === upgradeId)?.amount || 0)
+            : 1,
+        );
 
         userWorkers = await getWorkers(message.member);
 
