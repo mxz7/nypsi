@@ -17,9 +17,11 @@ import { addProgress } from "../../utils/functions/economy/achievements";
 import { addInventoryItem } from "../../utils/functions/economy/inventory";
 import { createUser, getItems, isEcoBanned, userExists } from "../../utils/functions/economy/utils";
 import { getPrefix } from "../../utils/functions/guilds/utils";
+
 import { percentChance, shuffle } from "../../utils/functions/random";
 import { getZeroWidth } from "../../utils/functions/string";
 import { getLastKnownUsername } from "../../utils/functions/users/tag";
+import { createProfile, hasProfile } from "../../utils/functions/users/utils";
 import { logger } from "../../utils/logger";
 import dayjs = require("dayjs");
 
@@ -109,6 +111,8 @@ async function randomDrop(client: NypsiClient) {
     const winner = await games[Math.floor(Math.random() * games.length)](client, channelId, prize);
 
     if (winner) {
+      if (!(await hasProfile(winner))) await createProfile(winner);
+      if (!(await userExists(winner))) await createUser(winner);
       if (await isEcoBanned(winner).catch(() => false)) continue;
 
       logger.info(
