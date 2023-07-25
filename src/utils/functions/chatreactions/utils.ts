@@ -14,22 +14,22 @@ export function doChatReactions(client: NypsiClient) {
   setInterval(async () => {
     let count = 0;
 
-    for (const guildId of client.guilds.cache.keys()) {
-      const guildData = await prisma.chatReaction.findFirst({
-        where: {
-          AND: [{ guildId: guildId }, { randomStart: true }],
-        },
-        select: {
-          guildId: true,
-          randomChannels: true,
-          betweenEvents: true,
-          randomModifier: true,
-        },
-      });
+    const query = await prisma.chatReaction.findMany({
+      where: {
+        AND: [{ guildId: { in: Array.from(client.guilds.cache.keys()) } }, { randomStart: true }],
+      },
+      select: {
+        guildId: true,
+        randomChannels: true,
+        randomModifier: true,
+        betweenEvents: true,
+      },
+    });
 
+    for (const guildData of query) {
       if (!guildData) continue;
 
-      const guild = client.guilds.cache.get(guildId);
+      const guild = client.guilds.cache.get(guildData.guildId);
 
       if (!guild) continue;
 
