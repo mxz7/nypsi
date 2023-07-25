@@ -205,6 +205,6 @@ export function runWorkerInterval() {
   setTimeout(() => {
     doWorkerThing();
 
-    setInterval(doWorkerThing, ms("1 hour"));
-  }, msNeeded);
+    setInterval(doWorkerThing, ms("1 seconds"));
+  }, 1000);
 }
