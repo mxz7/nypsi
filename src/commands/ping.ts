@@ -1,4 +1,5 @@
 import { CommandInteraction, Message } from "discord.js";
+import { loadavg } from "os";
 import prisma from "../init/database";
 import redis from "../init/redis";
 import { Command, NypsiCommandInteraction } from "../models/Command";
@@ -92,7 +93,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     desc += `\ndatabase \`${dbLatency.join("ms` | `")}ms\``;
   }
 
-  embed.setDescription(desc);
+  embed.setDescription(
+    `${desc}\nload avg: ${loadavg()
+      .map((i) => `\`${i}\``)
+      .join(" ")}`,
+  );
 
   return await msg.edit({ embeds: [embed] });
 }
