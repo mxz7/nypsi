@@ -513,7 +513,7 @@ async function handleKofiData(data: KofiResponse) {
               embeds: [
                 new CustomEmbed(
                   null,
-                  `${user.lastKnownUsername} just bought **${item}**!!!!`,
+                  `${user.lastKnownUsername} just bought **${item.name}**!!!!`,
                 ).setFooter({
                   text: "thank you for your purchase (:",
                 }),
@@ -532,7 +532,7 @@ async function handleKofiData(data: KofiResponse) {
             embeds: [
               new CustomEmbed(
                 null,
-                `${user.lastKnownUsername} just bought **${item}**!!!!`,
+                `${user.lastKnownUsername} just bought **${item.name}**!!!!`,
               ).setFooter({
                 text: "thank you for your purchase (:",
               }),
