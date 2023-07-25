@@ -342,7 +342,7 @@ async function run(
       });
     }
 
-    if (carCooldown.has(message.author.id)) {
+    if (carCooldown.has(message.author.id) && car.id !== "cycle") {
       let current = carCooldown.get(message.author.id);
 
       if (current.includes(car.id)) {
