@@ -128,6 +128,7 @@ export async function isLogsEnabled(guild: Guild) {
 
 export async function setLogsChannelHook(guild: Guild, hook: string) {
   await redis.del(`${Constants.redis.cache.guild.LOGS}:${guild.id}`);
+  await redis.del(Constants.redis.cache.guild.LOGS_GUILDS);
 
   if (!hook) {
     await redis.del(`${Constants.redis.nypsi.GUILD_LOG_QUEUE}:${guild.id}`);
@@ -187,6 +188,8 @@ export async function isModLogsEnabled(guild: Guild) {
 }
 
 export async function setModLogs(guild: Guild, hook: string) {
+  await redis.del(Constants.redis.cache.guild.MODLOGS_GUILDS);
+
   await prisma.moderation.update({
     where: {
       guildId: guild.id,
