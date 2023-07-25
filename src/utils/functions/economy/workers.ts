@@ -114,10 +114,10 @@ export async function calcWorkerValues(
           baseWorkers[worker.workerId].base.max_storage;
         break;
       case "scrap_chance":
-        scrapChance += baseUpgrades[upgrade.upgradeId].effect;
+        scrapChance += baseUpgrades[upgrade.upgradeId].effect * upgrade.amount;
         break;
       case "gem_chance":
-        gemChance += baseUpgrades[upgrade.upgradeId].effect;
+        gemChance += baseUpgrades[upgrade.upgradeId].effect * upgrade.amount;
         break;
     }
   }
