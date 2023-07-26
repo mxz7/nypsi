@@ -1,7 +1,6 @@
 import { ColorResolvable, EmbedBuilder, GuildMember } from "discord.js";
 import redis from "../init/redis";
 import Constants from "../utils/Constants";
-import { getColor } from "../utils/functions/color";
 import { getEmbedColor } from "../utils/functions/premium/color";
 import ms = require("ms");
 
@@ -16,13 +15,13 @@ export class CustomEmbed extends EmbedBuilder {
 
       if (color && color != "none") {
         if (color == "default") {
-          super.setColor(getColor(member));
+          super.setColor(Constants.PURPLE);
         } else {
           super.setColor(color);
         }
       } else {
         checkPremium(member.user.id);
-        super.setColor(getColor(member));
+        super.setColor(Constants.PURPLE);
       }
     }
 
