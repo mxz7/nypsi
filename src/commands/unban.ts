@@ -163,7 +163,7 @@ async function run(
     members1.push(m.id);
   }
 
-  await newCase(message.guild, "unban", members1, message.member.user.username, message.content);
+  await newCase(message.guild, "unban", members1, message.author, message.content);
 }
 
 cmd.setRun(run);

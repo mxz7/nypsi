@@ -257,7 +257,7 @@ async function run(
     }
   }
 
-  await newCase(message.guild, "unmute", members1, message.author.username, message.content);
+  await newCase(message.guild, "unmute", members1, message.author, message.content);
 }
 
 cmd.setRun(run);
