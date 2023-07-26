@@ -197,6 +197,14 @@ export async function createGuild(name: string, owner: GuildMember) {
 }
 
 export async function deleteGuild(name: string) {
+  const guild = await getGuildByName(name);
+
+  if (!guild) return;
+
+  for (const member of guild.members) {
+    await redis.del(`${Constants.redis.cache.economy.GUILD_USER}:${member.userId}`);
+  }
+
   await prisma.economyGuildMember.deleteMany({
     where: {
       guildName: name,
