@@ -170,7 +170,7 @@ export async function getOffersAverage(item: string) {
     take: 30,
   });
 
-  if (offers.map((i) => i.itemAmount).reduce((a, b) => a + b) < 3) {
+  if (offers.length === 0 || offers.map((i) => i.itemAmount).reduce((a, b) => a + b) < 3) {
     offers = await prisma.offer.findMany({
       where: {
         AND: [{ sold: true }, { itemId: item }, { soldAt: { gt: Constants.SEASON_START } }],

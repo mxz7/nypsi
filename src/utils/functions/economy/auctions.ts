@@ -358,7 +358,7 @@ export async function getAuctionAverage(item: string) {
     take: 30,
   });
 
-  if (auctions.map((i) => i.itemAmount).reduce((a, b) => a + b) < 3) {
+  if (auctions.length === 0 || auctions.map((i) => i.itemAmount).reduce((a, b) => a + b) < 3) {
     auctions = await prisma.auction.findMany({
       where: {
         AND: [{ sold: true }, { itemId: item }],
