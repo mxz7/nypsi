@@ -147,4 +147,5 @@ export default {
   SNOWFLAKE_REGEX: /^\d{17,19}$/,
   LUCKY_CHEESE_CHANCE: 0.1,
   BADGES: ["owner", "staff", "highroller", "contributor", "season_winner", "og"],
+  PURPLE: "#8b5cf6" as ColorResolvable,
 };
