@@ -1,4 +1,4 @@
-import { Guild } from "discord.js";
+import { Guild, User } from "discord.js";
 import prisma from "../../../init/database";
 import { PunishmentType } from "../../../types/Moderation";
 import { addModLog, isModLogsEnabled } from "./logs";
@@ -20,7 +20,7 @@ export async function newCase(
   guild: Guild,
   caseType: PunishmentType,
   userIDs: string[] | string,
-  moderator: string,
+  moderator: User,
   command: string,
 ) {
   if (!(userIDs instanceof Array)) {
@@ -34,7 +34,7 @@ export async function newCase(
         caseId: caseCount.toString(),
         type: caseType,
         user: userID,
-        moderator: moderator,
+        moderator: moderator.id,
         command: command,
         time: new Date(),
       },
@@ -50,7 +50,7 @@ export async function newCase(
 
     if (!(await isModLogsEnabled(guild))) return;
 
-    addModLog(guild, caseType, userID, moderator, command, caseCount);
+    addModLog(guild, caseType, userID, moderator.username, command, caseCount);
   }
 }
 

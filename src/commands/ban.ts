@@ -222,18 +222,12 @@ async function run(
   }
 
   if (mode === "id") {
-    await newCase(message.guild, "ban", userId, message.member.user.username, storeReason);
+    await newCase(message.guild, "ban", userId, message.author, storeReason);
     if (temporary) {
       await newBan(message.guild, userId, unbanDate);
     }
   } else {
-    await newCase(
-      message.guild,
-      "ban",
-      target.user.id,
-      message.author.username,
-      reason.split(": ")[1],
-    );
+    await newCase(message.guild, "ban", target.user.id, message.author, reason.split(": ")[1]);
 
     if (temporary) {
       await newBan(message.guild, target.user.id, unbanDate);
