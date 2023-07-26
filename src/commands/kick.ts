@@ -142,13 +142,7 @@ async function run(
     await send({ embeds: [embed] });
   }
 
-  await newCase(
-    message.guild,
-    "kick",
-    target.user.id,
-    message.author.username,
-    reason.split(": ")[1],
-  );
+  await newCase(message.guild, "kick", target.user.id, message.author, reason.split(": ")[1]);
 
   if (args.join(" ").includes("-s")) return;
 

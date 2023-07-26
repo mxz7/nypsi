@@ -13,9 +13,11 @@ import {
 } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
+import Constants from "../utils/Constants";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { deleteCase, getCase } from "../utils/functions/moderation/cases";
 import { createProfile, profileExists } from "../utils/functions/moderation/utils";
+import { getLastKnownUsername } from "../utils/functions/users/tag";
 
 const cmd = new Command("case", "get information about a given case", "moderation")
   .setPermissions(["MANAGE_MESSAGES", "MANAGE_SERVER", "MODERATE_MEMBERS"])
@@ -103,18 +105,22 @@ async function run(
     reason = "no reason specified";
   }
 
+  let moderator = `\`${case0.moderator}\``;
+
+  if (case0.moderator.match(Constants.SNOWFLAKE_REGEX)) {
+    const username = await getLastKnownUsername(case0.moderator).catch(() => "");
+
+    if (username) moderator = `${username}\n\`${case0.moderator}\``;
+  }
+
   const embed = new CustomEmbed(message.member)
     .setHeader("case " + case0.caseId)
     .addField("type", "`" + case0.type + "`", true)
-    .addField("moderator", case0.moderator, true)
+    .addField("moderator", moderator, true)
     .addField("date/time", `<t:${Math.floor(case0.time.getTime() / 1000)}>`, true)
-    .addField("user", "`" + case0.user + "`", true)
+    .addField("user", `${target ? `${target.toString()}\n` : ""} \`${case0.user}\``, true)
     .addField("reason", reason, true)
     .addField("deleted", case0.deleted.toString(), true);
-
-  if (target) {
-    embed.setDescription("punished user: " + target.toString());
-  }
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder().setCustomId("❌").setLabel("delete").setStyle(ButtonStyle.Danger),

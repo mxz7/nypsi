@@ -1,10 +1,12 @@
 import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
+import Constants from "../utils/Constants";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
 import { getAllCases } from "../utils/functions/moderation/cases";
 import { profileExists } from "../utils/functions/moderation/utils";
+import { getLastKnownUsername } from "../utils/functions/users/tag";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command(
@@ -92,11 +94,25 @@ async function run(
 
     let count = 0;
 
-    for (const s of staff) {
+    for (const userId of staff) {
       if (count >= 5) break;
 
+      let username = userId;
+
+      if (userId.match(Constants.SNOWFLAKE_REGEX)) {
+        const lastKnownUsername = await getLastKnownUsername(userId).catch(() => "");
+
+        if (username) username = lastKnownUsername;
+      }
+
       staffText[count] =
-        count + 1 + " `" + s + "` **" + topStaff.get(s).toLocaleString() + "** punishments given";
+        count +
+        1 +
+        " `" +
+        username +
+        "` **" +
+        topStaff.get(userId).toLocaleString() +
+        "** punishments given";
 
       count++;
     }
@@ -157,7 +173,11 @@ async function run(
     let unmutes = 0;
 
     for (const case0 of cases) {
-      if (case0.moderator == member.user.username) {
+      if (
+        case0.moderator.match(Constants.SNOWFLAKE_REGEX)
+          ? case0.moderator === member.user.id
+          : case0.moderator === member.user.username
+      ) {
         if (case0.deleted) {
           deletedCasesModerator++;
         } else {

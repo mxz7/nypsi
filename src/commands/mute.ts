@@ -302,7 +302,7 @@ async function run(
     storeReason = `[${mutedLength}] ${reason}`;
   }
 
-  await newCase(message.guild, "mute", target.user.id, message.author.username, storeReason);
+  await newCase(message.guild, "mute", target.user.id, message.author, storeReason);
 
   if (await isMuted(message.guild, target)) {
     await deleteMute(message.guild, target);

@@ -144,7 +144,7 @@ async function run(
     await send({ embeds: [embed] });
   }
 
-  await newCase(message.guild, "warn", target.user.id, message.author.username, reason);
+  await newCase(message.guild, "warn", target.user.id, message.author, reason);
 }
 
 cmd.setRun(run);
