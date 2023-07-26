@@ -362,6 +362,8 @@ async function prepareGame(
       `error occurred playing blackjack - ${message.author.username} (${message.author.id})`,
     );
     redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+    console.trace();
+    console.error(e);
     logger.error("bj error", e);
     message.channel.send({
       embeds: [new ErrorEmbed("an error occurred while running - join support server")],
