@@ -35,6 +35,18 @@ model User {
   Leaderboards   Leaderboards[]
   ActiveChannels ActiveChannels[]
   KofiPurchases  KofiPurchases[]
+  Tags           Tags[]
+}
+
+model Tags {
+  userId   String
+  tagId    String
+  selected Boolean  @default(false)
+  created  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, tagId])
 }
 
 model Leaderboards {
