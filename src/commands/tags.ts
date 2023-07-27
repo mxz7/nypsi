@@ -18,7 +18,7 @@ const cmd = new Command(
   "tags",
   "view, manage and choose a tag to be shown on your profile",
   "money",
-).setAliases(["titles"]);
+).setAliases(["titles", "tag"]);
 
 cmd.setRun((message, args) => {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
