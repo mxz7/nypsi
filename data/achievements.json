@@ -826,7 +826,8 @@
       "gem_crate:2",
       "nypsi_crate:3",
       "legendary_scratch_card:5",
-      "platinum_credit:2"
+      "platinum_credit:2",
+      "nypsi_tag:1"
     ]
   },
   "fighter_i": {
@@ -1305,6 +1306,6 @@
     "emoji": "🤓",
     "target": 25000,
     "description": "do 25,000 commands in a day",
-    "prize": ["legendary_scratch_card:2", "discordian_tag"]
+    "prize": ["legendary_scratch_card:2", "discordian_tag:1"]
   }
 }
