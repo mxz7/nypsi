@@ -5,6 +5,12 @@
     "description": "found in crates",
     "emoji": "🐐"
   },
+  "cat": {
+    "id": "cat",
+    "name": "cat",
+    "description": "found in crates",
+    "emoji": "<:nypsi_cat_tag:1134176717167149146>"
+  },
   "owner": {
     "id": "owner",
     "name": "owner",
