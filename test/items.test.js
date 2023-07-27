@@ -51,6 +51,7 @@ for (const item of Object.values(items)) {
     if (item.role === "car") expect(typeof item.speed).toBe("number");
     if (item.role === "ore") expect(typeof item.ingot).toBe("string");
     if (item.role === "worker-upgrade") expect(typeof item.worker_upgrade_id).toBe("string");
+    if (item.role === "tag") expect(typeof item.tagId).toBe("string");
 
     if (item.rarity) expect(typeof item.rarity).toBe("number");
     if (item.booster_desc) expect(typeof item.booster_desc).toBe("string");

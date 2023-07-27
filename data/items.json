@@ -2267,6 +2267,7 @@
     "rarity": 6,
     "role": "tag",
     "sell": 50000000,
-    "in_crates": true
+    "in_crates": true,
+    "tagId": "goat"
   }
 }
