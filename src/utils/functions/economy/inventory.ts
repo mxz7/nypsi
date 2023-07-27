@@ -365,7 +365,11 @@ export async function openCrate(
           if (chance != 2) continue;
         }
 
-        if (items[i].rarity == 5) {
+        if (items[i].rarity === 6) {
+          const chance = Math.floor(Math.random() * 500);
+
+          if (chance == 7) crateItemsModified.push(i);
+        } else if (items[i].rarity == 5) {
           const chance = Math.floor(Math.random() * 50);
 
           if (chance == 7) crateItemsModified.push(i);
