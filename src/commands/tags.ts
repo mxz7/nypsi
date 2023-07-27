@@ -75,7 +75,7 @@ cmd.setRun((message, args) => {
       ]);
 
     const embed = new CustomEmbed(message.member, pages.get(1).join("\n")).setHeader(
-      message.author.username,
+      `${message.author.username}'s avatar`,
       message.author.displayAvatarURL(),
     );
 
