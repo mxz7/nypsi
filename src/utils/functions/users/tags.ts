@@ -30,6 +30,21 @@ export async function getTags(userId: string) {
   return query;
 }
 
+export async function removeTag(userId: string, tagId: string) {
+  await redis.del(`${Constants.redis.cache.user.tags}:${userId}`);
+
+  await prisma.tags.delete({
+    where: {
+      userId_tagId: {
+        userId,
+        tagId,
+      },
+    },
+  });
+
+  return getTags(userId);
+}
+
 export async function addTag(userId: string, tagId: string) {
   const tags = getTagsData();
 
