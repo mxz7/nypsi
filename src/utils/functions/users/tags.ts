@@ -64,3 +64,28 @@ export async function addTag(userId: string, tagId: string) {
 
   return getTags(userId);
 }
+
+export async function setActiveTag(userId: string, tagId: string) {
+  await redis.del(`${Constants.redis.cache.user.tags}:${userId}`);
+
+  await prisma.tags.updateMany({
+    where: { userId },
+    data: {
+      selected: false,
+    },
+  });
+
+  await prisma.tags.update({
+    where: {
+      userId_tagId: {
+        userId,
+        tagId,
+      },
+    },
+    data: {
+      selected: true,
+    },
+  });
+
+  return getTags(userId);
+}
