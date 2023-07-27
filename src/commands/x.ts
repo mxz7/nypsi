@@ -329,9 +329,7 @@ async function run(
         const uses = await getCommandUses(user.id);
         const total = uses.map((x) => x.uses).reduce((a, b) => a + b);
 
-        const daily = parseInt(
-          await redis.hget(Constants.redis.nypsi.TOP_COMMANDS_USER, user.username),
-        );
+        const daily = parseInt(await redis.hget(Constants.redis.nypsi.TOP_COMMANDS_USER, user.id));
 
         const embed = new CustomEmbed(
           message.member,

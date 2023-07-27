@@ -11,6 +11,12 @@
     "description": "found in crates",
     "emoji": "<:nypsi_cat_tag:1134176717167149146>"
   },
+  "discordian": {
+    "id": "discordian",
+    "name": "discordian",
+    "description": "do 25,000 commands in 1 day",
+    "emoji": "🤓"
+  },
   "owner": {
     "id": "owner",
     "name": "owner",

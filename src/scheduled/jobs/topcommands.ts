@@ -4,6 +4,8 @@ import { inPlaceSort } from "fast-sort";
 import { parentPort } from "worker_threads";
 import redis from "../../init/redis";
 import Constants from "../../utils/Constants";
+import { getPreferences } from "../../utils/functions/users/notifications";
+import { getLastKnownUsername } from "../../utils/functions/users/tag";
 
 (async () => {
   const [topCommands, topUsers] = await Promise.all([
@@ -53,9 +55,14 @@ import Constants from "../../utils/Constants";
   embed.setTitle("top 10 commands");
   embed.setDescription(msg.join("\n"));
   embed.setColor(variants.latte.base.hex as ColorResolvable);
-  embed.setFooter({
-    text: `${users[0]} has no life (${parseInt(topUsers[users[0]]).toLocaleString()} commands)`,
-  });
+
+  if ((await getPreferences(users[0]).catch(() => null))?.leaderboards || false) {
+    embed.setFooter({
+      text: `${await getLastKnownUsername(users[0])} has no life (${parseInt(
+        topUsers[users[0]],
+      ).toLocaleString()} commands)`,
+    });
+  }
 
   const hook = new WebhookClient({ url: process.env.TOPCOMMANDS_HOOK });
 

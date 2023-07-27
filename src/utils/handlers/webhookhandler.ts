@@ -50,11 +50,6 @@ loadItems(false);
 
 const app = express();
 const webhook = new topgg.Webhook(process.env.TOPGG_AUTH);
-const apiRateLimits = new Map<string, number>();
-
-setInterval(() => {
-  apiRateLimits.clear();
-}, ms("1 hour"));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -81,32 +76,6 @@ export function listen(manager: ClusterManager) {
     response.status(200).send();
 
     return handleKofiData(data);
-  });
-
-  app.get("/commands-today", async (req, response) => {
-    const ip = req.headers["x-forwarded-for"] as string;
-
-    if (apiRateLimits.has(ip)) {
-      apiRateLimits.set(ip, apiRateLimits.get(ip) + 1);
-    } else {
-      apiRateLimits.set(ip, 1);
-    }
-
-    if (apiRateLimits.get(ip) >= 500) {
-      response.status(429).end();
-      return;
-    }
-
-    const total = Object.values(await redis.hgetall(Constants.redis.nypsi.TOP_COMMANDS))
-      .map((i) => parseInt(i))
-      .reduce((a, b) => a + b);
-    const users = Object.entries(await redis.hgetall(Constants.redis.nypsi.TOP_COMMANDS_USER)).map(
-      (i) => {
-        return { user: i[0], amount: parseInt(i[1]) };
-      },
-    );
-
-    return response.status(200).send(JSON.stringify({ total, users }));
   });
 
   app.listen(process.env.EXPRESS_PORT || 5000);

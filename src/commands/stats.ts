@@ -278,7 +278,7 @@ async function run(
     );
 
     const commandUses = parseInt(
-      await redis.hget(Constants.redis.nypsi.TOP_COMMANDS_USER, message.author.username),
+      await redis.hget(Constants.redis.nypsi.TOP_COMMANDS_USER, message.author.id),
     );
 
     const embed = new CustomEmbed(message.member, pages.get(1).join("\n"))
