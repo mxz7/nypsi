@@ -4,11 +4,12 @@ import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
 import PageManager from "../page";
 import { getPreferences } from "../users/notifications";
+import { getActiveTag } from "../users/tags";
 import workerSort from "../workers/sort";
 import wordleSortWorker from "../workers/wordlesort";
 import { calcNetWorth } from "./balance";
 import { checkLeaderboardPositions } from "./stats";
-import { getAchievements, getItems } from "./utils";
+import { getAchievements, getItems, getTagsData } from "./utils";
 import pAll = require("p-all");
 
 export async function topBalance(guild: Guild, userId?: string) {
@@ -75,12 +76,12 @@ export async function topBalance(guild: Guild, userId?: string) {
         pos = "🥉";
       }
 
-      out[count] =
-        pos +
-        " **" +
-        getMemberID(guild, user.userId).user.username +
-        "** $" +
-        Number(user.money).toLocaleString();
+      const tag = await getActiveTag(user.userId);
+
+      out[count] = `${pos} **${tag ? `[${getTagsData()[tag.tagId].emoji}]` : ""}${
+        getMemberID(guild, user.userId).user.username
+      }** $${Number(user.money).toLocaleString()}`;
+
       count++;
     }
   }
@@ -139,10 +140,12 @@ export async function topBalanceGlobal(amount: number): Promise<string[]> {
       pos = "🥉";
     }
 
-    usersFinal[count] =
-      pos + " **" + (await getPreferences(user.userId))?.leaderboards
-        ? user.user.lastKnownUsername
-        : "[hidden]" + "** $" + Number(user.money).toLocaleString();
+    const tag = await getActiveTag(user.userId);
+
+    usersFinal[count] = `${pos} **${tag ? `[${getTagsData()[tag.tagId].emoji}]` : ""}${
+      (await getPreferences(user.userId))?.leaderboards ? user.user.lastKnownUsername : "[hidden]"
+    }** $${Number(user.money).toLocaleString()}`;
+
     count++;
   }
 
@@ -194,14 +197,12 @@ export async function topNetWorthGlobal(userId: string) {
       pos = "🥉";
     }
 
+    const tag = await getActiveTag(user.userId);
+
     out.push(
-      pos +
-        " **" +
-        ((await getPreferences(user.userId))?.leaderboards
-          ? user.user.lastKnownUsername || user.userId
-          : "[hidden]") +
-        "** $" +
-        Number(user.netWorth).toLocaleString(),
+      `pos **${tag ? `[${getTagsData()[tag.tagId].emoji}]` : ""}${
+        (await getPreferences(user.userId))?.leaderboards ? user.user.lastKnownUsername : "[hidden]"
+      }** $${Number(user.netWorth).toLocaleString()}`,
     );
   }
 
@@ -297,12 +298,12 @@ export async function topNetWorth(guild: Guild, userId?: string) {
         pos = "🥉";
       }
 
-      out[count] =
-        pos +
-        " **" +
-        getMemberID(guild, user).user.username +
-        "** $" +
-        amounts.get(user).toLocaleString();
+      const tag = await getActiveTag(userId);
+
+      out[count] = `${pos} **${tag ? `[${getTagsData()[tag.tagId].emoji}]` : ""}${
+        getMemberID(guild, user).user.username
+      }** $${amounts.get(user).toLocaleString()}`;
+
       count++;
     }
   }
@@ -384,14 +385,13 @@ export async function topPrestige(guild: Guild, userId?: string) {
 
     const thing = ["th", "st", "nd", "rd"];
     const v = user.prestige % 100;
-    out[count] =
-      pos +
-      " **" +
-      getMemberID(guild, user.userId).user.username +
-      "** " +
-      user.prestige +
-      (thing[(v - 20) % 10] || thing[v] || thing[0]) +
-      " prestige";
+
+    const tag = await getActiveTag(user.userId);
+
+    out[count] = `${pos} **${tag ? `[${getTagsData()[tag.tagId].emoji}]` : ""}${
+      getMemberID(guild, user.userId).user.username
+    }** ${user.prestige}${thing[(v - 20) % 10] || thing[v] || thing[0]} prestige`;
+
     count++;
   }
 
@@ -449,18 +449,16 @@ export async function topPrestigeGlobal(userId: string) {
       pos = "🥉";
     }
 
+    const tag = await getActiveTag(user.userId);
+
     const thing = ["th", "st", "nd", "rd"];
     const v = user.prestige % 100;
-    out[count] =
-      pos +
-      " **" +
-      ((await getPreferences(user.userId))?.leaderboards
+    out[count] = `${pos} **${tag ? `[${getTagsData()[tag.tagId].emoji}]` : ""}${
+      (await getPreferences(user.userId))?.leaderboards
         ? user.user.lastKnownUsername || user.userId
-        : "[hidden]") +
-      "** " +
-      user.prestige +
-      (thing[(v - 20) % 10] || thing[v] || thing[0]) +
-      " prestige";
+        : "[hidden]"
+    }** ${user.prestige}${thing[(v - 20) % 10] || thing[v] || thing[0]} prestige`;
+
     count++;
   }
 
@@ -546,14 +544,14 @@ export async function topItem(guild: Guild, item: string, userId: string) {
     }
 
     const items = getItems();
+    const tag = await getActiveTag(user.userId);
 
-    out[count] =
-      pos +
-      " **" +
-      getMemberID(guild, user.userId).user.username +
-      "** " +
-      user.amount.toLocaleString() +
-      ` ${user.amount > 1 ? items[item].plural || items[item].name : items[item].name}`;
+    out[count] = `${pos} **${tag ? `[${getTagsData()[tag.tagId].emoji}]` : ""}${
+      getMemberID(guild, user.userId).user.username
+    }** ${user.amount.toLocaleString()}${
+      user.amount > 1 ? items[item].plural || items[item].name : items[item].name
+    }`;
+
     count++;
   }
 
@@ -616,16 +614,16 @@ export async function topItemGlobal(item: string, userId: string) {
     }
 
     const items = getItems();
+    const tag = await getActiveTag(user.userId);
 
-    out[count] =
-      pos +
-      " **" +
-      ((await getPreferences(user.userId))?.leaderboards
+    out[count] = `${pos} **${tag ? `[${getTagsData()[tag.tagId].emoji}]` : ""}${
+      (await getPreferences(user.userId))?.leaderboards
         ? user.economy.user.lastKnownUsername || user.userId
-        : "[hidden]") +
-      "** " +
-      user.amount.toLocaleString() +
-      ` ${user.amount > 1 ? items[item].plural || items[item].name : items[item].name}`;
+        : "[hidden]"
+    }** ${user.amount.toLocaleString()} ${
+      user.amount > 1 ? items[item].plural || items[item].name : items[item].name
+    }`;
+
     count++;
   }
 
@@ -734,13 +732,12 @@ export async function topCompletion(guild: Guild, userId: string) {
         pos = "🥉";
       }
 
-      out[count] =
-        pos +
-        " **" +
-        getMemberID(guild, user).user.username +
-        "** " +
-        completionRate.get(user).toFixed(1) +
-        "%";
+      const tag = await getActiveTag(user);
+
+      out[count] = `${pos} **${tag ? `[${getTagsData()[tag.tagId].emoji}]` : ""}${
+        getMemberID(guild, user).user.username
+      }** ${completionRate.get(user).toFixed(1)}%`;
+
       count++;
     }
   }
@@ -849,8 +846,12 @@ export async function topDailyStreak(guild: Guild, userId?: string) {
       pos = "🥉";
     }
 
-    out[count] =
-      pos + " **" + getMemberID(guild, user.userId).user.username + "** " + user.dailyStreak;
+    const tag = await getActiveTag(user.userId);
+
+    out[count] = `${pos} **${tag ? `[${getTagsData()[tag.tagId].emoji}]` : ""}${
+      getMemberID(guild, user.userId).user.username
+    }** ${user.dailyStreak}`;
+
     count++;
   }
 
@@ -907,14 +908,15 @@ export async function topDailyStreakGlobal(userId: string) {
     } else if (pos == 3) {
       pos = "🥉";
     }
-    out[count] =
-      pos +
-      " **" +
-      ((await getPreferences(user.userId))?.leaderboards
+
+    const tag = await getActiveTag(user.userId);
+
+    out[count] = `${pos} **${tag ? `[${getTagsData()[tag.tagId].emoji}]` : ""}${
+      (await getPreferences(user.userId))?.leaderboards
         ? user.user.lastKnownUsername || user.userId
-        : "[hidden]") +
-      "** " +
-      user.dailyStreak;
+        : "[hidden]"
+    }** ${user.dailyStreak}`;
+
     count++;
   }
 
@@ -1023,13 +1025,12 @@ export async function topWordle(guild: Guild, userId: string) {
       pos = "🥉";
     }
 
+    const tag = await getActiveTag(user.user.id);
+
     out.push(
-      pos +
-        " **" +
-        getMemberID(guild, user.user.id).user.username +
-        "** " +
-        user.wins.toLocaleString() +
-        " wins",
+      `${pos} **${tag ? `[${getTagsData()[tag.tagId].emoji}]` : ""}${
+        getMemberID(guild, user.user.id).user.username
+      }** ${user.wins.toLocaleString()} wins`,
     );
   }
 
@@ -1088,15 +1089,14 @@ export async function topWordleGlobal(userId: string) {
       pos = "🥉";
     }
 
+    const tag = await getActiveTag(user.user.id);
+
     out.push(
-      pos +
-        " **" +
-        ((await getPreferences(user.user.id))?.leaderboards
+      `${pos} **${tag ? `[${getTagsData()[tag.tagId].emoji}]` : ""}${
+        (await getPreferences(user.user.id))?.leaderboards
           ? user.user.lastKnownUsername || user.user.id
-          : "[hidden]") +
-        "** " +
-        user.wins.toLocaleString() +
-        " wins",
+          : "[hidden]"
+      }** ${user.wins.toLocaleString()} wins`,
     );
   }
 
@@ -1174,13 +1174,12 @@ export async function topCommand(guild: Guild, command: string, userId: string) 
       pos = "🥉";
     }
 
-    out[count] =
-      pos +
-      " **" +
-      getMemberID(guild, user.userId).user.tag +
-      "** " +
-      user.uses.toLocaleString() +
-      ` ${user.uses > 1 ? "uses" : "use"}`;
+    const tag = await getActiveTag(user.userId);
+
+    out[count] = `${pos} **${tag ? `[${getTagsData()[tag.tagId].emoji}]` : ""}${
+      getMemberID(guild, user.userId).user.username
+    }** ${user.uses.toLocaleString()} ${user.uses > 1 ? "uses" : "use"}`;
+
     count++;
   }
 
@@ -1232,15 +1231,14 @@ export async function topCommandGlobal(command: string, userId: string) {
       pos = "🥉";
     }
 
-    out[count] =
-      pos +
-      " **" +
-      ((await getPreferences(user.userId))?.leaderboards
-        ? user.user.lastKnownUsername?.split("#")[0] || user.userId
-        : "[hidden]") +
-      "** " +
-      user.uses.toLocaleString() +
-      ` ${user.uses > 1 ? "uses" : "use"}`;
+    const tag = await getActiveTag(user.userId);
+
+    out[count] = `${pos} **${tag ? `[${getTagsData()[tag.tagId].emoji}]` : ""}${
+      (await getPreferences(user.userId))?.leaderboards
+        ? user.user.lastKnownUsername || user.userId
+        : "[hidden]"
+    }** ${user.uses.toLocaleString()} ${user.uses > 1 ? "uses" : "use"}`;
+
     count++;
   }
 

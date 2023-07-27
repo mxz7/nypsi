@@ -89,3 +89,9 @@ export async function setActiveTag(userId: string, tagId: string) {
 
   return getTags(userId);
 }
+
+export async function getActiveTag(userId: string) {
+  const tags = await getTags(userId);
+
+  return tags.find((i) => i.selected);
+}
