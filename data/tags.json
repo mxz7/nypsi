@@ -25,7 +25,7 @@
   },
   "season_winner": {
     "id": "season_winner",
-    "name": "season_winner",
+    "name": "season winner",
     "description": "won a season",
     "emoji": "🏆"
   },
