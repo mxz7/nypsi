@@ -1107,7 +1107,9 @@ async function run(
 
     let tags = await getTags(user.id);
 
-    embed.setDescription(`${tags.length > 0 ? `\`${tags.join("` `")}\`` : "no tags"}`);
+    embed.setDescription(
+      `${tags.length > 0 ? `\`${tags.map((i) => i.tagId).join("` `")}\`` : "no tags"}`,
+    );
 
     const msg = await response.editReply({ embeds: [embed], components: rows });
 
@@ -1156,7 +1158,7 @@ async function run(
           embeds: [
             new CustomEmbed(
               message.member,
-              `${tags.length > 0 ? `\`${tags.join("` `")}\`` : "no tags"}`,
+              `${tags.length > 0 ? `\`${tags.map((i) => i.tagId).join("` `")}\`` : "no tags"}`,
             ),
           ],
         });
@@ -1203,7 +1205,7 @@ async function run(
           embeds: [
             new CustomEmbed(
               message.member,
-              `${tags.length > 0 ? `\`${tags.join("` `")}\`` : "no tags"}`,
+              `${tags.length > 0 ? `\`${tags.map((i) => i.tagId).join("` `")}\`` : "no tags"}`,
             ),
           ],
         });
