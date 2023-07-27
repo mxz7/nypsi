@@ -23,11 +23,13 @@ import {
   getBaseUpgrades,
   getBaseWorkers,
   getItems,
+  getTagsData,
   userExists,
 } from "../utils/functions/economy/utils";
 import { addWorkerUpgrade, getWorkers } from "../utils/functions/economy/workers";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import PageManager from "../utils/functions/page";
+import { addTag, getTags } from "../utils/functions/users/tags";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger } from "../utils/logger";
 
@@ -410,6 +412,30 @@ async function run(
     );
 
     return send({ embeds: [embed] });
+  } else if (selected.role === "tag") {
+    const tags = await getTags(message.author.id);
+
+    if (tags.find((i) => i.tagId === selected.tagId))
+      return send({ embeds: [new ErrorEmbed("you already have this tag")] });
+
+    await setInventoryItem(
+      message.member,
+      selected.id,
+      inventory.find((i) => i.item === selected.id).amount - 1,
+    );
+
+    await addTag(message.author.id, selected.tagId);
+
+    return send({
+      embeds: [
+        new CustomEmbed(
+          message.member,
+          `you can now use the ${getTagsData()[selected.tagId].emoji} \`${
+            getTagsData()[selected.tagId].name
+          }\``,
+        ),
+      ],
+    });
   } else {
     if (itemFunctions.has(selected.id)) {
       await addStat(message.member, selected.id);
