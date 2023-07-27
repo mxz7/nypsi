@@ -2294,5 +2294,17 @@
     "sell": 1000000,
     "in_crates": false,
     "tagId": "discordian"
+  },
+  "nypsi_tag": {
+    "id": "nypsi_tag",
+    "name": "nypsi tag",
+    "plural": "nypsi tags",
+    "article": "a",
+    "emoji": "<:xnypsi:819957267548864543>",
+    "longDesc": "nerd lol",
+    "role": "tag",
+    "sell": 1000000,
+    "in_crates": false,
+    "tagId": "nypsi"
   }
 }
