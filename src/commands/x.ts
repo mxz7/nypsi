@@ -74,6 +74,7 @@ async function run(
             LotteryTicket: true,
             OffersGiven: true,
             OffersReceived: true,
+            auctionWatch: true,
             EconomyWorker: {
               include: {
                 upgrades: true,
@@ -92,6 +93,10 @@ async function run(
         Achievements: true,
         DMSettings: true,
         Preferences: true,
+        ActiveChannels: true,
+        KofiPurchases: true,
+        Leaderboards: true,
+        Tags: true,
       },
     });
 
