@@ -35,7 +35,7 @@ import {
 import { getAdminLevel, setAdminLevel } from "../utils/functions/users/admin";
 import { isUserBlacklisted, setUserBlacklist } from "../utils/functions/users/blacklist";
 import { getCommandUses } from "../utils/functions/users/commands";
-import { addTag, getTags } from "../utils/functions/users/tags";
+import { addTag, getTags, removeTag } from "../utils/functions/users/tags";
 import { hasProfile } from "../utils/functions/users/utils";
 import { logger } from "../utils/logger";
 
@@ -1195,16 +1195,8 @@ async function run(
           `admin: ${message.author.id} (${message.author.username}) removed ${msgResponse.content} tag from ${user.id}`,
         );
 
-        await prisma.tags.delete({
-          where: {
-            userId_tagId: {
-              tagId: msgResponse.content,
-              userId: user.id,
-            },
-          },
-        });
+        tags = await removeTag(user.id, msgResponse.content);
 
-        tags = await getTags(user.id);
         msgResponse.react("✅");
         await msg.edit({
           embeds: [
