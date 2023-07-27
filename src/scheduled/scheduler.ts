@@ -17,10 +17,6 @@ const bree = new Bree({
   },
 
   jobs: [
-    {
-      name: "topglobal",
-      interval: "at 12:00am",
-    },
     // {
     //   name: "purgeguilds",
     //   interval: "at 3:02am",
