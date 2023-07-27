@@ -2269,5 +2269,18 @@
     "sell": 50000000,
     "in_crates": true,
     "tagId": "goat"
+  },
+  "cat_tag": {
+    "id": "cat_tag",
+    "name": "cat tag",
+    "plural": "cat tags",
+    "article": "a",
+    "emoji": "<:nypsi_cat_tag:1134176717167149146>",
+    "longDesc": "meow",
+    "rarity": 6,
+    "role": "tag",
+    "sell": 50000000,
+    "in_crates": true,
+    "tagId": "cat"
   }
 }
