@@ -29,7 +29,7 @@ import prisma from "../../init/database";
 import { Item } from "../../types/Economy";
 import Constants from "../Constants";
 import { a } from "../functions/anticheat";
-import { addProgress } from "../functions/economy/achievements";
+import { addProgress, setProgress } from "../functions/economy/achievements";
 import { commandGemCheck, gemBreak, getInventory } from "../functions/economy/inventory";
 import {
   createUser,
@@ -965,41 +965,46 @@ export async function runCommand(
     redis.hincrby(Constants.redis.nypsi.TOP_COMMANDS, command.name, 1),
     addProgress(message.author.id, "nypsi", 1),
     commandGemCheck(message.member, command.category),
+    redis.hincrby(Constants.redis.nypsi.TOP_COMMANDS_USER, message.author.id, 1),
   ]);
 
+  setProgress(
+    message.author.id,
+    "discordian",
+    parseInt(await redis.hget(Constants.redis.nypsi.TOP_COMMANDS_USER, message.author.id)) || 0,
+  );
+
   if ((await getPreferences(message.member)).leaderboards)
-    await redis.hincrby(Constants.redis.nypsi.TOP_COMMANDS_USER, message.author.username, 1);
+    if (command.category == "money") {
+      await prisma.activeChannels.upsert({
+        where: { userId_channelId: { channelId: message.channelId, userId: message.author.id } },
+        update: { date: new Date() },
+        create: { channelId: message.channelId, userId: message.author.id },
+      });
 
-  if (command.category == "money") {
-    await prisma.activeChannels.upsert({
-      where: { userId_channelId: { channelId: message.channelId, userId: message.author.id } },
-      update: { date: new Date() },
-      create: { channelId: message.channelId, userId: message.author.id },
-    });
+      if (!message.member) return;
 
-    if (!message.member) return;
+      setTimeout(async () => {
+        if (!(await userExists(message.member))) return;
+        try {
+          if (!xpCooldown.has(message.author.id)) {
+            await updateXp(message.member, (await getXp(message.member)) + 1);
 
-    setTimeout(async () => {
-      if (!(await userExists(message.member))) return;
-      try {
-        if (!xpCooldown.has(message.author.id)) {
-          await updateXp(message.member, (await getXp(message.member)) + 1);
+            xpCooldown.add(message.author.id);
 
-          xpCooldown.add(message.author.id);
-
-          setTimeout(() => {
-            try {
-              xpCooldown.delete(message.author.id);
-            } catch {
-              /* */
-            }
-          }, 60000);
+            setTimeout(() => {
+              try {
+                xpCooldown.delete(message.author.id);
+              } catch {
+                /* */
+              }
+            }, 60000);
+          }
+        } catch {
+          /* */
         }
-      } catch {
-        /* */
-      }
-    }, 30000);
-  }
+      }, 30000);
+    }
 }
 
 export function commandExists(cmd: string) {
