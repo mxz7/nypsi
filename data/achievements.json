@@ -1266,5 +1266,45 @@
     "target": 1000000000,
     "description": "earn $1,000,000,000 from your workers",
     "prize": ["nypsi_crate:1", "legendary_scratch_card:3", "gem_radar:1", "earth_scanner:2"]
+  },
+  "discordian_i": {
+    "id": "discordian_i",
+    "name": "discordian **I**",
+    "emoji": "🤓",
+    "target": 500,
+    "description": "do 500 commands in a day",
+    "prize": ["basic_crate:1"]
+  },
+  "discordian_ii": {
+    "id": "discordian_ii",
+    "name": "discordian **II**",
+    "emoji": "🤓",
+    "target": 1000,
+    "description": "do 1,000 commands in a day",
+    "prize": ["lucky_scratch_card:1"]
+  },
+  "discordian_iii": {
+    "id": "discordian_iii",
+    "name": "discordian **III**",
+    "emoji": "🤓",
+    "target": 5000,
+    "description": "do 5,000 commands in a day",
+    "prize": ["lucky_scratch_card:2"]
+  },
+  "discordian_iv": {
+    "id": "discordian_iv",
+    "name": "discordian **IV**",
+    "emoji": "🤓",
+    "target": 10000,
+    "description": "do 10,000 commands in a day",
+    "prize": ["legendary_scratch_card:1"]
+  },
+  "discordian_v": {
+    "id": "discordian_v",
+    "name": "discordian **V**",
+    "emoji": "🤓",
+    "target": 25000,
+    "description": "do 25,000 commands in a day",
+    "prize": ["legendary_scratch_card:2", "discordian_tag"]
   }
 }
