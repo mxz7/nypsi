@@ -200,7 +200,7 @@ export async function topNetWorthGlobal(userId: string) {
     const tag = await getActiveTag(user.userId);
 
     out.push(
-      `pos **${tag ? `[${getTagsData()[tag.tagId].emoji}]` : ""}${
+      `${pos} **${tag ? `[${getTagsData()[tag.tagId].emoji}]` : ""}${
         (await getPreferences(user.userId))?.leaderboards ? user.user.lastKnownUsername : "[hidden]"
       }** $${Number(user.netWorth).toLocaleString()}`,
     );
@@ -298,7 +298,7 @@ export async function topNetWorth(guild: Guild, userId?: string) {
         pos = "🥉";
       }
 
-      const tag = await getActiveTag(userId);
+      const tag = await getActiveTag(user);
 
       out[count] = `${pos} **${tag ? `[${getTagsData()[tag.tagId].emoji}]` : ""}${
         getMemberID(guild, user).user.username
