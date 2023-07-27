@@ -548,7 +548,7 @@ export async function topItem(guild: Guild, item: string, userId: string) {
 
     out[count] = `${pos} **${tag ? `[${getTagsData()[tag.tagId].emoji}]` : ""}${
       getMemberID(guild, user.userId).user.username
-    }** ${user.amount.toLocaleString()}${
+    }** ${user.amount.toLocaleString()} ${
       user.amount > 1 ? items[item].plural || items[item].name : items[item].name
     }`;
 
