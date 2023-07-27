@@ -44,6 +44,7 @@ export default {
         LASTFM: "cache:user:lastfm",
         TRACKING: "cache:user:tracking",
         ADMIN_LEVEL: "cache:user:adminlvl",
+        tags: "cache:user:tags",
       },
       guild: {
         EXISTS: "cache:guild:exists",

@@ -6,6 +6,7 @@ import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { AchievementData, BakeryUpgradeData, GuildUpgrade, Item } from "../../../types/Economy";
+import { Tag } from "../../../types/Tags";
 import { Worker, WorkerUpgrades } from "../../../types/Workers";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
@@ -27,6 +28,7 @@ let baseWorkers: { [key: string]: Worker };
 let baseUpgrades: { [key: string]: WorkerUpgrades };
 let bakeryUpgrades: { [key: string]: BakeryUpgradeData };
 let guildUpgrades: { [key: string]: GuildUpgrade };
+let tags: { [key: string]: Tag };
 
 const lotteryTicketPrice = 50000;
 /**
@@ -41,6 +43,7 @@ export function loadItems(crypto = true) {
   const workersFile: any = fs.readFileSync("./data/workers.json");
   const bakeryFile: any = fs.readFileSync("./data/bakery_upgrades.json");
   const guildUpgradesFile: any = fs.readFileSync("./data/guild_upgrades.json");
+  const tagsFile: any = fs.readFileSync("./data/tags.json");
 
   items = JSON.parse(itemsFile);
   achievements = JSON.parse(achievementsFile);
@@ -48,6 +51,7 @@ export function loadItems(crypto = true) {
   baseUpgrades = JSON.parse(workersFile).upgrades;
   bakeryUpgrades = JSON.parse(bakeryFile);
   guildUpgrades = JSON.parse(guildUpgradesFile);
+  tags = JSON.parse(tagsFile);
 
   const workerIds = Object.keys(baseWorkers);
 
@@ -66,6 +70,7 @@ export function loadItems(crypto = true) {
 
   logger.info(`${Array.from(Object.keys(items)).length.toLocaleString()} economy items loaded`);
   logger.info(`${Object.keys(achievements).length.toLocaleString()} achievements loaded`);
+  logger.info(`${Object.keys(tags).length} tags loaded`);
 
   if (crypto) {
     setTimeout(() => {
@@ -391,6 +396,10 @@ export function getItems(): { [key: string]: Item } {
   }
 
   return items;
+}
+
+export function getTagsData() {
+  return tags;
 }
 
 export function getBakeryUpgradesData() {
