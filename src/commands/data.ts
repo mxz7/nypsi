@@ -159,6 +159,7 @@ async function run(
               EconomyGuildMember: true,
               OffersGiven: true,
               OffersReceived: true,
+              auctionWatch: true,
               EconomyWorker: {
                 include: {
                   upgrades: true,
@@ -177,6 +178,10 @@ async function run(
           CommandUse: true,
           Achievements: true,
           DMSettings: true,
+          KofiPurchases: true,
+          ActiveChannels: true,
+          Leaderboards: true,
+          Tags: true,
         },
       });
 
