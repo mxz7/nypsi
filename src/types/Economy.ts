@@ -33,6 +33,7 @@ export interface Item {
   crate_runs?: number; // how many times to do crate thing
   clicks?: number; // amount of clicks for scratch cards
   random_drop_chance?: number; // chance to appear in random drop pool
+  tagId?: string;
 }
 
 export interface LotteryTicket {
