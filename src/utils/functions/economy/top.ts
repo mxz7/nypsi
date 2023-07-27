@@ -1030,7 +1030,7 @@ export async function topWordle(guild: Guild, userId: string) {
     out.push(
       `${pos} **${tag ? `[${getTagsData()[tag.tagId].emoji}]` : ""}${
         getMemberID(guild, user.user.id).user.username
-      }** ${user.wins.toLocaleString()} wins`,
+      }** ${user.wins.toLocaleString()} win${user.wins != 1 ? "s" : ""}`,
     );
   }
 
