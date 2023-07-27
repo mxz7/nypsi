@@ -4,5 +4,47 @@
     "name": "goat",
     "description": "found in crates",
     "emoji": "🐐"
+  },
+  "owner": {
+    "id": "owner",
+    "name": "owner",
+    "description": "owner of the bot",
+    "emoji": "<:nypsi_crown_tag:1134127531403006073>"
+  },
+  "highroller": {
+    "id": "highroller",
+    "name": "highroller",
+    "description": "donated at least $250",
+    "emoji": "💸"
+  },
+  "staff": {
+    "id": "staff",
+    "name": "staff",
+    "description": "staff of nypsi",
+    "emoji": "⚒️"
+  },
+  "season_winner": {
+    "id": "season_winner",
+    "name": "season_winner",
+    "description": "won a season",
+    "emoji": "🏆"
+  },
+  "og": {
+    "id": "og",
+    "name": "og",
+    "description": "played before 2021",
+    "emoji": "🔥"
+  },
+  "contributor": {
+    "id": "contributor",
+    "name": "contributor",
+    "description": "recently contributed code to nypsi",
+    "emoji": "<:nypsi_contributor_tag:1134128166567415846>"
+  },
+  "bug_catcher": {
+    "id": "bug_catcher",
+    "name": "bug catcher",
+    "description": "reported a bug serious enough to get this badge!!",
+    "emoji": "🕷️"
   }
 }

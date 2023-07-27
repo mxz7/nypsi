@@ -146,7 +146,7 @@ cmd.setRun((message, args) => {
 
   if (["choose", "select"].includes(args[0].toLowerCase())) args.shift();
 
-  return selectTag(args[0].toLowerCase());
+  return selectTag(args.join(" ").toLowerCase());
 });
 
 export = cmd;
