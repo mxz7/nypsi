@@ -1,4 +1,5 @@
 mkdir jobs
+mkdir out
 
 cd src
 cd utils
