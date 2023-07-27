@@ -48,7 +48,7 @@ export async function removeTag(userId: string, tagId: string) {
 export async function addTag(userId: string, tagId: string) {
   const tags = getTagsData();
 
-  if (!tags[tagId] || !Constants.BADGES.includes(tagId)) {
+  if (!tags[tagId] && !Constants.BADGES.includes(tagId)) {
     logger.warn("attempted to add invalid tag", { userId, tagId });
     return getTags(userId);
   }
