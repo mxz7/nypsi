@@ -1,5 +1,14 @@
+/*
+  Warnings:
+
+  - You are about to drop the column `badges` on the `User` table. All the data in the column will be lost.
+
+*/
 -- DropForeignKey
 ALTER TABLE "ActiveChannels" DROP CONSTRAINT "ActiveChannels_userId_fkey";
+
+-- AlterTable
+ALTER TABLE "User" DROP COLUMN "badges";
 
 -- CreateTable
 CREATE TABLE "Tags" (

@@ -33,7 +33,7 @@ export async function getTags(userId: string) {
 export async function addTag(userId: string, tagId: string) {
   const tags = getTagsData();
 
-  if (!tags[tagId]) {
+  if (!tags[tagId] || !Constants.BADGES.includes(tagId)) {
     logger.warn("attempted to add invalid tag", { userId, tagId });
     return getTags(userId);
   }

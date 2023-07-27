@@ -21,7 +21,6 @@ model User {
   blacklisted       Boolean  @default(false)
   adminLevel        Int      @default(0)
   booster           Boolean  @default(false)
-  badges            String[]
   totalSpend        Float    @default(0)
 
   Economy        Economy?
