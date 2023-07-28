@@ -79,7 +79,7 @@ export function doChatReactions(client: NypsiClient) {
         }
 
         logger.debug(`chat reaction randomly started in ${channel.id}`);
-        await startOpenChatReaction(guild, channel as TextChannel).catch(() => {});
+        startOpenChatReaction(guild, channel as TextChannel).catch(() => {});
         count++;
 
         const base = guildData.betweenEvents;
@@ -115,7 +115,7 @@ export function doChatReactions(client: NypsiClient) {
     if (count > 0) {
       logger.info(`::auto ${count} chat reaction${count > 1 ? "s" : ""} started`);
     }
-  }, ms("1m"));
+  }, ms("5m"));
 }
 
 export async function createReactionProfile(guild: Guild) {
