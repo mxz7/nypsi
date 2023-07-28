@@ -390,13 +390,7 @@ async function run(
           await sleep(1500);
 
           await countdownMsg.delete().catch(() => {});
-          const a = await startOpenChatReaction(message.guild, message.channel as TextChannel);
-
-          if (a == "xoxo69") {
-            return send({
-              embeds: [new ErrorEmbed("there is already a chat reaction in this channel")],
-            });
-          }
+          await startOpenChatReaction(message.guild, message.channel as TextChannel);
         } else {
           await msg.edit({ embeds: [embed] });
         }
@@ -428,19 +422,13 @@ async function run(
       return;
     }
 
-    const a = await startOpenChatReaction(message.guild, message.channel, true);
+    startOpenChatReaction(message.guild, message.channel);
 
-    if (a == "xoxo69") {
+    if (!(message instanceof Message)) {
       return send({
-        embeds: [new ErrorEmbed("there is already a chat reaction in this channel")],
+        embeds: [new CustomEmbed(message.member, "✅ chat reaction started")],
+        ephemeral: true,
       });
-    } else {
-      if (!(message instanceof Message)) {
-        return send({
-          embeds: [new CustomEmbed(message.member, "✅ chat reaction started")],
-          ephemeral: true,
-        });
-      }
     }
   } else if (args[0].toLowerCase() == "stats") {
     if (args.length == 2 && args[1].toLowerCase() == "reset") {
