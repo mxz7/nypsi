@@ -2243,7 +2243,7 @@
     "plural": "lucky cheese",
     "aliases": ["cheese"],
     "emoji": "🧀",
-    "longDesc": "increase your sell multiplier by 10% for 30 minutes (stacks to 10)",
+    "longDesc": "increase your sell multiplier by 5% for 30 minutes (stacks to 10)",
     "rarity": 4,
     "buy": 0,
     "sell": 100000,
@@ -2252,7 +2252,7 @@
     "max": 10,
     "boosterEffect": {
       "boosts": ["sellmulti"],
-      "effect": 10,
+      "effect": 5,
       "time": 1800
     },
     "in_crates": false
