@@ -1,7 +1,7 @@
 import { Guild, GuildMember, Message, TextChannel } from "discord.js";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
-import { gamble } from "../../logger";
+import { gamble, logger } from "../../logger";
 import { addProgress } from "../economy/achievements";
 import { getBalance, updateBalance } from "../economy/balance";
 import { createGame } from "../economy/stats";
@@ -47,6 +47,8 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel) 
   embed.setHeader("chat reaction");
   embed.setDescription(`type: \`${word.display}\``);
 
+  logger.debug(`open chat reaction started (${channel.id})`, word);
+
   let msg = await channel.send({ embeds: [embed] });
 
   const start = new Date().getTime();
@@ -61,7 +63,11 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel) 
     !m.member.user.bot &&
     blacklisted.indexOf(m.author.id) == -1;
 
+  logger.debug("a");
+
   const timeout = (await getReactionSettings(guild)).timeout;
+
+  logger.debug("b");
 
   const collector = channel.createMessageCollector({
     filter,
@@ -80,6 +86,7 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel) 
   let ended = false;
 
   const updateWinnersText = () => {
+    logger.debug(`updating winners text ${channel.id}`);
     winnersText.length = 0;
 
     for (const winner of winnersList) {
@@ -117,6 +124,7 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel) 
   }, 750);
 
   collector.on("collect", async (message): Promise<void> => {
+    logger.debug(`collected message ${channel.id}`);
     let time: number | string = new Date().getTime();
 
     time = ((time - start) / 1000).toFixed(2);
