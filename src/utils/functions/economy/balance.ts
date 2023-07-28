@@ -494,13 +494,13 @@ export async function calcMaxBet(member: GuildMember | string): Promise<number> 
   const boosters = await getBoosters(member);
   const guildUpgrades = await getGuildUpgradesByUser(member);
 
-  if (voted) {
-    total += 50000;
-  }
-
   total = total + 50000 * prestige;
 
   if (total > 1_000_000) total = 1_000_000;
+
+  if (voted) {
+    total += 50000;
+  }
 
   if (await isBooster(id)) total += 250_000;
   if (guildUpgrades.find((i) => i.upgradeId === "maxbet"))
