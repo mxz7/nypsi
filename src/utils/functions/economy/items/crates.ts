@@ -16,7 +16,7 @@ import PageManager from "../../page";
 import { getTier, isPremium } from "../../premium/premium";
 import sleep from "../../sleep";
 import { addProgress } from "../achievements";
-import { getInventory, openCrate, selectItem } from "../inventory";
+import { calcItemValue, getInventory, openCrate, selectItem } from "../inventory";
 import { addStat } from "../stats";
 import { getItems } from "../utils";
 
@@ -127,8 +127,14 @@ module.exports = new ItemUse(
       foundItems.delete("xp");
     }
 
+    const values = new Map<string, number>();
+
+    for (const [item, amount] of foundItems.entries()) {
+      values.set(item, ((await calcItemValue(item).catch(() => 0)) || 0) * amount);
+    }
+
     for (const [item, amount] of inPlaceSort(Array.from(foundItems.entries())).desc([
-      (i) => getItems()[i[0]].rarity,
+      (i) => values.get(i[0]),
       (i) => i[1],
     ])) {
       desc.push(`- \`${amount}x\` ${getItems()[item].emoji} ${getItems()[item].name}`);
