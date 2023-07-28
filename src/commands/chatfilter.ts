@@ -35,7 +35,12 @@ async function run(
   const prefix = await getPrefix(message.guild);
 
   if (args.length == 0) {
-    const pages = PageManager.createPages(inPlaceSort(filter).asc(), 15);
+    const pages = PageManager.createPages(
+      inPlaceSort(filter)
+        .asc()
+        .map((i) => `${i}`),
+      15,
+    );
 
     const embed = new CustomEmbed(message.member)
       .setHeader("current chat filter")
@@ -44,7 +49,7 @@ async function run(
     if (filter.length == 0) {
       embed.setDescription("`❌` empty chat filter");
     } else {
-      embed.setDescription("`" + pages.get(1).join("`\n`") + "`");
+      embed.setDescription(pages.get(1).join("\n"));
     }
 
     if (pages.size <= 1) return message.channel.send({ embeds: [embed] });
