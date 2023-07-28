@@ -17,7 +17,7 @@ import {
   createReactionStatsProfile,
   hasReactionStatsProfile,
 } from "./stats";
-import { currentChannels, getReactionSettings } from "./utils";
+import { getReactionSettings } from "./utils";
 import { getWords } from "./words";
 
 async function generateWord(guild: Guild) {
@@ -39,11 +39,7 @@ async function generateWord(guild: Guild) {
   return { actual: chosenWord, display: displayWord };
 }
 
-export async function startOpenChatReaction(guild: Guild, channel: TextChannel, force = false) {
-  if (currentChannels.has(channel.id) && !force) return "xoxo69";
-
-  currentChannels.add(channel.id);
-
+export async function startOpenChatReaction(guild: Guild, channel: TextChannel) {
   const word = await generateWord(guild);
 
   const embed = new CustomEmbed().setColor(Constants.EMBED_SUCCESS_COLOR);
@@ -148,7 +144,6 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel, 
   });
 
   collector.on("end", () => {
-    currentChannels.delete(channel.id);
     ended = true;
     setTimeout(async () => {
       clearInterval(interval);

@@ -7,7 +7,6 @@ import { logger } from "../../logger";
 import { startOpenChatReaction } from "./game";
 import ms = require("ms");
 
-export const currentChannels = new Set<string>();
 const lastGame = new Map<string, number>();
 
 export function doChatReactions(client: NypsiClient) {
@@ -80,15 +79,8 @@ export function doChatReactions(client: NypsiClient) {
         }
 
         logger.debug(`chat reaction randomly started in ${channel.id}`);
-        const a = await startOpenChatReaction(guild, channel as TextChannel).catch(() => {});
-
-        if (!a) continue;
-
-        if (a != "xoxo69") {
-          count++;
-        } else {
-          continue;
-        }
+        await startOpenChatReaction(guild, channel as TextChannel).catch(() => {});
+        count++;
 
         const base = guildData.betweenEvents;
         let final;
@@ -123,7 +115,7 @@ export function doChatReactions(client: NypsiClient) {
     if (count > 0) {
       logger.info(`::auto ${count} chat reaction${count > 1 ? "s" : ""} started`);
     }
-  }, ms("15m"));
+  }, ms("1m"));
 }
 
 export async function createReactionProfile(guild: Guild) {
