@@ -75,6 +75,8 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel) 
     time: timeout * 1000,
   });
 
+  logger.debug("c");
+
   const winnersList: { user: string; time: string }[] = [];
   const winnersText: string[] = [];
   const medals = new Map<number, string>();
@@ -176,6 +178,8 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel) 
       await msg.edit({ embeds: [embed] }).catch(() => {});
     }, 1000);
   });
+
+  logger.debug("d");
 }
 
 export async function startChatReactionDuel(
