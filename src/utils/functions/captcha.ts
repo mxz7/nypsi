@@ -90,12 +90,12 @@ export async function failedCaptcha(member: GuildMember, content: string) {
     captchaFails.set(member.user.id, 1);
   }
 
-  if (captchaFails.get(member.user.id) >= 69 && !(await isEcoBanned(member.user.id))) {
+  if (captchaFails.get(member.user.id) >= 50 && !(await isEcoBanned(member.user.id))) {
     await setEcoBan(member.user.id, dayjs().add(1, "day").toDate());
     await hook.send(
       `[${getTimestamp()}] **${member.user.username}** (${
         member.user.id
-      }) has been banned for 24 hours for failing 69 captchas`,
+      }) has been banned for 24 hours for failing 50 captchas`,
     );
     await requestDM({
       client: member.client as NypsiClient,
@@ -108,8 +108,8 @@ export async function failedCaptcha(member: GuildMember, content: string) {
     `[${getTimestamp()}] **${member.user.username}** (${
       member.user.id
     }) has failed a captcha (${content}) [${captchaFails.get(member.user.id)}]${
-      captchaFails.get(member.user.id) % 15 === 0
-        ? " <@&747059949770768475> <@672793821850894347>"
+      captchaFails.get(member.user.id) % 15 === 0 && !(await isEcoBanned(member.user.id))
+        ? " <@&1091314758986256424>"
         : ""
     }`,
   );
