@@ -57,11 +57,18 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel) 
 
   const blacklisted = await getBlacklisted(guild);
 
-  const filter = async (m: Message) =>
-    m.content.toLowerCase() == word.actual.toLowerCase() &&
-    winnersIDs.indexOf(m.author.id) == -1 &&
-    !m.member.user.bot &&
-    blacklisted.indexOf(m.author.id) == -1;
+  const filter = async (m: Message) => {
+    logger.debug(`received message (filter) ${m.content} ${word.actual}`, word);
+
+    console.log(m.content.toLowerCase() == word.actual.toLowerCase());
+
+    return (
+      m.content.toLowerCase() == word.actual.toLowerCase() &&
+      winnersIDs.indexOf(m.author.id) == -1 &&
+      !m.member.user.bot &&
+      blacklisted.indexOf(m.author.id) == -1
+    );
+  };
 
   logger.debug("a");
 
