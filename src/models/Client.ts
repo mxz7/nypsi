@@ -16,7 +16,6 @@ import messageCreate from "../events/message";
 import messageDelete from "../events/messageDelete";
 import messageDeleteBulk from "../events/messageDeleteBulk";
 import messageUpdate from "../events/messageUpdate";
-import ready from "../events/ready";
 import roleDelete from "../events/roleDelete";
 import userUpdate from "../events/userUpdate";
 import redis from "../init/redis";
@@ -83,8 +82,6 @@ export class NypsiClient extends Client {
       logger.info(`shard#${shardId} resume`);
     });
 
-    this.once("ready", ready.bind(null, this));
-
     this.cluster.on("message", (message: any) => {
       if (message._type) {
         if (message.alive) message.reply({ alive: true });
@@ -115,58 +112,35 @@ export class NypsiClient extends Client {
       this.on("emojiDelete", emojiDelete.bind(null));
       this.on("emojiUpdate", emojiUpdate.bind(null));
 
+      await setCustomPresence();
+      this.user.setPresence({
+        status: "dnd",
+        activities: [
+          {
+            name: "nypsi.xyz",
+          },
+        ],
+      });
+
+      setInterval(
+        async () => {
+          if (await getCustomPresence()) return;
+          const presence = randomPresence();
+
+          this.user.setPresence({
+            status: "dnd",
+            activities: [
+              {
+                name: presence,
+              },
+            ],
+          });
+        },
+        30 * 60 * 1000,
+      );
+
       setTimeout(async () => {
         this.runIntervals();
-
-        const presence = await getCustomPresence();
-
-        if (presence) {
-          if (presence.includes("rebooting")) return setCustomPresence();
-          if (presence.split(" ")[0].startsWith("https://www.youtube.com")) {
-            this.cluster.broadcastEval(
-              (c, { presence }) => {
-                const url = presence.shift();
-                c.user.setPresence({
-                  activities: [
-                    {
-                      type: 1,
-                      url: url,
-                      name: presence.join(" "),
-                    },
-                  ],
-                });
-              },
-              { context: { presence: presence.split(" ") } },
-            );
-          } else {
-            this.cluster.broadcastEval(
-              (c, { args }) => {
-                c.user.setPresence({
-                  activities: [
-                    {
-                      type: 0,
-                      name: args.join(" "),
-                    },
-                  ],
-                });
-              },
-              { context: { args: presence.split(" ") } },
-            );
-          }
-        } else {
-          this.cluster.broadcastEval(
-            (c, { presence }) => {
-              c.user.setPresence({
-                activities: [
-                  {
-                    name: presence,
-                  },
-                ],
-              });
-            },
-            { context: { presence: randomPresence() } },
-          );
-        }
       }, 60000);
     });
   }
