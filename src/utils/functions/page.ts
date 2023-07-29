@@ -194,7 +194,9 @@ export default class PageManager<T> {
     }
 
     if (this.handleResponses.has(res.customId)) {
-      return this.handleResponses.get(res.customId)(this, res);
+      return this.handleResponses
+        .get(res.customId)(this, res)
+        .catch(() => null);
     }
   }
 
