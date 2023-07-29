@@ -660,7 +660,7 @@ export async function runCommand(
   }
 
   if (!(await hasProfile(message.member))) {
-    await createProfile(message.member.user);
+    await createProfile(message.author);
   }
 
   if (await isUserBlacklisted(message.author.id)) return;
@@ -961,7 +961,7 @@ export async function runCommand(
   await Promise.all([
     a(message.author.id, message.author.username, message.content, cmd),
     updateCommandUses(message.member),
-    updateUser(message.author || message.member.user || null, command.name),
+    updateUser(message.author || message.author || null, command.name),
     redis.hincrby(Constants.redis.nypsi.TOP_COMMANDS, command.name, 1),
     addProgress(message.author.id, "nypsi", 1),
     commandGemCheck(message.member, command.category),

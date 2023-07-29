@@ -211,7 +211,7 @@ async function run(
   const embed = new CustomEmbed(message.member)
     .setHeader("payment", message.author.avatarURL())
     .addField(
-      message.member.user.username,
+      message.author.username,
       "$" +
         ((await getBalance(message.member)) + amount).toLocaleString() +
         "\n**-** $" +
@@ -220,7 +220,7 @@ async function run(
 
   if (tax > 0) {
     embed.setDescription(
-      message.member.user.toString() +
+      message.author.toString() +
         " -> " +
         target.user.toString() +
         "\n**" +
@@ -235,7 +235,7 @@ async function run(
         (amount - Math.round(amount * tax)).toLocaleString(),
     );
   } else {
-    embed.setDescription(message.member.user.toString() + " -> " + target.user.toString());
+    embed.setDescription(message.author.toString() + " -> " + target.user.toString());
     embed.addField(
       target.user.username,
       "$" +
@@ -257,11 +257,8 @@ async function run(
   send({ embeds: [embed] }).then(async (m) => {
     const embed = new CustomEmbed(message.member)
       .setHeader("payment", message.author.avatarURL())
-      .setDescription(message.member.user.toString() + " -> " + target.user.toString())
-      .addField(
-        message.member.user.username,
-        "$" + (await getBalance(message.member)).toLocaleString(),
-      );
+      .setDescription(message.author.toString() + " -> " + target.user.toString())
+      .addField(message.author.username, "$" + (await getBalance(message.member)).toLocaleString());
 
     if (tax > 0) {
       embed.addField(
@@ -273,7 +270,7 @@ async function run(
           "**)",
       );
       embed.setDescription(
-        message.member.user.toString() +
+        message.author.toString() +
           " -> " +
           target.user.toString() +
           "\n**" +

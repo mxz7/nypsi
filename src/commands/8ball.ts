@@ -50,7 +50,7 @@ async function run(
 
   const embed = new CustomEmbed(
     message.member,
-    `**${question}** - ${message.member.user.toString()}\n\n🎱 ${response}`,
+    `**${question}** - ${message.author.toString()}\n\n🎱 ${response}`,
   );
 
   message.channel.send({ embeds: [embed] });

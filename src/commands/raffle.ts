@@ -48,7 +48,7 @@ async function run(
   const chosenMember = await message.guild.members.fetch(chosen);
 
   const embed = new CustomEmbed(message.member)
-    .setHeader(`${message.member.user.username}'s raffle`, message.author.avatarURL())
+    .setHeader(`${message.author.username}'s raffle`, message.author.avatarURL())
     .setDescription(`${chosenMember.user.toString()} | \`${chosenMember.user.username}\``);
 
   return message.channel.send({ embeds: [embed] });

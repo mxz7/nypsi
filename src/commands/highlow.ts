@@ -223,7 +223,7 @@ async function prepareGame(
     }
   }
 
-  if (games.has(message.member.user.id)) {
+  if (games.has(message.author.id)) {
     if (msg) {
       return msg.edit({ embeds: [new ErrorEmbed("you are already playing highlow")] });
     } else {
@@ -301,7 +301,7 @@ async function prepareGame(
 
   const voteMulti = await getGambleMulti(message.member);
 
-  games.set(message.member.user.id, {
+  games.set(message.author.id, {
     bet: bet,
     win: 0,
     deck: shuffle(newDeck),
@@ -337,7 +337,7 @@ async function prepareGame(
     "**bet** $" + bet.toLocaleString() + "\n**0**x ($0)",
   )
     .setHeader("highlow", message.author.avatarURL())
-    .addField("card", "| " + games.get(message.member.user.id).card + " |");
+    .addField("card", "| " + games.get(message.author.id).card + " |");
 
   if (msg) {
     await msg.edit({ embeds: [embed], components: [row] });
@@ -402,9 +402,9 @@ async function playGame(
 ): Promise<void> {
   if (!games.has(message.author.id)) return;
 
-  const bet = games.get(message.member.user.id).bet;
-  let win = games.get(message.member.user.id).win;
-  let card = games.get(message.member.user.id).card;
+  const bet = games.get(message.author.id).bet;
+  let win = games.get(message.author.id).win;
+  let card = games.get(message.author.id).card;
 
   const newEmbed = new CustomEmbed(message.member).setHeader("highlow", message.author.avatarURL());
 
@@ -515,8 +515,8 @@ async function playGame(
     let winnings = Math.round(bet * win);
 
     newEmbed.setColor(Constants.EMBED_SUCCESS_COLOR);
-    if (games.get(message.member.user.id).voted > 0) {
-      winnings = winnings + Math.round(winnings * games.get(message.member.user.id).voted);
+    if (games.get(message.author.id).voted > 0) {
+      winnings = winnings + Math.round(winnings * games.get(message.author.id).voted);
 
       newEmbed.setDescription(
         "**bet** $" +
@@ -531,7 +531,7 @@ async function playGame(
           winnings.toLocaleString() +
           "\n" +
           "+**" +
-          Math.floor(games.get(message.member.user.id).voted * 100).toString() +
+          Math.floor(games.get(message.author.id).voted * 100).toString() +
           "**% bonus",
       );
     } else {
@@ -651,7 +651,7 @@ async function playGame(
   if (reaction == "⬆") {
     const oldCard = getValue(message.member);
     newCard(message.member);
-    card = games.get(message.member.user.id).card;
+    card = games.get(message.author.id).card;
     const newCard1 = getValue(message.member);
 
     if (newCard1 > oldCard) {
@@ -663,13 +663,13 @@ async function playGame(
         win += 0.5;
       }
 
-      games.set(message.member.user.id, {
+      games.set(message.author.id, {
         bet: bet,
         win: win,
-        deck: games.get(message.member.user.id).deck,
-        card: games.get(message.member.user.id).card,
-        id: games.get(message.member.user.id).id,
-        voted: games.get(message.member.user.id).voted,
+        deck: games.get(message.author.id).deck,
+        card: games.get(message.author.id).card,
+        id: games.get(message.author.id).id,
+        voted: games.get(message.author.id).voted,
       });
 
       let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -727,7 +727,7 @@ async function playGame(
   } else if (reaction == "⬇") {
     const oldCard = getValue(message.member);
     newCard(message.member);
-    card = games.get(message.member.user.id).card;
+    card = games.get(message.author.id).card;
     const newCard1 = getValue(message.member);
 
     if (newCard1 < oldCard) {
@@ -737,13 +737,13 @@ async function playGame(
         win += 1;
       }
 
-      games.set(message.member.user.id, {
+      games.set(message.author.id, {
         bet: bet,
         win: win,
-        deck: games.get(message.member.user.id).deck,
-        card: games.get(message.member.user.id).card,
-        id: games.get(message.member.user.id).id,
-        voted: games.get(message.member.user.id).voted,
+        deck: games.get(message.author.id).deck,
+        card: games.get(message.author.id).card,
+        id: games.get(message.author.id).id,
+        voted: games.get(message.author.id).voted,
       });
 
       let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(

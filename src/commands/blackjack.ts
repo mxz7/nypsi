@@ -142,7 +142,7 @@ async function prepareGame(
     }
   };
 
-  if (games.has(message.member.user.id)) {
+  if (games.has(message.author.id)) {
     return send({ embeds: [new ErrorEmbed("you are already playing blackjack")] });
   }
 
@@ -293,7 +293,7 @@ async function prepareGame(
 
   const multi = await getGambleMulti(message.member);
 
-  games.set(message.member.user.id, {
+  games.set(message.author.id, {
     bet: bet,
     deck: shuffle(newDeck),
     cards: [],
@@ -326,7 +326,7 @@ async function prepareGame(
       `${
         calcTotal(message.member) == 21
           ? `${getDealerCards(message.member)} **${calcTotalDealer(message.member)}**`
-          : `| ${games.get(message.member.user.id).dealerCards[0]} |`
+          : `| ${games.get(message.author.id).dealerCards[0]} |`
       }`,
     )
     .addField(
@@ -529,9 +529,9 @@ async function playGame(
     }
   };
 
-  let bet = games.get(message.member.user.id).bet;
-  const first = games.get(message.member.user.id).first;
-  const dealerPlaya = games.get(message.member.user.id).dealerPlay;
+  let bet = games.get(message.author.id).bet;
+  const first = games.get(message.author.id).first;
+  const dealerPlaya = games.get(message.author.id).dealerPlay;
 
   const newEmbed = new CustomEmbed(message.member, "**bet** $" + bet.toLocaleString()).setHeader(
     "blackjack",
@@ -639,8 +639,8 @@ async function playGame(
     }
 
     newEmbed.setColor(Constants.EMBED_SUCCESS_COLOR);
-    if (games.get(message.member.user.id).voted > 0) {
-      winnings = winnings + Math.round(winnings * games.get(message.member.user.id).voted);
+    if (games.get(message.author.id).voted > 0) {
+      winnings = winnings + Math.round(winnings * games.get(message.author.id).voted);
 
       newEmbed.setDescription(
         "**bet** $" +
@@ -649,7 +649,7 @@ async function playGame(
           winnings.toLocaleString() +
           "\n" +
           "+**" +
-          Math.floor(games.get(message.member.user.id).voted * 100).toString() +
+          Math.floor(games.get(message.author.id).voted * 100).toString() +
           "**% bonus",
       );
     } else {
@@ -768,15 +768,15 @@ async function playGame(
     lose();
     return;
   } else {
-    games.set(message.member.user.id, {
+    games.set(message.author.id, {
       bet: bet,
-      deck: games.get(message.member.user.id).deck,
-      cards: games.get(message.member.user.id).cards,
-      dealerCards: games.get(message.member.user.id).dealerCards,
-      id: games.get(message.member.user.id).id,
+      deck: games.get(message.author.id).deck,
+      cards: games.get(message.author.id).cards,
+      dealerCards: games.get(message.author.id).dealerCards,
+      id: games.get(message.author.id).id,
       first: false,
       dealerPlay: false,
-      voted: games.get(message.member.user.id).voted,
+      voted: games.get(message.author.id).voted,
     });
 
     const filter = (i: Interaction) => i.user.id == message.author.id;
@@ -852,7 +852,7 @@ async function playGame(
       } else {
         const newEmbed1 = new CustomEmbed(message.member, "**bet** $" + bet.toLocaleString())
           .setHeader("blackjack", message.author.avatarURL())
-          .addField("dealer", `| ${games.get(message.member.user.id).dealerCards[0]} |`)
+          .addField("dealer", `| ${games.get(message.author.id).dealerCards[0]} |`)
           .addField(
             message.author.username,
             getCards(message.member) + " **" + calcTotal(message.member) + "**",
@@ -888,15 +888,15 @@ async function playGame(
 
       await edit({ embeds: [newEmbed1], components: [row] });
 
-      games.set(message.member.user.id, {
+      games.set(message.author.id, {
         bet: bet,
-        deck: games.get(message.member.user.id).deck,
-        cards: games.get(message.member.user.id).cards,
-        dealerCards: games.get(message.member.user.id).dealerCards,
-        id: games.get(message.member.user.id).id,
+        deck: games.get(message.author.id).deck,
+        cards: games.get(message.author.id).cards,
+        dealerCards: games.get(message.author.id).dealerCards,
+        id: games.get(message.author.id).id,
         first: false,
         dealerPlay: true,
-        voted: games.get(message.member.user.id).voted,
+        voted: games.get(message.author.id).voted,
       });
 
       setTimeout(() => {
@@ -923,15 +923,15 @@ async function playGame(
 
       bet = bet * 2;
 
-      games.set(message.member.user.id, {
+      games.set(message.author.id, {
         bet: bet,
-        deck: games.get(message.member.user.id).deck,
-        cards: games.get(message.member.user.id).cards,
-        dealerCards: games.get(message.member.user.id).dealerCards,
-        id: games.get(message.member.user.id).id,
+        deck: games.get(message.author.id).deck,
+        cards: games.get(message.author.id).cards,
+        dealerCards: games.get(message.author.id).dealerCards,
+        id: games.get(message.author.id).id,
         first: false,
         dealerPlay: false,
-        voted: games.get(message.member.user.id).voted,
+        voted: games.get(message.author.id).voted,
       });
 
       newCard(message.member);

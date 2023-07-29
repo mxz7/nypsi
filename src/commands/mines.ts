@@ -635,7 +635,7 @@ async function playGame(
 
     embed.setColor(Constants.EMBED_SUCCESS_COLOR);
     if (games.get(message.author.id).voted > 0) {
-      winnings = winnings + Math.round(winnings * games.get(message.member.user.id).voted);
+      winnings = winnings + Math.round(winnings * games.get(message.author.id).voted);
 
       embed.setDescription(
         "**bet** $" +
@@ -650,7 +650,7 @@ async function playGame(
           winnings.toLocaleString() +
           "\n" +
           "+**" +
-          Math.floor(games.get(message.member.user.id).voted * 100).toString() +
+          Math.floor(games.get(message.author.id).voted * 100).toString() +
           "**% bonus",
       );
     } else {

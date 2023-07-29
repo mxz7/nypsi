@@ -60,7 +60,7 @@ async function run(
   }
 
   const embed = new CustomEmbed(message.member, choices)
-    .setHeader("poll by " + message.member.user.username)
+    .setHeader("poll by " + message.author.username)
     .setFooter({ text: "use $ezpoll to make a quick poll" })
     .setDescription(choices);
 

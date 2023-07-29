@@ -6,7 +6,7 @@ import { loadItems } from "../utils/functions/economy/utils";
 const cmd = new Command("reloaditems", "reload items", "none").setPermissions(["bot owner"]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-  if (message.member.user.id != Constants.TEKOH_ID) return;
+  if (message.author.id != Constants.TEKOH_ID) return;
 
   loadItems();
 
