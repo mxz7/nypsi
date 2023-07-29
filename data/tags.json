@@ -11,6 +11,12 @@
     "description": "found in crates",
     "emoji": "<:nypsi_cat_tag:1134176717167149146>"
   },
+  "clown": {
+    "id": "clown",
+    "name": "clown",
+    "description": "found in crates",
+    "emoji": "🤡"
+  },
   "nypsi": {
     "id": "nypsi",
     "name": "nypsi",
