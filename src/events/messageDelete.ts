@@ -10,7 +10,7 @@ export default async function messageDelete(message: Message) {
 
   if (!message.member) return;
 
-  if (message.content != "" && !message.member.user.bot && message.content.length > 1) {
+  if (message.content != "" && !message.author.bot && message.content.length > 1) {
     if (!(await hasGuild(message.guild))) await createGuild(message.guild);
 
     if (await isLogsEnabled(message.guild)) {

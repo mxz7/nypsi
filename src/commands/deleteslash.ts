@@ -14,7 +14,7 @@ async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
-  if (message.member.user.id != Constants.TEKOH_ID) return;
+  if (message.author.id != Constants.TEKOH_ID) return;
 
   if (args.length == 0) {
     await deleteSlashCommandsFromGuild(message.guild.id, message.client.user.id);

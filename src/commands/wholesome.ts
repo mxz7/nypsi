@@ -327,7 +327,7 @@ async function run(
     const lastPage = pages.size;
 
     const filter = (reaction: MessageReaction, user: User) => {
-      return ["⬅", "➡"].includes(reaction.emoji.name) && user.id == message.member.user.id;
+      return ["⬅", "➡"].includes(reaction.emoji.name) && user.id == message.author.id;
     };
 
     const pageManager = async (): Promise<void> => {

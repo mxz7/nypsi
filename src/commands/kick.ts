@@ -92,7 +92,7 @@ async function run(
   }
 
   const target = await getExactMember(message.guild, args[0]);
-  let reason = message.member.user.username + ": ";
+  let reason = message.author.username + ": ";
 
   if (!target) return send({ embeds: [new ErrorEmbed("invalid user")] });
 
@@ -107,7 +107,7 @@ async function run(
 
   if (
     targetHighestRole.position >= memberHighestRole.position &&
-    message.guild.ownerId != message.member.user.id
+    message.guild.ownerId != message.author.id
   ) {
     return send({
       embeds: [new ErrorEmbed(`your role is not high enough to punish ${target.toString()}`)],

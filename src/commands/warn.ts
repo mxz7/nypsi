@@ -105,7 +105,7 @@ async function run(
 
   if (
     targetHighestRole.position >= memberHighestRole.position &&
-    message.guild.ownerId != message.member.user.id
+    message.guild.ownerId != message.author.id
   ) {
     return send({
       embeds: [new ErrorEmbed(`your role is not high enough to punish ${target.toString()}`)],

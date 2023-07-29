@@ -84,7 +84,7 @@ async function run(
     await confirm.react("✅");
 
     const filter = (reaction: MessageReaction, user: User) => {
-      return ["✅"].includes(reaction.emoji.name) && user.id == message.member.user.id;
+      return ["✅"].includes(reaction.emoji.name) && user.id == message.author.id;
     };
 
     const reaction = await confirm
@@ -105,7 +105,7 @@ async function run(
 
   let status;
   let statusDesc = `\`0/${members.size}\` members kicked..`;
-  let reason = message.member.user.username + ": ";
+  let reason = message.author.username + ": ";
 
   if (members.size >= 15) {
     status = new CustomEmbed(
@@ -140,7 +140,7 @@ async function run(
 
     if (
       targetHighestRole.position >= memberHighestRole.position &&
-      message.guild.ownerId != message.member.user.id
+      message.guild.ownerId != message.author.id
     ) {
       failed.push(members.get(member).user);
     } else {
