@@ -178,6 +178,8 @@ export async function createUser(member: GuildMember | string) {
     id = member;
   }
 
+  if (!id) return;
+
   if (!(await hasProfile(id))) {
     if (member instanceof GuildMember) {
       await createProfile(member.user);
