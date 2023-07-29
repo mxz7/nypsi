@@ -61,7 +61,7 @@ async function doBake(
     }
   };
 
-  const member = await message.guild.members.fetch(message.author.id);
+  const member = await message.guild.members.fetch(message.member.user.id);
 
   if (!member) return;
 
