@@ -98,7 +98,7 @@ async function run(
   for (const arg of args) {
     if (arg.length == 18 || args.length == 19) {
       await message.guild.members
-        .unban(arg, message.member.user.username)
+        .unban(arg, message.author.username)
         .then(async (user) => {
           members.push(user);
           await deleteBan(message.guild, arg);
@@ -115,7 +115,7 @@ async function run(
         if (findingMember) {
           const id = findingMember.id;
           await message.guild.members
-            .unban(id, message.member.user.username)
+            .unban(id, message.author.username)
             .then(async (user) => {
               members.push(user);
               await deleteBan(message.guild, user.id);

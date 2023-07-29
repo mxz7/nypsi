@@ -206,7 +206,7 @@ async function run(
     embed3.setColor(Constants.EMBED_SUCCESS_COLOR);
     embed3.setDescription(
       "**" +
-        message.member.user.username +
+        message.author.username +
         "** tried to rob you in **" +
         message.guild.name +
         "**\n" +
@@ -238,7 +238,7 @@ async function run(
     embed3.setColor(Constants.EMBED_SUCCESS_COLOR);
     embed3.setDescription(
       "**" +
-        message.member.user.username +
+        message.author.username +
         "** tried to rob you in **" +
         message.guild.name +
         "**\n" +
@@ -288,7 +288,7 @@ async function run(
       embed3.setColor(Constants.EMBED_FAIL_COLOR);
       embed3.setDescription(
         "**" +
-          message.member.user.username +
+          message.author.username +
           "** has robbed you in **" +
           message.guild.name +
           "**\n" +
@@ -338,7 +338,7 @@ async function run(
         );
         embed3.setDescription(
           "**" +
-            message.member.user.username +
+            message.author.username +
             "** tried to rob you in **" +
             message.guild.name +
             "**\n" +
@@ -359,7 +359,7 @@ async function run(
         embed2.addField("fail!!", "you lost $**" + amountMoney.toLocaleString() + "**");
         embed3.setDescription(
           "**" +
-            message.member.user.username +
+            message.author.username +
             "** tried to rob you in **" +
             message.guild.name +
             "**\n" +

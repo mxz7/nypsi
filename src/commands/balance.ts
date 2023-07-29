@@ -47,7 +47,7 @@ async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
-  if (message.member.user.id == Constants.TEKOH_ID && args.length == 2) {
+  if (message.author.id == Constants.TEKOH_ID && args.length == 2) {
     let target: GuildMember | string = message.mentions.members.first();
 
     if (!target) {

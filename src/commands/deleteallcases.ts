@@ -18,7 +18,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (
     message.member.permissions.has(PermissionFlagsBits.ManageMessages) &&
-    message.guild.ownerId != message.member.user.id
+    message.guild.ownerId != message.author.id
   ) {
     const embed = new ErrorEmbed("to delete all cases you must be the server owner");
 
@@ -40,7 +40,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   await msg.react("✅");
 
   const filter = (reaction: MessageReaction, user: User) => {
-    return ["✅"].includes(reaction.emoji.name) && user.id == message.member.user.id;
+    return ["✅"].includes(reaction.emoji.name) && user.id == message.author.id;
   };
 
   const reaction = await msg

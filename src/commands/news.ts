@@ -11,7 +11,7 @@ async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
-  if (args.length == 0 || message.member.user.id != Constants.TEKOH_ID) {
+  if (args.length == 0 || message.author.id != Constants.TEKOH_ID) {
     const news = await getNews();
 
     if (news.text == "") {
@@ -24,7 +24,7 @@ async function run(
 
     return message.channel.send({ embeds: [embed] });
   } else {
-    if (message.member.user.id != Constants.TEKOH_ID) return;
+    if (message.author.id != Constants.TEKOH_ID) return;
     await setNews(args.join(" "));
 
     const news = await getNews();
