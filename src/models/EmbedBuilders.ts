@@ -4,12 +4,12 @@ import { getEmbedColor } from "../utils/functions/premium/color";
 import { logger } from "../utils/logger";
 import ms = require("ms");
 
-const colorCache = new Map<string, { color: ColorResolvable | "default"; lastAccess: number }>();
+const colorCache = new Map<string, string>();
 
 setInterval(() => {
   let count = 0;
-  for (const [key, { lastAccess }] of colorCache.entries()) {
-    if (lastAccess < Date.now() - ms("30 minutes")) {
+  for (const [key, color] of colorCache.entries()) {
+    if (color === "default") {
       count++;
       colorCache.delete(key);
     }
@@ -216,11 +216,10 @@ function getColor(id: string): ColorResolvable {
   (async () => {
     const color = await getEmbedColor(id);
 
-    colorCache.set(id, { color, lastAccess: Date.now() });
+    colorCache.set(id, color);
   })();
   if (colorCache.has(id)) {
-    colorCache.get(id).lastAccess = Date.now();
-    if (colorCache.get(id).color === "default") return Constants.PURPLE;
-    else return colorCache.get(id).color as ColorResolvable;
+    if (colorCache.get(id) === "default") return Constants.PURPLE;
+    else return colorCache.get(id) as ColorResolvable;
   } else return Constants.PURPLE;
 }
