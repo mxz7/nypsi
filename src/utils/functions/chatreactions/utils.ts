@@ -1,4 +1,4 @@
-import { ChannelType, Guild, TextChannel } from "discord.js";
+import { Guild, TextChannel } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
@@ -47,16 +47,13 @@ export function doChatReactions(client: NypsiClient) {
           }
         }
 
-        const channel = guild.channels.cache.find((cha) => cha.id == ch);
+        const channel: TextChannel = await guild.channels.fetch(ch).catch(() => null);
 
         if (!channel) {
           continue;
         }
 
         if (!channel.isTextBased()) return;
-        if (channel.isThread()) return;
-        if (channel.type == ChannelType.GuildVoice) return;
-        if (channel.type == ChannelType.GuildAnnouncement) return;
 
         const messages = await channel.messages.fetch({ limit: 50 }).catch(() => {});
         let stop = false;
