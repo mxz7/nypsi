@@ -2255,7 +2255,7 @@
       "effect": 5,
       "time": 1800
     },
-    "in_crates": false
+    "in_crates": true
   },
   "goat_tag": {
     "id": "goat_tag",
