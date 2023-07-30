@@ -1,9 +1,7 @@
 import { GuildMember } from "discord.js";
 import prisma from "../../../init/database";
-
-const colorCache = new Map<string, `#${string}` | "default">();
-
-export { colorCache };
+import redis from "../../../init/redis";
+import Constants from "../../Constants";
 
 export async function setEmbedColor(member: GuildMember | string, color: string) {
   let id: string;
@@ -22,15 +20,13 @@ export async function setEmbedColor(member: GuildMember | string, color: string)
     },
   });
 
-  if (colorCache.has(id)) {
-    colorCache.delete(id);
-  }
+  await redis.del(`${Constants.redis.cache.premium}:${id}`);
 }
 
 export async function getEmbedColor(member: string): Promise<`#${string}` | "default"> {
-  if (colorCache.has(member)) {
-    return colorCache.get(member);
-  }
+  const cache = await redis.get(`${Constants.redis.cache.premium.COLOR}:${member}`);
+
+  if (cache) return cache as `#${string}` | "default";
 
   const query = await prisma.premium.findUnique({
     where: {
@@ -41,7 +37,7 @@ export async function getEmbedColor(member: string): Promise<`#${string}` | "def
     },
   });
 
-  colorCache.set(member, query.embedColor as `#${string}` | "default");
+  await redis.set(`${Constants.redis.cache.premium.COLOR}:${member}`, query.embedColor, "EX", 3600);
 
   return query.embedColor as `#${string}` | "default";
 }
