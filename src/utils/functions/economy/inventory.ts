@@ -123,14 +123,6 @@ async function doAutosellThing(userId: string, itemId: string, amount: number): 
 
   await updateBalance(userId, (await getBalance(userId)) + sellWorth);
 
-  if (
-    ["sellable", "prey", "fish"].includes(item.role) &&
-    percentChance(amount * Constants.LUCKY_CHEESE_CHANCE)
-  ) {
-    await addInventoryItem(userId, "lucky_cheese", 1, false);
-    await redis.hincrby(`${Constants.redis.nypsi.AUTO_SELL_ITEMS}:${userId}`, "cheese", 1);
-  }
-
   await redis.hincrby(
     `${Constants.redis.nypsi.AUTO_SELL_ITEMS}:${userId}`,
     `${itemId}-money`,
