@@ -8,7 +8,6 @@ import { logger } from "../../logger";
 import { formatDate } from "../date";
 import requestDM from "../requestdm";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
-import { colorCache } from "./color";
 
 export async function isPremium(member: GuildMember | string): Promise<boolean> {
   let id: string;
@@ -270,10 +269,6 @@ export async function renewUser(member: string, client?: NypsiClient) {
   }
 
   await redis.del(`${Constants.redis.cache.premium.LEVEL}:${member}`);
-
-  if (colorCache.has(member)) {
-    colorCache.delete(member);
-  }
 }
 
 export async function expireUser(member: string, client: NypsiClient) {
@@ -298,10 +293,6 @@ export async function expireUser(member: string, client: NypsiClient) {
     });
 
   await redis.del(`${Constants.redis.cache.premium.LEVEL}:${member}`);
-
-  if (colorCache.has(member)) {
-    colorCache.delete(member);
-  }
 }
 
 export async function setExpireDate(member: GuildMember | string, date: Date, client: NypsiClient) {

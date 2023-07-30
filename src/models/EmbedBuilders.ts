@@ -1,28 +1,31 @@
 import { ColorResolvable, EmbedBuilder, GuildMember } from "discord.js";
-import redis from "../init/redis";
 import Constants from "../utils/Constants";
 import { getEmbedColor } from "../utils/functions/premium/color";
+import { logger } from "../utils/logger";
 import ms = require("ms");
 
-const embedColorCache = new Map<string, string>();
+const colorCache = new Map<string, { color: ColorResolvable | "default"; lastAccess: number }>();
+
+setInterval(() => {
+  let count = 0;
+  for (const [key, { lastAccess }] of colorCache.entries()) {
+    if (lastAccess < Date.now() - ms("30 minutes")) {
+      count++;
+      colorCache.delete(key);
+    }
+  }
+
+  logger.debug(`removed ${count} from color cache`);
+}, ms("1 hour"));
 
 export class CustomEmbed extends EmbedBuilder {
   constructor(member?: GuildMember, text?: string, disableFooter = false) {
     super();
 
-    if (member) {
-      const color = embedColorCache.get(member.user.id) as ColorResolvable | "default" | "none";
+    super.setColor(Constants.PURPLE);
 
-      if (color && color != "none") {
-        if (color == "default") {
-          super.setColor(Constants.PURPLE);
-        } else {
-          super.setColor(color);
-        }
-      } else {
-        checkPremium(member.user.id);
-        super.setColor(Constants.PURPLE);
-      }
+    if (member) {
+      super.setColor(getColor(member.id));
     }
 
     if (text) {
@@ -209,20 +212,15 @@ export class ErrorEmbed extends EmbedBuilder {
   }
 }
 
-async function checkPremium(id: string) {
-  const x = parseInt(await redis.get(`${Constants.redis.cache.premium.LEVEL}:${id}`));
+function getColor(id: string): ColorResolvable {
+  (async () => {
+    const color = await getEmbedColor(id);
 
-  if (x > 0) {
-    const embedColor = await getEmbedColor(id);
-
-    embedColorCache.set(id, embedColor);
-    setTimeout(() => {
-      embedColorCache.delete(id);
-    }, ms("1 hour"));
-  } else {
-    embedColorCache.set(id, "none");
-    setTimeout(() => {
-      embedColorCache.delete(id);
-    }, ms("1 hour"));
-  }
+    colorCache.set(id, { color, lastAccess: Date.now() });
+  })();
+  if (colorCache.has(id)) {
+    colorCache.get(id).lastAccess = Date.now();
+    if (colorCache.get(id).color === "default") return Constants.PURPLE;
+    else return colorCache.get(id).color as ColorResolvable;
+  } else return Constants.PURPLE;
 }
