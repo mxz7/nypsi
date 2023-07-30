@@ -146,7 +146,7 @@ export default {
   SEASON_START: new Date("06/01/2023"),
   SEASON_NUMBER: 6,
   SNOWFLAKE_REGEX: /^\d{17,19}$/,
-  LUCKY_CHEESE_CHANCE: 0.1,
+  LUCKY_CHEESE_CHANCE: 0.07,
   BADGES: ["owner", "staff", "highroller", "contributor", "season_winner", "og"],
   PURPLE: "#8b5cf6" as ColorResolvable,
 };
