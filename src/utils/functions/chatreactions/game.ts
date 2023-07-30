@@ -187,6 +187,10 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel) 
   });
 
   logger.debug("d");
+
+  setTimeout(() => {
+    console.log(collector);
+  }, 30000);
 }
 
 export async function startChatReactionDuel(
