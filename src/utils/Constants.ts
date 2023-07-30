@@ -33,6 +33,7 @@ export default {
         ALIASES: "cache:premium:aliases",
         LEVEL: "cache:premium:level",
         BOOSTER: "cache:premium:booster",
+        COLOR: "cache:premium:color",
       },
       user: {
         BLACKLIST: "cache:user:blacklist",
