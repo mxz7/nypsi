@@ -112,15 +112,9 @@ export class NypsiClient extends Client {
       this.on("emojiDelete", emojiDelete.bind(null));
       this.on("emojiUpdate", emojiUpdate.bind(null));
 
-      await setCustomPresence();
-      this.user.setPresence({
-        status: "dnd",
-        activities: [
-          {
-            name: "nypsi.xyz",
-          },
-        ],
-      });
+      setTimeout(async () => {
+        this.runIntervals();
+      }, 60000);
 
       setInterval(
         async () => {
@@ -139,9 +133,16 @@ export class NypsiClient extends Client {
         30 * 60 * 1000,
       );
 
-      setTimeout(async () => {
-        this.runIntervals();
-      }, 60000);
+      await setCustomPresence();
+
+      this.user?.setPresence({
+        status: "dnd",
+        activities: [
+          {
+            name: "nypsi.xyz",
+          },
+        ],
+      });
     });
   }
 
