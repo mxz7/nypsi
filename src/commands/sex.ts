@@ -260,7 +260,7 @@ async function run(
 
       const clusters = await (message.client as NypsiClient).cluster.broadcastEval(
         async (client, { guildId }) => {
-          const guild = await client.guilds.fetch(guildId);
+          const guild = client.guilds.cache.get(guildId);
 
           if (guild) return (client as unknown as NypsiClient).cluster.id;
           return "not-found";
@@ -280,7 +280,7 @@ async function run(
       return await (message.client as NypsiClient).cluster.broadcastEval(
         async (client, { embed, cluster, userId, channelId, guildId }) => {
           if ((client as unknown as NypsiClient).cluster.id != cluster) return;
-          const guild = await client.guilds.fetch(guildId);
+          const guild = client.guilds.cache.get(guildId);
 
           if (!guild) return;
 

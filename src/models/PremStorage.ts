@@ -186,7 +186,7 @@ export enum status {
 export async function requestRemoveRole(id: string, roleID: string, client: NypsiClient) {
   await client.cluster.broadcastEval(
     async (c, { guildId, memberId, roleId }) => {
-      const guild = await c.guilds.fetch(guildId).catch(() => {});
+      const guild = c.guilds.cache.get(guildId);
 
       if (!guild) return;
 

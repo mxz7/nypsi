@@ -77,7 +77,7 @@ export async function openKarmaShop(client: NypsiClient, now = false) {
     logger.info("karma shop has been opened");
 
     const clusters = await client.cluster.broadcastEval(async (client) => {
-      const guild = await client.guilds.fetch("747056029795221513");
+      const guild = await client.guilds.cache.get("747056029795221513");
 
       if (guild) return (client as unknown as NypsiClient).cluster.id;
       return "not-found";
@@ -96,7 +96,7 @@ export async function openKarmaShop(client: NypsiClient, now = false) {
       .broadcastEval(
         async (client, { content, cluster }) => {
           if ((client as unknown as NypsiClient).cluster.id != cluster) return;
-          const guild = await client.guilds.fetch("747056029795221513");
+          const guild = await client.guilds.cache.get("747056029795221513");
 
           if (!guild) return;
 

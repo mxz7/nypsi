@@ -47,7 +47,7 @@ async function run(
 
     let guild: any = await client.cluster.broadcastEval(
       async (c, { guildId }) => {
-        const g = await c.guilds.fetch(guildId);
+        const g = c.guilds.cache.get(guildId);
 
         if (!g) return null;
 
