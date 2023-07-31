@@ -24,7 +24,7 @@ export async function getTags(userId: string) {
     `${Constants.redis.cache.user.tags}:${userId}`,
     JSON.stringify(query),
     "EX",
-    3600 * 2,
+    604800,
   );
 
   return query;
