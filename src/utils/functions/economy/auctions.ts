@@ -87,7 +87,7 @@ export async function deleteAuction(id: number, client: NypsiClient) {
 
     await client.cluster.broadcastEval(
       async (client, { id }) => {
-        const guild = await client.guilds.fetch("747056029795221513");
+        const guild = await client.guilds.cache.get("747056029795221513");
 
         if (!guild) return;
 
@@ -146,7 +146,7 @@ export async function createAuction(
     );
 
   const clusters = await (member.client as NypsiClient).cluster.broadcastEval(async (client) => {
-    const guild = await client.guilds.fetch("747056029795221513");
+    const guild = await client.guilds.cache.get("747056029795221513");
 
     if (guild) return (client as unknown as NypsiClient).cluster.id;
     return "not-found";
@@ -165,7 +165,7 @@ export async function createAuction(
     .broadcastEval(
       async (client, { embed, row, cluster }) => {
         if ((client as unknown as NypsiClient).cluster.id != cluster) return;
-        const guild = await client.guilds.fetch("747056029795221513");
+        const guild = await client.guilds.cache.get("747056029795221513");
 
         if (!guild) return;
 
@@ -265,7 +265,7 @@ export async function bumpAuction(id: number, client: NypsiClient) {
     );
 
   const clusters = await client.cluster.broadcastEval(async (client) => {
-    const guild = await client.guilds.fetch("747056029795221513");
+    const guild = await client.guilds.cache.get("747056029795221513");
 
     if (guild) return (client as unknown as NypsiClient).cluster.id;
     return "not-found";
@@ -284,7 +284,7 @@ export async function bumpAuction(id: number, client: NypsiClient) {
     .broadcastEval(
       async (client, { row, messageId, embed, cluster }) => {
         if ((client as unknown as NypsiClient).cluster.id != cluster) return null;
-        const guild = await client.guilds.fetch("747056029795221513");
+        const guild = await client.guilds.cache.get("747056029795221513");
 
         if (!guild) return;
 

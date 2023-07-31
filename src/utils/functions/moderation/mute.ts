@@ -122,7 +122,7 @@ export async function requestUnmute(guildId: string, member: string, client: Nyp
 
   await client.cluster.broadcastEval(
     async (c, { guildId, memberId, muteRoleId }) => {
-      const guild = await c.guilds.fetch(guildId).catch(() => {});
+      const guild = c.guilds.cache.get(guildId);
 
       if (!guild) return "guild";
 
