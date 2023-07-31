@@ -37,7 +37,12 @@ export async function getEmbedColor(member: string): Promise<`#${string}` | "def
     },
   });
 
-  await redis.set(`${Constants.redis.cache.premium.COLOR}:${member}`, query.embedColor, "EX", 3600);
+  await redis.set(
+    `${Constants.redis.cache.premium.COLOR}:${member}`,
+    query?.embedColor || "default",
+    "EX",
+    3600,
+  );
 
-  return query.embedColor as `#${string}` | "default";
+  return (query?.embedColor as `#${string}` | "default") || "default";
 }
