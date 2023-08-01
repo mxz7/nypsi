@@ -14,6 +14,7 @@ import { addInventoryItem } from "../utils/functions/economy/inventory";
 import {
   createUser,
   doDaily,
+  getDailyStreak,
   getItems,
   getLastDaily,
   userExists,
@@ -72,9 +73,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (!dayjs(lastDaily.getTime()).isBefore(dayjs(), "day")) {
     const next = dayjs().add(1, "day").startOf("day").unix();
-    return send({
-      embeds: [new ErrorEmbed(`your next daily bonus is available <t:${next}:R>`).removeTitle()],
-    });
+    const embed = new ErrorEmbed(`your next daily bonus is available <t:${next}:R>`).removeTitle();
+    embed.setFooter({ text: `your current streak: ${await getDailyStreak(message.member)}` });
+    return send({ embeds: [embed] });
   }
 
   if (percentChance(0.07) && !(await redis.exists(Constants.redis.nypsi.GEM_GIVEN))) {
