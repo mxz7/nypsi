@@ -58,7 +58,7 @@ export async function runAuctionChecks(client: NypsiClient) {
       logger.info(`${query.length} auctions expired`);
     }
 
-    limit = dayjs().subtract(90, "days").toDate();
+    limit = dayjs().subtract(180, "days").toDate();
 
     const { count: deletedSoldAuctions } = await prisma.auction.deleteMany({
       where: {
