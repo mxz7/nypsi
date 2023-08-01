@@ -7,16 +7,23 @@ import pAll = require("p-all");
 
 let lastRun = 0;
 const actions: (() => Promise<boolean>)[] = [];
+let running = false;
 
 export function listenForDms(manager: ClusterManager) {
   setInterval(async () => {
     if (lastRun > Date.now() - 30000) return;
 
-    if ((await redis.llen(Constants.redis.nypsi.DM_QUEUE)) != 0) {
+    if ((await redis.llen(Constants.redis.nypsi.DM_QUEUE)) != 0 && !running) {
       logger.info("executing dm queue...");
-      doDmQueueInterval(manager).catch(() => {
-        lastRun = 0;
-      });
+      running = true;
+      doDmQueueInterval(manager)
+        .then(() => {
+          running = false;
+        })
+        .catch(() => {
+          lastRun = 0;
+          running = false;
+        });
     }
   }, 5_000);
 }
