@@ -276,167 +276,169 @@ async function handleKofiData(data: KofiResponse) {
         return;
       }
 
-      for (let i = 0; i < shopItem.quantity; i++) {
-        if (user) {
-          await addInventoryItem(user.id, item.name, 1, false);
+      if (user) {
+        await addInventoryItem(user.id, item.name, shopItem.quantity || 1, false);
 
-          await prisma.user.update({
-            where: {
-              id: user.id,
+        await prisma.user.update({
+          where: {
+            id: user.id,
+          },
+          data: {
+            totalSpend: { increment: parseFloat((item.cost * shopItem.quantity).toString()) },
+          },
+        });
+
+        await prisma.kofiPurchases.createMany({
+          data: new Array(shopItem.quantity).fill({
+            userId: user.id,
+            item: item.name,
+          }),
+        });
+
+        logger.info(`given to ${user.id} (${user.email})`, item);
+
+        if ((await getDmSettings(user.id)).premium) {
+          const payload: NotificationPayload = {
+            memberId: user.id,
+            payload: {
+              content: "thank you for your purchase",
+              embed: new CustomEmbed()
+                .setDescription(
+                  `you have received ${shopItem.quantity} ${getItems()[item.name].emoji} **${
+                    getItems()[item.name].name
+                  }**`,
+                )
+                .setColor(Constants.TRANSPARENT_EMBED_COLOR),
             },
-            data: { totalSpend: { increment: parseFloat(item.cost.toString()) } },
-          });
+          };
 
-          await prisma.kofiPurchases.create({
-            data: {
-              userId: user.id,
-              item: item.name,
-            },
-          });
+          await addNotificationToQueue(payload);
+          if (data.is_public && (await getPreferences(user.id)).leaderboards) {
+            const hook = new WebhookClient({ url: process.env.THANKYOU_HOOK });
+            await hook.send({
+              embeds: [
+                new CustomEmbed(
+                  null,
+                  `${user.lastKnownUsername} just bought ${shopItem.quantity}x ${
+                    getItems()[item.name].article
+                  } ${getItems()[item.name].emoji} **${getItems()[item.name].name}**!!!!`,
+                )
+                  .setFooter({ text: "thank you for your purchase (:" })
+                  .setColor(Constants.PURPLE),
+              ],
+            });
+            hook.destroy();
+          }
+        }
 
-          logger.info(`given to ${user.id} (${user.email})`, item);
+        const gemChance = Math.floor(Math.random() * 250);
 
-          if ((await getDmSettings(user.id)).premium) {
-            const payload: NotificationPayload = {
+        if (gemChance == 7) {
+          await addInventoryItem(user.id, "pink_gem", 1);
+          addProgress(user.id, "gem_hunter", 1);
+
+          if ((await getDmSettings(user.id)).other) {
+            await addNotificationToQueue({
               memberId: user.id,
               payload: {
-                content: "thank you for your purchase",
                 embed: new CustomEmbed()
                   .setDescription(
-                    `you have received 1 ${getItems()[item.name].emoji} **${
-                      getItems()[item.name].name
-                    }**`,
+                    `${
+                      getItems()["pink_gem"].emoji
+                    } you've found a gem! i wonder what powers it holds...`,
                   )
+                  .setTitle("you've found a gem")
                   .setColor(Constants.TRANSPARENT_EMBED_COLOR),
               },
-            };
-
-            await addNotificationToQueue(payload);
-            if (data.is_public && (await getPreferences(user.id)).leaderboards) {
-              const hook = new WebhookClient({ url: process.env.THANKYOU_HOOK });
-              await hook.send({
-                embeds: [
-                  new CustomEmbed(
-                    null,
-                    `${user.lastKnownUsername} just bought ${getItems()[item.name].article} ${
-                      getItems()[item.name].emoji
-                    } **${getItems()[item.name].name}**!!!!`,
-                  ).setFooter({ text: "thank you for your purchase (:" }),
-                ],
-              });
-              hook.destroy();
-            }
+            });
           }
+        } else if (gemChance == 17) {
+          await addInventoryItem(user.id, "blue_gem", 1);
+          addProgress(user.id, "gem_hunter", 1);
 
-          const gemChance = Math.floor(Math.random() * 250);
-
-          if (gemChance == 7) {
-            await addInventoryItem(user.id, "pink_gem", 1);
-            addProgress(user.id, "gem_hunter", 1);
-
-            if ((await getDmSettings(user.id)).other) {
-              await addNotificationToQueue({
-                memberId: user.id,
-                payload: {
-                  embed: new CustomEmbed()
-                    .setDescription(
-                      `${
-                        getItems()["pink_gem"].emoji
-                      } you've found a gem! i wonder what powers it holds...`,
-                    )
-                    .setTitle("you've found a gem")
-                    .setColor(Constants.TRANSPARENT_EMBED_COLOR),
-                },
-              });
-            }
-          } else if (gemChance == 17) {
-            await addInventoryItem(user.id, "blue_gem", 1);
-            addProgress(user.id, "gem_hunter", 1);
-
-            if ((await getDmSettings(user.id)).other) {
-              await addNotificationToQueue({
-                memberId: user.id,
-                payload: {
-                  embed: new CustomEmbed()
-                    .setDescription(
-                      `${
-                        getItems()["blue_gem"].emoji
-                      } you've found a gem! i wonder what powers it holds...`,
-                    )
-                    .setTitle("you've found a gem")
-                    .setColor(Constants.TRANSPARENT_EMBED_COLOR),
-                },
-              });
-            }
-          } else if (gemChance == 77) {
-            await addInventoryItem(user.id, "purple_gem", 1);
-            addProgress(user.id, "gem_hunter", 1);
-
-            if ((await getDmSettings(user.id)).other) {
-              await addNotificationToQueue({
-                memberId: user.id,
-                payload: {
-                  embed: new CustomEmbed()
-                    .setDescription(
-                      `${
-                        getItems()["purple_gem"].emoji
-                      } you've found a gem! i wonder what powers it holds...`,
-                    )
-                    .setTitle("you've found a gem"),
-                },
-              });
-            }
-          } else if (gemChance == 27) {
-            await addInventoryItem(user.id, "green_gem", 1);
-            addProgress(user.id, "gem_hunter", 1);
-
-            if ((await getDmSettings(user.id)).other) {
-              await addNotificationToQueue({
-                memberId: user.id,
-                payload: {
-                  embed: new CustomEmbed()
-                    .setDescription(
-                      `${
-                        getItems()["green_gem"].emoji
-                      } you've found a gem! i wonder what powers it holds...`,
-                    )
-                    .setTitle("you've found a gem")
-                    .setColor(Constants.TRANSPARENT_EMBED_COLOR),
-                },
-              });
-            }
-          } else if (gemChance == 57) {
-            const gemChance2 = Math.floor(Math.random() * 50);
-
-            if (gemChance2 == 7 && (await getDmSettings(user.id)).other) {
-              await addInventoryItem(user.id, "white_gem", 1);
-              addProgress(user.id, "gem_hunter", 1);
-
-              await addNotificationToQueue({
-                memberId: user.id,
-                payload: {
-                  embed: new CustomEmbed()
-                    .setDescription(
-                      `${
-                        getItems()["white_gem"].emoji
-                      } you've found a gem! i wonder what powers it holds...`,
-                    )
-                    .setTitle("you've found a gem")
-                    .setColor(Constants.TRANSPARENT_EMBED_COLOR),
-                },
-              });
-            }
+          if ((await getDmSettings(user.id)).other) {
+            await addNotificationToQueue({
+              memberId: user.id,
+              payload: {
+                embed: new CustomEmbed()
+                  .setDescription(
+                    `${
+                      getItems()["blue_gem"].emoji
+                    } you've found a gem! i wonder what powers it holds...`,
+                  )
+                  .setTitle("you've found a gem")
+                  .setColor(Constants.TRANSPARENT_EMBED_COLOR),
+              },
+            });
           }
-        } else {
-          await prisma.kofiPurchases.create({
-            data: {
-              email: data.email,
-              item: item.name,
-            },
-          });
+        } else if (gemChance == 77) {
+          await addInventoryItem(user.id, "purple_gem", 1);
+          addProgress(user.id, "gem_hunter", 1);
 
-          logger.info(`created purchase for ${data.email}`, item);
+          if ((await getDmSettings(user.id)).other) {
+            await addNotificationToQueue({
+              memberId: user.id,
+              payload: {
+                embed: new CustomEmbed()
+                  .setDescription(
+                    `${
+                      getItems()["purple_gem"].emoji
+                    } you've found a gem! i wonder what powers it holds...`,
+                  )
+                  .setTitle("you've found a gem"),
+              },
+            });
+          }
+        } else if (gemChance == 27) {
+          await addInventoryItem(user.id, "green_gem", 1);
+          addProgress(user.id, "gem_hunter", 1);
+
+          if ((await getDmSettings(user.id)).other) {
+            await addNotificationToQueue({
+              memberId: user.id,
+              payload: {
+                embed: new CustomEmbed()
+                  .setDescription(
+                    `${
+                      getItems()["green_gem"].emoji
+                    } you've found a gem! i wonder what powers it holds...`,
+                  )
+                  .setTitle("you've found a gem")
+                  .setColor(Constants.TRANSPARENT_EMBED_COLOR),
+              },
+            });
+          }
+        } else if (gemChance == 57) {
+          const gemChance2 = Math.floor(Math.random() * 50);
+
+          if (gemChance2 == 7 && (await getDmSettings(user.id)).other) {
+            await addInventoryItem(user.id, "white_gem", 1);
+            addProgress(user.id, "gem_hunter", 1);
+
+            await addNotificationToQueue({
+              memberId: user.id,
+              payload: {
+                embed: new CustomEmbed()
+                  .setDescription(
+                    `${
+                      getItems()["white_gem"].emoji
+                    } you've found a gem! i wonder what powers it holds...`,
+                  )
+                  .setTitle("you've found a gem")
+                  .setColor(Constants.TRANSPARENT_EMBED_COLOR),
+              },
+            });
+          }
         }
+      } else {
+        await prisma.kofiPurchases.createMany({
+          data: new Array(shopItem.quantity).fill({
+            email: data.email,
+            item: item.name,
+          }),
+        });
+
+        logger.info(`created purchase for ${data.email}`, item);
       }
     }
   }
