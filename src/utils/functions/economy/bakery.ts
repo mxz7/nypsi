@@ -185,25 +185,25 @@ export async function runBakery(member: GuildMember) {
 
   let total = chosenAmount + passive;
 
-  if (inventory.find((i) => i.item === "blue_gem")?.amount > 0) {
-    if (percentChance(0.1)) {
+  if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0) {
+    if (percentChance(5)) {
       total = total * 2;
-      earned.set("blue_gem", total / 2);
-    }
-  } else if (inventory.find((i) => i.item === "purple_gem")?.amount > 0) {
-    if (percentChance(0.5)) {
-      total = total * 2;
-      earned.set("purple_gem", total / 2);
+      earned.set("crystal_heart", total / 2);
     }
   } else if (inventory.find((i) => i.item === "white_gem")?.amount > 0) {
     if (percentChance(2)) {
       total = total * 2;
       earned.set("white_gem", total / 2);
     }
-  } else if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0) {
-    if (percentChance(5)) {
+  } else if (inventory.find((i) => i.item === "purple_gem")?.amount > 0) {
+    if (percentChance(0.5)) {
       total = total * 2;
-      earned.set("crystal_heart", total / 2);
+      earned.set("purple_gem", total / 2);
+    }
+  } else if (inventory.find((i) => i.item === "blue_gem")?.amount > 0) {
+    if (percentChance(0.1)) {
+      total = total * 2;
+      earned.set("blue_gem", total / 2);
     }
   }
 
