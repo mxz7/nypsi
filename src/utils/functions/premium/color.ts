@@ -20,7 +20,7 @@ export async function setEmbedColor(member: GuildMember | string, color: string)
     },
   });
 
-  await redis.del(`${Constants.redis.cache.premium}:${id}`);
+  await redis.del(`${Constants.redis.cache.premium.COLOR}:${id}`);
 }
 
 export async function getEmbedColor(member: string): Promise<`#${string}` | "default"> {
