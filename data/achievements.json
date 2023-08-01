@@ -786,7 +786,7 @@
   "nypsi_i": {
     "id": "nypsi_i",
     "name": "nypsi **I**",
-    "emoji": "<:xnypsi:819957267548864543>",
+    "emoji": "<<:xnypsi:1135923012458254416>",
     "target": 5000,
     "description": "use 5,000 nypsi commands",
     "prize": ["legendary_scratch_card:1"]
@@ -794,7 +794,7 @@
   "nypsi_ii": {
     "id": "nypsi_ii",
     "name": "nypsi **II**",
-    "emoji": "<:xnypsi:819957267548864543>",
+    "emoji": "<<:xnypsi:1135923012458254416>",
     "target": 25000,
     "description": "use 25,000 nypsi commands",
     "prize": ["legendary_scratch_card:2", "bronze_credit:2"]
@@ -802,7 +802,7 @@
   "nypsi_iii": {
     "id": "nypsi_iii",
     "name": "nypsi **III**",
-    "emoji": "<:xnypsi:819957267548864543>",
+    "emoji": "<<:xnypsi:1135923012458254416>",
     "target": 100000,
     "description": "use 100,000 nypsi commands",
     "prize": ["nypsi_crate:1", "legendary_scratch_card:3", "silver_credit:2"]
@@ -810,7 +810,7 @@
   "nypsi_iv": {
     "id": "nypsi_iv",
     "name": "nypsi **IV**",
-    "emoji": "<:xnypsi:819957267548864543>",
+    "emoji": "<<:xnypsi:1135923012458254416>",
     "target": 250000,
     "description": "use 250,000 nypsi commands",
     "prize": ["gem_crate:1", "nypsi_crate:2", "legendary_scratch_card:4", "gold_credit:2"]
@@ -818,7 +818,7 @@
   "nypsi_v": {
     "id": "nypsi_v",
     "name": "nypsi **V**",
-    "emoji": "<:xnypsi:819957267548864543>",
+    "emoji": "<<:xnypsi:1135923012458254416>",
     "target": 500000,
     "description": "use 500,000 nypsi commands",
     "prize": [
