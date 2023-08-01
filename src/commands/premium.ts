@@ -367,7 +367,7 @@ async function run(
       });
     }
 
-    await setEmbedColor(message.author.id, color);
+    await setEmbedColor(message.author.id, color.toLowerCase());
 
     return send({
       embeds: [
