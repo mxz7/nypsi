@@ -1,4 +1,6 @@
 import { Collection, Guild, GuildMember, Role } from "discord.js";
+import { inPlaceSort } from "fast-sort";
+import { compareTwoStrings } from "string-similarity";
 import Constants from "../Constants";
 import chooseMember from "./workers/choosemember";
 
@@ -11,67 +13,54 @@ export async function getMember(guild: Guild, memberName: string): Promise<Guild
 
   let members: Collection<string, GuildMember>;
 
-  if (guild.memberCount == guild.members.cache.size && guild.memberCount <= 25) {
+  if (guild.memberCount === guild.members.cache.size) {
     members = guild.members.cache;
   } else {
     members = await guild.members.fetch();
   }
 
   let target: GuildMember;
-  const possible = new Map<number, GuildMember>();
+  const scores: { id: string; score: number }[] = [];
 
-  if (members.size > 1000) {
+  if (members.size > 2000) {
     const id = await chooseMember(members, memberName);
     target = members.get(id);
   } else {
     for (const m of members.keys()) {
       const member = members.get(m);
 
-      if (member.user.id == memberName) {
+      if (member.user.id === memberName) {
         target = member;
         break;
-      } else if (member.user.username.toLowerCase() == memberName.toLowerCase()) {
+      } else if (member.user.username.toLowerCase() === memberName.toLowerCase()) {
         target = member;
         break;
-      } else if (member.displayName.toLowerCase() == memberName.toLowerCase()) {
-        if (member.user.bot) {
-          possible.set(4, member);
-        } else {
-          possible.set(1, member);
-        }
-      } else if (member.user.username.toLowerCase().includes(memberName.toLowerCase())) {
-        if (member.user.bot) {
-          possible.set(5, member);
-        } else {
-          possible.set(2, member);
-        }
-      } else if (member.displayName.toLowerCase().includes(memberName.toLowerCase())) {
-        if (member.user.bot) {
-          possible.set(6, member);
-        } else {
-          possible.set(3, member);
-        }
-      }
+      } else {
+        let score = 0;
 
-      if (possible.size == 6) break;
+        const usernameComparison = compareTwoStrings(
+          member.user.username.toLowerCase(),
+          memberName.toLowerCase(),
+        );
+        const displayNameComparison = compareTwoStrings(
+          member.user.displayName.toLowerCase(),
+          memberName.toLowerCase(),
+        );
+        const guildNameComparison = compareTwoStrings(
+          member.displayName.toLowerCase(),
+          memberName.toLowerCase(),
+        );
+
+        score += usernameComparison * 2.5;
+        score += displayNameComparison === 1 ? 1.5 : displayNameComparison;
+        score += guildNameComparison === 1 ? 1.2 : displayNameComparison;
+
+        if (score > 0.5) scores.push({ id: member.id, score });
+      }
     }
 
-    if (!target) {
-      if (possible.get(1)) {
-        target = possible.get(1);
-      } else if (possible.get(2)) {
-        target = possible.get(2);
-      } else if (possible.get(3)) {
-        target = possible.get(3);
-      } else if (possible.get(4)) {
-        target = possible.get(4);
-      } else if (possible.get(5)) {
-        target = possible.get(5);
-      } else if (possible.get(6)) {
-        target = possible.get(6);
-      } else {
-        target = null;
-      }
+    if (!target && scores.length > 0) {
+      target = members.get(inPlaceSort(scores).desc((i) => i.score)[0]?.id);
     }
   }
 
@@ -96,8 +85,8 @@ export async function getExactMember(guild: Guild, memberName: string): Promise<
   const target = members.find(
     (member) =>
       member.user.username.toLowerCase() == memberName.toLowerCase() ||
-      member.user.username.toLowerCase() == memberName.toLowerCase() ||
-      member.user.id == memberName,
+      member.user.id == memberName ||
+      member.user.displayName.toLowerCase() == memberName.toLowerCase(),
   );
 
   return target;

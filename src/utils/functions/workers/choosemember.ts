@@ -1,4 +1,6 @@
 import { Collection, GuildMember } from "discord.js";
+import { inPlaceSort } from "fast-sort";
+import { compareTwoStrings } from "string-similarity";
 import { Worker, isMainThread, parentPort, workerData } from "worker_threads";
 
 export default function chooseMember(
@@ -20,49 +22,45 @@ export default function chooseMember(
 if (!isMainThread) {
   process.title = "nypsi: choosemember worker";
   let target: GuildMember;
-  const possible = new Map<number, GuildMember>();
+  const scores: { id: string; score: number }[] = [];
   const members: Collection<string, GuildMember> = workerData[0];
   const memberName: string = workerData[1];
 
   for (const m of members.keys()) {
     const member = members.get(m);
 
-    const tag = member.user.username.toLowerCase();
+    if (member.user.id === memberName) {
+      target = member;
+      break;
+    } else if (member.user.username.toLowerCase() === memberName.toLowerCase()) {
+      target = member;
+      break;
+    } else {
+      let score = 0;
 
-    if (member.user.id == memberName) {
-      target = member;
-      break;
-    } else if (tag == memberName.toLowerCase()) {
-      target = member;
-      break;
-    } else if (member.user.username.toLowerCase() == memberName.toLowerCase()) {
-      if (member.user.bot) {
-        possible.set(2, member);
-      } else {
-        target = member;
-        break;
-      }
-    } else if (tag.includes(memberName.toLowerCase())) {
-      if (member.user.bot) {
-        possible.set(3, member);
-      } else {
-        possible.set(1, member);
-      }
+      const usernameComparison = compareTwoStrings(
+        member.user.username.toLowerCase(),
+        memberName.toLowerCase(),
+      );
+      const displayNameComparison = compareTwoStrings(
+        member.user.displayName.toLowerCase(),
+        memberName.toLowerCase(),
+      );
+      const guildNameComparison = compareTwoStrings(
+        member.displayName.toLowerCase(),
+        memberName.toLowerCase(),
+      );
+
+      score += usernameComparison * 2.5;
+      score += displayNameComparison === 1 ? 1.5 : displayNameComparison;
+      score += guildNameComparison === 1 ? 1.2 : displayNameComparison;
+
+      if (score > 0.5) scores.push({ id: member.id, score });
     }
-
-    if (possible.size == 3) break;
   }
 
-  if (!target) {
-    if (possible.get(1)) {
-      target = possible.get(1);
-    } else if (possible.get(2)) {
-      target = possible.get(2);
-    } else if (possible.get(3)) {
-      target = possible.get(3);
-    } else {
-      target = null;
-    }
+  if (!target && scores.length > 0) {
+    target = members.get(inPlaceSort(scores).desc((i) => i.score)[0]?.id);
   }
 
   if (!target) {
