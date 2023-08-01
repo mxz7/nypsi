@@ -331,7 +331,7 @@ async function handleKofiData(data: KofiResponse) {
           }
         }
 
-        const gemChance = Math.floor(Math.random() * 250);
+        const gemChance = Math.floor(Math.random() * 100);
 
         if (gemChance == 7) {
           await addInventoryItem(user.id, "pink_gem", 1);
