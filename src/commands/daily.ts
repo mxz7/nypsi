@@ -14,6 +14,7 @@ import { addInventoryItem } from "../utils/functions/economy/inventory";
 import {
   createUser,
   doDaily,
+  getDailyStreak,
   getItems,
   getLastDaily,
   userExists,
