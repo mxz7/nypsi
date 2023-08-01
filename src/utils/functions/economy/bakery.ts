@@ -124,13 +124,6 @@ export async function runBakery(member: GuildMember) {
     click[1] += await getTier(member);
   }
 
-  if (inventory.find((i) => i.item === "blue_gem")?.amount > 0)
-    click[1] += Math.floor(Math.random() * 7);
-  if (inventory.find((i) => i.item === "white_gem")?.amount > 0)
-    click[0] += Math.floor(Math.random() * 3);
-  if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0)
-    click[0] += Math.floor(Math.random() * 5);
-
   const diffMs = Date.now() - lastBaked.getTime();
 
   let diffHours = diffMs / 3.6e6;
@@ -190,9 +183,33 @@ export async function runBakery(member: GuildMember) {
     chosenAmount = Math.floor(Math.random() * (click[1] - click[0])) + click[0];
   }
 
+  let total = chosenAmount + passive;
+
+  if (inventory.find((i) => i.item === "blue_gem")?.amount > 0) {
+    if (percentChance(0.1)) {
+      total = total * 2;
+      earned.set("blue_gem", total / 2);
+    }
+  } else if (inventory.find((i) => i.item === "purple_gem")?.amount > 0) {
+    if (percentChance(0.5)) {
+      total = total * 2;
+      earned.set("purple_gem", total / 2);
+    }
+  } else if (inventory.find((i) => i.item === "white_gem")?.amount > 0) {
+    if (percentChance(2)) {
+      total = total * 2;
+      earned.set("white_gem", total / 2);
+    }
+  } else if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0) {
+    if (percentChance(5)) {
+      total = total * 2;
+      earned.set("crystal_heart", total / 2);
+    }
+  }
+
   while (percentChance(cakeChance > 25 ? 25 : cakeChance)) cakeAmount++;
 
-  await addInventoryItem(member, "cookie", chosenAmount + passive);
+  await addInventoryItem(member, "cookie", total);
   if (cakeAmount > 0) await addInventoryItem(member, "cake", cakeAmount);
 
   const embed = new CustomEmbed(member).setHeader(
@@ -216,17 +233,15 @@ export async function runBakery(member: GuildMember) {
 
   if (cakeAmount > 0) {
     embed.setDescription(
-      `you baked **${(chosenAmount + passive).toLocaleString()}** cookie${
-        chosenAmount + passive > 1 ? "s" : ""
+      `you baked **${total.toLocaleString()}** cookie${
+        total > 1 ? "s" : ""
       } 🍪 and **${cakeAmount.toLocaleString()}** cake${cakeAmount > 1 ? "s" : ""} ${
         getItems()["cake"].emoji
       } !!`,
     );
   } else {
     embed.setDescription(
-      `you baked **${(chosenAmount + passive).toLocaleString()}** cookie${
-        chosenAmount + passive > 1 ? "s" : ""
-      } 🍪 !!`,
+      `you baked **${total.toLocaleString()}** cookie${total > 1 ? "s" : ""} 🍪 !!`,
     );
   }
 
