@@ -7,6 +7,7 @@ import {
   MessageActionRowComponentBuilder,
 } from "discord.js";
 import { CustomEmbed } from "../../models/EmbedBuilders";
+import Constants from "../Constants";
 
 interface PageManagerOptions<T> {
   message: Message;
@@ -75,30 +76,50 @@ export default class PageManager<T> {
     this.filter = async (i: Interaction) => {
       if (i.user.id == this.userId) return true;
 
+      /*
+      
+      broken in recent discord.js update. 
+      cant await interactions on ephemeral message
+
+      */
+
       if (!this.allowMessageDupe) return false;
 
-      const msg = await (i as ButtonInteraction).reply({
-        embeds: [this.embed],
-        components: [this.row],
+      (i as ButtonInteraction).reply({
+        embeds: [
+          new CustomEmbed(
+            null,
+            "unfortunately, cloning paged messages is unavailable due to a recent discord.js update\n" +
+              "this may or may not be fixed in the future",
+          ).setColor(Constants.EMBED_FAIL_COLOR),
+        ],
         ephemeral: true,
       });
 
-      const manager = new PageManager({
-        embed: this.embed,
-        message: msg as unknown as Message,
-        row: this.row,
-        userId: i.user.id,
-        pages: this.pages,
-        updateEmbed: this.updatePageFunc,
-        onPageUpdate: this.onPageUpdate,
-        handleResponses: this.handleResponses,
-      });
-
-      manager.currentPage = this.currentPage;
-
-      manager.listen();
-
       return false;
+
+      // const msg = await (i as ButtonInteraction).reply({
+      //   embeds: [this.embed],
+      //   components: [this.row],
+      //   ephemeral: true,
+      // });
+
+      // const manager = new PageManager({
+      //   embed: this.embed,
+      //   message: msg as unknown as Message,
+      //   row: this.row,
+      //   userId: i.user.id,
+      //   pages: this.pages,
+      //   updateEmbed: this.updatePageFunc,
+      //   onPageUpdate: this.onPageUpdate,
+      //   handleResponses: this.handleResponses,
+      // });
+
+      // manager.currentPage = this.currentPage;
+
+      // manager.listen();
+
+      // return false;
     };
 
     this.handleResponses = new Map();
