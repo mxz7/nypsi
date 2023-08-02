@@ -172,8 +172,10 @@ async function prepare(
       })
       .catch((e) => {
         console.trace();
-        logger.warn("scratch error", e);
-        logger.warn(e);
+        logger.warn(
+          `scratch error ${message.author.id} (${message.guildId} ${message.guild.name})`,
+          e,
+        );
         console.error(e);
         fail = true;
         redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
