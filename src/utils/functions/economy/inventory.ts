@@ -767,25 +767,28 @@ export async function getAutosellItems(member: GuildMember | string) {
 }
 
 export async function calcItemValue(item: string) {
+  let itemValue = 1000;
+
   if (
     getItems()[item].buy ||
     item === "cookie" ||
     ["prey", "fish", "sellable", "ore"].includes(getItems()[item].role)
-  )
-    return getItems()[item].sell || 1000;
+  ) {
+    itemValue = getItems()[item].sell || 1000;
+  } else {
+    const [auctionAvg, offersAvg] = await Promise.all([
+      getAuctionAverage(item),
+      getOffersAverage(item),
+    ]);
 
-  const [auctionAvg, offersAvg] = await Promise.all([
-    getAuctionAverage(item),
-    getOffersAverage(item),
-  ]);
+    if (!offersAvg && auctionAvg) return auctionAvg;
+    if (!auctionAvg && offersAvg) return offersAvg;
+    if (!auctionAvg && !offersAvg) return getItems()[item].sell || 1000;
 
-  if (!offersAvg && auctionAvg) return auctionAvg;
-  if (!auctionAvg && offersAvg) return offersAvg;
-  if (!auctionAvg && !offersAvg) return getItems()[item].sell || 1000;
-
-  const value = Math.floor(
-    [offersAvg, auctionAvg, auctionAvg, auctionAvg].reduce((a, b) => a + b) / 4,
-  );
+    itemValue = Math.floor(
+      [offersAvg, auctionAvg, auctionAvg, auctionAvg].reduce((a, b) => a + b) / 4,
+    );
+  }
 
   (async () => {
     if (await redis.exists(`nypsi:item:value:store:cache:delay:thing:${item}`)) return;
@@ -811,10 +814,10 @@ export async function calcItemValue(item: string) {
         date,
         category: `item-value-${item}`,
         userId: "global",
-        value,
+        value: itemValue,
       },
     });
   })();
 
-  return value;
+  return itemValue;
 }
