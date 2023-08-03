@@ -57,6 +57,7 @@ export default {
         SLASH_ONLY: "cache:guild:slashonly",
         LOGS_GUILDS: "cache:guild:logs:guilds",
         MODLOGS_GUILDS: "cache:guild:modlogs:guilds",
+        JOIN_ORDER: "cache:guild:join:order",
       },
       moderation: {
         EXISTS: "cache:moderation:exists",

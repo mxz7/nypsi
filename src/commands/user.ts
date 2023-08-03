@@ -4,6 +4,8 @@ import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { formatDate } from "../utils/functions/date";
 
+import redis from "../init/redis";
+import Constants from "../utils/Constants";
 import { getMember } from "../utils/functions/member";
 import { fetchUsernameHistory } from "../utils/functions/users/history";
 import workerSort from "../utils/functions/workers/sort";
@@ -13,8 +15,6 @@ const cmd = new Command("user", "view info about a user in the server", "info").
   "whois",
   "who",
 ]);
-
-const sortCache = new Map<string, string[]>();
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
@@ -52,12 +52,11 @@ async function run(
 
   let membersSorted: string[] = [];
 
-  if (
-    sortCache.has(message.guild.id) &&
-    sortCache.get(message.guild.id).length == message.guild.memberCount
-  ) {
-    membersSorted = sortCache.get(message.guild.id);
-  } else if (message.guild.memberCount < 69420) {
+  if (await redis.exists(`${Constants.redis.cache.guild.JOIN_ORDER}:${message.guildId}`)) {
+    membersSorted = JSON.parse(
+      await redis.get(`${Constants.redis.cache.guild.JOIN_ORDER}:${message.guildId}`),
+    );
+  } else {
     const membersMap = new Map<string, number>();
 
     members.forEach((m) => {
@@ -67,24 +66,32 @@ async function run(
       }
     });
 
-    if (membersSorted.length > 1000) {
-      const msg = await message.channel.send({
-        embeds: [
-          new CustomEmbed(
-            message.member,
-            `sorting ${membersSorted.length.toLocaleString()} members..`,
-          ),
-        ],
-      });
+    if (membersSorted.length > 500) {
+      let msg;
+      if (message instanceof Message) {
+        msg = await message.channel.send({
+          embeds: [
+            new CustomEmbed(
+              message.member,
+              `sorting ${membersSorted.length.toLocaleString()} members..`,
+            ),
+          ],
+        });
+      }
       membersSorted = await workerSort(membersSorted, membersMap);
-      await msg.delete();
+      if (message instanceof Message) {
+        await msg.delete();
+      }
     } else {
       inPlaceSort(membersSorted).asc((i) => membersMap.get(i));
     }
 
-    sortCache.set(message.guild.id, membersSorted);
-
-    setTimeout(() => sortCache.delete(message.guild.id), 60000 * 10);
+    await redis.set(
+      `${Constants.redis.cache.guild.JOIN_ORDER}:${message.guildId}`,
+      JSON.stringify(membersSorted),
+      "EX",
+      3600 * 3,
+    );
   }
 
   let joinPos: number | string = membersSorted.indexOf(member.id) + 1;
