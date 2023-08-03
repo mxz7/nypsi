@@ -392,6 +392,7 @@ export async function reset() {
 
 export function getItems(): { [key: string]: Item } {
   if (!items) {
+    logger.warn("refetching items");
     const itemsFile: any = fs.readFileSync("./data/items.json");
 
     return JSON.parse(itemsFile);
