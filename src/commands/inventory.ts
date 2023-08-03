@@ -114,7 +114,7 @@ async function run(
   inPlaceSort(inventory).asc((i) => i.item);
 
   if (args.length != 0) {
-    inventory = setFilter(inventory, args.join(" "));
+    inventory = setFilter(inventory, args.join(" ").toLowerCase());
 
     if (inventory.length == 0) {
       return send({
