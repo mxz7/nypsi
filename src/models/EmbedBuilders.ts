@@ -15,7 +15,7 @@ setInterval(() => {
     }
   }
 
-  logger.debug(`removed ${count} from color cache`);
+  logger.debug(`removed ${count} from color cache. size: ${colorCache.size}`);
 }, ms("1 hour"));
 
 export class CustomEmbed extends EmbedBuilder {
