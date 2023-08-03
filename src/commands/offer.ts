@@ -34,7 +34,7 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 import { logger } from "../utils/logger";
 import dayjs = require("dayjs");
 
-const cmd = new Command("offer", "create and manage offers", "money").setAliases(["offers", "of"]);
+const cmd = new Command("offer", "create and manage offers", "money").setAliases(["offers","onlyfans", "of"]);
 
 cmd.slashEnabled = true;
 cmd.slashData
