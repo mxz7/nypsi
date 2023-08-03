@@ -28,7 +28,7 @@ export async function addModLog(
   guild: Guild,
   caseType: PunishmentType,
   userID: string,
-  moderator: string,
+  moderator: User,
   command: string,
   caseID: number,
   channelId?: string,
@@ -46,13 +46,13 @@ export async function addModLog(
   embed.setTimestamp();
 
   if (punished) {
-    embed.addField("user", `${punished.toString()} (${punished.id})`, true);
+    embed.addField("user", `${punished.toString()} \`${punished.id}\``, true);
   } else {
     embed.addField("user", userID, true);
   }
 
-  if (moderator != "nypsi") {
-    embed.addField("moderator", moderator, true);
+  if (moderator.id !== moderator.client.user.id) {
+    embed.addField("moderator", `${moderator.username} \`${moderator.id}\``, true);
   } else {
     if (channelId) {
       embed.addField("moderator", `nypsi in <#${channelId}>`, true);
