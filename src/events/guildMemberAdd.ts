@@ -1,5 +1,7 @@
 import { GuildMember } from "discord.js";
+import redis from "../init/redis";
 import { CustomEmbed } from "../models/EmbedBuilders";
+import Constants from "../utils/Constants";
 import { daysAgo, formatDate } from "../utils/functions/date";
 import {
   getAutoJoinRoles,
@@ -20,6 +22,8 @@ const queue = new Set<string>();
 
 export default async function guildMemberAdd(member: GuildMember) {
   if (!(await hasGuild(member.guild))) await createGuild(member.guild);
+
+  await redis.del(`${Constants.redis.cache.guild.JOIN_ORDER}:${member.guild.id}`);
 
   if (await isLogsEnabled(member.guild)) {
     const embed = new CustomEmbed().disableFooter().setTimestamp();
