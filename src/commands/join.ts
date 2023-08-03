@@ -7,8 +7,10 @@ import {
   Message,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
+import redis from "../init/redis";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import Constants from "../utils/Constants";
 import { daysAgo, formatDate } from "../utils/functions/date";
 import { getMember } from "../utils/functions/member";
 import workerSort from "../utils/functions/workers/sort";
@@ -22,8 +24,6 @@ cmd.slashEnabled = true;
 cmd.slashData.addUserOption((option) =>
   option.setName("user").setDescription("view join position for this user").setRequired(false),
 );
-
-const sortCache = new Map<string, string[]>();
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
@@ -87,12 +87,11 @@ async function run(
 
   let membersSorted: string[] = [];
 
-  if (
-    sortCache.has(message.guild.id) &&
-    sortCache.get(message.guild.id).length == message.guild.memberCount
-  ) {
-    membersSorted = sortCache.get(message.guild.id);
-  } else if (message.guild.memberCount < 69420) {
+  if (await redis.exists(`${Constants.redis.cache.guild.JOIN_ORDER}:${message.guildId}`)) {
+    membersSorted = JSON.parse(
+      await redis.get(`${Constants.redis.cache.guild.JOIN_ORDER}:${message.guildId}`),
+    );
+  } else {
     const membersMap = new Map<string, number>();
 
     members.forEach((m) => {
@@ -122,15 +121,12 @@ async function run(
       inPlaceSort(membersSorted).asc((i) => membersMap.get(i));
     }
 
-    sortCache.set(message.guild.id, membersSorted);
-
-    setTimeout(() => {
-      try {
-        sortCache.delete(message.guild.id);
-      } catch {
-        sortCache.clear();
-      }
-    }, 60000 * 10);
+    await redis.set(
+      `${Constants.redis.cache.guild.JOIN_ORDER}:${message.guildId}`,
+      JSON.stringify(membersSorted),
+      "EX",
+      3600 * 3,
+    );
   }
 
   let joinPos: number | string = membersSorted.indexOf(member.id) + 1;
