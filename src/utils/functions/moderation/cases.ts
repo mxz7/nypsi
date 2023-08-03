@@ -50,7 +50,7 @@ export async function newCase(
 
     if (!(await isModLogsEnabled(guild))) return;
 
-    addModLog(guild, caseType, userID, moderator.username, command, caseCount);
+    addModLog(guild, caseType, userID, moderator, command, caseCount);
   }
 }
 
