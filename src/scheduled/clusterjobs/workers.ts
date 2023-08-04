@@ -3,6 +3,7 @@ import {
   ButtonBuilder,
   ButtonStyle,
   MessageActionRowComponentBuilder,
+  User
 } from "discord.js";
 import prisma from "../../init/database";
 import redis from "../../init/redis";
@@ -22,7 +23,7 @@ import { logger } from "../../utils/logger";
 import ms = require("ms");
 import dayjs = require("dayjs");
 
-async function doWorkerThing() {
+export async function doWorkerThing(user?: User) {
   const query = await prisma.economyWorker.findMany({
     include: {
       upgrades: true,
@@ -33,6 +34,7 @@ async function doWorkerThing() {
   const hasSteve = new Set<string>();
 
   for (const worker of query) {
+    if (user && user.id != worker.userId) continue;
     const { maxStorage, perInterval, perItem, scrapChance, gemChance } = await calcWorkerValues(
       worker,
     );

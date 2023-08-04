@@ -38,6 +38,7 @@ import { getCommandUses } from "../utils/functions/users/commands";
 import { addTag, getTags, removeTag } from "../utils/functions/users/tags";
 import { hasProfile } from "../utils/functions/users/utils";
 import { logger } from "../utils/logger";
+import { doWorkerThing } from "../scheduled/clusterjobs/workers";
 
 const cmd = new Command("x", "admincmd", "none").setPermissions(["bot owner"]);
 
@@ -255,6 +256,11 @@ async function run(
           .setEmoji("🎒"),
       ),
       new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder()
+          .setCustomId("do-workers")
+          .setLabel("run workers")
+          .setStyle(ButtonStyle.Danger)
+          .setEmoji("👷‍♂️"),
         new ButtonBuilder()
           .setCustomId("set-karma")
           .setLabel("set karma")
@@ -668,6 +674,47 @@ async function run(
           user.id,
           msg.content.split(" ")[0],
           parseInt(msg.content.split(" ")[1]),
+        );
+        msg.react("✅");
+        return waitForButton();
+      } else if (res.customId === "do-workers") {
+        if ((await getAdminLevel(message.author.id)) < 4) {
+          await res.editReply({
+            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
+          });
+          return waitForButton();
+        }
+
+        await res.editReply({
+          embeds: [new CustomEmbed(message.member, "how many times")],
+        });
+
+        const msg = await message.channel
+          .awaitMessages({
+            filter: (msg: Message) => msg.author.id === message.author.id,
+            max: 1,
+            time: 30000,
+          })
+          .then((collected) => collected.first())
+          .catch(() => {
+            res.editReply({ embeds: [new CustomEmbed(message.member, "expired")] });
+          });
+
+        if (!msg) return;
+        const times = parseInt(msg.content);
+        if (!times) {
+          await res.editReply({ embeds: [new CustomEmbed(message.member, "invalid value")] });
+          return waitForButton();
+        }
+        if (times > 10) {
+          await res.editReply({ embeds: [new CustomEmbed(message.member, "probably a bad idea dont do that")] });
+          return waitForButton();
+        }
+
+        for (let i = 0; i < parseInt(msg.content); i++) await doWorkerThing(user);
+
+        logger.info(
+          `admin: ${message.author.id} (${message.author.username}) ran workers ${msg.content} time${parseInt(msg.content) != 1 ? "s" : ""} for ${user.id}`,
         );
         msg.react("✅");
         return waitForButton();
