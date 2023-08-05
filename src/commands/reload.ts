@@ -1,8 +1,7 @@
 import { CommandInteraction, Message } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
-import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
-import { loadCommands, reloadCommand } from "../utils/handlers/commandhandler";
+import { loadCommands } from "../utils/handlers/commandhandler";
 import { reloadInteractions } from "../utils/handlers/interactions";
 import { logger } from "../utils/logger";
 
@@ -26,18 +25,7 @@ async function run(
       message.react("✅");
     }
   } else {
-    let msg;
-
-    try {
-      msg = reloadCommand(args).split("✔");
-      msg = "```\n" + msg + "```";
-    } catch (e) {
-      return message.channel.send({ embeds: [new ErrorEmbed(`\`\`\`${e}\`\`\``)] });
-    }
-
-    const embed = new CustomEmbed(message.member, msg).setHeader("reload");
-
-    message.channel.send({ embeds: [embed] });
+    if (message instanceof Message) message.react("✅");
   }
 }
 
