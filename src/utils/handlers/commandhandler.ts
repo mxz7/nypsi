@@ -14,7 +14,6 @@ import {
   WebhookClient,
 } from "discord.js";
 import * as fs from "fs";
-import { getBorderCharacters, table } from "table";
 import redis from "../../init/redis";
 import { NypsiClient } from "../../models/Client";
 import { Command, NypsiCommandInteraction } from "../../models/Command";
@@ -79,7 +78,6 @@ let restarting = false;
 
 export function loadCommands() {
   const commandFiles = fs.readdirSync("./dist/commands/").filter((file) => file.endsWith(".js"));
-  const failedTable = [];
 
   if (commands.size > 0) {
     for (const command of commands.keys()) {
@@ -117,20 +115,16 @@ export function loadCommands() {
           }
         }
       } else {
-        failedTable.push([file, "❌"]);
+        logger.error(`failed to load ${file}`);
         logger.error(file + " missing name, description, category or run");
       }
     } catch (e) {
-      failedTable.push([file, "❌"]);
+      logger.error(`failed to load ${file}`);
       logger.error(e);
     }
   }
   aliasesSize = aliases.size;
   commandsSize = commands.size;
-
-  if (failedTable.length != 0) {
-    console.log(table(failedTable, { border: getBorderCharacters("ramac") }));
-  }
 
   logger.info(`${commands.size.toLocaleString()} commands loaded`);
   logger.info(`${aliases.size.toLocaleString()} aliases loaded`);
@@ -185,8 +179,8 @@ export function reloadCommand(commandsArray: string[]) {
   }
   aliasesSize = aliases.size;
   commandsSize = commands.size;
-  console.log(table(reloadTable, { border: getBorderCharacters("ramac") }));
-  return table(reloadTable, { border: getBorderCharacters("ramac") });
+
+  return;
 }
 
 async function helpCmd(message: Message, args: string[]) {
