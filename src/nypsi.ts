@@ -8,7 +8,7 @@ const client = new NypsiClient({
   },
   sweepers: {
     messages: {
-      interval: 3600,
+      interval: 1800,
       lifetime: 900,
       filter: () => (msg) =>
         (msg.author.id === msg.client.user.id &&
