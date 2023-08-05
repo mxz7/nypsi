@@ -178,7 +178,7 @@ async function fastClickGame(client: NypsiClient, channelId: string, prize: stri
 
       if (client.cluster.id != cluster) return;
 
-      const channel = await client.channels.fetch(channelId).catch(() => {});
+      const channel = client.channels.cache.get(channelId);
 
       if (!channel) return;
 
@@ -264,7 +264,7 @@ async function typeFastGame(client: NypsiClient, channelId: string, prize: strin
 
       if (client.cluster.id != cluster) return;
 
-      const channel = await client.channels.fetch(channelId).catch(() => {});
+      const channel = client.channels.cache.get(channelId);
 
       if (!channel) return;
 
@@ -394,7 +394,7 @@ async function clickSpecificGame(client: NypsiClient, channelId: string, prize: 
 
       if (client.cluster.id != cluster) return;
 
-      const channel = await client.channels.fetch(channelId).catch(() => {});
+      const channel = client.channels.cache.get(channelId);
 
       if (!channel) return;
 

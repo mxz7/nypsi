@@ -37,7 +37,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const clusterHas = await (message.client as NypsiClient).cluster.broadcastEval(
     async (c, { channelId }) => {
       const client = c as unknown as NypsiClient;
-      const channel = await client.channels.fetch(channelId).catch(() => {});
+      const channel = client.channels.cache.get(channelId);
 
       if (channel) {
         return client.cluster.id;
@@ -66,7 +66,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       const client = c as unknown as NypsiClient;
       if (client.cluster.id != shard) return false;
 
-      const channel = await client.channels.fetch(channelId);
+      const channel = await client.channels.cache.get(channelId);
 
       if (!channel) return false;
 

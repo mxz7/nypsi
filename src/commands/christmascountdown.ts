@@ -75,7 +75,7 @@ async function run(
         name: "christmas",
       });
     } else {
-      if (!(await message.guild.channels.fetch(channel))) {
+      if (!(await message.guild.channels.cache.get(channel))) {
         if (message.mentions.channels.first()) {
           channel = message.mentions.channels.first();
         } else {
@@ -201,7 +201,7 @@ async function run(
 
     let channel;
 
-    if (!(await message.guild.channels.fetch(channel).catch(() => {}))) {
+    if (!message.guild.channels.cache.get(channel)) {
       if (message.mentions.channels.first()) {
         channel = message.mentions.channels.first();
       } else {

@@ -522,7 +522,7 @@ async function run(
     if (!reactionRole)
       return send({ embeds: [new ErrorEmbed(`'${args[1]}' is not a reaction role`)] });
 
-    const channel = await message.guild.channels.fetch(reactionRole.channelId).catch(() => {});
+    const channel = message.guild.channels.cache.get(reactionRole.channelId);
 
     if (!channel) return send({ embeds: [new ErrorEmbed("channel is invalid")] });
 

@@ -100,7 +100,7 @@ export async function openKarmaShop(client: NypsiClient, now = false) {
 
           if (!guild) return;
 
-          const channel = await guild.channels.fetch("747057465245564939");
+          const channel = await guild.channels.cache.get("747057465245564939");
 
           if (!channel) return;
 
