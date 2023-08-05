@@ -10,14 +10,37 @@ const client = new NypsiClient({
     messages: {
       interval: 1800,
       lifetime: 900,
-      filter: () => (msg) =>
-        (msg.author.id === msg.client.user.id &&
-          (msg.editedTimestamp || msg.createdTimestamp) > Date.now() - ms("10 minutes")) ||
-        (msg.author.bot && msg.author.id !== msg.client.user.id),
+      filter: () => (msg) => {
+        if (msg.author.id === msg.client.user.id) {
+          if ((msg.editedTimestamp || msg.createdTimestamp) > Date.now() - ms("10 minutes")) {
+            return true;
+          }
+          return false;
+        }
+
+        if (msg.author.bot) return false;
+
+        if (recentCommands.has(msg.author.id)) {
+          if (recentCommands.get(msg.author.id) > Date.now() - ms("10 minutes")) return true;
+          recentCommands.delete(msg.author.id);
+          return false;
+        }
+
+        return false;
+      },
     },
     guildMembers: {
       interval: 3600,
-      filter: () => (member) => member.id !== member.client.user.id,
+      filter: () => (member) => {
+        if (member.id === member.client.user.id) return true;
+        if (member.user.bot) return false;
+
+        if (recentCommands.has(member.id)) {
+          if (recentCommands.get(member.id) > Date.now() - ms("10 minutes")) return true;
+          recentCommands.delete(member.id);
+          return false;
+        }
+      },
     },
   },
   makeCache: Options.cacheWithLimits({
@@ -29,11 +52,24 @@ const client = new NypsiClient({
     GuildScheduledEventManager: 0,
     MessageManager: {
       maxSize: 25,
-      keepOverLimit: (msg) =>
-        (msg.author.id === msg.client.user.id &&
-          (msg.editedTimestamp || msg.createdTimestamp) > Date.now() - ms("10 minutes")) ||
-        msg.createdTimestamp > Date.now() - ms("5 minutes") ||
-        (msg.author.bot && msg.author.id !== msg.client.user.id),
+      keepOverLimit: (msg) => {
+        if (msg.author.id === msg.client.user.id) {
+          if ((msg.editedTimestamp || msg.createdTimestamp) > Date.now() - ms("10 minutes")) {
+            return true;
+          }
+          return false;
+        }
+
+        if (msg.author.bot) return false;
+
+        if (recentCommands.has(msg.author.id)) {
+          if (recentCommands.get(msg.author.id) > Date.now() - ms("10 minutes")) return true;
+          recentCommands.delete(msg.author.id);
+          return false;
+        }
+
+        return false;
+      },
     },
     PresenceManager: 0,
     ReactionManager: 0,
@@ -48,12 +84,30 @@ const client = new NypsiClient({
     GuildTextThreadManager: 0,
     UserManager: {
       maxSize: 10_000,
-      keepOverLimit: (user) => user.id === user.client.user.id,
+      keepOverLimit: (user) => {
+        if (user.id === user.client.user.id) return true;
+        if (user.bot) return false;
+
+        if (recentCommands.has(user.id)) {
+          if (recentCommands.get(user.id) > Date.now() - ms("10 minutes")) return true;
+          recentCommands.delete(user.id);
+          return false;
+        }
+      },
     },
-    // GuildMemberManager: {
-    //   maxSize: 10_000,
-    //   keepOverLimit: (user) => user.id === user.client.user.id,
-    // },
+    GuildMemberManager: {
+      maxSize: 5_000,
+      keepOverLimit: (user) => {
+        if (user.id === user.client.user.id) return true;
+        if (user.user.bot) return false;
+
+        if (recentCommands.has(user.id)) {
+          if (recentCommands.get(user.id) > Date.now() - ms("10 minutes")) return true;
+          recentCommands.delete(user.id);
+          return false;
+        }
+      },
+    },
   }),
   presence: {
     status: "dnd",
@@ -82,6 +136,7 @@ const client = new NypsiClient({
   partials: [Partials.Channel], // for direct messages
 });
 
+import { recentCommands } from "./utils/functions/users/commands";
 import { loadCommands } from "./utils/handlers/commandhandler";
 import { loadInteractions } from "./utils/handlers/interactions";
 import { logger } from "./utils/logger";
