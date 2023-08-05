@@ -201,88 +201,81 @@ export default async function messageCreate(message: Message) {
     runCommand(cmd, message, args);
   }
 
-  setTimeout(async () => {
-    if (!message || !message.channel) return;
-    if (message.channel.isDMBased()) return;
+  if (
+    message.guild.memberCount < 150000 &&
+    ((await userExists(message.guild.ownerId)) ||
+      (await isPremium(message.guild.ownerId)) ||
+      (await getKarma(message.guild.ownerId)) >= 10 ||
+      (await getLastCommand(message.guild.ownerId)).getTime() >= Date.now() - ms("30 days"))
+  ) {
+    let mentionMembers: string[] = [];
 
-    if (
-      message.guild.memberCount < 150000 &&
-      ((await userExists(message.guild.ownerId)) ||
-        (await isPremium(message.guild.ownerId)) ||
-        (await getKarma(message.guild.ownerId)) >= 10 ||
-        (await getLastCommand(message.guild.ownerId)).getTime() >= Date.now() - ms("30 days"))
-    ) {
-      let mentionMembers: string[] = [];
-
-      if (message.mentions.everyone) {
-        if (message.guild.members.cache.size != message.guild.memberCount) {
-          await message.guild.members.fetch().catch((e) => {
-            logger.error("failed to fetch guild members for @everyone mention", e);
-          });
-        }
-
-        let members: Collection<string, GuildMember | ThreadMember> | ThreadMemberManager =
-          message.channel.members;
-
-        if (members instanceof ThreadMemberManager) {
-          members = members.cache;
-        }
-
-        mentionMembers = Array.from(members.mapValues((m) => m.user.id).values());
-      } else if (message.mentions.roles.first()) {
-        if (message.guild.members.cache.size != message.guild.memberCount) {
-          await message.guild.members.fetch().catch((e) => {
-            logger.error("failed to fetch members for role mention", e);
-          });
-        }
-
-        message.mentions.roles.forEach((r) => {
-          r.members.forEach((m) => {
-            if (!mentionMembers.includes(m.user.id)) {
-              mentionMembers.push(m.user.id);
-            }
-          });
+    if (message.mentions.everyone) {
+      if (message.guild.members.cache.size != message.guild.memberCount) {
+        await message.guild.members.fetch().catch((e) => {
+          logger.error("failed to fetch guild members for @everyone mention", e);
         });
       }
 
-      if (message.mentions?.members?.size > 0) {
-        if (mentionMembers) {
-          message.mentions.members.forEach((m) => {
-            if (!mentionMembers.includes(m.user.id)) {
-              mentionMembers.push(m.user.id);
-            }
-          });
-        } else {
-          mentionMembers = Array.from(
-            message.mentions.members.mapValues((m) => m.user.id).values(),
-          );
-        }
+      let members: Collection<string, GuildMember | ThreadMember> | ThreadMemberManager =
+        message.channel.members;
+
+      if (members instanceof ThreadMemberManager) {
+        members = members.cache;
       }
 
-      if (mentionMembers.length > 0) {
-        let channelMembers: Collection<string, GuildMember | ThreadMember> | ThreadMemberManager =
-          message.channel.members;
+      mentionMembers = Array.from(members.mapValues((m) => m.user.id).values());
+    } else if (message.mentions.roles.first()) {
+      if (message.guild.members.cache.size != message.guild.memberCount) {
+        await message.guild.members.fetch().catch((e) => {
+          logger.error("failed to fetch members for role mention", e);
+        });
+      }
 
-        if (channelMembers instanceof ThreadMemberManager) {
-          channelMembers = channelMembers.cache;
-        }
+      message.mentions.roles.forEach((r) => {
+        r.members.forEach((m) => {
+          if (!mentionMembers.includes(m.user.id)) {
+            mentionMembers.push(m.user.id);
+          }
+        });
+      });
+    }
 
-        await redis.rpush(
-          Constants.redis.nypsi.MENTION_QUEUE,
-          JSON.stringify({
-            members: mentionMembers,
-            channelMembers: Array.from(channelMembers.mapValues((m) => m.user.id).values()),
-            content:
-              message.content.length > 100
-                ? message.content.substring(0, 97) + "..."
-                : message.content,
-            url: message.url,
-            username: message.author.username,
-            date: message.createdTimestamp,
-            guildId: message.guild.id,
-          } as MentionQueueItem),
-        );
+    if (message.mentions?.members?.size > 0) {
+      if (mentionMembers) {
+        message.mentions.members.forEach((m) => {
+          if (!mentionMembers.includes(m.user.id)) {
+            mentionMembers.push(m.user.id);
+          }
+        });
+      } else {
+        mentionMembers = Array.from(message.mentions.members.mapValues((m) => m.user.id).values());
       }
     }
-  }, 200);
+
+    if (mentionMembers.length > 0) {
+      let channelMembers: Collection<string, GuildMember | ThreadMember> | ThreadMemberManager =
+        message.channel.members;
+
+      if (channelMembers instanceof ThreadMemberManager) {
+        channelMembers = channelMembers.cache;
+      }
+
+      await redis.rpush(
+        Constants.redis.nypsi.MENTION_QUEUE,
+        JSON.stringify({
+          members: mentionMembers,
+          channelMembers: Array.from(channelMembers.mapValues((m) => m.user.id).values()),
+          content:
+            message.content.length > 100
+              ? message.content.substring(0, 97) + "..."
+              : message.content,
+          url: message.url,
+          username: message.author.username,
+          date: message.createdTimestamp,
+          guildId: message.guild.id,
+        } as MentionQueueItem),
+      );
+    }
+  }
 }
