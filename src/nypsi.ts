@@ -11,8 +11,9 @@ const client = new NypsiClient({
       interval: 3600,
       lifetime: 900,
       filter: () => (msg) =>
-        msg.author.id === msg.client.user.id &&
-        (msg.editedTimestamp || msg.createdTimestamp) > Date.now() - ms("10 minutes"),
+        (msg.author.id === msg.client.user.id &&
+          (msg.editedTimestamp || msg.createdTimestamp) > Date.now() - ms("10 minutes")) ||
+        (msg.author.bot && msg.author.id !== msg.client.user.id),
     },
     guildMembers: {
       interval: 3600,
@@ -31,7 +32,8 @@ const client = new NypsiClient({
       keepOverLimit: (msg) =>
         (msg.author.id === msg.client.user.id &&
           (msg.editedTimestamp || msg.createdTimestamp) > Date.now() - ms("10 minutes")) ||
-        msg.createdTimestamp > Date.now() - ms("5 minutes"),
+        msg.createdTimestamp > Date.now() - ms("5 minutes") ||
+        (msg.author.bot && msg.author.id !== msg.client.user.id),
     },
     PresenceManager: 0,
     ReactionManager: 0,
