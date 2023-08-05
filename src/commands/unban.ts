@@ -4,15 +4,14 @@ import {
   InteractionReplyOptions,
   Message,
   PermissionFlagsBits,
-  User,
 } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
+import Constants from "../utils/Constants";
 import { getPrefix } from "../utils/functions/guilds/utils";
-import { deleteBan } from "../utils/functions/moderation/ban";
 import { newCase } from "../utils/functions/moderation/cases";
 import { createProfile, profileExists } from "../utils/functions/moderation/utils";
-import { logger } from "../utils/logger";
+import { getIdFromUsername, getLastKnownUsername } from "../utils/functions/users/tag";
 
 const cmd = new Command("unban", "unban one or more users", "moderation").setPermissions([
   "BAN_MEMBERS",
@@ -20,7 +19,7 @@ const cmd = new Command("unban", "unban one or more users", "moderation").setPer
 
 cmd.slashEnabled = true;
 cmd.slashData.addStringOption((option) =>
-  option.setName("user").setDescription("tag/id of user to unban").setRequired(true),
+  option.setName("user").setDescription("username/id of user to unban").setRequired(true),
 );
 
 async function run(
@@ -77,74 +76,61 @@ async function run(
   if (args.length == 0) {
     const embed = new CustomEmbed(message.member)
       .setHeader("unban help")
-      .addField("usage", `${prefix}unban <user(s)> [-s]`)
+      .addField("usage", `${prefix}unban <id or username> [-s]`)
       .addField(
         "help",
         "**<>** required | **[]** parameter\n" +
-          "**<users>** you can unban one or more members in one command\n" +
+          "**<user>** to unban with username, they must have recently used nypsi & be an exact username match\n" +
           "**[-s]** if used, command message will be deleted and the output will be sent to moderator as a DM if possible",
       )
       .addField(
         "examples",
-        `${prefix}unban user1234 **(only works if members are in cache)**\n${prefix}unban 123456789012345678\n${prefix}unban 123456789012345678 123456789012345678 -s`,
+        `${prefix}unban user1234\n${prefix}unban 123456789012345678\n${prefix}unban 123456789012345678 -s`,
       );
 
     return send({ embeds: [embed] });
   }
 
-  const members: User[] = [];
-  const failed: string[] = [];
+  let target = args[0];
 
-  for (const arg of args) {
-    if (arg.length == 18 || args.length == 19) {
-      await message.guild.members
-        .unban(arg, message.author.username)
-        .then(async (user) => {
-          members.push(user);
-          await deleteBan(message.guild, arg);
-        })
-        .catch(() => {
-          failed.push(arg);
-        });
-    } else if (arg.toLowerCase() != "-s") {
-      try {
-        const memberCache = message.client.users.cache;
-
-        const findingMember = memberCache.find((m) => m.username.includes(arg));
-
-        if (findingMember) {
-          const id = findingMember.id;
-          await message.guild.members
-            .unban(id, message.author.username)
-            .then(async (user) => {
-              members.push(user);
-              await deleteBan(message.guild, user.id);
-            })
-            .catch(() => {
-              failed.push(arg);
-            });
-        }
-      } catch (e) {
-        logger.error("unban error", e);
-      }
-    }
+  if (!target.match(Constants.SNOWFLAKE_REGEX)) {
+    target = await getIdFromUsername(target);
   }
 
-  if (members.length == 0) {
-    return send({ embeds: [new ErrorEmbed("i was unable to unban any users")] });
+  if (!target || !target.match(Constants.SNOWFLAKE_REGEX)) {
+    return send({ embeds: [new ErrorEmbed(`couldn't resolve \`${target}\` to a user`)] });
   }
 
-  const embed = new CustomEmbed(message.member);
+  let fail = false;
 
-  if (members.length == 1) {
-    embed.setDescription("✅ `" + members[0].username + "` was unbanned");
-  } else {
-    embed.setDescription("✅ **" + members.length + "** members have been unbanned");
-  }
+  const banned = await message.guild.bans.fetch();
 
-  if (failed.length != 0) {
-    embed.addField("error", "unable to unban: " + failed.join(", "));
-  }
+  if (!banned.find((i) => i.user.id === target))
+    return send({
+      embeds: [
+        new ErrorEmbed(
+          `\`${(await getLastKnownUsername(target).catch(() => null)) || target}\` is not banned`,
+        ),
+      ],
+    });
+
+  const unbannedUser = await message.guild.members.unban(target, message.content).catch(() => {
+    fail = true;
+  });
+
+  if (fail || !unbannedUser)
+    return send({
+      embeds: [
+        new ErrorEmbed(
+          `failed to unban \`${(await getLastKnownUsername(target).catch(() => null)) || target}\``,
+        ),
+      ],
+    });
+
+  const embed = new CustomEmbed(
+    message.member,
+    `✅ \`${unbannedUser.username}\` has been unbanned`,
+  );
 
   if (args.join(" ").includes("-s")) {
     if (message instanceof Message) {
@@ -157,13 +143,7 @@ async function run(
     await send({ embeds: [embed] });
   }
 
-  const members1 = [];
-
-  for (const m of members) {
-    members1.push(m.id);
-  }
-
-  await newCase(message.guild, "unban", members1, message.author, message.content);
+  await newCase(message.guild, "unban", unbannedUser.id, message.author, message.content);
 }
 
 cmd.setRun(run);
