@@ -47,7 +47,7 @@ export function doChatReactions(client: NypsiClient) {
           }
         }
 
-        const channel: TextChannel = await guild.channels.fetch(ch).catch(() => null);
+        const channel = guild.channels.cache.get(ch);
 
         if (!channel) {
           continue;

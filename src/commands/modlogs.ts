@@ -53,7 +53,7 @@ async function run(
     } else {
       const msg = await current.send({ content: "fetching channel..." });
 
-      const channel = await message.guild.channels.fetch(msg.channel_id);
+      const channel = await message.guild.channels.cache.get(msg.channel_id);
 
       text += `current channel: ${
         channel ? channel.toString() : `${msg.channel_id}`
@@ -76,7 +76,7 @@ async function run(
   } else {
     let channel: string | Channel = args[0];
 
-    if (!(await message.guild.channels.fetch(args[0]).catch(() => {}))) {
+    if (!message.guild.channels.cache.get(args[0])) {
       if (!message.mentions.channels.first()) {
         return message.channel.send({
           embeds: [

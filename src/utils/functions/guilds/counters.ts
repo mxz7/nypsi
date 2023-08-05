@@ -9,7 +9,7 @@ export async function updateChannel(data: GuildCounter, client: NypsiClient) {
   const clusterHas = await client.cluster.broadcastEval(
     async (c, { channelId }) => {
       const client = c as unknown as NypsiClient;
-      const channel = await client.channels.fetch(channelId).catch(() => {});
+      const channel = client.channels.cache.get(channelId);
 
       if (channel) {
         return client.cluster.id;
@@ -51,7 +51,7 @@ export async function updateChannel(data: GuildCounter, client: NypsiClient) {
 
           if (client.cluster.id != shard) return;
 
-          const channel = await client.channels.fetch(channelId);
+          const channel = await client.channels.cache.get(channelId);
 
           if (channel.isDMBased()) return;
 
@@ -75,7 +75,7 @@ export async function updateChannel(data: GuildCounter, client: NypsiClient) {
 
           if (client.cluster.id != shard) return;
 
-          const channel = await client.channels.fetch(channelId);
+          const channel = await client.channels.cache.get(channelId);
 
           if (channel.isDMBased()) return;
 
@@ -96,7 +96,7 @@ export async function updateChannel(data: GuildCounter, client: NypsiClient) {
 
           if (client.cluster.id != shard) return;
 
-          const channel = await client.channels.fetch(channelId);
+          const channel = await client.channels.cache.get(channelId);
 
           if (channel.isDMBased()) return;
 
@@ -117,7 +117,7 @@ export async function updateChannel(data: GuildCounter, client: NypsiClient) {
 
           if (client.cluster.id != shard) return;
 
-          const channel = await client.channels.fetch(channelId);
+          const channel = await client.channels.cache.get(channelId);
 
           if (channel.isDMBased()) return;
 
@@ -159,7 +159,7 @@ export async function updateChannel(data: GuildCounter, client: NypsiClient) {
 
           if (client.cluster.id != shard) return;
 
-          const channel = await client.channels.fetch(channelId);
+          const channel = await client.channels.cache.get(channelId);
 
           if (channel.isDMBased()) return;
 
@@ -200,7 +200,7 @@ export async function updateChannel(data: GuildCounter, client: NypsiClient) {
 
           if (client.cluster.id != shard) return;
 
-          const channel = await client.channels.fetch(channelId);
+          const channel = await client.channels.cache.get(channelId);
 
           if (channel.isDMBased()) return;
 
@@ -244,7 +244,7 @@ export async function updateChannel(data: GuildCounter, client: NypsiClient) {
 
       if (client.cluster.id != shard) return;
 
-      const channel = await client.channels.fetch(channelId);
+      const channel = await client.channels.cache.get(channelId);
 
       if (channel.isDMBased()) return;
 

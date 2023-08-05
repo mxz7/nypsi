@@ -5,7 +5,7 @@ export async function findChannelCluster(client: NypsiClient, channelId: string)
     async (c, { channelId }) => {
       const client = c as unknown as NypsiClient;
 
-      const channel = await client.channels.fetch(channelId).catch(() => {});
+      const channel = client.channels.cache.get(channelId);
 
       if (channel && !channel.isDMBased()) {
         return { cluster: client.cluster.id, guildId: channel.guildId };

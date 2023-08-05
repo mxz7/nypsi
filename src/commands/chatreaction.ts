@@ -975,7 +975,7 @@ async function run(
       if (args[1].toLowerCase() == "channel" || args[1].toLowerCase() == "channels") {
         let channel: string | Channel = args[2];
 
-        if (!(await message.guild.channels.fetch(channel).catch(() => {}))) {
+        if (!message.guild.channels.cache.get(channel)) {
           if (!message.mentions.channels.first()) {
             return send({
               embeds: [
