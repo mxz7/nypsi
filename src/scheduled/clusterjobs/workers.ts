@@ -3,7 +3,7 @@ import {
   ButtonBuilder,
   ButtonStyle,
   MessageActionRowComponentBuilder,
-  User
+  User,
 } from "discord.js";
 import prisma from "../../init/database";
 import redis from "../../init/redis";

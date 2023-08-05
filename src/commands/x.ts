@@ -707,14 +707,18 @@ async function run(
           return waitForButton();
         }
         if (times > 10) {
-          await res.editReply({ embeds: [new CustomEmbed(message.member, "probably a bad idea dont do that")] });
+          await res.editReply({
+            embeds: [new CustomEmbed(message.member, "probably a bad idea dont do that")],
+          });
           return waitForButton();
         }
 
         for (let i = 0; i < parseInt(msg.content); i++) await doWorkerThing(user);
 
         logger.info(
-          `admin: ${message.author.id} (${message.author.username}) ran workers ${msg.content} time${parseInt(msg.content) != 1 ? "s" : ""} for ${user.id}`,
+          `admin: ${message.author.id} (${message.author.username}) ran workers ${
+            msg.content
+          } time${parseInt(msg.content) != 1 ? "s" : ""} for ${user.id}`,
         );
         msg.react("✅");
         return waitForButton();
