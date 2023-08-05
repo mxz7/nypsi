@@ -31,3 +31,14 @@ export async function getLastKnownUsername(id: string) {
 
   return query.lastKnownUsername;
 }
+
+export async function getIdFromUsername(username: string) {
+  const query = await prisma.user.findFirst({
+    where: { lastKnownUsername: username },
+    select: {
+      id: true,
+    },
+  });
+
+  return query?.id;
+}
