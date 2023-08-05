@@ -2,7 +2,14 @@ import { GuildMember, User } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import Constants from "../../Constants";
+import { logger } from "../../logger";
 import ms = require("ms");
+
+export const recentCommands = new Map<string, number>();
+
+setInterval(() => {
+  logger.debug(`recent commands size: ${recentCommands.size}`);
+}, ms("1 hour"));
 
 export async function getLastCommand(member: GuildMember | string): Promise<Date> {
   let id: string;
@@ -57,6 +64,7 @@ export async function getCommandUses(member: GuildMember | string) {
 export async function updateUser(user: User, command: string) {
   if (!user) return;
   const date = new Date();
+  recentCommands.set(user.id, date.getTime());
 
   await redis.set(`${Constants.redis.cache.user.LAST_COMMAND}:${user.id}`, date.getTime());
   await redis.expire(
