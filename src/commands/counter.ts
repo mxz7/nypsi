@@ -141,7 +141,7 @@ async function run(
       embed.setDescription("this server has no counters");
     } else {
       for (const counter of counters) {
-        const channel = await message.guild.channels.fetch(counter.channel);
+        const channel = await message.guild.channels.cache.get(counter.channel);
         embed.addField(
           counter.channel,
           `**type** \`${counter.tracks}\` ${

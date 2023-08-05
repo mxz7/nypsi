@@ -4,7 +4,7 @@ import prisma from "../../../init/database";
 import { NypsiClient } from "../../../models/Client";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { logger } from "../../logger";
-import { daysUntilChristmas, MStoTime } from "../date";
+import { MStoTime, daysUntilChristmas } from "../date";
 
 export function runChristmas(client: NypsiClient) {
   const now = new Date();
@@ -33,7 +33,7 @@ export function runChristmas(client: NypsiClient) {
       const clusterHas = await client.cluster.broadcastEval(
         async (c, { channelId }) => {
           const client = c as unknown as NypsiClient;
-          const channel = await client.channels.fetch(channelId).catch(() => {});
+          const channel = client.channels.cache.get(channelId);
 
           if (channel) {
             return client.cluster.id;
@@ -81,7 +81,7 @@ export function runChristmas(client: NypsiClient) {
           const client = c as unknown as NypsiClient;
           if (client.cluster.id != needed) return false;
 
-          const channel = await client.channels.fetch(channelId).catch(() => {});
+          const channel = client.channels.cache.get(channelId);
 
           if (!channel) return false;
           if (!channel.isTextBased()) return false;

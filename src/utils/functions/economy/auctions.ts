@@ -91,7 +91,7 @@ export async function deleteAuction(id: number, client: NypsiClient) {
 
         if (!guild) return;
 
-        const channel = await guild.channels.fetch("1008467335973179482");
+        const channel = await guild.channels.cache.get("1008467335973179482");
 
         if (!channel) return;
 
@@ -169,7 +169,7 @@ export async function createAuction(
 
         if (!guild) return;
 
-        const channel = await guild.channels.fetch("1008467335973179482");
+        const channel = await guild.channels.cache.get("1008467335973179482");
 
         if (!channel) return;
 
@@ -288,7 +288,7 @@ export async function bumpAuction(id: number, client: NypsiClient) {
 
         if (!guild) return;
 
-        const channel = await guild.channels.fetch("1008467335973179482");
+        const channel = await guild.channels.cache.get("1008467335973179482");
 
         if (!channel) return;
 

@@ -318,7 +318,7 @@ export async function uploadImage(
 
       if (client.cluster.id != cluster) return;
 
-      const channel = await c.channels.fetch(channelId).catch((e) => e);
+      const channel = c.channels.cache.get(channelId);
 
       if (!channel || !channel.isTextBased())
         return { msg: "err: fetching channel", error: channel };

@@ -24,7 +24,7 @@ export function runCountdowns(client: NypsiClient) {
       const clusterHas = await client.cluster.broadcastEval(
         async (c, { channelId }) => {
           const client = c as unknown as NypsiClient;
-          const channel = await client.channels.fetch(channelId).catch(() => {});
+          const channel = client.channels.cache.get(channelId);
 
           if (channel) {
             return client.cluster.id;
@@ -78,7 +78,7 @@ export function runCountdowns(client: NypsiClient) {
           const client = c as unknown as NypsiClient;
           if (client.cluster.id != needed) return false;
 
-          const channel = await client.channels.fetch(channelId).catch(() => {});
+          const channel = client.channels.cache.get(channelId);
 
           if (!channel) return false;
           if (!channel.isTextBased()) return false;
