@@ -24,6 +24,8 @@ modLogColors.set("warn", variants.macchiato.flamingo.hex as ColorResolvable);
 modLogColors.set("kick", variants.macchiato.sky.hex as ColorResolvable);
 modLogColors.set("filter violation", variants.macchiato.sapphire.hex as ColorResolvable);
 
+let checkingLogsEnabled = false;
+
 export async function addModLog(
   guild: Guild,
   caseType: PunishmentType,
@@ -92,7 +94,7 @@ export async function isLogsEnabled(guild: Guild) {
       : false;
   }
 
-  if (await redis.exists(`nypsi:query:islogsenabled:searching:${guild.id}`)) {
+  if (checkingLogsEnabled) {
     return (await new Promise((resolve) => {
       setTimeout(() => {
         resolve(isLogsEnabled(guild));
@@ -100,8 +102,7 @@ export async function isLogsEnabled(guild: Guild) {
     })) as boolean;
   }
 
-  await redis.set(`nypsi:query:islogsenabled:searching:${guild.id}`, "t");
-  await redis.expire(`nypsi:query:islogsenabled:searching:${guild.id}`, 60);
+  checkingLogsEnabled = true;
 
   const query = await prisma.moderation.findUnique({
     where: {
@@ -112,15 +113,15 @@ export async function isLogsEnabled(guild: Guild) {
     },
   });
 
-  await redis.del(`nypsi:query:islogsenabled:searching:${guild.id}`);
+  checkingLogsEnabled = false;
 
   if (!query || !query.logs) {
     await redis.set(`${Constants.redis.cache.guild.LOGS}:${guild.id}`, "f");
-    await redis.expire(`${Constants.redis.cache.guild.LOGS}:${guild.id}`, 3600);
+    await redis.expire(`${Constants.redis.cache.guild.LOGS}:${guild.id}`, 36000);
     return false;
   } else {
     await redis.set(`${Constants.redis.cache.guild.LOGS}:${guild.id}`, "t");
-    await redis.expire(`${Constants.redis.cache.guild.LOGS}:${guild.id}`, 3600);
+    await redis.expire(`${Constants.redis.cache.guild.LOGS}:${guild.id}`, 36000);
   }
 
   return true;
