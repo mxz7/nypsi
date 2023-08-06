@@ -1304,8 +1304,8 @@
     "id": "discordian_v",
     "name": "discordian **V**",
     "emoji": "🤓",
-    "target": 25000,
-    "description": "do 25,000 commands in a day",
+    "target": 15000,
+    "description": "do 15,000 commands in a day",
     "prize": ["legendary_scratch_card:2", "discordian_tag:1"]
   }
 }
