@@ -134,10 +134,9 @@ export async function requestUnmute(guildId: string, member: string, client: Nyp
 
       try {
         if (muteRoleId == "" || muteRoleId == "default" || !muteRoleId) {
-          await guild.roles.fetch();
           role = guild.roles.cache.find((r) => r.name.toLowerCase() == "muted").id;
         } else {
-          role = (await guild.roles.fetch(muteRoleId)).id;
+          role = guild.roles.cache.get(muteRoleId).id;
         }
       } catch {
         return "role";

@@ -116,7 +116,7 @@ export async function runInteraction(interaction: Interaction) {
         }
       }
 
-      const role = await interaction.guild.roles.fetch(roleId);
+      const role = await interaction.guild.roles.cache.get(roleId);
 
       if (!role) return interaction.editReply({ embeds: [new ErrorEmbed("role is not valid")] });
 

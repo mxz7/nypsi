@@ -42,7 +42,7 @@ async function run(
 
   if (message.mentions.roles.first()) {
     role = message.mentions.roles.first();
-  } else if (!(await message.guild.roles.fetch(args[0]).catch(() => {})) && parseInt(args[0])) {
+  } else if (!message.guild.roles.cache.get(args[0]) && parseInt(args[0])) {
     role = roles.find((r) => r.id == args[0]);
   } else {
     role = roles.find((r) => r.name.toLowerCase().includes(args.join(" ").toLowerCase()));
