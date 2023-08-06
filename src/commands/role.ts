@@ -237,7 +237,7 @@ async function run(
     let role: Role;
 
     if (!(message instanceof Message) && message.isChatInputCommand()) {
-      role = await message.guild.roles.fetch(message.options.getRole("role").id);
+      role = await message.guild.roles.cache.get(message.options.getRole("role").id);
     } else if (message.mentions?.roles?.first()) {
       role = message.mentions.roles.first();
     } else {
@@ -379,7 +379,7 @@ async function run(
     let role: Role;
 
     if (!(message instanceof Message) && message.isChatInputCommand()) {
-      role = await message.guild.roles.fetch(message.options.getRole("role").id);
+      role = await message.guild.roles.cache.get(message.options.getRole("role").id);
     } else if (message.mentions?.roles?.first()) {
       role = message.mentions.roles.first();
     } else {
@@ -516,7 +516,7 @@ async function run(
       const rolesDisplay: string[] = [];
 
       for (const r of roles) {
-        const role = await message.guild.roles.fetch(r).catch(() => {});
+        const role = message.guild.roles.cache.get(r);
 
         if (!role) {
           roles.splice(roles.indexOf(r), 1);
@@ -594,7 +594,7 @@ async function run(
       const rolesDisplay: string[] = [];
 
       for (const r of roles) {
-        const role = await message.guild.roles.fetch(r).catch(() => {});
+        const role = message.guild.roles.cache.get(r);
 
         if (!role) {
           roles.splice(roles.indexOf(r), 1);

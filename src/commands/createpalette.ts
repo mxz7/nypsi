@@ -53,19 +53,17 @@ async function run(
     return message.channel.send({ embeds: [embed] });
   }
 
-  const roles = await message.guild.roles.fetch();
-
   const sortedRoleIDs: string[] = [];
 
-  roles.forEach((r) => sortedRoleIDs.push(r.id));
+  message.guild.roles.cache.forEach((r) => sortedRoleIDs.push(r.id));
 
-  inPlaceSort(sortedRoleIDs).desc((i) => roles.find((r) => r.id == i).position);
+  inPlaceSort(sortedRoleIDs).desc((i) => message.guild.roles.cache.find((r) => r.id == i).position);
 
   const colors = [];
 
   for (let i = 0; i < sortedRoleIDs.length; i++) {
     if (colors.length >= 100) break;
-    const role = roles.find((r) => r.id == sortedRoleIDs[i]);
+    const role = message.guild.roles.cache.find((r) => r.id == sortedRoleIDs[i]);
 
     if (role.hexColor != "#000000") {
       if (colors.indexOf(role.hexColor.substring(1, 7)) != -1) continue;

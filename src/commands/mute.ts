@@ -171,7 +171,7 @@ async function run(
   } else if (guildMuteRole == "timeout") {
     mode = "timeout";
   } else {
-    muteRole = await message.guild.roles.fetch(guildMuteRole);
+    muteRole = await message.guild.roles.cache.get(guildMuteRole);
 
     if (!muteRole) {
       return send({ embeds: [new ErrorEmbed(`failed to find muterole: ${guildMuteRole}`)] });

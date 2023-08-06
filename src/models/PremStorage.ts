@@ -194,8 +194,6 @@ export async function requestRemoveRole(id: string, roleID: string, client: Nyps
 
       if (!user) return;
 
-      await guild.roles.fetch();
-
       return await user.roles.remove(roleId);
     },
     {
