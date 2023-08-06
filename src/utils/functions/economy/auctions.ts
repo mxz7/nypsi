@@ -141,16 +141,15 @@ export async function createAuction(
     new ButtonBuilder().setCustomId("b").setLabel("buy").setStyle(ButtonStyle.Success),
   );
 
-  if (itemAmount > 1)
-    buttonRow.addComponents(
-      new ButtonBuilder().setCustomId("b-one").setLabel("buy one").setStyle(ButtonStyle.Secondary),
-    );
-
   if (itemAmount >= 10)
     buttonRow.addComponents(
       new ButtonBuilder().setCustomId("b-multi").setLabel("buy multiple").setStyle(ButtonStyle.Secondary),
     );
-    
+  
+  else if (itemAmount > 1)
+    buttonRow.addComponents(
+      new ButtonBuilder().setCustomId("b-one").setLabel("buy one").setStyle(ButtonStyle.Secondary),
+    );
 
   const clusters = await (member.client as NypsiClient).cluster.broadcastEval(async (client) => {
     const guild = await client.guilds.cache.get("747056029795221513");
@@ -1017,9 +1016,6 @@ export async function buyAuctionOne(
   );
 
   if (auction.itemAmount > 2) {
-    buttonRow.addComponents(
-      new ButtonBuilder().setCustomId("b-one").setLabel("buy one").setStyle(ButtonStyle.Secondary),
-    );
     embed.setFooter({
       text: `$${Math.floor(Number(auction.bin / auction.itemAmount)).toLocaleString()} per ${
         items[auction.itemId].name
@@ -1030,6 +1026,9 @@ export async function buyAuctionOne(
         new ButtonBuilder().setCustomId("b-multi").setLabel("buy multiple").setStyle(ButtonStyle.Secondary),
       );
     }
+    else buttonRow.addComponents(
+      new ButtonBuilder().setCustomId("b-one").setLabel("buy one").setStyle(ButtonStyle.Secondary),
+    );
   }
 
   beingBought.delete(auction.id);
@@ -1174,8 +1173,8 @@ export async function buyAuctionMulti(
       (await getBalance(auction.ownerId)) +
         (Math.floor(Number(auction.bin / auction.itemAmount * amount)) - taxedAmount),
     ),
-    addStat(interaction.user.id, "auction-bought-items"),
-    addStat(auction.ownerId, "auction-sold-items"),
+    addStat(interaction.user.id, "auction-bought-items", Number(amount)),
+    addStat(auction.ownerId, "auction-sold-items", Number(amount)),
   ]);
 
   logger.info(
