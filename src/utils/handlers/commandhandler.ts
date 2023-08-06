@@ -14,7 +14,6 @@ import {
   WebhookClient,
 } from "discord.js";
 import * as fs from "fs";
-import { performance } from "perf_hooks";
 import redis from "../../init/redis";
 import { NypsiClient } from "../../models/Client";
 import { Command, NypsiCommandInteraction } from "../../models/Command";
