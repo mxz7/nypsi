@@ -20,7 +20,7 @@ import {
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command("lottery", "enter the weekly lottery draw", "money").setAliases(["lotto"]);
+const cmd = new Command("lottery", "enter the daily lottery draw", "money").setAliases(["lotto"]);
 
 cmd.slashEnabled = true;
 cmd.slashData
