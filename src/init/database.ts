@@ -20,7 +20,6 @@ const prisma = new PrismaClient().$extends({
         }
 
         redis.lpush(Constants.redis.nypsi.HOURLY_DB_REPORT, timeTaken);
-        logger.warn(`${model}.${operation}: ${end - start}`, args);
 
         return result;
       },
