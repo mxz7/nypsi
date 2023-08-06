@@ -11,91 +11,110 @@ const cmd = new Command(
   "info",
 ).setAliases(["latency"]);
 
-let pingingDb = false;
-
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
   /**
    * not perfect latency testing i know but it works!!
    */
   const redisLatency: number[] = [];
 
-  let now = Date.now();
+  let now = performance.now();
   await redis.set("ping:test", "pong");
-  let after = Date.now();
+  let after = performance.now();
 
   redisLatency[0] = after - now;
 
-  now = Date.now();
-  await redis.del("ping:test");
-  after = Date.now();
+  now = performance.now();
+  await redis.get("ping:test");
+  after = performance.now();
 
   redisLatency[1] = after - now;
 
+  now = performance.now();
+  await redis.set("ping:test", "boobies");
+  after = performance.now();
+
+  redisLatency[2] = after - now;
+
+  now = performance.now();
+  await redis.del("ping:test");
+  after = performance.now();
+
+  redisLatency[3] = after - now;
+
   const dbLatency: number[] = [];
 
-  if (!pingingDb) {
-    pingingDb = true;
+  const dbId = "latency_test_user_" + Math.floor(Math.random() * 100);
 
-    now = Date.now();
-    await prisma.user.create({
-      data: {
-        id: "test_user",
-        lastKnownUsername: "",
-        lastCommand: new Date(),
-      },
-    });
-    after = Date.now();
+  now = performance.now();
+  await prisma.user.create({
+    data: {
+      id: dbId,
+      lastKnownUsername: "",
+      lastCommand: new Date(),
+    },
+  });
+  after = performance.now();
 
-    dbLatency[0] = after - now;
+  dbLatency[0] = after - now;
 
-    now = Date.now();
-    await prisma.user.update({
-      where: {
-        id: "test_user",
-      },
-      data: {
-        karma: 69,
-      },
-    });
-    after = Date.now();
+  now = performance.now();
+  await prisma.user.findUnique({
+    where: {
+      id: dbId,
+    },
+    select: {
+      karma: true,
+    },
+  });
+  after = performance.now();
 
-    dbLatency[1] = after - now;
+  dbLatency[1] = after - now;
 
-    now = Date.now();
-    await prisma.user.delete({
-      where: {
-        id: "test_user",
-      },
-    });
-    after = Date.now();
+  now = performance.now();
+  await prisma.user.update({
+    where: {
+      id: dbId,
+    },
+    data: {
+      karma: 69,
+    },
+  });
+  after = performance.now();
 
-    pingingDb = false;
+  dbLatency[2] = after - now;
 
-    dbLatency[2] = after - now;
-  }
+  now = performance.now();
+  await prisma.user.delete({
+    where: {
+      id: dbId,
+    },
+  });
+  after = performance.now();
 
-  now = Date.now();
+  dbLatency[3] = after - now;
+
+  now = performance.now();
   const msg = await message.channel.send({ content: "pong" });
-  after = Date.now();
+  after = performance.now();
 
-  const msgLatency = after - now;
+  const msgLatency = (after - now).toFixed(1);
 
-  const discordLatency = Math.round(message.client.ws.ping);
+  const discordLatency = message.client.ws.ping;
 
   const embed = new CustomEmbed(message.member);
 
   let desc =
     `websocket \`${discordLatency}ms\`\n` +
     `bot message \`${msgLatency}ms\`\n` +
-    `redis \`${redisLatency.join("ms` | `")}ms\``;
+    `redis \`${redisLatency.map((i) => i.toFixed(1)).join("ms` | `")}ms\``;
 
   if (dbLatency) {
-    desc += `\ndatabase \`${dbLatency.join("ms` | `")}ms\``;
+    desc += `\ndatabase \`${dbLatency.map((i) => i.toFixed(1)).join("ms` | `")}ms\``;
   }
 
   embed.setDescription(
-    `${desc}\nload avg: ${loadavg()
-      .map((i) => `\`${i}\``)
+    `${desc}\nload avg ${loadavg()
+      .map((i) => `\`${i.toFixed(2)}\``)
       .join(" ")}`,
   );
 
