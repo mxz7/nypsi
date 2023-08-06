@@ -39,6 +39,7 @@ import { addHourlyCommand } from "../utils/handlers/commandhandler.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 import { gamble, logger } from "../utils/logger.js";
 import ms = require("ms");
+import { recentCommands } from "../utils/functions/users/commands.js";
 
 const games = new Map<
   string,
@@ -167,6 +168,8 @@ async function prepareGame(
   args: string[],
   msg?: Message,
 ) {
+  recentCommands.set(message.author.id, Date.now());
+
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       let usedNewMessage = false;
