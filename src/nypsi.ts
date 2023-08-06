@@ -7,9 +7,9 @@ const client = new NypsiClient({
     parse: ["users", "roles"],
   },
   sweepers: {
+    ...Options.DefaultSweeperSettings,
     messages: {
       interval: 1800,
-      lifetime: 900,
       filter: () => (msg) => {
         if (msg.author.id === msg.client.user.id) {
           if ((msg.editedTimestamp || msg.createdTimestamp) > Date.now() - ms("10 minutes")) {
@@ -18,7 +18,7 @@ const client = new NypsiClient({
           return false;
         }
 
-        if (msg.author.bot) return false;
+        if (msg.author.bot || msg.embeds.length > 0) return false;
 
         if (recentCommands.has(msg.author.id)) {
           if (recentCommands.get(msg.author.id) > Date.now() - ms("10 minutes")) return true;
@@ -51,7 +51,7 @@ const client = new NypsiClient({
     GuildStickerManager: 0,
     GuildScheduledEventManager: 0,
     MessageManager: {
-      maxSize: 25,
+      maxSize: 5,
       keepOverLimit: (msg) => {
         if (msg.author.id === msg.client.user.id) {
           if ((msg.editedTimestamp || msg.createdTimestamp) > Date.now() - ms("10 minutes")) {
@@ -60,7 +60,7 @@ const client = new NypsiClient({
           return false;
         }
 
-        if (msg.author.bot) return false;
+        if (msg.author.bot || msg.embeds.length > 0) return false;
 
         if (recentCommands.has(msg.author.id)) {
           if (recentCommands.get(msg.author.id) > Date.now() - ms("10 minutes")) return true;
