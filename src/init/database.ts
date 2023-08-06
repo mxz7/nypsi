@@ -1,29 +1,31 @@
 import { PrismaClient } from "@prisma/client";
+import { performance } from "perf_hooks";
 import { parentPort } from "worker_threads";
 import Constants from "../utils/Constants";
 import { logger } from "../utils/logger";
 import redis from "./redis";
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient().$extends({
+  query: {
+    $allModels: {
+      async $allOperations({ query, args, model, operation }) {
+        const start = performance.now();
+        const result = await query(args);
+        const end = performance.now();
 
-prisma.$use(async (params, next) => {
-  const before = Date.now();
+        const timeTaken = end - start;
 
-  const result = await next(params);
+        if (timeTaken > 500 && !parentPort) {
+          logger.warn(`query ${model}.${operation} took ${timeTaken.toFixed(2)}ms`, args);
+        }
 
-  if (params.model === "Mention") return result;
+        redis.lpush(Constants.redis.nypsi.HOURLY_DB_REPORT, timeTaken);
+        logger.debug(`${model}.${operation}: ${end - start}`, args);
 
-  const timeTaken = Date.now() - before;
-
-  if (timeTaken > 500 && !parentPort) {
-    logger.warn(`query ${params.model}.${params.action} took ${timeTaken}ms`, params.args);
-  }
-
-  setImmediate(async () => {
-    await redis.lpush(Constants.redis.nypsi.HOURLY_DB_REPORT, timeTaken);
-  });
-
-  return result;
+        return result;
+      },
+    },
+  },
 });
 
 export default prisma;
