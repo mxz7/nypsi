@@ -284,7 +284,7 @@ async function run(
 
           if (!guild) return;
 
-          const channel = await guild.channels.cache.get(channelId);
+          const channel = guild.channels.cache.get(channelId);
 
           if (!channel) return;
 
