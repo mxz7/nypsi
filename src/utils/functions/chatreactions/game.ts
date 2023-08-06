@@ -1,4 +1,5 @@
 import { Guild, GuildMember, Message, TextChannel } from "discord.js";
+import { performance } from "perf_hooks";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
 import { gamble } from "../../logger";
@@ -49,7 +50,7 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel) 
 
   let msg = await channel.send({ embeds: [embed] });
 
-  const start = new Date().getTime();
+  const start = performance.now();
 
   const winnersIDs: string[] = [];
 
@@ -120,9 +121,7 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel) 
   }, 750);
 
   collector.on("collect", async (message): Promise<void> => {
-    let time: number | string = new Date().getTime();
-
-    time = ((time - start) / 1000).toFixed(2);
+    const time = ((performance.now() - start) / 1000).toFixed(2);
 
     winnersList.push({ user: message.author.toString(), time: time });
 
@@ -234,7 +233,7 @@ export async function startChatReactionDuel(
 
   const msg = await channel.send({ embeds: [embed] });
 
-  const start = new Date().getTime();
+  const start = performance.now();
 
   const filter = async (m: Message) => {
     const a = m.content.toLowerCase() == word.actual.toLowerCase();
@@ -265,7 +264,7 @@ export async function startChatReactionDuel(
     return null;
   }
 
-  const winTime = ((Date.now() - start) / 1000).toFixed(2);
+  const winTime = ((performance.now() - start) / 1000).toFixed(2);
   let winnings = wager * 2;
   let tax = 0;
 

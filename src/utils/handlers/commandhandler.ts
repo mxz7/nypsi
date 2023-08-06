@@ -14,6 +14,7 @@ import {
   WebhookClient,
 } from "discord.js";
 import * as fs from "fs";
+import { performance } from "perf_hooks";
 import redis from "../../init/redis";
 import { NypsiClient } from "../../models/Client";
 import { Command, NypsiCommandInteraction } from "../../models/Command";
@@ -537,7 +538,7 @@ export async function runCommand(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
-  const preProcessLength = [Date.now()];
+  const preProcessLength = [performance.now()];
   if (message.author.bot) return;
   if (!message.channel.isTextBased()) return;
   if (message.channel.isDMBased()) return;
@@ -898,10 +899,12 @@ export async function runCommand(
   }
 
   command.run(message, args);
-  preProcessLength[1] = Date.now();
+  preProcessLength[1] = performance.now();
 
   if (preProcessLength[1] - preProcessLength[0] > 30) {
-    logger.debug(`command preprocess length: ${preProcessLength[1] - preProcessLength[0]}ms`);
+    logger.debug(
+      `command preprocess length: ${(preProcessLength[1] - preProcessLength[0]).toFixed(2)}ms`,
+    );
   }
 
   setTimeout(async () => {
