@@ -1,5 +1,4 @@
 import { PrismaClient } from "@prisma/client";
-import { performance } from "perf_hooks";
 import { parentPort } from "worker_threads";
 import Constants from "../utils/Constants";
 import { logger } from "../utils/logger";

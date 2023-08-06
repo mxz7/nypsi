@@ -1,5 +1,4 @@
 import { Guild, GuildMember, Message, TextChannel } from "discord.js";
-import { performance } from "perf_hooks";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
 import { gamble } from "../../logger";
