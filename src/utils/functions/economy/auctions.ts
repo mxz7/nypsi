@@ -143,9 +143,11 @@ export async function createAuction(
 
   if (itemAmount >= 10)
     buttonRow.addComponents(
-      new ButtonBuilder().setCustomId("b-multi").setLabel("buy multiple").setStyle(ButtonStyle.Secondary),
+      new ButtonBuilder()
+        .setCustomId("b-multi")
+        .setLabel("buy multiple")
+        .setStyle(ButtonStyle.Secondary),
     );
-  
   else if (itemAmount > 1)
     buttonRow.addComponents(
       new ButtonBuilder().setCustomId("b-one").setLabel("buy one").setStyle(ButtonStyle.Secondary),
@@ -1023,12 +1025,18 @@ export async function buyAuctionOne(
     });
     if (auction.itemAmount > 10) {
       buttonRow.addComponents(
-        new ButtonBuilder().setCustomId("b-multi").setLabel("buy multiple").setStyle(ButtonStyle.Secondary),
+        new ButtonBuilder()
+          .setCustomId("b-multi")
+          .setLabel("buy multiple")
+          .setStyle(ButtonStyle.Secondary),
       );
-    }
-    else buttonRow.addComponents(
-      new ButtonBuilder().setCustomId("b-one").setLabel("buy one").setStyle(ButtonStyle.Secondary),
-    );
+    } else
+      buttonRow.addComponents(
+        new ButtonBuilder()
+          .setCustomId("b-one")
+          .setLabel("buy one")
+          .setStyle(ButtonStyle.Secondary),
+      );
   }
 
   beingBought.delete(auction.id);
@@ -1044,7 +1052,9 @@ export async function buyAuctionMulti(
 ) {
   if (beingBought.has(auction.id)) {
     return new Promise((resolve) => {
-      logger.debug(`repeating auction buy multi (${amount}) - ${auction.itemId} - ${auction.ownerId}`);
+      logger.debug(
+        `repeating auction buy multi (${amount}) - ${auction.itemId} - ${auction.ownerId}`,
+      );
       setTimeout(async () => {
         if (repeatCount > 100) beingBought.delete(auction.id);
         resolve(
@@ -1064,7 +1074,8 @@ export async function buyAuctionMulti(
   if (!(await userExists(interaction.user.id))) await createUser(interaction.user.id);
 
   if (
-    (await getBalance(interaction.user.id)) < Math.floor(Number(auction.bin / auction.itemAmount * amount))
+    (await getBalance(interaction.user.id)) <
+    Math.floor(Number((auction.bin / auction.itemAmount) * amount))
   ) {
     return await interaction.reply({
       embeds: [new ErrorEmbed("you cannot afford this")],
@@ -1109,7 +1120,7 @@ export async function buyAuctionMulti(
 
   const balance = await getBalance(interaction.user.id);
 
-  if (balance < Math.floor(Number(auction.bin / auction.itemAmount * amount))) {
+  if (balance < Math.floor(Number((auction.bin / auction.itemAmount) * amount))) {
     beingBought.delete(auction.id);
     return await interaction.reply({
       embeds: [new ErrorEmbed("you cannot afford this")],
@@ -1124,13 +1135,13 @@ export async function buyAuctionMulti(
       },
     });
   } else {
-    if (Math.floor(Number(auction.bin / auction.itemAmount * amount)) > 10_000) {
+    if (Math.floor(Number((auction.bin / auction.itemAmount) * amount)) > 10_000) {
       await prisma.auction.create({
         data: {
           sold: true,
           itemId: auction.itemId,
           itemAmount: amount,
-          bin: Math.floor(Number(auction.bin / auction.itemAmount * amount)),
+          bin: Math.floor(Number((auction.bin / auction.itemAmount) * amount)),
           messageId: randomUUID(),
           ownerId: auction.ownerId,
         },
@@ -1144,7 +1155,7 @@ export async function buyAuctionMulti(
         },
         data: {
           itemAmount: { decrement: amount },
-          bin: { decrement: Math.floor(Number(auction.bin / auction.itemAmount * amount)) },
+          bin: { decrement: Math.floor(Number((auction.bin / auction.itemAmount) * amount)) },
         },
       })
       .catch(() => {});
@@ -1156,9 +1167,9 @@ export async function buyAuctionMulti(
 
   if (
     !(await isPremium(auction.ownerId)) &&
-    Number(auction.bin / auction.itemAmount * amount) >= 1_000_000
+    Number((auction.bin / auction.itemAmount) * amount) >= 1_000_000
   ) {
-    taxedAmount = Math.floor(Math.floor(Number(auction.bin / auction.itemAmount * amount)) * tax);
+    taxedAmount = Math.floor(Math.floor(Number((auction.bin / auction.itemAmount) * amount)) * tax);
     addToNypsiBank(taxedAmount);
   }
 
@@ -1166,12 +1177,12 @@ export async function buyAuctionMulti(
     addInventoryItem(interaction.user.id, auction.itemId, Number(amount)),
     updateBalance(
       interaction.user.id,
-      balance - Math.floor(Number(auction.bin / auction.itemAmount * amount)),
+      balance - Math.floor(Number((auction.bin / auction.itemAmount) * amount)),
     ),
     updateBalance(
       auction.ownerId,
       (await getBalance(auction.ownerId)) +
-        (Math.floor(Number(auction.bin / auction.itemAmount * amount)) - taxedAmount),
+        (Math.floor(Number((auction.bin / auction.itemAmount) * amount)) - taxedAmount),
     ),
     addStat(interaction.user.id, "auction-bought-items", Number(amount)),
     addStat(auction.ownerId, "auction-sold-items", Number(amount)),
@@ -1190,7 +1201,7 @@ export async function buyAuctionMulti(
     interaction.user,
     await interaction.client.users.fetch(auction.ownerId),
     `$${(
-      Math.floor(Number(auction.bin / auction.itemAmount * amount)) - taxedAmount
+      Math.floor(Number((auction.bin / auction.itemAmount) * amount)) - taxedAmount
     ).toLocaleString()} (auction)`,
   );
 
@@ -1257,7 +1268,7 @@ export async function buyAuctionMulti(
   desc[1] = `**${(Number(auction.itemAmount) - Number(amount)).toLocaleString()}x** ${
     items[auction.itemId].emoji
   } ${items[auction.itemId].name} for $**${Math.floor(
-    Number(auction.bin) - Math.floor(Number(auction.bin / auction.itemAmount * amount)),
+    Number(auction.bin) - Math.floor(Number((auction.bin / auction.itemAmount) * amount)),
   ).toLocaleString()}**`;
 
   embed.setDescription(desc.join("\n\n"));
@@ -1267,19 +1278,29 @@ export async function buyAuctionMulti(
   );
 
   if (auction.itemAmount - amount > 1) {
-    buttonRow.addComponents(
-      new ButtonBuilder().setCustomId("b-one").setLabel("buy one").setStyle(ButtonStyle.Secondary),
-    );
     embed.setFooter({
       text: `$${Math.floor(Number(auction.bin / auction.itemAmount)).toLocaleString()} per ${
         items[auction.itemId].name
       }`,
     });
-    if (auction.itemAmount - amount >= 10) {
+
+    if (auction.itemAmount - amount < 10) {
       buttonRow.addComponents(
-        new ButtonBuilder().setCustomId("b-multi").setLabel("buy multiple").setStyle(ButtonStyle.Secondary),
+        new ButtonBuilder()
+          .setCustomId("b-one")
+          .setLabel("buy one")
+          .setStyle(ButtonStyle.Secondary),
       );
     }
+  }
+
+  if (auction.itemAmount - amount >= 10) {
+    buttonRow.addComponents(
+      new ButtonBuilder()
+        .setCustomId("b-multi")
+        .setLabel("buy multiple")
+        .setStyle(ButtonStyle.Secondary),
+    );
   }
 
   beingBought.delete(auction.id);
