@@ -26,7 +26,7 @@ export default {
       }
 
       const res = await showMultiBuyModal(interaction, Number(auction.itemAmount)).catch(
-        () => {},
+        () => null,
       );
   
       if (!res || !res.isModalSubmit()) return;
