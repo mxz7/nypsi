@@ -28,14 +28,14 @@ async function doLottery(client: Client) {
 
   if (tickets.length < 100) {
     logger.info(
-      `${tickets.length} tickets were bought ): maybe next week you'll have something to live for`,
+      `${tickets.length} tickets were bought ): maybe tomorrow you'll have something to live for`,
     );
 
     const embed = new CustomEmbed();
 
     embed.setTitle("lottery cancelled");
     embed.setDescription(
-      `the lottery has been cancelled as only **${tickets.length}** tickets were bought ):\n\nthese tickets will remain and the lottery will happen next week`,
+      `the lottery has been cancelled as only **${tickets.length}** tickets were bought ):\n\nthese tickets will remain and the lottery will happen tomorrow`,
     );
     embed.setColor(variants.latte.base.hex as ColorResolvable);
     embed.disableFooter();
