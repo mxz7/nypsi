@@ -136,7 +136,7 @@ export async function sendReactionRole(
   const components: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [];
 
   for (const role of reactionRole.roles) {
-    if (!(await channel.guild.roles.fetch(role.roleId))) {
+    if (!(await channel.guild.roles.cache.get(role.roleId))) {
       await deleteRoleFromReactionRole(channel.guild.id, reactionRole.messageId, role.roleId);
       continue;
     }

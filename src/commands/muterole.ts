@@ -32,7 +32,7 @@ async function run(
     let role;
 
     if (current != "" && current != "timeout" && current) {
-      role = await message.guild.roles.fetch(current);
+      role = await message.guild.roles.cache.get(current);
 
       if (!role) {
         await setMuteRole(message.guild, "");
@@ -74,7 +74,7 @@ async function run(
 
     if (message.mentions.roles.first()) {
       role = message.mentions.roles.first();
-    } else if (await message.guild.roles.fetch(args[1]).catch(() => {})) {
+    } else if (message.guild.roles.cache.get(args[1])) {
       role = roles.find((r) => r.id == args[1]);
     } else {
       args.shift();
@@ -106,7 +106,7 @@ async function run(
   } else if (args[0].toLowerCase() == "update") {
     let channelError = false;
     try {
-      let muteRole = await message.guild.roles.fetch(await getMuteRole(message.guild));
+      let muteRole = await message.guild.roles.cache.get(await getMuteRole(message.guild));
 
       if ((await getMuteRole(message.guild)) == "") {
         muteRole = await message.guild.roles.cache.find((r) => r.name.toLowerCase() == "muted");

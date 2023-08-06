@@ -95,14 +95,10 @@ export async function getExactMember(guild: Guild, memberName: string): Promise<
 export async function getRole(guild: Guild, roleName: string): Promise<Role> {
   if (!guild) return null;
 
-  const roles = await guild.roles.fetch();
-
   let target: Role;
   const possible = new Map<number, Role>();
 
-  for (const m of roles.keys()) {
-    const role = roles.get(m);
-
+  for (const role of guild.roles.cache.values()) {
     if (role.id == roleName) {
       target = role;
       break;
