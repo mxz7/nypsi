@@ -33,6 +33,7 @@ import { createUser, formatBet, userExists } from "../utils/functions/economy/ut
 import { calcEarnedGambleXp, getXp, updateXp } from "../utils/functions/economy/xp";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { shuffle } from "../utils/functions/random";
+import { recentCommands } from "../utils/functions/users/commands";
 import { addHourlyCommand } from "../utils/handlers/commandhandler";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 import { gamble, logger } from "../utils/logger";
@@ -112,6 +113,8 @@ async function prepareGame(
   args: string[],
   msg?: Message,
 ) {
+  recentCommands.set(message.author.id, Date.now());
+
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       let usedNewMessage = false;
