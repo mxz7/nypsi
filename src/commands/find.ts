@@ -45,7 +45,7 @@ async function run(
   } else if (args[0].toLowerCase() == "gid") {
     if (args.length == 1) return message.react("❌");
 
-    if (args[1].toLowerCase() === "leave") {
+    if (args[2].toLowerCase() === "leave") {
       return client.cluster.broadcastEval(
         (c, { guildId }) => {
           const g = c.guilds.cache.get(guildId);
