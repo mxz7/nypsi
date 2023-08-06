@@ -570,7 +570,7 @@ export async function runCommand(
 
   if (!["h", "w"].includes(cmd) && typeof command !== "undefined") {
     if (
-      !message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.ViewChannel) ||
+      !message.channel.permissionsFor(message.client.user)?.has(PermissionFlagsBits.ViewChannel) ||
       !message.guild.members.me.permissions.has(PermissionFlagsBits.ViewChannel)
     ) {
       if (message instanceof Message) {
