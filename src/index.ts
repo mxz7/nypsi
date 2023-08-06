@@ -89,20 +89,6 @@ process.on("uncaughtException", (e) => {
 
 manager.spawn();
 
-export async function getGuilds(): Promise<string[]> {
-  const guildIds = await manager.broadcastEval((c) => {
-    return c.guilds.cache.map((g) => g.id);
-  });
-
-  const newGuildIds: string[] = [];
-
-  for (const shardResponse of guildIds) {
-    shardResponse.forEach((id) => newGuildIds.push(id));
-  }
-
-  return newGuildIds;
-}
-
 listen(manager);
 
 setTimeout(async () => {
