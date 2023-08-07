@@ -32,13 +32,13 @@ const client = new NypsiClient({
     guildMembers: {
       interval: 3600,
       filter: () => (member) => {
-        if (member.id === member.client.user.id) return true;
-        if (member.user.bot) return false;
+        if (member.id === member.client.user.id) return false;
+        if (member.user.bot) return true;
 
         if (recentCommands.has(member.id)) {
-          if (recentCommands.get(member.id) > Date.now() - ms("10 minutes")) return true;
+          if (recentCommands.get(member.id) > Date.now() - ms("10 minutes")) return false;
           recentCommands.delete(member.id);
-          return false;
+          return true;
         }
       },
     },
