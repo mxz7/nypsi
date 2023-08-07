@@ -25,6 +25,7 @@ import {
   getTickets,
   isEcoBanned,
   loadItems,
+  setEcoBan,
   userExists,
 } from "../functions/economy/utils";
 import { addKarma } from "../functions/karma/karma";
@@ -277,8 +278,6 @@ async function handleKofiData(data: KofiResponse) {
       }
 
       if (user) {
-        await addInventoryItem(user.id, item.name, shopItem.quantity || 1, false);
-
         await prisma.user.update({
           where: {
             id: user.id,
@@ -295,39 +294,71 @@ async function handleKofiData(data: KofiResponse) {
           }),
         });
 
-        logger.info(`given to ${user.id} (${user.email})`, item);
+        if (item.name === "unecoban") {
+          await setEcoBan(user.id);
+          logger.info(`unbanned ${user.id} (${user.email})`, item);
 
-        if ((await getDmSettings(user.id)).premium) {
-          const payload: NotificationPayload = {
-            memberId: user.id,
-            payload: {
-              content: "thank you for your purchase",
-              embed: new CustomEmbed()
-                .setDescription(
-                  `you have received ${shopItem.quantity} ${getItems()[item.name].emoji} **${
-                    getItems()[item.name].name
-                  }**`,
-                )
-                .setColor(Constants.TRANSPARENT_EMBED_COLOR),
-            },
-          };
+          if ((await getDmSettings(user.id)).premium) {
+            const payload: NotificationPayload = {
+              memberId: user.id,
+              payload: {
+                content: "thank you for your purchase",
+                embed: new CustomEmbed()
+                  .setDescription(`you have been **unbanned**`)
+                  .setColor(Constants.TRANSPARENT_EMBED_COLOR),
+              },
+            };
 
-          await addNotificationToQueue(payload);
-          if (data.is_public && (await getPreferences(user.id)).leaderboards) {
-            const hook = new WebhookClient({ url: process.env.THANKYOU_HOOK });
-            await hook.send({
-              embeds: [
-                new CustomEmbed(
-                  null,
-                  `${user.lastKnownUsername} just bought ${shopItem.quantity}x ${
-                    getItems()[item.name].article
-                  } ${getItems()[item.name].emoji} **${getItems()[item.name].name}**!!!!`,
-                )
-                  .setFooter({ text: "thank you for your purchase (:" })
-                  .setColor(Constants.PURPLE),
-              ],
-            });
-            hook.destroy();
+            await addNotificationToQueue(payload);
+            if (data.is_public && (await getPreferences(user.id)).leaderboards) {
+              const hook = new WebhookClient({ url: process.env.THANKYOU_HOOK });
+              await hook.send({
+                embeds: [
+                  new CustomEmbed(null, `${user.lastKnownUsername} just bought an **unban**!!!!`)
+                    .setFooter({ text: "thank you for your purchase (:" })
+                    .setColor(Constants.PURPLE),
+                ],
+              });
+              hook.destroy();
+            }
+          }
+        } else {
+          await addInventoryItem(user.id, item.name, shopItem.quantity || 1, false);
+
+          logger.info(`given to ${user.id} (${user.email})`, item);
+
+          if ((await getDmSettings(user.id)).premium) {
+            const payload: NotificationPayload = {
+              memberId: user.id,
+              payload: {
+                content: "thank you for your purchase",
+                embed: new CustomEmbed()
+                  .setDescription(
+                    `you have received ${shopItem.quantity} ${getItems()[item.name].emoji} **${
+                      getItems()[item.name].name
+                    }**`,
+                  )
+                  .setColor(Constants.TRANSPARENT_EMBED_COLOR),
+              },
+            };
+
+            await addNotificationToQueue(payload);
+            if (data.is_public && (await getPreferences(user.id)).leaderboards) {
+              const hook = new WebhookClient({ url: process.env.THANKYOU_HOOK });
+              await hook.send({
+                embeds: [
+                  new CustomEmbed(
+                    null,
+                    `${user.lastKnownUsername} just bought ${shopItem.quantity}x ${
+                      getItems()[item.name].article
+                    } ${getItems()[item.name].emoji} **${getItems()[item.name].name}**!!!!`,
+                  )
+                    .setFooter({ text: "thank you for your purchase (:" })
+                    .setColor(Constants.PURPLE),
+                ],
+              });
+              hook.destroy();
+            }
           }
         }
 
