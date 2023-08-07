@@ -29,6 +29,10 @@ const client = new NypsiClient({
     //     return false;
     //   },
     // },
+    messages: {
+      interval: 60,
+      filter: () => () => true,
+    },
     guildMembers: {
       interval: 3600,
       filter: () => (member) => {
