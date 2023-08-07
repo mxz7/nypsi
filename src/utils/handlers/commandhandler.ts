@@ -784,10 +784,7 @@ export async function runCommand(
     return verifyUser(message);
   }
 
-  if (
-    command.category == "money" ||
-    ["wholesome", "settings", "wordle", "sex"].includes(command.name)
-  ) {
+  if (command.category == "money" || ["wholesome", "wordle", "sex"].includes(command.name)) {
     if (restarting || (await redis.get(Constants.redis.nypsi.RESTART)) == "t") {
       if (message.author.id == Constants.TEKOH_ID && message instanceof Message) {
         message.react("💀");
