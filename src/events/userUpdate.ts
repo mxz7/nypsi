@@ -13,6 +13,8 @@ let interval: NodeJS.Timer;
 export default async function userUpdate(oldUser: User, newUser: User) {
   if (oldUser.username != newUser.username) {
     if (await hasProfile(newUser.id)) {
+      if (!(await determineCluster(newUser.client as NypsiClient, newUser.id))) return;
+
       await updateLastKnownUsername(newUser.id, newUser.username);
 
       if (!(await isTracking(newUser.id))) return;
@@ -34,42 +36,45 @@ export default async function userUpdate(oldUser: User, newUser: User) {
   }
 }
 
-// async function determineCluster(client: NypsiClient, userId: string) {
-//   const thisId = client.cluster.id;
+// PREVENTS DOUBLE UPLOADS
+async function determineCluster(client: NypsiClient, userId: string) {
+  const thisId = client.cluster.id;
 
-//   const res = await client.cluster.broadcastEval(
-//     async (c, { currentId, userId }) => {
-//       const client = c as unknown as NypsiClient;
+  const res = await client.cluster.broadcastEval(
+    async (c, { currentId, userId }) => {
+      const client = c as unknown as NypsiClient;
 
-//       if (client.cluster.id == currentId) return "current";
+      if (client.cluster.id == currentId) return "current";
 
-//       const user = await client.users.fetch(userId).catch(() => {});
+      const user = await client.users.fetch(userId).catch(() => {});
 
-//       if (!user) return;
+      if (!user) return;
 
-//       return client.cluster.id;
-//     },
-//     { context: { currentId: thisId, userId: userId } },
-//   );
+      return client.cluster.id;
+    },
+    { context: { currentId: thisId, userId: userId } },
+  );
 
-//   let lowest = client.cluster.id;
+  let lowest = client.cluster.id;
 
-//   for (const response of res) {
-//     if (typeof response === "number") {
-//       if (response < thisId) {
-//         lowest = response;
-//       }
-//     }
-//   }
+  for (const response of res) {
+    if (typeof response === "number") {
+      if (response < thisId) {
+        lowest = response;
+      }
+    }
+  }
 
-//   if (lowest == client.cluster.id) return true;
-//   return false;
-// }
+  if (lowest == client.cluster.id) return true;
+  return false;
+}
 
-async function doQueue() {
+async function doQueue(client: NypsiClient) {
   const user = queue.shift();
 
   if (!user) return;
+
+  if (!(await determineCluster(client, user.id))) return;
 
   let uploadUrl = user.displayAvatarURL({ size: 256 });
 
