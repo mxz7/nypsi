@@ -135,14 +135,16 @@ export class NypsiClient extends Client {
 
       await setCustomPresence();
 
-      this.user?.setPresence({
-        status: "dnd",
-        activities: [
-          {
-            name: "nypsi.xyz",
-          },
-        ],
-      });
+      setTimeout(() => {
+        this.user.setPresence({
+          status: "dnd",
+          activities: [
+            {
+              name: "nypsi.xyz",
+            },
+          ],
+        });
+      }, 10000);
     });
   }
 
