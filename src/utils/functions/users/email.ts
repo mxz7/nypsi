@@ -5,7 +5,7 @@ import { NotificationPayload } from "../../../types/Notification";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { addInventoryItem } from "../economy/inventory";
-import { getItems } from "../economy/utils";
+import { getItems, setEcoBan } from "../economy/utils";
 import { addMember, getPremiumProfile, isPremium, renewUser, setTier } from "../premium/premium";
 import { addNotificationToQueue, getDmSettings } from "./notifications";
 
@@ -113,24 +113,42 @@ export async function checkPurchases(id: string, client: NypsiClient) {
           await addMember(id, premiums.indexOf(item.item) + 1, client);
         }
       } else {
-        await addInventoryItem(id, item.item, 1, false);
+        if (item.item === "unecoban") {
+          await setEcoBan(id);
 
-        if ((await getDmSettings(id)).premium) {
-          const payload: NotificationPayload = {
-            memberId: id,
-            payload: {
-              content: "thank you for your purchase",
-              embed: new CustomEmbed()
-                .setDescription(
-                  `you have received 1 ${getItems()[item.item].emoji} ${
-                    getItems()[item.item].name
-                  }`,
-                )
-                .setColor(Constants.TRANSPARENT_EMBED_COLOR),
-            },
-          };
+          if ((await getDmSettings(id)).premium) {
+            const payload: NotificationPayload = {
+              memberId: id,
+              payload: {
+                content: "thank you for your purchase",
+                embed: new CustomEmbed()
+                  .setDescription(`you have been **unbanned**`)
+                  .setColor(Constants.TRANSPARENT_EMBED_COLOR),
+              },
+            };
 
-          await addNotificationToQueue(payload);
+            await addNotificationToQueue(payload);
+          }
+        } else {
+          await addInventoryItem(id, item.item, 1, false);
+
+          if ((await getDmSettings(id)).premium) {
+            const payload: NotificationPayload = {
+              memberId: id,
+              payload: {
+                content: "thank you for your purchase",
+                embed: new CustomEmbed()
+                  .setDescription(
+                    `you have received 1 ${getItems()[item.item].emoji} ${
+                      getItems()[item.item].name
+                    }`,
+                  )
+                  .setColor(Constants.TRANSPARENT_EMBED_COLOR),
+              },
+            };
+
+            await addNotificationToQueue(payload);
+          }
         }
       }
     }
