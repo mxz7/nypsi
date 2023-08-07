@@ -568,9 +568,9 @@ export async function runCommand(
     command = commands.get(cmd);
   }
 
-  if (!["h", "w"].includes(cmd) && typeof command !== "undefined") {
+  if (typeof command !== "undefined") {
     if (
-      !message.channel.permissionsFor(message.client.user)?.has(PermissionFlagsBits.ViewChannel) ||
+      !message.channel.permissionsFor(message.client.user).has(PermissionFlagsBits.ViewChannel) ||
       !message.guild.members.me.permissions.has(PermissionFlagsBits.ViewChannel)
     ) {
       if (message instanceof Message) {
