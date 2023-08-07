@@ -14,6 +14,7 @@ import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
 import Constants from "../../../Constants";
 import { logger } from "../../../logger";
+import { recentCommands } from "../../users/commands";
 import { getInventory, selectItem, setInventoryItem } from "../inventory";
 import ScratchCard from "../scratchies";
 import { addStat, createGame } from "../stats";
@@ -23,6 +24,8 @@ async function prepare(
   args: string[],
   interaction?: ButtonInteraction,
 ): Promise<any> {
+  recentCommands.set(message.author.id, Date.now());
+
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (interaction) {
       return interaction.message.edit(data as BaseMessageOptions);
