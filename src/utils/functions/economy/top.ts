@@ -1002,6 +1002,153 @@ export async function topDailyStreakGlobal(userId: string) {
   return { pages, pos };
 }
 
+export async function topLottoWins(guild: Guild, userId?: string) {
+  let members: Collection<string, GuildMember>;
+
+  if (guild.memberCount == guild.members.cache.size) {
+    members = guild.members.cache;
+  } else {
+    members = await guild.members.fetch();
+  }
+
+  if (!members) members = guild.members.cache;
+
+  members = members.filter((m) => {
+    return !m.user.bot;
+  });
+
+  const query = await prisma.achievements.findMany({
+    where: {
+      AND: [
+        {
+          OR: [
+            { AND: [{ completed: false }, { achievementId: { startsWith: "lucky_" } }] },
+            { AND: [{ completed: true }, { achievementId: { equals: "lucky_v" } }] }
+          ]
+        },
+        { userId: { in: Array.from(members.keys()) } }
+      ],
+    },
+    select: {
+      userId: true,
+      progress: true,
+    },
+    orderBy: {
+      progress: "desc",
+    },
+    take: 100,
+  });
+
+  const out = [];
+
+  let count = 0;
+
+
+  const getMemberID = (guild: Guild, id: string) => {
+    const target = members.find((member) => {
+      return member.user.id == id;
+    });
+
+    return target;
+  };
+
+  const userIds = query.map((i) => i.userId);
+
+  for (const user of query) {
+    let pos: string | number = count + 1;
+
+    if (pos == 1) {
+      pos = "🥇";
+    } else if (pos == 2) {
+      pos = "🥈";
+    } else if (pos == 3) {
+      pos = "🥉";
+    }
+
+    const tag = await getActiveTag(user.userId);
+
+    out[count] = `${pos} **${tag ? `[${getTagsData()[tag.tagId].emoji}]` : ""}${
+      getMemberID(guild, user.userId).user.username
+    }** ${user.progress}`;
+
+    count++;
+  }
+
+  const pages = PageManager.createPages(out);
+
+  let pos = 0;
+
+  if (userId) {
+    pos = userIds.indexOf(userId) + 1;
+  }
+
+  return { pages, pos };
+}
+
+export async function topLottoWinsGlobal(userId: string) {
+
+  const query = await prisma.achievements.findMany({
+    where: {
+      OR: [
+        { AND: [{ completed: false }, { achievementId: { startsWith: "lucky_" } }] },
+        { AND: [{ completed: true }, { achievementId: { equals: "lucky_v" } }] }
+      ]
+    },
+    select: {
+      userId: true,
+      progress: true,
+      user: {
+        select: {
+          id: true,
+          lastKnownUsername: true,
+        },
+      },
+    },
+    orderBy: {
+      progress: "desc",
+    },
+    take: 100,
+  });
+
+  const out = [];
+
+  let count = 0;
+
+  const userIds = query.map((i) => i.userId);
+
+  for (const user of query) {
+    let pos: string | number = count + 1;
+
+    if (pos == 1) {
+      pos = "🥇";
+    } else if (pos == 2) {
+      pos = "🥈";
+    } else if (pos == 3) {
+      pos = "🥉";
+    }
+
+    const tag = await getActiveTag(user.userId);
+
+    out[count] = `${pos} **${tag ? `[${getTagsData()[tag.tagId].emoji}]` : ""}${
+      (await getPreferences(user.userId))?.leaderboards
+        ? user.user.lastKnownUsername || user.userId
+        : "[hidden]"
+    }** ${query[userIds.indexOf(user.userId)].progress}`;
+
+    count++;
+  }
+
+  const pages = PageManager.createPages(out);
+
+  let pos = 0;
+
+  if (userId) {
+    pos = userIds.indexOf(userId) + 1;
+  }
+
+  return { pages, pos };
+}
+
 export async function topWordle(guild: Guild, userId: string) {
   let members: Collection<string, GuildMember>;
 
