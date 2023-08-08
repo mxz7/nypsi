@@ -41,7 +41,7 @@ export default {
       inventory.find((i) => i.item === "vote_crate")?.amount < crateAmount
     ) {
       return interaction.reply({
-        embeds: [new ErrorEmbed(`you do not have ${crateAmount} vote crates`)],
+        embeds: [new ErrorEmbed(`you do not have ${crateAmount} vote crate${crateAmount != 1 ? "s" : ""}`)],
       });
     }
 
