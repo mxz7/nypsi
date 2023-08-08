@@ -75,7 +75,7 @@ export async function setActiveTag(userId: string, tagId: string) {
     },
   });
 
-  await prisma.tags.update({
+  if (tagId != "none") await prisma.tags.update({
     where: {
       userId_tagId: {
         userId,

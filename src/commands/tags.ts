@@ -123,12 +123,24 @@ cmd.setRun((message, args) => {
 
     if (!selected && search !== "none") return send({ embeds: [new ErrorEmbed("unknown tag")] });
 
-    if (!tags.find((i) => i.tagId === selected.id) && search !== "none") {
+    if (search !== "none" && !tags.find((i) => i.tagId === selected.id)) {
       return send({ embeds: [new ErrorEmbed("you dont have this tag")] });
     }
 
-    if (search === "none") await setActiveTag(message.author.id, "none");
-    else await setActiveTag(message.author.id, selected.id);
+    if (search === "none") {
+      await setActiveTag(message.author.id, "none");
+
+      return send({
+        embeds: [
+          new CustomEmbed(
+            message.member,
+            `disabled any active tag`,
+          ),
+        ],
+      });
+    }
+
+    await setActiveTag(message.author.id, selected.id);
 
     return send({
       embeds: [
