@@ -302,7 +302,9 @@ async function run(
             embeds: [
               new CustomEmbed(
                 message.member,
-                `added ${role.toString()} to ${count.toLocaleString()} member${count != 1 ? "s" : ""}`,
+                `added ${role.toString()} to ${count.toLocaleString()} member${
+                  count != 1 ? "s" : ""
+                }`,
               ),
             ],
           });
@@ -354,7 +356,9 @@ async function run(
       embeds: [
         new CustomEmbed(
           message.member,
-          `added ${role.toString()} to ${members.length.toLocaleString()} member${members.length != 1 ? "s" : ""}`,
+          `added ${role.toString()} to ${members.length.toLocaleString()} member${
+            members.length != 1 ? "s" : ""
+          }`,
         ),
       ],
     });
@@ -445,7 +449,9 @@ async function run(
             embeds: [
               new CustomEmbed(
                 message.member,
-                `removed ${role.toString()} from ${count.toLocaleString()} member${count != 1 ? "s" : ""}`,
+                `removed ${role.toString()} from ${count.toLocaleString()} member${
+                  count != 1 ? "s" : ""
+                }`,
               ),
             ],
           });
@@ -497,7 +503,9 @@ async function run(
       embeds: [
         new CustomEmbed(
           message.member,
-          `removed ${role.toString()} from ${members.length.toLocaleString()} member${members.length != 1 ? "s" : ""}`,
+          `removed ${role.toString()} from ${members.length.toLocaleString()} member${
+            members.length != 1 ? "s" : ""
+          }`,
         ),
       ],
     });

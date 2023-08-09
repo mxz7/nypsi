@@ -1023,10 +1023,10 @@ export async function topLottoWins(guild: Guild, userId?: string) {
         {
           OR: [
             { AND: [{ completed: false }, { achievementId: { startsWith: "lucky_" } }] },
-            { AND: [{ completed: true }, { achievementId: { equals: "lucky_v" } }] }
-          ]
+            { AND: [{ completed: true }, { achievementId: { equals: "lucky_v" } }] },
+          ],
         },
-        { userId: { in: Array.from(members.keys()) } }
+        { userId: { in: Array.from(members.keys()) } },
       ],
     },
     select: {
@@ -1042,7 +1042,6 @@ export async function topLottoWins(guild: Guild, userId?: string) {
   const out = [];
 
   let count = 0;
-
 
   const getMemberID = (guild: Guild, id: string) => {
     const target = members.find((member) => {
@@ -1086,13 +1085,12 @@ export async function topLottoWins(guild: Guild, userId?: string) {
 }
 
 export async function topLottoWinsGlobal(userId: string) {
-
   const query = await prisma.achievements.findMany({
     where: {
       OR: [
         { AND: [{ completed: false }, { achievementId: { startsWith: "lucky_" } }] },
-        { AND: [{ completed: true }, { achievementId: { equals: "lucky_v" } }] }
-      ]
+        { AND: [{ completed: true }, { achievementId: { equals: "lucky_v" } }] },
+      ],
     },
     select: {
       userId: true,

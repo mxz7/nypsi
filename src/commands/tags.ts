@@ -131,12 +131,7 @@ cmd.setRun((message, args) => {
       await setActiveTag(message.author.id, "none");
 
       return send({
-        embeds: [
-          new CustomEmbed(
-            message.member,
-            `disabled any active tag`,
-          ),
-        ],
+        embeds: [new CustomEmbed(message.member, `disabled any active tag`)],
       });
     }
 
