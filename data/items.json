@@ -1978,7 +1978,8 @@
       "id:green_gem:2",
       "id:blue_gem:2",
       "id:purple_gem:1",
-      "id:gem_crate:0.2"
+      "id:gem_crate:0.2",
+      "id:omega_crate:5"
     ],
     "random_drop_chance": 90
   },
@@ -2015,7 +2016,8 @@
       "id:gold_credit:3",
       "id:pink_gem:3",
       "id:gem_shard:50",
-      "id:gem_crate:2.5"
+      "id:gem_crate:2.5",
+      "id:omega_crate:10"
     ],
     "random_drop_chance": 40
   },
