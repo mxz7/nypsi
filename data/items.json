@@ -2364,10 +2364,11 @@
       "id:legendary_scratch_card",
       "id:lucky_cheese",
       "money:100000000",
-      "money:69000000",
+      "money:69000000:90",
       "id:multi_potion",
       "id:grandma:1",
-      "id:skyline_r34:85"
+      "id:skyline_r34:85",
+      "id:lucky_7:95"
     ]
   },
   "omega_tag": {
