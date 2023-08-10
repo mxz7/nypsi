@@ -11,7 +11,7 @@ import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { calcNetWorth } from "../utils/functions/economy/balance";
 import { getInventory } from "../utils/functions/economy/inventory";
-import { getItems } from "../utils/functions/economy/utils";
+import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import PageManager from "../utils/functions/page";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
@@ -25,6 +25,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   }
 
   await addCooldown(cmd.name, message.member, 30);
+
+  if (!(await userExists(message.member))) await createUser(message.member);
 
   const [net, inventory] = await Promise.all([
     calcNetWorth(message.member, true),
