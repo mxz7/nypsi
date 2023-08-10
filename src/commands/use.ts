@@ -314,12 +314,14 @@ async function run(
     if (args[1]) {
       if (args[1]?.toLowerCase() === "all") {
         amount = inventory.find((i) => i.item === selected.id)?.amount || 1;
+        if (amount > upgrade.stack_limit) amount = upgrade.stack_limit;
+        if (userUpgrade && userUpgrade.amount + amount > upgrade.stack_limit) amount = upgrade.stack_limit - userUpgrade.amount;
       } else {
         amount = formatNumber(args[1]);
       }
 
       if (amount) {
-        if (userUpgrade && userUpgrade.amount + amount <= upgrade.stack_limit) {
+        if ((!userUpgrade && amount <= upgrade.stack_limit) || (userUpgrade && userUpgrade.amount + amount <= upgrade.stack_limit)) {
           allowed = true;
         } else {
           allowed = false;
