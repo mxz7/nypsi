@@ -842,13 +842,9 @@ export async function runCommand(
       );
 
       if (message instanceof Message) {
-        return message.channel.send({ embeds: [embed] }).then((m) => {
-          setTimeout(() => {
-            Promise.all([m.delete().catch(() => {}), message.delete().catch(() => {})]);
-          }, 5000);
-        });
+        return message.channel.send({ embeds: [embed] });
       } else {
-        return message.reply({ embeds: [embed], ephemeral: true });
+        return message.reply({ embeds: [embed] });
       }
     } else if (await isHandcuffed(message.author.id)) {
       const init = parseInt(await redis.get(`economy:handcuffed:${message.author.id}`));
