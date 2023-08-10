@@ -34,7 +34,7 @@ const client = new NypsiClient({
       filter: () => () => true,
     },
     guildMembers: {
-      interval: 1800,
+      interval: 900,
       filter: () => (member) => {
         if (member.id === member.client.user.id) return false;
         if (member.user.bot) return true;
@@ -47,7 +47,7 @@ const client = new NypsiClient({
       },
     },
     users: {
-      interval: 1800,
+      interval: 900,
       filter: () => (user) => {
         if (user.id === user.client.user.id) return false;
         if (user.bot) return true;
