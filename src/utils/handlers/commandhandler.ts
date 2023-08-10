@@ -241,7 +241,7 @@ async function helpCmd(message: Message, args: string[]) {
 
     embed.setTitle("help menu");
     embed.setDescription(
-      "invite nypsi to your server: [invite.nypsi.xyz](http://invite.nypsi.xyz)\n\n" +
+      "[invite nypsi to your server](https://discord.com/oauth2/authorize?client_id=678711738845102087&permissions=1377879583830&scope=bot%20applications.commands)\n\n" +
         "if you need support, want to report a bug or suggest a feature, you can join the nypsi server: https://discord.gg/hJTDNST\n\n" +
         `my prefix for this server is \`${prefix}\``,
     );
