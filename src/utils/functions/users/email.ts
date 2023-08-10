@@ -8,6 +8,7 @@ import { addInventoryItem } from "../economy/inventory";
 import { getItems, setEcoBan } from "../economy/utils";
 import { addMember, getPremiumProfile, isPremium, renewUser, setTier } from "../premium/premium";
 import { addNotificationToQueue, getDmSettings } from "./notifications";
+import { hasProfile } from "./utils";
 
 export async function getEmail(id: string) {
   const query = await prisma.user.findUnique({
@@ -166,4 +167,15 @@ export async function checkPurchases(id: string, client: NypsiClient) {
       userId: id,
     },
   });
+}
+
+export async function getTotalSpend(userId: string) {
+  if (!(await hasProfile(userId))) return 0;
+
+  const query = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { totalSpend: true },
+  });
+
+  return query.totalSpend;
 }
