@@ -18,14 +18,6 @@ const colors = ["deeppink", "green", "red", "blue"];
 
 const generator = new CaptchaGenerator().setDecoy({ opacity: 0.6, total: 15 });
 
-const captchaFails = new Map<string, number>();
-const captchaPasses = new Map<string, number>();
-
-setInterval(() => {
-  captchaFails.clear();
-  captchaPasses.clear();
-}, ms("24 hours"));
-
 export async function isLockedOut(userId: string) {
   return Boolean(await redis.sismember(Constants.redis.nypsi.LOCKED_OUT, userId));
 }
@@ -59,16 +51,26 @@ export async function passedCaptcha(member: GuildMember) {
     url: process.env.ANTICHEAT_HOOK,
   });
 
-  if (captchaPasses.has(member.user.id)) {
-    captchaPasses.set(member.user.id, captchaPasses.get(member.user.id) + 1);
+  if (await redis.exists(`${Constants.redis.cache.user.captcha_pass}:${member.user.id}`)) {
+    await redis.set(
+      `${Constants.redis.cache.user.captcha_pass}:${member.user.id}`,
+      parseInt(await redis.get(`${Constants.redis.cache.user.captcha_pass}:${member.user.id}`)) + 1,
+    );
   } else {
-    captchaPasses.set(member.user.id, 1);
+    await redis.set(
+      `${Constants.redis.cache.user.captcha_pass}:${member.user.id}`,
+      1,
+      "EX",
+      Math.floor(ms("1 day") / 1000),
+    );
   }
 
   await hook.send(
     `[${getTimestamp()}] **${member.user.username}** (${
       member.user.id
-    }) has passed a captcha [${captchaPasses.get(member.user.id)}]`,
+    }) has passed a captcha [${await redis.get(
+      `${Constants.redis.cache.user.captcha_pass}:${member.user.id}`,
+    )}]`,
   );
 
   await redis.set(`${Constants.redis.nypsi.CAPTCHA_VERIFIED}:${member.user.id}`, member.user.id);
@@ -84,13 +86,25 @@ export async function failedCaptcha(member: GuildMember, content: string) {
     url: process.env.ANTICHEAT_HOOK,
   });
 
-  if (captchaFails.has(member.user.id)) {
-    captchaFails.set(member.user.id, captchaFails.get(member.user.id) + 1);
+  if (await redis.exists(`${Constants.redis.cache.user.captcha_fail}:${member.user.id}`)) {
+    await redis.set(
+      `${Constants.redis.cache.user.captcha_fail}:${member.user.id}`,
+      parseInt(await redis.get(`${Constants.redis.cache.user.captcha_fail}:${member.user.id}`)) + 1,
+    );
   } else {
-    captchaFails.set(member.user.id, 1);
+    await redis.set(
+      `${Constants.redis.cache.user.captcha_fail}:${member.user.id}`,
+      1,
+      "EX",
+      Math.floor(ms("1 day") / 1000),
+    );
   }
 
-  if (captchaFails.get(member.user.id) >= 50 && !(await isEcoBanned(member.user.id))) {
+  if (
+    parseInt(await redis.get(`${Constants.redis.cache.user.captcha_fail}:${member.user.id}`)) >=
+      50 &&
+    !(await isEcoBanned(member.user.id))
+  ) {
     await setEcoBan(member.user.id, dayjs().add(1, "day").toDate());
     await hook.send(
       `[${getTimestamp()}] **${member.user.username}** (${
@@ -107,8 +121,12 @@ export async function failedCaptcha(member: GuildMember, content: string) {
   await hook.send(
     `[${getTimestamp()}] **${member.user.username}** (${
       member.user.id
-    }) has failed a captcha (${content}) [${captchaFails.get(member.user.id)}]${
-      captchaFails.get(member.user.id) % 15 === 0 && !(await isEcoBanned(member.user.id))
+    }) has failed a captcha (${content}) [${parseInt(
+      await redis.get(`${Constants.redis.cache.user.captcha_fail}:${member.user.id}`),
+    )}]${
+      parseInt(await redis.get(`${Constants.redis.cache.user.captcha_fail}:${member.user.id}`)) %
+        15 ===
+        0 && !(await isEcoBanned(member.user.id))
         ? " <@&1091314758986256424>"
         : ""
     }`,
