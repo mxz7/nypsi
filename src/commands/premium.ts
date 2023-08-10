@@ -31,6 +31,7 @@ import {
 } from "../utils/functions/premium/premium";
 import sleep from "../utils/functions/sleep";
 import { cleanString } from "../utils/functions/string";
+import { getTotalSpend } from "../utils/functions/users/email";
 import { commandExists } from "../utils/handlers/commandhandler";
 import dayjs = require("dayjs");
 
@@ -173,9 +174,7 @@ async function run(
     if (doingRoles) return;
     doingRoles = true;
 
-    for (const guildMember of message.guild.members.cache.values()) {
-      await sleep(250);
-
+    for (const guildMember of (await message.guild.members.fetch()).values()) {
       const roleIds = Array.from(guildMember.roles.cache.keys());
 
       if (roleIds.includes(Constants.BOOST_ROLE_ID)) {
@@ -214,8 +213,10 @@ async function run(
           break;
       }
 
-      if (requiredRole != "none" && !roleIds.includes(requiredRole))
+      if (requiredRole != "none" && !roleIds.includes(requiredRole)) {
+        await sleep(250);
         await guildMember.roles.add(requiredRole);
+      }
 
       for (const role of guildMember.roles.cache.values()) {
         let requiredLevel = 0;
@@ -233,9 +234,22 @@ async function run(
             requiredLevel = 1;
             break;
         }
+
         if (requiredLevel !== 0) {
-          if ((await getTier(guildMember)) != requiredLevel)
+          if ((await getTier(guildMember)) != requiredLevel) {
+            await sleep(250);
             await guildMember.roles.remove(role.id);
+          }
+        }
+
+        if (guildMember.roles.cache.has(Constants.HIGHROLLER_ROLE)) {
+          if ((await getTotalSpend(guildMember.id)) < 250) {
+            await guildMember.roles.remove(Constants.HIGHROLLER_ROLE);
+          }
+        } else {
+          if ((await getTotalSpend(guildMember.id)) >= 250) {
+            await guildMember.roles.add(Constants.HIGHROLLER_ROLE);
+          }
         }
       }
     }
