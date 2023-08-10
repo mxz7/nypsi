@@ -152,7 +152,7 @@ async function run(
     !inventory.find((i) => i.item == selected.id) ||
     inventory.find((i) => i.item == selected.id).amount == 0
   ) {
-    return send({ embeds: [new ErrorEmbed("you dont have any " + selected.name)] });
+    return send({ embeds: [new ErrorEmbed("you dont have any " + selected.plural)] });
   }
 
   if (args[2]?.toLowerCase() === "all")
