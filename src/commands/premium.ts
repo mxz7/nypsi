@@ -32,6 +32,7 @@ import {
 import sleep from "../utils/functions/sleep";
 import { cleanString } from "../utils/functions/string";
 import { getTotalSpend } from "../utils/functions/users/email";
+import { addTag, getTags, removeTag } from "../utils/functions/users/tags";
 import { commandExists } from "../utils/handlers/commandhandler";
 import dayjs = require("dayjs");
 
@@ -243,11 +244,15 @@ async function run(
         }
 
         if (guildMember.roles.cache.has(Constants.HIGHROLLER_ROLE)) {
-          if ((await getTotalSpend(guildMember.id)) < 250) {
+          if ((await getTotalSpend(guildMember.id)) < 300) {
+            if ((await getTags(guildMember.id)).find((i) => i.tagId === "highroller"))
+              await removeTag(guildMember.id, "highroller");
             await guildMember.roles.remove(Constants.HIGHROLLER_ROLE);
           }
         } else {
-          if ((await getTotalSpend(guildMember.id)) >= 250) {
+          if ((await getTotalSpend(guildMember.id)) >= 300) {
+            if (!(await getTags(guildMember.id)).find((i) => i.tagId === "highroller"))
+              await addTag(guildMember.id, "highroller");
             await guildMember.roles.add(Constants.HIGHROLLER_ROLE);
           }
         }
