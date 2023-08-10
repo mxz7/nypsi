@@ -13,7 +13,7 @@ products.set("1e62c44770", { name: "workers_crate", cost: 2.99 });
 products.set("4b1d3a70b2", { name: "boosters_crate", cost: 2.99 });
 products.set("4ec1ebe6b4", { name: "gem_crate", cost: 14.99 });
 products.set("d18331a5bb", { name: "gem_shard", cost: 0 });
-products.set("1d78b621a5", { name: "unecoban", cost: 29.99 });
+products.set("1d78b621a5", { name: "unecoban", cost: 19.99 });
 
 export default {
   redis: {
