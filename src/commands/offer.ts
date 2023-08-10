@@ -502,7 +502,7 @@ async function run(
     const res = await createOffer(target.user, selected.id, amount, money, message.member);
 
     if (!res) {
-      await updateBalance(message.member, balance + money);
+      await updateBalance(message.member, balance);
       return send({ embeds: [new ErrorEmbed("failed to create offer")] });
     } else {
       return send({
