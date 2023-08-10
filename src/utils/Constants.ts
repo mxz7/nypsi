@@ -128,7 +128,7 @@ export default {
       COMMAND_WATCH: "nypsi:cmdwatch",
     },
   },
-  ADMIN_IDS: ["672793821850894347", "449774710469689355"],
+  ADMIN_IDS: ["672793821850894347", "449774710469689355"] as string[],
   BOOST_ROLE_ID: "747066190530347089",
   BOT_USER_ID: "678711738845102087",
   BRONZE_ROLE_ID: "819870590718181391",
@@ -153,4 +153,5 @@ export default {
   SNOWFLAKE_REGEX: /^\d{17,19}$/,
   BADGES: ["owner", "staff", "highroller", "contributor", "season_winner", "og"],
   PURPLE: "#8b5cf6" as ColorResolvable,
-};
+  HIGHROLLER_ROLE: "1139213092371308634",
+} as const;
