@@ -918,7 +918,7 @@ async function run(
       embeds: [
         new CustomEmbed(
           message.member,
-          `✅ you have bought **${selected.name}** for ${cost} tokens`,
+          `✅ you have bought **${selected.name}** for ${cost} token${cost != 1 ? "s" : ""}`,
         ),
       ],
     });
