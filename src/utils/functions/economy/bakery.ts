@@ -223,8 +223,8 @@ export async function runBakery(member: GuildMember) {
 
   for (const upgradeId of earnedIds) {
     breakdownDesc.push(
-      `${getBakeryUpgradesData()[upgradeId].emoji} ${
-        getBakeryUpgradesData()[upgradeId].name
+      `${(getBakeryUpgradesData()[upgradeId] || getItems()[upgradeId]).emoji} ${
+        (getBakeryUpgradesData()[upgradeId] || getItems()[upgradeId]).name
       } baked ${earned.get(upgradeId).toLocaleString()} cookie${
         earned.get(upgradeId) > 1 ? "s" : ""
       }`,
