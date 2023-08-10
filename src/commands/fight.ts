@@ -20,7 +20,6 @@ import { createUser, userExists } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import ms = require("ms");
 
 const cmd = new Command("fight", "challenge another member to a fight", "fun");
 
@@ -30,7 +29,7 @@ cmd.slashData.addUserOption((option) =>
 );
 
 const waiting = new Set<string>();
-const cookieRecent = new Set<string>();
+
 const gifs = [
   "https://c.tenor.com/p_cxPj2oRq0AAAAC/ksi-ksi-box.gif",
   "https://c.tenor.com/SgWHHMfm7uUAAAAC/salt-saltpapi.gif",
@@ -228,24 +227,36 @@ async function run(
   ]);
 
   let homeStrength = false;
+  let homeHealth = false;
 
   for (const booster of Array.from(homeBoosters.keys())) {
     if (homeBoosters.get(booster)[0].boosterId == "steroids") {
       homeStrength = true;
-      break;
+    } else if (homeBoosters.get(booster)[0].boosterId === "blue_rocks") {
+      homeHealth = true;
     }
   }
 
   let awayStrength = false;
+  let awayHealth = false;
 
   for (const booster of Array.from(awayBoosters.keys())) {
     if (awayBoosters.get(booster)[0].boosterId == "steroids") {
       awayStrength = true;
       break;
+    } else if (awayBoosters.get(booster)[0].boosterId === "blue_rocks") {
+      awayHealth = true;
     }
   }
 
-  const fight = new Fight(message.member, target, homeStrength, awayStrength);
+  const fight = new Fight(
+    message.member,
+    target,
+    homeStrength,
+    homeHealth,
+    awayStrength,
+    awayHealth,
+  );
 
   const fightEmbed = fight.renderEmbed();
 
@@ -329,18 +340,25 @@ module.exports = cmd;
 
 class Fight {
   private person1: FightCharacter;
-  private person1Strength: boolean;
+
   private person2: FightCharacter;
-  private person2Strength: boolean;
+
   private log: string[];
   private logCount: number;
 
   private home: GuildMember;
   private away: GuildMember;
 
-  constructor(home: GuildMember, away: GuildMember, homeStrength: boolean, awayStrength: boolean) {
-    this.person1 = new FightCharacter(homeStrength);
-    this.person2 = new FightCharacter(awayStrength);
+  constructor(
+    home: GuildMember,
+    away: GuildMember,
+    homeStrength: boolean,
+    homeHealth: boolean,
+    awayStrength: boolean,
+    awayHealth: boolean,
+  ) {
+    this.person1 = new FightCharacter(homeStrength, homeHealth);
+    this.person2 = new FightCharacter(awayStrength, awayHealth);
 
     this.home = home;
     this.away = away;
@@ -453,13 +471,8 @@ class Fight {
 
     if (await userExists(winner.member.user.id)) {
       addProgress(winner.member.user.id, "fighter", 1);
-      if (!cookieRecent.has(winner.member.user.id)) {
-        cookieRecent.add(winner.member.user.id);
-
-        await addInventoryItem(winner.member, "cookie", 1);
-
-        embed.setFooter({ text: "well done. enjoy this cookie 🍪" });
-      }
+      await addInventoryItem(winner.member, "cookie", 1);
+      embed.setFooter({ text: "well done. enjoy this cookie 🍪" });
     }
 
     if (await userExists(this.home.user.id)) {
@@ -498,8 +511,10 @@ class FightCharacter {
   private lastHit: number;
   private lastHeal: number;
   private strength: boolean;
+  private perHeal = 25;
+  private maxHealth = 100;
 
-  constructor(strength: boolean) {
+  constructor(strength: boolean, health: boolean) {
     this.health = 100;
     this.heals = 3;
     this.damageGiven = 0;
@@ -507,6 +522,12 @@ class FightCharacter {
     this.lastHit = Date.now();
     this.lastHeal = Date.now();
     this.strength = strength;
+
+    if (health) {
+      this.health = 300;
+      this.maxHealth = 300;
+      this.perHeal = 75;
+    }
   }
 
   public hit() {
@@ -532,9 +553,9 @@ class FightCharacter {
     if (this.lastHeal > Date.now() - 350) return false;
     this.heals -= 1;
 
-    this.health += 25;
+    this.health += this.perHeal;
 
-    if (this.health > 100) this.health = 100;
+    if (this.health > this.maxHealth) this.health = this.maxHealth;
 
     this.lastHeal = Date.now();
     return true;
@@ -548,7 +569,3 @@ async function wait(seconds: number) {
     }, seconds * 1000);
   });
 }
-
-setInterval(() => {
-  cookieRecent.clear();
-}, ms("30m"));
