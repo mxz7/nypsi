@@ -47,6 +47,8 @@ export default {
         TRACKING: "cache:user:tracking",
         ADMIN_LEVEL: "cache:user:adminlvl",
         tags: "cache:user:tags",
+        captcha_fail: "nypsi:user:captcha:fail",
+        captcha_pass: "nypsi:user:captcha:pass",
       },
       guild: {
         EXISTS: "cache:guild:exists",

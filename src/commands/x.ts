@@ -447,6 +447,8 @@ async function run(
         );
 
         c(user.id);
+        await redis.del(`${Constants.redis.cache.user.captcha_pass}:${user.id}`);
+        await redis.del(`${Constants.redis.cache.user.captcha_fail}:${user.id}`);
 
         await res.editReply({ content: "✅" });
         return waitForButton();
