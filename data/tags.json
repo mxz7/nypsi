@@ -70,5 +70,11 @@
     "name": "bug catcher",
     "description": "reported a bug serious enough to get this badge!!",
     "emoji": "🕷️"
+  },
+  "omega": {
+    "id": "omega",
+    "name": "omega",
+    "description": "found in the omega crate",
+    "emoji": "🌟"
   }
 }
