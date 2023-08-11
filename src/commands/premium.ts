@@ -179,7 +179,9 @@ async function run(
 
     let members = message.guild.members.cache;
 
+    logger.debug("checking fetch");
     if (members.size !== message.guild.memberCount) members = await message.guild.members.fetch();
+    logger.debug("finished checking fetch");
 
     for (const guildMember of members.values()) {
       logger.debug(guildMember.id);
