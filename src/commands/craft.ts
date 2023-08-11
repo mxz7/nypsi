@@ -411,7 +411,10 @@ async function run(
       });
     }
 
-    const selected = selectItem(args[0].toLowerCase());
+    const selected =
+      selectItem(args.join(" ")) ||
+      selectItem(args.slice(0, args.length - 1).join(" ")) ||
+      selectItem(args[0]);
 
     if (!selected) {
       return send({ embeds: [new ErrorEmbed(`couldnt find \`${args[0].toLowerCase()}\``)] });
