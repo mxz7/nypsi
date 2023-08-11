@@ -1730,7 +1730,7 @@
     "longDesc": "it's widely understood throughout history, that nobody truly understands the origin of any gem, including the crystal heart. ancient hieroglyphs depict the crystal heart forming when all gems in existence fuse together. quite a sight to behold.",
     "role": "item",
     "rarity": 4,
-    "sell": 10000000,
+    "sell": 57500000,
     "in_crates": false,
     "aliases": ["heart", "crystal"]
   },
@@ -2150,7 +2150,7 @@
     "role": "worker-upgrade",
     "rarity": 4,
     "buy": 0,
-    "sell": 1000000,
+    "sell": 12000000,
     "in_crates": false,
     "worker_upgrade_id": "gem_radar",
     "craft": {
@@ -2169,7 +2169,7 @@
     "role": "worker-upgrade",
     "rarity": 4,
     "buy": 0,
-    "sell": 1000000,
+    "sell": 5000000,
     "in_crates": false,
     "worker_upgrade_id": "earth_scanner",
     "craft": {
