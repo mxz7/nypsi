@@ -175,7 +175,11 @@ async function run(
     if (doingRoles) return;
     doingRoles = true;
 
-    for (const guildMember of (await message.guild.members.fetch()).values()) {
+    let members = message.guild.members.cache;
+
+    if (members.size !== message.guild.memberCount) members = await message.guild.members.fetch();
+
+    for (const guildMember of members.values()) {
       const roleIds = Array.from(guildMember.roles.cache.keys());
 
       if (roleIds.includes(Constants.BOOST_ROLE_ID)) {
