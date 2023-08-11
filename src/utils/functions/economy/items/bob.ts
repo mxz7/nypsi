@@ -88,16 +88,18 @@ module.exports = new ItemUse(
     const breakdown: string[] = [];
 
     for (const item of crafting) {
-      let newDate = dayjs(item.finished).subtract(amount, "hour").toDate();
+      const newDate = dayjs(item.finished).subtract(amount, "hour").toDate();
 
-      if (Date.now() > newDate.getTime()) newDate = dayjs().add(1, "second").toDate();
+      let newDateText = MStoTime(newDate.getTime() - Date.now());
+
+      if (Date.now() > newDate.getTime()) {
+        newDateText = "done";
+      }
 
       breakdown.push(
         `\`${item.amount.toLocaleString()}x\` ${getItems()[item.itemId].emoji} ${
           getItems()[item.itemId].name
-        }: \`${MStoTime(item.finished.getTime() - Date.now())}\` → \`${MStoTime(
-          newDate.getTime() - Date.now(),
-        )}\``,
+        }: \`${MStoTime(item.finished.getTime() - Date.now())}\` → \`${newDateText}\``,
       );
 
       await prisma.crafting.update({
