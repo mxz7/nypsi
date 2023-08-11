@@ -173,6 +173,7 @@ async function run(
   };
 
   const checkRoles = async () => {
+    logger.debug(`${doingRoles}`);
     if (doingRoles) return;
     doingRoles = true;
 
