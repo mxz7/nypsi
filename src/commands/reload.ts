@@ -1,7 +1,7 @@
 import { CommandInteraction, Message } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import Constants from "../utils/Constants";
-import { loadCommands } from "../utils/handlers/commandhandler";
+import { loadCommands, reloadCommand } from "../utils/handlers/commandhandler";
 import { reloadInteractions } from "../utils/handlers/interactions";
 import { logger } from "../utils/logger";
 
@@ -25,6 +25,7 @@ async function run(
       message.react("✅");
     }
   } else {
+    reloadCommand(args);
     if (message instanceof Message) message.react("✅");
   }
 }
