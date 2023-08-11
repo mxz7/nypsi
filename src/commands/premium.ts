@@ -34,7 +34,6 @@ import { cleanString } from "../utils/functions/string";
 import { getTotalSpend } from "../utils/functions/users/email";
 import { addTag, getTags, removeTag } from "../utils/functions/users/tags";
 import { commandExists } from "../utils/handlers/commandhandler";
-import { logger } from "../utils/logger";
 import dayjs = require("dayjs");
 
 let doingRoles = false;
@@ -173,18 +172,14 @@ async function run(
   };
 
   const checkRoles = async () => {
-    logger.debug(`${doingRoles}`);
     if (doingRoles) return;
     doingRoles = true;
 
     let members = message.guild.members.cache;
 
-    logger.debug("checking fetch");
     if (members.size !== message.guild.memberCount) members = await message.guild.members.fetch();
-    logger.debug("finished checking fetch");
 
     for (const guildMember of members.values()) {
-      logger.debug(guildMember.id);
       const roleIds = Array.from(guildMember.roles.cache.keys());
 
       if (roleIds.includes(Constants.BOOST_ROLE_ID)) {
