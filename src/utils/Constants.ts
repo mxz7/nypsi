@@ -154,5 +154,5 @@ export default {
   SNOWFLAKE_REGEX: /^\d{17,19}$/,
   BADGES: ["owner", "staff", "highroller", "contributor", "season_winner", "og"],
   PURPLE: "#8b5cf6" as ColorResolvable,
-  HIGHROLLER_ROLE: "1139213092371308634",
+  HIGHROLLER_ROLE: "1067122363143032992",
 } as const;
