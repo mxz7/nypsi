@@ -1,6 +1,7 @@
 import { ColorResolvable, CommandInteraction, Message } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
+import Constants from "../utils/Constants";
 import { getMember } from "../utils/functions/member";
 
 const cmd = new Command("color", "get a random hex color code", "info").setAliases(["colour"]);
@@ -20,15 +21,18 @@ async function run(
   }
 
   if (args.length != 0) {
-    member = await getMember(message.guild, args.join(" "));
+    if (args[0].match(Constants.COLOUR_REGEX)) color = args[0].substring(1);
+    else {
+      member = await getMember(message.guild, args.join(" "));
 
-    if (!member) {
-      color = args[0].split("#").join("");
-      if (color.length > 6) {
-        color = color.substring(0, 6);
+      if (!member) {
+        color = args[0].split("#").join("");
+        if (color.length > 6) {
+          color = color.substring(0, 6);
+        }
+      } else {
+        color = member.displayHexColor.substring(1);
       }
-    } else {
-      color = member.displayHexColor.substring(1);
     }
   }
 
