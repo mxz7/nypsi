@@ -44,13 +44,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       embeds: [new CustomEmbed(message.member, "✅ all clusters will be restarted soon")],
     });
 
-    await redis.set(Constants.redis.nypsi.RESTART, "t");
-    logger.info("starting graceful restart..");
+    logger.info("awaiting for inactivity");
 
     const check = setInterval(async () => {
       const thingy = await redis.scard(Constants.redis.nypsi.USERS_PLAYING);
 
       if (thingy == 0) {
+        await redis.set(Constants.redis.nypsi.RESTART, "t");
+        logger.info("starting graceful restart..");
+
         clearInterval(check);
         client.cluster.send("restart");
       }
