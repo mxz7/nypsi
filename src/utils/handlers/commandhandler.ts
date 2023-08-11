@@ -792,13 +792,19 @@ export async function runCommand(
         if (message instanceof Message) {
           return message.channel.send({
             embeds: [
-              new CustomEmbed(message.member, "nypsi is rebooting, try again in a few minutes"),
+              new CustomEmbed(
+                message.member,
+                "nypsi is rebooting, this shouldn't take more than 2 minutes.\njoin https://discord.gg/hJTDNST for help",
+              ),
             ],
           });
         } else {
           return message.reply({
             embeds: [
-              new CustomEmbed(message.member, "nypsi is rebooting, try again in a few minutes"),
+              new CustomEmbed(
+                message.member,
+                "nypsi is rebooting, this shouldn't take more than 2 minutes.\njoin https://discord.gg/hJTDNST for help",
+              ),
             ],
           });
         }
