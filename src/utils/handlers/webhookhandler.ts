@@ -350,8 +350,8 @@ async function handleKofiData(data: KofiResponse) {
                   new CustomEmbed(
                     null,
                     `${user.lastKnownUsername} just bought ${shopItem.quantity}x ${
-                      getItems()[item.name].article
-                    } ${getItems()[item.name].emoji} **${getItems()[item.name].name}**!!!!`,
+                      getItems()[item.name].emoji
+                    } **${getItems()[item.name].name}**!!!!`,
                   )
                     .setFooter({ text: "thank you for your purchase (:" })
                     .setColor(Constants.PURPLE),
