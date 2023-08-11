@@ -130,7 +130,7 @@
       "name": "gem radar",
       "plural": "gem radars",
       "upgrades": "gem_chance",
-      "effect": 0.0001,
+      "effect": 0.00032,
       "stack_limit": 10,
       "for": "quarry"
     },
