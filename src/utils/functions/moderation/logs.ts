@@ -1,5 +1,5 @@
 import { variants } from "@catppuccin/palette";
-import { ColorResolvable, Guild, GuildMember, User, WebhookClient } from "discord.js";
+import { ColorResolvable, Guild, User, WebhookClient } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
@@ -36,11 +36,9 @@ export async function addModLog(
   channelId?: string,
   similarity?: string,
 ) {
-  let punished: GuildMember | User | void = await guild.members.fetch(userID).catch(() => {});
+  const punished = await guild.client.users.fetch(userID).catch(() => {});
 
-  if (!punished) {
-    punished = await guild.client.users.fetch(userID).catch(() => {});
-  }
+  if (!punished) return;
 
   const embed = new CustomEmbed().disableFooter();
   embed.setColor(modLogColors.get(caseType));
@@ -48,7 +46,7 @@ export async function addModLog(
   embed.setTimestamp();
 
   if (punished) {
-    embed.addField("user", `${punished.toString()} \`${punished.id}\``, true);
+    embed.addField("user", `${punished.username} \`${punished.id}\``, true);
   } else {
     embed.addField("user", userID, true);
   }
@@ -67,7 +65,7 @@ export async function addModLog(
   }
 
   if (caseType == "filter violation") {
-    embed.addField("message content", command);
+    embed.addField("message", command);
   } else {
     embed.addField("reason", command);
   }
