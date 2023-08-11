@@ -34,7 +34,6 @@ import { cleanString } from "../utils/functions/string";
 import { getTotalSpend } from "../utils/functions/users/email";
 import { addTag, getTags, removeTag } from "../utils/functions/users/tags";
 import { commandExists } from "../utils/handlers/commandhandler";
-import { logger } from "../utils/logger";
 import dayjs = require("dayjs");
 
 let doingRoles = false;
@@ -221,7 +220,7 @@ async function run(
 
       if (requiredRole != "none" && !roleIds.includes(requiredRole)) {
         await sleep(250);
-        logger.debug(requiredRole);
+
         await guildMember.roles.add(requiredRole);
       }
 
