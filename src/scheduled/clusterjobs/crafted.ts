@@ -24,6 +24,8 @@ async function checkCraftItems() {
     await addInventoryItem(item.userId, item.itemId, item.amount, false);
 
     addProgress(item.userId, "crafter", item.amount);
+    if (item.itemId.includes("_gem") || item.itemId === "crystal_heart")
+      await addProgress(item.userId, "gem_hunter", item.amount);
 
     if ((await getDmSettings(item.userId)).other) {
       await addNotificationToQueue({
