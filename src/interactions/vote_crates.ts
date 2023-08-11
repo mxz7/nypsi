@@ -9,7 +9,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { InteractionHandler } from "../types/InteractionHandler";
 import Constants from "../utils/Constants";
 import { addProgress } from "../utils/functions/economy/achievements";
-import { getInventory, openCrate } from "../utils/functions/economy/inventory";
+import { calcItemValue, getInventory, openCrate } from "../utils/functions/economy/inventory";
 import { getPrestige } from "../utils/functions/economy/prestige";
 import { addStat } from "../utils/functions/economy/stats";
 import { getItems, isEcoBanned } from "../utils/functions/economy/utils";
@@ -87,8 +87,14 @@ export default {
       foundItems.delete("xp");
     }
 
+    const values = new Map<string, number>();
+
+    for (const [item, amount] of foundItems.entries()) {
+      values.set(item, ((await calcItemValue(item).catch(() => 0)) || 0) * amount);
+    }
+
     for (const [item, amount] of inPlaceSort(Array.from(foundItems.entries())).desc([
-      (i) => getItems()[i[0]].rarity,
+      (i) => values.get(i[0]),
       (i) => i[1],
     ])) {
       desc.push(`- \`${amount}x\` ${getItems()[item].emoji} ${getItems()[item].name}`);
