@@ -42,3 +42,16 @@ export async function getIdFromUsername(username: string) {
 
   return query?.id;
 }
+
+export async function getLastKnownAvatar(id: string) {
+  const query = await prisma.user.findUnique({
+    where: {
+      id: id,
+    },
+    select: {
+      avatar: true,
+    },
+  });
+
+  return query.avatar;
+}
