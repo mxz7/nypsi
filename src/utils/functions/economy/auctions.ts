@@ -761,7 +761,7 @@ export async function buyFullAuction(
     }
 
     const embedDm = new CustomEmbed()
-      .setColor(Constants.TRANSPARENT_EMBED_COLOR)
+      .setColor(Constants.EMBED_SUCCESS_COLOR)
       .setDescription(
         `your auction for ${auction.itemAmount}x ${items[auction.itemId].emoji} ${
           items[auction.itemId].name
