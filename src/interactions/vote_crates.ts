@@ -14,6 +14,7 @@ import { getPrestige } from "../utils/functions/economy/prestige";
 import { addStat } from "../utils/functions/economy/stats";
 import { getItems, isEcoBanned } from "../utils/functions/economy/utils";
 import PageManager from "../utils/functions/page";
+import { getEmbedColor } from "../utils/functions/premium/color";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 export default {
@@ -49,10 +50,14 @@ export default {
 
     await interaction.deferReply();
 
-    const embed = new CustomEmbed().setHeader(
-      `${interaction.user.username}'s ${crateAmount} vote crate${crateAmount > 1 ? "s" : ""}`,
-      interaction.user.avatarURL(),
-    );
+    const colour = await getEmbedColor(interaction.user.id);
+
+    const embed = new CustomEmbed()
+      .setHeader(
+        `${interaction.user.username}'s ${crateAmount} vote crate${crateAmount > 1 ? "s" : ""}`,
+        interaction.user.avatarURL(),
+      )
+      .setColor(colour === "default" ? Constants.PURPLE : colour);
 
     await Promise.all([
       addProgress(interaction.user.id, "unboxer", crateAmount),
