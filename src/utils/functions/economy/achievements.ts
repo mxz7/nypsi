@@ -5,9 +5,10 @@ import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { NotificationPayload } from "../../../types/Notification";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
+import { getEmbedColor } from "../premium/color";
 import { percentChance } from "../random";
 import { addNotificationToQueue, getDmSettings, getPreferences } from "../users/notifications";
-import { getLastKnownUsername } from "../users/tag";
+import { getLastKnownAvatar, getLastKnownUsername } from "../users/tag";
 import { addInventoryItem } from "./inventory";
 import { createUser, getAchievements, getItems, isEcoBanned, userExists } from "./utils";
 import { getXp, updateXp } from "./xp";
@@ -242,9 +243,12 @@ async function completeAchievement(userId: string, achievementId: string) {
     },
   });
 
+  const colour = await getEmbedColor(userId);
+
   const embed = new EmbedBuilder()
     .setAuthor({
       name: `${await getLastKnownUsername(userId)} has unlocked an achievement`,
+      iconURL: await getLastKnownAvatar(userId),
     })
     .setDescription(
       `${achievements[achievementId].emoji} ${achievements[achievementId].name}\n\n*${achievements[achievementId].description}*`,
@@ -253,7 +257,7 @@ async function completeAchievement(userId: string, achievementId: string) {
       text: `completed by ${completed.toLocaleString()} ${completed == 1 ? "person" : "people"}`,
     })
     .setTimestamp()
-    .setColor(Constants.TRANSPARENT_EMBED_COLOR);
+    .setColor(colour === "default" ? Constants.PURPLE : colour);
 
   const hook = new WebhookClient({ url: process.env.ACHIEVEMENTS_HOOK });
 
