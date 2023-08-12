@@ -135,7 +135,7 @@ async function completeAchievement(userId: string, achievementId: string) {
   const achievements = getAchievements();
 
   const userEmbed = new CustomEmbed()
-    .setColor(Constants.TRANSPARENT_EMBED_COLOR)
+    .setColor(Constants.EMBED_SUCCESS_COLOR)
     .setHeader("achievement unlocked")
     .setDescription(
       `you have completed ${achievements[achievementId].emoji} ${achievements[achievementId].name}`,
