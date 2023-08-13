@@ -1,6 +1,8 @@
+import { variants } from "@catppuccin/palette";
 import { Client, User, WebhookClient } from "discord.js";
 import { WriteStream, createWriteStream, existsSync } from "fs";
 import { rename, stat } from "fs/promises";
+import DiscordTransport from "../models/DiscordLogs";
 import Constants from "./Constants";
 import chalk = require("chalk");
 import dayjs = require("dayjs");
@@ -354,21 +356,21 @@ logger.addTransport(
     formatter,
   }),
 );
-// logger.addTransport(
-//   new DiscordTransport({
-//     formatter,
-//     levels: ["info", "warn", "error"],
-//     webhook: process.env.BOTLOGS_HOOK,
-//     mode: "hybrid",
-//     interval: 5000,
-//     colors: new Map([
-//       ["error", variants.mocha.red.hex as `#${string}`],
-//       ["warn", variants.mocha.yellow.hex as `#${string}`],
-//       ["debug", variants.mocha.pink.hex as `#${string}`],
-//       ["info", variants.mocha.sky.hex as `#${string}`],
-//     ]),
-//   }),
-// );
+logger.addTransport(
+  new DiscordTransport({
+    formatter,
+    levels: ["info", "warn", "error"],
+    webhook: process.env.BOTLOGS_HOOK,
+    mode: "hybrid",
+    interval: 5000,
+    colors: new Map([
+      ["error", variants.mocha.red.hex as `#${string}`],
+      ["warn", variants.mocha.yellow.hex as `#${string}`],
+      ["debug", variants.mocha.pink.hex as `#${string}`],
+      ["info", variants.mocha.sky.hex as `#${string}`],
+    ]),
+  }),
+);
 
 const webhook = new Map<string, string>();
 const nextLogMsg = new Map<string, string>();
