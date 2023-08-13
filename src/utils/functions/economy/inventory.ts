@@ -494,8 +494,8 @@ export async function openCrate(
       crateItems.length = 0;
 
       for (const itemFilter of item.items) {
-        if (parseInt(itemFilter.split(":")[2])) {
-          if (!percentChance(parseInt(itemFilter.split(":")[2]))) {
+        if (parseFloat(itemFilter.split(":")[2])) {
+          if (!percentChance(parseFloat(itemFilter.split(":")[2]))) {
             continue;
           }
         }
