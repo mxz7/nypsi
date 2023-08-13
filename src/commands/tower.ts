@@ -40,6 +40,7 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 import { gamble, logger } from "../utils/logger";
 import _ = require("lodash");
 import ms = require("ms");
+import { NypsiClient } from "../models/Client";
 
 const cmd = new Command("tower", "play dragon tower", "money").setAliases([
   "dragon",
@@ -531,7 +532,7 @@ async function playGame(
 
       await a(message.author.id, message.author.username, message.content);
 
-      if ((await redis.get(Constants.redis.nypsi.RESTART)) == "t") {
+      if ((await redis.get(`${Constants.redis.nypsi.RESTART}:${(message.client as NypsiClient).cluster.id}`)) == "t") {
         if (message.author.id == Constants.TEKOH_ID && message instanceof Message) {
           message.react("💀");
         } else {

@@ -14,6 +14,7 @@ import {
   MessageEditOptions,
 } from "discord.js";
 import redis from "../init/redis.js";
+import { NypsiClient } from "../models/Client.js";
 import { Command, NypsiCommandInteraction } from "../models/Command.js";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants.js";
@@ -33,10 +34,10 @@ import { createUser, formatBet, userExists } from "../utils/functions/economy/ut
 import { calcEarnedGambleXp, getXp, updateXp } from "../utils/functions/economy/xp.js";
 import { getTier, isPremium } from "../utils/functions/premium/premium.js";
 import { shuffle } from "../utils/functions/random.js";
+import { recentCommands } from "../utils/functions/users/commands.js";
 import { addHourlyCommand } from "../utils/handlers/commandhandler.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 import { gamble, logger } from "../utils/logger.js";
-import { recentCommands } from "../utils/functions/users/commands.js";
 
 const games = new Map<
   string,
@@ -455,7 +456,11 @@ async function playGame(
 
       await a(message.author.id, message.author.username, message.content);
 
-      if ((await redis.get(Constants.redis.nypsi.RESTART)) == "t") {
+      if (
+        (await redis.get(
+          `${Constants.redis.nypsi.RESTART}:${(message.client as NypsiClient).cluster.id}`,
+        )) == "t"
+      ) {
         if (message.author.id == Constants.TEKOH_ID && message instanceof Message) {
           message.react("💀");
         } else {
