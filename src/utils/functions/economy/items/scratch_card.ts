@@ -9,6 +9,7 @@ import {
   Message,
 } from "discord.js";
 import redis from "../../../../init/redis";
+import { NypsiClient } from "../../../../models/Client";
 import { NypsiCommandInteraction } from "../../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
@@ -143,7 +144,11 @@ async function prepare(
         if (!response || !response.isButton()) return;
 
         if (response.customId === "retry") {
-          if ((await redis.get(Constants.redis.nypsi.RESTART)) == "t") {
+          if (
+            (await redis.get(
+              `${Constants.redis.nypsi.RESTART}:${(message.client as NypsiClient).cluster.id}`,
+            )) == "t"
+          ) {
             if (message.author.id == Constants.TEKOH_ID && message instanceof Message) {
               message.react("💀");
             } else {

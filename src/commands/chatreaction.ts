@@ -16,6 +16,7 @@ import {
   TextChannel,
 } from "discord.js";
 import redis from "../init/redis";
+import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
@@ -453,7 +454,11 @@ async function run(
   ) {
     return showLeaderboard();
   } else if (["duel", "1v1", "wager"].includes(args[0].toLowerCase())) {
-    if ((await redis.get(Constants.redis.nypsi.RESTART)) == "t") {
+    if (
+      (await redis.get(
+        `${Constants.redis.nypsi.RESTART}:${(message.client as NypsiClient).cluster.id}`,
+      )) == "t"
+    ) {
       if (message.author.id == Constants.TEKOH_ID && message instanceof Message) {
         message.react("💀");
       } else {

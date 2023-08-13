@@ -786,7 +786,12 @@ export async function runCommand(
   }
 
   if (command.category == "money" || ["wholesome", "wordle", "sex"].includes(command.name)) {
-    if (restarting || (await redis.get(Constants.redis.nypsi.RESTART)) == "t") {
+    if (
+      restarting ||
+      (await redis.get(
+        `${Constants.redis.nypsi.RESTART}:${(message.client as NypsiClient).cluster.id}`,
+      )) == "t"
+    ) {
       if (message.author.id == Constants.TEKOH_ID && message instanceof Message) {
         message.react("💀");
       } else {

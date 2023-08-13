@@ -50,7 +50,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       const thingy = await redis.scard(Constants.redis.nypsi.USERS_PLAYING);
 
       if (thingy == 0) {
-        await redis.set(Constants.redis.nypsi.RESTART, "t");
+        for (let i = 0; i < (message.client as NypsiClient).cluster.count; i++) {
+          await redis.set(`${Constants.redis.nypsi.RESTART}:${i}`, "t");
+        }
         logger.info("starting graceful restart..");
 
         clearInterval(check);

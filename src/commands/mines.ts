@@ -40,6 +40,7 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 import { gamble, logger } from "../utils/logger.js";
 import ms = require("ms");
 import { recentCommands } from "../utils/functions/users/commands.js";
+import { NypsiClient } from "../models/Client.js";
 
 const games = new Map<
   string,
@@ -578,7 +579,7 @@ async function playGame(
 
       await a(message.author.id, message.author.username, message.content);
 
-      if ((await redis.get(Constants.redis.nypsi.RESTART)) == "t") {
+      if ((await redis.get(`${Constants.redis.nypsi.RESTART}:${(message.client as NypsiClient).cluster.id}`)) == "t") {
         if (message.author.id == Constants.TEKOH_ID && message instanceof Message) {
           message.react("💀");
         } else {
