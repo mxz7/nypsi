@@ -4,9 +4,12 @@ import {
   ButtonBuilder,
   ButtonStyle,
   CommandInteraction,
+  Interaction,
   InteractionReplyOptions,
+  InteractionResponse,
   Message,
   MessageActionRowComponentBuilder,
+  MessageEditOptions,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { Command, NypsiCommandInteraction } from "../models/Command";
@@ -17,7 +20,7 @@ import { createUser, getItems, userExists } from "../utils/functions/economy/uti
 import PageManager from "../utils/functions/page";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { addToNypsiBank, getTax } from "../utils/functions/tax";
-import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import { addCooldown, addExpiry, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import pAll = require("p-all");
 
 const cmd = new Command("sellall", "sell all commonly sold items", "money");
@@ -63,6 +66,121 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({ embeds: [embed], ephemeral: true });
   }
 
+  if ((await calcValues(message)).selected.size == 0) {
+    return send({ embeds: [new ErrorEmbed("you do not have anything to sell")] });
+  }
+
+  await addCooldown(cmd.name, message.member, 30);
+
+  const edit = async (data: MessageEditOptions, msg: Message | InteractionResponse) => {
+    if (!(message instanceof Message)) {
+      return await message.editReply(data);
+    } else {
+      if (msg instanceof InteractionResponse) return;
+      return await msg.edit(data);
+    }
+  };
+
+  let reaction;
+  let msg: Message;
+
+  if ((await calcValues(message)).total >= 10_000_000) {
+    
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder().setCustomId("✅").setLabel("do it.").setStyle(ButtonStyle.Success),
+    );
+
+    const embed = new CustomEmbed(message.member, "your sellable items are worth over $10 million\n\nare you sure you want to sell all?")
+    .setHeader("sellall", message.author.avatarURL());
+
+    msg = await send({ embeds: [embed], components: [row] });
+
+    const filter = (i: Interaction) => i.user.id == message.author.id;
+  
+    reaction = await msg
+      .awaitMessageComponent({ filter, time: 15000 })
+      .then(async (collected) => {
+        await collected.deferUpdate();
+        return collected.customId;
+      })
+      .catch(async () => {
+        embed.setDescription("❌ expired");
+        await edit({ embeds: [embed], components: [] }, msg);
+        addExpiry(cmd.name, message.member, 30);
+      });
+  }
+
+  if ((await calcValues(message)).total < 10_000_000 || reaction == "✅") {
+
+    const { selected, taxedAmount, desc, amounts, total, taxEnabled, multi} = await calcValues(message);
+
+    if (selected.size == 0) {
+      const embed = new ErrorEmbed("you do not have anything to sell")
+      return (msg ? edit({ embeds: [embed], components: [] }, msg) : send({ embeds: [embed], components: [] }));
+    }
+
+    const functions = [];
+      for (const item of selected.keys())
+      functions.push(async () => {
+        await setInventoryItem(message.member, item, 0, false);
+      });
+
+    functions.push(async () => {
+      await addToNypsiBank(taxedAmount);
+    });
+    functions.push(async () => {
+      await updateBalance(message.member, (await getBalance(message.member)) + total);
+    });
+
+    await pAll(functions, { concurrency: 5 });
+
+    inPlaceSort(desc).desc((i) => amounts.get(i));
+
+    const embed = new CustomEmbed(message.member);
+
+    embed.setDescription(`+$**${total.toLocaleString()}**`);
+
+    const footer: string[] = [];
+
+    if (taxEnabled) footer.push(`${((await getTax()) * 100).toFixed(1)}% tax`);
+    if (multi > 0) footer.push(`${Math.floor(multi * 100)}% bonus`);
+    if (footer.length > 0) embed.setFooter({ text: footer.join(" | ") });
+
+    const pages = PageManager.createPages(desc, 10);
+
+    embed.addField("items sold", pages.get(1).join("\n"));
+
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder()
+        .setCustomId("⬅")
+        .setLabel("back")
+        .setStyle(ButtonStyle.Primary)
+        .setDisabled(true),
+      new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
+    );
+    if (pages.size == 1) return (msg ? edit({ embeds: [embed], components: [] }, msg) : send({ embeds: [embed], components: [] }));
+    const m = await (msg ? edit({ embeds: [embed], components: [row] }, msg) : send({ embeds: [embed], components: [row] }));
+
+    const manager = new PageManager({
+      embed,
+      message: m,
+      row,
+      userId: message.author.id,
+      pages,
+      updateEmbed(page, embed) {
+        embed.data.fields.length = 0;
+        embed.addField("items sold", page.join("\n"));
+
+        return embed;
+      },
+    });
+
+    return manager.listen();
+  }
+  
+}
+
+async function calcValues(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
   const items = getItems();
 
   const inventory = await getInventory(message.member);
@@ -80,12 +198,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
   }
 
-  if (selected.size == 0) {
-    return send({ embeds: [new ErrorEmbed("you do not have anything to sell")] });
-  }
-
-  await addCooldown(cmd.name, message.member, 30);
-
   const multi = await getSellMulti(message.member);
 
   let total = 0;
@@ -96,15 +208,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if ((await isPremium(message.member)) && (await getTier(message.member)) == 4) taxEnabled = false;
 
-  const functions = [];
   const desc: string[] = [];
   const amounts = new Map<string, number>();
 
   for (const item of selected.keys()) {
-    functions.push(async () => {
-      await setInventoryItem(message.member, item, 0, false);
-    });
-
     let sellWorth = Math.floor(items[item].sell * selected.get(item));
 
     if (
@@ -137,58 +244,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       sellWorth,
     );
   }
+  
+  const res = {
+    selected,
+    total,
+    desc,
+    amounts,
+    taxEnabled,
+    taxedAmount,
+    multi,
+  };
 
-  functions.push(async () => {
-    await addToNypsiBank(taxedAmount);
-  });
-  functions.push(async () => {
-    await updateBalance(message.member, (await getBalance(message.member)) + total);
-  });
-
-  await pAll(functions, { concurrency: 5 });
-
-  inPlaceSort(desc).desc((i) => amounts.get(i));
-
-  const embed = new CustomEmbed(message.member);
-
-  embed.setDescription(`+$**${total.toLocaleString()}**`);
-
-  const footer: string[] = [];
-
-  if (taxEnabled) footer.push(`${((await getTax()) * 100).toFixed(1)}% tax`);
-  if (multi > 0) footer.push(`${Math.floor(multi * 100)}% bonus`);
-  if (footer.length > 0) embed.setFooter({ text: footer.join(" | ") });
-
-  const pages = PageManager.createPages(desc, 10);
-
-  embed.addField("items sold", pages.get(1).join("\n"));
-
-  const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder()
-      .setCustomId("⬅")
-      .setLabel("back")
-      .setStyle(ButtonStyle.Primary)
-      .setDisabled(true),
-    new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
-  );
-  if (pages.size == 1) return send({ embeds: [embed] });
-  const msg = await send({ embeds: [embed], components: [row] });
-
-  const manager = new PageManager({
-    embed,
-    message: msg,
-    row,
-    userId: message.author.id,
-    pages,
-    updateEmbed(page, embed) {
-      embed.data.fields.length = 0;
-      embed.addField("items sold", page.join("\n"));
-
-      return embed;
-    },
-  });
-
-  return manager.listen();
+  return res;
 }
 
 cmd.setRun(run);
