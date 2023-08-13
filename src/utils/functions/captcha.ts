@@ -144,7 +144,9 @@ export async function verifyUser(
   const embed = new CustomEmbed(message.member).setTitle("you have been locked");
 
   embed.setDescription(
-    "please note that using macros / auto typers is not allowed with nypsi\n\nplease type the following:",
+    "please note that using macros / auto typers is not allowed with nypsi" +
+      "\n**if you fail too many captchas you may be banned**" +
+      "\n\nplease type the following:",
   );
 
   embed.setImage("attachment://captcha.png");
