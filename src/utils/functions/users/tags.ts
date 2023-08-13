@@ -96,3 +96,15 @@ export async function getActiveTag(userId: string) {
 
   return tags.find((i) => i.selected);
 }
+
+export async function getTagCount(tagId: string) {
+  const cache = await redis.get(`${Constants.redis.cache.user.tagCount}:${tagId}`);
+
+  if (cache) return parseInt(cache);
+
+  const query = await prisma.tags.count({ where: { tagId } });
+
+  await redis.set(`${Constants.redis.cache.user.tagCount}:${tagId}`, query, "EX", 84000);
+
+  return query;
+}
