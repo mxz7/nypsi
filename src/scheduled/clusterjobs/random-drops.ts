@@ -84,7 +84,7 @@ async function randomDrop(client: NypsiClient) {
   if (
     channels.length === 0 ||
     (await redis.get("nypsi:maintenance")) ||
-    (await redis.get(Constants.redis.nypsi.RESTART)) == "t"
+    (await redis.get(`${Constants.redis.nypsi.RESTART}:${client.cluster.id}`)) == "t"
   )
     return;
 

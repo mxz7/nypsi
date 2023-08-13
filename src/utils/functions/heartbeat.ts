@@ -6,7 +6,7 @@ import { logger } from "../logger";
 const failedHeartbeats = new Map<number, number>();
 
 export async function sendHeartbeat(cluster: Cluster) {
-  if ((await redis.get(Constants.redis.nypsi.RESTART)) == "t") {
+  if ((await redis.get(`${Constants.redis.nypsi.RESTART}:${cluster.id}`)) == "t") {
     return true;
   }
 
