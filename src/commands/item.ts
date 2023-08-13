@@ -20,6 +20,7 @@ import {
   selectItem,
 } from "../utils/functions/economy/inventory";
 import { createUser, userExists } from "../utils/functions/economy/utils";
+import { getTagCount } from "../utils/functions/users/tags";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("item", "view information about an item", "money").setAliases(["i"]);
@@ -146,7 +147,13 @@ async function run(
   if (selected.role) {
     embed.addField(
       "role",
-      `\`${selected.role}${selected.role == "car" ? ` (${selected.speed})` : ""}\``,
+      `\`${selected.role}${
+        selected.role == "car"
+          ? ` (${selected.speed})`
+          : selected.role === "tag"
+          ? ` (${(await getTagCount(selected.tagId)).toLocaleString()})`
+          : ""
+      }\``,
       true,
     );
   }
