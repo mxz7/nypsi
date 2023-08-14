@@ -174,6 +174,55 @@ async function doMembers() {
   return count;
 }
 
+async function doGuilds() {
+  const query = await prisma.economyGuild.findMany({
+    select: {
+      level: true,
+      xp: true,
+      balance: true,
+      guildName: true,
+    },
+  });
+
+  const date = dayjs()
+    .set("hours", 0)
+    .set("minutes", 0)
+    .set("seconds", 0)
+    .set("milliseconds", 0)
+    .toDate();
+  let count = 0;
+
+  for (const guild of query) {
+    await prisma.graphMetrics.create({
+      data: {
+        date,
+        userId: guild.guildName,
+        category: `guild-balance`,
+        value: guild.balance,
+      },
+    });
+    await prisma.graphMetrics.create({
+      data: {
+        date,
+        userId: guild.guildName,
+        category: `guild-xp`,
+        value: guild.xp,
+      },
+    });
+    await prisma.graphMetrics.create({
+      data: {
+        date,
+        userId: guild.guildName,
+        category: `guild-level`,
+        value: guild.level,
+      },
+    });
+    count += 3;
+  }
+
+  return count;
+}
+
 async function clearOld() {
   const deleted = await prisma.graphMetrics.deleteMany({
     where: {
@@ -195,6 +244,7 @@ async function clearOld() {
     doTopNetworth(),
     doItems(),
     doMembers(),
+    doGuilds(),
     clearOld(),
   ]);
 
