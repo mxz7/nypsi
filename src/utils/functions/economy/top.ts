@@ -758,8 +758,8 @@ export async function topGuilds(guildName?: string) {
     let position = (query.indexOf(guild) + 1).toString();
 
     if (position == "1") position = "🥇";
-    if (position == "2") position = "🥈";
-    if (position == "3") position = "🥉";
+    else if (position == "2") position = "🥈";
+    else if (position == "3") position = "🥉";
     else position += ".";
 
     out.push(
