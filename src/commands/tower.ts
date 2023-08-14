@@ -532,7 +532,11 @@ async function playGame(
 
       await a(message.author.id, message.author.username, message.content);
 
-      if ((await redis.get(`${Constants.redis.nypsi.RESTART}:${(message.client as NypsiClient).cluster.id}`)) == "t") {
+      if (
+        (await redis.get(
+          `${Constants.redis.nypsi.RESTART}:${(message.client as NypsiClient).cluster.id}`,
+        )) == "t"
+      ) {
         if (message.author.id == Constants.TEKOH_ID && message instanceof Message) {
           message.react("💀");
         } else {
