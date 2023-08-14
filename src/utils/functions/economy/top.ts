@@ -1392,7 +1392,7 @@ export async function topCommandGlobal(command: string, userId: string) {
 function formatUsername(id: string, username: string, privacy: boolean, tag?: string) {
   if (!privacy) return "**[hidden]**";
 
-  let out = `[${username}](https://nypsi.xyz/user/${id})`;
+  let out = `[${username}](https://nypsi.xyz/user/${encodeURIComponent(id)})`;
 
   if (tag) out = `[${getTagsData()[tag].emoji}] ${out}`;
 
