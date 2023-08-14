@@ -210,7 +210,7 @@ export default class PageManager<T> {
       .catch(() => {});
 
     if (!res) {
-      await this.message.edit({ components: [] });
+      await this.message.edit({ components: [] }).catch(() => null);
       return;
     }
 
