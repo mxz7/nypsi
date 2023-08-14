@@ -39,18 +39,6 @@ export async function topBalance(guild: Guild, userId?: string) {
       userId: true,
       money: true,
       banned: true,
-      user: {
-        select: {
-          Tags: {
-            where: {
-              selected: true,
-            },
-            select: {
-              tagId: true,
-            },
-          },
-        },
-      },
     },
     orderBy: {
       money: "desc",
@@ -61,14 +49,6 @@ export async function topBalance(guild: Guild, userId?: string) {
   const out = [];
 
   let count = 0;
-
-  const getMemberID = (guild: Guild, id: string) => {
-    const target = members.find((member) => {
-      return member.user.id == id;
-    });
-
-    return target;
-  };
 
   const userIds = query.map((i) => i.userId);
 
@@ -88,9 +68,12 @@ export async function topBalance(guild: Guild, userId?: string) {
         pos = "🥉";
       }
 
-      out[count] = `${pos} **${
-        user.user.Tags[0] ? `[${getTagsData()[user.user.Tags[0].tagId].emoji}]` : ""
-      }${getMemberID(guild, user.userId).user.username}** $${Number(user.money).toLocaleString()}`;
+      out[count] = `${pos} ${formatUsername(
+        user.userId,
+        members.get(user.userId).user.username,
+        true,
+        (await getActiveTag(user.userId))?.tagId,
+      )} $${Number(user.money).toLocaleString()}`;
 
       count++;
     }
@@ -119,14 +102,6 @@ export async function topBalanceGlobal(amount: number): Promise<string[]> {
       user: {
         select: {
           lastKnownUsername: true,
-          Tags: {
-            where: {
-              selected: true,
-            },
-            select: {
-              tagId: true,
-            },
-          },
         },
       },
     },
@@ -158,11 +133,12 @@ export async function topBalanceGlobal(amount: number): Promise<string[]> {
       pos = "🥉";
     }
 
-    usersFinal[count] = `${pos} **${
-      user.user.Tags[0] ? `[${getTagsData()[user.user.Tags[0].tagId].emoji}]` : ""
-    }${
-      (await getPreferences(user.userId))?.leaderboards ? user.user.lastKnownUsername : "[hidden]"
-    }** $${Number(user.money).toLocaleString()}`;
+    usersFinal[count] = `${pos} ${formatUsername(
+      user.userId,
+      user.user.lastKnownUsername,
+      (await getPreferences(user.userId)).leaderboards,
+      (await getActiveTag(user.userId))?.tagId,
+    )} $${Number(user.money).toLocaleString()}`;
 
     count++;
   }
@@ -187,14 +163,6 @@ export async function topNetWorthGlobal(userId: string) {
       user: {
         select: {
           lastKnownUsername: true,
-          Tags: {
-            where: {
-              selected: true,
-            },
-            select: {
-              tagId: true,
-            },
-          },
         },
       },
     },
@@ -224,9 +192,12 @@ export async function topNetWorthGlobal(userId: string) {
     }
 
     out.push(
-      `${pos} **${user.user.Tags[0] ? `[${getTagsData()[user.user.Tags[0].tagId].emoji}]` : ""}${
-        (await getPreferences(user.userId))?.leaderboards ? user.user.lastKnownUsername : "[hidden]"
-      }** $${Number(user.netWorth).toLocaleString()}`,
+      `${pos} ${formatUsername(
+        user.userId,
+        user.user.lastKnownUsername,
+        (await getPreferences(user.userId)).leaderboards,
+        (await getActiveTag(user.userId))?.tagId,
+      )} $${Number(user.netWorth).toLocaleString()}`,
     );
   }
 
@@ -300,14 +271,6 @@ export async function topNetWorth(guild: Guild, userId?: string) {
 
   let count = 0;
 
-  const getMemberID = (guild: Guild, id: string) => {
-    const target = members.find((member) => {
-      return member.user.id == id;
-    });
-
-    return target;
-  };
-
   for (const user of userIds) {
     if (out.length >= 100) break;
 
@@ -324,9 +287,12 @@ export async function topNetWorth(guild: Guild, userId?: string) {
 
       const tag = await getActiveTag(user);
 
-      out[count] = `${pos} **${tag ? `[${getTagsData()[tag.tagId].emoji}]` : ""}${
-        getMemberID(guild, user).user.username
-      }** $${amounts.get(user).toLocaleString()}`;
+      out[count] = `${pos} ${formatUsername(
+        user,
+        members.get(user).user.username,
+        true,
+        tag?.tagId,
+      )} $${amounts.get(user).toLocaleString()}`;
 
       count++;
     }
@@ -370,18 +336,6 @@ export async function topPrestige(guild: Guild, userId?: string) {
       userId: true,
       prestige: true,
       banned: true,
-      user: {
-        select: {
-          Tags: {
-            where: {
-              selected: true,
-            },
-            select: {
-              tagId: true,
-            },
-          },
-        },
-      },
     },
     orderBy: {
       prestige: "desc",
@@ -392,14 +346,6 @@ export async function topPrestige(guild: Guild, userId?: string) {
   const out = [];
 
   let count = 0;
-
-  const getMemberID = (guild: Guild, id: string) => {
-    const target = members.find((member) => {
-      return member.user.id == id;
-    });
-
-    return target;
-  };
 
   const userIds = query.map((i) => i.userId);
 
@@ -422,11 +368,12 @@ export async function topPrestige(guild: Guild, userId?: string) {
     const thing = ["th", "st", "nd", "rd"];
     const v = user.prestige % 100;
 
-    out[count] = `${pos} **${
-      user.user.Tags[0] ? `[${getTagsData()[user.user.Tags[0].tagId].emoji}]` : ""
-    }${getMemberID(guild, user.userId).user.username}** ${user.prestige}${
-      thing[(v - 20) % 10] || thing[v] || thing[0]
-    } prestige`;
+    out[count] = `${pos} ${formatUsername(
+      user.userId,
+      members.get(user.userId).user.username,
+      true,
+      (await getActiveTag(user.userId))?.tagId,
+    )} ${user.prestige}${thing[(v - 20) % 10] || thing[v] || thing[0]} prestige`;
 
     count++;
   }
@@ -454,14 +401,6 @@ export async function topPrestigeGlobal(userId: string) {
       user: {
         select: {
           lastKnownUsername: true,
-          Tags: {
-            where: {
-              selected: true,
-            },
-            select: {
-              tagId: true,
-            },
-          },
         },
       },
     },
@@ -495,13 +434,12 @@ export async function topPrestigeGlobal(userId: string) {
 
     const thing = ["th", "st", "nd", "rd"];
     const v = user.prestige % 100;
-    out[count] = `${pos} **${
-      user.user.Tags[0] ? `[${getTagsData()[user.user.Tags[0].tagId].emoji}]` : ""
-    }${
-      (await getPreferences(user.userId))?.leaderboards
-        ? user.user.lastKnownUsername || user.userId
-        : "[hidden]"
-    }** ${user.prestige}${thing[(v - 20) % 10] || thing[v] || thing[0]} prestige`;
+    out[count] = `${pos} ${formatUsername(
+      user.userId,
+      user.user.lastKnownUsername,
+      (await getPreferences(user.userId)).leaderboards,
+      (await getActiveTag(user.userId))?.tagId,
+    )} ${user.prestige}${thing[(v - 20) % 10] || thing[v] || thing[0]} prestige`;
 
     count++;
   }
@@ -548,18 +486,6 @@ export async function topItem(guild: Guild, item: string, userId: string) {
       economy: {
         select: {
           banned: true,
-          user: {
-            select: {
-              Tags: {
-                where: {
-                  selected: true,
-                },
-                select: {
-                  tagId: true,
-                },
-              },
-            },
-          },
         },
       },
     },
@@ -572,14 +498,6 @@ export async function topItem(guild: Guild, item: string, userId: string) {
   const out = [];
 
   let count = 0;
-
-  const getMemberID = (guild: Guild, id: string) => {
-    const target = members.find((member) => {
-      return member.user.id == id;
-    });
-
-    return target;
-  };
 
   const userIds = query.map((i) => i.userId);
 
@@ -601,9 +519,12 @@ export async function topItem(guild: Guild, item: string, userId: string) {
 
     const items = getItems();
 
-    out[count] = `${pos} **${
-      user.economy.user.Tags[0] ? `[${getTagsData()[user.economy.user.Tags[0].tagId].emoji}]` : ""
-    }${getMemberID(guild, user.userId).user.username}** ${user.amount.toLocaleString()} ${
+    out[count] = `${pos} ${formatUsername(
+      user.userId,
+      members.get(user.userId).user.username,
+      true,
+      (await getActiveTag(user.userId))?.tagId,
+    )} ${user.amount.toLocaleString()} ${
       user.amount > 1 ? items[item].plural || items[item].name : items[item].name
     }`;
 
@@ -634,19 +555,6 @@ export async function topItemGlobal(item: string, userId: string) {
           user: {
             select: {
               lastKnownUsername: true,
-              Preferences: {
-                select: {
-                  leaderboards: true,
-                },
-              },
-              Tags: {
-                where: {
-                  selected: true,
-                },
-                select: {
-                  tagId: true,
-                },
-              },
             },
           },
           banned: true,
@@ -683,13 +591,12 @@ export async function topItemGlobal(item: string, userId: string) {
 
     const items = getItems();
 
-    out[count] = `${pos} **${
-      user.economy.user.Tags[0] ? `[${getTagsData()[user.economy.user.Tags[0].tagId].emoji}]` : ""
-    }${
-      user.economy.user.Preferences?.leaderboards
-        ? user.economy.user.lastKnownUsername || user.userId
-        : "[hidden]"
-    }** ${user.amount.toLocaleString()} ${
+    out[count] = `${pos} ${formatUsername(
+      user.userId,
+      user.economy.user.lastKnownUsername,
+      (await getPreferences(user.userId)).leaderboards,
+      (await getActiveTag(user.userId))?.tagId,
+    )} ${user.amount.toLocaleString()} ${
       user.amount > 1 ? items[item].plural || items[item].name : items[item].name
     }`;
 
@@ -781,14 +688,6 @@ export async function topCompletion(guild: Guild, userId: string) {
 
   let count = 0;
 
-  const getMemberID = (guild: Guild, id: string) => {
-    const target = members.find((member) => {
-      return member.user.id == id;
-    });
-
-    return target;
-  };
-
   for (const user of userIds) {
     if (completionRate.get(user) != 0) {
       let pos: number | string = count + 1;
@@ -803,9 +702,12 @@ export async function topCompletion(guild: Guild, userId: string) {
 
       const tag = await getActiveTag(user);
 
-      out[count] = `${pos} **${tag ? `[${getTagsData()[tag.tagId].emoji}]` : ""}${
-        getMemberID(guild, user).user.username
-      }** ${completionRate.get(user).toFixed(1)}%`;
+      out[count] = `${pos} ${formatUsername(
+        user,
+        members.get(user).user.username,
+        true,
+        tag?.tagId,
+      )}${completionRate.get(user).toFixed(1)}%`;
 
       count++;
     }
@@ -841,7 +743,9 @@ export async function topGuilds(guildName?: string) {
     if (position == 2) position = "🥈";
     if (position == 3) position = "🥉";
 
-    out.push(`${position} **${guild.guildName}** level ${guild.level}`);
+    out.push(
+      `${position} **[${guild.guildName}](https://nypsi.xyz/guild/${guild.guildName})** level ${guild.level}`,
+    );
   }
 
   const pages = PageManager.createPages(out);
@@ -889,14 +793,6 @@ export async function topDailyStreak(guild: Guild, userId?: string) {
 
   let count = 0;
 
-  const getMemberID = (guild: Guild, id: string) => {
-    const target = members.find((member) => {
-      return member.user.id == id;
-    });
-
-    return target;
-  };
-
   const userIds = query.map((i) => i.userId);
 
   for (const user of query) {
@@ -917,9 +813,12 @@ export async function topDailyStreak(guild: Guild, userId?: string) {
 
     const tag = await getActiveTag(user.userId);
 
-    out[count] = `${pos} **${tag ? `[${getTagsData()[tag.tagId].emoji}]` : ""}${
-      getMemberID(guild, user.userId).user.username
-    }** ${user.dailyStreak}`;
+    out[count] = `${pos} ${formatUsername(
+      user.userId,
+      members.get(user.userId).user.username,
+      true,
+      tag?.tagId,
+    )} ${user.dailyStreak}`;
 
     count++;
   }
@@ -980,11 +879,12 @@ export async function topDailyStreakGlobal(userId: string) {
 
     const tag = await getActiveTag(user.userId);
 
-    out[count] = `${pos} **${tag ? `[${getTagsData()[tag.tagId].emoji}]` : ""}${
-      (await getPreferences(user.userId))?.leaderboards
-        ? user.user.lastKnownUsername || user.userId
-        : "[hidden]"
-    }** ${user.dailyStreak}`;
+    out[count] = `${pos} ${formatUsername(
+      user.userId,
+      user.user.lastKnownUsername,
+      (await getPreferences(user.userId)).leaderboards,
+      tag?.tagId,
+    )} ${user.dailyStreak}`;
 
     count++;
   }
@@ -1043,14 +943,6 @@ export async function topLottoWins(guild: Guild, userId?: string) {
 
   let count = 0;
 
-  const getMemberID = (guild: Guild, id: string) => {
-    const target = members.find((member) => {
-      return member.user.id == id;
-    });
-
-    return target;
-  };
-
   const userIds = query.map((i) => i.userId);
 
   for (const user of query) {
@@ -1066,9 +958,12 @@ export async function topLottoWins(guild: Guild, userId?: string) {
 
     const tag = await getActiveTag(user.userId);
 
-    out[count] = `${pos} **${tag ? `[${getTagsData()[tag.tagId].emoji}]` : ""}${
-      getMemberID(guild, user.userId).user.username
-    }** ${user.progress}`;
+    out[count] = `${pos} ${formatUsername(
+      user.userId,
+      members.get(user.userId).user.username,
+      true,
+      tag?.tagId,
+    )} ${user.progress}`;
 
     count++;
   }
@@ -1127,11 +1022,12 @@ export async function topLottoWinsGlobal(userId: string) {
 
     const tag = await getActiveTag(user.userId);
 
-    out[count] = `${pos} **${tag ? `[${getTagsData()[tag.tagId].emoji}]` : ""}${
-      (await getPreferences(user.userId))?.leaderboards
-        ? user.user.lastKnownUsername || user.userId
-        : "[hidden]"
-    }** ${query[userIds.indexOf(user.userId)].progress}`;
+    out[count] = `${pos} ${formatUsername(
+      user.userId,
+      user.user.lastKnownUsername,
+      (await getPreferences(user.userId)).leaderboards,
+      tag?.tagId,
+    )} ${query[userIds.indexOf(user.userId)].progress}`;
 
     count++;
   }
@@ -1220,14 +1116,6 @@ export async function topWordle(guild: Guild, userId: string) {
 
   const out: string[] = [];
 
-  const getMemberID = (guild: Guild, id: string) => {
-    const target = members.find((member) => {
-      return member.user.id == id;
-    });
-
-    return target;
-  };
-
   for (const user of sorted) {
     let pos: number | string = out.length + 1;
 
@@ -1242,9 +1130,12 @@ export async function topWordle(guild: Guild, userId: string) {
     const tag = await getActiveTag(user.user.id);
 
     out.push(
-      `${pos} **${tag ? `[${getTagsData()[tag.tagId].emoji}]` : ""}${
-        getMemberID(guild, user.user.id).user.username
-      }** ${user.wins.toLocaleString()} win${user.wins != 1 ? "s" : ""}`,
+      `${pos} ${formatUsername(
+        user.user.id,
+        members.get(user.user.id).user.username,
+        true,
+        tag?.tagId,
+      )} ${user.wins.toLocaleString()} win${user.wins != 1 ? "s" : ""}`,
     );
   }
 
@@ -1306,11 +1197,12 @@ export async function topWordleGlobal(userId: string) {
     const tag = await getActiveTag(user.user.id);
 
     out.push(
-      `${pos} **${tag ? `[${getTagsData()[tag.tagId].emoji}]` : ""}${
-        (await getPreferences(user.user.id))?.leaderboards
-          ? user.user.lastKnownUsername || user.user.id
-          : "[hidden]"
-      }** ${user.wins.toLocaleString()} wins`,
+      `${pos} ${formatUsername(
+        user.user.id,
+        user.user.lastKnownUsername,
+        (await getPreferences(user.user.id)).leaderboards,
+        tag?.tagId,
+      )} ${user.wins.toLocaleString()} wins`,
     );
   }
 
@@ -1367,14 +1259,6 @@ export async function topCommand(guild: Guild, command: string, userId: string) 
 
   let count = 0;
 
-  const getMemberID = (guild: Guild, id: string) => {
-    const target = members.find((member) => {
-      return member.user.id == id;
-    });
-
-    return target;
-  };
-
   const userIds = query.map((i) => i.userId);
 
   for (const user of query) {
@@ -1390,9 +1274,12 @@ export async function topCommand(guild: Guild, command: string, userId: string) 
 
     const tag = await getActiveTag(user.userId);
 
-    out[count] = `${pos} **${tag ? `[${getTagsData()[tag.tagId].emoji}]` : ""}${
-      getMemberID(guild, user.userId).user.username
-    }** ${user.uses.toLocaleString()} ${user.uses > 1 ? "uses" : "use"}`;
+    out[count] = `${pos} ${formatUsername(
+      user.userId,
+      members.get(user.userId).user.username,
+      true,
+      tag?.tagId,
+    )} ${user.uses.toLocaleString()} ${user.uses > 1 ? "uses" : "use"}`;
 
     count++;
   }
@@ -1447,11 +1334,12 @@ export async function topCommandGlobal(command: string, userId: string) {
 
     const tag = await getActiveTag(user.userId);
 
-    out[count] = `${pos} **${tag ? `[${getTagsData()[tag.tagId].emoji}]` : ""}${
-      (await getPreferences(user.userId))?.leaderboards
-        ? user.user.lastKnownUsername || user.userId
-        : "[hidden]"
-    }** ${user.uses.toLocaleString()} ${user.uses > 1 ? "uses" : "use"}`;
+    out[count] = `${pos} ${formatUsername(
+      user.userId,
+      user.user.lastKnownUsername,
+      (await getPreferences(user.userId)).leaderboards,
+      tag?.tagId,
+    )} ${user.uses.toLocaleString()} ${user.uses > 1 ? "uses" : "use"}`;
 
     count++;
   }
@@ -1465,4 +1353,14 @@ export async function topCommandGlobal(command: string, userId: string) {
   }
 
   return { pages, pos };
+}
+
+function formatUsername(id: string, username: string, privacy: boolean, tag?: string) {
+  if (!privacy) return "**[hidden]**";
+
+  let out = `[${username}](https://nypsi.xyz/user/${id})`;
+
+  if (tag) out = `[${getTagsData()[tag].emoji}]${out}`;
+
+  return `**${out}**`;
 }
