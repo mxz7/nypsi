@@ -1360,7 +1360,7 @@ function formatUsername(id: string, username: string, privacy: boolean, tag?: st
 
   let out = `[${username}](https://nypsi.xyz/user/${id})`;
 
-  if (tag) out = `[${getTagsData()[tag].emoji}]${out}`;
+  if (tag) out = `[${getTagsData()[tag].emoji}] ${out}`;
 
   return `**${out}**`;
 }
