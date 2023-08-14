@@ -216,6 +216,16 @@ export async function deleteGuild(name: string) {
       guildName: name,
     },
   });
+
+  await prisma.economyGuildUpgrades.deleteMany({
+    where: { guildName: name },
+  });
+
+  await prisma.graphMetrics.deleteMany({
+    where: {
+      AND: [{ category: { contains: "guild" } }, { userId: guild.guildName }],
+    },
+  });
 }
 
 export async function addToGuildBank(name: string, amount: number, member: GuildMember) {

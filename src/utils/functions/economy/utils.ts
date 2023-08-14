@@ -333,7 +333,9 @@ export async function reset() {
   await prisma.crafting.deleteMany();
   await prisma.bakeryUpgrade.deleteMany();
   await prisma.graphMetrics.deleteMany({
-    where: { OR: [{ category: "networth" }, { category: "balance" }] },
+    where: {
+      OR: [{ category: "networth" }, { category: "balance" }, { category: { contains: "guild" } }],
+    },
   });
 
   await prisma.economy.deleteMany({
