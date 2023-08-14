@@ -70,9 +70,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   await addCooldown(cmd.name, message.member, 30);
 
-  let reaction;
-  let msg: Message;
-
   const embed = new CustomEmbed(
     message.member, "are you sure you want to sell all?",
   ).setHeader("sellall confirmation", message.author.avatarURL());
@@ -95,11 +92,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     new ButtonBuilder().setCustomId("❌").setLabel("cancel").setStyle(ButtonStyle.Success),
   );
 
-  msg = await send({ embeds: [embed], components: [row] });
+  const msg = await send({ embeds: [embed], components: [row] });
 
   const filter = (i: Interaction) => i.user.id == message.author.id;
 
-  reaction = await msg
+  const reaction = await msg
     .awaitMessageComponent({ filter, time: 15000 })
     .then(async (collected) => {
       await collected.deferUpdate();
