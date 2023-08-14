@@ -438,7 +438,7 @@ async function run(
           message.member,
           `you can now use the ${getTagsData()[selected.tagId].emoji} \`${
             getTagsData()[selected.tagId].name
-          }\``,
+          }\` tag`,
         ),
       ],
     });
