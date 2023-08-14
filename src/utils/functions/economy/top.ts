@@ -58,14 +58,16 @@ export async function topBalance(guild: Guild, userId?: string) {
       continue;
     }
     if (Number(user.money) != 0) {
-      let pos: number | string = count + 1;
+      let pos = (count + 1).toString();
 
-      if (pos == 1) {
+      if (pos == "1") {
         pos = "🥇";
-      } else if (pos == 2) {
+      } else if (pos == "2") {
         pos = "🥈";
-      } else if (pos == 3) {
+      } else if (pos == "3") {
         pos = "🥉";
+      } else {
+        pos += ".";
       }
 
       out[count] = `${pos} ${formatUsername(
@@ -123,14 +125,16 @@ export async function topBalanceGlobal(amount: number): Promise<string[]> {
       continue;
     }
 
-    let pos: number | string = count + 1;
+    let pos = (count + 1).toString();
 
-    if (pos == 1) {
+    if (pos == "1") {
       pos = "🥇";
-    } else if (pos == 2) {
+    } else if (pos == "2") {
       pos = "🥈";
-    } else if (pos == 3) {
+    } else if (pos == "3") {
       pos = "🥉";
+    } else {
+      pos += ".";
     }
 
     usersFinal[count] = `${pos} ${formatUsername(
@@ -181,14 +185,16 @@ export async function topNetWorthGlobal(userId: string) {
       continue;
     }
 
-    let pos: number | string = out.length + 1;
+    let pos = (out.length + 1).toString();
 
-    if (pos == 1) {
+    if (pos == "1") {
       pos = "🥇";
-    } else if (pos == 2) {
+    } else if (pos == "2") {
       pos = "🥈";
-    } else if (pos == 3) {
+    } else if (pos == "3") {
       pos = "🥉";
+    } else {
+      pos += ".";
     }
 
     out.push(
@@ -275,14 +281,16 @@ export async function topNetWorth(guild: Guild, userId?: string) {
     if (out.length >= 100) break;
 
     if (amounts.get(user) != 0) {
-      let pos: number | string = count + 1;
+      let pos = (count + 1).toString();
 
-      if (pos == 1) {
+      if (pos == "1") {
         pos = "🥇";
-      } else if (pos == 2) {
+      } else if (pos == "2") {
         pos = "🥈";
-      } else if (pos == 3) {
+      } else if (pos == "3") {
         pos = "🥉";
+      } else {
+        pos += ".";
       }
 
       const tag = await getActiveTag(user);
@@ -355,14 +363,16 @@ export async function topPrestige(guild: Guild, userId?: string) {
       continue;
     }
 
-    let pos: string | number = count + 1;
+    let pos = (count + 1).toString();
 
-    if (pos == 1) {
+    if (pos == "1") {
       pos = "🥇";
-    } else if (pos == 2) {
+    } else if (pos == "2") {
       pos = "🥈";
-    } else if (pos == 3) {
+    } else if (pos == "3") {
       pos = "🥉";
+    } else {
+      pos += ".";
     }
 
     const thing = ["th", "st", "nd", "rd"];
@@ -422,14 +432,16 @@ export async function topPrestigeGlobal(userId: string) {
       continue;
     }
 
-    let pos: string | number = count + 1;
+    let pos = (count + 1).toString();
 
-    if (pos == 1) {
+    if (pos == "1") {
       pos = "🥇";
-    } else if (pos == 2) {
+    } else if (pos == "2") {
       pos = "🥈";
-    } else if (pos == 3) {
+    } else if (pos == "3") {
       pos = "🥉";
+    } else {
+      pos += ".";
     }
 
     const thing = ["th", "st", "nd", "rd"];
@@ -507,14 +519,16 @@ export async function topItem(guild: Guild, item: string, userId: string) {
       continue;
     }
 
-    let pos: number | string = count + 1;
+    let pos = (count + 1).toString();
 
-    if (pos == 1) {
+    if (pos == "1") {
       pos = "🥇";
-    } else if (pos == 2) {
+    } else if (pos == "2") {
       pos = "🥈";
-    } else if (pos == 3) {
+    } else if (pos == "3") {
       pos = "🥉";
+    } else {
+      pos += ".";
     }
 
     const items = getItems();
@@ -579,14 +593,16 @@ export async function topItemGlobal(item: string, userId: string) {
       continue;
     }
 
-    let pos: number | string = count + 1;
+    let pos = (count + 1).toString();
 
-    if (pos == 1) {
+    if (pos == "1") {
       pos = "🥇";
-    } else if (pos == 2) {
+    } else if (pos == "2") {
       pos = "🥈";
-    } else if (pos == 3) {
+    } else if (pos == "3") {
       pos = "🥉";
+    } else {
+      pos += ".";
     }
 
     const items = getItems();
@@ -690,14 +706,16 @@ export async function topCompletion(guild: Guild, userId: string) {
 
   for (const user of userIds) {
     if (completionRate.get(user) != 0) {
-      let pos: number | string = count + 1;
+      let pos = (count + 1).toString();
 
-      if (pos == 1) {
+      if (pos == "1") {
         pos = "🥇";
-      } else if (pos == 2) {
+      } else if (pos == "2") {
         pos = "🥈";
-      } else if (pos == 3) {
+      } else if (pos == "3") {
         pos = "🥉";
+      } else {
+        pos += ".";
       }
 
       const tag = await getActiveTag(user);
@@ -801,14 +819,16 @@ export async function topDailyStreak(guild: Guild, userId?: string) {
       continue;
     }
 
-    let pos: string | number = count + 1;
+    let pos = (count + 1).toString();
 
-    if (pos == 1) {
+    if (pos == "1") {
       pos = "🥇";
-    } else if (pos == 2) {
+    } else if (pos == "2") {
       pos = "🥈";
-    } else if (pos == 3) {
+    } else if (pos == "3") {
       pos = "🥉";
+    } else {
+      pos += ".";
     }
 
     const tag = await getActiveTag(user.userId);
@@ -867,14 +887,16 @@ export async function topDailyStreakGlobal(userId: string) {
       continue;
     }
 
-    let pos: string | number = count + 1;
+    let pos = (count + 1).toString();
 
-    if (pos == 1) {
+    if (pos == "1") {
       pos = "🥇";
-    } else if (pos == 2) {
+    } else if (pos == "2") {
       pos = "🥈";
-    } else if (pos == 3) {
+    } else if (pos == "3") {
       pos = "🥉";
+    } else {
+      pos += ".";
     }
 
     const tag = await getActiveTag(user.userId);
@@ -946,14 +968,16 @@ export async function topLottoWins(guild: Guild, userId?: string) {
   const userIds = query.map((i) => i.userId);
 
   for (const user of query) {
-    let pos: string | number = count + 1;
+    let pos = (count + 1).toString();
 
-    if (pos == 1) {
+    if (pos == "1") {
       pos = "🥇";
-    } else if (pos == 2) {
+    } else if (pos == "2") {
       pos = "🥈";
-    } else if (pos == 3) {
+    } else if (pos == "3") {
       pos = "🥉";
+    } else {
+      pos += ".";
     }
 
     const tag = await getActiveTag(user.userId);
@@ -1010,14 +1034,16 @@ export async function topLottoWinsGlobal(userId: string) {
   const userIds = query.map((i) => i.userId);
 
   for (const user of query) {
-    let pos: string | number = count + 1;
+    let pos = (count + 1).toString();
 
-    if (pos == 1) {
+    if (pos == "1") {
       pos = "🥇";
-    } else if (pos == 2) {
+    } else if (pos == "2") {
       pos = "🥈";
-    } else if (pos == 3) {
+    } else if (pos == "3") {
       pos = "🥉";
+    } else {
+      pos += ".";
     }
 
     const tag = await getActiveTag(user.userId);
@@ -1117,14 +1143,16 @@ export async function topWordle(guild: Guild, userId: string) {
   const out: string[] = [];
 
   for (const user of sorted) {
-    let pos: number | string = out.length + 1;
+    let pos = (out.length + 1).toString();
 
-    if (pos == 1) {
+    if (pos == "1") {
       pos = "🥇";
-    } else if (pos == 2) {
+    } else if (pos == "2") {
       pos = "🥈";
-    } else if (pos == 3) {
+    } else if (pos == "3") {
       pos = "🥉";
+    } else {
+      pos += ".";
     }
 
     const tag = await getActiveTag(user.user.id);
@@ -1184,14 +1212,16 @@ export async function topWordleGlobal(userId: string) {
   const out: string[] = [];
 
   for (const user of sorted) {
-    let pos: number | string = out.length + 1;
+    let pos = (out.length + 1).toString();
 
-    if (pos == 1) {
+    if (pos == "1") {
       pos = "🥇";
-    } else if (pos == 2) {
+    } else if (pos == "2") {
       pos = "🥈";
-    } else if (pos == 3) {
+    } else if (pos == "3") {
       pos = "🥉";
+    } else {
+      pos += ".";
     }
 
     const tag = await getActiveTag(user.user.id);
@@ -1262,14 +1292,16 @@ export async function topCommand(guild: Guild, command: string, userId: string) 
   const userIds = query.map((i) => i.userId);
 
   for (const user of query) {
-    let pos: number | string = count + 1;
+    let pos = (count + 1).toString();
 
-    if (pos == 1) {
+    if (pos == "1") {
       pos = "🥇";
-    } else if (pos == 2) {
+    } else if (pos == "2") {
       pos = "🥈";
-    } else if (pos == 3) {
+    } else if (pos == "3") {
       pos = "🥉";
+    } else {
+      pos += ".";
     }
 
     const tag = await getActiveTag(user.userId);
@@ -1322,14 +1354,16 @@ export async function topCommandGlobal(command: string, userId: string) {
   const userIds = query.map((i) => i.userId);
 
   for (const user of query) {
-    let pos: number | string = count + 1;
+    let pos = (count + 1).toString();
 
-    if (pos == 1) {
+    if (pos == "1") {
       pos = "🥇";
-    } else if (pos == 2) {
+    } else if (pos == "2") {
       pos = "🥈";
-    } else if (pos == 3) {
+    } else if (pos == "3") {
       pos = "🥉";
+    } else {
+      pos += ".";
     }
 
     const tag = await getActiveTag(user.userId);
