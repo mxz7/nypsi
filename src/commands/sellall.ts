@@ -6,10 +6,8 @@ import {
   CommandInteraction,
   Interaction,
   InteractionReplyOptions,
-  InteractionResponse,
   Message,
   MessageActionRowComponentBuilder,
-  MessageEditOptions,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { Command, NypsiCommandInteraction } from "../models/Command";
@@ -72,46 +70,57 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   await addCooldown(cmd.name, message.member, 30);
 
-  const edit = async (data: MessageEditOptions, msg: Message | InteractionResponse) => {
-    if (!(message instanceof Message)) {
-      return await message.editReply(data);
-    } else {
-      if (msg instanceof InteractionResponse) return;
-      return await msg.edit(data);
-    }
-  };
-
   let reaction;
   let msg: Message;
 
-  if ((await calcValues(message)).total >= 10_000_000) {
-    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder().setCustomId("✅").setLabel("do it.").setStyle(ButtonStyle.Success),
-    );
+  const embed = new CustomEmbed(
+    message.member, "are you sure you want to sell all?",
+  ).setHeader("sellall confirmation", message.author.avatarURL());
 
-    const embed = new CustomEmbed(
-      message.member,
-      "your sellable items are worth over $10 million\n\nare you sure you want to sell all?",
-    ).setHeader("sellall", message.author.avatarURL());
+  const { desc, amounts, total } = await calcValues(message);
+  inPlaceSort(desc).desc((i) => amounts.get(i));
+  if (desc.length <= 10) embed.addField("items to be sold", desc.join("\n"));
+  else {
+    let newDesc = "";
+    for (let i = 0; i < 9; i++) newDesc += `${desc[i]}\n`;
+    let amount = 0;
+    for (let i = 9; i < desc.length; i++) amount += Number(desc[i].split(" ($")[1].split(")")[0].replaceAll(",", ""));
+    newDesc += `*${desc.length - 9} more ($${amount.toLocaleString()})*`;
+    embed.addField("items to be sold", newDesc);
+  }
+  embed.setFooter({ text: `total: $${total.toLocaleString()}` });
 
-    msg = await send({ embeds: [embed], components: [row] });
+  const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+    new ButtonBuilder().setCustomId("✅").setLabel("confirm").setStyle(ButtonStyle.Danger),
+    new ButtonBuilder().setCustomId("❌").setLabel("cancel").setStyle(ButtonStyle.Success),
+  );
 
-    const filter = (i: Interaction) => i.user.id == message.author.id;
+  msg = await send({ embeds: [embed], components: [row] });
 
-    reaction = await msg
-      .awaitMessageComponent({ filter, time: 15000 })
-      .then(async (collected) => {
-        await collected.deferUpdate();
-        return collected.customId;
-      })
-      .catch(async () => {
-        embed.setDescription("❌ expired");
-        await edit({ embeds: [embed], components: [] }, msg);
-        addExpiry(cmd.name, message.member, 30);
-      });
+  const filter = (i: Interaction) => i.user.id == message.author.id;
+
+  reaction = await msg
+    .awaitMessageComponent({ filter, time: 15000 })
+    .then(async (collected) => {
+      await collected.deferUpdate();
+      return collected.customId;
+    })
+    .catch(async () => {
+      embed.setDescription("❌ expired");
+      embed.disableFooter(); 
+      embed.setFields();
+      await msg.edit({ embeds: [embed], components: [] });
+      addExpiry(cmd.name, message.member, 30);
+    });
+
+  if (reaction == "❌") {
+    embed.setDescription("❌ cancelled");
+    embed.disableFooter();
+    embed.setFields();
+    return msg.edit({ embeds: [embed], components: [] });
   }
 
-  if ((await calcValues(message)).total < 10_000_000 || reaction == "✅") {
+  if (reaction == "✅") {
     const { selected, taxedAmount, desc, amounts, total, taxEnabled, multi } = await calcValues(
       message,
     );
@@ -119,7 +128,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (selected.size == 0) {
       const embed = new ErrorEmbed("you do not have anything to sell");
       return msg
-        ? edit({ embeds: [embed], components: [] }, msg)
+        ? msg.edit({ embeds: [embed], components: [] })
         : send({ embeds: [embed], components: [] });
     }
 
@@ -164,10 +173,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     );
     if (pages.size == 1)
       return msg
-        ? edit({ embeds: [embed], components: [] }, msg)
+        ? msg.edit({ embeds: [embed], components: [] })
         : send({ embeds: [embed], components: [] });
     const m = await (msg
-      ? edit({ embeds: [embed], components: [row] }, msg)
+      ? msg.edit({ embeds: [embed], components: [row] })
       : send({ embeds: [embed], components: [row] }));
 
     const manager = new PageManager({
