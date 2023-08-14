@@ -85,18 +85,19 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   let msg: Message;
 
   if ((await calcValues(message)).total >= 10_000_000) {
-    
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder().setCustomId("✅").setLabel("do it.").setStyle(ButtonStyle.Success),
     );
 
-    const embed = new CustomEmbed(message.member, "your sellable items are worth over $10 million\n\nare you sure you want to sell all?")
-    .setHeader("sellall", message.author.avatarURL());
+    const embed = new CustomEmbed(
+      message.member,
+      "your sellable items are worth over $10 million\n\nare you sure you want to sell all?",
+    ).setHeader("sellall", message.author.avatarURL());
 
     msg = await send({ embeds: [embed], components: [row] });
 
     const filter = (i: Interaction) => i.user.id == message.author.id;
-  
+
     reaction = await msg
       .awaitMessageComponent({ filter, time: 15000 })
       .then(async (collected) => {
@@ -111,16 +112,19 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   }
 
   if ((await calcValues(message)).total < 10_000_000 || reaction == "✅") {
-
-    const { selected, taxedAmount, desc, amounts, total, taxEnabled, multi} = await calcValues(message);
+    const { selected, taxedAmount, desc, amounts, total, taxEnabled, multi } = await calcValues(
+      message,
+    );
 
     if (selected.size == 0) {
-      const embed = new ErrorEmbed("you do not have anything to sell")
-      return (msg ? edit({ embeds: [embed], components: [] }, msg) : send({ embeds: [embed], components: [] }));
+      const embed = new ErrorEmbed("you do not have anything to sell");
+      return msg
+        ? edit({ embeds: [embed], components: [] }, msg)
+        : send({ embeds: [embed], components: [] });
     }
 
     const functions = [];
-      for (const item of selected.keys())
+    for (const item of selected.keys())
       functions.push(async () => {
         await setInventoryItem(message.member, item, 0, false);
       });
@@ -158,8 +162,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         .setDisabled(true),
       new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
     );
-    if (pages.size == 1) return (msg ? edit({ embeds: [embed], components: [] }, msg) : send({ embeds: [embed], components: [] }));
-    const m = await (msg ? edit({ embeds: [embed], components: [row] }, msg) : send({ embeds: [embed], components: [row] }));
+    if (pages.size == 1)
+      return msg
+        ? edit({ embeds: [embed], components: [] }, msg)
+        : send({ embeds: [embed], components: [] });
+    const m = await (msg
+      ? edit({ embeds: [embed], components: [row] }, msg)
+      : send({ embeds: [embed], components: [row] }));
 
     const manager = new PageManager({
       embed,
@@ -177,7 +186,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     return manager.listen();
   }
-  
 }
 
 async function calcValues(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
@@ -244,7 +252,7 @@ async function calcValues(message: Message | (NypsiCommandInteraction & CommandI
       sellWorth,
     );
   }
-  
+
   const res = {
     selected,
     total,
