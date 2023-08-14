@@ -256,8 +256,7 @@ async function run(
       await deleteMute(message.guild, members.get(m));
     }
   }
-
-  await newCase(message.guild, "unmute", members1, message.author, message.content);
+  await newCase(message.guild, "unmute", members1, message.author, args.length > 1 ? args.slice(1).join(" ") : "no reason given");
 }
 
 cmd.setRun(run);
