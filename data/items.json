@@ -77,6 +77,29 @@
     "sell": 23500,
     "in_crates": false
   },
+  "treasure_chest": {
+    "id": "treasure_chest",
+    "name": "treasure chest",
+    "article": "a",
+    "plural": "treasure chests",
+    "emoji": "<:nypsi_chest:1034843159647236190>",
+    "role": "crate",
+    "longDesc": "open to receive 5 fishing related items",
+    "aliases": ["treasure", "chest"],
+    "rarity": 3,
+    "in_crates": false,
+    "crate_runs": 5,
+    "items": [
+      "id:worm",
+      "id:incredible_fishing_rod",
+      "id:unbreaking",
+      "id:fishing_rod",
+      "id:terrible_fishing_rod",
+      "id:nemo",
+      "id:large_fish"
+    ],
+    "random_drop_chance": 40
+  },
   "cobblestone": {
     "id": "cobblestone",
     "name": "cobblestone",
