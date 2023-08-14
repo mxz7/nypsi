@@ -755,11 +755,12 @@ export async function topGuilds(guildName?: string) {
   const out: string[] = [];
 
   for (const guild of query) {
-    let position: number | string = query.indexOf(guild) + 1;
+    let position = (query.indexOf(guild) + 1).toString();
 
-    if (position == 1) position = "🥇";
-    if (position == 2) position = "🥈";
-    if (position == 3) position = "🥉";
+    if (position == "1") position = "🥇";
+    if (position == "2") position = "🥈";
+    if (position == "3") position = "🥉";
+    else position += ".";
 
     out.push(
       `${position} **[${guild.guildName}](https://nypsi.xyz/guild/${guild.guildName})** level ${guild.level}`,
