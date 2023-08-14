@@ -763,7 +763,9 @@ export async function topGuilds(guildName?: string) {
     else position += ".";
 
     out.push(
-      `${position} **[${guild.guildName}](https://nypsi.xyz/guild/${guild.guildName})** level ${guild.level}`,
+      `${position} **[${guild.guildName}](https://nypsi.xyz/guild/${encodeURIComponent(
+        guild.guildName,
+      )})** level ${guild.level}`,
     );
   }
 
