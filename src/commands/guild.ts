@@ -230,7 +230,11 @@ async function run(
         `you are not in a guild. you can create one with ${prefix}guild create or join one if you have been invited`,
       );
     } else {
-      embed.setHeader(guild.guildName, message.author.avatarURL());
+      embed.setHeader(
+        guild.guildName,
+        message.author.avatarURL(),
+        `https://nypsi.xyz/guild/${guild.guildName}`,
+      );
       // embed.setDescription(guild.motd + `\n\n**bank** $${guild.balance.toLocaleString()}\n**xp** ${guild.xp.toLocaleString()}`)
       embed.setDescription(guild.motd);
       embed.addField(
@@ -744,6 +748,7 @@ async function run(
       const embed = new CustomEmbed(message.member).setHeader(
         "guild deposit",
         message.author.avatarURL(),
+        `https://nypsi.xyz/guild/${guild.guildName}`,
       );
 
       embed.setDescription(
@@ -774,6 +779,7 @@ async function run(
     const embed = new CustomEmbed(message.member).setHeader(
       `${guild.guildName} stats`,
       message.author.avatarURL(),
+      `https://nypsi.xyz/guild/${guild.guildName}`,
     );
 
     let desc = "";
@@ -815,7 +821,11 @@ async function run(
 
     const embed = new CustomEmbed(message.member);
 
-    embed.setHeader(guild.guildName, message.author.avatarURL());
+    embed.setHeader(
+      guild.guildName,
+      message.author.avatarURL(),
+      `https://nypsi.xyz/guild/${guild.guildName}`,
+    );
     embed.setDescription(
       `requirements to upgrade to level **${guild.level + 1}**:\n\n` +
         `**money** $${guild.balance.toLocaleString()}/$${requirements.money.toLocaleString()}\n` +
@@ -974,7 +984,11 @@ async function run(
     );
 
     const embed = new CustomEmbed(message.member)
-      .setHeader(`${guild.guildName} upgrades`, message.author.avatarURL())
+      .setHeader(
+        `${guild.guildName} upgrades`,
+        message.author.avatarURL(),
+        `https://nypsi.xyz/guild/${guild.guildName}`,
+      )
       .setFields(...pages.get(1))
       .setFooter({ text: `you have ${guild.tokens} token${guild.tokens != 1 ? "s" : ""}` });
 
