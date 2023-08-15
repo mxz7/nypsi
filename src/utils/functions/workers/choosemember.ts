@@ -21,19 +21,19 @@ export default function chooseMember(
 
 if (!isMainThread) {
   process.title = "nypsi: choosemember worker";
-  let target: GuildMember;
+  let target: string;
   const scores: { id: string; score: number }[] = [];
-  const members: Collection<string, GuildMember> = workerData[0];
+  const members: Collection<string, any> = workerData[0];
   const memberName: string = workerData[1];
 
   for (const m of members.keys()) {
     const member = members.get(m);
 
     if (member.user.id === memberName) {
-      target = member;
+      target = member.user.id;
       break;
     } else if (member.user.username.toLowerCase() === memberName.toLowerCase()) {
-      target = member;
+      target = member.user.id;
       break;
     } else {
       let score = 0;
@@ -43,11 +43,11 @@ if (!isMainThread) {
         memberName.toLowerCase(),
       );
       const displayNameComparison = compareTwoStrings(
-        member.user.displayName.toLowerCase(),
+        (member.user.globalName || "").toLowerCase(),
         memberName.toLowerCase(),
       );
       const guildNameComparison = compareTwoStrings(
-        member.displayName.toLowerCase(),
+        (member.nickname || "").toLowerCase(),
         memberName.toLowerCase(),
       );
 
@@ -55,18 +55,18 @@ if (!isMainThread) {
       score += displayNameComparison === 1 ? 1.5 : displayNameComparison;
       score += guildNameComparison === 1 ? 1.2 : displayNameComparison;
 
-      if (score > 0.5) scores.push({ id: member.id, score });
+      if (score > 0.5) scores.push({ id: member.user.id, score });
     }
   }
 
   if (!target && scores.length > 0) {
-    target = members.get(inPlaceSort(scores).desc((i) => i.score)[0]?.id);
+    target = members.get(inPlaceSort(scores).desc((i) => i.score)[0]?.id).user.id;
   }
 
   if (!target) {
     parentPort.postMessage(null);
   } else {
-    parentPort.postMessage(target.user.id);
+    parentPort.postMessage(target);
   }
 
   process.exit(0);
