@@ -51,7 +51,7 @@ async function doHunt(
   message: Message | (NypsiCommandInteraction & CommandInteraction) | ButtonInteraction,
 ) {
   const member = await message.guild.members.fetch(message.member.user.id);
-  
+
   if (!(await userExists(member))) await createUser(member);
 
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
@@ -119,6 +119,7 @@ async function doHunt(
           "you need a gun to hunt\n[how do i get a gun?](https://docs.nypsi.xyz/economy/fishinghunting)",
         ),
       ],
+      ephemeral: true,
     });
   }
 
@@ -168,12 +169,7 @@ async function doHunt(
   }
 
   if (!unbreaking) {
-    await setInventoryItem(
-      member,
-      gun,
-      inventory.find((i) => i.item == gun).amount - 1,
-      false,
-    );
+    await setInventoryItem(member, gun, inventory.find((i) => i.item == gun).amount - 1, false);
   }
 
   const chosenPlace = places[Math.floor(Math.random() * places.length)];

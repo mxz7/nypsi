@@ -107,6 +107,7 @@ async function doFish(
           "you need a fishing rod to fish\n[how do i get a fishing rod?](https://docs.nypsi.xyz/economy/fishinghunting)",
         ),
       ],
+      ephemeral: true,
     });
   }
 

@@ -131,6 +131,7 @@ async function doMine(
           "you need a pickaxe to mine\n[how do i get a pickaxe?](https://docs.nypsi.xyz/economy/minecraft)",
         ),
       ],
+      ephemeral: true,
     });
   }
 
@@ -369,7 +370,6 @@ async function doMine(
         : " **nothing**"
     }`,
   );
-
 
   setTimeout(() => {
     msg.edit({ embeds: [embed], components: [row] });
