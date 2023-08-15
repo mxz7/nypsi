@@ -433,11 +433,11 @@ house
 household
 husband
 i live my life a quarter mile at a time
+i'll have the tuna. no crust
+i'll have two number 9s a number 9 large a number 6 with extra dip a number 7 two number 45s one with cheese and a large soda
 ice
 idea
 identity
-ill have the tuna. no crust
-ill have two number 9s a number 9 large a number 6 with extra dip a number 7 two number 45s one with cheese and a large soda
 image
 impact
 importance
@@ -609,6 +609,7 @@ offence
 offer
 office
 officer
+oh no! anyway
 oil
 operation
 opinion
@@ -997,5 +998,5 @@ worker
 world
 writer
 year
-you almost had me? you never had me. you never had your car. granny shifting not double clutching like you should. youre lucky that 100 shot of nos didnt blow the welds on the intake. almost had me? now me and the mad scientist are going to have to rip apart the block and replace the piston rings you fried
+you almost had me? you never had me. you never had your car. granny shifting not double clutching like you should. you're lucky that 100 shot of nos didnt blow the welds on the intake. almost had me? now me and the mad scientist are going to have to rip apart the block and replace the piston rings you fried
 youth
