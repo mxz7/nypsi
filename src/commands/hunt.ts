@@ -1,8 +1,13 @@
 import {
+  ActionRowBuilder,
   BaseMessageOptions,
+  ButtonBuilder,
+  ButtonInteraction,
+  ButtonStyle,
   CommandInteraction,
   InteractionReplyOptions,
   Message,
+  MessageActionRowComponentBuilder,
 } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
@@ -39,7 +44,15 @@ const places = [
 ];
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-  if (!(await userExists(message.member))) await createUser(message.member);
+  doHunt(message);
+}
+
+async function doHunt(
+  message: Message | (NypsiCommandInteraction & CommandInteraction) | ButtonInteraction,
+) {
+  const member = await message.guild.members.fetch(message.member.user.id);
+  
+  if (!(await userExists(member))) await createUser(member);
 
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -71,13 +84,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
   };
 
-  if (await onCooldown(cmd.name, message.member)) {
-    const embed = await getResponse(cmd.name, message.member);
+  if (await onCooldown(cmd.name, member)) {
+    const embed = await getResponse(cmd.name, member);
 
     return send({ embeds: [embed], ephemeral: true });
   }
 
-  const inventory = await getInventory(message.member);
+  const inventory = await getInventory(member);
   const items = getItems();
 
   let gun: string;
@@ -109,9 +122,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     });
   }
 
-  await addCooldown(cmd.name, message.member, 120);
+  await addCooldown(cmd.name, member, 120);
 
-  await addStat(message.member, gun);
+  await addStat(member, gun);
 
   const huntItems = Array.from(Object.keys(items));
 
@@ -123,7 +136,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     times = 3;
   }
 
-  const boosters = await getBoosters(message.member);
+  const boosters = await getBoosters(member);
   let unbreaking = false;
 
   for (const boosterId of boosters.keys()) {
@@ -138,13 +151,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (inventory.find((i) => i.item === "purple_gem")?.amount > 0) {
     if (percentChance(0.2)) {
-      gemBreak(message.author.id, 0.07, "purple_gem");
+      gemBreak(message.member.user.id, 0.07, "purple_gem");
       times++;
     }
   }
   if (inventory.find((i) => i.item === "white_gem")?.amount > 0) {
     if (percentChance(0.2)) {
-      gemBreak(message.author.id, 0.07, "white_gem");
+      gemBreak(message.member.user.id, 0.07, "white_gem");
       times++;
     }
   }
@@ -156,7 +169,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (!unbreaking) {
     await setInventoryItem(
-      message.member,
+      member,
       gun,
       inventory.find((i) => i.item == gun).amount - 1,
       false,
@@ -166,11 +179,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const chosenPlace = places[Math.floor(Math.random() * places.length)];
 
   const embed = new CustomEmbed(
-    message.member,
+    member,
     `you go to the ${chosenPlace} and prepare your **${items[gun].name}**`,
   );
 
-  const msg = await send({ embeds: [embed] });
+  const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+    new ButtonBuilder().setCustomId("hunt").setLabel("hunt").setStyle(ButtonStyle.Success),
+  );
+
+  const msg = await send({ embeds: [embed], components: [row] });
 
   for (let i = 0; i < 15; i++) {
     huntItems.push("nothing");
@@ -234,7 +251,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       amount = Math.floor(Math.random() * 5) + 1;
     }
 
-    await addInventoryItem(message.member, chosen, amount);
+    await addInventoryItem(member, chosen, amount);
 
     foundItems.set(chosen, foundItems.has(chosen) ? foundItems.get(chosen) + amount : amount);
   }
@@ -243,16 +260,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     .map((i) => (["money", "xp"].includes(i[0]) ? 0 : i[1]))
     .reduce((a, b) => a + b);
 
-  const earnedXp = await calcEarnedHFMXp(message.member, total);
+  const earnedXp = await calcEarnedHFMXp(member, total);
 
   if (earnedXp > 0) {
     embed.setFooter({ text: `+${earnedXp.toLocaleString()}xp` });
-    await updateXp(message.member, (await getXp(message.member)) + earnedXp);
+    await updateXp(member, (await getXp(member)) + earnedXp);
 
-    const guild = await getGuildName(message.member);
+    const guild = await getGuildName(member);
 
     if (guild) {
-      await addToGuildXP(guild, earnedXp, message.member);
+      await addToGuildXP(guild, earnedXp, member);
     }
   }
 
@@ -267,10 +284,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   );
 
   setTimeout(() => {
-    msg.edit({ embeds: [embed] });
+    msg.edit({ embeds: [embed], components: [row] });
   }, 1500);
 
-  addProgress(message.author.id, "hunter", total);
+  addProgress(message.member.user.id, "hunter", total);
 }
 
 cmd.setRun(run);
