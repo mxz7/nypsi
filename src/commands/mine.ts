@@ -1,8 +1,13 @@
 import {
+  ActionRowBuilder,
   BaseMessageOptions,
+  ButtonBuilder,
+  ButtonInteraction,
+  ButtonStyle,
   CommandInteraction,
   InteractionReplyOptions,
   Message,
+  MessageActionRowComponentBuilder,
 } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
@@ -51,7 +56,15 @@ const cmd = new Command("mine", "go to a cave and mine", "money").setDocs(
 cmd.slashEnabled = true;
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-  if (!(await userExists(message.member))) await createUser(message.member);
+  doMine(message);
+}
+
+async function doMine(
+  message: Message | (NypsiCommandInteraction & CommandInteraction) | ButtonInteraction,
+) {
+  const member = await message.guild.members.fetch(message.member.user.id);
+
+  if (!(await userExists(member))) await createUser(member);
 
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -83,13 +96,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
   };
 
-  if (await onCooldown(cmd.name, message.member)) {
-    const embed = await getResponse(cmd.name, message.member);
+  if (await onCooldown(cmd.name, member)) {
+    const embed = await getResponse(cmd.name, member);
 
     return send({ embeds: [embed], ephemeral: true });
   }
 
-  const inventory = await getInventory(message.member);
+  const inventory = await getInventory(member);
   const items = getItems();
 
   let pickaxe: string;
@@ -118,16 +131,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           "you need a pickaxe to mine\n[how do i get a pickaxe?](https://docs.nypsi.xyz/economy/minecraft)",
         ),
       ],
+      ephemeral: true,
     });
   }
 
-  await addCooldown(cmd.name, message.member, 120);
+  await addCooldown(cmd.name, member, 120);
 
-  await addStat(message.member, pickaxe);
+  await addStat(member, pickaxe);
 
   const mineItems = Array.from(Object.keys(items));
 
-  const boosters = await getBoosters(message.member);
+  const boosters = await getBoosters(member);
 
   let times = 1;
   let multi = 0;
@@ -174,13 +188,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (inventory.find((i) => i.item === "purple_gem")?.amount > 0) {
     if (percentChance(0.2)) {
-      gemBreak(message.author.id, 0.07, "purple_gem");
+      gemBreak(message.member.user.id, 0.07, "purple_gem");
       times++;
     }
   }
   if (inventory.find((i) => i.item === "white_gem")?.amount > 0) {
     if (percentChance(0.2)) {
-      gemBreak(message.author.id, 0.07, "white_gem");
+      gemBreak(message.member.user.id, 0.07, "white_gem");
       times++;
     }
   }
@@ -192,7 +206,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (!unbreakable) {
     await setInventoryItem(
-      message.member,
+      member,
       pickaxe,
       inventory.find((i) => i.item == pickaxe).amount - 1,
       false,
@@ -218,14 +232,20 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   chosenArea = choseArea();
 
+  const user = await message.client.users.fetch(message.member.user.id);
+
   const embed = new CustomEmbed(
-    message.member,
+    member,
     `you go to the ${chosenArea} and swing your **${items[pickaxe].name}**`,
+  ).setHeader(user.username, user.avatarURL(), `https://nypsi.xyz/user/${user.id}`);
+
+  const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+    new ButtonBuilder().setCustomId("mine").setLabel("mine").setStyle(ButtonStyle.Success),
   );
 
-  const msg = await send({ embeds: [embed] });
+  const msg = await send({ embeds: [embed], components: [row] });
 
-  if (chosenArea == "nether") await addStat(message.member, "nether_portal");
+  if (chosenArea == "nether") await addStat(member, "nether_portal");
 
   const foundItems = new Map<string, number>();
 
@@ -321,7 +341,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       }
     }
 
-    await addInventoryItem(message.member, chosen, amount);
+    await addInventoryItem(member, chosen, amount);
 
     foundItems.set(chosen, foundItems.has(chosen) ? foundItems.get(chosen) + amount : amount);
   }
@@ -330,16 +350,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     .map((i) => (["money", "xp"].includes(i[0]) ? 0 : i[1]))
     .reduce((a, b) => a + b);
 
-  const earnedXp = Math.floor((await calcEarnedHFMXp(message.member, total)) / 2);
+  const earnedXp = Math.floor((await calcEarnedHFMXp(member, total)) / 2);
 
   if (earnedXp > 0) {
     embed.setFooter({ text: `+${earnedXp.toLocaleString()}xp` });
-    await updateXp(message.member, (await getXp(message.member)) + earnedXp);
+    await updateXp(member, (await getXp(member)) + earnedXp);
 
-    const guild = await getGuildName(message.member);
+    const guild = await getGuildName(member);
 
     if (guild) {
-      await addToGuildXP(guild, earnedXp, message.member);
+      await addToGuildXP(guild, earnedXp, member);
     }
   }
 
@@ -354,10 +374,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   );
 
   setTimeout(() => {
-    msg.edit({ embeds: [embed] });
+    msg.edit({ embeds: [embed], components: [row] });
   }, 1500);
 
-  addProgress(message.author.id, "miner", total);
+  addProgress(message.member.user.id, "miner", total);
 }
 
 cmd.setRun(run);
