@@ -143,7 +143,13 @@ async function run(
     await send({ embeds: [embed] });
   }
 
-  await newCase(message.guild, "unban", unbannedUser.id, message.author, args.length > 1 ? args.slice(1).join(" ") : "no reason given");
+  await newCase(
+    message.guild,
+    "unban",
+    unbannedUser.id,
+    message.author,
+    args.length > 1 ? args.slice(1).join(" ") : "no reason given",
+  );
 }
 
 cmd.setRun(run);
