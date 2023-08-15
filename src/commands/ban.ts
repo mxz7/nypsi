@@ -227,7 +227,7 @@ async function run(
       await newBan(message.guild, userId, unbanDate);
     }
   } else {
-    await newCase(message.guild, "ban", target.user.id, message.author, reason.split(": ")[1]);
+    await newCase(message.guild, "ban", target.user.id, message.author, storeReason);
 
     if (temporary) {
       await newBan(message.guild, target.user.id, unbanDate);
