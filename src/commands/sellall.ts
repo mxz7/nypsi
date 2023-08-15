@@ -70,9 +70,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   await addCooldown(cmd.name, message.member, 30);
 
-  const embed = new CustomEmbed(
-    message.member, "are you sure you want to sell all?",
-  ).setHeader("sellall confirmation", message.author.avatarURL());
+  const embed = new CustomEmbed(message.member, "are you sure you want to sell all?").setHeader(
+    "sellall confirmation",
+    message.author.avatarURL(),
+  );
 
   const { desc, amounts, total } = await calcValues(message);
   inPlaceSort(desc).desc((i) => amounts.get(i));
@@ -81,7 +82,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     let newDesc = "";
     for (let i = 0; i < 9; i++) newDesc += `${desc[i]}\n`;
     let amount = 0;
-    for (let i = 9; i < desc.length; i++) amount += Number(desc[i].split(" ($")[1].split(")")[0].replaceAll(",", ""));
+    for (let i = 9; i < desc.length; i++)
+      amount += Number(desc[i].split(" ($")[1].split(")")[0].replaceAll(",", ""));
     newDesc += `*${desc.length - 9} more ($${amount.toLocaleString()})*`;
     embed.addField("items to be sold", newDesc);
   }
@@ -104,7 +106,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     })
     .catch(async () => {
       embed.setDescription("❌ expired");
-      embed.disableFooter(); 
+      embed.disableFooter();
       embed.setFields();
       await msg.edit({ embeds: [embed], components: [] });
       addExpiry(cmd.name, message.member, 30);
