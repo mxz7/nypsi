@@ -17,6 +17,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { KarmaShopItem } from "../types/Karmashop";
 import Constants from "../utils/Constants";
 import { addProgress } from "../utils/functions/economy/achievements";
+import { addToGuildXP, getGuildName } from "../utils/functions/economy/guilds";
 import { addInventoryItem } from "../utils/functions/economy/inventory";
 import { getPrestige } from "../utils/functions/economy/prestige";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
@@ -350,6 +351,7 @@ async function run(
     await setKarmaShopItems(items);
     await redis.del(Constants.redis.nypsi.KARMA_SHOP_BUYING);
     addProgress(message.author.id, "wizard", 1);
+    const guild = await getGuildName(message.member);
 
     switch (wanted.type) {
       case "item":
@@ -358,6 +360,9 @@ async function run(
         break;
       case "xp":
         await updateXp(message.member, (await getXp(message.member)) + parseInt(wanted.value));
+        if (guild) {
+          await addToGuildXP(guild, parseInt(wanted.value), message.member);
+        }
         break;
     }
 
