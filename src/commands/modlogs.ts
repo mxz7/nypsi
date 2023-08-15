@@ -113,12 +113,13 @@ async function run(
         name: "nypsi",
         avatar: "https://i.imgur.com/r3qfA10.png",
       })
-      .catch(() => {
+      .catch((e) => {
         fail = true;
         message.channel.send({
           embeds: [
             new ErrorEmbed(
-              "i was unable to make a webhook in that channel, please check my permissions",
+              "i was unable to make a webhook in that channel, please check my permissions\n" +
+                `\`\`\`${e.rawError.message}\`\`\``,
             ),
           ],
         });
