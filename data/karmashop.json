@@ -37,29 +37,29 @@
     "emoji": "🌟",
     "id": "100xp",
     "cost": 20,
-    "items_left": 50,
+    "items_left": 100,
     "aliases": [],
     "type": "xp",
     "value": 100,
-    "limit": 5
+    "limit": 10
   },
   "1000xp": {
     "name": "1000 xp",
     "emoji": "🌟",
     "id": "1000xp",
-    "cost": 150,
-    "items_left": 15,
+    "cost": 100,
+    "items_left": 30,
     "aliases": [],
     "type": "xp",
     "value": 1000,
-    "limit": 3
+    "limit": 10
   },
   "basic_crate": {
     "name": "basic crate",
     "emoji": "📦",
     "id": "basic_crate",
     "cost": 25,
-    "items_left": 50,
+    "items_left": 75,
     "aliases": ["basic"],
     "type": "item",
     "value": "basic_crate",
@@ -70,7 +70,7 @@
     "emoji": "<:nypsi_daily_scratch:1061368847522869289>",
     "id": "karma_scratch_card",
     "cost": 50,
-    "items_left": 30,
+    "items_left": 50,
     "aliases": ["karma", "scratch"],
     "type": "item",
     "value": "karma_scratch_card",
@@ -81,7 +81,7 @@
     "emoji": "<:nypsi_legendary_scratch:1061405285245272074>",
     "id": "legendary_scratch_card",
     "cost": 500,
-    "items_left": 2,
+    "items_left": 3,
     "aliases": ["legendary"],
     "type": "item",
     "value": "legendary_scratch_card",
@@ -92,11 +92,11 @@
     "emoji": "<:xnypsi:1135923012458254416>",
     "id": "nypsi_crate",
     "cost": 300,
-    "items_left": 2,
+    "items_left": 5,
     "aliases": ["nypsi"],
     "type": "item",
     "value": "nypsi_crate",
-    "limit": 1
+    "limit": 2
   },
   "gem_crate": {
     "name": "gem crate",
