@@ -22,7 +22,7 @@ export async function getMember(guild: Guild, memberName: string): Promise<Guild
   let target: GuildMember;
   const scores: { id: string; score: number }[] = [];
 
-  if (members.size > 100) {
+  if (members.size > 2000) {
     const id = await chooseMember(members, memberName);
     target = members.get(id);
   } else {
