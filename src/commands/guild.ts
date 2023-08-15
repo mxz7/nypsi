@@ -233,7 +233,7 @@ async function run(
       embed.setHeader(
         guild.guildName,
         message.author.avatarURL(),
-        `https://nypsi.xyz/guild/${guild.guildName.replaceAll(" ", "%20")}`,
+        `https://nypsi.xyz/guild/${encodeURIComponent(guild.guildName)}`,
       );
       // embed.setDescription(guild.motd + `\n\n**bank** $${guild.balance.toLocaleString()}\n**xp** ${guild.xp.toLocaleString()}`)
       embed.setDescription(guild.motd);
