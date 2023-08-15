@@ -12,6 +12,7 @@ import {
 import { inPlaceSort } from "fast-sort";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import Constants from "../utils/Constants";
 import { getBalance, getSellMulti, updateBalance } from "../utils/functions/economy/balance";
 import { getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
@@ -70,10 +71,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   await addCooldown(cmd.name, message.member, 30);
 
-  const embed = new CustomEmbed(message.member, "are you sure you want to sell all?").setHeader(
-    "sellall confirmation",
-    message.author.avatarURL(),
-  );
+  const embed = new CustomEmbed(message.member, "are you sure you want to sell all?");
 
   const { desc, amounts, total } = await calcValues(message);
   inPlaceSort(desc).desc((i) => amounts.get(i));
@@ -90,42 +88,42 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   embed.setFooter({ text: `total: $${total.toLocaleString()}` });
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder().setCustomId("✅").setLabel("confirm").setStyle(ButtonStyle.Danger),
-    new ButtonBuilder().setCustomId("❌").setLabel("cancel").setStyle(ButtonStyle.Success),
+    new ButtonBuilder().setCustomId("✅").setLabel("confirm").setStyle(ButtonStyle.Success),
+    new ButtonBuilder().setCustomId("❌").setLabel("cancel").setStyle(ButtonStyle.Danger),
   );
 
   const msg = await send({ embeds: [embed], components: [row] });
 
   const filter = (i: Interaction) => i.user.id == message.author.id;
 
-  const reaction = await msg
-    .awaitMessageComponent({ filter, time: 15000 })
-    .then(async (collected) => {
-      await collected.deferUpdate();
-      return collected.customId;
-    })
-    .catch(async () => {
-      embed.setDescription("❌ expired");
-      embed.disableFooter();
-      embed.setFields();
-      await msg.edit({ embeds: [embed], components: [] });
-      addExpiry(cmd.name, message.member, 30);
-    });
-
-  if (reaction == "❌") {
-    embed.setDescription("❌ cancelled");
+  const reaction = await msg.awaitMessageComponent({ filter, time: 15000 }).catch(async () => {
+    embed.setDescription("❌ expired");
     embed.disableFooter();
     embed.setFields();
-    return msg.edit({ embeds: [embed], components: [] });
+    await msg.edit({ embeds: [embed], components: [] });
+    addExpiry(cmd.name, message.member, 30);
+  });
+
+  if (!reaction) return;
+
+  if (reaction.customId === "❌") {
+    msg.edit({ components: [] });
+    return reaction.reply({
+      embeds: [new CustomEmbed(message.member, "✅ cancelled")],
+      ephemeral: true,
+    });
   }
 
-  if (reaction == "✅") {
+  if (reaction.customId == "✅") {
+    await reaction.deferReply({ ephemeral: true });
+
     const { selected, taxedAmount, desc, amounts, total, taxEnabled, multi } = await calcValues(
       message,
     );
 
     if (selected.size == 0) {
       const embed = new ErrorEmbed("you do not have anything to sell");
+      reaction.editReply({ embeds: [new CustomEmbed(message.member, "lol nice try")] });
       return msg
         ? msg.edit({ embeds: [embed], components: [] })
         : send({ embeds: [embed], components: [] });
@@ -151,6 +149,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const embed = new CustomEmbed(message.member);
 
     embed.setDescription(`+$**${total.toLocaleString()}**`);
+
+    reaction.editReply({
+      embeds: [
+        new CustomEmbed(null, `+$**${total.toLocaleString()}**`).setColor(
+          Constants.EMBED_SUCCESS_COLOR,
+        ),
+      ],
+    });
 
     const footer: string[] = [];
 
