@@ -185,7 +185,9 @@ export function runLogs() {
     }
 
     if (modLogCount > 0) {
-      logger.info(`::auto ${modLogCount.toLocaleString()} modlog${modLogCount != 1 ? "s" : ""} sent`);
+      logger.info(
+        `::auto ${modLogCount.toLocaleString()} modlog${modLogCount != 1 ? "s" : ""} sent`,
+      );
     }
   }, 2500);
 }
