@@ -232,10 +232,12 @@ async function doMine(
 
   chosenArea = choseArea();
 
+  const user = await message.client.users.fetch(message.member.user.id);
+
   const embed = new CustomEmbed(
     member,
     `you go to the ${chosenArea} and swing your **${items[pickaxe].name}**`,
-  );
+  ).setHeader(user.username, user.avatarURL(), `https://nypsi.xyz/user/${user.id}`);
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder().setCustomId("mine").setLabel("mine").setStyle(ButtonStyle.Success),
