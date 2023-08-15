@@ -76,5 +76,11 @@
     "name": "omega",
     "description": "found in the omega crate",
     "emoji": "<:nypsi_omega:1139279162276855890>"
+  },
+  "karma": {
+    "id": "karma",
+    "name": "karma",
+    "description": "found in the karma scratch card",
+    "emoji": "🔮"
   }
 }
