@@ -779,7 +779,7 @@ async function run(
     const embed = new CustomEmbed(message.member).setHeader(
       `${guild.guildName} stats`,
       message.author.avatarURL(),
-      `https://nypsi.xyz/guild/${guild.guildName}`,
+      `https://nypsi.xyz/guild/${encodeURIComponent(guild.guildName)}`,
     );
 
     let desc = "";
