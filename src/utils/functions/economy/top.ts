@@ -1393,7 +1393,7 @@ export async function topCommandGlobal(command: string, userId: string) {
 }
 
 function formatUsername(id: string, username: string, privacy: boolean, tag?: string) {
-  if (!privacy) return "**[hidden]**";
+  if (!privacy) return "[**[hidden]**](https://docs.nypsi.xyz/economy/hidden)";
 
   let out = `[${username}](https://nypsi.xyz/user/${encodeURIComponent(id)})`;
 
