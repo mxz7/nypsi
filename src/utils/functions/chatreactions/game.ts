@@ -132,12 +132,15 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel) 
     switch (winnersList.length) {
       case 1:
         await addWin(guild, message.member);
+        message.react("🥇");
         break;
       case 2:
         await add2ndPlace(guild, message.member);
+        message.react("🥈");
         break;
       case 3:
         await add3rdPlace(guild, message.member);
+        message.react("🥉");
         break;
     }
 
@@ -262,6 +265,8 @@ export async function startChatReactionDuel(
     await updateBalance(target, (await getBalance(target)) + wager);
     return null;
   }
+
+  winningMessage.react("🏆");
 
   const winTime = ((performance.now() - start) / 1000).toFixed(2);
   let winnings = wager * 2;
