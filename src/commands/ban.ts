@@ -1,18 +1,21 @@
 import {
   BaseMessageOptions,
   CommandInteraction,
+  GuildMember,
   InteractionReplyOptions,
   Message,
   PermissionFlagsBits,
-  User,
 } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
 import { getExactMember } from "../utils/functions/member";
-import { newBan } from "../utils/functions/moderation/ban";
+import { isBanned, newBan } from "../utils/functions/moderation/ban";
 import { newCase } from "../utils/functions/moderation/cases";
 import { createProfile, profileExists } from "../utils/functions/moderation/utils";
+import { getAlts, getMainAccount, isAlt } from "../utils/functions/moderation/alts";
+import { logger } from "../utils/logger";
+import { isAltPunish } from "../utils/functions/guilds/altpunish";
 
 const cmd = new Command(
   "ban",
@@ -93,14 +96,24 @@ async function run(
     return send({ embeds: [embed] });
   }
 
-  const target = await getExactMember(message.guild, args[0]);
+  let target = await getExactMember(message.guild, args[0]);
   let mode: "target" | "id" = "target";
   let userId: string;
+
+  const punishAlts = await isAltPunish(message.guild);
+
+  let alts = await getAlts(message.guild, target.user.id).catch(() => []);
 
   if (!target) {
     if (args[0].match(Constants.SNOWFLAKE_REGEX)) {
       mode = "id";
       userId = args[0];
+      alts = await getAlts(message.guild, args[0]);
+    }
+  } else if (punishAlts) {
+    if (await isAlt(message.guild, target.user.id)) {
+      target = await getExactMember(message.guild, await getMainAccount(message.guild, target.user.id));
+      alts = await getAlts(message.guild, target.user.id).catch(() => []);
     }
   }
 
@@ -133,7 +146,7 @@ async function run(
   let idUser: string;
 
   if (mode === "id") {
-    await message.guild.members
+    /*await message.guild.members
       .ban(userId, {
         reason: reason,
       })
@@ -151,7 +164,7 @@ async function run(
         return send({
           embeds: [new ErrorEmbed(`failed to ban: \`${userId}\``)],
         });
-      });
+      });*/logger.debug(`"banned" ${userId}`);
   } else {
     const targetHighestRole = target.roles.highest.position;
     const memberHighestRole = message.member.roles.highest.position;
@@ -168,7 +181,7 @@ async function run(
     }
 
     await message.guild.members
-      .ban(target, {
+      /*.ban(target, {
         reason: reason,
       })
       .catch(() => {
@@ -176,7 +189,8 @@ async function run(
         return send({
           embeds: [new ErrorEmbed(`unable to ban ${target.toString()}`)],
         });
-      });
+      });*/
+      logger.debug(`"banned" ${target.user.id}`);
   }
 
   if (fail) return;
@@ -187,12 +201,10 @@ async function run(
 
   const embed = new CustomEmbed(message.member);
 
-  let msg = "";
+  let msg = `✅ \`${mode == "id" ? idUser : target.user.username}\` has been banned`;
 
-  if (mode === "id") {
-    msg = `✅ \`${idUser}\` has been banned`;
-  } else {
-    msg = `✅ \`${target.user.username}\` has been banned`;
+  if (alts.length > 0 && punishAlts) {
+    msg = `✅ \`${mode == "id" ? idUser : target.user.username}\` + ${alts.length} ${alts.length != 1 ? "alts have" : "alt has"} been banned`;
   }
 
   if (temporary) {
@@ -213,6 +225,58 @@ async function run(
   } else {
     await send({ embeds: [embed] });
   }
+
+  
+  await doBan(message, target, reason, args, mode, temporary, banLength, unbanDate, userId);
+
+  if (!punishAlts) return;
+
+  for (const id of alts) {
+    if (!isBanned(message.guild, id.userId)) await doBan(message, await getExactMember(message.guild, id.userId), reason, args, "target", temporary, banLength, unbanDate, id.userId, true);
+  }
+}
+
+async function doBan(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  target: GuildMember,
+  reason: string,
+  args: string[],
+  mode: string,
+  temporary: boolean,
+  banLength: string,
+  unbanDate: Date,
+  userId: string,
+  isAlt?: boolean,
+) {
+  let fail = false
+  if (isAlt) {
+    try {
+      reason += " (alt)";
+      if (mode === "id") {
+        /*await message.guild.members
+          .ban(userId, {
+            reason: reason,
+          });*/logger.debug(`"banned" ${userId}`);
+      } else {
+        const targetHighestRole = target.roles.highest.position;
+        const memberHighestRole = message.member.roles.highest.position;
+    
+        if (targetHighestRole >= memberHighestRole && message.author.id !== message.guild.ownerId) {
+          return;
+        }
+    
+        if (target.user.id == message.client.user.id) return;
+    /*
+        await message.guild.members
+          .ban(target, {
+            reason: reason,
+          });*/logger.debug(`"banned" ${target.user.id}`);
+      }
+    } catch {
+      fail = true;
+    }
+  }
+  if (fail) return;
 
   let storeReason = reason.split(": ")[1];
   if (temporary) {

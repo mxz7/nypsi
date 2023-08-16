@@ -41,6 +41,7 @@ import {
 } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import ms = require("ms");
+import { setAltPunish } from "../utils/functions/guilds/altpunish";
 
 const cmd = new Command("settings", "manage nypsi settings for your server and you", "utility");
 
@@ -102,6 +103,14 @@ cmd.slashData
         slashonly
           .setName("slash-only")
           .setDescription("set the server to only use slash commands")
+          .addBooleanOption((option) =>
+            option.setName("value").setDescription("yes/no").setRequired(true),
+          ),
+      )
+      .addSubcommand((altpunish) =>
+        altpunish
+          .setName("alt-punish")
+          .setDescription("automatically punish a user's alts set with $alts when punished")
           .addBooleanOption((option) =>
             option.setName("value").setDescription("yes/no").setRequired(true),
           ),
@@ -716,6 +725,33 @@ async function run(
     });
   };
 
+  const altPunish = async () => {
+    if (message.author.id != message.guild.ownerId) {
+      return send({ embeds: [new ErrorEmbed("you must be the server owner to do this")] });
+    }
+
+    if (message instanceof Message) {
+      return await send({ embeds: [new ErrorEmbed("please use /settings server alt-punish")] });
+    }
+
+    if (!message.isChatInputCommand()) return;
+
+    await setAltPunish(message.guild, message.options.getBoolean("value"));
+
+    return await send({
+      embeds: [
+        new CustomEmbed(
+          message.member,
+          `✅ ${
+            message.options.getBoolean("value")
+              ? "alts will be automatically punished as a group\n\n[more info](https://docs.nypsi.xyz/moderation/alt-punish)"
+              : "alts will not be automatically punished as a group\n\n[more info](https://docs.nypsi.xyz/moderation/alt-punish)"
+          }`,
+        ),
+      ],
+    });
+  };
+
   const setLastFm = async () => {
     if (args.length == 2) {
       const embed = new CustomEmbed(message.member);
@@ -920,6 +956,9 @@ async function run(
   } else if (args[0].toLowerCase() == "server") {
     if (args[1].toLowerCase() == "slash-only") {
       return slashOnly();
+    }
+    if (args[1].toLowerCase() == "alt-punish") {
+      return altPunish();
     }
   }
 }
