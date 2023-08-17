@@ -1,13 +1,8 @@
 import {
-  ActionRowBuilder,
   BaseMessageOptions,
-  ButtonBuilder,
-  ButtonInteraction,
-  ButtonStyle,
   CommandInteraction,
   InteractionReplyOptions,
   Message,
-  MessageActionRowComponentBuilder,
 } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
@@ -27,20 +22,24 @@ import { calcEarnedHFMXp, getXp, updateXp } from "../utils/functions/economy/xp"
 import { percentChance } from "../utils/functions/random";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command("fish", "go to a pond and fish", "money");
+const areas = [
+  "lake",
+  "pond",
+  "sea",
+  "ocean",
+  "river",
+  "well",
+  "well",
+  "waterfall",
+];
+
+const cmd = new Command("fish", "go to a pond and fish", "money"
+
 
 cmd.slashEnabled = true;
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-  doFish(message);
-}
-
-async function doFish(
-  message: Message | (NypsiCommandInteraction & CommandInteraction) | ButtonInteraction,
-) {
-  const member = await message.guild.members.fetch(message.member.user.id);
-
-  if (!(await userExists(member))) await createUser(member);
+  if (!(await userExists(message.member))) await createUser(message.member);
 
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
@@ -72,13 +71,13 @@ async function doFish(
     }
   };
 
-  if (await onCooldown(cmd.name, member)) {
-    const embed = await getResponse(cmd.name, member);
+  if (await onCooldown(cmd.name, message.member)) {
+    const embed = await getResponse(cmd.name, message.member);
 
     return send({ embeds: [embed], ephemeral: true });
   }
 
-  const inventory = await getInventory(member);
+  const inventory = await getInventory(message.member);
   const items = getItems();
 
   let fishingRod: string;
@@ -107,11 +106,10 @@ async function doFish(
           "you need a fishing rod to fish\n[how do i get a fishing rod?](https://docs.nypsi.xyz/economy/fishinghunting)",
         ),
       ],
-      ephemeral: true,
     });
   }
 
-  await addCooldown(cmd.name, member, 120);
+  await addCooldown(cmd.name, message.member, 120);
 
   const fishItems = [
     "nothing",
@@ -159,15 +157,19 @@ async function doFish(
         "ancient_debris",
         "netherite_scrap",
         "netherite_ingot",
+        "treasure_chest",
       ].includes(items[i].id)
     )
       continue;
+     
+     if (items[i].id == "treasure_chest" && chosenArea != "lake") continue;
+    }
     fishItems.push(i);
 
     if (items[i].role === "fish") fishItems.push(i);
   }
 
-  await addStat(member, fishingRod);
+  await addStat(message.member, fishingRod);
 
   let times = 1;
 
@@ -176,8 +178,34 @@ async function doFish(
   } else if (fishingRod == "incredible_fishing_rod") {
     times = 3;
   }
+   if (items[i].rarity == 4) {
+          const chance = Math.floor(Math.random() * 3);
+          if (chance == 1 && fishingRod == "incredible_fishing_rod") {
+            for (let x = 0; x < 10; x++) {
+              mineItemsModified.push(i);
+            }
+          }
+        } else if (items[i].rarity == 3) {
+          if (fishingRod == "terrible_fishing_rod" && items[i].id != "treasure_chest") continue;
 
-  const boosters = await getBoosters(member);
+          if (items[i].id == "treasure_chest") {
+            for (let x = 0; x < 3; x++) {
+              mineItemsModified.push(i);
+            }
+          } else {
+            for (let x = 0; x < 10; x++) {
+              mineItemsModified.push(i);
+            }
+          }
+        } else if (items[i].rarity == 2 && fishingRod != "terrible_fishing_rod") {
+          for (let x = 0; x < 15; x++) {
+            mineItemsModified.push(i);
+          }
+        } else if (items[i].rarity == 1 && fishingRod != "terrible_fishing_rod") {
+          for (let x = 0; x < 20; x++) {
+            mineItemsModified.push(i);
+
+  const boosters = await getBoosters(message.member);
 
   let unbreaking = false;
 
@@ -193,13 +221,13 @@ async function doFish(
 
   if (inventory.find((i) => i.item === "purple_gem")?.amount > 0) {
     if (percentChance(0.2)) {
-      gemBreak(message.member.user.id, 0.07, "purple_gem");
+      gemBreak(message.author.id, 0.07, "purple_gem");
       times++;
     }
   }
   if (inventory.find((i) => i.item === "white_gem")?.amount > 0) {
     if (percentChance(0.2)) {
-      gemBreak(message.member.user.id, 0.07, "white_gem");
+      gemBreak(message.author.id, 0.07, "white_gem");
       times++;
     }
   }
@@ -211,25 +239,19 @@ async function doFish(
 
   if (!unbreaking) {
     await setInventoryItem(
-      member,
+      message.member,
       fishingRod,
       inventory.find((i) => i.item == fishingRod).amount - 1,
       false,
     );
   }
 
-  const user = await message.client.users.fetch(message.member.user.id);
-
   const embed = new CustomEmbed(
-    member,
+    message.member,
     `you go to the pond and cast your **${items[fishingRod].name}**`,
-  ).setHeader(user.username, user.avatarURL(), `https://nypsi.xyz/user/${user.id}`);
-
-  const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder().setCustomId("fish").setLabel("fish").setStyle(ButtonStyle.Success),
   );
 
-  const msg = await send({ embeds: [embed], components: [row] });
+  const msg = await send({ embeds: [embed] });
 
   const foundItems = new Map<string, number>();
 
@@ -313,7 +335,7 @@ async function doFish(
       if (chosen.includes("money:")) {
         const amount = parseInt(chosen.substring(6));
 
-        await updateBalance(member, (await getBalance(member)) + amount);
+        await updateBalance(message.member, (await getBalance(message.member)) + amount);
         foundItems.set(
           "money",
           foundItems.has("money") ? foundItems.get("money") + amount : amount,
@@ -321,7 +343,7 @@ async function doFish(
       } else if (chosen.includes("xp:")) {
         const amount = parseInt(chosen.substring(3));
 
-        await updateXp(member, (await getXp(member)) + amount);
+        await updateXp(message.member, (await getXp(message.member)) + amount);
         foundItems.set("xp", foundItems.has("xp") ? foundItems.get("xp") + amount : amount);
       }
     } else if (items[chosen]?.role == "fish") {
@@ -335,7 +357,7 @@ async function doFish(
         amount = Math.floor(Math.random() * 3) + 1;
       }
 
-      await addInventoryItem(member, chosen, amount);
+      await addInventoryItem(message.member, chosen, amount);
 
       foundItems.set(chosen, foundItems.has(chosen) ? foundItems.get(chosen) + amount : amount);
     } else {
@@ -349,7 +371,7 @@ async function doFish(
         amount = 10;
       }
 
-      await addInventoryItem(member, chosen, amount);
+      await addInventoryItem(message.member, chosen, amount);
 
       foundItems.set(chosen, foundItems.has(chosen) ? foundItems.get(chosen) + amount : amount);
     }
@@ -359,18 +381,18 @@ async function doFish(
     .map((i) => (["money", "xp"].includes(i[0]) ? 0 : i[1]))
     .reduce((a, b) => a + b);
 
-  const earnedXp = await calcEarnedHFMXp(member, total);
+  const earnedXp = await calcEarnedHFMXp(message.member, total);
 
   if (earnedXp > 0) {
     embed.setFooter({
       text: `+${foundItems.has("xp") ? foundItems.get("xp") + earnedXp : earnedXp}xp`,
     });
-    await updateXp(member, (await getXp(member)) + earnedXp);
+    await updateXp(message.member, (await getXp(message.member)) + earnedXp);
 
-    const guild = await getGuildName(member);
+    const guild = await getGuildName(message.member);
 
     if (guild) {
-      await addToGuildXP(guild, earnedXp, member);
+      await addToGuildXP(guild, earnedXp, message.member);
     }
   }
 
@@ -385,10 +407,10 @@ async function doFish(
   );
 
   setTimeout(() => {
-    msg.edit({ embeds: [embed], components: [row] });
+    msg.edit({ embeds: [embed] });
   }, 1500);
 
-  addProgress(message.member.user.id, "fisher", total);
+  addProgress(message.author.id, "fisher", total);
 }
 
 cmd.setRun(run);
