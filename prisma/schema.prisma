@@ -513,8 +513,8 @@ model ModerationCase {
 model Alt {
   guildId   String
   mainId    String
-  userId    String
-  @@id([userId, guildId])
+  altId     String
+  @@id([altId, guildId])
 }
 
 model ChatReaction {

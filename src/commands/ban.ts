@@ -15,7 +15,6 @@ import { isBanned, newBan } from "../utils/functions/moderation/ban";
 import { newCase } from "../utils/functions/moderation/cases";
 import { createProfile, profileExists } from "../utils/functions/moderation/utils";
 import { getAlts, getMainAccount, isAlt } from "../utils/functions/moderation/alts";
-import { logger } from "../utils/logger";
 import { isAltPunish } from "../utils/functions/guilds/altpunish";
 
 const cmd = new Command(
@@ -236,17 +235,17 @@ async function run(
   if (!punishAlts) return;
 
   for (const id of alts) {
-    if (!isBanned(message.guild, id.userId))
+    if (!await isBanned(message.guild, id.altId))
       await doBan(
         message,
-        await getExactMember(message.guild, id.userId),
+        await getExactMember(message.guild, id.altId),
         reason,
         args,
         "target",
         temporary,
         banLength,
         unbanDate,
-        id.userId,
+        id.altId,
         true,
       );
   }

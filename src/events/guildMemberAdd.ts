@@ -109,7 +109,7 @@ export default async function guildMemberAdd(member: GuildMember) {
     (await isBanned(member.guild, await getMainAccount(member.guild, member.user.id)))
   ) {
     const mainId = await getMainAccount(member.guild, member.user.id);
-    const query = await prisma.moderationBan.findMany({
+    const query = await prisma.moderationBan.findFirst({
       where: {
         guildId: member.guild.id,
         userId: mainId,
@@ -119,9 +119,11 @@ export default async function guildMemberAdd(member: GuildMember) {
       },
     });
 
-    if (query.length != 1) return;
+    let fail = false;
 
-    const expire = query[0].expire;
+    await member.ban({ reason: `alt of banned ${mainId} joined` }).catch(() => fail = true);
+
+    if (fail) return;
 
     await newCase(
       member.guild,
@@ -131,9 +133,8 @@ export default async function guildMemberAdd(member: GuildMember) {
       `alt of banned \`${mainId}\` joined`,
     );
 
-    await newBan(member.guild, [member.user.id], expire);
+    await newBan(member.guild, [member.user.id], query.expire);
 
-    await member.ban({ reason: `alt of banned ${mainId} joined` }).catch(() => {});
     return;
   }
 
@@ -147,7 +148,7 @@ export default async function guildMemberAdd(member: GuildMember) {
     (await isMuted(member.guild, await getMainAccount(member.guild, member.user.id)))
   ) {
     const mainId = await getMainAccount(member.guild, member.user.id);
-    const query = await prisma.moderationMute.findMany({
+    const query = await prisma.moderationMute.findFirst({
       where: {
         guildId: member.guild.id,
         userId: mainId,
@@ -156,10 +157,6 @@ export default async function guildMemberAdd(member: GuildMember) {
         expire: true,
       },
     });
-
-    if (query.length != 1) return;
-
-    const expire = query[0].expire;
 
     await newCase(
       member.guild,
@@ -173,7 +170,7 @@ export default async function guildMemberAdd(member: GuildMember) {
       await deleteMute(member.guild, member);
     }
 
-    await newMute(member.guild, [member.user.id], expire);
+    await newMute(member.guild, [member.user.id], query.expire);
 
     altPunish = true;
   }

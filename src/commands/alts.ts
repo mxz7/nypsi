@@ -88,6 +88,7 @@ async function run(
   if (args.length == 0) {
     const embed = new CustomEmbed(message.member)
       .setHeader("alts help")
+      .addField("info", "keep track of a user's alts in one easy place\n\nalts of a user can be automatically punished with their main\naccount when one is punished (/settings server alt-punish)\n[more info](https://docs.nypsi.xyz/moderation/alt-punish)")
       .addField("usage", `${prefix}alts @user\n${prefix}alts <user ID or tag>`);
 
     return send({ embeds: [embed] });
@@ -97,17 +98,11 @@ async function run(
 
   let member = (await getMember(message.guild, args.join(" "))) || args[0];
 
-  let alts = await getAlts(
-    message.guild,
-    member instanceof GuildMember ? member.user.id : member,
-  ).catch(() => []);
-
   if (await isAlt(message.guild, member instanceof GuildMember ? member.user.id : member)) {
     member = await getMember(
       message.guild,
       await getMainAccount(message.guild, member instanceof GuildMember ? member.user.id : member),
     );
-    alts = await getAlts(message.guild, member.user.id).catch(() => []);
   }
 
   await addCooldown(cmd.name, message.member, 7);
@@ -156,7 +151,7 @@ async function run(
         msg.content,
       );
 
-      if (addAltRes) await res.editReply({ embeds: [new CustomEmbed(message.member, "✅")] });
+      if (addAltRes) await res.editReply({ embeds: [new CustomEmbed(message.member, `✅ added \`${msg.content}\` as an alt for ${member instanceof GuildMember ? member.user.username : `\`${member}\``}`)] });
       else
         await res.editReply({
           embeds: [
@@ -203,7 +198,7 @@ async function run(
       }
 
       await deleteAlt(message.guild, msg.content);
-      await res.editReply({ embeds: [new CustomEmbed(message.member, "✅")] });
+      await res.editReply({ embeds: [new CustomEmbed(message.member, `✅ removed \`${msg.content}\` as an alt for ${member instanceof GuildMember ? member.user.username : `\`${member}\``}`)] });
       await altMsg.edit({
         embeds: [await getEmbed(message, member)],
         components: [await getRow(message, member)],
@@ -235,10 +230,10 @@ async function getEmbed(
     for (const alt of alts) {
       altList.push(
         `${
-          (await getLastKnownUsername(alt.userId))
-            ? (await getLastKnownUsername(alt.userId)) + " "
+          (await getLastKnownUsername(alt.altId))
+            ? (await getLastKnownUsername(alt.altId)) + " "
             : ""
-        }\`${alt.userId}\``,
+        }\`${alt.altId}\``,
       );
     }
     embed.setDescription(altList.join("\n"));

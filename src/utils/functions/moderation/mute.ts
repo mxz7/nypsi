@@ -1,270 +1,429 @@
-import { Guild, GuildMember, Role } from "discord.js";
-import prisma from "../../../init/database";
-import { NypsiClient } from "../../../models/Client";
-import { unmuteTimeouts } from "../../../scheduled/clusterjobs/moderationchecks";
-import { logger } from "../../logger";
-import sleep from "../sleep";
-import { createProfile, profileExists } from "./utils";
-import ms = require("ms");
+import {
+  BaseMessageOptions,
+  CommandInteraction,
+  GuildMember,
+  InteractionReplyOptions,
+  Message,
+  PermissionFlagsBits,
+  User,
+} from "discord.js";
+import { Command, NypsiCommandInteraction } from "../models/Command";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
+import Constants from "../utils/Constants";
+import { getExactMember } from "../utils/functions/member";
+import { isBanned, newBan } from "../utils/functions/moderation/ban";
+import { newCase } from "../utils/functions/moderation/cases";
+import { createProfile, profileExists } from "../utils/functions/moderation/utils";
+import { getAlts, getMainAccount, isAlt } from "../utils/functions/moderation/alts";
+import { isAltPunish } from "../utils/functions/guilds/altpunish";
 
-const muteRoleCache = new Map<string, string>();
-const autoMuteLevelCache = new Map<string, number[]>();
+const cmd = new Command(
+  "ban",
+  "ban one or more users from the server",
+  "moderation",
+).setPermissions(["BAN_MEMBERS"]);
 
-export const violations = new Map<string, Map<string, { vl: number; startedAt: number }>>();
+cmd.slashEnabled = true;
+cmd.slashData
+  .addUserOption((option) =>
+    option.setName("user").setDescription("member to ban from the server").setRequired(true),
+  )
+  .addStringOption((option) =>
+    option.setName("reason").setDescription("reason for the ban").setRequired(false),
+  );
 
-export function startAutoMuteViolationInterval() {
-  setInterval(async () => {
-    for (const guildId of violations.keys()) {
-      for (const [userId, userVl] of violations.get(guildId).entries()) {
-        if (userVl.startedAt < Date.now() - ms("1 hour")) violations.get(guildId).delete(userId);
-        await sleep(5);
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[],
+) {
+  const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
+    if (!(message instanceof Message)) {
+      let usedNewMessage = false;
+      let res;
+
+      if (message.deferred) {
+        res = await message.editReply(data).catch(async () => {
+          usedNewMessage = true;
+          return await message.channel.send(data as BaseMessageOptions);
+        });
+      } else {
+        res = await message.reply(data as InteractionReplyOptions).catch(() => {
+          return message.editReply(data).catch(async () => {
+            usedNewMessage = true;
+            return await message.channel.send(data as BaseMessageOptions);
+          });
+        });
       }
-      await sleep(50);
-    }
-  }, ms("1 hour"));
-}
 
-export async function newMute(guild: Guild, userIDs: string[], date: Date) {
-  if (!(userIDs instanceof Array)) {
-    userIDs = [userIDs];
+      if (usedNewMessage && res instanceof Message) return res;
+
+      const replyMsg = await message.fetchReply();
+      if (replyMsg instanceof Message) {
+        return replyMsg;
+      }
+    } else {
+      return await message.channel.send(data as BaseMessageOptions);
+    }
+  };
+
+  if (!message.member.permissions.has(PermissionFlagsBits.BanMembers)) {
+    if (message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
+      return send({ embeds: [new ErrorEmbed("you need the `ban members` permission")] });
+    }
+    return;
   }
-  for (const userID of userIDs) {
-    await prisma.moderationMute.create({
-      data: {
-        userId: userID,
-        expire: date,
-        guildId: guild.id,
-      },
+
+  if (!message.guild.members.me.permissions.has(PermissionFlagsBits.BanMembers)) {
+    return send({
+      embeds: [new ErrorEmbed("i need the `ban members` permission for this command to work")],
     });
   }
 
-  if (date.getTime() - Date.now() < ms("2 minutes")) {
-    for (const userId of userIDs) {
-      if (unmuteTimeouts.has(`${guild.id}_${userId}`)) continue;
-      unmuteTimeouts.add(`${guild.id}_${userId}`);
-      setTimeout(() => {
-        logger.info(`::auto requesting unmute in ${guild.id} for ${userId}`);
-        requestUnmute(guild.id, userId, guild.client as NypsiClient);
-      }, date.getTime() - Date.now());
+  if (!(await profileExists(message.guild))) await createProfile(message.guild);
+
+  if (args.length == 0 || !args[0]) {
+    const embed = new CustomEmbed(message.member)
+      .setHeader("ban help")
+      .addField("usage", "/ban <user> (reason) [-s]")
+      .addField(
+        "help",
+        "**<>** required | **()** optional | **[]** parameter\n" +
+          "**<user>** you can either tag the user or use their username\n" +
+          "**(reason)** reason for the ban, will be given to all banned members\n" +
+          "**[-s]** if used, command message will be deleted and the output will be sent to moderator as a DM if possible",
+      );
+
+    return send({ embeds: [embed] });
+  }
+
+  let target = await getExactMember(message.guild, args[0]);
+  let mode: "target" | "id" = "target";
+  let userId: string;
+
+  const punishAlts = await isAltPunish(message.guild);
+
+  let alts = await getAlts(message.guild, target.user.id).catch(() => []);
+
+  if (!target) {
+    if (args[0].match(Constants.SNOWFLAKE_REGEX)) {
+      mode = "id";
+      userId = args[0];
+      alts = await getAlts(message.guild, args[0]);
+    }
+  } else if (punishAlts) {
+    if (await isAlt(message.guild, target.user.id)) {
+      target = await getExactMember(
+        message.guild,
+        await getMainAccount(message.guild, target.user.id),
+      );
+      alts = await getAlts(message.guild, target.user.id).catch(() => []);
     }
   }
-}
 
-export async function isMuted(guild: Guild, member: GuildMember | string) {
-  const query = await prisma.moderationMute.findFirst({
-    where: {
-      AND: [
-        { guildId: guild.id },
-        { userId: typeof member == "string" ? member : (member as GuildMember).user.id },
-      ],
-    },
-    select: {
-      userId: true,
-    },
-  });
+  if (!target && !userId) return send({ embeds: [new ErrorEmbed("invalid user")] });
 
-  if (query) {
-    return true;
+  let reason = message.author.username + ": ";
+  let unbanDate: Date;
+  let temporary = false;
+  let duration;
+
+  if (args.length > 1) {
+    try {
+      duration = getDuration(args[1].toLowerCase());
+      unbanDate = new Date(Date.now() + duration * 1000);
+    } catch {
+      // eslint happy
+    }
+
+    if (duration) {
+      temporary = true;
+      args.shift();
+    }
+
+    reason = reason + args.slice(1).join(" ");
   } else {
-    return false;
-  }
-}
-
-export async function getMuteRole(guild: Guild | string) {
-  let guildId: string;
-  if (guild instanceof Guild) {
-    guildId = guild.id;
-  } else {
-    guildId = guild;
+    reason = reason + "no reason given";
   }
 
-  if (muteRoleCache.has(guildId)) return muteRoleCache.get(guildId);
+  let fail = false;
+  let idUser: string;
 
-  const query = await prisma.moderation.findUnique({
-    where: {
-      guildId: guildId,
-    },
-    select: {
-      muteRole: true,
-    },
-  });
-
-  if (query.muteRole == "") {
-    muteRoleCache.set(guildId, undefined);
-    return undefined;
-  } else {
-    muteRoleCache.set(guildId, query.muteRole);
-    return query.muteRole;
-  }
-}
-
-export async function setMuteRole(guild: Guild, role: Role | string) {
-  let id: string;
-
-  if (role instanceof Role) {
-    id = role.id;
-  } else {
-    id = role;
-  }
-
-  if (muteRoleCache.has(guild.id)) muteRoleCache.delete(guild.id);
-
-  await prisma.moderation.update({
-    where: {
-      guildId: guild.id,
-    },
-    data: {
-      muteRole: id,
-    },
-  });
-}
-
-export async function requestUnmute(guildId: string, member: string, client: NypsiClient) {
-  unmuteTimeouts.delete(`${guildId}_${member}`);
-  const muteRoleId = await getMuteRole(guildId);
-
-  await client.cluster.broadcastEval(
-    async (c, { guildId, memberId, muteRoleId }) => {
-      const guild = c.guilds.cache.get(guildId);
-
-      if (!guild) return "guild";
-
-      const member = await guild.members.fetch(memberId).catch(() => {});
-
-      if (!member) return "member";
-
-      let role = muteRoleId;
-
-      try {
-        if (muteRoleId == "" || muteRoleId == "default" || !muteRoleId) {
-          role = guild.roles.cache.find((r) => r.name.toLowerCase() == "muted").id;
+  if (mode === "id") {
+    await message.guild.members
+      .ban(userId, {
+        reason: reason,
+      })
+      .then((banned) => {
+        if (typeof banned == "string") {
+          idUser = banned;
+        } else if (banned instanceof User) {
+          idUser = `${banned.username}`;
         } else {
-          role = guild.roles.cache.get(muteRoleId).id;
+          idUser = `${banned.user.username}`;
         }
-      } catch {
-        return "role";
-      }
-
-      // return guild.roles.cache.find((r) => r.name.toLowerCase() == "muted");
-      // return role;
-
-      let fail = false;
-      await member.roles.remove(role, "mute expired").catch(() => {
+      })
+      .catch(() => {
         fail = true;
+        return send({
+          embeds: [new ErrorEmbed(`failed to ban: \`${userId}\``)],
+        });
       });
-      if (fail) return "role";
-      return true;
-    },
-    {
-      context: { guildId: guildId, memberId: member, muteRoleId: muteRoleId },
-    },
-  );
-
-  await deleteMute(guildId, member);
-}
-
-export async function getMutedUsers(guild: Guild) {
-  const query = await prisma.moderationMute.findMany({
-    where: {
-      guildId: guild.id,
-    },
-  });
-
-  return query;
-}
-
-export async function deleteMute(guild: Guild | string, member: GuildMember | string) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.id;
   } else {
-    id = member;
+    const targetHighestRole = target.roles.highest.position;
+    const memberHighestRole = message.member.roles.highest.position;
+
+    if (targetHighestRole >= memberHighestRole && message.author.id !== message.guild.ownerId) {
+      return send({
+        embeds: [new ErrorEmbed(`your role is not high enough to punish ${target.toString()}`)],
+      });
+    }
+
+    if (target.user.id == message.client.user.id) {
+      await send({ content: "NICE TRY LOSER CANT BAN THE BEST BOT" });
+      return;
+    }
+
+    await message.guild.members
+      .ban(target, {
+        reason: reason,
+      })
+      .catch(() => {
+        fail = true;
+        return send({
+          embeds: [new ErrorEmbed(`unable to ban ${target.toString()}`)],
+        });
+      });
   }
 
-  let guildId: string;
-  if (guild instanceof Guild) {
-    guildId = guild.id;
-  } else {
-    guildId = guild;
+  if (fail) return;
+
+  let banLength = "";
+
+  if (temporary) banLength = getTime(duration * 1000);
+
+  const embed = new CustomEmbed(message.member);
+
+  let msg = `✅ \`${mode == "id" ? idUser : target.user.username}\` has been banned`;
+
+  if (alts.length > 0 && punishAlts) {
+    msg = `✅ \`${mode == "id" ? idUser : target.user.username}\` + ${alts.length} ${
+      alts.length != 1 ? "alts have" : "alt has"
+    } been banned`;
   }
 
-  await prisma.moderationMute.deleteMany({
-    where: {
-      AND: [{ userId: id }, { guildId: guildId }],
-    },
-  });
-}
-
-export async function getAutoMuteLevels(guild: Guild) {
-  let guildId: string;
-  if (guild instanceof Guild) {
-    guildId = guild.id;
-  } else {
-    guildId = guild;
+  if (temporary) {
+    msg += ` for **${banLength}**`;
+  } else if (reason.split(": ")[1] !== "no reason given") {
+    msg += ` for **${reason.split(": ")[1]}**`;
   }
 
-  if (autoMuteLevelCache.has(guildId)) {
-    return autoMuteLevelCache.get(guildId);
-  }
+  embed.setDescription(msg);
 
-  if (!(await profileExists(guild))) await createProfile(guild);
-
-  const query = await prisma.moderation.findUnique({
-    where: {
-      guildId,
-    },
-    select: {
-      automute: true,
-    },
-  });
-
-  autoMuteLevelCache.set(guildId, query.automute);
-
-  return query.automute;
-}
-
-export async function setAutoMuteLevels(guild: Guild, levels: number[]) {
-  let guildId: string;
-  if (guild instanceof Guild) {
-    guildId = guild.id;
-  } else {
-    guildId = guild;
-  }
-
-  if (autoMuteLevelCache.has(guildId)) {
-    autoMuteLevelCache.delete(guildId);
-  }
-
-  await prisma.moderation.update({
-    where: {
-      guildId,
-    },
-    data: {
-      automute: levels,
-    },
-  });
-}
-
-export function getMuteViolations(guild: Guild, member: GuildMember) {
-  if (violations.get(guild.id)?.get(member.user.id)?.startedAt < Date.now() - ms("1 hour")) {
-    violations.get(guild.id).delete(member.user.id);
-    return 0;
-  }
-  return violations.get(guild.id)?.get(member.user.id).vl || 0;
-}
-
-export function addMuteViolation(guild: Guild, member: GuildMember) {
-  if (!violations.has(guild.id)) {
-    violations.set(guild.id, new Map([[member.user.id, { vl: 0, startedAt: Date.now() }]]));
-  } else {
-    if (violations.get(guild.id).has(member.user.id)) {
-      if (violations.get(guild.id).get(member.user.id)?.startedAt < Date.now() - ms("1 hour")) {
-        violations.get(guild.id).set(member.user.id, { vl: 0, startedAt: Date.now() });
-      } else {
-        violations.get(guild.id).get(member.user.id).vl++;
-      }
+  if (args.join(" ").includes("-s")) {
+    if (message instanceof Message) {
+      await message.delete();
+      await message.member.send({ embeds: [embed] }).catch(() => {});
     } else {
-      violations.get(guild.id).set(member.user.id, { vl: 0, startedAt: Date.now() });
+      await message.reply({ embeds: [embed], ephemeral: true });
+    }
+  } else {
+    await send({ embeds: [embed] });
+  }
+
+  await doBan(message, target, reason, args, mode, temporary, banLength, unbanDate, userId);
+
+  if (!punishAlts) return;
+
+  for (const id of alts) {
+    if (!await isBanned(message.guild, id.altId))
+      await doBan(
+        message,
+        await getExactMember(message.guild, id.altId),
+        reason,
+        args,
+        "target",
+        temporary,
+        banLength,
+        unbanDate,
+        id.altId,
+        true,
+      );
+  }
+}
+
+async function doBan(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  target: GuildMember,
+  reason: string,
+  args: string[],
+  mode: string,
+  temporary: boolean,
+  banLength: string,
+  unbanDate: Date,
+  userId: string,
+  isAlt?: boolean,
+) {
+  let fail = false;
+  if (isAlt) {
+    try {
+      reason += " (alt)";
+      if (mode === "id") {
+        await message.guild.members.ban(userId, {
+          reason: reason,
+        });
+      } else {
+        const targetHighestRole = target.roles.highest.position;
+        const memberHighestRole = message.member.roles.highest.position;
+
+        if (targetHighestRole >= memberHighestRole && message.author.id !== message.guild.ownerId) {
+          return;
+        }
+
+        if (target.user.id == message.client.user.id) return;
+
+        await message.guild.members.ban(target, {
+          reason: reason,
+        });
+      }
+    } catch {
+      fail = true;
     }
   }
+  if (fail) return;
+
+  let storeReason = reason.split(": ")[1];
+  if (temporary) {
+    storeReason = `[${banLength}] ${storeReason}`;
+  } else {
+    storeReason = `[perm] ${storeReason}`;
+  }
+
+  if (mode === "id") {
+    await newCase(message.guild, "ban", userId, message.author, storeReason);
+    if (temporary) {
+      await newBan(message.guild, userId, unbanDate);
+    }
+  } else {
+    await newCase(message.guild, "ban", target.user.id, message.author, storeReason);
+
+    if (temporary) {
+      await newBan(message.guild, target.user.id, unbanDate);
+    }
+
+    if (args.join(" ").includes("-s")) return;
+
+    if (reason.split(": ")[1] == "no reason given") {
+      await target
+        .send({
+          content: `you have been banned from ${message.guild.name}${
+            temporary ? `\n\nexpires in **${banLength}**}` : ""
+          }`,
+        })
+        .catch(() => {});
+    } else {
+      const embed = new CustomEmbed(target)
+        .setTitle(`banned from ${message.guild.name}`)
+        .addField("reason", `\`${reason.split(": ")[1]}\``, true);
+
+      if (temporary) {
+        embed.addField("length", `\`${banLength}\``, true);
+        embed.setFooter({ text: "unbanned at:" });
+        embed.setTimestamp(unbanDate);
+      }
+
+      await target
+        .send({ content: `you have been banned from ${message.guild.name}`, embeds: [embed] })
+        .catch(() => {});
+    }
+  }
+}
+
+cmd.setRun(run);
+
+module.exports = cmd;
+
+function getDuration(duration: string) {
+  duration.toLowerCase();
+
+  if (duration.includes("d")) {
+    if (!parseInt(duration.split("d")[0])) return undefined;
+
+    const num = parseInt(duration.split("d")[0]);
+
+    return num * 86400;
+  } else if (duration.includes("h")) {
+    if (!parseInt(duration.split("h")[0])) return undefined;
+
+    const num = parseInt(duration.split("h")[0]);
+
+    return num * 3600;
+  } else if (duration.includes("m")) {
+    if (!parseInt(duration.split("m")[0])) return undefined;
+
+    const num = parseInt(duration.split("m")[0]);
+
+    return num * 60;
+  } else if (duration.includes("s")) {
+    if (!parseInt(duration.split("s")[0])) return undefined;
+
+    const num = parseInt(duration.split("s")[0]);
+
+    return num;
+  }
+}
+
+function getTime(ms: number) {
+  const days = Math.floor(ms / (24 * 60 * 60 * 1000));
+  const daysms = ms % (24 * 60 * 60 * 1000);
+  const hours = Math.floor(daysms / (60 * 60 * 1000));
+  const hoursms = ms % (60 * 60 * 1000);
+  const minutes = Math.floor(hoursms / (60 * 1000));
+  const minutesms = ms % (60 * 1000);
+  const sec = Math.floor(minutesms / 1000);
+
+  let output = "";
+
+  if (days > 0) {
+    let a = " days";
+
+    if (days == 1) {
+      a = " day";
+    }
+
+    output = days + a;
+  }
+
+  if (hours > 0) {
+    let a = " hours";
+
+    if (hours == 1) {
+      a = " hour";
+    }
+
+    if (output == "") {
+      output = hours + a;
+    } else {
+      output = `${output} ${hours}${a}`;
+    }
+  }
+
+  if (minutes > 0) {
+    let a = " mins";
+
+    if (minutes == 1) {
+      a = " min";
+    }
+
+    if (output == "") {
+      output = minutes + a;
+    } else {
+      output = `${output} ${minutes}${a}`;
+    }
+  }
+
+  if (sec > 0) {
+    output = output + sec + "s";
+  }
+
+  return output;
 }

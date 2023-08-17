@@ -319,10 +319,10 @@ async function run(
   if (!punishAlts) return;
 
   for (const id of alts) {
-    if (!isMuted(message.guild, id.userId))
+    if (!isMuted(message.guild, id.altId))
       await doMute(
         message,
-        await getExactMember(message.guild, id.userId),
+        await getExactMember(message.guild, id.altId),
         reason,
         args,
         mode,
@@ -349,19 +349,31 @@ async function doMute(
 ) {
   let fail = false;
   if (isAlt) {
-    try {
-      reason += " (alt)";
+    reason += " (alt)";
+    if (mode == "role") try {
+      if (target.user.id == message.client.user.id) return;
 
-      const targetHighestRole = target.roles.highest;
-      const memberHighestRole = message.member.roles.highest;
-
-      if (
-        targetHighestRole.position >= memberHighestRole.position &&
-        message.guild.ownerId != message.author.id
-      )
-        return;
-
-      await target.roles.add(muteRole);
+      if (mode == "role") {
+        const targetHighestRole = target.roles.highest;
+        const memberHighestRole = message.member.roles.highest;
+  
+        if (
+          targetHighestRole.position >= memberHighestRole.position &&
+          message.guild.ownerId != message.author.id
+        ) return;
+        await target.roles.add(muteRole);
+      } else if (mode == "timeout") {
+    
+        const targetHighestRole = target.roles.highest;
+        const memberHighestRole = message.member.roles.highest;
+    
+        if (
+          (targetHighestRole.position >= memberHighestRole.position &&
+          message.guild.ownerId != message.author.id ) ||
+          target.isCommunicationDisabled() as boolean
+        ) return;
+        else await target.disableCommunicationUntil(unmuteDate, reason)
+      }
     } catch {
       fail = true;
     }
