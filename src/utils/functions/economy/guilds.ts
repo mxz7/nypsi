@@ -1,15 +1,28 @@
 import { EconomyGuildUpgrades } from "@prisma/client";
 import { GuildMember } from "discord.js";
+import { sort } from "fast-sort";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { GuildUpgradeRequirements } from "../../../types/Economy";
-import { NotificationPayload } from "../../../types/Notification";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { addInventoryItem } from "./inventory";
+import { getItems } from "./utils";
 import ms = require("ms");
+
+const upgrades = new Map<number, string[]>();
+
+upgrades.set(1, ["69420_crate:2"]);
+upgrades.set(2, ["69420_crate:3"]);
+upgrades.set(3, ["69420_crate:4"]);
+upgrades.set(4, ["69420_crate:5"]);
+upgrades.set(9, ["69420_crate:5", "lucky_scratch_card;1"]);
+upgrades.set(14, ["69420_crate:5", "lucky_scratch_card:2"]);
+upgrades.set(16, ["69420_crate:6", "lucky_scratch_card:2"]);
+upgrades.set(19, ["69420_crate:6", "lucky_scratch_card:3"]);
+upgrades.set(24, ["69420_crate:6", "lucky_scratch_card:3", "nypsi_crate:1"]);
 
 export async function getGuildByName(name: string) {
   const guild = await prisma.economyGuild
@@ -429,38 +442,74 @@ async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
       `${Constants.redis.cache.economy.GUILD_LEVEL}:${guild.guildName.toLowerCase()}`,
     );
 
-    const embed = new CustomEmbed().setColor(Constants.EMBED_SUCCESS_COLOR);
+    const upgradeMsg = `**${guild.guildName}** has upgraded to level **${guild.level + 1}**`;
 
-    const desc = [
-      `**${guild.guildName}** has upgraded to level **${guild.level + 1}**\n\nyou have received:`,
-    ];
+    let rewards = upgrades.get(guild.level);
 
-    let cratesEarned = Math.floor(guild.level / 1.75);
+    while (!rewards) rewards = upgrades.get(guild.level--);
 
-    if (cratesEarned < 1) cratesEarned = 1;
-    if (cratesEarned > 5) cratesEarned = 5;
-
-    desc.push(` +**${cratesEarned}** 69420 crate${cratesEarned != 1 ? "s" : ""}`);
-    desc.push(" +**1** upgrade token");
-
-    embed.setHeader(guild.guildName);
-    embed.setDescription(desc.join("\n"));
-    embed.disableFooter();
-
-    const payload: NotificationPayload = {
-      memberId: "boob",
-      payload: {
-        content: `${guild.guildName} has levelled up!`,
-        embed: embed,
-      },
-    };
+    const dms: { id: string; embed: CustomEmbed }[] = [];
 
     for (const member of guild.members) {
-      await addInventoryItem(member.userId, "69420_crate", cratesEarned, false);
+      dms.push({
+        id: member.userId,
+        embed: new CustomEmbed()
+          .setColor(Constants.EMBED_SUCCESS_COLOR)
+          .setDescription(`${upgradeMsg}`),
+      });
+    }
 
-      if ((await getDmSettings(member.userId)).other) {
-        payload.memberId = member.userId;
-        addNotificationToQueue(payload);
+    const top4Xp = sort(guild.members)
+      .desc((i) => i.contributedXp)
+      .slice(0, 4)
+      .filter((i) => i.contributedXp > 0);
+
+    const top4Money = sort(guild.members)
+      .desc((i) => i.contributedMoney)
+      .slice(0, 4)
+      .filter((i) => i.contributedMoney > 0);
+
+    for (const member of top4Xp) {
+      const desc: string[] = [];
+      for (const reward of rewards) {
+        const [itemId, amount] = reward.split(":");
+        await addInventoryItem(member.userId, itemId, parseInt(amount) || 0, false);
+        desc.push(`\`${amount}x\` ${getItems()[itemId].emoji} ${getItems()[itemId].name}`);
+      }
+
+      dms.find(
+        (i) => i.id === member.userId,
+      ).embed.data.description += `\n\nas you are a **top 4 xp** contributor you have received:\n${desc.join(
+        "\n",
+      )}`;
+    }
+
+    for (const member of top4Money) {
+      const desc: string[] = [];
+      for (const reward of rewards) {
+        const [itemId, amount] = reward.split(":");
+        await addInventoryItem(member.userId, itemId, parseInt(amount) || 0, false);
+        desc.push(`\`${amount}x\` ${getItems()[itemId].emoji} ${getItems()[itemId].name}`);
+      }
+
+      dms.find(
+        (i) => i.id === member.userId,
+      ).embed.data.description += `\n\nas you are a **top 4 money** contributor you have received:\n${desc.join(
+        "\n",
+      )}`;
+    }
+
+    for (const dm of dms) {
+      dm.embed.setAuthor({ name: guild.guildName });
+
+      if ((await getDmSettings(dm.id)).other) {
+        addNotificationToQueue({
+          memberId: dm.id,
+          payload: {
+            embed: dm.embed,
+            content: `${guild.guildName} has levelled up!`,
+          },
+        });
       }
     }
 
