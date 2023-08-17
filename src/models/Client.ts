@@ -112,6 +112,12 @@ export class NypsiClient extends Client {
       this.on("emojiDelete", emojiDelete.bind(null));
       this.on("emojiUpdate", emojiUpdate.bind(null));
 
+      this.cluster.on("message", (message: any) => {
+        if (message._type) {
+          if (message.responsive) message.reply({ responsive: true });
+        }
+      });
+
       setTimeout(async () => {
         this.runIntervals();
       }, 60000);

@@ -8,6 +8,7 @@ import {
   WebhookClient,
 } from "discord.js";
 import * as express from "express";
+import { checkStatus } from "../..";
 import prisma from "../../init/database";
 import redis from "../../init/redis";
 import { CustomEmbed } from "../../models/EmbedBuilders";
@@ -77,6 +78,14 @@ export function listen(manager: ClusterManager) {
     response.status(200).send();
 
     return handleKofiData(data);
+  });
+
+  app.get("/status", async (req, res) => {
+    res.set("cache-control", "max-age=60");
+
+    const response = await checkStatus();
+
+    res.json(response);
   });
 
   app.listen(process.env.EXPRESS_PORT || 5000);
