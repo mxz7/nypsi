@@ -9,18 +9,13 @@ import {
 } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
-
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getExactMember } from "../utils/functions/member";
 import { newCase } from "../utils/functions/moderation/cases";
-import { deleteMute, getMuteRole, isMuted } from "../utils/functions/moderation/mute";
+import { getMuteRole } from "../utils/functions/moderation/mute";
 import { createProfile, profileExists } from "../utils/functions/moderation/utils";
-import { logger } from "../utils/logger";
 import { isAltPunish } from "../utils/functions/guilds/altpunish";
-import Constants from "../utils/Constants";
-import { getIdFromUsername } from "../utils/functions/users/tag";
 import { getAlts, getMainAccount, isAlt } from "../utils/functions/moderation/alts";
-import e = require("express");
 
 const cmd = new Command("unmute", "unmute a user", "moderation").setPermissions([
   "MANAGE_MESSAGES",

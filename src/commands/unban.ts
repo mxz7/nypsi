@@ -1,7 +1,6 @@
 import {
   BaseMessageOptions,
   CommandInteraction,
-  GuildMember,
   InteractionReplyOptions,
   Message,
   PermissionFlagsBits,

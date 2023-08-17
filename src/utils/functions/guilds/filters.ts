@@ -313,7 +313,7 @@ export async function checkAutoMute(message: Message) {
 
   let main = message.member;
 
-  let punishAlts = await isAltPunish(message.guild);
+  const punishAlts = await isAltPunish(message.guild);
   let alts = await getAlts(message.guild, main.user.id).catch(() => []);
 
   if (punishAlts && await isAlt(message.guild,  message.member.user.id)) {
