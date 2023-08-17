@@ -377,6 +377,7 @@ model Guild {
   Moderation   Moderation?
   RolePersist  RolePersist[]
   ReactionRole ReactionRole[]
+  Alt          Alt[]
 }
 
 model ReactionRole {
@@ -511,9 +512,12 @@ model ModerationCase {
 }
 
 model Alt {
-  guildId   String
-  mainId    String
-  altId     String
+  guildId String
+  mainId  String
+  altId   String
+
+  guild Guild @relation(fields: [guildId], references: [id], onDelete: Cascade)
+
   @@id([altId, guildId])
 }
 

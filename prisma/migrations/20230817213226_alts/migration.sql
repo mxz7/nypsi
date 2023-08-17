@@ -7,5 +7,8 @@ CREATE TABLE "Alt" (
     "mainId" TEXT NOT NULL,
     "altId" TEXT NOT NULL,
 
-    CONSTRAINT "Alt_pkey" PRIMARY KEY ("userId","guildId")
+    CONSTRAINT "Alt_pkey" PRIMARY KEY ("altId","guildId")
 );
+
+-- AddForeignKey
+ALTER TABLE "Alt" ADD CONSTRAINT "Alt_guildId_fkey" FOREIGN KEY ("guildId") REFERENCES "Guild"("id") ON DELETE CASCADE ON UPDATE CASCADE;
