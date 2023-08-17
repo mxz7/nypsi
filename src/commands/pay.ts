@@ -174,7 +174,7 @@ async function run(
 
   let tax = await getTax();
 
-  if (await isPremium(message.member)) {
+  if ((await isPremium(message.member)) || (await isPremium(target))) {
     tax = 0;
   }
 
