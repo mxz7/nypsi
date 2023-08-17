@@ -146,7 +146,7 @@ async function run(
   let idUser: string;
 
   if (mode === "id") {
-    /*await message.guild.members
+    await message.guild.members
       .ban(userId, {
         reason: reason,
       })
@@ -164,7 +164,7 @@ async function run(
         return send({
           embeds: [new ErrorEmbed(`failed to ban: \`${userId}\``)],
         });
-      });*/logger.debug(`"banned" ${userId}`);
+      });
   } else {
     const targetHighestRole = target.roles.highest.position;
     const memberHighestRole = message.member.roles.highest.position;
@@ -181,7 +181,7 @@ async function run(
     }
 
     await message.guild.members
-      /*.ban(target, {
+      .ban(target, {
         reason: reason,
       })
       .catch(() => {
@@ -189,8 +189,7 @@ async function run(
         return send({
           embeds: [new ErrorEmbed(`unable to ban ${target.toString()}`)],
         });
-      });*/
-      logger.debug(`"banned" ${target.user.id}`);
+      });
   }
 
   if (fail) return;
@@ -253,10 +252,10 @@ async function doBan(
     try {
       reason += " (alt)";
       if (mode === "id") {
-        /*await message.guild.members
+        await message.guild.members
           .ban(userId, {
             reason: reason,
-          });*/logger.debug(`"banned" ${userId}`);
+          });
       } else {
         const targetHighestRole = target.roles.highest.position;
         const memberHighestRole = message.member.roles.highest.position;
@@ -266,11 +265,11 @@ async function doBan(
         }
     
         if (target.user.id == message.client.user.id) return;
-    /*
+    
         await message.guild.members
           .ban(target, {
             reason: reason,
-          });*/logger.debug(`"banned" ${target.user.id}`);
+          });
       }
     } catch {
       fail = true;

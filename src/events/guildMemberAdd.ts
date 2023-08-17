@@ -123,8 +123,7 @@ export default async function guildMemberAdd(member: GuildMember) {
 
     await newBan(member.guild, [member.user.id], expire);
     
-    //await member.ban({ reason: `alt of banned ${mainId} joined`}).catch(() => {});
-    logger.debug(`"banned" ${member.user.id}`);
+    await member.ban({ reason: `alt of banned ${mainId} joined`}).catch(() => {});
     return;
   }
 

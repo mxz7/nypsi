@@ -191,7 +191,7 @@ async function getEmbed(message: Message | (NypsiCommandInteraction & CommandInt
   if (alts.length == 0) {
     embed.setDescription("no alts to display");
   } else {
-    const altList: String[] = [];
+    const altList: string[] = [];
     for (const alt of alts) {
       altList.push(`${await getLastKnownUsername(alt.userId) ? await getLastKnownUsername(alt.userId) + " " : ""}\`${alt.userId}\``);
     }
