@@ -100,5 +100,11 @@
     "name": "spades",
     "description": "found in the blackjack pro v achievement",
     "emoji": ":spades:"
+  },
+  "bomb": {
+    "id": "bomb",
+    "name": "bomb",
+    "description": "found in the mines pro v achievement",
+    "emoji": "💣"
   }
 }

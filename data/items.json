@@ -2438,5 +2438,18 @@
     "sell": 5000000,
     "in_crates": false,
     "tagId": "spades"
+  },
+  "bomb_tag": {
+    "id": "bomb_tag",
+    "name": "bomb tag",
+    "plural": "bomb tags",
+    "article": "a",
+    "emoji": "💣",
+    "longDesc": "found from the mines v achievement",
+    "rarity": 6,
+    "role": "tag",
+    "sell": 5000000,
+    "in_crates": false,
+    "tagId": "bomb"
   }
 }
