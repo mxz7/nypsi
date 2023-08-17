@@ -209,7 +209,7 @@ export async function runBakery(member: GuildMember) {
 
   while (percentChance(cakeChance > 25 ? 25 : cakeChance)) cakeAmount++;
 
-  await addInventoryItem(member, "cookie", total);
+  await addInventoryItem(member, "cookie", Math.round(total));
   if (cakeAmount > 0) await addInventoryItem(member, "cake", cakeAmount);
 
   const embed = new CustomEmbed(member).setHeader(
@@ -233,7 +233,7 @@ export async function runBakery(member: GuildMember) {
 
   if (cakeAmount > 0) {
     embed.setDescription(
-      `you baked **${total.toLocaleString()}** cookie${
+      `you baked **${Math.round(total).toLocaleString()}** cookie${
         total > 1 ? "s" : ""
       } 🍪 and **${cakeAmount.toLocaleString()}** cake${cakeAmount > 1 ? "s" : ""} ${
         getItems()["cake"].emoji
@@ -241,7 +241,7 @@ export async function runBakery(member: GuildMember) {
     );
   } else {
     embed.setDescription(
-      `you baked **${total.toLocaleString()}** cookie${total > 1 ? "s" : ""} 🍪 !!`,
+      `you baked **${Math.round(total).toLocaleString()}** cookie${total > 1 ? "s" : ""} 🍪 !!`,
     );
   }
 
