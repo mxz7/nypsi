@@ -117,9 +117,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (reaction.customId == "✅") {
     await reaction.deferReply({ ephemeral: true });
 
-    const { selected, taxedAmount, desc, amounts, total, taxEnabled, multi } = await calcValues(
-      message,
-    );
+    const { selected, taxedAmount, desc, amounts, total, taxEnabled, multi } =
+      await calcValues(message);
 
     if (selected.size == 0) {
       const embed = new ErrorEmbed("you do not have anything to sell");
