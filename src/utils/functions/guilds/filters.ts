@@ -1,4 +1,4 @@
-import { Guild, Message, Role, ThreadChannel } from "discord.js";
+import { Guild, GuildMember, Message, Role, ThreadChannel } from "discord.js";
 import * as stringSimilarity from "string-similarity";
 import prisma from "../../../init/database";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
@@ -16,6 +16,9 @@ import {
   newMute,
 } from "../moderation/mute";
 import { getPercentMatch } from "./utils";
+import { isAltPunish } from "./altpunish";
+import { getAlts, getMainAccount, isAlt } from "../moderation/alts";
+import { getExactMember } from "../member";
 
 const chatFilterCache = new Map<string, string[]>();
 const snipeFilterCache = new Map<string, string[]>();
@@ -186,7 +189,7 @@ export async function checkAutoMute(message: Message) {
 
   if (muteLevels.length == 0) return;
 
-  const muteUser = async (length: number) => {
+  const muteUser = async (member: GuildMember, length: number, isAlt?: boolean) => {
     const guildMuteRole = await getMuteRole(message.guild);
 
     let muteRole: Role;
@@ -244,25 +247,25 @@ export async function checkAutoMute(message: Message) {
       }
     }
 
-    if (await isMuted(message.guild, message.member)) {
-      await deleteMute(message.guild, message.member);
+    if (await isMuted(message.guild, member)) {
+      await deleteMute(message.guild, member);
     }
 
     await newCase(
       message.guild,
       "mute",
-      message.author.id,
+      member.user.id,
       message.guild.members.me.user,
-      `[${MStoTime(length * 1000, true).trim()}] filter violation`,
+      `[${MStoTime(length * 1000, true).trim()}] filter violation${isAlt ? " (alt)" : ""}`,
     );
     if (mode !== "timeout")
-      newMute(message.guild, [message.author.id], new Date(Date.now() + length * 1000)),
-        logger.info(`::auto ${message.guild.id} ${message.author.id} automuted ${length}s`);
+      newMute(message.guild, [member.user.id], new Date(Date.now() + length * 1000)),
+        logger.info(`::auto ${message.guild.id} ${member.user.id} automuted ${length}s`);
 
     let successful = false;
 
     if (mode == "timeout") {
-      await message.member
+      await member
         .disableCommunicationUntil(
           new Date(Date.now() + length * 1000),
           `filter violation auto mute - ${MStoTime(length * 1000, true).trim()}`,
@@ -271,16 +274,16 @@ export async function checkAutoMute(message: Message) {
           successful = true;
         })
         .catch(() => {
-          logger.warn(`error timing out user ${message.guild.id} ${message.author.id}`);
+          logger.warn(`error timing out user ${message.guild.id} ${member.user.id}`);
         });
     } else {
-      await message.member.roles
-        .add(muteRole, `filter violation auto mute - ${MStoTime(length * 1000, true).trim()}`)
+      await member.roles
+        .add(muteRole, `filter violation auto mute${isAlt ? " (alt)" : ""} - ${MStoTime(length * 1000, true).trim()}`)
         .then(() => {
           successful = true;
         })
         .catch(() => {
-          logger.warn(`error adding mute role to user ${message.guild.id} ${message.author.id}`);
+          logger.warn(`error adding mute role to user ${message.guild.id} ${member.user.id}`);
         });
     }
 
@@ -291,19 +294,41 @@ export async function checkAutoMute(message: Message) {
         .setFooter({ text: "unmuted at:" })
         .setTimestamp(new Date(Date.now() + length * 1000))
         .setColor(Constants.TRANSPARENT_EMBED_COLOR)
-        .addField("reason", "filter violation", true);
+        .addField("reason", `filter violation${isAlt ? " (alt)" : ""}`, true);
 
-      return await message.member
+      return await member
         .send({ content: `you have been muted in ${message.guild.name}`, embeds: [embed] })
         .catch(() => {});
     }
   };
 
-  if (muteLevels[vl]) {
-    await muteUser(muteLevels[vl]);
-  } else if (vl > 0) {
+  let level;
+
+  if (muteLevels[vl]) level = muteLevels[vl];
+  else if (vl > 0) {
     let modified = vl;
     while (modified > 0 && !muteLevels[modified]) modified--;
-    await muteUser(muteLevels[modified]);
+    level = modified;
   }
+
+  let main = message.member;
+
+  let punishAlts = await isAltPunish(message.guild);
+  let alts = await getAlts(message.guild, main.user.id).catch(() => []);
+
+  if (punishAlts && await isAlt(message.guild,  message.member.user.id)) {
+    main = await getExactMember(message.guild, await getMainAccount(message.guild, message.member.user.id));
+    alts = await getAlts(message.guild, main.user.id).catch(() => []);
+  }
+
+  await muteUser(main, level);
+
+  if (punishAlts) {
+
+    for (const alt of alts) { 
+      const member = await getExactMember(message.guild, alt.altId);
+      if (member) await muteUser(member, level, true);
+    }
+  }
+  
 }

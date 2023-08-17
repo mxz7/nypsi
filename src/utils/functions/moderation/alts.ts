@@ -1,5 +1,6 @@
 import { Guild } from "discord.js";
 import prisma from "../../../init/database";
+import { getExactMember } from "../member";
 
 export async function addAlt(guild: Guild, mainId: string, altId: string) {
   try {
@@ -41,7 +42,7 @@ export async function isAlt(guild: Guild, altId: string) {
     },
   });
 
-  return Boolean(query);
+  return (query && await getExactMember(guild, await getMainAccount(guild, altId))) ? true : false;
 }
 
 export async function isMainAccount(guild: Guild, userId: string) {

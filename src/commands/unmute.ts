@@ -16,8 +16,13 @@ import { newCase } from "../utils/functions/moderation/cases";
 import { deleteMute, getMuteRole, isMuted } from "../utils/functions/moderation/mute";
 import { createProfile, profileExists } from "../utils/functions/moderation/utils";
 import { logger } from "../utils/logger";
+import { isAltPunish } from "../utils/functions/guilds/altpunish";
+import Constants from "../utils/Constants";
+import { getIdFromUsername } from "../utils/functions/users/tag";
+import { getAlts, getMainAccount, isAlt } from "../utils/functions/moderation/alts";
+import e = require("express");
 
-const cmd = new Command("unmute", "unmute one or more users", "moderation").setPermissions([
+const cmd = new Command("unmute", "unmute a user", "moderation").setPermissions([
   "MANAGE_MESSAGES",
   "MODERATE_MEMBERS",
 ]);
@@ -85,44 +90,24 @@ async function run(
   const prefix = await getPrefix(message.guild);
 
   if (args.length == 0 || !args[0]) {
-    return send({ embeds: [new ErrorEmbed(`${prefix}unmute <@user(s)>`)] });
+    return send({ embeds: [new ErrorEmbed(`${prefix}unmute <user> (reason)`)] });
   }
 
-  if (
-    (await message.guild.members.fetch(args[0]).catch(() => {})) &&
-    message.mentions.members.first() == null
-  ) {
-    let members;
+  let target = await getExactMember(message.guild, args[0]);
 
-    if (message.guild.memberCount !== message.guild.members.cache.size) {
-      members = message.guild.members.cache;
-    } else {
-      members = await message.guild.members.fetch().catch((e) => {
-        logger.error("failed to fetch members for unmute", e);
-        return message.guild.members.cache;
-      });
-    }
+  const punishAlts = await isAltPunish(message.guild);
 
-    const member = members.find((m) => m.id == args[0]);
+  let alts = await getAlts(message.guild, target.user.id).catch(() => []);
 
-    if (!member) {
-      return send({
-        embeds: [new ErrorEmbed("unable to find member with ID `" + args[0] + "`")],
-      });
-    }
-
-    message.mentions.members.set(member.user.id, member);
-  } else if (message.mentions.members.first() == null) {
-    const member = await getExactMember(message.guild, args[0]);
-
-    if (!member) {
-      return send({ embeds: [new ErrorEmbed("unable to find member `" + args[0] + "`")] });
-    }
-
-    message.mentions.members.set(member.user.id, member);
+  if (!target) return send({ embeds: [new ErrorEmbed("invalid user")] });
+  
+  if (punishAlts && (await isAlt(message.guild, target.user.id))) {
+    target = await getExactMember(
+      message.guild,
+      await getMainAccount(message.guild, target.user.id),
+    );
+    alts = await getAlts(message.guild, target.user.id).catch(() => []);
   }
-
-  const members = message.mentions.members;
 
   const guildMuteRole = await getMuteRole(message.guild);
 
@@ -145,18 +130,12 @@ async function run(
     }
   }
 
-  let count = 0;
   let fail = false;
-  const failed = [];
 
   if (mode == "role") {
-    for (const member of message.mentions.members.keys()) {
-      const m = message.mentions.members.get(member);
-
-      if (m.roles.cache.has(muteRole.id)) {
-        await m.roles
+      if (target.roles.cache.has(muteRole.id)) {
+        await target.roles
           .remove(muteRole)
-          .then(() => count++)
           .catch(() => {
             fail = true;
             return send({
@@ -168,27 +147,19 @@ async function run(
             });
           });
       } else {
-        if (message.mentions.members.size == 1) {
-          return send({
-            embeds: [
-              new ErrorEmbed(
-                `**${m.user.username}** does not have the muted role (${muteRole.toString()})`,
-              ),
-            ],
-          });
-        }
-        failed.push(m.user);
+        fail = true;
+        return send({
+          embeds: [
+            new ErrorEmbed(
+              `**${target.user.username}** does not have the muted role (${muteRole.toString()})`,
+            ),
+          ],
+        });
       }
-      if (fail) break;
-    }
   } else if (mode == "timeout") {
-    for (const member of message.mentions.members.keys()) {
-      const m: GuildMember = message.mentions.members.get(member);
-
-      if (m.isCommunicationDisabled()) {
-        await m
+      if (target.isCommunicationDisabled()) {
+        await target
           .disableCommunicationUntil(null)
-          .then(() => count++)
           .catch(() => {
             fail = true;
             return send({
@@ -199,36 +170,21 @@ async function run(
               ],
             });
           });
-      } else {
-        // @ts-expect-error weird??
-        failed.push(m.user);
       }
-      if (fail) break;
-    }
   }
 
   if (fail) return;
 
-  const embed = new CustomEmbed(message.member, "✅ **" + count + "** member(s) unmuted");
+  const embed = new CustomEmbed(message.member);
 
-  if (count == 1) {
-    embed.setDescription(
-      "✅ `" + message.mentions.members.first().user.username + "` has been unmuted",
-    );
-  }
+  let msg = `✅ \`${target.user.username}\` has been unmuted`;
 
-  if (count == 0) {
-    return send({ embeds: [new ErrorEmbed("i was unable to unmute any users")] });
-  }
+  if (alts.length > 0 && punishAlts)
+    msg = `✅ \`${target.user.username}\` + ${alts.length} ${
+      alts.length != 1 ? "alts have" : "alt has"
+    } been unmuted`;
 
-  if (failed.length != 0) {
-    const failedTags = [];
-    for (const fail1 of failed) {
-      failedTags.push(fail1.username);
-    }
-
-    embed.addField("error", "unable to unmute: " + failedTags.join(", "));
-  }
+    embed.setDescription(msg);
 
   if (args.join(" ").includes("-s")) {
     if (message instanceof Message) {
@@ -241,27 +197,48 @@ async function run(
     await send({ embeds: [embed] });
   }
 
-  const members1 = Array.from(members.keys());
+  await doUnmute(message, target, args, mode);
+  
+  if (!punishAlts) return;
 
-  if (failed.length != 0) {
-    for (const fail1 of failed) {
-      if (members1.includes(fail1.id)) {
-        members1.splice(members1.indexOf(fail1.id), 1);
+  for (const id of alts) {
+    await doUnmute(message, await getExactMember(message.guild, id.altId), args, mode, muteRole, true);
+  }
+}
+
+async function doUnmute(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  target: GuildMember,
+  args: string[],
+  mode: string,
+  muteRole?: Role,
+  isAlt?: boolean,
+) {
+  let reason = args.length > 1 ? args.slice(1).join(" ") : "no reason given";
+  let fail = false;
+  if (isAlt) {
+    reason += " (alt)"
+    try {
+      if (mode == "role") {
+        if (mode == "role") {
+          if (target.roles.cache.has(muteRole.id)) await target.roles.remove(muteRole)
+          else fail = true;
+      } else if (mode == "timeout") {
+          if (target.isCommunicationDisabled()) await target.disableCommunicationUntil(null);
+        }
       }
+    } catch {
+      fail = true;
     }
   }
+  if (fail) return;
 
-  for (const m of members1) {
-    if (await isMuted(message.guild, members.get(m))) {
-      await deleteMute(message.guild, members.get(m));
-    }
-  }
   await newCase(
     message.guild,
     "unmute",
-    members1,
+    target.user.id,
     message.author,
-    args.length > 1 ? args.slice(1).join(" ") : "no reason given",
+    reason,
   );
 }
 

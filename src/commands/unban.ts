@@ -1,6 +1,7 @@
 import {
   BaseMessageOptions,
   CommandInteraction,
+  GuildMember,
   InteractionReplyOptions,
   Message,
   PermissionFlagsBits,
@@ -12,6 +13,8 @@ import { getPrefix } from "../utils/functions/guilds/utils";
 import { newCase } from "../utils/functions/moderation/cases";
 import { createProfile, profileExists } from "../utils/functions/moderation/utils";
 import { getIdFromUsername, getLastKnownUsername } from "../utils/functions/users/tag";
+import { isAltPunish } from "../utils/functions/guilds/altpunish";
+import { getAlts, getMainAccount, isAlt } from "../utils/functions/moderation/alts";
 
 const cmd = new Command("unban", "unban one or more users", "moderation").setPermissions([
   "BAN_MEMBERS",
@@ -93,12 +96,21 @@ async function run(
 
   let target = args[0];
 
+  const punishAlts = await isAltPunish(message.guild);
+
   if (!target.match(Constants.SNOWFLAKE_REGEX)) {
     target = await getIdFromUsername(target);
   }
 
+  let alts = await getAlts(message.guild, target).catch(() => []);
+
   if (!target || !target.match(Constants.SNOWFLAKE_REGEX)) {
     return send({ embeds: [new ErrorEmbed(`couldn't resolve \`${target}\` to a user`)] });
+  } else if (punishAlts) {
+    if (await isAlt(message.guild, target)) {
+      target = await getMainAccount(message.guild, target);
+      alts = await getAlts(message.guild, target).catch(() => []);
+    }
   }
 
   let fail = false;
@@ -127,10 +139,15 @@ async function run(
       ],
     });
 
-  const embed = new CustomEmbed(
-    message.member,
-    `✅ \`${unbannedUser.username}\` has been unbanned`,
-  );
+    let msg = `✅ \`${unbannedUser.username}\` has been unbanned`;
+
+    if (alts.length > 0 && punishAlts) {
+      msg = `✅ \`${unbannedUser.username}\` + ${alts.length} ${
+        alts.length != 1 ? "alts have" : "alt has"
+      } been unbanned`;
+    }
+
+  const embed = new CustomEmbed(message.member, msg);
 
   if (args.join(" ").includes("-s")) {
     if (message instanceof Message) {
@@ -143,12 +160,43 @@ async function run(
     await send({ embeds: [embed] });
   }
 
+  await doUnban(message, target, args);
+  
+  if (!punishAlts) return;
+
+  for (const id of alts) {
+    await doUnban(message, id.altId, args, true);
+  }
+}
+
+async function doUnban(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  targetId: string,
+  args: string[],
+  isAlt?: boolean,
+) {
+  let reason = args.length > 1 ? args.slice(1).join(" ") : "no reason given";
+  if (isAlt) {
+    reason += " (alt)"
+    let fail = false;
+
+    const banned = await message.guild.bans.fetch();
+
+    if (!banned.find((i) => i.user.id === targetId)) return;
+
+    const unbannedUser = await message.guild.members.unban(targetId, message.content).catch(() => {
+      fail = true;
+    });
+
+    if (fail || !unbannedUser) return;
+  }
+
   await newCase(
     message.guild,
     "unban",
-    unbannedUser.id,
+    targetId,
     message.author,
-    args.length > 1 ? args.slice(1).join(" ") : "no reason given",
+    reason,
   );
 }
 

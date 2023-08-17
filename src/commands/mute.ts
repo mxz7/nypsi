@@ -19,7 +19,7 @@ import { createProfile, profileExists } from "../utils/functions/moderation/util
 import ms = require("ms");
 import dayjs = require("dayjs");
 
-const cmd = new Command("mute", "mute one or more users", "moderation").setPermissions([
+const cmd = new Command("mute", "mute a user", "moderation").setPermissions([
   "MANAGE_MESSAGES",
   "MODERATE_MEMBERS",
 ]);
