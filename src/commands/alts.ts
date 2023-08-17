@@ -23,10 +23,11 @@ import {
   getAlts,
   getMainAccount,
   isAlt,
+  isMainAccount,
 } from "../utils/functions/moderation/alts";
 import { createProfile, profileExists } from "../utils/functions/moderation/utils";
 import { getLastKnownUsername } from "../utils/functions/users/tag";
-import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import { getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("alts", "view a user's alts", "moderation")
   .setAliases(["alt", "account", "accounts"])
@@ -108,8 +109,6 @@ async function run(
     );
   }
 
-  await addCooldown(cmd.name, message.member, 7);
-
   const msg = await send({
     embeds: [await getEmbed(message, member)],
     components: [await getRow(message, member)],
@@ -145,6 +144,23 @@ async function run(
       if (!msg) return;
       if (!msg.content.match(Constants.SNOWFLAKE_REGEX)) {
         await res.editReply({ embeds: [new CustomEmbed(message.member, "invalid user")] });
+        return waitForButton(altMsg);
+      }
+
+      if (msg.content === (member instanceof GuildMember ? member.user.id : member)) {
+        await res.editReply({ embeds: [new CustomEmbed(message.member, "invalid user")] });
+        return waitForButton(altMsg);
+      }
+
+      if (await isMainAccount(message.guild, msg.content)) {
+        await res.editReply({
+          embeds: [
+            new CustomEmbed(
+              message.member,
+              `\`${msg.content}\` is a main account, use **${prefix}alts ${msg.content}** to add an alt to them`,
+            ),
+          ],
+        });
         return waitForButton(altMsg);
       }
 

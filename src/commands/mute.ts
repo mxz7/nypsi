@@ -319,7 +319,7 @@ async function run(
   if (!punishAlts) return;
 
   for (const id of alts) {
-    if (!isMuted(message.guild, id.altId))
+    if (!(await isMuted(message.guild, id.altId)))
       await doMute(
         message,
         await getExactMember(message.guild, id.altId),
