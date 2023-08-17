@@ -310,7 +310,7 @@
     "emoji": "🥷",
     "target": 10000,
     "description": "complete 10,000 successful robberies",
-    "prize": ["lucky_scratch_card:3"]
+    "prize": ["lucky_scratch_card:3", "ninja_tag:1"]
   },
   "whore_i": {
     "id": "whore_i",
@@ -547,7 +547,7 @@
     "emoji": "💣",
     "target": 1000,
     "description": "reach a 7x multiplier in mines 1,000 times",
-    "prize": ["nypsi_crate:1", "legendary_scratch_card:1"]
+    "prize": ["nypsi_crate:1", "legendary_scratch_card:1", "bomb_tag:1"]
   },
   "highlow_pro_i": {
     "id": "highlow_pro_i",
@@ -667,7 +667,7 @@
     "emoji": "🍒",
     "target": 1000,
     "description": "win on cherries 1,000 times",
-    "prize": ["nypsi_crate:1", "legendary_scratch_card:3"]
+    "prize": ["nypsi_crate:1", "legendary_scratch_card:3", "cherry_tag:1"]
   },
   "horny_i": {
     "id": "horny_i",
@@ -1233,7 +1233,7 @@
     "emoji": "♠️",
     "target": 1000,
     "description": "get a blackjack 1,000 times",
-    "prize": ["nypsi_crate:1", "legendary_scratch_card:3"]
+    "prize": ["nypsi_crate:1", "legendary_scratch_card:3", "spades_tag:1"]
   },
   "capitalist_i": {
     "id": "capitalist_i",
