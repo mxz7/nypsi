@@ -8,6 +8,7 @@ import Constants from "../../Constants";
 import { getTier, isPremium } from "../premium/premium";
 import { percentChance } from "../random";
 import { addProgress } from "./achievements";
+import { getGuildName, getGuildUpgradesByUser } from "./guilds";
 import { addInventoryItem, getInventory } from "./inventory";
 import { isPassive } from "./passive";
 import { getBakeryUpgradesData, getItems } from "./utils";
@@ -109,11 +110,12 @@ async function getMaxAfkHours(member: GuildMember | string) {
 }
 
 export async function runBakery(member: GuildMember) {
-  const [lastBaked, upgrades, maxAfkHours, inventory] = await Promise.all([
+  const [lastBaked, upgrades, maxAfkHours, inventory, guildUpgrades] = await Promise.all([
     getLastBake(member),
     getBakeryUpgrades(member),
     getMaxAfkHours(member),
     getInventory(member),
+    getGuildUpgradesByUser(member),
   ]);
 
   let passive = 0;
@@ -185,6 +187,13 @@ export async function runBakery(member: GuildMember) {
 
   let total = chosenAmount + passive;
 
+  if (guildUpgrades.find((i) => i.upgradeId === "bakery")) {
+    if (percentChance(0.5 * guildUpgrades.find((i) => i.upgradeId === "bakery").amount)) {
+      total = total * 2;
+      earned.set("guild", total / 2);
+    }
+  }
+
   if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0) {
     if (percentChance(5)) {
       total = total * 2;
@@ -209,7 +218,7 @@ export async function runBakery(member: GuildMember) {
 
   while (percentChance(cakeChance > 25 ? 25 : cakeChance)) cakeAmount++;
 
-  await addInventoryItem(member, "cookie", total);
+  await addInventoryItem(member, "cookie", Math.round(total));
   if (cakeAmount > 0) await addInventoryItem(member, "cake", cakeAmount);
 
   const embed = new CustomEmbed(member).setHeader(
@@ -223,8 +232,16 @@ export async function runBakery(member: GuildMember) {
 
   for (const upgradeId of earnedIds) {
     breakdownDesc.push(
-      `${(getBakeryUpgradesData()[upgradeId] || getItems()[upgradeId]).emoji} ${
-        (getBakeryUpgradesData()[upgradeId] || getItems()[upgradeId]).name
+      `${
+        (
+          getBakeryUpgradesData()[upgradeId] ||
+          getItems()[upgradeId] || { emoji: ":busts_in_silhouette:" }
+        ).emoji
+      } ${
+        (
+          getBakeryUpgradesData()[upgradeId] ||
+          getItems()[upgradeId] || { name: await getGuildName(member) }
+        ).name
       } baked ${earned.get(upgradeId).toLocaleString()} cookie${
         earned.get(upgradeId) > 1 ? "s" : ""
       }`,
@@ -233,7 +250,7 @@ export async function runBakery(member: GuildMember) {
 
   if (cakeAmount > 0) {
     embed.setDescription(
-      `you baked **${total.toLocaleString()}** cookie${
+      `you baked **${Math.round(total).toLocaleString()}** cookie${
         total > 1 ? "s" : ""
       } 🍪 and **${cakeAmount.toLocaleString()}** cake${cakeAmount > 1 ? "s" : ""} ${
         getItems()["cake"].emoji
@@ -241,7 +258,7 @@ export async function runBakery(member: GuildMember) {
     );
   } else {
     embed.setDescription(
-      `you baked **${total.toLocaleString()}** cookie${total > 1 ? "s" : ""} 🍪 !!`,
+      `you baked **${Math.round(total).toLocaleString()}** cookie${total > 1 ? "s" : ""} 🍪 !!`,
     );
   }
 

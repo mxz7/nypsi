@@ -14,7 +14,10 @@ import { NypsiCommandInteraction } from "../../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
 import Constants from "../../../Constants";
+import { addHourlyCommand } from "../../../handlers/commandhandler";
 import { logger } from "../../../logger";
+import { a } from "../../anticheat";
+import { isLockedOut, verifyUser } from "../../captcha";
 import { recentCommands } from "../../users/commands";
 import { getInventory, selectItem, setInventoryItem } from "../inventory";
 import ScratchCard from "../scratchies";
@@ -160,6 +163,16 @@ async function prepare(
               return;
             }
           }
+
+          if (await isLockedOut(message.author.id)) {
+            verifyUser(message);
+            return;
+          }
+
+          addHourlyCommand(message.member);
+
+          await a(message.author.id, message.author.username, message.content);
+
           logger.info(
             `::cmd ${message.guild.id} ${message.author.username}: replaying ${selected.id}`,
           );

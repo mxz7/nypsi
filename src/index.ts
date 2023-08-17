@@ -134,3 +134,42 @@ setInterval(async () => {
 
   logger.info(`average query takes ${avg}ms (${total.toLocaleString()} queries in the last hour)`);
 }, ms("1 hour"));
+
+export async function checkStatus() {
+  const response: {
+    main: boolean;
+    clusters: { online: boolean; responsive: boolean; id: number }[];
+  } = {
+    main: true,
+    clusters: [],
+  };
+
+  for (const [clusterId, cluster] of manager.clusters) {
+    response.clusters.push({ ...(await checkCluster(cluster)), id: clusterId });
+  }
+
+  return response;
+}
+
+async function checkCluster(
+  cluster: Cluster.Cluster,
+): Promise<{ online: boolean; responsive: boolean }> {
+  return new Promise((resolve) => {
+    const response = { responsive: false, online: false };
+
+    setTimeout(() => {
+      resolve(response);
+    }, 10000);
+
+    cluster.request({ alive: true }).then((res: any) => {
+      if (res.alive) {
+        response.online = true;
+
+        cluster.request({ responsive: true }).then((res: any) => {
+          if (res.responsive) response.responsive = true;
+          resolve(response);
+        });
+      }
+    });
+  });
+}

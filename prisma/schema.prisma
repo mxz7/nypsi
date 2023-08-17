@@ -562,11 +562,13 @@ model EconomyGuild {
 }
 
 model EconomyGuildMember {
-  userId           String   @unique
-  guildName        String
-  joinedAt         DateTime
-  contributedMoney BigInt   @default(0)
-  contributedXp    Int      @default(0)
+  userId                    String   @unique
+  guildName                 String
+  joinedAt                  DateTime
+  contributedMoney          BigInt   @default(0)
+  contributedXp             Int      @default(0)
+  contributedMoneyThisLevel BigInt   @default(0)
+  contributedXpThisLevel    Int      @default(0)
 
   economy Economy      @relation(fields: [userId], references: [userId], onDelete: Cascade)
   guild   EconomyGuild @relation(fields: [guildName], references: [guildName], onDelete: Cascade)

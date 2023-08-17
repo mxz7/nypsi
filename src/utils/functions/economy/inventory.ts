@@ -15,6 +15,7 @@ import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { addProgress, getAllAchievements, setAchievementProgress } from "./achievements";
 import { getAuctionAverage } from "./auctions";
 import { getBalance, getSellMulti, updateBalance } from "./balance";
+import { addToGuildXP, getGuildName } from "./guilds";
 import { getOffersAverage } from "./offers";
 import { createUser, getItems, userExists } from "./utils";
 import { getXp, updateXp } from "./xp";
@@ -458,6 +459,12 @@ export async function openCrate(
           const amount = parseInt(chosen.substring(3));
 
           await updateXp(member, (await getXp(member)) + amount);
+          const guild = await getGuildName(member);
+
+          if (guild) {
+            await addToGuildXP(guild, amount, member);
+          }
+
           found.set("xp", found.has("xp") ? found.get("xp") + amount : amount);
         }
       } else {
@@ -528,6 +535,12 @@ export async function openCrate(
           const amount = parseInt(chosen.split(":")[1]);
 
           await updateXp(member, (await getXp(member)) + amount);
+          const guild = await getGuildName(member);
+
+          if (guild) {
+            await addToGuildXP(guild, amount, member);
+          }
+
           found.set("xp", found.has("xp") ? found.get("xp") + amount : amount);
         }
       } else {

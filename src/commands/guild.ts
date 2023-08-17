@@ -11,7 +11,7 @@ import {
   MessageActionRowComponentBuilder,
   MessageEditOptions,
 } from "discord.js";
-import { inPlaceSort } from "fast-sort";
+import { sort } from "fast-sort";
 import prisma from "../init/database";
 import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
@@ -774,29 +774,47 @@ async function run(
 
     const members = guild.members;
 
-    inPlaceSort(members).desc([(i) => i.contributedXp, (i) => i.contributedMoney]);
-
     const embed = new CustomEmbed(message.member).setHeader(
       `${guild.guildName} stats`,
       message.author.avatarURL(),
       `https://nypsi.xyz/guild/${encodeURIComponent(guild.guildName)}`,
     );
 
-    let desc = "";
+    let overall = "";
+    let thislevel = "";
 
-    for (const m of members) {
-      let position: number | string = members.indexOf(m) + 1;
+    for (const m of sort(members).desc([(i) => i.contributedXp, (i) => i.contributedMoney])) {
+      let position = (members.indexOf(m) + 1).toString();
 
-      if (position == 1) position = "🥇";
-      if (position == 2) position = "🥈";
-      if (position == 3) position = "🥉";
+      if (position == "1") position = "🥇";
+      else if (position == "2") position = "🥈";
+      else if (position == "3") position = "🥉";
+      else position += ".";
 
-      desc += `${position} **${
+      overall += `${position} **${
         m.economy.user.lastKnownUsername
       }** ${m.contributedXp.toLocaleString()}xp **|** $${m.contributedMoney.toLocaleString()}\n`;
     }
 
-    embed.setDescription(desc);
+    embed.addField("overall", overall, true);
+
+    for (const m of sort(members).desc([
+      (i) => i.contributedXpThisLevel,
+      (i) => i.contributedMoneyThisLevel,
+    ])) {
+      let position = (members.indexOf(m) + 1).toString();
+
+      if (position == "1") position = "🥇";
+      else if (position == "2") position = "🥈";
+      else if (position == "3") position = "🥉";
+      else position += ".";
+
+      thislevel += `${position} **${
+        m.economy.user.lastKnownUsername
+      }** ${m.contributedXpThisLevel.toLocaleString()}xp **|** $${m.contributedMoneyThisLevel.toLocaleString()}\n`;
+    }
+
+    embed.addField(`level ${guild.level}`, thislevel, true);
 
     return send({ embeds: [embed] });
   }
