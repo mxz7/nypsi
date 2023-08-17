@@ -54,7 +54,10 @@ export async function getBannedUsers(guild: Guild) {
 export async function isBanned(guild: Guild, member: GuildMember | string) {
   const query = await prisma.moderationBan.findFirst({
     where: {
-      AND: [{ guildId: guild.id }, { userId: typeof member == "string" ? member : (member as GuildMember).user.id  }],
+      AND: [
+        { guildId: guild.id },
+        { userId: typeof member == "string" ? member : (member as GuildMember).user.id },
+      ],
     },
     select: {
       userId: true,

@@ -113,7 +113,10 @@ async function run(
     }
   } else if (punishAlts) {
     if (await isAlt(message.guild, target.user.id)) {
-      target = await getExactMember(message.guild, await getMainAccount(message.guild, target.user.id));
+      target = await getExactMember(
+        message.guild,
+        await getMainAccount(message.guild, target.user.id),
+      );
       alts = await getAlts(message.guild, target.user.id).catch(() => []);
     }
   }
@@ -204,7 +207,9 @@ async function run(
   let msg = `✅ \`${mode == "id" ? idUser : target.user.username}\` has been banned`;
 
   if (alts.length > 0 && punishAlts) {
-    msg = `✅ \`${mode == "id" ? idUser : target.user.username}\` + ${alts.length} ${alts.length != 1 ? "alts have" : "alt has"} been banned`;
+    msg = `✅ \`${mode == "id" ? idUser : target.user.username}\` + ${alts.length} ${
+      alts.length != 1 ? "alts have" : "alt has"
+    } been banned`;
   }
 
   if (temporary) {
@@ -226,13 +231,24 @@ async function run(
     await send({ embeds: [embed] });
   }
 
-  
   await doBan(message, target, reason, args, mode, temporary, banLength, unbanDate, userId);
 
   if (!punishAlts) return;
 
   for (const id of alts) {
-    if (!isBanned(message.guild, id.userId)) await doBan(message, await getExactMember(message.guild, id.userId), reason, args, "target", temporary, banLength, unbanDate, id.userId, true);
+    if (!isBanned(message.guild, id.userId))
+      await doBan(
+        message,
+        await getExactMember(message.guild, id.userId),
+        reason,
+        args,
+        "target",
+        temporary,
+        banLength,
+        unbanDate,
+        id.userId,
+        true,
+      );
   }
 }
 
@@ -248,29 +264,27 @@ async function doBan(
   userId: string,
   isAlt?: boolean,
 ) {
-  let fail = false
+  let fail = false;
   if (isAlt) {
     try {
       reason += " (alt)";
       if (mode === "id") {
-        await message.guild.members
-          .ban(userId, {
-            reason: reason,
-          });
+        await message.guild.members.ban(userId, {
+          reason: reason,
+        });
       } else {
         const targetHighestRole = target.roles.highest.position;
         const memberHighestRole = message.member.roles.highest.position;
-    
+
         if (targetHighestRole >= memberHighestRole && message.author.id !== message.guild.ownerId) {
           return;
         }
-    
+
         if (target.user.id == message.client.user.id) return;
-    
-        await message.guild.members
-          .ban(target, {
-            reason: reason,
-          });
+
+        await message.guild.members.ban(target, {
+          reason: reason,
+        });
       }
     } catch {
       fail = true;

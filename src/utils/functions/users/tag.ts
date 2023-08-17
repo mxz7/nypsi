@@ -29,7 +29,7 @@ export async function getLastKnownUsername(id: string) {
         lastKnownUsername: true,
       },
     });
-  
+
     return query.lastKnownUsername;
   } catch {
     return null;

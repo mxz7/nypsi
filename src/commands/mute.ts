@@ -110,15 +110,18 @@ async function run(
   if (!target) return send({ embeds: [new ErrorEmbed("invalid user")] });
 
   const punishAlts = await isAltPunish(message.guild);
-  
+
   let alts = await getAlts(message.guild, target.user.id).catch(() => []);
 
-  if (punishAlts && await isAlt(message.guild, target.user.id)) {
-    target = await getExactMember(message.guild, await getMainAccount(message.guild, target.user.id));
+  if (punishAlts && (await isAlt(message.guild, target.user.id))) {
+    target = await getExactMember(
+      message.guild,
+      await getMainAccount(message.guild, target.user.id),
+    );
     alts = await getAlts(message.guild, target.user.id).catch(() => []);
   }
 
-  if (args.length > 1) { 
+  if (args.length > 1) {
     reason = args.slice(1).join(" ");
   }
 
@@ -287,7 +290,10 @@ async function run(
 
   let msg = `✅ \`${target.user.username}\` has been muted`;
 
-  if (alts.length > 0 && punishAlts) msg = `✅ \`${target.user.username}\` + ${alts.length} ${alts.length != 1 ? "alts have" : "alt has"} been muted`
+  if (alts.length > 0 && punishAlts)
+    msg = `✅ \`${target.user.username}\` + ${alts.length} ${
+      alts.length != 1 ? "alts have" : "alt has"
+    } been muted`;
 
   if (timedMute) {
     msg += ` for **${mutedLength}**`;
@@ -313,9 +319,20 @@ async function run(
   if (!punishAlts) return;
 
   for (const id of alts) {
-    if (!isMuted(message.guild, id.userId)) await doMute(message, await getExactMember(message.guild, id.userId), reason, args, mode, timedMute, mutedLength, unmuteDate, muteRole, true);
+    if (!isMuted(message.guild, id.userId))
+      await doMute(
+        message,
+        await getExactMember(message.guild, id.userId),
+        reason,
+        args,
+        mode,
+        timedMute,
+        mutedLength,
+        unmuteDate,
+        muteRole,
+        true,
+      );
   }
-
 }
 
 async function doMute(
@@ -330,19 +347,20 @@ async function doMute(
   muteRole?: Role,
   isAlt?: boolean,
 ) {
-  let fail = false
+  let fail = false;
   if (isAlt) {
     try {
       reason += " (alt)";
-  
+
       const targetHighestRole = target.roles.highest;
       const memberHighestRole = message.member.roles.highest;
-    
+
       if (
         targetHighestRole.position >= memberHighestRole.position &&
         message.guild.ownerId != message.author.id
-      ) return;
-    
+      )
+        return;
+
       await target.roles.add(muteRole);
     } catch {
       fail = true;

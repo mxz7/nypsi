@@ -18,7 +18,13 @@ import { getPrefix } from "../utils/functions/guilds/utils";
 import { getExactMember, getMember } from "../utils/functions/member";
 import { createProfile, profileExists } from "../utils/functions/moderation/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import { addAlt, deleteAlt, getAlts, getMainAccount, isAlt } from "../utils/functions/moderation/alts";
+import {
+  addAlt,
+  deleteAlt,
+  getAlts,
+  getMainAccount,
+  isAlt,
+} from "../utils/functions/moderation/alts";
 import Constants from "../utils/Constants";
 import { getLastKnownUsername } from "../utils/functions/users/tag";
 
@@ -91,16 +97,25 @@ async function run(
 
   let member = (await getMember(message.guild, args.join(" "))) || args[0];
 
-  let alts = await getAlts(message.guild, member instanceof GuildMember ? member.user.id : member).catch(() => []);
+  let alts = await getAlts(
+    message.guild,
+    member instanceof GuildMember ? member.user.id : member,
+  ).catch(() => []);
 
   if (await isAlt(message.guild, member instanceof GuildMember ? member.user.id : member)) {
-    member = await getMember(message.guild, await getMainAccount(message.guild, member instanceof GuildMember ? member.user.id : member));
+    member = await getMember(
+      message.guild,
+      await getMainAccount(message.guild, member instanceof GuildMember ? member.user.id : member),
+    );
     alts = await getAlts(message.guild, member.user.id).catch(() => []);
   }
-  
+
   await addCooldown(cmd.name, message.member, 7);
-  
-  const msg = await send({ embeds: [await getEmbed(message, member)], components: [await getRow(message, member)] });
+
+  const msg = await send({
+    embeds: [await getEmbed(message, member)],
+    components: [await getRow(message, member)],
+  });
 
   const waitForButton = async (altMsg: Message): Promise<void> => {
     const filter = (i: Interaction) => i.user.id == message.author.id;
@@ -135,12 +150,30 @@ async function run(
         return waitForButton(altMsg);
       }
 
-      const addAltRes = await addAlt(message.guild, member instanceof GuildMember ? member.user.id : member, msg.content);
+      const addAltRes = await addAlt(
+        message.guild,
+        member instanceof GuildMember ? member.user.id : member,
+        msg.content,
+      );
 
       if (addAltRes) await res.editReply({ embeds: [new CustomEmbed(message.member, "✅")] });
-      else await res.editReply({ embeds: [new CustomEmbed(message.member, `user is already an alt of ${await getExactMember(message.guild, await getMainAccount(message.guild, msg.content))}`)]});
+      else
+        await res.editReply({
+          embeds: [
+            new CustomEmbed(
+              message.member,
+              `user is already an alt of ${await getExactMember(
+                message.guild,
+                await getMainAccount(message.guild, msg.content),
+              )}`,
+            ),
+          ],
+        });
 
-      await altMsg.edit({ embeds: [await getEmbed(message, member)], components: [await getRow(message, member)] });
+      await altMsg.edit({
+        embeds: [await getEmbed(message, member)],
+        components: [await getRow(message, member)],
+      });
 
       return waitForButton(altMsg);
     } else if (res.customId === "del-alt") {
@@ -160,24 +193,31 @@ async function run(
         });
 
       if (!msg) return;
-      if (!await isAlt(message.guild, msg.content) || await getMainAccount(message.guild, msg.content) != (member instanceof GuildMember ? member.user.id : member)) {
+      if (
+        !(await isAlt(message.guild, msg.content)) ||
+        (await getMainAccount(message.guild, msg.content)) !=
+          (member instanceof GuildMember ? member.user.id : member)
+      ) {
         await res.editReply({ embeds: [new CustomEmbed(message.member, "invalid alt")] });
         return waitForButton(altMsg);
       }
 
       await deleteAlt(message.guild, msg.content);
       await res.editReply({ embeds: [new CustomEmbed(message.member, "✅")] });
-      await altMsg.edit({ embeds: [
-        await getEmbed(message, member),
-      ], components: [await getRow(message, member)] });
+      await altMsg.edit({
+        embeds: [await getEmbed(message, member)],
+        components: [await getRow(message, member)],
+      });
       return waitForButton(altMsg);
     }
   };
   return waitForButton(msg);
 }
 
-async function getEmbed(message: Message | (NypsiCommandInteraction & CommandInteraction), member: GuildMember | string) {
-
+async function getEmbed(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  member: GuildMember | string,
+) {
   const alts = await getUserAlts(message.guild, member);
 
   const embed = new CustomEmbed(message.member);
@@ -193,7 +233,13 @@ async function getEmbed(message: Message | (NypsiCommandInteraction & CommandInt
   } else {
     const altList: string[] = [];
     for (const alt of alts) {
-      altList.push(`${await getLastKnownUsername(alt.userId) ? await getLastKnownUsername(alt.userId) + " " : ""}\`${alt.userId}\``);
+      altList.push(
+        `${
+          (await getLastKnownUsername(alt.userId))
+            ? (await getLastKnownUsername(alt.userId)) + " "
+            : ""
+        }\`${alt.userId}\``,
+      );
     }
     embed.setDescription(altList.join("\n"));
   }
@@ -201,19 +247,28 @@ async function getEmbed(message: Message | (NypsiCommandInteraction & CommandInt
   return embed;
 }
 
-async function getRow(message: Message | (NypsiCommandInteraction & CommandInteraction), member: GuildMember | string) {
+async function getRow(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  member: GuildMember | string,
+) {
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder().setCustomId("add-alt").setLabel("add alt").setStyle(ButtonStyle.Success),
-  )
-  if ((await getUserAlts(message.guild, member)).length > 0) row.addComponents(
-    new ButtonBuilder().setCustomId("del-alt").setLabel("remove alt").setStyle(ButtonStyle.Danger),
   );
+  if ((await getUserAlts(message.guild, member)).length > 0)
+    row.addComponents(
+      new ButtonBuilder()
+        .setCustomId("del-alt")
+        .setLabel("remove alt")
+        .setStyle(ButtonStyle.Danger),
+    );
 
   return row;
 }
 
 async function getUserAlts(guild: Guild, member: GuildMember | string) {
-  return await getAlts(guild, member instanceof GuildMember ? member.user.id : member).catch(() => []);
+  return await getAlts(guild, member instanceof GuildMember ? member.user.id : member).catch(
+    () => [],
+  );
 }
 
 cmd.setRun(run);

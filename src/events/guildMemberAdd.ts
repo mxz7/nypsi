@@ -103,7 +103,11 @@ export default async function guildMemberAdd(member: GuildMember) {
 
   if (!(await profileExists(member.guild))) return;
 
-  if (await isAltPunish(member.guild) && await isAlt(member.guild, member.user.id) && await isBanned(member.guild, await getMainAccount(member.guild, member.user.id))) {
+  if (
+    (await isAltPunish(member.guild)) &&
+    (await isAlt(member.guild, member.user.id)) &&
+    (await isBanned(member.guild, await getMainAccount(member.guild, member.user.id)))
+  ) {
     const mainId = await getMainAccount(member.guild, member.user.id);
     const query = await prisma.moderationBan.findMany({
       where: {
@@ -112,18 +116,24 @@ export default async function guildMemberAdd(member: GuildMember) {
       },
       select: {
         expire: true,
-      }
+      },
     });
 
     if (query.length != 1) return;
-    
+
     const expire = query[0].expire;
 
-    await newCase(member.guild, "ban", member.user.id, member.guild.members.me.user, `alt of banned \`${mainId}\` joined`);
+    await newCase(
+      member.guild,
+      "ban",
+      member.user.id,
+      member.guild.members.me.user,
+      `alt of banned \`${mainId}\` joined`,
+    );
 
     await newBan(member.guild, [member.user.id], expire);
-    
-    await member.ban({ reason: `alt of banned ${mainId} joined`}).catch(() => {});
+
+    await member.ban({ reason: `alt of banned ${mainId} joined` }).catch(() => {});
     return;
   }
 
@@ -131,7 +141,11 @@ export default async function guildMemberAdd(member: GuildMember) {
 
   let altPunish = false;
 
-  if (await isAltPunish(member.guild) && await isAlt(member.guild, member.user.id) && await isMuted(member.guild, await getMainAccount(member.guild, member.user.id))) {
+  if (
+    (await isAltPunish(member.guild)) &&
+    (await isAlt(member.guild, member.user.id)) &&
+    (await isMuted(member.guild, await getMainAccount(member.guild, member.user.id)))
+  ) {
     const mainId = await getMainAccount(member.guild, member.user.id);
     const query = await prisma.moderationMute.findMany({
       where: {
@@ -140,14 +154,20 @@ export default async function guildMemberAdd(member: GuildMember) {
       },
       select: {
         expire: true,
-      }
+      },
     });
 
     if (query.length != 1) return;
-    
+
     const expire = query[0].expire;
 
-    await newCase(member.guild, "mute", member.user.id, member.guild.members.me.user, `alt of muted \`${mainId}\` joined`);
+    await newCase(
+      member.guild,
+      "mute",
+      member.user.id,
+      member.guild.members.me.user,
+      `alt of muted \`${mainId}\` joined`,
+    );
 
     if (await isMuted(member.guild, member)) {
       await deleteMute(member.guild, member);
@@ -158,7 +178,7 @@ export default async function guildMemberAdd(member: GuildMember) {
     altPunish = true;
   }
 
-  if (await isMuted(member.guild, member) || altPunish) {
+  if ((await isMuted(member.guild, member)) || altPunish) {
     let muteRole = await member.guild.roles.cache.get(await getMuteRole(member.guild));
 
     if (!(await getMuteRole(member.guild))) {

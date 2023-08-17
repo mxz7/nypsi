@@ -53,7 +53,10 @@ export async function newMute(guild: Guild, userIDs: string[], date: Date) {
 export async function isMuted(guild: Guild, member: GuildMember | string) {
   const query = await prisma.moderationMute.findFirst({
     where: {
-      AND: [{ guildId: guild.id }, { userId: typeof member == "string" ? member : (member as GuildMember).user.id }],
+      AND: [
+        { guildId: guild.id },
+        { userId: typeof member == "string" ? member : (member as GuildMember).user.id },
+      ],
     },
     select: {
       userId: true,
