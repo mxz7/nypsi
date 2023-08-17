@@ -260,6 +260,7 @@ export async function addToGuildBank(name: string, amount: number, member: Guild
     },
     data: {
       contributedMoney: { increment: amount },
+      contributedMoneyThisLevel: { increment: amount },
     },
   });
 
@@ -281,6 +282,7 @@ export async function addToGuildXP(name: string, amount: number, member: GuildMe
     },
     data: {
       contributedXp: { increment: amount },
+      contributedXpThisLevel: { increment: amount },
     },
   });
 
@@ -416,6 +418,8 @@ interface EconomyGuildMember {
   joinedAt: Date;
   contributedMoney: bigint;
   contributedXp: number;
+  contributedMoneyThisLevel: bigint;
+  contributedXpThisLevel: number;
 }
 
 async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
@@ -436,6 +440,16 @@ async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
       data: {
         level: { increment: 1 },
         tokens: { increment: 1 },
+      },
+    });
+
+    await prisma.economyGuildMember.updateMany({
+      where: {
+        guildName: guild.guildName,
+      },
+      data: {
+        contributedMoneyThisLevel: 0,
+        contributedXpThisLevel: 0,
       },
     });
 
@@ -505,6 +519,11 @@ async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
 
     for (const dm of dms) {
       dm.embed.setAuthor({ name: guild.guildName });
+      dm.embed.data.description += `\n\nyou contributed ${guild.members
+        .find((i) => i.userId === dm.id)
+        .contributedXpThisLevel.toLocaleString()}xp | $${guild.members
+        .find((i) => i.userId === dm.id)
+        .contributedMoneyThisLevel.toLocaleString()} for this level`;
 
       if ((await getDmSettings(dm.id)).other) {
         addNotificationToQueue({
