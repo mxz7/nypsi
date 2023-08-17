@@ -2399,5 +2399,57 @@
     "sell": 5000000,
     "in_crates": false,
     "tagId": "karma"
+  },
+  "ninja_tag": {
+    "id": "ninja_tag",
+    "name": "ninja tag",
+    "plural": "ninja tags",
+    "article": "a",
+    "emoji": "🥷",
+    "longDesc": "found from the robber v achievement",
+    "rarity": 6,
+    "role": "tag",
+    "sell": 5000000,
+    "in_crates": false,
+    "tagId": "ninja"
+  },
+  "cherry_tag": {
+    "id": "cherry_tag",
+    "name": "cherry tag",
+    "plural": "cherry tags",
+    "article": "a",
+    "emoji": "🍒",
+    "longDesc": "found from the slots pro v achievement",
+    "rarity": 6,
+    "role": "tag",
+    "sell": 5000000,
+    "in_crates": false,
+    "tagId": "cherry"
+  },
+  "spades_tag": {
+    "id": "spades_tag",
+    "name": "spades tag",
+    "plural": "spades tags",
+    "article": "a",
+    "emoji": ":spades:",
+    "longDesc": "found from the blackjack v achievement",
+    "rarity": 6,
+    "role": "tag",
+    "sell": 5000000,
+    "in_crates": false,
+    "tagId": "spades"
+  },
+  "bomb_tag": {
+    "id": "bomb_tag",
+    "name": "bomb tag",
+    "plural": "bomb tags",
+    "article": "a",
+    "emoji": "💣",
+    "longDesc": "found from the mines v achievement",
+    "rarity": 6,
+    "role": "tag",
+    "sell": 5000000,
+    "in_crates": false,
+    "tagId": "bomb"
   }
 }

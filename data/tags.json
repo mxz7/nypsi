@@ -82,5 +82,29 @@
     "name": "karma",
     "description": "found in the karma scratch card",
     "emoji": "🔮"
+  },
+  "ninja": {
+    "id": "ninja",
+    "name": "ninja",
+    "description": "found in the robber achievement",
+    "emoji": "🥷"
+  },
+  "cherry": {
+    "id": "cherry",
+    "name": "cherry",
+    "description": "found in the slots pro v achievement",
+    "emoji": "🍒"
+  },
+  "spades": {
+    "id": "spades",
+    "name": "spades",
+    "description": "found in the blackjack pro v achievement",
+    "emoji": ":spades:"
+  },
+  "bomb": {
+    "id": "bomb",
+    "name": "bomb",
+    "description": "found in the mines pro v achievement",
+    "emoji": "💣"
   }
 }
