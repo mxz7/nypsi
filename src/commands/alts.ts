@@ -32,7 +32,7 @@ const cmd = new Command("alts", "view a user's alts", "moderation")
   .setAliases(["alt", "account", "accounts"])
   .setPermissions(["MANAGE_MESSAGES", "MODERATE_MEMBERS"]);
 
-cmd.slashEnabled = true;
+cmd.slashEnabled = false;
 cmd.slashData.addStringOption((option) =>
   option.setName("user").setDescription("use the user's id or username").setRequired(true),
 );
