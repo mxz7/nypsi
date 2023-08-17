@@ -26,5 +26,19 @@
     "description": "+5% sell multiplier",
     "cost": 2,
     "increment_per_level": 2
+  },
+  "cooldown": {
+    "id": "cooldown",
+    "name": "shorter cooldowns",
+    "description": "5% shorter cooldowns",
+    "cost": 1,
+    "increment_per_level": 1
+  },
+  "bakery": {
+    "id": "bakery",
+    "name": "double cookies",
+    "description": "+0.5% chance to double cookies produced",
+    "cost": 1,
+    "increment_per_level": 0.25
   }
 }

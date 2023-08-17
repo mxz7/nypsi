@@ -2,6 +2,7 @@ import { GuildMember } from "discord.js";
 import redis from "../../init/redis";
 import { ErrorEmbed } from "../../models/EmbedBuilders";
 import { getBoosters } from "../functions/economy/boosters";
+import { getGuildUpgradesByUser } from "../functions/economy/guilds";
 import { getItems } from "../functions/economy/utils";
 import { isBooster } from "../functions/premium/boosters";
 import { getTier, isPremium } from "../functions/premium/premium";
@@ -143,19 +144,27 @@ async function calculateCooldownLength(
   seconds: number,
   member: GuildMember | string,
 ): Promise<number> {
-  if (await isPremium(member)) {
-    if ((await getTier(member)) == 4) {
-      seconds = seconds * 0.25;
-    } else {
-      seconds = seconds * 0.5;
-    }
+  const [premiumTier, booster, guildUpgrades, boosters] = await Promise.all([
+    getTier(member),
+    isBooster(typeof member === "string" ? member : member.user.id),
+    getGuildUpgradesByUser(member),
+    getBoosters(member),
+  ]);
+
+  if (premiumTier == 4) {
+    seconds = seconds * 0.25;
+  } else if (premiumTier > 0) {
+    seconds = seconds * 0.5;
   }
 
-  if (await isBooster(typeof member === "string" ? member : member.user.id)) {
+  if (booster) {
     seconds = seconds * 0.9;
   }
 
-  const boosters = await getBoosters(member);
+  if (guildUpgrades.find((i) => i.upgradeId === "cooldown")) {
+    seconds = seconds * (1 - 0.05 * guildUpgrades.find((i) => i.upgradeId).amount);
+  }
+
   const items = getItems();
 
   if (Array.from(boosters.keys()).includes("redbull")) {
