@@ -18,7 +18,7 @@ upgrades.set(1, ["69420_crate:2"]);
 upgrades.set(2, ["69420_crate:3"]);
 upgrades.set(3, ["69420_crate:4"]);
 upgrades.set(4, ["69420_crate:5"]);
-upgrades.set(9, ["69420_crate:5", "lucky_scratch_card;1"]);
+upgrades.set(9, ["69420_crate:5", "lucky_scratch_card:1"]);
 upgrades.set(14, ["69420_crate:5", "lucky_scratch_card:2"]);
 upgrades.set(16, ["69420_crate:6", "lucky_scratch_card:2"]);
 upgrades.set(19, ["69420_crate:6", "lucky_scratch_card:3"]);
