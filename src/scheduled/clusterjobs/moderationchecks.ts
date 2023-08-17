@@ -79,7 +79,7 @@ export function runLogs() {
       embeds.reverse();
 
       await hook
-        .send({ embeds: embeds, avatarURL: "https://i.imgur.com/r3qfA10.png" })
+        .send({ embeds: embeds })
         .then(() => {
           count += embeds.length;
         })
@@ -166,21 +166,19 @@ export function runLogs() {
 
       modLogCount += embeds.length;
 
-      await webhook
-        .send({ embeds: embeds, avatarURL: "https://i.imgur.com/r3qfA10.png" })
-        .catch(async (e) => {
-          logger.error(`error sending modlogs to webhook (${modlog.guildId}) - removing modlogs`);
-          logger.error("moderation checks error", e);
+      await webhook.send({ embeds: embeds }).catch(async (e) => {
+        logger.error(`error sending modlogs to webhook (${modlog.guildId}) - removing modlogs`);
+        logger.error("moderation checks error", e);
 
-          await prisma.moderation.update({
-            where: {
-              guildId: modlog.guildId,
-            },
-            data: {
-              modlogs: "",
-            },
-          });
+        await prisma.moderation.update({
+          where: {
+            guildId: modlog.guildId,
+          },
+          data: {
+            modlogs: "",
+          },
         });
+      });
       webhook.destroy();
     }
 

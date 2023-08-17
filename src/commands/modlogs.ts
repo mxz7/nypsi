@@ -111,7 +111,7 @@ async function run(
     const hook = await channel
       .createWebhook({
         name: "nypsi",
-        avatar: "https://i.imgur.com/r3qfA10.png",
+        avatar: channel.client.user.avatarURL(),
       })
       .catch((e) => {
         fail = true;
