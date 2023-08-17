@@ -10,12 +10,12 @@ import {
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
+import { isAltPunish } from "../utils/functions/guilds/altpunish";
 import { getExactMember } from "../utils/functions/member";
+import { getAlts, getMainAccount, isAlt } from "../utils/functions/moderation/alts";
 import { isBanned, newBan } from "../utils/functions/moderation/ban";
 import { newCase } from "../utils/functions/moderation/cases";
 import { createProfile, profileExists } from "../utils/functions/moderation/utils";
-import { getAlts, getMainAccount, isAlt } from "../utils/functions/moderation/alts";
-import { isAltPunish } from "../utils/functions/guilds/altpunish";
 
 const cmd = new Command(
   "ban",
@@ -235,7 +235,7 @@ async function run(
   if (!punishAlts) return;
 
   for (const id of alts) {
-    if (!await isBanned(message.guild, id.altId))
+    if (!(await isBanned(message.guild, id.altId)))
       await doBan(
         message,
         await getExactMember(message.guild, id.altId),

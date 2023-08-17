@@ -14,10 +14,9 @@ import {
 } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders.js";
+import Constants from "../utils/Constants";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getExactMember, getMember } from "../utils/functions/member";
-import { createProfile, profileExists } from "../utils/functions/moderation/utils";
-import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import {
   addAlt,
   deleteAlt,
@@ -25,8 +24,9 @@ import {
   getMainAccount,
   isAlt,
 } from "../utils/functions/moderation/alts";
-import Constants from "../utils/Constants";
+import { createProfile, profileExists } from "../utils/functions/moderation/utils";
 import { getLastKnownUsername } from "../utils/functions/users/tag";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("alts", "view a user's alts", "moderation")
   .setAliases(["alt", "account", "accounts"])
@@ -88,7 +88,10 @@ async function run(
   if (args.length == 0) {
     const embed = new CustomEmbed(message.member)
       .setHeader("alts help")
-      .addField("info", "keep track of a user's alts in one easy place\n\nalts of a user can be automatically punished with their main\naccount when one is punished (/settings server alt-punish)\n[more info](https://docs.nypsi.xyz/moderation/alt-punish)")
+      .addField(
+        "info",
+        "keep track of a user's alts in one easy place\n\nalts of a user can be automatically punished with their main\naccount when one is punished (/settings server alt-punish)\n[more info](https://docs.nypsi.xyz/moderation/alt-punish)",
+      )
       .addField("usage", `${prefix}alts @user\n${prefix}alts <user ID or tag>`);
 
     return send({ embeds: [embed] });
@@ -125,7 +128,7 @@ async function run(
 
     if (res.customId === "add-alt") {
       await res.editReply({
-        embeds: [new CustomEmbed(message.member, "type user id")],
+        embeds: [new CustomEmbed(message.member, "send user id")],
       });
 
       const msg = await message.channel
@@ -151,7 +154,17 @@ async function run(
         msg.content,
       );
 
-      if (addAltRes) await res.editReply({ embeds: [new CustomEmbed(message.member, `✅ added \`${msg.content}\` as an alt for ${member instanceof GuildMember ? member.user.username : `\`${member}\``}`)] });
+      if (addAltRes)
+        await res.editReply({
+          embeds: [
+            new CustomEmbed(
+              message.member,
+              `✅ added \`${msg.content}\` as an alt for ${
+                member instanceof GuildMember ? member.user.username : `\`${member}\``
+              }`,
+            ),
+          ],
+        });
       else
         await res.editReply({
           embeds: [
@@ -173,7 +186,7 @@ async function run(
       return waitForButton(altMsg);
     } else if (res.customId === "del-alt") {
       await res.editReply({
-        embeds: [new CustomEmbed(message.member, "type user id")],
+        embeds: [new CustomEmbed(message.member, "send user id")],
       });
 
       const msg = await message.channel
@@ -198,7 +211,16 @@ async function run(
       }
 
       await deleteAlt(message.guild, msg.content);
-      await res.editReply({ embeds: [new CustomEmbed(message.member, `✅ removed \`${msg.content}\` as an alt for ${member instanceof GuildMember ? member.user.username : `\`${member}\``}`)] });
+      await res.editReply({
+        embeds: [
+          new CustomEmbed(
+            message.member,
+            `✅ removed \`${msg.content}\` as an alt for ${
+              member instanceof GuildMember ? member.user.username : `\`${member}\``
+            }`,
+          ),
+        ],
+      });
       await altMsg.edit({
         embeds: [await getEmbed(message, member)],
         components: [await getRow(message, member)],

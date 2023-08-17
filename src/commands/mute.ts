@@ -10,14 +10,14 @@ import {
 } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
+import { isAltPunish } from "../utils/functions/guilds/altpunish";
 import { getExactMember } from "../utils/functions/member";
+import { getAlts, getMainAccount, isAlt } from "../utils/functions/moderation/alts";
 import { newCase } from "../utils/functions/moderation/cases";
 import { deleteMute, getMuteRole, isMuted, newMute } from "../utils/functions/moderation/mute";
 import { createProfile, profileExists } from "../utils/functions/moderation/utils";
 import ms = require("ms");
 import dayjs = require("dayjs");
-import { getAlts, getMainAccount, isAlt } from "../utils/functions/moderation/alts";
-import { isAltPunish } from "../utils/functions/guilds/altpunish";
 
 const cmd = new Command("mute", "mute one or more users", "moderation").setPermissions([
   "MANAGE_MESSAGES",
@@ -350,29 +350,31 @@ async function doMute(
   let fail = false;
   if (isAlt) {
     reason += " (alt)";
-    if (mode == "role") try {
+
+    try {
       if (target.user.id == message.client.user.id) return;
 
       if (mode == "role") {
         const targetHighestRole = target.roles.highest;
         const memberHighestRole = message.member.roles.highest;
-  
+
         if (
           targetHighestRole.position >= memberHighestRole.position &&
           message.guild.ownerId != message.author.id
-        ) return;
-        await target.roles.add(muteRole);
+        )
+          return;
+        await target.roles.add(muteRole).catch(() => (fail = true));
       } else if (mode == "timeout") {
-    
         const targetHighestRole = target.roles.highest;
         const memberHighestRole = message.member.roles.highest;
-    
+
         if (
           (targetHighestRole.position >= memberHighestRole.position &&
-          message.guild.ownerId != message.author.id ) ||
-          target.isCommunicationDisabled() as boolean
-        ) return;
-        else await target.disableCommunicationUntil(unmuteDate, reason)
+            message.guild.ownerId != message.author.id) ||
+          (target.isCommunicationDisabled() as boolean)
+        )
+          return;
+        else await target.disableCommunicationUntil(unmuteDate, reason).catch(() => (fail = true));
       }
     } catch {
       fail = true;
