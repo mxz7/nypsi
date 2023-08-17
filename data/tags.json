@@ -94,5 +94,11 @@
     "name": "cherry",
     "description": "found in the slots pro v achievement",
     "emoji": "🍒"
+  },
+  "spades": {
+    "id": "spades",
+    "name": "spades",
+    "description": "found in the blackjack pro v achievement",
+    "emoji": ":spades:"
   }
 }

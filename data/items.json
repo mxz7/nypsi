@@ -2425,5 +2425,18 @@
     "sell": 5000000,
     "in_crates": false,
     "tagId": "cherry"
+  },
+  "spades_tag": {
+    "id": "spades_tag",
+    "name": "spades tag",
+    "plural": "spades tags",
+    "article": "a",
+    "emoji": ":spades:",
+    "longDesc": "found from the blackjack v achievement",
+    "rarity": 6,
+    "role": "tag",
+    "sell": 5000000,
+    "in_crates": false,
+    "tagId": "spades"
   }
 }

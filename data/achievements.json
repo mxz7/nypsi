@@ -1233,7 +1233,7 @@
     "emoji": "♠️",
     "target": 1000,
     "description": "get a blackjack 1,000 times",
-    "prize": ["nypsi_crate:1", "legendary_scratch_card:3"]
+    "prize": ["nypsi_crate:1", "legendary_scratch_card:3", "spades_tag:1"]
   },
   "capitalist_i": {
     "id": "capitalist_i",
