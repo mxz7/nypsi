@@ -310,7 +310,7 @@
     "emoji": "🥷",
     "target": 10000,
     "description": "complete 10,000 successful robberies",
-    "prize": ["lucky_scratch_card:3"]
+    "prize": ["lucky_scratch_card:3", "ninja_tag:1"]
   },
   "whore_i": {
     "id": "whore_i",

@@ -2399,5 +2399,18 @@
     "sell": 5000000,
     "in_crates": false,
     "tagId": "karma"
+  },
+  "ninja_tag": {
+    "id": "ninja_tag",
+    "name": "ninja tag",
+    "plural": "ninja tags",
+    "article": "a",
+    "emoji": "🥷",
+    "longDesc": "found from the robber v achievement",
+    "rarity": 6,
+    "role": "tag",
+    "sell": 5000000,
+    "in_crates": false,
+    "tagId": "ninja"
   }
 }
