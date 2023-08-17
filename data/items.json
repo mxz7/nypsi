@@ -2412,5 +2412,18 @@
     "sell": 5000000,
     "in_crates": false,
     "tagId": "ninja"
+  },
+  "cherry_tag": {
+    "id": "cherry_tag",
+    "name": "cherry tag",
+    "plural": "cherry tags",
+    "article": "a",
+    "emoji": "🍒",
+    "longDesc": "found from the slots pro v achievement",
+    "rarity": 6,
+    "role": "tag",
+    "sell": 5000000,
+    "in_crates": false,
+    "tagId": "cherry"
   }
 }

@@ -667,7 +667,7 @@
     "emoji": "🍒",
     "target": 1000,
     "description": "win on cherries 1,000 times",
-    "prize": ["nypsi_crate:1", "legendary_scratch_card:3"]
+    "prize": ["nypsi_crate:1", "legendary_scratch_card:3", "cherry_tag:1"]
   },
   "horny_i": {
     "id": "horny_i",

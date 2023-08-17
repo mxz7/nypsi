@@ -88,5 +88,11 @@
     "name": "ninja",
     "description": "found in the robber achievement",
     "emoji": "🥷"
+  },
+  "cherry": {
+    "id": "cherry",
+    "name": "cherry",
+    "description": "found in the slots pro v achievement",
+    "emoji": "🍒"
   }
 }
