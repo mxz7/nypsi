@@ -267,7 +267,14 @@ export async function addToGuildBank(name: string, amount: number, member: Guild
   return checkUpgrade(name);
 }
 
-export async function addToGuildXP(name: string, amount: number, member: GuildMember) {
+export async function addToGuildXP(name: string, amount: number, member: GuildMember | string) {
+  let id: string;
+  if (member instanceof GuildMember) {
+    id = member.user.id;
+  } else {
+    id = member;
+  }
+
   await prisma.economyGuild.update({
     where: {
       guildName: name,
@@ -278,7 +285,7 @@ export async function addToGuildXP(name: string, amount: number, member: GuildMe
   });
   await prisma.economyGuildMember.update({
     where: {
-      userId: member.user.id,
+      userId: id,
     },
     data: {
       contributedXp: { increment: amount },
@@ -639,8 +646,15 @@ export async function addGuildUpgrade(guildName: string, upgradeId: string) {
   await redis.del(`${Constants.redis.cache.economy.GUILD_UPGRADES}:${guildName}`);
 }
 
-export async function getGuildName(member: GuildMember) {
-  const cache = await redis.get(`${Constants.redis.cache.economy.GUILD_USER}:${member.user.id}`);
+export async function getGuildName(member: GuildMember | string) {
+  let id: string;
+  if (member instanceof GuildMember) {
+    id = member.user.id;
+  } else {
+    id = member;
+  }
+
+  const cache = await redis.get(`${Constants.redis.cache.economy.GUILD_USER}:${id}`);
 
   if (cache) {
     if (cache === "noguild") return null;
