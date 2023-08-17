@@ -28,7 +28,7 @@ export async function addFailedHeartbeat(cluster: Cluster) {
   if (failedHeartbeats.has(cluster.id)) {
     if (failedHeartbeats.get(cluster.id) >= 5) {
       logger.info(`respawning cluster ${cluster.id} due to missing heartbeats`);
-      await cluster.respawn();
+      await cluster.respawn().then((c) => c.emit("ready"));
       failedHeartbeats.delete(cluster.id);
     } else {
       failedHeartbeats.set(cluster.id, failedHeartbeats.get(cluster.id) + 1);
