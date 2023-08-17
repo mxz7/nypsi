@@ -33,9 +33,8 @@ async function doWorkerThing() {
   const hasSteve = new Set<string>();
 
   for (const worker of query) {
-    const { maxStorage, perInterval, perItem, scrapChance, gemChance } = await calcWorkerValues(
-      worker,
-    );
+    const { maxStorage, perInterval, perItem, scrapChance, gemChance } =
+      await calcWorkerValues(worker);
 
     if (!hasSteve.has(worker.userId)) {
       const boosters = await getBoosters(worker.userId);
