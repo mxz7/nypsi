@@ -811,7 +811,7 @@ async function run(
 
       thislevel += `${position} **${
         m.economy.user.lastKnownUsername
-      }** ${m.contributedXp.toLocaleString()}xp **|** $${m.contributedMoney.toLocaleString()}\n`;
+      }** ${m.contributedXpThisLevel.toLocaleString()}xp **|** $${m.contributedMoneyThisLevel.toLocaleString()}\n`;
     }
 
     embed.addField(`level ${guild.level}`, thislevel, true);
