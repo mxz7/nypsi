@@ -5,6 +5,7 @@ import {
   InteractionReplyOptions,
   Message,
   PermissionFlagsBits,
+  User,
 } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
