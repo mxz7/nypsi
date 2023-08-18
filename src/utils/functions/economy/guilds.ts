@@ -9,7 +9,7 @@ import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { addInventoryItem } from "./inventory";
-import { getItems } from "./utils";
+import { getItems, isEcoBanned } from "./utils";
 import ms = require("ms");
 
 const upgrades = new Map<number, string[]>();
@@ -493,6 +493,7 @@ async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
       .filter((i) => i.contributedMoney > 0);
 
     for (const member of top4Xp) {
+      if (await isEcoBanned(member.userId)) continue;
       const desc: string[] = [];
       for (const reward of rewards) {
         const [itemId, amount] = reward.split(":");
@@ -508,6 +509,7 @@ async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
     }
 
     for (const member of top4Money) {
+      if (await isEcoBanned(member.userId)) continue;
       const desc: string[] = [];
       for (const reward of rewards) {
         const [itemId, amount] = reward.split(":");
