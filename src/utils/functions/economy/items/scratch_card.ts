@@ -173,6 +173,22 @@ async function prepare(
 
           await a(message.author.id, message.author.username, message.content);
 
+          if (await redis.get("nypsi:maintenance")) {
+            if (message.author.id == Constants.TEKOH_ID && message instanceof Message) {
+              message.react("💀");
+            } else {
+              msg.edit({
+                embeds: [
+                  new CustomEmbed(
+                    message.member,
+                    "fun & moderation commands are still available to you. maintenance mode only prevents certain commands to prevent loss of progress",
+                  ).setTitle("⚠️ nypsi is under maintenance"),
+                ],
+              });
+              return;
+            }
+          }
+
           logger.info(
             `::cmd ${message.guild.id} ${message.author.username}: replaying ${selected.id}`,
           );
