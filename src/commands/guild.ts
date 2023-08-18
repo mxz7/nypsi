@@ -783,8 +783,10 @@ async function run(
     let overall = "";
     let thislevel = "";
 
-    for (const m of sort(members).desc([(i) => i.contributedXp, (i) => i.contributedMoney])) {
-      let position = (members.indexOf(m) + 1).toString();
+    const overallSort = sort(members).desc([(i) => i.contributedXp, (i) => i.contributedMoney]);
+
+    for (const m of overallSort) {
+      let position = (overallSort.indexOf(m) + 1).toString();
 
       if (position == "1") position = "🥇";
       else if (position == "2") position = "🥈";
@@ -798,11 +800,13 @@ async function run(
 
     embed.addField("overall", overall, true);
 
-    for (const m of sort(members).desc([
+    const levelSort = sort(members).desc([
       (i) => i.contributedXpThisLevel,
       (i) => i.contributedMoneyThisLevel,
-    ])) {
-      let position = (members.indexOf(m) + 1).toString();
+    ]);
+
+    for (const m of levelSort) {
+      let position = (levelSort.indexOf(m) + 1).toString();
 
       if (position == "1") position = "🥇";
       else if (position == "2") position = "🥈";
