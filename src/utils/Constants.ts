@@ -60,6 +60,7 @@ export default {
         PREFIX: "cache:guild:prefix",
         REACTION_ROLES: "cache:guild:reactionroles",
         SLASH_ONLY: "cache:guild:slashonly",
+        ALT_PUNISH: "cache:guild:altpunish",
         LOGS_GUILDS: "cache:guild:logs:guilds",
         MODLOGS_GUILDS: "cache:guild:modlogs:guilds",
         JOIN_ORDER: "cache:guild:join:order",

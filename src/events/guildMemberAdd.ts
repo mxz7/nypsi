@@ -12,11 +12,16 @@ import {
 } from "../utils/functions/guilds/roles";
 import { createGuild, hasGuild, runCheck } from "../utils/functions/guilds/utils";
 import { addLog, isLogsEnabled } from "../utils/functions/moderation/logs";
-import { deleteMute, getMuteRole, isMuted } from "../utils/functions/moderation/mute";
+import { deleteMute, getMuteRole, isMuted, newMute } from "../utils/functions/moderation/mute";
 import { profileExists } from "../utils/functions/moderation/utils";
 import sleep from "../utils/functions/sleep";
 import { fetchUsernameHistory } from "../utils/functions/users/history";
 import { logger } from "../utils/logger";
+import { isAltPunish } from "../utils/functions/guilds/altpunish";
+import { getAllGroupAccountIds } from "../utils/functions/moderation/alts";
+import prisma from "../init/database";
+import { newCase } from "../utils/functions/moderation/cases";
+import { isBanned, newBan } from "../utils/functions/moderation/ban";
 
 const queue = new Set<string>();
 
@@ -98,9 +103,85 @@ export default async function guildMemberAdd(member: GuildMember) {
 
   if (!(await profileExists(member.guild))) return;
 
+  let toBan: string = null;
+
+  for (const id of await getAllGroupAccountIds(member.guild, member.user.id)) {
+    if (await isBanned(member.guild, id)) toBan = id;
+  }
+
+  if (
+    (await isAltPunish(member.guild)) &&
+    toBan
+  ) {
+    const query = await prisma.moderationBan.findFirst({
+      where: {
+        guildId: member.guild.id,
+        userId: toBan,
+      },
+      select: {
+        expire: true,
+      },
+    });
+
+    let fail = false;
+
+    await member.ban({ reason: `known alt of banned user joined` }).catch(() => (fail = true));
+
+    if (fail) return;
+
+    await newCase(
+      member.guild,
+      "ban",
+      member.user.id,
+      member.guild.members.me.user,
+      `known alt of banned user joined`,
+    );
+
+    await newBan(member.guild, [member.user.id], query.expire);
+
+    return;
+  }
+
   if ((await getMuteRole(member.guild)) == "timeout") return;
 
-  if (await isMuted(member.guild, member)) {
+  let altPunish = false;
+
+
+  let toMute: string = null;
+
+  for (const id of await getAllGroupAccountIds(member.guild, member.user.id)) {
+    if (await isMuted(member.guild, id)) toMute = id;
+  }
+
+  if (
+    (await isAltPunish(member.guild)) &&
+    (!await isMuted(member.guild, member)) &&
+    toMute
+  ) {
+    const query = await prisma.moderationMute.findFirst({
+      where: {
+        guildId: member.guild.id,
+        userId: toMute,
+      },
+      select: {
+        expire: true,
+      },
+    });
+
+    await newCase(
+      member.guild,
+      "mute",
+      member.user.id,
+      member.guild.members.me.user,
+      `known alt of muted user joined`,
+    );
+
+    await newMute(member.guild, [member.user.id], query.expire);
+
+    altPunish = true;
+  }
+
+  if ((await isMuted(member.guild, member)) || altPunish) {
     let muteRole = await member.guild.roles.cache.get(await getMuteRole(member.guild));
 
     if (!(await getMuteRole(member.guild))) {
