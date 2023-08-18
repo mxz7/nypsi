@@ -42,7 +42,7 @@ export async function isAlt(guild: Guild, altId: string) {
     },
   });
 
-  return (query && await getExactMember(guild, await getMainAccount(guild, altId))) ? true : false;
+  return query && (await getExactMember(guild, await getMainAccount(guild, altId))) ? true : false;
 }
 
 export async function isMainAccount(guild: Guild, userId: string) {

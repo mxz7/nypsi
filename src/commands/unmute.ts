@@ -95,7 +95,7 @@ async function run(
   let alts = await getAlts(message.guild, target.user.id).catch(() => []);
 
   if (!target) return send({ embeds: [new ErrorEmbed("invalid user")] });
-  
+
   if (punishAlts && (await isAlt(message.guild, target.user.id))) {
     target = await getExactMember(
       message.guild,
@@ -128,44 +128,40 @@ async function run(
   let fail = false;
 
   if (mode == "role") {
-      if (target.roles.cache.has(muteRole.id)) {
-        await target.roles
-          .remove(muteRole)
-          .catch(() => {
-            fail = true;
-            return send({
-              embeds: [
-                new ErrorEmbed(
-                  "there was an error when removing the role, please ensure i have the correct permissions",
-                ),
-              ],
-            });
-          });
-      } else {
+    if (target.roles.cache.has(muteRole.id)) {
+      await target.roles.remove(muteRole).catch(() => {
         fail = true;
         return send({
           embeds: [
             new ErrorEmbed(
-              `**${target.user.username}** does not have the muted role (${muteRole.toString()})`,
+              "there was an error when removing the role, please ensure i have the correct permissions",
             ),
           ],
         });
-      }
+      });
+    } else {
+      fail = true;
+      return send({
+        embeds: [
+          new ErrorEmbed(
+            `**${target.user.username}** does not have the muted role (${muteRole.toString()})`,
+          ),
+        ],
+      });
+    }
   } else if (mode == "timeout") {
-      if (target.isCommunicationDisabled()) {
-        await target
-          .disableCommunicationUntil(null)
-          .catch(() => {
-            fail = true;
-            return send({
-              embeds: [
-                new ErrorEmbed(
-                  "there was an error when unmuting the user, please ensure i have the correct permissions",
-                ),
-              ],
-            });
-          });
-      }
+    if (target.isCommunicationDisabled()) {
+      await target.disableCommunicationUntil(null).catch(() => {
+        fail = true;
+        return send({
+          embeds: [
+            new ErrorEmbed(
+              "there was an error when unmuting the user, please ensure i have the correct permissions",
+            ),
+          ],
+        });
+      });
+    }
   }
 
   if (fail) return;
@@ -179,7 +175,7 @@ async function run(
       alts.length != 1 ? "alts have" : "alt has"
     } been unmuted`;
 
-    embed.setDescription(msg);
+  embed.setDescription(msg);
 
   if (args.join(" ").includes("-s")) {
     if (message instanceof Message) {
@@ -193,11 +189,18 @@ async function run(
   }
 
   await doUnmute(message, target, args, mode);
-  
+
   if (!punishAlts) return;
 
   for (const id of alts) {
-    await doUnmute(message, await getExactMember(message.guild, id.altId), args, mode, muteRole, true);
+    await doUnmute(
+      message,
+      await getExactMember(message.guild, id.altId),
+      args,
+      mode,
+      muteRole,
+      true,
+    );
   }
 }
 
@@ -212,13 +215,13 @@ async function doUnmute(
   let reason = args.length > 1 ? args.slice(1).join(" ") : "no reason given";
   let fail = false;
   if (isAlt) {
-    reason += " (alt)"
+    reason += " (alt)";
     try {
       if (mode == "role") {
         if (mode == "role") {
-          if (target.roles.cache.has(muteRole.id)) await target.roles.remove(muteRole)
+          if (target.roles.cache.has(muteRole.id)) await target.roles.remove(muteRole);
           else fail = true;
-      } else if (mode == "timeout") {
+        } else if (mode == "timeout") {
           if (target.isCommunicationDisabled()) await target.disableCommunicationUntil(null);
         }
       }
@@ -228,13 +231,7 @@ async function doUnmute(
   }
   if (fail) return;
 
-  await newCase(
-    message.guild,
-    "unmute",
-    target.user.id,
-    message.author,
-    reason,
-  );
+  await newCase(message.guild, "unmute", target.user.id, message.author, reason);
 }
 
 cmd.setRun(run);

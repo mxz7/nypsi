@@ -278,7 +278,13 @@ export async function checkAutoMute(message: Message) {
         });
     } else {
       await member.roles
-        .add(muteRole, `filter violation auto mute${isAlt ? " (alt)" : ""} - ${MStoTime(length * 1000, true).trim()}`)
+        .add(
+          muteRole,
+          `filter violation auto mute${isAlt ? " (alt)" : ""} - ${MStoTime(
+            length * 1000,
+            true,
+          ).trim()}`,
+        )
         .then(() => {
           successful = true;
         })
@@ -316,19 +322,20 @@ export async function checkAutoMute(message: Message) {
   const punishAlts = await isAltPunish(message.guild);
   let alts = await getAlts(message.guild, main.user.id).catch(() => []);
 
-  if (punishAlts && await isAlt(message.guild,  message.member.user.id)) {
-    main = await getExactMember(message.guild, await getMainAccount(message.guild, message.member.user.id));
+  if (punishAlts && (await isAlt(message.guild, message.member.user.id))) {
+    main = await getExactMember(
+      message.guild,
+      await getMainAccount(message.guild, message.member.user.id),
+    );
     alts = await getAlts(message.guild, main.user.id).catch(() => []);
   }
 
   await muteUser(main, level);
 
   if (punishAlts) {
-
-    for (const alt of alts) { 
+    for (const alt of alts) {
       const member = await getExactMember(message.guild, alt.altId);
       if (member) await muteUser(member, level, true);
     }
   }
-  
 }

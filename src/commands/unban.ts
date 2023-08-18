@@ -138,13 +138,13 @@ async function run(
       ],
     });
 
-    let msg = `✅ \`${unbannedUser.username}\` has been unbanned`;
+  let msg = `✅ \`${unbannedUser.username}\` has been unbanned`;
 
-    if (alts.length > 0 && punishAlts) {
-      msg = `✅ \`${unbannedUser.username}\` + ${alts.length} ${
-        alts.length != 1 ? "alts have" : "alt has"
-      } been unbanned`;
-    }
+  if (alts.length > 0 && punishAlts) {
+    msg = `✅ \`${unbannedUser.username}\` + ${alts.length} ${
+      alts.length != 1 ? "alts have" : "alt has"
+    } been unbanned`;
+  }
 
   const embed = new CustomEmbed(message.member, msg);
 
@@ -160,7 +160,7 @@ async function run(
   }
 
   await doUnban(message, target, args);
-  
+
   if (!punishAlts) return;
 
   for (const id of alts) {
@@ -176,7 +176,7 @@ async function doUnban(
 ) {
   let reason = args.length > 1 ? args.slice(1).join(" ") : "no reason given";
   if (isAlt) {
-    reason += " (alt)"
+    reason += " (alt)";
     let fail = false;
 
     const banned = await message.guild.bans.fetch();
@@ -190,13 +190,7 @@ async function doUnban(
     if (fail || !unbannedUser) return;
   }
 
-  await newCase(
-    message.guild,
-    "unban",
-    targetId,
-    message.author,
-    reason,
-  );
+  await newCase(message.guild, "unban", targetId, message.author, reason);
 }
 
 cmd.setRun(run);

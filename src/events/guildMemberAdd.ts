@@ -121,7 +121,7 @@ export default async function guildMemberAdd(member: GuildMember) {
 
     let fail = false;
 
-    await member.ban({ reason: `alt of banned ${mainId} joined` }).catch(() => fail = true);
+    await member.ban({ reason: `alt of banned ${mainId} joined` }).catch(() => (fail = true));
 
     if (fail) return;
 
