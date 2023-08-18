@@ -743,7 +743,7 @@
     "emoji": "🐶",
     "target": 15000,
     "description": "view 15,000 animal images",
-    "prize": ["legendary_scratch_card:1", "teddy:69"]
+    "prize": ["legendary_scratch_card:1", "teddy:69", "dog_tag:1"]
   },
   "unsure_i": {
     "id": "unsure_i",
