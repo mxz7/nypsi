@@ -106,5 +106,11 @@
     "name": "bomb",
     "description": "found in the mines pro v achievement",
     "emoji": "💣"
+  },
+  "cum": {
+    "id": "cum",
+    "name": "cum",
+    "description": "found in the horny v achievement",
+    "emoji": "💦"
   }
 }
