@@ -1009,7 +1009,7 @@ async function run(
       .setHeader(
         `${guild.guildName} upgrades`,
         message.author.avatarURL(),
-        `https://nypsi.xyz/guild/${guild.guildName}`,
+        `https://nypsi.xyz/guild/${encodeURIComponent(guild.guildName)}`,
       )
       .setFields(...pages.get(1))
       .setFooter({ text: `you have ${guild.tokens} token${guild.tokens != 1 ? "s" : ""}` });
