@@ -104,7 +104,7 @@ async function run(
     return send({ embeds: [embed] });
   }
 
-  let target = await getExactMember(message.guild, args[0]);
+  const target = await getExactMember(message.guild, args[0]);
   let reason = "";
 
   if (!target) return send({ embeds: [new ErrorEmbed("invalid user")] });

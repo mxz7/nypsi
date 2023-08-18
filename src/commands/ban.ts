@@ -16,7 +16,6 @@ import { getAllGroupAccountIds } from "../utils/functions/moderation/alts";
 import { isBanned, newBan } from "../utils/functions/moderation/ban";
 import { newCase } from "../utils/functions/moderation/cases";
 import { createProfile, profileExists } from "../utils/functions/moderation/utils";
-import { logger } from "../utils/logger";
 
 const cmd = new Command(
   "ban",
