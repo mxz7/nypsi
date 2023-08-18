@@ -725,7 +725,7 @@ export async function topCompletion(guild: Guild, userId: string) {
         members.get(user).user.username,
         true,
         tag?.tagId,
-      )}${completionRate.get(user).toFixed(1)}%`;
+      )} ${completionRate.get(user).toFixed(1)}%`;
 
       count++;
     }
