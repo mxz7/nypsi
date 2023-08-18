@@ -353,7 +353,7 @@ async function run(
         ),
       ];
 
-      const msg = await send({ embeds: [embed], components });
+      let msg = await send({ embeds: [embed], components });
 
       const voted = [message.author.id];
 
@@ -393,7 +393,7 @@ async function run(
           await countdownMsg.delete().catch(() => {});
           await startOpenChatReaction(message.guild, message.channel as TextChannel);
         } else {
-          await msg.edit({ embeds: [embed] });
+          msg = await msg.edit({ embeds: [embed] });
         }
       }, 500);
 
