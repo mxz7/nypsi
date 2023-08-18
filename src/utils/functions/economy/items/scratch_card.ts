@@ -166,6 +166,7 @@ async function prepare(
 
           if (await isLockedOut(message.author.id)) {
             verifyUser(message);
+            msg.edit({ embeds: [new ErrorEmbed("please answer the captcha")] });
             return;
           }
 
