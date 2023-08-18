@@ -12,10 +12,11 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
 import { isAltPunish } from "../utils/functions/guilds/altpunish";
 import { getExactMember } from "../utils/functions/member";
-import { getAlts, getMainAccount, isAlt } from "../utils/functions/moderation/alts";
+import { getAllGroupAccountIds } from "../utils/functions/moderation/alts";
 import { isBanned, newBan } from "../utils/functions/moderation/ban";
 import { newCase } from "../utils/functions/moderation/cases";
 import { createProfile, profileExists } from "../utils/functions/moderation/utils";
+import { logger } from "../utils/logger";
 
 const cmd = new Command(
   "ban",
@@ -96,27 +97,16 @@ async function run(
     return send({ embeds: [embed] });
   }
 
-  let target = await getExactMember(message.guild, args[0]);
+  const target = await getExactMember(message.guild, args[0]);
   let mode: "target" | "id" = "target";
   let userId: string;
 
   const punishAlts = await isAltPunish(message.guild);
 
-  let alts = await getAlts(message.guild, target.user.id).catch(() => []);
-
   if (!target) {
     if (args[0].match(Constants.SNOWFLAKE_REGEX)) {
       mode = "id";
       userId = args[0];
-      alts = await getAlts(message.guild, args[0]);
-    }
-  } else if (punishAlts) {
-    if (await isAlt(message.guild, target.user.id)) {
-      target = await getExactMember(
-        message.guild,
-        await getMainAccount(message.guild, target.user.id),
-      );
-      alts = await getAlts(message.guild, target.user.id).catch(() => []);
     }
   }
 
@@ -201,53 +191,74 @@ async function run(
 
   if (temporary) banLength = getTime(duration * 1000);
 
+  await doBan(message, target, reason, args, mode, temporary, banLength, unbanDate, userId);
+
   const embed = new CustomEmbed(message.member);
 
-  let msg = `✅ \`${mode == "id" ? idUser : target.user.username}\` has been banned`;
+  let msg = punishAlts ? `banning account and any alts...` : `✅ \`${mode == "id" ? idUser : target.user.username}\` has been banned`;
 
-  if (alts.length > 0 && punishAlts) {
-    msg = `✅ \`${mode == "id" ? idUser : target.user.username}\` + ${alts.length} ${
-      alts.length != 1 ? "alts have" : "alt has"
-    } been banned`;
-  }
-
-  if (temporary) {
+  if (!punishAlts && temporary) {
     msg += ` for **${banLength}**`;
-  } else if (reason.split(": ")[1] !== "no reason given") {
-    msg += ` for **${reason.split(": ")[1]}**`;
+  } else if (!punishAlts && reason.split(": ")[1] !== "no reason given") {
+    msg += ` for **${reason}**`;
   }
-
+  
   embed.setDescription(msg);
+  
+  let res;
 
   if (args.join(" ").includes("-s")) {
     if (message instanceof Message) {
       await message.delete();
-      await message.member.send({ embeds: [embed] }).catch(() => {});
+      res = await message.member.send({ embeds: [embed] }).catch(() => {});
     } else {
-      await message.reply({ embeds: [embed], ephemeral: true });
+      res = await message.reply({ embeds: [embed], ephemeral: true });
     }
   } else {
-    await send({ embeds: [embed] });
+    res = await send({ embeds: [embed] });
   }
 
-  await doBan(message, target, reason, args, mode, temporary, banLength, unbanDate, userId);
+  let altsBanned = 0;
 
-  if (!punishAlts) return;
+  if (punishAlts) {
+    for (const id of await getAllGroupAccountIds(message.guild, target.user.id)) {
+      if (id == target.user.id) continue;
+      if (!(await isBanned(message.guild, id))) {
+        const banned = await doBan(
+          message,
+          await getExactMember(message.guild, id),
+          reason,
+          args,
+          "target",
+          temporary,
+          banLength,
+          unbanDate,
+          id,
+          true,
+        );
+        if (banned) altsBanned++;
+      }
+    }
+  }
+  
+  if (altsBanned > 0)
+    msg = `✅ \`${target.user.username}\` + ${altsBanned} ${
+      altsBanned != 1 ? "alts have" : "alt has"
+    } been banned`;
+  else msg = `✅ \`${target.user.username}\` has been banned`;
 
-  for (const id of alts) {
-    if (!(await isBanned(message.guild, id.altId)))
-      await doBan(
-        message,
-        await getExactMember(message.guild, id.altId),
-        reason,
-        args,
-        "target",
-        temporary,
-        banLength,
-        unbanDate,
-        id.altId,
-        true,
-      );
+  if (temporary) {
+    msg += ` for **${banLength}**`;
+  } else if (!punishAlts && reason.split(": ")[1] !== "no reason given") {
+    msg += ` for **${reason}**`;
+  }
+
+  embed.setDescription(msg);
+  
+  if (message instanceof Message) {
+    await (res as Message).edit({ embeds: [embed] });
+  } else {
+    await message.editReply({ embeds: [embed] })
   }
 }
 
@@ -276,10 +287,10 @@ async function doBan(
         const memberHighestRole = message.member.roles.highest.position;
 
         if (targetHighestRole >= memberHighestRole && message.author.id !== message.guild.ownerId) {
-          return;
+          return false;
         }
 
-        if (target.user.id == message.client.user.id) return;
+        if (target.user.id == message.client.user.id) return false;
 
         await message.guild.members.ban(target, {
           reason: reason,
@@ -289,7 +300,7 @@ async function doBan(
       fail = true;
     }
   }
-  if (fail) return;
+  if (fail) return false;
 
   let storeReason = reason.split(": ")[1];
   if (temporary) {
@@ -310,7 +321,7 @@ async function doBan(
       await newBan(message.guild, target.user.id, unbanDate);
     }
 
-    if (args.join(" ").includes("-s")) return;
+    if (args.join(" ").includes("-s")) return true;
 
     if (reason.split(": ")[1] == "no reason given") {
       await target
@@ -336,6 +347,7 @@ async function doBan(
         .catch(() => {});
     }
   }
+  return true;
 }
 
 cmd.setRun(run);

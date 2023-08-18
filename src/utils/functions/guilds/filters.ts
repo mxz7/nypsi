@@ -17,7 +17,7 @@ import {
 } from "../moderation/mute";
 import { getPercentMatch } from "./utils";
 import { isAltPunish } from "./altpunish";
-import { getAlts, getMainAccount, isAlt } from "../moderation/alts";
+import { getAllGroupAccountIds } from "../moderation/alts";
 import { getExactMember } from "../member";
 
 const chatFilterCache = new Map<string, string[]>();
@@ -317,25 +317,14 @@ export async function checkAutoMute(message: Message) {
     level = modified;
   }
 
-  let main = message.member;
-
   const punishAlts = await isAltPunish(message.guild);
-  let alts = await getAlts(message.guild, main.user.id).catch(() => []);
 
-  if (punishAlts && (await isAlt(message.guild, message.member.user.id))) {
-    main = await getExactMember(
-      message.guild,
-      await getMainAccount(message.guild, message.member.user.id),
-    );
-    alts = await getAlts(message.guild, main.user.id).catch(() => []);
+  await muteUser(message.member, level);
+
+  if (punishAlts) for (const id of await getAllGroupAccountIds(message.guild, message.member.user.id)) {
+    if (id == message.member.user.id) continue;
+    const member = await getExactMember(message.guild, id);
+    if (member) await muteUser(member, level, true);
   }
-
-  await muteUser(main, level);
-
-  if (punishAlts) {
-    for (const alt of alts) {
-      const member = await getExactMember(message.guild, alt.altId);
-      if (member) await muteUser(member, level, true);
-    }
-  }
+  
 }

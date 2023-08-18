@@ -26,13 +26,35 @@ export async function deleteAlt(guild: Guild, altId: string) {
   });
 }
 
-export async function getAlts(guild: Guild, altId: string) {
+export async function getAlts(guild: Guild, mainId: string) {
   const query = await prisma.alt.findMany({
     where: {
-      AND: [{ guildId: guild.id }, { mainId: altId }],
+      AND: [{ guildId: guild.id }, { mainId: mainId }],
     },
   });
   return query;
+}
+
+export async function getAllGroupAccountIds(guild: Guild, userId: string) {
+  try {
+    let mainId = userId;
+  
+    if (!await isMainAccount(guild, userId)) mainId = await getMainAccount(guild, userId);
+  
+    const query = await prisma.alt.findMany({
+      where: {
+        AND: [{ guildId: guild.id }, { mainId: mainId }],
+      },
+    });
+  
+    const ids = [mainId];
+  
+    for (const alt of query) ids.push(alt.altId);
+  
+    return ids;
+  } catch {
+    return [userId];
+  }
 }
 
 export async function isAlt(guild: Guild, altId: string) {

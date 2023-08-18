@@ -94,6 +94,7 @@ export async function deleteBan(guild: Guild | string, member: GuildMember | str
 }
 
 export async function requestUnban(guildId: string, member: string, client: NypsiClient) {
+  unbanTimeouts.delete(`${guildId}_${member}`);
   await client.cluster.broadcastEval(
     async (c, { guildId, memberId }) => {
       const guild = c.guilds.cache.get(guildId);

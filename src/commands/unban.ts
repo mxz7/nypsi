@@ -13,7 +13,7 @@ import { newCase } from "../utils/functions/moderation/cases";
 import { createProfile, profileExists } from "../utils/functions/moderation/utils";
 import { getIdFromUsername, getLastKnownUsername } from "../utils/functions/users/tag";
 import { isAltPunish } from "../utils/functions/guilds/altpunish";
-import { getAlts, getMainAccount, isAlt } from "../utils/functions/moderation/alts";
+import { getAllGroupAccountIds } from "../utils/functions/moderation/alts";
 
 const cmd = new Command("unban", "unban one or more users", "moderation").setPermissions([
   "BAN_MEMBERS",
@@ -101,15 +101,8 @@ async function run(
     target = await getIdFromUsername(target);
   }
 
-  let alts = await getAlts(message.guild, target).catch(() => []);
-
   if (!target || !target.match(Constants.SNOWFLAKE_REGEX)) {
     return send({ embeds: [new ErrorEmbed(`couldn't resolve \`${target}\` to a user`)] });
-  } else if (punishAlts) {
-    if (await isAlt(message.guild, target)) {
-      target = await getMainAccount(message.guild, target);
-      alts = await getAlts(message.guild, target).catch(() => []);
-    }
   }
 
   let fail = false;
@@ -138,33 +131,51 @@ async function run(
       ],
     });
 
-  let msg = `✅ \`${unbannedUser.username}\` has been unbanned`;
+  await doUnban(message, target, args);
 
-  if (alts.length > 0 && punishAlts) {
-    msg = `✅ \`${unbannedUser.username}\` + ${alts.length} ${
-      alts.length != 1 ? "alts have" : "alt has"
-    } been unbanned`;
-  }
+  const embed = new CustomEmbed(message.member);
 
-  const embed = new CustomEmbed(message.member, msg);
+  let msg = punishAlts ? `unbanning account and any alts...` : `✅ \`${unbannedUser.username}\` has been unbanned`;
+  
+  embed.setDescription(msg);
+  
+  let res;
 
   if (args.join(" ").includes("-s")) {
     if (message instanceof Message) {
       await message.delete();
-      await message.member.send({ embeds: [embed] }).catch(() => {});
+      res = await message.member.send({ embeds: [embed] }).catch(() => {});
     } else {
-      await message.reply({ embeds: [embed], ephemeral: true });
+      res = await message.reply({ embeds: [embed], ephemeral: true });
     }
   } else {
-    await send({ embeds: [embed] });
+    res = await send({ embeds: [embed] });
   }
 
-  await doUnban(message, target, args);
+  let altsUnbanned = 0;
 
   if (!punishAlts) return;
 
-  for (const id of alts) {
-    await doUnban(message, id.altId, args, true);
+  if (punishAlts) {
+    for (const id of await getAllGroupAccountIds(message.guild, target)) {
+      if (id == target) continue;
+      const unbanned = await doUnban(message, id, args, true);
+      if (unbanned) altsUnbanned++;
+    }
+  }
+  
+  if (altsUnbanned > 0)
+    msg = `✅ \`${target}\` + ${altsUnbanned} ${
+      altsUnbanned != 1 ? "alts have" : "alt has"
+    } been unbanned`;
+  else msg = `✅ \`${target}\` has been unbanned`;
+
+  embed.setDescription(msg);
+  
+  if (message instanceof Message) {
+    await (res as Message).edit({ embeds: [embed] });
+  } else {
+    await message.editReply({ embeds: [embed] })
   }
 }
 
@@ -181,16 +192,17 @@ async function doUnban(
 
     const banned = await message.guild.bans.fetch();
 
-    if (!banned.find((i) => i.user.id === targetId)) return;
+    if (!banned.find((i) => i.user.id === targetId)) return false;
 
     const unbannedUser = await message.guild.members.unban(targetId, message.content).catch(() => {
       fail = true;
     });
 
-    if (fail || !unbannedUser) return;
+    if (fail || !unbannedUser) return false;
   }
 
   await newCase(message.guild, "unban", targetId, message.author, reason);
+  return true;
 }
 
 cmd.setRun(run);

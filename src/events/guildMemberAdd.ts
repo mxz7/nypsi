@@ -18,7 +18,7 @@ import sleep from "../utils/functions/sleep";
 import { fetchUsernameHistory } from "../utils/functions/users/history";
 import { logger } from "../utils/logger";
 import { isAltPunish } from "../utils/functions/guilds/altpunish";
-import { getMainAccount, isAlt } from "../utils/functions/moderation/alts";
+import { getAllGroupAccountIds } from "../utils/functions/moderation/alts";
 import prisma from "../init/database";
 import { newCase } from "../utils/functions/moderation/cases";
 import { isBanned, newBan } from "../utils/functions/moderation/ban";
@@ -103,16 +103,20 @@ export default async function guildMemberAdd(member: GuildMember) {
 
   if (!(await profileExists(member.guild))) return;
 
+  let toBan: string = null;
+
+  for (const id of await getAllGroupAccountIds(member.guild, member.user.id)) {
+    if (await isBanned(member.guild, id)) toBan = id;
+  }
+
   if (
     (await isAltPunish(member.guild)) &&
-    (await isAlt(member.guild, member.user.id)) &&
-    (await isBanned(member.guild, await getMainAccount(member.guild, member.user.id)))
+    toBan
   ) {
-    const mainId = await getMainAccount(member.guild, member.user.id);
     const query = await prisma.moderationBan.findFirst({
       where: {
         guildId: member.guild.id,
-        userId: mainId,
+        userId: toBan,
       },
       select: {
         expire: true,
@@ -121,7 +125,7 @@ export default async function guildMemberAdd(member: GuildMember) {
 
     let fail = false;
 
-    await member.ban({ reason: `alt of banned ${mainId} joined` }).catch(() => (fail = true));
+    await member.ban({ reason: `known alt of banned user joined` }).catch(() => (fail = true));
 
     if (fail) return;
 
@@ -130,7 +134,7 @@ export default async function guildMemberAdd(member: GuildMember) {
       "ban",
       member.user.id,
       member.guild.members.me.user,
-      `alt of banned \`${mainId}\` joined`,
+      `known alt of banned user joined`,
     );
 
     await newBan(member.guild, [member.user.id], query.expire);
@@ -142,16 +146,22 @@ export default async function guildMemberAdd(member: GuildMember) {
 
   let altPunish = false;
 
+
+  let toMute: string = null;
+
+  for (const id of await getAllGroupAccountIds(member.guild, member.user.id)) {
+    if (await isMuted(member.guild, id)) toMute = id;
+  }
+
   if (
     (await isAltPunish(member.guild)) &&
-    (await isAlt(member.guild, member.user.id)) &&
-    (await isMuted(member.guild, await getMainAccount(member.guild, member.user.id)))
+    (!await isMuted(member.guild, member)) &&
+    toMute
   ) {
-    const mainId = await getMainAccount(member.guild, member.user.id);
     const query = await prisma.moderationMute.findFirst({
       where: {
         guildId: member.guild.id,
-        userId: mainId,
+        userId: toMute,
       },
       select: {
         expire: true,
@@ -163,12 +173,8 @@ export default async function guildMemberAdd(member: GuildMember) {
       "mute",
       member.user.id,
       member.guild.members.me.user,
-      `alt of muted \`${mainId}\` joined`,
+      `known alt of muted user joined`,
     );
-
-    if (await isMuted(member.guild, member)) {
-      await deleteMute(member.guild, member);
-    }
 
     await newMute(member.guild, [member.user.id], query.expire);
 
