@@ -20,16 +20,20 @@ export async function updateLastKnownUsername(member: GuildMember | string, tag:
 }
 
 export async function getLastKnownUsername(id: string) {
-  const query = await prisma.user.findUnique({
-    where: {
-      id: id,
-    },
-    select: {
-      lastKnownUsername: true,
-    },
-  });
+  try {
+    const query = await prisma.user.findUnique({
+      where: {
+        id: id,
+      },
+      select: {
+        lastKnownUsername: true,
+      },
+    });
 
-  return query.lastKnownUsername;
+    return query.lastKnownUsername;
+  } catch {
+    return null;
+  }
 }
 
 export async function getIdFromUsername(username: string) {

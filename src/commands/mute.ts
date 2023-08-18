@@ -1,6 +1,7 @@
 import {
   BaseMessageOptions,
   CommandInteraction,
+  GuildMember,
   InteractionReplyOptions,
   Message,
   PermissionFlagsBits,
@@ -9,14 +10,16 @@ import {
 } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
+import { isAltPunish } from "../utils/functions/guilds/altpunish";
 import { getExactMember } from "../utils/functions/member";
+import { getAllGroupAccountIds } from "../utils/functions/moderation/alts";
 import { newCase } from "../utils/functions/moderation/cases";
 import { deleteMute, getMuteRole, isMuted, newMute } from "../utils/functions/moderation/mute";
 import { createProfile, profileExists } from "../utils/functions/moderation/utils";
 import ms = require("ms");
 import dayjs = require("dayjs");
 
-const cmd = new Command("mute", "mute one or more users", "moderation").setPermissions([
+const cmd = new Command("mute", "mute a user", "moderation").setPermissions([
   "MANAGE_MESSAGES",
   "MODERATE_MEMBERS",
 ]);
@@ -105,6 +108,8 @@ async function run(
   let reason = "";
 
   if (!target) return send({ embeds: [new ErrorEmbed("invalid user")] });
+
+  const punishAlts = await isAltPunish(message.guild);
 
   if (args.length > 1) {
     reason = args.slice(1).join(" ");
@@ -201,6 +206,18 @@ async function run(
 
   let fail = false;
 
+  if (target.user.id == message.member.user.id) {
+    await message.channel.send({ embeds: [new ErrorEmbed("you cannot mute yourself")] });
+    return;
+  }
+
+  const ids = await getAllGroupAccountIds(message.guild, target.user.id);
+
+  if (ids.includes(message.member.user.id)) {
+    await message.channel.send({ embeds: [new ErrorEmbed("you cannot mute one of your alts")] });
+    return;
+  }
+
   if (mode == "role") {
     if (target.user.id == message.client.user.id) {
       await message.channel.send({ content: "you'll never shut me up 😏" });
@@ -271,9 +288,63 @@ async function run(
     mutedLength = getTime(time * 1000);
   }
 
+  await doMute(message, target, reason, args, mode, timedMute, mutedLength, unmuteDate);
+
   const embed = new CustomEmbed(message.member);
 
-  let msg = `✅ \`${target.user.username}\` has been muted`;
+  let msg = punishAlts && ids.length > 3  ? `muting account and any alts...` : `✅ \`${target.user.username}\` has been muted`;
+
+  if (!punishAlts && timedMute) {
+    msg += ` for **${mutedLength}**`;
+  } else if (!punishAlts && reason) {
+    msg += ` for **${reason}**`;
+  }
+  
+  embed.setDescription(msg);
+  
+  let res;
+
+  if (ids.length > 3) {
+    if (args.join(" ").includes("-s")) {
+      if (message instanceof Message) {
+        await message.delete();
+        res = await message.member.send({ embeds: [embed] }).catch(() => {});
+      } else {
+        res = await message.reply({ embeds: [embed], ephemeral: true });
+      }
+    } else {
+      res = await send({ embeds: [embed] });
+    }
+  }
+
+  let altsMuted = 0;
+
+  if (punishAlts) {
+    for (const id of ids) {
+      if (id == target.user.id) continue;
+      if (!(await isMuted(message.guild, id))) {
+        const muted = await doMute(
+          message,
+          await getExactMember(message.guild, id),
+          reason,
+          args,
+          mode,
+          timedMute,
+          mutedLength,
+          unmuteDate,
+          muteRole,
+          true,
+        );
+        if (muted) altsMuted++;
+      }
+    }
+  }
+  
+  if (altsMuted > 0)
+    msg = `✅ \`${target.user.username}\` + ${altsMuted} ${
+      altsMuted != 1 ? "alts have" : "alt has"
+    } been muted`;
+  else msg = `✅ \`${target.user.username}\` has been muted`;
 
   if (timedMute) {
     msg += ` for **${mutedLength}**`;
@@ -282,17 +353,73 @@ async function run(
   }
 
   embed.setDescription(msg);
-
-  if (args.join(" ").includes("-s")) {
+  
+  if (ids.length > 3) {
     if (message instanceof Message) {
-      await message.delete();
-      await message.member.send({ embeds: [embed] }).catch(() => {});
+      await (res as Message).edit({ embeds: [embed] });
     } else {
-      await message.reply({ embeds: [embed], ephemeral: true });
+      await message.editReply({ embeds: [embed] })
     }
   } else {
-    await send({ embeds: [embed] });
+    if (args.join(" ").includes("-s")) {
+      if (message instanceof Message) {
+        await message.delete();
+        await message.member.send({ embeds: [embed] }).catch(() => {});
+      } else {
+        await message.reply({ embeds: [embed], ephemeral: true });
+      }
+    } else {
+     await send({ embeds: [embed] });
+    }
   }
+}
+
+async function doMute(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  target: GuildMember,
+  reason: string,
+  args: string[],
+  mode: string,
+  timedMute: boolean,
+  mutedLength: string,
+  unmuteDate: Date,
+  muteRole?: Role,
+  isAlt?: boolean,
+) {
+  let fail = false;
+  if (isAlt) {
+    reason += " (alt)";
+
+    try {
+      if (target.user.id == message.client.user.id) return false;
+
+      if (mode == "role") {
+        const targetHighestRole = target.roles.highest;
+        const memberHighestRole = message.member.roles.highest;
+
+        if (
+          targetHighestRole.position >= memberHighestRole.position &&
+          message.guild.ownerId != message.author.id
+        )
+          return false;
+        await target.roles.add(muteRole).catch(() => (fail = true));
+      } else if (mode == "timeout") {
+        const targetHighestRole = target.roles.highest;
+        const memberHighestRole = message.member.roles.highest;
+
+        if (
+          (targetHighestRole.position >= memberHighestRole.position &&
+            message.guild.ownerId != message.author.id) ||
+          (target.isCommunicationDisabled() as boolean)
+        )
+          return false;
+        else await target.disableCommunicationUntil(unmuteDate, reason).catch(() => (fail = true));
+      }
+    } catch {
+      fail = true;
+    }
+  }
+  if (fail) return false;
 
   let storeReason = reason;
 
@@ -316,7 +443,7 @@ async function run(
     await newMute(message.guild, [target.user.id], new Date(3130000000000));
   }
 
-  if (args.join(" ").includes("-s")) return;
+  if (args.join(" ").includes("-s")) return true;
   if (!timedMute) {
     const embed = new CustomEmbed(target)
       .setTitle(`muted in ${message.guild.name}`)
@@ -344,13 +471,15 @@ async function run(
       .send({ content: `you have been muted in ${message.guild.name}`, embeds: [embed] })
       .catch(() => {});
   }
+
+  return true;
 }
 
 cmd.setRun(run);
 
 module.exports = cmd;
 
-function getDuration(duration: string): number {
+export function getDuration(duration: string): number {
   duration.toLowerCase();
 
   if (duration.includes("d")) {

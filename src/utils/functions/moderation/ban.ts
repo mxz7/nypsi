@@ -51,10 +51,13 @@ export async function getBannedUsers(guild: Guild) {
   return query;
 }
 
-export async function isBanned(guild: Guild, member: GuildMember) {
+export async function isBanned(guild: Guild, member: GuildMember | string) {
   const query = await prisma.moderationBan.findFirst({
     where: {
-      AND: [{ guildId: guild.id }, { userId: member.user.id }],
+      AND: [
+        { guildId: guild.id },
+        { userId: typeof member == "string" ? member : (member as GuildMember).user.id },
+      ],
     },
     select: {
       userId: true,
@@ -91,6 +94,7 @@ export async function deleteBan(guild: Guild | string, member: GuildMember | str
 }
 
 export async function requestUnban(guildId: string, member: string, client: NypsiClient) {
+  unbanTimeouts.delete(`${guildId}_${member}`);
   await client.cluster.broadcastEval(
     async (c, { guildId, memberId }) => {
       const guild = c.guilds.cache.get(guildId);
