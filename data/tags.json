@@ -112,5 +112,11 @@
     "name": "cum",
     "description": "found in the horny v achievement",
     "emoji": "💦"
+  },
+  "dog": {
+    "id": "dog",
+    "name": "dog",
+    "description": "found in the cute v achievement",
+    "emoji": "🐶"
   }
 }

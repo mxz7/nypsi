@@ -2464,5 +2464,18 @@
     "sell": 5000000,
     "in_crates": false,
     "tagId": "cum"
+  },
+  "dog_tag": {
+    "id": "dog_tag",
+    "name": "dog tag",
+    "plural": "dog tags",
+    "article": "a",
+    "emoji": "🐶",
+    "longDesc": "found from the cute v achievement",
+    "rarity": 6,
+    "role": "tag",
+    "sell": 5000000,
+    "in_crates": false,
+    "tagId": "dog"
   }
 }
