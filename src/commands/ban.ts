@@ -1,6 +1,7 @@
 import {
   BaseMessageOptions,
   CommandInteraction,
+  GuildMember,
   InteractionReplyOptions,
   Message,
   PermissionFlagsBits,
@@ -9,8 +10,10 @@ import {
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
+import { isAltPunish } from "../utils/functions/guilds/altpunish";
 import { getExactMember } from "../utils/functions/member";
-import { newBan } from "../utils/functions/moderation/ban";
+import { getAllGroupAccountIds } from "../utils/functions/moderation/alts";
+import { isBanned, newBan } from "../utils/functions/moderation/ban";
 import { newCase } from "../utils/functions/moderation/cases";
 import { createProfile, profileExists } from "../utils/functions/moderation/utils";
 
@@ -97,6 +100,8 @@ async function run(
   let mode: "target" | "id" = "target";
   let userId: string;
 
+  const punishAlts = await isAltPunish(message.guild);
+
   if (!target) {
     if (args[0].match(Constants.SNOWFLAKE_REGEX)) {
       mode = "id";
@@ -131,6 +136,18 @@ async function run(
 
   let fail = false;
   let idUser: string;
+
+  if (target.user.id == message.member.user.id) {
+    await message.channel.send({ embeds: [new ErrorEmbed("you cannot ban yourself")] });
+    return;
+  }
+
+  const ids = await getAllGroupAccountIds(message.guild, target.user.id);
+
+  if (ids.includes(message.member.user.id)) {
+    await message.channel.send({ embeds: [new ErrorEmbed("you cannot ban one of your alts")] });
+    return;
+  }
 
   if (mode === "id") {
     await message.guild.members
@@ -185,34 +202,131 @@ async function run(
 
   if (temporary) banLength = getTime(duration * 1000);
 
+  await doBan(message, target, reason, args, mode, temporary, banLength, unbanDate, userId);
+
   const embed = new CustomEmbed(message.member);
 
-  let msg = "";
+  let msg = punishAlts && ids.length > 3 ? `banning account and any alts...` : `✅ \`${mode == "id" ? idUser : target.user.username}\` has been banned`;
 
-  if (mode === "id") {
-    msg = `✅ \`${idUser}\` has been banned`;
-  } else {
-    msg = `✅ \`${target.user.username}\` has been banned`;
+  if (!punishAlts && temporary) {
+    msg += ` for **${banLength}**`;
+  } else if (!punishAlts && reason.split(": ")[1] !== "no reason given") {
+    msg += ` for **${reason}**`;
   }
+  
+  embed.setDescription(msg);
+  
+  let res;
+
+  if (ids.length > 3) {
+    if (args.join(" ").includes("-s")) {
+      if (message instanceof Message) {
+        await message.delete();
+        res = await message.member.send({ embeds: [embed] }).catch(() => {});
+      } else {
+        res = await message.reply({ embeds: [embed], ephemeral: true });
+      }
+    } else {
+      res = await send({ embeds: [embed] });
+    }
+  }
+
+  let altsBanned = 0;
+
+  if (punishAlts) {
+    for (const id of ids) {
+      if (id == target.user.id) continue;
+      if (!(await isBanned(message.guild, id))) {
+        const banned = await doBan(
+          message,
+          await getExactMember(message.guild, id),
+          reason,
+          args,
+          "target",
+          temporary,
+          banLength,
+          unbanDate,
+          id,
+          true,
+        );
+        if (banned) altsBanned++;
+      }
+    }
+  }
+  
+  if (altsBanned > 0)
+    msg = `✅ \`${target.user.username}\` + ${altsBanned} ${
+      altsBanned != 1 ? "alts have" : "alt has"
+    } been banned`;
+  else msg = `✅ \`${target.user.username}\` has been banned`;
 
   if (temporary) {
     msg += ` for **${banLength}**`;
-  } else if (reason.split(": ")[1] !== "no reason given") {
-    msg += ` for **${reason.split(": ")[1]}**`;
+  } else if (!punishAlts && reason.split(": ")[1] !== "no reason given") {
+    msg += ` for **${reason}**`;
   }
 
   embed.setDescription(msg);
-
-  if (args.join(" ").includes("-s")) {
+  
+  if (ids.length > 3) {
     if (message instanceof Message) {
-      await message.delete();
-      await message.member.send({ embeds: [embed] }).catch(() => {});
+      await (res as Message).edit({ embeds: [embed] });
     } else {
-      await message.reply({ embeds: [embed], ephemeral: true });
+      await message.editReply({ embeds: [embed] })
     }
   } else {
-    await send({ embeds: [embed] });
+    if (args.join(" ").includes("-s")) {
+      if (message instanceof Message) {
+        await message.delete();
+        await message.member.send({ embeds: [embed] }).catch(() => {});
+      } else {
+        await message.reply({ embeds: [embed], ephemeral: true });
+      }
+    } else {
+     await send({ embeds: [embed] });
+    }
   }
+}
+
+async function doBan(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  target: GuildMember,
+  reason: string,
+  args: string[],
+  mode: string,
+  temporary: boolean,
+  banLength: string,
+  unbanDate: Date,
+  userId: string,
+  isAlt?: boolean,
+) {
+  let fail = false;
+  if (isAlt) {
+    try {
+      reason += " (alt)";
+      if (mode === "id") {
+        await message.guild.members.ban(userId, {
+          reason: reason,
+        });
+      } else {
+        const targetHighestRole = target.roles.highest.position;
+        const memberHighestRole = message.member.roles.highest.position;
+
+        if (targetHighestRole >= memberHighestRole && message.author.id !== message.guild.ownerId) {
+          return false;
+        }
+
+        if (target.user.id == message.client.user.id) return false;
+
+        await message.guild.members.ban(target, {
+          reason: reason,
+        });
+      }
+    } catch {
+      fail = true;
+    }
+  }
+  if (fail) return false;
 
   let storeReason = reason.split(": ")[1];
   if (temporary) {
@@ -233,7 +347,7 @@ async function run(
       await newBan(message.guild, target.user.id, unbanDate);
     }
 
-    if (args.join(" ").includes("-s")) return;
+    if (args.join(" ").includes("-s")) return true;
 
     if (reason.split(": ")[1] == "no reason given") {
       await target
@@ -259,6 +373,7 @@ async function run(
         .catch(() => {});
     }
   }
+  return true;
 }
 
 cmd.setRun(run);

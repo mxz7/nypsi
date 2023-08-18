@@ -364,6 +364,7 @@ model Guild {
   prefix           String   @default("$")
   createdAt        DateTime @default(now())
   slash_only       Boolean  @default(false)
+  alt_punish       Boolean  @default(false)
   auto_role        String[]
   persist_role     String[]
 
@@ -376,6 +377,7 @@ model Guild {
   Moderation   Moderation?
   RolePersist  RolePersist[]
   ReactionRole ReactionRole[]
+  Alt          Alt[]
 }
 
 model ReactionRole {
@@ -507,6 +509,16 @@ model ModerationCase {
   moderation Moderation @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
 
   @@id([caseId, guildId])
+}
+
+model Alt {
+  guildId String
+  mainId  String
+  altId   String
+
+  guild Guild @relation(fields: [guildId], references: [id], onDelete: Cascade)
+
+  @@id([altId, guildId])
 }
 
 model ChatReaction {
