@@ -9,8 +9,8 @@ dependencies:
     specifier: 0.2.0
     version: 0.2.0
   '@discordjs/rest':
-    specifier: 2.0.0
-    version: 2.0.0
+    specifier: 2.0.1
+    version: 2.0.1
   '@prisma/client':
     specifier: 5.1.1
     version: 5.1.1(prisma@5.1.1)
@@ -696,11 +696,6 @@ packages:
       tslib: 2.6.1
     dev: false
 
-  /@discordjs/collection@1.5.2:
-    resolution: {integrity: sha512-LDplPy8SPbc8MYkuCdnLRGWqygAX97E8NH7gA9uz+NZ/hXknUKJHuxsOmhC6pmHnF9Zmg0kvfwrDjGsRIljt9g==}
-    engines: {node: '>=16.9.0'}
-    dev: false
-
   /@discordjs/collection@1.5.3:
     resolution: {integrity: sha512-SVb428OMd3WO1paV3rm6tSjM4wC+Kecaa1EUGX7vc6/fddvw/6lg90z4QtCqm21zvVe92vMMDt9+DkIvjXImQQ==}
     engines: {node: '>=16.11.0'}
@@ -711,21 +706,6 @@ packages:
     engines: {node: '>=16.11.0'}
     dependencies:
       discord-api-types: 0.37.50
-    dev: false
-
-  /@discordjs/rest@2.0.0:
-    resolution: {integrity: sha512-CW9ldfzsRzUbHcS4Oqu5+Moo+yrQ5qQ9groKNxPOzcoq2nuXa/fXOXkuQtQHcTeSVXsC9cmJ56M8gBDBUyLgGA==}
-    engines: {node: '>=16.9.0'}
-    dependencies:
-      '@discordjs/collection': 1.5.2
-      '@discordjs/util': 1.0.0
-      '@sapphire/async-queue': 1.5.0
-      '@sapphire/snowflake': 3.5.1
-      '@vladfrangu/async_event_emitter': 2.2.2
-      discord-api-types: 0.37.51
-      magic-bytes.js: 1.0.15
-      tslib: 2.6.1
-      undici: 5.22.1
     dev: false
 
   /@discordjs/rest@2.0.1:
@@ -741,11 +721,6 @@ packages:
       magic-bytes.js: 1.0.15
       tslib: 2.6.1
       undici: 5.22.1
-    dev: false
-
-  /@discordjs/util@1.0.0:
-    resolution: {integrity: sha512-U2Iiab0mo8cFe+o4ZY4GROoAetGjFYA1PhhxiXEW82LuPUjOU/seHZDtVjDpOf6n3rz4IRm84wNtgHdpqRY5CA==}
-    engines: {node: '>=16.9.0'}
     dev: false
 
   /@discordjs/util@1.0.1:
@@ -2279,10 +2254,6 @@ packages:
 
   /discord-api-types@0.37.50:
     resolution: {integrity: sha512-X4CDiMnDbA3s3RaUXWXmgAIbY1uxab3fqe3qwzg5XutR3wjqi7M3IkgQbsIBzpqBN2YWr/Qdv7JrFRqSgb4TFg==}
-    dev: false
-
-  /discord-api-types@0.37.51:
-    resolution: {integrity: sha512-tdmdH98t3zgjQF6zwOHl0OB/PCBiE4aVsNTuN7m0PfU2jOLx3lNoU6xTeFALntUtlIxN80GTr9RPQR4t7msjSg==}
     dev: false
 
   /discord-hybrid-sharding@2.1.3:
