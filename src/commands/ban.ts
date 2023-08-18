@@ -137,6 +137,18 @@ async function run(
   let fail = false;
   let idUser: string;
 
+  if (target.user.id == message.member.user.id) {
+    await message.channel.send({ embeds: [new ErrorEmbed("you cannot ban yourself")] });
+    return;
+  }
+
+  const ids = await getAllGroupAccountIds(message.guild, target.user.id);
+
+  if (ids.includes(message.member.user.id)) {
+    await message.channel.send({ embeds: [new ErrorEmbed("you cannot ban one of your alts")] });
+    return;
+  }
+
   if (mode === "id") {
     await message.guild.members
       .ban(userId, {
@@ -194,7 +206,7 @@ async function run(
 
   const embed = new CustomEmbed(message.member);
 
-  let msg = punishAlts ? `banning account and any alts...` : `✅ \`${mode == "id" ? idUser : target.user.username}\` has been banned`;
+  let msg = punishAlts && ids.length > 3 ? `banning account and any alts...` : `✅ \`${mode == "id" ? idUser : target.user.username}\` has been banned`;
 
   if (!punishAlts && temporary) {
     msg += ` for **${banLength}**`;
@@ -206,21 +218,23 @@ async function run(
   
   let res;
 
-  if (args.join(" ").includes("-s")) {
-    if (message instanceof Message) {
-      await message.delete();
-      res = await message.member.send({ embeds: [embed] }).catch(() => {});
+  if (ids.length > 3) {
+    if (args.join(" ").includes("-s")) {
+      if (message instanceof Message) {
+        await message.delete();
+        res = await message.member.send({ embeds: [embed] }).catch(() => {});
+      } else {
+        res = await message.reply({ embeds: [embed], ephemeral: true });
+      }
     } else {
-      res = await message.reply({ embeds: [embed], ephemeral: true });
+      res = await send({ embeds: [embed] });
     }
-  } else {
-    res = await send({ embeds: [embed] });
   }
 
   let altsBanned = 0;
 
   if (punishAlts) {
-    for (const id of await getAllGroupAccountIds(message.guild, target.user.id)) {
+    for (const id of ids) {
       if (id == target.user.id) continue;
       if (!(await isBanned(message.guild, id))) {
         const banned = await doBan(
@@ -254,10 +268,23 @@ async function run(
 
   embed.setDescription(msg);
   
-  if (message instanceof Message) {
-    await (res as Message).edit({ embeds: [embed] });
+  if (ids.length > 3) {
+    if (message instanceof Message) {
+      await (res as Message).edit({ embeds: [embed] });
+    } else {
+      await message.editReply({ embeds: [embed] })
+    }
   } else {
-    await message.editReply({ embeds: [embed] })
+    if (args.join(" ").includes("-s")) {
+      if (message instanceof Message) {
+        await message.delete();
+        await message.member.send({ embeds: [embed] }).catch(() => {});
+      } else {
+        await message.reply({ embeds: [embed], ephemeral: true });
+      }
+    } else {
+     await send({ embeds: [embed] });
+    }
   }
 }
 

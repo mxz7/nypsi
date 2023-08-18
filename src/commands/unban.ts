@@ -135,21 +135,25 @@ async function run(
 
   const embed = new CustomEmbed(message.member);
 
-  let msg = punishAlts ? `unbanning account and any alts...` : `✅ \`${unbannedUser.username}\` has been unbanned`;
+  const ids = await getAllGroupAccountIds(message.guild, target);
+
+  let msg = punishAlts && ids.length > 3 ? `unbanning account and any alts...` : `✅ \`${unbannedUser.username}\` has been unbanned`;
   
   embed.setDescription(msg);
   
   let res;
 
-  if (args.join(" ").includes("-s")) {
-    if (message instanceof Message) {
-      await message.delete();
-      res = await message.member.send({ embeds: [embed] }).catch(() => {});
+  if (ids.length > 3) {
+    if (args.join(" ").includes("-s")) {
+      if (message instanceof Message) {
+        await message.delete();
+        res = await message.member.send({ embeds: [embed] }).catch(() => {});
+      } else {
+        res = await message.reply({ embeds: [embed], ephemeral: true });
+      }
     } else {
-      res = await message.reply({ embeds: [embed], ephemeral: true });
+      res = await send({ embeds: [embed] });
     }
-  } else {
-    res = await send({ embeds: [embed] });
   }
 
   let altsUnbanned = 0;
@@ -157,7 +161,7 @@ async function run(
   if (!punishAlts) return;
 
   if (punishAlts) {
-    for (const id of await getAllGroupAccountIds(message.guild, target)) {
+    for (const id of ids) {
       if (id == target) continue;
       const unbanned = await doUnban(message, id, args, true);
       if (unbanned) altsUnbanned++;
@@ -172,10 +176,23 @@ async function run(
 
   embed.setDescription(msg);
   
-  if (message instanceof Message) {
-    await (res as Message).edit({ embeds: [embed] });
+  if (ids.length > 3) {
+    if (message instanceof Message) {
+      await (res as Message).edit({ embeds: [embed] });
+    } else {
+      await message.editReply({ embeds: [embed] })
+    }
   } else {
-    await message.editReply({ embeds: [embed] })
+    if (args.join(" ").includes("-s")) {
+      if (message instanceof Message) {
+        await message.delete();
+        await message.member.send({ embeds: [embed] }).catch(() => {});
+      } else {
+        await message.reply({ embeds: [embed], ephemeral: true });
+      }
+    } else {
+     await send({ embeds: [embed] });
+    }
   }
 }
 

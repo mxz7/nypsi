@@ -206,6 +206,18 @@ async function run(
 
   let fail = false;
 
+  if (target.user.id == message.member.user.id) {
+    await message.channel.send({ embeds: [new ErrorEmbed("you cannot mute yourself")] });
+    return;
+  }
+
+  const ids = await getAllGroupAccountIds(message.guild, target.user.id);
+
+  if (ids.includes(message.member.user.id)) {
+    await message.channel.send({ embeds: [new ErrorEmbed("you cannot mute one of your alts")] });
+    return;
+  }
+
   if (mode == "role") {
     if (target.user.id == message.client.user.id) {
       await message.channel.send({ content: "you'll never shut me up 😏" });
@@ -280,7 +292,7 @@ async function run(
 
   const embed = new CustomEmbed(message.member);
 
-  let msg = punishAlts ? `muting account and any alts...` : `✅ \`${target.user.username}\` has been muted`;
+  let msg = punishAlts && ids.length > 3  ? `muting account and any alts...` : `✅ \`${target.user.username}\` has been muted`;
 
   if (!punishAlts && timedMute) {
     msg += ` for **${mutedLength}**`;
@@ -292,21 +304,23 @@ async function run(
   
   let res;
 
-  if (args.join(" ").includes("-s")) {
-    if (message instanceof Message) {
-      await message.delete();
-      res = await message.member.send({ embeds: [embed] }).catch(() => {});
+  if (ids.length > 3) {
+    if (args.join(" ").includes("-s")) {
+      if (message instanceof Message) {
+        await message.delete();
+        res = await message.member.send({ embeds: [embed] }).catch(() => {});
+      } else {
+        res = await message.reply({ embeds: [embed], ephemeral: true });
+      }
     } else {
-      res = await message.reply({ embeds: [embed], ephemeral: true });
+      res = await send({ embeds: [embed] });
     }
-  } else {
-    res = await send({ embeds: [embed] });
   }
 
   let altsMuted = 0;
 
   if (punishAlts) {
-    for (const id of await getAllGroupAccountIds(message.guild, target.user.id)) {
+    for (const id of ids) {
       if (id == target.user.id) continue;
       if (!(await isMuted(message.guild, id))) {
         const muted = await doMute(
@@ -340,10 +354,23 @@ async function run(
 
   embed.setDescription(msg);
   
-  if (message instanceof Message) {
-    await (res as Message).edit({ embeds: [embed] });
+  if (ids.length > 3) {
+    if (message instanceof Message) {
+      await (res as Message).edit({ embeds: [embed] });
+    } else {
+      await message.editReply({ embeds: [embed] })
+    }
   } else {
-    await message.editReply({ embeds: [embed] })
+    if (args.join(" ").includes("-s")) {
+      if (message instanceof Message) {
+        await message.delete();
+        await message.member.send({ embeds: [embed] }).catch(() => {});
+      } else {
+        await message.reply({ embeds: [embed], ephemeral: true });
+      }
+    } else {
+     await send({ embeds: [embed] });
+    }
   }
 }
 
