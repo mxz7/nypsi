@@ -162,10 +162,13 @@ async function run(
 
   const ids = await getAllGroupAccountIds(message.guild, target.user.id);
 
-  let msg = punishAlts && ids.length > 3 ? `unmuting account and any alts...` : `✅ \`${target.user.username}\` has been unmuted`;
-  
+  let msg =
+    punishAlts && ids.length > 3
+      ? `unmuting account and any alts...`
+      : `✅ \`${target.user.username}\` has been unmuted`;
+
   embed.setDescription(msg);
-  
+
   let res;
 
   if (ids.length > 3) {
@@ -197,7 +200,7 @@ async function run(
       if (unmuted) altsUnmted++;
     }
   }
-  
+
   if (altsUnmted > 0)
     msg = `✅ \`${target.user.username}\` + ${altsUnmted} ${
       altsUnmted != 1 ? "alts have" : "alt has"
@@ -205,12 +208,12 @@ async function run(
   else msg = `✅ \`${target.user.username}\` has been unmuted`;
 
   embed.setDescription(msg);
-  
+
   if (ids.length > 3) {
     if (message instanceof Message) {
       await (res as Message).edit({ embeds: [embed] });
     } else {
-      await message.editReply({ embeds: [embed] })
+      await message.editReply({ embeds: [embed] });
     }
   } else {
     if (args.join(" ").includes("-s")) {
@@ -221,7 +224,7 @@ async function run(
         await message.reply({ embeds: [embed], ephemeral: true });
       }
     } else {
-     await send({ embeds: [embed] });
+      await send({ embeds: [embed] });
     }
   }
 }

@@ -321,10 +321,10 @@ export async function checkAutoMute(message: Message) {
 
   await muteUser(message.member, level);
 
-  if (punishAlts) for (const id of await getAllGroupAccountIds(message.guild, message.member.user.id)) {
-    if (id == message.member.user.id) continue;
-    const member = await getExactMember(message.guild, id);
-    if (member) await muteUser(member, level, true);
-  }
-  
+  if (punishAlts)
+    for (const id of await getAllGroupAccountIds(message.guild, message.member.user.id)) {
+      if (id == message.member.user.id) continue;
+      const member = await getExactMember(message.guild, id);
+      if (member) await muteUser(member, level, true);
+    }
 }
