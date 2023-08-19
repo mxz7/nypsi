@@ -137,10 +137,13 @@ async function run(
 
   const ids = await getAllGroupAccountIds(message.guild, target);
 
-  let msg = punishAlts && ids.length > 3 ? `unbanning account and any alts...` : `✅ \`${unbannedUser.username}\` has been unbanned`;
-  
+  let msg =
+    punishAlts && ids.length > 3
+      ? `unbanning account and any alts...`
+      : `✅ \`${unbannedUser.username}\` has been unbanned`;
+
   embed.setDescription(msg);
-  
+
   let res;
 
   if (ids.length > 3) {
@@ -167,7 +170,7 @@ async function run(
       if (unbanned) altsUnbanned++;
     }
   }
-  
+
   if (altsUnbanned > 0)
     msg = `✅ \`${target}\` + ${altsUnbanned} ${
       altsUnbanned != 1 ? "alts have" : "alt has"
@@ -175,12 +178,12 @@ async function run(
   else msg = `✅ \`${target}\` has been unbanned`;
 
   embed.setDescription(msg);
-  
+
   if (ids.length > 3) {
     if (message instanceof Message) {
       await (res as Message).edit({ embeds: [embed] });
     } else {
-      await message.editReply({ embeds: [embed] })
+      await message.editReply({ embeds: [embed] });
     }
   } else {
     if (args.join(" ").includes("-s")) {
@@ -191,7 +194,7 @@ async function run(
         await message.reply({ embeds: [embed], ephemeral: true });
       }
     } else {
-     await send({ embeds: [embed] });
+      await send({ embeds: [embed] });
     }
   }
 }

@@ -109,10 +109,7 @@ export default async function guildMemberAdd(member: GuildMember) {
     if (await isBanned(member.guild, id)) toBan = id;
   }
 
-  if (
-    (await isAltPunish(member.guild)) &&
-    toBan
-  ) {
+  if ((await isAltPunish(member.guild)) && toBan) {
     const query = await prisma.moderationBan.findFirst({
       where: {
         guildId: member.guild.id,
@@ -146,18 +143,13 @@ export default async function guildMemberAdd(member: GuildMember) {
 
   let altPunish = false;
 
-
   let toMute: string = null;
 
   for (const id of await getAllGroupAccountIds(member.guild, member.user.id)) {
     if (await isMuted(member.guild, id)) toMute = id;
   }
 
-  if (
-    (await isAltPunish(member.guild)) &&
-    (!await isMuted(member.guild, member)) &&
-    toMute
-  ) {
+  if ((await isAltPunish(member.guild)) && !(await isMuted(member.guild, member)) && toMute) {
     const query = await prisma.moderationMute.findFirst({
       where: {
         guildId: member.guild.id,
