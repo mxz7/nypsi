@@ -206,16 +206,19 @@ async function run(
 
   const embed = new CustomEmbed(message.member);
 
-  let msg = punishAlts && ids.length > 3 ? `banning account and any alts...` : `✅ \`${mode == "id" ? idUser : target.user.username}\` has been banned`;
+  let msg =
+    punishAlts && ids.length > 3
+      ? `banning account and any alts...`
+      : `✅ \`${mode == "id" ? idUser : target.user.username}\` has been banned`;
 
   if (!punishAlts && temporary) {
     msg += ` for **${banLength}**`;
   } else if (!punishAlts && reason.split(": ")[1] !== "no reason given") {
     msg += ` for **${reason}**`;
   }
-  
+
   embed.setDescription(msg);
-  
+
   let res;
 
   if (ids.length > 3) {
@@ -253,7 +256,7 @@ async function run(
       }
     }
   }
-  
+
   if (altsBanned > 0)
     msg = `✅ \`${target.user.username}\` + ${altsBanned} ${
       altsBanned != 1 ? "alts have" : "alt has"
@@ -267,12 +270,12 @@ async function run(
   }
 
   embed.setDescription(msg);
-  
+
   if (ids.length > 3) {
     if (message instanceof Message) {
       await (res as Message).edit({ embeds: [embed] });
     } else {
-      await message.editReply({ embeds: [embed] })
+      await message.editReply({ embeds: [embed] });
     }
   } else {
     if (args.join(" ").includes("-s")) {
@@ -283,7 +286,7 @@ async function run(
         await message.reply({ embeds: [embed], ephemeral: true });
       }
     } else {
-     await send({ embeds: [embed] });
+      await send({ embeds: [embed] });
     }
   }
 }
