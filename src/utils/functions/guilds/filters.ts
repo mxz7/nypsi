@@ -5,6 +5,8 @@ import { CustomEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { MStoTime } from "../date";
+import { getExactMember } from "../member";
+import { getAllGroupAccountIds } from "../moderation/alts";
 import { newCase } from "../moderation/cases";
 import { addModLog } from "../moderation/logs";
 import {
@@ -15,10 +17,8 @@ import {
   isMuted,
   newMute,
 } from "../moderation/mute";
-import { getPercentMatch } from "./utils";
 import { isAltPunish } from "./altpunish";
-import { getAllGroupAccountIds } from "../moderation/alts";
-import { getExactMember } from "../member";
+import { getPercentMatch } from "./utils";
 
 const chatFilterCache = new Map<string, string[]>();
 const snipeFilterCache = new Map<string, string[]>();
@@ -308,7 +308,7 @@ export async function checkAutoMute(message: Message) {
     }
   };
 
-  let level;
+  let level: number;
 
   if (muteLevels[vl]) level = muteLevels[vl];
   else if (vl > 0) {
@@ -316,6 +316,8 @@ export async function checkAutoMute(message: Message) {
     while (modified > 0 && !muteLevels[modified]) modified--;
     level = modified;
   }
+
+  if (!level) return;
 
   const punishAlts = await isAltPunish(message.guild);
 
