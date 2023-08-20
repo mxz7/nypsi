@@ -1,5 +1,7 @@
 import { GuildMember } from "discord.js";
 import prisma from "../../../init/database";
+import redis from "../../../init/redis";
+import Constants from "../../Constants";
 
 export async function updateLastKnownUsername(member: GuildMember | string, tag: string) {
   let id: string;
@@ -17,23 +19,32 @@ export async function updateLastKnownUsername(member: GuildMember | string, tag:
       lastKnownUsername: tag,
     },
   });
+
+  await redis.set(`${Constants.redis.cache.user.username}:${id}`, tag, "EX", 7200);
 }
 
 export async function getLastKnownUsername(id: string) {
-  try {
-    const query = await prisma.user.findUnique({
-      where: {
-        id: id,
-      },
-      select: {
-        lastKnownUsername: true,
-      },
-    });
+  const cache = await redis.get(`${Constants.redis.cache.user.username}:${id}`);
 
-    return query.lastKnownUsername;
-  } catch {
-    return null;
-  }
+  if (cache) return cache;
+
+  const query = await prisma.user.findUnique({
+    where: {
+      id: id,
+    },
+    select: {
+      lastKnownUsername: true,
+    },
+  });
+
+  await redis.set(
+    `${Constants.redis.cache.user.username}:${id}`,
+    query?.lastKnownUsername || "",
+    "EX",
+    7200,
+  );
+
+  return query?.lastKnownUsername;
 }
 
 export async function getIdFromUsername(username: string) {
