@@ -51,6 +51,7 @@ export default {
         tagCount: "cache:tagcount",
         captcha_fail: "nypsi:user:captcha:fail",
         captcha_pass: "nypsi:user:captcha:pass",
+        username: "cache:user:username",
       },
       guild: {
         EXISTS: "cache:guild:exists",
