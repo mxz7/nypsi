@@ -18,6 +18,8 @@ import {
   topBalance,
   topCommand,
   topCommandGlobal,
+  topCommandUses,
+  topCommandUsesGlobal,
   topCompletion,
   topDailyStreak,
   topDailyStreakGlobal,
@@ -398,32 +400,39 @@ async function run(
       global ? "https://nypsi.xyz/leaderboard/wordle" : null,
     );
   } else if (args[0].toLowerCase() === "cmd" || args[0].toLowerCase() === "command") {
-    const searchTag = args[1].toLowerCase();
-
-    if (!commands.has(searchTag)) {
-      return send({ embeds: [new ErrorEmbed(`couldn't find ${searchTag}`)] });
-    }
-
-    let global = false;
-
-    if (args[2]?.toLowerCase() == "global") global = true;
-
     let data: { pages: Map<number, string[]>; pos: number };
+    let title: string;
 
-    if (global) {
-      data = await topCommandGlobal(searchTag, message.author.id);
+    if (args.length === 1 || args[1]?.toLowerCase() === "global") {
+      if (args[1]?.toLowerCase() === "global") {
+        data = await topCommandUsesGlobal(message.author.id);
+        title = `top command uses [global]`;
+      } else {
+        data = await topCommandUses(message.guild, message.author.id);
+        title = `top command uses for ${message.guild.name}`;
+      }
     } else {
-      data = await topCommand(message.guild, searchTag, message.author.id);
+      const cmd = args[1]?.toLowerCase();
+
+      if (!commands.has(cmd)) {
+        return send({ embeds: [new ErrorEmbed(`couldn't find ${cmd}`)] });
+      }
+      let global = false;
+
+      if (args[2]?.toLowerCase() == "global") global = true;
+
+      if (global) {
+        data = await topCommandGlobal(cmd, message.author.id);
+      } else {
+        data = await topCommand(message.guild, cmd, message.author.id);
+      }
+
+      title = `top ${await getPrefix(message.guild)}${cmd} uses ${
+        global ? "[global]" : `for ${message.guild.name}`
+      }`;
     }
 
-    return show(
-      data.pages,
-      data.pos,
-      `top ${await getPrefix(message.guild)}${searchTag} uses ${
-        global ? "[global]" : `for ${message.guild.name}`
-      }`,
-      // global ? `https://nypsi.xyz/leaderboard/${item.id}` : null
-    );
+    return show(data.pages, data.pos, title);
   } else {
     const selected =
       selectItem(args.join(" ")) ||
