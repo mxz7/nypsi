@@ -261,7 +261,7 @@ model Game {
 model Stats {
   userId String
   itemId String
-  amount Int
+  amount BigInt
 
   economy Economy @relation(fields: [userId], references: [userId], onDelete: Cascade)
 
