@@ -32,6 +32,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     client.cluster.broadcastEval((c) => {
       c.user.setPresence({
+        status: "dnd",
         activities: [
           {
             name: "rebooting..",
