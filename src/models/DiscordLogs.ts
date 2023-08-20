@@ -88,10 +88,13 @@ export default class DiscordTransport implements Transport {
     let repeat = false;
     let next = "";
 
-    if (data.message.length > 1500) {
+    let formatted = data.meta.nypsi_formatted ? data.message : await this.formatter(data);
+
+    if (formatted.length > this.maxLength) {
       repeat = true;
-      next = data.message.substring(1500, data.message.length - 1500);
-      data.message = data.message.substring(0, 1500);
+      next = formatted.substring(this.maxLength);
+      formatted = formatted.substring(0, this.maxLength);
+      data.meta.nypsi_formatted = true;
     }
 
     if (["hybrid", "embed"].includes(this.mode)) {
@@ -101,15 +104,15 @@ export default class DiscordTransport implements Transport {
         embed.setColor(this.colors.get(data.label) as ColorResolvable);
 
       if (this.mode == "hybrid") {
-        embed.setDescription(`\`\`\`ansi\n${await this.formatter(data)}\`\`\``);
+        embed.setDescription(`\`\`\`ansi\n${formatted}\`\`\``);
       } else {
-        embed.setDescription(`${await this.formatter(data)}`);
+        embed.setDescription(`${formatted}`);
       }
       this.queue.push(embed);
     } else if (this.mode == "codeblock") {
-      this.queue.push(`\`\`\`ansi\n${await this.formatter(data)}\`\`\``);
+      this.queue.push(`\`\`\`ansi\n${formatted}\`\`\``);
     } else {
-      this.queue.push(`${await this.formatter(data)}`);
+      this.queue.push(`${formatted}`);
     }
 
     if (repeat) return this.write({ ...data, message: next });
