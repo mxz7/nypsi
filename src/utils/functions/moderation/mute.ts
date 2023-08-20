@@ -168,6 +168,9 @@ export async function getMutedUsers(guild: Guild) {
     where: {
       guildId: guild.id,
     },
+    orderBy: {
+      expire: "desc",
+    },
   });
 
   return query;
