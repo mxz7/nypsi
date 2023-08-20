@@ -562,6 +562,22 @@ async function run(
     });
   };
 
+  const sellStats = async () => {
+    const stats = await getStats(message.member);
+
+    return send({
+      embeds: [
+        new CustomEmbed(
+          message.member,
+          `you have earned $**${findStatAmount(
+            stats,
+            "earned-sold",
+          ).toLocaleLowerCase()}** from selling items`,
+        ),
+      ],
+    });
+  };
+
   const lbStats = async () => {
     const positions = await getLeaderboardPositions(message.author.id);
 
@@ -707,6 +723,8 @@ async function run(
     args[0].toLowerCase().includes("leaderboard")
   ) {
     return lbStats();
+  } else if (args[0].toLowerCase() === "sell") {
+    return sellStats();
   } else {
     return gambleStats();
   }

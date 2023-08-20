@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Stats" ALTER COLUMN "amount" SET DATA TYPE BIGINT;
