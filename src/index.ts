@@ -130,7 +130,7 @@ setInterval(async () => {
   await redis.del(Constants.redis.nypsi.HOURLY_DB_REPORT);
 
   const total = parseInt(queries.reduce((a, b) => (parseInt(a) + parseInt(b)).toString()));
-  const avg = Math.floor(total / queries.length);
+  const avg = (total / queries.length).toFixed(2);
 
   logger.info(`average query takes ${avg}ms (${total.toLocaleString()} queries in the last hour)`);
 }, ms("1 hour"));
