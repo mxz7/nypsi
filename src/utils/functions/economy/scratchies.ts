@@ -6,9 +6,10 @@ import {
   GuildMember,
   MessageActionRowComponentBuilder,
 } from "discord.js";
-import { addToGuildXP, getGuildName } from "../../../utils/functions/economy/guilds";
+import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { Item } from "../../../types/Economy";
+import { addToGuildXP, getGuildName } from "../../../utils/functions/economy/guilds";
 import Constants from "../../Constants";
 import { addKarma } from "../karma/karma";
 import { percentChance, shuffle } from "../random";
@@ -17,6 +18,7 @@ import { getBalance, updateBalance } from "./balance";
 import { addInventoryItem } from "./inventory";
 import { getItems } from "./utils";
 import { getXp, updateXp } from "./xp";
+import ms = require("ms");
 
 export default class ScratchCard {
   private item: Item;
@@ -25,13 +27,17 @@ export default class ScratchCard {
   public remainingClicks: number;
   public won: boolean;
 
-  constructor(member: GuildMember, item: Item, area?: string[][]) {
+  constructor(member: GuildMember, item: Item) {
     this.item = item;
     this.member = member;
     this.remainingClicks = item.clicks;
     this.won = false;
 
-    this.area = area || this.createScratchArea(this.item) || [];
+    return this;
+  }
+
+  public async setArea(area?: string[][]) {
+    this.area = area || (await this.createScratchArea(this.item)) || [];
 
     return this;
   }
@@ -185,6 +191,11 @@ export default class ScratchCard {
           amount = 5;
         }
 
+        if (clickedItem.includes("_gem")) {
+          await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t");
+          await redis.expire(Constants.redis.nypsi.GEM_GIVEN, Math.floor(ms("1 days") / 1000));
+        }
+
         await addInventoryItem(this.member, clickedItem, amount);
         embed.setDescription(
           `you found ${getItems()[clickedItem].article} ${getItems()[clickedItem].emoji} **${
@@ -208,7 +219,7 @@ export default class ScratchCard {
     }
   }
 
-  private createScratchArea(item: Item) {
+  private async createScratchArea(item: Item) {
     if (item.role !== "scratch-card") return false;
 
     let arr: string[][] = [];
@@ -225,6 +236,8 @@ export default class ScratchCard {
       const chance = scratchItem.split(":")[2];
 
       if (chance && !percentChance(parseFloat(chance))) continue;
+
+      if (value.includes("_gem") && (await redis.exists(Constants.redis.nypsi.GEM_GIVEN))) continue;
 
       items.push(`${type}:${value}`);
     }
