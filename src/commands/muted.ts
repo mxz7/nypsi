@@ -3,7 +3,6 @@ import {
   ButtonBuilder,
   ButtonStyle,
   CommandInteraction,
-  GuildMember,
   Interaction,
   Message,
   MessageActionRowComponentBuilder,
@@ -13,6 +12,7 @@ import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { getMutedUsers } from "../utils/functions/moderation/mute";
 import { createProfile, profileExists } from "../utils/functions/moderation/utils";
+import { getLastKnownUsername } from "../utils/functions/users/tag";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command(
@@ -49,9 +49,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const pages = new Map<number, string[]>();
 
   for (const m of muted) {
-    const user: GuildMember | void = await message.guild.members.fetch(m.userId).catch(() => {});
+    const user = await message.client.users.fetch(m.userId);
+    const username = await getLastKnownUsername(m.userId);
 
-    const msg = `\`${user ? user.user.username : m.userId}\` ${
+    const msg = `${user ? user.username : username ? username : null}\`${m.userId}\` ${
       m.expire.getTime() >= 3130000000000
         ? "is permanently muted"
         : `will be unmuted <t:${Math.floor(m.expire.getTime() / 1000)}:R>`

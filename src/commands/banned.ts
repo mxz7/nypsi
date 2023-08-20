@@ -3,7 +3,6 @@ import {
   ButtonBuilder,
   ButtonStyle,
   CommandInteraction,
-  GuildMember,
   Interaction,
   Message,
   MessageActionRowComponentBuilder,
@@ -13,6 +12,7 @@ import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { getBannedUsers } from "../utils/functions/moderation/ban";
 import { createProfile, profileExists } from "../utils/functions/moderation/utils";
+import { getLastKnownUsername } from "../utils/functions/users/tag";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command(
@@ -30,6 +30,12 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (!(await profileExists(message.guild))) await createProfile(message.guild);
 
+  if (await onCooldown(cmd.name, message.member)) {
+    const embed = await getResponse(cmd.name, message.member);
+
+    return message.channel.send({ embeds: [embed] });
+  }
+
   const banned = await getBannedUsers(message.guild);
 
   if (!banned || banned.length == 0) {
@@ -38,20 +44,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     });
   }
 
-  if (await onCooldown(cmd.name, message.member)) {
-    const embed = await getResponse(cmd.name, message.member);
-
-    return message.channel.send({ embeds: [embed] });
-  }
-
   await addCooldown(cmd.name, message.member, 15);
 
   const pages = new Map<number, string[]>();
 
   for (const m of banned) {
-    const user: GuildMember | void = await message.guild.members.fetch(m.userId).catch(() => {});
+    const user = await message.client.users.fetch(m.userId);
+    const username = await getLastKnownUsername(m.userId);
 
-    const msg = `\`${user ? user.user.username : m.userId}\` ${
+    const msg = `${user ? user.username : username ? username : null}\`${m.userId}\` ${
       m.expire.getTime() >= 3130000000000
         ? "is permanently banned"
         : `will be unbanned <t:${Math.floor(m.expire.getTime() / 1000)}:R>`
