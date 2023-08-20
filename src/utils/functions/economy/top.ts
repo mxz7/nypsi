@@ -1353,6 +1353,8 @@ export async function topCommandGlobal(command: string, userId: string) {
     pos = userIds.indexOf(userId) + 1;
   }
 
+  checkLeaderboardPositions(userIds, "commands");
+
   return { pages, pos };
 }
 
