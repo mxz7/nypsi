@@ -30,18 +30,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (!(await profileExists(message.guild))) await createProfile(message.guild);
 
+  if (await onCooldown(cmd.name, message.member)) {
+    const embed = await getResponse(cmd.name, message.member);
+
+    return message.channel.send({ embeds: [embed] });
+  }
+
   const muted = await getMutedUsers(message.guild);
 
   if (!muted || muted.length == 0) {
     return message.channel.send({
       embeds: [new CustomEmbed(message.member, "there is no one currently muted with nypsi")],
     });
-  }
-
-  if (await onCooldown(cmd.name, message.member)) {
-    const embed = await getResponse(cmd.name, message.member);
-
-    return message.channel.send({ embeds: [embed] });
   }
 
   await addCooldown(cmd.name, message.member, 15);
