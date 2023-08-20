@@ -184,7 +184,7 @@
     "miner": {
       "id": "miner",
       "name": "miner",
-      "item_emoji": "⛏",
+      "item_emoji": "⛏️",
       "prestige_requirement": 2,
       "cost": 100000,
       "base": {
