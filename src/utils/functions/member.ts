@@ -78,6 +78,10 @@ export async function getExactMember(guild: Guild, memberName: string): Promise<
     return (await guild.members.fetch(memberName.replaceAll(/\D/g, ""))) || null;
   }
 
+  if (memberName.match(Constants.SNOWFLAKE_REGEX)) {
+    return await guild.members.fetch(memberName).catch(() => null);
+  }
+
   let members: Collection<string, GuildMember>;
 
   if (guild.memberCount == guild.members.cache.size && guild.memberCount <= 25) {
