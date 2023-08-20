@@ -83,7 +83,7 @@ async function prepare(
 
   await redis.sadd(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
 
-  const card = new ScratchCard(message.member, selected);
+  const card = await new ScratchCard(message.member, selected).setArea();
 
   const embed = new CustomEmbed(
     message.member,
