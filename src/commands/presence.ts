@@ -41,7 +41,7 @@ async function run(
           c.user.setPresence({
             activities: [
               {
-                type: 0,
+                type: 4,
                 name: args.join(" "),
               },
             ],

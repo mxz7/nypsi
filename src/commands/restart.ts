@@ -35,6 +35,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         status: "dnd",
         activities: [
           {
+            type: 4,
             name: "rebooting..",
           },
         ],
