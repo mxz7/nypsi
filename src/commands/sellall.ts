@@ -15,6 +15,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { getBalance, getSellMulti, updateBalance } from "../utils/functions/economy/balance";
 import { getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
+import { addStat } from "../utils/functions/economy/stats";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import PageManager from "../utils/functions/page";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
@@ -140,6 +141,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     functions.push(async () => {
       await updateBalance(message.member, (await getBalance(message.member)) + total);
     });
+
+    addStat(message.author.id, "earned-sold", total);
 
     await pAll(functions, { concurrency: 5 });
 

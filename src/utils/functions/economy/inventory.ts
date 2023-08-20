@@ -17,6 +17,7 @@ import { getAuctionAverage } from "./auctions";
 import { getBalance, getSellMulti, updateBalance } from "./balance";
 import { addToGuildXP, getGuildName } from "./guilds";
 import { getOffersAverage } from "./offers";
+import { addStat } from "./stats";
 import { createUser, getItems, userExists } from "./utils";
 import { getXp, updateXp } from "./xp";
 import ms = require("ms");
@@ -123,6 +124,8 @@ async function doAutosellThing(userId: string, itemId: string, amount: number): 
   }
 
   await updateBalance(userId, (await getBalance(userId)) + sellWorth);
+
+  addStat(userId, "earned-sold", sellWorth);
 
   await redis.hincrby(
     `${Constants.redis.nypsi.AUTO_SELL_ITEMS}:${userId}`,
