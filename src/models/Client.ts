@@ -1,5 +1,5 @@
 import { ClusterClient } from "discord-hybrid-sharding";
-import { Client, ClientOptions } from "discord.js";
+import { ActivityType, Client, ClientOptions } from "discord.js";
 import channelCreate from "../events/channelCreate";
 import channelDelete from "../events/channelDelete";
 import channelUpdate from "../events/channelUpdate";
@@ -128,7 +128,7 @@ export class NypsiClient extends Client {
           const presence = randomPresence();
 
           this.user.setPresence({
-            status: "dnd",
+            status: "online",
             activities: [
               {
                 name: presence,
@@ -143,9 +143,10 @@ export class NypsiClient extends Client {
 
       setTimeout(() => {
         this.user.setPresence({
-          status: "dnd",
+          status: "online",
           activities: [
             {
+              type: ActivityType.Custom,
               name: "nypsi.xyz",
             },
           ],
