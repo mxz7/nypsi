@@ -230,7 +230,7 @@ async function run(
         (i) =>
           `${getItems()[i.itemId].emoji} **${
             getItems()[i.itemId].name
-          }** ${i.amount.toLocaleString()} use${i.amount != 1 ? "s" : ""}`,
+          }** ${i.amount.toLocaleString()} use${Number(i.amount) != 1 ? "s" : ""}`,
       ),
     );
 
@@ -539,7 +539,7 @@ async function run(
     return send({ embeds: [embed] });
   };
 
-  function findStatAmount(stats: { amount: number; itemId: string }[], id: string) {
+  function findStatAmount(stats: { amount: bigint; itemId: string }[], id: string) {
     return stats.find((i) => i.itemId === id)?.amount.toLocaleString() || "0";
   }
 
