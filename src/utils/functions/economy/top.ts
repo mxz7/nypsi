@@ -4,6 +4,7 @@ import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
 import PageManager from "../page";
 import { getPreferences } from "../users/notifications";
+import { getLastKnownUsername } from "../users/tag";
 import { getActiveTag } from "../users/tags";
 import workerSort from "../workers/sort";
 import wordleSortWorker from "../workers/wordlesort";
@@ -70,11 +71,10 @@ export async function topBalance(guild: Guild, userId?: string) {
         pos += ".";
       }
 
-      out[count] = `${pos} ${formatUsername(
+      out[count] = `${pos} ${await formatUsername(
         user.userId,
         members.get(user.userId).user.username,
         true,
-        (await getActiveTag(user.userId))?.tagId,
       )} $${Number(user.money).toLocaleString()}`;
 
       count++;
@@ -137,11 +137,10 @@ export async function topBalanceGlobal(amount: number): Promise<string[]> {
       pos += ".";
     }
 
-    usersFinal[count] = `${pos} ${formatUsername(
+    usersFinal[count] = `${pos} ${await formatUsername(
       user.userId,
       user.user.lastKnownUsername,
       (await getPreferences(user.userId)).leaderboards,
-      (await getActiveTag(user.userId))?.tagId,
     )} $${Number(user.money).toLocaleString()}`;
 
     count++;
@@ -198,11 +197,10 @@ export async function topNetWorthGlobal(userId: string) {
     }
 
     out.push(
-      `${pos} ${formatUsername(
+      `${pos} ${await formatUsername(
         user.userId,
         user.user.lastKnownUsername,
         (await getPreferences(user.userId)).leaderboards,
-        (await getActiveTag(user.userId))?.tagId,
       )} $${Number(user.netWorth).toLocaleString()}`,
     );
   }
@@ -293,13 +291,10 @@ export async function topNetWorth(guild: Guild, userId?: string) {
         pos += ".";
       }
 
-      const tag = await getActiveTag(user);
-
-      out[count] = `${pos} ${formatUsername(
+      out[count] = `${pos} ${await formatUsername(
         user,
         members.get(user).user.username,
         true,
-        tag?.tagId,
       )} $${amounts.get(user).toLocaleString()}`;
 
       count++;
@@ -378,11 +373,10 @@ export async function topPrestige(guild: Guild, userId?: string) {
     const thing = ["th", "st", "nd", "rd"];
     const v = user.prestige % 100;
 
-    out[count] = `${pos} ${formatUsername(
+    out[count] = `${pos} ${await formatUsername(
       user.userId,
       members.get(user.userId).user.username,
       true,
-      (await getActiveTag(user.userId))?.tagId,
     )} ${user.prestige}${thing[(v - 20) % 10] || thing[v] || thing[0]} prestige`;
 
     count++;
@@ -446,11 +440,10 @@ export async function topPrestigeGlobal(userId: string) {
 
     const thing = ["th", "st", "nd", "rd"];
     const v = user.prestige % 100;
-    out[count] = `${pos} ${formatUsername(
+    out[count] = `${pos} ${await formatUsername(
       user.userId,
       user.user.lastKnownUsername,
       (await getPreferences(user.userId)).leaderboards,
-      (await getActiveTag(user.userId))?.tagId,
     )} ${user.prestige}${thing[(v - 20) % 10] || thing[v] || thing[0]} prestige`;
 
     count++;
@@ -533,11 +526,10 @@ export async function topItem(guild: Guild, item: string, userId: string) {
 
     const items = getItems();
 
-    out[count] = `${pos} ${formatUsername(
+    out[count] = `${pos} ${await formatUsername(
       user.userId,
       members.get(user.userId).user.username,
       true,
-      (await getActiveTag(user.userId))?.tagId,
     )} ${user.amount.toLocaleString()} ${
       user.amount > 1 ? items[item].plural || items[item].name : items[item].name
     }`;
@@ -607,11 +599,10 @@ export async function topItemGlobal(item: string, userId: string) {
 
     const items = getItems();
 
-    out[count] = `${pos} ${formatUsername(
+    out[count] = `${pos} ${await formatUsername(
       user.userId,
       user.economy.user.lastKnownUsername,
       (await getPreferences(user.userId)).leaderboards,
-      (await getActiveTag(user.userId))?.tagId,
     )} ${user.amount.toLocaleString()} ${
       user.amount > 1 ? items[item].plural || items[item].name : items[item].name
     }`;
@@ -718,13 +709,10 @@ export async function topCompletion(guild: Guild, userId: string) {
         pos += ".";
       }
 
-      const tag = await getActiveTag(user);
-
-      out[count] = `${pos} ${formatUsername(
+      out[count] = `${pos} ${await formatUsername(
         user,
         members.get(user).user.username,
         true,
-        tag?.tagId,
       )} ${completionRate.get(user).toFixed(1)}%`;
 
       count++;
@@ -834,13 +822,10 @@ export async function topDailyStreak(guild: Guild, userId?: string) {
       pos += ".";
     }
 
-    const tag = await getActiveTag(user.userId);
-
-    out[count] = `${pos} ${formatUsername(
+    out[count] = `${pos} ${await formatUsername(
       user.userId,
       members.get(user.userId).user.username,
       true,
-      tag?.tagId,
     )} ${user.dailyStreak}`;
 
     count++;
@@ -902,13 +887,10 @@ export async function topDailyStreakGlobal(userId: string) {
       pos += ".";
     }
 
-    const tag = await getActiveTag(user.userId);
-
-    out[count] = `${pos} ${formatUsername(
+    out[count] = `${pos} ${await formatUsername(
       user.userId,
       user.user.lastKnownUsername,
       (await getPreferences(user.userId)).leaderboards,
-      tag?.tagId,
     )} ${user.dailyStreak}`;
 
     count++;
@@ -983,13 +965,10 @@ export async function topLottoWins(guild: Guild, userId?: string) {
       pos += ".";
     }
 
-    const tag = await getActiveTag(user.userId);
-
-    out[count] = `${pos} ${formatUsername(
+    out[count] = `${pos} ${await formatUsername(
       user.userId,
       members.get(user.userId).user.username,
       true,
-      tag?.tagId,
     )} ${user.progress}`;
 
     count++;
@@ -1049,13 +1028,10 @@ export async function topLottoWinsGlobal(userId: string) {
       pos += ".";
     }
 
-    const tag = await getActiveTag(user.userId);
-
-    out[count] = `${pos} ${formatUsername(
+    out[count] = `${pos} ${await formatUsername(
       user.userId,
       user.user.lastKnownUsername,
       (await getPreferences(user.userId)).leaderboards,
-      tag?.tagId,
     )} ${query[userIds.indexOf(user.userId)].progress}`;
 
     count++;
@@ -1158,14 +1134,11 @@ export async function topWordle(guild: Guild, userId: string) {
       pos += ".";
     }
 
-    const tag = await getActiveTag(user.user.id);
-
     out.push(
-      `${pos} ${formatUsername(
+      `${pos} ${await formatUsername(
         user.user.id,
         members.get(user.user.id).user.username,
         true,
-        tag?.tagId,
       )} ${user.wins.toLocaleString()} win${user.wins != 1 ? "s" : ""}`,
     );
   }
@@ -1227,14 +1200,11 @@ export async function topWordleGlobal(userId: string) {
       pos += ".";
     }
 
-    const tag = await getActiveTag(user.user.id);
-
     out.push(
-      `${pos} ${formatUsername(
+      `${pos} ${await formatUsername(
         user.user.id,
         user.user.lastKnownUsername,
         (await getPreferences(user.user.id)).leaderboards,
-        tag?.tagId,
       )} ${user.wins.toLocaleString()} wins`,
     );
   }
@@ -1307,13 +1277,10 @@ export async function topCommand(guild: Guild, command: string, userId: string) 
       pos += ".";
     }
 
-    const tag = await getActiveTag(user.userId);
-
-    out[count] = `${pos} ${formatUsername(
+    out[count] = `${pos} ${await formatUsername(
       user.userId,
       members.get(user.userId).user.username,
       true,
-      tag?.tagId,
     )} ${user.uses.toLocaleString()} ${user.uses > 1 ? "uses" : "use"}`;
 
     count++;
@@ -1369,13 +1336,10 @@ export async function topCommandGlobal(command: string, userId: string) {
       pos += ".";
     }
 
-    const tag = await getActiveTag(user.userId);
-
-    out[count] = `${pos} ${formatUsername(
+    out[count] = `${pos} ${await formatUsername(
       user.userId,
       user.user.lastKnownUsername,
       (await getPreferences(user.userId)).leaderboards,
-      tag?.tagId,
     )} ${user.uses.toLocaleString()} ${user.uses > 1 ? "uses" : "use"}`;
 
     count++;
@@ -1392,12 +1356,140 @@ export async function topCommandGlobal(command: string, userId: string) {
   return { pages, pos };
 }
 
-function formatUsername(id: string, username: string, privacy: boolean, tag?: string) {
+export async function topCommandUses(guild: Guild, userId: string) {
+  let members: Collection<string, GuildMember>;
+
+  if (guild.memberCount == guild.members.cache.size) {
+    members = guild.members.cache;
+  } else {
+    members = await guild.members.fetch();
+  }
+
+  if (!members) members = guild.members.cache;
+
+  members = members.filter((m) => {
+    return !m.user.bot;
+  });
+
+  const query = await prisma.commandUse.groupBy({
+    where: {
+      AND: [{ userId: { in: Array.from(members.keys()) } }, { user: { blacklisted: false } }],
+    },
+    by: ["userId"],
+    _sum: {
+      uses: true,
+    },
+    orderBy: {
+      _sum: {
+        uses: "desc",
+      },
+    },
+    take: 100,
+  });
+
+  const out = [];
+
+  let count = 0;
+
+  const userIds = query.map((i) => i.userId);
+
+  for (const user of query) {
+    let pos = (count + 1).toString();
+
+    if (pos == "1") {
+      pos = "🥇";
+    } else if (pos == "2") {
+      pos = "🥈";
+    } else if (pos == "3") {
+      pos = "🥉";
+    } else {
+      pos += ".";
+    }
+
+    out[count] = `${pos} ${await formatUsername(
+      user.userId,
+      members.get(user.userId).user.username,
+      true,
+    )} ${user._sum.uses.toLocaleString()} ${user._sum.uses > 1 ? "commands" : "command"}`;
+
+    count++;
+  }
+
+  const pages = PageManager.createPages(out);
+
+  let pos = 0;
+
+  if (userId) {
+    pos = userIds.indexOf(userId) + 1;
+  }
+
+  return { pages, pos };
+}
+
+export async function topCommandUsesGlobal(userId: string) {
+  const query = await prisma.commandUse.groupBy({
+    where: {
+      user: { blacklisted: false },
+    },
+    by: ["userId"],
+    _sum: {
+      uses: true,
+    },
+    orderBy: {
+      _sum: {
+        uses: "desc",
+      },
+    },
+    take: 100,
+  });
+
+  const out = [];
+
+  let count = 0;
+
+  const userIds = query.map((i) => i.userId);
+
+  for (const user of query) {
+    let pos = (count + 1).toString();
+
+    if (pos == "1") {
+      pos = "🥇";
+    } else if (pos == "2") {
+      pos = "🥈";
+    } else if (pos == "3") {
+      pos = "🥉";
+    } else {
+      pos += ".";
+    }
+
+    out[count] = `${pos} ${await formatUsername(
+      user.userId,
+      await getLastKnownUsername(user.userId),
+      (await getPreferences(user.userId)).leaderboards,
+    )} ${user._sum.uses.toLocaleString()} ${user._sum.uses > 1 ? "commands" : "command"}`;
+
+    count++;
+  }
+
+  const pages = PageManager.createPages(out);
+
+  let pos = 0;
+
+  if (userId) {
+    pos = userIds.indexOf(userId) + 1;
+  }
+
+  return { pages, pos };
+}
+
+async function formatUsername(id: string, username: string, privacy: boolean) {
   if (!privacy) return "[**[hidden]**](https://docs.nypsi.xyz/economy/hidden)";
 
   let out = `[${username}](https://nypsi.xyz/user/${encodeURIComponent(id)})`;
 
-  if (tag) out = `[${getTagsData()[tag].emoji}] ${out}`;
+  const tag = await getActiveTag(id);
+
+  if (tag) out = `[${getTagsData()[tag.tagId].emoji}] ${out}`;
 
   return `**${out}**`;
 }
