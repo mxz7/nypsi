@@ -1,5 +1,5 @@
 import { getInfo } from "discord-hybrid-sharding";
-import { GatewayIntentBits, Options, Partials } from "discord.js";
+import { ActivityType, GatewayIntentBits, Options, Partials } from "discord.js";
 import { NypsiClient } from "./models/Client";
 
 const client = new NypsiClient({
@@ -132,6 +132,7 @@ const client = new NypsiClient({
     activities: [
       {
         name: "loading..",
+        type: ActivityType.Custom,
       },
     ],
   },
