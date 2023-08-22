@@ -65,7 +65,7 @@ async function run(
   const embed = new CustomEmbed(message.member)
     .setTitle(uuid.name)
     .setURL("https://namemc.com/profile/" + username)
-    .setThumbnail(`https://mc-heads.net/avatar/${uuid.id}?size=64`)
+    .setThumbnail(`https://mc-heads.net/avatar/${uuid.id}`)
     .setDescription(pages.get(1).join("\n"));
 
   if (pages.size === 1) return message.channel.send({ embeds: [embed] });
