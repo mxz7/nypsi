@@ -131,6 +131,7 @@ export class NypsiClient extends Client {
             status: "online",
             activities: [
               {
+                type: ActivityType.Custom,
                 name: presence,
               },
             ],
