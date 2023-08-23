@@ -2431,7 +2431,7 @@
     "name": "spades tag",
     "plural": "spades tags",
     "article": "a",
-    "emoji": ":spades:",
+    "emoji": "♠️",
     "longDesc": "found from the blackjack v achievement",
     "rarity": 6,
     "role": "tag",
