@@ -129,12 +129,7 @@ export class NypsiClient extends Client {
 
           this.user.setPresence({
             status: "online",
-            activities: [
-              {
-                type: ActivityType.Custom,
-                name: presence,
-              },
-            ],
+            activities: [presence],
           });
         },
         30 * 60 * 1000,
