@@ -19,7 +19,7 @@ import { isPremium } from "../premium/premium";
 import { getTax } from "../tax";
 import { getBalance, updateBalance } from "./balance";
 import { getInventory } from "./inventory";
-import { getItems } from "./utils";
+import { createUser, getItems, userExists } from "./utils";
 
 export async function createOffer(
   target: User,
@@ -103,6 +103,8 @@ export async function getTargetedOffers(userId: string) {
 }
 
 export async function getBlockedList(userId: string) {
+  if (!(await userExists(userId))) await createUser(userId);
+
   return await prisma.economy
     .findUnique({ where: { userId: userId }, select: { offersBlock: true } })
     .then((r) => r.offersBlock);
