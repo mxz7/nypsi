@@ -3,10 +3,12 @@ import {
   BaseMessageOptions,
   ButtonBuilder,
   ButtonStyle,
+  EmbedField,
   InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
 } from "discord.js";
+import { sort } from "fast-sort";
 import { Command } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { Tag } from "../types/Tags";
@@ -147,8 +149,61 @@ cmd.setRun((message, args) => {
     });
   };
 
+  const listAllTags = async () => {
+    const tagData = getTagsData();
+    const userTags = await getTags(message.author.id);
+
+    const tagList: { title: string; value: string; owned: boolean }[] = [];
+
+    for (const [id, data] of Object.entries(tagData)) {
+      tagList.push({
+        title: id,
+        value: `${data.emoji} **${data.name}**\n${data.description}${
+          userTags.find((i) => i.tagId === id) ? "\n*owned*" : ""
+        }`,
+        owned: Boolean(userTags.find((i) => i.tagId === id)),
+      });
+    }
+
+    const owned = tagList.filter((i) => i.owned).length;
+
+    const pages = PageManager.createPages(
+      sort(tagList)
+        .asc([(i) => i.owned, (i) => i.title])
+        .map((i) => {
+          return { name: i.title, value: i.value, inline: true } as EmbedField;
+        }),
+      6,
+    );
+
+    const embed = new CustomEmbed(message.member)
+      .setHeader("all tags", message.author.avatarURL())
+      .setFooter({ text: `${owned}/${Object.entries(tagData).length} owned` });
+
+    embed.setFields(...pages.get(1));
+
+    const msg = await send({ embeds: [embed], components: [PageManager.defaultRow] });
+
+    const manager = new PageManager({
+      embed,
+      message: msg,
+      row: PageManager.defaultRow,
+      userId: message.author.id,
+      pages,
+      updateEmbed(page, embed) {
+        embed.setFields(...page);
+
+        return embed;
+      },
+    });
+
+    return manager.listen();
+  };
+
   if (args.length === 0 || args[0].toLowerCase() === "list") {
     return listTags();
+  } else if (args[0].toLowerCase() === "all") {
+    return listAllTags();
   }
 
   if (["choose", "select"].includes(args[0].toLowerCase())) args.shift();
