@@ -104,7 +104,7 @@ export async function runInteraction(interaction: Interaction) {
     const responseDesc: string[] = [];
 
     if (member.roles.cache.has(roleId)) {
-      let role = member.roles.cache.find((r) => r.id === roleId);
+      const role = member.roles.cache.find((r) => r.id === roleId);
       let fail = false;
       await member.roles.remove(roleId).catch(() => {
         fail = true;
