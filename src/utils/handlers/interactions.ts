@@ -104,14 +104,21 @@ export async function runInteraction(interaction: Interaction) {
     const responseDesc: string[] = [];
 
     if (member.roles.cache.has(roleId)) {
-      responseDesc.push(`\\- ${member.roles.cache.find((r) => r.id === roleId).toString()}`);
-      await member.roles.remove(roleId);
+      let role = member.roles.cache.find((r) => r.id === roleId);
+      let fail = false;
+      await member.roles.remove(roleId).catch(() => {
+        fail = true;
+        interaction.editReply({ embeds: [new ErrorEmbed(`failed to remove ${role.toString()}, i may not have permissions`)]});
+      });
+      if (fail) return;
+      responseDesc.push(`\\- ${role.toString()}`);
     } else {
       if (reactionRole.mode === "UNIQUE") {
         for (const role of member.roles.cache.values()) {
           if (reactionRole.roles.find((r) => r.roleId === role.id)) {
-            responseDesc.push(`\\- ${role.toString()}`);
-            await member.roles.remove(role);
+            let fail = false;
+            await member.roles.remove(role).catch(() => fail = true);
+            if (!fail) responseDesc.push(`\\- ${role.toString()}`);
           }
         }
       }
@@ -120,12 +127,20 @@ export async function runInteraction(interaction: Interaction) {
 
       if (!role) return interaction.editReply({ embeds: [new ErrorEmbed("role is not valid")] });
 
-      await member.roles.add(role);
+      let fail = false;
+
+      await member.roles.add(role).catch(() => {
+        interaction.editReply({ embeds: [new ErrorEmbed(`failed to add ${role.toString()}, i may not have permissions`)]});
+        fail = true;
+      });
+
+      if (fail) return;
+
       responseDesc.push(`+ ${role.toString()}`);
       logger.info(`(reaction roles) added ${role.id} to ${member.user.id}`);
     }
 
-    return interaction.editReply({ embeds: [new CustomEmbed(member, responseDesc.join("\n"))] });
+    if (responseDesc.length > 0) return interaction.editReply({ embeds: [new CustomEmbed(member, responseDesc.join("\n"))] });
   } else if (interaction.isMessageComponent()) {
     return interactionHandlers.get(interaction.customId)?.run(interaction);
   }
