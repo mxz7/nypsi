@@ -314,7 +314,7 @@ export async function checkAutoMute(message: Message) {
   else if (vl > 0) {
     let modified = vl;
     while (modified > 0 && !muteLevels[modified]) modified--;
-    level = modified;
+    level = muteLevels[modified];
   }
 
   if (!level) return;
