@@ -108,7 +108,11 @@ export async function runInteraction(interaction: Interaction) {
       let fail = false;
       await member.roles.remove(roleId).catch(() => {
         fail = true;
-        interaction.editReply({ embeds: [new ErrorEmbed(`failed to remove ${role.toString()}, i may not have permissions`)]});
+        interaction.editReply({
+          embeds: [
+            new ErrorEmbed(`failed to remove ${role.toString()}, i may not have permissions`),
+          ],
+        });
       });
       if (fail) return;
       responseDesc.push(`\\- ${role.toString()}`);
@@ -117,7 +121,7 @@ export async function runInteraction(interaction: Interaction) {
         for (const role of member.roles.cache.values()) {
           if (reactionRole.roles.find((r) => r.roleId === role.id)) {
             let fail = false;
-            await member.roles.remove(role).catch(() => fail = true);
+            await member.roles.remove(role).catch(() => (fail = true));
             if (!fail) responseDesc.push(`\\- ${role.toString()}`);
           }
         }
@@ -130,7 +134,9 @@ export async function runInteraction(interaction: Interaction) {
       let fail = false;
 
       await member.roles.add(role).catch(() => {
-        interaction.editReply({ embeds: [new ErrorEmbed(`failed to add ${role.toString()}, i may not have permissions`)]});
+        interaction.editReply({
+          embeds: [new ErrorEmbed(`failed to add ${role.toString()}, i may not have permissions`)],
+        });
         fail = true;
       });
 
@@ -140,7 +146,8 @@ export async function runInteraction(interaction: Interaction) {
       logger.info(`(reaction roles) added ${role.id} to ${member.user.id}`);
     }
 
-    if (responseDesc.length > 0) return interaction.editReply({ embeds: [new CustomEmbed(member, responseDesc.join("\n"))] });
+    if (responseDesc.length > 0)
+      return interaction.editReply({ embeds: [new CustomEmbed(member, responseDesc.join("\n"))] });
   } else if (interaction.isMessageComponent()) {
     return interactionHandlers.get(interaction.customId)?.run(interaction);
   }
