@@ -8,30 +8,16 @@ const client = new NypsiClient({
   },
   sweepers: {
     ...Options.DefaultSweeperSettings,
-    // messages: {
-    //   interval: 1800,
-    //   filter: () => (msg) => {
-    //     if (msg.author.id === msg.client.user.id) {
-    //       if ((msg.editedTimestamp || msg.createdTimestamp) > Date.now() - ms("10 minutes")) {
-    //         return true;
-    //       }
-    //       return false;
-    //     }
-
-    //     if (msg.author.bot || msg.embeds.length > 0) return false;
-
-    //     if (recentCommands.has(msg.author.id)) {
-    //       if (recentCommands.get(msg.author.id) > Date.now() - ms("10 minutes")) return true;
-    //       recentCommands.delete(msg.author.id);
-    //       return false;
-    //     }
-
-    //     return false;
-    //   },
-    // },
     messages: {
       interval: 60,
-      filter: () => () => true,
+      filter: () => (msg) => {
+        if (msg.author.bot) return true;
+
+        if (msg.createdTimestamp > Date.now() - 60000 || msg.editedTimestamp > Date.now() - 60000)
+          return false;
+
+        return true;
+      },
     },
     guildMembers: {
       interval: 900,
@@ -67,28 +53,7 @@ const client = new NypsiClient({
     GuildInviteManager: 0,
     GuildStickerManager: 0,
     GuildScheduledEventManager: 0,
-    MessageManager: 0,
-    // MessageManager: {
-    //   maxSize: 5,
-    //   keepOverLimit: (msg) => {
-    //     if (msg.author.id === msg.client.user.id) {
-    //       if ((msg.editedTimestamp || msg.createdTimestamp) > Date.now() - ms("10 minutes")) {
-    //         return true;
-    //       }
-    //       return false;
-    //     }
-
-    //     if (msg.author.bot || msg.embeds.length > 0) return false;
-
-    //     if (recentCommands.has(msg.author.id)) {
-    //       if (recentCommands.get(msg.author.id) > Date.now() - ms("10 minutes")) return true;
-    //       recentCommands.delete(msg.author.id);
-    //       return false;
-    //     }
-
-    //     return false;
-    //   },
-    // },
+    MessageManager: 50,
     PresenceManager: 0,
     ReactionManager: 0,
     ReactionUserManager: 0,
