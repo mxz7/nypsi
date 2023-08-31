@@ -2050,7 +2050,8 @@
       "id:gold_credit:3",
       "id:pink_gem:1",
       "id:karma_scratch_card:5",
-      "id:omega_crate:1"
+      "id:omega_crate:1",
+      "id:karma_tag:5"
     ],
     "random_drop_chance": 50
   },
