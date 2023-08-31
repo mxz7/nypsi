@@ -25,13 +25,17 @@ export async function getCraftingItems(member: GuildMember | string, deleteOld =
     },
   });
 
+  const current = [...query];
   const completed: { itemId: string; amount: number; finished: Date }[] = [];
 
   if (deleteOld) {
     for (const item of query) {
       if (item.finished.getTime() < Date.now()) {
         completed.push(item);
-        query.splice(query.indexOf(item), 1);
+        current.splice(
+          current.findIndex((i) => i.id === item.id),
+          1,
+        );
 
         await prisma.crafting.delete({
           where: {
@@ -52,7 +56,7 @@ export async function getCraftingItems(member: GuildMember | string, deleteOld =
     );
   }
 
-  return { current: query, completed };
+  return { current, completed };
 }
 
 export async function newCraftItem(member: GuildMember | string, itemId: string, amount: number) {
