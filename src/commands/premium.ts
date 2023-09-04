@@ -35,6 +35,7 @@ import { getTotalSpend } from "../utils/functions/users/email";
 import { addTag, getTags, removeTag } from "../utils/functions/users/tags";
 import { commandExists } from "../utils/handlers/commandhandler";
 import dayjs = require("dayjs");
+import { getPrefix } from "../utils/functions/guilds/utils";
 
 let doingRoles = false;
 
@@ -131,8 +132,9 @@ cmd.slashData
             option
               .setName("alias")
               .setDescription("alias for your command")
+              .setAutocomplete(true)
               .setRequired(true)
-              .setMaxLength(15),
+              .setMaxLength(40),
           ),
       ),
   );
@@ -478,10 +480,12 @@ async function run(
 
     const aliases = await getUserAliases(message.author.id);
 
+    const prefix = await getPrefix(message.guild);
+
     if (args[1].toLowerCase() === "list") {
       if (aliases.length === 0) return send({ embeds: [new ErrorEmbed("you have no aliases")] });
       const pages = PageManager.createPages(
-        aliases.map((i) => `\`${i.alias}\` -> \`${i.command}\``),
+        aliases.map((i) => `\`${prefix}${i.alias}\` -> \`${prefix}${i.command}\``),
       );
 
       const embed = new CustomEmbed(message.member, pages.get(1).join("\n"));
@@ -557,18 +561,21 @@ async function run(
       await addUserAlias(message.author.id, trigger, command);
 
       return send({
-        embeds: [new CustomEmbed(message.member, `✅ added \`${trigger}\` -> \`${command}\``)],
+        embeds: [new CustomEmbed(message.member, `✅ added \`${prefix}${trigger}\` -> \`${prefix}${command}\``)],
       });
     } else if (args[1].toLowerCase() === "del") {
-      const foundAlias = aliases.find((i) => i.alias === args[2]);
+      const trigger = cleanString(
+        message.options.getString("alias").toLowerCase().normalize("NFD").split(" ")[0],
+      );
+      const foundAlias = aliases.find((i) => i.alias === trigger);
 
       if (!foundAlias) {
-        return send({ embeds: [new ErrorEmbed(`couldnt find alias \`${args[2]}\``)] });
+        return send({ embeds: [new ErrorEmbed(`couldnt find alias \`${prefix}${trigger}\``)] });
       }
 
-      await removeUserAlias(message.author.id, args[2]);
+      await removeUserAlias(message.author.id, trigger);
 
-      return send({ embeds: [new CustomEmbed(message.member, `✅ removed \`${args[2]}\``)] });
+      return send({ embeds: [new CustomEmbed(message.member, `✅ removed \`${prefix}${trigger}\``)] });
     }
   };
 

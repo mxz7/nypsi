@@ -35,6 +35,12 @@ async function run(
     return message.channel.send({ embeds: [embed] });
   }
 
+  if (args.join(" ").includes("`")) {
+    return message.channel.send({
+      embeds: [new ErrorEmbed("prefix cannot contain `")],
+    });
+  }
+
   if (args.join(" ").length > 3) {
     return message.channel.send({
       embeds: [new ErrorEmbed("prefix cannot be longer than 3 characters")],
