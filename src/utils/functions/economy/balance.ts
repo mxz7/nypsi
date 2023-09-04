@@ -550,6 +550,14 @@ export async function calcNetWorth(member: GuildMember | string, breakdown = fal
       bank: true,
       Inventory: true,
       netWorth: true,
+      OffersGiven: {
+        select: {
+          money: true,
+        },
+        where: {
+          sold: false,
+        },
+      },
       BakeryUpgrade: {
         select: {
           upgradeId: true,
@@ -591,6 +599,7 @@ export async function calcNetWorth(member: GuildMember | string, breakdown = fal
 
   worth += Number(query.money);
   worth += Number(query.bank);
+  worth += Number(query.OffersGiven.map((i) => i.money).reduce((a, b) => a + b));
 
   if (breakdown) breakdownItems.set("balance", worth);
 
