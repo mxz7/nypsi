@@ -9,7 +9,7 @@ export default {
     const aliases = await getUserAliases(interaction.user.id);
 
     if (aliases.length == 0) return await interaction.respond([]);
-    
+
     const prefix = await getPrefix(interaction.guild);
 
     const formatted = aliases.map((i) => ({

@@ -561,7 +561,12 @@ async function run(
       await addUserAlias(message.author.id, trigger, command);
 
       return send({
-        embeds: [new CustomEmbed(message.member, `✅ added \`${prefix}${trigger}\` -> \`${prefix}${command}\``)],
+        embeds: [
+          new CustomEmbed(
+            message.member,
+            `✅ added \`${prefix}${trigger}\` -> \`${prefix}${command}\``,
+          ),
+        ],
       });
     } else if (args[1].toLowerCase() === "del") {
       const trigger = cleanString(
@@ -575,7 +580,9 @@ async function run(
 
       await removeUserAlias(message.author.id, trigger);
 
-      return send({ embeds: [new CustomEmbed(message.member, `✅ removed \`${prefix}${trigger}\``)] });
+      return send({
+        embeds: [new CustomEmbed(message.member, `✅ removed \`${prefix}${trigger}\``)],
+      });
     }
   };
 
