@@ -53,7 +53,7 @@ const client = new NypsiClient({
     GuildInviteManager: 0,
     GuildStickerManager: 0,
     GuildScheduledEventManager: 0,
-    MessageManager: 50,
+    MessageManager: 20,
     PresenceManager: 0,
     ReactionManager: 0,
     ReactionUserManager: 0,
