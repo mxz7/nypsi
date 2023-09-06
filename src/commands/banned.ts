@@ -52,7 +52,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const user = await message.client.users.fetch(m.userId);
     const username = await getLastKnownUsername(m.userId);
 
-    const msg = `${user ? user.username : username ? username : null}\`${m.userId}\` ${
+    const msg = `${user ? `${user.username} ` : username ? `${username} ` : null}\`${m.userId}\` ${
       m.expire.getTime() >= 3130000000000
         ? "is permanently banned"
         : `will be unbanned <t:${Math.floor(m.expire.getTime() / 1000)}:R>`
