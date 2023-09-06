@@ -57,8 +57,8 @@ dependencies:
     specifier: 4.17.21
     version: 4.17.21
   mathjs:
-    specifier: 11.10.1
-    version: 11.10.1
+    specifier: 11.11.0
+    version: 11.11.0
   ms:
     specifier: 2.1.3
     version: 2.1.3
@@ -3836,8 +3836,8 @@ packages:
     engines: {node: '>=8'}
     dev: true
 
-  /mathjs@11.10.1:
-    resolution: {integrity: sha512-XcYBJFM7hsIXcE9443RxxMmK3sI41RJo0GltX4vZ8NlVg+puGAwyhTUBUoa4orLkBbbnetGCdqEPrOQvhToi2A==}
+  /mathjs@11.11.0:
+    resolution: {integrity: sha512-i1Ao/tv1mlNd09XlOMOUu3KMySX3S0jhHNfDPzh0sCnPf1i62x6RjxhLwZ9ytmVSs0OdhF3moI4O84VSEjmUFw==}
     engines: {node: '>= 14'}
     hasBin: true
     dependencies:
