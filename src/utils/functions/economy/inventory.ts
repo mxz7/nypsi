@@ -797,7 +797,7 @@ export async function gemBreak(userId: string, chance: number, gem: string) {
             `${
               getItems()[gem].emoji
             } your gem exerted too much power and destroyed itself. shattering into ${amount} piece${
-              amount > 1 ? "s" : ""
+              amount != 1 ? "s" : ""
             }`,
           ),
       },
