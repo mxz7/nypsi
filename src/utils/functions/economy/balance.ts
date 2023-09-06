@@ -599,7 +599,11 @@ export async function calcNetWorth(member: GuildMember | string, breakdown = fal
 
   worth += Number(query.money);
   worth += Number(query.bank);
-  worth += Number(query.OffersGiven.map((i) => i.money).reduce((a, b) => a + b));
+  worth += Number(
+    query.OffersGiven.length > 0
+      ? query.OffersGiven.map((i) => i.money).reduce((a, b) => a + b)
+      : 0,
+  );
 
   if (breakdown) breakdownItems.set("balance", worth);
 
