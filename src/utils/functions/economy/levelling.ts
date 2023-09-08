@@ -70,9 +70,9 @@ levellingRewards.set(100, {
 });
 
 const levelFormula = (level: number, prestige: number) =>
-  Math.floor(Math.pow(level, 2 + 0.07 * prestige) + 100);
+  Math.floor(Math.pow(level + 1, 2 + 0.07 * prestige) + 100) - 1;
 const moneyFormula = (level: number, prestige: number) =>
-  Math.floor(Math.pow(level, 3.7 + 0.07 * prestige) + 25_000);
+  Math.floor(Math.pow(level + 1, 3.7 + 0.07 * prestige) + 25_000) - 1;
 
 export async function getPrestige(member: GuildMember | string): Promise<number> {
   let id: string;
