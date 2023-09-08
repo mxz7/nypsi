@@ -38,7 +38,7 @@ import {
   selectItem,
   setInventoryItem,
 } from "../utils/functions/economy/inventory";
-import { getPrestige } from "../utils/functions/economy/prestige";
+import { getPrestige } from "../utils/functions/economy/levelling";
 import { formatBet, formatNumber, getItems, userExists } from "../utils/functions/economy/utils";
 import { getXp } from "../utils/functions/economy/xp";
 import PageManager from "../utils/functions/page";

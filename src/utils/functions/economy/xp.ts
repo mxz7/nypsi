@@ -7,7 +7,7 @@ import { getTier } from "../premium/premium";
 import { getRequiredBetForXp } from "./balance";
 import { getBoosters } from "./boosters";
 import { gemBreak, getInventory } from "./inventory";
-import { getPrestige } from "./prestige";
+import { getPrestige } from "./levelling";
 import { getItems } from "./utils";
 
 export async function getXp(member: GuildMember | string): Promise<number> {

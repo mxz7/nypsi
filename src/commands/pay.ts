@@ -8,7 +8,7 @@ import {
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
-import { getPrestige } from "../utils/functions/economy/prestige";
+import { getPrestige } from "../utils/functions/economy/levelling";
 import {
   createUser,
   formatNumber,

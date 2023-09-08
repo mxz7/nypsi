@@ -28,7 +28,7 @@ import {
   getPrestigeRequirement,
   getPrestigeRequirementBal,
   setPrestige,
-} from "../utils/functions/economy/prestige.js";
+} from "../utils/functions/economy/levelling.js";
 import { createUser, userExists } from "../utils/functions/economy/utils.js";
 import { getXp, updateXp } from "../utils/functions/economy/xp.js";
 import {

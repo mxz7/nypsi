@@ -35,7 +35,7 @@ import {
   setGuildMOTD,
   setOwner,
 } from "../utils/functions/economy/guilds";
-import { getPrestige } from "../utils/functions/economy/prestige";
+import { getPrestige } from "../utils/functions/economy/levelling";
 import {
   createUser,
   formatNumber,

@@ -20,7 +20,7 @@ import Constants from "../utils/Constants";
 import { b, c } from "../utils/functions/anticheat";
 import { updateBalance, updateBankBalance } from "../utils/functions/economy/balance";
 import { setInventoryItem } from "../utils/functions/economy/inventory";
-import { setPrestige } from "../utils/functions/economy/prestige";
+import { setPrestige } from "../utils/functions/economy/levelling";
 import { getItems, isEcoBanned, setEcoBan } from "../utils/functions/economy/utils";
 import { updateXp } from "../utils/functions/economy/xp";
 import { addKarma, getKarma, removeKarma } from "../utils/functions/karma/karma";

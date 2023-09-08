@@ -22,7 +22,7 @@ import {
   getPrestige,
   getPrestigeRequirement,
   getPrestigeRequirementBal,
-} from "../utils/functions/economy/prestige.js";
+} from "../utils/functions/economy/levelling.js";
 import { createUser, deleteUser, getItems, userExists } from "../utils/functions/economy/utils.js";
 import { getXp } from "../utils/functions/economy/xp.js";
 import { getPrefix } from "../utils/functions/guilds/utils";

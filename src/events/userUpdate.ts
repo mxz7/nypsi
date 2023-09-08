@@ -1,6 +1,6 @@
 import { User } from "discord.js";
 import { NypsiClient } from "../models/Client";
-import { getPrestige } from "../utils/functions/economy/prestige";
+import { getPrestige } from "../utils/functions/economy/levelling";
 import { userExists } from "../utils/functions/economy/utils";
 import { uploadImage } from "../utils/functions/image";
 import { addNewAvatar, addNewUsername, isTracking } from "../utils/functions/users/history";

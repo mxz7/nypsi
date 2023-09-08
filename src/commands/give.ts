@@ -13,7 +13,7 @@ import {
   selectItem,
   setInventoryItem,
 } from "../utils/functions/economy/inventory";
-import { getPrestige } from "../utils/functions/economy/prestige";
+import { getPrestige } from "../utils/functions/economy/levelling";
 import { createUser, isEcoBanned, userExists } from "../utils/functions/economy/utils";
 import { getXp } from "../utils/functions/economy/xp";
 import { getPrefix } from "../utils/functions/guilds/utils";

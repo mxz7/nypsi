@@ -15,6 +15,7 @@ import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
 import { getInventory, selectItem } from "../utils/functions/economy/inventory";
+import { getPrestige } from "../utils/functions/economy/levelling";
 import {
   createOffer,
   deleteOffer,
@@ -23,7 +24,6 @@ import {
   getTargetedOffers,
   setBlockedList,
 } from "../utils/functions/economy/offers";
-import { getPrestige } from "../utils/functions/economy/prestige";
 import { formatNumber, getItems, isEcoBanned } from "../utils/functions/economy/utils";
 import { getXp } from "../utils/functions/economy/xp";
 import { getMember } from "../utils/functions/member";

@@ -19,7 +19,7 @@ import { addProgress } from "../functions/economy/achievements";
 import { getBalance, updateBalance } from "../functions/economy/balance";
 import { addBooster } from "../functions/economy/boosters";
 import { addInventoryItem } from "../functions/economy/inventory";
-import { getPrestige } from "../functions/economy/prestige";
+import { getPrestige } from "../functions/economy/levelling";
 import {
   addTicket,
   getItems,
