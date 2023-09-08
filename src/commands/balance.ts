@@ -20,7 +20,6 @@ import {
 import { getInventory } from "../utils/functions/economy/inventory";
 import { getLevel, getPrestige } from "../utils/functions/economy/levelling.js";
 import { createUser, deleteUser, getItems, userExists } from "../utils/functions/economy/utils.js";
-import { getXp } from "../utils/functions/economy/xp.js";
 import { getMember } from "../utils/functions/member.js";
 import { getNypsiBankBalance, getTax, getTaxRefreshTime } from "../utils/functions/tax.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -137,10 +136,9 @@ async function run(
     return send({ embeds: [embed] });
   }
 
-  const [balance, xp, prestige, inventory, net, bankBalance, bankMaxBalance, padlock] =
+  const [balance, prestige, inventory, net, bankBalance, bankMaxBalance, padlock, level] =
     await Promise.all([
       getBalance(target),
-      getXp(target),
       getPrestige(target),
       getInventory(target),
       calcNetWorth(target),
@@ -150,10 +148,10 @@ async function run(
       getLevel(target),
     ]);
 
-  let footer = `xp: ${xp.toLocaleString()}`;
+  let footer = `level ${level}`;
 
   if (prestige > 0) {
-    footer += ` | prestige: ${prestige}`;
+    footer = `P${prestige}L${level}`;
   }
 
   let padlockStatus = false;
