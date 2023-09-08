@@ -10,7 +10,9 @@ import { addInventoryItem } from "./inventory";
 import { getXp } from "./xp";
 import ms = require("ms");
 
-const levellingRewards = new Map<number, { text: string; rewards: string[] }>();
+const levellingRewards = new Map<number, { text: string; rewards?: string[] }>();
+
+levellingRewards.set(1, { text: "congratulations on your first level up and welcome to nypsi!" });
 
 const levelFormula = (level: number, prestige: number) =>
   Math.floor(Math.pow(level, 2 + 0.07 * prestige) + 100);
@@ -246,15 +248,16 @@ async function doLevelUp(member: GuildMember | string) {
 
   const levelData = levellingRewards.get(level);
 
-  for (const reward of levelData.rewards) {
-    if (reward.startsWith("id:")) {
-      await addInventoryItem(member, reward.substring(3), 1, false);
-    } else if (reward.startsWith("money:")) {
-      await updateBalance(member, (await getBalance(member)) + parseInt(reward.substring(6)));
-    } else if (reward.startsWith("karma:")) {
-      await addKarma(member, parseInt(reward.substring(6)));
+  if (levelData.rewards)
+    for (const reward of levelData.rewards) {
+      if (reward.startsWith("id:")) {
+        await addInventoryItem(member, reward.substring(3), 1, false);
+      } else if (reward.startsWith("money:")) {
+        await updateBalance(member, (await getBalance(member)) + parseInt(reward.substring(6)));
+      } else if (reward.startsWith("karma:")) {
+        await addKarma(member, parseInt(reward.substring(6)));
+      }
     }
-  }
 
   const embed = new CustomEmbed(member instanceof GuildMember ? member : null)
     .setHeader(
