@@ -123,3 +123,71 @@ export async function getLevelRequirements(member: GuildMember | string) {
 
   return { xp: requiredXp, money: requiredMoney };
 }
+
+export async function getUpgrades(member: GuildMember | string): Promise<
+  {
+    upgradeId: string;
+    amount: number;
+  }[]
+> {
+  let id: string;
+  if (member instanceof GuildMember) {
+    id = member.user.id;
+  } else {
+    id = member;
+  }
+
+  const cache = await redis.get(`${Constants.redis.cache.economy.UPGRADES}:${id}`);
+
+  if (cache) return JSON.parse(cache);
+
+  const query = await prisma.upgrades.findMany({
+    where: {
+      userId: id,
+    },
+    select: {
+      amount: true,
+      upgradeId: true,
+    },
+  });
+
+  await redis.set(
+    `${Constants.redis.cache.economy.UPGRADES}:${id}`,
+    JSON.stringify(query),
+    "EX",
+    3600,
+  );
+
+  return query;
+}
+
+export async function setUpgrade(member: GuildMember | string, upgradeId: string, amount: number) {
+  let id: string;
+  if (member instanceof GuildMember) {
+    id = member.user.id;
+  } else {
+    id = member;
+  }
+
+  await prisma.upgrades.upsert({
+    where: {
+      userId_upgradeId: {
+        upgradeId,
+        userId: id,
+      },
+    },
+    update: {
+      upgradeId,
+      amount,
+    },
+    create: {
+      amount,
+      upgradeId,
+      userId: id,
+    },
+  });
+
+  await redis.del(`${Constants.redis.cache.economy.UPGRADES}:${id}`);
+
+  return await getUpgrades(member);
+}
