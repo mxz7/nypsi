@@ -237,15 +237,17 @@ export async function getSellMulti(member: GuildMember | string): Promise<number
     id = member;
   }
 
-  const [prestige, tier, booster, boosters, guildUpgrades, passive, inventory] = await Promise.all([
-    getPrestige(member),
-    getTier(member),
-    isBooster(id),
-    getBoosters(id),
-    getGuildUpgradesByUser(member),
-    isPassive(member),
-    getInventory(member, false),
-  ]);
+  const [prestige, tier, booster, boosters, guildUpgrades, passive, inventory, upgrades] =
+    await Promise.all([
+      getPrestige(member),
+      getTier(member),
+      isBooster(id),
+      getBoosters(id),
+      getGuildUpgradesByUser(member),
+      isPassive(member),
+      getInventory(member, false),
+      getUpgrades(member),
+    ]);
 
   let multi = 0;
 
@@ -272,6 +274,11 @@ export async function getSellMulti(member: GuildMember | string): Promise<number
 
   if (guildUpgrades.find((i) => i.upgradeId === "sellmulti"))
     multi += guildUpgrades.find((i) => i.upgradeId === "sellmulti").amount * 5;
+
+  if (upgrades.find((i) => i.upgradeId === "sell_multi"))
+    multi +=
+      upgrades.find((i) => i.upgradeId === "sell_multi").amount *
+      getUpgradesData()["sell_multi"].effect;
 
   if (
     (await getDmSettings(id)).voteReminder &&
