@@ -45,6 +45,6 @@
     "effect": 0.03,
     "description": "+3% xp sent to guild",
     "max": 10,
-    "chance": 10
+    "chance": 15
   }
 }
