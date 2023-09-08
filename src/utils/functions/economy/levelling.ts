@@ -83,6 +83,17 @@ export async function getLevel(member: GuildMember | string): Promise<number> {
   return query.level;
 }
 
+export async function getRawLevel(member: GuildMember | string) {
+  let [level, prestige] = await Promise.all([getLevel(member), getPrestige(member)]);
+
+  while (prestige > 0) {
+    prestige--;
+    level += 100;
+  }
+
+  return level;
+}
+
 export async function setLevel(member: GuildMember | string, amount: number) {
   let id: string;
   if (member instanceof GuildMember) {
