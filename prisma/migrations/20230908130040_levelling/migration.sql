@@ -4,12 +4,11 @@ ADD COLUMN     "prestigeDates" TIMESTAMP(3)[];
 
 -- CreateTable
 CREATE TABLE "Upgrades" (
-    "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
     "upgradeId" TEXT NOT NULL,
     "amount" INTEGER NOT NULL,
 
-    CONSTRAINT "Upgrades_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "Upgrades_pkey" PRIMARY KEY ("userId","upgradeId")
 );
 
 -- AddForeignKey
