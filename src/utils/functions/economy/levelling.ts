@@ -5,9 +5,9 @@ import Constants from "../../Constants";
 import ms = require("ms");
 
 const levelFormula = (level: number, prestige: number) =>
-  Math.floor(Math.pow(level, 2 + 0.1 * prestige) + 100);
+  Math.floor(Math.pow(level, 2 + 0.07 * prestige) + 100);
 const moneyFormula = (level: number, prestige: number) =>
-  Math.floor(Math.pow(level, 3.7 + 0.1 * prestige) + 25_000);
+  Math.floor(Math.pow(level, 3.7 + 0.07 * prestige) + 25_000);
 
 export async function getPrestige(member: GuildMember | string): Promise<number> {
   let id: string;
