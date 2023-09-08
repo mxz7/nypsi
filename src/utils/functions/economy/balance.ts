@@ -128,7 +128,17 @@ export async function getGambleMulti(member: GuildMember | string): Promise<numb
 
   let multi = 0;
 
-  const prestige = await getPrestige(member);
+  const [prestige, booster, boosters, guildUpgrades, passive, dmSettings, inventory, tier] =
+    await Promise.all([
+      getPrestige(member),
+      isBooster(id),
+      getBoosters(id),
+      getGuildUpgradesByUser(member),
+      isPassive(id),
+      getDmSettings(id),
+      getInventory(id, false),
+      getTier(id),
+    ]);
 
   let prestigeBonus = prestigeGambleMultiEffect[prestige];
 
@@ -137,7 +147,7 @@ export async function getGambleMulti(member: GuildMember | string): Promise<numb
 
   multi += prestigeBonus;
 
-  switch (await getTier(id)) {
+  switch (tier) {
     case 2:
       multi += 1;
       break;
@@ -149,12 +159,7 @@ export async function getGambleMulti(member: GuildMember | string): Promise<numb
       break;
   }
 
-  if (await isBooster(id)) multi += 2;
-
-  const [boosters, guildUpgrades] = await Promise.all([
-    getBoosters(id),
-    getGuildUpgradesByUser(member),
-  ]);
+  if (booster) multi += 2;
 
   const items = getItems();
 
@@ -162,12 +167,12 @@ export async function getGambleMulti(member: GuildMember | string): Promise<numb
     multi += guildUpgrades.find((i) => i.upgradeId === "multi").amount;
 
   if (
-    (await getDmSettings(id)).voteReminder &&
+    dmSettings.voteReminder &&
     !(await redis.sismember(Constants.redis.nypsi.VOTE_REMINDER_RECEIVED, id))
   )
     multi += 2;
 
-  if (await isPassive(id)) multi -= 3;
+  if (passive) multi -= 3;
 
   for (const boosterId of boosters.keys()) {
     if (items[boosterId].boosterEffect.boosts.includes("multi")) {
@@ -175,7 +180,6 @@ export async function getGambleMulti(member: GuildMember | string): Promise<numb
     }
   }
 
-  const inventory = await getInventory(id, false);
   if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0)
     multi += Math.floor(Math.random() * 7);
   if (inventory.find((i) => i.item == "white_gem")?.amount > 0) {
