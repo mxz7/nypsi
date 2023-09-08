@@ -349,7 +349,7 @@ export async function getMaxBankBalance(member: GuildMember | string): Promise<n
     .then((q) => Number(q.bankStorage));
 
   const level = await getRawLevel(id);
-  const constant = 5000;
+  const constant = 2000;
   const starting = 20000;
   const bonus = level * constant;
   const max = bonus + starting;
