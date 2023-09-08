@@ -6,31 +6,22 @@ import {
   CommandInteraction,
   Interaction,
   InteractionReplyOptions,
-  InteractionResponse,
   Message,
   MessageActionRowComponentBuilder,
-  MessageEditOptions,
 } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
-import { CustomEmbed } from "../models/EmbedBuilders";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import {
-  calcMaxBet,
-  getBankBalance,
-  getGambleMulti,
-  getSellMulti,
-  updateBankBalance,
-} from "../utils/functions/economy/balance.js";
-import { addBooster, getBoosters } from "../utils/functions/economy/boosters.js";
-import { addInventoryItem } from "../utils/functions/economy/inventory.js";
-import {
+  getLevel,
   getPrestige,
-  getPrestigeRequirement,
-  getPrestigeRequirementBal,
+  getUpgrades,
+  setLevel,
   setPrestige,
+  setUpgrade,
 } from "../utils/functions/economy/levelling.js";
-import { createUser, userExists } from "../utils/functions/economy/utils.js";
-import { getXp, updateXp } from "../utils/functions/economy/xp.js";
+import { createUser, getUpgradesData, userExists } from "../utils/functions/economy/utils.js";
+import { percentChance } from "../utils/functions/random";
 import {
   addCooldown,
   addExpiry,
@@ -73,15 +64,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
   };
 
-  const edit = async (data: MessageEditOptions, msg: Message | InteractionResponse) => {
-    if (!(message instanceof Message)) {
-      return await message.editReply(data);
-    } else {
-      if (msg instanceof InteractionResponse) return;
-      return await msg.edit(data);
-    }
-  };
-
   if (await onCooldown(cmd.name, message.member)) {
     const embed = await getResponse(cmd.name, message.member);
 
@@ -90,37 +72,20 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if (!(await userExists(message.member))) await createUser(message.member);
 
-  // if ((await getPrestige(message.member)) >= 20) {
-  //   return send({
-  //     embeds: [new ErrorEmbed("gg, you're max prestige. you completed nypsi").setImage("https://i.imgur.com/vB3UGgi.png")],
-  //   });
-  // }
-
-  let [currentXp, neededXp, currentBal] = await Promise.all([
-    getXp(message.member),
-    getPrestigeRequirement(message.member),
-    getBankBalance(message.member),
+  let [level, prestige] = await Promise.all([
+    getLevel(message.member),
+    getPrestige(message.member),
   ]);
 
-  let neededBal = getPrestigeRequirementBal(neededXp);
-
-  if (currentXp < neededXp || currentBal < neededBal) {
+  if (level < 100) {
     return send({
-      embeds: [
-        new CustomEmbed(
-          message.member,
-          `for prestige **${(await getPrestige(message.member)) + 1}**\n\n` +
-            `**xp** ${currentXp.toLocaleString()}/${neededXp.toLocaleString()}\n` +
-            `**bank** $${currentBal.toLocaleString()}/$${neededBal.toLocaleString()}`,
-        ).setHeader("prestige requirements", message.author.avatarURL()),
-      ],
+      embeds: [new ErrorEmbed(`you must be at least level 100 to prestige\n\n${level}/100`)],
     });
   }
 
   const embed = new CustomEmbed(
     message.member,
-    "are you sure you want to prestige?\n\n" +
-      `you will lose **${neededXp.toLocaleString()}**xp and $**${neededBal.toLocaleString()}**\n\n`,
+    `confirm you want to become even cooler (P${prestige + 1}L${level - 100})`,
   ).setHeader("prestige", message.author.avatarURL());
 
   await addCooldown(cmd.name, message.member);
@@ -141,90 +106,61 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     })
     .catch(async () => {
       embed.setDescription("❌ expired");
-      await edit({ embeds: [embed], components: [] }, msg);
+      await msg.edit({ embeds: [embed], components: [] });
       addExpiry(cmd.name, message.member, 30);
     });
 
   if (reaction == "✅") {
     await addExpiry(cmd.name, message.member, 1800);
-    [currentXp, neededXp, currentBal] = await Promise.all([
-      getXp(message.member),
-      getPrestigeRequirement(message.member),
-      getBankBalance(message.member),
-    ]);
-    neededBal = getPrestigeRequirementBal(neededXp);
+    [level, prestige] = await Promise.all([getLevel(message.member), getPrestige(message.member)]);
 
-    if (currentXp < neededXp || currentBal < neededBal) {
-      return send({
-        embeds: [
-          new CustomEmbed(
-            message.member,
-            `for prestige **${(await getPrestige(message.member)) + 1}**\n\n` +
-              `**xp** ${currentXp.toLocaleString()}/${neededXp.toLocaleString()}\n` +
-              `**bank** $${currentBal.toLocaleString()}/$${neededBal.toLocaleString()}`,
-          ).setHeader("prestige requirements", message.author.avatarURL()),
-        ],
-      });
-    }
+    if (level < 100) return msg.edit({ embeds: [new ErrorEmbed("lol nice try loser")] });
 
-    await updateBankBalance(message.member, currentBal - neededBal);
-    await updateXp(message.member, currentXp - neededXp);
-    await setPrestige(message.member, (await getPrestige(message.member)) + 1);
-
-    const [gambleMulti, sellMulti, maxBet] = await Promise.all([
-      getGambleMulti(message.member),
-      getSellMulti(message.member),
-      calcMaxBet(message.member),
+    const [upgrades] = await Promise.all([
+      getUpgrades(message.member),
+      setLevel(message.member, level - 100),
+      setPrestige(message.member, prestige + 1),
     ]);
 
-    let amount = 1;
+    const upgradesPool: string[] = [];
+    let attempts = 0;
 
-    if ((await getPrestige(message.member)) > 5) {
-      amount = 2;
-    } else if ((await getPrestige(message.member)) > 10) {
-      amount = 3;
-    }
+    while (upgradesPool.length === 0 && attempts < 10) {
+      attempts++;
+      for (const upgrade of Object.values(getUpgradesData())) {
+        if (upgrades.find((i) => i.upgradeId === upgrade.id).amount >= upgrade.max) continue;
 
-    amount += Math.floor((await getPrestige(message.member)) / 5);
-
-    await addInventoryItem(message.member, "basic_crate", amount);
-
-    const boosters = await getBoosters(message.member);
-
-    let booster = false;
-
-    if (boosters.has("xp_potion")) {
-      if (boosters.get("xp_potion").length < 3) {
-        booster = true;
-        await addBooster(message.member, "xp_potion");
+        if (percentChance(upgrade.chance)) {
+          upgradesPool.push(upgrade.id);
+        }
       }
-    } else {
-      booster = true;
-      await addBooster(message.member, "xp_potion");
     }
 
-    const crateAmount =
-      Constants.VOTE_CRATE_PROGRESSION[await getPrestige(message.member)] ||
-      Constants.VOTE_CRATE_PROGRESSION[Constants.VOTE_CRATE_PROGRESSION.length - 1];
+    const chosen =
+      upgradesPool.length > 0 ? upgradesPool[Math.floor(Math.random() * upgradesPool.length)] : "";
 
-    let prestige = await getPrestige(message.author.id);
-
-    if (prestige > 15) prestige = 15;
-
-    embed.setDescription(
-      `you are now prestige **${await getPrestige(message.member)}**\n\n` +
-        `vote rewards: $**${Math.floor(
-          15000 * (prestige / 2 + 1),
-        ).toLocaleString()}**, **${crateAmount}** vote crates\n` +
-        `gamble multiplier: **${Math.floor(gambleMulti * 100)}**%\n` +
-        `sell multiplier: **${Math.floor(sellMulti * 100)}**%\n` +
-        `your maximum bet: $**${maxBet.toLocaleString()}**\n` +
-        `you have received **${amount}** basic crate${amount > 1 ? "s" : ""}${
-          booster ? " and an xp booster for 30 minutes" : ""
-        }`,
+    await setUpgrade(
+      message.member,
+      chosen,
+      upgrades.find((i) => i.upgradeId === chosen).amount + 1,
     );
 
-    await edit({ embeds: [embed], components: [] }, msg);
+    const desc: string[] = [];
+
+    if (chosen) {
+      desc.push(`you have received the ${getUpgradesData()[chosen].name} upgrade`);
+    } else {
+      desc.push("you didn't find an upgrade this prestige");
+    }
+
+    return msg.edit({
+      embeds: [
+        new CustomEmbed()
+          .setHeader("prestige", message.author.avatarURL())
+          .setColor(Constants.EMBED_SUCCESS_COLOR)
+          .setDescription(`you are now **P${prestige + 1}L${level - 100}**\n\n${desc.join("\n")}`),
+      ],
+    });
   }
 }
 
