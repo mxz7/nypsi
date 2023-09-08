@@ -10,8 +10,9 @@ import { percentChance } from "../random";
 import { addProgress } from "./achievements";
 import { getGuildName, getGuildUpgradesByUser } from "./guilds";
 import { addInventoryItem, getInventory } from "./inventory";
+import { getUpgrades } from "./levelling";
 import { isPassive } from "./passive";
-import { getBakeryUpgradesData, getItems } from "./utils";
+import { getBakeryUpgradesData, getItems, getUpgradesData } from "./utils";
 import ms = require("ms");
 
 async function getLastBake(member: GuildMember | string) {
@@ -110,21 +111,22 @@ async function getMaxAfkHours(member: GuildMember | string) {
 }
 
 export async function runBakery(member: GuildMember) {
-  const [lastBaked, upgrades, maxAfkHours, inventory, guildUpgrades] = await Promise.all([
-    getLastBake(member),
-    getBakeryUpgrades(member),
-    getMaxAfkHours(member),
-    getInventory(member),
-    getGuildUpgradesByUser(member),
-  ]);
+  const [lastBaked, upgrades, maxAfkHours, inventory, guildUpgrades, tier, userUpgrades] =
+    await Promise.all([
+      getLastBake(member),
+      getBakeryUpgrades(member),
+      getMaxAfkHours(member),
+      getInventory(member),
+      getGuildUpgradesByUser(member),
+      getTier(member),
+      getUpgrades(member),
+    ]);
 
   let passive = 0;
   let cakeChance = 0;
   const click = [1, 3];
 
-  if (await isPremium(member)) {
-    click[1] += await getTier(member);
-  }
+  click[1] += tier;
 
   const diffMs = Date.now() - lastBaked.getTime();
 
@@ -138,7 +140,13 @@ export async function runBakery(member: GuildMember) {
   for (const upgrade of upgrades) {
     if (getBakeryUpgradesData()[upgrade.upgradeId].upgrades === "hourly") {
       const amount = Math.round(
-        upgrade.amount * getBakeryUpgradesData()[upgrade.upgradeId].value * diffHours,
+        upgrade.amount *
+          (userUpgrades.find((i) => i.upgradeId === "grandma") && upgrade.upgradeId === "grandma"
+            ? getBakeryUpgradesData()[upgrade.upgradeId].value +
+              userUpgrades.find((i) => i.upgradeId === "grandma").amount *
+                getUpgradesData()["grandma"].effect
+            : getBakeryUpgradesData()[upgrade.upgradeId].value) *
+          diffHours,
       );
 
       passive += amount;
@@ -148,8 +156,22 @@ export async function runBakery(member: GuildMember) {
       }
     } else if (getBakeryUpgradesData()[upgrade.upgradeId].upgrades === "bake") {
       if (upgrade.upgradeId === "super_cursor")
-        click[0] += Math.floor(upgrade.amount * getBakeryUpgradesData()[upgrade.upgradeId].value);
-      click[1] += Math.floor(upgrade.amount * getBakeryUpgradesData()[upgrade.upgradeId].value);
+        click[0] += Math.floor(
+          upgrade.amount *
+            (userUpgrades.find((i) => i.upgradeId === "cursor")
+              ? getBakeryUpgradesData()[upgrade.upgradeId].value +
+                userUpgrades.find((i) => i.upgradeId === "cursor").amount *
+                  getUpgradesData()["cursor"].effect
+              : getBakeryUpgradesData()[upgrade.upgradeId].value),
+        );
+      click[1] += Math.floor(
+        upgrade.amount *
+          (userUpgrades.find((i) => i.upgradeId === "cursor" && upgrade.upgradeId === "cursor")
+            ? getBakeryUpgradesData()[upgrade.upgradeId].value +
+              userUpgrades.find((i) => i.upgradeId === "cursor").amount *
+                getUpgradesData()["cursor"].effect
+            : getBakeryUpgradesData()[upgrade.upgradeId].value),
+      );
     } else if (getBakeryUpgradesData()[upgrade.upgradeId].upgrades === "cake") {
       cakeChance += upgrade.amount * getBakeryUpgradesData()[upgrade.upgradeId].value;
     }
