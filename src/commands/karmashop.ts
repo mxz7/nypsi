@@ -19,7 +19,7 @@ import Constants from "../utils/Constants";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { addToGuildXP, getGuildName } from "../utils/functions/economy/guilds";
 import { addInventoryItem } from "../utils/functions/economy/inventory";
-import { getPrestige } from "../utils/functions/economy/levelling";
+import { getRawLevel } from "../utils/functions/economy/levelling";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import { getXp, updateXp } from "../utils/functions/economy/xp";
 import { getKarma, removeKarma } from "../utils/functions/karma/karma";
@@ -407,12 +407,10 @@ async function run(
       });
     }
 
-    if ((await getPrestige(message.member)) < 1) {
-      if ((await getXp(message.member)) < 50) {
-        return send({
-          embeds: [new ErrorEmbed("you need at least 50xp to access karma shop")],
-        });
-      }
+    if ((await getRawLevel(message.member)) < 1) {
+      return send({
+        embeds: [new ErrorEmbed("you must be at least level 1 to access karma shop")],
+      });
     }
 
     const searchTag = args[1].toLowerCase();

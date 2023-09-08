@@ -8,14 +8,12 @@ import {
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
-import { getPrestige } from "../utils/functions/economy/levelling";
 import {
   createUser,
   formatNumber,
   isEcoBanned,
   userExists,
 } from "../utils/functions/economy/utils";
-import { getXp } from "../utils/functions/economy/xp";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
 import { isPremium } from "../utils/functions/premium/premium";
@@ -146,28 +144,6 @@ async function run(
         ),
       ],
     });
-  }
-
-  const targetPrestige = await getPrestige(target);
-
-  if (targetPrestige < 2) {
-    const targetXp = await getXp(target);
-
-    let payLimit = 150000;
-
-    let xpBonus = targetXp * 2500;
-
-    if (xpBonus > 200000) xpBonus = 200000;
-
-    payLimit += xpBonus;
-
-    const prestigeBonus = targetPrestige * 750000;
-
-    payLimit += prestigeBonus;
-
-    if (amount > payLimit) {
-      return send({ embeds: [new ErrorEmbed("you can't pay this user that much yet")] });
-    }
   }
 
   await addCooldown(cmd.name, message.member, 15);

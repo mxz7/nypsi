@@ -11,7 +11,7 @@ import { getAuctionAverage } from "./auctions";
 import { getBoosters } from "./boosters";
 import { getGuildUpgradesByUser } from "./guilds";
 import { calcItemValue, gemBreak, getInventory } from "./inventory";
-import { checkLevelUp, getPrestige, getRawLevel, getUpgrades } from "./levelling";
+import { checkLevelUp, getRawLevel, getUpgrades } from "./levelling";
 import { getOffersAverage } from "./offers";
 import { isPassive } from "./passive";
 import { getBaseUpgrades, getBaseWorkers, getItems, getUpgradesData } from "./utils";
@@ -19,8 +19,6 @@ import { hasVoted } from "./vote";
 import { calcWorkerValues } from "./workers";
 import ms = require("ms");
 import _ = require("lodash");
-
-const prestigeGambleMultiEffect = [0, 1, 1, 1, 2, 2, 3, 3, 4, 4, 5];
 
 export async function getBalance(member: GuildMember | string) {
   let id: string;
@@ -130,7 +128,6 @@ export async function getGambleMulti(member: GuildMember | string): Promise<numb
   let multi = 0;
 
   const [
-    prestige,
     booster,
     boosters,
     guildUpgrades,
@@ -139,8 +136,8 @@ export async function getGambleMulti(member: GuildMember | string): Promise<numb
     inventory,
     tier,
     upgrades,
+    rawLevel,
   ] = await Promise.all([
-    getPrestige(member),
     isBooster(id),
     getBoosters(id),
     getGuildUpgradesByUser(member),
@@ -149,14 +146,20 @@ export async function getGambleMulti(member: GuildMember | string): Promise<numb
     getInventory(id, false),
     getTier(id),
     getUpgrades(id),
+    getRawLevel(id),
   ]);
 
-  let prestigeBonus = prestigeGambleMultiEffect[prestige];
+  let rawLevelModified = rawLevel;
 
-  if (!prestigeBonus && prestige > 0)
-    prestigeBonus = prestigeGambleMultiEffect[prestigeGambleMultiEffect.length - 1];
+  let levelBonus: number;
 
-  multi += prestigeBonus;
+  while (typeof levelBonus !== "number") {
+    if (Constants.PROGRESSION.MULTI.has(rawLevelModified)) {
+      levelBonus = Constants.PROGRESSION.MULTI.get(rawLevelModified);
+    } else rawLevelModified--;
+  }
+
+  if (levelBonus > 0) multi += levelBonus;
 
   switch (tier) {
     case 2:
@@ -238,9 +241,9 @@ export async function getSellMulti(member: GuildMember | string): Promise<number
     id = member;
   }
 
-  const [prestige, tier, booster, boosters, guildUpgrades, passive, inventory, upgrades] =
+  const [level, tier, booster, boosters, guildUpgrades, passive, inventory, upgrades] =
     await Promise.all([
-      getPrestige(member),
+      getRawLevel(member),
       getTier(member),
       isBooster(id),
       getBoosters(id),
@@ -252,7 +255,7 @@ export async function getSellMulti(member: GuildMember | string): Promise<number
 
   let multi = 0;
 
-  multi += Math.floor(prestige * 0.69);
+  multi += Math.floor(level * 0.169);
 
   switch (tier) {
     case 1:
@@ -517,12 +520,17 @@ export async function calcMaxBet(member: GuildMember | string): Promise<number> 
 
   let total = 100000;
 
-  const voted = await hasVoted(member);
-  const prestige = await getPrestige(member);
-  const boosters = await getBoosters(member);
-  const guildUpgrades = await getGuildUpgradesByUser(member);
+  const [voted, level, boosters, guildUpgrades, booster] = await Promise.all([
+    hasVoted(member),
+    getRawLevel(member),
+    getBoosters(member),
+    getGuildUpgradesByUser(member),
+    isBooster(id),
+  ]);
 
-  total = total + 50000 * prestige;
+  const levelBonus = Math.floor(level / 25) * 50000;
+
+  total += levelBonus;
 
   if (total > 1_000_000) total = 1_000_000;
 
@@ -530,7 +538,7 @@ export async function calcMaxBet(member: GuildMember | string): Promise<number> 
     total += 50000;
   }
 
-  if (await isBooster(id)) total += 250_000;
+  if (booster) total += 250_000;
   if (guildUpgrades.find((i) => i.upgradeId === "maxbet"))
     total += guildUpgrades.find((i) => i.upgradeId === "maxbet").amount * 25000;
 
@@ -548,11 +556,9 @@ export async function calcMaxBet(member: GuildMember | string): Promise<number> 
 export async function getRequiredBetForXp(member: GuildMember): Promise<number> {
   let requiredBet = 1000;
 
-  const prestige = await getPrestige(member);
+  const level = await getRawLevel(member);
 
-  if (prestige > 2) requiredBet = 10000;
-
-  requiredBet += prestige * 1000;
+  requiredBet += Math.floor(level / 25) * 2500;
 
   return requiredBet;
 }

@@ -7,7 +7,7 @@ import { getTier } from "../premium/premium";
 import { getRequiredBetForXp } from "./balance";
 import { getBoosters } from "./boosters";
 import { gemBreak, getInventory } from "./inventory";
-import { checkLevelUp, getPrestige, getUpgrades } from "./levelling";
+import { checkLevelUp, getRawLevel, getUpgrades } from "./levelling";
 import { getItems, getUpgradesData } from "./utils";
 
 export async function getXp(member: GuildMember | string): Promise<number> {
@@ -74,21 +74,21 @@ export async function calcEarnedGambleXp(
   let min = 1;
   let max = 7;
 
-  const [inventory, tier, booster, prestige, boosters, upgrades] = await Promise.all([
+  const [inventory, tier, booster, boosters, upgrades, rawLevel] = await Promise.all([
     getInventory(member),
     getTier(member),
     isBooster(member.user.id),
-    getPrestige(member),
     getBoosters(member),
     getUpgrades(member),
+    getRawLevel(member),
   ]);
 
-  max += (prestige > 50 ? 50 : prestige) / 5.7;
+  max += rawLevel / 25 > 20 ? 20 : rawLevel / 25;
 
   if (booster) max += 7;
   if (tier) max += tier * 2.7;
 
-  let betDivisor = 6000 * prestige + 10_000;
+  let betDivisor = 6000 * (rawLevel / 15) + 10_000;
 
   if (betDivisor > 75_000) betDivisor = 75_000;
   if (betDivisor < 10_000) betDivisor = 10_000;

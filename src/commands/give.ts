@@ -13,9 +13,8 @@ import {
   selectItem,
   setInventoryItem,
 } from "../utils/functions/economy/inventory";
-import { getPrestige } from "../utils/functions/economy/levelling";
+import { getRawLevel } from "../utils/functions/economy/levelling";
 import { createUser, isEcoBanned, userExists } from "../utils/functions/economy/utils";
-import { getXp } from "../utils/functions/economy/xp";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
 import { getDmSettings } from "../utils/functions/users/notifications";
@@ -119,12 +118,10 @@ async function run(
     });
   }
 
-  if ((await getPrestige(message.member)) < 1) {
-    if ((await getXp(message.member)) < 30) {
-      return send({
-        embeds: [new ErrorEmbed("you cannot use this command yet. u might be an alt. or a bot 😳")],
-      });
-    }
+  if ((await getRawLevel(message.member)) < 3) {
+    return send({
+      embeds: [new ErrorEmbed("you cannot use this command yet. u might be an alt. or a bot 😳")],
+    });
   }
 
   const inventory = await getInventory(message.member);
@@ -178,28 +175,6 @@ async function run(
 
   if (selected.account_locked) {
     return send({ embeds: [new ErrorEmbed("this item is locked to your account")] });
-  }
-
-  const targetPrestige = await getPrestige(target);
-
-  if (targetPrestige < 2) {
-    const targetXp = await getXp(target);
-
-    let payLimit = 150000;
-
-    let xpBonus = targetXp * 2500;
-
-    if (xpBonus > 1000000) xpBonus = 200000;
-
-    payLimit += xpBonus;
-
-    const prestigeBonus = targetPrestige * 100000;
-
-    payLimit += prestigeBonus;
-
-    if (amount > payLimit) {
-      return send({ embeds: [new ErrorEmbed("you can't pay this user that much yet")] });
-    }
   }
 
   await addCooldown(cmd.name, message.member, 5);

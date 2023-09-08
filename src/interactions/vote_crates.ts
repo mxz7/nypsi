@@ -10,7 +10,7 @@ import { InteractionHandler } from "../types/InteractionHandler";
 import Constants from "../utils/Constants";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { calcItemValue, getInventory, openCrate } from "../utils/functions/economy/inventory";
-import { getPrestige } from "../utils/functions/economy/levelling";
+import { getRawLevel } from "../utils/functions/economy/levelling";
 import { addStat } from "../utils/functions/economy/stats";
 import { getItems, isEcoBanned } from "../utils/functions/economy/utils";
 import PageManager from "../utils/functions/page";
@@ -33,9 +33,14 @@ export default {
 
     const inventory = await getInventory(interaction.user.id, false);
 
-    const crateAmount =
-      Constants.VOTE_CRATE_PROGRESSION[await getPrestige(interaction.user.id)] ||
-      Constants.VOTE_CRATE_PROGRESSION[Constants.VOTE_CRATE_PROGRESSION.length - 1];
+    let crateAmount = 0;
+    let rawLevel = await getRawLevel(interaction.user.id);
+
+    while (crateAmount === 0 && rawLevel > 0) {
+      if (Constants.PROGRESSION.VOTE_CRATE.has(rawLevel)) {
+        crateAmount = Constants.PROGRESSION.VOTE_CRATE.get(rawLevel);
+      } else rawLevel--;
+    }
 
     if (
       !inventory.find((i) => i.item === "vote_crate") ||

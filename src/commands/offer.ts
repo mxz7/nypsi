@@ -15,7 +15,7 @@ import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
 import { getInventory, selectItem } from "../utils/functions/economy/inventory";
-import { getPrestige } from "../utils/functions/economy/levelling";
+import { getRawLevel } from "../utils/functions/economy/levelling";
 import {
   createOffer,
   deleteOffer,
@@ -25,7 +25,6 @@ import {
   setBlockedList,
 } from "../utils/functions/economy/offers";
 import { formatNumber, getItems, isEcoBanned } from "../utils/functions/economy/utils";
-import { getXp } from "../utils/functions/economy/xp";
 import { getMember } from "../utils/functions/member";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { getPreferences } from "../utils/functions/users/notifications";
@@ -128,12 +127,10 @@ async function run(
     });
   }
 
-  if ((await getPrestige(message.member)) < 1) {
-    if ((await getXp(message.member)) < 30) {
-      return send({
-        embeds: [new ErrorEmbed("you need at least 30xp before you can create an offer")],
-      });
-    }
+  if ((await getRawLevel(message.member)) < 3) {
+    return send({
+      embeds: [new ErrorEmbed("you must be at least level 3 before you can create an offer")],
+    });
   }
 
   const items = getItems();
@@ -487,12 +484,10 @@ async function run(
       });
     }
 
-    if ((await getPrestige(target)) < 1) {
-      if ((await getXp(target)) < 50) {
-        return send({
-          embeds: [new ErrorEmbed(`${target.user.toString()} cannot use offers yet`)],
-        });
-      }
+    if ((await getRawLevel(target)) < 50) {
+      return send({
+        embeds: [new ErrorEmbed(`${target.user.toString()} cannot use offers yet`)],
+      });
     }
 
     const balance = await getBalance(message.member);

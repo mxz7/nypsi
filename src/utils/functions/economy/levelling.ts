@@ -48,7 +48,10 @@ levellingRewards.set(10, {
 });
 levellingRewards.set(15, { text: "you will now receive 2 📦 vote crates when voting" });
 levellingRewards.set(25, {
-  text: "you have unlocked:\n" + "- 🎣 fisherman (</workers view:1014905682341924945>)",
+  text:
+    "you have unlocked:\n" +
+    "- 🎣 fisherman (</workers view:1014905682341924945>)\n" +
+    "- +1% gamble multi",
 });
 levellingRewards.set(30, { text: "you will now receive 3 📦 vote crates when voting" });
 levellingRewards.set(40, {
@@ -66,11 +69,24 @@ levellingRewards.set(50, {
 levellingRewards.set(75, {
   text: "you have unlocked:\n" + "- 👕 tailor (</workers view:1014905682341924945>)",
 });
+levellingRewards.set(90, {
+  text: "you have unlocked:\n" + "- +1% gamble multi",
+});
 levellingRewards.set(100, {
   text:
     "you have unlocked:\n" +
     "- 🚀 spacex (</workers view:1014905682341924945>)\n" +
-    "- 📦 amazon (</workers view:1014905682341924945>)",
+    "- 📦 amazon (</workers view:1014905682341924945>)\n" +
+    "- create your own guild",
+});
+levellingRewards.set(150, {
+  text: "you have unlocked:\n" + "- +1% gamble multi",
+});
+levellingRewards.set(250, {
+  text: "you have unlocked:\n" + "- +1% gamble multi",
+});
+levellingRewards.set(325, {
+  text: "you have unlocked:\n" + "- +1% gamble multi",
 });
 
 const levelFormula = (level: number, prestige: number) =>
