@@ -12,7 +12,62 @@ import ms = require("ms");
 
 const levellingRewards = new Map<number, { text: string; rewards?: string[] }>();
 
-levellingRewards.set(1, { text: "congratulations on your first level up and welcome to nypsi!" });
+levellingRewards.set(1, {
+  text:
+    "congratulations on your first level up and welcome to nypsi!!\n\n" +
+    "you have received:\n" +
+    "- `1x` 📦 basic crate\n" +
+    "- 🔮 50 karma\n" +
+    "- $30,000",
+  rewards: ["id:basic_crate", "karma:50", "money:30000"],
+});
+levellingRewards.set(3, {
+  text:
+    "congratulations on level 3!! it's about time we teach you about workers\n\n" +
+    "workers fill up their capacity in the background, whether you're using nypsi or not. when workers are full, you can use </workers claim:1014905682341924945> to empty their inventory and earn money.\n" +
+    "the quarry worker sometimes finds *scraps* and *shards*, which can be used to craft gems and worker upgrades\n\n" +
+    "you have unlocked:\n" +
+    "- 🪨 quarry worker (</workers view:1014905682341924945>)",
+});
+levellingRewards.set(7, {
+  text:
+    "just a little bonus for my favourite number 😁\n\nyou have received:\n" +
+    "- `1x` 📦 basic crate\n" +
+    "- `$100,000`",
+  rewards: ["id:basic_crate", "money:100000"],
+});
+levellingRewards.set(10, {
+  text:
+    "you're making *very* good progress. keep it up!!\n\nyou have received:\n" +
+    "- `2x` 📦 basic crate\n" +
+    "- 🔮 100 karma\n" +
+    "- $100,000\n\n" +
+    "you have unlocked:\n" +
+    "- 🥔 potato farmer (</workers view:1014905682341924945>)",
+  rewards: ["id:basic_crate", "id:basic_crate", "karma:100", "money:100000"],
+});
+levellingRewards.set(25, {
+  text: "you have unlocked:\n" + "- 🎣 fisherman (</workers view:1014905682341924945>)",
+});
+levellingRewards.set(40, {
+  text: "you have unlocked:\n" + "- 🍟 mcdonalds (</workers view:1014905682341924945>)",
+});
+levellingRewards.set(50, {
+  text:
+    "you have unlocked:\n" +
+    "- ⛏️ miner (</workers view:1014905682341924945>)\n" +
+    "- 🪓 lumberjack (</workers view:1014905682341924945>)\n" +
+    "- 🥓 butcher (</workers view:1014905682341924945>)",
+});
+levellingRewards.set(75, {
+  text: "you have unlocked:\n" + "- 👕 tailor (</workers view:1014905682341924945>)",
+});
+levellingRewards.set(100, {
+  text:
+    "you have unlocked:\n" +
+    "- 🚀 spacex (</workers view:1014905682341924945>)\n" +
+    "- 📦 amazon (</workers view:1014905682341924945>)",
+});
 
 const levelFormula = (level: number, prestige: number) =>
   Math.floor(Math.pow(level, 2 + 0.07 * prestige) + 100);
@@ -246,7 +301,7 @@ async function doLevelUp(member: GuildMember | string) {
     getPrestige(member),
   ]);
 
-  const levelData = levellingRewards.get(level);
+  const levelData = levellingRewards.get(await getRawLevel(member));
 
   if (levelData.rewards)
     for (const reward of levelData.rewards) {
