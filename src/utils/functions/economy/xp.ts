@@ -7,7 +7,7 @@ import { getTier } from "../premium/premium";
 import { getRequiredBetForXp } from "./balance";
 import { getBoosters } from "./boosters";
 import { gemBreak, getInventory } from "./inventory";
-import { getPrestige, getUpgrades } from "./levelling";
+import { checkLevelUp, getPrestige, getUpgrades } from "./levelling";
 import { getItems, getUpgradesData } from "./utils";
 
 export async function getXp(member: GuildMember | string): Promise<number> {
@@ -56,6 +56,8 @@ export async function updateXp(member: GuildMember | string, amount: number) {
     },
   });
   await redis.del(`${Constants.redis.cache.economy.XP}:${id}`);
+
+  checkLevelUp(member);
 }
 
 export async function calcEarnedGambleXp(

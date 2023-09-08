@@ -11,7 +11,7 @@ import { getAuctionAverage } from "./auctions";
 import { getBoosters } from "./boosters";
 import { getGuildUpgradesByUser } from "./guilds";
 import { calcItemValue, gemBreak, getInventory } from "./inventory";
-import { getLevel, getPrestige, getUpgrades } from "./levelling";
+import { checkLevelUp, getLevel, getPrestige, getUpgrades } from "./levelling";
 import { getOffersAverage } from "./offers";
 import { isPassive } from "./passive";
 import { getBaseUpgrades, getBaseWorkers, getItems, getUpgradesData } from "./utils";
@@ -104,6 +104,8 @@ export async function updateBankBalance(member: GuildMember | string, amount: nu
       bank: amount,
     },
   });
+
+  checkLevelUp(member);
 }
 
 export async function increaseBaseBankStorage(member: GuildMember, amount: number) {
