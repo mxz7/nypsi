@@ -11,13 +11,12 @@ import { getAuctionAverage } from "./auctions";
 import { getBoosters } from "./boosters";
 import { getGuildUpgradesByUser } from "./guilds";
 import { calcItemValue, gemBreak, getInventory } from "./inventory";
-import { getPrestige, getUpgrades } from "./levelling";
+import { getLevel, getPrestige, getUpgrades } from "./levelling";
 import { getOffersAverage } from "./offers";
 import { isPassive } from "./passive";
 import { getBaseUpgrades, getBaseWorkers, getItems, getUpgradesData } from "./utils";
 import { hasVoted } from "./vote";
 import { calcWorkerValues } from "./workers";
-import { getXp } from "./xp";
 import ms = require("ms");
 import _ = require("lodash");
 
@@ -347,10 +346,10 @@ export async function getMaxBankBalance(member: GuildMember | string): Promise<n
     })
     .then((q) => Number(q.bankStorage));
 
-  const xp = await getXp(id);
-  const constant = 1000;
-  const starting = 15000;
-  const bonus = xp * constant;
+  const level = await getLevel(id);
+  const constant = 5000;
+  const starting = 20000;
+  const bonus = level * constant;
   const max = bonus + starting;
 
   return max + base;
