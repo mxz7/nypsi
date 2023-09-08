@@ -153,7 +153,15 @@ export default {
   SILVER_ROLE_ID: "819870727834566696",
   TEKOH_ID: "672793821850894347",
   TRANSPARENT_EMBED_COLOR: "#2B2D31" as ColorResolvable,
-  VOTE_CRATE_PROGRESSION: [1, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 5],
+  PROGRESSION: {
+    VOTE_CRATE: new Map([
+      [0, 1],
+      [15, 2],
+      [30, 3],
+      [40, 4],
+      [50, 5],
+    ]),
+  },
   SEASON_START: new Date("06/01/2023"),
   SEASON_NUMBER: 6,
   SNOWFLAKE_REGEX: /^\d{17,19}$/,

@@ -14,7 +14,7 @@ const levellingRewards = new Map<number, { text: string; rewards?: string[] }>()
 
 levellingRewards.set(1, {
   text:
-    "congratulations on your first level up and welcome to nypsi!!\n\n" +
+    "congratulations on your first level up and welcome to nypsi!!\ndon't forget to </vote:1014905682341924944> daily for rewards\n\n" +
     "you have received:\n" +
     "- `1x` 📦 basic crate\n" +
     "- 🔮 50 karma\n" +
@@ -46,15 +46,19 @@ levellingRewards.set(10, {
     "- 🥔 potato farmer (</workers view:1014905682341924945>)",
   rewards: ["id:basic_crate", "id:basic_crate", "karma:100", "money:100000"],
 });
+levellingRewards.set(15, { text: "you will now receive 2 📦 vote crates when voting" });
 levellingRewards.set(25, {
   text: "you have unlocked:\n" + "- 🎣 fisherman (</workers view:1014905682341924945>)",
 });
+levellingRewards.set(30, { text: "you will now receive 3 📦 vote crates when voting" });
 levellingRewards.set(40, {
-  text: "you have unlocked:\n" + "- 🍟 mcdonalds (</workers view:1014905682341924945>)",
+  text:
+    "you will now receive 4 📦 vote crates when voting\n\nyou have unlocked:\n" +
+    "- 🍟 mcdonalds (</workers view:1014905682341924945>)",
 });
 levellingRewards.set(50, {
   text:
-    "you have unlocked:\n" +
+    "you will now receive 5 📦 vote crates when voting\n\nyou have unlocked:\n" +
     "- ⛏️ miner (</workers view:1014905682341924945>)\n" +
     "- 🪓 lumberjack (</workers view:1014905682341924945>)\n" +
     "- 🥓 butcher (</workers view:1014905682341924945>)",
