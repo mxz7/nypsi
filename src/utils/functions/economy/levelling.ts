@@ -280,7 +280,7 @@ export async function checkLevelUp(member: GuildMember | string) {
     getLevelRequirements(member),
   ]);
 
-  if (requirements.money < bank && requirements.xp < xp) {
+  if (requirements.money <= bank && requirements.xp <= xp) {
     await doLevelUp(member);
     return true;
   }
