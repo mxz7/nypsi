@@ -63,7 +63,7 @@ module.exports = new ItemUse(
     if (inventory.find((i) => i.item === "stolen_credit_card").amount < amount)
       return send({ embeds: [new ErrorEmbed("you dont have this many stolen credit cards")] });
 
-    const addedAmount = randomInt(1000 * amount, 500_000 * amount);
+    const addedAmount = randomInt(75_000 * amount, 2_500_000 * amount);
 
     await Promise.all([
       setInventoryItem(

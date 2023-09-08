@@ -1349,7 +1349,7 @@
     "plural": "stolen credit cards",
     "aliases": ["scc", "credit", "card", "cc"],
     "emoji": "💳",
-    "longDesc": "increase your bank limit by $1,000-$500,000",
+    "longDesc": "increase your bank limit by $75,000-$2,500,000",
     "rarity": 1,
     "buy": 0,
     "sell": 75000,
