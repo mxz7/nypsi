@@ -7,8 +7,8 @@ import { getTier } from "../premium/premium";
 import { getRequiredBetForXp } from "./balance";
 import { getBoosters } from "./boosters";
 import { gemBreak, getInventory } from "./inventory";
-import { getPrestige } from "./levelling";
-import { getItems } from "./utils";
+import { getPrestige, getUpgrades } from "./levelling";
+import { getItems, getUpgradesData } from "./utils";
 
 export async function getXp(member: GuildMember | string): Promise<number> {
   let id: string;
@@ -70,14 +70,15 @@ export async function calcEarnedGambleXp(
   }
 
   let min = 1;
-  let max = 10;
+  let max = 7;
 
-  const [inventory, tier, booster, prestige, boosters] = await Promise.all([
+  const [inventory, tier, booster, prestige, boosters, upgrades] = await Promise.all([
     getInventory(member),
     getTier(member),
     isBooster(member.user.id),
     getPrestige(member),
     getBoosters(member),
+    getUpgrades(member),
   ]);
 
   max += (prestige > 50 ? 50 : prestige) / 5.7;
@@ -85,7 +86,7 @@ export async function calcEarnedGambleXp(
   if (booster) max += 7;
   if (tier) max += tier * 2.7;
 
-  let betDivisor = 3000 * prestige + 10_000;
+  let betDivisor = 6000 * prestige + 10_000;
 
   if (betDivisor > 75_000) betDivisor = 75_000;
   if (betDivisor < 10_000) betDivisor = 10_000;
@@ -115,6 +116,10 @@ export async function calcEarnedGambleXp(
   let boosterEffect = 0;
 
   const items = getItems();
+
+  if (upgrades.find((i) => i.upgradeId === "xp"))
+    boosterEffect +=
+      upgrades.find((i) => i.upgradeId === "xp").amount * getUpgradesData()["xp"].effect;
 
   for (const boosterId of boosters.keys()) {
     if (boosterId == "beginner_booster") {

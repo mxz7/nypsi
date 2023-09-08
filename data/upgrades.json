@@ -34,7 +34,7 @@
   "xp": {
     "id": "xp",
     "name": "xp booster",
-    "effect": 1,
+    "effect": 0.17,
     "description": "increased xp earn",
     "max": 5,
     "chance": 10
