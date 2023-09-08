@@ -77,3 +77,11 @@ export type GuildUpgrade = {
   cost: number;
   increment_per_level: number;
 };
+
+export type UserUpgrade = {
+  id: string;
+  name: string;
+  description: string;
+  chance: number;
+  max: number;
+};

@@ -1,0 +1,50 @@
+{
+  "multi": {
+    "id": "multi",
+    "name": "gamble multiplier",
+    "effect": 1,
+    "description": "+1% gamble multiplier",
+    "max": 5,
+    "chance": 4
+  },
+  "sell_multi": {
+    "id": "sell_multi",
+    "name": "sell multiplier",
+    "effect": 3,
+    "description": "+3% sell multiplier",
+    "max": 10,
+    "chance": 15
+  },
+  "cursor": {
+    "id": "cursor",
+    "name": "cursor booster",
+    "effect": 0.1,
+    "description": "+0.1 cookies per cursor",
+    "max": 20,
+    "chance": 40
+  },
+  "grandma": {
+    "id": "grandma",
+    "name": "grandma booster",
+    "effect": 0.1,
+    "description": "+0.1 cookies per grandma",
+    "max": 20,
+    "chance": 40
+  },
+  "xp": {
+    "id": "xp",
+    "name": "xp booster",
+    "effect": 1,
+    "description": "increased xp earn",
+    "max": 5,
+    "chance": 10
+  },
+  "guild_xp": {
+    "id": "guild_xp",
+    "name": "guild xp booster",
+    "effect": 0.03,
+    "description": "+3% xp sent to guild",
+    "max": 10,
+    "chance": 10
+  }
+}
