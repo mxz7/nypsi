@@ -11,10 +11,10 @@ import { getAuctionAverage } from "./auctions";
 import { getBoosters } from "./boosters";
 import { getGuildUpgradesByUser } from "./guilds";
 import { calcItemValue, gemBreak, getInventory } from "./inventory";
-import { getPrestige } from "./levelling";
+import { getPrestige, getUpgrades } from "./levelling";
 import { getOffersAverage } from "./offers";
 import { isPassive } from "./passive";
-import { getBaseUpgrades, getBaseWorkers, getItems } from "./utils";
+import { getBaseUpgrades, getBaseWorkers, getItems, getUpgradesData } from "./utils";
 import { hasVoted } from "./vote";
 import { calcWorkerValues } from "./workers";
 import { getXp } from "./xp";
@@ -128,17 +128,27 @@ export async function getGambleMulti(member: GuildMember | string): Promise<numb
 
   let multi = 0;
 
-  const [prestige, booster, boosters, guildUpgrades, passive, dmSettings, inventory, tier] =
-    await Promise.all([
-      getPrestige(member),
-      isBooster(id),
-      getBoosters(id),
-      getGuildUpgradesByUser(member),
-      isPassive(id),
-      getDmSettings(id),
-      getInventory(id, false),
-      getTier(id),
-    ]);
+  const [
+    prestige,
+    booster,
+    boosters,
+    guildUpgrades,
+    passive,
+    dmSettings,
+    inventory,
+    tier,
+    upgrades,
+  ] = await Promise.all([
+    getPrestige(member),
+    isBooster(id),
+    getBoosters(id),
+    getGuildUpgradesByUser(member),
+    isPassive(id),
+    getDmSettings(id),
+    getInventory(id, false),
+    getTier(id),
+    getUpgrades(id),
+  ]);
 
   let prestigeBonus = prestigeGambleMultiEffect[prestige];
 
@@ -165,6 +175,10 @@ export async function getGambleMulti(member: GuildMember | string): Promise<numb
 
   if (guildUpgrades.find((i) => i.upgradeId === "multi"))
     multi += guildUpgrades.find((i) => i.upgradeId === "multi").amount;
+
+  if (upgrades.find((i) => i.upgradeId === "multi"))
+    multi +=
+      upgrades.find((i) => i.upgradeId === "multi").amount * getUpgradesData()["multi"].effect;
 
   if (
     dmSettings.voteReminder &&
