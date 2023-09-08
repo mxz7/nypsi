@@ -5,7 +5,7 @@ import { CustomEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
 import { addKarma } from "../karma/karma";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
-import { getBalance, getBankBalance, updateBalance } from "./balance";
+import { getBalance, getBankBalance, updateBalance, updateBankBalance } from "./balance";
 import { addInventoryItem } from "./inventory";
 import { getXp, updateXp } from "./xp";
 import ms = require("ms");
@@ -281,14 +281,17 @@ export async function checkLevelUp(member: GuildMember | string) {
   ]);
 
   if (requirements.money <= bank && requirements.xp <= xp) {
-    await doLevelUp(member);
+    await doLevelUp(member, requirements);
     return true;
   }
 
   return false;
 }
 
-async function doLevelUp(member: GuildMember | string) {
+async function doLevelUp(
+  member: GuildMember | string,
+  requirements: { money: number; xp: number },
+) {
   let id: string;
   if (member instanceof GuildMember) {
     id = member.user.id;
@@ -299,7 +302,8 @@ async function doLevelUp(member: GuildMember | string) {
   const [level, prestige] = await Promise.all([
     setLevel(member, (await getLevel(member)) + 1),
     getPrestige(member),
-    updateXp(member, 0),
+    updateXp(member, (await getXp(member)) - requirements.xp),
+    updateBankBalance(member, (await getBankBalance(member)) - requirements.money),
   ]);
 
   const levelData = levellingRewards.get(await getRawLevel(member));
