@@ -18,14 +18,9 @@ import {
   updateBalance,
 } from "../utils/functions/economy/balance.js";
 import { getInventory } from "../utils/functions/economy/inventory";
-import {
-  getPrestige,
-  getPrestigeRequirement,
-  getPrestigeRequirementBal,
-} from "../utils/functions/economy/levelling.js";
+import { getLevel, getPrestige } from "../utils/functions/economy/levelling.js";
 import { createUser, deleteUser, getItems, userExists } from "../utils/functions/economy/utils.js";
 import { getXp } from "../utils/functions/economy/xp.js";
-import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member.js";
 import { getNypsiBankBalance, getTax, getTaxRefreshTime } from "../utils/functions/tax.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -152,6 +147,7 @@ async function run(
       getBankBalance(target),
       getMaxBankBalance(target),
       hasPadlock(target),
+      getLevel(target),
     ]);
 
   let footer = `xp: ${xp.toLocaleString()}`;
@@ -202,20 +198,6 @@ async function run(
     target.user.avatarURL(),
     `https://nypsi.xyz/user/${target.id}`,
   );
-
-  if (message.member == target) {
-    if (
-      xp >= (await getPrestigeRequirement(target)) &&
-      bankBalance >= getPrestigeRequirementBal(xp)
-    ) {
-      return send({
-        content: `you are eligible to prestige, use ${await getPrefix(
-          message.guild,
-        )}prestige for more info`,
-        embeds: [embed],
-      });
-    }
-  }
 
   return send({ embeds: [embed] });
 }
