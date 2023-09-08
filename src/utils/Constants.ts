@@ -94,6 +94,7 @@ export default {
         PRESTIGE: "cache:economy:prestige",
         VOTE: "cache:economy:vote",
         XP: "cache:economy:xp",
+        LEVEL: "cache:economy:level",
       },
     },
     nypsi: {

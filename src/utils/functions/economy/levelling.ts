@@ -4,6 +4,11 @@ import redis from "../../../init/redis";
 import Constants from "../../Constants";
 import ms = require("ms");
 
+const levelFormula = (level: number, prestige: number) =>
+  Math.floor(Math.pow(level, 2 + 0.1 * prestige) + 100) - 1;
+const moneyFormula = (level: number, prestige: number) =>
+  Math.floor(Math.pow(level, 3.7 + 0.1 * prestige) + 25_000) - 1;
+
 export async function getPrestige(member: GuildMember | string): Promise<number> {
   let id: string;
   if (member instanceof GuildMember) {
@@ -51,16 +56,70 @@ export async function setPrestige(member: GuildMember | string, amount: number) 
   await redis.del(`${Constants.redis.cache.economy.PRESTIGE}:${id}`);
 }
 
-export async function getPrestigeRequirement(member: GuildMember): Promise<number> {
-  const constant = 500;
-  const extra = (await getPrestige(member)) * constant;
+export async function getLevel(member: GuildMember | string): Promise<number> {
+  let id: string;
+  if (member instanceof GuildMember) {
+    id = member.user.id;
+  } else {
+    id = member;
+  }
 
-  return 500 + extra;
+  if (await redis.exists(`${Constants.redis.cache.economy.LEVEL}:${id}`)) {
+    return parseInt(await redis.get(`${Constants.redis.cache.economy.LEVEL}:${id}`));
+  }
+
+  const query = await prisma.economy.findUnique({
+    where: {
+      userId: id,
+    },
+    select: {
+      level: true,
+    },
+  });
+
+  await redis.set(`${Constants.redis.cache.economy.LEVEL}:${id}`, query.level);
+  await redis.expire(`${Constants.redis.cache.economy.LEVEL}:${id}`, ms("1 hour") / 1000);
+
+  return query.level;
 }
 
-export function getPrestigeRequirementBal(xp: number): number {
-  const constant = 750;
-  const bonus = xp * constant;
+export async function setLevel(member: GuildMember | string, amount: number) {
+  let id: string;
+  if (member instanceof GuildMember) {
+    id = member.user.id;
+  } else {
+    id = member;
+  }
 
-  return bonus;
+  await prisma.economy.update({
+    where: {
+      userId: id,
+    },
+    data: {
+      level: amount,
+    },
+  });
+
+  await redis.del(`${Constants.redis.cache.economy.LEVEL}:${id}`);
+}
+
+export async function getLevelRequirements(member: GuildMember | string) {
+  let id: string;
+  if (member instanceof GuildMember) {
+    id = member.user.id;
+  } else {
+    id = member;
+  }
+
+  let [prestige, level] = await Promise.all([getPrestige(id), getLevel(id)]);
+
+  while (level > 100) {
+    prestige++;
+    level -= 100;
+  }
+
+  const requiredXp = levelFormula(level, prestige);
+  const requiredMoney = moneyFormula(level, prestige);
+
+  return { xp: requiredXp, money: requiredMoney };
 }
