@@ -424,6 +424,10 @@ export function getTagsData() {
   return tags;
 }
 
+export function getUpgradesData() {
+  return userUpgrades;
+}
+
 export function getBakeryUpgradesData() {
   return bakeryUpgrades;
 }
