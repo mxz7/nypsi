@@ -1,8 +1,16 @@
 import { GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
+import { CustomEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
+import { addKarma } from "../karma/karma";
+import { addNotificationToQueue, getDmSettings } from "../users/notifications";
+import { getBalance, getBankBalance, updateBalance } from "./balance";
+import { addInventoryItem } from "./inventory";
+import { getXp } from "./xp";
 import ms = require("ms");
+
+const levellingRewards = new Map<number, { text: string; rewards: string[] }>();
 
 const levelFormula = (level: number, prestige: number) =>
   Math.floor(Math.pow(level, 2 + 0.07 * prestige) + 100);
@@ -102,16 +110,21 @@ export async function setLevel(member: GuildMember | string, amount: number) {
     id = member;
   }
 
-  await prisma.economy.update({
+  const query = await prisma.economy.update({
     where: {
       userId: id,
     },
     data: {
       level: amount,
     },
+    select: {
+      level: true,
+    },
   });
 
   await redis.del(`${Constants.redis.cache.economy.LEVEL}:${id}`);
+
+  return query.level;
 }
 
 export async function getLevelRequirements(member: GuildMember | string) {
@@ -201,4 +214,64 @@ export async function setUpgrade(member: GuildMember | string, upgradeId: string
   await redis.del(`${Constants.redis.cache.economy.UPGRADES}:${id}`);
 
   return await getUpgrades(member);
+}
+
+export async function checkLevelUp(member: GuildMember | string) {
+  const [xp, bank, requirements] = await Promise.all([
+    getXp(member),
+    getBankBalance(member),
+    getLevelRequirements(member),
+  ]);
+
+  if (requirements.money < bank && requirements.xp < xp) {
+    await doLevelUp(member);
+    return true;
+  }
+
+  return false;
+}
+
+async function doLevelUp(member: GuildMember | string) {
+  let id: string;
+  if (member instanceof GuildMember) {
+    id = member.user.id;
+  } else {
+    id = member;
+  }
+
+  const [level, prestige] = await Promise.all([
+    setLevel(member, (await getLevel(member)) + 1),
+    getPrestige(member),
+  ]);
+
+  const levelData = levellingRewards.get(level);
+
+  for (const reward of levelData.rewards) {
+    if (reward.startsWith("id:")) {
+      await addInventoryItem(member, reward.substring(3), 1, false);
+    } else if (reward.startsWith("money:")) {
+      await updateBalance(member, (await getBalance(member)) + parseInt(reward.substring(6)));
+    } else if (reward.startsWith("karma:")) {
+      await addKarma(member, parseInt(reward.substring(6)));
+    }
+  }
+
+  const embed = new CustomEmbed(member instanceof GuildMember ? member : null)
+    .setHeader(
+      "level up",
+      member instanceof GuildMember
+        ? member.user.avatarURL()
+        : (await prisma.user.findUnique({ where: { id }, select: { avatar: true } })).avatar,
+    )
+    .setDescription(
+      `you are now ${prestige > 0 ? `P${prestige}L${level}` : `level ${level}`}${
+        levelData.text ? `\n\n${levelData.text}` : ""
+      }`,
+    );
+
+  if ((await getDmSettings(member)).other)
+    addNotificationToQueue({ memberId: id, payload: { embed } });
+  else redis.set(`nypsi:levelup:${id}`, JSON.stringify(embed.toJSON()));
+
+  return await checkLevelUp(member);
 }

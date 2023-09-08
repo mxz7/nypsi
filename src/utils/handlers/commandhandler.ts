@@ -958,6 +958,16 @@ export async function runCommand(
         )}\n\nhttps://tenor.com/view/rickroll-roll-rick-never-gonna-give-you-up-never-gonna-gif-22954713`,
       });
     }
+
+    if (await redis.exists(`nypsi:levelup:${message.author.id}`)) {
+      const embed: APIEmbed = JSON.parse(await redis.get(`nypsi:levelup:${message.author.id}`));
+
+      if (message instanceof Message) {
+        message.reply({ embeds: [embed] });
+      } else {
+        message.followUp({ embeds: [embed], ephemeral: true });
+      }
+    }
   }, 2000);
 
   await Promise.all([
