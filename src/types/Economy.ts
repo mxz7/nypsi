@@ -84,4 +84,5 @@ export type UserUpgrade = {
   description: string;
   chance: number;
   max: number;
+  effect: number;
 };
