@@ -237,13 +237,21 @@ export async function getSellMulti(member: GuildMember | string): Promise<number
     id = member;
   }
 
-  let multi = 0;
+  const [prestige, tier, booster, boosters, guildUpgrades, passive, inventory] = await Promise.all([
+    getPrestige(member),
+    getTier(member),
+    isBooster(id),
+    getBoosters(id),
+    getGuildUpgradesByUser(member),
+    isPassive(member),
+    getInventory(member, false),
+  ]);
 
-  const prestige = await getPrestige(member);
+  let multi = 0;
 
   multi += Math.floor(prestige * 0.69);
 
-  switch (await getTier(id)) {
+  switch (tier) {
     case 1:
       multi += 2;
       break;
@@ -258,12 +266,7 @@ export async function getSellMulti(member: GuildMember | string): Promise<number
       break;
   }
 
-  if (await isBooster(id)) multi += 3;
-
-  const [boosters, guildUpgrades] = await Promise.all([
-    getBoosters(id),
-    getGuildUpgradesByUser(member),
-  ]);
+  if (booster) multi += 3;
 
   const items = getItems();
 
@@ -276,7 +279,7 @@ export async function getSellMulti(member: GuildMember | string): Promise<number
   )
     multi += 5;
 
-  if (await isPassive(id)) multi -= 5;
+  if (passive) multi -= 5;
 
   for (const boosterId of boosters.keys()) {
     if (boosterId == "beginner_booster") {
@@ -286,7 +289,6 @@ export async function getSellMulti(member: GuildMember | string): Promise<number
     }
   }
 
-  const inventory = await getInventory(id, false);
   if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0)
     multi += Math.floor(Math.random() * 7);
   if (inventory.find((i) => i.item == "white_gem")?.amount > 0) {
