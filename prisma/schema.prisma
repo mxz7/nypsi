@@ -167,7 +167,8 @@ model Upgrades {
   userId    String
   upgradeId String
   amount    Int
-  economy   Economy @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  economy Economy @relation(fields: [userId], references: [userId], onDelete: Cascade)
 
   @@id([userId, upgradeId])
 }
