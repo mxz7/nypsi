@@ -7,7 +7,7 @@ import { addKarma } from "../karma/karma";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { getBalance, getBankBalance, updateBalance } from "./balance";
 import { addInventoryItem } from "./inventory";
-import { getXp } from "./xp";
+import { getXp, updateXp } from "./xp";
 import ms = require("ms");
 
 const levellingRewards = new Map<number, { text: string; rewards?: string[] }>();
@@ -299,6 +299,7 @@ async function doLevelUp(member: GuildMember | string) {
   const [level, prestige] = await Promise.all([
     setLevel(member, (await getLevel(member)) + 1),
     getPrestige(member),
+    updateXp(member, 0),
   ]);
 
   const levelData = levellingRewards.get(await getRawLevel(member));
