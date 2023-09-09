@@ -1,6 +1,12 @@
+-- CreateEnum
+CREATE TYPE "LevelDmSetting" AS ENUM ('Disabled', 'All', 'OnlyReward');
+
+-- AlterTable
+ALTER TABLE "DMSettings" ADD COLUMN     "level" "LevelDmSetting" NOT NULL DEFAULT 'OnlyReward';
+
 -- AlterTable
 ALTER TABLE "Economy" ADD COLUMN     "level" INTEGER NOT NULL DEFAULT 0,
-ADD COLUMN     "prestigeDates" TIMESTAMP(3)[];
+ALTER COLUMN "xp" SET DATA TYPE BIGINT;
 
 -- CreateTable
 CREATE TABLE "Upgrades" (

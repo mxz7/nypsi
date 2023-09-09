@@ -31,10 +31,9 @@ export async function getXp(member: GuildMember | string): Promise<number> {
     },
   });
 
-  await redis.set(`${Constants.redis.cache.economy.XP}:${id}`, query.xp);
-  await redis.expire(`${Constants.redis.cache.economy.XP}:${id}`, 30);
+  await redis.set(`${Constants.redis.cache.economy.XP}:${id}`, query.xp.toString(), "EX", 3600);
 
-  return query.xp;
+  return Number(query.xp);
 }
 
 export async function updateXp(member: GuildMember | string, amount: number, check = true) {

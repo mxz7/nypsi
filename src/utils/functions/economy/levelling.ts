@@ -3,6 +3,7 @@ import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
+import { logger } from "../../logger";
 import { addKarma } from "../karma/karma";
 import sleep from "../sleep";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
@@ -326,7 +327,11 @@ async function doLevelUp(
   await updateXp(member, (await getXp(member)) - requirements.xp, false);
   await updateBankBalance(member, (await getBankBalance(member)) - requirements.money, false);
 
-  const levelData = levellingRewards.get(await getRawLevel(member));
+  const rawLevel = await getRawLevel(member);
+
+  const levelData = levellingRewards.get(rawLevel);
+
+  logger.info(`${id} levelled up to ${rawLevel} (P${prestige}L${level})`);
 
   if (levelData?.rewards)
     for (const reward of levelData.rewards) {
@@ -352,9 +357,20 @@ async function doLevelUp(
       }`,
     );
 
-  if ((await getDmSettings(member)).other)
-    addNotificationToQueue({ memberId: id, payload: { embed } });
-  else await redis.set(`nypsi:levelup:${id}`, JSON.stringify(embed.toJSON()));
+  const dmSetting = (await getDmSettings(member)).level;
+
+  switch (dmSetting) {
+    case "All":
+      addNotificationToQueue({ memberId: id, payload: { embed } });
+      break;
+    case "OnlyReward":
+      if (levelData) addNotificationToQueue({ memberId: id, payload: { embed } });
+      else await redis.set(`nypsi:levelup:${id}`, JSON.stringify(embed.toJSON()));
+      break;
+    case "Disabled":
+      await redis.set(`nypsi:levelup:${id}`, JSON.stringify(embed.toJSON()));
+      break;
+  }
 
   await sleep(100);
 
