@@ -128,7 +128,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     while (upgradesPool.length === 0 && attempts < 10) {
       attempts++;
       for (const upgrade of Object.values(getUpgradesData())) {
-        if (upgrades.find((i) => i.upgradeId === upgrade.id).amount >= upgrade.max) continue;
+        if (
+          upgrades.find((i) => i.upgradeId === upgrade.id) &&
+          upgrades.find((i) => i.upgradeId === upgrade.id).amount >= upgrade.max
+        )
+          continue;
 
         if (percentChance(upgrade.chance)) {
           upgradesPool.push(upgrade.id);
@@ -142,7 +146,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     await setUpgrade(
       message.member,
       chosen,
-      upgrades.find((i) => i.upgradeId === chosen).amount + 1,
+      upgrades.find((i) => i.upgradeId === chosen)
+        ? upgrades.find((i) => i.upgradeId === chosen).amount + 1
+        : 1,
     );
 
     const desc: string[] = [];
@@ -160,6 +166,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           .setColor(Constants.EMBED_SUCCESS_COLOR)
           .setDescription(`you are now **P${prestige + 1}L${level - 100}**\n\n${desc.join("\n")}`),
       ],
+      components: [],
     });
   }
 }
