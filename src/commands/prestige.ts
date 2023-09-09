@@ -20,7 +20,12 @@ import {
   setPrestige,
   setUpgrade,
 } from "../utils/functions/economy/levelling.js";
-import { createUser, getUpgradesData, userExists } from "../utils/functions/economy/utils.js";
+import {
+  createUser,
+  getUpgradesData,
+  maxPrestige,
+  userExists,
+} from "../utils/functions/economy/utils.js";
 import { percentChance } from "../utils/functions/random";
 import {
   addCooldown,
@@ -82,6 +87,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       embeds: [new ErrorEmbed(`you must be at least level 100 to prestige\n\n${level}/100`)],
     });
   }
+
+  if (prestige >= maxPrestige)
+    return send({
+      embeds: [
+        new CustomEmbed(message.member, "you're at max prestige. well done. nerd. <3").setImage(
+          "https://i.imgur.com/vB3UGgi.png",
+        ),
+      ],
+    });
 
   const embed = new CustomEmbed(
     message.member,
