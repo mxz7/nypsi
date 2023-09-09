@@ -13,7 +13,7 @@
     "effect": 3,
     "description": "+{x}% sell multiplier",
     "max": 10,
-    "chance": 15
+    "chance": 10
   },
   "cursor": {
     "id": "cursor",
@@ -34,17 +34,17 @@
   "xp": {
     "id": "xp",
     "name": "xp booster",
-    "effect": 0.17,
-    "description": "increased xp earn",
+    "effect": 0.05,
+    "description": "+{x}% more xp",
     "max": 5,
-    "chance": 10
+    "chance": 5
   },
   "guild_xp": {
     "id": "guild_xp",
     "name": "guild xp booster",
     "effect": 0.03,
     "description": "+{x}% xp sent to guild",
-    "max": 10,
+    "max": 5,
     "chance": 15
   }
 }

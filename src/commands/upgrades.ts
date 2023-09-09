@@ -67,7 +67,10 @@ cmd.setRun(async (message) => {
                 i.upgradeId
               ].description.replace(
                 "{x}",
-                (getUpgradesData()[i.upgradeId].effect * i.amount).toString(),
+                (i.upgradeId.includes("xp")
+                  ? Math.floor(getUpgradesData()[i.upgradeId].effect * i.amount * 100)
+                  : getUpgradesData()[i.upgradeId].effect * i.amount
+                ).toString(),
               )}*`,
           )
           .join("\n"),
