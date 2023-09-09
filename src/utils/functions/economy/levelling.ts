@@ -46,15 +46,13 @@ levellingRewards.set(10, {
     "- 🔮 100 karma\n" +
     "- $100,000\n\n" +
     "you have unlocked:\n" +
-    "- 🥔 potato farmer (</workers view:1014905682341924945>)",
+    "- 🥔 potato farmer (</workers view:1014905682341924945>)\n" +
+    "- +1% gamble multi",
   rewards: ["id:basic_crate", "id:basic_crate", "karma:100", "money:100000"],
 });
 levellingRewards.set(15, { text: "you will now receive 3 📦 vote crates when voting" });
 levellingRewards.set(25, {
-  text:
-    "you have unlocked:\n" +
-    "- 🎣 fisherman (</workers view:1014905682341924945>)\n" +
-    "- +1% gamble multi",
+  text: "you have unlocked:\n" + "- 🎣 fisherman (</workers view:1014905682341924945>)",
 });
 levellingRewards.set(30, { text: "you will now receive 4 📦 vote crates when voting" });
 levellingRewards.set(40, {
@@ -67,28 +65,27 @@ levellingRewards.set(50, {
     "you will now receive 5 📦 vote crates when voting\n\nyou have unlocked:\n" +
     "- ⛏️ miner (</workers view:1014905682341924945>)\n" +
     "- 🪓 lumberjack (</workers view:1014905682341924945>)\n" +
-    "- 🥓 butcher (</workers view:1014905682341924945>)",
+    "- 🥓 butcher (</workers view:1014905682341924945>)\n" +
+    "- +1% gamble multi",
 });
 levellingRewards.set(75, {
-  text: "you have unlocked:\n" + "- 👕 tailor (</workers view:1014905682341924945>)",
-});
-levellingRewards.set(90, {
-  text: "you have unlocked:\n" + "- +1% gamble multi",
+  text:
+    "you have unlocked:\n" +
+    "- 👕 tailor (</workers view:1014905682341924945>)\n" +
+    "- +1% gamble multi",
 });
 levellingRewards.set(100, {
   text:
     "you have unlocked:\n" +
     "- 🚀 spacex (</workers view:1014905682341924945>)\n" +
     "- 📦 amazon (</workers view:1014905682341924945>)\n" +
-    "- create your own guild",
+    "- create your own guild\n" +
+    "- +1% gamble multi",
 });
-levellingRewards.set(150, {
+levellingRewards.set(200, {
   text: "you have unlocked:\n" + "- +1% gamble multi",
 });
 levellingRewards.set(250, {
-  text: "you have unlocked:\n" + "- +1% gamble multi",
-});
-levellingRewards.set(325, {
   text: "you have unlocked:\n" + "- +1% gamble multi",
 });
 
