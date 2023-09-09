@@ -90,10 +90,10 @@ levellingRewards.set(325, {
   text: "you have unlocked:\n" + "- +1% gamble multi",
 });
 
-const levelFormula = (level: number, prestige: number) =>
-  Math.floor(Math.pow(level + 1, 2 + 0.07 * prestige) + 100) - 1;
+const xpFormula = (level: number, prestige: number) =>
+  Math.floor(Math.pow(level + 1, 1.117 + 0.07 * prestige) + 100) - 1;
 const moneyFormula = (level: number, prestige: number) =>
-  Math.floor(Math.pow(level + 1, 3.7 + 0.07 * prestige) + 25_000) - 1;
+  Math.floor(Math.pow(level + 1, 2.5 + 0.17 * prestige) + 25_000) - 1;
 
 export async function getPrestige(member: GuildMember | string): Promise<number> {
   let id: string;
@@ -220,7 +220,7 @@ export async function getLevelRequirements(member: GuildMember | string) {
     level -= 100;
   }
 
-  const requiredXp = levelFormula(level, prestige);
+  const requiredXp = xpFormula(level, prestige);
   const requiredMoney = moneyFormula(level, prestige);
 
   return { xp: requiredXp, money: requiredMoney };
