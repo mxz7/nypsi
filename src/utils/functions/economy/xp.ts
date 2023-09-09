@@ -142,7 +142,7 @@ export async function calcEarnedHFMXp(member: GuildMember, items: number) {
     earned += Math.random() * 12.5 + 12.5;
     items -= 25;
 
-    earned += items * 0.33369;
+    earned += items * 0.269;
   } else {
     earned += Math.random() * (items / 2) + items / 2;
   }
