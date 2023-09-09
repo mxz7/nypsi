@@ -38,8 +38,6 @@ export async function getXp(member: GuildMember | string): Promise<number> {
 }
 
 export async function updateXp(member: GuildMember | string, amount: number, check = true) {
-  if (amount >= 69420) return;
-
   let id: string;
   if (member instanceof GuildMember) {
     id = member.user.id;
