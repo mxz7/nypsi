@@ -68,6 +68,10 @@ levellingRewards.set(50, {
     "- 🥓 butcher (</workers view:1014905682341924945>)\n" +
     "- +1% gamble multi",
 });
+levellingRewards.set(69, {
+  text: "hahaaaaahaha......\n\nyou have received:\n" + "- `3x` 🎁 69420 crate",
+  rewards: ["id:69420_crate", "id:69420_crate", "id:69420_crate"],
+});
 levellingRewards.set(75, {
   text:
     "you have unlocked:\n" +
