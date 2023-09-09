@@ -328,7 +328,7 @@ async function doLevelUp(
 
   const levelData = levellingRewards.get(await getRawLevel(member));
 
-  if (levelData.rewards)
+  if (levelData?.rewards)
     for (const reward of levelData.rewards) {
       if (reward.startsWith("id:")) {
         await addInventoryItem(member, reward.substring(3), 1, false);
@@ -348,7 +348,7 @@ async function doLevelUp(
     )
     .setDescription(
       `you are now ${prestige > 0 ? `**P${prestige}L${level}**` : `level **${level}**`}${
-        levelData.text ? `\n\n${levelData.text}` : ""
+        levelData?.text ? `\n\n${levelData.text}` : ""
       }`,
     );
 
