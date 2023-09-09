@@ -373,7 +373,7 @@ export async function topPrestige(guild: Guild, userId?: string) {
       user.userId,
       members.get(user.userId).user.username,
       true,
-    )} P${user.prestige}L${user.level}`;
+    )} P${user.prestige} L${user.level}`;
 
     count++;
   }
@@ -437,7 +437,7 @@ export async function topPrestigeGlobal(userId: string) {
       user.userId,
       user.user.lastKnownUsername,
       (await getPreferences(user.userId)).leaderboards,
-    )} P${user.prestige}L${user.level}`;
+    )} P${user.prestige} L${user.level}`;
 
     count++;
   }

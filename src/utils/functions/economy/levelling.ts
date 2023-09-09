@@ -354,7 +354,7 @@ async function doLevelUp(
         : (await prisma.user.findUnique({ where: { id }, select: { avatar: true } })).avatar,
     )
     .setDescription(
-      `you are now ${prestige > 0 ? `**P${prestige}L${level}**` : `level **${level}**`}${
+      `you are now ${prestige > 0 ? `**P${prestige} L${level}**` : `level **${level}**`}${
         levelData?.text ? `\n\n${levelData.text}` : ""
       }`,
     );
