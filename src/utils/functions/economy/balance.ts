@@ -562,7 +562,9 @@ export async function getRequiredBetForXp(member: GuildMember): Promise<number> 
 
   const level = await getRawLevel(member);
 
-  requiredBet += Math.floor(level / 25) * 2500;
+  requiredBet += Math.floor(level / 30) * 2500;
+
+  if (requiredBet > 50_000) requiredBet = 50_000;
 
   return requiredBet;
 }
