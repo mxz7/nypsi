@@ -532,7 +532,7 @@ export async function calcMaxBet(member: GuildMember | string): Promise<number> 
     isBooster(id),
   ]);
 
-  const levelBonus = Math.floor(level / 25) * 50000;
+  const levelBonus = Math.floor(level / 10) * 25000;
 
   total += levelBonus;
 
