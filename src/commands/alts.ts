@@ -258,7 +258,7 @@ async function getEmbed(
   if (!(member instanceof GuildMember)) {
     embed.setHeader("alts of " + member);
   } else {
-    embed.setHeader("alts of " + member.user.username);
+    embed.setHeader("alts of " + member.user.username, member.user.avatarURL());
   }
 
   if (alts.length == 0) {
