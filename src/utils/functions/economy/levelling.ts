@@ -4,6 +4,7 @@ import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
 import { addKarma } from "../karma/karma";
+import sleep from "../sleep";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { getBalance, getBankBalance, updateBalance, updateBankBalance } from "./balance";
 import { addInventoryItem } from "./inventory";
@@ -319,12 +320,11 @@ async function doLevelUp(
     id = member;
   }
 
-  const [level, prestige] = await Promise.all([
-    setLevel(member, (await getLevel(member)) + 1),
-    getPrestige(member),
-    updateXp(member, (await getXp(member)) - requirements.xp),
-    updateBankBalance(member, (await getBankBalance(member)) - requirements.money),
-  ]);
+  const level = await setLevel(member, (await getLevel(member)) + 1);
+  const prestige = await getPrestige(member);
+
+  await updateXp(member, (await getXp(member)) - requirements.xp, false);
+  await updateBankBalance(member, (await getBankBalance(member)) - requirements.money, false);
 
   const levelData = levellingRewards.get(await getRawLevel(member));
 
@@ -354,7 +354,9 @@ async function doLevelUp(
 
   if ((await getDmSettings(member)).other)
     addNotificationToQueue({ memberId: id, payload: { embed } });
-  else redis.set(`nypsi:levelup:${id}`, JSON.stringify(embed.toJSON()));
+  else await redis.set(`nypsi:levelup:${id}`, JSON.stringify(embed.toJSON()));
+
+  await sleep(100);
 
   return await checkLevelUp(member);
 }

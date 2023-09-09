@@ -86,7 +86,11 @@ export async function getBankBalance(member: GuildMember | string): Promise<numb
   return Number(query.bank);
 }
 
-export async function updateBankBalance(member: GuildMember | string, amount: number) {
+export async function updateBankBalance(
+  member: GuildMember | string,
+  amount: number,
+  check = true,
+) {
   let id: string;
   if (member instanceof GuildMember) {
     id = member.user.id;
@@ -103,7 +107,7 @@ export async function updateBankBalance(member: GuildMember | string, amount: nu
     },
   });
 
-  checkLevelUp(member);
+  if (check) checkLevelUp(member);
 }
 
 export async function increaseBaseBankStorage(member: GuildMember, amount: number) {

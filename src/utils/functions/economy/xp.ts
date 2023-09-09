@@ -37,7 +37,7 @@ export async function getXp(member: GuildMember | string): Promise<number> {
   return query.xp;
 }
 
-export async function updateXp(member: GuildMember | string, amount: number) {
+export async function updateXp(member: GuildMember | string, amount: number, check = true) {
   if (amount >= 69420) return;
 
   let id: string;
@@ -57,7 +57,7 @@ export async function updateXp(member: GuildMember | string, amount: number) {
   });
   await redis.del(`${Constants.redis.cache.economy.XP}:${id}`);
 
-  checkLevelUp(member);
+  if (check) checkLevelUp(member);
 }
 
 export async function calcEarnedGambleXp(
