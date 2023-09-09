@@ -967,6 +967,8 @@ export async function runCommand(
       } else {
         message.followUp({ embeds: [embed], ephemeral: true });
       }
+
+      await redis.del(`nypsi:levelup:${message.author.id}`);
     }
   }, 2000);
 
