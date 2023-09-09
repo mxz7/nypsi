@@ -218,7 +218,7 @@ export async function getLevelRequirements(member: GuildMember | string) {
 
   let [prestige, level] = await Promise.all([getPrestige(id), getLevel(id)]);
 
-  while (level > 100) {
+  while (level >= 100) {
     prestige++;
     level -= 100;
   }
