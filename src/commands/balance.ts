@@ -151,7 +151,7 @@ async function run(
   let footer = `level ${level}`;
 
   if (prestige > 0) {
-    footer = `P${prestige} L${level}`;
+    footer = `prestige ${prestige} | level ${level}`;
   }
 
   let padlockStatus = false;

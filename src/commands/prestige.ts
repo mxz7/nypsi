@@ -99,7 +99,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const embed = new CustomEmbed(
     message.member,
-    `confirm you want to become even cooler (P${prestige + 1} L${level - 100})`,
+    `confirm you want to become even cooler (prestige ${prestige + 1} level ${level - 100})`,
   ).setHeader("prestige", message.author.avatarURL());
 
   await addCooldown(cmd.name, message.member);
@@ -178,7 +178,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         new CustomEmbed()
           .setHeader("prestige", message.author.avatarURL())
           .setColor(Constants.EMBED_SUCCESS_COLOR)
-          .setDescription(`you are now **P${prestige + 1} L${level - 100}**\n\n${desc.join("\n")}`),
+          .setDescription(`you are now **prestige ${prestige + 1} level ${level - 100}**\n\n${desc.join("\n")}`),
       ],
       components: [],
     });
