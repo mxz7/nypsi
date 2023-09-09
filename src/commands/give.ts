@@ -120,7 +120,7 @@ async function run(
 
   if ((await getRawLevel(message.member)) < 3) {
     return send({
-      embeds: [new ErrorEmbed("you cannot use this command yet. u might be an alt. or a bot 😳")],
+      embeds: [new ErrorEmbed("you must be level 3 before you can give items")],
     });
   }
 
