@@ -31,6 +31,7 @@ levellingRewards.set(3, {
     "you have unlocked:\n" +
     "- 🪨 quarry worker (</workers view:1014905682341924945>)",
 });
+levellingRewards.set(5, { text: "you will now receive 2 📦 vote crates when voting" });
 levellingRewards.set(7, {
   text:
     "just a little bonus for my favourite number 😁\n\nyou have received:\n" +
@@ -48,14 +49,14 @@ levellingRewards.set(10, {
     "- 🥔 potato farmer (</workers view:1014905682341924945>)",
   rewards: ["id:basic_crate", "id:basic_crate", "karma:100", "money:100000"],
 });
-levellingRewards.set(15, { text: "you will now receive 2 📦 vote crates when voting" });
+levellingRewards.set(15, { text: "you will now receive 3 📦 vote crates when voting" });
 levellingRewards.set(25, {
   text:
     "you have unlocked:\n" +
     "- 🎣 fisherman (</workers view:1014905682341924945>)\n" +
     "- +1% gamble multi",
 });
-levellingRewards.set(30, { text: "you will now receive 3 📦 vote crates when voting" });
+levellingRewards.set(30, { text: "you will now receive 4 📦 vote crates when voting" });
 levellingRewards.set(40, {
   text:
     "you will now receive 4 📦 vote crates when voting\n\nyou have unlocked:\n" +

@@ -156,9 +156,9 @@ export default {
   PROGRESSION: {
     VOTE_CRATE: new Map([
       [0, 1],
-      [15, 2],
-      [30, 3],
-      [40, 4],
+      [5, 2],
+      [15, 3],
+      [30, 4],
       [50, 5],
     ]),
     MULTI: new Map([
