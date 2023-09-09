@@ -3,6 +3,7 @@ import { Command } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { getBankBalance } from "../utils/functions/economy/balance";
 import { getLevel, getLevelRequirements, getPrestige } from "../utils/functions/economy/levelling";
+import { createUser, userExists } from "../utils/functions/economy/utils";
 import { getXp } from "../utils/functions/economy/xp";
 import { getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
@@ -44,6 +45,8 @@ cmd.setRun(async (message) => {
       return await message.channel.send(data as BaseMessageOptions);
     }
   };
+
+  if (!(await userExists(message.member))) await createUser(message.member);
 
   if (await onCooldown(cmd.name, message.member)) {
     const embed = await getResponse(cmd.name, message.member);
