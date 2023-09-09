@@ -261,6 +261,8 @@ export async function getSellMulti(member: GuildMember | string): Promise<number
 
   multi += Math.floor(level * 0.869);
 
+  if (multi > 75) multi = 75;
+
   switch (tier) {
     case 1:
       multi += 2;
