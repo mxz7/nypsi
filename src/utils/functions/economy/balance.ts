@@ -259,7 +259,7 @@ export async function getSellMulti(member: GuildMember | string): Promise<number
 
   let multi = 0;
 
-  multi += Math.floor(level * 0.169);
+  multi += Math.floor(level * 0.869);
 
   switch (tier) {
     case 1:
