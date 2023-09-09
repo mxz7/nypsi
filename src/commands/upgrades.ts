@@ -63,9 +63,12 @@ cmd.setRun(async (message) => {
         upgrades
           .map(
             (i) =>
-              `\`${i.amount}x\` **${getUpgradesData()[i.upgradeId].name}** *${
-                getUpgradesData()[i.upgradeId].description
-              }*`,
+              `\`${i.amount}x\` **${getUpgradesData()[i.upgradeId].name}** *${getUpgradesData()[
+                i.upgradeId
+              ].description.replace(
+                "{x}",
+                (getUpgradesData()[i.upgradeId].effect * i.amount).toString(),
+              )}*`,
           )
           .join("\n"),
       ).setHeader("permanent upgrades", message.author.avatarURL()),
