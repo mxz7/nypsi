@@ -96,6 +96,23 @@ levellingRewards.set(250, {
 const xpFormula = (level: number, prestige: number) =>
   Math.floor(Math.pow(level + 1, 1.117 + 0.07 * prestige) + 100 + 15 * prestige) - 1;
 const moneyFormula = (level: number) => Math.floor(Math.pow(level + 1, 2.10769) + 25_000) - 1;
+const cratesFormula = (level: number, prestige: number) => {
+  const neededXp = xpFormula(level, prestige);
+
+  if (neededXp < 500) {
+    if (level % 15 !== 0) return 0;
+  } else {
+    if (level % 10 !== 0) return 0;
+  }
+
+  let crates = neededXp / 200;
+
+  crates += prestige * 0.69;
+
+  if (crates > 5) crates = 5;
+
+  return Math.floor(crates);
+};
 
 export async function getPrestige(member: GuildMember | string): Promise<number> {
   let id: string;
@@ -330,11 +347,11 @@ async function doLevelUp(
 
   const rawLevel = await getRawLevel(member);
 
-  const levelData = levellingRewards.get(rawLevel);
+  let levelData = levellingRewards.get(rawLevel);
 
   logger.info(`${id} levelled up to ${rawLevel} (P${prestige}L${level})`);
 
-  if (levelData?.rewards)
+  if (levelData?.rewards) {
     for (const reward of levelData.rewards) {
       if (reward.startsWith("id:")) {
         await addInventoryItem(member, reward.substring(3), 1, false);
@@ -344,6 +361,17 @@ async function doLevelUp(
         await addKarma(member, parseInt(reward.substring(6)));
       }
     }
+  } else {
+    const crates = cratesFormula(level, prestige);
+
+    if (crates > 0) {
+      await addInventoryItem(member, "basic_crate", crates);
+
+      levelData = {
+        text: `you have received:\n` + `- \`${crates}x\` 📦 basic crate${crates > 1 ? "s" : ""}`,
+      };
+    }
+  }
 
   const embed = new CustomEmbed(member instanceof GuildMember ? member : null)
     .setHeader(
@@ -353,9 +381,9 @@ async function doLevelUp(
         : (await prisma.user.findUnique({ where: { id }, select: { avatar: true } })).avatar,
     )
     .setDescription(
-      `you are now ${prestige > 0 ? `**prestige ${prestige} level ${level}**` : `level **${level}**`}${
-        levelData?.text ? `\n\n${levelData.text}` : ""
-      }`,
+      `you are now ${
+        prestige > 0 ? `**prestige ${prestige} level ${level}**` : `level **${level}**`
+      }${levelData?.text ? `\n\n${levelData.text}` : ""}`,
     );
 
   const dmSetting = (await getDmSettings(member)).level;
