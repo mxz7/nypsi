@@ -2478,5 +2478,25 @@
     "sell": 5000000,
     "in_crates": false,
     "tagId": "dog"
+  },
+  "xp_booster": {
+    "id": "xp_booster",
+    "name": "xp booster",
+    "article": "an",
+    "plural": "xp boosters",
+    "emoji": "✨",
+    "longDesc": "earn 20% more xp",
+    "rarity": 10,
+    "buy": 0,
+    "sell": 0,
+    "role": "booster",
+    "stackable": true,
+    "in_crates": false,
+    "max": 69,
+    "boosterEffect": {
+      "boosts": ["xp"],
+      "effect": 0.2,
+      "time": 1800
+    }
   }
 }

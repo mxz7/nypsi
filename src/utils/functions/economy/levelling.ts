@@ -8,9 +8,11 @@ import { addKarma } from "../karma/karma";
 import sleep from "../sleep";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { getBalance, getBankBalance, updateBalance, updateBankBalance } from "./balance";
+import { addBooster } from "./boosters";
 import { addInventoryItem } from "./inventory";
 import { getXp, updateXp } from "./xp";
 import ms = require("ms");
+import dayjs = require("dayjs");
 
 const levellingRewards = new Map<number, { text: string; rewards?: string[] }>();
 
@@ -369,6 +371,24 @@ async function doLevelUp(
       levelData = {
         text: `you have received:\n` + `- \`${crates}x\` 📦 basic crate${crates > 1 ? "s" : ""}`,
       };
+    }
+
+    if (level % 50 === 0) {
+      let time = 10;
+      if (prestige >= 5) time = 15;
+      if (level.toString().endsWith("50")) {
+        time *= 2;
+      }
+
+      await addBooster(member, "xp_booster", 1, dayjs().add(time, "minutes").toDate());
+
+      if (levelData?.text) {
+        levelData.text += `\n- \`${time}m\` ✨ xp booster`;
+      } else {
+        levelData = {
+          text: `you have received:\n` + `- \`${time}m\` ✨ xp booster`,
+        };
+      }
     }
   }
 
