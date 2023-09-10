@@ -18,10 +18,9 @@ levellingRewards.set(1, {
   text:
     "congratulations on your first level up and welcome to nypsi!!\ndon't forget to </vote:1014905682341924944> daily for rewards\n\n" +
     "you have received:\n" +
-    "- `1x` 📦 basic crate\n" +
     "- 🔮 50 karma\n" +
     "- $30,000",
-  rewards: ["id:basic_crate", "karma:50", "money:30000"],
+  rewards: ["karma:50", "money:30000"],
 });
 levellingRewards.set(3, {
   text:
