@@ -8,7 +8,7 @@ import { addKarma } from "../karma/karma";
 import sleep from "../sleep";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { getBalance, getBankBalance, updateBalance, updateBankBalance } from "./balance";
-import { addBooster } from "./boosters";
+import { addBooster, getBoosters } from "./boosters";
 import { addInventoryItem } from "./inventory";
 import { getXp, updateXp } from "./xp";
 import ms = require("ms");
@@ -374,20 +374,24 @@ async function doLevelUp(
     }
 
     if (level % 50 === 0) {
-      let time = 10;
-      if (prestige >= 5) time = 15;
-      if (level.toString().endsWith("50")) {
-        time *= 2;
-      }
+      const boosters = await getBoosters(member);
 
-      await addBooster(member, "xp_booster", 1, dayjs().add(time, "minutes").toDate());
+      if (!boosters.has("xp_booster")) {
+        let time = 10;
+        if (prestige >= 5) time = 15;
+        if (level.toString().endsWith("50")) {
+          time *= 2;
+        }
 
-      if (levelData?.text) {
-        levelData.text += `\n- \`${time}m\` ✨ xp booster`;
-      } else {
-        levelData = {
-          text: `you have received:\n` + `- \`${time}m\` ✨ xp booster`,
-        };
+        await addBooster(member, "xp_booster", 1, dayjs().add(time, "minutes").toDate());
+
+        if (levelData?.text) {
+          levelData.text += `\n- \`${time}m\` ✨ xp booster`;
+        } else {
+          levelData = {
+            text: `you have received:\n` + `- \`${time}m\` ✨ xp booster`,
+          };
+        }
       }
     }
   }
