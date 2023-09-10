@@ -38,7 +38,7 @@ async function run(
     const pages = PageManager.createPages(
       inPlaceSort(filter)
         .asc()
-        .map((i) => `${i}`),
+        .map((i) => `\`${i}\``),
       15,
     );
 
