@@ -71,7 +71,7 @@ cmd.setRun(async (message) => {
           `**bank** $${bank.toLocaleString()}/$${required.money.toLocaleString()}`,
       )
         .setHeader("level requirements", message.author.avatarURL())
-        .setFooter({ text: `currently P${prestige} L${level}` }),
+        .setFooter({ text: `currently prestige ${prestige} level ${level}` }),
     ],
   });
 });

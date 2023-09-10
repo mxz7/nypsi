@@ -210,7 +210,7 @@ async function run(
             `**rate** ${worker.base.per_interval.toLocaleString()} ${worker.item_emoji} / hour`,
         );
 
-        embed.setFooter({ text: `you are P${prestige}L${level}` });
+        embed.setFooter({ text: `you are prestige ${prestige} level ${level}` });
 
         if ((await getRawLevel(message.member)) >= worker.prestige_requirement) {
           row.addComponents(
