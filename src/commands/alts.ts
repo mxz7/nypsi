@@ -192,12 +192,16 @@ async function run(
         if (alt != null) {
           if ((await getMuteRole(message.guild)) != "timeout") {
             let toMute: string = null;
-    
+
             for (const id of await getAllGroupAccountIds(message.guild, msg.content)) {
               if (await isMuted(message.guild, id)) toMute = id;
             }
-    
-            if ((await isAltPunish(message.guild)) && !(await isMuted(message.guild, msg.content)) && toMute) {
+
+            if (
+              (await isAltPunish(message.guild)) &&
+              !(await isMuted(message.guild, msg.content)) &&
+              toMute
+            ) {
               const query = await prisma.moderationMute.findFirst({
                 where: {
                   guildId: message.guild.id,
@@ -207,17 +211,19 @@ async function run(
                   expire: true,
                 },
               });
-    
+
               await newMute(message.guild, [msg.content], query.expire);
-    
+
               let muteRole = await message.guild.roles.cache.get(await getMuteRole(message.guild));
-    
+
               if (!(await getMuteRole(message.guild))) {
-                muteRole = await message.guild.roles.cache.find((r) => r.name.toLowerCase() == "muted");
+                muteRole = await message.guild.roles.cache.find(
+                  (r) => r.name.toLowerCase() == "muted",
+                );
               }
-    
+
               if (!muteRole) return await deleteMute(message.guild, alt);
-    
+
               alt.roles.add(muteRole);
             }
           }
@@ -245,8 +251,7 @@ async function run(
             if (!fail) await newBan(message.guild, [msg.content], query.expire);
           }
         }
-      }
-      else
+      } else
         await res.editReply({
           embeds: [
             new CustomEmbed(
