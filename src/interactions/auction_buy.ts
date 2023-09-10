@@ -25,7 +25,7 @@ export default {
         });
       }
 
-      return buyFullAuction(interaction as ButtonInteraction, auction, false);
+      return buyFullAuction(interaction as ButtonInteraction, auction);
     } else if (auction.sold || Number(auction.itemAmount) === 0) {
       return await interaction.reply({
         embeds: [new ErrorEmbed("too slow ):").removeTitle()],

@@ -51,7 +51,7 @@ export default {
       if (auction.itemAmount == BigInt(amount)) {
         res.deferReply({ ephemeral: true });
         res.deleteReply();
-        return buyFullAuction(interaction as ButtonInteraction, auction, false);
+        return buyFullAuction(interaction as ButtonInteraction, auction);
       }
       setTimeout(() => userBuying.delete(interaction.user.id), ms("1 minute"));
       
