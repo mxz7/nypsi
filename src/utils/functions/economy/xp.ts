@@ -69,7 +69,7 @@ export async function calcEarnedGambleXp(
   }
 
   let min = 1;
-  let max = 7;
+  let max = 5;
 
   const [inventory, tier, booster, boosters, upgrades, rawLevel] = await Promise.all([
     getInventory(member),
@@ -87,14 +87,14 @@ export async function calcEarnedGambleXp(
 
   let betDivisor = 6000 * (rawLevel / 15) + 10_000;
 
-  if (betDivisor > 75_000) betDivisor = 75_000;
-  if (betDivisor < 10_000) betDivisor = 10_000;
+  if (betDivisor > 100_000) betDivisor = 100_000;
+  if (betDivisor < 20_000) betDivisor = 20_000;
 
   max += bet / betDivisor;
-  max += multiplier * 1.7;
+  max += multiplier * 2.5;
 
   if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0)
-    max += Math.floor(Math.random() * 7);
+    max += Math.floor(Math.random() * 10);
   if (inventory.find((i) => i.item == "white_gem")?.amount > 0) {
     const chance = Math.floor(Math.random() * 10);
 
