@@ -1,15 +1,15 @@
 import {
   ActionRowBuilder,
   ButtonInteraction,
-  Interaction,
   ModalBuilder,
+  ModalSubmitInteraction,
   TextInputBuilder,
   TextInputStyle,
 } from "discord.js";
 import prisma from "../init/database";
 import { ErrorEmbed } from "../models/EmbedBuilders";
 import { InteractionHandler } from "../types/InteractionHandler";
-import { buyFullAuction, buyAuctionMulti } from "../utils/functions/economy/auctions";
+import { buyAuctionMulti, buyFullAuction } from "../utils/functions/economy/auctions";
 import { isEcoBanned, userExists } from "../utils/functions/economy/utils";
 import ms = require("ms");
 
@@ -34,7 +34,7 @@ export default {
           ephemeral: true,
         });
       }
-      
+
       const res = await showMultiBuyModal(interaction, Number(auction.itemAmount)).catch(
         () => null,
       );
@@ -54,7 +54,7 @@ export default {
         return buyFullAuction(interaction as ButtonInteraction, auction);
       }
       setTimeout(() => userBuying.delete(interaction.user.id), ms("1 minute"));
-      
+
       return buyAuctionMulti(BigInt(amount), res, auction);
     } else if (auction.sold || Number(auction.itemAmount) === 0) {
       return await interaction.reply({
@@ -69,7 +69,8 @@ export default {
 } as InteractionHandler;
 
 async function showMultiBuyModal(interaction: ButtonInteraction, maxAmount: number) {
-  const modal = new ModalBuilder().setCustomId("auction-multi-buy").setTitle("buy multiple");
+  const id = `auction-confirm-${Math.floor(Math.random() * 69420)}`;
+  const modal = new ModalBuilder().setCustomId(id).setTitle("buy multiple");
 
   modal.addComponents(
     new ActionRowBuilder<TextInputBuilder>().addComponents(
@@ -85,7 +86,8 @@ async function showMultiBuyModal(interaction: ButtonInteraction, maxAmount: numb
 
   await interaction.showModal(modal);
 
-  const filter = (i: Interaction) => i.user.id == interaction.user.id;
+  const filter = (i: ModalSubmitInteraction) =>
+    i.user.id == interaction.user.id && i.customId === id;
 
   return await interaction.awaitModalSubmit({ filter, time: 30000 }).catch(() => {});
 }
