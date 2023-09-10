@@ -7,7 +7,6 @@ import {
   ButtonStyle,
   EmbedBuilder,
   GuildMember,
-  Interaction,
   MessageActionRowComponentBuilder,
   ModalBuilder,
   ModalSubmitInteraction,
@@ -548,7 +547,9 @@ export async function findAuctions(itemId: string) {
 }
 
 async function showAuctionConfirmation(interaction: ButtonInteraction, cost: number) {
-  const modal = new ModalBuilder().setCustomId("auction-confirm").setTitle("confirmation");
+  const id = `auction-confirm-${Math.floor(Math.random() * 69420)}`;
+
+  const modal = new ModalBuilder().setCustomId(id).setTitle("confirmation");
 
   modal.addComponents(
     new ActionRowBuilder<TextInputBuilder>().addComponents(
@@ -564,7 +565,8 @@ async function showAuctionConfirmation(interaction: ButtonInteraction, cost: num
 
   await interaction.showModal(modal);
 
-  const filter = (i: Interaction) => i.user.id == interaction.user.id;
+  const filter = (i: ModalSubmitInteraction) =>
+    i.user.id == interaction.user.id && i.customId === id;
 
   const res = await interaction.awaitModalSubmit({ filter, time: 30000 }).catch(() => {});
 
