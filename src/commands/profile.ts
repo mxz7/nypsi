@@ -45,7 +45,7 @@ import { getXp } from "../utils/functions/economy/xp";
 import { getMember } from "../utils/functions/member.js";
 import { getTier } from "../utils/functions/premium/premium";
 import { percentChance } from "../utils/functions/random";
-import { getActiveTag } from "../utils/functions/users/tags";
+import { getActiveTag, getTags } from "../utils/functions/users/tags";
 import { hasProfile } from "../utils/functions/users/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
@@ -129,7 +129,7 @@ async function run(
   const embed = new CustomEmbed(target)
     .setThumbnail(target.user.avatarURL())
     .setTitle(
-      `${tag ? `[${getTagsData()[tag.tagId]}] ` : ""}${target.user.username}${
+      `${tag ? `[${getTagsData()[tag.tagId].emoji}] ` : ""}${target.user.username}${
         tierMap.has(tier) ? ` ${tierMap.get(tier)}` : ""
       }`,
     )
@@ -148,6 +148,7 @@ async function run(
       levelRequirements,
       xp,
       guild,
+      tags,
     ] = await Promise.all([
       getBalance(target),
       getPrestige(target),
@@ -160,9 +161,11 @@ async function run(
       getLevelRequirements(target),
       getXp(target),
       getGuildByUser(target),
+      getTags(target.id),
     ]);
 
     embed.setFields([]);
+    row.setComponents([]);
     let padlockStatus = false;
 
     if (target.user.id == message.author.id && padlock) {
@@ -236,6 +239,14 @@ async function run(
         .setEmoji("🌟")
         .setStyle(ButtonStyle.Primary),
     );
+    if (tags.length > 0)
+      row.addComponents(
+        new ButtonBuilder()
+          .setCustomId("p-tag")
+          .setLabel("tags")
+          .setEmoji("🏷️")
+          .setStyle(ButtonStyle.Primary),
+      );
   };
 
   await updateEmbed();
@@ -447,6 +458,20 @@ async function run(
 
       await reaction.reply({ embeds: [embed] });
 
+      return awaitButton();
+    } else if (reaction.customId === "p-tag") {
+      const tags = await getTags(target.user.id);
+
+      await reaction.reply({
+        embeds: [
+          new CustomEmbed(
+            target,
+            `${tags.map(
+              (i) => `- ${getTagsData()[i.tagId].emoji} ${getTagsData()[i.tagId].name}`,
+            )}`,
+          ).setHeader(`${target.user.username}'s tags`, target.user.avatarURL()),
+        ],
+      });
       return awaitButton();
     }
   };
