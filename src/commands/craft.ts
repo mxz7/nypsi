@@ -206,7 +206,10 @@ async function run(
         item += `\n${craftable.toLocaleString()} craftable`;
       }
 
-      const score = (totalHas / totalNeeded) * 100;
+      let score = 0;
+
+      if (craftable > 0) score = craftable * 100;
+      else score = totalHas / totalNeeded;
 
       availableToCraftUnsorted.push([item, score]);
     }
