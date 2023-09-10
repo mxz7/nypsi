@@ -229,7 +229,7 @@ async function showUser(message: Message, user: User) {
             **xp** ${(await getXp(user.id)).toLocaleString()}
             **voted** ${voted}
             **prestige** ${await getPrestige(user.id)}
-            **bonus** ${Math.floor((await getGambleMulti(user.id)) * 100)}%`,
+            **bonus** ${Math.floor((await getGambleMulti(message.member)).multi * 100)}%`,
       true,
     );
   }

@@ -14,6 +14,7 @@ import {
   MessageActionRowComponentBuilder,
 } from "discord.js";
 import redis from "../init/redis";
+import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
@@ -40,7 +41,6 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 import { gamble, logger } from "../utils/logger";
 import _ = require("lodash");
 import ms = require("ms");
-import { NypsiClient } from "../models/Client";
 
 const cmd = new Command("tower", "play dragon tower", "money").setAliases([
   "dragon",
@@ -602,7 +602,7 @@ async function playGame(
 
   const win1 = async () => {
     let winnings = Math.round(game.bet * game.win);
-    const multi = await getGambleMulti(game.userId);
+    const multi = (await getGambleMulti(game.userId)).multi;
 
     if (multi > 0) {
       winnings += Math.round(winnings * multi);

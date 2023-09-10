@@ -121,7 +121,7 @@ export async function increaseBaseBankStorage(member: GuildMember, amount: numbe
   });
 }
 
-export async function getGambleMulti(member: GuildMember | string): Promise<number> {
+export async function getGambleMulti(member: GuildMember | string) {
   let id: string;
   if (member instanceof GuildMember) {
     id = member.user.id;
@@ -130,6 +130,7 @@ export async function getGambleMulti(member: GuildMember | string): Promise<numb
   }
 
   let multi = 0;
+  const breakdownMap = new Map<string, number>();
 
   const [
     booster,
@@ -154,7 +155,6 @@ export async function getGambleMulti(member: GuildMember | string): Promise<numb
   ]);
 
   let rawLevelModified = rawLevel;
-
   let levelBonus: number;
 
   while (typeof levelBonus !== "number") {
@@ -163,44 +163,71 @@ export async function getGambleMulti(member: GuildMember | string): Promise<numb
     } else rawLevelModified--;
   }
 
-  if (levelBonus > 0) multi += levelBonus;
+  if (levelBonus > 0) {
+    multi += levelBonus;
+    breakdownMap.set("level", levelBonus);
+  }
 
   switch (tier) {
     case 2:
       multi += 1;
+      breakdownMap.set("premium", 1);
       break;
     case 3:
       multi += 2;
+      breakdownMap.set("premium", 2);
       break;
     case 4:
       multi += 5;
+      breakdownMap.set("premium", 5);
       break;
   }
 
-  if (booster) multi += 2;
+  if (booster) {
+    multi += 2;
+    breakdownMap.set("booster", 2);
+  }
 
   const items = getItems();
 
-  if (guildUpgrades.find((i) => i.upgradeId === "multi"))
+  if (guildUpgrades.find((i) => i.upgradeId === "multi")) {
     multi += guildUpgrades.find((i) => i.upgradeId === "multi").amount;
+    breakdownMap.set("guild", guildUpgrades.find((i) => i.upgradeId === "multi").amount);
+  }
 
-  if (upgrades.find((i) => i.upgradeId === "multi"))
+  if (upgrades.find((i) => i.upgradeId === "multi")) {
     multi +=
       upgrades.find((i) => i.upgradeId === "multi").amount * getUpgradesData()["multi"].effect;
+    breakdownMap.set(
+      "upgrades",
+      upgrades.find((i) => i.upgradeId === "multi").amount * getUpgradesData()["multi"].effect,
+    );
+  }
 
   if (
     dmSettings.voteReminder &&
     !(await redis.sismember(Constants.redis.nypsi.VOTE_REMINDER_RECEIVED, id))
-  )
+  ) {
     multi += 2;
+    breakdownMap.set("vote reminders", 2);
+  }
 
-  if (passive) multi -= 3;
+  if (passive) {
+    multi -= 3;
+    breakdownMap.set("passive", -3);
+  }
+
+  const beforeBoosters = multi;
 
   for (const boosterId of boosters.keys()) {
     if (items[boosterId].boosterEffect.boosts.includes("multi")) {
       multi += items[boosterId].boosterEffect.effect * boosters.get(boosterId).length;
     }
   }
+
+  if (multi - beforeBoosters > 0) breakdownMap.set("boosters", multi - beforeBoosters);
+
+  const beforeGems = multi;
 
   if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0)
     multi += Math.floor(Math.random() * 7);
@@ -229,12 +256,14 @@ export async function getGambleMulti(member: GuildMember | string): Promise<numb
     }
   }
 
+  if (beforeGems - multi > 0) breakdownMap.set("gems", beforeGems - multi);
+
   multi = Math.floor(multi);
   if (multi < 0) multi = 0;
 
   multi = multi / 100;
 
-  return parseFloat(multi.toFixed(2));
+  return { multi: parseFloat(multi.toFixed(2)), breakdown: breakdownMap };
 }
 
 export async function getSellMulti(member: GuildMember | string): Promise<number> {

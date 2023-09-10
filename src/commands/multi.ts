@@ -24,7 +24,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (!(await userExists(message.member))) await createUser(message.member);
 
   const embed = new CustomEmbed(message.member).setDescription(
-    `gamble multiplier: **${Math.floor((await getGambleMulti(message.member)) * 100)}**%\n` +
+    `gamble multiplier: **${Math.floor((await getGambleMulti(message.member)).multi * 100)}**%\n` +
       `sell multiplier: **${Math.floor((await getSellMulti(message.member)) * 100)}**%`,
   );
 
