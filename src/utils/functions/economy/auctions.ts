@@ -587,6 +587,7 @@ async function showAuctionConfirmation(interaction: ButtonInteraction, cost: num
 export async function buyFullAuction(
   interaction: ButtonInteraction,
   auction: Auction,
+  alreadyConfirmed: boolean,
   repeatCount = 1,
 ) {
   if (beingBought.has(auction.id)) {
@@ -598,6 +599,7 @@ export async function buyFullAuction(
           buyFullAuction(
             interaction,
             await prisma.auction.findUnique({ where: { id: auction.id } }),
+            false,
             repeatCount + 1,
           ),
         );
@@ -624,11 +626,13 @@ export async function buyFullAuction(
 
   const preferences = await getPreferences(interaction.user.id);
 
-  if (auction.bin >= preferences.auctionConfirm && Number(preferences.auctionConfirm) !== 0) {
+  if (auction.bin >= preferences.auctionConfirm && Number(preferences.auctionConfirm) !== 0 && !alreadyConfirmed) {
     beingBought.delete(auction.id);
     const modalResponse = await showAuctionConfirmation(interaction, Number(auction.bin)).catch(
       () => {},
     );
+    if (beingBought.has(auction.id)) return;
+    beingBought.add(auction.id);
 
     if (!modalResponse) return beingBought.delete(auction.id);
 
@@ -818,7 +822,7 @@ export async function buyAuctionOne(
 
   if (interaction.createdTimestamp < Date.now() - 5000) return;
 
-  if (Number(auction.itemAmount) === 1) return buyFullAuction(interaction, auction);
+  if (Number(auction.itemAmount) === 1) return buyFullAuction(interaction, auction, false);
 
   if (!(await userExists(interaction.user.id))) await createUser(interaction.user.id);
 

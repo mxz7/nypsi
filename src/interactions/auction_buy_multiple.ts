@@ -11,6 +11,9 @@ import { ErrorEmbed } from "../models/EmbedBuilders";
 import { InteractionHandler } from "../types/InteractionHandler";
 import { buyFullAuction, buyAuctionMulti } from "../utils/functions/economy/auctions";
 import { isEcoBanned, userExists } from "../utils/functions/economy/utils";
+import ms = require("ms");
+
+const userBuying = new Map<string, number>();
 
 export default {
   name: "b-multi",
@@ -31,12 +34,14 @@ export default {
           ephemeral: true,
         });
       }
-
+      
       const res = await showMultiBuyModal(interaction, Number(auction.itemAmount)).catch(
         () => null,
       );
+      if (userBuying.has(interaction.user.id)) return;
+      userBuying.set(interaction.user.id, auction.id);
 
-      if (!res || !res.isModalSubmit()) return;
+      if (!res || !res.isModalSubmit()) return userBuying.delete(interaction.user.id);
 
       const amount = parseInt(res.fields.fields.first().value);
 
@@ -46,9 +51,10 @@ export default {
       if (auction.itemAmount == BigInt(amount)) {
         res.deferReply({ ephemeral: true });
         res.deleteReply();
-        return buyFullAuction(interaction as ButtonInteraction, auction);
+        return buyFullAuction(interaction as ButtonInteraction, auction, false);
       }
-
+      setTimeout(() => userBuying.delete(interaction.user.id), ms("1 minute"));
+      
       return buyAuctionMulti(BigInt(amount), res, auction);
     } else if (auction.sold || Number(auction.itemAmount) === 0) {
       return await interaction.reply({
