@@ -108,5 +108,16 @@
     "type": "item",
     "value": "gem_crate",
     "limit": 1
+  },
+  "reroll_token": {
+    "name": "reroll token",
+    "emoji": "<:reroll_token:1150463797497184307>",
+    "id": "reroll_token",
+    "cost": 1500,
+    "items_left": 1,
+    "aliases": ["reroll"],
+    "type": "item",
+    "value": "reroll_token",
+    "limit": 1
   }
 }

@@ -290,23 +290,26 @@ export async function setUpgrade(member: GuildMember | string, upgradeId: string
     id = member;
   }
 
-  await prisma.upgrades.upsert({
-    where: {
-      userId_upgradeId: {
+  if (amount === 0)
+    await prisma.upgrades.delete({ where: { userId_upgradeId: { userId: id, upgradeId } } });
+  else
+    await prisma.upgrades.upsert({
+      where: {
+        userId_upgradeId: {
+          upgradeId,
+          userId: id,
+        },
+      },
+      update: {
+        upgradeId,
+        amount,
+      },
+      create: {
+        amount,
         upgradeId,
         userId: id,
       },
-    },
-    update: {
-      upgradeId,
-      amount,
-    },
-    create: {
-      amount,
-      upgradeId,
-      userId: id,
-    },
-  });
+    });
 
   await redis.del(`${Constants.redis.cache.economy.UPGRADES}:${id}`);
 

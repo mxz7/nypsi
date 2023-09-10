@@ -5,7 +5,7 @@
     "effect": 1,
     "description": "+{x}% gamble multiplier",
     "max": 5,
-    "chance": 4
+    "chance": 5
   },
   "sell_multi": {
     "id": "sell_multi",

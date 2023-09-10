@@ -139,7 +139,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const upgradesPool: string[] = [];
     let attempts = 0;
 
-    while (upgradesPool.length === 0 && attempts < 10) {
+    while (upgradesPool.length === 0 && attempts < 50) {
       attempts++;
       for (const upgrade of Object.values(getUpgradesData())) {
         if (
@@ -157,20 +157,21 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const chosen =
       upgradesPool.length > 0 ? upgradesPool[Math.floor(Math.random() * upgradesPool.length)] : "";
 
-    await setUpgrade(
-      message.member,
-      chosen,
-      upgrades.find((i) => i.upgradeId === chosen)
-        ? upgrades.find((i) => i.upgradeId === chosen).amount + 1
-        : 1,
-    );
+    if (chosen)
+      await setUpgrade(
+        message.member,
+        chosen,
+        upgrades.find((i) => i.upgradeId === chosen)
+          ? upgrades.find((i) => i.upgradeId === chosen).amount + 1
+          : 1,
+      );
 
     const desc: string[] = [];
 
     if (chosen) {
       desc.push(`you have received the ${getUpgradesData()[chosen].name} upgrade`);
     } else {
-      desc.push("you didn't find an upgrade this prestige");
+      desc.push("you didn't find an upgrade this prestige ):");
     }
 
     return msg.edit({
@@ -178,7 +179,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         new CustomEmbed()
           .setHeader("prestige", message.author.avatarURL())
           .setColor(Constants.EMBED_SUCCESS_COLOR)
-          .setDescription(`you are now **prestige ${prestige + 1} level ${level - 100}**\n\n${desc.join("\n")}`),
+          .setDescription(
+            `you are now **prestige ${prestige + 1} level ${level - 100}**\n\n${desc.join("\n")}`,
+          ),
       ],
       components: [],
     });
