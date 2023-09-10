@@ -616,6 +616,8 @@ export async function buyFullAuction(
     beingBought.delete(auction.id);
   }
 
+  if (!(await userExists(interaction.user.id))) await createUser(interaction.user.id);
+
   if ((await getBalance(interaction.user.id)) < Number(auction.bin)) {
     beingBought.delete(auction.id);
     return await interaction.reply({
@@ -629,7 +631,7 @@ export async function buyFullAuction(
   if (auction.bin >= preferences.auctionConfirm && Number(preferences.auctionConfirm) !== 0) {
     beingBought.delete(auction.id);
     const modalResponse = await showAuctionConfirmation(interaction, Number(auction.bin)).catch(
-      () => {},
+      () => null,
     );
     if (beingBought.has(auction.id)) return;
     beingBought.add(auction.id);
