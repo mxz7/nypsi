@@ -5,7 +5,6 @@ import { CustomEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { addKarma } from "../karma/karma";
-import sleep from "../sleep";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { getBalance, getBankBalance, updateBalance, updateBankBalance } from "./balance";
 import { addBooster, getBoosters } from "./boosters";
@@ -95,7 +94,7 @@ levellingRewards.set(250, {
 });
 
 const xpFormula = (level: number, prestige: number) =>
-  Math.floor(Math.pow(level + 1, 1.117 + 0.07 * prestige) + 100 + 15 * prestige) - 1;
+  Math.floor(Math.pow(level + 1, 1.117 + 0.077 * prestige) + 100 + 15 * prestige) - 1;
 const moneyFormula = (level: number) => Math.floor(Math.pow(level + 1, 2.10769) + 25_000) - 1;
 const cratesFormula = (level: number, prestige: number) => {
   const neededXp = xpFormula(level, prestige);
@@ -314,7 +313,7 @@ export async function setUpgrade(member: GuildMember | string, upgradeId: string
   return await getUpgrades(member);
 }
 
-export async function checkLevelUp(member: GuildMember | string) {
+export async function checkLevelUp(member: GuildMember | string, consecutive?: number) {
   const [xp, bank, requirements] = await Promise.all([
     getXp(member),
     getBankBalance(member),
@@ -322,7 +321,7 @@ export async function checkLevelUp(member: GuildMember | string) {
   ]);
 
   if (requirements.money <= bank && requirements.xp <= xp) {
-    await doLevelUp(member, requirements);
+    await doLevelUp(member, requirements, consecutive);
     return true;
   }
 
@@ -332,6 +331,7 @@ export async function checkLevelUp(member: GuildMember | string) {
 async function doLevelUp(
   member: GuildMember | string,
   requirements: { money: number; xp: number },
+  consecutive = 1,
 ) {
   let id: string;
   if (member instanceof GuildMember) {
@@ -424,7 +424,9 @@ async function doLevelUp(
       break;
   }
 
-  await sleep(100);
+  // await sleep(100);
 
-  return await checkLevelUp(member);
+  if (consecutive >= 50) return;
+
+  return await checkLevelUp(member, consecutive + 1);
 }
