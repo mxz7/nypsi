@@ -20,7 +20,6 @@ import { logger } from "../utils/logger";
 import { isAltPunish } from "../utils/functions/guilds/altpunish";
 import { getAllGroupAccountIds } from "../utils/functions/moderation/alts";
 import prisma from "../init/database";
-import { newCase } from "../utils/functions/moderation/cases";
 import { isBanned, newBan } from "../utils/functions/moderation/ban";
 
 const queue = new Set<string>();
@@ -126,14 +125,6 @@ export default async function guildMemberAdd(member: GuildMember) {
 
     if (fail) return;
 
-    await newCase(
-      member.guild,
-      "ban",
-      member.user.id,
-      member.guild.members.me.user,
-      `known alt of banned user joined`,
-    );
-
     await newBan(member.guild, [member.user.id], query.expire);
 
     return;
@@ -159,14 +150,6 @@ export default async function guildMemberAdd(member: GuildMember) {
         expire: true,
       },
     });
-
-    await newCase(
-      member.guild,
-      "mute",
-      member.user.id,
-      member.guild.members.me.user,
-      `known alt of muted user joined`,
-    );
 
     await newMute(member.guild, [member.user.id], query.expire);
 
