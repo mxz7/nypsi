@@ -122,35 +122,9 @@ async function run(
 
   if (!(await userExists(target))) await createUser(target);
 
-  const [
-    balance,
-    prestige,
-    inventory,
-    net,
-    bankBalance,
-    bankMaxBalance,
-    padlock,
-    level,
-    tier,
-    tag,
-    levelRequirements,
-    xp,
-    guild,
-  ] = await Promise.all([
-    getBalance(target),
-    getPrestige(target),
-    getInventory(target),
-    calcNetWorth(target),
-    getBankBalance(target),
-    getMaxBankBalance(target),
-    hasPadlock(target),
-    getLevel(target),
-    getTier(target),
-    getActiveTag(target.user.id),
-    getLevelRequirements(target),
-    getXp(target),
-    getGuildByUser(target),
-  ]);
+  const [tag, tier] = await Promise.all([getActiveTag(target.user.id), getTier(target)]);
+
+  const row = new ActionRowBuilder<MessageActionRowComponentBuilder>();
 
   const embed = new CustomEmbed(target)
     .setThumbnail(target.user.avatarURL())
@@ -161,81 +135,110 @@ async function run(
     )
     .setURL(`https://nypsi.xyz/user/${target.id}`);
 
-  let padlockStatus = false;
+  const updateEmbed = async () => {
+    const [
+      balance,
+      prestige,
+      inventory,
+      net,
+      bankBalance,
+      bankMaxBalance,
+      padlock,
+      level,
+      levelRequirements,
+      xp,
+      guild,
+    ] = await Promise.all([
+      getBalance(target),
+      getPrestige(target),
+      getInventory(target),
+      calcNetWorth(target),
+      getBankBalance(target),
+      getMaxBankBalance(target),
+      hasPadlock(target),
+      getLevel(target),
+      getLevelRequirements(target),
+      getXp(target),
+      getGuildByUser(target),
+    ]);
 
-  if (target.user.id == message.author.id && padlock) {
-    padlockStatus = true;
-  }
+    embed.setFields([]);
+    let padlockStatus = false;
 
-  let gemLine = "";
-
-  const gems: string[] = [];
-  inventory.forEach((i) => {
-    switch (i.item) {
-      case "crystal_heart":
-      case "white_gem":
-      case "pink_gem":
-      case "purple_gem":
-      case "blue_gem":
-      case "green_gem":
-        gems.push(i.item);
-        break;
+    if (target.user.id == message.author.id && padlock) {
+      padlockStatus = true;
     }
-  });
-  if (gems.includes("crystal_heart")) gemLine += `${getItems()["crystal_heart"].emoji}`;
-  if (gems.includes("white_gem")) gemLine += `${getItems()["white_gem"].emoji}`;
-  if (gems.includes("pink_gem")) gemLine += `${getItems()["pink_gem"].emoji}`;
-  if (gems.includes("purple_gem")) gemLine += `${getItems()["purple_gem"].emoji}`;
-  if (gems.includes("blue_gem")) gemLine += `${getItems()["blue_gem"].emoji}`;
-  if (gems.includes("green_gem")) gemLine += `${getItems()["green_gem"].emoji}`;
 
-  const balanceSection =
-    `${padlockStatus ? "🔒" : "💰"} $**${formatNumber(balance)}**\n` +
-    `💳 $**${formatNumber(bankBalance)}** / $**${formatNumber(bankMaxBalance)}**${
-      net.amount > 15_000_000 ? `\n🌍 $**${formatNumber(net.amount)}**` : ""
-    }`;
+    let gemLine = "";
 
-  if (gemLine) embed.setDescription(gemLine);
-  embed.addField("balance", balanceSection, true);
-  embed.addField(
-    "level",
-    `P${prestige} L${level}\n` +
-      `**${formatNumber(xp)}**xp/**${formatNumber(levelRequirements.xp)}**xp\n` +
-      `$**${formatNumber(bankBalance)}**/$**${formatNumber(levelRequirements.money)}**`,
-    true,
-  );
-  if (guild)
+    const gems: string[] = [];
+    inventory.forEach((i) => {
+      switch (i.item) {
+        case "crystal_heart":
+        case "white_gem":
+        case "pink_gem":
+        case "purple_gem":
+        case "blue_gem":
+        case "green_gem":
+          gems.push(i.item);
+          break;
+      }
+    });
+    if (gems.includes("crystal_heart")) gemLine += `${getItems()["crystal_heart"].emoji}`;
+    if (gems.includes("white_gem")) gemLine += `${getItems()["white_gem"].emoji}`;
+    if (gems.includes("pink_gem")) gemLine += `${getItems()["pink_gem"].emoji}`;
+    if (gems.includes("purple_gem")) gemLine += `${getItems()["purple_gem"].emoji}`;
+    if (gems.includes("blue_gem")) gemLine += `${getItems()["blue_gem"].emoji}`;
+    if (gems.includes("green_gem")) gemLine += `${getItems()["green_gem"].emoji}`;
+
+    const balanceSection =
+      `${padlockStatus ? "🔒" : "💰"} $**${formatNumber(balance)}**\n` +
+      `💳 $**${formatNumber(bankBalance)}** / $**${formatNumber(bankMaxBalance)}**${
+        net.amount > 15_000_000 ? `\n🌍 $**${formatNumber(net.amount)}**` : ""
+      }`;
+
+    if (gemLine) embed.setDescription(gemLine);
+    embed.addField("balance", balanceSection, true);
     embed.addField(
-      "guild",
-      `[${guild.guildName}](https://nypsi.xyz/guild/${encodeURIComponent(guild.guildName)})\n` +
-        `level **${guild.level}**\n` +
-        `${guild.members.length} member${guild.members.length > 1 ? "s" : ""}`,
+      "level",
+      `P${prestige} L${level}\n` +
+        `**${formatNumber(xp)}**xp/**${formatNumber(levelRequirements.xp)}**xp\n` +
+        `$**${formatNumber(bankBalance)}**/$**${formatNumber(levelRequirements.money)}**`,
       true,
     );
+    if (guild)
+      embed.addField(
+        "guild",
+        `[${guild.guildName}](https://nypsi.xyz/guild/${encodeURIComponent(guild.guildName)})\n` +
+          `level **${guild.level}**\n` +
+          `${guild.members.length} member${guild.members.length > 1 ? "s" : ""}`,
+        true,
+      );
 
-  const row = new ActionRowBuilder<MessageActionRowComponentBuilder>();
+    if (target.id === message.author.id)
+      row.addComponents(
+        new ButtonBuilder()
+          .setCustomId("p-pre")
+          .setLabel("prestige")
+          .setEmoji("✨")
+          .setStyle(level >= 100 ? ButtonStyle.Success : ButtonStyle.Danger),
+      );
 
-  if (target.id === message.author.id)
     row.addComponents(
       new ButtonBuilder()
-        .setCustomId("p-pre")
-        .setLabel("prestige")
-        .setEmoji("✨")
-        .setStyle(level >= 100 ? ButtonStyle.Success : ButtonStyle.Danger),
+        .setCustomId("p-upg")
+        .setLabel("upgrades")
+        .setEmoji("💫")
+        .setStyle(ButtonStyle.Primary),
+      new ButtonBuilder()
+        .setCustomId("p-mul")
+        .setLabel("multiplier")
+        .setEmoji("🌟")
+        .setStyle(ButtonStyle.Primary),
     );
+  };
 
-  row.addComponents(
-    new ButtonBuilder()
-      .setCustomId("p-upg")
-      .setLabel("upgrades")
-      .setEmoji("💫")
-      .setStyle(ButtonStyle.Primary),
-    new ButtonBuilder()
-      .setCustomId("p-mul")
-      .setLabel("multiplier")
-      .setEmoji("🌟")
-      .setStyle(ButtonStyle.Primary),
-  );
+  await updateEmbed();
 
   const msg = await send({ embeds: [embed], components: [row] });
 
@@ -250,6 +253,7 @@ async function run(
     if (!reaction) return msg.edit({ components: [] });
 
     if (reaction.customId === "p-pre") {
+      const [level, prestige] = await Promise.all([getLevel(target), getPrestige(target)]);
       if (reaction.user.id === target.user.id) {
         if (level < 100) {
           await reaction.reply({
@@ -277,35 +281,41 @@ async function run(
           return awaitButton();
         }
 
-        const embed = new CustomEmbed(
+        const prestigeConfirmation = new CustomEmbed(
           message.member,
           `confirm you want to become even cooler (prestige ${prestige + 1} level ${level - 100})`,
         ).setHeader("prestige", message.author.avatarURL());
 
-        const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        const prestigeRow = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
           new ButtonBuilder().setCustomId("✅").setLabel("do it.").setStyle(ButtonStyle.Success),
         );
 
-        const msg = await reaction.reply({ embeds: [embed], components: [row] });
+        const prestigeMsg = await reaction
+          .reply({ embeds: [prestigeConfirmation], components: [prestigeRow] })
+          .then(() => reaction.fetchReply());
 
-        const prestigeReaction = await msg
+        const prestigeReaction: string = await prestigeMsg
           .awaitMessageComponent({ filter: (i) => i.user.id === message.author.id, time: 15000 })
           .then(async (collected) => {
             await collected.deferUpdate();
             return collected.customId;
           })
           .catch(async () => {
-            embed.setDescription("❌ expired");
-            await msg.edit({ embeds: [embed], components: [] });
+            prestigeConfirmation.setDescription("❌ expired");
+            await prestigeMsg.edit({ embeds: [prestigeConfirmation], components: [] });
+            return null;
           });
 
-        if (prestigeReaction == "✅") {
+        if (!prestigeReaction) return;
+
+        if (prestigeReaction === "✅") {
           const [level, prestige] = await Promise.all([
             getLevel(message.member),
             getPrestige(message.member),
           ]);
 
-          if (level < 100) return msg.edit({ embeds: [new ErrorEmbed("lol nice try loser")] });
+          if (level < 100)
+            return prestigeMsg.edit({ embeds: [new ErrorEmbed("lol nice try loser")] });
 
           const [upgrades] = await Promise.all([
             getUpgrades(message.member),
@@ -353,7 +363,7 @@ async function run(
             desc.push("you didn't find an upgrade this prestige ):");
           }
 
-          await msg.edit({
+          await prestigeMsg.edit({
             embeds: [
               new CustomEmbed()
                 .setHeader("prestige", message.author.avatarURL())
@@ -366,6 +376,8 @@ async function run(
             ],
             components: [],
           });
+          await updateEmbed();
+          await msg.edit({ embeds: [embed], components: [row] });
           return awaitButton();
         }
       } else {
