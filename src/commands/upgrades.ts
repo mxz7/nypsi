@@ -70,7 +70,7 @@ cmd.setRun(async (message) => {
                 (i.upgradeId.includes("xp")
                   ? Math.floor(getUpgradesData()[i.upgradeId].effect * i.amount * 100)
                   : getUpgradesData()[i.upgradeId].effect * i.amount
-                ).toString(),
+                ).toPrecision(2),
               )}*`,
           )
           .join("\n"),
