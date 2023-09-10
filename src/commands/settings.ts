@@ -10,6 +10,7 @@ import {
   Message,
   MessageActionRowComponentBuilder,
   ModalBuilder,
+  ModalSubmitInteraction,
   StringSelectMenuBuilder,
   StringSelectMenuOptionBuilder,
   TextInputBuilder,
@@ -27,6 +28,7 @@ import {
 } from "../utils/functions/economy/balance";
 import { isPassive, setPassive } from "../utils/functions/economy/passive";
 import { createUser, formatNumber, userExists } from "../utils/functions/economy/utils";
+import { setAltPunish } from "../utils/functions/guilds/altpunish";
 import { setSlashOnly } from "../utils/functions/guilds/slash";
 import { cleanString } from "../utils/functions/string";
 import { checkPurchases, getEmail, setEmail } from "../utils/functions/users/email";
@@ -41,7 +43,6 @@ import {
 } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import ms = require("ms");
-import { setAltPunish } from "../utils/functions/guilds/altpunish";
 
 const cmd = new Command("settings", "manage nypsi settings for your server and you", "utility");
 
@@ -333,7 +334,8 @@ async function run(
 
           await res.showModal(modal);
 
-          const filter = (i: Interaction) => i.user.id == res.user.id;
+          const filter = (i: ModalSubmitInteraction) =>
+            i.user.id == res.user.id && i.customId === "settings-update";
 
           const modalResponse = await res
             .awaitModalSubmit({ filter, time: 120000 })
@@ -562,7 +564,8 @@ async function run(
 
           await res.showModal(modal);
 
-          const filter = (i: Interaction) => i.user.id == res.user.id;
+          const filter = (i: ModalSubmitInteraction) =>
+            i.user.id == res.user.id && i.customId === "settings-update";
 
           const modalResponse = await res
             .awaitModalSubmit({ filter, time: 120000 })
