@@ -51,7 +51,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       await setLastWeekly(message.author.id, now);
 
       let amount = 150000;
-      const multi = await getSellMulti(message.member);
+      const multi = (await getSellMulti(message.member)).multi;
 
       let description = `$${(
         await getBalance(message.member)
