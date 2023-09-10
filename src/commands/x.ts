@@ -20,7 +20,7 @@ import Constants from "../utils/Constants";
 import { b, c } from "../utils/functions/anticheat";
 import { updateBalance, updateBankBalance } from "../utils/functions/economy/balance";
 import { setInventoryItem } from "../utils/functions/economy/inventory";
-import { setPrestige } from "../utils/functions/economy/levelling";
+import { setLevel, setPrestige } from "../utils/functions/economy/levelling";
 import { getItems, isEcoBanned, setEcoBan } from "../utils/functions/economy/utils";
 import { updateXp } from "../utils/functions/economy/xp";
 import { addKarma, getKarma, removeKarma } from "../utils/functions/karma/karma";
@@ -244,17 +244,22 @@ async function run(
           .setStyle(ButtonStyle.Danger)
           .setEmoji("🌟"),
         new ButtonBuilder()
+          .setCustomId("set-level")
+          .setLabel("set level")
+          .setStyle(ButtonStyle.Danger)
+          .setEmoji("⭐"),
+        new ButtonBuilder()
           .setCustomId("set-xp")
           .setLabel("set xp")
           .setStyle(ButtonStyle.Danger)
           .setEmoji("✨"),
+      ),
+      new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()
           .setCustomId("set-inv")
           .setLabel("modify inventory")
           .setStyle(ButtonStyle.Danger)
           .setEmoji("🎒"),
-      ),
-      new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()
           .setCustomId("set-karma")
           .setLabel("set karma")
@@ -575,6 +580,41 @@ async function run(
           `admin: ${message.author.id} (${message.author.username}) set ${user.id} prestige to ${msg.content}`,
         );
         await setPrestige(user.id, parseInt(msg.content));
+        msg.react("✅");
+        return waitForButton();
+      } else if (res.customId === "set-level") {
+        if ((await getAdminLevel(message.author.id)) < 4) {
+          await res.editReply({
+            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
+          });
+          return waitForButton();
+        }
+
+        await res.editReply({
+          embeds: [new CustomEmbed(message.member, "enter new level")],
+        });
+
+        const msg = await message.channel
+          .awaitMessages({
+            filter: (msg: Message) => msg.author.id === message.author.id,
+            max: 1,
+            time: 30000,
+          })
+          .then((collected) => collected.first())
+          .catch(() => {
+            res.editReply({ embeds: [new CustomEmbed(message.member, "expired")] });
+          });
+
+        if (!msg) return;
+        if (!parseInt(msg.content) && parseInt(msg.content) != 0) {
+          await res.editReply({ embeds: [new CustomEmbed(message.member, "invalid value")] });
+          return waitForButton();
+        }
+
+        logger.info(
+          `admin: ${message.author.id} (${message.author.username}) set ${user.id} level to ${msg.content}`,
+        );
+        await setLevel(user.id, parseInt(msg.content));
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "set-xp") {
