@@ -45,7 +45,7 @@ export default {
 
       const amount = parseInt(res.fields.fields.first().value);
 
-      if (!amount)
+      if (!amount || amount < 1)
         return res.reply({ embeds: [new ErrorEmbed("invalid amount")], ephemeral: true });
 
       if (auction.itemAmount == BigInt(amount)) {
