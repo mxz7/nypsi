@@ -629,6 +629,8 @@ export async function buyFullAuction(
     const modalResponse = await showAuctionConfirmation(interaction, Number(auction.bin)).catch(
       () => {},
     );
+    if (beingBought.has(auction.id)) return;
+    beingBought.add(auction.id);
 
     if (!modalResponse) return beingBought.delete(auction.id);
 
