@@ -13,8 +13,6 @@ const cmd = new Command("level", "view your progress to the next level", "money"
   "levelup",
 ]);
 
-cmd.slashEnabled = true;
-
 cmd.setRun(async (message) => {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {

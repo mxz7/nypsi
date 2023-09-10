@@ -36,8 +36,6 @@ import {
 
 const cmd = new Command("prestige", "prestige to gain extra benefits", "money");
 
-cmd.slashEnabled = true;
-
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
