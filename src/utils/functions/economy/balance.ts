@@ -360,7 +360,7 @@ export async function getSellMulti(member: GuildMember | string) {
     }
   }
 
-  if (beforeBoosters - multi !== 0) breakdown.set("boosters", beforeBoosters - multi);
+  if (multi - beforeBoosters !== 0) breakdown.set("boosters", multi - beforeBoosters);
   const beforeGems = multi;
 
   if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0)
@@ -387,7 +387,7 @@ export async function getSellMulti(member: GuildMember | string) {
     }
   }
 
-  if (beforeGems - multi !== 0) breakdown.set("boosters", beforeGems - multi);
+  if (multi - beforeGems !== 0) breakdown.set("gems", multi - beforeGems);
 
   multi = Math.floor(multi);
   if (multi < 0) multi = 0;
