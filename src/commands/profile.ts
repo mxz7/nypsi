@@ -49,7 +49,9 @@ import { getActiveTag, getTags } from "../utils/functions/users/tags";
 import { hasProfile } from "../utils/functions/users/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command("profile", "view yours or someone's nypsi profile", "money");
+const cmd = new Command("profile", "view yours or someone's nypsi profile", "money").setAliases([
+  "p",
+]);
 
 cmd.slashEnabled = true;
 cmd.slashData.addUserOption((user) =>
