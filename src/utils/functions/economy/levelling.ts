@@ -406,6 +406,18 @@ async function doLevelUp(
       }
     }
 
+    if (level % 69 === 0) {
+      await addInventoryItem(member, "69420_crate", 5);
+
+      if (levelData?.text) {
+        levelData.text += "\n- `5x` 🎁 69420 crate";
+      } else {
+        levelData = {
+          text: "you have received:\n" + "- `5x` 🎁 69420 crate",
+        };
+      }
+    }
+
     if (level % 50 === 0) {
       const boosters = await getBoosters(member);
 
