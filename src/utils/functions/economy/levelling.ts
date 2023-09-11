@@ -341,6 +341,17 @@ export async function setUpgrade(member: GuildMember | string, upgradeId: string
 }
 
 export async function checkLevelUp(member: GuildMember | string, consecutive?: number) {
+  let id: string;
+  if (member instanceof GuildMember) {
+    id = member.user.id;
+  } else {
+    id = member;
+  }
+
+  if (!consecutive) {
+    if (await redis.exists(`nypsi:levelup:progress:${id}`)) return false;
+  }
+
   const [xp, bank, requirements] = await Promise.all([
     getXp(member),
     getBankBalance(member),
@@ -348,7 +359,9 @@ export async function checkLevelUp(member: GuildMember | string, consecutive?: n
   ]);
 
   if (requirements.money <= bank && requirements.xp <= xp) {
+    if (!consecutive) await redis.set(`nypsi:levelup:progress:${id}`, "t", "EX", 300);
     await doLevelUp(member, requirements, consecutive);
+    if (!consecutive) await redis.del(`nypsi:levelup:progress:${id}`);
     return true;
   }
 
