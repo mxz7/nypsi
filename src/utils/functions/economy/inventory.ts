@@ -158,6 +158,8 @@ export async function addInventoryItem(
     id = member;
   }
 
+  if (amount <= 0) return;
+
   if (!(await userExists(id))) await createUser(id);
 
   if (!getItems()[itemId]) {
