@@ -182,12 +182,12 @@ cmd.setRun((message, args) => {
 
     embed.setFields(...pages.get(1));
 
-    const msg = await send({ embeds: [embed], components: [PageManager.defaultRow] });
+    const msg = await send({ embeds: [embed], components: [PageManager.defaultRow()] });
 
     const manager = new PageManager({
       embed,
       message: msg,
-      row: PageManager.defaultRow,
+      row: PageManager.defaultRow(),
       userId: message.author.id,
       pages,
       updateEmbed(page, embed) {
