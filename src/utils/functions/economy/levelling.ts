@@ -474,7 +474,7 @@ async function doLevelUp(
 
   await sleep(69);
 
-  if (consecutive >= 50) return;
+  if (consecutive >= 10) return;
 
   return await checkLevelUp(member, consecutive + 1);
 }
