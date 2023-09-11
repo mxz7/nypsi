@@ -597,7 +597,11 @@ export async function calcMaxBet(member: GuildMember | string): Promise<number> 
 
   total += levelBonus;
 
-  if (total > 1_000_000) total = 1_000_000;
+  if (total > 1_000_000) {
+    total = 1_000_000;
+
+    if (level > 400) total += Math.floor((level - 400) / 30) * 10000;
+  }
 
   if (voted) {
     total += 50000;
