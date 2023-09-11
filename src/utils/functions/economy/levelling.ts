@@ -6,6 +6,7 @@ import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { addKarma } from "../karma/karma";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
+import { addTag } from "../users/tags";
 import { getBalance, getBankBalance, updateBalance, updateBankBalance } from "./balance";
 import { addBooster, getBoosters } from "./boosters";
 import { addInventoryItem } from "./inventory";
@@ -91,6 +92,21 @@ levellingRewards.set(200, {
 });
 levellingRewards.set(250, {
   text: "you have unlocked:\n" + "- +1% gamble multi",
+});
+levellingRewards.set(1000, {
+  text: "you have received:\n" + "- ✨ prestige 10 tag",
+});
+levellingRewards.set(2000, {
+  text: "you have received:\n" + "- ⭐️ prestige 20 tag",
+});
+levellingRewards.set(3000, {
+  text: "you have received:\n" + "- 🌟 prestige 30 tag",
+});
+levellingRewards.set(4000, {
+  text: "you have received:\n" + "- 💫 prestige 40 tag",
+});
+levellingRewards.set(5000, {
+  text: "you have received:\n" + "- ❤️ prestige 50 tag",
 });
 
 const xpFormula = (level: number, prestige: number) =>
@@ -363,6 +379,8 @@ async function doLevelUp(
         await updateBalance(member, (await getBalance(member)) + parseInt(reward.substring(6)));
       } else if (reward.startsWith("karma:")) {
         await addKarma(member, parseInt(reward.substring(6)));
+      } else if (reward.startsWith("tag:")) {
+        await addTag(id, reward.substring(4)).catch(() => null);
       }
     }
   } else {

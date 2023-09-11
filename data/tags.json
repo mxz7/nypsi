@@ -118,5 +118,35 @@
     "name": "dog",
     "description": "found in the cute v achievement",
     "emoji": "🐶"
+  },
+  "p10": {
+    "id": "p10",
+    "name": "prestige 10",
+    "description": "prestige 10 tag",
+    "emoji": "✨"
+  },
+  "p20": {
+    "id": "p20",
+    "name": "prestige 20",
+    "description": "prestige 20 tag",
+    "emoji": "⭐️"
+  },
+  "p30": {
+    "id": "p30",
+    "name": "prestige 30",
+    "description": "prestige 30 tag",
+    "emoji": "🌟"
+  },
+  "p40": {
+    "id": "p40",
+    "name": "prestige 40",
+    "description": "prestige 40 tag",
+    "emoji": "💫"
+  },
+  "p50": {
+    "id": "p50",
+    "name": "prestige 50",
+    "description": "prestige 50 tag",
+    "emoji": "❤️"
   }
 }
