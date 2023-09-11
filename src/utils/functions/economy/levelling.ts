@@ -5,6 +5,7 @@ import { CustomEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { addKarma } from "../karma/karma";
+import sleep from "../sleep";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { addTag } from "../users/tags";
 import { getBalance, getBankBalance, updateBalance, updateBankBalance } from "./balance";
@@ -471,7 +472,7 @@ async function doLevelUp(
       break;
   }
 
-  // await sleep(100);
+  await sleep(69);
 
   if (consecutive >= 50) return;
 
