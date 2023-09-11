@@ -96,18 +96,23 @@ levellingRewards.set(250, {
 });
 levellingRewards.set(500, {
   text: "you have received:\n" + "- ✨ prestige 5 tag",
+  rewards: ["tag:p5"],
 });
 levellingRewards.set(1000, {
   text: "you have received:\n" + "- ⭐️ prestige 10 tag",
+  rewards: ["tag:p10"],
 });
 levellingRewards.set(1500, {
   text: "you have received:\n" + "- 🌟 prestige 15 tag",
+  rewards: ["tag:p15"],
 });
 levellingRewards.set(2000, {
   text: "you have received:\n" + "- 💫 prestige 20 tag",
+  rewards: ["tag:p20"],
 });
 levellingRewards.set(2500, {
   text: "you have received:\n" + "- ❤️ prestige 25 tag",
+  rewards: ["tag:p25"],
 });
 
 const xpFormula = (level: number, prestige: number) =>
