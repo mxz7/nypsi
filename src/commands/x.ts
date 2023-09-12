@@ -1393,7 +1393,13 @@ async function run(
         requirements = await getLevelRequirements(user.userId);
       }
 
-      console.log(`${user.userId} done. level: ${await getRawLevel(user.userId)}`);
+      const level = await getRawLevel(user.userId);
+
+      if (level >= 500) await addTag(user.userId, "p5").catch(() => null);
+      if (level >= 1000) await addTag(user.userId, "p10").catch(() => null);
+      if (level >= 1500) await addTag(user.userId, "p15").catch(() => null);
+
+      console.log(`${user.userId} done. level: ${level}`);
     }
 
     console.log("all done!!!!!");
