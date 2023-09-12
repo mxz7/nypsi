@@ -445,6 +445,18 @@ async function doLevelUp(
       }
     }
 
+    if (level % 500 === 0) {
+      await addInventoryItem(member, "bronze_credit", 2);
+
+      if (levelData?.text) {
+        levelData.text += "\n- `2x` <:nypsi_bronze:1108083689478443058> bronze credit";
+      } else {
+        levelData = {
+          text: "you have received:\n" + "- `2x` <:nypsi_bronze:1108083689478443058> bronze credit",
+        };
+      }
+    }
+
     if (level % 1000 === 0) {
       await addInventoryItem(member, "omega_crate", 1);
 
