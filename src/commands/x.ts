@@ -1383,6 +1383,8 @@ async function run(
 
         if (level % 50 === 0) console.log(`level: ${level} xp: ${user.xp}`);
         if (level % 69 === 0) await addInventoryItem(user.userId, "basic_crate", 1, false);
+        if (level % 420 === 0 && level > 0)
+          await addInventoryItem(user.userId, "nypsi_crate", 1, false);
 
         user.xp -= requirements.xp;
 
