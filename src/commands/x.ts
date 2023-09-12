@@ -1333,6 +1333,23 @@ async function run(
     }
 
     return findId(args.slice(1, args.length).join(" "));
+  } else if (args[0].toLowerCase() === "migrate" && message.author.id === Constants.TEKOH_ID) {
+    const query = await prisma.economy.findMany({
+      where: {
+        prestige: { gt: 0 },
+      },
+      select: {
+        userId: true,
+        bank: true,
+        xp: true,
+        prestige: true,
+      },
+    });
+    console.log("query fetched");
+
+    await fs.writeFile("backup.txt", query.map((i) => `${i.userId} ${i.prestige}`).join("\n"));
+
+    console.log("backup wrote");
   }
 }
 
