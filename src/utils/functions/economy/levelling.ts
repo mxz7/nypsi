@@ -445,6 +445,18 @@ async function doLevelUp(
       }
     }
 
+    if (level % 1000 === 0) {
+      await addInventoryItem(member, "omega_crate", 1);
+
+      if (levelData?.text) {
+        levelData.text += "\n- `1x` <:nypsi_omega:1139279162276855890> omega crate";
+      } else {
+        levelData = {
+          text: "you have received:\n" + "- `1x` <:nypsi_omega:1139279162276855890> omega crate",
+        };
+      }
+    }
+
     if (level % 50 === 0) {
       const boosters = await getBoosters(member);
 
