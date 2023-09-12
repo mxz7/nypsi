@@ -330,7 +330,7 @@ export async function topPrestige(guild: Guild, userId?: string) {
   const query = await prisma.economy.findMany({
     where: {
       AND: [
-        { level: { gt: 0 } },
+        { OR: [{ prestige: { gt: 0 } }, { level: { gt: 0 } }] },
         { userId: { in: Array.from(members.keys()) } },
         { user: { blacklisted: false } },
       ],
@@ -392,7 +392,10 @@ export async function topPrestige(guild: Guild, userId?: string) {
 export async function topPrestigeGlobal(userId: string) {
   const query = await prisma.economy.findMany({
     where: {
-      AND: [{ level: { gt: 0 } }, { user: { blacklisted: false } }],
+      AND: [
+        { OR: [{ prestige: { gt: 0 } }, { level: { gt: 0 } }] },
+        { user: { blacklisted: false } },
+      ],
     },
     select: {
       userId: true,
