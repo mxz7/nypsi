@@ -19,8 +19,14 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { b, c } from "../utils/functions/anticheat";
 import { updateBalance, updateBankBalance } from "../utils/functions/economy/balance";
-import { setInventoryItem } from "../utils/functions/economy/inventory";
-import { setLevel, setPrestige } from "../utils/functions/economy/levelling";
+import { addInventoryItem, setInventoryItem } from "../utils/functions/economy/inventory";
+import {
+  getLevel,
+  getLevelRequirements,
+  getRawLevel,
+  setLevel,
+  setPrestige,
+} from "../utils/functions/economy/levelling";
 import { getItems, isEcoBanned, setEcoBan } from "../utils/functions/economy/utils";
 import { updateXp } from "../utils/functions/economy/xp";
 import { addKarma, getKarma, removeKarma } from "../utils/functions/karma/karma";
@@ -1334,23 +1340,79 @@ async function run(
 
     return findId(args.slice(1, args.length).join(" "));
   } else if (args[0].toLowerCase() === "migrate" && message.author.id === Constants.TEKOH_ID) {
-    const query = await prisma.economy.findMany({
-      where: {
-        prestige: { gt: 0 },
-      },
-      select: {
-        userId: true,
-        bank: true,
-        xp: true,
-        prestige: true,
-      },
-    });
+    const query = await prisma.economy
+      .findMany({
+        where: {
+          prestige: { gt: 0 },
+        },
+        select: {
+          userId: true,
+          xp: true,
+          prestige: true,
+        },
+      })
+      .then((i) =>
+        i.map((i) => {
+          return { ...i, xp: Number(i.xp) };
+        }),
+      );
     console.log("query fetched");
 
     await fs.writeFile("backup.txt", query.map((i) => `${i.userId} ${i.prestige}`).join("\n"));
 
     console.log("backup wrote");
-  }
+
+    for (const user of query) {
+      console.log(`doing ${user.userId} ${JSON.stringify(user)}`);
+
+      for (let i = 0; i < user.prestige; i++) {
+        const neededXp = 500 + i * 500;
+        user.xp += neededXp;
+      }
+
+      console.log(`xp calculated: ${user.xp}`);
+
+      await setPrestige(user.userId, 0);
+
+      console.log("prestige reset");
+
+      let requirements = await getLevelRequirements(user.userId);
+
+      while (requirements.xp <= user.xp) {
+        const level = await getLevel(user.userId);
+
+        if (level % 50 === 0) console.log(`level: ${level} xp: ${user.xp}`);
+        if (level % 69 === 0) await addInventoryItem(user.userId, "basic_crate", 1, false);
+
+        user.xp -= requirements.xp;
+
+        await setLevel(user.userId, (await getLevel(user.userId)) + 1);
+
+        requirements = await getLevelRequirements(user.userId);
+      }
+
+      console.log(`${user.userId} done. level: ${await getRawLevel(user.userId)}`);
+    }
+
+    console.log("all done!!!!!");
+  } //else if (args[0].toLowerCase() === "load" && message.author.id === Constants.TEKOH_ID) {
+  //   const file = await fs.readFile("backup.txt").then((r) => r.toString());
+
+  //   console.log("loading");
+  //   for (const user of file.split("\n")) {
+  //     const [userId, prestige] = user.split(" ");
+
+  //     if (!userId) continue;
+
+  //     if (!(await userExists(userId))) await createUser(userId);
+
+  //     await setPrestige(userId, parseInt(prestige));
+
+  //     console.log(`done ${userId}`);
+  //   }
+
+  //   console.log("done");
+  // }
 }
 
 cmd.setRun(run);
