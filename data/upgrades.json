@@ -13,7 +13,7 @@
     "effect": 3,
     "description": "+{x}% sell multiplier",
     "max": 10,
-    "chance": 10
+    "chance": 15
   },
   "cursor": {
     "id": "cursor",
@@ -45,6 +45,6 @@
     "effect": 0.03,
     "description": "+{x}% xp sent to guild",
     "max": 5,
-    "chance": 15
+    "chance": 20
   }
 }
