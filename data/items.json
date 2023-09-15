@@ -1935,7 +1935,8 @@
       "id:green_gem:1",
       "id:blue_gem:1",
       "id:pink_gem:0.3",
-      "id:lucky_cheese:5"
+      "id:lucky_cheese:5",
+      "id:reroll_token:0.1"
     ]
   },
   "lucky_scratch_card": {
