@@ -820,6 +820,8 @@ export async function calcNetWorth(member: GuildMember | string, breakdown = fal
           worth += 100_000;
         }
       } else {
+        let totalCost = 0;
+
         let baseCost = _.clone(baseUpgrades[upgrade.upgradeId]).base_cost;
 
         baseCost =
@@ -828,12 +830,14 @@ export async function calcNetWorth(member: GuildMember | string, breakdown = fal
             ? baseWorkers[worker.workerId].prestige_requirement / 40
             : 1);
 
-        // zack's formula ((price+amount×price)×amount)/2
+        for (let i = upgrade.amount; i < upgrade.amount + 1; i++) {
+          const cost = baseCost + baseCost * i;
 
-        const cost = ((baseCost + upgrade.amount * baseCost) * upgrade.amount) / 2;
+          totalCost += cost;
+        }
 
-        worth += cost;
-        workersBreakdown += cost;
+        worth += totalCost;
+        workersBreakdown += totalCost;
       }
     }
 
