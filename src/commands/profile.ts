@@ -457,8 +457,12 @@ async function run(
 
       const embed = new CustomEmbed(target)
         .setHeader(`${target.user.username}'s multipliers`, target.user.avatarURL())
-        .addField("gamble", `**total** ${gamble.multi * 100}%\n${gambleBreakdown}`, true)
-        .addField("sell", `**total** ${sell.multi * 100}%\n${sellBreakdown}`, true);
+        .addField(
+          "gamble",
+          `**total** ${Math.round(gamble.multi * 100)}%\n${gambleBreakdown}`,
+          true,
+        )
+        .addField("sell", `**total** ${Math.round(sell.multi * 100)}%\n${sellBreakdown}`, true);
 
       await reaction.reply({ embeds: [embed] });
 
@@ -470,9 +474,9 @@ async function run(
         embeds: [
           new CustomEmbed(
             target,
-            `${tags.map(
-              (i) => `- ${getTagsData()[i.tagId].emoji} ${getTagsData()[i.tagId].name}`,
-            )}`,
+            `${tags
+              .map((i) => `- ${getTagsData()[i.tagId].emoji} ${getTagsData()[i.tagId].name}`)
+              .join("\n")}`,
           ).setHeader(`${target.user.username}'s tags`, target.user.avatarURL()),
         ],
       });
