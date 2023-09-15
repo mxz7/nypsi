@@ -189,7 +189,12 @@ export async function getBoosters(member: GuildMember | string): Promise<Map<str
   return map;
 }
 
-export async function addBooster(member: GuildMember | string, boosterId: string, amount = 1) {
+export async function addBooster(
+  member: GuildMember | string,
+  boosterId: string,
+  amount = 1,
+  expire?: Date,
+) {
   let id: string;
   if (member instanceof GuildMember) {
     id = member.user.id;
@@ -202,7 +207,7 @@ export async function addBooster(member: GuildMember | string, boosterId: string
   await prisma.booster.createMany({
     data: new Array(amount).fill({
       boosterId: boosterId,
-      expire: new Date(Date.now() + items[boosterId].boosterEffect.time * 1000),
+      expire: expire || new Date(Date.now() + items[boosterId].boosterEffect.time * 1000),
       userId: id,
     }),
   });

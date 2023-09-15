@@ -303,7 +303,7 @@ async function prepareGame(
     "K♦️",
   ];
 
-  const voteMulti = await getGambleMulti(message.member);
+  const voteMulti = (await getGambleMulti(message.member)).multi;
 
   games.set(message.author.id, {
     bet: bet,

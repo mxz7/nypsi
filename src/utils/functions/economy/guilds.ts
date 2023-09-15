@@ -9,7 +9,8 @@ import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { addInventoryItem } from "./inventory";
-import { getItems, isEcoBanned } from "./utils";
+import { getUpgrades } from "./levelling";
+import { getItems, getUpgradesData, isEcoBanned } from "./utils";
 import ms = require("ms");
 
 const upgrades = new Map<number, string[]>();
@@ -270,6 +271,15 @@ export async function addToGuildXP(name: string, amount: number, member: GuildMe
   } else {
     id = member;
   }
+
+  const upgrades = await getUpgrades(member);
+
+  if (upgrades.find((i) => i.upgradeId === "guild_xp"))
+    amount += Math.floor(
+      amount *
+        (upgrades.find((i) => i.upgradeId === "guild_xp").amount *
+          getUpgradesData()["guild_xp"].effect),
+    );
 
   await prisma.economyGuild.update({
     where: {

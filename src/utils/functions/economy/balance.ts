@@ -11,17 +11,14 @@ import { getAuctionAverage } from "./auctions";
 import { getBoosters } from "./boosters";
 import { getGuildUpgradesByUser } from "./guilds";
 import { calcItemValue, gemBreak, getInventory } from "./inventory";
+import { checkLevelUp, getRawLevel, getUpgrades } from "./levelling";
 import { getOffersAverage } from "./offers";
 import { isPassive } from "./passive";
-import { getPrestige } from "./prestige";
-import { getBaseUpgrades, getBaseWorkers, getItems } from "./utils";
+import { getBaseUpgrades, getBaseWorkers, getItems, getUpgradesData } from "./utils";
 import { hasVoted } from "./vote";
 import { calcWorkerValues } from "./workers";
-import { getXp } from "./xp";
 import ms = require("ms");
 import _ = require("lodash");
-
-const prestigeGambleMultiEffect = [0, 1, 1, 1, 2, 2, 3, 3, 4, 4, 5];
 
 export async function getBalance(member: GuildMember | string) {
   let id: string;
@@ -89,7 +86,11 @@ export async function getBankBalance(member: GuildMember | string): Promise<numb
   return Number(query.bank);
 }
 
-export async function updateBankBalance(member: GuildMember | string, amount: number) {
+export async function updateBankBalance(
+  member: GuildMember | string,
+  amount: number,
+  check = true,
+) {
   let id: string;
   if (member instanceof GuildMember) {
     id = member.user.id;
@@ -105,6 +106,8 @@ export async function updateBankBalance(member: GuildMember | string, amount: nu
       bank: amount,
     },
   });
+
+  if (check) checkLevelUp(member);
 }
 
 export async function increaseBaseBankStorage(member: GuildMember, amount: number) {
@@ -118,7 +121,7 @@ export async function increaseBaseBankStorage(member: GuildMember, amount: numbe
   });
 }
 
-export async function getGambleMulti(member: GuildMember | string): Promise<number> {
+export async function getGambleMulti(member: GuildMember | string) {
   let id: string;
   if (member instanceof GuildMember) {
     id = member.user.id;
@@ -127,47 +130,94 @@ export async function getGambleMulti(member: GuildMember | string): Promise<numb
   }
 
   let multi = 0;
+  const breakdownMap = new Map<string, number>();
 
-  const prestige = await getPrestige(member);
+  const [
+    booster,
+    boosters,
+    guildUpgrades,
+    passive,
+    dmSettings,
+    inventory,
+    tier,
+    upgrades,
+    rawLevel,
+  ] = await Promise.all([
+    isBooster(id),
+    getBoosters(id),
+    getGuildUpgradesByUser(member),
+    isPassive(id),
+    getDmSettings(id),
+    getInventory(id, false),
+    getTier(id),
+    getUpgrades(id),
+    getRawLevel(id),
+  ]);
 
-  let prestigeBonus = prestigeGambleMultiEffect[prestige];
+  let rawLevelModified = rawLevel;
+  let levelBonus: number;
 
-  if (!prestigeBonus && prestige > 0)
-    prestigeBonus = prestigeGambleMultiEffect[prestigeGambleMultiEffect.length - 1];
+  while (typeof levelBonus !== "number") {
+    if (Constants.PROGRESSION.MULTI.has(rawLevelModified)) {
+      levelBonus = Constants.PROGRESSION.MULTI.get(rawLevelModified);
+    } else rawLevelModified--;
+  }
 
-  multi += prestigeBonus;
+  if (levelBonus > 0) {
+    multi += levelBonus;
+    breakdownMap.set("level", levelBonus);
+  }
 
-  switch (await getTier(id)) {
+  switch (tier) {
     case 2:
       multi += 1;
+      breakdownMap.set("premium", 1);
       break;
     case 3:
       multi += 2;
+      breakdownMap.set("premium", 2);
       break;
     case 4:
       multi += 5;
+      breakdownMap.set("premium", 5);
       break;
   }
 
-  if (await isBooster(id)) multi += 2;
-
-  const [boosters, guildUpgrades] = await Promise.all([
-    getBoosters(id),
-    getGuildUpgradesByUser(member),
-  ]);
+  if (booster) {
+    multi += 2;
+    breakdownMap.set("booster", 2);
+  }
 
   const items = getItems();
 
-  if (guildUpgrades.find((i) => i.upgradeId === "multi"))
+  if (guildUpgrades.find((i) => i.upgradeId === "multi")) {
     multi += guildUpgrades.find((i) => i.upgradeId === "multi").amount;
+    breakdownMap.set("guild", guildUpgrades.find((i) => i.upgradeId === "multi").amount);
+  }
+
+  if (upgrades.find((i) => i.upgradeId === "multi")) {
+    multi +=
+      upgrades.find((i) => i.upgradeId === "multi").amount * getUpgradesData()["multi"].effect;
+    breakdownMap.set(
+      "upgrades",
+      upgrades.find((i) => i.upgradeId === "multi").amount * getUpgradesData()["multi"].effect,
+    );
+  }
 
   if (
-    (await getDmSettings(id)).voteReminder &&
+    dmSettings.voteReminder &&
     !(await redis.sismember(Constants.redis.nypsi.VOTE_REMINDER_RECEIVED, id))
-  )
+  ) {
     multi += 2;
+    breakdownMap.set("vote reminders", 2);
+  }
 
-  if (await isPassive(id)) multi -= 3;
+  if (passive) {
+    multi -= 3;
+    breakdownMap.set("passive", -3);
+  }
+
+  const beforeBoosters = multi;
 
   for (const boosterId of boosters.keys()) {
     if (items[boosterId].boosterEffect.boosts.includes("multi")) {
@@ -175,7 +225,10 @@ export async function getGambleMulti(member: GuildMember | string): Promise<numb
     }
   }
 
-  const inventory = await getInventory(id, false);
+  if (multi - beforeBoosters !== 0) breakdownMap.set("boosters", multi - beforeBoosters);
+
+  const beforeGems = multi;
+
   if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0)
     multi += Math.floor(Math.random() * 7);
   if (inventory.find((i) => i.item == "white_gem")?.amount > 0) {
@@ -203,15 +256,17 @@ export async function getGambleMulti(member: GuildMember | string): Promise<numb
     }
   }
 
+  if (beforeGems - multi !== 0) breakdownMap.set("gems", beforeGems - multi);
+
   multi = Math.floor(multi);
   if (multi < 0) multi = 0;
 
   multi = multi / 100;
 
-  return parseFloat(multi.toFixed(2));
+  return { multi: parseFloat(multi.toFixed(2)), breakdown: breakdownMap };
 }
 
-export async function getSellMulti(member: GuildMember | string): Promise<number> {
+export async function getSellMulti(member: GuildMember | string) {
   let id: string;
   if (member instanceof GuildMember) {
     id = member.user.id;
@@ -219,46 +274,83 @@ export async function getSellMulti(member: GuildMember | string): Promise<number
     id = member;
   }
 
+  const [level, tier, booster, boosters, guildUpgrades, passive, inventory, upgrades] =
+    await Promise.all([
+      getRawLevel(member),
+      getTier(member),
+      isBooster(id),
+      getBoosters(id),
+      getGuildUpgradesByUser(member),
+      isPassive(member),
+      getInventory(member, false),
+      getUpgrades(member),
+    ]);
+
   let multi = 0;
+  const breakdown = new Map<string, number>();
 
-  const prestige = await getPrestige(member);
+  multi += Math.floor(level * 0.0869);
 
-  multi += Math.floor(prestige * 0.69);
+  if (multi > 75) multi = 75;
 
-  switch (await getTier(id)) {
+  breakdown.set("level", Math.floor(multi));
+
+  switch (tier) {
     case 1:
       multi += 2;
+      breakdown.set("premium", 2);
       break;
     case 2:
       multi += 5;
+      breakdown.set("premium", 5);
       break;
     case 3:
       multi += 10;
+      breakdown.set("premium", 10);
       break;
     case 4:
       multi += 15;
+      breakdown.set("premium", 15);
       break;
   }
 
-  if (await isBooster(id)) multi += 3;
-
-  const [boosters, guildUpgrades] = await Promise.all([
-    getBoosters(id),
-    getGuildUpgradesByUser(member),
-  ]);
+  if (booster) {
+    multi += 3;
+    breakdown.set("booster", 3);
+  }
 
   const items = getItems();
 
-  if (guildUpgrades.find((i) => i.upgradeId === "sellmulti"))
+  if (guildUpgrades.find((i) => i.upgradeId === "sellmulti")) {
     multi += guildUpgrades.find((i) => i.upgradeId === "sellmulti").amount * 5;
+    breakdown.set("guild", guildUpgrades.find((i) => i.upgradeId === "sellmulti").amount * 5);
+  }
+
+  if (upgrades.find((i) => i.upgradeId === "sell_multi")) {
+    multi +=
+      upgrades.find((i) => i.upgradeId === "sell_multi").amount *
+      getUpgradesData()["sell_multi"].effect;
+    breakdown.set(
+      "upgrades",
+      upgrades.find((i) => i.upgradeId === "sell_multi").amount *
+        getUpgradesData()["sell_multi"].effect,
+    );
+  }
 
   if (
     (await getDmSettings(id)).voteReminder &&
     !(await redis.sismember(Constants.redis.nypsi.VOTE_REMINDER_RECEIVED, id))
-  )
+  ) {
     multi += 5;
+    breakdown.set("vote reminders", 5);
+  }
 
-  if (await isPassive(id)) multi -= 5;
+  if (passive) {
+    multi -= 5;
+    breakdown.set("passive", -5);
+  }
+
+  const beforeBoosters = multi;
 
   for (const boosterId of boosters.keys()) {
     if (boosterId == "beginner_booster") {
@@ -268,7 +360,9 @@ export async function getSellMulti(member: GuildMember | string): Promise<number
     }
   }
 
-  const inventory = await getInventory(id, false);
+  if (multi - beforeBoosters !== 0) breakdown.set("boosters", multi - beforeBoosters);
+  const beforeGems = multi;
+
   if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0)
     multi += Math.floor(Math.random() * 7);
   if (inventory.find((i) => i.item == "white_gem")?.amount > 0) {
@@ -293,12 +387,14 @@ export async function getSellMulti(member: GuildMember | string): Promise<number
     }
   }
 
+  if (multi - beforeGems !== 0) breakdown.set("gems", multi - beforeGems);
+
   multi = Math.floor(multi);
   if (multi < 0) multi = 0;
 
   multi = multi / 100;
 
-  return parseFloat(multi.toFixed(2));
+  return { multi: parseFloat(multi.toFixed(2)), breakdown };
 }
 
 export async function getMaxBankBalance(member: GuildMember | string): Promise<number> {
@@ -320,10 +416,10 @@ export async function getMaxBankBalance(member: GuildMember | string): Promise<n
     })
     .then((q) => Number(q.bankStorage));
 
-  const xp = await getXp(id);
-  const constant = 1000;
-  const starting = 15000;
-  const bonus = xp * constant;
+  const level = await getRawLevel(id);
+  const constant = 250;
+  const starting = 20000;
+  const bonus = level * constant;
   const max = bonus + starting;
 
   return max + base;
@@ -489,20 +585,29 @@ export async function calcMaxBet(member: GuildMember | string): Promise<number> 
 
   let total = 100000;
 
-  const voted = await hasVoted(member);
-  const prestige = await getPrestige(member);
-  const boosters = await getBoosters(member);
-  const guildUpgrades = await getGuildUpgradesByUser(member);
+  const [voted, level, boosters, guildUpgrades, booster] = await Promise.all([
+    hasVoted(member),
+    getRawLevel(member),
+    getBoosters(member),
+    getGuildUpgradesByUser(member),
+    isBooster(id),
+  ]);
 
-  total = total + 50000 * prestige;
+  const levelBonus = Math.floor(level / 10) * 25000;
 
-  if (total > 1_000_000) total = 1_000_000;
+  total += levelBonus;
+
+  if (total > 1_000_000) {
+    total = 1_000_000;
+
+    if (level > 400) total += Math.floor((level - 400) / 30) * 10000;
+  }
 
   if (voted) {
     total += 50000;
   }
 
-  if (await isBooster(id)) total += 250_000;
+  if (booster) total += 250_000;
   if (guildUpgrades.find((i) => i.upgradeId === "maxbet"))
     total += guildUpgrades.find((i) => i.upgradeId === "maxbet").amount * 25000;
 
@@ -520,11 +625,11 @@ export async function calcMaxBet(member: GuildMember | string): Promise<number> 
 export async function getRequiredBetForXp(member: GuildMember): Promise<number> {
   let requiredBet = 1000;
 
-  const prestige = await getPrestige(member);
+  const level = await getRawLevel(member);
 
-  if (prestige > 2) requiredBet = 10000;
+  requiredBet += Math.floor(level / 30) * 2500;
 
-  requiredBet += prestige * 1000;
+  if (requiredBet > 50_000) requiredBet = 50_000;
 
   return requiredBet;
 }

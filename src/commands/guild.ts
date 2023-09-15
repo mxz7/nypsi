@@ -35,7 +35,7 @@ import {
   setGuildMOTD,
   setOwner,
 } from "../utils/functions/economy/guilds";
-import { getPrestige } from "../utils/functions/economy/prestige";
+import { getRawLevel } from "../utils/functions/economy/levelling";
 import {
   createUser,
   formatNumber,
@@ -281,9 +281,9 @@ async function run(
       return send({ embeds: [new ErrorEmbed("you have already created a guild recently")] });
     }
 
-    if ((await getPrestige(message.member)) < 1) {
+    if ((await getRawLevel(message.member)) < 100) {
       return send({
-        embeds: [new ErrorEmbed("you must be at least prestige 1 to create a guild")],
+        embeds: [new ErrorEmbed("you must be at least level 100 to create a guild")],
       });
     }
 

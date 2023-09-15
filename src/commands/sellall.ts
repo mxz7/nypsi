@@ -222,7 +222,7 @@ async function calcValues(message: Message | (NypsiCommandInteraction & CommandI
     }
   }
 
-  const multi = await getSellMulti(message.member);
+  const multi = (await getSellMulti(message.member)).multi;
 
   let total = 0;
   let taxedAmount = 0;

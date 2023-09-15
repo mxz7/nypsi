@@ -19,7 +19,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { Worker } from "../types/Workers";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
 import { getBoosters } from "../utils/functions/economy/boosters";
-import { getPrestige } from "../utils/functions/economy/prestige";
+import { getLevel, getPrestige, getRawLevel } from "../utils/functions/economy/levelling";
 import {
   createUser,
   getBaseUpgrades,
@@ -125,6 +125,7 @@ async function run(
 
   let userWorkers = await getWorkers(message.member);
   const prestige = await getPrestige(message.member);
+  const level = await getLevel(message.member);
 
   const isOwned = (workerId: string) => {
     for (const worker of userWorkers) {
@@ -143,11 +144,9 @@ async function run(
 
     baseCost =
       baseCost *
-      (baseWorkers[workerId].prestige_requirement >= 4
-        ? baseWorkers[workerId].prestige_requirement / 2
-        : baseWorkers[workerId].prestige_requirement - 0.5 < 1
-        ? 1
-        : baseWorkers[workerId].prestige_requirement - 0.5);
+      (baseWorkers[workerId].prestige_requirement >= 40
+        ? baseWorkers[workerId].prestige_requirement / 40
+        : 1);
 
     for (let i = owned; i < owned + amount; i++) {
       const cost = baseCost + baseCost * i;
@@ -163,7 +162,9 @@ async function run(
       const embed = new CustomEmbed(message.member).disableFooter();
 
       embed.setHeader(
-        `${worker.name}${prestige < worker.prestige_requirement ? " [locked]" : ""}`,
+        `${worker.name}${
+          (await getRawLevel(message.member)) < worker.prestige_requirement ? " [locked]" : ""
+        }`,
         message.author.avatarURL(),
       );
 
@@ -204,14 +205,14 @@ async function run(
       } else {
         embed.setDescription(
           `**cost** $${worker.cost.toLocaleString()}\n` +
-            `**required prestige** ${worker.prestige_requirement}\n\n` +
+            `**required level** ${worker.prestige_requirement}\n\n` +
             `**worth** $${worker.base.per_item.toLocaleString()} / ${worker.item_emoji}\n` +
             `**rate** ${worker.base.per_interval.toLocaleString()} ${worker.item_emoji} / hour`,
         );
 
-        embed.setFooter({ text: `you are prestige ${prestige}` });
+        embed.setFooter({ text: `you are prestige ${prestige} level ${level}` });
 
-        if (prestige >= worker.prestige_requirement) {
+        if ((await getRawLevel(message.member)) >= worker.prestige_requirement) {
           row.addComponents(
             new ButtonBuilder().setCustomId("bu").setLabel("buy").setStyle(ButtonStyle.Primary),
           );
@@ -236,7 +237,7 @@ async function run(
         new StringSelectMenuOptionBuilder()
           .setLabel(
             `${baseWorkers[worker].name}${
-              baseWorkers[worker].prestige_requirement > prestige
+              baseWorkers[worker].prestige_requirement > (await getRawLevel(message.member))
                 ? " [locked]"
                 : isOwned(worker)
                 ? " [owned]"

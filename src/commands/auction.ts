@@ -38,9 +38,8 @@ import {
   selectItem,
   setInventoryItem,
 } from "../utils/functions/economy/inventory";
-import { getPrestige } from "../utils/functions/economy/prestige";
+import { getRawLevel } from "../utils/functions/economy/levelling";
 import { formatBet, formatNumber, getItems, userExists } from "../utils/functions/economy/utils";
-import { getXp } from "../utils/functions/economy/xp";
 import PageManager from "../utils/functions/page";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import requestDM from "../utils/functions/requestdm";
@@ -169,12 +168,10 @@ async function run(
     });
   }
 
-  if ((await getPrestige(message.member)) < 1) {
-    if ((await getXp(message.member)) < 50) {
-      return send({
-        embeds: [new ErrorEmbed("you need at least 50xp before you can create an auction")],
-      });
-    }
+  if ((await getRawLevel(message.member)) < 1) {
+    return send({
+      embeds: [new ErrorEmbed("you must be level 1 before you create an auction")],
+    });
   }
 
   const items = getItems();
