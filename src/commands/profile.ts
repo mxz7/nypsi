@@ -330,7 +330,7 @@ async function run(
           if (level < 100)
             return prestigeMsg.edit({ embeds: [new ErrorEmbed("lol nice try loser")] });
 
-          await addCooldown("prestige", message.member, 1800);
+          await addCooldown("prestige", message.member, 300);
 
           const [upgrades] = await Promise.all([
             getUpgrades(message.member),

@@ -123,7 +123,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     });
 
   if (reaction == "✅") {
-    await addExpiry(cmd.name, message.member, 1800);
+    await addExpiry(cmd.name, message.member, 300);
     [level, prestige] = await Promise.all([getLevel(message.member), getPrestige(message.member)]);
 
     if (level < 100) return msg.edit({ embeds: [new ErrorEmbed("lol nice try loser")] });
