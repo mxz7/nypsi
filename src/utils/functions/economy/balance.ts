@@ -824,11 +824,9 @@ export async function calcNetWorth(member: GuildMember | string, breakdown = fal
 
         baseCost =
           baseCost *
-          (baseWorkers[upgrade.workerId].prestige_requirement >= 4
-            ? baseWorkers[upgrade.workerId].prestige_requirement / 2
-            : baseWorkers[upgrade.workerId].prestige_requirement - 0.5 < 1
-            ? 1
-            : baseWorkers[upgrade.workerId].prestige_requirement - 0.5);
+          (baseWorkers[worker.workerId].prestige_requirement >= 40
+            ? baseWorkers[worker.workerId].prestige_requirement / 40
+            : 1);
 
         // zack's formula ((price+amount×price)×amount)/2
 
