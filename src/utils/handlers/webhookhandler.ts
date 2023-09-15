@@ -19,7 +19,7 @@ import { addProgress } from "../functions/economy/achievements";
 import { getBalance, updateBalance } from "../functions/economy/balance";
 import { addBooster } from "../functions/economy/boosters";
 import { addInventoryItem } from "../functions/economy/inventory";
-import { getPrestige } from "../functions/economy/prestige";
+import { getPrestige, getRawLevel } from "../functions/economy/levelling";
 import {
   addTicket,
   getItems,
@@ -165,9 +165,14 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
     await addTicket(user, 1);
   }
 
-  const crateAmount =
-    Constants.VOTE_CRATE_PROGRESSION[prestige] ||
-    Constants.VOTE_CRATE_PROGRESSION[Constants.VOTE_CRATE_PROGRESSION.length - 1];
+  let crateAmount = 0;
+  let rawLevel = await getRawLevel(user);
+
+  while (crateAmount === 0 && rawLevel > -1) {
+    if (Constants.PROGRESSION.VOTE_CRATE.has(rawLevel)) {
+      crateAmount = Constants.PROGRESSION.VOTE_CRATE.get(rawLevel);
+    } else rawLevel--;
+  }
 
   await addInventoryItem(user, "vote_crate", crateAmount, false);
 

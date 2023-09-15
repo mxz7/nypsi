@@ -11,7 +11,7 @@ import {
   getGambleMulti,
   getMaxBankBalance,
 } from "../utils/functions/economy/balance";
-import { getPrestige } from "../utils/functions/economy/prestige";
+import { getPrestige } from "../utils/functions/economy/levelling";
 import { topBalanceGlobal } from "../utils/functions/economy/top";
 import { isEcoBanned, userExists } from "../utils/functions/economy/utils";
 import { hasVoted } from "../utils/functions/economy/vote";
@@ -229,7 +229,7 @@ async function showUser(message: Message, user: User) {
             **xp** ${(await getXp(user.id)).toLocaleString()}
             **voted** ${voted}
             **prestige** ${await getPrestige(user.id)}
-            **bonus** ${Math.floor((await getGambleMulti(user.id)) * 100)}%`,
+            **bonus** ${Math.floor((await getGambleMulti(message.member)).multi * 100)}%`,
       true,
     );
   }

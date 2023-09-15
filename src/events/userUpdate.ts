@@ -1,6 +1,6 @@
 import { User } from "discord.js";
 import { NypsiClient } from "../models/Client";
-import { getPrestige } from "../utils/functions/economy/prestige";
+import { getRawLevel } from "../utils/functions/economy/levelling";
 import { userExists } from "../utils/functions/economy/utils";
 import { uploadImage } from "../utils/functions/image";
 import { addNewAvatar, addNewUsername, isTracking } from "../utils/functions/users/history";
@@ -24,7 +24,7 @@ export default async function userUpdate(oldUser: User, newUser: User) {
 
   if (oldUser.displayAvatarURL({ size: 256 }) != newUser.displayAvatarURL({ size: 256 })) {
     if (!(await userExists(newUser.id))) return;
-    if ((await getPrestige(newUser.id)) < 2) return;
+    if ((await getRawLevel(newUser.id)) < 50) return;
 
     if (!(await isTracking(newUser.id))) return;
 

@@ -94,6 +94,8 @@ export default {
         PRESTIGE: "cache:economy:prestige",
         VOTE: "cache:economy:vote",
         XP: "cache:economy:xp",
+        LEVEL: "cache:economy:level",
+        UPGRADES: "cache:economy:upgrades",
       },
     },
     nypsi: {
@@ -151,7 +153,23 @@ export default {
   SILVER_ROLE_ID: "819870727834566696",
   TEKOH_ID: "672793821850894347",
   TRANSPARENT_EMBED_COLOR: "#2B2D31" as ColorResolvable,
-  VOTE_CRATE_PROGRESSION: [1, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 5],
+  PROGRESSION: {
+    VOTE_CRATE: new Map([
+      [0, 1],
+      [5, 2],
+      [15, 3],
+      [30, 4],
+      [50, 5],
+    ]),
+    MULTI: new Map([
+      [0, 0],
+      [10, 1],
+      [50, 2],
+      [75, 3],
+      [100, 4],
+      [200, 5],
+    ]),
+  },
   SEASON_START: new Date("06/01/2023"),
   SEASON_NUMBER: 6,
   SNOWFLAKE_REGEX: /^\d{17,19}$/,

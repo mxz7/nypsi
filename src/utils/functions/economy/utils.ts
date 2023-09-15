@@ -5,7 +5,13 @@ import * as fs from "fs";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
-import { AchievementData, BakeryUpgradeData, GuildUpgrade, Item } from "../../../types/Economy";
+import {
+  AchievementData,
+  BakeryUpgradeData,
+  GuildUpgrade,
+  Item,
+  UserUpgrade,
+} from "../../../types/Economy";
 import { Tag } from "../../../types/Tags";
 import { Worker, WorkerUpgrades } from "../../../types/Workers";
 import Constants from "../../Constants";
@@ -28,6 +34,7 @@ let baseWorkers: { [key: string]: Worker };
 let baseUpgrades: { [key: string]: WorkerUpgrades };
 let bakeryUpgrades: { [key: string]: BakeryUpgradeData };
 let guildUpgrades: { [key: string]: GuildUpgrade };
+let userUpgrades: { [key: string]: UserUpgrade };
 let tags: { [key: string]: Tag };
 
 const lotteryTicketPrice = 50000;
@@ -37,6 +44,8 @@ const lotteryTicketPrice = 50000;
  */
 export { lotteryTicketPrice };
 
+export let maxPrestige = 0;
+
 export function loadItems(crypto = true) {
   const itemsFile: any = fs.readFileSync("./data/items.json");
   const achievementsFile: any = fs.readFileSync("./data/achievements.json");
@@ -44,6 +53,7 @@ export function loadItems(crypto = true) {
   const bakeryFile: any = fs.readFileSync("./data/bakery_upgrades.json");
   const guildUpgradesFile: any = fs.readFileSync("./data/guild_upgrades.json");
   const tagsFile: any = fs.readFileSync("./data/tags.json");
+  const userUpgradesFile: any = fs.readFileSync("./data/upgrades.json");
 
   items = JSON.parse(itemsFile);
   achievements = JSON.parse(achievementsFile);
@@ -52,6 +62,11 @@ export function loadItems(crypto = true) {
   bakeryUpgrades = JSON.parse(bakeryFile);
   guildUpgrades = JSON.parse(guildUpgradesFile);
   tags = JSON.parse(tagsFile);
+  userUpgrades = JSON.parse(userUpgradesFile);
+
+  Object.values(userUpgrades).forEach((i) => {
+    maxPrestige += i.max;
+  });
 
   const workerIds = Object.keys(baseWorkers);
 
@@ -71,6 +86,8 @@ export function loadItems(crypto = true) {
   logger.info(`${Array.from(Object.keys(items)).length.toLocaleString()} economy items loaded`);
   logger.info(`${Object.keys(achievements).length.toLocaleString()} achievements loaded`);
   logger.info(`${Object.keys(tags).length} tags loaded`);
+  logger.info(`${Object.keys(userUpgrades).length} user upgrades loaded`);
+  logger.info(`max prestige set at P${maxPrestige}`);
 
   if (crypto) {
     setTimeout(() => {
@@ -371,6 +388,7 @@ export async function reset() {
         defaultBet: 0,
         xp: 0,
         padlock: false,
+        level: 0,
       },
     });
 
@@ -405,6 +423,10 @@ export function getItems(): { [key: string]: Item } {
 
 export function getTagsData() {
   return tags;
+}
+
+export function getUpgradesData() {
+  return userUpgrades;
 }
 
 export function getBakeryUpgradesData() {

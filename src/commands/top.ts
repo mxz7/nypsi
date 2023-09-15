@@ -250,7 +250,7 @@ async function run(
     const data = await topBalance(message.guild, message.author.id);
 
     return show(data.pages, data.pos, `top balance for ${message.guild.name}`);
-  } else if (args[0].toLowerCase() == "prestige") {
+  } else if (args[0].toLowerCase() == "prestige" || args[0].toLowerCase() === "level") {
     let global = false;
 
     if (args[1]?.toLowerCase() == "global") global = true;
