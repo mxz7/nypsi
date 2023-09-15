@@ -19,8 +19,14 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { b, c } from "../utils/functions/anticheat";
 import { updateBalance, updateBankBalance } from "../utils/functions/economy/balance";
-import { setInventoryItem } from "../utils/functions/economy/inventory";
-import { setPrestige } from "../utils/functions/economy/prestige";
+import { addInventoryItem, setInventoryItem } from "../utils/functions/economy/inventory";
+import {
+  getLevel,
+  getLevelRequirements,
+  getRawLevel,
+  setLevel,
+  setPrestige,
+} from "../utils/functions/economy/levelling";
 import { getItems, isEcoBanned, setEcoBan } from "../utils/functions/economy/utils";
 import { updateXp } from "../utils/functions/economy/xp";
 import { addKarma, getKarma, removeKarma } from "../utils/functions/karma/karma";
@@ -244,17 +250,22 @@ async function run(
           .setStyle(ButtonStyle.Danger)
           .setEmoji("🌟"),
         new ButtonBuilder()
+          .setCustomId("set-level")
+          .setLabel("set level")
+          .setStyle(ButtonStyle.Danger)
+          .setEmoji("⭐"),
+        new ButtonBuilder()
           .setCustomId("set-xp")
           .setLabel("set xp")
           .setStyle(ButtonStyle.Danger)
           .setEmoji("✨"),
+      ),
+      new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()
           .setCustomId("set-inv")
           .setLabel("modify inventory")
           .setStyle(ButtonStyle.Danger)
           .setEmoji("🎒"),
-      ),
-      new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()
           .setCustomId("set-karma")
           .setLabel("set karma")
@@ -575,6 +586,41 @@ async function run(
           `admin: ${message.author.id} (${message.author.username}) set ${user.id} prestige to ${msg.content}`,
         );
         await setPrestige(user.id, parseInt(msg.content));
+        msg.react("✅");
+        return waitForButton();
+      } else if (res.customId === "set-level") {
+        if ((await getAdminLevel(message.author.id)) < 4) {
+          await res.editReply({
+            embeds: [new ErrorEmbed("you require admin level **4** to do this")],
+          });
+          return waitForButton();
+        }
+
+        await res.editReply({
+          embeds: [new CustomEmbed(message.member, "enter new level")],
+        });
+
+        const msg = await message.channel
+          .awaitMessages({
+            filter: (msg: Message) => msg.author.id === message.author.id,
+            max: 1,
+            time: 30000,
+          })
+          .then((collected) => collected.first())
+          .catch(() => {
+            res.editReply({ embeds: [new CustomEmbed(message.member, "expired")] });
+          });
+
+        if (!msg) return;
+        if (!parseInt(msg.content) && parseInt(msg.content) != 0) {
+          await res.editReply({ embeds: [new CustomEmbed(message.member, "invalid value")] });
+          return waitForButton();
+        }
+
+        logger.info(
+          `admin: ${message.author.id} (${message.author.username}) set ${user.id} level to ${msg.content}`,
+        );
+        await setLevel(user.id, parseInt(msg.content));
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "set-xp") {
@@ -1294,23 +1340,87 @@ async function run(
 
     return findId(args.slice(1, args.length).join(" "));
   } else if (args[0].toLowerCase() === "migrate" && message.author.id === Constants.TEKOH_ID) {
-    const query = await prisma.economy.findMany({
-      where: {
-        prestige: { gt: 0 },
-      },
-      select: {
-        userId: true,
-        bank: true,
-        xp: true,
-        prestige: true,
-      },
-    });
+    const query = await prisma.economy
+      .findMany({
+        where: {
+          prestige: { gt: 0 },
+        },
+        select: {
+          userId: true,
+          xp: true,
+          prestige: true,
+        },
+      })
+      .then((i) =>
+        i.map((i) => {
+          return { ...i, xp: Number(i.xp) };
+        }),
+      );
     console.log("query fetched");
 
     await fs.writeFile("backup.txt", query.map((i) => `${i.userId} ${i.prestige}`).join("\n"));
 
     console.log("backup wrote");
-  }
+
+    for (const user of query) {
+      console.log(`doing ${user.userId} ${JSON.stringify(user)}`);
+
+      for (let i = 0; i < user.prestige; i++) {
+        const neededXp = 500 + i * 500;
+        user.xp += neededXp;
+      }
+
+      console.log(`xp calculated: ${user.xp}`);
+
+      await setPrestige(user.userId, 0);
+
+      console.log("prestige reset");
+
+      let requirements = await getLevelRequirements(user.userId);
+
+      while (requirements.xp <= user.xp) {
+        const level = await getLevel(user.userId);
+
+        if (level % 50 === 0) console.log(`level: ${level} xp: ${user.xp}`);
+        if (level % 69 === 0) await addInventoryItem(user.userId, "basic_crate", 1, false);
+        if (level % 420 === 0 && level > 0)
+          await addInventoryItem(user.userId, "nypsi_crate", 1, false);
+
+        user.xp -= requirements.xp;
+
+        await setLevel(user.userId, (await getLevel(user.userId)) + 1);
+
+        requirements = await getLevelRequirements(user.userId);
+      }
+
+      const level = await getRawLevel(user.userId);
+
+      if (level >= 500) await addTag(user.userId, "p5").catch(() => null);
+      if (level >= 1000) await addTag(user.userId, "p10").catch(() => null);
+      if (level >= 1500) await addTag(user.userId, "p15").catch(() => null);
+
+      console.log(`${user.userId} done. level: ${level}`);
+    }
+
+    console.log("all done!!!!!");
+  } //else if (args[0].toLowerCase() === "load" && message.author.id === Constants.TEKOH_ID) {
+  //   const file = await fs.readFile("backup.txt").then((r) => r.toString());
+
+  //   console.log("loading");
+  //   for (const user of file.split("\n")) {
+  //     const [userId, prestige] = user.split(" ");
+
+  //     if (!userId) continue;
+
+  //     if (!(await userExists(userId))) await createUser(userId);
+
+  //     await setPrestige(userId, parseInt(prestige));
+
+  //     console.log(`done ${userId}`);
+  //   }
+
+  //   console.log("done");
+  // }
 }
 
 cmd.setRun(run);

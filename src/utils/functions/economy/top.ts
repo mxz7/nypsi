@@ -330,7 +330,7 @@ export async function topPrestige(guild: Guild, userId?: string) {
   const query = await prisma.economy.findMany({
     where: {
       AND: [
-        { prestige: { gt: 0 } },
+        { OR: [{ prestige: { gt: 0 } }, { level: { gt: 0 } }] },
         { userId: { in: Array.from(members.keys()) } },
         { user: { blacklisted: false } },
       ],
@@ -338,11 +338,10 @@ export async function topPrestige(guild: Guild, userId?: string) {
     select: {
       userId: true,
       prestige: true,
+      level: true,
       banned: true,
     },
-    orderBy: {
-      prestige: "desc",
-    },
+    orderBy: [{ prestige: "desc" }, { level: "desc" }],
     take: 100,
   });
 
@@ -370,14 +369,11 @@ export async function topPrestige(guild: Guild, userId?: string) {
       pos += ".";
     }
 
-    const thing = ["th", "st", "nd", "rd"];
-    const v = user.prestige % 100;
-
     out[count] = `${pos} ${await formatUsername(
       user.userId,
       members.get(user.userId).user.username,
       true,
-    )} ${user.prestige}${thing[(v - 20) % 10] || thing[v] || thing[0]} prestige`;
+    )} P${user.prestige} | L${user.level}`;
 
     count++;
   }
@@ -396,21 +392,23 @@ export async function topPrestige(guild: Guild, userId?: string) {
 export async function topPrestigeGlobal(userId: string) {
   const query = await prisma.economy.findMany({
     where: {
-      AND: [{ prestige: { gt: 0 } }, { user: { blacklisted: false } }],
+      AND: [
+        { OR: [{ prestige: { gt: 0 } }, { level: { gt: 0 } }] },
+        { user: { blacklisted: false } },
+      ],
     },
     select: {
       userId: true,
       prestige: true,
       banned: true,
+      level: true,
       user: {
         select: {
           lastKnownUsername: true,
         },
       },
     },
-    orderBy: {
-      prestige: "desc",
-    },
+    orderBy: [{ prestige: "desc" }, { level: "desc" }],
     take: 100,
   });
 
@@ -438,13 +436,11 @@ export async function topPrestigeGlobal(userId: string) {
       pos += ".";
     }
 
-    const thing = ["th", "st", "nd", "rd"];
-    const v = user.prestige % 100;
     out[count] = `${pos} ${await formatUsername(
       user.userId,
       user.user.lastKnownUsername,
       (await getPreferences(user.userId)).leaderboards,
-    )} ${user.prestige}${thing[(v - 20) % 10] || thing[v] || thing[0]} prestige`;
+    )} P${user.prestige} | L${user.level}`;
 
     count++;
   }

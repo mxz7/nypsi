@@ -72,6 +72,24 @@
       "id": "other",
       "name": "miscellaneous",
       "description": "get a dm for miscellaneous things, such as guild level upgrades"
+    },
+    "level": {
+      "id": "level",
+      "name": "level notifications",
+      "description": "get a dm when you level up",
+      "types": [
+        { "name": "disabled", "description": "no level notifications", "value": "Disabled" },
+        {
+          "name": "only on reward",
+          "description": "only receive a notification when you receive a reward from levelling up",
+          "value": "OnlyReward"
+        },
+        {
+          "name": "all",
+          "description": "receive a notification for every level up",
+          "value": "All"
+        }
+      ]
     }
   },
   "preferences": {

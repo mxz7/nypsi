@@ -102,7 +102,7 @@ async function doAutosellThing(userId: string, itemId: string, amount: number): 
 
   let sellWorth = Math.floor(item.sell * amount);
 
-  const multi = await getSellMulti(userId);
+  const multi = (await getSellMulti(userId)).multi;
 
   if (item.role == "fish" || item.role == "prey" || item.role == "sellable") {
     sellWorth = Math.floor(sellWorth + sellWorth * multi);

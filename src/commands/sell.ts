@@ -133,7 +133,7 @@ async function run(
 
   let sellWorth = Math.floor(selected.sell * amount);
 
-  const multi = await getSellMulti(message.member);
+  const multi = (await getSellMulti(message.member)).multi;
 
   if (selected.role == "fish" || selected.role == "prey" || selected.role == "sellable") {
     sellWorth = Math.floor(sellWorth + sellWorth * multi);

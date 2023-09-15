@@ -903,6 +903,19 @@ export async function runCommand(
     }
   }
 
+  if (await redis.exists(`nypsi:levelup:progress:${message.author.id}`)) {
+    if (message instanceof Message) {
+      return message.channel.send({
+        embeds: [new ErrorEmbed("please wait. you are currently levelling up")],
+      });
+    } else {
+      return message.reply({
+        embeds: [new ErrorEmbed("please wait. you are currently levelling up")],
+        ephemeral: true,
+      });
+    }
+  }
+
   command.run(message, args);
   preProcessLength[1] = performance.now();
 
@@ -957,6 +970,18 @@ export async function runCommand(
           userId,
         )}\n\nhttps://tenor.com/view/rickroll-roll-rick-never-gonna-give-you-up-never-gonna-gif-22954713`,
       });
+    }
+
+    if (await redis.exists(`nypsi:levelup:${message.author.id}`)) {
+      const embed: APIEmbed = JSON.parse(await redis.get(`nypsi:levelup:${message.author.id}`));
+
+      if (message instanceof Message) {
+        message.reply({ embeds: [embed] });
+      } else {
+        message.followUp({ embeds: [embed], ephemeral: true });
+      }
+
+      await redis.del(`nypsi:levelup:${message.author.id}`);
     }
   }, 2000);
 

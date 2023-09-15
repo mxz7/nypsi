@@ -12,7 +12,7 @@ import {
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
-import { getPrestige } from "../utils/functions/economy/prestige";
+import { getRawLevel } from "../utils/functions/economy/levelling";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { getLastVote, hasVoted } from "../utils/functions/economy/vote";
 
@@ -53,19 +53,24 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
   };
 
-  let prestige = await getPrestige(message.author.id);
+  let rawLevel = (await getRawLevel(message.author.id)) / 13;
 
-  if (prestige > 15) prestige = 15;
+  if (rawLevel > 15) rawLevel = 15;
 
-  const amount = Math.floor(15000 * (prestige / 2 + 1));
+  const amount = Math.floor(15000 * (rawLevel / 2 + 1));
   const [voted, lastVote] = await Promise.all([
     hasVoted(message.member),
     getLastVote(message.member),
   ]);
 
-  const crateAmount =
-    Constants.VOTE_CRATE_PROGRESSION[prestige] ||
-    Constants.VOTE_CRATE_PROGRESSION[Constants.VOTE_CRATE_PROGRESSION.length - 1];
+  let crateAmount = 0;
+  rawLevel = await getRawLevel(message.member);
+
+  while (crateAmount === 0 && rawLevel > -1) {
+    if (Constants.PROGRESSION.VOTE_CRATE.has(rawLevel)) {
+      crateAmount = Constants.PROGRESSION.VOTE_CRATE.get(rawLevel);
+    } else rawLevel--;
+  }
 
   const embed = new CustomEmbed(message.member);
 

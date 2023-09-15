@@ -285,7 +285,7 @@ async function run(
   let multi = 0;
 
   if (win) {
-    multi = await getGambleMulti(message.member);
+    multi = (await getGambleMulti(message.member)).multi;
 
     winnings -= bet;
 
