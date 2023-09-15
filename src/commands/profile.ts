@@ -288,7 +288,7 @@ async function run(
         }
 
         if (await onCooldown("prestige", message.member)) {
-          const embed = await getResponse(cmd.name, message.member);
+          const embed = await getResponse("prestige", message.member);
 
           await reaction.reply({ embeds: [embed], ephemeral: true });
           return awaitButton();
