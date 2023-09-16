@@ -19,7 +19,7 @@ import { addProgress } from "../functions/economy/achievements";
 import { getBalance, updateBalance } from "../functions/economy/balance";
 import { addBooster } from "../functions/economy/boosters";
 import { addInventoryItem } from "../functions/economy/inventory";
-import { getPrestige, getRawLevel } from "../functions/economy/levelling";
+import { getRawLevel } from "../functions/economy/levelling";
 import {
   addTicket,
   getItems,
@@ -137,11 +137,11 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
   redis.set(`${Constants.redis.cache.economy.VOTE}:${user}`, "true");
   redis.expire(`${Constants.redis.cache.economy.VOTE}:${user}`, ms("1 hour") / 1000);
 
-  let prestige = await getPrestige(user);
+  let level = await getRawLevel(user);
 
-  if (prestige > 15) prestige = 15;
+  if (level > 100) level = 100;
 
-  const amount = Math.floor(15000 * (prestige / 2 + 1));
+  const amount = Math.floor(15000 * (level / 13 + 1));
 
   if (!(await isEcoBanned(user))) {
     try {
