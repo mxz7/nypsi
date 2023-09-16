@@ -163,7 +163,7 @@ async function run(
 
       embed.setHeader(
         `${worker.name}${
-          (await getRawLevel(message.member)) < worker.prestige_requirement ? " [locked]" : ""
+          (await getRawLevel(message.member)) < worker.prestige_requirement && !isOwned(worker.id) ? " [locked]" : ""
         }`,
         message.author.avatarURL(),
       );
@@ -237,10 +237,10 @@ async function run(
         new StringSelectMenuOptionBuilder()
           .setLabel(
             `${baseWorkers[worker].name}${
-              baseWorkers[worker].prestige_requirement > (await getRawLevel(message.member))
-                ? " [locked]"
-                : isOwned(worker)
+              isOwned(worker)
                 ? " [owned]"
+                : baseWorkers[worker].prestige_requirement > (await getRawLevel(message.member))
+                ? " [locked]"
                 : ""
             }`,
           )
