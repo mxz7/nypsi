@@ -1256,7 +1256,7 @@
     "boosterEffect": {
       "boosts": ["mine"],
       "effect": 1,
-      "time": 3600
+      "time": 1800
     },
     "in_crates": true
   },
@@ -1297,7 +1297,7 @@
     "boosterEffect": {
       "boosts": ["mine"],
       "effect": 1,
-      "time": 3600
+      "time": 1800
     },
     "in_crates": true
   },
