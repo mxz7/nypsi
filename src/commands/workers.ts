@@ -163,7 +163,9 @@ async function run(
 
       embed.setHeader(
         `${worker.name}${
-          (await getRawLevel(message.member)) < worker.prestige_requirement && !isOwned(worker.id) ? " [locked]" : ""
+          (await getRawLevel(message.member)) < worker.prestige_requirement && !isOwned(worker.id)
+            ? " [locked]"
+            : ""
         }`,
         message.author.avatarURL(),
       );
