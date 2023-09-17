@@ -80,7 +80,7 @@ export async function calcEarnedGambleXp(
     getRawLevel(member),
   ]);
 
-  max += rawLevel / 25 > 20 ? 20 : rawLevel / 25;
+  max += rawLevel / 50 > 30 ? 30 : rawLevel / 50;
 
   if (booster) max += 7;
   if (tier) max += tier * 2.7;
@@ -136,18 +136,22 @@ export async function calcEarnedGambleXp(
 }
 
 export async function calcEarnedHFMXp(member: GuildMember, items: number) {
-  let earned = 0;
+  let min = 0;
 
   if (items > 25) {
-    earned += Math.random() * 12.5 + 12.5;
+    min += Math.random() * 12.5 + 12.5;
     items -= 25;
 
-    earned += items * 0.269;
+    min += items * 0.269;
   } else {
-    earned += Math.random() * (items / 2) + items / 2;
+    min += Math.random() * (items / 2) + items / 2;
   }
 
-  const boosters = await getBoosters(member);
+  const [boosters, level] = await Promise.all([getBoosters(member), getRawLevel(member)]);
+
+  const max = min + level / 50 > 30 ? 30 : level / 50;
+
+  let earned = Math.random() * (max - min) + min;
 
   let boosterEffect = 0;
 
