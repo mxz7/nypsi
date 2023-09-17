@@ -1418,13 +1418,13 @@
     "plural": "vote boosters",
     "article": "a",
     "emoji": "✨",
-    "longDesc": "increase your multiplier by 5% from voting",
+    "longDesc": "increase your multiplier by 3% from voting",
     "rarity": 69,
     "role": "booster",
     "stackable": false,
     "boosterEffect": {
       "boosts": ["multi"],
-      "effect": 5,
+      "effect": 3,
       "time": 3600
     },
     "in_crates": false
