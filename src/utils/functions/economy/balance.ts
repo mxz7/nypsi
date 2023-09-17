@@ -229,13 +229,14 @@ export async function getGambleMulti(member: GuildMember | string) {
 
   const beforeGems = multi;
 
-  if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0)
-    multi += Math.floor(Math.random() * 7);
+  let heart = false;
+
+  if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0) heart = true;
   if (inventory.find((i) => i.item == "white_gem")?.amount > 0) {
     const chance = Math.floor(Math.random() * 10);
 
-    if (chance < 2) {
-      multi -= Math.floor(Math.random() * 6) + 1;
+    if (chance < 2 && !heart) {
+      multi -= Math.floor(Math.random() * 3) + 1;
     } else {
       gemBreak(id, 0.01, "white_gem");
       const choices = [
@@ -247,7 +248,7 @@ export async function getGambleMulti(member: GuildMember | string) {
   } else if (inventory.find((i) => i.item == "pink_gem")?.amount > 0) {
     const chance = Math.floor(Math.random() * 10);
 
-    if (chance < 2) {
+    if (chance < 2 && !heart) {
       multi -= 3;
     } else {
       gemBreak(id, 0.07, "pink_gem");
@@ -256,7 +257,7 @@ export async function getGambleMulti(member: GuildMember | string) {
     }
   }
 
-  if (beforeGems - multi !== 0) breakdownMap.set("gems", beforeGems - multi);
+  if (multi - beforeGems !== 0) breakdownMap.set("gems", beforeGems - multi);
 
   multi = Math.floor(multi);
   if (multi < 0) multi = 0;
@@ -363,26 +364,29 @@ export async function getSellMulti(member: GuildMember | string) {
   if (multi - beforeBoosters !== 0) breakdown.set("boosters", multi - beforeBoosters);
   const beforeGems = multi;
 
-  if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0)
-    multi += Math.floor(Math.random() * 7);
+  let heart = false;
+
+  if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0) heart = true;
   if (inventory.find((i) => i.item == "white_gem")?.amount > 0) {
     const chance = Math.floor(Math.random() * 10);
 
-    if (chance < 2) {
+    if (chance < 2 && !heart) {
       multi -= Math.floor(Math.random() * 6) + 1;
     } else {
       gemBreak(id, 0.01, "white_gem");
-      const choices = [7, 3, 4, 5, 7, 2, 17, 7, 4, 5, 2, 2, 2, 2, 2, 3, 3, 3];
+      const choices = [
+        7, 3, 4, 5, 7, 2, 17, 7, 4, 5, 2, 2, 2, 2, 2, 3, 3, 3, 10, 17, 10, 7, 7, 7, 7,
+      ];
       multi += Math.floor(Math.random() * choices[Math.floor(Math.random() * choices.length)]) + 1;
     }
   } else if (inventory.find((i) => i.item == "pink_gem")?.amount > 0) {
     const chance = Math.floor(Math.random() * 10);
 
-    if (chance < 2) {
+    if (chance < 2 && !heart) {
       multi -= 3;
     } else {
       gemBreak(id, 0.07, "pink_gem");
-      const choices = [7, 5, 4, 3, 2, 1, 3, 1, 1, 1, 3, 3];
+      const choices = [7, 5, 4, 3, 2, 1, 3, 1, 1, 1, 3, 3, 7, 7, 7, 7, 7, 4, 4, 4, 4, 4, 4, 4];
       multi += choices[Math.floor(Math.random() * choices.length)];
     }
   }
