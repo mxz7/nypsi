@@ -418,9 +418,7 @@ async function run(
           i.reply({
             embeds: [
               new ErrorEmbed(
-                `your max bet is $**${(
-                  (await calcMaxBet(message.member)) * 10
-                ).toLocaleString()}**`,
+                `your max bet is $**${((await calcMaxBet(i.user.id)) * 10).toLocaleString()}**`,
               ),
             ],
             ephemeral: true,
