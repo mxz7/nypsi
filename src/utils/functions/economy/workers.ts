@@ -135,10 +135,13 @@ export async function calcWorkerValues(
     }
   }
 
+  let heart = false;
+  if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0) heart = true;
+
   if (inventory.find((i) => i.item == "purple_gem")?.amount > 0) {
     const chance = Math.floor(Math.random() * 10);
 
-    if (chance < 5) {
+    if (chance < 5 && !heart) {
       perItemBonus -= perItemBonus * 0.17;
     } else {
       gemBreak(worker.userId, 0.01, "purple_gem");
@@ -147,14 +150,14 @@ export async function calcWorkerValues(
   }
 
   if (inventory.find((i) => i.item == "green_gem")?.amount > 0) {
-    maxStoredBonus += maxStoredBonus * 0.17;
+    maxStoredBonus += maxStoredBonus * 0.2;
   }
 
   if (inventory.find((i) => i.item == "blue_gem")?.amount > 0) {
     const chance = Math.floor(Math.random() * 10);
 
-    if (chance < 5) {
-      perIntervalBonus -= perIntervalBonus * 0.27;
+    if (chance < 4 && !heart) {
+      perIntervalBonus -= perIntervalBonus * 0.2;
     } else {
       gemBreak(worker.userId, 0.01, "blue_gem");
       perIntervalBonus += perIntervalBonus * 0.17;
@@ -164,9 +167,9 @@ export async function calcWorkerValues(
   if (inventory.find((i) => i.item == "white_gem")?.amount > 0) {
     const chance = Math.floor(Math.random() * 10);
 
-    if (chance < 4) {
-      perIntervalBonus -= perIntervalBonus * 0.97;
-      perItemBonus -= perItemBonus * 0.97;
+    if (chance < 4 && !heart) {
+      perIntervalBonus -= perIntervalBonus * 0.5;
+      perItemBonus -= perItemBonus * 0.5;
     } else {
       gemBreak(worker.userId, 0.005, "white_gem");
       perIntervalBonus += perIntervalBonus * 0.7;
