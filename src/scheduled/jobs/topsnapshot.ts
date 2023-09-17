@@ -109,6 +109,8 @@ async function doMembers() {
               money: true,
               netWorth: true,
               Inventory: true,
+              level: true,
+              prestige: true,
             },
           },
         },
@@ -125,6 +127,24 @@ async function doMembers() {
   let count = 0;
 
   for (const user of query) {
+    if (user.user?.Economy.level || user.user?.Economy.prestige) {
+      let level = user.user.Economy.level;
+
+      while (user.user.Economy.prestige > 0) {
+        user.user.Economy.prestige--;
+        level += 100;
+      }
+
+      await prisma.graphMetrics.create({
+        data: {
+          category: "user-level",
+          date,
+          userId: user.userId,
+          value: level,
+        },
+      });
+    }
+
     if (user.user?.Economy?.money) {
       await prisma.graphMetrics.create({
         data: {
@@ -167,6 +187,7 @@ async function doMembers() {
           value: user.user.karma,
         },
       });
+
       count += 1;
     }
   }
