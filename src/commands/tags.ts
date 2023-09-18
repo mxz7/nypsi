@@ -9,6 +9,7 @@ import {
   MessageActionRowComponentBuilder,
 } from "discord.js";
 import { sort } from "fast-sort";
+import prisma from "../init/database";
 import { Command } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { Tag } from "../types/Tags";
@@ -158,9 +159,9 @@ cmd.setRun((message, args) => {
     for (const [id, data] of Object.entries(tagData)) {
       tagList.push({
         title: id,
-        value: `${data.emoji} **${data.name}**\n${data.description}${
-          userTags.find((i) => i.tagId === id) ? "\n*owned*" : ""
-        }`,
+        value: `${data.emoji} **${data.name}**\n${data.description}\n**${(
+          await prisma.tags.count({ where: { tagId: id } })
+        ).toLocaleString()}** in world${userTags.find((i) => i.tagId === id) ? "\n*owned*" : ""}`,
         owned: Boolean(userTags.find((i) => i.tagId === id)),
       });
     }
