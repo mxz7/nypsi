@@ -417,6 +417,15 @@ async function run(
         }
       }
     } else if (reaction.customId === "p-upg") {
+      if (await onCooldown("p-upg", message.member)) {
+        const embed = await getResponse("p-upg", message.member);
+
+        await reaction.reply({ embeds: [embed], ephemeral: true });
+        return awaitButton();
+      }
+
+      await addCooldown("p-upg", message.member, 5);
+
       const upgrades = sort(await getUpgrades(target)).desc((i) => i.amount);
 
       const embed = new CustomEmbed(
@@ -441,6 +450,15 @@ async function run(
 
       return awaitButton();
     } else if (reaction.customId === "p-mul") {
+      if (await onCooldown("p-mul", message.member)) {
+        const embed = await getResponse("p-mul", message.member);
+
+        await reaction.reply({ embeds: [embed], ephemeral: true });
+        return awaitButton();
+      }
+
+      await addCooldown("p-mul", message.member, 5);
+
       const gamble = await getGambleMulti(target);
       const sell = await getSellMulti(target);
 
@@ -468,6 +486,15 @@ async function run(
 
       return awaitButton();
     } else if (reaction.customId === "p-tag") {
+      if (await onCooldown("p-tag", message.member)) {
+        const embed = await getResponse("p-tag", message.member);
+
+        await reaction.reply({ embeds: [embed], ephemeral: true });
+        return awaitButton();
+      }
+
+      await addCooldown("p-tag", message.member, 5);
+
       const tags = await getTags(target.user.id);
 
       await reaction.reply({
