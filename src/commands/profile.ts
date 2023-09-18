@@ -38,6 +38,7 @@ import {
   getItems,
   getTagsData,
   getUpgradesData,
+  isEcoBanned,
   maxPrestige,
   userExists,
 } from "../utils/functions/economy/utils.js";
@@ -45,6 +46,7 @@ import { getXp } from "../utils/functions/economy/xp";
 import { getMember } from "../utils/functions/member.js";
 import { getTier } from "../utils/functions/premium/premium";
 import { percentChance } from "../utils/functions/random";
+import { isUserBlacklisted } from "../utils/functions/users/blacklist";
 import { getActiveTag, getTags } from "../utils/functions/users/tags";
 import { hasProfile } from "../utils/functions/users/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -123,6 +125,18 @@ async function run(
     });
 
   if (!(await userExists(target))) await createUser(target);
+
+  if (await isUserBlacklisted(target.user.id))
+    return send({
+      embeds: [
+        new ErrorEmbed(
+          `${target.user.toString()} is blacklisted 😬. they did something REALLY bad. laugh at them for me. lol. AHHAHAAHHA`,
+        ),
+      ],
+    });
+
+  if (await isEcoBanned(target.user.id))
+    return send({ embeds: [new ErrorEmbed(`${target.toString()} is banned AHAHAHAHA`)] });
 
   const [tag, tier] = await Promise.all([getActiveTag(target.user.id), getTier(target)]);
 
