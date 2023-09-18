@@ -52,9 +52,12 @@ export async function passedCaptcha(member: GuildMember) {
   });
 
   if (await redis.exists(`${Constants.redis.cache.user.captcha_pass}:${member.user.id}`)) {
+    const ttl = await redis.ttl(`${Constants.redis.cache.user.captcha_pass}:${member.user.id}`);
     await redis.set(
       `${Constants.redis.cache.user.captcha_pass}:${member.user.id}`,
       parseInt(await redis.get(`${Constants.redis.cache.user.captcha_pass}:${member.user.id}`)) + 1,
+      "EX",
+      ttl,
     );
   } else {
     await redis.set(
@@ -87,9 +90,12 @@ export async function failedCaptcha(member: GuildMember, content: string) {
   });
 
   if (await redis.exists(`${Constants.redis.cache.user.captcha_fail}:${member.user.id}`)) {
+    const ttl = await redis.ttl(`${Constants.redis.cache.user.captcha_fail}:${member.user.id}`);
     await redis.set(
       `${Constants.redis.cache.user.captcha_fail}:${member.user.id}`,
       parseInt(await redis.get(`${Constants.redis.cache.user.captcha_fail}:${member.user.id}`)) + 1,
+      "EX",
+      ttl,
     );
   } else {
     await redis.set(
