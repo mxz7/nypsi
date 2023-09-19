@@ -2515,5 +2515,16 @@
     "article": "a",
     "in_crates": false,
     "random_drop_chance": 0.1
+  },
+  "big_tiddy_goth_gf": {
+    "id": "big_tiddy_goth_gf",
+    "name": "big tiddy goth gf",
+    "article": "a",
+    "plural": "big tiddy goth gfs",
+    "emoji": "<:nypsi_big_tiddy_goth_gf:1153740340000469003>",
+    "longDesc": "uwu",
+    "rarity": 3,
+    "role": "collectable",
+    "in_crates": true
   }
 }
