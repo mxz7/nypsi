@@ -484,7 +484,7 @@ async function run(
       });
     }
 
-    if ((await getRawLevel(target)) < 50) {
+    if ((await getRawLevel(target)) < 3) {
       return send({
         embeds: [new ErrorEmbed(`${target.user.toString()} cannot use offers yet`)],
       });
