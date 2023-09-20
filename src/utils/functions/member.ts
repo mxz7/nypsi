@@ -8,7 +8,7 @@ export async function getMember(guild: Guild, memberName: string): Promise<Guild
   if (!guild) return null;
 
   if (memberName.match(Constants.MENTION_REGEX)) {
-    return (await guild.members.fetch(memberName.replaceAll(/\D/g, ""))) || null;
+    return (await guild.members.fetch(memberName.replaceAll(/\D/g, "")).catch(() => null)) || null;
   }
 
   if (memberName.match(Constants.SNOWFLAKE_REGEX)) {
@@ -75,7 +75,7 @@ export async function getExactMember(guild: Guild, memberName: string): Promise<
   if (!guild) return null;
 
   if (memberName.match(Constants.MENTION_REGEX)) {
-    return (await guild.members.fetch(memberName.replaceAll(/\D/g, ""))) || null;
+    return (await guild.members.fetch(memberName.replaceAll(/\D/g, "")).catch(() => null)) || null;
   }
 
   if (memberName.match(Constants.SNOWFLAKE_REGEX)) {
