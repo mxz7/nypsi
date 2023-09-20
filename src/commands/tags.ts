@@ -9,13 +9,12 @@ import {
   MessageActionRowComponentBuilder,
 } from "discord.js";
 import { sort } from "fast-sort";
-import prisma from "../init/database";
 import { Command } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { Tag } from "../types/Tags";
 import { getTagsData } from "../utils/functions/economy/utils";
 import PageManager from "../utils/functions/page";
-import { getTags, setActiveTag } from "../utils/functions/users/tags";
+import { getTagCount, getTags, setActiveTag } from "../utils/functions/users/tags";
 
 const cmd = new Command(
   "tags",
@@ -160,7 +159,7 @@ cmd.setRun((message, args) => {
       tagList.push({
         title: id,
         value: `${data.emoji} **${data.name}**\n${data.description}\n**${(
-          await prisma.tags.count({ where: { tagId: id } })
+          await getTagCount(id)
         ).toLocaleString()}** in world${userTags.find((i) => i.tagId === id) ? "\n*owned*" : ""}`,
         owned: Boolean(userTags.find((i) => i.tagId === id)),
       });
