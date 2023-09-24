@@ -559,6 +559,7 @@ async function run(
 
       if (wager > (await calcMaxBet(message.member)) * 10)
         return send({
+          ephemeral: true,
           embeds: [
             new ErrorEmbed(
               `your max bet is $**${((await calcMaxBet(message.member)) * 10).toLocaleString()}**`,
@@ -706,11 +707,10 @@ async function run(
         if ((await calcMaxBet(i.user.id)) * 10 < wager) {
           if (i.isRepliable())
             i.reply({
+              ephemeral: true,
               embeds: [
                 new ErrorEmbed(
-                  `your max bet is $**${(
-                    (await calcMaxBet(message.member)) * 10
-                  ).toLocaleString()}**`,
+                  `your max bet is $**${((await calcMaxBet(i.user.id)) * 10).toLocaleString()}**`,
                 ),
               ],
             });
