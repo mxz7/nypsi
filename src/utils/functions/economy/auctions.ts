@@ -362,7 +362,7 @@ export async function getAuctionAverage(item: string) {
     orderBy: {
       createdAt: "desc",
     },
-    take: 30,
+    take: 50,
   });
 
   if (auctions.length === 0 || auctions.map((i) => i.itemAmount).reduce((a, b) => a + b) < 3) {
