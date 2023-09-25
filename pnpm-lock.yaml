@@ -107,8 +107,8 @@ devDependencies:
     specifier: 20.4.9
     version: 20.4.9
   '@types/node-os-utils':
-    specifier: 1.3.1
-    version: 1.3.1
+    specifier: 1.3.2
+    version: 1.3.2
   '@types/string-similarity':
     specifier: 4.0.0
     version: 4.0.0
@@ -1328,8 +1328,8 @@ packages:
     resolution: {integrity: sha512-iiUgKzV9AuaEkZqkOLDIvlQiL6ltuZd9tGcW3gwpnX8JbuiuhFlEGmmFXEXkN50Cvq7Os88IY2v0dkDqXYWVgA==}
     dev: true
 
-  /@types/node-os-utils@1.3.1:
-    resolution: {integrity: sha512-gokG1AaQo78X3f1KXOPAfwbhERX95XL0nhosOhwFck0hZ3BG52Mfch3oj3gAhXuUsou3lwi+ewZWjDo0wshKwQ==}
+  /@types/node-os-utils@1.3.2:
+    resolution: {integrity: sha512-R8KgQEIzuBeblJ+yLh7Ytd4Q+xjldAcGQJ4t0iVxBJOr6l8s9A6Eifu+4kBnu9bZg2uqgKfBijWnQFIuRuxjpw==}
     dev: true
 
   /@types/node@20.4.7:
