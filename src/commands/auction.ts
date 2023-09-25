@@ -839,7 +839,7 @@ async function run(
               ? ` ($${Math.floor(Number(a.bin / a.itemAmount)).toLocaleString()} each)`
               : ""
           }\n` +
-          `- [jump](https://discord.com/channels/747056029795221513/1008467335973179482/${a.messageId})\n `,
+          `- [jump](https://discord.com/channels/747056029795221513/1008467335973179482/${a.messageId})\n`,
       ),
       3,
     );
