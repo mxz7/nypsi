@@ -519,7 +519,7 @@ async function run(
         embeds: [new ErrorEmbed("you are blacklisted from chat reactions in this server")],
       });
 
-    if (args.length === 3) {
+    if (args.length >= 3) {
       const target = await getMember(message.guild, args[1]);
 
       if (!target) return send({ embeds: [new ErrorEmbed("invalid target")] });
