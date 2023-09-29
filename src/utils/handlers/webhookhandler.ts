@@ -29,6 +29,7 @@ import {
   setEcoBan,
   userExists,
 } from "../functions/economy/utils";
+import { getXp, updateXp } from "../functions/economy/xp";
 import { addKarma } from "../functions/karma/karma";
 import {
   addMember,
@@ -143,11 +144,18 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
 
   const amount = Math.floor(15000 * (level / 13 + 1));
 
+  let xp = 15;
+
+  xp += Math.floor((await getRawLevel(user)) * 0.5);
+
+  if (xp > 100) xp = 100;
+
   if (!(await isEcoBanned(user))) {
     try {
       await Promise.all([
         updateBalance(user, (await getBalance(user)) + amount),
         addKarma(user, 10),
+        updateXp(user, (await getXp(user)) + xp),
         addBooster(user, "vote_booster"),
         redis.del(`${Constants.redis.cache.economy.VOTE}:${user}`),
         redis.del(`${Constants.redis.cache.economy.BOOSTERS}:${user}`),
@@ -213,7 +221,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
             tickets.length <= Constants.LOTTERY_TICKETS_MAX - 1 ? "\n+ **1** lottery ticket" : ""
           }`,
       )
-      .disableFooter();
+      .setFooter({ text: `+${xp}xp` });
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
