@@ -117,11 +117,9 @@ levellingRewards.set(2500, {
 
 const xpFormula = (level: number, prestige: number) => {
   let prestigeModified = prestige;
-  if (prestige > 13) prestigeModified = 13;
+  if (prestige > 10) prestigeModified = 10;
 
-  return (
-    Math.floor(Math.pow(level + 1, 1.117 + 0.077 * prestigeModified) + 100 + 15 * prestige) - 1
-  );
+  return Math.floor(Math.pow(level + 1, 1.117 + 0.077 * prestigeModified) + 50 + 15 * prestige) - 1;
 };
 const moneyFormula = (level: number) => Math.floor(Math.pow(level + 1, 2.10769) + 25_000) - 1;
 const cratesFormula = (level: number, prestige: number) => {
