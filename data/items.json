@@ -2376,7 +2376,7 @@
       "id:multi_potion",
       "id:skyline_r34:85",
       "id:lucky_7:95",
-      "id:reroll_token:5"
+      "id:reroll_token:20"
     ]
   },
   "omega_tag": {
@@ -2514,7 +2514,7 @@
     "rarity": 7,
     "article": "a",
     "in_crates": false,
-    "random_drop_chance": 0.1
+    "random_drop_chance": 3
   },
   "big_tiddy_goth_gf": {
     "id": "big_tiddy_goth_gf",
