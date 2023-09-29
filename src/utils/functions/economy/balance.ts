@@ -239,7 +239,9 @@ export async function getGambleMulti(member: GuildMember | string) {
       multi -= Math.floor(Math.random() * 3) + 1;
     } else {
       gemBreak(id, 0.01, "white_gem");
-      const choices = [7, 3, 4, 5, 7, 2, 17, 7, 4, 5, 3, 3, 3, 4, 3, 3, 3, 2, 2, 2, 7];
+      const choices = [
+        7, 3, 4, 5, 7, 2, 17, 7, 4, 5, 3, 3, 3, 4, 3, 3, 3, 2, 2, 2, 7, 7, 7, 7, 7, 7, 7,
+      ];
       multi += Math.floor(Math.random() * choices[Math.floor(Math.random() * choices.length)]);
     }
   } else if (inventory.find((i) => i.item == "pink_gem")?.amount > 0) {
@@ -249,7 +251,7 @@ export async function getGambleMulti(member: GuildMember | string) {
       multi -= 3;
     } else {
       gemBreak(id, 0.07, "pink_gem");
-      const choices = [7, 5, 4, 3, 2, 1, 3, 1, 1, 1, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2];
+      const choices = [7, 5, 4, 3, 2, 1, 3, 1, 1, 1, 3, 3, 2, 2, 2, 3, 3, 4, 4];
       multi += Math.floor(Math.random() * choices[Math.floor(Math.random() * choices.length)]);
     }
   }
