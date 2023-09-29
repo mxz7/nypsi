@@ -291,7 +291,7 @@ export async function getSellMulti(member: GuildMember | string) {
 
   if (multi > 75) multi = 75;
 
-  breakdown.set("level", Math.floor(multi));
+  if (multi > 0) breakdown.set("level", Math.floor(multi));
 
   switch (tier) {
     case 1:
