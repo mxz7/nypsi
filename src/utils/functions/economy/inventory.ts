@@ -341,7 +341,9 @@ export async function openCrate(
       crateItems.push(...filteredItems);
     }
   } else {
-    crateItems.push(...["money:50000", "money:100000", "xp:25", "xp:50"]);
+    crateItems.push(
+      ...["money:50000", "money:100000", "money:500000", "xp:50", "xp:100", "xp:250"],
+    );
 
     for (const i of Object.keys(items)) {
       if (!items[i].in_crates) continue;
@@ -442,7 +444,7 @@ export async function openCrate(
           if (item.id == "nypsi_crate") {
             for (let x = 0; x < 6; x++) {
               crateItemsModified.push("money:10000000");
-              crateItemsModified.push("xp:750");
+              crateItemsModified.push("xp:1000");
             }
           }
           for (let x = 0; x < 2; x++) {
