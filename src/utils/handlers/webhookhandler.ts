@@ -215,20 +215,25 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
       )
       .disableFooter();
 
-    if (!(await getDmSettings(user)).voteReminder) {
-      const chance = Math.floor(Math.random() * 10);
-
-      if (chance == 7) {
-        embed.setFooter({ text: "you can enable vote reminders with /settings me notifications" });
-      }
-    }
-
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
         .setLabel("open crates")
         .setCustomId("vote-crates")
         .setStyle(ButtonStyle.Success),
     );
+
+    if (!(await getDmSettings(user)).voteReminder) {
+      const chance = Math.floor(Math.random() * 10);
+
+      if (chance == 7) {
+        row.addComponents(
+          new ButtonBuilder()
+            .setLabel("enable vote reminders")
+            .setCustomId("enable-vote-reminders")
+            .setStyle(ButtonStyle.Secondary),
+        );
+      }
+    }
 
     const res = await requestDM({
       memberId: user,
