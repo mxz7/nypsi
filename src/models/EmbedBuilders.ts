@@ -19,13 +19,13 @@ setInterval(() => {
 }, ms("1 hour"));
 
 export class CustomEmbed extends EmbedBuilder {
-  constructor(member?: GuildMember, text?: string, disableFooter = false) {
+  constructor(member?: GuildMember | string, text?: string, disableFooter = false) {
     super();
 
     super.setColor(Constants.PURPLE);
 
     if (member) {
-      super.setColor(getColor(member.id));
+      super.setColor(getColor(typeof member === "string" ? member : member.id));
     }
 
     if (text) {
