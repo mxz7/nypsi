@@ -904,7 +904,7 @@ async function run(
       });
     }
 
-    if (args[2].toLowerCase() === "on") {
+    if (args[2].toLowerCase() === "on" || args[2].toLowerCase() === "enable") {
       if (await redis.exists(`cd:passive_toggle:${message.author.id}`)) {
         return send({ embeds: [new ErrorEmbed("you have already toggled passive mode recently")] });
       }
@@ -922,7 +922,7 @@ async function run(
           ),
         ],
       });
-    } else if (args[2].toLowerCase() === "off") {
+    } else if (args[2].toLowerCase() === "off" || args[2].toLowerCase() === "disable") {
       if (await redis.exists(`cd:passive_toggle:${message.author.id}`)) {
         return send({ embeds: [new ErrorEmbed("you have already toggled passive mode recently")] });
       }
@@ -938,6 +938,11 @@ async function run(
         ],
       });
     }
+    else return send({
+      embeds: [
+        new ErrorEmbed("/settings me passive on/off"),
+      ],
+    })
   };
 
   if (args.length == 0) {
