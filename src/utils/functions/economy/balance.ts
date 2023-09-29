@@ -250,7 +250,7 @@ export async function getGambleMulti(member: GuildMember | string) {
     } else {
       gemBreak(id, 0.07, "pink_gem");
       const choices = [7, 5, 4, 3, 2, 1, 3, 1, 1, 1, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2];
-      multi += choices[Math.floor(Math.random() * choices.length)];
+      multi += Math.floor(Math.random() * choices[Math.floor(Math.random() * choices.length)]);
     }
   }
 
