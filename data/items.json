@@ -582,7 +582,7 @@
     "role": "prey",
     "rarity": 4,
     "buy": 0,
-    "sell": 250000,
+    "sell": 200000,
     "in_crates": false
   },
   "panda": {
@@ -648,6 +648,71 @@
     "rarity": 3,
     "buy": 0,
     "sell": 30000,
+    "in_crates": false
+  },
+  "blaze": {
+    "id": "blaze",
+    "name": "blaze",
+    "article": "a",
+    "plural": "blazes",
+    "emoji": "<:nypsi_blaze:1157801702376886372>",
+    "longDesc": "found while hunting in the nether",
+    "role": "prey",
+    "rarity": 2,
+    "buy": 0,
+    "sell": 20000,
+    "in_crates": false
+  },
+  "wither_skeleton": {
+    "id": "wither_skeleton",
+    "name": "wither skeleton",
+    "article": "a",
+    "plural": "wither skeletons",
+    "emoji": "<:nypsi_wither_skel:1157805627788234913>",
+    "longDesc": "found while hunting in the nether",
+    "role": "prey",
+    "rarity": 2,
+    "buy": 0,
+    "sell": 20000,
+    "in_crates": false
+  },
+  "piglin": {
+    "id": "piglin",
+    "name": "piglin",
+    "article": "a",
+    "plural": "piglins",
+    "emoji": "<:nypsi_piglin:1157806701655900242>",
+    "longDesc": "found while hunting in the nether",
+    "role": "prey",
+    "rarity": 3,
+    "buy": 0,
+    "sell": 75000,
+    "in_crates": false
+  },
+  "ghast": {
+    "id": "ghast",
+    "name": "ghast",
+    "article": "a",
+    "plural": "ghasts",
+    "emoji": "<:nypsi_ghast:1157808196023488532>",
+    "longDesc": "found while hunting in the nether",
+    "role": "prey",
+    "rarity": 3,
+    "buy": 0,
+    "sell": 75000,
+    "in_crates": false
+  },
+  "enderman": {
+    "id": "enderman",
+    "name": "enderman",
+    "article": "an",
+    "plural": "endermen",
+    "emoji": "<:nypsi_blaze:1157801702376886372>",
+    "longDesc": "found while hunting",
+    "role": "prey",
+    "rarity": 4,
+    "buy": 0,
+    "sell": 100000,
     "in_crates": false
   },
   "mineshaft_chest": {
@@ -2526,5 +2591,51 @@
     "rarity": 3,
     "role": "collectable",
     "in_crates": true
+  },
+  "blaze_rod": {
+    "id": "blaze_rod",
+    "name": "blaze rod",
+    "article": "a",
+    "plural": "blaze rods",
+    "emoji": "<:nypsi_blazerod:1157803137197932544>",
+    "longDesc": "used to create eyes of ender",
+    "rarity": 69,
+    "role": "item",
+    "in_crates": false,
+    "craft": {
+      "time": 3600,
+      "ingredients": ["blaze:3"]
+    }
+  },
+  "ender_pearl": {
+    "id": "ender_pearl",
+    "name": "ender peal",
+    "article": "an",
+    "plural": "ender peals",
+    "emoji": "<:nypsi_blazerod:1157803137197932544>",
+    "longDesc": "used to create eyes of ender",
+    "rarity": 69,
+    "role": "item",
+    "in_crates": false,
+    "craft": {
+      "time": 5400,
+      "ingredients": ["enderman:2"]
+    }
+  },
+  "wither_skeleton_head": {
+    "id": "wither_skeleton_head",
+    "name": "wither skeleton head",
+    "article": "a",
+    "plural": "wither skeleton heads",
+    "emoji": "<:wither_skel_head:1157805930830905344>",
+    "longDesc": "crafted from wither skeletons",
+    "rarity": 69,
+    "role": "sellable",
+    "sell": 200000,
+    "in_crates": false,
+    "craft": {
+      "time": 600,
+      "ingredients": ["wither_skeleton:2"]
+    }
   }
 }

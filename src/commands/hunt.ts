@@ -41,6 +41,7 @@ const places = [
   "forest",
   "field",
   "forest",
+  "nether",
 ];
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
@@ -172,7 +173,24 @@ async function doHunt(
     await setInventoryItem(member, gun, inventory.find((i) => i.item == gun).amount - 1, false);
   }
 
-  const chosenPlace = places[Math.floor(Math.random() * places.length)];
+  let chosenPlace: string;
+
+  const choseArea = (): string => {
+    chosenPlace = places[Math.floor(Math.random() * places.length)];
+
+    if (chosenPlace == "nether") {
+      if (
+        !inventory.find((i) => i.item == "nether_portal") ||
+        inventory.find((i) => i.item == "nether_portal").amount == 0
+      ) {
+        return choseArea();
+      }
+    }
+
+    return chosenPlace;
+  };
+
+  chosenPlace = choseArea();
 
   const user = await message.client.users.fetch(message.member.user.id);
 
@@ -199,7 +217,19 @@ async function doHunt(
     for (const i of huntItems) {
       if (items[i]) {
         if (items[i].role != "prey") continue;
-        if (items[i].rarity == 4) {
+        if (chosenPlace === "nether") {
+          if (!["blaze", "wither_skeleton", "piglin", "ghast"].includes(i)) continue;
+        } else {
+          if (["blaze", "wither_skeleton", "piglin", "ghast"].includes(i)) continue;
+        }
+        if (items[i].rarity === 5) {
+          const chance = Math.floor(Math.random() * 75);
+          if (chance == 7 && gun == "incredible_gun") {
+            for (let x = 0; x < Math.floor(Math.random() * 5); x++) {
+              huntItemsModified.push(i);
+            }
+          }
+        } else if (items[i].rarity == 4) {
           const chance = Math.floor(Math.random() * 15);
           if (chance == 4 && gun == "incredible_gun") {
             for (let x = 0; x < 4; x++) {
