@@ -937,12 +937,10 @@ async function run(
           new CustomEmbed(message.member, "you are no longer in passive mode and can be robbed"),
         ],
       });
-    }
-    else return send({
-      embeds: [
-        new ErrorEmbed("/settings me passive on/off"),
-      ],
-    })
+    } else
+      return send({
+        embeds: [new ErrorEmbed("/settings me passive on/off")],
+      });
   };
 
   if (args.length == 0) {
