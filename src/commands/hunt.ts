@@ -131,6 +131,7 @@ async function doHunt(
   const huntItems = Array.from(Object.keys(items));
 
   let times = 1;
+  let multi = 0;
 
   if (gun == "gun") {
     times = 2;
@@ -145,6 +146,13 @@ async function doHunt(
     if (items[boosterId].boosterEffect.boosts.includes("hunt")) {
       if (items[boosterId].id == "unbreaking") {
         unbreaking = true;
+      } else if (items[boosterId].id == "looting") {
+        for (let i = 0; i < boosters.get(boosterId).length; i++) {
+          let chance = Math.floor(Math.random() * 5);
+          if (chance > 1) {
+            multi += items[boosterId].boosterEffect.effect;
+          }
+        }
       } else {
         times++;
       }
@@ -277,6 +285,12 @@ async function doHunt(
       amount = Math.floor(Math.random() * 3) + 1;
     } else if (gun == "incredible_gun") {
       amount = Math.floor(Math.random() * 5) + 1;
+    }
+
+    if (multi > 0) {
+      amount += amount * multi;
+      amount = Math.floor(amount);
+      if (amount > 64) amount = 64;
     }
 
     await addInventoryItem(member, chosen, amount);
