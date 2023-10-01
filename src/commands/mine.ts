@@ -47,6 +47,7 @@ const areas = [
   "nether",
   "nether",
   "nether",
+  "end",
 ];
 
 const cmd = new Command("mine", "go to a cave and mine", "money").setDocs(
@@ -225,6 +226,13 @@ async function doMine(
       ) {
         return choseArea();
       }
+    } else if (chosenArea === "end") {
+      if (
+        !inventory.find((i) => i.item == "end_portal") ||
+        inventory.find((i) => i.item == "end_portal").amount == 0
+      ) {
+        return choseArea();
+      }
     }
 
     return chosenArea;
@@ -257,6 +265,8 @@ async function doMine(
         if (chosenArea == "nether") {
           if (!["netherrack", "ancient_debris", "quartz", "gold_nugget"].includes(items[i].id))
             continue;
+        } else if (chosenArea === "end") {
+          if (!["end_stone", "purpur", "obsidian", "dragon_egg"].includes(items[i].id)) continue;
         } else {
           if (
             ![
