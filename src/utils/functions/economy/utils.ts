@@ -16,6 +16,7 @@ import { Tag } from "../../../types/Tags";
 import { Worker, WorkerUpgrades } from "../../../types/Workers";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
+import { getAllGroupAccountIds } from "../moderation/alts";
 import { isUserBlacklisted } from "../users/blacklist";
 import { getPreferences } from "../users/notifications";
 import { createProfile, hasProfile } from "../users/utils";
@@ -25,7 +26,6 @@ import { getGuildByUser } from "./guilds";
 import { addInventoryItem } from "./inventory";
 import { getXp, updateXp } from "./xp";
 import ms = require("ms");
-import dayjs = require("dayjs");
 import math = require("mathjs");
 
 let items: { [key: string]: Item };
@@ -262,51 +262,63 @@ export function formatNumber(number: string | number) {
 
 export async function isEcoBanned(id: string) {
   if (await isUserBlacklisted(id)) return true;
+
   if (await redis.exists(`${Constants.redis.cache.economy.BANNED}:${id}`)) {
     const res =
       (await redis.get(`${Constants.redis.cache.economy.BANNED}:${id}`)) === "t" ? true : false;
 
-    if (res) await redis.del(`${Constants.redis.cache.economy.BANNED}:${id}`);
     return res;
-  } else {
-    const query = await prisma.economy.findUnique({
-      where: {
-        userId: id,
-      },
-      select: {
-        banned: true,
-      },
-    });
+  }
 
-    if (!query || !query.banned) {
-      await redis.set(`${Constants.redis.cache.economy.BANNED}:${id}`, "f");
-      await redis.expire(`${Constants.redis.cache.economy.BANNED}:${id}`, ms("1 hour") / 1000);
-      return false;
-    }
+  const accounts = await getAllGroupAccountIds(Constants.NYPSI_SERVER_ID, id);
 
-    if (dayjs().isBefore(query.banned)) {
-      await redis.set(`${Constants.redis.cache.economy.BANNED}:${id}`, "t");
-      await redis.expire(`${Constants.redis.cache.economy.BANNED}:${id}`, ms("1 hour") / 1000);
-      return true;
+  for (const accountId of accounts) {
+    if (await redis.exists(`${Constants.redis.cache.economy.BANNED}:${accountId}`)) {
+      if ((await redis.get(`${Constants.redis.cache.economy.BANNED}:${accountId}`)) === "t")
+        return true;
     } else {
-      await redis.set(`${Constants.redis.cache.economy.BANNED}:${id}`, "f");
-      await redis.expire(`${Constants.redis.cache.economy.BANNED}:${id}`, ms("1 hour") / 1000);
-      return false;
+      const query = await prisma.economy.findUnique({
+        where: { userId: accountId },
+        select: { banned: true },
+      });
+
+      if (query && query.banned) {
+        if (query.banned.getTime() > Date.now()) {
+          for (const accountId of accounts) {
+            await redis.set(
+              `${Constants.redis.cache.economy.BANNED}:${accountId}`,
+              "t",
+              "EX",
+              ms("3 hour") / 1000,
+            );
+          }
+
+          return true;
+        } else {
+          await redis.set(`${Constants.redis.cache.economy.BANNED}:${accountId}`, "f", "EX", 3600);
+        }
+      } else {
+        await redis.set(`${Constants.redis.cache.economy.BANNED}:${accountId}`, "f", "EX", 3600);
+      }
     }
   }
+
+  return false;
 }
 
 export async function getEcoBanTime(id: string) {
-  const query = await prisma.economy.findUnique({
-    where: {
-      userId: id,
-    },
-    select: {
-      banned: true,
-    },
-  });
+  const accounts = await getAllGroupAccountIds(Constants.NYPSI_SERVER_ID, id);
 
-  return query.banned;
+  for (const accountId of accounts) {
+    const query = await prisma.economy.findUnique({
+      where: { userId: accountId },
+      select: { banned: true },
+    });
+
+    if (query && query.banned && query.banned.getTime() > Date.now()) {
+      return query.banned;
+    }
+  }
 }
 
 export async function setEcoBan(id: string, date?: Date) {
@@ -330,7 +342,7 @@ export async function setEcoBan(id: string, date?: Date) {
     });
   }
 
-  await redis.del(`${Constants.redis.cache.economy.BANNED}:${id}`);
+  exec(`redis-cli KEYS "*economy:banned*" | xargs redis-cli DEL`);
 }
 
 export async function reset() {
