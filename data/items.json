@@ -104,6 +104,45 @@
     "sell": 900,
     "in_crates": false
   },
+  "end_stone": {
+    "id": "end_stone",
+    "name": "end stone",
+    "article": "an",
+    "plural": "end stone",
+    "emoji": "<:nypsi_endstone:1158022795083665588>",
+    "longDesc": "found when mining in the end",
+    "role": "sellable",
+    "rarity": 0,
+    "buy": 0,
+    "sell": 1600,
+    "in_crates": false
+  },
+  "purpur": {
+    "id": "purpur",
+    "name": "purpur",
+    "article": "a",
+    "plural": "purpurs",
+    "emoji": "<:nypsi_purpur:1158024429373227098>",
+    "longDesc": "found when mining in the end",
+    "role": "sellable",
+    "rarity": 1,
+    "buy": 0,
+    "sell": 5000,
+    "in_crates": false
+  },
+  "dragon_egg": {
+    "id": "dragon_egg",
+    "name": "dragon egg",
+    "article": "a",
+    "plural": "dragon eggs",
+    "emoji": "<:nypsi_dragon_egg:1158024899470839898>",
+    "longDesc": "found when mining in the end",
+    "role": "sellable",
+    "rarity": 3,
+    "buy": 0,
+    "sell": 150000,
+    "in_crates": false
+  },
   "coal": {
     "id": "coal",
     "name": "coal",
@@ -2636,6 +2675,38 @@
     "craft": {
       "time": 600,
       "ingredients": ["wither_skeleton:2"]
+    }
+  },
+  "eye_of_ender": {
+    "id": "eye_of_ender",
+    "name": "eye of ender",
+    "article": "an",
+    "plural": "eye of enders",
+    "emoji": "<:nypsi_eye_ender:1158003799361863690>",
+    "longDesc": "used to create an end portal",
+    "rarity": 69,
+    "role": "resource",
+    "in_crates": false,
+    "sell": 100000,
+    "craft": {
+      "time": 21600,
+      "ingredients": ["ender_pearl:2", "blaze_rod:2"]
+    }
+  },
+  "end_portal": {
+    "id": "end_portal",
+    "name": "end portal",
+    "article": "an",
+    "plural": "end portals",
+    "emoji": "<:nypsi_end_portal:1158021880905744404>",
+    "longDesc": "used to mine in the end",
+    "rarity": 69,
+    "role": "item",
+    "in_crates": false,
+    "sell": 1000000,
+    "craft": {
+      "time": 259200,
+      "ingredients": ["eye_of_ender:12"]
     }
   }
 }
