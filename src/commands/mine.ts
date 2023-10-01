@@ -37,6 +37,8 @@ veins.set("amethyst", [1, 2, 3]);
 veins.set("netherrack", [5, 7, 15, 25]);
 veins.set("gold_nugget", [2, 8, 12, 18, 28]);
 veins.set("quartz", [1, 4, 6, 12]);
+veins.set("end_stone", [5, 7, 15, 25]);
+veins.set("purpur", [2, 8, 12, 14]);
 
 const areas = [
   "cave",
