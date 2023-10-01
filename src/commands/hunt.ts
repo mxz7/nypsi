@@ -231,7 +231,7 @@ async function doHunt(
           if (["blaze", "wither_skeleton", "piglin", "ghast"].includes(i)) continue;
         }
         if (items[i].rarity === 5) {
-          const chance = Math.floor(Math.random() * 75);
+          const chance = Math.floor(Math.random() * 50);
           if (chance == 7 && gun == "incredible_gun") {
             for (let x = 0; x < Math.floor(Math.random() * 5); x++) {
               huntItemsModified.push(i);
