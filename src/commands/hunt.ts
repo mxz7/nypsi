@@ -148,9 +148,9 @@ async function doHunt(
         unbreaking = true;
       } else if (items[boosterId].id == "looting") {
         for (let i = 0; i < boosters.get(boosterId).length; i++) {
-          let chance = Math.floor(Math.random() * 5);
-          if (chance > 1) {
-            multi += items[boosterId].boosterEffect.effect;
+          const chance = Math.floor(Math.random() * 5);
+          if (chance > 2) {
+            multi += Math.floor(Math.random() * items[boosterId].boosterEffect.effect);
           }
         }
       } else {
