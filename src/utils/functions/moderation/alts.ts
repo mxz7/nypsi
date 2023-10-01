@@ -35,15 +35,20 @@ export async function getAlts(guild: Guild, mainId: string) {
   return query;
 }
 
-export async function getAllGroupAccountIds(guild: Guild, userId: string) {
+export async function getAllGroupAccountIds(guild: Guild | string, userId: string) {
+  let id: string;
+
+  if (guild instanceof Guild) id = guild.id;
+  else id = guild;
+
   try {
     let mainId = userId;
 
-    if (!(await isMainAccount(guild, userId))) mainId = await getMainAccount(guild, userId);
+    if (!(await isMainAccount(id, userId))) mainId = await getMainAccount(id, userId);
 
     const query = await prisma.alt.findMany({
       where: {
-        AND: [{ guildId: guild.id }, { mainId: mainId }],
+        AND: [{ guildId: id }, { mainId: mainId }],
       },
     });
 
@@ -67,20 +72,25 @@ export async function isAlt(guild: Guild, altId: string) {
   return query && (await getExactMember(guild, await getMainAccount(guild, altId))) ? true : false;
 }
 
-export async function isMainAccount(guild: Guild, userId: string) {
+export async function isMainAccount(guild: Guild | string, userId: string) {
   const query = await prisma.alt.findFirst({
     where: {
-      AND: [{ guildId: guild.id }, { mainId: userId }],
+      AND: [{ guildId: typeof guild === "string" ? guild : guild.id }, { mainId: userId }],
     },
   });
 
   return Boolean(query);
 }
 
-export async function getMainAccount(guild: Guild, altId: string) {
+export async function getMainAccount(guild: Guild | string, altId: string) {
+  let id: string;
+
+  if (guild instanceof Guild) id = guild.id;
+  else id = guild;
+
   const query = await prisma.alt.findFirst({
     where: {
-      AND: [{ guildId: guild.id }, { altId: altId }],
+      AND: [{ guildId: id }, { altId: altId }],
     },
     select: {
       mainId: true,
