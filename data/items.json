@@ -2600,7 +2600,7 @@
     "emoji": "<:nypsi_blazerod:1157803137197932544>",
     "longDesc": "used to create eyes of ender",
     "rarity": 69,
-    "role": "item",
+    "role": "resource",
     "in_crates": false,
     "craft": {
       "time": 3600,
@@ -2615,7 +2615,7 @@
     "emoji": "<:nypsi_enderpearl:1158003398998753361>",
     "longDesc": "used to create eyes of ender",
     "rarity": 69,
-    "role": "item",
+    "role": "resource",
     "in_crates": false,
     "craft": {
       "time": 5400,
