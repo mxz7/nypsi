@@ -2642,7 +2642,7 @@
     "role": "resource",
     "in_crates": false,
     "craft": {
-      "time": 3600,
+      "time": 1800,
       "ingredients": ["blaze:3"]
     }
   },
