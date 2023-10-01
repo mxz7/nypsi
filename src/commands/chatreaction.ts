@@ -334,6 +334,14 @@ async function run(
     }
 
     if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
+      if (await onCooldown(cmd.name, message.member)) {
+        const embed = await getResponse(cmd.name, message.member);
+
+        return send({ embeds: [embed], ephemeral: true });
+      }
+
+      await addCooldown(cmd.name, message.member, 10);
+
       const blacklisted = await getBlacklisted(message.guild);
 
       if (blacklisted.includes(message.author.id)) return;
