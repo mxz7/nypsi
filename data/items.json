@@ -2507,7 +2507,7 @@
     "id": "reroll_token",
     "name": "reroll token",
     "emoji": "<:reroll_token:1150463797497184307>",
-    "longDesc": "reroll a permanant upgrade into a different one",
+    "longDesc": "reroll a permanent upgrade into a different one",
     "sell": 25000000,
     "role": "item",
     "aliases": ["reroll"],
