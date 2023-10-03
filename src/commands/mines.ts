@@ -5,6 +5,7 @@ import {
   APIApplicationCommandOptionChoice,
   BaseMessageOptions,
   ButtonBuilder,
+  ButtonInteraction,
   ButtonStyle,
   ColorResolvable,
   CommandInteraction,
@@ -15,6 +16,7 @@ import {
   MessageEditOptions,
 } from "discord.js";
 import redis from "../init/redis.js";
+import { NypsiClient } from "../models/Client.js";
 import { Command, NypsiCommandInteraction } from "../models/Command.js";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants.js";
@@ -35,12 +37,11 @@ import { createUser, formatBet, userExists } from "../utils/functions/economy/ut
 import { calcEarnedGambleXp, getXp, updateXp } from "../utils/functions/economy/xp.js";
 import { getTier, isPremium } from "../utils/functions/premium/premium.js";
 import { percentChance } from "../utils/functions/random.js";
+import { recentCommands } from "../utils/functions/users/commands.js";
 import { addHourlyCommand } from "../utils/handlers/commandhandler.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 import { gamble, logger } from "../utils/logger.js";
 import ms = require("ms");
-import { recentCommands } from "../utils/functions/users/commands.js";
-import { NypsiClient } from "../models/Client.js";
 
 const games = new Map<
   string,
@@ -520,23 +521,19 @@ async function playGame(
 
   const embed = new CustomEmbed(message.member).setHeader("mines", message.author.avatarURL());
 
-  const edit = async (data: MessageEditOptions) => {
-    if (!(message instanceof Message)) {
-      await message.editReply(data);
-      return await message.fetchReply();
-    } else {
-      return await msg.edit(data);
-    }
+  const edit = async (data: MessageEditOptions, interaction: ButtonInteraction) => {
+    if (!interaction || interaction.deferred || interaction.replied) return msg.edit(data);
+    return interaction.update(data);
   };
 
-  const replay = async (embed: CustomEmbed) => {
+  const replay = async (embed: CustomEmbed, interaction: ButtonInteraction) => {
     await redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
     if (
       !(await isPremium(message.member)) ||
       !((await getTier(message.member)) >= 2) ||
       (await getBalance(message.member)) < bet
     ) {
-      return msg.edit({ embeds: [embed], components: getRows(grid, true) });
+      return edit({ embeds: [embed], components: getRows(grid, true) }, interaction);
     }
 
     const components = getRows(grid, true);
@@ -550,7 +547,7 @@ async function playGame(
       .setLabel("play again")
       .setDisabled(false);
 
-    await msg.edit({ embeds: [embed], components });
+    await edit({ embeds: [embed], components }, interaction);
 
     const res = await msg
       .awaitMessageComponent({
@@ -614,7 +611,7 @@ async function playGame(
     }
   };
 
-  const lose = async () => {
+  const lose = async (interaction: ButtonInteraction) => {
     const id = await createGame({
       userId: message.author.id,
       bet: bet,
@@ -635,10 +632,10 @@ async function playGame(
         ")\n\n**you lose!!**",
     );
     games.delete(message.author.id);
-    return replay(embed);
+    return replay(embed, interaction);
   };
 
-  const win1 = async () => {
+  const win1 = async (interaction?: ButtonInteraction) => {
     let winnings = Math.round(bet * win);
 
     embed.setColor(Constants.EMBED_SUCCESS_COLOR);
@@ -710,10 +707,10 @@ async function playGame(
 
     await updateBalance(message.member, (await getBalance(message.member)) + winnings);
     games.delete(message.author.id);
-    return replay(embed);
+    return replay(embed, interaction);
   };
 
-  const draw = async () => {
+  const draw = async (interaction: ButtonInteraction) => {
     const id = await createGame({
       userId: message.author.id,
       bet: bet,
@@ -738,7 +735,7 @@ async function playGame(
     );
     await updateBalance(message.member, (await getBalance(message.member)) + bet);
     games.delete(message.author.id);
-    return replay(embed);
+    return replay(embed, interaction);
   };
 
   if (win >= 15) {
@@ -752,11 +749,10 @@ async function playGame(
   const response = await msg
     .awaitMessageComponent({ filter, time: 90000 })
     .then(async (collected) => {
-      await collected.deferUpdate().catch(() => {
-        fail = true;
-        return playGame(message, msg, args);
-      });
-      return collected;
+      setTimeout(() => {
+        collected.deferUpdate().catch(() => null);
+      }, 2500);
+      return collected as ButtonInteraction;
     })
     .catch((e) => {
       logger.warn("mines error", e);
@@ -779,13 +775,13 @@ async function playGame(
 
   if (response.customId == "finish") {
     if (win < 1) {
-      lose();
+      lose(response);
       return;
     } else if (win == 1) {
-      draw();
+      draw(response);
       return;
     } else {
-      win1();
+      win1(response);
       return;
     }
   } else {
@@ -822,7 +818,7 @@ async function playGame(
   switch (grid[location]) {
     case "b":
       grid[location] = "x";
-      lose();
+      lose(response);
       return;
     case "c":
       return playGame(message, msg, args);
@@ -839,15 +835,26 @@ async function playGame(
           await redis.expire(Constants.redis.nypsi.GEM_GIVEN, Math.floor(ms("1 days") / 1000));
           addInventoryItem(message.member, "green_gem", 1);
           addProgress(message.author.id, "gem_hunter", 1);
-          response.followUp({
-            embeds: [
-              new CustomEmbed(
-                message.member,
-                `${GEM_EMOJI} you found a **gem**!!\nit has been added to your inventory, i wonder what powers it has`,
-              ),
-            ],
-            ephemeral: true,
-          });
+          if (response.replied || response.deferred)
+            response.followUp({
+              embeds: [
+                new CustomEmbed(
+                  message.member,
+                  `${GEM_EMOJI} you found a **gem**!!\nit has been added to your inventory, i wonder what powers it has`,
+                ),
+              ],
+              ephemeral: true,
+            });
+          else
+            response.reply({
+              embeds: [
+                new CustomEmbed(
+                  message.member,
+                  `${GEM_EMOJI} you found a **gem**!!\nit has been added to your inventory, i wonder what powers it has`,
+                ),
+              ],
+              ephemeral: true,
+            });
         }
       }
 
@@ -873,7 +880,7 @@ async function playGame(
       );
 
       if (win >= 15) {
-        win1();
+        win1(response);
         return;
       }
 
@@ -883,7 +890,7 @@ async function playGame(
         components[4].components[4].setDisabled(true);
       }
 
-      edit({ embeds: [embed], components });
+      edit({ embeds: [embed], components }, response);
 
       return playGame(message, msg, args);
   }
