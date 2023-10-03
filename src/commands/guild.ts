@@ -903,7 +903,7 @@ async function run(
         `${prefix}**guild delete** *delete your guild*\n` +
         `${prefix}**guild deposit <amount>** *deposit money into your guild*\n` +
         `${prefix}**guild stats** *show contribution stats of your guild*\n` +
-        `${prefix}**guild shop** *view guild upgrades that are available to buy\n` +
+        `${prefix}**guild shop** *view guild upgrades that are available to buy*\n` +
         `${prefix}**guild buy** *buy guild upgrades with tokens*\n` +
         `${prefix}**guild upgrade** *show requirements for next upgrade*\n` +
         `${prefix}**guild motd <motd>** *set guild motd*\n` +
