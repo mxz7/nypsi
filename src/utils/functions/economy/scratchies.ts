@@ -204,7 +204,8 @@ export default class ScratchCard {
         );
       }
 
-      interaction.followUp({ embeds: [embed] });
+      if (interaction.deferred || interaction.replied) interaction.followUp({ embeds: [embed] });
+      else interaction.reply({ embeds: [embed] });
       return;
     };
 

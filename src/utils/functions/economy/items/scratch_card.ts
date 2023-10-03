@@ -225,7 +225,9 @@ async function prepare(
       embed.setDescription(
         `**${card.remainingClicks}** click${card.remainingClicks != 1 ? "s" : ""} left`,
       );
-      await response.update({ embeds: [embed], components: card.getButtons() });
+      if (!response.replied && !response.deferred)
+        await response.update({ embeds: [embed], components: card.getButtons() });
+      else await msg.edit({ embeds: [embed], components: card.getButtons() });
     }
     return play();
   };
