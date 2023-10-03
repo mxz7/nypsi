@@ -3,6 +3,7 @@ import {
   ActionRowBuilder,
   BaseMessageOptions,
   ButtonBuilder,
+  ButtonInteraction,
   ButtonStyle,
   ColorResolvable,
   CommandInteraction,
@@ -524,13 +525,9 @@ async function playGame(
 ): Promise<void> {
   if (!games.has(message.author.id)) return;
 
-  const edit = async (data: MessageEditOptions) => {
-    if (!(message instanceof Message)) {
-      await message.editReply(data);
-      return await message.fetchReply();
-    } else {
-      return await m.edit(data);
-    }
+  const edit = async (data: MessageEditOptions, interaction?: ButtonInteraction) => {
+    if (!interaction || interaction.deferred || interaction.replied) return m.edit(data);
+    return interaction.update(data);
   };
 
   let bet = games.get(message.author.id).bet;
@@ -542,21 +539,21 @@ async function playGame(
     message.author.avatarURL(),
   );
 
-  const replay = async (embed: CustomEmbed) => {
+  const replay = async (embed: CustomEmbed, interaction: ButtonInteraction) => {
     await redis.del(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
     if (
       !(await isPremium(message.member)) ||
       !((await getTier(message.member)) >= 2) ||
       (await getBalance(message.member)) < bet
     ) {
-      return m.edit({ embeds: [embed], components: [] });
+      return edit({ embeds: [embed], components: [] }, interaction);
     }
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder().setLabel("play again").setStyle(ButtonStyle.Success).setCustomId("rp"),
     );
 
-    await m.edit({ embeds: [embed], components: [row] });
+    await edit({ embeds: [embed], components: [row] }, interaction);
 
     const res = await m
       .awaitMessageComponent({
@@ -612,7 +609,7 @@ async function playGame(
     }
   };
 
-  const lose = async () => {
+  const lose = async (interaction?: ButtonInteraction) => {
     const id = await createGame({
       userId: message.author.id,
       bet: bet,
@@ -635,10 +632,10 @@ async function playGame(
     );
     newEmbed.setFooter({ text: `id: ${id}` });
     games.delete(message.author.id);
-    return replay(newEmbed);
+    return replay(newEmbed, interaction);
   };
 
-  const win = async () => {
+  const win = async (interaction?: ButtonInteraction) => {
     let winnings = bet * 2;
 
     if (games.get(message.author.id).cards.length == 2 && calcTotal(message.member) == 21) {
@@ -712,10 +709,10 @@ async function playGame(
     await updateBalance(message.member, (await getBalance(message.member)) + winnings);
 
     games.delete(message.author.id);
-    return replay(newEmbed);
+    return replay(newEmbed, interaction);
   };
 
-  const draw = async () => {
+  const draw = async (interaction?: ButtonInteraction) => {
     const id = await createGame({
       userId: message.author.id,
       bet: bet,
@@ -742,7 +739,7 @@ async function playGame(
     );
     await updateBalance(message.member, (await getBalance(message.member)) + bet);
     games.delete(message.author.id);
-    return replay(newEmbed);
+    return replay(newEmbed, interaction);
   };
 
   if (calcTotalDealer(message.member) > 21) {
@@ -794,11 +791,10 @@ async function playGame(
     const reaction = await m
       .awaitMessageComponent({ filter, time: 90000 })
       .then(async (collected) => {
-        await collected.deferUpdate().catch(() => {
-          fail = true;
-          return playGame(message, m, args);
-        });
-        return collected.customId;
+        setTimeout(() => {
+          collected.deferUpdate().catch(() => null);
+        }, 2500);
+        return collected as ButtonInteraction;
       })
       .catch((e) => {
         logger.warn("bj error", e);
@@ -808,13 +804,13 @@ async function playGame(
         redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
       });
 
-    if (fail) return;
+    if (fail || !reaction) return;
 
-    if (reaction == "1️⃣") {
+    if (reaction.customId == "1️⃣") {
       newCard(message.member);
 
       if (calcTotal(message.member) > 21) {
-        lose();
+        lose(reaction);
         return;
       }
 
@@ -836,23 +832,23 @@ async function playGame(
           );
 
         row.components.forEach((c) => c.setDisabled(true));
-        await edit({ embeds: [newEmbed1], components: [row] });
+        await edit({ embeds: [newEmbed1], components: [row] }, reaction);
         setTimeout(() => {
           dealerPlay(message);
 
           if (calcTotal(message.member) == calcTotalDealer(message.member)) {
-            return draw();
+            return draw(reaction);
           } else if (calcTotalDealer(message.member) > 21) {
-            return win();
+            return win(reaction);
           } else if (calcTotalDealer(message.member) == 21) {
-            return lose();
+            return lose(reaction);
           } else if (calcTotal(message.member) == 21) {
-            return win();
+            return win(reaction);
           } else {
             if (calcTotal(message.member) > calcTotalDealer(message.member)) {
-              return win();
+              return win(reaction);
             } else {
-              return lose();
+              return lose(reaction);
             }
           }
         }, 1500);
@@ -865,11 +861,11 @@ async function playGame(
             message.author.username,
             getCards(message.member) + " **" + calcTotal(message.member) + "**",
           );
-        await edit({ embeds: [newEmbed1], components: [row] });
+        await edit({ embeds: [newEmbed1], components: [row] }, reaction);
       }
 
       return playGame(message, m, args);
-    } else if (reaction == "2️⃣") {
+    } else if (reaction.customId == "2️⃣") {
       const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()
           .setCustomId("1️⃣")
@@ -894,7 +890,7 @@ async function playGame(
           getCards(message.member) + " **" + calcTotal(message.member) + "**",
         );
 
-      await edit({ embeds: [newEmbed1], components: [row] });
+      await edit({ embeds: [newEmbed1], components: [row] }, reaction);
 
       games.set(message.author.id, {
         bet: bet,
@@ -911,22 +907,22 @@ async function playGame(
         dealerPlay(message);
 
         if (calcTotal(message.member) == calcTotalDealer(message.member)) {
-          return draw();
+          return draw(reaction);
         } else if (calcTotalDealer(message.member) > 21) {
-          return win();
+          return win(reaction);
         } else if (calcTotalDealer(message.member) == 21) {
-          return lose();
+          return lose(reaction);
         } else if (calcTotal(message.member) == 21) {
-          return win();
+          return win(reaction);
         } else {
           if (calcTotal(message.member) > calcTotalDealer(message.member)) {
-            return win();
+            return win(reaction);
           } else {
-            return lose();
+            return lose(reaction);
           }
         }
       }, 1500);
-    } else if (reaction == "3️⃣") {
+    } else if (reaction.customId == "3️⃣") {
       await updateBalance(message.member, (await getBalance(message.member)) - bet);
 
       bet = bet * 2;
@@ -972,11 +968,11 @@ async function playGame(
           message.author.username,
           getCards(message.member) + " **" + calcTotal(message.member) + "**",
         );
-      await edit({ embeds: [newEmbed1], components: [row] });
+      await edit({ embeds: [newEmbed1], components: [row] }, reaction);
 
       if (calcTotal(message.member) > 21) {
         setTimeout(() => {
-          return lose();
+          return lose(reaction);
         }, 1500);
         return;
       }
@@ -985,18 +981,18 @@ async function playGame(
         dealerPlay(message);
 
         if (calcTotal(message.member) == calcTotalDealer(message.member)) {
-          return draw();
+          return draw(reaction);
         } else if (calcTotalDealer(message.member) > 21) {
-          return win();
+          return win(reaction);
         } else if (calcTotalDealer(message.member) == 21) {
-          return lose();
+          return lose(reaction);
         } else if (calcTotal(message.member) == 21) {
-          return win();
+          return win(reaction);
         } else {
           if (calcTotal(message.member) > calcTotalDealer(message.member)) {
-            return win();
+            return win(reaction);
           } else {
-            return lose();
+            return lose(reaction);
           }
         }
       }, 1500);

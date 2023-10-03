@@ -3,6 +3,7 @@ import {
   ActionRowBuilder,
   BaseMessageOptions,
   ButtonBuilder,
+  ButtonInteraction,
   ButtonStyle,
   ColorResolvable,
   CommandInteraction,
@@ -412,30 +413,26 @@ async function playGame(
 
   const newEmbed = new CustomEmbed(message.member).setHeader("highlow", message.author.avatarURL());
 
-  const edit = async (data: MessageEditOptions) => {
-    if (!(message instanceof Message)) {
-      await message.editReply(data);
-      return await message.fetchReply();
-    } else {
-      return await m.edit(data);
-    }
+  const edit = async (data: MessageEditOptions, interaction?: ButtonInteraction) => {
+    if (!interaction || interaction.deferred || interaction.replied) return m.edit(data);
+    return interaction.update(data);
   };
 
-  const replay = async (embed: CustomEmbed) => {
+  const replay = async (embed: CustomEmbed, interaction: ButtonInteraction) => {
     await redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
     if (
       !(await isPremium(message.member)) ||
       !((await getTier(message.member)) >= 2) ||
       (await getBalance(message.member)) < bet
     ) {
-      return m.edit({ embeds: [embed], components: [] });
+      return edit({ embeds: [embed], components: [] }, interaction);
     }
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder().setLabel("play again").setStyle(ButtonStyle.Success).setCustomId("rp"),
     );
 
-    await m.edit({ embeds: [embed], components: [row] });
+    await edit({ embeds: [embed], components: [row] }, interaction);
 
     const res = await m
       .awaitMessageComponent({
@@ -491,7 +488,7 @@ async function playGame(
     }
   };
 
-  const lose = async () => {
+  const lose = async (interaction: ButtonInteraction) => {
     const id = await createGame({
       userId: message.author.id,
       bet: bet,
@@ -516,10 +513,10 @@ async function playGame(
     );
     newEmbed.addField("card", "| " + card + " |");
     games.delete(message.author.id);
-    return replay(newEmbed);
+    return replay(newEmbed, interaction);
   };
 
-  const win1 = async () => {
+  const win1 = async (interaction?: ButtonInteraction) => {
     let winnings = Math.round(bet * win);
 
     newEmbed.setColor(Constants.EMBED_SUCCESS_COLOR);
@@ -594,10 +591,10 @@ async function playGame(
     newEmbed.addField("card", "| " + card + " |");
     await updateBalance(message.member, (await getBalance(message.member)) + winnings);
     games.delete(message.author.id);
-    return replay(newEmbed);
+    return replay(newEmbed, interaction);
   };
 
-  const draw = async () => {
+  const draw = async (interaction: ButtonInteraction) => {
     const id = await createGame({
       userId: message.author.id,
       bet: bet,
@@ -625,7 +622,7 @@ async function playGame(
     newEmbed.addField("card", "| " + card + " |");
     await updateBalance(message.member, (await getBalance(message.member)) + bet);
     games.delete(message.author.id);
-    return replay(newEmbed);
+    return replay(newEmbed, interaction);
   };
 
   if (win == 15) {
@@ -640,11 +637,10 @@ async function playGame(
   const reaction = await m
     .awaitMessageComponent({ filter, time: 90000 })
     .then(async (collected) => {
-      await collected.deferUpdate().catch(() => {
-        fail = true;
-        return playGame(message, m, args);
-      });
-      return collected.customId;
+      setTimeout(() => {
+        collected.deferUpdate().catch(() => null);
+      }, 2500);
+      return collected as ButtonInteraction;
     })
     .catch((e) => {
       logger.warn("hl error", e);
@@ -654,9 +650,9 @@ async function playGame(
       message.channel.send({ content: message.author.toString() + " highlow game expired" });
     });
 
-  if (fail) return;
+  if (fail || !reaction) return;
 
-  if (reaction == "⬆") {
+  if (reaction.customId == "⬆") {
     const oldCard = getValue(message.member);
     newCard(message.member);
     card = games.get(message.author.id).card;
@@ -712,7 +708,7 @@ async function playGame(
           ")",
       );
       newEmbed.addField("card", "| " + card + " |");
-      await edit({ embeds: [newEmbed], components: [row] });
+      await edit({ embeds: [newEmbed], components: [row] }, reaction);
       return playGame(message, m, args);
     } else if (newCard1 == oldCard) {
       newEmbed.setDescription(
@@ -726,13 +722,13 @@ async function playGame(
       );
       newEmbed.addField("card", "| " + card + " |");
 
-      await edit({ embeds: [newEmbed] });
+      await edit({ embeds: [newEmbed] }, reaction);
       return playGame(message, m, args);
     } else {
-      lose();
+      lose(reaction);
       return;
     }
-  } else if (reaction == "⬇") {
+  } else if (reaction.customId == "⬇") {
     const oldCard = getValue(message.member);
     newCard(message.member);
     card = games.get(message.author.id).card;
@@ -786,7 +782,7 @@ async function playGame(
           ")",
       );
       newEmbed.addField("card", "| " + card + " |");
-      await edit({ embeds: [newEmbed], components: [row] });
+      await edit({ embeds: [newEmbed], components: [row] }, reaction);
       return playGame(message, m, args);
     } else if (newCard1 == oldCard) {
       newEmbed.setDescription(
@@ -799,20 +795,20 @@ async function playGame(
           ")",
       );
       newEmbed.addField("card", "| " + card + " |");
-      await edit({ embeds: [newEmbed] });
+      await edit({ embeds: [newEmbed] }, reaction);
       return playGame(message, m, args);
     } else {
-      lose();
+      lose(reaction);
       return;
     }
-  } else if (reaction == "💰") {
+  } else if (reaction.customId == "💰") {
     if (win < 1) {
       return playGame(message, m, args);
     } else if (win == 1) {
-      draw();
+      draw(reaction);
       return;
     } else {
-      win1();
+      win1(reaction);
       return;
     }
   } else {

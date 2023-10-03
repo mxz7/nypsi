@@ -19,12 +19,12 @@ export function randomPresence(): ActivitiesOptions {
     { name: "with your mother", type: ActivityType.Playing },
     {
       name: "nothing. me? just hanging around",
-      type: ActivityType.Watching,
+      type: ActivityType.Streaming,
       url: "https://www.youtube.com/watch?v=d2r_LU6beVw",
     },
     {
       name: "ronnie pickering",
-      type: ActivityType.Watching,
+      type: ActivityType.Streaming,
       url: "https://youtube.com/watch?v=r0dcv6GKNNw&t=102s",
     },
   ];
