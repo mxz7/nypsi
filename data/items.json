@@ -104,6 +104,45 @@
     "sell": 900,
     "in_crates": false
   },
+  "end_stone": {
+    "id": "end_stone",
+    "name": "end stone",
+    "article": "an",
+    "plural": "end stone",
+    "emoji": "<:nypsi_endstone:1158022795083665588>",
+    "longDesc": "found when mining in the end",
+    "role": "sellable",
+    "rarity": 0,
+    "buy": 0,
+    "sell": 1600,
+    "in_crates": false
+  },
+  "purpur": {
+    "id": "purpur",
+    "name": "purpur",
+    "article": "a",
+    "plural": "purpurs",
+    "emoji": "<:nypsi_purpur:1158024429373227098>",
+    "longDesc": "found when mining in the end",
+    "role": "sellable",
+    "rarity": 1,
+    "buy": 0,
+    "sell": 5000,
+    "in_crates": false
+  },
+  "dragon_egg": {
+    "id": "dragon_egg",
+    "name": "dragon egg",
+    "article": "a",
+    "plural": "dragon eggs",
+    "emoji": "<:nypsi_dragon_egg:1158024899470839898>",
+    "longDesc": "found when mining in the end",
+    "role": "sellable",
+    "rarity": 3,
+    "buy": 0,
+    "sell": 150000,
+    "in_crates": false
+  },
   "coal": {
     "id": "coal",
     "name": "coal",
@@ -582,7 +621,7 @@
     "role": "prey",
     "rarity": 4,
     "buy": 0,
-    "sell": 250000,
+    "sell": 200000,
     "in_crates": false
   },
   "panda": {
@@ -648,6 +687,71 @@
     "rarity": 3,
     "buy": 0,
     "sell": 30000,
+    "in_crates": false
+  },
+  "blaze": {
+    "id": "blaze",
+    "name": "blaze",
+    "article": "a",
+    "plural": "blazes",
+    "emoji": "<:nypsi_blaze:1157801702376886372>",
+    "longDesc": "found while hunting in the nether",
+    "role": "prey",
+    "rarity": 2,
+    "buy": 0,
+    "sell": 20000,
+    "in_crates": false
+  },
+  "wither_skeleton": {
+    "id": "wither_skeleton",
+    "name": "wither skeleton",
+    "article": "a",
+    "plural": "wither skeletons",
+    "emoji": "<:nypsi_wither_skel:1157805627788234913>",
+    "longDesc": "found while hunting in the nether",
+    "role": "prey",
+    "rarity": 2,
+    "buy": 0,
+    "sell": 20000,
+    "in_crates": false
+  },
+  "piglin": {
+    "id": "piglin",
+    "name": "piglin",
+    "article": "a",
+    "plural": "piglins",
+    "emoji": "<:nypsi_piglin:1157806701655900242>",
+    "longDesc": "found while hunting in the nether",
+    "role": "prey",
+    "rarity": 3,
+    "buy": 0,
+    "sell": 75000,
+    "in_crates": false
+  },
+  "ghast": {
+    "id": "ghast",
+    "name": "ghast",
+    "article": "a",
+    "plural": "ghasts",
+    "emoji": "<:nypsi_ghast:1157808196023488532>",
+    "longDesc": "found while hunting in the nether",
+    "role": "prey",
+    "rarity": 3,
+    "buy": 0,
+    "sell": 75000,
+    "in_crates": false
+  },
+  "enderman": {
+    "id": "enderman",
+    "name": "enderman",
+    "article": "an",
+    "plural": "endermen",
+    "emoji": "<:nypsi_enderman:1158003251124375643>",
+    "longDesc": "found while hunting",
+    "role": "prey",
+    "rarity": 4,
+    "buy": 0,
+    "sell": 100000,
     "in_crates": false
   },
   "mineshaft_chest": {
@@ -1246,7 +1350,7 @@
     "plural": "fortunes",
     "article": "a",
     "emoji": "<a:nypsi_book:1001459250163359786>",
-    "longDesc": "enchant your pickaxe with fortune (stacks to 3)",
+    "longDesc": "enchant your pickaxe with fortune for 30 mins (stacks to 3)",
     "rarity": 2,
     "buy": 0,
     "sell": 75000,
@@ -1260,13 +1364,33 @@
     },
     "in_crates": true
   },
+  "looting": {
+    "id": "looting",
+    "name": "looting",
+    "plural": "lootings",
+    "article": "a",
+    "emoji": "<a:nypsi_book:1001459250163359786>",
+    "longDesc": "enchant your gun with looting for 30 mins",
+    "rarity": 3,
+    "buy": 0,
+    "sell": 75000,
+    "role": "booster",
+    "stackable": false,
+    "max": 1,
+    "boosterEffect": {
+      "boosts": ["hunt"],
+      "effect": 1,
+      "time": 1800
+    },
+    "in_crates": true
+  },
   "unbreaking": {
     "id": "unbreaking",
     "name": "unbreaking",
     "plural": "unbreakings",
     "article": "an",
     "emoji": "<a:nypsi_book:1001459250163359786>",
-    "longDesc": "when mining, fishing or hunting it will not reduce durability",
+    "longDesc": "when mining, fishing or hunting it will not reduce durability for 1 hour",
     "rarity": 4,
     "buy": 0,
     "sell": 150000,
@@ -1287,7 +1411,7 @@
     "article": "an",
     "plural": "efficiencies",
     "emoji": "<a:nypsi_book:1001459250163359786>",
-    "longDesc": "enchant your pickaxe with efficiency (stacks to 4)",
+    "longDesc": "enchant your pickaxe with efficiency for 30 mins (stacks to 4)",
     "rarity": 2,
     "buy": 0,
     "sell": 75000,
@@ -2373,6 +2497,7 @@
       "id:lucky_cheese",
       "money:100000000",
       "money:69000000:90",
+      "xp:5000",
       "id:multi_potion",
       "id:skyline_r34:85",
       "id:lucky_7:95",
@@ -2526,5 +2651,83 @@
     "rarity": 3,
     "role": "collectable",
     "in_crates": true
+  },
+  "blaze_rod": {
+    "id": "blaze_rod",
+    "name": "blaze rod",
+    "article": "a",
+    "plural": "blaze rods",
+    "emoji": "<:nypsi_blazerod:1157803137197932544>",
+    "longDesc": "used to create eyes of ender",
+    "rarity": 69,
+    "role": "resource",
+    "in_crates": false,
+    "craft": {
+      "time": 7200,
+      "ingredients": ["blaze:3"]
+    }
+  },
+  "ender_pearl": {
+    "id": "ender_pearl",
+    "name": "ender peal",
+    "article": "an",
+    "plural": "ender peals",
+    "emoji": "<:nypsi_enderpearl:1158003398998753361>",
+    "longDesc": "used to create eyes of ender",
+    "rarity": 69,
+    "role": "resource",
+    "in_crates": false,
+    "craft": {
+      "time": 14400,
+      "ingredients": ["enderman:2"]
+    }
+  },
+  "wither_skeleton_head": {
+    "id": "wither_skeleton_head",
+    "name": "wither skeleton head",
+    "article": "a",
+    "plural": "wither skeleton heads",
+    "emoji": "<:wither_skel_head:1157805930830905344>",
+    "longDesc": "crafted from wither skeletons",
+    "rarity": 69,
+    "role": "sellable",
+    "sell": 200000,
+    "in_crates": false,
+    "craft": {
+      "time": 600,
+      "ingredients": ["wither_skeleton:2"]
+    }
+  },
+  "eye_of_ender": {
+    "id": "eye_of_ender",
+    "name": "eye of ender",
+    "article": "an",
+    "plural": "eye of enders",
+    "emoji": "<:nypsi_eye_ender:1158003799361863690>",
+    "longDesc": "used to create an end portal",
+    "rarity": 69,
+    "role": "resource",
+    "in_crates": false,
+    "sell": 100000,
+    "craft": {
+      "time": 21600,
+      "ingredients": ["ender_pearl:2", "blaze_rod:2"]
+    }
+  },
+  "end_portal": {
+    "id": "end_portal",
+    "name": "end portal",
+    "article": "an",
+    "plural": "end portals",
+    "emoji": "<:nypsi_end_portal:1158021880905744404>",
+    "longDesc": "used to mine in the end",
+    "rarity": 69,
+    "role": "item",
+    "in_crates": false,
+    "sell": 1000000,
+    "craft": {
+      "time": 259200,
+      "ingredients": ["eye_of_ender:12"]
+    }
   }
 }

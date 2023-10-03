@@ -12,6 +12,7 @@ import {
   InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
+  MessageEditOptions,
 } from "discord.js";
 import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
@@ -490,14 +491,19 @@ async function playGame(
   const game = games.get(message.author.id);
   const board = game.board;
 
-  const replay = async (embed: CustomEmbed) => {
+  const edit = async (data: MessageEditOptions, interaction: ButtonInteraction) => {
+    if (!interaction || interaction.deferred || interaction.replied) return msg.edit(data);
+    return interaction.update(data);
+  };
+
+  const replay = async (embed: CustomEmbed, interaction: ButtonInteraction) => {
     await redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
     if (
       !(await isPremium(message.member)) ||
       !((await getTier(message.member)) >= 2) ||
       (await getBalance(message.member)) < game.bet
     ) {
-      return msg.edit({ embeds: [embed], components: createRows(board, true) });
+      return edit({ embeds: [embed], components: createRows(board, true) }, interaction);
     }
 
     const components = createRows(board, true);
@@ -507,7 +513,7 @@ async function playGame(
       .setLabel("play again")
       .setDisabled(false);
 
-    await msg.edit({ embeds: [embed], components });
+    await edit({ embeds: [embed], components }, interaction);
 
     const res = await msg
       .awaitMessageComponent({
@@ -567,7 +573,7 @@ async function playGame(
     }
   };
 
-  const lose = async () => {
+  const lose = async (interaction: ButtonInteraction) => {
     const board = _.cloneDeep(game.board);
 
     const id = await createGame({
@@ -596,11 +602,11 @@ async function playGame(
         ")\n\n**you lose!!**",
     );
 
-    replay(game.embed);
+    replay(game.embed, interaction);
     return games.delete(message.author.id);
   };
 
-  const win1 = async () => {
+  const win1 = async (interaction: ButtonInteraction) => {
     let winnings = Math.round(game.bet * game.win);
     const multi = (await getGambleMulti(game.userId)).multi;
 
@@ -659,10 +665,10 @@ async function playGame(
 
     await updateBalance(message.member, (await getBalance(message.member)) + winnings);
     games.delete(message.author.id);
-    return replay(game.embed);
+    return replay(game.embed, interaction);
   };
 
-  const draw = async () => {
+  const draw = async (interaction: ButtonInteraction) => {
     const board = _.cloneDeep(game.board);
 
     const id = await createGame({
@@ -694,7 +700,7 @@ async function playGame(
     );
     await updateBalance(message.member, (await getBalance(message.member)) + game.bet);
     games.delete(message.author.id);
-    return replay(game.embed);
+    return replay(game.embed, interaction);
   };
 
   const clickSquare = async (response: ButtonInteraction, x: number, y: number) => {
@@ -702,7 +708,9 @@ async function playGame(
 
     for (const item of row) {
       if (["c", "gc"].includes(item)) {
-        await response.followUp({ embeds: [new ErrorEmbed("invalid square")], ephemeral: true });
+        if (response.deferred || response.replied)
+          await response.followUp({ embeds: [new ErrorEmbed("invalid square")], ephemeral: true });
+        else await response.reply({ embeds: [new ErrorEmbed("invalid square")], ephemeral: true });
         return playGame(message, msg, args);
       }
     }
@@ -710,7 +718,7 @@ async function playGame(
     switch (row[x]) {
       case "a":
         row[x] = "x";
-        lose();
+        lose(response);
         return;
       case "g":
       case "b":
@@ -725,15 +733,26 @@ async function playGame(
             await redis.expire(Constants.redis.nypsi.GEM_GIVEN, Math.floor(ms("1 days") / 1000));
             addInventoryItem(message.member, "green_gem", 1);
             addProgress(message.author.id, "gem_hunter", 1);
-            response.followUp({
-              embeds: [
-                new CustomEmbed(
-                  message.member,
-                  `${GEM_EMOJI} you found a **gem**!!\nit has been added to your inventory, i wonder what powers it has`,
-                ),
-              ],
-              ephemeral: true,
-            });
+            if (response.replied || response.deferred)
+              response.followUp({
+                embeds: [
+                  new CustomEmbed(
+                    message.member,
+                    `${GEM_EMOJI} you found a **gem**!!\nit has been added to your inventory, i wonder what powers it has`,
+                  ),
+                ],
+                ephemeral: true,
+              });
+            else
+              response.reply({
+                embeds: [
+                  new CustomEmbed(
+                    message.member,
+                    `${GEM_EMOJI} you found a **gem**!!\nit has been added to your inventory, i wonder what powers it has`,
+                  ),
+                ],
+                ephemeral: true,
+              });
           }
         }
 
@@ -761,7 +780,7 @@ async function playGame(
         if (y >= 8) {
           if (game.difficulty != "easy") addProgress(message.author.id, "tower_pro", 1);
           game.win += game.increment * 2;
-          win1();
+          win1(response);
           return;
         }
 
@@ -771,7 +790,7 @@ async function playGame(
           components[components.length - 1].components[0].setDisabled(true);
         }
 
-        msg.edit({ embeds: [game.embed], components });
+        edit({ embeds: [game.embed], components }, response);
 
         return playGame(message, msg, args);
     }
@@ -783,11 +802,10 @@ async function playGame(
   const response = await msg
     .awaitMessageComponent({ filter, time: 90000 })
     .then(async (collected) => {
-      await collected.deferUpdate().catch(() => {
-        fail = true;
-        return playGame(message, msg, args);
-      });
-      return collected;
+      setTimeout(() => {
+        collected.deferUpdate().catch(() => null);
+      }, 2500);
+      return collected as ButtonInteraction;
     })
     .catch((e) => {
       logger.warn("tower error", e);
@@ -815,13 +833,13 @@ async function playGame(
 
   if (response.customId == "finish") {
     if (game.win < 1) {
-      lose();
+      lose(response);
       return;
     } else if (game.win == 1) {
-      draw();
+      draw(response);
       return;
     } else {
-      win1();
+      win1(response);
       return;
     }
   }

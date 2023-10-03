@@ -37,6 +37,8 @@ veins.set("amethyst", [1, 2, 3]);
 veins.set("netherrack", [5, 7, 15, 25]);
 veins.set("gold_nugget", [2, 8, 12, 18, 28]);
 veins.set("quartz", [1, 4, 6, 12]);
+veins.set("end_stone", [5, 7, 15, 25]);
+veins.set("purpur", [2, 8, 12, 14]);
 
 const areas = [
   "cave",
@@ -47,6 +49,7 @@ const areas = [
   "nether",
   "nether",
   "nether",
+  "end",
 ];
 
 const cmd = new Command("mine", "go to a cave and mine", "money").setDocs(
@@ -225,6 +228,13 @@ async function doMine(
       ) {
         return choseArea();
       }
+    } else if (chosenArea === "end") {
+      if (
+        !inventory.find((i) => i.item == "end_portal") ||
+        inventory.find((i) => i.item == "end_portal").amount == 0
+      ) {
+        return choseArea();
+      }
     }
 
     return chosenArea;
@@ -257,6 +267,8 @@ async function doMine(
         if (chosenArea == "nether") {
           if (!["netherrack", "ancient_debris", "quartz", "gold_nugget"].includes(items[i].id))
             continue;
+        } else if (chosenArea === "end") {
+          if (!["end_stone", "purpur", "obsidian", "dragon_egg"].includes(items[i].id)) continue;
         } else {
           if (
             ![

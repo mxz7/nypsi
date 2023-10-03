@@ -48,6 +48,7 @@ import PageManager from "../utils/functions/page";
 import requestDM from "../utils/functions/requestdm";
 import { cleanString } from "../utils/functions/string";
 import { getDmSettings } from "../utils/functions/users/notifications";
+import { getLastKnownAvatar } from "../utils/functions/users/tag";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import ms = require("ms");
 
@@ -232,7 +233,7 @@ async function run(
     } else {
       embed.setHeader(
         guild.guildName,
-        message.author.avatarURL(),
+        await getLastKnownAvatar(guild.ownerId),
         `https://nypsi.xyz/guild/${encodeURIComponent(guild.guildName)}`,
       );
       // embed.setDescription(guild.motd + `\n\n**bank** $${guild.balance.toLocaleString()}\n**xp** ${guild.xp.toLocaleString()}`)
