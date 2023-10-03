@@ -23,7 +23,7 @@ export function startMentionInterval() {
 
     if (
       (await redis.llen(Constants.redis.nypsi.MENTION_QUEUE)) >
-        Number(await redis.get(Constants.redis.nypsi.MENTION_DM_TEKOH_THRESHOLD)) ||
+        (Number(await redis.get(Constants.redis.nypsi.MENTION_DM_TEKOH_THRESHOLD)) || 100) ||
       (0 && lastWarn < Date.now() - ms("1 hour"))
     ) {
       lastWarn = Date.now();

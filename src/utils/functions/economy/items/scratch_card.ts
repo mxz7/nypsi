@@ -202,10 +202,9 @@ async function prepare(
     const response = await msg
       .awaitMessageComponent({ filter, time: 90000 })
       .then(async (collected) => {
-        await collected.deferUpdate().catch(() => {
-          fail = true;
-          return play();
-        });
+        setTimeout(() => {
+          collected.deferUpdate().catch(() => null);
+        }, 2500);
         return collected;
       })
       .catch(() => {
@@ -226,7 +225,9 @@ async function prepare(
       embed.setDescription(
         `**${card.remainingClicks}** click${card.remainingClicks != 1 ? "s" : ""} left`,
       );
-      await msg.edit({ embeds: [embed], components: card.getButtons() });
+      if (!response.replied && !response.deferred)
+        await response.update({ embeds: [embed], components: card.getButtons() });
+      else await msg.edit({ embeds: [embed], components: card.getButtons() });
     }
     return play();
   };

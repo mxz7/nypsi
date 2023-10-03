@@ -148,7 +148,6 @@ export default class PageManager<T> {
   }
 
   private async back(manager: PageManager<T>, interaction: ButtonInteraction): Promise<void> {
-    await interaction.deferUpdate();
     if (manager.currentPage == 1) {
       return manager.listen();
     }
@@ -176,12 +175,11 @@ export default class PageManager<T> {
 
     manager.row.components[1].setDisabled(false);
 
-    await manager.message.edit({ embeds: [manager.embed], components: [manager.row] });
+    await interaction.update({ embeds: [manager.embed], components: [manager.row] });
     return manager.listen();
   }
 
   private async next(manager: PageManager<T>, interaction: ButtonInteraction): Promise<void> {
-    await interaction.deferUpdate();
     if (manager.currentPage == manager.lastPage) {
       return manager.listen();
     }
@@ -209,7 +207,7 @@ export default class PageManager<T> {
 
     manager.row.components[0].setDisabled(false);
 
-    await manager.message.edit({ embeds: [manager.embed], components: [manager.row] });
+    await interaction.update({ embeds: [manager.embed], components: [manager.row] });
     return manager.listen();
   }
 
