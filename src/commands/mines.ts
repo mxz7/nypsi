@@ -471,6 +471,7 @@ function getRows(grid: string[], end: boolean) {
         break;
       case "x":
         button.setEmoji("💣").setStyle(ButtonStyle.Danger).setDisabled(true);
+        delete button.data.label;
         break;
     }
 
