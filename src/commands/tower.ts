@@ -804,7 +804,7 @@ async function playGame(
     .then(async (collected) => {
       setTimeout(() => {
         collected.deferUpdate().catch(() => null);
-      }, 2500);
+      }, 1500);
       return collected as ButtonInteraction;
     })
     .catch((e) => {
