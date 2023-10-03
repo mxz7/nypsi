@@ -177,23 +177,23 @@ async function run(
 
   if (loveBarNum == 100) {
     loveBar = "**❤️❤️❤️❤️❤️❤️❤️❤️❤️**";
-  } else if (loveBarNum > 90) {
+  } else if (loveBarNum >= 90) {
     loveBar = "**❤️❤️❤️❤️❤️❤️❤️❤️❤️** 💔";
-  } else if (loveBarNum > 80) {
+  } else if (loveBarNum >= 80) {
     loveBar = "**❤️❤️❤️❤️❤️❤️❤️❤️** 💔💔";
-  } else if (loveBarNum > 70) {
+  } else if (loveBarNum >= 70) {
     loveBar = "**❤️❤️❤️❤️❤️❤️❤️** 💔💔💔";
-  } else if (loveBarNum > 60) {
+  } else if (loveBarNum >= 60) {
     loveBar = "**❤️❤️❤️❤️❤️❤️** 💔💔💔💔";
-  } else if (loveBarNum > 50) {
+  } else if (loveBarNum >= 50) {
     loveBar = "**❤️❤️❤️❤️❤️** 💔💔💔💔💔";
-  } else if (loveBarNum > 40) {
+  } else if (loveBarNum >= 40) {
     loveBar = "**❤️❤️❤️❤️** 💔💔💔💔💔💔";
-  } else if (loveBarNum > 30) {
+  } else if (loveBarNum >= 30) {
     loveBar = "**❤️❤️❤️** 💔💔💔💔💔💔💔";
-  } else if (loveBarNum > 20) {
+  } else if (loveBarNum >= 20) {
     loveBar = "**❤️❤️** 💔💔💔💔💔💔";
-  } else if (loveBarNum > 10) {
+  } else if (loveBarNum >= 10) {
     loveBar = "**❤️** 💔💔💔💔💔💔💔";
   } else {
     loveBar = "💔💔💔💔💔💔💔💔💔💔";
