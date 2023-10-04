@@ -2694,7 +2694,7 @@
     "sell": 200000,
     "in_crates": false,
     "craft": {
-      "time": 600,
+      "time": 450,
       "ingredients": ["wither_skeleton:2"]
     }
   },
