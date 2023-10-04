@@ -908,6 +908,8 @@ async function run(
       if (await redis.exists(`cd:passive_toggle:${message.author.id}`)) {
         return send({ embeds: [new ErrorEmbed("you have already toggled passive mode recently")] });
       }
+      if (await redis.exists(`cd:rob:${message.author.id}`))
+        return send({ embeds: [new ErrorEmbed("you have robbed somebody recently")] });
       await setPassive(message.member, true);
       await redis.set(`cd:passive_toggle:${message.author.id}`, "boobs");
       await redis.expire(
