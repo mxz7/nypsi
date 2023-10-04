@@ -2663,7 +2663,7 @@
     "role": "resource",
     "in_crates": false,
     "craft": {
-      "time": 7200,
+      "time": 3600,
       "ingredients": ["blaze:3"]
     }
   },
@@ -2678,7 +2678,7 @@
     "role": "resource",
     "in_crates": false,
     "craft": {
-      "time": 14400,
+      "time": 10800,
       "ingredients": ["enderman:2"]
     }
   },
