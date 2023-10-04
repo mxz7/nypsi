@@ -37,8 +37,9 @@ async function doCrates(client: NypsiClient) {
     } else if (member.Premium?.level == 3) {
       rewards.set("basic_crate", 4);
     } else if (member.Premium?.level == 4) {
-      rewards.set("basic_crate", 4);
-      rewards.set("69420_crate", 2);
+      rewards.set("basic_crate", 5);
+      rewards.set("69420_crate", 3);
+      rewards.set("nypsi_crate", 1);
       rewards.set("lucky_scratch_card", 1);
     }
 
