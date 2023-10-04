@@ -92,7 +92,7 @@ const incrementOffsets = new Map<number, number>([
   [8, 0.1],
 ]);
 const games = new Map<string, Game>();
-const GEM_EMOJI = "<:nypsi_gem_green:1046866209326514206>";
+const GEM_EMOJI = "<:nypsi_gem:1046854542047850556>";
 
 cmd.slashEnabled = true;
 cmd.slashData
