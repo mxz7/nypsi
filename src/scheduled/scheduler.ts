@@ -45,7 +45,7 @@ const bree = new Bree({
     },
     {
       name: "dailystreak",
-      interval: "at 11:59pm",
+      interval: "at 12:00am",
     },
     {
       name: "votereminders",
