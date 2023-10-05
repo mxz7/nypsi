@@ -2650,6 +2650,7 @@
     "longDesc": "uwu",
     "rarity": 3,
     "role": "collectable",
+    "aliases": ["tiddy", "goth", "gf"],
     "in_crates": true
   },
   "blaze_rod": {
@@ -2676,6 +2677,7 @@
     "longDesc": "used to create eyes of ender",
     "rarity": 69,
     "role": "resource",
+    "aliases": ["pearl"],
     "in_crates": false,
     "craft": {
       "time": 10800,
@@ -2707,6 +2709,7 @@
     "longDesc": "used to create an end portal",
     "rarity": 69,
     "role": "resource",
+    "aliases": ["eye", "ender", "endereye", "ender_eye"],
     "in_crates": false,
     "sell": 100000,
     "craft": {
