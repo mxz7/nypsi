@@ -90,9 +90,9 @@ async function prepare(
     `**${card.remainingClicks}** click${card.remainingClicks != 1 ? "s" : ""} left`,
   ).setHeader(`${message.author.username}'s ${selected.name}`, message.author.avatarURL());
 
-  let msg = await send({ embeds: [embed], components: card.getButtons() });
+  const msg = await send({ embeds: [embed], components: card.getButtons() });
 
-  const play = async (): Promise<void> => {
+  const play = async (interaction?: ButtonInteraction): Promise<void> => {
     const filter = (i: Interaction) => i.user.id == message.author.id;
     let fail = false;
 
@@ -127,7 +127,9 @@ async function prepare(
         retry = true;
       }
 
-      msg = await msg.edit({ embeds: [embed], components: buttons });
+      if (interaction && !interaction.deferred && !interaction.replied)
+        await interaction.update({ embeds: [embed], components: buttons });
+      else await msg.edit({ embeds: [embed], components: buttons });
 
       if (retry) {
         const response = await msg
@@ -226,10 +228,16 @@ async function prepare(
         `**${card.remainingClicks}** click${card.remainingClicks != 1 ? "s" : ""} left`,
       );
 
+      if (response.deferred || response.replied)
+        await msg.edit({ embeds: [embed], components: card.getButtons(card.remainingClicks == 0) });
+      else
+        await response.update({
+          embeds: [embed],
+          components: card.getButtons(card.remainingClicks == 0),
+        });
     }
-    if (response.deferred || response.replied) await msg.edit({ embeds: [embed], components: card.getButtons(card.remainingClicks == 0) });
-    else await response.update({ embeds: [embed], components: card.getButtons(card.remainingClicks == 0) });
-    return play();
+
+    return play(response);
   };
   return play();
 }
