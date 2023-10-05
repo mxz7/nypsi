@@ -2670,14 +2670,14 @@
   },
   "ender_pearl": {
     "id": "ender_pearl",
-    "name": "ender peal",
+    "name": "ender pearl",
     "article": "an",
-    "plural": "ender peals",
+    "plural": "ender pearls",
     "emoji": "<:nypsi_enderpearl:1158003398998753361>",
     "longDesc": "used to create eyes of ender",
     "rarity": 69,
     "role": "resource",
-    "aliases": ["pearl"],
+    "aliases": ["pearl", "epearl"],
     "in_crates": false,
     "craft": {
       "time": 10800,
