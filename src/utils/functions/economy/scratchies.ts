@@ -204,8 +204,9 @@ export default class ScratchCard {
         );
       }
 
-      if (interaction.deferred || interaction.replied) interaction.followUp({ embeds: [embed] });
-      else await interaction.reply({ embeds: [embed] });
+      setTimeout(() => {
+        interaction.followUp({ embeds: [embed] }).catch(() => {});
+      }, 500);
       return;
     };
 
