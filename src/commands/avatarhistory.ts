@@ -11,7 +11,7 @@ import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { formatDate } from "../utils/functions/date";
-import { getPrestige } from "../utils/functions/economy/levelling";
+import { getRawLevel } from "../utils/functions/economy/levelling";
 import { uploadImage } from "../utils/functions/image";
 import {
   addNewAvatar,
@@ -48,7 +48,7 @@ async function run(
 
   await addCooldown(cmd.name, message.member, 15);
 
-  if ((await getPrestige(message.member).catch(() => 0)) < 2)
+  if ((await getRawLevel(message.member).catch(() => 0)) < 200)
     return message.channel.send({
       embeds: [
         new ErrorEmbed(
