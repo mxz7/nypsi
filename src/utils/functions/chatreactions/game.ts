@@ -56,6 +56,7 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel) 
   const blacklisted = await getBlacklisted(guild);
 
   const filter = async (m: Message) => {
+    m.content = m.content.replaceAll("’", "'").replaceAll("”", "'").replaceAll("‘", "'");
     return (
       m.content.toLowerCase() == word.actual.toLowerCase() &&
       winnersIDs.indexOf(m.author.id) == -1 &&
@@ -238,6 +239,8 @@ export async function startChatReactionDuel(
   const start = performance.now();
 
   const filter = async (m: Message) => {
+    m.content = m.content.replaceAll("’", "'").replaceAll("”", "'").replaceAll("‘", "'");
+
     const a = m.content.toLowerCase() == word.actual.toLowerCase();
     const b = [challenger.user.id, target.user.id].includes(m.author.id);
 
