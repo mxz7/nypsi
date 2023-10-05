@@ -26,9 +26,7 @@ import {
   denyWholesomeImage,
   getAllSuggestions,
   getWholesomeImage,
-  isImageUrl,
   suggestWholesomeImage,
-  uploadImage,
 } from "../utils/functions/image";
 import { getMember } from "../utils/functions/member";
 import PageManager from "../utils/functions/page";
@@ -149,41 +147,41 @@ async function run(
       return send({ embeds: [new ErrorEmbed("must be http**s**")] });
     }
 
-    if (!url.toLowerCase().startsWith("https://i.imgur.com/")) {
-      if (!isImageUrl(url)) {
-        return send({
-          embeds: [
-            new ErrorEmbed(
-              "must be an image hosted on https://imgur.com\n\ntutorial: https://youtu.be/xaRu40hawUE",
-            ),
-          ],
-        });
-      }
+    // if (!url.toLowerCase().startsWith("https://i.imgur.com/")) {
+    //   if (!isImageUrl(url)) {
+    //     return send({
+    //       embeds: [
+    //         new ErrorEmbed(
+    //           "must be an image hosted on https://imgur.com\n\ntutorial: https://youtu.be/xaRu40hawUE",
+    //         ),
+    //       ],
+    //     });
+    //   }
 
-      const upload = await uploadImage(
-        message.client as NypsiClient,
-        url,
-        "wholesome",
-        `user: ${message.author.id} (${message.author.username})`,
-      );
+    //   const upload = await uploadImage(
+    //     message.client as NypsiClient,
+    //     url,
+    //     "wholesome",
+    //     `user: ${message.author.id} (${message.author.username})`,
+    //   );
 
-      if (!upload) {
-        return send({
-          embeds: [
-            new ErrorEmbed(
-              "must be an image hosted on https://imgur.com\n\ntutorial: https://youtu.be/xaRu40hawUE",
-            ),
-          ],
-        });
-      } else {
-        uploadCooldown.set(message.member.id, new Date().getTime());
+    //   if (!upload) {
+    //     return send({
+    //       embeds: [
+    //         new ErrorEmbed(
+    //           "must be an image hosted on https://imgur.com\n\ntutorial: https://youtu.be/xaRu40hawUE",
+    //         ),
+    //       ],
+    //     });
+    //   } else {
+    //     uploadCooldown.set(message.member.id, new Date().getTime());
 
-        setTimeout(() => {
-          uploadCooldown.delete(message.author.id);
-        }, 25 * 1000);
-        url = upload;
-      }
-    }
+    //     setTimeout(() => {
+    //       uploadCooldown.delete(message.author.id);
+    //     }, 25 * 1000);
+    //     url = upload;
+    //   }
+    // }
 
     const res = await suggestWholesomeImage(message.member, url);
 
