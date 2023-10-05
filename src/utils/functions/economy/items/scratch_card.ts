@@ -226,10 +226,9 @@ async function prepare(
         `**${card.remainingClicks}** click${card.remainingClicks != 1 ? "s" : ""} left`,
       );
 
-      if (response.deferred || response.replied)
-        await msg.edit({ embeds: [embed], components: card.getButtons() });
-      else await response.update({ embeds: [embed], components: card.getButtons() });
     }
+    if (response.deferred || response.replied) await msg.edit({ embeds: [embed], components: card.getButtons(card.remainingClicks == 0) });
+    else await response.update({ embeds: [embed], components: card.getButtons(card.remainingClicks == 0) });
     return play();
   };
   return play();
