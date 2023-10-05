@@ -101,6 +101,7 @@ cmd.setRun((message, args) => {
       message: msg,
       row,
       userId: message.author.id,
+      allowMessageDupe: true,
       pages,
     });
 
@@ -190,6 +191,7 @@ cmd.setRun((message, args) => {
       row: PageManager.defaultRow(),
       userId: message.author.id,
       pages,
+      allowMessageDupe: true,
       updateEmbed(page, embed) {
         embed.setFields(...page);
 

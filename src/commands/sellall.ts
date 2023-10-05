@@ -191,6 +191,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       message: m,
       row,
       userId: message.author.id,
+      allowMessageDupe: true,
       pages,
       updateEmbed(page, embed) {
         embed.data.fields.length = 0;
