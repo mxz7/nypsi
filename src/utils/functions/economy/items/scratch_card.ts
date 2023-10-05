@@ -206,7 +206,7 @@ async function prepare(
       .then(async (collected) => {
         setTimeout(() => {
           collected.deferUpdate().catch(() => null);
-        }, 1750);
+        }, 1500);
         return collected;
       })
       .catch(() => {
