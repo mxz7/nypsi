@@ -420,6 +420,17 @@ async function run(
       return message.channel.send({ embeds: [new CustomEmbed(message.member, "sneaky bitch")] });
     }
 
+    let max = 1;
+
+    if (await isPremium(message.member)) {
+      max += await getTier(message.member);
+    }
+
+    const auctions = await getAuctions(message.member);
+
+    if (auctions.length >= max)
+      return message.channel.send({ embeds: [new CustomEmbed(message.member, "sneaky bitch")] });
+
     await setInventoryItem(
       message.member,
       selected.id,
