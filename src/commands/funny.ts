@@ -15,14 +15,9 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 
 const cache = new Map<string, number>();
 
-const cmd = new Command("funny", "measure how much funny u are", "fun").setAliases([
+const cmd = new Command("funny", "Measures how funny you are", "fun").setAliases([
   "howfunny",
   "unfunny",
-]);
-
-cmd.slashEnabled = true;
-cmd.slashData.addUserOption((option) =>
-  option.setName("user").setDescription("is this dude funny?"),
 );
 
 async function run(
@@ -102,25 +97,25 @@ async function run(
 
   if (funnyAmount >= 85) {
     funnyEmoji = "🤣😍😂😁🤭";
-    funnyText = "I bet youre funny at partys";
+    funnyText = "I am certain that you have a good sense of humor.";
   } else if (funnyAmount >= 70) {
     funnyEmoji = "😁😀😳";
-    funnyText = "Your friends must be funny too";
+    funnyText = "Your friends should have a sense of humor as well";
   } else if (funnyAmount >= 50) {
     funnyEmoji = "😤😨💀";
-    funnyText = "Not that funny, get out";
+    funnyText = "Don't be silly, get out";
   } else if (funnyAmount >= 30) {
     funnyEmoji = "😒🤔";
-    funnyText = "Youre searching for jokes on google. wow.";
+    funnyText = "You're looking for jokes on Google. Wow.";
   } else if (funnyAmount >= 25) {
     funnyEmoji = "😐";
-    funnyText = "Even the google cant help you";
+    funnyText = "Even the google can't help you";
   } else if (funnyAmount >= 15) {
     funnyEmoji = "🤨🤨";
     funnyText = "Your mama jokes are funnier than u";
   } else if (funnyAmount >= 7) {
     funnyEmoji = "🤨⁉";
-    funnyText = "nobody is laughting.";
+    funnyText = "nobody is laughing..";
   } else {
     funnyEmoji = "🙄";
     funnyText = "you're unfunny, but have 1 xp";
