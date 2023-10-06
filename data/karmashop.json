@@ -37,7 +37,7 @@
     "emoji": "🌟",
     "id": "100xp",
     "cost": 20,
-    "items_left": 100,
+    "items_left": 75,
     "aliases": [],
     "type": "xp",
     "value": 100,
@@ -63,7 +63,7 @@
     "aliases": ["basic"],
     "type": "item",
     "value": "basic_crate",
-    "limit": 5
+    "limit": 13
   },
   "karma_scratch_card": {
     "name": "karma scratch card",
