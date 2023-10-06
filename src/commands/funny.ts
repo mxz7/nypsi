@@ -18,7 +18,7 @@ const cache = new Map<string, number>();
 const cmd = new Command("funny", "Measures how funny you are", "fun").setAliases([
   "howfunny",
   "unfunny",
-);
+]);
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
