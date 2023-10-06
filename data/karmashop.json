@@ -82,7 +82,7 @@
     "id": "legendary_scratch_card",
     "cost": 500,
     "items_left": 3,
-    "aliases": ["legendary"],
+    "aliases": ["legendary", "lescratch"],
     "type": "item",
     "value": "legendary_scratch_card",
     "limit": 1
@@ -115,7 +115,7 @@
     "id": "reroll_token",
     "cost": 1500,
     "items_left": 1,
-    "aliases": ["reroll"],
+    "aliases": ["reroll", "token"],
     "type": "item",
     "value": "reroll_token",
     "limit": 1
