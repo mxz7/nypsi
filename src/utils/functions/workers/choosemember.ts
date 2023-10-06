@@ -39,8 +39,9 @@ if (!isMainThread) {
       let score = 0;
 
       if (member.user.username.toLowerCase().startsWith(memberName.toLowerCase())) score += 1;
-      if (member.user.globalName.toLowerCase().startsWith(memberName.toLowerCase())) score += 0.75;
-      if (member.nickname.toLowerCase().startsWith(memberName.toLowerCase())) score += 0.5;
+      if ((member.user.globalName || "").toLowerCase().startsWith(memberName.toLowerCase()))
+        score += 0.75;
+      if ((member.nickname || "").toLowerCase().startsWith(memberName.toLowerCase())) score += 0.5;
 
       const usernameComparison = compareTwoStrings(
         member.user.username.toLowerCase(),
