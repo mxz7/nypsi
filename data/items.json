@@ -2039,7 +2039,7 @@
     "clicks": 3,
     "items": [
       "money:1000000",
-      "xp:250",
+      "xp:300",
       "karma:75",
       "id:calendar:35",
       "id:bob",
@@ -2078,7 +2078,7 @@
     "clicks": 6,
     "items": [
       "money:2500000",
-      "xp:150",
+      "xp:500",
       "id:calendar:60",
       "id:bob",
       "id:lucky_7:40",
@@ -2162,8 +2162,8 @@
     "clicks": 9,
     "items": [
       "money:3000000",
-      "xp:175",
-      "karma:25",
+      "xp:750",
+      "karma:50",
       "id:super_cursor",
       "id:oven",
       "id:bob",
@@ -2171,14 +2171,20 @@
       "id:incredible_fishing_rod:95",
       "id:incredible_gun:90",
       "id:69420_crate",
-      "id:nypsi_crate:30",
+      "id:nypsi_crate:40",
       "id:silver_credit:5",
       "id:gold_credit:3",
       "id:pink_gem:1",
+      "id:gem_shard:75",
+      "id:quarry_scrap:75",
       "id:karma_scratch_card:5",
       "id:omega_crate:1",
       "id:karma_tag:5",
-      "id:reroll_token:7"
+      "id:reroll_token:7",
+      "id:lucky_cheese:50",
+      "id:xp_potion:50",
+      "id:double_xp:15",
+      "id:multi_potion:40"
     ],
     "random_drop_chance": 50
   },
@@ -2198,7 +2204,7 @@
     "clicks": 4,
     "items": [
       "money:500000",
-      "xp:100",
+      "xp:250",
       "id:lawyer",
       "id:diamond",
       "id:cookie",
