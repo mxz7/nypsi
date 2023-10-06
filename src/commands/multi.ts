@@ -1,5 +1,4 @@
 import { CommandInteraction, Message } from "discord.js";
-import { send } from "process";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders.js";
 import { getGambleMulti, getSellMulti } from "../utils/functions/economy/balance";
@@ -16,7 +15,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (await onCooldown(cmd.name, message.member)) {
     const embed = await getResponse(cmd.name, message.member);
 
-    return send({ embeds: [embed], ephemeral: true });
+    return message.channel.send({ embeds: [embed] });
   }
 
   await addCooldown(cmd.name, message.member, 5);
