@@ -12,7 +12,8 @@ import {
   MessageActionRowComponentBuilder,
   MessageEditOptions,
 } from "discord.js";
-import * as fs from "fs/promises";
+import { promisify } from "util";
+import { gzip } from "zlib";
 import prisma from "../init/database";
 import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction } from "../models/Command";
@@ -21,6 +22,7 @@ import { checkOffer } from "../utils/functions/economy/offers";
 import { addCooldown, onCooldown } from "../utils/handlers/cooldownhandler.js";
 import { logger } from "../utils/logger";
 import ms = require("ms");
+import dayjs = require("dayjs");
 
 const cmd = new Command("data", "view your raw data stored in nypsi's database", "info").setAliases(
   ["requestdata", "viewdata", "showmemydatazuckerberg"],
@@ -140,147 +142,102 @@ async function run(
       await m.edit({ embeds: [embed], components: [] });
 
       logger.info(`fetching data for ${message.author.username}...`);
-      const userData = await prisma.user.findUnique({
-        where: {
-          id: message.author.id,
-        },
-        include: {
-          Economy: {
-            include: {
-              Inventory: true,
-              Boosters: true,
-              Game: true,
-              Stats: true,
-              Crafting: true,
-              LotteryTicket: true,
-              EconomyGuild: true,
-              Auction: true,
-              BakeryUpgrade: true,
-              EconomyGuildMember: true,
-              OffersGiven: true,
-              OffersReceived: true,
-              auctionWatch: true,
-              EconomyWorker: {
-                include: {
-                  upgrades: true,
+
+      const data = {
+        data: `nypsi data for ${message.author.id} (${message.author.username}) at ${dayjs().format(
+          "YYYY-MM-DD HH:mm:ss",
+        )}`,
+        profile: await prisma.user.findUnique({
+          where: {
+            id: message.author.id,
+          },
+          include: {
+            Economy: {
+              include: {
+                Inventory: true,
+                Boosters: true,
+                Game: true,
+                Stats: true,
+                Crafting: true,
+                LotteryTicket: true,
+                EconomyGuild: true,
+                Auction: true,
+                BakeryUpgrade: true,
+                EconomyGuildMember: true,
+                OffersGiven: true,
+                Upgrades: true,
+                OffersReceived: true,
+                auctionWatch: true,
+                EconomyWorker: {
+                  include: {
+                    upgrades: true,
+                  },
                 },
               },
             },
-          },
-          Premium: {
-            include: {
-              PremiumCommand: true,
+            Premium: {
+              include: {
+                PremiumCommand: true,
+              },
             },
+            Username: true,
+            WordleStats: true,
+            Preferences: true,
+            CommandUse: true,
+            Achievements: true,
+            DMSettings: true,
+            KofiPurchases: true,
+            ActiveChannels: true,
+            Leaderboards: true,
+            Tags: true,
           },
-          Username: true,
-          WordleStats: true,
-          Preferences: true,
-          CommandUse: true,
-          Achievements: true,
-          DMSettings: true,
-          KofiPurchases: true,
-          ActiveChannels: true,
-          Leaderboards: true,
-          Tags: true,
+        }),
+        moderation: {
+          punished: await prisma.moderationCase.findMany({
+            where: {
+              user: message.author.id,
+            },
+            select: {
+              caseId: true,
+              command: true,
+              deleted: true,
+              guildId: true,
+              moderation: false,
+              time: true,
+              type: true,
+              user: true,
+              moderator: false,
+            },
+          }),
+          punisher: await prisma.moderationCase.findMany({
+            where: {
+              OR: [{ moderator: message.author.username }, { moderator: message.author.id }],
+            },
+          }),
+          bans: await prisma.moderationBan.findMany({ where: { userId: message.author.id } }),
+          mutes: await prisma.moderationMute.findMany({ where: { userId: message.author.id } }),
         },
-      });
-
-      const moderationCases = await prisma.moderationCase.findMany({
-        where: {
-          user: message.author.id,
+        chat_reaction: await prisma.chatReactionStats.findMany({
+          where: { userId: message.author.id },
+        }),
+        mentions: {
+          sender: await prisma.mention.findMany({ where: { userTag: message.author.username } }),
+          receiver: await prisma.mention.findMany({ where: { targetId: message.author.id } }),
         },
-        select: {
-          caseId: true,
-          command: true,
-          deleted: true,
-          guildId: true,
-          moderation: false,
-          time: true,
-          type: true,
-          user: true,
-          moderator: false,
-        },
-      });
+      };
 
-      const [
-        moderationCasesModerator,
-        moderationMutes,
-        moderationBans,
-        chatReactionStats,
-        mentionsTargetedData,
-        mentionsSenderData,
-      ] = await Promise.all([
-        prisma.moderationCase.findMany({ where: { moderator: message.author.username } }),
-        prisma.moderationMute.findMany({ where: { userId: message.author.id } }),
-        prisma.moderationBan.findMany({ where: { userId: message.author.id } }),
-        prisma.chatReactionStats.findMany({ where: { userId: message.author.id } }),
-        prisma.mention.findMany({ where: { targetId: message.author.id } }),
-        prisma.mention.findMany({ where: { userTag: message.author.username } }),
-      ]);
-
-      const file = `/tmp/nypsi_data_${message.author.id}.txt`;
-
-      logger.info(`packing into text file for ${message.author.username}...`);
-
-      await fs.writeFile(
-        file,
-        `nypsi data for ${message.author.id} (${
-          message.author.username
-        } at time of request) - ${new Date().toUTCString()}\n\n----------\nYOUR USER DATA\n----------\n\n`,
-      );
-      await fs.appendFile(file, JSON.stringify(userData, null, 2));
-
-      await fs.appendFile(
-        file,
-        "\n----------------------------------------------\n\n----------\nYOUR MODERATION CASE DATA WHERE YOU GOT PUNISHED\n----------\n\n",
-      );
-      await fs.appendFile(file, JSON.stringify(moderationCases, null, 2));
-
-      await fs.appendFile(
-        file,
-        "\n----------------------------------------------\n\n----------\nYOUR MODERATION CASE DATA WHERE YOU WERE THE MODERATOR\n----------\n\n",
-      );
-      await fs.appendFile(file, JSON.stringify(moderationCasesModerator, null, 2));
-
-      await fs.appendFile(
-        file,
-        "\n----------------------------------------------\n\n----------\nYOUR MODERATION MUTE DATA\n----------\n\n",
-      );
-      await fs.appendFile(file, JSON.stringify(moderationMutes, null, 2));
-
-      await fs.appendFile(
-        file,
-        "\n----------------------------------------------\n\n----------\nYOUR MODERATION BAN DATA\n----------\n\n",
-      );
-      await fs.appendFile(file, JSON.stringify(moderationBans, null, 2));
-
-      await fs.appendFile(
-        file,
-        "\n----------------------------------------------\n\n----------\nYOUR CHAT REACTION DATA\n----------\n\n",
-      );
-      await fs.appendFile(file, JSON.stringify(chatReactionStats, null, 2));
-
-      await fs.appendFile(
-        file,
-        "\n----------------------------------------------\n\n----------\nYOUR MENTIONS DATA\n(mentions targeted at you)\n----------\n\n",
-      );
-      await fs.appendFile(file, JSON.stringify(mentionsTargetedData, null, 2));
-
-      await fs.appendFile(
-        file,
-        "\n----------------------------------------------\n\n----------\nYOUR MENTIONS DATA\n(mentions from you - based on current tag)\n----------\n\n",
-      );
-      await fs.appendFile(file, JSON.stringify(mentionsSenderData, null, 2));
-
-      const buffer = await fs.readFile(file);
+      const buffer = Buffer.from(JSON.stringify(data, null, 2), "utf8");
+      const gzipped = await promisify(gzip)(buffer);
 
       let fail = false;
       await message.member
         .send({
+          content:
+            "if your computer cannot decompress the file, use this website: <https://gzip.swimburger.net>",
           files: [
             {
-              attachment: buffer,
-              name: "your data.txt",
+              attachment: gzipped,
+              name: `${message.author.id}.json.gz`,
             },
           ],
         })
