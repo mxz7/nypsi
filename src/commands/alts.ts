@@ -33,6 +33,7 @@ import { deleteMute, getMuteRole, isMuted, newMute } from "../utils/functions/mo
 import { isAltPunish } from "../utils/functions/guilds/altpunish";
 import prisma from "../init/database";
 import { isBanned, newBan } from "../utils/functions/moderation/ban";
+import { exec } from "node:child_process";
 
 const cmd = new Command("alts", "view a user's alts", "moderation")
   .setAliases(["alt", "account", "accounts"])
@@ -187,6 +188,8 @@ async function run(
           ],
         });
 
+        exec(`redis-cli KEYS "*economy:banned*" | xargs redis-cli DEL`);
+
         const alt = await getMember(message.guild, msg.content);
 
         if (alt != null) {
@@ -307,6 +310,7 @@ async function run(
           ),
         ],
       });
+      exec(`redis-cli KEYS "*economy:banned*" | xargs redis-cli DEL`);
       await altMsg.edit({
         embeds: [await getEmbed(message, member)],
         components: [await getRow(message, member)],
