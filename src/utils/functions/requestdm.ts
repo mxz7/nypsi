@@ -9,6 +9,7 @@ import {
 import { NypsiClient } from "../../models/Client";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 import { logger } from "../logger";
+import { isUserBlacklisted } from "./users/blacklist";
 import { getDmSettings, updateDmSettings } from "./users/notifications";
 
 interface RequestDMOptions {
@@ -21,6 +22,11 @@ interface RequestDMOptions {
 
 export default async function requestDM(options: RequestDMOptions): Promise<boolean> {
   logger.info(`DM requested: ${options.memberId}`);
+
+  if (await isUserBlacklisted(options.memberId)) {
+    logger.info(`${options.memberId} is blacklisted`);
+    return false;
+  }
 
   if (options.client instanceof NypsiClient) {
     const clusterHas = await options.client.cluster.broadcastEval(
