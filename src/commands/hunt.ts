@@ -288,9 +288,8 @@ async function doHunt(
     }
 
     if (multi > 0) {
-      amount += amount * multi;
+      amount += amount * (Math.random() * multi);
       amount = Math.floor(amount);
-      if (amount > 64) amount = 64;
     }
 
     await addInventoryItem(member, chosen, amount);

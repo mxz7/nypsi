@@ -1375,8 +1375,8 @@
     "buy": 0,
     "sell": 75000,
     "role": "booster",
-    "stackable": false,
-    "max": 1,
+    "stackable": true,
+    "max": 2,
     "boosterEffect": {
       "boosts": ["hunt"],
       "effect": 1,
