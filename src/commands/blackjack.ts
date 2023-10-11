@@ -527,7 +527,7 @@ async function playGame(
 
   const edit = async (data: MessageEditOptions, interaction?: ButtonInteraction) => {
     if (!interaction || interaction.deferred || interaction.replied) return m.edit(data);
-    return interaction.update(data);
+    return interaction.update(data).catch(() => m.edit(data));
   };
 
   let bet = games.get(message.author.id).bet;
@@ -793,7 +793,7 @@ async function playGame(
       .then(async (collected) => {
         setTimeout(() => {
           collected.deferUpdate().catch(() => null);
-        }, 1500);
+        }, 750);
         return collected as ButtonInteraction;
       })
       .catch((e) => {
