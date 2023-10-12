@@ -39,6 +39,7 @@ veins.set("gold_nugget", [2, 8, 12, 18, 28]);
 veins.set("quartz", [1, 4, 6, 12]);
 veins.set("end_stone", [5, 7, 15, 25]);
 veins.set("purpur", [2, 8, 12, 14]);
+veins.set("chorus", [2, 8, 12, 14]);
 
 const areas = [
   "cave",
@@ -268,7 +269,8 @@ async function doMine(
           if (!["netherrack", "ancient_debris", "quartz", "gold_nugget"].includes(items[i].id))
             continue;
         } else if (chosenArea === "end") {
-          if (!["end_stone", "purpur", "obsidian", "dragon_egg"].includes(items[i].id)) continue;
+          if (!["end_stone", "purpur", "obsidian", "dragon_egg", "chorus"].includes(items[i].id))
+            continue;
         } else {
           if (
             ![
