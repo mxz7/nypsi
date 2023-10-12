@@ -117,8 +117,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return collected.customId;
     })
     .catch(async () => {
-      embed.setDescription("❌ expired");
-      await msg.edit({ embeds: [embed], components: [] });
+      await msg.edit({
+        embeds: [embed],
+        components: [
+          new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+            new ButtonBuilder()
+              .setStyle(ButtonStyle.Danger)
+              .setLabel("expired")
+              .setCustomId("boobies")
+              .setDisabled(true),
+          ),
+        ],
+      });
       addExpiry(cmd.name, message.member, 30);
     });
 
