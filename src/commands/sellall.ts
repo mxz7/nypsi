@@ -98,10 +98,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const filter = (i: Interaction) => i.user.id == message.author.id;
 
   const reaction = await msg.awaitMessageComponent({ filter, time: 15000 }).catch(async () => {
-    embed.setDescription("❌ expired");
-    embed.disableFooter();
-    embed.setFields();
-    await msg.edit({ embeds: [embed], components: [] });
+    await msg.edit({
+      embeds: [embed],
+      components: [
+        new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+          new ButtonBuilder()
+            .setStyle(ButtonStyle.Danger)
+            .setLabel("expired")
+            .setCustomId("boobies")
+            .setDisabled(true),
+        ),
+      ],
+    });
     addExpiry(cmd.name, message.member, 30);
   });
 

@@ -427,7 +427,20 @@ async function run(
         return collected.customId;
       })
       .catch(async () => {
-        await edit({ components: [] }, msg).catch(() => {});
+        await edit(
+          {
+            components: [
+              new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+                new ButtonBuilder()
+                  .setStyle(ButtonStyle.Danger)
+                  .setLabel("expired")
+                  .setCustomId("boobies")
+                  .setDisabled(true),
+              ),
+            ],
+          },
+          msg,
+        ).catch(() => {});
         fail = true;
         invited.delete(target.user.id);
       });
