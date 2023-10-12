@@ -328,8 +328,18 @@ async function run(
             return collected.customId;
           })
           .catch(async () => {
-            prestigeConfirmation.setDescription("❌ expired");
-            await prestigeMsg.edit({ embeds: [prestigeConfirmation], components: [] });
+            await prestigeMsg.edit({
+              embeds: [prestigeConfirmation],
+              components: [
+                new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+                  new ButtonBuilder()
+                    .setStyle(ButtonStyle.Danger)
+                    .setLabel("expired")
+                    .setCustomId("boobies")
+                    .setDisabled(true),
+                ),
+              ],
+            });
             return null;
           });
 
