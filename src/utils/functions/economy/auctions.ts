@@ -695,6 +695,7 @@ export async function buyFullAuction(
         },
         data: {
           sold: true,
+          createdAt: new Date(),
         },
       })
       .catch(() => {});
