@@ -175,7 +175,9 @@ export default class PageManager<T> {
 
     manager.row.components[1].setDisabled(false);
 
-    await interaction.update({ embeds: [manager.embed], components: [manager.row] });
+    await interaction
+      .update({ embeds: [manager.embed], components: [manager.row] })
+      .catch(() => this.message.edit({ embeds: [manager.embed], components: [manager.row] }));
     return manager.listen();
   }
 
@@ -207,7 +209,9 @@ export default class PageManager<T> {
 
     manager.row.components[0].setDisabled(false);
 
-    await interaction.update({ embeds: [manager.embed], components: [manager.row] });
+    await interaction
+      .update({ embeds: [manager.embed], components: [manager.row] })
+      .catch(() => this.message.edit({ embeds: [manager.embed], components: [manager.row] }));
     return manager.listen();
   }
 

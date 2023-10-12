@@ -415,7 +415,7 @@ async function playGame(
 
   const edit = async (data: MessageEditOptions, interaction?: ButtonInteraction) => {
     if (!interaction || interaction.deferred || interaction.replied) return m.edit(data);
-    return interaction.update(data);
+    return interaction.update(data).catch(() => m.edit(data));
   };
 
   const replay = async (embed: CustomEmbed, interaction: ButtonInteraction) => {
