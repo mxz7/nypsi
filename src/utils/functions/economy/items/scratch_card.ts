@@ -128,7 +128,9 @@ async function prepare(
       }
 
       if (interaction && !interaction.deferred && !interaction.replied)
-        await interaction.update({ embeds: [embed], components: buttons });
+        await interaction
+          .update({ embeds: [embed], components: buttons })
+          .catch(() => msg.edit({ embeds: [embed], components: buttons }));
       else await msg.edit({ embeds: [embed], components: buttons });
 
       if (retry) {
@@ -231,10 +233,14 @@ async function prepare(
       if (response.deferred || response.replied)
         await msg.edit({ embeds: [embed], components: card.getButtons(card.remainingClicks == 0) });
       else
-        await response.update({
-          embeds: [embed],
-          components: card.getButtons(card.remainingClicks == 0),
-        });
+        await response
+          .update({
+            embeds: [embed],
+            components: card.getButtons(card.remainingClicks == 0),
+          })
+          .catch(() =>
+            msg.edit({ embeds: [embed], components: card.getButtons(card.remainingClicks == 0) }),
+          );
     }
 
     return play(response);
