@@ -25,6 +25,7 @@ import { createUser, getItems, userExists } from "../utils/functions/economy/uti
 import { calcEarnedHFMXp, getXp, updateXp } from "../utils/functions/economy/xp";
 import { percentChance } from "../utils/functions/random";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import { logger } from "../utils/logger";
 
 const cmd = new Command("hunt", "go to a field and hunt", "money");
 
@@ -311,6 +312,13 @@ async function doHunt(
 
     if (guild) {
       await addToGuildXP(guild, earnedXp, member);
+    }
+  }
+
+  for (const i of foundItems.entries()) {
+    if (!items[i[0]].emoji) {
+      logger.error("hunt error emoji thing");
+      console.error(foundItems);
     }
   }
 
