@@ -65,7 +65,7 @@ manager.on("clusterCreate", (cluster) => {
   });
   cluster.on("message", (message) => {
     if (message == "restart") {
-      manager.recluster.start({ restartMode: "rolling", delay: 7000 });
+      manager.recluster.start({ restartMode: "rolling", delay: 2500 });
       heartBeatIntervals.forEach((i) => clearInterval(i));
       heartBeatIntervals = [];
     } else if (typeof message === "string" && message.startsWith("trigger_job")) {
