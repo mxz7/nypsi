@@ -299,7 +299,7 @@ async function doMine(
         }
 
         if (items[i].rarity == 4) {
-          const chance = Math.floor(Math.random() * 3);
+          const chance = Math.floor(Math.random() * 6);
           if (chance == 1 && pickaxe == "diamond_pickaxe") {
             for (let x = 0; x < 10; x++) {
               mineItemsModified.push(i);
