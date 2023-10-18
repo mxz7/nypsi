@@ -1,13 +1,17 @@
 import { CommandInteraction, Message } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
-import { CustomEmbed } from "../models/EmbedBuilders";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getBakeryUpgrades } from "../utils/functions/economy/bakery";
 import { getBakeryUpgradesData } from "../utils/functions/economy/utils";
+import { getMember } from "../utils/functions/member";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("bakery", "view your current bakery upgrades", "money");
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[],
+) {
   if (await onCooldown(cmd.name, message.member)) {
     const embed = await getResponse(cmd.name, message.member);
 
@@ -16,10 +20,21 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   await addCooldown(cmd.name, message.member, 7);
 
-  const upgrades = await getBakeryUpgrades(message.member);
+  let target = message.member;
+
+  if (args.length > 0) {
+    target = await getMember(message.guild, args.join(" "));
+
+    if (!target)
+      return message.channel.send({
+        embeds: [new ErrorEmbed(`couldn't find a member matching \`${args.join(" ")}\``)],
+      });
+  }
+
+  const upgrades = await getBakeryUpgrades(target);
 
   const embed = new CustomEmbed(
-    message.member,
+    target,
     upgrades
       .map(
         (u) =>
@@ -29,8 +44,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       )
       .join("\n"),
   ).setHeader(
-    "your bakery upgrades",
-
+    target.user.id === message.author.id ? "your bakery" : `${target.user.username}'s bakery`,
     message.author.avatarURL(),
   );
 
