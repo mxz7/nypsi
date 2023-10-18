@@ -232,17 +232,21 @@ async function run(
       };
 
       const buffer = Buffer.from(JSON.stringify(data, null, 2), "utf8");
-      const gzipped = await promisify(gzip)(buffer);
+
+      let gzipped: Buffer;
+
+      if (buffer.byteLength > 7e6) gzipped = await promisify(gzip)(buffer);
 
       let fail = false;
       await message.member
         .send({
-          content:
-            "if your computer cannot decompress the file, use this website: <https://gzip.swimburger.net>",
+          content: gzipped
+            ? "if your computer cannot decompress the file, use this website: <https://gzip.swimburger.net>"
+            : null,
           files: [
             {
-              attachment: gzipped,
-              name: `${message.author.id}.json.gz`,
+              attachment: gzipped || buffer,
+              name: `${message.author.id}.json${gzipped ? ".gz" : ""}`,
             },
           ],
         })
