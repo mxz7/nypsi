@@ -149,7 +149,7 @@ async function run(
     const buffer = Buffer.from(JSON.stringify(data, null, 2), "utf8");
     const gzipped = await promisify(gzip)(buffer);
 
-    return { attachment: gzipped, name: `${user.id}.json.txt` };
+    return { attachment: gzipped, name: `${user.id}.json.gz` };
   };
 
   const showUser = async (id: string) => {
