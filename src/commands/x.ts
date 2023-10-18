@@ -80,7 +80,12 @@ async function run(
               Stats: true,
               Crafting: true,
               LotteryTicket: true,
-              EconomyGuild: true,
+              EconomyGuild: {
+                include: {
+                  upgrades: true,
+                  members: true,
+                },
+              },
               Auction: true,
               BakeryUpgrade: true,
               EconomyGuildMember: true,
