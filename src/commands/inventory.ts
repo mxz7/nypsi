@@ -69,7 +69,7 @@ async function run(
   let currentFilter: string;
 
   const setFilter = (inventory: { item: string; amount: number }[], filter: string) => {
-    currentFilter = filter;
+    currentFilter = filter.toLowerCase();
     return inventory.filter((i) => {
       const item = items[i.item];
       if (item.aliases) {
