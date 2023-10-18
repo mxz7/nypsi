@@ -107,11 +107,9 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel) 
 
     updateWinnersText();
 
-    if (embed.data.fields?.length == 0) {
-      embed.addField("winners", winnersText.join("\n"));
-    } else {
-      embed.setFields([{ name: "winners", value: winnersText.join("\n") }]);
-    }
+    embed.setFields([
+      { name: `winner${winnersText.length > 1 ? "s" : ""}`, value: winnersText.join("\n") },
+    ]);
 
     msg = await msg.edit({ embeds: [embed] });
 
