@@ -26,12 +26,16 @@ import {
   calcMaxBet,
   getBalance,
   getDefaultBet,
-  getGambleMulti,
   updateBalance,
 } from "../utils/functions/economy/balance.js";
 import { addToGuildXP, getGuildName } from "../utils/functions/economy/guilds";
 import { createGame } from "../utils/functions/economy/stats";
-import { createUser, formatBet, userExists } from "../utils/functions/economy/utils.js";
+import {
+  createUser,
+  formatBet,
+  renderGambleScreen,
+  userExists,
+} from "../utils/functions/economy/utils.js";
 import { calcEarnedGambleXp, getXp, updateXp } from "../utils/functions/economy/xp";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { shuffle } from "../utils/functions/random";
@@ -45,12 +49,9 @@ const games = new Map<
   {
     bet: number;
     deck: string[];
-    cards: string[];
+    hands: { cards: string[]; done: boolean }[];
     dealerCards: string[];
     id: number;
-    first: boolean;
-    dealerPlay: boolean;
-    voted: number;
   }
 >();
 
@@ -114,6 +115,7 @@ async function prepareGame(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
   msg?: Message,
+  interaction?: ButtonInteraction,
 ) {
   recentCommands.set(message.author.id, Date.now());
 
@@ -241,72 +243,12 @@ async function prepareGame(
 
   const id = Math.random();
 
-  const newDeck = [
-    "A♠️",
-    "2♠️",
-    "3♠️",
-    "4♠️",
-    "5♠️",
-    "6♠️",
-    "7♠️",
-    "8♠️",
-    "9♠️",
-    "10♠️",
-    "J♠️",
-    "Q♠️",
-    "K♠️",
-    "A♣️",
-    "2♣️",
-    "3♣️",
-    "4♣️",
-    "5♣️",
-    "6♣️",
-    "7♣️",
-    "8♣️",
-    "9♣️",
-    "10♣️",
-    "J♣️",
-    "Q♣️",
-    "K♣️",
-    "A♥️",
-    "2♥️",
-    "3♥️",
-    "4♥️",
-    "5♥️",
-    "6♥️",
-    "7♥️",
-    "8♥️",
-    "9♥️",
-    "10♥️",
-    "J♥️",
-    "Q♥️",
-    "K♥️",
-    "A♦️",
-    "2♦️",
-    "3♦️",
-    "4♦️",
-    "5♦️",
-    "6♦️",
-    "7♦️",
-    "8♦️",
-    "9♦️",
-    "10♦️",
-    "J♦️",
-    "Q♦️",
-    "K♦️",
-  ];
-
-  const multi = (await getGambleMulti(message.member)).multi;
-
   games.set(message.author.id, {
     bet: bet,
     deck: shuffle(newDeck),
-    cards: [],
+    hands: [{ cards: [], done: false }],
     dealerCards: [],
     id: id,
-    first: true,
-    dealerPlay: false,
-    voted: multi,
   });
 
   setTimeout(async () => {
@@ -339,7 +281,7 @@ async function prepareGame(
       getCards(message.member) + " **" + calcTotal(message.member) + "**",
     );
 
-  let row;
+  let row: ActionRowBuilder<MessageActionRowComponentBuilder>;
 
   if ((await getBalance(message.member)) >= bet) {
     row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -356,10 +298,20 @@ async function prepareGame(
 
   if (calcTotal(message.member) == 21) row.components.forEach((c) => c.setDisabled(true));
 
-  if (msg) {
-    await msg.edit({ embeds: [embed], components: [row] });
+  if (interaction && !interaction.replied && !interaction.deferred) {
+    await interaction.update({ embeds: [embed], components: [row] }).catch(() => {
+      if (msg) {
+        return msg.edit({ embeds: [embed], components: [row] });
+      } else {
+        return send({ embeds: [embed], components: [row] });
+      }
+    });
   } else {
-    msg = await send({ embeds: [embed], components: [row] });
+    if (msg) {
+      await msg.edit({ embeds: [embed], components: [row] });
+    } else {
+      msg = await send({ embeds: [embed], components: [row] });
+    }
   }
 
   playGame(message, msg, args).catch((e) => {
@@ -376,146 +328,196 @@ async function prepareGame(
   });
 }
 
-function newCard(member: GuildMember) {
-  const bet = games.get(member.user.id).bet;
-  const deck = games.get(member.user.id).deck;
-  const cards = games.get(member.user.id).cards;
-  const dealerCards = games.get(member.user.id).dealerCards;
-  const id = games.get(member.user.id).id;
-  const first = games.get(member.user.id).first;
-  const voted = games.get(member.user.id).voted;
+class Game {
+  private message: Message;
+  private member: GuildMember;
+  private deck: string[];
+  private bet: number;
+  private hands: Hand[];
+  private dealerCards: Hand;
+  private row: ActionRowBuilder<MessageActionRowComponentBuilder>;
+  private activeHand = 0;
 
-  const choice = deck[0];
+  constructor(
+    message: Message,
+    member: GuildMember,
+    bet: number,
+    row: ActionRowBuilder<MessageActionRowComponentBuilder>,
+  ) {
+    this.message = message;
+    this.member = member;
+    this.bet = bet;
+    this.row = row;
 
-  deck.shift();
+    this.deck = shuffle([
+      "A♠️",
+      "2♠️",
+      "3♠️",
+      "4♠️",
+      "5♠️",
+      "6♠️",
+      "7♠️",
+      "8♠️",
+      "9♠️",
+      "10♠️",
+      "J♠️",
+      "Q♠️",
+      "K♠️",
+      "A♣️",
+      "2♣️",
+      "3♣️",
+      "4♣️",
+      "5♣️",
+      "6♣️",
+      "7♣️",
+      "8♣️",
+      "9♣️",
+      "10♣️",
+      "J♣️",
+      "Q♣️",
+      "K♣️",
+      "A♥️",
+      "2♥️",
+      "3♥️",
+      "4♥️",
+      "5♥️",
+      "6♥️",
+      "7♥️",
+      "8♥️",
+      "9♥️",
+      "10♥️",
+      "J♥️",
+      "Q♥️",
+      "K♥️",
+      "A♦️",
+      "2♦️",
+      "3♦️",
+      "4♦️",
+      "5♦️",
+      "6♦️",
+      "7♦️",
+      "8♦️",
+      "9♦️",
+      "10♦️",
+      "J♦️",
+      "Q♦️",
+      "K♦️",
+    ]);
 
-  cards.push(choice);
+    this.hands = [new Hand(this.deck)];
+    this.dealerCards = new Hand(this.deck);
 
-  games.set(member.user.id, {
-    bet: bet,
-    deck: deck,
-    cards: cards,
-    dealerCards: dealerCards,
-    id: id,
-    first: first,
-    dealerPlay: false,
-    voted: voted,
-  });
+    return this;
+  }
+
+  private checkWin(handIndex = 0) {
+    const hand = this.hands[handIndex];
+
+    if (hand.total() > 21) return "lose";
+    if (this.dealerCards.total() > 21) return "win";
+    if (hand.total() > this.dealerCards.total()) return "win";
+    if (hand.total() < this.dealerCards.total()) return "lose";
+    if (hand.total() === this.dealerCards.total()) return "draw";
+  }
+
+  private async render(
+    state: "playing" | "win" | "lose" | "draw",
+    winnings?: number,
+    multi?: number,
+    xp?: number,
+    id?: string,
+  ) {
+    const embed = new CustomEmbed(
+      this.member,
+      await renderGambleScreen(this.member.user.id, state, this.bet, null, winnings, multi),
+    );
+
+    if (state === "win") embed.setColor(Constants.EMBED_SUCCESS_COLOR);
+    else if (state === "lose") embed.setColor(Constants.EMBED_FAIL_COLOR);
+    else if (state === "draw") embed.setColor(variants.macchiato.yellow.hex as ColorResolvable);
+
+    if (xp && id) embed.setFooter({ text: `+${xp.toLocaleString()}xp | id: ${id}` });
+    else if (id) embed.setFooter({ text: `id: ${id}` });
+
+    embed.addField("dealer", this.dealerCards.render());
+    for (const hand of this.hands) {
+      embed.addField(
+        `${this.member.user.username}${
+          this.activeHand === this.hands.indexOf(hand) && this.hands.length > 1 ? " (active)" : ""
+        }`,
+        hand.render(),
+      );
+    }
+  }
 }
 
-function newDealerCard(member: GuildMember) {
-  const bet = games.get(member.user.id).bet;
-  const deck = games.get(member.user.id).deck;
-  const cards = games.get(member.user.id).cards;
-  const dealerCards = games.get(member.user.id).dealerCards;
-  const id = games.get(member.user.id).id;
-  const first = games.get(member.user.id).first;
-  const voted = games.get(member.user.id).voted;
+class Hand {
+  public cards: string[];
+  public done: boolean;
+  private deck: string[];
+  public dealer: boolean;
 
-  const choice = deck[0];
+  constructor(deck: string[], dealer = false) {
+    this.cards = [];
+    this.done = false;
 
-  deck.shift();
-
-  dealerCards.push(choice);
-
-  games.set(member.user.id, {
-    bet: bet,
-    deck: deck,
-    cards: cards,
-    dealerCards: dealerCards,
-    id: id,
-    first: first,
-    dealerPlay: false,
-    voted: voted,
-  });
-}
-
-function calcTotal(member: GuildMember) {
-  const cards = games.get(member.user.id).cards;
-
-  let total = 0;
-  let aces = 0;
-
-  let aceAs11 = false;
-
-  for (let card of cards) {
-    card = card.split("♠️").join().split("♣️").join().split("♥️").join().split("♦️").join();
-
-    if (card.includes("K") || card.includes("Q") || card.includes("J")) {
-      total = total + 10;
-    } else if (card.includes("A")) {
-      aces++;
-    } else {
-      total = total + parseInt(card);
-    }
+    this.deck = deck;
+    this.dealer = dealer;
   }
 
-  for (let i = 0; i < aces; i++) {
-    if (total < 11) {
-      total += 11;
-      aceAs11 = true;
-    } else {
-      total += 1;
-    }
+  public newCard() {
+    const card = this.deck.shift();
+    this.cards.push(card);
+
+    return this;
   }
 
-  if (total > 21) {
-    if (aceAs11) {
-      total -= 10;
+  public total() {
+    let total = 0;
+    let aces = 0;
+
+    let aceAs11 = false;
+
+    for (let card of this.cards) {
+      card = card.split("♠️").join().split("♣️").join().split("♥️").join().split("♦️").join();
+
+      if (card.includes("K") || card.includes("Q") || card.includes("J")) {
+        total = total + 10;
+      } else if (card.includes("A")) {
+        aces++;
+      } else {
+        total = total + parseInt(card);
+      }
     }
+
+    for (let i = 0; i < aces; i++) {
+      if (total < 11) {
+        total += 11;
+        aceAs11 = true;
+      } else {
+        total += 1;
+      }
+    }
+
+    if (total > 21) {
+      if (aceAs11) {
+        total -= 10;
+      }
+    }
+
+    return total;
   }
 
-  return total;
-}
+  public autoPlay() {
+    while (this.total() < 17) this.newCard();
 
-function calcTotalDealer(member: GuildMember) {
-  const cards = games.get(member.user.id).dealerCards;
-
-  let total = 0;
-  let aces = 0;
-
-  let aceAs11 = false;
-
-  for (let card of cards) {
-    card = card.split("♠️").join().split("♣️").join().split("♥️").join().split("♦️").join();
-
-    if (card.includes("K") || card.includes("Q") || card.includes("J")) {
-      total = total + 10;
-    } else if (card.includes("A")) {
-      aces++;
-    } else {
-      total = total + parseInt(card);
-    }
+    return this;
   }
 
-  for (let i = 0; i < aces; i++) {
-    if (total < 11) {
-      total += 11;
-      aceAs11 = true;
-    } else {
-      total += 1;
-    }
+  public render() {
+    if (this.dealer) return `| ${this.cards[0]} |`;
+    return `| ${this.cards.join(" | ")} | **(${this.total()})**`;
   }
-
-  if (total > 21) {
-    if (aceAs11) {
-      total -= 10;
-    }
-  }
-
-  return total;
-}
-
-function getCards(member: GuildMember) {
-  const cards = games.get(member.user.id).cards;
-
-  return "| " + cards.join(" | ") + " |";
-}
-
-function getDealerCards(member: GuildMember) {
-  const cards = games.get(member.user.id).dealerCards;
-
-  return "| " + cards.join(" | ") + " |";
 }
 
 async function playGame(
@@ -530,11 +532,9 @@ async function playGame(
     return interaction.update(data).catch(() => m.edit(data));
   };
 
-  let bet = games.get(message.author.id).bet;
-  const first = games.get(message.author.id).first;
-  const dealerPlaya = games.get(message.author.id).dealerPlay;
+  const game = games.get(message.author.id);
 
-  const newEmbed = new CustomEmbed(message.member, "**bet** $" + bet.toLocaleString()).setHeader(
+  const embed = new CustomEmbed(message.member, "**bet** $" + game.bet.toLocaleString()).setHeader(
     "blackjack",
     message.author.avatarURL(),
   );
@@ -544,7 +544,7 @@ async function playGame(
     if (
       !(await isPremium(message.member)) ||
       !((await getTier(message.member)) >= 2) ||
-      (await getBalance(message.member)) < bet
+      (await getBalance(message.member)) < game.bet
     ) {
       return edit({ embeds: [embed], components: [] }, interaction);
     }
@@ -612,42 +612,42 @@ async function playGame(
   const lose = async (interaction?: ButtonInteraction) => {
     const id = await createGame({
       userId: message.author.id,
-      bet: bet,
+      bet: game.bet,
       game: "blackjack",
       result: "lose",
       outcome: `dealer cards: ${getDealerCards(message.member)} (${calcTotalDealer(
         message.member,
       )})\nmember cards: ${getCards(message.member)} (${calcTotal(message.member)})`,
     });
-    gamble(message.author, "blackjack", bet, "lose", id, 0);
-    newEmbed.setColor(Constants.EMBED_FAIL_COLOR);
-    newEmbed.setDescription("**bet** $" + bet.toLocaleString() + "\n\n**you lose!!**");
-    newEmbed.addField(
+    gamble(message.author, "blackjack", game.bet, "lose", id, 0);
+    embed.setColor(Constants.EMBED_FAIL_COLOR);
+    embed.setDescription("**bet** $" + game.bet.toLocaleString() + "\n\n**you lose!!**");
+    embed.addField(
       "dealer",
       getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**",
     );
-    newEmbed.addField(
+    embed.addField(
       message.author.username,
       getCards(message.member) + " **" + calcTotal(message.member) + "**",
     );
-    newEmbed.setFooter({ text: `id: ${id}` });
+    embed.setFooter({ text: `id: ${id}` });
     games.delete(message.author.id);
-    return replay(newEmbed, interaction);
+    return replay(embed, interaction);
   };
 
   const win = async (interaction?: ButtonInteraction) => {
-    let winnings = bet * 2;
+    let winnings = 0;
 
     if (games.get(message.author.id).cards.length == 2 && calcTotal(message.member) == 21) {
       winnings = Math.floor(bet * 2.5);
       addProgress(message.author.id, "blackjack_pro", 1);
     }
 
-    newEmbed.setColor(Constants.EMBED_SUCCESS_COLOR);
+    embed.setColor(Constants.EMBED_SUCCESS_COLOR);
     if (games.get(message.author.id).voted > 0) {
       winnings = winnings + Math.round(winnings * games.get(message.author.id).voted);
 
-      newEmbed.setDescription(
+      embed.setDescription(
         "**bet** $" +
           bet.toLocaleString() +
           "\n\n**winner!!**\n**you win** $" +
@@ -658,7 +658,7 @@ async function playGame(
           "**% bonus",
       );
     } else {
-      newEmbed.setDescription(
+      embed.setDescription(
         "**bet** $" +
           bet.toLocaleString() +
           "\n\n**winner!!**\n**you win** $" +
@@ -670,7 +670,7 @@ async function playGame(
 
     if (earnedXp > 0) {
       await updateXp(message.member, (await getXp(message.member)) + earnedXp);
-      newEmbed.setFooter({ text: `+${earnedXp}xp` });
+      embed.setFooter({ text: `+${earnedXp}xp` });
 
       const guild = await getGuildName(message.member);
 
@@ -693,23 +693,23 @@ async function playGame(
 
     gamble(message.author, "blackjack", bet, "win", id, winnings);
     if (earnedXp > 0) {
-      newEmbed.setFooter({ text: `+${earnedXp}xp | id: ${id}` });
+      embed.setFooter({ text: `+${earnedXp}xp | id: ${id}` });
     } else {
-      newEmbed.setFooter({ text: `id: ${id}` });
+      embed.setFooter({ text: `id: ${id}` });
     }
 
-    newEmbed.addField(
+    embed.addField(
       "dealer",
       getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**",
     );
-    newEmbed.addField(
+    embed.addField(
       message.author.username,
       getCards(message.member) + " **" + calcTotal(message.member) + "**",
     );
     await updateBalance(message.member, (await getBalance(message.member)) + winnings);
 
     games.delete(message.author.id);
-    return replay(newEmbed, interaction);
+    return replay(embed, interaction);
   };
 
   const draw = async (interaction?: ButtonInteraction) => {
@@ -724,22 +724,22 @@ async function playGame(
       earned: bet,
     });
     gamble(message.author, "blackjack", bet, "draw", id, bet);
-    newEmbed.setFooter({ text: `id: ${id}` });
-    newEmbed.setColor(variants.macchiato.yellow.hex as ColorResolvable);
-    newEmbed.setDescription(
+    embed.setFooter({ text: `id: ${id}` });
+    embed.setColor(variants.macchiato.yellow.hex as ColorResolvable);
+    embed.setDescription(
       "**bet** $" + bet.toLocaleString() + "\n\n**draw!!**\nyou win $" + bet.toLocaleString(),
     );
-    newEmbed.addField(
+    embed.addField(
       "dealer",
       getDealerCards(message.member) + " **" + calcTotalDealer(message.member) + "**",
     );
-    newEmbed.addField(
+    embed.addField(
       message.author.username,
       getCards(message.member) + " **" + calcTotal(message.member) + "**",
     );
     await updateBalance(message.member, (await getBalance(message.member)) + bet);
     games.delete(message.author.id);
-    return replay(newEmbed, interaction);
+    return replay(embed, interaction);
   };
 
   if (calcTotalDealer(message.member) > 21) {
@@ -1002,11 +1002,4 @@ async function playGame(
       return;
     }
   }
-}
-
-function dealerPlay(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
-  while (calcTotalDealer(message.member) < 17) {
-    newDealerCard(message.member);
-  }
-  return;
 }
