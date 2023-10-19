@@ -116,8 +116,8 @@ devDependencies:
     specifier: 13.1.2
     version: 13.1.2
   '@types/urban-dictionary':
-    specifier: 3.0.0
-    version: 3.0.0
+    specifier: 3.0.1
+    version: 3.0.1
   '@typescript-eslint/eslint-plugin':
     specifier: 5.62.0
     version: 5.62.0(@typescript-eslint/parser@5.62.0)(eslint@8.51.0)(typescript@5.2.2)
@@ -1444,8 +1444,8 @@ packages:
     resolution: {integrity: sha512-Yiuye7Ajzsh7YYrudWZXyBkRbRVGALPYFGHLREtnYzDBrXhwpzL6rc6GAQiqSDYIIZkE8297dVTebe5BsarO3g==}
     dev: true
 
-  /@types/urban-dictionary@3.0.0:
-    resolution: {integrity: sha512-zGc/rL7a11fSf98MsVKnTLQ0s3BukUrdHRWe4Hf4jj3psTVqBIibv7cKUF23We3qDn29/2mYeo56jLZjnm5ZzA==}
+  /@types/urban-dictionary@3.0.1:
+    resolution: {integrity: sha512-NjOjx1D80gVOyz1fbS0y4Y/FI0Cwq4gBX1cuxDFRC2780phYVMJYL38T2XQ+vp6u1Kho1KGH/MnxC9WFfHNQIw==}
     dev: true
 
   /@types/ws@8.5.5:
