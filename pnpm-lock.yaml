@@ -86,8 +86,8 @@ devDependencies:
     specifier: 17.8.0
     version: 17.8.0
   '@types/crypto-js':
-    specifier: 4.1.2
-    version: 4.1.2
+    specifier: 4.1.3
+    version: 4.1.3
   '@types/express':
     specifier: 4.17.20
     version: 4.17.20
@@ -1292,8 +1292,8 @@ packages:
       '@types/node': 20.4.9
     dev: true
 
-  /@types/crypto-js@4.1.2:
-    resolution: {integrity: sha512-t33RNmTu5ufG/sorROIafiCVJMx3jz95bXUMoPAZcUD14fxMXnuTzqzXZoxpR0tNx2xpw11Dlmem9vGCsrSOfA==}
+  /@types/crypto-js@4.1.3:
+    resolution: {integrity: sha512-YP1sYYayLe7Eg5oXyLLvOLfxBfZ5Fgpz6sVWkpB18wDMywCLPWmqzRz+9gyuOoLF0fzDTTFwlyNbx7koONUwqA==}
     dev: true
 
   /@types/express-serve-static-core@4.17.35:
