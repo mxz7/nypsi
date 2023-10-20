@@ -448,6 +448,8 @@ class Game {
         hand.render(),
       );
     }
+
+    return embed;
   }
 }
 
@@ -463,6 +465,8 @@ class Hand {
 
     this.deck = deck;
     this.dealer = dealer;
+
+    return this;
   }
 
   public newCard() {
