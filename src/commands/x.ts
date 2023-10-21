@@ -54,12 +54,15 @@ async function run(
   args: string[],
 ) {
   if (!(message instanceof Message)) return;
-  if ((await getAdminLevel(message.author.id)) < 1)
+  if ((await getAdminLevel(message.author.id)) < 1) {
+    if (await redis.exists("nypsi:xemoji:cooldown")) return;
+    await redis.set("nypsi:xemoji:cooldown", "boobies", "EX", 5);
     return message.react(
       ["🫦", "💦", "🍑", "🍆", "😩"][
         Math.floor(Math.random() * ["🫦", "💦", "🍑", "🍆", "😩"].length)
       ],
     );
+  }
 
   const getDbData = async (user: User) => {
     logger.info(`fetching data for ${user.id}...`);
