@@ -19,19 +19,19 @@ async function leaderboardThing() {
   const start = Date.now();
   const itemIds = Object.keys(getItems());
 
-  await topBalanceGlobal(100);
+  await topBalanceGlobal(1000);
   await sleep(1000);
-  await topDailyStreakGlobal("");
+  await topDailyStreakGlobal("", 1000);
   await sleep(1000);
-  await topPrestigeGlobal("");
+  await topPrestigeGlobal("", 1000);
   await sleep(1000);
-  await topNetWorthGlobal("");
+  await topNetWorthGlobal("", 1000);
   await sleep(1000);
   await topWordleGlobal("");
 
   for (const item of itemIds) {
     await sleep(1000);
-    await topItemGlobal(item, "");
+    await topItemGlobal(item, "", 1000);
     await calcItemValue(item);
   }
 
