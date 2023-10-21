@@ -400,7 +400,7 @@ export async function reset() {
         defaultBet: 0,
         xp: 0,
         padlock: false,
-        level: 0,
+        level: user.level - (user.level % 100),
       },
     });
 
