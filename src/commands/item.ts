@@ -199,25 +199,40 @@ async function run(
 
   embed.setThumbnail(thumbnail);
   const components: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [
-    new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+    new ActionRowBuilder<MessageActionRowComponentBuilder>(),
+  ];
+
+  if (total > 0)
+    components[0].addComponents(
+      new ButtonBuilder()
+        .setStyle(ButtonStyle.Link)
+        .setLabel("leaderboard")
+        .setEmoji("🏆")
+        .setURL(`https://nypsi.xyz/leaderboard/${selected.id}`),
+    );
+
+  if (
+    !(
+      (await prisma.auction.count({ where: { AND: [{ itemId: selected.id }, { sold: true }] } })) <
+        5 &&
+      (await prisma.offer.count({ where: { AND: [{ itemId: selected.id }, { sold: true }] } })) <
+        5 &&
+      (await prisma.graphMetrics.count({ where: { category: `item-count-${selected.id}` } })) < 5
+    )
+  ) {
+    components[0].addComponents(
       new ButtonBuilder()
         .setStyle(ButtonStyle.Link)
         .setLabel("history")
         .setEmoji("📈")
         .setURL("https://nypsi.xyz/item/history/" + selected.id),
-    ),
-  ];
-
-  if (
-    (await prisma.auction.count({ where: { AND: [{ itemId: selected.id }, { sold: true }] } })) <
-      5 &&
-    (await prisma.offer.count({ where: { AND: [{ itemId: selected.id }, { sold: true }] } })) < 5 &&
-    (await prisma.graphMetrics.count({ where: { category: `item-count-${selected.id}` } })) < 5
-  ) {
-    return await send({ embeds: [embed] });
+    );
   }
 
-  return await send({ embeds: [embed], components });
+  return await send({
+    embeds: [embed],
+    components: components[0].components.length > 0 ? components : null,
+  });
 }
 
 cmd.setRun(run);
