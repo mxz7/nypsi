@@ -154,7 +154,7 @@ export async function topBalanceGlobal(amount: number): Promise<string[]> {
   return usersFinal;
 }
 
-export async function topNetWorthGlobal(userId: string) {
+export async function topNetWorthGlobal(userId: string, amount = 100) {
   const query = await prisma.economy.findMany({
     where: {
       AND: [{ netWorth: { gt: 0 } }, { user: { blacklisted: false } }],
@@ -172,6 +172,7 @@ export async function topNetWorthGlobal(userId: string) {
     orderBy: {
       netWorth: "desc",
     },
+    take: amount,
   });
 
   const out: string[] = [];
@@ -389,7 +390,7 @@ export async function topPrestige(guild: Guild, userId?: string) {
   return { pages, pos };
 }
 
-export async function topPrestigeGlobal(userId: string) {
+export async function topPrestigeGlobal(userId: string, amount = 100) {
   const query = await prisma.economy.findMany({
     where: {
       AND: [
@@ -409,7 +410,7 @@ export async function topPrestigeGlobal(userId: string) {
       },
     },
     orderBy: [{ prestige: "desc" }, { level: "desc" }],
-    take: 100,
+    take: amount,
   });
 
   const out = [];
@@ -544,7 +545,7 @@ export async function topItem(guild: Guild, item: string, userId: string) {
   return { pages, pos };
 }
 
-export async function topItemGlobal(item: string, userId: string) {
+export async function topItemGlobal(item: string, userId: string, amount = 100) {
   const query = await prisma.inventory.findMany({
     where: {
       item,
@@ -566,7 +567,7 @@ export async function topItemGlobal(item: string, userId: string) {
     orderBy: {
       amount: "desc",
     },
-    take: 100,
+    take: amount,
   });
 
   const out = [];
@@ -838,7 +839,7 @@ export async function topDailyStreak(guild: Guild, userId?: string) {
   return { pages, pos };
 }
 
-export async function topDailyStreakGlobal(userId: string) {
+export async function topDailyStreakGlobal(userId: string, amount = 100) {
   const query = await prisma.economy.findMany({
     where: {
       dailyStreak: { gt: 0 },
@@ -856,7 +857,7 @@ export async function topDailyStreakGlobal(userId: string) {
     orderBy: {
       dailyStreak: "desc",
     },
-    take: 100,
+    take: amount,
   });
 
   const out = [];
