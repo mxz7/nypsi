@@ -30,6 +30,7 @@ import {
   getGambleMulti,
   updateBalance,
 } from "../utils/functions/economy/balance.js";
+import { addToGuildXP, getGuildName } from "../utils/functions/economy/guilds";
 import { createGame } from "../utils/functions/economy/stats";
 import {
   createUser,
@@ -418,7 +419,15 @@ class Game {
     }
 
     if (winnings > 0) await updateBalance(this.member, (await getBalance(this.member)) + winnings);
-    if (xp > 0) await updateXp(this.member, (await getXp(this.member)) + xp);
+    if (xp > 0) {
+      await updateXp(this.member, (await getXp(this.member)) + xp);
+
+      const guild = await getGuildName(this.member);
+
+      if (guild) {
+        await addToGuildXP(guild, xp, this.member);
+      }
+    }
 
     const id = await createGame({
       userId: this.member.user.id,
