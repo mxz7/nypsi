@@ -605,6 +605,7 @@ class Game {
 
       if (balance >= this.bet && this.hand.cards.length === 2) {
         await updateBalance(this.member, balance - this.bet);
+        this.bet *= 2;
       }
 
       this.hand.newCard();
