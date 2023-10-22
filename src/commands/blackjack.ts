@@ -515,10 +515,14 @@ class Game {
     if (this.hand.total() === 21) {
       this.dealer.dealer = false;
       const embed = await this.render("playing");
+      const row = Game.getRow(false, true);
       if (this.message) {
-        await this.edit({ embeds: [embed], components: [] });
+        await this.edit({ embeds: [embed], components: [row] });
       } else {
-        this.message = await this.playerMessage.channel.send({ embeds: [embed] });
+        this.message = await this.playerMessage.channel.send({
+          embeds: [embed],
+          components: [row],
+        });
       }
 
       this.dealer.autoPlay();
