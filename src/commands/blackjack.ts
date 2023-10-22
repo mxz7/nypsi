@@ -242,6 +242,7 @@ class Game {
   private member: GuildMember;
   private deck: string[];
   private bet: number;
+  private originalBet: number;
   private hand: Hand;
   private dealer: Hand;
   private interaction: ButtonInteraction;
@@ -282,6 +283,7 @@ class Game {
     this.playerMessage = message;
     this.member = member;
     this.bet = bet;
+    this.originalBet = bet;
     this.message = msg;
     this.interaction = interaction;
 
@@ -507,7 +509,12 @@ class Game {
         }
       }
 
-      return prepareGame(this.playerMessage, [this.bet.toString()], this.message, this.interaction);
+      return prepareGame(
+        this.playerMessage,
+        [this.originalBet.toString()],
+        this.message,
+        this.interaction,
+      );
     }
   }
 
