@@ -153,29 +153,19 @@ async function calculateCooldownLength(
     getBoosters(member),
   ]);
 
-  const id = typeof member === "string" ? member : member.user.id;
-
-  if (id === "518813624245026826") console.log(`1: ${seconds}`);
-
   if (premiumTier == 4) {
     seconds = seconds * 0.25;
   } else if (premiumTier > 0) {
     seconds = seconds * 0.5;
   }
 
-  if (id === "518813624245026826") console.log(`2: ${seconds}`);
-
   if (booster) {
     seconds = seconds * 0.9;
   }
 
-  if (id === "518813624245026826") console.log(`3: ${seconds}`);
-
   if (guildUpgrades.find((i) => i.upgradeId === "cooldown")) {
-    seconds = seconds * (1 - 0.05 * guildUpgrades.find((i) => i.upgradeId).amount);
+    seconds = seconds * (1 - 0.05 * guildUpgrades.find((i) => i.upgradeId === "cooldown").amount);
   }
-
-  if (id === "518813624245026826") console.log(`4: ${seconds}`);
 
   const items = getItems();
 
@@ -183,11 +173,7 @@ async function calculateCooldownLength(
     seconds = seconds * items["redbull"].boosterEffect.effect;
   }
 
-  if (id === "518813624245026826") console.log(`5: ${seconds}`);
-
   if (seconds < 1) seconds = 1;
-
-  if (id === "518813624245026826") console.log(`6: ${seconds}`);
 
   return Math.ceil(seconds);
 }
