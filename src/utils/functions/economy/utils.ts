@@ -672,3 +672,23 @@ export async function doDaily(member: GuildMember) {
 
   return embed;
 }
+
+export async function renderGambleScreen(
+  userId: string,
+  state: "playing" | "win" | "lose" | "draw",
+  bet: number,
+  insert?: string,
+  winnings?: number,
+  multiplier?: number,
+) {
+  let output = `**bet** $${bet.toLocaleString()}${insert ? `\n${insert}` : ""}`;
+  if (state === "playing") return output;
+  if (state === "lose") output += "\n\n**you lose!!**";
+  if (state === "win")
+    output += `\n\n**winner!!!**\n**you win** $${winnings.toLocaleString()}${
+      multiplier ? `\n+**${Math.floor(multiplier * 100).toString()}%** bonus` : ""
+    }`;
+  if (state === "draw") output += `\n\n**draw!!**\n**you win** $${bet.toLocaleString()}`;
+
+  return output;
+}

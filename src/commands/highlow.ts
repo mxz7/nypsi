@@ -31,7 +31,12 @@ import {
 } from "../utils/functions/economy/balance.js";
 import { addToGuildXP, getGuildName } from "../utils/functions/economy/guilds.js";
 import { createGame } from "../utils/functions/economy/stats.js";
-import { createUser, formatBet, userExists } from "../utils/functions/economy/utils.js";
+import {
+  createUser,
+  formatBet,
+  renderGambleScreen,
+  userExists,
+} from "../utils/functions/economy/utils.js";
 import { calcEarnedGambleXp, getXp, updateXp } from "../utils/functions/economy/xp.js";
 import { getTier, isPremium } from "../utils/functions/premium/premium.js";
 import { shuffle } from "../utils/functions/random.js";
@@ -337,10 +342,9 @@ async function prepareGame(
       .setDisabled(true),
   );
 
-  const embed = new CustomEmbed(
-    message.member,
-    "**bet** $" + bet.toLocaleString() + "\n**0**x ($0)",
-  )
+  const desc = await renderGambleScreen(message.author.id, "playing", bet, `**0**x ($0)`);
+
+  const embed = new CustomEmbed(message.member, desc)
     .setHeader("highlow", message.author.avatarURL())
     .addField("card", "| " + games.get(message.author.id).card + " |");
 
@@ -501,16 +505,13 @@ async function playGame(
     gamble(message.author, "highlow", bet, "lose", id, 0);
     newEmbed.setFooter({ text: `id: ${id}` });
     newEmbed.setColor(Constants.EMBED_FAIL_COLOR);
-    newEmbed.setDescription(
-      "**bet** $" +
-        bet.toLocaleString() +
-        "\n**" +
-        win +
-        "**x ($" +
-        Math.round(bet * win).toLocaleString() +
-        ")" +
-        "\n\n**you lose!!**",
+    const desc = await renderGambleScreen(
+      message.author.id,
+      "lose",
+      bet,
+      `**${win}**x ($${Math.round(bet * win).toLocaleString()})`,
     );
+    newEmbed.setDescription(desc);
     newEmbed.addField("card", "| " + card + " |");
     games.delete(message.author.id);
     return replay(newEmbed, interaction);
@@ -522,37 +523,18 @@ async function playGame(
     newEmbed.setColor(Constants.EMBED_SUCCESS_COLOR);
     if (games.get(message.author.id).voted > 0) {
       winnings = winnings + Math.round(winnings * games.get(message.author.id).voted);
-
-      newEmbed.setDescription(
-        "**bet** $" +
-          bet.toLocaleString() +
-          "\n" +
-          "**" +
-          win +
-          "**x ($" +
-          Math.round(bet * win).toLocaleString() +
-          ")" +
-          "\n\n**winner!!**\n**you win** $" +
-          winnings.toLocaleString() +
-          "\n" +
-          "+**" +
-          Math.floor(games.get(message.author.id).voted * 100).toString() +
-          "**% bonus",
-      );
-    } else {
-      newEmbed.setDescription(
-        "**bet** $" +
-          bet.toLocaleString() +
-          "\n" +
-          "**" +
-          win +
-          "**x ($" +
-          Math.round(bet * win).toLocaleString() +
-          ")" +
-          "\n\n**winner!!**\n**you win** $" +
-          winnings.toLocaleString(),
-      );
     }
+
+    const desc = await renderGambleScreen(
+      message.author.id,
+      "win",
+      bet,
+      `**${win}**x ($${Math.round(bet * win).toLocaleString()})`,
+      winnings,
+      games.get(message.author.id).voted,
+    );
+
+    newEmbed.setDescription(desc);
 
     const earnedXp = await calcEarnedGambleXp(message.member, bet, win);
 
@@ -608,17 +590,13 @@ async function playGame(
     gamble(message.author, "highlow", bet, "draw", id, bet);
     newEmbed.setFooter({ text: `id: ${id}` });
     newEmbed.setColor(variants.macchiato.yellow.hex as ColorResolvable);
-    newEmbed.setDescription(
-      "**bet** $" +
-        bet.toLocaleString() +
-        "\n**" +
-        win +
-        "**x ($" +
-        Math.round(bet * win).toLocaleString() +
-        ")" +
-        "\n\n**draw!!**\nyou win $" +
-        bet.toLocaleString(),
+    const desc = await renderGambleScreen(
+      message.author.id,
+      "draw",
+      bet,
+      `**${win}**x ($${Math.round(bet * win).toLocaleString()})`,
     );
+    newEmbed.setDescription(desc);
     newEmbed.addField("card", "| " + card + " |");
     await updateBalance(message.member, (await getBalance(message.member)) + bet);
     games.delete(message.author.id);
@@ -698,28 +676,24 @@ async function playGame(
         );
       }
 
-      newEmbed.setDescription(
-        "**bet** $" +
-          bet.toLocaleString() +
-          "\n**" +
-          win +
-          "**x ($" +
-          Math.round(bet * win).toLocaleString() +
-          ")",
+      const desc = await renderGambleScreen(
+        message.author.id,
+        "playing",
+        bet,
+        `**${win}**x ($${Math.round(bet * win).toLocaleString()})`,
       );
+      newEmbed.setDescription(desc);
       newEmbed.addField("card", "| " + card + " |");
       await edit({ embeds: [newEmbed], components: [row] }, reaction);
       return playGame(message, m, args);
     } else if (newCard1 == oldCard) {
-      newEmbed.setDescription(
-        "**bet** $" +
-          bet.toLocaleString() +
-          "\n**" +
-          win +
-          "**x ($" +
-          Math.round(bet * win).toLocaleString() +
-          ")",
+      const desc = await renderGambleScreen(
+        message.author.id,
+        "playing",
+        bet,
+        `**${win}**x ($${Math.round(bet * win).toLocaleString()})`,
       );
+      newEmbed.setDescription(desc);
       newEmbed.addField("card", "| " + card + " |");
 
       await edit({ embeds: [newEmbed] }, reaction);
@@ -772,28 +746,24 @@ async function playGame(
         );
       }
 
-      newEmbed.setDescription(
-        "**bet** $" +
-          bet.toLocaleString() +
-          "\n**" +
-          win +
-          "**x ($" +
-          Math.round(bet * win).toLocaleString() +
-          ")",
+      const desc = await renderGambleScreen(
+        message.author.id,
+        "playing",
+        bet,
+        `**${win}**x ($${Math.round(bet * win).toLocaleString()})`,
       );
+      newEmbed.setDescription(desc);
       newEmbed.addField("card", "| " + card + " |");
       await edit({ embeds: [newEmbed], components: [row] }, reaction);
       return playGame(message, m, args);
     } else if (newCard1 == oldCard) {
-      newEmbed.setDescription(
-        "**bet** $" +
-          bet.toLocaleString() +
-          "\n**" +
-          win +
-          "**x ($" +
-          Math.round(bet * win).toLocaleString() +
-          ")",
+      const desc = await renderGambleScreen(
+        message.author.id,
+        "playing",
+        bet,
+        `**${win}**x ($${Math.round(bet * win).toLocaleString()})`,
       );
+      newEmbed.setDescription(desc);
       newEmbed.addField("card", "| " + card + " |");
       await edit({ embeds: [newEmbed] }, reaction);
       return playGame(message, m, args);

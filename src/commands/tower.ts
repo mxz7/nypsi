@@ -32,7 +32,12 @@ import {
 import { addToGuildXP, getGuildName } from "../utils/functions/economy/guilds";
 import { addInventoryItem } from "../utils/functions/economy/inventory";
 import { createGame } from "../utils/functions/economy/stats";
-import { createUser, formatBet, userExists } from "../utils/functions/economy/utils";
+import {
+  createUser,
+  formatBet,
+  renderGambleScreen,
+  userExists,
+} from "../utils/functions/economy/utils";
 import { calcEarnedGambleXp, getXp, updateXp } from "../utils/functions/economy/xp";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { percentChance } from "../utils/functions/random";
@@ -312,7 +317,9 @@ async function prepareGame(
 
   components[components.length - 1].components[0].setDisabled(true);
 
-  const embed = new CustomEmbed(message.member, `**bet** $${bet.toLocaleString()}\n**0**x ($0)`)
+  const desc = await renderGambleScreen(message.author.id, "playing", bet, "**0**x ($0)");
+
+  const embed = new CustomEmbed(message.member, desc)
     .setHeader("dragon tower", message.author.avatarURL())
     .setFooter({ text: `difficulty: ${chosenDifficulty}` });
 
@@ -592,15 +599,13 @@ async function playGame(
     gamble(message.author, "tower", game.bet, "lose", id, 0);
     game.embed.setFooter({ text: `id: ${id}` });
     game.embed.setColor(Constants.EMBED_FAIL_COLOR);
-    game.embed.setDescription(
-      "**bet** $" +
-        game.bet.toLocaleString() +
-        "\n**" +
-        game.win.toFixed(2) +
-        "**x ($" +
-        Math.round(game.bet * game.win).toLocaleString() +
-        ")\n\n**you lose!!**",
+    const desc = await renderGambleScreen(
+      message.author.id,
+      "lose",
+      game.bet,
+      `**${game.win.toFixed(2)}**x ($${Math.round(game.bet * game.win).toLocaleString()})`,
     );
+    game.embed.setDescription(desc);
 
     replay(game.embed, interaction);
     return games.delete(message.author.id);
@@ -614,15 +619,16 @@ async function playGame(
       winnings += Math.round(winnings * multi);
     }
 
-    game.embed.setDescription(
-      `**bet** $${game.bet.toLocaleString()}\n` +
-        `**${game.win.toFixed(2)}**x ($${Math.round(
-          game.bet * game.win,
-        ).toLocaleString()})\n\n**winner!!**\n` +
-        `**you win** $${winnings.toLocaleString()}${
-          multi > 0 ? `\n**${Math.floor(multi * 100)}**% bonus` : ""
-        }`,
+    const desc = await renderGambleScreen(
+      message.author.id,
+      "win",
+      game.bet,
+      `**${game.win.toFixed(2)}**x ($${Math.round(game.bet * game.win).toLocaleString()})`,
+      winnings,
+      multi,
     );
+    game.embed.setDescription(desc);
+
     game.embed.setColor(Constants.EMBED_SUCCESS_COLOR);
 
     const earnedXp = await calcEarnedGambleXp(message.member, game.bet, game.win);
@@ -687,17 +693,13 @@ async function playGame(
     });
     gamble(message.author, "tower", game.bet, "draw", id, game.bet);
     game.embed.setColor(variants.macchiato.yellow.hex as ColorResolvable);
-    game.embed.setDescription(
-      "**bet** $" +
-        game.bet.toLocaleString() +
-        "\n**" +
-        game.win.toFixed(2) +
-        "**x ($" +
-        Math.round(game.bet * game.win).toLocaleString() +
-        ")" +
-        "\n\n**draw!!**\nyou win $" +
-        game.bet.toLocaleString(),
+    const desc = await renderGambleScreen(
+      message.author.id,
+      "draw",
+      game.bet,
+      `**${game.win.toFixed(2)}**x ($${Math.round(game.bet * game.win).toLocaleString()})`,
     );
+    game.embed.setDescription(desc);
     await updateBalance(message.member, (await getBalance(message.member)) + game.bet);
     games.delete(message.author.id);
     return replay(game.embed, interaction);
@@ -767,15 +769,13 @@ async function playGame(
         //   increment,
         // });
 
-        game.embed.setDescription(
-          "**bet** $" +
-            game.bet.toLocaleString() +
-            "\n**" +
-            game.win.toFixed(2) +
-            "**x ($" +
-            Math.round(game.bet * game.win).toLocaleString() +
-            ")",
+        const desc = await renderGambleScreen(
+          message.author.id,
+          "playing",
+          game.bet,
+          `**${game.win.toFixed(2)}**x ($${Math.round(game.bet * game.win).toLocaleString()})`,
         );
+        game.embed.setDescription(desc);
 
         if (y >= 8) {
           if (game.difficulty != "easy") addProgress(message.author.id, "tower_pro", 1);
