@@ -316,9 +316,10 @@ async function doHunt(
   }
 
   for (const i of foundItems.entries()) {
-    if (!items[i[0]].emoji) {
+    if (!items[i[0]]) {
       logger.error("hunt error emoji thing");
       console.error(foundItems);
+      console.error(huntItems);
     }
   }
 
