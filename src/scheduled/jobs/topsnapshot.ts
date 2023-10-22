@@ -248,7 +248,13 @@ async function clearOld() {
   const deleted = await prisma.graphMetrics.deleteMany({
     where: {
       AND: [
-        { OR: [{ category: { contains: "user" } }, { category: { contains: "item-count" } }] },
+        {
+          OR: [
+            { category: { contains: "user" } },
+            { category: { contains: "item-count" } },
+            { category: { contains: "item-value" } },
+          ],
+        },
         { date: { lt: dayjs().subtract(180, "day").toDate() } },
       ],
     },
