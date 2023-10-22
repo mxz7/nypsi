@@ -41,8 +41,6 @@ export async function addCooldown(cmd: string, member: GuildMember | string, sec
 
   const expire = await calculateCooldownLength(seconds, member);
 
-  if (id === "518813624245026826") console.log(`end: ${expire}`);
-
   const data: CooldownData = {
     date: Date.now(),
     length: expire,
