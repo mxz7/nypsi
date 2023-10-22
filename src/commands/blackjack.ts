@@ -524,7 +524,7 @@ class Game {
       this.dealer.autoPlay();
       const check = this.checkWin();
 
-      await sleep(1000);
+      await sleep(1500);
 
       return this.end(check);
     }
@@ -579,7 +579,7 @@ class Game {
         this.dealer.autoPlay();
         const state = this.checkWin();
 
-        await sleep(1000);
+        await sleep(1500);
         return this.end(state);
       } else {
         const embed = await this.render("playing");
@@ -597,7 +597,7 @@ class Game {
       this.dealer.autoPlay();
       const state = this.checkWin();
 
-      await sleep(1000);
+      await sleep(1500);
 
       return this.end(state);
     } else if (response.customId === "dd") {
@@ -620,7 +620,7 @@ class Game {
         this.dealer.autoPlay();
         const state = this.checkWin();
 
-        await sleep(1000);
+        await sleep(1500);
         return this.end(state);
       }
     }
