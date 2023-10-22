@@ -263,7 +263,7 @@ export async function topNetWorth(guild: Guild, userId?: string) {
     });
   }
 
-  await pAll(promises, { concurrency: 10 });
+  await pAll(promises, { concurrency: 25 });
 
   if (userIds.length > 500) {
     userIds = await workerSort(userIds, amounts);

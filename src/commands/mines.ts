@@ -33,7 +33,12 @@ import {
 import { addToGuildXP, getGuildName } from "../utils/functions/economy/guilds.js";
 import { addInventoryItem } from "../utils/functions/economy/inventory.js";
 import { createGame } from "../utils/functions/economy/stats.js";
-import { createUser, formatBet, userExists } from "../utils/functions/economy/utils.js";
+import {
+  createUser,
+  formatBet,
+  renderGambleScreen,
+  userExists,
+} from "../utils/functions/economy/utils.js";
 import { calcEarnedGambleXp, getXp, updateXp } from "../utils/functions/economy/xp.js";
 import { getTier, isPremium } from "../utils/functions/premium/premium.js";
 import { percentChance } from "../utils/functions/random.js";
@@ -401,10 +406,11 @@ async function prepareGame(
     increment: incrementAmount,
   });
 
-  const embed = new CustomEmbed(
-    message.member,
-    "**bet** $" + bet.toLocaleString() + "\n**0**x ($0)",
-  ).setHeader("mines", message.author.avatarURL());
+  const desc = await renderGambleScreen(message.author.id, "playing", bet, "**0**x ($0)");
+  const embed = new CustomEmbed(message.member, desc).setHeader(
+    "mines",
+    message.author.avatarURL(),
+  );
 
   const rows = getRows(grid, false);
 
@@ -623,15 +629,13 @@ async function playGame(
     gamble(message.author, "mines", bet, "lose", id, 0);
     embed.setFooter({ text: `id: ${id}` });
     embed.setColor(Constants.EMBED_FAIL_COLOR);
-    embed.setDescription(
-      "**bet** $" +
-        bet.toLocaleString() +
-        "\n**" +
-        win.toFixed(2) +
-        "**x ($" +
-        Math.round(bet * win).toLocaleString() +
-        ")\n\n**you lose!!**",
+    const desc = await renderGambleScreen(
+      message.author.id,
+      "lose",
+      bet,
+      `**${win.toFixed(2)}**x ($${Math.round(bet * win).toLocaleString()})`,
     );
+    embed.setDescription(desc);
     games.delete(message.author.id);
     return replay(embed, interaction);
   };
@@ -642,37 +646,17 @@ async function playGame(
     embed.setColor(Constants.EMBED_SUCCESS_COLOR);
     if (games.get(message.author.id).voted > 0) {
       winnings = winnings + Math.round(winnings * games.get(message.author.id).voted);
-
-      embed.setDescription(
-        "**bet** $" +
-          bet.toLocaleString() +
-          "\n" +
-          "**" +
-          win.toFixed(2) +
-          "**x ($" +
-          Math.round(bet * win).toLocaleString() +
-          ")" +
-          "\n\n**winner!!**\n**you win** $" +
-          winnings.toLocaleString() +
-          "\n" +
-          "+**" +
-          Math.floor(games.get(message.author.id).voted * 100).toString() +
-          "**% bonus",
-      );
-    } else {
-      embed.setDescription(
-        "**bet** $" +
-          bet.toLocaleString() +
-          "\n" +
-          "**" +
-          win.toFixed(2) +
-          "**x ($" +
-          Math.round(bet * win).toLocaleString() +
-          ")" +
-          "\n\n**winner!!**\n**you win** $" +
-          winnings.toLocaleString(),
-      );
     }
+
+    const desc = await renderGambleScreen(
+      message.author.id,
+      "win",
+      bet,
+      `**${win.toFixed(2)}**x ($${Math.round(bet * win).toLocaleString()})`,
+      winnings,
+      games.get(message.author.id).voted,
+    );
+    embed.setDescription(desc);
 
     const earnedXp = await calcEarnedGambleXp(message.member, bet, win);
 
@@ -723,17 +707,13 @@ async function playGame(
     gamble(message.author, "mines", bet, "draw", id, bet);
     embed.setFooter({ text: `id: ${id}` });
     embed.setColor(variants.macchiato.yellow.hex as ColorResolvable);
-    embed.setDescription(
-      "**bet** $" +
-        bet.toLocaleString() +
-        "\n**" +
-        win.toFixed(2) +
-        "**x ($" +
-        Math.round(bet * win).toLocaleString() +
-        ")" +
-        "\n\n**draw!!**\nyou win $" +
-        bet.toLocaleString(),
+    const desc = await renderGambleScreen(
+      message.author.id,
+      "draw",
+      bet,
+      `**${win.toFixed(2)}**x ($${Math.round(bet * win).toLocaleString()})`,
     );
+    embed.setDescription(desc);
     await updateBalance(message.member, (await getBalance(message.member)) + bet);
     games.delete(message.author.id);
     return replay(embed, interaction);
@@ -870,15 +850,13 @@ async function playGame(
         increment,
       });
 
-      embed.setDescription(
-        "**bet** $" +
-          bet.toLocaleString() +
-          "\n**" +
-          win.toFixed(2) +
-          "**x ($" +
-          Math.round(bet * win).toLocaleString() +
-          ")",
+      const desc = await renderGambleScreen(
+        message.author.id,
+        "playing",
+        bet,
+        `**${win.toFixed(2)}**x ($${Math.round(bet * win).toLocaleString()})`,
       );
+      embed.setDescription(desc);
 
       if (win >= 15) {
         win1(response);
