@@ -45,7 +45,7 @@ async function run(
       .join("\n"),
   ).setHeader(
     target.user.id === message.author.id ? "your bakery" : `${target.user.username}'s bakery`,
-    message.author.avatarURL(),
+    target.user.avatarURL(),
   );
 
   return message.channel.send({ embeds: [embed] });
