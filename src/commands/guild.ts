@@ -607,34 +607,6 @@ async function run(
 
     await addCooldown(cmd.name, message.member, 30);
 
-    for (const guildMember of guild.members) {
-      const contributedMoney = guildMember.contributedMoney;
-
-      if (contributedMoney > 100_000) {
-        await updateBalance(
-          guildMember.userId,
-          (await getBalance(guildMember.userId)) + Math.floor(Number(contributedMoney) * 0.1),
-        );
-
-        if ((await getDmSettings(guildMember.userId)).other) {
-          const embed = new CustomEmbed().setColor(Constants.EMBED_SUCCESS_COLOR);
-
-          embed.setDescription(
-            `since you contributed money to this guild, you have been repaid $**${Math.floor(
-              Number(contributedMoney) * 0.1,
-            ).toLocaleString()}**`,
-          );
-
-          await requestDM({
-            memberId: guildMember.userId,
-            content: `${guild.guildName} has been deleted`,
-            client: message.client as NypsiClient,
-            embed: embed,
-          });
-        }
-      }
-    }
-
     await deleteGuild(guild.guildName);
 
     return send({
