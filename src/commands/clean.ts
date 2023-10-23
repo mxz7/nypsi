@@ -48,7 +48,7 @@ async function run(
   const collecteda = collected.filter(
     (msg) =>
       (msg.author.id == message.client.user.id || msg.content.startsWith(prefix)) &&
-      dayjs(message.createdAt).isAfter(dayjs().subtract(13, "days")),
+      dayjs(msg.createdTimestamp).isAfter(dayjs().subtract(14, "days")),
   );
 
   await message.channel.bulkDelete(collecteda);
