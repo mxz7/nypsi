@@ -3,6 +3,7 @@ import { Command, NypsiCommandInteraction } from "../models/Command";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { isPremium } from "../utils/functions/premium/premium";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import dayjs = require("dayjs");
 
 const cmd = new Command(
   "clean",
@@ -45,7 +46,9 @@ async function run(
   ]);
 
   const collecteda = collected.filter(
-    (msg) => msg.author.id == message.client.user.id || msg.content.startsWith(prefix),
+    (msg) =>
+      (msg.author.id == message.client.user.id || msg.content.startsWith(prefix)) &&
+      dayjs(message.createdAt).isAfter(dayjs().subtract(13, "days")),
   );
 
   await message.channel.bulkDelete(collecteda);
