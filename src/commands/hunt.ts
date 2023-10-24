@@ -295,6 +295,10 @@ async function doHunt(
 
     await addInventoryItem(member, chosen, amount);
 
+    if (!chosen) {
+      console.error(chosen);
+    }
+
     foundItems.set(chosen, foundItems.has(chosen) ? foundItems.get(chosen) + amount : amount);
   }
 
