@@ -3,7 +3,6 @@ import {
   ButtonBuilder,
   ButtonStyle,
   CommandInteraction,
-  Interaction,
   Message,
   MessageActionRowComponentBuilder,
 } from "discord.js";
@@ -13,10 +12,10 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { formatDate } from "../utils/functions/date";
 import { getRawLevel } from "../utils/functions/economy/levelling";
 import { uploadImage } from "../utils/functions/image";
+import PageManager from "../utils/functions/page";
 import {
   addNewAvatar,
   clearAvatarHistory,
-  deleteAvatar,
   fetchAvatarHistory,
   isTracking,
 } from "../utils/functions/users/history";
@@ -97,7 +96,7 @@ async function run(
     embed.setDescription("`[tracking disabled]`");
   }
 
-  let row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+  const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder()
       .setCustomId("⬅")
       .setLabel("back")
@@ -115,136 +114,24 @@ async function run(
     msg = await message.channel.send({ embeds: [embed], components: [row] });
   }
 
-  let currentPage = index + 1;
-  const lastPage = history.length;
-
-  const filter = (i: Interaction) => i.user.id == message.author.id;
-
-  const pageManager = async (): Promise<void> => {
-    const reaction = await msg
-      .awaitMessageComponent({ filter, time: 30000 })
-      .then(async (collected) => {
-        await collected.deferUpdate();
-        return collected;
-      })
-      .catch(async () => {
-        await msg.edit({ components: [] });
+  const manager = new PageManager({
+    message: msg,
+    embed,
+    row,
+    userId: message.author.id,
+    allowMessageDupe: false,
+    pages: PageManager.createPages(history, 1),
+    updateEmbed(page, embed) {
+      embed.setImage(page[0].value);
+      embed.setFooter({
+        text: `${formatDate(page[0].date)} | ${manager.currentPage}/${manager.lastPage}`,
       });
 
-    if (!reaction) return;
+      return embed;
+    },
+  });
 
-    const newEmbed = new CustomEmbed(message.member);
-
-    if (!(await isTracking(message.member))) {
-      newEmbed.setDescription("`[tracking disabled]`");
-    }
-
-    if (reaction.customId == "⬅") {
-      if (currentPage <= 1) {
-        return pageManager();
-      } else {
-        currentPage--;
-
-        newEmbed.setHeader("your avatar history");
-        newEmbed.setImage(history[currentPage - 1].value);
-        newEmbed.setFooter({
-          text: `${formatDate(history[currentPage - 1].date)} | ${currentPage}/${history.length}`,
-        });
-        if (currentPage == 1) {
-          row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-            new ButtonBuilder()
-              .setCustomId("⬅")
-              .setLabel("back")
-              .setStyle(ButtonStyle.Primary)
-              .setDisabled(true),
-            new ButtonBuilder()
-              .setCustomId("➡")
-              .setLabel("next")
-              .setStyle(ButtonStyle.Primary)
-              .setDisabled(false),
-            new ButtonBuilder().setCustomId("d").setLabel("delete").setStyle(ButtonStyle.Danger),
-          );
-        } else {
-          row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-            new ButtonBuilder()
-              .setCustomId("⬅")
-              .setLabel("back")
-              .setStyle(ButtonStyle.Primary)
-              .setDisabled(false),
-            new ButtonBuilder()
-              .setCustomId("➡")
-              .setLabel("next")
-              .setStyle(ButtonStyle.Primary)
-              .setDisabled(false),
-            new ButtonBuilder().setCustomId("d").setLabel("delete").setStyle(ButtonStyle.Danger),
-          );
-        }
-        await msg.edit({ embeds: [newEmbed], components: [row] });
-        return pageManager();
-      }
-    } else if (reaction.customId == "➡") {
-      if (currentPage >= lastPage) {
-        return pageManager();
-      } else {
-        currentPage++;
-
-        newEmbed.setHeader("your avatar history");
-        newEmbed.setImage(history[currentPage - 1].value);
-        newEmbed.setFooter({
-          text: `${formatDate(history[currentPage - 1].date)} | ${currentPage}/${history.length}`,
-        });
-        if (currentPage == lastPage) {
-          row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-            new ButtonBuilder()
-              .setCustomId("⬅")
-              .setLabel("back")
-              .setStyle(ButtonStyle.Primary)
-              .setDisabled(false),
-            new ButtonBuilder()
-              .setCustomId("➡")
-              .setLabel("next")
-              .setStyle(ButtonStyle.Primary)
-              .setDisabled(true),
-            new ButtonBuilder().setCustomId("d").setLabel("delete").setStyle(ButtonStyle.Danger),
-          );
-        } else {
-          row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-            new ButtonBuilder()
-              .setCustomId("⬅")
-              .setLabel("back")
-              .setStyle(ButtonStyle.Primary)
-              .setDisabled(false),
-            new ButtonBuilder()
-              .setCustomId("➡")
-              .setLabel("next")
-              .setStyle(ButtonStyle.Primary)
-              .setDisabled(false),
-            new ButtonBuilder().setCustomId("d").setLabel("delete").setStyle(ButtonStyle.Danger),
-          );
-        }
-        await msg.edit({ embeds: [newEmbed], components: [row] });
-        return pageManager();
-      }
-    } else if (reaction.customId == "d") {
-      const res = await deleteAvatar(history[currentPage - 1].id);
-
-      if (res) {
-        await reaction.followUp({
-          embeds: [new CustomEmbed(message.member, "✅ successfully deleted this avatar")],
-          ephemeral: true,
-        });
-      } else {
-        await reaction.followUp({
-          embeds: [new CustomEmbed(message.member, "failed to delete this avatar")],
-          ephemeral: true,
-        });
-      }
-
-      return pageManager();
-    }
-  };
-
-  return pageManager();
+  return manager.listen();
 }
 
 cmd.setRun(run);

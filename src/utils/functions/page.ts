@@ -16,7 +16,7 @@ interface PageManagerOptions<T> {
   pages?: Map<number, T[]>;
   pageLength?: number;
   embed: CustomEmbed;
-  updateEmbed?: (page: any[], embed: CustomEmbed) => CustomEmbed;
+  updateEmbed?: (page: T[], embed: CustomEmbed) => CustomEmbed;
   userId: string;
   handleResponses?: Map<
     string,
