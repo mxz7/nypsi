@@ -214,7 +214,7 @@ async function doHunt(
 
   const msg = await send({ embeds: [embed], components: [row] });
 
-  for (let i = 0; i < 15; i++) {
+  for (let i = 0; i < 10; i++) {
     huntItems.push("nothing");
   }
 
@@ -271,6 +271,8 @@ async function doHunt(
             }
           }
         }
+      } else {
+        huntItemsModified.push(i);
       }
     }
 
@@ -302,9 +304,15 @@ async function doHunt(
     foundItems.set(chosen, foundItems.has(chosen) ? foundItems.get(chosen) + amount : amount);
   }
 
-  const total = Array.from(foundItems.entries())
-    .map((i) => (["money", "xp"].includes(i[0]) ? 0 : i[1]))
-    .reduce((a, b) => a + b);
+  let total = 0;
+
+  try {
+    total = Array.from(foundItems.entries())
+      .map((i) => (["money", "xp"].includes(i[0]) ? 0 : i[1]))
+      .reduce((a, b) => a + b);
+  } catch {
+    total = 0;
+  }
 
   const earnedXp = await calcEarnedHFMXp(member, total);
 
