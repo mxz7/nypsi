@@ -72,6 +72,10 @@ export async function createProfile(member: User | string) {
 
 export async function doProfileTransfer(fromId: string, toId: string) {
   logger.info(`beginning transfer (${fromId} -> ${toId})`);
+  await redis.del(`${Constants.redis.nypsi.PROFILE_TRANSFER}:${fromId}`);
+  await redis.del(`${Constants.redis.nypsi.PROFILE_TRANSFER}:${toId}`);
+
+  await dataDelete(toId);
 
   let fail = false;
 
@@ -81,13 +85,17 @@ export async function doProfileTransfer(fromId: string, toId: string) {
       user.id = toId;
       await prisma.user.create({ data: user });
 
-      const premium = await prisma.premium.findUnique({ where: { userId: fromId } });
+      const premium = await prisma.premium
+        .findUnique({ where: { userId: fromId } })
+        .catch(() => null);
       if (premium) {
         premium.userId = toId;
         await prisma.premium.create({ data: premium });
       }
 
-      const wordleStats = await prisma.wordleStats.findUnique({ where: { userId: fromId } });
+      const wordleStats = await prisma.wordleStats
+        .findUnique({ where: { userId: fromId } })
+        .catch(() => null);
       if (wordleStats) {
         wordleStats.userId = toId;
         await prisma.wordleStats.create({ data: wordleStats });
@@ -186,6 +194,7 @@ export async function doProfileTransfer(fromId: string, toId: string) {
         return i;
       });
       if (games.length > 0) {
+        await prisma.game.deleteMany({ where: { id: { in: games.map((i) => i.id) } } });
         await prisma.game.createMany({ data: games });
       }
 
@@ -311,11 +320,13 @@ export async function dataDelete(userId: string) {
     })
     .catch(() => {});
 
-  await prisma.user.delete({
-    where: {
-      id: userId,
-    },
-  });
+  await prisma.user
+    .delete({
+      where: {
+        id: userId,
+      },
+    })
+    .catch(() => null);
 
   exec(`redis-cli KEYS "*${userId}*" | xargs redis-cli DEL`);
 

@@ -44,7 +44,12 @@ export async function reloadInteractions() {
 }
 
 export async function runInteraction(interaction: Interaction) {
-  if (await redis.exists(`${Constants.redis.nypsi.PROFILE_TRANSFER}:${interaction.user.id}`)) {
+  if (
+    (await redis.exists(`${Constants.redis.nypsi.PROFILE_TRANSFER}:${interaction.user.id}`)) &&
+    interaction.isButton()
+      ? interaction.customId !== "t-f-p-boobies"
+      : true
+  ) {
     if (interaction.isRepliable()) {
       interaction.reply({
         embeds: [
