@@ -1343,6 +1343,12 @@ async function run(
         `your account has been requested to have data transferred from ${from.id} to you. if this was not you, you can safely ignore this message.\n\nyou cannot do commands for 10 minutes`,
       ),
       content: "IMPORTANT: your profile is being used in a data transfer",
+      components: new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder()
+          .setStyle(ButtonStyle.Danger)
+          .setLabel("confirm")
+          .setCustomId("t-f-p-boobies"),
+      ),
     });
 
     return message.channel.send({
