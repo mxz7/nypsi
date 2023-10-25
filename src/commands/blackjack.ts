@@ -13,6 +13,7 @@ import {
   InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
+  MessageCreateOptions,
   MessageEditOptions,
 } from "discord.js";
 import redis from "../init/redis";
@@ -357,8 +358,20 @@ class Game {
 
   private async edit(data: MessageEditOptions) {
     if (!this.interaction || this.interaction.deferred || this.interaction.replied)
-      return this.message.edit(data);
-    return this.interaction.update(data).catch(() => this.message.edit(data));
+      return this.message.edit(data).catch(async (e) => {
+        logger.error("bj edit error", e);
+        const msg = await this.message.channel.send(data as MessageCreateOptions);
+        this.message = msg;
+        return msg;
+      });
+    return this.interaction.update(data).catch(() =>
+      this.message.edit(data).catch(async (e) => {
+        logger.error("bj edit error", e);
+        const msg = await this.message.channel.send(data as MessageCreateOptions);
+        this.message = msg;
+        return msg;
+      }),
+    );
   }
 
   private checkWin() {
