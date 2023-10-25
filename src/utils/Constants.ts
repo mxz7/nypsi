@@ -132,6 +132,7 @@ export default {
       OFFER_PROCESS: "nypsi:offer:process",
       RICKROLL: "nypsi:rickroll",
       COMMAND_WATCH: "nypsi:cmdwatch",
+      PROFILE_TRANSFER: "nypsi:profiletransfer",
     },
   },
   ADMIN_IDS: ["672793821850894347"] as string[],
