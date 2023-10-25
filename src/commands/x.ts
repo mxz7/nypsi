@@ -21,14 +21,8 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { b, c } from "../utils/functions/anticheat";
 import { updateBalance, updateBankBalance } from "../utils/functions/economy/balance";
-import { addInventoryItem, setInventoryItem } from "../utils/functions/economy/inventory";
-import {
-  getLevel,
-  getLevelRequirements,
-  getRawLevel,
-  setLevel,
-  setPrestige,
-} from "../utils/functions/economy/levelling";
+import { setInventoryItem } from "../utils/functions/economy/inventory";
+import { setLevel, setPrestige } from "../utils/functions/economy/levelling";
 import { getItems, isEcoBanned, setEcoBan } from "../utils/functions/economy/utils";
 import { updateXp } from "../utils/functions/economy/xp";
 import { addKarma, getKarma, removeKarma } from "../utils/functions/karma/karma";
@@ -40,6 +34,7 @@ import {
   setExpireDate,
   setTier,
 } from "../utils/functions/premium/premium";
+import requestDM from "../utils/functions/requestdm";
 import { getAdminLevel, setAdminLevel } from "../utils/functions/users/admin";
 import { isUserBlacklisted, setUserBlacklist } from "../utils/functions/users/blacklist";
 import { getCommandUses } from "../utils/functions/users/commands";
@@ -1312,6 +1307,49 @@ async function run(
     return message.channel.send({ embeds: [new CustomEmbed(message.member, desc)] });
   };
 
+  const requestProfileTransfer = async (from: User, to: User, force = false) => {
+    if ((await getAdminLevel(message.author.id)) !== 69)
+      return message.channel.send({
+        embeds: [new ErrorEmbed("lol xd xdxddxd ahahhaha YOURE GAY dont even TRY")],
+      });
+
+    if (await hasProfile(to.id))
+      return message.channel.send({
+        embeds: [new ErrorEmbed(`${to.username} has a nypsi profile, ask them to do /data delete`)],
+      });
+
+    if (!(await hasProfile(from.id)))
+      return message.channel.send({
+        embeds: [new ErrorEmbed(`${from.username} doesn't have a nypsi profile you fucking idiot`)],
+      });
+
+    await redis.set(`${Constants.redis.nypsi.PROFILE_TRANSFER}:${to.id}`, from.id, "EX", 600);
+    await redis.set(`${Constants.redis.nypsi.PROFILE_TRANSFER}:${from.id}`, to.id, "EX", 600);
+
+    requestDM({
+      memberId: from.id,
+      client: message.client as NypsiClient,
+      embed: new CustomEmbed(
+        message.member,
+        `your profile has been requested to be transferred to ${to.id}, you cannot do commands during this period`,
+      ),
+      content: "IMPORTANT: your profile is being used in a data transfer",
+    });
+    requestDM({
+      memberId: to.id,
+      client: message.client as NypsiClient,
+      embed: new CustomEmbed(
+        message.member,
+        `your account has been requested to have data transferred from ${from.id} to you. if this was not you, you can safely ignore this message.\n\nyou cannot do commands for 10 minutes`,
+      ),
+      content: "IMPORTANT: your profile is being used in a data transfer",
+    });
+
+    return message.channel.send({
+      embeds: [new CustomEmbed(message.member, "profile transfer initiated")],
+    });
+  };
+
   if (args.length == 0) {
     const embed = new CustomEmbed(
       message.member,
@@ -1332,88 +1370,18 @@ async function run(
     }
 
     return findId(args.slice(1, args.length).join(" "));
-  } else if (args[0].toLowerCase() === "migrate" && message.author.id === Constants.TEKOH_ID) {
-    const query = await prisma.economy
-      .findMany({
-        where: {
-          prestige: { gt: 0 },
-        },
-        select: {
-          userId: true,
-          xp: true,
-          prestige: true,
-        },
-      })
-      .then((i) =>
-        i.map((i) => {
-          return { ...i, xp: Number(i.xp) };
-        }),
-      );
-    console.log("query fetched");
+  } else if (args[0].toLowerCase() === "transfer") {
+    const fromId = args[1];
+    const toId = args[2];
 
-    await fs.writeFile("backup.txt", query.map((i) => `${i.userId} ${i.prestige}`).join("\n"));
+    const fromUser = await message.client.users.fetch(fromId).catch(() => null);
+    const toUser = await message.client.users.fetch(toId).catch(() => null);
 
-    console.log("backup wrote");
+    if (!fromUser) return message.channel.send({ embeds: [new ErrorEmbed("invalid from user")] });
+    if (!toUser) return message.channel.send({ embeds: [new ErrorEmbed("invalid to user")] });
 
-    for (const user of query) {
-      console.log(`doing ${user.userId} ${JSON.stringify(user)}`);
-
-      for (let i = 0; i < user.prestige; i++) {
-        const neededXp = 500 + i * 500;
-        user.xp += neededXp;
-      }
-
-      console.log(`xp calculated: ${user.xp}`);
-
-      await setPrestige(user.userId, 0);
-
-      console.log("prestige reset");
-
-      let requirements = await getLevelRequirements(user.userId);
-
-      while (requirements.xp <= user.xp) {
-        const level = await getLevel(user.userId);
-
-        if (level % 50 === 0) console.log(`level: ${level} xp: ${user.xp}`);
-        if (level % 69 === 0) await addInventoryItem(user.userId, "basic_crate", 1, false);
-        if (level % 420 === 0 && level > 0)
-          await addInventoryItem(user.userId, "nypsi_crate", 1, false);
-
-        user.xp -= requirements.xp;
-
-        await setLevel(user.userId, (await getLevel(user.userId)) + 1);
-
-        requirements = await getLevelRequirements(user.userId);
-      }
-
-      const level = await getRawLevel(user.userId);
-
-      if (level >= 500) await addTag(user.userId, "p5").catch(() => null);
-      if (level >= 1000) await addTag(user.userId, "p10").catch(() => null);
-      if (level >= 1500) await addTag(user.userId, "p15").catch(() => null);
-
-      console.log(`${user.userId} done. level: ${level}`);
-    }
-
-    console.log("all done!!!!!");
-  } //else if (args[0].toLowerCase() === "load" && message.author.id === Constants.TEKOH_ID) {
-  //   const file = await fs.readFile("backup.txt").then((r) => r.toString());
-
-  //   console.log("loading");
-  //   for (const user of file.split("\n")) {
-  //     const [userId, prestige] = user.split(" ");
-
-  //     if (!userId) continue;
-
-  //     if (!(await userExists(userId))) await createUser(userId);
-
-  //     await setPrestige(userId, parseInt(prestige));
-
-  //     console.log(`done ${userId}`);
-  //   }
-
-  //   console.log("done");
-  // }
+    return requestProfileTransfer(fromUser, toUser);
+  }
 }
 
 cmd.setRun(run);
