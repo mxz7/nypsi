@@ -1,7 +1,9 @@
 import { Interaction } from "discord.js";
 import { readdir } from "fs/promises";
+import redis from "../../init/redis";
 import { CustomEmbed, ErrorEmbed } from "../../models/EmbedBuilders";
 import { AutocompleteHandler, InteractionHandler } from "../../types/InteractionHandler";
+import Constants from "../Constants";
 import { getReactionRolesByGuild } from "../functions/guilds/reactionroles";
 import { logger } from "../logger";
 
@@ -42,6 +44,19 @@ export async function reloadInteractions() {
 }
 
 export async function runInteraction(interaction: Interaction) {
+  if (await redis.exists(`${Constants.redis.nypsi.PROFILE_TRANSFER}:${interaction.user.id}`)) {
+    if (interaction.isRepliable()) {
+      interaction.reply({
+        embeds: [
+          new ErrorEmbed(
+            "your profile is currently involved in a profile transfer and you cannot use commands. this will expire in 10 minutes",
+          ),
+        ],
+      });
+    }
+    return;
+  }
+
   if (interaction.isAutocomplete()) {
     return autocompleteHandlers.get(interaction.options.getFocused(true).name)?.run(interaction);
   } else if (interaction.isMessageComponent() && !interactionHandlers.has(interaction.customId)) {

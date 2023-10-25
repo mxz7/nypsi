@@ -655,11 +655,16 @@ export async function runCommand(
     }
   }
 
-  if (!(await hasProfile(message.member))) {
-    await createProfile(message.author);
-  }
-
+  if (!(await hasProfile(message.member))) await createProfile(message.author);
   if (await isUserBlacklisted(message.author.id)) return;
+  if (await redis.exists(`${Constants.redis.nypsi.PROFILE_TRANSFER}:${message.author.id}`))
+    return message.channel.send({
+      embeds: [
+        new ErrorEmbed(
+          "you are currently involved in a profile transfer and cannot do any commands. this will expire in 10 minutes",
+        ),
+      ],
+    });
 
   if (!commandExists(cmd) && message instanceof Message) {
     if (!aliases.has(cmd)) {

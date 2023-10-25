@@ -54,6 +54,8 @@ export async function createProfile(member: User | string) {
     id = member;
   }
 
+  if (await redis.exists(`${Constants.redis.nypsi.PROFILE_TRANSFER}:${id}`)) return;
+
   await prisma.user
     .create({
       data: {
