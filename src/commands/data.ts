@@ -1,4 +1,3 @@
-import { exec } from "child_process";
 import {
   ActionRowBuilder,
   BaseMessageOptions,
@@ -15,10 +14,9 @@ import {
 import { promisify } from "util";
 import { gzip } from "zlib";
 import prisma from "../init/database";
-import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import { checkOffer } from "../utils/functions/economy/offers";
+import { dataDelete } from "../utils/functions/users/utils";
 import { addCooldown, onCooldown } from "../utils/handlers/cooldownhandler.js";
 import { logger } from "../utils/logger";
 import ms = require("ms");
@@ -309,103 +307,7 @@ async function run(
 
       await m.edit({ embeds: [embed], components: [] });
 
-      logger.info(`deleting data for ${message.author.username}...`);
-
-      await prisma.inventory.deleteMany({
-        where: {
-          userId: message.author.id,
-        },
-      });
-
-      for (const testOffer of await prisma.offer.findMany({
-        where: { AND: [{ targetId: message.author.id }, { sold: false }] },
-      })) {
-        await checkOffer(testOffer, message.client as NypsiClient);
-      }
-
-      await prisma.booster.deleteMany({
-        where: {
-          userId: message.author.id,
-        },
-      });
-
-      await prisma.economyGuildMember.deleteMany({
-        where: {
-          userId: message.author.id,
-        },
-      });
-
-      await prisma.wordleStats.deleteMany({
-        where: {
-          userId: message.author.id,
-        },
-      });
-
-      await prisma.username.deleteMany({
-        where: {
-          userId: message.author.id,
-        },
-      });
-
-      await prisma.mention.deleteMany({
-        where: {
-          targetId: message.author.id,
-        },
-      });
-
-      await prisma.lotteryTicket.deleteMany({
-        where: {
-          userId: message.author.id,
-        },
-      });
-
-      await prisma.premiumCommand.deleteMany({
-        where: {
-          owner: message.author.id,
-        },
-      });
-
-      await prisma.wholesomeImage.updateMany({
-        where: {
-          submitterId: message.author.id,
-        },
-        data: {
-          submitterId: "[redacted]",
-          submitter: "[redacted]",
-        },
-      });
-
-      await prisma.chatReactionStats.deleteMany({
-        where: {
-          userId: message.author.id,
-        },
-      });
-
-      await prisma.economy
-        .delete({
-          where: {
-            userId: message.author.id,
-          },
-        })
-        .catch(() => {});
-
-      await prisma.premium
-        .delete({
-          where: {
-            userId: message.author.id,
-          },
-        })
-        .catch(() => {});
-
-      await prisma.user.delete({
-        where: {
-          id: message.author.id,
-        },
-      });
-
-      exec(`redis-cli KEYS "*${message.author.id}*" | xargs redis-cli DEL`);
-
-      logger.info(`data deleted for ${message.author.id}`);
+      await dataDelete(message.author.id);
 
       embed.setDescription("your data has been deleted");
 
