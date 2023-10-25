@@ -248,8 +248,9 @@ class Game {
   private hand: Hand;
   private dealer: Hand;
   private interaction: ButtonInteraction;
+  private state: "playing" | "end";
 
-  public static getRow(doubleDown = true, disabled = false) {
+  static getRow(doubleDown = true, disabled = false) {
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder()
         .setLabel("hit")
@@ -288,6 +289,18 @@ class Game {
     this.originalBet = bet;
     this.message = msg;
     this.interaction = interaction;
+    this.state = "playing";
+
+    setTimeout(() => {
+      if (this.state === "playing") {
+        logger.warn(
+          "blackjack still in playing state after 5 minutes - deleting user from redis key",
+          { user: this.member.user },
+        );
+
+        redis.srem(Constants.redis.nypsi.USERS_PLAYING, this.member.user.id);
+      }
+    }, 300000);
 
     this.deck = shuffle([
       "A♠️",
@@ -408,6 +421,7 @@ class Game {
   }
 
   private async end(result: "win" | "lose" | "draw") {
+    this.state = "end";
     this.dealer.dealer = false;
 
     let winnings = 0;
