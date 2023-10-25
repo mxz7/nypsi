@@ -143,7 +143,7 @@ export async function deleteOffer(offer: Offer, client: NypsiClient) {
 }
 
 export async function checkOffer(offer: Offer, client: NypsiClient) {
-  const inventory = await getInventory(offer.targetId);
+  const inventory = await getInventory(offer.targetId).catch(() => []);
 
   if (offer.sold) return;
 

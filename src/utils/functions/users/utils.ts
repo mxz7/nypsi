@@ -1,7 +1,9 @@
+import { exec } from "child_process";
 import { GuildMember, User } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import Constants from "../../Constants";
+import { logger } from "../../logger";
 import ms = require("ms");
 
 export async function hasProfile(member: GuildMember | string) {
@@ -54,6 +56,8 @@ export async function createProfile(member: User | string) {
     id = member;
   }
 
+  if (await redis.exists(`${Constants.redis.nypsi.PROFILE_TRANSFER}:${id}`)) return;
+
   await prisma.user
     .create({
       data: {
@@ -64,4 +68,267 @@ export async function createProfile(member: User | string) {
     })
     .catch(() => {});
   await redis.del(`${Constants.redis.cache.user.EXISTS}:${id}`);
+}
+
+export async function doProfileTransfer(fromId: string, toId: string) {
+  logger.info(`beginning transfer (${fromId} -> ${toId})`);
+  await redis.del(`${Constants.redis.nypsi.PROFILE_TRANSFER}:${fromId}`);
+  await redis.del(`${Constants.redis.nypsi.PROFILE_TRANSFER}:${toId}`);
+
+  await dataDelete(toId);
+
+  let fail = false;
+
+  await prisma
+    .$transaction(async (prisma) => {
+      const user = await prisma.user.findUnique({ where: { id: fromId } });
+      user.id = toId;
+      await prisma.user.create({ data: user });
+
+      const premium = await prisma.premium
+        .findUnique({ where: { userId: fromId } })
+        .catch(() => null);
+      if (premium) {
+        premium.userId = toId;
+        await prisma.premium.create({ data: premium });
+      }
+
+      const wordleStats = await prisma.wordleStats
+        .findUnique({ where: { userId: fromId } })
+        .catch(() => null);
+      if (wordleStats) {
+        wordleStats.userId = toId;
+        await prisma.wordleStats.create({ data: wordleStats });
+      }
+
+      const usernames = (await prisma.username.findMany({ where: { userId: fromId } })).map((i) => {
+        i.userId = toId;
+        return i;
+      });
+      if (usernames.length > 0) {
+        await prisma.username.createMany({ data: usernames });
+      }
+
+      const commandUses = (await prisma.commandUse.findMany({ where: { userId: fromId } })).map(
+        (i) => {
+          i.userId = toId;
+          return i;
+        },
+      );
+      if (commandUses.length > 0) {
+        await prisma.commandUse.createMany({ data: commandUses });
+      }
+
+      const achievements = (await prisma.achievements.findMany({ where: { userId: fromId } })).map(
+        (i) => {
+          i.userId = toId;
+          return i;
+        },
+      );
+      if (achievements.length > 0) {
+        await prisma.achievements.createMany({ data: achievements });
+      }
+
+      const tags = (await prisma.tags.findMany({ where: { userId: fromId } })).map((i) => {
+        i.userId = toId;
+        return i;
+      });
+      if (tags.length > 0) {
+        await prisma.tags.createMany({ data: tags });
+      }
+
+      const purchases = (await prisma.kofiPurchases.findMany({ where: { userId: fromId } })).map(
+        (i) => {
+          i.userId = toId;
+          return i;
+        },
+      );
+      if (purchases.length > 0) {
+        await prisma.kofiPurchases.createMany({ data: purchases });
+      }
+
+      const economy = await prisma.economy.findUnique({ where: { userId: fromId } });
+      economy.userId = toId;
+      await prisma.economy.create({ data: economy });
+
+      const workers = (await prisma.economyWorker.findMany({ where: { userId: fromId } })).map(
+        (i) => {
+          i.userId = toId;
+          return i;
+        },
+      );
+      if (workers.length > 0) {
+        await prisma.economyWorker.createMany({ data: workers });
+      }
+
+      const workersUpgrades = (
+        await prisma.economyWorkerUpgrades.findMany({ where: { userId: fromId } })
+      ).map((i) => {
+        i.userId = toId;
+        return i;
+      });
+      if (workersUpgrades.length > 0) {
+        await prisma.economyWorkerUpgrades.createMany({ data: workersUpgrades });
+      }
+
+      const inventory = (await prisma.inventory.findMany({ where: { userId: fromId } })).map(
+        (i) => {
+          i.userId = toId;
+          return i;
+        },
+      );
+      if (inventory.length > 0) {
+        await prisma.inventory.createMany({ data: inventory });
+      }
+
+      const crafting = (await prisma.crafting.findMany({ where: { userId: fromId } })).map((i) => {
+        i.userId = toId;
+        return i;
+      });
+      if (crafting.length > 0) {
+        await prisma.crafting.createMany({ data: crafting });
+      }
+
+      const games = (await prisma.game.findMany({ where: { userId: fromId } })).map((i) => {
+        i.userId = toId;
+        return i;
+      });
+      if (games.length > 0) {
+        await prisma.game.deleteMany({ where: { id: { in: games.map((i) => i.id) } } });
+        await prisma.game.createMany({ data: games });
+      }
+
+      const stats = (await prisma.stats.findMany({ where: { userId: fromId } })).map((i) => {
+        i.userId = toId;
+        return i;
+      });
+      if (stats.length > 0) {
+        await prisma.stats.createMany({ data: stats });
+      }
+
+      const bakery = (await prisma.bakeryUpgrade.findMany({ where: { userId: fromId } })).map(
+        (i) => {
+          i.userId = toId;
+          return i;
+        },
+      );
+      if (bakery.length > 0) {
+        await prisma.bakeryUpgrade.createMany({ data: bakery });
+      }
+
+      const upgrades = (await prisma.upgrades.findMany({ where: { userId: fromId } })).map((i) => {
+        i.userId = toId;
+        return i;
+      });
+      if (upgrades.length > 0) {
+        await prisma.upgrades.createMany({ data: upgrades });
+      }
+    })
+    .catch((e) => {
+      logger.error(`transfer failed (${fromId} -> ${toId})`, e);
+      fail = true;
+    });
+  if (fail) return;
+
+  await dataDelete(fromId);
+  exec(`redis-cli KEYS "*${toId}*" | xargs redis-cli DEL`);
+  logger.info(`transfer complete (${fromId} -> ${toId})`);
+}
+
+export async function dataDelete(userId: string) {
+  logger.info(`deleting data for ${userId}...`);
+
+  await prisma.inventory.deleteMany({
+    where: {
+      userId: userId,
+    },
+  });
+
+  await prisma.booster.deleteMany({
+    where: {
+      userId: userId,
+    },
+  });
+
+  await prisma.economyGuildMember.deleteMany({
+    where: {
+      userId: userId,
+    },
+  });
+
+  await prisma.wordleStats.deleteMany({
+    where: {
+      userId: userId,
+    },
+  });
+
+  await prisma.username.deleteMany({
+    where: {
+      userId: userId,
+    },
+  });
+
+  await prisma.mention.deleteMany({
+    where: {
+      targetId: userId,
+    },
+  });
+
+  await prisma.lotteryTicket.deleteMany({
+    where: {
+      userId: userId,
+    },
+  });
+
+  await prisma.premiumCommand.deleteMany({
+    where: {
+      owner: userId,
+    },
+  });
+
+  await prisma.wholesomeImage.updateMany({
+    where: {
+      submitterId: userId,
+    },
+    data: {
+      submitterId: "[redacted]",
+      submitter: "[redacted]",
+    },
+  });
+
+  await prisma.chatReactionStats.deleteMany({
+    where: {
+      userId: userId,
+    },
+  });
+
+  await prisma.auctionWatch.deleteMany({ where: { userId } });
+
+  await prisma.economy
+    .delete({
+      where: {
+        userId: userId,
+      },
+    })
+    .catch(() => {});
+
+  await prisma.premium
+    .delete({
+      where: {
+        userId: userId,
+      },
+    })
+    .catch(() => {});
+
+  await prisma.user
+    .delete({
+      where: {
+        id: userId,
+      },
+    })
+    .catch(() => null);
+
+  exec(`redis-cli KEYS "*${userId}*" | xargs redis-cli DEL`);
+
+  logger.info(`data deleted for ${userId}`);
 }
