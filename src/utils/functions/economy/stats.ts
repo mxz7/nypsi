@@ -140,7 +140,7 @@ export async function createGame(
 
   if (fail || !res) {
     if (attempts > 10) {
-      logger.warn("failed to create game", opts);
+      logger.error("failed to create game", opts);
       return "failed to create game";
     }
     return createGame(opts, attempts + 1);
