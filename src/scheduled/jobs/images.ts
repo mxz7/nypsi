@@ -6,6 +6,7 @@ import sleep from "../../utils/functions/sleep";
 const bdsmLinks = [
   "https://www.reddit.com/r/bdsm/top.json?limit=6969&t=month",
   "https://www.reddit.com/r/bondage/top.json?limit=6969&t=month",
+  "https://www.reddit.com/r/dominated/top.json?limit=6969&t=month",
 ];
 const thighsLinks = [
   "https://www.reddit.com/r/legs/top.json?limit=6969&t=month",
@@ -62,7 +63,6 @@ const lizardLinks = [
   "https://www.reddit.com/r/BeardedDragons/top.json?limit=6969&t=month",
 ];
 const rabbitLinks = ["https://www.reddit.com/r/rabbits/top.json?limit=6969&t=month"];
-const snekLinks = ["https://www.reddit.com/r/snek/top.json?limit=6969&t=month"];
 
 async function cacheUpdate(links: string[], name: string) {
   await redis.del(`nypsi:images:${name}`);
@@ -114,7 +114,6 @@ async function cacheUpdate(links: string[], name: string) {
   await cacheUpdate(duckLinks, "duck");
   await cacheUpdate(lizardLinks, "lizard");
   await cacheUpdate(rabbitLinks, "rabbit");
-  await cacheUpdate(snekLinks, "snek");
 
   process.exit(0);
 })();
