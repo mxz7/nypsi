@@ -44,27 +44,24 @@ export async function reloadInteractions() {
 }
 
 export async function runInteraction(interaction: Interaction) {
-  if (
-    (await redis.exists(`${Constants.redis.nypsi.PROFILE_TRANSFER}:${interaction.user.id}`)) &&
-    interaction.isButton()
-      ? interaction.customId !== "t-f-p-boobies"
-      : true
-  ) {
-    if (interaction.isRepliable()) {
-      interaction.reply({
-        embeds: [
-          new ErrorEmbed(
-            "your profile is currently involved in a profile transfer and you cannot use commands. this will expire in 10 minutes",
-          ),
-        ],
-      });
-    }
-    return;
-  }
-
   if (interaction.isAutocomplete()) {
     return autocompleteHandlers.get(interaction.options.getFocused(true).name)?.run(interaction);
   } else if (interaction.isMessageComponent() && !interactionHandlers.has(interaction.customId)) {
+    if (
+      (await redis.exists(`${Constants.redis.nypsi.PROFILE_TRANSFER}:${interaction.user.id}`)) &&
+      (interaction.isButton() ? interaction.customId !== "t-f-p-boobies" : true)
+    ) {
+      if (interaction.isRepliable()) {
+        interaction.reply({
+          embeds: [
+            new ErrorEmbed(
+              "your profile is currently involved in a profile transfer and you cannot use commands. this will expire in 10 minutes",
+            ),
+          ],
+        });
+      }
+      return;
+    }
     if (!interaction.guild) return;
     const reactionRoles = await getReactionRolesByGuild(interaction.guild);
 
@@ -169,6 +166,21 @@ export async function runInteraction(interaction: Interaction) {
     if (responseDesc.length > 0)
       return interaction.editReply({ embeds: [new CustomEmbed(member, responseDesc.join("\n"))] });
   } else if (interaction.isMessageComponent()) {
+    if (
+      (await redis.exists(`${Constants.redis.nypsi.PROFILE_TRANSFER}:${interaction.user.id}`)) &&
+      (interaction.isButton() ? interaction.customId !== "t-f-p-boobies" : true)
+    ) {
+      if (interaction.isRepliable()) {
+        interaction.reply({
+          embeds: [
+            new ErrorEmbed(
+              "your profile is currently involved in a profile transfer and you cannot use commands. this will expire in 10 minutes",
+            ),
+          ],
+        });
+      }
+      return;
+    }
     return interactionHandlers.get(interaction.customId)?.run(interaction);
   }
 }
