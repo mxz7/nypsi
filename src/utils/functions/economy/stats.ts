@@ -134,12 +134,15 @@ export async function createGame(
       },
     })
     .catch((e) => {
-      logger.warn("stats error", e);
+      logger.warn("stats error", { error: e, opts: opts });
       fail = true;
     });
 
   if (fail || !res) {
-    if (attempts > 10) return "failed to create game";
+    if (attempts > 10) {
+      logger.warn("failed to create game", opts);
+      return "failed to create game";
+    }
     return createGame(opts, attempts + 1);
   }
 
