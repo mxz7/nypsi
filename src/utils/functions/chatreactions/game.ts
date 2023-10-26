@@ -1,7 +1,7 @@
-import { Guild, GuildMember, Message, TextChannel } from "discord.js";
-import { CustomEmbed } from "../../../models/EmbedBuilders";
+import { Guild, GuildMember, Message, TextChannel, User } from "discord.js";
+import { CustomEmbed, getColor } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
-import { gamble } from "../../logger";
+import { gamble, logger } from "../../logger";
 import { addProgress } from "../economy/achievements";
 import { getBalance, updateBalance } from "../economy/balance";
 import { createGame } from "../economy/stats";
@@ -179,7 +179,7 @@ export async function startChatReactionDuel(
   challenger: GuildMember,
   target: GuildMember,
   wager: number,
-): Promise<null | string> {
+): Promise<null | { winner: string; winnings: number }> {
   const word = await generateWord(guild);
 
   const countdownMsg = await channel
@@ -245,97 +245,120 @@ export async function startChatReactionDuel(
     return a && b;
   };
 
-  let fail = false;
+  return new Promise((resolve) => {
+    let winnings: number;
+    let tax = 0;
 
-  const winningMessage = await channel
-    .awaitMessages({
-      filter,
-      time: 30000,
-      max: 1,
-    })
-    .then((messages) => messages.first())
-    .catch(() => {
-      fail = true;
+    const interval = setInterval(() => {
+      if (collector.ended) clearInterval(interval);
+      if (winners.length === 0) return;
+      else if (winners.length === 2) clearInterval(interval);
+
+      embed.setFields({
+        name: "winner",
+        value: `${winners
+          .map(
+            (value, index) =>
+              `${index === 0 ? "🏅" : "🥈"} ${value.user.toString()} in \`${value.time}\`${
+                index === 0 && winnings > 0
+                  ? ` +$**${winnings.toLocaleString()}**${
+                      tax ? ` (${(tax * 100).toFixed(1)}% tax)` : ""
+                    }`
+                  : ""
+              } `,
+          )
+          .join("\n")}`,
+      });
+      embed.setColor(getColor(winners[0].user.id));
+
+      if (msg.embeds[0]?.fields[0]?.value === embed.data.fields[0].value) return;
+
+      logger.debug("edited");
+      msg.edit({ embeds: [embed] });
+    }, 500);
+
+    const collector = channel.createMessageCollector({ filter, time: 30000, max: 2 });
+
+    const winners: { user: User; time: string }[] = [];
+
+    collector.on("collect", async (message) => {
+      logger.debug("collected");
+      winners.push({
+        user: message.author,
+        time: `${((performance.now() - start) / 1000).toFixed(2)}s`,
+      });
+
+      if (winners.length === 1) {
+        message.react("🏆");
+        addProgress(message.author.id, "fast_typer", 1);
+
+        winnings = wager * 2;
+        tax = 0;
+
+        if (winnings > 1_000_000 && !(await isPremium(message.author.id))) {
+          tax = await getTax();
+
+          const taxed = Math.floor(winnings * tax);
+          await addToNypsiBank(taxed);
+          winnings -= taxed;
+        }
+
+        resolve({ winner: message.author.id, winnings });
+
+        const challengerId = await createGame({
+          bet: wager,
+          game: "chatreactionduel",
+          outcome: `${message.author.username} won in ${winners[0].time} vs ${
+            message.author.id === challenger.user.id
+              ? target.user.username
+              : challenger.user.username
+          }\nword: ${word.actual}`,
+          userId: challenger.user.id,
+          result: message.author.id === challenger.user.id ? "win" : "lose",
+          earned: message.author.id === challenger.user.id ? winnings : 0,
+        });
+        const targetId = await createGame({
+          bet: wager,
+          game: "chatreactionduel",
+          outcome: `${message.author.username} won in ${winners[0].time} vs ${
+            message.author.id === target.user.id ? challenger.user.username : target.user.username
+          }\nword: ${word.actual}`,
+          userId: target.user.id,
+          result: message.author.id === target.user.id ? "win" : "lose",
+          earned: message.author.id === target.user.id ? winnings : 0,
+        });
+
+        gamble(
+          challenger.user,
+          "chatreactionduel",
+          wager,
+          message.author.id == challenger.user.id ? "win" : "lose",
+          challengerId,
+          message.author.id == challenger.user.id ? winnings : null,
+        );
+        gamble(
+          target.user,
+          "chatreactionduel",
+          wager,
+          message.author.id == target.user.id ? "win" : "lose",
+          targetId,
+          message.author.id == target.user.id ? winnings : null,
+        );
+      } else {
+        message.react("🐌");
+      }
     });
 
-  if (fail || !winningMessage) {
-    embed.addField("winner", "nobody won... losers.");
+    collector.on("end", async () => {
+      logger.debug("ended");
+      if (winners.length === 0) {
+        embed.addField("winner", "nobody won... losers.");
 
-    await msg.edit({ embeds: [embed] });
-    await updateBalance(challenger, (await getBalance(challenger)) + wager);
-    await updateBalance(target, (await getBalance(target)) + wager);
-    return null;
-  }
-
-  winningMessage.react("🏆");
-
-  const winTime = ((performance.now() - start) / 1000).toFixed(2);
-  let winnings = wager * 2;
-  let tax = 0;
-
-  if (winnings > 1_000_000 && !(await isPremium(winningMessage.author.id))) {
-    tax = await getTax();
-
-    const taxed = Math.floor(winnings * tax);
-    await addToNypsiBank(taxed);
-    winnings -= taxed;
-  }
-
-  embed.addField(
-    "winner",
-    `🏅 ${winningMessage.author.toString()} in \`${winTime}s\`${
-      winnings > 0
-        ? `\n\n+$**${winnings.toLocaleString()}**${tax ? ` (${(tax * 100).toFixed(1)}% tax)` : ""}`
-        : ""
-    }`,
-  );
-
-  await addProgress(winningMessage.author.id, "fast_typer", 1);
-
-  const gameId = await createGame({
-    bet: wager,
-    game: "chatreactionduel",
-    outcome: `${winningMessage.author.username} won in ${winTime}s vs ${
-      winningMessage.author.id === challenger.user.id
-        ? target.user.username
-        : challenger.user.username
-    }\nword: ${word.actual}`,
-    userId: challenger.user.id,
-    result: winningMessage.author.id === challenger.user.id ? "win" : "lose",
-    earned: winningMessage.author.id === challenger.user.id ? winnings : 0,
+        await msg.edit({ embeds: [embed] });
+        await updateBalance(challenger, (await getBalance(challenger)) + wager);
+        await updateBalance(target, (await getBalance(target)) + wager);
+        resolve(null);
+      }
+    });
   });
-
-  await createGame({
-    bet: wager,
-    game: "chatreactionduel",
-    outcome: `${winningMessage.author.username} won in ${winTime}s vs ${
-      winningMessage.author.id === target.user.id ? challenger.user.username : target.user.username
-    }\nword: ${word.actual}`,
-    userId: target.user.id,
-    result: winningMessage.author.id === target.user.id ? "win" : "lose",
-    earned: winningMessage.author.id === target.user.id ? winnings : 0,
-  });
-
-  gamble(
-    challenger.user,
-    "chatreactionduel",
-    wager,
-    winningMessage.author.id == challenger.user.id ? "win" : "lose",
-    gameId,
-    winningMessage.author.id == challenger.user.id ? winnings : null,
-  );
-  gamble(
-    target.user,
-    "chatreactionduel",
-    wager,
-    winningMessage.author.id == target.user.id ? "win" : "lose",
-    gameId,
-    winningMessage.author.id == target.user.id ? winnings : null,
-  );
-
-  embed.setFooter({ text: `id: ${gameId}` });
-
-  await msg.edit({ embeds: [embed] });
-
-  return winningMessage.author.id;
 }

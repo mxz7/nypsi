@@ -513,8 +513,8 @@ async function run(
         wager,
       );
 
-      if (typeof result === "string")
-        await updateBalance(result, (await getBalance(result)) + wager * 2);
+      if (result)
+        await updateBalance(result.winner, (await getBalance(result.winner)) + result.winnings);
     };
 
     if (args.length === 0)
