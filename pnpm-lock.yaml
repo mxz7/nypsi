@@ -13,7 +13,7 @@ dependencies:
     version: 2.0.1
   '@prisma/client':
     specifier: 5.5.0
-    version: 5.5.0(prisma@5.5.0)
+    version: 5.5.0(prisma@5.5.2)
   '@top-gg/sdk':
     specifier: 3.1.6
     version: 3.1.6
@@ -140,8 +140,8 @@ devDependencies:
     specifier: 3.0.3
     version: 3.0.3
   prisma:
-    specifier: 5.5.0
-    version: 5.5.0
+    specifier: 5.5.2
+    version: 5.5.2
   typescript:
     specifier: 5.2.2
     version: 5.2.2
@@ -1171,7 +1171,7 @@ packages:
       fastq: 1.15.0
     dev: true
 
-  /@prisma/client@5.5.0(prisma@5.5.0):
+  /@prisma/client@5.5.0(prisma@5.5.2):
     resolution: {integrity: sha512-JiCj/h79PRawWiBVa4Ng4tBaKMrfJgUwuRrZi4NuQRd58gWIP4kEYMqIidpUrab3dU2NM617pWRG2avX+dh+Sg==}
     engines: {node: '>=16.13'}
     requiresBuild: true
@@ -1182,15 +1182,15 @@ packages:
         optional: true
     dependencies:
       '@prisma/engines-version': 5.5.0-19.475c616176945d72f4330c92801f0c5e6398dc0f
-      prisma: 5.5.0
+      prisma: 5.5.2
     dev: false
 
   /@prisma/engines-version@5.5.0-19.475c616176945d72f4330c92801f0c5e6398dc0f:
     resolution: {integrity: sha512-/1orOUq7I54ISYBJockYB15FmF/VkCBeFzYYkWyLtBl2tLlJWHmA3NEUBM+wSmXGLK78BmuSNHrLbf8bmXkukQ==}
     dev: false
 
-  /@prisma/engines@5.5.0:
-    resolution: {integrity: sha512-WX+8l4sJuWeS3A/5WqJpdBHp32UzUticiKwUWbFggcd6/sqGtCiiaFmXYmNw6Au2O6hjSX37Y07Vu2ZhP9cmWg==}
+  /@prisma/engines@5.5.2:
+    resolution: {integrity: sha512-Be5hoNF8k+lkB3uEMiCHbhbfF6aj1GnrTBnn5iYFT7GEr3TsOEp1soviEcBR0tYCgHbxjcIxJMhdbvxALJhAqg==}
     requiresBuild: true
 
   /@sapphire/async-queue@1.5.0:
@@ -4397,13 +4397,13 @@ packages:
       react-is: 18.2.0
     dev: true
 
-  /prisma@5.5.0:
-    resolution: {integrity: sha512-QyMMh1WQiGU07Iz3Q8jd6y5KlomGLDVb4etkMWpQ4EmDAaY+zGgNHmBk2MfRPb0A+un1Ior1nZWZorfnKD6E5A==}
+  /prisma@5.5.2:
+    resolution: {integrity: sha512-WQtG6fevOL053yoPl6dbHV+IWgKo25IRN4/pwAGqcWmg7CrtoCzvbDbN9fXUc7QS2KK0LimHIqLsaCOX/vHl8w==}
     engines: {node: '>=16.13'}
     hasBin: true
     requiresBuild: true
     dependencies:
-      '@prisma/engines': 5.5.0
+      '@prisma/engines': 5.5.2
 
   /prompts@2.4.2:
     resolution: {integrity: sha512-NxNv/kLguCA7p3jE8oL2aEBsrJWgAakBpgmgK6lpPWV+WuOmY6r2/zbAVnP+T8bQlA0nzHXSJSJW0Hq7ylaD2Q==}
