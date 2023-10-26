@@ -212,7 +212,7 @@ export class ErrorEmbed extends EmbedBuilder {
   }
 }
 
-function getColor(id: string): ColorResolvable {
+export function getColor(id: string): ColorResolvable {
   (async () => {
     const color = await getEmbedColor(id);
 
