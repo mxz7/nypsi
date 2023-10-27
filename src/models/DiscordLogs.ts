@@ -58,7 +58,7 @@ export default class DiscordTransport implements Transport {
     /**
      * @type {number}
      */
-    this.maxLength = opts.maxLength || 1900;
+    this.maxLength = opts.maxLength || 500;
 
     this.queue = [];
     this.hook = new WebhookClient({ url: opts.webhook });
@@ -71,8 +71,12 @@ export default class DiscordTransport implements Transport {
       setInterval(() => {
         const content = [];
 
-        while (content.length < this.maxLength) {
+        while (content.join("\n").length < this.maxLength) {
           content.push(this.queue.shift());
+        }
+
+        if (content.join("\n").length > this.maxLength) {
+          this.queue = [content.pop(), ...this.queue];
         }
 
         if (content.length == 0) return;
@@ -85,36 +89,36 @@ export default class DiscordTransport implements Transport {
   }
 
   public async write(data: WriteData): Promise<void> {
-    let repeat = false;
-    let next = "";
+    const items: string[] = [];
 
     let formatted = data.meta.nypsi_formatted ? data.message : await this.formatter(data);
 
-    if (formatted.length > this.maxLength) {
-      repeat = true;
-      next = formatted.substring(this.maxLength);
-      formatted = formatted.substring(0, this.maxLength);
-      data.meta.nypsi_formatted = true;
+    while (formatted.length > this.maxLength) {
+      const section = formatted.substring(0, this.maxLength);
+      formatted = formatted.substring(this.maxLength);
+      items.push(section);
     }
+
+    items.push(formatted);
 
     if (["hybrid", "embed"].includes(this.mode)) {
-      const embed = new EmbedBuilder();
+      for (const entry of items) {
+        const embed = new EmbedBuilder();
 
-      if (this.colors.has(data.label))
-        embed.setColor(this.colors.get(data.label) as ColorResolvable);
+        if (this.colors.has(data.label))
+          embed.setColor(this.colors.get(data.label) as ColorResolvable);
 
-      if (this.mode == "hybrid") {
-        embed.setDescription(`\`\`\`ansi\n${formatted}\`\`\``);
-      } else {
-        embed.setDescription(`${formatted}`);
+        if (this.mode == "hybrid") {
+          embed.setDescription(`\`\`\`ansi\n${entry}\`\`\``);
+        } else {
+          embed.setDescription(`${entry}`);
+        }
+        this.queue.push(embed);
       }
-      this.queue.push(embed);
     } else if (this.mode == "codeblock") {
-      this.queue.push(`\`\`\`ansi\n${formatted}\`\`\``);
+      for (const entry of items) this.queue.push(`\`\`\`ansi\n${entry}\`\`\``);
     } else {
-      this.queue.push(`${formatted}`);
+      for (const entry of items) this.queue.push(entry);
     }
-
-    if (repeat) return this.write({ ...data, message: next });
   }
 }
