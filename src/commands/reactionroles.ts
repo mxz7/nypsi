@@ -469,6 +469,13 @@ async function run(
     let reactionRoles = await getReactionRolesByGuild(message.guild);
     let reactionRole = reactionRoles.find((r) => r.messageId === args[1]);
 
+    if (!reactionRole)
+      return send({
+        embeds: [
+          new ErrorEmbed("invalid reaction role. you must create one with /reactionrole create"),
+        ],
+      });
+
     if (reactionRole.roles.length >= 15)
       return send({ embeds: [new ErrorEmbed("this reaction role already has 15 roles")] });
 
