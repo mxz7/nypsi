@@ -101,7 +101,7 @@
     "role": "sellable",
     "rarity": 0,
     "buy": 0,
-    "sell": 900,
+    "sell": 750,
     "in_crates": false
   },
   "end_stone": {
@@ -114,7 +114,7 @@
     "role": "sellable",
     "rarity": 0,
     "buy": 0,
-    "sell": 2000,
+    "sell": 3000,
     "in_crates": false
   },
   "purpur": {
