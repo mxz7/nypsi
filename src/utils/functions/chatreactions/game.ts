@@ -1,7 +1,7 @@
 import { Guild, GuildMember, Message, TextChannel, User } from "discord.js";
 import { CustomEmbed, getColor } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
-import { gamble, logger } from "../../logger";
+import { gamble } from "../../logger";
 import { addProgress } from "../economy/achievements";
 import { getBalance, updateBalance } from "../economy/balance";
 import { createGame } from "../economy/stats";
@@ -273,7 +273,6 @@ export async function startChatReactionDuel(
 
       if (msg.embeds[0]?.fields[0]?.value === embed.data.fields[0].value) return;
 
-      logger.debug("edited");
       msg.edit({ embeds: [embed] });
     }, 500);
 
@@ -282,7 +281,6 @@ export async function startChatReactionDuel(
     const winners: { user: User; time: string }[] = [];
 
     collector.on("collect", async (message) => {
-      logger.debug("collected");
       winners.push({
         user: message.author,
         time: `${((performance.now() - start) / 1000).toFixed(2)}s`,
@@ -350,7 +348,6 @@ export async function startChatReactionDuel(
     });
 
     collector.on("end", async () => {
-      logger.debug("ended");
       if (winners.length === 0) {
         embed.addField("winner", "nobody won... losers.");
 
