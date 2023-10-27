@@ -270,7 +270,7 @@ export const logger = new Logger();
 const formatter = (data: WriteData) => {
   let labelColor = chalk.green;
   let jsonColor = chalk.reset;
-  let messageColor = chalk.white;
+  let messageColor = chalk.reset;
 
   switch (data.label) {
     case "debug":
