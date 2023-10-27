@@ -620,8 +620,6 @@ async function run(
       const response = await m
         .awaitMessageComponent({ filter, time: 60000 })
         .then(async (collected) => {
-          await collected.deferUpdate();
-          m.edit({ components: [] });
           duelRequests.delete(message.author.id);
 
           return collected;
@@ -640,11 +638,11 @@ async function run(
       } else {
         await updateBalance(message.member, (await getBalance(message.member)) + wager);
         if (message.author.id === response.user.id) {
-          response.followUp({
+          response.reply({
             embeds: [new CustomEmbed(message.member, "✅ duel request cancelled")],
           });
         } else {
-          response.followUp({ embeds: [new CustomEmbed(target, "✅ duel request denied")] });
+          response.reply({ embeds: [new CustomEmbed(target, "✅ duel request denied")] });
         }
       }
     } else if (args.length <= 2 && (args.length === 1 ? true : Boolean(formatNumber(args[1])))) {
@@ -735,7 +733,6 @@ async function run(
         .awaitMessageComponent({ filter, time: 60000 })
         .then(async (collected) => {
           await collected.deferUpdate();
-          m.edit({ components: [] });
           duelRequests.delete(message.author.id);
 
           return collected;
@@ -759,11 +756,11 @@ async function run(
       } else {
         await updateBalance(message.member, (await getBalance(message.member)) + wager);
         if (message.author.id === response.user.id) {
-          response.followUp({
+          response.reply({
             embeds: [new CustomEmbed(message.member, "✅ duel request cancelled")],
           });
         } else {
-          response.followUp({ embeds: [new CustomEmbed(target, "✅ duel request denied")] });
+          response.reply({ embeds: [new CustomEmbed(target, "✅ duel request denied")] });
         }
       }
     }
