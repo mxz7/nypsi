@@ -83,6 +83,7 @@ export async function doProfileTransfer(fromId: string, toId: string) {
     .$transaction(async (prisma) => {
       const user = await prisma.user.findUnique({ where: { id: fromId } });
       user.id = toId;
+      if (user.email) delete user.email;
       await prisma.user.create({ data: user });
 
       const premium = await prisma.premium
