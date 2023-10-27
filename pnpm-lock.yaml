@@ -74,9 +74,6 @@ dependencies:
   twemoji-parser:
     specifier: 14.0.0
     version: 14.0.0
-  undici:
-    specifier: ^5.0.0
-    version: 5.0.0
   urban-dictionary:
     specifier: 3.0.2
     version: 3.0.2
@@ -4998,11 +4995,6 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
     dev: true
-
-  /undici@5.0.0:
-    resolution: {integrity: sha512-VhUpiZ3No1DOPPQVQnsDZyfcbTTcHdcgWej1PdFnSvOeJmOVDgiOHkunJmBLfmjt4CqgPQddPVjSWW0dsTs5Yg==}
-    engines: {node: '>=12.18'}
-    dev: false
 
   /undici@5.22.1:
     resolution: {integrity: sha512-Ji2IJhFXZY0x/0tVBXeQwgPlLWw13GVzpsWPQ3rV50IFMMof2I55PZZxtm4P6iNq+L5znYN9nSTAq0ZyE6lSJw==}
