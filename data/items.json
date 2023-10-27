@@ -979,6 +979,7 @@
     "name": "tooth",
     "article": "a",
     "plural": "teeth",
+    "aliases": ["teef", "toof", "toofer", "teefers"],
     "emoji": "🦷",
     "longDesc": "its a molar i think",
     "rarity": 1,
