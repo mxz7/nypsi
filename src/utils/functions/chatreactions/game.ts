@@ -248,8 +248,10 @@ export async function startChatReactionDuel(
   return new Promise((resolve) => {
     let winnings: number;
     let tax = 0;
+    let editing = false;
 
     const interval = setInterval(() => {
+      if (editing) return;
       if (collector.ended) clearInterval(interval);
       if (winners.length === 0) return;
       else if (winners.length === 2) clearInterval(interval);
@@ -271,10 +273,22 @@ export async function startChatReactionDuel(
       });
       embed.setColor(getColor(winners[0].user.id));
 
-      if (msg.embeds[0]?.fields[0]?.value === embed.data.fields[0].value) return;
+      if (
+        msg.embeds[0]?.fields[0]?.value.split("\n").length ===
+        embed.data.fields[0].value.split("\n").length
+      )
+        return;
 
-      msg.edit({ embeds: [embed] });
-    }, 500);
+      editing = true;
+      msg
+        .edit({ embeds: [embed] })
+        .then(() => {
+          editing = false;
+        })
+        .catch(() => {
+          editing = false;
+        });
+    }, 750);
 
     const collector = channel.createMessageCollector({ filter, time: 30000, max: 2 });
 
@@ -356,6 +370,9 @@ export async function startChatReactionDuel(
         await updateBalance(target, (await getBalance(target)) + wager);
         resolve(null);
       }
+      setTimeout(() => {
+        clearInterval(interval);
+      }, 750);
     });
   });
 }
