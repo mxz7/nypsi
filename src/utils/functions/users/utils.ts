@@ -106,6 +106,7 @@ export async function doProfileTransfer(fromId: string, toId: string) {
         return i;
       });
       if (usernames.length > 0) {
+        await prisma.username.deleteMany({ where: { id: { in: usernames.map((i) => i.id) } } });
         await prisma.username.createMany({ data: usernames });
       }
 
@@ -144,6 +145,9 @@ export async function doProfileTransfer(fromId: string, toId: string) {
         },
       );
       if (purchases.length > 0) {
+        await prisma.kofiPurchases.deleteMany({
+          where: { id: { in: purchases.map((i) => i.id) } },
+        });
         await prisma.kofiPurchases.createMany({ data: purchases });
       }
 
@@ -186,6 +190,7 @@ export async function doProfileTransfer(fromId: string, toId: string) {
         return i;
       });
       if (crafting.length > 0) {
+        await prisma.crafting.deleteMany({ where: { id: { in: crafting.map((i) => i.id) } } });
         await prisma.crafting.createMany({ data: crafting });
       }
 
