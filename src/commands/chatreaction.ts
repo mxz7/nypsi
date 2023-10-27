@@ -527,7 +527,7 @@ async function run(
         embeds: [new ErrorEmbed("you are blacklisted from chat reactions in this server")],
       });
 
-    if (args.length >= 3) {
+    if (args.length >= 2 && (args.length > 2 ? true : !formatNumber(args[1]))) {
       const target = await getMember(message.guild, args[1]);
 
       if (!target) return send({ embeds: [new ErrorEmbed("invalid target")] });
@@ -647,7 +647,7 @@ async function run(
           response.followUp({ embeds: [new CustomEmbed(target, "✅ duel request denied")] });
         }
       }
-    } else if (args.length === 2) {
+    } else if (args.length <= 2 && (args.length === 1 ? true : Boolean(formatNumber(args[1])))) {
       let wager = formatNumber(args[1] || 0);
 
       if (wager < 0) wager = 0;
