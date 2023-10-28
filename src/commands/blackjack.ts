@@ -443,7 +443,7 @@ class Game {
         this.bet,
         this.hand.cards.length === 2 && this.hand.total() === 21 ? 2.5 : 2,
       );
-    }
+    } else if (result === "draw") winnings = this.bet;
 
     if (winnings > 0) await updateBalance(this.member, (await getBalance(this.member)) + winnings);
     if (xp > 0) {
