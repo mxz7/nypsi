@@ -223,6 +223,7 @@ async function prepare(
 
     await card.clicked(response).catch(() => {
       logger.error("scratch card weird error !", card);
+      console.trace();
     });
 
     if (card.remainingClicks !== 0) {
