@@ -295,7 +295,7 @@ class Game {
       if (this.state === "playing") {
         logger.warn(
           "blackjack still in playing state after 5 minutes - deleting user from redis key",
-          { user: this.member.user },
+          { user: this.member.user, game: this },
         );
 
         redis.srem(Constants.redis.nypsi.USERS_PLAYING, this.member.user.id);
