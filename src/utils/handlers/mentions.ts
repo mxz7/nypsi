@@ -12,6 +12,11 @@ import ms = require("ms");
 
 let current = 0;
 let lastWarn = 0;
+let done = 0;
+setInterval(() => {
+  logger.info(`${done.toLocaleString()} mentions sent to database in the last hour`);
+  done = 0;
+}, ms("1 hour"));
 
 export function startMentionInterval() {
   setInterval(async () => {
@@ -78,6 +83,7 @@ async function addMention(item: MentionQueueItem) {
         (Date.now() - start) / 1000
       }s`,
     );
+    done += item.members.length;
 
     return;
   }
@@ -99,11 +105,13 @@ async function addMention(item: MentionQueueItem) {
 
     if (currentInsert.length >= 750) {
       await prisma.mention.createMany({ data: currentInsert });
+      done += currentInsert.length;
       currentInsert.length = 0;
     }
   }
 
   if (currentInsert.length > 0) {
     await prisma.mention.createMany({ data: currentInsert });
+    done += currentInsert.length;
   }
 }
