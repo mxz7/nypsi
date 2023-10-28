@@ -64,7 +64,9 @@ export async function getMember(guild: Guild, memberName: string): Promise<Guild
         score += displayNameComparison === 1 ? 1.5 : displayNameComparison;
         score += guildNameComparison === 1 ? 1.2 : displayNameComparison;
 
-        if (score > 0.5) scores.push({ id: member.id, score });
+        // remember to change on worker
+        // higher = require more accurate typing
+        if (score > 2.5) scores.push({ id: member.id, score });
       }
     }
 
