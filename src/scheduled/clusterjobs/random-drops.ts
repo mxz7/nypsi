@@ -208,10 +208,9 @@ async function fastClickGame(client: NypsiClient, channelId: string, prize: stri
         1000
       ).toFixed(2)}s\`!!`;
 
-      await Promise.all([
-        res.reply({ embeds: [winEmbed], ephemeral: true }),
-        msg.edit({ embeds: [embed], components: [row] }),
-      ]);
+      res
+        .update({ embeds: [embed], components: [row] })
+        .then(() => res.followUp({ embeds: [winEmbed], ephemeral: true }));
 
       return res.user.id;
     },
@@ -313,15 +312,48 @@ async function clickSpecificGame(client: NypsiClient, channelId: string, prize: 
 
   if (typeof cluster.cluster !== "number") return;
 
-  const colours = ["red", "blue", "green", "gray"];
+  const types = [
+    {
+      type: "colour",
+      values: [
+        { name: "red", label: "" },
+        { name: "blue", label: "" },
+        { name: "green", label: "" },
+        { name: "gray", label: "" },
+      ],
+    },
+    {
+      type: "emoji1",
+      values: [
+        { name: "laughing", label: "😂" },
+        { name: "yum", label: "😋" },
+        { name: "drooling", label: "🤤" },
+        { name: "kissing", label: "😘" },
+        { name: "sad", label: "☹️" },
+      ],
+    },
+    {
+      type: "emoji2",
+      values: [
+        { name: "angry", label: "😡" },
+        { name: "shocked", label: "😮" },
+        { name: "rich", label: "🤑" },
+        { name: "cowboy", label: "🤠" },
+        { name: "angel", label: "😇" },
+      ],
+    },
+  ];
 
-  const chosenColour = colours[Math.floor(Math.random() * colours.length)];
+  const chosenType = types[Math.floor(Math.random() * types.length)];
+  const chosenValue = chosenType.values[Math.floor(Math.random() * chosenType.values.length)];
 
   const embed = new CustomEmbed()
     .setColor(0xffffff)
     .setHeader("loot drop", client.user.avatarURL())
     .setDescription(
-      `first to click the **${chosenColour}** button wins ${
+      `first to click the **${chosenValue.name}** ${
+        chosenType.type.includes("emoji") ? "emoji" : "button"
+      } wins ${
         prize.startsWith("item:")
           ? `${getItems()[prize.substring(5)].article} ${getItems()[prize.substring(5)].emoji} **${
               getItems()[prize.substring(5)].name
@@ -345,48 +377,50 @@ async function clickSpecificGame(client: NypsiClient, channelId: string, prize: 
     .setColor(Constants.EMBED_FAIL_COLOR)
     .setHeader(`uh oh ):`)
     .setDescription(
-      `you clicked the wrong button!! you had to click the **${chosenColour}** button`,
+      `you clicked the wrong ${
+        chosenType.type.includes("emoji") ? "emoji" : "button"
+      }!! you had to click the **${chosenValue.name}** ${
+        chosenType.type.includes("emoji") ? "emoji" : "button"
+      }`,
     );
 
-  const greenButtonId = randomUUID();
-  const redButtonId = randomUUID();
-  const blueButtonId = randomUUID();
-  const greyButtonId = randomUUID();
+  const ids = [];
+  while (ids.length < 5) ids.push(randomUUID());
 
-  let winningId = "";
+  let winningId: string;
 
-  switch (chosenColour) {
-    case "red":
-      winningId = redButtonId;
-      break;
-    case "blue":
-      winningId = blueButtonId;
-      break;
-    case "green":
-      winningId = greenButtonId;
-      break;
-    case "gray":
-      winningId = greyButtonId;
-      break;
+  const row = new ActionRowBuilder<MessageActionRowComponentBuilder>();
+
+  for (const i of shuffle(chosenType.values)) {
+    const id = ids.shift();
+
+    if (i.name === chosenValue.name) winningId = id;
+
+    const button = new ButtonBuilder().setCustomId(id);
+
+    if (chosenType.type.includes("emoji")) {
+      button.setEmoji(i.label);
+      button.setStyle(ButtonStyle.Secondary);
+    } else {
+      button.setLabel(getZeroWidth());
+      switch (i.name) {
+        case "red":
+          button.setStyle(ButtonStyle.Danger);
+          break;
+        case "blue":
+          button.setStyle(ButtonStyle.Primary);
+          break;
+        case "gray":
+          button.setStyle(ButtonStyle.Secondary);
+          break;
+        case "green":
+          button.setStyle(ButtonStyle.Success);
+          break;
+      }
+    }
+
+    row.addComponents(button);
   }
-
-  const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    shuffle([
-      new ButtonBuilder()
-        .setCustomId(greenButtonId)
-        .setLabel("\u200b")
-        .setStyle(ButtonStyle.Success),
-      new ButtonBuilder().setCustomId(redButtonId).setLabel("\u200b").setStyle(ButtonStyle.Danger),
-      new ButtonBuilder()
-        .setCustomId(blueButtonId)
-        .setLabel("\u200b")
-        .setStyle(ButtonStyle.Primary),
-      new ButtonBuilder()
-        .setCustomId(greyButtonId)
-        .setLabel("\u200b")
-        .setStyle(ButtonStyle.Secondary),
-    ]),
-  );
 
   const winner = await client.cluster.broadcastEval(
     async (c, { embed, row, channelId, cluster, winningId, winEmbed, failEmbed }) => {
@@ -435,10 +469,9 @@ async function clickSpecificGame(client: NypsiClient, channelId: string, prize: 
         1000
       ).toFixed(2)}s\`!!`;
 
-      await Promise.all([
-        res.reply({ embeds: [winEmbed], ephemeral: true }),
-        msg.edit({ embeds: [embed], components: [row] }),
-      ]);
+      res
+        .update({ embeds: [embed], components: [row] })
+        .then(() => res.followUp({ embeds: [winEmbed], ephemeral: true }));
 
       return res.user.id;
     },
@@ -452,4 +485,41 @@ async function clickSpecificGame(client: NypsiClient, channelId: string, prize: 
   if (!(await userExists(winnerId))) await createUser(winnerId);
 
   return winnerId;
+}
+
+export async function startRandomDrop(client: NypsiClient, channelId: string) {
+  const items = Array.from(Object.values(getItems()))
+    .filter((i) => i.random_drop_chance && percentChance(i.random_drop_chance))
+    .map((i) => `item:${i.id}`);
+
+  if (items.length === 0) return;
+
+  const prize = items[Math.floor(Math.random() * items.length)];
+
+  const games = [fastClickGame, clickSpecificGame, typeFastGame];
+
+  logger.info(`random drop started in ${channelId}`);
+  const winner = await games[Math.floor(Math.random() * games.length)](client, channelId, prize);
+
+  if (winner) {
+    if (!(await hasProfile(winner))) await createProfile(winner);
+    if (!(await userExists(winner))) await createUser(winner);
+    if (await isEcoBanned(winner).catch(() => false)) return;
+
+    logger.info(
+      `random drop in ${channelId} winner: ${winner} (${await getLastKnownUsername(
+        winner,
+      )}) prize: ${prize}`,
+    );
+
+    addProgress(winner, "lootdrops_pro", 1);
+
+    if (prize.startsWith("item:")) {
+      let amount = 1;
+
+      if (getItems()[prize.substring(5)].role === "tool") amount = 15;
+
+      await addInventoryItem(winner, prize.substring(5), amount);
+    }
+  }
 }

@@ -18,6 +18,7 @@ import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import { startRandomDrop } from "../scheduled/clusterjobs/random-drops";
 import Constants from "../utils/Constants";
 import { b, c } from "../utils/functions/anticheat";
 import { updateBalance, updateBankBalance } from "../utils/functions/economy/balance";
@@ -1387,6 +1388,14 @@ async function run(
     if (!toUser) return message.channel.send({ embeds: [new ErrorEmbed("invalid to user")] });
 
     return requestProfileTransfer(fromUser, toUser);
+  } else if (args[0].toLowerCase() === "drop") {
+    if ((await getAdminLevel(message.author.id)) < 5) {
+      return message.channel.send({
+        embeds: [new ErrorEmbed("you require admin level **5** to do this")],
+      });
+    }
+
+    startRandomDrop(message.client as NypsiClient, message.channelId);
   }
 }
 
