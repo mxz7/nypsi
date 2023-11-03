@@ -137,7 +137,7 @@ async function run(
   let fail = false;
   let idUser: string;
 
-  if (target.user.id == message.member.user.id) {
+  if (target?.user.id == message.member.user.id) {
     await message.channel.send({ embeds: [new ErrorEmbed("you cannot ban yourself")] });
     return;
   }
