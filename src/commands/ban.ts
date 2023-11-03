@@ -142,7 +142,7 @@ async function run(
     return;
   }
 
-  const ids = await getAllGroupAccountIds(message.guild, target.user.id);
+  const ids = await getAllGroupAccountIds(message.guild, mode === "id" ? userId : target.user.id);
 
   if (ids.includes(message.member.user.id)) {
     await message.channel.send({ embeds: [new ErrorEmbed("you cannot ban one of your alts")] });
@@ -238,7 +238,7 @@ async function run(
 
   if (punishAlts) {
     for (const id of ids) {
-      if (id == target.user.id) continue;
+      if (id == target?.user.id || userId) continue;
       if (!(await isBanned(message.guild, id))) {
         const banned = await doBan(
           message,
@@ -319,7 +319,7 @@ async function doBan(
           return false;
         }
 
-        if (target.user.id == message.client.user.id) return false;
+        if ((target?.user.id || userId) == message.client.user.id) return false;
 
         await message.guild.members.ban(target, {
           reason: reason,
