@@ -258,10 +258,10 @@ async function run(
   }
 
   if (altsBanned > 0)
-    msg = `✅ \`${target.user.username}\` + ${altsBanned} ${
+    msg = `✅ \`${target?.user.username || userId}\` + ${altsBanned} ${
       altsBanned != 1 ? "alts have" : "alt has"
     } been banned`;
-  else msg = `✅ \`${target.user.username}\` has been banned`;
+  else msg = `✅ \`${target?.user.username || userId}\` has been banned`;
 
   if (temporary) {
     msg += ` for **${banLength}**`;
