@@ -236,15 +236,6 @@ export async function startChatReactionDuel(
 
   const start = performance.now();
 
-  const filter = async (m: Message) => {
-    m.content = m.content.replaceAll("’", "'").replaceAll("”", "'").replaceAll("‘", "'");
-
-    const a = m.content.toLowerCase() == word.actual.toLowerCase();
-    const b = [challenger.user.id, target.user.id].includes(m.author.id);
-
-    return a && b;
-  };
-
   return new Promise((resolve) => {
     let winnings: number;
     let tax = 0;
@@ -289,6 +280,16 @@ export async function startChatReactionDuel(
           editing = false;
         });
     }, 750);
+
+    const filter = async (m: Message) => {
+      m.content = m.content.replaceAll("’", "'").replaceAll("”", "'").replaceAll("‘", "'");
+  
+      const a = m.content.toLowerCase() == word.actual.toLowerCase();
+      const b = [challenger.user.id, target.user.id].includes(m.author.id);
+      const c = winners[0]?.user != m.author;
+  
+      return a && b && c;
+    };
 
     const collector = channel.createMessageCollector({ filter, time: 30000, max: 2 });
 
