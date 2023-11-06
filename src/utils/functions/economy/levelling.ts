@@ -97,25 +97,25 @@ levellingRewards.set(200, {
 levellingRewards.set(250, {
   text: "you have unlocked:\n" + "- +1% gamble multi",
 });
-levellingRewards.set(500, {
-  text: "you have received:\n" + "- ✨ prestige 5 tag",
-  rewards: ["tag:p5"],
-});
 levellingRewards.set(1000, {
-  text: "you have received:\n" + "- ⭐️ prestige 10 tag",
+  text: "you have received:\n" + "- ✨ prestige 10 tag",
   rewards: ["tag:p10"],
 });
 levellingRewards.set(1500, {
-  text: "you have received:\n" + "- 🌟 prestige 15 tag",
+  text: "you have received:\n" + "- ⭐️ prestige 15 tag",
   rewards: ["tag:p15"],
 });
 levellingRewards.set(2000, {
-  text: "you have received:\n" + "- 💫 prestige 20 tag",
+  text: "you have received:\n" + "- 🌟 prestige 20 tag",
   rewards: ["tag:p20"],
 });
 levellingRewards.set(2500, {
-  text: "you have received:\n" + "- ❤️ prestige 25 tag",
+  text: "you have received:\n" + "- 💫 prestige 25 tag",
   rewards: ["tag:p25"],
+});
+levellingRewards.set(3000, {
+  text: "you have received:\n" + "- ❤️ prestige 30 tag",
+  rewards: ["tag:p30"],
 });
 
 const xpFormula = (level: number, prestige: number) => {
