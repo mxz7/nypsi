@@ -71,11 +71,11 @@
     "description": "reported a bug serious enough to get this badge!!",
     "emoji": "🕷️"
   },
-  "omega": {
-    "id": "omega",
-    "name": "omega",
+  "infinity": {
+    "id": "infinity",
+    "name": "infinity",
     "description": "found in the omega crate",
-    "emoji": "<:nypsi_omega:1139279162276855890>"
+    "emoji": "♾️"
   },
   "karma": {
     "id": "karma",
