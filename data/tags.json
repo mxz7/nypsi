@@ -119,6 +119,12 @@
     "description": "found in the cute v achievement",
     "emoji": "🐶"
   },
+  "hanafuda": {
+    "id": "hanafuda",
+    "name": "hanafuda",
+    "description": "found in loot drops",
+    "emoji": "🎴"
+  },
   "p10": {
     "id": "p10",
     "name": "prestige 10",

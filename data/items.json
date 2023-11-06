@@ -2663,6 +2663,20 @@
     "in_crates": false,
     "tagId": "dog"
   },
+  "hanafuda_tag": {
+    "id": "hanafuda_tag",
+    "name": "hanafuda tag",
+    "plural": "hanafuda tags",
+    "article": "a",
+    "emoji": "🎴",
+    "longDesc": "found in loot drops",
+    "rarity": 6,
+    "role": "tag",
+    "sell": 5000000,
+    "in_crates": false,
+    "tagId": "hanafuda",
+    "random_drop_chance": 0.001
+  },
   "xp_booster": {
     "id": "xp_booster",
     "name": "xp booster",
