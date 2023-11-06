@@ -38,7 +38,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   }
 
   const posts = await redis
-    .lrange("nypsi:images:boobs", 0, -1)
+    .lrange("nypsi:images:boob", 0, -1)
     .then((i) => i.map((j) => JSON.parse(j) as RedditJSONPost));
 
   if (posts.length < 10) {
