@@ -2523,7 +2523,7 @@
     "in_crates": true,
     "random_drop_chance": 0.1,
     "items": [
-      "id:omega_tag:70",
+      "id:infinity_tag:70",
       "id:unbreaking",
       "id:highroller",
       "id:double_xp",
@@ -2559,18 +2559,18 @@
       "id:reroll_token:20"
     ]
   },
-  "omega_tag": {
-    "id": "omega_tag",
-    "name": "omega tag",
-    "plural": "omega tags",
+  "infinity_tag": {
+    "id": "infinity_tag",
+    "name": "infinity tag",
+    "plural": "infinity tags",
     "article": "an",
-    "emoji": "<:nypsi_omega:1139279162276855890>",
+    "emoji": "♾️",
     "longDesc": "found in the omega crate",
     "rarity": 6,
     "role": "tag",
     "sell": 5000000,
     "in_crates": false,
-    "tagId": "omega"
+    "tagId": "infinity"
   },
   "karma_tag": {
     "id": "karma_tag",
