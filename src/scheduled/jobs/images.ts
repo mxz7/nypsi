@@ -107,11 +107,11 @@ async function cacheUpdate(links: string[], name: string) {
       parentPort.postMessage(`no images @ ${link}`);
     }
 
-    await sleep(6250);
+    await sleep(10000);
   }
 
   await redis.expire(`nypsi:images:${name}`, 604800); // 7 days
-  await sleep(6250);
+  await sleep(10000);
 }
 
 (async () => {
