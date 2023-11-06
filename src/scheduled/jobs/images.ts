@@ -68,9 +68,23 @@ async function cacheUpdate(links: string[], name: string) {
   await redis.del(`nypsi:images:${name}`);
 
   for (const link of links) {
-    const res: RedditJSON = await fetch(link).then((a) => a.json());
+    const res: RedditJSON = await fetch(link).then(async (res) => {
+      if (res.status === 403) {
+        parentPort.postMessage(`blocked for ${link}. attempting to fetch again`);
+        res = await fetch(link);
+        if (res.ok) {
+          return res.json();
+        } else {
+          parentPort.postMessage(`failed - skipping`);
+          return { message: "skip" };
+        }
+      }
+      return res.json();
+    });
 
-    if (res.message == "Forbidden") {
+    if (res.message === "skip") {
+      continue;
+    } else if (res.message == "Forbidden") {
       if (res.reason === "private") {
         parentPort.postMessage(`skipped ${link} due to private subreddit`);
       } else {
