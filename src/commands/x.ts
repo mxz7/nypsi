@@ -1396,54 +1396,6 @@ async function run(
     }
 
     startRandomDrop(message.client as NypsiClient, message.channelId);
-  } else if (args[0].toLowerCase() === "ptags") {
-    // TEMPORARY
-    const users = await prisma.economy.findMany({
-      where: {
-        OR: [{ prestige: { gt: 1 } }, { level: { gt: 1 } }],
-      },
-      select: {
-        userId: true,
-        prestige: true,
-        level: true,
-        user: {
-          select: {
-            Tags: {
-              select: {
-                tagId: true,
-              },
-            },
-          },
-        },
-      },
-    });
-
-    for (const user of users) {
-      while (user.prestige > 1) {
-        user.prestige--;
-        user.level += 100;
-      }
-
-      if (user.level >= 1000 && !user.user.Tags.find((i) => i.tagId === "p10")) {
-        await addTag(user.userId, "p10");
-      }
-
-      if (user.level >= 1500 && !user.user.Tags.find((i) => i.tagId === "p15")) {
-        await addTag(user.userId, "p15");
-      }
-
-      if (user.level >= 2000 && !user.user.Tags.find((i) => i.tagId === "p20")) {
-        await addTag(user.userId, "p20");
-      }
-
-      if (user.level >= 2500 && !user.user.Tags.find((i) => i.tagId === "p25")) {
-        await addTag(user.userId, "p25");
-      }
-
-      if (user.level >= 3000 && !user.user.Tags.find((i) => i.tagId === "p30")) {
-        await addTag(user.userId, "p30");
-      }
-    }
   }
 }
 
