@@ -11,7 +11,7 @@ let running = false;
 
 export function listenForDms(manager: ClusterManager) {
   setInterval(async () => {
-    if (lastRun > Date.now() - 30000) return;
+    if (lastRun > Date.now() - 10_000) return;
 
     if ((await redis.llen(Constants.redis.nypsi.DM_QUEUE)) != 0 && !running) {
       logger.info("executing dm queue...");
