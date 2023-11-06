@@ -342,6 +342,16 @@ async function clickSpecificGame(client: NypsiClient, channelId: string, prize: 
         { name: "angel", label: "😇" },
       ],
     },
+    {
+      type: "emoji3",
+      values: [
+        { name: "angry", label: "😡" },
+        { name: "cheeky", label: "🤭" },
+        { name: "yummy", label: "😋" },
+        { name: "heart", label: "🫶" },
+        { name: "kissing", label: "😘" },
+      ],
+    },
   ];
 
   const chosenType = types[Math.floor(Math.random() * types.length)];
