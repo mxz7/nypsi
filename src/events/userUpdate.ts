@@ -8,7 +8,7 @@ import { updateLastKnownUsername } from "../utils/functions/users/tag";
 import { hasProfile } from "../utils/functions/users/utils";
 
 const queue: User[] = [];
-let interval: NodeJS.Timer;
+let interval: NodeJS.Timeout;
 
 export default async function userUpdate(oldUser: User, newUser: User) {
   if (oldUser.username != newUser.username) {
