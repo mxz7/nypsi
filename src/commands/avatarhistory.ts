@@ -1,6 +1,7 @@
 import {
   ActionRowBuilder,
   ButtonBuilder,
+  ButtonInteraction,
   ButtonStyle,
   CommandInteraction,
   Message,
@@ -16,6 +17,7 @@ import PageManager from "../utils/functions/page";
 import {
   addNewAvatar,
   clearAvatarHistory,
+  deleteAvatar,
   fetchAvatarHistory,
   isTracking,
 } from "../utils/functions/users/history";
@@ -121,6 +123,38 @@ async function run(
     userId: message.author.id,
     allowMessageDupe: false,
     pages: PageManager.createPages(history, 1),
+    handleResponses: new Map().set(
+      "d",
+      async (manager: PageManager<string>, interaction: ButtonInteraction) => {
+        const res = await deleteAvatar(history[manager.currentPage - 1].id);
+
+        if (res) {
+          await interaction
+            .reply({
+              embeds: [new CustomEmbed(message.member, "✅ successfully deleted this avatar")],
+              ephemeral: true,
+            })
+            .catch(() => {
+              interaction.followUp({
+                embeds: [new CustomEmbed(message.member, "✅ successfully deleted this avatar")],
+                ephemeral: true,
+              });
+            });
+        } else {
+          await interaction
+            .reply({
+              embeds: [new CustomEmbed(message.member, "failed to delete this avatar")],
+              ephemeral: true,
+            })
+            .catch(() => {
+              interaction.followUp({
+                embeds: [new CustomEmbed(message.member, "failed to delete this avatar")],
+                ephemeral: true,
+              });
+            });
+        }
+      },
+    ),
     updateEmbed(page, embed) {
       embed.setImage(page[0].value);
       embed.setFooter({
