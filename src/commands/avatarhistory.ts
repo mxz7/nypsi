@@ -153,6 +153,8 @@ async function run(
               });
             });
         }
+
+        return manager.listen();
       },
     ),
     updateEmbed(page, embed) {
