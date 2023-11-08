@@ -18,7 +18,7 @@ setClusterId("main");
 getWebhooks();
 process.title = `nypsi v${getVersion()}: main`;
 
-let heartBeatIntervals: NodeJS.Timer[] = [];
+let heartBeatIntervals: NodeJS.Timeout[] = [];
 
 const manager = new ClusterManager(`${__dirname}/nypsi.js`, {
   token: process.env.BOT_TOKEN,
