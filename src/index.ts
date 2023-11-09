@@ -140,7 +140,19 @@ export async function checkStatus() {
     cluster: Cluster.Cluster,
   ): Promise<{ online: boolean; responsive: boolean; id: number }> {
     return new Promise((resolve) => {
-      const response = { responsive: false, online: false, id: cluster.id };
+      const response: {
+        responsive: boolean;
+        online: boolean;
+        id: number;
+        guilds: { id: string; shard: number }[];
+        shards: { id: number; ping: number; status: number; lastPing: number }[];
+      } = {
+        responsive: false,
+        online: false,
+        id: cluster.id,
+        guilds: [],
+        shards: [],
+      };
 
       setTimeout(() => {
         resolve(response);
@@ -151,7 +163,11 @@ export async function checkStatus() {
           response.online = true;
 
           cluster.request({ responsive: true }).then((res: any) => {
-            if (res.responsive) response.responsive = true;
+            if (res.responsive) {
+              response.responsive = true;
+              response.guilds = res.guilds;
+              response.shards = res.shards;
+            }
             resolve(response);
           });
         }
@@ -174,6 +190,8 @@ export async function checkStatus() {
   }
 
   await Promise.all(promises).then((r) => (response.clusters = r));
+
+  console.log(response);
 
   return response;
 }
