@@ -115,7 +115,24 @@ export class NypsiClient extends Client {
 
       this.cluster.on("message", (message: any) => {
         if (message._type) {
-          if (message.responsive) message.reply({ responsive: true });
+          if (message.responsive) {
+            const guilds = this.guilds.cache.mapValues((i) => {
+              return {
+                id: i.id,
+                shard: i.shardId,
+              };
+            });
+            const shardStatus = ["idle", "connecting", "resuming", "ready"];
+            const shards = this.ws.shards.mapValues((shard) => {
+              return {
+                id: shard.id,
+                status: shardStatus[shard.status],
+                ping: shard.ping,
+                lastPing: shard.lastPingTimestamp,
+              };
+            });
+            message.reply({ responsive: true, guilds, shards });
+          }
         }
       });
 
