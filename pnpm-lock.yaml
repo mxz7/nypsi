@@ -113,8 +113,8 @@ devDependencies:
     specifier: 4.0.1
     version: 4.0.1
   '@types/twemoji-parser':
-    specifier: 13.1.3
-    version: 13.1.3
+    specifier: 13.1.4
+    version: 13.1.4
   '@types/urban-dictionary':
     specifier: 3.0.2
     version: 3.0.2
@@ -1380,8 +1380,8 @@ packages:
     resolution: {integrity: sha512-aUPUr+8RUgQH33o+DKPecDCJg1Z967Xwsqgjqfz6ZFpy6d8VDayMT7JmVMKaVAekGgRZpZmxxLS/jGQqk1kzTg==}
     dev: true
 
-  /@types/twemoji-parser@13.1.3:
-    resolution: {integrity: sha512-JKvVyIPPUy1A8w1gpBKA6kPIPg4E14/HZdElFKMbgmEX3RE1e01vAVP8FmjSND288AI38TZrx+v2JQu29r6q2g==}
+  /@types/twemoji-parser@13.1.4:
+    resolution: {integrity: sha512-pDZcn6irxV/CD8C9cAEyZeECKFGZud8R5Zvs9PLO+5361GXu8khZ2peEwidMwq1dqYFSAbSQCUNkWDl87DsX2g==}
     dev: true
 
   /@types/urban-dictionary@3.0.2:
