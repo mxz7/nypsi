@@ -17,7 +17,7 @@ export default {
       },
     });
 
-    if (auction && !auction.sold && (await userExists(auction.ownerId))) {
+    if (auction && !auction?.sold && (await userExists(auction.ownerId))) {
       if (auction.ownerId == interaction.user.id) {
         return await interaction.reply({
           embeds: [new ErrorEmbed("you cannot buy your own auction")],
@@ -26,7 +26,7 @@ export default {
       }
 
       return buyFullAuction(interaction as ButtonInteraction, auction);
-    } else if (auction.sold || Number(auction.itemAmount) === 0) {
+    } else if (auction?.sold || Number(auction.itemAmount) === 0) {
       return await interaction.reply({
         embeds: [new ErrorEmbed("too slow ):").removeTitle()],
         ephemeral: true,

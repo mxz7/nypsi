@@ -56,7 +56,7 @@ export default {
       setTimeout(() => userBuying.delete(interaction.user.id), ms("1 minute"));
 
       return buyAuctionMulti(BigInt(amount), res, auction);
-    } else if (auction.sold || Number(auction.itemAmount) === 0) {
+    } else if (auction?.sold || Number(auction.itemAmount) === 0) {
       return await interaction.reply({
         embeds: [new ErrorEmbed("too slow ):").removeTitle()],
         ephemeral: true,
