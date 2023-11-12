@@ -43,6 +43,11 @@ if (!isMainThread) {
         score += 1;
       if ((member.nickname || "").toLowerCase().startsWith(memberName.toLowerCase())) score += 0.5;
 
+      if (member.user.username.toLowerCase().includes(memberName.toLowerCase())) score += 0.75;
+      if ((member.user.globalName || "").toLowerCase().includes(memberName.toLowerCase()))
+        score += 0.5;
+      if ((member.nickname || "").toLowerCase().includes(memberName.toLowerCase())) score += 0.25;
+
       const usernameComparison = compareTwoStrings(
         member.user.username.toLowerCase(),
         memberName.toLowerCase(),
@@ -60,7 +65,7 @@ if (!isMainThread) {
       score += displayNameComparison === 1 ? 1.5 : displayNameComparison;
       score += guildNameComparison === 1 ? 1.2 : displayNameComparison;
 
-      if (score > 2.3) scores.push({ id: member.user.id, score });
+      if (score > 2) scores.push({ id: member.user.id, score });
     }
   }
 
