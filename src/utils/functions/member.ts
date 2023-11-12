@@ -25,6 +25,9 @@ export async function getMember(guild: Guild, memberName: string): Promise<Guild
 
   let target: GuildMember;
   const scores: { id: string; score: number }[] = [];
+  memberName = memberName.toLowerCase();
+
+  const before = performance.now();
 
   if (members.size > 2000) {
     const id = await chooseMember(members, memberName);
@@ -36,28 +39,29 @@ export async function getMember(guild: Guild, memberName: string): Promise<Guild
       if (member.user.id === memberName) {
         target = member;
         break;
-      } else if (member.user.username.toLowerCase() === memberName.toLowerCase()) {
+      } else if (member.user.username.toLowerCase() === memberName) {
         target = member;
         break;
       } else {
         let score = 0;
 
-        if (member.user.username.toLowerCase().startsWith(memberName.toLowerCase())) score += 1.25;
-        if (member.user.displayName.toLowerCase().startsWith(memberName.toLowerCase())) score += 1;
-        if (member.displayName.toLowerCase().startsWith(memberName.toLowerCase())) score += 0.5;
+        if (member.user.username.toLowerCase().startsWith(memberName)) score += 1.25;
+        if (member.user.displayName.toLowerCase().startsWith(memberName)) score += 1;
+        if (member.displayName.toLowerCase().startsWith(memberName)) score += 0.5;
+
+        if (member.user.username.toLowerCase().includes(memberName)) score += 0.75;
+        if (member.user.displayName.toLowerCase().includes(memberName)) score += 0.5;
+        if (member.displayName.toLowerCase().includes(memberName)) score += 0.25;
 
         const usernameComparison = compareTwoStrings(
           member.user.username.toLowerCase(),
-          memberName.toLowerCase(),
+          memberName,
         );
         const displayNameComparison = compareTwoStrings(
           member.user.displayName.toLowerCase(),
-          memberName.toLowerCase(),
+          memberName,
         );
-        const guildNameComparison = compareTwoStrings(
-          member.displayName.toLowerCase(),
-          memberName.toLowerCase(),
-        );
+        const guildNameComparison = compareTwoStrings(member.displayName.toLowerCase(), memberName);
 
         score += usernameComparison * 2.5;
         score += displayNameComparison === 1 ? 1.5 : displayNameComparison;
@@ -65,7 +69,7 @@ export async function getMember(guild: Guild, memberName: string): Promise<Guild
 
         // remember to change on worker
         // higher = require more accurate typing
-        if (score > 2.3) scores.push({ id: member.id, score });
+        if (score > 2) scores.push({ id: member.id, score });
       }
     }
 
@@ -73,6 +77,8 @@ export async function getMember(guild: Guild, memberName: string): Promise<Guild
       target = members.get(inPlaceSort(scores).desc((i) => i.score)[0]?.id);
     }
   }
+
+  console.log(`time taken: ${performance.now() - before}`);
 
   return target;
 }
