@@ -181,10 +181,10 @@ async function run(
       choice == "rock"
         ? winning != "paper"
         : choice == "paper"
-        ? winning != "scissors"
-        : choice == "scissors"
-        ? winning != "rock"
-        : false
+          ? winning != "scissors"
+          : choice == "scissors"
+            ? winning != "rock"
+            : false
     ) {
       winning = shuffle(values)[Math.floor(Math.random() * values.length)];
     }
