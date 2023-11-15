@@ -602,10 +602,10 @@ async function run(
             position.position === 1
               ? "🥇"
               : position.position === 2
-              ? "🥈"
-              : position.position === 3
-              ? "🥉"
-              : `#${position.position}`
+                ? "🥈"
+                : position.position === 3
+                  ? "🥉"
+                  : `#${position.position}`
           }`,
         );
       } else {
@@ -614,10 +614,10 @@ async function run(
             position.position === 1
               ? "🥇"
               : position.position === 2
-              ? "🥈"
-              : position.position === 3
-              ? "🥉"
-              : `#${position.position}`
+                ? "🥈"
+                : position.position === 3
+                  ? "🥉"
+                  : `#${position.position}`
           }`,
         );
       }
