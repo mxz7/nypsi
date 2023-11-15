@@ -242,8 +242,8 @@ async function run(
               isOwned(worker)
                 ? " [owned]"
                 : baseWorkers[worker].prestige_requirement > (await getRawLevel(message.member))
-                ? " [locked]"
-                : ""
+                  ? " [locked]"
+                  : ""
             }`,
           )
           .setValue(baseWorkers[worker].id)

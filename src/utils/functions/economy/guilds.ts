@@ -510,11 +510,8 @@ async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
         desc.push(`\`${amount}x\` ${getItems()[itemId].emoji} ${getItems()[itemId].name}`);
       }
 
-      dms.find(
-        (i) => i.id === member.userId,
-      ).embed.data.description += `\n\nas you are a **top 4 xp** contributor you have received:\n${desc.join(
-        "\n",
-      )}`;
+      dms.find((i) => i.id === member.userId).embed.data.description +=
+        `\n\nas you are a **top 4 xp** contributor you have received:\n${desc.join("\n")}`;
     }
 
     for (const member of top4Money) {
@@ -526,11 +523,8 @@ async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
         desc.push(`\`${amount}x\` ${getItems()[itemId].emoji} ${getItems()[itemId].name}`);
       }
 
-      dms.find(
-        (i) => i.id === member.userId,
-      ).embed.data.description += `\n\nas you are a **top 4 money** contributor you have received:\n${desc.join(
-        "\n",
-      )}`;
+      dms.find((i) => i.id === member.userId).embed.data.description +=
+        `\n\nas you are a **top 4 money** contributor you have received:\n${desc.join("\n")}`;
     }
 
     for (const dm of dms) {
