@@ -456,12 +456,17 @@ class Game {
       }
     }
 
+    const outcome = {
+      dealer: { cards: this.dealer.cards, total: this.dealer.total() },
+      player: { cards: this.hand.cards, total: this.hand.total() },
+    };
+
     const id = await createGame({
       userId: this.member.user.id,
       game: "blackjack",
       bet: this.bet,
       result,
-      outcome: `dealer cards: ${this.dealer.render()} (${this.dealer.total()})\nmember cards: ${this.hand.render()} (${this.hand.total()})`,
+      outcome: JSON.stringify(outcome),
       earned: result === "win" ? winnings : null,
       xp: result === "win" ? xp : null,
     });
