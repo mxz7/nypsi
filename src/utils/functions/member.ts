@@ -78,8 +78,6 @@ export async function getMember(guild: Guild, memberName: string): Promise<Guild
     }
   }
 
-  console.log(`time taken: ${performance.now() - before}`);
-
   return target;
 }
 
