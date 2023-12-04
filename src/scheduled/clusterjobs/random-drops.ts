@@ -17,7 +17,6 @@ import { addProgress } from "../../utils/functions/economy/achievements";
 import { addInventoryItem } from "../../utils/functions/economy/inventory";
 import { createUser, getItems, isEcoBanned, userExists } from "../../utils/functions/economy/utils";
 import { getPrefix } from "../../utils/functions/guilds/utils";
-
 import { percentChance, shuffle } from "../../utils/functions/random";
 import { getZeroWidth } from "../../utils/functions/string";
 import { getLastKnownUsername } from "../../utils/functions/users/tag";
@@ -350,6 +349,16 @@ async function clickSpecificGame(client: NypsiClient, channelId: string, prize: 
         { name: "yummy", label: "😋" },
         { name: "heart", label: "🫶" },
         { name: "kissing", label: "😘" },
+      ],
+    },
+    {
+      type: "emoji4",
+      values: [
+        { name: "cheeky", label: "🤭" },
+        { name: "white heart", label: "🤍" },
+        { name: "bubbles", label: "🫧" },
+        { name: "loved", label: "🥰" },
+        { name: "eye rolling", label: "🙄" },
       ],
     },
   ];
