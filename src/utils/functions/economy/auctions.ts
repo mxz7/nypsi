@@ -169,7 +169,7 @@ export async function createAuction(
     }
   }
 
-  const { message } = await (member.client as NypsiClient).cluster
+  const message = await (member.client as NypsiClient).cluster
     .broadcastEval(
       async (client, { embed, row, cluster }) => {
         if ((client as unknown as NypsiClient).cluster.id != cluster) return;
@@ -184,7 +184,7 @@ export async function createAuction(
         if (channel.isTextBased()) {
           const msg = await channel.send({ embeds: [embed], components: [row] });
 
-          return { message: msg };
+          return msg;
         }
       },
       { context: { embed: embed.toJSON(), row: buttonRow.toJSON(), cluster: cluster } },
