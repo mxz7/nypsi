@@ -36,7 +36,7 @@ export default {
     let crateAmount = 0;
     let rawLevel = await getRawLevel(interaction.user.id);
 
-    while (crateAmount === 0 && rawLevel > 0) {
+    while (crateAmount === 0 && rawLevel > -1) {
       if (Constants.PROGRESSION.VOTE_CRATE.has(rawLevel)) {
         crateAmount = Constants.PROGRESSION.VOTE_CRATE.get(rawLevel);
       } else rawLevel--;
