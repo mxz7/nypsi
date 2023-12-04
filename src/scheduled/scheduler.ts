@@ -68,6 +68,10 @@ const bree = new Bree({
       name: "purge",
       interval: "at 1:00am",
     },
+    {
+      name: "resetvote",
+      cron: "0 0 1 * *",
+    },
   ],
 });
 

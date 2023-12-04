@@ -402,6 +402,7 @@ export async function reset() {
         xp: 0,
         padlock: false,
         level: user.level - (user.level % 100),
+        seasonVote: 0,
       },
     });
 
