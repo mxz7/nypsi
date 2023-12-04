@@ -310,7 +310,7 @@
     "emoji": "🥷",
     "target": 5000,
     "description": "complete 5,000 successful robberies",
-    "prize": ["lucky_scratch_card:3", "ninja_tag:1"]
+    "prize": ["lucky_scratch_card:3", "tag:ninja"]
   },
   "whore_i": {
     "id": "whore_i",
@@ -547,7 +547,7 @@
     "emoji": "💣",
     "target": 1000,
     "description": "reach a 7x multiplier in mines 1,000 times",
-    "prize": ["nypsi_crate:1", "legendary_scratch_card:1", "bomb_tag:1"]
+    "prize": ["nypsi_crate:1", "legendary_scratch_card:1", "tag:bobm"]
   },
   "highlow_pro_i": {
     "id": "highlow_pro_i",
@@ -667,7 +667,7 @@
     "emoji": "🍒",
     "target": 1000,
     "description": "win on cherries 1,000 times",
-    "prize": ["nypsi_crate:1", "legendary_scratch_card:3", "cherry_tag:1"]
+    "prize": ["nypsi_crate:1", "legendary_scratch_card:3", "tag:cherry"]
   },
   "horny_i": {
     "id": "horny_i",
@@ -705,7 +705,7 @@
     "emoji": "💦",
     "target": 15000,
     "description": "view 15,000 nsfw images",
-    "prize": ["legendary_scratch_card:1", "test_tube:69", "cum_tag:1"]
+    "prize": ["legendary_scratch_card:1", "test_tube:69", "tag:cum"]
   },
   "cute_i": {
     "id": "cute_i",
@@ -743,7 +743,7 @@
     "emoji": "🐶",
     "target": 15000,
     "description": "view 15,000 animal images",
-    "prize": ["legendary_scratch_card:1", "teddy:69", "dog_tag:1"]
+    "prize": ["legendary_scratch_card:1", "teddy:69", "tag:dog"]
   },
   "unsure_i": {
     "id": "unsure_i",
@@ -833,8 +833,8 @@
       "nypsi_crate:3",
       "legendary_scratch_card:5",
       "platinum_credit:2",
-      "nypsi_tag:1",
-      "omega_crate:1"
+      "omega_crate:1",
+      "tag:nypsi"
     ]
   },
   "fighter_i": {
@@ -1233,7 +1233,7 @@
     "emoji": "♠️",
     "target": 1000,
     "description": "get a blackjack 1,000 times",
-    "prize": ["nypsi_crate:1", "legendary_scratch_card:3", "spades_tag:1"]
+    "prize": ["nypsi_crate:1", "legendary_scratch_card:3", "tag:spades"]
   },
   "capitalist_i": {
     "id": "capitalist_i",
@@ -1313,6 +1313,6 @@
     "emoji": "🤓",
     "target": 15000,
     "description": "do 15,000 commands in a day",
-    "prize": ["legendary_scratch_card:3", "discordian_tag:1", "omega_crate:1"]
+    "prize": ["legendary_scratch_card:3", "omega_crate:1", "tag:discordian"]
   }
 }
