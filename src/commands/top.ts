@@ -32,6 +32,8 @@ import {
   topNetWorthGlobal,
   topPrestige,
   topPrestigeGlobal,
+  topVote,
+  topVoteGlobal,
   topWordle,
   topWordleGlobal,
 } from "../utils/functions/economy/top";
@@ -60,6 +62,18 @@ cmd.slashData
     prestige
       .setName("prestige")
       .setDescription("view top prestiges in the server")
+      .addStringOption((option) =>
+        option
+          .setName("scope")
+          .setDescription("show global/server")
+          .setChoices(...scopeChoices)
+          .setRequired(false),
+      ),
+  )
+  .addSubcommand((prestige) =>
+    prestige
+      .setName("vote")
+      .setDescription("view top votes in the server")
       .addStringOption((option) =>
         option
           .setName("scope")
@@ -398,6 +412,25 @@ async function run(
       data.pos,
       `top wordle wins ${global ? "[global]" : `for ${message.guild.name}`}`,
       global ? "https://nypsi.xyz/leaderboard/wordle" : null,
+    );
+  } else if (args[0].toLowerCase().includes("vote")) {
+    let global = false;
+
+    if (args[1]?.toLowerCase() == "global") global = true;
+
+    let data: { pages: Map<number, string[]>; pos: number };
+
+    if (global) {
+      data = await topVoteGlobal(message.author.id);
+    } else {
+      data = await topVote(message.guild, message.author.id);
+    }
+
+    return show(
+      data.pages,
+      data.pos,
+      `top votes ${global ? "[global]" : `for ${message.guild.name}`}`,
+      global ? "https://nypsi.xyz/leaderboard/vote" : null,
     );
   } else if (args[0].toLowerCase() === "cmd" || args[0].toLowerCase() === "command") {
     let data: { pages: Map<number, string[]>; pos: number };
