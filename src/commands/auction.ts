@@ -1000,7 +1000,9 @@ async function run(
       false,
     );
 
-    const url = await createAuction(message.member, selected.id, amount, cost).catch(() => {});
+    const url = await createAuction(message.member, selected.id, amount, cost).catch((e) => {
+      console.log(e);
+    });
 
     let desc: string;
 
