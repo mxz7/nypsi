@@ -17,6 +17,12 @@ export default {
       },
     });
 
+    if (!auction) {
+      await interaction.reply({ embeds: [new ErrorEmbed("invalid auction")], ephemeral: true });
+      await interaction.message.delete();
+      return;
+    }
+
     if (auction && !auction?.sold && (await userExists(auction.ownerId))) {
       if (auction.ownerId == interaction.user.id) {
         return await interaction.reply({
