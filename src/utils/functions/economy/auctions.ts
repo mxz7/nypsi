@@ -7,7 +7,6 @@ import {
   ButtonStyle,
   EmbedBuilder,
   GuildMember,
-  Message,
   MessageActionRowComponentBuilder,
   ModalBuilder,
   ModalSubmitInteraction,
