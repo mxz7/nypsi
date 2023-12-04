@@ -7,6 +7,7 @@ import {
   ButtonStyle,
   EmbedBuilder,
   GuildMember,
+  Message,
   MessageActionRowComponentBuilder,
   ModalBuilder,
   ModalSubmitInteraction,
@@ -168,7 +169,7 @@ export async function createAuction(
     }
   }
 
-  const { messageId, messageUrl } = await (member.client as NypsiClient).cluster
+  const { message } = await (member.client as NypsiClient).cluster
     .broadcastEval(
       async (client, { embed, row, cluster }) => {
         if ((client as unknown as NypsiClient).cluster.id != cluster) return;
@@ -183,7 +184,7 @@ export async function createAuction(
         if (channel.isTextBased()) {
           const msg = await channel.send({ embeds: [embed], components: [row] });
 
-          return { messageId: msg.id, messageUrl: msg.url };
+          return { message: msg };
         }
       },
       { context: { embed: embed.toJSON(), row: buttonRow.toJSON(), cluster: cluster } },
@@ -193,21 +194,23 @@ export async function createAuction(
       return res[0];
     });
 
+  console.log(message);
+
   await prisma.auction.create({
     data: {
       bin: bin,
       itemId,
-      messageId: messageId,
+      messageId: (message as Message).id,
       itemAmount: itemAmount,
       ownerId: member.user.id,
     },
   });
 
-  checkWatchers(itemId, messageUrl, member.user.id, bin / itemAmount);
+  checkWatchers(itemId, (message as Message).url, member.user.id, bin / itemAmount);
 
   addStat(member.user.id, "auction-created");
 
-  return messageUrl;
+  return (message as Message).url;
 }
 
 export async function bumpAuction(id: number, client: NypsiClient) {
