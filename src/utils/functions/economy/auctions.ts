@@ -190,6 +190,7 @@ export async function createAuction(
       { context: { embed: embed.toJSON(), row: buttonRow.toJSON(), cluster: cluster } },
     )
     .then((res) => {
+      console.log(res);
       res.filter((i) => Boolean(i));
       return res[0];
     });
