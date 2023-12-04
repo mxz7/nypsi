@@ -118,8 +118,7 @@ export async function openKarmaShop(client: NypsiClient, now = false) {
         },
       )
       .then((res) => {
-        res.filter((i) => Boolean(i));
-        return res[0];
+        return res.filter((i) => Boolean(i));
       });
   };
 
