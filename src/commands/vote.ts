@@ -85,8 +85,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     embed.setColor(Constants.EMBED_SUCCESS_COLOR);
     embed.setDescription(
       `you can vote again <t:${nextVote}:R>\n\nyou've voted **${votes.monthVote}** time${
-        votes.monthVote > 1 ? "s" : ""
-      } this month and **${votes.seasonVote}** time${votes.seasonVote > 1 ? "s" : ""} this season`,
+        votes.monthVote === 1 ? "" : "s"
+      } this month and **${votes.seasonVote}** time${
+        votes.seasonVote === 1 ? "" : "s"
+      } this season`,
     );
     send({ embeds: [embed] });
   } else {
