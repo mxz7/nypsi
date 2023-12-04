@@ -309,6 +309,8 @@ async function run(
 
       await dataDelete(message.author.id);
 
+      await addCooldown(cmd.name + "_delete", message.member, Math.floor(ms("1 week") / 1000));
+
       embed.setDescription("your data has been deleted");
 
       await m.edit({ embeds: [embed] });
