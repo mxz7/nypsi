@@ -1481,6 +1481,159 @@ export async function topCommandUsesGlobal(userId: string) {
   return { pages, pos };
 }
 
+export async function topVote(guild: Guild, userId?: string) {
+  let members: Collection<string, GuildMember>;
+
+  if (guild.memberCount == guild.members.cache.size) {
+    members = guild.members.cache;
+  } else {
+    members = await guild.members.fetch();
+  }
+
+  if (!members) members = guild.members.cache;
+
+  members = members.filter((m) => {
+    return !m.user.bot;
+  });
+
+  const query = await prisma.economy.findMany({
+    where: {
+      AND: [
+        { OR: [{ monthVote: { gt: 0 } }, { seasonVote: { gt: 0 } }] },
+        { userId: { in: Array.from(members.keys()) } },
+        { user: { blacklisted: false } },
+      ],
+    },
+    select: {
+      userId: true,
+      monthVote: true,
+      seasonVote: true,
+      banned: true,
+    },
+    orderBy: {
+      seasonVote: "desc",
+    },
+    take: 100,
+  });
+
+  const out = [];
+
+  let count = 0;
+
+  const userIds = query.map((i) => i.userId);
+
+  for (const user of query) {
+    if (user.banned && dayjs().isBefore(user.banned)) {
+      userIds.splice(userIds.indexOf(user.userId), 1);
+      continue;
+    }
+
+    let pos = (count + 1).toString();
+
+    if (pos == "1") {
+      pos = "🥇";
+    } else if (pos == "2") {
+      pos = "🥈";
+    } else if (pos == "3") {
+      pos = "🥉";
+    } else {
+      pos += ".";
+    }
+
+    out[count] = `${pos} ${await formatUsername(
+      user.userId,
+      members.get(user.userId).user.username,
+      true,
+    )} ${user.seasonVote.toLocaleString()} | ${user.monthVote.toLocaleString()}`;
+
+    count++;
+  }
+
+  const pages = PageManager.createPages(out);
+
+  let pos = 0;
+
+  if (userId) {
+    pos = userIds.indexOf(userId) + 1;
+  }
+
+  return { pages, pos };
+}
+
+export async function topVoteGlobal(userId: string, amount = 100) {
+  const query = await prisma.economy.findMany({
+    where: {
+      AND: [
+        { user: { blacklisted: false } },
+        { OR: [{ monthVote: { gt: 0 } }, { seasonVote: { gt: 0 } }] },
+      ],
+    },
+    select: {
+      userId: true,
+      monthVote: true,
+      seasonVote: true,
+      banned: true,
+      user: {
+        select: {
+          lastKnownUsername: true,
+        },
+      },
+    },
+    orderBy: {
+      seasonVote: "desc",
+    },
+    take: amount,
+  });
+
+  const usersFinal = [];
+
+  let count = 0;
+
+  for (const user of query) {
+    if (count >= amount) break;
+    if (usersFinal.join().length >= 1500) break;
+
+    if (user.banned && dayjs().isBefore(user.banned)) {
+      continue;
+    }
+
+    let pos = (count + 1).toString();
+
+    if (pos == "1") {
+      pos = "🥇";
+    } else if (pos == "2") {
+      pos = "🥈";
+    } else if (pos == "3") {
+      pos = "🥉";
+    } else {
+      pos += ".";
+    }
+
+    usersFinal[count] = `${pos} ${await formatUsername(
+      user.userId,
+      user.user.lastKnownUsername,
+      (await getPreferences(user.userId)).leaderboards,
+    )} ${user.seasonVote.toLocaleString()} | ${user.monthVote.toLocaleString()}`;
+
+    count++;
+  }
+
+  checkLeaderboardPositions(
+    query.map((i) => i.userId),
+    "vote",
+  );
+
+  const pages = PageManager.createPages(usersFinal);
+
+  let pos = 0;
+
+  if (userId) {
+    pos = query.map((i) => i.userId).indexOf(userId) + 1;
+  }
+
+  return { pages, pos };
+}
+
 async function formatUsername(id: string, username: string, privacy: boolean) {
   if (!privacy) return "[**[hidden]**](https://docs.nypsi.xyz/economy/hidden)";
 

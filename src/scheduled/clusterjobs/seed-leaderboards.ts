@@ -7,6 +7,7 @@ import {
   topItemGlobal,
   topNetWorthGlobal,
   topPrestigeGlobal,
+  topVoteGlobal,
   topWordleGlobal,
 } from "../../utils/functions/economy/top";
 import { getItems } from "../../utils/functions/economy/utils";
@@ -19,19 +20,21 @@ async function leaderboardThing() {
   const start = Date.now();
   const itemIds = Object.keys(getItems());
 
-  await topBalanceGlobal(1000);
+  await topBalanceGlobal(100);
   await sleep(1000);
-  await topDailyStreakGlobal("", 1000);
+  await topDailyStreakGlobal("", 100);
   await sleep(1000);
-  await topPrestigeGlobal("", 1000);
+  await topPrestigeGlobal("", 100);
   await sleep(1000);
-  await topNetWorthGlobal("", 1000);
+  await topNetWorthGlobal("", 100);
   await sleep(1000);
   await topWordleGlobal("");
+  await sleep(1000);
+  await topVoteGlobal("", 100);
 
   for (const item of itemIds) {
     await sleep(1000);
-    await topItemGlobal(item, "", 1000);
+    await topItemGlobal(item, "", 100);
     await calcItemValue(item);
   }
 

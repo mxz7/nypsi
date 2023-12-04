@@ -126,12 +126,18 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
     return logger.error(`${user} already voted`);
   }
 
-  await prisma.economy.update({
+  const votes = await prisma.economy.update({
     where: {
       userId: user,
     },
     data: {
       lastVote: new Date(now),
+      monthVote: { increment: 1 },
+      seasonVote: { increment: 1 },
+    },
+    select: {
+      monthVote: true,
+      seasonVote: true,
     },
   });
 
@@ -219,7 +225,12 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
           `+ **${crateAmount}** vote crate${crateAmount != 1 ? "s" : ""}` +
           `${
             tickets.length <= Constants.LOTTERY_TICKETS_MAX - 1 ? "\n+ **1** lottery ticket" : ""
-          }`,
+          }\n\n` +
+          `you have voted ${votes.monthVote} time${
+            votes.monthVote < 1 ? "s" : ""
+          } this month and ${votes.seasonVote.toLocaleString()} time${
+            votes.seasonVote < 1 ? "s" : ""
+          } this season`,
       )
       .setFooter({ text: `+${xp}xp` });
 

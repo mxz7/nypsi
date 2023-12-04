@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Economy" ADD COLUMN     "monthVote" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "seasonVote" INTEGER NOT NULL DEFAULT 0;
