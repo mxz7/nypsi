@@ -20,7 +20,7 @@ import {
   getUncompletedAchievements,
   getUserAchievement,
 } from "../utils/functions/economy/achievements";
-import { getAchievements, getItems } from "../utils/functions/economy/utils";
+import { getAchievements, getItems, getTagsData } from "../utils/functions/economy/utils";
 import PageManager from "../utils/functions/page";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
@@ -316,11 +316,17 @@ async function run(
         "reward",
         selected.prize
           .map((prize) => {
-            const amount = parseInt(prize.split(":")[1]);
+            if (prize.startsWith("tag:")) {
+              return `${getTagsData()[prize.split("tag:")[1]].emoji} ${
+                getTagsData()[prize.split("tag:")[1]].name
+              } tag`;
+            } else {
+              const amount = parseInt(prize.split(":")[1]);
 
-            return `\`${amount}x\` ${getItems()[prize.split(":")[0]].emoji} ${
-              getItems()[prize.split(":")[0]].name
-            }`;
+              return `\`${amount}x\` ${getItems()[prize.split(":")[0]].emoji} ${
+                getItems()[prize.split(":")[0]].name
+              }`;
+            }
           })
           .join("\n"),
       );

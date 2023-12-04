@@ -9,8 +9,16 @@ import { getEmbedColor } from "../premium/color";
 import { percentChance } from "../random";
 import { addNotificationToQueue, getDmSettings, getPreferences } from "../users/notifications";
 import { getLastKnownAvatar, getLastKnownUsername } from "../users/tag";
+import { addTag } from "../users/tags";
 import { addInventoryItem } from "./inventory";
-import { createUser, getAchievements, getItems, isEcoBanned, userExists } from "./utils";
+import {
+  createUser,
+  getAchievements,
+  getItems,
+  getTagsData,
+  isEcoBanned,
+  userExists,
+} from "./utils";
 import { getXp, updateXp } from "./xp";
 import ms = require("ms");
 
@@ -184,16 +192,25 @@ async function completeAchievement(userId: string, achievementId: string) {
   if (achievements[achievementId].prize) {
     const prizes: string[] = [];
     for (const prize of achievements[achievementId].prize) {
-      const amount = parseInt(prize.split(":")[1]);
+      if (prize.startsWith("tag:")) {
+        await addTag(userId, prize.split("tag:")[1]).catch(() => null);
+        prizes.push(
+          `+ ${getTagsData()[prize.split("tag:")[1]].emoji} ${
+            getTagsData()[prize.split("tag:")[1]].name
+          } tag`,
+        );
+      } else {
+        const amount = parseInt(prize.split(":")[1]);
 
-      if (!amount) break;
+        if (!amount) break;
 
-      await addInventoryItem(userId, prize.split(":")[0], amount, false);
-      prizes.push(
-        `+ \`${amount}x\` ${getItems()[prize.split(":")[0]].emoji} ${
-          getItems()[prize.split(":")[0]].name
-        }`,
-      );
+        await addInventoryItem(userId, prize.split(":")[0], amount, false);
+        prizes.push(
+          `+ \`${amount}x\` ${getItems()[prize.split(":")[0]].emoji} ${
+            getItems()[prize.split(":")[0]].name
+          }`,
+        );
+      }
     }
 
     userEmbed.setDescription((userEmbed.data.description += `\n ${prizes.join("\n")}`));
