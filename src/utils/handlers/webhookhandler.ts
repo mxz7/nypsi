@@ -132,6 +132,8 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
     },
     data: {
       lastVote: new Date(now),
+      monthVote: { increment: 1 },
+      seasonVote: { increment: 1 },
     },
   });
 
