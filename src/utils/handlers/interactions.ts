@@ -5,6 +5,7 @@ import { CustomEmbed, ErrorEmbed } from "../../models/EmbedBuilders";
 import { AutocompleteHandler, InteractionHandler } from "../../types/InteractionHandler";
 import Constants from "../Constants";
 import { getReactionRolesByGuild } from "../functions/guilds/reactionroles";
+import { createProfile, hasProfile } from "../functions/users/utils";
 import { logger } from "../logger";
 
 const autocompleteHandlers = new Map<string, AutocompleteHandler>();
@@ -47,6 +48,8 @@ export async function runInteraction(interaction: Interaction) {
   if (interaction.isAutocomplete()) {
     return autocompleteHandlers.get(interaction.options.getFocused(true).name)?.run(interaction);
   } else if (interaction.isMessageComponent() && !interactionHandlers.has(interaction.customId)) {
+    if (!(await hasProfile(interaction.user.id))) await createProfile(interaction.user);
+
     if (
       (await redis.exists(`${Constants.redis.nypsi.PROFILE_TRANSFER}:${interaction.user.id}`)) &&
       (interaction.isButton() ? interaction.customId !== "t-f-p-boobies" : true)
