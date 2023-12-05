@@ -167,6 +167,8 @@ export async function userExists(member: GuildMember | string): Promise<boolean>
       : false;
   }
 
+  if (!(await hasProfile(id))) await createProfile(id);
+
   const query = await prisma.economy.findUnique({
     where: {
       userId: id,
