@@ -226,7 +226,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
           `${
             tickets.length <= Constants.LOTTERY_TICKETS_MAX - 1 ? "\n+ **1** lottery ticket" : ""
           }\n\n` +
-          `you have voted **${votes.monthVote}** time${votes.monthVote < 1 ? "s" : ""} this month`,
+          `you have voted **${votes.monthVote}** time${votes.monthVote > 1 ? "s" : ""} this month`,
       )
       .setFooter({ text: `+${xp}xp` });
 
