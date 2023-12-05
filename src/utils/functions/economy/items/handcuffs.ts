@@ -12,7 +12,7 @@ import { getDisabledCommands } from "../../guilds/disabledcommands";
 import { getMember } from "../../member";
 import { getInventory, setInventoryItem } from "../inventory";
 import { isPassive } from "../passive";
-import { addHandcuffs, isHandcuffed } from "../utils";
+import { addHandcuffs, createUser, isHandcuffed, userExists } from "../utils";
 
 module.exports = new ItemUse(
   "handcuffs",
@@ -69,6 +69,8 @@ module.exports = new ItemUse(
         embeds: [new ErrorEmbed(`**${handcuffsTarget.user.username}** is already restrained`)],
       });
     }
+
+    if (!(await userExists(handcuffsTarget))) await createUser(handcuffsTarget);
 
     if (await isPassive(handcuffsTarget))
       return send({
