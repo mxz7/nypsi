@@ -1512,6 +1512,7 @@ export async function topVote(guild: Guild, userId?: string) {
     },
     orderBy: {
       seasonVote: "desc",
+      lastVote: "asc",
     },
     take: 100,
   });
@@ -1581,6 +1582,7 @@ export async function topVoteGlobal(userId: string, amount = 100) {
     },
     orderBy: {
       seasonVote: "desc",
+      lastVote: "asc",
     },
     take: amount,
   });
