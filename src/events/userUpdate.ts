@@ -3,6 +3,7 @@ import { NypsiClient } from "../models/Client";
 import { getRawLevel } from "../utils/functions/economy/levelling";
 import { userExists } from "../utils/functions/economy/utils";
 import { uploadImage } from "../utils/functions/image";
+import { clearMemberCache } from "../utils/functions/member";
 import { addNewAvatar, addNewUsername, isTracking } from "../utils/functions/users/history";
 import { updateLastKnownUsername } from "../utils/functions/users/tag";
 import { hasProfile } from "../utils/functions/users/utils";
@@ -11,6 +12,10 @@ const queue: User[] = [];
 let interval: NodeJS.Timeout;
 
 export default async function userUpdate(oldUser: User, newUser: User) {
+  oldUser.client.guilds.cache
+    .filter((g) => g.members.cache.has(oldUser.id))
+    .forEach((g) => clearMemberCache(g.id));
+
   if (oldUser.username != newUser.username) {
     if (await hasProfile(newUser.id)) {
       if (!(await determineCluster(newUser.client as NypsiClient, newUser.id))) return;
