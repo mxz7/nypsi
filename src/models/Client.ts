@@ -113,7 +113,7 @@ export class NypsiClient extends Client {
       this.on("emojiDelete", emojiDelete.bind(null));
       this.on("emojiUpdate", emojiUpdate.bind(null));
 
-      this.cluster.on("message", (message: any) => {
+      this.cluster.on("message", async (message: any) => {
         if (message._type) {
           if (message.responsive) {
             const guilds = this.guilds.cache.mapValues((i) => {
@@ -131,7 +131,15 @@ export class NypsiClient extends Client {
                 lastPing: shard.lastPingTimestamp,
               };
             });
-            message.reply({ responsive: true, guilds, shards });
+            message.reply({
+              responsive: true,
+              guilds,
+              shards,
+              restarting: Boolean(
+                await redis.exists(`${Constants.redis.nypsi.RESTART}:${this.cluster.id}`),
+              ),
+              uptime: this.uptime,
+            });
           }
         }
       });

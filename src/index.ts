@@ -140,7 +140,7 @@ export async function checkStatus() {
     cluster: Cluster.Cluster,
   ): Promise<{ online: boolean; responsive: boolean; id: number }> {
     return new Promise((resolve) => {
-      const response: {
+      let response: {
         responsive: boolean;
         online: boolean;
         id: number;
@@ -164,9 +164,7 @@ export async function checkStatus() {
 
           cluster.request({ responsive: true }).then((res: any) => {
             if (res.responsive) {
-              response.responsive = true;
-              response.guilds = res.guilds;
-              response.shards = res.shards;
+              response = { ...response, ...res };
             }
             resolve(response);
           });
@@ -177,9 +175,11 @@ export async function checkStatus() {
 
   const response: {
     main: boolean;
+    maintenance: boolean;
     clusters: { online: boolean; responsive: boolean; id: number }[];
   } = {
     main: true,
+    maintenance: (await redis.get("nypsi:maintenance")) == "t",
     clusters: [],
   };
 
