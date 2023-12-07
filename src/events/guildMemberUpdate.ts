@@ -1,10 +1,13 @@
 import { GuildMember, Role } from "discord.js";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
+import { clearMemberCache } from "../utils/functions/member";
 import { addLog, isLogsEnabled } from "../utils/functions/moderation/logs";
 import { isBooster, setBooster } from "../utils/functions/premium/boosters";
 
 export default async function guildMemberUpdate(oldMember: GuildMember, newMember: GuildMember) {
+  clearMemberCache(oldMember.guild.id);
+
   const oldRoleIds = Array.from(oldMember.roles.cache.keys());
   const newRoleIds = Array.from(newMember.roles.cache.keys());
 
