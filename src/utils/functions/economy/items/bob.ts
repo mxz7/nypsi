@@ -10,6 +10,7 @@ import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
 import { MStoTime } from "../../date";
 import sleep from "../../sleep";
+import { getCraftingItems } from "../crafting";
 import { getInventory, setInventoryItem } from "../inventory";
 import { formatNumber, getItems } from "../utils";
 import dayjs = require("dayjs");
@@ -117,6 +118,8 @@ module.exports = new ItemUse(
         },
       });
     }
+
+    getCraftingItems(message.member);
 
     const msg = await send({
       embeds: [
