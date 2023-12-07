@@ -199,14 +199,15 @@ export async function createUser(member: GuildMember | string) {
 
   if (!id) return;
 
-  if (await redis.exists(`${Constants.redis.nypsi.PROFILE_TRANSFER}:${id}`))
-    if (!(await hasProfile(id))) {
-      if (member instanceof GuildMember) {
-        await createProfile(member.user);
-      } else {
-        await createProfile(id);
-      }
+  if (await redis.exists(`${Constants.redis.nypsi.PROFILE_TRANSFER}:${id}`)) return;
+
+  if (!(await hasProfile(id))) {
+    if (member instanceof GuildMember) {
+      await createProfile(member.user);
+    } else {
+      await createProfile(id);
     }
+  }
 
   await prisma.economy.create({
     data: {
