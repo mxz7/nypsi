@@ -5,11 +5,13 @@ import { CustomEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { daysAgo, formatDate } from "../utils/functions/date";
 import { getPersistentRoles } from "../utils/functions/guilds/roles";
+import { clearMemberCache } from "../utils/functions/member";
 import { addLog, isLogsEnabled } from "../utils/functions/moderation/logs";
 import { isBooster, setBooster } from "../utils/functions/premium/boosters";
 import { fetchUsernameHistory } from "../utils/functions/users/history";
 
 export default async function guildMemberRemove(member: GuildMember) {
+  clearMemberCache(member.guild.id);
   await redis.del(`${Constants.redis.cache.guild.JOIN_ORDER}:${member.guild.id}`);
 
   if (await isLogsEnabled(member.guild)) {

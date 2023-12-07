@@ -1,8 +1,10 @@
 import { GuildMember } from "discord.js";
+import prisma from "../init/database";
 import redis from "../init/redis";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { daysAgo, formatDate } from "../utils/functions/date";
+import { isAltPunish } from "../utils/functions/guilds/altpunish";
 import {
   getAutoJoinRoles,
   getPersistentRoles,
@@ -11,20 +13,20 @@ import {
   setPersistentRoles,
 } from "../utils/functions/guilds/roles";
 import { createGuild, hasGuild, runCheck } from "../utils/functions/guilds/utils";
+import { clearMemberCache } from "../utils/functions/member";
+import { getAllGroupAccountIds } from "../utils/functions/moderation/alts";
+import { isBanned, newBan } from "../utils/functions/moderation/ban";
 import { addLog, isLogsEnabled } from "../utils/functions/moderation/logs";
 import { deleteMute, getMuteRole, isMuted, newMute } from "../utils/functions/moderation/mute";
 import { profileExists } from "../utils/functions/moderation/utils";
 import sleep from "../utils/functions/sleep";
 import { fetchUsernameHistory } from "../utils/functions/users/history";
 import { logger } from "../utils/logger";
-import { isAltPunish } from "../utils/functions/guilds/altpunish";
-import { getAllGroupAccountIds } from "../utils/functions/moderation/alts";
-import prisma from "../init/database";
-import { isBanned, newBan } from "../utils/functions/moderation/ban";
 
 const queue = new Set<string>();
 
 export default async function guildMemberAdd(member: GuildMember) {
+  clearMemberCache(member.guild.id);
   if (!(await hasGuild(member.guild))) await createGuild(member.guild);
 
   await redis.del(`${Constants.redis.cache.guild.JOIN_ORDER}:${member.guild.id}`);

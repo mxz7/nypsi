@@ -2,7 +2,33 @@ import { Collection, Guild, GuildMember, Role } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { compareTwoStrings } from "string-similarity";
 import Constants from "../Constants";
+import { logger } from "../logger";
 import chooseMember from "./workers/choosemember";
+import ms = require("ms");
+
+const memberCache = new Map<string, Map<string, { userId: string; expire: number }>>();
+
+export function clearMemberCache(guildId?: string) {
+  if (guildId) memberCache.delete(guildId);
+  else memberCache.clear();
+}
+
+setInterval(() => {
+  let count = 0;
+
+  for (const [guildId, map] of memberCache.entries()) {
+    for (const [search, user] of map.entries()) {
+      if (user.expire < Date.now()) {
+        count++;
+        map.delete(search);
+      }
+    }
+
+    if (map.size === 0) memberCache.delete(guildId);
+  }
+
+  if (count > 0) logger.debug(`${count.toLocaleString()} member find cache entries deleted`);
+}, ms("30 minutes"));
 
 export async function getMember(guild: Guild, memberName: string): Promise<GuildMember> {
   if (!guild) return null;
@@ -23,11 +49,17 @@ export async function getMember(guild: Guild, memberName: string): Promise<Guild
     members = await guild.members.fetch();
   }
 
-  let target: GuildMember;
-  const scores: { id: string; score: number }[] = [];
   memberName = memberName.toLowerCase();
 
-  const before = performance.now();
+  const cacheHit = memberCache.get(guild.id)?.get(memberName);
+
+  if (cacheHit) {
+    if (cacheHit.expire < Date.now()) memberCache.get(guild.id).delete(memberName);
+    return members.get(cacheHit.userId);
+  }
+
+  let target: GuildMember;
+  const scores: { id: string; score: number }[] = [];
 
   if (members.size > 2000) {
     const id = await chooseMember(members, memberName);
@@ -75,6 +107,19 @@ export async function getMember(guild: Guild, memberName: string): Promise<Guild
 
     if (!target && scores.length > 0) {
       target = members.get(inPlaceSort(scores).desc((i) => i.score)[0]?.id);
+    }
+  }
+
+  if (target?.id) {
+    if (memberCache.get(guild.id)) {
+      memberCache
+        .get(guild.id)
+        .set(memberName, { userId: target.id, expire: Date.now() + ms("15 minutes") });
+    } else {
+      memberCache.set(
+        guild.id,
+        new Map([[memberName, { userId: target.id, expire: Date.now() + ms("15 minutes") }]]),
+      );
     }
   }
 
