@@ -191,7 +191,5 @@ export async function checkStatus() {
 
   await Promise.all(promises).then((r) => (response.clusters = r));
 
-  console.log(response);
-
   return response;
 }
