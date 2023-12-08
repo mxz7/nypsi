@@ -35,6 +35,30 @@ model User {
   ActiveChannels ActiveChannels[]
   KofiPurchases  KofiPurchases[]
   Tags           Tags[]
+  Views          ProfileView[]
+  Viewed         ProfileView[]    @relation(name: "viewer")
+}
+
+model ProfileView {
+  id String @id @default(uuid())
+
+  userId    String
+  createdAt DateTime @default(now())
+
+  source   ProfileViewSource
+  viewerId String?
+  viewerIp String?
+  referrer String?
+
+  viewer User? @relation(fields: [viewerId], references: [id], name: "viewer", onDelete: SetNull)
+  user   User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+enum ProfileViewSource {
+  WEB
+  BOT
 }
 
 model Tags {
