@@ -8,6 +8,7 @@ import redis from "../init/redis";
 import Constants from "../utils/Constants";
 import { getMember } from "../utils/functions/member";
 import { fetchUsernameHistory } from "../utils/functions/users/history";
+import { addView } from "../utils/functions/users/views";
 import workerSort from "../utils/functions/workers/sort";
 import { logger } from "../utils/logger";
 
@@ -149,6 +150,8 @@ async function run(
   }
 
   message.channel.send({ embeds: [embed] });
+
+  addView(member.user.id, message.author.id, `user in ${message.guild.id}`);
 }
 
 cmd.setRun(run);
