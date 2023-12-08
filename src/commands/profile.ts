@@ -167,6 +167,7 @@ async function run(
       guild,
       tags,
       views,
+      upgrades,
     ] = await Promise.all([
       getBalance(target),
       getPrestige(target),
@@ -181,6 +182,7 @@ async function run(
       getGuildByUser(target),
       getTags(target.id),
       getViews(target.id),
+      getUpgrades(target),
     ]);
 
     embed.setFields([]);
@@ -247,18 +249,23 @@ async function run(
           .setStyle(level >= 100 ? ButtonStyle.Success : ButtonStyle.Danger),
       );
 
+    if (upgrades.length > 0)
+      row.addComponents(
+        new ButtonBuilder()
+          .setCustomId("p-upg")
+          .setLabel("upgrades")
+          .setEmoji("💫")
+          .setStyle(ButtonStyle.Primary),
+      );
+
     row.addComponents(
-      new ButtonBuilder()
-        .setCustomId("p-upg")
-        .setLabel("upgrades")
-        .setEmoji("💫")
-        .setStyle(ButtonStyle.Primary),
       new ButtonBuilder()
         .setCustomId("p-mul")
         .setLabel("multiplier")
         .setEmoji("🌟")
         .setStyle(ButtonStyle.Primary),
     );
+
     if (tags.length > 0)
       row.addComponents(
         new ButtonBuilder()
