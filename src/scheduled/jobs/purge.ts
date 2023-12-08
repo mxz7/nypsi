@@ -81,5 +81,14 @@ import prisma from "../../init/database";
     parentPort.postMessage("reset wholesome suggestion count");
   }
 
+  const views = await prisma.profileView.deleteMany({
+    where: {
+      createdAt: { lte: dayjs().subtract(30, "day").toDate() },
+    },
+  });
+
+  if (views.count > 0)
+    parentPort.postMessage(`${views.count.toLocaleString()} monthly views purged`);
+
   process.exit(0);
 })();

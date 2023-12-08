@@ -193,6 +193,14 @@ async function run(
             ActiveChannels: true,
             Leaderboards: true,
             Tags: true,
+            Views: {
+              select: {
+                createdAt: true,
+                id: true,
+                referrer: true,
+                source: true,
+              },
+            },
           },
         }),
         moderation: {
