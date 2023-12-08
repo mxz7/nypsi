@@ -25,13 +25,25 @@ module.exports = new ItemUse(
   async (message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) => {
     const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
       if (!(message instanceof Message)) {
+        let usedNewMessage = false;
+        let res;
+
         if (message.deferred) {
-          await message.editReply(data);
+          res = await message.editReply(data).catch(async () => {
+            usedNewMessage = true;
+            return await message.channel.send(data as BaseMessageOptions);
+          });
         } else {
-          await message.reply(data as InteractionReplyOptions).catch(() => {
-            return message.editReply(data);
+          res = await message.reply(data as InteractionReplyOptions).catch(() => {
+            return message.editReply(data).catch(async () => {
+              usedNewMessage = true;
+              return await message.channel.send(data as BaseMessageOptions);
+            });
           });
         }
+
+        if (usedNewMessage && res instanceof Message) return res;
+
         const replyMsg = await message.fetchReply();
         if (replyMsg instanceof Message) {
           return replyMsg;
