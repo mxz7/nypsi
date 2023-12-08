@@ -22,6 +22,7 @@ import { getLevel, getPrestige } from "../utils/functions/economy/levelling.js";
 import { createUser, deleteUser, getItems, userExists } from "../utils/functions/economy/utils.js";
 import { getMember } from "../utils/functions/member.js";
 import { getNypsiBankBalance, getTax, getTaxRefreshTime } from "../utils/functions/tax.js";
+import { addView } from "../utils/functions/users/views";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("balance", "check your balance", "money").setAliases([
@@ -197,7 +198,9 @@ async function run(
     `https://nypsi.xyz/user/${target.id}`,
   );
 
-  return send({ embeds: [embed] });
+  send({ embeds: [embed] });
+
+  addView(target.user.id, message.author.id, `balance in ${message.guild.id}`);
 }
 
 cmd.setRun(run);

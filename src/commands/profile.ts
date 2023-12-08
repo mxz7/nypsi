@@ -49,6 +49,7 @@ import { percentChance } from "../utils/functions/random";
 import { isUserBlacklisted } from "../utils/functions/users/blacklist";
 import { getActiveTag, getTags } from "../utils/functions/users/tags";
 import { hasProfile } from "../utils/functions/users/utils";
+import { addView, getViews } from "../utils/functions/users/views";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("profile", "view yours or someone's nypsi profile", "money").setAliases([
@@ -165,6 +166,7 @@ async function run(
       xp,
       guild,
       tags,
+      views,
     ] = await Promise.all([
       getBalance(target),
       getPrestige(target),
@@ -178,15 +180,14 @@ async function run(
       getXp(target),
       getGuildByUser(target),
       getTags(target.id),
+      getViews(target.id),
     ]);
 
     embed.setFields([]);
     row.setComponents([]);
     let padlockStatus = false;
 
-    if (target.user.id == message.author.id && padlock) {
-      padlockStatus = true;
-    }
+    if (target.user.id == message.author.id && padlock) padlockStatus = true;
 
     let gemLine = "";
 
@@ -233,6 +234,9 @@ async function run(
           `${guild.members.length} member${guild.members.length > 1 ? "s" : ""}`,
         true,
       );
+
+    if (views.length > 25)
+      embed.setFooter({ text: `${views.length.toLocaleString()} monthly views` });
 
     if (target.id === message.author.id)
       row.addComponents(
@@ -535,6 +539,8 @@ async function run(
     }
   };
   awaitButton();
+
+  addView(target.user.id, message.author.id, `profile in ${message.guild.id}`);
 }
 
 cmd.setRun(run);
