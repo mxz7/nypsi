@@ -14,6 +14,8 @@ import { listen } from "./utils/handlers/webhookhandler";
 import { getWebhooks, logger, setClusterId } from "./utils/logger";
 import ms = require("ms");
 
+const start = Date.now();
+
 setClusterId("main");
 getWebhooks();
 process.title = `nypsi v${getVersion()}: main`;
@@ -156,7 +158,7 @@ export async function checkStatus() {
 
       setTimeout(() => {
         resolve(response);
-      }, 5000);
+      }, 2000);
 
       cluster.request({ alive: true }).then((res: any) => {
         if (res.alive) {
@@ -176,11 +178,13 @@ export async function checkStatus() {
   const response: {
     main: boolean;
     maintenance: boolean;
+    uptime: number;
     clusters: { online: boolean; responsive: boolean; id: number }[];
   } = {
     main: true,
     maintenance: (await redis.get("nypsi:maintenance")) == "t",
     clusters: [],
+    uptime: Date.now() - start,
   };
 
   const promises = [];
