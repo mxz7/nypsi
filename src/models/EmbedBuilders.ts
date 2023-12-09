@@ -70,8 +70,8 @@ export class CustomEmbed extends EmbedBuilder {
       text = text.substring(0, 1000);
     }
 
-    if (super.data?.fields) {
-      super.data.fields.push({ name: title, value: text, inline: inline });
+    if (this.data?.fields) {
+      this.data.fields.push({ name: title, value: text, inline: inline });
     } else {
       super.addFields([{ name: title, value: text, inline: inline }]);
     }
@@ -156,8 +156,8 @@ export class ErrorEmbed extends EmbedBuilder {
       text = text.substring(0, 1000);
     }
 
-    if (super.data?.fields) {
-      super.data.fields.push({ name: title, value: text, inline: inline });
+    if (this.data?.fields) {
+      this.data.fields.push({ name: title, value: text, inline: inline });
     } else {
       super.addFields([{ name: title, value: text, inline: inline }]);
     }
