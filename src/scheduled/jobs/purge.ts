@@ -90,5 +90,5 @@ import prisma from "../../init/database";
   if (views.count > 0)
     parentPort.postMessage(`${views.count.toLocaleString()} monthly views purged`);
 
-  process.exit(0);
+  parentPort.postMessage("done");
 })();

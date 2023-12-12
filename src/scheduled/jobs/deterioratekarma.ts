@@ -74,5 +74,5 @@ import Constants from "../../utils/Constants";
   }
 
   parentPort.postMessage(`${total} total karma deteriorated`);
-  process.exit(0);
+  parentPort.postMessage("done");
 })();

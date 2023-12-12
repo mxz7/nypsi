@@ -82,5 +82,5 @@ import Constants from "../../utils/Constants";
       parentPort.postMessage(`deleted guild ${guild.id} from database`);
     }
   }
-  process.exit(0);
+  parentPort.postMessage("done");
 })();
