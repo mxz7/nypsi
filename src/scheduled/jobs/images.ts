@@ -65,11 +65,18 @@ const lizardLinks = [
 ];
 const rabbitLinks = ["https://www.reddit.com/r/rabbits/top.json?limit=6969&t=month"];
 
+const headers = {
+  "user-agent":
+    "Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Mobile/15E148 Safari/604.1",
+};
+
 async function cacheUpdate(links: string[], name: string) {
   await redis.del(`nypsi:images:${name}`);
 
   for (const link of links) {
-    const res: RedditJSON = await fetch(link).then(async (res) => {
+    await sleep(10000);
+
+    const res: RedditJSON = await fetch(link, { headers }).then(async (res) => {
       if (res.status === 403) {
         parentPort.postMessage(`blocked for ${link}. attempting to fetch again`);
         res = await fetch(link);
@@ -107,8 +114,6 @@ async function cacheUpdate(links: string[], name: string) {
     } else {
       parentPort.postMessage(`no images @ ${link}`);
     }
-
-    await sleep(10000);
   }
 
   await redis.expire(`nypsi:images:${name}`, 604800); // 7 days
@@ -118,21 +123,19 @@ async function cacheUpdate(links: string[], name: string) {
 (async () => {
   process.title = `nypsi v${getVersion()}: images job`;
 
-  await Promise.all([
-    cacheUpdate(bdsmLinks, "bdsm"),
-    cacheUpdate(thighsLinks, "thighs"),
-    cacheUpdate(boobLinks, "boob"),
-    cacheUpdate(assLinks, "ass"),
-    cacheUpdate(pornLinks, "porn"),
-    cacheUpdate(feetLinks, "feet"),
-    cacheUpdate(handLinks, "hands"),
-    cacheUpdate(birbLinks, "birb"),
-    cacheUpdate(catLinks, "cat"),
-    cacheUpdate(dogLinks, "dog"),
-    cacheUpdate(duckLinks, "duck"),
-    cacheUpdate(lizardLinks, "lizard"),
-    cacheUpdate(rabbitLinks, "rabbit"),
-  ]);
+  await cacheUpdate(bdsmLinks, "bdsm");
+  await cacheUpdate(thighsLinks, "thighs");
+  await cacheUpdate(boobLinks, "boob");
+  await cacheUpdate(assLinks, "ass");
+  await cacheUpdate(pornLinks, "porn");
+  await cacheUpdate(feetLinks, "feet");
+  await cacheUpdate(handLinks, "hands");
+  await cacheUpdate(birbLinks, "birb");
+  await cacheUpdate(catLinks, "cat");
+  await cacheUpdate(dogLinks, "dog");
+  await cacheUpdate(duckLinks, "duck");
+  await cacheUpdate(lizardLinks, "lizard");
+  await cacheUpdate(rabbitLinks, "rabbit");
 
   parentPort.postMessage("done");
 })();
