@@ -3,8 +3,11 @@ import { parentPort } from "worker_threads";
 import prisma from "../../init/database";
 import redis from "../../init/redis";
 import Constants from "../../utils/Constants";
+import { getVersion } from "../../utils/functions/version";
 
 (async () => {
+  process.title = `nypsi v${getVersion()}: karma job`;
+
   const now = Date.now();
 
   const threshold = now - ms("6 hours");

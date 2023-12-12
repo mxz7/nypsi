@@ -2,6 +2,7 @@ import { parentPort } from "worker_threads";
 import redis from "../../init/redis";
 import { RedditJSON, RedditJSONPost } from "../../types/Reddit";
 import sleep from "../../utils/functions/sleep";
+import { getVersion } from "../../utils/functions/version";
 
 const bdsmLinks = [
   "https://www.reddit.com/r/bdsm/top.json?limit=6969&t=month",
@@ -115,19 +116,23 @@ async function cacheUpdate(links: string[], name: string) {
 }
 
 (async () => {
-  await cacheUpdate(bdsmLinks, "bdsm");
-  await cacheUpdate(thighsLinks, "thighs");
-  await cacheUpdate(boobLinks, "boob");
-  await cacheUpdate(assLinks, "ass");
-  await cacheUpdate(pornLinks, "porn");
-  await cacheUpdate(feetLinks, "feet");
-  await cacheUpdate(handLinks, "hands");
-  await cacheUpdate(birbLinks, "birb");
-  await cacheUpdate(catLinks, "cat");
-  await cacheUpdate(dogLinks, "dog");
-  await cacheUpdate(duckLinks, "duck");
-  await cacheUpdate(lizardLinks, "lizard");
-  await cacheUpdate(rabbitLinks, "rabbit");
+  process.title = `nypsi v${getVersion()}: images job`;
+
+  await Promise.all([
+    cacheUpdate(bdsmLinks, "bdsm"),
+    cacheUpdate(thighsLinks, "thighs"),
+    cacheUpdate(boobLinks, "boob"),
+    cacheUpdate(assLinks, "ass"),
+    cacheUpdate(pornLinks, "porn"),
+    cacheUpdate(feetLinks, "feet"),
+    cacheUpdate(handLinks, "hands"),
+    cacheUpdate(birbLinks, "birb"),
+    cacheUpdate(catLinks, "cat"),
+    cacheUpdate(dogLinks, "dog"),
+    cacheUpdate(duckLinks, "duck"),
+    cacheUpdate(lizardLinks, "lizard"),
+    cacheUpdate(rabbitLinks, "rabbit"),
+  ]);
 
   parentPort.postMessage("done");
 })();

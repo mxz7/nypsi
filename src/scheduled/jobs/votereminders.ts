@@ -11,9 +11,11 @@ import { CustomEmbed } from "../../models/EmbedBuilders";
 import { NotificationPayload } from "../../types/Notification";
 import Constants from "../../utils/Constants";
 import { addNotificationToQueue } from "../../utils/functions/users/notifications";
+import { getVersion } from "../../utils/functions/version";
 import dayjs = require("dayjs");
 
 (async () => {
+  process.title = `nypsi v${getVersion()}: vote reminders job`;
   const userIds = await prisma.dMSettings.findMany({
     where: {
       AND: [
