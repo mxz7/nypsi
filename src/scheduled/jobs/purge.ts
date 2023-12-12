@@ -2,8 +2,11 @@ import dayjs = require("dayjs");
 import { readFile, readdir, unlink } from "fs/promises";
 import { parentPort } from "worker_threads";
 import prisma from "../../init/database";
+import { getVersion } from "../../utils/functions/version";
 
 (async () => {
+  process.title = `nypsi v${getVersion()}: purge job`;
+
   const old = dayjs().subtract(365, "days").toDate();
 
   const d = await prisma.username.deleteMany({

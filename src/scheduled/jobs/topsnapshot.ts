@@ -1,6 +1,7 @@
 import dayjs = require("dayjs");
 import { parentPort } from "worker_threads";
 import prisma from "../../init/database";
+import { getVersion } from "../../utils/functions/version";
 
 async function doTopBalance() {
   const query = await prisma.economy.findMany({
@@ -266,6 +267,8 @@ async function clearOld() {
 }
 
 (async () => {
+  process.title = `nypsi v${getVersion()}: top snapshot job`;
+
   const count = await Promise.all([
     doTopBalance(),
     doTopNetworth(),
