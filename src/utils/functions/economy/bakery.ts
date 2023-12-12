@@ -289,6 +289,7 @@ export async function runBakery(member: GuildMember) {
   }
 
   addProgress(member.user.id, "baker", Math.round(chosenAmount + passive));
+  addProgress(member.user.id, "super_baker", Math.round(chosenAmount + passive));
 
   return embed;
 }
