@@ -6,8 +6,11 @@ import { NotificationPayload } from "../../types/Notification";
 import Constants from "../../utils/Constants";
 import { percentChance } from "../../utils/functions/random";
 import { addNotificationToQueue } from "../../utils/functions/users/notifications";
+import { getVersion } from "../../utils/functions/version";
 
 (async () => {
+  process.title = `nypsi v${getVersion()}: daily streak job`;
+
   const limit = dayjs().subtract(1, "day").subtract(2, "hours").toDate();
 
   const users = await prisma.economy.findMany({

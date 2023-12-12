@@ -2,8 +2,11 @@ import { variants } from "@catppuccin/palette";
 import { ColorResolvable, EmbedBuilder, WebhookClient } from "discord.js";
 import { parentPort } from "node:worker_threads";
 import redis from "../../init/redis";
+import { getVersion } from "../../utils/functions/version";
 
 (async () => {
+  process.title = `nypsi v${getVersion()}: lottery tickets job`;
+
   const hook = new WebhookClient({
     url: process.env.LOTTERY_HOOK,
   });
@@ -12,6 +15,7 @@ import redis from "../../init/redis";
 
   if (Object.keys(tickets).length == 0) {
     parentPort.postMessage("done");
+    return;
   }
 
   const desc = [];

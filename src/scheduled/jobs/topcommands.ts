@@ -6,8 +6,11 @@ import redis from "../../init/redis";
 import Constants from "../../utils/Constants";
 import { getPreferences } from "../../utils/functions/users/notifications";
 import { getLastKnownUsername } from "../../utils/functions/users/tag";
+import { getVersion } from "../../utils/functions/version";
 
 (async () => {
+  process.title = `nypsi v${getVersion()}: top commands job`;
+
   const [topCommands, topUsers] = await Promise.all([
     redis.hgetall(Constants.redis.nypsi.TOP_COMMANDS),
     redis.hgetall(Constants.redis.nypsi.TOP_COMMANDS_USER),

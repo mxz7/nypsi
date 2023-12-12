@@ -3,8 +3,11 @@ import { parentPort, workerData } from "worker_threads";
 import prisma from "../../init/database";
 import redis from "../../init/redis";
 import Constants from "../../utils/Constants";
+import { getVersion } from "../../utils/functions/version";
 
 (async () => {
+  process.title = `nypsi v${getVersion()}: purge guilds job`;
+
   const guilds: string[] = workerData.guilds;
 
   if (guilds.length < 5000) return parentPort.postMessage("less than 5k guilds. not running.");
