@@ -232,7 +232,7 @@
     "emoji": "🍪",
     "target": 50000,
     "description": "bake 50,000 cookies",
-    "prize": ["nypsi_crate:1"]
+    "prize": ["lucky_scratch_card:5"]
   },
   "wizard_i": {
     "id": "wizard_i",
