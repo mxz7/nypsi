@@ -129,5 +129,5 @@ async function cacheUpdate(links: string[], name: string) {
   await cacheUpdate(lizardLinks, "lizard");
   await cacheUpdate(rabbitLinks, "rabbit");
 
-  process.exit(0);
+  parentPort.postMessage("done");
 })();

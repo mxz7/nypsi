@@ -10,4 +10,5 @@ import prisma from "../../init/database";
   });
 
   parentPort.postMessage(`${query.count} users reset to 0 monthly votes`);
+  parentPort.postMessage("done");
 })();

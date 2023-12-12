@@ -145,5 +145,5 @@ import { addNotificationToQueue } from "../../utils/functions/users/notification
 
   parentPort.postMessage(`${notifications.length} streak notifications sent`);
 
-  process.exit(0);
+  parentPort.postMessage("done");
 })();
