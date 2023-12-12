@@ -92,7 +92,7 @@ export async function topBalance(guild: Guild, userId?: string) {
   return { pages, pos };
 }
 
-export async function topBalanceGlobal(amount: number): Promise<string[]> {
+export async function topBalanceGlobal(amount: number, allowHidden = true): Promise<string[]> {
   const query = await prisma.economy.findMany({
     where: {
       AND: [{ user: { blacklisted: false } }, { money: { gt: 10_000 } }],
@@ -140,7 +140,7 @@ export async function topBalanceGlobal(amount: number): Promise<string[]> {
     usersFinal[count] = `${pos} ${await formatUsername(
       user.userId,
       user.user.lastKnownUsername,
-      (await getPreferences(user.userId)).leaderboards,
+      allowHidden ? (await getPreferences(user.userId)).leaderboards : true,
     )} $${Number(user.money).toLocaleString()}`;
 
     count++;
