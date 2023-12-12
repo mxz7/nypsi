@@ -1,5 +1,6 @@
 import { variants } from "@catppuccin/palette";
 import { ColorResolvable, EmbedBuilder, WebhookClient } from "discord.js";
+import { parentPort } from "node:worker_threads";
 import redis from "../../init/redis";
 
 (async () => {
@@ -10,7 +11,7 @@ import redis from "../../init/redis";
   const tickets = await redis.hgetall("lotterytickets:queue");
 
   if (Object.keys(tickets).length == 0) {
-    process.exit(0);
+    parentPort.postMessage("done");
   }
 
   const desc = [];
@@ -35,5 +36,5 @@ import redis from "../../init/redis";
 
   hook.destroy();
 
-  process.exit(0);
+  parentPort.postMessage("done");
 })();

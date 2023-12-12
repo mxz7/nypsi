@@ -70,7 +70,7 @@ import { getLastKnownUsername } from "../../utils/functions/users/tag";
     .send({ embeds: [embed] })
     .then(() => {
       parentPort.postMessage("sent top commands");
-      process.exit(0);
+      parentPort.postMessage("done");
     })
     .catch(() => {
       parentPort.postMessage("failed to send top commands");
