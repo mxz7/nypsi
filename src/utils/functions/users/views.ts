@@ -2,7 +2,6 @@ import { ProfileViewSource } from "@prisma/client";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import Constants from "../../Constants";
-import { logger } from "../../logger";
 import ms = require("ms");
 import dayjs = require("dayjs");
 
@@ -44,11 +43,7 @@ export async function addView(userId: string, viewerId: string, source: string) 
 
   for (const view of views) {
     if (view.viewerId === viewerId) return;
-    try {
-      if (view.createdAt.getTime() >= dayjs().subtract(1, "minute").toDate().getTime()) return;
-    } catch {
-      logger.debug(`weird view no time think`, views);
-    }
+    if (view.createdAt.getTime() >= dayjs().subtract(1, "minute").toDate().getTime()) return;
   }
 
   await prisma.profileView.create({
