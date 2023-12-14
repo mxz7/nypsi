@@ -28,8 +28,10 @@ export async function getBalance(member: GuildMember | string) {
     id = member;
   }
 
-  if (await redis.exists(`${Constants.redis.cache.economy.BALANCE}:${id}`)) {
-    return parseInt(await redis.get(`${Constants.redis.cache.economy.BALANCE}:${id}`));
+  const cache = await redis.get(`${Constants.redis.cache.economy.BALANCE}:${id}`);
+
+  if (cache) {
+    return parseInt(cache);
   }
 
   const query = await prisma.economy.findUnique({

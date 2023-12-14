@@ -18,8 +18,10 @@ export async function getXp(member: GuildMember | string): Promise<number> {
     id = member;
   }
 
-  if (await redis.exists(`${Constants.redis.cache.economy.XP}:${id}`)) {
-    return parseInt(await redis.get(`${Constants.redis.cache.economy.XP}:${id}`));
+  const cache = await redis.get(`${Constants.redis.cache.economy.XP}:${id}`);
+
+  if (cache) {
+    return parseInt(cache);
   }
 
   const query = await prisma.economy.findUnique({
