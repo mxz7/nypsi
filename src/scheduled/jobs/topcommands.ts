@@ -73,7 +73,7 @@ import { getVersion } from "../../utils/functions/version";
     .send({ embeds: [embed] })
     .then(() => {
       parentPort.postMessage("sent top commands");
-      parentPort.postMessage("done");
+      process.exit(0);
     })
     .catch(() => {
       parentPort.postMessage("failed to send top commands");

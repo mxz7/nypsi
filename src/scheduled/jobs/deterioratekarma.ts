@@ -77,5 +77,5 @@ import { getVersion } from "../../utils/functions/version";
   }
 
   parentPort.postMessage(`${total} total karma deteriorated`);
-  parentPort.postMessage("done");
+  process.exit(0);
 })();
