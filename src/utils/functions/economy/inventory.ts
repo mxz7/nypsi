@@ -44,8 +44,14 @@ export async function getInventory(
     id = member;
   }
 
-  if (await redis.exists(`${Constants.redis.cache.economy.INVENTORY}:${id}`)) {
-    return JSON.parse(await redis.get(`${Constants.redis.cache.economy.INVENTORY}:${id}`)) || [];
+  const cache = await redis.get(`${Constants.redis.cache.economy.INVENTORY}:${id}`);
+
+  if (cache) {
+    try {
+      return JSON.parse(cache) || [];
+    } catch {
+      return [];
+    }
   }
 
   const query = await prisma.inventory
