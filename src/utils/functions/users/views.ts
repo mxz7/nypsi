@@ -45,7 +45,8 @@ export async function addView(userId: string, viewerId: string, source: string) 
   for (const view of views) {
     if (view.viewerId === viewerId) return;
     try {
-      if (view.createdAt.getTime() >= dayjs().subtract(1, "minute").toDate().getTime()) return;
+      if (new Date(view.createdAt).getTime() >= dayjs().subtract(1, "minute").toDate().getTime())
+        return;
     } catch {
       logger.debug(`weird view no time think`, views);
     }
