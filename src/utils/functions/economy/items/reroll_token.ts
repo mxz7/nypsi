@@ -1,14 +1,19 @@
 import {
+  ActionRowBuilder,
   BaseMessageOptions,
+  ButtonBuilder,
+  ButtonStyle,
   CommandInteraction,
   InteractionReplyOptions,
   Message,
+  MessageActionRowComponentBuilder,
+  StringSelectMenuBuilder,
 } from "discord.js";
 import { randomInt } from "mathjs";
 import { NypsiCommandInteraction } from "../../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
-import { UserUpgrade } from "../../../../types/Economy";
+import Constants from "../../../Constants";
 import sleep from "../../sleep";
 import { addInventoryItem, getInventory, setInventoryItem } from "../inventory";
 import { getUpgrades, setUpgrade } from "../levelling";
@@ -17,7 +22,7 @@ import { getUpgradesData } from "../utils";
 
 module.exports = new ItemUse(
   "reroll_token",
-  async (message: Message | (NypsiCommandInteraction & CommandInteraction), args) => {
+  async (message: Message | (NypsiCommandInteraction & CommandInteraction)) => {
     const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
       if (!(message instanceof Message)) {
         let usedNewMessage = false;
@@ -48,7 +53,19 @@ module.exports = new ItemUse(
       }
     };
 
-    const inventory = await getInventory(message.member, false);
+    let [inventory, upgrades] = await Promise.all([
+      getInventory(message.member, false),
+      getUpgrades(message.member),
+    ]);
+
+    const upgradesData = getUpgradesData();
+
+    if (upgrades.length === 0)
+      return send({
+        embeds: [
+          new ErrorEmbed("you have no upgrades to reroll, you must prestige to receive an upgrade"),
+        ],
+      });
 
     if (
       !inventory.find((i) => i.item === "reroll_token") ||
@@ -56,88 +73,144 @@ module.exports = new ItemUse(
     )
       return send({ embeds: [new ErrorEmbed("you don't have a reroll token")] });
 
-    if (args.length < 2)
-      return send({
-        embeds: [new ErrorEmbed("you need to specify an upgrade that you want to reroll")],
-      });
-
-    const search = args.slice(1).join(" ").toLowerCase();
-    let selected: UserUpgrade;
-
-    for (const upgrade of Object.values(getUpgradesData())) {
-      if (search === upgrade.id || search === upgrade.name) selected = upgrade;
-    }
-
-    if (!selected)
-      return send({ embeds: [new ErrorEmbed(`couldn't find an upgrade with the name ${search}`)] });
-
-    const upgrades = await getUpgrades(message.member);
-
-    if (
-      !upgrades.find((i) => i.upgradeId === selected.id) ||
-      upgrades.find((i) => i.upgradeId === selected.id).amount < 1
-    )
-      return send({ embeds: [new ErrorEmbed("you dont have this upgrade")] });
-
-    await setInventoryItem(
+    const embed = new CustomEmbed(
       message.member,
-      "reroll_token",
-      inventory.find((i) => i.item === "reroll_token").amount - 1,
-    );
-    await addStat(message.member, "reroll_token");
+      "which upgrade would you like to reroll?",
+    ).setHeader("reroll token", message.author.avatarURL());
 
-    const upgradesPool: string[] = [];
-    let attempts = 0;
-
-    while (upgradesPool.length === 0 && attempts < 100) {
-      attempts++;
-      for (const upgrade of Object.values(getUpgradesData())) {
-        if (
-          (upgrades.find((i) => i.upgradeId === upgrade.id) &&
-            upgrades.find((i) => i.upgradeId === upgrade.id).amount >= upgrade.max) ||
-          upgrade.id === selected.id
+    const selectMenu = new ActionRowBuilder<MessageActionRowComponentBuilder>().setComponents(
+      new StringSelectMenuBuilder()
+        .setCustomId("upgrade-list")
+        .setOptions(
+          upgrades.map((upgrade) => {
+            return { label: upgradesData[upgrade.upgradeId].name, value: upgrade.upgradeId };
+          }),
         )
-          continue;
+        .setPlaceholder("choose an upgrade"),
+    );
 
-        upgradesPool.push(upgrade.id);
+    const button = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder()
+        .setCustomId("booobies")
+        .setLabel("reroll")
+        .setStyle(ButtonStyle.Success)
+        .setDisabled(true),
+    );
+
+    const msg = await send({ embeds: [embed], components: [selectMenu, button] });
+
+    const reactionManager: any = async () => {
+      const interaction = await msg
+        .awaitMessageComponent({
+          filter: (i) => i.user.id === message.author.id,
+          time: 30000,
+        })
+        .catch(() => {
+          selectMenu.components.forEach((i) => i.setDisabled(true));
+          button.components.forEach((i) => i.setDisabled(true));
+          (button.components[0] as ButtonBuilder).setStyle(ButtonStyle.Danger).setLabel("expired");
+          msg.edit({ components: [selectMenu, button] });
+        });
+
+      if (!interaction) return;
+
+      if (interaction.isStringSelectMenu()) {
+        (selectMenu.components[0] as StringSelectMenuBuilder).options.forEach((option) => {
+          if (option.data.value === interaction.values[0]) option.setDefault(true);
+          else option.setDefault(false);
+        });
+        (button.components[0] as ButtonBuilder).setDisabled(false);
+
+        await interaction.update({ components: [selectMenu, button] });
+
+        return reactionManager();
+      } else if (interaction.isButton()) {
+        [inventory, upgrades] = await Promise.all([
+          getInventory(message.member, false),
+          getUpgrades(message.member),
+        ]);
+
+        if (
+          !inventory.find((i) => i.item === "reroll_token") ||
+          inventory.find((i) => i.item === "reroll_token").amount < 1
+        )
+          return interaction.reply({ embeds: [new ErrorEmbed("you don't have a reroll token")] });
+
+        const chosen = (selectMenu.components[0] as StringSelectMenuBuilder).options.find(
+          (i) => i.data.default,
+        ).data.value;
+
+        if (!chosen) return interaction.reply({ embeds: [new ErrorEmbed("invalid upgrade")] });
+
+        if (
+          !upgrades.find((i) => i.upgradeId === chosen) ||
+          upgrades.find((i) => i.upgradeId === chosen).amount < 1
+        )
+          return interaction.reply({ embeds: [new ErrorEmbed("sneaky sneaky sneaky")] });
+
+        embed.setDescription(
+          `<a:nypsi_reroll_token_spin:1185247632927490069> rerolling **${upgradesData[chosen].name}**...`,
+        );
+
+        await interaction.update({ embeds: [embed], components: [] });
+        await setUpgrade(message.member, chosen, upgrades.find((i) => i.upgradeId).amount - 1);
+        await setInventoryItem(
+          message.member,
+          "reroll_token",
+          inventory.find((i) => i.item === "reroll_token").amount - 1,
+        );
+        await addStat(message.member, "reroll_token", 1);
+
+        const upgradesPool: string[] = [];
+        let attempts = 0;
+
+        while (upgradesPool.length === 0 && attempts < 100) {
+          attempts++;
+          for (const upgrade of Object.values(getUpgradesData())) {
+            if (
+              (upgrades.find((i) => i.upgradeId === upgrade.id) &&
+                upgrades.find((i) => i.upgradeId === upgrade.id).amount >= upgrade.max) ||
+              upgrade.id === chosen
+            )
+              continue;
+
+            upgradesPool.push(upgrade.id);
+          }
+        }
+
+        const selected =
+          upgradesPool.length > 0
+            ? upgradesPool[Math.floor(Math.random() * upgradesPool.length)]
+            : "";
+
+        if (selected) {
+          await setUpgrade(
+            message.member,
+            selected,
+            upgrades.find((i) => i.upgradeId === selected)
+              ? upgrades.find((i) => i.upgradeId === selected).amount + 1
+              : 1,
+          );
+
+          embed.setDescription(
+            `you rerolled **${upgradesData[chosen].name}** into **${upgradesData[selected].name}**`,
+          );
+          embed.setColor(Constants.EMBED_SUCCESS_COLOR);
+        } else {
+          const pieces = randomInt(5, 13);
+          embed.setDescription(
+            `your reroll token failed and shattered into ${pieces} <:nypsi_gem_shard:1088524343367188510> shards`,
+          );
+          embed.setColor(Constants.EMBED_FAIL_COLOR);
+          await addInventoryItem(message.member, "gem_shard", pieces);
+        }
+
+        await sleep(2000);
+
+        return msg.edit({ embeds: [embed] });
       }
-    }
+    };
 
-    const chosen =
-      upgradesPool.length > 0 ? upgradesPool[Math.floor(Math.random() * upgradesPool.length)] : "";
-
-    let desc = "";
-
-    if (chosen) {
-      await setUpgrade(
-        message.member,
-        selected.id,
-        upgrades.find((i) => i.upgradeId === selected.id).amount - 1,
-      );
-
-      await setUpgrade(
-        message.member,
-        chosen,
-        upgrades.find((i) => i.upgradeId === chosen)
-          ? upgrades.find((i) => i.upgradeId === chosen).amount + 1
-          : 1,
-      );
-
-      desc = `you rerolled **${selected.name}** into **${getUpgradesData()[chosen].name}**`;
-    } else {
-      const pieces = randomInt(5, 13);
-      desc = `your reroll token failed and shattered into ${pieces} <:nypsi_gem_shard:1088524343367188510> shards`;
-      await addInventoryItem(message.member, "gem_shard", pieces);
-    }
-
-    const embed = new CustomEmbed(message.member, `rerolling ${selected.name}...`);
-
-    const msg = await send({ embeds: [embed] });
-
-    await sleep(2000);
-
-    embed.setDescription(desc);
-
-    msg.edit({ embeds: [embed] });
+    reactionManager();
   },
 );
