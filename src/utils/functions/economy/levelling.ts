@@ -151,8 +151,10 @@ export async function getPrestige(member: GuildMember | string): Promise<number>
     id = member;
   }
 
-  if (await redis.exists(`${Constants.redis.cache.economy.PRESTIGE}:${id}`)) {
-    return parseInt(await redis.get(`${Constants.redis.cache.economy.PRESTIGE}:${id}`));
+  const cache = await redis.get(`${Constants.redis.cache.economy.PRESTIGE}:${id}`);
+
+  if (cache) {
+    return parseInt(cache);
   }
 
   const query = await prisma.economy.findUnique({
