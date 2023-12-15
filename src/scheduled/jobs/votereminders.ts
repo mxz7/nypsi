@@ -64,5 +64,5 @@ import dayjs = require("dayjs");
 
   if (amount > 0) parentPort.postMessage(`${amount} vote reminders queued`);
 
-  parentPort.postMessage("done");
+  process.exit(0);
 })();

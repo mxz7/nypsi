@@ -93,5 +93,5 @@ import { getVersion } from "../../utils/functions/version";
   if (views.count > 0)
     parentPort.postMessage(`${views.count.toLocaleString()} monthly views purged`);
 
-  parentPort.postMessage("done");
+  process.exit(0);
 })();
