@@ -282,5 +282,5 @@ async function clearOld() {
     `created ${count.reduce((a, b) => a + b).toLocaleString()} entries in graph data`,
   );
 
-  parentPort.postMessage("done");
+  process.exit(0);
 })();

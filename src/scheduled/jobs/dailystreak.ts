@@ -148,5 +148,5 @@ import { getVersion } from "../../utils/functions/version";
 
   parentPort.postMessage(`${notifications.length} streak notifications sent`);
 
-  parentPort.postMessage("done");
+  process.exit(0);
 })();

@@ -85,5 +85,5 @@ import { getVersion } from "../../utils/functions/version";
       parentPort.postMessage(`deleted guild ${guild.id} from database`);
     }
   }
-  parentPort.postMessage("done");
+  process.exit(0);
 })();

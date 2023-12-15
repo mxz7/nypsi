@@ -13,5 +13,5 @@ import { getVersion } from "../../utils/functions/version";
   });
 
   parentPort.postMessage(`${query.count} users reset to 0 monthly votes`);
-  parentPort.postMessage("done");
+  process.exit(0);
 })();
