@@ -49,12 +49,7 @@ const bree = new Bree({
     },
     {
       name: "votereminders",
-      timeout: dayjs()
-        .add(1, "hour")
-        .set("minutes", 10)
-        .set("seconds", 0)
-        .diff(dayjs(), "milliseconds"),
-      interval: "15m",
+      cron: "*/15 * * * *",
     },
     {
       name: "topsnapshot",
