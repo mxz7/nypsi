@@ -11,7 +11,7 @@ async function run(
 ) {
   if (message.author.id !== Constants.TEKOH_ID) return;
 
-  if (args.length == 0) return;
+  if (args.length == 0) return (message.client as NypsiClient).cluster.send("reload_jobs");
 
   (message.client as NypsiClient).cluster.send(`trigger_job_${args[0].toLowerCase()}`);
 }
