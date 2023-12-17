@@ -51,7 +51,7 @@ module.exports = new ItemUse(
 
     if (!target) return send({ embeds: [new ErrorEmbed("invalid member")] });
 
-    const inventory = await getInventory(message.member, false);
+    const inventory = await getInventory(message.member);
 
     if (await redis.exists(`${Constants.redis.nypsi.RICKROLL}:${target.user.id}`))
       return send({

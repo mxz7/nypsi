@@ -215,7 +215,7 @@ export async function createUser(member: GuildMember | string) {
     },
   });
   await redis.del(`${Constants.redis.cache.economy.EXISTS}:${id}`);
-  await addInventoryItem(id, "beginner_booster", 1, false);
+  await addInventoryItem(id, "beginner_booster", 1);
 }
 
 export async function formatBet(bet: string | number, member: GuildMember): Promise<number | void> {
@@ -367,6 +367,9 @@ export async function reset() {
     where: {
       OR: [{ category: "networth" }, { category: "balance" }, { category: { contains: "guild" } }],
     },
+  });
+  await prisma.achievements.deleteMany({
+    where: { achievementId: { startsWith: "collector_" } },
   });
 
   await prisma.economy.deleteMany({

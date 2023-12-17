@@ -105,14 +105,13 @@ module.exports = new ItemUse(
       });
     }
 
-    const inventory = await getInventory(message.member, false);
+    const inventory = await getInventory(message.member);
 
     await Promise.all([
       setInventoryItem(
         message.member,
         "lock_pick",
         inventory.find((i) => i.item == "lock_pick").amount - 1,
-        false,
       ),
       setPadlock(lockPickTarget, false),
     ]);

@@ -211,7 +211,6 @@ async function doFish(
       member,
       fishingRod,
       inventory.find((i) => i.item == fishingRod).amount - 1,
-      false,
     );
   }
 

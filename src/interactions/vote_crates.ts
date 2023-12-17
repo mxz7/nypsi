@@ -31,7 +31,7 @@ export default {
 
     await addCooldown("use", interaction.user.id, 7);
 
-    const inventory = await getInventory(interaction.user.id, false);
+    const inventory = await getInventory(interaction.user.id);
 
     let crateAmount = 0;
     let rawLevel = await getRawLevel(interaction.user.id);

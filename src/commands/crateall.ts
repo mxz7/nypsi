@@ -79,7 +79,7 @@ async function run(
 
         if (!(await userExists(m))) return;
 
-        await addInventoryItem(member, selected.id, amount, false);
+        await addInventoryItem(member, selected.id, amount);
 
         logger.info(
           `${amount} ${selected.id} given to ${member.user.id} (${member.user.username})`,

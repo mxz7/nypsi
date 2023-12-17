@@ -80,14 +80,13 @@ module.exports = new ItemUse(
     if (await isPassive(message.member))
       return send({ embeds: [new ErrorEmbed("you are currently in passive mode")] });
 
-    const inventory = await getInventory(message.member, false);
+    const inventory = await getInventory(message.member);
 
     await Promise.all([
       setInventoryItem(
         message.member,
         "handcuffs",
         inventory.find((i) => i.item == "handcuffs").amount - 1,
-        false,
       ),
       addHandcuffs(handcuffsTarget.id),
     ]);

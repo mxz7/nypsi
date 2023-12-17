@@ -1,39 +1,4 @@
 {
-  "collector_i": {
-    "id": "collector_i",
-    "name": "collector **I**",
-    "emoji": "🎒",
-    "target": 100,
-    "description": "have 100 items in your inventory"
-  },
-  "collector_ii": {
-    "id": "collector_ii",
-    "name": "collector **II**",
-    "emoji": "🎒",
-    "target": 750,
-    "description": "have 750 items in your inventory"
-  },
-  "collector_iii": {
-    "id": "collector_iii",
-    "name": "collector **III**",
-    "emoji": "🎒",
-    "target": 5000,
-    "description": "have 5,000 items in your inventory"
-  },
-  "collector_iv": {
-    "id": "collector_iv",
-    "name": "collector **IV**",
-    "emoji": "🎒",
-    "target": 10000,
-    "description": "have 10,000 items in your inventory"
-  },
-  "collector_v": {
-    "id": "collector_v",
-    "name": "collector **V**",
-    "emoji": "🎒",
-    "target": 50000,
-    "description": "have 50,000 items in your inventory"
-  },
   "gambler_i": {
     "id": "gambler_i",
     "name": "gambler **I**",

@@ -48,7 +48,7 @@ module.exports = new ItemUse(
       }
     };
 
-    const inventory = await getInventory(message.member, false);
+    const inventory = await getInventory(message.member);
 
     if (
       !inventory.find((i) => i.item === "reroll_token") ||

@@ -148,7 +148,7 @@ export async function getGambleMulti(member: GuildMember | string) {
     getGuildUpgradesByUser(member),
     isPassive(id),
     getDmSettings(id),
-    getInventory(id, false),
+    getInventory(id),
     getTier(id),
     getUpgrades(id),
     getRawLevel(id),
@@ -282,7 +282,7 @@ export async function getSellMulti(member: GuildMember | string) {
       getBoosters(id),
       getGuildUpgradesByUser(member),
       isPassive(member),
-      getInventory(member, false),
+      getInventory(member),
       getUpgrades(member),
     ]);
 

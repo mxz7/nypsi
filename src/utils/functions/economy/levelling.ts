@@ -402,7 +402,7 @@ async function doLevelUp(
   if (levelData?.rewards) {
     for (const reward of levelData.rewards) {
       if (reward.startsWith("id:")) {
-        await addInventoryItem(member, reward.substring(3), 1, false);
+        await addInventoryItem(member, reward.substring(3), 1);
       } else if (reward.startsWith("money:")) {
         await updateBalance(member, (await getBalance(member)) + parseInt(reward.substring(6)));
       } else if (reward.startsWith("karma:")) {

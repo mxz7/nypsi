@@ -143,7 +143,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         message.member,
         ore,
         inventory.find((i) => i.item == ore).amount - smelted.get(ore),
-        false,
       ),
     );
 
@@ -151,23 +150,17 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     res += `\n${smelted.get(ore)} ${items[ingot].emoji} ${items[ingot].name}`;
 
-    promises.push(addInventoryItem(message.member, ingot, smelted.get(ore), false));
+    promises.push(addInventoryItem(message.member, ingot, smelted.get(ore)));
   }
 
   promises.push(
-    setInventoryItem(
-      message.member,
-      "coal",
-      inventory.find((i) => i.item == "coal").amount - coal,
-      false,
-    ),
+    setInventoryItem(message.member, "coal", inventory.find((i) => i.item == "coal").amount - coal),
   );
   promises.push(
     setInventoryItem(
       message.member,
       "furnace",
       inventory.find((i) => i.item == "furnace").amount - 1,
-      false,
     ),
   );
 

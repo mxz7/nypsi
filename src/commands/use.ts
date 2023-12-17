@@ -198,7 +198,6 @@ async function run(
         message.member,
         selected.id,
         inventory.find((i) => i.item == selected.id).amount - amount,
-        false,
       ),
     ]);
 
@@ -351,7 +350,6 @@ async function run(
       message.member,
       selected.id,
       inventory.find((i) => i.item == selected.id).amount - amount,
-      false,
     );
     await addStat(message.member, selected.id, amount);
 
@@ -392,7 +390,6 @@ async function run(
       message.member,
       selected.id,
       inventory.find((i) => i.item == selected.id).amount - amount,
-      false,
     );
     addStat(message.member, selected.id, amount);
 

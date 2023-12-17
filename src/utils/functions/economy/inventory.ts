@@ -12,7 +12,7 @@ import { percentChance } from "../random";
 import sleep from "../sleep";
 import { getTax } from "../tax";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
-import { addProgress, getAllAchievements, setAchievementProgress } from "./achievements";
+import { addProgress } from "./achievements";
 import { getAuctionAverage } from "./auctions";
 import { getBalance, getSellMulti, updateBalance } from "./balance";
 import { addToGuildXP, getGuildName } from "./guilds";
@@ -22,7 +22,6 @@ import { createUser, getItems, userExists } from "./utils";
 import { getXp, updateXp } from "./xp";
 import ms = require("ms");
 
-const inventoryAchievementCheckCooldown = new Set<string>();
 const gemChanceCooldown = new Set<string>();
 setInterval(() => {
   gemChanceCooldown.clear();
@@ -35,7 +34,6 @@ type Inventory = {
 
 export async function getInventory(
   member: GuildMember | string,
-  checkAchievement = false,
 ): Promise<{ item: string; amount: number }[]> {
   let id: string;
   if (member instanceof GuildMember) {
@@ -74,17 +72,6 @@ export async function getInventory(
 
   await redis.set(`${Constants.redis.cache.economy.INVENTORY}:${id}`, JSON.stringify(query));
   await redis.expire(`${Constants.redis.cache.economy.INVENTORY}:${id}`, 180);
-
-  setTimeout(async () => {
-    if (checkAchievement && !inventoryAchievementCheckCooldown.has(id)) {
-      inventoryAchievementCheckCooldown.add(id);
-      setTimeout(() => {
-        inventoryAchievementCheckCooldown.delete(id);
-      }, 60000);
-
-      await checkCollectorAchievement(id, query);
-    }
-  }, 1000);
 
   return query;
 }
@@ -149,7 +136,6 @@ export async function addInventoryItem(
   member: GuildMember | string,
   itemId: string,
   amount: number,
-  checkAchievement = true,
 ) {
   let id: string;
   if (member instanceof GuildMember) {
@@ -189,24 +175,12 @@ export async function addInventoryItem(
   });
 
   await redis.del(`${Constants.redis.cache.economy.INVENTORY}:${id}`);
-
-  setTimeout(async () => {
-    if (!inventoryAchievementCheckCooldown.has(id) && checkAchievement) {
-      inventoryAchievementCheckCooldown.add(id);
-      setTimeout(() => {
-        inventoryAchievementCheckCooldown.delete(id);
-      }, 60000);
-
-      checkCollectorAchievement(id, await getInventory(id, false));
-    }
-  }, 500);
 }
 
 export async function setInventoryItem(
   member: GuildMember | string,
   itemId: string,
   amount: number,
-  checkAchievement = true,
 ) {
   let id: string;
   if (member instanceof GuildMember) {
@@ -251,55 +225,6 @@ export async function setInventoryItem(
   }
 
   await redis.del(`${Constants.redis.cache.economy.INVENTORY}:${id}`);
-
-  if (!inventoryAchievementCheckCooldown.has(id) && checkAchievement) {
-    inventoryAchievementCheckCooldown.add(id);
-    setTimeout(() => {
-      inventoryAchievementCheckCooldown.delete(id);
-    }, 60000);
-
-    checkCollectorAchievement(id, await getInventory(id, false));
-  }
-}
-
-async function checkCollectorAchievement(id: string, inventory: Inventory) {
-  let itemCount = 0;
-
-  for (const item of inventory) {
-    itemCount += item.amount;
-  }
-
-  const achievements = await getAllAchievements(id);
-  let collectorCount = 0;
-
-  for (const achievement of achievements) {
-    if (achievement.achievementId.includes("collector")) collectorCount++;
-    // will always return if a valid achievement is found
-    if (achievement.achievementId.includes("collector") && !achievement.completed) {
-      if (achievement.progress != itemCount) {
-        await setAchievementProgress(id, achievement.achievementId, itemCount);
-      }
-      return;
-    }
-  }
-
-  switch (collectorCount) {
-    case 0:
-      await setAchievementProgress(id, "collector_i", itemCount);
-      break;
-    case 1:
-      await setAchievementProgress(id, "collector_ii", itemCount);
-      break;
-    case 2:
-      await setAchievementProgress(id, "collector_iii", itemCount);
-      break;
-    case 3:
-      await setAchievementProgress(id, "collector_iv", itemCount);
-      break;
-    case 4:
-      await setAchievementProgress(id, "collector_v", itemCount);
-      break;
-  }
 }
 
 export async function openCrate(
@@ -703,7 +628,7 @@ export async function commandGemCheck(member: GuildMember, commandCategory: Comm
 export async function gemBreak(userId: string, chance: number, gem: string) {
   if (!percentChance(chance)) return;
 
-  const inventory = await getInventory(userId, false);
+  const inventory = await getInventory(userId);
 
   if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0) return;
   if (!inventory.find((i) => i.item === gem)) return;
@@ -716,35 +641,22 @@ export async function gemBreak(userId: string, chance: number, gem: string) {
 
   if (uniqueGemCount === 5 && percentChance(50) && (await getDmSettings(userId)).other) {
     await Promise.all([
-      setInventoryItem(
-        userId,
-        "pink_gem",
-        inventory.find((i) => i.item === "pink_gem").amount - 1,
-        false,
-      ),
+      setInventoryItem(userId, "pink_gem", inventory.find((i) => i.item === "pink_gem").amount - 1),
       setInventoryItem(
         userId,
         "purple_gem",
         inventory.find((i) => i.item === "purple_gem").amount - 1,
-        false,
       ),
-      setInventoryItem(
-        userId,
-        "blue_gem",
-        inventory.find((i) => i.item === "blue_gem").amount - 1,
-        false,
-      ),
+      setInventoryItem(userId, "blue_gem", inventory.find((i) => i.item === "blue_gem").amount - 1),
       setInventoryItem(
         userId,
         "green_gem",
         inventory.find((i) => i.item === "green_gem").amount - 1,
-        false,
       ),
       setInventoryItem(
         userId,
         "white_gem",
         inventory.find((i) => i.item === "white_gem").amount - 1,
-        false,
       ),
       prisma.crafting.create({
         data: {
@@ -776,7 +688,7 @@ export async function gemBreak(userId: string, chance: number, gem: string) {
     return;
   }
 
-  await setInventoryItem(userId, gem, inventory.find((i) => i.item === gem).amount - 1, false);
+  await setInventoryItem(userId, gem, inventory.find((i) => i.item === gem).amount - 1);
 
   const shardMax = new Map<string, number>([
     ["green_gem", 3],
@@ -788,7 +700,7 @@ export async function gemBreak(userId: string, chance: number, gem: string) {
 
   const amount = Math.floor(Math.random() * shardMax.get(gem) - 1) + 1;
 
-  await addInventoryItem(userId, "gem_shard", amount, false);
+  await addInventoryItem(userId, "gem_shard", amount);
 
   if ((await getDmSettings(userId)).other) {
     await addNotificationToQueue({

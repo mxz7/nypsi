@@ -73,7 +73,7 @@ async function doBake(
 
   if (!(await userExists(member))) await createUser(member);
 
-  const inventory = await getInventory(member, false);
+  const inventory = await getInventory(member);
 
   let hasFurnace = false;
   let hasCoal = false;
@@ -115,12 +115,7 @@ async function doBake(
   }
 
   await addCooldown(cmd.name, member, 120);
-  await setInventoryItem(
-    member,
-    "coal",
-    inventory.find((i) => i.item === "coal").amount - 1,
-    false,
-  );
+  await setInventoryItem(member, "coal", inventory.find((i) => i.item === "coal").amount - 1);
 
   const response = await runBakery(member);
 
