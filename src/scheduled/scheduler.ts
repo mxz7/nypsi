@@ -3,9 +3,12 @@ import { readdir } from "fs/promises";
 import { Job } from "../types/Jobs";
 import { logger } from "../utils/logger";
 
-const jobs = new Map<string, { job: CronJob; name: string }>();
+const jobs = new Map<string, { job: CronJob; name: string; run: () => void }>();
 
-export async function startJobs() {
+export async function loadJobs() {
+  for (const { job } of jobs.values()) {
+    job.stop();
+  }
   jobs.clear();
   const files = await readdir("dist/scheduled/jobs");
 
@@ -14,20 +17,22 @@ export async function startJobs() {
 
     if (!imported) continue;
 
+    const run = async () => {
+      logger.info(`[${imported.name}] job started`);
+      await imported.run((message: string) => logger.info(`[${imported.name}] ${message}`));
+      logger.info(`[${imported.name}] job finished`);
+    };
+
     jobs.set(imported.name, {
       name: imported.name,
-      job: new CronJob(
-        imported.cron,
-        async () => {
-          logger.info(`[${imported.name}] job started`);
-          await imported.run((message: string) => logger.info(`[${imported.name}] ${message}`));
-          logger.info(`[${imported.name}] job finished`);
-        },
-        null,
-        true,
-      ),
+      job: new CronJob(imported.cron, run, null, true),
+      run,
     });
   }
 
   logger.info(`${jobs.size} jobs loaded`);
+}
+
+export function runJob(job: string) {
+  jobs.get(job)?.run();
 }

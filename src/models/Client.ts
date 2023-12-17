@@ -29,7 +29,6 @@ import { runNetWorthInterval } from "../scheduled/clusterjobs/networth-update";
 import { runPremiumChecks } from "../scheduled/clusterjobs/premiumexpire";
 import startRandomDrops from "../scheduled/clusterjobs/random-drops";
 import { doLeaderboardSeed } from "../scheduled/clusterjobs/seed-leaderboards";
-import { doTopGlobalDaily } from "../scheduled/clusterjobs/topglobal";
 import { runPremiumCrateInterval } from "../scheduled/clusterjobs/weeklycrates";
 import { runWorkerInterval } from "../scheduled/clusterjobs/workers";
 import Constants from "../utils/Constants";
@@ -186,7 +185,6 @@ export class NypsiClient extends Client {
 
     if (this.cluster.id != 0) return;
 
-    doTopGlobalDaily();
     runLotteryInterval(this);
     runPremiumCrateInterval(this);
     runPremiumChecks(this);

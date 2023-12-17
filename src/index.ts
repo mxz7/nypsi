@@ -3,7 +3,7 @@ import { ClusterManager } from "discord-hybrid-sharding";
 import "dotenv/config";
 import { clearInterval } from "timers";
 import redis from "./init/redis";
-import { startJobs } from "./scheduled/scheduler";
+import { loadJobs, runJob } from "./scheduled/scheduler";
 import Constants from "./utils/Constants";
 import { addFailedHeartbeat, sendHeartbeat } from "./utils/functions/heartbeat";
 import { updateStats } from "./utils/functions/topgg";
@@ -69,7 +69,9 @@ manager.on("clusterCreate", (cluster) => {
       heartBeatIntervals.forEach((i) => clearInterval(i));
       heartBeatIntervals = [];
     } else if (typeof message === "string" && message.startsWith("trigger_job")) {
-      // return runJob(message.split("trigger_job_")[1]);
+      return runJob(message.split("trigger_job_")[1]);
+    } else if (typeof message === "string" && message === "reload_jobs") {
+      return loadJobs();
     }
   });
   logger.info(`launched cluster ${cluster.id}`);
@@ -194,4 +196,4 @@ export async function checkStatus() {
   return response;
 }
 
-startJobs();
+loadJobs();
