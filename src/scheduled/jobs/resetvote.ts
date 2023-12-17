@@ -1,17 +1,17 @@
-import { parentPort } from "worker_threads";
 import prisma from "../../init/database";
-import { getVersion } from "../../utils/functions/version";
+import { Job } from "../../types/Jobs";
 
-(async () => {
-  process.title = `nypsi v${getVersion()}: reset vote job`;
+export default {
+  name: "reset vote",
+  cron: "0 0 1 * *",
+  async run(log) {
+    const query = await prisma.economy.updateMany({
+      where: {
+        monthVote: { gt: 0 },
+      },
+      data: { monthVote: 0 },
+    });
 
-  const query = await prisma.economy.updateMany({
-    where: {
-      monthVote: { gt: 0 },
-    },
-    data: { monthVote: 0 },
-  });
-
-  parentPort.postMessage(`${query.count} users reset to 0 monthly votes`);
-  process.exit(0);
-})();
+    log(`${query.count} users reset to 0 monthly votes`);
+  },
+} satisfies Job;

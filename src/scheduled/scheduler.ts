@@ -1,81 +1,38 @@
-import Bree = require("bree");
-import dayjs = require("dayjs");
-import path = require("path");
+import { CronJob } from "cron";
+import { readdir } from "fs/promises";
+import { Job } from "../types/Jobs";
 import { logger } from "../utils/logger";
 
-const bree = new Bree({
-  root: path.join(__dirname, "jobs"),
-  logger: logger,
+const jobs = new Map<string, { job: CronJob; name: string; run: () => void }>();
 
-  workerMessageHandler: (message) => {
-    if (message.message) {
-      logger.info(`[${message.name}] ${message.message}`);
-    }
-  },
-  errorHandler: (message) => {
-    logger.error(`[${message.name}] ${message.message}`);
-  },
+export async function loadJobs() {
+  for (const { job } of jobs.values()) {
+    job.stop();
+  }
+  jobs.clear();
+  const files = await readdir("dist/scheduled/jobs");
 
-  jobs: [
-    // {
-    //   name: "purgeguilds",
-    //   interval: "at 3:02am",
-    //   worker: {
-    //     workerData: {
-    //       guilds: [],
-    //     },
-    //   },
-    // },
-    {
-      name: "deterioratekarma",
-      interval: "at 1:00am",
-    },
-    {
-      name: "lotterytickets",
-      timeout: dayjs()
-        .add(1, "hour")
-        .set("minutes", 25)
-        .set("seconds", 0)
-        .diff(dayjs(), "milliseconds"),
-      interval: "30m",
-    },
-    {
-      name: "topcommands",
-      interval: "at 12:00am",
-    },
-    {
-      name: "dailystreak",
-      interval: "at 12:00am",
-    },
-    {
-      name: "votereminders",
-      cron: "*/15 * * * *",
-    },
-    {
-      name: "topsnapshot",
-      interval: "at 2:00am",
-    },
-    {
-      name: "images",
-      interval: "at 1:00am",
-    },
-    {
-      name: "purge",
-      interval: "at 1:00am",
-    },
-    {
-      name: "resetvote",
-      cron: "0 0 1 * *",
-    },
-  ],
-});
+  for (const file of files) {
+    const imported = await import(`./jobs/${file}`).then((i) => i.default as Job);
 
-export async function startJobs() {
-  await bree.start();
+    if (!imported) continue;
 
-  // await bree.run();
+    const run = async () => {
+      logger.info(`[${imported.name}] job started`);
+      await imported.run((message: string) => logger.info(`[${imported.name}] ${message}`));
+      logger.info(`[${imported.name}] job finished`);
+    };
+
+    jobs.set(imported.name, {
+      name: imported.name,
+      job: new CronJob(imported.cron, run, null, true),
+      run,
+    });
+  }
+
+  logger.info(`${jobs.size} jobs loaded`);
 }
 
-export function runJob(name: string) {
-  return bree.run(name);
+export function runJob(job: string) {
+  jobs.get(job)?.run();
 }

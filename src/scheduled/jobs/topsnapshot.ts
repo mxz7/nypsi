@@ -1,7 +1,7 @@
 import dayjs = require("dayjs");
 import { parentPort } from "worker_threads";
 import prisma from "../../init/database";
-import { getVersion } from "../../utils/functions/version";
+import { Job } from "../../types/Jobs";
 
 async function doTopBalance() {
   const query = await prisma.economy.findMany({
@@ -265,22 +265,19 @@ async function clearOld() {
 
   return 0;
 }
+export default {
+  name: "top snapshot",
+  cron: "0 2 * * *",
+  async run(log) {
+    const count = await Promise.all([
+      doTopBalance(),
+      doTopNetworth(),
+      doItems(),
+      doMembers(),
+      doGuilds(),
+      clearOld(),
+    ]);
 
-(async () => {
-  process.title = `nypsi v${getVersion()}: top snapshot job`;
-
-  const count = await Promise.all([
-    doTopBalance(),
-    doTopNetworth(),
-    doItems(),
-    doMembers(),
-    doGuilds(),
-    clearOld(),
-  ]);
-
-  parentPort.postMessage(
-    `created ${count.reduce((a, b) => a + b).toLocaleString()} entries in graph data`,
-  );
-
-  process.exit(0);
-})();
+    log(`created ${count.reduce((a, b) => a + b).toLocaleString()} entries in graph data`);
+  },
+} satisfies Job;

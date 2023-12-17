@@ -1,8 +1,7 @@
-import { parentPort } from "worker_threads";
 import redis from "../../init/redis";
+import { Job } from "../../types/Jobs";
 import { RedditJSON, RedditJSONPost } from "../../types/Reddit";
 import sleep from "../../utils/functions/sleep";
-import { getVersion } from "../../utils/functions/version";
 
 const bdsmLinks = [
   "https://www.reddit.com/r/bdsm/top.json?limit=6969&t=month",
@@ -70,7 +69,7 @@ const headers = {
     "Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Mobile/15E148 Safari/604.1",
 };
 
-async function cacheUpdate(links: string[], name: string) {
+async function cacheUpdate(links: string[], name: string, log: (message: string) => void) {
   await redis.del(`nypsi:images:${name}`);
 
   for (const link of links) {
@@ -78,12 +77,12 @@ async function cacheUpdate(links: string[], name: string) {
 
     const res: RedditJSON = await fetch(link, { headers }).then(async (res) => {
       if (res.status === 403) {
-        parentPort.postMessage(`blocked for ${link}. attempting to fetch again`);
+        log(`blocked for ${link}. attempting to fetch again`);
         res = await fetch(link);
         if (res.ok) {
           return res.json();
         } else {
-          parentPort.postMessage(`failed - skipping`);
+          log(`failed - skipping`);
           return { message: "skip" };
         }
       }
@@ -94,9 +93,9 @@ async function cacheUpdate(links: string[], name: string) {
       continue;
     } else if (res.message == "Forbidden") {
       if (res.reason === "private") {
-        parentPort.postMessage(`skipped ${link} due to private subreddit`);
+        log(`skipped ${link} due to private subreddit`);
       } else {
-        parentPort.postMessage(`skipped ${link} due to 403 (forbidden)`);
+        log(`skipped ${link} due to 403 (forbidden)`);
       }
       continue;
     }
@@ -106,13 +105,13 @@ async function cacheUpdate(links: string[], name: string) {
     try {
       allowed = res.data.children.filter((post) => !post.data.is_self);
     } catch {
-      parentPort.postMessage(`failed processing ${link}`);
+      log(`failed processing ${link}`);
     }
 
     if (allowed) {
       await redis.lpush(`nypsi:images:${name}`, ...allowed.map((i) => JSON.stringify(i)));
     } else {
-      parentPort.postMessage(`no images @ ${link}`);
+      log(`no images @ ${link}`);
     }
   }
 
@@ -120,22 +119,22 @@ async function cacheUpdate(links: string[], name: string) {
   await sleep(10000);
 }
 
-(async () => {
-  process.title = `nypsi v${getVersion()}: images job`;
-
-  await cacheUpdate(bdsmLinks, "bdsm");
-  await cacheUpdate(thighsLinks, "thighs");
-  await cacheUpdate(boobLinks, "boob");
-  await cacheUpdate(assLinks, "ass");
-  await cacheUpdate(pornLinks, "porn");
-  await cacheUpdate(feetLinks, "feet");
-  await cacheUpdate(handLinks, "hands");
-  await cacheUpdate(birbLinks, "birb");
-  await cacheUpdate(catLinks, "cat");
-  await cacheUpdate(dogLinks, "dog");
-  await cacheUpdate(duckLinks, "duck");
-  await cacheUpdate(lizardLinks, "lizard");
-  await cacheUpdate(rabbitLinks, "rabbit");
-
-  process.exit(0);
-})();
+export default {
+  name: "images",
+  cron: "0 0 * * 0",
+  async run(log) {
+    await cacheUpdate(bdsmLinks, "bdsm", log);
+    await cacheUpdate(thighsLinks, "thighs", log);
+    await cacheUpdate(boobLinks, "boob", log);
+    await cacheUpdate(assLinks, "ass", log);
+    await cacheUpdate(pornLinks, "porn", log);
+    await cacheUpdate(feetLinks, "feet", log);
+    await cacheUpdate(handLinks, "hands", log);
+    await cacheUpdate(birbLinks, "birb", log);
+    await cacheUpdate(catLinks, "cat", log);
+    await cacheUpdate(dogLinks, "dog", log);
+    await cacheUpdate(duckLinks, "duck", log);
+    await cacheUpdate(lizardLinks, "lizard", log);
+    await cacheUpdate(rabbitLinks, "rabbit", log);
+  },
+} satisfies Job;
