@@ -297,7 +297,7 @@ const formatter = (data: WriteData) => {
     return;
   }
 
-  if (data.message.startsWith("::")) {
+  if (typeof data.message === "string" && data.message.startsWith("::")) {
     const category = data.message.split(" ").splice(0, 1)[0].substring(2);
     data.message = data.message.split(" ").slice(1).join(" ");
 
@@ -321,6 +321,14 @@ const formatter = (data: WriteData) => {
 
   if (Boolean(data.data) && Object.keys(data.data).length > 0) {
     jsonData = JSON.stringify(data.data, null, 2);
+    jsonData = jsonColor(
+      jsonData
+        .substring(1, jsonData.length - 1)
+        .trim()
+        .replaceAll("\\n", "\n"),
+    );
+  } else if (typeof data.message === "object") {
+    jsonData = JSON.stringify(data.message, null, 2);
     jsonData = jsonColor(
       jsonData
         .substring(1, jsonData.length - 1)
