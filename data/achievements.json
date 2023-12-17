@@ -1265,7 +1265,7 @@
     "emoji": "👷🏻‍♂️",
     "target": 250000000,
     "description": "earn $250,000,000 from your workers",
-    "prize": ["legendary_scratch_card:1", "earth_scanner:1"]
+    "prize": ["legendary_scratch_card:1"]
   },
   "capitalist_v": {
     "id": "capitalist_v",
@@ -1273,7 +1273,7 @@
     "emoji": "👷🏻‍♂️",
     "target": 1000000000,
     "description": "earn $1,000,000,000 from your workers",
-    "prize": ["nypsi_crate:1", "legendary_scratch_card:2", "gem_radar:1", "earth_scanner:2"]
+    "prize": ["nypsi_crate:1", "legendary_scratch_card:1", "earth_scanner:1"]
   },
   "discordian_i": {
     "id": "discordian_i",
