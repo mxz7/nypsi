@@ -1,8 +1,8 @@
-import fetch from "node-fetch";
 import redis from "../../init/redis";
 import { Job } from "../../types/Jobs";
 import { RedditJSON, RedditJSONPost } from "../../types/Reddit";
 import sleep from "../../utils/functions/sleep";
+import { getVersion } from "../../utils/functions/version";
 
 const bdsmLinks = [
   "https://www.reddit.com/r/bdsm/top.json?limit=6969&t=month",
@@ -65,13 +65,17 @@ const lizardLinks = [
 ];
 const rabbitLinks = ["https://www.reddit.com/r/rabbits/top.json?limit=6969&t=month"];
 
+const headers = {
+  "user-agent": `nypsi/${getVersion()}`,
+};
+
 async function cacheUpdate(links: string[], name: string, log: (message: string) => void) {
   await redis.del(`nypsi:images:${name}`);
 
   for (const link of links) {
     await sleep(10000);
 
-    const res: RedditJSON = await fetch(link).then(async (res) => {
+    const res: RedditJSON = await fetch(link, { headers }).then(async (res) => {
       if (res.status === 403) {
         log(`blocked for ${link}. attempting to fetch again`);
         res = await fetch(link);
