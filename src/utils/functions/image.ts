@@ -20,7 +20,7 @@ export async function suggestImage(
   submitterId: string,
   type: ImageType,
   imageUrl: string,
-  client: NypsiClient,
+  client: NypsiClient | ClusterManager,
 ): Promise<"ok" | "limit" | "fail"> {
   const query = await prisma.imageSuggestion.count({
     where: {
