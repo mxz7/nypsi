@@ -435,7 +435,7 @@
     "name": "wholesome **I**",
     "emoji": "💖",
     "target": 1,
-    "description": "have 1 wholesome image accepted",
+    "description": "have 1 suggested image accepted",
     "prize": ["lucky_scratch_card:1", "teddy:1"]
   },
   "wholesome_ii": {
@@ -443,7 +443,7 @@
     "name": "wholesome **II**",
     "emoji": "💖",
     "target": 5,
-    "description": "have 5 wholesome images accepted",
+    "description": "have 5 suggested images accepted",
     "prize": ["lucky_scratch_card:2", "teddy:2"]
   },
   "wholesome_iii": {
@@ -451,7 +451,7 @@
     "name": "wholesome **III**",
     "emoji": "💖",
     "target": 15,
-    "description": "have 15 wholesome images accepted",
+    "description": "have 15 suggested images accepted",
     "prize": ["lucky_scratch_card:3", "teddy:3"]
   },
   "wholesome_iv": {
@@ -459,7 +459,7 @@
     "name": "wholesome **IV**",
     "emoji": "💖",
     "target": 25,
-    "description": "have 25 wholesome images accepted",
+    "description": "have 25 suggested images accepted",
     "prize": ["lucky_scratch_card:4", "teddy:4"]
   },
   "wholesome_v": {
@@ -467,7 +467,7 @@
     "name": "wholesome **V**",
     "emoji": "💖",
     "target": 50,
-    "description": "have 50 wholesome images accepted",
+    "description": "have 50 suggested images accepted",
     "prize": ["lucky_scratch_card:5", "teddy:5"]
   },
   "racer_i": {
