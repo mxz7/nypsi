@@ -1,13 +1,15 @@
 import { CommandInteraction, Message } from "discord.js";
-import redis from "../init/redis";
 import { Command, NypsiCommandInteraction } from "../models/Command";
-import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
-import { RedditJSONPost } from "../types/Reddit";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addProgress } from "../utils/functions/economy/achievements";
-import { redditImage } from "../utils/functions/image";
-import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import { getRandomImage } from "../utils/functions/image";
+import { getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command("cat", "get a random picture of a cat", "animals").setAliases(["kitty"]);
+const cmd = new Command("cat", "get a random picture of a cat", "animals").setAliases([
+  "kitty",
+  "meow",
+  "chipichipichapachapaloobieloobielabalabamagicomiloobieloobieboomboomboomboom",
+]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
   if (await onCooldown(cmd.name, message.member)) {
@@ -16,38 +18,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return message.channel.send({ embeds: [embed] });
   }
 
-  const posts = await redis
-    .lrange("nypsi:images:cat", 0, -1)
-    .then((i) => i.map((j) => JSON.parse(j) as RedditJSONPost));
+  const image = await getRandomImage("cat").catch(() => null);
 
-  if (posts.length < 10) {
-    return message.channel.send({
-      embeds: [new ErrorEmbed("please wait a couple more seconds..")],
-    });
-  }
-
-  await addCooldown(cmd.name, message.member, 7);
-
-  const chosen = posts[Math.floor(Math.random() * posts.length)];
-
-  const a = await redditImage(chosen, posts);
-
-  if (a == "lol") {
-    return message.channel.send({ embeds: [new ErrorEmbed("unable to find cat image")] });
-  }
-
-  const image = a.split("|")[0];
-  const title = a.split("|")[1];
-  let url = a.split("|")[2];
-  const author = a.split("|")[3];
-
-  url = "https://reddit.com" + url;
+  if (!image)
+    return message.channel.send({ embeds: [new ErrorEmbed("failed to find a cat image")] });
 
   const embed = new CustomEmbed(message.member)
-    .setTitle(title)
-    .setHeader("u/" + author + " | r/" + chosen.data.subreddit)
-    .setURL(url)
-    .setImage(image);
+    .disableFooter()
+    .setImage(image.url)
+    .setFooter({ text: `#${image.id}` });
 
   message.channel.send({ embeds: [embed] });
 
