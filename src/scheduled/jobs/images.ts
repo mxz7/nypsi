@@ -2,6 +2,7 @@ import redis from "../../init/redis";
 import { Job } from "../../types/Jobs";
 import { RedditJSON, RedditJSONPost } from "../../types/Reddit";
 import sleep from "../../utils/functions/sleep";
+import { getVersion } from "../../utils/functions/version";
 
 const bdsmLinks = [
   "https://www.reddit.com/r/bdsm/top.json?limit=6969&t=month",
@@ -65,8 +66,7 @@ const lizardLinks = [
 const rabbitLinks = ["https://www.reddit.com/r/rabbits/top.json?limit=6969&t=month"];
 
 const headers = {
-  "user-agent":
-    "Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0.3 Mobile/15E148 Safari/604.1",
+  "user-agent": `nypsi/${getVersion()}`,
 };
 
 async function cacheUpdate(links: string[], name: string, log: (message: string) => void) {
