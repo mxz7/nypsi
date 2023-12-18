@@ -76,7 +76,7 @@ async function cacheUpdate(links: string[], name: string, log: (message: string)
   for (const link of links) {
     await sleep(10000);
 
-    const res: RedditJSON = await axios.get(link).then(async (res) => {
+    const res: RedditJSON = await axios.get(link, { headers }).then(async (res) => {
       if (res.status === 403) {
         log(`blocked for ${link}. attempting to fetch again`);
         res = await axios.get(link);
