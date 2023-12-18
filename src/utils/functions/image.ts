@@ -1,7 +1,7 @@
 import { variants } from "@catppuccin/palette";
-import { Image, ImageType } from "@prisma/client";
+import { Image, ImageSuggestion, ImageType } from "@prisma/client";
 import { ClusterManager } from "discord-hybrid-sharding";
-import { ColorResolvable, WebhookClient } from "discord.js";
+import { ColorResolvable, User, WebhookClient } from "discord.js";
 import prisma from "../../init/database";
 import redis from "../../init/redis";
 import { NypsiClient } from "../../models/Client";
@@ -9,6 +9,7 @@ import { CustomEmbed } from "../../models/EmbedBuilders";
 import Constants from "../Constants";
 import { logger } from "../logger";
 import { findChannelCluster } from "./clusters";
+import { addNotificationToQueue } from "./users/notifications";
 import { getLastKnownUsername } from "./users/tag";
 
 export function isImageUrl(url: string): boolean {
@@ -88,6 +89,49 @@ export async function getRandomImage(type: ImageType) {
   await redis.set(`${Constants.redis.cache.IMAGE}:${type}`, JSON.stringify(query), "EX", 86400);
 
   return query[Math.floor(Math.random() * query.length)];
+}
+
+export async function getImageSuggestion() {
+  return await prisma.imageSuggestion.findFirst();
+}
+
+export async function reviewImageSuggestion(
+  image: ImageSuggestion,
+  result: "accept" | "deny",
+  mod: User,
+) {
+  await prisma.imageSuggestion.delete({
+    where: {
+      id: image.id,
+    },
+  });
+
+  if (result === "accept") {
+    const { id } = await prisma.image.create({
+      data: {
+        type: image.type,
+        accepterId: mod.id,
+        uploaderId: image.uploaderId,
+        url: image.url,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    await redis.del(`${Constants.redis.cache.IMAGE}:${image.type}`);
+
+    logger.info(
+      `admin: ${mod.id} (${mod.username}) accepted suggestion by ${image.uploaderId} id: ${id}`,
+    );
+
+    addNotificationToQueue({
+      memberId: image.uploaderId,
+      payload: { content: `your image (${image.url}) has been accepted` },
+    });
+  } else {
+    logger.info(`admin: ${mod.id} (${mod.username}) denied suggestion by ${image.uploaderId}`);
+  }
 }
 
 export async function uploadImage(
