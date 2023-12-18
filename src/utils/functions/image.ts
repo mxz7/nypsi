@@ -78,21 +78,28 @@ export async function suggestImage(
 export async function getRandomImage(type: ImageType) {
   const cache = await redis.get(`${Constants.redis.cache.IMAGE}:${type}`);
 
-  if (cache) {
-    const images = JSON.parse(cache) as Image[];
+  let images: Image[];
 
-    return images[Math.floor(Math.random() * images.length)];
+  if (cache) {
+    images = JSON.parse(cache) as Image[];
+  } else {
+    images = await prisma.image.findMany({
+      where: {
+        type,
+      },
+    });
+
+    await redis.set(`${Constants.redis.cache.IMAGE}:${type}`, JSON.stringify(images), "EX", 86400);
   }
 
-  const query = await prisma.image.findMany({
-    where: {
-      type,
-    },
+  const chosen = images[Math.floor(Math.random() * images.length)];
+
+  prisma.image.update({
+    where: { id: chosen.id },
+    data: { views: { increment: 1 } },
   });
 
-  await redis.set(`${Constants.redis.cache.IMAGE}:${type}`, JSON.stringify(query), "EX", 86400);
-
-  return query[Math.floor(Math.random() * query.length)];
+  return chosen;
 }
 
 export async function getImageSuggestion() {
