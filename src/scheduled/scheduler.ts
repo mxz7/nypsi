@@ -13,6 +13,7 @@ export async function loadJobs() {
   const files = await readdir("dist/scheduled/jobs");
 
   for (const file of files) {
+    delete require.cache[require.resolve(`./jobs/${file}`)];
     const imported = await import(`./jobs/${file}`).then((i) => i.default as Job);
 
     if (!imported) continue;
