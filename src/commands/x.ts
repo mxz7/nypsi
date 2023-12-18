@@ -1485,6 +1485,55 @@ async function run(
 
       manager();
     }
+  } else if (args[0].toLowerCase() === "img") {
+    if (args.length === 1)
+      return message.channel.send({
+        embeds: [new ErrorEmbed("fucking retard what image you literal fucking toad")],
+      });
+
+    const image = await prisma.image.findUnique({
+      where: { id: parseInt(args[1]) },
+    });
+
+    if (!image) return message.channel.send({ embeds: [new ErrorEmbed("invalid img")] });
+    const embed = new CustomEmbed(
+      message.member,
+      `\`\`\`${JSON.stringify(image, null, 2)}\`\`\``,
+    ).setImage(image.url);
+
+    const msg = await message.channel.send({
+      embeds: [embed],
+      components: [
+        new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+          new ButtonBuilder()
+            .setLabel("delete")
+            .setCustomId("booobieshahahaha")
+            .setStyle(ButtonStyle.Danger),
+        ),
+      ],
+    });
+
+    const interaction = await msg
+      .awaitMessageComponent({
+        filter: (i) => i.user.id === message.author.id,
+        time: 15000,
+        componentType: ComponentType.Button,
+      })
+      .catch(() => {
+        msg.edit({ components: [] });
+      });
+
+    if (interaction) {
+      if ((await getAdminLevel(message.author.id)) < 2)
+        return interaction.reply({
+          embeds: [new ErrorEmbed("you need admin level 2 loser lol xdxdxdxdxdxdxxd")],
+        });
+      await interaction.update({ components: [] });
+      await prisma.image.delete({ where: { id: image.id } });
+      await redis.del(`${Constants.redis.cache.IMAGE}:${image.type}`);
+
+      interaction.followUp({ embeds: [new CustomEmbed(message.member, "deleted image")] });
+    }
   }
 }
 
