@@ -10,6 +10,7 @@ import Constants from "../Constants";
 import { logger } from "../logger";
 import { findChannelCluster } from "./clusters";
 import { addProgress } from "./economy/achievements";
+import { userExists } from "./economy/utils";
 import { addNotificationToQueue } from "./users/notifications";
 import { getLastKnownUsername } from "./users/tag";
 
@@ -132,7 +133,7 @@ export async function reviewImageSuggestion(
       memberId: image.uploaderId,
       payload: { content: `your image (${image.url}) has been accepted` },
     });
-    addProgress(image.uploaderId, "wholesome", 1);
+    if (await userExists(image.uploaderId)) addProgress(image.uploaderId, "wholesome", 1);
   } else {
     logger.info(`admin: ${mod.id} (${mod.username}) denied suggestion by ${image.uploaderId}`);
   }
