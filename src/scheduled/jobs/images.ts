@@ -47,12 +47,12 @@ export default {
 
       const json = await res.json();
 
-      const d = await fetch(json.data.url);
+      const d = await fetch(json.data.url, { method: "HEAD" });
 
       const ext = d.headers.get("content-type").split("/")[1];
 
-      log(`suggesting ${json.data.url}.${ext}...`);
-      await suggestImage(Constants.BOT_USER_ID, "capybara", `${json.data.url}.${ext}`, manager);
+      log(`suggesting ${json.data.url}...`);
+      await suggestImage(Constants.BOT_USER_ID, "capybara", `${json.data.url}`, manager, ext);
     }
   },
 } satisfies Job;

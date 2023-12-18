@@ -22,6 +22,7 @@ export async function suggestImage(
   type: ImageType,
   imageUrl: string,
   client: NypsiClient | ClusterManager,
+  extension?: string,
 ): Promise<"ok" | "limit" | "fail"> {
   const query = await prisma.imageSuggestion.count({
     where: {
@@ -36,6 +37,7 @@ export async function suggestImage(
     imageUrl,
     "image",
     `image suggestion ${type} uploaded by ${submitterId}`,
+    extension,
   );
 
   if (!res) return "fail";
@@ -141,6 +143,7 @@ export async function uploadImage(
   url: string,
   type: "avatar" | "image",
   content?: string,
+  extension?: string,
 ) {
   const channelId =
     type === "avatar"
@@ -207,7 +210,9 @@ export async function uploadImage(
         buffer,
         channelId,
         content,
-        extension: `.${url.split(".")[url.split(".").length - 1].split("?")[0]}`,
+        extension: extension
+          ? `.${extension}`
+          : `.${url.split(".")[url.split(".").length - 1].split("?")[0]}`,
         cluster: cluster.cluster,
       },
     },
