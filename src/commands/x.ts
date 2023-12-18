@@ -1,10 +1,12 @@
 import dayjs = require("dayjs");
+import { ImageSuggestion } from "@prisma/client";
 import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonInteraction,
   ButtonStyle,
   CommandInteraction,
+  ComponentType,
   Interaction,
   Message,
   MessageActionRowComponentBuilder,
@@ -26,6 +28,7 @@ import { setInventoryItem } from "../utils/functions/economy/inventory";
 import { setLevel, setPrestige } from "../utils/functions/economy/levelling";
 import { getItems, isEcoBanned, setEcoBan } from "../utils/functions/economy/utils";
 import { updateXp } from "../utils/functions/economy/xp";
+import { getImageSuggestion, reviewImageSuggestion } from "../utils/functions/image";
 import { addKarma, getKarma, removeKarma } from "../utils/functions/karma/karma";
 import { getUserAliases } from "../utils/functions/premium/aliases";
 import {
@@ -39,6 +42,7 @@ import requestDM from "../utils/functions/requestdm";
 import { getAdminLevel, setAdminLevel } from "../utils/functions/users/admin";
 import { isUserBlacklisted, setUserBlacklist } from "../utils/functions/users/blacklist";
 import { getCommandUses } from "../utils/functions/users/commands";
+import { getLastKnownUsername } from "../utils/functions/users/tag";
 import { addTag, getTags, removeTag } from "../utils/functions/users/tags";
 import { hasProfile } from "../utils/functions/users/utils";
 import { logger } from "../utils/logger";
@@ -51,13 +55,25 @@ async function run(
 ) {
   if (!(message instanceof Message)) return;
   if ((await getAdminLevel(message.author.id)) < 1) {
-    if (await redis.exists("nypsi:xemoji:cooldown")) return;
-    await redis.set("nypsi:xemoji:cooldown", "boobies", "EX", 5);
-    return message.react(
-      ["🫦", "💦", "🍑", "🍆", "😩"][
-        Math.floor(Math.random() * ["🫦", "💦", "🍑", "🍆", "😩"].length)
-      ],
-    );
+    if (message.member.roles.cache.has("1023950187661635605")) {
+      if (args[0].toLowerCase() !== "review") {
+        if (await redis.exists("nypsi:xemoji:cooldown")) return;
+        await redis.set("nypsi:xemoji:cooldown", "boobies", "EX", 5);
+        return message.react(
+          ["🫦", "💦", "🍑", "🍆", "😩"][
+            Math.floor(Math.random() * ["🫦", "💦", "🍑", "🍆", "😩"].length)
+          ],
+        );
+      }
+    } else {
+      if (await redis.exists("nypsi:xemoji:cooldown")) return;
+      await redis.set("nypsi:xemoji:cooldown", "boobies", "EX", 5);
+      return message.react(
+        ["🫦", "💦", "🍑", "🍆", "😩"][
+          Math.floor(Math.random() * ["🫦", "💦", "🍑", "🍆", "😩"].length)
+        ],
+      );
+    }
   }
 
   const getDbData = async (user: User) => {
@@ -1396,6 +1412,79 @@ async function run(
     }
 
     startRandomDrop(message.client as NypsiClient, message.channelId);
+  } else if (args[0].toLowerCase() === "review") {
+    const embed = new CustomEmbed(message.member);
+    let suggestion: ImageSuggestion;
+
+    const getNext = async () => {
+      suggestion = await getImageSuggestion();
+
+      if (suggestion) {
+        const username = await getLastKnownUsername(suggestion.uploaderId);
+
+        embed.setImage(suggestion.url);
+        embed.setDescription(
+          `uploaded by ${suggestion.uploaderId} (${username ? username : "unknown"}) on <t:${dayjs(
+            suggestion.createdAt,
+          ).unix()}>\n\ntype: **${suggestion.type}**`,
+        );
+
+        return {
+          embeds: [embed],
+          components: [
+            new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+              new ButtonBuilder()
+                .setLabel("accept")
+                .setCustomId("accept-sug")
+                .setStyle(ButtonStyle.Success),
+              new ButtonBuilder()
+                .setLabel("deny")
+                .setCustomId("deny-sug")
+                .setStyle(ButtonStyle.Danger),
+            ),
+          ],
+        };
+      } else {
+        delete embed.data.image;
+        embed
+          .setDescription("no more left!!! (: :D :3 ^.^ MEOW")
+          .setImage("https://media1.tenor.com/m/JWFEQcWcJyQAAAAC/happy-catto-cats.gif");
+        return { embeds: [embed], components: [] };
+      }
+    };
+
+    const msg = await message.channel.send(await getNext());
+
+    if (suggestion) {
+      const manager = async (): Promise<void> => {
+        const interaction = await msg
+          .awaitMessageComponent({
+            filter: (interaction) => interaction.user.id === message.author.id,
+            componentType: ComponentType.Button,
+            time: 30000,
+          })
+          .catch(() => {
+            msg.edit({ components: [] });
+          });
+
+        if (!interaction) return;
+
+        if (interaction.customId === "accept-sug") {
+          await reviewImageSuggestion(suggestion, "accept", message.author);
+        } else {
+          await reviewImageSuggestion(suggestion, "deny", message.author);
+        }
+
+        const next = await getNext();
+
+        await interaction.update(next).catch(async () => {
+          await msg.edit(next);
+        });
+        if (suggestion) return manager();
+      };
+
+      manager();
+    }
   }
 }
 

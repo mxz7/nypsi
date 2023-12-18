@@ -59,7 +59,7 @@ export async function suggestImage(
     })\n**url** ${res}\n**type** ${type.toUpperCase()}`,
   );
 
-  embed.setFooter({ text: "$x img review" });
+  embed.setFooter({ text: "$x review" });
 
   embed.setImage(res);
 
