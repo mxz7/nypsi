@@ -1,3 +1,4 @@
+import axios from "axios";
 import redis from "../../init/redis";
 import { Job } from "../../types/Jobs";
 import { RedditJSON, RedditJSONPost } from "../../types/Reddit";
@@ -75,18 +76,18 @@ async function cacheUpdate(links: string[], name: string, log: (message: string)
   for (const link of links) {
     await sleep(10000);
 
-    const res: RedditJSON = await fetch(link, { headers }).then(async (res) => {
+    const res: RedditJSON = await axios.get(link, { headers }).then(async (res) => {
       if (res.status === 403) {
         log(`blocked for ${link}. attempting to fetch again`);
-        res = await fetch(link);
-        if (res.ok) {
-          return res.json();
+        res = await axios.get(link);
+        if (res.status === 200) {
+          return res.data;
         } else {
           log(`failed - skipping`);
           return { message: "skip" };
         }
       }
-      return res.json();
+      return res.data;
     });
 
     if (res.message === "skip") {
