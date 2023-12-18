@@ -1,10 +1,12 @@
 import { variants } from "@catppuccin/palette";
-import { ImageType } from "@prisma/client";
+import { Image, ImageType } from "@prisma/client";
 import { ClusterManager } from "discord-hybrid-sharding";
 import { ColorResolvable, WebhookClient } from "discord.js";
 import prisma from "../../init/database";
+import redis from "../../init/redis";
 import { NypsiClient } from "../../models/Client";
 import { CustomEmbed } from "../../models/EmbedBuilders";
+import Constants from "../Constants";
 import { logger } from "../logger";
 import { findChannelCluster } from "./clusters";
 import { getLastKnownUsername } from "./users/tag";
@@ -66,6 +68,26 @@ export async function suggestImage(
   hook.destroy();
 
   return "ok";
+}
+
+export async function getRandomImage(type: ImageType) {
+  const cache = await redis.get(`${Constants.redis.cache.IMAGE}:${type}`);
+
+  if (cache) {
+    const images = JSON.parse(cache) as Image[];
+
+    return images[Math.floor(Math.random() * images.length)];
+  }
+
+  const query = await prisma.image.findMany({
+    where: {
+      type,
+    },
+  });
+
+  await redis.set(`${Constants.redis.cache.IMAGE}:${type}`, JSON.stringify(query), "EX", 86400);
+
+  return query[Math.floor(Math.random() * query.length)];
 }
 
 export async function uploadImage(
