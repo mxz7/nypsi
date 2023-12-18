@@ -13,11 +13,7 @@ const cmd = new Command("image", "view random cute images & upload your own", "a
   ["img"],
 );
 
-const categories = [
-  { name: "cat", value: "cat" },
-  { name: "dog", value: "dog" },
-  { name: "wholesome", value: "wholesome" },
-];
+const categories = ["cat", "dog", "capybara", "wholesome"] as ImageType[];
 
 cmd.slashEnabled = true;
 cmd.slashData
@@ -31,7 +27,11 @@ cmd.slashData
         option
           .setName("type")
           .setDescription("type of picture you're uploading")
-          .setChoices(...categories)
+          .setChoices(
+            ...categories.map((i) => {
+              return { name: i, value: i };
+            }),
+          )
           .setRequired(true),
       )
       .addAttachmentOption((option) =>
@@ -79,14 +79,12 @@ cmd.setRun(async (message, args) => {
     return send({ embeds: [embed], ephemeral: true });
   }
 
-  let categories: ImageType[] = [];
+  let imgCategories: ImageType[] = [];
 
   if (args.length === 0) {
-    categories = ["cat", "dog"];
-  } else if (args[0].toLowerCase() === "cat") {
-    categories = ["cat"];
-  } else if (args[0].toLowerCase() === "dog") {
-    categories = ["dog"];
+    imgCategories = categories;
+  } else if (categories.includes(args[0].toLowerCase() as ImageType)) {
+    imgCategories = [args[0] as ImageType];
   } else if (args[0].toLowerCase() === "upload") {
     if (!(await userExists(message.member)))
       return send({
@@ -162,7 +160,7 @@ cmd.setRun(async (message, args) => {
   await addCooldown(cmd.name, message.member, 7);
 
   const image = await getRandomImage(
-    categories[Math.floor(Math.random() * categories.length)],
+    imgCategories[Math.floor(Math.random() * imgCategories.length)],
   ).catch(() => null);
 
   if (!image) return send({ embeds: [new ErrorEmbed("unable to find a picture ):")] });

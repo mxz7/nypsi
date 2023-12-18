@@ -39,5 +39,20 @@ export default {
       log(`suggesting ${json.url}`);
       await suggestImage(Constants.BOT_USER_ID, "dog", json.url, manager);
     }
+
+    for (let i = 0; i < Math.floor(Math.random() * 4) + 1; i++) {
+      const res = await fetch("https://api.capy.lol/v1/capybara?json=true");
+
+      if (!res.ok) break;
+
+      const json = await res.json();
+
+      const d = await fetch(json.data.url);
+
+      const ext = d.headers.get("content-type").split("/")[1];
+
+      log(`suggesting ${json.data.url}.${ext}...`);
+      await suggestImage(Constants.BOT_USER_ID, "capybara", `${json.data.url}.${ext}`, manager);
+    }
   },
 } satisfies Job;

@@ -717,5 +717,6 @@ model ImageSuggestion {
 enum ImageType {
   cat
   dog
+  capybara
   wholesome
 }

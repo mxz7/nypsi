@@ -6,7 +6,7 @@
 
 */
 -- CreateEnum
-CREATE TYPE "ImageType" AS ENUM ('cat', 'dog', 'wholesome');
+CREATE TYPE "ImageType" AS ENUM ('cat', 'dog', 'capybara', 'wholesome');
 
 -- DropTable
 DROP TABLE "WholesomeImage";

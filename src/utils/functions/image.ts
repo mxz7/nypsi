@@ -29,7 +29,7 @@ export async function suggestImage(
     },
   });
 
-  if (query > 5) return "limit";
+  if (query > 5 && submitterId !== Constants.BOT_USER_ID) return "limit";
 
   const res = await uploadImage(
     client,
