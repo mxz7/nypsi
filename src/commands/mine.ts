@@ -252,6 +252,7 @@ async function doMine(
   const msg = await send({ embeds: [embed], components: [row] });
 
   if (chosenArea == "nether") await addStat(member, "nether_portal");
+  else if (chosenArea === "end") await addStat(member, "end_portal");
 
   const foundItems = new Map<string, number>();
 

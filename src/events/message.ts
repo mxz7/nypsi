@@ -71,7 +71,7 @@ export default async function messageCreate(message: Message) {
         .setColor(Constants.TRANSPARENT_EMBED_COLOR)
         .setDescription(
           "if you need support, join the [**official nypsi server**](https://discord.gg/hJTDNST) or click the button below to talk to a staff member. only click the button if you actually need support" +
-            "\n\n**ONLY IF CLICK IF YOU WISH TO TALK TO A NYPSI STAFF MEMBER**",
+            "\n\n**ONLY CLICK IF YOU WISH TO TALK TO A NYPSI STAFF MEMBER**",
         );
 
       const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(

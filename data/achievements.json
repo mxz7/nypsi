@@ -440,7 +440,7 @@
     "name": "wholesome **I**",
     "emoji": "💖",
     "target": 1,
-    "description": "have 1 wholesome image accepted",
+    "description": "have 1 suggested image accepted",
     "prize": ["lucky_scratch_card:1", "teddy:1"]
   },
   "wholesome_ii": {
@@ -448,7 +448,7 @@
     "name": "wholesome **II**",
     "emoji": "💖",
     "target": 5,
-    "description": "have 5 wholesome images accepted",
+    "description": "have 5 suggested images accepted",
     "prize": ["lucky_scratch_card:2", "teddy:2"]
   },
   "wholesome_iii": {
@@ -456,7 +456,7 @@
     "name": "wholesome **III**",
     "emoji": "💖",
     "target": 15,
-    "description": "have 15 wholesome images accepted",
+    "description": "have 15 suggested images accepted",
     "prize": ["lucky_scratch_card:3", "teddy:3"]
   },
   "wholesome_iv": {
@@ -464,7 +464,7 @@
     "name": "wholesome **IV**",
     "emoji": "💖",
     "target": 25,
-    "description": "have 25 wholesome images accepted",
+    "description": "have 25 suggested images accepted",
     "prize": ["lucky_scratch_card:4", "teddy:4"]
   },
   "wholesome_v": {
@@ -472,7 +472,7 @@
     "name": "wholesome **V**",
     "emoji": "💖",
     "target": 50,
-    "description": "have 50 wholesome images accepted",
+    "description": "have 50 suggested images accepted",
     "prize": ["lucky_scratch_card:5", "teddy:5"]
   },
   "racer_i": {
@@ -552,7 +552,7 @@
     "emoji": "💣",
     "target": 1000,
     "description": "reach a 7x multiplier in mines 1,000 times",
-    "prize": ["nypsi_crate:1", "legendary_scratch_card:1", "tag:bobm"]
+    "prize": ["nypsi_crate:1", "legendary_scratch_card:1", "tag:bomb"]
   },
   "highlow_pro_i": {
     "id": "highlow_pro_i",
@@ -673,44 +673,6 @@
     "target": 1000,
     "description": "win on cherries 1,000 times",
     "prize": ["nypsi_crate:1", "legendary_scratch_card:3", "tag:cherry"]
-  },
-  "horny_i": {
-    "id": "horny_i",
-    "name": "horny **I**",
-    "emoji": "💦",
-    "target": 50,
-    "description": "view 50 nsfw images"
-  },
-  "horny_ii": {
-    "id": "horny_ii",
-    "name": "horny **II**",
-    "emoji": "💦",
-    "target": 250,
-    "description": "view 250 nsfw images"
-  },
-  "horny_iii": {
-    "id": "horny_iii",
-    "name": "horny **III**",
-    "emoji": "💦",
-    "target": 1000,
-    "description": "view 1,000 nsfw images",
-    "prize": ["lucky_scratch_card:1"]
-  },
-  "horny_iv": {
-    "id": "horny_iv",
-    "name": "horny **IV**",
-    "emoji": "💦",
-    "target": 5000,
-    "description": "view 5,000 nsfw images",
-    "prize": ["lucky_scratch_card:2"]
-  },
-  "horny_v": {
-    "id": "horny_v",
-    "name": "horny **V**",
-    "emoji": "💦",
-    "target": 15000,
-    "description": "view 15,000 nsfw images",
-    "prize": ["legendary_scratch_card:1", "test_tube:69", "tag:cum"]
   },
   "cute_i": {
     "id": "cute_i",
@@ -1270,7 +1232,7 @@
     "emoji": "👷🏻‍♂️",
     "target": 250000000,
     "description": "earn $250,000,000 from your workers",
-    "prize": ["legendary_scratch_card:1", "earth_scanner:1"]
+    "prize": ["legendary_scratch_card:1"]
   },
   "capitalist_v": {
     "id": "capitalist_v",
@@ -1278,7 +1240,7 @@
     "emoji": "👷🏻‍♂️",
     "target": 1000000000,
     "description": "earn $1,000,000,000 from your workers",
-    "prize": ["nypsi_crate:1", "legendary_scratch_card:2", "gem_radar:1", "earth_scanner:2"]
+    "prize": ["nypsi_crate:1", "legendary_scratch_card:1", "earth_scanner:1"]
   },
   "discordian_i": {
     "id": "discordian_i",

@@ -26,6 +26,7 @@ export default {
       SUPPORT: "cd:support",
     },
     cache: {
+      IMAGE: "nypsi:image",
       minecraft: {
         UUID: "cache:minecraft:uuid",
         NAME_HISTORY: "cache:minecraft:namehistory",

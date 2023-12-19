@@ -1063,7 +1063,7 @@ export function getRandomCommand(): Command {
   const a: Command[] = [];
 
   commands.forEach((d) => {
-    if (d.category != "none" && d.category != "nsfw") {
+    if (d.category != "none") {
       a.push(d);
     }
   });

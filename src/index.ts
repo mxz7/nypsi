@@ -3,7 +3,7 @@ import { ClusterManager } from "discord-hybrid-sharding";
 import "dotenv/config";
 import { clearInterval } from "timers";
 import redis from "./init/redis";
-import { runJob, startJobs } from "./scheduled/scheduler";
+import { loadJobs, runJob } from "./scheduled/scheduler";
 import Constants from "./utils/Constants";
 import { addFailedHeartbeat, sendHeartbeat } from "./utils/functions/heartbeat";
 import { updateStats } from "./utils/functions/topgg";
@@ -13,8 +13,6 @@ import { listenForDms } from "./utils/handlers/notificationhandler";
 import { listen } from "./utils/handlers/webhookhandler";
 import { getWebhooks, logger, setClusterId } from "./utils/logger";
 import ms = require("ms");
-
-const start = Date.now();
 
 setClusterId("main");
 getWebhooks();
@@ -72,6 +70,8 @@ manager.on("clusterCreate", (cluster) => {
       heartBeatIntervals = [];
     } else if (typeof message === "string" && message.startsWith("trigger_job")) {
       return runJob(message.split("trigger_job_")[1]);
+    } else if (typeof message === "string" && message === "reload_jobs") {
+      return loadJobs();
     }
   });
   logger.info(`launched cluster ${cluster.id}`);
@@ -94,10 +94,8 @@ manager.spawn();
 listen(manager);
 
 setTimeout(async () => {
-  await startJobs();
   listenForDms(manager);
   startMentionInterval();
-  logger.info("jobs triggered");
 }, 300000);
 // }, 15000);
 
@@ -184,7 +182,7 @@ export async function checkStatus() {
     main: true,
     maintenance: (await redis.get("nypsi:maintenance")) == "t",
     clusters: [],
-    uptime: Date.now() - start,
+    uptime: Math.floor(process.uptime() * 1000),
   };
 
   const promises = [];
@@ -197,3 +195,7 @@ export async function checkStatus() {
 
   return response;
 }
+
+loadJobs();
+
+export { manager };
