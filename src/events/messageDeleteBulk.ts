@@ -10,8 +10,6 @@ export default async function messageDeleteBulk(
 ) {
   if (channel.isDMBased()) return;
 
-  logger.debug(`bulk delete: ${channel.guildId} (${channel.guild.name})`);
-
   if (await isLogsEnabled(channel.guild)) {
     logger.debug("logs enabled");
     const embed = new CustomEmbed().disableFooter().setTimestamp();
