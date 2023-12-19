@@ -126,7 +126,7 @@ cmd.setRun(async (message, args) => {
 
     if (attachment.size > 7e6) return send({ embeds: [new ErrorEmbed("file too big")] });
 
-    if (!["jpeg", "jpg", "gif", "png"].includes(attachment.contentType.split("/")[1]))
+    if (!["jpeg", "jpg", "gif", "png", "webp"].includes(attachment.contentType.split("/")[1]))
       return send({ embeds: [new ErrorEmbed("invalid file type. must be an image")] });
 
     await addCooldown(cmd.name, message.member, 30);
