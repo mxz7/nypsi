@@ -636,25 +636,6 @@ model EconomyGuildUpgrades {
   @@id([guildName, upgradeId])
 }
 
-// wholesome tables
-
-model WholesomeImage {
-  id          Int      @id @default(autoincrement())
-  image       String   @unique()
-  submitter   String
-  submitterId String
-  uploadDate  DateTime
-  accepterId  String
-}
-
-model WholesomeSuggestion {
-  id          Int      @id @default(autoincrement())
-  image       String   @unique()
-  submitter   String
-  submitterId String
-  uploadDate  DateTime
-}
-
 // tables with no relation for easiness
 
 model Mention {
@@ -707,4 +688,35 @@ model ActiveChannels {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([userId, channelId])
+}
+
+// for image commands (wholesome etc)
+model Image {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  url  String
+  type ImageType
+
+  uploaderId String?
+  accepterId String?
+
+  views Int @default(0)
+}
+
+model ImageSuggestion {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  url  String
+  type ImageType
+
+  uploaderId String
+}
+
+enum ImageType {
+  cat
+  dog
+  capybara
+  wholesome
 }

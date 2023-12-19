@@ -88,8 +88,7 @@ export type CommandCategory =
   | "admin"
   | "minecraft"
   | "music"
-  | "utility"
-  | "nsfw";
+  | "utility";
 
 export interface NypsiCommandInteraction extends CommandInteraction {
   author?: User;

@@ -197,3 +197,5 @@ export async function checkStatus() {
 }
 
 loadJobs();
+
+export { manager };
