@@ -1429,6 +1429,7 @@ async function run(
             suggestion.createdAt,
           ).unix()}>\n\ntype: **${suggestion.type}**`,
         );
+        embed.setHeader(`suggestion #${suggestion.id}`);
 
         return {
           embeds: [embed],
