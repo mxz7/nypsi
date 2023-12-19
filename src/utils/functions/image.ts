@@ -36,23 +36,13 @@ export async function suggestImage(
 
   if (query > 5 && submitterId !== Constants.BOT_USER_ID) return "limit";
 
-  let url: string;
-
-  if (
-    submitterId === Constants.BOT_USER_ID &&
-    (imageUrl.startsWith("https://i.imgur") ||
-      imageUrl.startsWith("https://cdn.discordapp.com/attachments"))
-  ) {
-    url = imageUrl;
-  } else {
-    url = await uploadImage(
-      client,
-      imageUrl,
-      "image",
-      `image suggestion ${type} uploaded by ${submitterId}`,
-      extension,
-    );
-  }
+  const url = await uploadImage(
+    client,
+    imageUrl,
+    "image",
+    `image suggestion ${type} uploaded by ${submitterId}`,
+    extension,
+  );
 
   if (!url) return "fail";
 
