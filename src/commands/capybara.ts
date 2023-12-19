@@ -5,10 +5,8 @@ import { addProgress } from "../utils/functions/economy/achievements";
 import { getRandomImage } from "../utils/functions/image";
 import { getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command("cat", "get a random picture of a cat", "animals").setAliases([
-  "kitty",
-  "meow",
-  "chipichipichapachapaloobieloobielabalabamagicomiloobieloobieboomboomboomboom",
+const cmd = new Command("capybara", "get a random picture of a capybara", "animals").setAliases([
+  "capy",
 ]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
@@ -18,10 +16,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return message.channel.send({ embeds: [embed] });
   }
 
-  const image = await getRandomImage("cat").catch(() => null);
+  const image = await getRandomImage("capybara").catch(() => null);
 
   if (!image)
-    return message.channel.send({ embeds: [new ErrorEmbed("failed to find a cat image")] });
+    return message.channel.send({ embeds: [new ErrorEmbed("failed to find a capybara image")] });
 
   const embed = new CustomEmbed(message.member)
     .disableFooter()

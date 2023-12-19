@@ -682,7 +682,7 @@ export async function commandGemCheck(member: GuildMember, commandCategory: Comm
         });
       }
     }
-  } else if (commandCategory == "animals" || commandCategory == "nsfw") {
+  } else if (commandCategory == "animals") {
     if (percentChance(0.007)) {
       await addInventoryItem(member, "purple_gem", 1);
       addProgress(member.user.id, "gem_hunter", 1);

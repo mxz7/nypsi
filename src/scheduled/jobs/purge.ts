@@ -73,11 +73,11 @@ export default {
 
     log(`${query.count.toLocaleString()} role persist data purged`);
 
-    const wholesomeSuggestionCount = await prisma.wholesomeSuggestion.count();
+    const suggestionCount = await prisma.imageSuggestion.count();
 
-    if (wholesomeSuggestionCount == 0) {
-      await prisma.$executeRaw`ALTER SEQUENCE "WholesomeSuggestion_id_seq" RESTART WITH 1;`;
-      log("reset wholesome suggestion count");
+    if (suggestionCount == 0) {
+      await prisma.$executeRaw`ALTER SEQUENCE "ImageSuggestion_id_seq" RESTART WITH 1;`;
+      log("reset image suggestion count");
     }
 
     const views = await prisma.profileView.deleteMany({
