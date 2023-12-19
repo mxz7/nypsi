@@ -669,44 +669,6 @@
     "description": "win on cherries 1,000 times",
     "prize": ["nypsi_crate:1", "legendary_scratch_card:3", "tag:cherry"]
   },
-  "horny_i": {
-    "id": "horny_i",
-    "name": "horny **I**",
-    "emoji": "💦",
-    "target": 50,
-    "description": "view 50 nsfw images"
-  },
-  "horny_ii": {
-    "id": "horny_ii",
-    "name": "horny **II**",
-    "emoji": "💦",
-    "target": 250,
-    "description": "view 250 nsfw images"
-  },
-  "horny_iii": {
-    "id": "horny_iii",
-    "name": "horny **III**",
-    "emoji": "💦",
-    "target": 1000,
-    "description": "view 1,000 nsfw images",
-    "prize": ["lucky_scratch_card:1"]
-  },
-  "horny_iv": {
-    "id": "horny_iv",
-    "name": "horny **IV**",
-    "emoji": "💦",
-    "target": 5000,
-    "description": "view 5,000 nsfw images",
-    "prize": ["lucky_scratch_card:2"]
-  },
-  "horny_v": {
-    "id": "horny_v",
-    "name": "horny **V**",
-    "emoji": "💦",
-    "target": 15000,
-    "description": "view 15,000 nsfw images",
-    "prize": ["legendary_scratch_card:1", "test_tube:69", "tag:cum"]
-  },
   "cute_i": {
     "id": "cute_i",
     "name": "cute **I**",

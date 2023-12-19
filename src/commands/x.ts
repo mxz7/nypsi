@@ -1534,6 +1534,12 @@ async function run(
 
       interaction.followUp({ embeds: [new CustomEmbed(message.member, "deleted image")] });
     }
+  } else if (args[0].toLowerCase() === "boobies" && message.author.id === Constants.TEKOH_ID) {
+    const d = await prisma.achievements.deleteMany({
+      where: { achievementId: { startsWith: "horny_" } },
+    });
+
+    return message.channel.send({ content: `${d.count}` });
   }
 }
 
