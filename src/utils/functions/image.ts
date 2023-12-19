@@ -111,11 +111,15 @@ export async function reviewImageSuggestion(
   result: "accept" | "deny",
   mod: User,
 ) {
-  await prisma.imageSuggestion.delete({
-    where: {
-      id: image.id,
-    },
-  });
+  const found = await prisma.imageSuggestion
+    .delete({
+      where: {
+        id: image.id,
+      },
+    })
+    .catch(() => null);
+
+  if (!found) return;
 
   if (result === "accept") {
     const { id } = await prisma.image.create({
