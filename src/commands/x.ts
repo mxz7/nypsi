@@ -28,7 +28,7 @@ import { setInventoryItem } from "../utils/functions/economy/inventory";
 import { setLevel, setPrestige } from "../utils/functions/economy/levelling";
 import { getItems, isEcoBanned, setEcoBan } from "../utils/functions/economy/utils";
 import { updateXp } from "../utils/functions/economy/xp";
-import { getImageSuggestion, reviewImageSuggestion, suggestImage } from "../utils/functions/image";
+import { getImageSuggestion, reviewImageSuggestion } from "../utils/functions/image";
 import { addKarma, getKarma, removeKarma } from "../utils/functions/karma/karma";
 import { getUserAliases } from "../utils/functions/premium/aliases";
 import {
@@ -1535,26 +1535,6 @@ async function run(
 
       interaction.followUp({ embeds: [new CustomEmbed(message.member, "deleted image")] });
     }
-  } else if (args[0].toLowerCase() === "boobies" && message.author.id === Constants.TEKOH_ID) {
-    const d = await prisma.achievements.deleteMany({
-      where: { achievementId: { startsWith: "horny_" } },
-    });
-
-    return message.channel.send({ content: `${d.count}` });
-  } else if (
-    args[0].toLowerCase() === "importwholesome" &&
-    message.author.id === Constants.TEKOH_ID
-  ) {
-    const file = await fs.readFile("wholesome.txt").then((file) => file.toString());
-
-    const functions = [];
-
-    for (const url of file.split("\n")) {
-      functions.push(async () =>
-        suggestImage(Constants.BOT_USER_ID, "wholesome", url, message.client as NypsiClient),
-      );
-    }
-    pAll(functions, { concurrency: 5 });
   }
 }
 
