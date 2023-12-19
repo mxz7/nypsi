@@ -11,8 +11,11 @@ import { logger } from "../logger";
 import { findChannelCluster } from "./clusters";
 import { addProgress } from "./economy/achievements";
 import { userExists } from "./economy/utils";
+import sleep from "./sleep";
 import { addNotificationToQueue } from "./users/notifications";
 import { getLastKnownUsername } from "./users/tag";
+
+let hook: WebhookClient;
 
 export function isImageUrl(url: string): boolean {
   return /\.(jpg|jpeg|png|webp|avif|gif|svg)$/.test(url);
@@ -33,19 +36,29 @@ export async function suggestImage(
 
   if (query > 5 && submitterId !== Constants.BOT_USER_ID) return "limit";
 
-  const res = await uploadImage(
-    client,
-    imageUrl,
-    "image",
-    `image suggestion ${type} uploaded by ${submitterId}`,
-    extension,
-  );
+  let url: string;
 
-  if (!res) return "fail";
+  if (
+    submitterId === Constants.BOT_USER_ID &&
+    (imageUrl.startsWith("https://i.imgur") ||
+      imageUrl.startsWith("https://cdn.discordapp.com/attachments"))
+  ) {
+    url = imageUrl;
+  } else {
+    url = await uploadImage(
+      client,
+      imageUrl,
+      "image",
+      `image suggestion ${type} uploaded by ${submitterId}`,
+      extension,
+    );
+  }
+
+  if (!url) return "fail";
 
   const { id } = await prisma.imageSuggestion.create({
     data: {
-      url: res,
+      url: url,
       uploaderId: submitterId,
       type,
     },
@@ -60,17 +73,18 @@ export async function suggestImage(
   embed.setDescription(
     `**uploader** ${submitterId} (${
       username ? username : "unknown"
-    })\n**url** ${res}\n**type** ${type.toUpperCase()}`,
+    })\n**url** ${url}\n**type** ${type.toUpperCase()}`,
   );
 
   embed.setFooter({ text: "$x review" });
 
-  embed.setImage(res);
+  embed.setImage(url);
 
-  const hook = new WebhookClient({ url: process.env.WHOLESOME_HOOK });
+  if (!hook) hook = new WebhookClient({ url: process.env.WHOLESOME_HOOK });
 
-  await hook.send({ embeds: [embed] });
-  hook.destroy();
+  hook
+    .send({ embeds: [embed] })
+    .catch(() => (hook = new WebhookClient({ url: process.env.WHOLESOME_HOOK })));
 
   return "ok";
 }
@@ -157,12 +171,20 @@ export async function uploadImage(
   content?: string,
   extension?: string,
 ) {
+  if (await redis.exists("nypsi:uploadimg")) {
+    await sleep(Math.floor(Math.random() * 400) + 100);
+    return uploadImage(client, url, type, content, extension);
+  }
+
+  await redis.set("nypsi:uploadimg", "boobies", "EX", 5);
+
   const channelId =
     type === "avatar"
       ? process.env.DISCORD_IMAGE_AVATAR_CHANNEL
       : process.env.DISCORD_IMAGE_CHANNEL;
 
   if (!channelId) {
+    await redis.del("nypsi:uploadimg");
     logger.error("invalid channel for image upload", { url, type, content });
     return;
   }
@@ -172,6 +194,7 @@ export async function uploadImage(
     .catch(() => {});
 
   if (!imageBlob) {
+    await redis.del("nypsi:uploadimg");
     logger.error("failed converting image url to blob", { url, type, content });
     return;
   }
@@ -182,13 +205,17 @@ export async function uploadImage(
     .catch(() => {});
 
   if (!buffer) {
+    await redis.del("nypsi:uploadimg");
     logger.error("failed converting image blob to buffer", { url, type, content });
     return;
   }
 
   const cluster = await findChannelCluster(client, channelId);
 
-  if (typeof cluster.cluster !== "number") return;
+  if (typeof cluster.cluster !== "number") {
+    await redis.del("nypsi:uploadimg");
+    return;
+  }
 
   const res = await (client instanceof ClusterManager ? client : client.cluster).broadcastEval(
     async (c, { buffer, channelId, content, extension, cluster }) => {
@@ -233,9 +260,14 @@ export async function uploadImage(
   const uploaded = res.filter((i) => Boolean(i))[0];
 
   if (typeof uploaded !== "string") {
+    await redis.del("nypsi:uploadimg");
     logger.error("failed to upload image", { ...uploaded, url, content, type });
     return;
   }
+
+  setTimeout(() => {
+    redis.del("nypsi:uploadimg");
+  }, 5000);
 
   logger.info("uploaded image", { original: url, uploaded, content, type });
 

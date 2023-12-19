@@ -28,7 +28,7 @@ import { setInventoryItem } from "../utils/functions/economy/inventory";
 import { setLevel, setPrestige } from "../utils/functions/economy/levelling";
 import { getItems, isEcoBanned, setEcoBan } from "../utils/functions/economy/utils";
 import { updateXp } from "../utils/functions/economy/xp";
-import { getImageSuggestion, reviewImageSuggestion } from "../utils/functions/image";
+import { getImageSuggestion, reviewImageSuggestion, suggestImage } from "../utils/functions/image";
 import { addKarma, getKarma, removeKarma } from "../utils/functions/karma/karma";
 import { getUserAliases } from "../utils/functions/premium/aliases";
 import {
@@ -46,6 +46,7 @@ import { getLastKnownUsername } from "../utils/functions/users/tag";
 import { addTag, getTags, removeTag } from "../utils/functions/users/tags";
 import { hasProfile } from "../utils/functions/users/utils";
 import { logger } from "../utils/logger";
+import pAll = require("p-all");
 
 const cmd = new Command("x", "admincmd", "none").setPermissions(["bot owner"]);
 
@@ -1540,6 +1541,20 @@ async function run(
     });
 
     return message.channel.send({ content: `${d.count}` });
+  } else if (
+    args[0].toLowerCase() === "importwholesome" &&
+    message.author.id === Constants.TEKOH_ID
+  ) {
+    const file = await fs.readFile("wholesome.txt").then((file) => file.toString());
+
+    const functions = [];
+
+    for (const url of file.split("\n")) {
+      functions.push(async () =>
+        suggestImage(Constants.BOT_USER_ID, "wholesome", url, message.client as NypsiClient),
+      );
+    }
+    pAll(functions, { concurrency: 5 });
   }
 }
 
