@@ -19,6 +19,7 @@ cmd.slashEnabled = true;
 cmd.slashData
   .addSubcommand((cat) => cat.setName("cat").setDescription("get a picture of a cat"))
   .addSubcommand((dog) => dog.setName("dog").setDescription("get a picture of a dog"))
+  .addSubcommand((capy) => capy.setName("capybara").setDescription("get a picture of a capybara"))
   .addSubcommand((upload) =>
     upload
       .setName("upload")
