@@ -292,16 +292,6 @@ export async function dataDelete(userId: string) {
     },
   });
 
-  await prisma.wholesomeImage.updateMany({
-    where: {
-      submitterId: userId,
-    },
-    data: {
-      submitterId: "[redacted]",
-      submitter: "[redacted]",
-    },
-  });
-
   await prisma.chatReactionStats.deleteMany({
     where: {
       userId: userId,

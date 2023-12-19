@@ -1,290 +1,190 @@
 import { variants } from "@catppuccin/palette";
-import { WholesomeImage, WholesomeSuggestion } from "@prisma/client";
-import { ColorResolvable, GuildMember, WebhookClient } from "discord.js";
+import { Image, ImageSuggestion, ImageType } from "@prisma/client";
+import { ClusterManager } from "discord-hybrid-sharding";
+import { ColorResolvable, User, WebhookClient } from "discord.js";
 import prisma from "../../init/database";
+import redis from "../../init/redis";
 import { NypsiClient } from "../../models/Client";
 import { CustomEmbed } from "../../models/EmbedBuilders";
-import { RedditJSONPost } from "../../types/Reddit";
+import Constants from "../Constants";
 import { logger } from "../logger";
 import { findChannelCluster } from "./clusters";
 import { addProgress } from "./economy/achievements";
-import requestDM from "./requestdm";
+import { userExists } from "./economy/utils";
+import sleep from "./sleep";
+import { addNotificationToQueue } from "./users/notifications";
+import { getLastKnownUsername } from "./users/tag";
 
-let wholesomeCache: WholesomeImage[];
+let hook: WebhookClient;
 
 export function isImageUrl(url: string): boolean {
   return /\.(jpg|jpeg|png|webp|avif|gif|svg)$/.test(url);
 }
 
-export async function redditImage(
-  post: RedditJSONPost,
-  allowed: RedditJSONPost[],
-): Promise<string> {
-  let image = post.data.url;
+export async function suggestImage(
+  submitterId: string,
+  type: ImageType,
+  imageUrl: string,
+  client: NypsiClient | ClusterManager,
+  extension?: string,
+): Promise<"ok" | "limit" | "fail"> {
+  const query = await prisma.imageSuggestion.count({
+    where: {
+      uploaderId: submitterId,
+    },
+  });
 
-  if (image.includes("imgur.com/a/")) {
-    post = allowed[Math.floor(Math.random() * allowed.length)];
-    image = post.data.url;
-  }
+  if (query > 5 && submitterId !== Constants.BOT_USER_ID) return "limit";
 
-  if (image.includes("imgur") && !image.includes("gif")) {
-    image = "https://i.imgur.com/" + image.split("/")[3];
-    if (!isImageUrl(image)) {
-      image = "https://i.imgur.com/" + image.split("/")[3] + ".gif";
-    }
-    return image + "|" + post.data.title + "|" + post.data.permalink + "|" + post.data.author;
-  }
+  let url: string;
 
-  if (image.includes("gfycat")) {
-    const link = await fetch("https://api.gfycat.com/v1/gfycats/" + image.split("/")[3]).then(
-      (url) => url.json(),
+  if (
+    submitterId === Constants.BOT_USER_ID &&
+    (imageUrl.startsWith("https://i.imgur") ||
+      imageUrl.startsWith("https://cdn.discordapp.com/attachments"))
+  ) {
+    url = imageUrl;
+  } else {
+    url = await uploadImage(
+      client,
+      imageUrl,
+      "image",
+      `image suggestion ${type} uploaded by ${submitterId}`,
+      extension,
     );
-
-    if (link.gfyItem) {
-      image = link.gfyItem.max5mbGif;
-      return image + "|" + post.data.title + "|" + post.data.permalink + "|" + post.data.author;
-    }
   }
 
-  let count = 0;
+  if (!url) return "fail";
 
-  while (!isImageUrl(image)) {
-    if (count >= 10) {
-      logger.warn("couldnt find image @ " + post.data.subreddit_name_prefixed);
-      return "lol";
-    }
-
-    count++;
-
-    post = allowed[Math.floor(Math.random() * allowed.length)];
-    image = post.data.url;
-
-    if (image.includes("imgur.com/a/")) {
-      post = allowed[Math.floor(Math.random() * allowed.length)];
-      image = post.data.url;
-    }
-
-    if (image.includes("imgur") && !image.includes("gif") && !image.includes("png")) {
-      image = "https://i.imgur.com/" + image.split("/")[3];
-      image = "https://i.imgur.com/" + image.split("/")[3] + ".png";
-      if (!isImageUrl(image)) {
-        image = "https://i.imgur.com/" + image.split("/")[3] + ".gif";
-        return image + "|" + post.data.title + "|" + post.data.permalink + "|" + post.data.author;
-      }
-    }
-
-    if (image.includes("gfycat")) {
-      const link = await fetch("https://api.gfycat.com/v1/gfycats/" + image.split("/")[3]).then(
-        (url) => url.json(),
-      );
-
-      if (link) {
-        image = link.gfyItem.max5mbGif;
-        return image + "|" + post.data.title + "|" + post.data.permalink + "|" + post.data.author;
-      }
-    }
-  }
-
-  let title = post.data.title;
-
-  if (title.length >= 150) {
-    const a = title.split("");
-    let newTitle = "";
-    let count = 0;
-
-    for (const char of a) {
-      if (count == 145) {
-        newTitle = newTitle + "...";
-        break;
-      } else {
-        count++;
-        newTitle = newTitle + char;
-      }
-    }
-
-    title = newTitle;
-  }
-
-  return image + "|" + title + "|" + post.data.permalink + "|" + post.data.author;
-}
-
-export async function suggestWholesomeImage(
-  submitter: GuildMember,
-  image: string,
-): Promise<boolean> {
-  const query1 = await prisma.wholesomeImage.findUnique({
-    where: {
-      image: image,
-    },
-    select: {
-      id: true,
-    },
-  });
-
-  if (query1) {
-    return false;
-  }
-
-  const query2 = await prisma.wholesomeSuggestion.findUnique({
-    where: {
-      image: image,
-    },
-    select: {
-      id: true,
-    },
-  });
-
-  if (query2) {
-    return false;
-  }
-
-  const { id } = await prisma.wholesomeSuggestion.create({
+  const { id } = await prisma.imageSuggestion.create({
     data: {
-      image: image,
-      submitter: submitter.user.username,
-      submitterId: submitter.user.id,
-      uploadDate: new Date(),
+      url: url,
+      uploaderId: submitterId,
+      type,
     },
   });
 
   const embed = new CustomEmbed()
     .setColor(variants.latte.base.hex as ColorResolvable)
-    .setTitle("wholesome suggestion #" + id);
+    .setTitle("image suggestion #" + id);
+
+  const username = await getLastKnownUsername(submitterId);
 
   embed.setDescription(
-    `**submitter** ${submitter.user.username} (${submitter.user.id})\n**url** ${image}`,
+    `**uploader** ${submitterId} (${
+      username ? username : "unknown"
+    })\n**url** ${url}\n**type** ${type.toUpperCase()}`,
   );
 
-  embed.setFooter({ text: "$ws review" });
+  embed.setFooter({ text: "$x review" });
 
-  embed.setImage(image);
+  embed.setImage(url);
 
-  const hook = new WebhookClient({ url: process.env.WHOLESOME_HOOK });
+  if (!hook) hook = new WebhookClient({ url: process.env.WHOLESOME_HOOK });
 
-  await hook.send({ embeds: [embed] });
-  hook.destroy();
+  hook
+    .send({ embeds: [embed] })
+    .catch(() => (hook = new WebhookClient({ url: process.env.WHOLESOME_HOOK })));
 
-  return true;
+  return "ok";
 }
 
-export async function acceptWholesomeImage(
-  id: number,
-  accepter: GuildMember,
-  client: NypsiClient,
-): Promise<boolean> {
-  const query = await prisma.wholesomeSuggestion.findUnique({
-    where: {
-      id: id,
-    },
-  });
+export async function getRandomImage(type: ImageType) {
+  const cache = await redis.get(`${Constants.redis.cache.IMAGE}:${type}`);
 
-  if (!query) return false;
+  let images: Image[];
 
-  await prisma.wholesomeImage.create({
-    data: {
-      image: query.image,
-      submitter: query.submitter,
-      submitterId: query.submitterId,
-      uploadDate: query.uploadDate,
-      accepterId: accepter.user.id,
-    },
-  });
-
-  await prisma.wholesomeSuggestion.delete({
-    where: {
-      id: id,
-    },
-  });
-
-  clearWholesomeCache();
-
-  addProgress(query.submitterId, "wholesome", 1);
-  logger.info(`${query.image} by ${query.submitterId} accepted by ${accepter.user.id}`);
-
-  await requestDM({
-    memberId: query.submitterId,
-    client: client,
-    content: `your wholesome image (${query.image}) has been accepted`,
-  });
-
-  return true;
-}
-
-export async function denyWholesomeImage(id: number, staff: GuildMember) {
-  const d = await prisma.wholesomeSuggestion.delete({
-    where: {
-      id: id,
-    },
-  });
-
-  if (!d) {
-    return false;
-  }
-
-  logger.info(`${d.image} by ${d.submitterId} denied by ${staff.user.id}`);
-
-  return true;
-}
-
-export async function getWholesomeImage(id?: number): Promise<WholesomeImage> {
-  if (id) {
-    const query = await prisma.wholesomeImage.findUnique({
+  if (cache) {
+    images = JSON.parse(cache) as Image[];
+  } else {
+    images = await prisma.image.findMany({
       where: {
-        id: id,
+        type,
       },
     });
-    return query;
-  } else {
-    if (wholesomeCache) {
-      return wholesomeCache[Math.floor(Math.random() * wholesomeCache.length)];
-    } else {
-      const query = await prisma.wholesomeImage.findMany();
 
-      wholesomeCache = query;
-
-      return wholesomeCache[Math.floor(Math.random() * wholesomeCache.length)];
-    }
+    await redis.set(`${Constants.redis.cache.IMAGE}:${type}`, JSON.stringify(images), "EX", 86400);
   }
-}
 
-export function clearWholesomeCache() {
-  wholesomeCache = undefined;
-}
+  const chosen = images[Math.floor(Math.random() * images.length)];
 
-export async function deleteFromWholesome(id: number) {
-  const query = await prisma.wholesomeImage.delete({
-    where: {
-      id: id,
-    },
+  prisma.image.update({
+    where: { id: chosen.id },
+    data: { views: { increment: 1 } },
   });
 
-  clearWholesomeCache();
-
-  if (query) {
-    return true;
-  } else {
-    return false;
-  }
+  return chosen;
 }
 
-export async function getAllSuggestions(): Promise<WholesomeSuggestion[]> {
-  const query = await prisma.wholesomeSuggestion.findMany();
+export async function getImageSuggestion() {
+  return await prisma.imageSuggestion.findFirst();
+}
 
-  return query;
+export async function reviewImageSuggestion(
+  image: ImageSuggestion,
+  result: "accept" | "deny",
+  mod: User,
+) {
+  const found = await prisma.imageSuggestion
+    .delete({
+      where: {
+        id: image.id,
+      },
+    })
+    .catch(() => null);
+
+  if (!found) return;
+
+  if (result === "accept") {
+    const { id } = await prisma.image.create({
+      data: {
+        type: image.type,
+        accepterId: mod.id,
+        uploaderId: image.uploaderId,
+        url: image.url,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    await redis.del(`${Constants.redis.cache.IMAGE}:${image.type}`);
+
+    logger.info(
+      `admin: ${mod.id} (${mod.username}) accepted suggestion by ${image.uploaderId} id: ${id}`,
+    );
+
+    addNotificationToQueue({
+      memberId: image.uploaderId,
+      payload: { content: `your image (${image.url}) has been accepted` },
+    });
+    if (await userExists(image.uploaderId)) addProgress(image.uploaderId, "wholesome", 1);
+  } else {
+    logger.info(`admin: ${mod.id} (${mod.username}) denied suggestion by ${image.uploaderId}`);
+  }
 }
 
 export async function uploadImage(
-  client: NypsiClient,
+  client: NypsiClient | ClusterManager,
   url: string,
-  type: "avatar" | "wholesome",
+  type: "avatar" | "image",
   content?: string,
+  extension?: string,
 ) {
+  if (await redis.exists("nypsi:uploadimg")) {
+    await sleep(Math.floor(Math.random() * 400) + 100);
+    return uploadImage(client, url, type, content, extension);
+  }
+
+  await redis.set("nypsi:uploadimg", "boobies", "EX", 5);
+
   const channelId =
     type === "avatar"
       ? process.env.DISCORD_IMAGE_AVATAR_CHANNEL
-      : process.env.DISCORD_IMAGE_WHOLESOME_CHANNEL;
+      : process.env.DISCORD_IMAGE_CHANNEL;
 
   if (!channelId) {
+    await redis.del("nypsi:uploadimg");
     logger.error("invalid channel for image upload", { url, type, content });
     return;
   }
@@ -294,6 +194,7 @@ export async function uploadImage(
     .catch(() => {});
 
   if (!imageBlob) {
+    await redis.del("nypsi:uploadimg");
     logger.error("failed converting image url to blob", { url, type, content });
     return;
   }
@@ -304,15 +205,19 @@ export async function uploadImage(
     .catch(() => {});
 
   if (!buffer) {
+    await redis.del("nypsi:uploadimg");
     logger.error("failed converting image blob to buffer", { url, type, content });
     return;
   }
 
   const cluster = await findChannelCluster(client, channelId);
 
-  if (typeof cluster.cluster !== "number") return;
+  if (typeof cluster.cluster !== "number") {
+    await redis.del("nypsi:uploadimg");
+    return;
+  }
 
-  const res = await client.cluster.broadcastEval(
+  const res = await (client instanceof ClusterManager ? client : client.cluster).broadcastEval(
     async (c, { buffer, channelId, content, extension, cluster }) => {
       const client = c as unknown as NypsiClient;
 
@@ -344,7 +249,9 @@ export async function uploadImage(
         buffer,
         channelId,
         content,
-        extension: `.${url.split(".")[url.split(".").length - 1].split("?")[0]}`,
+        extension: extension
+          ? `.${extension}`
+          : `.${url.split(".")[url.split(".").length - 1].split("?")[0]}`,
         cluster: cluster.cluster,
       },
     },
@@ -353,9 +260,14 @@ export async function uploadImage(
   const uploaded = res.filter((i) => Boolean(i))[0];
 
   if (typeof uploaded !== "string") {
+    await redis.del("nypsi:uploadimg");
     logger.error("failed to upload image", { ...uploaded, url, content, type });
     return;
   }
+
+  setTimeout(() => {
+    redis.del("nypsi:uploadimg");
+  }, 5000);
 
   logger.info("uploaded image", { original: url, uploaded, content, type });
 
