@@ -39,39 +39,25 @@ import {
   renderGambleScreen,
   userExists,
 } from "../utils/functions/economy/utils.js";
-import {
-  calcEarnedGambleXp,
-  getXp,
-  updateXp,
-} from "../utils/functions/economy/xp";
+import { calcEarnedGambleXp, getXp, updateXp } from "../utils/functions/economy/xp";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { shuffle } from "../utils/functions/random";
 import sleep from "../utils/functions/sleep";
 import { recentCommands } from "../utils/functions/users/commands";
 import { addHourlyCommand } from "../utils/handlers/commandhandler";
-import {
-  addCooldown,
-  getResponse,
-  onCooldown,
-} from "../utils/handlers/cooldownhandler.js";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 import { gamble, logger } from "../utils/logger";
 
-const cmd = new Command("blackjack", "play blackjack", "money").setAliases([
-  "bj",
-  "blowjob",
-]);
+const cmd = new Command("blackjack", "play blackjack", "money").setAliases(["bj", "blowjob"]);
 
 cmd.slashEnabled = true;
 cmd.slashData.addStringOption((option) =>
-  option
-    .setName("bet")
-    .setDescription("how much would you like to bet")
-    .setRequired(false)
+  option.setName("bet").setDescription("how much would you like to bet").setRequired(false),
 );
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
-  args: string[]
+  args: string[],
 ) {
   if (!(await userExists(message.member))) await createUser(message.member);
 
@@ -122,7 +108,7 @@ async function prepareGame(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
   msg?: Message,
-  interaction?: ButtonInteraction
+  interaction?: ButtonInteraction,
 ): Promise<any> {
   recentCommands.set(message.author.id, Date.now());
 
@@ -156,12 +142,7 @@ async function prepareGame(
     }
   };
 
-  if (
-    await redis.sismember(
-      Constants.redis.nypsi.USERS_PLAYING,
-      message.author.id
-    )
-  ) {
+  if (await redis.sismember(Constants.redis.nypsi.USERS_PLAYING, message.author.id)) {
     if (msg) {
       return msg.edit({
         embeds: [new ErrorEmbed("you have an active game")],
@@ -182,7 +163,7 @@ async function prepareGame(
         "in blackjack, the aim is to get **21**, or as close as to **21** as you can get without going over\n" +
           "the dealer will always stand on or above **17**\n" +
           "**2**x multiplier for winning, on a draw you receive your bet back\n" +
-          "if your first 2 cards add up to 21, you get a **2.5**x win"
+          "if your first 2 cards add up to 21, you get a **2.5**x win",
       );
 
     return send({ embeds: [embed] });
@@ -194,7 +175,7 @@ async function prepareGame(
       "blackjack works exactly how it would in real life\n" +
         "when you create a game, a full 52 deck is shuffled in a random order\n" +
         "for every new card you take, it is taken from the first in the deck (array) and then removed from the deck\n" +
-        "view the code for this [here](https://github.com/tekoh/nypsi/blob/main/src/commands/blackjack.ts)"
+        "view the code for this [here](https://github.com/tekoh/nypsi/blob/main/src/commands/blackjack.ts)",
     ).setHeader("blackjack help");
 
     return send({ embeds: [embed] });
@@ -202,8 +183,7 @@ async function prepareGame(
 
   const maxBet = await calcMaxBet(message.member);
 
-  const bet =
-    (await formatBet(args[0], message.member).catch(() => {})) || defaultBet;
+  const bet = (await formatBet(args[0], message.member).catch(() => {})) || defaultBet;
 
   if (!bet) {
     if (msg) {
@@ -236,7 +216,7 @@ async function prepareGame(
       return msg.edit({
         embeds: [
           new ErrorEmbed(
-            `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
+            `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`,
           ),
         ],
       });
@@ -244,7 +224,7 @@ async function prepareGame(
       return send({
         embeds: [
           new ErrorEmbed(
-            `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`
+            `your max bet is $**${maxBet.toLocaleString()}**\nyou can upgrade this by prestiging and voting`,
           ),
         ],
       });
@@ -264,9 +244,7 @@ async function prepareGame(
 }
 
 class Game {
-  private playerMessage:
-    | Message
-    | (NypsiCommandInteraction & CommandInteraction);
+  private playerMessage: Message | (NypsiCommandInteraction & CommandInteraction);
   private message: Message;
   private member: GuildMember;
   private deck: string[];
@@ -278,19 +256,18 @@ class Game {
   private state: "playing" | "end";
 
   static getRow(doubleDown = true, disabled = false) {
-    const row =
-      new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder()
-          .setLabel("hit")
-          .setStyle(ButtonStyle.Primary)
-          .setCustomId("hit")
-          .setDisabled(disabled),
-        new ButtonBuilder()
-          .setLabel("stand")
-          .setStyle(ButtonStyle.Primary)
-          .setCustomId("stand")
-          .setDisabled(disabled)
-      );
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder()
+        .setLabel("hit")
+        .setStyle(ButtonStyle.Primary)
+        .setCustomId("hit")
+        .setDisabled(disabled),
+      new ButtonBuilder()
+        .setLabel("stand")
+        .setStyle(ButtonStyle.Primary)
+        .setCustomId("stand")
+        .setDisabled(disabled),
+    );
 
     if (doubleDown)
       row.addComponents(
@@ -298,7 +275,7 @@ class Game {
           .setLabel("double down")
           .setStyle(ButtonStyle.Secondary)
           .setCustomId("dd")
-          .setDisabled(disabled)
+          .setDisabled(disabled),
       );
 
     return row;
@@ -309,7 +286,7 @@ class Game {
     member: GuildMember,
     bet: number,
     msg?: Message,
-    interaction?: ButtonInteraction
+    interaction?: ButtonInteraction,
   ) {
     this.playerMessage = message;
     this.member = member;
@@ -323,7 +300,7 @@ class Game {
       if (this.state === "playing") {
         logger.warn(
           "blackjack still in playing state after 5 minutes - deleting user from redis key",
-          { user: this.member.user, game: this }
+          { user: this.member.user, game: this },
         );
 
         redis.srem(Constants.redis.nypsi.USERS_PLAYING, this.member.user.id);
@@ -398,28 +375,20 @@ class Game {
   }
 
   private async edit(data: MessageEditOptions) {
-    if (
-      !this.interaction ||
-      this.interaction.deferred ||
-      this.interaction.replied
-    )
+    if (!this.interaction || this.interaction.deferred || this.interaction.replied)
       return this.message.edit(data).catch(async (e) => {
         logger.error("bj edit error", e);
-        const msg = await this.message.channel.send(
-          data as MessageCreateOptions
-        );
+        const msg = await this.message.channel.send(data as MessageCreateOptions);
         this.message = msg;
         return msg;
       });
     return this.interaction.update(data).catch(() =>
       this.message.edit(data).catch(async (e) => {
         logger.error("bj edit error", e);
-        const msg = await this.message.channel.send(
-          data as MessageCreateOptions
-        );
+        const msg = await this.message.channel.send(data as MessageCreateOptions);
         this.message = msg;
         return msg;
-      })
+      }),
     );
   }
 
@@ -436,30 +405,18 @@ class Game {
     winnings?: number,
     multi?: number,
     xp?: number,
-    id?: string
+    id?: string,
   ) {
     const embed = new CustomEmbed(
       this.member,
-      await renderGambleScreen(
-        this.member.user.id,
-        state,
-        this.bet,
-        null,
-        winnings,
-        multi
-      )
-    ).setHeader(
-      "blackjack",
-      this.member.avatarURL() || this.member.user.avatarURL()
-    );
+      await renderGambleScreen(this.member.user.id, state, this.bet, null, winnings, multi),
+    ).setHeader("blackjack", this.member.avatarURL() || this.member.user.avatarURL());
 
     if (state === "win") embed.setColor(Constants.EMBED_SUCCESS_COLOR);
     else if (state === "lose") embed.setColor(Constants.EMBED_FAIL_COLOR);
-    else if (state === "draw")
-      embed.setColor(variants.macchiato.yellow.hex as ColorResolvable);
+    else if (state === "draw") embed.setColor(variants.macchiato.yellow.hex as ColorResolvable);
 
-    if (xp && id)
-      embed.setFooter({ text: `+${xp.toLocaleString()}xp | id: ${id}` });
+    if (xp && id) embed.setFooter({ text: `+${xp.toLocaleString()}xp | id: ${id}` });
     else if (id) embed.setFooter({ text: `id: ${id}` });
 
     embed.addField("dealer", this.dealer.render());
@@ -489,15 +446,11 @@ class Game {
       xp = await calcEarnedGambleXp(
         this.member,
         this.bet,
-        this.hand.cards.length === 2 && this.hand.total() === 21 ? 2.5 : 2
+        this.hand.cards.length === 2 && this.hand.total() === 21 ? 2.5 : 2,
       );
     } else if (result === "draw") winnings = this.bet;
 
-    if (winnings > 0)
-      await updateBalance(
-        this.member,
-        (await getBalance(this.member)) + winnings
-      );
+    if (winnings > 0) await updateBalance(this.member, (await getBalance(this.member)) + winnings);
     if (xp > 0) {
       await updateXp(this.member, (await getXp(this.member)) + xp);
 
@@ -536,13 +489,9 @@ class Game {
       return this.edit({ embeds: [embed], components: [] });
     }
 
-    const row =
-      new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder()
-          .setLabel("play again")
-          .setStyle(ButtonStyle.Success)
-          .setCustomId("rp")
-      );
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder().setLabel("play again").setStyle(ButtonStyle.Success).setCustomId("rp"),
+    );
 
     await this.edit({ embeds: [embed], components: [row] });
 
@@ -567,55 +516,39 @@ class Game {
     if (res && res.customId == "rp") {
       this.interaction = res;
       logger.info(
-        `::cmd ${this.message.guild.id} ${this.member.user.username}: replaying blackjack`
+        `::cmd ${this.message.guild.id} ${this.member.user.username}: replaying blackjack`,
       );
-      if (await isLockedOut(this.member.user.id))
-        return verifyUser(this.playerMessage);
+      if (await isLockedOut(this.member.user.id)) return verifyUser(this.playerMessage);
 
       addHourlyCommand(this.member);
 
-      await a(
-        this.member.user.id,
-        this.member.user.username,
-        this.playerMessage.content
-      );
+      await a(this.member.user.id, this.member.user.username, this.playerMessage.content);
 
       if (
         (await redis.get(
-          `${Constants.redis.nypsi.RESTART}:${
-            (this.message.client as NypsiClient).cluster.id
-          }`
+          `${Constants.redis.nypsi.RESTART}:${(this.message.client as NypsiClient).cluster.id}`,
         )) == "t"
       ) {
-        if (
-          this.member.user.id == Constants.TEKOH_ID &&
-          this.playerMessage instanceof Message
-        ) {
+        if (this.member.user.id == Constants.TEKOH_ID && this.playerMessage instanceof Message) {
           this.playerMessage.react("💀");
         } else {
           return this.edit({
             embeds: [
-              new CustomEmbed(
-                this.member,
-                "nypsi is rebooting, try again in a few minutes"
-              ),
+              new CustomEmbed(this.member, "nypsi is rebooting, try again in a few minutes"),
             ],
           });
         }
       }
 
       if (await redis.get("nypsi:maintenance")) {
-        if (
-          this.member.user.id == Constants.TEKOH_ID &&
-          this.playerMessage instanceof Message
-        ) {
+        if (this.member.user.id == Constants.TEKOH_ID && this.playerMessage instanceof Message) {
           this.playerMessage.react("💀");
         } else {
           return this.edit({
             embeds: [
               new CustomEmbed(
                 this.member,
-                "fun & moderation commands are still available to you. maintenance mode only prevents certain commands to prevent loss of progress"
+                "fun & moderation commands are still available to you. maintenance mode only prevents certain commands to prevent loss of progress",
               ).setTitle("⚠️ nypsi is under maintenance"),
             ],
           });
@@ -626,7 +559,7 @@ class Game {
         this.playerMessage,
         [this.originalBet.toString()],
         this.message,
-        this.interaction
+        this.interaction,
       );
     }
   }
@@ -664,21 +597,15 @@ class Game {
         if (this.playerMessage.deferred) {
           res = await this.playerMessage.editReply(data).catch(async () => {
             usedNewMessage = true;
-            return await this.playerMessage.channel.send(
-              data as BaseMessageOptions
-            );
+            return await this.playerMessage.channel.send(data as BaseMessageOptions);
           });
         } else {
-          res = await this.playerMessage
-            .reply(data as InteractionReplyOptions)
-            .catch(() => {
-              return this.playerMessage.editReply(data).catch(async () => {
-                usedNewMessage = true;
-                return await this.playerMessage.channel.send(
-                  data as BaseMessageOptions
-                );
-              });
+          res = await this.playerMessage.reply(data as InteractionReplyOptions).catch(() => {
+            return this.playerMessage.editReply(data).catch(async () => {
+              usedNewMessage = true;
+              return await this.playerMessage.channel.send(data as BaseMessageOptions);
             });
+          });
         }
 
         if (usedNewMessage && res instanceof Message) return res;
@@ -688,14 +615,11 @@ class Game {
           return replyMsg;
         }
       } else {
-        return await this.playerMessage.channel.send(
-          data as BaseMessageOptions
-        );
+        return await this.playerMessage.channel.send(data as BaseMessageOptions);
       }
     };
 
-    if (!this.message)
-      this.message = await send({ embeds: [embed], components: [row] });
+    if (!this.message) this.message = await send({ embeds: [embed], components: [row] });
     else await this.edit({ embeds: [embed], components: [row] });
 
     return this.listen();
@@ -721,10 +645,7 @@ class Game {
       });
 
     if (expire || !response) {
-      await redis.srem(
-        Constants.redis.nypsi.USERS_PLAYING,
-        this.member.user.id
-      );
+      await redis.srem(Constants.redis.nypsi.USERS_PLAYING, this.member.user.id);
       return this.message.reply({
         content: `${this.member.toString()} blackjack game expired`,
       });
@@ -831,15 +752,7 @@ class Hand {
     let aceAs11 = false;
 
     for (let card of this.cards) {
-      card = card
-        .split("♠️")
-        .join()
-        .split("♣️")
-        .join()
-        .split("♥️")
-        .join()
-        .split("♦️")
-        .join();
+      card = card.split("♠️").join().split("♣️").join().split("♥️").join().split("♦️").join();
 
       if (card.includes("K") || card.includes("Q") || card.includes("J")) {
         total = total + 10;
