@@ -590,7 +590,7 @@ class Game {
     const row = Game.getRow((await getBalance(this.member)) >= this.bet);
 
     const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
-      if (!(message instanceof Message)) {
+      if (!(this.playerMessage instanceof Message)) {
         let usedNewMessage = false;
         let res;
 
@@ -601,7 +601,7 @@ class Game {
           });
         } else {
           res = await this.playerMessage.reply(data as InteractionReplyOptions).catch(() => {
-            return this.playerMessage.editReply(data).catch(async () => {
+            return (this.playerMessage as CommandInteraction).editReply(data).catch(async () => {
               usedNewMessage = true;
               return await this.playerMessage.channel.send(data as BaseMessageOptions);
             });
@@ -610,7 +610,7 @@ class Game {
 
         if (usedNewMessage && res instanceof Message) return res;
 
-        const replyMsg = await message.fetchReply();
+        const replyMsg = await this.playerMessage.fetchReply();
         if (replyMsg instanceof Message) {
           return replyMsg;
         }
