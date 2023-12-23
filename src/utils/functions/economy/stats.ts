@@ -175,12 +175,12 @@ export async function addStat(member: GuildMember | string, item: string, amount
       },
     },
     update: {
-      amount: { increment: amount },
+      amount: { increment: Math.floor(amount) },
     },
     create: {
       userId: id,
       itemId: item,
-      amount: amount,
+      amount: Math.floor(amount),
     },
   });
 }
