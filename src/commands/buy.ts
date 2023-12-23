@@ -8,6 +8,7 @@ import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
 import { addInventoryItem } from "../utils/functions/economy/inventory";
+import { addStat } from "../utils/functions/economy/stats";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -134,7 +135,7 @@ async function run(
   await addCooldown(cmd.name, message.member, 7);
 
   await updateBalance(message.member, (await getBalance(message.member)) - selected.buy * amount);
-
+  addStat(message.author.id, "spent-shop", selected.buy * amount);
   await addInventoryItem(message.member, selected.id, amount);
 
   return send({

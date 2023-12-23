@@ -36,6 +36,7 @@ import {
   setOwner,
 } from "../utils/functions/economy/guilds";
 import { getRawLevel } from "../utils/functions/economy/levelling";
+import { addStat } from "../utils/functions/economy/stats";
 import {
   createUser,
   formatNumber,
@@ -329,6 +330,7 @@ async function run(
     await addCooldown(cmd.name, message.member, 3);
 
     await updateBalance(message.member, (await getBalance(message.member)) - 500000);
+    addStat(message.author.id, "spent-guild", 500000);
 
     await createGuild(name, message.member);
 
@@ -728,6 +730,7 @@ async function run(
       }
 
       await updateBalance(message.member, (await getBalance(message.member)) - amount);
+      addStat(message.author.id, "spent-guild", amount);
 
       await addToGuildBank(guild.guildName, amount, message.member);
 

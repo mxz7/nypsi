@@ -362,6 +362,7 @@ export async function openCrate(
 
   if (item.id.includes("69420")) {
     await updateBalance(member, (await getBalance(member)) + 69420);
+    addStat(member, "earned-crates", 69420);
     found.set("money", 69420);
   }
 
@@ -465,7 +466,7 @@ export async function openCrate(
       if (chosen.includes("money:") || chosen.includes("xp:")) {
         if (chosen.includes("money:")) {
           const amount = parseInt(chosen.substring(6));
-
+          addStat(member, "earned-crates", amount);
           await updateBalance(member, (await getBalance(member)) + amount);
           found.set("money", found.has("money") ? found.get("money") + amount : amount);
         } else if (chosen.includes("xp:")) {
@@ -541,7 +542,7 @@ export async function openCrate(
       if (chosen.includes("money:") || chosen.includes("xp:")) {
         if (chosen.includes("money:")) {
           const amount = parseInt(chosen.split(":")[1]);
-
+          addStat(member, "earned-crates", amount);
           await updateBalance(member, (await getBalance(member)) + amount);
           found.set("money", found.has("money") ? found.get("money") + amount : amount);
         } else if (chosen.includes("xp:")) {
