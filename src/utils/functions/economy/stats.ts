@@ -147,6 +147,8 @@ export async function createGame(
   }
 
   addProgress(opts.userId, "gambler", 1);
+  addStat(opts.userId, "spent-gamble", opts.bet);
+  if (opts.earned > 0) addStat(opts.userId, "earned-gamble", opts.earned);
 
   return res.id.toString(36);
 }
@@ -175,12 +177,12 @@ export async function addStat(member: GuildMember | string, item: string, amount
       },
     },
     update: {
-      amount: { increment: amount },
+      amount: { increment: Math.floor(amount) },
     },
     create: {
       userId: id,
       itemId: item,
-      amount: amount,
+      amount: Math.floor(amount),
     },
   });
 }

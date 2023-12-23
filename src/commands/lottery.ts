@@ -10,6 +10,7 @@ import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
+import { addStat } from "../utils/functions/economy/stats";
 import {
   addTicket,
   createUser,
@@ -144,6 +145,7 @@ async function run(
       message.member,
       (await getBalance(message.member)) - lotteryTicketPrice * amount,
     );
+    addStat(message.author.id, "spent-lottery", lotteryTicketPrice * amount);
 
     await addTicket(message.member, amount);
 

@@ -2,6 +2,7 @@ import { CommandInteraction, Message } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { getBalance, getSellMulti, updateBalance } from "../utils/functions/economy/balance.js";
+import { addStat } from "../utils/functions/economy/stats";
 import { createUser, userExists } from "../utils/functions/economy/utils.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getTier, isPremium } from "../utils/functions/premium/premium.js";
@@ -67,6 +68,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       }
 
       await updateBalance(message.member, (await getBalance(message.member)) + amount);
+      addStat(message.author.id, "earned-weekly", amount);
 
       const embed = new CustomEmbed(message.member, description);
 
