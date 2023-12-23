@@ -11,6 +11,7 @@ import { addTag } from "../users/tags";
 import { getBalance, getBankBalance, updateBalance, updateBankBalance } from "./balance";
 import { addBooster, getBoosters } from "./boosters";
 import { addInventoryItem } from "./inventory";
+import { addStat } from "./stats";
 import { getXp, updateXp } from "./xp";
 import ms = require("ms");
 import dayjs = require("dayjs");
@@ -394,6 +395,7 @@ async function doLevelUp(
 
   await updateXp(member, (await getXp(member)) - requirements.xp, false);
   await updateBankBalance(member, (await getBankBalance(member)) - requirements.money, false);
+  addStat(member, "spent-level", requirements.money);
 
   const rawLevel = await getRawLevel(member);
 
@@ -407,6 +409,7 @@ async function doLevelUp(
         await addInventoryItem(member, reward.substring(3), 1, false);
       } else if (reward.startsWith("money:")) {
         await updateBalance(member, (await getBalance(member)) + parseInt(reward.substring(6)));
+        addStat(member, "earned-level", parseInt(reward.substring(6)));
       } else if (reward.startsWith("karma:")) {
         await addKarma(member, parseInt(reward.substring(6)));
       } else if (reward.startsWith("tag:")) {
