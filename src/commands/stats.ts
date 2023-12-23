@@ -10,7 +10,7 @@ import {
   MessageActionRowComponentBuilder,
   MessageEditOptions,
 } from "discord.js";
-import { inPlaceSort } from "fast-sort";
+import { inPlaceSort, sort } from "fast-sort";
 import { cpu } from "node-os-utils";
 import * as os from "os";
 import prisma from "../init/database";
@@ -550,7 +550,9 @@ async function run(
   }
 
   const earnedStats = async () => {
-    const stats = (await getStats(message.member)).filter((i) => i.itemId.startsWith("earned-"));
+    const stats = sort(await getStats(message.member))
+      .desc((i) => i.amount)
+      .filter((i) => i.itemId.startsWith("earned-"));
 
     const desc: string[] = [];
 
@@ -569,7 +571,9 @@ async function run(
   };
 
   const spentStats = async () => {
-    const stats = (await getStats(message.member)).filter((i) => i.itemId.startsWith("spent-"));
+    const stats = sort(await getStats(message.member))
+      .desc((i) => i.amount)
+      .filter((i) => i.itemId.startsWith("spent-"));
 
     const desc: string[] = [];
 
