@@ -20,6 +20,7 @@ import { Worker } from "../types/Workers";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
 import { getBoosters } from "../utils/functions/economy/boosters";
 import { getLevel, getPrestige, getRawLevel } from "../utils/functions/economy/levelling";
+import { addStat } from "../utils/functions/economy/stats";
 import {
   createUser,
   getBaseUpgrades,
@@ -307,6 +308,7 @@ async function run(
           return pageManager();
         } else {
           await updateBalance(message.member, balance - baseWorkers[selected].cost);
+          addStat(message.author.id, "spent-workers", baseWorkers[selected].cost);
           await addWorker(message.member, selected);
 
           userWorkers = await getWorkers(message.member);
@@ -464,6 +466,7 @@ async function run(
         }
 
         await updateBalance(message.member, balance - cost);
+        addStat(message.author.id, "spent-workers", cost);
         await addWorkerUpgrade(
           message.member,
           worker.id,
