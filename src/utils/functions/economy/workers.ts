@@ -8,6 +8,7 @@ import { addProgress } from "./achievements";
 import { getBalance, updateBalance } from "./balance";
 import { getBoosters } from "./boosters";
 import { addInventoryItem, gemBreak, getInventory } from "./inventory";
+import { addStat } from "./stats";
 import { getBaseUpgrades, getBaseWorkers, getItems } from "./utils";
 
 export async function getWorkers(member: GuildMember | string) {
@@ -273,6 +274,7 @@ export async function claimFromWorkers(userId: string): Promise<string> {
   await emptyWorkersStored(userId);
   await updateBalance(userId, (await getBalance(userId)) + amountEarned);
   await addProgress(userId, "capitalist", amountEarned);
+  await addStat(userId, "earned-workers", amountEarned);
 
   const res = `+$**${amountEarned.toLocaleString()}**\n\n${earnedBreakdown.join("\n")}`;
   const footer: string[] = [];

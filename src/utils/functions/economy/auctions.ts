@@ -204,8 +204,6 @@ export async function createAuction(
 
   checkWatchers(itemId, url, member.user.id, bin / itemAmount);
 
-  addStat(member.user.id, "auction-created");
-
   return url;
 }
 
@@ -716,8 +714,8 @@ export async function buyFullAuction(
       auction.ownerId,
       (await getBalance(auction.ownerId)) + (Number(auction.bin) - taxedAmount),
     ),
-    addStat(interaction.user.id, "auction-bought-items", Number(auction.itemAmount)),
-    addStat(auction.ownerId, "auction-sold-items", Number(auction.itemAmount)),
+    addStat(auction.ownerId, "earned-auctions", Number(auction.bin) - taxedAmount),
+    addStat(interaction.user.id, "spent-auctions", Number(auction.bin) - taxedAmount),
   ]);
 
   logger.info(
@@ -930,8 +928,16 @@ export async function buyAuctionOne(
       (await getBalance(auction.ownerId)) +
         (Math.floor(Number(auction.bin / auction.itemAmount)) - taxedAmount),
     ),
-    addStat(interaction.user.id, "auction-bought-items"),
-    addStat(auction.ownerId, "auction-sold-items"),
+    addStat(
+      auction.ownerId,
+      "earned-auctions",
+      Math.floor(Number(auction.bin / auction.itemAmount)) - taxedAmount,
+    ),
+    addStat(
+      interaction.user.id,
+      "spent-auctions",
+      Math.floor(Number(auction.bin / auction.itemAmount)) - taxedAmount,
+    ),
   ]);
 
   logger.info(
@@ -1190,8 +1196,16 @@ export async function buyAuctionMulti(
       (await getBalance(auction.ownerId)) +
         (Math.floor(Number((auction.bin / auction.itemAmount) * amount)) - taxedAmount),
     ),
-    addStat(interaction.user.id, "auction-bought-items", Number(amount)),
-    addStat(auction.ownerId, "auction-sold-items", Number(amount)),
+    addStat(
+      auction.ownerId,
+      "earned-auctions",
+      Math.floor(Number((auction.bin / auction.itemAmount) * amount)) - taxedAmount,
+    ),
+    addStat(
+      interaction.user.id,
+      "spent-auctions",
+      Math.floor(Number((auction.bin / auction.itemAmount) * amount)) - taxedAmount,
+    ),
   ]);
 
   logger.info(

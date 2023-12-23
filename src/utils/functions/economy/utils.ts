@@ -24,6 +24,7 @@ import { setProgress } from "./achievements";
 import { calcMaxBet, getBalance, updateBalance } from "./balance";
 import { getGuildByUser } from "./guilds";
 import { addInventoryItem } from "./inventory";
+import { addStat } from "./stats";
 import { getXp, updateXp } from "./xp";
 import ms = require("ms");
 import math = require("mathjs");
@@ -657,6 +658,7 @@ export async function doDaily(member: GuildMember) {
   promises.push(updateBalance(member, (await getBalance(member)) + total));
   promises.push(updateLastDaily(member));
   promises.push(addInventoryItem(member, "daily_scratch_card", 1));
+  addStat(member.user.id, "earned-daily", total);
 
   await Promise.all(promises);
 

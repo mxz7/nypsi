@@ -10,6 +10,7 @@ import { MStoTime } from "../../utils/functions/date";
 import { addProgress } from "../../utils/functions/economy/achievements";
 import { getBalance, updateBalance } from "../../utils/functions/economy/balance";
 import { addInventoryItem } from "../../utils/functions/economy/inventory";
+import { addStat } from "../../utils/functions/economy/stats";
 import { getItems, lotteryTicketPrice } from "../../utils/functions/economy/utils";
 import { percentChance, shuffle } from "../../utils/functions/random";
 import { getTax } from "../../utils/functions/tax";
@@ -67,6 +68,7 @@ async function doLottery(client: Client) {
   await Promise.all([
     updateBalance(user.id, (await getBalance(user.id)) + total),
     addProgress(user.id, "lucky", 1),
+    addStat(user.id, "earned-lottery", total),
   ]);
 
   const embed = new CustomEmbed();
