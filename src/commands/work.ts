@@ -4,6 +4,7 @@ import { workMessages } from "../../data/lists.json";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
+import { addStat } from "../utils/functions/economy/stats";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
@@ -56,6 +57,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const work = workMessages[Math.floor(Math.random() * workMessages.length)];
 
   await updateBalance(message.member, (await getBalance(message.member)) + earned);
+  addStat(message.author.id, "earned-work", earned);
 
   const embed = new CustomEmbed(message.member, work).setHeader("work", message.author.avatarURL());
 
