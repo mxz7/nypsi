@@ -714,16 +714,8 @@ export async function buyFullAuction(
       auction.ownerId,
       (await getBalance(auction.ownerId)) + (Number(auction.bin) - taxedAmount),
     ),
-    addStat(
-      auction.ownerId,
-      "earned-auctions",
-      Math.floor(Number(auction.bin / auction.itemAmount)) - taxedAmount,
-    ),
-    addStat(
-      interaction.user.id,
-      "spent-auctions",
-      Math.floor(Number(auction.bin / auction.itemAmount)) - taxedAmount,
-    ),
+    addStat(auction.ownerId, "earned-auctions", Number(auction.bin) - taxedAmount),
+    addStat(interaction.user.id, "spent-auctions", Number(auction.bin) - taxedAmount),
   ]);
 
   logger.info(
@@ -1207,12 +1199,12 @@ export async function buyAuctionMulti(
     addStat(
       auction.ownerId,
       "earned-auctions",
-      Math.floor(Number(auction.bin / auction.itemAmount)) - taxedAmount,
+      Math.floor(Number((auction.bin / auction.itemAmount) * amount)) - taxedAmount,
     ),
     addStat(
       interaction.user.id,
       "spent-auctions",
-      Math.floor(Number(auction.bin / auction.itemAmount)) - taxedAmount,
+      Math.floor(Number((auction.bin / auction.itemAmount) * amount)) - taxedAmount,
     ),
   ]);
 
