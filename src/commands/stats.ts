@@ -52,6 +52,12 @@ cmd.slashData
   .addSubcommand((auction) => auction.setName("auction").setDescription("view your auction stats"))
   .addSubcommand((lb) =>
     lb.setName("leaderboards").setDescription("view your leaderboard positions"),
+  )
+  .addSubcommand((earned) =>
+    earned.setName("earned").setDescription("view your stats for sources of income"),
+  )
+  .addSubcommand((spent) =>
+    spent.setName("spent").setDescription("view your stats for sources of outgoings"),
   );
 
 async function run(
@@ -543,6 +549,44 @@ async function run(
     return stats.find((i) => i.itemId === id)?.amount.toLocaleString() || "0";
   }
 
+  const earnedStats = async () => {
+    const stats = (await getStats(message.member)).filter((i) => i.itemId.startsWith("earned-"));
+
+    const desc: string[] = [];
+
+    for (const stat of stats) {
+      desc.push(`**${stat.itemId.split("-")[1]}** $${stat.amount.toLocaleString()}`);
+    }
+
+    return send({
+      embeds: [
+        new CustomEmbed(message.member, desc.join("\n")).setHeader(
+          "earned stats",
+          message.author.avatarURL(),
+        ),
+      ],
+    });
+  };
+
+  const spentStats = async () => {
+    const stats = (await getStats(message.member)).filter((i) => i.itemId.startsWith("spent-"));
+
+    const desc: string[] = [];
+
+    for (const stat of stats) {
+      desc.push(`**${stat.itemId.split("-")[1]}** $${stat.amount.toLocaleString()}`);
+    }
+
+    return send({
+      embeds: [
+        new CustomEmbed(message.member, desc.join("\n")).setHeader(
+          "spent stats",
+          message.author.avatarURL(),
+        ),
+      ],
+    });
+  };
+
   const auctionStats = async () => {
     const stats = await getStats(message.member);
 
@@ -725,6 +769,10 @@ async function run(
     return lbStats();
   } else if (args[0].toLowerCase() === "sell") {
     return sellStats();
+  } else if (args[0].toLowerCase() === "earned") {
+    return earnedStats();
+  } else if (args[0].toLowerCase() === "spent") {
+    return spentStats();
   } else {
     return gambleStats();
   }
