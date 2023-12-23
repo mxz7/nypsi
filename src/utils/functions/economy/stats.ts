@@ -147,6 +147,8 @@ export async function createGame(
   }
 
   addProgress(opts.userId, "gambler", 1);
+  addStat(opts.userId, "spent-gamble", opts.bet);
+  if (opts.earned > 0) addStat(opts.userId, "earned-gamble", opts.earned);
 
   return res.id.toString(36);
 }
