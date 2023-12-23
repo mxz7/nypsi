@@ -193,7 +193,7 @@ jobs:
             cd ~/nypsi
             nvm use lts
             npm i -g pnpm
-            pnpm install --frozen-lockfile -P
+            pnpm install --frozen-lockfile
 
       - name: update deployment status
         uses: bobheadxi/deployments@v1
