@@ -720,7 +720,7 @@ export async function buyFullAuction(
       Math.floor(Number(auction.bin / auction.itemAmount)) - taxedAmount,
     ),
     addStat(
-      auction.ownerId,
+      interaction.user.id,
       "spent-auctions",
       Math.floor(Number(auction.bin / auction.itemAmount)) - taxedAmount,
     ),
@@ -942,7 +942,7 @@ export async function buyAuctionOne(
       Math.floor(Number(auction.bin / auction.itemAmount)) - taxedAmount,
     ),
     addStat(
-      auction.ownerId,
+      interaction.user.id,
       "spent-auctions",
       Math.floor(Number(auction.bin / auction.itemAmount)) - taxedAmount,
     ),
@@ -1210,7 +1210,7 @@ export async function buyAuctionMulti(
       Math.floor(Number(auction.bin / auction.itemAmount)) - taxedAmount,
     ),
     addStat(
-      auction.ownerId,
+      interaction.user.id,
       "spent-auctions",
       Math.floor(Number(auction.bin / auction.itemAmount)) - taxedAmount,
     ),
