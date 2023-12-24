@@ -14,6 +14,7 @@ import { addProgress } from "../../utils/functions/economy/achievements";
 import { getBalance, updateBalance } from "../../utils/functions/economy/balance";
 import { getBoosters } from "../../utils/functions/economy/boosters";
 import { addInventoryItem } from "../../utils/functions/economy/inventory";
+import { addStat } from "../../utils/functions/economy/stats";
 import { getBaseWorkers } from "../../utils/functions/economy/utils";
 import { calcWorkerValues, getWorkers } from "../../utils/functions/economy/workers";
 import { percentChance } from "../../utils/functions/random";
@@ -90,6 +91,7 @@ async function doWorkerThing() {
 
       await updateBalance(worker.userId, (await getBalance(worker.userId)) + earned);
       await addProgress(worker.userId, "capitalist", earned);
+      await addStat(worker.userId, "earned-workers", earned);
 
       steveStorage.money += earned;
 

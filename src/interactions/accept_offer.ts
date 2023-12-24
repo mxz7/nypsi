@@ -12,6 +12,7 @@ import {
   setInventoryItem,
 } from "../utils/functions/economy/inventory";
 import { checkOffer } from "../utils/functions/economy/offers";
+import { addStat } from "../utils/functions/economy/stats";
 import { getItems, isEcoBanned } from "../utils/functions/economy/utils";
 import { isPremium } from "../utils/functions/premium/premium";
 import { addToNypsiBank, getTax } from "../utils/functions/tax";
@@ -102,16 +103,16 @@ export default {
     if (!(await isPremium(offer.ownerId)) && Number(offer.money) > 1_000_000)
       taxedAmount = Math.floor(Number(offer.money) * tax);
 
-    await addToNypsiBank(taxedAmount);
-    await updateBalance(
-      interaction.user.id,
-      (await getBalance(interaction.user.id)) + (Number(offer.money) - taxedAmount),
-    );
-    await addInventoryItem(offer.ownerId, offer.itemId, Number(offer.itemAmount));
-
-    await interaction.editReply({
-      embeds: [new CustomEmbed(null, "offer accepted").setColor(Constants.EMBED_SUCCESS_COLOR)],
-    });
+    await Promise.all([
+      await addToNypsiBank(taxedAmount),
+      updateBalance(
+        interaction.user.id,
+        (await getBalance(interaction.user.id)) + (Number(offer.money) - taxedAmount),
+      ),
+      addInventoryItem(offer.ownerId, offer.itemId, Number(offer.itemAmount)),
+      addStat(offer.ownerId, "earned-offers", Math.floor(Number(offer.money)) - taxedAmount),
+      addStat(interaction.user.id, "spent-offers", Math.floor(Number(offer.money)) - taxedAmount),
+    ]);
 
     const embed = new EmbedBuilder(interaction.message.embeds[0]);
 

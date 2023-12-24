@@ -309,6 +309,7 @@ async function doFish(
       if (chosen.includes("money:")) {
         const amount = parseInt(chosen.substring(6));
 
+        addStat(member, "earned-fish", amount);
         await updateBalance(member, (await getBalance(member)) + amount);
         foundItems.set(
           "money",

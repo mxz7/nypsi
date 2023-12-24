@@ -144,10 +144,11 @@ export async function reviewImageSuggestion(
       `admin: ${mod.id} (${mod.username}) accepted suggestion by ${image.uploaderId} id: ${id}`,
     );
 
-    addNotificationToQueue({
-      memberId: image.uploaderId,
-      payload: { content: `your image (${image.url}) has been accepted` },
-    });
+    if (image.uploaderId !== Constants.BOT_USER_ID)
+      addNotificationToQueue({
+        memberId: image.uploaderId,
+        payload: { content: `your image (${image.url}) has been accepted` },
+      });
     if (await userExists(image.uploaderId)) addProgress(image.uploaderId, "wholesome", 1);
   } else {
     logger.info(`admin: ${mod.id} (${mod.username}) denied suggestion by ${image.uploaderId}`);

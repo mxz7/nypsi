@@ -144,7 +144,10 @@ async function prepareGame(
 
   if (await redis.sismember(Constants.redis.nypsi.USERS_PLAYING, message.author.id)) {
     if (msg) {
-      return msg.edit({ embeds: [new ErrorEmbed("you have an active game")], components: [] });
+      return msg.edit({
+        embeds: [new ErrorEmbed("you have an active game")],
+        components: [],
+      });
     }
     return send({ embeds: [new ErrorEmbed("you have an active game")] });
   }
@@ -200,7 +203,9 @@ async function prepareGame(
 
   if (bet > (await getBalance(message.member))) {
     if (msg) {
-      return msg.edit({ embeds: [new ErrorEmbed("you cannot afford this bet")] });
+      return msg.edit({
+        embeds: [new ErrorEmbed("you cannot afford this bet")],
+      });
     } else {
       return send({ embeds: [new ErrorEmbed("you cannot afford this bet")] });
     }
@@ -584,8 +589,37 @@ class Game {
     const embed = await this.render("playing");
     const row = Game.getRow((await getBalance(this.member)) >= this.bet);
 
-    if (!this.message)
-      this.message = await this.playerMessage.channel.send({ embeds: [embed], components: [row] });
+    const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
+      if (!(this.playerMessage instanceof Message)) {
+        let usedNewMessage = false;
+        let res;
+
+        if (this.playerMessage.deferred) {
+          res = await this.playerMessage.editReply(data).catch(async () => {
+            usedNewMessage = true;
+            return await this.playerMessage.channel.send(data as BaseMessageOptions);
+          });
+        } else {
+          res = await this.playerMessage.reply(data as InteractionReplyOptions).catch(() => {
+            return (this.playerMessage as CommandInteraction).editReply(data).catch(async () => {
+              usedNewMessage = true;
+              return await this.playerMessage.channel.send(data as BaseMessageOptions);
+            });
+          });
+        }
+
+        if (usedNewMessage && res instanceof Message) return res;
+
+        const replyMsg = await this.playerMessage.fetchReply();
+        if (replyMsg instanceof Message) {
+          return replyMsg;
+        }
+      } else {
+        return await this.playerMessage.channel.send(data as BaseMessageOptions);
+      }
+    };
+
+    if (!this.message) this.message = await send({ embeds: [embed], components: [row] });
     else await this.edit({ embeds: [embed], components: [row] });
 
     return this.listen();
@@ -612,7 +646,9 @@ class Game {
 
     if (expire || !response) {
       await redis.srem(Constants.redis.nypsi.USERS_PLAYING, this.member.user.id);
-      return this.message.reply({ content: `${this.member.toString()} blackjack game expired` });
+      return this.message.reply({
+        content: `${this.member.toString()} blackjack game expired`,
+      });
     }
 
     this.interaction = response;

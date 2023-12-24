@@ -16,6 +16,7 @@ import { percentChance, shuffle } from "../random";
 import { addProgress } from "./achievements";
 import { getBalance, updateBalance } from "./balance";
 import { addInventoryItem } from "./inventory";
+import { addStat } from "./stats";
 import { getItems } from "./utils";
 import { getXp, updateXp } from "./xp";
 import ms = require("ms");
@@ -177,6 +178,7 @@ export default class ScratchCard {
         if (guild) await addToGuildXP(guild, parseInt(clickedItem), this.member);
       } else if (clickedType === "money") {
         await updateBalance(this.member, (await getBalance(this.member)) + parseInt(clickedItem));
+        addStat(this.member, "earned-scratch", parseInt(clickedItem));
         embed.setDescription(`you found $**${parseInt(clickedItem).toLocaleString()}**`);
       } else if (clickedType === "karma") {
         await addKarma(this.member, parseInt(clickedItem));

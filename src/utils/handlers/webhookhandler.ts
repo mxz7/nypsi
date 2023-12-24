@@ -20,6 +20,7 @@ import { getBalance, updateBalance } from "../functions/economy/balance";
 import { addBooster } from "../functions/economy/boosters";
 import { addInventoryItem } from "../functions/economy/inventory";
 import { getRawLevel } from "../functions/economy/levelling";
+import { addStat } from "../functions/economy/stats";
 import {
   addTicket,
   getItems,
@@ -165,6 +166,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
         addBooster(user, "vote_booster"),
         redis.del(`${Constants.redis.cache.economy.VOTE}:${user}`),
         redis.del(`${Constants.redis.cache.economy.BOOSTERS}:${user}`),
+        addStat(user, "earned-vote", amount),
       ]).catch((e) => {
         logger.error("vote error", e);
       });
