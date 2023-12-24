@@ -260,9 +260,9 @@
       "prestige_requirement": 100,
       "cost": 1000000,
       "base": {
-        "per_item": 6,
-        "max_storage": 5000,
-        "per_interval": 450
+        "per_item": 5,
+        "max_storage": 4500,
+        "per_interval": 425
       }
     }
   }
