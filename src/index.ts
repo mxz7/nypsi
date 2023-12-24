@@ -82,7 +82,7 @@ manager.on("debug", (m) => {
 });
 
 process.on("unhandledRejection", (e: any) => {
-  logger.error(e.message, e);
+  logger.error(e.message, { stack: e.stack, ...e });
 });
 
 process.on("uncaughtException", (e) => {
