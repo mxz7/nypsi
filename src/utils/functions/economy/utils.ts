@@ -266,9 +266,10 @@ export function formatNumber(number: string | number) {
 export async function isEcoBanned(id: string) {
   if (await isUserBlacklisted(id)) return true;
 
-  if (await redis.exists(`${Constants.redis.cache.economy.BANNED}:${id}`)) {
-    const res =
-      (await redis.get(`${Constants.redis.cache.economy.BANNED}:${id}`)) === "t" ? true : false;
+  const cache = await redis.get(`${Constants.redis.cache.economy.BANNED}:${id}`);
+
+  if (cache) {
+    const res = cache === "t" ? true : false;
 
     return res;
   }
@@ -276,9 +277,9 @@ export async function isEcoBanned(id: string) {
   const accounts = await getAllGroupAccountIds(Constants.NYPSI_SERVER_ID, id);
 
   for (const accountId of accounts) {
-    if (await redis.exists(`${Constants.redis.cache.economy.BANNED}:${accountId}`)) {
-      if ((await redis.get(`${Constants.redis.cache.economy.BANNED}:${accountId}`)) === "t")
-        return true;
+    const cache = await redis.get(`${Constants.redis.cache.economy.BANNED}:${accountId}`);
+    if (cache === "t") {
+      return true;
     } else {
       const query = await prisma.economy.findUnique({
         where: { userId: accountId },
