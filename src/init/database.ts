@@ -14,13 +14,12 @@ const prisma = new PrismaClient().$extends({
 
         const timeTaken = end - start;
 
-        if (model === "Mention") return result;
+        redis.lpush(Constants.redis.nypsi.HOURLY_DB_REPORT, timeTaken);
 
+        if (["Mention", "GraphMetrics"].includes(model)) return result;
         if (timeTaken > 500 && !parentPort) {
           logger.warn(`query ${model}.${operation} took ${timeTaken.toFixed(2)}ms`, args);
         }
-
-        redis.lpush(Constants.redis.nypsi.HOURLY_DB_REPORT, timeTaken);
 
         return result;
       },
