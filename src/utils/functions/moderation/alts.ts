@@ -1,6 +1,9 @@
 import { Guild } from "discord.js";
 import prisma from "../../../init/database";
+import redis from "../../../init/redis";
+import Constants from "../../Constants";
 import { getExactMember } from "../member";
+import ms = require("ms");
 
 export async function addAlt(guild: Guild, mainId: string, altId: string) {
   try {
@@ -11,28 +14,56 @@ export async function addAlt(guild: Guild, mainId: string, altId: string) {
         altId: altId,
       },
     });
-
-    return true;
   } catch {
     return false;
   }
+
+  await redis.del(`${Constants.redis.cache.guild.ALTS}:${guild.id}:${mainId}`);
+
+  const alts = await getAlts(guild, mainId);
+
+  for (const alt of alts) await redis.del(`${Constants.redis.cache.guild.ALTS}:${guild.id}:${alt}`);
+
+  return true;
 }
 
 export async function deleteAlt(guild: Guild, altId: string) {
+  const alts = await getAllGroupAccountIds(guild, altId);
+
   await prisma.alt.deleteMany({
     where: {
       AND: [{ guildId: guild.id }, { altId: altId }],
     },
   });
+
+  for (const alt of alts) await redis.del(`${Constants.redis.cache.guild.ALTS}:${guild.id}:${alt}`);
 }
 
-export async function getAlts(guild: Guild, mainId: string) {
+export async function getAlts(guild: Guild | string, mainId: string) {
+  let id: string;
+
+  if (guild instanceof Guild) id = guild.id;
+  else id = guild;
+
+  const cache = await redis.get(`${Constants.redis.cache.guild.ALTS}:${id}:${mainId}`);
+
+  if (cache) return (JSON.parse(cache) as { mainId: string; altId: string }[]).map((i) => i.altId);
+
   const query = await prisma.alt.findMany({
     where: {
-      AND: [{ guildId: guild.id }, { mainId: mainId }],
+      AND: [{ guildId: id }, { mainId: mainId }],
     },
   });
-  return query;
+
+  for (const alt of [mainId, ...query.map((i) => i.altId)])
+    await redis.set(
+      `${Constants.redis.cache.guild.ALTS}:${id}:${alt}}`,
+      JSON.stringify({ altId: alt, mainId }),
+      "EX",
+      ms("6 hour") / 1000,
+    );
+
+  return query.map((i) => i.altId);
 }
 
 export async function getAllGroupAccountIds(guild: Guild | string, userId: string) {
@@ -41,25 +72,32 @@ export async function getAllGroupAccountIds(guild: Guild | string, userId: strin
   if (guild instanceof Guild) id = guild.id;
   else id = guild;
 
-  try {
-    let mainId = userId;
+  const cache = await redis.get(`${Constants.redis.cache.guild.ALTS}:${id}:${userId}`);
 
-    if (!(await isMainAccount(id, userId))) mainId = await getMainAccount(id, userId);
+  if (cache) {
+    const parsed = JSON.parse(cache) as { mainId: string; altId: string }[];
 
-    const query = await prisma.alt.findMany({
-      where: {
-        AND: [{ guildId: id }, { mainId: mainId }],
-      },
-    });
+    if (parsed.length === 0) return [];
+    return [parsed[0].mainId, ...parsed.map((i) => i.altId)];
+  }
 
-    const ids = [mainId];
+  const mainId = (await isMainAccount(guild, userId))
+    ? userId
+    : await getMainAccountId(guild, userId);
 
-    for (const alt of query) ids.push(alt.altId);
-
-    return ids;
-  } catch {
+  if (!mainId) {
+    await redis.set(
+      `${Constants.redis.cache.guild.ALTS}:${id}:${userId}`,
+      JSON.stringify([]),
+      "EX",
+      ms("24 hours"),
+    );
     return [userId];
   }
+
+  const alts = await getAlts(id, mainId);
+
+  return [mainId, ...alts];
 }
 
 export async function isAlt(guild: Guild, altId: string) {
@@ -69,24 +107,29 @@ export async function isAlt(guild: Guild, altId: string) {
     },
   });
 
-  return query && (await getExactMember(guild, await getMainAccount(guild, altId))) ? true : false;
+  return query && (await getExactMember(guild, await getMainAccountId(guild, altId)))
+    ? true
+    : false;
 }
 
-export async function isMainAccount(guild: Guild | string, userId: string) {
-  const query = await prisma.alt.findFirst({
-    where: {
-      AND: [{ guildId: typeof guild === "string" ? guild : guild.id }, { mainId: userId }],
-    },
-  });
-
-  return Boolean(query);
-}
-
-export async function getMainAccount(guild: Guild | string, altId: string) {
+export async function getMainAccountId(guild: Guild | string, altId: string) {
   let id: string;
 
   if (guild instanceof Guild) id = guild.id;
   else id = guild;
+
+  const cache = await redis.get(`${Constants.redis.cache.guild.ALTS}:${id}:${altId}`);
+
+  if (cache) {
+    let mainId: string;
+    try {
+      mainId = (JSON.parse(cache) as { mainId: string; altId: string }[])[0]?.mainId;
+    } catch {
+      mainId = null;
+    }
+
+    if (mainId) return mainId;
+  }
 
   const query = await prisma.alt.findFirst({
     where: {
@@ -98,4 +141,30 @@ export async function getMainAccount(guild: Guild | string, altId: string) {
   });
 
   return query?.mainId || null;
+}
+
+export async function isMainAccount(guild: Guild | string, userId: string) {
+  let id: string;
+
+  if (guild instanceof Guild) id = guild.id;
+  else id = guild;
+
+  const cache = await redis.get(`${Constants.redis.cache.guild.ALTS}:${id}:${userId}`);
+
+  if (cache) {
+    const parsed = JSON.parse(cache) as { mainId: string; altId: string }[];
+
+    if (parsed.length > 0) {
+      if (parsed[0]?.mainId === userId) return true;
+      else return false;
+    }
+  }
+
+  const query = await prisma.alt.findFirst({
+    where: {
+      AND: [{ guildId: id }, { mainId: userId }],
+    },
+  });
+
+  return Boolean(query);
 }
