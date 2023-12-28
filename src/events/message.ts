@@ -41,6 +41,8 @@ export default async function messageCreate(message: Message) {
   if (message.channel.isDMBased() && !message.author.bot) {
     logger.info("message in DM from " + message.author.username + ": " + message.content);
 
+    if (message.system) return;
+
     if (await isUserBlacklisted(message.author.id))
       return message.reply({
         content: "you are blacklisted from nypsi. this punishment will not be removed.",
