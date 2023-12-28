@@ -237,7 +237,7 @@ async function run(
         true,
       );
 
-    if (views.length > 25)
+    if (views.length > 10)
       embed.setFooter({ text: `${views.length.toLocaleString()} monthly views` });
 
     if (target.id === message.author.id)
