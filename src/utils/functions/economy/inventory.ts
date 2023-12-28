@@ -896,7 +896,12 @@ export async function calcItemValue(item: string) {
 
   (async () => {
     if (await redis.exists(`nypsi:item:value:store:cache:delay:thing:${item}`)) return;
-    await redis.set(`nypsi:item:value:store:cache:delay:thing:${item}`, "69", "EX", 3600 * 12);
+    await redis.set(
+      `nypsi:item:value:store:cache:delay:thing:${item}`,
+      "69",
+      "EX",
+      3600 * Math.floor(Math.random() * 6) + 7,
+    );
 
     const date = dayjs()
       .set("hours", 0)
