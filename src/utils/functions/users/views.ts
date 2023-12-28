@@ -52,14 +52,16 @@ export async function addView(userId: string, viewerId: string, source: string) 
     }
   }
 
-  await prisma.profileView.create({
-    data: {
-      source: "BOT",
-      userId: userId,
-      viewerId: viewerId,
-      referrer: source,
-    },
-  });
+  await prisma.profileView
+    .create({
+      data: {
+        source: "BOT",
+        userId: userId,
+        viewerId: viewerId,
+        referrer: source,
+      },
+    })
+    .catch(() => null);
 
   redis.del(`${Constants.redis.cache.user.views}:${userId}`);
 }
