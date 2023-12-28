@@ -1,11 +1,10 @@
 import { CommandInteraction, Message } from "discord.js";
 import { inPlaceSort } from "fast-sort";
+import redis from "../init/redis";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
-import { formatDate } from "../utils/functions/date";
-
-import redis from "../init/redis";
 import Constants from "../utils/Constants";
+import { formatDate } from "../utils/functions/date";
 import { getMember } from "../utils/functions/member";
 import { fetchUsernameHistory } from "../utils/functions/users/history";
 import { addView } from "../utils/functions/users/views";
@@ -52,6 +51,7 @@ async function run(
   }
 
   let membersSorted: string[] = [];
+  let msg: Message;
 
   if (await redis.exists(`${Constants.redis.cache.guild.JOIN_ORDER}:${message.guildId}`)) {
     membersSorted = JSON.parse(
@@ -68,8 +68,7 @@ async function run(
     });
 
     if (membersSorted.length > 500) {
-      let msg;
-      if (message instanceof Message) {
+      if (membersSorted.length > 1000)
         msg = await message.channel.send({
           embeds: [
             new CustomEmbed(
@@ -78,7 +77,7 @@ async function run(
             ),
           ],
         });
-      }
+
       membersSorted = await workerSort(membersSorted, membersMap);
       if (message instanceof Message) {
         await msg.delete();
@@ -149,7 +148,8 @@ async function run(
     embed.addField("username history", text.join("\n"), true);
   }
 
-  message.channel.send({ embeds: [embed] });
+  if (msg) msg.edit({ embeds: [embed] });
+  else message.channel.send({ embeds: [embed] });
 
   addView(member.user.id, message.author.id, `user in ${message.guild.id}`);
 }
