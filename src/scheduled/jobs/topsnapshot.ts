@@ -1,5 +1,4 @@
 import dayjs = require("dayjs");
-import { parentPort } from "worker_threads";
 import prisma from "../../init/database";
 import { Job } from "../../types/Jobs";
 
@@ -245,7 +244,7 @@ async function doGuilds() {
   return count;
 }
 
-async function clearOld() {
+async function clearOld(log: (msg: string) => void) {
   const deleted = await prisma.graphMetrics.deleteMany({
     where: {
       AND: [
@@ -261,7 +260,7 @@ async function clearOld() {
     },
   });
 
-  parentPort.postMessage(`deleted ${deleted.count.toLocaleString()} entries from graph data`);
+  log(`deleted ${deleted.count.toLocaleString()} entries from graph data`);
 
   return 0;
 }
@@ -275,7 +274,7 @@ export default {
       doItems(),
       doMembers(),
       doGuilds(),
-      clearOld(),
+      clearOld(log),
     ]);
 
     log(`created ${count.reduce((a, b) => a + b).toLocaleString()} entries in graph data`);
