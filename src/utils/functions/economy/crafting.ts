@@ -44,6 +44,8 @@ export async function getCraftingItems(member: GuildMember | string, deleteOld =
         });
 
         await addInventoryItem(id, item.itemId, item.amount);
+        if (item.itemId.includes("_gem") || item.itemId === "crystal_heart")
+          await addProgress(id, "gem_hunter", item.amount);
       }
     }
   }
