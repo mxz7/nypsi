@@ -79,9 +79,6 @@ async function run(
         });
 
       membersSorted = await workerSort(membersSorted, membersMap);
-      if (message instanceof Message) {
-        await msg.delete();
-      }
     } else {
       inPlaceSort(membersSorted).asc((i) => membersMap.get(i));
     }
