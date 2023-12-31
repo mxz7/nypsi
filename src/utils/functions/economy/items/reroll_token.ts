@@ -153,7 +153,11 @@ module.exports = new ItemUse(
         );
 
         await interaction.update({ embeds: [embed], components: [] });
-        await setUpgrade(message.member, chosen, upgrades.find((i) => i.upgradeId).amount - 1);
+        await setUpgrade(
+          message.member,
+          chosen,
+          upgrades.find((i) => i.upgradeId === chosen).amount - 1,
+        );
         await setInventoryItem(
           message.member,
           "reroll_token",

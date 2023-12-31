@@ -20,7 +20,7 @@ export async function setNews(string: string) {
   await redis.del(Constants.redis.nypsi.NEWS_SEEN);
 
   await redis.set(Constants.redis.nypsi.NEWS, JSON.stringify({ text: string, date: Date.now() }));
-  await redis.expire(Constants.redis.nypsi.NEWS, 86400 * 3);
+  await redis.expire(Constants.redis.nypsi.NEWS, 86400 * 7);
 }
 
 export async function hasSeenNews(id: string) {

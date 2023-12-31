@@ -40,26 +40,28 @@ export async function getViews(userId: string, limit?: Date) {
 
 export async function addView(userId: string, viewerId: string, source: string) {
   if (userId === viewerId) return;
-  const views = await getViews(userId, dayjs().subtract(10, "minute").toDate());
+  const views = await getViews(userId, dayjs().subtract(5, "minute").toDate());
 
   for (const view of views) {
     if (view.viewerId === viewerId) return;
     try {
-      if (new Date(view.createdAt).getTime() >= dayjs().subtract(1, "minute").toDate().getTime())
+      if (new Date(view.createdAt).getTime() >= dayjs().subtract(10, "second").toDate().getTime())
         return;
     } catch {
       logger.debug(`weird view no time think`, views);
     }
   }
 
-  await prisma.profileView.create({
-    data: {
-      source: "BOT",
-      userId: userId,
-      viewerId: viewerId,
-      referrer: source,
-    },
-  });
+  await prisma.profileView
+    .create({
+      data: {
+        source: "BOT",
+        userId: userId,
+        viewerId: viewerId,
+        referrer: source,
+      },
+    })
+    .catch(() => null);
 
   redis.del(`${Constants.redis.cache.user.views}:${userId}`);
 }

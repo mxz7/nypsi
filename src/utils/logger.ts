@@ -197,7 +197,10 @@ class FileTransport implements Transport {
       out[item] = data.meta[item];
     }
 
-    this.stream.write(JSON.stringify(out) + "\n");
+    this.stream.write(
+      JSON.stringify(out, (key, value) => (typeof value === "bigint" ? value.toString() : value)) +
+        "\n",
+    );
 
     this.checkFile();
   }
@@ -255,7 +258,11 @@ class ConsoleTransport implements Transport {
     let jsonData = "";
 
     if (Boolean(data.data) && Object.keys(data.data).length > 0) {
-      jsonData = JSON.stringify(data.data, null, 2);
+      jsonData = JSON.stringify(
+        data.data,
+        (key, value) => (typeof value === "bigint" ? value.toString() : value),
+        2,
+      );
       jsonData = jsonColor(jsonData.substring(1, jsonData.length - 1).trim());
     }
 
@@ -320,7 +327,11 @@ const formatter = (data: WriteData) => {
   let jsonData = "";
 
   if (Boolean(data.data) && Object.keys(data.data).length > 0) {
-    jsonData = JSON.stringify(data.data, null, 2);
+    jsonData = JSON.stringify(
+      data.data,
+      (key, value) => (typeof value === "bigint" ? value.toString() : value),
+      2,
+    );
     jsonData = jsonColor(
       jsonData
         .substring(1, jsonData.length - 1)
@@ -328,7 +339,11 @@ const formatter = (data: WriteData) => {
         .replaceAll("\\n", "\n"),
     );
   } else if (typeof data.message === "object") {
-    jsonData = JSON.stringify(data.message, null, 2);
+    jsonData = JSON.stringify(
+      data.message,
+      (key, value) => (typeof value === "bigint" ? value.toString() : value),
+      2,
+    );
     jsonData = jsonColor(
       jsonData
         .substring(1, jsonData.length - 1)

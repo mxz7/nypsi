@@ -12,9 +12,12 @@ import {
   MessageActionRowComponentBuilder,
   PermissionFlagsBits,
 } from "discord.js";
+import { exec } from "node:child_process";
+import prisma from "../init/database";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
+import { isAltPunish } from "../utils/functions/guilds/altpunish";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getExactMember, getMember } from "../utils/functions/member";
 import {
@@ -22,18 +25,15 @@ import {
   deleteAlt,
   getAllGroupAccountIds,
   getAlts,
-  getMainAccount,
+  getMainAccountId,
   isAlt,
   isMainAccount,
 } from "../utils/functions/moderation/alts";
+import { isBanned, newBan } from "../utils/functions/moderation/ban";
+import { deleteMute, getMuteRole, isMuted, newMute } from "../utils/functions/moderation/mute";
 import { createProfile, profileExists } from "../utils/functions/moderation/utils";
 import { getLastKnownUsername } from "../utils/functions/users/tag";
 import { getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import { deleteMute, getMuteRole, isMuted, newMute } from "../utils/functions/moderation/mute";
-import { isAltPunish } from "../utils/functions/guilds/altpunish";
-import prisma from "../init/database";
-import { isBanned, newBan } from "../utils/functions/moderation/ban";
-import { exec } from "node:child_process";
 
 const cmd = new Command("alts", "view a user's alts", "moderation")
   .setAliases(["alt", "account", "accounts"])
@@ -111,7 +111,10 @@ async function run(
   if (await isAlt(message.guild, member instanceof GuildMember ? member.user.id : member)) {
     member = await getMember(
       message.guild,
-      await getMainAccount(message.guild, member instanceof GuildMember ? member.user.id : member),
+      await getMainAccountId(
+        message.guild,
+        member instanceof GuildMember ? member.user.id : member,
+      ),
     );
   }
 
@@ -261,7 +264,7 @@ async function run(
               message.member,
               `user is already an alt of ${await getExactMember(
                 message.guild,
-                await getMainAccount(message.guild, msg.content),
+                await getMainAccountId(message.guild, msg.content),
               )}`,
             ),
           ],
@@ -292,7 +295,7 @@ async function run(
       if (!msg) return;
       if (
         !(await isAlt(message.guild, msg.content)) ||
-        (await getMainAccount(message.guild, msg.content)) !=
+        (await getMainAccountId(message.guild, msg.content)) !=
           (member instanceof GuildMember ? member.user.id : member)
       ) {
         await res.editReply({ embeds: [new CustomEmbed(message.member, "invalid alt")] });
@@ -342,10 +345,8 @@ async function getEmbed(
     for (const alt of alts) {
       altList.push(
         `${
-          (await getLastKnownUsername(alt.altId))
-            ? (await getLastKnownUsername(alt.altId)) + " "
-            : ""
-        }\`${alt.altId}\``,
+          (await getLastKnownUsername(alt)) ? (await getLastKnownUsername(alt)) + " " : ""
+        }\`${alt}\``,
       );
     }
     embed.setDescription(altList.join("\n"));
@@ -374,7 +375,7 @@ async function getRow(
 
 async function getUserAlts(guild: Guild, member: GuildMember | string) {
   return await getAlts(guild, member instanceof GuildMember ? member.user.id : member).catch(
-    () => [],
+    () => [] as string[],
   );
 }
 

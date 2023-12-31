@@ -86,6 +86,7 @@ async function run(
   }
 
   let membersSorted: string[] = [];
+  let msg: Message;
 
   if (await redis.exists(`${Constants.redis.cache.guild.JOIN_ORDER}:${message.guildId}`)) {
     membersSorted = JSON.parse(
@@ -102,8 +103,7 @@ async function run(
     });
 
     if (membersSorted.length > 500) {
-      let msg;
-      if (message instanceof Message) {
+      if (membersSorted.length > 1000)
         msg = await send({
           embeds: [
             new CustomEmbed(
@@ -112,11 +112,8 @@ async function run(
             ),
           ],
         });
-      }
+
       membersSorted = await workerSort(membersSorted, membersMap);
-      if (message instanceof Message) {
-        await msg.delete();
-      }
     } else {
       inPlaceSort(membersSorted).asc((i) => membersMap.get(i));
     }
@@ -142,7 +139,8 @@ async function run(
     .setTitle(member.user.username)
     .setThumbnail(member.user.displayAvatarURL({ size: 128 }));
 
-  return send({ embeds: [embed] });
+  if (msg) msg.edit({ embeds: [embed] });
+  else send({ embeds: [embed] });
 }
 
 cmd.setRun(run);

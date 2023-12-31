@@ -110,8 +110,8 @@ export default {
         (await getBalance(interaction.user.id)) + (Number(offer.money) - taxedAmount),
       ),
       addInventoryItem(offer.ownerId, offer.itemId, Number(offer.itemAmount)),
-      addStat(offer.ownerId, "earned-offers", Math.floor(Number(offer.money)) - taxedAmount),
-      addStat(interaction.user.id, "spent-offers", Math.floor(Number(offer.money)) - taxedAmount),
+      addStat(interaction.user.id, "earned-offers", Math.floor(Number(offer.money)) - taxedAmount),
+      addStat(offer.ownerId, "spent-offers", Math.floor(Number(offer.money)) - taxedAmount),
     ]);
 
     const embed = new EmbedBuilder(interaction.message.embeds[0]);
