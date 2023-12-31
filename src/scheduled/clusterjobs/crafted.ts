@@ -21,7 +21,7 @@ async function checkCraftItems() {
       },
     });
 
-    await addInventoryItem(item.userId, item.itemId, item.amount, false);
+    await addInventoryItem(item.userId, item.itemId, item.amount);
 
     addProgress(item.userId, "crafter", item.amount);
     if (item.itemId.includes("_gem") || item.itemId === "crystal_heart")

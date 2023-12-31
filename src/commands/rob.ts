@@ -319,7 +319,6 @@ async function run(
             message.member,
             "lawyer",
             inventory.find((i) => i.item == "lawyer").amount - 1,
-            false,
           ),
           addStat(message.member, "lawyer"),
         ]);

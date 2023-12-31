@@ -78,13 +78,12 @@ module.exports = new ItemUse(
     await redis.set(`${Constants.redis.cooldown.ROB_RADIO}:${radioTarget.user.id}`, Date.now());
     await redis.expire(`${Constants.redis.cooldown.ROB_RADIO}:${radioTarget.user.id}`, 900);
 
-    const inventory = await getInventory(message.member, false);
+    const inventory = await getInventory(message.member);
 
     await setInventoryItem(
       message.member,
       "radio",
       inventory.find((i) => i.item == "radio").amount - 1,
-      false,
     );
 
     const msg = await send({

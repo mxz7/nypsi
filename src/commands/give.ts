@@ -185,7 +185,6 @@ async function run(
       message.member,
       selected.id,
       inventory.find((i) => i.item == selected.id).amount - amount,
-      false,
     ),
   ]);
 

@@ -209,12 +209,7 @@ async function doMine(
   }
 
   if (!unbreakable) {
-    await setInventoryItem(
-      member,
-      pickaxe,
-      inventory.find((i) => i.item == pickaxe).amount - 1,
-      false,
-    );
+    await setInventoryItem(member, pickaxe, inventory.find((i) => i.item == pickaxe).amount - 1);
   }
 
   let chosenArea: string;

@@ -54,7 +54,7 @@ module.exports = new ItemUse(
     };
 
     let [inventory, upgrades] = await Promise.all([
-      getInventory(message.member, false),
+      getInventory(message.member),
       getUpgrades(message.member),
     ]);
 
@@ -126,7 +126,7 @@ module.exports = new ItemUse(
         return reactionManager();
       } else if (interaction.isButton()) {
         [inventory, upgrades] = await Promise.all([
-          getInventory(message.member, false),
+          getInventory(message.member),
           getUpgrades(message.member),
         ]);
 

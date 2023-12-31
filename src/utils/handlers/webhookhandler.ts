@@ -190,7 +190,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
     } else rawLevel--;
   }
 
-  await addInventoryItem(user, "vote_crate", crateAmount, false);
+  await addInventoryItem(user, "vote_crate", crateAmount);
 
   if (percentChance(0.05) && !(await redis.exists(Constants.redis.nypsi.GEM_GIVEN))) {
     await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t");
@@ -359,7 +359,7 @@ async function handleKofiData(data: KofiResponse) {
             }
           }
         } else {
-          await addInventoryItem(user.id, item.name, shopItem.quantity || 1, false);
+          await addInventoryItem(user.id, item.name, shopItem.quantity || 1);
 
           logger.info(`given to ${user.id} (${user.email})`, item);
 

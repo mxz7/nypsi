@@ -140,7 +140,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     const functions = [];
     for (const item of selected.keys())
       functions.push(async () => {
-        await setInventoryItem(message.member, item, 0, false);
+        await setInventoryItem(message.member, item, 0);
       });
 
     functions.push(async () => {

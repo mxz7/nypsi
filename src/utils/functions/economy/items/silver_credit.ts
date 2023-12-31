@@ -66,7 +66,7 @@ module.exports = new ItemUse(
     if (currentTier == SILVER_TIER) {
       const [profile, inventory] = await Promise.all([
         getPremiumProfile(message.author.id),
-        getInventory(message.member, false),
+        getInventory(message.member),
       ]);
 
       profile.expireDate = dayjs(profile.expireDate).add(7, "day").toDate();
@@ -96,7 +96,7 @@ module.exports = new ItemUse(
         dayjs().add(7, "day").toDate(),
         message.client as NypsiClient,
       );
-      const inventory = await getInventory(message.member, false);
+      const inventory = await getInventory(message.member);
       await setInventoryItem(
         message.member,
         "silver_credit",
@@ -136,7 +136,7 @@ module.exports = new ItemUse(
       if (!res) return msg.edit({ components: [] });
 
       await res.deferUpdate();
-      const inventory = await getInventory(message.member, false);
+      const inventory = await getInventory(message.member);
 
       if (
         !inventory.find((i) => i.item === "silver_credit") ||

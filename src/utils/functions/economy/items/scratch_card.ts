@@ -77,7 +77,6 @@ async function prepare(
     message.member,
     selected.id,
     inventory.find((i) => i.item == selected.id).amount - 1,
-    false,
   );
   await addStat(message.member, selected.id);
 
@@ -98,7 +97,7 @@ async function prepare(
 
     if (card.remainingClicks <= 0) {
       await redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
-      inventory = await getInventory(message.member, false);
+      inventory = await getInventory(message.member);
       const buttons = card.getButtons(true);
       let retry = false;
       const gameId = await createGame({

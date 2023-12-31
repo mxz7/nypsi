@@ -890,7 +890,7 @@
     "emoji": "📅",
     "longDesc": "protects your daily streak in the event you forget to do /daily",
     "role": "item",
-    "rarity": 3,
+    "rarity": 4,
     "buy": 0,
     "sell": 100000,
     "in_crates": true
