@@ -46,7 +46,7 @@ module.exports = new ItemUse(
       }
     };
 
-    const inventory = await getInventory(message.member, false);
+    const inventory = await getInventory(message.member);
 
     let amount = 1;
 
@@ -70,7 +70,6 @@ module.exports = new ItemUse(
         message.member,
         "stolen_credit_card",
         inventory.find((i) => i.item == "stolen_credit_card").amount - amount,
-        false,
       ),
       increaseBaseBankStorage(message.member, addedAmount),
     ]);

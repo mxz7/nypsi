@@ -195,7 +195,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           message.member,
           "lawyer",
           inventory.find((i) => i.item == "lawyer").amount - 1,
-          false,
         );
       }
 

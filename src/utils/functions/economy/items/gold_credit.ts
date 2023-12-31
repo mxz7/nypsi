@@ -66,7 +66,7 @@ module.exports = new ItemUse(
     if (currentTier == GOLD_TIER) {
       const [profile, inventory] = await Promise.all([
         getPremiumProfile(message.author.id),
-        getInventory(message.member, false),
+        getInventory(message.member),
       ]);
 
       profile.expireDate = dayjs(profile.expireDate).add(7, "day").toDate();
@@ -88,7 +88,7 @@ module.exports = new ItemUse(
         ],
       });
     } else if (currentTier === 0) {
-      const inventory = await getInventory(message.member, false);
+      const inventory = await getInventory(message.member);
       await setInventoryItem(
         message.member,
         "gold_credit",
@@ -135,7 +135,7 @@ module.exports = new ItemUse(
 
       await res.deferUpdate();
 
-      const inventory = await getInventory(message.member, false);
+      const inventory = await getInventory(message.member);
       if (
         !inventory.find((i) => i.item === "gold_credit") ||
         inventory.find((i) => i.item === "gold_credit").amount < 1

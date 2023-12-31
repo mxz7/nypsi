@@ -97,12 +97,12 @@ async function doWorkerThing() {
 
       while (percentChance(gemChance * incrementAmount)) {
         steveStorage.gemShards++;
-        await addInventoryItem(worker.userId, "gem_shard", 1, false);
+        await addInventoryItem(worker.userId, "gem_shard", 1);
       }
 
       while (percentChance(scrapChance * incrementAmount)) {
         steveStorage.scraps++;
-        await addInventoryItem(worker.userId, "quarry_scrap", 1, false);
+        await addInventoryItem(worker.userId, "quarry_scrap", 1);
       }
 
       await redis.set(

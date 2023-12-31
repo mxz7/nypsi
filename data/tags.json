@@ -125,6 +125,12 @@
     "description": "found in loot drops",
     "emoji": "🎴"
   },
+  "cupcake": {
+    "id": "cupcake",
+    "name": "cupcake",
+    "description": "found in the super baker achievement",
+    "emoji": "🧁"
+  },
   "p10": {
     "id": "p10",
     "name": "prestige 10",

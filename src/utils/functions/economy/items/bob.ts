@@ -63,7 +63,7 @@ module.exports = new ItemUse(
     if (crafting.length < 1)
       return send({ embeds: [new ErrorEmbed("you are not currently crafting anything")] });
 
-    const inventory = await getInventory(message.member, false);
+    const inventory = await getInventory(message.member);
 
     let amount = 1;
 

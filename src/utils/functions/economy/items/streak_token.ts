@@ -48,7 +48,6 @@ module.exports = new ItemUse(
       message.member,
       "streak_token",
       inventory.find((i) => i.item == "streak_token").amount - 1,
-      false,
     );
 
     const embed = await doDaily(message.member);

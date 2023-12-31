@@ -59,7 +59,7 @@ async function doCrates(client: NypsiClient) {
     const desc: string[] = [];
 
     for (const [key, value] of rewards.entries()) {
-      await addInventoryItem(member.id, key, value, false);
+      await addInventoryItem(member.id, key, value);
       desc.push(
         `+**${value}** ${getItems()[key].emoji} ${
           value > 1

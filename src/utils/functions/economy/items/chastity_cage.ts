@@ -93,13 +93,12 @@ module.exports = new ItemUse(
     );
     await redis.expire(`${Constants.redis.cooldown.SEX_CHASTITY}:${chastityTarget.user.id}`, 10800);
 
-    const inventory = await getInventory(message.member, false);
+    const inventory = await getInventory(message.member);
 
     await setInventoryItem(
       message.member,
       "chastity_cage",
       inventory.find((i) => i.item == "chastity_cage").amount - 1,
-      false,
     );
 
     const msg = await send({
