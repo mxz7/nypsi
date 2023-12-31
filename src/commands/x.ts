@@ -1536,6 +1536,29 @@ async function run(
 
       interaction.followUp({ embeds: [new CustomEmbed(message.member, "deleted image")] });
     }
+  } else if (args[0].toLowerCase() === "boobies") {
+    const users = await prisma.economy.findMany({
+      where: {
+        prestige: { gt: 1 },
+      },
+      select: {
+        userId: true,
+        prestige: true,
+        Upgrades: {
+          select: {
+            amount: true,
+          },
+        },
+      },
+    });
+
+    for (const user of users) {
+      let count = 0;
+
+      for (const upgrade of user.Upgrades) count += upgrade.amount;
+
+      if (count > user.prestige) logger.info(`${user.userId} out of sync upgrades`);
+    }
   }
 }
 
