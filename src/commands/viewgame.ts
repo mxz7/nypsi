@@ -133,7 +133,9 @@ async function run(
     const pages = PageManager.createPages(
       query.map((game) => {
         let out =
-          `**id** \`${game.id.toString(36)}\` \`(${game.id})\`\n` +
+          `**id** [\`${game.id.toString(36)}\`](https://nypsi.xyz/${game.id.toString(36)}) \`(${
+            game.id
+          })\`\n` +
           `**user** \`${
             game.economy.user.Preferences?.leaderboards
               ? game.economy.user.lastKnownUsername
@@ -241,7 +243,9 @@ async function run(
     let components: ActionRowBuilder<MessageActionRowComponentBuilder>[];
 
     const desc =
-      `**id** \`${game.id.toString(36)}\` \`(${game.id})\`\n` +
+      `**id** [\`${game.id.toString(36)}\`](https://nypsi.xyz/${game.id.toString(36)}) \`(${
+        game.id
+      })\`\n` +
       `**user** \`${username || "[redacted]"}\`\n` +
       `**game** \`${game.game}\`\n` +
       `**time** <t:${Math.floor(game.date.getTime() / 1000)}>\n` +
@@ -260,10 +264,8 @@ async function run(
       components[components.length - 1].components.length = 4;
     } else if (game.game.includes("scratch_card") || game.game.includes("scratchie")) {
       components = JSON.parse(game.outcome);
-    } else if (game.game === "tower") {
-      embed.addField("outcome", `https://nypsi.xyz/game/${game.id.toString(36)}`, true);
     } else {
-      embed.addField("outcome", game.outcome, true);
+      embed.addField("outcome", `https://nypsi.xyz/game/${game.id.toString(36)}`, true);
     }
 
     if (game.win == 1 && !(game.game.includes("scratchie") || game.game.includes("scratch_card"))) {
