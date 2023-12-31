@@ -179,7 +179,7 @@ async function doHunt(
   }
 
   if (!unbreaking) {
-    await setInventoryItem(member, gun, inventory.find((i) => i.item == gun).amount - 1, false);
+    await setInventoryItem(member, gun, inventory.find((i) => i.item == gun).amount - 1);
   }
 
   let chosenPlace: string;

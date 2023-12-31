@@ -34,7 +34,7 @@ export async function runAuctionChecks(client: NypsiClient) {
 
       if (!(await userExists(auction.ownerId))) continue;
 
-      await addInventoryItem(auction.ownerId, auction.itemId, Number(auction.itemAmount), false);
+      await addInventoryItem(auction.ownerId, auction.itemId, Number(auction.itemAmount));
 
       const embed = new CustomEmbed().setColor(Constants.TRANSPARENT_EMBED_COLOR);
 

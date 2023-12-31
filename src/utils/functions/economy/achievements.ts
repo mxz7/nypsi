@@ -165,11 +165,6 @@ async function completeAchievement(userId: string, achievementId: string) {
     earnedXp = 250;
   }
 
-  if (achievementId.includes("collector")) {
-    earnedCrates = 0;
-    earnedXp = 0;
-  }
-
   const rewardsDesc: string[] = [];
 
   if (earnedXp > 0) {
@@ -204,7 +199,7 @@ async function completeAchievement(userId: string, achievementId: string) {
 
         if (!amount) break;
 
-        await addInventoryItem(userId, prize.split(":")[0], amount, false);
+        await addInventoryItem(userId, prize.split(":")[0], amount);
         prizes.push(
           `+ \`${amount}x\` ${getItems()[prize.split(":")[0]].emoji} ${
             getItems()[prize.split(":")[0]].name

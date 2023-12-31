@@ -435,7 +435,6 @@ async function run(
       message.member,
       selected.id,
       inventory.find((i) => i.item == selected.id).amount - amount,
-      false,
     );
 
     const url = await createAuction(message.member, selected.id, amount, cost).catch(() => {});
@@ -997,7 +996,6 @@ async function run(
       message.member,
       selected.id,
       inventory.find((i) => i.item == selected.id).amount - amount,
-      false,
     );
 
     const url = await createAuction(message.member, selected.id, amount, cost).catch((e) => {

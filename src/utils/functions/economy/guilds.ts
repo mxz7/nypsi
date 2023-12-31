@@ -506,7 +506,7 @@ async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
       const desc: string[] = [];
       for (const reward of rewards) {
         const [itemId, amount] = reward.split(":");
-        await addInventoryItem(member.userId, itemId, parseInt(amount) || 0, false);
+        await addInventoryItem(member.userId, itemId, parseInt(amount) || 0);
         desc.push(`\`${amount}x\` ${getItems()[itemId].emoji} ${getItems()[itemId].name}`);
       }
 
@@ -519,7 +519,7 @@ async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
       const desc: string[] = [];
       for (const reward of rewards) {
         const [itemId, amount] = reward.split(":");
-        await addInventoryItem(member.userId, itemId, parseInt(amount) || 0, false);
+        await addInventoryItem(member.userId, itemId, parseInt(amount) || 0);
         desc.push(`\`${amount}x\` ${getItems()[itemId].emoji} ${getItems()[itemId].name}`);
       }
 

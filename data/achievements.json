@@ -1,39 +1,4 @@
 {
-  "collector_i": {
-    "id": "collector_i",
-    "name": "collector **I**",
-    "emoji": "🎒",
-    "target": 100,
-    "description": "have 100 items in your inventory"
-  },
-  "collector_ii": {
-    "id": "collector_ii",
-    "name": "collector **II**",
-    "emoji": "🎒",
-    "target": 750,
-    "description": "have 750 items in your inventory"
-  },
-  "collector_iii": {
-    "id": "collector_iii",
-    "name": "collector **III**",
-    "emoji": "🎒",
-    "target": 5000,
-    "description": "have 5,000 items in your inventory"
-  },
-  "collector_iv": {
-    "id": "collector_iv",
-    "name": "collector **IV**",
-    "emoji": "🎒",
-    "target": 10000,
-    "description": "have 10,000 items in your inventory"
-  },
-  "collector_v": {
-    "id": "collector_v",
-    "name": "collector **V**",
-    "emoji": "🎒",
-    "target": 50000,
-    "description": "have 50,000 items in your inventory"
-  },
   "gambler_i": {
     "id": "gambler_i",
     "name": "gambler **I**",
@@ -232,7 +197,47 @@
     "emoji": "🍪",
     "target": 50000,
     "description": "bake 50,000 cookies",
-    "prize": ["nypsi_crate:1"]
+    "prize": ["lucky_scratch_card:5"]
+  },
+  "super_baker_i": {
+    "id": "super_baker_i",
+    "name": "super baker **I**",
+    "emoji": "🧁",
+    "target": 500000,
+    "description": "bake 500,000 cookies",
+    "prize": ["lucky_scratch_card:1"]
+  },
+  "super_baker_ii": {
+    "id": "super_baker_ii",
+    "name": "super baker **II**",
+    "emoji": "🧁",
+    "target": 1000000,
+    "description": "bake 1,000,000 cookies",
+    "prize": ["lucky_scratch_card:3"]
+  },
+  "super_baker_iii": {
+    "id": "super_baker_iii",
+    "name": "super baker **III**",
+    "emoji": "🧁",
+    "target": 2500000,
+    "description": "bake 2,500,000 cookies",
+    "prize": ["lucky_scratch_card:3", "nypsi_crate:1"]
+  },
+  "super_baker_iv": {
+    "id": "super_baker_iv",
+    "name": "super baker **IV**",
+    "emoji": "🧁",
+    "target": 5000000,
+    "description": "bake 5,000,000 cookies",
+    "prize": ["lucky_scratch_card:3", "nypsi_crate:2"]
+  },
+  "super_baker_v": {
+    "id": "super_baker_v",
+    "name": "super baker **V**",
+    "emoji": "🧁",
+    "target": 10000000,
+    "description": "bake 10,000,000 cookies",
+    "prize": ["lucky_scratch_card:3", "nypsi_crate:3", "tag:cupcake"]
   },
   "wizard_i": {
     "id": "wizard_i",

@@ -62,7 +62,7 @@ export default {
 
     await interaction.deferReply({ ephemeral: true });
 
-    const inventory = await getInventory(interaction.user.id, false);
+    const inventory = await getInventory(interaction.user.id);
 
     if (
       !inventory.find((i) => i.item === offer.itemId) ||
@@ -95,7 +95,6 @@ export default {
       interaction.user.id,
       offer.itemId,
       inventory.find((i) => i.item === offer.itemId).amount - Number(offer.itemAmount),
-      false,
     );
 
     const tax = await getTax();

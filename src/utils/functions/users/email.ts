@@ -131,7 +131,7 @@ export async function checkPurchases(id: string, client: NypsiClient) {
             await addNotificationToQueue(payload);
           }
         } else {
-          await addInventoryItem(id, item.item, 1, false);
+          await addInventoryItem(id, item.item, 1);
 
           if ((await getDmSettings(id)).premium) {
             const payload: NotificationPayload = {

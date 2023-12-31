@@ -356,7 +356,7 @@ async function run(
     switch (wanted.type) {
       case "item":
       case "premium":
-        await addInventoryItem(message.member, wanted.value, 1, false);
+        await addInventoryItem(message.member, wanted.value, 1);
         break;
       case "xp":
         await updateXp(message.member, (await getXp(message.member)) + parseInt(wanted.value));

@@ -428,7 +428,7 @@ async function run(
     }
 
     const owned = new Map<string, number>();
-    const inventory = await getInventory(message.member, false);
+    const inventory = await getInventory(message.member);
 
     for (const ingredientId of selected.craft.ingredients) {
       const ownedAmount = inventory.find((i) => i.item == ingredientId.split(":")[0])?.amount || 0;
@@ -483,7 +483,6 @@ async function run(
           message.member,
           item,
           inventory.find((i) => i.item == item).amount - amount * ingredientAmount,
-          false,
         ),
       );
 

@@ -65,12 +65,11 @@ module.exports = new ItemUse(
       embed.setDescription("you're wearing your **mask** and can now rob a store again");
     }
 
-    const inventory = await getInventory(message.member, false);
+    const inventory = await getInventory(message.member);
     await setInventoryItem(
       message.member,
       "mask",
       inventory.find((i) => i.item == "mask").amount - 1,
-      false,
     );
 
     return send({ embeds: [embed] });
