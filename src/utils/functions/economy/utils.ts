@@ -350,21 +350,33 @@ export async function setEcoBan(id: string, date?: Date) {
 }
 
 export async function reset() {
+  logger.info("deleting lottery");
   await prisma.lotteryTicket.deleteMany();
   await prisma.$executeRaw`ALTER SEQUENCE "LotteryTicket_id_seq" RESTART WITH 1;`;
+  logger.info("deleting boosters");
   await prisma.booster.deleteMany();
+  logger.info("deleting games");
   await prisma.game.deleteMany();
   await prisma.$executeRaw`TRUNCATE TABLE "Game" RESTART IDENTITY;`;
+  logger.info("deleting stats");
   await prisma.stats.deleteMany();
+  logger.info("deleting guilds");
   await prisma.economyGuildMember.deleteMany();
   await prisma.economyGuild.deleteMany();
+  logger.info("deleting auctions");
   await prisma.auction.deleteMany({ where: { sold: false } });
+  logger.info("deleting offers");
   await prisma.offer.deleteMany({ where: { sold: false } });
+  logger.info("deleting workers");
   await prisma.economyWorkerUpgrades.deleteMany();
   await prisma.economyWorker.deleteMany();
+  logger.info("deleting inventory");
   await prisma.inventory.deleteMany();
+  logger.info("deleting crafting");
   await prisma.crafting.deleteMany();
+  logger.info("deleting bakery");
   await prisma.bakeryUpgrade.deleteMany();
+  logger.info("deleting graph");
   await prisma.graphMetrics.deleteMany({
     where: {
       OR: [{ category: "networth" }, { category: "balance" }, { category: { contains: "guild" } }],
@@ -374,12 +386,14 @@ export async function reset() {
     where: { achievementId: { startsWith: "collector_" } },
   });
 
+  logger.info("deleting banned");
   await prisma.economy.deleteMany({
     where: {
       banned: { gt: new Date() },
     },
   });
 
+  logger.info("deleting inactive");
   const deleted = await prisma.economy
     .deleteMany({
       where: {
@@ -392,6 +406,7 @@ export async function reset() {
     })
     .then((r) => r.count);
 
+  logger.info("resetting");
   const query = await prisma.economy.findMany();
   let updated = 0;
 
@@ -426,6 +441,8 @@ export async function reset() {
     await redis.del(`${Constants.redis.cache.economy.NETWORTH}:${user.userId}`);
     await redis.del(`${Constants.redis.nypsi.STEVE_EARNED}:${user.userId}`);
   }
+
+  logger.info("done");
 
   return updated + deleted;
 }
