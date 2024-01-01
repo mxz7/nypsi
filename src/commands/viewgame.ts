@@ -133,9 +133,9 @@ async function run(
     const pages = PageManager.createPages(
       query.map((game) => {
         let out =
-          `**id** [\`${game.id.toString(36)}\`](https://nypsi.xyz/${game.id.toString(36)}) \`(${
-            game.id
-          })\`\n` +
+          `**id** [\`${game.id.toString(36)}\`](https://nypsi.xyz/game/${game.id.toString(
+            36,
+          )}) \`(${game.id})\`\n` +
           `**user** \`${
             game.economy.user.Preferences?.leaderboards
               ? game.economy.user.lastKnownUsername
@@ -243,7 +243,7 @@ async function run(
     let components: ActionRowBuilder<MessageActionRowComponentBuilder>[];
 
     const desc =
-      `**id** [\`${game.id.toString(36)}\`](https://nypsi.xyz/${game.id.toString(36)}) \`(${
+      `**id** [\`${game.id.toString(36)}\`](https://nypsi.xyz/game/${game.id.toString(36)}) \`(${
         game.id
       })\`\n` +
       `**user** \`${username || "[redacted]"}\`\n` +
