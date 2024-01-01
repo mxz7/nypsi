@@ -13,6 +13,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   await message.channel.send({ embeds: [embed] });
 
+  const code = Math.floor(Math.random() * 10000);
+  console.log(code);
+
   const filter = (msg: Message) => message.author.id == msg.author.id;
 
   let response: any = await message.channel.awaitMessages({
@@ -22,7 +25,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   response = response.first().content;
 
-  if (response != "$reseteco") {
+  if (response != code) {
     return message.channel.send({ embeds: [new ErrorEmbed("captcha failed")] });
   } else {
     const c = await reset();
