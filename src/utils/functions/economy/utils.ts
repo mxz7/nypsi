@@ -424,6 +424,7 @@ export async function reset() {
         padlock: false,
         level: user.level - (user.level % 100),
         seasonVote: 0,
+        netWorth: 0,
       },
     });
 
