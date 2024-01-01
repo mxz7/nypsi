@@ -25,7 +25,6 @@ import { updateCounters } from "../scheduled/clusterjobs/counters";
 import { runCraftItemsJob } from "../scheduled/clusterjobs/crafted";
 import { runLotteryInterval } from "../scheduled/clusterjobs/lottery";
 import { runLogs, runModerationChecks } from "../scheduled/clusterjobs/moderationchecks";
-import { runNetWorthInterval } from "../scheduled/clusterjobs/networth-update";
 import { runPremiumChecks } from "../scheduled/clusterjobs/premiumexpire";
 import startRandomDrops from "../scheduled/clusterjobs/random-drops";
 import { doLeaderboardSeed } from "../scheduled/clusterjobs/seed-leaderboards";
@@ -197,7 +196,6 @@ export class NypsiClient extends Client {
     startRandomDrops(this);
     runLogs();
     runWorkerInterval();
-    runNetWorthInterval();
     runCraftItemsJob();
     doAutosellSitrep();
     doLeaderboardSeed();
