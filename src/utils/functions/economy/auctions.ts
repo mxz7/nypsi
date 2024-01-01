@@ -363,19 +363,20 @@ export async function getAuctionAverage(item: string) {
   });
 
   if (auctions.length === 0 || auctions.map((i) => i.itemAmount).reduce((a, b) => a + b) < 3) {
-    auctions = await prisma.auction.findMany({
-      where: {
-        AND: [{ sold: true }, { itemId: item }],
-      },
-      select: {
-        bin: true,
-        itemAmount: true,
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-      take: 30,
-    });
+    if (Constants.SEASON_START.getTime() < dayjs().subtract(1, "month").toDate().getTime())
+      auctions = await prisma.auction.findMany({
+        where: {
+          AND: [{ sold: true }, { itemId: item }],
+        },
+        select: {
+          bin: true,
+          itemAmount: true,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+        take: 30,
+      });
   }
 
   const costs: number[] = [];
