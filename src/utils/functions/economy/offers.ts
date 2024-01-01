@@ -20,6 +20,7 @@ import { getTax } from "../tax";
 import { getBalance, updateBalance } from "./balance";
 import { getInventory } from "./inventory";
 import { createUser, getItems, userExists } from "./utils";
+import dayjs = require("dayjs");
 
 export async function createOffer(
   target: User,
@@ -173,19 +174,20 @@ export async function getOffersAverage(item: string) {
   });
 
   if (offers.length === 0 || offers.map((i) => i.itemAmount).reduce((a, b) => a + b) < 3) {
-    offers = await prisma.offer.findMany({
-      where: {
-        AND: [{ sold: true }, { itemId: item }, { soldAt: { gt: Constants.SEASON_START } }],
-      },
-      select: {
-        money: true,
-        itemAmount: true,
-      },
-      orderBy: {
-        soldAt: "desc",
-      },
-      take: 30,
-    });
+    if (Constants.SEASON_START.getTime() < dayjs().subtract(1, "month").toDate().getTime())
+      offers = await prisma.offer.findMany({
+        where: {
+          AND: [{ sold: true }, { itemId: item }, { soldAt: { gt: Constants.SEASON_START } }],
+        },
+        select: {
+          money: true,
+          itemAmount: true,
+        },
+        orderBy: {
+          soldAt: "desc",
+        },
+        take: 30,
+      });
   }
 
   const costs: number[] = [];

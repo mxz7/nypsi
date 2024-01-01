@@ -27,11 +27,6 @@ setInterval(() => {
   gemChanceCooldown.clear();
 }, 60000);
 
-type Inventory = {
-  item: string;
-  amount: number;
-}[];
-
 export async function getInventory(
   member: GuildMember | string,
 ): Promise<{ item: string; amount: number }[]> {
