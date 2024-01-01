@@ -112,7 +112,7 @@ cmd.setRun(async (message, args) => {
 
     if (args.length < 2) return send({ embeds: [new ErrorEmbed("/image upload <type> <file>")] });
 
-    if (!["cat", "dog", "wholesome"].includes(args[1].toLowerCase()))
+    if (!(categories as string[]).includes(args[1].toLowerCase()))
       return send({ embeds: [new ErrorEmbed("invalid suggestion type")] });
 
     let attachment: Attachment;
