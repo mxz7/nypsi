@@ -125,7 +125,7 @@ export async function createGame(
         game: opts.game,
         win: opts.result == "win" ? 1 : opts.result == "lose" ? 0 : 2,
         bet: opts.bet,
-        earned: Math.floor(opts.earned) || 0,
+        earned: Math.floor(opts.earned) || opts.result == "draw" ? opts.bet : 0,
         xpEarned: opts.xp || 0,
         outcome: opts.outcome,
       },
