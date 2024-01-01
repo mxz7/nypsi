@@ -19,6 +19,7 @@ import { hasVoted } from "./vote";
 import { calcWorkerValues } from "./workers";
 import ms = require("ms");
 import _ = require("lodash");
+import { logger } from "../../logger";
 
 export async function getBalance(member: GuildMember | string) {
   let id: string;
@@ -837,7 +838,7 @@ export async function calcNetWorth(member: GuildMember | string, breakdown = fal
             ? baseWorkers[worker.workerId].prestige_requirement / 40
             : 1);
 
-        for (let i = upgrade.amount; i < upgrade.amount + 1; i++) {
+        for (let i = 0; i < upgrade.amount; i++) {
           const cost = baseCost + baseCost * i;
 
           totalCost += cost;
@@ -850,8 +851,11 @@ export async function calcNetWorth(member: GuildMember | string, breakdown = fal
 
     const { perItem } = await calcWorkerValues(worker);
 
+    
+    worth += baseWorkers[worker.workerId].cost;
     worth += worker.stored * perItem;
     workersBreakdown += worker.stored * perItem;
+    workersBreakdown += baseWorkers[worker.workerId].cost;
   }
 
   breakdownItems.set("workers", workersBreakdown);
