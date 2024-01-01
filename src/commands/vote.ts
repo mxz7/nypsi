@@ -16,6 +16,7 @@ import Constants from "../utils/Constants";
 import { getRawLevel } from "../utils/functions/economy/levelling";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { getLastVote, hasVoted } from "../utils/functions/economy/vote";
+import { getDmSettings } from "../utils/functions/users/notifications";
 
 const cmd = new Command("vote", "vote every 12 hours to get rewards", "money");
 
@@ -59,13 +60,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   if (rawLevel > 100) rawLevel = 100;
 
   const amount = Math.floor(15000 * (rawLevel / 13 + 1));
-  const [voted, lastVote, votes] = await Promise.all([
+  const [voted, lastVote, votes, dmSettings] = await Promise.all([
     hasVoted(message.member),
     getLastVote(message.member),
     prisma.economy.findUnique({
       where: { userId: message.author.id },
       select: { monthVote: true, seasonVote: true },
     }),
+    getDmSettings(message.member),
   ]);
 
   let crateAmount = 0;
@@ -84,7 +86,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     embed.setHeader("thank you for voting", message.author.avatarURL());
     embed.setColor(Constants.EMBED_SUCCESS_COLOR);
     embed.setDescription(
-      `you can vote again <t:${nextVote}:R>\n\nyou've voted **${votes.monthVote}** time${
+      `you can vote again <t:${nextVote}:R>${
+        dmSettings.voteReminder
+          ? ""
+          : "\n\nyou can enable vote reminders with /settings me notifications"
+      }\n\nyou've voted **${votes.monthVote}** time${
         votes.monthVote === 1 ? "" : "s"
       } this month and **${votes.seasonVote}** time${
         votes.seasonVote === 1 ? "" : "s"
