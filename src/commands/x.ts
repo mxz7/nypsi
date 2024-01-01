@@ -1536,6 +1536,29 @@ async function run(
 
       interaction.followUp({ embeds: [new CustomEmbed(message.member, "deleted image")] });
     }
+  } 
+  //remove after fix
+  else if (args[0].toLowerCase() == "fixstats") {
+    if ((await getAdminLevel(message.author.id)) < 69)
+      return message.channel.send({
+        embeds: [new ErrorEmbed("i made this why did i make only you be able to do this")],
+      });
+
+    const query = await prisma.game.findMany({
+      where: {
+        AND: [{win: 2}, {earned: 0}]
+      }
+    });
+
+    for (const game of query) {
+      await prisma.game.update({
+        where: { id: game.id },
+        data: { earned: game.bet }
+      })
+    }
+    return message.channel.send({
+      embeds: [new CustomEmbed(message.member, `${query.length} game${query.length == 1 ? "" : "s"} fixed`)],
+    });
   }
 }
 
