@@ -159,7 +159,7 @@ export async function getOffersAverage(item: string) {
   if (await redis.exists(`${Constants.redis.cache.economy.OFFER_AVG}:${item}`))
     return parseInt(await redis.get(`${Constants.redis.cache.economy.OFFER_AVG}:${item}`));
 
-  let offers = await prisma.offer.findMany({
+  const offers = await prisma.offer.findMany({
     where: {
       AND: [{ sold: true }, { itemId: item }, { soldAt: { gt: Constants.SEASON_START } }],
     },
@@ -172,23 +172,6 @@ export async function getOffersAverage(item: string) {
     },
     take: 30,
   });
-
-  if (offers.length === 0 || offers.map((i) => i.itemAmount).reduce((a, b) => a + b) < 3) {
-    if (Constants.SEASON_START.getTime() < dayjs().subtract(1, "month").toDate().getTime())
-      offers = await prisma.offer.findMany({
-        where: {
-          AND: [{ sold: true }, { itemId: item }, { soldAt: { gt: Constants.SEASON_START } }],
-        },
-        select: {
-          money: true,
-          itemAmount: true,
-        },
-        orderBy: {
-          soldAt: "desc",
-        },
-        take: 30,
-      });
-  }
 
   const costs: number[] = [];
 
