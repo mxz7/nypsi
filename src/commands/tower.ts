@@ -81,18 +81,18 @@ interface Game {
 
 const difficultyIncrements = new Map<string, number>([
   ["easy", 0.45],
-  ["medium", 1.05],
-  ["hard", 1.429],
+  ["medium", 0.99],
+  ["hard", 1.419],
   ["expert", 2.9],
 ]);
 const incrementOffsets = new Map<number, number>([
   [0, 0.69],
-  [1, 0.55],
-  [2, 0.45],
-  [3, 0.35],
+  [1, 0.5],
+  [2, 0.42],
+  [3, 0.33],
   [4, 0.3],
-  [5, 0.24],
-  [6, 0.16],
+  [5, 0.22],
+  [6, 0.14],
   [7, 0.1],
   [8, 0.1],
 ]);
