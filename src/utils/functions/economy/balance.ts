@@ -851,7 +851,6 @@ export async function calcNetWorth(member: GuildMember | string, breakdown = fal
 
     const { perItem } = await calcWorkerValues(worker);
 
-    
     worth += baseWorkers[worker.workerId].cost;
     worth += worker.stored * perItem;
     workersBreakdown += worker.stored * perItem;
