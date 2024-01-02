@@ -127,7 +127,7 @@ export async function createGame(
         bet: opts.bet,
         earned:
           opts.result === "win"
-            ? Math.floor(opts.earned)
+            ? (Math.floor(opts.earned) || 0)
             : opts.result === "draw"
               ? Math.floor(opts.bet)
               : 0,
