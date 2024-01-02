@@ -348,7 +348,7 @@ export async function getAuctionAverage(item: string) {
   if (await redis.exists(`${Constants.redis.cache.economy.AUCTION_AVG}:${item}`))
     return parseInt(await redis.get(`${Constants.redis.cache.economy.AUCTION_AVG}:${item}`));
 
-  let auctions = await prisma.auction.findMany({
+  const auctions = await prisma.auction.findMany({
     where: {
       AND: [{ sold: true }, { itemId: item }, { createdAt: { gt: Constants.SEASON_START } }],
     },
@@ -361,23 +361,6 @@ export async function getAuctionAverage(item: string) {
     },
     take: 50,
   });
-
-  if (auctions.length === 0 || auctions.map((i) => i.itemAmount).reduce((a, b) => a + b) < 3) {
-    if (Constants.SEASON_START.getTime() < dayjs().subtract(1, "month").toDate().getTime())
-      auctions = await prisma.auction.findMany({
-        where: {
-          AND: [{ sold: true }, { itemId: item }],
-        },
-        select: {
-          bin: true,
-          itemAmount: true,
-        },
-        orderBy: {
-          createdAt: "desc",
-        },
-        take: 30,
-      });
-  }
 
   const costs: number[] = [];
 
