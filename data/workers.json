@@ -130,7 +130,7 @@
       "name": "gem radar",
       "plural": "gem radars",
       "upgrades": "gem_chance",
-      "effect": 0.00032,
+      "effect": 0.00027,
       "stack_limit": 10,
       "for": "quarry"
     },
@@ -139,7 +139,7 @@
       "name": "earth scanner",
       "plural": "earth scanners",
       "upgrades": "scrap_chance",
-      "effect": 0.001,
+      "effect": 0.00077,
       "stack_limit": 10,
       "for": "quarry"
     }

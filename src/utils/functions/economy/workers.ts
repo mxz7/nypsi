@@ -90,8 +90,8 @@ export async function calcWorkerValues(
   let scrapChance = 0;
 
   if (worker.workerId === "quarry") {
-    scrapChance = 0.0001;
-    gemChance = 0.00005;
+    scrapChance = 0.00009;
+    gemChance = 0.00003;
   }
 
   for (const upgrade of worker.upgrades) {
