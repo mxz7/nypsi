@@ -2,6 +2,7 @@ import dayjs = require("dayjs");
 import { Collection, Guild, GuildMember } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
+import Constants from "../../Constants";
 import PageManager from "../page";
 import { getPreferences } from "../users/notifications";
 import { getLastKnownUsername } from "../users/tag";
@@ -1542,7 +1543,11 @@ export async function topVote(guild: Guild, userId?: string) {
       user.userId,
       members.get(user.userId).user.username,
       true,
-    )} ${user.seasonVote.toLocaleString()} | ${user.monthVote.toLocaleString()}`;
+    )} ${
+      dayjs().subtract(1, "month").isAfter(Constants.SEASON_START)
+        ? `${user.seasonVote.toLocaleString()} | ${user.monthVote.toLocaleString()}`
+        : user.monthVote.toLocaleString()
+    }`;
 
     count++;
   }
@@ -1609,7 +1614,11 @@ export async function topVoteGlobal(userId: string, amount = 100) {
       user.userId,
       user.user.lastKnownUsername,
       (await getPreferences(user.userId)).leaderboards,
-    )} ${user.seasonVote.toLocaleString()} | ${user.monthVote.toLocaleString()}`;
+    )} ${
+      dayjs().subtract(1, "month").isAfter(Constants.SEASON_START)
+        ? `${user.seasonVote.toLocaleString()} | ${user.monthVote.toLocaleString()}`
+        : user.monthVote.toLocaleString()
+    }`;
 
     count++;
   }
