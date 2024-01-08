@@ -33,9 +33,11 @@ import { addKarma, getKarma, removeKarma } from "../utils/functions/karma/karma"
 import { getUserAliases } from "../utils/functions/premium/aliases";
 import {
   addMember,
+  expireUser,
   getPremiumProfile,
   isPremium,
   levelString,
+  setCredits,
   setExpireDate,
   setTier,
 } from "../utils/functions/premium/premium";
@@ -849,87 +851,93 @@ async function run(
   };
 
   const doPremium = async (user: User, response: ButtonInteraction) => {
-    let desc = "";
+    const render = async () => {
+      let desc = "";
 
-    const rows: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [
-      new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder()
-          .setCustomId("add-premium")
-          .setLabel("add premium")
-          .setStyle(ButtonStyle.Primary)
-          .setEmoji("➕"),
-        new ButtonBuilder()
-          .setCustomId("set-tier")
-          .setLabel("set tier")
-          .setStyle(ButtonStyle.Primary)
-          .setEmoji("😁"),
-        new ButtonBuilder()
-          .setCustomId("set-expire")
-          .setLabel("set expire date")
-          .setStyle(ButtonStyle.Primary)
-          .setEmoji("😣"),
-        new ButtonBuilder()
-          .setCustomId("set-credits")
-          .setLabel("set credits")
-          .setStyle(ButtonStyle.Primary)
-          .setEmoji("🪙"),
-        new ButtonBuilder()
-          .setCustomId("raw-data")
-          .setLabel("view raw data")
-          .setStyle(ButtonStyle.Primary)
-          .setEmoji("🥩"),
-      ),
+      const rows: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [
+        new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+          new ButtonBuilder()
+            .setCustomId("add-premium")
+            .setLabel("add premium")
+            .setStyle(ButtonStyle.Primary)
+            .setEmoji("➕"),
+          new ButtonBuilder()
+            .setCustomId("set-tier")
+            .setLabel("set tier")
+            .setStyle(ButtonStyle.Primary)
+            .setEmoji("😁"),
+          new ButtonBuilder()
+            .setCustomId("set-expire")
+            .setLabel("set expire date")
+            .setStyle(ButtonStyle.Primary)
+            .setEmoji("😣"),
+          new ButtonBuilder()
+            .setCustomId("set-credits")
+            .setLabel("set credits")
+            .setStyle(ButtonStyle.Primary)
+            .setEmoji("🪙"),
+          new ButtonBuilder()
+            .setCustomId("raw-data")
+            .setLabel("view raw data")
+            .setStyle(ButtonStyle.Primary)
+            .setEmoji("🥩"),
+        ),
 
-      new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder()
-          .setCustomId("del-cmd")
-          .setLabel("delete cmd")
-          .setStyle(ButtonStyle.Danger)
-          .setEmoji("❌"),
-        new ButtonBuilder()
-          .setCustomId("del-aliases")
-          .setLabel("delete aliases")
-          .setStyle(ButtonStyle.Danger)
-          .setEmoji("❌"),
-        new ButtonBuilder()
-          .setCustomId("expire-now")
-          .setLabel("expire now")
-          .setStyle(ButtonStyle.Danger)
-          .setEmoji("❌"),
-      ),
-    ];
+        new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+          new ButtonBuilder()
+            .setCustomId("del-cmd")
+            .setLabel("delete cmd")
+            .setStyle(ButtonStyle.Danger)
+            .setEmoji("❌"),
+          new ButtonBuilder()
+            .setCustomId("del-aliases")
+            .setLabel("delete aliases")
+            .setStyle(ButtonStyle.Danger)
+            .setEmoji("❌"),
+          new ButtonBuilder()
+            .setCustomId("expire-now")
+            .setLabel("expire now")
+            .setStyle(ButtonStyle.Danger)
+            .setEmoji("❌"),
+        ),
+      ];
 
-    const embed = new CustomEmbed(message.member);
+      const embed = new CustomEmbed(message.member);
 
-    if (await isPremium(user.id)) {
-      const [profile, aliases] = await Promise.all([
-        getPremiumProfile(user.id),
-        getUserAliases(user.id),
-      ]);
+      if (await isPremium(user.id)) {
+        const [profile, aliases] = await Promise.all([
+          getPremiumProfile(user.id),
+          getUserAliases(user.id),
+        ]);
 
-      rows[0].components[0].setDisabled(true);
-      desc +=
-        `**level** ${levelString(profile.level)}\n` +
-        `**expires** <t:${Math.floor(profile.expireDate.getTime() / 1000)}>\n` +
-        `**credits** ${profile.credit}`;
+        rows[0].components[0].setDisabled(true);
+        desc +=
+          `**level** ${levelString(profile.level)}\n` +
+          `**expires** <t:${Math.floor(profile.expireDate.getTime() / 1000)}>\n` +
+          `**credits** ${profile.credit}`;
 
-      embed.setDescription(desc);
-      if (aliases.length > 0) {
-        embed.addField(
-          "aliases",
-          aliases.map((i) => `\`${i.alias}\` -> \`${i.command}\``).join("\n"),
-        );
+        embed.setDescription(desc);
+        if (aliases.length > 0) {
+          embed.addField(
+            "aliases",
+            aliases.map((i) => `\`${i.alias}\` -> \`${i.command}\``).join("\n"),
+          );
+        }
+      } else {
+        rows.forEach((i) => i.components.forEach((j) => j.setDisabled(true)));
+        rows[0].components[0].setDisabled(false);
+
+        embed.setDescription("no premium");
       }
-    } else {
-      rows.forEach((i) => i.components.forEach((j) => j.setDisabled(true)));
-      rows[0].components[0].setDisabled(false);
 
-      embed.setDescription("no premium");
-    }
-
-    const msg = await response.editReply({ embeds: [embed], components: rows });
+      return { rows, embed };
+    };
 
     const waitForButton = async (): Promise<void> => {
+      const { rows, embed } = await render();
+
+      const msg = await response.editReply({ embeds: [embed], components: rows });
+
       const filter = (i: Interaction) => i.user.id == message.author.id;
 
       const res = await msg.awaitMessageComponent({ filter, time: 120000 }).catch(async () => {
@@ -1143,8 +1151,55 @@ async function run(
         logger.info(
           `admin: ${message.author.id} (${message.author.username}) set ${user.id} expire to now`,
         );
-        await setExpireDate(user.id, new Date(0), message.client as NypsiClient);
+        await expireUser(user.id, message.client as NypsiClient);
         await res.editReply({ embeds: [new CustomEmbed(message.member, "done sir.")] });
+        return waitForButton();
+      } else if (res.customId === "set-credits") {
+        if ((await getAdminLevel(message.author.id)) < 5) {
+          await res.editReply({
+            embeds: [new ErrorEmbed("you require admin level **5** to do this")],
+          });
+          return waitForButton();
+        }
+
+        if (!(await isPremium(user.id))) {
+          await res.editReply({ embeds: [new ErrorEmbed("idiot bro")] });
+          return waitForButton();
+        }
+
+        await res.editReply({ embeds: [new CustomEmbed(message.member, "how many")] });
+
+        const msg = await message.channel
+          .awaitMessages({
+            filter: (msg: Message) => msg.author.id === message.author.id,
+            max: 1,
+            time: 30000,
+          })
+          .then((collected) => collected.first())
+          .catch(() => {
+            res.editReply({ embeds: [new CustomEmbed(message.member, "expired")] });
+          });
+
+        if (!msg) return;
+        if (!parseInt(msg.content) && parseInt(msg.content) != 0) {
+          await res.editReply({ embeds: [new CustomEmbed(message.member, "invalid value")] });
+          return waitForButton();
+        }
+        if (parseInt(msg.content) < 0) {
+          await res.editReply({
+            embeds: [
+              new CustomEmbed(message.member, "nice try bozo ! suck this dick you wANK STAIN"),
+            ],
+          });
+          return waitForButton();
+        }
+
+        logger.info(
+          `admin: ${message.author.id} (${message.author.username}) set ${user.id} premium credits to ${msg.content}`,
+        );
+
+        await setCredits(user.id, parseInt(msg.content));
+        msg.react("✅");
         return waitForButton();
       }
     };
