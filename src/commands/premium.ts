@@ -14,6 +14,7 @@ import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { daysAgo, daysUntil, formatDate } from "../utils/functions/date";
+import { getPrefix } from "../utils/functions/guilds/utils";
 import PageManager from "../utils/functions/page";
 import { addUserAlias, getUserAliases, removeUserAlias } from "../utils/functions/premium/aliases";
 import { isBooster, setBooster } from "../utils/functions/premium/boosters";
@@ -21,12 +22,14 @@ import { getEmbedColor, setEmbedColor } from "../utils/functions/premium/color";
 import { getCommand, getUserCommand, setCommand } from "../utils/functions/premium/command";
 import {
   addMember,
+  getCredits,
   getPremiumProfile,
   getTier,
   isPremium,
+  levelString,
   renewUser,
+  setCredits,
   setExpireDate,
-  setStatus,
   setTier,
 } from "../utils/functions/premium/premium";
 import sleep from "../utils/functions/sleep";
@@ -35,7 +38,6 @@ import { getTotalSpend } from "../utils/functions/users/email";
 import { addTag, getTags, removeTag } from "../utils/functions/users/tags";
 import { commandExists } from "../utils/handlers/commandhandler";
 import dayjs = require("dayjs");
-import { getPrefix } from "../utils/functions/guilds/utils";
 
 let doingRoles = false;
 
@@ -283,18 +285,25 @@ async function run(
         getUserAliases(message.member),
       ]);
 
-      const timeStarted = formatDate(profile.startDate);
-      const timeAgo = daysAgo(profile.startDate);
-      const expires = formatDate(profile.expireDate);
-      const timeUntil = daysUntil(profile.expireDate);
-      const embedColor = profile.embedColor;
+      let expiresText = `<t:${Math.floor(profile.expireDate.getTime() / 1000)}> (<t:${Math.floor(
+        profile.expireDate.getTime() / 1000,
+      )}:R>)`;
+
+      if (dayjs(profile.expireDate).set("hour", 0).set("minute", 0).isBefore(dayjs())) {
+        const date = dayjs().set("hour", 23).set("minute", 45).set("second", 0).unix();
+
+        expiresText = `<t:${date}> (<t:${date}:R>)`;
+      }
 
       let description =
-        `**tier** ${profile.getLevelString()}` +
+        `**tier** ${levelString(profile.level)}` +
         `\n**booster** ${await isBooster(message.author.id)}` +
-        `\n**started** ${timeStarted} (${timeAgo} day${timeAgo != 1 ? "s" : ""} ago)` +
-        `\n**expires** ${expires} (${timeUntil} day${timeUntil != 1 ? "s" : ""} left)` +
-        `\n\n**color** ${embedColor} - /premium color` +
+        `\n**started** <t:${Math.floor(profile.startDate.getTime() / 1000)}> (<t:${Math.floor(
+          profile.startDate.getTime() / 1000,
+        )}:R>)` +
+        `\n**expires** ${expiresText}` +
+        `\n**credit** ${profile.credit}` +
+        `\n\n**color** ${profile.embedColor} - /premium color` +
         `\n**aliases** ${aliases.length.toLocaleString()}`;
 
       if (profile.level > 2) {
@@ -613,7 +622,11 @@ async function run(
       const expires = formatDate(profile.expireDate);
       const timeUntil = daysUntil(profile.expireDate);
 
-      let description = `**tier** ${profile.getLevelString()}\n**started** ${timeStarted} (${timeAgo} days ago)\n**expires** ${expires} (${timeUntil} days left)`;
+      let description = `**tier** ${levelString(
+        profile.level,
+      )}\n**started** ${timeStarted} (${timeAgo} days ago)\n**expires** ${expires} (${timeUntil} days left)\n**credit** ${
+        profile.credit
+      }`;
 
       if (profile.level > 2) {
         const cmd = await getUserCommand(user.id);
@@ -647,9 +660,6 @@ async function run(
       });
     }
 
-    const expire = (await getPremiumProfile(args[2])).expireDate;
-    let date: dayjs.Dayjs;
-
     switch (args[1].toLowerCase()) {
       case "level":
         await setTier(args[2], parseInt(args[3]), message.client as NypsiClient);
@@ -661,28 +671,10 @@ async function run(
         return send({
           embeds: [new CustomEmbed(message.member, `✅ embed color changed to ${args[3]}`)],
         });
-      case "status":
-        await setStatus(args[2], parseInt(args[3]));
+      case "setcreds":
+        await setCredits(args[2], parseInt(args[3]));
         return send({
-          embeds: [new CustomEmbed(message.member, `✅ status changed to ${args[3]}`)],
-        });
-      case "adddays":
-        date = dayjs(expire);
-
-        date = date.add(parseInt(args[3]), "days");
-
-        await setExpireDate(args[2], date.toDate(), message.client as NypsiClient);
-        return send({
-          embeds: [new CustomEmbed(message.member, `✅ expire date changed to ${date.toDate()}`)],
-        });
-      case "remdays":
-        date = dayjs(expire);
-
-        date = date.subtract(parseInt(args[3]), "days");
-
-        await setExpireDate(args[2], date.toDate(), message.client as NypsiClient);
-        return send({
-          embeds: [new CustomEmbed(message.member, `✅ expire date changed to ${date.toDate()}`)],
+          embeds: [new CustomEmbed(message.member, `✅ credits: ${await getCredits(args[2])}`)],
         });
     }
   } else if (args[0].toLowerCase() == "add") {
@@ -694,7 +686,7 @@ async function run(
       return send({ embeds: [new ErrorEmbed("invalid syntax bro")] });
     }
 
-    await addMember(args[1], parseInt(args[2]), message.client as NypsiClient);
+    await addMember(args[1], parseInt(args[2]));
 
     return send({
       embeds: [new CustomEmbed(message.member, "✅ created profile at tier " + args[2])],
