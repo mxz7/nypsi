@@ -12,7 +12,7 @@ import { logger } from "../../utils/logger";
 async function doCrates(client: NypsiClient) {
   const query = await prisma.user.findMany({
     where: {
-      OR: [{ booster: true }, { Premium: { AND: [{ level: { gt: 1 } }, { status: 1 }] } }],
+      OR: [{ booster: true }, { Premium: { level: { gt: 1 } } }],
     },
     select: {
       id: true,

@@ -219,24 +219,6 @@ export async function setTier(member: GuildMember | string, level: number, clien
   await redis.del(`${Constants.redis.cache.premium.LEVEL}:${id}`);
 }
 
-export async function setStatus(member: GuildMember | string, status: number) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
-
-  await prisma.premium.update({
-    where: {
-      userId: id,
-    },
-    data: {
-      status: status,
-    },
-  });
-}
-
 export async function renewUser(member: string, client?: NypsiClient) {
   const profile = await getPremiumProfile(member);
 

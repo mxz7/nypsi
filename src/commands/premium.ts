@@ -14,6 +14,7 @@ import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { daysAgo, daysUntil, formatDate } from "../utils/functions/date";
+import { getPrefix } from "../utils/functions/guilds/utils";
 import PageManager from "../utils/functions/page";
 import { addUserAlias, getUserAliases, removeUserAlias } from "../utils/functions/premium/aliases";
 import { isBooster, setBooster } from "../utils/functions/premium/boosters";
@@ -26,7 +27,6 @@ import {
   isPremium,
   renewUser,
   setExpireDate,
-  setStatus,
   setTier,
 } from "../utils/functions/premium/premium";
 import sleep from "../utils/functions/sleep";
@@ -35,7 +35,6 @@ import { getTotalSpend } from "../utils/functions/users/email";
 import { addTag, getTags, removeTag } from "../utils/functions/users/tags";
 import { commandExists } from "../utils/handlers/commandhandler";
 import dayjs = require("dayjs");
-import { getPrefix } from "../utils/functions/guilds/utils";
 
 let doingRoles = false;
 
@@ -660,11 +659,6 @@ async function run(
         await setEmbedColor(args[2], args[3]);
         return send({
           embeds: [new CustomEmbed(message.member, `✅ embed color changed to ${args[3]}`)],
-        });
-      case "status":
-        await setStatus(args[2], parseInt(args[3]));
-        return send({
-          embeds: [new CustomEmbed(message.member, `✅ status changed to ${args[3]}`)],
         });
       case "adddays":
         date = dayjs(expire);
