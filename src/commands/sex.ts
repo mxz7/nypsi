@@ -13,9 +13,11 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants.js";
 import { MStoTime } from "../utils/functions/date.js";
 import { addProgress } from "../utils/functions/economy/achievements.js";
+import { getTagsData } from "../utils/functions/economy/utils.js";
 import { cleanString } from "../utils/functions/string.js";
 import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications.js";
 import { getLastKnownUsername } from "../utils/functions/users/tag.js";
+import { getActiveTag } from "../utils/functions/users/tags.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 
 const cmd = new Command("sex", "find horny milfs in ur area 😏", "fun").setAliases([
@@ -184,6 +186,8 @@ async function run(
 
       await redis.lrem(Constants.redis.nypsi.MILF_QUEUE, 1, JSON.stringify(milf));
 
+      const tag = await getActiveTag(milf.userId);
+
       const embed = new CustomEmbed(
         message.member,
         `a match has been made from **${
@@ -191,9 +195,11 @@ async function run(
             ? "[nypsi](https://discord.gg/hJTDNST)"
             : milf.guildName
         }**\n\n` +
-          `go ahead and send [**${await getLastKnownUsername(
-            milf.userId,
-          )}**](https://discord.com/users/${milf.userId}) a *private* message 😉😏`,
+          `go ahead and send [**${
+            tag ? `[${getTagsData()[tag.tagId]}]` : ""
+          }${await getLastKnownUsername(milf.userId)}**](https://discord.com/users/${
+            milf.userId
+          }) a *private* message 😉😏`,
       ).setHeader("milf finder");
 
       if (milf.description != "") {
@@ -203,9 +209,9 @@ async function run(
               ? "[nypsi](https://discord.gg/hJTDNST)"
               : milf.guildName
           }**\n\n` +
-            `[**${await getLastKnownUsername(milf.userId)}**](https://discord.com/users/${
-              milf.userId
-            }) - ${milf.description}\n\n` +
+            `[**${tag ? `[${getTagsData()[tag.tagId]}]` : ""}${await getLastKnownUsername(
+              milf.userId,
+            )}**](https://discord.com/users/${milf.userId}) - ${milf.description}\n\n` +
             "go ahead and send them a *private* message 😉😏",
         );
       }
@@ -216,15 +222,17 @@ async function run(
         addProgress(milf.userId, "whore", 1),
       ]);
 
+      const authorTag = await getActiveTag(message.author.id);
+
       const embed2 = new CustomEmbed(
         undefined,
         `a match has been made from **${
           message.guild.id == "747056029795221513"
             ? "[nypsi](https://discord.gg/hJTDNST)"
             : message.guild.name
-        }**\n\ngo ahead and send [**${message.author.username}**](https://discord.com/users/${
-          message.author.id
-        }) a *private* message 😉😏`,
+        }**\n\ngo ahead and send [${authorTag ? `[${getTagsData()[authorTag.tagId]}]` : ""}**${
+          message.author.username
+        }**](https://discord.com/users/${message.author.id}) a *private* message 😉😏`,
       )
         .setHeader("milf finder")
         .setColor(Constants.EMBED_SUCCESS_COLOR);
@@ -253,7 +261,9 @@ async function run(
               ? "[nypsi](https://discord.gg/hJTDNST)"
               : message.guild.name
           }**\n\n` +
-            `[**${message.author.username}**](https://discord.com/users/${message.author.id}) - ${description}\n\n` +
+            `[${authorTag ? `[${getTagsData()[authorTag.tagId]}]` : ""}**${
+              message.author.username
+            }**](https://discord.com/users/${message.author.id}) - ${description}\n\n` +
             "go ahead and send them a *private* message 😉😏",
         );
       }
