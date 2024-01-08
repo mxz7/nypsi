@@ -4,6 +4,7 @@ import {
   APIApplicationCommandOptionChoice,
   BaseMessageOptions,
   ButtonBuilder,
+  ButtonInteraction,
   ButtonStyle,
   CommandInteraction,
   Interaction,
@@ -158,7 +159,7 @@ async function run(
     return Math.floor(totalCost);
   };
 
-  const showWorkers = async (defaultWorker = "quarry", msg?: Message) => {
+  const showWorkers = async (defaultWorker = "quarry", msg?: Message, res?: ButtonInteraction) => {
     const displayWorker = async (worker: Worker) => {
       const embed = new CustomEmbed(message.member).disableFooter();
 
@@ -258,7 +259,11 @@ async function run(
 
     const { buttonRow, embed } = await displayWorker(baseWorkers[defaultWorker]);
 
-    if (msg) {
+    if (res) {
+      await res
+        .update({ embeds: [embed], components: [workersList, buttonRow] })
+        .catch(() => msg.edit({ embeds: [embed], components: [workersList, buttonRow] }));
+    } else if (msg) {
       msg = await msg.edit({ embeds: [embed], components: [workersList, buttonRow] });
     } else {
       msg = await send({ embeds: [embed], components: [workersList, buttonRow] });
@@ -270,7 +275,10 @@ async function run(
       const res = await msg
         .awaitMessageComponent({ filter, time: 30_000 })
         .then(async (i) => {
-          await i.deferUpdate();
+          setTimeout(() => {
+            i.deferUpdate().catch(() => null);
+          }, 1500);
+
           return i;
         })
         .catch(() => {});
@@ -293,7 +301,9 @@ async function run(
           new StringSelectMenuBuilder().setCustomId("worker").setOptions(options),
         );
 
-        await res.message.edit({ embeds: [embed], components: [workersList, buttonRow] });
+        await res
+          .update({ embeds: [embed], components: [workersList, buttonRow] })
+          .catch(() => res.message.edit({ embeds: [embed], components: [workersList, buttonRow] }));
         return pageManager();
       } else if (res.customId == "bu") {
         const balance = await getBalance(message.member);
@@ -301,10 +311,17 @@ async function run(
         const selected = options.filter((o) => o.data.default)[0].data.value;
 
         if (balance < baseWorkers[selected].cost) {
-          await res.followUp({
-            embeds: [new ErrorEmbed("you cannot afford this worker")],
-            ephemeral: true,
-          });
+          await res
+            .reply({
+              embeds: [new ErrorEmbed("you cannot afford this worker")],
+              ephemeral: true,
+            })
+            .catch(() =>
+              res.followUp({
+                embeds: [new ErrorEmbed("you cannot afford this worker")],
+                ephemeral: true,
+              }),
+            );
           return pageManager();
         } else {
           await updateBalance(message.member, balance - baseWorkers[selected].cost);
@@ -313,18 +330,18 @@ async function run(
 
           userWorkers = await getWorkers(message.member);
 
-          return showWorkers(selected, msg);
+          return showWorkers(selected, msg, res as ButtonInteraction);
         }
       } else if (res.customId == "upg") {
         const selected = options.filter((o) => o.data.default)[0].data.value;
-        return upgradeWorker(baseWorkers[selected], res.message);
+        return upgradeWorker(baseWorkers[selected], res.message, res as ButtonInteraction);
       }
     };
 
     return pageManager();
   };
 
-  const upgradeWorker = async (worker: Worker, msg?: Message) => {
+  const upgradeWorker = async (worker: Worker, msg?: Message, res?: ButtonInteraction) => {
     const embed = new CustomEmbed(message.member).disableFooter();
 
     embed.setHeader(`${worker.name} upgrades`, message.author.avatarURL());
@@ -395,10 +412,14 @@ async function run(
 
     embed.setDescription(desc);
 
-    if (!msg) {
-      msg = await send({ embeds: [embed], components: [row, maxRow] });
-    } else {
+    if (res) {
+      await res
+        .update({ embeds: [embed], components: [row, maxRow] })
+        .catch(() => msg.edit({ embeds: [embed], components: [row, maxRow] }));
+    } else if (msg) {
       msg = await msg.edit({ embeds: [embed], components: [row, maxRow] });
+    } else {
+      msg = await send({ embeds: [embed], components: [row, maxRow] });
     }
 
     const filter = (i: Interaction) => i.user.id == message.author.id;
@@ -407,7 +428,9 @@ async function run(
       const res = await msg
         .awaitMessageComponent({ filter, time: 30_000 })
         .then(async (i) => {
-          await i.deferUpdate();
+          setTimeout(() => {
+            i.deferUpdate().catch(() => null);
+          }, 1500);
           return i;
         })
         .catch(() => {});
@@ -428,14 +451,21 @@ async function run(
             .upgrades.find((u) => u.upgradeId == upgradeId)?.amount >=
           baseUpgrades[upgradeId].stack_limit
         ) {
-          await res.followUp({
-            embeds: [new ErrorEmbed("you have maxed out this upgrade")],
-            ephemeral: true,
-          });
+          await res
+            .reply({
+              embeds: [new ErrorEmbed("you have maxed out this upgrade")],
+              ephemeral: true,
+            })
+            .catch(() =>
+              res.followUp({
+                embeds: [new ErrorEmbed("you have maxed out this upgrade")],
+                ephemeral: true,
+              }),
+            );
 
           userWorkers = await getWorkers(message.member);
 
-          return upgradeWorker(worker, res.message);
+          return upgradeWorker(worker, res.message, res as ButtonInteraction);
         }
 
         const cost = calcUpgradeCost(
@@ -455,14 +485,21 @@ async function run(
         const balance = await getBalance(message.member);
 
         if (balance < cost) {
-          await res.followUp({
-            embeds: [new ErrorEmbed(`you cannot afford this ($${cost.toLocaleString()})`)],
-            ephemeral: true,
-          });
+          await res
+            .reply({
+              embeds: [new ErrorEmbed(`you cannot afford this ($${cost.toLocaleString()})`)],
+              ephemeral: true,
+            })
+            .catch(() =>
+              res.followUp({
+                embeds: [new ErrorEmbed(`you cannot afford this ($${cost.toLocaleString()})`)],
+                ephemeral: true,
+              }),
+            );
 
           userWorkers = await getWorkers(message.member);
 
-          return upgradeWorker(worker, res.message);
+          return upgradeWorker(worker, res.message, res as ButtonInteraction);
         }
 
         await updateBalance(message.member, balance - cost);
@@ -481,7 +518,7 @@ async function run(
 
         userWorkers = await getWorkers(message.member);
 
-        return upgradeWorker(worker, res.message);
+        return upgradeWorker(worker, res.message, res as ButtonInteraction);
       }
     };
 
