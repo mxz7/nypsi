@@ -34,9 +34,11 @@ import { getXp, updateXp } from "../functions/economy/xp";
 import { addKarma } from "../functions/karma/karma";
 import {
   addMember,
-  getPremiumProfile,
+  getTier,
   isPremium,
+  levelString,
   renewUser,
+  setCredits,
   setTier,
 } from "../functions/premium/premium";
 import { percentChance } from "../functions/random";
@@ -542,8 +544,9 @@ async function handleKofiData(data: KofiResponse) {
       });
 
       if (await isPremium(user.id)) {
-        if ((await getPremiumProfile(user.id)).getLevelString().toLowerCase() != item.name) {
+        if (levelString(await getTier(user.id)).toLowerCase() != item.name) {
           await setTier(user.id, premiums.indexOf(item.name) + 1);
+          await setCredits(user.id, 0);
           await renewUser(user.id);
           if (data.is_public && (await getPreferences(user.id)).leaderboards) {
             const hook = new WebhookClient({ url: process.env.THANKYOU_HOOK });

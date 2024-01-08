@@ -18,7 +18,7 @@ import { hasVoted } from "../utils/functions/economy/vote";
 import { getXp } from "../utils/functions/economy/xp";
 import { getPeaks } from "../utils/functions/guilds/utils";
 import { getKarma } from "../utils/functions/karma/karma";
-import { getPremiumProfile, isPremium } from "../utils/functions/premium/premium";
+import { getTier, isPremium, levelString } from "../utils/functions/premium/premium";
 import { getLastCommand } from "../utils/functions/users/commands";
 import { fetchUsernameHistory } from "../utils/functions/users/history";
 
@@ -198,9 +198,7 @@ async function showUser(message: Message, user: User) {
     .setTitle(user.username)
     .setDescription(
       `\`${user.id}\`${
-        (await isPremium(user.id))
-          ? ` (${(await getPremiumProfile(user.id)).getLevelString()}) `
-          : ""
+        (await isPremium(user.id)) ? ` (${levelString(await getTier(user.id))}) ` : ""
       } ${(await isEcoBanned(user.id)) ? "[banned]" : ""}`,
     )
     .addField(
