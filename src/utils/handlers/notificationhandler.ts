@@ -2,6 +2,7 @@ import { ClusterManager } from "discord-hybrid-sharding";
 import redis from "../../init/redis";
 import Constants from "../Constants";
 import requestDM from "../functions/requestdm";
+import sleep from "../functions/sleep";
 import { logger } from "../logger";
 import pAll = require("p-all");
 
@@ -30,7 +31,7 @@ export function listenForDms(manager: ClusterManager) {
 
 async function doDmQueueInterval(manager: ClusterManager): Promise<void> {
   if ((await redis.llen(Constants.redis.nypsi.DM_QUEUE)) == 0) {
-    await pAll(actions, { concurrency: 5 });
+    await pAll(actions, { concurrency: 2 });
 
     actions.length = 0;
 
@@ -42,15 +43,26 @@ async function doDmQueueInterval(manager: ClusterManager): Promise<void> {
 
   if (!item) return;
 
-  actions.push(() =>
-    requestDM({
+  actions.push(async () => {
+    // if (await redis.exists(Constants.redis.cache.user.DM_BLOCK)) {
+    //   setTimeout(() => {
+    //     redis.rpush(Constants.redis.nypsi.DM_QUEUE, JSON.stringify(item));
+    //   }, 5000);
+    //   return;
+    // }
+
+    // await redis.set(Constants.redis.cache.user.DM_BLOCK, "boobies", "EX", 5);
+
+    await sleep(100);
+
+    return await requestDM({
       client: manager,
       content: item.payload.content,
       memberId: item.memberId,
       embed: item.payload.embed,
       components: item.payload.components,
-    }),
-  );
+    });
+  });
 
   lastRun = Date.now();
 
