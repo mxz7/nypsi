@@ -280,11 +280,13 @@ export async function expireUser(member: string, client?: NypsiClient | ClusterM
     );
   }
 
-  if ((await getDmSettings(this.id)).premium) {
+  if ((await getDmSettings(member)).premium) {
     await addNotificationToQueue({
-      memberId: this.id,
+      memberId: member,
       payload: {
-        content: `your **${this.getLevelString()}** membership has expired, join the support server if this is an error ($support)`,
+        content: `your **${levelString(
+          level,
+        )}** membership has expired, join the support server if this is an error ($support)`,
       },
     }).catch(() => {});
   }
