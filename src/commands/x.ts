@@ -1540,6 +1540,31 @@ async function run(
 
       interaction.followUp({ embeds: [new CustomEmbed(message.member, "deleted image")] });
     }
+  } else if (args[0].toLowerCase() === "boobies") {
+    if (message.author.id !== Constants.TEKOH_ID) return;
+
+    const query = await prisma.premium.findMany({
+      where: {
+        expireDate: { gt: dayjs().add(35, "day").toDate() },
+      },
+    });
+
+    for (const user of query) {
+      const diff = Date.now() - user.expireDate.getTime();
+      const dayDiff = Math.floor(diff / 8.64e7);
+
+      logger.info(`${user.userId} expire:${user.expireDate.toString()} daydiff:${dayDiff}`);
+
+      await prisma.premium.update({
+        where: {
+          userId: user.userId,
+        },
+        data: {
+          expireDate: dayjs().add(35, "day").toDate(),
+          credit: dayDiff,
+        },
+      });
+    }
   }
 }
 
