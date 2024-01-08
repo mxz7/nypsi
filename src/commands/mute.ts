@@ -462,9 +462,8 @@ async function doMute(
   } else {
     const embed = new CustomEmbed(target)
       .setTitle(`muted in ${message.guild.name}`)
-      .addField("length", `\`${mutedLength}\``, true)
-      .setFooter({ text: "unmuted at:" })
-      .setTimestamp(unmuteDate);
+      .setDescription(`unmuted <t:${dayjs(unmuteDate).unix()}:R>`)
+      .addField("length", `\`${mutedLength}\``, true);
 
     if (reason != "") {
       embed.addField("reason", `\`${reason}\``, true);

@@ -16,6 +16,7 @@ import { getAllGroupAccountIds } from "../utils/functions/moderation/alts";
 import { isBanned, newBan } from "../utils/functions/moderation/ban";
 import { newCase } from "../utils/functions/moderation/cases";
 import { createProfile, profileExists } from "../utils/functions/moderation/utils";
+import dayjs = require("dayjs");
 
 const cmd = new Command(
   "ban",
@@ -367,8 +368,7 @@ async function doBan(
 
       if (temporary) {
         embed.addField("length", `\`${banLength}\``, true);
-        embed.setFooter({ text: "unbanned at:" });
-        embed.setTimestamp(unbanDate);
+        embed.setDescription(`unbanned <t:${dayjs(unbanDate).unix()}:R>`);
       }
 
       await target
