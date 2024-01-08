@@ -6,7 +6,15 @@ import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { addInventoryItem } from "../economy/inventory";
 import { getItems, setEcoBan } from "../economy/utils";
-import { addMember, getTier, isPremium, levelString, renewUser, setTier } from "../premium/premium";
+import {
+  addMember,
+  getTier,
+  isPremium,
+  levelString,
+  renewUser,
+  setCredits,
+  setTier,
+} from "../premium/premium";
 import { addNotificationToQueue, getDmSettings } from "./notifications";
 import { hasProfile } from "./utils";
 
@@ -106,6 +114,7 @@ export async function checkPurchases(id: string, client: NypsiClient) {
         if (await isPremium(id)) {
           if (levelString(await getTier(id)).toLowerCase() != item.item) {
             await setTier(id, premiums.indexOf(item.item) + 1, client);
+            await setCredits(id, 0);
             await renewUser(id, client);
           } else {
             await renewUser(id, client);
