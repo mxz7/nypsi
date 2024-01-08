@@ -289,7 +289,10 @@ async function run(
         profile.expireDate.getTime() / 1000,
       )}:R>)`;
 
-      if (dayjs(profile.expireDate).set("hour", 0).set("minute", 0).isBefore(dayjs())) {
+      if (
+        dayjs(profile.expireDate).set("hour", 0).set("minute", 0).isBefore(dayjs()) &&
+        profile.credit < 1
+      ) {
         const date = dayjs().set("hour", 23).set("minute", 45).set("second", 0).unix();
 
         expiresText = `<t:${date}> (<t:${date}:R>)`;
