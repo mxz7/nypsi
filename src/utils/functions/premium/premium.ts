@@ -337,7 +337,9 @@ export async function setCredits(id: string, amount: number) {
 
   await addNotificationToQueue({
     memberId: id,
-    payload: { content: `you now have ${amount} premium credits` },
+    payload: {
+      content: `you now have **${amount}** premium credits\n\ncredits will be used automatically once the expire date has elapsed. if your tier changes, you will lose your credits`,
+    },
   });
 }
 
