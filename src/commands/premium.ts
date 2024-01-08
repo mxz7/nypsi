@@ -37,6 +37,7 @@ import { cleanString } from "../utils/functions/string";
 import { getTotalSpend } from "../utils/functions/users/email";
 import { addTag, getTags, removeTag } from "../utils/functions/users/tags";
 import { commandExists } from "../utils/handlers/commandhandler";
+import dayjs = require("dayjs");
 
 let doingRoles = false;
 
@@ -284,15 +285,23 @@ async function run(
         getUserAliases(message.member),
       ]);
 
+      let expiresText = `<t:${Math.floor(profile.expireDate.getTime() / 1000)}> (<t:${Math.floor(
+        profile.expireDate.getTime() / 1000,
+      )}:R>)`;
+
+      if (dayjs(profile.expireDate).set("hour", 0).set("minute", 0).isBefore(dayjs())) {
+        const date = dayjs().set("hour", 23).set("minute", 45).set("second", 0).unix();
+
+        expiresText = `<t:${date}> (<t:${date}:R>)`;
+      }
+
       let description =
         `**tier** ${levelString(profile.level)}` +
         `\n**booster** ${await isBooster(message.author.id)}` +
         `\n**started** <t:${Math.floor(profile.startDate.getTime() / 1000)}> (<t:${Math.floor(
           profile.startDate.getTime() / 1000,
         )}:R>)` +
-        `\n**expires** <t:${Math.floor(profile.expireDate.getTime() / 1000)}> (<t:${Math.floor(
-          profile.expireDate.getTime() / 1000,
-        )}:R>)` +
+        `\n**expires** ${expiresText}` +
         `\n**credit** ${profile.credit}` +
         `\n\n**color** ${profile.embedColor} - /premium color` +
         `\n**aliases** ${aliases.length.toLocaleString()}`;
