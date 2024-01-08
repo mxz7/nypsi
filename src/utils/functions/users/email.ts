@@ -6,7 +6,15 @@ import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { addInventoryItem } from "../economy/inventory";
 import { getItems, setEcoBan } from "../economy/utils";
-import { addMember, getPremiumProfile, isPremium, renewUser, setTier } from "../premium/premium";
+import {
+  addMember,
+  getTier,
+  isPremium,
+  levelString,
+  renewUser,
+  setCredits,
+  setTier,
+} from "../premium/premium";
 import { addNotificationToQueue, getDmSettings } from "./notifications";
 import { hasProfile } from "./utils";
 
@@ -104,14 +112,15 @@ export async function checkPurchases(id: string, client: NypsiClient) {
 
       if (premiums.includes(item.item)) {
         if (await isPremium(id)) {
-          if ((await getPremiumProfile(id)).getLevelString().toLowerCase() != item.item) {
+          if (levelString(await getTier(id)).toLowerCase() != item.item) {
             await setTier(id, premiums.indexOf(item.item) + 1, client);
+            await setCredits(id, 0);
             await renewUser(id, client);
           } else {
             await renewUser(id, client);
           }
         } else {
-          await addMember(id, premiums.indexOf(item.item) + 1, client);
+          await addMember(id, premiums.indexOf(item.item) + 1);
         }
       } else {
         if (item.item === "unecoban") {

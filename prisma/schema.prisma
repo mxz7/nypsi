@@ -319,9 +319,9 @@ model Premium {
   level      Int
   embedColor String   @default("default")
   lastWeekly DateTime
-  status     Int      @default(1)
   startDate  DateTime
   expireDate DateTime
+  credit     Int      @default(0)
 
   user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId         String          @id
