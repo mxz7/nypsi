@@ -1,3 +1,4 @@
+import { ClusterManager } from "discord-hybrid-sharding";
 import { GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
@@ -218,7 +219,8 @@ export async function renewUser(member: string, client?: NypsiClient) {
   await redis.del(`${Constants.redis.cache.premium.LEVEL}:${member}`);
 }
 
-export async function expireUser(member: string, client?: NypsiClient) {
+export async function expireUser(member: string, client?: NypsiClient | ClusterManager) {
+  logger.info(`expiring ${member}'s premium`);
   const level = await getTier(member);
   await prisma.premiumCommand
     .delete({
@@ -258,7 +260,7 @@ export async function expireUser(member: string, client?: NypsiClient) {
   if (client) {
     const cluster = await findGuildCluster(client, Constants.NYPSI_SERVER_ID);
 
-    await client.cluster.broadcastEval(
+    await (client instanceof NypsiClient ? client.cluster : client).broadcastEval(
       async (c, { cluster, guildId, memberId, roleId }) => {
         if ((c as NypsiClient).cluster.id !== cluster) return;
 
@@ -276,6 +278,15 @@ export async function expireUser(member: string, client?: NypsiClient) {
         context: { guildId: Constants.NYPSI_SERVER_ID, cluster, memberId: member, roleId },
       },
     );
+  }
+
+  if ((await getDmSettings(this.id)).premium) {
+    await addNotificationToQueue({
+      memberId: this.id,
+      payload: {
+        content: `your **${this.getLevelString()}** membership has expired, join the support server if this is an error ($support)`,
+      },
+    }).catch(() => {});
   }
 }
 

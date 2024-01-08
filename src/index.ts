@@ -71,7 +71,7 @@ manager.on("clusterCreate", (cluster) => {
     } else if (typeof message === "string" && message.startsWith("trigger_job")) {
       return runJob(message.split("trigger_job_")[1]);
     } else if (typeof message === "string" && message === "reload_jobs") {
-      return loadJobs();
+      return loadJobs(manager);
     }
   });
   logger.info(`launched cluster ${cluster.id}`);
@@ -196,6 +196,6 @@ export async function checkStatus() {
   return response;
 }
 
-loadJobs();
+loadJobs(manager);
 
 export { manager };
