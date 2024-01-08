@@ -310,8 +310,27 @@ export function createPremUser(query: any) {
     embedColor: query.embedColor,
     lastDaily: query.lastDaily,
     lastWeekly: query.lastWeekly,
-    status: query.status,
     startDate: query.startDate,
     expireDate: query.expireDate,
+  });
+}
+
+export async function getCredits(id: string) {
+  const query = await prisma.premium.findUnique({
+    where: { userId: id },
+    select: { credit: true },
+  });
+
+  return query?.credit || 0;
+}
+
+export async function setCredits(id: string, amount: number) {
+  await prisma.premium.update({
+    where: {
+      userId: id,
+    },
+    data: {
+      credit: amount,
+    },
   });
 }
