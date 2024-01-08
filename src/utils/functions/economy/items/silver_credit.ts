@@ -15,8 +15,10 @@ import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
 import {
   addMember,
+  getCredits,
   getPremiumProfile,
   getTier,
+  setCredits,
   setExpireDate,
   setTier,
 } from "../../premium/premium";
@@ -69,9 +71,8 @@ module.exports = new ItemUse(
         getInventory(message.member),
       ]);
 
-      profile.expireDate = dayjs(profile.expireDate).add(7, "day").toDate();
-
-      await setExpireDate(message.author.id, profile.expireDate, message.client as NypsiClient);
+      const credits = await getCredits(message.author.id);
+      await setCredits(message.author.id, credits + 7);
 
       await setInventoryItem(
         message.member,
@@ -83,19 +84,15 @@ module.exports = new ItemUse(
         embeds: [
           new CustomEmbed(
             message.member,
-            `your silver membership will now expire <t:${Math.floor(
-              profile.expireDate.getTime() / 1000,
-            )}:R>`,
+            `your silver membership will now expire <t:${dayjs(profile.expireDate)
+              .add(await getCredits(message.author.id), "day")
+              .unix()}:R>`,
           ),
         ],
       });
     } else if (currentTier === 0) {
-      await addMember(message.author.id, SILVER_TIER, message.client as NypsiClient);
-      await setExpireDate(
-        message.author.id,
-        dayjs().add(7, "day").toDate(),
-        message.client as NypsiClient,
-      );
+      await addMember(message.author.id, SILVER_TIER, new Date());
+      await setCredits(message.author.id, 7);
       const inventory = await getInventory(message.member);
       await setInventoryItem(
         message.member,
@@ -152,11 +149,8 @@ module.exports = new ItemUse(
       );
 
       await setTier(message.author.id, SILVER_TIER, message.client as NypsiClient);
-      await setExpireDate(
-        message.author.id,
-        dayjs().add(7, "day").toDate(),
-        message.client as NypsiClient,
-      );
+      await setExpireDate(message.author.id, new Date(), message.client as NypsiClient);
+      await setCredits(message.author.id, 7);
 
       return send({
         embeds: [

@@ -2,12 +2,13 @@ import { GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
-import { PremUser, requestRemoveRole } from "../../../models/PremStorage";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
+import { findGuildCluster } from "../clusters";
 import { formatDate } from "../date";
 import requestDM from "../requestdm";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
+import dayjs = require("dayjs");
 
 export async function isPremium(member: GuildMember | string): Promise<boolean> {
   let id: string;
@@ -85,7 +86,7 @@ export async function getTier(member: GuildMember | string): Promise<number> {
   return query?.level || 0;
 }
 
-export async function addMember(member: GuildMember | string, level: number, client?: NypsiClient) {
+export async function addMember(member: GuildMember | string, level: number, expires?: Date) {
   let id: string;
   if (member instanceof GuildMember) {
     id = member.user.id;
@@ -93,44 +94,12 @@ export async function addMember(member: GuildMember | string, level: number, cli
     id = member;
   }
 
-  if (await isPremium(member)) {
-    if (client) {
-      const tier = await getTier(member);
-
-      let role: string;
-
-      switch (tier) {
-        case 1:
-          role = Constants.BRONZE_ROLE_ID;
-          break;
-        case 2:
-          role = Constants.SILVER_ROLE_ID;
-          break;
-        case 3:
-          role = Constants.GOLD_ROLE_ID;
-          break;
-        case 4:
-          role = Constants.PLATINUM_ROLE_ID;
-          break;
-      }
-
-      await requestRemoveRole(id, role, client);
-    }
-
-    return await setTier(member, level, client);
-  }
-
-  const start = new Date();
-  const expire = new Date();
-
-  expire.setDate(new Date().getDate() + 35);
-
   await prisma.premium.create({
     data: {
       userId: id,
       level: level,
-      startDate: start,
-      expireDate: expire,
+      startDate: new Date(),
+      expireDate: expires || dayjs().add(35, "day").toDate(),
       lastWeekly: new Date(0),
     },
   });
@@ -140,30 +109,22 @@ export async function addMember(member: GuildMember | string, level: number, cli
   logger.info(`premium level ${level} given to ${id}`);
 
   if ((await getDmSettings(id)).premium) {
-    if (client) {
-      await requestDM({
-        memberId: id,
-        client: client,
-        content: `you have been given **${profile.getLevelString()}** membership, this will expire on **${formatDate(
+    await addNotificationToQueue({
+      memberId: id,
+      payload: {
+        content: `you have been given **${levelString(
+          profile.level,
+        )}** membership, this will expire on **${formatDate(
           profile.expireDate,
         )}**\n\nplease join the support server if you have any problems, or questions. discord.gg/hJTDNST`,
-      });
-    } else {
-      await addNotificationToQueue({
-        memberId: id,
-        payload: {
-          content: `you have been given **${profile.getLevelString()}** membership, this will expire on **${formatDate(
-            profile.expireDate,
-          )}**\n\nplease join the support server if you have any problems, or questions. discord.gg/hJTDNST`,
-        },
-      });
-    }
+      },
+    });
   }
 
   await redis.del(`${Constants.redis.cache.premium.LEVEL}:${id}`);
 }
 
-export async function getPremiumProfile(member: GuildMember | string): Promise<PremUser> {
+export async function getPremiumProfile(member: GuildMember | string) {
   let id: string;
   if (member instanceof GuildMember) {
     id = member.user.id;
@@ -175,9 +136,13 @@ export async function getPremiumProfile(member: GuildMember | string): Promise<P
     where: {
       userId: id,
     },
+    include: {
+      PremiumCommand: true,
+      UserAlias: true,
+    },
   });
 
-  return createPremUser(query);
+  return query;
 }
 
 export async function setTier(member: GuildMember | string, level: number, client?: NypsiClient) {
@@ -204,13 +169,13 @@ export async function setTier(member: GuildMember | string, level: number, clien
       await requestDM({
         memberId: id,
         client: client,
-        content: `your membership has been updated to **${PremUser.getLevelString(level)}**`,
+        content: `your membership has been updated to **${levelString(level)}**`,
       });
     } else {
       await addNotificationToQueue({
         memberId: id,
         payload: {
-          content: `your membership has been updated to **${PremUser.getLevelString(level)}**`,
+          content: `your membership has been updated to **${levelString(level)}**`,
         },
       });
     }
@@ -220,16 +185,12 @@ export async function setTier(member: GuildMember | string, level: number, clien
 }
 
 export async function renewUser(member: string, client?: NypsiClient) {
-  const profile = await getPremiumProfile(member);
-
-  profile.renew();
-
   await prisma.premium.update({
     where: {
       userId: member,
     },
     data: {
-      expireDate: profile.expireDate,
+      expireDate: dayjs().add(35, "days").toDate(),
     },
   });
 
@@ -238,13 +199,17 @@ export async function renewUser(member: string, client?: NypsiClient) {
       await requestDM({
         memberId: member,
         client: client,
-        content: `your membership has been renewed until **${formatDate(profile.expireDate)}**`,
+        content: `your membership has been renewed until **${formatDate(
+          dayjs().add(35, "days").toDate(),
+        )}**`,
       });
     } else {
       await addNotificationToQueue({
         memberId: member,
         payload: {
-          content: `your membership has been renewed until **${formatDate(profile.expireDate)}**`,
+          content: `your membership has been renewed until **${formatDate(
+            dayjs().add(35, "days").toDate(),
+          )}**`,
         },
       });
     }
@@ -253,17 +218,8 @@ export async function renewUser(member: string, client?: NypsiClient) {
   await redis.del(`${Constants.redis.cache.premium.LEVEL}:${member}`);
 }
 
-export async function expireUser(member: string, client: NypsiClient) {
-  const profile = await getPremiumProfile(member);
-
-  await profile.expire(client);
-
-  await prisma.premium.delete({
-    where: {
-      userId: member,
-    },
-  });
-
+export async function expireUser(member: string, client?: NypsiClient) {
+  const level = await getTier(member);
   await prisma.premiumCommand
     .delete({
       where: {
@@ -274,7 +230,53 @@ export async function expireUser(member: string, client: NypsiClient) {
       // doesnt need to find one
     });
 
+  await prisma.premium.delete({
+    where: {
+      userId: member,
+    },
+  });
+
+  let roleId: string;
+
+  switch (level) {
+    case 1:
+      roleId = "819870590718181391";
+      break;
+    case 2:
+      roleId = "819870727834566696";
+      break;
+    case 3:
+      roleId = "819870846536646666";
+      break;
+    case 4:
+      roleId = "819870959325413387";
+      break;
+  }
+
   await redis.del(`${Constants.redis.cache.premium.LEVEL}:${member}`);
+
+  if (client) {
+    const cluster = await findGuildCluster(client, Constants.NYPSI_SERVER_ID);
+
+    await client.cluster.broadcastEval(
+      async (c, { cluster, guildId, memberId, roleId }) => {
+        if ((c as NypsiClient).cluster.id !== cluster) return;
+
+        const guild = c.guilds.cache.get(guildId);
+
+        if (!guild) return;
+
+        const member = await guild.members.fetch(memberId);
+
+        if (!member) return;
+
+        await member.roles.remove(roleId);
+      },
+      {
+        context: { guildId: Constants.NYPSI_SERVER_ID, cluster, memberId: member, roleId },
+      },
+    );
+  }
 }
 
 export async function setExpireDate(member: GuildMember | string, date: Date, client: NypsiClient) {
@@ -303,18 +305,6 @@ export async function setExpireDate(member: GuildMember | string, date: Date, cl
   }
 }
 
-export function createPremUser(query: any) {
-  return PremUser.fromData({
-    id: query.userId,
-    level: query.level,
-    embedColor: query.embedColor,
-    lastDaily: query.lastDaily,
-    lastWeekly: query.lastWeekly,
-    startDate: query.startDate,
-    expireDate: query.expireDate,
-  });
-}
-
 export async function getCredits(id: string) {
   const query = await prisma.premium.findUnique({
     where: { userId: id },
@@ -333,4 +323,20 @@ export async function setCredits(id: string, amount: number) {
       credit: amount,
     },
   });
+
+  await addNotificationToQueue({
+    memberId: id,
+    payload: { content: `you now have ${amount} premium credits` },
+  });
+}
+
+export function levelString(level: number) {
+  const map = new Map([
+    [1, "bronze"],
+    [2, "silver"],
+    [3, "gold"],
+    [4, "platinum"],
+  ]);
+
+  return map.get(level) || "invalid";
 }

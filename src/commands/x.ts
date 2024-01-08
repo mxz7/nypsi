@@ -35,6 +35,7 @@ import {
   addMember,
   getPremiumProfile,
   isPremium,
+  levelString,
   setExpireDate,
   setTier,
 } from "../utils/functions/premium/premium";
@@ -868,6 +869,11 @@ async function run(
           .setStyle(ButtonStyle.Primary)
           .setEmoji("😣"),
         new ButtonBuilder()
+          .setCustomId("set-credits")
+          .setLabel("set credits")
+          .setStyle(ButtonStyle.Primary)
+          .setEmoji("🪙"),
+        new ButtonBuilder()
           .setCustomId("raw-data")
           .setLabel("view raw data")
           .setStyle(ButtonStyle.Primary)
@@ -903,8 +909,9 @@ async function run(
 
       rows[0].components[0].setDisabled(true);
       desc +=
-        `**level** ${profile.getLevelString()}\n` +
-        `**expires** <t:${Math.floor(profile.expireDate.getTime() / 1000)}>`;
+        `**level** ${levelString(profile.level)}\n` +
+        `**expires** <t:${Math.floor(profile.expireDate.getTime() / 1000)}>\n` +
+        `**credits** ${profile.credit}`;
 
       embed.setDescription(desc);
       if (aliases.length > 0) {
@@ -977,7 +984,7 @@ async function run(
           `admin: ${message.author.id} (${message.author.username}) added ${user.id} premium at level ${msg.content}`,
         );
 
-        await addMember(user.id, parseInt(msg.content), message.client as NypsiClient);
+        await addMember(user.id, parseInt(msg.content));
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "set-tier") {
@@ -1381,7 +1388,7 @@ async function run(
         "\n$x findid (tag/username) - will attempt to find user id from cached users and database" +
         "\n$x transfer <from id> <to id> - start a profile transfer" +
         "\n$x drop - start a random drop" +
-        "\n$x revuew - review image suggestions" +
+        "\n$x review - review image suggestions" +
         "\n$x img <id> - view a specific image",
     );
 
