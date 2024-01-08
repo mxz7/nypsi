@@ -1378,7 +1378,11 @@ async function run(
     const embed = new CustomEmbed(
       message.member,
       "$x userid (id) - view/edit disc info and db info" +
-        "\n$x findid (tag/username) - will attempt to find user id from cached users and database",
+        "\n$x findid (tag/username) - will attempt to find user id from cached users and database" +
+        "\n$x transfer <from id> <to id> - start a profile transfer" +
+        "\n$x drop - start a random drop" +
+        "\n$x revuew - review image suggestions" +
+        "\n$x img <id> - view a specific image",
     );
 
     return message.channel.send({ embeds: [embed] });
