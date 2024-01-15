@@ -383,6 +383,8 @@ model Auction {
   sold       Boolean  @default(false)
 
   owner Economy @relation(fields: [ownerId], references: [userId], onDelete: Cascade)
+
+  @@index([itemId])
 }
 
 model Offer {
@@ -397,6 +399,8 @@ model Offer {
 
   target Economy? @relation(fields: [targetId], references: [userId], name: "target")
   owner  Economy? @relation(fields: [ownerId], references: [userId], name: "owner")
+
+  @@index([itemId])
 }
 
 // guild specific tables
