@@ -887,11 +887,21 @@ export async function runCommand(
           ],
         });
       } else {
-        return message.editReply({
-          embeds: [
-            new ErrorEmbed(`you have been handcuffed, they will be removed in **${remaining}**`),
-          ],
-        });
+        return message
+          .reply({
+            embeds: [
+              new ErrorEmbed(`you have been handcuffed, they will be removed in **${remaining}**`),
+            ],
+          })
+          .catch(() =>
+            message.editReply({
+              embeds: [
+                new ErrorEmbed(
+                  `you have been handcuffed, they will be removed in **${remaining}**`,
+                ),
+              ],
+            }),
+          );
       }
     }
   }
