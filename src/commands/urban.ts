@@ -1,6 +1,6 @@
+import { Client } from "@zeyrbot/urbandictionary";
 import { CommandInteraction, Message } from "discord.js";
 import { inPlaceSort } from "fast-sort";
-import * as urban from "urban-dictionary";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
@@ -9,6 +9,8 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 const cmd = new Command("urban", "get a definition from urban dictionary", "info").setAliases([
   "define",
 ]);
+
+const urban = new Client();
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
@@ -40,9 +42,9 @@ async function run(
     return message.channel.send({ embeds: [new ErrorEmbed("unknown definition")] });
   }
 
-  inPlaceSort(results).desc((i: any) => i.thumbs_up);
+  inPlaceSort(results.list).desc((i: any) => i.thumbs_up);
 
-  const result = results[0];
+  const result = results.list[0];
 
   if (!result) return;
   if (!result.word) return;
