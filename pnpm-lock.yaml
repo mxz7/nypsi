@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@catppuccin/palette':
-    specifier: 0.2.0
-    version: 0.2.0
+    specifier: 1.0.3
+    version: 1.0.3
   '@discordjs/rest':
     specifier: 2.2.0
     version: 2.2.0
@@ -488,8 +488,8 @@ packages:
     resolution: {integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==}
     dev: true
 
-  /@catppuccin/palette@0.2.0:
-    resolution: {integrity: sha512-PoAMQMEbL8fBEO80eusB+XQg+1i2kxQHw6COwBRC4bVWxWuRroZjm3K6bOdqPHNHKikDIV7wLi9hSG4NoD1FEQ==}
+  /@catppuccin/palette@1.0.3:
+    resolution: {integrity: sha512-L3jclhx8z7Oyv4b1x9TCXjikvLbKd+dwksNOJsi6W811PPGdP38PYiX5h4/renukOp8lUEkPIPv07S/5HA3tVg==}
     dev: false
 
   /@discordjs/builders@1.7.0:
