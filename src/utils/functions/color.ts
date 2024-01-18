@@ -1,15 +1,15 @@
-import { variants } from "@catppuccin/palette";
+import { flavors } from "@catppuccin/palette";
 import { ColorResolvable, GuildMember } from "discord.js";
 
 const colors: string[] = [
-  variants.mocha.flamingo.hex,
-  variants.mocha.mauve.hex,
-  variants.mocha.maroon.hex,
-  variants.mocha.peach.hex,
-  variants.mocha.yellow.hex,
-  variants.mocha.green.hex,
-  variants.mocha.sky.hex,
-  variants.mocha.lavender.hex,
+  flavors.mocha.colors.flamingo.hex,
+  flavors.mocha.colors.mauve.hex,
+  flavors.mocha.colors.maroon.hex,
+  flavors.mocha.colors.peach.hex,
+  flavors.mocha.colors.yellow.hex,
+  flavors.mocha.colors.green.hex,
+  flavors.mocha.colors.sky.hex,
+  flavors.mocha.colors.lavender.hex,
 ];
 
 export function getColor(member: GuildMember) {
