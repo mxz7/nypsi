@@ -1,4 +1,4 @@
-import { variants } from "@catppuccin/palette";
+import { flavors } from "@catppuccin/palette";
 import { randomInt } from "crypto";
 import {
   ActionRowBuilder,
@@ -706,7 +706,7 @@ async function playGame(
     });
     gamble(message.author, "mines", bet, "draw", id, bet);
     embed.setFooter({ text: `id: ${id}` });
-    embed.setColor(variants.macchiato.yellow.hex as ColorResolvable);
+    embed.setColor(flavors.macchiato.colors.yellow.hex as ColorResolvable);
     const desc = await renderGambleScreen(
       message.author.id,
       "draw",

@@ -1,4 +1,4 @@
-import { variants } from "@catppuccin/palette";
+import { flavors } from "@catppuccin/palette";
 import {
   ActionRowBuilder,
   BaseMessageOptions,
@@ -414,7 +414,8 @@ class Game {
 
     if (state === "win") embed.setColor(Constants.EMBED_SUCCESS_COLOR);
     else if (state === "lose") embed.setColor(Constants.EMBED_FAIL_COLOR);
-    else if (state === "draw") embed.setColor(variants.macchiato.yellow.hex as ColorResolvable);
+    else if (state === "draw")
+      embed.setColor(flavors.macchiato.colors.yellow.hex as ColorResolvable);
 
     if (xp && id) embed.setFooter({ text: `+${xp.toLocaleString()}xp | id: ${id}` });
     else if (id) embed.setFooter({ text: `id: ${id}` });

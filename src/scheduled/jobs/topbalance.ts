@@ -1,4 +1,4 @@
-import { variants } from "@catppuccin/palette";
+import { flavors } from "@catppuccin/palette";
 import { ColorResolvable, EmbedBuilder, WebhookClient } from "discord.js";
 import { Job } from "../../types/Jobs";
 import { topBalanceGlobal } from "../../utils/functions/economy/top";
@@ -13,7 +13,7 @@ export default {
 
     embed.setTitle("top 10 richest users");
     embed.setDescription(baltop.join("\n"));
-    embed.setColor(variants.latte.base.hex as ColorResolvable);
+    embed.setColor(flavors.latte.colors.base.hex as ColorResolvable);
 
     const hook = new WebhookClient({ url: process.env.TOPGLOBAL_HOOK });
 

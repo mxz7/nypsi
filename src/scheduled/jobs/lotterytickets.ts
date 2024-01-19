@@ -1,4 +1,4 @@
-import { variants } from "@catppuccin/palette";
+import { flavors } from "@catppuccin/palette";
 import { ColorResolvable, EmbedBuilder, WebhookClient } from "discord.js";
 import redis from "../../init/redis";
 import { Job } from "../../types/Jobs";
@@ -29,7 +29,7 @@ export default {
 
     const embed = new EmbedBuilder();
 
-    embed.setColor(variants.latte.base.hex as ColorResolvable);
+    embed.setColor(flavors.latte.colors.base.hex as ColorResolvable);
     embed.setDescription(desc.join("\n"));
     embed.setTimestamp();
 
