@@ -1,4 +1,4 @@
-import { variants } from "@catppuccin/palette";
+import { flavors } from "@catppuccin/palette";
 import { Client, ColorResolvable, User, WebhookClient } from "discord.js";
 import { randomInt } from "node:crypto";
 import prisma from "../../init/database";
@@ -38,7 +38,7 @@ async function doLottery(client: Client) {
     embed.setDescription(
       `the lottery has been cancelled as only **${tickets.length}** tickets were bought ):\n\nthese tickets will remain and the lottery will happen tomorrow`,
     );
-    embed.setColor(variants.latte.base.hex as ColorResolvable);
+    embed.setColor(flavors.latte.colors.base.hex as ColorResolvable);
     embed.disableFooter();
 
     await hook.send({ embeds: [embed] });
@@ -80,7 +80,7 @@ async function doLottery(client: Client) {
     ).toLocaleString()} tickets!!\n\n` + `they have won $**${total.toLocaleString()}**`,
   );
   embed.setFooter({ text: `a total of ${tickets.length.toLocaleString()} tickets were bought` });
-  embed.setColor(variants.latte.base.hex as ColorResolvable);
+  embed.setColor(flavors.latte.colors.base.hex as ColorResolvable);
 
   await hook.send({ embeds: [embed] });
 
@@ -93,7 +93,7 @@ async function doLottery(client: Client) {
         chosen.id
       }`,
     );
-    embed.setColor(variants.latte.base.hex as ColorResolvable);
+    embed.setColor(flavors.latte.colors.base.hex as ColorResolvable);
 
     await user
       .send({ embeds: [embed] })

@@ -1,4 +1,4 @@
-import { variants } from "@catppuccin/palette";
+import { flavors } from "@catppuccin/palette";
 import { Client, User, WebhookClient } from "discord.js";
 import { WriteStream, createWriteStream, existsSync } from "fs";
 import { rename, stat } from "fs/promises";
@@ -387,10 +387,10 @@ logger.addTransport(
     mode: "hybrid",
     interval: 5000,
     colors: new Map([
-      ["error", variants.mocha.red.hex as `#${string}`],
-      ["warn", variants.mocha.yellow.hex as `#${string}`],
-      ["debug", variants.mocha.pink.hex as `#${string}`],
-      ["info", variants.mocha.sky.hex as `#${string}`],
+      ["error", flavors.mocha.colors.red.hex as `#${string}`],
+      ["warn", flavors.mocha.colors.yellow.hex as `#${string}`],
+      ["debug", flavors.mocha.colors.pink.hex as `#${string}`],
+      ["info", flavors.mocha.colors.sky.hex as `#${string}`],
     ]),
   }),
 );
