@@ -1,4 +1,4 @@
-import { variants } from "@catppuccin/palette";
+import { flavors } from "@catppuccin/palette";
 import {
   ActionRowBuilder,
   BaseMessageOptions,
@@ -589,7 +589,7 @@ async function playGame(
     });
     gamble(message.author, "highlow", bet, "draw", id, bet);
     newEmbed.setFooter({ text: `id: ${id}` });
-    newEmbed.setColor(variants.macchiato.yellow.hex as ColorResolvable);
+    newEmbed.setColor(flavors.macchiato.colors.yellow.hex as ColorResolvable);
     const desc = await renderGambleScreen(
       message.author.id,
       "draw",

@@ -1,4 +1,4 @@
-import { variants } from "@catppuccin/palette";
+import { flavors } from "@catppuccin/palette";
 import { ColorResolvable, EmbedBuilder, WebhookClient } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import redis from "../../init/redis";
@@ -57,7 +57,7 @@ export default {
 
     embed.setTitle("top 10 commands");
     embed.setDescription(msg.join("\n"));
-    embed.setColor(variants.latte.base.hex as ColorResolvable);
+    embed.setColor(flavors.latte.colors.base.hex as ColorResolvable);
 
     if ((await getPreferences(users[0]).catch(() => null))?.leaderboards || false) {
       embed.setFooter({

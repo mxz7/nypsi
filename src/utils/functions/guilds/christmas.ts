@@ -1,4 +1,4 @@
-import { variants } from "@catppuccin/palette";
+import { flavors } from "@catppuccin/palette";
 import { ColorResolvable, Guild } from "discord.js";
 import prisma from "../../../init/database";
 import { NypsiClient } from "../../../models/Client";
@@ -72,7 +72,7 @@ export function runChristmas(client: NypsiClient) {
 
       const embed = new CustomEmbed()
         .setDescription(format)
-        .setColor(variants.macchiato.red.hex as ColorResolvable)
+        .setColor(flavors.macchiato.colors.red.hex as ColorResolvable)
         .setTitle(":santa_tone1:")
         .disableFooter();
 
@@ -203,7 +203,7 @@ export async function checkChristmasCountdown(guild: Guild) {
       embeds: [
         new CustomEmbed()
           .setDescription(format)
-          .setColor(variants.macchiato.red.hex as ColorResolvable)
+          .setColor(flavors.macchiato.colors.red.hex as ColorResolvable)
           .setTitle(":santa_tone1:")
           .disableFooter(),
       ],

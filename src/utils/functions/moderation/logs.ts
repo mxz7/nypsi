@@ -1,4 +1,4 @@
-import { variants } from "@catppuccin/palette";
+import { flavors } from "@catppuccin/palette";
 import { ColorResolvable, Guild, User, WebhookClient } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
@@ -9,20 +9,20 @@ import Constants from "../../Constants";
 const logColors = new Map<LogType, ColorResolvable>();
 const modLogColors = new Map<PunishmentType, ColorResolvable>();
 
-logColors.set("server", variants.mocha.red.hex as ColorResolvable);
-logColors.set("role", variants.mocha.pink.hex as ColorResolvable);
-logColors.set("channel", variants.mocha.green.hex as ColorResolvable);
-logColors.set("emoji", variants.mocha.peach.hex as ColorResolvable);
-logColors.set("member", variants.mocha.sky.hex as ColorResolvable);
-logColors.set("message", variants.mocha.flamingo.hex as ColorResolvable);
+logColors.set("server", flavors.mocha.colors.red.hex as ColorResolvable);
+logColors.set("role", flavors.mocha.colors.pink.hex as ColorResolvable);
+logColors.set("channel", flavors.mocha.colors.green.hex as ColorResolvable);
+logColors.set("emoji", flavors.mocha.colors.peach.hex as ColorResolvable);
+logColors.set("member", flavors.mocha.colors.sky.hex as ColorResolvable);
+logColors.set("message", flavors.mocha.colors.flamingo.hex as ColorResolvable);
 
-modLogColors.set("mute", variants.macchiato.yellow.hex as ColorResolvable);
-modLogColors.set("unmute", variants.macchiato.yellow.hex as ColorResolvable);
-modLogColors.set("ban", variants.macchiato.red.hex as ColorResolvable);
-modLogColors.set("unban", variants.macchiato.red.hex as ColorResolvable);
-modLogColors.set("warn", variants.macchiato.flamingo.hex as ColorResolvable);
-modLogColors.set("kick", variants.macchiato.sky.hex as ColorResolvable);
-modLogColors.set("filter violation", variants.macchiato.sapphire.hex as ColorResolvable);
+modLogColors.set("mute", flavors.macchiato.colors.yellow.hex as ColorResolvable);
+modLogColors.set("unmute", flavors.macchiato.colors.yellow.hex as ColorResolvable);
+modLogColors.set("ban", flavors.macchiato.colors.red.hex as ColorResolvable);
+modLogColors.set("unban", flavors.macchiato.colors.red.hex as ColorResolvable);
+modLogColors.set("warn", flavors.macchiato.colors.flamingo.hex as ColorResolvable);
+modLogColors.set("kick", flavors.macchiato.colors.sky.hex as ColorResolvable);
+modLogColors.set("filter violation", flavors.macchiato.colors.sapphire.hex as ColorResolvable);
 
 let checkingLogsEnabled = false;
 
