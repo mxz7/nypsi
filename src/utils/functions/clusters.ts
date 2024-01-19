@@ -2,9 +2,8 @@ import { ClusterManager } from "discord-hybrid-sharding";
 import { NypsiClient } from "../../models/Client";
 
 export async function findChannelCluster(client: NypsiClient | ClusterManager, channelId: string) {
-  const clusterHas = await (client instanceof ClusterManager
-    ? client
-    : client.cluster
+  const clusterHas = await (
+    client instanceof ClusterManager ? client : client.cluster
   ).broadcastEval(
     async (c, { channelId }) => {
       const client = c as unknown as NypsiClient;
@@ -32,9 +31,8 @@ export async function findChannelCluster(client: NypsiClient | ClusterManager, c
 }
 
 export async function findGuildCluster(client: NypsiClient | ClusterManager, guildId: string) {
-  const clusterHas = await (client instanceof ClusterManager
-    ? client
-    : client.cluster
+  const clusterHas = await (
+    client instanceof ClusterManager ? client : client.cluster
   ).broadcastEval(
     async (c, { guildId }) => {
       const client = c as unknown as NypsiClient;
