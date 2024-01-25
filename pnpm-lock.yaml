@@ -45,8 +45,8 @@ dependencies:
     specifier: 14.14.1
     version: 14.14.1(bufferutil@4.0.8)
   dotenv:
-    specifier: 16.4.0
-    version: 16.4.0
+    specifier: 16.4.1
+    version: 16.4.1
   express:
     specifier: 4.18.2
     version: 4.18.2
@@ -2049,8 +2049,8 @@ packages:
       esutils: 2.0.3
     dev: true
 
-  /dotenv@16.4.0:
-    resolution: {integrity: sha512-WvImr5kpN5NGNn7KaDjJnLTh5rDVLZiDf/YLA8T1ZEZEBZNEDOE+mnkS0PVjPax8ZxBP5zC5SLMB3/9VV5de9g==}
+  /dotenv@16.4.1:
+    resolution: {integrity: sha512-CjA3y+Dr3FyFDOAMnxZEGtnW9KBR2M0JvvUtXNW+dYJL5ROWxP9DUHCwgFqpMk0OXCc0ljhaNTr2w/kutYIcHQ==}
     engines: {node: '>=12'}
     dev: false
 
