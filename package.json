@@ -14,7 +14,7 @@
   "dependencies": {
     "@catppuccin/palette": "1.0.3",
     "@discordjs/rest": "2.2.0",
-    "@prisma/client": "5.9.0",
+    "@prisma/client": "5.9.1",
     "@top-gg/sdk": "3.1.6",
     "@zeyrbot/urbandictionary": "^1.0.3",
     "bufferutil": "4.0.8",
