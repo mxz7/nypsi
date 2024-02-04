@@ -131,6 +131,12 @@
     "description": "found in the super baker achievement",
     "emoji": "🧁"
   },
+   "unboxer": {
+    "id": "unboxer",
+    "name": "unboxer",
+    "description": "found in the unboxer achievement",
+    "emoji": "🎁"
+  },
   "p10": {
     "id": "p10",
     "name": "prestige 10",
