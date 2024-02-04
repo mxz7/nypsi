@@ -433,7 +433,7 @@
     "emoji": "📦",
     "target": 10000,
     "description": "open 10,000 crates",
-    "prize": ["nypsi_crate:2"]
+    "prize": ["nypsi_crate:2", "tag:unboxer"]
   },
   "wholesome_i": {
     "id": "wholesome_i",
