@@ -60,8 +60,6 @@ export default {
       return interaction.reply({ embeds: [new ErrorEmbed("they are banned.")] });
     }
 
-    await interaction.deferReply({ ephemeral: true });
-
     const inventory = await getInventory(interaction.user.id);
 
     if (
@@ -69,7 +67,7 @@ export default {
       inventory.find((i) => i.item === offer.itemId).amount < offer.itemAmount
     ) {
       await redis.del(`${Constants.redis.nypsi.OFFER_PROCESS}:${interaction.user.id}`);
-      return interaction.editReply({
+      return interaction.reply({
         embeds: [new ErrorEmbed("you don't have the items for this offer")],
       });
     }
