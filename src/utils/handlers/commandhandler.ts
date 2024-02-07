@@ -791,6 +791,8 @@ export async function runCommand(
   }
 
   if (command.category == "money" || ["wholesome", "wordle", "sex"].includes(command.name)) {
+    if (!(await userExists(message.member))) await createUser(message.member);
+
     if (
       restarting ||
       (await redis.get(
