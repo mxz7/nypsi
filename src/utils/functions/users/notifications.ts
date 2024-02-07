@@ -142,7 +142,7 @@ export async function addNotificationToQueue(...payload: NotificationPayload[]) 
 
 export async function addInlineNotification(...payload: InlineNotificationPayload[]) {
   for (const p of payload) {
-    await redis.lpush(`${Constants.redis.nypsi.INLINE_QUEUE}:${p.memberId}`, JSON.stringify(p));
+    await redis.sadd(`${Constants.redis.nypsi.INLINE_QUEUE}:${p.memberId}`, JSON.stringify(p));
   }
 }
 
