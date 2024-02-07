@@ -7,7 +7,12 @@ import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { getEmbedColor } from "../premium/color";
 import { percentChance } from "../random";
-import { addNotificationToQueue, getDmSettings, getPreferences } from "../users/notifications";
+import {
+  addInlineNotification,
+  addNotificationToQueue,
+  getDmSettings,
+  getPreferences,
+} from "../users/notifications";
 import { getLastKnownAvatar, getLastKnownUsername } from "../users/tag";
 import { addTag } from "../users/tags";
 import { addInventoryItem } from "./inventory";
@@ -244,7 +249,7 @@ async function completeAchievement(userId: string, achievementId: string) {
       });
     }
   } else {
-    await redis.set(`achievements:completed:${userId}`, JSON.stringify(userEmbed.toJSON()));
+    await addInlineNotification({ memberId: userId, embed: userEmbed });
   }
 
   if (!process.env.ACHIEVEMENTS_HOOK || !(await getPreferences(userId))?.leaderboards) return;

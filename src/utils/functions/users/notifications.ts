@@ -2,7 +2,7 @@ import { DMSettings, Preferences } from "@prisma/client";
 import { GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
-import { NotificationPayload } from "../../../types/Notification";
+import { InlineNotificationPayload, NotificationPayload } from "../../../types/Notification";
 import Constants from "../../Constants";
 import ms = require("ms");
 
@@ -138,4 +138,17 @@ export async function updatePreferences(member: GuildMember | string, data: Pref
 
 export async function addNotificationToQueue(...payload: NotificationPayload[]) {
   await redis.lpush(Constants.redis.nypsi.DM_QUEUE, ...payload.map((p) => JSON.stringify(p)));
+}
+
+export async function addInlineNotification(...payload: InlineNotificationPayload[]) {
+  for (const p of payload) {
+    await redis.sadd(`${Constants.redis.nypsi.INLINE_QUEUE}:${p.memberId}`, JSON.stringify(p));
+  }
+}
+
+// gets max of 8 and clears
+export async function getInlineNotifications(userId: string) {
+  const notifs = await redis.spop(`${Constants.redis.nypsi.INLINE_QUEUE}:${userId}`, 8);
+
+  return notifs.map((i) => JSON.parse(i) as InlineNotificationPayload);
 }

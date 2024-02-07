@@ -9,3 +9,8 @@ export interface NotificationPayload {
     content?: string;
   };
 }
+
+export interface InlineNotificationPayload {
+  memberId: string;
+  embed: CustomEmbed;
+}
