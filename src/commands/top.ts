@@ -9,6 +9,7 @@ import {
   Message,
   MessageActionRowComponentBuilder,
 } from "discord.js";
+import redis from "../init/redis";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { Item } from "../types/Economy.js";
@@ -237,6 +238,15 @@ async function run(
         .setDisabled(true),
       new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
     );
+
+    if (
+      pos === 1 &&
+      message instanceof Message &&
+      !(await redis.exists(`nypsi:cd:topemoji:${message.channelId}`))
+    ) {
+      await redis.set(`nypsi:cd:topemoji:${message.channelId}`, "boobies", "EX", 3);
+      message.react("👑");
+    }
 
     if (pages.size <= 1) {
       return send({ embeds: [embed] });
