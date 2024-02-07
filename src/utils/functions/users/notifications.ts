@@ -146,9 +146,9 @@ export async function addInlineNotification(...payload: InlineNotificationPayloa
   }
 }
 
-// gets max of 9 and clears
+// gets max of 8 and clears
 export async function getInlineNotifications(userId: string) {
-  const notifs = await redis.spop(`${Constants.redis.nypsi.INLINE_QUEUE}:${userId}`, 9);
+  const notifs = await redis.spop(`${Constants.redis.nypsi.INLINE_QUEUE}:${userId}`, 8);
 
   return notifs.map((i) => JSON.parse(i) as InlineNotificationPayload);
 }
