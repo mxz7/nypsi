@@ -5,6 +5,7 @@ import {
   ButtonBuilder,
   ButtonStyle,
   CommandInteraction,
+  Embed,
   GuildMember,
   Interaction,
   Message,
@@ -49,7 +50,7 @@ import { percentChance } from "../functions/random";
 import { cleanString } from "../functions/string";
 import { isUserBlacklisted } from "../functions/users/blacklist";
 import { getLastCommand, updateUser } from "../functions/users/commands";
-import { getPreferences } from "../functions/users/notifications";
+import { getInlineNotifications, getPreferences } from "../functions/users/notifications";
 import { getLastKnownUsername } from "../functions/users/tag";
 import { createProfile, hasProfile } from "../functions/users/utils";
 import dayjs = require("dayjs");
@@ -945,6 +946,8 @@ export async function runCommand(
   setTimeout(async () => {
     const news = await getNews();
 
+    const embeds: (Embed | CustomEmbed | APIEmbed)[] = [];
+
     if (news.text != "" && command.category == "money" && !(await hasSeenNews(message.author.id))) {
       await redis.rpush(Constants.redis.nypsi.NEWS_SEEN, message.author.id);
 
@@ -954,13 +957,14 @@ export async function runCommand(
         .setHeader("news", message.author.avatarURL())
         .setFooter({ text: `you are #${pos} to see this` });
 
-      if (message instanceof Message) {
-        message.reply({ embeds: [embed] });
-      } else {
-        message.followUp({ embeds: [embed], ephemeral: true });
-      }
+      embeds.push(embed);
+
       logger.info(`news shown to ${message.author.username}`);
     }
+
+    const notifs = await getInlineNotifications(message.author.id);
+
+    if (notifs.length > 0) embeds.push(...notifs.map((i) => i.embed));
 
     if (await redis.exists(`achievements:completed:${message.author.id}`)) {
       if (!(await userExists(message.member))) await createUser(message.member);
@@ -992,13 +996,17 @@ export async function runCommand(
     if (await redis.exists(`nypsi:levelup:${message.author.id}`)) {
       const embed: APIEmbed = JSON.parse(await redis.get(`nypsi:levelup:${message.author.id}`));
 
-      if (message instanceof Message) {
-        message.reply({ embeds: [embed] });
-      } else {
-        message.followUp({ embeds: [embed], ephemeral: true });
-      }
+      embeds.push(embed);
 
       await redis.del(`nypsi:levelup:${message.author.id}`);
+    }
+
+    if (embeds.length > 0) {
+      if (message instanceof Message) {
+        message.reply({ embeds });
+      } else {
+        message.followUp({ embeds, ephemeral: true });
+      }
     }
   }, 2000);
 
