@@ -39,7 +39,13 @@ import {
   setInventoryItem,
 } from "../utils/functions/economy/inventory";
 import { getRawLevel } from "../utils/functions/economy/levelling";
-import { formatBet, formatNumber, getItems, userExists } from "../utils/functions/economy/utils";
+import {
+  createUser,
+  formatBet,
+  formatNumber,
+  getItems,
+  userExists,
+} from "../utils/functions/economy/utils";
 import PageManager from "../utils/functions/page";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import requestDM from "../utils/functions/requestdm";
@@ -153,6 +159,8 @@ async function run(
       return await msg.edit(data);
     }
   };
+
+  if (!(await userExists(message.author.id))) await createUser(message.author.id);
 
   if (message.client.user.id !== Constants.BOT_USER_ID && message.author.id !== Constants.TEKOH_ID)
     return send({ embeds: [new ErrorEmbed("lol")] });
