@@ -92,7 +92,6 @@ model DMSettings {
   lottery        Boolean         @default(true)
   premium        Boolean         @default(true)
   auction        Boolean         @default(true)
-  vote           Boolean         @default(true)
   voteReminder   Boolean         @default(false)
   worker         WorkerDmSetting @default(OnlyWhenFull)
   booster        Boolean         @default(false)
@@ -194,6 +193,26 @@ model Economy {
   OffersReceived     Offer[]             @relation(name: "target")
   OffersGiven        Offer[]             @relation(name: "owner")
   Upgrades           Upgrades[]
+  Task               Task[]
+}
+
+model Task {
+  user_id   String
+  task_id   String
+  progress  BigInt   @default(0)
+  target    BigInt
+  completed Boolean  @default(false)
+  prize     String
+  type      TaskType
+
+  economy Economy @relation(fields: [user_id], references: [userId])
+
+  @@id([user_id, task_id])
+}
+
+enum TaskType {
+  daily
+  weekly
 }
 
 model Upgrades {
