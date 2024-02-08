@@ -219,52 +219,50 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
 
   logger.info(`::success vote processed for ${user}`);
 
-  if ((await getDmSettings(user)).vote) {
-    const embed = new CustomEmbed()
-      .setColor(Constants.EMBED_SUCCESS_COLOR)
-      .setDescription(
-        "you have received the following: \n\n" +
-          `+ $**${amount.toLocaleString()}**\n` +
-          "+ **3**% multiplier\n" +
-          `+ **${crateAmount}** vote crate${crateAmount != 1 ? "s" : ""}` +
-          `${
-            tickets.length <= Constants.LOTTERY_TICKETS_MAX - 1 ? "\n+ **1** lottery ticket" : ""
-          }\n\n` +
-          `you have voted **${votes.monthVote}** time${votes.monthVote > 1 ? "s" : ""} this month`,
-      )
-      .setFooter({ text: `+${xp}xp` });
+  const embed = new CustomEmbed()
+    .setColor(Constants.EMBED_SUCCESS_COLOR)
+    .setDescription(
+      "you have received the following: \n\n" +
+        `+ $**${amount.toLocaleString()}**\n` +
+        "+ **3**% multiplier\n" +
+        `+ **${crateAmount}** vote crate${crateAmount != 1 ? "s" : ""}` +
+        `${
+          tickets.length <= Constants.LOTTERY_TICKETS_MAX - 1 ? "\n+ **1** lottery ticket" : ""
+        }\n\n` +
+        `you have voted **${votes.monthVote}** time${votes.monthVote > 1 ? "s" : ""} this month`,
+    )
+    .setFooter({ text: `+${xp}xp` });
 
-    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new ButtonBuilder()
-        .setLabel("open crates")
-        .setCustomId("vote-crates")
-        .setStyle(ButtonStyle.Success),
-    );
+  const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+    new ButtonBuilder()
+      .setLabel("open crates")
+      .setCustomId("vote-crates")
+      .setStyle(ButtonStyle.Success),
+  );
 
-    if (!(await getDmSettings(user)).voteReminder) {
-      const chance = Math.floor(Math.random() * 10);
+  if (!(await getDmSettings(user)).voteReminder) {
+    const chance = Math.floor(Math.random() * 10);
 
-      if (chance == 7) {
-        row.addComponents(
-          new ButtonBuilder()
-            .setLabel("enable vote reminders")
-            .setCustomId("enable-vote-reminders")
-            .setStyle(ButtonStyle.Secondary),
-        );
-      }
+    if (chance == 7) {
+      row.addComponents(
+        new ButtonBuilder()
+          .setLabel("enable vote reminders")
+          .setCustomId("enable-vote-reminders")
+          .setStyle(ButtonStyle.Secondary),
+      );
     }
+  }
 
-    const res = await requestDM({
-      memberId: user,
-      client: manager,
-      content: "thank you for voting!",
-      embed: embed,
-      components: row,
-    });
+  const res = await requestDM({
+    memberId: user,
+    client: manager,
+    content: "thank you for voting!",
+    embed: embed,
+    components: row,
+  });
 
-    if (!res) {
-      logger.warn(`failed to send vote confirmation to ${user}`);
-    }
+  if (!res) {
+    logger.warn(`failed to send vote confirmation to ${user}`);
   }
 }
 
