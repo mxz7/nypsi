@@ -100,7 +100,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const weeklyEnd = dayjs()
     .add(1, "week")
-    .set("date", 0)
+    .set("day", 1)
     .set("hour", 0)
     .set("minute", 0)
     .set("second", 0)
