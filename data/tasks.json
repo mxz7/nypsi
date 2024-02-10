@@ -10,7 +10,7 @@
   "bake_daily": {
     "id": "bake_daily",
     "name": "baking",
-    "description": "bake {x} cookies",
+    "description": "bake cookies",
     "target": [50, 100, 200],
     "prizes": ["id:basic_crate:1", "id:69420_crate:1", "xp:100"],
     "type": "daily"
@@ -18,7 +18,7 @@
   "bake_weekly": {
     "id": "bake_weekly",
     "name": "baking",
-    "description": "bake {x} cookies",
+    "description": "bake cookies",
     "target": [500, 1000, 1500],
     "prizes": ["id:basic_crate:2", "id:69420_crate:2", "xp:500"],
     "type": "weekly"
@@ -26,7 +26,7 @@
   "commands_weekly": {
     "id": "commands_weekly",
     "name": "nypsi player",
-    "description": "do {x} commands",
+    "description": "use commands",
     "target": [500, 1000, 2000],
     "prizes": ["id:lucky_scratch_card:2", "xp:750", "karma:100"],
     "type": "weekly"
@@ -34,7 +34,7 @@
   "commands_daily": {
     "id": "commands_daily",
     "name": "nypsi player",
-    "description": "do {x} commands",
+    "description": "use commands",
     "target": [50, 100, 200],
     "prizes": ["id:basic_crate:1", "id:69420_crate:1", "xp:150", "id:lucky_scratch_card:1"],
     "type": "daily"
@@ -50,7 +50,7 @@
   "open_crates": {
     "id": "open_crates",
     "name": "crate opener",
-    "description": "open {x} crates",
+    "description": "open crates",
     "target": [50, 75, 100, 115],
     "prizes": ["id:basic_crate:5", "id:69420_crate:5", "id:lucky_scratch_card:2", "xp:1000"],
     "type": "weekly"
@@ -58,7 +58,7 @@
   "cats_daily": {
     "id": "cats_daily",
     "name": "meow",
-    "description": "look at {x} pictures of cats",
+    "description": "look at pictures of cats",
     "target": [5, 10, 10, 10, 10, 10, 25, 50, 100],
     "prizes": ["id:basic_crate:1", "id:69420_crate:1", "xp:100"],
     "type": "daily"
@@ -66,9 +66,25 @@
   "dogs_daily": {
     "id": "dogs_daily",
     "name": "woof",
-    "description": "look at {x} pictures of dogs",
+    "description": "look at pictures of dogs",
     "target": [5, 10, 10, 10, 10, 10, 25, 50, 100],
     "prizes": ["id:basic_crate:1", "id:69420_crate:1", "xp:100"],
     "type": "daily"
+  },
+  "chat_daily": {
+    "id": "chat_daily",
+    "name": "community member",
+    "description": "talk in the official nypsi server (dont spam pls, commands count too)",
+    "target": [10, 15, 25, 50],
+    "prizes": ["id:basic_crate:1", "id:69420_crate:1", "xp:100"],
+    "type": "daily"
+  },
+  "chat_weekly": {
+    "id": "chat_weekly",
+    "name": "community member",
+    "description": "talk in the official nypsi server (dont spam pls, commands count too)",
+    "target": [50, 75, 100, 250],
+    "prizes": ["id:lucky_scratch_card:2", "id:69420_crate:3", "xp:750", "karma:500"],
+    "type": "weekly"
   }
 }
