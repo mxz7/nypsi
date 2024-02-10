@@ -23,6 +23,11 @@ export default {
           where: { userId: user.user_id },
           data: { dailyTaskStreak: { increment: 1 } },
         });
+      } else {
+        await prisma.economy.update({
+          where: { userId: user.user_id },
+          data: { dailyTaskStreak: 0 },
+        });
       }
     }
 
