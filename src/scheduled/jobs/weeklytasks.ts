@@ -2,8 +2,8 @@ import prisma from "../../init/database";
 import { Job } from "../../types/Jobs";
 
 export default {
-  name: "daily tasks",
-  cron: "0 0 * * *",
+  name: "weekly tasks",
+  cron: "0 0 * * 1",
   async run(log) {
     const query = await prisma.task.groupBy({
       by: "user_id",
@@ -11,7 +11,7 @@ export default {
         completed: true,
       },
       where: {
-        type: "daily",
+        type: "weekly",
       },
     });
 
@@ -19,18 +19,18 @@ export default {
       if (user._count.completed === 3) {
         await prisma.economy.update({
           where: { userId: user.user_id },
-          data: { dailyTaskStreak: { increment: 1 } },
+          data: { weeklyTaskStreak: { increment: 1 } },
         });
       } else {
         await prisma.economy.update({
           where: { userId: user.user_id },
-          data: { dailyTaskStreak: 0 },
+          data: { weeklyTaskStreak: 0 },
         });
       }
     }
 
-    const count = await prisma.task.deleteMany({ where: { type: "daily" } });
+    const count = await prisma.task.deleteMany({ where: { type: "weekly" } });
 
-    log(`${count.count} daily tasks deleted`);
+    log(`${count.count} weekly tasks deleted`);
   },
 } satisfies Job;
