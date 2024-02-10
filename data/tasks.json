@@ -93,6 +93,6 @@
     "description": "increase your nypsi level",
     "target": [10, 15, 50, 100],
     "prizes": ["id:basic_crate:5", "id:69420_crate:5", "xp:1000", "id:nypsi_crate:1"],
-    "type": "daily"
+    "type": "weekly"
   }
 }
