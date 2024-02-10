@@ -86,5 +86,13 @@
     "target": [50, 75, 100, 250],
     "prizes": ["id:lucky_scratch_card:2", "id:69420_crate:3", "xp:750", "karma:500"],
     "type": "weekly"
+  },
+  "levelup_weekly": {
+    "id": "levelup_weekly",
+    "name": "progression",
+    "description": "increase your nypsi level",
+    "target": [10, 15, 50, 100],
+    "prizes": ["id:basic_crate:5", "id:69420_crate:5", "xp:1000", "id:nypsi_crate:1"],
+    "type": "daily"
   }
 }
