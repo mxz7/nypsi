@@ -11,7 +11,7 @@ import {
 } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders";
-import { getTasks } from "../utils/functions/economy/tasks";
+import { getTaskStreaks, getTasks } from "../utils/functions/economy/tasks";
 import { getTasksData } from "../utils/functions/economy/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import dayjs = require("dayjs");
@@ -62,6 +62,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   await addCooldown(cmd.name, message.member, 5);
 
   const tasks = await getTasks(message.author.id);
+  const streaks = await getTaskStreaks(message.author.id);
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder()
@@ -128,6 +129,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     .setHeader(`${message.author.username}'s tasks`, message.author.avatarURL())
     .setFields(dailies);
 
+  if (streaks.dailyTaskStreak > 0)
+    embed.setFooter({ text: `streak: ${streaks.dailyTaskStreak} days` });
+
   const msg = await send({ embeds: [embed], components: [row] });
 
   const pageManager = async () => {
@@ -151,6 +155,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       embed.setFields(dailies);
       embed.setDescription(`expires <t:${dailyEnd}:R>`);
       embed.setHeader(`${message.author.username}'s daily tasks`, message.author.avatarURL());
+      if (streaks.dailyTaskStreak > 0)
+        embed.setFooter({ text: `streak: ${streaks.dailyTaskStreak}` });
+      else delete embed.data.footer;
       row.components[0].setDisabled(true);
       row.components[1].setDisabled(false);
       interaction.update({ embeds: [embed], components: [row] });
@@ -158,6 +165,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       embed.setFields(weeklies);
       embed.setDescription(`expires <t:${weeklyEnd}:R>`);
       embed.setHeader(`${message.author.username}'s weekly tasks`, message.author.avatarURL());
+      if (streaks.weeklyTaskStreak > 0)
+        embed.setFooter({ text: `streak: ${streaks.weeklyTaskStreak}` });
+      else delete embed.data.footer;
       row.components[1].setDisabled(true);
       row.components[0].setDisabled(false);
       interaction.update({ embeds: [embed], components: [row] });
