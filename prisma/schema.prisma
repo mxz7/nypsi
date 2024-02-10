@@ -166,9 +166,11 @@ model Economy {
   lastVote  DateTime @default("1970-01-01T14:21:00+02:00")
   lastBake  DateTime @default("1970-01-01T14:21:00+02:00")
 
-  monthVote   Int @default(0)
-  seasonVote  Int @default(0)
-  dailyStreak Int @default(0)
+  monthVote        Int @default(0)
+  seasonVote       Int @default(0)
+  dailyStreak      Int @default(0)
+  dailyTaskStreak  Int @default(0)
+  weeklyTaskStreak Int @default(0)
 
   banned DateTime?
 

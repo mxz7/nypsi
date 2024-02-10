@@ -10,6 +10,10 @@ CREATE TYPE "TaskType" AS ENUM ('daily', 'weekly');
 -- AlterTable
 ALTER TABLE "DMSettings" DROP COLUMN "vote";
 
+-- AlterTable
+ALTER TABLE "Economy" ADD COLUMN     "dailyTaskStreak" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "weeklyTaskStreak" INTEGER NOT NULL DEFAULT 0;
+
 -- CreateTable
 CREATE TABLE "Task" (
     "user_id" TEXT NOT NULL,
