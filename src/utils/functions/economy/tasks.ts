@@ -75,3 +75,17 @@ export async function getTasks(userId: string) {
 
   return query;
 }
+
+export async function getTaskStreaks(userId: string) {
+  const query = await prisma.economy.findUnique({
+    where: {
+      userId,
+    },
+    select: {
+      weeklyTaskStreak: true,
+      dailyTaskStreak: true,
+    },
+  });
+
+  return query;
+}
