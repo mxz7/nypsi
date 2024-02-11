@@ -5,6 +5,7 @@ import { Command } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { getRawLevel } from "../utils/functions/economy/levelling";
+import { addTaskProgress } from "../utils/functions/economy/tasks";
 import { isEcoBanned, userExists } from "../utils/functions/economy/utils";
 import { getRandomImage, suggestImage } from "../utils/functions/image";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -85,6 +86,8 @@ cmd.setRun(async (message, args) => {
   if (args.length === 0) {
     imgCategories = categories;
   } else if (categories.includes(args[0].toLowerCase() as ImageType)) {
+    if (args[0] === "cat") addTaskProgress(message.author.id, "cats_daily");
+    if (args[0] === "dog") addTaskProgress(message.author.id, "dogs_daily");
     imgCategories = [args[0] as ImageType];
   } else if (args[0].toLowerCase() === "upload") {
     if (!(await userExists(message.member)))

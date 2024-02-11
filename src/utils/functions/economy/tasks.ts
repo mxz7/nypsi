@@ -10,7 +10,7 @@ import { addInlineNotification } from "../users/notifications";
 import { getLastKnownAvatar } from "../users/tag";
 import { getBalance, updateBalance } from "./balance";
 import { addInventoryItem } from "./inventory";
-import { getItems, getTasksData } from "./utils";
+import { getItems, getTasksData, userExists } from "./utils";
 import { getXp, updateXp } from "./xp";
 
 export async function generateTasks(userId: string) {
@@ -136,7 +136,9 @@ export function parseReward(reward: string) {
   return out;
 }
 
-export async function addTaskProgress(userId: string, taskId: string, amount: number) {
+export async function addTaskProgress(userId: string, taskId: string, amount = 1) {
+  if (!(await userExists(userId))) return;
+
   const tasks = await getTasks(userId);
 
   const task = tasks.find((i) => i.task_id === taskId);
@@ -190,6 +192,8 @@ export async function addTaskProgress(userId: string, taskId: string, amount: nu
     embed.setDescription(desc);
 
     addInlineNotification({ embed, memberId: task.user_id });
+
+    if (task.type === "daily") addTaskProgress(task.user_id, "all_dailies");
   } else {
     await prisma.task.update({
       where: { user_id_task_id: { user_id: userId, task_id: taskId } },

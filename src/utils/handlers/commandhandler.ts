@@ -33,6 +33,7 @@ import { addProgress, setProgress } from "../functions/economy/achievements";
 import { addBooster } from "../functions/economy/boosters";
 import { commandGemCheck, gemBreak, getInventory } from "../functions/economy/inventory";
 import { getRawLevel } from "../functions/economy/levelling";
+import { addTaskProgress } from "../functions/economy/tasks";
 import {
   createUser,
   getEcoBanTime,
@@ -1046,6 +1047,8 @@ export async function runCommand(
     updateUser(message.author || message.author || null, command.name),
     redis.hincrby(Constants.redis.nypsi.TOP_COMMANDS, command.name, 1),
     addProgress(message.author.id, "nypsi", 1),
+    addTaskProgress(message.author.id, "commands_weekly"),
+    addTaskProgress(message.author.id, "commands_daily"),
     commandGemCheck(message.member, command.category),
     redis.hincrby(Constants.redis.nypsi.TOP_COMMANDS_USER, message.author.id, 1),
   ]);

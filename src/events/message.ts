@@ -16,6 +16,7 @@ import { NypsiClient } from "../models/Client";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { a } from "../utils/functions/anticheat";
+import { addTaskProgress } from "../utils/functions/economy/tasks";
 import { userExists } from "../utils/functions/economy/utils";
 import { checkAutoMute, checkMessageContent } from "../utils/functions/guilds/filters";
 import { isSlashOnly } from "../utils/functions/guilds/slash";
@@ -164,6 +165,11 @@ export default async function messageCreate(message: Message) {
   if (message.channel.isDMBased()) return;
   if (message.channel.isVoiceBased()) return;
   if (!message.member) return;
+
+  if (message.guildId === Constants.NYPSI_SERVER_ID) {
+    addTaskProgress(message.author.id, "chat_daily");
+    addTaskProgress(message.author.id, "chat_weekly");
+  }
 
   message.content = message.content.replace(/ +(?= )/g, ""); // remove any additional spaces
 

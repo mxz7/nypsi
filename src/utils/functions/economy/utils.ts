@@ -13,6 +13,7 @@ import {
   UserUpgrade,
 } from "../../../types/Economy";
 import { Tag } from "../../../types/Tags";
+import { Task } from "../../../types/Tasks";
 import { Worker, WorkerUpgrades } from "../../../types/Workers";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
@@ -25,10 +26,10 @@ import { calcMaxBet, getBalance, updateBalance } from "./balance";
 import { getGuildByUser } from "./guilds";
 import { addInventoryItem } from "./inventory";
 import { addStat } from "./stats";
+import { addTaskProgress } from "./tasks";
 import { getXp, updateXp } from "./xp";
 import ms = require("ms");
 import math = require("mathjs");
-import { Task } from "../../../types/Tasks";
 
 let items: { [key: string]: Item };
 let achievements: { [key: string]: AchievementData };
@@ -705,6 +706,7 @@ export async function doDaily(member: GuildMember) {
   }
 
   await setProgress(member.id, "streaker", streak);
+  addTaskProgress(member.id, "daily_streaks");
 
   return embed;
 }
