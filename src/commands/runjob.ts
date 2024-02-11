@@ -13,7 +13,7 @@ async function run(
 
   if (args.length == 0) return (message.client as NypsiClient).cluster.send("reload_jobs");
 
-  (message.client as NypsiClient).cluster.send(`trigger_job_${args[0].toLowerCase()}`);
+  (message.client as NypsiClient).cluster.send(`trigger_job_${args.join(" ").toLowerCase()}`);
 }
 
 cmd.setRun(run);
