@@ -4,7 +4,7 @@
     "name": "all dailies",
     "description": "complete 21 daily tasks",
     "target": [21],
-    "prizes": ["id:nypsi_crate:1", "id:legendary_scratch_card:1", "karma:500", "xp:15000"],
+    "prizes": ["id:nypsi_crate:1", "id:legendary_scratch_card:1", "karma:500", "xp:2500"],
     "type": "weekly"
   },
   "bake_daily": {
