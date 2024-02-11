@@ -1,5 +1,7 @@
 import prisma from "../../init/database";
+import redis from "../../init/redis";
 import { Job } from "../../types/Jobs";
+import Constants from "../../utils/Constants";
 
 export default {
   name: "weekly tasks",
@@ -16,6 +18,7 @@ export default {
     });
 
     for (const user of query) {
+      await redis.del(`${Constants.redis.cache.economy.TASKS}:${user.user_id}`);
       if (user._count.completed === 3) {
         await prisma.economy.update({
           where: { userId: user.user_id },
