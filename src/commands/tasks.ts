@@ -98,14 +98,16 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     .set("millisecond", 0)
     .unix();
 
-  const weeklyEnd = dayjs()
-    .add(1, "week")
-    .set("day", 1)
-    .set("hour", 0)
-    .set("minute", 0)
-    .set("second", 0)
-    .set("millisecond", 0)
-    .unix();
+  let weeklyEndDate =
+    dayjs().day() >= 1 ? dayjs().add(1, "week").set("day", 1) : dayjs().set("day", 1);
+
+  weeklyEndDate = weeklyEndDate
+    .set("hours", 0)
+    .set("minutes", 0)
+    .set("seconds", 0)
+    .set("millisecond", 0);
+
+  const weeklyEnd = weeklyEndDate.unix();
 
   for (const task of tasks.filter((i) => i.type === "daily")) {
     let reward: string;
