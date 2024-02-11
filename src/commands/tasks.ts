@@ -165,7 +165,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   }
 
   const embed = new CustomEmbed(message.member, `expires <t:${dailyEnd}:R>`)
-    .setHeader(`${message.author.username}'s tasks`, message.author.avatarURL())
+    .setHeader(`${message.author.username}'s daily tasks`, message.author.avatarURL())
     .setFields(dailies);
 
   if (streaks.dailyTaskStreak > 0)
