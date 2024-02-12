@@ -197,7 +197,7 @@ async function run(
         }**\n\n` +
           `go ahead and send [**${
             tag ? `[${getTagsData()[tag.tagId].emoji}]` : ""
-          }${await getLastKnownUsername(milf.userId)}**](https://discord.com/users/${
+          }${await getLastKnownUsername(milf.userId)}**](https://nypsi.xyz/user/${
             milf.userId
           }) a *private* message 😉😏`,
       ).setHeader("milf finder");
@@ -211,7 +211,7 @@ async function run(
           }**\n\n` +
             `[**${tag ? `[${getTagsData()[tag.tagId].emoji}]` : ""}${await getLastKnownUsername(
               milf.userId,
-            )}**](https://discord.com/users/${milf.userId}) - ${milf.description}\n\n` +
+            )}**](https://nypsi.xyz/user/${milf.userId}) - ${milf.description}\n\n` +
             "go ahead and send them a *private* message 😉😏",
         );
       }
@@ -232,7 +232,7 @@ async function run(
             : message.guild.name
         }**\n\ngo ahead and send [${
           authorTag ? `[${getTagsData()[authorTag.tagId].emoji}]` : ""
-        }**${message.author.username}**](https://discord.com/users/${
+        }**${message.author.username}**](https://nypsi.xyz/user/${
           message.author.id
         }) a *private* message 😉😏`,
       )
@@ -265,7 +265,7 @@ async function run(
           }**\n\n` +
             `[${authorTag ? `[${getTagsData()[authorTag.tagId].emoji}]` : ""}**${
               message.author.username
-            }**](https://discord.com/users/${message.author.id}) - ${description}\n\n` +
+            }**](https://nypsi.xyz/user/${message.author.id}) - ${description}\n\n` +
             "go ahead and send them a *private* message 😉😏",
         );
       }
