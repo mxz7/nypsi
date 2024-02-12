@@ -99,7 +99,12 @@ export async function getTasks(userId: string) {
     return JSON.parse(cache) as PrismaTask[];
   }
 
-  const query = await prisma.task.findMany({ where: { user_id: userId } });
+  const query = await prisma.task.findMany({
+    where: { user_id: userId },
+    orderBy: {
+      task_id: "asc",
+    },
+  });
 
   if (query.length < 6) {
     if (query.length === 0) {
