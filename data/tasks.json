@@ -94,5 +94,29 @@
     "target": [10, 15, 50, 100],
     "prizes": ["id:basic_crate:5", "id:69420_crate:5", "xp:1000", "id:nypsi_crate:1"],
     "type": "weekly"
+  },
+  "gamble_weekly": {
+    "id": "gamble_weekly",
+    "name": "gambling addiction",
+    "description": "win gambles",
+    "target": [150, 250, 500, 1000],
+    "prizes": ["id:lucky_scratch_card:3", "xp:1000", "karma:300", "id:basic_crate:5"],
+    "type": "weekly"
+  },
+  "gamble_daily": {
+    "id": "gamble_daily",
+    "name": "gambling addiction",
+    "description": "win gambles",
+    "target": [10, 25, 50, 100],
+    "prizes": ["id:lucky_scratch_card:1", "xp:250", "karma:50", "id:basic_crate:1"],
+    "type": "daily"
+  },
+  "gamble_streak": {
+    "id": "gamble_streak",
+    "name": "gambling addiction",
+    "description": "get a gambling win streak",
+    "target": [10, 15],
+    "prizes": ["id:lucky_scratch_card:3", "xp:1000", "id:basic_crate:5"],
+    "type": "weekly"
   }
 }
