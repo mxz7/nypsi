@@ -12,6 +12,7 @@ import { addProgress } from "../utils/functions/economy/achievements";
 import { calcItemValue, getInventory, openCrate } from "../utils/functions/economy/inventory";
 import { getRawLevel } from "../utils/functions/economy/levelling";
 import { addStat } from "../utils/functions/economy/stats";
+import { addTaskProgress } from "../utils/functions/economy/tasks";
 import { getItems, isEcoBanned } from "../utils/functions/economy/utils";
 import PageManager from "../utils/functions/page";
 import { getEmbedColor } from "../utils/functions/premium/color";
@@ -67,6 +68,7 @@ export default {
     await Promise.all([
       addProgress(interaction.user.id, "unboxer", crateAmount),
       addStat(interaction.user.id, "vote_crate", crateAmount),
+      addTaskProgress(interaction.user.id, "open_crates", crateAmount),
     ]);
 
     const foundItems = new Map<string, number>();

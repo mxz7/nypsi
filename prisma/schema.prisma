@@ -92,7 +92,6 @@ model DMSettings {
   lottery        Boolean         @default(true)
   premium        Boolean         @default(true)
   auction        Boolean         @default(true)
-  vote           Boolean         @default(true)
   voteReminder   Boolean         @default(false)
   worker         WorkerDmSetting @default(OnlyWhenFull)
   booster        Boolean         @default(false)
@@ -167,9 +166,11 @@ model Economy {
   lastVote  DateTime @default("1970-01-01T14:21:00+02:00")
   lastBake  DateTime @default("1970-01-01T14:21:00+02:00")
 
-  monthVote   Int @default(0)
-  seasonVote  Int @default(0)
-  dailyStreak Int @default(0)
+  monthVote        Int @default(0)
+  seasonVote       Int @default(0)
+  dailyStreak      Int @default(0)
+  dailyTaskStreak  Int @default(0)
+  weeklyTaskStreak Int @default(0)
 
   banned DateTime?
 
@@ -194,6 +195,26 @@ model Economy {
   OffersReceived     Offer[]             @relation(name: "target")
   OffersGiven        Offer[]             @relation(name: "owner")
   Upgrades           Upgrades[]
+  Task               Task[]
+}
+
+model Task {
+  user_id   String
+  task_id   String
+  progress  BigInt   @default(0)
+  target    BigInt
+  completed Boolean  @default(false)
+  prize     String
+  type      TaskType
+
+  economy Economy @relation(fields: [user_id], references: [userId])
+
+  @@id([user_id, task_id])
+}
+
+enum TaskType {
+  daily
+  weekly
 }
 
 model Upgrades {

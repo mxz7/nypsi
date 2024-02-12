@@ -18,6 +18,7 @@ import sleep from "../../sleep";
 import { addProgress } from "../achievements";
 import { calcItemValue, getInventory, openCrate, selectItem } from "../inventory";
 import { addStat } from "../stats";
+import { addTaskProgress } from "../tasks";
 import { getItems } from "../utils";
 
 module.exports = new ItemUse(
@@ -111,6 +112,7 @@ module.exports = new ItemUse(
     await Promise.all([
       addProgress(message.author.id, "unboxer", amount),
       addStat(message.author.id, selected.id, amount),
+      addTaskProgress(message.author.id, "open_crates", amount),
     ]);
 
     for (let i = 0; i < amount; i++) {

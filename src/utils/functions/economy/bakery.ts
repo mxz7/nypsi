@@ -12,6 +12,7 @@ import { getGuildName, getGuildUpgradesByUser } from "./guilds";
 import { addInventoryItem, getInventory } from "./inventory";
 import { getUpgrades } from "./levelling";
 import { isPassive } from "./passive";
+import { addTaskProgress } from "./tasks";
 import { getBakeryUpgradesData, getItems, getUpgradesData } from "./utils";
 import ms = require("ms");
 
@@ -290,6 +291,8 @@ export async function runBakery(member: GuildMember) {
 
   addProgress(member.user.id, "baker", Math.round(chosenAmount + passive));
   addProgress(member.user.id, "super_baker", Math.round(chosenAmount + passive));
+  addTaskProgress(member.user.id, "bake_daily", Math.round(chosenAmount + passive));
+  addTaskProgress(member.user.id, "bake_weekly", Math.round(chosenAmount + passive));
 
   return embed;
 }

@@ -20,11 +20,6 @@
       "name": "auction notifications",
       "description": "get a dm when someone buys your auctions"
     },
-    "vote": {
-      "id": "vote",
-      "name": "vote notifications",
-      "description": "get a dm when you vote to show your rewards for voting"
-    },
     "voteReminder": {
       "id": "voteReminder",
       "name": "vote reminders",
