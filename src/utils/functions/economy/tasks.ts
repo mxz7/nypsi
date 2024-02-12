@@ -6,6 +6,7 @@ import { Item } from "../../../types/Economy";
 import { Task } from "../../../types/Tasks";
 import Constants from "../../Constants";
 import { addKarma } from "../karma/karma";
+import sleep from "../sleep";
 import { addInlineNotification } from "../users/notifications";
 import { getLastKnownAvatar } from "../users/tag";
 import { getBalance, updateBalance } from "./balance";
@@ -13,38 +14,25 @@ import { addInventoryItem } from "./inventory";
 import { getItems, getTasksData, userExists } from "./utils";
 import { getXp, updateXp } from "./xp";
 
-export async function generateTasks(userId: string) {
-  await prisma.task.deleteMany({ where: { user_id: userId } });
+const taskGeneration = new Set<string>();
+
+async function generateDailyTasks(userId: string) {
+  await prisma.task.deleteMany({ where: { AND: [{ user_id: userId }, { type: "daily" }] } });
   await redis.del(`${Constants.redis.cache.economy.TASKS}:${userId}`);
 
-  const tasks = getTasksData();
-
-  const dailyTasks = Object.values(tasks).filter((i) => i.type === "daily");
-  const weeklyTasks = Object.values(tasks).filter((i) => i.type === "weekly");
+  const tasks = Object.values(getTasksData()).filter((i) => i.type === "daily");
 
   const usersTasks: Task[] = [];
 
   for (let i = 0; i < 3; i++) {
-    const chosen = dailyTasks[Math.floor(Math.random() * dailyTasks.length)];
+    const chosen = tasks[Math.floor(Math.random() * tasks.length)];
 
     usersTasks.push(chosen);
 
-    dailyTasks.splice(dailyTasks.indexOf(chosen), 1);
-  }
-
-  usersTasks.push(tasks["all_dailies"]);
-
-  weeklyTasks.splice(
-    weeklyTasks.findIndex((i) => i.id === "all_dailies"),
-    1,
-  );
-
-  for (let i = 0; i < 2; i++) {
-    const chosen = weeklyTasks[Math.floor(Math.random() * weeklyTasks.length)];
-
-    usersTasks.push(chosen);
-
-    weeklyTasks.splice(weeklyTasks.indexOf(chosen), 1);
+    tasks.splice(
+      tasks.findIndex((t) => t.id === chosen.id),
+      1,
+    );
   }
 
   await prisma.task.createMany({
@@ -58,21 +46,70 @@ export async function generateTasks(userId: string) {
       };
     }),
   });
+}
 
+async function generateWeeklyTasks(userId: string) {
+  await prisma.task.deleteMany({ where: { AND: [{ user_id: userId }, { type: "weekly" }] } });
   await redis.del(`${Constants.redis.cache.economy.TASKS}:${userId}`);
+
+  const tasks = Object.values(getTasksData()).filter((i) => i.type === "weekly");
+
+  const usersTasks: Task[] = [];
+
+  for (let i = 0; i < 3; i++) {
+    const chosen = tasks[Math.floor(Math.random() * tasks.length)];
+
+    usersTasks.push(chosen);
+
+    tasks.splice(
+      tasks.findIndex((t) => t.id === chosen.id),
+      1,
+    );
+  }
+
+  await prisma.task.createMany({
+    data: usersTasks.map((task) => {
+      return {
+        task_id: task.id,
+        prize: task.prizes[Math.floor(Math.random() * task.prizes.length)],
+        user_id: userId,
+        target: task.target[Math.floor(Math.random() * task.target.length)],
+        type: task.type,
+      };
+    }),
+  });
 }
 
 export async function getTasks(userId: string) {
+  if (taskGeneration.has(userId)) {
+    await sleep(50);
+    return getTasks(userId);
+  }
+
+  taskGeneration.add(userId);
+
+  setTimeout(() => {
+    taskGeneration.delete(userId);
+  }, 100);
+
   const cache = await redis.get(`${Constants.redis.cache.economy.TASKS}:${userId}`);
 
   if (cache) {
+    taskGeneration.delete(userId);
     return JSON.parse(cache) as PrismaTask[];
   }
 
   const query = await prisma.task.findMany({ where: { user_id: userId } });
 
-  if (query.length === 0) {
-    await generateTasks(userId);
+  if (query.length < 6) {
+    if (query.length === 0) {
+      await generateDailyTasks(userId);
+      await generateWeeklyTasks(userId);
+    } else {
+      await generateDailyTasks(userId);
+    }
+
+    taskGeneration.delete(userId);
     return getTasks(userId);
   }
 
@@ -83,6 +120,7 @@ export async function getTasks(userId: string) {
     3600,
   );
 
+  taskGeneration.delete(userId);
   return query;
 }
 
