@@ -131,8 +131,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     dailies.push({
       name: getTasksData()[task.task_id].name,
       value:
-        `${getTasksData()[task.task_id].description.replace("{x}", task.target.toLocaleString())}\n` +
-        `${task.progress.toLocaleString()}/${task.target.toLocaleString()}\n` +
+        `${getTasksData()[task.task_id].description.replace("{x}", Number(task.target).toLocaleString())}\n` +
+        `${Number(task.progress).toLocaleString()}/${Number(task.target).toLocaleString()}\n` +
         `${reward}`,
     });
   }
@@ -160,8 +160,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     weeklies.push({
       name: getTasksData()[task.task_id].name,
       value:
-        `${getTasksData()[task.task_id].description.replace("{x}", task.target.toLocaleString())}\n` +
-        `${task.progress.toLocaleString()}/${task.target.toLocaleString()}\n` +
+        `${getTasksData()[task.task_id].description.replace("{x}", Number(task.target).toLocaleString())}\n` +
+        `${Number(task.progress).toLocaleString()}/${Number(task.target).toLocaleString()}\n` +
         `${reward}`,
     });
   }
