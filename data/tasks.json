@@ -126,5 +126,13 @@
     "target": [25, 100, 150],
     "prizes": ["id:lucky_scratch_card:1", "id:basic_crate:1", "id:69420_crate:1"],
     "type": "daily"
+  },
+  "vin_diesel": {
+    "id": "vin_diesel",
+    "name": "boy racer",
+    "description": "win street races",
+    "target": [10, 25, 30],
+    "prizes": ["id:redbull:2", "id:69420_crate:2", "xp:750", "id:toyota_supra:1"],
+    "type": "weekly"
   }
 }
