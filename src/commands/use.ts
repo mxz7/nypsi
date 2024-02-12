@@ -16,6 +16,7 @@ import { addBakeryUpgrade, getBakeryUpgrades } from "../utils/functions/economy/
 import { addBooster, getBoosters } from "../utils/functions/economy/boosters";
 import { getInventory, selectItem, setInventoryItem } from "../utils/functions/economy/inventory";
 import { addStat } from "../utils/functions/economy/stats";
+import { addTaskProgress } from "../utils/functions/economy/tasks";
 import {
   createUser,
   formatNumber,
@@ -233,6 +234,7 @@ async function run(
     let desc2 = `you have activated ${amount > 1 ? `${amount}x ` : ""}**${selected.name}**`;
 
     if (["cake", "cookie", "lucky_cheese"].includes(selected.id)) {
+      addTaskProgress(message.author.id, "eat_cookies", amount);
       desc = `eating ${amount > 1 ? `${amount} ` : ""}**${
         amount > 1 ? selected.plural || selected.name : selected.name
       }**...`;

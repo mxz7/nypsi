@@ -12,6 +12,7 @@ import { getBalance, getBankBalance, updateBalance, updateBankBalance } from "./
 import { addBooster, getBoosters } from "./boosters";
 import { addInventoryItem } from "./inventory";
 import { addStat } from "./stats";
+import { addTaskProgress } from "./tasks";
 import { getXp, updateXp } from "./xp";
 import ms = require("ms");
 import dayjs = require("dayjs");
@@ -525,6 +526,8 @@ async function doLevelUp(
       await redis.set(`nypsi:levelup:${id}`, JSON.stringify(embed.toJSON()));
       break;
   }
+
+  addTaskProgress(id, "levelup_weekly");
 
   await sleep(69);
 

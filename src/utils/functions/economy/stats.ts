@@ -4,6 +4,7 @@ import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { logger } from "../../logger";
 import { addProgress } from "./achievements";
+import { addTaskProgress, setTaskProgress } from "./tasks";
 
 export async function getGambleStats(member: GuildMember) {
   let id: string;
@@ -151,7 +152,16 @@ export async function createGame(
     return createGame(opts, attempts + 1);
   }
 
+  if (opts.result === "win") {
+    addTaskProgress(opts.userId, "gamble_daily");
+    addTaskProgress(opts.userId, "gamble_weekly");
+    addTaskProgress(opts.userId, "gamble_streak");
+  } else {
+    setTaskProgress(opts.userId, "gamble_streak", 0);
+  }
+
   addProgress(opts.userId, "gambler", 1);
+
   addStat(opts.userId, "spent-gamble", opts.bet);
   if (opts.earned > 0) addStat(opts.userId, "earned-gamble", opts.earned);
 

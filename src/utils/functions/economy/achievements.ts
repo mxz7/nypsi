@@ -1,19 +1,16 @@
-import { EmbedBuilder, GuildMember, WebhookClient } from "discord.js";
+import { GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { NotificationPayload } from "../../../types/Notification";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
-import { getEmbedColor } from "../premium/color";
 import { percentChance } from "../random";
 import {
   addInlineNotification,
   addNotificationToQueue,
   getDmSettings,
-  getPreferences,
 } from "../users/notifications";
-import { getLastKnownAvatar, getLastKnownUsername } from "../users/tag";
 import { addTag } from "../users/tags";
 import { addInventoryItem } from "./inventory";
 import {
@@ -251,35 +248,6 @@ async function completeAchievement(userId: string, achievementId: string) {
   } else {
     await addInlineNotification({ memberId: userId, embed: userEmbed });
   }
-
-  if (!process.env.ACHIEVEMENTS_HOOK || !(await getPreferences(userId))?.leaderboards) return;
-
-  const completed = await prisma.achievements.count({
-    where: {
-      AND: [{ achievementId: achievementId }, { completed: true }],
-    },
-  });
-
-  const colour = await getEmbedColor(userId);
-
-  const embed = new EmbedBuilder()
-    .setAuthor({
-      name: `${await getLastKnownUsername(userId)} has unlocked an achievement`,
-      iconURL: await getLastKnownAvatar(userId),
-    })
-    .setDescription(
-      `${achievements[achievementId].emoji} ${achievements[achievementId].name}\n\n*${achievements[achievementId].description}*`,
-    )
-    .setFooter({
-      text: `completed by ${completed.toLocaleString()} ${completed == 1 ? "person" : "people"}`,
-    })
-    .setTimestamp()
-    .setColor(colour === "default" ? Constants.PURPLE : colour);
-
-  const hook = new WebhookClient({ url: process.env.ACHIEVEMENTS_HOOK });
-
-  await hook.send({ embeds: [embed] });
-  hook.destroy();
 }
 
 export async function getUserAchievement(userId: string, achievementId: string) {

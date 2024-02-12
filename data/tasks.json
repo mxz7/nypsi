@@ -1,0 +1,138 @@
+{
+  "all_dailies": {
+    "id": "all_dailies",
+    "name": "all dailies",
+    "description": "complete 21 daily tasks",
+    "target": [21],
+    "prizes": ["id:nypsi_crate:1", "id:legendary_scratch_card:1", "karma:500", "xp:5000"],
+    "type": "weekly"
+  },
+  "bake_daily": {
+    "id": "bake_daily",
+    "name": "baking",
+    "description": "bake cookies",
+    "target": [50, 100, 200],
+    "prizes": ["id:basic_crate:1", "id:69420_crate:1", "xp:100"],
+    "type": "daily"
+  },
+  "bake_weekly": {
+    "id": "bake_weekly",
+    "name": "baking",
+    "description": "bake cookies",
+    "target": [500, 1000, 1500],
+    "prizes": ["id:basic_crate:2", "id:69420_crate:2", "xp:500"],
+    "type": "weekly"
+  },
+  "commands_weekly": {
+    "id": "commands_weekly",
+    "name": "nypsi addict",
+    "description": "use commands",
+    "target": [500, 1000, 2000, 4000],
+    "prizes": ["id:lucky_scratch_card:2", "xp:750", "karma:100"],
+    "type": "weekly"
+  },
+  "commands_daily": {
+    "id": "commands_daily",
+    "name": "nypsi addict",
+    "description": "use commands",
+    "target": [50, 100, 200],
+    "prizes": ["id:basic_crate:1", "id:69420_crate:1", "xp:150", "id:lucky_scratch_card:1"],
+    "type": "daily"
+  },
+  "daily_streaks": {
+    "id": "daily_streaks",
+    "name": "daily streaks",
+    "description": "get your daily streak 7 times",
+    "target": [7],
+    "prizes": ["id:basic_crate:5", "id:69420_crate:5", "id:lucky_scratch_card:2", "xp:1000"],
+    "type": "weekly"
+  },
+  "open_crates": {
+    "id": "open_crates",
+    "name": "crate opener",
+    "description": "open crates",
+    "target": [50, 75, 100, 115],
+    "prizes": ["id:basic_crate:5", "id:69420_crate:5", "id:lucky_scratch_card:2", "xp:1000"],
+    "type": "weekly"
+  },
+  "cats_daily": {
+    "id": "cats_daily",
+    "name": "meow",
+    "description": "look at pictures of cats",
+    "target": [5, 10, 10, 10, 10, 10, 25, 50, 100],
+    "prizes": ["id:basic_crate:1", "id:69420_crate:1", "xp:100"],
+    "type": "daily"
+  },
+  "dogs_daily": {
+    "id": "dogs_daily",
+    "name": "woof",
+    "description": "look at pictures of dogs",
+    "target": [5, 10, 10, 10, 10, 10, 25, 50, 100],
+    "prizes": ["id:basic_crate:1", "id:69420_crate:1", "xp:100"],
+    "type": "daily"
+  },
+  "chat_daily": {
+    "id": "chat_daily",
+    "name": "community member",
+    "description": "talk in the official nypsi server (dont spam pls, commands count too)",
+    "target": [10, 15, 25, 50],
+    "prizes": ["id:basic_crate:1", "id:69420_crate:1", "xp:100"],
+    "type": "daily"
+  },
+  "chat_weekly": {
+    "id": "chat_weekly",
+    "name": "community member",
+    "description": "talk in the official nypsi server (dont spam pls, commands count too)",
+    "target": [50, 75, 100, 250],
+    "prizes": ["id:lucky_scratch_card:2", "id:69420_crate:3", "xp:750", "karma:500"],
+    "type": "weekly"
+  },
+  "levelup_weekly": {
+    "id": "levelup_weekly",
+    "name": "progression",
+    "description": "increase your nypsi level",
+    "target": [10, 15, 50, 100],
+    "prizes": ["id:basic_crate:5", "id:69420_crate:5", "xp:1000", "id:nypsi_crate:1"],
+    "type": "weekly"
+  },
+  "gamble_weekly": {
+    "id": "gamble_weekly",
+    "name": "gambling addiction",
+    "description": "win gambles",
+    "target": [150, 250, 500, 1000],
+    "prizes": ["id:lucky_scratch_card:3", "xp:1000", "karma:300", "id:basic_crate:5"],
+    "type": "weekly"
+  },
+  "gamble_daily": {
+    "id": "gamble_daily",
+    "name": "gambling addiction",
+    "description": "win gambles",
+    "target": [10, 25, 50, 100],
+    "prizes": ["id:lucky_scratch_card:1", "xp:250", "karma:50", "id:basic_crate:1"],
+    "type": "daily"
+  },
+  "gamble_streak": {
+    "id": "gamble_streak",
+    "name": "gambling addiction",
+    "description": "get a gambling win streak",
+    "target": [10, 15],
+    "prizes": ["id:lucky_scratch_card:3", "xp:1000", "id:basic_crate:5"],
+    "type": "weekly"
+  },
+  "eat_cookies": {
+    "id": "eat_cookies",
+    "name": "cookie monster",
+    "description": "eat cookies",
+    "target": [25, 100, 150],
+    "prizes": ["id:lucky_scratch_card:1", "id:basic_crate:1", "id:69420_crate:1"],
+    "type": "daily"
+  },
+  "vin_diesel": {
+    "id": "vin_diesel",
+    "name": "boy racer",
+    "description": "win street races",
+    "target": [10, 25, 30],
+    "prizes": ["id:redbull:2", "id:69420_crate:2", "xp:750", "id:toyota_supra:1"],
+    "type": "weekly"
+  }
+}

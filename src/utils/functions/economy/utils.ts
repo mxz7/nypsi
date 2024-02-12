@@ -13,6 +13,7 @@ import {
   UserUpgrade,
 } from "../../../types/Economy";
 import { Tag } from "../../../types/Tags";
+import { Task } from "../../../types/Tasks";
 import { Worker, WorkerUpgrades } from "../../../types/Workers";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
@@ -25,6 +26,7 @@ import { calcMaxBet, getBalance, updateBalance } from "./balance";
 import { getGuildByUser } from "./guilds";
 import { addInventoryItem } from "./inventory";
 import { addStat } from "./stats";
+import { addTaskProgress } from "./tasks";
 import { getXp, updateXp } from "./xp";
 import ms = require("ms");
 import math = require("mathjs");
@@ -37,6 +39,7 @@ let bakeryUpgrades: { [key: string]: BakeryUpgradeData };
 let guildUpgrades: { [key: string]: GuildUpgrade };
 let userUpgrades: { [key: string]: UserUpgrade };
 let tags: { [key: string]: Tag };
+let tasks: { [key: string]: Task };
 
 const lotteryTicketPrice = 50000;
 /**
@@ -55,6 +58,7 @@ export function loadItems(crypto = true) {
   const guildUpgradesFile: any = fs.readFileSync("./data/guild_upgrades.json");
   const tagsFile: any = fs.readFileSync("./data/tags.json");
   const userUpgradesFile: any = fs.readFileSync("./data/upgrades.json");
+  const tasksFile: any = fs.readFileSync("./data/tasks.json");
 
   items = JSON.parse(itemsFile);
   achievements = JSON.parse(achievementsFile);
@@ -64,6 +68,7 @@ export function loadItems(crypto = true) {
   guildUpgrades = JSON.parse(guildUpgradesFile);
   tags = JSON.parse(tagsFile);
   userUpgrades = JSON.parse(userUpgradesFile);
+  tasks = JSON.parse(tasksFile);
 
   Object.values(userUpgrades).forEach((i) => {
     maxPrestige += i.max;
@@ -88,6 +93,7 @@ export function loadItems(crypto = true) {
   logger.info(`${Object.keys(achievements).length.toLocaleString()} achievements loaded`);
   logger.info(`${Object.keys(tags).length} tags loaded`);
   logger.info(`${Object.keys(userUpgrades).length} user upgrades loaded`);
+  logger.info(`${Object.keys(tasks).length} tasks loaded`);
   logger.info(`max prestige set at P${maxPrestige}`);
 
   if (crypto) {
@@ -475,6 +481,10 @@ export function getAchievements() {
   return achievements;
 }
 
+export function getTasksData() {
+  return tasks;
+}
+
 export async function deleteUser(member: GuildMember | string) {
   let id: string;
   if (member instanceof GuildMember) {
@@ -696,6 +706,7 @@ export async function doDaily(member: GuildMember) {
   }
 
   await setProgress(member.id, "streaker", streak);
+  addTaskProgress(member.id, "daily_streaks");
 
   return embed;
 }

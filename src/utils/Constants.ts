@@ -77,6 +77,7 @@ export default {
         EXISTS: "cache:chatreaction:exists",
       },
       economy: {
+        TASKS: "cache:economy:tasks",
         AUTO_SELL: "cache:economy:autosell",
         AUCTION_AVG: "cache:economy:auctionavg",
         OFFER_AVG: "cache:economy:offeravg",

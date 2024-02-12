@@ -13,6 +13,7 @@ import { RaceDetails, RaceUserDetails } from "../types/StreetRace";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { calcMaxBet, getBalance, updateBalance } from "../utils/functions/economy/balance";
 import { getInventory } from "../utils/functions/economy/inventory";
+import { addTaskProgress } from "../utils/functions/economy/tasks";
 import { createUser, formatBet, getItems, userExists } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -523,6 +524,7 @@ async function startRace(id: string) {
 
     await updateBalance(winner.id, (await getBalance(winner.id)) + race.bet * race.users.size);
     addProgress(winner.id, "racer", 1);
+    addTaskProgress(winner.id, "vin_diesel");
 
     description +=
       `\n\n**${winner.username}** has won with their ${race.users.get(winner.id).car.name} ${
