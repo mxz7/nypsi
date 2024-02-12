@@ -9,31 +9,32 @@ export default {
   async run(log) {
     const query = await prisma.task.groupBy({
       by: "user_id",
-      _count: {
-        completed: true,
-      },
       where: {
         type: "weekly",
       },
     });
 
     for (const user of query) {
-      await redis.del(`${Constants.redis.cache.economy.TASKS}:${user.user_id}`);
-      if (user._count.completed === 3) {
+      const completed = await prisma.task.count({
+        where: { AND: [{ user_id: user.user_id }, { type: "weekly" }, { completed: true }] },
+      });
+
+      if (completed === 3)
         await prisma.economy.update({
           where: { userId: user.user_id },
           data: { weeklyTaskStreak: { increment: 1 } },
         });
-      } else {
+      else
         await prisma.economy.update({
           where: { userId: user.user_id },
           data: { weeklyTaskStreak: 0 },
         });
-      }
+
+      await redis.del(`${Constants.redis.cache.economy.TASKS}:${user.user_id}`);
     }
 
     const count = await prisma.task.deleteMany({ where: { type: "weekly" } });
 
-    log(`${count.count} weekly tasks deleted`);
+    log(`${count.count} daily tasks deleted`);
   },
 } satisfies Job;
