@@ -118,5 +118,13 @@
     "target": [10, 15],
     "prizes": ["id:lucky_scratch_card:3", "xp:1000", "id:basic_crate:5"],
     "type": "weekly"
+  },
+  "eat_cookies": {
+    "id": "eat_cookies",
+    "name": "cookie monster",
+    "description": "eat cookies",
+    "target": [25, 100, 150],
+    "prizes": ["id:lucky_scratch_card:1", "id:basic_crate:1", "id:69420_crate:1"],
+    "type": "daily"
   }
 }
