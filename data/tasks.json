@@ -25,15 +25,15 @@
   },
   "commands_weekly": {
     "id": "commands_weekly",
-    "name": "nypsi player",
+    "name": "nypsi addict",
     "description": "use commands",
-    "target": [500, 1000, 2000],
+    "target": [500, 1000, 2000, 4000],
     "prizes": ["id:lucky_scratch_card:2", "xp:750", "karma:100"],
     "type": "weekly"
   },
   "commands_daily": {
     "id": "commands_daily",
-    "name": "nypsi player",
+    "name": "nypsi addict",
     "description": "use commands",
     "target": [50, 100, 200],
     "prizes": ["id:basic_crate:1", "id:69420_crate:1", "xp:150", "id:lucky_scratch_card:1"],
