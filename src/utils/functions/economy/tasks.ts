@@ -186,7 +186,7 @@ export async function addTaskProgress(userId: string, taskId: string, amount = 1
 
   await redis.del(`${Constants.redis.cache.economy.TASKS}:${userId}`);
 
-  if (Number(task.progress) + amount > Number(task.target)) {
+  if (Number(task.progress) + amount >= Number(task.target)) {
     await prisma.task.update({
       where: {
         user_id_task_id: {
@@ -236,6 +236,72 @@ export async function addTaskProgress(userId: string, taskId: string, amount = 1
     await prisma.task.update({
       where: { user_id_task_id: { user_id: userId, task_id: taskId } },
       data: { progress: { increment: amount } },
+    });
+  }
+}
+
+export async function setTaskProgress(userId: string, taskId: string, amount: number) {
+  if (!(await userExists(userId))) return;
+
+  const tasks = await getTasks(userId);
+
+  const task = tasks.find((i) => i.task_id === taskId);
+
+  if (!task) return;
+  if (task.completed) return;
+
+  await redis.del(`${Constants.redis.cache.economy.TASKS}:${userId}`);
+
+  if (amount >= Number(task.target)) {
+    await prisma.task.update({
+      where: {
+        user_id_task_id: {
+          task_id: taskId,
+          user_id: userId,
+        },
+      },
+      data: {
+        progress: task.target,
+        completed: true,
+      },
+    });
+
+    const reward = parseReward(task.prize);
+
+    const embed = new CustomEmbed()
+      .setHeader("task completed", await getLastKnownAvatar(userId))
+      .setColor(Constants.EMBED_SUCCESS_COLOR);
+
+    let desc = `you have completed the **${getTasksData()[task.task_id].name}** task`;
+
+    switch (reward.type) {
+      case "item":
+        desc += `\n\nyou have received ${reward.value}x ${reward.item.emoji} ${reward.item.name}`;
+        await addInventoryItem(task.user_id, reward.item.id, reward.value);
+        break;
+      case "karma":
+        desc += `\n\nyou have received 🔮 ${reward.value} karma`;
+        await addKarma(task.user_id, reward.value);
+        break;
+      case "money":
+        desc += `\n\nyou have received $${reward.value.toLocaleString()}`;
+        await updateBalance(task.user_id, (await getBalance(task.user_id)) + reward.value);
+        break;
+      case "xp":
+        desc += `\n\nyou have received ${reward.value.toLocaleString()}xp`;
+        await updateXp(task.user_id, (await getXp(task.user_id)) + reward.value);
+        break;
+    }
+
+    embed.setDescription(desc);
+
+    addInlineNotification({ embed, memberId: task.user_id });
+
+    if (task.type === "daily") addTaskProgress(task.user_id, "all_dailies");
+  } else {
+    await prisma.task.update({
+      where: { user_id_task_id: { user_id: userId, task_id: taskId } },
+      data: { progress: amount },
     });
   }
 }
