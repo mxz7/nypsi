@@ -4,6 +4,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { getRandomImage } from "../utils/functions/image";
 import { getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import { addTaskProgress } from "../utils/functions/economy/tasks";
 
 const cmd = new Command("dog", "get a random picture of a dog", "animals");
 
@@ -27,6 +28,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   message.channel.send({ embeds: [embed] });
 
   addProgress(message.author.id, "cute", 1);
+  addTaskProgress(message.author.id, "dogs_daily");
 }
 
 cmd.setRun(run);
