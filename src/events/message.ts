@@ -166,7 +166,7 @@ export default async function messageCreate(message: Message) {
   if (message.channel.isVoiceBased()) return;
   if (!message.member) return;
 
-  if (message.guildId === Constants.NYPSI_SERVER_ID) {
+  if (!message.author.bot && message.guildId === Constants.NYPSI_SERVER_ID) {
     addTaskProgress(message.author.id, "chat_daily");
     addTaskProgress(message.author.id, "chat_weekly");
   }
