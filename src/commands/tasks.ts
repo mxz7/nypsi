@@ -170,8 +170,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     .setHeader(`${message.author.username}'s daily tasks`, message.author.avatarURL())
     .setFields(dailies);
 
-  if (streaks.dailyTaskStreak > 0)
-    embed.setFooter({ text: `streak: ${streaks.dailyTaskStreak} days` });
+  if (streaks.dailyTaskStreak > 0) embed.setFooter({ text: `streak: ${streaks.dailyTaskStreak}` });
 
   const msg = await send({ embeds: [embed], components: [row] });
 
