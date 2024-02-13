@@ -5,6 +5,7 @@ import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { Item } from "../../../types/Economy";
 import { Task } from "../../../types/Tasks";
 import Constants from "../../Constants";
+import { logger } from "../../logger";
 import { addKarma } from "../karma/karma";
 import sleep from "../sleep";
 import { addInlineNotification } from "../users/notifications";
@@ -107,10 +108,14 @@ export async function getTasks(userId: string) {
   });
 
   if (query.length < 6) {
+    logger.debug(`${userId} less than 6 tasks`);
+
     if (query.length === 0) {
+      logger.debug(`${userId} generating daily and weeklies`);
       await generateDailyTasks(userId);
       await generateWeeklyTasks(userId);
     } else {
+      logger.debug(`${userId} generating dailies`, { tasks: query });
       await generateDailyTasks(userId);
     }
 
@@ -119,6 +124,11 @@ export async function getTasks(userId: string) {
   } else if (query.length > 6) {
     const dailies = query.filter((i) => i.type === "daily");
     const weeklies = query.filter((i) => i.type === "weekly");
+
+    logger.debug(`${userId} more than 6 tasks`, {
+      dailies: dailies.length,
+      weeklies: weeklies.length,
+    });
 
     if (dailies.length > 3) {
       await prisma.task.delete({
