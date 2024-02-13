@@ -220,10 +220,18 @@ async function prepare(
 
     if (!response || !response.isButton()) return;
 
-    await card.clicked(response).catch(() => {
+    await card.clicked(response).catch((e: any) => {
+      redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
       logger.error("scratch card weird error !", card);
+      console.error(e);
+      logger.error("follow up", e);
       console.trace();
+
+      fail = true;
     });
+
+    // if (fail) return play(response);
+    if (fail) return; // in case it causes problems cause i cant recreate
 
     if (card.remainingClicks !== 0) {
       embed.setDescription(
