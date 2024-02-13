@@ -670,7 +670,7 @@ export async function topCompletion(guild: Guild, userId: string) {
 
   for (const userId of userIds) {
     if (
-      query.find((u) => u.userId).user.Economy.banned &&
+      query.find((u) => u.userId).user?.Economy?.banned &&
       dayjs().isBefore(query.find((u) => u.userId).user.Economy.banned)
     ) {
       userIds.splice(userIds.indexOf(userId), 1);
