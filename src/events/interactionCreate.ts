@@ -9,13 +9,12 @@ import {
   InteractionType,
   Role,
 } from "discord.js";
-import { createNypsiInteraction, NypsiCommandInteraction } from "../models/Command";
+import { NypsiCommandInteraction, createNypsiInteraction } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { isUserBlacklisted } from "../utils/functions/users/blacklist";
 import { runCommand } from "../utils/handlers/commandhandler";
 import { runInteraction } from "../utils/handlers/interactions";
-import { logger } from "../utils/logger";
 
 export default async function interactionCreate(interaction: Interaction) {
   if (await isUserBlacklisted(interaction.user.id)) return;
@@ -47,20 +46,13 @@ export default async function interactionCreate(interaction: Interaction) {
 
   const args = [""];
 
-  let fail = false;
   setTimeout(async () => {
     if (!interaction.isCommand()) return;
     if (interaction.replied) return;
-    await interaction.deferReply().catch(() => {
-      if (!interaction.isCommand()) return;
-      logger.warn(
-        `failed to defer slash command. ${interaction.commandName} by ${interaction.member.user.username}`,
-      );
-      fail = true;
-    });
-  }, 2000);
+    if (interaction.deferred) return;
 
-  if (fail) return;
+    await interaction.deferReply().catch(() => {});
+  }, 2000);
 
   const parseArgument = async (arg: CommandInteractionOption) => {
     switch (arg.type) {
