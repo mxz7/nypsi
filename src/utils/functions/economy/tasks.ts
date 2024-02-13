@@ -116,6 +116,29 @@ export async function getTasks(userId: string) {
 
     taskGeneration.delete(userId);
     return getTasks(userId);
+  } else if (query.length > 6) {
+    const dailies = query.filter((i) => i.type === "daily");
+    const weeklies = query.filter((i) => i.type === "weekly");
+
+    if (dailies.length > 3) {
+      await prisma.task.delete({
+        where: {
+          user_id_task_id: {
+            task_id: dailies[0].task_id,
+            user_id: dailies[0].user_id,
+          },
+        },
+      });
+    } else if (weeklies.length > 3) {
+      await prisma.task.delete({
+        where: {
+          user_id_task_id: {
+            task_id: weeklies[0].task_id,
+            user_id: weeklies[0].user_id,
+          },
+        },
+      });
+    }
   }
 
   await redis.set(
