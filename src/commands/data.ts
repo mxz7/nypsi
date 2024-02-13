@@ -244,6 +244,8 @@ async function run(
 
       if (buffer.byteLength > 7e6) gzipped = await promisify(gzip)(buffer);
 
+      logger.info("data fetched");
+
       let fail = false;
       await message.member
         .send({
