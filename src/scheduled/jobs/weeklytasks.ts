@@ -1,7 +1,6 @@
+import { exec } from "child_process";
 import prisma from "../../init/database";
-import redis from "../../init/redis";
 import { Job } from "../../types/Jobs";
-import Constants from "../../utils/Constants";
 
 export default {
   name: "weekly tasks",
@@ -29,11 +28,10 @@ export default {
           where: { userId: user.user_id },
           data: { weeklyTaskStreak: 0 },
         });
-
-      await redis.del(`${Constants.redis.cache.economy.TASKS}:${user.user_id}`);
     }
 
     const count = await prisma.task.deleteMany({ where: { type: "weekly" } });
+    exec(`redis-cli KEYS "cache:economy:tasks:*" | xargs redis-cli DEL`);
 
     log(`${count.count} daily tasks deleted`);
   },
