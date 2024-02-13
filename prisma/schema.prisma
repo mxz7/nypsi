@@ -207,7 +207,7 @@ model Task {
   prize     String
   type      TaskType
 
-  economy Economy @relation(fields: [user_id], references: [userId])
+  economy Economy @relation(fields: [user_id], references: [userId], onDelete: Cascade)
 
   @@id([user_id, task_id])
 }
