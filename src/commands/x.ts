@@ -93,6 +93,7 @@ async function run(
         include: {
           Economy: {
             include: {
+              Task: true,
               Inventory: true,
               Boosters: true,
               Game: true,
