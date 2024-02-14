@@ -148,6 +148,7 @@ model Achievements {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([userId, achievementId])
+  @@index([userId])
 }
 
 model Economy {
@@ -266,7 +267,7 @@ model Inventory {
 
   economy Economy @relation(fields: [userId], references: [userId], onDelete: Cascade)
 
-  @@unique([userId, item])
+  @@id([userId, item])
   @@index([userId])
 }
 
