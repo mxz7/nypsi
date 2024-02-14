@@ -873,6 +873,7 @@
       "id:incredible_fishing_rod:50",
       "id:cursor:65",
       "id:grandma:65",
+      "id:lamborghini:20",
       "id:orphan:50",
       "id:big_tiddy_goth_gf:75",
       "id:viagra:30",
@@ -2141,6 +2142,8 @@
       "id:cursor:70",
       "id:super_cursor:50",
       "id:oven:30",
+      "id:lamborghini:5",
+      "id:mini_cooper:60",
       "id:diamond_pickaxe:50",
       "id:iron_pickaxe:75",
       "id:incredible_fishing_rod:50",
@@ -2182,6 +2185,7 @@
       "id:lucky_7:80",
       "id:incredible_fishing_rod",
       "id:incredible_gun",
+      "id:lamborghini:90",
       "id:quarry_scrap",
       "id:nypsi_crate:50",
       "id:platinum_credit:0.5",
@@ -2535,6 +2539,7 @@
       "id:multi_potion",
       "id:skyline_r34:85",
       "id:lucky_7:95",
+      "id:lamborghini:60",
       "id:reroll_token:20"
     ]
   },
@@ -2731,6 +2736,6 @@
     "aliases": ["lambo", "aventador"],
     "buy": 0,
     "sell": 100000,
-    "in_crates": true
+    "in_crates": false
   }
 }
