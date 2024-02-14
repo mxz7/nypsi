@@ -81,7 +81,7 @@ async function generateWeeklyTasks(userId: string, count: number) {
   await redis.del(`${Constants.redis.cache.economy.TASKS}:${userId}`);
 }
 
-export async function getTasks(userId: string) {
+export async function getTasks(userId: string): Promise<PrismaTask[]> {
   if (taskGeneration.has(userId)) {
     await sleep(25 + Math.floor(Math.random() * 50));
     return getTasks(userId);
