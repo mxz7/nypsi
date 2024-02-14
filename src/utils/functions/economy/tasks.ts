@@ -36,6 +36,8 @@ async function generateDailyTasks(userId: string) {
     );
   }
 
+  logger.debug(`generated dailies`, { usersTasks });
+
   await prisma.task.createMany({
     data: usersTasks.map((task) => {
       return {
@@ -67,6 +69,8 @@ async function generateWeeklyTasks(userId: string) {
       1,
     );
   }
+
+  logger.debug("generated weeklies", { usersTasks });
 
   await prisma.task.createMany({
     data: usersTasks.map((task) => {
@@ -117,7 +121,7 @@ export async function getTasks(userId: string) {
     });
 
   if (query.length < 6) {
-    logger.debug(`${userId} less than 6 tasks`);
+    logger.debug(`${userId} less than 6 tasks`, { query });
 
     if (query.length === 0) {
       logger.debug(`${userId} generating daily and weeklies`);
