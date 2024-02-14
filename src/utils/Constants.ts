@@ -183,4 +183,5 @@ export default {
   BADGES: ["owner", "staff", "highroller", "contributor", "season_winner", "og"],
   PURPLE: "#8b5cf6" as ColorResolvable,
   HIGHROLLER_ROLE: "1067122363143032992",
+  HIGHEROLLER_REQUIREMENT: 500,
 } as const;
