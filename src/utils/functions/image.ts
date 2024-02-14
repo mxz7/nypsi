@@ -98,7 +98,8 @@ export async function getRandomImage(type: ImageType) {
 
   const chosen = images[Math.floor(Math.random() * images.length)];
 
-  prisma.image.update({
+  // doesnt work if not awaited !?!?!??!!?
+  await prisma.image.update({
     where: { id: chosen.id },
     data: { views: { increment: 1 } },
   });
