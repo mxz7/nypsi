@@ -107,8 +107,8 @@
     "id": "gamble_daily",
     "name": "gambling addiction",
     "description": "win gambles",
-    "target": [10, 25, 50, 100],
-    "prizes": ["id:lucky_scratch_card:1", "xp:250", "karma:50", "id:basic_crate:1"],
+    "target": [10, 25, 50],
+    "prizes": ["xp:250", "karma:50", "id:basic_crate:1"],
     "type": "daily"
   },
   "gamble_streak": {
