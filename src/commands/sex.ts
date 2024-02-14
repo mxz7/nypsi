@@ -13,6 +13,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants.js";
 import { MStoTime } from "../utils/functions/date.js";
 import { addProgress } from "../utils/functions/economy/achievements.js";
+import { addTaskProgress } from "../utils/functions/economy/tasks.js";
 import { getTagsData } from "../utils/functions/economy/utils.js";
 import { cleanString } from "../utils/functions/string.js";
 import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications.js";
@@ -220,6 +221,8 @@ async function run(
         send({ embeds: [embed] }),
         addProgress(message.author.id, "whore", 1),
         addProgress(milf.userId, "whore", 1),
+        addTaskProgress(message.author.id, "horny"),
+        addTaskProgress(milf.userId, "horny"),
       ]);
 
       const authorTag = await getActiveTag(message.author.id);
