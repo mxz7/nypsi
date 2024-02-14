@@ -60,9 +60,7 @@ levellingRewards.set(25, {
 });
 levellingRewards.set(30, { text: "you will now receive 4 📦 vote crates when voting" });
 levellingRewards.set(40, {
-  text:
-    "you will now receive 4 📦 vote crates when voting\n\nyou have unlocked:\n" +
-    "- 🍟 mcdonalds (</workers view:1014905682341924945>)",
+  text: "you have unlocked:\n" + "- 🍟 mcdonalds (</workers view:1014905682341924945>)",
 });
 levellingRewards.set(50, {
   text:

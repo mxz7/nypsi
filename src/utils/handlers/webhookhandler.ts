@@ -144,20 +144,20 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
     },
   });
 
-  redis.set(`${Constants.redis.cache.economy.VOTE}:${user}`, "true");
-  redis.expire(`${Constants.redis.cache.economy.VOTE}:${user}`, ms("1 hour") / 1000);
+  await redis.set(`${Constants.redis.cache.economy.VOTE}:${user}`, "true");
+  await redis.expire(`${Constants.redis.cache.economy.VOTE}:${user}`, ms("1 hour") / 1000);
 
   let level = await getRawLevel(user);
 
-  if (level > 100) level = 100;
+  if (level > 75) level = 75;
 
   const amount = Math.floor(15000 * (level / 13 + 1));
 
   let xp = 15;
 
-  xp += Math.floor((await getRawLevel(user)) * 0.5);
+  xp += Math.floor((await getRawLevel(user)) * 0.3);
 
-  if (xp > 100) xp = 100;
+  if (xp > 50) xp = 50;
 
   if (!(await isEcoBanned(user))) {
     try {
