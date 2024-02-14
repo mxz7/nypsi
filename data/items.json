@@ -2717,5 +2717,20 @@
     "buy": 0,
     "sell": 17500,
     "in_crates": true
+  },
+  "lamborghini": {
+    "id": "lamborghini",
+    "name": "lamborghini aventador",
+    "plural": "lamborghinis",
+    "article": "a",
+    "emoji": "<:nypsi_lambo:1207439589011357796>",
+    "longDesc": "NYYOOWWMMMMM",
+    "rarity": 5,
+    "role": "car",
+    "speed": 7,
+    "aliases": ["lambo", "aventador"],
+    "buy": 0,
+    "sell": 100000,
+    "in_crates": true
   }
 }
