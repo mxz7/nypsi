@@ -11,6 +11,7 @@ import {
   ThreadMember,
   ThreadMemberManager,
 } from "discord.js";
+import { compareTwoStrings } from "string-similarity";
 import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
@@ -24,6 +25,7 @@ import { getPrefix, hasGuild } from "../utils/functions/guilds/utils";
 import { getKarma } from "../utils/functions/karma/karma";
 import { addMuteViolation } from "../utils/functions/moderation/mute";
 import { isPremium } from "../utils/functions/premium/premium";
+import sleep from "../utils/functions/sleep";
 import {
   createSupportRequest,
   getSupportRequest,
@@ -37,6 +39,11 @@ import { logger } from "../utils/logger";
 import ms = require("ms");
 
 const dmCooldown = new Set<string>();
+const lastContent = new Map<string, { history: string[]; last: number }>();
+
+setInterval(() => {
+  lastContent.clear();
+}, ms("30 minutes"));
 
 export default async function messageCreate(message: Message) {
   if (message.channel.isDMBased() && !message.author.bot) {
@@ -166,9 +173,45 @@ export default async function messageCreate(message: Message) {
   if (message.channel.isVoiceBased()) return;
   if (!message.member) return;
 
+  const checkTask = async () => {
+    await sleep(500);
+    const lastContents = lastContent.get(message.author.id);
+
+    const addProgress = async () => {
+      await addTaskProgress(message.author.id, "chat_daily");
+      await addTaskProgress(message.author.id, "chat_weekly");
+    };
+
+    if (!lastContents) {
+      lastContent.set(message.author.id, {
+        history: [message.content.toLowerCase()],
+        last: Date.now(),
+      });
+    } else {
+      let fail = false;
+      for (const content of lastContents.history) {
+        const similarity = compareTwoStrings(content, message.content.toLowerCase());
+
+        if (similarity > 75) {
+          fail = true;
+          break;
+        }
+      }
+
+      lastContents.history.push(message.content.toLowerCase());
+      lastContents.last = Date.now();
+      if (lastContents.history.length >= 5) lastContents.history.shift();
+
+      lastContent.set(message.author.id, lastContents);
+
+      if (fail) return;
+    }
+
+    addProgress();
+  };
+
   if (!message.author.bot && message.guildId === Constants.NYPSI_SERVER_ID) {
-    addTaskProgress(message.author.id, "chat_daily");
-    addTaskProgress(message.author.id, "chat_weekly");
+    checkTask();
   }
 
   message.content = message.content.replace(/ +(?= )/g, ""); // remove any additional spaces
