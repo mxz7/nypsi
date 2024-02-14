@@ -206,5 +206,21 @@
     "target": [1, 3],
     "prizes": ["id:basic_crate:1"],
     "type": "daily"
+  },
+  "chat_reaction_daily": {
+    "id": "chat_reaction_daily",
+    "name": "fast typer",
+    "description": "win chat reactions",
+    "target": [2, 5, 7],
+    "prizes": ["id:basic_crate:1", "xp:100"],
+    "type": "daily"
+  },
+  "chat_reaction_weekly": {
+    "id": "chat_reaction_weekly",
+    "name": "fast typer",
+    "description": "win chat reactions",
+    "target": [15, 25, 35],
+    "prizes": ["id:basic_crate:3", "xp:500"],
+    "type": "weekly"
   }
 }

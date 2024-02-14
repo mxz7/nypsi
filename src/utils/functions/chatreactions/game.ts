@@ -5,6 +5,7 @@ import { gamble } from "../../logger";
 import { addProgress } from "../economy/achievements";
 import { getBalance, updateBalance } from "../economy/balance";
 import { createGame } from "../economy/stats";
+import { addTaskProgress } from "../economy/tasks";
 import { isPremium } from "../premium/premium";
 import sleep from "../sleep";
 import { getZeroWidth } from "../string";
@@ -156,7 +157,11 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel) 
         if (winnersList.length == 1) {
           embed.setFooter({ text: "ended with 1 winner" });
         } else {
-          if (winnersList.length === 3) addProgress(winnersIDs[0], "fast_typer", 1);
+          if (winnersList.length === 3) {
+            await addProgress(winnersIDs[0], "fast_typer", 1);
+            await addTaskProgress(winnersIDs[0], "chat_reaction_daily");
+            await addTaskProgress(winnersIDs[0], "chat_reaction_weekly");
+          }
           embed.setFooter({ text: `ended with ${winnersList.length} winners` });
         }
         updateWinnersText();
