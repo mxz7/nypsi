@@ -189,12 +189,17 @@ export default async function messageCreate(message: Message) {
       });
     } else {
       let fail = false;
-      for (const content of lastContents.history) {
-        const similarity = compareTwoStrings(content, message.content.toLowerCase());
 
-        if (similarity > 75) {
-          fail = true;
-          break;
+      if (lastContents.last > Date.now() - ms("1 minute")) {
+        fail = true;
+      } else {
+        for (const content of lastContents.history) {
+          const similarity = compareTwoStrings(content, message.content.toLowerCase());
+
+          if (similarity > 75) {
+            fail = true;
+            break;
+          }
         }
       }
 
