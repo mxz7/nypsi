@@ -1,6 +1,8 @@
 import { CommandInteraction, Message } from "discord.js";
 import redis from "../init/redis";
+import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction } from "../models/Command";
+import { randomPresence } from "../utils/functions/presence";
 import { getAdminLevel } from "../utils/functions/users/admin";
 
 const cmd = new Command("maintenance", "maintenance", "none").setPermissions(["bot owner"]);
@@ -10,8 +12,33 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   if ((await redis.get("nypsi:maintenance")) == "t") {
     await redis.del("nypsi:maintenance");
+
+    const presence = randomPresence();
+
+    (message.client as NypsiClient).cluster.broadcastEval(
+      (c, { presence }) => {
+        c.user.setPresence({
+          status: "online",
+          activities: [presence],
+        });
+      },
+      { context: { presence } },
+    );
   } else {
     await redis.set("nypsi:maintenance", "t");
+
+    (message.client as NypsiClient).cluster.broadcastEval((c) => {
+      c.user.setPresence({
+        status: "idle",
+        activities: [
+          {
+            type: 4,
+            name: "boobies",
+            state: "⚠️ maintenance",
+          },
+        ],
+      });
+    });
   }
 
   if (!(message instanceof Message)) return;

@@ -147,6 +147,7 @@ export class NypsiClient extends Client {
 
       setInterval(
         async () => {
+          if (await redis.exists("nypsi:maintenance")) return;
           if (await getCustomPresence()) return;
           const presence = randomPresence();
 
@@ -160,7 +161,20 @@ export class NypsiClient extends Client {
 
       await setCustomPresence();
 
-      setTimeout(() => {
+      setTimeout(async () => {
+        if (await redis.exists("nypsi:maintenance")) {
+          this.user.setPresence({
+            status: "idle",
+            activities: [
+              {
+                type: 4,
+                name: "boobies",
+                state: "⚠️ maintenance",
+              },
+            ],
+          });
+          return;
+        }
         this.user.setPresence({
           status: "online",
           activities: [
