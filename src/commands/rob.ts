@@ -20,6 +20,7 @@ import { addToGuildXP, getGuildByUser, getGuildName } from "../utils/functions/e
 import { getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
 import { isPassive } from "../utils/functions/economy/passive";
 import { addStat, createGame } from "../utils/functions/economy/stats";
+import { addTaskProgress } from "../utils/functions/economy/tasks";
 import { createUser, isEcoBanned, userExists } from "../utils/functions/economy/utils";
 import { calcEarnedGambleXp, getXp, updateXp } from "../utils/functions/economy/xp";
 import { getPrefix } from "../utils/functions/guilds/utils";
@@ -272,6 +273,7 @@ async function run(
 
       const earnedXp = await calcEarnedGambleXp(message.member, 1_000_000, 1);
       addProgress(message.author.id, "robber", 1);
+      addTaskProgress(message.author.id, "thief");
 
       if (earnedXp > 0) {
         await updateXp(message.member, (await getXp(message.member)) + earnedXp);
