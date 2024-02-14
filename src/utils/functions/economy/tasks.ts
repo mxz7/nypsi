@@ -83,7 +83,7 @@ async function generateWeeklyTasks(userId: string) {
 
 export async function getTasks(userId: string) {
   if (taskGeneration.has(userId)) {
-    await sleep(25);
+    await sleep(25 + Math.floor(Math.random() * 50));
     return getTasks(userId);
   }
 
