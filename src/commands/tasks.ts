@@ -68,10 +68,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder()
       .setCustomId("daily")
-      .setLabel("daily")
+      .setLabel(`daily (${tasks.filter((t) => t.completed && t.type === "daily").length}/3)`)
       .setStyle(ButtonStyle.Secondary)
       .setDisabled(true),
-    new ButtonBuilder().setCustomId("weekly").setLabel("weekly").setStyle(ButtonStyle.Secondary),
+    new ButtonBuilder()
+      .setCustomId("weekly")
+      .setLabel(`weekly (${tasks.filter((t) => t.completed && t.type === "weekly").length}/3)`)
+      .setStyle(ButtonStyle.Secondary),
   );
 
   if (
