@@ -238,5 +238,13 @@
     "target": [2, 5, 7],
     "prizes": ["id:basic_crate:1", "id:69420_crate:1"],
     "type": "daily"
+  },
+  "bank_thief": {
+    "id": "bank_thief",
+    "name": "bank robber",
+    "description": "rob the bank",
+    "target": [3, 5, 7],
+    "prizes": ["id:basic_crate:1", "id:69420_crate:1"],
+    "type": "daily"
   }
 }

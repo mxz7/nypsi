@@ -28,6 +28,7 @@ import {
   getResponse,
   onCooldown,
 } from "../utils/handlers/cooldownhandler.js";
+import { addTaskProgress } from "../utils/functions/economy/tasks";
 
 const cmd = new Command("bankrob", "attempt to rob a bank for a high reward", "money");
 
@@ -161,6 +162,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       await Promise.all([
         updateBalance(message.member, (await getBalance(message.member)) + stolen),
         addProgress(message.author.id, "robber", 1),
+        addTaskProgress(message.author.id, "bank_thief"),
       ]);
 
       await removeFromNypsiBankBalance(stolen);
