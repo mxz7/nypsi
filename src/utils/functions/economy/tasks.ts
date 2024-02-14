@@ -17,15 +17,12 @@ import { getXp, updateXp } from "./xp";
 
 const taskGeneration = new Map<string, number>();
 
-async function generateDailyTasks(userId: string) {
-  await prisma.task.deleteMany({ where: { AND: [{ user_id: userId }, { type: "daily" }] } });
-  await redis.del(`${Constants.redis.cache.economy.TASKS}:${userId}`);
-
+async function generateDailyTasks(userId: string, count: number) {
   const tasks = Object.values(getTasksData()).filter((i) => i.type === "daily");
 
   const usersTasks: Task[] = [];
 
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < count; i++) {
     const chosen = tasks[Math.floor(Math.random() * tasks.length)];
 
     usersTasks.push(chosen);
@@ -36,7 +33,7 @@ async function generateDailyTasks(userId: string) {
     );
   }
 
-  logger.debug(`generated dailies`, { usersTasks });
+  logger.debug(`${userId} generated dailies`, { usersTasks });
 
   await prisma.task.createMany({
     data: usersTasks.map((task) => {
@@ -49,17 +46,15 @@ async function generateDailyTasks(userId: string) {
       };
     }),
   });
+  await redis.del(`${Constants.redis.cache.economy.TASKS}:${userId}`);
 }
 
-async function generateWeeklyTasks(userId: string) {
-  await prisma.task.deleteMany({ where: { AND: [{ user_id: userId }, { type: "weekly" }] } });
-  await redis.del(`${Constants.redis.cache.economy.TASKS}:${userId}`);
-
+async function generateWeeklyTasks(userId: string, count: number) {
   const tasks = Object.values(getTasksData()).filter((i) => i.type === "weekly");
 
   const usersTasks: Task[] = [];
 
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < count; i++) {
     const chosen = tasks[Math.floor(Math.random() * tasks.length)];
 
     usersTasks.push(chosen);
@@ -70,7 +65,7 @@ async function generateWeeklyTasks(userId: string) {
     );
   }
 
-  logger.debug("generated weeklies", { usersTasks });
+  logger.debug(`${userId} generated weeklies`, { usersTasks });
 
   await prisma.task.createMany({
     data: usersTasks.map((task) => {
@@ -83,6 +78,7 @@ async function generateWeeklyTasks(userId: string) {
       };
     }),
   });
+  await redis.del(`${Constants.redis.cache.economy.TASKS}:${userId}`);
 }
 
 export async function getTasks(userId: string) {
@@ -123,13 +119,19 @@ export async function getTasks(userId: string) {
   if (query.length < 6) {
     logger.debug(`${userId} less than 6 tasks`, { query });
 
-    if (query.length === 0) {
-      logger.debug(`${userId} generating daily and weeklies`);
-      await generateDailyTasks(userId);
-      await generateWeeklyTasks(userId);
-    } else {
-      logger.debug(`${userId} generating dailies`, { tasks: query });
-      await generateDailyTasks(userId);
+    console.trace();
+
+    const dailiesCount = query.filter((t) => t.type === "daily").length;
+    const weekliesCount = query.length - dailiesCount;
+
+    if (dailiesCount < 3) {
+      logger.debug(`${userId} generating daily tasks`);
+      await generateDailyTasks(userId, 3 - dailiesCount);
+    }
+
+    if (weekliesCount < 3) {
+      logger.debug(`${userId} generating weekly tasks`);
+      await generateWeeklyTasks(userId, 3 - weekliesCount);
     }
 
     taskGeneration.delete(userId);
