@@ -57,7 +57,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   let rawLevel = await getRawLevel(message.member);
 
-  if (rawLevel > 100) rawLevel = 100;
+  if (rawLevel > 75) rawLevel = 75;
 
   const amount = Math.floor(15000 * (rawLevel / 13 + 1));
   const [voted, lastVote, votes, dmSettings] = await Promise.all([
