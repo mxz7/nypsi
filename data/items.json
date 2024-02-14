@@ -2702,5 +2702,20 @@
       "time": 259200,
       "ingredients": ["eye_of_ender:12"]
     }
+  },
+  "mini_cooper": {
+    "id": "mini_cooper",
+    "name": "mini cooper",
+    "plural": "minis",
+    "article": "a",
+    "emoji": "<:nypsi_mini:1206639656431657030>",
+    "longDesc": "mr bean",
+    "rarity": 1,
+    "role": "car",
+    "speed": 2,
+    "aliases": ["mini"],
+    "buy": 0,
+    "sell": 17500,
+    "in_crates": true
   }
 }
