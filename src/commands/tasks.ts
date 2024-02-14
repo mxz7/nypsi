@@ -18,6 +18,7 @@ import dayjs = require("dayjs");
 
 const cmd = new Command("tasks", "view your daily/weekly tasks", "money").setAliases([
   "objectives",
+  "quests",
 ]);
 
 cmd.slashEnabled = true;
