@@ -15,6 +15,7 @@ import { findChannelCluster } from "../../utils/functions/clusters";
 import { MStoTime } from "../../utils/functions/date";
 import { addProgress } from "../../utils/functions/economy/achievements";
 import { addInventoryItem } from "../../utils/functions/economy/inventory";
+import { addTaskProgress } from "../../utils/functions/economy/tasks";
 import { createUser, getItems, isEcoBanned, userExists } from "../../utils/functions/economy/utils";
 import { getPrefix } from "../../utils/functions/guilds/utils";
 import { percentChance, shuffle } from "../../utils/functions/random";
@@ -121,6 +122,7 @@ async function randomDrop(client: NypsiClient) {
       );
 
       addProgress(winner, "lootdrops_pro", 1);
+      addTaskProgress(winner, "lootdrops");
 
       if (prize.startsWith("item:")) {
         let amount = 1;
@@ -532,6 +534,7 @@ export async function startRandomDrop(client: NypsiClient, channelId: string) {
     );
 
     addProgress(winner, "lootdrops_pro", 1);
+    addTaskProgress(winner, "lootdrops");
 
     if (prize.startsWith("item:")) {
       let amount = 1;
