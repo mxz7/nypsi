@@ -162,7 +162,7 @@ export async function getTasks(userId: string) {
 
   await redis.set(
     `${Constants.redis.cache.economy.TASKS}:${userId}`,
-    JSON.stringify(query, (key, value) => (typeof value === "bigint" ? value.toString() : value)),
+    JSON.stringify(query, (key, value) => (typeof value === "bigint" ? Number(value) : value)),
     "EX",
     3600,
   );
