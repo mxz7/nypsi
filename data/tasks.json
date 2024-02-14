@@ -222,5 +222,13 @@
     "target": [15, 25, 35],
     "prizes": ["id:basic_crate:3", "xp:500"],
     "type": "weekly"
+  },
+  "scratch_cards": {
+    "id": "scratch_cards",
+    "name": "scratch card addiction",
+    "description": "win scratch cards",
+    "target": [3, 5, 10],
+    "prizes": ["id:lucky_scratch_card:1", "id:basic_crate:1"],
+    "type": "daily"
   }
 }

@@ -17,6 +17,7 @@ import { addProgress } from "./achievements";
 import { getBalance, updateBalance } from "./balance";
 import { addInventoryItem } from "./inventory";
 import { addStat } from "./stats";
+import { addTaskProgress } from "./tasks";
 import { getItems } from "./utils";
 import { getXp, updateXp } from "./xp";
 import ms = require("ms");
@@ -160,6 +161,7 @@ export default class ScratchCard {
 
     const giveReward = async () => {
       await addProgress(this.member.user.id, "scratchies_pro", 1);
+      await addTaskProgress(this.member.user.id, "scratch_cards");
       this.won = true;
       const clickedType = this.area[y][x].split(":")[0];
       const clickedItem = this.area[y][x].split(":")[1];
