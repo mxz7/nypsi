@@ -47,6 +47,7 @@ import { recentCommands } from "../utils/functions/users/commands";
 import { addHourlyCommand } from "../utils/handlers/commandhandler";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 import { gamble, logger } from "../utils/logger";
+import { addTaskProgress } from "../utils/functions/economy/tasks";
 
 const cmd = new Command("blackjack", "play blackjack", "money").setAliases(["bj", "blowjob"]);
 
@@ -440,6 +441,7 @@ class Game {
       if (this.hand.cards.length === 2 && this.hand.total() === 21) {
         winnings = this.bet * 2.5;
         addProgress(this.member.user.id, "blackjack_pro", 1);
+        addTaskProgress(this.member.user.id, "blackjack");
       }
 
       winnings = winnings + Math.floor(winnings * multi.multi);
