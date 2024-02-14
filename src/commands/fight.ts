@@ -16,6 +16,7 @@ import { addProgress } from "../utils/functions/economy/achievements";
 import { getBoosters } from "../utils/functions/economy/boosters";
 import { addInventoryItem } from "../utils/functions/economy/inventory";
 import { createGame, getGambleStats, getGameWins } from "../utils/functions/economy/stats";
+import { addTaskProgress } from "../utils/functions/economy/tasks";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
@@ -471,6 +472,8 @@ class Fight {
 
     if (await userExists(winner.member.user.id)) {
       addProgress(winner.member.user.id, "fighter", 1);
+      await addTaskProgress(winner.member.user.id, "mike_tyson");
+      addTaskProgress(winner.member.user.id, "mike_tyson_daily");
       await addInventoryItem(winner.member, "cookie", 1);
       embed.setFooter({ text: "well done. enjoy this cookie 🍪" });
     }
