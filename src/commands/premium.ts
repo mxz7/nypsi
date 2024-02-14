@@ -285,17 +285,17 @@ async function run(
         getUserAliases(message.member),
       ]);
 
-      let expiresText = `<t:${Math.floor(profile.expireDate.getTime() / 1000)}> (<t:${Math.floor(
-        profile.expireDate.getTime() / 1000,
-      )}:R>)`;
+      const expire = dayjs(profile.expireDate)
+        .add(1, "day")
+        .set("hours", 0)
+        .set("minutes", 0)
+        .set("seconds", 0)
+        .subtract(15, "minutes");
 
-      if (
-        dayjs(profile.expireDate).set("hour", 0).set("minute", 0).isBefore(dayjs()) &&
-        profile.credit < 1
-      ) {
-        const date = dayjs().set("hour", 23).set("minute", 45).set("second", 0).unix();
+      let expiresText = `<t:${expire.unix()}> (<t:${expire.unix()}:R>)`;
 
-        expiresText = `<t:${date}> (<t:${date}:R>)`;
+      if (expire.isBefore(dayjs())) {
+        expiresText = expiresText.split(">")[0] + "> (using credits)";
       }
 
       let description =
