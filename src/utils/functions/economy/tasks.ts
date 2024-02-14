@@ -15,7 +15,7 @@ import { addInventoryItem } from "./inventory";
 import { getItems, getTasksData, userExists } from "./utils";
 import { getXp, updateXp } from "./xp";
 
-const taskGeneration = new Set<string>();
+const taskGeneration = new Map<string, number>();
 
 async function generateDailyTasks(userId: string) {
   await prisma.task.deleteMany({ where: { AND: [{ user_id: userId }, { type: "daily" }] } });
@@ -83,15 +83,19 @@ async function generateWeeklyTasks(userId: string) {
 
 export async function getTasks(userId: string) {
   if (taskGeneration.has(userId)) {
-    await sleep(50);
+    await sleep(25);
     return getTasks(userId);
   }
 
-  taskGeneration.add(userId);
+  const queueId = Math.random();
+
+  taskGeneration.set(userId, queueId);
 
   setTimeout(() => {
-    taskGeneration.delete(userId);
-  }, 100);
+    if (taskGeneration.has(userId)) {
+      if (taskGeneration.get(userId) === queueId) taskGeneration.delete(userId);
+    }
+  }, 3000);
 
   const cache = await redis.get(`${Constants.redis.cache.economy.TASKS}:${userId}`);
 
@@ -100,12 +104,17 @@ export async function getTasks(userId: string) {
     return JSON.parse(cache) as PrismaTask[];
   }
 
-  const query = await prisma.task.findMany({
-    where: { user_id: userId },
-    orderBy: {
-      task_id: "asc",
-    },
-  });
+  const query = await prisma.task
+    .findMany({
+      where: { user_id: userId },
+      orderBy: {
+        task_id: "asc",
+      },
+    })
+    .catch(() => {
+      taskGeneration.delete(userId);
+      return [];
+    });
 
   if (query.length < 6) {
     logger.debug(`${userId} less than 6 tasks`);
