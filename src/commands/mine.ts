@@ -21,6 +21,7 @@ import {
   setInventoryItem,
 } from "../utils/functions/economy/inventory";
 import { addStat } from "../utils/functions/economy/stats";
+import { addTaskProgress } from "../utils/functions/economy/tasks";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import { calcEarnedHFMXp, getXp, updateXp } from "../utils/functions/economy/xp";
 import { percentChance } from "../utils/functions/random";
@@ -388,6 +389,8 @@ async function doMine(
   }, 1500);
 
   addProgress(message.member.user.id, "miner", total);
+  await addTaskProgress(message.member.user.id, "mine_daily");
+  await addTaskProgress(message.member.user.id, "mine_weekly");
 }
 
 cmd.setRun(run);
