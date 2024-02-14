@@ -135,7 +135,8 @@ model CommandUse {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, command])
+  @@id([userId, command])
+  @@index([userId])
 }
 
 model Achievements {
