@@ -246,5 +246,13 @@
     "target": [3, 5, 7],
     "prizes": ["id:basic_crate:1", "id:69420_crate:1"],
     "type": "daily"
+  },
+  "lootdrops": {
+    "id": "lootdrops",
+    "name": "loot drop professional",
+    "description": "win loot drops",
+    "target": [2, 5],
+    "prizes": ["id:lucky_scratch_card:2", "id:69420_crate:3"],
+    "type": "weekly"
   }
 }
