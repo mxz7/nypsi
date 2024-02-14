@@ -142,5 +142,53 @@
     "target": [5, 10, 15],
     "prizes": ["id:redbull:2", "id:69420_crate:2", "xp:750"],
     "type": "weekly"
+  },
+  "mine_daily": {
+    "id": "mine_daily",
+    "name": "miner",
+    "description": "mine",
+    "target": [10, 15],
+    "prizes": ["id:basic_crate:1", "id:diamond_pickaxe:7"],
+    "type": "daily"
+  },
+  "mine_weekly": {
+    "id": "mine_weekly",
+    "name": "miner",
+    "description": "mine",
+    "target": [50, 75, 100],
+    "prizes": ["id:basic_crate:2", "id:diamond_pickaxe:15"],
+    "type": "weekly"
+  },
+  "fish_daily": {
+    "id": "fish_daily",
+    "name": "fishr",
+    "description": "fish",
+    "target": [10, 15],
+    "prizes": ["id:basic_crate:1", "id:incredible_fishing_rod:7"],
+    "type": "daily"
+  },
+  "fish_weekly": {
+    "id": "fish_weekly",
+    "name": "fishr",
+    "description": "fish",
+    "target": [50, 75, 100],
+    "prizes": ["id:basic_crate:2", "id:incredible_fishing_rod:15"],
+    "type": "weekly"
+  },
+  "hunt_daily": {
+    "id": "hunt_daily",
+    "name": "huntr",
+    "description": "hunt",
+    "target": [10, 15],
+    "prizes": ["id:basic_crate:1", "id:incredible_gun:7"],
+    "type": "daily"
+  },
+  "hunt_weekly": {
+    "id": "hunt_weekly",
+    "name": "huntr",
+    "description": "hunt",
+    "target": [50, 75, 100],
+    "prizes": ["id:basic_crate:2", "id:incredible_gun:15"],
+    "type": "weekly"
   }
 }
