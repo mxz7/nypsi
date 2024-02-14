@@ -51,6 +51,7 @@ export { lotteryTicketPrice };
 export let maxPrestige = 0;
 
 export function loadItems(crypto = true) {
+  maxPrestige = 0;
   const itemsFile: any = fs.readFileSync("./data/items.json");
   const achievementsFile: any = fs.readFileSync("./data/achievements.json");
   const workersFile: any = fs.readFileSync("./data/workers.json");
