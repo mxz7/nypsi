@@ -254,5 +254,21 @@
     "target": [2, 5],
     "prizes": ["id:lucky_scratch_card:2", "id:69420_crate:3"],
     "type": "weekly"
+  },
+  "wordles_daily": {
+    "id": "wordles_daily",
+    "name": "old man gamer",
+    "description": "win wordles",
+    "target": [2, 5, 7],
+    "prizes": ["id:basic_crate:1", "xp:100"],
+    "type": "daily"
+  },
+  "wordles_weekly": {
+    "id": "wordles_weekly",
+    "name": "old man gamer",
+    "description": "win wordles",
+    "target": [15, 25, 35],
+    "prizes": ["id:basic_crate:3", "xp:500"],
+    "type": "weekly"
   }
 }

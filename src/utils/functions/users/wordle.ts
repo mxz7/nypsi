@@ -1,6 +1,7 @@
 import { GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import { addProgress } from "../economy/achievements";
+import { addTaskProgress } from "../economy/tasks";
 
 export async function getWordleStats(member: GuildMember) {
   const query = await prisma.wordleStats.findUnique({
@@ -92,6 +93,8 @@ export async function addWordleGame(
         data: data,
       });
       addProgress(member.user.id, "wordle", 1);
+      await addTaskProgress(member.user.id, "wordles_daily");
+      await addTaskProgress(member.user.id, "wordles_weekly");
     } else {
       let data;
 
