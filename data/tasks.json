@@ -279,10 +279,26 @@
     "prizes": ["id:basic_crate:1", "xp:100"],
     "type": "daily"
   },
+  "pp_small": {
+    "id": "pp_small",
+    "name": "its just cold i swear",
+    "description": "get a below average pp size",
+    "target": [1],
+    "prizes": ["xp:100"],
+    "type": "daily"
+  },
   "pp": {
     "id": "pp",
-    "name": "its cold i swear",
-    "description": "check your pp size",
+    "name": "average joe",
+    "description": "get an average pp size",
+    "target": [1],
+    "prizes": ["xp:100"],
+    "type": "daily"
+  },
+  "pp_big": {
+    "id": "pp_big",
+    "name": "oh yeah baby girl",
+    "description": "get an above average pp size",
     "target": [1],
     "prizes": ["xp:100"],
     "type": "daily"
