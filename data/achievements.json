@@ -1281,5 +1281,45 @@
     "target": 15000,
     "description": "do 15,000 commands in a day",
     "prize": ["legendary_scratch_card:3", "omega_crate:1", "tag:discordian"]
+  },
+  "taskmaster_i": {
+    "id": "taskmaster_i",
+    "name": "taskmaster **I**",
+    "emoji": "📋",
+    "target": 10,
+    "description": "complete 10 tasks",
+    "prize": ["basic_crate:1"]
+  },
+  "taskmaster_ii": {
+    "id": "taskmaster_ii",
+    "name": "taskmaster **II**",
+    "emoji": "📋",
+    "target": 25,
+    "description": "complete 25 tasks",
+    "prize": ["lucky_scratch_card:1"]
+  },
+  "taskmaster_iii": {
+    "id": "taskmaster_iii",
+    "name": "taskmaster **III**",
+    "emoji": "📋",
+    "target": 100,
+    "description": "complete 100 tasks",
+    "prize": ["legendary_scratch_card:1"]
+  },
+  "taskmaster_iv": {
+    "id": "taskmaster_iv",
+    "name": "taskmaster **IV**",
+    "emoji": "📋",
+    "target": 250,
+    "description": "complete 250 tasks",
+    "prize": ["legendary_scratch_card:2"]
+  },
+  "taskmaster_v": {
+    "id": "taskmaster_v",
+    "name": "taskmaster **V**",
+    "emoji": "📋",
+    "target": 500,
+    "description": "complete 500 tasks",
+    "prize": ["legendary_scratch_card:3", "omega_crate:1"]
   }
 }

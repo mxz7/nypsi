@@ -10,6 +10,7 @@ import { addKarma } from "../karma/karma";
 import sleep from "../sleep";
 import { addInlineNotification } from "../users/notifications";
 import { getLastKnownAvatar } from "../users/tag";
+import { addProgress } from "./achievements";
 import { getBalance, updateBalance } from "./balance";
 import { addInventoryItem } from "./inventory";
 import { getItems, getTasksData, userExists } from "./utils";
@@ -283,6 +284,7 @@ export async function addTaskProgress(userId: string, taskId: string, amount = 1
     embed.setDescription(desc);
 
     addInlineNotification({ embed, memberId: task.user_id });
+    addProgress(task.user_id, "taskmaster", 1);
 
     if (task.type === "daily") addTaskProgress(task.user_id, "all_dailies");
   } else {
@@ -349,6 +351,7 @@ export async function setTaskProgress(userId: string, taskId: string, amount: nu
     embed.setDescription(desc);
 
     addInlineNotification({ embed, memberId: task.user_id });
+    addProgress(task.user_id, "taskmaster", 1);
 
     if (task.type === "daily") addTaskProgress(task.user_id, "all_dailies");
   } else {
