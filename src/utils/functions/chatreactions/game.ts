@@ -309,6 +309,8 @@ export async function startChatReactionDuel(
       if (winners.length === 1) {
         message.react("🏆");
         addProgress(message.author.id, "fast_typer", 1);
+        await addTaskProgress(message.author.id, "chat_reaction_daily");
+        addTaskProgress(message.author.id, "chat_reaction_weekly");
 
         winnings = wager * 2;
         tax = 0;
