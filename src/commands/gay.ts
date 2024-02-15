@@ -18,8 +18,6 @@ const cmd = new Command("gay", "very accurate gay level calculator", "fun").setA
   "lgbtdetector",
 ]);
 
-cmd.slashEnabled = true;
-cmd.slashData.addUserOption((option) => option.setName("user").setDescription("are u gay"));
 
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
