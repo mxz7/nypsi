@@ -278,5 +278,13 @@
     "target": [3, 5, 10],
     "prizes": ["id:basic_crate:1", "xp:100"],
     "type": "daily"
+  },
+  "pp": {
+    "id": "pp",
+    "name": "its cold i swear",
+    "description": "check your pp size",
+    "target": [1],
+    "prizes": ["xp:100"],
+    "type": "daily"
   }
 }
