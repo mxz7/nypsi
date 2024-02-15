@@ -2718,7 +2718,7 @@
     "rarity": 1,
     "role": "car",
     "speed": 2,
-    "aliases": ["mini"],
+    "aliases": ["mini" , "cooper"],
     "buy": 0,
     "sell": 17500,
     "in_crates": true
