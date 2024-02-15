@@ -133,7 +133,10 @@ async function run(
   send({ embeds: [embed] });
 
   addProgress(message.author.id, "unsure", 1);
-  addTaskProgress(message.author.id, "pp");
+
+  if (size < 5) addTaskProgress(message.author.id, "pp_small");
+  else if (size > 6) addTaskProgress(message.author.id, "pp_big");
+  else addTaskProgress(message.author.id, "pp");
 }
 
 cmd.setRun(run);
