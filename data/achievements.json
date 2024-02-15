@@ -504,7 +504,7 @@
     "emoji": "🏎️",
     "target": 1000,
     "description": "win 1,000 street races",
-    "prize": ["lucky_scratch_card:3"]
+    "prize": ["lucky_scratch_card:3", "skyline_r34:1"]
   },
   "racer_v": {
     "id": "racer_v",
@@ -512,7 +512,7 @@
     "emoji": "🏎️",
     "target": 5000,
     "description": "win 5,000 street races",
-    "prize": ["nypsi_crate:1", "lucky_scratch_card:4", "skyline_r34:1"]
+    "prize": ["nypsi_crate:1", "lucky_scratch_card:4", "lamborghini:1"]
   },
   "minesweeper_pro_i": {
     "id": "minesweeper_pro_i",
