@@ -105,17 +105,12 @@ export async function getTasks(userId: string): Promise<PrismaTask[]> {
     return JSON.parse(cache) as PrismaTask[];
   }
 
-  const query = await prisma.task
-    .findMany({
-      where: { user_id: userId },
-      orderBy: {
-        task_id: "asc",
-      },
-    })
-    .catch(() => {
-      taskGeneration.delete(userId);
-      return [];
-    });
+  const query = await prisma.task.findMany({
+    where: { user_id: userId },
+    orderBy: {
+      task_id: "asc",
+    },
+  });
 
   if (query.length < 6) {
     logger.debug(`${userId} less than 6 tasks`, { query });
@@ -134,6 +129,8 @@ export async function getTasks(userId: string): Promise<PrismaTask[]> {
       logger.debug(`${userId} generating weekly tasks`);
       await generateWeeklyTasks(userId, 3 - weekliesCount);
     }
+
+    await sleep(10);
 
     taskGeneration.delete(userId);
     return getTasks(userId);
@@ -155,7 +152,7 @@ export async function getTasks(userId: string): Promise<PrismaTask[]> {
           },
         },
       });
-    } else if (weeklies.length > 3) {
+    } else {
       await prisma.task.delete({
         where: {
           user_id_task_id: {
@@ -165,6 +162,11 @@ export async function getTasks(userId: string): Promise<PrismaTask[]> {
         },
       });
     }
+
+    await sleep(10);
+
+    taskGeneration.delete(userId);
+    return getTasks(userId);
   }
 
   await redis.set(
