@@ -9,6 +9,7 @@ import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { getBoosters } from "../utils/functions/economy/boosters";
+import { addTaskProgress } from "../utils/functions/economy/tasks";
 import { getItems } from "../utils/functions/economy/utils";
 import { getMember } from "../utils/functions/member";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
@@ -132,6 +133,7 @@ async function run(
   send({ embeds: [embed] });
 
   addProgress(message.author.id, "unsure", 1);
+  addTaskProgress(message.author.id, "pp");
 }
 
 cmd.setRun(run);
