@@ -26,6 +26,7 @@ import {
 } from "../utils/functions/economy/offers";
 import { formatNumber, getItems, isEcoBanned } from "../utils/functions/economy/utils";
 import { getMember } from "../utils/functions/member";
+import PageManager from "../utils/functions/page";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { getPreferences } from "../utils/functions/users/notifications";
 import { getLastKnownUsername } from "../utils/functions/users/tag";
@@ -312,21 +313,37 @@ async function run(
         });
       }
 
-      return send({
-        embeds: [
-          new CustomEmbed(
-            message.member,
-            `blocklist: \n\n${current
-              .map((i) => {
-                if (items[i]) return `${items[i].emoji} ${items[i].name}`;
-                if (message.guild.members.cache.has(i))
-                  return `\`${i}\` (${message.guild.members.cache.get(i).user.username})`;
-                return `\`${i}\``;
-              })
-              .join("\n")}`,
-          ).setHeader("offer blocklist", message.author.avatarURL()),
-        ],
+      const pages = PageManager.createPages(
+        current.map((i) => {
+          if (items[i]) return `${items[i].emoji} ${items[i].name}`;
+          if (message.guild.members.cache.has(i))
+            return `\`${i}\` (${message.guild.members.cache.get(i).user.username})`;
+          return `\`${i}\``;
+        }),
+      );
+
+      const embed = new CustomEmbed(message.member)
+        .setHeader("offer blocklist", message.author.avatarURL())
+        .setDescription(pages.get(1).join("\n"));
+
+      if (pages.size === 1) {
+        return send({ embeds: [embed] });
+      }
+
+      const row = PageManager.defaultRow();
+
+      const msg = await send({ embeds: [embed], components: [row] });
+
+      const manager = new PageManager({
+        embed,
+        pages,
+        row,
+        userId: message.author.id,
+        allowMessageDupe: true,
+        message: msg,
       });
+
+      return manager.listen();
     }
 
     const searchTag = args[1].toLowerCase();
