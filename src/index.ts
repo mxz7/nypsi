@@ -5,6 +5,7 @@ import { clearInterval } from "timers";
 import redis from "./init/redis";
 import { loadJobs, runJob } from "./scheduled/scheduler";
 import Constants from "./utils/Constants";
+import { loadItems } from "./utils/functions/economy/utils";
 import { addFailedHeartbeat, sendHeartbeat } from "./utils/functions/heartbeat";
 import { updateStats } from "./utils/functions/topgg";
 import { getVersion } from "./utils/functions/version";
@@ -72,6 +73,8 @@ manager.on("clusterCreate", (cluster) => {
       return runJob(message.split("trigger_job_")[1]);
     } else if (typeof message === "string" && message === "reload_jobs") {
       return loadJobs(manager);
+    } else if (typeof message === "string" && message === "reload_items") {
+      return loadItems();
     }
   });
   logger.info(`launched cluster ${cluster.id}`);
