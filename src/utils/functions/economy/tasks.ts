@@ -108,57 +108,64 @@ export async function getTasks(userId: string): Promise<PrismaTask[]> {
     },
   });
 
-  if (query.length < 6) {
-    logger.debug(`${userId} less than 6 tasks`, { query });
+  try {
+    if (query.length < 6) {
+      logger.debug(`${userId} less than 6 tasks`, { query });
 
-    const dailiesCount = query.filter((t) => t.type === "daily").length;
-    const weekliesCount = query.length - dailiesCount;
+      const dailiesCount = query.filter((t) => t.type === "daily").length;
+      const weekliesCount = query.length - dailiesCount;
 
-    if (dailiesCount < 3) {
-      logger.debug(`${userId} generating daily tasks`);
-      await generateDailyTasks(userId, 3 - dailiesCount);
-    }
+      if (dailiesCount < 3) {
+        logger.debug(`${userId} generating daily tasks`);
+        await generateDailyTasks(userId, 3 - dailiesCount);
+      }
 
-    if (weekliesCount < 3) {
-      logger.debug(`${userId} generating weekly tasks`);
-      await generateWeeklyTasks(userId, 3 - weekliesCount);
-    }
+      if (weekliesCount < 3) {
+        logger.debug(`${userId} generating weekly tasks`);
+        await generateWeeklyTasks(userId, 3 - weekliesCount);
+      }
 
-    await sleep(10);
+      await sleep(10);
 
-    taskGeneration.delete(userId);
-    return getTasks(userId);
-  } else if (query.length > 6) {
-    const dailies = query.filter((i) => i.type === "daily");
-    const weeklies = query.filter((i) => i.type === "weekly");
+      taskGeneration.delete(userId);
+      return getTasks(userId);
+    } else if (query.length > 6) {
+      const dailies = query.filter((i) => i.type === "daily");
+      const weeklies = query.filter((i) => i.type === "weekly");
 
-    logger.debug(`${userId} more than 6 tasks`, {
-      dailies: dailies.length,
-      weeklies: weeklies.length,
-    });
-
-    if (dailies.length > 3) {
-      await prisma.task.delete({
-        where: {
-          user_id_task_id: {
-            task_id: dailies[0].task_id,
-            user_id: dailies[0].user_id,
-          },
-        },
+      logger.debug(`${userId} more than 6 tasks`, {
+        dailies: dailies.length,
+        weeklies: weeklies.length,
       });
-    } else {
-      await prisma.task.delete({
-        where: {
-          user_id_task_id: {
-            task_id: weeklies[0].task_id,
-            user_id: weeklies[0].user_id,
+
+      if (dailies.length > 3) {
+        await prisma.task.delete({
+          where: {
+            user_id_task_id: {
+              task_id: dailies[0].task_id,
+              user_id: dailies[0].user_id,
+            },
           },
-        },
-      });
+        });
+      } else {
+        await prisma.task.delete({
+          where: {
+            user_id_task_id: {
+              task_id: weeklies[0].task_id,
+              user_id: weeklies[0].user_id,
+            },
+          },
+        });
+      }
+
+      await sleep(10);
+
+      taskGeneration.delete(userId);
+      return getTasks(userId);
     }
-
-    await sleep(10);
-
+  } catch (e) {
+    logger.error(`caught error generating tasks`, { error: e });
+    await redis.del(`${Constants.redis.cache.economy.TASKS}:${userId}`);
     taskGeneration.delete(userId);
     return getTasks(userId);
   }
