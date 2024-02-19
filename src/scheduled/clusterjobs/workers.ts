@@ -24,6 +24,7 @@ import ms = require("ms");
 import dayjs = require("dayjs");
 
 async function doWorkerThing() {
+  const start = performance.now();
   const query = await prisma.economyWorker.findMany({
     include: {
       upgrades: true,
@@ -196,7 +197,10 @@ async function doWorkerThing() {
     }
   }
 
+  const end = performance.now();
+
   if (amount > 0) logger.info(`${amount} worker notifications queued`);
+  logger.debug(`time taken for workers: ${Math.floor(end - start) / 1000}s`);
 }
 
 export function runWorkerInterval() {
