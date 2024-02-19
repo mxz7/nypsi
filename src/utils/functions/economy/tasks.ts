@@ -111,8 +111,6 @@ export async function getTasks(userId: string): Promise<PrismaTask[]> {
   if (query.length < 6) {
     logger.debug(`${userId} less than 6 tasks`, { query });
 
-    console.trace();
-
     const dailiesCount = query.filter((t) => t.type === "daily").length;
     const weekliesCount = query.length - dailiesCount;
 
