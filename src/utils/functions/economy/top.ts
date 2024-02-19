@@ -42,9 +42,7 @@ export async function topBalance(guild: Guild, userId?: string) {
       money: true,
       banned: true,
     },
-    orderBy: {
-      money: "desc",
-    },
+    orderBy: [{ money: "desc" }, { user: { lastKnownUsername: "asc" } }],
     take: 100,
   });
 
@@ -108,9 +106,7 @@ export async function topBalanceGlobal(amount: number, allowHidden = true): Prom
         },
       },
     },
-    orderBy: {
-      money: "desc",
-    },
+    orderBy: [{ money: "desc" }, { user: { lastKnownUsername: "asc" } }],
     take: amount,
   });
 
@@ -170,9 +166,7 @@ export async function topNetWorthGlobal(userId: string, amount = 100) {
         },
       },
     },
-    orderBy: {
-      netWorth: "desc",
-    },
+    orderBy: [{ netWorth: "desc" }, { user: { lastKnownUsername: "asc" } }],
     take: amount,
   });
 
@@ -343,7 +337,7 @@ export async function topPrestige(guild: Guild, userId?: string) {
       level: true,
       banned: true,
     },
-    orderBy: [{ prestige: "desc" }, { level: "desc" }],
+    orderBy: [{ prestige: "desc" }, { level: "desc" }, { user: { lastKnownUsername: "asc" } }],
     take: 100,
   });
 
@@ -410,7 +404,7 @@ export async function topPrestigeGlobal(userId: string, amount = 100) {
         },
       },
     },
-    orderBy: [{ prestige: "desc" }, { level: "desc" }],
+    orderBy: [{ prestige: "desc" }, { level: "desc" }, { user: { lastKnownUsername: "asc" } }],
     take: amount,
   });
 
@@ -492,9 +486,7 @@ export async function topItem(guild: Guild, item: string, userId: string) {
         },
       },
     },
-    orderBy: {
-      amount: "desc",
-    },
+    orderBy: [{ amount: "desc" }, { economy: { user: { lastKnownUsername: "asc" } } }],
     take: 100,
   });
 
@@ -565,9 +557,7 @@ export async function topItemGlobal(item: string, userId: string, amount = 100) 
         },
       },
     },
-    orderBy: {
-      amount: "desc",
-    },
+    orderBy: [{ amount: "desc" }, { economy: { user: { lastKnownUsername: "asc" } } }],
     take: amount,
   });
 
@@ -734,7 +724,7 @@ export async function topGuilds(guildName?: string) {
       guildName: true,
       level: true,
     },
-    orderBy: [{ level: "desc" }, { xp: "desc" }, { balance: "desc" }],
+    orderBy: [{ level: "desc" }, { xp: "desc" }, { balance: "desc" }, { guildName: "asc" }],
     take: 100,
   });
 
@@ -790,9 +780,7 @@ export async function topDailyStreak(guild: Guild, userId?: string) {
       dailyStreak: true,
       banned: true,
     },
-    orderBy: {
-      dailyStreak: "desc",
-    },
+    orderBy: [{ dailyStreak: "desc" }, { user: { lastKnownUsername: "asc" } }],
     take: 100,
   });
 
@@ -855,9 +843,7 @@ export async function topDailyStreakGlobal(userId: string, amount = 100) {
         },
       },
     },
-    orderBy: {
-      dailyStreak: "desc",
-    },
+    orderBy: [{ dailyStreak: "desc" }, { user: { lastKnownUsername: "asc" } }],
     take: amount,
   });
 
@@ -1250,9 +1236,7 @@ export async function topCommand(guild: Guild, command: string, userId: string) 
       userId: true,
       uses: true,
     },
-    orderBy: {
-      uses: "desc",
-    },
+    orderBy: [{ uses: "desc" }, { user: { lastKnownUsername: "asc" } }],
     take: 100,
   });
 
@@ -1309,9 +1293,7 @@ export async function topCommandGlobal(command: string, userId: string) {
         },
       },
     },
-    orderBy: {
-      uses: "desc",
-    },
+    orderBy: [{ uses: "desc" }, { user: { lastKnownUsername: "asc" } }],
     take: 100,
   });
 
@@ -1511,7 +1493,7 @@ export async function topVote(guild: Guild, userId?: string) {
       seasonVote: true,
       banned: true,
     },
-    orderBy: [{ seasonVote: "desc" }, { lastVote: "asc" }],
+    orderBy: [{ seasonVote: "desc" }, { lastVote: "asc" }, { user: { lastKnownUsername: "asc" } }],
     take: 100,
   });
 
@@ -1582,7 +1564,7 @@ export async function topVoteGlobal(userId: string, amount = 100) {
         },
       },
     },
-    orderBy: [{ seasonVote: "desc" }, { lastVote: "asc" }],
+    orderBy: [{ seasonVote: "desc" }, { lastVote: "asc" }, { user: { lastKnownUsername: "asc" } }],
     take: amount,
   });
 
