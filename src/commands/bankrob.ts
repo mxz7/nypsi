@@ -16,6 +16,7 @@ import { addProgress } from "../utils/functions/economy/achievements.js";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance.js";
 import { getInventory, setInventoryItem } from "../utils/functions/economy/inventory.js";
 import { createGame } from "../utils/functions/economy/stats.js";
+import { addTaskProgress } from "../utils/functions/economy/tasks";
 import { createUser, userExists } from "../utils/functions/economy/utils.js";
 import {
   addToNypsiBank,
@@ -28,7 +29,6 @@ import {
   getResponse,
   onCooldown,
 } from "../utils/handlers/cooldownhandler.js";
-import { addTaskProgress } from "../utils/functions/economy/tasks";
 
 const cmd = new Command("bankrob", "attempt to rob a bank for a high reward", "money");
 
@@ -162,7 +162,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       await Promise.all([
         updateBalance(message.member, (await getBalance(message.member)) + stolen),
         addProgress(message.author.id, "robber", 1),
-        addTaskProgress(message.author.id, "bank_thief"),
+        addTaskProgress(message.author.id, "thief"),
       ]);
 
       await removeFromNypsiBankBalance(stolen);
