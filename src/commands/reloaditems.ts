@@ -1,4 +1,5 @@
 import { CommandInteraction, Message } from "discord.js";
+import { exec } from "node:child_process";
 import prisma from "../init/database";
 import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction } from "../models/Command";
@@ -23,6 +24,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     .then((count) => {
       if (count.count > 0) logger.info(`${count} invalid tasks deleted`);
     });
+
+  exec(`redis-cli KEYS "*economy:task*" | xargs redis-cli DEL`);
 
   return (message as Message).react("✅");
 }
