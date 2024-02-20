@@ -349,6 +349,9 @@ async function run(
     let desc = `💰 $${(await getBalance(message.member)).toLocaleString()}\n\n`;
 
     const userWorker = userWorkers.find((w) => w.workerId == worker.id);
+
+    if (!userWorker) return send({ embeds: [new ErrorEmbed("you don't have this worker")] });
+
     const baseUpgrades = getBaseUpgrades();
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder().setCustomId("ba").setLabel("back").setStyle(ButtonStyle.Danger),
