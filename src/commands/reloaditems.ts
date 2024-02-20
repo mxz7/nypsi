@@ -22,7 +22,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       },
     })
     .then((count) => {
-      if (count.count > 0) logger.info(`${count} invalid tasks deleted`);
+      if (count.count > 0) logger.info(`${count.count} invalid tasks deleted`);
     });
 
   exec(`redis-cli KEYS "*economy:task*" | xargs redis-cli DEL`);
