@@ -122,6 +122,7 @@ export default class ScratchCard {
 
   public async clicked(interaction: ButtonInteraction) {
     const [y, x] = interaction.customId.split("-").map((i) => parseInt(i));
+    if (this.area[y][x].endsWith(":x")) return;
     this.area[y][x] += ":x";
     this.remainingClicks--;
 
