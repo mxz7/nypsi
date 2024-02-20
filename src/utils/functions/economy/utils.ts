@@ -404,11 +404,7 @@ export async function reset() {
   const deleted = await prisma.economy
     .deleteMany({
       where: {
-        AND: [
-          { prestige: 0 },
-          { lastVote: { lt: new Date(Date.now() - ms("12 hours")) } },
-          { dailyStreak: { lt: 2 } },
-        ],
+        AND: [{ prestige: 0 }, { dailyStreak: 0 }, { level: 0 }],
       },
     })
     .then((r) => r.count);
