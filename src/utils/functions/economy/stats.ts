@@ -155,9 +155,9 @@ export async function createGame(
   if (opts.result === "win") {
     addTaskProgress(opts.userId, "gamble_daily");
     addTaskProgress(opts.userId, "gamble_weekly");
-    addTaskProgress(opts.userId, "gamble_streak");
+    if (!opts.game.includes("scratch")) addTaskProgress(opts.userId, "gamble_streak");
   } else {
-    setTaskProgress(opts.userId, "gamble_streak", 0);
+    if (!opts.game.includes("scratch")) setTaskProgress(opts.userId, "gamble_streak", 0);
   }
 
   addProgress(opts.userId, "gambler", 1);
