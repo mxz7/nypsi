@@ -190,7 +190,7 @@ export default async function messageCreate(message: Message) {
     } else {
       let fail = false;
 
-      if (lastContents.last > Date.now() - 30000) {
+      if (lastContents.last > Date.now() - 15000) {
         fail = true;
       } else {
         for (const content of lastContents.history) {
