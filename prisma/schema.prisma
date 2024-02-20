@@ -630,7 +630,7 @@ model EconomyGuild {
   xp        BigInt   @default(0)
   tokens    Int      @default(0)
   level     Int      @default(1)
-  motd      String   @default("welcome to the guild fool (/guild motd)")
+  motd      String   @default("/guild motd")
 
   owner   Economy @relation(fields: [ownerId], references: [userId], onDelete: Cascade)
   ownerId String  @unique
