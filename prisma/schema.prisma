@@ -83,7 +83,6 @@ model Leaderboards {
 
   @@unique([leaderboard, position])
   @@unique([userId, leaderboard])
-  @@index([userId])
 }
 
 model DMSettings {
