@@ -125,8 +125,9 @@ export async function getTasks(userId: string): Promise<PrismaTask[]> {
         await generateWeeklyTasks(userId, 3 - weekliesCount);
       }
 
-      await sleep(10);
+      await sleep(50);
 
+      logger.debug(`${userId} done generating tasks`);
       taskGeneration.delete(userId);
       return getTasks(userId);
     } else if (query.length > 6) {
