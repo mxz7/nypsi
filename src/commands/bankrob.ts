@@ -254,8 +254,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const pageManager: any = async () => {
     const res = await msg
       .awaitMessageComponent({ filter, time: 60_000 })
-      .then(async (i) => {
-        await i.deferUpdate();
+      .then((i) => {
+        setTimeout(() => {
+          if (!i.replied) i.deferUpdate().catch(() => {});
+        }, 2000);
+
         return i;
       })
       .catch(() => {});
@@ -268,9 +271,14 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (res.customId == "ro") {
       const newEmbed = await robBank("nypsi");
 
-      if (!newEmbed) return await res.message.edit({ components: [] });
+      if (!newEmbed)
+        return await res
+          .update({ components: [] })
+          .catch(() => res.message.edit({ components: [] }));
 
-      await res.message.edit({ embeds: [newEmbed], components: [] });
+      await res
+        .update({ embeds: [newEmbed], components: [] })
+        .then(() => res.message.edit({ embeds: [newEmbed], components: [] }));
       return;
     }
   };
