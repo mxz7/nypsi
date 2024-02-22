@@ -123,7 +123,7 @@
     "id": "eat_cookies",
     "name": "cookie monster",
     "description": "eat cookies",
-    "target": [25, 100, 150],
+    "target": [25, 50, 75],
     "prizes": ["id:lucky_scratch_card:1", "id:basic_crate:1", "id:69420_crate:1"],
     "type": "daily"
   },
