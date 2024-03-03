@@ -1007,7 +1007,11 @@ export async function runCommand(
       if (message instanceof Message) {
         message.reply({ embeds: [embed] });
       } else {
-        message.followUp({ embeds: [embed] });
+        message.followUp({ embeds: [embed] }).catch(() => {
+          setTimeout(() => {
+            message.followUp({ embeds: [embed] }).catch(() => {});
+          }, 2500);
+        });
       }
     }
 
@@ -1036,7 +1040,11 @@ export async function runCommand(
       if (message instanceof Message) {
         message.reply({ embeds });
       } else {
-        message.followUp({ embeds, ephemeral: true });
+        message.followUp({ embeds: embeds, ephemeral: true }).catch(() => {
+          setTimeout(() => {
+            message.followUp({ embeds: embeds, ephemeral: true }).catch(() => {});
+          }, 2500);
+        });
       }
     }
   }, 2000);
