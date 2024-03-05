@@ -33,14 +33,14 @@ export async function hasProfile(member: GuildMember | string) {
     await redis.set(`${Constants.redis.cache.user.EXISTS}:${id}`, "true");
     await redis.expire(
       `${Constants.redis.cache.user.EXISTS}:${id}`,
-      Math.floor(ms("24 hour") / 1000),
+      Math.floor(ms("7 day") / 1000),
     );
     return true;
   } else {
     await redis.set(`${Constants.redis.cache.user.EXISTS}:${id}`, "false");
     await redis.expire(
       `${Constants.redis.cache.user.EXISTS}:${id}`,
-      Math.floor(ms("24 hour") / 1000),
+      Math.floor(ms("7 day") / 1000),
     );
     return false;
   }
