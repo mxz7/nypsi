@@ -169,10 +169,10 @@ export async function userExists(member: GuildMember | string): Promise<boolean>
 
   if (!id) return;
 
-  if (await redis.exists(`${Constants.redis.cache.economy.EXISTS}:${id}`)) {
-    return (await redis.get(`${Constants.redis.cache.economy.EXISTS}:${id}`)) === "true"
-      ? true
-      : false;
+  const cache = await redis.get(`${Constants.redis.cache.economy.EXISTS}:${id}`);
+
+  if (cache) {
+    return cache === "true" ? true : false;
   }
 
   const query = await prisma.economy.findUnique({
@@ -186,11 +186,11 @@ export async function userExists(member: GuildMember | string): Promise<boolean>
 
   if (query) {
     await redis.set(`${Constants.redis.cache.economy.EXISTS}:${id}`, "true");
-    await redis.expire(`${Constants.redis.cache.economy.EXISTS}:${id}`, ms("12 hour") / 1000);
+    await redis.expire(`${Constants.redis.cache.economy.EXISTS}:${id}`, ms("7 day") / 1000);
     return true;
   } else {
     await redis.set(`${Constants.redis.cache.economy.EXISTS}:${id}`, "false");
-    await redis.expire(`${Constants.redis.cache.economy.EXISTS}:${id}`, ms("12 hour") / 1000);
+    await redis.expire(`${Constants.redis.cache.economy.EXISTS}:${id}`, ms("7 day") / 1000);
     return false;
   }
 }
