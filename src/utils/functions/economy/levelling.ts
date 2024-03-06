@@ -426,7 +426,7 @@ async function doLevelUp(
       };
     }
 
-    if (rawLevel % 150 === 0) {
+    if (rawLevel % 200 === 0) {
       await addInventoryItem(member, "nypsi_crate", 1);
 
       if (levelData?.text) {
