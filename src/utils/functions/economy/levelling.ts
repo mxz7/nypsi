@@ -426,7 +426,7 @@ async function doLevelUp(
       };
     }
 
-    if (level % 150 === 0) {
+    if (rawLevel % 150 === 0) {
       await addInventoryItem(member, "nypsi_crate", 1);
 
       if (levelData?.text) {
@@ -438,7 +438,7 @@ async function doLevelUp(
       }
     }
 
-    if (level % 69 === 0) {
+    if (rawLevel % 69 === 0) {
       await addInventoryItem(member, "69420_crate", 5);
 
       if (levelData?.text) {
@@ -450,19 +450,19 @@ async function doLevelUp(
       }
     }
 
-    if (level % 500 === 0) {
-      await addInventoryItem(member, "bronze_credit", 2);
+    if (rawLevel % 750 === 0) {
+      await addInventoryItem(member, "bronze_credit", 1);
 
       if (levelData?.text) {
-        levelData.text += "\n- `2x` <:nypsi_bronze:1108083689478443058> bronze credit";
+        levelData.text += "\n- `1x` <:nypsi_bronze:1108083689478443058> bronze credit";
       } else {
         levelData = {
-          text: "you have received:\n" + "- `2x` <:nypsi_bronze:1108083689478443058> bronze credit",
+          text: "you have received:\n" + "- `1x` <:nypsi_bronze:1108083689478443058> bronze credit",
         };
       }
     }
 
-    if (level % 1000 === 0) {
+    if (rawLevel % 1500 === 0) {
       await addInventoryItem(member, "omega_crate", 1);
 
       if (levelData?.text) {
@@ -474,7 +474,7 @@ async function doLevelUp(
       }
     }
 
-    if (level % 50 === 0) {
+    if (rawLevel % 50 === 0) {
       const boosters = await getBoosters(member);
 
       if (!boosters.has("xp_booster")) {
