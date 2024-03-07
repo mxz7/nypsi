@@ -10,7 +10,11 @@ import {
 import { inPlaceSort } from "fast-sort";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
-import { getChatFilter, updateChatFilter } from "../utils/functions/guilds/filters";
+import {
+  checkMessageContentNoModLog,
+  getChatFilter,
+  updateChatFilter,
+} from "../utils/functions/guilds/filters";
 import { getPercentMatch, getPrefix, setPercentMatch } from "../utils/functions/guilds/utils";
 import PageManager from "../utils/functions/page";
 
@@ -205,6 +209,22 @@ async function run(
     const embed = new CustomEmbed(message.member, "✅ filter has been reset").setHeader(
       "chat filter",
     );
+
+    return message.channel.send({ embeds: [embed] });
+  }
+
+  if (args[0].toLowerCase() == "test") {
+    const content = args.slice(1, args.length).join(" ").toLowerCase().normalize("NFD");
+    const check = await checkMessageContentNoModLog(content, message.guild);
+    let embed;
+    if (check.filtered) {
+      embed = new CustomEmbed(message.member).setHeader("chat filter test");
+      embed.setDescription(
+        `\`${content}\` was found in the filter with a similarity of **${check.similarity}%**`,
+      );
+    } else {
+      embed = new ErrorEmbed(`\`${content}\` was not found in the filter`);
+    }
 
     return message.channel.send({ embeds: [embed] });
   }
