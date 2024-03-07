@@ -95,6 +95,59 @@ export async function updateChatFilter(guild: Guild, array: string[]) {
 
   if (chatFilterCache.has(guild.id)) chatFilterCache.delete(guild.id);
 }
+export async function checkMessageContentNoModLog(content: string, guild: Guild) {
+  const [filter, match] = await Promise.all([getChatFilter(guild), getPercentMatch(guild)]);
+
+  if (content.length >= 69) {
+    for (const word of filter) {
+      if (word.includes(" ")) {
+        if (content.includes(word.toLowerCase())) {
+          const contentModified = content.replace(word, `**${word}**`);
+          return {
+            filtered: true,
+            contentModified,
+          };
+        }
+      } else {
+        if (content.split(" ").indexOf(word.toLowerCase()) != -1) {
+          const contentModified = content.replace(word, `**${word}**`);
+          return {
+            filtered: true,
+            contentModified,
+          };
+        }
+      }
+    }
+  } else {
+    for (const word of filter) {
+      if (word.includes(" ")) {
+        if (content.includes(word.toLowerCase())) {
+          const contentModified = content.replace(word, `**${word}**`);
+          return {
+            filtered: true,
+            contentModified,
+          };
+        }
+      } else {
+        for (const contentWord of content.split(" ")) {
+          const similarity = stringSimilarity.compareTwoStrings(word, contentWord);
+
+          if (similarity >= match / 100) {
+            const contentModified = content.replace(contentWord, `**${contentWord}**`);
+            return {
+              filtered: true,
+              contentModified,
+              similarity: (similarity * 100).toFixed(2),
+            };
+          }
+        }
+      }
+    }
+  }
+  return {
+    filtered: false,
+  };
+}
 
 export async function checkMessageContent(message: Message) {
   const [filter, match] = await Promise.all([
