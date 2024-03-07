@@ -96,10 +96,7 @@ export async function updateChatFilter(guild: Guild, array: string[]) {
   if (chatFilterCache.has(guild.id)) chatFilterCache.delete(guild.id);
 }
 export async function checkMessageContentNoModLog(content: String, guild: Guild) {
-  const [filter, match] = await Promise.all([
-    getChatFilter(guild),
-    getPercentMatch(guild),
-  ]);
+  const [filter, match] = await Promise.all([getChatFilter(guild), getPercentMatch(guild)]);
 
   if (content.length >= 69) {
     for (const word of filter) {
