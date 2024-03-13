@@ -197,7 +197,7 @@ async function run(
             : milf.guildName
         }**\n\n` +
           `go ahead and send [**${
-            tag ? `[${getTagsData()[tag.tagId].emoji}]` : ""
+            tag ? `[${getTagsData()[tag.tagId].emoji}] ` : ""
           }${await getLastKnownUsername(milf.userId)}**](https://nypsi.xyz/user/${
             milf.userId
           }) a *private* message 😉😏`,
@@ -210,7 +210,7 @@ async function run(
               ? "[nypsi](https://discord.gg/hJTDNST)"
               : milf.guildName
           }**\n\n` +
-            `[**${tag ? `[${getTagsData()[tag.tagId].emoji}]` : ""}${await getLastKnownUsername(
+            `[**${tag ? `[${getTagsData()[tag.tagId].emoji}] ` : ""}${await getLastKnownUsername(
               milf.userId,
             )}**](https://nypsi.xyz/user/${milf.userId}) - ${milf.description}\n\n` +
             "go ahead and send them a *private* message 😉😏",
@@ -234,7 +234,7 @@ async function run(
             ? "[nypsi](https://discord.gg/hJTDNST)"
             : message.guild.name
         }**\n\ngo ahead and send [${
-          authorTag ? `[${getTagsData()[authorTag.tagId].emoji}]` : ""
+          authorTag ? `[${getTagsData()[authorTag.tagId].emoji}] ` : ""
         }**${message.author.username}**](https://nypsi.xyz/user/${
           message.author.id
         }) a *private* message 😉😏`,
@@ -266,7 +266,7 @@ async function run(
               ? "[nypsi](https://discord.gg/hJTDNST)"
               : message.guild.name
           }**\n\n` +
-            `[${authorTag ? `[${getTagsData()[authorTag.tagId].emoji}]` : ""}**${
+            `[${authorTag ? `[${getTagsData()[authorTag.tagId].emoji}] ` : ""}**${
               message.author.username
             }**](https://nypsi.xyz/user/${message.author.id}) - ${description}\n\n` +
             "go ahead and send them a *private* message 😉😏",
