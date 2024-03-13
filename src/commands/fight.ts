@@ -38,7 +38,7 @@ const gifs = [
   "https://c.tenor.com/EkWAL6XhODIAAAAC/deji-boxing-deji.gif",
   "https://c.tenor.com/OHZwNy6nr5IAAAAC/conor-mcgregor-ufc.gif",
   "https://media.tenor.com/5bvwDvOIZ28AAAAd/ksi-knockout-ksiko.gif",
-  "https://tenor.com/view/ksi-elbow-joe-fournier-gif-9557003097386058166",
+  "https://c.tenor.com/hKFLrpEBAbYAAAAd/tenor.gif",
 ];
 
 async function run(
@@ -273,24 +273,20 @@ async function run(
   let ended = false;
 
   collector.on("collect", async (i) => {
-    await i.deferUpdate();
-
     if (ended) return;
 
     if (i.customId == "at") {
-      if (ended) return;
       if (i.user.id == message.author.id) {
         fight.homeHit();
       } else {
         fight.awayHit();
       }
     } else {
-      if (ended) return;
       if (i.user.id == message.author.id) {
         const res = fight.homeHeal();
 
         if (!res) {
-          await i.followUp({
+          await i.reply({
             embeds: [new CustomEmbed(message.member, "you have no more heals left")],
             ephemeral: true,
           });
@@ -300,7 +296,7 @@ async function run(
         const res = fight.awayHeal();
 
         if (!res) {
-          await i.followUp({
+          await i.reply({
             embeds: [new CustomEmbed(target, "you have no more heals left")],
             ephemeral: true,
           });
@@ -317,21 +313,23 @@ async function run(
 
       embed.setImage(gifs[Math.floor(Math.random() * gifs.length)]);
 
-      await msg.edit({ embeds: [embed], components: [] });
+      await i.update({ embeds: [embed], components: [] });
       collector.stop();
       return;
     }
 
-    if (lastUpdate < Date.now() - 1000) {
+    if (lastUpdate < Date.now() - 500) {
       lastUpdate = Date.now();
       const embed = fight.renderEmbed();
       if (ended) return;
 
       embed.disableFooter();
 
-      await msg.edit({ embeds: [embed] });
+      await i.update({ embeds: [embed] });
       return;
     }
+
+    if (!i.deferred && !i.replied) i.deferUpdate();
   });
 }
 
