@@ -39,6 +39,7 @@ model User {
   Tags           Tags[]
   Views          ProfileView[]
   Viewed         ProfileView[]    @relation(name: "viewer")
+  Sessions       Session[]
 }
 
 model ProfileView {
@@ -747,4 +748,11 @@ enum ImageType {
   dog
   capybara
   wholesome
+}
+
+model Session {
+  id        String   @id
+  userId    String
+  expiresAt DateTime
+  user      User     @relation(references: [id], fields: [userId], onDelete: Cascade)
 }
