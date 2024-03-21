@@ -59,7 +59,7 @@
     "id": "cats_daily",
     "name": "meow",
     "description": "look at pictures of cats",
-    "target": [5, 10, 10, 10, 10, 10, 25, 50, 100],
+    "target": [5, 10, 10, 10, 10, 10, 25],
     "prizes": ["id:basic_crate:1", "id:69420_crate:1", "xp:100"],
     "type": "daily"
   },
