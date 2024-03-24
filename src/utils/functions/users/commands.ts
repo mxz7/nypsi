@@ -74,6 +74,9 @@ export async function updateUser(user: User, command: string) {
   await redis.set(`${Constants.redis.cache.user.username}:${user.id}`, user.tag || "", "EX", 7200);
 
   await prisma.user.update({
+    select: {
+      id: true,
+    },
     where: {
       id: user.id,
     },
