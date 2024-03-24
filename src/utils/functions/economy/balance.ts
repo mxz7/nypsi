@@ -19,7 +19,6 @@ import { hasVoted } from "./vote";
 import { calcWorkerValues } from "./workers";
 import ms = require("ms");
 import _ = require("lodash");
-import { logger } from "../../logger";
 
 export async function getBalance(member: GuildMember | string) {
   let id: string;
@@ -868,6 +867,9 @@ export async function calcNetWorth(member: GuildMember | string, breakdown = fal
     },
     data: {
       netWorth: Math.floor(worth),
+    },
+    select: {
+      userId: true,
     },
   });
 
