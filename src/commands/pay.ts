@@ -136,7 +136,7 @@ async function run(
   if (target.user.id == message.client.user.id) {
     await updateBalance(message.member, (await getBalance(message.member)) - amount);
     addStat(message.author.id, "spent-bank", amount);
-    await addToNypsiBank(amount, false);
+    await addToNypsiBank(amount);
 
     return send({
       embeds: [
@@ -163,7 +163,7 @@ async function run(
 
   if (tax > 0) {
     taxedAmount = Math.floor(amount * tax);
-    await addToNypsiBank(taxedAmount);
+    await addToNypsiBank(taxedAmount * 0.5);
     await updateBalance(target, (await getBalance(target)) + (amount - taxedAmount));
     addStat(target.user.id, "earned-pay", amount - taxedAmount);
   } else {
