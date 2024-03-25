@@ -155,7 +155,7 @@ async function run(
       tax = await getTax();
 
       const taxed = Math.floor(winnings * tax);
-      await addToNypsiBank(taxed);
+      await addToNypsiBank(taxed * 0.5);
       winnings -= taxed;
     }
 

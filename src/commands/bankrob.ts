@@ -205,7 +205,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
       await updateBalance(message.member, (await getBalance(message.member)) - totalLost);
 
-      await addToNypsiBank(totalLost * 0.9);
+      await addToNypsiBank(totalLost * 0.3);
 
       embed.setColor(Constants.EMBED_FAIL_COLOR);
 

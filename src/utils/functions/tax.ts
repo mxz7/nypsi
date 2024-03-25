@@ -28,7 +28,7 @@ async function updateTax() {
   return tax;
 }
 
-export async function addToNypsiBank(amount: number, reduce = true) {
+export async function addToNypsiBank(amount: number) {
   await prisma.economy
     .upsert({
       where: {
@@ -36,11 +36,7 @@ export async function addToNypsiBank(amount: number, reduce = true) {
       },
       update: {
         bank: {
-          increment: reduce
-            ? Math.floor(amount * 0.25) < 0
-              ? amount
-              : Math.floor(amount * 0.25)
-            : amount,
+          increment: amount,
         },
       },
       create: {

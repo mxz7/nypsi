@@ -144,7 +144,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       });
 
     functions.push(async () => {
-      await addToNypsiBank(taxedAmount);
+      await addToNypsiBank(taxedAmount * 0.7);
     });
     functions.push(async () => {
       await updateBalance(message.member, (await getBalance(message.member)) + total);
