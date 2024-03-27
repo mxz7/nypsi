@@ -196,7 +196,7 @@ async function run(
       }`,
     )
       .setHeader(
-        `you have received ${amount == 1 ? "an item" : `${amount.toLocaleString()} items`}`,
+        `you have received ${amount == 1 ? `${selected.article || "a"} ${selected.name}` : `${amount.toLocaleString()} ${selected.plural}`}`,
       )
       .setFooter({ text: "/settings me notifications" });
 
