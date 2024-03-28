@@ -137,7 +137,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       .setStyle(ButtonStyle.Primary)
       .setDisabled(true),
     new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
-    new ButtonBuilder().setCustomId("❌").setLabel("clear mentions").setStyle(ButtonStyle.Danger),
+    new ButtonBuilder().setCustomId("❌").setLabel("clear").setStyle(ButtonStyle.Danger),
   );
 
   if (pages.size === 1) {
