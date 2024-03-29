@@ -18,7 +18,7 @@
 
 ### 🍟 invite / use in your server
 
-invite link can be found at: [`invite.nypsi.xyz`](http://invite.nypsi.xyz)
+invite link can be found at: [`nypsi.xyz/invite`](https://nypsi.xyz/invite)
 
 ### 📔 documentation
 

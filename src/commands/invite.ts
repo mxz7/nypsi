@@ -9,7 +9,7 @@ const cmd = new Command("invite", "generate an invite link for the bot", "info")
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
   const embed = new CustomEmbed(
     message.member,
-    "bot invite: [invite.nypsi.xyz](http://invite.nypsi.xyz)\nsupport server: https://discord.gg/hJTDNST",
+    "bot invite: [nypsi.xyz/invite](https://nypsi.xyz/invite)\nsupport server: https://discord.gg/hJTDNST",
   )
     .setHeader("nypsi")
     .setFooter({ text: "made by tekoh | github.com/tekoh" });
