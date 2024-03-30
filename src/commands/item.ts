@@ -191,7 +191,10 @@ async function run(
     }
   } else {
     try {
-      thumbnail = parse(selected.emoji, { assetType: "png" })[0].url;
+      thumbnail = parse(selected.emoji, { assetType: "png" })[0].url.replace(
+        "https://twemoji.maxcdn.com/v/latest/",
+        "https://jdecked.github.io/twemoji/v/latest/",
+      );
     } catch {
       /* happy linter */
     }
