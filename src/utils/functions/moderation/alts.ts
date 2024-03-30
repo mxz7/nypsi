@@ -77,7 +77,7 @@ export async function getAllGroupAccountIds(guild: Guild | string, userId: strin
   if (cache) {
     const parsed = JSON.parse(cache) as { mainId: string; altId: string }[];
 
-    if (parsed.length === 0) return [];
+    if (parsed.length === 0) return [userId];
     return [parsed[0].mainId, ...parsed.map((i) => i.altId)];
   }
 
