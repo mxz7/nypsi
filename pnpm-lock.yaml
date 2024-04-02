@@ -24,8 +24,8 @@ dependencies:
     specifier: 4.0.8
     version: 4.0.8
   captcha-canvas:
-    specifier: 3.2.1
-    version: 3.2.1
+    specifier: 3.2.2
+    version: 3.2.2
   chalk:
     specifier: 4.1.2
     version: 4.1.2
@@ -1718,8 +1718,8 @@ packages:
     resolution: {integrity: sha512-ggIhCsTxmITBAMmK8yZjEhCO5/47jKXPu6Dha/wuCS4JePVL+3uiDEBuhu2aIoT+bqTOR8L76Ip1ARL9xYsEJA==}
     dev: true
 
-  /captcha-canvas@3.2.1:
-    resolution: {integrity: sha512-uOXuQtGM3ug6FiNNLZiK0eO5izrW4M3tato1lVpBDsjjZRF8mpxSAZ5kmqIeEz6yc3ecOUGN3RZqOvZcyi2KWA==}
+  /captcha-canvas@3.2.2:
+    resolution: {integrity: sha512-3GTUMTy16jwxM5UpDz9iSxcukUUKnEv5Jntmr1aHNoXMck68V/gMjqNr5L/ilwZdIXDrAI+jSQbFUSHlAgDUXg==}
     dependencies:
       skia-canvas: 1.0.1
     transitivePeerDependencies:
