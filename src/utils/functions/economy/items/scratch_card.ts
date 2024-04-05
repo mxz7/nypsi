@@ -239,7 +239,11 @@ async function prepare(
       );
 
       if (response.deferred || response.replied)
-        await msg.edit({ embeds: [embed], components: card.getButtons(card.remainingClicks == 0) });
+        await msg
+          .edit({ embeds: [embed], components: card.getButtons(card.remainingClicks == 0) })
+          .catch(() => {
+            redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+          });
       else
         await response
           .update({
@@ -247,7 +251,11 @@ async function prepare(
             components: card.getButtons(card.remainingClicks == 0),
           })
           .catch(() =>
-            msg.edit({ embeds: [embed], components: card.getButtons(card.remainingClicks == 0) }),
+            msg
+              .edit({ embeds: [embed], components: card.getButtons(card.remainingClicks == 0) })
+              .catch(() => {
+                redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+              }),
           );
     }
 
