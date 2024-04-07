@@ -1769,7 +1769,6 @@
     "rarity": 5,
     "role": "collectable",
     "sell": 50000000,
-    "speed": 6,
     "aliases": ["palm", "tree", "necklace"],
     "in_crates": true
   },
@@ -2098,6 +2097,7 @@
       "id:streak_token:50",
       "id:grandma:60",
       "id:grandpa:75",
+      "id:dave:1",
       "id:super_cursor:40",
       "id:oven:35",
       "id:diamond_pickaxe:40",
@@ -2737,5 +2737,17 @@
     "buy": 0,
     "sell": 100000,
     "in_crates": false
+  },
+  "dave": {
+    "id": "dave",
+    "name": "dave",
+    "plural": "daves",
+    "article": "a",
+    "emoji": "<:nypsi_dave:1226524341294858394>",
+    "longDesc": "meow meow meow meow meow meow meow meow",
+    "rarity": 5,
+    "role": "collectable",
+    "sell": 50000000,
+    "in_crates": true
   }
 }
