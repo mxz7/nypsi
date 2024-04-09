@@ -87,22 +87,42 @@ export async function getRandomImage(type: ImageType) {
   if (cache) {
     images = JSON.parse(cache) as Image[];
   } else {
-    images = await prisma.image.findMany({
-      where: {
-        type,
-      },
-    });
+    if (type !== "wholesome") {
+      images = await fetch(`https://animals.maxz.dev/api/${type}/all`).then((r) =>
+        r.json().then((i) => i.map((i: any) => ({ id: i.id, url: i.image, name: i.name }))),
+      );
 
-    await redis.set(`${Constants.redis.cache.IMAGE}:${type}`, JSON.stringify(images), "EX", 86400);
+      await redis.set(
+        `${Constants.redis.cache.IMAGE}:${type}`,
+        JSON.stringify(images),
+        "EX",
+        86400,
+      );
+    } else {
+      images = await prisma.image.findMany({
+        where: {
+          type,
+        },
+      });
+
+      await redis.set(
+        `${Constants.redis.cache.IMAGE}:${type}`,
+        JSON.stringify(images),
+        "EX",
+        86400,
+      );
+    }
   }
 
   const chosen = images[Math.floor(Math.random() * images.length)];
 
   // doesnt work if not awaited !?!?!??!!?
-  await prisma.image.update({
-    where: { id: chosen.id },
-    data: { views: { increment: 1 } },
-  });
+  await prisma.image
+    .update({
+      where: { id: chosen.id },
+      data: { views: { increment: 1 } },
+    })
+    .catch(() => null);
 
   return chosen;
 }
