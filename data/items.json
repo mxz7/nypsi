@@ -2124,7 +2124,7 @@
     "role": "scratch-card",
     "longDesc": "match 3 in a row to win!",
     "aliases": ["luckyscratch", "lscratch", "lscratchie"],
-    "rarity": 1,
+    "rarity": 3,
     "in_crates": true,
     "sell": 100000,
     "clicks": 6,
