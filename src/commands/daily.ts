@@ -78,7 +78,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     return send({ embeds: [embed] });
   }
 
-  if (percentChance(0.07) && !(await redis.exists(Constants.redis.nypsi.GEM_GIVEN))) {
+  if (percentChance(0.03) && !(await redis.exists(Constants.redis.nypsi.GEM_GIVEN))) {
     await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t");
     await redis.expire(Constants.redis.nypsi.GEM_GIVEN, Math.floor(ms("1 days") / 1000));
     await addInventoryItem(message.member, "blue_gem", 1);
