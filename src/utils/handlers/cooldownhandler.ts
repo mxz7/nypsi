@@ -167,8 +167,10 @@ async function calculateCooldownLength(
 
   const items = getItems();
 
-  if (Array.from(boosters.keys()).includes("redbull")) {
-    seconds = seconds * items["redbull"].boosterEffect.effect;
+  for (const id of boosters.keys()) {
+    if (items[id].boosterEffect.boosts.includes("cooldown")) {
+      seconds -= seconds * items[id].boosterEffect.effect;
+    }
   }
 
   if (seconds < 1) seconds = 1;
