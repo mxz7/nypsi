@@ -2749,5 +2749,86 @@
     "role": "collectable",
     "sell": 50000000,
     "in_crates": true
+  },
+  "football": {
+    "id": "football",
+    "name": "football",
+    "plural": "footballs",
+    "article": "a",
+    "emoji": "⚽",
+    "longDesc": "ITS FOOTBALL. NOT SOCCER. FLIP YOU SMELLY FAT AMERICANS",
+    "rarity": 0,
+    "role": "collectable",
+    "sell": 25000,
+    "in_crates": true
+  },
+  "american_football": {
+    "id": "american_football",
+    "name": "american football",
+    "plural": "american footballs",
+    "article": "an",
+    "emoji": "🏈",
+    "longDesc": "obviously the worse one",
+    "rarity": 0,
+    "role": "collectable",
+    "sell": 1,
+    "in_crates": true
+  },
+  "donut": {
+    "id": "donut",
+    "name": "donut",
+    "plural": "donuts",
+    "article": "a",
+    "aliases": ["doughnut"],
+    "emoji": "🍩",
+    "longDesc": "greggs obviously do the best ones",
+    "rarity": 1,
+    "role": "booster",
+    "sell": 25000,
+    "in_crates": true,
+    "boosterEffect": {
+      "boosts": ["multi", "sellmulti"],
+      "effect": 1,
+      "time": 180
+    },
+    "stackable": false
+  },
+  "sausageroll": {
+    "id": "sausageroll",
+    "name": "sausage roll",
+    "plural": "sausage rolls",
+    "article": "a",
+    "aliases": ["roll"],
+    "emoji": "<:nypsi_sausageroll:1227622815893684248>",
+    "longDesc": "this is what youre missing out on if youre not from the uk",
+    "rarity": 1,
+    "role": "booster",
+    "sell": 25000,
+    "in_crates": true,
+    "boosterEffect": {
+      "boosts": ["xp"],
+      "effect": 0.1,
+      "time": 180
+    },
+    "stackable": false
+  },
+  "apple_juice": {
+    "id": "apple_juice",
+    "name": "apple juice",
+    "plural": "apple juice",
+    "article": "an",
+    "aliases": ["appy joos", "appy", "joos", "juice", "apple"],
+    "emoji": "🧃",
+    "longDesc": "if you drink orange juice youre a massive loser",
+    "rarity": 2,
+    "role": "booster",
+    "sell": 50000,
+    "in_crates": true,
+    "boosterEffect": {
+      "boosts": ["cooldown"],
+      "effect": 0.1,
+      "time": 180
+    },
+    "stackable": false
   }
 }
