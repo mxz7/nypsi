@@ -223,7 +223,7 @@ async function completeAchievement(userId: string, achievementId: string) {
 
     await addNotificationToQueue(payload);
 
-    if (percentChance(0.7) && !(await redis.exists(Constants.redis.nypsi.GEM_GIVEN))) {
+    if (percentChance(0.07) && !(await redis.exists(Constants.redis.nypsi.GEM_GIVEN))) {
       await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t");
       await redis.expire(Constants.redis.nypsi.GEM_GIVEN, Math.floor(ms("1 days") / 1000));
       const gems = ["green_gem", "blue_gem", "purple_gem", "pink_gem"];

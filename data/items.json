@@ -2153,10 +2153,6 @@
       "id:nypsi_crate:20",
       "id:bronze_credit:1",
       "id:silver_credit:0.5",
-      "id:green_gem:2",
-      "id:blue_gem:2",
-      "id:purple_gem:1",
-      "id:gem_crate:0.2",
       "id:omega_crate:0.1"
     ],
     "random_drop_chance": 90
