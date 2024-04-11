@@ -158,10 +158,9 @@ model Economy {
   bankStorage BigInt @default(5000)
   netWorth    BigInt @default(0)
 
-  defaultBet  Int?
-  padlock     Boolean @default(false)
-  passive     Boolean @default(false)
-  garageSlots Int     @default(0)
+  defaultBet Int?
+  padlock    Boolean @default(false)
+  passive    Boolean @default(false)
 
   xp       BigInt @default(0)
   level    Int    @default(0)
