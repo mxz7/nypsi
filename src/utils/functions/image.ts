@@ -2,6 +2,7 @@ import { flavors } from "@catppuccin/palette";
 import { Image, ImageSuggestion, ImageType } from "@prisma/client";
 import { ClusterManager } from "discord-hybrid-sharding";
 import { ColorResolvable, User, WebhookClient } from "discord.js";
+import { parse } from "twemoji-parser";
 import prisma from "../../init/database";
 import redis from "../../init/redis";
 import { NypsiClient } from "../../models/Client";
@@ -284,4 +285,31 @@ export async function uploadImage(
   logger.info("uploaded image", { original: url, uploaded, content, type });
 
   return uploaded;
+}
+
+export function getEmojiImage(emoji: string) {
+  let image: string;
+
+  if (emoji.split(":")[2]) {
+    const emojiID = emoji.split(":")[2].slice(0, emoji.split(":")[2].length - 1);
+
+    image = `https://cdn.discordapp.com/emojis/${emojiID}`;
+
+    if (emoji.split(":")[0].includes("a")) {
+      image = image + ".gif";
+    } else {
+      image = image + ".png";
+    }
+  } else {
+    try {
+      image = parse(emoji, { assetType: "png" })[0].url.replace(
+        "https://twemoji.maxcdn.com/v/latest/",
+        "https://jdecked.github.io/twemoji/v/latest/",
+      );
+    } catch {
+      /* happy linter */
+    }
+  }
+
+  return image;
 }

@@ -8,7 +8,7 @@ import {
   Message,
   MessageActionRowComponentBuilder,
 } from "discord.js";
-import { parse } from "twemoji-parser";
+
 import prisma from "../init/database";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
@@ -20,6 +20,7 @@ import {
   selectItem,
 } from "../utils/functions/economy/inventory";
 import { createUser, userExists } from "../utils/functions/economy/utils";
+import { getEmojiImage } from "../utils/functions/image";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("item", "view information about an item", "money").setAliases(["i"]);
@@ -177,28 +178,7 @@ async function run(
 
   embed.setDescription(desc.join("\n"));
 
-  let thumbnail: string;
-
-  if (selected.emoji.split(":")[2]) {
-    const emojiID = selected.emoji.split(":")[2].slice(0, selected.emoji.split(":")[2].length - 1);
-
-    thumbnail = `https://cdn.discordapp.com/emojis/${emojiID}`;
-
-    if (selected.emoji.split(":")[0].includes("a")) {
-      thumbnail = thumbnail + ".gif";
-    } else {
-      thumbnail = thumbnail + ".png";
-    }
-  } else {
-    try {
-      thumbnail = parse(selected.emoji, { assetType: "png" })[0].url.replace(
-        "https://twemoji.maxcdn.com/v/latest/",
-        "https://jdecked.github.io/twemoji/v/latest/",
-      );
-    } catch {
-      /* happy linter */
-    }
-  }
+  const thumbnail = getEmojiImage(selected.emoji);
 
   embed.setThumbnail(thumbnail);
   const components: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [
