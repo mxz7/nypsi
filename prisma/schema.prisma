@@ -215,14 +215,14 @@ model CustomCar {
 }
 
 model CarUpgrade {
-  id String @id @default(uuid())
-
   createdAt DateTime       @default(now())
   type      CarUpgradeType
   amount    Int            @default(1)
 
   carId String
   car   CustomCar @relation(fields: [carId], references: [id], onDelete: Cascade)
+
+  @@id([carId, type])
 }
 
 enum CarUpgradeType {
