@@ -199,6 +199,37 @@ model Economy {
   OffersGiven        Offer[]             @relation(name: "owner")
   Upgrades           Upgrades[]
   Task               Task[]
+  CustomCar          CustomCar[]
+}
+
+model CustomCar {
+  id String @id @default(uuid())
+
+  createdAt DateTime @default(now())
+  level     CarLevel
+  name      String
+
+  userId   String
+  economy  Economy      @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  upgrades CarUpgrade[]
+}
+
+model CarUpgrade {
+  id String @id @default(uuid())
+
+  createdAt DateTime @default(now())
+  level     CarLevel
+  amount    Int      @default(1)
+
+  carId String
+  car   CustomCar @relation(fields: [carId], references: [id], onDelete: Cascade)
+}
+
+enum CarLevel {
+  common
+  rare
+  exotic
+  insane
 }
 
 model Task {
