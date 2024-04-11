@@ -153,13 +153,15 @@ model Achievements {
 }
 
 model Economy {
-  money       BigInt  @default(500)
-  bank        BigInt  @default(9500)
-  bankStorage BigInt  @default(5000)
-  netWorth    BigInt  @default(0)
+  money       BigInt @default(500)
+  bank        BigInt @default(9500)
+  bankStorage BigInt @default(5000)
+  netWorth    BigInt @default(0)
+
   defaultBet  Int?
   padlock     Boolean @default(false)
   passive     Boolean @default(false)
+  garageSlots Int     @default(0)
 
   xp       BigInt @default(0)
   level    Int    @default(0)
@@ -206,7 +208,6 @@ model CustomCar {
   id String @id @default(uuid())
 
   createdAt DateTime @default(now())
-  level     CarLevel
   name      String
 
   userId   String
@@ -217,19 +218,18 @@ model CustomCar {
 model CarUpgrade {
   id String @id @default(uuid())
 
-  createdAt DateTime @default(now())
-  level     CarLevel
-  amount    Int      @default(1)
+  createdAt DateTime       @default(now())
+  type      CarUpgradeType
+  amount    Int            @default(1)
 
   carId String
   car   CustomCar @relation(fields: [carId], references: [id], onDelete: Cascade)
 }
 
-enum CarLevel {
-  common
-  rare
-  exotic
-  insane
+enum CarUpgradeType {
+  engine
+  turbo
+  wheel
 }
 
 model Task {

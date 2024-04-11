@@ -2826,5 +2826,89 @@
       "time": 180
     },
     "stackable": false
+  },
+  "engine_upgrade_part": {
+    "id": "engine_upgrade_part",
+    "name": "engine upgrade part",
+    "plural": "engine upgrade parts",
+    "article": "a",
+    "aliases": ["eup"],
+    "emoji": "<:nypsi_engine_upgrade_part:1227972460755025970>",
+    "longDesc": "used to create an engine upgrade",
+    "rarity": 1,
+    "role": "car_part",
+    "sell": 10000,
+    "in_crates": true
+  },
+  "engine_upgrade": {
+    "id": "engine_upgrade",
+    "name": "engine upgrade",
+    "plural": "engine upgrades",
+    "article": "a",
+    "aliases": ["eu"],
+    "emoji": "<:nypsi_engine_upgrade:1227971592076791941>",
+    "longDesc": "upgrades base engine performance",
+    "role": "car_upgrade",
+    "sell": 100000,
+    "craft": {
+      "ingredients": ["engine_upgrade_part:10"],
+      "time": 172800
+    }
+  },
+  "turbo_upgrade_part": {
+    "id": "turbo_upgrade_part",
+    "name": "turbo upgrade part",
+    "plural": "turbo upgrade parts",
+    "article": "a",
+    "aliases": ["tup"],
+    "emoji": "<:nypsi_turbo_upgrade_part:1227978185262501941>",
+    "longDesc": "used to create a turbo upgrade",
+    "rarity": 3,
+    "role": "car_part",
+    "sell": 10000,
+    "in_crates": true
+  },
+  "turbo_upgrade": {
+    "id": "turbo_upgrade",
+    "name": "turbo upgrade",
+    "plural": "turbo upgrades",
+    "article": "a",
+    "aliases": ["tu"],
+    "emoji": "<:nypsi_turbo_upgrade:1227978377970057218>",
+    "longDesc": "boosts engine performance at speed",
+    "role": "car_upgrade",
+    "sell": 100000,
+    "craft": {
+      "ingredients": ["turbo_upgrade_part:6"],
+      "time": 604800
+    }
+  },
+  "wheel_upgrade_part": {
+    "id": "wheel_upgrade_part",
+    "name": "wheel upgrade part",
+    "plural": "wheel upgrade parts",
+    "article": "a",
+    "aliases": ["wup"],
+    "emoji": "<:nypsi_wheel_upgrade_part:1227979317565194335>",
+    "longDesc": "used to create a wheel upgrade",
+    "rarity": 4,
+    "role": "car_part",
+    "sell": 10000,
+    "in_crates": true
+  },
+  "wheel_upgrade": {
+    "id": "wheel_upgrade",
+    "name": "wheel upgrade",
+    "plural": "wheel upgrades",
+    "article": "a",
+    "aliases": ["wu"],
+    "emoji": "🛞",
+    "longDesc": "allows better power application",
+    "role": "car_upgrade",
+    "sell": 100000,
+    "craft": {
+      "ingredients": ["wheel_upgrade_part:4"],
+      "time": 604800
+    }
   }
 }
