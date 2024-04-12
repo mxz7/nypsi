@@ -9,6 +9,7 @@ export type Car = {
     amount: number;
   }[];
   name: string;
+  id: string;
 };
 
 const carEmojis = new Map<number, string>();
@@ -33,6 +34,7 @@ export async function getGarage(userId: string) {
         },
       },
       name: true,
+      id: true,
     },
   });
 
@@ -51,13 +53,13 @@ export function calcSpeed(car: Car) {
   const max = base * 1.5 + (car.upgrades.find((i) => i.type === "wheel")?.amount || 0) * 2.3;
   const turbo = car.upgrades.find((i) => i.type === "turbo")?.amount || 0;
 
-  base += car.upgrades.find((i) => i.type === "engine")?.amount * 1.5;
+  base += (car.upgrades.find((i) => i.type === "engine")?.amount || 0) * 1.5;
   if (base > max) base = max;
 
   return { speed: base, turbo };
 }
 
-export function getEmoji(car: Car) {
+export function getCarEmoji(car: Car) {
   const calc = calcSpeed(car);
   let speed = calc.speed + calc.turbo;
 
@@ -65,6 +67,7 @@ export function getEmoji(car: Car) {
 
   while (!emoji) {
     speed--;
+
     emoji = carEmojis.get(speed);
   }
 
@@ -110,4 +113,17 @@ export function calcCarCost(amount: number) {
   }
 
   return base;
+}
+
+export async function setCarName(userId: string, carId: string, name: string) {
+  await prisma.customCar.update({
+    where: {
+      id: carId,
+    },
+    data: {
+      name,
+    },
+  });
+
+  await redis.del(`${Constants.redis.cache.economy.GARAGE}:${userId}`);
 }
