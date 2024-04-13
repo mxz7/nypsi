@@ -78,6 +78,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     index = 0,
     msg?: Message,
     interaction?: ButtonInteraction | StringSelectMenuInteraction,
+    needsUpdate = true,
   ): Promise<any> => {
     const embed = new CustomEmbed(message.member).setHeader(
       `${message.author.username}'s garage`,
@@ -157,31 +158,35 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         description: `you can buy another custom car for $${calcCarCost(cars.length).toLocaleString()}`,
       });
 
-      embed.setDescription(pages[index].description);
-      if (pages[index].image) embed.setImage(pages[index].image);
-      pages[index].selectMenuOption.setDefault(true);
+      if (pages.length < 10) {
+        embed.setDescription(pages[index].description);
+        if (pages[index].image) embed.setImage(pages[index].image);
+        pages[index].selectMenuOption.setDefault(true);
+      }
 
-      const msgPayload: MessageEditOptions = {
-        embeds: [embed],
-        components: [
-          new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-            new StringSelectMenuBuilder()
-              .setCustomId("car")
-              .setOptions(pages.map((i) => i.selectMenuOption)),
-          ),
-          pages[index].buttonRow,
-        ],
-      };
+      if (needsUpdate) {
+        const msgPayload: MessageEditOptions = {
+          embeds: [embed],
+          components: [
+            new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+              new StringSelectMenuBuilder()
+                .setCustomId("car")
+                .setOptions(pages.map((i) => i.selectMenuOption)),
+            ),
+            pages[index].buttonRow,
+          ],
+        };
 
-      if (interaction) {
-        msg = await interaction
-          .update(msgPayload)
-          .then((r) => r.fetch())
-          .catch(() => msg.edit(msgPayload));
-      } else if (msg) {
-        msg = await msg.edit(msgPayload);
-      } else {
-        msg = await send(msgPayload);
+        if (interaction) {
+          msg = await interaction
+            .update(msgPayload)
+            .then((r) => r.fetch())
+            .catch(() => msg.edit(msgPayload));
+        } else if (msg) {
+          msg = await msg.edit(msgPayload);
+        } else {
+          msg = await send(msgPayload);
+        }
       }
 
       const pageManager = async (): Promise<any> => {
@@ -203,7 +208,22 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
               interaction,
             );
         } else if (interaction.componentType === ComponentType.Button) {
-          if (interaction.customId === "rename") {
+          if (interaction.customId === "new") {
+            const balance = await getBalance(message.author.id);
+            const cost = calcCarCost((await getGarage(message.author.id)).length);
+
+            if (balance < cost) {
+              await interaction.reply({
+                ephemeral: true,
+                embeds: [new ErrorEmbed("you cannot afford this")],
+              });
+              return showCars(cars, index, msg, undefined, false);
+            }
+
+            await addCar(message.author.id);
+            await updateBalance(message.author.id, balance - cost);
+            return showCars(await getGarage(message.author.id), index, msg, interaction);
+          } else if (interaction.customId === "rename") {
             const modal = new ModalBuilder()
               .setCustomId("rename_modal")
               .setTitle(`rename ${cars[index].name}`)
