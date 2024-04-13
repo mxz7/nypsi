@@ -17,7 +17,7 @@ import {
   StringSelectMenuOptionBuilder,
   User,
 } from "discord.js";
-import { inPlaceSort } from "fast-sort";
+import { inPlaceSort, sort } from "fast-sort";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { Item } from "../types/Economy";
@@ -362,6 +362,9 @@ class Race {
       if (winner) {
         this.ended = true;
 
+        const ordered = sort(this.members).desc((i) => i.position);
+        const diff = ordered[0].position - ordered[1].position;
+
         let description = this.message.embeds[0].description;
 
         const winnings = this.bet * this.members.length;
@@ -378,7 +381,7 @@ class Race {
         description +=
           `\n\n**${winner.username}** has won with their ${
             this.members.find((i) => i.user.id === winner.id).car.emoji
-          } **${this.members.find((i) => i.user.id === winner.id).car.car.name}**` +
+          } **${this.members.find((i) => i.user.id === winner.id).car.car.name}** by ${diff.toLocaleString()} distance` +
           `${
             this.bet
               ? `\n +
