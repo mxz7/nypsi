@@ -107,6 +107,11 @@ async function run(
     if (bet < 0)
       return send({ embeds: [new ErrorEmbed("/streetrace start <bet> (length) (speed limit)")] });
 
+    if (bet > (await calcMaxBet(message.member)) * 100)
+      return send({ embeds: [new ErrorEmbed("meow")] });
+
+    if (limit > 1000) return send({ embeds: [new ErrorEmbed("limit cannot be more than 1,000")] });
+
     if (length > 1000)
       return send({ embeds: [new ErrorEmbed("length cannot be more than 1,000")] });
 
