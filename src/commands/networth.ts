@@ -42,6 +42,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const itemValues: { itemId: string; value: number }[] = [];
 
   for (const [key, value] of net.breakdown.entries()) {
+    if (value <= 0) continue;
+
     if (key === "balance") {
       mainValues += `\n💰 $**${value.toLocaleString()}** (${((value / net.amount) * 100).toFixed(
         2,
