@@ -85,194 +85,161 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       message.author.avatarURL(),
     );
 
-    if (cars.length === 0) {
-      embed.setDescription("you don't have any custom cars. you can buy one for $75,000,000");
+    const pages: {
+      description: string;
+      image?: string;
+      selectMenuOption: StringSelectMenuOptionBuilder;
+      buttonRow: ActionRowBuilder<MessageActionRowComponentBuilder>;
+    }[] = [];
+
+    for (const car of cars) {
+      const calc = calcSpeed(car);
       const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder().setCustomId("buy").setLabel("buy").setStyle(ButtonStyle.Success),
+        new ButtonBuilder()
+          .setStyle(ButtonStyle.Secondary)
+          .setLabel("rename")
+          .setCustomId("rename"),
       );
 
-      const msg = await send({ embeds: [embed], components: [row] });
-
-      const reaction = await msg
-        .awaitMessageComponent({
-          filter: (i) => i.user.id === message.author.id,
-          time: 30000,
-          componentType: ComponentType.Button,
-        })
-        .catch(() => {});
-
-      if (!reaction) {
-        row.components[0].setDisabled(true);
-        return msg.edit({ components: [row] });
-      }
-
-      if (reaction.customId === "buy") {
-        const balance = await getBalance(message.author.id);
-
-        if (balance < 75_000_000)
-          return reaction.reply({ embeds: [new ErrorEmbed("you cannot afford this")] });
-
-        await updateBalance(message.author.id, balance - 75_000_000);
-        await addCar(message.author.id);
-        return showCars(await getGarage(message.author.id), 0, msg, reaction);
-      }
-    } else {
-      const pages: {
-        description: string;
-        image?: string;
-        selectMenuOption: StringSelectMenuOptionBuilder;
-        buttonRow: ActionRowBuilder<MessageActionRowComponentBuilder>;
-      }[] = [];
-
-      for (const car of cars) {
-        const calc = calcSpeed(car);
-        const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-          new ButtonBuilder()
-            .setStyle(ButtonStyle.Secondary)
-            .setLabel("rename")
-            .setCustomId("rename"),
-        );
-
-        pages.push({
-          selectMenuOption: new StringSelectMenuOptionBuilder().setLabel(car.name).setValue(car.id),
-          buttonRow: row,
-          image: getEmojiImage(getCarEmoji(car)),
-          description:
-            `**name** ${car.name}\n` +
-            `**speed** ${calc.speed + calc.turbo}\n\n` +
-            sort(car.upgrades)
-              .asc((u) => u.type)
-              .map((upgrade) => `**${upgrade.type}** ${upgrade.amount}`)
-              .join("\n"),
-        });
-      }
-
       pages.push({
-        buttonRow: new ActionRowBuilder<MessageActionRowComponentBuilder>().setComponents(
-          new ButtonBuilder()
-            .setStyle(ButtonStyle.Success)
-            .setLabel(`buy car ($${calcCarCost(cars.length).toLocaleString()})`)
-            .setCustomId("buy"),
-        ),
-        selectMenuOption: new StringSelectMenuOptionBuilder().setLabel("new car").setValue("new"),
-        description: `you can buy another custom car for $${calcCarCost(cars.length).toLocaleString()}`,
+        selectMenuOption: new StringSelectMenuOptionBuilder().setLabel(car.name).setValue(car.id),
+        buttonRow: row,
+        image: getEmojiImage(getCarEmoji(car)),
+        description:
+          `**name** ${car.name}\n` +
+          `**speed** ${calc.speed + calc.turbo}\n\n` +
+          sort(car.upgrades)
+            .asc((u) => u.type)
+            .map((upgrade) => `**${upgrade.type}** ${upgrade.amount}`)
+            .join("\n"),
       });
+    }
 
-      if (pages.length < 10) {
-        embed.setDescription(pages[index].description);
-        if (pages[index].image) embed.setImage(pages[index].image);
-        pages[index].selectMenuOption.setDefault(true);
-      }
+    pages.push({
+      buttonRow: new ActionRowBuilder<MessageActionRowComponentBuilder>().setComponents(
+        new ButtonBuilder()
+          .setStyle(ButtonStyle.Success)
+          .setLabel(`buy car ($${calcCarCost(cars.length).toLocaleString()})`)
+          .setCustomId("buy"),
+      ),
+      selectMenuOption: new StringSelectMenuOptionBuilder().setLabel("new car").setValue("new"),
+      description: `you can buy a custom car for $${calcCarCost(cars.length).toLocaleString()}`,
+    });
 
-      if (needsUpdate) {
-        const msgPayload: MessageEditOptions = {
-          embeds: [embed],
-          components: [
-            new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-              new StringSelectMenuBuilder()
-                .setCustomId("car")
-                .setOptions(pages.map((i) => i.selectMenuOption)),
-            ),
-            pages[index].buttonRow,
-          ],
-        };
+    if (pages.length < 10) {
+      embed.setDescription(pages[index].description);
+      if (pages[index].image) embed.setImage(pages[index].image);
+      pages[index].selectMenuOption.setDefault(true);
+    }
 
-        if (interaction) {
-          msg = await interaction
-            .update(msgPayload)
-            .then((r) => r.fetch())
-            .catch(() => msg.edit(msgPayload));
-        } else if (msg) {
-          msg = await msg.edit(msgPayload);
-        } else {
-          msg = await send(msgPayload);
-        }
-      }
-
-      const pageManager = async (): Promise<any> => {
-        const interaction = await msg
-          .awaitMessageComponent({ filter: (i) => i.user.id === message.author.id, time: 30000 })
-          .catch(() => {});
-
-        if (!interaction) {
-          return msg.edit({ components: [] });
-        }
-
-        if (interaction.componentType === ComponentType.StringSelect) {
-          if (interaction.values[0] === "new") return showCars(cars, cars.length, msg, interaction);
-          else
-            return showCars(
-              cars,
-              cars.findIndex((car) => car.id === interaction.values[0]),
-              msg,
-              interaction,
-            );
-        } else if (interaction.componentType === ComponentType.Button) {
-          if (interaction.customId === "new") {
-            const balance = await getBalance(message.author.id);
-            const cost = calcCarCost((await getGarage(message.author.id)).length);
-
-            if (balance < cost) {
-              await interaction.reply({
-                ephemeral: true,
-                embeds: [new ErrorEmbed("you cannot afford this")],
-              });
-              return showCars(cars, index, msg, undefined, false);
-            }
-
-            await addCar(message.author.id);
-            await updateBalance(message.author.id, balance - cost);
-            return showCars(await getGarage(message.author.id), index, msg, interaction);
-          } else if (interaction.customId === "rename") {
-            const modal = new ModalBuilder()
-              .setCustomId("rename_modal")
-              .setTitle(`rename ${cars[index].name}`)
-              .addComponents(
-                new ActionRowBuilder<TextInputBuilder>().addComponents(
-                  new TextInputBuilder()
-                    .setCustomId("name")
-                    .setLabel("new car name")
-                    .setPlaceholder(cars[index].name)
-                    .setRequired(true)
-                    .setStyle(TextInputStyle.Short),
-                ),
-              );
-
-            await interaction.showModal(modal);
-
-            const res = await interaction
-              .awaitModalSubmit({ filter: (i) => i.user.id === message.author.id, time: 120000 })
-              .catch(() => {});
-
-            if (!res) return;
-            if (!res.isModalSubmit()) return;
-
-            const name = res.fields.fields.first().value;
-
-            for (const word of filter) {
-              if (cleanString(name).includes(word)) {
-                return res.reply({ ephemeral: true, embeds: [new ErrorEmbed("invalid name")] });
-              }
-            }
-
-            if (name.length > 30)
-              return res.reply({ ephemeral: true, embeds: [new ErrorEmbed("invalid name")] });
-            if (name.length < 3)
-              return res.reply({ ephemeral: true, embeds: [new ErrorEmbed("invalid name")] });
-
-            res.reply({
-              ephemeral: true,
-              embeds: [new CustomEmbed(message.member, "car name updated")],
-            });
-
-            await setCarName(message.author.id, cars[index].id, name);
-            return showCars(await getGarage(message.author.id), index, msg);
-          }
-        }
+    if (needsUpdate) {
+      const msgPayload: MessageEditOptions = {
+        embeds: [embed],
+        components: [
+          new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+            new StringSelectMenuBuilder()
+              .setCustomId("car")
+              .setOptions(pages.map((i) => i.selectMenuOption)),
+          ),
+          pages[index].buttonRow,
+        ],
       };
 
-      return pageManager();
+      if (interaction) {
+        msg = await interaction
+          .update(msgPayload)
+          .then((r) => r.fetch())
+          .catch(() => msg.edit(msgPayload));
+      } else if (msg) {
+        msg = await msg.edit(msgPayload);
+      } else {
+        msg = await send(msgPayload);
+      }
     }
+
+    const pageManager = async (): Promise<any> => {
+      const interaction = await msg
+        .awaitMessageComponent({ filter: (i) => i.user.id === message.author.id, time: 30000 })
+        .catch(() => {});
+
+      if (!interaction) {
+        return msg.edit({ components: [] });
+      }
+
+      if (interaction.componentType === ComponentType.StringSelect) {
+        if (interaction.values[0] === "new") return showCars(cars, cars.length, msg, interaction);
+        else
+          return showCars(
+            cars,
+            cars.findIndex((car) => car.id === interaction.values[0]),
+            msg,
+            interaction,
+          );
+      } else if (interaction.componentType === ComponentType.Button) {
+        if (interaction.customId === "new") {
+          const balance = await getBalance(message.author.id);
+          const cost = calcCarCost((await getGarage(message.author.id)).length);
+
+          if (balance < cost) {
+            await interaction.reply({
+              ephemeral: true,
+              embeds: [new ErrorEmbed("you cannot afford this")],
+            });
+            return showCars(cars, index, msg, undefined, false);
+          }
+
+          await addCar(message.author.id);
+          await updateBalance(message.author.id, balance - cost);
+          return showCars(await getGarage(message.author.id), index, msg, interaction);
+        } else if (interaction.customId === "rename") {
+          const modal = new ModalBuilder()
+            .setCustomId("rename_modal")
+            .setTitle(`rename ${cars[index].name}`)
+            .addComponents(
+              new ActionRowBuilder<TextInputBuilder>().addComponents(
+                new TextInputBuilder()
+                  .setCustomId("name")
+                  .setLabel("new car name")
+                  .setPlaceholder(cars[index].name)
+                  .setRequired(true)
+                  .setStyle(TextInputStyle.Short),
+              ),
+            );
+
+          await interaction.showModal(modal);
+
+          const res = await interaction
+            .awaitModalSubmit({ filter: (i) => i.user.id === message.author.id, time: 120000 })
+            .catch(() => {});
+
+          if (!res) return;
+          if (!res.isModalSubmit()) return;
+
+          const name = res.fields.fields.first().value;
+
+          for (const word of filter) {
+            if (cleanString(name).includes(word)) {
+              return res.reply({ ephemeral: true, embeds: [new ErrorEmbed("invalid name")] });
+            }
+          }
+
+          if (name.length > 30)
+            return res.reply({ ephemeral: true, embeds: [new ErrorEmbed("invalid name")] });
+          if (name.length < 3)
+            return res.reply({ ephemeral: true, embeds: [new ErrorEmbed("invalid name")] });
+
+          res.reply({
+            ephemeral: true,
+            embeds: [new CustomEmbed(message.member, "car name updated")],
+          });
+
+          await setCarName(message.author.id, cars[index].id, name);
+          return showCars(await getGarage(message.author.id), index, msg);
+        }
+      }
+    };
+
+    return pageManager();
   };
 
   showCars(await getGarage(message.author.id));
