@@ -101,6 +101,7 @@ export default {
         XP: "cache:economy:xp",
         LEVEL: "cache:economy:level",
         UPGRADES: "cache:economy:upgrades",
+        GARAGE: "cache:economy:garage",
       },
     },
     nypsi: {

@@ -1,3 +1,5 @@
+import { CarUpgradeType } from "@prisma/client";
+
 export interface Item {
   id: string;
   name: string;
@@ -34,6 +36,7 @@ export interface Item {
   clicks?: number; // amount of clicks for scratch cards
   random_drop_chance?: number; // chance to appear in random drop pool
   tagId?: string;
+  upgrades?: CarUpgradeType;
 }
 
 export interface LotteryTicket {

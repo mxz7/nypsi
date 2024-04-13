@@ -160,5 +160,11 @@
     "name": "prestige 30",
     "description": "prestige 30 tag",
     "emoji": "❤️"
+  },
+  "mechanic": {
+    "id": "mechanic",
+    "name": "mechanic",
+    "description": "obtained from the mechanic achievement",
+    "emoji": "🔧"
   }
 }
