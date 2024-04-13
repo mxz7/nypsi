@@ -255,6 +255,9 @@ class Race {
         if (car.type === "car") option.setEmoji(getCarEmoji(car.car));
         else option.setEmoji(car.car.emoji);
 
+        if (this.limit !== -1 && car.speed > this.limit)
+          option.setDescription("⚠️ over the race's speed limit");
+
         return option;
       });
 
