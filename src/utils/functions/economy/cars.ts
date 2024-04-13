@@ -114,7 +114,7 @@ export async function addCarUpgrade(userId: string, carId: string, upgradeType: 
 }
 
 export function calcCarCost(amount: number) {
-  let base = 75_000_000;
+  let base = 50_000_000;
 
   for (let i = 0; i < amount; i++) {
     base += 50_000_000;
