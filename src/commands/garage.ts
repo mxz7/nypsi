@@ -28,9 +28,13 @@ import {
   calcSpeed,
   getCarEmoji,
   getGarage,
+  setCarName,
 } from "../utils/functions/economy/cars";
 import { createUser, userExists } from "../utils/functions/economy/utils.js";
 import { getEmojiImage } from "../utils/functions/image";
+import { cleanString } from "../utils/functions/string";
+
+const filter = ["nig", "fag", "queer", "hitler"];
 
 const cmd = new Command("garage", "view your custom cars", "money");
 
@@ -223,7 +227,26 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             if (!res) return;
             if (!res.isModalSubmit()) return;
 
-            res.
+            const name = res.fields.fields.first().value;
+
+            for (const word of filter) {
+              if (cleanString(name).includes(word)) {
+                return res.reply({ ephemeral: true, embeds: [new ErrorEmbed("invalid name")] });
+              }
+            }
+
+            if (name.length > 30)
+              return res.reply({ ephemeral: true, embeds: [new ErrorEmbed("invalid name")] });
+            if (name.length < 3)
+              return res.reply({ ephemeral: true, embeds: [new ErrorEmbed("invalid name")] });
+
+            res.reply({
+              ephemeral: true,
+              embeds: [new CustomEmbed(message.member, "car name updated")],
+            });
+
+            await setCarName(message.author.id, cars[index].id, name);
+            return showCars(await getGarage(message.author.id), index, msg);
           }
         }
       };
