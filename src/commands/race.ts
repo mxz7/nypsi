@@ -43,6 +43,12 @@ cmd.slashData.addSubcommand((start) =>
         .setName("bet")
         .setDescription("this is the bet and the entry fee for the race")
         .setRequired(true),
+    )
+    .addIntegerOption((option) =>
+      option.setName("length").setDescription("length of the race. default = 100"),
+    )
+    .addIntegerOption((option) =>
+      option.setName("limit").setDescription("speed limit for the race"),
     ),
 );
 
