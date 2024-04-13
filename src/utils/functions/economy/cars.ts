@@ -17,6 +17,12 @@ carEmojis.set(0, "<:nypsi_car_0:1227982579139874896>");
 carEmojis.set(10, "<:nypsi_i20n:1228692848900050944>");
 carEmojis.set(15, "<:nypsi_octaviavrs:1228693886193369120>");
 carEmojis.set(20, "<:nypsi_rs3:1228694189345210430>");
+carEmojis.set(25, "<:nypsi_c63:1228703330193248326>");
+carEmojis.set(30, "<:nypsi_m5:1228703019885924453>");
+carEmojis.set(35, "<:nypsi_pinkporsche:1228700212835647589>");
+carEmojis.set(40, "<:nypsi_db11:1228708967769702401>");
+carEmojis.set(45, "<:nypsi_812:1228709501771841558>");
+carEmojis.set(50, "<:nypsi_lambo:1207439589011357796>");
 
 export async function getGarage(userId: string) {
   const cache = await redis.get(`${Constants.redis.cache.economy.GARAGE}:${userId}`);
@@ -59,12 +65,11 @@ export function calcSpeed(car: Car) {
   base += (car.upgrades.find((i) => i.type === "engine")?.amount || 0) * 1.5;
   if (base > max) base = max;
 
-  return { speed: Math.floor(base), turbo: Math.floor(turbo) };
+  return Math.floor(base + turbo);
 }
 
 export function getCarEmoji(car: Car) {
-  const calc = calcSpeed(car);
-  let speed = calc.speed + calc.turbo;
+  let speed = calcSpeed(car);
 
   let emoji: string;
 

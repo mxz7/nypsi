@@ -96,7 +96,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }[] = [];
 
     for (const car of cars) {
-      const calc = calcSpeed(car);
       const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()
           .setStyle(ButtonStyle.Secondary)
@@ -124,7 +123,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         image: getEmojiImage(getCarEmoji(car)),
         description:
           `**name** ${car.name}\n` +
-          `**speed** ${calc.speed + calc.turbo}\n\n` +
+          `**speed** ${calcSpeed(car)}\n\n` +
           sort(car.upgrades)
             .asc((u) => u.type)
             .map((upgrade) => `**${upgrade.type}** ${upgrade.amount}`)
