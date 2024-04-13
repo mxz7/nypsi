@@ -50,13 +50,13 @@ export async function getGarage(userId: string) {
 
 export function calcSpeed(car: Car) {
   let base = 5;
-  const max = base * 1.5 + (car.upgrades.find((i) => i.type === "wheel")?.amount || 0) * 2.3;
+  const max = base * 1.3 + (car.upgrades.find((i) => i.type === "wheel")?.amount || 0) * 1.75;
   const turbo = car.upgrades.find((i) => i.type === "turbo")?.amount || 0;
 
   base += (car.upgrades.find((i) => i.type === "engine")?.amount || 0) * 1.5;
   if (base > max) base = max;
 
-  return { speed: base, turbo };
+  return { speed: Math.floor(base), turbo: Math.floor(turbo) };
 }
 
 export function getCarEmoji(car: Car) {
