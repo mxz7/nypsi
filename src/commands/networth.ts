@@ -59,6 +59,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         (value / net.amount) *
         100
       ).toFixed(2)}%)`;
+    } else if (key === "garage") {
+      mainValues += `\n🔧 $**${value.toLocaleString()}** (${((value / net.amount) * 100).toFixed(
+        2,
+      )}%)`;
     } else {
       itemValues.push({ itemId: key, value });
     }
