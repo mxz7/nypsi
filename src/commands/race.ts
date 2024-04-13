@@ -267,6 +267,12 @@ class Race {
     if (this.members.find((i) => i.user.id === interaction.user.id))
       return interaction.deferUpdate();
 
+    if (cars.find((i) => i.car.id === chosen).speed > this.limit)
+      return carInteraction.reply({
+        ephemeral: true,
+        embeds: [new ErrorEmbed("this car is faster than the speed limit for this race")],
+      });
+
     await updateBalance(interaction.user.id, (await getBalance(interaction.user.id)) - this.bet);
 
     const chosen = carInteraction.values[0];
