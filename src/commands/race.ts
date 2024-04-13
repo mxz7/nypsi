@@ -378,7 +378,7 @@ class Race {
         description +=
           `\n\n**${winner.username}** has won with their ${
             this.members.find((i) => i.user.id === winner.id).car.emoji
-          } ${this.members.find((i) => i.user.id === winner.id).car.car.name}` +
+          } **${this.members.find((i) => i.user.id === winner.id).car.car.name}**` +
           `${
             this.bet
               ? `\n +
