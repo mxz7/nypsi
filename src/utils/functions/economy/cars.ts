@@ -14,6 +14,9 @@ export type Car = {
 
 const carEmojis = new Map<number, string>();
 carEmojis.set(0, "<:nypsi_car_0:1227982579139874896>");
+carEmojis.set(10, "<:nypsi_i20n:1228692848900050944>");
+carEmojis.set(15, "<:nypsi_octaviavrs:1228693886193369120>");
+carEmojis.set(20, "<:nypsi_rs3:1228694189345210430>");
 
 export async function getGarage(userId: string) {
   const cache = await redis.get(`${Constants.redis.cache.economy.GARAGE}:${userId}`);
