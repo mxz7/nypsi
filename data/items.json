@@ -2849,6 +2849,7 @@
     "emoji": "<:nypsi_engine_upgrade:1227971592076791941>",
     "longDesc": "upgrades base engine performance",
     "role": "car_upgrade",
+    "upgrades": "engine",
     "sell": 100000,
     "craft": {
       "ingredients": ["engine_upgrade_part:10"],
@@ -2877,6 +2878,7 @@
     "emoji": "<:nypsi_turbo_upgrade:1227978377970057218>",
     "longDesc": "boosts engine performance at speed",
     "role": "car_upgrade",
+    "upgrades": "turbo",
     "sell": 100000,
     "craft": {
       "ingredients": ["turbo_upgrade_part:6"],
@@ -2905,6 +2907,7 @@
     "emoji": "🛞",
     "longDesc": "allows better power application",
     "role": "car_upgrade",
+    "upgrades": "wheel",
     "sell": 100000,
     "craft": {
       "ingredients": ["wheel_upgrade_part:4"],

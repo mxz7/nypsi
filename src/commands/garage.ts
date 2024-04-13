@@ -24,13 +24,15 @@ import { getBalance, updateBalance } from "../utils/functions/economy/balance";
 import {
   Car,
   addCar,
+  addCarUpgrade,
   calcCarCost,
   calcSpeed,
   getCarEmoji,
   getGarage,
   setCarName,
 } from "../utils/functions/economy/cars";
-import { createUser, userExists } from "../utils/functions/economy/utils.js";
+import { getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
+import { createUser, getItems, userExists } from "../utils/functions/economy/utils.js";
 import { getEmojiImage } from "../utils/functions/image";
 import { cleanString } from "../utils/functions/string";
 
@@ -80,6 +82,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     interaction?: ButtonInteraction | StringSelectMenuInteraction,
     needsUpdate = true,
   ): Promise<any> => {
+    const inventory = await getInventory(message.author.id);
     const embed = new CustomEmbed(message.member).setHeader(
       `${message.author.username}'s garage`,
       message.author.avatarURL(),
@@ -101,6 +104,20 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           .setCustomId("rename"),
       );
 
+      for (const item of Object.values(getItems()).filter((i) => i.role === "car_upgrade")) {
+        const button = new ButtonBuilder()
+          .setLabel(item.name)
+          .setCustomId(`upg-${item.id}`)
+          .setStyle(ButtonStyle.Success);
+
+        if (inventory.find((i) => i.item === item.id)) {
+          button.setDisabled(false);
+        } else {
+          button.setDisabled(true);
+        }
+
+        row.addComponents(button);
+      }
       pages.push({
         selectMenuOption: new StringSelectMenuOptionBuilder().setLabel(car.name).setValue(car.id),
         buttonRow: row,
@@ -235,6 +252,26 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
           await setCarName(message.author.id, cars[index].id, name);
           return showCars(await getGarage(message.author.id), index, msg);
+        } else if (interaction.customId.startsWith("upg-")) {
+          const upgrade = interaction.customId.substring(4);
+          const inventory = await getInventory(message.author.id);
+
+          if (!inventory.find((i) => i.item === upgrade)) {
+            await interaction.reply({
+              embeds: [new ErrorEmbed("you don't have this upgrade. sneaky bitch")],
+              ephemeral: true,
+            });
+            return showCars(cars, index, msg, interaction, false);
+          }
+
+          await addCarUpgrade(message.author.id, cars[index].id, getItems()[upgrade].upgrades);
+          await setInventoryItem(
+            message.author.id,
+            upgrade,
+            inventory.find((i) => i.item === upgrade).amount - 1,
+          );
+
+          return showCars(cars, index, msg, interaction);
         }
       }
     };
