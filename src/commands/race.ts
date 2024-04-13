@@ -122,11 +122,15 @@ async function run(
     );
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder().setCustomId("join").setLabel("join race").setStyle(ButtonStyle.Success),
+      new ButtonBuilder()
+        .setCustomId("start")
+        .setLabel("start now")
+        .setStyle(ButtonStyle.Secondary),
     );
 
     const msg = await send({ embeds: [embed], components: [row] });
 
-    new Race(msg, embed, bet, length, limit);
+    new Race(msg, embed, bet, length, limit, message.author.id);
   }
 }
 
@@ -146,8 +150,16 @@ class Race {
   private collector: InteractionCollector<ButtonInteraction>;
   private init: number;
   private startedAt: number;
+  private ownerId: string;
 
-  constructor(message: Message, embed: CustomEmbed, bet: number, length: number, limit: number) {
+  constructor(
+    message: Message,
+    embed: CustomEmbed,
+    bet: number,
+    length: number,
+    limit: number,
+    ownerId: string,
+  ) {
     this.message = message;
     this.embed = embed;
     this.bet = bet;
@@ -157,6 +169,7 @@ class Race {
       componentType: ComponentType.Button,
     });
     this.init = Date.now();
+    this.ownerId = ownerId;
 
     this.collector.on("collect", (e) => this.collectorFunction(e));
     setTimeout(() => {
@@ -165,141 +178,158 @@ class Race {
   }
 
   private async collectorFunction(interaction: ButtonInteraction): Promise<any> {
-    if (!(await userExists(interaction.user.id)))
-      return interaction.reply({
-        ephemeral: true,
-        embeds: [new ErrorEmbed("you cannot afford the entry fee for this race")],
+    if (interaction.customId === "join") {
+      if (!(await userExists(interaction.user.id)))
+        return interaction.reply({
+          ephemeral: true,
+          embeds: [new ErrorEmbed("you cannot afford the entry fee for this race")],
+        });
+
+      if (this.members.find((i) => i.user.id === interaction.user.id))
+        return interaction.deferUpdate();
+
+      const [garage, inventory, balance] = await Promise.all([
+        getGarage(interaction.user.id),
+        getInventory(interaction.user.id).then((i) =>
+          i.filter((i) => getItems()[i.item].role === "car"),
+        ),
+        getBalance(interaction.user.id),
+      ]);
+
+      const maxBet = (await calcMaxBet(interaction.user.id)) * 10;
+
+      if (maxBet < this.bet)
+        return interaction.reply({
+          ephemeral: true,
+          embeds: [new ErrorEmbed(`your max bet for races is $${maxBet.toLocaleString()}`)],
+        });
+
+      if (balance < this.bet)
+        return interaction.reply({
+          ephemeral: true,
+          embeds: [new ErrorEmbed("you cannot afford the entry fee for this race")],
+        });
+
+      inventory.push({ amount: 1, item: "cycle" });
+
+      const cars: (RaceUserItem | RaceUserCar)[] = [
+        ...garage.map((car) => ({
+          type: "car" as const,
+          car,
+          speed: calcSpeed(car),
+          emoji: getCarEmoji(car),
+        })),
+        ...inventory.map((car) => ({
+          type: "item" as const,
+          car: getItems()[car.item],
+          speed: getItems()[car.item].speed,
+          emoji: getItems()[car.item].emoji,
+        })),
+      ];
+
+      inPlaceSort(cars).desc((car) => {
+        if (car.type === "car") {
+          return calcSpeed(car.car);
+        } else return car.car.speed;
       });
 
-    if (this.members.find((i) => i.user.id === interaction.user.id))
-      return interaction.deferUpdate();
+      const options = cars.map((car) => {
+        const option = new StringSelectMenuOptionBuilder();
 
-    const [garage, inventory, balance] = await Promise.all([
-      getGarage(interaction.user.id),
-      getInventory(interaction.user.id).then((i) =>
-        i.filter((i) => getItems()[i.item].role === "car"),
-      ),
-      getBalance(interaction.user.id),
-    ]);
+        option.setLabel(`${car.car.name} [${car.speed}]`);
+        option.setValue(`${car.car.id}`);
 
-    const maxBet = (await calcMaxBet(interaction.user.id)) * 10;
+        if (car.type === "car") option.setEmoji(getCarEmoji(car.car));
+        else option.setEmoji(car.car.emoji);
 
-    if (maxBet < this.bet)
-      return interaction.reply({
-        ephemeral: true,
-        embeds: [new ErrorEmbed(`your max bet for races is $${maxBet.toLocaleString()}`)],
+        return option;
       });
 
-    if (balance < this.bet)
-      return interaction.reply({
-        ephemeral: true,
-        embeds: [new ErrorEmbed("you cannot afford the entry fee for this race")],
+      const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new StringSelectMenuBuilder().setOptions(options).setCustomId("car"),
+      );
+
+      if (this.started)
+        return interaction.reply({
+          ephemeral: true,
+          embeds: [new ErrorEmbed("the race has already started")],
+        });
+
+      const msg = await interaction
+        .reply({
+          ephemeral: true,
+          embeds: [
+            new CustomEmbed(interaction.user.id, "choose a car").setHeader(
+              this.embed.data.author.name,
+              this.embed.data.author.icon_url,
+            ),
+          ],
+          components: [row],
+        })
+        .then(() => interaction.fetchReply());
+
+      const carInteraction = await msg
+        .awaitMessageComponent({
+          componentType: ComponentType.StringSelect,
+          filter: (i) => i.user.id === interaction.user.id,
+          time: 30000,
+        })
+        .catch(() => {});
+
+      if (!carInteraction) return;
+
+      if ((await getBalance(interaction.user.id)) < this.bet)
+        return carInteraction.reply({
+          ephemeral: true,
+          embeds: [new ErrorEmbed("you cannot afford the entry fee for this race")],
+        });
+
+      if (this.members.find((i) => i.user.id === interaction.user.id))
+        return interaction.deferUpdate();
+
+      const chosen = carInteraction.values[0];
+
+      if (this.limit > -1 && cars.find((i) => i.car.id === chosen).speed > this.limit)
+        return carInteraction.reply({
+          ephemeral: true,
+          embeds: [new ErrorEmbed("this car is faster than the speed limit for this race")],
+        });
+
+      await updateBalance(interaction.user.id, (await getBalance(interaction.user.id)) - this.bet);
+
+      this.members.push({
+        car: cars.find((i) => i.car.id === chosen),
+        position: 0,
+        user: interaction.user,
       });
 
-    inventory.push({ amount: 1, item: "cycle" });
+      this.message.edit(this.render());
 
-    const cars: (RaceUserItem | RaceUserCar)[] = [
-      ...garage.map((car) => ({
-        type: "car" as const,
-        car,
-        speed: calcSpeed(car),
-        emoji: getCarEmoji(car),
-      })),
-      ...inventory.map((car) => ({
-        type: "item" as const,
-        car: getItems()[car.item],
-        speed: getItems()[car.item].speed,
-        emoji: getItems()[car.item].emoji,
-      })),
-    ];
-
-    inPlaceSort(cars).desc((car) => {
-      if (car.type === "car") {
-        return calcSpeed(car.car);
-      } else return car.car.speed;
-    });
-
-    const options = cars.map((car) => {
-      const option = new StringSelectMenuOptionBuilder();
-
-      option.setLabel(`${car.car.name} [${car.speed}]`);
-      option.setValue(`${car.car.id}`);
-
-      if (car.type === "car") option.setEmoji(getCarEmoji(car.car));
-      else option.setEmoji(car.car.emoji);
-
-      return option;
-    });
-
-    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-      new StringSelectMenuBuilder().setOptions(options).setCustomId("car"),
-    );
-
-    if (this.started)
-      return interaction.reply({
-        ephemeral: true,
-        embeds: [new ErrorEmbed("the race has already started")],
-      });
-
-    const msg = await interaction
-      .reply({
-        ephemeral: true,
+      return carInteraction.update({
+        components: [],
         embeds: [
-          new CustomEmbed(interaction.user.id, "choose a car").setHeader(
-            this.embed.data.author.name,
-            this.embed.data.author.icon_url,
-          ),
+          new CustomEmbed(
+            interaction.user.id,
+            `chosen **${cars.find((i) => i.car.id === chosen).car.name}**`,
+          ).setHeader(this.embed.data.author.name, this.embed.data.author.icon_url),
         ],
-        components: [row],
-      })
-      .then(() => interaction.fetchReply());
-
-    const carInteraction = await msg
-      .awaitMessageComponent({
-        componentType: ComponentType.StringSelect,
-        filter: (i) => i.user.id === interaction.user.id,
-        time: 30000,
-      })
-      .catch(() => {});
-
-    if (!carInteraction) return;
-
-    if ((await getBalance(interaction.user.id)) < this.bet)
-      return carInteraction.reply({
-        ephemeral: true,
-        embeds: [new ErrorEmbed("you cannot afford the entry fee for this race")],
       });
+    } else if (interaction.customId === "start") {
+      if (interaction.user.id !== this.ownerId)
+        return interaction.reply({
+          ephemeral: true,
+          embeds: [new ErrorEmbed("you are not the race owner")],
+        });
 
-    if (this.members.find((i) => i.user.id === interaction.user.id))
-      return interaction.deferUpdate();
+      if (this.members.length < 2)
+        return interaction.reply({
+          ephemeral: true,
+          embeds: [new ErrorEmbed("there are not enough racers")],
+        });
 
-    const chosen = carInteraction.values[0];
-
-    if (this.limit > -1 && cars.find((i) => i.car.id === chosen).speed > this.limit)
-      return carInteraction.reply({
-        ephemeral: true,
-        embeds: [new ErrorEmbed("this car is faster than the speed limit for this race")],
-      });
-
-    await updateBalance(interaction.user.id, (await getBalance(interaction.user.id)) - this.bet);
-
-    this.members.push({
-      car: cars.find((i) => i.car.id === chosen),
-      position: 0,
-      user: interaction.user,
-    });
-
-    this.message.edit(this.render());
-
-    return carInteraction.update({
-      components: [],
-      embeds: [
-        new CustomEmbed(
-          interaction.user.id,
-          `chosen **${cars.find((i) => i.car.id === chosen).car.name}**`,
-        ).setHeader(this.embed.data.author.name, this.embed.data.author.icon_url),
-      ],
-    });
+      interaction.deferUpdate();
+      this.start();
+    }
   }
 
   private render() {
@@ -341,6 +371,10 @@ class Race {
   }
 
   private async start() {
+    if (this.started) return;
+    this.started = true;
+    this.startedAt = Date.now();
+
     if (this.members.length < 2) {
       if (this.bet > 0) {
         for (const member of this.members) {
@@ -352,8 +386,6 @@ class Race {
       return this.message.edit({ embeds: [this.embed], components: [] });
     }
 
-    this.started = true;
-    this.startedAt = Date.now();
     let winner: User;
     this.message = await this.message.channel.send(this.render() as MessageCreateOptions);
 
@@ -388,7 +420,10 @@ class Race {
         }
       }
 
-      await this.message.edit(this.render());
+      const render = this.render();
+
+      if ((render.embeds[0] as CustomEmbed).data.description !== this.message.embeds[0].description)
+        await this.message.edit(render);
 
       if (winner) {
         this.ended = true;
