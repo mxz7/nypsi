@@ -33,6 +33,8 @@ import ms = require("ms");
 
 const cmd = new Command("race", "create or join a race", "money").setAliases(["sr"]);
 
+const channels = new Set<string>();
+
 cmd.slashEnabled = true;
 cmd.slashData.addSubcommand((start) =>
   start
@@ -100,6 +102,9 @@ async function run(
   }
 
   if (["start", "create"].includes(args[0].toLowerCase())) {
+    if (channels.has(message.channelId))
+      return send({ embeds: [new ErrorEmbed("there is already a race in this channel")] });
+
     const bet = (await formatBet(args[1] || 0, message.member)) || 0;
     const length = parseInt(args[2] || "100") || 100;
     const limit = parseInt(args[3] || "-1") || -1;
@@ -114,6 +119,8 @@ async function run(
 
     if (length > 1000)
       return send({ embeds: [new ErrorEmbed("length cannot be more than 1,000")] });
+
+    if (length < 10) return send({ embeds: [new ErrorEmbed("length cannot be less than 10")] });
 
     let description = "";
     description += `starts <t:${Math.floor((Date.now() + 60000) / 1000)}:R>\n`;
@@ -177,6 +184,7 @@ class Race {
     this.ownerId = ownerId;
 
     this.collector.on("collect", (e) => this.collectorFunction(e));
+    channels.add(this.message.channelId);
     setTimeout(() => {
       this.start();
     }, 60000);
@@ -388,6 +396,7 @@ class Race {
       }
 
       this.embed.setDescription("not enough people joined ):");
+      channels.delete(this.message.channelId);
       return this.message.edit({ embeds: [this.embed], components: [] });
     }
 
@@ -482,6 +491,7 @@ class Race {
         this.embed.setDescription(description);
         this.embed.setFooter({ text: `race has ended | id: ${gameId}` });
 
+        channels.delete(this.message.channelId);
         return setTimeout(async () => {
           await this.message.edit({ embeds: [this.embed] }).catch(() => {});
         }, 500);
