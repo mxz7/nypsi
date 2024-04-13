@@ -387,6 +387,7 @@ class Race {
     }
 
     let winner: User;
+    this.message.edit({ components: [] });
     this.message = await this.message.channel.send(this.render() as MessageCreateOptions);
 
     while (!this.ended) {
