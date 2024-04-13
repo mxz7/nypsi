@@ -412,7 +412,7 @@ class Race {
         description +=
           `\n\n**${winner.username}** has won with their ${
             this.members.find((i) => i.user.id === winner.id).car.emoji
-          } **${this.members.find((i) => i.user.id === winner.id).car.car.name}** by ${diff.toLocaleString()} distance` +
+          } **${this.members.find((i) => i.user.id === winner.id).car.car.name}** by ${diff.toLocaleString()} meters` +
           `${this.bet ? `\n +$${winnings.toLocaleString()}` : ""}`;
 
         let gameId: string;
