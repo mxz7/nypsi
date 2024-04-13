@@ -9,6 +9,7 @@ import { getTier } from "../premium/premium";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { getAuctionAverage } from "./auctions";
 import { getBoosters } from "./boosters";
+import { calcCarCost } from "./cars";
 import { getGuildUpgradesByUser } from "./guilds";
 import { calcItemValue, gemBreak, getInventory } from "./inventory";
 import { checkLevelUp, getRawLevel, getUpgrades } from "./levelling";
@@ -696,6 +697,16 @@ export async function calcNetWorth(member: GuildMember | string, breakdown = fal
           },
         },
       },
+      CustomCar: {
+        select: {
+          upgrades: {
+            select: {
+              amount: true,
+              type: true,
+            },
+          },
+        },
+      },
     },
   });
 
@@ -795,6 +806,24 @@ export async function calcNetWorth(member: GuildMember | string, breakdown = fal
       }
     }
   }
+
+  let garageBreakdown = 0;
+
+  for (let i = 0; i < query.CustomCar.length; i++) {
+    garageBreakdown += calcCarCost(i);
+
+    const car = query.CustomCar[i];
+
+    for (const upgrade of car.upgrades) {
+      garageBreakdown +=
+        (await calcItemValue(
+          Object.values(getItems()).find((i) => i.upgrades === upgrade.type).id,
+        )) * upgrade.amount;
+    }
+  }
+
+  breakdownItems.set("garage", garageBreakdown);
+  worth += garageBreakdown;
 
   let workersBreakdown = 0;
 
