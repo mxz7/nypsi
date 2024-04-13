@@ -25,6 +25,7 @@ import { addProgress } from "../utils/functions/economy/achievements";
 import { calcMaxBet, getBalance, updateBalance } from "../utils/functions/economy/balance";
 import { Car, calcSpeed, getCarEmoji, getGarage } from "../utils/functions/economy/cars";
 import { getInventory } from "../utils/functions/economy/inventory";
+import { createGame } from "../utils/functions/economy/stats";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
 import { createUser, formatBet, getItems, userExists } from "../utils/functions/economy/utils";
 import sleep from "../utils/functions/sleep";
@@ -407,8 +408,31 @@ class Race {
               : ""
           }`;
 
+        let gameId: string;
+
+        for (const member of this.members) {
+          if (member.user.id === winner.id) {
+            gameId = await createGame({
+              userId: member.user.id,
+              bet: this.bet,
+              game: "race",
+              result: "win",
+              earned: this.bet * this.members.length,
+              outcome: this.embed.data.description,
+            });
+          }
+
+          await createGame({
+            userId: member.user.id,
+            bet: this.bet,
+            game: "race",
+            result: "lose",
+            outcome: this.embed.data.description,
+          });
+        }
+
         this.embed.setDescription(description);
-        this.embed.setFooter({ text: "race has ended" });
+        this.embed.setFooter({ text: `race has ended | id: ${gameId}` });
 
         return setTimeout(async () => {
           await this.message.edit({ embeds: [this.embed] }).catch(() => {});
