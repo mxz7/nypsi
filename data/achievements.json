@@ -1321,5 +1321,45 @@
     "target": 500,
     "description": "complete 500 tasks",
     "prize": ["legendary_scratch_card:3", "omega_crate:1"]
+  },
+  "mechanic_i": {
+    "id": "mechanic_i",
+    "name": "mechanic **I**",
+    "emoji": "🔧",
+    "target": 1,
+    "description": "upgrade a car once",
+    "prize": ["basic_crate:1"]
+  },
+  "mechanic_ii": {
+    "id": "mechanic_ii",
+    "name": "mechanic **II**",
+    "emoji": "🔧",
+    "target": 10,
+    "description": "upgrade a car 10 times",
+    "prize": ["lucky_scratch_card:1"]
+  },
+  "mechanic_iii": {
+    "id": "mechanic_iii",
+    "name": "mechanic **III**",
+    "emoji": "🔧",
+    "target": 20,
+    "description": "upgrade a car 20 times",
+    "prize": ["legendary_scratch_card:1"]
+  },
+  "mechanic_iv": {
+    "id": "mechanic_iv",
+    "name": "mechanic **IV**",
+    "emoji": "🔧",
+    "target": 50,
+    "description": "upgrade a car 50 times",
+    "prize": ["legendary_scratch_card:2"]
+  },
+  "mechanic_v": {
+    "id": "mechanic_v",
+    "name": "mechanic **V**",
+    "emoji": "🔧",
+    "target": 250,
+    "description": "upgrade a car 250 times",
+    "prize": ["legendary_scratch_card:3", "omega_crate:1", "tag:mechanic"]
   }
 }
