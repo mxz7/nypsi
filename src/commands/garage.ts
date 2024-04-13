@@ -192,7 +192,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             interaction,
           );
       } else if (interaction.componentType === ComponentType.Button) {
-        if (interaction.customId === "new") {
+        if (interaction.customId === "buy") {
           const balance = await getBalance(message.author.id);
           const cost = calcCarCost((await getGarage(message.author.id)).length);
 
