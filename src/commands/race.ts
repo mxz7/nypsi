@@ -28,6 +28,7 @@ import { getInventory } from "../utils/functions/economy/inventory";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
 import { createUser, formatBet, getItems, userExists } from "../utils/functions/economy/utils";
 import sleep from "../utils/functions/sleep";
+import ms = require("ms");
 
 const cmd = new Command("race", "create or join a race", "money").setAliases(["sr"]);
 
@@ -137,6 +138,7 @@ class Race {
   private limit: number;
   private collector: InteractionCollector<ButtonInteraction>;
   private init: number;
+  private startedAt: number;
 
   constructor(message: Message, embed: CustomEmbed, bet: number, length: number, limit: number) {
     this.message = message;
@@ -338,10 +340,26 @@ class Race {
     }
 
     this.started = true;
+    this.startedAt = Date.now();
     let winner: User;
     this.message = await this.message.channel.send(this.render() as MessageCreateOptions);
 
     while (!this.ended) {
+      if (this.startedAt < Date.now() - ms("10 minutes")) {
+        this.ended = true;
+
+        if (this.bet > 0) {
+          for (const member of this.members) {
+            await updateBalance(member.user.id, (await getBalance(member.user.id)) + this.bet);
+          }
+        }
+
+        this.embed.setDescription(
+          this.embed.data.description + "\n\nthis race took too long to finish",
+        );
+        return this.message.edit({ embeds: [this.embed] });
+      }
+
       for (const member of this.members) {
         const randomness = randomInt(-5, 6);
 
