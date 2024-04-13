@@ -2143,6 +2143,7 @@
       "id:super_cursor:50",
       "id:oven:30",
       "id:lamborghini:1",
+      "id:engine_upgrade_part:50",
       "id:mini_cooper:60",
       "id:diamond_pickaxe:50",
       "id:iron_pickaxe:75",
@@ -2181,6 +2182,8 @@
       "id:lucky_7:80",
       "id:incredible_fishing_rod",
       "id:incredible_gun",
+      "id:turbo_upgrade_part:40",
+      "id:wheel_upgrade_part:40",
       "id:lamborghini:45",
       "id:quarry_scrap",
       "id:nypsi_crate:50",
@@ -2505,6 +2508,8 @@
       "id:infinity_tag:70",
       "id:unbreaking:90",
       "id:highroller",
+      "id:turbo_upgrade_part:50",
+      "id:wheel_upgrade_part:50",
       "id:double_xp",
       "id:gem_crate:25",
       "id:boosters_crate:75",
@@ -2854,7 +2859,8 @@
     "craft": {
       "ingredients": ["engine_upgrade_part:10"],
       "time": 172800
-    }
+    },
+    "in_crates": false
   },
   "turbo_upgrade_part": {
     "id": "turbo_upgrade_part",
@@ -2864,7 +2870,7 @@
     "aliases": ["tup"],
     "emoji": "<:nypsi_turbo_upgrade_part:1227978185262501941>",
     "longDesc": "used to create a turbo upgrade",
-    "rarity": 3,
+    "rarity": 5,
     "role": "car_part",
     "sell": 10000,
     "in_crates": true
@@ -2883,7 +2889,8 @@
     "craft": {
       "ingredients": ["turbo_upgrade_part:6"],
       "time": 604800
-    }
+    },
+    "in_crates": false
   },
   "wheel_upgrade_part": {
     "id": "wheel_upgrade_part",
@@ -2893,7 +2900,7 @@
     "aliases": ["wup"],
     "emoji": "<:nypsi_wheel_upgrade_part:1227979317565194335>",
     "longDesc": "used to create a wheel upgrade",
-    "rarity": 4,
+    "rarity": 5,
     "role": "car_part",
     "sell": 10000,
     "in_crates": true
@@ -2912,6 +2919,7 @@
     "craft": {
       "ingredients": ["wheel_upgrade_part:4"],
       "time": 604800
-    }
+    },
+    "in_crates": false
   }
 }
