@@ -115,22 +115,22 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       });
     }
 
-    pages.push({
-      buttonRow: new ActionRowBuilder<MessageActionRowComponentBuilder>().setComponents(
-        new ButtonBuilder()
-          .setStyle(ButtonStyle.Success)
-          .setLabel(`buy car ($${calcCarCost(cars.length).toLocaleString()})`)
-          .setCustomId("buy"),
-      ),
-      selectMenuOption: new StringSelectMenuOptionBuilder().setLabel("new car").setValue("new"),
-      description: `you can buy a custom car for $${calcCarCost(cars.length).toLocaleString()}`,
-    });
-
     if (pages.length < 10) {
-      embed.setDescription(pages[index].description);
-      if (pages[index].image) embed.setImage(pages[index].image);
-      pages[index].selectMenuOption.setDefault(true);
+      pages.push({
+        buttonRow: new ActionRowBuilder<MessageActionRowComponentBuilder>().setComponents(
+          new ButtonBuilder()
+            .setStyle(ButtonStyle.Success)
+            .setLabel(`buy car ($${calcCarCost(cars.length).toLocaleString()})`)
+            .setCustomId("buy"),
+        ),
+        selectMenuOption: new StringSelectMenuOptionBuilder().setLabel("new car").setValue("new"),
+        description: `you can buy a custom car for $${calcCarCost(cars.length).toLocaleString()}`,
+      });
     }
+
+    embed.setDescription(pages[index].description);
+    if (pages[index].image) embed.setImage(pages[index].image);
+    pages[index].selectMenuOption.setDefault(true);
 
     if (needsUpdate) {
       const msgPayload: MessageEditOptions = {
