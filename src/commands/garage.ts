@@ -35,6 +35,7 @@ import { getInventory, setInventoryItem } from "../utils/functions/economy/inven
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils.js";
 import { getEmojiImage } from "../utils/functions/image";
 import { cleanString } from "../utils/functions/string";
+import { addProgress } from "../utils/functions/economy/achievements";
 
 const filter = ["nig", "fag", "queer", "hitler"];
 
@@ -263,6 +264,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             return showCars(cars, index, msg, interaction, false);
           }
 
+          addProgress(message.author.id, "mechanic", 1);
           await addCarUpgrade(message.author.id, cars[index].id, getItems()[upgrade].upgrades);
           await setInventoryItem(
             message.author.id,
