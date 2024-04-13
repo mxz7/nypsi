@@ -22,7 +22,7 @@ import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { Item } from "../types/Economy";
 import { addProgress } from "../utils/functions/economy/achievements";
-import { getBalance, updateBalance } from "../utils/functions/economy/balance";
+import { calcMaxBet, getBalance, updateBalance } from "../utils/functions/economy/balance";
 import { Car, calcSpeed, getCarEmoji, getGarage } from "../utils/functions/economy/cars";
 import { getInventory } from "../utils/functions/economy/inventory";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
@@ -172,6 +172,14 @@ class Race {
       ),
       getBalance(interaction.user.id),
     ]);
+
+    const maxBet = (await calcMaxBet(interaction.user.id)) * 10;
+
+    if (maxBet < this.bet)
+      return interaction.reply({
+        ephemeral: true,
+        embeds: [new ErrorEmbed(`your max bet for races is $${maxBet.toLocaleString()}`)],
+      });
 
     if (balance < this.bet)
       return interaction.reply({
