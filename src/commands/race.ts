@@ -275,7 +275,7 @@ class Race {
 
     const chosen = carInteraction.values[0];
 
-    if (cars.find((i) => i.car.id === chosen).speed > this.limit)
+    if (this.limit > -1 && cars.find((i) => i.car.id === chosen).speed > this.limit)
       return carInteraction.reply({
         ephemeral: true,
         embeds: [new ErrorEmbed("this car is faster than the speed limit for this race")],
