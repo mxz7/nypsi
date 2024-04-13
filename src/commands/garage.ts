@@ -271,7 +271,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
             inventory.find((i) => i.item === upgrade).amount - 1,
           );
 
-          return showCars(cars, index, msg, interaction);
+          return showCars(await getGarage(message.author.id), index, msg, interaction);
         }
       }
     };
