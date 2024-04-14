@@ -2982,5 +2982,19 @@
     "sell": 100000,
     "in_crates": true,
     "rarity": 5
+  },
+  "rx7_skin": {
+    "id": "rx7_skin",
+    "name": "rx7 skin",
+    "plural": "rx7 skins",
+    "article": "an",
+    "aliases": ["rx7"],
+    "emoji": "<:nypsi_rx7:1229104303738851518>",
+    "longDesc": "rx7 car skin for custom cars",
+    "role": "car_skin",
+    "sell": 100000,
+    "in_crates": true,
+    "rarity": 5,
+    "random_drop_chance": 15
   }
 }
