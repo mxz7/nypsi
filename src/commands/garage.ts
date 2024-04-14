@@ -35,6 +35,7 @@ import {
   setSkin,
 } from "../utils/functions/economy/cars";
 import { getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
+import { addStat } from "../utils/functions/economy/stats";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils.js";
 import { getEmojiImage } from "../utils/functions/image";
 import sleep from "../utils/functions/sleep";
@@ -263,6 +264,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
           await addCar(message.author.id);
           await updateBalance(message.author.id, balance - cost);
+          addStat(message.author.id, "spent-garage", cost);
           return showCars(await getGarage(message.author.id), index, msg, interaction);
         } else if (interaction.customId === "rename") {
           const modal = new ModalBuilder()
