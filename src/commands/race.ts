@@ -440,7 +440,10 @@ class Race {
 
       const render = this.render();
 
-      if ((render.embeds[0] as CustomEmbed).data.description !== this.message.embeds[0].description)
+      if (
+        (render.embeds[0] as CustomEmbed).data.description !== this.message.embeds[0].description &&
+        !winner
+      )
         await this.message.edit(render);
 
       if (winner) {
@@ -449,7 +452,7 @@ class Race {
         const ordered = sort(this.members).desc((i) => i.position);
         const diff = ordered[0].position - ordered[1].position;
 
-        let description = this.message.embeds[0].description;
+        let description = (render.embeds[0] as CustomEmbed).data.description;
 
         const winnings = this.bet * this.members.length;
 
