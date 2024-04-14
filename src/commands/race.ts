@@ -434,7 +434,6 @@ class Race {
 
         if (member.position >= this.length) {
           winner = member.user;
-          break;
         }
       }
 
@@ -450,6 +449,9 @@ class Race {
         this.ended = true;
 
         const ordered = sort(this.members).desc((i) => i.position);
+
+        winner = ordered[0].user;
+
         const diff = ordered[0].position - ordered[1].position;
 
         let description = (render.embeds[0] as CustomEmbed).data.description;
