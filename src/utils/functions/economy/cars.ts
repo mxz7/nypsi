@@ -72,6 +72,9 @@ export async function getGarage(userId: string) {
       id: true,
       skin: true,
     },
+    orderBy: {
+      createdAt: "asc",
+    },
   });
 
   await redis.set(
