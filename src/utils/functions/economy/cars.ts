@@ -2,6 +2,8 @@ import { CarUpgradeType } from "@prisma/client";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import Constants from "../../Constants";
+import { getInventory } from "./inventory";
+import { getItems } from "./utils";
 
 export type Car = {
   upgrades: {
@@ -10,6 +12,7 @@ export type Car = {
   }[];
   name: string;
   id: string;
+  skin?: string;
 };
 
 const carEmojis = new Map<number, string>();
@@ -23,6 +26,29 @@ carEmojis.set(35, "<:nypsi_pinkporsche:1228700212835647589>");
 carEmojis.set(40, "<:nypsi_db11:1228708967769702401>");
 carEmojis.set(45, "<:nypsi_812:1228709501771841558>");
 carEmojis.set(50, "<:nypsi_lambo:1207439589011357796>");
+
+export async function checkSkins(userId: string, cars: Car[]) {
+  const inventory = await getInventory(userId);
+
+  let changed = false;
+  const counts = new Map<string, number>();
+
+  for (const car of cars) {
+    if (car.skin) {
+      if (counts.has(car.skin)) counts.set(car.skin, counts.get(car.skin) + 1);
+      else counts.set(car.skin, 1);
+
+      const owned = inventory.find((i) => i.item === car.skin)?.amount || 0;
+
+      if (owned < counts.get(car.skin)) {
+        await setSkin(userId, car.id);
+        changed = true;
+      }
+    }
+  }
+
+  return changed;
+}
 
 export async function getGarage(userId: string) {
   const cache = await redis.get(`${Constants.redis.cache.economy.GARAGE}:${userId}`);
@@ -44,6 +70,10 @@ export async function getGarage(userId: string) {
       },
       name: true,
       id: true,
+      skin: true,
+    },
+    orderBy: {
+      createdAt: "asc",
     },
   });
 
@@ -69,6 +99,8 @@ export function calcSpeed(car: Car) {
 }
 
 export function getCarEmoji(car: Car) {
+  if (car.skin) return getItems()[car.skin].emoji;
+
   let speed = calcSpeed(car);
 
   let emoji: string;
@@ -130,6 +162,19 @@ export async function setCarName(userId: string, carId: string, name: string) {
     },
     data: {
       name,
+    },
+  });
+
+  await redis.del(`${Constants.redis.cache.economy.GARAGE}:${userId}`);
+}
+
+export async function setSkin(userId: string, carId: string, skin?: string) {
+  await prisma.customCar.update({
+    where: {
+      id: carId,
+    },
+    data: {
+      skin: skin || null,
     },
   });
 

@@ -208,6 +208,7 @@ model CustomCar {
 
   createdAt DateTime @default(now())
   name      String
+  skin      String?
 
   userId   String
   economy  Economy      @relation(fields: [userId], references: [userId], onDelete: Cascade)
