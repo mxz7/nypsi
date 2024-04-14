@@ -20,6 +20,7 @@ import {
 import { sort } from "fast-sort";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import { addProgress } from "../utils/functions/economy/achievements";
 import { getBalance, updateBalance } from "../utils/functions/economy/balance";
 import {
   Car,
@@ -27,15 +28,17 @@ import {
   addCarUpgrade,
   calcCarCost,
   calcSpeed,
+  checkSkins,
   getCarEmoji,
   getGarage,
   setCarName,
+  setSkin,
 } from "../utils/functions/economy/cars";
 import { getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils.js";
 import { getEmojiImage } from "../utils/functions/image";
+import sleep from "../utils/functions/sleep";
 import { cleanString } from "../utils/functions/string";
-import { addProgress } from "../utils/functions/economy/achievements";
 
 const filter = ["nig", "fag", "queer", "hitler"];
 
@@ -94,6 +97,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       image?: string;
       selectMenuOption: StringSelectMenuOptionBuilder;
       buttonRow: ActionRowBuilder<MessageActionRowComponentBuilder>;
+      skinsRow?: StringSelectMenuBuilder;
     }[] = [];
 
     for (const car of cars) {
@@ -103,6 +107,15 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           .setLabel("rename")
           .setCustomId("rename"),
       );
+
+      const skinItems = inventory.filter((i) => getItems()[i.item].role === "car_skin");
+      const skinOptions: { value: string; label: string; emoji: string; default: boolean }[] =
+        skinItems.map((i) => ({
+          value: i.item,
+          label: getItems()[i.item].name,
+          emoji: getItems()[i.item].emoji,
+          default: car.skin === i.item,
+        }));
 
       for (const item of Object.values(getItems()).filter((i) => i.role === "car_upgrade")) {
         const button = new ButtonBuilder()
@@ -119,9 +132,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         row.addComponents(button);
       }
       pages.push({
-        selectMenuOption: new StringSelectMenuOptionBuilder().setLabel(car.name).setValue(car.id),
+        selectMenuOption: new StringSelectMenuOptionBuilder()
+          .setLabel(car.name)
+          .setValue(car.id)
+          .setEmoji(getCarEmoji(car)),
         buttonRow: row,
         image: getEmojiImage(getCarEmoji(car)),
+        skinsRow:
+          skinOptions.length > 0
+            ? new StringSelectMenuBuilder()
+                .setOptions({ value: "none", label: "no skin", default: !car.skin }, ...skinOptions)
+                .setCustomId("skin")
+            : undefined,
         description:
           `**name** ${car.name}\n` +
           `**speed** ${calcSpeed(car)}\n\n` +
@@ -150,16 +172,25 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     pages[index].selectMenuOption.setDefault(true);
 
     if (needsUpdate) {
+      const components = [
+        new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+          new StringSelectMenuBuilder()
+            .setCustomId("car")
+            .setOptions(pages.map((i) => i.selectMenuOption)),
+        ),
+        pages[index].buttonRow,
+      ];
+
+      if (pages[index].skinsRow)
+        components.push(
+          new ActionRowBuilder<MessageActionRowComponentBuilder>().setComponents(
+            pages[index].skinsRow,
+          ),
+        );
+
       const msgPayload: MessageEditOptions = {
         embeds: [embed],
-        components: [
-          new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-            new StringSelectMenuBuilder()
-              .setCustomId("car")
-              .setOptions(pages.map((i) => i.selectMenuOption)),
-          ),
-          pages[index].buttonRow,
-        ],
+        components,
       };
 
       if (interaction) {
@@ -184,14 +215,39 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       }
 
       if (interaction.componentType === ComponentType.StringSelect) {
-        if (interaction.values[0] === "new") return showCars(cars, cars.length, msg, interaction);
-        else
-          return showCars(
-            cars,
-            cars.findIndex((car) => car.id === interaction.values[0]),
-            msg,
-            interaction,
-          );
+        if (interaction.customId === "car") {
+          if (interaction.values[0] === "new") return showCars(cars, cars.length, msg, interaction);
+          else
+            return showCars(
+              cars,
+              cars.findIndex((car) => car.id === interaction.values[0]),
+              msg,
+              interaction,
+            );
+        } else if (interaction.customId === "skin") {
+          const chosen = interaction.values[0];
+
+          await setSkin(message.author.id, cars[index].id, chosen === "none" ? undefined : chosen);
+
+          const changed = await checkSkins(message.author.id, await getGarage(message.author.id));
+
+          showCars(await getGarage(message.author.id), index, msg, interaction, true);
+
+          if (changed) {
+            await sleep(1000);
+            if (interaction.replied || interaction.deferred) {
+              interaction.followUp({
+                ephemeral: true,
+                embeds: [
+                  new CustomEmbed(
+                    message.member,
+                    "the skin was removed from one of your other cars",
+                  ),
+                ],
+              });
+            }
+          }
+        }
       } else if (interaction.componentType === ComponentType.Button) {
         if (interaction.customId === "buy") {
           const balance = await getBalance(message.author.id);
