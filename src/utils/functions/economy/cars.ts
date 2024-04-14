@@ -3,6 +3,7 @@ import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import Constants from "../../Constants";
 import { getInventory } from "./inventory";
+import { getItems } from "./utils";
 
 export type Car = {
   upgrades: {
@@ -95,6 +96,8 @@ export function calcSpeed(car: Car) {
 }
 
 export function getCarEmoji(car: Car) {
+  if (car.skin) return getItems()[car.skin].emoji;
+
   let speed = calcSpeed(car);
 
   let emoji: string;
