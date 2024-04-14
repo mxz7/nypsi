@@ -2921,5 +2921,57 @@
       "time": 604800
     },
     "in_crates": false
+  },
+  "range_rover_skin": {
+    "id": "range_rover_skin",
+    "name": "range rover skin",
+    "plural": "ranger rover skins",
+    "article": "a",
+    "aliases": ["rangerover"],
+    "emoji": "<:nypsi_rangerover:1229070562131841107>",
+    "longDesc": "range rover skin for custom cars",
+    "role": "car_skin",
+    "sell": 100000,
+    "in_crates": true,
+    "rarity": 5
+  },
+  "pontiac_skin": {
+    "id": "pontiac_skin",
+    "name": "pontiac car skin",
+    "plural": "pontiac skins",
+    "article": "a",
+    "aliases": ["pontiac"],
+    "emoji": "<:nypsi_pontiac:1229082173374730311>",
+    "longDesc": "pontiac car skin for custom cars",
+    "role": "car_skin",
+    "sell": 100000,
+    "in_crates": true,
+    "rarity": 5
+  },
+  "ferrari_skin": {
+    "id": "ferrari_skin",
+    "name": "ferrari skin",
+    "plural": "ferrari skins",
+    "article": "a",
+    "aliases": ["ferrari"],
+    "emoji": "<:nypsi_ferrari:1229083946017624166>",
+    "longDesc": "ferrari car skin for custom cars",
+    "role": "car_skin",
+    "sell": 100000,
+    "in_crates": true,
+    "rarity": 5
+  },
+  "bugatti_skin": {
+    "id": "bugatti_skin",
+    "name": "bugatti skin",
+    "plural": "bugatti skins",
+    "article": "a",
+    "aliases": ["bugatti"],
+    "emoji": "<:nypsi_bugatti:1229084570763264090>",
+    "longDesc": "bugatti car skin for custom cars",
+    "role": "car_skin",
+    "sell": 100000,
+    "in_crates": true,
+    "rarity": 5
   }
 }
