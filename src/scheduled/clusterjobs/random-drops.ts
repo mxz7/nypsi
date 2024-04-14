@@ -42,7 +42,7 @@ const words = [
 ];
 
 function doRandomDrop(client: NypsiClient) {
-  const rand = Math.floor(Math.random() * ms("30 minutes") + ms("15 minutes"));
+  const rand = Math.floor(Math.random() * ms("20 minutes") + ms("10 minutes"));
   setTimeout(() => {
     randomDrop(client);
     doRandomDrop(client);
