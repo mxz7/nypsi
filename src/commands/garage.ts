@@ -132,7 +132,10 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         row.addComponents(button);
       }
       pages.push({
-        selectMenuOption: new StringSelectMenuOptionBuilder().setLabel(car.name).setValue(car.id),
+        selectMenuOption: new StringSelectMenuOptionBuilder()
+          .setLabel(car.name)
+          .setValue(car.id)
+          .setEmoji(getCarEmoji(car)),
         buttonRow: row,
         image: getEmojiImage(getCarEmoji(car)),
         skinsRow:
