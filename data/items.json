@@ -2878,7 +2878,8 @@
     "rarity": 5,
     "role": "car_part",
     "sell": 10000,
-    "in_crates": true
+    "in_crates": true,
+    "random_drop_chance": 10
   },
   "turbo_upgrade": {
     "id": "turbo_upgrade",
@@ -2908,7 +2909,8 @@
     "rarity": 5,
     "role": "car_part",
     "sell": 10000,
-    "in_crates": true
+    "in_crates": true,
+    "random_drop_chance": 10
   },
   "wheel_upgrade": {
     "id": "wheel_upgrade",
@@ -2951,7 +2953,8 @@
     "role": "car_skin",
     "sell": 100000,
     "in_crates": true,
-    "rarity": 5
+    "rarity": 5,
+    "random_drop_chance": 15
   },
   "ferrari_skin": {
     "id": "ferrari_skin",
@@ -2964,7 +2967,8 @@
     "role": "car_skin",
     "sell": 100000,
     "in_crates": true,
-    "rarity": 5
+    "rarity": 5,
+    "random_drop_chance": 5
   },
   "bugatti_skin": {
     "id": "bugatti_skin",
