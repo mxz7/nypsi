@@ -137,7 +137,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         image: getEmojiImage(getCarEmoji(car)),
         skinsRow:
           skinOptions.length > 0
-            ? new StringSelectMenuBuilder().setOptions(skinOptions).setCustomId("skin")
+            ? new StringSelectMenuBuilder()
+                .setOptions({ value: "none", label: "no skin", default: !car.skin }, ...skinOptions)
+                .setCustomId("skin")
             : undefined,
         description:
           `**name** ${car.name}\n` +
@@ -167,16 +169,25 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     pages[index].selectMenuOption.setDefault(true);
 
     if (needsUpdate) {
+      const components = [
+        new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+          new StringSelectMenuBuilder()
+            .setCustomId("car")
+            .setOptions(pages.map((i) => i.selectMenuOption)),
+        ),
+        pages[index].buttonRow,
+      ];
+
+      if (pages[index].skinsRow)
+        components.push(
+          new ActionRowBuilder<MessageActionRowComponentBuilder>().setComponents(
+            pages[index].skinsRow,
+          ),
+        );
+
       const msgPayload: MessageEditOptions = {
         embeds: [embed],
-        components: [
-          new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-            new StringSelectMenuBuilder()
-              .setCustomId("car")
-              .setOptions(pages.map((i) => i.selectMenuOption)),
-          ),
-          pages[index].buttonRow,
-        ],
+        components,
       };
 
       if (interaction) {
@@ -213,9 +224,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
         } else if (interaction.customId === "skin") {
           const chosen = interaction.values[0];
 
-          await setSkin(message.author.id, cars[index].id, chosen);
+          await setSkin(message.author.id, cars[index].id, chosen === "none" ? undefined : chosen);
 
-          const changed = checkSkins(message.author.id, await getGarage(message.author.id));
+          const changed = await checkSkins(message.author.id, await getGarage(message.author.id));
 
           showCars(await getGarage(message.author.id), index, msg, interaction, true);
 
