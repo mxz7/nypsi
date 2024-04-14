@@ -2141,6 +2141,8 @@
       "id:grandpa:60",
       "id:cursor:70",
       "id:super_cursor:50",
+      "id:range_rover_skin:10",
+      "id:pontiac_skin:10",
       "id:oven:30",
       "id:lamborghini:1",
       "id:engine_upgrade_part:50",
@@ -2196,6 +2198,7 @@
       "id:gem_crate:2.5",
       "id:omega_crate:2",
       "id:cat_tag:0.5",
+      "id:ferrari_skin:10",
       "id:reroll_token:4"
     ],
     "random_drop_chance": 40
@@ -2529,6 +2532,8 @@
       "id:goat_tag:0.5",
       "id:cat_tag:1",
       "id:clown_tag:2",
+      "id:bugatti_skin:15",
+      "id:ferrari_skin:15",
       "id:steve:75",
       "id:coffee:40",
       "id:cookie:3",
