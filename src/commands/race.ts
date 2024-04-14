@@ -25,7 +25,7 @@ import { addProgress } from "../utils/functions/economy/achievements";
 import { calcMaxBet, getBalance, updateBalance } from "../utils/functions/economy/balance";
 import { Car, calcSpeed, getCarEmoji, getGarage } from "../utils/functions/economy/cars";
 import { getInventory } from "../utils/functions/economy/inventory";
-import { createGame } from "../utils/functions/economy/stats";
+import { addStat, createGame } from "../utils/functions/economy/stats";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
 import { createUser, formatBet, getItems, userExists } from "../utils/functions/economy/utils";
 import sleep from "../utils/functions/sleep";
@@ -482,13 +482,14 @@ class Race {
             });
           }
 
-          await createGame({
-            userId: member.user.id,
-            bet: this.bet,
-            game: "race",
-            result: "lose",
-            outcome: this.embed.data.description,
-          });
+          addStat(member.user.id, member.car.car.id, 1),
+            await createGame({
+              userId: member.user.id,
+              bet: this.bet,
+              game: "race",
+              result: "lose",
+              outcome: this.embed.data.description,
+            });
         }
 
         this.embed.setDescription(description);
