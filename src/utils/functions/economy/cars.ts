@@ -54,6 +54,7 @@ export async function getGarage(userId: string) {
   const cache = await redis.get(`${Constants.redis.cache.economy.GARAGE}:${userId}`);
 
   if (cache) {
+    checkSkins(userId, JSON.parse(cache));
     return JSON.parse(cache) as Car[];
   }
 
@@ -83,6 +84,8 @@ export async function getGarage(userId: string) {
     "EX",
     86400,
   );
+
+  checkSkins(userId, query);
 
   return query;
 }
