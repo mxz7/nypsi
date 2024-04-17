@@ -2862,7 +2862,7 @@
     "upgrades": "engine",
     "sell": 100000,
     "craft": {
-      "ingredients": ["engine_upgrade_part:10"],
+      "ingredients": ["engine_upgrade_part:15"],
       "time": 172800
     },
     "in_crates": false
