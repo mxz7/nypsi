@@ -28,7 +28,7 @@
     "dotenv": "16.4.5",
     "express": "4.19.2",
     "fast-sort": "3.4.0",
-    "ioredis": "5.3.2",
+    "ioredis": "5.4.0",
     "lodash": "4.17.21",
     "mathjs": "12.4.1",
     "ms": "2.1.3",
