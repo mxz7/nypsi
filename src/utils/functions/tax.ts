@@ -36,7 +36,7 @@ export async function addToNypsiBank(amount: number) {
       },
       update: {
         bank: {
-          increment: amount,
+          increment: Math.floor(amount),
         },
       },
       create: {
