@@ -732,7 +732,6 @@ async function run(
       const response = await m
         .awaitMessageComponent({ filter, time: 60000 })
         .then(async (collected) => {
-          await collected.deferUpdate();
           duelRequests.delete(message.author.id);
 
           return collected;
