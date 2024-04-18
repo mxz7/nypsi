@@ -16,7 +16,7 @@ export function startAutoMuteViolationInterval() {
   setInterval(async () => {
     for (const guildId of violations.keys()) {
       for (const [userId, userVl] of violations.get(guildId).entries()) {
-        if (userVl.startedAt < Date.now() - ms("1 hour")) violations.get(guildId).delete(userId);
+        if (userVl.startedAt < Date.now() - ms("1 day")) violations.get(guildId).delete(userId);
         await sleep(5);
       }
 
