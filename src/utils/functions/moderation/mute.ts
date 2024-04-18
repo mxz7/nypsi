@@ -19,6 +19,9 @@ export function startAutoMuteViolationInterval() {
         if (userVl.startedAt < Date.now() - ms("1 hour")) violations.get(guildId).delete(userId);
         await sleep(5);
       }
+
+      if (violations.get(guildId).size === 0) violations.delete(guildId);
+
       await sleep(50);
     }
   }, ms("1 hour"));
