@@ -532,6 +532,9 @@ async function run(
 
       if (!target) return send({ embeds: [new ErrorEmbed("invalid target")] });
 
+      if (target.user.id === message.author.id)
+        return send({ embeds: [new ErrorEmbed("you cannot duel yourself. idiot.")] });
+
       if (blacklisted.includes(target.user.id))
         return send({
           embeds: [new ErrorEmbed("that user is blacklisted from chat reactions in this server")],
