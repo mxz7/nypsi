@@ -663,6 +663,15 @@ export async function calcNetWorth(member: GuildMember | string, breakdown = fal
       bank: true,
       Inventory: true,
       netWorth: true,
+      Auction: {
+        select: {
+          itemId: true,
+          itemAmount: true,
+        },
+        where: {
+          sold: false,
+        },
+      },
       OffersGiven: {
         select: {
           money: true,
@@ -727,6 +736,9 @@ export async function calcNetWorth(member: GuildMember | string, breakdown = fal
       ? query.OffersGiven.map((i) => i.money).reduce((a, b) => a + b)
       : 0,
   );
+
+  for (const auction of query.Auction)
+    worth += (await calcItemValue(auction.itemId)) * Number(auction.itemAmount);
 
   if (breakdown) breakdownItems.set("balance", worth);
 
