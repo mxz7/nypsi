@@ -87,7 +87,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   embed.setDescription(mainValues);
   if (itemValues && itemValues.length > 1)
     embed.addField(
-      `items (${itemValues
+      `inventory (${itemValues
         .map((i) => (i.value / net.amount) * 100)
         .reduce((a, b) => a + b)
         .toFixed(2)}%)`,
@@ -114,7 +114,13 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     allowMessageDupe: true,
     updateEmbed(page, embed) {
       embed.data.fields.length = 0;
-      embed.addField("items", page.join("\n"));
+      embed.addField(
+        `inventory (${itemValues
+          .map((i) => (i.value / net.amount) * 100)
+          .reduce((a, b) => a + b)
+          .toFixed(2)}%)`,
+        page.join("\n"),
+      );
 
       return embed;
     },
