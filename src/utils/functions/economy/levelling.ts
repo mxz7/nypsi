@@ -16,6 +16,7 @@ import { addTaskProgress } from "./tasks";
 import { getXp, updateXp } from "./xp";
 import ms = require("ms");
 import dayjs = require("dayjs");
+import _ = require("lodash");
 
 const levellingRewards = new Map<number, { text: string; rewards?: string[] }>();
 
@@ -398,7 +399,7 @@ async function doLevelUp(
 
   const rawLevel = await getRawLevel(member);
 
-  let levelData = levellingRewards.get(rawLevel);
+  let levelData = _.clone(levellingRewards.get(rawLevel));
 
   logger.info(`${id} levelled up to ${rawLevel} (P${prestige}L${level})`);
 
