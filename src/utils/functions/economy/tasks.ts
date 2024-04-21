@@ -287,6 +287,8 @@ export async function addTaskProgress(userId: string, taskId: string, amount = 1
     }
 
     embed.setDescription(desc);
+    if (getTasksData()[task.task_id].complete_gif)
+      embed.setImage(getTasksData()[task.task_id].complete_gif);
 
     addInlineNotification({ embed, memberId: task.user_id });
     addProgress(task.user_id, "taskmaster", 1);
