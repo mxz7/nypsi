@@ -17,7 +17,7 @@ export type Car = {
 
 const carEmojis = new Map<number, string>();
 carEmojis.set(0, "<:nypsi_car_0:1227982579139874896>");
-carEmojis.set(6, "<:nypsi_i20n:1228692848900050944>");
+carEmojis.set(5, "<:nypsi_i20n:1228692848900050944>");
 carEmojis.set(8, "<:nypsi_octaviavrs:1228693886193369120>");
 carEmojis.set(11, "<:nypsi_rs3:1228694189345210430>");
 carEmojis.set(13, "<:nypsi_c63:1228703330193248326>");
