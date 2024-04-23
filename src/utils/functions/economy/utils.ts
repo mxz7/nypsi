@@ -23,7 +23,7 @@ import { getPreferences } from "../users/notifications";
 import { createProfile, hasProfile } from "../users/utils";
 import { setProgress } from "./achievements";
 import { calcMaxBet, getBalance, updateBalance } from "./balance";
-import { getGuildByUser } from "./guilds";
+import { addToGuildXP, getGuildByUser, getGuildName } from "./guilds";
 import { addInventoryItem } from "./inventory";
 import { addStat } from "./stats";
 import { addTaskProgress } from "./tasks";
@@ -700,6 +700,12 @@ export async function doDaily(member: GuildMember) {
   if (xp > 0) {
     await updateXp(member, (await getXp(member)) + xp);
     embed.setFooter({ text: `+${xp}xp` });
+
+    const guild = await getGuildName(member);
+
+    if (guild) {
+      await addToGuildXP(guild, xp, member);
+    }
   }
 
   await setProgress(member.id, "streaker", streak);

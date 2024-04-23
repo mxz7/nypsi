@@ -12,6 +12,7 @@ import { addInlineNotification } from "../users/notifications";
 import { getLastKnownAvatar } from "../users/tag";
 import { addProgress } from "./achievements";
 import { getBalance, updateBalance } from "./balance";
+import { addToGuildXP, getGuildName } from "./guilds";
 import { addInventoryItem } from "./inventory";
 import { getItems, getTasksData, userExists } from "./utils";
 import { getXp, updateXp } from "./xp";
@@ -283,6 +284,12 @@ export async function addTaskProgress(userId: string, taskId: string, amount = 1
       case "xp":
         desc += `\n\nyou have received ${reward.value.toLocaleString()}xp`;
         await updateXp(task.user_id, (await getXp(task.user_id)) + reward.value);
+
+        const guild = await getGuildName(task.user_id);
+
+        if (guild) {
+          await addToGuildXP(guild, reward.value, task.user_id);
+        }
         break;
     }
 
