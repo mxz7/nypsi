@@ -74,7 +74,7 @@ async function run(
     return send({ embeds: [embed] });
   }
 
-  await addCooldown(cmd.name, message.member, 10);
+  await addCooldown(cmd.name, message.member, 5);
 
   const items = getItems();
   const craftableItemIds = Object.keys(items).filter((i) => items[i].craft);
