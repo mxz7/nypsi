@@ -242,7 +242,7 @@
   "thief": {
     "id": "thief",
     "name": "thief",
-    "description": "rob people or the bank",
+    "description": "rob people or the bank successfully",
     "target": [3, 5, 7, 10],
     "prizes": ["id:basic_crate:1", "id:69420_crate:1"],
     "type": "daily"
