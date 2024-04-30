@@ -112,6 +112,11 @@ async function run(
               Upgrades: true,
               OffersReceived: true,
               auctionWatch: true,
+              CustomCar: {
+                include: {
+                  upgrades: true,
+                },
+              },
               EconomyWorker: {
                 include: {
                   upgrades: true,

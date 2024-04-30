@@ -170,6 +170,11 @@ async function run(
                 EconomyGuildMember: true,
                 OffersGiven: true,
                 Upgrades: true,
+                CustomCar: {
+                  include: {
+                    upgrades: true,
+                  },
+                },
                 OffersReceived: true,
                 auctionWatch: true,
                 EconomyWorker: {
