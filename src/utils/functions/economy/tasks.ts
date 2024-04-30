@@ -5,7 +5,6 @@ import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { Item } from "../../../types/Economy";
 import { Task } from "../../../types/Tasks";
 import Constants from "../../Constants";
-import { logger } from "../../logger";
 import { addKarma } from "../karma/karma";
 import sleep from "../sleep";
 import { addInlineNotification } from "../users/notifications";
@@ -111,35 +110,24 @@ export async function getTasks(userId: string): Promise<PrismaTask[]> {
 
   try {
     if (query.length < 6) {
-      logger.debug(`${userId} less than 6 tasks`);
-      console.trace();
-
       const dailiesCount = query.filter((t) => t.type === "daily").length;
       const weekliesCount = query.length - dailiesCount;
 
       if (dailiesCount < 3) {
-        logger.debug(`${userId} generating daily tasks`);
         await generateDailyTasks(userId, 3 - dailiesCount);
       }
 
       if (weekliesCount < 3) {
-        logger.debug(`${userId} generating weekly tasks`);
         await generateWeeklyTasks(userId, 3 - weekliesCount);
       }
 
       await sleep(100);
 
-      logger.debug(`${userId} done generating tasks`);
       taskGeneration.delete(userId);
       return getTasks(userId);
     } else if (query.length > 6) {
       const dailies = query.filter((i) => i.type === "daily");
       const weeklies = query.filter((i) => i.type === "weekly");
-
-      logger.debug(`${userId} more than 6 tasks`, {
-        dailies: dailies.length,
-        weeklies: weeklies.length,
-      });
 
       if (dailies.length > 3) {
         await prisma.task.delete({
@@ -167,7 +155,6 @@ export async function getTasks(userId: string): Promise<PrismaTask[]> {
       return getTasks(userId);
     }
   } catch (e) {
-    logger.error(`caught error generating tasks`, { error: e });
     await redis.del(`${Constants.redis.cache.economy.TASKS}:${userId}`);
     taskGeneration.delete(userId);
     return getTasks(userId);
