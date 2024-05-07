@@ -9,6 +9,7 @@ import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getMember } from "../utils/functions/member";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import { addProgress } from "../utils/functions/economy/achievements";
 
 const cache = new Map<string, number>();
 
@@ -122,6 +123,8 @@ async function run(
     message.member,
     `${member.user.toString()}\n**${slutAmount}**% slut ${slutEmoji}\n${slutText}`,
   ).setTitle("slut calculator");
+
+  addProgress(message.author.id, "unsure", 1);
 
   return await send({ embeds: [embed] });
 }
