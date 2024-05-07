@@ -41,6 +41,7 @@ import { getCustomPresence, randomPresence, setCustomPresence } from "../utils/f
 import { getVersion } from "../utils/functions/version";
 import { runCommandUseTimers } from "../utils/handlers/commandhandler";
 import { getWebhooks, logger, setClusterId } from "../utils/logger";
+import entitlementCreate from "../events/entitlementCreate";
 
 export class NypsiClient extends Client {
   public cluster: ClusterClient<Client>;
@@ -109,6 +110,7 @@ export class NypsiClient extends Client {
       this.on("emojiCreate", emojiCreate.bind(null));
       this.on("emojiDelete", emojiDelete.bind(null));
       this.on("emojiUpdate", emojiUpdate.bind(null));
+      this.on("entitlementCreate", entitlementCreate.bind(null));
 
       this.cluster.on("message", async (message: any) => {
         if (message._type) {
