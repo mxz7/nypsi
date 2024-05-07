@@ -100,7 +100,7 @@ export async function addMember(member: GuildMember | string, level: number, exp
       userId: id,
       level: level,
       startDate: new Date(),
-      expireDate: expires || dayjs().add(35, "day").toDate(),
+      expireDate: expires || dayjs().add(31, "day").toDate(),
       lastWeekly: new Date(0),
     },
   });
@@ -191,7 +191,7 @@ export async function renewUser(member: string, client?: NypsiClient) {
       userId: member,
     },
     data: {
-      expireDate: dayjs().add(35, "days").toDate(),
+      expireDate: dayjs().add(31, "days").toDate(),
     },
   });
 
@@ -201,7 +201,7 @@ export async function renewUser(member: string, client?: NypsiClient) {
         memberId: member,
         client: client,
         content: `your membership has been renewed until **${formatDate(
-          dayjs().add(35, "days").toDate(),
+          dayjs().add(31, "days").toDate(),
         )}**`,
       });
     } else {
@@ -209,7 +209,7 @@ export async function renewUser(member: string, client?: NypsiClient) {
         memberId: member,
         payload: {
           content: `your membership has been renewed until **${formatDate(
-            dayjs().add(35, "days").toDate(),
+            dayjs().add(31, "days").toDate(),
           )}**`,
         },
       });
