@@ -1,6 +1,6 @@
 import { CommandInteraction, Message } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
-import { toggleLock } from "../utils/functions/captcha";
+import { giveCaptcha } from "../utils/functions/captcha";
 import { getAdminLevel } from "../utils/functions/users/admin";
 import { logger } from "../utils/logger";
 
@@ -17,8 +17,8 @@ async function run(
   }
 
   for (const user of args) {
-    toggleLock(user, true);
-    logger.info(`admin: ${message.author.id} (${message.author.username}) toggled ${user} captcha`);
+    giveCaptcha(user, 2, true);
+    logger.info(`admin: ${message.author.id} (${message.author.username}) gave ${user} captcha`);
   }
 
   if (!(message instanceof Message)) return;

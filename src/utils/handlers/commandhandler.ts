@@ -19,7 +19,7 @@ import redis from "../../init/redis";
 import { NypsiClient } from "../../models/Client";
 import { Command, NypsiCommandInteraction } from "../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../models/EmbedBuilders";
-import { isLockedOut, toggleLock, verifyUser } from "../functions/captcha";
+import { giveCaptcha, isLockedOut, verifyUser } from "../functions/captcha";
 import { formatDate, MStoTime } from "../functions/date";
 import { getNews, hasSeenNews } from "../functions/news";
 import { getTimestamp, logger } from "../logger";
@@ -795,7 +795,9 @@ export async function runCommand(
   }
 
   if (await isLockedOut(message.author.id)) {
-    return verifyUser(message);
+    const res = await verifyUser(message);
+
+    if (!res) return;
   }
 
   if (command.category == "money" || ["wholesome", "wordle", "sex"].includes(command.name)) {
@@ -1227,7 +1229,7 @@ export function runCommandUseTimers(client: NypsiClient) {
 
           if (dayjs().subtract(30, "seconds").unix() * 1000 > lastCommand.getTime()) continue; // dont lock if last command was more than 5 minutes ago
 
-          toggleLock(id, true);
+          giveCaptcha(id, 2, true);
           logger.info(`${tag} (${id}) has been given a captcha`);
           await hook.send(`[${getTimestamp()}] **${tag}** (${id}) has been given a captcha`);
         }
