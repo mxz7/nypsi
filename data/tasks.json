@@ -153,7 +153,7 @@
     "id": "mine_daily",
     "name": "miner",
     "description": "mine",
-    "complete_gif": "https://tenor.com/view/master-finish-finished-working-over-gif-27234987",
+    "complete_gif": "https://c.tenor.com/21SK19ZNydwAAAAC/tenor.gif",
     "target": [10, 15],
     "prizes": ["id:basic_crate:1", "id:diamond_pickaxe:7"],
     "type": "daily"
@@ -162,7 +162,7 @@
     "id": "mine_weekly",
     "name": "miner",
     "description": "mine",
-    "complete_gif": "https://tenor.com/view/master-finish-finished-working-over-gif-27234987",
+    "complete_gif": "https://c.tenor.com/21SK19ZNydwAAAAC/tenor.gif",
     "target": [50, 75, 100],
     "prizes": ["id:basic_crate:2", "id:diamond_pickaxe:15"],
     "type": "weekly"
