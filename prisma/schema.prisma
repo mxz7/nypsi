@@ -787,3 +787,15 @@ model Session {
   expiresAt DateTime
   user      User     @relation(references: [id], fields: [userId], onDelete: Cascade)
 }
+
+model Captcha {
+  id     String @id @default(uuid())
+  userId String
+
+  solved   Boolean    @default(false)
+  received Int        @default(0)
+  visits   DateTime[]
+
+  createdAt DateTime  @default(now())
+  solvedAt  DateTime? @default(now())
+}

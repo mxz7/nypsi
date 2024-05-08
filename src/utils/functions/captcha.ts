@@ -1,6 +1,7 @@
 import { CaptchaGenerator } from "captcha-canvas";
 import { CommandInteraction, GuildMember, Message, WebhookClient } from "discord.js";
 import * as crypto from "node:crypto";
+import prisma from "../../init/database";
 import redis from "../../init/redis";
 import { NypsiClient } from "../../models/Client";
 import { NypsiCommandInteraction } from "../../models/Command";
@@ -18,16 +19,40 @@ const colors = ["deeppink", "green", "red", "blue"];
 
 const generator = new CaptchaGenerator().setDecoy({ opacity: 0.6, total: 15 });
 
-export async function isLockedOut(userId: string) {
-  return Boolean(await redis.sismember(Constants.redis.nypsi.LOCKED_OUT, userId));
+type CaptchaType1 = {
+  type: 1;
+};
+
+type CaptchaType2 = {
+  type: 2;
+  id: string;
+};
+
+export async function isLockedOut(userId: string): Promise<false | CaptchaType1 | CaptchaType2> {
+  const cache = await redis.get(`${Constants.redis.nypsi.LOCKED_OUT}:${userId}`);
+  if (!cache) return false;
+
+  return JSON.parse(cache);
 }
 
-export async function toggleLock(userId: string, force = false) {
-  if (await isLockedOut(userId)) {
-    await redis.srem(Constants.redis.nypsi.LOCKED_OUT, userId);
+export async function giveCaptcha(userId: string, type: 1 | 2 = 2, force = false) {
+  if (!force && isVerified(userId)) return false;
+
+  if (type === 2) {
+    const id = await prisma.captcha.create({
+      data: {
+        userId,
+      },
+      select: {
+        id: true,
+      },
+    });
+    await redis.set(
+      `${Constants.redis.nypsi.LOCKED_OUT}:${userId}`,
+      JSON.stringify({ type: 2, id }),
+    );
   } else {
-    if ((await isVerified(userId)) && !force) return false;
-    await redis.sadd(Constants.redis.nypsi.LOCKED_OUT, userId);
+    await redis.set(`${Constants.redis.nypsi.LOCKED_OUT}:${userId}`, JSON.stringify({ type: 1 }));
   }
 
   return true;
@@ -46,7 +71,7 @@ async function isVerified(id: string) {
   return await redis.exists(`${Constants.redis.nypsi.CAPTCHA_VERIFIED}:${id}`);
 }
 
-export async function passedCaptcha(member: GuildMember) {
+export async function passedCaptcha(member: GuildMember, meta?: string) {
   const hook = new WebhookClient({
     url: process.env.ANTICHEAT_HOOK,
   });
@@ -73,7 +98,7 @@ export async function passedCaptcha(member: GuildMember) {
       member.user.id
     }) has passed a captcha [${await redis.get(
       `${Constants.redis.cache.user.captcha_pass}:${member.user.id}`,
-    )}]`,
+    )}]${meta ? meta : ""}`,
   );
 
   await redis.set(`${Constants.redis.nypsi.CAPTCHA_VERIFIED}:${member.user.id}`, member.user.id);
@@ -119,7 +144,8 @@ export async function failedCaptcha(member: GuildMember, content: string) {
     );
     await requestDM({
       client: member.client as NypsiClient,
-      content: "you have been banned from nypsi economy for 24 hours for failing too many captchas",
+      content:
+        "you have been banned from nypsi economy for 24 hours for failing/ignoring too many captchas",
       memberId: member.user.id,
     });
   }
@@ -127,7 +153,7 @@ export async function failedCaptcha(member: GuildMember, content: string) {
   await hook.send(
     `[${getTimestamp()}] **${member.user.username}** (${
       member.user.id
-    }) has failed a captcha (${content}) [${parseInt(
+    }) has failed/ignored a captcha (${content}) [${parseInt(
       await redis.get(`${Constants.redis.cache.user.captcha_fail}:${member.user.id}`),
     )}]${
       parseInt(await redis.get(`${Constants.redis.cache.user.captcha_fail}:${member.user.id}`)) %
@@ -143,73 +169,115 @@ export async function failedCaptcha(member: GuildMember, content: string) {
 export async function verifyUser(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
 ) {
-  if (beingVerified.has(message.author.id)) return;
+  const res = await isLockedOut(message.author.id);
 
-  const { captcha, text } = await createCaptcha();
+  if (!res) return;
 
-  const embed = new CustomEmbed(message.member).setTitle("you have been locked");
+  if (res.type === 1) {
+    if (beingVerified.has(message.author.id)) return;
 
-  embed.setDescription(
-    "please note that using macros / auto typers is not allowed with nypsi" +
-      "\n**if you fail too many captchas you may be banned**" +
-      "\n\nplease type the following:",
-  );
+    const { captcha, text } = await createCaptcha();
 
-  embed.setImage("attachment://captcha.png");
+    const embed = new CustomEmbed(message.member).setTitle("you have been locked");
 
-  beingVerified.add(message.author.id);
+    embed.setDescription(
+      "please note that using macros / auto typers is not allowed with nypsi" +
+        "\n**if you fail too many captchas you may be banned**" +
+        "\n\nplease type the following:",
+    );
 
-  await message.channel.send({
-    content: message.author.toString(),
-    embeds: [embed],
-    files: [
-      {
-        attachment: captcha,
-        name: "captcha.png",
-      },
-    ],
-  });
+    embed.setImage("attachment://captcha.png");
 
-  logger.info(`sent captcha (${message.author.id}) - awaiting reply`);
+    beingVerified.add(message.author.id);
 
-  const filter = (m: Message) => m.author.id == message.author.id;
+    await message.channel.send({
+      content: message.author.toString(),
+      embeds: [embed],
+      files: [
+        {
+          attachment: captcha,
+          name: "captcha.png",
+        },
+      ],
+    });
 
-  let fail = false;
+    logger.info(`sent captcha (${message.author.id}) - awaiting reply`);
 
-  const response = await message.channel
-    .awaitMessages({ filter, max: 1, time: 30000, errors: ["time"] })
-    .then(async (collected) => {
-      return collected.first();
-    })
-    .catch(() => {
-      fail = true;
+    const filter = (m: Message) => m.author.id == message.author.id;
+
+    let fail = false;
+
+    const response = await message.channel
+      .awaitMessages({ filter, max: 1, time: 30000, errors: ["time"] })
+      .then(async (collected) => {
+        return collected.first();
+      })
+      .catch(() => {
+        fail = true;
+        logger.info(`captcha (${message.author.id}) failed`);
+        failedCaptcha(message.member, "captcha timed out");
+        message.channel.send({
+          content:
+            message.author.toString() +
+            " captcha failed, please **type** the letter/number combination shown",
+        });
+      });
+
+    beingVerified.delete(message.author.id);
+
+    if (fail) return;
+    if (!response) return;
+
+    if (response.content.toLowerCase() == text) {
+      logger.info(`captcha (${message.author.id}) passed`);
+      passedCaptcha(message.member);
+      await redis.del(`${Constants.redis.nypsi.LOCKED_OUT}:${message.author.id}`);
+      response.react("✅");
+    } else {
+      logger.info(`${message.guild} - ${message.author.username}: ${message.content}`);
       logger.info(`captcha (${message.author.id}) failed`);
-      failedCaptcha(message.member, "captcha timed out");
+      failedCaptcha(message.member, response.content);
       message.channel.send({
         content:
           message.author.toString() +
           " captcha failed, please **type** the letter/number combination shown",
       });
+    }
+  } else if (res.type === 2) {
+    const embed = new CustomEmbed(message.member).setTitle("you have been locked");
+
+    embed.setDescription(
+      "please note that using macros / auto typers is not allowed with nypsi" +
+        "\n**if you fail or ignore too many captchas you may be banned**" +
+        `\n\n[you must complete a captcha by clicking here](https://nypsi.xyz/captcha?id=${res.id})`,
+    );
+    embed.setColor(Constants.EMBED_FAIL_COLOR);
+
+    const msg =
+      message instanceof Message
+        ? await message.reply({ embeds: [embed] })
+        : await message.reply({ embeds: [embed], ephemeral: true }).then((r) => r.fetch());
+
+    const query = await prisma.captcha.update({
+      where: { id: res.id },
+      data: { received: { increment: 1 } },
     });
 
-  beingVerified.delete(message.author.id);
+    if (query.solved) {
+      await msg.edit({
+        embeds: [
+          new CustomEmbed().setColor(Constants.EMBED_SUCCESS_COLOR).setDescription("✅ verified"),
+        ],
+      });
+      await redis.del(`${Constants.redis.nypsi.LOCKED_OUT}:${message.author.id}`);
+      passedCaptcha(message.member, "```" + "json\n" + `${JSON.stringify(query, null, 2)}` + "```");
 
-  if (fail) return;
-  if (!response) return;
-
-  if (response.content.toLowerCase() == text) {
-    logger.info(`captcha (${message.author.id}) passed`);
-    passedCaptcha(message.member);
-    toggleLock(message.author.id);
-    return response.react("✅");
-  } else {
-    logger.info(`${message.guild} - ${message.author.username}: ${message.content}`);
-    logger.info(`captcha (${message.author.id}) failed`);
-    failedCaptcha(message.member, response.content);
-    return message.channel.send({
-      content:
-        message.author.toString() +
-        " captcha failed, please **type** the letter/number combination shown",
-    });
+      return true;
+    } else if (query.received > 1) {
+      failedCaptcha(message.member, "null");
+      return false;
+    }
   }
+
+  return false;
 }
