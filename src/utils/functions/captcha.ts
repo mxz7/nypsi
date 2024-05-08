@@ -270,7 +270,13 @@ export async function verifyUser(
         ],
       });
       await redis.del(`${Constants.redis.nypsi.LOCKED_OUT}:${message.author.id}`);
-      passedCaptcha(message.member, "```" + "json\n" + `${JSON.stringify(query, null, 2)}` + "```");
+      passedCaptcha(
+        message.member,
+        "```" +
+          `received: ${query.received}\n` +
+          `visits (${query.visits.length}): ${query.visits.map((i) => `<t:${Math.floor(i.getTime() / 1000)}:R>`)}` +
+          "```",
+      );
 
       return true;
     } else if (query.received > 1) {
