@@ -246,8 +246,6 @@ export async function verifyUser(
   } else if (res.type === 2) {
     const embed = new CustomEmbed(message.member).setTitle("you have been locked");
 
-    console.log(res);
-
     embed.setDescription(
       "please note that using macros / auto typers is not allowed with nypsi" +
         "\n**if you fail or ignore too many captchas you may be banned**" +
