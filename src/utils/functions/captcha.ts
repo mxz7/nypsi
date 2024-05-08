@@ -49,7 +49,7 @@ export async function giveCaptcha(userId: string, type: 1 | 2 = 2, force = false
     });
     await redis.set(
       `${Constants.redis.nypsi.LOCKED_OUT}:${userId}`,
-      JSON.stringify({ type: 2, id }),
+      JSON.stringify({ type: 2, id: id.id }),
     );
   } else {
     await redis.set(`${Constants.redis.nypsi.LOCKED_OUT}:${userId}`, JSON.stringify({ type: 1 }));
@@ -245,6 +245,8 @@ export async function verifyUser(
     }
   } else if (res.type === 2) {
     const embed = new CustomEmbed(message.member).setTitle("you have been locked");
+
+    console.log(res);
 
     embed.setDescription(
       "please note that using macros / auto typers is not allowed with nypsi" +
