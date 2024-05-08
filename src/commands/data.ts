@@ -207,6 +207,7 @@ async function run(
                 source: true,
               },
             },
+            Captchas: true,
           },
         }),
         moderation: {
