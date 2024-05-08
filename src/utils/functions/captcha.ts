@@ -276,7 +276,7 @@ export async function verifyUser(
         message.member,
         "```" +
           `received: ${query.received}\n` +
-          `visits (${query.visits.length}): ${query.visits.map((i) => dayjs(i).format("MM/DD HH:mm:ss"))}` +
+          `visits (${query.visits.length}): ${query.visits.map((i) => dayjs(i).format("HH:mm:ss")).join(" ")}` +
           "```",
       );
 
