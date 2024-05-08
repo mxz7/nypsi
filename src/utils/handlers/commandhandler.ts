@@ -797,7 +797,7 @@ export async function runCommand(
   if (await isLockedOut(message.author.id)) {
     const res = await verifyUser(message);
 
-    if (!res) return;
+    if (!res || !(message instanceof Message)) return;
   }
 
   if (command.category == "money" || ["wholesome", "wordle", "sex"].includes(command.name)) {
