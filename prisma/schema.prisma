@@ -40,6 +40,7 @@ model User {
   Views          ProfileView[]
   Viewed         ProfileView[]    @relation(name: "viewer")
   Sessions       Session[]
+  Captchas       Captcha[]
 }
 
 model ProfileView {
@@ -798,4 +799,6 @@ model Captcha {
 
   createdAt DateTime  @default(now())
   solvedAt  DateTime? @default(now())
+
+  user User @relation(fields: [userId], references: [id])
 }
