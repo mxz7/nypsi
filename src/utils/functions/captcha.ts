@@ -256,7 +256,9 @@ export async function verifyUser(
     const msg =
       message instanceof Message
         ? await message.reply({ embeds: [embed] })
-        : await message.reply({ embeds: [embed], ephemeral: true }).then((r) => r.fetch());
+        : await message
+            .reply({ embeds: [embed], ephemeral: true })
+            .then(() => message.fetchReply());
 
     const query = await prisma.captcha.update({
       where: { id: res.id },
