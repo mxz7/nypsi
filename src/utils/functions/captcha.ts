@@ -282,7 +282,7 @@ export async function verifyUser(
 
       return true;
     } else if (query.received > 1) {
-      failedCaptcha(message.member, "null");
+      failedCaptcha(message.member, message.content);
       return false;
     }
   }
