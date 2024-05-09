@@ -8,7 +8,7 @@ export default {
   type: "interaction",
   async run(interaction) {
     if (!interaction.isButton()) return;
-    if (await isEcoBanned(interaction.user.id)) return;
+    if ((await isEcoBanned(interaction.user.id)).banned) return;
     if (!interaction.channel.permissionsFor(interaction.user.id).has("SendMessages")) return;
 
     const int = interaction as unknown as NypsiCommandInteraction;

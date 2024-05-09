@@ -20,7 +20,7 @@ export default {
   type: "interaction",
   async run(interaction) {
     if (!interaction.isButton()) return;
-    if (await isEcoBanned(interaction.user.id)) return;
+    if ((await isEcoBanned(interaction.user.id)).banned) return;
     const auction = await prisma.auction.findFirst({
       where: {
         AND: [{ messageId: interaction.message.id }],

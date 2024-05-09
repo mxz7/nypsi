@@ -860,14 +860,20 @@ export async function runCommand(
       }
     }
 
-    if (await isEcoBanned(message.author.id)) {
+    const banCheck = await isEcoBanned(message.author.id);
+
+    if (banCheck.banned) {
       const unbanTime = await getEcoBanTime(message.author.id);
 
       const embed = new CustomEmbed(
         message.member,
-        `**you are banned from this command. dm me for help**\n\nyou'll be unbanned <t:${Math.floor(
-          unbanTime.getTime() / 1000,
-        )}:R>`,
+        `**you are banned from this command. dm me for help**\n\n` +
+          `${
+            banCheck.bannedAccount !== message.author.id
+              ? `in relation to \`${await getLastKnownUsername(banCheck.bannedAccount)}\`\n`
+              : ""
+          }` +
+          `you'll be unbanned <t:${Math.floor(unbanTime.getTime() / 1000)}:R>`,
       );
 
       if (message instanceof Message) {
@@ -1264,7 +1270,7 @@ export function runCommandUseTimers(client: NypsiClient) {
 
       const amount = Math.floor(commandUses.get(user) / modifier);
 
-      if (amount > 0 && !(await isEcoBanned(user))) {
+      if (amount > 0 && !(await isEcoBanned(user)).banned) {
         await addKarma(user, amount);
       }
     }

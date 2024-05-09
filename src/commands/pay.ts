@@ -99,8 +99,8 @@ async function run(
     return send({ embeds: [new ErrorEmbed("invalid user")] });
   }
 
-  if (await isEcoBanned(target.user.id)) {
-    return send({ embeds: [new ErrorEmbed("invalid user")] });
+  if ((await isEcoBanned(target.user.id)).banned) {
+    return send({ embeds: [new ErrorEmbed("they are banned xd")] });
   }
 
   if (!(await userExists(target))) await createUser(target);

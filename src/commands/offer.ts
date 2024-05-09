@@ -427,7 +427,7 @@ async function run(
       return send({ embeds: [new ErrorEmbed("lol xd cant offer yourself something")] });
     }
 
-    if (await isEcoBanned(target.user.id))
+    if ((await isEcoBanned(target.user.id)).banned)
       return send({ embeds: [new ErrorEmbed("theyre banned lol xd be mean to them for me ty")] });
 
     if ((await getPreferences(target)).offers <= (await getTargetedOffers(target.user.id)).length) {

@@ -89,3 +89,15 @@ export type UserUpgrade = {
   max: number;
   effect: number;
 };
+
+type BannedCache = {
+  banned: true;
+  bannedAccount: string;
+  expire: number;
+};
+
+type NotBannedCache = {
+  banned: false;
+};
+
+export type BanCache = BannedCache | NotBannedCache;

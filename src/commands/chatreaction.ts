@@ -554,10 +554,10 @@ async function run(
         });
       }
 
-      if ((await isEcoBanned(message.author.id)) && wager > 0)
+      if ((await isEcoBanned(message.author.id)).banned && wager > 0)
         return send({ embeds: [new ErrorEmbed("you are banned. lol.")] });
 
-      if ((await isEcoBanned(target.user.id)) && wager > 0)
+      if ((await isEcoBanned(target.user.id)).banned && wager > 0)
         return send({ embeds: [new ErrorEmbed("they are banned. lol.")] });
 
       if ((await getBalance(message.member)) < wager)
@@ -655,7 +655,7 @@ async function run(
       if (!wager) wager = 0;
       if (isNaN(wager)) wager = 0;
 
-      if ((await isEcoBanned(message.author.id)) && wager > 0)
+      if ((await isEcoBanned(message.author.id)).banned && wager > 0)
         return send({ embeds: [new ErrorEmbed("you are banned. lol.")] });
 
       if ((await getBalance(message.member)) < wager)
@@ -697,7 +697,7 @@ async function run(
       const filter = async (i: Interaction): Promise<boolean> => {
         if (i.user.id != message.author.id && (i as ButtonInteraction).customId == "n")
           return false;
-        if ((await isEcoBanned(i.user.id)) && wager > 0) return false;
+        if ((await isEcoBanned(i.user.id)).banned && wager > 0) return false;
 
         if (i.user.id === message.author.id) {
           if ((i as ButtonInteraction).customId === "n") return true;

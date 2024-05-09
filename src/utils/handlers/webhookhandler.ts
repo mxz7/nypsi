@@ -159,7 +159,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
 
   if (xp > 50) xp = 50;
 
-  if (!(await isEcoBanned(user))) {
+  if (!(await isEcoBanned(user)).banned) {
     try {
       await Promise.all([
         updateBalance(user, (await getBalance(user)) + amount),

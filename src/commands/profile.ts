@@ -136,7 +136,7 @@ async function run(
       ],
     });
 
-  if (await isEcoBanned(target.user.id))
+  if ((await isEcoBanned(target.user.id)).banned)
     return send({ embeds: [new ErrorEmbed(`${target.toString()} is banned AHAHAHAHA`)] });
 
   const [tag, tier] = await Promise.all([getActiveTag(target.user.id), getTier(target)]);

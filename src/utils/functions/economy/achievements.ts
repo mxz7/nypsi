@@ -28,7 +28,7 @@ import ms = require("ms");
  * returns true if user has met requirements for achievement
  */
 export async function addAchievementProgress(userId: string, achievementId: string, amount = 1) {
-  if (await isEcoBanned(userId)) return;
+  if ((await isEcoBanned(userId)).banned) return;
   const query = await prisma.achievements.upsert({
     create: {
       userId: userId,
@@ -63,7 +63,7 @@ export async function setAchievementProgress(
   achievementId: string,
   progress: number,
 ) {
-  if (await isEcoBanned(userId)) return;
+  if ((await isEcoBanned(userId)).banned) return;
   const query = await prisma.achievements.upsert({
     create: {
       userId: userId,
@@ -262,7 +262,7 @@ export async function getUserAchievement(userId: string, achievementId: string) 
 }
 
 export async function addProgress(userId: string, achievementStartName: string, amount: number) {
-  if (await isEcoBanned(userId)) return;
+  if ((await isEcoBanned(userId)).banned) return;
   const achievements = await getAllAchievements(userId, achievementStartName);
   let count = 0;
 
@@ -310,7 +310,7 @@ export async function addProgress(userId: string, achievementStartName: string, 
 }
 
 export async function setProgress(userId: string, achievementStartName: string, amount: number) {
-  if (await isEcoBanned(userId)) return;
+  if ((await isEcoBanned(userId)).banned) return;
   const achievements = await getAllAchievements(userId, achievementStartName);
   let count = 0;
 

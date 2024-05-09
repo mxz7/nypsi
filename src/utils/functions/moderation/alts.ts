@@ -22,7 +22,11 @@ export async function addAlt(guild: Guild, mainId: string, altId: string) {
 
   const alts = await getAlts(guild, mainId);
 
-  for (const alt of alts) await redis.del(`${Constants.redis.cache.guild.ALTS}:${guild.id}:${alt}`);
+  for (const alt of alts)
+    await redis.del(
+      `${Constants.redis.cache.guild.ALTS}:${guild.id}:${alt}`,
+      `${Constants.redis.cache.economy.BANNED}:${alt}`,
+    );
 
   return true;
 }
