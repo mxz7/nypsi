@@ -266,13 +266,24 @@ export async function verifyUser(
     });
 
     if (query.solved) {
-      await msg
-        .edit({
+      if (message instanceof Message) {
+        await msg
+          .edit({
+            embeds: [
+              new CustomEmbed()
+                .setColor(Constants.EMBED_SUCCESS_COLOR)
+                .setDescription("✅ verified"),
+            ],
+          })
+          .catch(() => {});
+      } else {
+        await message.followUp({
           embeds: [
             new CustomEmbed().setColor(Constants.EMBED_SUCCESS_COLOR).setDescription("✅ verified"),
           ],
-        })
-        .catch(() => {});
+        });
+      }
+
       await redis.del(`${Constants.redis.nypsi.LOCKED_OUT}:${message.author.id}`);
       passedCaptcha(
         message.member,
