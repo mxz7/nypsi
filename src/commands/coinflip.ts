@@ -234,7 +234,7 @@ async function run(
         embeds: [new ErrorEmbed("this user is waiting for a response on a coinflip")],
       });
 
-    if (await isEcoBanned(target.user.id)) {
+    if ((await isEcoBanned(target.user.id)).banned) {
       return send({ embeds: [new ErrorEmbed("they are banned. lol.")] });
     }
 
@@ -397,7 +397,7 @@ async function run(
 
     const filter = async (i: Interaction): Promise<boolean> => {
       if (i.user.id != message.author.id && (i as ButtonInteraction).customId == "n") return false;
-      if (await isEcoBanned(i.user.id)) return false;
+      if ((await isEcoBanned(i.user.id)).banned) return false;
 
       if (i.user.id === message.author.id) {
         if ((i as ButtonInteraction).customId === "n") return true;

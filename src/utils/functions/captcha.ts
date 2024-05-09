@@ -134,7 +134,7 @@ export async function failedCaptcha(member: GuildMember, content: string) {
   if (
     parseInt(await redis.get(`${Constants.redis.cache.user.captcha_fail}:${member.user.id}`)) >=
       50 &&
-    !(await isEcoBanned(member.user.id))
+    !(await isEcoBanned(member.user.id)).banned
   ) {
     await setEcoBan(member.user.id, dayjs().add(1, "day").toDate());
     await hook.send(
@@ -158,7 +158,7 @@ export async function failedCaptcha(member: GuildMember, content: string) {
     )}]${
       parseInt(await redis.get(`${Constants.redis.cache.user.captcha_fail}:${member.user.id}`)) %
         15 ===
-        0 && !(await isEcoBanned(member.user.id))
+        0 && !(await isEcoBanned(member.user.id)).banned
         ? " <@&1091314758986256424>"
         : ""
     }`,

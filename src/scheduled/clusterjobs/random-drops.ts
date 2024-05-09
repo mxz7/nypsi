@@ -114,7 +114,7 @@ async function randomDrop(client: NypsiClient) {
     if (winner) {
       if (!(await hasProfile(winner))) await createProfile(winner);
       if (!(await userExists(winner))) await createUser(winner);
-      if (await isEcoBanned(winner).catch(() => false)) continue;
+      if ((await isEcoBanned(winner).catch(() => ({ banned: false }))).banned) continue;
 
       logger.info(
         `random drop in ${channelId} winner: ${winner} (${await getLastKnownUsername(
@@ -536,7 +536,7 @@ export async function startRandomDrop(client: NypsiClient, channelId: string) {
   if (winner) {
     if (!(await hasProfile(winner))) await createProfile(winner);
     if (!(await userExists(winner))) await createUser(winner);
-    if (await isEcoBanned(winner).catch(() => false)) return;
+    if ((await isEcoBanned(winner).catch(() => ({ banned: false }))).banned) return;
 
     logger.info(
       `random drop in ${channelId} winner: ${winner} (${await getLastKnownUsername(

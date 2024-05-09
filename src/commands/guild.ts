@@ -386,8 +386,8 @@ async function run(
       return send({ embeds: [new ErrorEmbed("this user has already been invited to a guild")] });
     }
 
-    if (await isEcoBanned(target.user.id)) {
-      return send({ embeds: [new ErrorEmbed("invalid user")] });
+    if ((await isEcoBanned(target.user.id)).banned) {
+      return send({ embeds: [new ErrorEmbed("they're banned. lol. HA. HAHAHA.")] });
     }
 
     if (!(await userExists(target.user.id))) {

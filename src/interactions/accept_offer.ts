@@ -24,7 +24,7 @@ export default {
   type: "interaction",
   async run(interaction) {
     if (!interaction.isButton()) return;
-    if (await isEcoBanned(interaction.user.id)) return;
+    if ((await isEcoBanned(interaction.user.id)).banned) return;
 
     if (await redis.exists(`${Constants.redis.nypsi.OFFER_PROCESS}:${interaction.user.id}`)) {
       return interaction.reply({
@@ -50,7 +50,7 @@ export default {
       return await redis.del(`${Constants.redis.nypsi.OFFER_PROCESS}:${interaction.user.id}`);
     }
 
-    if (await isEcoBanned(offer.ownerId)) {
+    if ((await isEcoBanned(offer.ownerId)).banned) {
       await prisma.offer.delete({
         where: {
           messageId: offer.messageId,

@@ -9,7 +9,7 @@ export default {
   type: "interaction",
   async run(interaction) {
     if (!interaction.isButton()) return;
-    if (await isEcoBanned(interaction.user.id)) return;
+    if ((await isEcoBanned(interaction.user.id)).banned) return;
     await interaction.deferReply();
     const desc = await claimFromWorkers(interaction.user.id);
 

@@ -307,7 +307,7 @@ async function run(
     if (await isUserBlacklisted(user.id)) {
       rows[3].components[1].setDisabled(true);
       desc += "\n**currently blacklisted**";
-    } else if (await isEcoBanned(user.id)) {
+    } else if ((await isEcoBanned(user.id)).banned) {
       desc += "\n**currently economy banned**";
     }
 
@@ -788,7 +788,7 @@ async function run(
           return waitForButton();
         }
 
-        if (await isEcoBanned(user.id)) {
+        if ((await isEcoBanned(user.id)).banned) {
           logger.info(
             `admin: ${message.author.id} (${message.author.username}) removed ecoban for ${user.id} `,
           );

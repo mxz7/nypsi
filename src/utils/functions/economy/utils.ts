@@ -8,6 +8,7 @@ import { CustomEmbed } from "../../../models/EmbedBuilders";
 import {
   AchievementData,
   BakeryUpgradeData,
+  BanCache,
   GuildUpgrade,
   Item,
   UserUpgrade,
@@ -270,13 +271,16 @@ export function formatNumber(number: string | number) {
   return Math.floor(parseFloat(number.toString()));
 }
 
-export async function isEcoBanned(id: string) {
-  if (await isUserBlacklisted(id)) return true;
+export async function isEcoBanned(id: string): Promise<BanCache> {
+  if (await isUserBlacklisted(id))
+    return { banned: true, bannedAccount: id, expire: 0 } as BanCache;
 
   const cache = await redis.get(`${Constants.redis.cache.economy.BANNED}:${id}`);
 
   if (cache) {
-    const res = cache === "t" ? true : false;
+    const res = JSON.parse(cache) as BanCache;
+
+    if (res.banned && res.expire < Date.now()) return { banned: false } as BanCache;
 
     return res;
   }
@@ -285,8 +289,17 @@ export async function isEcoBanned(id: string) {
 
   for (const accountId of accounts) {
     const cache = await redis.get(`${Constants.redis.cache.economy.BANNED}:${accountId}`);
-    if (cache === "t") {
-      return true;
+
+    if (cache) {
+      const res = JSON.parse(cache) as BanCache;
+
+      if (res.banned) {
+        if (res.expire < Date.now()) {
+          await redis.del(`${Constants.redis.cache.economy.BANNED}:${accountId}`);
+          return { banned: false };
+        }
+        return res;
+      }
     } else {
       const query = await prisma.economy.findUnique({
         where: { userId: accountId },
@@ -298,23 +311,31 @@ export async function isEcoBanned(id: string) {
           for (const accountId of accounts) {
             await redis.set(
               `${Constants.redis.cache.economy.BANNED}:${accountId}`,
-              "t",
+              JSON.stringify({
+                banned: true,
+                bannedAccount: accountId,
+                expire: query.banned.getTime(),
+              }),
               "EX",
               ms("3 hour") / 1000,
             );
           }
 
-          return true;
-        } else {
-          await redis.set(`${Constants.redis.cache.economy.BANNED}:${accountId}`, "f", "EX", 3600);
+          return { banned: true, bannedAccount: accountId, expire: query.banned.getTime() };
         }
-      } else {
-        await redis.set(`${Constants.redis.cache.economy.BANNED}:${accountId}`, "f", "EX", 3600);
       }
     }
   }
 
-  return false;
+  for (const id of accounts)
+    await redis.set(
+      `${Constants.redis.cache.economy.BANNED}:${id}`,
+      JSON.stringify({ banned: false }),
+      "EX",
+      ms("3 hour") / 1000,
+    );
+
+  return { banned: false };
 }
 
 export async function getEcoBanTime(id: string) {

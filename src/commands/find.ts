@@ -199,7 +199,7 @@ async function showUser(message: Message, user: User) {
     .setDescription(
       `\`${user.id}\`${
         (await isPremium(user.id)) ? ` (${levelString(await getTier(user.id))}) ` : ""
-      } ${(await isEcoBanned(user.id)) ? "[banned]" : ""}`,
+      } ${(await isEcoBanned(user.id)).banned ? "[banned]" : ""}`,
     )
     .addField(
       "user",

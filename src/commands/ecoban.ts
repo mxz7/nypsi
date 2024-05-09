@@ -17,7 +17,7 @@ async function run(
   }
 
   if (!args[1]) {
-    if (await isEcoBanned(args[0])) {
+    if ((await isEcoBanned(args[0])).banned) {
       await setEcoBan(args[0]); // unbans user
       logger.info(
         `admin: ${message.author.id} (${message.author.username}) set ${args[0]} ecoban to unban`,
