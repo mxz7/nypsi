@@ -308,9 +308,9 @@ export async function isEcoBanned(id: string): Promise<BanCache> {
 
       if (query && query.banned) {
         if (query.banned.getTime() > Date.now()) {
-          for (const accountId of accounts) {
+          for (const accountId2 of accounts) {
             await redis.set(
-              `${Constants.redis.cache.economy.BANNED}:${accountId}`,
+              `${Constants.redis.cache.economy.BANNED}:${accountId2}`,
               JSON.stringify({
                 banned: true,
                 bannedAccount: accountId,
