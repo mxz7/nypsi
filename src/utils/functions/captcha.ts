@@ -279,6 +279,7 @@ export async function verifyUser(
         "```" +
           `received: ${query.received}\n` +
           `visits (${query.visits.length}): ${query.visits.map((i) => dayjs(i).format("HH:mm:ss")).join(" ")}` +
+          `solved at: ${dayjs(query.solvedAt).format("HH:mm:ss")}\n` +
           "```",
       );
 
