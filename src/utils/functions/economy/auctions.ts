@@ -779,8 +779,9 @@ export async function buyFullAuction(
   }
 
   beingBought.delete(auction.id);
-  await interaction.deferUpdate().catch(() => {});
-  await interaction.message.edit({ embeds: [embed], components: [] });
+  await interaction
+    .update({ embeds: [embed], components: [] })
+    .catch(() => interaction.message.edit({ embeds: [embed], components: [] }));
 }
 
 export async function buyAuctionOne(
@@ -1036,8 +1037,9 @@ export async function buyAuctionOne(
   }
 
   beingBought.delete(auction.id);
-  await interaction.deferUpdate().catch(() => {});
-  await interaction.message.edit({ embeds: [embed], components: [buttonRow] });
+  await interaction
+    .update({ embeds: [embed], components: [buttonRow] })
+    .catch(() => interaction.message.edit({ embeds: [embed], components: [buttonRow] }));
 }
 
 export async function buyAuctionMulti(
@@ -1308,6 +1310,7 @@ export async function buyAuctionMulti(
   }
 
   beingBought.delete(auction.id);
+
   await interaction.deferUpdate().catch(() => {});
   await interaction.message.edit({ embeds: [embed], components: [buttonRow] });
 }
