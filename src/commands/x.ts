@@ -21,12 +21,14 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { startRandomDrop } from "../scheduled/clusterjobs/random-drops";
 import Constants from "../utils/Constants";
 import { b, c } from "../utils/functions/anticheat";
+import { giveCaptcha } from "../utils/functions/captcha";
 import { updateBalance, updateBankBalance } from "../utils/functions/economy/balance";
 import { setInventoryItem } from "../utils/functions/economy/inventory";
 import { setLevel, setPrestige } from "../utils/functions/economy/levelling";
 import { getItems, isEcoBanned, setEcoBan } from "../utils/functions/economy/utils";
 import { updateXp } from "../utils/functions/economy/xp";
 import { addKarma, getKarma, removeKarma } from "../utils/functions/karma/karma";
+import PageManager from "../utils/functions/page";
 import { getUserAliases } from "../utils/functions/premium/aliases";
 import {
   addMember,
@@ -228,15 +230,10 @@ async function run(
       ),
       new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder()
-          .setCustomId("ac-hist")
-          .setLabel("anticheat info")
+          .setCustomId("ac")
+          .setLabel("anticheat")
           .setStyle(ButtonStyle.Primary)
           .setEmoji("🤥"),
-        new ButtonBuilder()
-          .setCustomId("ac-clear")
-          .setLabel("clear violations")
-          .setStyle(ButtonStyle.Primary)
-          .setEmoji("😃"),
         new ButtonBuilder()
           .setCustomId("tags")
           .setLabel("tags")
@@ -416,62 +413,6 @@ async function run(
         );
         await setAdminLevel(user.id, parseInt(msg.content));
         await res.editReply({ embeds: [new CustomEmbed(message.member, "✅")] });
-        return waitForButton();
-      } else if (res.customId === "ac-hist") {
-        if ((await getAdminLevel(message.author.id)) < 2) {
-          await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **2** to do this")],
-          });
-          return waitForButton();
-        }
-
-        logger.info(
-          `admin: ${message.author.id} (${message.author.username}) viewed ${user.id} ac data`,
-        );
-
-        const data = b(user.id);
-
-        await fs.writeFile(
-          `/tmp/nypsi_ac_${user.id}.txt`,
-          JSON.stringify(
-            data,
-            (key, value) => {
-              if (value instanceof Map) {
-                return Array.from(value.entries());
-              } else {
-                return value;
-              }
-            },
-            2,
-          ),
-        );
-
-        await res.editReply({
-          files: [
-            {
-              attachment: await fs.readFile(`/tmp/nypsi_ac_${user.id}.txt`),
-              name: `nypsi_ac_${user.id}.txt`,
-            },
-          ],
-        });
-        return waitForButton();
-      } else if (res.customId === "ac-clear") {
-        if ((await getAdminLevel(message.author.id)) < 3) {
-          await res.editReply({
-            embeds: [new ErrorEmbed("you require admin level **3** to do this")],
-          });
-          return waitForButton();
-        }
-
-        logger.info(
-          `admin: ${message.author.id} (${message.author.username}) cleared ${user.id} violations`,
-        );
-
-        c(user.id);
-        await redis.del(`${Constants.redis.cache.user.captcha_pass}:${user.id}`);
-        await redis.del(`${Constants.redis.cache.user.captcha_fail}:${user.id}`);
-
-        await res.editReply({ content: "✅" });
         return waitForButton();
       } else if (res.customId === "tags") {
         if ((await getAdminLevel(message.author.id)) < 4) {
@@ -846,6 +787,18 @@ async function run(
           await res.editReply({ embeds: [new CustomEmbed(message.member, "user blacklisted")] });
           return waitForButton();
         }
+      } else if (res.customId === "ac") {
+        if ((await getAdminLevel(message.author.id)) < 1) {
+          await res.editReply({
+            embeds: [new ErrorEmbed("you require admin level **1** to do this")],
+          });
+          return waitForButton();
+        }
+        logger.info(
+          `admin: ${message.author.id} (${message.author.username}) viewed ${user.id} ac data`,
+        );
+        doAnticheat(user, res as ButtonInteraction);
+        return waitForButton();
       }
     };
     return waitForButton();
@@ -1201,6 +1154,180 @@ async function run(
 
         await setCredits(user.id, parseInt(msg.content));
         msg.react("✅");
+        return waitForButton();
+      }
+    };
+    return waitForButton();
+  };
+
+  const doAnticheat = async (user: User, response: ButtonInteraction) => {
+    const render = async () => {
+      const rows: ActionRowBuilder<MessageActionRowComponentBuilder>[] = [
+        new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+          new ButtonBuilder()
+            .setCustomId("ac-hist")
+            .setLabel("show data")
+            .setStyle(ButtonStyle.Primary)
+            .setEmoji("📋"),
+          new ButtonBuilder()
+            .setCustomId("ac-clear")
+            .setLabel("clear")
+            .setStyle(ButtonStyle.Primary)
+            .setEmoji("🗑️"),
+        ),
+
+        new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+          new ButtonBuilder()
+            .setCustomId("captcha-hist")
+            .setLabel("captcha history")
+            .setStyle(ButtonStyle.Primary)
+            .setEmoji("🤖"),
+          new ButtonBuilder()
+            .setCustomId("give-captcha")
+            .setLabel("give captcha")
+            .setStyle(ButtonStyle.Primary)
+            .setEmoji("🤖"),
+        ),
+      ];
+
+      const embed = new CustomEmbed(message.member, "choose one");
+
+      return { rows, embed };
+    };
+
+    const waitForButton = async (): Promise<void> => {
+      const { rows, embed } = await render();
+
+      const msg = await response.editReply({ embeds: [embed], components: rows });
+
+      const filter = (i: Interaction) => i.user.id == message.author.id;
+
+      const res = await msg.awaitMessageComponent({ filter, time: 120000 }).catch(async () => {
+        await msg.edit({ components: [] });
+      });
+
+      if (!res) return;
+
+      await res.deferReply();
+
+      if (res.customId === "ac-hist") {
+        if ((await getAdminLevel(message.author.id)) < 2) {
+          await res.editReply({
+            embeds: [new ErrorEmbed("you require admin level **2** to do this")],
+          });
+          return waitForButton();
+        }
+
+        logger.info(
+          `admin: ${message.author.id} (${message.author.username}) viewed ${user.id} ac data`,
+        );
+
+        const data = b(user.id);
+
+        await fs.writeFile(
+          `/tmp/nypsi_ac_${user.id}.txt`,
+          JSON.stringify(
+            data,
+            (key, value) => {
+              if (value instanceof Map) {
+                return Array.from(value.entries());
+              } else {
+                return value;
+              }
+            },
+            2,
+          ),
+        );
+
+        await res.editReply({
+          files: [
+            {
+              attachment: await fs.readFile(`/tmp/nypsi_ac_${user.id}.txt`),
+              name: `nypsi_ac_${user.id}.txt`,
+            },
+          ],
+        });
+        return waitForButton();
+      } else if (res.customId === "ac-clear") {
+        if ((await getAdminLevel(message.author.id)) < 3) {
+          await res.editReply({
+            embeds: [new ErrorEmbed("you require admin level **3** to do this")],
+          });
+          return waitForButton();
+        }
+
+        logger.info(
+          `admin: ${message.author.id} (${message.author.username}) cleared ${user.id} violations`,
+        );
+
+        c(user.id);
+        await redis.del(`${Constants.redis.cache.user.captcha_pass}:${user.id}`);
+        await redis.del(`${Constants.redis.cache.user.captcha_fail}:${user.id}`);
+
+        await res.editReply({ content: "✅" });
+        return waitForButton();
+      } else if (res.customId === "give-captcha") {
+        if ((await getAdminLevel(res.user.id)) < 1) {
+          res.followUp({ embeds: [new ErrorEmbed("you require admin level 1 for this")] });
+          return;
+        }
+
+        logger.info(
+          `admin: ${message.author.id} (${message.author.username}) gave ${user.id} captcha`,
+        );
+
+        await giveCaptcha(user.id, 2, true);
+
+        res.followUp({ content: "✅" });
+        return waitForButton();
+      } else if (res.customId === "captcha-hist") {
+        if ((await getAdminLevel(res.user.id)) < 1) {
+          res.followUp({ embeds: [new ErrorEmbed("you require admin level 2 for this")] });
+          return;
+        }
+
+        logger.info(
+          `admin: ${message.author.id} (${message.author.username}) viewed ${user.id} captcha history`,
+        );
+
+        const history = await prisma.captcha.findMany({
+          where: { userId: user.id },
+          orderBy: { createdAt: "desc" },
+        });
+
+        const embed = new CustomEmbed(message.member);
+
+        const pages = PageManager.createPages(
+          history.map(
+            (captcha) =>
+              "```\n" +
+              `received at: ${dayjs(captcha.createdAt).format("YYYY-MM-DD HH:mm:ss")}\n` +
+              `prompts: ${captcha.received}\n` +
+              `visits: ${captcha.visits.map((i) => dayjs(i).format("HH:mm:ss")).join(" ")}\n` +
+              `${captcha.solved ? `solved at: ${dayjs(captcha.solvedAt).format("HH:mm:ss")}` : "not solved"}` +
+              "\n```",
+          ),
+          1,
+        );
+
+        embed.setDescription(pages.get(1).join("")).setFooter({ text: `1/${pages.size}` });
+
+        const msg = await res.followUp({ embeds: [embed], components: [PageManager.defaultRow()] });
+
+        const manager = new PageManager({
+          embed,
+          pages,
+          message: msg,
+          userId: message.author.id,
+          row: PageManager.defaultRow(),
+          allowMessageDupe: false,
+          onPageUpdate(manager) {
+            manager.embed.setFooter({ text: `${manager.currentPage}/${manager.lastPage}` });
+            return manager.embed;
+          },
+        });
+
+        manager.listen();
         return waitForButton();
       }
     };
