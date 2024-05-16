@@ -125,7 +125,7 @@ const xpFormula = (level: number, prestige: number) => {
 
   return Math.floor(Math.pow(level + 1, 1.117 + 0.077 * prestigeModified) + 50 + 15 * prestige) - 1;
 };
-const moneyFormula = (level: number) => Math.floor(Math.pow(level + 1, 2.103) + 25_000) - 1;
+const moneyFormula = (level: number) => Math.floor(Math.pow(level + 1, 2.103) + 10_000) - 1;
 const cratesFormula = (level: number, prestige: number) => {
   const neededXp = xpFormula(level, prestige);
 
