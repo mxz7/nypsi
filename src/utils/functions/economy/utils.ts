@@ -410,9 +410,11 @@ export async function reset() {
       OR: [{ category: "networth" }, { category: "balance" }, { category: { contains: "guild" } }],
     },
   });
-  await prisma.achievements.deleteMany({
-    where: { achievementId: { startsWith: "collector_" } },
-  });
+  logger.info("deleting cars");
+  await prisma.carUpgrade.deleteMany();
+  await prisma.customCar.deleteMany();
+  logger.info("deleting tasks");
+  await prisma.task.deleteMany();
 
   logger.info("deleting banned");
   await prisma.economy.deleteMany({
