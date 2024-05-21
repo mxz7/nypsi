@@ -46,8 +46,8 @@ async function run(
 
   const result = results.list[0];
 
-  if (!result) return;
-  if (!result.word) return;
+  if (!result) return message.channel.send({ embeds: [new ErrorEmbed("unknown definition")] });
+  if (!result.word) return message.channel.send({ embeds: [new ErrorEmbed("unknown definition")] });
 
   const embed = new CustomEmbed(message.member, result.definition + "\n\n" + result.example)
     .setTitle(result.word)
