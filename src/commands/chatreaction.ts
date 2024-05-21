@@ -594,6 +594,7 @@ async function run(
 
       duelRequests.add(message.author.id);
 
+      let cancelled = false;
       await updateBalance(message.member, (await getBalance(message.member)) - wager);
 
       const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -630,7 +631,8 @@ async function run(
         .catch(async () => {
           fail = true;
           duelRequests.delete(message.author.id);
-          await updateBalance(message.member, (await getBalance(message.member)) + wager);
+          if (!cancelled)
+            await updateBalance(message.member, (await getBalance(message.member)) + wager);
           m.edit({ components: [] });
         });
 
@@ -639,6 +641,7 @@ async function run(
       if (response.customId === "y") {
         return doGame(target, wager, response as ButtonInteraction, m);
       } else {
+        cancelled = true;
         await updateBalance(message.member, (await getBalance(message.member)) + wager);
         if (message.author.id === response.user.id) {
           response.reply({
@@ -675,6 +678,7 @@ async function run(
 
       duelRequests.add(message.author.id);
 
+      let cancelled = false;
       await updateBalance(message.member, (await getBalance(message.member)) - wager);
 
       const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -742,7 +746,8 @@ async function run(
         .catch(async () => {
           fail = true;
           duelRequests.delete(message.author.id);
-          await updateBalance(message.member, (await getBalance(message.member)) + wager);
+          if (!cancelled)
+            await updateBalance(message.member, (await getBalance(message.member)) + wager);
           m.edit({ components: [] });
         });
 
@@ -756,6 +761,7 @@ async function run(
       if (response.customId === "y") {
         return doGame(target, wager, response as ButtonInteraction, m);
       } else {
+        cancelled = true;
         await updateBalance(message.member, (await getBalance(message.member)) + wager);
         if (message.author.id === response.user.id) {
           response.reply({

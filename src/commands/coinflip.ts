@@ -377,6 +377,7 @@ async function run(
     }, 120000);
 
     await updateBalance(message.member, (await getBalance(message.member)) - bet);
+    let cancelled = false;
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
       new ButtonBuilder().setCustomId("y").setLabel("play").setStyle(ButtonStyle.Success),
@@ -442,7 +443,8 @@ async function run(
       .catch(async () => {
         fail = true;
         playing.delete(message.author.id);
-        await updateBalance(message.member, (await getBalance(message.member)) + bet);
+        if (cancelled)
+          await updateBalance(message.member, (await getBalance(message.member)) + bet);
         msg.edit({ components: [] });
       });
 
@@ -455,6 +457,7 @@ async function run(
     if (response.customId == "y") {
       return doGame(message.member, target, bet, response as ButtonInteraction);
     } else {
+      cancelled = true;
       await updateBalance(message.member, (await getBalance(message.member)) + bet);
       if (message.author.id === response.user.id) {
         response.editReply({
