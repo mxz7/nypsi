@@ -36,7 +36,7 @@ export async function isLockedOut(userId: string): Promise<false | CaptchaType1 
 }
 
 export async function giveCaptcha(userId: string, type: 1 | 2 = 2, force = false) {
-  if (!force && isVerified(userId)) return false;
+  if (!force && (await isVerified(userId))) return false;
 
   if (type === 2) {
     const id = await prisma.captcha.create({
