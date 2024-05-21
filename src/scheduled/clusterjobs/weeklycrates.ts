@@ -59,6 +59,7 @@ async function doCrates(client: NypsiClient) {
     const desc: string[] = [];
 
     for (const [key, value] of rewards.entries()) {
+      logger.info(`[weekly crates] ${member.id} receiving ${value}x ${key}`);
       await addInventoryItem(member.id, key, value);
       desc.push(
         `+**${value}** ${getItems()[key].emoji} ${
