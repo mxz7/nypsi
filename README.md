@@ -26,7 +26,7 @@ the documentation can be found at [`docs.nypsi.xyz`](https://docs.nypsi.xyz)
 
 ### 🏗 installation / cloning
 
-[setup tutorial](https://github.com/tekoh/nypsi/blob/main/SETUP.md)
+[setup tutorial](https://github.com/mxz7/nypsi/blob/main/SETUP.md)
 
 ### 🍪 top.gg
 

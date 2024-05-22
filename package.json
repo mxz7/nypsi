@@ -9,7 +9,7 @@
     "build": "tsc",
     "watch": "tsc --build --watch"
   },
-  "author": "tekoh",
+  "author": "mxz7",
   "license": "ISC",
   "dependencies": {
     "@catppuccin/palette": "1.2.0",
@@ -60,10 +60,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tekoh/nypsi.git"
+    "url": "git+https://github.com/mxz7/nypsi.git"
   },
   "bugs": {
-    "url": "https://github.com/tekoh/nypsi/issues"
+    "url": "https://github.com/mxz7/nypsi/issues"
   },
-  "homepage": "https://github.com/tekoh/nypsi#readme"
+  "homepage": "https://github.com/mxz7/nypsi#readme"
 }

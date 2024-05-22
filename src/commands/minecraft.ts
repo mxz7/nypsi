@@ -126,7 +126,7 @@ async function getNameHistory(uuid: string): Promise<{ username: string; changed
     `https://laby.net/api/user/${uuid}/get-names`,
     {
       headers: {
-        "User-Agent": `Mozilla/5.0 (compatible; nypsi/${getVersion()}; +https://github.com/tekoh)`,
+        "User-Agent": `Mozilla/5.0 (compatible; nypsi/${getVersion()}; +https://github.com/mxz7)`,
       },
     },
   ).then((r) => r.json());
