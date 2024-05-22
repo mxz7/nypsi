@@ -14,7 +14,7 @@ i strongly recommend against using windows for running nypsi. however, if your c
 
 ### instructions
 
-- `git clone https://github.com/tekoh/nypsi`
+- `git clone https://github.com/mxz7/nypsi`
 - `cd nypsi`
 - configure .env.example with your tokens/keys etc. (most of these will cause issues if not given)
 - `./setup.sh`

@@ -186,7 +186,7 @@ async function run(
       .addField("usage", `${prefix}slots <bet>\n${prefix}slots info`)
       .addField(
         "help",
-        "[slots has a ~39% winrate](https://github.com/tekoh/nypsi/blob/main/src/commands/slots.ts#279)",
+        "[slots has a ~39% winrate](https://github.com/mxz7/nypsi/blob/main/src/commands/slots.ts#279)",
       );
     return send({ embeds: [embed] });
   }

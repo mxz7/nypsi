@@ -397,11 +397,7 @@ async function run(
       }
     } catch {
       return send({
-        embeds: [
-          new ErrorEmbed(
-            "invalid color, please use a hex color ([color.tekoh.net](https://color.tekoh.net))",
-          ),
-        ],
+        embeds: [new ErrorEmbed("invalid color, please use a hex color")],
       });
     }
 

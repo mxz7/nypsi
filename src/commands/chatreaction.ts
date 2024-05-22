@@ -1162,7 +1162,7 @@ async function run(
         `${prefix}**cr words list** *view the current wordlist*\n` +
           `${prefix}**cr words add/+ <word/sentence>** *add a word or sentence to the wordlist*\n` +
           `${prefix}**cr words del/- <word/sentence>** *remove a word or sentence from the wordlist*\n` +
-          `${prefix}**cr words reset** *delete the custom word list and use the [default list](https://github.com/tekoh/nypsi/blob/main/data/cr_words.txt)*`,
+          `${prefix}**cr words reset** *delete the custom word list and use the [default list](https://github.com/mxz7/nypsi/blob/main/data/cr_words.txt)*`,
       );
 
       return send({ embeds: [embed] });
@@ -1253,7 +1253,7 @@ async function run(
 
       if (words.length == 0) {
         embed.setDescription(
-          "using [default word list](https://github.com/tekoh/nypsi/blob/main/data/cr_words.txt)",
+          "using [default word list](https://github.com/mxz7/nypsi/blob/main/data/cr_words.txt)",
         );
         embed.setHeader("chat reactions");
       } else {
