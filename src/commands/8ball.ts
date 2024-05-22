@@ -26,6 +26,8 @@ const answers = [
   "you may rely on it",
 ];
 
+const uri = "https://eightballapi.com/api"
+
 const cmd = new Command("8ball", "ask the 8ball a question", "fun").setAliases(["8"]);
 
 async function run(
@@ -46,7 +48,14 @@ async function run(
 
   const question = args.join(" ");
 
-  const response = answers[Math.floor(Math.random() * answers.length)];
+  // can also add lucky and biased params for extra fun, might be interesing
+  const url = `${uri}?question=${question}&lucky=true&biased=false`;
+  let response = await fetch(url).then((res) => res.json()).then((json) => json.reading);
+
+  // fallback if api fails so user still gets answers
+  if (!response) {
+    response = answers[Math.floor(Math.random() * answers.length)];
+  }
 
   const embed = new CustomEmbed(
     message.member,
