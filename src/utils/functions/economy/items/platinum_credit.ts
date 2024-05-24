@@ -142,7 +142,7 @@ module.exports = new ItemUse(
         !inventory.find((i) => i.item === "platinum_credit") ||
         inventory.find((i) => i.item === "platinum_credit").amount < 1
       ) {
-        return send({ embeds: [new ErrorEmbed("lol!")] });
+        return res.editReply({ embeds: [new ErrorEmbed("lol!")] });
       }
 
       await setInventoryItem(
@@ -155,7 +155,7 @@ module.exports = new ItemUse(
       await setExpireDate(message.author.id, new Date(), message.client as NypsiClient);
       await setCredits(message.author.id, 7);
 
-      return send({
+      return res.editReply({
         embeds: [
           new CustomEmbed(
             message.member,
