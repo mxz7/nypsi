@@ -156,6 +156,12 @@ async function run(
     return send({ embeds: [new ErrorEmbed("this user doesnt have sufficient funds")] });
   }
 
+  if (await redis.get(`${Constants.redis.cache.guild.JOIN_GRACE_PERIOD}:${message.guild.id}:${target.id}`)) {
+    return send({
+      embeds: [new ErrorEmbed(`${target.toString()} cannot be robbed yet`)],
+    });
+  }
+
   if (await isPassive(target))
     return send({ embeds: [new ErrorEmbed(`${target.toString()} is currently in passive mode`)] });
 
@@ -175,6 +181,8 @@ async function run(
   }
 
   await addCooldown(cmd.name, message.member, 700);
+  
+  await redis.del(`${Constants.redis.cache.guild.JOIN_GRACE_PERIOD}:${message.guild.id}:${message.member.id}`);
 
   const embed = new CustomEmbed(
     message.member,

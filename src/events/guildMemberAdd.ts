@@ -22,6 +22,7 @@ import { profileExists } from "../utils/functions/moderation/utils";
 import sleep from "../utils/functions/sleep";
 import { fetchUsernameHistory } from "../utils/functions/users/history";
 import { logger } from "../utils/logger";
+import ms = require("ms");
 
 const queue = new Set<string>();
 
@@ -101,6 +102,12 @@ export default async function guildMemberAdd(member: GuildMember) {
       queue.delete(member.guild.id);
     }, 120000);
   }
+
+  await redis.set(`${Constants.redis.cache.guild.JOIN_GRACE_PERIOD}:${member.guild.id}:${member.id}`, "t");
+  await redis.expire(
+    `${Constants.redis.cache.guild.JOIN_GRACE_PERIOD}:${member.guild.id}:${member.id}`,
+    Math.floor(ms("1 hour") / 1000),
+  );
 
   if (!(await profileExists(member.guild))) return;
 

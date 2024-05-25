@@ -75,6 +75,8 @@ export default async function guildMemberRemove(member: GuildMember) {
     });
   }
 
+  redis.del(`${Constants.redis.cache.guild.JOIN_GRACE_PERIOD}:${member.guild.id}:${member.id}`);
+  
   if (member.guild.id != "747056029795221513") return;
 
   if (await isBooster(member.user.id)) await setBooster(member.user.id, false);

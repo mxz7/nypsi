@@ -76,14 +76,6 @@ module.exports = new ItemUse(
       return send({ embeds: [new ErrorEmbed("invalid user")] });
     }
 
-    if (await isPassive(lockPickTarget))
-      return send({
-        embeds: [new ErrorEmbed(`${lockPickTarget.toString()} is currently in passive mode`)],
-      });
-
-    if (await isPassive(message.member))
-      return send({ embeds: [new ErrorEmbed("you are currently in passive mode")] });
-
     if (message.member == lockPickTarget) {
       if (
         (await redis.exists(`${Constants.redis.cooldown.SEX_CHASTITY}:${message.author.id}`)) == 1
@@ -111,11 +103,27 @@ module.exports = new ItemUse(
       return send({ embeds: [new ErrorEmbed("invalid user")] });
     }
 
+    if (await redis.get(`${Constants.redis.cache.guild.JOIN_GRACE_PERIOD}:${message.guild.id}:${lockPickTarget.id}`)) {
+      return send({
+        embeds: [new ErrorEmbed(`${lockPickTarget.toString()} cannot be robbed yet`)],
+      });
+    }
+
+    if (await isPassive(lockPickTarget))
+      return send({
+        embeds: [new ErrorEmbed(`${lockPickTarget.toString()} is currently in passive mode`)],
+      });
+
+    if (await isPassive(message.member))
+      return send({ embeds: [new ErrorEmbed("you are currently in passive mode")] });
+
     if (!(await hasPadlock(lockPickTarget))) {
       return send({
         embeds: [new ErrorEmbed("this member doesn't have a padlock")],
       });
     }
+    
+    await redis.del(`${Constants.redis.cache.guild.JOIN_GRACE_PERIOD}:${message.guild.id}:${message.member.id}`);
 
     const inventory = await getInventory(message.member);
 
