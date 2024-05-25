@@ -13,6 +13,7 @@ import Constants from "../../../Constants";
 import { getDisabledCommands } from "../../guilds/disabledcommands";
 import { getMember } from "../../member";
 import sleep from "../../sleep";
+import { isUserBlacklisted } from "../../users/blacklist";
 import { getDmSettings } from "../../users/notifications";
 import { hasPadlock, setPadlock } from "../balance";
 import { getInventory, setInventoryItem } from "../inventory";
@@ -49,6 +50,17 @@ module.exports = new ItemUse(
     if ((await getDisabledCommands(message.guild)).includes("rob")) {
       return send({
         embeds: [new ErrorEmbed(`lockpicks have been disabled in ${message.guild.name}`)],
+      });
+    }
+
+    if (await isUserBlacklisted(message.guild.ownerId)) {
+      return send({
+        embeds: [
+          new ErrorEmbed(
+            `the owner of this server (${(await message.guild.members.fetch(message.guild.ownerId)).toString()}) is blacklisted\n` +
+              "this means that robbing and other aggressive commands are disabled for this server",
+          ),
+        ],
       });
     }
 

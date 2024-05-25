@@ -25,6 +25,7 @@ import { createUser, isEcoBanned, userExists } from "../utils/functions/economy/
 import { calcEarnedGambleXp, getXp, updateXp } from "../utils/functions/economy/xp";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
+import { isUserBlacklisted } from "../utils/functions/users/blacklist";
 import { getDmSettings } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
@@ -99,6 +100,17 @@ async function run(
       embeds: [
         new ErrorEmbed(
           `you have been reported to the police, they will continue looking for you for **${remaining}**`,
+        ),
+      ],
+    });
+  }
+
+  if (await isUserBlacklisted(message.guild.ownerId)) {
+    return send({
+      embeds: [
+        new ErrorEmbed(
+          `the owner of this server (${(await message.guild.members.fetch(message.guild.ownerId)).toString()}) is blacklisted\n` +
+            "this means that robbing and other aggressive commands are disabled for this server",
         ),
       ],
     });
