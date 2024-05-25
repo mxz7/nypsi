@@ -21,6 +21,7 @@ import { getKarma } from "../utils/functions/karma/karma";
 import { getTier, isPremium, levelString } from "../utils/functions/premium/premium";
 import { getLastCommand } from "../utils/functions/users/commands";
 import { fetchUsernameHistory } from "../utils/functions/users/history";
+import dayjs = require("dayjs");
 
 const cmd = new Command("find", "find info", "none").setPermissions(["bot owner"]);
 
@@ -173,7 +174,7 @@ async function showGuild(message: Message, guild: any) {
     .addField(
       "info",
       `**owner** ${owner}
-            **created** ${formatDate(guild.createdAt)}`,
+            **created** ${dayjs(guild.createdTimestamp).format()}`,
       true,
     )
     .addField(
