@@ -28,6 +28,7 @@ import { getMember } from "../utils/functions/member";
 import { isUserBlacklisted } from "../utils/functions/users/blacklist";
 import { getDmSettings } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import ms = require("ms");
 
 const playerCooldown = new Set<string>();
 
@@ -156,7 +157,10 @@ async function run(
     return send({ embeds: [new ErrorEmbed("this user doesnt have sufficient funds")] });
   }
 
-  if (await redis.get(`${Constants.redis.cache.guild.JOIN_GRACE_PERIOD}:${message.guild.id}:${target.id}`)) {
+  if (
+    target.joinedAt.getTime() > new Date().getTime() - ms("1 hour") && 
+    !await redis.get(`${Constants.redis.cache.guild.RECENTLY_ATTACKED}:${message.guild.id}:${target.id}`)
+    ) {
     return send({
       embeds: [new ErrorEmbed(`${target.toString()} cannot be robbed yet`)],
     });
@@ -181,8 +185,12 @@ async function run(
   }
 
   await addCooldown(cmd.name, message.member, 700);
-  
-  await redis.del(`${Constants.redis.cache.guild.JOIN_GRACE_PERIOD}:${message.guild.id}:${message.member.id}`);
+    
+  await redis.set(`${Constants.redis.cache.guild.RECENTLY_ATTACKED}:${message.guildId}:${message.member.id}`, "t");
+  await redis.expire(
+    `${Constants.redis.cache.guild.RECENTLY_ATTACKED}:${message.guildId}:${message.member.id}`,
+    Math.floor(ms("1 hour") / 1000),
+  );
 
   const embed = new CustomEmbed(
     message.member,

@@ -103,12 +103,6 @@ export default async function guildMemberAdd(member: GuildMember) {
     }, 120000);
   }
 
-  await redis.set(`${Constants.redis.cache.guild.JOIN_GRACE_PERIOD}:${member.guild.id}:${member.id}`, "t");
-  await redis.expire(
-    `${Constants.redis.cache.guild.JOIN_GRACE_PERIOD}:${member.guild.id}:${member.id}`,
-    Math.floor(ms("1 hour") / 1000),
-  );
-
   if (!(await profileExists(member.guild))) return;
 
   let toBan: string = null;
