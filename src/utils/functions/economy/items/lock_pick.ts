@@ -105,9 +105,11 @@ module.exports = new ItemUse(
     }
 
     if (
-      lockPickTarget.joinedAt.getTime() > new Date().getTime() - ms("1 hour") && 
-      !await redis.get(`${Constants.redis.cache.guild.RECENTLY_ATTACKED}:${message.guildId}:${lockPickTarget.id}`)
-      ) {
+      lockPickTarget.joinedAt.getTime() > new Date().getTime() - ms("1 hour") &&
+      !(await redis.get(
+        `${Constants.redis.cache.guild.RECENTLY_ATTACKED}:${message.guildId}:${lockPickTarget.id}`,
+      ))
+    ) {
       return send({
         embeds: [new ErrorEmbed(`${lockPickTarget.toString()} cannot be robbed yet`)],
       });
@@ -126,8 +128,11 @@ module.exports = new ItemUse(
         embeds: [new ErrorEmbed("this member doesn't have a padlock")],
       });
     }
-    
-    await redis.set(`${Constants.redis.cache.guild.RECENTLY_ATTACKED}:${message.guildId}:${message.member.id}`, "t");
+
+    await redis.set(
+      `${Constants.redis.cache.guild.RECENTLY_ATTACKED}:${message.guildId}:${message.member.id}`,
+      "t",
+    );
     await redis.expire(
       `${Constants.redis.cache.guild.RECENTLY_ATTACKED}:${message.guildId}:${message.member.id}`,
       Math.floor(ms("1 hour") / 1000),

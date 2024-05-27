@@ -158,9 +158,11 @@ async function run(
   }
 
   if (
-    target.joinedAt.getTime() > new Date().getTime() - ms("1 hour") && 
-    !await redis.get(`${Constants.redis.cache.guild.RECENTLY_ATTACKED}:${message.guild.id}:${target.id}`)
-    ) {
+    target.joinedAt.getTime() > new Date().getTime() - ms("1 hour") &&
+    !(await redis.get(
+      `${Constants.redis.cache.guild.RECENTLY_ATTACKED}:${message.guild.id}:${target.id}`,
+    ))
+  ) {
     return send({
       embeds: [new ErrorEmbed(`${target.toString()} cannot be robbed yet`)],
     });
@@ -185,8 +187,11 @@ async function run(
   }
 
   await addCooldown(cmd.name, message.member, 700);
-    
-  await redis.set(`${Constants.redis.cache.guild.RECENTLY_ATTACKED}:${message.guildId}:${message.member.id}`, "t");
+
+  await redis.set(
+    `${Constants.redis.cache.guild.RECENTLY_ATTACKED}:${message.guildId}:${message.member.id}`,
+    "t",
+  );
   await redis.expire(
     `${Constants.redis.cache.guild.RECENTLY_ATTACKED}:${message.guildId}:${message.member.id}`,
     Math.floor(ms("1 hour") / 1000),
