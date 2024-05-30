@@ -227,8 +227,12 @@ export async function createUser(member: GuildMember | string) {
   await addInventoryItem(id, "beginner_booster", 1);
 }
 
-export async function formatBet(bet: string | number, member: GuildMember): Promise<number | void> {
-  const maxBet = await calcMaxBet(member);
+export async function formatBet(
+  bet: string | number,
+  member: GuildMember,
+  maxBet?: number,
+): Promise<number | void> {
+  if (!maxBet) maxBet = await calcMaxBet(member);
 
   bet = bet.toString().toLowerCase();
 

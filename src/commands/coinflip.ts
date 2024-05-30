@@ -240,7 +240,10 @@ async function run(
 
     if (!(await userExists(target))) await createUser(target);
 
-    const bet = await formatBet(args[1], message.member);
+    const memberMaxBet = (await calcMaxBet(message.member)) * 10;
+    const targetMaxBet = (await calcMaxBet(target)) * 10;
+
+    const bet = await formatBet(args[1], message.member, memberMaxBet);
 
     if (!bet) {
       return send({ embeds: [new ErrorEmbed("invalid bet")] });
@@ -264,22 +267,14 @@ async function run(
       });
     }
 
-    if (bet > (await calcMaxBet(message.member)) * 10)
+    if (bet > memberMaxBet)
       return send({
-        embeds: [
-          new ErrorEmbed(
-            `your max bet is $**${((await calcMaxBet(message.member)) * 10).toLocaleString()}**`,
-          ),
-        ],
+        embeds: [new ErrorEmbed(`your max bet is $**${memberMaxBet.toLocaleString()}**`)],
       });
 
-    if (bet > (await calcMaxBet(target)) * 10)
+    if (bet > targetMaxBet)
       return send({
-        embeds: [
-          new ErrorEmbed(
-            `their max bet is $**${((await calcMaxBet(target)) * 10).toLocaleString()}**`,
-          ),
-        ],
+        embeds: [new ErrorEmbed(`their max bet is $**${targetMaxBet.toLocaleString()}**`)],
       });
 
     await addCooldown(cmd.name, message.member, 10);
@@ -343,7 +338,8 @@ async function run(
       }
     }
   } else if (args.length == 1) {
-    const bet = await formatBet(args[0], message.member);
+    const memberMaxBet = (await calcMaxBet(message.member)) * 10;
+    const bet = await formatBet(args[0], message.member, memberMaxBet);
 
     if (!bet) {
       return send({ embeds: [new ErrorEmbed("invalid bet")] });
@@ -361,13 +357,9 @@ async function run(
       return send({ embeds: [new ErrorEmbed("you cannot afford this bet")] });
     }
 
-    if (bet > (await calcMaxBet(message.member)) * 10)
+    if (bet > memberMaxBet)
       return send({
-        embeds: [
-          new ErrorEmbed(
-            `your max bet is $**${((await calcMaxBet(message.member)) * 10).toLocaleString()}**`,
-          ),
-        ],
+        embeds: [new ErrorEmbed(`your max bet is $**${memberMaxBet.toLocaleString()}**`)],
       });
 
     await addCooldown(cmd.name, message.member, 10);
