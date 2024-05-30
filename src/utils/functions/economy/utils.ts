@@ -133,7 +133,7 @@ async function updateCryptoWorth() {
   }
 
   if (ethWorth > 1_000_000) {
-    logger.error("FATAL - something wrong with btc");
+    logger.error("FATAL - something wrong with eth");
     return;
   }
 
