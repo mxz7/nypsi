@@ -143,6 +143,7 @@ async function run(
   let tax = true;
 
   if ((await isPremium(message.member)) && (await getTier(message.member)) == 4) tax = false;
+  if (["bitcoin", "ethereum"].includes(selected.id)) tax = false;
 
   if (tax) {
     const taxedAmount = Math.floor(sellWorth * (await getTax()));
