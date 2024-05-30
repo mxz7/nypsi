@@ -18,6 +18,7 @@ import { getDmSettings } from "../../users/notifications";
 import { hasPadlock, setPadlock } from "../balance";
 import { getInventory, setInventoryItem } from "../inventory";
 import { isPassive } from "../passive";
+import ms = require("ms");
 
 module.exports = new ItemUse(
   "lock_pick",
@@ -76,14 +77,6 @@ module.exports = new ItemUse(
       return send({ embeds: [new ErrorEmbed("invalid user")] });
     }
 
-    if (await isPassive(lockPickTarget))
-      return send({
-        embeds: [new ErrorEmbed(`${lockPickTarget.toString()} is currently in passive mode`)],
-      });
-
-    if (await isPassive(message.member))
-      return send({ embeds: [new ErrorEmbed("you are currently in passive mode")] });
-
     if (message.member == lockPickTarget) {
       if (
         (await redis.exists(`${Constants.redis.cooldown.SEX_CHASTITY}:${message.author.id}`)) == 1
@@ -111,11 +104,39 @@ module.exports = new ItemUse(
       return send({ embeds: [new ErrorEmbed("invalid user")] });
     }
 
+    if (
+      lockPickTarget.joinedAt.getTime() > new Date().getTime() - ms("1 hour") &&
+      !(await redis.get(
+        `${Constants.redis.cache.guild.RECENTLY_ATTACKED}:${message.guildId}:${lockPickTarget.id}`,
+      ))
+    ) {
+      return send({
+        embeds: [new ErrorEmbed(`${lockPickTarget.toString()} cannot be robbed yet`)],
+      });
+    }
+
+    if (await isPassive(lockPickTarget))
+      return send({
+        embeds: [new ErrorEmbed(`${lockPickTarget.toString()} is currently in passive mode`)],
+      });
+
+    if (await isPassive(message.member))
+      return send({ embeds: [new ErrorEmbed("you are currently in passive mode")] });
+
     if (!(await hasPadlock(lockPickTarget))) {
       return send({
         embeds: [new ErrorEmbed("this member doesn't have a padlock")],
       });
     }
+
+    await redis.set(
+      `${Constants.redis.cache.guild.RECENTLY_ATTACKED}:${message.guildId}:${message.member.id}`,
+      "t",
+    );
+    await redis.expire(
+      `${Constants.redis.cache.guild.RECENTLY_ATTACKED}:${message.guildId}:${message.member.id}`,
+      Math.floor(ms("1 hour") / 1000),
+    );
 
     const inventory = await getInventory(message.member);
 

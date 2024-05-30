@@ -68,6 +68,7 @@ export default {
         LOGS_GUILDS: "cache:guild:logs:guilds",
         MODLOGS_GUILDS: "cache:guild:modlogs:guilds",
         JOIN_ORDER: "cache:guild:join:order",
+        RECENTLY_ATTACKED: "cache:guild:recentlyattacked",
         ALTS: "cache:guilds:alts",
       },
       moderation: {
