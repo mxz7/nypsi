@@ -22,6 +22,7 @@ import { profileExists } from "../utils/functions/moderation/utils";
 import sleep from "../utils/functions/sleep";
 import { fetchUsernameHistory } from "../utils/functions/users/history";
 import { logger } from "../utils/logger";
+import ms = require("ms");
 
 const queue = new Set<string>();
 
