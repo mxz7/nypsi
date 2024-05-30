@@ -3,6 +3,7 @@ import {
   ButtonBuilder,
   ButtonStyle,
   Collection,
+  EmbedBuilder,
   GuildMember,
   Interaction,
   Message,
@@ -176,6 +177,26 @@ export default async function messageCreate(message: Message) {
   const checkTask = async () => {
     await sleep(500);
     const lastContents = lastContent.get(message.author.id);
+
+    if (message.author.id === Constants.TEKOH_ID) redis.set("nypsi:tekoh:lastchat", Date.now());
+
+    if (
+      message.channelId === "747057312468041791" &&
+      message.content.includes(`<@${Constants.TEKOH_ID}>`) &&
+      parseInt(await redis.get("nypsi:tekoh:lastchat")) < Date.now() - ms("1 hour")
+    ) {
+      message.reply({
+        content: message.author.toString(),
+        embeds: [
+          new EmbedBuilder()
+            .setColor(Constants.EMBED_FAIL_COLOR)
+            .setDescription(
+              "max doesn't receive notifications for this channel\n\n" +
+                "if it is urgent, dm nypsi to create a support request, or use <#747056029795221516>",
+            ),
+        ],
+      });
+    }
 
     const addProgress = async () => {
       await addTaskProgress(message.author.id, "chat_daily");
