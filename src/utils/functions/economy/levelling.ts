@@ -351,6 +351,8 @@ export async function setUpgrade(member: GuildMember | string, upgradeId: string
 }
 
 export async function checkLevelUp(member: GuildMember | string, consecutive?: number) {
+  if (await redis.exists("nypsi:infinitemaxbet")) return false;
+
   let id: string;
   if (member instanceof GuildMember) {
     id = member.user.id;
