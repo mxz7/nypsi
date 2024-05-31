@@ -5,17 +5,24 @@ import { NypsiClient } from "../../../models/Client";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { logger } from "../../logger";
 import { MStoTime, daysUntilChristmas } from "../date";
+import dayjs = require("dayjs");
 
 export function runChristmas(client: NypsiClient) {
-  const now = new Date();
+  let start = 0;
 
-  let d = `${now.getMonth() + 1}/${now.getDate() + 1}/${now.getUTCFullYear()}`;
-
-  if (now.getHours() < 3) {
-    d = `${now.getMonth() + 1}/${now.getDate()}/${now.getUTCFullYear()}`;
+  if (dayjs().hour() < 3) {
+    start = dayjs().set("hour", 3).set("minute", 0).set("second", 0).toDate().getTime();
+  } else {
+    start = dayjs()
+      .add(1, "day")
+      .set("hour", 3)
+      .set("minute", 0)
+      .set("second", 0)
+      .toDate()
+      .getTime();
   }
 
-  const needed = new Date(Date.parse(d) + 10800000);
+  const needed = start - Date.now();
 
   const runChristmasThing = async () => {
     const query = await prisma.guildChristmas.findMany({
@@ -119,11 +126,9 @@ export function runChristmas(client: NypsiClient) {
       runChristmasThing();
     }, 86400000);
     runChristmasThing();
-  }, needed.getTime() - now.getTime());
+  }, needed);
 
-  logger.info(
-    `::auto christmas countdowns will run in ${MStoTime(needed.getTime() - now.getTime())}`,
-  );
+  logger.info(`::auto christmas countdowns will run in ${MStoTime(needed)}`);
 }
 
 export async function hasChristmasCountdown(guild: Guild) {
