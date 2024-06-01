@@ -27,7 +27,14 @@ setInterval(() => {
     if (map.size === 0) memberCache.delete(guildId);
   }
 
-  if (count > 0) logger.debug(`${count.toLocaleString()} member find cache entries deleted`);
+  if (count > 0)
+    logger.debug(
+      `${count.toLocaleString()} member find cache entries deleted. size: ${Array.from(
+        memberCache.values(),
+      )
+        .map((i) => i.size)
+        .reduce((a, b) => a + b)}`,
+    );
 }, ms("30 minutes"));
 
 export async function getMember(guild: Guild, memberName: string): Promise<GuildMember> {
