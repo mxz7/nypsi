@@ -1607,132 +1607,29 @@ async function run(
     }
 
     startRandomDrop(message.client as NypsiClient, message.channelId);
+  } else if (args[0].toLowerCase() === "migrateprefix") {
+    if (message.author.id !== Constants.TEKOH_ID) return message.channel.send({ content: "done" });
+
+    const guilds = await prisma.guild.findMany({
+      select: {
+        prefix: true,
+        id: true,
+      },
+    });
+
+    for (const guild of guilds) {
+      await prisma.guild.update({
+        data: {
+          prefixes: [guild.prefix],
+        },
+        where: {
+          id: guild.id,
+        },
+      });
+    }
+
+    message.channel.send({ content: "done" });
   }
-
-  // else if (args[0].toLowerCase() === "review") {
-  //   const embed = new CustomEmbed(message.member);
-  //   let suggestion: ImageSuggestion;
-
-  //   const getNext = async () => {
-  //     suggestion = await getImageSuggestion();
-
-  //     if (suggestion) {
-  //       const username = await getLastKnownUsername(suggestion.uploaderId);
-
-  //       embed.setImage(suggestion.url);
-  //       embed.setDescription(
-  //         `uploaded by ${suggestion.uploaderId} (${username ? username : "unknown"}) on <t:${dayjs(
-  //           suggestion.createdAt,
-  //         ).unix()}>\n\ntype: **${suggestion.type}**`,
-  //       );
-  //       embed.setHeader(`suggestion #${suggestion.id}`);
-
-  //       return {
-  //         embeds: [embed],
-  //         components: [
-  //           new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-  //             new ButtonBuilder()
-  //               .setLabel("accept")
-  //               .setCustomId("accept-sug")
-  //               .setStyle(ButtonStyle.Success),
-  //             new ButtonBuilder()
-  //               .setLabel("deny")
-  //               .setCustomId("deny-sug")
-  //               .setStyle(ButtonStyle.Danger),
-  //           ),
-  //         ],
-  //       };
-  //     } else {
-  //       delete embed.data.image;
-  //       embed
-  //         .setDescription("no more left!!! (: :D :3 ^.^ MEOW")
-  //         .setImage("https://media1.tenor.com/m/JWFEQcWcJyQAAAAC/happy-catto-cats.gif");
-  //       return { embeds: [embed], components: [] };
-  //     }
-  //   };
-
-  //   const msg = await message.channel.send(await getNext());
-
-  //   if (suggestion) {
-  //     const manager = async (): Promise<void> => {
-  //       const interaction = await msg
-  //         .awaitMessageComponent({
-  //           filter: (interaction) => interaction.user.id === message.author.id,
-  //           componentType: ComponentType.Button,
-  //           time: 30000,
-  //         })
-  //         .catch(() => {
-  //           msg.edit({ components: [] });
-  //         });
-
-  //       if (!interaction) return;
-
-  //       if (interaction.customId === "accept-sug") {
-  //         await reviewImageSuggestion(suggestion, "accept", message.author);
-  //       } else {
-  //         await reviewImageSuggestion(suggestion, "deny", message.author);
-  //       }
-
-  //       const next = await getNext();
-
-  //       await interaction.update(next).catch(async () => {
-  //         await msg.edit(next);
-  //       });
-  //       if (suggestion) return manager();
-  //     };
-
-  //     manager();
-  //   }
-  // } else if (args[0].toLowerCase() === "img") {
-  //   if (args.length === 1)
-  //     return message.channel.send({
-  //       embeds: [new ErrorEmbed("fucking retard what image you literal fucking toad")],
-  //     });
-
-  //   const image = await prisma.image.findUnique({
-  //     where: { id: parseInt(args[1]) },
-  //   });
-
-  //   if (!image) return message.channel.send({ embeds: [new ErrorEmbed("invalid img")] });
-  //   const embed = new CustomEmbed(
-  //     message.member,
-  //     `\`\`\`${JSON.stringify(image, null, 2)}\`\`\``,
-  //   ).setImage(image.url);
-
-  //   const msg = await message.channel.send({
-  //     embeds: [embed],
-  //     components: [
-  //       new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-  //         new ButtonBuilder()
-  //           .setLabel("delete")
-  //           .setCustomId("booobieshahahaha")
-  //           .setStyle(ButtonStyle.Danger),
-  //       ),
-  //     ],
-  //   });
-
-  //   const interaction = await msg
-  //     .awaitMessageComponent({
-  //       filter: (i) => i.user.id === message.author.id,
-  //       time: 15000,
-  //       componentType: ComponentType.Button,
-  //     })
-  //     .catch(() => {
-  //       msg.edit({ components: [] });
-  //     });
-
-  //   if (interaction) {
-  //     if ((await getAdminLevel(message.author.id)) < 2)
-  //       return interaction.reply({
-  //         embeds: [new ErrorEmbed("you need admin level 2 loser lol xdxdxdxdxdxdxxd")],
-  //       });
-  //     await interaction.update({ components: [] });
-  //     await prisma.image.delete({ where: { id: image.id } });
-  //     await redis.del(`${Constants.redis.cache.IMAGE}:${image.type}`);
-
-  //     interaction.followUp({ embeds: [new CustomEmbed(message.member, "deleted image")] });
-  //   }
-  // }
 }
 
 cmd.setRun(run);
