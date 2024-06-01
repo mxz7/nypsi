@@ -69,12 +69,12 @@ const mineIncrements = new Map<number, number>([
   [3, 0.3],
   [4, 0.4],
   [5, 0.45],
-  [6, 0.6],
-  [7, 0.7],
-  [10, 1.3],
-  [15, 1.9],
+  [6, 0.5],
+  [7, 0.6],
+  [10, 1.25],
+  [15, 1.8],
   [20, 4.5],
-  [23, 14],
+  [23, 17],
 ]);
 
 abcde.set("a", 0);
@@ -356,7 +356,7 @@ async function prepareGame(
   ];
 
   let bombCount: number;
-  let incrementAmount = 0.7;
+  let incrementAmount = 0.65;
 
   if (chosenMinesCount == 0) {
     bombCount = Math.floor(Math.random() * 4) + 3;
