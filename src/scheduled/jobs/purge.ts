@@ -7,7 +7,7 @@ export default {
   name: "purge",
   cron: "0 1 * * *",
   async run(log) {
-    const old = dayjs().subtract(365, "days").toDate();
+    const old = dayjs().subtract(900, "days").toDate();
 
     const d = await prisma.username.deleteMany({
       where: {
