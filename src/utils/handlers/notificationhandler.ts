@@ -31,7 +31,7 @@ export function listenForDms(manager: ClusterManager) {
 
 async function doDmQueueInterval(manager: ClusterManager): Promise<void> {
   if ((await redis.llen(Constants.redis.nypsi.DM_QUEUE)) == 0) {
-    await pAll(actions, { concurrency: 2 });
+    await pAll(actions, { concurrency: 3 });
 
     actions.length = 0;
 
