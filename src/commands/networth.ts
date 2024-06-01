@@ -15,7 +15,10 @@ import { createUser, getItems, userExists } from "../utils/functions/economy/uti
 import PageManager from "../utils/functions/page";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command("networth", "view breakdown of your networth", "money").setAliases(["net"]);
+const cmd = new Command("networth", "view breakdown of your networth", "money").setAliases([
+  "net",
+  "nw",
+]);
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
   if (await onCooldown(cmd.name, message.member)) {
