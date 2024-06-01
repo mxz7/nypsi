@@ -179,7 +179,7 @@ export default {
       [200, 5],
     ]),
   },
-  SEASON_START: new Date("01/06/2024"),
+  SEASON_START: new Date("06/01/2024"),
   SEASON_NUMBER: 8,
   SNOWFLAKE_REGEX: /^\d{17,19}$/,
   BADGES: ["owner", "staff", "highroller", "contributor", "season_winner", "og"],
