@@ -53,7 +53,7 @@ export default {
 
     log(`${filesCount} logs files deleted`);
 
-    const limit = dayjs().subtract(2, "weeks").toDate();
+    const limit = dayjs().subtract(1, "weeks").toDate();
 
     const c = await prisma.mention.deleteMany({
       where: {
