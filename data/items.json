@@ -1945,7 +1945,7 @@
     "name": "super cursor",
     "article": "a",
     "plural": "super cursors",
-    "aliases": ["super_pointer", "super pointer"],
+    "aliases": ["super_pointer", "super pointer", "scursor"],
     "emoji": "<:super_cursor:1090263183278739517>",
     "longDesc": "+1 min & max cookie when baking",
     "rarity": 3,
