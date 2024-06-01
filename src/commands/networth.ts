@@ -8,11 +8,14 @@ import {
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import { Command, NypsiCommandInteraction } from "../models/Command";
-import { CustomEmbed } from "../models/EmbedBuilders";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { calcNetWorth } from "../utils/functions/economy/balance";
 import { getInventory } from "../utils/functions/economy/inventory";
-import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
+import { createUser, getItems, isEcoBanned, userExists } from "../utils/functions/economy/utils";
+import { getMember } from "../utils/functions/member";
 import PageManager from "../utils/functions/page";
+import { isUserBlacklisted } from "../utils/functions/users/blacklist";
+import { hasProfile } from "../utils/functions/users/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("networth", "view breakdown of your networth", "money").setAliases([
@@ -20,7 +23,10 @@ const cmd = new Command("networth", "view breakdown of your networth", "money").
   "nw",
 ]);
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
+async function run(
+  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  args: string[],
+) {
   if (await onCooldown(cmd.name, message.member)) {
     const embed = await getResponse(cmd.name, message.member);
 
@@ -29,16 +35,42 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   await addCooldown(cmd.name, message.member, 30);
 
-  if (!(await userExists(message.member))) await createUser(message.member);
+  let target = message.member;
 
-  const [net, inventory] = await Promise.all([
-    calcNetWorth(message.member, true),
-    getInventory(message.member),
-  ]);
+  if (args.length >= 1) {
+    target = await getMember(message.guild, args.join(" "));
 
-  const embed = new CustomEmbed(message.member).setHeader(
-    `${message.author.username}'s networth`,
-    message.author.avatarURL(),
+    if (!target) {
+      return message.channel.send({ embeds: [new ErrorEmbed("invalid user")] });
+    }
+  }
+
+  if (!(await hasProfile(target)))
+    return message.channel.send({
+      embeds: [new ErrorEmbed(`${target.toString()} has never used nypsi. what a LOSER lol.`)],
+    });
+
+  if (!(await userExists(target))) await createUser(target);
+
+  if (await isUserBlacklisted(target.user.id))
+    return message.channel.send({
+      embeds: [
+        new ErrorEmbed(
+          `${target.user.toString()} is blacklisted 😬. they did something REALLY bad. laugh at them for me. lol. AHHAHAAHHA`,
+        ),
+      ],
+    });
+
+  if ((await isEcoBanned(target.user.id)).banned)
+    return message.channel.send({
+      embeds: [new ErrorEmbed(`${target.toString()} is banned AHAHAHAHA`)],
+    });
+
+  const [net, inventory] = await Promise.all([calcNetWorth(target, true), getInventory(target)]);
+
+  const embed = new CustomEmbed(target).setHeader(
+    `${target.user.username}'s networth`,
+    target.user.avatarURL(),
   );
 
   let mainValues = `🌍 $**${net.amount.toLocaleString()}**\n`;
