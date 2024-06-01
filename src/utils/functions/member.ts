@@ -33,7 +33,8 @@ setInterval(() => {
         memberCache.values(),
       )
         .map((i) => i.size)
-        .reduce((a, b) => a + b)}`,
+        .reduce((a, b) => a + b)
+        .toLocaleString()}`,
     );
 }, ms("30 minutes"));
 
