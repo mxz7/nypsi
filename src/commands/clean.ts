@@ -1,4 +1,4 @@
-import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
+import { CommandInteraction, Message, PermissionFlagsBits, TextChannel } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { isPremium } from "../utils/functions/premium/premium";
@@ -16,7 +16,7 @@ async function run(
   args: string[],
 ) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
-    if (message.channel.id != "747056029795221516") return;
+    if ((message.channel as TextChannel).parentId != "747056029795221514") return;
     if (!(await isPremium(message.member))) return;
   }
 
