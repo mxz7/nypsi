@@ -367,7 +367,7 @@ async function run(
   const helpMenu = async () => {
     const embed = new CustomEmbed(message.member).setHeader("purge", message.author.avatarURL());
 
-    const prefix = await getPrefix(message.guild);
+    const prefix = (await getPrefix(message.guild))[0];
 
     embed.setDescription(
       `${prefix}**purge <number>** *delete messages from current channel*\n` +
@@ -490,7 +490,9 @@ async function run(
     const collected = await message.channel.messages.fetch({ limit: amount });
 
     const collecteda = collected.filter(
-      (msg) => msg.author.id == message.client.user.id || msg.content.startsWith(prefix),
+      (msg) =>
+        msg.author.id == message.client.user.id ||
+        prefix.map((i) => message.content.startsWith(i)).length > 0,
     );
 
     await message.channel.bulkDelete(collecteda);

@@ -9,13 +9,13 @@ import {
 } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
+import { isAltPunish } from "../utils/functions/guilds/altpunish";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getExactMember } from "../utils/functions/member";
+import { getAllGroupAccountIds } from "../utils/functions/moderation/alts";
 import { newCase } from "../utils/functions/moderation/cases";
 import { deleteMute, getMuteRole } from "../utils/functions/moderation/mute";
 import { createProfile, profileExists } from "../utils/functions/moderation/utils";
-import { isAltPunish } from "../utils/functions/guilds/altpunish";
-import { getAllGroupAccountIds } from "../utils/functions/moderation/alts";
 
 const cmd = new Command("unmute", "unmute a user", "moderation").setPermissions([
   "MANAGE_MESSAGES",
@@ -82,7 +82,7 @@ async function run(
 
   if (!(await profileExists(message.guild))) await createProfile(message.guild);
 
-  const prefix = await getPrefix(message.guild);
+  const prefix = (await getPrefix(message.guild))[0];
 
   if (args.length == 0 || !args[0]) {
     return send({ embeds: [new ErrorEmbed(`${prefix}unmute <user> (reason)`)] });

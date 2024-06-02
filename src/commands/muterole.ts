@@ -22,7 +22,7 @@ async function run(
     return;
   }
 
-  const prefix = await getPrefix(message.guild);
+  const prefix = (await getPrefix(message.guild))[0];
 
   if (!(await profileExists(message.guild))) await createProfile(message.guild);
 

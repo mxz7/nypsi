@@ -196,7 +196,7 @@ async function helpCmd(message: Message, args: string[]) {
 
   const helpCategories = new Map<string, Map<number, string[]>>();
 
-  const prefix = await getPrefix(message.guild);
+  const prefix = (await getPrefix(message.guild))[0];
 
   for (const cmd of commands.keys()) {
     const category = getCmdCategory(cmd);

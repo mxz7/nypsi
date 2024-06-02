@@ -47,7 +47,8 @@ async function run(
 
   const collecteda = collected.filter(
     (msg) =>
-      (msg.author.id == message.client.user.id || msg.content.startsWith(prefix)) &&
+      (msg.author.id == message.client.user.id ||
+        prefix.map((i) => message.content.startsWith(i)).length > 0) &&
       dayjs(msg.createdTimestamp).isAfter(dayjs().subtract(14, "days")),
   );
 

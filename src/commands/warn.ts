@@ -31,7 +31,7 @@ async function run(
 
   if (!(await profileExists(message.guild))) await createProfile(message.guild);
 
-  const prefix = await getPrefix(message.guild);
+  const prefix = (await getPrefix(message.guild))[0];
 
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {

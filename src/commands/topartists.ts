@@ -116,7 +116,7 @@ async function run(
     return send({
       embeds: [
         new ErrorEmbed(
-          `you have not set your last.fm username (${await getPrefix(message.guild)}**slfm**)`,
+          `you have not set your last.fm username (${(await getPrefix(message.guild))[0]}**slfm**)`,
         ),
       ],
     });

@@ -30,7 +30,7 @@ async function run(
     return message.channel.send({ embeds: [embed] });
   }
 
-  const prefix = await getPrefix(message.guild);
+  const prefix = (await getPrefix(message.guild))[0];
 
   if (args.length == 0) {
     return message.channel.send({ embeds: [new ErrorEmbed(`${prefix}inrole <role>`)] });

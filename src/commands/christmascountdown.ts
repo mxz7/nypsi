@@ -40,7 +40,7 @@ async function run(
     await createNewChristmasCountdown(message.guild);
 
   let profile = await getChristmasCountdown(message.guild);
-  const prefix = await getPrefix(message.guild);
+  const prefix = (await getPrefix(message.guild))[0];
 
   const help = () => {
     const embed = new CustomEmbed(

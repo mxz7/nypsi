@@ -151,7 +151,7 @@ async function run(
     });
   }
 
-  const prefix = await getPrefix(message.guild);
+  const prefix = (await getPrefix(message.guild))[0];
   const defaultBet = await getDefaultBet(message.member);
 
   if (args.length != 2 && !defaultBet) {

@@ -36,7 +36,7 @@ async function run(
   }
 
   let filter = await getChatFilter(message.guild);
-  const prefix = await getPrefix(message.guild);
+  const prefix = (await getPrefix(message.guild))[0];
 
   if (args.length == 0) {
     const pages = PageManager.createPages(
