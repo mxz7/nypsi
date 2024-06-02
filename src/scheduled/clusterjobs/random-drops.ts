@@ -233,7 +233,7 @@ async function typeFastGame(client: NypsiClient, channelId: string, prize: strin
 
   const chosenWord = words[Math.floor(Math.random() * words.length)].replace(
     `{prefix}`,
-    await getPrefix(cluster.guildId),
+    (await getPrefix(cluster.guildId))[0],
   );
 
   let displayWord = chosenWord;

@@ -236,7 +236,7 @@ async function play(
     response == "stop" ||
     response == "cancel" ||
     response == "" ||
-    response.startsWith(await getPrefix(message.guild))
+    response.startsWith((await getPrefix(message.guild))[0])
   ) {
     return cancel(message, m);
   }
