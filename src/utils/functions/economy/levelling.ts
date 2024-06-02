@@ -56,10 +56,12 @@ levellingRewards.set(10, {
   rewards: ["id:basic_crate", "id:basic_crate", "karma:100", "money:100000"],
 });
 levellingRewards.set(15, { text: "you will now receive 3 📦 vote crates when voting" });
+levellingRewards.set(20, { text: "you have unlocked:\n" + "- +1% gamble multi" });
 levellingRewards.set(25, {
   text: "you have unlocked:\n" + "- 🎣 fisherman (</workers view:1014905682341924945>)",
 });
 levellingRewards.set(30, { text: "you will now receive 4 📦 vote crates when voting" });
+levellingRewards.set(35, { text: "you have unlocked:\n" + "- +1% gamble multi" });
 levellingRewards.set(40, {
   text: "you have unlocked:\n" + "- 🍟 mcdonalds (</workers view:1014905682341924945>)",
 });
@@ -76,10 +78,7 @@ levellingRewards.set(69, {
   rewards: ["id:69420_crate", "id:69420_crate", "id:69420_crate"],
 });
 levellingRewards.set(75, {
-  text:
-    "you have unlocked:\n" +
-    "- 👕 tailor (</workers view:1014905682341924945>)\n" +
-    "- +1% gamble multi",
+  text: "you have unlocked:\n" + "- 👕 tailor (</workers view:1014905682341924945>)",
 });
 levellingRewards.set(100, {
   text:
@@ -89,6 +88,7 @@ levellingRewards.set(100, {
     "- create your own guild\n" +
     "- +1% gamble multi",
 });
+levellingRewards.set(150, { text: "you have unlocked:\n" + "- +1% gamble multi" });
 levellingRewards.set(200, {
   text:
     "you have unlocked:\n" +
