@@ -12,7 +12,7 @@ export default async function guildDelete(client: Client, guild: Guild) {
 
   logger.info(`::guild removed from ${guild.name} (${guild.id})`);
 
-  await setPrefix(guild, "$");
+  await setPrefix(guild, ["$"]);
   await updateDisabledCommands(guild, []);
   if (await profileExists(guild)) {
     await setMuteRole(guild, "");

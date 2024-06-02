@@ -243,9 +243,9 @@ export default async function messageCreate(message: Message) {
 
   message.content = message.content.replace(/ +(?= )/g, ""); // remove any additional spaces
 
-  let prefixes = await getPrefix(message.guild);
+  const prefixes = await getPrefix(message.guild);
 
-  if (message.client.user.id == "685193083570094101") prefixes = ["£"];
+  if (message.client.user.id == "685193083570094101") prefixes.push("£");
 
   if (
     message.content == `<@!${message.client.user.id}>` ||

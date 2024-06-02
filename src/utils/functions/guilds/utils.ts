@@ -188,13 +188,13 @@ export async function getPrefix(guild: Guild | string): Promise<string[]> {
   }
 }
 
-export async function setPrefix(guild: Guild, prefix: string) {
+export async function setPrefix(guild: Guild, prefix: string[]) {
   await prisma.guild.update({
     where: {
       id: guild.id,
     },
     data: {
-      prefix: prefix,
+      prefixes: prefix,
     },
   });
 
