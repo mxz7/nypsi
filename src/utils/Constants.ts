@@ -76,6 +76,8 @@ export default {
       },
       chatReaction: {
         EXISTS: "cache:chatreaction:exists",
+        WORD_LIST_TYPE: "cache:chatreaction:wordlist:type",
+        WORD_LIST: "cache:chatreaction:wordlist:words",
       },
       economy: {
         TASKS: "cache:economy:tasks",
