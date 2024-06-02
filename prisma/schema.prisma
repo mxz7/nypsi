@@ -630,17 +630,25 @@ model Alt {
 }
 
 model ChatReaction {
+  wordListType   ChatReactionWordList @default(english_1k)
   wordList       String[]
-  randomStart    Boolean  @default(false)
+  randomStart    Boolean              @default(false)
   randomChannels String[]
-  betweenEvents  Int      @default(600)
-  randomModifier Int      @default(300)
-  timeout        Int      @default(60)
+  betweenEvents  Int                  @default(600)
+  randomModifier Int                  @default(300)
+  timeout        Int                  @default(60)
   blacklisted    String[]
 
   guild             Guild               @relation(fields: [guildId], references: [id], onDelete: Cascade)
   guildId           String              @unique
   ChatReactionStats ChatReactionStats[]
+}
+
+enum ChatReactionWordList {
+  english_1k
+  english_5k
+  english_10k
+  custom
 }
 
 model ChatReactionStats {
