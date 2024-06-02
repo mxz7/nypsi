@@ -142,7 +142,7 @@ export async function createGuild(guild: Guild | string) {
   );
 }
 
-export async function getPrefix(guild: Guild | string): Promise<string> {
+export async function getPrefix(guild: Guild | string): Promise<string[]> {
   let guildId: string;
 
   if (guild instanceof Guild) {
@@ -153,7 +153,7 @@ export async function getPrefix(guild: Guild | string): Promise<string> {
 
   try {
     if (await redis.exists(`${Constants.redis.cache.guild.PREFIX}:${guildId}`)) {
-      return redis.get(`${Constants.redis.cache.guild.PREFIX}:${guildId}`);
+      return (await redis.get(`${Constants.redis.cache.guild.PREFIX}:${guildId}`)).split(" ");
     }
 
     const query = await prisma.guild.findUnique({
@@ -161,40 +161,40 @@ export async function getPrefix(guild: Guild | string): Promise<string> {
         id: guildId,
       },
       select: {
-        prefix: true,
+        prefixes: true,
       },
     });
 
-    if (query.prefix == "") {
-      query.prefix = "$";
+    if (query.prefixes.length === 0) {
+      query.prefixes = ["$"];
       await prisma.guild.update({
         where: {
           id: guildId,
         },
         data: {
-          prefix: "$",
+          prefixes: ["$"],
         },
       });
     }
 
-    await redis.set(`${Constants.redis.cache.guild.PREFIX}:${guildId}`, query.prefix);
+    await redis.set(`${Constants.redis.cache.guild.PREFIX}:${guildId}`, query.prefixes.join(" "));
     await redis.expire(`${Constants.redis.cache.guild.PREFIX}:${guildId}`, 3600);
 
-    return query.prefix;
+    return query.prefixes;
   } catch (e) {
     if (!(await hasGuild(guild))) await createGuild(guild);
     logger.warn("couldn't fetch prefix for server " + guildId);
-    return "$";
+    return ["$"];
   }
 }
 
-export async function setPrefix(guild: Guild, prefix: string) {
+export async function setPrefix(guild: Guild, prefix: string[]) {
   await prisma.guild.update({
     where: {
       id: guild.id,
     },
     data: {
-      prefix: prefix,
+      prefixes: prefix,
     },
   });
 

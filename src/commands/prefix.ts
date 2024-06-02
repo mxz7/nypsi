@@ -25,36 +25,65 @@ async function run(
   if (args.length == 0) {
     const embed = new CustomEmbed(
       message.member,
-      "current prefix: `" +
-        prefix +
-        "`\n\nuse " +
-        prefix +
-        "**prefix** <new prefix> to change the current prefix",
+      "current prefixes: \n" +
+        prefix.map((i) => "`" + i + "`").join("\n") +
+        `\n\n${prefix[0]}**prefix add <prefix>** *add a prefix*\n` +
+        `${prefix[0]}**prefix del <prefix>** *remove a prefix*`,
     ).setHeader("prefix");
 
     return message.channel.send({ embeds: [embed] });
   }
 
-  if (args.join(" ").includes("`")) {
+  if (args[0].toLowerCase() === "add") {
+    if (prefix.length >= 5)
+      return message.channel.send({ embeds: [new ErrorEmbed("you can have a max of 5 prefixes")] });
+
+    if (args.length === 1)
+      return message.channel.send({
+        content:
+          "are you actually stupid?? like what prefix do you want to add. nothing? fucking idiot.",
+      });
+
+    if (args[1].length > 3)
+      return message.channel.send({
+        embeds: [new ErrorEmbed("prefix cannot be longer than 3 characters")],
+      });
+
+    if (args[1].includes("`") || args[1].includes("*") || args[1].includes("_"))
+      return message.channel.send({
+        embeds: [new ErrorEmbed("prefix includes illegal character")],
+      });
+
+    prefix.push(args[1]);
+
+    await setPrefix(message.guild, prefix);
+
     return message.channel.send({
-      embeds: [new ErrorEmbed("prefix cannot contain `")],
+      embeds: [new CustomEmbed(message.member, `added \`${args[1]}\` as a prefix`)],
     });
+  } else if (args[0].toLowerCase() === "del") {
+    if (prefix.length === 1)
+      return message.channel.send({
+        embeds: [new ErrorEmbed("are you really trying to remove your ONLY prefix???")],
+      });
+
+    if (args.length === 1)
+      return message.channel.send({
+        content:
+          "are you actually stupid?? like what prefix do you want to remove. nothing? fucking idiot.",
+      });
+
+    const index = prefix.findIndex((i) => i === args[1]);
+
+    if (index < 0)
+      return message.channel.send({ embeds: [new ErrorEmbed("couldnt find that prefix")] });
+
+    prefix.splice(index, 1);
+
+    await setPrefix(message.guild, prefix);
+
+    return message.channel.send({ embeds: [new CustomEmbed(message.member, "✅ removed")] });
   }
-
-  if (args.join(" ").length > 3) {
-    return message.channel.send({
-      embeds: [new ErrorEmbed("prefix cannot be longer than 3 characters")],
-    });
-  }
-
-  await setPrefix(message.guild, args.join(" "));
-
-  const embed = new CustomEmbed(
-    message.member,
-    "✅ prefix changed to `" + args.join(" ") + "`",
-  ).setHeader("prefix");
-
-  return await message.channel.send({ embeds: [embed] });
 }
 
 cmd.setRun(run);

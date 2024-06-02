@@ -43,7 +43,7 @@ async function run(
 
   const embed = new CustomEmbed(message.member).setHeader("top cases");
 
-  const prefix = await getPrefix(message.guild);
+  const prefix = (await getPrefix(message.guild))[0];
 
   if (args.length == 0) {
     const topStaff = new Map<string, number>();

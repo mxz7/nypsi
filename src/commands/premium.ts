@@ -488,7 +488,7 @@ async function run(
 
     const aliases = await getUserAliases(message.author.id);
 
-    const prefix = await getPrefix(message.guild);
+    const prefix = (await getPrefix(message.guild))[0];
 
     if (args[1].toLowerCase() === "list") {
       if (aliases.length === 0) return send({ embeds: [new ErrorEmbed("you have no aliases")] });

@@ -470,7 +470,7 @@ async function run(
         data = await topCommand(message.guild, cmd, message.author.id);
       }
 
-      title = `top ${await getPrefix(message.guild)}${cmd} uses ${
+      title = `top ${(await getPrefix(message.guild))[0]}${cmd} uses ${
         global ? "[global]" : `for ${message.guild.name}`
       }`;
     }

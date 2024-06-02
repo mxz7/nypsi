@@ -88,9 +88,7 @@ async function run(
         .add(1, "day")
         .startOf("day")
         .unix()}:R>\n\n` +
-        `you can buy lottery tickets for $**${lotteryTicketPrice.toLocaleString()}** with ${await getPrefix(
-          message.guild,
-        )}**lotto buy**\nyou have **${tickets.length.toLocaleString()}**/${Constants.LOTTERY_TICKETS_MAX.toLocaleString()} tickets (${winChance}% chance of winning)`,
+        `you can buy lottery tickets for $**${lotteryTicketPrice.toLocaleString()}** with ${(await getPrefix(message.guild))[0]}**lotto buy**\nyou have **${tickets.length.toLocaleString()}**/${Constants.LOTTERY_TICKETS_MAX.toLocaleString()} tickets (${winChance}% chance of winning)`,
     );
 
     return send({ embeds: [embed] });

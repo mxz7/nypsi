@@ -16,7 +16,7 @@ async function run(
 ) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) return;
 
-  const prefix = await getPrefix(message.guild);
+  const prefix = (await getPrefix(message.guild))[0];
 
   if (args.length <= 1) {
     const embed = new CustomEmbed(message.member)

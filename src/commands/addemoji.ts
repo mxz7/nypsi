@@ -79,7 +79,7 @@ async function run(
     return;
   }
 
-  const prefix = await getPrefix(message.guild);
+  const prefix = (await getPrefix(message.guild))[0];
 
   if (args.length == 0 && message instanceof Message && !message.attachments.first()) {
     return send({
