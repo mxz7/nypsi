@@ -24,7 +24,7 @@ async function run(
 
   let filter = await getSnipeFilter(message.guild);
 
-  const prefix = await getPrefix(message.guild);
+  const prefix = (await getPrefix(message.guild))[0];
 
   if (args.length == 0) {
     const embed = new CustomEmbed(message.member, "`" + filter.join("`\n`") + "`")

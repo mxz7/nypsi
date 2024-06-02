@@ -73,9 +73,7 @@ async function run(
       embeds: [
         new CustomEmbed(
           message.member,
-          `buy items from ${await getPrefix(
-            message.guild,
-          )}shop by using the item id or item name without spaces`,
+          `buy items from ${(await getPrefix(message.guild))[0]}shop by using the item id or item name without spaces`,
         ),
       ],
     });

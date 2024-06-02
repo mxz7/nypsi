@@ -75,7 +75,7 @@ async function run(
     embed.setDescription(`${target.user.username} has **${karma.toLocaleString()}** karma 🔮`);
   }
 
-  embed.setFooter({ text: `whats karma? do ${await getPrefix(message.guild)}karmahelp` });
+  embed.setFooter({ text: `whats karma? do ${(await getPrefix(message.guild))[0]}karmahelp` });
 
   return send({ embeds: [embed] });
 }

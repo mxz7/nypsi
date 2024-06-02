@@ -8,12 +8,12 @@ import {
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
+import { isAltPunish } from "../utils/functions/guilds/altpunish";
 import { getPrefix } from "../utils/functions/guilds/utils";
+import { getAllGroupAccountIds } from "../utils/functions/moderation/alts";
 import { newCase } from "../utils/functions/moderation/cases";
 import { createProfile, profileExists } from "../utils/functions/moderation/utils";
 import { getIdFromUsername, getLastKnownUsername } from "../utils/functions/users/tag";
-import { isAltPunish } from "../utils/functions/guilds/altpunish";
-import { getAllGroupAccountIds } from "../utils/functions/moderation/alts";
 
 const cmd = new Command("unban", "unban one or more users", "moderation").setPermissions([
   "BAN_MEMBERS",
@@ -73,7 +73,7 @@ async function run(
 
   if (!(await profileExists(message.guild))) await createProfile(message.guild);
 
-  const prefix = await getPrefix(message.guild);
+  const prefix = (await getPrefix(message.guild))[0];
 
   if (args.length == 0) {
     const embed = new CustomEmbed(message.member)

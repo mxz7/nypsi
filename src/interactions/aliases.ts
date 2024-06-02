@@ -10,7 +10,7 @@ export default {
 
     if (aliases.length == 0) return await interaction.respond([]);
 
-    const prefix = await getPrefix(interaction.guild);
+    const prefix = (await getPrefix(interaction.guild))[0];
 
     const formatted = aliases.map((i) => ({
       name: `${prefix}${i.alias} (${prefix}${i.command})`,

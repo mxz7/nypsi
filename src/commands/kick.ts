@@ -74,7 +74,7 @@ async function run(
 
   if (!(await profileExists(message.guild))) await createProfile(message.guild);
 
-  const prefix = await getPrefix(message.guild);
+  const prefix = (await getPrefix(message.guild))[0];
 
   if (args.length == 0 || !args[0]) {
     const embed = new CustomEmbed(message.member)

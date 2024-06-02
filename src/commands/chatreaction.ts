@@ -243,7 +243,7 @@ async function run(
   if (!(await hasReactionStatsProfile(message.guild, message.member)))
     await createReactionStatsProfile(message.guild, message.member);
 
-  const prefix = await getPrefix(message.guild);
+  const prefix = (await getPrefix(message.guild))[0];
 
   const helpCmd = () => {
     const embed = new CustomEmbed(message.member).setHeader("chat reactions");

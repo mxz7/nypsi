@@ -367,7 +367,7 @@ async function run(
   const helpMenu = async () => {
     const embed = new CustomEmbed(message.member).setHeader("purge", message.author.avatarURL());
 
-    const prefix = await getPrefix(message.guild);
+    const prefix = (await getPrefix(message.guild))[0];
 
     embed.setDescription(
       `${prefix}**purge <number>** *delete messages from current channel*\n` +

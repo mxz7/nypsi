@@ -87,7 +87,7 @@ async function run(
     return send({ embeds: [new ErrorEmbed("you have an active game")] });
   }
 
-  const prefix = await getPrefix(message.guild);
+  const prefix = (await getPrefix(message.guild))[0];
 
   if (args.length == 0) {
     const embed = new CustomEmbed(message.member);

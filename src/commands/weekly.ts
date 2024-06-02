@@ -24,7 +24,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     await createUser(message.member);
   }
 
-  const prefix = await getPrefix(message.guild);
+  const prefix = (await getPrefix(message.guild))[0];
 
   const notValidForYou = () => {
     const embed = new CustomEmbed(

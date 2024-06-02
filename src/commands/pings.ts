@@ -83,7 +83,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     qualified = true;
   }
 
-  const prefix = await getPrefix(message.guild);
+  const prefix = (await getPrefix(message.guild))[0];
 
   if (!qualified) {
     const embed = new ErrorEmbed(
