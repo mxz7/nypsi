@@ -243,19 +243,19 @@ export default async function messageCreate(message: Message) {
 
   message.content = message.content.replace(/ +(?= )/g, ""); // remove any additional spaces
 
-  let prefix = await getPrefix(message.guild);
+  let prefixes = await getPrefix(message.guild);
 
-  if (message.client.user.id == "685193083570094101") prefix = "£";
+  if (message.client.user.id == "685193083570094101") prefixes = ["£"];
 
   if (
     message.content == `<@!${message.client.user.id}>` ||
     message.content == `<@${message.client.user.id}>`
   ) {
     return message.channel
-      .send({ content: `my prefix for this server is \`${prefix}\`` })
+      .send({ content: `my prefix for this server is \`${prefixes}\`` })
       .catch(() => {
         return message.member.send({
-          content: `my prefix for this server is \`${prefix}\` -- i do not have permission to send messages in that channel`,
+          content: `my prefix for this server is \`${prefixes}\` -- i do not have permission to send messages in that channel`,
         });
       });
   }
@@ -273,12 +273,15 @@ export default async function messageCreate(message: Message) {
     }
   }
 
-  if (message.content.startsWith(prefix) && !(await isSlashOnly(message.guild))) {
-    const args = message.content.substring(prefix.length).split(" ");
+  for (const prefix of prefixes) {
+    if (message.content.startsWith(prefix) && !(await isSlashOnly(message.guild))) {
+      const args = message.content.substring(prefix.length).split(" ");
 
-    const cmd = args[0].toLowerCase();
+      const cmd = args[0].toLowerCase();
 
-    runCommand(cmd, message, args);
+      runCommand(cmd, message, args);
+      break;
+    }
   }
 
   if (
