@@ -9,6 +9,7 @@ import {
   Message,
   MessageActionRowComponentBuilder,
   PermissionsBitField,
+  TextChannel,
   ThreadMember,
   ThreadMemberManager,
 } from "discord.js";
@@ -181,7 +182,7 @@ export default async function messageCreate(message: Message) {
     if (message.author.id === Constants.TEKOH_ID) redis.set("nypsi:tekoh:lastchat", Date.now());
 
     if (
-      message.channelId === "747057312468041791" &&
+      (message.channel as TextChannel).parentId === "1246516186171314337" &&
       message.content.includes(`<@${Constants.TEKOH_ID}>`) &&
       parseInt(await redis.get("nypsi:tekoh:lastchat")) < Date.now() - ms("1 hour")
     ) {
