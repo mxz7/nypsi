@@ -1,3 +1,4 @@
+import { ChatReactionWordList } from "@prisma/client";
 import {
   ActionRowBuilder,
   BaseMessageOptions,
@@ -38,7 +39,12 @@ import {
   hasReactionProfile,
   updateReactionSettings,
 } from "../utils/functions/chatreactions/utils";
-import { getWordList, updateWords } from "../utils/functions/chatreactions/words";
+import {
+  getWordList,
+  getWordListType,
+  setWordListType,
+  updateWords,
+} from "../utils/functions/chatreactions/words";
 import { calcMaxBet, getBalance, updateBalance } from "../utils/functions/economy/balance";
 import {
   createUser,
@@ -1160,6 +1166,7 @@ async function run(
 
       embed.setDescription(
         `${prefix}**cr words list** *view the current wordlist*\n` +
+          `${prefix}**cr words type <type>** *set the word list type*\n` +
           `${prefix}**cr words add/+ <word/sentence>** *add a word or sentence to the wordlist*\n` +
           `${prefix}**cr words del/- <word/sentence>** *remove a word or sentence from the wordlist*\n` +
           `${prefix}**cr words reset** *delete the custom word list and use the [default list](https://github.com/mxz7/nypsi/blob/main/data/cr_words.txt)*`,
@@ -1386,6 +1393,34 @@ async function run(
       }
 
       return send({ embeds: [embed] });
+    } else if (args[1].toLowerCase() === "type") {
+      const type = await getWordListType(message.guild);
+
+      if (args.length === 2) {
+        return send({
+          embeds: [
+            new CustomEmbed(
+              message.member,
+              `word list type: \`${type}\`\n\n` +
+                "available types:\n" +
+                Object.values(ChatReactionWordList)
+                  .map((i) => "`" + i + "`")
+                  .join("\n"),
+            ).setHeader("chat reactions"),
+          ],
+        });
+      } else {
+        const search = args[2].toLowerCase();
+
+        if (!Object.values(ChatReactionWordList).find((i) => i === search))
+          return send({ embeds: [new ErrorEmbed("invalid word list")] });
+
+        await setWordListType(message.guild, search as ChatReactionWordList);
+
+        return send({
+          embeds: [new CustomEmbed(message.member, `word list type set to: \`${args[2]}\``)],
+        });
+      }
     }
   }
 }
