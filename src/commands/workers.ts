@@ -444,7 +444,7 @@ async function run(
       }
 
       if (res.customId == "ba" || res.customId === "ba2") {
-        return showWorkers(worker.id, msg);
+        return showWorkers(worker.id, msg, res as ButtonInteraction);
       } else if (res.customId.startsWith("up-")) {
         const upgradeId = res.customId.split("-")[1];
 
