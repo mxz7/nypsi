@@ -74,7 +74,7 @@
   "chat_daily": {
     "id": "chat_daily",
     "name": "community member",
-    "description": "talk in the official nypsi server (dont spam pls, commands count too)",
+    "description": "talk in the [official nypsi server](https://discord.gg/hJTDNST) (dont spam pls, commands count too)",
     "target": [10, 15, 25, 50],
     "prizes": ["id:basic_crate:1", "id:69420_crate:1", "xp:100"],
     "type": "daily"
@@ -82,7 +82,7 @@
   "chat_weekly": {
     "id": "chat_weekly",
     "name": "community member",
-    "description": "talk in the official nypsi server (dont spam pls, commands count too)",
+    "description": "talk in the [official nypsi server](https://discord.gg/hJTDNST) (dont spam pls, commands count too)",
     "target": [50, 75, 100, 250],
     "prizes": ["id:lucky_scratch_card:2", "id:69420_crate:3", "xp:750", "karma:500"],
     "type": "weekly"
