@@ -46,8 +46,8 @@ export async function addCooldown(cmd: string, member: GuildMember | string, sec
     length: expire,
   };
 
-  await redis.set(key, JSON.stringify(data));
-  if (!expireDisabled) await redis.expire(key, expire);
+  if (!expireDisabled) await redis.set(key, JSON.stringify(data), "PX", expire);
+  else await redis.set(key, JSON.stringify(data));
 }
 
 export async function addExpiry(cmd: string, member: GuildMember, seconds: number) {
@@ -151,31 +151,33 @@ async function calculateCooldownLength(
     getBoosters(member),
   ]);
 
+  let ms = seconds * 1000;
+
   if (premiumTier == 4) {
-    seconds = seconds * 0.25;
+    ms = ms * 0.25;
   } else if (premiumTier > 0) {
-    seconds = seconds * 0.5;
+    ms = ms * 0.5;
   }
 
   if (booster) {
-    seconds = seconds * 0.9;
+    ms = ms * 0.9;
   }
 
   if (guildUpgrades.find((i) => i.upgradeId === "cooldown")) {
-    seconds = seconds * (1 - 0.05 * guildUpgrades.find((i) => i.upgradeId === "cooldown").amount);
+    ms = ms * (1 - 0.05 * guildUpgrades.find((i) => i.upgradeId === "cooldown").amount);
   }
 
   const items = getItems();
 
   for (const id of boosters.keys()) {
     if (items[id].boosterEffect.boosts.includes("cooldown")) {
-      seconds -= seconds * items[id].boosterEffect.effect;
+      ms -= ms * items[id].boosterEffect.effect;
     }
   }
 
-  if (seconds < 1) seconds = 1;
+  if (ms < 250) ms = 250;
 
-  return Math.ceil(seconds);
+  return Math.ceil(ms);
 }
 
 interface CooldownData {
