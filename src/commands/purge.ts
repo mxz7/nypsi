@@ -492,7 +492,7 @@ async function run(
     const collecteda = collected.filter(
       (msg) =>
         msg.author.id == message.client.user.id ||
-        prefix.map((i) => message.content.startsWith(i)).length > 0,
+        prefix.map((i) => msg.content.startsWith(i)).length > 0,
     );
 
     await message.channel.bulkDelete(collecteda);
