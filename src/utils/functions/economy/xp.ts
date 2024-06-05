@@ -151,7 +151,7 @@ export async function calcEarnedHFMXp(member: GuildMember, items: number) {
     min += Math.random() * (items / 2) + items / 2;
   }
 
-  min *= 1.69;
+  min *= 1.369;
 
   const [boosters, level] = await Promise.all([getBoosters(member), getRawLevel(member)]);
 
