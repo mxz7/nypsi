@@ -118,6 +118,8 @@ export async function setWordListType(guild: Guild, type: ChatReactionWordList) 
 }
 
 export async function updateWords(guild: Guild, newWordList: string[]) {
+  await redis.del(`${Constants.redis.cache.chatReaction.WORD_LIST}:${guild.id}`);
+
   await prisma.chatReaction.update({
     where: {
       guildId: guild.id,
