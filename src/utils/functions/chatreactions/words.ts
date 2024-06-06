@@ -33,14 +33,16 @@ export async function getWordListType(guild: Guild) {
   return query.wordListType;
 }
 
-export async function getWords(guild: Guild) {
-  const type = await getWordListType(guild);
+export async function getWords(guild: Guild, type?: ChatReactionWordList) {
+  type = await getWordListType(guild);
 
   if (type === "custom") {
     const cache = await redis.get(`${Constants.redis.cache.chatReaction.WORD_LIST}:${guild.id}`);
 
     if (cache) {
-      return cache.split(" ");
+      const words = cache.split(" ");
+
+      if (words.length === 0) return getWords(guild, "english_1k");
     } else {
       const query = await prisma.chatReaction.findUnique({
         where: {
@@ -57,6 +59,8 @@ export async function getWords(guild: Guild) {
         "EX",
         86400,
       );
+
+      if (query.wordList.length === 0) return getWords(guild, "english_1k");
 
       return query.wordList;
     }

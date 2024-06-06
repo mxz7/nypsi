@@ -1259,9 +1259,7 @@ async function run(
       const embed = new CustomEmbed(message.member);
 
       if (words.length == 0) {
-        embed.setDescription(
-          "using [default word list](https://github.com/mxz7/nypsi/blob/main/data/cr_words.txt)",
-        );
+        embed.setDescription("using `english_1k` - add a custom word to use custom words");
         embed.setHeader("chat reactions");
       } else {
         const pages = PageManager.createPages(words);
