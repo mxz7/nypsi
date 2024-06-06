@@ -435,7 +435,7 @@ async function run(
       .catch(async () => {
         fail = true;
         playing.delete(message.author.id);
-        if (cancelled)
+        if (!cancelled)
           await updateBalance(message.member, (await getBalance(message.member)) + bet);
         msg.edit({ components: [] });
       });
