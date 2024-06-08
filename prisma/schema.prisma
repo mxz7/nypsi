@@ -468,7 +468,6 @@ model Guild {
   snipeFilter      String[]
   chatFilter       String[]
   percentMatch     Int      @default(75)
-  prefix           String   @default("$")
   prefixes         String[] @default(["$"])
   createdAt        DateTime @default(now())
   slash_only       Boolean  @default(false)
