@@ -1607,28 +1607,6 @@ async function run(
     }
 
     startRandomDrop(message.client as NypsiClient, message.channelId);
-  } else if (args[0].toLowerCase() === "migrateprefix") {
-    if (message.author.id !== Constants.TEKOH_ID) return message.channel.send({ content: "done" });
-
-    const guilds = await prisma.guild.findMany({
-      select: {
-        prefix: true,
-        id: true,
-      },
-    });
-
-    for (const guild of guilds) {
-      await prisma.guild.update({
-        data: {
-          prefixes: [guild.prefix],
-        },
-        where: {
-          id: guild.id,
-        },
-      });
-    }
-
-    message.channel.send({ content: "done" });
   }
 }
 
