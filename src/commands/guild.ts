@@ -784,7 +784,7 @@ async function run(
 
       xp += `${position} **${
         m.economy.user.lastKnownUsername
-      }** ${m.contributedXp.toLocaleString()}xp **|** $${m.contributedMoney.toLocaleString()}\n`;
+      }** ${m.contributedXp.toLocaleString()}xp\n`;
     }
 
     embed.addField("xp", xp, true);
@@ -801,7 +801,7 @@ async function run(
 
       money += `${position} **${
         m.economy.user.lastKnownUsername
-      }** ${m.contributedXpThisLevel.toLocaleString()}xp **|** $${m.contributedMoneyThisLevel.toLocaleString()}\n`;
+      }** $${m.contributedMoney.toLocaleString()}\n`;
     }
 
     embed.addField(`money`, money, true);
