@@ -769,45 +769,42 @@ async function run(
       `https://nypsi.xyz/guild/${encodeURIComponent(guild.guildName)}`,
     );
 
-    let overall = "";
-    let thislevel = "";
+    let xp = "";
+    let money = "";
 
-    const overallSort = sort(members).desc([(i) => i.contributedXp, (i) => i.contributedMoney]);
+    const xpSort = sort(members).desc([(i) => i.contributedXp, (i) => i.contributedMoney]);
 
-    for (const m of overallSort) {
-      let position = (overallSort.indexOf(m) + 1).toString();
+    for (const m of xpSort) {
+      let position = (xpSort.indexOf(m) + 1).toString();
 
       if (position == "1") position = "🥇";
       else if (position == "2") position = "🥈";
       else if (position == "3") position = "🥉";
       else position += ".";
 
-      overall += `${position} **${
+      xp += `${position} **${
         m.economy.user.lastKnownUsername
       }** ${m.contributedXp.toLocaleString()}xp **|** $${m.contributedMoney.toLocaleString()}\n`;
     }
 
-    embed.addField("overall", overall, true);
+    embed.addField("xp", xp, true);
 
-    const levelSort = sort(members).desc([
-      (i) => i.contributedXpThisLevel,
-      (i) => i.contributedMoneyThisLevel,
-    ]);
+    const moneySort = sort(members).desc([(i) => i.contributedMoney, (i) => i.contributedXp]);
 
-    for (const m of levelSort) {
-      let position = (levelSort.indexOf(m) + 1).toString();
+    for (const m of moneySort) {
+      let position = (moneySort.indexOf(m) + 1).toString();
 
       if (position == "1") position = "🥇";
       else if (position == "2") position = "🥈";
       else if (position == "3") position = "🥉";
       else position += ".";
 
-      thislevel += `${position} **${
+      money += `${position} **${
         m.economy.user.lastKnownUsername
       }** ${m.contributedXpThisLevel.toLocaleString()}xp **|** $${m.contributedMoneyThisLevel.toLocaleString()}\n`;
     }
 
-    embed.addField(`level ${guild.level}`, thislevel, true);
+    embed.addField(`money`, money, true);
 
     return send({ embeds: [embed] });
   }
