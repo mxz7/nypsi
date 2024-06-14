@@ -177,7 +177,7 @@ async function run(
     await createUser(message.member);
   }
 
-  const prefix = await getPrefix(message.guild);
+  const prefix = (await getPrefix(message.guild))[0];
   const defaultBet = await getDefaultBet(message.member);
 
   if (args.length == 0 && !defaultBet) {
