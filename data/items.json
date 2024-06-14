@@ -2239,8 +2239,7 @@
       "id:xp_potion:50",
       "id:double_xp:15",
       "id:multi_potion:40"
-    ],
-    "random_drop_chance": 50
+    ]
   },
   "corner_shop_scratchie": {
     "id": "corner_shop_scratchie",
