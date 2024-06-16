@@ -4,7 +4,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
 import { getRandomImage } from "../utils/functions/image";
-import { getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("cat", "get a random picture of a cat", "animals").setAliases([
   "kitty",
@@ -18,6 +18,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     return message.channel.send({ embeds: [embed] });
   }
+
+  await addCooldown(cmd.name, message.member, 3);
 
   const image = await getRandomImage("cat").catch(() => null);
 
