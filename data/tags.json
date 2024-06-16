@@ -166,5 +166,11 @@
     "name": "mechanic",
     "description": "obtained from the mechanic achievement",
     "emoji": "🔧"
+  },
+  "keyboard": {
+    "id": "keyboard",
+    "name": "keyboard",
+    "description": "win an official chat reaction tournament",
+    "emoji": "⌨️"
   }
 }
