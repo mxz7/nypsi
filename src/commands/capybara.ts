@@ -3,7 +3,7 @@ import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { getRandomImage } from "../utils/functions/image";
-import { getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("capybara", "get a random picture of a capybara", "animals").setAliases([
   "capy",
@@ -15,6 +15,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     return message.channel.send({ embeds: [embed] });
   }
+
+  await addCooldown(cmd.name, message.member, 3);
 
   const image = await getRandomImage("capybara").catch(() => null);
 
