@@ -186,7 +186,7 @@ export default {
   SEASON_START: new Date("06/01/2024"),
   SEASON_NUMBER: 8,
   SNOWFLAKE_REGEX: /^\d{17,19}$/,
-  BADGES: ["owner", "staff", "highroller", "contributor", "season_winner", "og"],
+  BADGES: ["owner", "staff", "highroller", "contributor", "season_winner", "og", "keyboard"],
   PURPLE: "#8b5cf6" as ColorResolvable,
   HIGHROLLER_ROLE: "1067122363143032992",
   HIGHEROLLER_REQUIREMENT: 500,
