@@ -244,6 +244,16 @@ export async function verifyUser(
       });
     }
   } else if (res.type === 2) {
+    const check = await prisma.captcha.findUnique({
+      where: { id: res.id },
+      select: { solved: true },
+    });
+
+    if (check.solved) {
+      await redis.del(`${Constants.redis.nypsi.LOCKED_OUT}:${message.author.id}`);
+      return true;
+    }
+
     const embed = new CustomEmbed(message.member).setTitle("you have been locked");
 
     embed.setDescription(
