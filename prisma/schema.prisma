@@ -474,6 +474,10 @@ model Guild {
   alt_punish       Boolean  @default(false)
   auto_role        String[]
   persist_role     String[]
+  muteRole         String?
+  modlogs          String?
+  logs             String?
+  automute         Int[]    @default([0, 60, 120, 300])
 
   GuildChristmas GuildChristmas?
   counters       GuildCounter[]
