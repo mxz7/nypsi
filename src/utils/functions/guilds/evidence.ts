@@ -3,7 +3,7 @@ import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import Constants from "../../Constants";
 
-export async function getMaxEvidence(guild: Guild) {
+export async function getMaxEvidenceBytes(guild: Guild) {
   const cache = await redis.get(`${Constants.redis.cache.guild.EVIDENCE_MAX}:${guild.id}`);
 
   if (cache) {
