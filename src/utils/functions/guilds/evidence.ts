@@ -14,6 +14,9 @@ export async function getMaxEvidenceBytes(guild: Guild) {
     where: {
       guildId: guild.id,
     },
+    select: {
+      bytes: true,
+    },
   });
 
   const base = Constants.EVIDENCE_BASE;
@@ -24,4 +27,18 @@ export async function getMaxEvidenceBytes(guild: Guild) {
   await redis.set(`${Constants.redis.cache.guild.EVIDENCE_MAX}:${guild.id}`, total, "EX", 21600); // 6 hours
 
   return total;
+}
+
+export async function getUsedEvidenceBytes(guild: Guild) {
+  const evidences = await prisma.moderationEvidence.findMany({
+    where: {
+      guildId: guild.id,
+    },
+    select: {
+      bytes: true,
+    },
+  });
+
+  if (evidences.length === 0) return 0;
+  else return Number(evidences.map((e) => e.bytes).reduce((a, b) => a + b));
 }
