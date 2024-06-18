@@ -6,8 +6,7 @@
 
 */
 -- AlterTable
-ALTER TABLE "ModerationCase" DROP CONSTRAINT "ModerationCase_pkey",
-DROP COLUMN "tempId",
+ALTER TABLE "ModerationCase" DROP COLUMN "tempId",
 ADD CONSTRAINT "ModerationCase_pkey" PRIMARY KEY ("caseId", "guildId");
 
 -- CreateIndex
