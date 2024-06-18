@@ -488,10 +488,12 @@ model Guild {
   RolePersist  RolePersist[]
   ReactionRole ReactionRole[]
 
-  Alt   Alt[]
-  cases ModerationCase[]
-  bans  ModerationBan[]
-  mutes ModerationMute[]
+  Alt                 Alt[]
+  cases               ModerationCase[]
+  bans                ModerationBan[]
+  mutes               ModerationMute[]
+  ModerationEvidence  ModerationEvidence[]
+  GuildEvidenceCredit GuildEvidenceCredit[]
 }
 
 model ReactionRole {
@@ -606,10 +608,35 @@ model ModerationCase {
   time      DateTime @default(now())
   deleted   Boolean  @default(false)
 
+  evidence ModerationEvidence?
+
   guild Guild @relation(fields: [guildId], references: [id], onDelete: Cascade)
 
   @@id([caseId, guildId])
   @@index([guildId])
+}
+
+model ModerationEvidence {
+  id    String @id @default(uuid())
+  bytes BigInt
+
+  caseId  Int
+  guildId String
+
+  guild Guild          @relation(fields: [guildId], references: [id], onDelete: Restrict)
+  case  ModerationCase @relation(fields: [caseId, guildId], references: [caseId, guildId], onDelete: Restrict)
+
+  @@unique([caseId, guildId])
+}
+
+model GuildEvidenceCredit {
+  id        Int      @id @default(autoincrement())
+  guildId   String
+  createdAt DateTime @default(now())
+
+  bytes BigInt
+
+  guild Guild @relation(fields: [guildId], references: [id])
 }
 
 model Alt {
