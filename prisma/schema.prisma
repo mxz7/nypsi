@@ -597,15 +597,14 @@ model ModerationMute {
 }
 
 model ModerationCase {
-  caseId_old String?
-  caseId     Int
-  guildId    String
-  type       String
-  user       String
-  moderator  String
-  command    String
-  time       DateTime @default(now())
-  deleted    Boolean  @default(false)
+  caseId    Int
+  guildId   String
+  type      String
+  user      String
+  moderator String
+  command   String
+  time      DateTime @default(now())
+  deleted   Boolean  @default(false)
 
   guild Guild @relation(fields: [guildId], references: [id], onDelete: Cascade)
 
