@@ -246,11 +246,19 @@ export async function verifyUser(
   } else if (res.type === 2) {
     const check = await prisma.captcha.findUnique({
       where: { id: res.id },
-      select: { solved: true },
+      select: { solved: true, received: true, visits: true, solvedAt: true },
     });
 
     if (check.solved) {
       await redis.del(`${Constants.redis.nypsi.LOCKED_OUT}:${message.author.id}`);
+      passedCaptcha(
+        message.member,
+        "```" +
+          `received: ${check.received}\n` +
+          `visits (${check.visits.length}): ${check.visits.map((i) => dayjs(i).format("HH:mm:ss")).join(" ")}\n` +
+          `solved at: ${dayjs(check.solvedAt).format("HH:mm:ss")}\n` +
+          "```",
+      );
       return true;
     }
 
