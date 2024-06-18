@@ -102,10 +102,10 @@ export async function isLogsEnabled(guild: Guild) {
 
   checkingLogsEnabled = true;
 
-  const query = await prisma.moderation
+  const query = await prisma.guild
     .findUnique({
       where: {
-        guildId: guild.id,
+        id: guild.id,
       },
       select: {
         logs: true,
