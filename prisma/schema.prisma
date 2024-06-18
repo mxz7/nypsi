@@ -609,7 +609,7 @@ model ModerationCase {
 
   guild Guild @relation(fields: [guildId], references: [id], onDelete: Cascade)
 
-  @@id([caseId, guildId])
+  tempId String @id @default(uuid())
 }
 
 model Alt {
