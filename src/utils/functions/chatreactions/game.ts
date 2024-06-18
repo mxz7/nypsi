@@ -126,9 +126,6 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel) 
 
     winnersIDs.push(message.author.id);
 
-    if (!(await hasReactionStatsProfile(guild, message.member)))
-      await createReactionStatsProfile(guild, message.member);
-
     switch (winnersList.length) {
       case 1:
         await addWin(guild, message.member);
