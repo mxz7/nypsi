@@ -485,10 +485,13 @@ model Guild {
 
   ChatReaction ChatReaction?
 
-  Moderation   Moderation?
   RolePersist  RolePersist[]
   ReactionRole ReactionRole[]
-  Alt          Alt[]
+
+  Alt   Alt[]
+  cases ModerationCase[]
+  bans  ModerationBan[]
+  mutes ModerationMute[]
 }
 
 model ReactionRole {
@@ -573,26 +576,12 @@ model GuildCountdown {
   @@id([guildId, id])
 }
 
-model Moderation {
-  caseCount Int     @default(0)
-  muteRole  String?
-  modlogs   String?
-  logs      String?
-  automute  Int[]   @default([0, 60, 120, 300])
-
-  guild          Guild            @relation(fields: [guildId], references: [id], onDelete: Cascade)
-  guildId        String           @unique
-  ModerationBan  ModerationBan[]
-  ModerationMute ModerationMute[]
-  ModerationCase ModerationCase[]
-}
-
 model ModerationBan {
   userId  String
   guildId String
   expire  DateTime
 
-  moderation Moderation @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+  guild Guild @relation(fields: [guildId], references: [id], onDelete: Cascade)
 
   @@id([userId, guildId])
 }
@@ -602,22 +591,23 @@ model ModerationMute {
   guildId String
   expire  DateTime
 
-  moderation Moderation @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+  guild Guild @relation(fields: [guildId], references: [id], onDelete: Cascade)
 
   @@id([userId, guildId])
 }
 
 model ModerationCase {
-  caseId    String
-  guildId   String
-  type      String
-  user      String
-  moderator String
-  command   String
-  time      DateTime
-  deleted   Boolean  @default(false)
+  caseId     String
+  caseId_new Int
+  guildId    String
+  type       String
+  user       String
+  moderator  String
+  command    String
+  time       DateTime @default(now())
+  deleted    Boolean  @default(false)
 
-  moderation Moderation @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+  guild Guild @relation(fields: [guildId], references: [id], onDelete: Cascade)
 
   @@id([caseId, guildId])
 }
