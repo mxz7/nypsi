@@ -598,7 +598,7 @@ model ModerationMute {
 
 model ModerationCase {
   caseId     String
-  caseId_new Int
+  caseId_new Int? // optional for now so it doesnt error
   guildId    String
   type       String
   user       String
