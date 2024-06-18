@@ -3,7 +3,6 @@ import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getLogsChannelHook, setLogsChannelHook } from "../utils/functions/moderation/logs";
-import { createProfile, profileExists } from "../utils/functions/moderation/utils";
 
 const cmd = new Command("logs", "set/update the logs channel", "admin").setPermissions([
   "MANAGE_SERVER",
@@ -36,8 +35,6 @@ async function run(
   }
 
   const prefix = (await getPrefix(message.guild))[0];
-
-  if (!(await profileExists(message.guild))) await createProfile(message.guild);
 
   const help = async () => {
     const current = await getLogsChannelHook(message.guild);

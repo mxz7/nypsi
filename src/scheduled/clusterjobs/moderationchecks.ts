@@ -15,19 +15,19 @@ export const unbanTimeouts = new Set<string>();
 export function runLogs() {
   setInterval(async () => {
     let query: {
-      guildId: string;
+      id: string;
       logs: string;
     }[];
 
     if (await redis.exists(Constants.redis.cache.guild.LOGS_GUILDS)) {
       query = JSON.parse(await redis.get(Constants.redis.cache.guild.LOGS_GUILDS));
     } else {
-      query = await prisma.moderation.findMany({
+      query = await prisma.guild.findMany({
         where: {
           logs: { not: null },
         },
         select: {
-          guildId: true,
+          id: true,
           logs: true,
         },
       });
@@ -38,15 +38,15 @@ export function runLogs() {
     let count = 0;
 
     for (const guild of query) {
-      if ((await redis.llen(`${Constants.redis.nypsi.GUILD_LOG_QUEUE}:${guild.guildId}`)) == 0) {
+      if ((await redis.llen(`${Constants.redis.nypsi.GUILD_LOG_QUEUE}:${guild.id}`)) == 0) {
         continue;
       }
       const hook = new WebhookClient({ url: guild.logs });
 
       if (!hook) {
-        await prisma.moderation.update({
+        await prisma.guild.update({
           where: {
-            guildId: guild.guildId,
+            id: guild.id,
           },
           data: {
             logs: null,
@@ -57,20 +57,18 @@ export function runLogs() {
 
       const embeds: APIEmbed[] = [];
 
-      if ((await redis.llen(`${Constants.redis.nypsi.GUILD_LOG_QUEUE}:${guild.guildId}`)) > 10) {
+      if ((await redis.llen(`${Constants.redis.nypsi.GUILD_LOG_QUEUE}:${guild.id}`)) > 10) {
         for (let i = 0; i < 10; i++) {
-          const current = await redis.rpop(
-            `${Constants.redis.nypsi.GUILD_LOG_QUEUE}:${guild.guildId}`,
-          );
+          const current = await redis.rpop(`${Constants.redis.nypsi.GUILD_LOG_QUEUE}:${guild.id}`);
           embeds.push(JSON.parse(current) as APIEmbed);
         }
       } else {
         const current = await redis.lrange(
-          `${Constants.redis.nypsi.GUILD_LOG_QUEUE}:${guild.guildId}`,
+          `${Constants.redis.nypsi.GUILD_LOG_QUEUE}:${guild.id}`,
           0,
           10,
         );
-        await redis.del(`${Constants.redis.nypsi.GUILD_LOG_QUEUE}:${guild.guildId}`);
+        await redis.del(`${Constants.redis.nypsi.GUILD_LOG_QUEUE}:${guild.id}`);
         for (const i of current) {
           embeds.push(JSON.parse(i) as APIEmbed);
         }
@@ -85,11 +83,11 @@ export function runLogs() {
         })
         .catch(async (e) => {
           console.log(e);
-          logger.error(`error sending logs to webhook (${guild.guildId})`);
+          logger.error(`error sending logs to webhook (${guild.id})`);
 
-          await prisma.moderation.update({
+          await prisma.guild.update({
             where: {
-              guildId: guild.guildId,
+              id: guild.id,
             },
             data: {
               logs: null,
@@ -104,19 +102,19 @@ export function runLogs() {
     }
 
     let modlogsQuery: {
-      guildId: string;
+      id: string;
       modlogs: string;
     }[];
 
     if (await redis.exists(Constants.redis.cache.guild.MODLOGS_GUILDS)) {
       modlogsQuery = JSON.parse(await redis.get(Constants.redis.cache.guild.MODLOGS_GUILDS));
     } else {
-      modlogsQuery = await prisma.moderation.findMany({
+      modlogsQuery = await prisma.guild.findMany({
         where: {
           modlogs: { not: null },
         },
         select: {
-          guildId: true,
+          id: true,
           modlogs: true,
         },
       });
@@ -133,8 +131,8 @@ export function runLogs() {
 
     for (const modlog of modlogsQuery) {
       if (
-        !(await redis.exists(`${Constants.redis.cache.guild.MODLOGS}:${modlog.guildId}`)) ||
-        (await redis.llen(`${Constants.redis.cache.guild.MODLOGS}:${modlog.guildId}`)) == 0
+        !(await redis.exists(`${Constants.redis.cache.guild.MODLOGS}:${modlog.id}`)) ||
+        (await redis.llen(`${Constants.redis.cache.guild.MODLOGS}:${modlog.id}`)) == 0
       )
         continue;
 
@@ -144,20 +142,18 @@ export function runLogs() {
 
       const embeds: APIEmbed[] = [];
 
-      if ((await redis.llen(`${Constants.redis.cache.guild.MODLOGS}:${modlog.guildId}`)) > 10) {
+      if ((await redis.llen(`${Constants.redis.cache.guild.MODLOGS}:${modlog.id}`)) > 10) {
         for (let i = 0; i < 10; i++) {
-          const current = await redis.rpop(
-            `${Constants.redis.cache.guild.MODLOGS}:${modlog.guildId}`,
-          );
+          const current = await redis.rpop(`${Constants.redis.cache.guild.MODLOGS}:${modlog.id}`);
           embeds.push(JSON.parse(current) as APIEmbed);
         }
       } else {
         const current = await redis.lrange(
-          `${Constants.redis.cache.guild.MODLOGS}:${modlog.guildId}`,
+          `${Constants.redis.cache.guild.MODLOGS}:${modlog.id}`,
           0,
           10,
         );
-        await redis.del(`${Constants.redis.cache.guild.MODLOGS}:${modlog.guildId}`);
+        await redis.del(`${Constants.redis.cache.guild.MODLOGS}:${modlog.id}`);
         for (const i of current) {
           embeds.push(JSON.parse(i) as APIEmbed);
         }
@@ -167,12 +163,12 @@ export function runLogs() {
       modLogCount += embeds.length;
 
       await webhook.send({ embeds: embeds }).catch(async (e) => {
-        logger.error(`error sending modlogs to webhook (${modlog.guildId}) - removing modlogs`);
+        logger.error(`error sending modlogs to webhook (${modlog.id}) - removing modlogs`);
         logger.error("moderation checks error", e);
 
-        await prisma.moderation.update({
+        await prisma.guild.update({
           where: {
-            guildId: modlog.guildId,
+            id: modlog.id,
           },
           data: {
             modlogs: "",

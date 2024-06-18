@@ -15,7 +15,7 @@ import { getExactMember } from "../utils/functions/member";
 import { getAllGroupAccountIds } from "../utils/functions/moderation/alts";
 import { isBanned, newBan } from "../utils/functions/moderation/ban";
 import { newCase } from "../utils/functions/moderation/cases";
-import { createProfile, profileExists } from "../utils/functions/moderation/utils";
+
 import dayjs = require("dayjs");
 
 const cmd = new Command(
@@ -79,8 +79,6 @@ async function run(
       embeds: [new ErrorEmbed("i need the `ban members` permission for this command to work")],
     });
   }
-
-  if (!(await profileExists(message.guild))) await createProfile(message.guild);
 
   if (args.length == 0 || !args[0]) {
     const embed = new CustomEmbed(message.member)

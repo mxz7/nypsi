@@ -18,7 +18,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
 import { getCases } from "../utils/functions/moderation/cases";
-import { createProfile, profileExists } from "../utils/functions/moderation/utils";
+
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("history", "view punishment history for a given user", "moderation")
@@ -85,8 +85,6 @@ async function run(
 
     return send({ embeds: [embed] });
   }
-
-  if (!(await profileExists(message.guild))) await createProfile(message.guild);
 
   const member = (await getMember(message.guild, args.join(" "))) || args[0];
 

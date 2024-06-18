@@ -138,9 +138,9 @@ export async function setLogsChannelHook(guild: Guild, hook: string) {
     await redis.del(`${Constants.redis.nypsi.GUILD_LOG_QUEUE}:${guild.id}`);
   }
 
-  await prisma.moderation.update({
+  await prisma.guild.update({
     where: {
-      guildId: guild.id,
+      id: guild.id,
     },
     data: {
       logs: hook,
@@ -160,9 +160,9 @@ export async function getLogsChannelHook(guild: Guild) {
   await redis.set(`nypsi:query:islogsenabled:searching:${guild.id}`, "t");
   await redis.expire(`nypsi:query:islogsenabled:searching:${guild.id}`, 60);
 
-  const query = await prisma.moderation.findUnique({
+  const query = await prisma.guild.findUnique({
     where: {
-      guildId: guild.id,
+      id: guild.id,
     },
     select: {
       logs: true,
@@ -177,9 +177,9 @@ export async function getLogsChannelHook(guild: Guild) {
 }
 
 export async function isModLogsEnabled(guild: Guild) {
-  const query = await prisma.moderation.findUnique({
+  const query = await prisma.guild.findUnique({
     where: {
-      guildId: guild.id,
+      id: guild.id,
     },
     select: {
       modlogs: true,
@@ -194,9 +194,9 @@ export async function isModLogsEnabled(guild: Guild) {
 export async function setModLogs(guild: Guild, hook: string) {
   await redis.del(Constants.redis.cache.guild.MODLOGS_GUILDS);
 
-  await prisma.moderation.update({
+  await prisma.guild.update({
     where: {
-      guildId: guild.id,
+      id: guild.id,
     },
     data: {
       modlogs: hook,
@@ -205,9 +205,9 @@ export async function setModLogs(guild: Guild, hook: string) {
 }
 
 export async function getModLogsHook(guild: Guild): Promise<WebhookClient | undefined> {
-  const query = await prisma.moderation.findUnique({
+  const query = await prisma.guild.findUnique({
     where: {
-      guildId: guild.id,
+      id: guild.id,
     },
     select: {
       modlogs: true,

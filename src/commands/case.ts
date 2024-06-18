@@ -16,7 +16,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { deleteCase, getCase } from "../utils/functions/moderation/cases";
-import { createProfile, profileExists } from "../utils/functions/moderation/utils";
+
 import { getLastKnownUsername } from "../utils/functions/users/tag";
 
 const cmd = new Command("case", "get information about a given case", "moderation")
@@ -86,8 +86,6 @@ async function run(
 
     return send({ embeds: [embed] });
   }
-
-  if (!(await profileExists(message.guild))) await createProfile(message.guild);
 
   const case0 = await getCase(message.guild, parseInt(args[0]));
 

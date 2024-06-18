@@ -15,7 +15,7 @@ import { getExactMember } from "../utils/functions/member";
 import { getAllGroupAccountIds } from "../utils/functions/moderation/alts";
 import { newCase } from "../utils/functions/moderation/cases";
 import { deleteMute, getMuteRole, isMuted, newMute } from "../utils/functions/moderation/mute";
-import { createProfile, profileExists } from "../utils/functions/moderation/utils";
+
 import ms = require("ms");
 import dayjs = require("dayjs");
 
@@ -40,8 +40,6 @@ async function run(
       return;
     }
   }
-
-  if (!(await profileExists(message.guild))) await createProfile(message.guild);
 
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {

@@ -18,7 +18,7 @@ import { getAllGroupAccountIds } from "../utils/functions/moderation/alts";
 import { isBanned, newBan } from "../utils/functions/moderation/ban";
 import { addLog, isLogsEnabled } from "../utils/functions/moderation/logs";
 import { deleteMute, getMuteRole, isMuted, newMute } from "../utils/functions/moderation/mute";
-import { profileExists } from "../utils/functions/moderation/utils";
+
 import sleep from "../utils/functions/sleep";
 import { fetchUsernameHistory } from "../utils/functions/users/history";
 import { logger } from "../utils/logger";
@@ -102,8 +102,6 @@ export default async function guildMemberAdd(member: GuildMember) {
       queue.delete(member.guild.id);
     }, 120000);
   }
-
-  if (!(await profileExists(member.guild))) return;
 
   let toBan: string = null;
 

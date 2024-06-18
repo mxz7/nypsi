@@ -31,7 +31,7 @@ import {
 } from "../utils/functions/moderation/alts";
 import { isBanned, newBan } from "../utils/functions/moderation/ban";
 import { deleteMute, getMuteRole, isMuted, newMute } from "../utils/functions/moderation/mute";
-import { createProfile, profileExists } from "../utils/functions/moderation/utils";
+
 import { getLastKnownUsername } from "../utils/functions/users/tag";
 import { getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
@@ -103,8 +103,6 @@ async function run(
 
     return send({ embeds: [embed] });
   }
-
-  if (!(await profileExists(message.guild))) await createProfile(message.guild);
 
   let member = (await getMember(message.guild, args.join(" "))) || args[0];
 

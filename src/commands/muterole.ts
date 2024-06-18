@@ -3,7 +3,6 @@ import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMuteRole, setMuteRole } from "../utils/functions/moderation/mute";
-import { createProfile, profileExists } from "../utils/functions/moderation/utils";
 
 const cmd = new Command("muterole", "set the muterole for the server", "admin")
   .setPermissions(["MANAGE_SERVER"])
@@ -23,8 +22,6 @@ async function run(
   }
 
   const prefix = (await getPrefix(message.guild))[0];
-
-  if (!(await profileExists(message.guild))) await createProfile(message.guild);
 
   const help = async () => {
     const current = await getMuteRole(message.guild);

@@ -4,7 +4,6 @@ import { NypsiClient } from "../../../models/Client";
 import { unmuteTimeouts } from "../../../scheduled/clusterjobs/moderationchecks";
 import { logger } from "../../logger";
 import sleep from "../sleep";
-import { createProfile, profileExists } from "./utils";
 import ms = require("ms");
 
 const muteRoleCache = new Map<string, string>();
@@ -83,9 +82,9 @@ export async function getMuteRole(guild: Guild | string) {
 
   if (muteRoleCache.has(guildId)) return muteRoleCache.get(guildId);
 
-  const query = await prisma.moderation.findUnique({
+  const query = await prisma.guild.findUnique({
     where: {
-      guildId: guildId,
+      id: guildId,
     },
     select: {
       muteRole: true,
@@ -112,9 +111,9 @@ export async function setMuteRole(guild: Guild, role: Role | string) {
 
   if (muteRoleCache.has(guild.id)) muteRoleCache.delete(guild.id);
 
-  await prisma.moderation.update({
+  await prisma.guild.update({
     where: {
-      guildId: guild.id,
+      id: guild.id,
     },
     data: {
       muteRole: id,
@@ -213,11 +212,9 @@ export async function getAutoMuteLevels(guild: Guild) {
     return autoMuteLevelCache.get(guildId);
   }
 
-  if (!(await profileExists(guild))) await createProfile(guild);
-
-  const query = await prisma.moderation.findUnique({
+  const query = await prisma.guild.findUnique({
     where: {
-      guildId,
+      id: guildId,
     },
     select: {
       automute: true,
@@ -241,9 +238,9 @@ export async function setAutoMuteLevels(guild: Guild, levels: number[]) {
     autoMuteLevelCache.delete(guildId);
   }
 
-  await prisma.moderation.update({
+  await prisma.guild.update({
     where: {
-      guildId,
+      id: guildId,
     },
     data: {
       automute: levels,

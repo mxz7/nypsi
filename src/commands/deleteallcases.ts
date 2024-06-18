@@ -5,9 +5,9 @@ import {
   PermissionFlagsBits,
   User,
 } from "discord.js";
+import prisma from "../init/database";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
-import { deleteServer, profileExists } from "../utils/functions/moderation/utils";
 
 const cmd = new Command("deleteallcases", "delete all cases in a server", "admin")
   .setAliases(["dac"])
@@ -24,9 +24,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
     return message.channel.send({ embeds: [embed] });
   }
-
-  if (!(await profileExists(message.guild)))
-    return await message.channel.send({ embeds: [new ErrorEmbed("there are no cases to delete")] });
 
   const embed = new CustomEmbed(
     message.member,
@@ -53,7 +50,11 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     });
 
   if (reaction == "✅") {
-    await deleteServer(message.guild);
+    await prisma.moderationCase.deleteMany({
+      where: {
+        guildId: message.guildId,
+      },
+    });
 
     const newEmbed = new CustomEmbed(
       message.member,

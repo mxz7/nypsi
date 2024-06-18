@@ -2,7 +2,6 @@ import { GuildChannel } from "discord.js";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { addLog, isLogsEnabled } from "../utils/functions/moderation/logs";
 import { getMuteRole } from "../utils/functions/moderation/mute";
-import { profileExists } from "../utils/functions/moderation/utils";
 
 export default async function channelCreate(channel: GuildChannel) {
   if (!channel.guild) return;
@@ -19,8 +18,6 @@ export default async function channelCreate(channel: GuildChannel) {
 
     await addLog(channel.guild, "channel", embed);
   }
-
-  if (!(await profileExists(channel.guild))) return;
 
   if ((await getMuteRole(channel.guild)) == "timeout") return;
 
