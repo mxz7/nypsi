@@ -1609,24 +1609,6 @@ async function run(
     }
 
     startRandomDrop(message.client as NypsiClient, message.channelId);
-  } else if (args[0].toLowerCase() === "migrate") {
-    const moderation = await prisma.moderation.findMany();
-
-    for (const data of moderation) {
-      await prisma.guild.update({
-        where: {
-          id: data.guildId,
-        },
-        data: {
-          muteRole: data.muteRole,
-          modlogs: data.modlogs,
-          logs: data.logs,
-          automute: data.automute,
-        },
-      });
-    }
-
-    return message.channel.send({ content: "done" });
   }
 }
 
