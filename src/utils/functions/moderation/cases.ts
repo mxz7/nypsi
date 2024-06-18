@@ -28,8 +28,7 @@ export async function newCase(
     await prisma.moderationCase.create({
       data: {
         guildId: guild.id,
-        caseId: caseCount.toString(),
-        caseId_new: caseCount + 1,
+        caseId: caseCount + 1,
         type: caseType,
         user: userID,
         moderator: moderator.id,
@@ -44,10 +43,13 @@ export async function newCase(
   }
 }
 
-export async function deleteCase(guild: Guild, caseID: string) {
-  await prisma.moderationCase.updateMany({
+export async function deleteCase(guild: Guild, caseId: number) {
+  await prisma.moderationCase.update({
     where: {
-      AND: [{ guildId: guild.id }, { caseId: caseID.toString() }],
+      caseId_guildId: {
+        caseId,
+        guildId: guild.id,
+      },
     },
     data: {
       deleted: true,
@@ -87,12 +89,13 @@ export async function getAllCases(guild: Guild) {
   return query;
 }
 
-export async function getCase(guild: Guild, caseID: number) {
-  if (caseID > (await getCaseCount(guild))) return undefined;
-
-  const query = await prisma.moderationCase.findFirst({
+export async function getCase(guild: Guild, caseId: number) {
+  const query = await prisma.moderationCase.findUnique({
     where: {
-      AND: [{ guildId: guild.id }, { caseId: caseID.toString() }],
+      caseId_guildId: {
+        caseId,
+        guildId: guild.id,
+      },
     },
   });
 
@@ -101,10 +104,13 @@ export async function getCase(guild: Guild, caseID: number) {
   return query;
 }
 
-export async function setReason(guild: Guild, caseID: number, reason: string) {
-  await prisma.moderationCase.updateMany({
+export async function setReason(guild: Guild, caseId: number, reason: string) {
+  await prisma.moderationCase.update({
     where: {
-      AND: [{ caseId: caseID.toString() }, { guildId: guild.id }],
+      caseId_guildId: {
+        caseId,
+        guildId: guild.id,
+      },
     },
     data: {
       command: reason,

@@ -154,7 +154,7 @@ async function run(
     });
 
   if (reaction == "❌") {
-    await deleteCase(message.guild, case0.caseId.toString());
+    await deleteCase(message.guild, case0.caseId);
 
     const newEmbed = new CustomEmbed(
       message.member,
