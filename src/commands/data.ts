@@ -220,7 +220,6 @@ async function run(
               command: true,
               deleted: true,
               guildId: true,
-              moderation: false,
               time: true,
               type: true,
               user: true,

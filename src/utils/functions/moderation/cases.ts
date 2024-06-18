@@ -4,16 +4,13 @@ import { PunishmentType } from "../../../types/Moderation";
 import { addModLog, isModLogsEnabled } from "./logs";
 
 export async function getCaseCount(guild: Guild) {
-  const query = await prisma.moderation.findUnique({
+  const query = await prisma.moderationCase.count({
     where: {
       guildId: guild.id,
     },
-    select: {
-      caseCount: true,
-    },
   });
 
-  return query.caseCount;
+  return query;
 }
 
 export async function newCase(
@@ -32,19 +29,12 @@ export async function newCase(
       data: {
         guildId: guild.id,
         caseId: caseCount.toString(),
+        caseId_new: caseCount + 1,
         type: caseType,
         user: userID,
         moderator: moderator.id,
         command: command,
         time: new Date(),
-      },
-    });
-    await prisma.moderation.update({
-      where: {
-        guildId: guild.id,
-      },
-      data: {
-        caseCount: { increment: 1 },
       },
     });
 
