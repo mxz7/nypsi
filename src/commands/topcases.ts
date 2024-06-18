@@ -1,11 +1,11 @@
-import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
+import { CommandInteraction, Message, PermissionFlagsBits, User } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
-import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
-import Constants from "../utils/Constants";
-import { getPrefix } from "../utils/functions/guilds/utils";
-import { getMember } from "../utils/functions/member";
-import { getAllCases } from "../utils/functions/moderation/cases";
 
+import prisma from "../init/database";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import Constants from "../utils/Constants";
+import { getMember } from "../utils/functions/member";
+import { getCaseCount } from "../utils/functions/moderation/cases";
 import { getLastKnownUsername } from "../utils/functions/users/tag";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
@@ -31,222 +31,142 @@ async function run(
     return message.channel.send({ embeds: [embed] });
   }
 
-  const cases = await getAllCases(message.guild);
+  async function allUsers() {
+    const [moderators, users, types, count] = await Promise.all([
+      prisma.moderationCase.groupBy({
+        where: {
+          guildId: message.guildId,
+        },
+        by: ["moderator"],
+        _count: true,
+        orderBy: {
+          _count: { caseId: "desc" },
+        },
+      }),
+      prisma.moderationCase.groupBy({
+        where: {
+          guildId: message.guildId,
+        },
+        by: ["user"],
+        _count: true,
+        orderBy: {
+          _count: { caseId: "desc" },
+        },
+      }),
+      prisma.moderationCase.groupBy({
+        where: {
+          guildId: message.guildId,
+        },
+        by: ["type"],
+        _count: true,
+        orderBy: {
+          _count: { caseId: "desc" },
+        },
+      }),
+      getCaseCount(message.guild),
+    ]);
 
-  if (cases.length <= 0)
-    return message.channel.send({ embeds: [new ErrorEmbed("no data for this server")] });
+    if (moderators.length === 0)
+      return message.channel.send({ embeds: [new ErrorEmbed("no data")] });
+
+    let moderatorsText: string[] = [];
+    let usersText: string[] = [];
+    let typeText: string[] = [];
+
+    for (const mod of moderators) {
+      if (moderatorsText.length >= 10) break;
+
+      let username = mod.moderator;
+
+      if (username.match(Constants.SNOWFLAKE_REGEX))
+        username = (await getLastKnownUsername(username)) || mod.moderator;
+
+      moderatorsText.push(`\`${username}\` **${mod._count.toLocaleString()}**`);
+    }
+
+    for (const user of users) {
+      if (usersText.length >= 10) break;
+
+      const username = (await getLastKnownUsername(user.user)) || user.user;
+
+      usersText.push(`\`${username}\` **${user._count.toLocaleString()}**`);
+    }
+
+    for (const type of types) {
+      typeText.push(`\`${type.type}\` **${type._count.toLocaleString()}**`);
+    }
+
+    const embed = new CustomEmbed(message.member)
+      .setFooter({ text: `${count.toLocaleString()} total cases` })
+      .setHeader(`${message.guild.name} case stats`, message.guild.iconURL());
+
+    if (moderatorsText.length > 0) embed.addField("given", moderatorsText.join("\n"), true);
+    if (usersText.length > 0) embed.addField("received", usersText.join("\n"), true);
+    if (typeText.length > 0) embed.addField("types", typeText.join("\n"), true);
+
+    return message.channel.send({ embeds: [embed] });
+  }
+
+  async function specificUser(user: User) {
+    const [given, received] = await Promise.all([
+      prisma.moderationCase.groupBy({
+        where: { AND: [{ guildId: message.guildId }, { moderator: user.id }] },
+        by: ["type"],
+        _count: true,
+        orderBy: {
+          _count: {
+            caseId: "desc",
+          },
+        },
+      }),
+      prisma.moderationCase.groupBy({
+        where: { AND: [{ guildId: message.guildId }, { user: user.id }] },
+        by: ["type"],
+        _count: true,
+        orderBy: {
+          _count: {
+            caseId: "desc",
+          },
+        },
+      }),
+    ]);
+
+    if (given.length === 0 && received.length === 0)
+      return message.channel.send({ embeds: [new ErrorEmbed("no data")] });
+
+    const givenText: string[] = [];
+    const receivedText: string[] = [];
+
+    for (const givenCase of given) {
+      givenText.push(`\`${givenCase.type}\` **${givenCase._count.toLocaleString()}**`);
+    }
+
+    for (const receivedCase of received) {
+      receivedText.push(`\`${receivedCase.type}\` **${receivedCase._count.toLocaleString()}**`);
+    }
+
+    const embed = new CustomEmbed(message.member).setHeader(
+      `${message.guild.name} case stats`,
+      message.guild.iconURL(),
+    );
+
+    if (givenText.length > 0) embed.addField("given", givenText.join("\n"), true);
+    if (receivedText.length > 0) embed.addField("received", receivedText.join("\n"), true);
+
+    return message.channel.send({ embeds: [embed] });
+  }
 
   await addCooldown(cmd.name, message.member, 15);
 
-  const embed = new CustomEmbed(message.member).setHeader("top cases");
-
-  const prefix = (await getPrefix(message.guild))[0];
-
-  if (args.length == 0) {
-    const topStaff = new Map<string, number>();
-    const topMembers = new Map<string, number>();
-
-    let deletedCaseCount = 0;
-
-    for (const case0 of cases) {
-      if (case0.deleted) {
-        deletedCaseCount++;
-        continue;
-      }
-
-      if (topStaff.has(case0.moderator)) {
-        topStaff.set(case0.moderator, topStaff.get(case0.moderator) + 1);
-      } else {
-        topStaff.set(case0.moderator, 1);
-      }
-
-      if (topMembers.has(case0.user)) {
-        topMembers.set(case0.user, topMembers.get(case0.user) + 1);
-      } else {
-        topMembers.set(case0.user, 1);
-      }
-    }
-
-    const staff = [];
-    const members = [];
-
-    for (const s of topStaff.keys()) {
-      staff.push(s);
-    }
-
-    for (const m of topMembers.keys()) {
-      members.push(m);
-    }
-
-    staff.sort(function (a, b) {
-      return topStaff.get(b) - topStaff.get(a);
-    });
-
-    members.sort(function (a, b) {
-      return topMembers.get(b) - topMembers.get(a);
-    });
-
-    const staffText = [];
-    const memberText = [];
-
-    let count = 0;
-
-    for (const userId of staff) {
-      if (count >= 5) break;
-
-      let username = userId;
-
-      if (userId.match(Constants.SNOWFLAKE_REGEX)) {
-        const lastKnownUsername = await getLastKnownUsername(userId).catch(() => "");
-
-        if (username) username = lastKnownUsername;
-      }
-
-      staffText[count] =
-        count +
-        1 +
-        " `" +
-        username +
-        "` **" +
-        topStaff.get(userId).toLocaleString() +
-        "** punishments given";
-
-      count++;
-    }
-
-    count = 0;
-
-    for (const m of members) {
-      if (count >= 5) break;
-
-      let username: any = message.guild.members.cache.find((mem) => mem.id == m);
-
-      if (!username) {
-        username = m;
-      } else {
-        username = username.user.username;
-      }
-
-      memberText[count] =
-        count +
-        1 +
-        " `" +
-        username +
-        "` **" +
-        topMembers.get(m).toLocaleString() +
-        "** punishments taken";
-
-      count++;
-    }
-
-    embed.addField("top staff", staffText.join("\n"), true);
-    embed.addField("top members", memberText.join("\n"), true);
-
-    if (deletedCaseCount) {
-      embed.setFooter({
-        text: `${prefix}topcases <user> | ${cases.length.toLocaleString()} total cases | ${deletedCaseCount.toLocaleString()} deleted cases`,
-      });
-    } else {
-      embed.setFooter({
-        text: `${prefix}topcases <user> | ${cases.length.toLocaleString()} total cases`,
-      });
-    }
+  if (args.length === 0) {
+    return allUsers();
   } else {
-    const member = await getMember(message.guild, args.join(" "));
+    const target = await getMember(message.guild, args.join(" "));
 
-    if (!member) return message.channel.send({ embeds: [new ErrorEmbed("invalid member")] });
+    if (!target) return message.channel.send({ embeds: [new ErrorEmbed("invalid member")] });
 
-    let deletedCasesModerator = 0;
-    let deletedCases = 0;
-
-    let punished = 0;
-    let punishments = 0;
-
-    let mutes = 0;
-    let bans = 0;
-    let kicks = 0;
-    let warns = 0;
-    let unbans = 0;
-    let unmutes = 0;
-
-    for (const case0 of cases) {
-      if (
-        case0.moderator.match(Constants.SNOWFLAKE_REGEX)
-          ? case0.moderator === member.user.id
-          : case0.moderator === member.user.username
-      ) {
-        if (case0.deleted) {
-          deletedCasesModerator++;
-        } else {
-          punished++;
-
-          switch (case0.type) {
-            case "mute":
-              mutes++;
-              break;
-            case "ban":
-              bans++;
-              break;
-            case "kick":
-              kicks++;
-              break;
-            case "warn":
-              warns++;
-              break;
-            case "unban":
-              unbans++;
-              break;
-            case "unmute":
-              unmutes++;
-              break;
-          }
-        }
-      } else if (case0.user == member.user.id) {
-        if (case0.deleted) {
-          deletedCases++;
-        } else {
-          punishments++;
-        }
-      }
-    }
-
-    embed.setDescription(member.user.toString());
-
-    if (punished > 5) {
-      embed.addField(
-        "moderator stats",
-        "cases `" +
-          punished.toLocaleString() +
-          "`\ndeleted cases `" +
-          deletedCasesModerator.toLocaleString() +
-          "`\nbans `" +
-          bans.toLocaleString() +
-          "`\nkicks `" +
-          kicks.toLocaleString() +
-          "`\nmutes `" +
-          mutes.toLocaleString() +
-          "`\nwarns `" +
-          warns.toLocaleString() +
-          "`\nunbans `" +
-          unbans.toLocaleString() +
-          "`\nunmutes `" +
-          unmutes.toLocaleString() +
-          "`",
-        true,
-      );
-    }
-    embed.addField(
-      "member stats",
-      "punishments `" +
-        punishments.toLocaleString() +
-        "`\ndeleted `" +
-        deletedCases.toLocaleString() +
-        "`",
-      true,
-    );
+    return specificUser(target.user);
   }
-
-  return await message.channel.send({ embeds: [embed] });
 }
 
 cmd.setRun(run);
