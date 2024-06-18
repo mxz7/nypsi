@@ -149,7 +149,6 @@ async function run(
             command: true,
             deleted: true,
             guildId: true,
-            moderation: false,
             time: true,
             type: true,
             user: true,
@@ -1609,6 +1608,24 @@ async function run(
     }
 
     startRandomDrop(message.client as NypsiClient, message.channelId);
+  } else if (args[0].toLowerCase() === "migrate") {
+    const cases = await prisma.moderationCase.findMany();
+
+    for (const modCase of cases) {
+      await prisma.moderationCase.update({
+        where: {
+          caseId_guildId: {
+            caseId: modCase.caseId,
+            guildId: modCase.guildId,
+          },
+        },
+        data: {
+          caseId_new: parseInt(modCase.caseId),
+        },
+      });
+    }
+
+    return message.channel.send({ content: "done" });
   }
 }
 
