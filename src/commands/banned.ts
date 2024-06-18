@@ -11,7 +11,7 @@ import {
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { getBannedUsers } from "../utils/functions/moderation/ban";
-import { createProfile, profileExists } from "../utils/functions/moderation/utils";
+
 import { getLastKnownUsername } from "../utils/functions/users/tag";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
@@ -27,8 +27,6 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       return;
     }
   }
-
-  if (!(await profileExists(message.guild))) await createProfile(message.guild);
 
   if (await onCooldown(cmd.name, message.member)) {
     const embed = await getResponse(cmd.name, message.member);

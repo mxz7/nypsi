@@ -10,7 +10,6 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getExactMember } from "../utils/functions/member";
 import { newCase } from "../utils/functions/moderation/cases";
-import { createProfile, profileExists } from "../utils/functions/moderation/utils";
 
 const cmd = new Command("warn", "warn one or more users", "moderation").setPermissions([
   "MANAGE_MESSAGES",
@@ -28,8 +27,6 @@ async function run(
   args: string[],
 ) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) return;
-
-  if (!(await profileExists(message.guild))) await createProfile(message.guild);
 
   const prefix = (await getPrefix(message.guild))[0];
 

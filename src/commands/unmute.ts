@@ -15,7 +15,6 @@ import { getExactMember } from "../utils/functions/member";
 import { getAllGroupAccountIds } from "../utils/functions/moderation/alts";
 import { newCase } from "../utils/functions/moderation/cases";
 import { deleteMute, getMuteRole } from "../utils/functions/moderation/mute";
-import { createProfile, profileExists } from "../utils/functions/moderation/utils";
 
 const cmd = new Command("unmute", "unmute a user", "moderation").setPermissions([
   "MANAGE_MESSAGES",
@@ -79,8 +78,6 @@ async function run(
       ],
     });
   }
-
-  if (!(await profileExists(message.guild))) await createProfile(message.guild);
 
   const prefix = (await getPrefix(message.guild))[0];
 

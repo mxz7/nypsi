@@ -5,7 +5,7 @@ import Constants from "../utils/Constants";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
 import { getAllCases } from "../utils/functions/moderation/cases";
-import { profileExists } from "../utils/functions/moderation/utils";
+
 import { getLastKnownUsername } from "../utils/functions/users/tag";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
@@ -24,9 +24,6 @@ async function run(
       return;
     }
   }
-
-  if (!(await profileExists(message.guild)))
-    return message.channel.send({ embeds: [new ErrorEmbed("no data for this server")] });
 
   if (await onCooldown(cmd.name, message.member)) {
     const embed = await getResponse(cmd.name, message.member);

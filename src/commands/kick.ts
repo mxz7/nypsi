@@ -10,7 +10,6 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getExactMember } from "../utils/functions/member";
 import { newCase } from "../utils/functions/moderation/cases";
-import { createProfile, profileExists } from "../utils/functions/moderation/utils";
 
 const cmd = new Command("kick", "kick one or more users", "moderation")
   .setPermissions(["KICK_MEMBERS"])
@@ -71,8 +70,6 @@ async function run(
       embeds: [new ErrorEmbed("i need the `kick members` permission for this command to work")],
     });
   }
-
-  if (!(await profileExists(message.guild))) await createProfile(message.guild);
 
   const prefix = (await getPrefix(message.guild))[0];
 

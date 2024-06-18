@@ -12,7 +12,7 @@ import { isAltPunish } from "../utils/functions/guilds/altpunish";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getAllGroupAccountIds } from "../utils/functions/moderation/alts";
 import { newCase } from "../utils/functions/moderation/cases";
-import { createProfile, profileExists } from "../utils/functions/moderation/utils";
+
 import { getIdFromUsername, getLastKnownUsername } from "../utils/functions/users/tag";
 
 const cmd = new Command("unban", "unban one or more users", "moderation").setPermissions([
@@ -70,8 +70,6 @@ async function run(
       embeds: [new ErrorEmbed("i need the `ban members` permission for this command to work")],
     });
   }
-
-  if (!(await profileExists(message.guild))) await createProfile(message.guild);
 
   const prefix = (await getPrefix(message.guild))[0];
 
