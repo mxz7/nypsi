@@ -75,8 +75,8 @@ export async function getRemaining(cmd: string, member: GuildMember) {
   const init = cd.date;
   const length = cd.length;
 
-  const diff = (Date.now() - init) / 1000;
-  const time = length - diff;
+  const diff = Date.now() - init;
+  const time = (length - diff) / 1000;
 
   const minutes = Math.floor(time / 60);
   const seconds = (time - minutes * 60).toFixed(1);
@@ -110,8 +110,8 @@ export async function getResponse(cmd: string, member: GuildMember | string): Pr
   const init = cd.date;
   const length = cd.length;
 
-  const diff = (Date.now() - init) / 1000;
-  const time = length - diff;
+  const diff = Date.now() - init;
+  const time = (length - diff) / 1000;
 
   const minutes = Math.floor(time / 60);
   const seconds = (time - minutes * 60).toFixed(1);
