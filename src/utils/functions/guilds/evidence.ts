@@ -1,6 +1,8 @@
+import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { Guild } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
+import s3 from "../../../init/s3";
 import Constants from "../../Constants";
 
 export async function getMaxEvidenceBytes(guild: Guild) {
@@ -41,4 +43,21 @@ export async function getUsedEvidenceBytes(guild: Guild) {
 
   if (evidences.length === 0) return 0;
   else return Number(evidences.map((e) => e.bytes).reduce((a, b) => a + b));
+}
+
+export async function deleteEvidence(guild: Guild, caseId: number) {
+  const evidence = await prisma.moderationEvidence.delete({
+    where: {
+      caseId_guildId: {
+        caseId,
+        guildId: guild.id,
+      },
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (evidence)
+    s3.send(new DeleteObjectCommand({ Key: evidence.id, Bucket: process.env.S3_BUCKET }));
 }
