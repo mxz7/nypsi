@@ -69,9 +69,9 @@ async function run(
     if (moderators.length === 0)
       return message.channel.send({ embeds: [new ErrorEmbed("no data")] });
 
-    let moderatorsText: string[] = [];
-    let usersText: string[] = [];
-    let typeText: string[] = [];
+    const moderatorsText: string[] = [];
+    const usersText: string[] = [];
+    const typeText: string[] = [];
 
     for (const mod of moderators) {
       if (moderatorsText.length >= 10) break;
