@@ -50,6 +50,9 @@ export async function createReactionStatsProfile(guild: Guild, member: GuildMemb
 }
 
 export async function addWin(guild: Guild, member: GuildMember) {
+  if (!(await hasReactionStatsProfile(guild, member)))
+    await createReactionStatsProfile(guild, member);
+
   await prisma.chatReactionStats.updateMany({
     where: {
       AND: [{ chatReactionGuildId: guild.id }, { userId: member.user.id }],
@@ -61,6 +64,9 @@ export async function addWin(guild: Guild, member: GuildMember) {
 }
 
 export async function add2ndPlace(guild: Guild, member: GuildMember) {
+  if (!(await hasReactionStatsProfile(guild, member)))
+    await createReactionStatsProfile(guild, member);
+
   await prisma.chatReactionStats.updateMany({
     where: {
       AND: [{ chatReactionGuildId: guild.id }, { userId: member.user.id }],
@@ -72,6 +78,9 @@ export async function add2ndPlace(guild: Guild, member: GuildMember) {
 }
 
 export async function add3rdPlace(guild: Guild, member: GuildMember) {
+  if (!(await hasReactionStatsProfile(guild, member)))
+    await createReactionStatsProfile(guild, member);
+
   await prisma.chatReactionStats.updateMany({
     where: {
       AND: [{ chatReactionGuildId: guild.id }, { userId: member.user.id }],
