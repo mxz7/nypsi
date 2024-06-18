@@ -70,6 +70,7 @@ export default {
         JOIN_ORDER: "cache:guild:join:order",
         RECENTLY_ATTACKED: "cache:guild:recentlyattacked",
         ALTS: "cache:guilds:alts",
+        EVIDENCE_MAX: "cache:guilds:evidence:max",
       },
       chatReaction: {
         EXISTS: "cache:chatreaction:exists",
@@ -187,4 +188,5 @@ export default {
   PURPLE: "#8b5cf6" as ColorResolvable,
   HIGHROLLER_ROLE: "1067122363143032992",
   HIGHEROLLER_REQUIREMENT: 500,
+  EVIDENCE_BASE: 30000000, // 30MB
 } as const;
