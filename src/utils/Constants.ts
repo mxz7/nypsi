@@ -71,9 +71,6 @@ export default {
         RECENTLY_ATTACKED: "cache:guild:recentlyattacked",
         ALTS: "cache:guilds:alts",
       },
-      moderation: {
-        EXISTS: "cache:moderation:exists",
-      },
       chatReaction: {
         EXISTS: "cache:chatreaction:exists",
         WORD_LIST_TYPE: "cache:chatreaction:wordlist:type",
