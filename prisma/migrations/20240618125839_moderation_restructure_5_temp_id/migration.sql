@@ -7,5 +7,5 @@
 */
 -- AlterTable
 ALTER TABLE "ModerationCase" DROP CONSTRAINT "ModerationCase_pkey",
-ADD COLUMN     "tempId" TEXT NOT NULL,
-ADD CONSTRAINT "ModerationCase_pkey" PRIMARY KEY ("tempId");
+ADD COLUMN     "tempId" TEXT;
+-- ADD CONSTRAINT "ModerationCase_pkey" PRIMARY KEY ("tempId");
