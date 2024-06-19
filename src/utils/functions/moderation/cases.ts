@@ -97,6 +97,13 @@ export async function getCase(guild: Guild, caseId: number) {
         guildId: guild.id,
       },
     },
+    include: {
+      evidence: {
+        select: {
+          id: true,
+        },
+      },
+    },
   });
 
   if (!query) return undefined;
