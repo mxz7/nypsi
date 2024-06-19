@@ -115,6 +115,8 @@ export async function getCase(guild: Guild, caseId: number) {
       evidence: {
         select: {
           id: true,
+          createdAt: true,
+          userId: true,
         },
       },
     },
