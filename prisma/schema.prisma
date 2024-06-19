@@ -625,6 +625,8 @@ model ModerationEvidence {
   guildId String
   userId  String?
 
+  createdAt DateTime @default(now())
+
   guild Guild          @relation(fields: [guildId], references: [id], onDelete: Restrict)
   case  ModerationCase @relation(fields: [caseId, guildId], references: [caseId, guildId], onDelete: Restrict)
   user  User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
