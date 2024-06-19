@@ -73,7 +73,7 @@ export async function createEvidence(
 ) {
   logger.debug(`uploading case evidence`, { guildId: guild.id, caseId, userId });
   const id = nanoid();
-  const key = `${guild.id}/${id}`;
+  const key = `evidence/${guild.id}/${id}`;
 
   const res = await fetch(fileUrl);
 
