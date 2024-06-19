@@ -2,20 +2,21 @@ import {
   ActionRowBuilder,
   BaseMessageOptions,
   ButtonBuilder,
+  ButtonInteraction,
   ButtonStyle,
   CommandInteraction,
+  ComponentType,
   Interaction,
   InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
-  MessageEditOptions,
   PermissionFlagsBits,
 } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
 import { getPrefix } from "../utils/functions/guilds/utils";
-import { deleteCase, getCase } from "../utils/functions/moderation/cases";
+import { deleteCase, getCase, restoreCase } from "../utils/functions/moderation/cases";
 
 import { getLastKnownUsername } from "../utils/functions/users/tag";
 
@@ -92,81 +93,128 @@ async function run(
       embeds: [new ErrorEmbed("couldn't find a case with the id `" + args[0] + "`")],
     });
 
-  const caseData = await getCase(message.guild, caseId);
+  async function displayCase(msg?: Message, interaction?: ButtonInteraction) {
+    const caseData = await getCase(message.guild, caseId);
 
-  if (!caseData)
-    return send({
-      embeds: [new ErrorEmbed("couldn't find a case with the id `" + args[0] + "`")],
-    });
+    if (!caseData)
+      return send({
+        embeds: [new ErrorEmbed("couldn't find a case with the id `" + args[0] + "`")],
+      });
 
-  const target = await message.guild.members.fetch(caseData.user).catch(() => {});
+    const target = await message.guild.members.fetch(caseData.user).catch(() => {});
 
-  let reason = caseData.command;
+    let reason = caseData.command;
 
-  if (reason == "") {
-    reason = "no reason specified";
-  }
-
-  let moderator = `\`${caseData.moderator}\``;
-
-  if (caseData.moderator.match(Constants.SNOWFLAKE_REGEX)) {
-    const username = await getLastKnownUsername(caseData.moderator).catch(() => "");
-
-    if (username) moderator = `${username}\n\`${caseData.moderator}\``;
-  }
-
-  const embed = new CustomEmbed(message.member)
-    .setHeader("case " + caseData.caseId)
-    .addField("type", "`" + caseData.type + "`", true)
-    .addField("moderator", moderator, true)
-    .addField("date/time", `<t:${Math.floor(caseData.time.getTime() / 1000)}>`, true)
-    .addField("user", `${target ? `${target.toString()}\n` : ""} \`${caseData.user}\``, true)
-    .addField("reason", reason, true)
-    .addField("deleted", caseData.deleted.toString(), true);
-
-  const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-    new ButtonBuilder().setCustomId("❌").setLabel("delete").setStyle(ButtonStyle.Danger),
-  );
-
-  let msg: Message;
-
-  if (message.member.permissions.has(PermissionFlagsBits.ManageGuild) && !caseData.deleted) {
-    msg = await send({ embeds: [embed], components: [row] });
-  } else {
-    return await send({ embeds: [embed] });
-  }
-
-  const edit = async (data: MessageEditOptions, msg: Message) => {
-    if (!(message instanceof Message)) {
-      await message.editReply(data).catch(() => {});
-      return await message.fetchReply();
-    } else {
-      return await msg.edit(data).catch(() => {});
+    if (reason == "") {
+      reason = "no reason specified";
     }
-  };
 
-  const filter = (i: Interaction) => i.user.id == message.author.id;
+    let moderator = `\`${caseData.moderator}\``;
 
-  const reaction = await msg
-    .awaitMessageComponent({ filter, time: 15000 })
-    .then(async (collected) => {
-      await collected.deferUpdate();
-      return collected.customId;
-    })
-    .catch(async () => {
-      await edit({ components: [] }, msg);
-    });
+    if (caseData.moderator.match(Constants.SNOWFLAKE_REGEX)) {
+      const username = await getLastKnownUsername(caseData.moderator).catch(() => "");
 
-  if (reaction == "❌") {
-    await deleteCase(message.guild, caseData.caseId);
+      if (username) moderator = `${username}\n\`${caseData.moderator}\``;
+    }
 
-    const newEmbed = new CustomEmbed(
-      message.member,
-      "✅ case `" + caseData.caseId + "` successfully deleted by " + message.member.toString(),
+    const embed = new CustomEmbed(message.member)
+      .setHeader("case " + caseData.caseId)
+      .addField("type", "`" + caseData.type + "`", true)
+      .addField("moderator", moderator, true)
+      .addField("date/time", `<t:${Math.floor(caseData.time.getTime() / 1000)}>`, true)
+      .addField("user", `${target ? `${target.toString()}\n` : ""} \`${caseData.user}\``, true)
+      .addField("reason", reason, true)
+      .addField("deleted", caseData.deleted.toString(), true);
+
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder()
+        .setCustomId("evidence")
+        .setEmoji("📋")
+        .setLabel("evidence")
+        .setStyle(ButtonStyle.Success),
     );
 
-    await edit({ embeds: [newEmbed], components: [] }, msg);
+    if (message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {
+      if (caseData.deleted) {
+        row.addComponents(
+          new ButtonBuilder()
+            .setCustomId("restore")
+            .setLabel("restore")
+            .setStyle(ButtonStyle.Secondary)
+            .setEmoji("♻️"),
+        );
+      } else {
+        row.addComponents(
+          new ButtonBuilder()
+            .setCustomId("delete")
+            .setLabel("delete")
+            .setEmoji("🗑️")
+            .setStyle(ButtonStyle.Danger),
+        );
+      }
+    }
+
+    if (msg) {
+      if (interaction) {
+        await interaction
+          .update({ embeds: [embed], components: [row] })
+          .catch(() => msg.edit({ embeds: [embed], components: [row] }));
+      } else {
+        await msg.edit({ embeds: [embed], components: [row] });
+      }
+    } else {
+      msg = await send({ embeds: [embed], components: [row] });
+    }
+
+    async function listen() {
+      const filter = (i: Interaction) => i.user.id == message.author.id;
+
+      const interaction = await msg
+        .awaitMessageComponent({ filter, time: 15000, componentType: ComponentType.Button })
+        .catch(async () => {
+          await msg.edit({ components: [] });
+        });
+
+      if (!interaction) return;
+
+      if (interaction.customId === "delete") {
+        if (caseData.deleted) {
+          await interaction.reply({
+            embeds: [new ErrorEmbed("case is already marked as deleted")],
+            ephemeral: true,
+          });
+          return listen();
+        }
+        await deleteCase(message.guild, caseData.caseId);
+
+        await interaction.reply({
+          embeds: [new CustomEmbed(message.member, "✅ case marked as deleted")],
+          ephemeral: true,
+        });
+
+        return displayCase(msg);
+      } else if (interaction.customId === "restore") {
+        if (!caseData.deleted) {
+          await interaction.reply({
+            embeds: [new ErrorEmbed("case is not marked as deleted")],
+            ephemeral: true,
+          });
+          return listen();
+        }
+
+        await restoreCase(message.guild, caseData.caseId);
+
+        await interaction.reply({
+          embeds: [new CustomEmbed(message.member, "✅ case restored")],
+          ephemeral: true,
+        });
+      }
+    }
+
+    listen();
   }
+
+  displayCase();
 }
 
 cmd.setRun(run);
