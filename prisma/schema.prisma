@@ -138,7 +138,6 @@ model CommandUse {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([userId, command])
-  @@index([userId])
 }
 
 model Achievements {
@@ -151,7 +150,6 @@ model Achievements {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([userId, achievementId])
-  @@index([userId])
 }
 
 model Economy {
@@ -302,7 +300,6 @@ model Inventory {
   economy Economy @relation(fields: [userId], references: [userId], onDelete: Cascade)
 
   @@id([userId, item])
-  @@index([userId])
 }
 
 model EconomyWorker {
@@ -613,8 +610,7 @@ model ModerationCase {
 
   guild Guild @relation(fields: [guildId], references: [id], onDelete: Cascade)
 
-  @@id([caseId, guildId])
-  @@index([guildId])
+  @@id([guildId, caseId])
 }
 
 model ModerationEvidence {
