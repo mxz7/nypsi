@@ -85,6 +85,12 @@ export async function deleteAllEvidence(guild: Guild) {
   });
 
   await s3.send(cmd);
+
+  await prisma.moderationEvidence.deleteMany({
+    where: {
+      guildId: guild.id,
+    },
+  });
 }
 
 export async function createEvidence(
