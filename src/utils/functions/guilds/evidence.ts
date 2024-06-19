@@ -84,7 +84,7 @@ export async function createEvidence(
 
   const buffer = await res.arrayBuffer();
 
-  const image = await sharp(buffer).webp().toBuffer();
+  const image = await sharp(buffer).webp({ nearLossless: true }).toBuffer();
 
   await s3.send(
     new PutObjectCommand({
