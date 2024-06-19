@@ -57,6 +57,20 @@ export async function deleteCase(guild: Guild, caseId: number) {
   });
 }
 
+export async function restoreCase(guild: Guild, caseId: number) {
+  await prisma.moderationCase.update({
+    where: {
+      caseId_guildId: {
+        caseId,
+        guildId: guild.id,
+      },
+    },
+    data: {
+      deleted: false,
+    },
+  });
+}
+
 export async function getCases(guild: Guild, userID: string) {
   const query = await prisma.moderationCase.findMany({
     where: {
