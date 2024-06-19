@@ -177,7 +177,7 @@ async function run(
       const filter = (i: Interaction) => i.user.id == message.author.id;
 
       const interaction = await caseMsg
-        .awaitMessageComponent({ filter, time: 15000, componentType: ComponentType.Button })
+        .awaitMessageComponent({ filter, time: 120000, componentType: ComponentType.Button })
         .catch(async () => {
           await caseMsg.edit({ components: [] });
         });
@@ -284,7 +284,7 @@ async function run(
         const filter = (i: Interaction) => i.user.id == message.author.id;
 
         const interaction = await evidenceMsg
-          .awaitMessageComponent({ filter, time: 15000, componentType: ComponentType.Button })
+          .awaitMessageComponent({ filter, time: 120000, componentType: ComponentType.Button })
           .catch(async () => {
             await evidenceMsg.edit({ components: [] });
           });
@@ -349,7 +349,7 @@ async function run(
           const filter = (m: Message) => m.author.id == message.author.id;
 
           const evidenceMessage = await message.channel
-            .awaitMessages({ filter, time: 60000, max: 1 })
+            .awaitMessages({ filter, time: 120000, max: 1 })
             .then((r) => r.first())
             .catch(async () => {
               embed.data.description += "\n\nexpired";
