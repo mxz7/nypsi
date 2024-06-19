@@ -46,7 +46,7 @@ export async function newCase(
 export async function deleteCase(guild: Guild, caseId: number) {
   await prisma.moderationCase.update({
     where: {
-      caseId_guildId: {
+      guildId_caseId: {
         caseId,
         guildId: guild.id,
       },
@@ -60,7 +60,7 @@ export async function deleteCase(guild: Guild, caseId: number) {
 export async function restoreCase(guild: Guild, caseId: number) {
   await prisma.moderationCase.update({
     where: {
-      caseId_guildId: {
+      guildId_caseId: {
         caseId,
         guildId: guild.id,
       },
@@ -106,7 +106,7 @@ export async function getAllCases(guild: Guild) {
 export async function getCase(guild: Guild, caseId: number) {
   const query = await prisma.moderationCase.findUnique({
     where: {
-      caseId_guildId: {
+      guildId_caseId: {
         caseId,
         guildId: guild.id,
       },
@@ -131,7 +131,7 @@ export async function getCase(guild: Guild, caseId: number) {
 export async function setReason(guild: Guild, caseId: number, reason: string) {
   await prisma.moderationCase.update({
     where: {
-      caseId_guildId: {
+      guildId_caseId: {
         caseId,
         guildId: guild.id,
       },
