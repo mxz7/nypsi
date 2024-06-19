@@ -87,38 +87,38 @@ async function run(
     return send({ embeds: [embed] });
   }
 
-  const case0 = await getCase(message.guild, parseInt(args[0]));
+  const caseData = await getCase(message.guild, parseInt(args[0]));
 
-  if (!case0) {
+  if (!caseData) {
     return send({
       embeds: [new ErrorEmbed("couldn't find a case with the id `" + args[0] + "`")],
     });
   }
 
-  const target = await message.guild.members.fetch(case0.user).catch(() => {});
+  const target = await message.guild.members.fetch(caseData.user).catch(() => {});
 
-  let reason = case0.command;
+  let reason = caseData.command;
 
   if (reason == "") {
     reason = "no reason specified";
   }
 
-  let moderator = `\`${case0.moderator}\``;
+  let moderator = `\`${caseData.moderator}\``;
 
-  if (case0.moderator.match(Constants.SNOWFLAKE_REGEX)) {
-    const username = await getLastKnownUsername(case0.moderator).catch(() => "");
+  if (caseData.moderator.match(Constants.SNOWFLAKE_REGEX)) {
+    const username = await getLastKnownUsername(caseData.moderator).catch(() => "");
 
-    if (username) moderator = `${username}\n\`${case0.moderator}\``;
+    if (username) moderator = `${username}\n\`${caseData.moderator}\``;
   }
 
   const embed = new CustomEmbed(message.member)
-    .setHeader("case " + case0.caseId)
-    .addField("type", "`" + case0.type + "`", true)
+    .setHeader("case " + caseData.caseId)
+    .addField("type", "`" + caseData.type + "`", true)
     .addField("moderator", moderator, true)
-    .addField("date/time", `<t:${Math.floor(case0.time.getTime() / 1000)}>`, true)
-    .addField("user", `${target ? `${target.toString()}\n` : ""} \`${case0.user}\``, true)
+    .addField("date/time", `<t:${Math.floor(caseData.time.getTime() / 1000)}>`, true)
+    .addField("user", `${target ? `${target.toString()}\n` : ""} \`${caseData.user}\``, true)
     .addField("reason", reason, true)
-    .addField("deleted", case0.deleted.toString(), true);
+    .addField("deleted", caseData.deleted.toString(), true);
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder().setCustomId("❌").setLabel("delete").setStyle(ButtonStyle.Danger),
@@ -126,7 +126,7 @@ async function run(
 
   let msg: Message;
 
-  if (message.member.permissions.has(PermissionFlagsBits.ManageGuild) && !case0.deleted) {
+  if (message.member.permissions.has(PermissionFlagsBits.ManageGuild) && !caseData.deleted) {
     msg = await send({ embeds: [embed], components: [row] });
   } else {
     return await send({ embeds: [embed] });
@@ -154,11 +154,11 @@ async function run(
     });
 
   if (reaction == "❌") {
-    await deleteCase(message.guild, case0.caseId);
+    await deleteCase(message.guild, caseData.caseId);
 
     const newEmbed = new CustomEmbed(
       message.member,
-      "✅ case `" + case0.caseId + "` successfully deleted by " + message.member.toString(),
+      "✅ case `" + caseData.caseId + "` successfully deleted by " + message.member.toString(),
     );
 
     await edit({ embeds: [newEmbed], components: [] }, msg);
