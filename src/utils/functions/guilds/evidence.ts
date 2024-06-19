@@ -92,6 +92,7 @@ export async function createEvidence(
   caseId: number,
   userId: string,
   fileUrl: string,
+  contentType: string,
 ) {
   logger.debug(`uploading case evidence`, { guildId: guild.id, caseId, userId });
   const id = nanoid();
@@ -101,14 +102,25 @@ export async function createEvidence(
 
   const buffer = await res.arrayBuffer();
 
-  const image = await sharp(buffer).webp({ nearLossless: true }).toBuffer();
+  let image: Buffer;
+
+  // discord strips exif - not an issue
+
+  if (contentType.split("/")[1] === "png") {
+    image = await sharp(buffer).webp({ nearLossless: true }).toBuffer();
+    contentType = "image/webp";
+  } else {
+    image = Buffer.from(buffer);
+  }
+
+  // if (buffer.byteLength < image.length) image = Buffer.from(buffer);
 
   await s3.send(
     new PutObjectCommand({
       Bucket: process.env.S3_BUCKET,
       Key: key,
       Body: image,
-      ContentType: "image/webp",
+      ContentType: contentType,
     }),
   );
 

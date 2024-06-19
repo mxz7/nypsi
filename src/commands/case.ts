@@ -374,7 +374,13 @@ async function run(
               embeds: [new ErrorEmbed("invalid file type. must be an image")],
             });
 
-          await createEvidence(message.guild, caseData.caseId, message.author.id, attachment.url);
+          await createEvidence(
+            message.guild,
+            caseData.caseId,
+            message.author.id,
+            attachment.url,
+            attachment.contentType,
+          );
 
           evidenceMessage.delete().catch(() => null);
           evidencePrompt.delete().catch(() => null);
