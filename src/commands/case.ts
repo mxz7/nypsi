@@ -237,7 +237,8 @@ async function run(
           .setImage(`https://cdn.nypsi.xyz/evidence/${caseData.guildId}/${caseData.evidence.id}`)
           .setDescription(
             `uploaded by: ${lastKnownUsername ? `${lastKnownUsername} ` : ""}\`${caseData.evidence.userId}\`\n` +
-              `uploaded at: <t:${Math.floor(caseData.evidence.createdAt.getTime() / 1000)}>`,
+              `uploaded at: <t:${Math.floor(caseData.evidence.createdAt.getTime() / 1000)}>\n` +
+              `size: \`${formatBytes(Number(caseData.evidence.bytes))}\``,
           );
 
         if (

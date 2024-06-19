@@ -117,6 +117,7 @@ export async function getCase(guild: Guild, caseId: number) {
           id: true,
           createdAt: true,
           userId: true,
+          bytes: true,
         },
       },
     },

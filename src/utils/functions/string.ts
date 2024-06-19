@@ -45,5 +45,5 @@ export function formatBytes(bytes: number): string {
   }
 
   const value = parseFloat((bytes / Math.pow(k, i)).toFixed(2));
-  return `${value} ${sizes[i - 2].toLowerCase()}`;
+  return `${value} ${sizes[i - 2]}`;
 }
