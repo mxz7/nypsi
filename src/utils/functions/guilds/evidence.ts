@@ -62,7 +62,12 @@ export async function deleteEvidence(guild: Guild, caseId: number) {
   });
 
   if (evidence)
-    s3.send(new DeleteObjectCommand({ Key: evidence.id, Bucket: process.env.S3_BUCKET }));
+    s3.send(
+      new DeleteObjectCommand({
+        Key: `evidence/${guild.id}/${evidence.id}`,
+        Bucket: process.env.S3_BUCKET,
+      }),
+    );
 }
 
 export async function createEvidence(
