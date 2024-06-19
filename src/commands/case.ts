@@ -79,21 +79,25 @@ async function run(
       .addField("usage", `${prefix}case <caseID>`)
       .addField(
         "help",
-        "to delete a case, react with ❌ after running the command\n" +
-          "dates are in MM/DD/YYYY format\n" +
-          `to delete data for the server, run ${prefix}**deleteallcases**\nto delete a case you need the \`manage server\` permission`,
+        `to delete data for the server, run ${prefix}**deleteallcases**\nto delete a case you need the \`manage server\` permission`,
       );
 
     return send({ embeds: [embed] });
   }
 
-  const caseData = await getCase(message.guild, parseInt(args[0]));
+  const caseId = parseInt(args[0]);
 
-  if (!caseData) {
+  if (isNaN(caseId) || (!caseId && caseId !== 0))
     return send({
       embeds: [new ErrorEmbed("couldn't find a case with the id `" + args[0] + "`")],
     });
-  }
+
+  const caseData = await getCase(message.guild, caseId);
+
+  if (!caseData)
+    return send({
+      embeds: [new ErrorEmbed("couldn't find a case with the id `" + args[0] + "`")],
+    });
 
   const target = await message.guild.members.fetch(caseData.user).catch(() => {});
 
