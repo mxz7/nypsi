@@ -25,22 +25,23 @@ model User {
   booster           Boolean  @default(false)
   totalSpend        Float    @default(0)
 
-  Economy        Economy?
-  Premium        Premium?
-  Username       Username[]
-  WordleStats    WordleStats?
-  CommandUse     CommandUse[]
-  Achievements   Achievements[]
-  DMSettings     DMSettings?
-  Preferences    Preferences?
-  Leaderboards   Leaderboards[]
-  ActiveChannels ActiveChannels[]
-  KofiPurchases  KofiPurchases[]
-  Tags           Tags[]
-  Views          ProfileView[]
-  Viewed         ProfileView[]    @relation(name: "viewer")
-  Sessions       Session[]
-  Captchas       Captcha[]
+  Economy            Economy?
+  Premium            Premium?
+  Username           Username[]
+  WordleStats        WordleStats?
+  CommandUse         CommandUse[]
+  Achievements       Achievements[]
+  DMSettings         DMSettings?
+  Preferences        Preferences?
+  Leaderboards       Leaderboards[]
+  ActiveChannels     ActiveChannels[]
+  KofiPurchases      KofiPurchases[]
+  Tags               Tags[]
+  Views              ProfileView[]
+  Viewed             ProfileView[]        @relation(name: "viewer")
+  Sessions           Session[]
+  Captchas           Captcha[]
+  ModerationEvidence ModerationEvidence[]
 }
 
 model ProfileView {
@@ -488,10 +489,12 @@ model Guild {
   RolePersist  RolePersist[]
   ReactionRole ReactionRole[]
 
-  Alt   Alt[]
-  cases ModerationCase[]
-  bans  ModerationBan[]
-  mutes ModerationMute[]
+  Alt                 Alt[]
+  cases               ModerationCase[]
+  bans                ModerationBan[]
+  mutes               ModerationMute[]
+  ModerationEvidence  ModerationEvidence[]
+  GuildEvidenceCredit GuildEvidenceCredit[]
 }
 
 model ReactionRole {
@@ -606,10 +609,39 @@ model ModerationCase {
   time      DateTime @default(now())
   deleted   Boolean  @default(false)
 
+  evidence ModerationEvidence?
+
   guild Guild @relation(fields: [guildId], references: [id], onDelete: Cascade)
 
   @@id([caseId, guildId])
   @@index([guildId])
+}
+
+model ModerationEvidence {
+  id    String @id
+  bytes BigInt
+
+  caseId  Int
+  guildId String
+  userId  String?
+
+  createdAt DateTime @default(now())
+
+  guild Guild          @relation(fields: [guildId], references: [id], onDelete: Restrict)
+  case  ModerationCase @relation(fields: [caseId, guildId], references: [caseId, guildId], onDelete: Restrict)
+  user  User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@unique([caseId, guildId])
+}
+
+model GuildEvidenceCredit {
+  id        Int      @id @default(autoincrement())
+  guildId   String
+  createdAt DateTime @default(now())
+
+  bytes BigInt
+
+  guild Guild @relation(fields: [guildId], references: [id])
 }
 
 model Alt {
