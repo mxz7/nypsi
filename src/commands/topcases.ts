@@ -145,7 +145,7 @@ async function run(
       receivedText.push(`\`${receivedCase.type}\` **${receivedCase._count.toLocaleString()}**`);
     }
 
-    const embed = new CustomEmbed(message.member).setHeader(
+    const embed = new CustomEmbed(message.member, user.toString()).setHeader(
       `${message.guild.name} case stats`,
       message.guild.iconURL(),
     );
