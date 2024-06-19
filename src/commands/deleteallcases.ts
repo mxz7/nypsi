@@ -8,6 +8,7 @@ import {
 import prisma from "../init/database";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
+import { deleteAllEvidence } from "../utils/functions/guilds/evidence";
 
 const cmd = new Command("deleteallcases", "delete all cases in a server", "admin")
   .setAliases(["dac"])
@@ -50,6 +51,8 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     });
 
   if (reaction == "✅") {
+    await deleteAllEvidence(message.guild);
+
     await prisma.moderationCase.deleteMany({
       where: {
         guildId: message.guildId,
