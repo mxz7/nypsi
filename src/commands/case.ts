@@ -352,7 +352,7 @@ async function run(
             .awaitMessages({ filter, time: 120000, max: 1 })
             .then((r) => r.first())
             .catch(async () => {
-              embed.data.description += "\n\nexpired";
+              embed.setDescription(embed.data.description + "\n\nexpired");
               await evidencePrompt.edit({ embeds: [embed] });
             });
 
