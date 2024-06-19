@@ -34,7 +34,7 @@ export async function newBan(guild: Guild, userIDs: string[] | string, date: Dat
       if (unbanTimeouts.has(`${guild.id}_${userId}`)) continue;
       unbanTimeouts.add(`${guild.id}_${userId}`);
       setTimeout(() => {
-        logger.info(`::auto requesting unban in ${guild.id} for ${userId}`);
+        logger.info(`::auto requesting unban in ${guild.id} for ${userId} (short ban)`);
         requestUnban(guild.id, userId, guild.client as NypsiClient);
       }, date.getTime() - Date.now());
     }
