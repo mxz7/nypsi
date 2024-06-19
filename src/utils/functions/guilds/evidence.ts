@@ -1,4 +1,4 @@
-import { DeleteObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
+import { DeleteObjectCommand, DeleteObjectsCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { Guild } from "discord.js";
 import { nanoid } from "nanoid";
 import prisma from "../../../init/database";
@@ -68,6 +68,23 @@ export async function deleteEvidence(guild: Guild, caseId: number) {
         Bucket: process.env.S3_BUCKET,
       }),
     );
+}
+
+export async function deleteAllEvidence(guild: Guild) {
+  const evidence = await prisma.moderationEvidence.findMany({
+    where: { guildId: guild.id },
+    select: { id: true },
+  });
+
+  const cmd = new DeleteObjectsCommand({
+    Bucket: process.env.S3_BUCKET,
+    Delete: {
+      Objects: evidence.map((e) => ({ Key: `evidence/${guild.id}/${e.id}` })),
+      Quiet: true,
+    },
+  });
+
+  await s3.send(cmd);
 }
 
 export async function createEvidence(
