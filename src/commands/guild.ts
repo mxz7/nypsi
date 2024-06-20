@@ -855,7 +855,7 @@ async function run(
 
     const msg = await send({ embeds: [embed], components: [row] });
 
-    async function listen() {
+    const listen = async () => {
       const filter = (i: ButtonInteraction) => i.user.id === message.author.id;
 
       const interaction = await msg
@@ -888,7 +888,7 @@ async function run(
         interaction.update({ embeds: [embed], components: [row] });
         listen();
       }
-    }
+    };
 
     return listen();
   }
