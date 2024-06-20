@@ -5,7 +5,7 @@ import { NypsiClient } from "../models/Client";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { InteractionHandler } from "../types/InteractionHandler";
 import Constants from "../utils/Constants";
-import { getBalance, updateBalance } from "../utils/functions/economy/balance";
+import { addBalance } from "../utils/functions/economy/balance";
 import {
   addInventoryItem,
   getInventory,
@@ -103,10 +103,7 @@ export default {
 
     await Promise.all([
       await addToNypsiBank(taxedAmount),
-      updateBalance(
-        interaction.user.id,
-        (await getBalance(interaction.user.id)) + (Number(offer.money) - taxedAmount),
-      ),
+      addBalance(interaction.user.id, Number(offer.money) - taxedAmount),
       addInventoryItem(offer.ownerId, offer.itemId, Number(offer.itemAmount)),
       addStat(interaction.user.id, "earned-offers", Math.floor(Number(offer.money)) - taxedAmount),
       addStat(offer.ownerId, "spent-offers", Math.floor(Number(offer.money)) - taxedAmount),

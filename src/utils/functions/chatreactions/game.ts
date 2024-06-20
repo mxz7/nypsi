@@ -3,7 +3,7 @@ import { CustomEmbed, getColor } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
 import { gamble } from "../../logger";
 import { addProgress } from "../economy/achievements";
-import { getBalance, updateBalance } from "../economy/balance";
+import { addBalance } from "../economy/balance";
 import { createGame } from "../economy/stats";
 import { addTaskProgress } from "../economy/tasks";
 import { isPremium } from "../premium/premium";
@@ -11,13 +11,7 @@ import sleep from "../sleep";
 import { getZeroWidth } from "../string";
 import { addToNypsiBank, getTax } from "../tax";
 import { getBlacklisted } from "./blacklisted";
-import {
-  add2ndPlace,
-  add3rdPlace,
-  addWin,
-  createReactionStatsProfile,
-  hasReactionStatsProfile,
-} from "./stats";
+import { add2ndPlace, add3rdPlace, addWin } from "./stats";
 import { getReactionSettings } from "./utils";
 import { getWords } from "./words";
 
@@ -371,8 +365,8 @@ export async function startChatReactionDuel(
         embed.addField("winner", "nobody won... losers.");
 
         await msg.edit({ embeds: [embed] });
-        await updateBalance(challenger, (await getBalance(challenger)) + wager);
-        await updateBalance(target, (await getBalance(target)) + wager);
+        await addBalance(challenger, wager);
+        await addBalance(target, wager);
         resolve(null);
       }
       setTimeout(() => {

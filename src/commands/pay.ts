@@ -7,7 +7,7 @@ import {
 } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
-import { getBalance, updateBalance } from "../utils/functions/economy/balance";
+import { addBalance, getBalance, removeBalance } from "../utils/functions/economy/balance";
 import { addStat } from "../utils/functions/economy/stats";
 import {
   createUser,
@@ -135,7 +135,7 @@ async function run(
 
   if (target.user.id == message.client.user.id) {
     await addCooldown(cmd.name, message.member, 10);
-    await updateBalance(message.member, (await getBalance(message.member)) - amount);
+    await removeBalance(message.member, amount);
     addStat(message.author.id, "spent-bank", amount);
     await addToNypsiBank(amount);
 
@@ -157,7 +157,7 @@ async function run(
     tax = 0;
   }
 
-  await updateBalance(message.member, (await getBalance(message.member)) - amount);
+  await removeBalance(message.member, amount);
   addStat(message.author.id, "spent-pay", amount);
 
   let taxedAmount = 0;
@@ -165,10 +165,10 @@ async function run(
   if (tax > 0) {
     taxedAmount = Math.floor(amount * tax);
     await addToNypsiBank(taxedAmount * 0.5);
-    await updateBalance(target, (await getBalance(target)) + (amount - taxedAmount));
+    await addBalance(target, amount - taxedAmount);
     addStat(target.user.id, "earned-pay", amount - taxedAmount);
   } else {
-    await updateBalance(target, (await getBalance(target)) + amount);
+    await addBalance(target, amount);
     addStat(target.user.id, "earned-pay", amount);
   }
 

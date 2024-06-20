@@ -25,14 +25,16 @@ import { a } from "../utils/functions/anticheat";
 import { isLockedOut, verifyUser } from "../utils/functions/captcha";
 import { addProgress } from "../utils/functions/economy/achievements";
 import {
+  addBalance,
   calcMaxBet,
   getBalance,
   getDefaultBet,
   getGambleMulti,
-  updateBalance,
+  removeBalance,
 } from "../utils/functions/economy/balance.js";
 import { addToGuildXP, getGuildName } from "../utils/functions/economy/guilds";
 import { createGame } from "../utils/functions/economy/stats";
+import { addTaskProgress } from "../utils/functions/economy/tasks";
 import {
   createUser,
   formatBet,
@@ -47,7 +49,6 @@ import { recentCommands } from "../utils/functions/users/commands";
 import { addHourlyCommand } from "../utils/handlers/commandhandler";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 import { gamble, logger } from "../utils/logger";
-import { addTaskProgress } from "../utils/functions/economy/tasks";
 
 const cmd = new Command("blackjack", "play blackjack", "money").setAliases(["bj", "blowjob"]);
 
@@ -234,7 +235,7 @@ async function prepareGame(
 
   await addCooldown(cmd.name, message.member, 15);
   await redis.sadd(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
-  await updateBalance(message.member, (await getBalance(message.member)) - bet);
+  await removeBalance(message.member, bet);
 
   const game = new Game(message, message.member, bet, msg, interaction);
 
@@ -453,7 +454,7 @@ class Game {
       );
     } else if (result === "draw") winnings = this.bet;
 
-    if (winnings > 0) await updateBalance(this.member, (await getBalance(this.member)) + winnings);
+    if (winnings > 0) await addBalance(this.member, winnings);
     if (xp > 0) {
       await updateXp(this.member, (await getXp(this.member)) + xp);
 
@@ -695,7 +696,7 @@ class Game {
       const balance = await getBalance(this.member);
 
       if (balance >= this.bet && this.hand.cards.length === 2) {
-        await updateBalance(this.member, balance - this.bet);
+        await removeBalance(this.member, this.bet);
         this.bet *= 2;
       }
 

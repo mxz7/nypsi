@@ -26,7 +26,7 @@ import requestDM from "../requestdm";
 import { addToNypsiBank, getTax } from "../tax";
 import { addNotificationToQueue, getDmSettings, getPreferences } from "../users/notifications";
 import itemHistoryWorker from "../workers/itemhistory";
-import { getBalance, updateBalance } from "./balance";
+import { addBalance, getBalance, removeBalance } from "./balance";
 import { addInventoryItem } from "./inventory";
 import { addStat } from "./stats";
 import { createUser, getItems, userExists } from "./utils";
@@ -693,11 +693,8 @@ export async function buyFullAuction(
 
   await Promise.all([
     addInventoryItem(interaction.user.id, auction.itemId, Number(auction.itemAmount)),
-    updateBalance(interaction.user.id, balance - Number(auction.bin)),
-    updateBalance(
-      auction.ownerId,
-      (await getBalance(auction.ownerId)) + (Number(auction.bin) - taxedAmount),
-    ),
+    removeBalance(interaction.user.id, Number(auction.bin)),
+    addBalance(auction.ownerId, Number(auction.bin) - taxedAmount),
     addStat(auction.ownerId, "earned-auctions", Number(auction.bin) - taxedAmount),
     addStat(interaction.user.id, "spent-auctions", Number(auction.bin) - taxedAmount),
   ]);
@@ -904,15 +901,8 @@ export async function buyAuctionOne(
 
   await Promise.all([
     addInventoryItem(interaction.user.id, auction.itemId, 1),
-    updateBalance(
-      interaction.user.id,
-      balance - Math.floor(Number(auction.bin / auction.itemAmount)),
-    ),
-    updateBalance(
-      auction.ownerId,
-      (await getBalance(auction.ownerId)) +
-        (Math.floor(Number(auction.bin / auction.itemAmount)) - taxedAmount),
-    ),
+    removeBalance(interaction.user.id, Math.floor(Number(auction.bin / auction.itemAmount))),
+    addBalance(auction.ownerId, Math.floor(Number(auction.bin / auction.itemAmount)) - taxedAmount),
     addStat(
       auction.ownerId,
       "earned-auctions",
@@ -1173,14 +1163,13 @@ export async function buyAuctionMulti(
 
   await Promise.all([
     addInventoryItem(interaction.user.id, auction.itemId, Number(amount)),
-    updateBalance(
+    removeBalance(
       interaction.user.id,
-      balance - Math.floor(Number((auction.bin / auction.itemAmount) * amount)),
+      Math.floor(Number((auction.bin / auction.itemAmount) * amount)),
     ),
-    updateBalance(
+    addBalance(
       auction.ownerId,
-      (await getBalance(auction.ownerId)) +
-        (Math.floor(Number((auction.bin / auction.itemAmount) * amount)) - taxedAmount),
+      Math.floor(Number((auction.bin / auction.itemAmount) * amount)) - taxedAmount,
     ),
     addStat(
       auction.ownerId,

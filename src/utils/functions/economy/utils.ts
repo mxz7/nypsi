@@ -23,7 +23,7 @@ import { isUserBlacklisted } from "../users/blacklist";
 import { getPreferences } from "../users/notifications";
 import { createProfile, hasProfile } from "../users/utils";
 import { setProgress } from "./achievements";
-import { calcMaxBet, getBalance, updateBalance } from "./balance";
+import { addBalance, calcMaxBet, getBalance } from "./balance";
 import { addToGuildXP, getGuildByUser, getGuildName } from "./guilds";
 import { addInventoryItem } from "./inventory";
 import { addStat } from "./stats";
@@ -711,7 +711,7 @@ export async function doDaily(member: GuildMember) {
     rewards.push(`+ **1** ${items["gem_crate"].emoji} gem crate`);
   }
 
-  promises.push(updateBalance(member, (await getBalance(member)) + total));
+  promises.push(addBalance(member, total));
   promises.push(updateLastDaily(member));
   promises.push(addInventoryItem(member, "daily_scratch_card", 1));
   addStat(member.user.id, "earned-daily", total);

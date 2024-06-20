@@ -5,7 +5,7 @@ import prisma from "../../../init/database";
 import { logger } from "../../logger";
 import { percentChance } from "../random";
 import { addProgress } from "./achievements";
-import { getBalance, updateBalance } from "./balance";
+import { addBalance } from "./balance";
 import { getBoosters } from "./boosters";
 import { addInventoryItem, gemBreak, getInventory } from "./inventory";
 import { addStat } from "./stats";
@@ -272,7 +272,7 @@ export async function claimFromWorkers(userId: string): Promise<string> {
   }
 
   await emptyWorkersStored(userId);
-  await updateBalance(userId, (await getBalance(userId)) + amountEarned);
+  await addBalance(userId, amountEarned);
   await addProgress(userId, "capitalist", amountEarned);
   await addStat(userId, "earned-workers", amountEarned);
 

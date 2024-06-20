@@ -11,10 +11,11 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
 import { addProgress } from "../utils/functions/economy/achievements";
 import {
+  addBalance,
   getBalance,
   hasPadlock,
+  removeBalance,
   setPadlock,
-  updateBalance,
 } from "../utils/functions/economy/balance";
 import { addToGuildXP, getGuildByUser, getGuildName } from "../utils/functions/economy/guilds";
 import { getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
@@ -215,8 +216,8 @@ async function run(
     const amount = Math.floor(Math.random() * 9) + 1;
     const amountMoney = Math.round((await getBalance(message.member)) * (amount / 100));
 
-    await updateBalance(target, (await getBalance(target)) + amountMoney);
-    await updateBalance(message.member, (await getBalance(message.member)) - amountMoney);
+    await addBalance(target, amountMoney);
+    await removeBalance(message.member, amountMoney);
 
     createGame({
       userId: message.author.id,
@@ -298,8 +299,8 @@ async function run(
         earned: amountMoney,
       });
 
-      await updateBalance(target, (await getBalance(target)) - amountMoney);
-      await updateBalance(message.member, (await getBalance(message.member)) + amountMoney);
+      await removeBalance(target, amountMoney);
+      await addBalance(message.member, amountMoney);
 
       embed2.setColor(Constants.EMBED_SUCCESS_COLOR);
       embed2.addField("success!!", "you stole $**" + amountMoney.toLocaleString() + "**");
@@ -379,8 +380,8 @@ async function run(
             "they were caught by the police, but a lawyer protected their money",
         );
       } else {
-        await updateBalance(target, (await getBalance(target)) + amountMoney);
-        await updateBalance(message.member, (await getBalance(message.member)) - amountMoney);
+        await addBalance(target, amountMoney);
+        await removeBalance(message.member, amountMoney);
 
         createGame({
           userId: message.author.id,

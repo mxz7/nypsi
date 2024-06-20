@@ -18,7 +18,7 @@ import { inPlaceSort } from "fast-sort";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { Worker } from "../types/Workers";
-import { getBalance, updateBalance } from "../utils/functions/economy/balance";
+import { getBalance, removeBalance } from "../utils/functions/economy/balance";
 import { getBoosters } from "../utils/functions/economy/boosters";
 import { getLevel, getPrestige, getRawLevel } from "../utils/functions/economy/levelling";
 import { addStat } from "../utils/functions/economy/stats";
@@ -324,7 +324,7 @@ async function run(
             );
           return pageManager();
         } else {
-          await updateBalance(message.member, balance - baseWorkers[selected].cost);
+          await removeBalance(message.member, baseWorkers[selected].cost);
           addStat(message.author.id, "spent-workers", baseWorkers[selected].cost);
           await addWorker(message.member, selected);
 
@@ -505,7 +505,7 @@ async function run(
           return upgradeWorker(worker, res.message, res as ButtonInteraction);
         }
 
-        await updateBalance(message.member, balance - cost);
+        await removeBalance(message.member, cost);
         addStat(message.author.id, "spent-workers", cost);
         await addWorkerUpgrade(
           message.member,

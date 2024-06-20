@@ -14,7 +14,7 @@ import Constants from "../../Constants";
 import { addKarma } from "../karma/karma";
 import { percentChance, shuffle } from "../random";
 import { addProgress } from "./achievements";
-import { getBalance, updateBalance } from "./balance";
+import { addBalance } from "./balance";
 import { addInventoryItem } from "./inventory";
 import { addStat } from "./stats";
 import { addTaskProgress } from "./tasks";
@@ -180,7 +180,7 @@ export default class ScratchCard {
         const guild = await getGuildName(this.member);
         if (guild) await addToGuildXP(guild, parseInt(clickedItem), this.member);
       } else if (clickedType === "money") {
-        await updateBalance(this.member, (await getBalance(this.member)) + parseInt(clickedItem));
+        await addBalance(this.member, parseInt(clickedItem));
         addStat(this.member, "earned-scratch", parseInt(clickedItem));
         embed.setDescription(`you found $**${parseInt(clickedItem).toLocaleString()}**`);
       } else if (clickedType === "karma") {
