@@ -3,8 +3,10 @@ import {
   ActionRowBuilder,
   BaseMessageOptions,
   ButtonBuilder,
+  ButtonInteraction,
   ButtonStyle,
   CommandInteraction,
+  ComponentType,
   Interaction,
   InteractionReplyOptions,
   Message,
@@ -768,8 +770,19 @@ async function run(
 
     let xp = "";
     let money = "";
+    let xpLevel = "";
+    let moneyLevel = "";
 
     const xpSort = sort(members).desc([(i) => i.contributedXp, (i) => i.contributedMoney]);
+    const moneySort = sort(members).desc([(i) => i.contributedMoney, (i) => i.contributedXp]);
+    const xpLevelSort = sort(members).desc([
+      (i) => i.contributedXpThisLevel,
+      (i) => i.contributedMoneyThisLevel,
+    ]);
+    const moneyLevelSort = sort(members).desc([
+      (i) => i.contributedMoneyThisLevel,
+      (i) => i.contributedXp,
+    ]);
 
     for (const m of xpSort) {
       let position = (xpSort.indexOf(m) + 1).toString();
@@ -784,10 +797,6 @@ async function run(
       }** ${m.contributedXp.toLocaleString()}xp\n`;
     }
 
-    embed.addField("xp", xp, true);
-
-    const moneySort = sort(members).desc([(i) => i.contributedMoney, (i) => i.contributedXp]);
-
     for (const m of moneySort) {
       let position = (moneySort.indexOf(m) + 1).toString();
 
@@ -801,9 +810,87 @@ async function run(
       }** $${m.contributedMoney.toLocaleString()}\n`;
     }
 
-    embed.addField(`money`, money, true);
+    for (const m of xpLevelSort) {
+      let position = (xpSort.indexOf(m) + 1).toString();
 
-    return send({ embeds: [embed] });
+      if (position == "1") position = "🥇";
+      else if (position == "2") position = "🥈";
+      else if (position == "3") position = "🥉";
+      else position += ".";
+
+      xpLevel += `${position} **${
+        m.economy.user.lastKnownUsername
+      }** ${m.contributedXp.toLocaleString()}xp\n`;
+    }
+
+    for (const m of moneyLevelSort) {
+      let position = (moneySort.indexOf(m) + 1).toString();
+
+      if (position == "1") position = "🥇";
+      else if (position == "2") position = "🥈";
+      else if (position == "3") position = "🥉";
+      else position += ".";
+
+      moneyLevel += `${position} **${
+        m.economy.user.lastKnownUsername
+      }** $${m.contributedMoney.toLocaleString()}\n`;
+    }
+
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+      new ButtonBuilder()
+        .setLabel("overall")
+        .setCustomId("overall")
+        .setStyle(ButtonStyle.Secondary)
+        .setDisabled(true),
+      new ButtonBuilder()
+        .setLabel("this leve")
+        .setCustomId("level")
+        .setStyle(ButtonStyle.Secondary),
+    );
+
+    embed.setFields(
+      { name: "xp", value: xp, inline: true },
+      { name: "money", value: money, inline: true },
+    );
+
+    const msg = await send({ embeds: [embed], components: [row] });
+
+    async function listen() {
+      const filter = (i: ButtonInteraction) => i.user.id === message.author.id;
+
+      const interaction = await msg
+        .awaitMessageComponent({ filter, time: 30000, componentType: ComponentType.Button })
+        .catch(() => {
+          row.components.forEach((c) => c.setDisabled(true));
+          msg.edit({ components: [row] });
+        });
+
+      if (!interaction) return;
+
+      if (interaction.customId === "overall") {
+        embed.setFields(
+          { name: "xp", value: xp, inline: true },
+          { name: "money", value: money, inline: true },
+        );
+        row.components[0].setDisabled(true);
+        row.components[1].setDisabled(false);
+
+        interaction.update({ embeds: [embed], components: [row] });
+        listen();
+      } else {
+        embed.setFields(
+          { name: "xp", value: xpLevel, inline: true },
+          { name: "money", value: moneyLevel, inline: true },
+        );
+        row.components[0].setDisabled(false);
+        row.components[1].setDisabled(true);
+
+        interaction.update({ embeds: [embed], components: [row] });
+        listen();
+      }
+    }
+
+    return listen();
   }
 
   if (args[0].toLowerCase() == "upgrade") {
