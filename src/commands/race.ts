@@ -22,7 +22,12 @@ import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { Item } from "../types/Economy";
 import { addProgress } from "../utils/functions/economy/achievements";
-import { calcMaxBet, getBalance, updateBalance } from "../utils/functions/economy/balance";
+import {
+  addBalance,
+  calcMaxBet,
+  getBalance,
+  removeBalance,
+} from "../utils/functions/economy/balance";
 import { Car, calcSpeed, getCarEmoji, getGarage } from "../utils/functions/economy/cars";
 import { getInventory } from "../utils/functions/economy/inventory";
 import { addStat, createGame } from "../utils/functions/economy/stats";
@@ -311,7 +316,7 @@ class Race {
           embeds: [new ErrorEmbed("this car is faster than the speed limit for this race")],
         });
 
-      await updateBalance(interaction.user.id, (await getBalance(interaction.user.id)) - this.bet);
+      await removeBalance(interaction.user.id, this.bet);
 
       this.members.push({
         car: cars.find((i) => i.car.id === chosen),
@@ -394,7 +399,7 @@ class Race {
     if (this.members.length < 2) {
       if (this.bet > 0) {
         for (const member of this.members) {
-          await updateBalance(member.user.id, (await getBalance(member.user.id)) + this.bet);
+          await addBalance(member.user.id, this.bet);
         }
       }
 
@@ -413,7 +418,7 @@ class Race {
 
         if (this.bet > 0) {
           for (const member of this.members) {
-            await updateBalance(member.user.id, (await getBalance(member.user.id)) + this.bet);
+            await addBalance(member.user.id, this.bet);
           }
         }
 
@@ -458,11 +463,7 @@ class Race {
 
         const winnings = this.bet * this.members.length;
 
-        if (this.bet)
-          await updateBalance(
-            winner.id,
-            (await getBalance(winner.id)) + this.bet * this.members.length,
-          );
+        if (this.bet) await addBalance(winner.id, this.bet * this.members.length);
 
         addProgress(winner.id, "racer", 1);
         addTaskProgress(winner.id, "vin_diesel");

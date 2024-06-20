@@ -8,11 +8,11 @@ import {
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addProgress } from "../utils/functions/economy/achievements";
-import { getBalance, updateBalance } from "../utils/functions/economy/balance";
+import { addBalance } from "../utils/functions/economy/balance";
+import { addStat } from "../utils/functions/economy/stats";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { getMember } from "../utils/functions/member";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import { addStat } from "../utils/functions/economy/stats";
 
 const cache = new Map<string, number>();
 
@@ -101,7 +101,7 @@ async function run(
 
     if (cache.has(member.user.id)) {
       cache.delete(member.user.id);
-      await updateBalance(member, (await getBalance(member)) + 1069);
+      await addBalance(member, 1069);
       addStat(member, "earned-hot", 1069);
     }
   } else if (hotAmount >= 80) {

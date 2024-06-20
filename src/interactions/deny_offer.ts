@@ -4,7 +4,7 @@ import redis from "../init/redis";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { InteractionHandler } from "../types/InteractionHandler";
 import Constants from "../utils/Constants";
-import { getBalance, updateBalance } from "../utils/functions/economy/balance";
+import { addBalance } from "../utils/functions/economy/balance";
 import { getItems, isEcoBanned } from "../utils/functions/economy/utils";
 import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications";
 
@@ -57,7 +57,7 @@ export default {
       },
     });
 
-    await updateBalance(offer.ownerId, (await getBalance(offer.ownerId)) + Number(offer.money));
+    await addBalance(offer.ownerId, Number(offer.money));
 
     await interaction.editReply({
       embeds: [new CustomEmbed(null, "offer denied").setColor(Constants.EMBED_SUCCESS_COLOR)],

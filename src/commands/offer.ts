@@ -13,7 +13,7 @@ import {
 import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import { getBalance, updateBalance } from "../utils/functions/economy/balance";
+import { addBalance, getBalance, removeBalance } from "../utils/functions/economy/balance";
 import { getInventory, selectItem } from "../utils/functions/economy/inventory";
 import { getRawLevel } from "../utils/functions/economy/levelling";
 import {
@@ -510,11 +510,11 @@ async function run(
     const balance = await getBalance(message.member);
 
     if (balance < money) return send({ embeds: [new ErrorEmbed("you cant afford this")] });
-    await updateBalance(message.member, balance - money);
+    await removeBalance(message.member, money);
     const res = await createOffer(target.user, selected.id, amount, money, message.member);
 
     if (!res) {
-      await updateBalance(message.member, balance);
+      await addBalance(message.member, money);
       return send({ embeds: [new ErrorEmbed("failed to create offer")] });
     } else {
       return send({

@@ -13,7 +13,7 @@ import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants.js";
 import { addProgress } from "../utils/functions/economy/achievements.js";
-import { getBalance, updateBalance } from "../utils/functions/economy/balance.js";
+import { addBalance, getBalance, removeBalance } from "../utils/functions/economy/balance.js";
 import { getInventory, setInventoryItem } from "../utils/functions/economy/inventory.js";
 import { createGame } from "../utils/functions/economy/stats.js";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
@@ -160,7 +160,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       const stolen = Math.floor(Math.random() * (steal - minStolen)) + minStolen;
 
       await Promise.all([
-        updateBalance(message.member, (await getBalance(message.member)) + stolen),
+        addBalance(message.member, stolen),
         addProgress(message.author.id, "robber", 1),
         addTaskProgress(message.author.id, "thief"),
       ]);
@@ -203,7 +203,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       const minLoss = Math.floor(loss * 0.4);
       const totalLost = Math.floor(Math.random() * (loss - minLoss)) + minLoss;
 
-      await updateBalance(message.member, (await getBalance(message.member)) - totalLost);
+      await removeBalance(message.member, totalLost);
 
       await addToNypsiBank(totalLost * 0.3);
 

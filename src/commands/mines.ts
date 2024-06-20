@@ -24,11 +24,12 @@ import { a } from "../utils/functions/anticheat.js";
 import { isLockedOut, verifyUser } from "../utils/functions/captcha.js";
 import { addProgress } from "../utils/functions/economy/achievements.js";
 import {
+  addBalance,
   calcMaxBet,
   getBalance,
   getDefaultBet,
   getGambleMulti,
-  updateBalance,
+  removeBalance,
 } from "../utils/functions/economy/balance.js";
 import { addToGuildXP, getGuildName } from "../utils/functions/economy/guilds.js";
 import { addInventoryItem } from "../utils/functions/economy/inventory.js";
@@ -316,14 +317,14 @@ async function prepareGame(
       if (games.get(message.author.id).id == id) {
         games.delete(message.author.id);
         await redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
-        await updateBalance(message.member, (await getBalance(message.member)) + bet);
+        await addBalance(message.member, bet);
       }
     }
   }, 180000);
 
   await redis.sadd(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
 
-  await updateBalance(message.member, (await getBalance(message.member)) - bet);
+  await removeBalance(message.member, bet);
 
   const id = Math.random();
 
@@ -690,7 +691,7 @@ async function playGame(
 
     if (win >= 7) addProgress(message.author.id, "minesweeper_pro", 1);
 
-    await updateBalance(message.member, (await getBalance(message.member)) + winnings);
+    await addBalance(message.member, winnings);
     games.delete(message.author.id);
     return replay(embed, interaction);
   };
@@ -714,7 +715,7 @@ async function playGame(
       `**${win.toFixed(2)}**x ($${Math.round(bet * win).toLocaleString()})`,
     );
     embed.setDescription(desc);
-    await updateBalance(message.member, (await getBalance(message.member)) + bet);
+    await addBalance(message.member, bet);
     games.delete(message.author.id);
     return replay(embed, interaction);
   };

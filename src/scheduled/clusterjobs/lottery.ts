@@ -8,7 +8,7 @@ import { LotteryTicket } from "../../types/Economy";
 import Constants from "../../utils/Constants";
 import { MStoTime } from "../../utils/functions/date";
 import { addProgress } from "../../utils/functions/economy/achievements";
-import { getBalance, updateBalance } from "../../utils/functions/economy/balance";
+import { addBalance } from "../../utils/functions/economy/balance";
 import { addInventoryItem } from "../../utils/functions/economy/inventory";
 import { addStat } from "../../utils/functions/economy/stats";
 import { getItems, lotteryTicketPrice } from "../../utils/functions/economy/utils";
@@ -66,7 +66,7 @@ async function doLottery(client: Client) {
   logger.info(`::success winner: ${user.id} (${user.username}) with ticket #${chosen.id}`);
 
   await Promise.all([
-    updateBalance(user.id, (await getBalance(user.id)) + total),
+    addBalance(user.id, total),
     addProgress(user.id, "lucky", 1),
     addStat(user.id, "earned-lottery", total),
   ]);

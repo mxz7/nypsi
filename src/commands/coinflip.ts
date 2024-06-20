@@ -13,7 +13,12 @@ import {
 } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
-import { calcMaxBet, getBalance, updateBalance } from "../utils/functions/economy/balance";
+import {
+  addBalance,
+  calcMaxBet,
+  getBalance,
+  removeBalance,
+} from "../utils/functions/economy/balance";
 import { createGame } from "../utils/functions/economy/stats";
 import { createUser, formatBet, isEcoBanned, userExists } from "../utils/functions/economy/utils";
 import { getMember } from "../utils/functions/member.js";
@@ -95,13 +100,13 @@ async function run(
     response: ButtonInteraction,
   ) => {
     if (bet > (await getBalance(player2))) {
-      await updateBalance(player1.user.id, (await getBalance(player1.user.id)) + bet);
+      await addBalance(player1.user.id, bet);
       return response.editReply({
         embeds: [new ErrorEmbed(`${player2.user.toString()} cannot afford this bet`)],
       });
     }
 
-    await updateBalance(player2, (await getBalance(player2)) - bet);
+    await removeBalance(player2, bet);
 
     // its big to make sure that theres little to no deviation in chance cus of rounding
     const lols = [
@@ -180,7 +185,7 @@ async function run(
     gamble(winner.user, "coinflip", bet, "win", id, bet * 2);
     gamble(loser.user, "coinflip", bet, "lose", id);
 
-    await updateBalance(winner, (await getBalance(winner)) + winnings);
+    await addBalance(winner, winnings);
 
     const embed = new CustomEmbed(
       message.member,
@@ -283,7 +288,7 @@ async function run(
       if (playing.has(message.author.id)) playing.delete(message.author.id);
     }, 120000);
 
-    await updateBalance(message.member, (await getBalance(message.member)) - bet);
+    await removeBalance(message.member, bet);
     let cancelled = false;
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -320,8 +325,7 @@ async function run(
       .catch(async () => {
         fail = true;
         playing.delete(message.author.id);
-        if (!cancelled)
-          await updateBalance(message.member, (await getBalance(message.member)) + bet);
+        if (!cancelled) await addBalance(message.member, bet);
         msg.edit({ components: [] });
       });
 
@@ -331,7 +335,7 @@ async function run(
       return doGame(message.member, target, bet, response as ButtonInteraction);
     } else {
       cancelled = true;
-      await updateBalance(message.member, (await getBalance(message.member)) + bet);
+      await addBalance(message.member, bet);
       if (message.author.id === response.user.id) {
         response.editReply({
           embeds: [new CustomEmbed(message.member, "✅ coinflip request cancelled")],
@@ -371,7 +375,7 @@ async function run(
       if (playing.has(message.author.id)) playing.delete(message.author.id);
     }, 120000);
 
-    await updateBalance(message.member, (await getBalance(message.member)) - bet);
+    await removeBalance(message.member, bet);
     let cancelled = false;
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -438,8 +442,7 @@ async function run(
       .catch(async () => {
         fail = true;
         playing.delete(message.author.id);
-        if (!cancelled)
-          await updateBalance(message.member, (await getBalance(message.member)) + bet);
+        if (!cancelled) await addBalance(message.member, bet);
         msg.edit({ components: [] });
       });
 
@@ -453,7 +456,7 @@ async function run(
       return doGame(message.member, target, bet, response as ButtonInteraction);
     } else {
       cancelled = true;
-      await updateBalance(message.member, (await getBalance(message.member)) + bet);
+      await addBalance(message.member, bet);
       if (message.author.id === response.user.id) {
         response.editReply({
           embeds: [new CustomEmbed(message.member, "✅ coinflip request cancelled")],
