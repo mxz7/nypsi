@@ -843,7 +843,7 @@ async function run(
         .setStyle(ButtonStyle.Secondary)
         .setDisabled(true),
       new ButtonBuilder()
-        .setLabel("this leve")
+        .setLabel("this level")
         .setCustomId("level")
         .setStyle(ButtonStyle.Secondary),
     );
