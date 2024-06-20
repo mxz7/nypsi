@@ -811,7 +811,7 @@ async function run(
     }
 
     for (const m of xpLevelSort) {
-      let position = (xpSort.indexOf(m) + 1).toString();
+      let position = (xpLevelSort.indexOf(m) + 1).toString();
 
       if (position == "1") position = "🥇";
       else if (position == "2") position = "🥈";
@@ -824,7 +824,7 @@ async function run(
     }
 
     for (const m of moneyLevelSort) {
-      let position = (moneySort.indexOf(m) + 1).toString();
+      let position = (moneyLevelSort.indexOf(m) + 1).toString();
 
       if (position == "1") position = "🥇";
       else if (position == "2") position = "🥈";
