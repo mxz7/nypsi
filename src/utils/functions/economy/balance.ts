@@ -44,8 +44,12 @@ export async function getBalance(member: GuildMember | string) {
     },
   });
 
-  await redis.set(`${Constants.redis.cache.economy.BALANCE}:${id}`, Number(query.money));
-  await redis.expire(`${Constants.redis.cache.economy.BALANCE}:${id}`, 30);
+  await redis.set(
+    `${Constants.redis.cache.economy.BALANCE}:${id}`,
+    Number(query.money),
+    "EX",
+    3600,
+  );
 
   return Number(query.money);
 }
@@ -58,15 +62,84 @@ export async function updateBalance(member: GuildMember | string, amount: number
     id = member;
   }
 
-  await prisma.economy.update({
+  const query = await prisma.economy.update({
     where: {
       userId: id,
     },
     data: {
       money: Math.floor(amount),
     },
+    select: {
+      money: true,
+    },
   });
-  await redis.del(`${Constants.redis.cache.economy.BALANCE}:${id}`);
+
+  await redis.set(
+    `${Constants.redis.cache.economy.BALANCE}:${id}`,
+    Number(query.money),
+    "EX",
+    3600,
+  );
+}
+
+export async function addBalance(member: GuildMember | string, amount: number) {
+  let id: string;
+  if (member instanceof GuildMember) {
+    id = member.user.id;
+  } else {
+    id = member;
+  }
+
+  const query = await prisma.economy.update({
+    where: {
+      userId: id,
+    },
+    data: {
+      money: { increment: Math.floor(amount) },
+    },
+    select: {
+      money: true,
+    },
+  });
+
+  await redis.set(
+    `${Constants.redis.cache.economy.BALANCE}:${id}`,
+    Number(query.money),
+    "EX",
+    3600,
+  );
+
+  return query.money;
+}
+
+export async function removeBalance(member: GuildMember | string, amount: number) {
+  let id: string;
+  if (member instanceof GuildMember) {
+    id = member.user.id;
+  } else {
+    id = member;
+  }
+
+  const query = await prisma.economy.update({
+    where: {
+      userId: id,
+    },
+    data: {
+      money: { decrement: Math.floor(amount) },
+    },
+    select: {
+      money: true,
+    },
+  });
+
+  await redis.set(
+    `${Constants.redis.cache.economy.BALANCE}:${id}`,
+    Number(query.money),
+    "EX",
+    3600,
+  );
+
+  return query.money;
 }
 
 export async function getBankBalance(member: GuildMember | string): Promise<number> {

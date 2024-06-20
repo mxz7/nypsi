@@ -14,7 +14,7 @@ import { getTax } from "../tax";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { addProgress } from "./achievements";
 import { getAuctionAverage } from "./auctions";
-import { getBalance, getSellMulti, updateBalance } from "./balance";
+import { addBalance, getSellMulti } from "./balance";
 import { addToGuildXP, getGuildName } from "./guilds";
 import { getOffersAverage } from "./offers";
 import { addStat } from "./stats";
@@ -111,7 +111,7 @@ async function doAutosellThing(userId: string, itemId: string, amount: number): 
     sellWorth = sellWorth - taxedAmount;
   }
 
-  await updateBalance(userId, (await getBalance(userId)) + sellWorth);
+  await addBalance(userId, sellWorth);
 
   addStat(userId, "earned-sold", sellWorth);
 
@@ -281,7 +281,7 @@ export async function openCrate(
   const found = new Map<string, number>();
 
   if (item.id.includes("69420")) {
-    await updateBalance(member, (await getBalance(member)) + 69420);
+    await addBalance(member, 69420);
     addStat(member, "earned-crates", 69420);
     found.set("money", 69420);
   }
@@ -387,7 +387,7 @@ export async function openCrate(
         if (chosen.includes("money:")) {
           const amount = parseInt(chosen.substring(6));
           addStat(member, "earned-crates", amount);
-          await updateBalance(member, (await getBalance(member)) + amount);
+          await addBalance(member, amount);
           found.set("money", found.has("money") ? found.get("money") + amount : amount);
         } else if (chosen.includes("xp:")) {
           const amount = parseInt(chosen.substring(3));
@@ -463,7 +463,7 @@ export async function openCrate(
         if (chosen.includes("money:")) {
           const amount = parseInt(chosen.split(":")[1]);
           addStat(member, "earned-crates", amount);
-          await updateBalance(member, (await getBalance(member)) + amount);
+          await addBalance(member, amount);
           found.set("money", found.has("money") ? found.get("money") + amount : amount);
         } else if (chosen.includes("xp:")) {
           const amount = parseInt(chosen.split(":")[1]);

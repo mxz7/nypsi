@@ -23,11 +23,12 @@ import { a } from "../utils/functions/anticheat";
 import { isLockedOut, verifyUser } from "../utils/functions/captcha";
 import { addProgress } from "../utils/functions/economy/achievements";
 import {
+  addBalance,
   calcMaxBet,
   getBalance,
   getDefaultBet,
   getGambleMulti,
-  updateBalance,
+  removeBalance,
 } from "../utils/functions/economy/balance";
 import { addToGuildXP, getGuildName } from "../utils/functions/economy/guilds";
 import { addInventoryItem } from "../utils/functions/economy/inventory";
@@ -309,7 +310,7 @@ async function prepareGame(
   await addCooldown(cmd.name, message.member, 15);
 
   await redis.sadd(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
-  await updateBalance(message.member, (await getBalance(message.member)) - bet);
+  await removeBalance(message.member, bet);
 
   const board = createBoard(chosenDifficulty);
 
@@ -341,7 +342,7 @@ async function prepareGame(
       if (games.get(message.author.id).gameId == gameId) {
         games.delete(message.author.id);
         await redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
-        await updateBalance(message.member, (await getBalance(message.member)) + bet);
+        await addBalance(message.member, bet);
       }
     }
   }, 180000);
@@ -669,7 +670,7 @@ async function playGame(
       game.embed.setFooter({ text: `id: ${id}` });
     }
 
-    await updateBalance(message.member, (await getBalance(message.member)) + winnings);
+    await addBalance(message.member, winnings);
     games.delete(message.author.id);
     return replay(game.embed, interaction);
   };
@@ -700,7 +701,7 @@ async function playGame(
       `**${game.win.toFixed(2)}**x ($${Math.round(game.bet * game.win).toLocaleString()})`,
     );
     game.embed.setDescription(desc);
-    await updateBalance(message.member, (await getBalance(message.member)) + game.bet);
+    await addBalance(message.member, game.bet);
     games.delete(message.author.id);
     return replay(game.embed, interaction);
   };

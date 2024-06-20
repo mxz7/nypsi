@@ -17,7 +17,7 @@ import { logger } from "../../logger";
 import { filterOutliers } from "../outliers";
 import { isPremium } from "../premium/premium";
 import { getTax } from "../tax";
-import { getBalance, updateBalance } from "./balance";
+import { addBalance } from "./balance";
 import { getInventory } from "./inventory";
 import { createUser, getItems, userExists } from "./utils";
 import dayjs = require("dayjs");
@@ -123,7 +123,7 @@ export async function deleteOffer(offer: Offer, client: NypsiClient) {
 
   await prisma.offer.delete({ where: { messageId: offer.messageId } });
 
-  await updateBalance(offer.ownerId, (await getBalance(offer.ownerId)) + Number(offer.money));
+  await addBalance(offer.ownerId, Number(offer.money));
 
   (async () => {
     const user = await client.users.fetch(offer.targetId);

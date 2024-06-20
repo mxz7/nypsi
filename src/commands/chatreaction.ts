@@ -45,7 +45,12 @@ import {
   setWordListType,
   updateWords,
 } from "../utils/functions/chatreactions/words";
-import { calcMaxBet, getBalance, updateBalance } from "../utils/functions/economy/balance";
+import {
+  addBalance,
+  calcMaxBet,
+  getBalance,
+  removeBalance,
+} from "../utils/functions/economy/balance";
 import {
   createUser,
   formatNumber,
@@ -501,13 +506,13 @@ async function run(
       const balance = await getBalance(player);
 
       if (balance < wager) {
-        await updateBalance(message.member, (await getBalance(message.member)) + wager);
+        await addBalance(message.member, wager);
         return response.followUp({
           embeds: [new ErrorEmbed(`${player.user.toString()} cannot afford this`)],
         });
       }
 
-      await updateBalance(player, balance - wager);
+      await removeBalance(player, wager);
 
       if (m.deletable) m.delete();
 
@@ -519,8 +524,7 @@ async function run(
         wager,
       );
 
-      if (result)
-        await updateBalance(result.winner, (await getBalance(result.winner)) + result.winnings);
+      if (result) await addBalance(result.winner, result.winnings);
     };
 
     if (args.length === 0)
@@ -601,7 +605,7 @@ async function run(
       duelRequests.add(message.author.id);
 
       let cancelled = false;
-      await updateBalance(message.member, (await getBalance(message.member)) - wager);
+      await removeBalance(message.member, wager);
 
       const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder().setCustomId("y").setLabel("accept").setStyle(ButtonStyle.Success),
@@ -637,8 +641,7 @@ async function run(
         .catch(async () => {
           fail = true;
           duelRequests.delete(message.author.id);
-          if (!cancelled)
-            await updateBalance(message.member, (await getBalance(message.member)) + wager);
+          if (!cancelled) await addBalance(message.member, wager);
           m.edit({ components: [] });
         });
 
@@ -648,7 +651,7 @@ async function run(
         return doGame(target, wager, response as ButtonInteraction, m);
       } else {
         cancelled = true;
-        await updateBalance(message.member, (await getBalance(message.member)) + wager);
+        await addBalance(message.member, wager);
         if (message.author.id === response.user.id) {
           response.reply({
             embeds: [new CustomEmbed(message.member, "✅ duel request cancelled")],
@@ -685,7 +688,7 @@ async function run(
       duelRequests.add(message.author.id);
 
       let cancelled = false;
-      await updateBalance(message.member, (await getBalance(message.member)) - wager);
+      await removeBalance(message.member, wager);
 
       const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder().setCustomId("y").setLabel("play").setStyle(ButtonStyle.Success),
@@ -752,8 +755,7 @@ async function run(
         .catch(async () => {
           fail = true;
           duelRequests.delete(message.author.id);
-          if (!cancelled)
-            await updateBalance(message.member, (await getBalance(message.member)) + wager);
+          if (!cancelled) await addBalance(message.member, wager);
           m.edit({ components: [] });
         });
 
@@ -768,7 +770,7 @@ async function run(
         return doGame(target, wager, response as ButtonInteraction, m);
       } else {
         cancelled = true;
-        await updateBalance(message.member, (await getBalance(message.member)) + wager);
+        await addBalance(message.member, wager);
         if (message.author.id === response.user.id) {
           response.reply({
             embeds: [new CustomEmbed(message.member, "✅ duel request cancelled")],

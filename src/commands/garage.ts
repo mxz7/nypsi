@@ -21,7 +21,7 @@ import { sort } from "fast-sort";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addProgress } from "../utils/functions/economy/achievements";
-import { getBalance, updateBalance } from "../utils/functions/economy/balance";
+import { getBalance, removeBalance } from "../utils/functions/economy/balance";
 import {
   Car,
   addCar,
@@ -263,7 +263,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
           }
 
           await addCar(message.author.id);
-          await updateBalance(message.author.id, balance - cost);
+          await removeBalance(message.author.id, cost);
           addStat(message.author.id, "spent-garage", cost);
           return showCars(await getGarage(message.author.id), index, msg, interaction);
         } else if (interaction.customId === "rename") {

@@ -12,7 +12,7 @@ import {
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addProgress } from "../utils/functions/economy/achievements";
-import { getBalance, updateBalance } from "../utils/functions/economy/balance";
+import { addBalance } from "../utils/functions/economy/balance";
 import { getBoosters } from "../utils/functions/economy/boosters";
 import { addToGuildXP, getGuildName } from "../utils/functions/economy/guilds";
 import {
@@ -311,7 +311,7 @@ async function doFish(
         const amount = parseInt(chosen.substring(6));
 
         addStat(member, "earned-fish", amount);
-        await updateBalance(member, (await getBalance(member)) + amount);
+        await addBalance(member, amount);
         foundItems.set(
           "money",
           foundItems.has("money") ? foundItems.get("money") + amount : amount,

@@ -19,7 +19,7 @@ import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { daysAgo, formatDate } from "../utils/functions/date";
-import { getBalance, updateBalance } from "../utils/functions/economy/balance";
+import { addBalance, getBalance, removeBalance } from "../utils/functions/economy/balance";
 import {
   RemoveMemberMode,
   addGuildUpgrade,
@@ -329,7 +329,7 @@ async function run(
 
     await addCooldown(cmd.name, message.member, 3);
 
-    await updateBalance(message.member, (await getBalance(message.member)) - 500000);
+    await removeBalance(message.member, 500000);
     addStat(message.author.id, "spent-guild", 500000);
 
     await createGuild(name, message.member);
@@ -629,10 +629,7 @@ async function run(
       const contributedMoney = guildMember.contributedMoney;
 
       if (contributedMoney > 100) {
-        await updateBalance(
-          guildMember.userId,
-          (await getBalance(guildMember.userId)) + Math.floor(Number(contributedMoney) * 0.25),
-        );
+        await addBalance(guildMember.userId, Math.floor(Number(contributedMoney) * 0.25));
 
         if ((await getDmSettings(guildMember.userId)).other) {
           const embed = new CustomEmbed().setColor(Constants.EMBED_SUCCESS_COLOR);
@@ -729,7 +726,7 @@ async function run(
         });
       }
 
-      await updateBalance(message.member, (await getBalance(message.member)) - amount);
+      await removeBalance(message.member, amount);
       addStat(message.author.id, "spent-guild", amount);
 
       await addToGuildBank(guild.guildName, amount, message.member);

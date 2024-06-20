@@ -1,7 +1,7 @@
 import { CommandInteraction, Message } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders.js";
-import { getBalance, updateBalance } from "../utils/functions/economy/balance";
+import { addBalance, getBalance } from "../utils/functions/economy/balance";
 import { addStat } from "../utils/functions/economy/stats";
 import { createUser, userExists } from "../utils/functions/economy/utils";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
@@ -38,7 +38,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     }
   }
 
-  await updateBalance(message.member, (await getBalance(message.member)) + amount);
+  await addBalance(message.member, amount);
   addStat(message.author.id, "earned-freemoney", amount);
 
   const embed = new CustomEmbed(message.member, `+$**${amount.toLocaleString()}**`).setHeader(

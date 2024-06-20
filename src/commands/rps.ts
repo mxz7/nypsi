@@ -10,11 +10,12 @@ import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants.js";
 import {
+  addBalance,
   calcMaxBet,
   getBalance,
   getDefaultBet,
   getGambleMulti,
-  updateBalance,
+  removeBalance,
 } from "../utils/functions/economy/balance.js";
 import { addToGuildXP, getGuildName } from "../utils/functions/economy/guilds.js";
 import { createGame } from "../utils/functions/economy/stats";
@@ -221,16 +222,13 @@ async function run(
     winnings -= bet;
 
     if (multi > 0) {
-      await updateBalance(
-        message.member,
-        (await getBalance(message.member)) + winnings + Math.round(winnings * multi),
-      );
+      await addBalance(message.member, winnings + Math.round(winnings * multi));
       winnings = winnings + Math.round(winnings * multi);
     } else {
-      await updateBalance(message.member, (await getBalance(message.member)) + winnings);
+      await addBalance(message.member, winnings);
     }
   } else {
-    await updateBalance(message.member, (await getBalance(message.member)) - bet);
+    await removeBalance(message.member, bet);
   }
 
   winnings += bet;

@@ -8,7 +8,7 @@ import { addKarma } from "../karma/karma";
 import sleep from "../sleep";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { addTag } from "../users/tags";
-import { getBalance, getBankBalance, updateBalance, updateBankBalance } from "./balance";
+import { addBalance, getBankBalance, updateBankBalance } from "./balance";
 import { addBooster, getBoosters } from "./boosters";
 import { addInventoryItem } from "./inventory";
 import { addStat } from "./stats";
@@ -410,7 +410,7 @@ async function doLevelUp(
       if (reward.startsWith("id:")) {
         await addInventoryItem(member, reward.substring(3), 1);
       } else if (reward.startsWith("money:")) {
-        await updateBalance(member, (await getBalance(member)) + parseInt(reward.substring(6)));
+        await addBalance(member, parseInt(reward.substring(6)));
         addStat(member, "earned-level", parseInt(reward.substring(6)));
       } else if (reward.startsWith("karma:")) {
         await addKarma(member, parseInt(reward.substring(6)));

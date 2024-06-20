@@ -10,7 +10,7 @@ import sleep from "../sleep";
 import { addInlineNotification } from "../users/notifications";
 import { getLastKnownAvatar } from "../users/tag";
 import { addProgress } from "./achievements";
-import { getBalance, updateBalance } from "./balance";
+import { addBalance } from "./balance";
 import { addToGuildXP, getGuildName } from "./guilds";
 import { addInventoryItem } from "./inventory";
 import { getItems, getTasksData, userExists } from "./utils";
@@ -266,7 +266,7 @@ export async function addTaskProgress(userId: string, taskId: string, amount = 1
         break;
       case "money":
         desc += `\n\nyou have received $${reward.value.toLocaleString()}`;
-        await updateBalance(task.user_id, (await getBalance(task.user_id)) + reward.value);
+        await addBalance(task.user_id, reward.value);
         break;
       case "xp":
         desc += `\n\nyou have received ${reward.value.toLocaleString()}xp`;
@@ -341,7 +341,7 @@ export async function setTaskProgress(userId: string, taskId: string, amount: nu
         break;
       case "money":
         desc += `\n\nyou have received $${reward.value.toLocaleString()}`;
-        await updateBalance(task.user_id, (await getBalance(task.user_id)) + reward.value);
+        await addBalance(task.user_id, reward.value);
         break;
       case "xp":
         desc += `\n\nyou have received ${reward.value.toLocaleString()}xp`;

@@ -13,7 +13,7 @@ import { inPlaceSort } from "fast-sort";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
-import { getBalance, getSellMulti, updateBalance } from "../utils/functions/economy/balance";
+import { addBalance, getSellMulti } from "../utils/functions/economy/balance";
 import { getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
 import { addStat } from "../utils/functions/economy/stats";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
@@ -147,7 +147,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
       await addToNypsiBank(taxedAmount);
     });
     functions.push(async () => {
-      await updateBalance(message.member, (await getBalance(message.member)) + total);
+      await addBalance(message.member, total);
     });
 
     addStat(message.author.id, "earned-sold", total);

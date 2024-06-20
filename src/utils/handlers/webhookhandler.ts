@@ -16,7 +16,7 @@ import { KofiResponse } from "../../types/Kofi";
 import { NotificationPayload } from "../../types/Notification";
 import Constants from "../Constants";
 import { addProgress } from "../functions/economy/achievements";
-import { getBalance, updateBalance } from "../functions/economy/balance";
+import { addBalance } from "../functions/economy/balance";
 import { addBooster } from "../functions/economy/boosters";
 import { addInventoryItem } from "../functions/economy/inventory";
 import { getRawLevel } from "../functions/economy/levelling";
@@ -162,7 +162,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
   if (!(await isEcoBanned(user)).banned) {
     try {
       await Promise.all([
-        updateBalance(user, (await getBalance(user)) + amount),
+        addBalance(user, amount),
         addKarma(user, 10),
         updateXp(user, (await getXp(user)) + xp),
         addBooster(user, "vote_booster"),
