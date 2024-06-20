@@ -820,7 +820,7 @@ async function run(
 
       xpLevel += `${position} **${
         m.economy.user.lastKnownUsername
-      }** ${m.contributedXp.toLocaleString()}xp\n`;
+      }** ${m.contributedXpThisLevel.toLocaleString()}xp\n`;
     }
 
     for (const m of moneyLevelSort) {
@@ -833,7 +833,7 @@ async function run(
 
       moneyLevel += `${position} **${
         m.economy.user.lastKnownUsername
-      }** $${m.contributedMoney.toLocaleString()}\n`;
+      }** $${m.contributedMoneyThisLevel.toLocaleString()}\n`;
     }
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
