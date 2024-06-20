@@ -53,7 +53,10 @@ export async function addTag(userId: string, tagId: string) {
     return getTags(userId);
   }
 
-  await redis.del(`${Constants.redis.cache.user.tags}:${userId}`);
+  await redis.del(
+    `${Constants.redis.cache.user.tags}:${userId}`,
+    `${Constants.redis.cache.user.tagCount}:${tagId}`,
+  );
 
   await prisma.tags.create({
     data: {
