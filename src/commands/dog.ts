@@ -30,7 +30,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   }
 
   if (Math.floor(Math.random() * 25) === 7)
-    embed.setFooter({ text: `powered by animals.maxz.dev` });
+    embed.setFooter({ text: `upload your pets: animals.maxz.dev` });
 
   message.channel.send({ embeds: [embed] });
 
