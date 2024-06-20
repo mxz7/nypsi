@@ -62,7 +62,7 @@ interface Game {
   bet: number;
   win: number;
   board: string[][];
-  increment: number;
+  payout: number[];
   embed: CustomEmbed;
   difficulty: string;
 }
@@ -80,23 +80,29 @@ interface Game {
  *
  */
 
-const difficultyIncrements = new Map<string, number>([
-  ["easy", 0.45],
-  ["medium", 0.8],
-  ["hard", 1.425],
-  ["expert", 2.5],
+const payoutsData = new Map<string, number[]>([
+  ["easy", [0.3, 0.7, 1.25, 1.9, 2.7, 3.6, 4.6, 4.7, 6]],
+  ["medium", [0.95, 2, 3, 3.9, 4.8, 6, 7.3, 8.7, 10]],
+  ["hard", [1, 2, 3.1, 4.3, 5.6, 6.9, 8.6, 10, 15]],
+  ["expert", [2, 3.8, 6.1, 8.4, 10.6, 14, 17, 25, 50]],
 ]);
-const incrementOffsets = new Map<number, number>([
-  [0, 1],
-  [1, 0.9],
-  [2, 0.45],
-  [3, 0.35],
-  [4, 0.3],
-  [5, 0.22],
-  [6, 0.14],
-  [7, 0.1],
-  [8, 0.1],
-]);
+
+// is the difference
+const payouts = new Map<string, number[]>();
+
+for (const [difficulty, values] of payoutsData.entries()) {
+  const increments: number[] = [];
+
+  for (const value of values) {
+    if (values.indexOf(value) === 0) increments.push(value);
+    else increments.push(parseFloat((value - values[values.indexOf(value) - 1]).toFixed(2)));
+  }
+
+  payouts.set(difficulty, increments);
+}
+
+// console.log(payouts);
+
 const games = new Map<string, Game>();
 const GEM_EMOJI = "<:nypsi_gem:1046854542047850556>";
 
@@ -110,7 +116,7 @@ cmd.slashData
       .setName("difficulty")
       .setDescription("how hard would you like your game to be")
       .setChoices(
-        ...Array.from(difficultyIncrements.keys()).map((i) => {
+        ...Array.from(payouts.keys()).map((i) => {
           return { name: i, value: i };
         }),
       ),
@@ -287,21 +293,17 @@ async function prepareGame(
 
   if (!chosenDifficulty) {
     chosenDifficulty = "medium";
-  } else if (!difficultyIncrements.has(chosenDifficulty)) {
+  } else if (!payouts.has(chosenDifficulty)) {
     if (msg) {
       return msg.edit({
         embeds: [
-          new ErrorEmbed(
-            `invalid difficulty\nallowed: ${Array.from(difficultyIncrements.keys()).join(", ")}`,
-          ),
+          new ErrorEmbed(`invalid difficulty\nallowed: ${Array.from(payouts.keys()).join(", ")}`),
         ],
       });
     } else {
       return send({
         embeds: [
-          new ErrorEmbed(
-            `invalid difficulty\nallowed: ${Array.from(difficultyIncrements.keys()).join(", ")}`,
-          ),
+          new ErrorEmbed(`invalid difficulty\nallowed: ${Array.from(payouts.keys()).join(", ")}`),
         ],
       });
     }
@@ -330,7 +332,7 @@ async function prepareGame(
     gameId,
     bet,
     board,
-    increment: difficultyIncrements.get(chosenDifficulty),
+    payout: payouts.get(chosenDifficulty),
     userId: message.author.id,
     win: 0,
     embed,
@@ -759,7 +761,7 @@ async function playGame(
           }
         }
 
-        game.win += game.increment * (y + 1) * incrementOffsets.get(y);
+        game.win += game.payout[y];
 
         // games.set(message.author.id, {
         //   bet: bet,
@@ -779,8 +781,7 @@ async function playGame(
         game.embed.setDescription(desc);
 
         if (y >= 8) {
-          if (game.difficulty != "easy") addProgress(message.author.id, "tower_pro", 1);
-          game.win += game.increment * 2;
+          addProgress(message.author.id, "tower_pro", 1);
           win1(response);
           return;
         }
