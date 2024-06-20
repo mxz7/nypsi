@@ -29,7 +29,7 @@ export default async function userUpdate(oldUser: User, newUser: User) {
 
   if (oldUser.displayAvatarURL({ size: 256 }) != newUser.displayAvatarURL({ size: 256 })) {
     if (!(await userExists(newUser.id))) return;
-    if ((await getRawLevel(newUser.id)) < 200) return;
+    if ((await getRawLevel(newUser.id)) < 50) return;
 
     if (!(await isTracking(newUser.id))) return;
 
