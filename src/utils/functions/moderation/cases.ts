@@ -25,7 +25,7 @@ export async function newCase(
   }
   for (const userID of userIDs) {
     const caseCount = await getCaseCount(guild);
-    await prisma.moderationCase.create({
+    const { caseId } = await prisma.moderationCase.create({
       data: {
         guildId: guild.id,
         caseId: caseCount + 1,
@@ -35,11 +35,14 @@ export async function newCase(
         command: command,
         time: new Date(),
       },
+      select: {
+        caseId: true,
+      },
     });
 
     if (!(await isModLogsEnabled(guild))) return;
 
-    addModLog(guild, caseType, userID, moderator, command, caseCount);
+    addModLog(guild, caseType, userID, moderator, command, caseId);
   }
 }
 
