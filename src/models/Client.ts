@@ -97,7 +97,7 @@ export class NypsiClient extends Client {
       this.ready = true;
 
       logger.info(`cluster ${this.cluster.id} ready`);
-      await redis.del(`${Constants.redis.nypsi.RESTART}:${this.cluster.id}`);
+      await redis.del(`${Constants.redis.nypsi.RESTART}:${this.cluster.id}`, "nypsi:users:playing");
       this.on("guildCreate", guildCreate.bind(null, this));
       this.on("guildDelete", guildDelete.bind(null, this));
       this.rest.on("rateLimited", (rate) => {
