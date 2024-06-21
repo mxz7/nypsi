@@ -7,15 +7,12 @@ import {
   Message,
   MessageActionRowComponentBuilder,
 } from "discord.js";
-import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { formatDate } from "../utils/functions/date";
 import { getRawLevel } from "../utils/functions/economy/levelling";
-import { uploadImage } from "../utils/functions/image";
 import PageManager from "../utils/functions/page";
 import {
-  addNewAvatar,
   clearAvatarHistory,
   deleteAvatar,
   fetchAvatarHistory,
@@ -49,11 +46,11 @@ async function run(
 
   await addCooldown(cmd.name, message.member, 15);
 
-  if ((await getRawLevel(message.member).catch(() => 0)) < 200)
+  if ((await getRawLevel(message.member).catch(() => 0)) < 100)
     return message.channel.send({
       embeds: [
         new ErrorEmbed(
-          "you require at least prestige 2 (/prestige) for nypsi to track your avatars\n\nyou can disable avatar tracking with $toggletracking",
+          "you require at least level 100 (/profile) for nypsi to track your avatars\n\nyou can disable avatar tracking with $toggletracking",
         ),
       ],
     });
@@ -61,18 +58,7 @@ async function run(
   let history = await fetchAvatarHistory(message.member);
 
   if (history.length == 0) {
-    const url = await uploadImage(
-      message.client as NypsiClient,
-      message.author.displayAvatarURL({ extension: "png", size: 256 }),
-      "avatar",
-      `user: ${message.author.id} (${message.author.username})`,
-    );
-    if (url) {
-      await addNewAvatar(message.member, url);
-      history = await fetchAvatarHistory(message.member);
-    } else {
-      return message.channel.send({ embeds: [new ErrorEmbed("no avatar history")] });
-    }
+    return message.channel.send({ embeds: [new ErrorEmbed("no avatar history")] });
   }
 
   let index = 0;
@@ -86,11 +72,11 @@ async function run(
   const embed = new CustomEmbed(message.member)
     .setHeader("your avatar history")
     .setImage(history[index].value)
-    .setFooter({ text: formatDate(history[index].date) });
+    .setFooter({ text: formatDate(history[index].createdAt) });
 
   if (history.length > 1) {
     embed.setFooter({
-      text: `${formatDate(history[index].date)} | ${index + 1}/${history.length}`,
+      text: `${formatDate(history[index].createdAt)} | ${index + 1}/${history.length}`,
     });
   }
 
@@ -125,21 +111,30 @@ async function run(
     pages: PageManager.createPages(history, 1),
     handleResponses: new Map().set(
       "d",
-      async (manager: PageManager<string>, interaction: ButtonInteraction) => {
+      async (
+        manager: PageManager<{
+          id: number;
+          createdAt: Date;
+          value: string;
+        }>,
+        interaction: ButtonInteraction,
+      ) => {
         const res = await deleteAvatar(history[manager.currentPage - 1].id);
 
         if (res) {
-          await interaction
-            .reply({
-              embeds: [new CustomEmbed(message.member, "✅ successfully deleted this avatar")],
-              ephemeral: true,
-            })
-            .catch(() => {
-              interaction.followUp({
-                embeds: [new CustomEmbed(message.member, "✅ successfully deleted this avatar")],
-                ephemeral: true,
-              });
-            });
+          history = await fetchAvatarHistory(message.author.id);
+          manager.pages = PageManager.createPages(history, 1);
+          manager.lastPage = manager.pages.size;
+          if (manager.currentPage === 1) {
+            await manager.next(manager, interaction);
+          } else if (manager.currentPage === manager.lastPage) {
+            await manager.back(manager, interaction);
+          } else await manager.next(manager, interaction);
+
+          interaction.followUp({
+            embeds: [new CustomEmbed(message.member, "✅ successfully deleted this avatar")],
+            ephemeral: true,
+          });
         } else {
           await interaction
             .reply({
@@ -160,7 +155,7 @@ async function run(
     updateEmbed(page, embed) {
       embed.setImage(page[0].value);
       embed.setFooter({
-        text: `${formatDate(page[0].date)} | ${manager.currentPage}/${manager.lastPage}`,
+        text: `${formatDate(page[0].createdAt)} | ${manager.currentPage}/${manager.lastPage}`,
       });
 
       return embed;

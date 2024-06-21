@@ -59,6 +59,12 @@ export async function getIdFromUsername(username: string) {
 }
 
 export async function getLastKnownAvatar(id: string) {
+  const cache = await redis.get(`${Constants.redis.cache.user.avatar}:${id}`);
+
+  if (cache) {
+    return cache;
+  }
+
   const query = await prisma.user.findUnique({
     where: {
       id: id,
@@ -67,6 +73,8 @@ export async function getLastKnownAvatar(id: string) {
       avatar: true,
     },
   });
+
+  await redis.set(`${Constants.redis.cache.user.avatar}:${id}`, query.avatar, "EX", 86400);
 
   return query.avatar;
 }

@@ -241,7 +241,7 @@ async function showUser(message: Message, user: User) {
     let count = 0;
     for (const un of usernameHistory) {
       if (count >= 10) break;
-      msg += `\`${un.value}\` | \`${formatDate(un.date)}\`\n`;
+      msg += `\`${un.value}\` | \`${formatDate(un.createdAt)}\`\n`;
       count++;
     }
 

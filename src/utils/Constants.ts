@@ -54,6 +54,7 @@ export default {
         captcha_fail: "nypsi:user:captcha:fail",
         captcha_pass: "nypsi:user:captcha:pass",
         username: "cache:user:username",
+        avatar: "cache:user:avatar",
         views: "cache:user:views",
       },
       guild: {
