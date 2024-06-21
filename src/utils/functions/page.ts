@@ -147,13 +147,7 @@ export default class PageManager<T> {
     }
   }
 
-  async back(manager: PageManager<T>, interaction: ButtonInteraction): Promise<void> {
-    if (manager.currentPage == 1) {
-      return manager.listen();
-    }
-
-    manager.currentPage--;
-
+  async render(manager: PageManager<T>, interaction: ButtonInteraction): Promise<void> {
     if (manager.updatePageFunc) {
       manager.embed = manager.updatePageFunc(manager.pages.get(manager.currentPage), manager.embed);
     } else {
@@ -169,11 +163,12 @@ export default class PageManager<T> {
 
     if (manager.currentPage == 1) {
       manager.row.components[0].setDisabled(true);
+    } else if (manager.currentPage == manager.lastPage) {
+      manager.row.components[1].setDisabled(true);
     } else {
+      manager.row.components[1].setDisabled(false);
       manager.row.components[0].setDisabled(false);
     }
-
-    manager.row.components[1].setDisabled(false);
 
     await interaction
       .update({ embeds: [manager.embed], components: [manager.row] })
@@ -181,38 +176,24 @@ export default class PageManager<T> {
     return manager.listen();
   }
 
-  async next(manager: PageManager<T>, interaction: ButtonInteraction): Promise<void> {
+  private async back(manager: PageManager<T>, interaction: ButtonInteraction): Promise<void> {
+    if (manager.currentPage == 1) {
+      return manager.listen();
+    }
+
+    manager.currentPage--;
+
+    manager.render(manager, interaction);
+  }
+
+  private async next(manager: PageManager<T>, interaction: ButtonInteraction): Promise<void> {
     if (manager.currentPage == manager.lastPage) {
       return manager.listen();
     }
 
     manager.currentPage++;
 
-    if (manager.updatePageFunc) {
-      manager.embed = manager.updatePageFunc(manager.pages.get(manager.currentPage), manager.embed);
-    } else {
-      manager.embed = PageManager.defaultUpdateEmbed(
-        manager.pages.get(manager.currentPage),
-        manager.embed,
-      );
-    }
-
-    if (manager.onPageUpdate) {
-      manager.embed = manager.onPageUpdate(manager);
-    }
-
-    if (manager.currentPage == manager.lastPage) {
-      manager.row.components[1].setDisabled(true);
-    } else {
-      manager.row.components[1].setDisabled(false);
-    }
-
-    manager.row.components[0].setDisabled(false);
-
-    await interaction
-      .update({ embeds: [manager.embed], components: [manager.row] })
-      .catch(() => this.message.edit({ embeds: [manager.embed], components: [manager.row] }));
-    return manager.listen();
+    return manager.render(manager, interaction);
   }
 
   public async listen(): Promise<void> {
