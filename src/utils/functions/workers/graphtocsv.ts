@@ -20,7 +20,7 @@ if (!isMainThread) {
 
   const toCsv = async (
     fileName: string,
-    data: { userId: string; value: bigint | number; date: Date; id: string }[],
+    data: { userId: string; value: bigint | number; date: Date; id: bigint }[],
   ) => {
     const dates: number[] = [];
     const map = new Map<string, { value: number; date: number }[]>();

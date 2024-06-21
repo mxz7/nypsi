@@ -53,7 +53,7 @@ export interface GuildUpgradeRequirements {
 export interface Booster {
   boosterId: string;
   expire: number;
-  id: string;
+  id: number;
 }
 
 export interface AchievementData {

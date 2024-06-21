@@ -184,7 +184,7 @@ export async function fetchAvatarHistory(member: GuildMember | string) {
   return query;
 }
 
-export async function deleteAvatar(id: string) {
+export async function deleteAvatar(id: number) {
   let res = true;
   await prisma.username
     .delete({
