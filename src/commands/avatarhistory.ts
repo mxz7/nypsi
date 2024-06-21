@@ -125,11 +125,10 @@ async function run(
           history = await fetchAvatarHistory(message.author.id);
           manager.pages = PageManager.createPages(history, 1);
           manager.lastPage = manager.pages.size;
-          if (manager.currentPage === 1) {
-            await manager.next(manager, interaction);
-          } else if (manager.currentPage === manager.lastPage) {
-            await manager.back(manager, interaction);
-          } else await manager.next(manager, interaction);
+
+          if (manager.currentPage > manager.lastPage) manager.currentPage = manager.lastPage;
+
+          await manager.render(manager, interaction);
 
           interaction.followUp({
             embeds: [new CustomEmbed(message.member, "✅ successfully deleted this avatar")],
