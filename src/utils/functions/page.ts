@@ -147,7 +147,7 @@ export default class PageManager<T> {
     }
   }
 
-  private async back(manager: PageManager<T>, interaction: ButtonInteraction): Promise<void> {
+  async back(manager: PageManager<T>, interaction: ButtonInteraction): Promise<void> {
     if (manager.currentPage == 1) {
       return manager.listen();
     }
@@ -181,7 +181,7 @@ export default class PageManager<T> {
     return manager.listen();
   }
 
-  private async next(manager: PageManager<T>, interaction: ButtonInteraction): Promise<void> {
+  async next(manager: PageManager<T>, interaction: ButtonInteraction): Promise<void> {
     if (manager.currentPage == manager.lastPage) {
       return manager.listen();
     }
