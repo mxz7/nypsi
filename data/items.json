@@ -2991,5 +2991,19 @@
     "in_crates": true,
     "rarity": 5,
     "random_drop_chance": 15
+  },
+  "veilside_rx7_skin": {
+    "id": "veilside_skin",
+    "name": "veilside rx7 skin",
+    "plural": "veilside skins",
+    "article": "an",
+    "aliases": ["veilside"],
+    "emoji": "<:nypsi_veilside_rx7:1253785772331372624>",
+    "longDesc": "veilside rx7 car skin for custom cars",
+    "role": "car_skin",
+    "sell": 100000,
+    "in_crates": true,
+    "rarity": 10,
+    "random_drop_chance": 10
   }
 }
