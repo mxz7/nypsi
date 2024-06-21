@@ -4,6 +4,7 @@ import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
+import { deleteAllAvatars } from "./history";
 import ms = require("ms");
 
 export async function hasProfile(member: GuildMember | string) {
@@ -101,17 +102,6 @@ export async function doProfileTransfer(fromId: string, toId: string) {
         if (wordleStats) {
           wordleStats.userId = toId;
           await prisma.wordleStats.create({ data: wordleStats });
-        }
-
-        const usernames = (await prisma.username.findMany({ where: { userId: fromId } })).map(
-          (i) => {
-            i.userId = toId;
-            return i;
-          },
-        );
-        if (usernames.length > 0) {
-          await prisma.username.deleteMany({ where: { id: { in: usernames.map((i) => i.id) } } });
-          await prisma.username.createMany({ data: usernames });
         }
 
         const commandUses = (await prisma.commandUse.findMany({ where: { userId: fromId } })).map(
@@ -266,6 +256,7 @@ export async function doProfileTransfer(fromId: string, toId: string) {
 
 export async function dataDelete(userId: string) {
   logger.info(`deleting data for ${userId}...`);
+  await deleteAllAvatars(userId);
 
   await prisma.inventory.deleteMany({
     where: {

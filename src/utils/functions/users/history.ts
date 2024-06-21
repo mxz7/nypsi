@@ -1,4 +1,4 @@
-import { DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { DeleteObjectCommand, DeleteObjectsCommand } from "@aws-sdk/client-s3";
 import { GuildMember } from "discord.js";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
@@ -202,6 +202,40 @@ export async function deleteAvatar(id: number) {
   }
 
   return res;
+}
+
+export async function deleteAllAvatars(userId: string) {
+  const avatars = await prisma.username.findMany({
+    where: {
+      AND: [{ type: "avatar" }, { userId }],
+    },
+    select: {
+      value: true,
+    },
+  });
+
+  const commands: { Key: string }[] = [];
+
+  for (const { value } of avatars) {
+    if (value.startsWith("https://cdn.nypsi.xyz")) {
+      const key = value.substring(22);
+      commands.push({ Key: key });
+    }
+  }
+
+  if (commands.length > 0)
+    await s3.send(
+      new DeleteObjectsCommand({
+        Bucket: process.env.S3_BUCKET,
+        Delete: { Objects: commands },
+      }),
+    );
+
+  await prisma.username.deleteMany({
+    where: {
+      AND: [{ type: "avatar" }, { userId }],
+    },
+  });
 }
 
 export async function clearAvatarHistory(member: GuildMember | string) {
