@@ -96,6 +96,7 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel) 
       if (ended) return;
       ended = true;
 
+      // @ts-ignore new version doesnt like that but it works!
       collector.emit("end");
       clearInterval(interval);
     }, 10000);
