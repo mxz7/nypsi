@@ -152,7 +152,7 @@ export async function addNewAvatar(member: GuildMember | string, url: string) {
   });
 }
 
-export async function fetchAvatarHistory(member: GuildMember | string) {
+export async function fetchAvatarHistory(member: GuildMember | string, limit = 69) {
   let id: string;
   if (member instanceof GuildMember) {
     id = member.user.id;
@@ -172,6 +172,7 @@ export async function fetchAvatarHistory(member: GuildMember | string) {
     orderBy: {
       createdAt: "desc",
     },
+    take: limit,
   });
 
   return query;
