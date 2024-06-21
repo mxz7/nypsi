@@ -5,7 +5,7 @@ import { promisify } from "util";
 import { isMainThread, parentPort, Worker, workerData } from "worker_threads";
 import dayjs = require("dayjs");
 
-export default function searchLogs(searchTerm: string): Promise<[Buffer, number]> {
+export default function searchLogs(searchTerm: string): Promise<string> {
   return new Promise((resolve, reject) => {
     const worker = new Worker(__filename, {
       workerData: [searchTerm],
@@ -83,7 +83,10 @@ if (!isMainThread) {
     });
 
     if (buffer) {
-      parentPort.postMessage([values.join("\n"), buffer.toString().split("\n").length]);
+      const path = `/tmp/nypsi_logsearch_results_formatted_${Date.now()}.txt`;
+      await fs.writeFile(path, buffer);
+
+      parentPort.postMessage(path);
     }
 
     process.exit(0);

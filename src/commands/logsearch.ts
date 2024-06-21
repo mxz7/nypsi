@@ -1,7 +1,8 @@
 import { CommandInteraction, Message } from "discord.js";
+import { readFile } from "fs/promises";
 import { Command, NypsiCommandInteraction } from "../models/Command";
-import searchLogs from "../utils/functions/workers/logsearch";
 import { getAdminLevel } from "../utils/functions/users/admin";
+import searchLogs from "../utils/functions/workers/logsearch";
 
 const cmd = new Command("logsearch", "search through logs", "none").setPermissions(["bot owner"]);
 
@@ -13,16 +14,16 @@ async function run(
 
   if (args.length == 0) return;
 
-  const res = await searchLogs(args.join(" "));
+  const path = await searchLogs(args.join(" "));
 
-  if (!res[0]) {
+  if (!path) {
     if (!(message instanceof Message)) return;
     return message.react("❌");
   }
 
   return message.channel.send({
-    content: `${res[1].toLocaleString()} results for \`${args.join(" ")}\``,
-    files: [{ name: "search_results.txt", attachment: Buffer.from(res[0]) }],
+    content: `results for \`${args.join(" ")}\``,
+    files: [{ name: "search_results.txt", attachment: await readFile(path) }],
   });
 }
 
