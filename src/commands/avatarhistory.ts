@@ -49,11 +49,11 @@ async function run(
 
   await addCooldown(cmd.name, message.member, 15);
 
-  if ((await getRawLevel(message.member).catch(() => 0)) < 200)
+  if ((await getRawLevel(message.member).catch(() => 0)) < 50)
     return message.channel.send({
       embeds: [
         new ErrorEmbed(
-          "you require at least prestige 2 (/prestige) for nypsi to track your avatars\n\nyou can disable avatar tracking with $toggletracking",
+          "you require at least level 50 (/profile) for nypsi to track your avatars\n\nyou can disable avatar tracking with $toggletracking",
         ),
       ],
     });
