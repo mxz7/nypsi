@@ -2198,7 +2198,8 @@
       "id:omega_crate:2",
       "id:cat_tag:0.1",
       "id:ferrari_skin:10",
-      "id:reroll_token:4"
+      "id:reroll_token:4",
+      "id:veilside_rx7_skin:5"
     ],
     "random_drop_chance": 40
   },
@@ -2238,7 +2239,8 @@
       "id:lucky_cheese:50",
       "id:xp_potion:50",
       "id:double_xp:15",
-      "id:multi_potion:40"
+      "id:multi_potion:40",
+      "id:veilside_rx7_skin:10"
     ]
   },
   "corner_shop_scratchie": {
