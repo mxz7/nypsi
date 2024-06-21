@@ -7,6 +7,7 @@ import s3 from "../../../init/s3";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { getRawLevel } from "../economy/levelling";
+import { isEcoBanned } from "../economy/utils";
 import { addNewAvatar, addNewUsername, fetchUsernameHistory, isTracking } from "./history";
 import { getLastKnownAvatar, getLastKnownUsername } from "./tag";
 import ms = require("ms");
@@ -105,7 +106,13 @@ export async function updateUser(user: User, command: string) {
 
     updateAvatar = true;
     const level = await getRawLevel(user.id).catch(() => 0);
-    if (level >= 100 && (await isTracking(user.id))) {
+    if (
+      level >= 100 &&
+      (await isTracking(user.id)) &&
+      !(await isEcoBanned(user.id)
+        .then((r) => r.banned)
+        .catch(() => false))
+    ) {
       (async () => {
         const arrayBuffer = await fetch(newAvatar).then((r) => r.arrayBuffer());
         const ext = newAvatar.split(".").pop().split("?")[0];
