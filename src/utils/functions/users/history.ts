@@ -1,5 +1,4 @@
 import { GuildMember } from "discord.js";
-import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import Constants from "../../Constants";
@@ -92,7 +91,6 @@ export async function addNewUsername(member: GuildMember | string, username: str
     data: {
       userId: id,
       value: username,
-      date: new Date(),
     },
   });
 }
@@ -111,15 +109,13 @@ export async function fetchUsernameHistory(member: GuildMember | string, limit =
     },
     select: {
       value: true,
-      date: true,
+      createdAt: true,
     },
     orderBy: {
-      date: "desc",
+      createdAt: "desc",
     },
     take: limit,
   });
-
-  inPlaceSort(query).desc((u) => u.date);
 
   return query;
 }
@@ -152,7 +148,6 @@ export async function addNewAvatar(member: GuildMember | string, url: string) {
       userId: id,
       type: "avatar",
       value: url,
-      date: new Date(),
     },
   });
 }
@@ -171,15 +166,13 @@ export async function fetchAvatarHistory(member: GuildMember | string) {
     },
     select: {
       value: true,
-      date: true,
+      createdAt: true,
       id: true,
     },
     orderBy: {
-      date: "desc",
+      createdAt: "desc",
     },
   });
-
-  inPlaceSort(query).desc((u) => u.date);
 
   return query;
 }

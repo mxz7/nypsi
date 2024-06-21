@@ -11,7 +11,7 @@ export default {
 
     const d = await prisma.username.deleteMany({
       where: {
-        AND: [{ type: "username" }, { date: { lt: old } }],
+        AND: [{ type: "username" }, { createdAt: { lt: old } }],
       },
     });
 

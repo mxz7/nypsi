@@ -139,7 +139,7 @@ async function run(
 
     for (const un of usernameHistory) {
       if (text.length > 5) break;
-      text.push(`\`${un.value}\` | \`${formatDate(un.date)}\``);
+      text.push(`\`${un.value}\` | \`${formatDate(un.createdAt)}\``);
     }
 
     embed.addField("username history", text.join("\n"), true);

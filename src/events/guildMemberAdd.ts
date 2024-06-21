@@ -50,7 +50,7 @@ export default async function guildMemberAdd(member: GuildMember) {
 
       for (const un of history) {
         if (text.length > 10) break;
-        text.push(`\`${un.value}\` | \`${formatDate(un.date)}\``);
+        text.push(`\`${un.value}\` | \`${formatDate(un.createdAt)}\``);
       }
 
       embed.addField("username history", text.join("\n"));

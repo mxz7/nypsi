@@ -86,11 +86,11 @@ async function run(
   const embed = new CustomEmbed(message.member)
     .setHeader("your avatar history")
     .setImage(history[index].value)
-    .setFooter({ text: formatDate(history[index].date) });
+    .setFooter({ text: formatDate(history[index].createdAt) });
 
   if (history.length > 1) {
     embed.setFooter({
-      text: `${formatDate(history[index].date)} | ${index + 1}/${history.length}`,
+      text: `${formatDate(history[index].createdAt)} | ${index + 1}/${history.length}`,
     });
   }
 
@@ -160,7 +160,7 @@ async function run(
     updateEmbed(page, embed) {
       embed.setImage(page[0].value);
       embed.setFooter({
-        text: `${formatDate(page[0].date)} | ${manager.currentPage}/${manager.lastPage}`,
+        text: `${formatDate(page[0].createdAt)} | ${manager.currentPage}/${manager.lastPage}`,
       });
 
       return embed;
