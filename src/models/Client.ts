@@ -47,6 +47,7 @@ import { getWebhooks, logger, setClusterId } from "../utils/logger";
 
 export class NypsiClient extends Client {
   public cluster: ClusterClient<Client>;
+  private ready = false;
 
   constructor(options: ClientOptions) {
     super(options);
@@ -88,7 +89,13 @@ export class NypsiClient extends Client {
       }
     });
 
-    this.cluster.once("ready", async () => {
+    this.cluster.on("ready", async () => {
+      if (this.ready) {
+        logger.error("ready event called but already ready");
+        return;
+      }
+      this.ready = true;
+
       logger.info(`cluster ${this.cluster.id} ready`);
       await redis.del(`${Constants.redis.nypsi.RESTART}:${this.cluster.id}`);
       this.on("guildCreate", guildCreate.bind(null, this));
