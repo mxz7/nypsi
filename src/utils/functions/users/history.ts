@@ -29,12 +29,12 @@ export async function isTracking(member: GuildMember | string): Promise<boolean>
   });
 
   if (query.tracking) {
-    await redis.set(`${Constants.redis.cache.user.TRACKING}:${id}`, "t");
-    await redis.expire(`${Constants.redis.cache.user.TRACKING}:${id}`, ms("12 hour") / 1000);
+    await redis.set(`${Constants.redis.cache.user.TRACKING}:${id}`, "t", "EX", 86400);
+
     return true;
   } else {
-    await redis.set(`${Constants.redis.cache.user.TRACKING}:${id}`, "f");
-    await redis.expire(`${Constants.redis.cache.user.TRACKING}:${id}`, ms("12 hour") / 1000);
+    await redis.set(`${Constants.redis.cache.user.TRACKING}:${id}`, "f", "EX", 86400);
+
     return false;
   }
 }
