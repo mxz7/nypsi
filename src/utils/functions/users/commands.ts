@@ -1,8 +1,14 @@
+import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { GuildMember, User } from "discord.js";
+import { nanoid } from "nanoid";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
+import s3 from "../../../init/s3";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
+import { getRawLevel } from "../economy/levelling";
+import { addNewAvatar, addNewUsername, fetchUsernameHistory, isTracking } from "./history";
+import { getLastKnownAvatar, getLastKnownUsername } from "./tag";
 import ms = require("ms");
 
 export const recentCommands = new Map<string, number>();
@@ -66,12 +72,59 @@ export async function updateUser(user: User, command: string) {
   const date = new Date();
   recentCommands.set(user.id, date.getTime());
 
-  await redis.set(`${Constants.redis.cache.user.LAST_COMMAND}:${user.id}`, date.getTime());
-  await redis.expire(
+  await redis.set(
     `${Constants.redis.cache.user.LAST_COMMAND}:${user.id}`,
-    ms("30 minutes") / 1000,
+    date.getTime(),
+    "EX",
+    1800,
   );
-  await redis.set(`${Constants.redis.cache.user.username}:${user.id}`, user.tag || "", "EX", 7200);
+
+  const [username, avatar] = await Promise.all([
+    getLastKnownUsername(user.id),
+    getLastKnownAvatar(user.id),
+  ]);
+
+  let updateUsername = false;
+  let updateAvatar = false;
+
+  if (username !== user.username) {
+    updateUsername = true;
+    if (await isTracking(user.id)) {
+      const history = await fetchUsernameHistory(user.id, 1);
+
+      if (history[0]?.value !== user.username) {
+        addNewUsername(user.id, user.username);
+      }
+    }
+  }
+
+  const newAvatar = user.displayAvatarURL({ size: 256, extension: "png" });
+
+  if (newAvatar !== avatar) {
+    await redis.set(`${Constants.redis.cache.user.avatar}:${user.id}`, newAvatar);
+
+    updateAvatar = true;
+    const level = await getRawLevel(user.id).catch(() => 0);
+    if (level >= 100 && (await isTracking(user.id))) {
+      (async () => {
+        const arrayBuffer = await fetch(newAvatar).then((r) => r.arrayBuffer());
+        const ext = newAvatar.split(".").pop().split("?")[0];
+        const key = `avatar/${user.id}/${nanoid()}.${ext}`;
+
+        await s3.send(
+          new PutObjectCommand({
+            Bucket: process.env.S3_BUCKET,
+            Key: key,
+            Body: Buffer.from(arrayBuffer),
+            ContentType: `image/${ext}`,
+          }),
+        );
+
+        await addNewAvatar(user.id, `https://cdn.nypsi.xyz/${key}`);
+        logger.debug(`uploaded new avatar for ${user.id}`);
+      })();
+    }
+  }
 
   await prisma.user.update({
     select: {
@@ -82,10 +135,8 @@ export async function updateUser(user: User, command: string) {
     },
     data: {
       lastCommand: date,
-      lastKnownUsername: user.username,
-      avatar: user.displayAvatarURL({ size: 256 }).endsWith("webp")
-        ? user.displayAvatarURL({ extension: "gif", size: 256 })
-        : user.displayAvatarURL({ extension: "png", size: 256 }),
+      lastKnownUsername: updateUsername ? user.username : undefined,
+      avatar: updateAvatar ? newAvatar : undefined,
       CommandUse: {
         upsert: {
           where: {
