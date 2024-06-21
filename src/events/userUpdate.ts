@@ -1,15 +1,9 @@
 import { User } from "discord.js";
 import { NypsiClient } from "../models/Client";
-import { getRawLevel } from "../utils/functions/economy/levelling";
-import { userExists } from "../utils/functions/economy/utils";
-import { uploadImage } from "../utils/functions/image";
 import { clearMemberCache } from "../utils/functions/member";
-import { addNewAvatar, addNewUsername, isTracking } from "../utils/functions/users/history";
+import { addNewUsername, isTracking } from "../utils/functions/users/history";
 import { updateLastKnownUsername } from "../utils/functions/users/tag";
 import { hasProfile } from "../utils/functions/users/utils";
-
-const queue: User[] = [];
-let interval: NodeJS.Timeout;
 
 export default async function userUpdate(oldUser: User, newUser: User) {
   oldUser.client.guilds.cache
@@ -24,19 +18,6 @@ export default async function userUpdate(oldUser: User, newUser: User) {
 
       if (!(await isTracking(newUser.id))) return;
       await addNewUsername(newUser.id, newUser.username);
-    }
-  }
-
-  if (oldUser.displayAvatarURL({ size: 256 }) != newUser.displayAvatarURL({ size: 256 })) {
-    if (!(await userExists(newUser.id))) return;
-    if ((await getRawLevel(newUser.id)) < 50) return;
-
-    if (!(await isTracking(newUser.id))) return;
-
-    queue.push(newUser);
-
-    if (!interval) {
-      interval = setInterval(doQueue.bind(null, newUser.client), 1000);
     }
   }
 }
@@ -72,36 +53,4 @@ async function determineCluster(client: NypsiClient, userId: string) {
 
   if (lowest == client.cluster.id) return true;
   return false;
-}
-
-async function doQueue(client: NypsiClient) {
-  const user = queue.shift();
-
-  if (!user) return;
-
-  if (!(await determineCluster(client, user.id))) return;
-
-  let uploadUrl = user.displayAvatarURL({ size: 256 });
-
-  if (uploadUrl.endsWith("webp")) {
-    uploadUrl = user.displayAvatarURL({ extension: "gif", size: 256 });
-  } else {
-    uploadUrl = user.displayAvatarURL({ extension: "png", size: 256 });
-  }
-
-  const url = await uploadImage(
-    user.client as NypsiClient,
-    uploadUrl,
-    "avatar",
-    `user: ${user.id} (${user.username})`,
-  );
-
-  if (!url) return;
-
-  await addNewAvatar(user.id, url);
-
-  if (queue.length == 0) {
-    clearInterval(interval);
-    interval = undefined;
-  }
 }

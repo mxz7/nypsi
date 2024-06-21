@@ -1,7 +1,8 @@
+import { DeleteObjectCommand, DeleteObjectsCommand } from "@aws-sdk/client-s3";
 import { GuildMember } from "discord.js";
-import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
+import s3 from "../../../init/s3";
 import Constants from "../../Constants";
 import { hasProfile } from "./utils";
 import ms = require("ms");
@@ -30,12 +31,12 @@ export async function isTracking(member: GuildMember | string): Promise<boolean>
   });
 
   if (query.tracking) {
-    await redis.set(`${Constants.redis.cache.user.TRACKING}:${id}`, "t");
-    await redis.expire(`${Constants.redis.cache.user.TRACKING}:${id}`, ms("12 hour") / 1000);
+    await redis.set(`${Constants.redis.cache.user.TRACKING}:${id}`, "t", "EX", 86400);
+
     return true;
   } else {
-    await redis.set(`${Constants.redis.cache.user.TRACKING}:${id}`, "f");
-    await redis.expire(`${Constants.redis.cache.user.TRACKING}:${id}`, ms("12 hour") / 1000);
+    await redis.set(`${Constants.redis.cache.user.TRACKING}:${id}`, "f", "EX", 86400);
+
     return false;
   }
 }
@@ -92,7 +93,6 @@ export async function addNewUsername(member: GuildMember | string, username: str
     data: {
       userId: id,
       value: username,
-      date: new Date(),
     },
   });
 }
@@ -111,15 +111,13 @@ export async function fetchUsernameHistory(member: GuildMember | string, limit =
     },
     select: {
       value: true,
-      date: true,
+      createdAt: true,
     },
     orderBy: {
-      date: "desc",
+      createdAt: "desc",
     },
     take: limit,
   });
-
-  inPlaceSort(query).desc((u) => u.date);
 
   return query;
 }
@@ -152,12 +150,11 @@ export async function addNewAvatar(member: GuildMember | string, url: string) {
       userId: id,
       type: "avatar",
       value: url,
-      date: new Date(),
     },
   });
 }
 
-export async function fetchAvatarHistory(member: GuildMember | string) {
+export async function fetchAvatarHistory(member: GuildMember | string, limit = 69) {
   let id: string;
   if (member instanceof GuildMember) {
     id = member.user.id;
@@ -171,31 +168,74 @@ export async function fetchAvatarHistory(member: GuildMember | string) {
     },
     select: {
       value: true,
-      date: true,
+      createdAt: true,
       id: true,
     },
     orderBy: {
-      date: "desc",
+      createdAt: "desc",
     },
+    take: limit,
   });
-
-  inPlaceSort(query).desc((u) => u.date);
 
   return query;
 }
 
 export async function deleteAvatar(id: number) {
   let res = true;
-  await prisma.username
+  const query = await prisma.username
     .delete({
       where: {
         id: id,
+      },
+      select: {
+        value: true,
       },
     })
     .catch(() => {
       res = false;
     });
+
+  if (query && query.value.startsWith("https://cdn.nypsi.xyz")) {
+    const key = query.value.substring(22);
+
+    s3.send(new DeleteObjectCommand({ Bucket: process.env.S3_BUCKET, Key: key }));
+  }
+
   return res;
+}
+
+export async function deleteAllAvatars(userId: string) {
+  const avatars = await prisma.username.findMany({
+    where: {
+      AND: [{ type: "avatar" }, { userId }],
+    },
+    select: {
+      value: true,
+    },
+  });
+
+  const commands: { Key: string }[] = [];
+
+  for (const { value } of avatars) {
+    if (value.startsWith("https://cdn.nypsi.xyz")) {
+      const key = value.substring(22);
+      commands.push({ Key: key });
+    }
+  }
+
+  if (commands.length > 0)
+    await s3.send(
+      new DeleteObjectsCommand({
+        Bucket: process.env.S3_BUCKET,
+        Delete: { Objects: commands },
+      }),
+    );
+
+  await prisma.username.deleteMany({
+    where: {
+      AND: [{ type: "avatar" }, { userId }],
+    },
+  });
 }
 
 export async function clearAvatarHistory(member: GuildMember | string) {

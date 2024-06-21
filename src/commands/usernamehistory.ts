@@ -75,7 +75,10 @@ async function run(
   }
 
   if (!isUserTracking) {
-    history.push({ value: "[tracking disabled]", date: new Date() });
+    history.push({
+      value: "[tracking disabled]",
+      createdAt: new Date(),
+    });
   }
 
   const pages = PageManager.createPages(history, 7);
@@ -87,7 +90,7 @@ async function run(
   let description = "";
 
   for (const item of pages.get(1)) {
-    description += `\`${item.value}\` | <t:${dayjs(item.date).unix()}:d>\n`;
+    description += `\`${item.value}\` | <t:${dayjs(item.createdAt).unix()}:d>\n`;
   }
 
   embed.setDescription(description);
@@ -146,7 +149,7 @@ async function run(
         let description = "";
 
         for (const item of pages.get(currentPage)) {
-          description += `\`${item.value}\` | <t:${dayjs(item.date).unix()}:d>\n`;
+          description += `\`${item.value}\` | <t:${dayjs(item.createdAt).unix()}:d>\n`;
         }
 
         newEmbed.setDescription(description);
@@ -191,7 +194,7 @@ async function run(
         let description = "";
 
         for (const item of pages.get(currentPage)) {
-          description += `\`${item.value}\` | <t:${dayjs(item.date).unix()}:d>\n`;
+          description += `\`${item.value}\` | <t:${dayjs(item.createdAt).unix()}:d>\n`;
         }
 
         newEmbed.setDescription(description);
