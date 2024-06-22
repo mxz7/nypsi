@@ -64,7 +64,12 @@ async function run(
   let history = await fetchAvatarHistory(message.member);
 
   if (history.length == 0) {
-    if ((await isTracking(message.author.id)) && !(await isEcoBanned(message.author.id))) {
+    if (
+      (await isTracking(message.author.id)) &&
+      !(await isEcoBanned(message.author.id)
+        .then((r) => r.banned)
+        .catch(() => false))
+    ) {
       const avatar = message.author.avatarURL({ size: 256, extension: "png" });
       const arrayBuffer = await fetch(avatar).then((r) => r.arrayBuffer());
       const ext = avatar.split(".").pop().split("?")[0];
