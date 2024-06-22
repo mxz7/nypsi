@@ -1,3 +1,4 @@
+import { PutObjectCommand } from "@aws-sdk/client-s3";
 import {
   ActionRowBuilder,
   ButtonBuilder,
@@ -7,18 +8,23 @@ import {
   Message,
   MessageActionRowComponentBuilder,
 } from "discord.js";
+import { nanoid } from "nanoid";
+import s3 from "../init/s3";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { formatDate } from "../utils/functions/date";
 import { getRawLevel } from "../utils/functions/economy/levelling";
+import { isEcoBanned } from "../utils/functions/economy/utils";
 import PageManager from "../utils/functions/page";
 import {
+  addNewAvatar,
   clearAvatarHistory,
   deleteAvatar,
   fetchAvatarHistory,
   isTracking,
 } from "../utils/functions/users/history";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import { logger } from "../utils/logger";
 
 const cmd = new Command("avatarhistory", "view a user's avatar history", "info").setAliases([
   "avh",
@@ -58,7 +64,26 @@ async function run(
   let history = await fetchAvatarHistory(message.member);
 
   if (history.length == 0) {
-    return message.channel.send({ embeds: [new ErrorEmbed("no avatar history")] });
+    if ((await isTracking(message.author.id)) && !(await isEcoBanned(message.author.id))) {
+      const avatar = message.author.avatarURL({ size: 256, extension: "png" });
+      const arrayBuffer = await fetch(avatar).then((r) => r.arrayBuffer());
+      const ext = avatar.split(".").pop().split("?")[0];
+      const key = `avatar/${message.author.id}/${nanoid()}.${ext}`;
+
+      await s3.send(
+        new PutObjectCommand({
+          Bucket: process.env.S3_BUCKET,
+          Key: key,
+          Body: Buffer.from(arrayBuffer),
+          ContentType: `image/${ext}`,
+        }),
+      );
+
+      await addNewAvatar(message.author.id, `https://cdn.nypsi.xyz/${key}`);
+      logger.debug(`uploaded new avatar for ${message.author.id}`);
+
+      history = await fetchAvatarHistory(message.member);
+    } else return message.channel.send({ embeds: [new ErrorEmbed("no avatar history")] });
   }
 
   let index = 0;
