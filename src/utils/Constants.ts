@@ -142,6 +142,8 @@ export default {
       RICKROLL: "nypsi:rickroll",
       COMMAND_WATCH: "nypsi:cmdwatch",
       PROFILE_TRANSFER: "nypsi:profiletransfer",
+      DAILY_ACTIVE: "nypsi:dailyactive",
+      MONTHLY_ACTIVE: "nypsi:monthlyactive",
     },
   },
   ADMIN_IDS: ["672793821850894347"] as string[],

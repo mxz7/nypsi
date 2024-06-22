@@ -1067,6 +1067,8 @@ export async function runCommand(
     addTaskProgress(message.author.id, "commands_daily"),
     commandGemCheck(message.member, command.category),
     redis.hincrby(Constants.redis.nypsi.TOP_COMMANDS_USER, message.author.id, 1),
+    redis.sadd(Constants.redis.nypsi.DAILY_ACTIVE, message.author.id),
+    redis.sadd(Constants.redis.nypsi.MONTHLY_ACTIVE, message.author.id),
   ]);
 
   setProgress(
