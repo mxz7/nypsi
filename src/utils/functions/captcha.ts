@@ -55,13 +55,7 @@ export async function passedCaptcha(member: GuildMember, check: Captcha) {
   });
 
   if (await redis.exists(`${Constants.redis.cache.user.captcha_pass}:${member.user.id}`)) {
-    const ttl = await redis.ttl(`${Constants.redis.cache.user.captcha_pass}:${member.user.id}`);
-    await redis.set(
-      `${Constants.redis.cache.user.captcha_pass}:${member.user.id}`,
-      parseInt(await redis.get(`${Constants.redis.cache.user.captcha_pass}:${member.user.id}`)) + 1,
-      "EX",
-      ttl,
-    );
+    await redis.incr(`${Constants.redis.cache.user.captcha_pass}:${member.user.id}`);
   } else {
     await redis.set(
       `${Constants.redis.cache.user.captcha_pass}:${member.user.id}`,
@@ -84,11 +78,20 @@ export async function passedCaptcha(member: GuildMember, check: Captcha) {
       "```",
   );
 
-  await redis.set(`${Constants.redis.nypsi.CAPTCHA_VERIFIED}:${member.user.id}`, member.user.id);
-  await redis.expire(
+  let ttl = Math.floor(ms("30 minutes") / 1000);
+
+  if (check.received > 1) ttl = Math.floor(ms("15 minutes") / 1000);
+  else if (check.received > 3) ttl = Math.floor(ms("10 minutes") / 1000);
+  else if (check.received > 5) ttl = Math.floor(ms("5 minutes") / 1000);
+  else if (check.received > 10) ttl = 1;
+
+  await redis.set(
     `${Constants.redis.nypsi.CAPTCHA_VERIFIED}:${member.user.id}`,
-    ms("30 minutes") / 1000,
+    member.user.id,
+    "EX",
+    ttl,
   );
+
   hook.destroy();
 }
 
