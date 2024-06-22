@@ -435,6 +435,8 @@ interface EconomyGuildMember {
 }
 
 async function checkUpgrade(guild: EconomyGuild | string): Promise<boolean> {
+  if (await redis.exists("nypsi:infinitemaxbet")) return false;
+
   if (typeof guild == "string") {
     guild = await getGuildByName(guild);
   }
