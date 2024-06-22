@@ -1069,6 +1069,7 @@ export async function runCommand(
     redis.hincrby(Constants.redis.nypsi.TOP_COMMANDS_USER, message.author.id, 1),
     redis.sadd(Constants.redis.nypsi.DAILY_ACTIVE, message.author.id),
     redis.sadd(Constants.redis.nypsi.MONTHLY_ACTIVE, message.author.id),
+    redis.incr(Constants.redis.nypsi.DAILY_COMMANDS),
   ]);
 
   setProgress(

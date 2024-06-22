@@ -37,5 +37,18 @@ export default {
         value: count,
       },
     });
+
+    const commandsCount = await redis
+      .get(Constants.redis.nypsi.DAILY_COMMANDS)
+      .then((r) => parseInt(r));
+
+    await redis.del(Constants.redis.nypsi.DAILY_COMMANDS);
+
+    await prisma.botMetrics.create({
+      data: {
+        category: "daily_commands",
+        value: commandsCount,
+      },
+    });
   },
 } satisfies Job;
