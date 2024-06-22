@@ -832,3 +832,11 @@ model Captcha {
 
   user User @relation(fields: [userId], references: [id])
 }
+
+model BotMetrics {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  category String
+  value    Int
+}

@@ -2,6 +2,7 @@ import * as Cluster from "discord-hybrid-sharding";
 import { ClusterManager } from "discord-hybrid-sharding";
 import "dotenv/config";
 import { clearInterval } from "timers";
+import prisma from "./init/database";
 import redis from "./init/redis";
 import { loadJobs, runJob } from "./scheduled/scheduler";
 import Constants from "./utils/Constants";
@@ -136,6 +137,19 @@ setInterval(async () => {
   const avg = (total / queries.length).toFixed(2);
 
   logger.info(`average query takes ${avg}ms (${total.toLocaleString()} queries in the last hour)`);
+
+  await prisma.botMetrics.createMany({
+    data: [
+      {
+        category: "hourly_query",
+        value: total,
+      },
+      {
+        category: "hourly_query_time",
+        value: Math.round(total / queries.length),
+      },
+    ],
+  });
 }, ms("1 hour"));
 
 export async function checkStatus() {
