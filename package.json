@@ -19,7 +19,6 @@
     "@top-gg/sdk": "3.1.6",
     "@zeyrbot/urbandictionary": "^1.0.3",
     "bufferutil": "4.0.8",
-    "captcha-canvas": "3.2.2",
     "chalk": "4.1.2",
     "cron": "^3.1.7",
     "crypto-js": "4.2.0",
