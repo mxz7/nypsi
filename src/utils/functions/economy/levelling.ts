@@ -86,14 +86,12 @@ levellingRewards.set(100, {
     "- 🚀 spacex (</workers view:1014905682341924945>)\n" +
     "- 📦 amazon (</workers view:1014905682341924945>)\n" +
     "- create your own guild\n" +
+    "- avatar history tracking (disabled with $toggletracking)\n" +
     "- +1% gamble multi",
 });
 levellingRewards.set(150, { text: "you have unlocked:\n" + "- +1% gamble multi" });
 levellingRewards.set(200, {
-  text:
-    "you have unlocked:\n" +
-    "- +1% gamble multi\n" +
-    "- avatar history tracking (disabled with $toggletracking)",
+  text: "you have unlocked:\n" + "- +1% gamble multi",
 });
 levellingRewards.set(250, {
   text: "you have unlocked:\n" + "- +1% gamble multi",
