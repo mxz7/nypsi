@@ -163,8 +163,10 @@ export default class PageManager<T> {
 
     if (manager.currentPage == 1) {
       manager.row.components[0].setDisabled(true);
+      manager.row.components[1].setDisabled(false);
     } else if (manager.currentPage == manager.lastPage) {
       manager.row.components[1].setDisabled(true);
+      manager.row.components[0].setDisabled(false);
     } else {
       manager.row.components[1].setDisabled(false);
       manager.row.components[0].setDisabled(false);
@@ -183,7 +185,7 @@ export default class PageManager<T> {
 
     manager.currentPage--;
 
-    manager.render(manager, interaction);
+    return manager.render(manager, interaction);
   }
 
   private async next(manager: PageManager<T>, interaction: ButtonInteraction): Promise<void> {
