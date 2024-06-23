@@ -25,7 +25,7 @@ import { giveCaptcha } from "../utils/functions/captcha";
 import { updateBalance, updateBankBalance } from "../utils/functions/economy/balance";
 import { setInventoryItem } from "../utils/functions/economy/inventory";
 import { setLevel, setPrestige } from "../utils/functions/economy/levelling";
-import { getItems, isEcoBanned, setEcoBan } from "../utils/functions/economy/utils";
+import { getEcoBanTime, getItems, isEcoBanned, setEcoBan } from "../utils/functions/economy/utils";
 import { updateXp } from "../utils/functions/economy/xp";
 import { addKarma, getKarma, removeKarma } from "../utils/functions/karma/karma";
 import PageManager from "../utils/functions/page";
@@ -300,7 +300,7 @@ async function run(
       rows[3].components[1].setDisabled(true);
       desc += "\n**currently blacklisted**";
     } else if ((await isEcoBanned(user.id)).banned) {
-      desc += "\n**currently economy banned**";
+      desc += `\n**currently economy banned** - unbanned <t:${Math.floor((await getEcoBanTime(user.id)).getTime() / 1000)}:R>`;
     }
 
     const embed = new CustomEmbed(message.member, desc).setHeader(
