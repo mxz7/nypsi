@@ -134,9 +134,11 @@ async function run(
 
   addProgress(message.author.id, "unsure", 1);
 
-  if (size < 5) addTaskProgress(message.author.id, "pp_small");
-  else if (size > 6) addTaskProgress(message.author.id, "pp_big");
-  else addTaskProgress(message.author.id, "pp");
+  if (size < 5 && member.user.id === message.author.id)
+    addTaskProgress(message.author.id, "pp_small");
+  else if (size > 6 && member.user.id === message.author.id)
+    addTaskProgress(message.author.id, "pp_big");
+  else if (member.user.id === message.author.id) addTaskProgress(message.author.id, "pp");
 }
 
 cmd.setRun(run);
