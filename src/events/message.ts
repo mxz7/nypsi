@@ -8,8 +8,12 @@ import {
   Interaction,
   Message,
   MessageActionRowComponentBuilder,
+  ModalActionRowComponentBuilder,
+  ModalBuilder,
   PermissionsBitField,
   TextChannel,
+  TextInputBuilder,
+  TextInputStyle,
   ThreadMember,
   ThreadMemberManager,
 } from "discord.js";
@@ -100,6 +104,21 @@ export default async function messageCreate(message: Message) {
         components: [row],
       });
 
+      const modal = new ModalBuilder()
+        .setCustomId("support_ticket")
+        .setTitle("nypsi support request")
+        .addComponents(
+          new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(
+            new TextInputBuilder()
+              .setCustomId("ticket_message")
+              .setLabel("message")
+              .setPlaceholder("what do you need help with?")
+              .setStyle(TextInputStyle.Paragraph)
+              .setRequired(true)
+              .setMinLength(15),
+          ),
+        );
+
       const filter = (i: Interaction) => i.user.id == message.author.id;
 
       const res = await msg.awaitMessageComponent({ filter, time: 30000 }).catch(() => {});
@@ -110,7 +129,17 @@ export default async function messageCreate(message: Message) {
       }
 
       if (res.customId == "s") {
-        await res.deferUpdate();
+        await res.showModal(modal);
+
+        const modalSubmit = await res.awaitModalSubmit({ filter, time: 300000 }).catch(() => {});
+
+        if (!modalSubmit) return;
+        if (!modalSubmit.isModalSubmit()) return;
+
+        await modalSubmit.deferReply();
+
+        const helpMessage = modalSubmit.fields.fields.first().value;
+
         const a = await getSupportRequest(message.author.id);
 
         if (a) return;
@@ -122,11 +151,27 @@ export default async function messageCreate(message: Message) {
         );
 
         if (!r) {
-          return res.followUp({
+          return modalSubmit.editReply({
             embeds: [new CustomEmbed().setDescription("failed to create support request")],
           });
         } else {
-          return res.followUp({
+          const embed = new CustomEmbed()
+            .setHeader(message.author.username, message.author.avatarURL())
+            .setColor(Constants.TRANSPARENT_EMBED_COLOR);
+
+          if (message.attachments.first()) {
+            if (message.attachments.first().contentType.startsWith("image/")) {
+              embed.setImage(message.attachments.first().url);
+            } else {
+              message.content += `\n\n${message.attachments.first().url}`;
+            }
+          }
+
+          embed.setDescription(helpMessage);
+
+          await sendToRequestChannel(message.author.id, embed, message.client as NypsiClient);
+
+          return modalSubmit.editReply({
             embeds: [
               new CustomEmbed().setDescription(
                 "✅ created support request, you can now talk directly to nypsi staff",
