@@ -105,7 +105,8 @@ export default async function messageCreate(message: Message) {
       const res = await msg.awaitMessageComponent({ filter, time: 30000 }).catch(() => {});
 
       if (!res) {
-        return await msg.edit({ components: [] });
+        row.components[0].setDisabled(true);
+        return await msg.edit({ components: [row] });
       }
 
       if (res.customId == "s") {
