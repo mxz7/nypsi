@@ -303,7 +303,10 @@ async function run(
   const showLeaderboard = async () => {
     await addCooldown(cmd.name, message.member, 10);
 
-    const embed = new CustomEmbed(message.member).setHeader("chat reactions leaderboard");
+    const embed = new CustomEmbed(message.member).setHeader(
+      "chat reactions leaderboard",
+      message.guild.iconURL(),
+    );
 
     let amount = 3;
 
@@ -315,25 +318,87 @@ async function run(
       }
     }
 
-    const leaderboards = await getServerLeaderboard(message.guild, amount);
+    const leaderboards = await getServerLeaderboard(message.guild);
+
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>();
+
+    if (leaderboards.get("overall")) {
+      row.addComponents(
+        new ButtonBuilder()
+          .setCustomId("overall")
+          .setLabel("overall")
+          .setEmoji("🏆")
+          .setStyle(ButtonStyle.Secondary),
+      );
+    }
 
     if (leaderboards.get("wins")) {
-      embed.addField("first place", leaderboards.get("wins"), true);
+      row.addComponents(
+        new ButtonBuilder()
+          .setCustomId("wins")
+          .setLabel("first")
+          .setEmoji("🥇")
+          .setStyle(ButtonStyle.Secondary),
+      );
     }
 
     if (leaderboards.get("second")) {
-      embed.addField("second place", leaderboards.get("second"), true);
+      row.addComponents(
+        new ButtonBuilder()
+          .setCustomId("second")
+          .setLabel("second")
+          .setEmoji("🥈")
+          .setStyle(ButtonStyle.Secondary),
+      );
     }
 
     if (leaderboards.get("third")) {
-      embed.addField("third place", leaderboards.get("third"), true);
+      row.addComponents(
+        new ButtonBuilder()
+          .setCustomId("third")
+          .setLabel("third")
+          .setEmoji("🥉")
+          .setStyle(ButtonStyle.Secondary),
+      );
     }
 
-    if (leaderboards.get("overall")) {
-      embed.addField("overall", leaderboards.get("overall"));
-    }
+    if (leaderboards.size === 0 || row.components?.length === 0)
+      return send({ embeds: [new ErrorEmbed("no data")] });
 
-    return send({ embeds: [embed] });
+    row.components[0].setDisabled(true);
+    // @ts-ignore stupid discordjs types
+    embed.setDescription(leaderboards.get((row.components[0] as ButtonBuilder).data.custom_id));
+
+    const msg = await send({ embeds: [embed], components: [row] });
+
+    const listen: any = async () => {
+      const interaction = await msg
+        .awaitMessageComponent({
+          filter: (i) => i.user.id === message.author.id,
+          time: 60000,
+        })
+        .catch(() => {
+          row.components.forEach((e) => e.setDisabled(true));
+          msg.edit({ components: [row] });
+        });
+
+      if (!interaction) return;
+
+      embed.setDescription(
+        leaderboards.get(
+          // @ts-ignore stupid discordjs types
+          row.components.find((i) => i.data.custom_id === interaction.customId).data.custom_id,
+        ),
+      );
+      row.components.forEach((i) => i.setDisabled(false));
+      // @ts-ignore stupid discordjs types
+      row.components.find((i) => i.data.custom_id === interaction.customId).setDisabled(true);
+
+      interaction.update({ embeds: [embed], components: [row] });
+      return listen();
+    };
+
+    listen();
   };
 
   if (args.length == 0) {

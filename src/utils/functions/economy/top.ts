@@ -1768,7 +1768,7 @@ export async function topChatReactionGlobal(userId: string, daily: boolean, amou
   return { pages, pos };
 }
 
-async function formatUsername(id: string, username: string, privacy: boolean) {
+export async function formatUsername(id: string, username: string, privacy: boolean) {
   if (!privacy) return "[**[hidden]**](https://docs.nypsi.xyz/economy/hidden)";
 
   let out = `[${username}](https://nypsi.xyz/user/${encodeURIComponent(id)})`;

@@ -2,6 +2,7 @@ import { Collection, Guild, GuildMember } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
 import { logger } from "../../logger";
+import { formatUsername } from "../economy/top";
 import { getBlacklisted } from "./blacklisted";
 
 export async function getReactionStats(guild: Guild, member: GuildMember) {
@@ -91,10 +92,7 @@ export async function add3rdPlace(guild: Guild, member: GuildMember) {
   });
 }
 
-export async function getServerLeaderboard(
-  guild: Guild,
-  amount: number,
-): Promise<Map<string, string>> {
+export async function getServerLeaderboard(guild: Guild): Promise<Map<string, string>> {
   let members: Collection<string, GuildMember>;
 
   if (guild.memberCount == guild.members.cache.size) {
@@ -173,10 +171,10 @@ export async function getServerLeaderboard(
   inPlaceSort(usersThird).desc((i) => thirdStats.get(i));
   inPlaceSort(overallWins).desc((i) => overallStats.get(i));
 
-  usersWins.splice(amount, usersWins.length - amount);
-  usersSecond.splice(amount, usersSecond.length - amount);
-  usersThird.splice(amount, usersThird.length - amount);
-  overallWins.splice(amount, overallWins.length - amount);
+  usersWins.splice(10, usersWins.length - 10);
+  usersSecond.splice(10, usersSecond.length - 10);
+  usersThird.splice(10, usersThird.length - 10);
+  overallWins.splice(10, overallWins.length - 10);
 
   let winsMsg = "";
   let secondMsg = "";
@@ -196,7 +194,7 @@ export async function getServerLeaderboard(
       pos = "🥉";
     }
 
-    winsMsg += `${pos} **${getMember(user).user.username}** ${winsStats
+    winsMsg += `${pos} ${await formatUsername(user, members.get(user).user.username, true)} ${winsStats
       .get(user)
       .toLocaleString()}\n`;
     count++;
@@ -215,7 +213,7 @@ export async function getServerLeaderboard(
       pos = "🥉";
     }
 
-    secondMsg += `${pos} **${getMember(user).user.username}** ${secondStats
+    secondMsg += `${pos} ${await formatUsername(user, members.get(user).user.username, true)} ${secondStats
       .get(user)
       .toLocaleString()}\n`;
     count++;
@@ -234,7 +232,7 @@ export async function getServerLeaderboard(
       pos = "🥉";
     }
 
-    thirdMsg += `${pos} **${getMember(user).user.username}** ${thirdStats
+    thirdMsg += `${pos} ${await formatUsername(user, members.get(user).user.username, true)} ${thirdStats
       .get(user)
       .toLocaleString()}\n`;
     count++;
@@ -253,7 +251,7 @@ export async function getServerLeaderboard(
       pos = "🥉";
     }
 
-    overallMsg += `${pos} **${getMember(user).user.username}** ${overallStats
+    overallMsg += `${pos} ${await formatUsername(user, members.get(user).user.username, true)} ${overallStats
       .get(user)
       .toLocaleString()}\n`;
     count++;
