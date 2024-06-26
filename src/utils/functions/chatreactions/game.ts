@@ -13,7 +13,7 @@ import { addToNypsiBank, getTax } from "../tax";
 import { getBlacklisted } from "./blacklisted";
 import { add2ndPlace, add3rdPlace, addLeaderboardEntry, addWin } from "./stats";
 import { getReactionSettings } from "./utils";
-import { getWords } from "./words";
+import { getWordListType, getWords } from "./words";
 
 async function generateWord(guild: Guild) {
   const words = await getWords(guild);
@@ -36,6 +36,7 @@ async function generateWord(guild: Guild) {
 
 export async function startOpenChatReaction(guild: Guild, channel: TextChannel, forced: boolean) {
   const word = await generateWord(guild);
+  const wordListType = await getWordListType(guild);
 
   const embed = new CustomEmbed().setColor(Constants.EMBED_SUCCESS_COLOR);
 
@@ -136,7 +137,7 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel, 
         break;
     }
 
-    if (!forced) addLeaderboardEntry(message.author.id, time);
+    if (!forced && wordListType !== "custom") addLeaderboardEntry(message.author.id, time);
 
     return;
   });
