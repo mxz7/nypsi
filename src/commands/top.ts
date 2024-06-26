@@ -17,6 +17,8 @@ import { getGuildByUser } from "../utils/functions/economy/guilds";
 import { selectItem } from "../utils/functions/economy/inventory";
 import {
   topBalance,
+  topChatReaction,
+  topChatReactionGlobal,
   topCommand,
   topCommandGlobal,
   topCommandUses,
@@ -167,6 +169,30 @@ cmd.slashData
           .setChoices(...scopeChoices)
           .setRequired(false),
       ),
+  )
+  .addSubcommand((cmd) =>
+    cmd
+      .setName("cr-daily")
+      .setDescription("view fastest daily chat reaction wins")
+      .addStringOption((option) =>
+        option
+          .setName("scope")
+          .setDescription("show global/server")
+          .setChoices(...scopeChoices)
+          .setRequired(false),
+      ),
+  )
+  .addSubcommand((cmd) =>
+    cmd
+      .setName("cr-global")
+      .setDescription("view fastest global chat reaction wins")
+      .addStringOption((option) =>
+        option
+          .setName("scope")
+          .setDescription("show global/server")
+          .setChoices(...scopeChoices)
+          .setRequired(false),
+      ),
   );
 
 async function run(
@@ -211,7 +237,13 @@ async function run(
 
   await addCooldown(cmd.name, message.member, 5);
 
-  const show = async (pages: Map<number, string[]>, pos: number, title: string, url?: string) => {
+  const show = async (
+    pages: Map<number, string[]>,
+    pos: number,
+    title: string,
+    url?: string,
+    footer?: string,
+  ) => {
     const embed = new CustomEmbed(message.member).setHeader(
       title,
       title.includes("global") || title.includes("guild")
@@ -227,7 +259,9 @@ async function run(
     }
 
     if (pos != 0) {
-      embed.setFooter({ text: `you are #${pos}` });
+      embed.setFooter({ text: `you are #${pos}${footer ? "| " + footer : ""}` });
+    } else if (footer) {
+      embed.setFooter({ text: footer });
     }
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -440,7 +474,50 @@ async function run(
       data.pages,
       data.pos,
       `top votes ${global ? "[global]" : `for ${message.guild.name}`}`,
-      global ? "https://nypsi.xyz/leaderboard?lb=vote" : null,
+    );
+  } else if (["cr", "crglobal", "cr-global", "chatreaction"].includes(args[0].toLowerCase())) {
+    let global = false;
+
+    if (args[1].toLowerCase() == "daily") {
+      args.splice(1, 1);
+      args[0] = "crdaily";
+      await redis.del(`cd:top:${message.author.id}`);
+      return run(message, args);
+    }
+    if (args[1]?.toLowerCase() == "global") global = true;
+
+    let data: { pages: Map<number, string[]>; pos: number };
+
+    if (global) {
+      data = await topChatReactionGlobal(message.author.id, false);
+    } else {
+      data = await topChatReaction(message.guild, false, message.author.id);
+    }
+
+    return show(
+      data.pages,
+      data.pos,
+      `top chat reaction ${global ? "[global]" : `for ${message.guild.name}`}`,
+    );
+  } else if (
+    ["crdaily", "cr_daily", "cr-daily", "chatreactiondaily"].includes(args[0].toLowerCase())
+  ) {
+    let global = false;
+
+    if (args[1]?.toLowerCase() == "global") global = true;
+
+    let data: { pages: Map<number, string[]>; pos: number };
+
+    if (global) {
+      data = await topChatReactionGlobal(message.author.id, true);
+    } else {
+      data = await topChatReaction(message.guild, true, message.author.id);
+    }
+
+    return show(
+      data.pages,
+      data.pos,
+      `top daily chat reaction ${global ? "[global]" : `for ${message.guild.name}`}`,
     );
   } else if (args[0].toLowerCase() === "cmd" || args[0].toLowerCase() === "command") {
     let data: { pages: Map<number, string[]>; pos: number };
