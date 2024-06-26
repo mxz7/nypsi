@@ -988,6 +988,18 @@
     "role": "collectable",
     "in_crates": true
   },
+  "galvanised_square_steel": {
+    "id": "galvanised_square_steel",
+    "name": "galvanised square steel",
+    "article": "a",
+    "plural": "galvanised square steel",
+    "aliases": ["galvanised", "steel"],
+    "emoji": "<:nypsi_galvanised_square_steel:1255597224361070783>",
+    "longDesc": "eco friendly wood veneer and screws from your aunt",
+    "rarity": 1,
+    "role": "collectable",
+    "in_crates": true
+  },
   "bitch": {
     "id": "bitch",
     "name": "bitch",
