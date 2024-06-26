@@ -70,7 +70,10 @@ export async function getWords(guild: Guild, type?: ChatReactionWordList) {
     }
 
     const words = await readFile("data/chatreaction/english_1k.txt").then((r) =>
-      r.toString().split("\n"),
+      r
+        .toString()
+        .split("\n")
+        .filter((word) => word.length > 2),
     );
 
     english1k = words;
@@ -82,7 +85,10 @@ export async function getWords(guild: Guild, type?: ChatReactionWordList) {
     }
 
     const words = await readFile("data/chatreaction/english_5k.txt").then((r) =>
-      r.toString().split("\n"),
+      r
+        .toString()
+        .split("\n")
+        .filter((word) => word.length > 2),
     );
 
     english5k = words;
@@ -94,7 +100,10 @@ export async function getWords(guild: Guild, type?: ChatReactionWordList) {
     }
 
     const words = await readFile("data/chatreaction/english_10k.txt").then((r) =>
-      r.toString().split("\n"),
+      r
+        .toString()
+        .split("\n")
+        .filter((word) => word.length > 2),
     );
 
     english10k = words;
