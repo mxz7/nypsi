@@ -49,6 +49,8 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 const cmd = new Command("top", "view top etc. in the server", "money").setAliases([
   "baltop",
   "gangsters",
+  "leaderboard",
+  "lb",
 ]);
 
 const scopeChoices: APIApplicationCommandOptionChoice<string>[] = [
