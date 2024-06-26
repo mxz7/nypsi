@@ -43,10 +43,6 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel, 
   embed.setHeader("chat reaction");
   embed.setDescription(`type: \`${word.display}\``);
 
-  let msg = await channel.send({ embeds: [embed] });
-
-  const start = performance.now();
-
   const winnersIDs: string[] = [];
 
   const blacklisted = await getBlacklisted(guild);
@@ -62,6 +58,10 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel, 
   };
 
   const timeout = (await getReactionSettings(guild)).timeout;
+
+  const start = performance.now();
+
+  let msg = await channel.send({ embeds: [embed] });
 
   const collector = channel.createMessageCollector({
     filter,
