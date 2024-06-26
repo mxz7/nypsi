@@ -1747,7 +1747,7 @@ export async function topChatReactionGlobal(userId: string, daily: boolean, amou
       user.userId,
       user.user.lastKnownUsername,
       (await getPreferences(user.userId)).leaderboards,
-    )} \`${user.time.toFixed(3)}s\` <t:${Math.floor(user.createdAt.getTime() / 1000)}>`;
+    )} \`${user.time.toFixed(3)}s\` <t:${Math.floor(user.createdAt.getTime() / 1000)}:${daily ? "R" : "D"}>`;
 
     count++;
   }
