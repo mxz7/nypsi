@@ -25,23 +25,24 @@ model User {
   booster           Boolean  @default(false)
   totalSpend        Float    @default(0)
 
-  Economy            Economy?
-  Premium            Premium?
-  Username           Username[]
-  WordleStats        WordleStats?
-  CommandUse         CommandUse[]
-  Achievements       Achievements[]
-  DMSettings         DMSettings?
-  Preferences        Preferences?
-  Leaderboards       Leaderboards[]
-  ActiveChannels     ActiveChannels[]
-  KofiPurchases      KofiPurchases[]
-  Tags               Tags[]
-  Views              ProfileView[]
-  Viewed             ProfileView[]        @relation(name: "viewer")
-  Sessions           Session[]
-  Captchas           Captcha[]
-  ModerationEvidence ModerationEvidence[]
+  Economy                  Economy?
+  Premium                  Premium?
+  Username                 Username[]
+  WordleStats              WordleStats?
+  CommandUse               CommandUse[]
+  Achievements             Achievements[]
+  DMSettings               DMSettings?
+  Preferences              Preferences?
+  Leaderboards             Leaderboards[]
+  ActiveChannels           ActiveChannels[]
+  KofiPurchases            KofiPurchases[]
+  Tags                     Tags[]
+  Views                    ProfileView[]
+  Viewed                   ProfileView[]              @relation(name: "viewer")
+  Sessions                 Session[]
+  Captchas                 Captcha[]
+  ModerationEvidence       ModerationEvidence[]
+  ChatReactionLeaderboards ChatReactionLeaderboards[]
 }
 
 model ProfileView {
@@ -86,6 +87,17 @@ model Leaderboards {
 
   @@unique([leaderboard, position])
   @@unique([userId, leaderboard])
+}
+
+model ChatReactionLeaderboards {
+  userId    String
+  daily     Boolean
+  time      Float
+  createdAt DateTime @default(now()) @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@id([daily, userId])
 }
 
 model DMSettings {
