@@ -1655,7 +1655,7 @@ export async function topChatReaction(guild: Guild, daily: boolean, userId?: str
       time: true,
       createdAt: true,
     },
-    orderBy: [{ time: "desc" }, { user: { lastKnownUsername: "asc" } }],
+    orderBy: [{ time: "asc" }, { user: { lastKnownUsername: "asc" } }],
     take: 100,
   });
 
@@ -1722,7 +1722,7 @@ export async function topChatReactionGlobal(userId: string, daily: boolean, amou
         },
       },
     },
-    orderBy: [{ time: "desc" }, { user: { lastKnownUsername: "asc" } }],
+    orderBy: [{ time: "asc" }, { user: { lastKnownUsername: "asc" } }],
     take: 100,
   });
 
