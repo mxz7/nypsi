@@ -410,7 +410,7 @@ async function run(
           await sleep(1500);
 
           await countdownMsg.delete().catch(() => {});
-          await startOpenChatReaction(message.guild, message.channel as TextChannel);
+          await startOpenChatReaction(message.guild, message.channel as TextChannel, true);
         } else {
           msg = await msg.edit({ embeds: [embed] });
         }
@@ -442,7 +442,7 @@ async function run(
       return;
     }
 
-    startOpenChatReaction(message.guild, message.channel);
+    startOpenChatReaction(message.guild, message.channel, true);
 
     if (!(message instanceof Message)) {
       return send({

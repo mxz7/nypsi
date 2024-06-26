@@ -76,7 +76,7 @@ export function doChatReactions(client: NypsiClient) {
         }
 
         logger.debug(`chat reaction randomly started in ${channel.id}`);
-        startOpenChatReaction(guild, channel as TextChannel).catch(() => {});
+        startOpenChatReaction(guild, channel as TextChannel, false).catch(() => {});
         count++;
 
         const base = guildData.betweenEvents;

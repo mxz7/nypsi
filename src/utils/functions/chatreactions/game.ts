@@ -11,7 +11,7 @@ import sleep from "../sleep";
 import { getZeroWidth } from "../string";
 import { addToNypsiBank, getTax } from "../tax";
 import { getBlacklisted } from "./blacklisted";
-import { add2ndPlace, add3rdPlace, addWin } from "./stats";
+import { add2ndPlace, add3rdPlace, addLeaderboardEntry, addWin } from "./stats";
 import { getReactionSettings } from "./utils";
 import { getWords } from "./words";
 
@@ -34,7 +34,7 @@ async function generateWord(guild: Guild) {
   return { actual: chosenWord, display: displayWord };
 }
 
-export async function startOpenChatReaction(guild: Guild, channel: TextChannel) {
+export async function startOpenChatReaction(guild: Guild, channel: TextChannel, forced: boolean) {
   const word = await generateWord(guild);
 
   const embed = new CustomEmbed().setColor(Constants.EMBED_SUCCESS_COLOR);
@@ -115,9 +115,9 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel) 
   }, 750);
 
   collector.on("collect", async (message): Promise<void> => {
-    const time = ((performance.now() - start) / 1000).toFixed(2);
+    const time = (performance.now() - start) / 1000;
 
-    winnersList.push({ user: message.author.toString(), time: time });
+    winnersList.push({ user: message.author.toString(), time: time.toFixed(2) });
 
     winnersIDs.push(message.author.id);
 
@@ -135,6 +135,8 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel) 
         message.react("🥉");
         break;
     }
+
+    if (!forced) addLeaderboardEntry(message.author.id, time);
 
     return;
   });

@@ -273,3 +273,74 @@ export async function deleteStats(guild: Guild) {
     },
   });
 }
+
+export async function addLeaderboardEntry(userId: string, time: number) {
+  async function daily() {
+    const query = await prisma.chatReactionLeaderboards.findUnique({
+      where: {
+        daily_userId: {
+          daily: true,
+          userId,
+        },
+      },
+      select: {
+        time: true,
+      },
+    });
+
+    if (!query || query.time > time) {
+      await prisma.chatReactionLeaderboards.upsert({
+        create: {
+          daily: true,
+          time,
+          userId,
+        },
+        where: {
+          daily_userId: {
+            daily: true,
+            userId,
+          },
+        },
+        update: {
+          time,
+        },
+      });
+    }
+  }
+
+  async function global() {
+    const query = await prisma.chatReactionLeaderboards.findUnique({
+      where: {
+        daily_userId: {
+          daily: false,
+          userId,
+        },
+      },
+      select: {
+        time: true,
+      },
+    });
+
+    if (!query || query.time > time) {
+      await prisma.chatReactionLeaderboards.upsert({
+        create: {
+          daily: false,
+          time,
+          userId,
+        },
+        where: {
+          daily_userId: {
+            daily: false,
+            userId,
+          },
+        },
+        update: {
+          time,
+        },
+      });
+    }
+  }
+
+  daily();
+  global();
+}
