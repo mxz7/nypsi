@@ -84,7 +84,7 @@ if (!isMainThread) {
 
     if (buffer) {
       const path = `/tmp/nypsi_logsearch_results_formatted_${Date.now()}.txt`;
-      await fs.writeFile(path, buffer);
+      await fs.writeFile(path, values.join("\n"));
 
       parentPort.postMessage(path);
     }
