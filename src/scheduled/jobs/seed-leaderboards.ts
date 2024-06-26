@@ -3,6 +3,7 @@ import { MStoTime } from "../../utils/functions/date";
 import { calcItemValue } from "../../utils/functions/economy/inventory";
 import {
   topBalanceGlobal,
+  topChatReactionGlobal,
   topDailyStreakGlobal,
   topItemGlobal,
   topNetWorthGlobal,
@@ -32,6 +33,10 @@ export default {
     await topWordleGlobal("");
     await sleep(1000);
     await topVoteGlobal("", 100);
+    await sleep(1000);
+    await topChatReactionGlobal("", false, 100);
+    await sleep(1000);
+    await topChatReactionGlobal("", true, 100);
 
     for (const item of itemIds) {
       await sleep(1000);
