@@ -480,7 +480,7 @@ async function run(
   } else if (["cr", "crglobal", "cr-global", "chatreaction"].includes(args[0].toLowerCase())) {
     let global = false;
 
-    if (args[1].toLowerCase() == "daily") {
+    if (args[1]?.toLowerCase() == "daily") {
       args.splice(1, 1);
       args[0] = "crdaily";
       await redis.del(`cd:top:${message.author.id}`);
