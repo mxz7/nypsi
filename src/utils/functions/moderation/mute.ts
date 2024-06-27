@@ -252,6 +252,19 @@ export async function getAutoMuteTimeout(guild: Guild) {
   return query.autoMuteExpire;
 }
 
+export async function setAutoMuteTimeout(guild: Guild, seconds: number) {
+  await prisma.guild.update({
+    where: {
+      id: guild.id,
+    },
+    data: {
+      autoMuteExpire: seconds,
+    },
+  });
+
+  autoMuteTimeoutCache.delete(guild.id);
+}
+
 export async function getMuteViolations(guild: Guild, member: GuildMember) {
   const res = await redis.get(
     `${Constants.redis.cache.guild.AUTOMUTE_VL}:${guild.id}:${member.user.id}`,
