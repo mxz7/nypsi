@@ -4,7 +4,7 @@ import redis from "../../../init/redis";
 import Constants from "../../Constants";
 import { isBooster } from "../premium/boosters";
 import { getTier } from "../premium/premium";
-import { getRequiredBetForXp } from "./balance";
+import { calcMaxBet, getRequiredBetForXp } from "./balance";
 import { getBoosters } from "./boosters";
 import { gemBreak, getInventory } from "./inventory";
 import { checkLevelUp, getRawLevel, getUpgrades } from "./levelling";
@@ -73,48 +73,46 @@ export async function calcEarnedGambleXp(
   }
 
   let min = 1;
-  let max = 5;
 
-  const [inventory, tier, booster, boosters, upgrades, rawLevel] = await Promise.all([
+  const [inventory, tier, booster, boosters, upgrades, rawLevel, maxBet] = await Promise.all([
     getInventory(member),
     getTier(member),
     isBooster(member.user.id),
     getBoosters(member),
     getUpgrades(member),
     getRawLevel(member),
+    calcMaxBet(member),
   ]);
 
-  max += rawLevel / 15 > 75 ? 75 : rawLevel / 15;
+  min += rawLevel / 25 > 40 ? 40 : rawLevel / 25;
 
-  if (booster) max += 7;
-  if (tier) max += tier * 2.7;
-
-  let betDivisor = 6000 * (rawLevel / 15) + 10_000;
-
-  if (betDivisor > 100_000) betDivisor = 100_000;
-  if (betDivisor < 20_000) betDivisor = 20_000;
-
-  max += bet / betDivisor;
-  max += multiplier * 2.5;
+  if (booster) min += 5;
+  if (tier) min += tier * 2.7;
 
   if (inventory.find((i) => i.item === "crystal_heart")?.amount > 0)
-    max += Math.floor(Math.random() * 10);
+    min += Math.floor(Math.random() * 10);
   if (inventory.find((i) => i.item == "white_gem")?.amount > 0) {
     const chance = Math.floor(Math.random() * 10);
 
     if (chance < 2) {
-      max -= Math.floor(Math.random() * 7) + 1;
+      min -= Math.floor(Math.random() * 7);
     } else {
       gemBreak(member.user.id, 0.007, "white_gem");
-      max += Math.floor(Math.random() * 17) + 1;
+      min += Math.floor(Math.random() * 17) + 1;
     }
   }
 
-  if (min < max * 0.3) min = max * 0.3;
+  let percentageOfMaxBet = bet / maxBet;
+  if (percentageOfMaxBet < 0.25) percentageOfMaxBet = 0.25;
+  min = min * percentageOfMaxBet;
+
+  min = min * (multiplier * 0.7);
+
+  const max = min * 1.3;
 
   let earned = Math.floor(Math.random() * (max - min)) + min;
 
-  if (min > max) earned = max;
+  if (min > earned) earned = min;
 
   let boosterEffect = 0;
 
