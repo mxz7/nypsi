@@ -445,16 +445,22 @@ async function run(
 
       const collector = msg.createMessageComponentCollector({ filter, time: 45_000, max: 4 });
 
-      const i = setInterval(async () => {
+      collector.on("collect", async (interaction) => {
+        if (voted.includes(interaction.user.id)) {
+          await interaction.reply({
+            embeds: [new ErrorEmbed("you have already voted start")],
+            ephemeral: true,
+          });
+          return;
+        }
+        voted.push(interaction.user.id);
+
         embed.setDescription(
           `click the button below to vote start a chat reaction\n\n${voted.length}/4`,
         );
 
-        if (embed.data.description == msg.embeds[0].description) return;
-
         if (voted.length >= 4) {
-          clearInterval(i);
-          await msg.edit({ embeds: [embed], components: [] });
+          await interaction.update({ embeds: [embed], components: [] });
 
           const countdownMsg = await message.channel.send({
             embeds: [new CustomEmbed(message.member, "chat reaction starting in 3 seconds...")],
@@ -477,25 +483,12 @@ async function run(
           await countdownMsg.delete().catch(() => {});
           await startOpenChatReaction(message.guild, message.channel as TextChannel, true);
         } else {
-          msg = await msg.edit({ embeds: [embed] });
+          await interaction.update({ embeds: [embed] });
         }
-      }, 500);
-
-      collector.on("collect", async (interaction) => {
-        if (voted.includes(interaction.user.id)) {
-          await interaction.reply({
-            embeds: [new ErrorEmbed("you have already voted start")],
-            ephemeral: true,
-          });
-          return;
-        }
-        voted.push(interaction.user.id);
-        await interaction.deferUpdate();
       });
 
       collector.on("end", () => {
         if (voted.length < 4) {
-          clearInterval(i);
           embed.setDescription(
             `chat reaction not started\n\nonly received ${voted.length}/4 votes ):`,
           );
