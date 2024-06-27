@@ -59,9 +59,8 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel, 
 
   const timeout = (await getReactionSettings(guild)).timeout;
 
-  const start = performance.now();
-
   let msg = await channel.send({ embeds: [embed] });
+  const start = performance.now();
 
   const collector = channel.createMessageCollector({
     filter,
