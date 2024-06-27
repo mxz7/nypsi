@@ -1,30 +1,15 @@
 import { Guild, GuildMember, Role } from "discord.js";
 import prisma from "../../../init/database";
+import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
 import { unmuteTimeouts } from "../../../scheduled/clusterjobs/moderationchecks";
+import Constants from "../../Constants";
 import { logger } from "../../logger";
-import sleep from "../sleep";
 import ms = require("ms");
 
 const muteRoleCache = new Map<string, string>();
 const autoMuteLevelCache = new Map<string, number[]>();
-
-export const violations = new Map<string, Map<string, { vl: number; startedAt: number }>>();
-
-export function startAutoMuteViolationInterval() {
-  setInterval(async () => {
-    for (const guildId of violations.keys()) {
-      for (const [userId, userVl] of violations.get(guildId).entries()) {
-        if (userVl.startedAt < Date.now() - ms("1 day")) violations.get(guildId).delete(userId);
-        await sleep(5);
-      }
-
-      if (violations.get(guildId).size === 0) violations.delete(guildId);
-
-      await sleep(50);
-    }
-  }, ms("1 hour"));
-}
+const autoMuteTimeoutCache = new Map<string, number>();
 
 export async function newMute(guild: Guild, userIDs: string[], date: Date) {
   if (!(userIDs instanceof Array)) {
@@ -248,26 +233,51 @@ export async function setAutoMuteLevels(guild: Guild, levels: number[]) {
   });
 }
 
-export function getMuteViolations(guild: Guild, member: GuildMember) {
-  if (violations.get(guild.id)?.get(member.user.id)?.startedAt < Date.now() - ms("1 hour")) {
-    violations.get(guild.id).delete(member.user.id);
-    return 0;
+export async function getAutoMuteTimeout(guild: Guild) {
+  if (autoMuteTimeoutCache.has(guild.id)) {
+    return autoMuteTimeoutCache.get(guild.id);
   }
-  return violations.get(guild.id)?.get(member.user.id).vl || 0;
+
+  const query = await prisma.guild.findUnique({
+    where: {
+      id: guild.id,
+    },
+    select: {
+      autoMuteExpire: true,
+    },
+  });
+
+  autoMuteTimeoutCache.set(guild.id, query.autoMuteExpire);
+
+  return query.autoMuteExpire;
 }
 
-export function addMuteViolation(guild: Guild, member: GuildMember) {
-  if (!violations.has(guild.id)) {
-    violations.set(guild.id, new Map([[member.user.id, { vl: 0, startedAt: Date.now() }]]));
-  } else {
-    if (violations.get(guild.id).has(member.user.id)) {
-      if (violations.get(guild.id).get(member.user.id)?.startedAt < Date.now() - ms("1 hour")) {
-        violations.get(guild.id).set(member.user.id, { vl: 0, startedAt: Date.now() });
-      } else {
-        violations.get(guild.id).get(member.user.id).vl++;
-      }
-    } else {
-      violations.get(guild.id).set(member.user.id, { vl: 0, startedAt: Date.now() });
-    }
-  }
+export async function setAutoMuteTimeout(guild: Guild, seconds: number) {
+  await prisma.guild.update({
+    where: {
+      id: guild.id,
+    },
+    data: {
+      autoMuteExpire: seconds,
+    },
+  });
+
+  autoMuteTimeoutCache.delete(guild.id);
+}
+
+export async function getMuteViolations(guild: Guild, member: GuildMember) {
+  const res = await redis.get(
+    `${Constants.redis.cache.guild.AUTOMUTE_VL}:${guild.id}:${member.user.id}`,
+  );
+
+  if (res) return parseInt(res);
+  else return 0;
+}
+
+export async function addMuteViolation(guild: Guild, member: GuildMember) {
+  await redis.incr(`${Constants.redis.cache.guild.AUTOMUTE_VL}:${guild.id}:${member.user.id}`);
+  await redis.expire(
+    `${Constants.redis.cache.guild.AUTOMUTE_VL}:${guild.id}:${member.user.id}`,
+    await getAutoMuteTimeout(guild),
+  );
 }

@@ -30,7 +30,6 @@ import {
   getStats,
 } from "../utils/functions/economy/stats";
 import { getItems } from "../utils/functions/economy/utils";
-import { violations } from "../utils/functions/moderation/mute";
 import PageManager from "../utils/functions/page";
 import { getCommandUses } from "../utils/functions/users/commands";
 
@@ -431,7 +430,6 @@ async function run(
   const botStats = async () => {
     logger.debug(`unmute timeouts: ${unmuteTimeouts.size}`);
     logger.debug(`unban timeouts: ${unbanTimeouts.size}`);
-    logger.debug(`chat violations: ${violations.size}`);
 
     const systemUptime = MStoTime(os.uptime() * 1000);
     const uptime = MStoTime(message.client.uptime);

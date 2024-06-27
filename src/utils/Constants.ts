@@ -72,6 +72,7 @@ export default {
         RECENTLY_ATTACKED: "cache:guild:recentlyattacked",
         ALTS: "cache:guilds:alts",
         EVIDENCE_MAX: "cache:guilds:evidence:max",
+        AUTOMUTE_VL: "cache:guild:automute",
       },
       chatReaction: {
         EXISTS: "cache:chatreaction:exists",
