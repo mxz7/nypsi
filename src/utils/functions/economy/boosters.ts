@@ -25,11 +25,13 @@ async function checkBoosters(member: string | GuildMember, boosters: Map<string,
 
     for (const booster of boosters2) {
       if (booster.expire <= Date.now()) {
-        await prisma.booster.delete({
-          where: {
-            id: booster.id,
-          },
-        });
+        await prisma.booster
+          .delete({
+            where: {
+              id: booster.id,
+            },
+          })
+          .catch(() => {});
 
         if (expired.has(booster.boosterId)) {
           expired.set(booster.boosterId, expired.get(booster.boosterId) + 1);
