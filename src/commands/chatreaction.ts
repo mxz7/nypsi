@@ -245,9 +245,10 @@ async function run(
   };
 
   if (await onCooldown(cmd.name, message.member)) {
-    const embed = await getResponse(cmd.name, message.member);
+    const res = await getResponse(cmd.name, message.member);
 
-    return send({ embeds: [embed], ephemeral: true });
+    if (res.respond) send({ embeds: [res.embed], ephemeral: true });
+    return;
   }
 
   if (!(await hasReactionProfile(message.guild))) await createReactionProfile(message.guild);
@@ -411,9 +412,10 @@ async function run(
 
     if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
       if (await onCooldown(cmd.name, message.member)) {
-        const embed = await getResponse(cmd.name, message.member);
+        const res = await getResponse(cmd.name, message.member);
 
-        return send({ embeds: [embed], ephemeral: true });
+        if (res.respond) send({ embeds: [res.embed], ephemeral: true });
+        return;
       }
 
       await addCooldown(cmd.name, message.member, 10);

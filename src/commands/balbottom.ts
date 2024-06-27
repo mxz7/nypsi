@@ -14,9 +14,10 @@ async function run(
   args: string[],
 ) {
   if (await onCooldown(cmd.name, message.member)) {
-    const embed = await getResponse(cmd.name, message.member);
+    const res = await getResponse(cmd.name, message.member);
 
-    return message.channel.send({ embeds: [embed] });
+    if (res.respond) message.channel.send({ embeds: [res.embed] });
+    return;
   }
 
   await addCooldown(cmd.name, message.member, 10);

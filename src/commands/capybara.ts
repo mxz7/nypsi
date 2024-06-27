@@ -11,9 +11,10 @@ const cmd = new Command("capybara", "get a random picture of a capybara", "anima
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
   if (await onCooldown(cmd.name, message.member)) {
-    const embed = await getResponse(cmd.name, message.member);
+    const res = await getResponse(cmd.name, message.member);
 
-    return message.channel.send({ embeds: [embed] });
+    if (res.respond) message.channel.send({ embeds: [res.embed] });
+    return;
   }
 
   await addCooldown(cmd.name, message.member, 3);

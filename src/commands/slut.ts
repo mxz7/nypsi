@@ -7,9 +7,9 @@ import {
 } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
+import { addProgress } from "../utils/functions/economy/achievements";
 import { getMember } from "../utils/functions/member";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
-import { addProgress } from "../utils/functions/economy/achievements";
 
 const cache = new Map<string, number>();
 
@@ -57,9 +57,10 @@ async function run(
   };
 
   if (await onCooldown(cmd.name, message.member)) {
-    const embed = await getResponse(cmd.name, message.member);
+    const res = await getResponse(cmd.name, message.member);
 
-    return send({ embeds: [embed], ephemeral: true });
+    if (res.respond) send({ embeds: [res.embed], ephemeral: true });
+    return;
   }
 
   await addCooldown(cmd.name, message.member, 7);

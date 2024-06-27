@@ -119,15 +119,18 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const robBank = async (bank: string) => {
     if (await onCooldown(cmd.name, message.member)) {
-      const embed = await getResponse(cmd.name, message.member);
+      const res = await getResponse(cmd.name, message.member);
 
-      if (message instanceof Message) {
-        message.channel.send({ embeds: [embed] });
-        return;
-      } else {
-        message.followUp({ embeds: [embed] });
-        return;
+      if (res.respond) {
+        if (message instanceof Message) {
+          message.channel.send({ embeds: [res.embed] });
+          return;
+        } else {
+          message.followUp({ embeds: [res.embed] });
+          return;
+        }
       }
+      return;
     }
 
     if ((await getBalance(message.member)) < 5_000) {

@@ -47,9 +47,10 @@ cmd.setRun(async (message) => {
   if (!(await userExists(message.member))) await createUser(message.member);
 
   if (await onCooldown(cmd.name, message.member)) {
-    const embed = await getResponse(cmd.name, message.member);
+    const res = await getResponse(cmd.name, message.member);
 
-    return send({ embeds: [embed], ephemeral: true });
+    if (res.respond) send({ embeds: [res.embed], ephemeral: true });
+    return;
   }
 
   const [required, level, xp, bank, prestige] = await Promise.all([

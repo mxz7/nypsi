@@ -113,9 +113,10 @@ async function run(
   };
 
   if (await onCooldown(cmd.name, message.member)) {
-    const embed = await getResponse(cmd.name, message.member);
+    const res = await getResponse(cmd.name, message.member);
 
-    return send({ embeds: [embed], ephemeral: true });
+    if (res.respond) send({ embeds: [res.embed], ephemeral: true });
+    return;
   }
 
   await addCooldown(cmd.name, message.member, 10);
@@ -313,9 +314,9 @@ async function run(
         }
 
         if (await onCooldown("prestige", message.member)) {
-          const embed = await getResponse("prestige", message.member);
+          const res = await getResponse("prestige", message.member);
 
-          await reaction.reply({ embeds: [embed], ephemeral: true });
+          if (res.respond) await reaction.reply({ embeds: [embed], ephemeral: true });
           return awaitButton();
         }
 
@@ -453,9 +454,9 @@ async function run(
       }
     } else if (reaction.customId === "p-upg") {
       if (await onCooldown("p-upg", message.member)) {
-        const embed = await getResponse("p-upg", message.member);
+        const res = await getResponse("p-upg", message.member);
 
-        await reaction.reply({ embeds: [embed], ephemeral: true });
+        if (res.respond) await reaction.reply({ embeds: [res.embed], ephemeral: true });
         return awaitButton();
       }
 
@@ -486,9 +487,9 @@ async function run(
       return awaitButton();
     } else if (reaction.customId === "p-mul") {
       if (await onCooldown("p-mul", message.member)) {
-        const embed = await getResponse("p-mul", message.member);
+        const res = await getResponse("p-mul", message.member);
 
-        await reaction.reply({ embeds: [embed], ephemeral: true });
+        if (res.respond) await reaction.reply({ embeds: [res.embed], ephemeral: true });
         return awaitButton();
       }
 
@@ -522,9 +523,9 @@ async function run(
       return awaitButton();
     } else if (reaction.customId === "p-tag") {
       if (await onCooldown("p-tag", message.member)) {
-        const embed = await getResponse("p-tag", message.member);
+        const res = await getResponse("p-tag", message.member);
 
-        await reaction.reply({ embeds: [embed], ephemeral: true });
+        if (res.respond) await reaction.reply({ embeds: [res.embed], ephemeral: true });
         return awaitButton();
       }
 
