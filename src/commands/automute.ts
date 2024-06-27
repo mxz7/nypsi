@@ -83,7 +83,7 @@ async function run(
       embeds: [
         new CustomEmbed(
           message.member,
-          `✅ updated to ${MStoTime((await getAutoMuteTimeout(message.guild)) * 100, true).trim()}`,
+          `✅ updated to ${MStoTime((await getAutoMuteTimeout(message.guild)) * 1000, true).trim()}`,
         ),
       ],
     });
