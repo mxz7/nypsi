@@ -66,9 +66,10 @@ async function doBake(
   if (!member) return;
 
   if (await onCooldown(cmd.name, member)) {
-    const embed = await getResponse(cmd.name, member);
+    const res = await getResponse(cmd.name, member);
 
-    return send({ embeds: [embed], ephemeral: true });
+    if (res.respond) send({ embeds: [res.embed], ephemeral: true });
+    return;
   }
 
   if (!(await userExists(member))) await createUser(member);

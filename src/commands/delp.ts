@@ -10,9 +10,10 @@ const cmd = new Command("delp", "bulk delete/purge your own messages", "moderati
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
   if (await onCooldown(cmd.name, message.member)) {
-    const embed = await getResponse(cmd.name, message.member);
+    const res = await getResponse(cmd.name, message.member);
 
-    return message.channel.send({ embeds: [embed] });
+    if (res.respond) message.channel.send({ embeds: [res.embed] });
+    return;
   }
 
   let amount = 25;

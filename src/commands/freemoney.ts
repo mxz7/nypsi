@@ -15,9 +15,10 @@ const cmd = new Command("freemoney", "get some free money", "money").setAliases(
 
 async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
   if (await onCooldown(cmd.name, message.member)) {
-    const embed = await getResponse(cmd.name, message.member);
+    const res = await getResponse(cmd.name, message.member);
 
-    return message.channel.send({ embeds: [embed] });
+    if (res.respond) message.channel.send({ embeds: [res.embed] });
+    return;
   }
 
   if (!(await userExists(message.member))) await createUser(message.member);

@@ -92,7 +92,19 @@ export async function getRemaining(cmd: string, member: GuildMember) {
   return remaining;
 }
 
-export async function getResponse(cmd: string, member: GuildMember | string): Promise<ErrorEmbed> {
+type CooldownResponseInvalid = {
+  respond: false;
+};
+
+type CooldownResponseValid = {
+  respond: true;
+  embed: ErrorEmbed;
+};
+
+export async function getResponse(
+  cmd: string,
+  member: GuildMember | string,
+): Promise<CooldownResponseValid | CooldownResponseInvalid> {
   let id: string;
   if (member instanceof GuildMember) {
     id = member.user.id;
@@ -100,12 +112,16 @@ export async function getResponse(cmd: string, member: GuildMember | string): Pr
     id = member;
   }
 
+  const responseCooldown = await redis.exists(`cd:response:${id}`);
+
+  if (responseCooldown) return { respond: false };
+  else await redis.set(`cd:response:${id}`, "meow", "EX", 1);
+
   const key = `cd:${cmd}:${id}`;
   const cd: CooldownData = JSON.parse(await redis.get(key));
 
-  if (!cd) {
-    return new ErrorEmbed("you are on cooldown for `0.1s`").removeTitle();
-  }
+  if (!cd)
+    return { respond: true, embed: new ErrorEmbed("you are on cooldown for `0.1s`").removeTitle() };
 
   const init = cd.date;
   const length = cd.length;
@@ -137,7 +153,7 @@ export async function getResponse(cmd: string, member: GuildMember | string): Pr
     embed.setFooter({ text: "premium members get 50% shorter cooldowns (/premium)" });
   }
 
-  return embed;
+  return { respond: true, embed };
 }
 
 async function calculateCooldownLength(

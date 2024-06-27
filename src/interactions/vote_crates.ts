@@ -25,9 +25,10 @@ export default {
     if (!interaction.isButton()) return;
     if ((await isEcoBanned(interaction.user.id)).banned) return;
     if (await onCooldown("use", interaction.user.id)) {
-      const embed = await getResponse("use", interaction.user.id);
+      const res = await getResponse("use", interaction.user.id);
 
-      return interaction.reply({ embeds: [embed] });
+      if (res.respond) interaction.reply({ embeds: [res.embed] });
+      return;
     }
 
     await addCooldown("use", interaction.user.id, 7);

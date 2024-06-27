@@ -98,9 +98,10 @@ async function run(
     return help();
   } else if (args[0].toLowerCase() == "buy" || args[0].toLowerCase() == "b") {
     if (await onCooldown(cmd.name, message.member)) {
-      const embed = await getResponse(cmd.name, message.member);
+      const res = await getResponse(cmd.name, message.member);
 
-      return send({ embeds: [embed] });
+      if (res.respond) send({ embeds: [res.embed] });
+      return;
     }
 
     let amount: number;
