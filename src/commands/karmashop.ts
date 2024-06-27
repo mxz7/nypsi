@@ -401,7 +401,7 @@ async function run(
   };
 
   if (args[0]?.toLowerCase() == "buy") {
-    if (message.author.createdTimestamp > dayjs().subtract(7, "day").unix() * 1000) {
+    if (message.author.createdTimestamp > dayjs().subtract(7, "day").valueOf()) {
       return send({
         embeds: [new ErrorEmbed("your account must be at least 1 week old to access karma shop")],
       });

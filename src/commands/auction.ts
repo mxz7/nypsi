@@ -172,7 +172,7 @@ async function run(
 
   await addCooldown(cmd.name, message.member, 7);
 
-  if (message.author.createdTimestamp > dayjs().subtract(1, "day").unix() * 1000) {
+  if (message.author.createdTimestamp > dayjs().subtract(1, "day").valueOf()) {
     return send({
       embeds: [new ErrorEmbed("you cannot use this command yet. u might be an alt. or a bot 😳")],
     });
