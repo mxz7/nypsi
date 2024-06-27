@@ -488,6 +488,7 @@ model Guild {
   modlogs          String?
   logs             String?
   automute         Int[]    @default([0, 60, 120, 300])
+  autoMuteExpire   Int      @default(86400)
 
   GuildChristmas GuildChristmas?
   counters       GuildCounter[]
