@@ -272,7 +272,12 @@ export async function deleteStats(guild: Guild) {
   });
 }
 
-export async function addLeaderboardEntry(userId: string, time: number) {
+export async function addLeaderboardEntry(
+  userId: string,
+  time: number,
+): Promise<{ daily: boolean; global: boolean }> {
+  const res = { daily: false, global: false };
+
   async function daily() {
     const query = await prisma.chatReactionLeaderboards.findUnique({
       where: {
@@ -287,6 +292,7 @@ export async function addLeaderboardEntry(userId: string, time: number) {
     });
 
     if (!query || query.time > time) {
+      res.daily = true;
       await prisma.chatReactionLeaderboards.upsert({
         create: {
           daily: true,
@@ -320,6 +326,7 @@ export async function addLeaderboardEntry(userId: string, time: number) {
     });
 
     if (!query || query.time > time) {
+      res.global = true;
       await prisma.chatReactionLeaderboards.upsert({
         create: {
           daily: false,
@@ -339,6 +346,7 @@ export async function addLeaderboardEntry(userId: string, time: number) {
     }
   }
 
-  daily();
-  global();
+  await Promise.all([daily(), global()]);
+
+  return res;
 }

@@ -6,6 +6,7 @@ import { addProgress } from "../economy/achievements";
 import { addBalance } from "../economy/balance";
 import { createGame } from "../economy/stats";
 import { addTaskProgress } from "../economy/tasks";
+import { topChatReactionGlobal } from "../economy/top";
 import { isPremium } from "../premium/premium";
 import sleep from "../sleep";
 import { getZeroWidth } from "../string";
@@ -136,7 +137,29 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel, 
         break;
     }
 
-    if (!forced && wordListType !== "custom") addLeaderboardEntry(message.author.id, time);
+    if (!forced && wordListType !== "custom") {
+      const update = await addLeaderboardEntry(message.author.id, time);
+
+      if (update.daily || update.global) {
+        const embed = new CustomEmbed(message.member);
+
+        let desc = "";
+
+        if (update.daily) {
+          const { pos } = await topChatReactionGlobal(message.author.id, true);
+          desc += `you just set a new daily personal best of \`${time.toFixed(3)}s\`${pos ? ` (#${pos})` : ""}\n\n`;
+        }
+
+        if (update.global) {
+          const { pos } = await topChatReactionGlobal(message.author.id, false);
+          desc += `you just set a new personal best of \`${time.toFixed(3)}s\`${pos ? ` (#${pos})` : ""}`;
+        }
+
+        setTimeout(() => {
+          message.reply({ embeds: [embed] });
+        }, 1000);
+      }
+    }
 
     return;
   });
