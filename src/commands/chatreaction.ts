@@ -51,6 +51,7 @@ import {
   getBalance,
   removeBalance,
 } from "../utils/functions/economy/balance";
+import { topChatReaction } from "../utils/functions/economy/top";
 import {
   createUser,
   formatNumber,
@@ -320,6 +321,11 @@ async function run(
     }
 
     const leaderboards = await getServerLeaderboard(message.guild);
+    const timeLeaderboard = await topChatReaction(message.guild, false).then((r) =>
+      r.pages.get(1).join("\n"),
+    );
+
+    if (timeLeaderboard) leaderboards.set("time", timeLeaderboard);
 
     const row = new ActionRowBuilder<MessageActionRowComponentBuilder>();
 
@@ -359,6 +365,16 @@ async function run(
           .setCustomId("third")
           .setLabel("third")
           .setEmoji("🥉")
+          .setStyle(ButtonStyle.Secondary),
+      );
+    }
+
+    if (leaderboards.get("time")) {
+      row.addComponents(
+        new ButtonBuilder()
+          .setCustomId("time")
+          .setLabel("speed")
+          .setEmoji("🏎️")
           .setStyle(ButtonStyle.Secondary),
       );
     }
