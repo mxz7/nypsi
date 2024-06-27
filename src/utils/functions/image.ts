@@ -80,7 +80,7 @@ export async function suggestImage(
   return "ok";
 }
 
-export async function getRandomImage(type: ImageType) {
+export async function getRandomImage(type: string) {
   const cache = await redis.get(`${Constants.redis.cache.IMAGE}:${type}`);
 
   let images: Image[];
