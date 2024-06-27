@@ -1236,7 +1236,7 @@ export function runCommandUseTimers(client: NypsiClient) {
         if (uses > 400 && typeof id === "string") {
           const lastCommand = await getLastCommand(id);
 
-          if (dayjs().subtract(30, "seconds").unix() * 1000 > lastCommand.getTime()) continue; // dont lock if last command was more than 5 minutes ago
+          if (dayjs().subtract(30, "seconds").valueOf() > lastCommand.getTime()) continue; // dont lock if last command was more than 5 minutes ago
 
           giveCaptcha(id, 2, true);
           logger.info(`${tag} (${id}) has been given a captcha`);
