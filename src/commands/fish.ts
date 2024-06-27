@@ -217,16 +217,15 @@ async function doFish(
 
   const user = await message.client.users.fetch(message.member.user.id);
 
-  const embed = new CustomEmbed(
-    member,
-    `you go to the pond and cast your **${items[fishingRod].name}**`,
-  ).setHeader(user.username, user.avatarURL(), `https://nypsi.xyz/user/${user.id}`);
+  const embed = new CustomEmbed(member).setHeader(
+    user.username,
+    user.avatarURL(),
+    `https://nypsi.xyz/user/${user.id}`,
+  );
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder().setCustomId("fish").setLabel("fish").setStyle(ButtonStyle.Success),
   );
-
-  const msg = await send({ embeds: [embed], components: [row] });
 
   const foundItems = new Map<string, number>();
 
@@ -382,9 +381,7 @@ async function doFish(
     }`,
   );
 
-  setTimeout(() => {
-    msg.edit({ embeds: [embed], components: [row] });
-  }, 1500);
+  send({ embeds: [embed], components: [row] });
 
   addProgress(message.member.user.id, "fisher", total);
   await addTaskProgress(message.member.user.id, "fish_daily");

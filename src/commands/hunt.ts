@@ -204,16 +204,15 @@ async function doHunt(
 
   const user = await message.client.users.fetch(message.member.user.id);
 
-  const embed = new CustomEmbed(
-    member,
-    `you go to the ${chosenPlace} and prepare your **${items[gun].name}**`,
-  ).setHeader(user.username, user.avatarURL(), `https://nypsi.xyz/user/${user.id}`);
+  const embed = new CustomEmbed(member).setHeader(
+    user.username,
+    user.avatarURL(),
+    `https://nypsi.xyz/user/${user.id}`,
+  );
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder().setCustomId("hunt").setLabel("hunt").setStyle(ButtonStyle.Success),
   );
-
-  const msg = await send({ embeds: [embed], components: [row] });
 
   for (let i = 0; i < 10; i++) {
     huntItems.push("nothing");
@@ -346,9 +345,7 @@ async function doHunt(
     }`,
   );
 
-  setTimeout(() => {
-    msg.edit({ embeds: [embed], components: [row] });
-  }, 1500);
+  send({ embeds: [embed], components: [row] });
 
   addProgress(message.member.user.id, "hunter", total);
   await addTaskProgress(message.member.user.id, "hunt_daily");
