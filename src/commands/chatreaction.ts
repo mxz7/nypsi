@@ -437,7 +437,7 @@ async function run(
         ),
       ];
 
-      let msg = await send({ embeds: [embed], components });
+      const msg = await send({ embeds: [embed], components });
 
       const voted = [message.author.id];
 
