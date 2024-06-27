@@ -11,7 +11,7 @@ const cmd = new Command("image", "view random cute images & upload your own", "a
   ["img"],
 );
 
-const categories = ["cat", "dog", "capybara", "wholesome"] as ImageType[];
+const categories = ["cat", "dog", "capybara", "hamster", "wholesome"] as ImageType[];
 
 cmd.slashEnabled = true;
 cmd.slashData
