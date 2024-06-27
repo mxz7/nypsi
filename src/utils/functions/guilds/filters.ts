@@ -236,7 +236,7 @@ export async function checkMessageContent(message: Message) {
 }
 
 export async function checkAutoMute(message: Message) {
-  const vl = getMuteViolations(message.guild, message.member);
+  const vl = await getMuteViolations(message.guild, message.member);
 
   const muteLevels = await getAutoMuteLevels(message.guild);
 
