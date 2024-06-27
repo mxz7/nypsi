@@ -241,16 +241,15 @@ async function doMine(
 
   const user = await message.client.users.fetch(message.member.user.id);
 
-  const embed = new CustomEmbed(
-    member,
-    `you go to the ${chosenArea} and swing your **${items[pickaxe].name}**`,
-  ).setHeader(user.username, user.avatarURL(), `https://nypsi.xyz/user/${user.id}`);
+  const embed = new CustomEmbed(member).setHeader(
+    user.username,
+    user.avatarURL(),
+    `https://nypsi.xyz/user/${user.id}`,
+  );
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder().setCustomId("mine").setLabel("mine").setStyle(ButtonStyle.Success),
   );
-
-  const msg = await send({ embeds: [embed], components: [row] });
 
   if (chosenArea == "nether") await addStat(member, "nether_portal");
   else if (chosenArea === "end") await addStat(member, "end_portal");
@@ -384,9 +383,7 @@ async function doMine(
     }`,
   );
 
-  setTimeout(() => {
-    msg.edit({ embeds: [embed], components: [row] });
-  }, 1500);
+  send({ embeds: [embed], components: [row] });
 
   addProgress(message.member.user.id, "miner", total);
   await addTaskProgress(message.member.user.id, "mine_daily");
