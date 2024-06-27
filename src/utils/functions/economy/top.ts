@@ -1682,7 +1682,7 @@ export async function topChatReaction(guild: Guild, daily: boolean, userId?: str
       user.userId,
       members.get(user.userId).user.username,
       true,
-    )} \`${user.time.toFixed(3)}s\` <t:${Math.floor(user.createdAt.getTime() / 1000)}:${daily ? "R" : "D"}>`;
+    )} \`${user.time.toFixed(3)}s\` <t:${Math.floor(user.createdAt.getTime() / 1000)}:${dayjs(user.createdAt).isAfter(dayjs().subtract(1, "day")) ? "R" : "D"}>`;
 
     count++;
   }
@@ -1747,7 +1747,7 @@ export async function topChatReactionGlobal(userId: string, daily: boolean, amou
       user.userId,
       user.user.lastKnownUsername,
       (await getPreferences(user.userId)).leaderboards,
-    )} \`${user.time.toFixed(3)}s\` <t:${Math.floor(user.createdAt.getTime() / 1000)}:${daily ? "R" : "D"}>`;
+    )} \`${user.time.toFixed(3)}s\` <t:${Math.floor(user.createdAt.getTime() / 1000)}:${dayjs(user.createdAt).isAfter(dayjs().subtract(1, "day")) ? "R" : "D"}>`;
 
     count++;
   }
