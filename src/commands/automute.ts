@@ -72,7 +72,12 @@ async function run(
 
     const duration = getDuration(args[1].toLowerCase());
 
-    if (duration < 0 || isNaN(duration) || typeof duration !== "number")
+    if (duration < 3600 || isNaN(duration) || typeof duration !== "number")
+      return message.channel.send({
+        embeds: [new ErrorEmbed("invalid duration. format: 15m = 15 minutes")],
+      });
+
+    if (duration > 2629746)
       return message.channel.send({
         embeds: [new ErrorEmbed("invalid duration. format: 15m = 15 minutes")],
       });
