@@ -37,7 +37,7 @@ async function run(
       `${levels
         .map((secs, index) => `${index + 1} \`${MStoTime(secs * 1000, true).trim() || "no mute"}\``)
         .join("\n")}\n\n` +
-        `VL expire: ${MStoTime((await getAutoMuteTimeout(message.guild)) * 1000, true).trim()}`,
+        `VL expire: \`${MStoTime((await getAutoMuteTimeout(message.guild)) * 1000, true).trim()}\``,
     )
       .setHeader("current auto mute lengths")
       .setFooter({ text: `${prefix}automute <vl | timeout> <length | delete>` });
@@ -63,7 +63,7 @@ async function run(
         embeds: [
           new CustomEmbed(
             message.member,
-            `VL timeout: ${MStoTime((await getAutoMuteTimeout(message.guild)) * 1000, true).trim()}\n\n` +
+            `VL timeout: \`${MStoTime((await getAutoMuteTimeout(message.guild)) * 1000, true).trim()}\`\n\n` +
               `use ${prefix}**automute timeout <length>** to change. eg: ${prefix}automute timeout 1d`,
           ),
         ],
