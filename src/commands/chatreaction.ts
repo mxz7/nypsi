@@ -506,13 +506,15 @@ async function run(
       });
 
       collector.on("end", () => {
-        if (voted.length < 4) {
-          embed.setDescription(
-            `chat reaction not started\n\nonly received ${voted.length}/4 votes ):`,
-          );
-          msg.edit({ embeds: [embed], components: [] });
-          return;
-        }
+        setTimeout(() => {
+          if (voted.length < 4) {
+            embed.setDescription(
+              `chat reaction not started\n\nonly received ${voted.length}/4 votes ):`,
+            );
+            msg.edit({ embeds: [embed], components: [] });
+            return;
+          }
+        }, 1000);
       });
 
       return;
