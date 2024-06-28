@@ -41,7 +41,7 @@ import {
   renderGambleScreen,
   userExists,
 } from "../utils/functions/economy/utils.js";
-import { calcEarnedGambleXp, getXp, updateXp } from "../utils/functions/economy/xp";
+import { addXp, calcEarnedGambleXp } from "../utils/functions/economy/xp";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { shuffle } from "../utils/functions/random";
 import sleep from "../utils/functions/sleep";
@@ -457,7 +457,7 @@ class Game {
 
     if (winnings > 0) await addBalance(this.member, winnings);
     if (xp > 0) {
-      await updateXp(this.member, (await getXp(this.member)) + xp);
+      await addXp(this.member, xp);
 
       const guild = await getGuildName(this.member);
 

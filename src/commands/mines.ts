@@ -40,7 +40,7 @@ import {
   renderGambleScreen,
   userExists,
 } from "../utils/functions/economy/utils.js";
-import { calcEarnedGambleXp, getXp, updateXp } from "../utils/functions/economy/xp.js";
+import { addXp, calcEarnedGambleXp } from "../utils/functions/economy/xp.js";
 import { getTier, isPremium } from "../utils/functions/premium/premium.js";
 import { percentChance } from "../utils/functions/random.js";
 import { recentCommands } from "../utils/functions/users/commands.js";
@@ -663,7 +663,7 @@ async function playGame(
     const earnedXp = await calcEarnedGambleXp(message.member, bet, win);
 
     if (earnedXp > 0) {
-      await updateXp(message.member, (await getXp(message.member)) + earnedXp);
+      await addXp(message.member, earnedXp);
       embed.setFooter({ text: `+${earnedXp}xp` });
 
       const guild = await getGuildName(message.member);

@@ -9,7 +9,7 @@ import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addProgress } from "../utils/functions/economy/achievements.js";
 import { createUser, userExists } from "../utils/functions/economy/utils.js";
-import { getXp, updateXp } from "../utils/functions/economy/xp.js";
+import { addXp } from "../utils/functions/economy/xp.js";
 import { getMember } from "../utils/functions/member.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 
@@ -128,7 +128,7 @@ async function run(
 
     if (cache.has(member.user.id)) {
       cache.delete(member.user.id);
-      await updateXp(member, (await getXp(member)) + 1);
+      await addXp(member, 1);
     }
   }
 

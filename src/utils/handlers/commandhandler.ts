@@ -42,7 +42,7 @@ import {
   isHandcuffed,
   userExists,
 } from "../functions/economy/utils";
-import { getXp, updateXp } from "../functions/economy/xp";
+import { addXp } from "../functions/economy/xp";
 import { getDisabledCommands } from "../functions/guilds/disabledcommands";
 import { getChatFilter } from "../functions/guilds/filters";
 import { getPrefix } from "../functions/guilds/utils";
@@ -1092,7 +1092,7 @@ export async function runCommand(
         if (!(await userExists(message.member))) return;
         try {
           if (!xpCooldown.has(message.author.id)) {
-            await updateXp(message.member, (await getXp(message.member)) + 1);
+            await addXp(message.member, 1);
 
             xpCooldown.add(message.author.id);
 

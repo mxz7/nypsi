@@ -23,7 +23,7 @@ import { isPassive } from "../utils/functions/economy/passive";
 import { addStat, createGame } from "../utils/functions/economy/stats";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
 import { createUser, isEcoBanned, userExists } from "../utils/functions/economy/utils";
-import { calcEarnedGambleXp, getXp, updateXp } from "../utils/functions/economy/xp";
+import { addXp, calcEarnedGambleXp } from "../utils/functions/economy/xp";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
 import { isUserBlacklisted } from "../utils/functions/users/blacklist";
@@ -311,7 +311,7 @@ async function run(
       addTaskProgress(message.author.id, "thief");
 
       if (earnedXp > 0) {
-        await updateXp(message.member, (await getXp(message.member)) + earnedXp);
+        await addXp(message.member, earnedXp);
         embed2.setFooter({ text: `+${earnedXp}xp` });
 
         const guild = await getGuildName(message.member);

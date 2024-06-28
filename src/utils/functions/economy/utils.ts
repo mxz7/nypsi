@@ -28,7 +28,7 @@ import { addToGuildXP, getGuildByUser, getGuildName } from "./guilds";
 import { addInventoryItem } from "./inventory";
 import { addStat } from "./stats";
 import { addTaskProgress } from "./tasks";
-import { getXp, updateXp } from "./xp";
+import { addXp } from "./xp";
 import ms = require("ms");
 import math = require("mathjs");
 
@@ -725,7 +725,7 @@ export async function doDaily(member: GuildMember) {
   embed.addField("rewards", rewards.join("\n"));
 
   if (xp > 0) {
-    await updateXp(member, (await getXp(member)) + xp);
+    await addXp(member, xp);
     embed.setFooter({ text: `+${xp}xp` });
 
     const guild = await getGuildName(member);

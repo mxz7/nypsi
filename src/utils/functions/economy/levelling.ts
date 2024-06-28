@@ -13,7 +13,7 @@ import { addBooster, getBoosters } from "./boosters";
 import { addInventoryItem } from "./inventory";
 import { addStat } from "./stats";
 import { addTaskProgress } from "./tasks";
-import { getXp, updateXp } from "./xp";
+import { getXp, removeXp } from "./xp";
 import ms = require("ms");
 import dayjs = require("dayjs");
 import _ = require("lodash");
@@ -393,7 +393,7 @@ async function doLevelUp(
   const level = await setLevel(member, (await getLevel(member)) + 1);
   const prestige = await getPrestige(member);
 
-  await updateXp(member, (await getXp(member)) - requirements.xp, false);
+  await removeXp(member, requirements.xp, false);
   await removeBankBalance(member, requirements.money, false);
   addStat(member, "spent-level", requirements.money);
 

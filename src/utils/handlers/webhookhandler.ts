@@ -30,7 +30,7 @@ import {
   setEcoBan,
   userExists,
 } from "../functions/economy/utils";
-import { getXp, updateXp } from "../functions/economy/xp";
+import { addXp } from "../functions/economy/xp";
 import { addKarma } from "../functions/karma/karma";
 import {
   addMember,
@@ -164,7 +164,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
       await Promise.all([
         addBalance(user, amount),
         addKarma(user, 10),
-        updateXp(user, (await getXp(user)) + xp),
+        addXp(user, xp),
         addBooster(user, "vote_booster"),
         redis.del(`${Constants.redis.cache.economy.VOTE}:${user}`),
         redis.del(`${Constants.redis.cache.economy.BOOSTERS}:${user}`),

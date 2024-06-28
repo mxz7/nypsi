@@ -59,6 +59,54 @@ export async function updateXp(member: GuildMember | string, amount: number, che
   if (check) checkLevelUp(member);
 }
 
+export async function addXp(member: GuildMember | string, amount: number, check = true) {
+  let id: string;
+  if (member instanceof GuildMember) {
+    id = member.user.id;
+  } else {
+    id = member;
+  }
+
+  const query = await prisma.economy.update({
+    where: {
+      userId: id,
+    },
+    data: {
+      xp: { increment: amount },
+    },
+    select: {
+      xp: true,
+    },
+  });
+  await redis.set(`${Constants.redis.cache.economy.XP}:${id}`, query.xp.toString(), "EX", 3600);
+
+  if (check) checkLevelUp(member);
+}
+
+export async function removeXp(member: GuildMember | string, amount: number, check = true) {
+  let id: string;
+  if (member instanceof GuildMember) {
+    id = member.user.id;
+  } else {
+    id = member;
+  }
+
+  const query = await prisma.economy.update({
+    where: {
+      userId: id,
+    },
+    data: {
+      xp: { decrement: amount },
+    },
+    select: {
+      xp: true,
+    },
+  });
+  await redis.set(`${Constants.redis.cache.economy.XP}:${id}`, query.xp.toString(), "EX", 3600);
+
+  if (check) checkLevelUp(member);
+}
+
 export async function calcEarnedGambleXp(
   member: GuildMember,
   bet: number,

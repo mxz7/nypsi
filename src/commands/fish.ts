@@ -24,7 +24,7 @@ import {
 import { addStat } from "../utils/functions/economy/stats";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
-import { calcEarnedHFMXp, getXp, updateXp } from "../utils/functions/economy/xp";
+import { addXp, calcEarnedHFMXp } from "../utils/functions/economy/xp";
 import { percentChance } from "../utils/functions/random";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
@@ -319,7 +319,7 @@ async function doFish(
       } else if (chosen.includes("xp:")) {
         const amount = parseInt(chosen.substring(3));
 
-        await updateXp(member, (await getXp(member)) + amount);
+        await addXp(member, amount);
         foundItems.set("xp", foundItems.has("xp") ? foundItems.get("xp") + amount : amount);
       }
     } else if (items[chosen]?.role == "fish") {
@@ -363,7 +363,7 @@ async function doFish(
     embed.setFooter({
       text: `+${foundItems.has("xp") ? foundItems.get("xp") + earnedXp : earnedXp}xp`,
     });
-    await updateXp(member, (await getXp(member)) + earnedXp);
+    await addXp(member, earnedXp);
 
     const guild = await getGuildName(member);
 

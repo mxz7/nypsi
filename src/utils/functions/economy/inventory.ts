@@ -19,7 +19,7 @@ import { addToGuildXP, getGuildName } from "./guilds";
 import { getOffersAverage } from "./offers";
 import { addStat } from "./stats";
 import { createUser, getItems, userExists } from "./utils";
-import { getXp, updateXp } from "./xp";
+import { addXp } from "./xp";
 import ms = require("ms");
 
 const gemChanceCooldown = new Set<string>();
@@ -392,7 +392,7 @@ export async function openCrate(
         } else if (chosen.includes("xp:")) {
           const amount = parseInt(chosen.substring(3));
 
-          await updateXp(member, (await getXp(member)) + amount);
+          await addXp(member, amount);
           const guild = await getGuildName(member);
 
           if (guild) {
@@ -468,7 +468,7 @@ export async function openCrate(
         } else if (chosen.includes("xp:")) {
           const amount = parseInt(chosen.split(":")[1]);
 
-          await updateXp(member, (await getXp(member)) + amount);
+          await addXp(member, amount);
           const guild = await getGuildName(member);
 
           if (guild) {
