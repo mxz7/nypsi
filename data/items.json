@@ -780,13 +780,14 @@
     "in_crates": false,
     "crate_runs": 5,
     "items": [
-      "id:efficiency",
-      "id:fortune",
-      "id:unbreaking",
-      "id:diamond_pickaxe",
-      "id:ancient_debris",
+      "id:efficiency:90",
+      "id:fortune:90",
+      "id:unbreaking:5",
+      "id:diamond_pickaxe:85",
+      "id:ancient_debris:90",
       "id:emerald",
-      "id:obsidian"
+      "id:diamond",
+      "id:obsidian:50"
     ],
     "random_drop_chance": 40
   },
