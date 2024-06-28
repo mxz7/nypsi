@@ -8,11 +8,11 @@ import {
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import {
+  addBankBalance,
   getBalance,
   getBankBalance,
   getMaxBankBalance,
   removeBalance,
-  updateBankBalance,
 } from "../utils/functions/economy/balance.js";
 import { createUser, formatNumber, userExists } from "../utils/functions/economy/utils.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
@@ -134,7 +134,7 @@ async function run(
   const m = await send({ embeds: [embed] });
 
   await removeBalance(message.member, amount);
-  await updateBankBalance(message.member, (await getBankBalance(message.member)) + amount);
+  await addBankBalance(message.member, amount);
 
   const embed1 = new CustomEmbed(message.member)
     .setHeader("bank deposit", message.author.avatarURL())

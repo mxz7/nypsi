@@ -186,6 +186,50 @@ export async function updateBankBalance(
   if (check) checkLevelUp(member);
 }
 
+export async function addBankBalance(member: GuildMember | string, amount: number, check = true) {
+  let id: string;
+  if (member instanceof GuildMember) {
+    id = member.user.id;
+  } else {
+    id = member;
+  }
+
+  await prisma.economy.update({
+    where: {
+      userId: id,
+    },
+    data: {
+      bank: { increment: amount },
+    },
+  });
+
+  if (check) checkLevelUp(member);
+}
+
+export async function removeBankBalance(
+  member: GuildMember | string,
+  amount: number,
+  check = true,
+) {
+  let id: string;
+  if (member instanceof GuildMember) {
+    id = member.user.id;
+  } else {
+    id = member;
+  }
+
+  await prisma.economy.update({
+    where: {
+      userId: id,
+    },
+    data: {
+      bank: { decrement: amount },
+    },
+  });
+
+  if (check) checkLevelUp(member);
+}
+
 export async function increaseBaseBankStorage(member: GuildMember, amount: number) {
   await prisma.economy.update({
     where: {

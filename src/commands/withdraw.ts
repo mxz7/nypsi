@@ -11,7 +11,7 @@ import {
   addBalance,
   getBankBalance,
   getMaxBankBalance,
-  updateBankBalance,
+  removeBankBalance,
 } from "../utils/functions/economy/balance.js";
 import { createUser, formatNumber, userExists } from "../utils/functions/economy/utils.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
@@ -124,7 +124,7 @@ async function run(
 
   const m = await send({ embeds: [embed] });
 
-  await updateBankBalance(message.member, (await getBankBalance(message.member)) - amount);
+  await removeBankBalance(message.member, amount);
   await addBalance(message.member, amount);
 
   const embed1 = new CustomEmbed(message.member)

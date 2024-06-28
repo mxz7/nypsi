@@ -8,7 +8,7 @@ import { addKarma } from "../karma/karma";
 import sleep from "../sleep";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { addTag } from "../users/tags";
-import { addBalance, getBankBalance, updateBankBalance } from "./balance";
+import { addBalance, getBankBalance, removeBankBalance } from "./balance";
 import { addBooster, getBoosters } from "./boosters";
 import { addInventoryItem } from "./inventory";
 import { addStat } from "./stats";
@@ -394,7 +394,7 @@ async function doLevelUp(
   const prestige = await getPrestige(member);
 
   await updateXp(member, (await getXp(member)) - requirements.xp, false);
-  await updateBankBalance(member, (await getBankBalance(member)) - requirements.money, false);
+  await removeBankBalance(member, requirements.money, false);
   addStat(member, "spent-level", requirements.money);
 
   const rawLevel = await getRawLevel(member);
