@@ -19,7 +19,7 @@ import { addInventoryItem } from "./inventory";
 import { addStat } from "./stats";
 import { addTaskProgress } from "./tasks";
 import { getItems } from "./utils";
-import { getXp, updateXp } from "./xp";
+import { addXp } from "./xp";
 import ms = require("ms");
 
 export default class ScratchCard {
@@ -175,7 +175,7 @@ export default class ScratchCard {
           this.member.user.avatarURL(),
         );
       if (clickedType === "xp") {
-        await updateXp(this.member, (await getXp(this.member)) + parseInt(clickedItem));
+        await addXp(this.member, parseInt(clickedItem));
         embed.setDescription(`you found **${parseInt(clickedItem).toLocaleString()}**xp!`);
         const guild = await getGuildName(this.member);
         if (guild) await addToGuildXP(guild, parseInt(clickedItem), this.member);

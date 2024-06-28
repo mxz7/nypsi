@@ -14,7 +14,7 @@ import { addBalance } from "./balance";
 import { addToGuildXP, getGuildName } from "./guilds";
 import { addInventoryItem } from "./inventory";
 import { getItems, getTasksData, userExists } from "./utils";
-import { getXp, updateXp } from "./xp";
+import { addXp } from "./xp";
 
 const taskGeneration = new Map<string, number>();
 
@@ -270,7 +270,7 @@ export async function addTaskProgress(userId: string, taskId: string, amount = 1
         break;
       case "xp":
         desc += `\n\nyou have received ${reward.value.toLocaleString()}xp`;
-        await updateXp(task.user_id, (await getXp(task.user_id)) + reward.value);
+        await addXp(task.user_id, reward.value);
 
         const guild = await getGuildName(task.user_id);
 
@@ -345,7 +345,7 @@ export async function setTaskProgress(userId: string, taskId: string, amount: nu
         break;
       case "xp":
         desc += `\n\nyou have received ${reward.value.toLocaleString()}xp`;
-        await updateXp(task.user_id, (await getXp(task.user_id)) + reward.value);
+        await addXp(task.user_id, reward.value);
         break;
     }
 

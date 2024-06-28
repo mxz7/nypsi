@@ -21,7 +21,7 @@ import { addToGuildXP, getGuildName } from "../utils/functions/economy/guilds";
 import { addInventoryItem } from "../utils/functions/economy/inventory";
 import { getRawLevel } from "../utils/functions/economy/levelling";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
-import { getXp, updateXp } from "../utils/functions/economy/xp";
+import { addXp } from "../utils/functions/economy/xp";
 import { getKarma, removeKarma } from "../utils/functions/karma/karma";
 import {
   closeKarmaShop,
@@ -360,7 +360,7 @@ async function run(
         await addInventoryItem(message.member, wanted.value, 1);
         break;
       case "xp":
-        await updateXp(message.member, (await getXp(message.member)) + parseInt(wanted.value));
+        await addXp(message.member, parseInt(wanted.value));
         if (guild) {
           await addToGuildXP(guild, parseInt(wanted.value), message.member);
         }

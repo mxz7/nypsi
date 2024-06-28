@@ -23,7 +23,7 @@ import {
 import { addStat } from "../utils/functions/economy/stats";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
-import { calcEarnedHFMXp, getXp, updateXp } from "../utils/functions/economy/xp";
+import { addXp, calcEarnedHFMXp } from "../utils/functions/economy/xp";
 import { percentChance } from "../utils/functions/random";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger } from "../utils/logger";
@@ -319,7 +319,7 @@ async function doHunt(
 
   if (earnedXp > 0) {
     embed.setFooter({ text: `+${earnedXp.toLocaleString()}xp` });
-    await updateXp(member, (await getXp(member)) + earnedXp);
+    await addXp(member, earnedXp);
 
     const guild = await getGuildName(member);
 

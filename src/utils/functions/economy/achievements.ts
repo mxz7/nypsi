@@ -21,7 +21,7 @@ import {
   isEcoBanned,
   userExists,
 } from "./utils";
-import { getXp, updateXp } from "./xp";
+import { addXp } from "./xp";
 import ms = require("ms");
 
 /**
@@ -172,7 +172,7 @@ async function completeAchievement(userId: string, achievementId: string) {
   if (earnedXp > 0) {
     rewardsDesc.push(`+ ${earnedXp.toLocaleString()}xp`);
 
-    await updateXp(userId, (await getXp(userId)) + earnedXp);
+    await addXp(userId, earnedXp);
   }
 
   if (earnedCrates > 0) {
