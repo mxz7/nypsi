@@ -42,7 +42,7 @@ export async function addModLog(
 
   const embed = new CustomEmbed().disableFooter();
   embed.setColor(modLogColors.get(caseType));
-  embed.setHeader(`${caseType}${caseID > -1 ? ` [${caseID}]` : ""}`);
+  embed.setHeader(`${caseType}${caseID > -1 ? ` [${caseID}]` : ""}`, guild.iconURL());
   embed.setTimestamp();
 
   if (punished) {
