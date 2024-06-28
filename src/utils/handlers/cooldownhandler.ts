@@ -120,8 +120,10 @@ export async function getResponse(
   const key = `cd:${cmd}:${id}`;
   const cd: CooldownData = JSON.parse(await redis.get(key));
 
-  if (!cd)
+  if (!cd) {
+    console.log("invalid cd");
     return { respond: true, embed: new ErrorEmbed("you are on cooldown for `0.1s`").removeTitle() };
+  }
 
   const init = cd.date;
   const length = cd.length;
@@ -142,7 +144,7 @@ export async function getResponse(
 
   const embed = new ErrorEmbed(`you are on cooldown for \`${remaining}\``).removeTitle();
 
-  if (remaining.includes("0.0") || remaining.includes("-")) {
+  if (remaining === "0.0s" || remaining.includes("-")) {
     await redis.del(key);
     embed.setDescription("you are on cooldown for `0.1s`");
   }
