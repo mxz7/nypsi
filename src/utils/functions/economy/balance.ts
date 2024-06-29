@@ -12,7 +12,7 @@ import { getBoosters } from "./boosters";
 import { calcCarCost } from "./cars";
 import { getGuildUpgradesByUser } from "./guilds";
 import { calcItemValue, gemBreak, getInventory } from "./inventory";
-import { checkLevelUp, getRawLevel, getUpgrades } from "./levelling";
+import { doLevelUp, getRawLevel, getUpgrades } from "./levelling";
 import { getOffersAverage } from "./offers";
 import { isPassive } from "./passive";
 import { getBaseUpgrades, getBaseWorkers, getItems, getUpgradesData } from "./utils";
@@ -183,7 +183,7 @@ export async function updateBankBalance(
     },
   });
 
-  if (check) checkLevelUp(member);
+  if (check) doLevelUp(member);
 }
 
 export async function addBankBalance(member: GuildMember | string, amount: number, check = true) {
@@ -203,7 +203,7 @@ export async function addBankBalance(member: GuildMember | string, amount: numbe
     },
   });
 
-  if (check) checkLevelUp(member);
+  if (check) doLevelUp(member);
 }
 
 export async function removeBankBalance(
@@ -227,7 +227,7 @@ export async function removeBankBalance(
     },
   });
 
-  if (check) checkLevelUp(member);
+  if (check) doLevelUp(member);
 }
 
 export async function increaseBaseBankStorage(member: GuildMember, amount: number) {
