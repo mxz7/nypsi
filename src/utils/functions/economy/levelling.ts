@@ -5,10 +5,13 @@ import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
+import { addKarma } from "../karma/karma";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { getLastKnownAvatar } from "../users/tag";
-import { getBankBalance, removeBankBalance } from "./balance";
+import { addTag } from "../users/tags";
+import { addBalance, getBankBalance, removeBankBalance } from "./balance";
 import { addBooster, getBoosters } from "./boosters";
+import { addInventoryItem } from "./inventory";
 import { addStat } from "./stats";
 import { addTaskProgress } from "./tasks";
 import { getXp, removeXp } from "./xp";
@@ -508,6 +511,19 @@ export async function doLevelUp(member: GuildMember | string) {
   logger.info(
     `${id} levelled up ${beforePrestige * 100 + beforeLevel} -> ${beforePrestige * 100 + beforeLevel + levels} (P${beforePrestige}L${beforeLevel} -> P${beforePrestige}L${beforeLevel + levels})`,
   );
+
+  if (items.size > 0) {
+    for (const [itemId, amount] of items.entries()) {
+      await addInventoryItem(id, itemId, amount);
+    }
+  }
+  if (tags.length > 0) {
+    for (const tag of tags) {
+      await addTag(id, tag);
+    }
+  }
+  if (earnedKarma > 0) await addKarma(id, earnedKarma);
+  if (earnedMoney > 0) await addBalance(id, earnedMoney);
 
   let earnedBooster: "no" | "double" | "yes" = "no";
 
