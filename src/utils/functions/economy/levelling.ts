@@ -354,6 +354,8 @@ export async function doLevelUp(member: GuildMember | string) {
   let requirements = getLevelRequirements(beforePrestige, beforeLevel);
   const [beforeXp, beforeBank] = await Promise.all([getXp(id), getBankBalance(id)]);
 
+  if (beforeXp < requirements.xp || beforeBank < requirements.money) return;
+
   let totalUsedXp = 0;
   let totalUsedBank = 0;
   let levels = 0;
@@ -452,7 +454,10 @@ export async function doLevelUp(member: GuildMember | string) {
 
     requirements = getLevelRequirements(beforePrestige, beforeLevel + levels);
 
-    if (beforeBank - totalUsedBank > requirements.money && beforeXp - totalUsedXp > requirements.xp)
+    if (
+      beforeBank - totalUsedBank >= requirements.money &&
+      beforeXp - totalUsedXp >= requirements.xp
+    )
       return levelUp(consecutive++);
   }
 
