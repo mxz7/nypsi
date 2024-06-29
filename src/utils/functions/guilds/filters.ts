@@ -311,9 +311,10 @@ export async function checkAutoMute(message: Message) {
       message.guild.members.me.user,
       `[${MStoTime(length * 1000, true).trim()}] filter violation${isAlt ? " (alt)" : ""}`,
     );
-    if (mode !== "timeout")
-      newMute(message.guild, [member.user.id], new Date(Date.now() + length * 1000)),
-        logger.info(`::auto ${message.guild.id} ${member.user.id} automuted ${length}s`);
+    if (mode !== "timeout") {
+      newMute(message.guild, [member.user.id], new Date(Date.now() + length * 1000));
+      logger.info(`::auto ${message.guild.id} ${member.user.id} automuted ${length}s`);
+    }
 
     let successful = false;
 
