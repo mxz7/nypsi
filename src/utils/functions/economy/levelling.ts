@@ -4,13 +4,10 @@ import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
-import { addKarma } from "../karma/karma";
-import sleep from "../sleep";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
-import { addTag } from "../users/tags";
-import { addBalance, getBankBalance, removeBankBalance } from "./balance";
+import { getLastKnownAvatar } from "../users/tag";
+import { getBankBalance, removeBankBalance } from "./balance";
 import { addBooster, getBoosters } from "./boosters";
-import { addInventoryItem } from "./inventory";
 import { addStat } from "./stats";
 import { addTaskProgress } from "./tasks";
 import { getXp, removeXp } from "./xp";
@@ -341,9 +338,7 @@ export async function setUpgrade(member: GuildMember | string, upgradeId: string
   return await getUpgrades(member);
 }
 
-export async function checkLevelUp(member: GuildMember | string, consecutive?: number) {
-  if (await redis.exists("nypsi:infinitemaxbet")) return false;
-
+export async function doLevelUp(member: GuildMember | string) {
   let id: string;
   if (member instanceof GuildMember) {
     id = member.user.id;
@@ -351,158 +346,168 @@ export async function checkLevelUp(member: GuildMember | string, consecutive?: n
     id = member;
   }
 
-  if (!consecutive) {
-    if (await redis.exists(`nypsi:levelup:progress:${id}`)) return false;
+  if (await redis.exists(`${Constants.redis.cache.economy.LEVELLING_UP}:${id}`)) return;
+
+  await redis.set(`${Constants.redis.cache.economy.LEVELLING_UP}:${id}`, "t", "EX", 600);
+
+  const [beforePrestige, beforeLevel] = await Promise.all([getPrestige(id), getLevel(id)]);
+  let requirements = getLevelRequirements(beforePrestige, beforeLevel);
+  const [beforeXp, beforeBank] = await Promise.all([getXp(id), getBankBalance(id)]);
+
+  let totalUsedXp = 0;
+  let totalUsedBank = 0;
+  let levels = 0;
+
+  const items = new Map<string, number>();
+  const tags: string[] = [];
+  let earnedMoney = 0;
+  let earnedKarma = 0;
+  let rewardsText: string[] = [];
+
+  async function levelUp(consecutive = 1) {
+    if (consecutive >= 10) {
+      const [afterXp, afterBank, afterLevel, afterPrestige] = await Promise.all([
+        getXp(id),
+        getBankBalance(id),
+        getLevel(id),
+        getPrestige(id),
+      ]);
+
+      if (
+        afterXp === beforeXp &&
+        beforeBank === afterBank &&
+        afterLevel === beforeLevel &&
+        afterPrestige === beforePrestige
+      )
+        return true;
+      return false;
+    }
+
+    totalUsedXp += requirements.xp;
+    totalUsedBank += requirements.money;
+    levels++;
+
+    const rawLevel = beforePrestige * 100 + (beforeLevel + levels);
+
+    const levelData = levellingRewards.get(rawLevel);
+
+    if (levelData.text) rewardsText.push(levelData.text);
+
+    if (levelData?.rewards) {
+      for (const reward of levelData.rewards) {
+        if (reward.startsWith("id:")) {
+          if (items.has(reward.substring(3)))
+            items.set(reward.substring(3), items.get(reward.substring(3)) + 1);
+          else items.set(reward.substring(3), 1);
+        } else if (reward.startsWith("money:")) {
+          earnedMoney += parseInt(reward.substring(6));
+        } else if (reward.startsWith("karma:")) {
+          earnedKarma += parseInt(reward.substring(6));
+        } else if (reward.startsWith("tag:")) {
+          tags.push(reward.substring(4));
+        }
+      }
+    } else {
+      const crates = cratesFormula(beforeLevel + levels, beforePrestige);
+
+      if (crates > 0) {
+        if (items.has("basic_crate")) items.set("basic_crate", items.get("basic_crate") + crates);
+        else items.set("basic_crate", crates);
+
+        rewardsText.push(
+          `you have received:\n` + `- \`${crates}x\` 📦 basic crate${crates > 1 ? "s" : ""}`,
+        );
+      }
+
+      if (rawLevel % 200 === 0) {
+        if (items.has("nypsi_crate")) items.set("nypsi_crate", items.get("nypsi_crate") + 1);
+        else items.set("nypsi_crate", 1);
+
+        rewardsText.push("- `1x` <:xnypsi:1135923012458254416> nypsi crate");
+      }
+
+      if (rawLevel % 69 === 0) {
+        if (items.has("69420_crate")) items.set("69420_crate", items.get("69420_crate") + 5);
+        else items.set("69420_crate", 5);
+
+        rewardsText.push("- `5x` 🎁 69420 crate");
+      }
+
+      if (rawLevel % 750 === 0) {
+        if (items.has("bronze_credit")) items.set("bronze_credit", items.get("bronze_credit") + 1);
+        else items.set("bronze_credit", 1);
+
+        rewardsText.push("- `1x` <:nypsi_bronze:1108083689478443058> bronze credit");
+      }
+
+      if (rawLevel % 1500 === 0) {
+        if (items.has("omega_crate")) items.set("omega_crate", items.get("omega_crate") + 1);
+        else items.set("omega_crate", 1);
+
+        rewardsText.push("- `1x` <:nypsi_omega:1139279162276855890> omega crate");
+      }
+    }
+
+    if (rewardsText.length > 0) rewardsText.push("\n");
+
+    requirements = getLevelRequirements(beforePrestige, beforeLevel + levels);
+
+    if (beforeBank - totalUsedBank > requirements.money && beforeXp - totalUsedXp > requirements.xp)
+      return levelUp(consecutive++);
   }
 
-  const [xp, bank, requirements] = await Promise.all([
-    getXp(member),
-    getBankBalance(member),
-    getLevelRequirements(member),
-  ]);
+  const res = await levelUp().catch((e) => logger.error("level up failed", e));
 
-  if (requirements.money <= bank && requirements.xp <= xp) {
-    if (!consecutive) await redis.set(`nypsi:levelup:progress:${id}`, "t", "EX", 300);
-    await doLevelUp(member, requirements, consecutive);
-    if (!consecutive) await redis.del(`nypsi:levelup:progress:${id}`);
-    return true;
+  if (!res) {
+    await redis.del(`${Constants.redis.cache.economy.LEVELLING_UP}:${id}`);
+    return;
   }
 
-  return false;
-}
+  await removeXp(id, totalUsedXp, false);
+  await removeBankBalance(id, totalUsedBank, false);
+  await setLevel(id, beforeLevel + levels);
+  addStat(id, "spent-level", totalUsedBank);
+  addTaskProgress(id, "levelup_weekly", levels);
 
-async function doLevelUp(
-  member: GuildMember | string,
-  requirements: { money: number; xp: number },
-  consecutive = 1,
-) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
+  logger.info(
+    `${id} levelled up ${beforePrestige * 100 + beforeLevel} -> ${beforePrestige * 100 + beforeLevel + levels} (P${beforePrestige}L${beforeLevel} -> P${beforePrestige}L${beforeLevel + levels})`,
+  );
 
-  const level = await setLevel(member, (await getLevel(member)) + 1);
-  const prestige = await getPrestige(member);
+  let earnedBooster: "no" | "double" | "yes" = "no";
 
-  await removeXp(member, requirements.xp, false);
-  await removeBankBalance(member, requirements.money, false);
-  addStat(member, "spent-level", requirements.money);
+  for (let i = beforeLevel; i < beforeLevel + levels; i++) {
+    console.log(i);
 
-  const rawLevel = await getRawLevel(member);
-
-  let levelData = _.clone(levellingRewards.get(rawLevel));
-
-  logger.info(`${id} levelled up to ${rawLevel} (P${prestige}L${level})`);
-
-  if (levelData?.rewards) {
-    for (const reward of levelData.rewards) {
-      if (reward.startsWith("id:")) {
-        await addInventoryItem(member, reward.substring(3), 1);
-      } else if (reward.startsWith("money:")) {
-        await addBalance(member, parseInt(reward.substring(6)));
-        addStat(member, "earned-level", parseInt(reward.substring(6)));
-      } else if (reward.startsWith("karma:")) {
-        await addKarma(member, parseInt(reward.substring(6)));
-      } else if (reward.startsWith("tag:")) {
-        await addTag(id, reward.substring(4)).catch(() => null);
-      }
-    }
-  } else {
-    const crates = cratesFormula(level, prestige);
-
-    if (crates > 0) {
-      await addInventoryItem(member, "basic_crate", crates);
-
-      levelData = {
-        text: `you have received:\n` + `- \`${crates}x\` 📦 basic crate${crates > 1 ? "s" : ""}`,
-      };
-    }
-
-    if (rawLevel % 200 === 0) {
-      await addInventoryItem(member, "nypsi_crate", 1);
-
-      if (levelData?.text) {
-        levelData.text += "\n- `1x` <:xnypsi:1135923012458254416> nypsi crate";
-      } else {
-        levelData = {
-          text: "you have received:\n" + "- `1x` <:xnypsi:1135923012458254416> nypsi crate",
-        };
-      }
-    }
-
-    if (rawLevel % 69 === 0) {
-      await addInventoryItem(member, "69420_crate", 5);
-
-      if (levelData?.text) {
-        levelData.text += "\n- `5x` 🎁 69420 crate";
-      } else {
-        levelData = {
-          text: "you have received:\n" + "- `5x` 🎁 69420 crate",
-        };
-      }
-    }
-
-    if (rawLevel % 750 === 0) {
-      await addInventoryItem(member, "bronze_credit", 1);
-
-      if (levelData?.text) {
-        levelData.text += "\n- `1x` <:nypsi_bronze:1108083689478443058> bronze credit";
-      } else {
-        levelData = {
-          text: "you have received:\n" + "- `1x` <:nypsi_bronze:1108083689478443058> bronze credit",
-        };
-      }
-    }
-
-    if (rawLevel % 1500 === 0) {
-      await addInventoryItem(member, "omega_crate", 1);
-
-      if (levelData?.text) {
-        levelData.text += "\n- `1x` <:nypsi_omega:1139279162276855890> omega crate";
-      } else {
-        levelData = {
-          text: "you have received:\n" + "- `1x` <:nypsi_omega:1139279162276855890> omega crate",
-        };
-      }
-    }
+    const rawLevel = beforePrestige * 100 + i;
 
     if (rawLevel % 50 === 0) {
-      const boosters = await getBoosters(member);
-
-      if (!boosters.has("xp_booster")) {
-        let time = 10;
-        if (prestige >= 5) time = 15;
-        if (level.toString().endsWith("50")) {
-          time *= 2;
-        }
-
-        await addBooster(member, "xp_booster", 1, dayjs().add(time, "minutes").toDate());
-
-        if (levelData?.text) {
-          levelData.text += `\n- \`${time}m\` ✨ xp booster`;
-        } else {
-          levelData = {
-            text: `you have received:\n` + `- \`${time}m\` ✨ xp booster`,
-          };
-        }
-      }
+      if (rawLevel.toString().endsWith("50")) earnedBooster = "double";
+      else earnedBooster = "yes";
     }
   }
 
-  const embed = new CustomEmbed(member instanceof GuildMember ? member : null)
-    .setHeader(
-      "level up",
-      member instanceof GuildMember
-        ? member.user.avatarURL()
-        : (await prisma.user.findUnique({ where: { id }, select: { avatar: true } })).avatar,
-    )
-    .setDescription(
-      `you are now ${
-        prestige > 0 ? `**prestige ${prestige} level ${level}**` : `level **${level}**`
-      }${levelData?.text ? `\n\n${levelData.text}` : ""}`,
-    );
+  console.log(earnedBooster);
+
+  if (earnedBooster !== "no") {
+    const boosters = await getBoosters(id);
+
+    if (!boosters.has("xp_booster")) {
+      let time = 10;
+      if (beforePrestige >= 5) time = 15;
+      if (earnedBooster === "double") time *= 2;
+
+      await addBooster(id, "xp_booster", 1, dayjs().add(time, "minutes").toDate());
+
+      rewardsText.push("- `${time}m` ✨ xp booster");
+    }
+  }
+
+  const embed = new CustomEmbed(member).setHeader(
+    "level up",
+    member instanceof GuildMember ? member.avatarURL() : await getLastKnownAvatar(id),
+  );
+
+  if (rewardsText.length > 0) embed.setDescription(rewardsText.join("\n"));
 
   const dmSetting = (await getDmSettings(member)).level;
 
@@ -511,19 +516,11 @@ async function doLevelUp(
       addNotificationToQueue({ memberId: id, payload: { embed } });
       break;
     case "OnlyReward":
-      if (levelData) addNotificationToQueue({ memberId: id, payload: { embed } });
+      if (rewardsText.length > 0) addNotificationToQueue({ memberId: id, payload: { embed } });
       else await redis.set(`nypsi:levelup:${id}`, JSON.stringify(embed.toJSON()));
       break;
     case "Disabled":
       await redis.set(`nypsi:levelup:${id}`, JSON.stringify(embed.toJSON()));
       break;
   }
-
-  addTaskProgress(id, "levelup_weekly");
-
-  await sleep(69);
-
-  if (consecutive >= 10) return;
-
-  return await checkLevelUp(member, consecutive + 1);
 }
