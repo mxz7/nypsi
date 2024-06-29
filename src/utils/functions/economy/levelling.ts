@@ -355,8 +355,6 @@ export async function doLevelUp(member: GuildMember | string) {
 
   if (await redis.exists(`${Constants.redis.cache.economy.LEVELLING_UP}:${id}`)) return;
 
-  await redis.set(`${Constants.redis.cache.economy.LEVELLING_UP}:${id}`, "t", "EX", 600);
-
   const [beforePrestige, beforeLevel] = await Promise.all([getPrestige(id), getLevel(id)]);
   let requirements = getLevelRequirements(beforePrestige, beforeLevel);
   const [beforeXp, beforeBank] = await Promise.all([getXp(id), getBankBalance(id)]);
@@ -365,6 +363,10 @@ export async function doLevelUp(member: GuildMember | string) {
     await redis.del(`${Constants.redis.cache.economy.LEVELLING_UP}:${id}`);
     return;
   }
+
+  if (await redis.exists(`${Constants.redis.cache.economy.LEVELLING_UP}:${id}`)) return;
+
+  await redis.set(`${Constants.redis.cache.economy.LEVELLING_UP}:${id}`, "t", "EX", 600);
 
   let totalUsedXp = 0;
   let totalUsedBank = 0;
