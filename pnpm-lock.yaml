@@ -63,8 +63,8 @@ importers:
         specifier: 4.17.21
         version: 4.17.21
       mathjs:
-        specifier: 13.0.0
-        version: 13.0.0
+        specifier: 13.0.1
+        version: 13.0.1
       ms:
         specifier: 2.1.3
         version: 2.1.3
@@ -100,8 +100,8 @@ importers:
         specifier: ^29.5.12
         version: 29.5.12
       '@types/lodash':
-        specifier: 4.17.5
-        version: 4.17.5
+        specifier: 4.17.6
+        version: 4.17.6
       '@types/ms':
         specifier: 0.7.34
         version: 0.7.34
@@ -1082,8 +1082,8 @@ packages:
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
 
-  '@types/lodash@4.17.5':
-    resolution: {integrity: sha512-MBIOHVZqVqgfro1euRDWX7OO0fBVUUMrN6Pwm8LQsz8cWhEpihlvR70ENj3f40j58TNxZaWv2ndSkInykNBBJw==}
+  '@types/lodash@4.17.6':
+    resolution: {integrity: sha512-OpXEVoCKSS3lQqjx9GGGOapBeuW5eUboYHRlHP9urXPX25IKZ6AnP5ZRxtVf63iieUbsHxLn8NQ5Nlftc6yzAA==}
 
   '@types/luxon@3.4.2':
     resolution: {integrity: sha512-TifLZlFudklWlMBfhubvgqTXRzLDI5pCbGa4P8a3wPyUQSW+1xQ5eDsreP9DWHX3tjq1ke96uYG/nwundroWcA==}
@@ -2172,8 +2172,8 @@ packages:
   makeerror@1.0.12:
     resolution: {integrity: sha512-JmqCvUhmt43madlpFzG4BQzG2Z3m6tvQDNKdClZnO3VbIudJYmxsT0FNJMeiB2+JTSlTQTSbU8QdesVmwJcmLg==}
 
-  mathjs@13.0.0:
-    resolution: {integrity: sha512-Jy9/01M5lTRLxlkxnvPmvWq6EFwzq8guIspeQ9p66AY+8Pih3Jf8Us5fSZ9kC8gl7iRNHUQ+SJpitX41aa6agw==}
+  mathjs@13.0.1:
+    resolution: {integrity: sha512-38IzJ/MY0erNp7apXJp6DZwUYHOuvlqRqk2KtMo9GPqrTmCaLb1vTzw/Fib3PessXEMs52wnJaga0pd9xkIjjA==}
     engines: {node: '>= 18'}
     hasBin: true
 
@@ -4321,7 +4321,7 @@ snapshots:
 
   '@types/json-schema@7.0.15': {}
 
-  '@types/lodash@4.17.5': {}
+  '@types/lodash@4.17.6': {}
 
   '@types/luxon@3.4.2': {}
 
@@ -5683,7 +5683,7 @@ snapshots:
     dependencies:
       tmpl: 1.0.5
 
-  mathjs@13.0.0:
+  mathjs@13.0.1:
     dependencies:
       '@babel/runtime': 7.24.7
       complex.js: 2.1.1
