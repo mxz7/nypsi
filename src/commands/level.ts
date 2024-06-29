@@ -53,13 +53,14 @@ cmd.setRun(async (message) => {
     return;
   }
 
-  const [required, level, xp, bank, prestige] = await Promise.all([
-    getLevelRequirements(message.member),
+  const [level, xp, bank, prestige] = await Promise.all([
     getLevel(message.member),
     getXp(message.member),
     getBankBalance(message.member),
     getPrestige(message.member),
   ]);
+
+  const required = getLevelRequirements(prestige, level);
 
   return send({
     embeds: [
