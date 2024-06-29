@@ -155,8 +155,10 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel, 
           desc += `you just set a new personal best of \`${time.toFixed(3)}s\`${pos ? ` (#${pos})` : ""}`;
         }
 
+        if (desc) embed.setDescription(desc);
+
         setTimeout(() => {
-          message.reply({ embeds: [embed] });
+          if (desc) message.reply({ embeds: [embed] });
         }, 1000);
       }
     }
