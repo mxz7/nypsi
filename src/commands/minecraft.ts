@@ -102,9 +102,11 @@ async function getUUID(username: string): Promise<{ name: string; id: string }> 
     return JSON.parse(await redis.get(`${Constants.redis.cache.minecraft.UUID}:${username}`));
   }
 
-  let uuid = await fetch(`https://api.mojang.com/users/profiles/minecraft/${username}`).then(
-    (uuidURL) => uuidURL.json(),
-  );
+  const res = await fetch(`https://api.mojang.com/users/profiles/minecraft/${username}`);
+
+  console.log(res);
+
+  let uuid = await res.json();
 
   if (uuid.errorMessage) uuid = { id: "null", string: "null" };
 
