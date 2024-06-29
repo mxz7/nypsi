@@ -228,7 +228,7 @@ export async function getRawLevel(member: GuildMember | string) {
     level += 100;
   }
 
-  return level;
+  return prestige * 100 + level;
 }
 
 export async function setLevel(member: GuildMember | string, amount: number) {
