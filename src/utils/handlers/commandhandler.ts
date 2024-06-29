@@ -936,7 +936,7 @@ export async function runCommand(
     }
   }
 
-  if (await redis.exists(`nypsi:levelup:progress:${message.author.id}`)) {
+  if (await redis.exists(`${Constants.redis.cache.economy.LEVELLING_UP}:${message.author.id}`)) {
     if (message instanceof Message) {
       return message.channel.send({
         embeds: [new ErrorEmbed("please wait. you are currently levelling up")],
