@@ -256,23 +256,16 @@ export async function setLevel(member: GuildMember | string, amount: number) {
   return query.level;
 }
 
-export async function getLevelRequirements(member: GuildMember | string) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
-
-  let [prestige, level] = await Promise.all([getPrestige(id), getLevel(id)]);
-
+export function getLevelRequirements(prestige: number, level: number) {
   while (level >= 100) {
     prestige++;
     level -= 100;
   }
 
+  const rawLevel = prestige * 100 + level;
+
   const requiredXp = xpFormula(level, prestige);
-  const requiredMoney = moneyFormula(await getRawLevel(id));
+  const requiredMoney = moneyFormula(rawLevel);
 
   return { xp: requiredXp, money: requiredMoney };
 }
