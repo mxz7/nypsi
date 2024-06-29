@@ -163,7 +163,6 @@ async function run(
       bankMaxBalance,
       padlock,
       level,
-      levelRequirements,
       xp,
       guild,
       tags,
@@ -178,13 +177,14 @@ async function run(
       getMaxBankBalance(target),
       hasPadlock(target),
       getLevel(target),
-      getLevelRequirements(target),
       getXp(target),
       getGuildByUser(target),
       getTags(target.id),
       getViews(target.id),
       getUpgrades(target),
     ]);
+
+    const levelRequirements = getLevelRequirements(prestige, level);
 
     embed.setFields([]);
     row.setComponents([]);

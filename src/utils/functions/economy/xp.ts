@@ -7,7 +7,7 @@ import { getTier } from "../premium/premium";
 import { calcMaxBet, getRequiredBetForXp } from "./balance";
 import { getBoosters } from "./boosters";
 import { gemBreak, getInventory } from "./inventory";
-import { checkLevelUp, getRawLevel, getUpgrades } from "./levelling";
+import { doLevelUp, getRawLevel, getUpgrades } from "./levelling";
 import { getItems, getUpgradesData } from "./utils";
 
 export async function getXp(member: GuildMember | string): Promise<number> {
@@ -56,7 +56,7 @@ export async function updateXp(member: GuildMember | string, amount: number, che
   });
   await redis.del(`${Constants.redis.cache.economy.XP}:${id}`);
 
-  if (check) checkLevelUp(member);
+  if (check) doLevelUp(member);
 }
 
 export async function addXp(member: GuildMember | string, amount: number, check = true) {
@@ -80,7 +80,7 @@ export async function addXp(member: GuildMember | string, amount: number, check 
   });
   await redis.set(`${Constants.redis.cache.economy.XP}:${id}`, query.xp.toString(), "EX", 3600);
 
-  if (check) checkLevelUp(member);
+  if (check) doLevelUp(member);
 }
 
 export async function removeXp(member: GuildMember | string, amount: number, check = true) {
@@ -104,7 +104,7 @@ export async function removeXp(member: GuildMember | string, amount: number, che
   });
   await redis.set(`${Constants.redis.cache.economy.XP}:${id}`, query.xp.toString(), "EX", 3600);
 
-  if (check) checkLevelUp(member);
+  if (check) doLevelUp(member);
 }
 
 export async function calcEarnedGambleXp(
