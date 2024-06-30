@@ -147,7 +147,7 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel, 
 
         if (update.daily) {
           const { pos } = await topChatReactionGlobal(message.author.id, true);
-          desc += `you just set a new **daily personal best** of \`${time.toFixed(3)}s\`${pos ? ` (#${pos})` : ""}\n\n`;
+          desc += `you just set a new **daily** personal best of \`${time.toFixed(3)}s\`${pos ? ` (#${pos})` : ""}\n\n`;
         }
 
         if (update.global) {
