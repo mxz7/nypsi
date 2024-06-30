@@ -3,6 +3,7 @@ import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
 import { logger } from "../../logger";
 import { formatUsername } from "../economy/top";
+import { isEcoBanned } from "../economy/utils";
 import { getBlacklisted } from "./blacklisted";
 
 export async function getReactionStats(guild: Guild, member: GuildMember) {
@@ -345,6 +346,8 @@ export async function addLeaderboardEntry(
       });
     }
   }
+
+  if ((await isEcoBanned(userId)).banned) return res
 
   await Promise.all([daily(), global()]);
 
