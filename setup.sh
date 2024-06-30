@@ -1,4 +1,3 @@
-mkdir jobs
 mkdir out
 
 cd src
