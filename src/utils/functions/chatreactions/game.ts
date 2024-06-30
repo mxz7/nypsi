@@ -145,14 +145,14 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel, 
 
         let desc = "";
 
-        if (update.daily) {
-          const { pos } = await topChatReactionGlobal(message.author.id, true);
-          desc += `you just set a new **daily** personal best of \`${time.toFixed(3)}s\`${pos ? ` (#${pos})` : ""}\n\n`;
-        }
-
         if (update.global) {
           const { pos } = await topChatReactionGlobal(message.author.id, false);
-          desc += `you just set a new **personal best** of \`${time.toFixed(3)}s\`${pos ? ` (#${pos})` : ""}`;
+          desc += `you just set a new **personal best** of \`${time.toFixed(3)}s\`${pos ? ` (#${pos})` : ""}\n\n`;
+        }
+
+        if (update.daily) {
+          const { pos } = await topChatReactionGlobal(message.author.id, true);
+          desc += `you just set a new **daily** personal best of \`${time.toFixed(3)}s\`${pos ? ` (#${pos})` : ""}`;
         }
 
         if (desc) embed.setDescription(desc);
