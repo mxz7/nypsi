@@ -347,7 +347,7 @@ export async function addLeaderboardEntry(
     }
   }
 
-  if ((await isEcoBanned(userId)).banned) return res
+  if ((await isEcoBanned(userId)).banned) return res;
 
   await Promise.all([daily(), global()]);
 
