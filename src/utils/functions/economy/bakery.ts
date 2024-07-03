@@ -211,7 +211,7 @@ export async function runBakery(member: GuildMember) {
   let total = chosenAmount + passive;
 
   if (guildUpgrades.find((i) => i.upgradeId === "bakery")) {
-    if (percentChance(0.5 * guildUpgrades.find((i) => i.upgradeId === "bakery").amount)) {
+    if (percentChance(2 * guildUpgrades.find((i) => i.upgradeId === "bakery").amount)) {
       total = total * 2;
       earned.set("guild", Math.floor(total / 2));
     }

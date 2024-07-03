@@ -37,7 +37,7 @@
   "bakery": {
     "id": "bakery",
     "name": "double cookies",
-    "description": "+0.5% chance to double cookies produced",
+    "description": "+2% chance to double cookies produced",
     "cost": 1,
     "increment_per_level": 0.25
   }
