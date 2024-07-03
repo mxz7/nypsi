@@ -564,7 +564,7 @@ export async function doLevelUp(member: GuildMember | string) {
     for (const [key, value] of rewardsText.entries()) {
       const level =
         beforePrestige > 0 ? key.toString().substring(beforePrestige.toString().length) : key;
-      if (rewardsText.size > 1)
+      if (rewardsText.size > 1 || levels > 1)
         desc += `-- ${beforePrestige > 0 ? `prestige ${beforePrestige} ` : ""}level ${level} --\n\n`;
 
       desc += value.join("\n");
