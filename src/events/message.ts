@@ -298,10 +298,10 @@ export default async function messageCreate(message: Message) {
     message.content == `<@${message.client.user.id}>`
   ) {
     return message.channel
-      .send({ content: `my prefix for this server is \`${prefixes}\`` })
+      .send({ content: `my prefixes for this server: \`${prefixes.join("` `")}\`` })
       .catch(() => {
         return message.member.send({
-          content: `my prefix for this server is \`${prefixes}\` -- i do not have permission to send messages in that channel`,
+          content: `my prefixes for this server: \`${prefixes.join("` `")}\` -- i do not have permission to send messages in that channel`,
         });
       });
   }
