@@ -208,6 +208,10 @@ async function run(
               },
             },
             Captchas: true,
+            ChatReactionLeaderboards: true,
+            ModerationEvidence: true,
+            Sessions: true,
+            Viewed: true,
           },
         }),
         moderation: {
