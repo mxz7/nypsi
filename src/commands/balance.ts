@@ -184,7 +184,7 @@ async function run(
   if (gems.includes("blue_gem")) gemLine += `${getItems()["blue_gem"].emoji}`;
   if (gems.includes("green_gem")) gemLine += `${getItems()["green_gem"].emoji}`;
 
-  const embed = new CustomEmbed(message.member)
+  const embed = new CustomEmbed(target)
     .setDescription(
       `${padlockStatus ? "🔒" : "💰"} $**${balance.toLocaleString()}**\n` +
         `💳 $**${bankBalance.toLocaleString()}** / $**${bankMaxBalance.toLocaleString()}**${
