@@ -138,14 +138,18 @@ async function run(
           .setDescription(ratio),
       );
 
-      pages.set(
-        stat.game,
-        ratio +
-          "\n\n" +
-          `**profit** $${(Number(stat._sum.earned) - Number(stat._sum.bet)).toLocaleString()}\n` +
-          `**xp** ${Number(stat._sum.xpEarned).toLocaleString()}\n` +
-          `**avg bet** $${Math.floor(Number(stat._avg.bet)).toLocaleString()}`,
-      );
+      if (stat.game.includes("scratch")) {
+        pages.set(stat.game, ratio);
+      } else {
+        pages.set(
+          stat.game,
+          ratio +
+            "\n\n" +
+            `**profit** $${(Number(stat._sum.earned) - Number(stat._sum.bet)).toLocaleString()}\n` +
+            `**xp** ${Number(stat._sum.xpEarned).toLocaleString()}\n` +
+            `**avg bet** $${Math.floor(Number(stat._avg.bet)).toLocaleString()}`,
+        );
+      }
     }
 
     const render = (type: string) => {
