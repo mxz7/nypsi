@@ -14,7 +14,7 @@ import {
 import { checkOffer } from "../utils/functions/economy/offers";
 import { addStat } from "../utils/functions/economy/stats";
 import { getItems, isEcoBanned } from "../utils/functions/economy/utils";
-import { isPremium } from "../utils/functions/premium/premium";
+import { getTier } from "../utils/functions/premium/premium";
 import { addToNypsiBank, getTax } from "../utils/functions/tax";
 import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications";
 import { transaction } from "../utils/logger";
@@ -98,7 +98,7 @@ export default {
     const tax = await getTax();
     let taxedAmount = 0;
 
-    if (!(await isPremium(offer.ownerId)) && Number(offer.money) > 1_000_000)
+    if ((await getTier(offer.ownerId)) !== 4 && Number(offer.money) > 1_000_000)
       taxedAmount = Math.floor(Number(offer.money) * tax);
 
     await Promise.all([

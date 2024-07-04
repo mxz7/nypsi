@@ -17,7 +17,7 @@ import {
 } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
-import { isPremium } from "../utils/functions/premium/premium";
+import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { addToNypsiBank, getTax } from "../utils/functions/tax";
 import { getDmSettings } from "../utils/functions/users/notifications";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -154,7 +154,10 @@ async function run(
 
   let tax = await getTax();
 
-  if ((await isPremium(message.member)) || (await isPremium(target))) {
+  if (
+    ((await isPremium(message.member)) && (await getTier(message.member)) === 4) ||
+    ((await isPremium(target)) && (await getTier(target)) === 4)
+  ) {
     tax = 0;
   }
 
