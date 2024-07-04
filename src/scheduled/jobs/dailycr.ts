@@ -3,7 +3,7 @@ import prisma from "../../init/database";
 import { Job } from "../../types/Jobs";
 
 export default {
-  name: "daily streak",
+  name: "daily chat reaction purge",
   cron: "0 0 * * *",
   async run(log) {
     const query = await prisma.chatReactionLeaderboards.deleteMany({
