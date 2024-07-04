@@ -120,7 +120,7 @@ export async function calcEarnedGambleXp(
     return 0;
   }
 
-  let min = 1;
+  let min = 5;
 
   const [inventory, tier, booster, boosters, upgrades, rawLevel, maxBet] = await Promise.all([
     getInventory(member),
@@ -132,7 +132,7 @@ export async function calcEarnedGambleXp(
     calcMaxBet(member),
   ]);
 
-  min += rawLevel / 25 > 40 ? 40 : rawLevel / 25;
+  min += rawLevel / 20 > 35 ? 35 : rawLevel / 20;
 
   if (booster) min += 5;
   if (tier) min += tier * 2.7;
