@@ -21,7 +21,7 @@ import { CustomEmbed, ErrorEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
 import { logger, transaction } from "../../logger";
 import { filterOutliers } from "../outliers";
-import { isPremium } from "../premium/premium";
+import { getTier, isPremium } from "../premium/premium";
 import requestDM from "../requestdm";
 import { addToNypsiBank, getTax } from "../tax";
 import { addNotificationToQueue, getDmSettings, getPreferences } from "../users/notifications";
@@ -686,7 +686,7 @@ export async function buyFullAuction(
 
   let taxedAmount = 0;
 
-  if (!(await isPremium(auction.ownerId))) {
+  if ((await getTier(auction.ownerId)) !== 4) {
     taxedAmount = Math.floor(Number(auction.bin) * tax);
     addToNypsiBank(taxedAmount);
   }
