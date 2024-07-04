@@ -1,5 +1,5 @@
 import { GuildMember } from "discord.js";
-import { inPlaceSort } from "fast-sort";
+import { inPlaceSort, sort } from "fast-sort";
 import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { logger } from "../../logger";
@@ -16,7 +16,7 @@ export async function getGambleStats(member: GuildMember) {
 
   const query = await prisma.game.groupBy({
     where: {
-      AND: [{ userId: id }, { game: { not: { contains: "scratch" } } }],
+      userId: id,
     },
     by: ["game"],
     _count: {
@@ -32,9 +32,7 @@ export async function getGambleStats(member: GuildMember) {
     },
   });
 
-  inPlaceSort(query).desc((i) => i._count._all);
-
-  return query;
+  return sort(query).desc((i) => i._count._all);
 }
 
 export async function getGameWins(member: GuildMember, game: string) {

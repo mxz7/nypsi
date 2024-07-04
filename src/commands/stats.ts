@@ -4,11 +4,14 @@ import {
   ButtonBuilder,
   ButtonStyle,
   CommandInteraction,
+  ComponentType,
   Interaction,
   InteractionReplyOptions,
   Message,
   MessageActionRowComponentBuilder,
   MessageEditOptions,
+  StringSelectMenuBuilder,
+  StringSelectMenuOptionBuilder,
 } from "discord.js";
 import { inPlaceSort, sort } from "fast-sort";
 import { cpu } from "node-os-utils";
@@ -118,55 +121,82 @@ async function run(
       return send({ embeds: [new ErrorEmbed("you have no gamble stats")] });
     }
 
-    const fields: { name: string; value: string; inline: boolean }[] = [];
+    const pages = new Map<string, string>();
+    const options = new StringSelectMenuBuilder().setCustomId("game_type");
 
     for (const stat of gambleStats) {
       const wins = await getGameWins(message.member, stat.game);
-      fields.push({
-        name: stat.game,
-        value:
-          `${wins.toLocaleString()}/${stat._count._all.toLocaleString()} (${(
-            (wins / stat._count._all) *
-            100
-          ).toFixed(1)}%)\n` +
-          `profit: $${(Number(stat._sum.earned) - Number(stat._sum.bet)).toLocaleString()}\n` +
-          `xp: ${Number(stat._sum.xpEarned).toLocaleString()}\n` +
-          `avg bet: $${Math.floor(Number(stat._avg.bet)).toLocaleString()}`,
-        inline: true,
-      });
-    }
+      const ratio = `${wins.toLocaleString()}/${stat._count._all.toLocaleString()} (${(
+        (wins / stat._count._all) *
+        100
+      ).toFixed(1)}%)`;
 
-    const pages = PageManager.createPages(fields, 6);
-
-    const embed = new CustomEmbed(message.member)
-      .setFields(pages.get(1))
-      .setHeader("gamble stats", message.author.avatarURL());
-
-    if (pages.size > 1) {
-      const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder()
-          .setCustomId("⬅")
-          .setLabel("back")
-          .setStyle(ButtonStyle.Primary)
-          .setDisabled(true),
-        new ButtonBuilder().setCustomId("➡").setLabel("next").setStyle(ButtonStyle.Primary),
+      options.addOptions(
+        new StringSelectMenuOptionBuilder()
+          .setLabel(stat.game)
+          .setValue(stat.game)
+          .setDescription(ratio),
       );
-      const msg = await send({ embeds: [embed], components: [row] });
-      const manager = new PageManager({
-        embed,
-        row,
-        message: msg,
-        userId: message.author.id,
-        pages,
-        updateEmbed(page, embed) {
-          return embed.setFields(page);
-        },
-      });
 
-      return manager.listen();
+      pages.set(
+        stat.game,
+        ratio +
+          "\n\n" +
+          `**profit** $${(Number(stat._sum.earned) - Number(stat._sum.bet)).toLocaleString()}\n` +
+          `**xp** ${Number(stat._sum.xpEarned).toLocaleString()}\n` +
+          `**avg bet** $${Math.floor(Number(stat._avg.bet)).toLocaleString()}`,
+      );
     }
 
-    return send({ embeds: [embed] });
+    const render = (type: string) => {
+      options.options.forEach((o) => o.setDefault(false));
+      options.options.find((o) => o.data.value === type).setDefault(true);
+
+      const rows = [
+        new ActionRowBuilder<MessageActionRowComponentBuilder>().setComponents(options),
+        new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+          new ButtonBuilder()
+            .setStyle(ButtonStyle.Link)
+            .setLabel("history")
+            .setURL(`https://nypsi.xyz/game?user=${message.author.id}&game=${type}`)
+            .setEmoji("📖"),
+        ),
+      ];
+
+      const embed = new CustomEmbed(message.member, pages.get(type)).setHeader(
+        `${type} stats`,
+        message.author.avatarURL(),
+      );
+
+      return { embeds: [embed], components: rows };
+    };
+
+    let rendered = render(gambleStats[0].game);
+
+    const msg = await send(rendered);
+
+    const listen = async () => {
+      const interaction = await msg
+        .awaitMessageComponent({
+          filter: (i) => i.user.id === message.author.id,
+          time: 60000,
+          componentType: ComponentType.StringSelect,
+        })
+        .catch(() => {
+          rendered.components.forEach((i) => i.components.forEach((j) => j.setDisabled(true)));
+          msg.edit({ components: rendered.components });
+        });
+
+      if (!interaction) return;
+
+      if (interaction.customId === "game_type") {
+        rendered = render(interaction.values[0]);
+        interaction.update(rendered);
+        return listen();
+      }
+    };
+
+    listen();
   };
 
   const scratchStats = async () => {
