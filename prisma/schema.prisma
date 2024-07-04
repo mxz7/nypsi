@@ -95,7 +95,7 @@ model ChatReactionLeaderboards {
   time      Float
   createdAt DateTime @default(now()) @updatedAt
 
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([daily, userId])
 }
