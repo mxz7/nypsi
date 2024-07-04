@@ -750,6 +750,7 @@ async function playGame(
   if (!response) return;
 
   if (response.customId.length != 2 && response.customId != "finish") {
+    logger.error("WEIRD MINES COORDINATE THING", { response, game: games.get(message.author.id) });
     await message.channel.send({
       content: message.author.toString() + " invalid coordinate, example: `a3`",
     });
