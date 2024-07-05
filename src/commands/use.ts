@@ -41,6 +41,8 @@ const cmd = new Command("use", "use an item or open crates", "money").setAliases
   "activate",
   "eat",
   "cuddle",
+  "drink",
+  "dink",
 ]);
 
 cmd.slashEnabled = true;
