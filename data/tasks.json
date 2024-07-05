@@ -4,7 +4,7 @@
     "name": "all dailies",
     "description": "complete 21 daily tasks",
     "target": [21],
-    "prizes": ["id:nypsi_crate:1", "id:legendary_scratch_card:1", "karma:500", "xp:5000"],
+    "prizes": ["id:nypsi_crate:1", "id:legendary_scratch_card:1", "karma:750", "xp:10000"],
     "type": "weekly"
   },
   "bake_daily": {
@@ -12,7 +12,7 @@
     "name": "baking",
     "description": "bake cookies",
     "target": [50, 100, 200],
-    "prizes": ["id:basic_crate:1", "id:69420_crate:1", "xp:100"],
+    "prizes": ["id:basic_crate:1", "id:69420_crate:1", "xp:250"],
     "type": "daily"
   },
   "bake_weekly": {
@@ -28,7 +28,7 @@
     "name": "nypsi addict",
     "description": "use commands",
     "target": [500, 1000, 2000, 4000],
-    "prizes": ["id:lucky_scratch_card:2", "xp:750", "karma:100"],
+    "prizes": ["id:lucky_scratch_card:2", "xp:750", "karma:250"],
     "type": "weekly"
   },
   "commands_daily": {
@@ -36,7 +36,7 @@
     "name": "nypsi addict",
     "description": "use commands",
     "target": [50, 100, 200],
-    "prizes": ["id:basic_crate:1", "id:69420_crate:1", "xp:150", "id:lucky_scratch_card:1"],
+    "prizes": ["id:basic_crate:1", "id:69420_crate:1", "xp:200", "id:lucky_scratch_card:1"],
     "type": "daily"
   },
   "daily_streaks": {
@@ -60,7 +60,7 @@
     "name": "meow",
     "description": "look at pictures of cats",
     "target": [5, 10, 10, 10, 10, 10, 25],
-    "prizes": ["id:basic_crate:1", "id:69420_crate:1", "xp:100"],
+    "prizes": ["id:basic_crate:1", "id:69420_crate:1", "xp:150"],
     "type": "daily"
   },
   "dogs_daily": {
@@ -68,7 +68,7 @@
     "name": "woof",
     "description": "look at pictures of dogs",
     "target": [5, 10, 10, 10, 10, 10, 25],
-    "prizes": ["id:basic_crate:1", "id:69420_crate:1", "xp:100"],
+    "prizes": ["id:basic_crate:1", "id:69420_crate:1", "xp:150"],
     "type": "daily"
   },
   "chat_daily": {
@@ -155,7 +155,7 @@
     "description": "mine",
     "complete_gif": "https://c.tenor.com/21SK19ZNydwAAAAC/tenor.gif",
     "target": [10, 15],
-    "prizes": ["id:basic_crate:1", "id:diamond_pickaxe:7"],
+    "prizes": ["id:basic_crate:1", "id:diamond_pickaxe:10"],
     "type": "daily"
   },
   "mine_weekly": {
@@ -164,7 +164,7 @@
     "description": "mine",
     "complete_gif": "https://c.tenor.com/21SK19ZNydwAAAAC/tenor.gif",
     "target": [50, 75, 100],
-    "prizes": ["id:basic_crate:2", "id:diamond_pickaxe:15"],
+    "prizes": ["id:basic_crate:2", "id:diamond_pickaxe:20"],
     "type": "weekly"
   },
   "fish_daily": {
@@ -172,7 +172,7 @@
     "name": "fisher",
     "description": "fish",
     "target": [10, 15],
-    "prizes": ["id:basic_crate:1", "id:incredible_fishing_rod:7"],
+    "prizes": ["id:basic_crate:1", "id:incredible_fishing_rod:10"],
     "type": "daily"
   },
   "fish_weekly": {
@@ -180,7 +180,7 @@
     "name": "fisher",
     "description": "fish",
     "target": [50, 75, 100],
-    "prizes": ["id:basic_crate:2", "id:incredible_fishing_rod:15"],
+    "prizes": ["id:basic_crate:2", "id:incredible_fishing_rod:20"],
     "type": "weekly"
   },
   "hunt_daily": {
@@ -188,7 +188,7 @@
     "name": "hunter",
     "description": "hunt",
     "target": [10, 15],
-    "prizes": ["id:basic_crate:1", "id:incredible_gun:7"],
+    "prizes": ["id:basic_crate:1", "id:incredible_gun:10"],
     "type": "daily"
   },
   "hunt_weekly": {
@@ -196,7 +196,7 @@
     "name": "hunter",
     "description": "hunt",
     "target": [50, 75, 100],
-    "prizes": ["id:basic_crate:2", "id:incredible_gun:15"],
+    "prizes": ["id:basic_crate:2", "id:incredible_gun:20"],
     "type": "weekly"
   },
   "mike_tyson": {
@@ -220,7 +220,7 @@
     "name": "fast typer",
     "description": "win chat reactions",
     "target": [2, 5, 7],
-    "prizes": ["id:basic_crate:1", "xp:100"],
+    "prizes": ["id:basic_crate:1", "xp:300"],
     "type": "daily"
   },
   "chat_reaction_weekly": {
@@ -260,7 +260,7 @@
     "name": "old man gamer",
     "description": "win wordles",
     "target": [2, 5, 7],
-    "prizes": ["id:basic_crate:1", "xp:100"],
+    "prizes": ["id:basic_crate:1", "xp:300"],
     "type": "daily"
   },
   "wordles_weekly": {
@@ -268,7 +268,7 @@
     "name": "old man gamer",
     "description": "win wordles",
     "target": [15, 25, 35],
-    "prizes": ["id:basic_crate:3", "xp:500"],
+    "prizes": ["id:basic_crate:3", "xp:1000"],
     "type": "weekly"
   },
   "horny": {
