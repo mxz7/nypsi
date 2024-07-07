@@ -547,9 +547,13 @@ export async function doLevelUp(member: GuildMember | string) {
       await addBooster(id, "xp_booster", 1, dayjs().add(time, "minutes").toDate());
 
       const highest = inPlaceSort(Array.from(rewardsText.keys())).asc()[0];
-      rewardsText.get(highest).push(`- \`${time}m\` ✨ xp booster`);
+      if (rewardsText.has(highest)) {
+        rewardsText.set(beforeLevel + levels, [`- \`${time}m\` ✨ xp booster`]);
+      } else rewardsText.get(highest).push(`- \`${time}m\` ✨ xp booster`);
     }
   }
+
+  await redis.del(`${Constants.redis.cache.economy.LEVELLING_UP}:${id}`);
 
   const embed = new CustomEmbed(member).setHeader(
     "level up",
@@ -588,6 +592,4 @@ export async function doLevelUp(member: GuildMember | string) {
       await redis.set(`nypsi:levelup:${id}`, JSON.stringify(embed.toJSON()));
       break;
   }
-
-  await redis.del(`${Constants.redis.cache.economy.LEVELLING_UP}:${id}`);
 }
