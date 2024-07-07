@@ -4,6 +4,7 @@ import { CustomEmbed } from "../../models/EmbedBuilders";
 import { Job } from "../../types/Jobs";
 import { NotificationPayload } from "../../types/Notification";
 import Constants from "../../utils/Constants";
+import { setInventoryItem } from "../../utils/functions/economy/inventory";
 import { percentChance } from "../../utils/functions/random";
 import { addNotificationToQueue } from "../../utils/functions/users/notifications";
 
@@ -71,28 +72,12 @@ export default {
         if (user.user.DMSettings.other)
           notifications.push({ memberId: user.userId, payload: { embed: calendarSavedEmbed } });
 
-        if (Number(user.Inventory.find((i) => i.item == "calendar").amount) == 1) {
-          await prisma.inventory.delete({
-            where: {
-              userId_item: {
-                userId: user.userId,
-                item: "calendar",
-              },
-            },
-          });
-        } else {
-          await prisma.inventory.update({
-            where: {
-              userId_item: {
-                userId: user.userId,
-                item: "calendar",
-              },
-            },
-            data: {
-              amount: { decrement: 1 },
-            },
-          });
-        }
+        setInventoryItem(
+          user.userId,
+          "calendar",
+          Number(user.Inventory.find((i) => i.item === "calendar").amount) - 1,
+        );
+
         continue;
       } else if (user.Inventory.find((i) => i.item == "white_gem")?.amount > 0n) {
         const gemSaveChance = Math.floor(Math.random() * 10);
@@ -101,28 +86,12 @@ export default {
           notifications.push({ memberId: user.userId, payload: { embed: gemSavedEmbed } });
 
           if (percentChance(7)) {
-            if (user.Inventory.find((i) => i.item === "white_gem")?.amount === 1n) {
-              await prisma.inventory.delete({
-                where: {
-                  userId_item: {
-                    userId: user.userId,
-                    item: "white_gem",
-                  },
-                },
-              });
-            } else {
-              await prisma.inventory.update({
-                where: {
-                  userId_item: {
-                    userId: user.userId,
-                    item: "white_gem",
-                  },
-                },
-                data: {
-                  amount: { decrement: 1 },
-                },
-              });
-            }
+            setInventoryItem(
+              user.userId,
+              "calendar",
+              Number(user.Inventory.find((i) => i.item === "white_gem").amount) - 1,
+            );
+
             notifications.push({ memberId: user.userId, payload: { embed: whiteGemBrokeEmbed } });
           }
           continue;
@@ -132,7 +101,7 @@ export default {
       if (user.user.DMSettings.other)
         notifications.push({ memberId: user.userId, payload: { embed: resetEmbed } });
 
-      await prisma.economy.update({
+      prisma.economy.update({
         where: {
           userId: user.userId,
         },
@@ -143,7 +112,7 @@ export default {
     }
 
     for (const notif of notifications) {
-      await addNotificationToQueue(notif);
+      addNotificationToQueue(notif);
     }
 
     log(`${notifications.length} streak notifications sent`);
