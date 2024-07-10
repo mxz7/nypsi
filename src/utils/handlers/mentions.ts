@@ -6,6 +6,7 @@ import sleep from "../functions/sleep";
 import { encrypt } from "../functions/string";
 import { MentionQueueItem } from "../functions/users/mentions";
 import { addNotificationToQueue } from "../functions/users/notifications";
+import { hasProfile } from "../functions/users/utils";
 import doMentionsWorker from "../functions/workers/mentions";
 import { logger } from "../logger";
 import ms = require("ms");
@@ -91,6 +92,7 @@ async function addMention(item: MentionQueueItem) {
   const currentInsert: Mention[] = [];
 
   for (const member of item.members) {
+    if (!(await hasProfile(member))) continue;
     await sleep(Number(await redis.get(Constants.redis.nypsi.MENTION_DELAY)) || 5);
     if (!item.channelMembers.includes(member)) continue;
     // @ts-expect-error weird
