@@ -527,11 +527,13 @@ async function run(
   } else if (args[0].toLowerCase() === "cmd" || args[0].toLowerCase() === "command") {
     let data: { pages: Map<number, string[]>; pos: number };
     let title: string;
+    let url: string;
 
     if (args.length === 1 || args[1]?.toLowerCase() === "global") {
       if (args[1]?.toLowerCase() === "global") {
         data = await topCommandUsesGlobal(message.author.id);
         title = `top command uses [global]`;
+        url = "https://nypsi.xyz/leaderboard?lb=commands";
       } else {
         data = await topCommandUses(message.guild, message.author.id);
         title = `top command uses for ${message.guild.name}`;
@@ -557,7 +559,7 @@ async function run(
       }`;
     }
 
-    return show(data.pages, data.pos, title);
+    return show(data.pages, data.pos, title, url);
   } else {
     const selected =
       selectItem(args.join(" ")) ||
