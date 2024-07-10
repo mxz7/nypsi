@@ -286,14 +286,25 @@ async function run(
     mutedLength = getTime(time * 1000);
   }
 
-  await doMute(message, target, reason, args, mode, timedMute, mutedLength, unmuteDate);
+  const caseId = await doMute(
+    message,
+    target,
+    reason,
+    args,
+    mode,
+    timedMute,
+    mutedLength,
+    unmuteDate,
+  );
 
   const embed = new CustomEmbed(message.member);
+
+  if (caseId) embed.setHeader(`mute [${caseId}]`, message.guild.iconURL());
 
   let msg =
     punishAlts && ids.length > 3
       ? `muting account and any alts...`
-      : `✅ \`${target.user.username}\` has been muted`;
+      : `\`${target.user.username}\` has been muted`;
 
   if (!punishAlts && timedMute) {
     msg += ` for **${mutedLength}**`;
@@ -342,10 +353,10 @@ async function run(
   }
 
   if (altsMuted > 0)
-    msg = `✅ \`${target.user.username}\` + ${altsMuted} ${
+    msg = `\`${target.user.username}\` + ${altsMuted} ${
       altsMuted != 1 ? "alts have" : "alt has"
     } been muted`;
-  else msg = `✅ \`${target.user.username}\` has been muted`;
+  else msg = `\`${target.user.username}\` has been muted`;
 
   if (timedMute) {
     msg += ` for **${mutedLength}**`;
@@ -430,7 +441,7 @@ async function doMute(
     storeReason = `[${mutedLength}] ${reason}`;
   }
 
-  await newCase(message.guild, "mute", target.user.id, message.author, storeReason);
+  const caseId = await newCase(message.guild, "mute", target.user.id, message.author, storeReason);
 
   if (await isMuted(message.guild, target)) {
     await deleteMute(message.guild, target);
@@ -472,7 +483,7 @@ async function doMute(
       .catch(() => {});
   }
 
-  return true;
+  return caseId;
 }
 
 cmd.setRun(run);

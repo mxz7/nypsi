@@ -118,9 +118,19 @@ async function run(
     await target.kick(reason);
   }
 
+  const caseId = await newCase(
+    message.guild,
+    "kick",
+    target.user.id,
+    message.author,
+    reason.split(": ")[1],
+  );
+
   const embed = new CustomEmbed(message.member);
 
-  let msg = `✅ \`${target.user.username}\` has been kicked`;
+  if (caseId) embed.setHeader(`kick [${caseId}]`, message.guild.iconURL());
+
+  let msg = `\`${target.user.username}\` has been kicked`;
 
   if (reason.split(": ")[1] !== "no reason given") {
     msg += ` for **${reason.split(": ")[1]}**`;
@@ -138,8 +148,6 @@ async function run(
   } else {
     await send({ embeds: [embed] });
   }
-
-  await newCase(message.guild, "kick", target.user.id, message.author, reason.split(": ")[1]);
 
   if (args.join(" ").includes("-s")) return;
 
