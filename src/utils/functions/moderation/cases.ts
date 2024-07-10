@@ -16,34 +16,31 @@ export async function getCaseCount(guild: Guild) {
 export async function newCase(
   guild: Guild,
   caseType: PunishmentType,
-  userIDs: string[] | string,
+  userId: string,
   moderator: User,
   command: string,
 ) {
-  if (!(userIDs instanceof Array)) {
-    userIDs = [userIDs];
-  }
-  for (const userID of userIDs) {
-    const caseCount = await getCaseCount(guild);
-    const { caseId } = await prisma.moderationCase.create({
-      data: {
-        guildId: guild.id,
-        caseId: caseCount + 1,
-        type: caseType,
-        user: userID,
-        moderator: moderator.id,
-        command: command,
-        time: new Date(),
-      },
-      select: {
-        caseId: true,
-      },
-    });
+  const caseCount = await getCaseCount(guild);
+  const { caseId } = await prisma.moderationCase.create({
+    data: {
+      guildId: guild.id,
+      caseId: caseCount + 1,
+      type: caseType,
+      user: userId,
+      moderator: moderator.id,
+      command: command,
+      time: new Date(),
+    },
+    select: {
+      caseId: true,
+    },
+  });
 
-    if (!(await isModLogsEnabled(guild))) return;
+  if (!(await isModLogsEnabled(guild))) return caseId;
 
-    addModLog(guild, caseType, userID, moderator, command, caseId);
-  }
+  addModLog(guild, caseType, userId, moderator, command, caseId);
+
+  return caseId;
 }
 
 export async function deleteCase(guild: Guild, caseId: number) {

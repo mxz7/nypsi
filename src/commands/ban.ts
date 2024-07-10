@@ -201,14 +201,26 @@ async function run(
 
   if (temporary) banLength = getTime(duration * 1000);
 
-  await doBan(message, target, reason, args, mode, temporary, banLength, unbanDate, userId);
+  const caseId = await doBan(
+    message,
+    target,
+    reason,
+    args,
+    mode,
+    temporary,
+    banLength,
+    unbanDate,
+    userId,
+  );
 
   const embed = new CustomEmbed(message.member);
+
+  if (caseId) embed.setHeader(`ban [${caseId}]`, message.guild.iconURL());
 
   let msg =
     punishAlts && ids.length > 3
       ? `banning account and any alts...`
-      : `✅ \`${mode == "id" ? idUser : target.user.username}\` has been banned`;
+      : `\`${mode == "id" ? idUser : target.user.username}\` has been banned`;
 
   if (!punishAlts && temporary) {
     msg += ` for **${banLength}**`;
@@ -257,10 +269,10 @@ async function run(
   }
 
   if (altsBanned > 0)
-    msg = `✅ \`${target?.user.username || userId}\` + ${altsBanned} ${
+    msg = `\`${target?.user.username || userId}\` + ${altsBanned} ${
       altsBanned != 1 ? "alts have" : "alt has"
     } been banned`;
-  else msg = `✅ \`${target?.user.username || userId}\` has been banned`;
+  else msg = `\`${target?.user.username || userId}\` has been banned`;
 
   if (temporary) {
     msg += ` for **${banLength}**`;
@@ -302,6 +314,7 @@ async function doBan(
   userId: string,
   isAlt?: boolean,
 ) {
+  let caseId: number;
   let fail = false;
   if (isAlt) {
     try {
@@ -338,12 +351,12 @@ async function doBan(
   }
 
   if (mode === "id") {
-    await newCase(message.guild, "ban", userId, message.author, storeReason);
+    caseId = await newCase(message.guild, "ban", userId, message.author, storeReason);
     if (temporary) {
       await newBan(message.guild, userId, unbanDate);
     }
   } else {
-    await newCase(message.guild, "ban", target.user.id, message.author, storeReason);
+    caseId = await newCase(message.guild, "ban", target.user.id, message.author, storeReason);
 
     if (temporary) {
       await newBan(message.guild, target.user.id, unbanDate);
@@ -374,7 +387,7 @@ async function doBan(
         .catch(() => {});
     }
   }
-  return true;
+  return caseId;
 }
 
 cmd.setRun(run);

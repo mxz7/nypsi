@@ -153,16 +153,18 @@ async function run(
 
   if (fail) return;
 
-  await doUnmute(message, target, args, mode);
+  const caseId = await doUnmute(message, target, args, mode);
 
   const embed = new CustomEmbed(message.member);
+
+  if (caseId) embed.setHeader(`ummute [${caseId}]`, message.guild.iconURL());
 
   const ids = await getAllGroupAccountIds(message.guild, target.user.id);
 
   let msg =
     punishAlts && ids.length > 3
       ? `unmuting account and any alts...`
-      : `✅ \`${target.user.username}\` has been unmuted`;
+      : `\`${target.user.username}\` has been unmuted`;
 
   embed.setDescription(msg);
 
@@ -199,10 +201,10 @@ async function run(
   }
 
   if (altsUnmted > 0)
-    msg = `✅ \`${target.user.username}\` + ${altsUnmted} ${
+    msg = `\`${target.user.username}\` + ${altsUnmted} ${
       altsUnmted != 1 ? "alts have" : "alt has"
     } been unmuted`;
-  else msg = `✅ \`${target.user.username}\` has been unmuted`;
+  else msg = `\`${target.user.username}\` has been unmuted`;
 
   embed.setDescription(msg);
 
@@ -254,8 +256,7 @@ async function doUnmute(
   if (fail) return false;
 
   await deleteMute(message.guild, target.user.id);
-  await newCase(message.guild, "unmute", target.user.id, message.author, reason);
-  return true;
+  return await newCase(message.guild, "unmute", target.user.id, message.author, reason);
 }
 
 cmd.setRun(run);

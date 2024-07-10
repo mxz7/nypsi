@@ -129,16 +129,18 @@ async function run(
       ],
     });
 
-  await doUnban(message, target, args);
+  const caseId = await doUnban(message, target, args);
 
   const embed = new CustomEmbed(message.member);
+
+  if (caseId) embed.setHeader(`unban [${caseId}]`, message.guild.iconURL());
 
   const ids = await getAllGroupAccountIds(message.guild, target);
 
   let msg =
     punishAlts && ids.length > 3
       ? `unbanning account and any alts...`
-      : `✅ \`${unbannedUser.username}\` has been unbanned`;
+      : `\`${unbannedUser.username}\` has been unbanned`;
 
   embed.setDescription(msg);
 
@@ -170,10 +172,10 @@ async function run(
   }
 
   if (altsUnbanned > 0)
-    msg = `✅ \`${target}\` + ${altsUnbanned} ${
+    msg = `\`${target}\` + ${altsUnbanned} ${
       altsUnbanned != 1 ? "alts have" : "alt has"
     } been unbanned`;
-  else msg = `✅ \`${target}\` has been unbanned`;
+  else msg = `\`${target}\` has been unbanned`;
 
   embed.setDescription(msg);
 
@@ -219,8 +221,7 @@ async function doUnban(
     if (fail || !unbannedUser) return false;
   }
 
-  await newCase(message.guild, "unban", targetId, message.author, reason);
-  return true;
+  return await newCase(message.guild, "unban", targetId, message.author, reason);
 }
 
 cmd.setRun(run);

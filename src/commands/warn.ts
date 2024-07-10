@@ -119,10 +119,14 @@ async function run(
       });
   }
 
+  const caseId = await newCase(message.guild, "warn", target.user.id, message.author, reason);
+
   const embed = new CustomEmbed(
     message.member,
-    `✅ \`${target.user.username}\` has been warned for **${reason}**`,
+    `\`${target.user.username}\` has been warned for **${reason}**`,
   );
+
+  if (caseId) embed.setHeader(`warn [${caseId}]`, message.guild.iconURL());
 
   if (dmFail) {
     embed.setDescription(
@@ -140,8 +144,6 @@ async function run(
   } else {
     await send({ embeds: [embed] });
   }
-
-  await newCase(message.guild, "warn", target.user.id, message.author, reason);
 }
 
 cmd.setRun(run);
