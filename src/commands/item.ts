@@ -9,10 +9,11 @@ import {
   MessageActionRowComponentBuilder,
 } from "discord.js";
 
+import { sort } from "fast-sort";
 import prisma from "../init/database";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import { countItemOnAuction } from "../utils/functions/economy/auctions";
+import { countItemOnAuction, findAuctions } from "../utils/functions/economy/auctions";
 import {
   calcItemValue,
   getInventory,
@@ -138,10 +139,23 @@ async function run(
   }
 
   if (inAuction) {
+    const auctions = await findAuctions(selected.id);
+    let cheapest: number;
+
+    if (auctions.length > 0) {
+      const cheapestItem = sort(auctions).asc((a) => a.bin / a.itemAmount)[0];
+
+      cheapest = Math.floor(Number(cheapestItem.bin / cheapestItem.itemAmount));
+    }
+
     if (total) {
-      desc.push(`**in auction** ${inAuction.toLocaleString()}`);
+      desc.push(
+        `**in auction** ${inAuction.toLocaleString()}${cheapest ? ` ($${cheapest.toLocaleString()})` : ""}`,
+      );
     } else {
-      desc.push(`\n**in auction** ${inAuction.toLocaleString()}`);
+      desc.push(
+        `\n**in auction** ${inAuction.toLocaleString()}${cheapest ? ` ($${cheapest.toLocaleString()})` : ""}`,
+      );
     }
   }
 
