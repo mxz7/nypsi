@@ -223,7 +223,8 @@ async function run(
     }
   }
 
-  await newCase(message.guild, "kick", members1, message.author, reason.split(": ")[1]);
+  for (const member of members1)
+    await newCase(message.guild, "kick", member, message.author, reason.split(": ")[1]);
 
   for (const member of members1) {
     const m = members.get(member);
