@@ -373,7 +373,7 @@ async function run(
       data.pages,
       data.pos,
       `top ${item.name} ${global ? "[global]" : `for ${message.guild.name}`}`,
-      global ? `https://nypsi.xyz/leaderboard/${item.id}` : null,
+      global ? `https://nypsi.xyz/leaderboard?lb=items&item=${item.id}` : null,
     );
   } else if (args[0].toLowerCase() == "completion") {
     const data = await topCompletion(message.guild, message.author.id);
@@ -440,6 +440,7 @@ async function run(
       data.pages,
       data.pos,
       `top lottery wins ${global ? "[global]" : `for ${message.guild.name}`}`,
+      global ? "https://nypsi.xyz/leaderboard?lb=lottery" : null,
     );
   } else if (args[0].toLowerCase().includes("wordle")) {
     let global = false;
@@ -477,6 +478,7 @@ async function run(
       data.pages,
       data.pos,
       `top votes ${global ? "[global]" : `for ${message.guild.name}`}`,
+      global ? "https://nypsi.xyz/leaderboard?lb=vote" : null,
     );
   } else if (["cr", "crglobal", "cr-global", "chatreaction"].includes(args[0].toLowerCase())) {
     let global = false;
@@ -580,7 +582,7 @@ async function run(
       data.pages,
       data.pos,
       `top ${selected.name} ${global ? "[global]" : `for ${message.guild.name}`}`,
-      global ? `https://nypsi.xyz/leaderboard/${selected.id}` : null,
+      global ? `https://nypsi.xyz/leaderboard?lb=items&item=${selected.id}` : null,
     );
   }
 }
