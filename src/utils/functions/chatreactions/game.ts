@@ -61,7 +61,6 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel, 
   const timeout = (await getReactionSettings(guild)).timeout;
 
   let msg = await channel.send({ embeds: [embed] });
-  const start = performance.now();
 
   const collector = channel.createMessageCollector({
     filter,
@@ -114,6 +113,8 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel, 
       clearInterval(interval);
     }
   }, 750);
+
+  const start = performance.now();
 
   collector.on("collect", async (message): Promise<void> => {
     const time = (performance.now() - start) / 1000;
@@ -258,8 +259,6 @@ export async function startChatReactionDuel(
 
   const msg = await channel.send({ embeds: [embed] });
 
-  const start = performance.now();
-
   return new Promise((resolve) => {
     let winnings: number;
     let tax = 0;
@@ -318,6 +317,8 @@ export async function startChatReactionDuel(
     const collector = channel.createMessageCollector({ filter, time: 30000, max: 2 });
 
     const winners: { user: User; time: string }[] = [];
+
+    const start = performance.now();
 
     collector.on("collect", async (message) => {
       winners.push({
