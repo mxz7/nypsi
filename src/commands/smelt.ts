@@ -110,13 +110,9 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
     if (coal > ores.length) coal = ores.length;
   }
 
-  if (coal == 0) {
+  if (coal < ores.length) {
     return send({
-      embeds: [
-        new ErrorEmbed(
-          "you need coal to smelt ore. coal can be found in crates and through mining",
-        ),
-      ],
+      embeds: [new ErrorEmbed("you don't have enough coal to smelt")],
     });
   }
 
