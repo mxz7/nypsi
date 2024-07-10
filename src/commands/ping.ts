@@ -18,30 +18,42 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   const redisLatency: number[] = [];
 
   let now = performance.now();
-  await redis.set("ping:test", "pong");
+  await redis.ping();
   let after = performance.now();
 
-  redisLatency[0] = after - now;
+  redisLatency.push(after - now);
+
+  now = performance.now();
+  await redis.set("ping:test", "pong");
+  after = performance.now();
+
+  redisLatency.push(after - now);
 
   now = performance.now();
   await redis.get("ping:test");
   after = performance.now();
 
-  redisLatency[1] = after - now;
+  redisLatency.push(after - now);
 
   now = performance.now();
   await redis.set("ping:test", "boobies");
   after = performance.now();
 
-  redisLatency[2] = after - now;
+  redisLatency.push(after - now);
 
   now = performance.now();
   await redis.del("ping:test");
   after = performance.now();
 
-  redisLatency[3] = after - now;
+  redisLatency.push(after - now);
 
   const dbLatency: number[] = [];
+
+  now = performance.now();
+  await prisma.$queryRaw`select 1`;
+  after = performance.now();
+
+  dbLatency.push(after - now);
 
   const dbId = "latency_test_user_" + Math.floor(Math.random() * 100);
 
@@ -55,7 +67,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   });
   after = performance.now();
 
-  dbLatency[0] = after - now;
+  dbLatency.push(after - now);
 
   now = performance.now();
   await prisma.user.findUnique({
@@ -68,7 +80,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   });
   after = performance.now();
 
-  dbLatency[1] = after - now;
+  dbLatency.push(after - now);
 
   now = performance.now();
   await prisma.user.update({
@@ -81,7 +93,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   });
   after = performance.now();
 
-  dbLatency[2] = after - now;
+  dbLatency.push(after - now);
 
   now = performance.now();
   await prisma.user.delete({
@@ -91,7 +103,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
   });
   after = performance.now();
 
-  dbLatency[3] = after - now;
+  dbLatency.push(after - now);
 
   now = performance.now();
   const msg = await message.channel.send({ content: "pong" });
