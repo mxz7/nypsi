@@ -389,6 +389,21 @@ async function run(
     if (inventory.find((i) => i.item === selected.id).amount < amount)
       return send({ embeds: [new ErrorEmbed(`you don't have this many ${selected.name}`)] });
 
+    const bakeryUpgrades = await getBakeryUpgrades(message.member);
+
+    if (getBakeryUpgradesData()[selected.id].max) {
+      const current = bakeryUpgrades.find((i) => i.upgradeId === selected.id)?.amount || 0;
+
+      if (current + amount > getBakeryUpgradesData()[selected.id].max)
+        return send({
+          embeds: [
+            new ErrorEmbed(
+              `you can only use ${getBakeryUpgradesData()[selected.id].max} of this item`,
+            ),
+          ],
+        });
+    }
+
     await addBakeryUpgrade(message.member, selected.id, amount);
 
     setInventoryItem(
@@ -412,7 +427,7 @@ async function run(
       upgrades
         .map(
           (u) =>
-            `\`${u.amount.toLocaleString()}x\` ${getBakeryUpgradesData()[u.upgradeId].emoji} ${
+            `\`${u.amount.toLocaleString()}${getBakeryUpgradesData()[u.upgradeId].max ? `/${getBakeryUpgradesData()[u.upgradeId].max}` : "x"}\` ${getBakeryUpgradesData()[u.upgradeId].emoji} ${
               getBakeryUpgradesData()[u.upgradeId].name
             }`,
         )

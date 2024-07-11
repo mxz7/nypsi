@@ -39,7 +39,7 @@ async function run(
     upgrades
       .map(
         (u) =>
-          `\`${u.amount.toLocaleString()}x\` ${getBakeryUpgradesData()[u.upgradeId].emoji} ${
+          `\`${u.amount.toLocaleString()}${getBakeryUpgradesData()[u.upgradeId].max ? `/${getBakeryUpgradesData()[u.upgradeId].max}` : "x"}\` ${getBakeryUpgradesData()[u.upgradeId].emoji} ${
             getBakeryUpgradesData()[u.upgradeId].name
           }`,
       )
