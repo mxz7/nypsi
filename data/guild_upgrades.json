@@ -30,7 +30,7 @@
   "cooldown": {
     "id": "cooldown",
     "name": "shorter cooldowns",
-    "description": "5% shorter cooldowns",
+    "description": "+5% shorter cooldowns",
     "cost": 1,
     "increment_per_level": 2.5
   },
