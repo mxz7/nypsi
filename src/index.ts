@@ -2,7 +2,6 @@ import * as Cluster from "discord-hybrid-sharding";
 import { ClusterManager } from "discord-hybrid-sharding";
 import "dotenv/config";
 import { clearInterval } from "timers";
-import prisma from "./init/database";
 import redis from "./init/redis";
 import { loadJobs, runJob } from "./scheduled/scheduler";
 import Constants from "./utils/Constants";
@@ -128,29 +127,6 @@ setTimeout(async () => {
   updateStats(guildCount, shardCount);
   logger.info(`::guild guild count posted to top.gg: ${guildCount}`);
 }, 60000);
-
-setInterval(async () => {
-  const queries = await redis.lrange(Constants.redis.nypsi.HOURLY_DB_REPORT, 0, -1);
-  await redis.del(Constants.redis.nypsi.HOURLY_DB_REPORT);
-
-  const total = parseInt(queries.reduce((a, b) => (parseInt(a) + parseInt(b)).toString()));
-  const avg = (total / queries.length).toFixed(2);
-
-  logger.info(`average query takes ${avg}ms (${total.toLocaleString()} queries in the last hour)`);
-
-  await prisma.botMetrics.createMany({
-    data: [
-      {
-        category: "hourly_query",
-        value: total,
-      },
-      {
-        category: "hourly_query_time",
-        value: total / queries.length,
-      },
-    ],
-  });
-}, ms("1 hour"));
 
 export async function checkStatus() {
   async function checkCluster(
