@@ -851,5 +851,5 @@ model BotMetrics {
   createdAt DateTime @default(now())
 
   category String
-  value    Int
+  value    Float
 }

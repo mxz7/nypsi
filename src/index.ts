@@ -146,7 +146,7 @@ setInterval(async () => {
       },
       {
         category: "hourly_query_time",
-        value: Math.round(total / queries.length),
+        value: total / queries.length,
       },
     ],
   });
