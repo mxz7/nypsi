@@ -147,6 +147,7 @@ export default {
       DAILY_ACTIVE: "nypsi:dailyactive",
       MONTHLY_ACTIVE: "nypsi:monthlyactive",
       DAILY_COMMANDS: "nypsi:dailycommands",
+      HOURLY_COMMAND_PREPROCESS: "nypso:preprocess",
     },
   },
   ADMIN_IDS: ["672793821850894347"] as string[],
