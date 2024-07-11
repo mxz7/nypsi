@@ -71,6 +71,7 @@ export interface BakeryUpgradeData {
   name: string;
   emoji: string;
   value: number;
+  max?: number;
 }
 
 export type GuildUpgrade = {

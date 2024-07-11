@@ -25,7 +25,8 @@
     "name": "grandpa",
     "emoji": "👴🏻",
     "upgrades": "cake",
-    "value": 0.5
+    "value": 0.5,
+    "max": 50
   },
   "oven": {
     "id": "oven",
