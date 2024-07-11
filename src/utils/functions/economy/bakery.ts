@@ -82,6 +82,9 @@ export async function getBakeryUpgrades(member: GuildMember | string) {
     where: {
       userId: id,
     },
+    orderBy: {
+      upgradeId: "asc",
+    },
   });
 
   await redis.set(`${Constants.redis.cache.economy.BAKERY_UPGRADES}:${id}`, JSON.stringify(query));
