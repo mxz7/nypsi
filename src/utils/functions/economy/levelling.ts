@@ -547,7 +547,7 @@ export async function doLevelUp(member: GuildMember | string) {
       await addBooster(id, "xp_booster", 1, dayjs().add(time, "minutes").toDate());
 
       const highest = inPlaceSort(Array.from(rewardsText.keys())).asc()[0];
-      if (rewardsText.has(highest)) {
+      if (!rewardsText.has(highest)) {
         rewardsText.set(beforeLevel + levels, [`- \`${time}m\` ✨ xp booster`]);
       } else rewardsText.get(highest).push(`- \`${time}m\` ✨ xp booster`);
     }
