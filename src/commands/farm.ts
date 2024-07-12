@@ -9,6 +9,7 @@ import {
   StringSelectMenuBuilder,
   StringSelectMenuOptionBuilder,
 } from "discord.js";
+import { sort } from "fast-sort";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getClaimable, getFarm } from "../utils/functions/economy/farm";
@@ -124,7 +125,21 @@ async function run(
       let desc =
         `${getItems()[getPlantsData()[plantId].item].emoji} **${getPlantsData()[plantId].name}** farm\n\n` +
         `you have **${plants.length.toLocaleString()}** ${getPlantsData()[plantId].type}${plants.length > 1 ? "s" : ""}\n` +
-        `${growing > 0 ? `${growing.toLocaleString()} growing\n` : ""}` +
+        `${
+          growing > 0
+            ? `${growing.toLocaleString()} growing (next <t:${
+                Math.floor(
+                  sort(plants)
+                    .asc((p) =>
+                      p.plantedAt.getTime() < Date.now() - getPlantsData()[p.plantId].growthTime
+                        ? Number.MAX_SAFE_INTEGER
+                        : p.plantedAt.getTime(),
+                    )[0]
+                    .plantedAt.getTime() / 1000,
+                ) + getPlantsData()[plantId].growthTime
+              }:R>)\n`
+            : ""
+        }` +
         `${healthy > 0 ? `${healthy.toLocaleString()} healthy\n` : ""}` +
         `${ready > 0 ? `\n\`${ready.toLocaleString()}x\` ${getItems()[getPlantsData()[plantId].item].emoji} ${getItems()[getPlantsData()[plantId].item].name} ready for harvest` : ""}`;
 
