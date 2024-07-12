@@ -4,7 +4,7 @@ import { addInventoryItem } from "./inventory";
 import { getPlantsData } from "./utils";
 import dayjs = require("dayjs");
 
-export async function getFarm(member: GuildMember | string, plantId?: string) {
+export async function getFarm(member: GuildMember | string) {
   let id: string;
   if (typeof member === "string") id = member;
   else id = member.user.id;
@@ -12,6 +12,9 @@ export async function getFarm(member: GuildMember | string, plantId?: string) {
   const query = await prisma.farm.findMany({
     where: {
       userId: id,
+    },
+    orderBy: {
+      id: "asc",
     },
   });
 
