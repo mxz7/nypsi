@@ -2126,7 +2126,8 @@
       "id:gem_shard:0.5",
       "id:blue_gem:0.5",
       "id:lucky_cheese:5",
-      "id:reroll_token:0.05"
+      "id:reroll_token:0.05",
+      "id:banana_seed:7"
     ]
   },
   "lucky_scratch_card": {
@@ -3037,5 +3038,33 @@
     "in_crates": false,
     "rarity": 10,
     "random_drop_chance": 10
+  },
+  "banana": {
+    "id": "banana",
+    "name": "banana",
+    "article": "a",
+    "plural": "bananas",
+    "emoji": "🍌",
+    "longDesc": "delicious treat",
+    "rarity": 0,
+    "role": "item",
+    "buy": 0,
+    "sell": 1000,
+    "in_crates": false
+  },
+  "banana_seed": {
+    "id": "banana_seed",
+    "name": "banana tree seed",
+    "article": "a",
+    "plural": "banana tree seeds",
+    "emoji": "<:nypsi_banana_tree_seeds:1261357859891843132>",
+    "longDesc": "plant to grow a banana tree",
+    "rarity": 4,
+    "role": "seed",
+    "plantId": "banana_tree",
+    "buy": 0,
+    "sell": 50000,
+    "in_crates": true,
+    "aliases": ["bseed"]
   }
 }
