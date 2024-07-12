@@ -49,6 +49,8 @@ export async function getClaimable(member: GuildMember | string, plantId: string
     },
   });
 
+  if (plants.length === 0) return 0;
+
   if (claim) {
     await prisma.farm.updateMany({
       where: {
