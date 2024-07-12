@@ -213,6 +213,20 @@ model Economy {
   Upgrades           Upgrades[]
   Task               Task[]
   CustomCar          CustomCar[]
+  Farm               Farm[]
+}
+
+model Farm {
+  id      Int    @id @default(autoincrement())
+  userId  String
+  plantId String
+
+  plantedAt   DateTime @default(now())
+  harvestedAt DateTime @default(now())
+
+  economy Economy @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model CustomCar {
