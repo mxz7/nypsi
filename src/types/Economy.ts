@@ -37,6 +37,7 @@ export interface Item {
   random_drop_chance?: number; // chance to appear in random drop pool
   tagId?: string;
   upgrades?: CarUpgradeType;
+  plantId: string; // for seeds
 }
 
 export interface LotteryTicket {
@@ -102,3 +103,12 @@ type NotBannedCache = {
 };
 
 export type BanCache = BannedCache | NotBannedCache;
+
+export type Plant = {
+  id: string;
+  name: string;
+  growthTime: number;
+  hourly: number;
+  max: number;
+  item: string;
+};
