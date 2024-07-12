@@ -14,6 +14,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { ItemUse } from "../models/ItemUse";
 import { addBakeryUpgrade, getBakeryUpgrades } from "../utils/functions/economy/bakery";
 import { addBooster, getBoosters } from "../utils/functions/economy/boosters";
+import { addFarm } from "../utils/functions/economy/farm";
 import { getInventory, selectItem, setInventoryItem } from "../utils/functions/economy/inventory";
 import { addStat } from "../utils/functions/economy/stats";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
@@ -456,6 +457,37 @@ async function run(
           `you can now use the ${getTagsData()[selected.tagId].emoji} \`${
             getTagsData()[selected.tagId].name
           }\` tag`,
+        ),
+      ],
+    });
+  }
+  if (selected.role === "seed") {
+    let amount = 1;
+
+    if (args[1]?.toLowerCase() === "all") {
+      amount = inventory.find((i) => i.item === selected.id)?.amount || 1;
+    } else if (args[1]) {
+      amount = formatNumber(args[1]);
+    }
+
+    if (!amount || isNaN(amount) || amount < 1)
+      return send({ embeds: [new ErrorEmbed("invalid amount")] });
+
+    if (inventory.find((i) => i.item === selected.id).amount < amount)
+      return send({ embeds: [new ErrorEmbed(`you don't have this many ${selected.name}`)] });
+
+    await setInventoryItem(
+      message.member,
+      selected.id,
+      inventory.find((i) => i.item === selected.id).amount - amount,
+    );
+    await addFarm(message.member, selected.plantId);
+
+    return send({
+      embeds: [
+        new CustomEmbed(
+          message.member,
+          `you've planted ${amount} ${amount > 1 ? selected.plural : selected.name} in your farm`,
         ),
       ],
     });
