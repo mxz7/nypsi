@@ -11,6 +11,7 @@ import {
   BanCache,
   GuildUpgrade,
   Item,
+  Plant,
   UserUpgrade,
 } from "../../../types/Economy";
 import { Tag } from "../../../types/Tags";
@@ -41,6 +42,7 @@ let guildUpgrades: { [key: string]: GuildUpgrade };
 let userUpgrades: { [key: string]: UserUpgrade };
 let tags: { [key: string]: Tag };
 let tasks: { [key: string]: Task };
+let plants: { [key: string]: Plant };
 
 const lotteryTicketPrice = 50000;
 /**
@@ -61,6 +63,7 @@ export function loadItems(crypto = true) {
   const tagsFile: any = fs.readFileSync("./data/tags.json");
   const userUpgradesFile: any = fs.readFileSync("./data/upgrades.json");
   const tasksFile: any = fs.readFileSync("./data/tasks.json");
+  const plantsFile: any = fs.readFileSync("./data/plants.json");
 
   items = JSON.parse(itemsFile);
   achievements = JSON.parse(achievementsFile);
@@ -71,6 +74,7 @@ export function loadItems(crypto = true) {
   tags = JSON.parse(tagsFile);
   userUpgrades = JSON.parse(userUpgradesFile);
   tasks = JSON.parse(tasksFile);
+  plants = JSON.parse(plantsFile);
 
   Object.values(userUpgrades).forEach((i) => {
     maxPrestige += i.max;
@@ -96,6 +100,7 @@ export function loadItems(crypto = true) {
   logger.info(`${Object.keys(tags).length} tags loaded`);
   logger.info(`${Object.keys(userUpgrades).length} user upgrades loaded`);
   logger.info(`${Object.keys(tasks).length} tasks loaded`);
+  logger.info(`${Object.keys(plants).length} plants loaded`);
   logger.info(`max prestige set at P${maxPrestige}`);
 
   if (crypto) {
@@ -507,6 +512,10 @@ export function getAchievements() {
 
 export function getTasksData() {
   return tasks;
+}
+
+export function getPlantsData() {
+  return plants;
 }
 
 export async function deleteUser(member: GuildMember | string) {
