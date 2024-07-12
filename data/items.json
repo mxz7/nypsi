@@ -3064,6 +3064,7 @@
     "plantId": "banana_tree",
     "buy": 0,
     "sell": 50000,
-    "in_crates": true
+    "in_crates": true,
+    "aliases": ["bseed"]
   }
 }
