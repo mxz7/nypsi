@@ -1468,7 +1468,8 @@
       "time": 3600
     },
     "in_crates": true,
-    "random_drop_chance": 50
+    "random_drop_chance": 50,
+    "aliases": ["unb"]
   },
   "efficiency": {
     "id": "efficiency",
