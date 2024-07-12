@@ -126,7 +126,7 @@ async function run(
         `you have **${plants.length.toLocaleString()}** ${getPlantsData()[plantId].type}${plants.length > 1 ? "s" : ""}\n` +
         `${growing > 0 ? `${growing.toLocaleString()} growing\n` : ""}` +
         `${healthy > 0 ? `${healthy.toLocaleString()} healthy\n` : ""}` +
-        `${ready > 0 ? `\`${ready.toLocaleString()}x\` ${getItems()[getPlantsData()[plantId].item].name} ready for harvest` : ""}`;
+        `${ready > 0 ? `\n\`${ready.toLocaleString()}x\` ${getItems()[getPlantsData()[plantId].item].emoji} ${getItems()[getPlantsData()[plantId].item].name} ready for harvest` : ""}`;
 
       embed.setDescription(desc);
 
