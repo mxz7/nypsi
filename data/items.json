@@ -3059,7 +3059,7 @@
     "plural": "banana tree seeds",
     "emoji": "<:nypsi_banana_tree_seeds:1261357859891843132>",
     "longDesc": "plant to grow a banana tree",
-    "rarity": 4,
+    "rarity": 3,
     "role": "seed",
     "plantId": "banana_tree",
     "buy": 0,
