@@ -723,7 +723,7 @@ export async function buyFullAuction(
       const moneyReceived = Math.floor(Number(auction.bin / auction.itemAmount) * total);
       let taxedAmount = 0;
 
-      if (!(await isPremium(auction.ownerId))) taxedAmount = Math.floor(moneyReceived * tax);
+      if ((await getTier(auction.ownerId)) !== 4) taxedAmount = Math.floor(moneyReceived * tax);
 
       const embedDm = new CustomEmbed()
         .setColor(Constants.TRANSPARENT_EMBED_COLOR)
@@ -892,7 +892,7 @@ export async function buyAuctionOne(
   let taxedAmount = 0;
 
   if (
-    !(await isPremium(auction.ownerId)) &&
+    (await getTier(auction.ownerId)) !== 4 &&
     Number(auction.bin / auction.itemAmount) >= 1_000_000
   ) {
     taxedAmount = Math.floor(Math.floor(Number(auction.bin / auction.itemAmount)) * tax);
@@ -964,7 +964,7 @@ export async function buyAuctionOne(
         const moneyReceived = Math.floor(Number(auction.bin / auction.itemAmount) * total);
         let taxedAmount = 0;
 
-        if (!(await isPremium(auction.ownerId))) taxedAmount = Math.floor(moneyReceived * tax);
+        if ((await getTier(auction.ownerId)) !== 4) taxedAmount = Math.floor(moneyReceived * tax);
 
         const embedDm = new CustomEmbed()
           .setColor(Constants.TRANSPARENT_EMBED_COLOR)
@@ -1154,7 +1154,7 @@ export async function buyAuctionMulti(
   let taxedAmount = 0;
 
   if (
-    !(await isPremium(auction.ownerId)) &&
+    (await getTier(auction.ownerId)) !== 4 &&
     Number((auction.bin / auction.itemAmount) * amount) >= 1_000_000
   ) {
     taxedAmount = Math.floor(Math.floor(Number((auction.bin / auction.itemAmount) * amount)) * tax);
@@ -1232,7 +1232,7 @@ export async function buyAuctionMulti(
         const moneyReceived = Math.floor(Number(auction.bin / auction.itemAmount) * total);
         let taxedAmount = 0;
 
-        if (!(await isPremium(auction.ownerId))) taxedAmount = Math.floor(moneyReceived * tax);
+        if ((await getTier(auction.ownerId)) !== 4) taxedAmount = Math.floor(moneyReceived * tax);
 
         const embedDm = new CustomEmbed()
           .setColor(Constants.TRANSPARENT_EMBED_COLOR)
