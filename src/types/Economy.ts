@@ -111,4 +111,5 @@ export type Plant = {
   hourly: number;
   max: number;
   item: string;
+  type: string; // tree / plant etc
 };
