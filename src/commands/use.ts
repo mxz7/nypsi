@@ -481,7 +481,7 @@ async function run(
       selected.id,
       inventory.find((i) => i.item === selected.id).amount - amount,
     );
-    await addFarm(message.member, selected.plantId);
+    await addFarm(message.member, selected.plantId, amount);
 
     return send({
       embeds: [
