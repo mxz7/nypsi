@@ -392,6 +392,7 @@ export async function reset() {
   await prisma.$executeRaw`ALTER SEQUENCE "LotteryTicket_id_seq" RESTART WITH 1;`;
   logger.info("deleting boosters");
   await prisma.booster.deleteMany();
+  await prisma.$executeRaw`TRUNCATE TABLE "Booster" RESTART IDENTITY;`;
   logger.info("deleting games");
   await prisma.game.deleteMany();
   await prisma.$executeRaw`TRUNCATE TABLE "Game" RESTART IDENTITY;`;
@@ -411,6 +412,7 @@ export async function reset() {
   await prisma.inventory.deleteMany();
   logger.info("deleting crafting");
   await prisma.crafting.deleteMany();
+  await prisma.$executeRaw`TRUNCATE TABLE "Crafting" RESTART IDENTITY;`;
   logger.info("deleting bakery");
   await prisma.bakeryUpgrade.deleteMany();
   logger.info("deleting graph");
@@ -424,6 +426,9 @@ export async function reset() {
   await prisma.customCar.deleteMany();
   logger.info("deleting tasks");
   await prisma.task.deleteMany();
+  logger.info("deleting farms");
+  await prisma.farm.deleteMany();
+  await prisma.$executeRaw`TRUNCATE TABLE "Farm" RESTART IDENTITY;`;
 
   logger.info("deleting banned");
   await prisma.economy.deleteMany({
