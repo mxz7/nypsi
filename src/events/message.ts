@@ -313,7 +313,7 @@ export default async function messageCreate(message: Message) {
     const res = await checkMessageContent(message);
 
     if (!res) {
-      addMuteViolation(message.guild, message.member);
+      await addMuteViolation(message.guild, message.member);
       await checkAutoMute(message);
       return;
     }
