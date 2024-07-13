@@ -6,6 +6,7 @@ import { getGuildUpgradesByUser } from "../functions/economy/guilds";
 import { getItems } from "../functions/economy/utils";
 import { isBooster } from "../functions/premium/boosters";
 import { getTier, isPremium } from "../functions/premium/premium";
+import { logger } from "../logger";
 
 export async function onCooldown(cmd: string, member: GuildMember | string): Promise<boolean> {
   let id: string;
@@ -121,7 +122,7 @@ export async function getResponse(
   const cd: CooldownData = JSON.parse(await redis.get(key));
 
   if (!cd) {
-    console.log("invalid cd");
+    logger.debug("invalid cd");
     return { respond: true, embed: new ErrorEmbed("you are on cooldown for `0.1s`").removeTitle() };
   }
 
