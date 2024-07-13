@@ -105,7 +105,7 @@ async function addMention(item: MentionQueueItem) {
       userTag: item.username,
     });
 
-    if (currentInsert.length >= 750) {
+    if (currentInsert.length >= 1000) {
       await prisma.mention.createMany({ data: currentInsert });
       done += currentInsert.length;
       currentInsert.length = 0;
