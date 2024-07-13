@@ -5,8 +5,7 @@ import Constants from "../../utils/Constants";
 import { MStoTime } from "../../utils/functions/date";
 import { addInventoryItem } from "../../utils/functions/economy/inventory";
 import { getItems } from "../../utils/functions/economy/utils";
-import requestDM from "../../utils/functions/requestdm";
-import { getDmSettings } from "../../utils/functions/users/notifications";
+import { addNotificationToQueue, getDmSettings } from "../../utils/functions/users/notifications";
 import { logger } from "../../utils/logger";
 
 async function doCrates(client: NypsiClient) {
@@ -75,11 +74,12 @@ async function doCrates(client: NypsiClient) {
     embed.addField("rewards", desc.join("\n"));
 
     if ((await getDmSettings(member.id)).premium) {
-      await requestDM({
-        client: client,
+      await addNotificationToQueue({
         memberId: member.id,
-        content: "enjoy your weekly crates (:",
-        embed: embed,
+        payload: {
+          content: "enjoy your weekly crates (:",
+          embed: embed,
+        },
       }).catch(() => {});
     }
   }
