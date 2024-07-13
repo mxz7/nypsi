@@ -8,6 +8,7 @@ import {
   addNotificationToQueue,
   getDmSettings,
 } from "../../utils/functions/users/notifications";
+import pAll = require("p-all");
 
 export default {
   name: "daily tasks",
@@ -20,8 +21,10 @@ export default {
       },
     });
 
+    const promises: (() => Promise<any>)[] = [];
+
     for (const user of query) {
-      (async () => {
+      promises.push(async () => {
         const completed = await prisma.task.count({
           where: { AND: [{ user_id: user.user_id }, { type: "daily" }, { completed: true }] },
         });
@@ -55,8 +58,10 @@ export default {
             else addInlineNotification({ memberId: user.user_id, embed });
           }
         }
-      })();
+      });
     }
+
+    await pAll(promises, { concurrency: 7 });
 
     const count = await prisma.task.deleteMany({ where: { type: "daily" } });
     exec(`redis-cli KEYS "cache:economy:tasks:*" | xargs redis-cli DEL`);
