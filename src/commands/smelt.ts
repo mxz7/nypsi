@@ -16,9 +16,7 @@ import { addStat } from "../utils/functions/economy/stats";
 import { createUser, getItems, userExists } from "../utils/functions/economy/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
-const cmd = new Command("smelt", "smelt your ores into ingots with coal", "money").setDocs(
-  "https://docs.nypsi.xyz/economy/minecraft",
-);
+const cmd = new Command("smelt", "smelt your ores into ingots with coal", "money");
 
 cmd.slashEnabled = true;
 
