@@ -3091,6 +3091,7 @@
     "emoji": "\uD83C\uDF31",
     "longDesc": "sell some pot",
     "rarity": 0,
+    "role": "item",
     "sell": 1000000,
     "in_crates": false,
     "aliases": ["weed"]
