@@ -9,13 +9,13 @@ import {
   StringSelectMenuBuilder,
   StringSelectMenuOptionBuilder,
 } from "discord.js";
-import { sort } from "fast-sort";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getClaimable, getFarm } from "../utils/functions/economy/farm";
 import { createUser, getItems, getPlantsData, userExists } from "../utils/functions/economy/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import _ = require("lodash");
+import dayjs = require("dayjs");
 
 const cmd = new Command("farm", "view your farms and harvest", "money").setAliases(["fields"]);
 
@@ -100,10 +100,16 @@ async function run(
 
       let growing = 0;
       let healthy = 0;
+
+      let nextGrow = Number.MAX_SAFE_INTEGER;
       const plants = farms.filter((i) => {
         if (i.plantId === plantId) {
-          if (i.plantedAt.getTime() > Date.now() - getPlantsData()[plantId].growthTime * 1000) {
+          const growTime =
+            i.plantedAt.getTime() + getPlantsData()[plantId].growthTime * 1000 - Date.now();
+
+          if (growTime > 0) {
             growing++;
+            if (growTime < nextGrow) nextGrow = growTime;
           } else {
             healthy++;
           }
@@ -119,17 +125,7 @@ async function run(
           `you have **${plants.length.toLocaleString()}** ${getPlantsData()[plantId].type}${plants.length > 1 ? "s" : ""}\n` +
           `${
             growing > 0
-              ? `${growing.toLocaleString()} growing (next <t:${
-                  Math.floor(
-                    sort(plants)
-                      .asc((p) =>
-                        p.plantedAt.getTime() < Date.now() - getPlantsData()[p.plantId].growthTime
-                          ? Number.MAX_SAFE_INTEGER
-                          : p.plantedAt.getTime(),
-                      )[0]
-                      .plantedAt.getTime() / 1000,
-                  ) + getPlantsData()[plantId].growthTime
-                }:R>)\n`
+              ? `${growing.toLocaleString()} growing (next <t:${dayjs().add(nextGrow, "milliseconds").unix()}:R>)\n`
               : ""
           }` +
           `${healthy > 0 ? `${healthy.toLocaleString()} healthy\n` : ""}` +
