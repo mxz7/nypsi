@@ -95,7 +95,7 @@ async function checkBoosters(member: string | GuildMember, boosters: Map<string,
             );
           }
 
-          if (descOther.length > 0) desc += `\n${descOther.join("\n")}`;
+          if (descOther.length > 0) desc += `\n${descOther.join("\n")}\n\n`;
         } else {
           desc += `\`${expired.get(expiredBoosterId)}x\` ${items[expiredBoosterId].emoji} ${
             items[expiredBoosterId].name
