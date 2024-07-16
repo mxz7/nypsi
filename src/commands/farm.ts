@@ -13,13 +13,7 @@ import { sort } from "fast-sort";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getClaimable, getFarm } from "../utils/functions/economy/farm";
-import {
-  createUser,
-  getBaseWorkers,
-  getItems,
-  getPlantsData,
-  userExists,
-} from "../utils/functions/economy/utils";
+import { createUser, getItems, getPlantsData, userExists } from "../utils/functions/economy/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import _ = require("lodash");
 
@@ -36,8 +30,6 @@ async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
-  const baseWorkers = getBaseWorkers();
-
   if (!(await userExists(message.member))) await createUser(message.member);
 
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
