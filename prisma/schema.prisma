@@ -867,3 +867,10 @@ model BotMetrics {
   category String
   value    Float
 }
+
+// for specific image hosting on cdn.nypsi.xyz
+model Images {
+  id        String   @id
+  createdAt DateTime @default(now())
+  bytes     BigInt
+}
