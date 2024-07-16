@@ -120,8 +120,8 @@ async function run(
         }
       });
 
-      const ready = await getClaimable(message.member, plantId, false);
-
+      const ready_obj = await getClaimable(message.member, plantId, false);
+      const ready = typeof ready_obj === 'number' ? ready_obj : ready_obj.items;
       embed.setDescription(
         `${getItems()[getPlantsData()[plantId].item].emoji} **${getPlantsData()[plantId].name}** farm\n\n` +
           `you have **${plants.length.toLocaleString()}** ${getPlantsData()[plantId].type}${plants.length > 1 ? "s" : ""}\n` +
@@ -146,42 +146,40 @@ async function run(
 
       return embed;
     };
-
-    const msg = await send({
-      embeds: [await render(options.options[0].data.value)],
-      components: [new ActionRowBuilder<MessageActionRowComponentBuilder>().setComponents(options)],
-    });
-
     const listen = async () => {
-      const interaction = await msg
-        .awaitMessageComponent({
-          filter: (i) => i.user.id === message.author.id,
-          componentType: ComponentType.StringSelect,
-          time: 60000,
-        })
-        .catch(() => {
-          options.setDisabled(true);
-          msg.edit({
+      const collector = msg.createMessageComponentCollector({
+        filter: (i) => i.user.id === message.author.id,
+        componentType: ComponentType.StringSelect,
+        time: 60000,
+      });
+
+      collector.on('collect', async (interaction) => {
+        if (interaction.customId === "farm") {
+          const embed = await render(interaction.values[0]);
+
+          await interaction.update({
+            embeds: [embed],
             components: [
               new ActionRowBuilder<MessageActionRowComponentBuilder>().setComponents(options),
             ],
           });
-        });
+        }
+      });
 
-      if (!interaction) return;
-
-      if (interaction.customId === "farm") {
-        const embed = await render(interaction.values[0]);
-
-        interaction.update({
-          embeds: [embed],
+      collector.on('end', () => {
+        options.setDisabled(true);
+        msg.edit({
           components: [
             new ActionRowBuilder<MessageActionRowComponentBuilder>().setComponents(options),
           ],
         });
-        return listen();
-      }
+      });
     };
+    const msg = await send({
+      embeds: [await render(options.options[0].data.value)],
+      components: [new ActionRowBuilder<MessageActionRowComponentBuilder>().setComponents(options)],
+    });
+    listen();
   } else if (["claim", "harvest"].includes(args[0].toLowerCase())) {
     const promises = [];
 
@@ -192,12 +190,19 @@ async function run(
     );
 
     const earned = new Map<string, number>();
-
+    let totalExtraItems = 0;
     for (const plant of plantTypes) {
       promises.push(
         (async () => {
-          const items = await getClaimable(message.member, plant, true);
-          if (items > 0) earned.set(plant, items);
+          const result = await getClaimable(message.member, plant, true);
+          if (typeof result === 'number') {
+          if (result > 0) earned.set(plant, result);
+        } else {
+            if (result.items > 0) earned.set(plant, result.items);
+            if (result.extraItems > 0) {
+              totalExtraItems += result.extraItems;
+            }
+          }
         })(),
       );
     }
@@ -210,6 +215,9 @@ async function run(
 
     for (const [plantId, value] of earned.entries()) {
       desc += `\`${value.toLocaleString()}x\` ${getItems()[getPlantsData()[plantId].item].emoji} ${getItems()[getPlantsData()[plantId].item].name}`;
+    }
+    if (totalExtraItems > 0) {
+      desc += `\n It appears that weed has found its way into your banana farm?! ${totalExtraItems} extra ${totalExtraItems === 1 ? 'weed seed' : 'weed seeds'}!`;
     }
 
     const embed = new CustomEmbed(message.member, desc).setHeader(
