@@ -1,83 +1,20 @@
-import { flavors } from "@catppuccin/palette";
-import { Image, ImageSuggestion, ImageType } from "@prisma/client";
-import { ClusterManager } from "discord-hybrid-sharding";
-import { ColorResolvable, User, WebhookClient } from "discord.js";
+import { PutObjectCommand } from "@aws-sdk/client-s3";
+import { Image, ImageSuggestion } from "@prisma/client";
+import { User, WebhookClient } from "discord.js";
 import { parse } from "twemoji-parser";
 import prisma from "../../init/database";
 import redis from "../../init/redis";
-import { NypsiClient } from "../../models/Client";
-import { CustomEmbed } from "../../models/EmbedBuilders";
+import s3 from "../../init/s3";
 import Constants from "../Constants";
 import { logger } from "../logger";
-import { findChannelCluster } from "./clusters";
 import { addProgress } from "./economy/achievements";
 import { userExists } from "./economy/utils";
-import sleep from "./sleep";
 import { addNotificationToQueue } from "./users/notifications";
-import { getLastKnownUsername } from "./users/tag";
 
 let hook: WebhookClient;
 
 export function isImageUrl(url: string): boolean {
   return /\.(jpg|jpeg|png|webp|avif|gif|svg)$/.test(url);
-}
-
-export async function suggestImage(
-  submitterId: string,
-  type: ImageType,
-  imageUrl: string,
-  client: NypsiClient | ClusterManager,
-  extension?: string,
-): Promise<"ok" | "limit" | "fail"> {
-  const query = await prisma.imageSuggestion.count({
-    where: {
-      uploaderId: submitterId,
-    },
-  });
-
-  if (query > 5 && submitterId !== Constants.BOT_USER_ID) return "limit";
-
-  const url = await uploadImage(
-    client,
-    imageUrl,
-    "image",
-    `image suggestion ${type} uploaded by ${submitterId}`,
-    extension,
-  );
-
-  if (!url) return "fail";
-
-  const { id } = await prisma.imageSuggestion.create({
-    data: {
-      url: url,
-      uploaderId: submitterId,
-      type,
-    },
-  });
-
-  const embed = new CustomEmbed()
-    .setColor(flavors.latte.colors.base.hex as ColorResolvable)
-    .setTitle("image suggestion #" + id);
-
-  const username = await getLastKnownUsername(submitterId);
-
-  embed.setDescription(
-    `**uploader** ${submitterId} (${
-      username ? username : "unknown"
-    })\n**url** ${url}\n**type** ${type.toUpperCase()}`,
-  );
-
-  embed.setFooter({ text: "$x review" });
-
-  embed.setImage(url);
-
-  if (!hook) hook = new WebhookClient({ url: process.env.WHOLESOME_HOOK });
-
-  hook
-    .send({ embeds: [embed] })
-    .catch(() => (hook = new WebhookClient({ url: process.env.WHOLESOME_HOOK })));
-
-  return "ok";
 }
 
 export async function getRandomImage(type: string) {
@@ -177,116 +114,6 @@ export async function reviewImageSuggestion(
   }
 }
 
-export async function uploadImage(
-  client: NypsiClient | ClusterManager,
-  url: string,
-  type: "avatar" | "image",
-  content?: string,
-  extension?: string,
-) {
-  if (await redis.exists("nypsi:uploadimg")) {
-    await sleep(Math.floor(Math.random() * 400) + 100);
-    return uploadImage(client, url, type, content, extension);
-  }
-
-  await redis.set("nypsi:uploadimg", "boobies", "EX", 5);
-
-  const channelId =
-    type === "avatar"
-      ? process.env.DISCORD_IMAGE_AVATAR_CHANNEL
-      : process.env.DISCORD_IMAGE_CHANNEL;
-
-  if (!channelId) {
-    await redis.del("nypsi:uploadimg");
-    logger.error("invalid channel for image upload", { url, type, content });
-    return;
-  }
-
-  const imageBlob = await fetch(url)
-    .then((r) => r.blob())
-    .catch(() => {});
-
-  if (!imageBlob) {
-    await redis.del("nypsi:uploadimg");
-    logger.error("failed converting image url to blob", { url, type, content });
-    return;
-  }
-
-  const buffer = await imageBlob
-    .arrayBuffer()
-    .then((r) => Buffer.from(r))
-    .catch(() => {});
-
-  if (!buffer) {
-    await redis.del("nypsi:uploadimg");
-    logger.error("failed converting image blob to buffer", { url, type, content });
-    return;
-  }
-
-  const cluster = await findChannelCluster(client, channelId);
-
-  if (typeof cluster.cluster !== "number") {
-    await redis.del("nypsi:uploadimg");
-    return;
-  }
-
-  const res = await (client instanceof ClusterManager ? client : client.cluster).broadcastEval(
-    async (c, { buffer, channelId, content, extension, cluster }) => {
-      const client = c as unknown as NypsiClient;
-
-      if (client.cluster.id != cluster) return;
-
-      const channel = c.channels.cache.get(channelId);
-
-      if (!channel || !channel.isTextBased())
-        return { msg: "err: fetching channel", error: channel };
-
-      const res = await channel
-        .send({
-          content,
-          files: [
-            {
-              attachment: Buffer.from(buffer.data),
-              name: `${Math.floor(Math.random() * 69420)}_image${extension}`,
-            },
-          ],
-        })
-        .catch((e: any) => e);
-
-      if (!res) return { error: res, msg: "err: message" };
-
-      return res.attachments.first().url;
-    },
-    {
-      context: {
-        buffer,
-        channelId,
-        content,
-        extension: extension
-          ? `.${extension}`
-          : `.${url.split(".")[url.split(".").length - 1].split("?")[0]}`,
-        cluster: cluster.cluster,
-      },
-    },
-  );
-
-  const uploaded = res.filter((i) => Boolean(i))[0];
-
-  if (typeof uploaded !== "string") {
-    await redis.del("nypsi:uploadimg");
-    logger.error("failed to upload image", { ...uploaded, url, content, type });
-    return;
-  }
-
-  setTimeout(() => {
-    redis.del("nypsi:uploadimg");
-  }, 5000);
-
-  logger.info("uploaded image", { original: url, uploaded, content, type });
-
-  return uploaded;
-}
-
 export function getEmojiImage(emoji: string) {
   let image: string;
 
@@ -312,4 +139,31 @@ export function getEmojiImage(emoji: string) {
   }
 
   return image;
+}
+
+export async function imageExists(id: string) {
+  if (await redis.exists(`${Constants.redis.cache.IMAGE}:${id}`)) return true;
+  const query = await prisma.images.findUnique({ where: { id } });
+
+  const exists = Boolean(query);
+
+  if (exists) await redis.set(`${Constants.redis.cache.IMAGE}:${id}`, "y", "EX", 86400);
+
+  return exists;
+}
+
+export async function uploadImage(id: string, buffer: Buffer, ContentType: string) {
+  await Promise.all([
+    s3.send(
+      new PutObjectCommand({
+        Bucket: process.env.S3_BUCKET,
+        Key: id,
+        Body: buffer,
+        ContentType: ContentType,
+      }),
+    ),
+    prisma.images.create({ data: { id, bytes: buffer.byteLength } }),
+  ]);
+
+  await redis.set(`${Constants.redis.cache.IMAGE}`, "y", "EX", 86400);
 }

@@ -2,6 +2,7 @@ import { ColorResolvable, CommandInteraction, Message } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
+import { imageExists, uploadImage } from "../utils/functions/image";
 import { getMember } from "../utils/functions/member";
 
 const cmd = new Command("color", "get a random hex color code", "info").setAliases(["colour"]);
@@ -49,7 +50,18 @@ async function run(
     embed.setHeader(member.displayHexColor);
   }
 
-  embed.setImage(`https://singlecolorimage.com/get/${color}/54x42`);
+  const id = `colour/${color}/54x42`;
+
+  if (!(await imageExists(id))) {
+    const res = await fetch(`https://singlecolorimage.com/get/${color}/54x42`);
+
+    if (res.ok && res.status === 200) {
+      const arrayBuffer = await res.arrayBuffer();
+      await uploadImage(id, Buffer.from(arrayBuffer), "image/png");
+    }
+  }
+
+  embed.setImage(`https://cdn.nypsi.xyz/${id}`);
 
   return await message.channel.send({ embeds: [embed] }).catch(() => {
     message.channel.send({ embeds: [new ErrorEmbed("invalid color")] });
