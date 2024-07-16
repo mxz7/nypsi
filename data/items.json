@@ -3067,5 +3067,32 @@
     "sell": 50000,
     "in_crates": true,
     "aliases": ["bseed"]
+  },
+  "weed_seed": {
+    "id": "weed_seed",
+    "name": "weed seed",
+    "article": "a",
+    "plural": "weed seeds",
+    "emoji": "\uD83C\uDF30",
+    "longDesc": "plant some pot",
+    "rarity": 3,
+    "role": "seed",
+    "plantId": "weed_plant",
+    "buy": 0,
+    "sell": 50000,
+    "in_crates": false,
+    "aliases": ["wseed"]
+  },
+  "weed": {
+    "id": "weed",
+    "name": "weed",
+    "article": "a piece of",
+    "plural": "weed",
+    "emoji": "\uD83C\uDF31",
+    "longDesc": "sell some pot",
+    "rarity": 0,
+    "sell": 1000000,
+    "in_crates": false,
+    "aliases": ["weed"]
   }
 }

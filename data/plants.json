@@ -7,5 +7,14 @@
     "max": 6,
     "item": "banana",
     "type": "tree"
+  },
+  "weed_plant": {
+    "id": "weed_plant",
+    "name": "weed plant",
+    "growthTime": 86400,
+    "hourly": 3,
+    "max": 9,
+    "item": "weed",
+    "type": "plant"
   }
 }

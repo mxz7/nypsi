@@ -44,11 +44,10 @@ export async function getClaimable(member: GuildMember | string, plantId: string
         { userId: id },
         { plantId },
         { plantedAt: { lt: dayjs().subtract(plantData.growthTime, "seconds").toDate() } },
-        { harvestedAt: { lt: dayjs().subtract(1, "hour").toDate() } },
+        { harvestedAt: { lt: dayjs().subtract(1, "hours").toDate() } },
       ],
     },
   });
-
   if (plants.length === 0) return 0;
 
   if (claim) {
@@ -63,19 +62,26 @@ export async function getClaimable(member: GuildMember | string, plantId: string
   }
 
   let items = 0;
-
+  let weed = 0;
   for (const plant of plants) {
-    const start = Date.now() - plant.harvestedAt.getTime();
+    const start = Math.max(0, Date.now() - plant.harvestedAt.getTime());
     const hours = start / 3600000; // hours - chatgpt
-    const earned = hours * plantData.hourly;
-
+    const earned = Math.max(0, hours * plantData.hourly);
     if (earned > plantData.max) items += plantData.max;
     else items += earned;
+    if (plantId === 'banana_tree' && Math.random() < 0.001) { // 0.1% chance
+      weed++;
+    }
   }
 
   items = Math.floor(items);
+   if (claim && items > 0) {
+    await addInventoryItem(id, plantData.item, items);
 
-  if (claim && items > 0) await addInventoryItem(id, plantData.item, items);
+    if (weed > 0) {
+        await addInventoryItem(id, "weed_seed", weed);
+      }
+    }
 
-  return items;
+  return {items: items, extraItems: weed};
 }
