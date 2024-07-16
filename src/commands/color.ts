@@ -1,9 +1,21 @@
-import { ColorResolvable, CommandInteraction, Message } from "discord.js";
+import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  ColorResolvable,
+  CommandInteraction,
+  ComponentType,
+  EmbedBuilder,
+  GuildMember,
+  Message,
+  MessageActionRowComponentBuilder,
+} from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
 import { imageExists, uploadImage } from "../utils/functions/image";
 import { getMember } from "../utils/functions/member";
+import sharp = require("sharp");
 
 const cmd = new Command("color", "get a random hex color code", "info").setAliases(["colour"]);
 
@@ -11,8 +23,8 @@ async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
-  let color;
-  let member;
+  let color: string;
+  let member: GuildMember;
 
   if (args.length == 0) {
     color = Math.floor(Math.random() * 16777215).toString(16);
@@ -63,9 +75,61 @@ async function run(
 
   embed.setImage(`https://cdn.nypsi.xyz/${id}`);
 
-  return await message.channel.send({ embeds: [embed] }).catch(() => {
-    message.channel.send({ embeds: [new ErrorEmbed("invalid color")] });
-  });
+  const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+    new ButtonBuilder().setStyle(ButtonStyle.Secondary).setCustomId("circle").setLabel("circle"),
+  );
+
+  const msg = await message.channel
+    .send({ embeds: [embed], components: [row] })
+    .catch(async () => message.channel.send({ embeds: [new ErrorEmbed("invalid color")] }));
+
+  const listen = async () => {
+    const interaction = await msg
+      .awaitMessageComponent({
+        filter: (i) => i.user.id === message.author.id,
+        componentType: ComponentType.Button,
+        time: 15000,
+      })
+      .catch(async () => msg.edit({ components: [] }));
+
+    if (!interaction || interaction instanceof Message) return;
+
+    msg.edit({ components: [] });
+    await interaction.deferReply();
+
+    const circleId = `colour/${color}/128x128-circle`;
+
+    if (!(await imageExists(circleId))) {
+      const res = await fetch(`https://cdn.nypsi.xyz/${id}`);
+
+      if (!res.ok || res.status !== 200)
+        return interaction.editReply({ embeds: [new ErrorEmbed("failed to generate circle")] });
+
+      const arrayBuffer = await res.arrayBuffer();
+
+      const roundedEdges = Buffer.from(
+        '<svg><rect x="0" y="0" width="128" height="128" rx="128" ry="128"/></svg>',
+      );
+
+      const circleImage = await sharp(arrayBuffer)
+        .resize(128, 128, { fit: "fill" })
+        .composite([{ input: roundedEdges, blend: "dest-in" }])
+        .png()
+        .toBuffer();
+
+      await uploadImage(circleId, circleImage, "image/png");
+    }
+
+    interaction.editReply({
+      embeds: [
+        new EmbedBuilder()
+          .setColor(color as ColorResolvable)
+          .setImage(`https://cdn.nypsi.xyz/${circleId}`),
+      ],
+    });
+  };
+
+  listen();
 }
 
 cmd.setRun(run);
