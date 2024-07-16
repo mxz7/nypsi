@@ -25,38 +25,38 @@ levellingRewards.set(1, {
   text: [
     "congratulations on your first level up and welcome to nypsi!!\ndon't forget to </vote:1014905682341924944> daily for rewards\n" +
       "you have received:" +
-      "- 🔮 50 karma" +
-      "- $30,000",
+      "\n- 🔮 50 karma" +
+      "\n- $30,000",
   ],
   rewards: ["karma:50", "money:30000"],
 });
 levellingRewards.set(3, {
   text: [
     "congratulations on level 3!! it's about time we teach you about workers\n" +
-      "workers fill up their capacity in the background, whether you're using nypsi or not. when workers are full, you can use </workers claim:1014905682341924945> to empty their inventory and earn money." +
-      "the quarry worker sometimes finds *scraps* and *shards*, which can be used to craft gems and worker upgrades\n" +
-      "you have unlocked:" +
-      "- 🪨 quarry worker (</workers view:1014905682341924945>)",
+      "\nworkers fill up their capacity in the background, whether you're using nypsi or not. when workers are full, you can use </workers claim:1014905682341924945> to empty their inventory and earn money." +
+      "\nthe quarry worker sometimes finds *scraps* and *shards*, which can be used to craft gems and worker upgrades\n" +
+      "\nyou have unlocked:" +
+      "\n- 🪨 quarry worker (</workers view:1014905682341924945>)",
   ],
 });
 levellingRewards.set(5, { text: ["you will now receive 2 📦 vote crates when voting"] });
 levellingRewards.set(7, {
   text: [
     "just a little bonus for my favourite number 😁\n\nyou have received:" +
-      "- `1x` 📦 basic crate" +
-      "- `$100,000`",
+      "\n- `1x` 📦 basic crate" +
+      "\n- `$100,000`",
   ],
   rewards: ["id:basic_crate", "money:100000"],
 });
 levellingRewards.set(10, {
   text: [
     "you're making *very* good progress. keep it up!!\n\nyou have received:" +
-      "- `2x` 📦 basic crate" +
-      "- 🔮 100 karma" +
-      "- $100,000\n" +
+      "\n- `2x` 📦 basic crate" +
+      "\n- 🔮 100 karma" +
+      "\n- $100,000\n" +
       "you have unlocked:" +
-      "- 🥔 potato farmer (</workers view:1014905682341924945>)" +
-      "- +1% gamble multi",
+      "\n- 🥔 potato farmer (</workers view:1014905682341924945>)" +
+      "\n- +1% gamble multi",
   ],
   rewards: ["id:basic_crate", "id:basic_crate", "karma:100", "money:100000"],
 });
@@ -73,10 +73,10 @@ levellingRewards.set(40, {
 levellingRewards.set(50, {
   text: [
     "you will now receive 5 📦 vote crates when voting\n\nyou have unlocked:" +
-      "- ⛏️ miner (</workers view:1014905682341924945>)" +
-      "- 🪓 lumberjack (</workers view:1014905682341924945>)" +
-      "- 🥓 butcher (</workers view:1014905682341924945>)" +
-      "- +1% gamble multi",
+      "\n- ⛏️ miner (</workers view:1014905682341924945>)" +
+      "\n- 🪓 lumberjack (</workers view:1014905682341924945>)" +
+      "\n- 🥓 butcher (</workers view:1014905682341924945>)" +
+      "\n- +1% gamble multi",
   ],
 });
 levellingRewards.set(69, {
@@ -88,17 +88,20 @@ levellingRewards.set(75, {
 });
 levellingRewards.set(100, {
   text: [
-    "you have unlocked:" +
-      "- 🚀 spacex (</workers view:1014905682341924945>)" +
-      "- 📦 amazon (</workers view:1014905682341924945>)" +
-      "- create your own guild" +
-      "- avatar history tracking (disabled with $toggletracking)" +
+    "you have unlocked:\n" +
+      "- 🚀 spacex (</workers view:1014905682341924945>)\n" +
+      "- 📦 amazon (</workers view:1014905682341924945>)\n" +
+      "- create your own guild\n" +
       "- +1% gamble multi",
   ],
 });
 levellingRewards.set(150, { text: ["you have unlocked:\n" + "- +1% gamble multi"] });
 levellingRewards.set(200, {
-  text: ["you have unlocked:\n" + "- +1% gamble multi"],
+  text: [
+    "you have unlocked:\n" +
+      "- +1% gamble multi\n" +
+      "- avatar history tracking (disabled with $toggletracking)",
+  ],
 });
 levellingRewards.set(250, {
   text: ["you have unlocked:\n" + "- +1% gamble multi"],
