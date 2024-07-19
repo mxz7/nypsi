@@ -28,6 +28,7 @@ import { setLevel, setPrestige } from "../utils/functions/economy/levelling";
 import { getEcoBanTime, getItems, isEcoBanned, setEcoBan } from "../utils/functions/economy/utils";
 import { updateXp } from "../utils/functions/economy/xp";
 import { addKarma, getKarma, removeKarma } from "../utils/functions/karma/karma";
+import { getMember } from "../utils/functions/member";
 import PageManager from "../utils/functions/page";
 import { getUserAliases } from "../utils/functions/premium/aliases";
 import {
@@ -1608,6 +1609,19 @@ async function run(
     }
 
     startRandomDrop(message.client as NypsiClient, message.channelId);
+  } else if (args[0].toLowerCase() === "memberfind") {
+    const search = args.slice(1);
+
+    const results = await getMember(message.guild, search.join(" "), true);
+
+    return message.channel.send({
+      embeds: [
+        new CustomEmbed(
+          message.member,
+          `\`${results.map((i) => `${i.username} - ${i.score}`).join("`\n`")}\``,
+        ),
+      ],
+    });
   }
 }
 

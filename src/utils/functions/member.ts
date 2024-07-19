@@ -1,5 +1,5 @@
 import { Collection, Guild, GuildMember, Role } from "discord.js";
-import { inPlaceSort } from "fast-sort";
+import { inPlaceSort, sort } from "fast-sort";
 import { compareTwoStrings } from "string-similarity";
 import Constants from "../Constants";
 import { logger } from "../logger";
@@ -38,7 +38,17 @@ setInterval(() => {
   }
 }, ms("30 minutes"));
 
-export async function getMember(guild: Guild, memberName: string): Promise<GuildMember> {
+export async function getMember(
+  guild: Guild,
+  memberName: string,
+  debug: true,
+): Promise<{ username: string; score: number }[]>;
+export async function getMember(guild: Guild, memberName: string): Promise<GuildMember>;
+export async function getMember(
+  guild: Guild,
+  memberName: string,
+  debug?: true,
+): Promise<GuildMember | { username: string; score: number }[]> {
   if (!guild) return null;
 
   if (memberName.match(Constants.MENTION_REGEX)) {
@@ -61,7 +71,7 @@ export async function getMember(guild: Guild, memberName: string): Promise<Guild
 
   const cacheHit = memberCache.get(guild.id)?.get(memberName);
 
-  if (cacheHit) {
+  if (cacheHit && !debug) {
     if (cacheHit.expire < Date.now()) memberCache.get(guild.id).delete(memberName);
     return members.get(cacheHit.userId);
   }
@@ -69,7 +79,7 @@ export async function getMember(guild: Guild, memberName: string): Promise<Guild
   let target: GuildMember;
   const scores: { id: string; score: number }[] = [];
 
-  if (memberName === "max" && members.get(Constants.TEKOH_ID))
+  if (memberName === "max" && members.get(Constants.TEKOH_ID) && !debug)
     return members.get(Constants.TEKOH_ID);
 
   if (members.size > 2000) {
@@ -117,6 +127,11 @@ export async function getMember(guild: Guild, memberName: string): Promise<Guild
     }
 
     if (!target && scores.length > 0) {
+      if (debug) {
+        return sort(scores)
+          .desc((i) => i.score)
+          .map((i) => ({ score: i.score, username: members.get(i.id).user.username }));
+      }
       target = members.get(inPlaceSort(scores).desc((i) => i.score)[0]?.id);
     }
   }
@@ -132,6 +147,15 @@ export async function getMember(guild: Guild, memberName: string): Promise<Guild
         new Map([[memberName, { userId: target.id, expire: Date.now() + ms("15 minutes") }]]),
       );
     }
+  }
+
+  if (debug) {
+    return [
+      { username: target.user.username, score: 10000 },
+      ...sort(scores)
+        .desc((i) => i.score)
+        .map((i) => ({ score: i.score, username: members.get(i.id).user.username })),
+    ];
   }
 
   return target;
