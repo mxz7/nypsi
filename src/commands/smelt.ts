@@ -163,7 +163,7 @@ async function run(message: Message | (NypsiCommandInteraction & CommandInteract
 
   const embed = new CustomEmbed(message.member);
   embed.setHeader("furnace", message.author.avatarURL());
-  embed.setDescription("<:nypsi_furnace_lit:959445186847584388> smelting...");
+  embed.setDescription("<:nypsi_furnace_lit:1264185514978705472> smelting...");
 
   const msg = await send({ embeds: [embed] });
 
