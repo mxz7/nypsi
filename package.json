@@ -22,7 +22,7 @@
     "chalk": "4.1.2",
     "cron": "^3.1.7",
     "crypto-js": "4.2.0",
-    "dayjs": "1.11.11",
+    "dayjs": "1.11.12",
     "discord-hybrid-sharding": "2.2.0",
     "discord.js": "14.15.3",
     "dotenv": "16.4.5",
