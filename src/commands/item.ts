@@ -206,7 +206,7 @@ async function run(
         .setStyle(ButtonStyle.Link)
         .setLabel("leaderboard")
         .setEmoji("🏆")
-        .setURL(`https://nypsi.xyz/leaderboard/${selected.id}`),
+        .setURL(`https://nypsi.xyz/leaderboard?lb=items&item=${selected.id}`),
     );
 
   if (
