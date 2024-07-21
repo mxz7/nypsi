@@ -476,8 +476,8 @@ async function run(
         ],
       });
 
-    if (reactionRole.roles.length >= 15)
-      return send({ embeds: [new ErrorEmbed("this reaction role already has 15 roles")] });
+    if (reactionRole.roles.length >= 25)
+      return send({ embeds: [new ErrorEmbed("this reaction role already has 25 roles")] });
 
     if (!reactionRole)
       return send({
