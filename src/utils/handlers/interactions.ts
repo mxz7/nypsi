@@ -76,6 +76,10 @@ export async function runInteraction(interaction: Interaction) {
     const reactionRole = reactionRoles.find((r) => r.messageId === interactionMessageId);
     if (!reactionRole) return;
 
+    setTimeout(() => {
+      interaction.deferReply({ ephemeral: true }).catch(() => {});
+    }, 1000);
+
     const member = await interaction.guild.members.fetch(interaction.user.id);
 
     if (reactionRole.whitelist.length !== 0) {
@@ -90,12 +94,21 @@ export async function runInteraction(interaction: Interaction) {
             .fetch(reactionRole.whitelist[0])
             .then((r) => r.toString())
             .catch(() => {});
-          return interaction.reply({
-            embeds: [
-              new ErrorEmbed(`you require ${role || reactionRole.whitelist[0]} to use this`),
-            ],
-            ephemeral: true,
-          });
+
+          return interaction
+            .reply({
+              embeds: [
+                new ErrorEmbed(`you require ${role || reactionRole.whitelist[0]} to use this`),
+              ],
+              ephemeral: true,
+            })
+            .catch(() =>
+              interaction.editReply({
+                embeds: [
+                  new ErrorEmbed(`you require ${role || reactionRole.whitelist[0]} to use this`),
+                ],
+              }),
+            );
         } else {
           const roles: string[] = [];
 
@@ -108,18 +121,33 @@ export async function runInteraction(interaction: Interaction) {
             roles.push(role || roleId);
           }
 
-          return interaction.reply({
-            embeds: [new ErrorEmbed(`to use this, you need one of:\n\n${roles.join("\n")}`)],
-            ephemeral: true,
-          });
+          return interaction
+            .reply({
+              embeds: [new ErrorEmbed(`to use this, you need one of:\n\n${roles.join("\n")}`)],
+              ephemeral: true,
+            })
+            .catch(() =>
+              interaction.editReply({
+                embeds: [new ErrorEmbed(`to use this, you need one of:\n\n${roles.join("\n")}`)],
+              }),
+            );
         }
       }
     }
 
     const roleId = reactionRole.roles.find((r) => r.roleId === customId).roleId;
-    if (!roleId) return;
-
-    await interaction.deferReply({ ephemeral: true });
+    if (!roleId) {
+      return interaction
+        .reply({
+          embeds: [new ErrorEmbed(`couldn't find role with id \`${customId}\``)],
+          ephemeral: true,
+        })
+        .catch(() =>
+          interaction.editReply({
+            embeds: [new ErrorEmbed(`couldn't find role with id \`${customId}\``)],
+          }),
+        );
+    }
 
     const responseDesc: string[] = [];
 
@@ -128,11 +156,20 @@ export async function runInteraction(interaction: Interaction) {
       let fail = false;
       await member.roles.remove(roleId).catch(() => {
         fail = true;
-        interaction.editReply({
-          embeds: [
-            new ErrorEmbed(`failed to remove ${role.toString()}, i may not have permissions`),
-          ],
-        });
+        interaction
+          .reply({
+            embeds: [
+              new ErrorEmbed(`failed to remove ${role.toString()}, i may not have permissions`),
+            ],
+            ephemeral: true,
+          })
+          .catch(() =>
+            interaction.editReply({
+              embeds: [
+                new ErrorEmbed(`failed to remove ${role.toString()}, i may not have permissions`),
+              ],
+            }),
+          );
       });
       if (fail) return;
       responseDesc.push(`\\- ${role.toString()}`);
@@ -149,14 +186,29 @@ export async function runInteraction(interaction: Interaction) {
 
       const role = await interaction.guild.roles.cache.get(roleId);
 
-      if (!role) return interaction.editReply({ embeds: [new ErrorEmbed("role is not valid")] });
+      if (!role) {
+        return interaction
+          .reply({ embeds: [new ErrorEmbed("role is not valid")], ephemeral: true })
+          .catch(() => interaction.editReply({ embeds: [new ErrorEmbed("role is not valid")] }));
+      }
 
       let fail = false;
 
       await member.roles.add(role).catch(() => {
-        interaction.editReply({
-          embeds: [new ErrorEmbed(`failed to add ${role.toString()}, i may not have permissions`)],
-        });
+        interaction
+          .reply({
+            embeds: [
+              new ErrorEmbed(`failed to add ${role.toString()}, i may not have permissions`),
+            ],
+            ephemeral: true,
+          })
+          .catch(() =>
+            interaction.editReply({
+              embeds: [
+                new ErrorEmbed(`failed to add ${role.toString()}, i may not have permissions`),
+              ],
+            }),
+          );
         fail = true;
       });
 
@@ -166,8 +218,13 @@ export async function runInteraction(interaction: Interaction) {
       logger.info(`(reaction roles) added ${role.id} to ${member.user.id}`);
     }
 
-    if (responseDesc.length > 0)
-      return interaction.editReply({ embeds: [new CustomEmbed(member, responseDesc.join("\n"))] });
+    if (responseDesc.length > 0) {
+      return interaction
+        .reply({ embeds: [new CustomEmbed(member, responseDesc.join("\n"))], ephemeral: true })
+        .catch(() =>
+          interaction.editReply({ embeds: [new CustomEmbed(member, responseDesc.join("\n"))] }),
+        );
+    }
   } else if (interaction.isMessageComponent()) {
     if (
       (await redis.exists(`${Constants.redis.nypsi.PROFILE_TRANSFER}:${interaction.user.id}`)) &&
