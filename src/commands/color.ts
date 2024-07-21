@@ -63,17 +63,24 @@ async function run(
   }
 
   const id = `colour/${color}/54x42`;
+  const promises: Promise<void>[] = [];
 
-  if (!(await imageExists(id))) {
-    const res = await fetch(`https://singlecolorimage.com/get/${color}/54x42`);
+  if (await imageExists(id)) {
+    embed.setImage(`https://cdn.nypsi.xyz/${id}`);
+  } else {
+    embed.setImage(`https://singlecolorimage.com/get/${color}/54x42`);
 
-    if (res.ok && res.status === 200) {
-      const arrayBuffer = await res.arrayBuffer();
-      await uploadImage(id, Buffer.from(arrayBuffer), "image/png");
-    }
+    promises.push(
+      (async () => {
+        const res = await fetch(`https://singlecolorimage.com/get/${color}/54x42`);
+
+        if (res.ok && res.status === 200) {
+          const arrayBuffer = await res.arrayBuffer();
+          await uploadImage(id, Buffer.from(arrayBuffer), "image/png");
+        }
+      })(),
+    );
   }
-
-  embed.setImage(`https://cdn.nypsi.xyz/${id}`);
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder().setStyle(ButtonStyle.Secondary).setCustomId("circle").setLabel("circle"),
@@ -95,15 +102,23 @@ async function run(
     if (!interaction || interaction instanceof Message) return;
 
     msg.edit({ components: [] });
-    await interaction.deferReply();
+    setTimeout(() => {
+      interaction.deferReply().catch(() => {});
+    }, 1000);
 
     const circleId = `colour/${color}/128x128-circle`;
 
     if (!(await imageExists(circleId))) {
+      await Promise.all(promises);
       const res = await fetch(`https://cdn.nypsi.xyz/${id}`);
 
-      if (!res.ok || res.status !== 200)
-        return interaction.editReply({ embeds: [new ErrorEmbed("failed to generate circle")] });
+      if (!res.ok || res.status !== 200) {
+        return interaction
+          .reply({ embeds: [new ErrorEmbed("failed to generate circle")] })
+          .catch(() =>
+            interaction.editReply({ embeds: [new ErrorEmbed("failed to generate circle")] }),
+          );
+      }
 
       const arrayBuffer = await res.arrayBuffer();
 
@@ -120,13 +135,23 @@ async function run(
       await uploadImage(circleId, circleImage, "image/png");
     }
 
-    interaction.editReply({
-      embeds: [
-        new EmbedBuilder()
-          .setColor(color as ColorResolvable)
-          .setImage(`https://cdn.nypsi.xyz/${circleId}`),
-      ],
-    });
+    interaction
+      .reply({
+        embeds: [
+          new EmbedBuilder()
+            .setColor(color as ColorResolvable)
+            .setImage(`https://cdn.nypsi.xyz/${circleId}`),
+        ],
+      })
+      .catch(() =>
+        interaction.editReply({
+          embeds: [
+            new EmbedBuilder()
+              .setColor(color as ColorResolvable)
+              .setImage(`https://cdn.nypsi.xyz/${circleId}`),
+          ],
+        }),
+      );
   };
 
   listen();
