@@ -21,7 +21,7 @@ export default {
       filtered.map((rr) => {
         let title = rr.title;
 
-        if (title.length > 20) title = title.substring(0, 20) + "...";
+        if (title?.length > 20) title = title.substring(0, 20) + "...";
 
         return { name: title ? `${title} (${rr.messageId})` : rr.messageId, value: rr.messageId };
       }),
