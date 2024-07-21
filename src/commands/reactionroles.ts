@@ -501,6 +501,12 @@ async function run(
         ],
       });
 
+    if (role.position > message.member.roles.highest.position)
+      return send({ embeds: [new ErrorEmbed("you don't have permission to access this role")] });
+
+    if (role.position > message.guild.members.me.roles.highest.position)
+      return send({ embeds: [new ErrorEmbed("i don't have permission to access this role")] });
+
     if (reactionRole.roles.find((r) => r.roleId === role.id))
       return send({ embeds: [new ErrorEmbed("this role is already on this reaction role")] });
 
