@@ -101,8 +101,8 @@ async function run(
 
     if (!interaction || interaction instanceof Message) return;
 
-    msg.edit({ components: [] });
     setTimeout(() => {
+      if (msg.components.length > 0) msg.edit({ components: [] });
       interaction.deferReply().catch(() => {});
     }, 1000);
 
@@ -113,6 +113,7 @@ async function run(
       const res = await fetch(`https://cdn.nypsi.xyz/${id}`);
 
       if (!res.ok || res.status !== 200) {
+        msg.edit({ components: [] });
         return interaction
           .reply({ embeds: [new ErrorEmbed("failed to generate circle")] })
           .catch(() =>
@@ -135,6 +136,7 @@ async function run(
       await uploadImage(circleId, circleImage, "image/png");
     }
 
+    msg.edit({ components: [] });
     interaction
       .reply({
         embeds: [
