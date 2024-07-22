@@ -547,7 +547,16 @@ export async function runCommand(
   args: string[],
 ) {
   const preProcessLength = [performance.now()];
-  if (message.author.bot) return;
+  if (message.author.bot) {
+    if (
+      message.author.id === "974297735559806986" &&
+      message.guildId === Constants.NYPSI_SERVER_ID
+    ) {
+      // continue
+    } else {
+      return;
+    }
+  }
   if (!message.channel.isTextBased()) return;
   if (message.channel.isDMBased()) return;
 
