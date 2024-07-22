@@ -96,7 +96,7 @@ async function run(
     return send({ embeds: [new ErrorEmbed("invalid user")] });
   }
 
-  if (target.user.bot && target.user.id != message.client.user.id) {
+  if (target.user.bot && ![message.client.user.id, "974297735559806986"].includes(target.user.id)) {
     return send({ embeds: [new ErrorEmbed("invalid user")] });
   }
 

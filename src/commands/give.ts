@@ -101,7 +101,7 @@ async function run(
     return send({ embeds: [new ErrorEmbed("invalid user")] });
   }
 
-  if (target.user.bot) {
+  if (target.user.bot && target.user.id !== "974297735559806986") {
     return send({ embeds: [new ErrorEmbed("invalid user")] });
   }
 
