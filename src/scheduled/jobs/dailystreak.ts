@@ -16,10 +16,11 @@ export default {
 
     const users = await prisma.economy.findMany({
       where: {
-        AND: [{ lastDaily: { lte: limit } }, { dailyStreak: { gt: 1 } }],
+        AND: [{ lastDaily: { lte: limit } }, { dailyStreak: { gt: 0 } }],
       },
       select: {
         userId: true,
+        dailyStreak: true,
         user: {
           select: {
             DMSettings: {
@@ -98,7 +99,7 @@ export default {
         }
       }
 
-      if (user.user.DMSettings.other)
+      if (user.user.DMSettings.other && user.dailyStreak >= 7)
         notifications.push({ memberId: user.userId, payload: { embed: resetEmbed } });
 
       prisma.economy.update({
