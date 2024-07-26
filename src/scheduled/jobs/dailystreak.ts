@@ -7,6 +7,7 @@ import Constants from "../../utils/Constants";
 import { setInventoryItem } from "../../utils/functions/economy/inventory";
 import { percentChance } from "../../utils/functions/random";
 import { addNotificationToQueue } from "../../utils/functions/users/notifications";
+import pAll = require("p-all");
 
 export default {
   name: "daily streak",
@@ -67,54 +68,56 @@ export default {
       );
 
     const notifications: NotificationPayload[] = [];
+    const promises: (() => Promise<any>)[] = [];
 
     for (const user of users) {
-      if (user.Inventory.find((i) => i.item == "calendar")?.amount > 0) {
-        if (user.user.DMSettings.other)
-          notifications.push({ memberId: user.userId, payload: { embed: calendarSavedEmbed } });
+      promises.push(async () => {
+        if (user.Inventory.find((i) => i.item == "calendar")?.amount > 0) {
+          if (user.user.DMSettings.other)
+            notifications.push({ memberId: user.userId, payload: { embed: calendarSavedEmbed } });
 
-        setInventoryItem(
-          user.userId,
-          "calendar",
-          Number(user.Inventory.find((i) => i.item === "calendar").amount) - 1,
-        );
+          await setInventoryItem(
+            user.userId,
+            "calendar",
+            Number(user.Inventory.find((i) => i.item === "calendar").amount) - 1,
+          );
 
-        continue;
-      } else if (user.Inventory.find((i) => i.item == "white_gem")?.amount > 0n) {
-        const gemSaveChance = Math.floor(Math.random() * 10);
+          return;
+        } else if (user.Inventory.find((i) => i.item == "white_gem")?.amount > 0n) {
+          const gemSaveChance = Math.floor(Math.random() * 10);
 
-        if (gemSaveChance < 5) {
-          notifications.push({ memberId: user.userId, payload: { embed: gemSavedEmbed } });
+          if (gemSaveChance < 5) {
+            notifications.push({ memberId: user.userId, payload: { embed: gemSavedEmbed } });
 
-          if (percentChance(7)) {
-            setInventoryItem(
-              user.userId,
-              "calendar",
-              Number(user.Inventory.find((i) => i.item === "white_gem").amount) - 1,
-            );
+            if (percentChance(7)) {
+              await setInventoryItem(
+                user.userId,
+                "calendar",
+                Number(user.Inventory.find((i) => i.item === "white_gem").amount) - 1,
+              );
 
-            notifications.push({ memberId: user.userId, payload: { embed: whiteGemBrokeEmbed } });
+              notifications.push({ memberId: user.userId, payload: { embed: whiteGemBrokeEmbed } });
+            }
+            return;
           }
-          continue;
         }
-      }
 
-      if (user.user.DMSettings.other && user.dailyStreak >= 7)
-        notifications.push({ memberId: user.userId, payload: { embed: resetEmbed } });
+        if (user.user.DMSettings.other && user.dailyStreak >= 7)
+          notifications.push({ memberId: user.userId, payload: { embed: resetEmbed } });
 
-      prisma.economy.update({
-        where: {
-          userId: user.userId,
-        },
-        data: {
-          dailyStreak: 0,
-        },
+        await prisma.economy.update({
+          where: {
+            userId: user.userId,
+          },
+          data: {
+            dailyStreak: 0,
+          },
+        });
       });
     }
 
-    for (const notif of notifications) {
-      addNotificationToQueue(notif);
-    }
+    await pAll(promises, { concurrency: 7 });
+    notifications.forEach((notif) => addNotificationToQueue(notif));
 
     log(`${notifications.length} streak notifications sent`);
   },
