@@ -421,15 +421,6 @@ async function run(
       });
     }
 
-    inventory = await getInventory(message.member);
-
-    if (
-      !inventory.find((i) => i.item == selected.id) ||
-      inventory.find((i) => i.item == selected.id).amount < amount
-    ) {
-      return message.channel.send({ embeds: [new CustomEmbed(message.member, "sneaky bitch")] });
-    }
-
     let max = 1;
 
     if (await isPremium(message.member)) {
@@ -450,7 +441,6 @@ async function run(
         new ButtonBuilder().setCustomId("✅").setLabel("confirm").setStyle(ButtonStyle.Success),
         new ButtonBuilder().setCustomId("❌").setLabel("cancel").setStyle(ButtonStyle.Danger),
       );
-
       
       msg.edit({ embeds: [embed], components: [row] });
 
@@ -480,15 +470,6 @@ async function run(
           embeds: [new CustomEmbed(message.member, "✅ cancelled")],
           ephemeral: true,
         });
-      }
-    
-      inventory = await getInventory(message.member);
-  
-      if (
-        !inventory.find((i) => i.item == selected.id) ||
-        inventory.find((i) => i.item == selected.id).amount < amount
-      ) {
-        return message.channel.send({ embeds: [new CustomEmbed(message.member, "sneaky bitch")] });
       }
     }
     
@@ -1118,15 +1099,6 @@ async function run(
       ) {
         return await reaction.reply({ embeds: [new CustomEmbed(message.member, "sneaky bitch")] });
       }
-    }
-    
-    inventory = await getInventory(message.member);
-    
-    if (
-      !inventory.find((i) => i.item == selected.id) ||
-      inventory.find((i) => i.item == selected.id).amount < amount
-    ) {
-      return message.channel.send({ embeds: [new CustomEmbed(message.member, "sneaky bitch")] });
     }
 
     await setInventoryItem(
