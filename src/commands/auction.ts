@@ -482,6 +482,13 @@ async function run(
         });
       }
     }
+    
+    if (
+      !inventory.find((i) => i.item == selected.id) ||
+      inventory.find((i) => i.item == selected.id).amount < amount
+    ) {
+      return message.channel.send({ embeds: [new CustomEmbed(message.member, "sneaky bitch")] });
+    }
 
     await setInventoryItem(
       message.member,
@@ -1091,6 +1098,13 @@ async function run(
           ephemeral: true,
         });
       }
+    }
+    
+    if (
+      !inventory.find((i) => i.item == selected.id) ||
+      inventory.find((i) => i.item == selected.id).amount < amount
+    ) {
+      return message.channel.send({ embeds: [new CustomEmbed(message.member, "sneaky bitch")] });
     }
 
     await setInventoryItem(
