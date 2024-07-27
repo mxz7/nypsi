@@ -758,6 +758,12 @@ export async function runCommand(
     }
   }
 
+  if (
+    message.author.id === "974297735559806986" &&
+    (command.category === "admin" || command.category === "moderation")
+  )
+    return;
+
   logCommand(message, args);
 
   if (
