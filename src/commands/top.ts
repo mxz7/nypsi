@@ -250,8 +250,8 @@ async function run(
     const embed = new CustomEmbed(message.member).setHeader(
       title,
       title.includes("global") || title.includes("guild")
-        ? message.guild.iconURL()
-        : message.client.user.avatarURL(),
+        ? message.client.user.avatarURL()
+        : message.guild.iconURL(),
       url,
     );
 
