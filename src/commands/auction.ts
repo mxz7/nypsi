@@ -483,6 +483,8 @@ async function run(
       }
     }
     
+    inventory = await getInventory(message.member);
+    
     if (
       !inventory.find((i) => i.item == selected.id) ||
       inventory.find((i) => i.item == selected.id).amount < amount
@@ -969,7 +971,7 @@ async function run(
       return send({ embeds: [new ErrorEmbed("couldnt find that item")] });
     }
 
-    const inventory = await getInventory(message.member);
+    let inventory = await getInventory(message.member);
 
     if (
       !inventory.find((i) => i.item == selected.id) ||
@@ -1099,6 +1101,8 @@ async function run(
         });
       }
     }
+    
+    inventory = await getInventory(message.member);
     
     if (
       !inventory.find((i) => i.item == selected.id) ||
