@@ -427,21 +427,18 @@ async function run(
       max += await getTier(message.member);
     }
 
-    const auctions = await getAuctions(message.member);
-
-    if (auctions.length >= max)
-      return message.channel.send({ embeds: [new CustomEmbed(message.member, "sneaky bitch")] });
-
     const itemValue = await calcItemValue(selected.id);
 
-    if (cost/amount < itemValue/2) {
-      embed.setDescription(`**are you sure you want to auction at this price?**\nyou are selling this item for $${Math.floor(cost/amount).toLocaleString()} each\nthe average worth for this item is $${itemValue.toLocaleString()}`);
+    if (cost / amount < itemValue / 2) {
+      embed.setDescription(
+        `**are you sure you want to auction at this price?**\nyou are selling this item for $${Math.floor(cost / amount).toLocaleString()} each\nthe average worth for this item is $${itemValue.toLocaleString()}`,
+      );
 
       const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder().setCustomId("✅").setLabel("confirm").setStyle(ButtonStyle.Success),
         new ButtonBuilder().setCustomId("❌").setLabel("cancel").setStyle(ButtonStyle.Danger),
       );
-      
+
       msg.edit({ embeds: [embed], components: [row] });
 
       const filter = (i: Interaction) => i.user.id == message.author.id;
@@ -472,15 +469,20 @@ async function run(
         });
       }
     }
-    
+
     inventory = await getInventory(message.member);
-    
+
     if (
       !inventory.find((i) => i.item == selected.id) ||
       inventory.find((i) => i.item == selected.id).amount < amount
     ) {
       return message.channel.send({ embeds: [new CustomEmbed(message.member, "sneaky bitch")] });
     }
+
+    const auctions = await getAuctions(message.member);
+
+    if (auctions.length >= max)
+      return message.channel.send({ embeds: [new CustomEmbed(message.member, "sneaky bitch")] });
 
     await setInventoryItem(
       message.member,
@@ -1047,20 +1049,21 @@ async function run(
 
     let msg: Message<boolean>;
 
-    if (cost/amount < itemValue/2) {
+    if (cost / amount < itemValue / 2) {
       const embed = new CustomEmbed(message.member).setHeader(
         "create an auction",
         message.author.avatarURL(),
       );
 
-      embed.setDescription(`**are you sure you want to auction at this price?**\nyou are selling this item for $${Math.floor(cost/amount).toLocaleString()} each\nthe average worth for this item is $${itemValue.toLocaleString()}`);
+      embed.setDescription(
+        `**are you sure you want to auction at this price?**\nyou are selling this item for $${Math.floor(cost / amount).toLocaleString()} each\nthe average worth for this item is $${itemValue.toLocaleString()}`,
+      );
 
       const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
         new ButtonBuilder().setCustomId("✅").setLabel("confirm").setStyle(ButtonStyle.Success),
         new ButtonBuilder().setCustomId("❌").setLabel("cancel").setStyle(ButtonStyle.Danger),
       );
 
-      
       msg = await send({ embeds: [embed], components: [row] });
 
       const filter = (i: Interaction) => i.user.id == message.author.id;
@@ -1090,9 +1093,9 @@ async function run(
           ephemeral: true,
         });
       }
-    
+
       inventory = await getInventory(message.member);
-  
+
       if (
         !inventory.find((i) => i.item == selected.id) ||
         inventory.find((i) => i.item == selected.id).amount < amount
@@ -1120,10 +1123,18 @@ async function run(
     }
 
     if (msg) {
-      return await edit({ embeds: [new CustomEmbed(message.member, desc).setHeader(
-        "create an auction",
-        message.author.avatarURL(),
-      )], components: [] }, msg);
+      return await edit(
+        {
+          embeds: [
+            new CustomEmbed(message.member, desc).setHeader(
+              "create an auction",
+              message.author.avatarURL(),
+            ),
+          ],
+          components: [],
+        },
+        msg,
+      );
     }
     return await send({ embeds: [new CustomEmbed(message.member, desc)] });
   }
