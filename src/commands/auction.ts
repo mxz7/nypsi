@@ -443,7 +443,7 @@ async function run(
 
     const itemValue = await calcItemValue(selected.id);
 
-    if (cost/amount < itemValue) {
+    if (cost/amount < itemValue/2) {
       embed.setDescription(`**are you sure you want to auction at this price?**\nyou are selling this item for $${Math.floor(cost/amount).toLocaleString()} each\nthe average worth for this item is $${itemValue.toLocaleString()}`);
 
       const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
@@ -480,6 +480,15 @@ async function run(
           embeds: [new CustomEmbed(message.member, "✅ cancelled")],
           ephemeral: true,
         });
+      }
+    
+      inventory = await getInventory(message.member);
+  
+      if (
+        !inventory.find((i) => i.item == selected.id) ||
+        inventory.find((i) => i.item == selected.id).amount < amount
+      ) {
+        return message.channel.send({ embeds: [new CustomEmbed(message.member, "sneaky bitch")] });
       }
     }
     
@@ -1057,7 +1066,7 @@ async function run(
 
     let msg: Message<boolean>;
 
-    if (cost/amount < itemValue) {
+    if (cost/amount < itemValue/2) {
       const embed = new CustomEmbed(message.member).setHeader(
         "create an auction",
         message.author.avatarURL(),
@@ -1099,6 +1108,15 @@ async function run(
           embeds: [new CustomEmbed(message.member, "✅ cancelled")],
           ephemeral: true,
         });
+      }
+    
+      inventory = await getInventory(message.member);
+  
+      if (
+        !inventory.find((i) => i.item == selected.id) ||
+        inventory.find((i) => i.item == selected.id).amount < amount
+      ) {
+        return await reaction.reply({ embeds: [new CustomEmbed(message.member, "sneaky bitch")] });
       }
     }
     
