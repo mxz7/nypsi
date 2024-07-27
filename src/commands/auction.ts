@@ -34,6 +34,7 @@ import {
 } from "../utils/functions/economy/auctions";
 import {
   addInventoryItem,
+  calcItemValue,
   getInventory,
   selectItem,
   setInventoryItem,
@@ -50,7 +51,7 @@ import PageManager from "../utils/functions/page";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import requestDM from "../utils/functions/requestdm";
 import { getDmSettings } from "../utils/functions/users/notifications";
-import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import { addCooldown, addExpiry, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger } from "../utils/logger";
 
 const cmd = new Command("auction", "create and manage your item auctions", "money").setAliases([
@@ -420,15 +421,6 @@ async function run(
       });
     }
 
-    inventory = await getInventory(message.member);
-
-    if (
-      !inventory.find((i) => i.item == selected.id) ||
-      inventory.find((i) => i.item == selected.id).amount < amount
-    ) {
-      return message.channel.send({ embeds: [new CustomEmbed(message.member, "sneaky bitch")] });
-    }
-
     let max = 1;
 
     if (await isPremium(message.member)) {
@@ -439,6 +431,56 @@ async function run(
 
     if (auctions.length >= max)
       return message.channel.send({ embeds: [new CustomEmbed(message.member, "sneaky bitch")] });
+
+    const itemValue = await calcItemValue(selected.id);
+
+    if (cost/amount < itemValue/2) {
+      embed.setDescription(`**are you sure you want to auction at this price?**\nyou are selling this item for $${Math.floor(cost/amount).toLocaleString()} each\nthe average worth for this item is $${itemValue.toLocaleString()}`);
+
+      const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder().setCustomId("✅").setLabel("confirm").setStyle(ButtonStyle.Success),
+        new ButtonBuilder().setCustomId("❌").setLabel("cancel").setStyle(ButtonStyle.Danger),
+      );
+      
+      msg.edit({ embeds: [embed], components: [row] });
+
+      const filter = (i: Interaction) => i.user.id == message.author.id;
+
+      const reaction = await msg.awaitMessageComponent({ filter, time: 15000 }).catch(async () => {
+        await msg.edit({
+          embeds: [embed],
+          components: [
+            new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+              new ButtonBuilder()
+                .setStyle(ButtonStyle.Danger)
+                .setLabel("expired")
+                .setCustomId("boobies")
+                .setDisabled(true),
+            ),
+          ],
+        });
+        addExpiry(cmd.name, message.member, 30);
+      });
+
+      if (!reaction) return;
+
+      if (reaction.customId === "❌") {
+        msg.edit({ components: [] });
+        return reaction.reply({
+          embeds: [new CustomEmbed(message.member, "✅ cancelled")],
+          ephemeral: true,
+        });
+      }
+    }
+    
+    inventory = await getInventory(message.member);
+    
+    if (
+      !inventory.find((i) => i.item == selected.id) ||
+      inventory.find((i) => i.item == selected.id).amount < amount
+    ) {
+      return message.channel.send({ embeds: [new CustomEmbed(message.member, "sneaky bitch")] });
+    }
 
     await setInventoryItem(
       message.member,
@@ -454,7 +496,7 @@ async function run(
       embed.setDescription("there was an error while creating your auction");
     }
 
-    return await edit({ embeds: [embed] }, msg);
+    return await edit({ embeds: [embed], components: [] }, msg);
   };
 
   const manageAuctions = async (msg?: Message) => {
@@ -919,7 +961,7 @@ async function run(
       return send({ embeds: [new ErrorEmbed("couldnt find that item")] });
     }
 
-    const inventory = await getInventory(message.member);
+    let inventory = await getInventory(message.member);
 
     if (
       !inventory.find((i) => i.item == selected.id) ||
@@ -1001,6 +1043,64 @@ async function run(
       });
     }
 
+    const itemValue = await calcItemValue(selected.id);
+
+    let msg: Message<boolean>;
+
+    if (cost/amount < itemValue/2) {
+      const embed = new CustomEmbed(message.member).setHeader(
+        "create an auction",
+        message.author.avatarURL(),
+      );
+
+      embed.setDescription(`**are you sure you want to auction at this price?**\nyou are selling this item for $${Math.floor(cost/amount).toLocaleString()} each\nthe average worth for this item is $${itemValue.toLocaleString()}`);
+
+      const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+        new ButtonBuilder().setCustomId("✅").setLabel("confirm").setStyle(ButtonStyle.Success),
+        new ButtonBuilder().setCustomId("❌").setLabel("cancel").setStyle(ButtonStyle.Danger),
+      );
+
+      
+      msg = await send({ embeds: [embed], components: [row] });
+
+      const filter = (i: Interaction) => i.user.id == message.author.id;
+
+      const reaction = await msg.awaitMessageComponent({ filter, time: 15000 }).catch(async () => {
+        await msg.edit({
+          embeds: [embed],
+          components: [
+            new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+              new ButtonBuilder()
+                .setStyle(ButtonStyle.Danger)
+                .setLabel("expired")
+                .setCustomId("boobies")
+                .setDisabled(true),
+            ),
+          ],
+        });
+        addExpiry(cmd.name, message.member, 30);
+      });
+
+      if (!reaction) return;
+
+      if (reaction.customId === "❌") {
+        msg.edit({ components: [] });
+        return reaction.reply({
+          embeds: [new CustomEmbed(message.member, "✅ cancelled")],
+          ephemeral: true,
+        });
+      }
+    
+      inventory = await getInventory(message.member);
+  
+      if (
+        !inventory.find((i) => i.item == selected.id) ||
+        inventory.find((i) => i.item == selected.id).amount < amount
+      ) {
+        return await reaction.reply({ embeds: [new CustomEmbed(message.member, "sneaky bitch")] });
+      }
+    }
+
     await setInventoryItem(
       message.member,
       selected.id,
@@ -1019,6 +1119,12 @@ async function run(
       desc = "there was an error while creating your auction";
     }
 
+    if (msg) {
+      return await edit({ embeds: [new CustomEmbed(message.member, desc).setHeader(
+        "create an auction",
+        message.author.avatarURL(),
+      )], components: [] }, msg);
+    }
     return await send({ embeds: [new CustomEmbed(message.member, desc)] });
   }
 }
