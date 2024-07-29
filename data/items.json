@@ -3080,6 +3080,6 @@
     "buy": 30000,
     "sell": 10000,
     "in_crates": true,
-    "aliases": ["lotto"]
+    "aliases": ["lotto", "lottery"]
   }
 }
