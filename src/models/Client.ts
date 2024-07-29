@@ -26,7 +26,6 @@ import { doAutosellSitrep } from "../scheduled/clusterjobs/autosell_status";
 import { runAuctionChecks } from "../scheduled/clusterjobs/checkauctions";
 import { updateCounters } from "../scheduled/clusterjobs/counters";
 import { runCraftItemsJob } from "../scheduled/clusterjobs/crafted";
-import { runLotteryInterval } from "../scheduled/clusterjobs/lottery";
 import { runLogs, runModerationChecks } from "../scheduled/clusterjobs/moderationchecks";
 import startRandomDrops from "../scheduled/clusterjobs/random-drops";
 
@@ -208,7 +207,6 @@ export class NypsiClient extends Client {
 
     if (this.cluster.id != 0) return;
 
-    runLotteryInterval(this);
     runPremiumCrateInterval(this);
     runModerationChecks(this);
     runAuctionChecks(this);
