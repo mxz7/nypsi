@@ -21,7 +21,6 @@ import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { getAllGroupAccountIds } from "../moderation/alts";
 import { isUserBlacklisted } from "../users/blacklist";
-import { getPreferences } from "../users/notifications";
 import { createProfile, hasProfile } from "../users/utils";
 import { setProgress } from "./achievements";
 import { addBalance, calcMaxBet, getBalance } from "./balance";
@@ -43,13 +42,6 @@ let userUpgrades: { [key: string]: UserUpgrade };
 let tags: { [key: string]: Tag };
 let tasks: { [key: string]: Task };
 let plants: { [key: string]: Plant };
-
-const lotteryTicketPrice = 50000;
-/**
- * higher ticket price = more favourable to rich people cus poor people cant buy tickets resulting in less tickets overall
- * the goal is to have more tickets overall for a more random outcome
- */
-export { lotteryTicketPrice };
 
 export let maxPrestige = 0;
 
@@ -563,46 +555,6 @@ export async function deleteUser(member: GuildMember | string) {
       userId: id,
     },
   });
-}
-
-export async function getTickets(member: GuildMember | string) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
-
-  const query = await prisma.lotteryTicket.findMany({
-    where: {
-      userId: id,
-    },
-  });
-
-  return query;
-}
-
-export async function addTicket(member: GuildMember | string, amount = 1) {
-  let id: string;
-  if (member instanceof GuildMember) {
-    id = member.user.id;
-  } else {
-    id = member;
-  }
-
-  const data: { userId: string }[] = new Array(amount).fill({ userId: id });
-
-  await prisma.lotteryTicket.createMany({
-    data,
-  });
-
-  if (!(member instanceof GuildMember)) return;
-
-  await redis.hincrby(
-    "lotterytickets:queue",
-    (await getPreferences(id)).leaderboards ? member.user.username : "[hidden]",
-    amount,
-  );
 }
 
 export async function isHandcuffed(id: string): Promise<boolean> {

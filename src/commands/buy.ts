@@ -1,8 +1,14 @@
 import {
+  ActionRowBuilder,
   BaseMessageOptions,
+  ButtonBuilder,
+  ButtonInteraction,
+  ButtonStyle,
   CommandInteraction,
+  ComponentType,
   InteractionReplyOptions,
   Message,
+  MessageActionRowComponentBuilder,
 } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
@@ -110,13 +116,12 @@ async function run(
     return send({ embeds: [new ErrorEmbed("you cannot buy this item")] });
   }
 
+  let balance = await getBalance(message.member);
   let amount = 1;
 
   if (args.length != 1) {
     amount =
-      args[1].toLowerCase() === "all"
-        ? Math.floor((await getBalance(message.member)) / selected.buy)
-        : parseInt(args[1]);
+      args[1].toLowerCase() === "all" ? Math.floor(balance / selected.buy) : parseInt(args[1]);
   }
 
   if (!amount) {
@@ -127,8 +132,68 @@ async function run(
     return send({ embeds: [new ErrorEmbed("invalid amount")] });
   }
 
-  if ((await getBalance(message.member)) < selected.buy * amount) {
+  if (balance < selected.buy * amount) {
     return send({ embeds: [new ErrorEmbed("you cannot afford this")] });
+  }
+
+  let msg: Message;
+  let interaction: ButtonInteraction | void;
+
+  if (selected.buy * amount > 5_000_000) {
+    const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().setComponents(
+      new ButtonBuilder().setCustomId("confirm").setLabel("confirm").setStyle(ButtonStyle.Success),
+      new ButtonBuilder().setCustomId("cancel").setLabel("cancel").setStyle(ButtonStyle.Danger),
+    );
+
+    msg = await send({
+      embeds: [
+        new CustomEmbed(
+          message.member,
+          `are you sure you want to buy **${amount.toLocaleString()}** ${selected.emoji} ${selected.name} for $**${(selected.buy * amount).toLocaleString()}**?`,
+        ),
+      ],
+      components: [row],
+    });
+
+    interaction = await msg
+      .awaitMessageComponent({
+        filter: (i) => i.user.id === message.author.id,
+        componentType: ComponentType.Button,
+        time: 15000,
+      })
+      .catch(() => {
+        row.components.forEach((i) => i.setDisabled(true));
+        msg.edit({ components: [row] });
+      });
+
+    if (!interaction) return;
+
+    setTimeout(() => {
+      if (!interaction) return;
+      interaction.deferUpdate().catch(() => {});
+    }, 1500);
+
+    if (interaction.customId === "cancel") {
+      row.components.forEach((i) => i.setDisabled(true));
+
+      return interaction
+        .update({
+          components: [row],
+        })
+        .catch(() => msg.edit({ components: [row] }));
+    }
+
+    balance = await getBalance(message.member);
+
+    if (balance < selected.buy * amount) {
+      return interaction
+        .reply({ embeds: [new CustomEmbed(message.member, "trying to pull a fast one are you?")] })
+        .catch(() =>
+          msg.edit({
+            embeds: [new CustomEmbed(message.member, "trying to pull a fast one are you?")],
+          }),
+        );
+    }
   }
 
   await addCooldown(cmd.name, message.member, 7);
@@ -137,16 +202,20 @@ async function run(
   addStat(message.author.id, "spent-shop", selected.buy * amount);
   await addInventoryItem(message.member, selected.id, amount);
 
-  return send({
-    embeds: [
-      new CustomEmbed(
-        message.member,
-        `you have bought **${amount.toLocaleString()}** ${selected.emoji} ${selected.name} for $${(
-          selected.buy * amount
-        ).toLocaleString()}`,
-      ),
-    ],
-  });
+  const embed = new CustomEmbed(
+    message.member,
+    `you have bought **${amount.toLocaleString()}** ${selected.emoji} ${selected.name} for $${(
+      selected.buy * amount
+    ).toLocaleString()}`,
+  );
+
+  if (!msg) {
+    return send({ embeds: [embed] });
+  } else if (msg && interaction) {
+    return interaction
+      .update({ embeds: [embed], components: [] })
+      .catch(() => msg.edit({ embeds: [embed], components: [] }));
+  }
 }
 
 cmd.setRun(run);

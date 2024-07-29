@@ -22,9 +22,7 @@ import { addInventoryItem } from "../functions/economy/inventory";
 import { getRawLevel } from "../functions/economy/levelling";
 import { addStat } from "../functions/economy/stats";
 import {
-  addTicket,
   getItems,
-  getTickets,
   isEcoBanned,
   loadItems,
   setEcoBan,
@@ -177,11 +175,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
     }
   }
 
-  const tickets = await getTickets(user);
-
-  if (tickets.length <= Constants.LOTTERY_TICKETS_MAX - 1) {
-    await addTicket(user, 1);
-  }
+  await addInventoryItem(user, "lottery_ticket", 1);
 
   let crateAmount = 0;
   let rawLevel = await getRawLevel(user);
@@ -226,9 +220,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
         `+ $**${amount.toLocaleString()}**\n` +
         "+ **3**% multiplier\n" +
         `+ **${crateAmount}** vote crate${crateAmount != 1 ? "s" : ""}` +
-        `${
-          tickets.length <= Constants.LOTTERY_TICKETS_MAX - 1 ? "\n+ **1** lottery ticket" : ""
-        }\n\n` +
+        "\n+ **1** lottery ticket\n\n" +
         `you have voted **${votes.monthVote}** time${votes.monthVote > 1 ? "s" : ""} this month`,
     )
     .setFooter({ text: `+${xp}xp` });
