@@ -3067,5 +3067,19 @@
     "sell": 50000,
     "in_crates": true,
     "aliases": ["bseed"]
+  },
+  "lottery_ticket": {
+    "id": "lottery_ticket",
+    "name": "lottery ticket",
+    "article": "a",
+    "plural": "lottery tickets",
+    "emoji": "🎫",
+    "longDesc": "maybe you'll get lucky",
+    "rarity": 0,
+    "role": "lottery ticket",
+    "buy": 30000,
+    "sell": 10000,
+    "in_crates": true,
+    "aliases": ["lotto"]
   }
 }
