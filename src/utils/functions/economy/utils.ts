@@ -422,10 +422,10 @@ export async function reset() {
   await prisma.farm.deleteMany();
   await prisma.$executeRaw`TRUNCATE TABLE "Farm" RESTART IDENTITY;`;
 
-  logger.info("deleting banned");
+  logger.info("deleting banned/blacklisted");
   await prisma.economy.deleteMany({
     where: {
-      banned: { gt: new Date() },
+      OR: [{ banned: { gt: new Date() } }, { user: { blacklisted: true } }],
     },
   });
 
