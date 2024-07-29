@@ -140,7 +140,7 @@ export class NypsiClient extends Client {
               };
             });
             message.reply({
-              responsive: true,
+              responsive: this.ready,
               guilds,
               shards,
               restarting: Boolean(
