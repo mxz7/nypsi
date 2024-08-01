@@ -46,7 +46,7 @@
     "@types/jest": "^29.5.12",
     "@types/lodash": "4.17.7",
     "@types/ms": "0.7.34",
-    "@types/node": "20.14.12",
+    "@types/node": "22.0.2",
     "@types/node-os-utils": "1.3.4",
     "@types/string-similarity": "4.0.2",
     "@types/twemoji-parser": "13.1.4",
