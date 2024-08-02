@@ -42,6 +42,7 @@ import {
 import { percentChance } from "../functions/random";
 import requestDM from "../functions/requestdm";
 import { isUserBlacklisted } from "../functions/users/blacklist";
+import { getTax, getTaxRefreshTime } from "../functions/tax";
 import {
   addNotificationToQueue,
   getDmSettings,
@@ -88,6 +89,17 @@ export function listen(manager: ClusterManager) {
     const response = await checkStatus();
 
     res.json(response);
+  });
+
+  app.get("/tax", async (req, res) => {
+    res.set("cache-control", "max-age=60");
+
+    const [tax, refreshTime] = await Promise.all([getTax(), getTaxRefreshTime()]);
+
+    res.json({
+      tax,
+      refreshTime,
+    });
   });
 
   app.listen(process.env.EXPRESS_PORT || 5000);
