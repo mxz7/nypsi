@@ -109,14 +109,23 @@ async function run(
   }
 
   if (!(await isKarmaShopOpen())) {
+    await addCooldown(cmd.name, message.member, 7);
     const embed = new CustomEmbed(message.member);
 
     embed.setDescription(
       `the karma shop is currently **closed**, it was last open at <t:${Math.floor(
-        (await getLastKarmaShopOpen()).getTime() / 1000,
+        dayjs(await getLastKarmaShopOpen())
+          .set("seconds", 0)
+          .unix(),
       )}>\n\nwill **next open at** <t:${Math.floor(
-        (await getNextKarmaShopOpen()).getTime() / 1000,
-      )}> (<t:${Math.floor((await getNextKarmaShopOpen()).getTime() / 1000)}:R>)`,
+        dayjs(await getNextKarmaShopOpen())
+          .set("seconds", 0)
+          .unix(),
+      )}> (<t:${Math.floor(
+        dayjs(await getNextKarmaShopOpen())
+          .set("seconds", 0)
+          .unix(),
+      )}:R>)`,
     );
 
     return send({ embeds: [embed] });
