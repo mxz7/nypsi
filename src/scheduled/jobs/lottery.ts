@@ -46,7 +46,7 @@ export default {
     }
 
     const taxedAmount =
-      Math.floor(ticketCount * getItems()["lottery_ticket"].buy * (await getTax())) * 2;
+      Math.floor(ticketCount * getItems()["lottery_ticket"].buy * (await getTax())) * 1.5;
 
     const total = Math.floor(ticketCount * getItems()["lottery_ticket"].buy - taxedAmount);
 
