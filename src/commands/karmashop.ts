@@ -327,6 +327,8 @@ async function run(
       return buyItem(itemId, attempts++);
     }
 
+    await redis.set(Constants.redis.nypsi.KARMA_SHOP_BUYING, "meow");
+
     const items = await getKarmaShopItems();
     const wanted = items[itemId];
 
