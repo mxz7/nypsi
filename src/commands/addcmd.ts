@@ -13,7 +13,7 @@ cmd.setRun(async (message) => {
 
   const { children } = category;
 
-  const name = `cmds-${children.cache.size - 1}`;
+  const name = `cmds-${children.cache.size}`;
 
   let channel: TextChannel;
 
@@ -31,7 +31,7 @@ cmd.setRun(async (message) => {
 
   console.log(channel.position);
 
-  await channel.setPosition(children.cache.size - 3);
+  await channel.setPosition(children.cache.size - 2);
 
   console.log(channel.position);
 
