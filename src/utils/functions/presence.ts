@@ -27,6 +27,11 @@ export function randomPresence(): ActivitiesOptions {
       type: ActivityType.Streaming,
       url: "https://youtube.com/watch?v=r0dcv6GKNNw&t=102s",
     },
+    {
+      name: "this",
+      type: ActivityType.Watching,
+      url: "https://www.youtube.com/watch?v=7fMrijCFVdE",
+    },
   ];
 
   const chosen = possibilities[Math.floor(Math.random() * possibilities.length)];
