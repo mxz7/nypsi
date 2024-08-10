@@ -158,7 +158,7 @@ export default {
   MENTION_REGEX: /<@!*&*[0-9]+>/,
   EMBED_FAIL_COLOR: "#e31e3b" as ColorResolvable,
   EMBED_SUCCESS_COLOR: "#68f78c" as ColorResolvable,
-  EMOJI_REGEX: /(<:[A-z]+:[0-9]+>)/,
+  EMOJI_REGEX: /(<:[A-Za-z]+:[0-9]+>)/,
   GOLD_ROLE_ID: "819870846536646666",
   KOFI_PRODUCTS: products,
   MAX_AUCTION_PER_ITEM: 35_000_000,
