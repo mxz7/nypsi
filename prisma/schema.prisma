@@ -476,6 +476,7 @@ model Offer {
   targetId   String?
   sold       Boolean   @default(false)
   soldAt     DateTime?
+  createdAt  DateTime  @default(now())
 
   target Economy? @relation(fields: [targetId], references: [userId], name: "target")
   owner  Economy? @relation(fields: [ownerId], references: [userId], name: "owner")

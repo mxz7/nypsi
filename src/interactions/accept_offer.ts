@@ -47,6 +47,12 @@ export default {
     });
 
     if (!offer) {
+      const embed = new EmbedBuilder(interaction.message.embeds[0]);
+
+      embed.setDescription(embed.data.description.split("\n\n")[0] + "\n\n**no longer valid**");
+
+      interaction.update({ embeds: [embed], components: [] });
+
       return await redis.del(`${Constants.redis.nypsi.OFFER_PROCESS}:${interaction.user.id}`);
     }
 
