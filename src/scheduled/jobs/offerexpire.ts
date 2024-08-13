@@ -32,7 +32,7 @@ export default {
 
       const embed = new CustomEmbed(
         offer.ownerId,
-        `your offer to **${getLastKnownUsername(offer.targetId)}** for ${offer.itemAmount}x ${getItems()[offer.itemId].name} has expired`,
+        `your offer to **${await getLastKnownUsername(offer.targetId)}** for ${offer.itemAmount}x ${getItems()[offer.itemId].name} has expired`,
       ).setFooter({ text: `+$${offer.money.toLocaleString()}` });
 
       addNotificationToQueue({ memberId: offer.ownerId, payload: { embed } });
