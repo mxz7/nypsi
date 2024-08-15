@@ -718,14 +718,14 @@ export async function calcMaxBet(member: GuildMember | string): Promise<number> 
     isBooster(id),
   ]);
 
-  const levelBonus = Math.floor(level / 10) * 25000;
+  const levelBonus = Math.floor(level / 10) * 50_000;
 
   total += levelBonus;
 
-  if (total > 1_000_000) {
-    total = 1_000_000;
+  if (total > 5_000_000) {
+    total = 5_000_000;
 
-    if (level > 400) total += Math.floor((level - 400) / 30) * 10000;
+    if (level > 500) total += Math.floor((level - 400) / 30) * 10000;
   }
 
   if (voted) {
@@ -734,7 +734,7 @@ export async function calcMaxBet(member: GuildMember | string): Promise<number> 
 
   if (booster) total += 250_000;
   if (guildUpgrades.find((i) => i.upgradeId === "maxbet"))
-    total += guildUpgrades.find((i) => i.upgradeId === "maxbet").amount * 25000;
+    total += guildUpgrades.find((i) => i.upgradeId === "maxbet").amount * 100_000;
 
   for (const boosterId of boosters.keys()) {
     if (getItems()[boosterId].boosterEffect.boosts.includes("maxbet")) {

@@ -9,7 +9,7 @@
   "maxbet": {
     "id": "maxbet",
     "name": "max bet increase",
-    "description": "+25k maxbet",
+    "description": "+100k maxbet",
     "cost": 1,
     "increment_per_level": 0.5
   },
