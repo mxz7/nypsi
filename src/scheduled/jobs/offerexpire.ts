@@ -14,7 +14,14 @@ export default {
   async run(log) {
     const query = await prisma.offer.findMany({
       where: {
-        createdAt: { lt: dayjs().subtract(7, "day").toDate() },
+        AND: [
+          {
+            createdAt: { lt: dayjs().subtract(7, "day").toDate() },
+          },
+          {
+            sold: false,
+          },
+        ],
       },
       select: {
         itemId: true,
