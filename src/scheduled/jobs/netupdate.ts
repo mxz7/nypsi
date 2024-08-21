@@ -9,7 +9,7 @@ import pAll = require("p-all");
 
 export default {
   name: "netupdate",
-  cron: "0 */3 * * *",
+  cron: "0 0 * * *",
   async run(log) {
     const start = Date.now();
     const query = await prisma.economy.findMany({
@@ -29,7 +29,7 @@ export default {
       });
     }
 
-    await pAll(actions, { concurrency: 7 });
+    await pAll(actions, { concurrency: 2 });
 
     log(`net worth updated for ${actions.length} members in ${MStoTime(Date.now() - start)}`);
   },
