@@ -250,7 +250,7 @@ export async function topNetWorth(guild: Guild, userId?: string) {
     }
 
     promises.push(async () => {
-      const net = await calcNetWorth(user.userId);
+      const net = await calcNetWorth("leaderboard", user.userId);
 
       amounts.set(user.userId, net.amount);
       userIds.push(user.userId);

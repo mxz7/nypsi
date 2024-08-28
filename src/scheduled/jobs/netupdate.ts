@@ -25,7 +25,7 @@ export default {
       if (await redis.exists(`${Constants.redis.cache.economy.NETWORTH}:${user.userId}`)) continue;
 
       actions.push(async () => {
-        await calcNetWorth(user.userId);
+        await calcNetWorth("job", user.userId);
       });
     }
 
