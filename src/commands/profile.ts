@@ -172,7 +172,7 @@ async function run(
       getBalance(target),
       getPrestige(target),
       getInventory(target),
-      calcNetWorth(target),
+      calcNetWorth("profile", target),
       getBankBalance(target),
       getMaxBankBalance(target),
       hasPadlock(target),

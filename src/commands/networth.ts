@@ -68,7 +68,10 @@ async function run(
       embeds: [new ErrorEmbed(`${target.toString()} is banned AHAHAHAHA`)],
     });
 
-  const [net, inventory] = await Promise.all([calcNetWorth(target, true), getInventory(target)]);
+  const [net, inventory] = await Promise.all([
+    calcNetWorth("cmd", target, true),
+    getInventory(target),
+  ]);
 
   const embed = new CustomEmbed(target).setHeader(
     `${target.user.username}'s networth`,

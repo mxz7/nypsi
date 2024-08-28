@@ -4,6 +4,7 @@ import redis from "../../../init/redis";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { NotificationPayload } from "../../../types/Notification";
 import Constants from "../../Constants";
+import { logger } from "../../logger";
 import { isBooster } from "../premium/boosters";
 import { getTier } from "../premium/premium";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
@@ -759,7 +760,11 @@ export async function getRequiredBetForXp(member: GuildMember): Promise<number> 
   return requiredBet;
 }
 
-export async function calcNetWorth(member: GuildMember | string, breakdown = false) {
+export async function calcNetWorth(
+  source: string,
+  member: GuildMember | string,
+  breakdown = false,
+) {
   let id: string;
   if (member instanceof GuildMember) {
     id = member.user.id;
@@ -1055,6 +1060,11 @@ export async function calcNetWorth(member: GuildMember | string, breakdown = fal
       } else {
         return;
       }
+
+      logger.debug(`added net worth notification`, {
+        userId: id,
+        source,
+      });
 
       await addNotificationToQueue(payload);
     }
