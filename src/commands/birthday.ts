@@ -29,6 +29,37 @@ const cmd = new Command(
   "info",
 );
 
+cmd.slashEnabled = true;
+cmd.slashData
+  .addSubcommand((set) =>
+    set
+      .setName("set")
+      .setDescription("set your birthday")
+      .addStringOption((birthday) =>
+        birthday
+          .setName("birthday")
+          .setDescription("your birthday in the format YYYY-MM-DD")
+          .setRequired(true),
+      ),
+  )
+  .addSubcommand((toggle) =>
+    toggle.setName("toggle").setDescription("toggle birthday announcements for yourself on/off"),
+  )
+  .addSubcommand((channel) =>
+    channel
+      .setName("channel")
+      .setDescription("set the channel for birthday announcements in the server")
+      .addChannelOption((channel) =>
+        channel
+          .setName("channel")
+          .setDescription("channel for birthday announcements")
+          .setRequired(true),
+      ),
+  )
+  .addSubcommand((disable) =>
+    disable.setName("disable").setDescription("disable birthday announcements in this server"),
+  );
+
 async function run(
   message: Message | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
