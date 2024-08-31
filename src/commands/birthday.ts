@@ -21,6 +21,7 @@ import {
   setBirthdayEnabled,
 } from "../utils/functions/users/birthday";
 import dayjs = require("dayjs");
+import ms = require("ms");
 
 const cmd = new Command(
   "birthday",
@@ -102,6 +103,9 @@ async function run(
       return send({ embeds: [new ErrorEmbed("you must be at least 13 to use discord")] });
 
     if (years > 60) return send({ embeds: [new ErrorEmbed("HAHAHA")] });
+
+    if (message.author.createdTimestamp > Date.now() - ms("30 days"))
+      return send({ embeds: [new ErrorEmbed("your account is too new to use this feature ☹️")] });
 
     const birthdayCheck = await getBirthday(message.author.id);
 
