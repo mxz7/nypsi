@@ -3,6 +3,7 @@ import { WebhookClient } from "discord.js";
 import prisma from "../../init/database";
 import { NypsiClient } from "../../models/Client";
 import { MStoTime } from "../../utils/functions/date";
+import { getOrdinalSuffix } from "../../utils/functions/string";
 import { logger } from "../../utils/logger";
 import ms = require("ms");
 
@@ -22,17 +23,10 @@ async function doBirthdays(client: NypsiClient) {
     },
   });
 
-  const birthdayMembers = await prisma.user.findMany({
-    where: {
-      AND: [
-        { birthdayAnnounce: true },
-        { birthday: { not: null } },
-        { birthday: { gt: day.subtract(12, "hours").toDate() } },
-        { birthday: { lt: day.add(12, "hours").toDate() } },
-      ],
-    },
-    select: { id: true, birthday: true },
-  });
+  const birthdayMembers: { id: string; birthday: Date }[] =
+    await prisma.$queryRaw`SELECT id, birthday FROM "User"
+  WHERE date_part('day', birthday) = date_part('day', CURRENT_DATE)
+  AND date_part('month', birthday) = date_part('month', CURRENT_DATE)`;
 
   for (const guildData of guilds) {
     const hook = new WebhookClient({ url: guildData.birthdayHook });
@@ -47,7 +41,7 @@ async function doBirthdays(client: NypsiClient) {
 
       const years = dayjs().diff(birthday.birthday, "years");
 
-      const msg = `it is ${member.toString()}'s **${years}th** birthday today!`;
+      const msg = `it's ${member.toString()}'s **${years}${getOrdinalSuffix(years)}** birthday today!`;
 
       await hook
         .send({ content: msg })
