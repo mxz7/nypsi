@@ -68,7 +68,7 @@ async function run(
     const embed = new CustomEmbed(
       message.member,
       birthday
-        ? `your birthday is <t:${Math.floor(birthday.getTime() / 1000)}:D>\n\n`
+        ? `your birthday is ${dayjs(birthday).format("MMMM D, YYYY")}\n\n`
         : "" +
           "/**birthday set <YYYY-MM-DD>** *set your birthday*\n" +
           "/**birthday toggle** *enable/disable your birthday from being announced in servers*\n" +
@@ -84,10 +84,17 @@ async function run(
       return send({ embeds: [new ErrorEmbed("you forgot your birthday..... idiot.....")] });
     }
 
-    const birthday = new Date(args[1]);
+    let birthday = new Date(args[1]);
 
     if (isNaN(birthday as unknown as number))
       return send({ embeds: [new ErrorEmbed("invalid date, use the format YYYY-MM-DD")] });
+
+    birthday = dayjs(birthday)
+      .set("hours", 0)
+      .set("minute", 0)
+      .set("second", 0)
+      .set("millisecond", 0)
+      .toDate();
 
     const years = dayjs().diff(birthday, "years");
 
@@ -116,7 +123,7 @@ async function run(
       embeds: [
         new CustomEmbed(
           message.member,
-          `confirm that your birthday is <t:${Math.floor(birthday.getTime() / 1000)}:D>, you are ${years} years old`,
+          `confirm that your birthday is ${dayjs(birthday).format("MMMM D, YYYY")}, you are ${years} years old`,
         ),
       ],
       components: [row],
@@ -142,7 +149,7 @@ async function run(
         embeds: [
           new CustomEmbed(
             message.member,
-            `your birthday has been set to <t:${Math.floor(birthday.getTime() / 1000)}:D>`,
+            `your birthday has been set to ${dayjs(birthday).format("MMMM D, YYYY")}`,
           ),
         ],
         components: [],
