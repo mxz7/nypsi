@@ -29,6 +29,7 @@ import { runCraftItemsJob } from "../scheduled/clusterjobs/crafted";
 import { runLogs, runModerationChecks } from "../scheduled/clusterjobs/moderationchecks";
 import startRandomDrops from "../scheduled/clusterjobs/random-drops";
 
+import { runBirthdays } from "../scheduled/clusterjobs/birthdays";
 import { runPremiumCrateInterval } from "../scheduled/clusterjobs/weeklycrates";
 import { runWorkerInterval } from "../scheduled/clusterjobs/workers";
 import Constants from "../utils/Constants";
@@ -204,6 +205,7 @@ export class NypsiClient extends Client {
     runSnipeClearIntervals();
     doChatReactions(this);
     runCommandUseTimers(this);
+    runBirthdays(this);
 
     if (this.cluster.id != 0) return;
 
