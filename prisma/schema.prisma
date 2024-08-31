@@ -25,6 +25,9 @@ model User {
   booster           Boolean  @default(false)
   totalSpend        Float    @default(0)
 
+  birthday         DateTime?
+  birthdayAnnounce Boolean   @default(true)
+
   Economy                  Economy?
   Premium                  Premium?
   Username                 Username[]
@@ -504,6 +507,8 @@ model Guild {
   logs             String?
   automute         Int[]    @default([0, 60, 120, 300])
   autoMuteExpire   Int      @default(86400)
+
+  birthdayHook String?
 
   GuildChristmas GuildChristmas?
   counters       GuildCounter[]
