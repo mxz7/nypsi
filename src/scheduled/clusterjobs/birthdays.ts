@@ -24,7 +24,12 @@ async function doBirthdays(client: NypsiClient) {
 
   const birthdayMembers = await prisma.user.findMany({
     where: {
-      AND: [{ birthdayAnnounce: true }, { birthday: { not: null } }, { birthday: day.toDate() }],
+      AND: [
+        { birthdayAnnounce: true },
+        { birthday: { not: null } },
+        { birthday: { gt: day.subtract(12, "hours").toDate() } },
+        { birthday: { lt: day.add(12, "hours").toDate() } },
+      ],
     },
     select: { id: true, birthday: true },
   });
