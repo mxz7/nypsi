@@ -89,6 +89,8 @@ async function run(
     if (years < 13)
       return send({ embeds: [new ErrorEmbed("you must be at least 13 to use discord")] });
 
+    if (years > 60) return send({ embeds: [new ErrorEmbed("HAHAHA")] });
+
     const birthdayCheck = await getBirthday(message.author.id);
 
     if (birthdayCheck)
@@ -109,7 +111,7 @@ async function run(
       embeds: [
         new CustomEmbed(
           message.member,
-          `confirm that your birthday is <t:${Math.floor(birthday.getTime() / 1000)}>, you are ${years} years old`,
+          `confirm that your birthday is <t:${Math.floor(birthday.getTime() / 1000)}:D>, you are ${years} years old`,
         ),
       ],
       components: [row],
@@ -135,7 +137,7 @@ async function run(
         embeds: [
           new CustomEmbed(
             message.member,
-            `your birthday has been set to <t:${Math.floor(birthday.getTime() / 1000)}`,
+            `your birthday has been set to <t:${Math.floor(birthday.getTime() / 1000)}:D>`,
           ),
         ],
         components: [],
