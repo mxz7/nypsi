@@ -29,31 +29,39 @@ async function doBirthdays(client: NypsiClient) {
   AND date_part('month', birthday) = date_part('month', CURRENT_DATE)`;
 
   for (const guildData of guilds) {
-    const hook = new WebhookClient({ url: guildData.birthdayHook });
-    const guild = await client.guilds.fetch(guildData.id);
+    try {
+      const hook = new WebhookClient({ url: guildData.birthdayHook });
+      const guild = await client.guilds.fetch(guildData.id);
 
-    const members = await guild.members.fetch({ user: birthdayMembers.map((i) => i.id) });
+      const members = await guild.members.fetch({ user: birthdayMembers.map((i) => i.id) });
 
-    for (const member of members.values()) {
-      const birthday = birthdayMembers.find((i) => i.id === member.id);
+      for (const member of members.values()) {
+        try {
+          const birthday = birthdayMembers.find((i) => i.id === member.id);
 
-      if (!birthday) continue;
+          if (!birthday) continue;
 
-      const years = dayjs().diff(birthday.birthday, "years");
+          const years = dayjs().diff(birthday.birthday, "years");
 
-      const msg = `it's ${member.toString()}'s **${years}${getOrdinalSuffix(years)}** birthday today!`;
+          const msg = `it's ${member.toString()}'s **${years}${getOrdinalSuffix(years)}** birthday today!`;
 
-      await hook
-        .send({ content: msg })
-        .then(() => {
-          logger.info(`::auto sent ${member.id} birthday announcement in ${guild.id}`);
-        })
-        .catch(() => {
-          logger.warn(`failed to send ${member.id} birthday announcement in ${guild.id}`);
-        });
+          await hook
+            .send({ content: msg })
+            .then(() => {
+              logger.info(`::auto sent ${member.id} birthday announcement in ${guild.id}`);
+            })
+            .catch(() => {
+              logger.warn(`failed to send ${member.id} birthday announcement in ${guild.id}`);
+            });
+        } catch (e) {
+          logger.error(`error handling birthday in ${guildData.id} for ${member.id}`, e);
+        }
+      }
+
+      hook.destroy();
+    } catch (e) {
+      logger.error(`error handlings birthdays in ${guildData.id}`, e);
     }
-
-    hook.destroy();
   }
 }
 
