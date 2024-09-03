@@ -92,7 +92,7 @@ export default {
     if ((await getDmSettings(winner.winner)).lottery) {
       embed.setTitle("you have won the lottery!");
       embed.setDescription(
-        `you have won a total of $**${total.toLocaleString()}**\n\nyou had${winner.amount.toLocaleString()} tickets`,
+        `you have won a total of $**${total.toLocaleString()}**\n\nyou had ${winner.amount.toLocaleString()} tickets`,
       );
       embed.setColor(flavors.latte.colors.base.hex as ColorResolvable);
 
