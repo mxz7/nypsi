@@ -738,7 +738,7 @@ async function run(
 
         for (const roleId of reactionRole.whitelist) {
           const role = await message.guild.roles
-            .fetch(reactionRole.whitelist[0])
+            .fetch(roleId)
             .then((r) => r.toString())
             .catch(async () => {
               reactionRole.whitelist.splice(reactionRole.whitelist.indexOf(roleId), 1);
