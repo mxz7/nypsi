@@ -487,6 +487,17 @@ model Offer {
   @@index([itemId])
 }
 
+model Aura {
+  id          Int      @id @default(autoincrement())
+  recipientId String
+  senderId    String
+  createdAt   DateTime @default(now())
+  amount      Int
+
+  @@index([recipientId])
+  @@index([senderId])
+}
+
 // guild specific tables
 
 model Guild {
