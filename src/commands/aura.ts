@@ -11,11 +11,13 @@ import {
 } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
-import { createUser, userExists } from "../utils/functions/economy/utils.js";
+import { createUser, isEcoBanned, userExists } from "../utils/functions/economy/utils.js";
 import { getMember } from "../utils/functions/member.js";
 import PageManager from "../utils/functions/page";
-import { getAura, getAuraTransactions } from "../utils/functions/users/aura";
+import { createAuraTransaction, getAura, getAuraTransactions } from "../utils/functions/users/aura";
+import { isUserBlacklisted } from "../utils/functions/users/blacklist";
 import { getLastKnownUsername } from "../utils/functions/users/tag";
+import { hasProfile } from "../utils/functions/users/utils";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import ms = require("ms");
 
@@ -83,8 +85,6 @@ async function run(
     });
   }
 
-  if (!(await userExists(target))) await createUser(target);
-
   const showProfile = async () => {
     const aura = await getAura(target.user.id);
 
@@ -136,12 +136,27 @@ async function run(
     let runningCount = 1000;
 
     for (const transaction of history) {
-      runningCount + transaction.amount;
+      if (
+        (transaction.senderId === target.user.id && transaction.amount > 0) ||
+        (transaction.recipientId === target.user.id && transaction.amount > 0)
+      ) {
+        runningCount -= transaction.amount;
 
-      pageData.push(
-        `**${await getLastKnownUsername(transaction.senderId)}** ${transaction.amount > 0 ? `+${transaction.amount}` : transaction.amount} (${runningCount})\n` +
-          `at <t:${Math.floor(transaction.createdAt.getTime() / 1000)}:d> <t:${Math.floor(transaction.createdAt.getTime() / 1000)}:t>\n`,
-      );
+        pageData.push(
+          `**${await getLastKnownUsername(transaction.senderId)}** → **${await getLastKnownUsername(transaction.recipientId)}** ${Math.abs(transaction.amount).toLocaleString()} (${runningCount.toLocaleString()})\n` +
+            ` - <t:${Math.floor(transaction.createdAt.getTime() / 1000)}:d> <t:${Math.floor(transaction.createdAt.getTime() / 1000)}:t>\n`,
+        );
+      } else if (
+        (transaction.senderId === target.user.id && transaction.amount < 0) ||
+        (transaction.recipientId === target.user.id && transaction.amount < 0)
+      ) {
+        runningCount += transaction.amount;
+
+        pageData.push(
+          `**${await getLastKnownUsername(transaction.recipientId)}** → **${await getLastKnownUsername(transaction.senderId)}** ${Math.abs(transaction.amount).toLocaleString()} (${runningCount.toLocaleString()})\n` +
+            ` - <t:${Math.floor(transaction.createdAt.getTime() / 1000)}:d> <t:${Math.floor(transaction.createdAt.getTime() / 1000)}:t>\n`,
+        );
+      }
     }
 
     pageData.reverse();
@@ -155,10 +170,14 @@ async function run(
 
     const historyRow = PageManager.defaultRow();
 
-    const historyMsg = await interaction.editReply({
-      embeds: [historyEmbed],
-      components: [historyRow],
-    });
+    let historyMsg: Message;
+
+    if (pages.size > 1)
+      historyMsg = await interaction.editReply({
+        embeds: [historyEmbed],
+        components: [historyRow],
+      });
+    else return interaction.editReply({ embeds: [historyEmbed] });
 
     const manager = new PageManager({
       pages,
@@ -176,11 +195,67 @@ async function run(
   else {
     target = await getMember(message.guild, args.join(" "));
 
+    if (!(await hasProfile(target)))
+      return send({
+        embeds: [new ErrorEmbed(`${target.toString()} has never used nypsi. what a LOSER lol.`)],
+      });
+
+    if (!(await userExists(target))) await createUser(target);
+
+    if (await isUserBlacklisted(target.user.id))
+      return send({
+        embeds: [
+          new ErrorEmbed(
+            `${target.user.toString()} is blacklisted 😬. they did something REALLY bad. laugh at them for me. lol. AHHAHAAHHA`,
+          ),
+        ],
+      });
+
+    if ((await isEcoBanned(target.user.id)).banned)
+      return send({ embeds: [new ErrorEmbed(`${target.toString()} is banned AHAHAHAHA`)] });
+
     if (!target) {
       return send({ embeds: [new ErrorEmbed("invalid user")], ephemeral: true });
     }
 
-    return showProfile();
+    if (args.length === 1) {
+      return showProfile();
+    }
+
+    if (
+      args[1].toLowerCase() === "give" ||
+      args[1].toLowerCase().startsWith("+") ||
+      args[1] === "+"
+    ) {
+      let amount: number;
+
+      if (args.length > 2) amount = parseInt(args[2]);
+      else amount = parseInt(args[1]);
+
+      if (amount === 0 || isNaN(amount) || !amount) {
+        await createAuraTransaction(message.author.id, message.client.user.id, -50);
+
+        return send({ embeds: [new ErrorEmbed("invalid amount. -50 aura")] });
+      }
+
+      const aura = await getAura(message.author.id);
+
+      if (aura < amount) {
+        await createAuraTransaction(message.author.id, message.client.user.id, -10);
+
+        return send({ embeds: [new ErrorEmbed("you don't have this much aura. damn. -10 aura")] });
+      }
+
+      let amountGiven = amount;
+
+      if (amount > 10) {
+        amountGiven = Math.floor(Math.random() * (amount / 2)) + amount / 2;
+      }
+
+      await createAuraTransaction(target.user.id, message.author.id, amountGiven);
+
+      return send({ embeds: [new CustomEmbed(target, `+${amountGiven.toLocaleString()} aura`)] });
+    }
   }
 }
 

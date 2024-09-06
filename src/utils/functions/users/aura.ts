@@ -9,14 +9,20 @@ export async function getAura(userId: string) {
 
   if (cache) return parseInt(cache);
 
-  const query = await prisma.aura.aggregate({
-    where: { OR: [{ recipientId: userId }, { senderId: userId }] },
+  const received = await prisma.aura.aggregate({
+    where: { recipientId: userId },
+    _sum: { amount: true },
+  });
+  const sent = await prisma.aura.aggregate({
+    where: { senderId: userId },
     _sum: { amount: true },
   });
 
-  await redis.set(`${Constants.redis.cache.user.aura}:${userId}`, base + query._sum.amount);
+  const total = base + (received._sum.amount - sent._sum.amount);
 
-  return base + query._sum.amount;
+  await redis.set(`${Constants.redis.cache.user.aura}:${userId}`, total);
+
+  return total;
 }
 
 export async function createAuraTransaction(recipientId: string, senderId: string, amount: number) {
