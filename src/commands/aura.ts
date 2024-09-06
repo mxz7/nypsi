@@ -17,6 +17,7 @@ import PageManager from "../utils/functions/page";
 import { getAura, getAuraTransactions } from "../utils/functions/users/aura";
 import { getLastKnownUsername } from "../utils/functions/users/tag";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import ms = require("ms");
 
 const cmd = new Command("aura", "aura check", "fun").setAliases([
   "socialcreditscore",
@@ -75,6 +76,13 @@ async function run(
 
   await addCooldown(cmd.name, message.member, 5);
 
+  if (message.author.createdTimestamp > Date.now() - ms("2 weeks")) {
+    return send({
+      embeds: [new ErrorEmbed("your account is too new for aura 🙄")],
+      ephemeral: true,
+    });
+  }
+
   if (!(await userExists(target))) await createUser(target);
 
   const showProfile = async () => {
@@ -117,12 +125,26 @@ async function run(
 
     let pageData: string[] = [];
 
+    /**
+     * todo
+     * make database return transaction history in ascending order
+     * ues that to calc aura at each stage
+     * add other commands for take/give etc
+     * take aura for brainrot words
+     */
+
+    let runningCount = 1000;
+
     for (const transaction of history) {
+      runningCount + transaction.amount;
+
       pageData.push(
-        `**${await getLastKnownUsername(transaction.senderId)}** ${transaction.amount > 0 ? `+${transaction.amount}` : transaction.amount}\n` +
+        `**${await getLastKnownUsername(transaction.senderId)}** ${transaction.amount > 0 ? `+${transaction.amount}` : transaction.amount} (${runningCount})\n` +
           `at <t:${Math.floor(transaction.createdAt.getTime() / 1000)}:d> <t:${Math.floor(transaction.createdAt.getTime() / 1000)}:t>\n`,
       );
     }
+
+    pageData.reverse();
 
     const pages = PageManager.createPages(pageData, 3);
 
