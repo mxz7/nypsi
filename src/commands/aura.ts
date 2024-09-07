@@ -123,15 +123,7 @@ async function run(
     if (history.length === 0)
       return interaction.editReply({ embeds: [new ErrorEmbed("no history to show")] });
 
-    let pageData: string[] = [];
-
-    /**
-     * todo
-     * make database return transaction history in ascending order
-     * ues that to calc aura at each stage
-     * add other commands for take/give etc
-     * take aura for brainrot words
-     */
+    const pageData: string[] = [];
 
     let runningCount = 1000;
 
@@ -306,7 +298,7 @@ async function run(
         amountGiven = Math.floor(Math.random() * (amount / 2)) + amount / 2;
       }
 
-      let fail = Math.floor(Math.random() * 10);
+      const fail = Math.floor(Math.random() * 10);
 
       if (fail < 3) {
         await createAuraTransaction(target.user.id, message.author.id, amountGiven);
