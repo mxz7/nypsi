@@ -56,6 +56,7 @@ export default {
         username: "cache:user:username",
         avatar: "cache:user:avatar",
         views: "cache:user:views",
+        aura: "cache:user:aura",
       },
       guild: {
         EXISTS: "cache:guild:exists",

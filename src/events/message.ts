@@ -37,9 +37,11 @@ import {
   getSupportRequest,
   sendToRequestChannel,
 } from "../utils/functions/supportrequest";
+import { createAuraTransaction } from "../utils/functions/users/aura";
 import { isUserBlacklisted } from "../utils/functions/users/blacklist";
 import { getLastCommand } from "../utils/functions/users/commands";
 import { MentionQueueItem } from "../utils/functions/users/mentions";
+import { hasProfile } from "../utils/functions/users/utils";
 import { runCommand } from "../utils/handlers/commandhandler";
 import { logger } from "../utils/logger";
 import ms = require("ms");
@@ -50,6 +52,29 @@ const lastContent = new Map<string, { history: string[]; last: number }>();
 setInterval(() => {
   lastContent.clear();
 }, ms("30 minutes"));
+
+const brainrotFilter = [
+  "skibidi",
+  "gyatt",
+  "sigma",
+  "rizzler",
+  "gooning",
+  "l + ratio",
+  "ohio",
+  "fanum tax",
+  "mewing",
+  "sussy",
+  "baka",
+  "goofy ahh",
+  "chungus",
+  "bing chilling",
+  "only in ohio",
+  "edging",
+  "bussing",
+  "grimace shake",
+  "whats up chat",
+  "mogging",
+];
 
 export default async function messageCreate(message: Message) {
   if (message.channel.isDMBased() && !message.author.bot) {
@@ -221,8 +246,26 @@ export default async function messageCreate(message: Message) {
   if (message.channel.isVoiceBased()) return;
   if (!message.member) return;
 
+  const checkAura = async () => {
+    if (await hasProfile(message.member)) {
+      for (const brainrot of brainrotFilter) {
+        if (message.content.toLowerCase().includes(brainrot)) {
+          const amounts = [5, 10, 25, 50, 75];
+          const chosen = amounts[Math.floor(Math.random() * amounts.length)];
+
+          createAuraTransaction(message.author.id, message.client.user.id, -chosen);
+
+          if (!(await redis.exists(`brainrot:cooldown:${message.channelId}`)))
+            message.reply({ embeds: [new CustomEmbed(message.member, `-${chosen} aura`)] });
+          redis.set(`brainrot:cooldown:${message.channelId}`, 1, "EX", 1);
+        }
+      }
+    }
+  };
+
   const checkTask = async () => {
     await sleep(500);
+
     const lastContents = lastContent.get(message.author.id);
 
     if (message.author.id === Constants.TEKOH_ID) redis.set("nypsi:tekoh:lastchat", Date.now());
@@ -283,8 +326,9 @@ export default async function messageCreate(message: Message) {
     addProgress();
   };
 
-  if (!message.author.bot && message.guildId === Constants.NYPSI_SERVER_ID) {
-    checkTask();
+  if (!message.author.bot) {
+    if (message.guildId === Constants.NYPSI_SERVER_ID) checkTask();
+    checkAura();
   }
 
   message.content = message.content.replace(/ +(?= )/g, ""); // remove any additional spaces
