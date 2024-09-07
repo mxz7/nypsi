@@ -246,9 +246,7 @@ export default async function messageCreate(message: Message) {
   if (message.channel.isVoiceBased()) return;
   if (!message.member) return;
 
-  const checkTask = async () => {
-    await sleep(500);
-
+  const checkAura = async () => {
     if (await hasProfile(message.member)) {
       for (const brainrot of brainrotFilter) {
         if (message.content.toLowerCase().includes(brainrot)) {
@@ -263,6 +261,10 @@ export default async function messageCreate(message: Message) {
         }
       }
     }
+  };
+
+  const checkTask = async () => {
+    await sleep(500);
 
     const lastContents = lastContent.get(message.author.id);
 
@@ -324,8 +326,9 @@ export default async function messageCreate(message: Message) {
     addProgress();
   };
 
-  if (!message.author.bot && message.guildId === Constants.NYPSI_SERVER_ID) {
-    checkTask();
+  if (!message.author.bot) {
+    if (message.guildId === Constants.NYPSI_SERVER_ID) checkTask();
+    checkAura();
   }
 
   message.content = message.content.replace(/ +(?= )/g, ""); // remove any additional spaces
