@@ -140,7 +140,8 @@ async function run(
         (transaction.senderId === target.user.id && transaction.amount > 0) ||
         (transaction.recipientId === target.user.id && transaction.amount > 0)
       ) {
-        runningCount -= transaction.amount;
+        if (transaction.senderId === target.user.id) runningCount -= transaction.amount;
+        else runningCount += transaction.amount;
 
         pageData.push(
           `**${await getLastKnownUsername(transaction.senderId)}** → **${await getLastKnownUsername(transaction.recipientId)}** ${Math.abs(transaction.amount).toLocaleString()} (${runningCount.toLocaleString()})\n` +
@@ -150,7 +151,8 @@ async function run(
         (transaction.senderId === target.user.id && transaction.amount < 0) ||
         (transaction.recipientId === target.user.id && transaction.amount < 0)
       ) {
-        runningCount += transaction.amount;
+        if (transaction.senderId === target.user.id) runningCount -= transaction.amount;
+        else runningCount += transaction.amount;
 
         pageData.push(
           `**${await getLastKnownUsername(transaction.recipientId)}** → **${await getLastKnownUsername(transaction.senderId)}** ${Math.abs(transaction.amount).toLocaleString()} (${runningCount.toLocaleString()})\n` +
