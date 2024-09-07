@@ -195,7 +195,11 @@ async function run(
 
   if (args.length === 0) return showProfile();
   else {
-    target = await getMember(message.guild, args.join(" "));
+    target = await getMember(message.guild, args[0]);
+
+    if (!target) {
+      return send({ embeds: [new ErrorEmbed("invalid user")], ephemeral: true });
+    }
 
     if (!(await hasProfile(target)))
       return send({
@@ -215,10 +219,6 @@ async function run(
 
     if ((await isEcoBanned(target.user.id)).banned)
       return send({ embeds: [new ErrorEmbed(`${target.toString()} is banned AHAHAHAHA`)] });
-
-    if (!target) {
-      return send({ embeds: [new ErrorEmbed("invalid user")], ephemeral: true });
-    }
 
     if (args.length === 1) {
       return showProfile();
