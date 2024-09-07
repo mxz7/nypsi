@@ -254,7 +254,63 @@ async function run(
 
       await createAuraTransaction(target.user.id, message.author.id, amountGiven);
 
-      return send({ embeds: [new CustomEmbed(target, `+${amountGiven.toLocaleString()} aura`)] });
+      return send({
+        embeds: [
+          new CustomEmbed(target, `+${amountGiven.toLocaleString()} aura`).setHeader(
+            target.user.username,
+            target.user.displayAvatarURL(),
+          ),
+        ],
+      });
+    } else if (
+      args[1].toLowerCase() === "take" ||
+      args[1].toLowerCase() === "-" ||
+      args[1].toLowerCase().startsWith("-")
+    ) {
+      let amount: number;
+
+      if (args.length > 2) amount = parseInt(args[2]);
+      else amount = parseInt(args[1]);
+
+      if (amount === 0 || isNaN(amount) || !amount) {
+        await createAuraTransaction(message.author.id, message.client.user.id, -50);
+
+        return send({ embeds: [new ErrorEmbed("invalid amount. -50 aura")] });
+      }
+
+      amount = Math.abs(amount);
+
+      let amountGiven = amount;
+
+      if (amount > 10) {
+        amountGiven = Math.floor(Math.random() * (amount / 2)) + amount / 2;
+      }
+
+      let fail = Math.floor(Math.random() * 10);
+
+      if (fail < 2) {
+        await createAuraTransaction(target.user.id, message.author.id, amountGiven);
+
+        return send({
+          embeds: [
+            new CustomEmbed(
+              message.member,
+              `declined. -${amountGiven.toLocaleString()} aura`,
+            ).setHeader(message.author.username, message.author.displayAvatarURL()),
+          ],
+        });
+      }
+
+      await createAuraTransaction(target.user.id, message.author.id, -Math.abs(amountGiven));
+
+      return send({
+        embeds: [
+          new CustomEmbed(target, `-${amountGiven.toLocaleString()} aura`).setHeader(
+            target.user.username,
+            target.user.displayAvatarURL(),
+          ),
+        ],
+      });
     }
   }
 }
