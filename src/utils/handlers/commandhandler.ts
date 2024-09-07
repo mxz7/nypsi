@@ -51,6 +51,7 @@ import { getUserAliases } from "../functions/premium/aliases";
 import { addUse, getCommand } from "../functions/premium/command";
 import { percentChance } from "../functions/random";
 import { cleanString } from "../functions/string";
+import { createAuraTransaction } from "../functions/users/aura";
 import { isUserBlacklisted } from "../functions/users/blacklist";
 import { getLastCommand, updateUser } from "../functions/users/commands";
 import {
@@ -1087,6 +1088,14 @@ export async function runCommand(
     "discordian",
     parseInt(await redis.hget(Constants.redis.nypsi.TOP_COMMANDS_USER, message.author.id)) || 0,
   );
+
+  if (
+    (parseInt(await redis.hget(Constants.redis.nypsi.TOP_COMMANDS_USER, message.author.id)) || 1) %
+      1000 ===
+    0
+  ) {
+    createAuraTransaction(message.author.id, message.client.user.id, 50);
+  }
 
   if ((await getPreferences(message.member)).leaderboards)
     if (command.category == "money") {
