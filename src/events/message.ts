@@ -249,7 +249,7 @@ export default async function messageCreate(message: Message) {
   const checkAura = async () => {
     if (
       (await hasProfile(message.member)) &&
-      (await getLastCommand(message.member)).getTime() > Date.now() - ms("1 week")
+      (await getLastCommand(message.member)).getTime() > Date.now() - ms("1 day")
     ) {
       for (const brainrot of brainrotFilter) {
         if (message.content.toLowerCase().includes(brainrot)) {
