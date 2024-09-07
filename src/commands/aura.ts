@@ -269,7 +269,7 @@ async function run(
       args[1].toLowerCase() === "-" ||
       args[1].toLowerCase().startsWith("-")
     ) {
-      if (await onCooldown(`${cmd.name}:${target.user.username}`, message.member)) {
+      if (await onCooldown(`${cmd.name}:${target.user.id}`, message.member)) {
         return send({
           embeds: [new ErrorEmbed("you've already taken aura from this user recently")],
         });
@@ -286,7 +286,12 @@ async function run(
         return send({ embeds: [new ErrorEmbed("invalid amount. -50 aura")] });
       }
 
+      const aura = await getAura(message.author.id);
+
       amount = Math.abs(amount);
+
+      if (amount > aura)
+        return send({ embeds: [new ErrorEmbed("you don't have enough aura to take this 🙄")] });
 
       let amountGiven = amount;
 
@@ -296,7 +301,7 @@ async function run(
 
       let fail = Math.floor(Math.random() * 10);
 
-      if (fail < 2) {
+      if (fail < 3) {
         await createAuraTransaction(target.user.id, message.author.id, amountGiven);
 
         return send({

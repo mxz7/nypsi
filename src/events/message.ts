@@ -41,6 +41,7 @@ import { createAuraTransaction } from "../utils/functions/users/aura";
 import { isUserBlacklisted } from "../utils/functions/users/blacklist";
 import { getLastCommand } from "../utils/functions/users/commands";
 import { MentionQueueItem } from "../utils/functions/users/mentions";
+import { hasProfile } from "../utils/functions/users/utils";
 import { runCommand } from "../utils/handlers/commandhandler";
 import { logger } from "../utils/logger";
 import ms = require("ms");
@@ -72,6 +73,7 @@ const brainrotFilter = [
   "bussing",
   "grimace shake",
   "whats up chat",
+  "mogging",
 ];
 
 export default async function messageCreate(message: Message) {
@@ -247,10 +249,10 @@ export default async function messageCreate(message: Message) {
   const checkTask = async () => {
     await sleep(500);
 
-    if (await userExists(message.member)) {
+    if (await hasProfile(message.member)) {
       for (const brainrot of brainrotFilter) {
         if (message.content.toLowerCase().includes(brainrot)) {
-          const amounts = [10, 25, 50, 75];
+          const amounts = [5, 10, 25, 50, 75];
           const chosen = amounts[Math.floor(Math.random() * amounts.length)];
 
           createAuraTransaction(message.author.id, message.client.user.id, -chosen);
