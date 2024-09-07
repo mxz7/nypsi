@@ -290,8 +290,15 @@ async function run(
 
       amount = Math.abs(amount);
 
-      if (amount > aura)
+      if (amount > aura * 2)
         return send({ embeds: [new ErrorEmbed("you don't have enough aura to take this 🙄")] });
+
+      const targetAura = await getAura(target.user.id);
+
+      if (targetAura < aura / 2.5) {
+        createAuraTransaction(message.author.id, target.user.id, -50);
+        return send({ embeds: [new ErrorEmbed("pick on someone your own size. -50 aura")] });
+      }
 
       let amountGiven = amount;
 
