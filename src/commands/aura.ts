@@ -269,6 +269,12 @@ async function run(
       args[1].toLowerCase() === "-" ||
       args[1].toLowerCase().startsWith("-")
     ) {
+      if (await onCooldown(`${cmd.name}:${target.user.username}`, message.member)) {
+        return send({
+          embeds: [new ErrorEmbed("you've already taken aura from this user recently")],
+        });
+      }
+
       let amount: number;
 
       if (args.length > 2) amount = parseInt(args[2]);
@@ -303,6 +309,7 @@ async function run(
         });
       }
 
+      await addCooldown(`${cmd.name}:${target.user.id}`, message.member, 600);
       await createAuraTransaction(target.user.id, message.author.id, -Math.abs(amountGiven));
 
       return send({
