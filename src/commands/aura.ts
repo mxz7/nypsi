@@ -300,7 +300,7 @@ async function run(
 
       const fail = Math.floor(Math.random() * 10);
 
-      if (fail < 3) {
+      if (fail < 3 || target.user.id === message.client.user.id) {
         await createAuraTransaction(target.user.id, message.author.id, amountGiven);
 
         return send({
