@@ -11,8 +11,10 @@ import {
 } from "discord.js";
 import { Command, NypsiCommandInteraction } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
+import Constants from "../utils/Constants";
 import { createUser, isEcoBanned, userExists } from "../utils/functions/economy/utils.js";
 import { getMember } from "../utils/functions/member.js";
+import { getAllGroupAccountIds } from "../utils/functions/moderation/alts";
 import PageManager from "../utils/functions/page";
 import { createAuraTransaction, getAura, getAuraTransactions } from "../utils/functions/users/aura";
 import { isUserBlacklisted } from "../utils/functions/users/blacklist";
@@ -221,6 +223,11 @@ async function run(
       args[1].toLowerCase().startsWith("+") ||
       args[1] === "+"
     ) {
+      const groupIds = await getAllGroupAccountIds(Constants.NYPSI_SERVER_ID, message.author.id);
+
+      if (groupIds.length > 0 && groupIds[0] !== message.author.id)
+        return send({ embeds: [new ErrorEmbed("you cannot give aura")] });
+
       let amount: number;
 
       if (args.length > 2) amount = parseInt(args[2]);
@@ -262,9 +269,22 @@ async function run(
       args[1].toLowerCase().startsWith("-")
     ) {
       if (await onCooldown(`${cmd.name}:${target.user.id}`, message.member)) {
+        await createAuraTransaction(message.author.id, message.client.user.id, -50);
+
         return send({
-          embeds: [new ErrorEmbed("you've already taken aura from this user recently")],
+          embeds: [new ErrorEmbed("you've already taken aura from this user recently. -50 aura")],
         });
+      }
+
+      const groupIds = await getAllGroupAccountIds(Constants.NYPSI_SERVER_ID, target.user.id);
+
+      if (
+        (groupIds.length > 0 && groupIds[0] !== target.user.id) ||
+        message.client.user.id === target.user.id
+      ) {
+        await createAuraTransaction(message.author.id, message.client.user.id, -10);
+
+        return send({ embeds: [new ErrorEmbed("this user cannot be stolen from. -10 aura")] });
       }
 
       let amount: number;
