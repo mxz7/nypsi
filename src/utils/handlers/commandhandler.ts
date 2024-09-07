@@ -1091,10 +1091,10 @@ export async function runCommand(
 
   if (
     (parseInt(await redis.hget(Constants.redis.nypsi.TOP_COMMANDS_USER, message.author.id)) || 1) %
-      1000 ===
+      100 ===
     0
   ) {
-    createAuraTransaction(message.author.id, message.client.user.id, 50);
+    createAuraTransaction(message.author.id, message.client.user.id, 25);
   }
 
   if ((await getPreferences(message.member)).leaderboards)
