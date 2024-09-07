@@ -218,6 +218,12 @@ async function run(
       return showProfile();
     }
 
+    if (target.user.id === message.author.id) {
+      await createAuraTransaction(message.author.id, message.client.user.id, -50);
+
+      return send({ embeds: [new ErrorEmbed("that's pretty sad. -50 aura")] });
+    }
+
     if (
       args[1].toLowerCase() === "give" ||
       args[1].toLowerCase().startsWith("+") ||
