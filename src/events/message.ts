@@ -247,7 +247,10 @@ export default async function messageCreate(message: Message) {
   if (!message.member) return;
 
   const checkAura = async () => {
-    if (await hasProfile(message.member)) {
+    if (
+      (await hasProfile(message.member)) &&
+      (await getLastCommand(message.member)).getTime() > Date.now() - ms("1 week")
+    ) {
       for (const brainrot of brainrotFilter) {
         if (message.content.toLowerCase().includes(brainrot)) {
           const amounts = [5, 10, 25, 50, 75];
