@@ -263,7 +263,7 @@ async function run(
 
       return send({
         embeds: [
-          new CustomEmbed(target, `+${amountGiven.toLocaleString()} aura`).setHeader(
+          new CustomEmbed(target, `+${Math.abs(amountGiven).toLocaleString()} aura`).setHeader(
             target.user.username,
             target.user.displayAvatarURL(),
           ),
@@ -345,7 +345,7 @@ async function run(
 
       return send({
         embeds: [
-          new CustomEmbed(target, `-${amountGiven.toLocaleString()} aura`).setHeader(
+          new CustomEmbed(target, `-${Math.abs(amountGiven).toLocaleString()} aura`).setHeader(
             target.user.username,
             target.user.displayAvatarURL(),
           ),
