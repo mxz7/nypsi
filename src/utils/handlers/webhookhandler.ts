@@ -41,8 +41,9 @@ import {
 } from "../functions/premium/premium";
 import { percentChance } from "../functions/random";
 import requestDM from "../functions/requestdm";
-import { isUserBlacklisted } from "../functions/users/blacklist";
 import { getTax, getTaxRefreshTime } from "../functions/tax";
+import { createAuraTransaction } from "../functions/users/aura";
+import { isUserBlacklisted } from "../functions/users/blacklist";
 import {
   addNotificationToQueue,
   getDmSettings,
@@ -199,6 +200,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
   }
 
   await addInventoryItem(user, "vote_crate", crateAmount);
+  createAuraTransaction(user, Constants.BOT_USER_ID, 50);
 
   if (percentChance(0.05) && !(await redis.exists(Constants.redis.nypsi.GEM_GIVEN))) {
     await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t");
@@ -285,6 +287,7 @@ async function handleKofiData(data: KofiResponse) {
 
   if (data.type === "Donation") {
     if (user) {
+      createAuraTransaction(user.id, Constants.BOT_USER_ID, 500);
       await prisma.user.update({
         where: {
           id: user.id,
@@ -318,6 +321,7 @@ async function handleKofiData(data: KofiResponse) {
       }
 
       if (user) {
+        createAuraTransaction(user.id, Constants.BOT_USER_ID, 500);
         await prisma.user.update({
           where: {
             id: user.id,
@@ -531,6 +535,7 @@ async function handleKofiData(data: KofiResponse) {
     }
 
     if (user) {
+      createAuraTransaction(user.id, Constants.BOT_USER_ID, 500);
       await prisma.user.update({
         where: {
           id: user.id,
