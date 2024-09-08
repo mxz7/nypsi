@@ -224,6 +224,12 @@ async function run(
       return send({ embeds: [new ErrorEmbed("that's pretty sad. -50 aura")] });
     }
 
+    const groupIds = await getAllGroupAccountIds(Constants.NYPSI_SERVER_ID, message.author.id);
+
+    if (groupIds.length > 0 && groupIds[0] !== message.author.id) {
+      return send({ embeds: [new ErrorEmbed("you cannot do this")] });
+    }
+
     if (
       args[1].toLowerCase() === "give" ||
       args[1].toLowerCase().startsWith("+") ||
