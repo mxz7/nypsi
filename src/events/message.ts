@@ -74,6 +74,7 @@ const brainrotFilter = [
   "grimace shake",
   "whats up chat",
   "mogging",
+  "hawk tua",
 ];
 
 export default async function messageCreate(message: Message) {
