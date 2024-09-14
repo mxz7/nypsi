@@ -4,7 +4,7 @@ import Constants from "../utils/Constants";
 import { getDmSettings, updateDmSettings } from "../utils/functions/users/notifications";
 
 export default {
-  name: "enable_vote_reminders",
+  name: "enable-vote-reminders",
   type: "interaction",
   async run(interaction) {
     const settings = await getDmSettings(interaction.user.id);
