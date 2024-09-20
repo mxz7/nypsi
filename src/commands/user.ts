@@ -1,7 +1,7 @@
 import { CommandInteraction, Message } from "discord.js";
 import { inPlaceSort } from "fast-sort";
 import redis from "../init/redis";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
 import { formatDate } from "../utils/functions/date";
@@ -17,7 +17,7 @@ const cmd = new Command("user", "view info about a user in the server", "info").
 ]);
 
 async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
   let member;

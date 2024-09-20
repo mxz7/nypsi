@@ -1,13 +1,13 @@
 import { CommandInteraction, Message } from "discord.js";
 import redis from "../init/redis";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import Constants from "../utils/Constants";
 import { getAdminLevel } from "../utils/functions/users/admin";
 
 const cmd = new Command("forcelose", "make an account lose 100% of the time", "none");
 
 async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
   if ((await getAdminLevel(message.author.id)) < 3) return;

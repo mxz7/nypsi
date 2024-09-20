@@ -5,7 +5,7 @@ import {
   Message,
 } from "discord.js";
 import { randomInt } from "node:crypto";
-import { NypsiCommandInteraction } from "../../../../models/Command";
+import { NypsiCommandInteraction, NypsiMessage } from "../../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
 import sleep from "../../sleep";
@@ -15,7 +15,10 @@ import { formatNumber } from "../utils";
 
 module.exports = new ItemUse(
   "stolen_credit_card",
-  async (message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) => {
+  async (
+    message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+    args: string[],
+  ) => {
     const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
       if (!(message instanceof Message)) {
         let usedNewMessage = false;

@@ -1,5 +1,5 @@
-import { Channel, CommandInteraction, Message } from "discord.js";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { Channel, CommandInteraction } from "discord.js";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { eSnipe } from "../utils/functions/guilds/utils";
 
@@ -8,7 +8,7 @@ const cmd = new Command("esnipe", "snipe the most recently edited message", "fun
 ]);
 
 async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
   let channel: Channel = message.channel;

@@ -3,12 +3,11 @@ import {
   ButtonBuilder,
   ButtonStyle,
   CommandInteraction,
-  Message,
   MessageActionRowComponentBuilder,
   PermissionFlagsBits,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import {
   checkMessageContentNoModLog,
@@ -23,7 +22,7 @@ const cmd = new Command("chatfilter", "change the chat filter for your server", 
   .setPermissions(["MANAGE_SERVER"]);
 
 async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {

@@ -1,5 +1,5 @@
-import { CommandInteraction, Message, PermissionFlagsBits, Role, ThreadChannel } from "discord.js";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { CommandInteraction, PermissionFlagsBits, Role, ThreadChannel } from "discord.js";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMuteRole, setMuteRole } from "../utils/functions/moderation/mute";
@@ -9,7 +9,7 @@ const cmd = new Command("muterole", "set the muterole for the server", "admin")
   .setDocs("https://docs.nypsi.xyz/moderation/muterole");
 
 async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {

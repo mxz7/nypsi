@@ -20,6 +20,7 @@ import {
 import { compareTwoStrings } from "string-similarity";
 import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
+import { NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { a } from "../utils/functions/anticheat";
@@ -78,6 +79,8 @@ const brainrotFilter = [
 ];
 
 export default async function messageCreate(message: Message) {
+  if (!message.channel.isSendable()) return;
+
   if (message.channel.isDMBased() && !message.author.bot) {
     logger.info("message in DM from " + message.author.username + ": " + message.content);
 
@@ -373,7 +376,7 @@ export default async function messageCreate(message: Message) {
 
       const cmd = args[0].toLowerCase();
 
-      runCommand(cmd, message, args);
+      runCommand(cmd, message as NypsiMessage, args);
       break;
     }
   }

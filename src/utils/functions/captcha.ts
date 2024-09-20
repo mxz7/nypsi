@@ -3,7 +3,7 @@ import { CommandInteraction, GuildMember, Message, WebhookClient } from "discord
 import prisma from "../../init/database";
 import redis from "../../init/redis";
 import { NypsiClient } from "../../models/Client";
-import { NypsiCommandInteraction } from "../../models/Command";
+import { NypsiCommandInteraction, NypsiMessage } from "../../models/Command";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 import Constants from "../Constants";
 import { getTimestamp } from "../logger";
@@ -153,7 +153,7 @@ export async function failedCaptcha(member: GuildMember, content: string) {
 }
 
 export async function verifyUser(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
 ) {
   const res = await isLockedOut(message.author.id);
 

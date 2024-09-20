@@ -4,14 +4,14 @@ import {
   InteractionReplyOptions,
   Message,
 } from "discord.js";
-import { NypsiCommandInteraction } from "../../../../models/Command";
+import { NypsiCommandInteraction, NypsiMessage } from "../../../../models/Command";
 import { ItemUse } from "../../../../models/ItemUse";
 import { getInventory, setInventoryItem } from "../inventory";
 import { doDaily } from "../utils";
 
 module.exports = new ItemUse(
   "streak_token",
-  async (message: Message | (NypsiCommandInteraction & CommandInteraction)) => {
+  async (message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) => {
     const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
       if (!(message instanceof Message)) {
         let usedNewMessage = false;

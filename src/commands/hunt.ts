@@ -9,7 +9,7 @@ import {
   Message,
   MessageActionRowComponentBuilder,
 } from "discord.js";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { getBoosters } from "../utils/functions/economy/boosters";
@@ -46,12 +46,12 @@ const places = [
   "nether",
 ];
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
+async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) {
   doHunt(message);
 }
 
 async function doHunt(
-  message: Message | (NypsiCommandInteraction & CommandInteraction) | ButtonInteraction,
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction) | ButtonInteraction,
 ) {
   const member = await message.guild.members.fetch(message.member.user.id);
 

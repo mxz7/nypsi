@@ -1,8 +1,8 @@
-import { CommandInteraction, Message } from "discord.js";
+import { CommandInteraction } from "discord.js";
 import { loadavg } from "os";
 import prisma from "../init/database";
 import redis from "../init/redis";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders.js";
 
 const cmd = new Command(
@@ -11,7 +11,7 @@ const cmd = new Command(
   "info",
 ).setAliases(["latency"]);
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
+async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) {
   /**
    * not perfect latency testing i know but it works!!
    */

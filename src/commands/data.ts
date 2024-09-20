@@ -14,7 +14,7 @@ import {
 import { promisify } from "util";
 import { gzip } from "zlib";
 import prisma from "../init/database";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { dataDelete } from "../utils/functions/users/utils";
 import { addCooldown, onCooldown } from "../utils/handlers/cooldownhandler.js";
@@ -43,7 +43,7 @@ BigInt.prototype.toJSON = function () {
 };
 
 async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {

@@ -3,11 +3,10 @@ import {
   ButtonBuilder,
   ButtonStyle,
   CommandInteraction,
-  Message,
   MessageActionRowComponentBuilder,
 } from "discord.js";
 import { inPlaceSort } from "fast-sort";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { calcNetWorth } from "../utils/functions/economy/balance";
 import { getInventory } from "../utils/functions/economy/inventory";
@@ -16,8 +15,8 @@ import { getMember } from "../utils/functions/member";
 import PageManager from "../utils/functions/page";
 import { isUserBlacklisted } from "../utils/functions/users/blacklist";
 import { hasProfile } from "../utils/functions/users/utils";
-import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { addView } from "../utils/functions/users/views";
+import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("networth", "view breakdown of your networth", "money").setAliases([
   "net",
@@ -25,7 +24,7 @@ const cmd = new Command("networth", "view breakdown of your networth", "money").
 ]);
 
 async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
   if (await onCooldown(cmd.name, message.member)) {

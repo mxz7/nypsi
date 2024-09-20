@@ -9,7 +9,7 @@ import {
   Message,
   MessageActionRowComponentBuilder,
 } from "discord.js";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { ErrorEmbed } from "../models/EmbedBuilders";
 import { runBakery } from "../utils/functions/economy/bakery";
 import { getInventory, setInventoryItem } from "../utils/functions/economy/inventory";
@@ -24,12 +24,12 @@ const cmd = new Command(
 
 cmd.slashEnabled = true;
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
+async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) {
   doBake(message);
 }
 
 async function doBake(
-  message: Message | (NypsiCommandInteraction & CommandInteraction) | ButtonInteraction,
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction) | ButtonInteraction,
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {

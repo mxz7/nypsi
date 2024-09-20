@@ -17,7 +17,7 @@ import {
 } from "discord.js";
 import prisma from "../init/database";
 import { NypsiClient } from "../models/Client";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { Item } from "../types/Economy";
 import Constants from "../utils/Constants";
@@ -119,7 +119,7 @@ cmd.slashData
   );
 
 async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
@@ -188,7 +188,7 @@ async function run(
 
   const items = getItems();
 
-  const createAuctionProcess = async (msg: Message) => {
+  const createAuctionProcess = async (msg: NypsiMessage) => {
     const embed = new CustomEmbed(message.member).setHeader(
       "create an auction",
       message.author.avatarURL(),
@@ -501,7 +501,7 @@ async function run(
     return await edit({ embeds: [embed], components: [] }, msg);
   };
 
-  const manageAuctions = async (msg?: Message) => {
+  const manageAuctions = async (msg?: NypsiMessage) => {
     const auctions = await getAuctions(message.member);
 
     const embed = new CustomEmbed(message.member).setHeader(
@@ -611,7 +611,7 @@ async function run(
     if (msg) {
       msg = await msg.edit({ embeds: [embed], components: [row] });
     } else {
-      msg = await send({ embeds: [embed], components: [row] });
+      msg = (await send({ embeds: [embed], components: [row] })) as NypsiMessage;
     }
 
     const filter = (i: Interaction) => i.user.id == message.author.id;

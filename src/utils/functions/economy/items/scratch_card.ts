@@ -10,7 +10,7 @@ import {
 } from "discord.js";
 import redis from "../../../../init/redis";
 import { NypsiClient } from "../../../../models/Client";
-import { NypsiCommandInteraction } from "../../../../models/Command";
+import { NypsiCommandInteraction, NypsiMessage } from "../../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
 import Constants from "../../../Constants";
@@ -24,7 +24,7 @@ import ScratchCard from "../scratchies";
 import { addStat, createGame } from "../stats";
 
 async function prepare(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
   interaction?: ButtonInteraction,
 ): Promise<any> {
@@ -266,7 +266,7 @@ async function prepare(
 
 module.exports = new ItemUse(
   "scratch_card",
-  (message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) => {
+  (message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction), args: string[]) => {
     return prepare(message, args);
   },
 );

@@ -10,7 +10,7 @@ import {
   MessageActionRowComponentBuilder,
 } from "discord.js";
 import { NypsiClient } from "../../../../models/Client";
-import { NypsiCommandInteraction } from "../../../../models/Command";
+import { NypsiCommandInteraction, NypsiMessage } from "../../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
 import {
@@ -29,7 +29,7 @@ const GOLD_TIER = 3;
 
 module.exports = new ItemUse(
   "gold_credit",
-  async (message: Message | (NypsiCommandInteraction & CommandInteraction)) => {
+  async (message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) => {
     const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
       if (!(message instanceof Message)) {
         let usedNewMessage = false;

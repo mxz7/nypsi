@@ -4,7 +4,7 @@ import {
   InteractionReplyOptions,
   Message,
 } from "discord.js";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addBalance, getSellMulti } from "../utils/functions/economy/balance";
 import { getInventory, selectItem, setInventoryItem } from "../utils/functions/economy/inventory";
@@ -28,7 +28,7 @@ cmd.slashData
   .addStringOption((option) => option.setName("amount").setDescription("amount you want to sell"));
 
 async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
   if (!(await userExists(message.member))) await createUser(message.member);

@@ -18,7 +18,7 @@ import {
   User,
 } from "discord.js";
 import { inPlaceSort, sort } from "fast-sort";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { Item } from "../types/Economy";
 import { addProgress } from "../utils/functions/economy/achievements";
@@ -60,7 +60,7 @@ cmd.slashData.addSubcommand((start) =>
 );
 
 async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
   if (!(await userExists(message.member))) await createUser(message.member);
@@ -147,7 +147,7 @@ async function run(
 
     const msg = await send({ embeds: [embed], components: [row] });
 
-    new Race(msg, embed, bet, length, limit, message.author.id);
+    new Race(msg as NypsiMessage, embed, bet, length, limit, message.author.id);
   }
 }
 
@@ -156,7 +156,7 @@ cmd.setRun(run);
 module.exports = cmd;
 
 class Race {
-  private message: Message;
+  private message: NypsiMessage;
   private started = false;
   private ended = false;
   private members: RaceUserDetails[] = [];
@@ -170,7 +170,7 @@ class Race {
   private ownerId: string;
 
   constructor(
-    message: Message,
+    message: NypsiMessage,
     embed: CustomEmbed,
     bet: number,
     length: number,
@@ -410,7 +410,9 @@ class Race {
 
     let winner: User;
     this.message.edit({ components: [] });
-    this.message = await this.message.channel.send(this.render() as MessageCreateOptions);
+    this.message = (await this.message.channel.send(
+      this.render() as MessageCreateOptions,
+    )) as NypsiMessage;
 
     while (!this.ended) {
       if (this.startedAt < Date.now() - ms("10 minutes")) {

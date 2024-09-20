@@ -17,7 +17,7 @@ import {
 import * as fs from "fs";
 import redis from "../../init/redis";
 import { NypsiClient } from "../../models/Client";
-import { Command, NypsiCommandInteraction } from "../../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../models/EmbedBuilders";
 import { giveCaptcha, isLockedOut, verifyUser } from "../functions/captcha";
 import { formatDate, MStoTime } from "../functions/date";
@@ -192,7 +192,7 @@ export function reloadCommand(commandsArray: string[]) {
   return;
 }
 
-async function helpCmd(message: Message, args: string[]) {
+async function helpCmd(message: NypsiMessage, args: string[]) {
   logCommand(message, args);
 
   const helpCategories = new Map<string, Map<number, string[]>>();
@@ -544,7 +544,7 @@ async function helpCmd(message: Message, args: string[]) {
 
 export async function runCommand(
   cmd: string,
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
   const preProcessLength = [performance.now()];
@@ -1165,7 +1165,7 @@ export function getRandomCommand(): Command {
 }
 
 export function logCommand(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
   args.shift();

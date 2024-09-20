@@ -1,5 +1,5 @@
 import { CommandInteraction, Message } from "discord.js";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import Constants from "../utils/Constants";
 import { loadCommands, reloadCommand } from "../utils/handlers/commandhandler";
 import { reloadInteractions } from "../utils/handlers/interactions";
@@ -8,7 +8,7 @@ import { logger } from "../utils/logger";
 const cmd = new Command("reload", "reload commands", "none").setPermissions(["bot owner"]);
 
 async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
   if (message.author.id != Constants.TEKOH_ID) return;

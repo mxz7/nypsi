@@ -5,7 +5,7 @@ import {
   Message,
   MessageEditOptions,
 } from "discord.js";
-import { NypsiCommandInteraction } from "../../../../models/Command";
+import { NypsiCommandInteraction, NypsiMessage } from "../../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
 import { getDisabledCommands } from "../../guilds/disabledcommands";
@@ -16,7 +16,10 @@ import { addHandcuffs, createUser, isHandcuffed, userExists } from "../utils";
 
 module.exports = new ItemUse(
   "handcuffs",
-  async (message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) => {
+  async (
+    message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+    args: string[],
+  ) => {
     const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
       if (!(message instanceof Message)) {
         if (message.deferred) {

@@ -4,6 +4,7 @@ import {
   ActionRowBuilder,
   BaseMessageOptions,
   ButtonBuilder,
+  ButtonComponentData,
   ButtonInteraction,
   ButtonStyle,
   ColorResolvable,
@@ -16,7 +17,7 @@ import {
 } from "discord.js";
 import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { a } from "../utils/functions/anticheat";
@@ -39,7 +40,7 @@ import {
   renderGambleScreen,
   userExists,
 } from "../utils/functions/economy/utils";
-import { addXp, calcEarnedGambleXp, getXp, updateXp } from "../utils/functions/economy/xp";
+import { addXp, calcEarnedGambleXp } from "../utils/functions/economy/xp";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
 import { percentChance } from "../utils/functions/random";
 import { recentCommands } from "../utils/functions/users/commands";
@@ -123,7 +124,7 @@ cmd.slashData
   );
 
 async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
   if (!(await userExists(message.member))) await createUser(message.member);
@@ -176,7 +177,7 @@ cmd.setRun(run);
 module.exports = cmd;
 
 async function prepareGame(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
   msg?: Message,
 ) {
@@ -446,27 +447,27 @@ function createRows(board: string[][], end = false) {
           if (end || i != getActiveRow(board)) button.setDisabled(true);
           if (end) {
             button.setEmoji("🥚");
-            delete button.data.label;
+            delete (button.data as ButtonComponentData).label;
           }
           break;
         case "g":
           if (end || i != getActiveRow(board)) button.setDisabled(true);
           if (end) {
             button.setEmoji(GEM_EMOJI);
-            delete button.data.label;
+            delete (button.data as ButtonComponentData).label;
           }
           break;
         case "c":
           button.setStyle(ButtonStyle.Success);
           button.setDisabled(true);
           button.setEmoji("🥚");
-          delete button.data.label;
+          delete (button.data as ButtonComponentData).label;
           break;
         case "gc":
           button.setStyle(ButtonStyle.Success);
           button.setDisabled(true);
           button.setEmoji(GEM_EMOJI);
-          delete button.data.label;
+          delete (button.data as ButtonComponentData).label;
           break;
         case "x":
           button.setStyle(ButtonStyle.Danger);
@@ -495,7 +496,7 @@ function createRows(board: string[][], end = false) {
 }
 
 async function playGame(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   msg: Message,
   args: string[],
 ): Promise<void> {
