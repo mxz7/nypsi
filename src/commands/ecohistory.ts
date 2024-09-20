@@ -4,7 +4,7 @@ import {
   InteractionReplyOptions,
   Message,
 } from "discord.js";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { isPremium } from "../utils/functions/premium/premium";
 import { getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
@@ -19,7 +19,7 @@ const cmd = new Command(
 ).setAliases(["graph"]);
 
 async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   //args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {

@@ -1,6 +1,6 @@
 import { CommandInteraction, Message } from "discord.js";
 import { NypsiClient } from "../models/Client";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import requestDM from "../utils/functions/requestdm";
 import {
@@ -11,7 +11,7 @@ import {
 const cmd = new Command("reply", "reply to a support ticket", "none");
 
 async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
   const support = await getSupportRequestByChannelId(message.channel.id);

@@ -1,13 +1,13 @@
 import { CommandInteraction, Message } from "discord.js";
 import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { randomPresence } from "../utils/functions/presence";
 import { getAdminLevel } from "../utils/functions/users/admin";
 
 const cmd = new Command("maintenance", "maintenance", "none").setPermissions(["bot owner"]);
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
+async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) {
   if ((await getAdminLevel(message.author.id)) < 69) return;
 
   if ((await redis.get("nypsi:maintenance")) == "t") {

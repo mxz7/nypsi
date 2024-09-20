@@ -1,14 +1,14 @@
 import { CommandInteraction, Message } from "discord.js";
-import { Command, NypsiCommandInteraction } from "../models/Command";
-import { isUserBlacklisted, setUserBlacklist } from "../utils/functions/users/blacklist";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { getAdminLevel } from "../utils/functions/users/admin";
+import { isUserBlacklisted, setUserBlacklist } from "../utils/functions/users/blacklist";
 
 const cmd = new Command("bluser", "blacklist account from nypsi", "none").setPermissions([
   "bot owner",
 ]);
 
 async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
   if ((await getAdminLevel(message.author.id)) < 3) return;

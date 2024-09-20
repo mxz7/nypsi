@@ -7,7 +7,7 @@ import {
 } from "discord.js";
 import * as fs from "fs/promises";
 import redis from "../init/redis";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { MStoTime } from "../utils/functions/date";
@@ -46,7 +46,7 @@ const karmaCooldown = new Set<string>();
 let wordList: string[];
 
 async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
@@ -190,7 +190,7 @@ async function run(
 }
 
 async function play(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
 ): Promise<void> {
   const m = games.get(message.author.id).message;
   const edit = async (data: MessageEditOptions) => {

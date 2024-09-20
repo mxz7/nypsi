@@ -6,7 +6,7 @@ import {
   MessageEditOptions,
 } from "discord.js";
 import redis from "../../../../init/redis";
-import { NypsiCommandInteraction } from "../../../../models/Command";
+import { NypsiCommandInteraction, NypsiMessage } from "../../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
 import Constants from "../../../Constants";
@@ -16,7 +16,10 @@ import { getInventory, setInventoryItem } from "../inventory";
 
 module.exports = new ItemUse(
   "chastity_cage",
-  async (message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) => {
+  async (
+    message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+    args: string[],
+  ) => {
     const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
       if (!(message instanceof Message)) {
         let usedNewMessage = false;

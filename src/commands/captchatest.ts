@@ -1,5 +1,5 @@
 import { CommandInteraction, Message } from "discord.js";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { giveCaptcha } from "../utils/functions/captcha";
 import { getAdminLevel } from "../utils/functions/users/admin";
 import { logger } from "../utils/logger";
@@ -7,7 +7,7 @@ import { logger } from "../utils/logger";
 const cmd = new Command("captchatest", "test an account", "none");
 
 async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
   if ((await getAdminLevel(message.author.id)) < 1) return;

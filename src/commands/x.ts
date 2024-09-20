@@ -16,7 +16,7 @@ import { gzip } from "zlib";
 import prisma from "../init/database";
 import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { startRandomDrop } from "../scheduled/clusterjobs/random-drops";
 import Constants from "../utils/Constants";
@@ -52,7 +52,7 @@ import { logger } from "../utils/logger";
 const cmd = new Command("x", "admincmd", "none").setPermissions(["bot owner"]);
 
 async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
   if (!(message instanceof Message)) return;

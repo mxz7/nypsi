@@ -1,5 +1,5 @@
-import { CommandInteraction, Message, PermissionFlagsBits, User } from "discord.js";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { CommandInteraction, PermissionFlagsBits, User } from "discord.js";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 
 import prisma from "../init/database";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
@@ -16,7 +16,7 @@ const cmd = new Command(
 ).setPermissions(["MANAGE_MESSAGES", "MODERATE_MEMBERS"]);
 
 async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {

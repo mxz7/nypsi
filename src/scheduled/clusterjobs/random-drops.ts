@@ -184,7 +184,7 @@ async function fastClickGame(client: NypsiClient, channelId: string, prize: stri
 
       if (!channel) return;
 
-      if (!channel.isTextBased()) return;
+      if (!channel.isSendable()) return;
 
       const msg = await channel.send({ embeds: [embed], components: [row] });
 
@@ -269,7 +269,7 @@ async function typeFastGame(client: NypsiClient, channelId: string, prize: strin
 
       if (!channel) return;
 
-      if (!channel.isTextBased()) return;
+      if (!channel.isSendable()) return;
 
       const msg = await channel.send({ embeds: [embed] });
 
@@ -464,7 +464,7 @@ async function clickSpecificGame(client: NypsiClient, channelId: string, prize: 
 
       if (!channel) return;
 
-      if (!channel.isTextBased()) return;
+      if (!channel.isSendable()) return;
 
       const msg = await channel.send({ embeds: [embed], components: [row] });
 

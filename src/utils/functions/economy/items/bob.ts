@@ -5,7 +5,7 @@ import {
   Message,
 } from "discord.js";
 import prisma from "../../../../init/database";
-import { NypsiCommandInteraction } from "../../../../models/Command";
+import { NypsiCommandInteraction, NypsiMessage } from "../../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
 import { MStoTime } from "../../date";
@@ -17,7 +17,10 @@ import dayjs = require("dayjs");
 
 module.exports = new ItemUse(
   "bob",
-  async (message: Message | (NypsiCommandInteraction & CommandInteraction), args: string[]) => {
+  async (
+    message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
+    args: string[],
+  ) => {
     const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
       if (!(message instanceof Message)) {
         let usedNewMessage = false;

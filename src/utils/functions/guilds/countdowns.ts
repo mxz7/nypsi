@@ -88,7 +88,7 @@ export function runCountdowns(client: NypsiClient) {
           const channel = client.channels.cache.get(channelId);
 
           if (!channel) return false;
-          if (!channel.isTextBased()) return false;
+          if (!channel.isSendable()) return false;
 
           let fail = false;
 

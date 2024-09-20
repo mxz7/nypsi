@@ -4,14 +4,14 @@ import {
   InteractionReplyOptions,
   Message,
 } from "discord.js";
-import { NypsiCommandInteraction } from "../../../../models/Command";
+import { NypsiCommandInteraction, NypsiMessage } from "../../../../models/Command";
 import { CustomEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
 import { getInventory } from "../inventory";
 
 module.exports = new ItemUse(
   "bitch",
-  async (message: Message | (NypsiCommandInteraction & CommandInteraction)) => {
+  async (message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) => {
     const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
       if (!(message instanceof Message)) {
         let usedNewMessage = false;

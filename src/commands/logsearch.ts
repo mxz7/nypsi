@@ -1,13 +1,13 @@
 import { CommandInteraction, Message } from "discord.js";
 import { readFile } from "fs/promises";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { getAdminLevel } from "../utils/functions/users/admin";
 import searchLogs from "../utils/functions/workers/logsearch";
 
 const cmd = new Command("logsearch", "search through logs", "none").setPermissions(["bot owner"]);
 
 async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
   if ((await getAdminLevel(message.author.id)) < 3) return;

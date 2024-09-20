@@ -18,7 +18,7 @@ import {
 } from "discord.js";
 import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
 import { a } from "../utils/functions/anticheat";
@@ -58,7 +58,7 @@ cmd.slashData.addStringOption((option) =>
 );
 
 async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
   if (!(await userExists(message.member))) await createUser(message.member);
@@ -108,9 +108,9 @@ cmd.setRun(run);
 module.exports = cmd;
 
 async function prepareGame(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
-  msg?: Message,
+  msg?: NypsiMessage,
   interaction?: ButtonInteraction,
 ): Promise<any> {
   recentCommands.set(message.author.id, Date.now());
@@ -247,8 +247,8 @@ async function prepareGame(
 }
 
 class Game {
-  private playerMessage: Message | (NypsiCommandInteraction & CommandInteraction);
-  private message: Message;
+  private playerMessage: NypsiMessage | (NypsiCommandInteraction & CommandInteraction);
+  private message: NypsiMessage;
   private member: GuildMember;
   private deck: string[];
   private bet: number;
@@ -285,10 +285,10 @@ class Game {
   }
 
   constructor(
-    message: Message | (NypsiCommandInteraction & CommandInteraction),
+    message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
     member: GuildMember,
     bet: number,
-    msg?: Message,
+    msg?: NypsiMessage,
     interaction?: ButtonInteraction,
   ) {
     this.playerMessage = message;
@@ -381,14 +381,14 @@ class Game {
     if (!this.interaction || this.interaction.deferred || this.interaction.replied)
       return this.message.edit(data).catch(async (e) => {
         logger.error("bj edit error", e);
-        const msg = await this.message.channel.send(data as MessageCreateOptions);
+        const msg = (await this.message.channel.send(data as MessageCreateOptions)) as NypsiMessage;
         this.message = msg;
         return msg;
       });
     return this.interaction.update(data).catch(() =>
       this.message.edit(data).catch(async (e) => {
         logger.error("bj edit error", e);
-        const msg = await this.message.channel.send(data as MessageCreateOptions);
+        const msg = (await this.message.channel.send(data as MessageCreateOptions)) as NypsiMessage;
         this.message = msg;
         return msg;
       }),
@@ -577,10 +577,10 @@ class Game {
       if (this.message) {
         await this.edit({ embeds: [embed], components: [row] });
       } else {
-        this.message = await this.playerMessage.channel.send({
+        this.message = (await this.playerMessage.channel.send({
           embeds: [embed],
           components: [row],
-        });
+        })) as NypsiMessage;
       }
 
       this.dealer.autoPlay();
@@ -624,7 +624,8 @@ class Game {
       }
     };
 
-    if (!this.message) this.message = await send({ embeds: [embed], components: [row] });
+    if (!this.message)
+      this.message = (await send({ embeds: [embed], components: [row] })) as NypsiMessage;
     else await this.edit({ embeds: [embed], components: [row] });
 
     return this.listen();

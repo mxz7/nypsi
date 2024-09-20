@@ -1,12 +1,12 @@
 import { CommandInteraction, Message } from "discord.js";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { reset } from "../utils/functions/economy/utils";
 
 const cmd = new Command("reseteco", "reset economy except prestige and karma", "none");
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
+async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) {
   if (message.author.id != Constants.TEKOH_ID) return;
 
   const embed = new CustomEmbed(message.member, "run that command again");

@@ -4,7 +4,7 @@ import {
   InteractionReplyOptions,
   Message,
 } from "discord.js";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getRandomImage } from "../utils/functions/image";
 import { getMember } from "../utils/functions/member";
@@ -26,7 +26,7 @@ const cmd = new Command("wholesome", "get a random wholesome picture", "fun").se
 cmd.slashEnabled = true;
 
 async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {

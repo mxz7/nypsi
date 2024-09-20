@@ -9,7 +9,7 @@ import {
   Message,
   MessageActionRowComponentBuilder,
 } from "discord.js";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { addBalance } from "../utils/functions/economy/balance";
@@ -32,12 +32,12 @@ const cmd = new Command("fish", "go to a pond and fish", "money");
 
 cmd.slashEnabled = true;
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
+async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) {
   doFish(message);
 }
 
 async function doFish(
-  message: Message | (NypsiCommandInteraction & CommandInteraction) | ButtonInteraction,
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction) | ButtonInteraction,
 ) {
   const member = await message.guild.members.fetch(message.member.user.id);
 
