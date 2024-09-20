@@ -1,5 +1,5 @@
-import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { CommandInteraction, PermissionFlagsBits } from "discord.js";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { MStoTime } from "../utils/functions/date";
 import { getPrefix } from "../utils/functions/guilds/utils";
@@ -15,7 +15,7 @@ const cmd = new Command("automute", "change auto mute lengths", "admin").setPerm
 ]);
 
 async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {

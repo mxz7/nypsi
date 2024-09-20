@@ -9,7 +9,7 @@ import {
   MessageActionRowComponentBuilder,
 } from "discord.js";
 import { readdir } from "fs/promises";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { ItemUse } from "../models/ItemUse";
 import { addBakeryUpgrade, getBakeryUpgrades } from "../utils/functions/economy/bakery";
@@ -63,7 +63,7 @@ cmd.slashData
   );
 
 async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
   if (!(await userExists(message.member))) await createUser(message.member);

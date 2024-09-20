@@ -7,7 +7,7 @@ import {
   PermissionFlagsBits,
   PermissionsBitField,
 } from "discord.js";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
@@ -20,7 +20,7 @@ const cmd = new Command(
   .setPermissions(["MANAGE_MESSAGES", "MANAGE_CHANNELS"]);
 
 async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {

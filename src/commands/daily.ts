@@ -6,7 +6,7 @@ import {
   Message,
 } from "discord.js";
 import redis from "../init/redis";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { addProgress } from "../utils/functions/economy/achievements";
@@ -28,7 +28,7 @@ const cmd = new Command("daily", "get your daily bonus", "money");
 
 cmd.slashEnabled = true;
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
+async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       let usedNewMessage = false;

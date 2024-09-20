@@ -5,6 +5,7 @@ import {
   GuildMember,
   Message,
   Role,
+  SendableChannels,
   SlashCommandBuilder,
   User,
 } from "discord.js";
@@ -20,7 +21,7 @@ export class Command {
   public slashEnabled: boolean;
   public data?: any;
   public run: (
-    message: Message | (NypsiCommandInteraction & CommandInteraction),
+    message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
     args?: string[],
   ) => void;
 
@@ -60,7 +61,7 @@ export class Command {
 
   public setRun(
     run: (
-      message: Message | (NypsiCommandInteraction & CommandInteraction),
+      message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
       args?: string[],
     ) => void,
   ) {
@@ -100,6 +101,10 @@ export interface NypsiCommandInteraction extends CommandInteraction {
   member: GuildMember;
   interaction?: boolean;
   content?: string;
+}
+
+export interface NypsiMessage extends Message {
+  channel: SendableChannels;
 }
 
 export function createNypsiInteraction(

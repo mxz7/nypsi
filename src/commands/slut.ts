@@ -5,7 +5,7 @@ import {
   InteractionReplyOptions,
   Message,
 } from "discord.js";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { getMember } from "../utils/functions/member";
@@ -23,7 +23,7 @@ cmd.slashEnabled = true;
 cmd.slashData.addUserOption((option) => option.setName("user").setDescription("are you slutty 😳"));
 
 async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {

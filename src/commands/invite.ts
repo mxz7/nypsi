@@ -1,12 +1,12 @@
-import { CommandInteraction, Message } from "discord.js";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { CommandInteraction } from "discord.js";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders.js";
 
 const cmd = new Command("invite", "generate an invite link for the bot", "info").setAliases([
   "bot",
 ]);
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
+async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) {
   const embed = new CustomEmbed(
     message.member,
     "bot invite: [nypsi.xyz/invite](https://nypsi.xyz/invite)\nsupport server: https://discord.gg/hJTDNST",

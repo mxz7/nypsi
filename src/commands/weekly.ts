@@ -1,5 +1,5 @@
-import { CommandInteraction, Message } from "discord.js";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { CommandInteraction } from "discord.js";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { addBalance, getBalance, getSellMulti } from "../utils/functions/economy/balance.js";
 import { addStat } from "../utils/functions/economy/stats";
@@ -11,7 +11,7 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 
 const cmd = new Command("weekly", "get your weekly bonus (premium only)", "money");
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
+async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) {
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
 

@@ -6,7 +6,7 @@ import {
   Message,
 } from "discord.js";
 import prisma from "../init/database";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants.js";
 import {
@@ -39,7 +39,7 @@ cmd.slashData.addUserOption((option) =>
 );
 
 async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
   if (message.author.id == Constants.TEKOH_ID && args.length == 2) {

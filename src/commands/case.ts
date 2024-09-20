@@ -12,7 +12,7 @@ import {
   MessageActionRowComponentBuilder,
   PermissionFlagsBits,
 } from "discord.js";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
 import { getPrefix } from "../utils/functions/guilds/utils";
@@ -40,7 +40,7 @@ cmd.slashData.addIntegerOption((option) =>
 );
 
 async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
@@ -223,7 +223,7 @@ async function run(
       }
     }
 
-    async function showEvidence(interaction?: ButtonInteraction, evidenceMsg?: Message) {
+    async function showEvidence(interaction?: ButtonInteraction, evidenceMsg?: NypsiMessage) {
       const embed = new CustomEmbed(message.member).setHeader(
         `case ${caseData.caseId} evidence`,
         message.guild.iconURL(),
@@ -273,11 +273,11 @@ async function run(
         else evidenceMsg.edit(payload);
       } else {
         if (interaction)
-          evidenceMsg = await interaction
+          evidenceMsg = (await interaction
             .reply(payload)
             .then((m) => m.fetch())
-            .catch(() => interaction.message.edit(payload));
-        else evidenceMsg = await evidenceMsg.channel.send(payload);
+            .catch(() => interaction.message.edit(payload))) as NypsiMessage;
+        else evidenceMsg = (await evidenceMsg.channel.send(payload)) as NypsiMessage;
       }
 
       async function evidenceListen() {

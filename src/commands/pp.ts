@@ -5,7 +5,7 @@ import {
   InteractionReplyOptions,
   Message,
 } from "discord.js";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { getBoosters } from "../utils/functions/economy/boosters";
@@ -29,7 +29,7 @@ cmd.slashData.addUserOption((option) =>
 );
 
 async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {

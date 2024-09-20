@@ -10,7 +10,7 @@ import {
 } from "discord.js";
 import { nanoid } from "nanoid";
 import s3 from "../init/s3";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { formatDate } from "../utils/functions/date";
 import { getRawLevel } from "../utils/functions/economy/levelling";
@@ -34,7 +34,7 @@ const cmd = new Command("avatarhistory", "view a user's avatar history", "info")
 ]);
 
 async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
   if (await onCooldown(cmd.name, message.member)) {

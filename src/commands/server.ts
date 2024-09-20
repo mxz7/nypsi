@@ -1,5 +1,5 @@
-import { CommandInteraction, Message } from "discord.js";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { CommandInteraction } from "discord.js";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders.js";
 import { formatDate } from "../utils/functions/date";
 import { getPeaks, runCheck } from "../utils/functions/guilds/utils";
@@ -11,7 +11,7 @@ const cmd = new Command("server", "view information about the server", "info").s
 ]);
 
 async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
   const server = message.guild;

@@ -7,7 +7,7 @@ import {
   PermissionFlagsBits,
   Role,
 } from "discord.js";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { isAltPunish } from "../utils/functions/guilds/altpunish";
 import { getPrefix } from "../utils/functions/guilds/utils";
@@ -27,7 +27,7 @@ cmd.slashData.addUserOption((option) =>
 );
 
 async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
@@ -229,7 +229,7 @@ async function run(
 }
 
 async function doUnmute(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   target: GuildMember,
   args: string[],
   mode: string,

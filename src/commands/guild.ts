@@ -17,7 +17,7 @@ import { sort } from "fast-sort";
 import prisma from "../init/database";
 import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { daysAgo, formatDate } from "../utils/functions/date";
@@ -160,7 +160,7 @@ const filter = [
 const invited = new Set<string>();
 
 async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
   if (await onCooldown(cmd.name, message.member)) {

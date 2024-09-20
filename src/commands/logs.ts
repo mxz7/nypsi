@@ -1,5 +1,5 @@
-import { Channel, CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { Channel, CommandInteraction, PermissionFlagsBits } from "discord.js";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getLogsChannelHook, setLogsChannelHook } from "../utils/functions/moderation/logs";
@@ -9,7 +9,7 @@ const cmd = new Command("logs", "set/update the logs channel", "admin").setPermi
 ]);
 
 async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {

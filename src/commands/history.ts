@@ -13,7 +13,7 @@ import {
   MessageEditOptions,
   PermissionFlagsBits,
 } from "discord.js";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getMember } from "../utils/functions/member";
@@ -31,7 +31,7 @@ cmd.slashData.addStringOption((option) =>
 );
 
 async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {

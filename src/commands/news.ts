@@ -1,5 +1,5 @@
-import { CommandInteraction, Message } from "discord.js";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { CommandInteraction } from "discord.js";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { formatDate } from "../utils/functions/date";
@@ -8,7 +8,7 @@ import { getNews, setNews } from "../utils/functions/news";
 const cmd = new Command("news", "set the news for the help command", "info");
 
 async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
   if (args.length == 0 || message.author.id != Constants.TEKOH_ID) {

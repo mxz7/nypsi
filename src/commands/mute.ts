@@ -8,7 +8,7 @@ import {
   Role,
   ThreadChannel,
 } from "discord.js";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { isAltPunish } from "../utils/functions/guilds/altpunish";
 import { getExactMember } from "../utils/functions/member";
@@ -32,7 +32,7 @@ cmd.slashData
   .addStringOption((option) => option.setName("reason").setDescription("reason for the mute"));
 
 async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
@@ -387,7 +387,7 @@ async function run(
 }
 
 async function doMute(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   target: GuildMember,
   reason: string,
   args: string[],

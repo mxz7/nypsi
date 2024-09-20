@@ -16,7 +16,7 @@ import {
 } from "discord.js";
 import redis from "../init/redis.js";
 import { NypsiClient } from "../models/Client.js";
-import { Command, NypsiCommandInteraction } from "../models/Command.js";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command.js";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants.js";
 import { a } from "../utils/functions/anticheat.js";
@@ -67,7 +67,7 @@ cmd.slashData.addStringOption((option) =>
 );
 
 async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
   if (!(await userExists(message.member))) await createUser(message.member);
@@ -117,7 +117,7 @@ cmd.setRun(run);
 module.exports = cmd;
 
 async function prepareGame(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
   msg?: Message,
 ) {
@@ -407,7 +407,7 @@ function getValue(member: GuildMember) {
 }
 
 async function playGame(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   m: Message,
   args: string[],
 ): Promise<void> {

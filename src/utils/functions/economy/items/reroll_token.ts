@@ -10,7 +10,7 @@ import {
   StringSelectMenuBuilder,
 } from "discord.js";
 import { randomInt } from "mathjs";
-import { NypsiCommandInteraction } from "../../../../models/Command";
+import { NypsiCommandInteraction, NypsiMessage } from "../../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
 import Constants from "../../../Constants";
@@ -22,7 +22,7 @@ import { getUpgradesData } from "../utils";
 
 module.exports = new ItemUse(
   "reroll_token",
-  async (message: Message | (NypsiCommandInteraction & CommandInteraction)) => {
+  async (message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) => {
     const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
       if (!(message instanceof Message)) {
         let usedNewMessage = false;

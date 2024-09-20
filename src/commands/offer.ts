@@ -11,7 +11,7 @@ import {
   MessageEditOptions,
 } from "discord.js";
 import { NypsiClient } from "../models/Client";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addBalance, getBalance, removeBalance } from "../utils/functions/economy/balance";
 import { getInventory, selectItem } from "../utils/functions/economy/inventory";
@@ -81,7 +81,7 @@ cmd.slashData
   );
 
 async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {

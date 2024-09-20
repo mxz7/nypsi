@@ -14,7 +14,7 @@ import {
 } from "discord.js";
 import { exec } from "node:child_process";
 import prisma from "../init/database";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
 import { isAltPunish } from "../utils/functions/guilds/altpunish";
@@ -45,7 +45,7 @@ cmd.slashData.addStringOption((option) =>
 );
 
 async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) {
@@ -324,7 +324,7 @@ async function run(
 }
 
 async function getEmbed(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   member: GuildMember | string,
 ) {
   const alts = await getUserAlts(message.guild, member);
@@ -355,7 +355,7 @@ async function getEmbed(
 }
 
 async function getRow(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   member: GuildMember | string,
 ) {
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(

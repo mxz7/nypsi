@@ -1,5 +1,5 @@
-import { CommandInteraction, Message } from "discord.js";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { CommandInteraction } from "discord.js";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { getPrefix } from "../utils/functions/guilds/utils";
 
@@ -8,7 +8,7 @@ const cmd = new Command("enlarge", "enlarge a custom emoji to its full size", "u
 );
 
 async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
   const prefix = (await getPrefix(message.guild))[0];

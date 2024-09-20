@@ -1,5 +1,5 @@
-import { CommandInteraction, Message } from "discord.js";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { CommandInteraction } from "discord.js";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { disableTracking, enableTracking, isTracking } from "../utils/functions/users/history";
@@ -11,7 +11,7 @@ const cmd = new Command(
   "info",
 );
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
+async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) {
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
 

@@ -9,7 +9,7 @@ import {
   Message,
   MessageActionRowComponentBuilder,
 } from "discord.js";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import {
@@ -36,7 +36,7 @@ import {
 
 const cmd = new Command("prestige", "prestige to gain extra benefits", "money");
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
+async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
     if (!(message instanceof Message)) {
       let usedNewMessage = false;

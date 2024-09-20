@@ -18,7 +18,7 @@ import {
   TextInputStyle,
 } from "discord.js";
 import { sort } from "fast-sort";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addProgress } from "../utils/functions/economy/achievements";
 import { getBalance, removeBalance } from "../utils/functions/economy/balance";
@@ -47,7 +47,7 @@ const cmd = new Command("garage", "view your custom cars", "money");
 
 cmd.slashEnabled = true;
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
+async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) {
   if (!(await userExists(message.member))) await createUser(message.member);
 
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {

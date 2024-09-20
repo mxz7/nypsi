@@ -1,17 +1,17 @@
-import { CommandInteraction, Message } from "discord.js";
-import { NypsiCommandInteraction } from "./Command";
+import { CommandInteraction } from "discord.js";
+import { NypsiCommandInteraction, NypsiMessage } from "./Command";
 
 export class ItemUse {
   public itemId: string;
   public run: (
-    message: Message | (NypsiCommandInteraction & CommandInteraction),
+    message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
     args?: string[],
   ) => void;
 
   constructor(
     itemId: string,
     func: (
-      message: Message | (NypsiCommandInteraction & CommandInteraction),
+      message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
       args?: string[],
     ) => void,
   ) {

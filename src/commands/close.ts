@@ -1,8 +1,8 @@
-import { CommandInteraction, Message } from "discord.js";
+import { CommandInteraction } from "discord.js";
 import prisma from "../init/database";
 import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import requestDM from "../utils/functions/requestdm";
@@ -14,7 +14,7 @@ import ms = require("ms");
 
 const cmd = new Command("close", "close a support ticket", "none");
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
+async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) {
   const support = await getSupportRequestByChannelId(message.channel.id);
 
   if (!support) return;

@@ -1,11 +1,5 @@
-import {
-  CommandInteraction,
-  Message,
-  MessageReaction,
-  PermissionFlagsBits,
-  User,
-} from "discord.js";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { CommandInteraction, MessageReaction, PermissionFlagsBits, User } from "discord.js";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { newCase } from "../utils/functions/moderation/cases";
@@ -15,7 +9,7 @@ const cmd = new Command("kicksince", "kick members that joined after a certain t
   .setAliases(["fuckoffsince"]);
 
 async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
   if (!message.member.permissions.has(PermissionFlagsBits.Administrator)) {

@@ -1,6 +1,6 @@
 import { CommandInteraction, Message, User } from "discord.js";
 import { NypsiClient } from "../models/Client";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { formatDate } from "../utils/functions/date";
@@ -26,7 +26,7 @@ import dayjs = require("dayjs");
 const cmd = new Command("find", "find info", "none").setPermissions(["bot owner"]);
 
 async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
   if (message.author.id != Constants.TEKOH_ID) return;
@@ -163,7 +163,7 @@ async function run(
   }
 }
 
-async function showGuild(message: Message, guild: any) {
+async function showGuild(message: NypsiMessage, guild: any) {
   const owner = guild.ownerId;
 
   const invites = guild.invites.cache;
@@ -194,7 +194,7 @@ async function showGuild(message: Message, guild: any) {
   return message.channel.send({ embeds: [embed] });
 }
 
-async function showUser(message: Message, user: User) {
+async function showUser(message: NypsiMessage, user: User) {
   const embed = new CustomEmbed(message.member)
     .setTitle(user.username)
     .setDescription(

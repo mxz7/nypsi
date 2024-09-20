@@ -1,5 +1,5 @@
-import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { CommandInteraction, PermissionFlagsBits } from "discord.js";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { getSnipeFilter, updateSnipeFilter } from "../utils/functions/guilds/filters";
 import { getPrefix } from "../utils/functions/guilds/utils";
@@ -10,7 +10,7 @@ const cmd = new Command("snipefilter", "change the snipe filter for your server"
   .setPermissions(["MANAGE_SERVER"]);
 
 async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {

@@ -5,7 +5,7 @@ import {
   InteractionReplyOptions,
   Message,
 } from "discord.js";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import { getInventory } from "../utils/functions/economy/inventory";
 import { getTicketCount } from "../utils/functions/economy/lottery";
@@ -29,7 +29,7 @@ cmd.slashData
   );
 
 async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
   if (!(await userExists(message.member))) await createUser(message.member);

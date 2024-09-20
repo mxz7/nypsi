@@ -3,17 +3,16 @@ import {
   ButtonBuilder,
   ButtonStyle,
   CommandInteraction,
-  Message,
   MessageActionRowComponentBuilder,
 } from "discord.js";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 
 const cmd = new Command("f", "pay your respects", "fun");
 
 async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
   if (await onCooldown(cmd.name, message.member)) {

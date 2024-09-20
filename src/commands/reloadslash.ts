@@ -1,5 +1,5 @@
 import { CommandInteraction, Message } from "discord.js";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import Constants from "../utils/Constants";
 import { uploadSlashCommands, uploadSlashCommandsToGuild } from "../utils/handlers/commandhandler";
 
@@ -8,7 +8,7 @@ const cmd = new Command("reloadslash", "reload data for slash commands", "none")
 ]);
 
 async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
   if (message.author.id != Constants.TEKOH_ID) return;

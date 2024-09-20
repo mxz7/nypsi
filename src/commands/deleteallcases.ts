@@ -1,12 +1,6 @@
-import {
-  CommandInteraction,
-  Message,
-  MessageReaction,
-  PermissionFlagsBits,
-  User,
-} from "discord.js";
+import { CommandInteraction, MessageReaction, PermissionFlagsBits, User } from "discord.js";
 import prisma from "../init/database";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { deleteAllEvidence } from "../utils/functions/guilds/evidence";
 
@@ -14,7 +8,7 @@ const cmd = new Command("deleteallcases", "delete all cases in a server", "admin
   .setAliases(["dac"])
   .setPermissions(["server owner"]);
 
-async function run(message: Message | (NypsiCommandInteraction & CommandInteraction)) {
+async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageMessages)) return;
 
   if (

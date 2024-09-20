@@ -149,7 +149,7 @@ export async function sendToRequestChannel(id: string, embed: CustomEmbed, clien
 
       if (!channel) return false;
 
-      if (!channel.isTextBased()) return;
+      if (!channel.isSendable()) return;
 
       const msg = await channel.send({ embeds: [embed] }).catch(() => {});
 

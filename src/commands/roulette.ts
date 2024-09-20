@@ -7,7 +7,7 @@ import {
   MessageEditOptions,
 } from "discord.js";
 import redis from "../init/redis";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants.js";
 import { addProgress } from "../utils/functions/economy/achievements.js";
@@ -88,7 +88,7 @@ cmd.slashData
   );
 
 async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {

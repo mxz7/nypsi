@@ -1,5 +1,5 @@
-import { CommandInteraction, Message, PermissionFlagsBits } from "discord.js";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { CommandInteraction, PermissionFlagsBits } from "discord.js";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { daysUntilChristmas } from "../utils/functions/date";
 import {
@@ -16,7 +16,7 @@ const cmd = new Command("christmascountdown", "create a christmas countdown", "a
   .setPermissions(["MANAGE_SERVER"]);
 
 async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
   if (!message.member.permissions.has(PermissionFlagsBits.ManageGuild)) {

@@ -5,7 +5,7 @@ import {
   Message,
   MessageEditOptions,
 } from "discord.js";
-import { Command, NypsiCommandInteraction } from "../models/Command";
+import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import { addBalance, getBalance, removeBalance } from "../utils/functions/economy/balance";
 import { addStat } from "../utils/functions/economy/stats";
@@ -36,7 +36,7 @@ cmd.slashData
   );
 
 async function run(
-  message: Message | (NypsiCommandInteraction & CommandInteraction),
+  message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),
   args: string[],
 ) {
   const send = async (data: BaseMessageOptions | InteractionReplyOptions) => {
