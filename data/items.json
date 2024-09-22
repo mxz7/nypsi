@@ -3048,9 +3048,9 @@
     "emoji": "🍌",
     "longDesc": "delicious treat",
     "rarity": 0,
-    "role": "item",
+    "role": "sellable",
     "buy": 0,
-    "sell": 1000,
+    "sell": 35000,
     "in_crates": false
   },
   "banana_seed": {
