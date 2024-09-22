@@ -881,7 +881,9 @@
       "id:looting:30",
       "id:super_cursor:20",
       "id:bob:80",
-      "id:stolen_credit_card"
+      "id:stolen_credit_card",
+      "id:banana_seed:10",
+      "id:apple_seed:7"
     ]
   },
   "calendar": {
@@ -2171,7 +2173,8 @@
       "id:nypsi_crate:10",
       "id:bronze_credit:0.7",
       "id:gem_shard:0.9",
-      "id:omega_crate:0.05"
+      "id:omega_crate:0.05",
+      "id:apple_seed:7"
     ],
     "random_drop_chance": 90
   },
@@ -2844,11 +2847,15 @@
     "rarity": 2,
     "role": "booster",
     "sell": 50000,
-    "in_crates": true,
+    "in_crates": false,
     "boosterEffect": {
       "boosts": ["cooldown"],
       "effect": 0.1,
       "time": 180
+    },
+    "craft": {
+      "ingredients": ["apple:13"],
+      "time": 600
     },
     "stackable": false
   },
@@ -3067,6 +3074,34 @@
     "sell": 50000,
     "in_crates": true,
     "aliases": ["bseed"]
+  },
+  "apple": {
+    "id": "apple",
+    "name": "apple",
+    "article": "an",
+    "plural": "apples",
+    "emoji": "🍎",
+    "longDesc": "the best fruit",
+    "rarity": 0,
+    "role": "item",
+    "buy": 0,
+    "sell": 50000,
+    "in_crates": false
+  },
+  "apple_seed": {
+    "id": "apple_seed",
+    "name": "apple tree seed",
+    "article": "an",
+    "plural": "apple tree seeds",
+    "emoji": "<:nypsi_apple_tree_seeds:1261357859891843132>",
+    "longDesc": "plant to grow a apple tree",
+    "rarity": 4,
+    "role": "seed",
+    "plantId": "apple_tree",
+    "buy": 0,
+    "sell": 50000,
+    "in_crates": true,
+    "aliases": ["aseed"]
   },
   "lottery_ticket": {
     "id": "lottery_ticket",
