@@ -7,5 +7,14 @@
     "max": 6,
     "item": "banana",
     "type": "tree"
+  },
+  "apple_tree": {
+    "id": "apple_tree",
+    "name": "apple tree",
+    "growthTime": 129600,
+    "hourly": 0.5,
+    "max": 6,
+    "item": "apple",
+    "type": "tree"
   }
 }
