@@ -170,6 +170,7 @@ async function run(
         return listen();
       }
     };
+    listen();
   } else if (["claim", "harvest"].includes(args[0].toLowerCase())) {
     const promises = [];
 
