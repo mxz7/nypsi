@@ -13,7 +13,7 @@
     "name": "apple tree",
     "growthTime": 129600,
     "hourly": 0.5,
-    "max": 6,
+    "max": 4,
     "item": "apple",
     "type": "tree"
   }
