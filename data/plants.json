@@ -5,6 +5,7 @@
     "growthTime": 172800,
     "hourly": 1,
     "max": 6,
+    "seed": "banana_seed",
     "item": "banana",
     "type": "tree"
   },
@@ -14,6 +15,7 @@
     "growthTime": 129600,
     "hourly": 0.5,
     "max": 4,
+    "seed": "apple_seed",
     "item": "apple",
     "type": "tree"
   }

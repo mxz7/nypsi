@@ -17,6 +17,7 @@ import { isUserBlacklisted } from "../utils/functions/users/blacklist";
 import { hasProfile } from "../utils/functions/users/utils";
 import { addView } from "../utils/functions/users/views";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
+import { getFarm } from "../utils/functions/economy/farm";
 
 const cmd = new Command("networth", "view breakdown of your networth", "money").setAliases([
   "net",
@@ -102,6 +103,10 @@ async function run(
       ).toFixed(2)}%)`;
     } else if (key === "garage") {
       mainValues += `\n🔧 $**${value.toLocaleString()}** (${((value / net.amount) * 100).toFixed(
+        2,
+      )}%)`;
+    } else if (key === "farm") {
+      mainValues += `\n🌱 $**${value.toLocaleString()}** (${((value / net.amount) * 100).toFixed(
         2,
       )}%)`;
     } else {
