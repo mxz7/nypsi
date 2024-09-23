@@ -1026,7 +1026,7 @@ export async function calcNetWorth(
 
   const farms = await getFarm(id);
 
-  let typesChecked: string[] = [];
+  const typesChecked: string[] = [];
 
   for (const farm of farms) {
     if (typesChecked.includes(farm.plantId)) continue;
