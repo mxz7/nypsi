@@ -16,11 +16,12 @@ import { calcItemValue, gemBreak, getInventory } from "./inventory";
 import { doLevelUp, getRawLevel, getUpgrades } from "./levelling";
 import { getOffersAverage } from "./offers";
 import { isPassive } from "./passive";
-import { getBaseUpgrades, getBaseWorkers, getItems, getUpgradesData } from "./utils";
+import { getBaseUpgrades, getBaseWorkers, getItems, getPlantsData, getUpgradesData } from "./utils";
 import { hasVoted } from "./vote";
 import { calcWorkerValues } from "./workers";
 import ms = require("ms");
 import _ = require("lodash");
+import { getClaimable, getFarm } from "./farm";
 
 export async function getBalance(member: GuildMember | string) {
   let id: string;
@@ -1020,6 +1021,28 @@ export async function calcNetWorth(
   }
 
   breakdownItems.set("workers", workersBreakdown);
+
+  let farmBreakdown = 0;
+
+  const farms = await getFarm(id);
+
+  const typesChecked: string[] = [];
+
+  for (const farm of farms) {
+    if (typesChecked.includes(farm.plantId)) continue;
+
+    const seed = Object.keys(getItems()).find((i) => getItems()[i].plantId === farm.plantId);
+
+    const seedValue = farms.filter((i) => i.plantId === farm.plantId).length * await calcItemValue(seed);
+    const harvestValue = await getClaimable(id, farm.plantId, false) * await calcItemValue(getPlantsData()[farm.plantId].item);
+
+    worth += seedValue + harvestValue;
+    farmBreakdown += seedValue + harvestValue;
+
+    typesChecked.push(farm.plantId);
+  }
+
+  breakdownItems.set("farm", farmBreakdown);
 
   await redis.set(`${Constants.redis.cache.economy.NETWORTH}:${id}`, Math.floor(worth));
   await redis.expire(`${Constants.redis.cache.economy.NETWORTH}:${id}`, ms("2 hour") / 1000);

@@ -104,6 +104,10 @@ async function run(
       mainValues += `\n🔧 $**${value.toLocaleString()}** (${((value / net.amount) * 100).toFixed(
         2,
       )}%)`;
+    } else if (key === "farm") {
+      mainValues += `\n🌱 $**${value.toLocaleString()}** (${((value / net.amount) * 100).toFixed(
+        2,
+      )}%)`;
     } else {
       itemValues.push({ itemId: key, value });
     }
