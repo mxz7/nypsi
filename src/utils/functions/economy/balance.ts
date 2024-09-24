@@ -1031,7 +1031,9 @@ export async function calcNetWorth(
   for (const farm of farms) {
     if (typesChecked.includes(farm.plantId)) continue;
 
-    const seedValue = farms.filter((i) => i.plantId === farm.plantId).length * await calcItemValue(getPlantsData()[farm.plantId].seed);
+    const seed = Object.keys(getItems()).find((i) => getItems()[i].plantId === farm.plantId);
+
+    const seedValue = farms.filter((i) => i.plantId === farm.plantId).length * await calcItemValue(seed);
     const harvestValue = await getClaimable(id, farm.plantId, false) * await calcItemValue(getPlantsData()[farm.plantId].item);
 
     worth += seedValue + harvestValue;

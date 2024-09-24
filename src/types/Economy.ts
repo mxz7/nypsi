@@ -110,7 +110,6 @@ export type Plant = {
   growthTime: number;
   hourly: number;
   max: number;
-  seed: string; // id of seed
   item: string;
   type: string; // tree / plant etc
 };
