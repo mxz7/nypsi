@@ -195,10 +195,10 @@ async function run(
 
     if (earned.size === 0) return send({ embeds: [new ErrorEmbed("you have nothing to harvest")] });
 
-    let desc = "you have harvested:\n\n";
+    let desc = "you have harvested:\n";
 
     for (const [plantId, value] of earned.entries()) {
-      desc += `\`${value.toLocaleString()}x\` ${getItems()[getPlantsData()[plantId].item].emoji} ${getItems()[getPlantsData()[plantId].item].name}`;
+      desc += `\n\`${value.toLocaleString()}x\` ${getItems()[getPlantsData()[plantId].item].emoji} ${getItems()[getPlantsData()[plantId].item].name}`;
     }
 
     const embed = new CustomEmbed(message.member, desc).setHeader(
