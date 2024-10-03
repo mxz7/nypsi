@@ -172,5 +172,11 @@
     "name": "keyboard",
     "description": "win an official chat reaction tournament",
     "emoji": "⌨️"
+  },
+  "omega_heart": {
+    "id": "omega_heart",
+    "name": "omega heart",
+    "description": "the most powerful heart. unfortunately relegated to only be used as a decoration",
+    "emoji": "<:nypsi_gem_hunter_Tag:1291367431540969472>"
   }
 }

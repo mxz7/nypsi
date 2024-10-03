@@ -1001,7 +1001,7 @@
     "emoji": "<:nypsi_gem_white:1046933670436552725>",
     "target": 100,
     "description": "find 100 gems",
-    "prize": ["crystal_heart:1", "legendary_scratch_card:5", "omega_crate:2"]
+    "prize": ["crystal_heart:1", "legendary_scratch_card:5", "omega_crate:2", "tag:omega_heart"]
   },
   "tower_pro_i": {
     "id": "tower_pro_i",
