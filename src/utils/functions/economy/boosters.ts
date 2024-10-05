@@ -52,6 +52,7 @@ async function checkBoosters(member: string | GuildMember, boosters: Map<string,
 
   if (expired.size != 0) {
     await redis.del(`${Constants.redis.cache.economy.BOOSTERS}:${userId}`);
+    await redis.del(`${Constants.redis.nypsi.STEVE_EARNED}:${userId}`);
     if ((await getDmSettings(userId)).booster) {
       const embed = new CustomEmbed()
         .setColor(Constants.TRANSPARENT_EMBED_COLOR)
@@ -69,7 +70,6 @@ async function checkBoosters(member: string | GuildMember, boosters: Map<string,
           let earned: SteveData = JSON.parse(
             await redis.get(`${Constants.redis.nypsi.STEVE_EARNED}:${userId}`),
           );
-          await redis.del(`${Constants.redis.nypsi.STEVE_EARNED}:${userId}`);
 
           if (!earned) earned = { money: 0, gemShards: 0, scraps: 0 };
 
