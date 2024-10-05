@@ -457,7 +457,7 @@ async function playGame(
 
       addHourlyCommand(message.member);
 
-      await a(message.author.id, message.author.username, message.content);
+      await a(message.author.id, message.author.username, message.content, "highlow");
 
       if (
         (await redis.get(

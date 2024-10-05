@@ -527,7 +527,12 @@ class Game {
 
       addHourlyCommand(this.member);
 
-      await a(this.member.user.id, this.member.user.username, this.playerMessage.content);
+      await a(
+        this.member.user.id,
+        this.member.user.username,
+        this.playerMessage.content,
+        "blackjack",
+      );
 
       if (
         (await redis.get(
