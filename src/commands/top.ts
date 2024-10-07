@@ -357,6 +357,9 @@ async function run(
       return send({ embeds: [new ErrorEmbed(`couldn't find ${searchTag}`)] });
     }
 
+    if (item.id === "lottery_ticket")
+      return send({ embeds: [new ErrorEmbed("leaderboards for this item are unavailable")] });
+
     let global = false;
 
     if (args[2]?.toLowerCase() == "global") global = true;
@@ -567,6 +570,9 @@ async function run(
       selectItem(args[0]);
 
     if (!selected) return send({ embeds: [new ErrorEmbed("invalid option")] });
+
+    if (selected.id === "lottery_ticket")
+      return send({ embeds: [new ErrorEmbed("leaderboards for this item are unavailable")] });
 
     let global = false;
 
