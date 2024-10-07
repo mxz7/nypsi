@@ -28,6 +28,7 @@ const responses = [
   "img:https://i.imgur.com/f5XVEdt.jpeg",
   "img:https://animalscdn.maxz.dev/cat/3gUaxje",
   "img:https://animalscdn.maxz.dev/cat/Ufn2wni",
+  "img:https://cdn.maxz.dev/J297W2CFaw.webp",
 ];
 
 module.exports = new ItemUse(
