@@ -42,7 +42,7 @@
   "devDependencies": {
     "@types/crypto-js": "4.2.2",
     "@types/express": "5.0.0",
-    "@types/figlet": "1.5.8",
+    "@types/figlet": "1.7.0",
     "@types/jest": "^29.5.13",
     "@types/lodash": "4.17.10",
     "@types/ms": "0.7.34",
