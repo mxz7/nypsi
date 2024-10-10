@@ -508,24 +508,27 @@ async function playGame(
     return interaction.update(data).catch(() => msg.edit(data));
   };
 
-  const replay = async (embed: CustomEmbed, interaction: ButtonInteraction) => {
+  const replay = async (embed: CustomEmbed, interaction: ButtonInteraction, update = true) => {
     await redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
-    if (
-      !(await isPremium(message.member)) ||
-      !((await getTier(message.member)) >= 2) ||
-      (await getBalance(message.member)) < game.bet
-    ) {
-      return edit({ embeds: [embed], components: createRows(board, true) }, interaction);
-    }
 
     const components = createRows(board, true);
 
-    (components[components.length - 1].components[0] as ButtonBuilder)
-      .setCustomId("rp")
-      .setLabel("play again")
-      .setDisabled(false);
+    if (update) {
+      if (
+        !(await isPremium(message.member)) ||
+        !((await getTier(message.member)) >= 2) ||
+        (await getBalance(message.member)) < game.bet
+      ) {
+        return edit({ embeds: [embed], components: createRows(board, true) }, interaction);
+      }
 
-    await edit({ embeds: [embed], components }, interaction);
+      (components[components.length - 1].components[0] as ButtonBuilder)
+        .setCustomId("rp")
+        .setLabel("play again")
+        .setDisabled(false);
+
+      await edit({ embeds: [embed], components }, interaction);
+    }
 
     const res = await msg
       .awaitMessageComponent({
@@ -544,7 +547,10 @@ async function playGame(
     if (res && res.customId == "rp") {
       await res.deferUpdate();
       logger.info(`::cmd ${message.guild.id} ${message.author.username}: replaying tower`);
-      if (await isLockedOut(message.author.id)) return verifyUser(message);
+      if (await isLockedOut(message.author.id)) {
+        await verifyUser(message);
+        return replay(embed, interaction, false);
+      }
 
       addHourlyCommand(message.member);
 
