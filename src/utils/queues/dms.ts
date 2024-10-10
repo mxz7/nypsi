@@ -10,8 +10,6 @@ const dmQueueHandler = new BeeQueue<NotificationPayload>("nypsi:dms", {
 
 export function handleDmQueue(manager: ClusterManager) {
   dmQueueHandler.process(3, async (job) => {
-    console.log(job.data);
-
     return await requestDM({
       client: manager,
       content: job.data.payload.content,
