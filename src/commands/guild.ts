@@ -47,6 +47,7 @@ import {
   userExists,
 } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
+import { getAllGroupAccountIds } from "../utils/functions/moderation/alts";
 import PageManager from "../utils/functions/page";
 import requestDM from "../utils/functions/requestdm";
 import { cleanString } from "../utils/functions/string";
@@ -282,8 +283,12 @@ async function run(
   }
 
   if (args[0].toLowerCase() == "create") {
-    if (await redis.exists(`${Constants.redis.cooldown.GUILD_CREATE}:${message.author.id}`)) {
-      return send({ embeds: [new ErrorEmbed("you have already created a guild recently")] });
+    const alts = await getAllGroupAccountIds(Constants.NYPSI_SERVER_ID, message.author.id);
+
+    for (const accountId of alts) {
+      if (await redis.exists(`${Constants.redis.cooldown.GUILD_CREATE}:${accountId}`)) {
+        return send({ embeds: [new ErrorEmbed("you have already created a guild recently")] });
+      }
     }
 
     if ((await getRawLevel(message.member)) < 100) {
