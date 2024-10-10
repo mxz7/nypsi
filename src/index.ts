@@ -10,9 +10,9 @@ import { addFailedHeartbeat, sendHeartbeat } from "./utils/functions/heartbeat";
 import { updateStats } from "./utils/functions/topgg";
 import { getVersion } from "./utils/functions/version";
 import { startMentionInterval } from "./utils/handlers/mentions";
-import { listenForDms } from "./utils/handlers/notificationhandler";
 import { listen } from "./utils/handlers/webhookhandler";
 import { getWebhooks, logger, setClusterId } from "./utils/logger";
+import { handleDmQueue } from "./utils/queues/dms";
 import ms = require("ms");
 
 setClusterId("main");
@@ -97,7 +97,7 @@ manager.spawn();
 listen(manager);
 
 setTimeout(async () => {
-  listenForDms(manager);
+  handleDmQueue(manager);
   startMentionInterval();
 }, 300000);
 // }, 15000);
