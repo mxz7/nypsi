@@ -4,7 +4,9 @@ import prisma from "../../../init/database";
 import redis from "../../../init/redis";
 import { InlineNotificationPayload, NotificationPayload } from "../../../types/Notification";
 import Constants from "../../Constants";
+import { dmQueue } from "../../queues/queues";
 import ms = require("ms");
+import BeeQueue = require("bee-queue");
 
 declare function require(name: string): any;
 
@@ -137,7 +139,7 @@ export async function updatePreferences(member: GuildMember | string, data: Pref
 }
 
 export async function addNotificationToQueue(...payload: NotificationPayload[]) {
-  await redis.lpush(Constants.redis.nypsi.DM_QUEUE, ...payload.map((p) => JSON.stringify(p)));
+  dmQueue.saveAll(payload.map((p) => dmQueue.createJob(p)));
 }
 
 export async function addInlineNotification(...payload: InlineNotificationPayload[]) {
