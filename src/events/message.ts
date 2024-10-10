@@ -26,6 +26,7 @@ import Constants from "../utils/Constants";
 import { a } from "../utils/functions/anticheat";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
 import { userExists } from "../utils/functions/economy/utils";
+import { getDisabledCommands } from "../utils/functions/guilds/disabledcommands";
 import { checkAutoMute, checkMessageContent } from "../utils/functions/guilds/filters";
 import { isSlashOnly } from "../utils/functions/guilds/slash";
 import { getPrefix, hasGuild } from "../utils/functions/guilds/utils";
@@ -262,8 +263,12 @@ export default async function messageCreate(message: Message) {
 
           createAuraTransaction(message.author.id, message.client.user.id, -chosen);
 
-          if (!(await redis.exists(`brainrot:cooldown:${message.channelId}`)))
-            message.reply({ embeds: [new CustomEmbed(message.member, `-${chosen} aura`)] });
+          if (!(await redis.exists(`brainrot:cooldown:${message.channelId}`))) {
+            const disabledCommands = await getDisabledCommands(message.guild);
+
+            if (!disabledCommands.includes("aura"))
+              message.reply({ embeds: [new CustomEmbed(message.member, `-${chosen} aura`)] });
+          }
           redis.set(`brainrot:cooldown:${message.channelId}`, 1, "EX", 1);
         }
       }
