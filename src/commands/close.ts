@@ -5,11 +5,11 @@ import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
-import requestDM from "../utils/functions/requestdm";
 import {
   getSupportRequestByChannelId,
   sendToRequestChannel,
 } from "../utils/functions/supportrequest";
+import { addNotificationToQueue } from "../utils/functions/users/notifications";
 import ms = require("ms");
 
 const cmd = new Command("close", "close a support ticket", "none");
@@ -27,11 +27,9 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
     "your support request has been closed, you will be able to create another in 24 hours",
   );
 
-  await requestDM({
-    client: message.client as NypsiClient,
-    content: "your support request has been closed",
-    embed: embed,
+  addNotificationToQueue({
     memberId: support.userId,
+    payload: { embed, content: "your support request has been closed" },
   });
 
   const clusterHas = await (message.client as NypsiClient).cluster.broadcastEval(

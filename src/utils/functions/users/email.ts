@@ -1,5 +1,4 @@
 import prisma from "../../../init/database";
-import { NypsiClient } from "../../../models/Client";
 import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { NotificationPayload } from "../../../types/Notification";
 import Constants from "../../Constants";
@@ -44,7 +43,7 @@ export async function setEmail(id: string, email: string) {
   });
 }
 
-export async function checkPurchases(id: string, client: NypsiClient) {
+export async function checkPurchases(id: string) {
   const email = await getEmail(id);
 
   if (!email) return;
@@ -113,11 +112,11 @@ export async function checkPurchases(id: string, client: NypsiClient) {
       if (premiums.includes(item.item)) {
         if (await isPremium(id)) {
           if (levelString(await getTier(id)).toLowerCase() != item.item) {
-            await setTier(id, premiums.indexOf(item.item) + 1, client);
+            await setTier(id, premiums.indexOf(item.item) + 1);
             await setCredits(id, 0);
-            await renewUser(id, client);
+            await renewUser(id);
           } else {
-            await renewUser(id, client);
+            await renewUser(id);
           }
         } else {
           await addMember(id, premiums.indexOf(item.item) + 1);

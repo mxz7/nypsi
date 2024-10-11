@@ -148,8 +148,8 @@ module.exports = new ItemUse(
         inventory.find((i) => i.item === "silver_credit").amount - 1,
       );
 
-      await setTier(message.author.id, SILVER_TIER, message.client as NypsiClient);
-      await setExpireDate(message.author.id, new Date(), message.client as NypsiClient);
+      await setTier(message.author.id, SILVER_TIER);
+      await setExpireDate(message.author.id, new Date());
       await setCredits(message.author.id, 7);
 
       return res.editReply({

@@ -7,8 +7,7 @@ import Constants from "../../utils/Constants";
 import { deleteAuction } from "../../utils/functions/economy/auctions";
 import { addInventoryItem } from "../../utils/functions/economy/inventory";
 import { getItems, userExists } from "../../utils/functions/economy/utils";
-import requestDM from "../../utils/functions/requestdm";
-import { getDmSettings } from "../../utils/functions/users/notifications";
+import { addNotificationToQueue, getDmSettings } from "../../utils/functions/users/notifications";
 import { logger } from "../../utils/logger";
 
 export async function runAuctionChecks(client: NypsiClient) {
@@ -45,11 +44,12 @@ export async function runAuctionChecks(client: NypsiClient) {
       );
 
       if ((await getDmSettings(auction.ownerId)).auction) {
-        await requestDM({
-          client: client,
-          content: "your auction has expired",
+        addNotificationToQueue({
           memberId: auction.ownerId,
-          embed: embed,
+          payload: {
+            content: "your auction has expired",
+            embed: embed,
+          },
         });
       }
     }

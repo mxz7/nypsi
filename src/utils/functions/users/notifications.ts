@@ -138,7 +138,7 @@ export async function updatePreferences(member: GuildMember | string, data: Pref
   return query;
 }
 
-export async function addNotificationToQueue(...payload: NotificationPayload[]) {
+export function addNotificationToQueue(...payload: NotificationPayload[]) {
   dmQueue.saveAll(payload.map((p) => dmQueue.createJob(p)));
 }
 

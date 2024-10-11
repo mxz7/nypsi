@@ -9,7 +9,6 @@ import {
   Message,
   MessageActionRowComponentBuilder,
 } from "discord.js";
-import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
@@ -661,7 +660,7 @@ async function run(
 
     switch (args[1].toLowerCase()) {
       case "level":
-        await setTier(args[2], parseInt(args[3]), message.client as NypsiClient);
+        await setTier(args[2], parseInt(args[3]));
         return send({
           embeds: [new CustomEmbed(message.member, `✅ tier changed to ${args[3]}`)],
         });
@@ -699,7 +698,7 @@ async function run(
       return send({ embeds: [new ErrorEmbed("invalid syntax bro")] });
     }
 
-    await renewUser(args[1], message.client as NypsiClient);
+    await renewUser(args[1]);
 
     return send({ embeds: [new CustomEmbed(message.member, "✅ membership renewed")] });
   } else if (args[0].toLowerCase() == "expire") {
@@ -711,7 +710,7 @@ async function run(
       return send({ embeds: [new ErrorEmbed("invalid syntax bro")] });
     }
 
-    setExpireDate(args[1], new Date(0), message.client as NypsiClient);
+    setExpireDate(args[1], new Date(0));
 
     return send({ embeds: [new CustomEmbed(message.member, "✅ membership will expire soon")] });
   } else if (args[0].toLowerCase() == "color") {

@@ -1,5 +1,4 @@
 import { Entitlement } from "discord.js";
-import { NypsiClient } from "../models/Client";
 import { addMember, getTier, renewUser, setTier } from "../utils/functions/premium/premium";
 import { createProfile, hasProfile } from "../utils/functions/users/utils";
 import { logger } from "../utils/logger";
@@ -13,7 +12,7 @@ export default async function entitlementCreate(entitlement: Entitlement) {
 
   if (tier < 4) {
     await setTier(entitlement.userId, 4);
-    await renewUser(entitlement.userId, entitlement.client as NypsiClient);
+    await renewUser(entitlement.userId);
   } else {
     await addMember(entitlement.userId, 4);
   }

@@ -2,13 +2,12 @@ import { Captcha } from "@prisma/client";
 import { CommandInteraction, GuildMember, Message, WebhookClient } from "discord.js";
 import prisma from "../../init/database";
 import redis from "../../init/redis";
-import { NypsiClient } from "../../models/Client";
 import { NypsiCommandInteraction, NypsiMessage } from "../../models/Command";
 import { CustomEmbed } from "../../models/EmbedBuilders";
 import Constants from "../Constants";
 import { getTimestamp } from "../logger";
 import { isEcoBanned, setEcoBan } from "./economy/utils";
-import requestDM from "./requestdm";
+import { addNotificationToQueue } from "./users/notifications";
 import ms = require("ms");
 import dayjs = require("dayjs");
 
@@ -128,11 +127,11 @@ export async function failedCaptcha(member: GuildMember, content: string) {
         member.user.id
       }) has been banned for 24 hours for failing 50 captchas`,
     );
-    await requestDM({
-      client: member.client as NypsiClient,
-      content:
-        "you have been banned from nypsi economy for 24 hours for failing/ignoring too many captchas",
+    addNotificationToQueue({
       memberId: member.user.id,
+      payload: {
+        content: `you have been banned from nypsi economy for 24 hours for failing 50 captchas`,
+      },
     });
   }
 

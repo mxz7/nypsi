@@ -9,7 +9,6 @@ import {
   Message,
   MessageActionRowComponentBuilder,
 } from "discord.js";
-import { NypsiClient } from "../../../../models/Client";
 import { NypsiCommandInteraction, NypsiMessage } from "../../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../../models/EmbedBuilders";
 import { ItemUse } from "../../../../models/ItemUse";
@@ -146,8 +145,8 @@ module.exports = new ItemUse(
         inventory.find((i) => i.item === "bronze_credit").amount - 1,
       );
 
-      await setTier(message.author.id, BRONZE_TIER, message.client as NypsiClient);
-      await setExpireDate(message.author.id, new Date(), message.client as NypsiClient);
+      await setTier(message.author.id, BRONZE_TIER);
+      await setExpireDate(message.author.id, new Date());
       await setCredits(message.author.id, 7);
 
       return send({

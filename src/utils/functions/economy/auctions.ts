@@ -22,7 +22,6 @@ import Constants from "../../Constants";
 import { logger, transaction } from "../../logger";
 import { filterOutliers } from "../outliers";
 import { getTier, isPremium } from "../premium/premium";
-import requestDM from "../requestdm";
 import { addToNypsiBank, getTax } from "../tax";
 import { addNotificationToQueue, getDmSettings, getPreferences } from "../users/notifications";
 import itemHistoryWorker from "../workers/itemhistory";
@@ -737,11 +736,12 @@ export async function buyFullAuction(
         .setFooter({ text: `+$${(moneyReceived - taxedAmount).toLocaleString()}` });
       dmQueue.delete(`${auction.ownerId}-${auction.itemId}`);
 
-      await requestDM({
-        client: interaction.client as NypsiClient,
+      addNotificationToQueue({
         memberId: auction.ownerId,
-        content: `${total.toLocaleString()}x of your auctioned items have been bought`,
-        embed: embedDm,
+        payload: {
+          content: `${total.toLocaleString()}x of your auctioned items have been bought`,
+          embed: embedDm,
+        },
       });
     }
 
@@ -755,11 +755,12 @@ export async function buyFullAuction(
         ).toLocaleString()}**${taxedAmount != 0 ? `(${(tax * 100).toFixed(1)}% tax)` : ""} `,
       );
 
-    await requestDM({
-      client: interaction.client as NypsiClient,
+    addNotificationToQueue({
       memberId: auction.ownerId,
-      content: "your auction has been bought",
-      embed: embedDm,
+      payload: {
+        content: "your auction has been bought",
+        embed: embedDm,
+      },
     });
   }
 
@@ -978,11 +979,12 @@ export async function buyAuctionOne(
           .setFooter({ text: `+$${(moneyReceived - taxedAmount).toLocaleString()}` });
         dmQueue.delete(`${auction.ownerId}-${auction.itemId}`);
 
-        await requestDM({
-          client: interaction.client as NypsiClient,
+        addNotificationToQueue({
           memberId: auction.ownerId,
-          content: `${total.toLocaleString()}x of your auctioned items have been bought`,
-          embed: embedDm,
+          payload: {
+            content: `${total.toLocaleString()}x of your auctioned items have been bought`,
+            embed: embedDm,
+          },
         });
       }, ms("10 minutes"));
     }
@@ -1246,11 +1248,12 @@ export async function buyAuctionMulti(
           .setFooter({ text: `+$${(moneyReceived - taxedAmount).toLocaleString()}` });
         dmQueue.delete(`${auction.ownerId}-${auction.itemId}`);
 
-        await requestDM({
-          client: interaction.client as NypsiClient,
+        addNotificationToQueue({
           memberId: auction.ownerId,
-          content: `${total.toLocaleString()}x of your auctioned items have been bought`,
-          embed: embedDm,
+          payload: {
+            content: `${total.toLocaleString()}x of your auctioned items have been bought`,
+            embed: embedDm,
+          },
         });
       }, ms("10 minutes"));
     }
