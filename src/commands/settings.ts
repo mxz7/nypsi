@@ -17,7 +17,6 @@ import {
   TextInputStyle,
 } from "discord.js";
 import redis from "../init/redis";
-import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import {
@@ -883,7 +882,7 @@ async function run(
         });
       }
 
-      checkPurchases(message.author.id, message.client as NypsiClient);
+      checkPurchases(message.author.id);
 
       return res.message.edit({
         embeds: [new CustomEmbed(message.member, "✅ your email has been set")],

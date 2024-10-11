@@ -49,8 +49,7 @@ import {
 } from "../utils/functions/economy/utils";
 import PageManager from "../utils/functions/page";
 import { getTier, isPremium } from "../utils/functions/premium/premium";
-import requestDM from "../utils/functions/requestdm";
-import { getDmSettings } from "../utils/functions/users/notifications";
+import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications";
 import { addCooldown, addExpiry, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import { logger } from "../utils/logger";
 
@@ -782,11 +781,9 @@ async function run(
           embed.addField("reason", args.join(" "));
         }
 
-        await requestDM({
-          client: message.client as NypsiClient,
-          content: "your auction has been removed by a staff member",
+        addNotificationToQueue({
           memberId: auction.ownerId,
-          embed: embed,
+          payload: { embed: embed, content: "your auction has been removed by a staff member" },
         });
       }
     }

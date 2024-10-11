@@ -16,7 +16,6 @@ import {
 import { sort } from "fast-sort";
 import prisma from "../init/database";
 import redis from "../init/redis";
-import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
@@ -49,9 +48,8 @@ import {
 import { getPrefix } from "../utils/functions/guilds/utils";
 import { getAllGroupAccountIds } from "../utils/functions/moderation/alts";
 import PageManager from "../utils/functions/page";
-import requestDM from "../utils/functions/requestdm";
 import { cleanString } from "../utils/functions/string";
-import { getDmSettings } from "../utils/functions/users/notifications";
+import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications";
 import { getLastKnownAvatar } from "../utils/functions/users/tag";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import ms = require("ms");
@@ -648,11 +646,12 @@ async function run(
             ).toLocaleString()}**`,
           );
 
-          await requestDM({
+          addNotificationToQueue({
             memberId: guildMember.userId,
-            content: `${guild.guildName} has been deleted`,
-            client: message.client as NypsiClient,
-            embed: embed,
+            payload: {
+              content: `${guild.guildName} has been deleted`,
+              embed: embed,
+            },
           });
         }
       }

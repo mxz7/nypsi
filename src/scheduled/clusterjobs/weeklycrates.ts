@@ -74,13 +74,13 @@ async function doCrates(client: NypsiClient) {
     embed.addField("rewards", desc.join("\n"));
 
     if ((await getDmSettings(member.id)).premium) {
-      await addNotificationToQueue({
+      addNotificationToQueue({
         memberId: member.id,
         payload: {
           content: "enjoy your weekly crates (:",
           embed: embed,
         },
-      }).catch(() => {});
+      });
     }
   }
 }

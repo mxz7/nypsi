@@ -2,11 +2,11 @@ import { CommandInteraction, Message } from "discord.js";
 import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
-import requestDM from "../utils/functions/requestdm";
 import {
   getSupportRequestByChannelId,
   sendToRequestChannel,
 } from "../utils/functions/supportrequest";
+import { addNotificationToQueue } from "../utils/functions/users/notifications";
 
 const cmd = new Command("reply", "reply to a support ticket", "none");
 
@@ -39,10 +39,11 @@ async function run(
 
   Promise.all([
     sendToRequestChannel(support.userId, embed, message.client as NypsiClient),
-    requestDM({
-      client: message.client as NypsiClient,
-      content: "you have received a message from your support ticket",
-      embed: embed,
+    addNotificationToQueue({
+      payload: {
+        content: "you have received a message from your support ticket",
+        embed: embed,
+      },
       memberId: support.userId,
     }),
     message.delete(),

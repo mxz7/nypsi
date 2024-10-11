@@ -41,10 +41,10 @@ import {
   setExpireDate,
   setTier,
 } from "../utils/functions/premium/premium";
-import requestDM from "../utils/functions/requestdm";
 import { getAdminLevel, setAdminLevel } from "../utils/functions/users/admin";
 import { isUserBlacklisted, setUserBlacklist } from "../utils/functions/users/blacklist";
 import { getCommandUses } from "../utils/functions/users/commands";
+import { addNotificationToQueue } from "../utils/functions/users/notifications";
 import { addTag, getTags, removeTag } from "../utils/functions/users/tags";
 import { hasProfile } from "../utils/functions/users/utils";
 import { logger } from "../utils/logger";
@@ -993,7 +993,7 @@ async function run(
           `admin: ${message.author.id} (${message.author.username}) set ${user.id} premium tier to ${msg.content}`,
         );
 
-        await setTier(user.id, parseInt(msg.content), message.client as NypsiClient);
+        await setTier(user.id, parseInt(msg.content));
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "set-expire") {
@@ -1044,7 +1044,7 @@ async function run(
           } premium expire date to ${date.format()}`,
         );
 
-        await setExpireDate(user.id, date.toDate(), message.client as NypsiClient);
+        await setExpireDate(user.id, date.toDate());
         msg.react("✅");
         return waitForButton();
       } else if (res.customId === "raw-data") {
@@ -1534,30 +1534,34 @@ async function run(
     await redis.set(`${Constants.redis.nypsi.PROFILE_TRANSFER}:${to.id}`, from.id, "EX", 600);
     await redis.set(`${Constants.redis.nypsi.PROFILE_TRANSFER}:${from.id}`, to.id, "EX", 600);
 
-    requestDM({
-      memberId: from.id,
-      client: message.client as NypsiClient,
-      embed: new CustomEmbed(
-        message.member,
-        `your profile has been requested to be transferred to ${to.id}, you cannot do commands during this period`,
-      ),
-      content: "IMPORTANT: your profile is being used in a data transfer",
-    });
-    requestDM({
-      memberId: to.id,
-      client: message.client as NypsiClient,
-      embed: new CustomEmbed(
-        message.member,
-        `your account has been requested to have data transferred from ${from.id} to you. if this was not you, you can safely ignore this message.\n\nyou cannot do commands for 10 minutes`,
-      ),
-      content: "IMPORTANT: your profile is being used in a data transfer",
-      components: new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
-        new ButtonBuilder()
-          .setStyle(ButtonStyle.Danger)
-          .setLabel("confirm")
-          .setCustomId("t-f-p-boobies"),
-      ),
-    });
+    addNotificationToQueue(
+      {
+        memberId: from.id,
+        payload: {
+          embed: new CustomEmbed(
+            message.member,
+            `your profile has been requested to be transferred to ${to.id}, you cannot do commands during this period`,
+          ),
+          content: "IMPORTANT: your profile is being used in a data transfer",
+        },
+      },
+      {
+        memberId: to.id,
+        payload: {
+          embed: new CustomEmbed(
+            message.member,
+            `your account has been requested to have data transferred from ${from.id} to you. if this was not you, you can safely ignore this message.\n\nyou cannot do commands for 10 minutes`,
+          ),
+          content: "IMPORTANT: your profile is being used in a data transfer",
+          components: new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+            new ButtonBuilder()
+              .setStyle(ButtonStyle.Danger)
+              .setLabel("confirm")
+              .setCustomId("t-f-p-boobies"),
+          ),
+        },
+      },
+    );
 
     return message.channel.send({
       embeds: [new CustomEmbed(message.member, "profile transfer initiated")],

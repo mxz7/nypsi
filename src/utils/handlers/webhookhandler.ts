@@ -40,7 +40,6 @@ import {
   setTier,
 } from "../functions/premium/premium";
 import { percentChance } from "../functions/random";
-import requestDM from "../functions/requestdm";
 import { getTax, getTaxRefreshTime } from "../functions/tax";
 import { createAuraTransaction } from "../functions/users/aura";
 import { isUserBlacklisted } from "../functions/users/blacklist";
@@ -259,17 +258,14 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
     }
   }
 
-  const res = await requestDM({
+  addNotificationToQueue({
     memberId: user,
-    client: manager,
-    content: "thank you for voting!",
-    embed: embed,
-    components: row,
+    payload: {
+      content: "thank you for voting!",
+      embed: embed,
+      components: row,
+    },
   });
-
-  if (!res) {
-    logger.warn(`failed to send vote confirmation to ${user}`);
-  }
 }
 
 async function handleKofiData(data: KofiResponse) {

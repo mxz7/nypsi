@@ -151,8 +151,8 @@ module.exports = new ItemUse(
         inventory.find((i) => i.item === "platinum_credit").amount - 1,
       );
 
-      await setTier(message.author.id, PLAT_TIER, message.client as NypsiClient);
-      await setExpireDate(message.author.id, new Date(), message.client as NypsiClient);
+      await setTier(message.author.id, PLAT_TIER);
+      await setExpireDate(message.author.id, new Date());
       await setCredits(message.author.id, 7);
 
       return res.editReply({

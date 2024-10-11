@@ -7,7 +7,6 @@ import Constants from "../../Constants";
 import { logger } from "../../logger";
 import { findGuildCluster } from "../clusters";
 import { formatDate } from "../date";
-import requestDM from "../requestdm";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import dayjs = require("dayjs");
 
@@ -146,7 +145,7 @@ export async function getPremiumProfile(member: GuildMember | string) {
   return query;
 }
 
-export async function setTier(member: GuildMember | string, level: number, client?: NypsiClient) {
+export async function setTier(member: GuildMember | string, level: number) {
   let id: string;
   if (member instanceof GuildMember) {
     id = member.user.id;
@@ -166,26 +165,18 @@ export async function setTier(member: GuildMember | string, level: number, clien
   logger.info(`premium level updated to ${level} for ${id}`);
 
   if ((await getDmSettings(id)).premium) {
-    if (client) {
-      await requestDM({
-        memberId: id,
-        client: client,
+    addNotificationToQueue({
+      memberId: id,
+      payload: {
         content: `your membership has been updated to **${levelString(level)}**`,
-      });
-    } else {
-      await addNotificationToQueue({
-        memberId: id,
-        payload: {
-          content: `your membership has been updated to **${levelString(level)}**`,
-        },
-      });
-    }
+      },
+    });
   }
 
   await redis.del(`${Constants.redis.cache.premium.LEVEL}:${id}`);
 }
 
-export async function renewUser(member: string, client?: NypsiClient) {
+export async function renewUser(member: string) {
   await prisma.premium.update({
     where: {
       userId: member,
@@ -196,24 +187,14 @@ export async function renewUser(member: string, client?: NypsiClient) {
   });
 
   if ((await getDmSettings(member)).premium) {
-    if (client) {
-      await requestDM({
-        memberId: member,
-        client: client,
+    await addNotificationToQueue({
+      memberId: member,
+      payload: {
         content: `your membership has been renewed until **${formatDate(
           dayjs().add(31, "days").toDate(),
         )}**`,
-      });
-    } else {
-      await addNotificationToQueue({
-        memberId: member,
-        payload: {
-          content: `your membership has been renewed until **${formatDate(
-            dayjs().add(31, "days").toDate(),
-          )}**`,
-        },
-      });
-    }
+      },
+    });
   }
 
   await redis.del(`${Constants.redis.cache.premium.LEVEL}:${member}`);
@@ -281,18 +262,18 @@ export async function expireUser(member: string, client?: NypsiClient | ClusterM
   }
 
   if ((await getDmSettings(member)).premium) {
-    await addNotificationToQueue({
+    addNotificationToQueue({
       memberId: member,
       payload: {
         content: `your **${levelString(
           level,
         )}** membership has expired, join the support server if this is an error ($support)`,
       },
-    }).catch(() => {});
+    });
   }
 }
 
-export async function setExpireDate(member: GuildMember | string, date: Date, client: NypsiClient) {
+export async function setExpireDate(member: GuildMember | string, date: Date) {
   let id: string;
   if (member instanceof GuildMember) {
     id = member.user.id;
@@ -310,10 +291,9 @@ export async function setExpireDate(member: GuildMember | string, date: Date, cl
   });
 
   if ((await getDmSettings(id)).premium) {
-    await requestDM({
+    addNotificationToQueue({
       memberId: id,
-      client: client,
-      content: `your membership will now expire on **${formatDate(date)}**`,
+      payload: { content: `your membership will now expire on **${formatDate(date)}**` },
     });
   }
 }
