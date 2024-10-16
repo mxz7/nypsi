@@ -200,6 +200,11 @@ async function run(
     time = ms("1 week") / 1000;
 
     timedMute = true;
+  } else if (mode === "timeout" && timedMute) {
+    if (time > ms("28 days")) {
+      unmuteDate = dayjs().add(28, "days").toDate();
+      time = ms("28 days") / 1000;
+    }
   }
 
   let fail = false;
