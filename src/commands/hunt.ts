@@ -153,7 +153,7 @@ async function doHunt(
         for (let i = 0; i < boosters.get(boosterId).length; i++) {
           const chance = Math.floor(Math.random() * 5);
           if (chance > 2) {
-            multi += Math.floor(Math.random() * items[boosterId].boosterEffect.effect);
+            multi += items[boosterId].boosterEffect.effect;
           }
         }
       } else {
