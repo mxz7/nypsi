@@ -14,7 +14,7 @@ import { getPrefix } from "../utils/functions/guilds/utils";
 import { getExactMember } from "../utils/functions/member";
 import { getAllGroupAccountIds } from "../utils/functions/moderation/alts";
 import { newCase } from "../utils/functions/moderation/cases";
-import { deleteMute, getMuteRole } from "../utils/functions/moderation/mute";
+import { deleteMute, getMuteRole, isMuted } from "../utils/functions/moderation/mute";
 
 const cmd = new Command("unmute", "unmute a user", "moderation").setPermissions([
   "MANAGE_MESSAGES",
@@ -89,7 +89,28 @@ async function run(
 
   const punishAlts = await isAltPunish(message.guild);
 
-  if (!target) return send({ embeds: [new ErrorEmbed("invalid user")] });
+  if (!target) {
+    if (await isMuted(message.guild, args[0])) {
+      const accounts: string[] = [];
+
+      if (punishAlts) accounts.push(...(await getAllGroupAccountIds(message.guild, args[0])));
+      else accounts.push(args[0]);
+
+      for (const account of accounts) {
+        await deleteMute(message.guild, account);
+      }
+
+      return send({
+        embeds: [
+          new CustomEmbed(message.member).setDescription(
+            `**${accounts[0]}**${accounts.length > 1 ? ` (+ ${accounts.length - 1} alts)` : ""} has been unmuted`,
+          ),
+        ],
+      });
+    }
+
+    return send({ embeds: [new ErrorEmbed("invalid user")] });
+  }
 
   const guildMuteRole = await getMuteRole(message.guild);
 
