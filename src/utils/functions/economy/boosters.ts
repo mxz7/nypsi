@@ -53,8 +53,6 @@ async function checkBoosters(member: string | GuildMember, boosters: Map<string,
   if (expired.size != 0) {
     await redis.del(`${Constants.redis.cache.economy.BOOSTERS}:${userId}`);
 
-    if (expired.has("steve")) await redis.del(`${Constants.redis.nypsi.STEVE_EARNED}:${userId}`);
-
     if ((await getDmSettings(userId)).booster) {
       const embed = new CustomEmbed()
         .setColor(Constants.TRANSPARENT_EMBED_COLOR)
@@ -128,6 +126,8 @@ async function checkBoosters(member: string | GuildMember, boosters: Map<string,
         });
       }
     }
+
+    if (expired.has("steve")) await redis.del(`${Constants.redis.nypsi.STEVE_EARNED}:${userId}`);
   }
 
   return boosters;
