@@ -15,7 +15,7 @@ import { CustomEmbed } from "../../models/EmbedBuilders";
 import { KofiResponse } from "../../types/Kofi";
 import { NotificationPayload } from "../../types/Notification";
 import Constants from "../Constants";
-import { addProgress } from "../functions/economy/achievements";
+import { addProgress, setProgress } from "../functions/economy/achievements";
 import { addBalance } from "../functions/economy/balance";
 import { addBooster } from "../functions/economy/boosters";
 import { addInventoryItem } from "../functions/economy/inventory";
@@ -100,6 +100,20 @@ export function listen(manager: ClusterManager) {
       tax,
       refreshTime,
     });
+  });
+
+  app.post("/achievement/animal_lover/progress/:id", async (req, res) => {
+    const auth = req.headers.authorization;
+
+    if (auth !== process.env.API_AUTH) {
+      res.status(401).send();
+      return;
+    }
+
+    const { id } = req.params;
+    const { progress } = req.body;
+    await setProgress(id, "animal_lover", progress);
+    res.status(200).send();
   });
 
   app.listen(process.env.EXPRESS_PORT || 5000);
