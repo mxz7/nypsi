@@ -262,7 +262,9 @@ export async function getUserAchievement(userId: string, achievementId: string) 
 }
 
 export async function addProgress(userId: string, achievementStartName: string, amount: number) {
+  if (!(await userExists(userId))) return;
   if ((await isEcoBanned(userId)).banned) return;
+
   const achievements = await getAllAchievements(userId, achievementStartName);
   let count = 0;
 
@@ -310,6 +312,7 @@ export async function addProgress(userId: string, achievementStartName: string, 
 }
 
 export async function setProgress(userId: string, achievementStartName: string, amount: number) {
+  if (!(await userExists(userId))) return;
   if ((await isEcoBanned(userId)).banned) return;
   const achievements = await getAllAchievements(userId, achievementStartName);
   let count = 0;
