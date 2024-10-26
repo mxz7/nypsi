@@ -1397,7 +1397,7 @@
     "name": "animal lover **V**",
     "emoji": "😻",
     "target": 100,
-    "description": "upload 15,000 animal images (https://animals.maxz.dev)",
+    "description": "upload 100 animal images (https://animals.maxz.dev)",
     "prize": ["lucky_scratch_card:1", "nypsi_crate:1", "tag:animal_lover"]
   }
 }
