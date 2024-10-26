@@ -1361,5 +1361,43 @@
     "target": 250,
     "description": "upgrade a car 250 times",
     "prize": ["legendary_scratch_card:3", "omega_crate:1", "tag:mechanic"]
+  },
+  "animal_lover_i": {
+    "id": "animal_lover_i",
+    "name": "animal lover **I**",
+    "emoji": "😻",
+    "target": 1,
+    "description": "upload 1 animal image (https://animals.maxz.dev)"
+  },
+  "animal_lover_ii": {
+    "id": "animal_lover_ii",
+    "name": "animal lover **II**",
+    "emoji": "😻",
+    "target": 10,
+    "description": "upload 10 animal images (https://animals.maxz.dev)"
+  },
+  "animal_lover_iii": {
+    "id": "animal_lover_iii",
+    "name": "animal lover **III**",
+    "emoji": "😻",
+    "target": 25,
+    "description": "upload 25 animal images (https://animals.maxz.dev)",
+    "prize": ["lucky_scratch_card:1"]
+  },
+  "animal_lover_iv": {
+    "id": "animal_lover_iv",
+    "name": "animal lover **IV**",
+    "emoji": "😻",
+    "target": 50,
+    "description": "upload 50 animal images (https://animals.maxz.dev)",
+    "prize": ["lucky_scratch_card:1", "nypsi:crate:1"]
+  },
+  "animal_lover_v": {
+    "id": "animal_lover_v",
+    "name": "animal lover **V**",
+    "emoji": "😻",
+    "target": 100,
+    "description": "upload 15,000 animal images (https://animals.maxz.dev)",
+    "prize": ["lucky_scratch_card:1", "nypsi:crate:1", "tag:animal_lover"]
   }
 }

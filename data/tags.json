@@ -178,5 +178,11 @@
     "name": "omega heart",
     "description": "the most powerful heart. unfortunately relegated to only be used as a decoration",
     "emoji": "<:nypsi_gem_hunter_Tag:1291367431540969472>"
+  },
+  "animal_lover": {
+    "id": "animal_lover",
+    "name": "animal lover",
+    "description": "found in the animal lover achievement",
+    "emoji": "😻"
   }
 }
