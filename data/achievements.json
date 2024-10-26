@@ -1390,7 +1390,7 @@
     "emoji": "😻",
     "target": 50,
     "description": "upload 50 animal images (https://animals.maxz.dev)",
-    "prize": ["lucky_scratch_card:1", "nypsi:crate:1"]
+    "prize": ["lucky_scratch_card:1", "nypsi_crate:1"]
   },
   "animal_lover_v": {
     "id": "animal_lover_v",
@@ -1398,6 +1398,6 @@
     "emoji": "😻",
     "target": 100,
     "description": "upload 15,000 animal images (https://animals.maxz.dev)",
-    "prize": ["lucky_scratch_card:1", "nypsi:crate:1", "tag:animal_lover"]
+    "prize": ["lucky_scratch_card:1", "nypsi_crate:1", "tag:animal_lover"]
   }
 }
