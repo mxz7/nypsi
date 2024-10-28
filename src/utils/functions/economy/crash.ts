@@ -100,7 +100,7 @@ async function render(client: NypsiClient) {
       }
     }
 
-    embed.setDescription("starting <t:" + lastJoin + ":R>");
+    embed.setDescription("starting <t:" + Math.floor(lastJoin / 1000) + 30 + ":R>");
   }
 
   const channel = client.channels.cache.get(Constants.CRASH_CHANNEL) as TextBasedChannel;
