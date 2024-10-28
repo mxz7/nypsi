@@ -119,7 +119,7 @@ async function render(client: NypsiClient, status?: CrashStatus) {
       } else {
         const fieldText = embed.data.fields[embed.data.fields.length - 1].value;
 
-        if (fieldText.split("\n").length >= 5) {
+        if (fieldText.split("\n").length >= 6) {
           embed.addField("players", text, true);
         } else {
           embed.data.fields[embed.data.fields.length - 1].value += text;
