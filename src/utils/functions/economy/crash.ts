@@ -374,15 +374,39 @@ async function start(client: NypsiClient) {
         );
 
         if (player.stoppedAt > 1) {
-          calcEarnedGambleXp(player.userId, player.bet, player.autoStop).then(async (xp) => {
-            await addXp(player.userId, xp);
+          const [xp, { multi }] = await Promise.all([
+            calcEarnedGambleXp(player.userId, player.bet, player.autoStop),
+            getGambleMulti(player.userId),
+          ]);
+
+          if (multi > 0) player.won = player.won + Math.round(player.won * multi);
+          addBalance(player.userId, player.won);
+
+          createGame({
+            userId: player.userId,
+            bet: player.bet,
+            game: "crash",
+            result: "win",
+            outcome: status.value.toFixed(2),
+            earned: player.won,
+            xp: xp,
+          });
+
+          if (xp > 0) {
+            addXp(player.userId, xp);
             const guild = await getGuildName(player.userId);
             if (guild) await addToGuildXP(guild, xp, player.userId);
+          }
+        } else {
+          createGame({
+            userId: player.userId,
+            bet: player.bet,
+            game: "crash",
+            result: "lose",
+            outcome: status.value.toFixed(2),
+            earned: player.won,
           });
-          getGambleMulti(player.userId).then(({ multi }) => {
-            if (multi > 0) player.won = player.won + Math.round(player.won * multi);
-            addBalance(player.userId, player.won);
-          });
+          addBalance(player.userId, player.won);
         }
       } else if (player.autoStop && player.autoStop <= status.value && !player.won) {
         player.stoppedAt = player.autoStop;
@@ -416,6 +440,16 @@ async function start(client: NypsiClient) {
             const guild = await getGuildName(player.userId);
             if (guild) await addToGuildXP(guild, xp, player.userId);
           }
+        } else {
+          createGame({
+            userId: player.userId,
+            bet: player.bet,
+            game: "crash",
+            result: "draw",
+            outcome: status.value.toFixed(2),
+            earned: player.won,
+          });
+          addBalance(player.userId, player.won);
         }
       }
     }
