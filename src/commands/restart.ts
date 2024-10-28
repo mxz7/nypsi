@@ -4,6 +4,7 @@ import { NypsiClient } from "../models/Client";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
+import { getCrashStatus } from "../utils/functions/economy/crash";
 import { setCustomPresence } from "../utils/functions/presence";
 import { startRestart } from "../utils/handlers/commandhandler";
 import { logger } from "../utils/logger";
@@ -50,8 +51,9 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
 
     const check = setInterval(async () => {
       const thingy = await redis.scard(Constants.redis.nypsi.USERS_PLAYING);
+      const crashStatus = await getCrashStatus();
 
-      if (thingy == 0) {
+      if (thingy == 0 && crashStatus.state === "waiting" && crashStatus.players.length === 0) {
         for (let i = 0; i < (message.client as NypsiClient).cluster.count; i++) {
           await redis.set(`${Constants.redis.nypsi.RESTART}:${i}`, "t");
         }
