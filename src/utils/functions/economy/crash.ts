@@ -151,7 +151,8 @@ export async function addCrashPlayer(interaction: ButtonInteraction) {
         new TextInputBuilder()
           .setLabel("auto stop")
           .setCustomId("auto-stop")
-          .setStyle(TextInputStyle.Short),
+          .setStyle(TextInputStyle.Short)
+          .setRequired(false),
       ),
     );
 
