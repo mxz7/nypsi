@@ -13,9 +13,12 @@ import {
 } from "discord.js";
 import redis from "../../../init/redis";
 import { NypsiClient } from "../../../models/Client";
+import { NypsiMessage } from "../../../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../../../models/EmbedBuilders";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
+import { a } from "../anticheat";
+import { isLockedOut, verifyUser } from "../captcha";
 import { percentChance } from "../random";
 import sleep from "../sleep";
 import { addBalance, calcMaxBet, getBalance, getGambleMulti, removeBalance } from "./balance";
@@ -216,6 +219,16 @@ export async function addCrashPlayer(interaction: ButtonInteraction) {
     );
 
   await interaction.showModal(modal);
+
+  a(interaction.user.id, interaction.user.username, "crash", "crash");
+
+  if (await isLockedOut(interaction.user.id)) {
+    const message = interaction as unknown as NypsiMessage;
+
+    message.author = interaction.user;
+    message.content = "crash";
+    return verifyUser(message);
+  }
 
   const modalInteraction = await interaction
     .awaitModalSubmit({
