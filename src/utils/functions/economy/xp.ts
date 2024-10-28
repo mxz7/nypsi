@@ -108,10 +108,16 @@ export async function removeXp(member: GuildMember | string, amount: number, che
 }
 
 export async function calcEarnedGambleXp(
-  member: GuildMember,
+  member: GuildMember | string,
   bet: number,
   multiplier: number,
 ): Promise<number> {
+  let id: string;
+  if (member instanceof GuildMember) {
+    id = member.user.id;
+  } else {
+    id = member;
+  }
   const requiredBet = await getRequiredBetForXp(member);
 
   if (await redis.exists("nypsi:infinitemaxbet")) bet = 0;
@@ -125,7 +131,7 @@ export async function calcEarnedGambleXp(
   const [inventory, tier, booster, boosters, upgrades, rawLevel, maxBet] = await Promise.all([
     getInventory(member),
     getTier(member),
-    isBooster(member.user.id),
+    isBooster(id),
     getBoosters(member),
     getUpgrades(member),
     getRawLevel(member),
@@ -145,7 +151,7 @@ export async function calcEarnedGambleXp(
     if (chance < 2) {
       min -= Math.floor(Math.random() * 7);
     } else {
-      gemBreak(member.user.id, 0.007, "white_gem");
+      gemBreak(id, 0.007, "white_gem");
       min += Math.floor(Math.random() * 17) + 1;
     }
   }

@@ -3,11 +3,11 @@ import { NypsiClient } from "../models/Client";
 import { ErrorEmbed } from "../models/EmbedBuilders";
 import { InteractionHandler } from "../types/InteractionHandler";
 import Constants from "../utils/Constants";
-import { addCrashPlayer } from "../utils/functions/economy/crash";
+import { crashOut } from "../utils/functions/economy/crash";
 import { isEcoBanned, userExists } from "../utils/functions/economy/utils";
 
 export default {
-  name: "crash-join",
+  name: "crash-out",
   type: "interaction",
   async run(interaction) {
     if (!interaction.isButton()) return;
@@ -22,6 +22,6 @@ export default {
       return interaction.reply({ embeds: [new ErrorEmbed("nypsi is rebooting")] });
     }
 
-    await addCrashPlayer(interaction);
+    await crashOut(interaction);
   },
 } as InteractionHandler;
