@@ -35,6 +35,7 @@ import {
 } from "../utils/functions/economy/levelling.js";
 import {
   createUser,
+  formatNumberPretty,
   getItems,
   getTagsData,
   getUpgradesData,
@@ -215,9 +216,9 @@ async function run(
     if (gems.includes("green_gem")) gemLine += `${getItems()["green_gem"].emoji}`;
 
     const balanceSection =
-      `${padlockStatus ? "🔒" : "💰"} $**${formatNumber(balance)}**\n` +
-      `💳 $**${formatNumber(bankBalance)}** / $**${formatNumber(bankMaxBalance)}**${
-        net.amount > 15_000_000 ? `\n🌍 $**${formatNumber(net.amount)}**` : ""
+      `${padlockStatus ? "🔒" : "💰"} $**${formatNumberPretty(balance)}**\n` +
+      `💳 $**${formatNumberPretty(bankBalance)}** / $**${formatNumberPretty(bankMaxBalance)}**${
+        net.amount > 15_000_000 ? `\n🌍 $**${formatNumberPretty(net.amount)}**` : ""
       }`;
 
     if (gemLine) embed.setDescription(gemLine);
@@ -225,8 +226,8 @@ async function run(
     embed.addField(
       "level",
       `P${prestige} L${level}\n` +
-        `**${formatNumber(xp)}**xp/**${formatNumber(levelRequirements.xp)}**xp\n` +
-        `$**${formatNumber(bankBalance)}**/$**${formatNumber(levelRequirements.money)}**`,
+        `**${formatNumberPretty(xp)}**xp/**${formatNumberPretty(levelRequirements.xp)}**xp\n` +
+        `$**${formatNumberPretty(bankBalance)}**/$**${formatNumberPretty(levelRequirements.money)}**`,
       true,
     );
     if (guild)
@@ -554,18 +555,3 @@ async function run(
 cmd.setRun(run);
 
 module.exports = cmd;
-
-function formatNumber(number: number): string {
-  let out: string;
-  if (number >= 1e9) {
-    out = (number / 1e9).toFixed(1) + "b";
-  } else if (number >= 1e6) {
-    out = (number / 1e6).toFixed(1) + "m";
-  } else if (number >= 1e3) {
-    out = (number / 1e3).toFixed(1) + "k";
-  } else {
-    return number.toString();
-  }
-
-  return out.replace(".0", "");
-}

@@ -226,7 +226,7 @@ export async function createUser(member: GuildMember | string) {
 
 export async function formatBet(
   bet: string | number,
-  member: GuildMember,
+  member: GuildMember | string,
   maxBet?: number,
 ): Promise<number | void> {
   if (!maxBet) maxBet = await calcMaxBet(member);
@@ -270,6 +270,21 @@ export function formatNumber(number: string | number) {
   if (isNaN(parseFloat(number.toString()))) return null;
 
   return Math.floor(parseFloat(number.toString()));
+}
+
+export function formatNumberPretty(number: number): string {
+  let out: string;
+  if (number >= 1e9) {
+    out = (number / 1e9).toFixed(1) + "b";
+  } else if (number >= 1e6) {
+    out = (number / 1e6).toFixed(1) + "m";
+  } else if (number >= 1e3) {
+    out = (number / 1e3).toFixed(1) + "k";
+  } else {
+    return number.toString();
+  }
+
+  return out.replace(".0", "");
 }
 
 export async function isEcoBanned(id: string): Promise<BanCache> {

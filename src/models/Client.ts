@@ -23,17 +23,17 @@ import roleDelete from "../events/roleDelete";
 import userUpdate from "../events/userUpdate";
 import redis from "../init/redis";
 import { doAutosellSitrep } from "../scheduled/clusterjobs/autosell_status";
+import { runBirthdays } from "../scheduled/clusterjobs/birthdays";
 import { runAuctionChecks } from "../scheduled/clusterjobs/checkauctions";
 import { updateCounters } from "../scheduled/clusterjobs/counters";
 import { runCraftItemsJob } from "../scheduled/clusterjobs/crafted";
 import { runLogs, runModerationChecks } from "../scheduled/clusterjobs/moderationchecks";
 import startRandomDrops from "../scheduled/clusterjobs/random-drops";
-
-import { runBirthdays } from "../scheduled/clusterjobs/birthdays";
 import { runPremiumCrateInterval } from "../scheduled/clusterjobs/weeklycrates";
 import { runWorkerInterval } from "../scheduled/clusterjobs/workers";
 import Constants from "../utils/Constants";
 import { doChatReactions } from "../utils/functions/chatreactions/utils";
+import { initCrashGame } from "../utils/functions/economy/crash";
 import { runEconomySetup } from "../utils/functions/economy/utils";
 import { runChristmas } from "../utils/functions/guilds/christmas";
 import { runCountdowns } from "../utils/functions/guilds/countdowns";
@@ -206,6 +206,8 @@ export class NypsiClient extends Client {
     doChatReactions(this);
     runCommandUseTimers(this);
     runBirthdays(this);
+
+    if (this.channels.cache.get(Constants.CRASH_CHANNEL)) initCrashGame(this);
 
     if (this.cluster.id != 0) return;
 
