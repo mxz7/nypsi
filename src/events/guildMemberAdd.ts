@@ -103,32 +103,27 @@ export default async function guildMemberAdd(member: GuildMember) {
     }, 120000);
   }
 
-  let toBan: string = null;
+  if (await isAltPunish(member.guild)) {
+    const alts = await getAllGroupAccountIds(member.guild, member.user.id);
 
-  for (const id of await getAllGroupAccountIds(member.guild, member.user.id)) {
-    if (await isBanned(member.guild, id)) toBan = id;
-  }
+    for (const id of alts) {
+      if (await isBanned(member.guild, id)) {
+        const query = await prisma.moderationBan.findFirst({
+          where: {
+            guildId: member.guild.id,
+            userId: id,
+          },
+          select: {
+            expire: true,
+          },
+        });
 
-  if ((await isAltPunish(member.guild)) && toBan) {
-    const query = await prisma.moderationBan.findFirst({
-      where: {
-        guildId: member.guild.id,
-        userId: toBan,
-      },
-      select: {
-        expire: true,
-      },
-    });
+        await member.ban({ reason: `known alt of banned user joined` }).catch(() => {});
 
-    let fail = false;
-
-    await member.ban({ reason: `known alt of banned user joined` }).catch(() => (fail = true));
-
-    if (fail) return;
-
-    await newBan(member.guild, [member.user.id], query.expire);
-
-    return;
+        await newBan(member.guild, [member.user.id], query.expire);
+        break;
+      }
+    }
   }
 
   if ((await getMuteRole(member.guild)) == "timeout") return;

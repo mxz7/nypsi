@@ -13,6 +13,7 @@ import { getPrefix } from "../utils/functions/guilds/utils";
 import { getAllGroupAccountIds } from "../utils/functions/moderation/alts";
 import { newCase } from "../utils/functions/moderation/cases";
 
+import { deleteBan } from "../utils/functions/moderation/ban";
 import { getIdFromUsername, getLastKnownUsername } from "../utils/functions/users/tag";
 
 const cmd = new Command("unban", "unban one or more users", "moderation").setPermissions([
@@ -221,6 +222,7 @@ async function doUnban(
     if (fail || !unbannedUser) return false;
   }
 
+  await deleteBan(message.guild, targetId);
   return await newCase(message.guild, "unban", targetId, message.author, reason);
 }
 
