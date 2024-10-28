@@ -1,6 +1,6 @@
 import redis from "../init/redis";
 import { NypsiClient } from "../models/Client";
-import { ErrorEmbed } from "../models/EmbedBuilders";
+import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { InteractionHandler } from "../types/InteractionHandler";
 import Constants from "../utils/Constants";
 import { addCrashPlayer } from "../utils/functions/economy/crash";
@@ -20,6 +20,17 @@ export default {
       )) == "t"
     ) {
       return interaction.reply({ embeds: [new ErrorEmbed("nypsi is rebooting")] });
+    }
+
+    if (await redis.get("nypsi:maintenance")) {
+      return interaction.reply({
+        embeds: [
+          new CustomEmbed(
+            this.member,
+            "fun & moderation commands are still available to you. maintenance mode only prevents certain commands to prevent loss of progress",
+          ).setTitle("⚠️ nypsi is under maintenance"),
+        ],
+      });
     }
 
     await addCrashPlayer(interaction);
