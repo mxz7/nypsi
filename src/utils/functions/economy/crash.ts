@@ -73,7 +73,7 @@ export async function initCrashGame(client: NypsiClient) {
   ready = true;
   let status = await getCrashStatus();
 
-  if (status.state === "waiting" && status.players.length === 0) return;
+  if (status && status.state === "waiting" && status.players.length === 0) return;
 
   status = {
     state: "waiting",
