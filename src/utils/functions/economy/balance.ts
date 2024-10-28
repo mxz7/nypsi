@@ -11,6 +11,7 @@ import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { getAuctionAverage } from "./auctions";
 import { getBoosters } from "./boosters";
 import { calcCarCost } from "./cars";
+import { getClaimable, getFarm } from "./farm";
 import { getGuildUpgradesByUser } from "./guilds";
 import { calcItemValue, gemBreak, getInventory } from "./inventory";
 import { doLevelUp, getRawLevel, getUpgrades } from "./levelling";
@@ -21,7 +22,6 @@ import { hasVoted } from "./vote";
 import { calcWorkerValues } from "./workers";
 import ms = require("ms");
 import _ = require("lodash");
-import { getClaimable, getFarm } from "./farm";
 
 export async function getBalance(member: GuildMember | string) {
   let id: string;
@@ -749,7 +749,7 @@ export async function calcMaxBet(member: GuildMember | string): Promise<number> 
   return total;
 }
 
-export async function getRequiredBetForXp(member: GuildMember): Promise<number> {
+export async function getRequiredBetForXp(member: GuildMember | string): Promise<number> {
   let requiredBet = 1000;
 
   const level = await getRawLevel(member);
@@ -1033,8 +1033,11 @@ export async function calcNetWorth(
 
     const seed = Object.keys(getItems()).find((i) => getItems()[i].plantId === farm.plantId);
 
-    const seedValue = farms.filter((i) => i.plantId === farm.plantId).length * await calcItemValue(seed);
-    const harvestValue = await getClaimable(id, farm.plantId, false) * await calcItemValue(getPlantsData()[farm.plantId].item);
+    const seedValue =
+      farms.filter((i) => i.plantId === farm.plantId).length * (await calcItemValue(seed));
+    const harvestValue =
+      (await getClaimable(id, farm.plantId, false)) *
+      (await calcItemValue(getPlantsData()[farm.plantId].item));
 
     worth += seedValue + harvestValue;
     farmBreakdown += seedValue + harvestValue;

@@ -149,6 +149,7 @@ export default {
       MONTHLY_ACTIVE: "nypsi:monthlyactive",
       DAILY_COMMANDS: "nypsi:dailycommands",
       HOURLY_COMMAND_PREPROCESS: "nypso:preprocess",
+      CRASH_STATUS: "nypsi:crash:status",
     },
   },
   ADMIN_IDS: ["672793821850894347"] as string[],
@@ -194,4 +195,5 @@ export default {
   HIGHROLLER_ROLE: "1067122363143032992",
   HIGHEROLLER_REQUIREMENT: 500,
   EVIDENCE_BASE: 30000000, // 30MB
+  CRASH_CHANNEL: "1300561687975432272",
 } as const;
