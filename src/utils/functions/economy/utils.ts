@@ -226,7 +226,7 @@ export async function createUser(member: GuildMember | string) {
 
 export async function formatBet(
   bet: string | number,
-  member: GuildMember,
+  member: GuildMember | string,
   maxBet?: number,
 ): Promise<number | void> {
   if (!maxBet) maxBet = await calcMaxBet(member);
