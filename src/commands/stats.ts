@@ -121,11 +121,27 @@ async function run(
       return send({ embeds: [new ErrorEmbed("you have no gamble stats")] });
     }
 
+    const winsMap = new Map<string, number>();
+
+    const promises: Promise<any>[] = [];
+
+    for (const stat of gambleStats) {
+      async function getWins() {
+        const gameWins = await getGameWins(message.member, stat.game);
+
+        winsMap.set(stat.game, gameWins);
+      }
+
+      promises.push(getWins());
+    }
+
+    await Promise.all(promises);
+
     const pages = new Map<string, string>();
     const options = new StringSelectMenuBuilder().setCustomId("game_type");
 
     for (const stat of gambleStats) {
-      const wins = await getGameWins(message.member, stat.game);
+      const wins = winsMap.get(stat.game) || 0;
       const ratio = `${wins.toLocaleString()}/${stat._count._all.toLocaleString()} (${(
         (wins / stat._count._all) *
         100
