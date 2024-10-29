@@ -7,7 +7,7 @@ products.set("gold", { name: "gold", cost: 3 });
 products.set("silver", { name: "silver", cost: 2.5 });
 products.set("bronze", { name: "bronze", cost: 1 });
 products.set("dfcfa66092", { name: "basic_crate", cost: 1 });
-products.set("595ba15808", { name: "69420_crate", cost: 0 });
+products.set("595ba15808", { name: "69420_crate", cost: 0.5 });
 products.set("5569964b90", { name: "nypsi_crate", cost: 3.99 });
 products.set("1e62c44770", { name: "workers_crate", cost: 2.99 });
 products.set("4b1d3a70b2", { name: "boosters_crate", cost: 2.99 });
