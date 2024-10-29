@@ -131,7 +131,7 @@ async function render(client: NypsiClient, status?: CrashStatus) {
     }
 
     if (status.state === "waiting") {
-      embed.setDescription(`starting <t:${Math.floor(lastJoin / 1000) + 30}:R>`);
+      embed.setDescription(`starting <t:${Math.floor(lastJoin / 1000) + 15}:R>`);
     } else if (status.state === "started") {
       embed.setColor(Constants.EMBED_SUCCESS_COLOR);
       embed.setDescription(`\`${status.value.toFixed(2)}x\``);
@@ -309,7 +309,7 @@ export async function addCrashPlayer(interaction: ButtonInteraction) {
   clearTimeout(startTimeout);
   startTimeout = setTimeout(() => {
     start(interaction.client as NypsiClient);
-  }, 30000);
+  }, 15000);
 
   logger.info(`crash: ${interaction.user.username} joined`, status);
 
