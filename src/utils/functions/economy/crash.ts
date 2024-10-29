@@ -82,7 +82,7 @@ export async function initCrashGame(client: NypsiClient) {
     state: "waiting",
     messageId: "",
     players: [],
-    chance: 0,
+    chance: 1,
     value: 0,
   };
 
@@ -350,14 +350,12 @@ async function start(client: NypsiClient) {
   function doGame() {
     status.value = formulas[Math.floor(Math.random() * formulas.length)](status.value);
 
-    status.chance += 0.12;
-    if (status.value >= 1) status.chance += 7;
-    if (status.value >= 2) status.chance += 5;
-    if (status.value >= 3) status.chance += 1;
-    if (status.value >= 4) status.chance += 0.5;
-    if (status.value >= 5) status.chance += 0.1;
+    status.chance += 0.9;
+    if (status.value >= 0.75) status.chance += 7;
+    if (status.value >= 1) status.chance += 3;
+    if (status.value >= 2) status.chance += 0.1;
 
-    if (status.chance > 60) status.chance = 60;
+    if (status.chance > 50) status.chance = 50;
 
     if (percentChance(status.chance)) {
       return true;
