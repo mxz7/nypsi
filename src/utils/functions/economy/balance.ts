@@ -1092,7 +1092,7 @@ export async function calcNetWorth(
         source,
       });
 
-      await addNotificationToQueue(payload);
+      addNotificationToQueue(payload);
     }
   });
 

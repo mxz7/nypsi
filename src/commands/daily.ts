@@ -86,7 +86,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
     addProgress(message.author.id, "gem_hunter", 1);
 
     if ((await getDmSettings(message.member)).other) {
-      await addNotificationToQueue({
+      addNotificationToQueue({
         memberId: message.author.id,
         payload: {
           embed: new CustomEmbed(

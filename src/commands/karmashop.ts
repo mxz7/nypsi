@@ -387,7 +387,7 @@ async function run(
       await redis.expire(Constants.redis.nypsi.GEM_GIVEN, Math.floor(ms("1 days") / 1000));
       await addInventoryItem(message.member, "purple_gem", 1);
       addProgress(message.author.id, "gem_hunter", 1);
-      await addNotificationToQueue({
+      addNotificationToQueue({
         memberId: message.author.id,
         payload: {
           embed: new CustomEmbed(

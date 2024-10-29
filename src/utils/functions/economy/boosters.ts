@@ -117,7 +117,7 @@ async function checkBoosters(member: string | GuildMember, boosters: Map<string,
       if (member instanceof GuildMember) {
         await member.send({ embeds: [embed], content: text });
       } else {
-        await addNotificationToQueue({
+        addNotificationToQueue({
           memberId: userId,
           payload: {
             content: text,

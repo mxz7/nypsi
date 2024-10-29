@@ -66,7 +66,7 @@ async function autosellThing() {
       msg.push(`\nyou found **${cheese.toLocaleString()}** 🧀 lucky cheese`);
     }
 
-    await addNotificationToQueue({
+    addNotificationToQueue({
       memberId: user,
       payload: {
         embed: new CustomEmbed(null, msg.join("\n"))

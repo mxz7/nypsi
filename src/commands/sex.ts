@@ -348,7 +348,7 @@ setInterval(async () => {
     if (dayjs(milf.date).isBefore(dayjs().subtract(6, "hours"))) {
       await redis.lrem(Constants.redis.nypsi.MILF_QUEUE, 1, obj);
       if ((await getDmSettings(milf.userId)).other) {
-        await addNotificationToQueue({
+        addNotificationToQueue({
           memberId: milf.userId,
           payload: {
             embed: new CustomEmbed(undefined, "unfortunately we couldn't find you a milf 😢")

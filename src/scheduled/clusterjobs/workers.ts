@@ -190,7 +190,7 @@ async function doWorkerThing() {
 
       if (!data.payload.embed) continue;
 
-      await addNotificationToQueue(data);
+      addNotificationToQueue(data);
       amount++;
     } catch {
       /* happy linter */

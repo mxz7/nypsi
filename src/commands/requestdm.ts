@@ -24,7 +24,7 @@ async function run(
 
   args.shift();
 
-  await addNotificationToQueue({
+  addNotificationToQueue({
     memberId: user,
     payload: {
       content: args.join(" "),

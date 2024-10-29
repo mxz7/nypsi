@@ -489,7 +489,7 @@ async function checkWatchers(
 
     payload.memberId = userId;
 
-    await addNotificationToQueue(payload);
+    addNotificationToQueue(payload);
 
     await redis.set(`${Constants.redis.cooldown.AUCTION_WATCH}:${userId}`, "true");
     await redis.expire(
