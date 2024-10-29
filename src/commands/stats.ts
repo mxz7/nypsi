@@ -126,7 +126,7 @@ async function run(
     const promises: Promise<any>[] = [];
 
     for (const stat of gambleStats) {
-      async function getWins() {
+      const getWins = async () => {
         const gameWins = await getGameWins(message.member, stat.game);
 
         winsMap.set(stat.game, gameWins);
