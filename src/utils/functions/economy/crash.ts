@@ -82,7 +82,7 @@ export async function initCrashGame(client: NypsiClient) {
     state: "waiting",
     messageId: "",
     players: [],
-    chance: 1,
+    chance: 0.1,
     value: 0,
   };
 
