@@ -207,7 +207,8 @@ export class NypsiClient extends Client {
     runCommandUseTimers(this);
     runBirthdays(this);
 
-    if (this.channels.cache.get(Constants.CRASH_CHANNEL)) initCrashGame(this);
+    if (this.channels.cache.get(Constants.CRASH_CHANNEL) && this.user.id === "678711738845102087")
+      initCrashGame(this);
 
     if (this.cluster.id != 0) return;
 
