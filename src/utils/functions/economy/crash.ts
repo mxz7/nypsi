@@ -489,7 +489,7 @@ async function start(client: NypsiClient) {
 
       setTimeout(() => {
         initCrashGame(client);
-      }, 10000);
+      }, 5000);
     } else {
       await render(client, status);
       await sleep(1000);
