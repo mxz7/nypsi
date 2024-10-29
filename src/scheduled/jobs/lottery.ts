@@ -105,7 +105,7 @@ export default {
         addProgress(winner.winner, "gem_hunter", 1);
 
         if ((await getDmSettings(winner.winner)).other) {
-          await addNotificationToQueue({
+          addNotificationToQueue({
             memberId: winner.winner,
             payload: {
               embed: new CustomEmbed()

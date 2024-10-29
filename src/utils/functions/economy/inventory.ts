@@ -568,7 +568,7 @@ export async function commandGemCheck(member: GuildMember, commandCategory: Comm
     addProgress(member.user.id, "gem_hunter", 1);
 
     if ((await getDmSettings(member)).other) {
-      await addNotificationToQueue({
+      addNotificationToQueue({
         memberId: member.user.id,
         payload: {
           embed: new CustomEmbed(
@@ -588,7 +588,7 @@ export async function commandGemCheck(member: GuildMember, commandCategory: Comm
       addProgress(member.user.id, "gem_hunter", 1);
 
       if ((await getDmSettings(member)).other) {
-        await addNotificationToQueue({
+        addNotificationToQueue({
           memberId: member.user.id,
           payload: {
             embed: new CustomEmbed(
@@ -609,7 +609,7 @@ export async function commandGemCheck(member: GuildMember, commandCategory: Comm
       addProgress(member.user.id, "gem_hunter", 1);
 
       if ((await getDmSettings(member)).other) {
-        await addNotificationToQueue({
+        addNotificationToQueue({
           memberId: member.user.id,
           payload: {
             embed: new CustomEmbed(
@@ -670,7 +670,7 @@ export async function gemBreak(userId: string, chance: number, gem: string) {
       }),
     ]);
 
-    await addNotificationToQueue({
+    addNotificationToQueue({
       memberId: userId,
       payload: {
         embed: new CustomEmbed()
@@ -705,7 +705,7 @@ export async function gemBreak(userId: string, chance: number, gem: string) {
   await addInventoryItem(userId, "gem_shard", amount);
 
   if ((await getDmSettings(userId)).other) {
-    await addNotificationToQueue({
+    addNotificationToQueue({
       memberId: userId,
       payload: {
         embed: new CustomEmbed()

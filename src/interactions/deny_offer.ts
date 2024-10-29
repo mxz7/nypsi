@@ -73,7 +73,7 @@ export default {
     await interaction.message.edit({ embeds: [embed], components: [] });
 
     if ((await getDmSettings(offer.ownerId)).auction) {
-      await addNotificationToQueue({
+      addNotificationToQueue({
         memberId: offer.ownerId,
         payload: {
           content: `your offer to ${interaction.user.username} for ${offer.itemAmount}x ${

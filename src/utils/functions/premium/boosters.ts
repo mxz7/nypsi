@@ -57,7 +57,7 @@ export async function setBooster(userId: string, value: boolean): Promise<void> 
   await redis.del(`${Constants.redis.cache.premium.BOOSTER}:${userId}`);
 
   if (value && (await getDmSettings(userId)).premium) {
-    await addNotificationToQueue({
+    addNotificationToQueue({
       memberId: userId,
       payload: {
         embed: new CustomEmbed(

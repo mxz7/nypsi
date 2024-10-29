@@ -109,7 +109,7 @@ export async function addMember(member: GuildMember | string, level: number, exp
   logger.info(`premium level ${level} given to ${id}`);
 
   if ((await getDmSettings(id)).premium) {
-    await addNotificationToQueue({
+    addNotificationToQueue({
       memberId: id,
       payload: {
         content: `you have been given **${levelString(
@@ -187,7 +187,7 @@ export async function renewUser(member: string) {
   });
 
   if ((await getDmSettings(member)).premium) {
-    await addNotificationToQueue({
+    addNotificationToQueue({
       memberId: member,
       payload: {
         content: `your membership has been renewed until **${formatDate(
@@ -317,7 +317,7 @@ export async function setCredits(id: string, amount: number) {
     },
   });
 
-  await addNotificationToQueue({
+  addNotificationToQueue({
     memberId: id,
     payload: {
       content: `you now have **${amount}** premium credits\n\ncredits will be used automatically once the expire date has elapsed. if your tier changes, you will lose your credits`,

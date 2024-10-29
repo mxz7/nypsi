@@ -222,7 +222,7 @@ async function doVote(vote: topgg.WebhookPayload, manager: ClusterManager) {
     addProgress(user, "gem_hunter", 1);
 
     if ((await getDmSettings(user)).other) {
-      await addNotificationToQueue({
+      addNotificationToQueue({
         memberId: user,
         payload: {
           embed: new CustomEmbed()
@@ -363,7 +363,7 @@ async function handleKofiData(data: KofiResponse) {
               },
             };
 
-            await addNotificationToQueue(payload);
+            addNotificationToQueue(payload);
             if (data.is_public && (await getPreferences(user.id)).leaderboards) {
               const hook = new WebhookClient({ url: process.env.THANKYOU_HOOK });
               await hook.send({
@@ -396,7 +396,7 @@ async function handleKofiData(data: KofiResponse) {
               },
             };
 
-            await addNotificationToQueue(payload);
+            addNotificationToQueue(payload);
             if (data.is_public && (await getPreferences(user.id)).leaderboards) {
               const hook = new WebhookClient({ url: process.env.THANKYOU_HOOK });
               await hook.send({
@@ -423,7 +423,7 @@ async function handleKofiData(data: KofiResponse) {
           addProgress(user.id, "gem_hunter", 1);
 
           if ((await getDmSettings(user.id)).other) {
-            await addNotificationToQueue({
+            addNotificationToQueue({
               memberId: user.id,
               payload: {
                 embed: new CustomEmbed()
@@ -442,7 +442,7 @@ async function handleKofiData(data: KofiResponse) {
           addProgress(user.id, "gem_hunter", 1);
 
           if ((await getDmSettings(user.id)).other) {
-            await addNotificationToQueue({
+            addNotificationToQueue({
               memberId: user.id,
               payload: {
                 embed: new CustomEmbed()
@@ -461,7 +461,7 @@ async function handleKofiData(data: KofiResponse) {
           addProgress(user.id, "gem_hunter", 1);
 
           if ((await getDmSettings(user.id)).other) {
-            await addNotificationToQueue({
+            addNotificationToQueue({
               memberId: user.id,
               payload: {
                 embed: new CustomEmbed()
@@ -479,7 +479,7 @@ async function handleKofiData(data: KofiResponse) {
           addProgress(user.id, "gem_hunter", 1);
 
           if ((await getDmSettings(user.id)).other) {
-            await addNotificationToQueue({
+            addNotificationToQueue({
               memberId: user.id,
               payload: {
                 embed: new CustomEmbed()
@@ -500,7 +500,7 @@ async function handleKofiData(data: KofiResponse) {
             await addInventoryItem(user.id, "white_gem", 1);
             addProgress(user.id, "gem_hunter", 1);
 
-            await addNotificationToQueue({
+            addNotificationToQueue({
               memberId: user.id,
               payload: {
                 embed: new CustomEmbed()

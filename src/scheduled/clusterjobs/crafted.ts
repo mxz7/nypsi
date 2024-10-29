@@ -28,7 +28,7 @@ async function checkCraftItems() {
       await addProgress(item.userId, "gem_hunter", item.amount);
 
     if ((await getDmSettings(item.userId)).other) {
-      await addNotificationToQueue({
+      addNotificationToQueue({
         memberId: item.userId,
         payload: {
           content: `you have finished crafting ${item.amount} ${getItems()[item.itemId].emoji} ${

@@ -78,7 +78,7 @@ export default {
       ) {
         data.memberId = user.userId;
 
-        await addNotificationToQueue(data);
+        addNotificationToQueue(data);
 
         await redis.sadd(Constants.redis.nypsi.VOTE_REMINDER_RECEIVED, user.userId);
       } else {

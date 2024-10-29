@@ -93,7 +93,7 @@ export async function checkPurchases(id: string) {
           },
         };
 
-        await addNotificationToQueue(payload);
+        addNotificationToQueue(payload);
       }
     } else {
       await prisma.user.update({
@@ -136,7 +136,7 @@ export async function checkPurchases(id: string) {
               },
             };
 
-            await addNotificationToQueue(payload);
+            addNotificationToQueue(payload);
           }
         } else {
           await addInventoryItem(id, item.item, 1);
@@ -156,7 +156,7 @@ export async function checkPurchases(id: string) {
               },
             };
 
-            await addNotificationToQueue(payload);
+            addNotificationToQueue(payload);
           }
         }
       }

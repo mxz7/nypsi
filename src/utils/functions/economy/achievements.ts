@@ -221,7 +221,7 @@ async function completeAchievement(userId: string, achievementId: string) {
       },
     };
 
-    await addNotificationToQueue(payload);
+    addNotificationToQueue(payload);
 
     if (percentChance(0.07) && !(await redis.exists(Constants.redis.nypsi.GEM_GIVEN))) {
       await redis.set(Constants.redis.nypsi.GEM_GIVEN, "t");
@@ -233,7 +233,7 @@ async function completeAchievement(userId: string, achievementId: string) {
       await addInventoryItem(userId, gem, 1);
       await addProgress(userId, "gem_hunter", 1);
 
-      await addNotificationToQueue({
+      addNotificationToQueue({
         memberId: userId,
         payload: {
           embed: new CustomEmbed(
