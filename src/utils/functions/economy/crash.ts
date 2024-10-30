@@ -352,7 +352,8 @@ async function start(client: NypsiClient) {
 
     status.chance += 0.5;
     if (status.value >= 0.75) status.chance += 1.5;
-    if (status.value >= 1) status.chance += 3;
+    if (status.value >= 1) status.chance += 2;
+    if (status.value >= 1.5) status.chance += 0.5;
     if (status.value >= 2) status.chance += 0.1;
 
     if (status.chance > 40) status.chance = 40;
