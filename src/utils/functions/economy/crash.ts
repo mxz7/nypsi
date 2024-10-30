@@ -200,7 +200,7 @@ export async function addCrashPlayer(interaction: ButtonInteraction) {
 
   const modal = new ModalBuilder()
     .setCustomId("crash-join-modal")
-    .setTitle("modal")
+    .setTitle("join crash")
     .addComponents(
       new ActionRowBuilder<ModalActionRowComponentBuilder>().addComponents(
         new TextInputBuilder()
