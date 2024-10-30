@@ -304,7 +304,13 @@ export async function openCrate(
           if (items[i].rarity === 6) {
             const chance = Math.floor(Math.random() * 2000);
 
-            if (chance == 7) crateItemsModified.push(i);
+            if (chance == 7) {
+              if (items[i].role === "tag") {
+                const chance = Math.floor(Math.random() * 100);
+
+                if (chance === 7) crateItemsModified.push(i);
+              } else crateItemsModified.push(i);
+            }
           } else if (items[i].rarity == 5) {
             const chance = Math.floor(Math.random() * 50);
 
