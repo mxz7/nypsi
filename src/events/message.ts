@@ -340,7 +340,7 @@ export default async function messageCreate(message: Message) {
 
   if (!message.author.bot) {
     if (message.guildId === Constants.NYPSI_SERVER_ID) checkTask();
-    checkAura();
+    // checkAura();
   }
 
   message.content = message.content.replace(/ +(?= )/g, ""); // remove any additional spaces
