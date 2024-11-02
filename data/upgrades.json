@@ -12,7 +12,7 @@
     "name": "sell multiplier",
     "effect": 3,
     "description": "+{x}% sell multiplier",
-    "max": 10,
+    "max": 15,
     "chance": 15
   },
   "cursor": {
