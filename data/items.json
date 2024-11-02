@@ -3084,7 +3084,7 @@
     "longDesc": "the best fruit",
     "aliases": ["appy"],
     "rarity": 0,
-    "role": "item",
+    "role": "sellable",
     "buy": 0,
     "sell": 50000,
     "in_crates": false
