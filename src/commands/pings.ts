@@ -87,9 +87,7 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
   const prefix = (await getPrefix(message.guild))[0];
 
   if (!qualified) {
-    const embed = new ErrorEmbed(
-      `this server does not qualify to track mentions (/pings)\n[more information](https://docs.nypsi.xyz/#my-server-does-not-qualify-for-the-pings-command)\njoin the support server for help (${prefix}support)`,
-    );
+    const embed = new ErrorEmbed(`this server does not qualify to track mentions (/pings)`);
 
     return send({ embeds: [embed] });
   }

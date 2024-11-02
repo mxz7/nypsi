@@ -98,7 +98,7 @@ async function run(
       .setHeader("alts help")
       .addField(
         "info",
-        "keep track of a user's alts in one easy place\n\nalts of a user can be automatically punished with their main\naccount when one is punished (/settings server alt-punish)\n[more info](https://docs.nypsi.xyz/moderation/alt-punish)",
+        "keep track of a user's alts in one easy place\n\nalts of a user can be automatically punished with their main\naccount when one is punished (/settings server alt-punish)\n[more info](https://nypsi.xyz/docs/moderation/alt-punish)",
       )
       .addField("usage", `${prefix}alts @user\n${prefix}alts <user ID or tag>`);
 

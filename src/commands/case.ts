@@ -29,7 +29,7 @@ import { getLastKnownUsername } from "../utils/functions/users/tag";
 
 const cmd = new Command("case", "get information about a given case", "moderation")
   .setPermissions(["MANAGE_MESSAGES", "MANAGE_SERVER", "MODERATE_MEMBERS"])
-  .setDocs("https://docs.nypsi.xyz/moderation/cases");
+  .setDocs("https://nypsi.xyz/docs/moderation/cases");
 
 cmd.slashEnabled = true;
 cmd.slashData.addIntegerOption((option) =>

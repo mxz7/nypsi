@@ -6,7 +6,7 @@ import { getMuteRole, setMuteRole } from "../utils/functions/moderation/mute";
 
 const cmd = new Command("muterole", "set the muterole for the server", "admin")
   .setPermissions(["MANAGE_SERVER"])
-  .setDocs("https://docs.nypsi.xyz/moderation/muterole");
+  .setDocs("https://nypsi.xyz/docs/moderation/muterole");
 
 async function run(
   message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction),

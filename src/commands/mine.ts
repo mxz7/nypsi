@@ -55,7 +55,7 @@ const areas = [
 ];
 
 const cmd = new Command("mine", "go to a cave and mine", "money").setDocs(
-  "https://docs.nypsi.xyz/economy/fishhuntmine",
+  "https://nypsi.xyz/docs/economy/fish-hunt-mine",
 );
 
 cmd.slashEnabled = true;
@@ -134,7 +134,7 @@ async function doMine(
     return send({
       embeds: [
         new ErrorEmbed(
-          "you need a pickaxe to mine\n[how do i get a pickaxe?](https://docs.nypsi.xyz/economy/fishhuntmine)",
+          "you need a pickaxe to mine\n[how do i get a pickaxe?](https://nypsi.xyz/docs/economy/fishhuntmine)",
         ),
       ],
       ephemeral: true,

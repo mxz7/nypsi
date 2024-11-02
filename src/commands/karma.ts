@@ -11,7 +11,7 @@ import { getKarma } from "../utils/functions/karma/karma";
 import { getMember } from "../utils/functions/member";
 
 const cmd = new Command("karma", "check how much karma you have", "info").setDocs(
-  "https://docs.nypsi.xyz/economy/karma",
+  "https://nypsi.xyz/docs/economy/karma",
 );
 
 cmd.slashEnabled = true;

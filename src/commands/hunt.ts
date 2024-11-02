@@ -120,7 +120,7 @@ async function doHunt(
     return send({
       embeds: [
         new ErrorEmbed(
-          "you need a gun to hunt\n[how do i get a gun?](https://docs.nypsi.xyz/economy/fishhuntmine)",
+          "you need a gun to hunt\n[how do i get a gun?](https://nypsi.xyz/docs/economy/fish-hunt-mine)",
         ),
       ],
       ephemeral: true,

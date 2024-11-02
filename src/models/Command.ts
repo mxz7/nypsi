@@ -32,13 +32,13 @@ export class Command {
 
     switch (category) {
       case "money":
-        this.docs = "https://docs.nypsi.xyz/economy/";
+        this.docs = "https://nypsi.xyz/docs";
         break;
       case "music":
-        this.docs = "https://docs.nypsi.xyz/music/";
+        this.docs = "https://nypsi.xyz/docs/music";
         break;
       case "moderation":
-        this.docs = "https://docs.nypsi.xyz/moderation/";
+        this.docs = "https://nypsi.xyz/docs";
         break;
     }
 
@@ -70,7 +70,7 @@ export class Command {
   }
 
   public setDocs(url: string) {
-    if (!url.startsWith("https://docs.nypsi.xyz/")) {
+    if (!url.startsWith("https://nypsi.xyz/docs/")) {
       throw new Error(`invalid nypsi docs url given for command: ${this.name}`);
     }
 
