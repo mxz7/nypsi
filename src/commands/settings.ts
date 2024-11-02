@@ -747,8 +747,8 @@ async function run(
           message.member,
           `✅ ${
             message.options.getBoolean("value")
-              ? "alts will be automatically punished as a group\n\n[more info](https://docs.nypsi.xyz/moderation/alt-punish)"
-              : "alts will not be automatically punished as a group\n\n[more info](https://docs.nypsi.xyz/moderation/alt-punish)"
+              ? "alts will be automatically punished as a group\n\n[more info](https://nypsi.xyz/docs/moderation/alt-punish)"
+              : "alts will not be automatically punished as a group\n\n[more info](https://nypsi.xyz/docs/moderation/alt-punish)"
           }`,
         ),
       ],

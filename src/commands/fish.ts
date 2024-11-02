@@ -106,7 +106,7 @@ async function doFish(
     return send({
       embeds: [
         new ErrorEmbed(
-          "you need a fishing rod to fish\n[how do i get a fishing rod?](https://docs.nypsi.xyz/economy/fishhuntmine)",
+          "you need a fishing rod to fish\n[how do i get a fishing rod?](https://nypsi.xyz/docs/economy/fish-hunt-mine)",
         ),
       ],
       ephemeral: true,

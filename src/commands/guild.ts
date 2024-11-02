@@ -56,7 +56,7 @@ import ms = require("ms");
 
 const cmd = new Command("guild", "create and manage your guild/clan", "money")
   .setAliases(["g", "clan"])
-  .setDocs("https://docs.nypsi.xyz/economy/guilds");
+  .setDocs("https://nypsi.xyz/docs/economy/guilds");
 
 cmd.slashEnabled = true;
 
