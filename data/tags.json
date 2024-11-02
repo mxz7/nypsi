@@ -161,6 +161,30 @@
     "description": "prestige 30 tag",
     "emoji": "❤️"
   },
+  "p40": {
+    "id": "p40",
+    "name": "prestige 40",
+    "description": "prestige 40 tag",
+    "emoji": "💛"
+  },
+  "p50": {
+    "id": "p50",
+    "name": "prestige 50",
+    "description": "prestige 50 tag",
+    "emoji": "💜"
+  },
+  "p60": {
+    "id": "p60",
+    "name": "prestige 60",
+    "description": "prestige 60 tag",
+    "emoji": "🖤"
+  },
+  "p70": {
+    "id": "p70",
+    "name": "prestige 70",
+    "description": "prestige 70 tag",
+    "emoji": "🤍"
+  },
   "mechanic": {
     "id": "mechanic",
     "name": "mechanic",
