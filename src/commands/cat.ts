@@ -12,6 +12,8 @@ const cmd = new Command("cat", "get a random picture of a cat", "animals").setAl
   "chipichipichapachapaloobieloobielabalabamagicomiloobieloobieboomboomboomboom",
 ]);
 
+cmd.slashEnabled = true;
+
 async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) {
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);

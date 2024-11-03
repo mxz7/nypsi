@@ -8,6 +8,8 @@ import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldown
 
 const cmd = new Command("dog", "get a random picture of a dog", "animals");
 
+cmd.slashEnabled = true;
+
 async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInteraction)) {
   if (await onCooldown(cmd.name, message.member)) {
     const res = await getResponse(cmd.name, message.member);
