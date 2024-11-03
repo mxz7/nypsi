@@ -82,7 +82,7 @@
   "hunter_i": {
     "id": "hunter_i",
     "name": "hunter **I**",
-    "emoji": ":gun:",
+    "emoji": "🔫",
     "target": 100,
     "description": "hunt 100 animals",
     "prize": ["lucky_scratch_card:1"]
@@ -90,7 +90,7 @@
   "hunter_ii": {
     "id": "hunter_ii",
     "name": "hunter **II**",
-    "emoji": ":gun:",
+    "emoji": "🔫",
     "target": 500,
     "description": "hunt 500 animals",
     "prize": ["lucky_scratch_card:2"]
@@ -98,7 +98,7 @@
   "hunter_iii": {
     "id": "hunter_iii",
     "name": "hunter **III**",
-    "emoji": ":gun:",
+    "emoji": "🔫",
     "target": 1000,
     "description": "hunt 1,000 animals",
     "prize": ["lucky_scratch_card:3"]
@@ -106,7 +106,7 @@
   "hunter_iv": {
     "id": "hunter_iv",
     "name": "hunter **IV**",
-    "emoji": ":gun:",
+    "emoji": "🔫",
     "target": 10000,
     "description": "hunt 10,000 animals",
     "prize": ["lucky_scratch_card:4"]
@@ -114,7 +114,7 @@
   "hunter_v": {
     "id": "hunter_v",
     "name": "hunter **V**",
-    "emoji": ":gun:",
+    "emoji": "🔫",
     "target": 25000,
     "description": "hunt 25,000 animals",
     "prize": ["legendary_scratch_card:1"]
@@ -122,7 +122,7 @@
   "miner_i": {
     "id": "miner_i",
     "name": "miner **I**",
-    "emoji": ":pick:",
+    "emoji": "⛏️",
     "target": 500,
     "description": "mine 500 items",
     "prize": ["lucky_scratch_card:1"]
@@ -130,7 +130,7 @@
   "miner_ii": {
     "id": "miner_ii",
     "name": "miner **II**",
-    "emoji": ":pick:",
+    "emoji": "⛏️",
     "target": 1000,
     "description": "mine 1,000 items",
     "prize": ["lucky_scratch_card:2"]
@@ -138,7 +138,7 @@
   "miner_iii": {
     "id": "miner_iii",
     "name": "miner **III**",
-    "emoji": ":pick:",
+    "emoji": "⛏️",
     "target": 5000,
     "description": "mine 5,000 items",
     "prize": ["lucky_scratch_card:3"]
@@ -146,7 +146,7 @@
   "miner_iv": {
     "id": "miner_iv",
     "name": "miner **IV**",
-    "emoji": ":pick:",
+    "emoji": "⛏️",
     "target": 15000,
     "description": "mine 15,000 items",
     "prize": ["lucky_scratch_card:4"]
@@ -154,7 +154,7 @@
   "miner_v": {
     "id": "miner_v",
     "name": "miner **V**",
-    "emoji": ":pick:",
+    "emoji": "⛏️",
     "target": 50000,
     "description": "mine 50,000 items",
     "prize": ["lucky_scratch_card:5"]
