@@ -385,7 +385,7 @@ model Game {
 
   economy Economy? @relation(fields: [userId], references: [userId])
 
-  @@index([userId])
+  @@index([userId, game])
 }
 
 model Stats {
