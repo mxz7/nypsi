@@ -145,20 +145,37 @@ const xpFormula = (level: number, prestige: number) => {
   return Math.floor(Math.pow(level + 1, 1.117 + 0.077 * prestigeModified) + 50 + 15 * prestige) - 1;
 };
 const moneyFormula = (level: number) => Math.floor(Math.pow(level + 1, 2.103) + 10_000) - 1;
-const cratesFormula = (level: number, prestige: number) => {
+const cratesFormula = (rawLevel: number) => {
+  const prestige = Math.floor(rawLevel / 100);
+  const level = rawLevel - prestige * 100;
   const neededXp = xpFormula(level, prestige);
 
-  if (neededXp < 500) {
-    if (level % 15 !== 0) return 0;
+  let crates = neededXp / 200 + prestige * 0.69;
+
+  if (rawLevel < 1000) {
+    if (rawLevel % 30 !== 0) crates = 0;
+  } else if (rawLevel < 1500) {
+    crates = neededXp / 250;
+    if (rawLevel % 30 !== 0) crates = 0;
+  } else if (rawLevel < 2000) {
+    crates = neededXp / 250;
+    if (rawLevel % 25 !== 0) crates = 0;
+  } else if (rawLevel < 3000) {
+    crates = neededXp / 300;
+    if (rawLevel % 25 !== 0) crates = 0;
+  } else if (rawLevel < 4000) {
+    crates = neededXp / 350;
+    if (rawLevel % 20 !== 0) crates = 0;
+  } else if (rawLevel < 5000) {
+    crates = neededXp / 400;
+    if (rawLevel % 15 !== 0) crates = 0;
+  } else if (rawLevel < 6000) {
+    crates = neededXp / 400;
+    if (rawLevel % 15 !== 0) crates = 0;
   } else {
-    if (level % 10 !== 0) return 0;
+    crates = neededXp / 400;
+    if (rawLevel % 15 !== 0) crates = 0;
   }
-
-  let crates = neededXp / 200;
-
-  crates += prestige * 0.69;
-
-  if (crates > 5) crates = 5;
 
   return Math.floor(crates);
 };
@@ -446,7 +463,7 @@ export async function doLevelUp(member: GuildMember | string) {
         }
       }
     } else {
-      const crates = cratesFormula(beforeLevel + levels, beforePrestige);
+      const crates = cratesFormula(rawLevel);
 
       if (crates > 0) {
         if (items.has("basic_crate")) items.set("basic_crate", items.get("basic_crate") + crates);
