@@ -14,6 +14,7 @@ import { addBooster, getBoosters } from "./boosters";
 import { addInventoryItem } from "./inventory";
 import { addStat } from "./stats";
 import { addTaskProgress } from "./tasks";
+import { getItems } from "./utils";
 import { getXp, removeXp } from "./xp";
 import ms = require("ms");
 import dayjs = require("dayjs");
@@ -118,8 +119,12 @@ levellingRewards.set(2500, {
   rewards: ["tag:p25"],
 });
 levellingRewards.set(3000, {
-  text: ["you have received:\n" + "- ❤️ prestige 30 tag"],
-  rewards: ["tag:p30"],
+  text: [
+    "you have received:\n" +
+      "- ❤️ prestige 30 tag\n" +
+      `- ${getItems()["omega_crate"].emoji} ${getItems()["omega_crate"].name}`,
+  ],
+  rewards: ["tag:p30", "id:omega_crate"],
 });
 levellingRewards.set(4000, {
   text: ["you have received:\n" + "- 💛 prestige 40 tag"],
@@ -130,8 +135,12 @@ levellingRewards.set(5000, {
   rewards: ["tag:p50"],
 });
 levellingRewards.set(6000, {
-  text: ["you have received:\n" + "- 🖤 prestige 60 tag"],
-  rewards: ["tag:p60"],
+  text: [
+    "you have received:\n" +
+      "- 🖤 prestige 60 tag\n" +
+      `- ${getItems()["omega_crate"].emoji} ${getItems()["omega_crate"].name}`,
+  ],
+  rewards: ["tag:p60", "id:omega_crate"],
 });
 levellingRewards.set(7000, {
   text: ["you have received:\n" + "- 🤍 prestige 70 tag"],
