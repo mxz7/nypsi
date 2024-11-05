@@ -36,8 +36,8 @@ importers:
         specifier: 4.1.2
         version: 4.1.2
       cron:
-        specifier: ^3.1.8
-        version: 3.1.8
+        specifier: ^3.1.9
+        version: 3.1.9
       crypto-js:
         specifier: 4.2.0
         version: 4.2.0
@@ -1472,8 +1472,8 @@ packages:
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
     hasBin: true
 
-  cron@3.1.8:
-    resolution: {integrity: sha512-45bqmAOSd/XB5JJWfV1W59fFEzqgNNWmOYQZVcw0sfyQqU35HFdVfTsr2xzlqWoTAfspRrvK0lSSLj8Pj9YmpQ==}
+  cron@3.1.9:
+    resolution: {integrity: sha512-eNZu+YhLRHLxNJNqZgYuy8mXhzMV0XXmOSh+Ls2j1yTeQLCQ04ya7oNpujxwl4lEyck1fcVa1aRVZ+T4tAC7SA==}
 
   cross-fetch@4.0.0:
     resolution: {integrity: sha512-e4a5N8lVvuLgAWgnCrLr2PP0YyDOTHa9H/Rj54dirp61qXnNq46m82bRhNqIA5VccJtWBvPTFRV3TtvHUKPB1g==}
@@ -5047,7 +5047,7 @@ snapshots:
       - supports-color
       - ts-node
 
-  cron@3.1.8:
+  cron@3.1.9:
     dependencies:
       '@types/luxon': 3.4.2
       luxon: 3.5.0
