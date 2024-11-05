@@ -332,6 +332,9 @@ async function start(client: NypsiClient) {
 
   await setCrashStatus(status);
 
+  await render(client, status);
+  await sleep(1000);
+
   const formulas = [
     (i: number) => {
       if (i < 1) i += 0.05;
