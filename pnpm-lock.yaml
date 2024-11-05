@@ -12,8 +12,8 @@ importers:
         specifier: ^3.685.0
         version: 3.685.0
       '@catppuccin/palette':
-        specifier: 1.5.0
-        version: 1.5.0
+        specifier: 1.7.1
+        version: 1.7.1
       '@discordjs/rest':
         specifier: 2.4.0
         version: 2.4.0
@@ -492,8 +492,8 @@ packages:
   '@bcoe/v8-coverage@0.2.3':
     resolution: {integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==}
 
-  '@catppuccin/palette@1.5.0':
-    resolution: {integrity: sha512-SQd/1h2gkK+nA5SWfd7NnUA/RsM8fIMJaqB8HzwATlNSDtPzTI7qmy3ei+jlgThlGILvdDt0C5CJ+3n/G9trKw==}
+  '@catppuccin/palette@1.7.1':
+    resolution: {integrity: sha512-aRc1tbzrevOTV7nFTT9SRdF26w/MIwT4Jwt4fDMc9itRZUDXCuEDBLyz4TQMlqO9ZP8mf5Hu4Jr6D03NLFc6Gw==}
 
   '@discordjs/builders@1.9.0':
     resolution: {integrity: sha512-0zx8DePNVvQibh5ly5kCEei5wtPBIUbSoE9n+91Rlladz4tgtFbJ36PZMxxZrTEOQ7AHMZ/b0crT/0fCy6FTKg==}
@@ -3754,7 +3754,7 @@ snapshots:
 
   '@bcoe/v8-coverage@0.2.3': {}
 
-  '@catppuccin/palette@1.5.0': {}
+  '@catppuccin/palette@1.7.1': {}
 
   '@discordjs/builders@1.9.0':
     dependencies:
