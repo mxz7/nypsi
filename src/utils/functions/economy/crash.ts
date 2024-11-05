@@ -462,7 +462,6 @@ async function start(client: NypsiClient) {
             outcome: status.value.toFixed(2),
             earned: player.won,
           });
-          addBalance(player.userId, player.won);
         }
       }
     }
@@ -477,7 +476,7 @@ async function start(client: NypsiClient) {
             userId: player.userId,
             bet: player.bet,
             game: "crash",
-            result: "loss",
+            result: "lose",
             outcome: status.value.toFixed(2),
           });
         }
