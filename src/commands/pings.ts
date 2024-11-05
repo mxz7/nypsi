@@ -12,7 +12,6 @@ import {
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import { createUser, userExists } from "../utils/functions/economy/utils";
-import { getPrefix } from "../utils/functions/guilds/utils";
 import { getKarma } from "../utils/functions/karma/karma";
 import PageManager from "../utils/functions/page";
 import { isPremium } from "../utils/functions/premium/premium";
@@ -83,8 +82,6 @@ async function run(message: NypsiMessage | (NypsiCommandInteraction & CommandInt
     await createUser(message.member);
     qualified = true;
   }
-
-  const prefix = (await getPrefix(message.guild))[0];
 
   if (!qualified) {
     const embed = new ErrorEmbed(`this server does not qualify to track mentions (/pings)`);
