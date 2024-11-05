@@ -458,7 +458,7 @@ async function start(client: NypsiClient) {
             userId: player.userId,
             bet: player.bet,
             game: "crash",
-            result: "draw",
+            result: "lose",
             outcome: status.value.toFixed(2),
             earned: player.won,
           });
