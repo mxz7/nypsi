@@ -23,10 +23,12 @@ upgrades.set(9, ["69420_crate:5"]);
 upgrades.set(14, ["69420_crate:5", "lucky_scratch_card:1"]);
 upgrades.set(24, ["69420_crate:5", "lucky_scratch_card:2"]);
 upgrades.set(49, ["69420_crate:5", "lucky_scratch_card:2", "nypsi_crate:1"]);
-upgrades.set(99, ["69420_crate:10", "lucky_scratch_card:2", "nypsi_crate:2"]);
+upgrades.set(99, ["69420_crate:10", "lucky_scratch_card:2", "nypsi_crate:2", "omega_crate:1"]);
+upgrades.set(100, ["69420_crate:10", "lucky_scratch_card:2", "nypsi_crate:2"]);
 upgrades.set(149, ["69420_crate:10", "lucky_scratch_card:3", "nypsi_crate:2"]);
 upgrades.set(174, ["69420_crate:10", "lucky_scratch_card:3", "nypsi_crate:3"]);
-upgrades.set(199, ["69420_crate:10", "lucky_scratch_card:4", "nypsi_crate:3"]);
+upgrades.set(199, ["69420_crate:10", "lucky_scratch_card:4", "nypsi_crate:3", "omega_crate:1"]);
+upgrades.set(200, ["69420_crate:10", "lucky_scratch_card:4", "nypsi_crate:3"]);
 
 export async function getGuildByName(name: string) {
   const guild = await prisma.economyGuild
