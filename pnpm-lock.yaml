@@ -66,8 +66,8 @@ importers:
         specifier: 4.17.21
         version: 4.17.21
       mathjs:
-        specifier: 13.2.0
-        version: 13.2.0
+        specifier: 13.2.1
+        version: 13.2.1
       ms:
         specifier: 2.1.3
         version: 2.1.3
@@ -473,8 +473,8 @@ packages:
     peerDependencies:
       '@babel/core': ^7.0.0-0
 
-  '@babel/runtime@7.25.7':
-    resolution: {integrity: sha512-FjoyLe754PMiYsFaN5C94ttGiOmBNYTf6pLr4xXHAT5uctHb092PBszndLDR5XA/jghQvn4n7JMHl7dmTgbm9w==}
+  '@babel/runtime@7.26.0':
+    resolution: {integrity: sha512-FDSOghenHTiToteC/QRlv2q3DhPZ/oOXTBoirfWNx1Cx3TMVcGWQtMMmQcSvb/JjpNeGzx8Pq/b4fKEJuWm1sw==}
     engines: {node: '>=6.9.0'}
 
   '@babel/template@7.24.7':
@@ -1443,8 +1443,8 @@ packages:
     resolution: {integrity: sha512-1rXeuUUiGGrykh+CeBdu5Ie7OJwinCgQY0bc7GCRxy5xVHy+moaqkpL/jqQq0MtQOeYcrqEz4abc5f0KtU7W4A==}
     engines: {node: '>=12.5.0'}
 
-  complex.js@2.1.1:
-    resolution: {integrity: sha512-8njCHOTtFFLtegk6zQo0kkVX1rngygb/KQI6z1qZxlFI3scluC+LVTCFbrkWjBv4vvLlbQ9t88IPMC6k95VTTg==}
+  complex.js@2.4.2:
+    resolution: {integrity: sha512-qtx7HRhPGSCBtGiST4/WGHuW+zeaND/6Ld+db6PbrulIB1i2Ev/2UPiqcmpQNPSyfBKraC0EOvOKCB5dGZKt3g==}
 
   concat-map@0.0.1:
     resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
@@ -2327,8 +2327,8 @@ packages:
   makeerror@1.0.12:
     resolution: {integrity: sha512-JmqCvUhmt43madlpFzG4BQzG2Z3m6tvQDNKdClZnO3VbIudJYmxsT0FNJMeiB2+JTSlTQTSbU8QdesVmwJcmLg==}
 
-  mathjs@13.2.0:
-    resolution: {integrity: sha512-P5PZoiUX2Tkghkv3tsSqlK0B9My/ErKapv1j6wdxd0MOrYQ30cnGE4LH/kzYB2gA5rN46Njqc4cFgJjaxgijoQ==}
+  mathjs@13.2.1:
+    resolution: {integrity: sha512-HEKNV0hckO5Y4uY/KHucmQMMiXgdNUXfJ+SkExRJHLlD3f7mt4DZMJzndQOoTp/dX8ROwk4zl2xO+iq49OEliQ==}
     engines: {node: '>= 18'}
     hasBin: true
 
@@ -3721,7 +3721,7 @@ snapshots:
       '@babel/core': 7.24.7
       '@babel/helper-plugin-utils': 7.24.7
 
-  '@babel/runtime@7.25.7':
+  '@babel/runtime@7.26.0':
     dependencies:
       regenerator-runtime: 0.14.1
 
@@ -5016,7 +5016,7 @@ snapshots:
       color-convert: 2.0.1
       color-string: 1.9.1
 
-  complex.js@2.1.1: {}
+  complex.js@2.4.2: {}
 
   concat-map@0.0.1: {}
 
@@ -6162,10 +6162,10 @@ snapshots:
     dependencies:
       tmpl: 1.0.5
 
-  mathjs@13.2.0:
+  mathjs@13.2.1:
     dependencies:
-      '@babel/runtime': 7.25.7
-      complex.js: 2.1.1
+      '@babel/runtime': 7.26.0
+      complex.js: 2.4.2
       decimal.js: 10.4.3
       escape-latex: 1.2.0
       fraction.js: 4.3.7
@@ -6359,7 +6359,7 @@ snapshots:
 
   promise-callbacks@3.8.2:
     dependencies:
-      '@babel/runtime': 7.25.7
+      '@babel/runtime': 7.26.0
       object.getownpropertydescriptors: 2.1.0
 
   prompts@2.4.2:
