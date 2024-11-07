@@ -128,7 +128,7 @@ async function requestDM(options: RequestDMOptions): Promise<boolean> {
     );
 
     if (res.includes(true)) {
-      logger.info(`::success DM sent: ${options.memberId}`);
+      logger.info(`::success DM sent: ${options.memberId} (${shard})`);
       return true;
     } else {
       logger.warn(`failed to send DM: ${options.memberId}`);
