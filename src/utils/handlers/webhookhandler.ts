@@ -18,7 +18,7 @@ import Constants from "../Constants";
 import { addProgress, setProgress } from "../functions/economy/achievements";
 import { addBalance } from "../functions/economy/balance";
 import { addBooster } from "../functions/economy/boosters";
-import { addInventoryItem } from "../functions/economy/inventory";
+import { addInventoryItem, calcItemValue } from "../functions/economy/inventory";
 import { getRawLevel } from "../functions/economy/levelling";
 import { addStat } from "../functions/economy/stats";
 import {
@@ -114,6 +114,15 @@ export function listen(manager: ClusterManager) {
     const { progress } = req.body;
     await setProgress(id, "animal_lover", progress);
     res.status(200).send();
+  });
+
+  app.get("/item/value/:item", async (req, res) => {
+    const { item } = req.params;
+
+    const value = await calcItemValue(item);
+    res.status(200).json({
+      value,
+    });
   });
 
   app.listen(process.env.EXPRESS_PORT || 5000);
