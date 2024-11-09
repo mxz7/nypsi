@@ -24,8 +24,7 @@ const levellingRewards = new Map<number, { text: string[]; rewards?: string[] }>
 levellingRewards.set(1, {
   text: [
     "congratulations on your first level up and welcome to nypsi!!\ndon't forget to </vote:1014905682341924944> daily for rewards\n" +
-      "you have received:" +
-      "\n- 🔮 50 karma" +
+      "- 🔮 50 karma" +
       "\n- $30,000",
   ],
   rewards: ["karma:50", "money:30000"],
@@ -42,16 +41,16 @@ levellingRewards.set(3, {
 levellingRewards.set(5, { text: ["you will now receive 2 📦 vote crates when voting"] });
 levellingRewards.set(7, {
   text: [
-    "just a little bonus for my favourite number 😁\n\nyou have received:" +
-      "\n- `1x` 📦 basic crate" +
+    "just a little bonus for my favourite number 😁\n\n" +
+      "- `1x` 📦 basic crate" +
       "\n- `$100,000`",
   ],
   rewards: ["id:basic_crate", "money:100000"],
 });
 levellingRewards.set(10, {
   text: [
-    "you're making *very* good progress. keep it up!!\n\nyou have received:" +
-      "\n- `2x` 📦 basic crate" +
+    "you're making *very* good progress. keep it up!!\n\n" +
+      "- `2x` 📦 basic crate" +
       "\n- 🔮 100 karma" +
       "\n- $100,000\n" +
       "you have unlocked:" +
@@ -80,7 +79,7 @@ levellingRewards.set(50, {
   ],
 });
 levellingRewards.set(69, {
-  text: ["hahaaaaahaha......\n\nyou have received:\n" + "- `3x` 🎁 69420 crate"],
+  text: ["hahaaaaahaha......\n\n" + "- `3x` 🎁 69420 crate"],
   rewards: ["id:69420_crate", "id:69420_crate", "id:69420_crate"],
 });
 levellingRewards.set(75, {
@@ -102,19 +101,19 @@ levellingRewards.set(250, {
   text: ["you have unlocked:\n" + "- +1% gamble multi"],
 });
 levellingRewards.set(1000, {
-  text: ["you have received:\n" + "- ✨ prestige 10 tag"],
+  text: ["- ✨ prestige 10 tag"],
   rewards: ["tag:p10"],
 });
 levellingRewards.set(1500, {
-  text: ["you have received:\n" + "- ⭐️ prestige 15 tag"],
+  text: ["- ⭐️ prestige 15 tag"],
   rewards: ["tag:p15"],
 });
 levellingRewards.set(2000, {
-  text: ["you have received:\n" + "- 🌟 prestige 20 tag"],
+  text: ["- 🌟 prestige 20 tag"],
   rewards: ["tag:p20"],
 });
 levellingRewards.set(2500, {
-  text: ["you have received:\n" + "- 💫 prestige 25 tag"],
+  text: ["- 💫 prestige 25 tag"],
   rewards: ["tag:p25"],
 });
 levellingRewards.set(3000, {
@@ -126,11 +125,11 @@ levellingRewards.set(3000, {
   rewards: ["tag:p30", "id:omega_crate"],
 });
 levellingRewards.set(4000, {
-  text: ["you have received:\n" + "- 💛 prestige 40 tag"],
+  text: ["- 💛 prestige 40 tag"],
   rewards: ["tag:p40"],
 });
 levellingRewards.set(5000, {
-  text: ["you have received:\n" + "- 💜 prestige 50 tag"],
+  text: ["- 💜 prestige 50 tag"],
   rewards: ["tag:p50"],
 });
 levellingRewards.set(6000, {
@@ -142,7 +141,7 @@ levellingRewards.set(6000, {
   rewards: ["tag:p60", "id:omega_crate"],
 });
 levellingRewards.set(7000, {
-  text: ["you have received:\n" + "- 🤍 prestige 70 tag"],
+  text: ["- 🤍 prestige 70 tag"],
   rewards: ["tag:p70"],
 });
 
@@ -480,12 +479,8 @@ export async function doLevelUp(member: GuildMember | string) {
         rewardsText.has(rawLevel)
           ? rewardsText
               .get(rawLevel)
-              .push(
-                `you have received:\n` + `- \`${crates}x\` 📦 basic crate${crates > 1 ? "s" : ""}`,
-              )
-          : rewardsText.set(rawLevel, [
-              `you have received:\n` + `- \`${crates}x\` 📦 basic crate${crates > 1 ? "s" : ""}`,
-            ]);
+              .push(`- \`${crates}x\` 📦 basic crate${crates > 1 ? "s" : ""}`)
+          : rewardsText.set(rawLevel, [`- \`${crates}x\` 📦 basic crate${crates > 1 ? "s" : ""}`]);
       }
 
       if (rawLevel % 200 === 0) {
