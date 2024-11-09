@@ -328,7 +328,7 @@ async function run(
       data.pages,
       data.pos,
       `top prestige ${global ? "[global]" : `for ${message.guild.name}`}`,
-      global ? "https://nypsi.xyz/leaderboard?lb=level" : null,
+      global ? "https://nypsi.xyz/leaderboard/level" : null,
     );
   } else if (args[0].toLowerCase() == "item") {
     const items = getItems();
@@ -376,7 +376,7 @@ async function run(
       data.pages,
       data.pos,
       `top ${item.name} ${global ? "[global]" : `for ${message.guild.name}`}`,
-      global ? `https://nypsi.xyz/leaderboard?lb=items&item=${item.id}` : null,
+      global ? `https://nypsi.xyz/leaderboard/${item.id}` : null,
     );
   } else if (args[0].toLowerCase() == "completion") {
     const data = await topCompletion(message.guild, message.author.id);
@@ -399,14 +399,14 @@ async function run(
       data.pages,
       data.pos,
       `top net worth ${global ? "[global]" : `for ${message.guild.name}`}`,
-      global ? "https://nypsi.xyz/leaderboard?lb=net%2520worth" : null,
+      global ? "https://nypsi.xyz/leaderboard/net-worth" : null,
     );
   } else if (args[0].toLowerCase().includes("guild")) {
     const userGuild = await getGuildByUser(message.member);
 
     const data = await topGuilds(userGuild?.guildName);
 
-    return show(data.pages, data.pos, "top guilds", "https://nypsi.xyz/leaderboard?lb=guilds");
+    return show(data.pages, data.pos, "top guilds", "https://nypsi.xyz/leaderboard/guilds");
   } else if (args[0].toLowerCase().includes("streak")) {
     let global = false;
 
@@ -424,7 +424,7 @@ async function run(
       data.pages,
       data.pos,
       `top daily streak ${global ? "[global]" : `for ${message.guild.name}`}`,
-      global ? "https://nypsi.xyz/leaderboard?lb=streak" : null,
+      global ? "https://nypsi.xyz/leaderboard/streak" : null,
     );
   } else if (args[0].toLowerCase().includes("lott")) {
     let global = false;
@@ -443,7 +443,7 @@ async function run(
       data.pages,
       data.pos,
       `top lottery wins ${global ? "[global]" : `for ${message.guild.name}`}`,
-      global ? "https://nypsi.xyz/leaderboard?lb=lottery" : null,
+      global ? "https://nypsi.xyz/leaderboard/lottery" : null,
     );
   } else if (args[0].toLowerCase().includes("wordle")) {
     let global = false;
@@ -462,7 +462,7 @@ async function run(
       data.pages,
       data.pos,
       `top wordle wins ${global ? "[global]" : `for ${message.guild.name}`}`,
-      global ? "https://nypsi.xyz/leaderboard?lb=wordle" : null,
+      global ? "https://nypsi.xyz/leaderboard/wordle" : null,
     );
   } else if (args[0].toLowerCase().includes("vote")) {
     let global = false;
@@ -481,7 +481,7 @@ async function run(
       data.pages,
       data.pos,
       `top votes ${global ? "[global]" : `for ${message.guild.name}`}`,
-      global ? "https://nypsi.xyz/leaderboard?lb=vote" : null,
+      global ? "https://nypsi.xyz/leaderboard/vote" : null,
     );
   } else if (["cr", "crglobal", "cr-global", "chatreaction"].includes(args[0].toLowerCase())) {
     let global = false;
@@ -536,7 +536,7 @@ async function run(
       if (args[1]?.toLowerCase() === "global") {
         data = await topCommandUsesGlobal(message.author.id);
         title = `top command uses [global]`;
-        url = "https://nypsi.xyz/leaderboard?lb=commands";
+        url = "https://nypsi.xyz/leaderboard/commands";
       } else {
         data = await topCommandUses(message.guild, message.author.id);
         title = `top command uses for ${message.guild.name}`;
@@ -590,7 +590,7 @@ async function run(
       data.pages,
       data.pos,
       `top ${selected.name} ${global ? "[global]" : `for ${message.guild.name}`}`,
-      global ? `https://nypsi.xyz/leaderboard?lb=items&item=${selected.id}` : null,
+      global ? `https://nypsi.xyz/leaderboard/${selected.id}` : null,
     );
   }
 }
