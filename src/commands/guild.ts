@@ -333,6 +333,10 @@ async function run(
       }
     }
 
+    const regex = /^[A-Za-z0-9 ]*$/;
+
+    if (!regex.test(name)) return send({ embeds: [new ErrorEmbed("invalid guild name")] });
+
     await addCooldown(cmd.name, message.member, 3);
 
     await removeBalance(message.member, 500000);
