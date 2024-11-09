@@ -233,7 +233,7 @@ async function run(
     if (guild)
       embed.addField(
         "guild",
-        `[${guild.guildName}](https://nypsi.xyz/guild/${encodeURIComponent(guild.guildName)})\n` +
+        `[${guild.guildName}](https://nypsi.xyz/guild/${encodeURIComponent(guild.guildName.replaceAll(" ", "-"))})\n` +
           `level **${guild.level}**\n` +
           `${guild.members.length} member${guild.members.length > 1 ? "s" : ""}`,
         true,
