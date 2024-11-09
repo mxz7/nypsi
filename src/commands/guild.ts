@@ -237,7 +237,7 @@ async function run(
       embed.setHeader(
         guild.guildName,
         await getLastKnownAvatar(guild.ownerId),
-        `https://nypsi.xyz/guild/${encodeURIComponent(guild.guildName)}`,
+        `https://nypsi.xyz/guild/${encodeURIComponent(guild.guildName.replaceAll(" ", "-"))}`,
       );
       // embed.setDescription(guild.motd + `\n\n**bank** $${guild.balance.toLocaleString()}\n**xp** ${guild.xp.toLocaleString()}`)
       embed.setDescription(guild.motd);
@@ -745,7 +745,7 @@ async function run(
       const embed = new CustomEmbed(message.member).setHeader(
         "guild deposit",
         message.author.avatarURL(),
-        `https://nypsi.xyz/guild/${encodeURIComponent(guild.guildName)}`,
+        `https://nypsi.xyz/guild/${encodeURIComponent(guild.guildName.replaceAll(" ", "-"))}`,
       );
 
       embed.setDescription(
@@ -774,7 +774,7 @@ async function run(
     const embed = new CustomEmbed(message.member).setHeader(
       `${guild.guildName} stats`,
       message.author.avatarURL(),
-      `https://nypsi.xyz/guild/${encodeURIComponent(guild.guildName)}`,
+      `https://nypsi.xyz/guild/${encodeURIComponent(guild.guildName.replaceAll(" ", "-"))}`,
     );
 
     let xp = "";
@@ -925,7 +925,7 @@ async function run(
     embed.setHeader(
       guild.guildName,
       message.author.avatarURL(),
-      `https://nypsi.xyz/guild/${encodeURIComponent(guild.guildName)}`,
+      `https://nypsi.xyz/guild/${encodeURIComponent(guild.guildName.replaceAll(" ", "-"))}`,
     );
     embed.setDescription(
       `requirements to upgrade to level **${guild.level + 1}**:\n\n` +
@@ -1088,7 +1088,7 @@ async function run(
       .setHeader(
         `${guild.guildName} upgrades`,
         message.author.avatarURL(),
-        `https://nypsi.xyz/guild/${encodeURIComponent(guild.guildName)}`,
+        `https://nypsi.xyz/guild/${encodeURIComponent(guild.guildName.replaceAll(" ", "-"))}`,
       )
       .setFields(...pages.get(1))
       .setFooter({ text: `you have ${guild.tokens} token${guild.tokens != 1 ? "s" : ""}` });

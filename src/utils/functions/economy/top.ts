@@ -740,7 +740,7 @@ export async function topGuilds(guildName?: string) {
 
     out.push(
       `${position} **[${guild.guildName}](https://nypsi.xyz/guild/${encodeURIComponent(
-        guild.guildName,
+        guild.guildName.replaceAll(" ", "-"),
       )})** level ${guild.level}`,
     );
   }
