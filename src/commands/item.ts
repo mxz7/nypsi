@@ -90,13 +90,11 @@ async function run(
 
   await addCooldown(cmd.name, message.member, 4);
 
-  const embed = new CustomEmbed(message.member)
-    .setTitle(`${selected.emoji} ${selected.name}`)
-    .setURL(`https://nypsi.xyz/item/${selected.id}`);
+  const embed = new CustomEmbed(message.member).setTitle(`${selected.emoji} ${selected.name}`);
 
   const desc: string[] = [];
 
-  desc.push(`\`${selected.id}\``);
+  desc.push(`[\`${selected.id}\`](https://nypsi.xyz/item/${selected.id})`);
   desc.push(`\n> ${selected.longDesc}\n`);
 
   if (selected.booster_desc) {
