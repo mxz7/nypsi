@@ -90,7 +90,9 @@ async function run(
 
   await addCooldown(cmd.name, message.member, 4);
 
-  const embed = new CustomEmbed(message.member).setTitle(`${selected.emoji} ${selected.name}`);
+  const embed = new CustomEmbed(message.member)
+    .setTitle(`${selected.emoji} ${selected.name}`)
+    .setURL(`https://nypsi.xyz/item/${selected.id}`);
 
   const desc: string[] = [];
 
