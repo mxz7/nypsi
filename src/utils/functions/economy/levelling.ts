@@ -453,7 +453,7 @@ export async function doLevelUp(member: GuildMember | string) {
 
     const levelData = levellingRewards.get(rawLevel);
 
-    if (levelData?.text) rewardsText.set(rawLevel, levelData.text);
+    if (levelData?.text) rewardsText.set(rawLevel, [...levelData.text]);
 
     if (levelData?.rewards) {
       for (const reward of levelData.rewards) {
