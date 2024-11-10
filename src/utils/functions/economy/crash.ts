@@ -218,8 +218,6 @@ export async function addCrashPlayer(interaction: ButtonInteraction) {
       ),
     );
 
-  await interaction.showModal(modal);
-
   a(interaction.user.id, interaction.user.username, "crash", "crash");
 
   if (await isLockedOut(interaction.user.id)) {
@@ -229,6 +227,8 @@ export async function addCrashPlayer(interaction: ButtonInteraction) {
     message.content = "crash";
     return verifyUser(message);
   }
+
+  await interaction.showModal(modal);
 
   const modalInteraction = await interaction
     .awaitModalSubmit({
@@ -253,6 +253,13 @@ export async function addCrashPlayer(interaction: ButtonInteraction) {
       embeds: [new ErrorEmbed("this game is full")],
       ephemeral: true,
     });
+
+  if (status.players.find((p) => p.userId === interaction.user.id)) {
+    return interaction.reply({
+      embeds: [new ErrorEmbed("you have already joined")],
+      ephemeral: true,
+    });
+  }
 
   const betValue = modalInteraction.fields.getTextInputValue("bet");
   const autoStop = modalInteraction.fields.getTextInputValue("auto-stop");
@@ -293,6 +300,13 @@ export async function addCrashPlayer(interaction: ButtonInteraction) {
   removeBalance(interaction.user.id, bet);
 
   status = await getCrashStatus();
+
+  if (status.players.find((p) => p.userId === interaction.user.id)) {
+    return interaction.reply({
+      embeds: [new ErrorEmbed("you have already joined")],
+      ephemeral: true,
+    });
+  }
 
   status.players.push({
     userId: interaction.user.id,
