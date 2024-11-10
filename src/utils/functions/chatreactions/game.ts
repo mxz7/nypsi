@@ -139,7 +139,10 @@ export async function startOpenChatReaction(guild: Guild, channel: TextChannel, 
     }
 
     if (!forced && wordListType !== "custom") {
-      const update = await addLeaderboardEntry(message.author.id, time);
+      const update = await addLeaderboardEntry(message.author.id, time).catch(() => ({
+        daily: false,
+        global: false,
+      }));
 
       if (update.daily || update.global) {
         const embed = new CustomEmbed(message.member);
