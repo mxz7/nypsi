@@ -289,8 +289,8 @@ export async function addCrashPlayer(interaction: ButtonInteraction) {
     });
   }
 
-  if (typeof parseInt(autoStop) === "number") {
-    if (parseInt(autoStop) <= 1)
+  if (typeof parseFloat(autoStop) === "number") {
+    if (parseFloat(autoStop) <= 1)
       return modalInteraction.reply({
         ephemeral: true,
         embeds: [new ErrorEmbed("your autostop must be higher than 1")],
