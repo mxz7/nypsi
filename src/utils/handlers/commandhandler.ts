@@ -959,7 +959,7 @@ export async function runCommand(
   command.run(message, args);
   preProcessLength[1] = performance.now();
 
-  if (preProcessLength[1] - preProcessLength[0] > 30) {
+  if (preProcessLength[1] - preProcessLength[0] > 100) {
     logger.debug(
       `command preprocess length: ${(preProcessLength[1] - preProcessLength[0]).toFixed(2)}ms`,
     );
