@@ -146,10 +146,27 @@ levellingRewards.set(7000, {
 });
 
 const xpFormula = (level: number, prestige: number) => {
-  let prestigeModified = prestige;
-  if (prestige > 10) prestigeModified = 10;
+  let prestigeModifier = 30;
 
-  return Math.floor(Math.pow(level + 1, 1.117 + 0.077 * prestigeModified) + 50 + 15 * prestige) - 1;
+  if (prestige >= 1) prestigeModifier = 35;
+  if (prestige >= 2) prestigeModifier = 40;
+  if (prestige >= 3) prestigeModifier = 45;
+  if (prestige >= 4) prestigeModifier = 50;
+  if (prestige >= 5) prestigeModifier = 75;
+  if (prestige >= 6) prestigeModifier = 80;
+  if (prestige >= 7) prestigeModifier = 90;
+  if (prestige >= 8) prestigeModifier = 100;
+  if (prestige >= 9) prestigeModifier = 110;
+  if (prestige >= 10) prestigeModifier = 120;
+  if (prestige >= 20) prestigeModifier = 115;
+  if (prestige >= 25) prestigeModifier = 110;
+  if (prestige >= 30) prestigeModifier = 105;
+
+  if (prestige >= 55) prestigeModifier = 115;
+  if (prestige >= 60) prestigeModifier = 125;
+  if (prestige >= 65) prestigeModifier = 135;
+
+  return Math.floor((level + 1) * 1.117 + prestigeModifier * prestige + 50 + 15 * prestige) - 1;
 };
 const moneyFormula = (level: number) => Math.floor(Math.pow(level + 1, 2.103) + 10_000) - 1;
 const cratesFormula = (rawLevel: number) => {
