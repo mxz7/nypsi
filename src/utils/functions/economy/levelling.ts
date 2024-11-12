@@ -168,7 +168,7 @@ const xpFormula = (level: number, prestige: number) => {
 
   return Math.floor((level + 1) * 1.117 + prestigeModifier * prestige + 50 + 15 * prestige) - 1;
 };
-const moneyFormula = (level: number) => Math.floor(Math.pow(level + 1, 2.103) + 10_000) - 1;
+const moneyFormula = (level: number) => Math.floor(Math.pow(level + 1, 2.07) + 10_000) - 1;
 const cratesFormula = (rawLevel: number) => {
   const prestige = Math.floor(rawLevel / 100);
   const level = rawLevel - prestige * 100;
