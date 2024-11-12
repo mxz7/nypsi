@@ -17,7 +17,7 @@ const prisma = new PrismaClient().$extends({
         if (["Mention", "GraphMetrics"].includes(model)) return result;
 
         redis.lpush(Constants.redis.nypsi.HOURLY_DB_REPORT, timeTaken);
-        if (timeTaken > 500 && !parentPort) {
+        if (timeTaken > 1000 && !parentPort) {
           if (
             JSON.stringify(
               args,
