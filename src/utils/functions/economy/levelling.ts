@@ -185,19 +185,33 @@ const cratesFormula = (rawLevel: number) => {
     crates = neededXp / 250;
     if (rawLevel % 25 !== 0) crates = 0;
   } else if (rawLevel < 3000) {
-    crates = neededXp / 300;
+    crates = neededXp / 350;
     if (rawLevel % 25 !== 0) crates = 0;
   } else if (rawLevel < 4000) {
-    crates = neededXp / 350;
+    crates = neededXp / 400;
     if (rawLevel % 20 !== 0) crates = 0;
   } else if (rawLevel < 5000) {
-    crates = neededXp / 400;
+    crates = neededXp / 450;
     if (rawLevel % 15 !== 0) crates = 0;
   } else if (rawLevel < 6000) {
-    crates = neededXp / 400;
+    crates = neededXp / 500;
+    if (rawLevel % 15 !== 0) crates = 0;
+  } else if (rawLevel < 7000) {
+    crates = neededXp / 500;
     if (rawLevel % 15 !== 0) crates = 0;
   } else {
-    crates = neededXp / 400;
+    if (rawLevel < 8000) {
+      crates = neededXp / 600;
+    } else if (rawLevel < 9000) {
+      crates = neededXp / 700;
+    } else if (rawLevel < 10000) {
+      crates = neededXp / 800;
+    } else if (rawLevel < 11000) {
+      crates = neededXp / 900;
+    } else {
+      crates = neededXp / 1000;
+    }
+
     if (rawLevel % 15 !== 0) crates = 0;
   }
 
