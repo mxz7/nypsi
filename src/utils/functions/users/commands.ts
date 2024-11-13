@@ -107,7 +107,7 @@ export async function updateUser(user: User, command: string) {
     updateAvatar = true;
     const level = await getRawLevel(user.id).catch(() => 0);
     if (
-      level >= 200 &&
+      level >= 500 &&
       (await isTracking(user.id)) &&
       !(await isEcoBanned(user.id)
         .then((r) => r.banned)
