@@ -94,11 +94,11 @@ levellingRewards.set(100, {
       "- +1% gamble multi",
   ],
 });
-levellingRewards.set(200, {
-  text: ["you have unlocked:\n" + "- avatar history tracking (disabled with $toggletracking)"],
-});
 levellingRewards.set(250, {
   text: ["you have unlocked:\n" + "- +1% gamble multi"],
+});
+levellingRewards.set(500, {
+  text: ["you have unlocked:\n" + "- avatar history tracking (disabled with $toggletracking)"],
 });
 levellingRewards.set(1000, {
   text: ["- ✨ prestige 10 tag"],
