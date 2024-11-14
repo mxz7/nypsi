@@ -99,6 +99,7 @@ async function prepare(
       await redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
       inventory = await getInventory(message.member);
       const buttons = card.getButtons(true);
+      card.state = "finished";
       let retry = false;
       const gameId = await createGame({
         bet: 0,

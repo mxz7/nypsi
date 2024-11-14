@@ -341,15 +341,16 @@ async function prepareGame(
     difficulty: chosenDifficulty,
   });
 
-  setTimeout(async () => {
+  setTimeout(() => {
     if (games.has(message.author.id)) {
       if (games.get(message.author.id).gameId == gameId) {
+        const game = games.get(message.author.id);
         games.delete(message.author.id);
-        await redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
-        await addBalance(message.member, bet);
+        redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+        logger.warn("tower still in playing state after 5 minutes - deleting key", game);
       }
     }
-  }, 180000);
+  }, ms("5 minutes"));
 
   if (msg) {
     await msg.edit({ embeds: [embed], components });
