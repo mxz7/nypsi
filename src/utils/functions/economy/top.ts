@@ -4,6 +4,7 @@ import { inPlaceSort } from "fast-sort";
 import prisma from "../../../init/database";
 import Constants from "../../Constants";
 import PageManager from "../page";
+import sleep from "../sleep";
 import { getPreferences } from "../users/notifications";
 import { getLastKnownUsername } from "../users/tag";
 import { getActiveTag } from "../users/tags";
@@ -214,7 +215,16 @@ export async function topNetWorthGlobal(userId: string, amount = 100) {
   return { pages, pos };
 }
 
-export async function topNetWorth(guild: Guild, userId?: string) {
+const topNetLock = new Set<string>();
+
+export async function topNetWorth(guild: Guild, userId?: string, repeatcount = 1) {
+  if (topNetLock.has(guild.id)) {
+    if (repeatcount > 100) topNetLock.delete(guild.id);
+    await sleep(100);
+    return topNetWorth(guild, userId, repeatcount++);
+  }
+  topNetLock.add(guild.id);
+
   let members: Collection<string, GuildMember>;
 
   if (guild.memberCount == guild.members.cache.size) {
