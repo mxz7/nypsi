@@ -11,6 +11,7 @@ import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { Item } from "../../../types/Economy";
 import { addToGuildXP, getGuildName } from "../../../utils/functions/economy/guilds";
 import Constants from "../../Constants";
+import { logger } from "../../logger";
 import { addKarma } from "../karma/karma";
 import { percentChance, shuffle } from "../random";
 import { addProgress } from "./achievements";
@@ -28,12 +29,21 @@ export default class ScratchCard {
   private member: GuildMember;
   public remainingClicks: number;
   public won: boolean;
+  public state: "playing" | "finished";
 
   constructor(member: GuildMember, item: Item) {
     this.item = item;
     this.member = member;
     this.remainingClicks = item.clicks;
     this.won = false;
+    this.state = "playing";
+
+    setTimeout(() => {
+      if (this.state === "playing") {
+        redis.srem(Constants.redis.nypsi.USERS_PLAYING, member.user.id);
+        logger.warn("scratch still in playing state after 7 minutes - deleting key", this);
+      }
+    }, ms("7 minutes"));
 
     return this;
   }

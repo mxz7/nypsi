@@ -409,6 +409,17 @@ async function prepareGame(
     increment: incrementAmount,
   });
 
+  setTimeout(() => {
+    if (games.has(message.author.id)) {
+      if (games.get(message.author.id).id == id) {
+        const game = games.get(message.author.id);
+        games.delete(message.author.id);
+        redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+        logger.warn("mines still in playing state after 5 minutes - deleting key", game);
+      }
+    }
+  }, ms("5 minutes"));
+
   const desc = await renderGambleScreen(message.author.id, "playing", bet, "**0**x ($0)");
   const embed = new CustomEmbed(message.member, desc).setHeader(
     "mines",

@@ -45,6 +45,7 @@ import { recentCommands } from "../utils/functions/users/commands.js";
 import { addHourlyCommand } from "../utils/handlers/commandhandler.js";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler.js";
 import { gamble, logger } from "../utils/logger.js";
+import ms = require("ms");
 
 const games = new Map<
   string,
@@ -322,15 +323,16 @@ async function prepareGame(
     voted: voteMulti,
   });
 
-  setTimeout(async () => {
+  setTimeout(() => {
     if (games.has(message.author.id)) {
       if (games.get(message.author.id).id == id) {
+        const game = games.get(message.author.id);
         games.delete(message.author.id);
-        await redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
-        await addBalance(message.member, bet);
+        redis.srem(Constants.redis.nypsi.USERS_PLAYING, message.author.id);
+        logger.warn("highlow still in playing state after 5 minutes - deleting key", game);
       }
     }
-  }, 180000);
+  }, ms("5 minutes"));
 
   newCard(message.member);
 
