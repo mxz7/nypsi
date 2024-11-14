@@ -76,6 +76,13 @@ export async function getCases(guild: Guild, userID: string) {
     where: {
       AND: [{ guildId: guild.id }, { user: userID }],
     },
+    include: {
+      evidence: {
+        select: {
+          id: true,
+        },
+      },
+    },
     orderBy: {
       time: "desc",
     },

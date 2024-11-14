@@ -1,4 +1,3 @@
-import { ModerationCase } from "@prisma/client";
 import {
   ActionRowBuilder,
   BaseMessageOptions,
@@ -93,7 +92,7 @@ async function run(
     message.guild,
     member instanceof GuildMember ? member.user.id : member,
   );
-  const pages: ModerationCase[][] = [];
+  const pages: (typeof cases)[] = [];
 
   if (cases.length == 0) {
     return send({ embeds: [new ErrorEmbed("no history to display")] });
@@ -102,7 +101,7 @@ async function run(
   await addCooldown(cmd.name, message.member, 7);
 
   let count = 0;
-  let page: ModerationCase[] = [];
+  let page: typeof cases = [];
   for (const case0 of cases) {
     if (count == 5) {
       pages.push(page);
@@ -131,13 +130,17 @@ async function run(
 
   for (const case0 of pages[0]) {
     if (case0.deleted) {
-      embed.addField("case " + case0.caseId, "`[deleted]`");
+      embed.addField(
+        `case ${case0.caseId}`,
+        `${case0.evidence?.id ? `[\`[deleted]\`](https://cdn.nypsi.xyz/evidence/${case0.guildId}/${case0.evidence.id})` : "`[deleted`]"}`,
+      );
     } else {
       embed.addField(
-        "case " + case0.caseId,
-        "`" +
-          case0.type +
-          "` - " +
+        `${case0.caseId}`,
+        (case0.evidence?.id
+          ? `[\`${case0.type}\`](https://cdn.nypsi.xyz/evidence/${case0.guildId}/${case0.evidence.id})`
+          : `\`${case0.type}\``) +
+          " - " +
           case0.command +
           "\non " +
           `<t:${Math.floor(case0.time.getTime() / 1000)}:d>`,
@@ -205,11 +208,16 @@ async function run(
         } else {
           currentPage--;
           for (const case0 of pages[currentPage]) {
+            let title = `case ${case0.caseId}`;
+
+            if (case0.evidence?.id)
+              title = `[case ${case0.caseId}](https://cdn.nypsi.xyz/evidence/${case0.guildId}/${case0.evidence.id}) `;
+
             if (case0.deleted) {
-              newEmbed.addField("case " + case0.caseId, "`[deleted]`");
+              embed.addField(title, "`[deleted]`");
             } else {
-              newEmbed.addField(
-                "case " + case0.caseId,
+              embed.addField(
+                title,
                 "`" +
                   case0.type +
                   "` - " +
@@ -258,16 +266,21 @@ async function run(
         } else {
           currentPage++;
           for (const case0 of pages[currentPage]) {
+            let title = `case ${case0.caseId}`;
+
+            if (case0.evidence?.id)
+              title = `[case ${case0.caseId}](https://cdn.nypsi.xyz/evidence/${case0.guildId}/${case0.evidence.id}) `;
+
             if (case0.deleted) {
-              newEmbed.addField("case " + case0.caseId, "`[deleted]`");
+              embed.addField(title, "`[deleted]`");
             } else {
-              newEmbed.addField(
-                "case " + case0.caseId,
+              embed.addField(
+                title,
                 "`" +
                   case0.type +
                   "` - " +
                   case0.command +
-                  "\nat " +
+                  "\non " +
                   `<t:${Math.floor(case0.time.getTime() / 1000)}:d>`,
               );
             }
