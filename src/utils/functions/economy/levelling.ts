@@ -613,7 +613,9 @@ export async function doLevelUp(member: GuildMember | string) {
 
       const highest = inPlaceSort(Array.from(rewardsText.keys())).asc()[0];
       if (!rewardsText.has(highest)) {
-        rewardsText.set(beforeLevel + levels, [`- \`${time}m\` ✨ xp booster`]);
+        const rawLevel = beforePrestige * 100 + beforeLevel + levels;
+
+        rewardsText.set(rawLevel, [`- \`${time}m\` ✨ xp booster`]);
       } else rewardsText.get(highest).push(`- \`${time}m\` ✨ xp booster`);
     }
   }
@@ -632,6 +634,7 @@ export async function doLevelUp(member: GuildMember | string) {
 
     for (const [key, value] of rewardsText.entries()) {
       const level = beforePrestige > 0 ? key - beforePrestige * 100 : key;
+
       if (rewardsText.size > 1 || levels > 1)
         desc += `-- ${beforePrestige > 0 ? `prestige ${beforePrestige} ` : ""}level ${level} --\n\n`;
 
