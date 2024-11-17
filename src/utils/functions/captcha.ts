@@ -1,5 +1,14 @@
 import { Captcha } from "@prisma/client";
-import { CommandInteraction, GuildMember, Message, WebhookClient } from "discord.js";
+import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  CommandInteraction,
+  GuildMember,
+  Message,
+  MessageActionRowComponentBuilder,
+  WebhookClient,
+} from "discord.js";
 import prisma from "../../init/database";
 import redis from "../../init/redis";
 import { NypsiCommandInteraction, NypsiMessage } from "../../models/Command";
@@ -171,16 +180,26 @@ export async function verifyUser(
   const embed = new CustomEmbed(message.member).setTitle("you have been locked");
 
   embed.setDescription(
-    "please note that using macros / auto typers is not allowed with nypsi" +
-      "\n**if you fail or ignore too many captchas you may be banned**" +
-      `\n\n[you must complete a captcha by clicking here](https://nypsi.xyz/captcha?id=${res.id})`,
+    "**you must complete a captcha to continue using commands**\n\n" +
+      "please note that using macros / auto typers is not allowed with nypsi" +
+      "\n*if you fail or ignore too many captchas you may be banned*" +
+      `\n\nclick the button below to solve the captcha`,
   );
   embed.setColor(Constants.EMBED_FAIL_COLOR);
 
+  const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
+    new ButtonBuilder()
+      .setURL(`https://nypsi.xyz/captcha?id=${res.id}`)
+      .setStyle(ButtonStyle.Link)
+      .setLabel("click me"),
+  );
+
   const msg =
     message instanceof Message
-      ? await message.reply({ embeds: [embed] })
-      : await message.reply({ embeds: [embed], ephemeral: true }).then(() => message.fetchReply());
+      ? await message.reply({ embeds: [embed], components: [row] })
+      : await message
+          .reply({ embeds: [embed], components: [row], ephemeral: true })
+          .then(() => message.fetchReply());
 
   const query = await prisma.captcha.update({
     where: { id: res.id },
