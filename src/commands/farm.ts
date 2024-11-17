@@ -75,7 +75,7 @@ async function run(
 
   if (farms.length === 0) return send({ embeds: [new ErrorEmbed("you don't have any farms")] });
 
-  if (args.length === 0) {
+  if (args.length === 0 || args[0].toLowerCase() === "view") {
     const options = new StringSelectMenuBuilder().setCustomId("farm");
 
     for (const farm of farms) {
