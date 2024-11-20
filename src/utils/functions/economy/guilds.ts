@@ -7,6 +7,7 @@ import { CustomEmbed } from "../../../models/EmbedBuilders";
 import { GuildUpgradeRequirements } from "../../../types/Economy";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
+import { deleteImage } from "../image";
 import { addNotificationToQueue, getDmSettings } from "../users/notifications";
 import { addInventoryItem } from "./inventory";
 import { getUpgrades } from "./levelling";
@@ -219,6 +220,8 @@ export async function deleteGuild(name: string) {
   const guild = await getGuildByName(name);
 
   if (!guild) return;
+
+  if (guild.avatarId) await deleteImage(guild.avatarId);
 
   for (const member of guild.members) {
     await redis.del(`${Constants.redis.cache.economy.GUILD_USER}:${member.userId}`);
