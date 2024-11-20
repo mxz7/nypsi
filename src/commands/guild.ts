@@ -54,6 +54,7 @@ import { cleanString } from "../utils/functions/string";
 import { getLastKnownAvatar } from "../utils/functions/users/tag";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import ms = require("ms");
+import sharp = require("sharp");
 
 const cmd = new Command("guild", "create and manage your guild/clan", "money")
   .setAliases(["g", "clan"])
@@ -989,7 +990,11 @@ async function run(
     if (imageRes.status !== 200)
       return message.channel.send({ embeds: [new ErrorEmbed("failed to download image")] });
 
-    const buffer = Buffer.from(await imageRes.arrayBuffer());
+    const arrayBuffer = await imageRes.arrayBuffer();
+
+    const buffer = await sharp(arrayBuffer)
+      .resize({ width: 256, height: 256, fit: "cover" })
+      .toBuffer();
 
     const contentType = imageRes.headers.get("content-type");
 
