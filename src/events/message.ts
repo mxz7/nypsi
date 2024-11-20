@@ -25,14 +25,11 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { a } from "../utils/functions/anticheat";
 import { addTaskProgress } from "../utils/functions/economy/tasks";
-import { userExists } from "../utils/functions/economy/utils";
 import { getDisabledCommands } from "../utils/functions/guilds/disabledcommands";
 import { checkAutoMute, checkMessageContent } from "../utils/functions/guilds/filters";
 import { isSlashOnly } from "../utils/functions/guilds/slash";
 import { getPrefix, hasGuild } from "../utils/functions/guilds/utils";
-import { getKarma } from "../utils/functions/karma/karma";
 import { addMuteViolation } from "../utils/functions/moderation/mute";
-import { isPremium } from "../utils/functions/premium/premium";
 import sleep from "../utils/functions/sleep";
 import {
   createSupportRequest,
@@ -42,10 +39,10 @@ import {
 import { createAuraTransaction } from "../utils/functions/users/aura";
 import { isUserBlacklisted } from "../utils/functions/users/blacklist";
 import { getLastCommand } from "../utils/functions/users/commands";
-import { MentionQueueItem } from "../utils/functions/users/mentions";
 import { hasProfile } from "../utils/functions/users/utils";
 import { runCommand } from "../utils/handlers/commandhandler";
 import { logger } from "../utils/logger";
+import { mentionQueue } from "../utils/queues/queues";
 import ms = require("ms");
 
 const dmCooldown = new Set<string>();
@@ -388,10 +385,7 @@ export default async function messageCreate(message: Message) {
 
   if (
     message.guild.memberCount < 150000 &&
-    ((await userExists(message.guild.ownerId)) ||
-      (await isPremium(message.guild.ownerId)) ||
-      (await getKarma(message.guild.ownerId)) >= 10 ||
-      (await getLastCommand(message.guild.ownerId)).getTime() >= Date.now() - ms("30 days"))
+    (await getLastCommand(message.guild.ownerId)).getTime() >= Date.now() - ms("30 days")
   ) {
     let mentionMembers: string[] = [];
 
@@ -428,13 +422,23 @@ export default async function messageCreate(message: Message) {
 
     if (message.mentions?.members?.size > 0) {
       if (mentionMembers) {
-        message.mentions.members.forEach((m) => {
-          if (!mentionMembers.includes(m.user.id)) {
-            mentionMembers.push(m.user.id);
+        let i = 0;
+        for (const m of message.mentions.members) {
+          i++;
+          if (i % 100 === 0) await sleep(15);
+
+          if (!mentionMembers.includes(m[0])) {
+            mentionMembers.push(m[0]);
           }
-        });
+        }
       } else {
-        mentionMembers = Array.from(message.mentions.members.mapValues((m) => m.user.id).values());
+        let i = 0;
+        for (const m of message.mentions.members) {
+          i++;
+          if (i % 100 === 0) await sleep(15);
+
+          mentionMembers.push(m[0]);
+        }
       }
     }
 
@@ -446,11 +450,20 @@ export default async function messageCreate(message: Message) {
         channelMembers = channelMembers.cache;
       }
 
-      await redis.rpush(
-        Constants.redis.nypsi.MENTION_QUEUE,
-        JSON.stringify({
+      const channelMemberIds: string[] = [];
+
+      let i = 0;
+      for (const m of channelMembers) {
+        i++;
+        if (i % 100 === 0) await sleep(15);
+
+        channelMemberIds.push(m[0]);
+      }
+
+      mentionQueue
+        .createJob({
           members: mentionMembers,
-          channelMembers: Array.from(channelMembers.mapValues((m) => m.user.id).values()),
+          channelMembers: channelMemberIds,
           content:
             message.content.length > 100
               ? message.content.substring(0, 97) + "..."
@@ -459,8 +472,8 @@ export default async function messageCreate(message: Message) {
           username: message.author.username,
           date: message.createdTimestamp,
           guildId: message.guild.id,
-        } as MentionQueueItem),
-      );
+        })
+        .save();
     }
   }
 }
