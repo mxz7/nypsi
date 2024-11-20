@@ -1039,7 +1039,7 @@ export async function runCommand(
       await message.channel.send({
         content: `${message.author.toString()} you have been **RICK ROLLED** by ${await getLastKnownUsername(
           userId,
-        )}\n\nhttps://tenor.com/view/rickroll-roll-rick-never-gonna-give-you-up-never-gonna-gif-22954713`,
+        )}\n\nhttps://cdn.nypsi.xyz/rickroll.gif`,
       });
     }
 
