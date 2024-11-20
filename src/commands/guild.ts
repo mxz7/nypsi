@@ -14,6 +14,7 @@ import {
   MessageEditOptions,
 } from "discord.js";
 import { sort } from "fast-sort";
+import { nanoid } from "nanoid";
 import prisma from "../init/database";
 import redis from "../init/redis";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
@@ -46,6 +47,7 @@ import {
   userExists,
 } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
+import { uploadImage } from "../utils/functions/image";
 import { getAllGroupAccountIds } from "../utils/functions/moderation/alts";
 import PageManager from "../utils/functions/page";
 import { cleanString } from "../utils/functions/string";
@@ -153,6 +155,10 @@ const filter = [
   "kick",
   "forcekick",
   "noguild",
+  "avatar",
+  "pfp",
+  "picture",
+  "icon",
 ];
 
 const invited = new Set<string>();
@@ -908,6 +914,83 @@ async function run(
     );
 
     return send({ embeds: [embed] });
+  }
+
+  if (["avatar", "pfp", "icon", "picture"].includes(args[0].toLowerCase())) {
+    if (!guild) {
+      return send({ embeds: [new ErrorEmbed("you're not in a guild")] });
+    }
+
+    if (guild.ownerId !== message.author.id) {
+      return send({ embeds: [new ErrorEmbed("you are not the guild owner")] });
+    }
+
+    const msg = await send({
+      embeds: [
+        new CustomEmbed(
+          message.member,
+          "10MB max file size\n\nsend a picture in the channel",
+        ).setHeader("guild avatar", message.author.avatarURL()),
+      ],
+    });
+
+    const res = await message.channel
+      .awaitMessages({
+        filter: (m) => m.author.id === message.author.id,
+        max: 1,
+        time: 60000,
+        errors: ["time"],
+      })
+      .then((r) => r.first())
+      .catch(() => {
+        msg.edit({
+          embeds: [new ErrorEmbed("expired")],
+        });
+      });
+
+    if (!res) return;
+
+    const attachment = res.attachments.first();
+
+    if (!attachment)
+      return message.channel.send({ embeds: [new ErrorEmbed("you must send an image")] });
+
+    if (attachment.size > 10e6)
+      return message.channel.send({
+        embeds: [new ErrorEmbed("file too big. max size: 10MB")],
+      });
+
+    if (!["jpeg", "jpg", "gif", "png", "webp"].includes(attachment.contentType.split("/")[1]))
+      return message.channel.send({
+        embeds: [new ErrorEmbed("invalid file type. must be an image")],
+      });
+
+    const imageRes = await fetch(attachment.url);
+
+    if (imageRes.status !== 200)
+      return message.channel.send({ embeds: [new ErrorEmbed("failed to download image")] });
+
+    const buffer = Buffer.from(await imageRes.arrayBuffer());
+
+    const contentType = imageRes.headers.get("content-type");
+
+    if (!["jpeg", "jpg", "gif", "png", "webp"].includes(contentType.split("/")[1]))
+      return message.channel.send({
+        embeds: [new ErrorEmbed("invalid file type. must be an image")],
+      });
+
+    const id = `avatar/${encodeURIComponent(guild.guildName.replaceAll(" ", "-"))}/${nanoid()}`;
+
+    await uploadImage(id, buffer, contentType);
+
+    await prisma.economyGuild.update({
+      where: { guildName: guild.guildName },
+      data: { avatarId: id },
+    });
+
+    return message.channel.send({
+      embeds: [new CustomEmbed(message.member, "✅ guild avatar has been updated")],
+    });
   }
 
   if (args[0].toLowerCase() == "motd") {
