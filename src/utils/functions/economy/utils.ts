@@ -19,6 +19,7 @@ import { Task } from "../../../types/Tasks";
 import { Worker, WorkerUpgrades } from "../../../types/Workers";
 import Constants from "../../Constants";
 import { logger } from "../../logger";
+import { deleteImage } from "../image";
 import { getAllGroupAccountIds } from "../moderation/alts";
 import { isUserBlacklisted } from "../users/blacklist";
 import { createProfile, hasProfile } from "../users/utils";
@@ -407,6 +408,10 @@ export async function reset() {
   await prisma.stats.deleteMany();
   logger.info("deleting guilds");
   await prisma.economyGuildMember.deleteMany();
+  const guilds = await prisma.economyGuild.findMany({ select: { avatarId: true } });
+  for (const guild of guilds) {
+    if (guild.avatarId) await deleteImage(guild.avatarId);
+  }
   await prisma.economyGuild.deleteMany();
   logger.info("deleting auctions");
   await prisma.auction.deleteMany({ where: { sold: false } });
