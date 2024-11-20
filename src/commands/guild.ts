@@ -47,7 +47,7 @@ import {
   userExists,
 } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
-import { uploadImage } from "../utils/functions/image";
+import { deleteImage, uploadImage } from "../utils/functions/image";
 import { getAllGroupAccountIds } from "../utils/functions/moderation/alts";
 import PageManager from "../utils/functions/page";
 import { cleanString } from "../utils/functions/string";
@@ -924,6 +924,24 @@ async function run(
 
     if (guild.ownerId !== message.author.id) {
       return send({ embeds: [new ErrorEmbed("you are not the guild owner")] });
+    }
+
+    if (args[1]?.toLowerCase() === "remove") {
+      if (!guild.avatarId) {
+        return send({ embeds: [new ErrorEmbed("your guld does not have an avatar")] });
+      }
+
+      await deleteImage(guild.avatarId);
+      await prisma.economyGuild.update({
+        where: {
+          guildName: guild.guildName,
+        },
+        data: {
+          avatarId: null,
+        },
+      });
+
+      return send({ embeds: [new CustomEmbed(message.member, "✅ guild avatar removed")] });
     }
 
     const msg = await send({
