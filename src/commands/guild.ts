@@ -239,9 +239,12 @@ async function run(
         `you are not in a guild. you can create one with ${prefix}guild create or join one if you have been invited`,
       );
     } else {
+      if (guild.avatarId) embed.setThumbnail(`https://cdn.nypsi.xyz/${guild.avatarId}`);
       embed.setHeader(
         guild.guildName,
-        await getLastKnownAvatar(guild.ownerId),
+        guild.avatarId
+          ? `https://cdn.nypsi.xyz/${guild.avatarId}`
+          : await getLastKnownAvatar(guild.ownerId),
         `https://nypsi.xyz/guild/${encodeURIComponent(guild.guildName.replaceAll(" ", "-"))}`,
       );
       // embed.setDescription(guild.motd + `\n\n**bank** $${guild.balance.toLocaleString()}\n**xp** ${guild.xp.toLocaleString()}`)
