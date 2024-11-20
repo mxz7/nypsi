@@ -20,7 +20,7 @@ import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Comman
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { daysAgo, formatDate } from "../utils/functions/date";
-import { addBalance, getBalance, removeBalance } from "../utils/functions/economy/balance";
+import { getBalance, removeBalance } from "../utils/functions/economy/balance";
 import {
   RemoveMemberMode,
   addGuildUpgrade,
@@ -49,7 +49,6 @@ import { getPrefix } from "../utils/functions/guilds/utils";
 import { getAllGroupAccountIds } from "../utils/functions/moderation/alts";
 import PageManager from "../utils/functions/page";
 import { cleanString } from "../utils/functions/string";
-import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications";
 import { getLastKnownAvatar } from "../utils/functions/users/tag";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import ms = require("ms");
@@ -634,32 +633,6 @@ async function run(
     guild = await getGuildByName(args.join(" "));
 
     if (!guild) return;
-
-    for (const guildMember of guild.members) {
-      const contributedMoney = guildMember.contributedMoney;
-
-      if (contributedMoney > 100) {
-        await addBalance(guildMember.userId, Math.floor(Number(contributedMoney) * 0.25));
-
-        if ((await getDmSettings(guildMember.userId)).other) {
-          const embed = new CustomEmbed().setColor(Constants.EMBED_SUCCESS_COLOR);
-
-          embed.setDescription(
-            `since you contributed money to this guild, you have been repaid $**${Math.floor(
-              Number(contributedMoney) * 0.25,
-            ).toLocaleString()}**`,
-          );
-
-          addNotificationToQueue({
-            memberId: guildMember.userId,
-            payload: {
-              content: `${guild.guildName} has been deleted`,
-              embed: embed,
-            },
-          });
-        }
-      }
-    }
 
     await deleteGuild(guild.guildName);
 
