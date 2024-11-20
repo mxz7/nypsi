@@ -110,10 +110,6 @@ export default {
       },
     },
     nypsi: {
-      MENTION_QUEUE: "nypsi:mention:queue",
-      MENTION_DELAY: "nypsi:mention:delay",
-      MENTION_MAX: "nypsi:mention:max",
-      MENTION_DM_TEKOH_THRESHOLD: "nypsi:mention:warn",
       CAPTCHA_VERIFIED: "nypsi:captcha_verified",
       DM_QUEUE: "nypsi:dmqueue",
       INLINE_QUEUE: "nypsi:inlinequeue",
