@@ -1,4 +1,4 @@
-import { PutObjectCommand } from "@aws-sdk/client-s3";
+import { DeleteObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { Image, ImageSuggestion } from "@prisma/client";
 import { User, WebhookClient } from "discord.js";
 import { parse } from "twemoji-parser";
@@ -165,5 +165,11 @@ export async function uploadImage(id: string, buffer: Buffer, ContentType: strin
     prisma.images.create({ data: { id, bytes: buffer.byteLength } }),
   ]);
 
-  await redis.set(`${Constants.redis.cache.IMAGE}`, "y", "EX", 86400);
+  await redis.set(`${Constants.redis.cache.IMAGE}:${id}`, "y", "EX", 86400);
+}
+
+export async function deleteImage(id: string) {
+  await s3.send(new DeleteObjectCommand({ Bucket: process.env.S3_BUCKET, Key: id }));
+  await prisma.images.delete({ where: { id } });
+  await redis.del(`${Constants.redis.cache.IMAGE}:${id}`);
 }
