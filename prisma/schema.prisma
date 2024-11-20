@@ -739,6 +739,9 @@ model EconomyGuild {
   level     Int      @default(1)
   motd      String   @default("/guild motd")
 
+  avatarId String?
+  avatar   Images? @relation(fields: [avatarId], references: [id], onDelete: SetNull)
+
   owner   Economy @relation(fields: [ownerId], references: [userId], onDelete: Cascade)
   ownerId String  @unique
 
@@ -887,7 +890,8 @@ model BotMetrics {
 
 // for specific image hosting on cdn.nypsi.xyz
 model Images {
-  id        String   @id
-  createdAt DateTime @default(now())
-  bytes     BigInt
+  id           String         @id
+  createdAt    DateTime       @default(now())
+  bytes        BigInt
+  EconomyGuild EconomyGuild[]
 }

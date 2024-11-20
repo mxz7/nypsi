@@ -1,6 +1,6 @@
 {
   "name": "nypsi",
-  "version": "8.8.2",
+  "version": "8.9.0",
   "description": "",
   "main": "dist/index.js",
   "scripts": {

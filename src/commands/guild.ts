@@ -14,13 +14,14 @@ import {
   MessageEditOptions,
 } from "discord.js";
 import { sort } from "fast-sort";
+import { nanoid } from "nanoid";
 import prisma from "../init/database";
 import redis from "../init/redis";
 import { Command, NypsiCommandInteraction, NypsiMessage } from "../models/Command";
 import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders";
 import Constants from "../utils/Constants";
 import { daysAgo, formatDate } from "../utils/functions/date";
-import { addBalance, getBalance, removeBalance } from "../utils/functions/economy/balance";
+import { getBalance, removeBalance } from "../utils/functions/economy/balance";
 import {
   RemoveMemberMode,
   addGuildUpgrade,
@@ -46,13 +47,14 @@ import {
   userExists,
 } from "../utils/functions/economy/utils";
 import { getPrefix } from "../utils/functions/guilds/utils";
+import { deleteImage, uploadImage } from "../utils/functions/image";
 import { getAllGroupAccountIds } from "../utils/functions/moderation/alts";
 import PageManager from "../utils/functions/page";
 import { cleanString } from "../utils/functions/string";
-import { addNotificationToQueue, getDmSettings } from "../utils/functions/users/notifications";
 import { getLastKnownAvatar } from "../utils/functions/users/tag";
 import { addCooldown, getResponse, onCooldown } from "../utils/handlers/cooldownhandler";
 import ms = require("ms");
+import sharp = require("sharp");
 
 const cmd = new Command("guild", "create and manage your guild/clan", "money")
   .setAliases(["g", "clan"])
@@ -154,6 +156,10 @@ const filter = [
   "kick",
   "forcekick",
   "noguild",
+  "avatar",
+  "pfp",
+  "picture",
+  "icon",
 ];
 
 const invited = new Set<string>();
@@ -234,9 +240,10 @@ async function run(
         `you are not in a guild. you can create one with ${prefix}guild create or join one if you have been invited`,
       );
     } else {
+      if (guild.avatarId) embed.setThumbnail(`https://cdn.nypsi.xyz/${guild.avatarId}`);
       embed.setHeader(
         guild.guildName,
-        await getLastKnownAvatar(guild.ownerId),
+        guild.avatarId ? undefined : await getLastKnownAvatar(guild.ownerId),
         `https://nypsi.xyz/guild/${encodeURIComponent(guild.guildName.replaceAll(" ", "-"))}`,
       );
       // embed.setDescription(guild.motd + `\n\n**bank** $${guild.balance.toLocaleString()}\n**xp** ${guild.xp.toLocaleString()}`)
@@ -635,32 +642,6 @@ async function run(
 
     if (!guild) return;
 
-    for (const guildMember of guild.members) {
-      const contributedMoney = guildMember.contributedMoney;
-
-      if (contributedMoney > 100) {
-        await addBalance(guildMember.userId, Math.floor(Number(contributedMoney) * 0.25));
-
-        if ((await getDmSettings(guildMember.userId)).other) {
-          const embed = new CustomEmbed().setColor(Constants.EMBED_SUCCESS_COLOR);
-
-          embed.setDescription(
-            `since you contributed money to this guild, you have been repaid $**${Math.floor(
-              Number(contributedMoney) * 0.25,
-            ).toLocaleString()}**`,
-          );
-
-          addNotificationToQueue({
-            memberId: guildMember.userId,
-            payload: {
-              content: `${guild.guildName} has been deleted`,
-              embed: embed,
-            },
-          });
-        }
-      }
-    }
-
     await deleteGuild(guild.guildName);
 
     return send({
@@ -935,6 +916,114 @@ async function run(
     );
 
     return send({ embeds: [embed] });
+  }
+
+  if (["avatar", "pfp", "icon", "picture"].includes(args[0].toLowerCase())) {
+    if (!guild) {
+      return send({ embeds: [new ErrorEmbed("you're not in a guild")] });
+    }
+
+    if (guild.ownerId !== message.author.id) {
+      return send({ embeds: [new ErrorEmbed("you are not the guild owner")] });
+    }
+
+    if (args[1]?.toLowerCase() === "remove") {
+      if (!guild.avatarId) {
+        return send({ embeds: [new ErrorEmbed("your guld does not have an avatar")] });
+      }
+
+      await deleteImage(guild.avatarId);
+      await prisma.economyGuild.update({
+        where: {
+          guildName: guild.guildName,
+        },
+        data: {
+          avatarId: null,
+        },
+      });
+
+      return send({ embeds: [new CustomEmbed(message.member, "✅ guild avatar removed")] });
+    }
+
+    const msg = await send({
+      embeds: [
+        new CustomEmbed(
+          message.member,
+          "10MB max file size\n\nsend a picture in the channel",
+        ).setHeader("guild avatar", message.author.avatarURL()),
+      ],
+    });
+
+    const res = await message.channel
+      .awaitMessages({
+        filter: (m) => m.author.id === message.author.id,
+        max: 1,
+        time: 60000,
+        errors: ["time"],
+      })
+      .then((r) => r.first())
+      .catch(() => {
+        msg.edit({
+          embeds: [new ErrorEmbed("expired")],
+        });
+      });
+
+    if (!res) return;
+
+    const attachment = res.attachments.first();
+
+    if (!attachment)
+      return message.channel.send({ embeds: [new ErrorEmbed("you must send an image")] });
+
+    if (attachment.size > 10e6)
+      return message.channel.send({
+        embeds: [new ErrorEmbed("file too big. max size: 10MB")],
+      });
+
+    if (!["jpeg", "jpg", "gif", "png", "webp"].includes(attachment.contentType.split("/")[1]))
+      return message.channel.send({
+        embeds: [new ErrorEmbed("invalid file type. must be an image")],
+      });
+
+    const imageRes = await fetch(attachment.url);
+
+    if (imageRes.status !== 200)
+      return message.channel.send({ embeds: [new ErrorEmbed("failed to download image")] });
+
+    const arrayBuffer = await imageRes.arrayBuffer();
+
+    const buffer = await sharp(arrayBuffer)
+      .resize({ width: 256, height: 256, fit: "cover" })
+      .toBuffer();
+
+    const contentType = imageRes.headers.get("content-type");
+
+    if (!["jpeg", "jpg", "gif", "png", "webp"].includes(contentType.split("/")[1]))
+      return message.channel.send({
+        embeds: [new ErrorEmbed("invalid file type. must be an image")],
+      });
+
+    if (guild.avatarId) {
+      await deleteImage(guild.avatarId);
+
+      await prisma.economyGuild.update({
+        where: { guildName: guild.guildName },
+        data: { avatarId: null },
+      });
+    }
+
+    const id = `avatar/${encodeURIComponent(guild.guildName.replaceAll(" ", "-"))}/${nanoid()}`;
+
+    await uploadImage(id, buffer, contentType);
+
+    await prisma.economyGuild.update({
+      where: { guildName: guild.guildName },
+      data: { avatarId: id },
+    });
+
+    return message.channel.send({
+      embeds: [new CustomEmbed(message.member, "✅ guild avatar has been updated")],
+    });
   }
 
   if (args[0].toLowerCase() == "motd") {
