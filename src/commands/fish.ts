@@ -353,9 +353,15 @@ async function doFish(
     }
   }
 
-  const total = Array.from(foundItems.entries())
-    .map((i) => (["money", "xp"].includes(i[0]) ? 0 : i[1]))
-    .reduce((a, b) => a + b);
+  let total = 0;
+
+  try {
+    total = Array.from(foundItems.entries())
+      .map((i) => (["money", "xp"].includes(i[0]) ? 0 : i[1]))
+      .reduce((a, b) => a + b);
+  } catch {
+    total = 0;
+  }
 
   const earnedXp = await calcEarnedHFMXp(member, total);
 
