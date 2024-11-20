@@ -15,6 +15,7 @@ import { CustomEmbed, ErrorEmbed } from "../models/EmbedBuilders.js";
 import Constants from "../utils/Constants";
 import { imageExists, uploadImage } from "../utils/functions/image";
 import { getMember } from "../utils/functions/member";
+import { logger } from "../utils/logger";
 import sharp = require("sharp");
 
 const cmd = new Command("color", "get a random hex color code", "info").setAliases(["colour"]);
@@ -62,25 +63,7 @@ async function run(
     embed.setHeader(member.displayHexColor);
   }
 
-  const id = `colour/${color}/54x42`;
-  const promises: Promise<void>[] = [];
-
-  if (await imageExists(id)) {
-    embed.setImage(`https://cdn.nypsi.xyz/${id}`);
-  } else {
-    embed.setImage(`https://singlecolorimage.com/get/${color}/54x42`);
-
-    promises.push(
-      (async () => {
-        const res = await fetch(`https://singlecolorimage.com/get/${color}/54x42`);
-
-        if (res.ok && res.status === 200) {
-          const arrayBuffer = await res.arrayBuffer();
-          await uploadImage(id, Buffer.from(arrayBuffer), "image/png");
-        }
-      })(),
-    );
-  }
+  embed.setImage(`https://singlecolorimage.com/get/${color}/54x42`);
 
   const row = new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(
     new ButtonBuilder().setStyle(ButtonStyle.Secondary).setCustomId("circle").setLabel("circle"),
@@ -109,11 +92,11 @@ async function run(
     const circleId = `colour/${color}/128x128-circle`;
 
     if (!(await imageExists(circleId))) {
-      await Promise.all(promises);
-      const res = await fetch(`https://cdn.nypsi.xyz/${id}`);
+      const res = await fetch(`https://singlecolorimage.com/get/${color}/32x32`);
 
       if (!res.ok || res.status !== 200) {
         msg.edit({ components: [] });
+        logger.error("invalid response from singlecolorimage.com");
         return interaction
           .reply({ embeds: [new ErrorEmbed("failed to generate circle")] })
           .catch(() =>
