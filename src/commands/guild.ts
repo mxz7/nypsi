@@ -998,6 +998,15 @@ async function run(
         embeds: [new ErrorEmbed("invalid file type. must be an image")],
       });
 
+    if (guild.avatarId) {
+      await deleteImage(guild.avatarId);
+
+      await prisma.economyGuild.update({
+        where: { guildName: guild.guildName },
+        data: { avatarId: null },
+      });
+    }
+
     const id = `avatar/${encodeURIComponent(guild.guildName.replaceAll(" ", "-"))}/${nanoid()}`;
 
     await uploadImage(id, buffer, contentType);
