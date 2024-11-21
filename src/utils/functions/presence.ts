@@ -29,7 +29,7 @@ export function randomPresence(): ActivitiesOptions {
     },
     {
       name: "this",
-      type: ActivityType.Watching,
+      type: ActivityType.Streaming,
       url: "https://www.youtube.com/watch?v=7fMrijCFVdE",
     },
   ];
